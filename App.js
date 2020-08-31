@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, Button, Image, View, TextInput } from 'react-native';
 
 export default function App() {	
-	const [username, setUsername] = useState('');
+	const [username, setUsername] = useState(''); //creates a variable "username" initialized to '', along with an updater function "setUsername()"
 	const [password, setPassword] = useState('');
 	
 	const readValues = () => {
