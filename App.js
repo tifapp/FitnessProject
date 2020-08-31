@@ -19,7 +19,7 @@ export default function App() {
 		<Text>Login Screen</Text>
 		
 		<TextInput
-		  style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
+		  style={{ height: 40 , borderColor: 'gray', borderWidth: 1 }}
 		  placeholder={"username"}
           onChangeText={(text) => setUsername(text)}
 		  value={username}
