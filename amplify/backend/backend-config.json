@@ -1,0 +1,10 @@
+{
+  "auth": {
+    "fitnessprojecta8f49cfe": {
+      "service": "Cognito",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false
+    }
+  }
+}

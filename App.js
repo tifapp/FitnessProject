@@ -1,43 +1,23 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import { StyleSheet, Text, Button, Image, View, TextInput } from 'react-native';
+import { withAuthenticator } from 'aws-amplify-react-native';
+import Amplify from 'aws-amplify';
+// Get the aws resources configuration parameters
+import awsconfig from './aws-exports'; // if you are using Amplify CLI
 
-export default function App() {	
-	const [username, setUsername] = useState(''); //creates a variable "username" initialized to '', along with an updater function "setUsername()"
-	const [password, setPassword] = useState('');
-	
-	const readValues = () => {
-		if (username == "Sean" && password == "pass") {
-			alert('yes');
-		} else {
-			alert('no');
-		}
-	}
+Amplify.configure(awsconfig);
 
-	return (
-	  <View>
-		<Text>Login Screen</Text>
-		
-		<TextInput
-		  style={{ height: 40 , borderColor: 'gray', borderWidth: 1 }}
-		  placeholder={"username"}
-          onChangeText={(text) => setUsername(text)}
-		  value={username}
-		/>
-		<TextInput
-		  style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
-		  placeholder={"password"}
-          onChangeText={(text) => setPassword(text)}
-		  value={password}
-		/>
-		<Button
-			title="Submit"
-			onPress={readValues}
-		/>
-	  </View>
-	);
+const App = () => {	
+  return (
+    <View style={styles.container}>
+      <Text>Open up App.js to start working on your app!</Text>
+      <StatusBar style="auto" />
+    </View>
+  );
 }
 
+export default withAuthenticator(App);
 
 const styles = StyleSheet.create({
   container: {
