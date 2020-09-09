@@ -42,7 +42,7 @@ const App = () => {
 	  <TextInput
 		  style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
 		  placeholder={"new user"}
-          onChangeText={(text) => setUsername(text)}
+          onChangeText={setUsername}
 		  value={username}
 		/>
 
