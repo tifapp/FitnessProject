@@ -2,15 +2,13 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import { StyleSheet, Text, Button, Image, View, TextInput } from 'react-native';
 import { withAuthenticator } from 'aws-amplify-react-native';
-import Amplify from 'aws-amplify';
 // Get the aws resources configuration parameters
 import awsconfig from './aws-exports'; // if you are using Amplify CLI
-
-Amplify.configure(awsconfig);
-
-import { API, graphqlOperation } from "aws-amplify";
+import { Amplify, API, graphqlOperation } from "aws-amplify";
 import { createUser, updateUser, deleteUser } from './src/graphql/mutations';
 import { listUsers } from './src/graphql/queries';
+
+Amplify.configure(awsconfig);
 
 const App = () => {	
   const [username, setUsername] = useState('');
