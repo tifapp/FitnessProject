@@ -16,5 +16,23 @@
         "fitnessprojecta8f49cfe": {}
       }
     }
+  },
+  "posts": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-fitnessproject-posts-32457-authRole",
+      "UnauthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-posts-32457-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-posts-32457-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-fitnessproject-posts-32457-deployment",
+      "UnauthRoleName": "amplify-fitnessproject-posts-32457-unauthRole",
+      "StackName": "amplify-fitnessproject-posts-32457",
+      "StackId": "arn:aws:cloudformation:us-west-2:213277979580:stack/amplify-fitnessproject-posts-32457/b47ce090-f73d-11ea-8de9-0aab9126761b",
+      "AmplifyAppId": "d19kzf7eu35pq1"
+    },
+    "categories": {
+      "auth": {
+        "fitnessprojecta8f49cfe": {}
+      }
+    }
   }
 }

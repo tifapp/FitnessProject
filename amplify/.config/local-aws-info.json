@@ -3,5 +3,10 @@
         "configLevel": "project",
         "useProfile": true,
         "profileName": "default"
+    },
+    "posts": {
+        "configLevel": "project",
+        "useProfile": true,
+        "profileName": "surya"
     }
 }
