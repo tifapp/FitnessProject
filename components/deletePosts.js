@@ -13,9 +13,7 @@ export default function DeleteItem({ item, pressHandler, deleteUsersAsync }) {
     <View>
       <Text style={styles.check}>{item.name}</Text>
       <Button
-        onPress={() => (
-          pressHandler(item.id), deleteUsersAsync(item.id, item.name)
-        )}
+        onPress={() => (pressHandler(item.id), deleteUsersAsync(item.id))}
         title="delete"
         color="blue"
       />

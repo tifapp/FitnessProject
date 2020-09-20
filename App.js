@@ -54,17 +54,11 @@ const App = () => {
     }
   };
 
-  const deleteUsersAsync = async (val, post) => {
+  const deleteUsersAsync = async (val) => {
     try {
-      console.log("check");
-      console.log(val);
-      console.log(post);
-      const deleteUser = { id: val, name: post };
-      const remove = await API.graphql(
-        graphqlOperation(deleteUser, { input: deleteUser })
-      );
+      await API.graphql(graphqlOperation(deleteUser, { input: { id: val } }));
     } catch {
-      console.log("error: ", err);
+      console.log("error: ");
     }
   };
 
