@@ -10,52 +10,33 @@ import { listUsers } from './src/graphql/queries';
 
 Amplify.configure(awsconfig);
 
-const App = () => {	
-  const [username, setUsername] = useState('');
-  const [users, setUsers] = useState([]);
-
-	const addUserAsync = async () => {
-	  const newUser = { id : Date.now(), name: username };
-	  try {
-		await API.graphql(graphqlOperation(createUser, {input: newUser}));
-		console.log('success');
-	  } catch (err) {
-		console.log('error: ', err);
-	  }
-	};
-	
-	const showUsersAsync = async () => {
-	  try {
-		const query = await API.graphql(graphqlOperation(listUsers));
-		setUsers(query.data.listUsers.items);
-		console.log('success', users);
-	  } catch (err) {
-		console.log('error: ', err);
-	  }
-	};
-
+function HomeScreen() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-	  <TextInput
-		  style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
-		  placeholder={"new user"}
-          onChangeText={setUsername}
-		  value={username}
-		/>
-
-	  <Button onPress={addUserAsync} title="Add User" color="#eeaa55" />
-	  <Button onPress={showUsersAsync} title="List All Users" color="#eeaa55" />
-	  
-      <Text>All users:</Text>
-	  {users.map((book, index) => (
-		  <View key={index}>
-			<Text>{book.name}</Text>
-		  </View>
-		))}
-	  
-      <StatusBar style="auto" />
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Home!</Text>
     </View>
+  );
+}
+
+function SettingsScreen() {
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Settings!</Text>
+    </View>
+  );
+}
+
+const Tab = createBottomTabNavigator();
+
+const App = () => {	
+  return (
+    <NavigationContainer>
+      <Tab.Navigator>
+        <Tab.Screen name="Groups" component={GroupScreen} />
+        <Tab.Screen name="Users" component={UsersScreen} />
+        <Tab.Screen name="Profile" component={ProfileScreen} />
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 }
 
