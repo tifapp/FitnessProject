@@ -8,9 +8,15 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-export default function DeleteItem({ item, pressHandler, deleteUsersAsync }) {
+export default function DeleteItem({
+  item,
+  pressHandler,
+  deleteUsersAsync,
+  userVal,
+}) {
   return (
     <View>
+      <Text>{userVal}</Text>
       <Text style={styles.check}>{item.name}</Text>
       <Button
         onPress={() => (pressHandler(item.id), deleteUsersAsync(item.id))}

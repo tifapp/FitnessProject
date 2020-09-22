@@ -14,7 +14,7 @@ import {
 import { withAuthenticator } from "aws-amplify-react-native";
 // Get the aws resources configuration parameters
 import awsconfig from "./aws-exports"; // if you are using Amplify CLI
-import { Amplify, API, graphqlOperation } from "aws-amplify";
+import { Amplify, API, Auth, graphqlOperation } from "aws-amplify";
 import { createUser, updateUser, deleteUser } from "./src/graphql/mutations";
 import { DataStore, Predicates } from "@aws-amplify/datastore";
 import { listUsers } from "./src/graphql/queries";
@@ -27,6 +27,12 @@ Amplify.configure(awsconfig);
 const App = () => {
   const [username, setUsername] = useState("");
   const [users, setUsers] = useState([]);
+  const [userVal, setUserVal] = useState("");
+
+  const usernameVal = async () => {
+    let info = await Auth.currentUserInfo();
+    setUserVal(info.attributes.email);
+  };
 
   const pressHandler = (key) => {
     setUsers((users) => {
@@ -76,7 +82,7 @@ const App = () => {
       <Button
         onPress={() => {
           username != ""
-            ? (addUserAsync(), showUsersAsync())
+            ? (addUserAsync(), showUsersAsync(), usernameVal())
             : alert("No text detected in text field");
         }}
         title="Add Post"
@@ -94,6 +100,7 @@ const App = () => {
         data={users}
         renderItem={({ item }) => (
           <DeleteItem
+            userVal={userVal}
             item={item}
             pressHandler={pressHandler}
             deleteUsersAsync={deleteUsersAsync}
