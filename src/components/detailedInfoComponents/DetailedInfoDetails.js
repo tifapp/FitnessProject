@@ -1,24 +1,30 @@
 import React from 'react'
 import {View, StyleSheet, Text, TextInput, TouchableOpacity} from 'react-native'
 import { Entypo } from '@expo/vector-icons'; 
+import { useNavigation } from '@react-navigation/native';
 
-const DetailedInfoDetails = ({navigation, label, field, setField}) => {
+
+const DetailedInfoDetails = ({label, field, setField}) => {
+    const navigation = useNavigation();
+
     return (
         <View>
             <TouchableOpacity onPress = {() => 
-                { (label == 'bio') ? navigation.navigate('Bio') : navigation.navigate('Goals') }}
+                { (label == 'bio') ? 
+                    navigation.navigate('Bio', {field : field}) : 
+                    navigation.navigate('Goals', {field : field}) 
+                }}
             >
-                <Entypo style = {styles.editIconStyle}name="edit" size={24} color="black" />
+                <Entypo style = {styles.editIconStyle} name="edit" size={24} color="black" />
             </TouchableOpacity>
 
             <TextInput 
                 style = {styles.textInputStyle}
-                placeholder = {`Enter your ${label}`} 
+                placeholder = {`Enter your ${label}!`} 
                 multiline = {true}
-                scrollEnabled = {false}
                 autoCorrect = {false}
                 value = {field}
-                onChangeText = {setField}
+                //onChangeText = {setField}
                 editable = {false}
             />
         </View>
@@ -35,7 +41,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         marginHorizontal: 15,
         paddingHorizontal: 10,
-        height: 150,
+        height: 100,
         marginBottom: 20,
         flex: 1,
         backgroundColor: 'white'

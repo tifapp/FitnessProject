@@ -17,10 +17,7 @@ export default () => {
             if (!response.cancelled) {
                 setImageURL(response.uri)
             }
-            else {
-                setImageURL('')
-            }
-    
+            
             console.log(response)
         }
         else {
@@ -41,9 +38,7 @@ export default () => {
             if (!response.cancelled) {
                 setImageURL(response.uri)
             }
-            else {
-                setImageURL('')
-            }
+            
             console.log(response)
         }
         else {
