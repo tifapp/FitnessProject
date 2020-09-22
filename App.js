@@ -31,30 +31,13 @@ const App = () => {
 
 	const uploadImageToStorage = async (uri) => {
 		try {
-			const { identityId } = await Auth.currentCredentials();
-			const query = await Auth.currentUserInfo();
-			console.log('success finding user id', query, query.attributes.sub);
-
-			const [, , , extension] = /([^.]+)(\.(\w+))?$/.exec(uri);
-
 			const response = await fetch(uri);
 			const blob = await response.blob();
-			const visibility = 'public';
-			const key = `${visibility}/${identityId}/${query.attributes.sub}${extension && '.'}${extension}`;
 
-			Storage.put(key, blob, {
-				contentType: 'image/jpeg',
-				level: 'public'
+			Storage.put('profileimage.jpeg', blob, {
+				level: 'protected',
+				contentType: 'image/jpeg'
 			})
-			
-			try {
-				await API.graphql(graphqlOperation(createPicture, { input: { id: key } }));
-				console.log('success uploading');
-				
-				setSelectedImage({ localUri: uri });
-			} catch (err) {
-				console.log('error uploading: ', err);
-			}
 		} catch (err) {
 			console.log(err)
 		}
@@ -65,30 +48,38 @@ const App = () => {
 	const [username, setUsername] = useState('');
 	const [users, setUsers] = useState([]);
 
-    //useEffect
+    //componentDidMount event with useEffect
     useEffect(() => {
         console.log('useEffect has been called!');
-		setFullName({name:'Marco',familyName: 'Shaw'});
 		//check if user exists with fetch; if doesn't, create a user
 		//download profile image if one exists by...;
-		//either reading user's profile image field and then download with the key
 
-		Storage.get('test.txt', { 
+		const { identityId } = await Auth.currentCredentials(); //make sure this format works plz
+		console.log('identityId is: ', identityId);
+
+		try {
+			await API.graphql(graphqlOperation(updateUser, { input: { id: 'iwjaroajwro;i', identityId: identityId } })); //update user's identityid if they don't have one
+			console.log('success uploading');
+			
+			setSelectedImage({ localUri: uri });
+		} catch (err) {
+			console.log('error uploading: ', err);
+		}
+
+		//downloading "profileimage" with the user's identityid. assuming auto overwriting, this is better. we'll have to save the user's identityid in the backend first though. ^
+		Storage.get('profileimage.jpeg', { 
 			level: 'protected', 
-			identityId: 'xxxxxxx' // the identityId of that user
+			identityId: identityId // the identityId of that user
 		})
-		.then(result => console.log(result)) //what does this return???
+		.then(result => console.log(result)) //what does this return??? uri???
 		.catch(err => console.log(err));
-		
-
-		//or simply downloading "profileimage" with the user's identityid. assuming auto overwriting, this is better.
-		//okay we'll try using protected since it seems more secure (even though it's absolute busted since we also need to keep track of identityid...)
 
 		//can't find any docs that clearly state if uploading a file with the same name overwrites it; probably not but we'll test it here
 		//otherwise we'll have to remove the old picture before updating it when uploading a profile pic
 
 		//test by closing and reopening the app; the selected profile image should show up persistently
-    },[]); //Pass Array as second argument
+		//check on the s3 console as well
+    },[]); //Pass empty array as second argument to mimic componentDidMount()
 
 	const addUserAsync = async () => {
 		const newUser = { id: Date.now(), name: username };
@@ -123,8 +114,6 @@ const App = () => {
 		}
 	};
 
-
-
 	return (
 		<View style={styles.container}>
 			<Image
@@ -151,20 +140,6 @@ const App = () => {
 					<Text>{book.name}</Text>
 				</View>
 			))} */}
-
-			<Image
-				source={{ uri: pictures.length > 0 ? pictures[0].file.key : '' }}
-				style={styles.thumbnail}
-			/>
-			{/* {
-				pictures.map((p, i) => (
-					<Image
-						key={i}
-						source={{ uri: p.key }}
-						style={styles.thumbnail}
-					/>
-				))
-			} */}
 
 			<StatusBar style="auto" />
 		</View>
