@@ -1,0 +1,10 @@
+type Picture @model @auth(
+    rules: [
+      {
+        allow: owner
+        operations: [create, update, read]
+      }
+    ]
+  ) {
+  id: ID!
+}
