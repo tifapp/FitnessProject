@@ -4,7 +4,7 @@ import { StyleSheet, Text, Button, Image, View, TextInput } from 'react-native';
 import { withAuthenticator } from 'aws-amplify-react-native';
 // Get the aws resources configuration parameters
 import awsconfig from './aws-exports'; // if you are using Amplify CLI
-import { Auth, Amplify, API, graphqlOperation } from "aws-amplify";
+import { Auth, Amplify, API, graphqlOperation, Storage } from "aws-amplify";
 import { createUser, updateUser, deleteUser, createPicture } from './src/graphql/mutations';
 import { listUsers, listPictures } from './src/graphql/queries';
 import * as ImagePicker from 'expo-image-picker';
@@ -12,8 +12,6 @@ import * as ImagePicker from 'expo-image-picker';
 Amplify.configure(awsconfig);
 
 const App = () => {
-	const [selectedImage, setSelectedImage] = React.useState(null);
-
 	const openImagePickerAsync = async () => {
 		let permissionResult = await ImagePicker.requestCameraRollPermissionsAsync();
 
@@ -28,45 +26,69 @@ const App = () => {
 			return;
 		}
 
+		uploadImageToStorage(pickerResult.uri);
+	};
+
+	const uploadImageToStorage = async (uri) => {
 		try {
+			const { identityId } = await Auth.currentCredentials();
 			const query = await Auth.currentUserInfo();
 			console.log('success finding user id', query, query.attributes.sub);
-			
-			const [, , , extension] = /([^.]+)(\.(\w+))?$/.exec(pickerResult.uri);
-			const mimeType = pickerResult.type + "/" + (extension == "jpg" ? "jpeg" : extension); //kinda hacky but idk how else to resolve to the exact mimetype with expo's image picker
 
-			const bucket = awsconfig.aws_user_files_s3_bucket;
-			const region = awsconfig.aws_user_files_s3_bucket_region;
+			const [, , , extension] = /([^.]+)(\.(\w+))?$/.exec(uri);
+
+			const response = await fetch(uri);
+			const blob = await response.blob();
 			const visibility = 'public';
-			const { identityId } = await Auth.currentCredentials();
-
 			const key = `${visibility}/${identityId}/${query.attributes.sub}${extension && '.'}${extension}`;
 
-			let selectedFile = {
-				bucket,
-				key,
-				region,
-				mimeType,
-				localUri: pickerResult.uri,
-			};
+			Storage.put(key, blob, {
+				contentType: 'image/jpeg',
+				level: 'public'
+			})
 			
-			console.log("generated key is " + mimeType);
-
 			try {
-				await API.graphql(graphqlOperation(createPicture, { input: { id: key + Date.now(), file: selectedFile } }));
+				await API.graphql(graphqlOperation(createPicture, { input: { id: key } }));
 				console.log('success uploading');
-				setSelectedImage({ localUri: pickerResult.uri });
+				
+				setSelectedImage({ localUri: uri });
 			} catch (err) {
 				console.log('error uploading: ', err);
 			}
-
 		} catch (err) {
-			console.log('error finding user id: ', err);
+			console.log(err)
 		}
-	};
+	}
+
+	const [selectedImage, setSelectedImage] = React.useState(null);
 
 	const [username, setUsername] = useState('');
 	const [users, setUsers] = useState([]);
+
+    //useEffect
+    useEffect(() => {
+        console.log('useEffect has been called!');
+		setFullName({name:'Marco',familyName: 'Shaw'});
+		//check if user exists with fetch; if doesn't, create a user
+		//download profile image if one exists by...;
+		//either reading user's profile image field and then download with the key
+
+		Storage.get('test.txt', { 
+			level: 'protected', 
+			identityId: 'xxxxxxx' // the identityId of that user
+		})
+		.then(result => console.log(result)) //what does this return???
+		.catch(err => console.log(err));
+		
+
+		//or simply downloading "profileimage" with the user's identityid. assuming auto overwriting, this is better.
+		//okay we'll try using protected since it seems more secure (even though it's absolute busted since we also need to keep track of identityid...)
+
+		//can't find any docs that clearly state if uploading a file with the same name overwrites it; probably not but we'll test it here
+		//otherwise we'll have to remove the old picture before updating it when uploading a profile pic
+
+		//test by closing and reopening the app; the selected profile image should show up persistently
+    },[]); //Pass Array as second argument
 
 	const addUserAsync = async () => {
 		const newUser = { id: Date.now(), name: username };
@@ -87,9 +109,9 @@ const App = () => {
 			console.log('error: ', err);
 		}
 	};
-	
+
 	const [pictures, setPictures] = useState([]);
-	
+
 	const showPicturesAsync = async () => {
 		try {
 			const query = await API.graphql(graphqlOperation(listPictures));
@@ -100,6 +122,8 @@ const App = () => {
 			console.log('error: ', err);
 		}
 	};
+
+
 
 	return (
 		<View style={styles.container}>
@@ -127,7 +151,7 @@ const App = () => {
 					<Text>{book.name}</Text>
 				</View>
 			))} */}
-			
+
 			<Image
 				source={{ uri: pictures.length > 0 ? pictures[0].file.key : '' }}
 				style={styles.thumbnail}
