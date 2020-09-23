@@ -10,6 +10,11 @@
       "StackName": "amplify-fitnessproject-posts-32457",
       "StackId": "arn:aws:cloudformation:us-west-2:213277979580:stack/amplify-fitnessproject-posts-32457/b47ce090-f73d-11ea-8de9-0aab9126761b",
       "AmplifyAppId": "d19kzf7eu35pq1"
+    },
+    "categories": {
+      "auth": {
+        "fitnessprojecta8f49cfe": {}
+      }
     }
   },
   "auth": {
@@ -18,11 +23,6 @@
       "providerPlugin": "awscloudformation",
       "dependsOn": [],
       "customAuth": false,
-      "providerMetadata": {
-        "s3TemplateURL": "https://s3.amazonaws.com/amplify-fitnessproject-posts-32457-deployment/amplify-cfn-templates/auth/fitnessprojecta8f49cfe-cloudformation-template.yml",
-        "logicalId": "authfitnessprojecta8f49cfe"
-      },
-      "lastPushTimeStamp": "2020-09-15T10:33:27.060Z",
       "output": {
         "AppClientSecret": "pfvekosa5ikf8r4jh1lm52gbbcfgqtn83mbe7ckho2bldf35m2a",
         "UserPoolId": "us-west-2_DnTxqq3Il",
@@ -32,7 +32,11 @@
         "IdentityPoolName": "fitnessprojecta8f49cfe_identitypool_a8f49cfe__posts",
         "UserPoolName": "fitnessprojecta8f49cfe_userpool_a8f49cfe"
       },
-      "lastPushDirHash": "ETPUagwti6Vz7eAtT13uYhkWuNo="
+      "lastPushTimeStamp": "2020-09-23T05:17:34.558Z",
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-fitnessproject-posts-32457-deployment/amplify-cfn-templates/auth/fitnessprojecta8f49cfe-cloudformation-template.yml",
+        "logicalId": "authfitnessprojecta8f49cfe"
+      }
     }
   },
   "api": {
@@ -52,12 +56,12 @@
         "GraphQLAPIIdOutput": "ljodliyzyjexha45thfnwtr3qe",
         "GraphQLAPIEndpointOutput": "https://3dm7tzc3ojd7rfeatbp4tpvi7i.appsync-api.us-west-2.amazonaws.com/graphql"
       },
+      "lastPushTimeStamp": "2020-09-23T05:17:36.482Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-fitnessproject-posts-32457-deployment/amplify-cfn-templates/api/cloudformation-template.json",
         "logicalId": "apifitnessproject"
       },
-      "lastPushTimeStamp": "2020-09-15T10:33:27.060Z",
-      "lastPushDirHash": "6IBDe9rF5gM1+s3o9KFcEnukQyE="
+      "lastPushDirHash": "OjqpDobQofF3Qzpa9ygDLDu8Os8="
     }
   }
 }

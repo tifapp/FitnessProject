@@ -1,66 +1,67 @@
 {
-    "providers": {
-        "awscloudformation": {
-            "AuthRoleName": "amplify-fitnessproject-posts-32457-authRole",
-            "UnauthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-posts-32457-unauthRole",
-            "AuthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-posts-32457-authRole",
-            "Region": "us-west-2",
-            "DeploymentBucketName": "amplify-fitnessproject-posts-32457-deployment",
-            "UnauthRoleName": "amplify-fitnessproject-posts-32457-unauthRole",
-            "StackName": "amplify-fitnessproject-posts-32457",
-            "StackId": "arn:aws:cloudformation:us-west-2:213277979580:stack/amplify-fitnessproject-posts-32457/b47ce090-f73d-11ea-8de9-0aab9126761b",
-            "AmplifyAppId": "d19kzf7eu35pq1"
-        },
-        "categories": {
-            "auth": {
-                "fitnessprojecta8f49cfe": {}
-            }
-        }
+  "providers": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-fitnessproject-posts-32457-authRole",
+      "UnauthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-posts-32457-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-posts-32457-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-fitnessproject-posts-32457-deployment",
+      "UnauthRoleName": "amplify-fitnessproject-posts-32457-unauthRole",
+      "StackName": "amplify-fitnessproject-posts-32457",
+      "StackId": "arn:aws:cloudformation:us-west-2:213277979580:stack/amplify-fitnessproject-posts-32457/b47ce090-f73d-11ea-8de9-0aab9126761b",
+      "AmplifyAppId": "d19kzf7eu35pq1"
     },
-    "auth": {
-        "fitnessprojecta8f49cfe": {
-            "service": "Cognito",
-            "providerPlugin": "awscloudformation",
-            "dependsOn": [],
-            "customAuth": false,
-            "output": {
-                "AppClientSecret": "pfvekosa5ikf8r4jh1lm52gbbcfgqtn83mbe7ckho2bldf35m2a",
-                "UserPoolId": "us-west-2_DnTxqq3Il",
-                "AppClientIDWeb": "3b8l148e1npdpkt366ha3gfjhh",
-                "AppClientID": "1rs676g1dv8dkglqbfqjemveiu",
-                "IdentityPoolId": "us-west-2:dfa4e3e1-c14a-4726-a397-47806a10791c",
-                "IdentityPoolName": "fitnessprojecta8f49cfe_identitypool_a8f49cfe__posts",
-                "UserPoolName": "fitnessprojecta8f49cfe_userpool_a8f49cfe"
-            },
-            "lastPushTimeStamp": "2020-09-19T23:58:03.735Z",
-            "providerMetadata": {
-                "s3TemplateURL": "https://s3.amazonaws.com/amplify-fitnessproject-posts-32457-deployment/amplify-cfn-templates/auth/fitnessprojecta8f49cfe-cloudformation-template.yml",
-                "logicalId": "authfitnessprojecta8f49cfe"
-            }
-        }
-    },
-    "api": {
-        "fitnessproject": {
-            "service": "AppSync",
-            "providerPlugin": "awscloudformation",
-            "output": {
-                "authConfig": {
-                    "defaultAuthentication": {
-                        "authenticationType": "AMAZON_COGNITO_USER_POOLS",
-                        "userPoolConfig": {
-                            "userPoolId": "authfitnessprojecta8f49cfe"
-                        }
-                    },
-                    "additionalAuthenticationProviders": []
-                },
-                "GraphQLAPIIdOutput": "ljodliyzyjexha45thfnwtr3qe",
-                "GraphQLAPIEndpointOutput": "https://3dm7tzc3ojd7rfeatbp4tpvi7i.appsync-api.us-west-2.amazonaws.com/graphql"
-            },
-            "lastPushTimeStamp": "2020-09-19T23:58:03.746Z",
-            "providerMetadata": {
-                "s3TemplateURL": "https://s3.amazonaws.com/amplify-fitnessproject-posts-32457-deployment/amplify-cfn-templates/api/cloudformation-template.json",
-                "logicalId": "apifitnessproject"
-            }
-        }
+    "categories": {
+      "auth": {
+        "fitnessprojecta8f49cfe": {}
+      }
     }
+  },
+  "auth": {
+    "fitnessprojecta8f49cfe": {
+      "service": "Cognito",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false,
+      "output": {
+        "AppClientSecret": "pfvekosa5ikf8r4jh1lm52gbbcfgqtn83mbe7ckho2bldf35m2a",
+        "UserPoolId": "us-west-2_DnTxqq3Il",
+        "AppClientIDWeb": "3b8l148e1npdpkt366ha3gfjhh",
+        "AppClientID": "1rs676g1dv8dkglqbfqjemveiu",
+        "IdentityPoolId": "us-west-2:dfa4e3e1-c14a-4726-a397-47806a10791c",
+        "IdentityPoolName": "fitnessprojecta8f49cfe_identitypool_a8f49cfe__posts",
+        "UserPoolName": "fitnessprojecta8f49cfe_userpool_a8f49cfe"
+      },
+      "lastPushTimeStamp": "2020-09-23T05:17:34.558Z",
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-fitnessproject-posts-32457-deployment/amplify-cfn-templates/auth/fitnessprojecta8f49cfe-cloudformation-template.yml",
+        "logicalId": "authfitnessprojecta8f49cfe"
+      }
+    }
+  },
+  "api": {
+    "fitnessproject": {
+      "service": "AppSync",
+      "providerPlugin": "awscloudformation",
+      "output": {
+        "authConfig": {
+          "defaultAuthentication": {
+            "authenticationType": "AMAZON_COGNITO_USER_POOLS",
+            "userPoolConfig": {
+              "userPoolId": "authfitnessprojecta8f49cfe"
+            }
+          },
+          "additionalAuthenticationProviders": []
+        },
+        "GraphQLAPIIdOutput": "ljodliyzyjexha45thfnwtr3qe",
+        "GraphQLAPIEndpointOutput": "https://3dm7tzc3ojd7rfeatbp4tpvi7i.appsync-api.us-west-2.amazonaws.com/graphql"
+      },
+      "lastPushTimeStamp": "2020-09-23T05:17:36.482Z",
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-fitnessproject-posts-32457-deployment/amplify-cfn-templates/api/cloudformation-template.json",
+        "logicalId": "apifitnessproject"
+      },
+      "lastPushDirHash": "OjqpDobQofF3Qzpa9ygDLDu8Os8="
+    }
+  }
 }

@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -9,15 +9,17 @@ import {
   TextInput,
   ScrollView,
   TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
   FlatList,
 } from "react-native";
 import { withAuthenticator } from "aws-amplify-react-native";
 // Get the aws resources configuration parameters
 import awsconfig from "./aws-exports"; // if you are using Amplify CLI
 import { Amplify, API, Auth, graphqlOperation } from "aws-amplify";
-import { createUser, updateUser, deleteUser } from "./src/graphql/mutations";
+import { createPost, updatePost, deletePost } from "./src/graphql/mutations";
 import { DataStore, Predicates } from "@aws-amplify/datastore";
-import { listUsers } from "./src/graphql/queries";
+import { listPosts } from "./src/graphql/queries";
 import Header from "./components/header";
 import AddPost from "./components/AddPosts";
 import DeleteItem from "./components/deletePosts";
@@ -25,95 +27,125 @@ import DeleteItem from "./components/deletePosts";
 Amplify.configure(awsconfig);
 
 const App = () => {
-  const [username, setUsername] = useState("");
-  const [users, setUsers] = useState([]);
-  const [userVal, setUserVal] = useState("");
+  const [postVal, setPostVal] = useState("");
+  const [posts, setPosts] = useState([]);
+  const [emailVal, setEmailVal] = useState("");
 
-  const usernameVal = async () => {
-    let info = await Auth.currentUserInfo();
-    setUserVal(info.attributes.email);
-  };
+  useEffect(() => {
+    showPostsAsync(), addingEmail();
+  }, []);
 
   const pressHandler = (key) => {
-    setUsers((users) => {
-      return users.filter((val) => val.id != key);
+    setPosts((posts) => {
+      return posts.filter((val) => val.id != key);
     });
   };
 
-  const addUserAsync = async () => {
-    const newUser = { id: Date.now(), name: username };
+  const sortPosts = () => {
+    posts.sort((a, b) => {
+      return a.createdAt - b.created.At;
+    });
+  };
+
+  const addingEmail = async () => {
     try {
-      await API.graphql(graphqlOperation(createUser, { input: newUser }));
+      let info = await Auth.currentUserInfo();
+      setEmailVal(info.attributes.email);
+    } catch {
+      console.log("error");
+    }
+  };
+
+  const addPostAsync = async () => {
+    const newUser = {
+      id: Date.now(),
+      name: postVal,
+      email: emailVal,
+      createdAt: new Date().toISOString(),
+    };
+    try {
+      await API.graphql(graphqlOperation(createPost, { input: newUser }));
       console.log("success");
     } catch (err) {
       console.log("error: ", err);
     }
   };
 
-  const showUsersAsync = async () => {
+  const showPostsAsync = async () => {
     try {
-      const query = await API.graphql(graphqlOperation(listUsers));
-      setUsers(query.data.listUsers.items);
-      console.log("success", users);
+      const query = await API.graphql(graphqlOperation(listPosts));
+      setPosts(query.data.listPosts.items);
     } catch (err) {
       console.log("error: ", err);
     }
   };
 
-  const deleteUsersAsync = async (val) => {
+  const deletePostsAsync = async (val) => {
     try {
-      await API.graphql(graphqlOperation(deleteUser, { input: { id: val } }));
+      await API.graphql(graphqlOperation(deletePost, { input: { id: val } }));
     } catch {
       console.log("error: ");
     }
   };
 
   return (
-    <View>
-      <Header />
-      <TextInput
-        style={styles.input}
-        multiline={true}
-        placeholder="New Post"
-        onChangeText={setUsername}
-        value={username}
-      />
+    <ScrollView
+      contentContainerStyle={{ flexGrow: 1 }}
+      keyboardShouldPersistsTaps="handled"
+    >
+      <View>
+        <Header />
+        <TextInput
+          style={styles.input}
+          multiline={true}
+          placeholder="New Post"
+          onChangeText={setPostVal}
+          value={postVal}
+        />
 
-      <Button
-        onPress={() => {
-          username != ""
-            ? (addUserAsync(), showUsersAsync(), usernameVal())
-            : alert("No text detected in text field");
-        }}
-        title="Add Post"
-        color="red"
-      />
+        <Button
+          onPress={() => {
+            postVal != ""
+              ? (addingEmail(), addPostAsync(), showPostsAsync())
+              : alert("No text detected in text field");
+          }}
+          title="Add Post"
+          color="red"
+        />
 
-      <Button onPress={showUsersAsync} title="Show All Posts" color="#eeaa55" />
-      <Button
-        onPress={deleteUsersAsync}
-        title="Delete All Posts"
-        color="#eeaa55"
-      />
+        <Button
+          onPress={() => {
+            showPostsAsync(), addingEmail();
+          }}
+          title="Show All Posts"
+          color="#eeaa55"
+        />
 
-      <FlatList
-        data={users}
-        renderItem={({ item }) => (
-          <DeleteItem
-            userVal={userVal}
-            item={item}
-            pressHandler={pressHandler}
-            deleteUsersAsync={deleteUsersAsync}
-          />
-        )}
-      />
+        <Button
+          onPress={deletePostsAsync}
+          title="Delete All Posts"
+          color="#eeaa55"
+        />
 
-      <StatusBar style="auto" />
-    </View>
+        <FlatList
+          data={posts}
+          renderItem={({ item }) => (
+            <DeleteItem
+              item={item}
+              pressHandler={pressHandler}
+              deletePostsAsync={deletePostsAsync}
+              emailVal={emailVal}
+            />
+          )}
+        />
+
+        <StatusBar style="auto" />
+      </View>
+    </ScrollView>
   );
 };
 
-export default withAuthenticator(App);
+export default withAuthenticator(App, true);
 
 const styles = StyleSheet.create({
   container: {

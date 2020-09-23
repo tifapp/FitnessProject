@@ -11,29 +11,39 @@ import {
 export default function DeleteItem({
   item,
   pressHandler,
-  deleteUsersAsync,
-  userVal,
+  deletePostsAsync,
+  emailVal,
 }) {
+  const val = emailVal === item.email;
+
   return (
     <View>
-      <Text>{userVal}</Text>
-      <Text style={styles.check}>{item.name}</Text>
-      <Button
-        onPress={() => (pressHandler(item.id), deleteUsersAsync(item.id))}
-        title="delete"
-        color="blue"
-      />
+      <View style={styles.spaceAround}>
+        <Text>{item.email}</Text>
+        <Text style={styles.check}>{item.name}</Text>
+      </View>
+
+      {val ? (
+        <Button
+          onPress={() => (pressHandler(item.id), deletePostsAsync(item.id))}
+          title="delete"
+          color="blue"
+        />
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   check: {
-    padding: 16,
+    padding: 25,
     marginTop: 16,
     borderColor: "#bbb",
     borderWidth: 1,
     borderStyle: "dashed",
     borderRadius: 10,
+  },
+  spaceAround: {
+    padding: 25,
   },
 });
