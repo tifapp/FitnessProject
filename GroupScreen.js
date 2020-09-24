@@ -41,12 +41,6 @@ export default function GroupScreen() {
     });
   };
 
-  const sortPosts = () => {
-    posts.sort((a, b) => {
-      return a.createdAt - b.created.At;
-    });
-  };
-
   const addingEmail = async () => {
     try {
       let info = await Auth.currentUserInfo();
@@ -56,13 +50,47 @@ export default function GroupScreen() {
     }
   };
 
+  async function signOut() {
+    try {
+      await Auth.signOut();
+    } catch (error) {
+      console.log("error");
+    }
+  }
+
   const addPostAsync = async () => {
+    var yearVal = new Date().getFullYear();
+    var monthVal = new Date().getMonth();
+    var dayVal = new Date().getDate();
+    var hourVal = new Date().getHours();
+    var minuteVal = new Date().getMinutes();
+    let timeCheck = "AM";
+
+    if (hourVal >= 12 && hourVal <= 23) {
+      timeCheck = "PM";
+    }
+
+    if (hourVal == 0) {
+      hourVal = hourVal + 12;
+    }
+
+    if (hourVal > 12) {
+      hourVal = hourVal - 12;
+    }
+
     const newUser = {
       id: Date.now(),
       name: postVal,
       email: emailVal,
-      createdAt: new Date().toISOString(),
+      year: yearVal,
+      month: monthVal,
+      day: dayVal,
+      hour: hourVal,
+      minute: minuteVal,
+      timeOfDay: timeCheck,
     };
+    setPostVal("");
+
     try {
       await API.graphql(graphqlOperation(createPost, { input: newUser }));
       console.log("success");
@@ -74,7 +102,12 @@ export default function GroupScreen() {
   const showPostsAsync = async () => {
     try {
       const query = await API.graphql(graphqlOperation(listPosts));
-      setPosts(query.data.listPosts.items);
+      let val = query.data.listPosts.items;
+
+      val.sort((a, b) => {
+        return b.id - a.id;
+      });
+      setPosts(val);
     } catch (err) {
       console.log("error: ", err);
     }
@@ -94,38 +127,35 @@ export default function GroupScreen() {
       keyboardShouldPersistsTaps="handled"
     >
       <View>
+        <View style={styles.signOutTop}>
+          <TouchableOpacity style={styles.top} color="red" onPress={signOut}>
+            <Text style={styles.signOutVal}>Sign Out</Text>
+          </TouchableOpacity>
+        </View>
+
         <Header />
         <TextInput
           style={styles.input}
           multiline={true}
-          placeholder="New Post"
+          placeholder="Start Typing ..."
           onChangeText={setPostVal}
           value={postVal}
+          clearButtonMode="always"
         />
-
-        <Button
-          onPress={() => {
-            postVal != ""
-              ? (addingEmail(), addPostAsync(), showPostsAsync())
-              : alert("No text detected in text field");
-          }}
-          title="Add Post"
-          color="red"
-        />
-
-        <Button
-          onPress={() => {
-            showPostsAsync(), addingEmail();
-          }}
-          title="Show All Posts"
-          color="#eeaa55"
-        />
-
-        <Button
-          onPress={deletePostsAsync}
-          title="Delete All Posts"
-          color="#eeaa55"
-        />
+        <View style={styles.spaceAround}>
+          <TouchableOpacity
+            style={styles.postButton}
+            onPress={() => {
+              postVal != ""
+                ? (addingEmail(), addPostAsync(), showPostsAsync())
+                : alert("No text detected in text field");
+            }}
+          >
+            <View>
+              <Text style={styles.val}>Add Post</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
 
         <FlatList
           data={posts}
