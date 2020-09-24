@@ -13,6 +13,8 @@ const ProfileScreen = ({navigation, route}) => {
     const [bioDetails, setBioDetails] = useState('')
     const [goalsDetails, setGoalsDetails] = useState('')
 
+    const [initialFields, setInitialFields] = useState([])
+
     const [loadUserAsync, updateUserAsync] = useDatabase()
 
     const updateDetailedInfo = () => {
@@ -21,18 +23,41 @@ const ProfileScreen = ({navigation, route}) => {
             const updatedField = route.params.updatedField
             if (label == 'bio') {
                 setBioDetails(updatedField)
-                console.log(updatedField)
+                //console.log(updatedField)
             }
             else if (label == 'goals') {
                 setGoalsDetails(updatedField)
-                console.log(updatedField)
+                //console.log(updatedField)
             }
         }
+    }
+
+    const updateInitialFields = () => {
+        const arr = [name, age, gender, bioDetails, goalsDetails]
+        setInitialFields(arr)
+    }
+
+    const areFieldsUpdated = () => {
+       
+        if (name == initialFields[0]
+            && age == initialFields[1]
+            && gender == initialFields[2] 
+            && bioDetails == initialFields[3]
+            && goalsDetails == initialFields[4]) {
+            
+            return false;
+        }
+
+        return true;
+    
     }
 
     const submitHandler = () => {
         if (name == '') {
             Alert.alert('Please enter your name!')
+        }
+        else if (!areFieldsUpdated()) {
+            Alert.alert('Profile is up to date!')
         }
         else {
             updateUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails)
@@ -41,14 +66,15 @@ const ProfileScreen = ({navigation, route}) => {
     }
 
     useEffect(() => { loadUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails, 
-                      setImageURL, setName, setAge, setGender, setBioDetails, setGoalsDetails) }, [ ])
-
+                      setImageURL, setName, setAge, setGender, setBioDetails, setGoalsDetails)
+                      updateInitialFields()}, [ ])
+    
     useEffect(() => { updateDetailedInfo() }, [route.params?.updatedField])
 
     return (
         <ScrollView style = {styles.containerStyle}>
             <View style = {styles.upperScreenStyle}>
-                <ProfilePic imageURL = {imageURL} setImageURL = {setImageURL} />
+                <ProfilePic setImageUpdated = {setImageUpdated} imageURL = {imageURL} setImageURL = {setImageURL} />
                 <BasicInfo 
                     name = {name} 
                     setName = {setName}
