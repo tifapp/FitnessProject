@@ -7,6 +7,7 @@ import awsconfig from './aws-exports'; // if you are using Amplify CLI
 import { Amplify, API, graphqlOperation } from "aws-amplify";
 import { createUser, updateUser, deleteUser } from './src/graphql/mutations';
 import { listUsers } from './src/graphql/queries';
+import { GroupScreen } from './GroupScreen';
 
 Amplify.configure(awsconfig);
 
@@ -33,8 +34,8 @@ const App = () => {
     <NavigationContainer>
       <Tab.Navigator>
         <Tab.Screen name="Groups" component={GroupScreen} />
-        <Tab.Screen name="Users" component={UsersScreen} />
-        <Tab.Screen name="Profile" component={ProfileScreen} />
+        //<Tab.Screen name="Users" component={UsersScreen} />
+        //<Tab.Screen name="Profile" component={ProfileScreen} />
       </Tab.Navigator>
     </NavigationContainer>
   );

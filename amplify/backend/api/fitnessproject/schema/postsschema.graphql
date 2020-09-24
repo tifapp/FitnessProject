@@ -1,0 +1,8 @@
+type Post @model {
+  id: ID!
+  name: String!
+  email: String!
+  description: String
+  group: String
+  createdAt: String!
+}
