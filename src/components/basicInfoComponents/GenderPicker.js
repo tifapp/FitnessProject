@@ -1,7 +1,18 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import {View, StyleSheet, Text, Picker} from 'react-native'
 
-const GenderPicker = ({selectedValue, setSelectedValue}) => {
+const GenderPicker = ({field, selectedValue, setSelectedValue}) => {
+    const fieldHandler = () => {
+        if (field == '') {
+            setSelectedValue('Male')
+        }
+        else {
+            setSelectedValue(field)
+        }
+    }
+
+    useEffect(() => fieldHandler(), [ ])
+
     return (
         <View>
             <Picker

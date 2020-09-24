@@ -1,21 +1,27 @@
-import React, {useState} from 'react'
+import React, {useEffect, useImperativeHandle, useState} from 'react'
 import {View, StyleSheet, Text, Modal, Picker} from 'react-native'
 import { AntDesign } from '@expo/vector-icons'
 import AgePicker from './AgePicker'
 import GenderPicker from './GenderPicker'
 
-const Selector = ({label, modalOpen, setModalOpen, updateField}) => {
+const Selector = ({label, modalOpen, setModalOpen, field, updateField}) => {
+
     const [selectedValue, setSelectedValue] = useState('');
-    
+    //console.log(label + ': ' + s)
+
+    const fieldHandler = () => {
+        if (selectedValue != field) {
+            console.log('hello')
+            updateField(selectedValue) 
+        }
+        setModalOpen(false)
+    }
     return (
         <Modal transparent = {true} visible = {modalOpen} animationType ='slide'>
 
             <View style = {styles.modalStyle} >
                 <AntDesign 
-                    onPress = {() => {
-                        updateField(selectedValue)
-                        setModalOpen(false)
-                    }}
+                    onPress = { () => fieldHandler() }
                     style = {styles.exitModalButton}
                     name="closecircle" 
                     size={18} 
@@ -23,8 +29,8 @@ const Selector = ({label, modalOpen, setModalOpen, updateField}) => {
                 />
                 
             {label == 'age' ? 
-            <AgePicker selectedValue = {selectedValue} setSelectedValue = {setSelectedValue} /> : 
-            <GenderPicker selectedValue = {selectedValue} setSelectedValue = {setSelectedValue} /> }
+            <AgePicker field = {field} selectedValue = {selectedValue} setSelectedValue = {setSelectedValue} /> : 
+            <GenderPicker field = {field} selectedValue = {selectedValue} setSelectedValue = {setSelectedValue} /> }
             
             </View>
         </Modal>

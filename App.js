@@ -5,7 +5,6 @@ import ProfileScreen from './src/screens/ProfileScreen'
 import BioScreen from './src/screens/BioScreen'
 import GoalsScreen from './src/screens/GoalsScreen'
 
-
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import { StyleSheet, Text, Button, Image, View, TextInput } from 'react-native';

@@ -13,6 +13,7 @@ const BasicInfoDetails = ({label, field, updateField}) => {
                 label = {label}
                 modalOpen = {modalOpen} 
                 setModalOpen = {setModalOpen} 
+                field = {field}
                 updateField = {updateField} /> : 
             null}
 

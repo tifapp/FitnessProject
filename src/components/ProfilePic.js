@@ -4,8 +4,8 @@ import { set } from 'react-native-reanimated';
 import usePhotos from '../hooks/usePhotos';
 
 
-const ProfilePic = () => {
-    const [imageURL, setImageURL] = useState('')
+const ProfilePic = ({imageURL, setImageURL}) => {
+    //const [imageURL, setImageURL] = useState('')
     const [pickFromGallery, pickFromCamera] = usePhotos();
     //pickFromCamera(setImageURL)
 

@@ -2,11 +2,11 @@ import React, {useState} from 'react';
 import {View, StyleSheet, Text, TextInput} from 'react-native';
 import BasicInfoDetails from './BasicInfoDetails';
 
-const BasicInfo = () => {
-    const [name, setName] = useState('')
-    const [age, setAge] = useState('')
-    const [gender, setGender] = useState('')
-    
+const BasicInfo = ({name, setName, age, setAge, gender, setGender}) => {
+    //const [name, setName] = useState('')
+    //const [age, setAge] = useState('')
+    //const [gender, setGender] = useState('')
+
     return (
         <View>
             <BasicInfoDetails label = 'name' field = {name} updateField = {setName} /> 

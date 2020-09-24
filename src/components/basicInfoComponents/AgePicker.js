@@ -1,7 +1,19 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import {View, StyleSheet, Text, Picker} from 'react-native'
 
-const AgePicker = ({selectedValue, setSelectedValue}) => {
+const AgePicker = ({field, selectedValue, setSelectedValue}) => {
+
+    const fieldHandler = () => {
+        if (field == '') {
+            setSelectedValue('16')
+        }
+        else {
+            setSelectedValue(field)
+        }
+    }
+
+    useEffect(() => fieldHandler(), [ ])
+
     return (
         <View>
             <Picker
