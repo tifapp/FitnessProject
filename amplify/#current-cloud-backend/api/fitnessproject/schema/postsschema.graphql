@@ -4,5 +4,10 @@ type Post @model {
   email: String!
   description: String
   group: String
-  createdAt: String!
+  year: Int
+  month: Int
+  day: Int
+  hour: Int
+  minute: Int
+  timeOfDay: String
 }

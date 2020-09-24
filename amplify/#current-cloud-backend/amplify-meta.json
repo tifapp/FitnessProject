@@ -32,7 +32,7 @@
         "IdentityPoolName": "fitnessprojecta8f49cfe_identitypool_a8f49cfe__posts",
         "UserPoolName": "fitnessprojecta8f49cfe_userpool_a8f49cfe"
       },
-      "lastPushTimeStamp": "2020-09-23T05:17:34.558Z",
+      "lastPushTimeStamp": "2020-09-24T07:53:56.510Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-fitnessproject-posts-32457-deployment/amplify-cfn-templates/auth/fitnessprojecta8f49cfe-cloudformation-template.yml",
         "logicalId": "authfitnessprojecta8f49cfe"
@@ -56,12 +56,12 @@
         "GraphQLAPIIdOutput": "ljodliyzyjexha45thfnwtr3qe",
         "GraphQLAPIEndpointOutput": "https://3dm7tzc3ojd7rfeatbp4tpvi7i.appsync-api.us-west-2.amazonaws.com/graphql"
       },
-      "lastPushTimeStamp": "2020-09-23T05:17:36.482Z",
+      "lastPushTimeStamp": "2020-09-24T07:53:57.922Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-fitnessproject-posts-32457-deployment/amplify-cfn-templates/api/cloudformation-template.json",
         "logicalId": "apifitnessproject"
       },
-      "lastPushDirHash": "OjqpDobQofF3Qzpa9ygDLDu8Os8="
+      "lastPushDirHash": "ny/LsUYmyshaXlS89pm3pOJNRG0="
     }
   }
 }

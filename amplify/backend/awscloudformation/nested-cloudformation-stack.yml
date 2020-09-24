@@ -138,7 +138,7 @@
 						]
 					},
 					"S3DeploymentBucket": "amplify-fitnessproject-posts-32457-deployment",
-					"S3DeploymentRootKey": "amplify-appsync-files/62beb95452bc3671590ba61775487467207e932b",
+					"S3DeploymentRootKey": "amplify-appsync-files/053aa9ef43dae778eae6ee004a198e067297f2bb",
 					"env": "posts"
 				}
 			}
