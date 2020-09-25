@@ -16,7 +16,7 @@ Amplify.configure(awsconfig);
 
 const Stack = createStackNavigator();
 
-export default function ProfileScreen() {	
+export default function ProfileTab() {	
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName = 'Profile' screenOptions={{ headerStyle: {backgroundColor: '#d3d3d3'} }}>

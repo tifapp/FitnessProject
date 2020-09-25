@@ -8,7 +8,7 @@ import { Amplify, API, graphqlOperation } from "aws-amplify";
 import { createUser, updateUser, deleteUser } from './src/graphql/mutations';
 import { listUsers } from './src/graphql/queries';
 import GroupScreen from './GroupScreen';
-import ProfileScreen from './ProfileScreen';
+import ProfileTab from './ProfileTab';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -38,7 +38,7 @@ const App = () => {
     <NavigationContainer>
       <Tab.Navigator>
         <Tab.Screen name="Groups" component={GroupScreen} />
-        <Tab.Screen name="Profile" component={ProfileScreen} />
+        <Tab.Screen name="Profile" component={ProfileTab} />
       </Tab.Navigator>
     </NavigationContainer>
   );
