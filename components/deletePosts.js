@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 
+var styles = require('../styles/stylesheet');
+
 export default function DeleteItem({
   item,
   pressHandler,
@@ -31,7 +33,7 @@ export default function DeleteItem({
   ];
 
   return (
-    <View>
+    <View style={styles.secondaryContainerStyle}>
       <View style={styles.spaceAround}>
         <Text>{item.email}</Text>
         <Text>
@@ -42,26 +44,10 @@ export default function DeleteItem({
       </View>
 
       {val ? (
-        <Button
-          onPress={() => (pressHandler(item.id), deletePostsAsync(item.id))}
-          title="Delete"
-          color="blue"
-        />
+        <TouchableOpacity style={[styles.unselectedButtonStyle, {borderColor: 'red'}]} color="red" onPress={() => (pressHandler(item.id), deletePostsAsync(item.id))}>
+            <Text style={[styles.unselectedButtonTextStyle, {color: 'red'}]}>Delete</Text>
+        </TouchableOpacity>
       ) : null}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  check: {
-    padding: 25,
-    marginTop: 16,
-    borderColor: "#bbb",
-    borderWidth: 1,
-    borderStyle: "dashed",
-    borderRadius: 10,
-  },
-  spaceAround: {
-    padding: 25,
-  },
-});

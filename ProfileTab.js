@@ -17,7 +17,10 @@ const Stack = createStackNavigator();
 export default function ProfileTab() {
   return (
     <Stack.Navigator initialRouteName='Profile' screenOptions={{ headerStyle: { backgroundColor: '#d3d3d3' } }}>
-      <Stack.Screen name='Profile' component={ProfileScreen} />
+      <Stack.Screen name='Profile' component={ProfileScreen}
+            options={{
+              headerShown: false,
+            }} />
       <Stack.Screen name='Bio' component={BioScreen} />
       <Stack.Screen name='Goals' component={GoalsScreen} />
     </Stack.Navigator>

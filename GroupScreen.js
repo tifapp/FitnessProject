@@ -13,7 +13,6 @@ import {
   Keyboard,
   FlatList,
 } from "react-native";
-import { withAuthenticator } from "aws-amplify-react-native";
 // Get the aws resources configuration parameters
 import awsconfig from "./aws-exports"; // if you are using Amplify CLI
 import { Amplify, API, Auth, graphqlOperation } from "aws-amplify";
@@ -25,6 +24,8 @@ import AddPost from "./components/AddPosts";
 import DeleteItem from "./components/deletePosts";
 
 Amplify.configure(awsconfig);
+
+var styles = require('./styles/stylesheet');
 
 export default function GroupScreen() {
   const [postVal, setPostVal] = useState("");
@@ -49,14 +50,6 @@ export default function GroupScreen() {
       console.log("error");
     }
   };
-
-  async function signOut() {
-    try {
-      await Auth.signOut();
-    } catch (error) {
-      console.log("error");
-    }
-  }
 
   const addPostAsync = async () => {
     var yearVal = new Date().getFullYear();
@@ -122,112 +115,42 @@ export default function GroupScreen() {
   };
 
   return (
-      <View>
-        <View style={styles.signOutTop}>
-          <TouchableOpacity style={styles.top} color="red" onPress={signOut}>
-            <Text style={styles.signOutVal}>Sign Out</Text>
-          </TouchableOpacity>
-        </View>
-
-        <Header />
-        <TextInput
-          style={styles.input}
-          multiline={true}
-          placeholder="Start Typing ..."
-          onChangeText={setPostVal}
-          value={postVal}
-          clearButtonMode="always"
-        />
-        <View style={styles.spaceAround}>
-          <TouchableOpacity
-            style={styles.postButton}
-            onPress={() => {
-              postVal != ""
-                ? (addingEmail(), addPostAsync(), showPostsAsync())
-                : alert("No text detected in text field");
-            }}
-          >
-            <View>
-              <Text style={styles.val}>Add Post</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        <FlatList
-          data={posts}
-          renderItem={({ item }) => (
-            <DeleteItem
-              item={item}
-              pressHandler={pressHandler}
-              deletePostsAsync={deletePostsAsync}
-              emailVal={emailVal}
-            />
-          )}
-        />
-
-        <StatusBar style="auto" />
+    <View style={styles.containerStyle}>
+      <TextInput
+        style={[styles.textInputStyle, {marginTop: 40}]}
+        multiline={true}
+        placeholder="Start Typing ..."
+        onChangeText={setPostVal}
+        value={postVal}
+        clearButtonMode="always"
+      />
+      
+      <View style={styles.spaceAround}>
+        <TouchableOpacity
+          style={styles.buttonStyle}
+          onPress={() => {
+            postVal != ""
+              ? (addingEmail(), addPostAsync(), showPostsAsync())
+              : alert("No text detected in text field");
+          }}
+        >
+          <Text style={styles.buttonTextStyle}>Add Post</Text>
+        </TouchableOpacity>
       </View>
+
+      <FlatList
+        data={posts}
+        renderItem={({ item }) => (
+          <DeleteItem
+            item={item}
+            pressHandler={pressHandler}
+            deletePostsAsync={deletePostsAsync}
+            emailVal={emailVal}
+          />
+        )}
+      />
+
+      <StatusBar style="auto" />
+    </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  input: {
-    marginBottom: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-    fontSize: 30,
-  },
-  stretch: {
-    flex: 1,
-  },
-  button: {
-    alignItems: "center",
-    padding: 25,
-    marginTop: 16,
-    borderColor: "#bbb",
-    borderWidth: 2,
-    borderRadius: 10,
-    backgroundColor: "#ffa500",
-  },
-  val: {
-    fontSize: 20,
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  signOutVal: {
-    fontWeight: "bold",
-  },
-  spaceAround: {
-    paddingHorizontal: 125,
-  },
-  top: {
-    alignItems: "center",
-    marginTop: 30,
-    padding: 15,
-    borderWidth: 2,
-    borderRadius: 10,
-    backgroundColor: "#ADD8E6",
-  },
-  signOutTop: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    paddingHorizontal: 25,
-    paddingVertical: 25,
-  },
-  postButton: {
-    alignItems: "center",
-    marginTop: 30,
-    padding: 20,
-    borderWidth: 2,
-    borderRadius: 10,
-    backgroundColor: "#ffa500",
-  },
-});

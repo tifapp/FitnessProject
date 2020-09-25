@@ -19,7 +19,7 @@ const BasicInfoDetails = ({label, field, updateField}) => {
 
             <View style = {styles.textBoxStyle}>
                 <TextInput
-                    style = {styles.textInputStyle} 
+                    style = {field === '' ? styles.emptyTextInputStyle : styles.textInputStyle} 
                     placeholder = {`Enter your ${label}`} 
                     autoCorrect = {false}
                     value = {field}
@@ -54,6 +54,15 @@ const styles = new StyleSheet.create({
         height: 30,
         flex: 1,
         borderBottomWidth: 1,
+        borderBottomColor: 'gray',
+    },
+    emptyTextInputStyle: {
+        fontSize: 15,
+        marginHorizontal: 10,
+        height: 30,
+        flex: 1,
+        borderBottomWidth: 1,
+        borderBottomColor: 'red',
     },
    
 })

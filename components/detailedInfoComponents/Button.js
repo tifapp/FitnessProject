@@ -1,42 +1,20 @@
 import React from 'react'
 import {StyleSheet, Text, TouchableOpacity} from 'react-native'
 
+var styles = require('../../styles/stylesheet');
+
 const Button = ({label, field, validate, invalidate}) => {
     return (
         <TouchableOpacity 
-            style = { (field) ? styles.onButtonStyle : styles.offButtonStyle}
+            style = { (field) ? styles.outlineButtonStyle : styles.unselectedButtonStyle}
             onPress = {() => {
                 validate(true) 
                 invalidate(false)
             }}
         >
-            <Text style = {styles.buttonTextStyle}>{label}</Text>  
+            <Text style = {(field) ? styles.outlineButtonTextStyle : styles.unselectedButtonTextStyle}>{label}</Text>  
         </TouchableOpacity>
     )
 }
-
-const styles = StyleSheet.create({
-    onButtonStyle: {
-        alignSelf: 'center',
-        backgroundColor: 'black',
-        padding: 10,
-        borderRadius: 10,
-        height: 50,
-        width: 100
-    },
-    offButtonStyle: {
-        alignSelf: 'center',
-        backgroundColor: 'white',
-        padding: 10,
-        borderRadius: 10,
-        height: 50,
-        width: 100
-    },
-    buttonTextStyle: {
-        fontSize: 25,
-        color: '#d3d3d3',
-        alignSelf: 'center'
-    }
-})
 
 export default Button
