@@ -25,7 +25,7 @@ const ProfilePic = ({imageURL, setImageURL} ) => {
             >
                 <Image 
                     style = {styles.imageStyle}
-                    source = {imageURL === '' ? require('../../assets/icon.png') : { uri: imageURL }}
+                    source = {imageURL === '' ? require('../assets/icon.png') : { uri: imageURL }}
                 />
             </TouchableOpacity>     
         </View>

@@ -8,6 +8,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@react-native-community/masked-view": "^0.1.10",
     "@react-native-community/netinfo": "^5.9.6",
     "@react-navigation/bottom-tabs": "^5.9.0",
     "@react-navigation/native": "^5.7.4",
@@ -15,6 +16,7 @@
     "aws-amplify": "^3.0.25",
     "aws-amplify-react-native": "^4.2.5",
     "expo": "~38.0.8",
+    "expo-image-picker": "^9.1.1",
     "expo-status-bar": "^1.0.2",
     "react": "~16.11.0",
     "react-dom": "~16.11.0",

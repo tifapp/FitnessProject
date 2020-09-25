@@ -13,7 +13,10 @@ import ProfileTab from './ProfileTab';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-Amplify.configure(awsconfig);
+Amplify.configure(
+  {awsconfig, Analytics: {
+    disabled: true,
+  },}); //for some reason this removes the unhandled promise rejection error on startup
 
 function HomeScreen() {
   return (
