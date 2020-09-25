@@ -1,9 +1,7 @@
-import {useEffect, useState} from 'react';
-import {Alert} from 'react-native';
 import { Auth } from 'aws-amplify';
 import {createUser, updateUser} from '../graphql/mutations.js'
 import {getUser} from '../graphql/queries.js'
-import { Amplify, API, graphqlOperation, Storage} from "aws-amplify";
+import { API, graphqlOperation, Storage} from "aws-amplify";
 
 export default () => {
 

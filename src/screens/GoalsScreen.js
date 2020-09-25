@@ -1,8 +1,7 @@
 import React, {useState} from 'react';
-import {View, StyleSheet, Text} from 'react-native';
 import DetailedInfoInput from '../components/detailedInfoComponents/DetailedInfoInput'
 
-const GoalsScreen = ({route, navigation}) => {
+const GoalsScreen = ({route}) => {
     const field = route.params.field
     const [text, setText] = useState(field)
 
@@ -15,9 +14,5 @@ const GoalsScreen = ({route, navigation}) => {
         />
     )
 }
-
-const styles = new StyleSheet.create({
-   
-})
 
 export default GoalsScreen;

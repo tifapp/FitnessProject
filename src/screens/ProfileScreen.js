@@ -1,11 +1,11 @@
 import React, {useState, useEffect} from 'react';
-import {View, StyleSheet, Text, Button, ScrollView, TouchableOpacity, Alert} from 'react-native';
+import {View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert} from 'react-native';
 import ProfilePic from '../components/ProfilePic'
 import BasicInfo from '../components/basicInfoComponents/BasicInfo'
 import DetailedInfo from '../components/detailedInfoComponents/DetailedInfo';
 import useDatabase from '../hooks/useDatabase';
 
-const ProfileScreen = ({navigation, route}) => {
+const ProfileScreen = ({route}) => {
     const [imageURL, setImageURL] = useState('')
     const [name, setName] = useState('')
     const [age, setAge] = useState('')
@@ -23,22 +23,15 @@ const ProfileScreen = ({navigation, route}) => {
             const updatedField = route.params.updatedField
             if (label == 'bio') {
                 setBioDetails(updatedField)
-                //console.log(updatedField)
             }
             else if (label == 'goals') {
                 setGoalsDetails(updatedField)
-                //console.log(updatedField)
             }
         }
     }
 
-    const updateInitialFields = () => {
-        const arr = [name, age, gender, bioDetails, goalsDetails]
-        setInitialFields(arr)
-    }
-
     const areFieldsUpdated = () => {
-       
+        console.log(initialFields)
         if (name == initialFields[0]
             && age == initialFields[1]
             && gender == initialFields[2] 
@@ -47,9 +40,7 @@ const ProfileScreen = ({navigation, route}) => {
             
             return false;
         }
-
         return true;
-    
     }
 
     const submitHandler = () => {
@@ -62,19 +53,20 @@ const ProfileScreen = ({navigation, route}) => {
         else {
             updateUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails)
             Alert.alert('Profile updated!')
+            setInitialFields([name, age, gender, bioDetails, goalsDetails])
         }
     }
 
     useEffect(() => { loadUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails, 
-                      setImageURL, setName, setAge, setGender, setBioDetails, setGoalsDetails)
-                      updateInitialFields()}, [ ])
+                      setImageURL, setName, setAge, setGender, setBioDetails, setGoalsDetails) 
+                      setInitialFields([name, age, gender, bioDetails, goalsDetails]) }, [ ])
     
     useEffect(() => { updateDetailedInfo() }, [route.params?.updatedField])
 
     return (
         <ScrollView style = {styles.containerStyle}>
             <View style = {styles.upperScreenStyle}>
-                <ProfilePic setImageUpdated = {setImageUpdated} imageURL = {imageURL} setImageURL = {setImageURL} />
+                <ProfilePic imageURL = {imageURL} setImageURL = {setImageURL} />
                 <BasicInfo 
                     name = {name} 
                     setName = {setName}

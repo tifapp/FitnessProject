@@ -1,5 +1,5 @@
-import React, {useState} from 'react'
-import {View, StyleSheet, Text, TouchableOpacity} from 'react-native'
+import React from 'react'
+import {View, StyleSheet} from 'react-native'
 import Button from './Button'
 
 const ButtonToggle = ({bio, goals, setBio, setGoals}) => {

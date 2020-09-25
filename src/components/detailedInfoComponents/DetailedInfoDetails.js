@@ -1,5 +1,5 @@
 import React from 'react'
-import {View, StyleSheet, Text, TextInput, TouchableOpacity} from 'react-native'
+import {View, StyleSheet, TextInput, TouchableOpacity} from 'react-native'
 import { Entypo } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
 
@@ -24,7 +24,7 @@ const DetailedInfoDetails = ({label, field, setField}) => {
                 multiline = {true}
                 autoCorrect = {false}
                 value = {field}
-                //onChangeText = {setField}
+                onChangeText = {setField}
                 editable = {false}
             />
         </View>

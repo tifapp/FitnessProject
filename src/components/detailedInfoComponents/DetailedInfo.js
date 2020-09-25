@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {View, StyleSheet, Text} from 'react-native'
+import {View} from 'react-native'
 import ButtonToggle from './ButtonToggle'
 import DetailedInfoDetails from './DetailedInfoDetails'
 
@@ -17,9 +17,5 @@ const DetailedInfo = ({bioDetails, goalsDetails, setBioDetails, setGoalsDetails}
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-
-})
 
 export default DetailedInfo

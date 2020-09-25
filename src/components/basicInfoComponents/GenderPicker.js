@@ -1,10 +1,10 @@
 import React, {useEffect} from 'react'
-import {View, StyleSheet, Text, Picker} from 'react-native'
+import {View, Picker} from 'react-native'
 
 const GenderPicker = ({field, selectedValue, setSelectedValue}) => {
     const fieldHandler = () => {
         if (field == '') {
-            setSelectedValue('Male')
+            setSelectedValue("Male")
         }
         else {
             setSelectedValue(field)
@@ -28,9 +28,5 @@ const GenderPicker = ({field, selectedValue, setSelectedValue}) => {
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-
-})
 
 export default GenderPicker

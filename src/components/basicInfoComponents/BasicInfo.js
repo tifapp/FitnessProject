@@ -1,12 +1,9 @@
-import React, {useState} from 'react';
-import {View, StyleSheet, Text, TextInput} from 'react-native';
+import React from 'react';
+import {View} from 'react-native';
 import BasicInfoDetails from './BasicInfoDetails';
 
 const BasicInfo = ({name, setName, age, setAge, gender, setGender}) => {
-    //const [name, setName] = useState('')
-    //const [age, setAge] = useState('')
-    //const [gender, setGender] = useState('')
-
+    
     return (
         <View>
             <BasicInfoDetails label = 'name' field = {name} updateField = {setName} /> 
@@ -15,9 +12,5 @@ const BasicInfo = ({name, setName, age, setAge, gender, setGender}) => {
         </View>
     )
 }
-
-const styles = new StyleSheet.create({
-  
-})
 
 export default BasicInfo;

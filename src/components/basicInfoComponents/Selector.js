@@ -1,5 +1,5 @@
-import React, {useEffect, useImperativeHandle, useState} from 'react'
-import {View, StyleSheet, Text, Modal, Picker} from 'react-native'
+import React, {useState} from 'react'
+import {View, StyleSheet, Modal} from 'react-native'
 import { AntDesign } from '@expo/vector-icons'
 import AgePicker from './AgePicker'
 import GenderPicker from './GenderPicker'
@@ -7,11 +7,9 @@ import GenderPicker from './GenderPicker'
 const Selector = ({label, modalOpen, setModalOpen, field, updateField}) => {
 
     const [selectedValue, setSelectedValue] = useState('');
-    //console.log(label + ': ' + s)
 
     const fieldHandler = () => {
         if (selectedValue != field) {
-            console.log('hello')
             updateField(selectedValue) 
         }
         setModalOpen(false)

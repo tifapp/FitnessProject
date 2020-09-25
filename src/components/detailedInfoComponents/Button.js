@@ -1,8 +1,7 @@
 import React from 'react'
-import {View, StyleSheet, Text, TouchableOpacity} from 'react-native'
+import {StyleSheet, Text, TouchableOpacity} from 'react-native'
 
 const Button = ({label, field, validate, invalidate}) => {
-    //console.log({field})
     return (
         <TouchableOpacity 
             style = { (field) ? styles.onButtonStyle : styles.offButtonStyle}

@@ -1,11 +1,11 @@
 import React, {useEffect} from 'react'
-import {View, StyleSheet, Text, Picker} from 'react-native'
+import {View, StyleSheet, Picker} from 'react-native'
 
 const AgePicker = ({field, selectedValue, setSelectedValue}) => {
 
     const fieldHandler = () => {
         if (field == '') {
-            setSelectedValue('16')
+            setSelectedValue("16")
         }
         else {
             setSelectedValue(field)
@@ -66,9 +66,5 @@ const AgePicker = ({field, selectedValue, setSelectedValue}) => {
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-
-})
 
 export default AgePicker

@@ -5,15 +5,12 @@ import ProfileScreen from './src/screens/ProfileScreen'
 import BioScreen from './src/screens/BioScreen'
 import GoalsScreen from './src/screens/GoalsScreen'
 
-import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
-import { StyleSheet, Text, Button, Image, View, TextInput } from 'react-native';
+import React from 'react';
 import { withAuthenticator } from 'aws-amplify-react-native';
+
 // Get the aws resources configuration parameters
 import awsconfig from './aws-exports'; // if you are using Amplify CLI
-import { Amplify, API, graphqlOperation } from "aws-amplify";
-import { createUser, updateUser, deleteUser } from './src/graphql/mutations';
-import { listUsers } from './src/graphql/queries';
+import { Amplify } from "aws-amplify";
 
 Amplify.configure(awsconfig);
 
@@ -33,11 +30,3 @@ const App = () => {
 
 export default withAuthenticator(App);
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

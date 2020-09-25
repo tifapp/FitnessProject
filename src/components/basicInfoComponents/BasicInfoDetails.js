@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, StyleSheet, Text, TextInput, TouchableOpacity, Modal, Picker} from 'react-native';
+import {View, StyleSheet, TextInput, TouchableOpacity} from 'react-native';
 import { Entypo } from '@expo/vector-icons'; 
 import Selector from './Selector'
 

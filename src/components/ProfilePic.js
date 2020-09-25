@@ -1,13 +1,10 @@
-import React, {useState} from 'react';
-import {View, StyleSheet, Text, Button, Image, TouchableOpacity, Alert} from 'react-native';
-import { set } from 'react-native-reanimated';
+import React from 'react';
+import {View, StyleSheet, Image, TouchableOpacity, Alert} from 'react-native';
 import usePhotos from '../hooks/usePhotos';
 
 
-const ProfilePic = ( {imageURL, setImageURL} ) => {
-    //const [imageURL, setImageURL] = useState('')
+const ProfilePic = ({imageURL, setImageURL} ) => {
     const [pickFromGallery, pickFromCamera] = usePhotos();
-    //pickFromCamera(setImageURL)
 
     const promptUser = () => {
         const title = 'Choose a profile pic!';
