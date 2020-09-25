@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
   postButton: {
     alignItems: "center",
     marginTop: 30,
-    padding: 15,
+    padding: 20,
     borderWidth: 2,
     borderRadius: 10,
     backgroundColor: "#ffa500",
