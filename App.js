@@ -18,22 +18,6 @@ Amplify.configure(
     disabled: true,
   },}); //for some reason this removes the unhandled promise rejection error on startup
 
-function HomeScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Home!</Text>
-    </View>
-  );
-}
-
-function SettingsScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Settings!</Text>
-    </View>
-  );
-}
-
 const Tab = createBottomTabNavigator();
 
 const App = () => {	
