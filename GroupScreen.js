@@ -122,10 +122,6 @@ export default function GroupScreen() {
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={{ flexGrow: 1 }}
-      keyboardShouldPersistsTaps="handled"
-    >
       <View>
         <View style={styles.signOutTop}>
           <TouchableOpacity style={styles.top} color="red" onPress={signOut}>
@@ -171,7 +167,6 @@ export default function GroupScreen() {
 
         <StatusBar style="auto" />
       </View>
-    </ScrollView>
   );
 };
 
@@ -192,5 +187,47 @@ const styles = StyleSheet.create({
   },
   stretch: {
     flex: 1,
+  },
+  button: {
+    alignItems: "center",
+    padding: 25,
+    marginTop: 16,
+    borderColor: "#bbb",
+    borderWidth: 2,
+    borderRadius: 10,
+    backgroundColor: "#ffa500",
+  },
+  val: {
+    fontSize: 20,
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  signOutVal: {
+    fontWeight: "bold",
+  },
+  spaceAround: {
+    paddingHorizontal: 125,
+  },
+  top: {
+    alignItems: "center",
+    marginTop: 30,
+    padding: 15,
+    borderWidth: 2,
+    borderRadius: 10,
+    backgroundColor: "#ADD8E6",
+  },
+  signOutTop: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    paddingHorizontal: 25,
+    paddingVertical: 25,
+  },
+  postButton: {
+    alignItems: "center",
+    marginTop: 30,
+    padding: 20,
+    borderWidth: 2,
+    borderRadius: 10,
+    backgroundColor: "#ffa500",
   },
 });
