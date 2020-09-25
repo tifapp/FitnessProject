@@ -8,6 +8,7 @@ import { Amplify, API, graphqlOperation, Auth } from "aws-amplify";
 import { getUser } from './src/graphql/queries';
 import GroupScreen from './GroupScreen';
 import ProfileTab from './ProfileTab';
+import ProfileScreen from './screens/ProfileScreen';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -99,7 +100,8 @@ const App = () => {
           />
           <Stack.Screen
             name="Create your profile"
-            component={ProfileTab}
+            component={ProfileScreen}
+            initialParams={{ newUser: true }}
             options={{
               headerShown: false,
             }}

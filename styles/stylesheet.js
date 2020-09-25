@@ -25,13 +25,13 @@ module.exports = StyleSheet.create({
     borderRadius: 5,
   },
   textButtonTextStyle: {
-    color: 'blue',
+    color: 'orange',
     alignSelf: 'center',
     marginBottom: 2,
     marginHorizontal: 6,
   },
   unselectedButtonStyle: {
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: "gray",
     alignSelf: 'center',
     backgroundColor: 'transparent',
@@ -44,10 +44,11 @@ module.exports = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: 2,
     marginHorizontal: 6,
+    fontWeight: 'bold',
   },
   outlineButtonStyle: {
-    borderWidth: 1,
-    borderColor: "blue",
+    borderWidth: 2,
+    borderColor: "orange",
     alignSelf: 'center',
     backgroundColor: 'transparent',
     padding: 9,
@@ -55,23 +56,24 @@ module.exports = StyleSheet.create({
     marginHorizontal: 10,
   },
   outlineButtonTextStyle: {
-    color: 'blue',
+    color: 'orange',
     alignSelf: 'center',
     marginBottom: 2,
     marginHorizontal: 6,
+    fontWeight: 'bold',
   },
   buttonTextStyle: {
     color: 'white',
     alignSelf: 'center',
     fontWeight: 'bold',
-    fontSize: 30,
+    fontSize: 25,
     marginBottom: 2,
     marginHorizontal: 6,
   },
 
   containerStyle: {
     flex: 1,
-    backgroundColor: '#eeefff'
+    backgroundColor: '#fffffd'
   },
   upperScreenStyle: {
     backgroundColor: '#ffffff',
@@ -90,7 +92,7 @@ module.exports = StyleSheet.create({
   },
   textBoxStyle: {
     textAlignVertical: 'top',
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: "gray",
     borderRadius: 20,
     fontSize: 15,
@@ -101,13 +103,13 @@ module.exports = StyleSheet.create({
     paddingLeft: 12,
     marginBottom: 30,
     flex: 1,
-    backgroundColor: 'white'
+    backgroundColor: 'transparent'
   },
 
   textInputStyle: {
     marginHorizontal: 10,
     height: 30,
-    borderBottomWidth: 1,
+    borderBottomWidth: 2,
     borderBottomColor: 'gray',
   },
 
@@ -150,14 +152,14 @@ module.exports = StyleSheet.create({
     padding: 25,
     marginTop: 16,
     borderColor: "#bbb",
-    borderWidth: 1,
-    borderStyle: "dashed",
+    borderWidth: 2,
+    borderStyle: "solid",
     borderRadius: 10,
   },
   spaceAround: {
     padding: 25,
   },
   secondaryContainerStyle: {
-    backgroundColor: '#eeeeee',
+    backgroundColor: '#fdfffe',
   },
 });

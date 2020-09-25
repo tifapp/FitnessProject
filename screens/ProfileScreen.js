@@ -66,11 +66,8 @@ const ProfileScreen = ({ navigation, route }) => {
             Alert.alert('Profile updated!')
             setInitialFields([name, age, gender, bioDetails, goalsDetails])
         }
-        try {
-            navigation.popToTop(); //hacky way of refreshing the main screen when the user makes their account
-        }
-        catch (err) {
-            console.log("error: ", err);
+        if (route.params?.newUser) {
+            navigation.navigate('Compliance Forms');
         }
     }
 
@@ -89,7 +86,7 @@ const ProfileScreen = ({ navigation, route }) => {
                     <Text style={styles.unselectedButtonTextStyle}>Sign Out</Text>
                 </TouchableOpacity>
             </View>
-            <View >
+            <View style={{paddingBottom: 15}}>
                 <ProfilePic imageURL={imageURL} setImageURL={setImageURL} />
                 <BasicInfo
                     name={name}
