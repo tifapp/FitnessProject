@@ -1,4 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, Button, Image, View, TextInput, TouchableOpacity, Linking } from 'react-native';
 import { withAuthenticator } from 'aws-amplify-react-native';
@@ -64,13 +65,13 @@ function ComplianceScreen({ navigation }) {
 
 const App = () => {
   const Tab = createBottomTabNavigator();
-  const [user, setUser] = useState(null);
+  const [userNull, setUser] = useState(true);
 
   const checkIfUserExists = async () => {
     try {
       const query = await Auth.currentUserInfo();
       const user = await API.graphql(graphqlOperation(getUser, { id: query.attributes.sub }));
-      setUser(user);
+      setUser(user.data.getUser == null);
 
       console.log("success, user is ", user);
     }
@@ -83,11 +84,11 @@ const App = () => {
     checkIfUserExists();
   }, [])
 
-  console.log("App rerendered, userexists is... ", user);
+  console.log("App rerendered, userexists is... ", userNull);
 
   const Stack = createStackNavigator();
 
-  if (user == null) {
+  if (userNull) {
     return (
       <NavigationContainer>
         <Stack.Navigator>
@@ -101,7 +102,7 @@ const App = () => {
           <Stack.Screen
             name="Create your profile"
             component={ProfileScreen}
-            initialParams={{ newUser: true }}
+            initialParams={{ newUser: true, setUserNullFunction : setUser }}
             options={{
               headerShown: false,
             }}
@@ -112,7 +113,19 @@ const App = () => {
   } else {
     return (
       <NavigationContainer>
-        <Tab.Navigator>
+        <Tab.Navigator
+        tabBarOptions={{
+          activeTintColor: 'orange',
+          labelStyle:{
+          fontSize: 20,
+          fontWeight: 'bold',
+          margin: 0,
+          padding: 10,
+          },
+          tabStyle:{
+          height:47,
+          }
+        }}>
           <Tab.Screen name="Groups" component={GroupScreen}
             options={{
               headerShown: false,
@@ -125,6 +138,12 @@ const App = () => {
       </NavigationContainer>
     );
   }
+}
+
+// You can explore the built-in icon families and icons on the web at:
+// https://icons.expo.fyi/
+function TabBarIcon({ name, color }) {
+  return <Ionicons size={50} style={{ marginBottom:0 }} {...{ name, color }} />;
 }
 
 export default withAuthenticator(App);

@@ -4,6 +4,7 @@ import ProfilePic from '../components/ProfilePic'
 import BasicInfo from '../components/basicInfoComponents/BasicInfo'
 import DetailedInfo from '../components/detailedInfoComponents/DetailedInfo';
 import useDatabase from '../hooks/useDatabase';
+import { Auth} from "aws-amplify";
 import { StackActions, NavigationActions } from 'react-navigation';
 
 var styles = require('../styles/stylesheet');
@@ -67,7 +68,7 @@ const ProfileScreen = ({ navigation, route }) => {
             setInitialFields([name, age, gender, bioDetails, goalsDetails])
         }
         if (route.params?.newUser) {
-            navigation.navigate('Compliance Forms');
+            route.params?.setUserNullFunction(false);
         }
     }
 
