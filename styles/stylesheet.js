@@ -66,7 +66,7 @@ module.exports = StyleSheet.create({
     color: 'white',
     alignSelf: 'center',
     fontWeight: 'bold',
-    fontSize: 25,
+    fontSize: 20,
     marginBottom: 2,
     marginHorizontal: 6,
   },
@@ -74,6 +74,9 @@ module.exports = StyleSheet.create({
   containerStyle: {
     flex: 1,
     backgroundColor: '#fffffd'
+  },
+  floatingContainerStyle: {
+    borderBottomWidth: 1,
   },
   upperScreenStyle: {
     backgroundColor: '#ffffff',

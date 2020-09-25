@@ -10,6 +10,8 @@ import { getUser } from './src/graphql/queries';
 import GroupScreen from './GroupScreen';
 import ProfileTab from './ProfileTab';
 import ProfileScreen from './screens/ProfileScreen';
+import BioScreen from './screens/BioScreen'
+import GoalsScreen from './screens/GoalsScreen'
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -107,6 +109,8 @@ const App = () => {
               headerShown: false,
             }}
           />
+          <Stack.Screen name='Bio' component={BioScreen} />
+          <Stack.Screen name='Goals' component={GoalsScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     );
