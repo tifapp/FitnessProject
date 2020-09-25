@@ -102,7 +102,7 @@ const App = () => {
             }}
           />
           <Stack.Screen
-            name="Create your profile"
+            name="Profile"
             component={ProfileScreen}
             initialParams={{ newUser: true, setUserNullFunction : setUser }}
             options={{
