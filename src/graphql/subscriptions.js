@@ -54,6 +54,12 @@ export const onCreatePost = /* GraphQL */ `
       email
       description
       group
+      year
+      month
+      day
+      hour
+      minute
+      timeOfDay
       createdAt
       updatedAt
     }
@@ -67,6 +73,12 @@ export const onUpdatePost = /* GraphQL */ `
       email
       description
       group
+      year
+      month
+      day
+      hour
+      minute
+      timeOfDay
       createdAt
       updatedAt
     }
@@ -80,6 +92,12 @@ export const onDeletePost = /* GraphQL */ `
       email
       description
       group
+      year
+      month
+      day
+      hour
+      minute
+      timeOfDay
       createdAt
       updatedAt
     }

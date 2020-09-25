@@ -46,6 +46,12 @@ export const getPost = /* GraphQL */ `
       email
       description
       group
+      year
+      month
+      day
+      hour
+      minute
+      timeOfDay
       createdAt
       updatedAt
     }
@@ -64,6 +70,12 @@ export const listPosts = /* GraphQL */ `
         email
         description
         group
+        year
+        month
+        day
+        hour
+        minute
+        timeOfDay
         createdAt
         updatedAt
       }
