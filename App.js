@@ -35,22 +35,22 @@ function ComplianceScreen({ navigation }) {
         }}
       >By continuing, you agree to our {"\n"}
         <Text
-          style={{ color: 'blue' }}
+          style={{ color: 'orange' }}
           onPress={() => Linking.openURL('https://drive.google.com/file/d/15OG-z9vZ97eNWHKooDrBEtV51Yz2fMRQ/view?usp=sharing')}>
           Terms of Service, {" "}
         </Text>
         <Text
-          style={{ color: 'blue' }}
+          style={{ color: 'orange' }}
           onPress={() => Linking.openURL('https://drive.google.com/file/d/11wIw9yQcT_mHHDT_xflVxEzzEUfh3KgN/view?usp=sharing')}>
           Privacy Policy, {"\n"}
         </Text>
         <Text
-          style={{ color: 'blue' }}
+          style={{ color: 'orange' }}
           onPress={() => Linking.openURL('https://drive.google.com/file/d/13VlxdknD3xSVdqMFHpV3ADXfmEql_NP6/view?usp=sharing')}>
           Community Standards, {" "}
         </Text>
         <Text
-          style={{ color: 'blue' }}
+          style={{ color: 'orange' }}
           onPress={() => Linking.openURL('https://drive.google.com/file/d/1aZ0oiThB4vBztSdmemN8p97L3gxcS302/view?usp=sharing')}>
           and Disclaimers.
 </Text></Text>

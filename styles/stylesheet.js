@@ -8,19 +8,13 @@ var {
 
 module.exports = StyleSheet.create({
 
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   secondaryContainerStyle: {
     backgroundColor: '#fefefe',
   },
 
   buttonStyle: {
     alignSelf: 'center',
-    backgroundColor: 'blue',
+    backgroundColor: 'orange',
     padding: 10,
     borderRadius: 5,
   },
@@ -69,13 +63,15 @@ module.exports = StyleSheet.create({
   buttonTextStyle: {
     color: 'white',
     alignSelf: 'center',
+    fontWeight: 'bold',
+    fontSize: 30,
     marginBottom: 2,
     marginHorizontal: 6,
   },
 
   containerStyle: {
     flex: 1,
-    backgroundColor: '#ffffff'
+    backgroundColor: '#eeefff'
   },
   upperScreenStyle: {
     backgroundColor: '#ffffff',

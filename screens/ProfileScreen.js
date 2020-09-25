@@ -89,7 +89,7 @@ const ProfileScreen = ({ navigation, route }) => {
                     <Text style={styles.unselectedButtonTextStyle}>Sign Out</Text>
                 </TouchableOpacity>
             </View>
-            <View style={styles.upperScreenStyle}>
+            <View >
                 <ProfilePic imageURL={imageURL} setImageURL={setImageURL} />
                 <BasicInfo
                     name={name}
@@ -106,7 +106,7 @@ const ProfileScreen = ({ navigation, route }) => {
                 setBioDetails={setBioDetails}
                 setGoalsDetails={setGoalsDetails}
             />
-            <TouchableOpacity style={[styles.buttonStyle, {marginBottom: 25}]} onPress={() => submitHandler()} >
+            <TouchableOpacity style={[styles.buttonStyle, {marginBottom: 25}]} onPress={submitHandler} >
                 <Text style={styles.buttonTextStyle}>Submit</Text>
             </TouchableOpacity>
         </ScrollView>
