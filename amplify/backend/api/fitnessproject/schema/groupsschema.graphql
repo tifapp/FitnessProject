@@ -1,0 +1,8 @@
+type Group @model {
+  id: ID!
+  name: String!
+  maxUsers: String!
+  Privacy: String!
+  Sport: String!
+  Description: String!
+}

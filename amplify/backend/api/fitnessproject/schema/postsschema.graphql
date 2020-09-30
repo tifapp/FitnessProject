@@ -11,3 +11,16 @@ type Post @model {
   minute: Int
   timeOfDay: String
 }
+
+input CreatePostInput {
+  name: String!
+  email: String!
+  description: String
+  group: String
+  year: Int
+  month: Int
+  day: Int
+  hour: Int
+  minute: Int
+  timeOfDay: String
+}
