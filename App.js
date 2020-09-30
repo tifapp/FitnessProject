@@ -58,7 +58,7 @@ function ComplianceScreen({ navigation }) {
           onPress={() => Linking.openURL('https://drive.google.com/file/d/1aZ0oiThB4vBztSdmemN8p97L3gxcS302/view?usp=sharing')}>
           and Disclaimers.
 </Text></Text>
-      <TouchableOpacity style={styles.buttonStyle} onPress={() => navigation.navigate('Create your profile')} >
+      <TouchableOpacity style={styles.buttonStyle} onPress={() => navigation.navigate('Profile')} >
         <Text style={styles.buttonTextStyle}>Continue</Text>
       </TouchableOpacity>
     </View>

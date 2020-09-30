@@ -1,94 +1,106 @@
 import { Auth } from 'aws-amplify';
-import {createUser, updateUser} from '../src/graphql/mutations.js'
-import {getUser} from '../src/graphql/queries.js'
-import { API, graphqlOperation, Storage} from "aws-amplify";
+import { createUser, updateUser } from '../src/graphql/mutations.js'
+import { getUser } from '../src/graphql/queries.js'
+import { API, graphqlOperation, Storage } from "aws-amplify";
+import { Image } from 'react-native';
 
 export default () => {
 
-    const loadUserAsync = async (imageURL, name, age, gender, bioDetails, goalsDetails,
-                                  setImageURL, setName, setAge, setGender, setBioDetails, setGoalsDetails) => {
-        
-        const updateFields = ({fields}) => {
-            Storage.get('profileimage.jpg', {level: 'protected'})
-            .then((imageURL) => {setImageURL(imageURL)})
-            .catch((err) => {console.log(err)})
+  const loadUserAsync = async (setImageURL, setName, setAge, setGender, setBioDetails, setGoalsDetails, setInitialFields) => {
 
-            setName(fields.name)
-            setAge(fields.age)
-            setGender(fields.gender)
-            setBioDetails(fields.bio)
-            setGoalsDetails(fields.goals)
-        }
-        
-        const createUserInDB = async ({newUser}) => {
-          try {
-            await API.graphql(graphqlOperation(createUser, { input: newUser }));
-            console.log("success");
-          } catch (err) {
-            console.log("error: ", err);
-          }
-        }
+    const updateFields = ({ fields }) => {
+      Storage.get('profileimage.jpg', { level: 'protected' })
+        .then((imageURL) => { //console.log("found profile image!", imageURL); 
+          Image.getSize(imageURL, () => {
+            setImageURL(imageURL);
+          }, err => {
+            setImageURL('')
+          });
+        })
+        .catch((err) => { console.log("could not find image!", err) })
 
-        try {
-            const query = await Auth.currentUserInfo();
-            const {identityId} = await Auth.currentCredentials();
-            const user = await API.graphql(graphqlOperation(getUser, {id: query.attributes.sub }));
+      setName(fields.name)
+      setAge(fields.age)
+      setGender(fields.gender)
+      setBioDetails(fields.bio)
+      setGoalsDetails(fields.goals)
+      setInitialFields([fields.name, fields.age, fields.gender, fields.bio, fields.goals])
+    }
 
-            const fields = user.data.getUser;
+    try {
+      const query = await Auth.currentUserInfo();
+      const { identityId } = await Auth.currentCredentials();
+      const user = await API.graphql(graphqlOperation(getUser, { id: query.attributes.sub }));
 
-            if (user.data.getUser == null) {
-                const newUser = {
-                    id: query.attributes.sub,
-                    pictureURL: identityId,
-                    name: name,
-                    age: age,
-                    gender: gender,
-                    bio: bioDetails,
-                    goals: goalsDetails
-                  };
-                createUserInDB({newUser})
-            }
-            else {
-                updateFields({fields})
-            }
-        }
-        catch(err) {
-            console.log("error: ", err);
-        }
-    };
+      const fields = user.data.getUser;
 
-    const updateUserAsync = async (imageURL, name, age, gender, bioDetails, goalsDetails) => {
-        const updateUserInDB = async({recurringUser}) => {
-          try {
-            const response = await fetch(imageURL);
-            const blob = await response.blob();
-            Storage.put('profileimage.jpg', blob, {level: 'protected', contentType: 'image/jpeg'})
-            await API.graphql(graphqlOperation(updateUser, { input: recurringUser }));
-            console.log("updated");
-          } catch (err) {
-            console.log("error: ", err);
-          }
-        }
+      if (fields == null) {
+        console.log("user doesn't exist, they must be making their profile for the first time");
+      }
+      else {
+        updateFields({ fields })
+      }
+    }
+    catch (err) {
+      console.log("error: ", err);
+    }
+  };
 
-        try {
-            const query = await Auth.currentUserInfo();
-            const user = await API.graphql(graphqlOperation(getUser, {id: query.attributes.sub }));
-            const {identityId} = await Auth.currentCredentials();
-            const recurringUser = {
-                id: query.attributes.sub,
-                pictureURL: identityId,
-                name: name,
-                age: age,
-                gender: gender,
-                bio: bioDetails,
-                goals: goalsDetails
-              };
-              updateUserInDB({recurringUser})
+  const updateUserAsync = async (imageURL, name, age, gender, bioDetails, goalsDetails) => {
+    const updateUserInDB = async ({ recurringUser }) => {
+      try {
+        if (imageURL !== '') {
+          const response = await fetch(imageURL);
+          const blob = await response.blob();
+          Storage.put('profileimage.jpg', blob, { level: 'protected', contentType: 'image/jpeg' })
+        } else {
+          Storage.remove('profileimage.jpg', { level: 'protected' })
+            .then(result => console.log("removed profile image!", result))
+            .catch(err => console.log(err));
         }
-        catch(err) {
-            console.log("error: ", err);
-        }
-    };
+        await API.graphql(graphqlOperation(updateUser, { input: recurringUser }));
+        console.log("updated");
+      } catch (err) {
+        console.log("error: ", err);
+      }
+    }
 
-    return [loadUserAsync, updateUserAsync];
+    const createUserInDB = async ({ newUser }) => {
+      try {
+        await API.graphql(graphqlOperation(createUser, { input: newUser }));
+        console.log("success");
+      } catch (err) {
+        console.log("error: ", err);
+      }
+    }
+
+    //if user doesn't exist, make one
+    try {
+      const { identityId } = await Auth.currentCredentials();
+      const query = await Auth.currentUserInfo();
+      const user = await API.graphql(graphqlOperation(getUser, { id: query.attributes.sub }));
+      const fields = user.data.getUser;
+
+      if (fields == null) {
+        const newUser = {
+          id: query.attributes.sub,
+          pictureURL: identityId,
+          name: name,
+          age: age,
+          gender: gender,
+          bio: bioDetails,
+          goals: goalsDetails
+        };
+        createUserInDB({ newUser })
+      }
+      else {
+        updateUserInDB({ fields })
+      }
+    }
+    catch (err) {
+      console.log("error: ", err);
+    }
+  };
+
+  return [loadUserAsync, updateUserAsync];
 }

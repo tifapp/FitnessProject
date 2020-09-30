@@ -18,16 +18,17 @@ const ProfileScreen = ({ navigation, route }) => {
         }
     }
 
-    const [imageURL, setImageURL] = useState('')
-    const [name, setName] = useState('')
-    const [age, setAge] = useState('')
-    const [gender, setGender] = useState('')
-    const [bioDetails, setBioDetails] = useState('')
-    const [goalsDetails, setGoalsDetails] = useState('')
+    const [imageChanged, setImageChanged] = useState(false);
+    const [imageURL, setImageURL] = useState('');
+    const [name, setName] = useState('');
+    const [age, setAge] = useState('');
+    const [gender, setGender] = useState('');
+    const [bioDetails, setBioDetails] = useState('');
+    const [goalsDetails, setGoalsDetails] = useState('');
 
-    const [initialFields, setInitialFields] = useState([])
+    const [initialFields, setInitialFields] = useState([]);
 
-    const [loadUserAsync, updateUserAsync] = useDatabase()
+    const [loadUserAsync, updateUserAsync] = useDatabase();
 
     const updateDetailedInfo = () => {
         if (route.params?.updatedField) {
@@ -43,13 +44,13 @@ const ProfileScreen = ({ navigation, route }) => {
     }
 
     const areFieldsUpdated = () => {
-        console.log(initialFields)
-        if (name == initialFields[0]
-            && age == initialFields[1]
-            && gender == initialFields[2]
-            && bioDetails == initialFields[3]
-            && goalsDetails == initialFields[4]) {
-
+        console.log(initialFields);
+        if (name == initialFields[0] &&
+            age == initialFields[1] &&
+            gender == initialFields[2] &&
+            bioDetails == initialFields[3] &&
+            goalsDetails == initialFields[4] &&
+            !imageChanged) {
             return false;
         }
         return true;
@@ -66,6 +67,7 @@ const ProfileScreen = ({ navigation, route }) => {
             updateUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails)
             Alert.alert('Profile updated!')
             setInitialFields([name, age, gender, bioDetails, goalsDetails])
+            setImageChanged(false)
         }
         if (route.params?.newUser) {
             route.params?.setUserNullFunction(false);
@@ -73,9 +75,7 @@ const ProfileScreen = ({ navigation, route }) => {
     }
 
     useEffect(() => {
-        loadUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails,
-            setImageURL, setName, setAge, setGender, setBioDetails, setGoalsDetails)
-        setInitialFields([name, age, gender, bioDetails, goalsDetails])
+        loadUserAsync(setImageURL, setName, setAge, setGender, setBioDetails, setGoalsDetails, setInitialFields)
     }, [])
 
     useEffect(() => { updateDetailedInfo() }, [route.params?.updatedField])
@@ -88,7 +88,7 @@ const ProfileScreen = ({ navigation, route }) => {
                 </TouchableOpacity>
             </View>
             <View style={{paddingBottom: 15}}>
-                <ProfilePic imageURL={imageURL} setImageURL={setImageURL} />
+                <ProfilePic imageURL={imageURL} setImageURL={setImageURL} setImageChanged={setImageChanged} />
                 <BasicInfo
                     name={name}
                     setName={setName}

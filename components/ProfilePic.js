@@ -3,19 +3,21 @@ import {View, StyleSheet, Image, TouchableOpacity, Alert} from 'react-native';
 import usePhotos from '../hooks/usePhotos';
 
 
-const ProfilePic = ({imageURL, setImageURL} ) => {
+const ProfilePic = ({imageURL, setImageURL, setImageChanged} ) => {
     const [pickFromGallery, pickFromCamera] = usePhotos();
 
     const promptUser = () => {
-        const title = 'Choose a profile pic!';
-        const message = 'Please make your selection.';
+        const title = 'Select a profile pic!';
         const options = [
-            { text: 'Take a pic', onPress: () => pickFromCamera(setImageURL) },
-            { text: 'Select a pic from photos', onPress: () => pickFromGallery(setImageURL) },
-            { text: 'Remove pic', onPress: () => setImageURL('') },
-            { text: 'Cancel', type: 'cancel' },
+            { text: 'Take a pic', onPress: () => pickFromCamera(setImageURL, setImageChanged) },
+            { text: 'Select a pic from photos', onPress: () => pickFromGallery(setImageURL, setImageChanged) },
+            { text: 'Remove pic', onPress: () => {
+                if (imageURL !== '') setImageChanged(true);
+                setImageURL('');
+            } },
+            { text: 'Cancel', type: 'cancel', },
         ];
-        Alert.alert(title, message, options);
+        Alert.alert(title, '', options, { cancelable: true });
     }
 
     return (

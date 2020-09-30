@@ -4,7 +4,7 @@ import * as Permissions from 'expo-permissions';
 
 export default () => {
 
-    const pickFromGallery = async(setImageURL) => {
+    const pickFromGallery = async(setImageURL, setImageChanged) => {
         const {granted} = await Permissions.askAsync(Permissions.CAMERA_ROLL)
         if (granted) {
             let response = await ImagePicker.launchImageLibraryAsync({
@@ -15,6 +15,7 @@ export default () => {
             })
             if (!response.cancelled) {
                 setImageURL(response.uri)
+                setImageChanged(true)
             }
             
             console.log(response)
@@ -25,7 +26,7 @@ export default () => {
         
     }
 
-    const pickFromCamera = async(setImageURL) => {
+    const pickFromCamera = async(setImageURL, setImageChanged) => {
         const {granted} = await Permissions.askAsync(Permissions.CAMERA)
         if (granted) {
             let response = await ImagePicker.launchCameraAsync({
@@ -36,6 +37,7 @@ export default () => {
             })
             if (!response.cancelled) {
                 setImageURL(response.uri)
+                setImageChanged(true)
             }
             
             console.log(response)
