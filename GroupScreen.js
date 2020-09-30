@@ -21,7 +21,7 @@ import { DataStore, Predicates } from "@aws-amplify/datastore";
 import { listPosts } from "./src/graphql/queries";
 import Header from "./components/header";
 import AddPost from "./components/AddPosts";
-import DeleteItem from "./components/deletePosts";
+import PostItem from "./components/PostItem";
 
 Amplify.configure(awsconfig);
 
@@ -141,7 +141,7 @@ export default function GroupScreen() {
       <FlatList
         data={posts}
         renderItem={({ item }) => (
-          <DeleteItem
+          <PostItem
             item={item}
             pressHandler={pressHandler}
             deletePostsAsync={deletePostsAsync}

@@ -10,7 +10,7 @@ import {
 
 var styles = require('../styles/stylesheet');
 
-export default function DeleteItem({
+export default function PostItem({
   item,
   pressHandler,
   deletePostsAsync,
