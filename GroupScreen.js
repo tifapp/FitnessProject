@@ -52,35 +52,10 @@ export default function GroupScreen() {
   };
 
   const addPostAsync = async () => {
-    var yearVal = new Date().getFullYear();
-    var monthVal = new Date().getMonth();
-    var dayVal = new Date().getDate();
-    var hourVal = new Date().getHours();
-    var minuteVal = new Date().getMinutes();
-    let timeCheck = "AM";
-
-    if (hourVal >= 12 && hourVal <= 23) {
-      timeCheck = "PM";
-    }
-
-    if (hourVal == 0) {
-      hourVal = hourVal + 12;
-    }
-
-    if (hourVal > 12) {
-      hourVal = hourVal - 12;
-    }
-
     const newUser = {
-      id: Date.now(),
+      date: Date.now(),
       name: postVal,
       email: emailVal,
-      year: yearVal,
-      month: monthVal,
-      day: dayVal,
-      hour: hourVal,
-      minute: minuteVal,
-      timeOfDay: timeCheck,
     };
     setPostVal("");
 
@@ -98,7 +73,7 @@ export default function GroupScreen() {
       let val = query.data.listPosts.items;
 
       val.sort((a, b) => {
-        return b.id - a.id;
+        return b.date - a.date;
       });
       setPosts(val);
     } catch (err) {

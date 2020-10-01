@@ -1,6 +1,48 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const onCreateGroup = /* GraphQL */ `
+  subscription OnCreateGroup {
+    onCreateGroup {
+      id
+      name
+      maxUsers
+      Privacy
+      Sport
+      Description
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdateGroup = /* GraphQL */ `
+  subscription OnUpdateGroup {
+    onUpdateGroup {
+      id
+      name
+      maxUsers
+      Privacy
+      Sport
+      Description
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteGroup = /* GraphQL */ `
+  subscription OnDeleteGroup {
+    onDeleteGroup {
+      id
+      name
+      maxUsers
+      Privacy
+      Sport
+      Description
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const onCreatePicture = /* GraphQL */ `
   subscription OnCreatePicture($owner: String!) {
     onCreatePicture(owner: $owner) {
@@ -50,6 +92,7 @@ export const onCreatePost = /* GraphQL */ `
   subscription OnCreatePost {
     onCreatePost {
       id
+      date
       name
       email
       description
@@ -69,6 +112,7 @@ export const onUpdatePost = /* GraphQL */ `
   subscription OnUpdatePost {
     onUpdatePost {
       id
+      date
       name
       email
       description
@@ -88,6 +132,7 @@ export const onDeletePost = /* GraphQL */ `
   subscription OnDeletePost {
     onDeletePost {
       id
+      date
       name
       email
       description

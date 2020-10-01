@@ -1,5 +1,6 @@
 type Post @model {
   id: ID!
+  date: Int!
   name: String!
   email: String!
   description: String
@@ -13,6 +14,7 @@ type Post @model {
 }
 
 input CreatePostInput {
+  date: Int!
   name: String!
   email: String!
   description: String
