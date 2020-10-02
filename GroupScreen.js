@@ -22,6 +22,7 @@ import { listPosts } from "./src/graphql/queries";
 import Header from "./components/header";
 import AddPost from "./components/AddPosts";
 import PostItem from "./components/PostItem";
+import * as subscriptions from './src/graphql/subscriptions';
 
 Amplify.configure(awsconfig);
 
@@ -33,7 +34,7 @@ export default function GroupScreen() {
   const [emailVal, setEmailVal] = useState("");
 
   useEffect(() => {
-    showPostsAsync(), addingEmail();
+    showPostsAsync();
   }, []);
 
   const pressHandler = (key) => {
@@ -53,7 +54,7 @@ export default function GroupScreen() {
 
   const addPostAsync = async () => {
     const newUser = {
-      timestamp: Math.floor(Date.now()/1000),
+      timestamp: Math.floor(Date.now() / 1000),
       name: postVal,
       email: emailVal,
     };
@@ -62,6 +63,7 @@ export default function GroupScreen() {
 
     try {
       await API.graphql(graphqlOperation(createPost, { input: newUser }));
+      showPostsAsync();
       console.log("success");
     } catch (err) {
       console.log("error: ", err);
@@ -78,6 +80,7 @@ export default function GroupScreen() {
         return b.timestamp - a.timestamp;
       });
       setPosts(val);
+      addingEmail();
     } catch (err) {
       console.log("error: ", err);
     }
@@ -94,24 +97,33 @@ export default function GroupScreen() {
   return (
     <View style={styles.containerStyle}>
       <TextInput
-        style={[styles.textInputStyle, {marginTop: 40}]}
+        style={[styles.textInputStyle, { marginTop: 40 }]}
         multiline={true}
         placeholder="Start Typing ..."
         onChangeText={setPostVal}
         value={postVal}
         clearButtonMode="always"
       />
-      
-      <View style={styles.spaceAround}>
+
+      <View style={[styles.rowContainerStyle, {paddingVertical: 50, paddingHorizontal: 20, marginHorizontal: 100}]}>
         <TouchableOpacity
           style={styles.buttonStyle}
           onPress={() => {
             postVal != ""
-              ? (addingEmail(), addPostAsync(), showPostsAsync())
+              ? (addPostAsync())
               : alert("No text detected in text field");
           }}
         >
           <Text style={styles.buttonTextStyle}>Add Post</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={styles.outlineButtonStyle}
+          onPress={() => {
+            showPostsAsync();
+          }}
+        >
+          <Text style={styles.outlineButtonTextStyle}>Refresh</Text>
         </TouchableOpacity>
       </View>
 
