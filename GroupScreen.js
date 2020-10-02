@@ -53,10 +53,11 @@ export default function GroupScreen() {
 
   const addPostAsync = async () => {
     const newUser = {
-      timestamp: (int)(Date.now() / 1000),
+      timestamp: Math.floor(Date.now()/1000),
       name: postVal,
       email: emailVal,
     };
+
     setPostVal("");
 
     try {
@@ -65,6 +66,7 @@ export default function GroupScreen() {
     } catch (err) {
       console.log("error: ", err);
     }
+    //console.log("current time..", );
   };
 
   const showPostsAsync = async () => {

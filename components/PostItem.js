@@ -32,7 +32,7 @@ export default function PostItem({
     "December",
   ];
 
-  const dateInfo = new Date((long)(item.timestamp * 1000));
+  const dateInfo = new Date(item.timestamp * 1000);
   
   var yearVal = dateInfo.getFullYear();
   var monthVal = dateInfo.getMonth();
