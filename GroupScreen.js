@@ -34,7 +34,11 @@ export default function GroupScreen() {
   const [emailVal, setEmailVal] = useState("");
 
   useEffect(() => {
-    showPostsAsync();
+    async function showPostsFirstTime() {
+      showPostsAsync();
+    }
+
+    showPostsFirstTime(); //to get rid of the "effect function must not return anything" warning
   }, []);
 
   const pressHandler = (key) => {

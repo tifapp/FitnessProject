@@ -2,6 +2,7 @@ import React from 'react';
 import {View, StyleSheet, Image, TouchableOpacity, Alert} from 'react-native';
 import usePhotos from '../hooks/usePhotos';
 
+var styles = require('../styles/stylesheet');
 
 const ProfilePic = ({imageURL, setImageURL, setImageChanged} ) => {
     const [pickFromGallery, pickFromCamera] = usePhotos();
@@ -33,15 +34,5 @@ const ProfilePic = ({imageURL, setImageURL, setImageChanged} ) => {
         </View>
     )
 }
-
-const styles = new StyleSheet.create({
-    imageStyle: {
-        alignSelf: 'center',
-        marginTop: 30,
-        height: 110,
-        width: 110,
-        borderRadius: 10,
-    }
-})
 
 export default ProfilePic;

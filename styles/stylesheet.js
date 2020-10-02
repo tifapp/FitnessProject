@@ -150,7 +150,7 @@ module.exports = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#ffffff",
   },
-  
+
   check: {
     padding: 25,
     marginTop: 16,
@@ -165,4 +165,17 @@ module.exports = StyleSheet.create({
   secondaryContainerStyle: {
     backgroundColor: '#fdfffe',
   },
+
+  imageStyle: {
+    alignSelf: 'center',
+    marginTop: 30,
+    height: 110,
+    width: 110,
+    borderRadius: 10,
+  },
+  smallImageStyle: {
+    height: 60,
+    width: 60,
+    borderRadius: 5,
+  }
 });
