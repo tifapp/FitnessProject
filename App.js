@@ -1,64 +1,98 @@
-import { StatusBar } from 'expo-status-bar';
-import { Ionicons } from '@expo/vector-icons';
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, Button, Image, View, TextInput, TouchableOpacity, Linking } from 'react-native';
-import { withAuthenticator } from 'aws-amplify-react-native';
+import { StatusBar } from "expo-status-bar";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useState, useEffect } from "react";
+import {
+  StyleSheet,
+  Text,
+  Button,
+  Image,
+  View,
+  TextInput,
+  TouchableOpacity,
+  Linking,
+} from "react-native";
+import { withAuthenticator } from "aws-amplify-react-native";
 // Get the aws resources configuration parameters
-import awsconfig from './aws-exports'; // if you are using Amplify CLI
+import awsconfig from "./aws-exports"; // if you are using Amplify CLI
 import { Amplify, API, graphqlOperation, Auth } from "aws-amplify";
-import { getUser } from './src/graphql/queries';
-import GroupScreen from './GroupScreen';
-import ProfileTab from './ProfileTab';
-import ProfileScreen from './screens/ProfileScreen';
-import BioScreen from './screens/BioScreen'
-import GoalsScreen from './screens/GoalsScreen'
+import { getUser } from "./src/graphql/queries";
+import GroupScreen from "./GroupScreen";
+import ProfileTab from "./ProfileTab";
+import ProfileScreen from "./screens/ProfileScreen";
+import BioScreen from "./screens/BioScreen";
+import GoalsScreen from "./screens/GoalsScreen";
+import CreatingGroups from "./screens/CreatingGroups";
 
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createStackNavigator } from '@react-navigation/stack';
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createStackNavigator } from "@react-navigation/stack";
 
-Amplify.configure(
-  {
-    awsconfig, Analytics: {
-      disabled: true,
-    },
-  }
-); //for some reason this removes the unhandled promise rejection error on startup
+Amplify.configure({
+  awsconfig,
+  Analytics: {
+    disabled: true,
+  },
+}); //for some reason this removes the unhandled promise rejection error on startup
 
-var styles = require('./styles/stylesheet');
+var styles = require("./styles/stylesheet");
 
 function ComplianceScreen({ navigation }) {
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Text
         style={{
-          textAlign: 'center',
+          textAlign: "center",
           padding: 40,
-          fontWeight: 'bold',
+          fontWeight: "bold",
           lineHeight: 20,
         }}
-      >By continuing, you agree to our {"\n"}
+      >
+        By continuing, you agree to our {"\n"}
         <Text
-          style={{ color: 'orange' }}
-          onPress={() => Linking.openURL('https://drive.google.com/file/d/15OG-z9vZ97eNWHKooDrBEtV51Yz2fMRQ/view?usp=sharing')}>
-          Terms of Service, {" "}
+          style={{ color: "orange" }}
+          onPress={() =>
+            Linking.openURL(
+              "https://drive.google.com/file/d/15OG-z9vZ97eNWHKooDrBEtV51Yz2fMRQ/view?usp=sharing"
+            )
+          }
+        >
+          Terms of Service,{" "}
         </Text>
         <Text
-          style={{ color: 'orange' }}
-          onPress={() => Linking.openURL('https://drive.google.com/file/d/11wIw9yQcT_mHHDT_xflVxEzzEUfh3KgN/view?usp=sharing')}>
+          style={{ color: "orange" }}
+          onPress={() =>
+            Linking.openURL(
+              "https://drive.google.com/file/d/11wIw9yQcT_mHHDT_xflVxEzzEUfh3KgN/view?usp=sharing"
+            )
+          }
+        >
           Privacy Policy, {"\n"}
         </Text>
         <Text
-          style={{ color: 'orange' }}
-          onPress={() => Linking.openURL('https://drive.google.com/file/d/13VlxdknD3xSVdqMFHpV3ADXfmEql_NP6/view?usp=sharing')}>
-          Community Standards, {" "}
+          style={{ color: "orange" }}
+          onPress={() =>
+            Linking.openURL(
+              "https://drive.google.com/file/d/13VlxdknD3xSVdqMFHpV3ADXfmEql_NP6/view?usp=sharing"
+            )
+          }
+        >
+          Community Standards,{" "}
         </Text>
         <Text
-          style={{ color: 'orange' }}
-          onPress={() => Linking.openURL('https://drive.google.com/file/d/1aZ0oiThB4vBztSdmemN8p97L3gxcS302/view?usp=sharing')}>
+          style={{ color: "orange" }}
+          onPress={() =>
+            Linking.openURL(
+              "https://drive.google.com/file/d/1aZ0oiThB4vBztSdmemN8p97L3gxcS302/view?usp=sharing"
+            )
+          }
+        >
           and Disclaimers.
-</Text></Text>
-      <TouchableOpacity style={styles.buttonStyle} onPress={() => navigation.navigate('Create your profile')} >
+        </Text>
+      </Text>
+      <TouchableOpacity
+        style={styles.buttonStyle}
+        onPress={() => navigation.navigate("Create your profile")}
+      >
         <Text style={styles.buttonTextStyle}>Continue</Text>
       </TouchableOpacity>
     </View>
@@ -72,19 +106,20 @@ const App = () => {
   const checkIfUserExists = async () => {
     try {
       const query = await Auth.currentUserInfo();
-      const user = await API.graphql(graphqlOperation(getUser, { id: query.attributes.sub }));
+      const user = await API.graphql(
+        graphqlOperation(getUser, { id: query.attributes.sub })
+      );
       setUser(user.data.getUser == null);
 
       console.log("success, user is ", user);
-    }
-    catch (err) {
+    } catch (err) {
       console.log("error: ", err);
     }
-  }
+  };
 
   useEffect(() => {
     checkIfUserExists();
-  }, [])
+  }, []);
 
   console.log("App rerendered, userexists is... ", userNull);
 
@@ -104,13 +139,14 @@ const App = () => {
           <Stack.Screen
             name="Create your profile"
             component={ProfileScreen}
-            initialParams={{ newUser: true, setUserNullFunction : setUser }}
+            initialParams={{ newUser: true, setUserNullFunction: setUser }}
             options={{
               headerShown: false,
             }}
           />
-          <Stack.Screen name='Bio' component={BioScreen} />
-          <Stack.Screen name='Goals' component={GoalsScreen} />
+          <Stack.Screen name="Bio" component={BioScreen} />
+          <Stack.Screen name="Goals" component={GoalsScreen} />
+          <Stack.Screen name="Group" component={CreatingGroups} />
         </Stack.Navigator>
       </NavigationContainer>
     );
@@ -118,36 +154,52 @@ const App = () => {
     return (
       <NavigationContainer>
         <Tab.Navigator
-        tabBarOptions={{
-          activeTintColor: 'orange',
-          labelStyle:{
-          fontSize: 20,
-          fontWeight: 'bold',
-          margin: 0,
-          padding: 10,
-          },
-          tabStyle:{
-          height:47,
-          }
-        }}>
-          <Tab.Screen name="Groups" component={GroupScreen}
+          tabBarOptions={{
+            activeTintColor: "orange",
+            labelStyle: {
+              fontSize: 20,
+              fontWeight: "bold",
+              margin: 0,
+              padding: 0,
+            },
+            tabStyle: {
+              height: 47,
+            },
+          }}
+        >
+          <Tab.Screen
+            name="Groups"
+            component={GroupScreen}
             options={{
               headerShown: false,
-            }} />
-          <Tab.Screen name="Profile" component={ProfileTab}
+            }}
+          />
+          <Tab.Screen
+            name="Profile"
+            component={ProfileTab}
             options={{
               headerShown: false,
-            }} />
+            }}
+          />
+          <Tab.Screen
+            name="CreateGroup"
+            component={CreatingGroups}
+            options={{
+              headerShown: false,
+            }}
+          />
         </Tab.Navigator>
       </NavigationContainer>
     );
   }
-}
+};
 
 // You can explore the built-in icon families and icons on the web at:
 // https://icons.expo.fyi/
 function TabBarIcon({ name, color }) {
-  return <Ionicons size={50} style={{ marginBottom:0 }} {...{ name, color }} />;
+  return (
+    <Ionicons size={50} style={{ marginBottom: 0 }} {...{ name, color }} />
+  );
 }
 
 export default withAuthenticator(App);
