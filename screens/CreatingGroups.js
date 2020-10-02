@@ -16,6 +16,7 @@ import {
   Keyboard,
   Modal,
   Dimensions,
+  Alert
 } from "react-native";
 import { withAuthenticator } from "aws-amplify-react-native";
 // Get the aws resources configuration parameters
@@ -39,6 +40,8 @@ export default function CreatingGroups() {
   const [descriptionVal, setDescription] = useState("");
 
   const addGroup = async () => {
+    Alert.alert('Submitting Group...', '', [], {cancelable: false})
+
     const val = {
       id: Date.now(),
       name: nameVal,
@@ -58,8 +61,10 @@ export default function CreatingGroups() {
     try {
       await API.graphql(graphqlOperation(createGroup, { input: val }));
       console.log("success");
+      alert('Group submitted successfully!')
     } catch (err) {
       console.log(err);
+      alert('Group could not be submitted!', err)
     }
   };
 

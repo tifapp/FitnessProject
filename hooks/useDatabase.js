@@ -53,7 +53,7 @@ export default () => {
         if (imageURL !== '') {
           const response = await fetch(imageURL);
           const blob = await response.blob();
-          Storage.put('profileimage.jpg', blob, { level: 'protected', contentType: 'image/jpeg' })
+          await Storage.put('profileimage.jpg', blob, { level: 'protected', contentType: 'image/jpeg' })
         } else {
           Storage.remove('profileimage.jpg', { level: 'protected' })
             .then(result => console.log("removed profile image!", result))
