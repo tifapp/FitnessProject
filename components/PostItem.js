@@ -32,11 +32,13 @@ export default function PostItem({
     "December",
   ];
 
-  var yearVal = new Date(item.date).getFullYear();
-  var monthVal = new Date(item.date).getMonth();
-  var dayVal = new Date(item.date).getDate();
-  var hourVal = new Date(item.date).getHours();
-  var minuteVal = new Date(item.date).getMinutes();
+  const dateInfo = new Date((long)(item.timestamp * 1000));
+  
+  var yearVal = dateInfo.getFullYear();
+  var monthVal = dateInfo.getMonth();
+  var dayVal = dateInfo.getDate();
+  var hourVal = dateInfo.getHours();
+  var minuteVal = dateInfo.getMinutes();
   let timeCheck = "AM";
 
   if (hourVal >= 12 && hourVal <= 23) {

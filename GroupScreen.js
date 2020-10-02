@@ -53,7 +53,7 @@ export default function GroupScreen() {
 
   const addPostAsync = async () => {
     const newUser = {
-      date: Date.now(),
+      timestamp: (int)(Date.now() / 1000),
       name: postVal,
       email: emailVal,
     };
@@ -73,7 +73,7 @@ export default function GroupScreen() {
       let val = query.data.listPosts.items;
 
       val.sort((a, b) => {
-        return b.date - a.date;
+        return b.timestamp - a.timestamp;
       });
       setPosts(val);
     } catch (err) {

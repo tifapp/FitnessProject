@@ -1,28 +1,16 @@
 type Post @model {
   id: ID!
-  date: Int!
+  timestamp: AWSTimestamp!
   name: String!
   email: String!
   description: String
   group: String
-  year: Int
-  month: Int
-  day: Int
-  hour: Int
-  minute: Int
-  timeOfDay: String
 }
 
 input CreatePostInput {
-  date: Int!
+  timestamp: AWSTimestamp!
   name: String!
   email: String!
   description: String
   group: String
-  year: Int
-  month: Int
-  day: Int
-  hour: Int
-  minute: Int
-  timeOfDay: String
 }
