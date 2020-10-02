@@ -32,13 +32,34 @@ export default function PostItem({
     "December",
   ];
 
+  const dateInfo = new Date(item.timestamp * 1000);
+  
+  var yearVal = dateInfo.getFullYear();
+  var monthVal = dateInfo.getMonth();
+  var dayVal = dateInfo.getDate();
+  var hourVal = dateInfo.getHours();
+  var minuteVal = dateInfo.getMinutes();
+  let timeCheck = "AM";
+
+  if (hourVal >= 12 && hourVal <= 23) {
+    timeCheck = "PM";
+  }
+
+  if (hourVal == 0) {
+    hourVal = hourVal + 12;
+  }
+
+  if (hourVal > 12) {
+    hourVal = hourVal - 12;
+  }
+
   return (
     <View style={styles.secondaryContainerStyle}>
       <View style={styles.spaceAround}>
         <Text>{item.email}</Text>
         <Text>
-          {months[item.month]}-{item.day}-{item.year} {item.hour}:{item.minute}{" "}
-          {item.timeOfDay}
+          {months[monthVal]}-{dayVal}-{yearVal} {hourVal}:{minuteVal}{" "}
+          {timeCheck}
         </Text>
         <Text style={styles.check}>{item.name}</Text>
       </View>

@@ -22,6 +22,7 @@ import { listPosts } from "./src/graphql/queries";
 import Header from "./components/header";
 import AddPost from "./components/AddPosts";
 import PostItem from "./components/PostItem";
+import * as subscriptions from './src/graphql/subscriptions';
 
 Amplify.configure(awsconfig);
 
@@ -33,7 +34,7 @@ export default function GroupScreen() {
   const [emailVal, setEmailVal] = useState("");
 
   useEffect(() => {
-    showPostsAsync(), addingEmail();
+    showPostsAsync();
   }, []);
 
   const pressHandler = (key) => {
@@ -52,44 +53,22 @@ export default function GroupScreen() {
   };
 
   const addPostAsync = async () => {
-    var yearVal = new Date().getFullYear();
-    var monthVal = new Date().getMonth();
-    var dayVal = new Date().getDate();
-    var hourVal = new Date().getHours();
-    var minuteVal = new Date().getMinutes();
-    let timeCheck = "AM";
-
-    if (hourVal >= 12 && hourVal <= 23) {
-      timeCheck = "PM";
-    }
-
-    if (hourVal == 0) {
-      hourVal = hourVal + 12;
-    }
-
-    if (hourVal > 12) {
-      hourVal = hourVal - 12;
-    }
-
     const newUser = {
-      id: Date.now(),
+      timestamp: Math.floor(Date.now() / 1000),
       name: postVal,
       email: emailVal,
-      year: yearVal,
-      month: monthVal,
-      day: dayVal,
-      hour: hourVal,
-      minute: minuteVal,
-      timeOfDay: timeCheck,
     };
+
     setPostVal("");
 
     try {
       await API.graphql(graphqlOperation(createPost, { input: newUser }));
+      showPostsAsync();
       console.log("success");
     } catch (err) {
       console.log("error: ", err);
     }
+    //console.log("current time..", );
   };
 
   const showPostsAsync = async () => {
@@ -98,9 +77,10 @@ export default function GroupScreen() {
       let val = query.data.listPosts.items;
 
       val.sort((a, b) => {
-        return b.id - a.id;
+        return b.timestamp - a.timestamp;
       });
       setPosts(val);
+      addingEmail();
     } catch (err) {
       console.log("error: ", err);
     }
@@ -117,24 +97,33 @@ export default function GroupScreen() {
   return (
     <View style={styles.containerStyle}>
       <TextInput
-        style={[styles.textInputStyle, {marginTop: 40}]}
+        style={[styles.textInputStyle, { marginTop: 40 }]}
         multiline={true}
         placeholder="Start Typing ..."
         onChangeText={setPostVal}
         value={postVal}
         clearButtonMode="always"
       />
-      
-      <View style={styles.spaceAround}>
+
+      <View style={[styles.rowContainerStyle, {paddingVertical: 50, paddingHorizontal: 20, marginHorizontal: 100}]}>
         <TouchableOpacity
           style={styles.buttonStyle}
           onPress={() => {
             postVal != ""
-              ? (addingEmail(), addPostAsync(), showPostsAsync())
+              ? (addPostAsync())
               : alert("No text detected in text field");
           }}
         >
           <Text style={styles.buttonTextStyle}>Add Post</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={styles.outlineButtonStyle}
+          onPress={() => {
+            showPostsAsync();
+          }}
+        >
+          <Text style={styles.outlineButtonTextStyle}>Refresh</Text>
         </TouchableOpacity>
       </View>
 
