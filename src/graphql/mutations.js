@@ -52,60 +52,6 @@ export const deleteGroup = /* GraphQL */ `
     }
   }
 `;
-export const createPicture = /* GraphQL */ `
-  mutation CreatePicture(
-    $input: CreatePictureInput!
-    $condition: ModelPictureConditionInput
-  ) {
-    createPicture(input: $input, condition: $condition) {
-      id
-      file {
-        bucket
-        key
-        region
-      }
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-`;
-export const updatePicture = /* GraphQL */ `
-  mutation UpdatePicture(
-    $input: UpdatePictureInput!
-    $condition: ModelPictureConditionInput
-  ) {
-    updatePicture(input: $input, condition: $condition) {
-      id
-      file {
-        bucket
-        key
-        region
-      }
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-`;
-export const deletePicture = /* GraphQL */ `
-  mutation DeletePicture(
-    $input: DeletePictureInput!
-    $condition: ModelPictureConditionInput
-  ) {
-    deletePicture(input: $input, condition: $condition) {
-      id
-      file {
-        bucket
-        key
-        region
-      }
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-`;
 export const createPost = /* GraphQL */ `
   mutation CreatePost(
     $input: CreatePostInput!
@@ -113,16 +59,11 @@ export const createPost = /* GraphQL */ `
   ) {
     createPost(input: $input, condition: $condition) {
       id
+      timestamp
       name
       email
       description
       group
-      year
-      month
-      day
-      hour
-      minute
-      timeOfDay
       createdAt
       updatedAt
     }
@@ -135,16 +76,11 @@ export const updatePost = /* GraphQL */ `
   ) {
     updatePost(input: $input, condition: $condition) {
       id
+      timestamp
       name
       email
       description
       group
-      year
-      month
-      day
-      hour
-      minute
-      timeOfDay
       createdAt
       updatedAt
     }
@@ -157,16 +93,11 @@ export const deletePost = /* GraphQL */ `
   ) {
     deletePost(input: $input, condition: $condition) {
       id
+      timestamp
       name
       email
       description
       group
-      year
-      month
-      day
-      hour
-      minute
-      timeOfDay
       createdAt
       updatedAt
     }
