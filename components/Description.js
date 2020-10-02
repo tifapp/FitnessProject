@@ -31,7 +31,7 @@ export default function GroupDescription({ setDescription, descriptionVal }) {
         <Text>Description: </Text>
         <TextInput
           style={styles.DescriptionBox}
-          multiline="true"
+          multiline={true}
           onChangeText={setDescription}
           placeholder="Enter a description for your group ...."
           value={descriptionVal}
