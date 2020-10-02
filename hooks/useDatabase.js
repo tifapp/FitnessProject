@@ -1,4 +1,5 @@
 import { Auth } from 'aws-amplify';
+import { Alert } from 'react-native';
 import { createUser, updateUser } from '../src/graphql/mutations.js'
 import { getUser } from '../src/graphql/queries.js'
 import { API, graphqlOperation, Storage } from "aws-amplify";
@@ -47,7 +48,7 @@ export default () => {
   };
 
   const updateUserAsync = async (imageURL, name, age, gender, bioDetails, goalsDetails) => {
-    const updateUserInDB = async ({ recurringUser }) => {
+    const updateUserInDB = async ( recurringUser ) => {
       try {
         if (imageURL !== '') {
           const response = await fetch(imageURL);
@@ -59,13 +60,15 @@ export default () => {
             .catch(err => console.log(err));
         }
         await API.graphql(graphqlOperation(updateUser, { input: recurringUser }));
-        console.log("updated");
+        Alert.alert("Profile submitted successfully!");
+        console.log("updated user successfully");
       } catch (err) {
-        console.log("error: ", err);
+        Alert.alert("Could not submit profile! Error: ", err);
+        console.log("error when updating user: ", err);
       }
     }
 
-    const createUserInDB = async ({ newUser }) => {
+    const createUserInDB = async ( newUser ) => {
       try {
         await API.graphql(graphqlOperation(createUser, { input: newUser }));
         console.log("success");
@@ -80,21 +83,23 @@ export default () => {
       const query = await Auth.currentUserInfo();
       const user = await API.graphql(graphqlOperation(getUser, { id: query.attributes.sub }));
       const fields = user.data.getUser;
+      console.log('returning users fields looks like', fields);
+      
+      const ourUser = {
+        id: query.attributes.sub,
+        pictureURL: identityId,
+        name: name,
+        age: age,
+        gender: gender,
+        bio: bioDetails,
+        goals: goalsDetails
+      };
 
       if (fields == null) {
-        const newUser = {
-          id: query.attributes.sub,
-          pictureURL: identityId,
-          name: name,
-          age: age,
-          gender: gender,
-          bio: bioDetails,
-          goals: goalsDetails
-        };
-        createUserInDB({ newUser })
+        createUserInDB( ourUser )
       }
       else {
-        updateUserInDB({ fields })
+        updateUserInDB( ourUser )
       }
     }
     catch (err) {
