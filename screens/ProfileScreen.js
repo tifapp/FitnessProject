@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { ActivityIndicator, View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import ProfilePic from '../components/ProfilePic'
 import BasicInfo from '../components/basicInfoComponents/BasicInfo'
 import DetailedInfo from '../components/detailedInfoComponents/DetailedInfo';
@@ -11,10 +11,17 @@ var styles = require('../styles/stylesheet');
 
 const ProfileScreen = ({ navigation, route }) => {
     async function signOut() {
-        try {
-            await Auth.signOut();
-        } catch (error) {
-            console.log("error");
+        console.log("user is signing out.");
+        if (areFieldsUpdated()) {
+            const title = 'Your profile has unsubmitted changes!';
+            const message = '';
+            const options = [
+                { text: 'Submit changes', onPress: () => {submitHandler();} }, //if submithandler fails user won't know
+                { text: 'Just sign out', onPress: Auth.signOut },
+            ];
+            Alert.alert(title, message, options, { cancelable: true });
+        } else {
+            Auth.signOut();
         }
     }
 
@@ -64,8 +71,8 @@ const ProfileScreen = ({ navigation, route }) => {
             Alert.alert('Profile is up to date!')
         }
         else {
+            Alert.alert('Submitting Profile...', '', [], {cancelable: false})
             updateUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails)
-            Alert.alert('Profile updated!')
             setInitialFields([name, age, gender, bioDetails, goalsDetails])
             setImageChanged(false)
         }
