@@ -10,6 +10,7 @@ import {
   TextInput,
   TouchableOpacity,
   Linking,
+  ActivityIndicator,
 } from "react-native";
 import { withAuthenticator } from "aws-amplify-react-native";
 // Get the aws resources configuration parameters
@@ -102,6 +103,7 @@ function ComplianceScreen({ navigation }) {
 
 const App = () => {
   const Tab = createBottomTabNavigator();
+  const [checkingIfLoggedIn, setCheckingIfLoggedIn] = useState(false);
   const [userNull, setUser] = useState(true);
 
   const checkIfUserExists = async () => {
@@ -111,6 +113,7 @@ const App = () => {
         graphqlOperation(getUser, { id: query.attributes.sub })
       );
       setUser(user.data.getUser == null);
+      setCheckingIfLoggedIn(false);
 
       console.log("success, user is ", user);
     } catch (err) {
@@ -119,6 +122,7 @@ const App = () => {
   };
 
   useEffect(() => {
+    setCheckingIfLoggedIn(true);
     checkIfUserExists();
   }, []);
 
@@ -126,7 +130,17 @@ const App = () => {
 
   const Stack = createStackNavigator();
 
-  if (userNull) {
+  if (checkingIfLoggedIn) {
+    return (
+      <ActivityIndicator size="large" style={{
+        flex: 1,
+        justifyContent: "center",
+        flexDirection: "row",
+        justifyContent: "space-around",
+        padding: 10
+      }} />
+    )
+  } else if (userNull) {
     return (
       <NavigationContainer>
         <Stack.Navigator>
