@@ -1,39 +1,37 @@
-import React, {useState} from 'react';
-import {View, StyleSheet, TextInput, TouchableOpacity} from 'react-native';
-import { Entypo } from '@expo/vector-icons'; 
+import React, { useState } from 'react';
+import { View, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { Entypo } from '@expo/vector-icons';
 import Selector from './Selector'
 
-const BasicInfoDetails = ({label, field, updateField}) => {
+const BasicInfoDetails = ({ label, field, updateField }) => {
     const [modalOpen, setModalOpen] = useState(false)
 
     return (
         <View>
-            {label != 'name' ? 
-            <Selector 
-                label = {label}
-                modalOpen = {modalOpen} 
-                setModalOpen = {setModalOpen} 
-                field = {field}
-                updateField = {updateField} /> : 
-            null}
+            {label != 'name'
+                ? <Selector
+                    label={label}
+                    modalOpen={modalOpen}
+                    setModalOpen={setModalOpen}
+                    field={field}
+                    updateField={updateField} />
+                : null}
 
-            <View style = {styles.textBoxStyle}>
+            <TouchableOpacity style={styles.textBoxStyle} onPress={() => setModalOpen(true)}>
                 <TextInput
-                    style = {field === '' ? styles.emptyTextInputStyle : styles.textInputStyle} 
-                    placeholder = {`Enter your ${label}`} 
-                    autoCorrect = {false}
-                    value = {field}
-                    onChangeText = {updateField}
-                    editable = {(label == 'name') ? true : false}
+                    style={field === '' ? styles.emptyTextInputStyle : styles.textInputStyle}
+                    placeholder={`Enter your ${label}`}
+                    autoCorrect={false}
+                    value={field}
+                    onChangeText={updateField}
+                    editable={(label == 'name') ? true : false}
                 />
 
-                <TouchableOpacity onPress = {() => setModalOpen(true)}> 
-                    <Entypo name="edit" size={18} color="black" /> 
-                </TouchableOpacity>
-                
-            </View> 
+                <Entypo name="edit" size={18} color="black" />
 
-        </View> 
+            </TouchableOpacity>
+
+        </View>
     )
 }
 
@@ -64,7 +62,7 @@ const styles = new StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: 'red',
     },
-   
+
 })
 
 export default BasicInfoDetails;
