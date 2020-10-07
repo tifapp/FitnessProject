@@ -28,44 +28,54 @@ Amplify.configure(awsconfig);
 
 var styles = require('./styles/stylesheet');
 
-export default function GroupScreen() {
+export default function SearchScreen() {
   const [query, setQuery] = useState("");
   const [users, setUsers] = useState([]);
-  
+
+  //we'll use a variable for debouncing in case multiple queries are sent at the same time.
+  const [fetchingData, setFetchingData] = useState(false);
+
   const showUsersAsync = async (query) => {
     if (query !== '') {
-      try {
-        const namematchresult = await API.graphql(graphqlOperation(listUsers, {
-          filter: {
-            name: {
-              contains: query
+      if (fetchingData) {
+        setUsers([]);
+      } else {
+        setFetchingData(true);
+        try {
+          const namematchresult = await API.graphql(graphqlOperation(listUsers, {
+            filter: {
+              name: {
+                contains: query
+              }
             }
           }
-        }
-        ));
-        const biomatchresult = await API.graphql(graphqlOperation(listUsers, {
-          filter: {
-            bio: {
-              contains: query
+          ));
+          const biomatchresult = await API.graphql(graphqlOperation(listUsers, {
+            filter: {
+              bio: {
+                contains: query
+              }
             }
           }
-        }
-        ));
-        const goalsmatchresult = await API.graphql(graphqlOperation(listUsers, {
-          filter: {
-            goals: {
-              contains: query
+          ));
+          const goalsmatchresult = await API.graphql(graphqlOperation(listUsers, {
+            filter: {
+              goals: {
+                contains: query
+              }
             }
           }
+          ));
+
+          let items = [...new Set([...namematchresult.data.listUsers.items, ...biomatchresult.data.listUsers.items, ...goalsmatchresult.data.listUsers.items])]; //uses Set() to remove duplicates from the combined array
+
+          //this is where the debounce should happen. we can discard this result if there is a newer query in line. we'll need to figure out if this query is outdated by the time it finishes. maybe compare the old query with the curreny query variable. yeah that sounds good.
+          setUsers(items);
+          console.log("searching for... ", items);
+        } catch (err) {
+          console.log("error: ", err);
         }
-        ));
-        
-        let items = [...namematchresult.data.listUsers.items, ...biomatchresult.data.listUsers.items, ...goalsmatchresult.data.listUsers.items];
-    
-        setUsers(items);
-        console.log("searching for... ", items);
-      } catch (err) {
-        console.log("error: ", err);
+        setFetchingData(false);
       }
     } else {
       setUsers([]);
@@ -78,7 +88,7 @@ export default function GroupScreen() {
         style={[styles.textInputStyle, { marginTop: 40 }]}
         multiline={true}
         placeholder="Start Typing ..."
-        onChangeText={(text) => {setQuery(text); showUsersAsync(text)}}
+        onChangeText={(text) => { setQuery(text); showUsersAsync(text) }}
         value={query}
         clearButtonMode="always"
       />
