@@ -24,6 +24,7 @@ import BioScreen from "./screens/BioScreen";
 import GoalsScreen from "./screens/GoalsScreen";
 import CreatingGroups from "./screens/CreatingGroups";
 import SearchStack from "./SearchStack";
+import VideoTest from "./VideoTest";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -206,6 +207,13 @@ const App = () => {
           <Tab.Screen
             name="User Search"
             component={SearchStack}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Tab.Screen
+            name="Video test"
+            component={VideoTest}
             options={{
               headerShown: false,
             }}
