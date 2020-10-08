@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -31,8 +31,13 @@ var styles = require('./styles/stylesheet');
 export default function SearchScreen() {
   const [query, setQuery] = useState("");
   const [users, setUsers] = useState([]);
+  const stateRef = useRef();
+
+  //still not 100% sure why this works, will have to come back to it. got from here: https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
+  stateRef.current = query;
   
   const showUsersAsync = async (text) => {
+    console.log("text received: ", text);
     if (text !== '') {
       try {
         const namematchresult = await API.graphql(graphqlOperation(listUsers, {
@@ -68,9 +73,11 @@ export default function SearchScreen() {
           ))
         )
 
-        if (text === query) {
+        if (text === stateRef.current) {
           setUsers(items);
-          console.log("here's some users! ");
+          console.log("here's some users! ", text);
+        } else {          
+          console.log("ignoring!");
         }
       } catch (err) {
         console.log("error: ", err);
@@ -88,7 +95,7 @@ export default function SearchScreen() {
     <View style={styles.containerStyle}>
       <TextInput
         style={[styles.textInputStyle, { marginTop: 40 }]}
-        placeholder="Start Typing ..."
+        placeholder="Start Searching ..."
         onChangeText={(text) => {setQuery(text);}}
         value={query}
         clearButtonMode="always"
