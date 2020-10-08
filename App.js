@@ -23,7 +23,7 @@ import ProfileScreen from "./screens/ProfileScreen";
 import BioScreen from "./screens/BioScreen";
 import GoalsScreen from "./screens/GoalsScreen";
 import CreatingGroups from "./screens/CreatingGroups";
-import SearchScreen from "./SearchScreen";
+import SearchStack from "./SearchStack";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -205,7 +205,7 @@ const App = () => {
           />
           <Tab.Screen
             name="User Search"
-            component={SearchScreen}
+            component={SearchStack}
             options={{
               headerShown: false,
             }}

@@ -38,7 +38,7 @@ export default function SearchScreen() {
         const namematchresult = await API.graphql(graphqlOperation(listUsers, {
           filter: {
             name: {
-              contains: text
+              beginsWith: text
             }
           }
         }
@@ -60,12 +60,18 @@ export default function SearchScreen() {
         }
         ));
         
-        let items = [...new Set([...namematchresult.data.listUsers.items, ...biomatchresult.data.listUsers.items, ...goalsmatchresult.data.listUsers.items])]; //uses Set() to remove duplicates from the combined array
+        let items = [...namematchresult.data.listUsers.items, ...biomatchresult.data.listUsers.items, ...goalsmatchresult.data.listUsers.items]; //uses Set() to remove duplicates from the combined array
         
+        items = items.filter((item, index, self) =>
+          index === self.findIndex((temp) => (
+            temp.id === item.id
+          ))
+        )
+
         if (text === query) {
           setUsers(items);
+          console.log("here's some users! ");
         }
-        console.log("searching for... ", items);
       } catch (err) {
         console.log("error: ", err);
       }
@@ -73,14 +79,17 @@ export default function SearchScreen() {
       setUsers([]);
     }
   };
+  
+  useEffect(() => {
+    showUsersAsync(query);
+  }, [query]);
 
   return (
     <View style={styles.containerStyle}>
       <TextInput
         style={[styles.textInputStyle, { marginTop: 40 }]}
-        multiline={true}
         placeholder="Start Typing ..."
-        onChangeText={(text) => {setQuery(text); showUsersAsync(text)}}
+        onChangeText={(text) => {setQuery(text);}}
         value={query}
         clearButtonMode="always"
       />
