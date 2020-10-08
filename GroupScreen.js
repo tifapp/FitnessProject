@@ -100,35 +100,41 @@ export default function GroupScreen() {
 
   return (
     <View style={styles.containerStyle}>
-      <TextInput
-        style={[styles.textInputStyle, { marginTop: 40 }]}
-        multiline={true}
-        placeholder="Start Typing ..."
-        onChangeText={setPostVal}
-        value={postVal}
-        clearButtonMode="always"
-      />
+      <View style={{}}>
+        <TextInput
+          style={[styles.textInputStyle, { marginTop: 40, marginBottom: 30 }]}
+          multiline={true}
+          placeholder="Start Typing ..."
+          onChangeText={setPostVal}
+          value={postVal}
+          clearButtonMode="always"
+        />
 
-      <View style={[styles.rowContainerStyle, {paddingVertical: 50, paddingHorizontal: 20, marginHorizontal: 100}]}>
-        <TouchableOpacity
-          style={styles.buttonStyle}
-          onPress={() => {
-            postVal != ""
-              ? (addPostAsync())
-              : alert("No text detected in text field");
-          }}
-        >
-          <Text style={styles.buttonTextStyle}>Add Post</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={styles.outlineButtonStyle}
-          onPress={() => {
-            showPostsAsync();
-          }}
-        >
-          <Text style={styles.outlineButtonTextStyle}>Refresh</Text>
-        </TouchableOpacity>
+        <View style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          marginBottom: 15,
+        }}>
+          <TouchableOpacity
+            style={styles.buttonStyle}
+            onPress={() => {
+              postVal != ""
+                ? (addPostAsync())
+                : alert("No text detected in text field");
+            }}
+          >
+            <Text style={styles.buttonTextStyle}>Add Post</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.outlineButtonStyle}
+            onPress={() => {
+              showPostsAsync();
+            }}
+          >
+            <Text style={styles.outlineButtonTextStyle}>Refresh</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <FlatList
@@ -142,6 +148,7 @@ export default function GroupScreen() {
           />
         )}
       />
+
 
       <StatusBar style="auto" />
     </View>
