@@ -1,9 +1,7 @@
 import 'react-native-gesture-handler';
 import { createStackNavigator } from '@react-navigation/stack';
-import ProfileScreen from './screens/ProfileScreen'
-import BioScreen from './screens/BioScreen'
-import GoalsScreen from './screens/GoalsScreen'
 import SearchScreen from "./SearchScreen";
+import LookupUserScreen from "./screens/LookupUser";
 
 import React from 'react';
 
@@ -19,7 +17,7 @@ export default function SearchStack() {
   return (
     <Stack.Navigator initialRouteName='Search' screenOptions={{ headerStyle: { backgroundColor: '#d3d3d3' } }}>
       <Stack.Screen name='Search' component={SearchScreen} />
-      <Stack.Screen name='Profile' component={ProfileScreen} />
+      <Stack.Screen name='Lookup' component={LookupUserScreen} />
     </Stack.Navigator>
   );
 }

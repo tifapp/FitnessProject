@@ -177,5 +177,25 @@ module.exports = StyleSheet.create({
     height: 60,
     width: 60,
     borderRadius: 5,
+  },
+  goBackButton: {
+    alignSelf: "center",
+    backgroundColor: "orange",
+    padding: 20,
+    marginTop: 50,
+    borderRadius: 5,
+  },
+  border: {
+    alignItems: "center",
+  },
+  viewProfileScreen : {
+    alignItems: "center",
+    marginTop: 20,
+    marginBottom: 20
+  },
+  boxFormat: {
+    paddingHorizontal: 8,
+    paddingTop: 30,
+    paddingBottom: 15,
   }
 });

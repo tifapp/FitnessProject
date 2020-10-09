@@ -14,19 +14,18 @@ import { useNavigation } from '@react-navigation/native';
 
 var styles = require('../styles/stylesheet');
 
-
-
 export default function UserListItem({
   item
 }) {
   const navigation = useNavigation();
 
   const goToProfile = () => {
-    navigation.navigate('Profile', { id: item.id })
+    navigation.navigate('Lookup', 
+          {user: item, picture: imageURL})
   }
 
   const [imageURL, setImageURL] = useState('');
-
+{
   Storage.get('profileimage.jpg', { level: 'protected', identityId: item.pictureURL }) //this will incur lots of repeated calls to the backend, idk how else to fix it right now
     .then((imageURL) => { //console.log("found profile image!", imageURL); 
       Image.getSize(imageURL, () => {
@@ -36,6 +35,7 @@ export default function UserListItem({
       });
     })
     .catch((err) => { console.log("could not find image!", err) }) //should just use a "profilepic" component
+  }
 
   return (
     <TouchableOpacity

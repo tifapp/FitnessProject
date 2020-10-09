@@ -22,11 +22,12 @@ import { listUsers } from "./src/graphql/queries";
 import Header from "./components/header";
 import AddPost from "./components/AddPosts";
 import UserListItem from "./components/UserListItem";
-import * as subscriptions from './src/graphql/subscriptions';
+import * as subscriptions from "./src/graphql/subscriptions";
+import { useNavigation } from '@react-navigation/native';
 
 Amplify.configure(awsconfig);
 
-var styles = require('./styles/stylesheet');
+var styles = require("./styles/stylesheet");
 
 export default function SearchScreen() {
   const [query, setQuery] = useState("");
@@ -65,7 +66,11 @@ export default function SearchScreen() {
         }
         ));
         
-        let items = [...namematchresult.data.listUsers.items, ...biomatchresult.data.listUsers.items, ...goalsmatchresult.data.listUsers.items]; //uses Set() to remove duplicates from the combined array
+        let items = [
+          ...namematchresult.data.listUsers.items,
+          ...biomatchresult.data.listUsers.items,
+          ...goalsmatchresult.data.listUsers.items,
+        ];
         
         items = items.filter((item, index, self) =>
           index === self.findIndex((temp) => (
@@ -96,21 +101,17 @@ export default function SearchScreen() {
       <TextInput
         style={[styles.textInputStyle, { marginTop: 40 }]}
         placeholder="Start Searching ..."
-        onChangeText={(text) => {setQuery(text);}}
+        onChangeText={setQuery}
         value={query}
         clearButtonMode="always"
       />
 
       <FlatList
         data={users}
-        renderItem={({ item }) => (
-          <UserListItem
-            item={item}
-          />
-        )}
+        renderItem={({ item }) => <UserListItem item={item} />}
       />
 
       <StatusBar style="auto" />
     </View>
   );
-};
+}
