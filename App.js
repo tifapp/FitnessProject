@@ -199,6 +199,13 @@ const App = () => {
             }}
           />
           <Tab.Screen 
+            name="GroupSearch"
+            component={GroupSearchScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Tab.Screen 
             name="User Search"
             component={SearchStack}
             options={{

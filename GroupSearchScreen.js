@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -32,9 +32,13 @@ var styles = require("./styles/stylesheet");
 export default function GroupSearchScreen({ navigation }) {
   const [query, setQuery] = useState("");
   const [users, setUsers] = useState([]);
+  const stateRef = useRef();
 
-  const showUsersAsync = async (query) => {
-    if (query !== "") {
+  //still not 100% sure why this works, will have to come back to it. got from here: https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
+  stateRef.current = query;
+
+  const showUsersAsync = async (text) => {
+    if (text !== '') {
       try {
         const namematchresult = await API.graphql(
           graphqlOperation(listGroups, {
@@ -56,10 +60,20 @@ export default function GroupSearchScreen({ navigation }) {
           })
         );
 
-        let items = [...sportmatchresult.data.listGroups.items];
+        let items = [...sportmatchresult.data.listGroups.items, ...namematchresult.data.listGroups.items];
+        
+        items = items.filter((item, index, self) =>
+          index === self.findIndex((temp) => (
+            temp.id === item.id
+          ))
+        )
 
-        setUsers(items);
-        console.log("searching for... ", items);
+        if (text === stateRef.current) {
+          setUsers(items);
+          console.log("here's some users! ", text);
+        } else {          
+          console.log("ignoring!");
+        }
       } catch (err) {
         console.log("error: ", err);
       }
@@ -67,28 +81,21 @@ export default function GroupSearchScreen({ navigation }) {
       setUsers([]);
     }
   };
+  
+  useEffect(() => {
+    showUsersAsync(query);
+  }, [query]);
 
   return (
     <View style={styles.containerStyle}>
       <TextInput
         style={[styles.textInputStyle, { marginTop: 40 }]}
-        multiline={true}
         placeholder="Start Typing ..."
-        onChangeText={(text) => {
-          setQuery(text);
-          showUsersAsync(text);
-        }}
+        onChangeText={setQuery}
         value={query}
         clearButtonMode="always"
       />
 
-<TouchableOpacity onPress={() => navigation.navigate('Profile', {name: 'Surya'})}>
-  <Text>Checker</Text>
-</TouchableOpacity>
-
-      <Button title="Go to the Profile screen"
-      onPress={() => navigation.navigate('Profile', {name: 'Surya'})}
-      />
       <FlatList
         data={users}
         renderItem={({ item }) => <ListGroupItem item={item} />}
