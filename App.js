@@ -19,14 +19,17 @@ import { getUser } from "./src/graphql/queries";
 import GroupScreen from "./GroupScreen";
 import ProfileTab from "./ProfileTab";
 import ProfileScreen from "./screens/ProfileScreen";
+import LookupUserScreen from "./screens/LookupUser";
 import BioScreen from "./screens/BioScreen";
 import GoalsScreen from "./screens/GoalsScreen";
 import CreatingGroups from "./screens/CreatingGroups";
 import SearchScreen from "./SearchScreen";
+import GroupSearchScreen from "./GroupSearchScreen";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
+
 
 Amplify.configure({
   awsconfig,
@@ -176,13 +179,6 @@ const App = () => {
             }}
           />
           <Tab.Screen
-            name="Profile"
-            component={ProfileTab}
-            options={{
-              headerShown: false,
-            }}
-          />
-          <Tab.Screen
             name="Create Group"
             component={CreatingGroups}
             options={{
@@ -192,6 +188,20 @@ const App = () => {
           <Tab.Screen
             name="User Search"
             component={SearchScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name='Lookup'
+            component={LookupUserScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Tab.Screen
+            name="Profile"
+            component={ProfileTab}
             options={{
               headerShown: false,
             }}

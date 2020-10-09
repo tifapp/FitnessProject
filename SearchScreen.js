@@ -22,46 +22,56 @@ import { listUsers } from "./src/graphql/queries";
 import Header from "./components/header";
 import AddPost from "./components/AddPosts";
 import UserListItem from "./components/UserListItem";
-import * as subscriptions from './src/graphql/subscriptions';
+import * as subscriptions from "./src/graphql/subscriptions";
+import { useNavigation } from '@react-navigation/native';
 
 Amplify.configure(awsconfig);
 
-var styles = require('./styles/stylesheet');
+var styles = require("./styles/stylesheet");
 
 export default function GroupScreen() {
   const [query, setQuery] = useState("");
   const [users, setUsers] = useState([]);
-  
+
+  const navigation = useNavigation();
+
   const showUsersAsync = async (query) => {
-    if (query !== '') {
+    if (query !== "") {
       try {
-        const namematchresult = await API.graphql(graphqlOperation(listUsers, {
-          filter: {
-            name: {
-              contains: query
-            }
-          }
-        }
-        ));
-        const biomatchresult = await API.graphql(graphqlOperation(listUsers, {
-          filter: {
-            bio: {
-              contains: query
-            }
-          }
-        }
-        ));
-        const goalsmatchresult = await API.graphql(graphqlOperation(listUsers, {
-          filter: {
-            goals: {
-              contains: query
-            }
-          }
-        }
-        ));
-        
-        let items = [...namematchresult.data.listUsers.items, ...biomatchresult.data.listUsers.items, ...goalsmatchresult.data.listUsers.items];
-    
+        const namematchresult = await API.graphql(
+          graphqlOperation(listUsers, {
+            filter: {
+              name: {
+                contains: query,
+              },
+            },
+          })
+        );
+        const biomatchresult = await API.graphql(
+          graphqlOperation(listUsers, {
+            filter: {
+              bio: {
+                contains: query,
+              },
+            },
+          })
+        );
+        const goalsmatchresult = await API.graphql(
+          graphqlOperation(listUsers, {
+            filter: {
+              goals: {
+                contains: query,
+              },
+            },
+          })
+        );
+
+        let items = [
+          ...namematchresult.data.listUsers.items,
+          ...biomatchresult.data.listUsers.items,
+          ...goalsmatchresult.data.listUsers.items,
+        ];
+
         setUsers(items);
         console.log("searching for... ", items);
       } catch (err) {
@@ -78,21 +88,20 @@ export default function GroupScreen() {
         style={[styles.textInputStyle, { marginTop: 40 }]}
         multiline={true}
         placeholder="Start Typing ..."
-        onChangeText={(text) => {setQuery(text); showUsersAsync(text)}}
+        onChangeText={(text) => {
+          setQuery(text);
+          showUsersAsync(text);
+        }}
         value={query}
         clearButtonMode="always"
       />
 
       <FlatList
         data={users}
-        renderItem={({ item }) => (
-          <UserListItem
-            item={item}
-          />
-        )}
+        renderItem={({ item }) => <UserListItem nameVal={item.name} genderVal={item.gender} goalsVal={item.goals} ageVal= {item.age} pictureURL={item.pictureURL} navigation={navigation} bioVal={item.bio} />}
       />
 
       <StatusBar style="auto" />
     </View>
   );
-};
+}

@@ -29,7 +29,7 @@ Amplify.configure(awsconfig);
 
 var styles = require("./styles/stylesheet");
 
-export default function GroupSearchScreen() {
+export default function GroupSearchScreen({ navigation }) {
   const [query, setQuery] = useState("");
   const [users, setUsers] = useState([]);
 
@@ -82,6 +82,13 @@ export default function GroupSearchScreen() {
         clearButtonMode="always"
       />
 
+<TouchableOpacity onPress={() => navigation.navigate('Profile', {name: 'Surya'})}>
+  <Text>Checker</Text>
+</TouchableOpacity>
+
+      <Button title="Go to the Profile screen"
+      onPress={() => navigation.navigate('Profile', {name: 'Surya'})}
+      />
       <FlatList
         data={users}
         renderItem={({ item }) => <ListGroupItem item={item} />}
