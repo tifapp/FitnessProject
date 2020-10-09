@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -22,23 +22,29 @@ import { listUsers } from "./src/graphql/queries";
 import Header from "./components/header";
 import AddPost from "./components/AddPosts";
 import UserListItem from "./components/UserListItem";
-import * as subscriptions from './src/graphql/subscriptions';
+import * as subscriptions from "./src/graphql/subscriptions";
+import { useNavigation } from '@react-navigation/native';
 
 Amplify.configure(awsconfig);
 
-var styles = require('./styles/stylesheet');
+var styles = require("./styles/stylesheet");
 
-export default function GroupScreen() {
+export default function SearchScreen() {
   const [query, setQuery] = useState("");
   const [users, setUsers] = useState([]);
+  const stateRef = useRef();
+
+  //still not 100% sure why this works, will have to come back to it. got from here: https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
+  stateRef.current = query;
   
-  const showUsersAsync = async (query) => {
-    if (query !== '') {
+  const showUsersAsync = async (text) => {
+    console.log("text received: ", text);
+    if (text !== '') {
       try {
         const namematchresult = await API.graphql(graphqlOperation(listUsers, {
           filter: {
             name: {
-              contains: query
+              beginsWith: text
             }
           }
         }
@@ -46,7 +52,7 @@ export default function GroupScreen() {
         const biomatchresult = await API.graphql(graphqlOperation(listUsers, {
           filter: {
             bio: {
-              contains: query
+              contains: text
             }
           }
         }
@@ -54,16 +60,30 @@ export default function GroupScreen() {
         const goalsmatchresult = await API.graphql(graphqlOperation(listUsers, {
           filter: {
             goals: {
-              contains: query
+              contains: text
             }
           }
         }
         ));
         
-        let items = [...namematchresult.data.listUsers.items, ...biomatchresult.data.listUsers.items, ...goalsmatchresult.data.listUsers.items];
-    
-        setUsers(items);
-        console.log("searching for... ", items);
+        let items = [
+          ...namematchresult.data.listUsers.items,
+          ...biomatchresult.data.listUsers.items,
+          ...goalsmatchresult.data.listUsers.items,
+        ];
+        
+        items = items.filter((item, index, self) =>
+          index === self.findIndex((temp) => (
+            temp.id === item.id
+          ))
+        )
+
+        if (text === stateRef.current) {
+          setUsers(items);
+          console.log("here's some users! ", text);
+        } else {          
+          console.log("ignoring!");
+        }
       } catch (err) {
         console.log("error: ", err);
       }
@@ -71,28 +91,27 @@ export default function GroupScreen() {
       setUsers([]);
     }
   };
+  
+  useEffect(() => {
+    showUsersAsync(query);
+  }, [query]);
 
   return (
     <View style={styles.containerStyle}>
       <TextInput
         style={[styles.textInputStyle, { marginTop: 40 }]}
-        multiline={true}
-        placeholder="Start Typing ..."
-        onChangeText={(text) => {setQuery(text); showUsersAsync(text)}}
+        placeholder="Start Searching ..."
+        onChangeText={setQuery}
         value={query}
         clearButtonMode="always"
       />
 
       <FlatList
         data={users}
-        renderItem={({ item }) => (
-          <UserListItem
-            item={item}
-          />
-        )}
+        renderItem={({ item }) => <UserListItem item={item} />}
       />
 
       <StatusBar style="auto" />
     </View>
   );
-};
+}

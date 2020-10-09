@@ -23,11 +23,13 @@ import ProfileScreen from "./screens/ProfileScreen";
 import BioScreen from "./screens/BioScreen";
 import GoalsScreen from "./screens/GoalsScreen";
 import CreatingGroups from "./screens/CreatingGroups";
-import SearchScreen from "./SearchScreen";
+import SearchStack from "./SearchStack";
+import GroupSearchScreen from "./GroupSearchScreen";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
+
 
 Amplify.configure({
   awsconfig,
@@ -190,22 +192,22 @@ const App = () => {
             }}
           />
           <Tab.Screen
-            name="Profile"
-            component={ProfileTab}
-            options={{
-              headerShown: false,
-            }}
-          />
-          <Tab.Screen
             name="Create Group"
             component={CreatingGroups}
             options={{
               headerShown: false,
             }}
           />
-          <Tab.Screen
+          <Tab.Screen 
             name="User Search"
-            component={SearchScreen}
+            component={SearchStack}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Tab.Screen 
+            name="Profile"
+            component={ProfileTab}
             options={{
               headerShown: false,
             }}
