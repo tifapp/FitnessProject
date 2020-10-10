@@ -43,7 +43,6 @@ export default function CreatingGroups() {
     Alert.alert('Submitting Group...', '', [], {cancelable: false})
 
     const val = {
-      id: Date.now(),
       name: nameVal,
       maxUsers: totalUsersVal,
       Privacy: privacyVal,

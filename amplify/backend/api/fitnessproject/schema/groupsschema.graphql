@@ -6,3 +6,11 @@ type Group @model {
   Sport: String!
   Description: String!
 }
+
+input CreateGroupInput {
+  name: String!
+  maxUsers: String!
+  Privacy: String!
+  Sport: String!
+  Description: String!
+}
