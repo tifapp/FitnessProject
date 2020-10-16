@@ -19,9 +19,11 @@ const LookupUser = ({ route, navigation }) => {
         <ScrollView>
             <View>
             <View style={styles.border}>
+                {/*
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.goBackButton}>
                     <Text style={styles.buttonTextStyle}>Go Back</Text>
                 </TouchableOpacity>
+                 */}
                 
                 <View style={{paddingBottom: 15}}>
                  

@@ -1,12 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Storage } from "aws-amplify";
 import {
   StyleSheet,
   View,
   Button,
+  Image,
   TextInput,
   Text,
   TouchableOpacity,
 } from "react-native";
+import { listUsers } from "../src/graphql/queries";
+import { Amplify, API, graphqlOperation } from "aws-amplify";
 
 var styles = require('../styles/stylesheet');
 
@@ -116,9 +120,45 @@ export default function PostItem({
   if (hourVal > 12) {
     hourVal = hourVal - 12;
   }
+  
+    /*
+  const [imageURL, setImageURL] = useState('');
+
+  useEffect(() => {
+    const getUserfromDB = async () => {
+      const user = await API.graphql(graphqlOperation(listUsers, {
+        filter: {
+          username: {
+            beginsWith: item.email
+          }
+        }
+      }
+      ));
+
+      console.log("in posts screen, returned user is ", user);
+      
+      Storage.get('profileimage.jpg', { level: 'protected', identityId: user.data.listUsers.items[0].pictureURL }) //this will incur lots of repeated calls to the backend, idk how else to fix it right now
+      .then((imageURL) => { //console.log("found profile image!", imageURL); 
+        Image.getSize(imageURL, () => {
+          setImageURL(imageURL);
+        }, err => {
+          setImageURL('')
+        });
+      })
+      .catch((err) => { console.log("could not find image!", err) }) //should just use a "profilepic" component
+    }
+
+    getUserfromDB();
+  }, []); */
 
   return (
     <View style={styles.secondaryContainerStyle}>
+      {/*
+      <Image
+          style={styles.smallImageStyle}
+          source={imageURL === '' ? require('../assets/icon.png') : { uri: imageURL }}
+        />
+      */}
       <View style={styles.spaceAround}>
         <Text>{item.email}</Text>
         <Text>
