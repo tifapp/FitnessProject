@@ -38,6 +38,7 @@ export default function CreatingGroups() {
   const [sportVal, setSport] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [descriptionVal, setDescription] = useState("");
+  const [characterCount, setCharacterCount] = useState(1000);
 
   const addGroup = async () => {
     Alert.alert('Submitting Group...', '', [], {cancelable: false})
@@ -92,6 +93,7 @@ export default function CreatingGroups() {
           <GroupDescription
             setDescription={setDescription}
             descriptionVal={descriptionVal}
+            characterCount = {characterCount}
           />
 
           <View style={styles.buttonFormat}>
@@ -101,7 +103,8 @@ export default function CreatingGroups() {
                 privacyVal != "" &&
                 totalUsersVal != "" &&
                 sportVal != "" &&
-                descriptionVal != ""
+                descriptionVal != "" &&
+                descriptionVal.length()<characterCount
                   ? addGroup()
                   : alert("Please fill out all available fields");
               }}

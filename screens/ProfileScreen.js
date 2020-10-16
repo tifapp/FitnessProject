@@ -32,6 +32,8 @@ const ProfileScreen = ({ navigation, route }) => {
     const [gender, setGender] = useState('');
     const [bioDetails, setBioDetails] = useState('');
     const [goalsDetails, setGoalsDetails] = useState('');
+    const [bioDetailsMaxLength, setBioDetailsMaxLength] = useState(1000);
+    const [goalsDetailsMaxLength, setGoalsDetailsMaxLength] = useState(1000);
 
     const [initialFields, setInitialFields] = useState([]);
 
@@ -108,6 +110,8 @@ const ProfileScreen = ({ navigation, route }) => {
             <DetailedInfo
                 bioDetails={bioDetails}
                 goalsDetails={goalsDetails}
+                bioDetailsMaxLength = {bioDetailsMaxLength}
+                goalsDetailsMaxLength = {goalsDetailsMaxLength}
                 setBioDetails={setBioDetails}
                 setGoalsDetails={setGoalsDetails}
             />

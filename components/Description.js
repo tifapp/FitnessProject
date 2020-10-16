@@ -24,17 +24,20 @@ import awsconfig from "../aws-exports"; // if you are using Amplify CLI
 
 const { width } = Dimensions.get("screen");
 
-export default function GroupDescription({ setDescription, descriptionVal }) {
+export default function GroupDescription({ setDescription, descriptionVal, characterCount }) {
+  var totalCharsRemaining = characterCount - descriptionVal.length;
   return (
     <View>
       <View style={styles.boxFormat}>
-        <Text>Description: </Text>
+        <Text> Description: </Text>
+        <Text> Characters remaining: {totalCharsRemaining}</Text>
         <TextInput
           style={styles.DescriptionBox}
           multiline={true}
           onChangeText={setDescription}
           placeholder="Enter a description for your group ...."
           value={descriptionVal}
+          maxLength = {1000}
         />
       </View>
     </View>

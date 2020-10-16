@@ -5,13 +5,13 @@ import { useNavigation } from '@react-navigation/native';
 
 var styles = require('../../styles/stylesheet');
 
-const DetailedInfoDetails = ({ label, field, setField }) => {
+const DetailedInfoDetails = ({ label, field, setField, goalsDetailMaxLength, bioDetailsMaxLength }) => {
     const navigation = useNavigation();
 
     const goToTextBox = () => {
         (label == 'bio') ?
-            navigation.navigate('Bio', { field: field }) :
-            navigation.navigate('Goals', { field: field })
+            navigation.navigate('Bio', { field: field, bio: bioDetailsMaxLength }) :
+            navigation.navigate('Goals', { field: field, goals: goalsDetailMaxLength })
     }
 
     return (
