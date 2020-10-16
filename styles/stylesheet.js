@@ -101,7 +101,6 @@ module.exports = StyleSheet.create({
     fontSize: 15,
     marginHorizontal: 15,
     paddingHorizontal: 10,
-    height: 100,
     paddingTop: 10,
     paddingLeft: 12,
     marginBottom: 30,
