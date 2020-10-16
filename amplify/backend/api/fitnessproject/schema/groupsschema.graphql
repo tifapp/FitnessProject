@@ -5,4 +5,5 @@ type Group @model {
   Privacy: String!
   Sport: String!
   Description: String!
+  characterCount: Int
 }

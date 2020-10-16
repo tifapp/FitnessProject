@@ -32,6 +32,7 @@ export default function GroupScreen() {
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
   const [emailVal, setEmailVal] = useState("");
+  const [currentTime, setCurrentTime] = useState("");
 
   useEffect(() => {
     async function showPostsFirstTime() {
