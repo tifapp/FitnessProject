@@ -63,7 +63,7 @@ export default () => {
         Alert.alert("Profile submitted successfully!");
         console.log("updated user successfully");
       } catch (err) {
-        Alert.alert("Could not submit profile! Error: ", err);
+        Alert.alert("Could not submit profile! Error: ", err.errors[0].message);
         console.log("error when updating user: ", err);
       }
     }

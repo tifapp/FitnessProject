@@ -61,10 +61,10 @@ export default function CreatingGroups() {
     try {
       await API.graphql(graphqlOperation(createGroup, { input: val }));
       console.log("success");
-      alert('Group submitted successfully!')
+      alert('Group submitted successfully!');
     } catch (err) {
       console.log(err);
-      alert('Group could not be submitted!', err)
+      alert('Group could not be submitted! ' + err.errors[0].message);
     }
   };
 
@@ -104,7 +104,7 @@ export default function CreatingGroups() {
                 totalUsersVal != "" &&
                 sportVal != "" &&
                 descriptionVal != "" &&
-                descriptionVal.length()<characterCount
+                descriptionVal.length <= characterCount
                   ? addGroup()
                   : alert("Please fill out all available fields");
               }}
