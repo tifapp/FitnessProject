@@ -7,48 +7,23 @@ import { Image } from 'react-native';
 
 export default () => {
 
-  const loadUserAsync = async (setImageURL, setName, setAge, setGender, setBioDetails, setGoalsDetails, setInitialFields) => {
+  const loadUserAsync = async () => {
+    const query = await Auth.currentUserInfo();
+    const { identityId } = await Auth.currentCredentials();
+    const user = await API.graphql(graphqlOperation(getUser, { id: query.attributes.sub }));
+    const imageURL = await Storage.get('profileimage.jpg', { level: 'protected' });
 
-    const updateFields = ({ fields }) => {
-      Storage.get('profileimage.jpg', { level: 'protected' })
-        .then((imageURL) => { //console.log("found profile image!", imageURL); 
-          Image.getSize(imageURL, () => {
-            setImageURL(imageURL);
-          }, err => {
-            setImageURL('')
-          });
-        })
-        .catch((err) => { console.log("could not find image!", err) })
+    const fields = user.data.getUser;
 
-      setName(fields.name)
-      setAge(fields.age)
-      setGender(fields.gender)
-      setBioDetails(fields.bio)
-      setGoalsDetails(fields.goals)
-      setInitialFields([fields.name, fields.age, fields.gender, fields.bio, fields.goals])
-    }
-
-    try {
-      const query = await Auth.currentUserInfo();
-      const { identityId } = await Auth.currentCredentials();
-      const user = await API.graphql(graphqlOperation(getUser, { id: query.attributes.sub }));
-
-      const fields = user.data.getUser;
-
-      if (fields == null) {
-        console.log("user doesn't exist, they must be making their profile for the first time");
-      }
-      else {
-        updateFields({ fields })
-      }
-    }
-    catch (err) {
-      console.log("error: ", err);
+    if (fields == null) {
+      console.log("user doesn't exist, they must be making their profile for the first time");
+    } else {
+      return {...fields, pictureURL: imageURL};
     }
   };
 
   const updateUserAsync = async (imageURL, name, age, gender, bioDetails, goalsDetails) => {
-    const updateUserInDB = async ( recurringUser ) => {
+    const updateUserInDB = async (recurringUser) => {
       try {
         if (imageURL !== '') {
           const response = await fetch(imageURL);
@@ -68,7 +43,7 @@ export default () => {
       }
     }
 
-    const createUserInDB = async ( newUser ) => {
+    const createUserInDB = async (newUser) => {
       try {
         await API.graphql(graphqlOperation(createUser, { input: newUser }));
         console.log("success");
@@ -84,7 +59,7 @@ export default () => {
       const user = await API.graphql(graphqlOperation(getUser, { id: query.attributes.sub }));
       const fields = user.data.getUser;
       console.log('returning users fields looks like', fields);
-      
+
       const ourUser = {
         id: query.attributes.sub,
         identityId: identityId,
@@ -96,10 +71,10 @@ export default () => {
       };
 
       if (fields == null) {
-        createUserInDB( ourUser )
+        createUserInDB(ourUser)
       }
       else {
-        updateUserInDB( ourUser )
+        updateUserInDB(ourUser)
       }
     }
     catch (err) {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { ActivityIndicator, View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
 import ProfilePic from '../components/ProfileImagePicker'
 import BasicInfo from '../components/basicInfoComponents/BasicInfo'
 import DetailedInfo from '../components/detailedInfoComponents/DetailedInfo';
@@ -25,6 +25,7 @@ const ProfileScreen = ({ navigation, route }) => {
         }
     }
 
+    const [loading, setLoading] = useState(false);
     const [imageChanged, setImageChanged] = useState(false);
     const [imageURL, setImageURL] = useState('');
     const [name, setName] = useState('');
@@ -84,42 +85,66 @@ const ProfileScreen = ({ navigation, route }) => {
     }
 
     useEffect(() => {
-        loadUserAsync(setImageURL, setName, setAge, setGender, setBioDetails, setGoalsDetails, setInitialFields)
+        setLoading(true);
+        loadUserAsync()
+        .then(user => {
+            setName(user.name);
+            setAge(user.age);
+            setGender(user.gender);
+            setBioDetails(user.bio);
+            setGoalsDetails(user.goals);
+            setInitialFields([user.name, user.age, user.gender, user.bio, user.goals]);
+            Image.getSize(user.pictureURL, () => {
+                setImageURL(user.pictureURL);
+            }, err => {
+                setImageURL('');
+            });
+        })
+        .finally(()=>{setLoading(false);})
     }, [])
 
     useEffect(() => { updateDetailedInfo() }, [route.params?.updatedField])
 
-    return (
-        <ScrollView style={styles.containerStyle}>
-            <View style={styles.signOutTop}>
-                <TouchableOpacity style={styles.unselectedButtonStyle} color="red" onPress={signOut}>
-                    <Text style={styles.unselectedButtonTextStyle}>Sign Out</Text>
-                </TouchableOpacity>
-            </View>
-            <View style={{paddingBottom: 15}}>
-                <ProfilePic imageURL={imageURL} setImageURL={setImageURL} setImageChanged={setImageChanged} />
-                <BasicInfo
-                    name={name}
-                    setName={setName}
-                    age={age}
-                    setAge={setAge}
-                    gender={gender}
-                    setGender={setGender}
+    if (loading) {
+        return (
+            <ActivityIndicator size="large" style={{
+              flex: 1,
+              justifyContent: "center",
+            }} />
+        )
+    } else {
+        return (
+            <ScrollView style={styles.containerStyle}>
+                <View style={styles.signOutTop}>
+                    <TouchableOpacity style={styles.unselectedButtonStyle} color="red" onPress={signOut}>
+                        <Text style={styles.unselectedButtonTextStyle}>Sign Out</Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={{paddingBottom: 15}}>
+                    <ProfilePic imageURL={imageURL} setImageURL={setImageURL} setImageChanged={setImageChanged} />
+                    <BasicInfo
+                        name={name}
+                        setName={setName}
+                        age={age}
+                        setAge={setAge}
+                        gender={gender}
+                        setGender={setGender}
+                    />
+                </View>
+                <DetailedInfo
+                    bioDetails={bioDetails}
+                    goalsDetails={goalsDetails}
+                    bioDetailsMaxLength = {bioDetailsMaxLength}
+                    goalsDetailsMaxLength = {goalsDetailsMaxLength}
+                    setBioDetails={setBioDetails}
+                    setGoalsDetails={setGoalsDetails}
                 />
-            </View>
-            <DetailedInfo
-                bioDetails={bioDetails}
-                goalsDetails={goalsDetails}
-                bioDetailsMaxLength = {bioDetailsMaxLength}
-                goalsDetailsMaxLength = {goalsDetailsMaxLength}
-                setBioDetails={setBioDetails}
-                setGoalsDetails={setGoalsDetails}
-            />
-            <TouchableOpacity style={[styles.buttonStyle, {marginBottom: 25}]} onPress={submitHandler} >
-                <Text style={styles.buttonTextStyle}>Submit</Text>
-            </TouchableOpacity>
-        </ScrollView>
-    )
+                <TouchableOpacity style={[styles.buttonStyle, {marginBottom: 25}]} onPress={submitHandler} >
+                    <Text style={styles.buttonTextStyle}>Submit</Text>
+                </TouchableOpacity>
+            </ScrollView>
+        )
+    }
 }
 
 export default ProfileScreen;
