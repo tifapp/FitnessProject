@@ -58,51 +58,51 @@ export default function PostItem({
   let displayTime = "";
   if(secondDifference>1 && secondDifference<60){
     secondDifference = Math.floor(secondDifference);
-    displayTime = "Last Posted: " + secondDifference + " seconds ago";
+    displayTime = secondDifference + " seconds ago";
   }
   else if(minuteDifference>=1 && minuteDifference<60){
     minuteDifference = Math.floor(minuteDifference);
     if(minuteDifference==1){
-      displayTime = " Last Posted: " + minuteDifference + " minute ago";
+      displayTime = minuteDifference + " minute ago";
     }
     else{
-      displayTime = " Last Posted: " + minuteDifference + " minutes ago";
+      displayTime = minuteDifference + " minutes ago";
     }
   }
   else if(hourDifference>=1 && hourDifference<24){
     hourDifference = Math.floor(hourDifference);
     if(hourDifference==1){
-      displayTime = " Last Posted: " + hourDifference + " hour ago";
+      displayTime = hourDifference + " hour ago";
     }
     else{
-      displayTime = " Last Posted: " + hourDifference + " hours ago";
+      displayTime = hourDifference + " hours ago";
     }
   }
   else if(dayDifference>=1 && dayDifference<31){
     dayDifference = Math.floor(dayDifference);
     if(dayDifference==1){
-      displayTime = " Last Posted: " + dayDifference + " day ago";
+      displayTime = dayDifference + " day ago";
     }
     else{
-      displayTime = " Last Posted: " + dayDifference + " days ago";
+      displayTime = dayDifference + " days ago";
     }
   }
   else if(monthDifference>=1 && monthDifference<12){
     monthDifference = Math.floor(monthDifference);
     if(monthDifference==1){
-      displayTime = " Last Posted: " + monthDifference + " month ago";
+      displayTime = monthDifference + " month ago";
     }
     else{
-      displayTime = " Last Posted: " + dayDifference + " months ago";
+      displayTime = dayDifference + " months ago";
     }
   }
   else if(yearDifference>=1){
     yearDifference = Math.floor(yearDifference);
     if(yearDifference==1){
-      displayTime = " Last Posted: " + yearDifference + " year ago";
+      displayTime = yearDifference + " year ago";
     }
     else{
-      displayTime = " Last Posted: " + yearDifference + " years ago";
+      displayTime = yearDifference + " years ago";
     }
   }
 
