@@ -7,11 +7,3 @@ type Group @model {
   Description: String!
   characterCount: Int
 }
-
-input CreateGroupInput {
-  name: String!
-  maxUsers: String!
-  Privacy: String!
-  Sport: String!
-  Description: String!
-}

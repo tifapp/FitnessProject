@@ -1,6 +1,6 @@
 {
     "identityPoolName": "fitnessprojecta8f49cfe_identitypool_a8f49cfe",
-    "allowUnauthenticatedIdentities": true,
+    "allowUnauthenticatedIdentities": false,
     "resourceNameTruncated": "fitnesa8f49cfe",
     "userPoolName": "fitnessprojecta8f49cfe_userpool_a8f49cfe",
     "autoVerifiedAttributes": [

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "api": {
+      "fitnessproject": [
+        "read"
+      ]
+    }
+  },
+  "lambdaLayers": []
+}
