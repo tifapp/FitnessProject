@@ -31,8 +31,6 @@ var styles = require('./styles/stylesheet');
 export default function GroupScreen({ navigation, route }) {
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
-  const [emailVal, setEmailVal] = useState("");
-  const [currentTime, setCurrentTime] = useState("");
 
   useEffect(() => {
     async function showPostsFirstTime() {
