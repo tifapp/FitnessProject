@@ -48,15 +48,6 @@ export default function GroupScreen({ navigation, route }) {
     });
   };
 
-  const addingEmail = async () => {
-    try {
-      let info = await Auth.currentUserInfo();
-      setEmailVal(info.attributes.email);
-    } catch {
-      console.log("error");
-    }
-  };
-
   const addPostAsync = async () => {
     const newPost = {
       timestamp: Math.floor(Date.now() / 1000),
@@ -85,7 +76,6 @@ export default function GroupScreen({ navigation, route }) {
         return b.timestamp - a.timestamp;
       });
       setPosts(val);
-      addingEmail();
     } catch (err) {
       console.log("error: ", err);
     }

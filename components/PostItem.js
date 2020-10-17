@@ -78,7 +78,7 @@ export default function PostItem({
   var yearDifference = monthDifference / 12;
 
   let displayTime = "";
-  if (secondDifference > 1 && secondDifference < 60) {
+  if (secondDifference < 60) {
     //secondDifference = Math.floor(secondDifference);
     displayTime = "Just now";
   }
