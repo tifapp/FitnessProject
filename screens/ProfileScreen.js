@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ActivityIndicator, View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import ProfilePic from '../components/ProfilePic'
+import ProfilePic from '../components/ProfileImagePicker'
 import BasicInfo from '../components/basicInfoComponents/BasicInfo'
 import DetailedInfo from '../components/detailedInfoComponents/DetailedInfo';
 import useDatabase from '../hooks/useDatabase';

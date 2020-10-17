@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { ActivityIndicator, View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert, Button, Image, Dimensions} from 'react-native';
-import ProfilePic from '../components/ProfilePic'
-import BasicInfo from '../components/basicInfoComponents/BasicInfo'
-import DetailedInfo from '../components/detailedInfoComponents/DetailedInfo';
-import useDatabase from '../hooks/useDatabase';
 import { Auth} from "aws-amplify";
 import { StackActions, NavigationActions } from 'react-navigation';
+import { ProfileImage } from '../components/ProfileImage'
 
 var styles = require('../styles/stylesheet');
 
 const LookupUser = ({ route, navigation }) => {
 
-    const { user, picture } = route.params;
+    const { user } = route.params;
 
-    console.log(user.name);
+    console.log("checking out the profile of ", user.name);
 
     return (
         <ScrollView>
@@ -27,9 +24,9 @@ const LookupUser = ({ route, navigation }) => {
                 
                 <View style={{paddingBottom: 15}}>
                  
-                <Image 
+                <ProfileImage 
                     style = {styles.imageStyle}
-                    source = {picture === '' ? require('../assets/icon.png') : { uri: picture }}
+                    user = {user}
                 />
                 </View>
                 
