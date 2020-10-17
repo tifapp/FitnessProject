@@ -33,11 +33,7 @@ export default function GroupScreen({ navigation, route }) {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    async function showPostsFirstTime() {
-      showPostsAsync();
-    }
-
-    showPostsFirstTime(); //to get rid of the "effect function must not return anything" warning
+    showPostsAsync();
   }, []);
 
   const pressHandler = (key) => {
