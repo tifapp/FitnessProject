@@ -28,7 +28,7 @@ Amplify.configure(awsconfig);
 
 var styles = require('./styles/stylesheet');
 
-export default function GroupScreen() {
+export default function GroupScreen({ navigation, route }) {
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
   const [emailVal, setEmailVal] = useState("");
@@ -58,16 +58,16 @@ export default function GroupScreen() {
   };
 
   const addPostAsync = async () => {
-    const newUser = {
+    const newPost = {
       timestamp: Math.floor(Date.now() / 1000),
-      name: postVal,
-      email: emailVal,
+      userId: route.params?.userId,
+      description: postVal,
     };
 
     setPostVal("");
 
     try {
-      await API.graphql(graphqlOperation(createPost, { input: newUser }));
+      await API.graphql(graphqlOperation(createPost, { input: newPost }));
       showPostsAsync();
       console.log("success");
     } catch (err) {
@@ -145,7 +145,7 @@ export default function GroupScreen() {
             item={item}
             pressHandler={pressHandler}
             deletePostsAsync={deletePostsAsync}
-            emailVal={emailVal}
+            writtenByYou={item.userId === route.params?.userId}
           />
         )}
       />

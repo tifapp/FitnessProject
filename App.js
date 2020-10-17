@@ -66,7 +66,7 @@ const App = () => {
     checkIfUserExists();
   }, []);
 
-  console.log("App rerendered, userexists is... ", userNull);
+  //console.log("App rerendered, userexists is... ", userId == '');
 
   const Stack = createStackNavigator();
 
@@ -94,7 +94,7 @@ const App = () => {
           <Stack.Screen
             name="Profile"
             component={ProfileScreen}
-            initialParams={{ newUser: true, id = userId, setUserIdFunction: setUserId }}
+            initialParams={{ newUser: true, id: userId, setUserIdFunction: setUserId }}
             options={{
               headerShown: false,
             }}
@@ -125,6 +125,7 @@ const App = () => {
           <Tab.Screen
             name="Groups"
             component={GroupScreen}
+            initialParams={{ userId: userId }}
             options={{
               headerShown: false,
             }}

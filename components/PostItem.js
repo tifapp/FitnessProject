@@ -9,35 +9,57 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
-import { listUsers } from "../src/graphql/queries";
+import { getUser } from "../src/graphql/queries";
+import { ProfileImage } from './ProfileImage'
 import { Amplify, API, graphqlOperation } from "aws-amplify";
 
 var styles = require('../styles/stylesheet');
+
+const months = [
+  "January",
+  "Febuary",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
 export default function PostItem({
   item,
   pressHandler,
   deletePostsAsync,
-  emailVal,
+  writtenByYou,
 }) {
-  const val = emailVal === item.email;
-  const months = [
-    "January",
-    "Febuary",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+
+  const [postAuthor, setPostAuthor] = useState('');
+
+  const checkUsersName = async () => {
+    try {
+      const user = await API.graphql(
+        graphqlOperation(getUser, { id: item.userId })
+      );
+      if (user.data.getUser != null) {
+        setPostAuthor(user.data.getUser);
+      }
+
+      //console.log("success, user is ", user);
+    } catch (err) {
+      console.log("error: ", err);
+    }
+  };
+
+  useEffect(() => {
+    checkUsersName();
+  }, []);
 
   const dateInfo = new Date(item.timestamp * 1000);
-  
+
   var yearVal = dateInfo.getFullYear();
   var monthVal = dateInfo.getMonth();
   var dayVal = dateInfo.getDate();
@@ -47,61 +69,61 @@ export default function PostItem({
 
   var currentTotalTime = new Date().getTime();
 
-  var timeDifference = currentTotalTime-totalTime;
-  var secondDifference = timeDifference/1000;
-  var minuteDifference = secondDifference/60;
-  var hourDifference = minuteDifference/60;
-  var dayDifference = hourDifference/24;
-  var monthDifference = dayDifference/30;
-  var yearDifference = monthDifference/12;
+  var timeDifference = currentTotalTime - totalTime;
+  var secondDifference = timeDifference / 1000;
+  var minuteDifference = secondDifference / 60;
+  var hourDifference = minuteDifference / 60;
+  var dayDifference = hourDifference / 24;
+  var monthDifference = dayDifference / 30;
+  var yearDifference = monthDifference / 12;
 
   let displayTime = "";
-  if(secondDifference>1 && secondDifference<60){
+  if (secondDifference > 1 && secondDifference < 60) {
     secondDifference = Math.floor(secondDifference);
     displayTime = secondDifference + " seconds ago";
   }
-  else if(minuteDifference>=1 && minuteDifference<60){
+  else if (minuteDifference >= 1 && minuteDifference < 60) {
     minuteDifference = Math.floor(minuteDifference);
-    if(minuteDifference==1){
+    if (minuteDifference == 1) {
       displayTime = minuteDifference + " minute ago";
     }
-    else{
+    else {
       displayTime = minuteDifference + " minutes ago";
     }
   }
-  else if(hourDifference>=1 && hourDifference<24){
+  else if (hourDifference >= 1 && hourDifference < 24) {
     hourDifference = Math.floor(hourDifference);
-    if(hourDifference==1){
+    if (hourDifference == 1) {
       displayTime = hourDifference + " hour ago";
     }
-    else{
+    else {
       displayTime = hourDifference + " hours ago";
     }
   }
-  else if(dayDifference>=1 && dayDifference<31){
+  else if (dayDifference >= 1 && dayDifference < 31) {
     dayDifference = Math.floor(dayDifference);
-    if(dayDifference==1){
+    if (dayDifference == 1) {
       displayTime = dayDifference + " day ago";
     }
-    else{
+    else {
       displayTime = dayDifference + " days ago";
     }
   }
-  else if(monthDifference>=1 && monthDifference<12){
+  else if (monthDifference >= 1 && monthDifference < 12) {
     monthDifference = Math.floor(monthDifference);
-    if(monthDifference==1){
+    if (monthDifference == 1) {
       displayTime = monthDifference + " month ago";
     }
-    else{
+    else {
       displayTime = dayDifference + " months ago";
     }
   }
-  else if(yearDifference>=1){
+  else if (yearDifference >= 1) {
     yearDifference = Math.floor(yearDifference);
-    if(yearDifference==1){
+    if (yearDifference == 1) {
       displayTime = yearDifference + " year ago";
     }
-    else{
+    else {
       displayTime = yearDifference + " years ago";
     }
   }
@@ -120,56 +142,28 @@ export default function PostItem({
   if (hourVal > 12) {
     hourVal = hourVal - 12;
   }
-  
-    /*
-  const [imageURL, setImageURL] = useState('');
-
-  useEffect(() => {
-    const getUserfromDB = async () => {
-      const user = await API.graphql(graphqlOperation(listUsers, {
-        filter: {
-          username: {
-            beginsWith: item.email
-          }
-        }
-      }
-      ));
-
-      console.log("in posts screen, returned user is ", user);
-      
-      Storage.get('profileimage.jpg', { level: 'protected', identityId: user.data.listUsers.items[0].pictureURL }) //this will incur lots of repeated calls to the backend, idk how else to fix it right now
-      .then((imageURL) => { //console.log("found profile image!", imageURL); 
-        Image.getSize(imageURL, () => {
-          setImageURL(imageURL);
-        }, err => {
-          setImageURL('')
-        });
-      })
-      .catch((err) => { console.log("could not find image!", err) }) //should just use a "profilepic" component
-    }
-
-    getUserfromDB();
-  }, []); */
 
   return (
     <View style={styles.secondaryContainerStyle}>
-      {/*
-      <Image
-          style={styles.smallImageStyle}
-          source={imageURL === '' ? require('../assets/icon.png') : { uri: imageURL }}
-        />
-      */}
       <View style={styles.spaceAround}>
-        <Text>{item.email}</Text>
-        <Text>
-          {displayTime}
-        </Text>
-        <Text style={styles.check}>{item.name}</Text>
+        <View style={{flexDirection: 'row'}}>
+          <ProfileImage
+            style={styles.smallImageStyle}
+            user={postAuthor}
+          />
+          <View>
+            <Text>{postAuthor.name}</Text>
+            <Text>
+              {displayTime}
+            </Text>
+          </View>
+        </View>
+        <Text style={styles.check}>{item.description}</Text>
       </View>
 
-      {val ? (
-        <TouchableOpacity style={[styles.unselectedButtonStyle, {borderColor: 'red'}]} color="red" onPress={() => (pressHandler(item.id), deletePostsAsync(item.id))}>
-            <Text style={[styles.unselectedButtonTextStyle, {color: 'red'}]}>Delete</Text>
+      {writtenByYou ? (
+        <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={() => (pressHandler(item.id), deletePostsAsync(item.id))}>
+          <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>Delete</Text>
         </TouchableOpacity>
       ) : null}
     </View>
