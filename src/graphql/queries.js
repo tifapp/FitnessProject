@@ -10,6 +10,7 @@ export const getGroup = /* GraphQL */ `
       Privacy
       Sport
       Description
+      characterCount
       createdAt
       updatedAt
     }
@@ -29,6 +30,7 @@ export const listGroups = /* GraphQL */ `
         Privacy
         Sport
         Description
+        characterCount
         createdAt
         updatedAt
       }
@@ -41,8 +43,17 @@ export const getPost = /* GraphQL */ `
     getPost(id: $id) {
       id
       timestamp
-      name
-      email
+      user {
+        id
+        identityId
+        name
+        age
+        gender
+        bio
+        goals
+        createdAt
+        updatedAt
+      }
       description
       group
       createdAt
@@ -60,8 +71,17 @@ export const listPosts = /* GraphQL */ `
       items {
         id
         timestamp
-        name
-        email
+        user {
+          id
+          identityId
+          name
+          age
+          gender
+          bio
+          goals
+          createdAt
+          updatedAt
+        }
         description
         group
         createdAt
@@ -75,7 +95,7 @@ export const getUser = /* GraphQL */ `
   query GetUser($id: ID!) {
     getUser(id: $id) {
       id
-      pictureURL
+      identityId
       name
       age
       gender
@@ -95,7 +115,7 @@ export const listUsers = /* GraphQL */ `
     listUsers(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
-        pictureURL
+        identityId
         name
         age
         gender

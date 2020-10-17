@@ -1,6 +1,6 @@
 type User @model {
   id: ID!
-  pictureURL: String
+  identityId: String
   name: String!
   age: String
   gender: String

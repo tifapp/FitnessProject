@@ -10,6 +10,7 @@ export const onCreateGroup = /* GraphQL */ `
       Privacy
       Sport
       Description
+      characterCount
       createdAt
       updatedAt
     }
@@ -24,6 +25,7 @@ export const onUpdateGroup = /* GraphQL */ `
       Privacy
       Sport
       Description
+      characterCount
       createdAt
       updatedAt
     }
@@ -38,6 +40,7 @@ export const onDeleteGroup = /* GraphQL */ `
       Privacy
       Sport
       Description
+      characterCount
       createdAt
       updatedAt
     }
@@ -48,8 +51,17 @@ export const onCreatePost = /* GraphQL */ `
     onCreatePost {
       id
       timestamp
-      name
-      email
+      user {
+        id
+        identityId
+        name
+        age
+        gender
+        bio
+        goals
+        createdAt
+        updatedAt
+      }
       description
       group
       createdAt
@@ -62,8 +74,17 @@ export const onUpdatePost = /* GraphQL */ `
     onUpdatePost {
       id
       timestamp
-      name
-      email
+      user {
+        id
+        identityId
+        name
+        age
+        gender
+        bio
+        goals
+        createdAt
+        updatedAt
+      }
       description
       group
       createdAt
@@ -76,8 +97,17 @@ export const onDeletePost = /* GraphQL */ `
     onDeletePost {
       id
       timestamp
-      name
-      email
+      user {
+        id
+        identityId
+        name
+        age
+        gender
+        bio
+        goals
+        createdAt
+        updatedAt
+      }
       description
       group
       createdAt
@@ -89,7 +119,7 @@ export const onCreateUser = /* GraphQL */ `
   subscription OnCreateUser {
     onCreateUser {
       id
-      pictureURL
+      identityId
       name
       age
       gender
@@ -104,7 +134,7 @@ export const onUpdateUser = /* GraphQL */ `
   subscription OnUpdateUser {
     onUpdateUser {
       id
-      pictureURL
+      identityId
       name
       age
       gender
@@ -119,7 +149,7 @@ export const onDeleteUser = /* GraphQL */ `
   subscription OnDeleteUser {
     onDeleteUser {
       id
-      pictureURL
+      identityId
       name
       age
       gender

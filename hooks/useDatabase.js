@@ -87,7 +87,7 @@ export default () => {
       
       const ourUser = {
         id: query.attributes.sub,
-        pictureURL: identityId,
+        identityId: identityId,
         name: name,
         age: age,
         gender: gender,

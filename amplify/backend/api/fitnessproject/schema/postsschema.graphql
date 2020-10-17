@@ -1,8 +1,7 @@
 type Post @model {
   id: ID!
   timestamp: AWSTimestamp!
-  name: String!
-  email: String!
+  user: User!
   description: String
   group: String
 }

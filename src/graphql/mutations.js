@@ -13,6 +13,7 @@ export const createGroup = /* GraphQL */ `
       Privacy
       Sport
       Description
+      characterCount
       createdAt
       updatedAt
     }
@@ -30,6 +31,7 @@ export const updateGroup = /* GraphQL */ `
       Privacy
       Sport
       Description
+      characterCount
       createdAt
       updatedAt
     }
@@ -47,6 +49,7 @@ export const deleteGroup = /* GraphQL */ `
       Privacy
       Sport
       Description
+      characterCount
       createdAt
       updatedAt
     }
@@ -60,8 +63,17 @@ export const createPost = /* GraphQL */ `
     createPost(input: $input, condition: $condition) {
       id
       timestamp
-      name
-      email
+      user {
+        id
+        identityId
+        name
+        age
+        gender
+        bio
+        goals
+        createdAt
+        updatedAt
+      }
       description
       group
       createdAt
@@ -77,8 +89,17 @@ export const updatePost = /* GraphQL */ `
     updatePost(input: $input, condition: $condition) {
       id
       timestamp
-      name
-      email
+      user {
+        id
+        identityId
+        name
+        age
+        gender
+        bio
+        goals
+        createdAt
+        updatedAt
+      }
       description
       group
       createdAt
@@ -94,8 +115,17 @@ export const deletePost = /* GraphQL */ `
     deletePost(input: $input, condition: $condition) {
       id
       timestamp
-      name
-      email
+      user {
+        id
+        identityId
+        name
+        age
+        gender
+        bio
+        goals
+        createdAt
+        updatedAt
+      }
       description
       group
       createdAt
@@ -110,7 +140,7 @@ export const createUser = /* GraphQL */ `
   ) {
     createUser(input: $input, condition: $condition) {
       id
-      pictureURL
+      identityId
       name
       age
       gender
@@ -128,7 +158,7 @@ export const updateUser = /* GraphQL */ `
   ) {
     updateUser(input: $input, condition: $condition) {
       id
-      pictureURL
+      identityId
       name
       age
       gender
@@ -146,7 +176,7 @@ export const deleteUser = /* GraphQL */ `
   ) {
     deleteUser(input: $input, condition: $condition) {
       id
-      pictureURL
+      identityId
       name
       age
       gender
