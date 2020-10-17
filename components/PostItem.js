@@ -79,8 +79,8 @@ export default function PostItem({
 
   let displayTime = "";
   if (secondDifference > 1 && secondDifference < 60) {
-    secondDifference = Math.floor(secondDifference);
-    displayTime = secondDifference + " seconds ago";
+    //secondDifference = Math.floor(secondDifference);
+    displayTime = "Just now";
   }
   else if (minuteDifference >= 1 && minuteDifference < 60) {
     minuteDifference = Math.floor(minuteDifference);
