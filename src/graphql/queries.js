@@ -43,17 +43,7 @@ export const getPost = /* GraphQL */ `
     getPost(id: $id) {
       id
       timestamp
-      user {
-        id
-        identityId
-        name
-        age
-        gender
-        bio
-        goals
-        createdAt
-        updatedAt
-      }
+      userId
       description
       group
       createdAt
@@ -71,17 +61,7 @@ export const listPosts = /* GraphQL */ `
       items {
         id
         timestamp
-        user {
-          id
-          identityId
-          name
-          age
-          gender
-          bio
-          goals
-          createdAt
-          updatedAt
-        }
+        userId
         description
         group
         createdAt

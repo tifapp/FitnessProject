@@ -79,7 +79,7 @@ const ProfileScreen = ({ navigation, route }) => {
             setImageChanged(false)
         }
         if (route.params?.newUser) {
-            route.params?.setUserNullFunction(false);
+            route.params?.setUserIdFunction(route.params?.id);
         }
     }
 

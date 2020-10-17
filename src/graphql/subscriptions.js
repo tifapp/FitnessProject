@@ -51,17 +51,7 @@ export const onCreatePost = /* GraphQL */ `
     onCreatePost {
       id
       timestamp
-      user {
-        id
-        identityId
-        name
-        age
-        gender
-        bio
-        goals
-        createdAt
-        updatedAt
-      }
+      userId
       description
       group
       createdAt
@@ -74,17 +64,7 @@ export const onUpdatePost = /* GraphQL */ `
     onUpdatePost {
       id
       timestamp
-      user {
-        id
-        identityId
-        name
-        age
-        gender
-        bio
-        goals
-        createdAt
-        updatedAt
-      }
+      userId
       description
       group
       createdAt
@@ -97,17 +77,7 @@ export const onDeletePost = /* GraphQL */ `
     onDeletePost {
       id
       timestamp
-      user {
-        id
-        identityId
-        name
-        age
-        gender
-        bio
-        goals
-        createdAt
-        updatedAt
-      }
+      userId
       description
       group
       createdAt

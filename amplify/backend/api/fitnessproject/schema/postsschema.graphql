@@ -1,15 +1,14 @@
 type Post @model {
   id: ID!
   timestamp: AWSTimestamp!
-  user: User!
+  userId: String!
   description: String
   group: String
 }
 
 input CreatePostInput {
   timestamp: AWSTimestamp!
-  name: String!
-  email: String!
+  userId: String!
   description: String
   group: String
 }

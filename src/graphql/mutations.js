@@ -63,17 +63,7 @@ export const createPost = /* GraphQL */ `
     createPost(input: $input, condition: $condition) {
       id
       timestamp
-      user {
-        id
-        identityId
-        name
-        age
-        gender
-        bio
-        goals
-        createdAt
-        updatedAt
-      }
+      userId
       description
       group
       createdAt
@@ -89,17 +79,7 @@ export const updatePost = /* GraphQL */ `
     updatePost(input: $input, condition: $condition) {
       id
       timestamp
-      user {
-        id
-        identityId
-        name
-        age
-        gender
-        bio
-        goals
-        createdAt
-        updatedAt
-      }
+      userId
       description
       group
       createdAt
@@ -115,17 +95,7 @@ export const deletePost = /* GraphQL */ `
     deletePost(input: $input, condition: $condition) {
       id
       timestamp
-      user {
-        id
-        identityId
-        name
-        age
-        gender
-        bio
-        goals
-        createdAt
-        updatedAt
-      }
+      userId
       description
       group
       createdAt

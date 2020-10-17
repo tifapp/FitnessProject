@@ -9,7 +9,6 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  Linking,
   ActivityIndicator,
 } from "react-native";
 import { withAuthenticator } from "aws-amplify-react-native";
@@ -19,6 +18,7 @@ import { Amplify, API, graphqlOperation, Auth } from "aws-amplify";
 import { getUser } from "./src/graphql/queries";
 import GroupScreen from "./GroupScreen";
 import ProfileTab from "./ProfileTab";
+import ComplianceScreen from "./screens/ComplianceScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import BioScreen from "./screens/BioScreen";
 import GoalsScreen from "./screens/GoalsScreen";
@@ -30,7 +30,6 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 
-
 Amplify.configure({
   awsconfig,
   Analytics: {
@@ -40,82 +39,22 @@ Amplify.configure({
 
 var styles = require("./styles/stylesheet");
 
-function ComplianceScreen({ navigation }) {
-  return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Text
-        style={{
-          textAlign: "center",
-          padding: 40,
-          fontWeight: "bold",
-          lineHeight: 20,
-        }}
-      >
-        By continuing, you agree to our {"\n"}
-        <Text
-          style={{ color: "orange" }}
-          onPress={() =>
-            Linking.openURL(
-              "https://drive.google.com/file/d/15OG-z9vZ97eNWHKooDrBEtV51Yz2fMRQ/view?usp=sharing"
-            )
-          }
-        >
-          Terms of Service,{" "}
-        </Text>
-        <Text
-          style={{ color: "orange" }}
-          onPress={() =>
-            Linking.openURL(
-              "https://drive.google.com/file/d/11wIw9yQcT_mHHDT_xflVxEzzEUfh3KgN/view?usp=sharing"
-            )
-          }
-        >
-          Privacy Policy, {"\n"}
-        </Text>
-        <Text
-          style={{ color: "orange" }}
-          onPress={() =>
-            Linking.openURL(
-              "https://drive.google.com/file/d/13VlxdknD3xSVdqMFHpV3ADXfmEql_NP6/view?usp=sharing"
-            )
-          }
-        >
-          Community Standards,{" "}
-        </Text>
-        <Text
-          style={{ color: "orange" }}
-          onPress={() =>
-            Linking.openURL(
-              "https://drive.google.com/file/d/1aZ0oiThB4vBztSdmemN8p97L3gxcS302/view?usp=sharing"
-            )
-          }
-        >
-          and Disclaimers.
-        </Text>
-      </Text>
-      <TouchableOpacity
-        style={styles.buttonStyle}
-        onPress={() => navigation.navigate("Profile")}
-      >
-        <Text style={styles.buttonTextStyle}>Continue</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
-
 const App = () => {
   const Tab = createBottomTabNavigator();
-  const [checkingIfLoggedIn, setCheckingIfLoggedIn] = useState(false);
-  const [userNull, setUser] = useState(true);
+  const [userId, setUserId] = useState(''); //stores the user's id if logged in
 
   const checkIfUserExists = async () => {
     try {
+      setUserId('checking...');
       const query = await Auth.currentUserInfo();
       const user = await API.graphql(
         graphqlOperation(getUser, { id: query.attributes.sub })
       );
-      setUser(user.data.getUser == null);
-      setCheckingIfLoggedIn(false);
+      if (user.data.getUser != null) {
+        setUserId(query.attributes.sub);
+      } else {
+        setUserId('');
+      }
 
       console.log("success, user is ", user);
     } catch (err) {
@@ -124,7 +63,6 @@ const App = () => {
   };
 
   useEffect(() => {
-    setCheckingIfLoggedIn(true);
     checkIfUserExists();
   }, []);
 
@@ -132,7 +70,7 @@ const App = () => {
 
   const Stack = createStackNavigator();
 
-  if (checkingIfLoggedIn) {
+  if (userId == 'checking...') {
     return (
       <ActivityIndicator size="large" style={{
         flex: 1,
@@ -142,7 +80,7 @@ const App = () => {
         padding: 10
       }} />
     )
-  } else if (userNull) {
+  } else if (userId == '') {
     return (
       <NavigationContainer>
         <Stack.Navigator>
@@ -156,7 +94,7 @@ const App = () => {
           <Stack.Screen
             name="Profile"
             component={ProfileScreen}
-            initialParams={{ newUser: true, setUserNullFunction: setUser }}
+            initialParams={{ newUser: true, id = userId, setUserIdFunction: setUserId }}
             options={{
               headerShown: false,
             }}
