@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import { createStackNavigator } from '@react-navigation/stack';
-import SearchScreen from "./screens/SearchScreen";
+import GroupScreen from "./screens/GroupScreen";
 import LookupUserScreen from "./screens/LookupUser";
 
 import React from 'react';
@@ -13,10 +13,10 @@ Amplify.configure(awsconfig);
 
 const Stack = createStackNavigator();
 
-export default function SearchStack() {
+export default function SearchStack({ navigation, route }) {
   return (
-    <Stack.Navigator initialRouteName='Search' screenOptions={{ headerStyle: { backgroundColor: '#d3d3d3' } }}>
-      <Stack.Screen name='Search' component={SearchScreen} />
+    <Stack.Navigator initialRouteName='Wall' screenOptions={{ headerStyle: { backgroundColor: '#d3d3d3' } }}>
+      <Stack.Screen name='Wall' component={GroupScreen} initialParams={route.params}/>
       <Stack.Screen name='Lookup' component={LookupUserScreen} />
     </Stack.Navigator>
   );

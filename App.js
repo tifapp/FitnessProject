@@ -16,7 +16,7 @@ import { withAuthenticator } from "aws-amplify-react-native";
 import awsconfig from "./aws-exports"; // if you are using Amplify CLI
 import { Amplify, API, graphqlOperation, Auth } from "aws-amplify";
 import { getUser } from "./src/graphql/queries";
-import GroupScreen from "./GroupScreen";
+import GroupStack from "./GroupStack";
 import ProfileTab from "./ProfileTab";
 import ComplianceScreen from "./screens/ComplianceScreen";
 import ProfileScreen from "./screens/ProfileScreen";
@@ -124,7 +124,7 @@ const App = () => {
         >
           <Tab.Screen
             name="Groups"
-            component={GroupScreen}
+            component={GroupStack}
             initialParams={{ userId: userId }}
             options={{
               headerShown: false,

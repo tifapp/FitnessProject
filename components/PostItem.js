@@ -12,6 +12,7 @@ import {
 import { getUser } from "../src/graphql/queries";
 import { ProfileImage } from './ProfileImage'
 import { Amplify, API, graphqlOperation } from "aws-amplify";
+import { useNavigation } from '@react-navigation/native';
 
 var styles = require('../styles/stylesheet');
 
@@ -36,7 +37,6 @@ export default function PostItem({
   deletePostsAsync,
   writtenByYou,
 }) {
-
   const [postAuthor, setPostAuthor] = useState({});
 
   const checkUsersName = async () => {
@@ -143,11 +143,19 @@ export default function PostItem({
   if (hourVal > 12) {
     hourVal = hourVal - 12;
   }
+  
+  const navigation = useNavigation();
+  const goToProfile = () => {
+    navigation.navigate('Lookup',
+      { user: postAuthor })
+  }
 
   return (
     <View style={styles.secondaryContainerStyle}>
       <View style={styles.spaceAround}>
-        <View style={{flexDirection: 'row'}}>
+        <TouchableOpacity 
+        onPress={goToProfile}
+        style={{flexDirection: 'row'}}>
           <ProfileImage
             style={styles.smallImageStyle}
             user={postAuthor}
@@ -158,7 +166,7 @@ export default function PostItem({
               {displayTime}
             </Text>
           </View>
-        </View>
+        </TouchableOpacity>
         <Text style={styles.check}>{item.description}</Text>
       </View>
 
