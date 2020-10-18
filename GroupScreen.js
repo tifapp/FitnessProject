@@ -22,7 +22,9 @@ import { listPosts } from "./src/graphql/queries";
 import Header from "./components/header";
 import AddPost from "./components/AddPosts";
 import PostItem from "./components/PostItem";
-import * as subscriptions from './src/graphql/subscriptions';
+import { onCreatePost, onDeletePost, onUpdatePost } from './src/graphql/subscriptions';
+
+require('./androidtimerfix');
 
 Amplify.configure(awsconfig);
 
@@ -34,9 +36,28 @@ export default function GroupScreen({ navigation, route }) {
 
   useEffect(() => {
     showPostsAsync();
+    waitForNewPostsAsync();
   }, []);
 
-  const pressHandler = (key) => {
+  const waitForNewPostsAsync = async () => {
+    await API.graphql(graphqlOperation(onCreatePost)).subscribe({
+      next: newPost => {
+        showPostsAsync();
+      }
+    });
+    await API.graphql(graphqlOperation(onDeletePost)).subscribe({
+      next: newPost => {
+        showPostsAsync();
+      }
+    });
+    await API.graphql(graphqlOperation(onUpdatePost)).subscribe({
+      next: newPost => {
+        showPostsAsync();
+      }
+    });
+  }
+
+  const deleteButtonHandler = (key) => {
     setPosts((posts) => {
       return posts.filter((val) => val.id != key);
     });
@@ -54,7 +75,7 @@ export default function GroupScreen({ navigation, route }) {
     try {
       await API.graphql(graphqlOperation(createPost, { input: newPost }));
       showPostsAsync();
-      console.log("success");
+      console.log("success in making a new post");
     } catch (err) {
       console.log("error: ", err);
     }
@@ -127,7 +148,7 @@ export default function GroupScreen({ navigation, route }) {
         renderItem={({ item }) => (
           <PostItem
             item={item}
-            pressHandler={pressHandler}
+            pressHandler={deleteButtonHandler}
             deletePostsAsync={deletePostsAsync}
             writtenByYou={item.userId === route.params?.userId}
           />

@@ -9,12 +9,13 @@ export const ProfileImage = (props) => { //user is required in props. it's a typ
 
     useEffect(() => {
         setImageURL('loading...');
+        //console.log("this identity id is...", props.user.identityId);
         Storage.get('profileimage.jpg', { level: 'protected', identityId: props.user.identityId }) //this will incur lots of repeated calls to the backend, idk how else to fix it right now
             .then((imageURL) => { //console.log("found profile image!", imageURL); 
                 Image.getSize(imageURL, () => {
                     setImageURL(imageURL);
                 }, err => {
-                    setImageURL('')
+                    setImageURL('');
                 });
             })
             .catch((err) => { console.log("could not find image!", err) }) //should just use a "profilepic" component

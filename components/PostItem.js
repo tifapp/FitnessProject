@@ -37,7 +37,7 @@ export default function PostItem({
   writtenByYou,
 }) {
 
-  const [postAuthor, setPostAuthor] = useState('');
+  const [postAuthor, setPostAuthor] = useState({});
 
   const checkUsersName = async () => {
     try {
@@ -45,6 +45,7 @@ export default function PostItem({
         graphqlOperation(getUser, { id: item.userId })
       );
       if (user.data.getUser != null) {
+        //console.log("this post is...", item.description, "and the author is...", user.data.getUser);
         setPostAuthor(user.data.getUser);
       }
 
