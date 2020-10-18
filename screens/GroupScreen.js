@@ -14,21 +14,19 @@ import {
   FlatList,
 } from "react-native";
 // Get the aws resources configuration parameters
-import awsconfig from "../aws-exports"; // if you are using Amplify CLI
+import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
 import { Amplify, API, Auth, graphqlOperation } from "aws-amplify";
-import { createPost, updatePost, deletePost } from "../src/graphql/mutations";
+import { createPost, updatePost, deletePost } from "root/src/graphql/mutations";
 import { DataStore, Predicates } from "@aws-amplify/datastore";
-import { listPosts } from "../src/graphql/queries";
-import Header from "../components/header";
-import AddPost from "../components/AddPosts";
-import PostItem from "../components/PostItem";
-import { onCreatePost, onDeletePost, onUpdatePost } from '../src/graphql/subscriptions';
+import { listPosts } from "root/src/graphql/queries";
+import PostItem from "components/PostItem";
+import { onCreatePost, onDeletePost, onUpdatePost } from 'root/src/graphql/subscriptions';
 
-require('../androidtimerfix');
+require('root/androidtimerfix');
 
 Amplify.configure(awsconfig);
 
-var styles = require('../styles/stylesheet');
+var styles = require('styles/stylesheet');
 
 export default function GroupScreen({ navigation, route }) {
   const [postVal, setPostVal] = useState("");
@@ -79,7 +77,7 @@ export default function GroupScreen({ navigation, route }) {
     } catch (err) {
       console.log("error: ", err);
     }
-    //console.log("current time..", );
+    //console.log("current time...", );
   };
 
   const showPostsAsync = async () => {
@@ -110,7 +108,7 @@ export default function GroupScreen({ navigation, route }) {
         <TextInput
           style={[styles.textInputStyle, { marginTop: 40, marginBottom: 30 }]}
           multiline={true}
-          placeholder="Start Typing ..."
+          placeholder="Start Typing..."
           onChangeText={setPostVal}
           value={postVal}
           clearButtonMode="always"

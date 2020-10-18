@@ -1,7 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState, useEffect } from "react";
-import { createGroup } from "../src/graphql/mutations";
+import { createGroup } from "root/src/graphql/mutations";
 import {
   StyleSheet,
   Text,
@@ -21,15 +21,15 @@ import {
 import { withAuthenticator } from "aws-amplify-react-native";
 // Get the aws resources configuration parameters
 import { Amplify, API, graphqlOperation, Auth } from "aws-amplify";
-import awsconfig from "../aws-exports"; // if you are using Amplify CLI
+import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
 import CreatingHeader from "./GroupsHeader";
 import { Entypo } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
-import NameField from "../components/NameField";
-import MaxUsers from "../components/MaxUsers";
-import PrivacySettings from "../components/Privacy";
-import SportCreation from "../components/Sport";
-import GroupDescription from "../components/Description";
+import NameField from "components/NameField";
+import MaxUsers from "components/MaxUsers";
+import PrivacySettings from "components/Privacy";
+import SportCreation from "components/Sport";
+import GroupDescription from "components/Description";
 
 export default function CreatingGroups() {
   const [nameVal, setName] = useState("");

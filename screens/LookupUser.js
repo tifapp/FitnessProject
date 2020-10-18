@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { ActivityIndicator, View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert, Button, Image, Dimensions} from 'react-native';
 import { Auth} from "aws-amplify";
 import { StackActions, NavigationActions } from 'react-navigation';
-import { ProfileImage } from '../components/ProfileImage'
+import { ProfileImage } from 'components/ProfileImage'
 
-var styles = require('../styles/stylesheet');
+var styles = require('styles/stylesheet');
 
 const LookupUser = ({ route, navigation }) => {
 

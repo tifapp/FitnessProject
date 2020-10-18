@@ -14,20 +14,20 @@ import {
   FlatList,
 } from "react-native";
 // Get the aws resources configuration parameters
-import awsconfig from "../aws-exports"; // if you are using Amplify CLI
+import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
 import { Amplify, API, Auth, graphqlOperation } from "aws-amplify";
-import { createPost, updatePost, deletePost } from "../src/graphql/mutations";
+import { createPost, updatePost, deletePost } from "root/src/graphql/mutations";
 import { DataStore, Predicates } from "@aws-amplify/datastore";
-import { listUsers } from "../src/graphql/queries";
-import Header from "../components/header";
-import AddPost from "../components/AddPosts";
-import UserListItem from "../components/UserListItem";
-import * as subscriptions from "../src/graphql/subscriptions";
+import { listUsers } from "root/src/graphql/queries";
+import Header from "components/header";
+import AddPost from "components/AddPosts";
+import UserListItem from "components/UserListItem";
+import * as subscriptions from "root/src/graphql/subscriptions";
 import { useNavigation } from '@react-navigation/native';
 
 Amplify.configure(awsconfig);
 
-var styles = require("../styles/stylesheet");
+var styles = require("styles/stylesheet");
 
 export default function SearchScreen() {
   const [query, setQuery] = useState("");
@@ -100,7 +100,7 @@ export default function SearchScreen() {
     <View style={styles.containerStyle}>
       <TextInput
         style={[styles.textInputStyle, { marginTop: 40 }]}
-        placeholder="Start Searching ..."
+        placeholder="Start Searching..."
         onChangeText={setQuery}
         value={query}
         clearButtonMode="always"

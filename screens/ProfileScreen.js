@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { ActivityIndicator, View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
-import ProfilePic from '../components/ProfileImagePicker'
-import BasicInfo from '../components/basicInfoComponents/BasicInfo'
-import DetailedInfo from '../components/detailedInfoComponents/DetailedInfo';
-import useDatabase from '../hooks/useDatabase';
+import ProfilePic from 'components/ProfileImagePicker'
+import BasicInfo from 'components/basicInfoComponents/BasicInfo'
+import DetailedInfo from 'components/detailedInfoComponents/DetailedInfo';
+import useDatabase from 'hooks/useDatabase';
 import { Auth} from "aws-amplify";
 import { StackActions, NavigationActions } from 'react-navigation';
 
-var styles = require('../styles/stylesheet');
+var styles = require('styles/stylesheet');
 
 const ProfileScreen = ({ navigation, route }) => {
     async function signOut() {

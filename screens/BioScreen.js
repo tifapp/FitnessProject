@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import DetailedInfoInput from '../components/detailedInfoComponents/DetailedInfoInput'
+import DetailedInfoInput from 'components/detailedInfoComponents/DetailedInfoInput'
 import {
     StyleSheet,
     View,
