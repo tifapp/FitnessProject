@@ -1,22 +1,13 @@
 {
 	"AWSTemplateFormatVersion": "2010-09-09",
-	"Description": "Lambda Function resource stack creation using Amplify CLI",
+	"Description": "Lambda resource stack creation using Amplify CLI",
 	"Parameters": {
-		"CloudWatchRule": {
-			"Type": "String",
-			"Default": "NONE",
-			"Description": " Schedule Expression"
-		},
 		"env": {
 			"Type": "String"
 		},
-		"apifitnessprojectGraphQLAPIIdOutput": {
+		"authfitnessprojecta8f49cfeUserPoolId": {
 			"Type": "String",
-			"Default": "apifitnessprojectGraphQLAPIIdOutput"
-		},
-		"apifitnessprojectGraphQLAPIEndpointOutput": {
-			"Type": "String",
-			"Default": "apifitnessprojectGraphQLAPIEndpointOutput"
+			"Default": "authfitnessprojecta8f49cfeUserPoolId"
 		}
 	},
 	"Conditions": {
@@ -41,12 +32,12 @@
 				"FunctionName": {
 					"Fn::If": [
 						"ShouldNotCreateEnvResources",
-						"pushNotification",
+						"AdminQueries07a4b24d",
 						{
 							"Fn::Join": [
 								"",
 								[
-									"pushNotification",
+									"AdminQueries07a4b24d",
 									"-",
 									{
 										"Ref": "env"
@@ -61,14 +52,9 @@
 						"ENV": {
 							"Ref": "env"
 						},
-						"REGION": {
-							"Ref": "AWS::Region"
-						},
-						"API_FITNESSPROJECT_GRAPHQLAPIIDOUTPUT": {
-							"Ref": "apifitnessprojectGraphQLAPIIdOutput"
-						},
-						"API_FITNESSPROJECT_GRAPHQLAPIENDPOINTOUTPUT": {
-							"Ref": "apifitnessprojectGraphQLAPIEndpointOutput"
+						"GROUP": "admins",
+						"USERPOOL": {
+							"Ref": "authfitnessprojecta8f49cfeUserPoolId"
 						}
 					}
 				},
@@ -78,12 +64,11 @@
 						"Arn"
 					]
 				},
-				"Runtime": "nodejs12.x",
-				"Layers": [],
+				"Runtime": "nodejs10.x",
 				"Timeout": "25",
 				"Code": {
 					"S3Bucket": "amplify-fitnessproject-dev-145229-deployment",
-					"S3Key": "amplify-builds/pushNotification-6779474e59726f673267-build.zip"
+					"S3Key": "amplify-builds/AdminQueries07a4b24d-38574b64715956534650-build.zip"
 				}
 			}
 		},
@@ -93,12 +78,12 @@
 				"RoleName": {
 					"Fn::If": [
 						"ShouldNotCreateEnvResources",
-						"fitnessprojectLambdaRole0ed96065",
+						"AdminQueries07a4b24dLambdaRole",
 						{
 							"Fn::Join": [
 								"",
 								[
-									"fitnessprojectLambdaRole0ed96065",
+									"AdminQueries07a4b24dLambdaRole",
 									"-",
 									{
 										"Ref": "env"
@@ -164,54 +149,40 @@
 									}
 								]
 							}
-						}
-					]
-				}
-			}
-		},
-		"AmplifyResourcesPolicy": {
-			"DependsOn": [
-				"LambdaExecutionRole"
-			],
-			"Type": "AWS::IAM::Policy",
-			"Properties": {
-				"PolicyName": "amplify-lambda-execution-policy",
-				"Roles": [
-					{
-						"Ref": "LambdaExecutionRole"
-					}
-				],
-				"PolicyDocument": {
-					"Version": "2012-10-17",
-					"Statement": [
+						},
 						{
 							"Effect": "Allow",
 							"Action": [
-								"appsync:Get*",
-								"appsync:List*"
+								"cognito-idp:ListUsersInGroup",
+								"cognito-idp:AdminUserGlobalSignOut",
+								"cognito-idp:AdminEnableUser",
+								"cognito-idp:AdminDisableUser",
+								"cognito-idp:AdminRemoveUserFromGroup",
+								"cognito-idp:AdminAddUserToGroup",
+								"cognito-idp:AdminListGroupsForUser",
+								"cognito-idp:AdminGetUser",
+								"cognito-idp:AdminConfirmSignUp",
+								"cognito-idp:ListUsers"
 							],
-							"Resource": [
-								{
-									"Fn::Join": [
-										"",
-										[
-											"arn:aws:appsync:",
-											{
-												"Ref": "AWS::Region"
-											},
-											":",
-											{
-												"Ref": "AWS::AccountId"
-											},
-											":apis/",
-											{
-												"Ref": "apifitnessprojectGraphQLAPIIdOutput"
-											},
-											"/*"
-										]
+							"Resource": {
+								"Fn::Join": [
+									"",
+									[
+										"arn:aws:cognito-idp:",
+										{
+											"Ref": "AWS::Region"
+										},
+										":",
+										{
+											"Ref": "AWS::AccountId"
+										},
+										":userpool/",
+										{
+											"Ref": "authfitnessprojecta8f49cfeUserPoolId"
+										}
 									]
-								}
-							]
+								]
+							}
 						}
 					]
 				}

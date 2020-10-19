@@ -82,7 +82,15 @@ export default function GroupScreen({ navigation, route }) {
 
   const showPostsAsync = async () => {
     try {
-      const query = await API.graphql(graphqlOperation(listPosts));
+      const query = await API.graphql(graphqlOperation(listPosts,
+        {
+            filter: {
+              group: {
+                eq: ''
+              }
+            }
+        }
+        ));
       let val = query.data.listPosts.items;
 
       val.sort((a, b) => {
