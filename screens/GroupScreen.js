@@ -66,6 +66,7 @@ export default function GroupScreen({ navigation, route }) {
       timestamp: Math.floor(Date.now() / 1000),
       userId: route.params?.userId,
       description: postVal,
+      group: '',
     };
 
     setPostVal("");
