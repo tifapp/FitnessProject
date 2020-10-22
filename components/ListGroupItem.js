@@ -9,12 +9,25 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
+import { useNavigation } from '@react-navigation/native';
 
 var styles = require("../styles/stylesheet");
 
-export default function ListGroupItem({ item }) {
+export default function ListGroupItem({ item, check }) {
+
+  const navigation = useNavigation();
+  console.log(check);
+
+  const goToGroupPosts = () => {
+    console.log(item);
+    navigation.navigate('Group Posts Screen', {group: item})
+  }
+
   if (item.Privacy == "Public") {
     return (
+      <TouchableOpacity
+      style={[styles.secondaryContainerStyle]}
+      onPress={goToGroupPosts}>
       <View style={styles.secondaryContainerStyle}>
         <View
           style={[
@@ -31,6 +44,7 @@ export default function ListGroupItem({ item }) {
           <Text>{item.name}</Text>
         </View>
       </View>
+      </TouchableOpacity>
     );
   } else {
     return null;

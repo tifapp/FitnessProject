@@ -32,7 +32,14 @@ const { width } = Dimensions.get('window');
 
 var styles = require('styles/stylesheet');
 
-export default function GroupScreen({ navigation, route }) {
+export default function GroupPostsScreen({ navigation, route }) {
+
+const { group } = route.params;
+var nameVal = group.name;
+var tempVal = group.createdAt;
+
+console.log(group);
+
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
   const [onlineCheck, setOnlineCheck] = useState(true);
@@ -87,9 +94,9 @@ export default function GroupScreen({ navigation, route }) {
   const addPostAsync = async () => {
     const newPost = {
       timestamp: Math.floor(Date.now() / 1000),
-      userId: route.params?.userId,
+      userId: group.id,
       description: postVal,
-      group: '',
+      group: nameVal
     };
 
     setPostVal("");
@@ -110,8 +117,8 @@ export default function GroupScreen({ navigation, route }) {
         {
             filter: {
               group: {
-                eq: ''
-              }
+                eq: nameVal
+              },
             }
         }
         ));

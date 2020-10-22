@@ -7,6 +7,20 @@ var {
 } = React;
 
 module.exports = StyleSheet.create({
+  offlineContainer: {
+    backgroundColor: '#b52424',
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  offlineText: { color: '#fff' },
+  submitButton: {
+    marginTop: 20,
+    alignSelf: "center",
+    backgroundColor: "orange",
+    padding: 10,
+    borderRadius: 5,
+  },
 
   secondaryContainerStyle: {
     backgroundColor: '#fefefe',

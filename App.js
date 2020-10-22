@@ -24,7 +24,7 @@ import BioScreen from "./screens/BioScreen";
 import GoalsScreen from "./screens/GoalsScreen";
 import CreatingGroups from "./screens/CreatingGroups";
 import SearchStack from "./SearchStack";
-import GroupSearchScreen from "./GroupSearchScreen";
+import GroupSearchStack from "./GroupCreationStack";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -130,16 +130,10 @@ const App = () => {
               headerShown: false,
             }}
           />
-          <Tab.Screen
-            name="Create Group"
-            component={CreatingGroups}
-            options={{
-              headerShown: false,
-            }}
-          />
           <Tab.Screen 
             name="GroupSearch"
-            component={GroupSearchScreen}
+            component={GroupSearchStack}
+            initialParams={{ userId: userId }}
             options={{
               headerShown: false,
             }}
