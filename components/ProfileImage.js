@@ -26,7 +26,7 @@ export const ProfileImage = (props) => { //user is required in props. it's a typ
             .catch((err) => { console.log("could not find image!", err) }) //should just use a "profilepic" component
 
         return () => mounted = false;
-    }, []);
+    }, [props.user]);
 
     if (imageURL == 'loading...') {
         return (
