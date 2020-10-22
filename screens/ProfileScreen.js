@@ -85,11 +85,13 @@ const ProfileScreen = ({ navigation, route }) => {
         else {
             Alert.alert('Submitting Profile...', '', [], {cancelable: false})
             updateUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails)
+            .then((userId) => {
+                if (route.params?.newUser) {
+                    route.params?.setUserIdFunction(userId);
+                }
+            });
             setInitialFields([name, age, gender, bioDetails, goalsDetails])
             setImageChanged(false)
-        }
-        if (route.params?.newUser) {
-            route.params?.setUserIdFunction(route.params?.id);
         }
     }
 
