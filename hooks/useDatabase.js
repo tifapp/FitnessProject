@@ -1,6 +1,6 @@
 import { Auth } from 'aws-amplify';
 import { Alert } from 'react-native';
-import { createUser, updateUser } from '../src/graphql/mutations.js'
+import { createUser, updateUser, deleteUser } from '../src/graphql/mutations.js'
 import { getUser } from '../src/graphql/queries.js'
 import { API, graphqlOperation, Storage } from "aws-amplify";
 import { Image } from 'react-native';
@@ -9,7 +9,6 @@ export default () => {
 
   const loadUserAsync = async () => {
     const query = await Auth.currentUserInfo();
-    const { identityId } = await Auth.currentCredentials();
     const user = await API.graphql(graphqlOperation(getUser, { id: query.attributes.sub }));
     const imageURL = await Storage.get('profileimage.jpg', { level: 'protected' });
 
@@ -20,6 +19,17 @@ export default () => {
     } else {
       return {...fields, pictureURL: imageURL};
     }
+  };
+  
+  const deleteUserAsync = async () => {
+    const query = await Auth.currentUserInfo();
+    await API.graphql(graphqlOperation(deleteUser, { input: { id: query.attributes.sub }}));
+
+    await Storage.remove('profileimage.jpg', { level: 'protected' })
+    .then(result => console.log("removed profile image!", result))
+    .catch(err => console.log(err));
+
+    return 'successfully deleted';
   };
 
   const updateUserAsync = async (imageURL, name, age, gender, bioDetails, goalsDetails) => {
@@ -82,5 +92,5 @@ export default () => {
     }
   };
 
-  return [loadUserAsync, updateUserAsync];
+  return [loadUserAsync, updateUserAsync, deleteUserAsync];
 }

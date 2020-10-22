@@ -16,13 +16,22 @@ const ProfileScreen = ({ navigation, route }) => {
             const title = 'Your profile has unsubmitted changes!';
             const message = '';
             const options = [
-                { text: 'Submit changes', onPress: () => {submitHandler();} }, //if submithandler fails user won't know
+                { text: 'Submit changes', onPress: submitHandler }, //if submithandler fails user won't know
                 { text: 'Just sign out', onPress: Auth.signOut },
             ];
             Alert.alert(title, message, options, { cancelable: true });
         } else {
             Auth.signOut();
         }
+    }
+    
+    async function deleteAccount() {
+        const title = 'Are you sure you want to delete your account?';
+        const message = '';
+        const options = [
+            { text: 'Yes', onPress: () => {deleteUserAsync().then(()=>{Auth.signOut()}).catch()} }, //if submithandler fails user won't know
+        ];
+        Alert.alert(title, message, options, { cancelable: true });
     }
 
     const [loading, setLoading] = useState(false);
@@ -38,7 +47,7 @@ const ProfileScreen = ({ navigation, route }) => {
 
     const [initialFields, setInitialFields] = useState([]);
 
-    const [loadUserAsync, updateUserAsync] = useDatabase();
+    const [loadUserAsync, updateUserAsync, deleteUserAsync] = useDatabase();
 
     const updateDetailedInfo = () => {
         if (route.params?.updatedField) {
@@ -118,6 +127,9 @@ const ProfileScreen = ({ navigation, route }) => {
                 <View style={styles.signOutTop}>
                     <TouchableOpacity style={styles.unselectedButtonStyle} color="red" onPress={signOut}>
                         <Text style={styles.unselectedButtonTextStyle}>Sign Out</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.unselectedButtonStyle} color="red" onPress={deleteAccount}>
+                        <Text style={styles.unselectedButtonTextStyle}>Delete Account</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={{paddingBottom: 15}}>
