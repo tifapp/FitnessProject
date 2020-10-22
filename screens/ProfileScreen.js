@@ -97,17 +97,19 @@ const ProfileScreen = ({ navigation, route }) => {
         setLoading(true);
         loadUserAsync()
         .then(user => {
-            setName(user.name);
-            setAge(user.age);
-            setGender(user.gender);
-            setBioDetails(user.bio);
-            setGoalsDetails(user.goals);
-            setInitialFields([user.name, user.age, user.gender, user.bio, user.goals]);
-            Image.getSize(user.pictureURL, () => {
-                setImageURL(user.pictureURL);
-            }, err => {
-                setImageURL('');
-            });
+            if (user != null) {
+                setName(user.name);
+                setAge(user.age);
+                setGender(user.gender);
+                setBioDetails(user.bio);
+                setGoalsDetails(user.goals);
+                setInitialFields([user.name, user.age, user.gender, user.bio, user.goals]);
+                Image.getSize(user.pictureURL, () => {
+                    setImageURL(user.pictureURL);
+                }, err => {
+                    setImageURL('');
+                });
+            }
         })
         .finally(()=>{setLoading(false);})
     }, [])
