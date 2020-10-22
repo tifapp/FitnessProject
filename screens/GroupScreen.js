@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -31,10 +31,13 @@ var styles = require('styles/stylesheet');
 export default function GroupScreen({ navigation, route }) {
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
+  const isMounted = useRef(); //this variable exists to eliminate the "updated state on an unmounted component" warning
 
   useEffect(() => {
+    isMounted.current = true;
     showPostsAsync();
     waitForNewPostsAsync();
+    return () => {isMounted.current = false;}
   }, []);
 
   const waitForNewPostsAsync = async () => {
@@ -97,7 +100,8 @@ export default function GroupScreen({ navigation, route }) {
       val.sort((a, b) => {
         return b.timestamp - a.timestamp;
       });
-      setPosts(val);
+      if (isMounted.current)
+        setPosts(val);
     } catch (err) {
       console.log("error: ", err);
     }
