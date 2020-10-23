@@ -72,12 +72,15 @@ const App = () => {
 
   if (userId == 'checking...') {
     return (
-      <ActivityIndicator size="large" style={{
+      <ActivityIndicator 
+      size="large" 
+      color="#0000ff"
+      style={{
         flex: 1,
         justifyContent: "center",
         flexDirection: "row",
         justifyContent: "space-around",
-        padding: 10
+        padding: 10,
       }} />
     )
   } else if (userId == '') {
