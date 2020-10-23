@@ -2,20 +2,22 @@ import React, { useEffect } from 'react'
 import { View, StyleSheet } from 'react-native'
 import { Picker } from '@react-native-community/picker'
 
-const ageRange = Array.from({ length: 100 - 18 + 1 }, (_, i) => i + 18);
+const minAge = 18;
+const maxAge = 100;
+const ageRange = Array.from({ length: maxAge - minAge + 1 }, (_, i) => i + minAge);
 
 const AgePicker = ({ field, selectedValue, setSelectedValue }) => {
 
     const fieldHandler = () => {
         if (field == '') {
-            setSelectedValue("16")
+            setSelectedValue("18")
         }
         else {
             setSelectedValue(field)
         }
     }
 
-    useEffect(() => fieldHandler(), [])
+    useEffect(fieldHandler, [])
 
     return (
         <View>
