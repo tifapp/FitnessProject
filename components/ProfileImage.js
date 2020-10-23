@@ -11,6 +11,7 @@ export const ProfileImage = (props) => { //user is required in props. it's a typ
         let mounted = true;
         setImageURL('loading...');
         console.log("this identity id is...", props.user.identityId); //seems to fix the profile images on the feed screen, idk why
+        {/*
         Storage.get('profileimage.jpg', { level: 'protected', identityId: props.user.identityId }) //this will incur lots of repeated calls to the backend, idk how else to fix it right now
             .then((imageURL) => { //console.log("found profile image!", imageURL); 
                 Image.getSize(imageURL, () => {
@@ -25,6 +26,7 @@ export const ProfileImage = (props) => { //user is required in props. it's a typ
             })
             .catch((err) => { console.log("could not find image!", err) }) //should just use a "profilepic" component
 
+        */}
         return () => mounted = false;
     }, [props.user]);
 
