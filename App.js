@@ -10,6 +10,7 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
+  YellowBox
 } from "react-native";
 import { withAuthenticator } from "aws-amplify-react-native";
 // Get the aws resources configuration parameters
@@ -29,6 +30,10 @@ import GroupSearchStack from "./GroupCreationStack";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
+
+YellowBox.ignoreWarnings([
+    'Non-serializable values were found in the navigation state',
+  ]);
 
 Amplify.configure({
   awsconfig,
