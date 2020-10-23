@@ -15,7 +15,6 @@ const BioScreen = ({route}) => {
     const [text, setText] = useState(field)
     const totalCharsRemaining = bio-text.length;
     
-
     return (
         <View>
             <Text> Characters remaining: {totalCharsRemaining}</Text>

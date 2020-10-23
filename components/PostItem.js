@@ -36,6 +36,8 @@ export default function PostItem({
   pressHandler,
   deletePostsAsync,
   writtenByYou,
+  setPostVal,
+  setUpdatePostID,
 }) {
   const [postAuthor, setPostAuthor] = useState({});
 
@@ -60,7 +62,6 @@ export default function PostItem({
   }, []);
 
   const dateInfo = new Date(item.timestamp * 1000);
-
   var yearVal = dateInfo.getFullYear();
   var monthVal = dateInfo.getMonth();
   var dayVal = dateInfo.getDate();
@@ -162,18 +163,27 @@ export default function PostItem({
           />
           <View>
             <Text>{postAuthor.name}</Text>
-            <Text>
-              {displayTime}
-            </Text>
+            <Text> Last Updated: {displayTime} </Text>
           </View>
         </TouchableOpacity>
         <Text style={styles.check}>{item.description}</Text>
       </View>
 
       {writtenByYou ? (
-        <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={() => (pressHandler(item.id), deletePostsAsync(item.id))}>
-          <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>Delete</Text>
-        </TouchableOpacity>
+        <View style = {{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly'}}>
+          
+          <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={() => (pressHandler(item.id), deletePostsAsync(item.id))}>
+              <Text style={[styles.unselectedButtonTextStyle, {color: 'red'}]}>Delete</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.unselectedButtonStyle, { borderColor: 'blue' }]} 
+            color="blue" 
+            onPress={() => (setPostVal(item.description), setUpdatePostID(item.id))}>
+            <Text style={[styles.unselectedButtonTextStyle, {color: 'blue'}]}>Edit</Text>
+          </TouchableOpacity>
+        </View>
+        
       ) : null}
     </View>
   );

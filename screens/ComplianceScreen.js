@@ -9,9 +9,9 @@ const ComplianceScreen = ({ navigation }) => {
             <Text
                 style={{
                     textAlign: "center",
-                    padding: 40,
+                    //padding: 40,
                     fontWeight: "bold",
-                    lineHeight: 20,
+                    lineHeight: 30,
                 }}
             >
                 By continuing, you agree to our {"\n"}
@@ -57,7 +57,7 @@ const ComplianceScreen = ({ navigation }) => {
             </Text>
             </Text>
             <TouchableOpacity
-                style={styles.buttonStyle}
+                style={[styles.buttonStyle, {marginTop: 20}]}
                 onPress={() => navigation.navigate("Profile")}
             >
                 <Text style={styles.buttonTextStyle}>Continue</Text>

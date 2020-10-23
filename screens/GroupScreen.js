@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -31,11 +31,18 @@ var styles = require('styles/stylesheet');
 export default function GroupScreen({ navigation, route }) {
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
+  const numCharsLeft = 1000 - postVal.length;
+  const [updatePostID, setUpdatePostID] = useState('');
+  
+  const isMounted = useRef(); //this variable exists to eliminate the "updated state on an unmounted component" warning
 
   useEffect(() => {
+    isMounted.current = true;
     showPostsAsync();
     waitForNewPostsAsync();
+    return () => {isMounted.current = false;}
   }, []);
+  
 
   const waitForNewPostsAsync = async () => {
     await API.graphql(graphqlOperation(onCreatePost)).subscribe({
@@ -61,24 +68,42 @@ export default function GroupScreen({ navigation, route }) {
     });
   };
 
-  const addPostAsync = async () => {
-    const newPost = {
-      timestamp: Math.floor(Date.now() / 1000),
-      userId: route.params?.userId,
-      description: postVal,
-      group: '',
-    };
+  // This function now also has functionality for updating a post
+  // We can separate updating functionality from adding functionality if it
+  // becomes an issue later on.
+  const addPostAsync = async (val) => {
+    if (updatePostID != '') {
+      try {
+        await API.graphql(graphqlOperation(updatePost, { input: { id: val, description: postVal, timestamp: Math.floor(Date.now() / 1000)}}));
+        showPostsAsync();
+        console.log("success in updating a post");
+      } catch (err) {
+        console.log("error: ", err);
+      }
 
-    setPostVal("");
-
-    try {
-      await API.graphql(graphqlOperation(createPost, { input: newPost }));
-      showPostsAsync();
-      console.log("success in making a new post");
-    } catch (err) {
-      console.log("error: ", err);
+      setPostVal("");
+      setUpdatePostID('')
     }
-    //console.log("current time...", );
+    else {
+      const newPost = {
+        timestamp: Math.floor(Date.now() / 1000),
+        userId: route.params?.userId,
+        description: postVal,
+        group: '',
+      };
+  
+      setPostVal("");
+  
+      try {
+        await API.graphql(graphqlOperation(createPost, { input: newPost }));
+        showPostsAsync();
+        console.log("success in making a new post");
+      } catch (err) {
+        console.log("error: ", err);
+      }
+      //console.log("current time...", );
+    }
+    
   };
 
   const showPostsAsync = async () => {
@@ -97,7 +122,8 @@ export default function GroupScreen({ navigation, route }) {
       val.sort((a, b) => {
         return b.timestamp - a.timestamp;
       });
-      setPosts(val);
+      if (isMounted.current)
+        setPosts(val);
     } catch (err) {
       console.log("error: ", err);
     }
@@ -114,13 +140,15 @@ export default function GroupScreen({ navigation, route }) {
   return (
     <View style={styles.containerStyle}>
       <View style={{}}>
+        <Text style = {{marginTop: 20, marginLeft: 5}}> Characters remaining: {numCharsLeft} </Text>
         <TextInput
-          style={[styles.textInputStyle, { marginTop: 40, marginBottom: 30 }]}
+          style={[styles.textInputStyle, { marginTop: 5, marginBottom: 30 }]}
           multiline={true}
           placeholder="Start Typing..."
           onChangeText={setPostVal}
           value={postVal}
           clearButtonMode="always"
+          maxLength={1000}
         />
 
         <View style={{
@@ -132,7 +160,7 @@ export default function GroupScreen({ navigation, route }) {
             style={styles.buttonStyle}
             onPress={() => {
               postVal != ""
-                ? (addPostAsync())
+                ? (addPostAsync(updatePostID))
                 : alert("No text detected in text field");
             }}
           >
@@ -157,7 +185,9 @@ export default function GroupScreen({ navigation, route }) {
             item={item}
             pressHandler={deleteButtonHandler}
             deletePostsAsync={deletePostsAsync}
+            setPostVal={setPostVal}
             writtenByYou={item.userId === route.params?.userId}
+            setUpdatePostID={setUpdatePostID}
           />
         )}
       />
