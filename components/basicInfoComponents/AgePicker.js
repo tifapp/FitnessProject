@@ -10,10 +10,10 @@ const AgePicker = ({ field, selectedValue, setSelectedValue }) => {
 
     const fieldHandler = () => {
         if (field == '') {
-            setSelectedValue("18")
+            setSelectedValue(minAge);
         }
         else {
-            setSelectedValue(field)
+            setSelectedValue(field);
         }
     }
 
@@ -28,7 +28,7 @@ const AgePicker = ({ field, selectedValue, setSelectedValue }) => {
             >
                 {
                     ageRange.map((v) => {
-                        return <Picker.Item key={v} label={v.toString()} value={v.toString()} />
+                        return <Picker.Item key={v} label={v} value={v} />
                     })
                 }
             </Picker>

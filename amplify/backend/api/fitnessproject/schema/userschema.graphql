@@ -2,7 +2,7 @@ type User @model {
   id: ID!
   identityId: String
   name: String!
-  age: String
+  age: Int
   gender: String
   bio: String
   goals: String

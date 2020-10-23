@@ -38,7 +38,7 @@ const ProfileScreen = ({ navigation, route }) => {
     const [imageChanged, setImageChanged] = useState(false);
     const [imageURL, setImageURL] = useState('');
     const [name, setName] = useState('');
-    const [age, setAge] = useState('');
+    const [age, setAge] = useState(18);
     const [gender, setGender] = useState('');
     const [bioDetails, setBioDetails] = useState('');
     const [goalsDetails, setGoalsDetails] = useState('');

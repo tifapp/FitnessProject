@@ -32,7 +32,7 @@ var styles = require("styles/stylesheet");
 
 export default function SearchScreen() {
   const [query, setQuery] = useState("");
-  const [selectedAge, setSelectedAge] = useState('');
+  const [selectedAge, setSelectedAge] = useState(18);
   const [selectedMode, setSelectedMode] = useState('name');
   const [greaterThan, setGreaterThan] = useState(true);
   const [users, setUsers] = useState([]);
