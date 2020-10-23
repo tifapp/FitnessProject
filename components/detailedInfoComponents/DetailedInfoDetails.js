@@ -1,6 +1,7 @@
 import React from 'react'
 import { View, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
-import { Entypo } from '@expo/vector-icons';
+//import { Entypo } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
 
 var styles = require('../../styles/stylesheet');
@@ -18,7 +19,7 @@ const DetailedInfoDetails = ({ label, field, setField, goalsDetailMaxLength, bio
         <View>
             <TouchableOpacity onPress={goToTextBox}
             >
-                <Entypo style={styles.editIconStyle} name="edit" size={24} color="black" />
+                <MaterialCommunityIcons style={styles.editIconStyle}name="dumbbell" size={24} color="black" />
             </TouchableOpacity>
 
             <TextInput

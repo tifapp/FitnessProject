@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
-import { Entypo } from '@expo/vector-icons';
+//import { Entypo } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 import Selector from './Selector'
 
 const BasicInfoDetails = ({ label, field, updateField }) => {
@@ -27,7 +28,7 @@ const BasicInfoDetails = ({ label, field, updateField }) => {
                     editable={(label == 'name') ? true : false}
                 />
 
-                <Entypo name="edit" size={18} color="black" />
+            <MaterialCommunityIcons name="dumbbell" size={24} color="black" />
 
             </TouchableOpacity>
 
