@@ -45,6 +45,7 @@ export default function SearchScreen() {
     console.log("text received: ", text);
     if (text !== '') {
       try {
+          //since age is being stored as a string, there may be issues doing a greater/less than comparison on it. we may have to go into profilescreen and the schema and change the age field from a string to an int.
         let matchresult;
         if (selectedMode == 'name') {
             if (greaterThan) {
