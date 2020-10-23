@@ -89,7 +89,9 @@ const ProfileScreen = ({ navigation, route }) => {
                 if (route.params?.newUser) {
                     route.params?.setUserIdFunction(userId);
                 }
-            });
+                Alert.alert("Profile submitted successfully!");
+            })
+            .catch(Alert.alert("Profile could not be submitted!"));
             setInitialFields([name, age, gender, bioDetails, goalsDetails])
             setImageChanged(false)
         }
