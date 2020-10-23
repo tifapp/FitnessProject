@@ -22,7 +22,7 @@ import { listUsers } from "root/src/graphql/queries";
 import Header from "components/header";
 import AddPost from "components/AddPosts";
 import UserListItem from "components/UserListItem";
-import AgePicker from "components/AgePicker";
+import AgePicker from "components/basicInfoComponents/AgePicker";
 import * as subscriptions from "root/src/graphql/subscriptions";
 import { useNavigation } from '@react-navigation/native';
 
@@ -140,7 +140,7 @@ export default function SearchScreen() {
         }
 
         if (text === stateRef.current) {
-          setUsers(items);
+          setUsers(matchresult);
           console.log("here's some users! ", text);
         } else {          
           console.log("ignoring!");
@@ -167,19 +167,19 @@ export default function SearchScreen() {
         clearButtonMode="always"
       />
       <TouchableOpacity 
-            style = { (field) ? styles.outlineButtonStyle : styles.unselectedButtonStyle}
+            style = { styles.outlineButtonStyle}
             onPress = {() => {
                 if (selectedMode == 'name')
                     setSelectedMode('description');
                 else
-                    setSelectedAge('name');
+                    setSelectedMode('name');
             }}
         >
             <Text style = {styles.outlineButtonTextStyle}>{selectedMode}</Text>  
         </TouchableOpacity>
       
       <TouchableOpacity 
-            style = { (field) ? styles.outlineButtonStyle : styles.unselectedButtonStyle}
+            style = { styles.outlineButtonStyle }
             onPress = {() => {
                 setGreaterThan(!greaterThan);
             }}
