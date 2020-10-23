@@ -12,6 +12,7 @@ import {
     TouchableWithoutFeedback,
     Keyboard,
     FlatList,
+    ActivityIndicator,
 } from "react-native";
 // Get the aws resources configuration parameters
 import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
@@ -36,12 +37,14 @@ export default function SearchScreen() {
     const [selectedMode, setSelectedMode] = useState('name');
     const [greaterThan, setGreaterThan] = useState(true);
     const [users, setUsers] = useState([]);
+    const [isSearching, setIsSearching] = useState(false); //to show a loading icon when in the process of searching
     const stateRef = useRef();
 
     //still not 100% sure why this works, will have to come back to it. got from here: https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
     stateRef.current = query;
 
     const showUsersAsync = async (text) => {
+        setIsSearching(true);
         console.log("text received: ", text);
         if (text !== '') {
             try {
@@ -151,6 +154,7 @@ export default function SearchScreen() {
         } else {
             setUsers([]);
         }
+        setIsSearching(false);
     };
 
     useEffect(() => {
@@ -202,10 +206,16 @@ export default function SearchScreen() {
                 <AgePicker field={''} selectedValue={selectedAge} setSelectedValue={setSelectedAge} />
             </View>
 
-            <FlatList
-                data={users}
-                renderItem={({ item }) => <UserListItem item={item} />}
-            />
+            {
+                isSearching ?
+                <ActivityIndicator
+                />
+                :
+                <FlatList
+                    data={users}
+                    renderItem={({ item }) => <UserListItem item={item} />}
+                />
+            }
 
             <StatusBar style="auto" />
         </View>
