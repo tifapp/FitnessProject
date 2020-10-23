@@ -28,7 +28,7 @@ const AgePicker = ({ field, selectedValue, setSelectedValue }) => {
             >
                 {
                     ageRange.map((v) => {
-                        return <Picker.Item key={v} label={v} value={v} />
+                        return <Picker.Item key={v} label={v.toString()} value={v} />
                     })
                 }
             </Picker>
