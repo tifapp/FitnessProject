@@ -37,9 +37,9 @@ export default function GroupPostsScreen({ navigation, route}) {
 const { group, userId } = route.params;
 var nameVal = group.name;
 var tempVal = group.createdAt;
-console.log(userId);
+//console.log(userId);
 
-console.log(group);
+//console.log(group);
 
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
