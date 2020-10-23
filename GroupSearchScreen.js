@@ -102,14 +102,14 @@ export default function GroupSearchScreen({ navigation}) {
         clearButtonMode="always"
       />
 
-      <TouchableOpacity style={styles.submitButton} onPress={goGroupCreationScreen}>
-        <Text style={styles.buttonTextStyle}>Create Group</Text>
-      </TouchableOpacity>
-
       <FlatList
         data={users}
         renderItem={({ item }) => <ListGroupItem item={item}/>}
       />
+      
+      <TouchableOpacity style={styles.submitButton} onPress={goGroupCreationScreen}>
+        <Text style={styles.buttonTextStyle}>Create Group</Text>
+      </TouchableOpacity>
 
       <StatusBar style="auto" />
     </View>
