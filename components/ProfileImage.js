@@ -33,6 +33,7 @@ export const ProfileImage = (props) => { //user is required in props. it's a typ
     if (imageURL == 'loading...') {
         return (
             <ActivityIndicator
+                color="#0000ff"
                 style={[props.style]}
             />
         )

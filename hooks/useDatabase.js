@@ -47,7 +47,7 @@ export default () => {
         await API.graphql(graphqlOperation(updateUser, { input: recurringUser }));
         console.log("updated user successfully");
       } catch (err) {
-        //Alert.alert("Could not submit profile! Error: ", err.errors[0].message);
+        Alert.alert("Could not submit profile! Error: ", err.errors[0].message);
         console.log("error when updating user: ", err);
       }
     }

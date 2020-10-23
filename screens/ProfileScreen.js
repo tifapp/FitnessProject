@@ -4,7 +4,7 @@ import ProfilePic from 'components/ProfileImagePicker'
 import BasicInfo from 'components/basicInfoComponents/BasicInfo'
 import DetailedInfo from 'components/detailedInfoComponents/DetailedInfo';
 import useDatabase from 'hooks/useDatabase';
-import { Auth} from "aws-amplify";
+import { Auth } from "aws-amplify";
 import { StackActions, NavigationActions } from 'react-navigation';
 
 var styles = require('styles/stylesheet');
@@ -24,12 +24,12 @@ const ProfileScreen = ({ navigation, route }) => {
             Auth.signOut();
         }
     }
-    
+
     async function deleteAccount() {
         const title = 'Are you sure you want to delete your account?';
         const message = '';
         const options = [
-            { text: 'Yes', onPress: () => {deleteUserAsync().then(()=>{Auth.signOut()}).catch()} }, //if submithandler fails user won't know
+            { text: 'Yes', onPress: () => { deleteUserAsync().then(() => { Auth.signOut() }).catch() } }, //if submithandler fails user won't know
         ];
         Alert.alert(title, message, options, { cancelable: true });
     }
@@ -83,15 +83,14 @@ const ProfileScreen = ({ navigation, route }) => {
             Alert.alert('Profile is up to date!')
         }
         else {
-            Alert.alert('Submitting Profile...', '', [], {cancelable: false})
+            Alert.alert('Submitting Profile...', '', [], { cancelable: false })
             updateUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails)
-            .then((userId) => {
-                if (route.params?.newUser) {
-                    route.params?.setUserIdFunction(userId);
-                }
-                Alert.alert("Profile submitted successfully!");
-            })
-            .catch(Alert.alert("Profile could not be submitted!"));
+                .then((userId) => {
+                    if (route.params?.newUser) {
+                        route.params?.setUserIdFunction(userId);
+                    }
+                    Alert.alert("Profile submitted successfully!");
+                })
             setInitialFields([name, age, gender, bioDetails, goalsDetails])
             setImageChanged(false)
         }
@@ -100,32 +99,38 @@ const ProfileScreen = ({ navigation, route }) => {
     useEffect(() => {
         setLoading(true);
         loadUserAsync()
-        .then(user => {
-            if (user != null) {
-                setName(user.name);
-                setAge(user.age);
-                setGender(user.gender);
-                setBioDetails(user.bio);
-                setGoalsDetails(user.goals);
-                setInitialFields([user.name, user.age, user.gender, user.bio, user.goals]);
-                Image.getSize(user.pictureURL, () => {
-                    setImageURL(user.pictureURL);
-                }, err => {
-                    setImageURL('');
-                });
-            }
-        })
-        .finally(()=>{setLoading(false);})
+            .then(user => {
+                if (user != null) {
+                    setName(user.name);
+                    setAge(user.age);
+                    setGender(user.gender);
+                    setBioDetails(user.bio);
+                    setGoalsDetails(user.goals);
+                    setInitialFields([user.name, user.age, user.gender, user.bio, user.goals]);
+                    Image.getSize(user.pictureURL, () => {
+                        setImageURL(user.pictureURL);
+                    }, err => {
+                        setImageURL('');
+                    });
+                }
+            })
+            .finally(() => { setLoading(false); })
     }, [])
 
     useEffect(() => { updateDetailedInfo() }, [route.params?.updatedField])
 
     if (loading) {
         return (
-            <ActivityIndicator size="large" style={{
-              flex: 1,
-              justifyContent: "center",
-            }} />
+            <ActivityIndicator
+                size="large"
+                color="#0000ff"
+                style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    flexDirection: "row",
+                    justifyContent: "space-around",
+                    padding: 10,
+                }} />
         )
     } else {
         return (
@@ -138,7 +143,7 @@ const ProfileScreen = ({ navigation, route }) => {
                         <Text style={styles.unselectedButtonTextStyle}>Delete Account</Text>
                     </TouchableOpacity>
                 </View>
-                <View style={{paddingBottom: 15}}>
+                <View style={{ paddingBottom: 15 }}>
                     <ProfilePic imageURL={imageURL} setImageURL={setImageURL} setImageChanged={setImageChanged} />
                     <BasicInfo
                         name={name}
@@ -152,12 +157,12 @@ const ProfileScreen = ({ navigation, route }) => {
                 <DetailedInfo
                     bioDetails={bioDetails}
                     goalsDetails={goalsDetails}
-                    bioDetailsMaxLength = {bioDetailsMaxLength}
-                    goalsDetailsMaxLength = {goalsDetailsMaxLength}
+                    bioDetailsMaxLength={bioDetailsMaxLength}
+                    goalsDetailsMaxLength={goalsDetailsMaxLength}
                     setBioDetails={setBioDetails}
                     setGoalsDetails={setGoalsDetails}
                 />
-                <TouchableOpacity style={[styles.buttonStyle, {marginBottom: 25}]} onPress={submitHandler} >
+                <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25 }]} onPress={submitHandler} >
                     <Text style={styles.buttonTextStyle}>Submit</Text>
                 </TouchableOpacity>
             </ScrollView>
