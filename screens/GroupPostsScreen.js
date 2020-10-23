@@ -24,6 +24,7 @@ import PostItem from "components/PostItem";
 import { onCreatePost, onDeletePost, onUpdatePost } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
 
+
 require('root/androidtimerfix');
 
 Amplify.configure(awsconfig);
@@ -32,11 +33,11 @@ const { width } = Dimensions.get('window');
 
 var styles = require('styles/stylesheet');
 
-export default function GroupPostsScreen({ navigation, route }) {
-
-const { group } = route.params;
+export default function GroupPostsScreen({ navigation, route}) {
+const { group, userId } = route.params;
 var nameVal = group.name;
 var tempVal = group.createdAt;
+console.log(userId);
 
 console.log(group);
 
@@ -143,7 +144,9 @@ console.log(group);
 
   return (
     <View style={styles.containerStyle}>
-      <DisplayInternetConnection />
+        <View style={styles.header}>
+          <Text style={styles.title}>{group.name}</Text>
+        </View>
       <View style={{}}>
       
         <TextInput
@@ -191,7 +194,7 @@ console.log(group);
             item={item}
             pressHandler={deleteButtonHandler}
             deletePostsAsync={deletePostsAsync}
-            writtenByYou={item.userId === route.params?.userId}
+            writtenByYou={userId === route.params?.userId}
           />
         )}
       />

@@ -15,11 +15,14 @@ Amplify.configure(awsconfig);
 const Stack = createStackNavigator();
 
 export default function GroupSearchStack({route}) {
+  const {id} = route.params
+  //console.log("hello");
+  //console.log(id);
   return (
     <Stack.Navigator initialRouteName='GroupSearch' screenOptions={{ headerStyle: { backgroundColor: '#d3d3d3' } }}>
       <Stack.Screen name='GroupSearch' component={GroupSearchScreen}/>
       <Stack.Screen name='Create Group' component={CreatingGroups} />
-      <Stack.Screen name='Group Posts Screen' component={GroupPostsScreen}/>
+      <Stack.Screen name='Group Posts Screen' component={GroupPostsScreen} userId={id}/>
     </Stack.Navigator>
   );
 }

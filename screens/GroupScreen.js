@@ -50,10 +50,11 @@ export default function GroupScreen({ navigation, route }) {
   };
 
   const DisplayInternetConnection = () => {
-    if(onlineCheck){
+    console.log(onlineCheck);
+    if(!onlineCheck){
       return (
         <View style={styles.offlineContainer}>
-          <Text style={styles.offlineText}> Connected to the Internet</Text>
+          <Text style={styles.offlineText}> Not Connected to the Internet</Text>
         </View>
       );
     }

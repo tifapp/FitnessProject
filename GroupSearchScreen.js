@@ -29,7 +29,7 @@ Amplify.configure(awsconfig);
 
 var styles = require("styles/stylesheet");
 
-export default function GroupSearchScreen({ navigation, route}) {
+export default function GroupSearchScreen({ navigation}) {
   const [query, setQuery] = useState("");
   const [users, setUsers] = useState([]);
   const stateRef = useRef();
@@ -108,7 +108,7 @@ export default function GroupSearchScreen({ navigation, route}) {
 
       <FlatList
         data={users}
-        renderItem={({ item }) => <ListGroupItem item={item} check={check}/>}
+        renderItem={({ item }) => <ListGroupItem item={item}/>}
       />
 
       <StatusBar style="auto" />

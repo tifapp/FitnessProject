@@ -7,6 +7,20 @@ var {
 } = React;
 
 module.exports = StyleSheet.create({
+  header: {
+    height: 80,
+    paddingTop: 25,
+    backgroundColor: "coral",
+    borderRadius: 5,
+    marginHorizontal: 10,
+    marginTop: 10
+  },
+  title: {
+    textAlign: "center",
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
   offlineContainer: {
     backgroundColor: '#b52424',
     height: 30,

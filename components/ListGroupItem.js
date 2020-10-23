@@ -13,10 +13,9 @@ import { useNavigation } from '@react-navigation/native';
 
 var styles = require("../styles/stylesheet");
 
-export default function ListGroupItem({ item, check }) {
+export default function ListGroupItem({ item}) {
 
   const navigation = useNavigation();
-  console.log(check);
 
   const goToGroupPosts = () => {
     console.log(item);
