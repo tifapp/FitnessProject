@@ -37,10 +37,10 @@ export const ProfileImage = (props) => { //user is required in props. it's a typ
             />
         )
     } else {
-        return (
+        return ( //source={imageURL === '' ? require('../assets/icon.png') : { uri: imageURL }}
             <Image 
                 style={[props.style]}
-                source={imageURL === '' ? require('../assets/icon.png') : { uri: imageURL }}
+                source={require('../assets/icon.png')}
             />
         )
     }
