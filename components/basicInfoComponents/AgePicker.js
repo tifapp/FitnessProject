@@ -22,6 +22,7 @@ const AgePicker = ({ field, selectedValue, setSelectedValue }) => {
     return (
         <View>
             <Picker
+                style={{width: 100}}
                 selectedValue={selectedValue}
                 itemStyle={{ height: 200, width: '100%' }}
                 onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}

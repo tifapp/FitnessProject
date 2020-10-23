@@ -23,7 +23,7 @@ const BasicInfoDetails = ({ label, field, updateField }) => {
                     style={field === '' ? styles.emptyTextInputStyle : styles.textInputStyle}
                     placeholder={`Enter your ${label}`}
                     autoCorrect={false}
-                    value={field}
+                    value={field.toString()}
                     onChangeText={updateField}
                     editable={(label == 'name') ? true : false}
                 />
