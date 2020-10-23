@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState, useEffect, useRef, PureComponent } from "react";
+import React, { useState, useEffect, PureComponent } from "react";
 import {
   StyleSheet,
   Text,
@@ -24,6 +24,7 @@ import PostItem from "components/PostItem";
 import { onCreatePost, onDeletePost, onUpdatePost } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
 
+
 require('root/androidtimerfix');
 
 Amplify.configure(awsconfig);
@@ -32,23 +33,24 @@ const { width } = Dimensions.get('window');
 
 var styles = require('styles/stylesheet');
 
-export default function GroupScreen({ navigation, route }) {
+export default function GroupPostsScreen({ navigation, route}) {
+const { group, userId } = route.params;
+var nameVal = group.name;
+var tempVal = group.createdAt;
+//console.log(userId);
+
+//console.log(group);
+
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
-  const numCharsLeft = 1000 - postVal.length;
-  const [updatePostID, setUpdatePostID] = useState('');
-  
-  const isMounted = useRef(); //this variable exists to eliminate the "updated state on an unmounted component" warning
   const [onlineCheck, setOnlineCheck] = useState(true);
 
   useEffect(() => {
-    isMounted.current = true;
     showPostsAsync();
     waitForNewPostsAsync();
     checkInternetConnection();
-    return () => {isMounted.current = false;}
   }, []);
-  
+
   const checkInternetConnection = () => {
     NetInfo.fetch().then(state => 
       setOnlineCheck(state.isConnected)
@@ -56,11 +58,10 @@ export default function GroupScreen({ navigation, route }) {
   };
 
   const DisplayInternetConnection = () => {
-    console.log(onlineCheck);
-    if(!onlineCheck){
+    if(onlineCheck){
       return (
         <View style={styles.offlineContainer}>
-          <Text style={styles.offlineText}> Not Connected to the Internet</Text>
+          <Text style={styles.offlineText}> Connected to the Internet</Text>
         </View>
       );
     }
@@ -91,43 +92,24 @@ export default function GroupScreen({ navigation, route }) {
     });
   };
 
-  // This function now also has functionality for updating a post
-  // We can separate updating functionality from adding functionality if it
-  // becomes an issue later on.
-  const addPostAsync = async (val) => {
-    checkInternetConnection();
-    if (updatePostID != '') {
-      try {
-        await API.graphql(graphqlOperation(updatePost, { input: { id: val, description: postVal, timestamp: Math.floor(Date.now() / 1000)}}));
-        showPostsAsync();
-        console.log("success in updating a post");
-      } catch (err) {
-        console.log("error: ", err);
-      }
+  const addPostAsync = async () => {
+    const newPost = {
+      timestamp: Math.floor(Date.now() / 1000),
+      userId: group.id,
+      description: postVal,
+      group: nameVal
+    };
 
-      setPostVal("");
-      setUpdatePostID('')
+    setPostVal("");
+
+    try {
+      await API.graphql(graphqlOperation(createPost, { input: newPost }));
+      showPostsAsync();
+      console.log("success in making a new post");
+    } catch (err) {
+      console.log("error: ", err);
     }
-    else {
-      const newPost = {
-        timestamp: Math.floor(Date.now() / 1000),
-        userId: route.params?.userId,
-        description: postVal,
-        group: '',
-      };
-  
-      setPostVal("");
-  
-      try {
-        await API.graphql(graphqlOperation(createPost, { input: newPost }));
-        showPostsAsync();
-        console.log("success in making a new post");
-      } catch (err) {
-        console.log("error: ", err);
-      }
-      //console.log("current time...", );
-    }
-    
+    //console.log("current time...", );
   };
 
   const showPostsAsync = async () => {
@@ -136,8 +118,8 @@ export default function GroupScreen({ navigation, route }) {
         {
             filter: {
               group: {
-                eq: ''
-              }
+                eq: nameVal
+              },
             }
         }
         ));
@@ -146,15 +128,13 @@ export default function GroupScreen({ navigation, route }) {
       val.sort((a, b) => {
         return b.timestamp - a.timestamp;
       });
-      if (isMounted.current)
-        setPosts(val);
+      setPosts(val);
     } catch (err) {
       console.log("error: ", err);
     }
   };
 
   const deletePostsAsync = async (val) => {
-    checkInternetConnection();
     try {
       await API.graphql(graphqlOperation(deletePost, { input: { id: val } }));
     } catch {
@@ -164,17 +144,18 @@ export default function GroupScreen({ navigation, route }) {
 
   return (
     <View style={styles.containerStyle}>
-      <DisplayInternetConnection />
+        <View style={styles.header}>
+          <Text style={styles.title}>{group.name}</Text>
+        </View>
       <View style={{}}>
-        <Text style = {{marginTop: 20, marginLeft: 5}}> Characters remaining: {numCharsLeft} </Text>
+      
         <TextInput
-          style={[styles.textInputStyle, { marginTop: 5, marginBottom: 30 }]}
+          style={[styles.textInputStyle, { marginTop: 40, marginBottom: 30 }]}
           multiline={true}
           placeholder="Start Typing..."
           onChangeText={setPostVal}
           value={postVal}
           clearButtonMode="always"
-          maxLength={1000}
         />
         
 
@@ -187,11 +168,11 @@ export default function GroupScreen({ navigation, route }) {
             style={styles.buttonStyle}
             onPress={() => {
               postVal != ""
-                ? (addPostAsync(updatePostID))
+                ? (addPostAsync())
                 : alert("No text detected in text field");
             }}
           >
-            <Text style={styles.buttonTextStyle}>{updatePostID == '' ? 'Add Post' : 'Edit Post'}</Text>
+            <Text style={styles.buttonTextStyle}>Add Post</Text>
           </TouchableOpacity>
           
 
@@ -213,9 +194,7 @@ export default function GroupScreen({ navigation, route }) {
             item={item}
             pressHandler={deleteButtonHandler}
             deletePostsAsync={deletePostsAsync}
-            setPostVal={setPostVal}
-            writtenByYou={item.userId === route.params?.userId}
-            setUpdatePostID={setUpdatePostID}
+            writtenByYou={userId === route.params?.userId}
           />
         )}
       />

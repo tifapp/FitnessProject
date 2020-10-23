@@ -74,7 +74,6 @@ export default function CreatingGroups() {
       keyboardShouldPersistsTaps="handled"
     >
       <View>
-        <CreatingHeader />
         <View style={styles.border}>
           <NameField setName={setName} nameVal={nameVal} />
           <MaxUsers

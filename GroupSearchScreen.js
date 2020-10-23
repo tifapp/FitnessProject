@@ -29,10 +29,14 @@ Amplify.configure(awsconfig);
 
 var styles = require("styles/stylesheet");
 
-export default function GroupSearchScreen({ navigation }) {
+export default function GroupSearchScreen({ navigation}) {
   const [query, setQuery] = useState("");
   const [users, setUsers] = useState([]);
   const stateRef = useRef();
+
+  const goGroupCreationScreen = () => {
+    navigation.navigate('Create Group')
+  }
 
   //still not 100% sure why this works, will have to come back to it. got from here: https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
   stateRef.current = query;
@@ -62,11 +66,13 @@ export default function GroupSearchScreen({ navigation }) {
 
         let items = [...sportmatchresult.data.listGroups.items, ...namematchresult.data.listGroups.items];
         
+        
         items = items.filter((item, index, self) =>
           index === self.findIndex((temp) => (
             temp.id === item.id
           ))
         )
+        
 
         if (text === stateRef.current) {
           setUsers(items);
@@ -96,12 +102,18 @@ export default function GroupSearchScreen({ navigation }) {
         clearButtonMode="always"
       />
 
+      <TouchableOpacity style={styles.submitButton} onPress={goGroupCreationScreen}>
+        <Text style={styles.buttonTextStyle}>Create Group</Text>
+      </TouchableOpacity>
+
       <FlatList
         data={users}
-        renderItem={({ item }) => <ListGroupItem item={item} />}
+        renderItem={({ item }) => <ListGroupItem item={item}/>}
       />
 
       <StatusBar style="auto" />
     </View>
   );
 }
+
+
