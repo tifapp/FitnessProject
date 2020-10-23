@@ -163,7 +163,7 @@ export default function PostItem({
           />
           <View>
             <Text>{postAuthor.name}</Text>
-            <Text> Last Updated: {displayTime} </Text>
+            <Text> Updated {displayTime} </Text>
           </View>
         </TouchableOpacity>
         <Text style={styles.check}>{item.description}</Text>
