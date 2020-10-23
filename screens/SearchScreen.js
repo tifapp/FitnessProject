@@ -22,6 +22,7 @@ import { listUsers } from "root/src/graphql/queries";
 import Header from "components/header";
 import AddPost from "components/AddPosts";
 import UserListItem from "components/UserListItem";
+import AgePicker from "components/AgePicker";
 import * as subscriptions from "root/src/graphql/subscriptions";
 import { useNavigation } from '@react-navigation/native';
 
@@ -31,6 +32,9 @@ var styles = require("styles/stylesheet");
 
 export default function SearchScreen() {
   const [query, setQuery] = useState("");
+  const [selectedAge, setSelectedAge] = useState('');
+  const [selectedMode, setSelectedMode] = useState('name');
+  const [greaterThan, setGreaterThan] = useState(true);
   const [users, setUsers] = useState([]);
   const stateRef = useRef();
 
@@ -41,42 +45,98 @@ export default function SearchScreen() {
     console.log("text received: ", text);
     if (text !== '') {
       try {
-        const namematchresult = await API.graphql(graphqlOperation(listUsers, {
-          filter: {
-            name: {
-              beginsWith: text
+        let matchresult;
+        if (selectedMode == 'name') {
+            if (greaterThan) {
+                const namematchresult = await API.graphql(graphqlOperation(listUsers, {
+                    filter: {
+                        age: {ge: selectedAge},
+                        and: {
+                            name: {
+                                beginsWith: text
+                            }
+                        }
+                    }
+                  }
+                  ));
+                matchresult = namematchresult.data.listUsers.items;
+            } else {
+                const namematchresult = await API.graphql(graphqlOperation(listUsers, {
+                    filter: {
+                        age: {le: selectedAge},
+                        and: {
+                            name: {
+                                beginsWith: text
+                            }
+                        }
+                    }
+                  }
+                  ));
+                matchresult = namematchresult.data.listUsers.items;
             }
-          }
-        }
-        ));
-        const biomatchresult = await API.graphql(graphqlOperation(listUsers, {
-          filter: {
-            bio: {
-              contains: text
+        } else {
+            let biomatchresult;
+            let goalsmatchresult;
+            if (greaterThan) {
+                
+            biomatchresult = await API.graphql(graphqlOperation(listUsers, {
+                filter: {
+                    age: {ge: selectedAge},
+                    and: {
+                  bio: {
+                    contains: text
+                  }
+                }
+                }
+              }
+              ));
+            goalsmatchresult = await API.graphql(graphqlOperation(listUsers, {
+                filter: {
+                    age: {ge: selectedAge},
+                    and: {
+                  goals: {
+                    contains: text
+                  }
+                }
+                }
+              }
+              ));
+            } else {
+                
+            biomatchresult = await API.graphql(graphqlOperation(listUsers, {
+                filter: {
+                    age: {le: selectedAge},
+                    and: {
+                  bio: {
+                    contains: text
+                  }
+                }
+                }
+              }
+              ));
+            goalsmatchresult = await API.graphql(graphqlOperation(listUsers, {
+                filter: {
+                    age: {le: selectedAge},
+                    and: {
+                  goals: {
+                    contains: text
+                  }
+                }
+                }
+              }
+              ));
             }
-          }
-        }
-        ));
-        const goalsmatchresult = await API.graphql(graphqlOperation(listUsers, {
-          filter: {
-            goals: {
-              contains: text
-            }
-          }
-        }
-        ));
-        
-        let items = [
-          ...namematchresult.data.listUsers.items,
-          ...biomatchresult.data.listUsers.items,
-          ...goalsmatchresult.data.listUsers.items,
-        ];
-        
-        items = items.filter((item, index, self) =>
-          index === self.findIndex((temp) => (
+              
+            matchresult = [
+                ...biomatchresult.data.listUsers.items,
+                ...goalsmatchresult.data.listUsers.items,
+              ].filter((item, index, self) =>
+              //to remove duplicates from this array
+            index === self.findIndex((temp) => (
             temp.id === item.id
-          ))
-        )
+            ))
+            )
+        }
 
         if (text === stateRef.current) {
           setUsers(items);
@@ -94,7 +154,7 @@ export default function SearchScreen() {
   
   useEffect(() => {
     showUsersAsync(query);
-  }, [query]);
+  }, [query, greaterThan, selectedAge, selectedMode]);
 
   return (
     <View style={styles.containerStyle}>
@@ -105,6 +165,27 @@ export default function SearchScreen() {
         value={query}
         clearButtonMode="always"
       />
+      <TouchableOpacity 
+            style = { (field) ? styles.outlineButtonStyle : styles.unselectedButtonStyle}
+            onPress = {() => {
+                if (selectedMode == 'name')
+                    setSelectedMode('description');
+                else
+                    setSelectedAge('name');
+            }}
+        >
+            <Text style = {styles.outlineButtonTextStyle}>{selectedMode}</Text>  
+        </TouchableOpacity>
+      
+      <TouchableOpacity 
+            style = { (field) ? styles.outlineButtonStyle : styles.unselectedButtonStyle}
+            onPress = {() => {
+                setGreaterThan(!greaterThan);
+            }}
+        >
+            <Text style = {styles.outlineButtonTextStyle}>{greaterThan ? '>=' : '<='}</Text>  
+        </TouchableOpacity>
+      <AgePicker field = {''} selectedValue = {selectedAge} setSelectedValue = {setSelectedAge} />
 
       <FlatList
         data={users}
