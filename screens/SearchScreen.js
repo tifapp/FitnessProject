@@ -222,6 +222,8 @@ export default function SearchScreen() {
                 <FlatList
                     data={users}
                     renderItem={({ item }) => <UserListItem item={item} />}
+                    //if there are only 1 or 2 characters in the query, dont load images
+                    //if there are more than 5 search results only download images from the top 5 (paginate)
                 />
             }
 
