@@ -10,7 +10,7 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
-  YellowBox
+  LogBox
 } from "react-native";
 import { withAuthenticator } from "aws-amplify-react-native";
 // Get the aws resources configuration parameters
@@ -31,7 +31,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 
-YellowBox.ignoreWarnings([
+LogBox.ignoreLogs([
     'Non-serializable values were found in the navigation state',
   ]);
 
