@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import {Text, View, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 //import { Entypo } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 import Selector from './Selector'
@@ -18,19 +18,30 @@ const BasicInfoDetails = ({ label, field, updateField }) => {
                     updateField={updateField} />
                 : null}
 
-            <TouchableOpacity style={styles.textBoxStyle} onPress={() => setModalOpen(true)}>
-                <TextInput
-                    style={field === '' ? styles.emptyTextInputStyle : styles.textInputStyle}
-                    placeholder={`Enter your ${label}`}
-                    autoCorrect={false}
-                    value={field.toString()}
-                    onChangeText={updateField}
-                    editable={(label == 'name') ? true : false}
-                />
+            {label == 'name' ?
+                <TouchableOpacity style={styles.textBoxStyle}>
+                    <TextInput
+                        style={field === '' ? styles.emptyTextInputStyle : styles.textInputStyle}
+                        placeholder={`Enter your ${label}`}
+                        autoCorrect={false}
+                        value={field.toString()}
+                        onChangeText={updateField}
+                    />
 
-            <MaterialCommunityIcons name="dumbbell" size={24} color="black" />
+                    {/* <MaterialCommunityIcons name="dumbbell" size={24} color="black" /> */}
+                </TouchableOpacity> 
 
-            </TouchableOpacity>
+                :
+
+                <TouchableOpacity style={[styles.textBoxStyle, {borderBottomColor: 'gray', borderBottomWidth: 1}]} onPress={()=>setModalOpen(true)}>
+                    <View>
+                        <Text style = {{marginLeft: 5}}> {field}</Text>
+                    </View>
+
+                    {/* <MaterialCommunityIcons name="dumbbell" size={24} color="black" /> */}
+                </TouchableOpacity> 
+            }
+            
 
         </View>
     )

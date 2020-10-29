@@ -133,6 +133,7 @@ const App = () => {
           <Tab.Screen
             name="Groups"
             component={GroupStack}
+            initialParams={{id: userId}}
             options={{
               headerShown: false,
             }}

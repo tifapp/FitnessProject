@@ -16,6 +16,7 @@ const Stack = createStackNavigator();
 
 export default function GroupSearchStack({route}) {
   const {id} = route.params
+  
   //console.log("hello");
   //console.log(id);
   return (

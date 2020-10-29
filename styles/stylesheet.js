@@ -136,6 +136,7 @@ module.exports = StyleSheet.create({
     backgroundColor: 'transparent'
   },
 
+
   textInputStyle: {
     marginHorizontal: 10,
     height: 30,
