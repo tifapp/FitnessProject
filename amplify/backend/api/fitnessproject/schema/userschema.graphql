@@ -6,4 +6,5 @@ type User @model {
   gender: String
   bio: String
   goals: String
+  isUser: Boolean
 }
