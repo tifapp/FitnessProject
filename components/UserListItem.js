@@ -6,6 +6,7 @@ import {
 } from "react-native";
 import { ProfileImage } from './ProfileImage'
 import { useNavigation } from '@react-navigation/native';
+import { AntDesign } from '@expo/vector-icons'; 
 
 var styles = require('../styles/stylesheet');
 
@@ -30,6 +31,7 @@ export default function UserListItem({
         alignItems: 'center',
         marginHorizontal: 25,
       }, styles.check]}>
+        <AntDesign name="user" size={24} color="black" />
         <Text>{item.name}</Text>
         <ProfileImage
           style={styles.smallImageStyle}
