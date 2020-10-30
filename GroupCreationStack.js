@@ -23,7 +23,7 @@ export default function GroupSearchStack({route}) {
     <Stack.Navigator initialRouteName='GroupSearch' screenOptions={{ headerStyle: { backgroundColor: '#d3d3d3' } }}>
       <Stack.Screen name='GroupSearch' component={GroupSearchScreen}/>
       <Stack.Screen name='Create Group' component={CreatingGroups} />
-      <Stack.Screen name='Group Posts Screen' component={GroupPostsScreen} userId={id}/>
+      <Stack.Screen name='Group Posts Screen' component={GroupPostsScreen} initialParams={route.params}/>
     </Stack.Navigator>
   );
 }

@@ -34,7 +34,7 @@ const { width } = Dimensions.get('window');
 var styles = require('styles/stylesheet');
 
 export default function GroupPostsScreen({ navigation, route}) {
-const { group, userId } = route.params;
+const { group } = route.params;
 
 var nameVal = group.name;
 var tempVal = group.createdAt;
@@ -111,7 +111,7 @@ var tempVal = group.createdAt;
     else {
       const newPost = {
         timestamp: Math.floor(Date.now() / 1000),
-        userId: group.id,
+        userId: route.params?.id,
         description: postVal,
         group: nameVal
       };
@@ -212,13 +212,12 @@ var tempVal = group.createdAt;
             item={item}
             pressHandler={deleteButtonHandler}
             deletePostsAsync={deletePostsAsync}
-            writtenByYou={userId === route.params?.userId}
+            writtenByYou={item.userId === route.params?.id}
             setPostVal={setPostVal}
             setUpdatePostID={setUpdatePostID}
           />
         )}
       />
-
 
       <StatusBar style="auto" />
     </View>
