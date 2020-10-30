@@ -190,7 +190,7 @@ var tempVal = group.createdAt;
                 : alert("No text detected in text field");
             }}
           >
-            <Text style={styles.buttonTextStyle}>Add Post</Text>
+            <Text style={styles.buttonTextStyle}>{updatePostID == '' ? 'Add Post' : 'Edit Post'}</Text>
           </TouchableOpacity>
           
 
