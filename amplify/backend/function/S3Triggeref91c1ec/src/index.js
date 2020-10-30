@@ -18,13 +18,6 @@ exports.handler = async (event, context, callback) => {
     const BASE_FOLDER = PARTS[0];
     if (BASE_FOLDER === 'thumbnails') return;
     
-    // Check that the image type is supported  
-    const imageType = typeMatch[1].toLowerCase();
-    if (imageType != "jpg" && imageType != "png") {
-        console.log(`Unsupported image type: ${imageType}`);
-        return;
-    }
-    
     /* Stores the main file name in a variable */
     let FILE = PARTS[PARTS.length - 1]
     

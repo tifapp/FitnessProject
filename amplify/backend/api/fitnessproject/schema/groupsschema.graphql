@@ -6,5 +6,4 @@ type Group @model {
   Sport: String!
   Description: String!
   characterCount: Int
-  isUser: Boolean
 }

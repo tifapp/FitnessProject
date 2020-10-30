@@ -20,6 +20,10 @@
           "appId": "d19kzf7eu35pq1",
           "type": "manual"
         }
+      },
+      "function": {
+        "pushNotification": {},
+        "pinpoint": {}
       }
     }
   }
