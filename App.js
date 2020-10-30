@@ -139,16 +139,9 @@ const App = () => {
             }}
           />
           <Tab.Screen 
-            name="GroupSearch"
+            name="Search"
             component={GroupSearchStack}
             initialParams={{id: userId}}
-            options={{
-              headerShown: false,
-            }}
-          />
-          <Tab.Screen 
-            name="User Search"
-            component={SearchStack}
             options={{
               headerShown: false,
             }}

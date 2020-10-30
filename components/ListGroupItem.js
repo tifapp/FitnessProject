@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useNavigation } from '@react-navigation/native';
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 var styles = require("../styles/stylesheet");
 
@@ -33,13 +34,14 @@ export default function ListGroupItem({ item}) {
             {
               flexBasis: 1,
               flexDirection: "row",
-              justifyContent: "space-around",
+              justifyContent: "space-evenly",
               alignItems: "center",
               marginHorizontal: 25,
             },
             styles.check,
           ]}
         >
+          <MaterialCommunityIcons name="account-group" color="black" size={30}/>
           <Text>{item.name}</Text>
         </View>
       </View>
