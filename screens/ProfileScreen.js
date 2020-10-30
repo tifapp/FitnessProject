@@ -18,6 +18,7 @@ const ProfileScreen = ({ navigation, route }) => {
             const options = [
                 { text: 'Submit changes', onPress: submitHandler }, //if submithandler fails user won't know
                 { text: 'Just sign out', onPress: Auth.signOut },
+                { text: 'Cancel', type: 'cancel', },
             ];
             Alert.alert(title, message, options, { cancelable: true });
         } else {
@@ -30,6 +31,8 @@ const ProfileScreen = ({ navigation, route }) => {
         const message = '';
         const options = [
             { text: 'Yes', onPress: () => { deleteUserAsync().then(() => { Auth.signOut() }).catch() } }, //if submithandler fails user won't know
+            { text: 'Cancel', type: 'cancel', },
+
         ];
         Alert.alert(title, message, options, { cancelable: true });
     }
