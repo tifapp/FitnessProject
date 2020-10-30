@@ -23,9 +23,7 @@ import ComplianceScreen from "./screens/ComplianceScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import BioScreen from "./screens/BioScreen";
 import GoalsScreen from "./screens/GoalsScreen";
-import CreatingGroups from "./screens/CreatingGroups";
 import SearchStack from "./SearchStack";
-import GroupSearchStack from "./GroupCreationStack";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -139,7 +137,7 @@ const App = () => {
           />
           <Tab.Screen 
             name="Search"
-            component={GroupSearchStack}
+            component={SearchStack}
             initialParams={{id: userId}}
             options={{
               headerShown: false,

@@ -1,56 +1,107 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useState, useEffect, useRef } from "react";
 import {
-    StyleSheet,
-    Text,
-    Button,
-    Image,
-    View,
-    TextInput,
-    ScrollView,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    Keyboard,
-    FlatList,
-    ActivityIndicator,
+  StyleSheet,
+  Text,
+  Button,
+  Image,
+  View,
+  TextInput,
+  ScrollView,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
+  FlatList,
 } from "react-native";
 // Get the aws resources configuration parameters
 import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
 import { Amplify, API, Auth, graphqlOperation } from "aws-amplify";
 import { createPost, updatePost, deletePost } from "root/src/graphql/mutations";
 import { DataStore, Predicates } from "@aws-amplify/datastore";
+import { listGroups } from "root/src/graphql/queries";
 import { listUsers } from "root/src/graphql/queries";
 import Header from "components/header";
 import AddPost from "components/AddPosts";
 import UserListItem from "components/UserListItem";
-import AgePicker from "components/basicInfoComponents/AgePicker";
+import ListGroupItem from "components/ListGroupItem";
 import * as subscriptions from "root/src/graphql/subscriptions";
-import { useNavigation } from '@react-navigation/native';
+import AgePicker from "components/basicInfoComponents/AgePicker";
 
 Amplify.configure(awsconfig);
 
 var styles = require("styles/stylesheet");
 
-export default function SearchScreen() {
-    const [query, setQuery] = useState("");
-    const [selectedAge, setSelectedAge] = useState(18);
-    const [selectedMode, setSelectedMode] = useState('name');
-    const [greaterThan, setGreaterThan] = useState(true);
-    const [users, setUsers] = useState([]);
-    const [isSearching, setIsSearching] = useState(false); //to show a loading icon when in the process of searching
-    const stateRef = useRef();
+export default function GroupSearchScreen({ navigation}) {
+  const [query, setQuery] = useState("");
+  const [users, setUsers] = useState([]);
+  const [mode, setMode] = useState("user");
+  const [greaterThan, setGreaterThan] = useState(true);
+  const [selectedAge, setSelectedAge] = useState(18);
+  const [userMode, setUserMode] = useState("name");
+  const stateRef = useRef();
 
-    //still not 100% sure why this works, will have to come back to it. got from here: https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
-    stateRef.current = query;
+  const goGroupCreationScreen = () => {
+    navigation.navigate('Create Group')
+  }
 
-    const showUsersAsync = async (text) => {
-        setIsSearching(true);
-        console.log("text received: ", text);
-        if (text !== '') {
-            try {
-                //since age is being stored as a string, there may be issues doing a greater/less than comparison on it. we may have to go into profilescreen and the schema and change the age field from a string to an int.
-                let matchresult;
-                if (selectedMode == 'name') {
+  //still not 100% sure why this works, will have to come back to it. got from here: https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
+  stateRef.current = query;
+
+  const showUsersAsync = async (text) => {
+    let items = [];
+    /*
+    if(mode=="group"){
+      console.log("check");
+    }
+    */
+
+    if(text !== ""){
+      if (mode=="group") {
+        try {
+          const namematchresult = await API.graphql(
+            graphqlOperation(listGroups, {
+              filter: {
+                name: {
+                  contains: query,
+                },
+              },
+            })
+          );
+
+          const sportmatchresult = await API.graphql(
+            graphqlOperation(listGroups, {
+              filter: {
+                Sport: {
+                  contains: query,
+                },
+              },
+            })
+          );
+
+          items = [...sportmatchresult.data.listGroups.items, ...namematchresult.data.listGroups.items];
+          
+          
+          items = items.filter((item, index, self) =>
+            index === self.findIndex((temp) => (
+              temp.id === item.id
+            ))
+          )
+          
+
+          if (text === stateRef.current) {
+            setUsers(items);
+            console.log("here's some users! ", text);
+          } else {          
+            console.log("ignoring!");
+          }
+        } catch (err) {
+          console.log("error: ", err);
+        }
+      }
+      else{
+        try {
+        let matchresult;
+                if (userMode == 'name') {
                     if (greaterThan) {
                         const namematchresult = await API.graphql(graphqlOperation(listUsers, {
                             filter: {
@@ -151,51 +202,60 @@ export default function SearchScreen() {
             } catch (err) {
                 console.log("error: ", err);
             }
-        } else {
-            setUsers([]);
-        }
-        setIsSearching(false);
-    };
+      }
+    }
+    else {
+      console.log("check");
+      setUsers([]);
+    }
+  };
+  
+  useEffect(() => {
+    showUsersAsync(query);
+  }, [query, mode, greaterThan, selectedAge, userMode]);
 
-    useEffect(() => {
-        showUsersAsync(query);
-    }, [query, greaterThan, selectedAge, selectedMode]);
+  return (
+    <View style={styles.containerStyle}>
+      <View style={styles.spacingTop}>
+        <TouchableOpacity
+                style={styles.outlineButtonStyle}
+                onPress={() => {
+                    if (mode == "user")
+                        setMode("group")
+                    else
+                        setMode("user")
+                }}
+        >
+            <Text style={styles.outlineButtonTextStyle}>{mode}</Text>
+        </TouchableOpacity>
+      </View>
 
-    return (
-        <View style={styles.containerStyle}>
-        <View
-        style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginTop: 30,
-          }}>
-          <TouchableOpacity
+      <TextInput
+        style={[styles.textInputStyle, { marginTop: 40 }]}
+        placeholder="Start Typing ..."
+        onChangeText={setQuery}
+        value={query}
+        clearButtonMode="always"
+      />
+
+      {(mode=="user") ?
+      <View style={{
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginBottom: 15,
+      }}>
+        <TouchableOpacity
               style={styles.outlineButtonStyle}
               onPress={() => {
-                  if (selectedMode == 'name')
-                      setSelectedMode('description');
+                  if (userMode == 'name')
+                      setUserMode('description');
                   else
-                      setSelectedMode('name');
+                      setUserMode('name');
               }}
           >
-              <Text style={styles.outlineButtonTextStyle}>{selectedMode}</Text>
+            <Text style={styles.outlineButtonTextStyle}>{userMode}</Text>
           </TouchableOpacity>
-            <TextInput
-                style={[styles.textInputStyle, { marginTop: 0, flex: 1 }]}
-                placeholder="Start Searching..."
-                onChangeText={setQuery}
-                value={query}
-                clearButtonMode="always"
-            />
-            </View>
-
-            <View
-            style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                marginBottom: 15,
-              }}>
-                <TouchableOpacity
+        <TouchableOpacity
                     style={styles.outlineButtonStyle}
                     onPress={() => {
                         setGreaterThan(!greaterThan);
@@ -203,31 +263,32 @@ export default function SearchScreen() {
                 >
                     <Text style={styles.outlineButtonTextStyle}>{greaterThan ? 'age >=' : 'age <='}</Text>
                 </TouchableOpacity>
-                <AgePicker field={''} selectedValue={selectedAge} setSelectedValue={setSelectedAge} />
-            </View>
-
-            {
-                isSearching ?
-                <ActivityIndicator 
-                size="large" 
-                color="#0000ff"
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  flexDirection: "row",
-                  justifyContent: "space-around",
-                  padding: 10,
-                }} />
-                :
-                <FlatList
-                    data={users}
-                    renderItem={({ item }) => <UserListItem item={item} />}
-                    //if there are only 1 or 2 characters in the query, dont load images
-                    //if there are more than 5 search results only download images from the top 5 (paginate)
-                />
-            }
-
-            <StatusBar style="auto" />
+        <AgePicker field={''} selectedValue={selectedAge} setSelectedValue={setSelectedAge} />
         </View>
-    );
+        : null
+      }
+
+      {(mode=="group") ?
+      <FlatList
+        data={users}
+        renderItem={({ item }) => <ListGroupItem item={item}/>}
+      />
+      :
+      <FlatList
+        data={users}
+        renderItem={({ item }) => <UserListItem item={item} />}
+        //if there are only 1 or 2 characters in the query, dont load images
+        //if there are more than 5 search results only download images from the top 5 (paginate)
+      />
+      }
+      
+      <TouchableOpacity style={styles.submitButton} onPress={goGroupCreationScreen}>
+        <Text style={styles.buttonTextStyle}>Create Group</Text>
+      </TouchableOpacity>
+
+      <StatusBar style="auto" />
+    </View>
+  );
 }
+
+
