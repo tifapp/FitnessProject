@@ -34,9 +34,11 @@ const { width } = Dimensions.get('window');
 var styles = require('styles/stylesheet');
 
 export default function GroupPostsScreen({ navigation, route}) {
-const { group, userId } = route.params;
+const { group } = route.params;
+
 var nameVal = group.name;
 var tempVal = group.createdAt;
+
 //console.log(userId);
 
 //console.log(group);
@@ -44,6 +46,7 @@ var tempVal = group.createdAt;
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
   const [onlineCheck, setOnlineCheck] = useState(true);
+  const [updatePostID, setUpdatePostID] = useState('');
 
   useEffect(() => {
     showPostsAsync();
@@ -93,22 +96,37 @@ var tempVal = group.createdAt;
   };
 
   const addPostAsync = async () => {
-    const newPost = {
-      timestamp: Math.floor(Date.now() / 1000),
-      userId: group.id,
-      description: postVal,
-      group: nameVal
-    };
+    if (updatePostID != '') {
+      try {
+        await API.graphql(graphqlOperation(updatePost, { input: { id: updatePostID, description: postVal, timestamp: Math.floor(Date.now() / 1000)}}));
+        showPostsAsync();
+        console.log("success in updating a post");
+      } catch (err) {
+        console.log("error: ", err);
+      }
 
-    setPostVal("");
-
-    try {
-      await API.graphql(graphqlOperation(createPost, { input: newPost }));
-      showPostsAsync();
-      console.log("success in making a new post");
-    } catch (err) {
-      console.log("error: ", err);
+      setPostVal("");
+      setUpdatePostID('')
     }
+    else {
+      const newPost = {
+        timestamp: Math.floor(Date.now() / 1000),
+        userId: route.params?.id,
+        description: postVal,
+        group: nameVal
+      };
+  
+      setPostVal("");
+  
+      try {
+        await API.graphql(graphqlOperation(createPost, { input: newPost }));
+        showPostsAsync();
+        console.log("success in making a new post");
+      } catch (err) {
+        console.log("error: ", err);
+      }
+    }
+    
     //console.log("current time...", );
   };
 
@@ -194,11 +212,12 @@ var tempVal = group.createdAt;
             item={item}
             pressHandler={deleteButtonHandler}
             deletePostsAsync={deletePostsAsync}
-            writtenByYou={userId === route.params?.userId}
+            writtenByYou={item.userId === route.params?.id}
+            setPostVal={setPostVal}
+            setUpdatePostID={setUpdatePostID}
           />
         )}
       />
-
 
       <StatusBar style="auto" />
     </View>

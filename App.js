@@ -133,21 +133,15 @@ const App = () => {
           <Tab.Screen
             name="Groups"
             component={GroupStack}
-            options={{
-              headerShown: false,
-            }}
-          />
-          <Tab.Screen 
-            name="GroupSearch"
-            component={GroupSearchStack}
             initialParams={{id: userId}}
             options={{
               headerShown: false,
             }}
           />
           <Tab.Screen 
-            name="User Search"
-            component={SearchStack}
+            name="Search"
+            component={GroupSearchStack}
+            initialParams={{id: userId}}
             options={{
               headerShown: false,
             }}

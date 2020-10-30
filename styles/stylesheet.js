@@ -15,6 +15,9 @@ module.exports = StyleSheet.create({
     marginHorizontal: 10,
     marginTop: 10
   },
+  spacingTop: {
+    marginTop: 10
+  },
   title: {
     textAlign: "center",
     color: "#fff",
@@ -136,6 +139,7 @@ module.exports = StyleSheet.create({
     backgroundColor: 'transparent'
   },
 
+
   textInputStyle: {
     marginHorizontal: 10,
     height: 30,
@@ -152,7 +156,7 @@ module.exports = StyleSheet.create({
     fontWeight: "bold",
   },
   spaceAround: {
-    paddingHorizontal: 125,
+    paddingHorizontal: 5,
     paddingVertical: 15,
   },
   top: {

@@ -33,6 +33,7 @@ const { width } = Dimensions.get('window');
 var styles = require('styles/stylesheet');
 
 export default function GroupScreen({ navigation, route }) {
+  
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
   const numCharsLeft = 1000 - postVal.length;
@@ -111,11 +112,10 @@ export default function GroupScreen({ navigation, route }) {
     else {
       const newPost = {
         timestamp: Math.floor(Date.now() / 1000),
-        userId: route.params?.userId,
+        userId: route.params?.id,
         description: postVal,
         group: '',
       };
-  
       setPostVal("");
   
       try {
@@ -213,8 +213,8 @@ export default function GroupScreen({ navigation, route }) {
             item={item}
             pressHandler={deleteButtonHandler}
             deletePostsAsync={deletePostsAsync}
+            writtenByYou={item.userId === route.params?.id}
             setPostVal={setPostVal}
-            writtenByYou={item.userId === route.params?.userId}
             setUpdatePostID={setUpdatePostID}
           />
         )}
