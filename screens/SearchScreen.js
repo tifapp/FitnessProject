@@ -1,17 +1,17 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useState, useEffect, useRef } from "react";
 import {
-  StyleSheet,
-  Text,
-  Button,
-  Image,
-  View,
-  TextInput,
-  ScrollView,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  Keyboard,
-  FlatList,
+    StyleSheet,
+    Text,
+    Button,
+    Image,
+    View,
+    TextInput,
+    ScrollView,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    Keyboard,
+    FlatList,
 } from "react-native";
 // Get the aws resources configuration parameters
 import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
@@ -31,264 +31,263 @@ Amplify.configure(awsconfig);
 
 var styles = require("styles/stylesheet");
 
-export default function GroupSearchScreen({ navigation}) {
-  const [query, setQuery] = useState("");
-  const [users, setUsers] = useState([]);
-  const [mode, setMode] = useState("user");
-  const [greaterThan, setGreaterThan] = useState(true);
-  const [selectedAge, setSelectedAge] = useState(18);
-  const [userMode, setUserMode] = useState("name");
-  const stateRef = useRef();
+export default function GroupSearchScreen({ navigation }) {
+    const [query, setQuery] = useState("");
+    const [users, setUsers] = useState([]);
+    const [mode, setMode] = useState("user");
+    const [greaterThan, setGreaterThan] = useState(true);
+    const [selectedAge, setSelectedAge] = useState(18);
+    const [userMode, setUserMode] = useState("name");
+    const stateRef = useRef();
 
-  const goGroupCreationScreen = () => {
-    navigation.navigate('Create Group')
-  }
-
-  //still not 100% sure why this works, will have to come back to it. got from here: https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
-  stateRef.current = query;
-
-  const showUsersAsync = async (text) => {
-    let items = [];
-    /*
-    if(mode=="group"){
-      console.log("check");
+    const goGroupCreationScreen = () => {
+        navigation.navigate('Create Group')
     }
-    */
 
-    if(text !== ""){
-      if (mode=="group") {
-        try {
-          const namematchresult = await API.graphql(
-            graphqlOperation(listGroups, {
-              filter: {
-                name: {
-                  contains: query,
-                },
-              },
-            })
-          );
+    //still not 100% sure why this works, will have to come back to it. got from here: https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
+    stateRef.current = query;
 
-          const sportmatchresult = await API.graphql(
-            graphqlOperation(listGroups, {
-              filter: {
-                Sport: {
-                  contains: query,
-                },
-              },
-            })
-          );
-
-          items = [...sportmatchresult.data.listGroups.items, ...namematchresult.data.listGroups.items];
-          
-          
-          items = items.filter((item, index, self) =>
-            index === self.findIndex((temp) => (
-              temp.id === item.id
-            ))
-          )
-          
-
-          if (text === stateRef.current) {
-            setUsers(items);
-            console.log("here's some users! ", text);
-          } else {          
-            console.log("ignoring!");
-          }
-        } catch (err) {
-          console.log("error: ", err);
+    const showUsersAsync = async (text) => {
+        let items = [];
+        /*
+        if(mode=="group"){
+          console.log("check");
         }
-      }
-      else{
-        try {
-        let matchresult;
-                if (userMode == 'name') {
-                    if (greaterThan) {
-                        const namematchresult = await API.graphql(graphqlOperation(listUsers, {
-                            filter: {
-                                age: { ge: selectedAge },
-                                and: {
-                                    name: {
-                                        beginsWith: text
-                                    }
-                                }
-                            }
-                        }
-                        ));
-                        matchresult = namematchresult.data.listUsers.items;
-                    } else {
-                        const namematchresult = await API.graphql(graphqlOperation(listUsers, {
-                            filter: {
-                                age: { le: selectedAge },
-                                and: {
-                                    name: {
-                                        beginsWith: text
-                                    }
-                                }
-                            }
-                        }
-                        ));
-                        matchresult = namematchresult.data.listUsers.items;
-                    }
-                } else {
-                    let biomatchresult;
-                    let goalsmatchresult;
-                    if (greaterThan) {
+        */
 
-                        biomatchresult = await API.graphql(graphqlOperation(listUsers, {
+        if (text !== "") {
+            const cleanText = text.trim();
+            if (mode == "group") {
+                try {
+                    const namematchresult = await API.graphql(
+                        graphqlOperation(listGroups, {
                             filter: {
-                                age: { ge: selectedAge },
-                                and: {
-                                    bio: {
-                                        contains: text
-                                    }
-                                }
-                            }
-                        }
-                        ));
-                        goalsmatchresult = await API.graphql(graphqlOperation(listUsers, {
-                            filter: {
-                                age: { ge: selectedAge },
-                                and: {
-                                    goals: {
-                                        contains: text
-                                    }
-                                }
-                            }
-                        }
-                        ));
-                    } else {
+                                name: {
+                                    contains: cleanText,
+                                },
+                            },
+                        })
+                    );
 
-                        biomatchresult = await API.graphql(graphqlOperation(listUsers, {
+                    const sportmatchresult = await API.graphql(
+                        graphqlOperation(listGroups, {
                             filter: {
-                                age: { le: selectedAge },
-                                and: {
-                                    bio: {
-                                        contains: text
-                                    }
-                                }
-                            }
-                        }
-                        ));
-                        goalsmatchresult = await API.graphql(graphqlOperation(listUsers, {
-                            filter: {
-                                age: { le: selectedAge },
-                                and: {
-                                    goals: {
-                                        contains: text
-                                    }
-                                }
-                            }
-                        }
-                        ));
-                    }
+                                Sport: {
+                                    contains: cleanText,
+                                },
+                            },
+                        })
+                    );
 
-                    matchresult = [
-                        ...biomatchresult.data.listUsers.items,
-                        ...goalsmatchresult.data.listUsers.items,
-                    ].filter((item, index, self) =>
-                        //to remove duplicates from this array
+                    items = [...sportmatchresult.data.listGroups.items, ...namematchresult.data.listGroups.items];
+
+
+                    items = items.filter((item, index, self) =>
                         index === self.findIndex((temp) => (
                             temp.id === item.id
                         ))
                     )
-                }
 
-                if (text === stateRef.current) {
-                    setUsers(matchresult);
-                    console.log("here's some users! ", text);
-                } else {
-                    console.log("ignoring!");
+
+                    if (cleanText === stateRef.current.trim()) {
+                        setUsers(items);
+                        console.log("here's some users! ", cleanText);
+                    } else {
+                        console.log("ignoring!");
+                    }
+                } catch (err) {
+                    console.log("error: ", err);
                 }
-            } catch (err) {
-                console.log("error: ", err);
             }
-      }
-    }
-    else {
-      console.log("check");
-      setUsers([]);
-    }
-  };
-  
-  useEffect(() => {
-    showUsersAsync(query);
-  }, [query, mode, greaterThan, selectedAge, userMode]);
+            else {
+                try {
+                    let matchresult;
+                    if (userMode == 'name') {
+                        if (greaterThan) {
+                            const namematchresult = await API.graphql(graphqlOperation(listUsers, {
+                                filter: {
+                                    age: { ge: selectedAge },
+                                    and: {
+                                        name: {
+                                            beginsWith: cleanText
+                                        }
+                                    }
+                                }
+                            }
+                            ));
+                            matchresult = namematchresult.data.listUsers.items;
+                        } else {
+                            const namematchresult = await API.graphql(graphqlOperation(listUsers, {
+                                filter: {
+                                    age: { le: selectedAge },
+                                    and: {
+                                        name: {
+                                            beginsWith: cleanText
+                                        }
+                                    }
+                                }
+                            }
+                            ));
+                            matchresult = namematchresult.data.listUsers.items;
+                        }
+                    } else {
+                        let biomatchresult;
+                        let goalsmatchresult;
+                        if (greaterThan) {
 
-  return (
-    <View style={styles.containerStyle}>
-      <View style={styles.spacingTop}>
-        <TouchableOpacity
-                style={styles.outlineButtonStyle}
-                onPress={() => {
-                    if (mode == "user")
-                        setMode("group")
-                    else
-                        setMode("user")
-                }}
-        >
-            <Text style={styles.outlineButtonTextStyle}>{mode}</Text>
-        </TouchableOpacity>
-      </View>
+                            biomatchresult = await API.graphql(graphqlOperation(listUsers, {
+                                filter: {
+                                    age: { ge: selectedAge },
+                                    and: {
+                                        bio: {
+                                            contains: cleanText
+                                        }
+                                    }
+                                }
+                            }
+                            ));
+                            goalsmatchresult = await API.graphql(graphqlOperation(listUsers, {
+                                filter: {
+                                    age: { ge: selectedAge },
+                                    and: {
+                                        goals: {
+                                            contains: cleanText
+                                        }
+                                    }
+                                }
+                            }
+                            ));
+                        } else {
 
-      <TextInput
-        style={[styles.textInputStyle, { marginTop: 40 }]}
-        placeholder="Start Typing ..."
-        onChangeText={setQuery}
-        value={query}
-        clearButtonMode="always"
-      />
+                            biomatchresult = await API.graphql(graphqlOperation(listUsers, {
+                                filter: {
+                                    age: { le: selectedAge },
+                                    and: {
+                                        bio: {
+                                            contains: cleanText
+                                        }
+                                    }
+                                }
+                            }
+                            ));
+                            goalsmatchresult = await API.graphql(graphqlOperation(listUsers, {
+                                filter: {
+                                    age: { le: selectedAge },
+                                    and: {
+                                        goals: {
+                                            contains: cleanText
+                                        }
+                                    }
+                                }
+                            }
+                            ));
+                        }
 
-      {(mode=="user") ?
-      <View style={{
-        flexDirection: 'row',
-        justifyContent: 'center',
-        marginBottom: 15,
-      }}>
-        <TouchableOpacity
-              style={styles.outlineButtonStyle}
-              onPress={() => {
-                  if (userMode == 'name')
-                      setUserMode('description');
-                  else
-                      setUserMode('name');
-              }}
-          >
-            <Text style={styles.outlineButtonTextStyle}>{userMode}</Text>
-          </TouchableOpacity>
-        <TouchableOpacity
+                        matchresult = [
+                            ...biomatchresult.data.listUsers.items,
+                            ...goalsmatchresult.data.listUsers.items,
+                        ].filter((item, index, self) =>
+                            //to remove duplicates from this array
+                            index === self.findIndex((temp) => (
+                                temp.id === item.id
+                            ))
+                        )
+                    }
+
+                    if (cleanText === stateRef.current.trim()) {
+                        setUsers(matchresult);
+                        console.log("here's some users! ", cleanText);
+                    } else {
+                        console.log("ignoring!");
+                    }
+                } catch (err) {
+                    console.log("error: ", err);
+                }
+            }
+        }
+        else {
+            console.log("check");
+            setUsers([]);
+        }
+    };
+
+    useEffect(() => {
+        showUsersAsync(query);
+    }, [query, mode, greaterThan, selectedAge, userMode]);
+
+    return (
+        <View style={styles.containerStyle}>
+            <View style={styles.spacingTop}>
+                <TouchableOpacity
                     style={styles.outlineButtonStyle}
                     onPress={() => {
-                        setGreaterThan(!greaterThan);
+                        if (mode == "user")
+                            setMode("group")
+                        else
+                            setMode("user")
                     }}
                 >
-                    <Text style={styles.outlineButtonTextStyle}>{greaterThan ? 'age >=' : 'age <='}</Text>
+                    <Text style={styles.outlineButtonTextStyle}>{mode}</Text>
                 </TouchableOpacity>
-        <AgePicker field={''} selectedValue={selectedAge} setSelectedValue={setSelectedAge} />
+            </View>
+
+            <TextInput
+                style={[styles.textInputStyle, { marginTop: 40 }]}
+                placeholder="Start Typing ..."
+                onChangeText={setQuery}
+                value={query}
+                clearButtonMode="always"
+            />
+
+            {(mode == "user") ?
+                <View style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    marginBottom: 15,
+                }}>
+                    <TouchableOpacity
+                        style={styles.outlineButtonStyle}
+                        onPress={() => {
+                            if (userMode == 'name')
+                                setUserMode('description');
+                            else
+                                setUserMode('name');
+                        }}
+                    >
+                        <Text style={styles.outlineButtonTextStyle}>{userMode}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.outlineButtonStyle}
+                        onPress={() => {
+                            setGreaterThan(!greaterThan);
+                        }}
+                    >
+                        <Text style={styles.outlineButtonTextStyle}>{greaterThan ? 'age >=' : 'age <='}</Text>
+                    </TouchableOpacity>
+                    <AgePicker field={''} selectedValue={selectedAge} setSelectedValue={setSelectedAge} />
+                </View>
+                : null
+            }
+
+            {(mode == "group") ?
+                <FlatList
+                    data={users}
+                    renderItem={({ item }) => <ListGroupItem item={item} />}
+                />
+                :
+                <FlatList
+                    data={users}
+                    renderItem={({ item }) => <UserListItem item={item} />}
+                //if there are only 1 or 2 characters in the query, dont load images
+                //if there are more than 5 search results only download images from the top 5 (paginate)
+                />
+            }
+
+            <TouchableOpacity style={styles.submitButton} onPress={goGroupCreationScreen}>
+                <Text style={styles.buttonTextStyle}>Create Group</Text>
+            </TouchableOpacity>
+
+            <StatusBar style="auto" />
         </View>
-        : null
-      }
-
-      {(mode=="group") ?
-      <FlatList
-        data={users}
-        renderItem={({ item }) => <ListGroupItem item={item}/>}
-      />
-      :
-      <FlatList
-        data={users}
-        renderItem={({ item }) => <UserListItem item={item} />}
-        //if there are only 1 or 2 characters in the query, dont load images
-        //if there are more than 5 search results only download images from the top 5 (paginate)
-      />
-      }
-      
-      <TouchableOpacity style={styles.submitButton} onPress={goGroupCreationScreen}>
-        <Text style={styles.buttonTextStyle}>Create Group</Text>
-      </TouchableOpacity>
-
-      <StatusBar style="auto" />
-    </View>
-  );
+    );
 }
-
-
