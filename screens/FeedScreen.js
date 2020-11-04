@@ -34,6 +34,7 @@ var styles = require('styles/stylesheet');
 
 export default function GroupScreen({ navigation, route }) {
   
+  const { group } = route.params;
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
   const numCharsLeft = 1000 - postVal.length;
@@ -120,7 +121,7 @@ export default function GroupScreen({ navigation, route }) {
         timestamp: Math.floor(Date.now() / 1000),
         userId: route.params?.id,
         description: postVal,
-        group: '',
+        group: group != null ? group.id : '',
       };
       setPostVal("");
   
@@ -142,7 +143,7 @@ export default function GroupScreen({ navigation, route }) {
         {
             filter: {
               group: {
-                eq: ''
+                eq: group != null ? group.id : '',
               }
             }
         }
