@@ -7,12 +7,12 @@ import {
   Image,
   View,
   TextInput,
-  ScrollView,
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
   FlatList,
-  Dimensions
+  Dimensions,
+  RefreshControl,
 } from "react-native";
 // Get the aws resources configuration parameters
 import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
@@ -41,6 +41,12 @@ export default function GroupScreen({ navigation, route }) {
   
   const isMounted = useRef(); //this variable exists to eliminate the "updated state on an unmounted component" warning
   const [onlineCheck, setOnlineCheck] = useState(true);
+
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    showPostsAsync();
+  }, []);
 
   useEffect(() => {
     isMounted.current = true;
@@ -151,6 +157,7 @@ export default function GroupScreen({ navigation, route }) {
     } catch (err) {
       console.log("error: ", err);
     }
+    setRefreshing(false);
   };
 
   const deletePostsAsync = async (val) => {
@@ -193,21 +200,14 @@ export default function GroupScreen({ navigation, route }) {
           >
             <Text style={styles.buttonTextStyle}>{updatePostID == '' ? 'Add Post' : 'Edit Post'}</Text>
           </TouchableOpacity>
-          
-
-          <TouchableOpacity
-            style={styles.outlineButtonStyle}
-            onPress={() => {
-              showPostsAsync();
-            }}
-          >
-            <Text style={styles.outlineButtonTextStyle}>Refresh</Text>
-          </TouchableOpacity>
         </View>
       </View>
 
       <FlatList
         data={posts}
+        refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
         renderItem={({ item }) => (
           <PostItem
             item={item}
