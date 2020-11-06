@@ -12,220 +12,280 @@ import {
     TouchableWithoutFeedback,
     Keyboard,
     FlatList,
-    ActivityIndicator,
 } from "react-native";
 // Get the aws resources configuration parameters
 import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
 import { Amplify, API, Auth, graphqlOperation } from "aws-amplify";
 import { createPost, updatePost, deletePost } from "root/src/graphql/mutations";
 import { DataStore, Predicates } from "@aws-amplify/datastore";
+import { listGroups } from "root/src/graphql/queries";
 import { listUsers } from "root/src/graphql/queries";
 import Header from "components/header";
 import AddPost from "components/AddPosts";
 import UserListItem from "components/UserListItem";
-import AgePicker from "components/basicInfoComponents/AgePicker";
+import ListGroupItem from "components/ListGroupItem";
 import * as subscriptions from "root/src/graphql/subscriptions";
-import { useNavigation } from '@react-navigation/native';
+import AgePicker from "components/basicInfoComponents/AgePicker";
 
 Amplify.configure(awsconfig);
 
 var styles = require("styles/stylesheet");
 
-export default function SearchScreen() {
+export default function GroupSearchScreen({ navigation }) {
     const [query, setQuery] = useState("");
-    const [selectedAge, setSelectedAge] = useState(18);
-    const [selectedMode, setSelectedMode] = useState('name');
-    const [greaterThan, setGreaterThan] = useState(true);
     const [users, setUsers] = useState([]);
-    const [isSearching, setIsSearching] = useState(false); //to show a loading icon when in the process of searching
+    const [mode, setMode] = useState("user");
+    const [greaterThan, setGreaterThan] = useState(true);
+    const [selectedAge, setSelectedAge] = useState(18);
+    const [userMode, setUserMode] = useState("name");
     const stateRef = useRef();
+
+    const goGroupCreationScreen = () => {
+        navigation.navigate('Create Group')
+    }
 
     //still not 100% sure why this works, will have to come back to it. got from here: https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
     stateRef.current = query;
 
     const showUsersAsync = async (text) => {
-        setIsSearching(true);
-        console.log("text received: ", text);
-        if (text !== '') {
-            try {
-                //since age is being stored as a string, there may be issues doing a greater/less than comparison on it. we may have to go into profilescreen and the schema and change the age field from a string to an int.
-                let matchresult;
-                if (selectedMode == 'name') {
-                    if (greaterThan) {
-                        const namematchresult = await API.graphql(graphqlOperation(listUsers, {
-                            filter: {
-                                age: { ge: selectedAge },
-                                and: {
-                                    name: {
-                                        beginsWith: text
-                                    }
-                                }
-                            }
-                        }
-                        ));
-                        matchresult = namematchresult.data.listUsers.items;
-                    } else {
-                        const namematchresult = await API.graphql(graphqlOperation(listUsers, {
-                            filter: {
-                                age: { le: selectedAge },
-                                and: {
-                                    name: {
-                                        beginsWith: text
-                                    }
-                                }
-                            }
-                        }
-                        ));
-                        matchresult = namematchresult.data.listUsers.items;
-                    }
-                } else {
-                    let biomatchresult;
-                    let goalsmatchresult;
-                    if (greaterThan) {
+        let items = [];
+        /*
+        if(mode=="group"){
+          console.log("check");
+        }
+        */
 
-                        biomatchresult = await API.graphql(graphqlOperation(listUsers, {
+        if (text !== "") {
+            const cleanText = text.trim();
+            if (mode == "group") {
+                try {
+                    const namematchresult = await API.graphql(
+                        graphqlOperation(listGroups, {
                             filter: {
-                                age: { ge: selectedAge },
-                                and: {
-                                    bio: {
-                                        contains: text
-                                    }
-                                }
-                            }
-                        }
-                        ));
-                        goalsmatchresult = await API.graphql(graphqlOperation(listUsers, {
-                            filter: {
-                                age: { ge: selectedAge },
-                                and: {
-                                    goals: {
-                                        contains: text
-                                    }
-                                }
-                            }
-                        }
-                        ));
-                    } else {
+                                name: {
+                                    contains: cleanText,
+                                },
+                            },
+                        })
+                    );
 
-                        biomatchresult = await API.graphql(graphqlOperation(listUsers, {
+                    const sportmatchresult = await API.graphql(
+                        graphqlOperation(listGroups, {
                             filter: {
-                                age: { le: selectedAge },
-                                and: {
-                                    bio: {
-                                        contains: text
-                                    }
-                                }
-                            }
-                        }
-                        ));
-                        goalsmatchresult = await API.graphql(graphqlOperation(listUsers, {
-                            filter: {
-                                age: { le: selectedAge },
-                                and: {
-                                    goals: {
-                                        contains: text
-                                    }
-                                }
-                            }
-                        }
-                        ));
-                    }
+                                Sport: {
+                                    contains: cleanText,
+                                },
+                            },
+                        })
+                    );
 
-                    matchresult = [
-                        ...biomatchresult.data.listUsers.items,
-                        ...goalsmatchresult.data.listUsers.items,
-                    ].filter((item, index, self) =>
-                        //to remove duplicates from this array
+                    items = [...sportmatchresult.data.listGroups.items, ...namematchresult.data.listGroups.items];
+
+
+                    items = items.filter((item, index, self) =>
                         index === self.findIndex((temp) => (
                             temp.id === item.id
                         ))
                     )
-                }
 
-                if (text === stateRef.current) {
-                    setUsers(matchresult);
-                    console.log("here's some users! ", text);
-                } else {
-                    console.log("ignoring!");
+
+                    if (cleanText === stateRef.current.trim()) {
+                        setUsers(items);
+                        console.log("here's some users! ", cleanText);
+                    } else {
+                        console.log("ignoring!");
+                    }
+                } catch (err) {
+                    console.log("error: ", err);
                 }
-            } catch (err) {
-                console.log("error: ", err);
             }
-        } else {
+            else {
+                try {
+                    let matchresult;
+                    if (userMode == 'name') {
+                        if (greaterThan) {
+                            const namematchresult = await API.graphql(graphqlOperation(listUsers, {
+                                filter: {
+                                    age: { ge: selectedAge },
+                                    and: {
+                                        name: {
+                                            beginsWith: cleanText
+                                        }
+                                    }
+                                }
+                            }
+                            ));
+                            matchresult = namematchresult.data.listUsers.items;
+                        } else {
+                            const namematchresult = await API.graphql(graphqlOperation(listUsers, {
+                                filter: {
+                                    age: { le: selectedAge },
+                                    and: {
+                                        name: {
+                                            beginsWith: cleanText
+                                        }
+                                    }
+                                }
+                            }
+                            ));
+                            matchresult = namematchresult.data.listUsers.items;
+                        }
+                    } else {
+                        let biomatchresult;
+                        let goalsmatchresult;
+                        if (greaterThan) {
+
+                            biomatchresult = await API.graphql(graphqlOperation(listUsers, {
+                                filter: {
+                                    age: { ge: selectedAge },
+                                    and: {
+                                        bio: {
+                                            contains: cleanText
+                                        }
+                                    }
+                                }
+                            }
+                            ));
+                            goalsmatchresult = await API.graphql(graphqlOperation(listUsers, {
+                                filter: {
+                                    age: { ge: selectedAge },
+                                    and: {
+                                        goals: {
+                                            contains: cleanText
+                                        }
+                                    }
+                                }
+                            }
+                            ));
+                        } else {
+
+                            biomatchresult = await API.graphql(graphqlOperation(listUsers, {
+                                filter: {
+                                    age: { le: selectedAge },
+                                    and: {
+                                        bio: {
+                                            contains: cleanText
+                                        }
+                                    }
+                                }
+                            }
+                            ));
+                            goalsmatchresult = await API.graphql(graphqlOperation(listUsers, {
+                                filter: {
+                                    age: { le: selectedAge },
+                                    and: {
+                                        goals: {
+                                            contains: cleanText
+                                        }
+                                    }
+                                }
+                            }
+                            ));
+                        }
+
+                        matchresult = [
+                            ...biomatchresult.data.listUsers.items,
+                            ...goalsmatchresult.data.listUsers.items,
+                        ].filter((item, index, self) =>
+                            //to remove duplicates from this array
+                            index === self.findIndex((temp) => (
+                                temp.id === item.id
+                            ))
+                        )
+                    }
+
+                    if (cleanText === stateRef.current.trim()) {
+                        setUsers(matchresult);
+                        console.log("here's some users! ", cleanText);
+                    } else {
+                        console.log("ignoring!");
+                    }
+                } catch (err) {
+                    console.log("error: ", err);
+                }
+            }
+        }
+        else {
+            console.log("check");
             setUsers([]);
         }
-        setIsSearching(false);
     };
 
     useEffect(() => {
         showUsersAsync(query);
-    }, [query, greaterThan, selectedAge, selectedMode]);
+    }, [query, mode, greaterThan, selectedAge, userMode]);
 
     return (
         <View style={styles.containerStyle}>
-        <View
-        style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginTop: 30,
-          }}>
-          <TouchableOpacity
-              style={styles.outlineButtonStyle}
-              onPress={() => {
-                  if (selectedMode == 'name')
-                      setSelectedMode('description');
-                  else
-                      setSelectedMode('name');
-              }}
-          >
-              <Text style={styles.outlineButtonTextStyle}>{selectedMode}</Text>
-          </TouchableOpacity>
+            <View style={styles.spacingTop}>
+                <TouchableOpacity
+                    style={styles.outlineButtonStyle}
+                    onPress={() => {
+                        if (mode == "user")
+                            setMode("group")
+                        else
+                            setMode("user")
+                    }}
+                >
+                    <Text style={styles.outlineButtonTextStyle}>{mode}</Text>
+                </TouchableOpacity>
+            </View>
+
             <TextInput
-                style={[styles.textInputStyle, { marginTop: 0, flex: 1 }]}
-                placeholder="Start Searching..."
+                style={[styles.textInputStyle, { marginTop: 40 }]}
+                placeholder="Start Typing ..."
                 onChangeText={setQuery}
                 value={query}
                 clearButtonMode="always"
             />
-            </View>
 
-            <View
-            style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                marginBottom: 15,
-              }}>
-                <TouchableOpacity
-                    style={styles.outlineButtonStyle}
-                    onPress={() => {
-                        setGreaterThan(!greaterThan);
-                    }}
-                >
-                    <Text style={styles.outlineButtonTextStyle}>{greaterThan ? 'age >=' : 'age <='}</Text>
-                </TouchableOpacity>
-                <AgePicker field={''} selectedValue={selectedAge} setSelectedValue={setSelectedAge} />
-            </View>
+            {(mode == "user") ?
+                <View style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    marginBottom: 15,
+                }}>
+                    <TouchableOpacity
+                        style={styles.outlineButtonStyle}
+                        onPress={() => {
+                            if (userMode == 'name')
+                                setUserMode('description');
+                            else
+                                setUserMode('name');
+                        }}
+                    >
+                        <Text style={styles.outlineButtonTextStyle}>{userMode}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.outlineButtonStyle}
+                        onPress={() => {
+                            setGreaterThan(!greaterThan);
+                        }}
+                    >
+                        <Text style={styles.outlineButtonTextStyle}>{greaterThan ? 'age >=' : 'age <='}</Text>
+                    </TouchableOpacity>
+                    <AgePicker field={''} selectedValue={selectedAge} setSelectedValue={setSelectedAge} />
+                </View>
+                : null
+            }
 
-            {
-                isSearching ?
-                <ActivityIndicator 
-                size="large" 
-                color="#0000ff"
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  flexDirection: "row",
-                  justifyContent: "space-around",
-                  padding: 10,
-                }} />
+            {(mode == "group") ?
+                <FlatList
+                    data={users}
+                    renderItem={({ item }) => <ListGroupItem item={item} />}
+                />
                 :
                 <FlatList
                     data={users}
                     renderItem={({ item }) => <UserListItem item={item} />}
-                    //if there are only 1 or 2 characters in the query, dont load images
-                    //if there are more than 5 search results only download images from the top 5 (paginate)
+                //if there are only 1 or 2 characters in the query, dont load images
+                //if there are more than 5 search results only download images from the top 5 (paginate)
                 />
             }
+
+            <TouchableOpacity style={styles.submitButton} onPress={goGroupCreationScreen}>
+                <Text style={styles.buttonTextStyle}>Create Group</Text>
+            </TouchableOpacity>
 
             <StatusBar style="auto" />
         </View>

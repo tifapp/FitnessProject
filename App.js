@@ -10,22 +10,21 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
-  LogBox
+  LogBox,
+  AsyncStorage
 } from "react-native";
 import { withAuthenticator } from "aws-amplify-react-native";
 // Get the aws resources configuration parameters
 import awsconfig from "./aws-exports"; // if you are using Amplify CLI
-import { Amplify, API, graphqlOperation, Auth } from "aws-amplify";
+import { Amplify, API, graphqlOperation, Auth, Cache } from "aws-amplify";
 import { getUser } from "./src/graphql/queries";
-import GroupStack from "./GroupStack";
+import FeedStack from "./FeedStack";
 import ProfileTab from "./ProfileTab";
 import ComplianceScreen from "./screens/ComplianceScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import BioScreen from "./screens/BioScreen";
 import GoalsScreen from "./screens/GoalsScreen";
-import CreatingGroups from "./screens/CreatingGroups";
 import SearchStack from "./SearchStack";
-import GroupSearchStack from "./GroupCreationStack";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -41,6 +40,13 @@ Amplify.configure({
     disabled: true,
   },
 }); //for some reason this removes the unhandled promise rejection error on startup
+
+const config = {
+  itemMaxSize: 3000, // 3000 bytes
+  storage: AsyncStorage,
+};
+
+const myCacheConfig = Cache.configure(config);
 
 var styles = require("./styles/stylesheet");
 
@@ -109,7 +115,6 @@ const App = () => {
           />
           <Stack.Screen name="Bio" component={BioScreen} />
           <Stack.Screen name="Goals" component={GoalsScreen} />
-          <Stack.Screen name="Group" component={CreatingGroups} />
         </Stack.Navigator>
       </NavigationContainer>
     );
@@ -131,8 +136,8 @@ const App = () => {
           }}
         >
           <Tab.Screen
-            name="Groups"
-            component={GroupStack}
+            name="Feed"
+            component={FeedStack}
             initialParams={{id: userId}}
             options={{
               headerShown: false,
@@ -140,7 +145,7 @@ const App = () => {
           />
           <Tab.Screen 
             name="Search"
-            component={GroupSearchStack}
+            component={SearchStack}
             initialParams={{id: userId}}
             options={{
               headerShown: false,
