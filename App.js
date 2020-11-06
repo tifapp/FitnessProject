@@ -10,12 +10,13 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
-  LogBox
+  LogBox,
+  AsyncStorage
 } from "react-native";
 import { withAuthenticator } from "aws-amplify-react-native";
 // Get the aws resources configuration parameters
 import awsconfig from "./aws-exports"; // if you are using Amplify CLI
-import { Amplify, API, graphqlOperation, Auth } from "aws-amplify";
+import { Amplify, API, graphqlOperation, Auth, Cache } from "aws-amplify";
 import { getUser } from "./src/graphql/queries";
 import FeedStack from "./FeedStack";
 import ProfileTab from "./ProfileTab";
@@ -39,6 +40,13 @@ Amplify.configure({
     disabled: true,
   },
 }); //for some reason this removes the unhandled promise rejection error on startup
+
+const config = {
+  itemMaxSize: 3000, // 3000 bytes
+  storage: AsyncStorage,
+};
+
+const myCacheConfig = Cache.configure(config);
 
 var styles = require("./styles/stylesheet");
 
