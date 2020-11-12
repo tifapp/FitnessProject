@@ -38,6 +38,7 @@ export default function GroupSearchScreen({ navigation }) {
     const [mode, setMode] = useState("name");
     const [greaterThan, setGreaterThan] = useState(true);
     const [selectedAge, setSelectedAge] = useState(18);
+    const [ageHidden, setAgeHidden] = useState(true);
     const stateRef = useRef();
 
     const goGroupCreationScreen = () => {
@@ -103,10 +104,10 @@ export default function GroupSearchScreen({ navigation }) {
                 try {
                     let matchresult;
                     if (mode == 'name') {
-                        if (greaterThan) {
+                        if (greaterThan || ageHidden) {
                             const namematchresult = await API.graphql(graphqlOperation(listUsers, {
                                 filter: {
-                                    age: { ge: selectedAge },
+                                    age: { ge: ageHidden ? 18 : selectedAge },
                                     and: {
                                         name: {
                                             beginsWith: cleanText
@@ -133,11 +134,11 @@ export default function GroupSearchScreen({ navigation }) {
                     } else {
                         let biomatchresult;
                         let goalsmatchresult;
-                        if (greaterThan) {
+                        if (greaterThan || ageHidden) {
 
                             biomatchresult = await API.graphql(graphqlOperation(listUsers, {
                                 filter: {
-                                    age: { ge: selectedAge },
+                                    age: { ge: ageHidden ? 18 : selectedAge },
                                     and: {
                                         bio: {
                                             contains: cleanText
@@ -148,7 +149,7 @@ export default function GroupSearchScreen({ navigation }) {
                             ));
                             goalsmatchresult = await API.graphql(graphqlOperation(listUsers, {
                                 filter: {
-                                    age: { ge: selectedAge },
+                                    age: { ge: ageHidden ? 18 : selectedAge },
                                     and: {
                                         goals: {
                                             contains: cleanText
@@ -213,7 +214,7 @@ export default function GroupSearchScreen({ navigation }) {
 
     useEffect(() => {
         showResultsAsync(query);
-    }, [query, type, greaterThan, selectedAge, mode]);
+    }, [query, type, greaterThan, selectedAge, mode, ageHidden]);
 
     return (
         <View style={styles.containerStyle}>
@@ -274,22 +275,46 @@ export default function GroupSearchScreen({ navigation }) {
                             <Text style={(mode == 'description') ? styles.outlineButtonTextStyle : styles.unselectedButtonTextStyle}>description</Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={[styles.spacingTop, {
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                        marginBottom: 15,
-                    }]}>
-                        <Text style={styles.outlineButtonTextStyle}>Filter:</Text>
-                        <TouchableOpacity
-                            style={styles.outlineButtonStyle}
-                            onPress={() => {
-                                setGreaterThan(!greaterThan);
-                            }}
-                        >
-                            <Text style={styles.outlineButtonTextStyle}>{greaterThan ? 'age >=' : 'age <='}</Text>
-                        </TouchableOpacity>
-                        <AgePicker field={''} selectedValue={selectedAge} setSelectedValue={setSelectedAge} />
-                    </View>
+                    {
+                        ageHidden ?
+                        <View style={[styles.spacingTop, {
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                            marginBottom: 15,
+                        }]}>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setAgeHidden(false);
+                                }}
+                            >
+                                <Text style={styles.unselectedButtonTextStyle}>+ Add Age Filter</Text>
+                            </TouchableOpacity>
+                        </View>
+                        :
+                        <View style={[styles.spacingTop, {
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            marginBottom: 15,
+                        }]}>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setAgeHidden(true);
+                                }}
+                            >
+                                <Text style={styles.unselectedButtonTextStyle}>- Remove Filter</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.outlineButtonStyle}
+                                onPress={() => {
+                                    setGreaterThan(!greaterThan);
+                                }}
+                            >
+                                <Text style={styles.outlineButtonTextStyle}>{greaterThan ? 'age >=' : 'age <='}</Text>
+                            </TouchableOpacity>
+                            <AgePicker field={''} selectedValue={selectedAge} setSelectedValue={setSelectedAge} />
+                        </View>
+                    }
                 </View>
                 : null
             }
