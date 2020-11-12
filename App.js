@@ -47,6 +47,7 @@ const config = {
 };
 
 const myCacheConfig = Cache.configure(config);
+//Cache.clear();
 
 var styles = require("./styles/stylesheet");
 
