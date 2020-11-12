@@ -16,12 +16,12 @@ export const ProfileImage = (props) => { //user is required in props. it's a typ
             .then((imageURL) => { //console.log("found profile image!", imageURL); 
                 Image.getSize(imageURL, () => {
                     //if (mounted) {
-                        Cache.setItem(props.user.id, imageURL, { expires: Date.now().getTime() + 86400000 });
+                        Cache.setItem(props.user.id, imageURL, { expires: Date.now() + 86400000 }); //profile pic url is cached for 1 day, hopefully it doesnt expire till then
                         setImageURL(imageURL);
                     //}
                 }, err => {
                     //if (mounted) {
-                        Cache.setItem(props.user.id, '', { expires: Date.now().getTime() + 86400000 });
+                        Cache.setItem(props.user.id, '', { expires: Date.now() + 86400000 });
                         setImageURL('');
                     //}
                 });
