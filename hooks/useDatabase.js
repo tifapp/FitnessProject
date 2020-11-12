@@ -11,7 +11,7 @@ export default () => {
     const query = await Auth.currentUserInfo();
     const user = await API.graphql(graphqlOperation(getUser, { id: query.attributes.sub }));
     const imageURL = await Storage.get('profileimage.jpg', { level: 'protected' });
-    Cache.setItem(query.attributes.sub, imageURL, { priority: 1, expires: Date.now().getTime() + 86400000 });
+    Cache.setItem(query.attributes.sub, imageURL, { priority: 1, expires: Date.now() + 86400000 });
 
     const fields = user.data.getUser;
 
@@ -40,7 +40,7 @@ export default () => {
           const response = await fetch(imageURL);
           const blob = await response.blob();
           await Storage.put('profileimage.jpg', blob, { level: 'protected', contentType: 'image/jpeg' });
-          Cache.setItem(query.attributes.sub, imageURL, { priority: 1, expires: Date.now().getTime() + 86400000 });
+          Cache.setItem(query.attributes.sub, imageURL, { priority: 1, expires: Date.now() + 86400000 });
         } else {
           Storage.remove('profileimage.jpg', { level: 'protected' })
             .then(result => console.log("removed profile image!", result))
