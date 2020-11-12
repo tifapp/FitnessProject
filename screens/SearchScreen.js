@@ -34,10 +34,10 @@ var styles = require("styles/stylesheet");
 export default function GroupSearchScreen({ navigation }) {
     const [query, setQuery] = useState("");
     const [users, setUsers] = useState([]);
-    const [mode, setMode] = useState("user");
+    const [type, setType] = useState("user");
+    const [mode, setMode] = useState("name");
     const [greaterThan, setGreaterThan] = useState(true);
     const [selectedAge, setSelectedAge] = useState(18);
-    const [userMode, setUserMode] = useState("name");
     const stateRef = useRef();
 
     const goGroupCreationScreen = () => {
@@ -47,7 +47,7 @@ export default function GroupSearchScreen({ navigation }) {
     //still not 100% sure why this works, will have to come back to it. got from here: https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
     stateRef.current = query;
 
-    const showUsersAsync = async (text) => {
+    const showResultsAsync = async (text) => {
         let items = [];
         /*
         if(mode=="group"){
@@ -57,7 +57,7 @@ export default function GroupSearchScreen({ navigation }) {
 
         if (text !== "") {
             const cleanText = text.trim();
-            if (mode == "group") {
+            if (type == "group") {
                 try {
                     const namematchresult = await API.graphql(
                         graphqlOperation(listGroups, {
@@ -102,7 +102,7 @@ export default function GroupSearchScreen({ navigation }) {
             else {
                 try {
                     let matchresult;
-                    if (userMode == 'name') {
+                    if (mode == 'name') {
                         if (greaterThan) {
                             const namematchresult = await API.graphql(graphqlOperation(listUsers, {
                                 filter: {
@@ -212,22 +212,32 @@ export default function GroupSearchScreen({ navigation }) {
     };
 
     useEffect(() => {
-        showUsersAsync(query);
-    }, [query, mode, greaterThan, selectedAge, userMode]);
+        showResultsAsync(query);
+    }, [query, type, greaterThan, selectedAge, mode]);
 
     return (
         <View style={styles.containerStyle}>
-            <View style={styles.spacingTop}>
+            <View style={[styles.spacingTop, {
+                flexDirection: 'row',
+                justifyContent: 'center',
+                marginBottom: 15,
+            }]}>
+                <Text style={styles.outlineButtonTextStyle}>Search for:</Text>
                 <TouchableOpacity
-                    style={styles.outlineButtonStyle}
+                    style={(type == 'user') ? styles.outlineButtonStyle : styles.unselectedButtonStyle}
                     onPress={() => {
-                        if (mode == "user")
-                            setMode("group")
-                        else
-                            setMode("user")
+                        setType("user")
                     }}
                 >
-                    <Text style={styles.outlineButtonTextStyle}>{mode}</Text>
+                    <Text style={(type == 'user') ? styles.outlineButtonTextStyle : styles.unselectedButtonTextStyle}>users</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={(type == 'group') ? styles.outlineButtonStyle : styles.unselectedButtonStyle}
+                    onPress={() => {
+                        setType("group")
+                    }}
+                >
+                    <Text style={(type == 'group') ? styles.outlineButtonTextStyle : styles.unselectedButtonTextStyle}>groups</Text>
                 </TouchableOpacity>
             </View>
 
@@ -239,37 +249,52 @@ export default function GroupSearchScreen({ navigation }) {
                 clearButtonMode="always"
             />
 
-            {(mode == "user") ?
-                <View style={{
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    marginBottom: 15,
-                }}>
-                    <TouchableOpacity
-                        style={styles.outlineButtonStyle}
-                        onPress={() => {
-                            if (userMode == 'name')
-                                setUserMode('description');
-                            else
-                                setUserMode('name');
-                        }}
-                    >
-                        <Text style={styles.outlineButtonTextStyle}>{userMode}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.outlineButtonStyle}
-                        onPress={() => {
-                            setGreaterThan(!greaterThan);
-                        }}
-                    >
-                        <Text style={styles.outlineButtonTextStyle}>{greaterThan ? 'age >=' : 'age <='}</Text>
-                    </TouchableOpacity>
-                    <AgePicker field={''} selectedValue={selectedAge} setSelectedValue={setSelectedAge} />
+            {(type == "user") ?
+                <View>
+                    <View style={[styles.spacingTop, {
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        marginBottom: 15,
+                    }]}>
+                        <Text style={styles.outlineButtonTextStyle}>Search by:</Text>
+                        <TouchableOpacity
+                            style={(mode == 'name') ? styles.outlineButtonStyle : styles.unselectedButtonStyle}
+                            onPress={() => {
+                                setMode("name")
+                            }}
+                        >
+                            <Text style={(mode == 'name') ? styles.outlineButtonTextStyle : styles.unselectedButtonTextStyle}>name</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={(mode == 'description') ? styles.outlineButtonStyle : styles.unselectedButtonStyle}
+                            onPress={() => {
+                                setMode("description")
+                            }}
+                        >
+                            <Text style={(mode == 'description') ? styles.outlineButtonTextStyle : styles.unselectedButtonTextStyle}>description</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={[styles.spacingTop, {
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        marginBottom: 15,
+                    }]}>
+                        <Text style={styles.outlineButtonTextStyle}>Filter:</Text>
+                        <TouchableOpacity
+                            style={styles.outlineButtonStyle}
+                            onPress={() => {
+                                setGreaterThan(!greaterThan);
+                            }}
+                        >
+                            <Text style={styles.outlineButtonTextStyle}>{greaterThan ? 'age >=' : 'age <='}</Text>
+                        </TouchableOpacity>
+                        <AgePicker field={''} selectedValue={selectedAge} setSelectedValue={setSelectedAge} />
+                    </View>
                 </View>
                 : null
             }
 
-            {(mode == "group") ?
+            {(type == "group") ?
                 <FlatList
                     data={users}
                     renderItem={({ item }) => <ListGroupItem item={item} />}
