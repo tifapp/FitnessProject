@@ -24,6 +24,7 @@ import ComplianceScreen from "./screens/ComplianceScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import BioScreen from "./screens/BioScreen";
 import GoalsScreen from "./screens/GoalsScreen";
+import LocationTest from "./screens/LocationTest";
 import SearchStack from "./SearchStack";
 
 import { NavigationContainer } from "@react-navigation/native";
@@ -155,6 +156,13 @@ const App = () => {
           <Tab.Screen 
             name="Profile"
             component={ProfileTab}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Tab.Screen 
+            name="LocationTest"
+            component={LocationTest}
             options={{
               headerShown: false,
             }}
