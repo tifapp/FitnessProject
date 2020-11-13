@@ -155,6 +155,7 @@ const App = () => {
           <Tab.Screen 
             name="Profile"
             component={ProfileTab}
+            initialParams={{id: userId}}
             options={{
               headerShown: false,
             }}

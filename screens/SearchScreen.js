@@ -31,7 +31,7 @@ Amplify.configure(awsconfig);
 
 var styles = require("styles/stylesheet");
 
-export default function GroupSearchScreen({ navigation }) {
+export default function GroupSearchScreen({ navigation}) {
     const [query, setQuery] = useState("");
     const [users, setUsers] = useState([]);
     const [type, setType] = useState("user");

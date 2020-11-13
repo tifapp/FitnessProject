@@ -53,6 +53,7 @@ export const createGroup = /* GraphQL */ `
   ) {
     createGroup(input: $input, condition: $condition) {
       id
+      userID
       name
       maxUsers
       Privacy
@@ -72,6 +73,7 @@ export const updateGroup = /* GraphQL */ `
   ) {
     updateGroup(input: $input, condition: $condition) {
       id
+      userID
       name
       maxUsers
       Privacy
@@ -91,6 +93,7 @@ export const deleteGroup = /* GraphQL */ `
   ) {
     deleteGroup(input: $input, condition: $condition) {
       id
+      userID
       name
       maxUsers
       Privacy

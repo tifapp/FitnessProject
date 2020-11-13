@@ -10,6 +10,11 @@ import { StackActions, NavigationActions } from 'react-navigation';
 var styles = require('styles/stylesheet');
 
 const ProfileScreen = ({ navigation, route }) => {
+
+    const goToMyGroups = () => {
+        navigation.navigate('My Groups')
+      }
+
     async function signOut() {
         console.log("user is signing out.");
         if (areFieldsUpdated()) {
@@ -175,6 +180,9 @@ const ProfileScreen = ({ navigation, route }) => {
                     setBioDetails={setBioDetails}
                     setGoalsDetails={setGoalsDetails}
                 />
+                <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25 }]} onPress={goToMyGroups} >
+                    <Text style={styles.buttonTextStyle}>My Groups</Text>
+                </TouchableOpacity>
                 <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25 }]} onPress={submitHandler} >
                     <Text style={styles.buttonTextStyle}>Submit</Text>
                 </TouchableOpacity>
