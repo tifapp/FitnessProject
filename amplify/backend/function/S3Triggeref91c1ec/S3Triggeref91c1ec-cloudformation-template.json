@@ -59,7 +59,7 @@
         "Runtime": "nodejs10.x",
         "Timeout": "25",
         "Code": {
-          "S3Bucket": "amplify-fitnessproject-location-20113-deployment",
+          "S3Bucket": "amplify-fitnessproject-dev-145229-deployment",
           "S3Key": "amplify-builds/S3Triggeref91c1ec-6d46494952786e6b3143-build.zip"
         },
         "Layers": []
