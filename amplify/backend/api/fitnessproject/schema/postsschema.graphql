@@ -1,7 +1,8 @@
 type Post @model
-@key(fields: ["createdAt", "userId"])
-@key(name: "ByGroup", fields: ["group", "createdAt"], queryField: "postsByGroup")
+@key(fields: ["timestamp", "userId"])
+@key(name: "ByGroup", fields: ["group", "timestamp"], queryField: "postsByGroup")
 {
+  timestamp: AWSTimestamp!
   userId: String!
   description: String
   group: String
