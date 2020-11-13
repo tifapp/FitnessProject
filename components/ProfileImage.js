@@ -33,7 +33,7 @@ export const ProfileImage = (props) => { //user is required in props. it's a typ
     useEffect(() => {
         Cache.getItem(props.user.id, { callback: addURLtoCache }) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
         .then((url)=>{
-            console.log('cache hit! ', url.substring(0, 15), '...');
+            //console.log('cache hit! ', url.substring(0, 15), '...');
             setImageURL(url)});
         //return () => mounted = false;
     }, [props.user]);

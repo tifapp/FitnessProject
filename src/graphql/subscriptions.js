@@ -1,6 +1,42 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const onCreateFriend = /* GraphQL */ `
+  subscription OnCreateFriend {
+    onCreateFriend {
+      id
+      sender
+      receiever
+      accepted
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdateFriend = /* GraphQL */ `
+  subscription OnUpdateFriend {
+    onUpdateFriend {
+      id
+      sender
+      receiever
+      accepted
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteFriend = /* GraphQL */ `
+  subscription OnDeleteFriend {
+    onDeleteFriend {
+      id
+      sender
+      receiever
+      accepted
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const onCreateGroup = /* GraphQL */ `
   subscription OnCreateGroup {
     onCreateGroup {
@@ -11,6 +47,7 @@ export const onCreateGroup = /* GraphQL */ `
       Sport
       Description
       characterCount
+      latitude
       createdAt
       updatedAt
     }
@@ -26,6 +63,7 @@ export const onUpdateGroup = /* GraphQL */ `
       Sport
       Description
       characterCount
+      latitude
       createdAt
       updatedAt
     }
@@ -41,6 +79,7 @@ export const onDeleteGroup = /* GraphQL */ `
       Sport
       Description
       characterCount
+      latitude
       createdAt
       updatedAt
     }
@@ -49,7 +88,6 @@ export const onDeleteGroup = /* GraphQL */ `
 export const onCreatePost = /* GraphQL */ `
   subscription OnCreatePost {
     onCreatePost {
-      id
       timestamp
       userId
       description
@@ -62,7 +100,6 @@ export const onCreatePost = /* GraphQL */ `
 export const onUpdatePost = /* GraphQL */ `
   subscription OnUpdatePost {
     onUpdatePost {
-      id
       timestamp
       userId
       description
@@ -75,7 +112,6 @@ export const onUpdatePost = /* GraphQL */ `
 export const onDeletePost = /* GraphQL */ `
   subscription OnDeletePost {
     onDeletePost {
-      id
       timestamp
       userId
       description

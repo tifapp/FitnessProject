@@ -54,6 +54,12 @@
           ]
         }
       ]
+    },
+    "S3Triggeref91c1ec": {
+      "service": "Lambda",
+      "providerPlugin": "awscloudformation",
+      "build": true,
+      "dependsOn": []
     }
   },
   "storage": {
