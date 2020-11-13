@@ -33,7 +33,7 @@ export default () => {
     return 'successfully deleted';
   };
 
-  const updateUserAsync = async (imageURL, name, age, gender, bioDetails, goalsDetails) => {
+  const updateUserAsync = async (imageURL, name, age, gender, bioDetails, goalsDetails, location) => {
     const updateUserInDB = async (recurringUser) => {
       try {
         if (imageURL !== '') {
@@ -80,6 +80,9 @@ export default () => {
         bio: bioDetails,
         goals: goalsDetails
       };
+
+      if (location != null)
+        //append location.latitude and location/longitude to ouruser
 
       if (fields == null) {
         createUserInDB(ourUser)

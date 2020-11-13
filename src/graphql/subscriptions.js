@@ -131,6 +131,8 @@ export const onCreateUser = /* GraphQL */ `
       gender
       bio
       goals
+      latitude
+      longitude
       createdAt
       updatedAt
     }
@@ -146,6 +148,8 @@ export const onUpdateUser = /* GraphQL */ `
       gender
       bio
       goals
+      latitude
+      longitude
       createdAt
       updatedAt
     }
@@ -161,6 +165,8 @@ export const onDeleteUser = /* GraphQL */ `
       gender
       bio
       goals
+      latitude
+      longitude
       createdAt
       updatedAt
     }
