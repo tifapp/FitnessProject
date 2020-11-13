@@ -53,7 +53,7 @@ export default function PostItem({
 
       //console.log("success, user is ", user);
     } catch (err) {
-      console.log("error: ", err);
+      console.log("error in finding user ", err);
     }
   };
 
@@ -163,7 +163,7 @@ export default function PostItem({
           />
           <View>
             <Text>{postAuthor.name}</Text>
-            <Text> Updated {displayTime} </Text>
+            <Text>{displayTime} </Text>
           </View>
         </TouchableOpacity>
         <Text style={styles.check}>{item.description}</Text>
@@ -172,14 +172,14 @@ export default function PostItem({
       {writtenByYou ? (
         <View style = {{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly'}}>
           
-          <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={() => (pressHandler(item.id), deletePostsAsync(item.id))}>
+          <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={() => (pressHandler(item.timestamp), deletePostsAsync(item.timestamp))}>
               <Text style={[styles.unselectedButtonTextStyle, {color: 'red'}]}>Delete</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
             style={[styles.unselectedButtonStyle, { borderColor: 'blue' }]} 
             color="blue" 
-            onPress={() => (setPostVal(item.description), setUpdatePostID(item.id))}>
+            onPress={() => (setPostVal(item.description), setUpdatePostID(item.timestamp))}>
             <Text style={[styles.unselectedButtonTextStyle, {color: 'blue'}]}>Edit</Text>
           </TouchableOpacity>
         </View>

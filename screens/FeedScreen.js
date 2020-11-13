@@ -19,7 +19,7 @@ import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
 import { Amplify, API, Auth, graphqlOperation } from "aws-amplify";
 import { createPost, updatePost, deletePost } from "root/src/graphql/mutations";
 import { DataStore, Predicates } from "@aws-amplify/datastore";
-import { listPosts } from "root/src/graphql/queries";
+import { listPosts, postsByGroup } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
 import { onCreatePost, onDeletePost, onUpdatePost } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
@@ -38,7 +38,7 @@ export default function GroupScreen({ navigation, route }) {
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
   const numCharsLeft = 1000 - postVal.length;
-  const [updatePostID, setUpdatePostID] = useState('');
+  const [updatePostID, setUpdatePostID] = useState(0);
   
   const isMounted = useRef(); //this variable exists to eliminate the "updated state on an unmounted component" warning
   const [onlineCheck, setOnlineCheck] = useState(true);
@@ -104,33 +104,33 @@ export default function GroupScreen({ navigation, route }) {
   // becomes an issue later on.
   const addPostAsync = async (val) => {
     checkInternetConnection();
-    if (updatePostID != '') {
+    if (updatePostID != 0) {
       try {
-        await API.graphql(graphqlOperation(updatePost, { input: { timestamp: Math.floor(Date.now()/1000), userId: route.params?.id, description: postVal }}));
+        await API.graphql(graphqlOperation(updatePost, { input: { timestamp: updatePostID, userId: route.params?.id, description: postVal }}));
         showPostsAsync();
         console.log("success in updating a post");
       } catch (err) {
-        console.log("error: ", err);
+        console.log("error in updating post: ", err);
       }
 
       setPostVal("");
-      setUpdatePostID('')
+      setUpdatePostID(0)
     }
     else {
       const newPost = {
         timestamp: Math.floor(Date.now()/1000),
         userId: route.params?.id,
         description: postVal,
-        group: group != null ? group.id : '',
+        group: group != null ? group.id : 'general',
       };
       setPostVal("");
   
       try {
         await API.graphql(graphqlOperation(createPost, { input: newPost }));
         showPostsAsync();
-        console.log("success in making a new post");
+        console.log("success in making a new post, group is false? ", group == null);
       } catch (err) {
-        console.log("error: ", err);
+        console.log("error in creating post: ", err);
       }
       //console.log("current time...", );
     }
@@ -139,31 +139,24 @@ export default function GroupScreen({ navigation, route }) {
 
   const showPostsAsync = async () => {
     try {
-      const query = await API.graphql(graphqlOperation(listPosts,
-        {
-            filter: {
-              group: {
-                eq: group != null ? group.id : '',
-              }
-            }
-        }
-        ));
-      let val = query.data.listPosts.items;
+      const query = await API.graphql(graphqlOperation(postsByGroup, {group: group != null ? group.id : 'general', sortDirection: 'DESC'} ));
+      console.log('this query', query);
+      let val = query.data.postsByGroup.items;
 
       if (isMounted.current)
         setPosts(val);
     } catch (err) {
-      console.log("error: ", err);
+      console.log("error in displaying posts: ", err);
     }
     setRefreshing(false);
   };
 
-  const deletePostsAsync = async (val) => {
+  const deletePostsAsync = async (timestamp) => {
     checkInternetConnection();
     try {
-      await API.graphql(graphqlOperation(deletePost, { input: { id: val } }));
+      await API.graphql(graphqlOperation(deletePost, { input: { timestamp: timestamp, userId: route.params?.id } }));
     } catch {
-      console.log("error: ");
+      console.log("error in deleting post: ");
     }
   };
 
@@ -196,7 +189,7 @@ export default function GroupScreen({ navigation, route }) {
                 : alert("No text detected in text field");
             }}
           >
-            <Text style={styles.buttonTextStyle}>{updatePostID == '' ? 'Add Post' : 'Edit Post'}</Text>
+            <Text style={styles.buttonTextStyle}>{updatePostID == 0 ? 'Add Post' : 'Edit Post'}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -216,6 +209,7 @@ export default function GroupScreen({ navigation, route }) {
             setUpdatePostID={setUpdatePostID}
           />
         )}
+        keyExtractor={(item, index) => index.toString()}
       />
 
 

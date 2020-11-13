@@ -5,7 +5,7 @@ type Friend @model {
   accepted: ID!
 }
 
-input AddFriend {
+input CreateFriendInput {
   sender: ID!
   receiever: ID!
   accepted: ID!
