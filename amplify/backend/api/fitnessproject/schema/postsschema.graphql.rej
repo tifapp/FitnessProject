@@ -1,0 +1,19 @@
+diff a/amplify/backend/api/fitnessproject/schema/postsschema.graphql b/amplify/backend/api/fitnessproject/schema/postsschema.graphql	(rejected hunks)
+@@ -1,13 +0,7 @@
+-type Post @model {
+-  id: ID!
+-  timestamp: AWSTimestamp!
+-  userId: String!
+-  description: String
+-  group: String
+-}
+-
+-input CreatePostInput {
+-  timestamp: AWSTimestamp!
++type Post @model 
++@key(fields: ["createdAt", "userId"])
++@key(name: "ByGroup", fields: ["group", "createdAt"], queryField: "postsByGroup")
++{
+   userId: String!
+   description: String
+   group: String

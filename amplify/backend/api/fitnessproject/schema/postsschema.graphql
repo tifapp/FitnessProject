@@ -1,4 +1,4 @@
-type Post @model 
+type Post @model
 @key(fields: ["createdAt", "userId"])
 @key(name: "ByGroup", fields: ["group", "createdAt"], queryField: "postsByGroup")
 {
