@@ -6,6 +6,7 @@ import DetailedInfo from 'components/detailedInfoComponents/DetailedInfo';
 import useDatabase from 'hooks/useDatabase';
 import { Auth } from "aws-amplify";
 import { StackActions, NavigationActions } from 'react-navigation';
+import * as Location from 'expo-location';
 
 var styles = require('styles/stylesheet');
 
@@ -57,6 +58,7 @@ const ProfileScreen = ({ navigation, route }) => {
     const [goalsDetails, setGoalsDetails] = useState('');
     const [bioDetailsMaxLength, setBioDetailsMaxLength] = useState(1000);
     const [goalsDetailsMaxLength, setGoalsDetailsMaxLength] = useState(1000);
+    const [location, setLocation] = useState(null); //object with latitude and longitude properties
 
     const [initialFields, setInitialFields] = useState([]);
 
@@ -86,6 +88,20 @@ const ProfileScreen = ({ navigation, route }) => {
             return false;
         }
         return true;
+    }
+    
+    const toggleAddLocation = async () => {
+        if (location == null) {
+            let { status } = await Location.requestPermissionsAsync();
+            if (status !== 'granted') {
+              setErrorMsg('Permission to access location was denied');
+            }
+      
+            let location = await Location.getCurrentPositionAsync({ accuracy: 1 });
+            setLocation({latitude: location.coords.latitude, longitude: location.coords.longitude});
+        } else {
+            setLocation(null);
+        }
     }
 
     const submitHandler = () => {
@@ -175,6 +191,9 @@ const ProfileScreen = ({ navigation, route }) => {
                     setBioDetails={setBioDetails}
                     setGoalsDetails={setGoalsDetails}
                 />
+                <TouchableOpacity style={[]} onPress={toggleAddLocation} >
+                    <Text style={styles.textButtonTextStyle}>{location == null ? '+ Add location' : '- Remove Location'}</Text>
+                </TouchableOpacity>
                 <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25 }]} onPress={submitHandler} >
                     <Text style={styles.buttonTextStyle}>Submit</Text>
                 </TouchableOpacity>
