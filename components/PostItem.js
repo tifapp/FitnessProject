@@ -151,6 +151,7 @@ export default function PostItem({
       { user: postAuthor })
   }
 
+  //
   return (
     <View style={styles.secondaryContainerStyle}>
       <View style={styles.spaceAround}>
