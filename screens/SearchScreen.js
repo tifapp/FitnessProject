@@ -327,7 +327,7 @@ export default function GroupSearchScreen({ navigation }) {
                 :
                 <FlatList
                     data={users}
-                    renderItem={({ item }) => <UserListItem item={item} />}
+                    renderItem={({ item }) => <UserListItem item={item} distance={computeDistance([route.params?.latitude, route.params?.longitude], [item.latitude, item.longitude])} />}
                 //if there are only 1 or 2 characters in the query, dont load images
                 //if there are more than 5 search results only download images from the top 5 (paginate)
                 />

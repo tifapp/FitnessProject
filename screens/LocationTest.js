@@ -22,7 +22,7 @@ export default function App() {
   if (errorMsg) {
     text = errorMsg;
   } else if (location) {
-    text = JSON.stringify(location);
+    text = JSON.stringify(location.coords.longitude) + ', ' + JSON.stringify(location.coords.latitude);
   }
 
   return (

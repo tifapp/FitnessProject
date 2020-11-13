@@ -7,11 +7,13 @@ import {
 import { ProfileImage } from './ProfileImage'
 import { useNavigation } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons'; 
+import { computeDistance } from 'hooks/computeDistance';
 
 var styles = require('../styles/stylesheet');
 
 export default function UserListItem({
-  item
+  item,
+  distance
 }) {
   const navigation = useNavigation();
 
@@ -37,6 +39,7 @@ export default function UserListItem({
           style={styles.smallImageStyle}
           user={item}
         />
+        <Text>{distance} meters</Text>
       </View>
     </TouchableOpacity>
   );
