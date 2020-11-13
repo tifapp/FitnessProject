@@ -78,11 +78,10 @@ export default () => {
         age: age,
         gender: gender,
         bio: bioDetails,
-        goals: goalsDetails
+        goals: goalsDetails,
+        latitude: location == null ? null : location.latitude,
+        longitude: location == null ? null : location.longitude,
       };
-
-      if (location != null)
-        //append location.latitude and location/longitude to ouruser
 
       if (fields == null) {
         createUserInDB(ourUser)
