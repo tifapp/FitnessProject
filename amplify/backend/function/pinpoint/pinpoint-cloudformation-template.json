@@ -82,7 +82,7 @@
 				"Layers": [],
 				"Timeout": "25",
 				"Code": {
-					"S3Bucket": "amplify-fitnessproject-schematest-173835-deployment",
+					"S3Bucket": "amplify-fitnessproject-dev-145229-deployment",
 					"S3Key": "amplify-builds/pinpoint-336758496575717a674c-build.zip"
 				}
 			}

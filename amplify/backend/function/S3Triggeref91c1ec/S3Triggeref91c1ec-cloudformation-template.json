@@ -1,22 +1,9 @@
 {
 	"AWSTemplateFormatVersion": "2010-09-09",
-	"Description": "Lambda Function resource stack creation using Amplify CLI",
+	"Description": "Lambda resource stack creation using Amplify CLI",
 	"Parameters": {
-		"CloudWatchRule": {
-			"Type": "String",
-			"Default": "NONE",
-			"Description": " Schedule Expression"
-		},
 		"env": {
 			"Type": "String"
-		},
-		"apifitnessprojectGraphQLAPIIdOutput": {
-			"Type": "String",
-			"Default": "apifitnessprojectGraphQLAPIIdOutput"
-		},
-		"apifitnessprojectGraphQLAPIEndpointOutput": {
-			"Type": "String",
-			"Default": "apifitnessprojectGraphQLAPIEndpointOutput"
 		}
 	},
 	"Conditions": {
@@ -41,12 +28,12 @@
 				"FunctionName": {
 					"Fn::If": [
 						"ShouldNotCreateEnvResources",
-						"pushNotification",
+						"S3Triggeref91c1ec",
 						{
 							"Fn::Join": [
 								"",
 								[
-									"pushNotification",
+									"S3Triggeref91c1ec",
 									"-",
 									{
 										"Ref": "env"
@@ -60,15 +47,6 @@
 					"Variables": {
 						"ENV": {
 							"Ref": "env"
-						},
-						"REGION": {
-							"Ref": "AWS::Region"
-						},
-						"API_FITNESSPROJECT_GRAPHQLAPIIDOUTPUT": {
-							"Ref": "apifitnessprojectGraphQLAPIIdOutput"
-						},
-						"API_FITNESSPROJECT_GRAPHQLAPIENDPOINTOUTPUT": {
-							"Ref": "apifitnessprojectGraphQLAPIEndpointOutput"
 						}
 					}
 				},
@@ -78,13 +56,13 @@
 						"Arn"
 					]
 				},
-				"Runtime": "nodejs12.x",
-				"Layers": [],
+				"Runtime": "nodejs10.x",
 				"Timeout": "25",
 				"Code": {
 					"S3Bucket": "amplify-fitnessproject-dev-145229-deployment",
-					"S3Key": "amplify-builds/pushNotification-6779474e59726f673267-build.zip"
-				}
+					"S3Key": "amplify-builds/S3Triggeref91c1ec-6d46494952786e6b3143-build.zip"
+				},
+				"Layers": []
 			}
 		},
 		"LambdaExecutionRole": {
@@ -93,12 +71,12 @@
 				"RoleName": {
 					"Fn::If": [
 						"ShouldNotCreateEnvResources",
-						"fitnessprojectLambdaRole0ed96065",
+						"S3Triggeref91c1ecLambdaRoleef91c1ec",
 						{
 							"Fn::Join": [
 								"",
 								[
-									"fitnessprojectLambdaRole0ed96065",
+									"S3Triggeref91c1ecLambdaRoleef91c1ec",
 									"-",
 									{
 										"Ref": "env"
@@ -164,54 +142,6 @@
 									}
 								]
 							}
-						}
-					]
-				}
-			}
-		},
-		"AmplifyResourcesPolicy": {
-			"DependsOn": [
-				"LambdaExecutionRole"
-			],
-			"Type": "AWS::IAM::Policy",
-			"Properties": {
-				"PolicyName": "amplify-lambda-execution-policy",
-				"Roles": [
-					{
-						"Ref": "LambdaExecutionRole"
-					}
-				],
-				"PolicyDocument": {
-					"Version": "2012-10-17",
-					"Statement": [
-						{
-							"Effect": "Allow",
-							"Action": [
-								"appsync:Get*",
-								"appsync:List*"
-							],
-							"Resource": [
-								{
-									"Fn::Join": [
-										"",
-										[
-											"arn:aws:appsync:",
-											{
-												"Ref": "AWS::Region"
-											},
-											":",
-											{
-												"Ref": "AWS::AccountId"
-											},
-											":apis/",
-											{
-												"Ref": "apifitnessprojectGraphQLAPIIdOutput"
-											},
-											"/*"
-										]
-									]
-								}
-							]
 						}
 					]
 				}

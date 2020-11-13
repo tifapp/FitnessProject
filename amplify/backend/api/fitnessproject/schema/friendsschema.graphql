@@ -1,0 +1,12 @@
+type Friend @model {
+  id: ID!
+  sender: ID!
+  receiever: ID!
+  accepted: ID!
+}
+
+input AddFriend {
+  sender: ID!
+  receiever: ID!
+  accepted: ID!
+}
