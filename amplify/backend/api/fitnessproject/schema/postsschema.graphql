@@ -1,13 +1,7 @@
-type Post @model {
-  id: ID!
-  timestamp: AWSTimestamp!
-  userId: String!
-  description: String
-  group: String
-}
-
-input CreatePostInput {
-  timestamp: AWSTimestamp!
+type Post @model 
+@key(fields: ["createdAt", "userId"])
+@key(name: "ByGroup", fields: ["group", "createdAt"], queryField: "postsByGroup")
+{
   userId: String!
   description: String
   group: String

@@ -61,7 +61,7 @@ export default function PostItem({
     checkUsersName();
   }, []);
 
-  const dateInfo = new Date(item.timestamp * 1000);
+  const dateInfo = new Date(item.createdAt * 1000);
   var yearVal = dateInfo.getFullYear();
   var monthVal = dateInfo.getMonth();
   var dayVal = dateInfo.getDate();

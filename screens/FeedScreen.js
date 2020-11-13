@@ -106,7 +106,7 @@ export default function GroupScreen({ navigation, route }) {
     checkInternetConnection();
     if (updatePostID != '') {
       try {
-        await API.graphql(graphqlOperation(updatePost, { input: { id: val, description: postVal, timestamp: Math.floor(Date.now() / 1000)}}));
+        await API.graphql(graphqlOperation(updatePost, { input: { userId: route.params?.id, group: group != null ? group.id : '', description: postVal }}));
         showPostsAsync();
         console.log("success in updating a post");
       } catch (err) {
@@ -118,7 +118,6 @@ export default function GroupScreen({ navigation, route }) {
     }
     else {
       const newPost = {
-        timestamp: Math.floor(Date.now() / 1000),
         userId: route.params?.id,
         description: postVal,
         group: group != null ? group.id : '',
@@ -150,9 +149,6 @@ export default function GroupScreen({ navigation, route }) {
         ));
       let val = query.data.listPosts.items;
 
-      val.sort((a, b) => {
-        return b.timestamp - a.timestamp;
-      });
       if (isMounted.current)
         setPosts(val);
     } catch (err) {
