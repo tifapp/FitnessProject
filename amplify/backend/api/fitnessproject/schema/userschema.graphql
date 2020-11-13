@@ -6,6 +6,4 @@ type User @model {
   gender: String
   bio: String
   goals: String
-  latitude: Float   
-  longitude: Float
 }
