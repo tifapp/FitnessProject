@@ -28,6 +28,10 @@ const ProfileScreen = ({ navigation, route }) => {
     const [initialFields, setInitialFields] = useState([]);
     const [loadUserAsync, updateUserAsync, deleteUserAsync] = useDatabase();
     
+    const goToMyGroups = () => {
+        navigation.navigate('My Groups')
+      }
+
     async function signOut() {
         console.log("user is signing out.");
         if (areFieldsUpdated()) {
@@ -99,7 +103,7 @@ const ProfileScreen = ({ navigation, route }) => {
               setErrorMsg('Permission to access location was denied');
             }
       
-            let location = await Location.getCurrentPositionAsync({ accuracy: 1 });
+            let location = await Location.getCurrentPositionAsync({ accuracy: 2 });
             setLocation({latitude: location.coords.latitude, longitude: location.coords.longitude});
         } else {
             setLocation(null);
@@ -207,6 +211,9 @@ const ProfileScreen = ({ navigation, route }) => {
                         : <Ionicons size={16} style={{ marginBottom: 0 }} name="md-checkbox-outline" color="orange" />
                     }
                     <Text style={styles.textButtonTextStyle}>{'Let others see your location'}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25 }]} onPress={goToMyGroups} >
+                    <Text style={styles.buttonTextStyle}>My Groups</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25 }]} onPress={submitHandler} >
                     <Text style={styles.buttonTextStyle}>Submit</Text>

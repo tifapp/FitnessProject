@@ -26,14 +26,16 @@ import UserListItem from "components/UserListItem";
 import ListGroupItem from "components/ListGroupItem";
 import * as subscriptions from "root/src/graphql/subscriptions";
 import AgePicker from "components/basicInfoComponents/AgePicker";
+import * as Location from 'expo-location';
 
 Amplify.configure(awsconfig);
 
 var styles = require("styles/stylesheet");
 
-export default function GroupSearchScreen({ navigation }) {
+export default function GroupSearchScreen({ navigation}) {
+    const [location, setLocation] = useState(null); //object with latitude and longitude properties
     const [query, setQuery] = useState("");
-    const [users, setUsers] = useState([]);
+    const [results, setResults] = useState([]);
     const [type, setType] = useState("user");
     const [mode, setMode] = useState("name");
     const [greaterThan, setGreaterThan] = useState(true);
@@ -91,7 +93,7 @@ export default function GroupSearchScreen({ navigation }) {
 
 
                     if (cleanText === stateRef.current.trim()) {
-                        setUsers(items);
+                        setResults(items);
                         console.log("here's some users! ", cleanText);
                     } else {
                         console.log("ignoring!");
@@ -193,10 +195,19 @@ export default function GroupSearchScreen({ navigation }) {
                                 temp.id === item.id
                             ))
                         )
+
+                        if (location != null) {
+                            matchresult.sort((a, b) => {
+                                if (isNaN(a.latitude) && isNaN(b.latitude)) return 0;
+                                if (isNaN(a.latitude)) return 1;
+                                if (isNaN(b.latitude)) return -1;
+                                return computeDistance([location.latitude, location.longitude], [a.latitude, a.longitude]) - computeDistance([location.latitude, location.longitude], [b.latitude, b.longitude]);
+                            })
+                        }
                     }
 
                     if (cleanText === stateRef.current.trim()) {
-                        setUsers(matchresult);
+                        setResults(matchresult);
                         console.log("here's some users! ", cleanText);
                     } else {
                         console.log("ignoring!");
@@ -208,13 +219,47 @@ export default function GroupSearchScreen({ navigation }) {
         }
         else {
             console.log("check");
-            setUsers([]);
+            setResults([]);
         }
     };
 
     useEffect(() => {
         showResultsAsync(query);
     }, [query, type, greaterThan, selectedAge, mode, ageHidden]);
+    
+    useEffect(() => {
+        (async () => {
+            let { status } = await Location.requestPermissionsAsync();
+            if (status !== 'granted') {
+              setErrorMsg('Permission to access location was denied');
+            }
+      
+            let location = await Location.getCurrentPositionAsync({ accuracy: 2 });
+            setLocation({latitude: location.coords.latitude, longitude: location.coords.longitude});
+          })();
+    }, []);
+
+    function computeDistance([lat1, long1], [lat2, long2]) {
+        const prevLatInRad = toRad(lat1);
+        const prevLongInRad = toRad(long1);
+        const latInRad = toRad(lat2);
+        const longInRad = toRad(long2);
+
+        const distance = 6377.830272 *
+        Math.acos(
+            Math.sin(prevLatInRad) * Math.sin(latInRad) +
+            Math.cos(prevLatInRad) * Math.cos(latInRad) * Math.cos(longInRad - prevLongInRad),
+        )
+    
+        return (
+            // In kilometers
+            distance.toFixed(0)
+        );
+    }
+    
+    function toRad(angle) {
+        return (angle * Math.PI) / 180;
+    }
 
     return (
         <View style={styles.containerStyle}>
@@ -321,13 +366,13 @@ export default function GroupSearchScreen({ navigation }) {
 
             {(type == "group") ?
                 <FlatList
-                    data={users}
+                    data={results}
                     renderItem={({ item }) => <ListGroupItem item={item} />}
                 />
                 :
                 <FlatList
-                    data={users}
-                    renderItem={({ item }) => <UserListItem item={item} distance={computeDistance([route.params?.latitude, route.params?.longitude], [item.latitude, item.longitude])} />}
+                    data={results}
+                    renderItem={({ item }) => <UserListItem item={item} distance={location == null || isNaN(item.latitude) ? 0 : computeDistance([location.latitude, location.longitude], [item.latitude, item.longitude])} />}
                 //if there are only 1 or 2 characters in the query, dont load images
                 //if there are more than 5 search results only download images from the top 5 (paginate)
                 />

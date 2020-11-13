@@ -36,6 +36,7 @@ export const getGroup = /* GraphQL */ `
   query GetGroup($id: ID!) {
     getGroup(id: $id) {
       id
+      userID
       name
       maxUsers
       Privacy
@@ -57,6 +58,7 @@ export const listGroups = /* GraphQL */ `
     listGroups(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
+        userID
         name
         maxUsers
         Privacy

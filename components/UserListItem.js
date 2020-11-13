@@ -39,7 +39,11 @@ export default function UserListItem({
           style={styles.smallImageStyle}
           user={item}
         />
-        <Text>{distance} meters</Text>
+        {
+          distance > 0
+          ? <Text>{distance} km.</Text>
+          : <Text> </Text>
+        }
       </View>
     </TouchableOpacity>
   );

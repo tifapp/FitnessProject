@@ -156,13 +156,7 @@ const App = () => {
           <Tab.Screen 
             name="Profile"
             component={ProfileTab}
-            options={{
-              headerShown: false,
-            }}
-          />
-          <Tab.Screen 
-            name="LocationTest"
-            component={LocationTest}
+            initialParams={{id: userId}}
             options={{
               headerShown: false,
             }}

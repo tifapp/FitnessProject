@@ -2,11 +2,11 @@ type Friend @model {
   id: ID!
   sender: ID!
   receiever: ID!
-  accepted: ID!
+  accepted: Boolean!
 }
 
 input CreateFriendInput {
   sender: ID!
   receiever: ID!
-  accepted: ID!
+  accepted: Boolean!
 }

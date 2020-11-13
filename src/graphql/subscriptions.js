@@ -41,6 +41,7 @@ export const onCreateGroup = /* GraphQL */ `
   subscription OnCreateGroup {
     onCreateGroup {
       id
+      userID
       name
       maxUsers
       Privacy
@@ -57,6 +58,7 @@ export const onUpdateGroup = /* GraphQL */ `
   subscription OnUpdateGroup {
     onUpdateGroup {
       id
+      userID
       name
       maxUsers
       Privacy
@@ -73,6 +75,7 @@ export const onDeleteGroup = /* GraphQL */ `
   subscription OnDeleteGroup {
     onDeleteGroup {
       id
+      userID
       name
       maxUsers
       Privacy
