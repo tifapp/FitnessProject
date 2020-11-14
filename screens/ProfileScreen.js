@@ -142,8 +142,8 @@ const ProfileScreen = ({ navigation, route }) => {
                     setBioDetails(user.bio);
                     setGoalsDetails(user.goals);
                     setLocation(null);
-                    if (!isNaN(user.latitude)) toggleAddLocation();
-                    setInitialFields([user.name, user.age, user.gender, user.bio, user.goals, isNaN(user.latitude)]);
+                    if (user.latitude != null) toggleAddLocation();
+                    setInitialFields([user.name, user.age, user.gender, user.bio, user.goals, location == null]);
                     Image.getSize(user.pictureURL, () => {
                         setImageURL(user.pictureURL);
                     }, err => {

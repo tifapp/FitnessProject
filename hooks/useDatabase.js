@@ -71,7 +71,7 @@ export default () => {
       const fields = user.data.getUser;
       console.log('returning users fields looks like', fields);
 
-      const ourUser = {
+      let ourUser = {
         id: query.attributes.sub,
         identityId: identityId,
         name: name,
@@ -79,9 +79,12 @@ export default () => {
         gender: gender,
         bio: bioDetails,
         goals: goalsDetails,
-        latitude: location == null ? null : location.latitude,
-        longitude: location == null ? null : location.longitude,
       };
+
+      if (location != null) {
+        ourUser.latitude = location.latitude;
+        ourUser.longitude = location.longitude;
+      }
 
       if (fields == null) {
         createUserInDB(ourUser)
