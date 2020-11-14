@@ -114,7 +114,6 @@ module.exports = StyleSheet.create({
     marginBottom: 30,
   },
   rowContainerStyle: {
-    flexBasis: 1,
     flexDirection: 'row',
     justifyContent: 'center',
   },

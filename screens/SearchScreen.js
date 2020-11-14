@@ -26,18 +26,21 @@ import UserListItem from "components/UserListItem";
 import ListGroupItem from "components/ListGroupItem";
 import * as subscriptions from "root/src/graphql/subscriptions";
 import AgePicker from "components/basicInfoComponents/AgePicker";
+import * as Location from 'expo-location';
 
 Amplify.configure(awsconfig);
 
 var styles = require("styles/stylesheet");
 
-export default function GroupSearchScreen({ navigation }) {
+export default function GroupSearchScreen({ navigation}) {
+    const [location, setLocation] = useState(null); //object with latitude and longitude properties
     const [query, setQuery] = useState("");
-    const [users, setUsers] = useState([]);
-    const [mode, setMode] = useState("user");
+    const [results, setResults] = useState([]);
+    const [type, setType] = useState("user");
+    const [mode, setMode] = useState("name");
     const [greaterThan, setGreaterThan] = useState(true);
     const [selectedAge, setSelectedAge] = useState(18);
-    const [userMode, setUserMode] = useState("name");
+    const [ageHidden, setAgeHidden] = useState(true);
     const stateRef = useRef();
 
     const goGroupCreationScreen = () => {
@@ -47,7 +50,7 @@ export default function GroupSearchScreen({ navigation }) {
     //still not 100% sure why this works, will have to come back to it. got from here: https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
     stateRef.current = query;
 
-    const showUsersAsync = async (text) => {
+    const showResultsAsync = async (text) => {
         let items = [];
         /*
         if(mode=="group"){
@@ -57,7 +60,7 @@ export default function GroupSearchScreen({ navigation }) {
 
         if (text !== "") {
             const cleanText = text.trim();
-            if (mode == "group") {
+            if (type == "group") {
                 try {
                     const namematchresult = await API.graphql(
                         graphqlOperation(listGroups, {
@@ -90,7 +93,7 @@ export default function GroupSearchScreen({ navigation }) {
 
 
                     if (cleanText === stateRef.current.trim()) {
-                        setUsers(items);
+                        setResults(items);
                         console.log("here's some users! ", cleanText);
                     } else {
                         console.log("ignoring!");
@@ -102,11 +105,11 @@ export default function GroupSearchScreen({ navigation }) {
             else {
                 try {
                     let matchresult;
-                    if (userMode == 'name') {
-                        if (greaterThan) {
+                    if (mode == 'name') {
+                        if (greaterThan || ageHidden) {
                             const namematchresult = await API.graphql(graphqlOperation(listUsers, {
                                 filter: {
-                                    age: { ge: selectedAge },
+                                    age: { ge: ageHidden ? 18 : selectedAge },
                                     and: {
                                         name: {
                                             beginsWith: cleanText
@@ -133,11 +136,11 @@ export default function GroupSearchScreen({ navigation }) {
                     } else {
                         let biomatchresult;
                         let goalsmatchresult;
-                        if (greaterThan) {
+                        if (greaterThan || ageHidden) {
 
                             biomatchresult = await API.graphql(graphqlOperation(listUsers, {
                                 filter: {
-                                    age: { ge: selectedAge },
+                                    age: { ge: ageHidden ? 18 : selectedAge },
                                     and: {
                                         bio: {
                                             contains: cleanText
@@ -148,7 +151,7 @@ export default function GroupSearchScreen({ navigation }) {
                             ));
                             goalsmatchresult = await API.graphql(graphqlOperation(listUsers, {
                                 filter: {
-                                    age: { ge: selectedAge },
+                                    age: { ge: ageHidden ? 18 : selectedAge },
                                     and: {
                                         goals: {
                                             contains: cleanText
@@ -192,10 +195,19 @@ export default function GroupSearchScreen({ navigation }) {
                                 temp.id === item.id
                             ))
                         )
+
+                        if (location != null) {
+                            matchresult.sort((a, b) => {
+                                if (isNaN(a.latitude) && isNaN(b.latitude)) return 0;
+                                if (isNaN(a.latitude)) return 1;
+                                if (isNaN(b.latitude)) return -1;
+                                return computeDistance([location.latitude, location.longitude], [a.latitude, a.longitude]) - computeDistance([location.latitude, location.longitude], [b.latitude, b.longitude]);
+                            })
+                        }
                     }
 
                     if (cleanText === stateRef.current.trim()) {
-                        setUsers(matchresult);
+                        setResults(matchresult);
                         console.log("here's some users! ", cleanText);
                     } else {
                         console.log("ignoring!");
@@ -207,27 +219,71 @@ export default function GroupSearchScreen({ navigation }) {
         }
         else {
             console.log("check");
-            setUsers([]);
+            setResults([]);
         }
     };
 
     useEffect(() => {
-        showUsersAsync(query);
-    }, [query, mode, greaterThan, selectedAge, userMode]);
+        showResultsAsync(query);
+    }, [query, type, greaterThan, selectedAge, mode, ageHidden]);
+    
+    useEffect(() => {
+        (async () => {
+            let { status } = await Location.requestPermissionsAsync();
+            if (status !== 'granted') {
+              setErrorMsg('Permission to access location was denied');
+            }
+      
+            let location = await Location.getCurrentPositionAsync({ accuracy: 2 });
+            setLocation({latitude: location.coords.latitude, longitude: location.coords.longitude});
+          })();
+    }, []);
+
+    function computeDistance([lat1, long1], [lat2, long2]) {
+        const prevLatInRad = toRad(lat1);
+        const prevLongInRad = toRad(long1);
+        const latInRad = toRad(lat2);
+        const longInRad = toRad(long2);
+
+        const distance = 6377.830272 *
+        Math.acos(
+            Math.sin(prevLatInRad) * Math.sin(latInRad) +
+            Math.cos(prevLatInRad) * Math.cos(latInRad) * Math.cos(longInRad - prevLongInRad),
+        )
+    
+        return (
+            // In kilometers
+            distance.toFixed(0)
+        );
+    }
+    
+    function toRad(angle) {
+        return (angle * Math.PI) / 180;
+    }
 
     return (
         <View style={styles.containerStyle}>
-            <View style={styles.spacingTop}>
+            <View style={[styles.spacingTop, {
+                flexDirection: 'row',
+                justifyContent: 'center',
+                marginBottom: 15,
+            }]}>
+                <Text style={styles.outlineButtonTextStyle}>Search for:</Text>
                 <TouchableOpacity
-                    style={styles.outlineButtonStyle}
+                    style={(type == 'user') ? styles.outlineButtonStyle : styles.unselectedButtonStyle}
                     onPress={() => {
-                        if (mode == "user")
-                            setMode("group")
-                        else
-                            setMode("user")
+                        setType("user")
                     }}
                 >
-                    <Text style={styles.outlineButtonTextStyle}>{mode}</Text>
+                    <Text style={(type == 'user') ? styles.outlineButtonTextStyle : styles.unselectedButtonTextStyle}>users</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={(type == 'group') ? styles.outlineButtonStyle : styles.unselectedButtonStyle}
+                    onPress={() => {
+                        setType("group")
+                    }}
+                >
+                    <Text style={(type == 'group') ? styles.outlineButtonTextStyle : styles.unselectedButtonTextStyle}>groups</Text>
                 </TouchableOpacity>
             </View>
 
@@ -239,45 +295,84 @@ export default function GroupSearchScreen({ navigation }) {
                 clearButtonMode="always"
             />
 
-            {(mode == "user") ?
-                <View style={{
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    marginBottom: 15,
-                }}>
-                    <TouchableOpacity
-                        style={styles.outlineButtonStyle}
-                        onPress={() => {
-                            if (userMode == 'name')
-                                setUserMode('description');
-                            else
-                                setUserMode('name');
-                        }}
-                    >
-                        <Text style={styles.outlineButtonTextStyle}>{userMode}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.outlineButtonStyle}
-                        onPress={() => {
-                            setGreaterThan(!greaterThan);
-                        }}
-                    >
-                        <Text style={styles.outlineButtonTextStyle}>{greaterThan ? 'age >=' : 'age <='}</Text>
-                    </TouchableOpacity>
-                    <AgePicker field={''} selectedValue={selectedAge} setSelectedValue={setSelectedAge} />
+            {(type == "user") ?
+                <View>
+                    <View style={[styles.spacingTop, {
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        marginBottom: 15,
+                    }]}>
+                        <Text style={styles.outlineButtonTextStyle}>Search by:</Text>
+                        <TouchableOpacity
+                            style={(mode == 'name') ? styles.outlineButtonStyle : styles.unselectedButtonStyle}
+                            onPress={() => {
+                                setMode("name")
+                            }}
+                        >
+                            <Text style={(mode == 'name') ? styles.outlineButtonTextStyle : styles.unselectedButtonTextStyle}>name</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={(mode == 'description') ? styles.outlineButtonStyle : styles.unselectedButtonStyle}
+                            onPress={() => {
+                                setMode("description")
+                            }}
+                        >
+                            <Text style={(mode == 'description') ? styles.outlineButtonTextStyle : styles.unselectedButtonTextStyle}>description</Text>
+                        </TouchableOpacity>
+                    </View>
+                    {
+                        ageHidden ?
+                        <View style={[styles.spacingTop, {
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                            marginBottom: 15,
+                        }]}>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setAgeHidden(false);
+                                }}
+                            >
+                                <Text style={styles.unselectedButtonTextStyle}>+ Add Age Filter</Text>
+                            </TouchableOpacity>
+                        </View>
+                        :
+                        <View style={[styles.spacingTop, {
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            marginBottom: 15,
+                        }]}>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setAgeHidden(true);
+                                }}
+                            >
+                                <Text style={styles.unselectedButtonTextStyle}>- Remove Filter</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.outlineButtonStyle}
+                                onPress={() => {
+                                    setGreaterThan(!greaterThan);
+                                }}
+                            >
+                                <Text style={styles.outlineButtonTextStyle}>{greaterThan ? 'age >=' : 'age <='}</Text>
+                            </TouchableOpacity>
+                            <AgePicker field={''} selectedValue={selectedAge} setSelectedValue={setSelectedAge} />
+                        </View>
+                    }
                 </View>
                 : null
             }
 
-            {(mode == "group") ?
+            {(type == "group") ?
                 <FlatList
-                    data={users}
+                    data={results}
                     renderItem={({ item }) => <ListGroupItem item={item} />}
                 />
                 :
                 <FlatList
-                    data={users}
-                    renderItem={({ item }) => <UserListItem item={item} />}
+                    data={results}
+                    renderItem={({ item }) => <UserListItem item={item} distance={location == null || isNaN(item.latitude) ? 0 : computeDistance([location.latitude, location.longitude], [item.latitude, item.longitude])} />}
                 //if there are only 1 or 2 characters in the query, dont load images
                 //if there are more than 5 search results only download images from the top 5 (paginate)
                 />

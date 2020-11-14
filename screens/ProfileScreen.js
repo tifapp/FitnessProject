@@ -6,10 +6,32 @@ import DetailedInfo from 'components/detailedInfoComponents/DetailedInfo';
 import useDatabase from 'hooks/useDatabase';
 import { Auth } from "aws-amplify";
 import { StackActions, NavigationActions } from 'react-navigation';
+import * as Location from 'expo-location';
+import { Platform } from 'react-native';
+import { Ionicons } from "@expo/vector-icons";
+import CheckBox from '@react-native-community/checkbox'; //when ios is supported, we'll use this
 
 var styles = require('styles/stylesheet');
 
 const ProfileScreen = ({ navigation, route }) => {
+    const [loading, setLoading] = useState(false);
+    const [imageChanged, setImageChanged] = useState(false);
+    const [imageURL, setImageURL] = useState('');
+    const [name, setName] = useState('');
+    const [age, setAge] = useState(18);
+    const [gender, setGender] = useState('');
+    const [bioDetails, setBioDetails] = useState('');
+    const [goalsDetails, setGoalsDetails] = useState('');
+    const [bioDetailsMaxLength, setBioDetailsMaxLength] = useState(1000);
+    const [goalsDetailsMaxLength, setGoalsDetailsMaxLength] = useState(1000);
+    const [location, setLocation] = useState(null); //object with latitude and longitude properties
+    const [initialFields, setInitialFields] = useState([]);
+    const [loadUserAsync, updateUserAsync, deleteUserAsync] = useDatabase();
+    
+    const goToMyGroups = () => {
+        navigation.navigate('My Groups')
+      }
+
     async function signOut() {
         console.log("user is signing out.");
         if (areFieldsUpdated()) {
@@ -47,21 +69,6 @@ const ProfileScreen = ({ navigation, route }) => {
         Alert.alert(title, message, options, { cancelable: true });
     }
 
-    const [loading, setLoading] = useState(false);
-    const [imageChanged, setImageChanged] = useState(false);
-    const [imageURL, setImageURL] = useState('');
-    const [name, setName] = useState('');
-    const [age, setAge] = useState(18);
-    const [gender, setGender] = useState('');
-    const [bioDetails, setBioDetails] = useState('');
-    const [goalsDetails, setGoalsDetails] = useState('');
-    const [bioDetailsMaxLength, setBioDetailsMaxLength] = useState(1000);
-    const [goalsDetailsMaxLength, setGoalsDetailsMaxLength] = useState(1000);
-
-    const [initialFields, setInitialFields] = useState([]);
-
-    const [loadUserAsync, updateUserAsync, deleteUserAsync] = useDatabase();
-
     const updateDetailedInfo = () => {
         if (route.params?.updatedField) {
             const label = route.params.label
@@ -82,10 +89,25 @@ const ProfileScreen = ({ navigation, route }) => {
             gender == initialFields[2] &&
             bioDetails == initialFields[3] &&
             goalsDetails == initialFields[4] &&
+            (location == null) == initialFields[5] &&
             !imageChanged) {
             return false;
         }
         return true;
+    }
+    
+    const toggleAddLocation = async () => {
+        if (location == null) {
+            let { status } = await Location.requestPermissionsAsync();
+            if (status !== 'granted') {
+              setErrorMsg('Permission to access location was denied');
+            }
+      
+            let location = await Location.getCurrentPositionAsync({ accuracy: 2 });
+            setLocation({latitude: location.coords.latitude, longitude: location.coords.longitude});
+        } else {
+            setLocation(null);
+        }
     }
 
     const submitHandler = () => {
@@ -97,14 +119,14 @@ const ProfileScreen = ({ navigation, route }) => {
         }
         else {
             Alert.alert('Submitting Profile...', '', [], { cancelable: false })
-            updateUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails)
+            updateUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails, location)
                 .then((userId) => {
                     if (route.params?.newUser) {
                         route.params?.setUserIdFunction(userId);
                     }
                     Alert.alert("Profile submitted successfully!");
                 })
-            setInitialFields([name, age, gender, bioDetails, goalsDetails])
+            setInitialFields([name, age, gender, bioDetails, goalsDetails, location == null])
             setImageChanged(false)
         }
     }
@@ -119,7 +141,9 @@ const ProfileScreen = ({ navigation, route }) => {
                     setGender(user.gender);
                     setBioDetails(user.bio);
                     setGoalsDetails(user.goals);
-                    setInitialFields([user.name, user.age, user.gender, user.bio, user.goals]);
+                    setLocation(null);
+                    if (!isNaN(user.latitude)) toggleAddLocation();
+                    setInitialFields([user.name, user.age, user.gender, user.bio, user.goals, isNaN(user.latitude)]);
                     Image.getSize(user.pictureURL, () => {
                         setImageURL(user.pictureURL);
                     }, err => {
@@ -175,6 +199,22 @@ const ProfileScreen = ({ navigation, route }) => {
                     setBioDetails={setBioDetails}
                     setGoalsDetails={setGoalsDetails}
                 />
+                <TouchableOpacity style={[styles.rowContainerStyle, {marginBottom: 20}]} onPress={toggleAddLocation} >
+                    {
+                        Platform.OS === 'android' 
+                        ? <CheckBox
+                            disabled={true}
+                            value={location != null}
+                        />
+                        : location == null
+                        ? <Ionicons size={16} style={{ marginBottom: 0 }} name="md-square-outline" color="orange" />
+                        : <Ionicons size={16} style={{ marginBottom: 0 }} name="md-checkbox-outline" color="orange" />
+                    }
+                    <Text style={styles.textButtonTextStyle}>{'Let others see your location'}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25 }]} onPress={goToMyGroups} >
+                    <Text style={styles.buttonTextStyle}>My Groups</Text>
+                </TouchableOpacity>
                 <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25 }]} onPress={submitHandler} >
                     <Text style={styles.buttonTextStyle}>Submit</Text>
                 </TouchableOpacity>

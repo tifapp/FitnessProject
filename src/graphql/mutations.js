@@ -1,6 +1,51 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const createFriend = /* GraphQL */ `
+  mutation CreateFriend(
+    $input: CreateFriendInput!
+    $condition: ModelFriendConditionInput
+  ) {
+    createFriend(input: $input, condition: $condition) {
+      id
+      sender
+      receiever
+      accepted
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateFriend = /* GraphQL */ `
+  mutation UpdateFriend(
+    $input: UpdateFriendInput!
+    $condition: ModelFriendConditionInput
+  ) {
+    updateFriend(input: $input, condition: $condition) {
+      id
+      sender
+      receiever
+      accepted
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteFriend = /* GraphQL */ `
+  mutation DeleteFriend(
+    $input: DeleteFriendInput!
+    $condition: ModelFriendConditionInput
+  ) {
+    deleteFriend(input: $input, condition: $condition) {
+      id
+      sender
+      receiever
+      accepted
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const createGroup = /* GraphQL */ `
   mutation CreateGroup(
     $input: CreateGroupInput!
@@ -8,12 +53,14 @@ export const createGroup = /* GraphQL */ `
   ) {
     createGroup(input: $input, condition: $condition) {
       id
+      userID
       name
       maxUsers
       Privacy
       Sport
       Description
       characterCount
+      latitude
       createdAt
       updatedAt
     }
@@ -26,12 +73,14 @@ export const updateGroup = /* GraphQL */ `
   ) {
     updateGroup(input: $input, condition: $condition) {
       id
+      userID
       name
       maxUsers
       Privacy
       Sport
       Description
       characterCount
+      latitude
       createdAt
       updatedAt
     }
@@ -44,12 +93,14 @@ export const deleteGroup = /* GraphQL */ `
   ) {
     deleteGroup(input: $input, condition: $condition) {
       id
+      userID
       name
       maxUsers
       Privacy
       Sport
       Description
       characterCount
+      latitude
       createdAt
       updatedAt
     }
@@ -61,7 +112,6 @@ export const createPost = /* GraphQL */ `
     $condition: ModelPostConditionInput
   ) {
     createPost(input: $input, condition: $condition) {
-      id
       timestamp
       userId
       description
@@ -77,7 +127,6 @@ export const updatePost = /* GraphQL */ `
     $condition: ModelPostConditionInput
   ) {
     updatePost(input: $input, condition: $condition) {
-      id
       timestamp
       userId
       description
@@ -93,7 +142,6 @@ export const deletePost = /* GraphQL */ `
     $condition: ModelPostConditionInput
   ) {
     deletePost(input: $input, condition: $condition) {
-      id
       timestamp
       userId
       description
@@ -116,6 +164,8 @@ export const createUser = /* GraphQL */ `
       gender
       bio
       goals
+      latitude
+      longitude
       createdAt
       updatedAt
     }
@@ -134,6 +184,8 @@ export const updateUser = /* GraphQL */ `
       gender
       bio
       goals
+      latitude
+      longitude
       createdAt
       updatedAt
     }
@@ -152,6 +204,8 @@ export const deleteUser = /* GraphQL */ `
       gender
       bio
       goals
+      latitude
+      longitude
       createdAt
       updatedAt
     }

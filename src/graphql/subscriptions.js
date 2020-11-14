@@ -1,16 +1,54 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const onCreateFriend = /* GraphQL */ `
+  subscription OnCreateFriend {
+    onCreateFriend {
+      id
+      sender
+      receiever
+      accepted
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdateFriend = /* GraphQL */ `
+  subscription OnUpdateFriend {
+    onUpdateFriend {
+      id
+      sender
+      receiever
+      accepted
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteFriend = /* GraphQL */ `
+  subscription OnDeleteFriend {
+    onDeleteFriend {
+      id
+      sender
+      receiever
+      accepted
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const onCreateGroup = /* GraphQL */ `
   subscription OnCreateGroup {
     onCreateGroup {
       id
+      userID
       name
       maxUsers
       Privacy
       Sport
       Description
       characterCount
+      latitude
       createdAt
       updatedAt
     }
@@ -20,12 +58,14 @@ export const onUpdateGroup = /* GraphQL */ `
   subscription OnUpdateGroup {
     onUpdateGroup {
       id
+      userID
       name
       maxUsers
       Privacy
       Sport
       Description
       characterCount
+      latitude
       createdAt
       updatedAt
     }
@@ -35,12 +75,14 @@ export const onDeleteGroup = /* GraphQL */ `
   subscription OnDeleteGroup {
     onDeleteGroup {
       id
+      userID
       name
       maxUsers
       Privacy
       Sport
       Description
       characterCount
+      latitude
       createdAt
       updatedAt
     }
@@ -49,7 +91,6 @@ export const onDeleteGroup = /* GraphQL */ `
 export const onCreatePost = /* GraphQL */ `
   subscription OnCreatePost {
     onCreatePost {
-      id
       timestamp
       userId
       description
@@ -62,7 +103,6 @@ export const onCreatePost = /* GraphQL */ `
 export const onUpdatePost = /* GraphQL */ `
   subscription OnUpdatePost {
     onUpdatePost {
-      id
       timestamp
       userId
       description
@@ -75,7 +115,6 @@ export const onUpdatePost = /* GraphQL */ `
 export const onDeletePost = /* GraphQL */ `
   subscription OnDeletePost {
     onDeletePost {
-      id
       timestamp
       userId
       description
@@ -95,6 +134,8 @@ export const onCreateUser = /* GraphQL */ `
       gender
       bio
       goals
+      latitude
+      longitude
       createdAt
       updatedAt
     }
@@ -110,6 +151,8 @@ export const onUpdateUser = /* GraphQL */ `
       gender
       bio
       goals
+      latitude
+      longitude
       createdAt
       updatedAt
     }
@@ -125,6 +168,8 @@ export const onDeleteUser = /* GraphQL */ `
       gender
       bio
       goals
+      latitude
+      longitude
       createdAt
       updatedAt
     }
