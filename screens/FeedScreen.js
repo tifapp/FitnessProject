@@ -40,6 +40,7 @@ export default function GroupScreen({ navigation, route }) {
   const numCharsLeft = 1000 - postVal.length;
   const [updatePostID, setUpdatePostID] = useState(0);
   const [nextToken, setNextToken] = useState(null); //for pagination
+  const [amountShown, setAmountShown] = useState(5);
   
   const isMounted = useRef(); //this variable exists to eliminate the "updated state on an unmounted component" warning
   const [onlineCheck, setOnlineCheck] = useState(true);
@@ -47,12 +48,13 @@ export default function GroupScreen({ navigation, route }) {
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    showPostsAsync();
+    setAmountShown(5);
+    showPostsAsync(5);
   }, []);
 
   useEffect(() => {
     isMounted.current = true;
-    showPostsAsync();
+    showPostsAsync(amountShown);
     waitForNewPostsAsync();
     checkInternetConnection();
     return () => {isMounted.current = false;}
@@ -79,17 +81,18 @@ export default function GroupScreen({ navigation, route }) {
   const waitForNewPostsAsync = async () => {
     await API.graphql(graphqlOperation(onCreatePost)).subscribe({
       next: newPost => {
-        showPostsAsync();
+        showPostsAsync(amountShown+1);
+        setAmountShown(amountShown+1);
       }
     });
     await API.graphql(graphqlOperation(onDeletePost)).subscribe({
       next: newPost => {
-        showPostsAsync();
+        showPostsAsync(amountShown);
       }
     });
     await API.graphql(graphqlOperation(onUpdatePost)).subscribe({
       next: newPost => {
-        showPostsAsync();
+        showPostsAsync(amountShown);
       }
     });
   }
@@ -108,7 +111,7 @@ export default function GroupScreen({ navigation, route }) {
     if (updatePostID != 0) {
       try {
         await API.graphql(graphqlOperation(updatePost, { input: { timestamp: updatePostID, userId: route.params?.id, description: postVal }}));
-        showPostsAsync();
+        showPostsAsync(amountShown);
         console.log("success in updating a post");
       } catch (err) {
         console.log("error in updating post: ", err);
@@ -128,7 +131,8 @@ export default function GroupScreen({ navigation, route }) {
   
       try {
         await API.graphql(graphqlOperation(createPost, { input: newPost }));
-        showPostsAsync();
+        showPostsAsync(amountShown+1);
+        setAmountShown(amountShown+1);
         console.log("success in making a new post, group is false? ", group == null);
       } catch (err) {
         console.log("error in creating post: ", err);
@@ -138,9 +142,9 @@ export default function GroupScreen({ navigation, route }) {
     
   };
 
-  const showPostsAsync = async () => {
+  const showPostsAsync = async (amountShown) => {
     try {
-      const query = await API.graphql(graphqlOperation(postsByGroup, {limit: 10, nextToken: nextToken, group: group != null ? group.id : 'general', sortDirection: 'DESC'} ));
+      const query = await API.graphql(graphqlOperation(postsByGroup, {limit: amountShown, nextToken: null, group: group != null ? group.id : 'general', sortDirection: 'DESC'} ));
       console.log('showing these posts: ', query);
 
       if (isMounted.current) {
@@ -152,6 +156,23 @@ export default function GroupScreen({ navigation, route }) {
     }
     setRefreshing(false);
   };
+  
+  const showMorePostsAsync = async () => {
+    try {
+      const query = await API.graphql(graphqlOperation(postsByGroup, {limit: 5, nextToken: nextToken, group: group != null ? group.id : 'general', sortDirection: 'DESC'} ));
+      console.log('showing these posts: ', query);
+
+      if (isMounted.current) {
+        setPosts([...posts, ...query.data.postsByGroup.items]);
+        setAmountShown(amountShown+5);
+        setNextToken(query.data.postsByGroup.nextToken);
+      }
+    } catch (err) {
+      console.log("error in displaying posts: ", err);
+    }
+    setRefreshing(false);
+  };
+
 
   const deletePostsAsync = async (timestamp) => {
     checkInternetConnection();
@@ -212,8 +233,9 @@ export default function GroupScreen({ navigation, route }) {
           />
         )}
         keyExtractor={(item, index) => index.toString()}
+        onEndReached={showMorePostsAsync}
+        onEndReachedThreshold={1}
       />
-
 
       <StatusBar style="auto" />
     </View>
