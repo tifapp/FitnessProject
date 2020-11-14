@@ -37,6 +37,7 @@ export default () => {
     const updateUserInDB = async (recurringUser) => {
       try {
         if (imageURL !== '') {
+          const query = await Auth.currentUserInfo();
           const response = await fetch(imageURL);
           const blob = await response.blob();
           await Storage.put('profileimage.jpg', blob, { level: 'protected', contentType: 'image/jpeg' });
@@ -71,7 +72,7 @@ export default () => {
       const fields = user.data.getUser;
       console.log('returning users fields looks like', fields);
 
-      let ourUser = {
+      const ourUser = {
         id: query.attributes.sub,
         identityId: identityId,
         name: name,
@@ -79,12 +80,9 @@ export default () => {
         gender: gender,
         bio: bioDetails,
         goals: goalsDetails,
+        latitude: location == null ? null : location.latitude,
+        longitude: location == null ? null : location.longitude
       };
-
-      if (location != null) {
-        ourUser.latitude = location.latitude;
-        ourUser.longitude = location.longitude;
-      }
 
       if (fields == null) {
         createUserInDB(ourUser)
