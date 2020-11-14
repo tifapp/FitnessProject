@@ -1,7 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState, useEffect } from "react";
-import { createGroup } from "root/src/graphql/mutations";
+import { createGroup, updateGroup} from "root/src/graphql/mutations";
 import {
   StyleSheet,
   Text,
@@ -42,6 +42,26 @@ export default function CreatingGroups({route}) {
   const [characterCount, setCharacterCount] = useState(1000);
   const [myID, setMyID] = useState(route.params?.id);
 
+  //console.log(myID);
+
+  console.log(route);
+  if (route.params.check !== undefined) {
+    useEffect(() => {
+      setFields()
+    }, [route.params]);
+  }
+  
+  const setFields = () => {
+    const {group} = route.params;
+    setName(group.name);
+    setPrivacy(group.Privacy);
+    setTotalUsers(group.maxUsers)
+    setSport(group.Sport);
+    setDescription(group.Description);
+  }
+  
+  
+
   const addGroup = async () => {
     Alert.alert('Submitting Group...', '', [], {cancelable: false})
 
@@ -63,6 +83,28 @@ export default function CreatingGroups({route}) {
 
     try {
       await API.graphql(graphqlOperation(createGroup, { input: val }));
+      console.log("success");
+      alert('Group submitted successfully!');
+    } catch (err) {
+      console.log(err);
+      alert('Group could not be submitted! ' + err.errors[0].message);
+    }
+  };
+
+  const updtGroup = async () => {
+    Alert.alert('Updating Group...', '', [], {cancelable: false})
+
+    setDescription("");
+    setName("");
+    setPrivacy("Public");
+    setTotalUsers("");
+    setSport("");
+
+    try {
+      const {group} = route.params;
+      await API.graphql(graphqlOperation(updateGroup, { input: { id: group.id, name: nameVal, maxUsers: totalUsersVal,
+                                                                 Privacy: privacyVal, Sport: sportVal, 
+                                                                 Description: descriptionVal} }));
       console.log("success");
       alert('Group submitted successfully!');
     } catch (err) {
@@ -107,12 +149,16 @@ export default function CreatingGroups({route}) {
                 sportVal != "" &&
                 descriptionVal != "" &&
                 descriptionVal.length <= characterCount
-                  ? addGroup()
+                  ? (route.params.check !== undefined 
+                     ? updtGroup() : 
+                     addGroup())
                   : alert("Please fill out all available fields");
               }}
               style={styles.submitButton}
             >
-              <Text style={styles.buttonTextStyle}>Submit</Text>
+              {route.params.check !== undefined ?
+               <Text style={styles.buttonTextStyle}>Save</Text> :
+              <Text style={styles.buttonTextStyle}>Submit</Text>}
             </TouchableOpacity>
           </View>
         </View>
