@@ -38,8 +38,8 @@ const ProfileScreen = ({ navigation, route }) => {
             const title = 'Your profile has unsubmitted changes!';
             const message = '';
             const options = [
-                { text: 'Submit changes', onPress: submitHandler }, //if submithandler fails user won't know
-                { text: 'Just sign out', onPress: Auth.signOut },
+                { text: 'Submit changes', onPress: () => {submitHandler()} }, //if submithandler fails user won't know
+                { text: 'Just sign out', onPress: () => {Auth.signOut()} },
                 { text: 'Cancel', type: 'cancel', },
             ];
             Alert.alert(title, message, options, { cancelable: true });
@@ -98,6 +98,8 @@ const ProfileScreen = ({ navigation, route }) => {
     
     const toggleAddLocation = async () => {
         if (location == null) {
+            setLocation({latitude: -1, longitude: -1});
+
             let { status } = await Location.requestPermissionsAsync();
             if (status !== 'granted') {
               setErrorMsg('Permission to access location was denied');
@@ -201,7 +203,14 @@ const ProfileScreen = ({ navigation, route }) => {
                 />
                 <TouchableOpacity style={[styles.rowContainerStyle, {marginBottom: 20}]} onPress={toggleAddLocation} >
                     {
-                        Platform.OS === 'android' 
+                        location != null && location.latitude < 0
+                        ? <ActivityIndicator
+                            size="small"
+                            color="#dddddd"
+                            style={{
+                                padding: 6,
+                            }} />
+                        : Platform.OS === 'android' 
                         ? <CheckBox
                             disabled={true}
                             value={location != null}
