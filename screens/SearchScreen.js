@@ -198,9 +198,9 @@ export default function GroupSearchScreen({ navigation}) {
 
                         if (location != null) {
                             matchresult.sort((a, b) => {
-                                if (isNaN(a.latitude) && isNaN(b.latitude)) return 0;
-                                if (isNaN(a.latitude)) return 1;
-                                if (isNaN(b.latitude)) return -1;
+                                if (a.latitude == null && b.latitude == null) return 0;
+                                if (a.latitude == null) return 1;
+                                if (b.latitude == null) return -1;
                                 return computeDistance([location.latitude, location.longitude], [a.latitude, a.longitude]) - computeDistance([location.latitude, location.longitude], [b.latitude, b.longitude]);
                             })
                         }
@@ -372,7 +372,7 @@ export default function GroupSearchScreen({ navigation}) {
                 :
                 <FlatList
                     data={results}
-                    renderItem={({ item }) => <UserListItem item={item} distance={location == null || isNaN(item.latitude) ? 0 : computeDistance([location.latitude, location.longitude], [item.latitude, item.longitude])} />}
+                    renderItem={({ item }) => <UserListItem item={item} distance={location == null || item.latitude == null ? 0 : computeDistance([location.latitude, location.longitude], [item.latitude, item.longitude])} />}
                 //if there are only 1 or 2 characters in the query, dont load images
                 //if there are more than 5 search results only download images from the top 5 (paginate)
                 />
