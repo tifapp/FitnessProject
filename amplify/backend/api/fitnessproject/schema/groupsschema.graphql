@@ -1,9 +1,11 @@
 type Group @model {
   id: ID!
+  userID: ID!
   name: String!
   maxUsers: String!
   Privacy: String!
   Sport: String!
   Description: String!
   characterCount: Int
+  latitude: Float
 }

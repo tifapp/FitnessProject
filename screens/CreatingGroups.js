@@ -31,7 +31,8 @@ import PrivacySettings from "components/Privacy";
 import SportCreation from "components/Sport";
 import GroupDescription from "components/Description";
 
-export default function CreatingGroups() {
+export default function CreatingGroups({route}) {
+
   const [nameVal, setName] = useState("");
   const [privacyVal, setPrivacy] = useState("Public");
   const [totalUsersVal, setTotalUsers] = useState("");
@@ -39,6 +40,21 @@ export default function CreatingGroups() {
   const [modalOpen, setModalOpen] = useState(false);
   const [descriptionVal, setDescription] = useState("");
   const [characterCount, setCharacterCount] = useState(1000);
+  
+  if (route.params !== undefined) {
+    useEffect(() => {
+      setFields()
+    }, [route.params]);
+  }
+  
+  const setFields = () => {
+    const {group} = route.params;
+    setName(group.name);
+    setPrivacy(group.Privacy);
+    setTotalUsers(group.maxUsers)
+    setSport(group.Sport);
+    setDescription(group.Description);
+  }
 
   const addGroup = async () => {
     Alert.alert('Submitting Group...', '', [], {cancelable: false})
