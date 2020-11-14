@@ -30,6 +30,7 @@ import MaxUsers from "components/MaxUsers";
 import PrivacySettings from "components/Privacy";
 import SportCreation from "components/Sport";
 import GroupDescription from "components/Description";
+import { useNavigation } from '@react-navigation/native';
 
 export default function CreatingGroups({route}) {
   console.log(route.params?.id);
@@ -43,6 +44,7 @@ export default function CreatingGroups({route}) {
   const [myID, setMyID] = useState(route.params?.id);
 
   //console.log(myID);
+  const navigation = useNavigation();
 
   console.log(route);
   if (route.params.check !== undefined) {
@@ -102,11 +104,19 @@ export default function CreatingGroups({route}) {
 
     try {
       const {group} = route.params;
-      await API.graphql(graphqlOperation(updateGroup, { input: { id: group.id, name: nameVal, maxUsers: totalUsersVal,
-                                                                 Privacy: privacyVal, Sport: sportVal, 
-                                                                 Description: descriptionVal} }));
+      const updatedGroup = { id: group.id, name: nameVal, maxUsers: totalUsersVal,
+        Privacy: privacyVal, Sport: sportVal, 
+        Description: descriptionVal};
+      await API.graphql(graphqlOperation(updateGroup, { input: updatedGroup }));
       console.log("success");
       alert('Group submitted successfully!');
+      updatedGroup.userID = route.params?.id;
+      navigation.navigate('Search', {
+        updatedGroup: updatedGroup,
+      });
+      navigation.navigate('Group Posts Screen', {
+        group: updatedGroup,
+      });
     } catch (err) {
       console.log(err);
       alert('Group could not be submitted! ' + err.errors[0].message);

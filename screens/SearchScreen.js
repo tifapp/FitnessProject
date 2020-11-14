@@ -32,7 +32,7 @@ Amplify.configure(awsconfig);
 
 var styles = require("styles/stylesheet");
 
-export default function GroupSearchScreen({ navigation}) {
+export default function GroupSearchScreen({ navigation, route }) {
     const [location, setLocation] = useState(null); //object with latitude and longitude properties
     const [query, setQuery] = useState("");
     const [results, setResults] = useState([]);
@@ -367,7 +367,7 @@ export default function GroupSearchScreen({ navigation}) {
             {(type == "group") ?
                 <FlatList
                     data={results}
-                    renderItem={({ item }) => <ListGroupItem item={item} />}
+                    renderItem={({ item }) => <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} />}
                 />
                 :
                 <FlatList
