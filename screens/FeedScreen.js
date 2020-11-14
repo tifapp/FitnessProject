@@ -39,6 +39,7 @@ export default function GroupScreen({ navigation, route }) {
   const [posts, setPosts] = useState([]);
   const numCharsLeft = 1000 - postVal.length;
   const [updatePostID, setUpdatePostID] = useState(0);
+  const [nextToken, setNextToken] = useState(null); //for pagination
   
   const isMounted = useRef(); //this variable exists to eliminate the "updated state on an unmounted component" warning
   const [onlineCheck, setOnlineCheck] = useState(true);
@@ -139,12 +140,13 @@ export default function GroupScreen({ navigation, route }) {
 
   const showPostsAsync = async () => {
     try {
-      const query = await API.graphql(graphqlOperation(postsByGroup, {group: group != null ? group.id : 'general', sortDirection: 'DESC'} ));
-      console.log('this query', query);
-      let val = query.data.postsByGroup.items;
+      const query = await API.graphql(graphqlOperation(postsByGroup, {limit: 10, nextToken: nextToken, group: group != null ? group.id : 'general', sortDirection: 'DESC'} ));
+      console.log('showing these posts: ', query);
 
-      if (isMounted.current)
-        setPosts(val);
+      if (isMounted.current) {
+        setPosts(query.data.postsByGroup.items);
+        setNextToken(query.data.postsByGroup.nextToken);
+      }
     } catch (err) {
       console.log("error in displaying posts: ", err);
     }
