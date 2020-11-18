@@ -13,6 +13,7 @@ import {
   FlatList,
   Dimensions,
   RefreshControl,
+  ActivityIndicator,
 } from "react-native";
 // Get the aws resources configuration parameters
 import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
@@ -46,6 +47,7 @@ export default function GroupScreen({ navigation, route }) {
   const [onlineCheck, setOnlineCheck] = useState(true);
 
   const [refreshing, setRefreshing] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setAmountShown(5);
@@ -159,18 +161,21 @@ export default function GroupScreen({ navigation, route }) {
   
   const showMorePostsAsync = async () => {
     try {
-      const query = await API.graphql(graphqlOperation(postsByGroup, {limit: 5, nextToken: nextToken, group: group != null ? group.id : 'general', sortDirection: 'DESC'} ));
-      console.log('showing these posts: ', query);
-
-      if (isMounted.current) {
-        setPosts([...posts, ...query.data.postsByGroup.items]);
-        setAmountShown(amountShown+5);
-        setNextToken(query.data.postsByGroup.nextToken);
+      if (nextToken != null) {
+        setLoadingMore(true);
+        const query = await API.graphql(graphqlOperation(postsByGroup, {limit: 5, nextToken: nextToken, group: group != null ? group.id : 'general', sortDirection: 'DESC'} ));
+  
+        if (isMounted.current) {
+          setPosts([...posts, ...query.data.postsByGroup.items]);
+          setAmountShown(amountShown+5);
+          setNextToken(query.data.postsByGroup.nextToken);
+          console.log('nextToken: ', query.data.postsByGroup.nextToken);
+        }
       }
     } catch (err) {
       console.log("error in displaying posts: ", err);
     }
-    setRefreshing(false);
+    setLoadingMore(false);
   };
 
 
@@ -236,6 +241,21 @@ export default function GroupScreen({ navigation, route }) {
         onEndReached={showMorePostsAsync}
         onEndReachedThreshold={1}
       />
+
+      {
+        loadingMore
+          ? 
+          <ActivityIndicator
+              size="large"
+              color="#0000ff"
+              style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  bottom: 20
+              }} />
+          : null
+      }
 
       <StatusBar style="auto" />
     </View>

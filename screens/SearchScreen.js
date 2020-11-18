@@ -378,7 +378,7 @@ export default function GroupSearchScreen({ navigation, route }) {
                 />
             }
 
-            <TouchableOpacity style={styles.submitButton} onPress={goGroupCreationScreen}>
+            <TouchableOpacity style={[styles.submitButton , {position: 'absolute', bottom: 20}]} onPress={goGroupCreationScreen}>
                 <Text style={styles.buttonTextStyle}>Create Group</Text>
             </TouchableOpacity>
 
