@@ -156,7 +156,7 @@ const App = () => {
           <Tab.Screen 
             name="Profile"
             component={ProfileTab}
-            initialParams={{id: userId}}
+            initialParams={{id: userId, fromLookup: false}}
             options={{
               headerShown: false,
             }}
@@ -175,4 +175,4 @@ function TabBarIcon({ name, color }) {
   );
 }
 
-export default withAuthenticator(App);
+export default withAuthenticator(App, {usernameAttributes: 'email'});

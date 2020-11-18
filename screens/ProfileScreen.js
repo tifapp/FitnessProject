@@ -122,10 +122,14 @@ const ProfileScreen = ({ navigation, route }) => {
         else {
             Alert.alert('Submitting Profile...', '', [], { cancelable: false })
             updateUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails, location)
-                .then((userId) => {
+                .then((user) => {
                     if (route.params?.newUser) {
                         route.params?.setUserIdFunction(userId);
-                    }
+                    }            
+                    if (route.params?.fromLookup) {
+                        navigation.setParams({fromLookup: false})
+                        navigation.navigate('Lookup', {user: user});
+                    }         
                     Alert.alert("Profile submitted successfully!");
                 })
             setInitialFields([name, age, gender, bioDetails, goalsDetails, location == null])

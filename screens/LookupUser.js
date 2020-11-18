@@ -3,18 +3,30 @@ import { ActivityIndicator, View, StyleSheet, Text, ScrollView, TouchableOpacity
 import { Auth} from "aws-amplify";
 import { StackActions, NavigationActions } from 'react-navigation';
 import { ProfileImage } from 'components/ProfileImage'
-
+import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 var styles = require('styles/stylesheet');
 
 const LookupUser = ({ route, navigation }) => {
 
     const { user } = route.params;
+    const { id } = route.params;
 
     console.log("checking out the profile of ", user.name);
 
     return (
         <ScrollView>
-            <View>
+            {
+                user.id == id
+                ?<TouchableOpacity 
+                style={ {position: 'absolute', top: 25, right: 25, borderWidth: 1, borderRadius: 25, padding: 10}}
+                onPress={() => navigation.navigate('Profile', {
+                    screen: 'Profile',
+                    params: { fromLookup: true },
+                  })}>
+                    <MaterialCommunityIcons style={styles.editIconStyle}name="dumbbell" size={24} color="black" />
+                </TouchableOpacity>
+                :null
+            }
             <View style={styles.border}>
                 {/*
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.goBackButton}>
@@ -52,7 +64,6 @@ const LookupUser = ({ route, navigation }) => {
                     <Text>Goals: </Text>
                 </View>
             <Text style={styles.textBoxStyle}>{user.goals}</Text>
-                </View>
         </ScrollView>
     )
 }

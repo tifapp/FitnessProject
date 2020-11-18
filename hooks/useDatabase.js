@@ -98,6 +98,8 @@ export default () => {
       else {
         updateUserInDB(ourUser)
       }
+
+      return ourUser;
     }
     catch (err) {
       console.log("error: ", err);

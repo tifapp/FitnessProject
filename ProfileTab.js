@@ -19,7 +19,7 @@ const Stack = createStackNavigator();
 export default function ProfileTab({route}) {
   return (
     <Stack.Navigator initialRouteName='Profile' screenOptions={{ headerStyle: { backgroundColor: '#d3d3d3' } }}>
-      <Stack.Screen name='Profile' component={ProfileScreen}
+      <Stack.Screen name='Profile' component={ProfileScreen} initialParams={route.params}
             options={{
               headerShown: false,
             }} />
