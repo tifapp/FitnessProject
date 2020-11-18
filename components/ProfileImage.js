@@ -12,7 +12,8 @@ export const ProfileImage = (props) => { //user is required in props. it's a typ
     const addURLtoCache = () => {
         console.log('cache missed!'); //this isn't printing for some reason
         //console.log("this identity id is...", props.user.identityId); //seems to fix the profile images on the feed screen, idk why
-        if (props.isFull) {
+        if (props.isFull) { //since this only runs during cache misses, we'll probably never see this. maybe we'll need a new index with a very low priority. it'll definitely need to be cached and shown when viewing someone's profile.
+            console.log("showing full image");
             Storage.get('profileimage.jpg', { level: 'protected', identityId: props.user.identityId }) //this will incur lots of repeated calls to the backend, idk how else to fix it right now
             .then((imageURL) => { //console.log("found profile image!", imageURL); 
                 Image.getSize(imageURL, () => {
@@ -30,8 +31,9 @@ export const ProfileImage = (props) => { //user is required in props. it's a typ
             .catch((err) => { console.log("could not find image!", err) }) //should just use a "profilepic" component
         } else {
             //const region = aws_config.aws_user_files_s3_bucket_region;
+            console.log("showing thumb image");
 
-            Storage.get(`thumbnails/protected/us-west-2:${props.user.identityId}/profileimage.jpg/thumbnail-profileimage.jpg`) //idk if this will work in other regions
+            Storage.get(`thumbnails/${props.user.identityId}/thumbnail-profileimage.jpg`) //idk if this will work in other regions
                 .then((imageURL) => { //console.log("found profile image!", imageURL); 
                     Image.getSize(imageURL, () => {
                         //if (mounted) {

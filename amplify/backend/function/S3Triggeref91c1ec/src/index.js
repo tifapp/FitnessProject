@@ -24,7 +24,7 @@ exports.handler = (event, context, callback) => {
   s3.getObject({ Bucket: BUCKET, Key: KEY }).promise()
     .then(image => {
       // Use the Sharp module to resize the image and save in a buffer.
-      Sharp(image.Body).resize(60).toBuffer()
+      Sharp(image.Body).resize(70).toBuffer()
         .then((buffer) => {
           s3.putObject({ Bucket: BUCKET, Body: buffer, Key: `public/thumbnails/${PARTS[1]}/thumbnail-${FILE}` }).promise()
             .then(() => { callback(null) })
