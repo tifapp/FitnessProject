@@ -27,6 +27,7 @@ const LookupUser = ({ route, navigation }) => {
                 <ProfileImage 
                     style = {styles.imageStyle}
                     user = {user}
+                    isFull = {true}
                 />
                 </View>
                 
