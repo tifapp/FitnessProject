@@ -164,7 +164,7 @@ export default function GroupScreen({ navigation, route }) {
       if (nextToken != null) {
         setLoadingMore(true);
         const query = await API.graphql(graphqlOperation(postsByGroup, {limit: 5, nextToken: nextToken, group: group != null ? group.id : 'general', sortDirection: 'DESC'} ));
-  
+  //
         if (isMounted.current) {
           setPosts([...posts, ...query.data.postsByGroup.items]);
           setAmountShown(amountShown+5);
