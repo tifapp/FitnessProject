@@ -31,7 +31,7 @@ export const ProfileImage = (props) => { //user is required in props. it's a typ
         } else {
             //const region = aws_config.aws_user_files_s3_bucket_region;
 
-            Storage.get(`thumbnails/protected/us-west-2:${props.user.identityId}`) //idk if this will work in other regions
+            Storage.get(`thumbnails/protected/us-west-2:${props.user.identityId}/profileimage.jpg/thumbnail-profileimage.jpg`) //idk if this will work in other regions
                 .then((imageURL) => { //console.log("found profile image!", imageURL); 
                     Image.getSize(imageURL, () => {
                         //if (mounted) {

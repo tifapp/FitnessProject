@@ -4,6 +4,7 @@ import { createUser, updateUser, deleteUser } from '../src/graphql/mutations.js'
 import { getUser } from '../src/graphql/queries.js'
 import { API, graphqlOperation, Storage, Cache } from "aws-amplify";
 import { Image } from 'react-native';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 export default () => {
 
@@ -37,10 +38,17 @@ export default () => {
     const updateUserInDB = async (recurringUser) => {
       try {
         if (imageURL !== '') {
-          const query = await Auth.currentUserInfo();
-          const response = await fetch(imageURL);
+          const resizedPhoto = await ImageManipulator.manipulateAsync(
+            imageURL,
+            [{ resize: { width: 200 } }], // resize to width of 300 and preserve aspect ratio 
+            { compress: 1, format: 'jpeg' },
+           );
+          const response = await fetch(resizedPhoto.uri);
           const blob = await response.blob();
+
           await Storage.put('profileimage.jpg', blob, { level: 'protected', contentType: 'image/jpeg' });
+
+          const query = await Auth.currentUserInfo();
           Cache.setItem(query.attributes.sub, imageURL, { priority: 1, expires: Date.now() + 86400000 });
         } else {
           Storage.remove('profileimage.jpg', { level: 'protected' })
