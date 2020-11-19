@@ -12,6 +12,7 @@ import {
     TouchableWithoutFeedback,
     Keyboard,
     FlatList,
+    SectionList,
 } from "react-native";
 // Get the aws resources configuration parameters
 import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
@@ -27,7 +28,7 @@ import ListGroupItem from "components/ListGroupItem";
 import * as subscriptions from "root/src/graphql/subscriptions";
 import AgePicker from "components/basicInfoComponents/AgePicker";
 import * as Location from 'expo-location';
-import { MaterialCommunityIcons } from '@expo/vector-icons'; 
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 Amplify.configure(awsconfig);
 
@@ -36,13 +37,13 @@ var styles = require("styles/stylesheet");
 export default function GroupSearchScreen({ navigation, route }) {
     const [location, setLocation] = useState(null); //object with latitude and longitude properties
     const [query, setQuery] = useState("");
-    const [results, setResults] = useState([]);
+    const [results, setResults] = useState({});
     const [type, setType] = useState("user");
     const [mode, setMode] = useState("name");
     const [greaterThan, setGreaterThan] = useState(true);
     const [selectedAge, setSelectedAge] = useState(18);
     const [ageHidden, setAgeHidden] = useState(true);
-    const stateRef = useRef();
+    const currentQuery = useRef();
     const searchBarRef = useRef();
 
     const goGroupCreationScreen = () => {
@@ -50,7 +51,7 @@ export default function GroupSearchScreen({ navigation, route }) {
     }
 
     //still not 100% sure why this works, will have to come back to it. got from here: https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
-    stateRef.current = query;
+    currentQuery.current = query;
 
     const showResultsAsync = async (text) => {
         let items = [];
@@ -94,7 +95,7 @@ export default function GroupSearchScreen({ navigation, route }) {
                     )
 
 
-                    if (cleanText === stateRef.current.trim()) {
+                    if (cleanText === currentQuery.current.trim()) {
                         setResults(items);
                         console.log("here's some users! ", cleanText);
                     } else {
@@ -106,109 +107,57 @@ export default function GroupSearchScreen({ navigation, route }) {
             }
             else {
                 try {
-                    let matchresult;
-                    if (mode == 'name') {
-                        if (greaterThan || ageHidden) {
-                            const namematchresult = await API.graphql(graphqlOperation(listUsers, {
-                                filter: {
-                                    age: { ge: ageHidden ? 18 : selectedAge },
-                                    and: {
-                                        name: {
-                                            beginsWith: cleanText
-                                        }
+                    const matchresult = await API.graphql(graphqlOperation(listUsers, {
+                        filter: {
+                            age: { 
+                                ge: (greaterThan || ageHidden) ? (ageHidden ? 18 : selectedAge) : 18,
+                                le: (greaterThan || ageHidden) ? 100 : selectedAge,
+                            },
+                            and: {
+                                name: {
+                                    beginsWith: cleanText
+                                },
+                                or: {
+                                    bio: {
+                                        contains: cleanText
+                                    }
+                                },
+                                or: {
+                                    goals: {
+                                        contains: cleanText
                                     }
                                 }
                             }
-                            ));
-                            matchresult = namematchresult.data.listUsers.items;
-                        } else {
-                            const namematchresult = await API.graphql(graphqlOperation(listUsers, {
-                                filter: {
-                                    age: { le: selectedAge },
-                                    and: {
-                                        name: {
-                                            beginsWith: cleanText
-                                        }
-                                    }
-                                }
-                            }
-                            ));
-                            matchresult = namematchresult.data.listUsers.items;
-                        }
-                    } else {
-                        let biomatchresult;
-                        let goalsmatchresult;
-                        if (greaterThan || ageHidden) {
-
-                            biomatchresult = await API.graphql(graphqlOperation(listUsers, {
-                                filter: {
-                                    age: { ge: ageHidden ? 18 : selectedAge },
-                                    and: {
-                                        bio: {
-                                            contains: cleanText
-                                        }
-                                    }
-                                }
-                            }
-                            ));
-                            goalsmatchresult = await API.graphql(graphqlOperation(listUsers, {
-                                filter: {
-                                    age: { ge: ageHidden ? 18 : selectedAge },
-                                    and: {
-                                        goals: {
-                                            contains: cleanText
-                                        }
-                                    }
-                                }
-                            }
-                            ));
-                        } else {
-
-                            biomatchresult = await API.graphql(graphqlOperation(listUsers, {
-                                filter: {
-                                    age: { le: selectedAge },
-                                    and: {
-                                        bio: {
-                                            contains: cleanText
-                                        }
-                                    }
-                                }
-                            }
-                            ));
-                            goalsmatchresult = await API.graphql(graphqlOperation(listUsers, {
-                                filter: {
-                                    age: { le: selectedAge },
-                                    and: {
-                                        goals: {
-                                            contains: cleanText
-                                        }
-                                    }
-                                }
-                            }
-                            ));
-                        }
-
-                        matchresult = [
-                            ...biomatchresult.data.listUsers.items,
-                            ...goalsmatchresult.data.listUsers.items,
-                        ].filter((item, index, self) =>
-                            //to remove duplicates from this array
-                            index === self.findIndex((temp) => (
-                                temp.id === item.id
-                            ))
-                        )
-
-                        if (location != null) {
-                            matchresult.sort((a, b) => {
-                                if (a.latitude == null && b.latitude == null) return 0;
-                                if (a.latitude == null) return 1;
-                                if (b.latitude == null) return -1;
-                                return computeDistance([location.latitude, location.longitude], [a.latitude, a.longitude]) - computeDistance([location.latitude, location.longitude], [b.latitude, b.longitude]);
-                            })
                         }
                     }
+                    ));
 
-                    if (cleanText === stateRef.current.trim()) {
+                    matchresult = matchresult.data.listUsers.items;
+
+                    //now separate this into "matching names" and "relevant descriptions" sections by comparing cleanText with the names of each item in matchresult. data should look like this:
+                    /*
+                    const DATA = [
+                    {
+                        title: "Main dishes",
+                        data: ["Pizza", "Burger", "Risotto"]
+                    },
+                    {
+                        title: "Sides",
+                        data: ["French Fries", "Onion Rings", "Fried Shrimps"]
+                    },
+                    ];
+                    */
+
+                    if (location != null) {
+                        matchresult.sort((a, b) => {
+                            if (a.latitude == null && b.latitude == null) return 0;
+                            if (a.latitude == null) return 1;
+                            if (b.latitude == null) return -1;
+                            return computeDistance([location.latitude, location.longitude], [a.latitude, a.longitude]) - computeDistance([location.latitude, location.longitude], [b.latitude, b.longitude]);
+                        })
+                    }
+
+                    if (cleanText === currentQuery.current.trim()) {
                         setResults(matchresult);
                         console.log("here's some users! ", cleanText);
                     } else {
@@ -221,24 +170,24 @@ export default function GroupSearchScreen({ navigation, route }) {
         }
         else {
             console.log("check");
-            setResults([]);
+            setResults({});
         }
     };
 
     useEffect(() => {
         showResultsAsync(query);
     }, [query, type, greaterThan, selectedAge, mode, ageHidden]);
-    
+
     useEffect(() => {
         (async () => {
             let { status } = await Location.requestPermissionsAsync();
             if (status !== 'granted') {
-              setErrorMsg('Permission to access location was denied');
+                setErrorMsg('Permission to access location was denied');
             }
-      
+
             let location = await Location.getCurrentPositionAsync({ accuracy: 2 });
-            setLocation({latitude: location.coords.latitude, longitude: location.coords.longitude});
-          })();
+            setLocation({ latitude: location.coords.latitude, longitude: location.coords.longitude });
+        })();
     }, []);
 
     function computeDistance([lat1, long1], [lat2, long2]) {
@@ -248,17 +197,17 @@ export default function GroupSearchScreen({ navigation, route }) {
         const longInRad = toRad(long2);
 
         const distance = 6377.830272 *
-        Math.acos(
-            Math.sin(prevLatInRad) * Math.sin(latInRad) +
-            Math.cos(prevLatInRad) * Math.cos(latInRad) * Math.cos(longInRad - prevLongInRad),
-        )
-    
+            Math.acos(
+                Math.sin(prevLatInRad) * Math.sin(latInRad) +
+                Math.cos(prevLatInRad) * Math.cos(latInRad) * Math.cos(longInRad - prevLongInRad),
+            )
+
         return (
             // In kilometers
             distance.toFixed(0)
         );
     }
-    
+
     function toRad(angle) {
         return (angle * Math.PI) / 180;
     }
@@ -267,23 +216,23 @@ export default function GroupSearchScreen({ navigation, route }) {
         <View style={styles.containerStyle}>
             <TouchableOpacity style={[{
                 flexDirection: 'row',
-                marginTop: 10, 
+                marginTop: 10,
                 marginBottom: 10,
             }]}
-            onPress={() => {
-                searchBarRef.current.focus();
-            }}
+                onPress={() => {
+                    searchBarRef.current.focus();
+                }}
             >
                 <TextInput
                     ref={searchBarRef}
-                    style={[styles.textInputStyle, {flexGrow: 1}]}
-                    placeholder="Search for users or groups!"
+                    style={[styles.textInputStyle, { flexGrow: 1 }]}
+                    placeholder="Search by name or description!"
                     onChangeText={setQuery}
                     value={query}
                     clearButtonMode="always"
                 />
-                <MaterialCommunityIcons name="magnify" size={28} color="gray" 
-                style={[{marginRight: 10}]}/>
+                <MaterialCommunityIcons name="magnify" size={28} color="gray"
+                    style={[{ marginRight: 10 }]} />
             </TouchableOpacity>
 
             {
@@ -325,16 +274,19 @@ export default function GroupSearchScreen({ navigation, route }) {
                     : null
             }
 
-            <FlatList
-                data={results}
+            <SectionList
+                sections={results}
                 renderItem={({ item }) =>
                     (type == "group")
-                    ?<ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup}/>
-                    : <UserListItem item={item} distance={location == null || item.latitude == null ? 0 : computeDistance([location.latitude, location.longitude], [item.latitude, item.longitude])} />
+                        ? <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} />
+                        : <UserListItem item={item} distance={location == null || item.latitude == null ? 0 : computeDistance([location.latitude, location.longitude], [item.latitude, item.longitude])} />
                 }
+                renderSectionHeader={({ section: { title } }) => (
+                    <Text style={styles.outlineButtonTextStyle}>{title}</Text>
+                )}
             />
 
-            <TouchableOpacity style={[styles.submitButton , {position: 'absolute', bottom: 20}]} onPress={goGroupCreationScreen}>
+            <TouchableOpacity style={[styles.submitButton, { position: 'absolute', bottom: 20 }]} onPress={goGroupCreationScreen}>
                 <Text style={styles.buttonTextStyle}>Create Group</Text>
             </TouchableOpacity>
 
