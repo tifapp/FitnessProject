@@ -263,120 +263,61 @@ export default function GroupSearchScreen({ navigation, route }) {
 
     return (
         <View style={styles.containerStyle}>
-            <View style={[styles.spacingTop, {
-                flexDirection: 'row',
-                justifyContent: 'center',
-                marginBottom: 15,
-            }]}>
-                <Text style={styles.outlineButtonTextStyle}>Search for:</Text>
-                <TouchableOpacity
-                    style={(type == 'user') ? styles.outlineButtonStyle : styles.unselectedButtonStyle}
-                    onPress={() => {
-                        setType("user")
-                    }}
-                >
-                    <Text style={(type == 'user') ? styles.outlineButtonTextStyle : styles.unselectedButtonTextStyle}>users</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={(type == 'group') ? styles.outlineButtonStyle : styles.unselectedButtonStyle}
-                    onPress={() => {
-                        setType("group")
-                    }}
-                >
-                    <Text style={(type == 'group') ? styles.outlineButtonTextStyle : styles.unselectedButtonTextStyle}>groups</Text>
-                </TouchableOpacity>
-            </View>
-
             <TextInput
-                style={[styles.textInputStyle, { marginTop: 40 }]}
-                placeholder="Start Typing ..."
+                style={[styles.textInputStyle, { marginTop: 10, marginBottom: 10 }]}
+                placeholder="Search for users or groups!"
                 onChangeText={setQuery}
                 value={query}
                 clearButtonMode="always"
             />
 
-            {(type == "user") ?
-                <View>
-                    <View style={[styles.spacingTop, {
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                        marginBottom: 15,
-                    }]}>
-                        <Text style={styles.outlineButtonTextStyle}>Search by:</Text>
-                        <TouchableOpacity
-                            style={(mode == 'name') ? styles.outlineButtonStyle : styles.unselectedButtonStyle}
-                            onPress={() => {
-                                setMode("name")
-                            }}
-                        >
-                            <Text style={(mode == 'name') ? styles.outlineButtonTextStyle : styles.unselectedButtonTextStyle}>name</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={(mode == 'description') ? styles.outlineButtonStyle : styles.unselectedButtonStyle}
-                            onPress={() => {
-                                setMode("description")
-                            }}
-                        >
-                            <Text style={(mode == 'description') ? styles.outlineButtonTextStyle : styles.unselectedButtonTextStyle}>description</Text>
-                        </TouchableOpacity>
+            {
+                query !== ""
+                    ? <View>
+                        <View style={[styles.spacingTop, {
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                            zIndex: 1,
+                        }]}>
+                            <Text style={styles.outlineButtonTextStyle}>Show </Text>
+
+                            <TouchableOpacity
+                                style={[(type == 'user') ? styles.outlineButtonStyle : styles.unselectedButtonStyle, { borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type == 'user') ? "white" : "orange", }]}
+                                onPress={() => {
+                                    setType("user")
+                                }}
+                            >
+                                <Text style={(type == 'user') ? styles.outlineButtonTextStyle : styles.unselectedButtonTextStyle}>users</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[(type == 'group') ? styles.outlineButtonStyle : styles.unselectedButtonStyle, { borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type == 'group') ? "white" : "orange" }]}
+                                onPress={() => {
+                                    setType("group")
+                                }}
+                            >
+                                <Text style={(type == 'group') ? styles.outlineButtonTextStyle : styles.unselectedButtonTextStyle}>groups</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={[{
+                            position: "relative",
+                            bottom: 2,
+                            borderBottomWidth: 2,
+                            borderColor: "orange",
+                            zIndex: 0,
+                        }]}>
+                        </View>
                     </View>
-                    {
-                        ageHidden ?
-                        <View style={[styles.spacingTop, {
-                            flexDirection: 'row',
-                            justifyContent: 'center',
-                            marginBottom: 15,
-                        }]}>
-                            <TouchableOpacity
-                                onPress={() => {
-                                    setAgeHidden(false);
-                                }}
-                            >
-                                <Text style={styles.unselectedButtonTextStyle}>+ Add Age Filter</Text>
-                            </TouchableOpacity>
-                        </View>
-                        :
-                        <View style={[styles.spacingTop, {
-                            flexDirection: 'row',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            marginBottom: 15,
-                        }]}>
-                            <TouchableOpacity
-                                onPress={() => {
-                                    setAgeHidden(true);
-                                }}
-                            >
-                                <Text style={styles.unselectedButtonTextStyle}>- Remove Filter</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={styles.outlineButtonStyle}
-                                onPress={() => {
-                                    setGreaterThan(!greaterThan);
-                                }}
-                            >
-                                <Text style={styles.outlineButtonTextStyle}>{greaterThan ? 'age >=' : 'age <='}</Text>
-                            </TouchableOpacity>
-                            <AgePicker field={''} selectedValue={selectedAge} setSelectedValue={setSelectedAge} />
-                        </View>
-                    }
-                </View>
-                : null
+                    : null
             }
 
-            {(type == "group") ?
-                <FlatList
-                    data={results}
-                    renderItem={({ item }) => <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} />}
-                />
-                :
-                <FlatList
-                    data={results}
-                    renderItem={({ item }) => <UserListItem item={item} distance={location == null || item.latitude == null ? 0 : computeDistance([location.latitude, location.longitude], [item.latitude, item.longitude])} />}
-                //if there are only 1 or 2 characters in the query, dont load images
-                //if there are more than 5 search results only download images from the top 5 (paginate)
-                />
-            }
+            <FlatList
+                data={results}
+                renderItem={({ item }) =>
+                    (type == "group")
+                    ?<ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup}/>
+                    : <UserListItem item={item} distance={location == null || item.latitude == null ? 0 : computeDistance([location.latitude, location.longitude], [item.latitude, item.longitude])} />
+                }
+            />
 
             <TouchableOpacity style={[styles.submitButton , {position: 'absolute', bottom: 20}]} onPress={goGroupCreationScreen}>
                 <Text style={styles.buttonTextStyle}>Create Group</Text>
