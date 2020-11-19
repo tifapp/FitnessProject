@@ -27,6 +27,7 @@ import ListGroupItem from "components/ListGroupItem";
 import * as subscriptions from "root/src/graphql/subscriptions";
 import AgePicker from "components/basicInfoComponents/AgePicker";
 import * as Location from 'expo-location';
+import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 
 Amplify.configure(awsconfig);
 
@@ -42,6 +43,7 @@ export default function GroupSearchScreen({ navigation, route }) {
     const [selectedAge, setSelectedAge] = useState(18);
     const [ageHidden, setAgeHidden] = useState(true);
     const stateRef = useRef();
+    const searchBarRef = useRef();
 
     const goGroupCreationScreen = () => {
         navigation.navigate('Create Group')
@@ -263,13 +265,26 @@ export default function GroupSearchScreen({ navigation, route }) {
 
     return (
         <View style={styles.containerStyle}>
-            <TextInput
-                style={[styles.textInputStyle, { marginTop: 10, marginBottom: 10 }]}
-                placeholder="Search for users or groups!"
-                onChangeText={setQuery}
-                value={query}
-                clearButtonMode="always"
-            />
+            <TouchableOpacity style={[{
+                flexDirection: 'row',
+                marginTop: 10, 
+                marginBottom: 10,
+            }]}
+            onPress={() => {
+                searchBarRef.current.focus();
+            }}
+            >
+                <TextInput
+                    ref={searchBarRef}
+                    style={[styles.textInputStyle, {flexGrow: 1}]}
+                    placeholder="Search for users or groups!"
+                    onChangeText={setQuery}
+                    value={query}
+                    clearButtonMode="always"
+                />
+                <MaterialCommunityIcons name="magnify" size={28} color="gray" 
+                style={[{marginRight: 10}]}/>
+            </TouchableOpacity>
 
             {
                 query !== ""
