@@ -240,20 +240,24 @@ export default function GroupSearchScreen({ navigation, route }) {
                             <Text style={styles.outlineButtonTextStyle}>Show </Text>
 
                             <TouchableOpacity
-                                style={[(type == 'user') ? styles.outlineButtonStyle : styles.unselectedButtonStyle, { borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type == 'user') ? "white" : "orange", }]}
+                                style={(type == 'user') ? [styles.outlineButtonStyle, { 
+                                    borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type == 'user') ? "white" : "orange", }] : 
+                                [styles.unselectedButtonStyle, {backgroundColor: "lightgray", borderColor: "white", borderBottomColor: "orange"}]}
                                 onPress={() => {
                                     setType("user")
                                 }}
                             >
-                                <Text style={(type == 'user') ? styles.outlineButtonTextStyle : styles.unselectedButtonTextStyle}>users</Text>
+                                <Text style={(type == 'user') ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, {color: "white",
+                            },]}>users</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                style={[(type == 'group') ? styles.outlineButtonStyle : styles.unselectedButtonStyle, { borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type == 'group') ? "white" : "orange" }]}
+                                style={(type == 'group') ? [styles.outlineButtonStyle, { borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type == 'group') ? "white" : "orange", }] : 
+                                [styles.unselectedButtonStyle, {backgroundColor: "lightgray", borderColor: "white", borderBottomColor: "orange"}]}
                                 onPress={() => {
                                     setType("group")
                                 }}
                             >
-                                <Text style={(type == 'group') ? styles.outlineButtonTextStyle : styles.unselectedButtonTextStyle}>groups</Text>
+                                <Text style={(type == 'group') ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, {color: "white"}]}>groups</Text>
                             </TouchableOpacity>
                         </View>
                         <View style={[{
@@ -289,7 +293,7 @@ export default function GroupSearchScreen({ navigation, route }) {
                                 : <UserListItem item={item} distance={location == null || item.latitude == null ? 0 : computeDistance([location.latitude, location.longitude], [item.latitude, item.longitude])} />
                         }
                         renderSectionHeader={({ section: { title } }) => (
-                            <Text style={[styles.outlineButtonTextStyle, {marginTop: 10}]}>{title}</Text>
+                            <Text style={[styles.outlineButtonTextStyle, {marginTop: 15}]}>{title}</Text>
                         )}
                         stickySectionHeadersEnabled={true}
                     />
