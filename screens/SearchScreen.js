@@ -220,7 +220,7 @@ export default function GroupSearchScreen({ navigation, route }) {
                 <TextInput
                     ref={searchBarRef}
                     style={[styles.textInputStyle, { flexGrow: 1 }]}
-                    placeholder="Search by name or description!"
+                    placeholder="Search for names or keywords!"
                     onChangeText={setQuery}
                     value={query}
                     clearButtonMode="always"
@@ -273,33 +273,35 @@ export default function GroupSearchScreen({ navigation, route }) {
             }
 
             {
-                results.length > 0
-                    ? loading
-                    ? <ActivityIndicator 
-                    size="large" 
-                    color="#0000ff"
-                    style={{
-                      flex: 1,
-                      justifyContent: "center",
-                      flexDirection: "row",
-                      justifyContent: "space-around",
-                      padding: 10,
-                    }} />
-                    : <SectionList
-                        style={{marginBottom: 80}}
-                        sections={results}
-                        renderItem={({ item }) =>
-                            (type == "group")
-                                ? <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} />
-                                : <UserListItem item={item} distance={location == null || item.latitude == null ? 0 : computeDistance([location.latitude, location.longitude], [item.latitude, item.longitude])} />
-                        }
-                        renderSectionHeader={({ section: { title } }) => (
-                            <Text style={[styles.outlineButtonTextStyle, {marginTop: 15}]}>{title}</Text>
-                        )}
-                        stickySectionHeadersEnabled={true}
-                        keyExtractor={(item, index) => item.id}
-                    />
-                    : null
+                loading
+                    ? <ActivityIndicator
+                        size="large"
+                        color="#0000ff"
+                        style={{
+                            flex: 1,
+                            justifyContent: "center",
+                            flexDirection: "row",
+                            justifyContent: "space-around",
+                            padding: 10,
+                        }} />
+                    : results.length > 0
+                        ? <SectionList
+                            style={{ marginBottom: 80 }}
+                            sections={results}
+                            renderItem={({ item }) =>
+                                (type == "group")
+                                    ? <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} />
+                                    : <UserListItem item={item} distance={location == null || item.latitude == null ? 0 : computeDistance([location.latitude, location.longitude], [item.latitude, item.longitude])} />
+                            }
+                            renderSectionHeader={({ section: { title } }) => (
+                                <Text style={[styles.outlineButtonTextStyle, { marginTop: 15 }]}>{title}</Text>
+                            )}
+                            stickySectionHeadersEnabled={true}
+                            keyExtractor={(item, index) => item.id}
+                        />
+                        : query !== "" 
+                            ? <Text style={[styles.outlineButtonTextStyle, { marginTop: 15 }]}>No matching results</Text>
+                            : null
             }
 
             <TouchableOpacity style={[styles.submitButton, { position: 'absolute', bottom: 20 }]} onPress={goGroupCreationScreen}>
