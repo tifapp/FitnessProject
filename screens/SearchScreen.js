@@ -56,8 +56,8 @@ export default function GroupSearchScreen({ navigation, route }) {
     currentQuery.current = query;
 
     const formatresults = (cleanText, items) => {
-        let matchingnames = { title: "Matching Names", data: [] }
-        let relevantdescriptions = { title: "Relevant Descriptions", data: [] }
+        let matchingnames = { title: "Matching Names", key: "name", data: [] }
+        let relevantdescriptions = { title: "Relevant Descriptions", key: "desc", data: [] }
         items.forEach(element => {
             console.log(element.name);
             if (element.name.startsWith(cleanText)) {
@@ -296,6 +296,7 @@ export default function GroupSearchScreen({ navigation, route }) {
                             <Text style={[styles.outlineButtonTextStyle, {marginTop: 15}]}>{title}</Text>
                         )}
                         stickySectionHeadersEnabled={true}
+                        keyExtractor={(item, index) => item.id}
                     />
                     : null
             }

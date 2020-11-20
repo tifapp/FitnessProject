@@ -147,7 +147,7 @@ export default function GroupScreen({ navigation, route }) {
   const showPostsAsync = async (amountShown) => {
     try {
       const query = await API.graphql(graphqlOperation(postsByGroup, {limit: amountShown, nextToken: null, group: group != null ? group.id : 'general', sortDirection: 'DESC'} ));
-      console.log('showing these posts: ', query);
+      //console.log('showing these posts: ', query);
 
       if (isMounted.current) {
         setPosts(query.data.postsByGroup.items);
@@ -169,7 +169,7 @@ export default function GroupScreen({ navigation, route }) {
           setPosts([...posts, ...query.data.postsByGroup.items]);
           setAmountShown(amountShown+5);
           setNextToken(query.data.postsByGroup.nextToken);
-          console.log('nextToken: ', query.data.postsByGroup.nextToken);
+          //console.log('nextToken: ', query.data.postsByGroup.nextToken);
         }
       }
     } catch (err) {
@@ -237,7 +237,7 @@ export default function GroupScreen({ navigation, route }) {
             setUpdatePostID={setUpdatePostID}
           />
         )}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item, index) => item.timestamp.toString() + item.userId}
         onEndReached={showMorePostsAsync}
         onEndReachedThreshold={1}
       />
