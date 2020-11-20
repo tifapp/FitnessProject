@@ -102,10 +102,11 @@ const ProfileScreen = ({ navigation, route }) => {
 
             let { status } = await Location.requestPermissionsAsync();
             if (status !== 'granted') {
-              setErrorMsg('Permission to access location was denied');
+                setLocation(null);
+                setErrorMsg('Permission to access location was denied');
             }
       
-            let location = await Location.getCurrentPositionAsync({ accuracy: 2 });
+            let location = await Location.getCurrentPositionAsync({ accuracy: 3 });
             setLocation({latitude: location.coords.latitude, longitude: location.coords.longitude});
         } else {
             setLocation(null);

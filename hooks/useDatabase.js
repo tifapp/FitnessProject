@@ -88,8 +88,8 @@ export default () => {
         gender: gender,
         bio: bioDetails,
         goals: goalsDetails,
-        latitude: location == null ? null : location.latitude,
-        longitude: location == null ? null : location.longitude
+        latitude: location == null || location.latitude < 0 ? null : location.latitude,
+        longitude: location == null || location.latitude < 0 ? null : location.longitude
       };
 
       if (fields == null) {
