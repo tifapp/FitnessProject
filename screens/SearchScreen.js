@@ -13,6 +13,7 @@ import {
     Keyboard,
     FlatList,
     SectionList,
+    ActivityIndicator,
 } from "react-native";
 // Get the aws resources configuration parameters
 import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
@@ -43,6 +44,7 @@ export default function GroupSearchScreen({ navigation, route }) {
     const [greaterThan, setGreaterThan] = useState(true);
     const [selectedAge, setSelectedAge] = useState(18);
     const [ageHidden, setAgeHidden] = useState(true);
+    const [loading, setLoading] = useState(false);
     const currentQuery = useRef();
     const searchBarRef = useRef();
 
@@ -53,6 +55,30 @@ export default function GroupSearchScreen({ navigation, route }) {
     //still not 100% sure why this works, will have to come back to it. got from here: https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
     currentQuery.current = query;
 
+    const formatresults = (cleanText, items) => {
+        let matchingnames = { title: "Matching Names", data: [] }
+        let relevantdescriptions = { title: "Relevant Descriptions", data: [] }
+        items.forEach(element => {
+            console.log(element.name);
+            if (element.name.startsWith(cleanText)) {
+                matchingnames.data.push(element);
+            } else {
+                relevantdescriptions.data.push(element);
+            }
+        });
+
+        const allresults = [];
+        if (matchingnames.data.length > 0) allresults.push(matchingnames);
+        if (relevantdescriptions.data.length > 0) allresults.push(relevantdescriptions);
+
+        if (cleanText === currentQuery.current.trim()) {
+            setResults(allresults);
+            console.log("here's some results! ", cleanText);
+        } else {
+            console.log("ignoring!");
+        }
+    }
+
     const showResultsAsync = async (text) => {
         let items = [];
         /*
@@ -62,69 +88,65 @@ export default function GroupSearchScreen({ navigation, route }) {
         */
 
         if (text !== "") {
+            setLoading(true);
             const cleanText = text.trim();
             if (type == "group") {
                 try {
-                    const namematchresult = await API.graphql(
+                    const unformattedresults = await API.graphql(
                         graphqlOperation(listGroups, {
                             filter: {
-                                name: {
-                                    contains: cleanText,
-                                },
+                                not: {
+                                    and: {
+                                        not: {
+                                            name: {
+                                                beginsWith: cleanText
+                                            }
+                                        },
+                                        and: {
+                                            not: {
+                                                Sport: {
+                                                    contains: cleanText
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             },
                         })
                     );
 
-                    const sportmatchresult = await API.graphql(
-                        graphqlOperation(listGroups, {
-                            filter: {
-                                Sport: {
-                                    contains: cleanText,
-                                },
-                            },
-                        })
-                    );
-
-                    items = [...sportmatchresult.data.listGroups.items, ...namematchresult.data.listGroups.items];
-
-
-                    items = items.filter((item, index, self) =>
-                        index === self.findIndex((temp) => (
-                            temp.id === item.id
-                        ))
-                    )
-
-
-                    if (cleanText === currentQuery.current.trim()) {
-                        setResults(items);
-                        console.log("here's some users! ", cleanText);
-                    } else {
-                        console.log("ignoring!");
-                    }
+                    formatresults(cleanText, unformattedresults.data.listGroups.items);
                 } catch (err) {
+                    formatresults(cleanText, err.data.listGroups.items);
                     console.log("error: ", err);
                 }
             }
             else {
                 try {
-                    const matchresult = await API.graphql(graphqlOperation(listUsers, {
+                    //for some darn reason the or operator doesn't work. and works, not works, but not OR!!!! So I have to use these dumb demorgans laws.
+                    //also case insensitive search does not work for some reason.
+                    const unformattedresults = await API.graphql(graphqlOperation(listUsers, {
                         filter: {
-                            age: { 
-                                ge: (greaterThan || ageHidden) ? (ageHidden ? 18 : selectedAge) : 18,
-                                le: (greaterThan || ageHidden) ? 100 : selectedAge,
-                            },
-                            and: {
-                                name: {
-                                    beginsWith: cleanText
-                                },
-                                or: {
-                                    bio: {
-                                        contains: cleanText
-                                    }
-                                },
-                                or: {
-                                    goals: {
-                                        contains: cleanText
+                            not: {
+                                and: {
+                                    not: {
+                                        name: {
+                                            beginsWith: cleanText
+                                        }
+                                    },
+                                    and: {
+                                        not: {
+                                            and: {
+                                                bio: {
+                                                    contains: cleanText
+                                                }
+                                            },
+                                            not: {
+                                                goals: {
+                                                    contains: cleanText
+                                                }
+                                            },
+                                        }
                                     }
                                 }
                             }
@@ -132,39 +154,10 @@ export default function GroupSearchScreen({ navigation, route }) {
                     }
                     ));
 
-                    matchresult = matchresult.data.listUsers.items;
-
-                    //now separate this into "matching names" and "relevant descriptions" sections by comparing cleanText with the names of each item in matchresult. data should look like this:
-                    /*
-                    const DATA = [
-                    {
-                        title: "Main dishes",
-                        data: ["Pizza", "Burger", "Risotto"]
-                    },
-                    {
-                        title: "Sides",
-                        data: ["French Fries", "Onion Rings", "Fried Shrimps"]
-                    },
-                    ];
-                    */
-
-                    if (location != null) {
-                        matchresult.sort((a, b) => {
-                            if (a.latitude == null && b.latitude == null) return 0;
-                            if (a.latitude == null) return 1;
-                            if (b.latitude == null) return -1;
-                            return computeDistance([location.latitude, location.longitude], [a.latitude, a.longitude]) - computeDistance([location.latitude, location.longitude], [b.latitude, b.longitude]);
-                        })
-                    }
-
-                    if (cleanText === currentQuery.current.trim()) {
-                        setResults(matchresult);
-                        console.log("here's some users! ", cleanText);
-                    } else {
-                        console.log("ignoring!");
-                    }
+                    formatresults(cleanText, unformattedresults.data.listUsers.items);
                 } catch (err) {
-                    console.log("error: ", err);
+                    formatresults(cleanText, err.data.listUsers.items);
+                    console.log("error while searching: ", err);
                 }
             }
         }
@@ -172,11 +165,12 @@ export default function GroupSearchScreen({ navigation, route }) {
             console.log("check");
             setResults({});
         }
+        setLoading(false);
     };
 
     useEffect(() => {
         showResultsAsync(query);
-    }, [query, type, greaterThan, selectedAge, mode, ageHidden]);
+    }, [query, greaterThan, selectedAge, type, mode, ageHidden]);
 
     useEffect(() => {
         (async () => {
@@ -274,17 +268,33 @@ export default function GroupSearchScreen({ navigation, route }) {
                     : null
             }
 
-            <SectionList
-                sections={results}
-                renderItem={({ item }) =>
-                    (type == "group")
-                        ? <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} />
-                        : <UserListItem item={item} distance={location == null || item.latitude == null ? 0 : computeDistance([location.latitude, location.longitude], [item.latitude, item.longitude])} />
-                }
-                renderSectionHeader={({ section: { title } }) => (
-                    <Text style={styles.outlineButtonTextStyle}>{title}</Text>
-                )}
-            />
+            {
+                results.length > 0
+                    ? loading
+                    ? <ActivityIndicator 
+                    size="large" 
+                    color="#0000ff"
+                    style={{
+                      flex: 1,
+                      justifyContent: "center",
+                      flexDirection: "row",
+                      justifyContent: "space-around",
+                      padding: 10,
+                    }} />
+                    : <SectionList
+                        sections={results}
+                        renderItem={({ item }) =>
+                            (type == "group")
+                                ? <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} />
+                                : <UserListItem item={item} distance={location == null || item.latitude == null ? 0 : computeDistance([location.latitude, location.longitude], [item.latitude, item.longitude])} />
+                        }
+                        renderSectionHeader={({ section: { title } }) => (
+                            <Text style={[styles.outlineButtonTextStyle, {marginTop: 10}]}>{title}</Text>
+                        )}
+                        stickySectionHeadersEnabled={true}
+                    />
+                    : null
+            }
 
             <TouchableOpacity style={[styles.submitButton, { position: 'absolute', bottom: 20 }]} onPress={goGroupCreationScreen}>
                 <Text style={styles.buttonTextStyle}>Create Group</Text>

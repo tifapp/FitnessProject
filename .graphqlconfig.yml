@@ -1,6 +1,6 @@
 projects:
   fitnessproject:
-    schemaPath: src/graphql/schema.json
+    schemaPath: amplify/backend/api/fitnessproject/build/schema.graphql
     includes:
       - functions
     excludes:
