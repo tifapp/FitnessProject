@@ -286,6 +286,7 @@ export default function GroupSearchScreen({ navigation, route }) {
                       padding: 10,
                     }} />
                     : <SectionList
+                        style={{marginBottom: 80}}
                         sections={results}
                         renderItem={({ item }) =>
                             (type == "group")

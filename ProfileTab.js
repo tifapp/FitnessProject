@@ -5,6 +5,7 @@ import BioScreen from 'screens/BioScreen'
 import GoalsScreen from 'screens/GoalsScreen'
 import MyGroupsScreen from 'screens/MyGroupsScreen'
 import GroupPostsScreen from "screens/GroupPostsScreen";
+import CreatingGroups from "screens/CreatingGroups";
 
 import React from 'react';
 
@@ -26,6 +27,7 @@ export default function ProfileTab({route}) {
       <Stack.Screen name='Bio' component={BioScreen} />
       <Stack.Screen name='Goals' component={GoalsScreen} />
       <Stack.Screen name='My Groups' component={MyGroupsScreen} initialParams={route.params}/>
+      <Stack.Screen name='Create Group' component={CreatingGroups} initialParams={route.params}/>
       <Stack.Screen name='Group Posts Screen' component={GroupPostsScreen} initialParams={route.params}/>
     </Stack.Navigator>
   );

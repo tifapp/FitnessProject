@@ -23,7 +23,7 @@ Amplify.configure(awsconfig);
 
 var styles = require("styles/stylesheet");
 
-export default function MyGroups({route}) {
+export default function MyGroups({navigation, route}) {
     
     const [users, setUsers] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
@@ -76,6 +76,10 @@ export default function MyGroups({route}) {
                     renderItem={({ item }) => <ListGroupItem item={item} />}
             />
             </View>
+            
+            <TouchableOpacity style={[styles.submitButton]} onPress={() => navigation.navigate('Create Group')}>
+                <Text style={styles.buttonTextStyle}>Create Group</Text>
+            </TouchableOpacity>
         </View>
     );
 };
