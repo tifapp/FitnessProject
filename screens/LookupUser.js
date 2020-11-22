@@ -8,10 +8,32 @@ var styles = require('styles/stylesheet');
 
 const LookupUser = ({ route, navigation }) => {
 
-    const { user } = route.params;
+    const { userId } = route.params;
     const { id } = route.params;
 
     console.log("checking out the profile of ", user.name);
+    
+    const [user, setUser] = useState({});
+
+    const checkUsersInfo = async () => {
+        try {
+        const user = await API.graphql(
+            graphqlOperation(getUser, { id: item.userId })
+        );
+        if (user.data.getUser != null) {
+            //console.log("this post is...", item.description, "and the author is...", user.data.getUser);
+            setUser(user.data.getUser);
+        }
+
+        //console.log("success, user is ", user);
+        } catch (err) {
+        console.log("error in finding user ", err);
+        }
+    };
+
+    useEffect(() => {
+        checkUsersInfo();
+    }, []);
 
     return (
         <ScrollView>
