@@ -43,8 +43,8 @@ Amplify.configure({
 }); //for some reason this removes the unhandled promise rejection error on startup
 
 const config = {
-  itemMaxSize: 3000, // 3000 bytes
   storage: AsyncStorage,
+  capacityInBytes: 5000000,
 };
 
 const myCacheConfig = Cache.configure(config);

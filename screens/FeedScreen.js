@@ -33,6 +33,9 @@ const { width } = Dimensions.get('window');
 
 var styles = require('styles/stylesheet');
 
+const initialAmount = 10;
+const additionalAmount = 5;
+
 export default function GroupScreen({ navigation, route }) {
   
   const { group } = route.params;
@@ -41,7 +44,7 @@ export default function GroupScreen({ navigation, route }) {
   const numCharsLeft = 1000 - postVal.length;
   const [updatePostID, setUpdatePostID] = useState(0);
   const [nextToken, setNextToken] = useState(null); //for pagination
-  const [amountShown, setAmountShown] = useState(5);
+  const [amountShown, setAmountShown] = useState(initialAmount);
   
   const isMounted = useRef(); //this variable exists to eliminate the "updated state on an unmounted component" warning
   const [onlineCheck, setOnlineCheck] = useState(true);
@@ -50,8 +53,8 @@ export default function GroupScreen({ navigation, route }) {
   const [loadingMore, setLoadingMore] = useState(false);
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    setAmountShown(5);
-    showPostsAsync(5);
+    setAmountShown(initialAmount);
+    showPostsAsync(initialAmount);
   }, []);
 
   useEffect(() => {
@@ -163,11 +166,11 @@ export default function GroupScreen({ navigation, route }) {
     try {
       if (nextToken != null) {
         setLoadingMore(true);
-        const query = await API.graphql(graphqlOperation(postsByGroup, {limit: 5, nextToken: nextToken, group: group != null ? group.id : 'general', sortDirection: 'DESC'} ));
+        const query = await API.graphql(graphqlOperation(postsByGroup, {limit: additionalAmount, nextToken: nextToken, group: group != null ? group.id : 'general', sortDirection: 'DESC'} ));
   //
         if (isMounted.current) {
           setPosts([...posts, ...query.data.postsByGroup.items]);
-          setAmountShown(amountShown+5);
+          setAmountShown(amountShown+additionalAmount);
           setNextToken(query.data.postsByGroup.nextToken);
           //console.log('nextToken: ', query.data.postsByGroup.nextToken);
         }
