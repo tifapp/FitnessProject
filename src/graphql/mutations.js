@@ -1,13 +1,13 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const createFriend = /* GraphQL */ `
-  mutation CreateFriend(
-    $input: CreateFriendInput!
-    $condition: ModelFriendConditionInput
+export const createFriendship = /* GraphQL */ `
+  mutation CreateFriendship(
+    $input: CreateFriendshipInput!
+    $condition: ModelFriendshipConditionInput
   ) {
-    createFriend(input: $input, condition: $condition) {
-      id
+    createFriendship(input: $input, condition: $condition) {
+      timestamp
       sender
       receiever
       accepted
@@ -16,13 +16,13 @@ export const createFriend = /* GraphQL */ `
     }
   }
 `;
-export const updateFriend = /* GraphQL */ `
-  mutation UpdateFriend(
-    $input: UpdateFriendInput!
-    $condition: ModelFriendConditionInput
+export const updateFriendship = /* GraphQL */ `
+  mutation UpdateFriendship(
+    $input: UpdateFriendshipInput!
+    $condition: ModelFriendshipConditionInput
   ) {
-    updateFriend(input: $input, condition: $condition) {
-      id
+    updateFriendship(input: $input, condition: $condition) {
+      timestamp
       sender
       receiever
       accepted
@@ -31,13 +31,13 @@ export const updateFriend = /* GraphQL */ `
     }
   }
 `;
-export const deleteFriend = /* GraphQL */ `
-  mutation DeleteFriend(
-    $input: DeleteFriendInput!
-    $condition: ModelFriendConditionInput
+export const deleteFriendship = /* GraphQL */ `
+  mutation DeleteFriendship(
+    $input: DeleteFriendshipInput!
+    $condition: ModelFriendshipConditionInput
   ) {
-    deleteFriend(input: $input, condition: $condition) {
-      id
+    deleteFriendship(input: $input, condition: $condition) {
+      timestamp
       sender
       receiever
       accepted

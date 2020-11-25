@@ -1,10 +1,10 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const onCreateFriend = /* GraphQL */ `
-  subscription OnCreateFriend {
-    onCreateFriend {
-      id
+export const onCreateFriendship = /* GraphQL */ `
+  subscription OnCreateFriendship {
+    onCreateFriendship {
+      timestamp
       sender
       receiever
       accepted
@@ -13,10 +13,10 @@ export const onCreateFriend = /* GraphQL */ `
     }
   }
 `;
-export const onUpdateFriend = /* GraphQL */ `
-  subscription OnUpdateFriend {
-    onUpdateFriend {
-      id
+export const onUpdateFriendship = /* GraphQL */ `
+  subscription OnUpdateFriendship {
+    onUpdateFriendship {
+      timestamp
       sender
       receiever
       accepted
@@ -25,10 +25,10 @@ export const onUpdateFriend = /* GraphQL */ `
     }
   }
 `;
-export const onDeleteFriend = /* GraphQL */ `
-  subscription OnDeleteFriend {
-    onDeleteFriend {
-      id
+export const onDeleteFriendship = /* GraphQL */ `
+  subscription OnDeleteFriendship {
+    onDeleteFriendship {
+      timestamp
       sender
       receiever
       accepted

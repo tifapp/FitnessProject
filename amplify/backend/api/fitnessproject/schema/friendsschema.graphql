@@ -1,11 +1,7 @@
-type Friend @model {
-  id: ID!
-  sender: ID!
-  receiever: ID!
-  accepted: Boolean!
-}
-
-input CreateFriendInput {
+type Friend @model
+@key(fields: ["sender", "receiever"])
+{
+  timestamp: AWSTimestamp!
   sender: ID!
   receiever: ID!
   accepted: Boolean!
