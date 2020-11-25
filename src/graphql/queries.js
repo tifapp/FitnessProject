@@ -1,9 +1,9 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const getFriendship = /* GraphQL */ `
-  query GetFriendship($sender: ID!, $receiever: ID!) {
-    getFriendship(sender: $sender, receiever: $receiever) {
+export const getFriend = /* GraphQL */ `
+  query GetFriend($sender: ID!, $receiever: ID!) {
+    getFriend(sender: $sender, receiever: $receiever) {
       timestamp
       sender
       receiever
@@ -13,16 +13,16 @@ export const getFriendship = /* GraphQL */ `
     }
   }
 `;
-export const listFriendships = /* GraphQL */ `
-  query ListFriendships(
+export const listFriends = /* GraphQL */ `
+  query ListFriends(
     $sender: ID
     $receiever: ModelIDKeyConditionInput
-    $filter: ModelFriendshipFilterInput
+    $filter: ModelFriendFilterInput
     $limit: Int
     $nextToken: String
     $sortDirection: ModelSortDirection
   ) {
-    listFriendships(
+    listFriends(
       sender: $sender
       receiever: $receiever
       filter: $filter
