@@ -4,7 +4,7 @@
 export const onCreateFriend = /* GraphQL */ `
   subscription OnCreateFriend {
     onCreateFriend {
-      id
+      timestamp
       sender
       receiever
       accepted
@@ -16,7 +16,7 @@ export const onCreateFriend = /* GraphQL */ `
 export const onUpdateFriend = /* GraphQL */ `
   subscription OnUpdateFriend {
     onUpdateFriend {
-      id
+      timestamp
       sender
       receiever
       accepted
@@ -28,7 +28,7 @@ export const onUpdateFriend = /* GraphQL */ `
 export const onDeleteFriend = /* GraphQL */ `
   subscription OnDeleteFriend {
     onDeleteFriend {
-      id
+      timestamp
       sender
       receiever
       accepted

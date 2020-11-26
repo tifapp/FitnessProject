@@ -7,7 +7,7 @@ export const createFriend = /* GraphQL */ `
     $condition: ModelFriendConditionInput
   ) {
     createFriend(input: $input, condition: $condition) {
-      id
+      timestamp
       sender
       receiever
       accepted
@@ -22,7 +22,7 @@ export const updateFriend = /* GraphQL */ `
     $condition: ModelFriendConditionInput
   ) {
     updateFriend(input: $input, condition: $condition) {
-      id
+      timestamp
       sender
       receiever
       accepted
@@ -37,7 +37,7 @@ export const deleteFriend = /* GraphQL */ `
     $condition: ModelFriendConditionInput
   ) {
     deleteFriend(input: $input, condition: $condition) {
-      id
+      timestamp
       sender
       receiever
       accepted

@@ -184,28 +184,6 @@ export default function GroupSearchScreen({ navigation, route }) {
         })();
     }, []);
 
-    function computeDistance([lat1, long1], [lat2, long2]) {
-        const prevLatInRad = toRad(lat1);
-        const prevLongInRad = toRad(long1);
-        const latInRad = toRad(lat2);
-        const longInRad = toRad(long2);
-
-        const distance = 6377.830272 *
-            Math.acos(
-                Math.sin(prevLatInRad) * Math.sin(latInRad) +
-                Math.cos(prevLatInRad) * Math.cos(latInRad) * Math.cos(longInRad - prevLongInRad),
-            )
-
-        return (
-            // In kilometers
-            distance.toFixed(0)
-        );
-    }
-
-    function toRad(angle) {
-        return (angle * Math.PI) / 180;
-    }
-
     return (
         <View style={styles.containerStyle}>
             <TouchableOpacity style={[{
@@ -291,7 +269,7 @@ export default function GroupSearchScreen({ navigation, route }) {
                             renderItem={({ item }) =>
                                 (type == "group")
                                     ? <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} />
-                                    : <UserListItem item={item} distance={location == null || item.latitude == null ? 0 : computeDistance([location.latitude, location.longitude], [item.latitude, item.longitude])} />
+                                    : <UserListItem item={item} location={location} />
                             }
                             renderSectionHeader={({ section: { title } }) => (
                                 <Text style={[styles.outlineButtonTextStyle, { marginTop: 15 }]}>{title}</Text>
