@@ -4,14 +4,31 @@ import { Auth} from "aws-amplify";
 import { StackActions, NavigationActions } from 'react-navigation';
 import { ProfileImage } from 'components/ProfileImage'
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
+import computeDistance from "hooks/computeDistance"
 var styles = require('styles/stylesheet');
 
 const LookupUser = ({ route, navigation }) => {
 
     const { user } = route.params;
     const { id } = route.params;
+    const { location } = route.params;
 
     console.log("checking out the profile of ", user.name);
+
+    useEffect(() => {
+        if (location == null) {
+            (async () => {
+                let { status } = await Location.requestPermissionsAsync();
+                if (status !== 'granted') {
+                    setErrorMsg('Permission to access location was denied');
+                }
+    
+                let loc = await Location.getCurrentPositionAsync({ accuracy: 2 });
+                
+                navigation.setParams({location: { latitude: loc.coords.latitude, longitude: loc.coords.longitude }})
+            })();
+        }
+    }, []);
 
     return (
         <ScrollView>
@@ -64,6 +81,11 @@ const LookupUser = ({ route, navigation }) => {
                     <Text>Goals: </Text>
                 </View>
             <Text style={styles.textBoxStyle}>{user.goals}</Text>
+            {
+                location != null && user.latitude != null
+                ? <Text>{computeDistance([location.latitude, location.longitude], [user.latitude, user.longitude])} mi. away</Text>
+                : null
+            }
         </ScrollView>
     )
 }

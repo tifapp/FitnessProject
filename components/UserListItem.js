@@ -7,19 +7,19 @@ import {
 import { ProfileImage } from './ProfileImage'
 import { useNavigation } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons'; 
-import { computeDistance } from 'hooks/computeDistance';
+import computeDistance from "hooks/computeDistance"
 
 var styles = require('../styles/stylesheet');
 
 export default function UserListItem({
   item,
-  distance
+  location
 }) {
   const navigation = useNavigation();
 
   const goToProfile = () => {
     navigation.navigate('Lookup',
-      { user: item })
+      { user: item, location: location })
   }
 
   return (
@@ -40,9 +40,9 @@ export default function UserListItem({
           user={item}
         />
         {
-          distance > 0
-          ? <Text>{distance} km.</Text>
-          : <Text> </Text>
+          location != null && item.latitude != null
+          ? <Text>{computeDistance([location.latitude, location.longitude], [item.latitude, item.longitude])} mi.</Text>
+          : null
         }
       </View>
     </TouchableOpacity>
