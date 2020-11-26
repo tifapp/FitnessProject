@@ -1,41 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import { ActivityIndicator, View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert, Button, Image, Dimensions} from 'react-native';
-import { Auth} from "aws-amplify";
+import { API, graphqlOperation } from "aws-amplify";
 import { StackActions, NavigationActions } from 'react-navigation';
-import { ProfileImage } from 'components/ProfileImage'
+import { ProfileImageAndName } from 'components/ProfileImage'
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 import computeDistance from "hooks/computeDistance"
 import * as Location from 'expo-location';
+import { getUser } from "../src/graphql/queries";
 var styles = require('styles/stylesheet');
 
 const LookupUser = ({ route, navigation }) => {
-
+    const { user } = route.params;
     const { userId } = route.params;
     const { id } = route.params;
     const { location } = route.params;
 
-    console.log("checking out the profile of ", user.name);
-    
-    const [user, setUser] = useState({});
-
     const checkUsersInfo = async () => {
         try {
-        const user = await API.graphql(
-            graphqlOperation(getUser, { id: item.userId })
-        );
-        if (user.data.getUser != null) {
-            //console.log("this post is...", item.description, "and the author is...", user.data.getUser);
-            setUser(user.data.getUser);
-        }
+            console.log("on the lookup screen, id is: ", userId);
+            const u = await API.graphql(
+                graphqlOperation(getUser, { id: userId })
+            );
+            console.log(u.data.getUser);
+            if (u.data.getUser != null) {
+                //console.log("this post is...", item.description, "and the author is...", user.data.getUser);
+                navigation.setParams({user: u.data.getUser})
+            }
 
-        //console.log("success, user is ", user);
+            //console.log("success, user is ", user);
         } catch (err) {
-        console.log("error in finding user ", err);
+            console.log("error in finding user ", err);
         }
     };
 
     useEffect(() => {
-        checkUsersInfo();
+        if (user == null) {
+            checkUsersInfo();
+        }
     }, []);
 
     useEffect(() => {
@@ -54,6 +55,7 @@ const LookupUser = ({ route, navigation }) => {
     }, []);
 
     return (
+        user == null ? null :
         <ScrollView>
             {
                 user.id == id
@@ -76,7 +78,7 @@ const LookupUser = ({ route, navigation }) => {
                 
                 <View style={{paddingBottom: 15}}>
                  
-                <ProfileImage 
+                <ProfileImageAndName 
                     style = {styles.imageStyle}
                     user = {user}
                     isFull = {true}

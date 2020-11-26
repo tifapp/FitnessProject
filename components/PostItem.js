@@ -148,7 +148,7 @@ export default function PostItem({
   const navigation = useNavigation();
   const goToProfile = () => {
     navigation.navigate('Lookup',
-      { user: postAuthor })
+      { userId: postAuthor.id })
   }
 
   //
