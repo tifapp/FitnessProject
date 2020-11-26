@@ -4,7 +4,7 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
-import { ProfileImage } from './ProfileImage'
+import { ProfileImageAndName } from './ProfileImage'
 import { useNavigation } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons'; 
 import computeDistance from "hooks/computeDistance"
@@ -34,8 +34,7 @@ export default function UserListItem({
         marginHorizontal: 25,
       }, styles.check]}>
         <AntDesign name="user" size={24} color="black" />
-        <Text>{item.name}</Text>
-        <ProfileImage
+        <ProfileImageAndName
           style={styles.smallImageStyle}
           user={item}
         />

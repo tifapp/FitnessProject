@@ -7,25 +7,26 @@ var styles = require('../styles/stylesheet');
 //currently the predicted behavior is that it will cache images but the links will be invalid after 15 minutes-1 hour. let's see.
 
 export const ProfileImageAndName = (props) => { //user is required in props. it's a type of object described in userschema.graphql
-    const [imageURLAndName, setImageURLAndName] = useState('');
+    const [userInfo, setUserInfo] = useState(null);
 
-    const addURLtoCache = () => {
-        console.log('cache missed!'); //this isn't printing for some reason
-        //console.log("this identity id is...", props.user.identityId); //seems to fix the profile images on the feed screen, idk why
+    const addUserInfotoCache = () => {
+        //console.log('cache missed!'); //this isn't printing for some reason
+
+        const info = {name: props.user.name, imageURL: ''};
         if (props.isFull) { //since this only runs during cache misses, we'll probably never see this. maybe we'll need a new index with a very low priority. it'll definitely need to be cached and shown when viewing someone's profile.
             console.log("showing full image");
             Storage.get('profileimage.jpg', { level: 'protected', identityId: props.user.identityId }) //this will incur lots of repeated calls to the backend, idk how else to fix it right now
-            .then((imageURL) => { //console.log("found profile image!", imageURL); 
+            .then((imageURL) => { 
                 Image.getSize(imageURL, () => {
                     //if (mounted) {
-                        Cache.setItem(props.user.id, imageURL, { expires: Date.now() + 86400000 }); //profile pic url is cached for 1 day, hopefully it doesnt expire till then
-                        setImageURL(imageURL);
+                        info.imageURL = imageURL;
+                        Cache.setItem(props.user.id, info, { expires: Date.now() + 86400000 });
+                        setUserInfo(info);
                     //}
                 }, err => {
-                    //if (mounted) {
-                        Cache.setItem(props.user.id, '', { expires: Date.now() + 86400000 });
-                        setImageURL('');
-                    //}
+                    console.log("couldn't find user's profile image");
+                    Cache.setItem(props.user.id, info, { expires: Date.now() + 86400000 });
+                    setUserInfo(info);
                 });
             })
             .catch((err) => { console.log("could not find image!", err) }) //should just use a "profilepic" component
@@ -34,33 +35,33 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
             console.log("showing thumb image");
 
             Storage.get(`thumbnails/${props.user.identityId}/thumbnail-profileimage.jpg`) //idk if this will work in other regions
-                .then((imageURL) => { //console.log("found profile image!", imageURL); 
+                .then((imageURL) => {
                     Image.getSize(imageURL, () => {
                         //if (mounted) {
-                            Cache.setItem(props.user.id, imageURL, { expires: Date.now() + 86400000 }); //profile pic url is cached for 1 day, hopefully it doesnt expire till then
-                            setImageURL(imageURL);
+                            info.imageURL = imageURL;
+                            Cache.setItem(props.user.id, info, { expires: Date.now() + 86400000 }); //profile pic url is cached for 1 day, hopefully it doesnt expire till then
+                            setUserInfo(info);
                         //}
                     }, err => {
-                        //if (mounted) {
-                            Cache.setItem(props.user.id, '', { expires: Date.now() + 86400000 });
-                            setImageURL('');
-                        //}
+                        console.log("couldn't find user's thumbnail");
+                        Cache.setItem(props.user.id, info, { expires: Date.now() + 86400000 });
+                        setUserInfo(info);
                     });
                 })
                 .catch((err) => { console.log("could not find image!", err) }) //should just use a "profilepic" component
         }
-        return 'loading...';
+        return null;
     }
 
     useEffect(() => {
-        Cache.getItem(props.user.id, { callback: addURLtoCache }) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
-        .then((url)=>{
+        Cache.getItem(props.user.id, { callback: addUserInfotoCache }) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
+        .then((info)=>{
             //console.log('cache hit! ', url.substring(0, 15), '...');
-            setImageURL(url)});
+            setUserInfo(info)}); //redundant???
         //return () => mounted = false;
     }, [props.user]);
 
-    if (imageURL == 'loading...') {
+    if (userInfo == null) {
         return (
             <ActivityIndicator
                 color="#0000ff"
@@ -69,10 +70,13 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
         )
     } else {
         return (
+            <View>
             <Image 
                 style={[props.style]}
-                source={imageURL === '' ? require('../assets/icon.png') : { uri: imageURL }}
+                source={userInfo.imageURL === '' ? require('../assets/icon.png') : { uri: userInfo.imageURL }}
             />
+            <Text>{userInfo.name}</Text>
+            </View>
         )
     }
 }
