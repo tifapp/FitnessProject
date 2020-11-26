@@ -1,4 +1,4 @@
-export function computeDistance([lat1, long1], [lat2, long2]) {
+export default function computeDistance([lat1, long1], [lat2, long2]) {
     const prevLatInRad = toRad(lat1);
     const prevLongInRad = toRad(long1);
     const latInRad = toRad(lat2);

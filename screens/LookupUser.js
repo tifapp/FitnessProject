@@ -5,6 +5,7 @@ import { StackActions, NavigationActions } from 'react-navigation';
 import { ProfileImage } from 'components/ProfileImage'
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 import computeDistance from "hooks/computeDistance"
+import * as Location from 'expo-location';
 var styles = require('styles/stylesheet');
 
 const LookupUser = ({ route, navigation }) => {
@@ -83,7 +84,10 @@ const LookupUser = ({ route, navigation }) => {
             <Text style={styles.textBoxStyle}>{user.goals}</Text>
             {
                 location != null && user.latitude != null
-                ? <Text>{computeDistance([location.latitude, location.longitude], [user.latitude, user.longitude])} mi. away</Text>
+                ? 
+                <View style={styles.viewProfileScreen}>
+                    <Text style={styles.viewProfileScreen}>{computeDistance([location.latitude, location.longitude], [user.latitude, user.longitude])} mi. away</Text>
+                </View>
                 : null
             }
         </ScrollView>
