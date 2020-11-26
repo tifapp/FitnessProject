@@ -80,7 +80,7 @@ const LookupUser = ({ route, navigation }) => {
                  
                 <ProfileImageAndName 
                     style = {styles.imageStyle}
-                    user = {user}
+                    userId = {user.id}
                     isFull = {true}
                 />
                 </View>

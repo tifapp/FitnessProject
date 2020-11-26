@@ -36,7 +36,7 @@ export default function UserListItem({
         <AntDesign name="user" size={24} color="black" />
         <ProfileImageAndName
           style={styles.smallImageStyle}
-          user={item}
+          userId={item.id}
         />
         {
           location != null && item.latitude != null
