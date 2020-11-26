@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, TouchableOpacity, Alert, ActivityIndicator, } from 'react-native';
+import { View, StyleSheet, Image, TouchableOpacity, Alert, ActivityIndicator, Text, } from 'react-native';
 import { Cache, Storage } from "aws-amplify";
 
 var styles = require('../styles/stylesheet');

@@ -39,6 +39,28 @@ export default function PostItem({
   setPostVal,
   setUpdatePostID,
 }) {
+  const [postAuthor, setPostAuthor] = useState({});
+
+  const checkUsersName = async () => {
+    try {
+      const user = await API.graphql(
+        graphqlOperation(getUser, { id: item.userId })
+      );
+      if (user.data.getUser != null) {
+        //console.log("this post is...", item.description, "and the author is...", user.data.getUser);
+        setPostAuthor(user.data.getUser);
+      }
+
+      //console.log("success, user is ", user);
+    } catch (err) {
+      console.log("error in finding user ", err);
+    }
+  };
+
+  useEffect(() => {
+    checkUsersName();
+  }, []);
+
   const dateInfo = new Date(item.timestamp * 1000);
   var yearVal = dateInfo.getFullYear();
   var monthVal = dateInfo.getMonth();
@@ -126,7 +148,7 @@ export default function PostItem({
   const navigation = useNavigation();
   const goToProfile = () => {
     navigation.navigate('Lookup',
-      { userId: item.userId })
+      { user: postAuthor })
   }
 
   //
@@ -138,8 +160,11 @@ export default function PostItem({
         style={{flexDirection: 'row'}}>
           <ProfileImageAndName
             style={styles.smallImageStyle}
-            userId={item.userId}
+            user={postAuthor}
           />
+          <View>
+            <Text>{displayTime} </Text>
+          </View>
         </TouchableOpacity>
         <Text style={styles.check}>{item.description}</Text>
       </View>

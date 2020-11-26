@@ -48,7 +48,7 @@ const config = {
 };
 
 const myCacheConfig = Cache.configure(config);
-//Cache.clear();
+//Cache.clear(); //will we have to do this for the next build?
 
 var styles = require("./styles/stylesheet");
 
