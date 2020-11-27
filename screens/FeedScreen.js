@@ -33,7 +33,6 @@ const initialAmount = 10;
 const additionalAmount = 5;
 
 export default function FeedScreen({ navigation, route }) {
-  
   const { group } = route.params;
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
@@ -115,13 +114,18 @@ export default function FeedScreen({ navigation, route }) {
     setDidUserPost(true);
     checkInternetConnection();
     if (updatePostID != 0) {
+      //replace the post locally
+      let tempposts = [...posts];
+      tempposts[tempposts.findIndex(p => p.timestamp == updatePostID && p.userId == route.params?.id)].description = postVal;
+      setPosts(tempposts);
+      
       try {
         await API.graphql(graphqlOperation(updatePost, { input: { timestamp: updatePostID, userId: route.params?.id, description: postVal }}));
         console.log("success in updating a post");
       } catch (err) {
         console.log("error in updating post: ", err);
       }
-
+      
       setPostVal("");
       setUpdatePostID(0);
     }
@@ -134,6 +138,7 @@ export default function FeedScreen({ navigation, route }) {
       };
       setPostVal("");
   
+      setPosts([newPost, ...query.data.postsByGroup.items]);
       try {
         await API.graphql(graphqlOperation(createPost, { input: newPost }));
         setAmountShown(amountShown+1);
