@@ -17,9 +17,8 @@ import {
 } from "react-native";
 // Get the aws resources configuration parameters
 import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
-import { Amplify, API, Auth, graphqlOperation } from "aws-amplify";
+import { Amplify, API, graphqlOperation } from "aws-amplify";
 import { createPost, updatePost, deletePost } from "root/src/graphql/mutations";
-import { DataStore, Predicates } from "@aws-amplify/datastore";
 import { listPosts, postsByGroup } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
 import { onCreatePost, onDeletePost, onUpdatePost } from 'root/src/graphql/subscriptions';
@@ -112,12 +111,6 @@ export default function FeedScreen({ navigation, route }) {
     });
   }
 
-  const deleteButtonHandler = (key) => {
-    setPosts((posts) => {
-      return posts.filter((val) => val.id != key);
-    });
-  };
-
   // This function now also has functionality for updating a post
   // We can separate updating functionality from adding functionality if it
   // becomes an issue later on.
@@ -198,6 +191,13 @@ export default function FeedScreen({ navigation, route }) {
   const deletePostsAsync = async (timestamp) => {
     setDidUserPost(true);
     checkInternetConnection();
+
+    //locally removes the post
+    setPosts((posts) => {
+      return posts.filter((val) => (val.timestamp != timestamp && val.userId != route.params?.id));
+    });
+
+    //sends a request to remove the post from the server
     try {
       await API.graphql(graphqlOperation(deletePost, { input: { timestamp: timestamp, userId: route.params?.id } }));
     } catch {
@@ -247,7 +247,6 @@ export default function FeedScreen({ navigation, route }) {
         renderItem={({ item }) => (
           <PostItem
             item={item}
-            pressHandler={deleteButtonHandler}
             deletePostsAsync={deletePostsAsync}
             writtenByYou={item.userId === route.params?.id}
             setPostVal={setPostVal}

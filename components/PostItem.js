@@ -33,7 +33,6 @@ const months = [
 
 export default function PostItem({
   item,
-  pressHandler,
   deletePostsAsync,
   writtenByYou,
   setPostVal,
@@ -150,7 +149,7 @@ export default function PostItem({
       {writtenByYou ? (
         <View style = {{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly'}}>
           
-          <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={() => (pressHandler(item.timestamp), deletePostsAsync(item.timestamp))}>
+          <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={() => (deletePostsAsync(item.timestamp))}>
               <Text style={[styles.unselectedButtonTextStyle, {color: 'red'}]}>Delete</Text>
           </TouchableOpacity>
 
