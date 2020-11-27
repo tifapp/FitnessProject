@@ -106,5 +106,28 @@ export default () => {
     }
   };
 
+  const updateUserAsync = async (location) => {
+    //if user doesn't exist, make one
+    try {
+      const query = await Auth.currentUserInfo();
+      const user = await API.graphql(graphqlOperation(getUser, { id: query.attributes.sub }));
+      const fields = user.data.getUser;
+      console.log('returning users fields looks like', fields);
+
+      const ourUser = {
+        id: query.attributes.sub,
+        latitude: location == null || location.latitude < 0 ? null : location.latitude,
+        longitude: location == null || location.latitude < 0 ? null : location.longitude
+      };
+
+      if (fields != null) {
+        await API.graphql(graphqlOperation(updateUser, { input: ourUser }));
+      }
+    }
+    catch (err) {
+      console.log("error: ", err);
+    }   
+  }
+
   return [loadUserAsync, updateUserAsync, deleteUserAsync];
 }

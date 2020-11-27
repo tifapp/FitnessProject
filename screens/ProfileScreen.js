@@ -107,7 +107,9 @@ const ProfileScreen = ({ navigation, route }) => {
             }
       
             let location = await Location.getCurrentPositionAsync({ accuracy: 3 });
-            setLocation({latitude: location.coords.latitude, longitude: location.coords.longitude});
+            location = {latitude: location.coords.latitude, longitude: location.coords.longitude};
+            setLocation(location);
+            updateUserAsync(location);
         } else {
             setLocation(null);
         }
@@ -139,6 +141,7 @@ const ProfileScreen = ({ navigation, route }) => {
     }
 
     useEffect(() => {
+        toggleAddLocation();
         setLoading(true);
         loadUserAsync()
             .then(user => {
