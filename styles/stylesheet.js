@@ -39,6 +39,14 @@ module.exports = StyleSheet.create({
     borderRadius: 5,
   },
 
+  unsendButton: {
+    marginTop: 20,
+    alignSelf: "center",
+    backgroundColor: "red",
+    padding: 10,
+    borderRadius: 5,
+  },
+
   secondaryContainerStyle: {
     backgroundColor: '#fefefe',
   },

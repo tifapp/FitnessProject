@@ -18,7 +18,7 @@ import {
 // Get the aws resources configuration parameters
 import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
 import { Amplify, API, Auth, graphqlOperation } from "aws-amplify";
-import { createPost, updatePost, deletePost } from "root/src/graphql/mutations";
+import { createPost, updatePost, deletePost, createFriend } from "root/src/graphql/mutations";
 import { DataStore, Predicates } from "@aws-amplify/datastore";
 import { listGroups } from "root/src/graphql/queries";
 import { listUsers } from "root/src/graphql/queries";
