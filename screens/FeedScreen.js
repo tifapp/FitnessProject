@@ -11,7 +11,6 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   FlatList,
-  Dimensions,
   RefreshControl,
   ActivityIndicator,
 } from "react-native";
@@ -27,8 +26,6 @@ import NetInfo from '@react-native-community/netinfo';
 require('root/androidtimerfix');
 
 Amplify.configure(awsconfig);
-
-const { width } = Dimensions.get('window');
 
 var styles = require('styles/stylesheet');
 
