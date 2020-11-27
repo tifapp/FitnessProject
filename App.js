@@ -1,14 +1,6 @@
-import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState, useEffect } from "react";
 import {
-  StyleSheet,
-  Text,
-  Button,
-  Image,
-  View,
-  TextInput,
-  TouchableOpacity,
   ActivityIndicator,
   LogBox,
   AsyncStorage
@@ -24,7 +16,6 @@ import ComplianceScreen from "./screens/ComplianceScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import BioScreen from "./screens/BioScreen";
 import GoalsScreen from "./screens/GoalsScreen";
-import LocationTest from "./screens/LocationTest";
 import SearchStack from "./SearchStack";
 
 import { NavigationContainer } from "@react-navigation/native";
@@ -48,7 +39,7 @@ const config = {
 };
 
 const myCacheConfig = Cache.configure(config);
-//Cache.clear(); //will we have to do this for the next build?
+Cache.clear(); //will we have to do this for the next build?
 
 var styles = require("./styles/stylesheet");
 

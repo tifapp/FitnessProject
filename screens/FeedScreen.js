@@ -36,7 +36,7 @@ var styles = require('styles/stylesheet');
 const initialAmount = 10;
 const additionalAmount = 5;
 
-export default function GroupScreen({ navigation, route }) {
+export default function FeedScreen({ navigation, route }) {
   
   const { group } = route.params;
   const [postVal, setPostVal] = useState("");
@@ -45,6 +45,7 @@ export default function GroupScreen({ navigation, route }) {
   const [updatePostID, setUpdatePostID] = useState(0);
   const [nextToken, setNextToken] = useState(null); //for pagination
   const [amountShown, setAmountShown] = useState(initialAmount);
+  const [didUserPost, setDidUserPost] = useState(false);
   
   const isMounted = useRef(); //this variable exists to eliminate the "updated state on an unmounted component" warning
   const [onlineCheck, setOnlineCheck] = useState(true);
@@ -86,18 +87,27 @@ export default function GroupScreen({ navigation, route }) {
   const waitForNewPostsAsync = async () => {
     await API.graphql(graphqlOperation(onCreatePost)).subscribe({
       next: newPost => {
-        showPostsAsync(amountShown+1);
-        setAmountShown(amountShown+1);
+        if (!didUserPost) {
+          setDidUserPost(false);
+          showPostsAsync(amountShown+1);
+          setAmountShown(amountShown+1);
+        }
       }
     });
     await API.graphql(graphqlOperation(onDeletePost)).subscribe({
       next: newPost => {
-        showPostsAsync(amountShown);
+        if (!didUserPost) {
+          setDidUserPost(false);
+          showPostsAsync(amountShown);
+        }
       }
     });
     await API.graphql(graphqlOperation(onUpdatePost)).subscribe({
       next: newPost => {
-        showPostsAsync(amountShown);
+        if (!didUserPost) {
+          setDidUserPost(false);
+          showPostsAsync(amountShown);
+        }
       }
     });
   }
@@ -112,18 +122,18 @@ export default function GroupScreen({ navigation, route }) {
   // We can separate updating functionality from adding functionality if it
   // becomes an issue later on.
   const addPostAsync = async (val) => {
+    setDidUserPost(true);
     checkInternetConnection();
     if (updatePostID != 0) {
       try {
         await API.graphql(graphqlOperation(updatePost, { input: { timestamp: updatePostID, userId: route.params?.id, description: postVal }}));
-        showPostsAsync(amountShown);
         console.log("success in updating a post");
       } catch (err) {
         console.log("error in updating post: ", err);
       }
 
       setPostVal("");
-      setUpdatePostID(0)
+      setUpdatePostID(0);
     }
     else {
       const newPost = {
@@ -136,7 +146,6 @@ export default function GroupScreen({ navigation, route }) {
   
       try {
         await API.graphql(graphqlOperation(createPost, { input: newPost }));
-        showPostsAsync(amountShown+1);
         setAmountShown(amountShown+1);
         console.log("success in making a new post, group is false? ", group == null);
       } catch (err) {
@@ -148,6 +157,10 @@ export default function GroupScreen({ navigation, route }) {
   };
 
   const showPostsAsync = async (amountShown) => {
+    //do not refetch if the user themselves added or updated a post
+    //if new posts are being added don't refetch the entire batch, only append the new posts
+    //if a post is being updated don't refetch the entire batch, only update that post
+    //if a lot of new posts are being added dont save all of them, paginate them at like 100 posts
     try {
       const query = await API.graphql(graphqlOperation(postsByGroup, {limit: amountShown, nextToken: null, group: group != null ? group.id : 'general', sortDirection: 'DESC'} ));
       //console.log('showing these posts: ', query);
@@ -183,6 +196,7 @@ export default function GroupScreen({ navigation, route }) {
 
 
   const deletePostsAsync = async (timestamp) => {
+    setDidUserPost(true);
     checkInternetConnection();
     try {
       await API.graphql(graphqlOperation(deletePost, { input: { timestamp: timestamp, userId: route.params?.id } }));
