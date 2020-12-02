@@ -42,6 +42,8 @@ const LookupUser = ({ route, navigation }) => {
   useEffect(() => {
     if (user == null) {
       checkUsersInfo();
+    } else {
+      checkFriendRequest();
     }
   }, []);
 
@@ -116,11 +118,6 @@ const LookupUser = ({ route, navigation }) => {
       console.log("error in deleting post: ");
     }
   };
-
-  useEffect(() => {
-    checkFriendRequest();
-  }, []);
-
 
   return (
     user == null ? null :
