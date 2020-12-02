@@ -6,7 +6,7 @@ export const onCreateFriend = /* GraphQL */ `
     onCreateFriend {
       timestamp
       sender
-      receiever
+      receiver
       accepted
       createdAt
       updatedAt
@@ -18,7 +18,7 @@ export const onUpdateFriend = /* GraphQL */ `
     onUpdateFriend {
       timestamp
       sender
-      receiever
+      receiver
       accepted
       createdAt
       updatedAt
@@ -30,7 +30,7 @@ export const onDeleteFriend = /* GraphQL */ `
     onDeleteFriend {
       timestamp
       sender
-      receiever
+      receiver
       accepted
       createdAt
       updatedAt

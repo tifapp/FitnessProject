@@ -2,11 +2,11 @@
 // this is an auto generated file. This will be overwritten
 
 export const getFriend = /* GraphQL */ `
-  query GetFriend($sender: ID!, $receiever: ID!) {
-    getFriend(sender: $sender, receiever: $receiever) {
+  query GetFriend($sender: ID!, $receiver: ID!) {
+    getFriend(sender: $sender, receiver: $receiver) {
       timestamp
       sender
-      receiever
+      receiver
       accepted
       createdAt
       updatedAt
@@ -16,7 +16,7 @@ export const getFriend = /* GraphQL */ `
 export const listFriends = /* GraphQL */ `
   query ListFriends(
     $sender: ID
-    $receiever: ModelIDKeyConditionInput
+    $receiver: ModelIDKeyConditionInput
     $filter: ModelFriendFilterInput
     $limit: Int
     $nextToken: String
@@ -24,7 +24,7 @@ export const listFriends = /* GraphQL */ `
   ) {
     listFriends(
       sender: $sender
-      receiever: $receiever
+      receiver: $receiver
       filter: $filter
       limit: $limit
       nextToken: $nextToken
@@ -33,7 +33,7 @@ export const listFriends = /* GraphQL */ `
       items {
         timestamp
         sender
-        receiever
+        receiver
         accepted
         createdAt
         updatedAt
@@ -158,6 +158,35 @@ export const listUsers = /* GraphQL */ `
         goals
         latitude
         longitude
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const friendsByReceiver = /* GraphQL */ `
+  query FriendsByReceiver(
+    $receiver: ID
+    $sender: ModelIDKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelFriendFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    friendsByReceiver(
+      receiver: $receiver
+      sender: $sender
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        timestamp
+        sender
+        receiver
+        accepted
         createdAt
         updatedAt
       }
