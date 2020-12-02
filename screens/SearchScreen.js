@@ -185,6 +185,7 @@ export default function GroupSearchScreen({ navigation, route }) {
     }, []);
 
     return (
+        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <View style={styles.containerStyle}>
             <TouchableOpacity style={[{
                 flexDirection: 'row',
@@ -288,5 +289,6 @@ export default function GroupSearchScreen({ navigation, route }) {
 
             <StatusBar style="auto" />
         </View>
+        </TouchableWithoutFeedback>
     );
 }

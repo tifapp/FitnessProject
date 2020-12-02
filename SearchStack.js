@@ -18,8 +18,6 @@ const Stack = createStackNavigator();
 export default function GroupSearchStack({route}) {
   const {id} = route.params
   
-  //console.log("hello");
-  //console.log(id);
   return (
     <Stack.Navigator initialRouteName='Search' screenOptions={{ headerStyle: { backgroundColor: '#d3d3d3' } }}>
       <Stack.Screen name='Search' component={SearchScreen} />

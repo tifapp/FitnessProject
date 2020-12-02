@@ -17,6 +17,7 @@ import ProfileScreen from "./screens/ProfileScreen";
 import BioScreen from "./screens/BioScreen";
 import GoalsScreen from "./screens/GoalsScreen";
 import SearchStack from "./SearchStack";
+import FriendStack from "./FriendStack"
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -148,6 +149,14 @@ const App = () => {
             name="Profile"
             component={ProfileTab}
             initialParams={{id: userId, fromLookup: false}}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Tab.Screen 
+            name="Friends"
+            component={FriendStack}
+            initialParams={{id: userId}}
             options={{
               headerShown: false,
             }}
