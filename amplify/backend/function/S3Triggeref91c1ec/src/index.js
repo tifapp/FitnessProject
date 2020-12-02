@@ -13,7 +13,7 @@ exports.handler = (event, context, callback) => {
   const PARTS = KEY.split('/')
 
   /* Check to see if the base folder is already set to thumbnails, if it is we return so we do not have a recursive call. */
-  const BASE_FOLDER = PARTS[1]
+  const BASE_FOLDER = PARTS[0]
   if (BASE_FOLDER === 'thumbnails') return
 
   /* Stores the main file name in a variable */
@@ -24,9 +24,9 @@ exports.handler = (event, context, callback) => {
   s3.getObject({ Bucket: BUCKET, Key: KEY }).promise()
     .then(image => {
       // Use the Sharp module to resize the image and save in a buffer.
-      Sharp(image.Body).resize(70).toBuffer()
+      Sharp(image.Body).resize(60).toBuffer()
         .then((buffer) => {
-          s3.putObject({ Bucket: BUCKET, Body: buffer, Key: `public/thumbnails/${PARTS[1]}/thumbnail-${FILE}` }).promise()
+          s3.putObject({ Bucket: BUCKET, Body: buffer, Key: `thumbnails/${KEY}/thumbnail-${FILE}` }).promise()
             .then(() => { callback(null) })
             .catch(err => {
               console.log('error storing and resizing image: ', err)
