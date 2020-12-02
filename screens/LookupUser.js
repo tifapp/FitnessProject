@@ -63,7 +63,7 @@ const LookupUser = ({ route, navigation }) => {
   const checkFriendRequest = async () => {
     try {
       const friend = await API.graphql(
-        graphqlOperation(getFriend, { sender: route.params?.id, receiever: user.id })
+        graphqlOperation(getFriend, { sender: route.params?.id, receiver: user.id })
       );
       console.log(friend);
 
@@ -89,8 +89,8 @@ const LookupUser = ({ route, navigation }) => {
     const newFriend = {
       timestamp: Math.floor(Date.now() / 1000),
       sender: route.params?.id,
-      receiever: user.id,
-      accepted: false
+      receiver: user.id,
+      accepted: false //whoops
     };
     setFriendRequest(false);
 
@@ -108,7 +108,7 @@ const LookupUser = ({ route, navigation }) => {
     Alert.alert('Deleting Friend Request...', '', [], { cancelable: false })
     console.log("hello");
     try {
-      await API.graphql(graphqlOperation(deleteFriend, { input: { sender: route.params?.id, receiever: user.id } }));
+      await API.graphql(graphqlOperation(deleteFriend, { input: { sender: route.params?.id, receiver: user.id } }));
       setFriendRequest(true);
       console.log("success");
     } catch (err) {
