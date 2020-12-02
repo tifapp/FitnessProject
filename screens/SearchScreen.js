@@ -283,10 +283,6 @@ export default function GroupSearchScreen({ navigation, route }) {
                             : null
             }
 
-            <TouchableOpacity style={[styles.submitButton, { position: 'absolute', bottom: 20 }]} onPress={goGroupCreationScreen}>
-                <Text style={styles.buttonTextStyle}>Create Group</Text>
-            </TouchableOpacity>
-
             <StatusBar style="auto" />
         </View>
         </TouchableWithoutFeedback>
