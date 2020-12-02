@@ -106,7 +106,7 @@ export default () => {
     }
   };
 
-  const updateUserAsync = async (location) => {
+  const updateUserLocationAsync = async (location) => {
     //if user doesn't exist, make one
     try {
       const query = await Auth.currentUserInfo();
@@ -129,5 +129,5 @@ export default () => {
     }   
   }
 
-  return [loadUserAsync, updateUserAsync, deleteUserAsync];
+  return [loadUserAsync, updateUserAsync, updateUserLocationAsync, deleteUserAsync];
 }

@@ -26,7 +26,7 @@ const ProfileScreen = ({ navigation, route }) => {
     const [goalsDetailsMaxLength, setGoalsDetailsMaxLength] = useState(1000);
     const [location, setLocation] = useState(null); //object with latitude and longitude properties
     const [initialFields, setInitialFields] = useState([]);
-    const [loadUserAsync, updateUserAsync, deleteUserAsync] = useDatabase();
+    const [loadUserAsync, updateUserAsync, updateUserLocationAsync, deleteUserAsync] = useDatabase();
     
     const goToMyGroups = () => {
         navigation.navigate('My Groups')
@@ -109,7 +109,7 @@ const ProfileScreen = ({ navigation, route }) => {
             let location = await Location.getCurrentPositionAsync({ accuracy: 3 });
             location = {latitude: location.coords.latitude, longitude: location.coords.longitude};
             setLocation(location);
-            updateUserAsync(location);
+            updateUserLocationAsync(location);
         } else {
             setLocation(null);
         }
