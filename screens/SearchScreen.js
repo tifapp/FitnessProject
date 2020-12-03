@@ -28,7 +28,6 @@ import UserListItem from "components/UserListItem";
 import ListGroupItem from "components/ListGroupItem";
 import * as subscriptions from "root/src/graphql/subscriptions";
 import AgePicker from "components/basicInfoComponents/AgePicker";
-import * as Location from 'expo-location';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 Amplify.configure(awsconfig);
@@ -36,7 +35,6 @@ Amplify.configure(awsconfig);
 var styles = require("styles/stylesheet");
 
 export default function GroupSearchScreen({ navigation, route }) {
-    const [location, setLocation] = useState(null); //object with latitude and longitude properties
     const [query, setQuery] = useState("");
     const [results, setResults] = useState({});
     const [type, setType] = useState("user");
@@ -166,19 +164,7 @@ export default function GroupSearchScreen({ navigation, route }) {
 
     useEffect(() => {
         showResultsAsync(query);
-    }, [query, greaterThan, selectedAge, type, mode, ageHidden]);
-
-    useEffect(() => {
-        (async () => {
-            let { status } = await Location.requestPermissionsAsync();
-            if (status !== 'granted') {
-                setErrorMsg('Permission to access location was denied');
-            }
-
-            let location = await Location.getCurrentPositionAsync({ accuracy: 2 });
-            setLocation({ latitude: location.coords.latitude, longitude: location.coords.longitude });
-        })();
-    }, []);
+    }, [query, type]);
 
     return (
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -275,7 +261,7 @@ export default function GroupSearchScreen({ navigation, route }) {
                             renderItem={({ item }) =>
                                 (type == "group")
                                     ? <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} />
-                                    : <UserListItem item={item} location={location} />
+                                    : <UserListItem item={item} />
                             }
                             renderSectionHeader={({ section: { title } }) => (
                                 <Text style={[styles.outlineButtonTextStyle, { marginTop: 15 }]}>{title}</Text>

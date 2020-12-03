@@ -1,6 +1,9 @@
-export default function computeDistance([lat1, long1], [lat2, long2]) {
-    const prevLatInRad = toRad(lat1);
-    const prevLongInRad = toRad(long1);
+import getLocation from 'hooks/useLocation';
+
+export default function computeDistance([lat2, long2]) {
+    const location = getLocation();
+    const prevLatInRad = toRad(location.latitude);
+    const prevLongInRad = toRad(location.longitude);
     const latInRad = toRad(lat2);
     const longInRad = toRad(long2);
 

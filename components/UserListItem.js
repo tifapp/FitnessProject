@@ -4,22 +4,22 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
-import { ProfileImageAndName } from './ProfileImage'
+import { ProfileImageAndName } from './ProfileImage';
 import { useNavigation } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons'; 
-import computeDistance from "hooks/computeDistance"
+import computeDistance from "hooks/computeDistance";
+import getLocation from 'hooks/useLocation';
 
 var styles = require('../styles/stylesheet');
 
 export default function UserListItem({
   item,
-  location
 }) {
   const navigation = useNavigation();
 
   const goToProfile = () => {
     navigation.navigate('Lookup',
-      { user: item, location: location })
+      { user: item, })
   }
 
   return (
@@ -39,8 +39,8 @@ export default function UserListItem({
           userId={item.id}
         />
         {
-          location != null && item.latitude != null
-          ? <Text>{computeDistance([location.latitude, location.longitude], [item.latitude, item.longitude])} mi.</Text>
+          getLocation() != null && item.latitude != null
+          ? <Text>{computeDistance([item.latitude, item.longitude])} mi.</Text>
           : null
         }
       </View>

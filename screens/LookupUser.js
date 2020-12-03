@@ -5,7 +5,7 @@ import { StackActions, NavigationActions } from 'react-navigation';
 import { ProfileImageAndName } from 'components/ProfileImage'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import computeDistance from "hooks/computeDistance"
-import * as Location from 'expo-location';
+import getLocation from 'hooks/useLocation';
 import { getUser } from "../src/graphql/queries";
 import { createPost, updatePost, deletePost, createFriend, deleteFriend } from "root/src/graphql/mutations";
 import { getFriend } from "root/src/graphql/queries";
@@ -19,7 +19,6 @@ const LookupUser = ({ route, navigation }) => {
   const { user } = route.params;
   const { userId } = route.params;
   const { id } = route.params;
-  const { location } = route.params;
 
   const checkUsersInfo = async () => {
     try {
@@ -44,21 +43,6 @@ const LookupUser = ({ route, navigation }) => {
       checkUsersInfo();
     } else {
       checkFriendRequest();
-    }
-  }, []);
-
-  useEffect(() => {
-    if (location == null) {
-      (async () => {
-        let { status } = await Location.requestPermissionsAsync();
-        if (status !== 'granted') {
-          setErrorMsg('Permission to access location was denied');
-        }
-
-        let loc = await Location.getCurrentPositionAsync({ accuracy: 2 });
-
-        navigation.setParams({ location: { latitude: loc.coords.latitude, longitude: loc.coords.longitude } })
-      })();
     }
   }, []);
 
@@ -172,10 +156,10 @@ const LookupUser = ({ route, navigation }) => {
         </View>
         <Text style={styles.textBoxStyle}>{user.goals}</Text>
         {
-          location != null && user.latitude != null
+          getLocation() != null && user.latitude != null
             ?
             <View style={styles.viewProfileScreen}>
-              <Text style={styles.viewProfileScreen}>{computeDistance([location.latitude, location.longitude], [user.latitude, user.longitude])} mi. away</Text>
+              <Text style={styles.viewProfileScreen}>{computeDistance([user.latitude, user.longitude])} mi. away</Text>
             </View>
             : null
         }
