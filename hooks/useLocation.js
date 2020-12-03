@@ -1,22 +1,13 @@
-import { Auth } from 'aws-amplify';
-import { Alert } from 'react-native';
-import { createUser, updateUser, deleteUser } from '../src/graphql/mutations.js'
-import { getUser } from '../src/graphql/queries.js'
-import { API, graphqlOperation, Storage, Cache } from "aws-amplify";
-import * as ImageManipulator from 'expo-image-manipulator';
+import { Alert, Linking } from 'react-native';
+import * as Location from 'expo-location';
 
-export default () => {
-  const [location, setLocation] = useState(null); //object with latitude and longitude properties
- 
-  const toggleAddLocation = async () => {
-    if (location == null) {
-      setLocation({ latitude: -1, longitude: -1 });
-
-      let { status } = await Location.requestPermissionsAsync();
-      if (status !== 'granted') {
-        setLocation(null);
+export default async function getLocation(ask = false) {
+  if (global.location == null) {
+    let { status } = await Location.requestPermissionsAsync();
+    if (status !== 'granted') {
+      if (ask) {
         Alert.alert(
-          "No Notification Permission",
+          "No Location Permission",
           "please goto setting and on notification permission manual",
           [
             { text: "cancel", onPress: () => console.log("cancel") },
@@ -25,13 +16,13 @@ export default () => {
           { cancelable: false }
         );
       }
-
-      let location = await Location.getCurrentPositionAsync({ accuracy: 3 });
-      location = { latitude: location.coords.latitude, longitude: location.coords.longitude };
-      setLocation(location);
-      updateUserLocationAsync(location);
+  
+      global.location = null;
     } else {
-      setLocation(null);
+      let location = await Location.getCurrentPositionAsync({ accuracy: 3 });
+      global.location = { latitude: location.coords.latitude, longitude: location.coords.longitude };
     }
   }
+
+  return global.location;
 }

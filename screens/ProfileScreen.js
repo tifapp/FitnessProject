@@ -6,11 +6,10 @@ import DetailedInfo from 'components/detailedInfoComponents/DetailedInfo';
 import useDatabase from 'hooks/useDatabase';
 import { Auth } from "aws-amplify";
 import { StackActions, NavigationActions } from 'react-navigation';
-import * as Location from 'expo-location';
 import { Platform } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import CheckBox from '@react-native-community/checkbox'; //when ios is supported, we'll use this
-import { getLocation } from 'hooks/useLocation';
+import getLocation from 'hooks/useLocation';
 
 var styles = require('styles/stylesheet');
 
@@ -122,7 +121,7 @@ const ProfileScreen = ({ navigation, route }) => {
     }
 
     useEffect(() => {
-        if (locationEnabled) updateUserLocationAsync(getLocation());
+        if (locationEnabled) updateUserLocationAsync(getLocation(true));
         setLoading(true);
         loadUserAsync()
             .then(user => {
@@ -190,7 +189,7 @@ const ProfileScreen = ({ navigation, route }) => {
                 />
                 <TouchableOpacity style={[styles.rowContainerStyle, {marginBottom: 20}]} onPress={() => {setLocationEnabled(!locationEnabled)}} >
                     {
-                        locationEnabled === true && getLocation() == null
+                        locationEnabled === true && getLocation(true) == null
                         ? <ActivityIndicator
                             size="small"
                             color="#dddddd"
