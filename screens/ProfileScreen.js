@@ -201,7 +201,7 @@ const ProfileScreen = ({ navigation, route }) => {
                         : Platform.OS === 'android' 
                         ? <CheckBox
                             disabled={true}
-                            value={getLocation() != null}
+                            value={locationEnabled}
                         />
                         : locationEnabled === false
                         ? <Ionicons size={16} style={{ marginBottom: 0 }} name="md-square-outline" color="orange" />
