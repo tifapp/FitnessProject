@@ -89,6 +89,7 @@ const ProfileScreen = ({ navigation, route }) => {
             gender == initialFields[2] &&
             bioDetails == initialFields[3] &&
             goalsDetails == initialFields[4] &&
+            locationEnabled == initialFields[5] &&
             !imageChanged) {
             return false;
         }
@@ -104,7 +105,7 @@ const ProfileScreen = ({ navigation, route }) => {
         }
         else {
             Alert.alert('Submitting Profile...', '', [], { cancelable: false })
-            updateUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails)
+            updateUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails, locationEnabled ? getLocation() : null)
                 .then((user) => {
                     if (route.params?.newUser) {
                         route.params?.setUserIdFunction(userId);
@@ -115,7 +116,7 @@ const ProfileScreen = ({ navigation, route }) => {
                     }         
                     Alert.alert("Profile submitted successfully!");
                 })
-            setInitialFields([name, age, gender, bioDetails, goalsDetails])
+            setInitialFields([name, age, gender, bioDetails, goalsDetails, locationEnabled])
             setImageChanged(false)
         }
     }
@@ -131,7 +132,8 @@ const ProfileScreen = ({ navigation, route }) => {
                     setGender(user.gender);
                     setBioDetails(user.bio);
                     setGoalsDetails(user.goals);
-                    setInitialFields([user.name, user.age, user.gender, user.bio, user.goals]);
+                    setLocationEnabled(user.latitude != null);
+                    setInitialFields([user.name, user.age, user.gender, user.bio, user.goals, user.latitude != null]);
                     Image.getSize(user.pictureURL, () => {
                         setImageURL(user.pictureURL);
                     }, err => {
