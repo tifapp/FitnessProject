@@ -26,7 +26,7 @@ exports.handler = (event, context, callback) => {
       // Use the Sharp module to resize the image and save in a buffer.
       Sharp(image.Body).resize(60).toBuffer()
         .then((buffer) => {
-          s3.putObject({ Bucket: BUCKET, Body: buffer, Key: `thumbnails/${KEY}/thumbnail-${FILE}` }).promise()
+          s3.putObject({ Bucket: BUCKET, Body: buffer, Key: `public/thumbnails/${PARTS[1]}/thumbnail-${FILE}` }).promise()
             .then(() => { callback(null) })
             .catch(err => {
               console.log('error storing and resizing image: ', err)

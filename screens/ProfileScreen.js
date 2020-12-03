@@ -206,7 +206,7 @@ const ProfileScreen = ({ navigation, route }) => {
                         ? <Ionicons size={16} style={{ marginBottom: 0 }} name="md-square-outline" color="orange" />
                         : <Ionicons size={16} style={{ marginBottom: 0 }} name="md-checkbox-outline" color="orange" />
                     }
-                    <Text style={styles.textButtonTextStyle}>{'Let others see your location'}</Text>
+                    <Text style={styles.textButtonTextStyle}>{locationEnabled === true && getLocation(true) == null ? 'Locating user' : 'Let others see your location'}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25 }]} onPress={goToMyGroups} >
                     <Text style={styles.buttonTextStyle}>My Groups</Text>
