@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
+import { ActivityIndicator, View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert, Image, Linking } from 'react-native';
 import ProfilePic from 'components/ProfileImagePicker'
 import BasicInfo from 'components/basicInfoComponents/BasicInfo'
 import DetailedInfo from 'components/detailedInfoComponents/DetailedInfo';
@@ -24,7 +24,6 @@ const ProfileScreen = ({ navigation, route }) => {
     const [goalsDetails, setGoalsDetails] = useState('');
     const [bioDetailsMaxLength, setBioDetailsMaxLength] = useState(1000);
     const [goalsDetailsMaxLength, setGoalsDetailsMaxLength] = useState(1000);
-    const [location, setLocation] = useState(null); //object with latitude and longitude properties
     const [initialFields, setInitialFields] = useState([]);
     const [loadUserAsync, updateUserAsync, updateUserLocationAsync, deleteUserAsync] = useDatabase();
     
@@ -89,30 +88,10 @@ const ProfileScreen = ({ navigation, route }) => {
             gender == initialFields[2] &&
             bioDetails == initialFields[3] &&
             goalsDetails == initialFields[4] &&
-            (location == null) == initialFields[5] &&
             !imageChanged) {
             return false;
         }
         return true;
-    }
-    
-    const toggleAddLocation = async () => {
-        if (location == null) {
-            setLocation({latitude: -1, longitude: -1});
-
-            let { status } = await Location.requestPermissionsAsync();
-            if (status !== 'granted') {
-                setLocation(null);
-                setErrorMsg('Permission to access location was denied');
-            }
-      
-            let location = await Location.getCurrentPositionAsync({ accuracy: 3 });
-            location = {latitude: location.coords.latitude, longitude: location.coords.longitude};
-            setLocation(location);
-            updateUserLocationAsync(location);
-        } else {
-            setLocation(null);
-        }
     }
 
     const submitHandler = () => {
@@ -124,7 +103,7 @@ const ProfileScreen = ({ navigation, route }) => {
         }
         else {
             Alert.alert('Submitting Profile...', '', [], { cancelable: false })
-            updateUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails, location)
+            updateUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails)
                 .then((user) => {
                     if (route.params?.newUser) {
                         route.params?.setUserIdFunction(userId);
@@ -135,13 +114,13 @@ const ProfileScreen = ({ navigation, route }) => {
                     }         
                     Alert.alert("Profile submitted successfully!");
                 })
-            setInitialFields([name, age, gender, bioDetails, goalsDetails, location == null])
+            setInitialFields([name, age, gender, bioDetails, goalsDetails])
             setImageChanged(false)
         }
     }
 
     useEffect(() => {
-        toggleAddLocation();
+        updateUserLocationAsync(getLocation());
         setLoading(true);
         loadUserAsync()
             .then(user => {
@@ -151,9 +130,7 @@ const ProfileScreen = ({ navigation, route }) => {
                     setGender(user.gender);
                     setBioDetails(user.bio);
                     setGoalsDetails(user.goals);
-                    setLocation(null);
-                    if (user.latitude != null) toggleAddLocation();
-                    setInitialFields([user.name, user.age, user.gender, user.bio, user.goals, location == null]);
+                    setInitialFields([user.name, user.age, user.gender, user.bio, user.goals]);
                     Image.getSize(user.pictureURL, () => {
                         setImageURL(user.pictureURL);
                     }, err => {

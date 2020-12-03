@@ -40,10 +40,6 @@ export default function GroupSearchScreen({ navigation, route }) {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState({});
     const [type, setType] = useState("user");
-    const [mode, setMode] = useState("name");
-    const [greaterThan, setGreaterThan] = useState(true);
-    const [selectedAge, setSelectedAge] = useState(18);
-    const [ageHidden, setAgeHidden] = useState(true);
     const [loading, setLoading] = useState(false);
     const currentQuery = useRef();
     const searchBarRef = useRef();
@@ -218,6 +214,15 @@ export default function GroupSearchScreen({ navigation, route }) {
                         }]}>
                             <Text style={styles.outlineButtonTextStyle}>Show </Text>
 
+                            <TouchableOpacity
+                                style={(type == 'all') ? [styles.outlineButtonStyle, { borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type == 'all') ? "white" : "orange", }] : 
+                                [styles.unselectedButtonStyle, {backgroundColor: "lightgray", borderColor: "white", borderBottomColor: "orange"}]}
+                                onPress={() => {
+                                    setType("all")
+                                }}
+                            >
+                                <Text style={(type == 'all') ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, {color: "white"}]}>all</Text>
+                            </TouchableOpacity>
                             <TouchableOpacity
                                 style={(type == 'user') ? [styles.outlineButtonStyle, { 
                                     borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type == 'user') ? "white" : "orange", }] : 
