@@ -10,6 +10,7 @@ import * as Location from 'expo-location';
 import { Platform } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import CheckBox from '@react-native-community/checkbox'; //when ios is supported, we'll use this
+import { getLocation } from 'hooks/useLocation';
 
 var styles = require('styles/stylesheet');
 
@@ -25,6 +26,7 @@ const ProfileScreen = ({ navigation, route }) => {
     const [bioDetailsMaxLength, setBioDetailsMaxLength] = useState(1000);
     const [goalsDetailsMaxLength, setGoalsDetailsMaxLength] = useState(1000);
     const [initialFields, setInitialFields] = useState([]);
+    const [locationEnabled, setLocationEnabled] = useState(false);
     const [loadUserAsync, updateUserAsync, updateUserLocationAsync, deleteUserAsync] = useDatabase();
     
     const goToMyGroups = () => {
@@ -120,7 +122,7 @@ const ProfileScreen = ({ navigation, route }) => {
     }
 
     useEffect(() => {
-        updateUserLocationAsync(getLocation());
+        if (locationEnabled) updateUserLocationAsync(getLocation());
         setLoading(true);
         loadUserAsync()
             .then(user => {
@@ -186,9 +188,9 @@ const ProfileScreen = ({ navigation, route }) => {
                     setBioDetails={setBioDetails}
                     setGoalsDetails={setGoalsDetails}
                 />
-                <TouchableOpacity style={[styles.rowContainerStyle, {marginBottom: 20}]} onPress={toggleAddLocation} >
+                <TouchableOpacity style={[styles.rowContainerStyle, {marginBottom: 20}]} onPress={() => {setLocationEnabled(!locationEnabled)}} >
                     {
-                        location != null && location.latitude < 0
+                        locationEnabled === true && getLocation() == null
                         ? <ActivityIndicator
                             size="small"
                             color="#dddddd"
@@ -198,9 +200,9 @@ const ProfileScreen = ({ navigation, route }) => {
                         : Platform.OS === 'android' 
                         ? <CheckBox
                             disabled={true}
-                            value={location != null}
+                            value={getLocation() != null}
                         />
-                        : location == null
+                        : locationEnabled === false
                         ? <Ionicons size={16} style={{ marginBottom: 0 }} name="md-square-outline" color="orange" />
                         : <Ionicons size={16} style={{ marginBottom: 0 }} name="md-checkbox-outline" color="orange" />
                     }
