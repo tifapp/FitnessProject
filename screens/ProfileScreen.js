@@ -30,7 +30,11 @@ const ProfileScreen = ({ navigation, route }) => {
     
     const goToMyGroups = () => {
         navigation.navigate('My Groups')
-      }
+    }
+
+    const goToFriendScreen = () => {
+        navigation.navigate('Friend Screen')
+    }
 
     async function signOut() {
         console.log("user is signing out.");
@@ -229,9 +233,15 @@ const ProfileScreen = ({ navigation, route }) => {
                     }
                     <Text style={styles.textButtonTextStyle}>{'Let others see your location'}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25 }]} onPress={goToMyGroups} >
-                    <Text style={styles.buttonTextStyle}>My Groups</Text>
-                </TouchableOpacity>
+                <View style = {{flexDirection: 'row', justifyContent: 'center'}}>
+                    <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25, marginHorizontal: 5}]} onPress={goToMyGroups} >
+                        <Text style={styles.buttonTextStyle}>My Groups</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25, marginHorizontal: 5}]} onPress={goToFriendScreen} >
+                        <Text style={styles.buttonTextStyle}>My Friends</Text>
+                    </TouchableOpacity>
+                </View>
+                
                 <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25 }]} onPress={submitHandler} >
                     <Text style={styles.buttonTextStyle}>Submit</Text>
                 </TouchableOpacity>

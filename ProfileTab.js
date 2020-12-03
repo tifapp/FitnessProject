@@ -6,6 +6,7 @@ import GoalsScreen from 'screens/GoalsScreen'
 import MyGroupsScreen from 'screens/MyGroupsScreen'
 import GroupPostsScreen from "screens/GroupPostsScreen";
 import CreatingGroups from "screens/CreatingGroups";
+import FriendScreen from "screens/FriendScreen";
 
 import React from 'react';
 
@@ -29,6 +30,7 @@ export default function ProfileTab({route}) {
       <Stack.Screen name='My Groups' component={MyGroupsScreen} initialParams={route.params}/>
       <Stack.Screen name='Create Group' component={CreatingGroups} initialParams={route.params}/>
       <Stack.Screen name='Group Posts Screen' component={GroupPostsScreen} initialParams={route.params}/>
+      <Stack.Screen name='Friend Screen' component={FriendScreen} initialParams={route.params}/>
     </Stack.Navigator>
   );
 }
