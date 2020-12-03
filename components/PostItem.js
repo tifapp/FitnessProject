@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { getUser } from "../src/graphql/queries";
-import { ProfileImageAndName } from './ProfileImage'
+import { ProfileImageAndName } from './ProfileImageAndName'
 import { Amplify, API, graphqlOperation } from "aws-amplify";
 import { useNavigation } from '@react-navigation/native';
 

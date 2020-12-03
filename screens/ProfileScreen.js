@@ -3,9 +3,8 @@ import { ActivityIndicator, View, StyleSheet, Text, ScrollView, TouchableOpacity
 import ProfilePic from 'components/ProfileImagePicker'
 import BasicInfo from 'components/basicInfoComponents/BasicInfo'
 import DetailedInfo from 'components/detailedInfoComponents/DetailedInfo';
-import useDatabase from 'hooks/useDatabase';
+import useUserDatabase from 'hooks/useUserDatabase';
 import { Auth } from "aws-amplify";
-import { StackActions, NavigationActions } from 'react-navigation';
 import { Platform } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import CheckBox from '@react-native-community/checkbox'; //when ios is supported, we'll use this
@@ -26,7 +25,7 @@ const ProfileScreen = ({ navigation, route }) => {
     const [goalsDetailsMaxLength, setGoalsDetailsMaxLength] = useState(1000);
     const [initialFields, setInitialFields] = useState([]);
     const [locationEnabled, setLocationEnabled] = useState(false);
-    const [loadUserAsync, updateUserAsync, updateUserLocationAsync, deleteUserAsync] = useDatabase();
+    const [loadUserAsync, updateUserAsync, updateUserLocationAsync, deleteUserAsync] = useUserDatabase();
     
     const goToMyGroups = () => {
         navigation.navigate('My Groups')

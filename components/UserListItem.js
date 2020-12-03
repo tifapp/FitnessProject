@@ -4,7 +4,7 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
-import { ProfileImageAndName } from './ProfileImage';
+import { ProfileImageAndName } from './ProfileImageAndName';
 import { useNavigation } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons'; 
 import computeDistance from "hooks/computeDistance";

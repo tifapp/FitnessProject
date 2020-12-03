@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ActivityIndicator, View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert, Button, Image, Dimensions } from 'react-native';
 import { API, graphqlOperation } from "aws-amplify";
 import { StackActions, NavigationActions } from 'react-navigation';
-import { ProfileImageAndName } from 'components/ProfileImage'
+import { ProfileImageAndName } from 'components/ProfileImageAndName'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import computeDistance from "hooks/computeDistance"
 import getLocation from 'hooks/useLocation';
