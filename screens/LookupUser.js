@@ -19,7 +19,8 @@ const LookupUser = ({ route, navigation }) => {
   const { user } = route.params;
   const { userId } = route.params;
   const { id } = route.params;
-
+  const { location } = route.params;
+  console.log(route.params)
   const checkUsersInfo = async () => {
     try {
       console.log("on the lookup screen, id is: ", userId);
