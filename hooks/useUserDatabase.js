@@ -18,6 +18,7 @@ export default () => {
     if (fields == null) {
       console.log("user doesn't exist, they must be making their profile for the first time");
     } else {
+      Cache.setItem(query.attributes.sub, { name: user.data.getUser.name, imageURL: imageURL }, { priority: 1, expires: Date.now() + 86400000 });
       return {...fields, pictureURL: imageURL};
     }
   };
@@ -41,7 +42,7 @@ export default () => {
             imageURL,
             [{ resize: { width: 200 } }], // resize to width of 300 and preserve aspect ratio 
             { compress: 1, format: 'jpeg' },
-           );
+          );
           const response = await fetch(resizedPhoto.uri);
           const blob = await response.blob();
 
@@ -53,6 +54,7 @@ export default () => {
           Storage.remove('profileimage.jpg', { level: 'protected' })
             .then(result => console.log("removed profile image!", result))
             .catch(err => console.log(err));
+          Cache.setItem(query.attributes.sub, { name: name, imageURL: '' }, { priority: 1, expires: Date.now() + 86400000 });
         }
         await API.graphql(graphqlOperation(updateUser, { input: recurringUser }));
         console.log("updated user successfully");
