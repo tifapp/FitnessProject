@@ -42,7 +42,7 @@ const FriendScreen = ({route, navigation }) => {
     const rejectRequest = async (item) => {
         // delete friend object
         try {
-            await API.graphql(graphqlOperation(deleteFriend, { input: { id: item }}));
+            await API.graphql(graphqlOperation(deleteFriend, { input: { sender: item.sender, receiver: item.receiver}}));
         }
         catch(err){
             console.log("error: ", err);
@@ -54,7 +54,7 @@ const FriendScreen = ({route, navigation }) => {
     const acceptRequest =  async (item) => {
         // accept friend request
         try {
-            await API.graphql(graphqlOperation(updateFriend, { input: { id: item, accepted: true}}));
+            await API.graphql(graphqlOperation(updateFriend, { input: { sender: item.sender, receiver: item.receiver, accepted: true}}));
         }
         catch(err){
             console.log("error: ", err);
