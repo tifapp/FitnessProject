@@ -16,7 +16,7 @@ import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
 import { Amplify, API, graphqlOperation } from "aws-amplify";
 import { updateFriend, deleteFriend } from "root/src/graphql/mutations";
 import { listFriends } from "root/src/graphql/queries";
-import { ProfileImageAndName } from '../components/ProfileImage'
+import { ProfileImageAndName } from 'components/ProfileImageAndName'
 
 import { AntDesign } from '@expo/vector-icons'; 
 import { Entypo } from '@expo/vector-icons'; 

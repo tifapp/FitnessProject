@@ -51,17 +51,21 @@ const LookupUser = ({ route, navigation }) => {
 
   const checkFriendRequest = async () => {
     try {
-      const friend = await API.graphql(
+      const sentFriend = await API.graphql(
         graphqlOperation(getFriend, { sender: route.params?.id, receiver: user.id })
       );
+      const receivedFriend = await API.graphql(
+        graphqlOperation(getFriend, { sender: user.id, receiver: route.params?.id })
+      );
+      const friendData = sentFriend.data.getFriend ?? receivedFriend.data.getFriend;
 
       setFriendsSince("");
 
-      if (friend.data.getFriend != null && friend.data.getFriend.accepted == true) {
-        setFriendsSince(printTime(friend.data.getFriend.timestamp * 1000));
+      if (friendData != null && friendData.accepted == true) {
+        setFriendsSince(printTime(friendData.timestamp * 1000));
         setFriendRequest(false);
       }
-      else if (friend.data.getFriend != null && friend.data.getFriend.accepted == false) {
+      else if (friendData != null && friendData.accepted == false) {
         setFriendRequest(false);
       }
       else {
@@ -153,9 +157,6 @@ const LookupUser = ({ route, navigation }) => {
 
         </View>
         <View style={styles.viewProfileScreen}>
-          <Text>Friends For: {friendsSince} </Text>
-        </View>
-        <View style={styles.viewProfileScreen}>
           <Text>Bio: </Text>
         </View>
         <Text style={styles.textBoxStyle}>{user.bio}</Text>
@@ -171,6 +172,9 @@ const LookupUser = ({ route, navigation }) => {
             </View>
             : null
         }
+        <View style={styles.viewProfileScreen}>
+          <Text>Friends for {friendsSince} </Text>
+        </View>
         <View style={styles.buttonFormat}>
           {friendRequest ?
             <TouchableOpacity

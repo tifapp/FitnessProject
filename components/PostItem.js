@@ -17,21 +17,6 @@ import printTime from 'hooks/printTime';
 
 var styles = require('../styles/stylesheet');
 
-const months = [
-  "January",
-  "Febuary",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-
 export default function PostItem({
   item,
   deletePostsAsync,
