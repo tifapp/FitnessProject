@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "analytics": {
+      "fitnessproject": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ]
+    }
+  },
+  "lambdaLayers": []
+}

@@ -1,0 +1,21 @@
+{
+    "appName": "fitnessproject",
+    "roleName": "pinpointLambdaRolee51257c9",
+    "cloudformationPolicyName": "cloudformationPolicye51257c9",
+    "cloudWatchPolicyName": "cloudWatchPolicye51257c9",
+    "pinpointPolicyName": "pinpointPolicye51257c9",
+    "authPolicyName": "pinpoint_amplify_e51257c9",
+    "unauthPolicyName": "pinpoint_amplify_e51257c9",
+    "authRoleName": {
+        "Ref": "AuthRoleName"
+    },
+    "unauthRoleName": {
+        "Ref": "UnauthRoleName"
+    },
+    "authRoleArn": {
+        "Fn::GetAtt": [
+            "AuthRole",
+            "Arn"
+        ]
+    }
+}
