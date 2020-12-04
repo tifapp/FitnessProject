@@ -14,12 +14,87 @@ var styles = require('styles/stylesheet');
 
 const LookupUser = ({ route, navigation }) => {
 
-  const [friendRequest, setFriendRequest] = useState(false);
+  const [friendRequest, setFriendRequest] = useState(true);
+  const [friendsSince, setFriendsSince] = useState("");
+  //const [isFriend, setIsFriend] = useState(true);
 
   const { user } = route.params;
   const { userId } = route.params;
   const { id } = route.params;
   const { location } = route.params;
+
+
+ const FriendsInfo = async (friendsFrom) => {
+  const dateInfo = new Date(friendsFrom * 1000);
+
+  var hourVal = dateInfo.getHours();
+  var totalTime = dateInfo.getTime();
+
+  var currentTotalTime = new Date().getTime();
+
+  var timeDifference = currentTotalTime - totalTime;
+
+  var secondDifference = timeDifference / 1000;
+  var minuteDifference = secondDifference / 60;
+  var hourDifference = minuteDifference / 60;
+  var dayDifference = hourDifference / 24;
+  var monthDifference = dayDifference / 30;
+  var yearDifference = monthDifference / 12;
+
+  let displayTime = "";
+  if (secondDifference < 60) {
+    displayTime = "Just recently";
+  }
+  else if (minuteDifference >= 1 && minuteDifference < 60) {
+    minuteDifference = Math.floor(minuteDifference);
+    if (minuteDifference == 1) {
+      displayTime = minuteDifference + " minute";
+    }
+    else {
+      displayTime = minuteDifference + " minutes";
+    }
+  }
+  else if (hourDifference >= 1 && hourDifference < 24) {
+    hourDifference = Math.floor(hourDifference);
+    if (hourDifference == 1) {
+      displayTime = hourDifference + " hour";
+    }
+    else {
+      displayTime = hourDifference + " hours";
+    }
+  }
+  else if (dayDifference >= 1 && dayDifference < 31) {
+    dayDifference = Math.floor(dayDifference);
+    if (dayDifference == 1) {
+      displayTime = dayDifference + " day";
+    }
+    else {
+      displayTime = dayDifference + " days";
+    }
+  }
+  else if (monthDifference >= 1 && monthDifference < 12) {
+    monthDifference = Math.floor(monthDifference);
+    if (monthDifference == 1) {
+      displayTime = monthDifference + " month";
+    }
+    else {
+      displayTime = dayDifference + " months";
+    }
+  }
+  else if (yearDifference >= 1) {
+    yearDifference = Math.floor(yearDifference);
+    if (yearDifference == 1) {
+      displayTime = yearDifference + " year";
+    }
+    else {
+      displayTime = yearDifference + " years";
+    }
+  }
+
+  setFriendsSince(displayTime);
+}
+
+
 
   const checkUsersInfo = async () => {
     try {
@@ -67,21 +142,23 @@ const LookupUser = ({ route, navigation }) => {
       const friend = await API.graphql(
         graphqlOperation(getFriend, { sender: route.params?.id, receiver: user.id })
       );
-      console.log(friend);
 
-      if (friend.data.getFriend == null) {
-        setFriendRequest(true);
-      }
-      else {
+      setFriendsSince("");
+
+      if(friend.data.getFriend!=null && friend.data.getFriend.accepted==true){
+        FriendsInfo(friend.data.getFriend.timestamp);
         setFriendRequest(false);
+      }
+      else if(friend.data.getFriend!=null && friend.data.getFriend.accepted==false){
+        setFriendRequest(false);
+      }
+      else{
+        setFriendRequest(true);
       }
 
 
     } catch (err) {
       console.log(err);
-      //console.log("error in finding user ", err);
-      setFriendRequest(true);
-      //console.log("check");
     }
   };
 
@@ -109,9 +186,9 @@ const LookupUser = ({ route, navigation }) => {
   const deleteFriendRequest = async () => {
     Alert.alert('Deleting Friend Request...', '', [], { cancelable: false })
     console.log("hello");
+    setFriendRequest(true);
     try {
       await API.graphql(graphqlOperation(deleteFriend, { input: { sender: route.params?.id, receiver: user.id } }));
-      setFriendRequest(true);
       console.log("success");
     } catch (err) {
       console.log(err);
@@ -164,6 +241,9 @@ const LookupUser = ({ route, navigation }) => {
 
         </View>
         <View style={styles.viewProfileScreen}>
+          <Text>Friends For: {friendsSince} </Text>
+        </View>
+        <View style={styles.viewProfileScreen}>
           <Text>Bio: </Text>
         </View>
         <Text style={styles.textBoxStyle}>{user.bio}</Text>
@@ -183,7 +263,7 @@ const LookupUser = ({ route, navigation }) => {
           {friendRequest ?
             <TouchableOpacity
               onPress={() => {
-                addFriend()
+                addFriend(), checkFriendRequest()
               }}
               style={styles.submitButton}
             >
@@ -192,7 +272,7 @@ const LookupUser = ({ route, navigation }) => {
             :
             <TouchableOpacity
               onPress={() => {
-                deleteFriendRequest()
+                deleteFriendRequest(), checkFriendRequest()
               }}
               style={styles.unsendButton}
             >
