@@ -6,6 +6,7 @@ import { ProfileImageAndName } from 'components/ProfileImageAndName'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import computeDistance from "hooks/computeDistance"
 import getLocation from 'hooks/useLocation';
+import printTime from 'hooks/printTime';
 import { getUser } from "../src/graphql/queries";
 import { createPost, updatePost, deletePost, createFriend, deleteFriend } from "root/src/graphql/mutations";
 import { getFriend } from "root/src/graphql/queries";
@@ -15,6 +16,8 @@ var styles = require('styles/stylesheet');
 const LookupUser = ({ route, navigation }) => {
 
   const [friendRequest, setFriendRequest] = useState(true);
+  const [friendsSince, setFriendsSince] = useState("");
+  //const [isFriend, setIsFriend] = useState(true);
 
   const { user } = route.params;
   const { userId } = route.params;
@@ -51,21 +54,23 @@ const LookupUser = ({ route, navigation }) => {
       const friend = await API.graphql(
         graphqlOperation(getFriend, { sender: route.params?.id, receiver: user.id })
       );
-      console.log(friend);
 
-      if (friend.data.getFriend == null) {
-        setFriendRequest(true);
+      setFriendsSince("");
+
+      if (friend.data.getFriend != null && friend.data.getFriend.accepted == true) {
+        setFriendsSince(printTime(friend.data.getFriend.timestamp * 1000));
+        setFriendRequest(false);
+      }
+      else if (friend.data.getFriend != null && friend.data.getFriend.accepted == false) {
+        setFriendRequest(false);
       }
       else {
-        setFriendRequest(false);
+        setFriendRequest(true);
       }
 
 
     } catch (err) {
       console.log(err);
-      //console.log("error in finding user ", err);
-      setFriendRequest(true);
-      //console.log("check");
     }
   };
 
@@ -93,9 +98,9 @@ const LookupUser = ({ route, navigation }) => {
   const deleteFriendRequest = async () => {
     Alert.alert('Deleting Friend Request...', '', [], { cancelable: false })
     console.log("hello");
+    setFriendRequest(true);
     try {
       await API.graphql(graphqlOperation(deleteFriend, { input: { sender: route.params?.id, receiver: user.id } }));
-      setFriendRequest(true);
       console.log("success");
     } catch (err) {
       console.log(err);
@@ -148,6 +153,9 @@ const LookupUser = ({ route, navigation }) => {
 
         </View>
         <View style={styles.viewProfileScreen}>
+          <Text>Friends For: {friendsSince} </Text>
+        </View>
+        <View style={styles.viewProfileScreen}>
           <Text>Bio: </Text>
         </View>
         <Text style={styles.textBoxStyle}>{user.bio}</Text>
@@ -167,7 +175,7 @@ const LookupUser = ({ route, navigation }) => {
           {friendRequest ?
             <TouchableOpacity
               onPress={() => {
-                addFriend()
+                addFriend(), checkFriendRequest()
               }}
               style={styles.submitButton}
             >
@@ -176,7 +184,7 @@ const LookupUser = ({ route, navigation }) => {
             :
             <TouchableOpacity
               onPress={() => {
-                deleteFriendRequest()
+                deleteFriendRequest(), checkFriendRequest()
               }}
               style={styles.unsendButton}
             >
