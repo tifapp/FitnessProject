@@ -14,7 +14,7 @@ var styles = require('styles/stylesheet');
 
 const LookupUser = ({ route, navigation }) => {
 
-  const [friendRequest, setFriendRequest] = useState(false);
+  const [friendRequest, setFriendRequest] = useState(true);
 
   const { user } = route.params;
   const { userId } = route.params;
