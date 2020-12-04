@@ -18,7 +18,7 @@ export default () => {
     if (fields == null) {
       console.log("user doesn't exist, they must be making their profile for the first time");
     } else {
-      Cache.setItem(query.attributes.sub, { name: user.data.getUser.name, imageURL: imageURL }, { priority: 1, expires: Date.now() + 86400000 });
+      Cache.setItem(query.attributes.sub, { name: fields.name, imageURL: imageURL }, { priority: 1, expires: Date.now() + 86400000 });
       return {...fields, pictureURL: imageURL};
     }
   };
