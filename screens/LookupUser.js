@@ -172,30 +172,37 @@ const LookupUser = ({ route, navigation }) => {
             </View>
             : null
         }
-        <View style={styles.viewProfileScreen}>
-          <Text>Friends for {friendsSince} </Text>
-        </View>
-        <View style={styles.buttonFormat}>
-          {friendRequest ?
-            <TouchableOpacity
-              onPress={() => {
-                addFriend(), checkFriendRequest()
-              }}
-              style={styles.submitButton}
-            >
-              <Text style={styles.buttonTextStyle}>Send Friend Request</Text>
-            </TouchableOpacity>
-            :
-            <TouchableOpacity
-              onPress={() => {
-                deleteFriendRequest(), checkFriendRequest()
-              }}
-              style={styles.unsendButton}
-            >
-              <Text style={styles.buttonTextStyle}>Unsend Friend Request</Text>
-            </TouchableOpacity>
-          }
-        </View>
+        {friendsSince != "" ?
+          <View style={styles.viewProfileScreen}>
+            <Text>Friends for {friendsSince} </Text>
+          </View>
+          : null
+        }
+        {route.params?.id == user.id ?
+          <View style={styles.buttonFormat}>
+            {friendRequest ?
+              <TouchableOpacity
+                onPress={() => {
+                  addFriend(), checkFriendRequest()
+                }}
+                style={styles.submitButton}
+              >
+                <Text style={styles.buttonTextStyle}>Send Friend Request</Text>
+              </TouchableOpacity>
+              :
+              <TouchableOpacity
+                onPress={() => {
+                  deleteFriendRequest(), checkFriendRequest()
+                }}
+                style={styles.unsendButton}
+              >
+                <Text style={styles.buttonTextStyle}>Unsend Friend Request</Text>
+              </TouchableOpacity>
+
+            }
+          </View>
+          : null
+        }
       </ScrollView>
   )
 }
