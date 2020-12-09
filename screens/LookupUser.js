@@ -240,9 +240,12 @@ const LookupUser = ({ route, navigation }) => {
           </View>
 
         </View>
+        { friendsSince != "" ?
         <View style={styles.viewProfileScreen}>
           <Text>Friends For: {friendsSince} </Text>
         </View>
+          :null
+        }
         <View style={styles.viewProfileScreen}>
           <Text>Bio: </Text>
         </View>
@@ -259,6 +262,8 @@ const LookupUser = ({ route, navigation }) => {
             </View>
             : null
         }
+        { route.params?.id != user.id 
+            ?
         <View style={styles.buttonFormat}>
           {friendRequest ?
             <TouchableOpacity
@@ -278,8 +283,11 @@ const LookupUser = ({ route, navigation }) => {
             >
               <Text style={styles.buttonTextStyle}>Unsend Friend Request</Text>
             </TouchableOpacity>
+            
           }
         </View>
+          : null
+        }
       </ScrollView>
   )
 }
