@@ -201,7 +201,7 @@ const LookupUser = ({ route, navigation }) => {
           </View>
           : null
         }
-        {route.params?.id == user.id ?
+        {route.params?.id != user.id ?
           <View style={styles.buttonFormat}>
             {friendStatus == "none" ?
               <TouchableOpacity
