@@ -10,13 +10,13 @@
     "env": {
       "Type": "String"
     },
-    "analyticsfitnessprojectId": {
+    "apifitnessprojectGraphQLAPIIdOutput": {
       "Type": "String",
-      "Default": "analyticsfitnessprojectId"
+      "Default": "apifitnessprojectGraphQLAPIIdOutput"
     },
-    "analyticsfitnessprojectRegion": {
+    "apifitnessprojectGraphQLAPIEndpointOutput": {
       "Type": "String",
-      "Default": "analyticsfitnessprojectRegion"
+      "Default": "apifitnessprojectGraphQLAPIEndpointOutput"
     }
   },
   "Conditions": {
@@ -41,12 +41,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "pinpoint",
+            "connectFriendRequests",
             {
               "Fn::Join": [
                 "",
                 [
-                  "pinpoint",
+                  "connectFriendRequests",
                   "-",
                   {
                     "Ref": "env"
@@ -64,11 +64,11 @@
             "REGION": {
               "Ref": "AWS::Region"
             },
-            "ANALYTICS_FITNESSPROJECT_ID": {
-              "Ref": "analyticsfitnessprojectId"
+            "API_FITNESSPROJECT_GRAPHQLAPIIDOUTPUT": {
+              "Ref": "apifitnessprojectGraphQLAPIIdOutput"
             },
-            "ANALYTICS_FITNESSPROJECT_REGION": {
-              "Ref": "analyticsfitnessprojectRegion"
+            "API_FITNESSPROJECT_GRAPHQLAPIENDPOINTOUTPUT": {
+              "Ref": "apifitnessprojectGraphQLAPIEndpointOutput"
             }
           }
         },
@@ -83,7 +83,7 @@
         "Timeout": "25",
         "Code": {
           "S3Bucket": "amplify-fitnessproject-apisecure-231510-deployment",
-          "S3Key": "amplify-builds/pinpoint-336758496575717a674c-build.zip"
+          "S3Key": "amplify-builds/connectFriendRequests-6c64374d6e2b32447633-build.zip"
         }
       }
     },
@@ -93,12 +93,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "fitnessprojectLambdaRole5328e379",
+            "fitnessprojectLambdaRole171de26e",
             {
               "Fn::Join": [
                 "",
                 [
-                  "fitnessprojectLambdaRole5328e379",
+                  "fitnessprojectLambdaRole171de26e",
                   "-",
                   {
                     "Ref": "env"
@@ -187,49 +187,28 @@
             {
               "Effect": "Allow",
               "Action": [
-                "mobiletargeting:Put*",
-                "mobiletargeting:Create*",
-                "mobiletargeting:Send*",
-                "mobiletargeting:Get*",
-                "mobiletargeting:List*",
-                "mobiletargeting:Update*",
-                "mobiletargeting:Delete*"
+                "appsync:Create*",
+                "appsync:StartSchemaCreation",
+                "appsync:GraphQL",
+                "appsync:Update*",
+                "appsync:Delete*"
               ],
               "Resource": [
                 {
                   "Fn::Join": [
                     "",
                     [
-                      "arn:aws:mobiletargeting:",
+                      "arn:aws:appsync:",
                       {
-                        "Ref": "analyticsfitnessprojectRegion"
+                        "Ref": "AWS::Region"
                       },
                       ":",
                       {
                         "Ref": "AWS::AccountId"
                       },
-                      ":apps/",
+                      ":apis/",
                       {
-                        "Ref": "analyticsfitnessprojectId"
-                      }
-                    ]
-                  ]
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:aws:mobiletargeting:",
-                      {
-                        "Ref": "analyticsfitnessprojectRegion"
-                      },
-                      ":",
-                      {
-                        "Ref": "AWS::AccountId"
-                      },
-                      ":apps/",
-                      {
-                        "Ref": "analyticsfitnessprojectId"
+                        "Ref": "apifitnessprojectGraphQLAPIIdOutput"
                       },
                       "/*"
                     ]
@@ -239,6 +218,118 @@
             }
           ]
         }
+      }
+    },
+    "LambdaTriggerPolicyFriendRequest": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "amplify-lambda-execution-policy-FriendRequest",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:DescribeStream",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:ListStreams"
+              ],
+              "Resource": {
+                "Fn::ImportValue": {
+                  "Fn::Sub": "${apifitnessprojectGraphQLAPIIdOutput}:GetAtt:FriendRequestTable:StreamArn"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "LambdaEventSourceMappingFriendRequest": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "DependsOn": [
+        "LambdaTriggerPolicyFriendRequest",
+        "LambdaExecutionRole"
+      ],
+      "Properties": {
+        "BatchSize": 100,
+        "Enabled": true,
+        "EventSourceArn": {
+          "Fn::ImportValue": {
+            "Fn::Sub": "${apifitnessprojectGraphQLAPIIdOutput}:GetAtt:FriendRequestTable:StreamArn"
+          }
+        },
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "LambdaFunction",
+            "Arn"
+          ]
+        },
+        "StartingPosition": "LATEST"
+      }
+    },
+    "LambdaTriggerPolicyFriendship": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "amplify-lambda-execution-policy-Friendship",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:DescribeStream",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:ListStreams"
+              ],
+              "Resource": {
+                "Fn::ImportValue": {
+                  "Fn::Sub": "${apifitnessprojectGraphQLAPIIdOutput}:GetAtt:FriendshipTable:StreamArn"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "LambdaEventSourceMappingFriendship": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "DependsOn": [
+        "LambdaTriggerPolicyFriendship",
+        "LambdaExecutionRole"
+      ],
+      "Properties": {
+        "BatchSize": 100,
+        "Enabled": true,
+        "EventSourceArn": {
+          "Fn::ImportValue": {
+            "Fn::Sub": "${apifitnessprojectGraphQLAPIIdOutput}:GetAtt:FriendshipTable:StreamArn"
+          }
+        },
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "LambdaFunction",
+            "Arn"
+          ]
+        },
+        "StartingPosition": "LATEST"
       }
     }
   },
