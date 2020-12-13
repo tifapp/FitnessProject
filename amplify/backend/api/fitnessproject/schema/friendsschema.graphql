@@ -11,6 +11,7 @@ input CreateFriendRequestInput
   receiver: ID!
 }
 
+
 type Friendship @model
 @key(fields: ["sender", "receiver"])
 @key(name: "ByReceiver", fields: ["receiver", "sender"], queryField: "friendsByReceiver")
@@ -18,5 +19,4 @@ type Friendship @model
   sender: ID!
   receiver: ID!
   timestamp: AWSTimestamp!
-  hifives: Int!
 }
