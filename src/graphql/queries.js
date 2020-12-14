@@ -44,6 +44,7 @@ export const getFriendship = /* GraphQL */ `
       sender
       receiver
       timestamp
+      hifives
       createdAt
       updatedAt
     }
@@ -70,6 +71,7 @@ export const listFriendships = /* GraphQL */ `
         sender
         receiver
         timestamp
+        hifives
         createdAt
         updatedAt
       }
@@ -248,6 +250,7 @@ export const friendsByReceiver = /* GraphQL */ `
         sender
         receiver
         timestamp
+        hifives
         createdAt
         updatedAt
       }

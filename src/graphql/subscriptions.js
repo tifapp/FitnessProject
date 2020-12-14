@@ -37,6 +37,7 @@ export const onCreateFriendship = /* GraphQL */ `
       sender
       receiver
       timestamp
+      hifives
       createdAt
       updatedAt
     }
@@ -48,6 +49,7 @@ export const onUpdateFriendship = /* GraphQL */ `
       sender
       receiver
       timestamp
+      hifives
       createdAt
       updatedAt
     }
@@ -59,6 +61,7 @@ export const onDeleteFriendship = /* GraphQL */ `
       sender
       receiver
       timestamp
+      hifives
       createdAt
       updatedAt
     }

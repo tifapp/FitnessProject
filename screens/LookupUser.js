@@ -55,7 +55,7 @@ const LookupUser = ({ route, navigation }) => {
       );
       if (friendship.data.getFriendship == null) {
         friendship = await API.graphql(
-          graphqlOperation(getFriendship, { sender: user.id, receiver: friendship.id })
+          graphqlOperation(getFriendship, { sender: user.id, receiver: route.params?.id })
         );
       }
 
@@ -91,7 +91,7 @@ const LookupUser = ({ route, navigation }) => {
     Alert.alert('Submitting Friend Request...', '', [], { cancelable: false })
  
     try {
-      await API.graphql(graphqlOperation(createFriendRequest, { input: { sender: route.params?.id, receiver: user.id, } }));
+      await API.graphql(graphqlOperation(createFriendRequest, { input: { receiver: user.id, } }));
       console.log("success");
       setFriendStatus("sent"); //if received, should change to "friends"
       alert('Friend request submitted successfully!');
