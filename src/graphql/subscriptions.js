@@ -2,8 +2,8 @@
 // this is an auto generated file. This will be overwritten
 
 export const onCreateFriendRequest = /* GraphQL */ `
-  subscription OnCreateFriendRequest {
-    onCreateFriendRequest {
+  subscription OnCreateFriendRequest($sender: String!, $receiver: String!) {
+    onCreateFriendRequest(sender: $sender, receiver: $receiver) {
       sender
       receiver
       createdAt
@@ -12,8 +12,8 @@ export const onCreateFriendRequest = /* GraphQL */ `
   }
 `;
 export const onUpdateFriendRequest = /* GraphQL */ `
-  subscription OnUpdateFriendRequest {
-    onUpdateFriendRequest {
+  subscription OnUpdateFriendRequest($sender: String!, $receiver: String!) {
+    onUpdateFriendRequest(sender: $sender, receiver: $receiver) {
       sender
       receiver
       createdAt
@@ -22,8 +22,8 @@ export const onUpdateFriendRequest = /* GraphQL */ `
   }
 `;
 export const onDeleteFriendRequest = /* GraphQL */ `
-  subscription OnDeleteFriendRequest {
-    onDeleteFriendRequest {
+  subscription OnDeleteFriendRequest($sender: String!, $receiver: String!) {
+    onDeleteFriendRequest(sender: $sender, receiver: $receiver) {
       sender
       receiver
       createdAt

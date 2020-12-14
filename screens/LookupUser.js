@@ -93,8 +93,8 @@ const LookupUser = ({ route, navigation }) => {
     try {
       await API.graphql(graphqlOperation(createFriendRequest, { input: { receiver: user.id, } }));
       console.log("success");
-      setFriendStatus("sent"); //if received, should change to "friends"
-      alert('Friend request submitted successfully!');
+      setFriendStatus("sent"); //if received, should change to "friends". do a check before this
+      alert('Friend request sent successfully!');
     } catch (err) {
       console.log(err);
       alert('Friend request could not be submitted! ');
@@ -106,7 +106,9 @@ const LookupUser = ({ route, navigation }) => {
 
     try {
       await API.graphql(graphqlOperation(deleteFriendRequest, { input: { sender: route.params?.id, receiver: user.id } }));
-      console.log("success");
+      console.log("success");      
+      setFriendStatus("none");
+      alert('Friend request unsent successfully!');
     } catch (err) {
       console.log(err);
       console.log("error in deleting post: ");
@@ -119,6 +121,8 @@ const LookupUser = ({ route, navigation }) => {
     try {
       await API.graphql(graphqlOperation(deleteFriendRequest, { input: { sender: user.id, receiver: route.params?.id } }));
       console.log("success");
+      setFriendStatus("none");
+      alert('Friend request rejected successfully!');
     } catch (err) {
       console.log(err);
       console.log("error in deleting post: ");
@@ -131,6 +135,8 @@ const LookupUser = ({ route, navigation }) => {
     try {
       await API.graphql(graphqlOperation(deleteFriendship, { input: { sender: user.id, receiver: route.params?.id } }));
       console.log("success");
+      setFriendStatus("none");
+      alert('Friend removed from friends list successfully!');
     } catch (err) {
       console.log(err);
       console.log("error in deleting post: ");
