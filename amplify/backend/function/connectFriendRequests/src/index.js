@@ -14,15 +14,15 @@ const getFriendRequest = gql`
   }
 `
 
-exports.handler = (event, context) => {
+exports.handler = async (event, context) => {
   //eslint-disable-line
   event.Records.forEach(record => {
     if (record.eventName == "INSERT") {
       axios({
-        url: process.env.API_URL,
+        url: process.env.API_FITNESSPROJECT_GRAPHQLAPIENDPOINTOUTPUT,
         method: 'post',
         headers: {
-          'x-api-key': process.env.API_FITNESSPROJECT_GRAPHQLAPIKEYOUTPUT
+          'x-api-key': process.env.API_FITNESSPROJECT_GRAPHQLAPIIDOUTPUT
         },
         data: {
           query: print(getFriendRequest),
@@ -33,17 +33,7 @@ exports.handler = (event, context) => {
         }
       })
         .then(gqData => {
-          const body = {
-            graphqlData: gqData.data.data.getFriendRequest
-          }
           console.log("checking if we can read the table... ", gqData.data.data.getFriendRequest);
-          return {
-            statusCode: 200,
-            body: JSON.stringify(body),
-            headers: {
-              "Access-Control-Allow-Origin": "*",
-            }
-          }
         })
         .catch(err => {
           console.log('error in reading fr table: ', err)

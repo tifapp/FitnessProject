@@ -83,7 +83,7 @@
         "Timeout": "25",
         "Code": {
           "S3Bucket": "amplify-fitnessproject-apisecure-231510-deployment",
-          "S3Key": "amplify-builds/connectFriendRequests-397145496f645764377a-build.zip"
+          "S3Key": "amplify-builds/connectFriendRequests-5a436c76424d76463656-build.zip"
         }
       }
     },
