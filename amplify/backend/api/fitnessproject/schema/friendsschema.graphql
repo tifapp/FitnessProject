@@ -1,8 +1,6 @@
 type FriendRequest @model
 @auth(
 rules: [
-      { allow: owner, ownerField: "sender" },
-      { allow: owner, ownerField: "receiver" },
     ])
 @key(fields: ["sender", "receiver"])
 @key(name: "ByReceiver", fields: ["receiver", "sender"], queryField: "friendRequestsByReceiver")

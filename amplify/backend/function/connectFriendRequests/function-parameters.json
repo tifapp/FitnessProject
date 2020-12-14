@@ -3,6 +3,7 @@
     "api": {
       "fitnessproject": [
         "create",
+        "read",
         "update",
         "delete"
       ]
