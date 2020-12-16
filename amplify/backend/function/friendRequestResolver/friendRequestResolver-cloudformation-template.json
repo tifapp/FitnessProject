@@ -41,12 +41,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "connectFriendRequests",
+            "friendRequestResolver",
             {
               "Fn::Join": [
                 "",
                 [
-                  "connectFriendRequests",
+                  "friendRequestResolver",
                   "-",
                   {
                     "Ref": "env"
@@ -83,7 +83,7 @@
         "Timeout": "25",
         "Code": {
           "S3Bucket": "amplify-fitnessproject-apisecure-231510-deployment",
-          "S3Key": "amplify-builds/connectFriendRequests-4a636541452b56324c65-build.zip"
+          "S3Key": "amplify-builds/friendRequestResolver-4a6d644c743374444931-build.zip"
         }
       }
     },
@@ -93,12 +93,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "fitnessprojectLambdaRole171de26e",
+            "fitnessprojectLambdaRole2a9a421a",
             {
               "Fn::Join": [
                 "",
                 [
-                  "fitnessprojectLambdaRole171de26e",
+                  "fitnessprojectLambdaRole2a9a421a",
                   "-",
                   {
                     "Ref": "env"
@@ -267,62 +267,6 @@
         "EventSourceArn": {
           "Fn::ImportValue": {
             "Fn::Sub": "${apifitnessprojectGraphQLAPIIdOutput}:GetAtt:FriendRequestTable:StreamArn"
-          }
-        },
-        "FunctionName": {
-          "Fn::GetAtt": [
-            "LambdaFunction",
-            "Arn"
-          ]
-        },
-        "StartingPosition": "LATEST"
-      }
-    },
-    "LambdaTriggerPolicyFriendship": {
-      "DependsOn": [
-        "LambdaExecutionRole"
-      ],
-      "Type": "AWS::IAM::Policy",
-      "Properties": {
-        "PolicyName": "amplify-lambda-execution-policy-Friendship",
-        "Roles": [
-          {
-            "Ref": "LambdaExecutionRole"
-          }
-        ],
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": [
-                "dynamodb:DescribeStream",
-                "dynamodb:GetRecords",
-                "dynamodb:GetShardIterator",
-                "dynamodb:ListStreams"
-              ],
-              "Resource": {
-                "Fn::ImportValue": {
-                  "Fn::Sub": "${apifitnessprojectGraphQLAPIIdOutput}:GetAtt:FriendshipTable:StreamArn"
-                }
-              }
-            }
-          ]
-        }
-      }
-    },
-    "LambdaEventSourceMappingFriendship": {
-      "Type": "AWS::Lambda::EventSourceMapping",
-      "DependsOn": [
-        "LambdaTriggerPolicyFriendship",
-        "LambdaExecutionRole"
-      ],
-      "Properties": {
-        "BatchSize": 100,
-        "Enabled": true,
-        "EventSourceArn": {
-          "Fn::ImportValue": {
-            "Fn::Sub": "${apifitnessprojectGraphQLAPIIdOutput}:GetAtt:FriendshipTable:StreamArn"
           }
         },
         "FunctionName": {

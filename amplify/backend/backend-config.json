@@ -19,7 +19,11 @@
               "userPoolId": "authfitnessprojecta8f49cfe"
             }
           },
-          "additionalAuthenticationProviders": []
+          "additionalAuthenticationProviders": [
+            {
+              "authenticationType": "AWS_IAM"
+            }
+          ]
         }
       }
     }
@@ -61,7 +65,7 @@
       "build": true,
       "dependsOn": []
     },
-    "connectFriendRequests": {
+    "friendRequestResolver": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda",

@@ -27,19 +27,6 @@ export const updateFriendRequest = /* GraphQL */ `
     }
   }
 `;
-export const deleteFriendRequest = /* GraphQL */ `
-  mutation DeleteFriendRequest(
-    $input: DeleteFriendRequestInput!
-    $condition: ModelFriendRequestConditionInput
-  ) {
-    deleteFriendRequest(input: $input, condition: $condition) {
-      sender
-      receiver
-      createdAt
-      updatedAt
-    }
-  }
-`;
 export const createFriendship = /* GraphQL */ `
   mutation CreateFriendship(
     $input: CreateFriendshipInput!
@@ -245,6 +232,19 @@ export const deleteUser = /* GraphQL */ `
       goals
       latitude
       longitude
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteFriendRequest = /* GraphQL */ `
+  mutation DeleteFriendRequest(
+    $input: DeleteFriendRequestInput!
+    $condition: ModelFriendRequestConditionInput
+  ) {
+    deleteFriendRequest(input: $input, condition: $condition) {
+      sender
+      receiver
       createdAt
       updatedAt
     }

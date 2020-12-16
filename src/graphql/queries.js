@@ -1,43 +1,6 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const getFriendRequest = /* GraphQL */ `
-  query GetFriendRequest($sender: ID!, $receiver: ID!) {
-    getFriendRequest(sender: $sender, receiver: $receiver) {
-      sender
-      receiver
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const listFriendRequests = /* GraphQL */ `
-  query ListFriendRequests(
-    $sender: ID
-    $receiver: ModelIDKeyConditionInput
-    $filter: ModelFriendRequestFilterInput
-    $limit: Int
-    $nextToken: String
-    $sortDirection: ModelSortDirection
-  ) {
-    listFriendRequests(
-      sender: $sender
-      receiver: $receiver
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      sortDirection: $sortDirection
-    ) {
-      items {
-        sender
-        receiver
-        createdAt
-        updatedAt
-      }
-      nextToken
-    }
-  }
-`;
 export const getFriendship = /* GraphQL */ `
   query GetFriendship($sender: ID!, $receiver: ID!) {
     getFriendship(sender: $sender, receiver: $receiver) {
@@ -202,33 +165,6 @@ export const listUsers = /* GraphQL */ `
     }
   }
 `;
-export const friendRequestsByReceiver = /* GraphQL */ `
-  query FriendRequestsByReceiver(
-    $receiver: ID
-    $sender: ModelIDKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelFriendRequestFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    friendRequestsByReceiver(
-      receiver: $receiver
-      sender: $sender
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        sender
-        receiver
-        createdAt
-        updatedAt
-      }
-      nextToken
-    }
-  }
-`;
 export const friendsByReceiver = /* GraphQL */ `
   query FriendsByReceiver(
     $receiver: ID
@@ -280,6 +216,70 @@ export const postsByGroup = /* GraphQL */ `
         userId
         description
         group
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const getFriendRequest = /* GraphQL */ `
+  query GetFriendRequest($sender: ID!, $receiver: ID!) {
+    getFriendRequest(sender: $sender, receiver: $receiver) {
+      sender
+      receiver
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listFriendRequests = /* GraphQL */ `
+  query ListFriendRequests(
+    $sender: ID
+    $receiver: ModelIDKeyConditionInput
+    $filter: ModelFriendRequestFilterInput
+    $limit: Int
+    $nextToken: String
+    $sortDirection: ModelSortDirection
+  ) {
+    listFriendRequests(
+      sender: $sender
+      receiver: $receiver
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
+    ) {
+      items {
+        sender
+        receiver
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const friendRequestsByReceiver = /* GraphQL */ `
+  query FriendRequestsByReceiver(
+    $receiver: ID
+    $sender: ModelIDKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelFriendRequestFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    friendRequestsByReceiver(
+      receiver: $receiver
+      sender: $sender
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        sender
+        receiver
         createdAt
         updatedAt
       }

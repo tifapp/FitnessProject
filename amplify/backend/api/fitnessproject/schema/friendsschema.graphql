@@ -1,7 +1,11 @@
 type FriendRequest @model
 @auth(
-rules: [
-    ])
+  rules: [
+      { allow: owner, ownerField: "sender", operations: [create, delete, read] },
+      { allow: owner, ownerField: "receiver", operations: [create, delete, read] },
+      { allow: private, provider: iam, operations: [read, delete] },
+  ]
+)
 @key(fields: ["sender", "receiver"])
 @key(name: "ByReceiver", fields: ["receiver", "sender"], queryField: "friendRequestsByReceiver")
 {
