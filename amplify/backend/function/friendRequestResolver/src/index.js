@@ -32,22 +32,26 @@ exports.handler = (event, context, callback) => {
   const record = event.Records[0];
   console.log(record);
 
-  if (record.eventName == "INSERT") {
-    (async () => {
-      try {
-        const result = await client.query({
-          query: gql(frQuery),
-          variables: {
-            sender: '6fad5bc8-a389-4d73-b171-e709d5d8bdd8',
-            receiver: 'c2217b13-12e8-42a4-a1ab-627f764493c9',
+  event.Records.forEach((record) => {
+    if (record.eventName == "INSERT") {
+      (async () => {
+        try {
+          //console.log('getting a new object with a sender of ', JSON.stringify(record.dynamodb.NewImage.sender.S), 'seeing if an object exists with that receiver');
+          const result = await client.query({
+            query: gql(frQuery),
+            variables: {
+              sender: record.dynamodb.NewImage.receiver.S,
+              receiver: record.dynamodb.NewImage.sender.S,
+            }
+          });
+          if (result.data.getFriendRequest != null) {
+            console.log("phase 2")
           }
-        });
-        console.log(result);
-        callback(null, result.data);
-      } catch (e) {
-        console.warn('Error sending mutation: ',  e);
-        callback(Error(e));
-      }
-    })();
-  }
+          console.log(result);
+        } catch (e) {
+          console.warn('Error sending mutation: ',  e);
+        }
+      })();
+    }
+  });
 };
