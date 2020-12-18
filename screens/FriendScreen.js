@@ -32,8 +32,8 @@ const FriendScreen = ({route, navigation }) => {
     }
 
     const findFriendID = (item) => {
-        if (route.params?.id == item.receiver) return item.sender;
-        if (route.params?.id == item.sender) return item.receiver;
+        if (route.params?.id == item.user1) return item.user2;
+        if (route.params?.id == item.user2) return item.user1;
     }
 
     const removeFriendHandler = (item) => {
@@ -97,22 +97,22 @@ const FriendScreen = ({route, navigation }) => {
                 graphqlOperation(listFriendships)
             );
             items = matchresult.data.listFriendships.items;
+            console.log("#########-Friends-###########");
+            console.log(items);
             setFriendList(items);
         }
         catch(err){
             console.log("error: ", err);
         }
-        console.log("#########-Friends-###########");
-        console.log(friendList);
 
     }
     const collectFriendRequests = async () => {
         let items = [];
         try{
-            const namematchresult = await API.graphql(
+            const matchresult = await API.graphql(
                 graphqlOperation(listFriendRequests)
             );
-            items = namematchresult.data.listFriendRequests.items;
+            items = matchresult.data.listFriendRequests.items;
             setFriendRequestList(items);
         }
         catch(err){
@@ -147,7 +147,7 @@ const FriendScreen = ({route, navigation }) => {
                     <View>
                         <Text style = {{alignSelf: 'center'}}>Your awesome friends!</Text> 
                         <FlatList
-                            keyExtractor = {(item) => item.timestamp}
+                            keyExtractor = {(item) => item.timestamp.toString()}
                             data={friendList}
                             renderItem={({ item }) => (
                                 <View style = {{flexDirection: 'row', marginVertical: 5}}>

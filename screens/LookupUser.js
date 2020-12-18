@@ -42,10 +42,12 @@ const LookupUser = ({ route, navigation }) => {
   useEffect(() => {
     if (user == null) {
       checkUsersInfo();
-    } else {
-      checkFriendStatus();
     }
   }, []);
+  
+  useEffect(() => {
+    checkFriendStatus();
+  });
 
   const checkFriendStatus = async () => {
     console.log("CHECKING FRIEND STATUS");
