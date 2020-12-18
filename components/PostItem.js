@@ -38,12 +38,12 @@ export default function PostItem({
       <View style={styles.spaceAround}>
         <TouchableOpacity 
         onPress={goToProfile}
-        style={{flexDirection: 'row'}}>
+        style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
           <ProfileImageAndName
             style={styles.smallImageStyle}
             userId={item.userId}
           />
-          <View>
+          <View style={{marginRight: 15}}>
             <Text>{displayTime}</Text>
           </View>
         </TouchableOpacity>

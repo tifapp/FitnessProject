@@ -150,15 +150,16 @@ const FriendScreen = ({route, navigation }) => {
                             keyExtractor = {(item) => item.timestamp.toString()}
                             data={friendList}
                             renderItem={({ item }) => (
-                                <View style = {{flexDirection: 'row', marginVertical: 5}}>
+                                <View style = {{flexDirection: 'row', alignSelf: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%'}}>
                                     <TouchableOpacity onPress = {() => goToProfile(findFriendID(item))}>
                                         <ProfileImageAndName
                                             style={styles.smallImageStyle}
                                             userId={findFriendID(item)}
                                         />
                                     </TouchableOpacity>  
-                                    <TouchableOpacity style = {{alignSelf: 'center'}} 
+                                    <TouchableOpacity style = {{flexDirection: 'row', alignItems: 'center'}} 
                                                       onPress = {() => removeFriendHandler(item)}>
+                                        <Text>Delete</Text>
                                         <Entypo name="cross" style = {{marginHorizontal: 7}}
                                                 size={44} color="red" />
                                     </TouchableOpacity>
@@ -176,7 +177,7 @@ const FriendScreen = ({route, navigation }) => {
                             data={friendRequestList}
                             renderItem={({ item }) => (
                                 <View style = {{marginVertical: 5}}>
-                                    <View style = {{flexDirection: 'row'}}>
+                                    <View style = {{flexDirection: 'row', alignSelf: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%'}}>
                                         <TouchableOpacity onPress = {() => goToProfile(item.sender)}>
                                             <ProfileImageAndName
                                                 style={styles.smallImageStyle}
@@ -184,14 +185,16 @@ const FriendScreen = ({route, navigation }) => {
                                             />
                                         </TouchableOpacity> 
                                         
-                                        <TouchableOpacity style = {{alignSelf: 'center'}}
+                                        <TouchableOpacity style = {{flexDirection: 'row', alignItems: 'center'}} 
                                                           onPress = {() => acceptRequest(item)}>
+                                            <Text>Accept</Text>
                                             <AntDesign name="check" style = {{marginHorizontal: 7}} 
                                                 size={44} color="green" />
                                         </TouchableOpacity>
 
-                                        <TouchableOpacity style = {{alignSelf: 'center'}} 
+                                        <TouchableOpacity style = {{flexDirection: 'row', alignItems: 'center'}} 
                                                           onPress = {() => rejectRequest(item)}>
+                                            <Text>Reject</Text>
                                             <Entypo name="cross" style = {{marginHorizontal: 7}}
                                                 size={44} color="red" />
                                         </TouchableOpacity>

@@ -79,9 +79,9 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
         )
     } else {
         return (
-            <View>
+            <View style = {{flexDirection: 'row', alignItems: 'center'}} >
             <Image 
-                style={[props.style]}
+                style={[props.style, {marginRight: 15}]}
                 source={userInfo.imageURL === '' ? require('../assets/icon.png') : { uri: userInfo.imageURL }}
             />
             <Text>{userInfo.name}</Text>
