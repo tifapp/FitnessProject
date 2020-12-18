@@ -93,16 +93,16 @@ const LookupUser = ({ route, navigation }) => {
   };
 
   const sendFriendRequest = async () => {
-    Alert.alert('Submitting Friend Request...', '', [], { cancelable: false })
+    Alert.alert('Sending...', '', [], { cancelable: false })
  
     try {
       await API.graphql(graphqlOperation(createFriendRequest, { input: { receiver: user.id, } }));
       console.log("success");
       setFriendStatus("sent"); //if received, should change to "friends". do a check before this
-      alert('Friend request sent successfully!');
+      alert('Sent successfully!');
     } catch (err) {
       console.log(err);
-      alert('Friend request could not be submitted! ');
+      alert('Could not be submitted!');
     }
   };
 
@@ -249,21 +249,6 @@ const LookupUser = ({ route, navigation }) => {
                 <View style={styles.viewProfileScreen}>
                   <Text>Friends for {friendsSince} </Text>
                 </View>
-                <View style={styles.viewProfileScreen}>
-                  <Text>Hi-fives: {hifives} </Text>
-                </View>
-                {
-                  hifiveSent
-                  ?
-                  null
-                  :  
-                  <TouchableOpacity
-                    onPress={sendFriendRequest}
-                    style={styles.unsendButton}
-                  >
-                    <Text style={styles.buttonTextStyle}>Hi-Five</Text>
-                  </TouchableOpacity>
-                }
                 <TouchableOpacity
                   onPress={deleteFriend}
                   style={styles.unsendButton}
