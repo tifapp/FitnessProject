@@ -15,7 +15,9 @@ var styles = require('styles/stylesheet');
 const LookupUser = ({ route, navigation }) => {
 
   const [friendStatus, setFriendStatus] = useState("none"); //can be either "received", "sent", "friends", or "none". don't misspell!
+  const [hifiveSent, setHifiveSent] = useState(false); //can be either "received", "sent", or "none". don't misspell!
   const [friendsSince, setFriendsSince] = useState("");
+  const [hifives, setHifives] = useState(0);
 
   const { user } = route.params;
   const { userId } = route.params;
@@ -62,6 +64,7 @@ const LookupUser = ({ route, navigation }) => {
       if (friendship.data.getFriendship != null) {
         setFriendStatus("friends");
         setFriendsSince(printTime(friendship.data.getFriendship.timestamp * 1000));
+        setHifives(friendship.data.getFriendship.hifives);
       } else {
         console.log("YOU ARE NOT FRIENDS");
         setFriendsSince("");
@@ -210,12 +213,6 @@ const LookupUser = ({ route, navigation }) => {
             </View>
             : null
         }
-        {friendsSince != "" ?
-          <View style={styles.viewProfileScreen}>
-            <Text>Friends for {friendsSince} </Text>
-          </View>
-          : null
-        }
         {route.params?.id != user.id ?
           <View style={styles.buttonFormat}>
             {friendStatus == "none" ?
@@ -248,12 +245,32 @@ const LookupUser = ({ route, navigation }) => {
                 </TouchableOpacity>
               </View>
               : 
-              <TouchableOpacity
-                onPress={deleteFriend}
-                style={styles.unsendButton}
-              >
-                <Text style={styles.buttonTextStyle}>Delete Friend</Text>
-              </TouchableOpacity>
+              <View>
+                <View style={styles.viewProfileScreen}>
+                  <Text>Friends for {friendsSince} </Text>
+                </View>
+                <View style={styles.viewProfileScreen}>
+                  <Text>Hi-fives: {hifives} </Text>
+                </View>
+                {
+                  hifiveSent
+                  ?
+                  null
+                  :  
+                  <TouchableOpacity
+                    onPress={sendFriendRequest}
+                    style={styles.unsendButton}
+                  >
+                    <Text style={styles.buttonTextStyle}>Hi-Five</Text>
+                  </TouchableOpacity>
+                }
+                <TouchableOpacity
+                  onPress={deleteFriend}
+                  style={styles.unsendButton}
+                >
+                  <Text style={styles.buttonTextStyle}>Delete Friend</Text>
+                </TouchableOpacity>
+              </View>
             }
           </View>
           : null
