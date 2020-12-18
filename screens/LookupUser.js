@@ -7,9 +7,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import computeDistance from "hooks/computeDistance"
 import getLocation from 'hooks/useLocation';
 import printTime from 'hooks/printTime';
-import { getFriendRequest, getUser } from "../src/graphql/queries";
-import { createFriendRequest, deleteFriendRequest, getFriendship, deleteFriendship } from "root/src/graphql/mutations";
-import { getFriend } from "root/src/graphql/queries";
+import { getUser, getFriendRequest, getFriendship, } from "../src/graphql/queries";
+import { createFriendRequest, deleteFriendRequest, deleteFriendship } from "root/src/graphql/mutations";
 
 var styles = require('styles/stylesheet');
 
@@ -49,21 +48,22 @@ const LookupUser = ({ route, navigation }) => {
   }, []);
 
   const checkFriendStatus = async () => {
+    console.log("CHECKING FRIEND STATUS");
     try {
       let friendship = await API.graphql(
-        graphqlOperation(getFriendship, { sender: route.params?.id, receiver: user.id })
+        graphqlOperation(getFriendship, { 
+          user1: route.params?.id < user.id ? route.params?.id : user.id, 
+          user2: route.params?.id < user.id ? user.id : route.params?.id, 
+        })
       );
-      if (friendship.data.getFriendship == null) {
-        friendship = await API.graphql(
-          graphqlOperation(getFriendship, { sender: user.id, receiver: route.params?.id })
-        );
-      }
 
       if (friendship.data.getFriendship != null) {
         setFriendStatus("friends");
         setFriendsSince(printTime(friendship.data.getFriendship.timestamp * 1000));
       } else {
+        console.log("YOU ARE NOT FRIENDS");
         setFriendsSince("");
+
         const sentFriendRequest = await API.graphql(
           graphqlOperation(getFriendRequest, { sender: route.params?.id, receiver: user.id })
         );
@@ -133,17 +133,15 @@ const LookupUser = ({ route, navigation }) => {
     Alert.alert('Deleting Friend...', '', [], { cancelable: false })
 
     try {
-      await API.graphql(graphqlOperation(deleteFriendship, { input: { sender: user.id, receiver: route.params?.id } }));
+      await API.graphql(graphqlOperation(deleteFriendship, { 
+        input: { 
+          user1: route.params?.id < user.id ? route.params?.id : user.id ,
+          user2: route.params?.id < user.id ? user.id : route.params?.id,
+        } 
+      }));
       console.log("success");
       setFriendStatus("none");
       alert('Friend removed from friends list successfully!');
-    } catch (err) {
-      console.log(err);
-      console.log("error in deleting post: ");
-    }
-    try {
-      await API.graphql(graphqlOperation(deleteFriendship, { input: { sender: route.params?.id, receiver: user.id } }));
-      console.log("success");
     } catch (err) {
       console.log(err);
       console.log("error in deleting post: ");

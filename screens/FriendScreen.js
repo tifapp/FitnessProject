@@ -1,21 +1,17 @@
 import React, {useState, useEffect} from 'react';
 import {
     Alert,
-    StyleSheet,
     View,
-    Button,
     FlatList,
-    Image,
     RefreshControl,
-    TextInput,
     Text,
     TouchableOpacity,
   } from "react-native";
 
 import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
 import { Amplify, API, graphqlOperation } from "aws-amplify";
-import { updateFriend, deleteFriend } from "root/src/graphql/mutations";
-import { listFriends } from "root/src/graphql/queries";
+import { listFriendRequests, listFriendships, getFriendship, } from "root/src/graphql/queries";
+import { createFriendRequest, deleteFriendRequest, deleteFriendship } from "root/src/graphql/mutations";
 import { ProfileImageAndName } from 'components/ProfileImageAndName'
 
 import { AntDesign } from '@expo/vector-icons'; 
@@ -52,7 +48,7 @@ const FriendScreen = ({route, navigation }) => {
     const rejectRequest = async (item) => {
         // delete friend object
         try {
-            await API.graphql(graphqlOperation(deleteFriend, { input: { sender: item.sender, receiver: item.receiver}}));
+            await API.graphql(graphqlOperation(deleteFriendRequest, { input: { sender: item.sender, receiver: item.receiver}}));
         }
         catch(err){
             console.log("error: ", err);
@@ -64,7 +60,7 @@ const FriendScreen = ({route, navigation }) => {
     const removeFriend = async (item) => {
         // delete friend object
         try {
-            await API.graphql(graphqlOperation(deleteFriend, { input: { sender: item.sender, receiver: item.receiver}}));
+            await API.graphql(graphqlOperation(deleteFriendship, { input: { user1: item.user1, user2: item.user2 }}));
         }
         catch(err){
             console.log("error: ", err);
@@ -76,7 +72,7 @@ const FriendScreen = ({route, navigation }) => {
     const acceptRequest =  async (item) => {
         // accept friend request
         try {
-            await API.graphql(graphqlOperation(updateFriend, { input: { sender: item.sender, receiver: item.receiver, accepted: true}}));
+            await API.graphql(graphqlOperation(createFriendRequest, { input: { receiver: item.sender }}));
         }
         catch(err){
             console.log("error: ", err);
@@ -96,22 +92,11 @@ const FriendScreen = ({route, navigation }) => {
         let items = [];
         // Not sure if I set up the friend filter correctly.
         // Will come back to it when I figure out accept/rejecting requests
-        let friendFilter = {
-            and: {
-                or: [
-                    { receiver: {eq : route.params?.id} },
-                    { sender: {eq : route.params?.id} },
-                ],
-                and: { accepted: {eq : true} }
-            }
-        };
         try{
-            const namematchresult = await API.graphql(
-                graphqlOperation(listFriends, {
-                    filter: friendFilter
-                })
+            const matchresult = await API.graphql(
+                graphqlOperation(listFriendships)
             );
-            items = namematchresult.data.listFriends.items;
+            items = matchresult.data.listFriendships.items;
             setFriendList(items);
         }
         catch(err){
@@ -123,19 +108,11 @@ const FriendScreen = ({route, navigation }) => {
     }
     const collectFriendRequests = async () => {
         let items = [];
-        let requestFilter = {
-            and: [
-                { receiver: {eq : route.params?.id} },
-                { accepted: {eq : false} }
-            ]
-        };
         try{
             const namematchresult = await API.graphql(
-                graphqlOperation(listFriends, {
-                    filter: requestFilter
-                })
+                graphqlOperation(listFriendRequests)
             );
-            items = namematchresult.data.listFriends.items;
+            items = namematchresult.data.listFriendRequests.items;
             setFriendRequestList(items);
         }
         catch(err){

@@ -27,44 +27,14 @@ export const updateFriendRequest = /* GraphQL */ `
     }
   }
 `;
-export const createFriendship = /* GraphQL */ `
-  mutation CreateFriendship(
-    $input: CreateFriendshipInput!
-    $condition: ModelFriendshipConditionInput
-  ) {
-    createFriendship(input: $input, condition: $condition) {
-      sender
-      receiver
-      timestamp
-      hifives
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const updateFriendship = /* GraphQL */ `
-  mutation UpdateFriendship(
-    $input: UpdateFriendshipInput!
-    $condition: ModelFriendshipConditionInput
-  ) {
-    updateFriendship(input: $input, condition: $condition) {
-      sender
-      receiver
-      timestamp
-      hifives
-      createdAt
-      updatedAt
-    }
-  }
-`;
 export const deleteFriendship = /* GraphQL */ `
   mutation DeleteFriendship(
     $input: DeleteFriendshipInput!
     $condition: ModelFriendshipConditionInput
   ) {
     deleteFriendship(input: $input, condition: $condition) {
-      sender
-      receiver
+      user1
+      user2
       timestamp
       hifives
       createdAt
@@ -245,6 +215,36 @@ export const deleteFriendRequest = /* GraphQL */ `
     deleteFriendRequest(input: $input, condition: $condition) {
       sender
       receiver
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const createFriendship = /* GraphQL */ `
+  mutation CreateFriendship(
+    $input: CreateFriendshipInput!
+    $condition: ModelFriendshipConditionInput
+  ) {
+    createFriendship(input: $input, condition: $condition) {
+      user1
+      user2
+      timestamp
+      hifives
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateFriendship = /* GraphQL */ `
+  mutation UpdateFriendship(
+    $input: UpdateFriendshipInput!
+    $condition: ModelFriendshipConditionInput
+  ) {
+    updateFriendship(input: $input, condition: $condition) {
+      user1
+      user2
+      timestamp
+      hifives
       createdAt
       updatedAt
     }

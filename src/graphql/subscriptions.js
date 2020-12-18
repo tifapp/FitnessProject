@@ -1,42 +1,6 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const onCreateFriendship = /* GraphQL */ `
-  subscription OnCreateFriendship {
-    onCreateFriendship {
-      sender
-      receiver
-      timestamp
-      hifives
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const onUpdateFriendship = /* GraphQL */ `
-  subscription OnUpdateFriendship {
-    onUpdateFriendship {
-      sender
-      receiver
-      timestamp
-      hifives
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const onDeleteFriendship = /* GraphQL */ `
-  subscription OnDeleteFriendship {
-    onDeleteFriendship {
-      sender
-      receiver
-      timestamp
-      hifives
-      createdAt
-      updatedAt
-    }
-  }
-`;
 export const onCreateGroup = /* GraphQL */ `
   subscription OnCreateGroup {
     onCreateGroup {
@@ -200,6 +164,42 @@ export const onDeleteFriendRequest = /* GraphQL */ `
     onDeleteFriendRequest(sender: $sender, receiver: $receiver) {
       sender
       receiver
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onCreateFriendship = /* GraphQL */ `
+  subscription OnCreateFriendship($user1: String, $user2: String) {
+    onCreateFriendship(user1: $user1, user2: $user2) {
+      user1
+      user2
+      timestamp
+      hifives
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdateFriendship = /* GraphQL */ `
+  subscription OnUpdateFriendship($user1: String, $user2: String) {
+    onUpdateFriendship(user1: $user1, user2: $user2) {
+      user1
+      user2
+      timestamp
+      hifives
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteFriendship = /* GraphQL */ `
+  subscription OnDeleteFriendship($user1: String, $user2: String) {
+    onDeleteFriendship(user1: $user1, user2: $user2) {
+      user1
+      user2
+      timestamp
+      hifives
       createdAt
       updatedAt
     }

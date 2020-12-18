@@ -14,12 +14,44 @@ const config = {
   disableOffline: true
 };
 
-const frQuery =
+const getFriendRequest =
 `
   query GetFriendRequest($sender: ID!, $receiver: ID!) {
     getFriendRequest(sender: $sender, receiver: $receiver) {
       sender
       receiver
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+const deleteFriendRequest =
+`
+  mutation DeleteFriendRequest(
+    $input: DeleteFriendRequestInput!
+    $condition: ModelFriendRequestConditionInput
+  ) {
+    deleteFriendRequest(input: $input, condition: $condition) {
+      sender
+      receiver
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+const createFriendship =
+`
+  mutation CreateFriendship(
+    $input: CreateFriendshipInput!
+    $condition: ModelFriendshipConditionInput
+  ) {
+    createFriendship(input: $input, condition: $condition) {
+      user1
+      user2
+      timestamp
+      hifives
       createdAt
       updatedAt
     }
@@ -37,17 +69,50 @@ exports.handler = (event, context, callback) => {
       (async () => {
         try {
           //console.log('getting a new object with a sender of ', JSON.stringify(record.dynamodb.NewImage.sender.S), 'seeing if an object exists with that receiver');
+          const receiver = record.dynamodb.NewImage.receiver.S;
+          const sender = record.dynamodb.NewImage.sender.S;
           const result = await client.query({
-            query: gql(frQuery),
+            query: gql(getFriendRequest),
             variables: {
-              sender: record.dynamodb.NewImage.receiver.S,
-              receiver: record.dynamodb.NewImage.sender.S,
+              sender: receiver,
+              receiver: sender,
             }
           });
-          if (result.data.getFriendRequest != null) {
-            console.log("phase 2")
+          if (result.data.getFriendRequest == null) {
+            console.log('couldnt find matching friend request');
+            callback(null, result.data);
+            return;
           }
           console.log(result);
+          await client.mutate({
+            mutation: gql(deleteFriendRequest),
+            variables: {
+              input: {
+                sender: receiver,
+                receiver: sender,
+              }
+            }
+          });
+          await client.mutate({
+            mutation: gql(deleteFriendRequest),
+            variables: {
+              input: {
+                sender: sender,
+                receiver: receiver,
+              }
+            }
+          });
+          await client.mutate({
+            mutation: gql(createFriendship),
+            variables: {
+              input: {
+                user1: receiver < sender ? receiver : sender,
+                user2: receiver < sender ? sender : receiver,
+                timestamp: Date.now(),
+                hifives: 0
+              }
+            }
+          });
         } catch (e) {
           console.warn('Error sending mutation: ',  e);
         }

@@ -24,11 +24,18 @@ input UpdateFriendRequestInput
 }
 
 type Friendship @model
-@key(fields: ["sender", "receiver"])
-@key(name: "ByReceiver", fields: ["receiver", "sender"], queryField: "friendsByReceiver")
+@auth(
+  rules: [
+      { allow: owner, ownerField: "user1", operations: [delete, read] },
+      { allow: owner, ownerField: "user2", operations: [delete, read] },
+      { allow: private, provider: iam, operations: [create, read, update] },
+  ]
+)
+@key(fields: ["user1", "user2"])
+@key(name: "BySecondUser", fields: ["user2", "user1"], queryField: "friendsBySecondUser")
 {
-  sender: ID!
-  receiver: ID!
+  user1: ID!
+  user2: ID!
   timestamp: AWSTimestamp!
   hifives: Int
 }
