@@ -25,6 +25,7 @@ const FriendScreen = ({route, navigation }) => {
     const [friendsEnabled, setFriendsEnabled] = useState(true);
     const [friendList, setFriendList] = useState([]);
     const [friendRequestList, setFriendRequestList] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
     
     const goToProfile = (id) => {
         navigation.navigate('Lookup',
@@ -35,6 +36,20 @@ const FriendScreen = ({route, navigation }) => {
         if (route.params?.id == item.user1) return item.user2;
         if (route.params?.id == item.user2) return item.user1;
     }
+    
+    const onFriendsRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        collectFriends();
+        //setAmountShown(initialAmount);
+        //showPostsAsync(initialAmount);
+    }, []);
+    
+    const onRequestsRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        collectFriendRequests();
+        //setAmountShown(initialAmount);
+        //showPostsAsync(initialAmount);
+    }, []);
 
     const removeFriendHandler = (item) => {
         const title = 'Are you sure you want to remove this friend?';
@@ -100,6 +115,7 @@ const FriendScreen = ({route, navigation }) => {
             console.log("#########-Friends-###########");
             console.log(items);
             setFriendList(items);
+            setRefreshing(false);
         }
         catch(err){
             console.log("error: ", err);
@@ -114,6 +130,7 @@ const FriendScreen = ({route, navigation }) => {
             );
             items = matchresult.data.listFriendRequests.items;
             setFriendRequestList(items);
+            setRefreshing(false);
         }
         catch(err){
             console.log("error: ", err);
@@ -146,7 +163,10 @@ const FriendScreen = ({route, navigation }) => {
                     
                     <View>
                         <Text style = {{alignSelf: 'center'}}>Your awesome friends!</Text> 
-                        <FlatList
+                        <FlatList                        
+                            refreshControl={
+                                <RefreshControl refreshing={refreshing} onRefresh={onFriendsRefresh} />
+                            }
                             keyExtractor = {(item) => item.timestamp.toString()}
                             data={friendList}
                             renderItem={({ item }) => (
@@ -172,7 +192,10 @@ const FriendScreen = ({route, navigation }) => {
 
                     <View>
                         <Text style = {{alignSelf: 'center'}}>Incoming Requests!</Text>
-                        <FlatList
+                        <FlatList                                            
+                            refreshControl={
+                                <RefreshControl refreshing={refreshing} onRefresh={onRequestsRefresh} />
+                            }
                             keyExtractor = {(item) => item.sender}
                             data={friendRequestList}
                             renderItem={({ item }) => (
