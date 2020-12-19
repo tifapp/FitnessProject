@@ -10,7 +10,7 @@ import {
 
 import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
 import { Amplify, API, graphqlOperation } from "aws-amplify";
-import { listFriendRequests, listFriendships, getFriendship, } from "root/src/graphql/queries";
+import { listFriendRequests, friendRequestsByReceiver, listFriendships, getFriendship, } from "root/src/graphql/queries";
 import { createFriendRequest, deleteFriendRequest, deleteFriendship } from "root/src/graphql/mutations";
 import { ProfileImageAndName } from 'components/ProfileImageAndName'
 
@@ -93,8 +93,9 @@ const FriendScreen = ({route, navigation }) => {
             console.log("error: ", err);
         }
 
-        // update friendRequestList and friendList
-        collectFriendRequests();
+        setFriendRequestList((friendRequestList) => {
+            return friendRequestList.filter((i) => (i.sender != item.sender));
+          });
         collectFriends();
     }
 
@@ -126,9 +127,9 @@ const FriendScreen = ({route, navigation }) => {
         let items = [];
         try{
             const matchresult = await API.graphql(
-                graphqlOperation(listFriendRequests)
+                graphqlOperation(friendRequestsByReceiver, {receiver: route.params?.id})
             );
-            items = matchresult.data.listFriendRequests.items;
+            items = matchresult.data.friendRequestsByReceiver.items;
             setFriendRequestList(items);
             setRefreshing(false);
         }
@@ -170,14 +171,14 @@ const FriendScreen = ({route, navigation }) => {
                             keyExtractor = {(item) => item.timestamp.toString()}
                             data={friendList}
                             renderItem={({ item }) => (
-                                <View style = {{flexDirection: 'row', alignSelf: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%'}}>
+                                <View style = {{flexDirection: 'row', alignItems: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%'}}>
                                     <TouchableOpacity onPress = {() => goToProfile(findFriendID(item))}>
                                         <ProfileImageAndName
                                             style={styles.smallImageStyle}
                                             userId={findFriendID(item)}
                                         />
                                     </TouchableOpacity>  
-                                    <TouchableOpacity style = {{flexDirection: 'row', alignItems: 'center'}} 
+                                    <TouchableOpacity style = {{flexDirection: 'row', alignItems: 'center', marginHorizontal: 15}} 
                                                       onPress = {() => removeFriendHandler(item)}>
                                         <Text>Delete</Text>
                                         <Entypo name="cross" style = {{marginHorizontal: 7}}
@@ -200,28 +201,30 @@ const FriendScreen = ({route, navigation }) => {
                             data={friendRequestList}
                             renderItem={({ item }) => (
                                 <View style = {{marginVertical: 5}}>
-                                    <View style = {{flexDirection: 'row', alignSelf: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%'}}>
+                                    <View style = {{flexDirection: 'column', alignSelf: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%'}}>
                                         <TouchableOpacity onPress = {() => goToProfile(item.sender)}>
                                             <ProfileImageAndName
                                                 style={styles.smallImageStyle}
                                                 userId={item.sender}
                                             />
                                         </TouchableOpacity> 
-                                        
-                                        <TouchableOpacity style = {{flexDirection: 'row', alignItems: 'center'}} 
-                                                          onPress = {() => acceptRequest(item)}>
-                                            <Text>Accept</Text>
-                                            <AntDesign name="check" style = {{marginHorizontal: 7}} 
-                                                size={44} color="green" />
-                                        </TouchableOpacity>
+                                        <View style = {{flexDirection: 'row', alignSelf: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%'}}>
+                                            
+                                            <TouchableOpacity style = {{flexDirection: 'row', alignItems: 'center'}} 
+                                                            onPress = {() => acceptRequest(item)}>
+                                                <Text>Accept</Text>
+                                                <AntDesign name="check" style = {{marginHorizontal: 7}} 
+                                                    size={44} color="green" />
+                                            </TouchableOpacity>
 
-                                        <TouchableOpacity style = {{flexDirection: 'row', alignItems: 'center'}} 
-                                                          onPress = {() => rejectRequest(item)}>
-                                            <Text>Reject</Text>
-                                            <Entypo name="cross" style = {{marginHorizontal: 7}}
-                                                size={44} color="red" />
-                                        </TouchableOpacity>
-                                        
+                                            <TouchableOpacity style = {{flexDirection: 'row', alignItems: 'center'}} 
+                                                            onPress = {() => rejectRequest(item)}>
+                                                <Text>Reject</Text>
+                                                <Entypo name="cross" style = {{marginHorizontal: 7}}
+                                                    size={44} color="red" />
+                                            </TouchableOpacity>
+                                            
+                                        </View>
                                     </View>
                                 </View>
                             )}
