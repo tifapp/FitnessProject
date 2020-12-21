@@ -26,8 +26,8 @@ input UpdateFriendRequestInput
 type Friendship @model
 @auth(
   rules: [
-      { allow: owner, ownerField: "user1", operations: [delete, read] },
-      { allow: owner, ownerField: "user2", operations: [delete, read] },
+      { allow: owner, ownerField: "user1", operations: [delete] },
+      { allow: owner, ownerField: "user2", operations: [delete] },
       { allow: private, provider: iam, operations: [create, read, update] },
   ]
 )
