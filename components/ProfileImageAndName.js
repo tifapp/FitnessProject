@@ -78,14 +78,26 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
             />
         )
     } else {
-        return (
-            <View style = {{flexDirection: 'row', alignItems: 'center'}} >
-            <Image 
-                style={[props.style, {marginRight: 15}]}
-                source={userInfo.imageURL === '' ? require('../assets/icon.png') : { uri: userInfo.imageURL }}
-            />
-            <Text>{userInfo.name}</Text>
-            </View>
-        )
+        if (props.vertical) {
+            return (
+                <View style = {{alignItems: 'center'}} >
+                <Image 
+                    style={[props.style, {marginBottom: 15}]}
+                    source={userInfo.imageURL === '' ? require('../assets/icon.png') : { uri: userInfo.imageURL }}
+                />
+                <Text>{userInfo.name}</Text>
+                </View>
+            )
+        } else {
+            return (
+                <View style = {{flexDirection: 'row', alignItems: 'center'}} >
+                <Image 
+                    style={[props.style, {marginRight: 15}]}
+                    source={userInfo.imageURL === '' ? require('../assets/icon.png') : { uri: userInfo.imageURL }}
+                />
+                <Text>{userInfo.name}</Text>
+                </View>
+            )
+        }
     }
 }
