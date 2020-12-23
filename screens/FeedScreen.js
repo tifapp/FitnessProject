@@ -38,7 +38,6 @@ export default function FeedScreen({ navigation, route }) {
   const [posts, setPosts] = useState([]);
   const numCharsLeft = 1000 - postVal.length;
   const [updatePostID, setUpdatePostID] = useState(0);
-  const [nextToken, setNextToken] = useState(null); //for pagination
   const [amountShown, setAmountShown] = useState(initialAmount);
   const [didUserPost, setDidUserPost] = useState(false);
   
@@ -46,7 +45,6 @@ export default function FeedScreen({ navigation, route }) {
   const [onlineCheck, setOnlineCheck] = useState(true);
 
   const [refreshing, setRefreshing] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setAmountShown(initialAmount);
@@ -173,7 +171,6 @@ export default function FeedScreen({ navigation, route }) {
   const showMorePostsAsync = async () => {
     try {
       if (nextToken != null) {
-        setLoadingMore(true);
         const query = await API.graphql(graphqlOperation(postsByGroup, {limit: additionalAmount, nextToken: nextToken, group: group != null ? group.id : 'general', sortDirection: 'DESC'} ));
   //
         if (isMounted.current) {
@@ -186,7 +183,6 @@ export default function FeedScreen({ navigation, route }) {
     } catch (err) {
       console.log("error in displaying posts: ", err);
     }
-    setLoadingMore(false);
   };
 
 
@@ -241,7 +237,7 @@ export default function FeedScreen({ navigation, route }) {
         </View>
       </View>
 
-      <FlatList
+      <PaginatedList
         data={posts}
         refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -259,21 +255,6 @@ export default function FeedScreen({ navigation, route }) {
         onEndReached={showMorePostsAsync}
         onEndReachedThreshold={1}
       />
-
-      {
-        loadingMore
-          ? 
-          <ActivityIndicator
-              size="large"
-              color="#0000ff"
-              style={{
-                  position: 'absolute',
-                  left: 0,
-                  right: 0,
-                  bottom: 20
-              }} />
-          : null
-      }
 
       <StatusBar style="auto" />
     </View>
