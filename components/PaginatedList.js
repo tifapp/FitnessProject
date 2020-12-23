@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   StyleSheet,
   View,
@@ -12,14 +12,20 @@ var styles = require("../styles/stylesheet");
 export default function PaginatedList(props) {
   const [loadingMore, setLoadingMore] = useState(false);
   const [nextToken, setNextToken] = useState(null); //for pagination
+  const [debounce, setDebounce] = useState(false);
 
   const loadMore = () => {
-    if (nextToken != null) { //if we don't check this, the list will repeat endlessly
+    if (!debounce && nextToken != null) { //if we don't check this, the list will repeat endlessly
+      setDebounce(true);
       setLoadingMore(true);
       props.showDataFunction(nextToken, setNextToken)
-        .finally(() => { setLoadingMore(false) });
+        .finally(() => { setLoadingMore(false); setDebounce(false); });
     }
   }
+  
+  useEffect(() => {
+    props.showDataFunction(nextToken, setNextToken);
+  }, []);
 
   return (
     <View>

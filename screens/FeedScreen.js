@@ -22,6 +22,7 @@ import { listPosts, postsByGroup } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
 import { onCreatePost, onDeletePost, onUpdatePost } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
+import PaginatedList from 'components/PaginatedList';
 
 require('root/androidtimerfix');
 
@@ -41,7 +42,6 @@ export default function FeedScreen({ navigation, route }) {
   const [amountShown, setAmountShown] = useState(initialAmount);
   const [didUserPost, setDidUserPost] = useState(false);
   
-  const isMounted = useRef(); //this variable exists to eliminate the "updated state on an unmounted component" warning
   const [onlineCheck, setOnlineCheck] = useState(true);
 
   const [refreshing, setRefreshing] = useState(false);
@@ -52,11 +52,8 @@ export default function FeedScreen({ navigation, route }) {
   }, []);
 
   useEffect(() => {
-    isMounted.current = true;
-    showPostsAsync();
     waitForNewPostsAsync();
     checkInternetConnection();
-    return () => {isMounted.current = false;}
   }, []);
   
   const checkInternetConnection = () => {
@@ -158,12 +155,10 @@ export default function FeedScreen({ navigation, route }) {
       const query = await API.graphql(graphqlOperation(postsByGroup, { limit: amountShown, nextToken: nextToken, group: group != null ? group.id : 'general', sortDirection: 'DESC' }));
       //console.log('showing these posts: ', query);
 
-      if (isMounted.current) {
-        setPosts([...posts, ...query.data.postsByGroup.items]);
-        setNextToken(query.data.postsByGroup.nextToken);
-        if (nextToken == null) {
-          setAmountShown(amountShown+additionalAmount);
-        }
+      setPosts([...posts, ...query.data.postsByGroup.items]);
+      setNextToken(query.data.postsByGroup.nextToken);
+      if (nextToken == null) {
+        setAmountShown(amountShown+additionalAmount);
       }
     } catch (err) {
       console.log("error in displaying posts: ", err);
