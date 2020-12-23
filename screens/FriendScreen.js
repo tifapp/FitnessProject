@@ -10,7 +10,7 @@ import {
 
 import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
 import { Amplify, API, graphqlOperation } from "aws-amplify";
-import { listFriendRequests, friendRequestsByReceiver, listFriendships, getFriendship, } from "root/src/graphql/queries";
+import { listFriendRequests, friendRequestsByReceiver, listFriendships, getFriendship, friendsBySecondUser} from "root/src/graphql/queries";
 import { createFriendRequest, deleteFriendRequest, deleteFriendship } from "root/src/graphql/mutations";
 import { ProfileImageAndName } from 'components/ProfileImageAndName'
 
@@ -109,10 +109,13 @@ const FriendScreen = ({route, navigation }) => {
         // Not sure if I set up the friend filter correctly.
         // Will come back to it when I figure out accept/rejecting requests
         try{
-            const matchresult = await API.graphql(
-                graphqlOperation(listFriendships)
+            const matchresult1 = await API.graphql(
+                graphqlOperation(listFriendships, {user1: route.params?.id})
             );
-            items = matchresult.data.listFriendships.items;
+            const matchresult2 = await API.graphql(
+                graphqlOperation(friendsBySecondUser, {user2: route.params?.id})
+            );
+            items = [...matchresult1.data.listFriendships.items, ...matchresult2.data.friendsBySecondUser.items,];
             console.log("#########-Friends-###########");
             console.log(items);
             setFriendList(items);
