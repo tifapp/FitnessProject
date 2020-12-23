@@ -23,8 +23,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 
 LogBox.ignoreLogs([
-    'Non-serializable values were found in the navigation state',
-  ]);
+  'Non-serializable values were found in the navigation state',
+]);
 
 Amplify.configure({
   awsconfig,
@@ -39,7 +39,7 @@ const config = {
 };
 
 const myCacheConfig = Cache.configure(config);
-//Cache.clear(); //will we have to do this for the next build?
+Cache.clear(); //will we have to do this for the next build?
 
 var styles = require("./styles/stylesheet");
 

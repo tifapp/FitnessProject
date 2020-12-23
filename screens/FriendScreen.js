@@ -1,22 +1,18 @@
 import React, {useState, useEffect} from 'react';
 import {
     Alert,
-    StyleSheet,
     View,
-    Button,
     FlatList,
-    Image,
     RefreshControl,
-    TextInput,
     Text,
     TouchableOpacity,
   } from "react-native";
 
 import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
 import { Amplify, API, graphqlOperation } from "aws-amplify";
-import { updateFriend, deleteFriend } from "root/src/graphql/mutations";
-import { listFriends } from "root/src/graphql/queries";
-import { ProfileImageAndName } from '../components/ProfileImage'
+import { listFriendRequests, friendRequestsByReceiver, listFriendships, getFriendship, } from "root/src/graphql/queries";
+import { createFriendRequest, deleteFriendRequest, deleteFriendship } from "root/src/graphql/mutations";
+import { ProfileImageAndName } from 'components/ProfileImageAndName'
 
 import { AntDesign } from '@expo/vector-icons'; 
 import { Entypo } from '@expo/vector-icons'; 
@@ -29,6 +25,7 @@ const FriendScreen = ({route, navigation }) => {
     const [friendsEnabled, setFriendsEnabled] = useState(true);
     const [friendList, setFriendList] = useState([]);
     const [friendRequestList, setFriendRequestList] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
     
     const goToProfile = (id) => {
         navigation.navigate('Lookup',
@@ -36,9 +33,23 @@ const FriendScreen = ({route, navigation }) => {
     }
 
     const findFriendID = (item) => {
-        if (route.params?.id == item.receiver) return item.sender;
-        if (route.params?.id == item.sender) return item.receiver;
+        if (route.params?.id == item.user1) return item.user2;
+        if (route.params?.id == item.user2) return item.user1;
     }
+    
+    const onFriendsRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        collectFriends();
+        //setAmountShown(initialAmount);
+        //showPostsAsync(initialAmount);
+    }, []);
+    
+    const onRequestsRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        collectFriendRequests();
+        //setAmountShown(initialAmount);
+        //showPostsAsync(initialAmount);
+    }, []);
 
     const removeFriendHandler = (item) => {
         const title = 'Are you sure you want to remove this friend?';
@@ -52,7 +63,7 @@ const FriendScreen = ({route, navigation }) => {
     const rejectRequest = async (item) => {
         // delete friend object
         try {
-            await API.graphql(graphqlOperation(deleteFriend, { input: { sender: item.sender, receiver: item.receiver}}));
+            await API.graphql(graphqlOperation(deleteFriendRequest, { input: { sender: item.sender, receiver: item.receiver}}));
         }
         catch(err){
             console.log("error: ", err);
@@ -64,7 +75,7 @@ const FriendScreen = ({route, navigation }) => {
     const removeFriend = async (item) => {
         // delete friend object
         try {
-            await API.graphql(graphqlOperation(deleteFriend, { input: { sender: item.sender, receiver: item.receiver}}));
+            await API.graphql(graphqlOperation(deleteFriendship, { input: { user1: item.user1, user2: item.user2 }}));
         }
         catch(err){
             console.log("error: ", err);
@@ -76,14 +87,15 @@ const FriendScreen = ({route, navigation }) => {
     const acceptRequest =  async (item) => {
         // accept friend request
         try {
-            await API.graphql(graphqlOperation(updateFriend, { input: { sender: item.sender, receiver: item.receiver, accepted: true}}));
+            await API.graphql(graphqlOperation(createFriendRequest, { input: { receiver: item.sender }}));
         }
         catch(err){
             console.log("error: ", err);
         }
 
-        // update friendRequestList and friendList
-        collectFriendRequests();
+        setFriendRequestList((friendRequestList) => {
+            return friendRequestList.filter((i) => (i.sender != item.sender));
+          });
         collectFriends();
     }
 
@@ -96,47 +108,30 @@ const FriendScreen = ({route, navigation }) => {
         let items = [];
         // Not sure if I set up the friend filter correctly.
         // Will come back to it when I figure out accept/rejecting requests
-        let friendFilter = {
-            and: {
-                or: [
-                    { receiver: {eq : route.params?.id} },
-                    { sender: {eq : route.params?.id} },
-                ],
-                and: { accepted: {eq : true} }
-            }
-        };
         try{
-            const namematchresult = await API.graphql(
-                graphqlOperation(listFriends, {
-                    filter: friendFilter
-                })
+            const matchresult = await API.graphql(
+                graphqlOperation(listFriendships)
             );
-            items = namematchresult.data.listFriends.items;
+            items = matchresult.data.listFriendships.items;
+            console.log("#########-Friends-###########");
+            console.log(items);
             setFriendList(items);
+            setRefreshing(false);
         }
         catch(err){
             console.log("error: ", err);
         }
-        console.log("#########-Friends-###########");
-        console.log(friendList);
 
     }
     const collectFriendRequests = async () => {
         let items = [];
-        let requestFilter = {
-            and: [
-                { receiver: {eq : route.params?.id} },
-                { accepted: {eq : false} }
-            ]
-        };
         try{
-            const namematchresult = await API.graphql(
-                graphqlOperation(listFriends, {
-                    filter: requestFilter
-                })
+            const matchresult = await API.graphql(
+                graphqlOperation(friendRequestsByReceiver, {receiver: route.params?.id})
             );
-            items = namematchresult.data.listFriends.items;
+            items = matchresult.data.friendRequestsByReceiver.items;
             setFriendRequestList(items);
+            setRefreshing(false);
         }
         catch(err){
             console.log("error: ", err);
@@ -169,19 +164,23 @@ const FriendScreen = ({route, navigation }) => {
                     
                     <View>
                         <Text style = {{alignSelf: 'center'}}>Your awesome friends!</Text> 
-                        <FlatList
-                            keyExtractor = {(item) => item.timestamp}
+                        <FlatList                        
+                            refreshControl={
+                                <RefreshControl refreshing={refreshing} onRefresh={onFriendsRefresh} />
+                            }
+                            keyExtractor = {(item) => item.timestamp.toString()}
                             data={friendList}
                             renderItem={({ item }) => (
-                                <View style = {{flexDirection: 'row', marginVertical: 5}}>
+                                <View style = {{flexDirection: 'row', alignItems: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%'}}>
                                     <TouchableOpacity onPress = {() => goToProfile(findFriendID(item))}>
                                         <ProfileImageAndName
                                             style={styles.smallImageStyle}
                                             userId={findFriendID(item)}
                                         />
                                     </TouchableOpacity>  
-                                    <TouchableOpacity style = {{alignSelf: 'center'}} 
+                                    <TouchableOpacity style = {{flexDirection: 'row', alignItems: 'center', marginHorizontal: 15}} 
                                                       onPress = {() => removeFriendHandler(item)}>
+                                        <Text>Delete</Text>
                                         <Entypo name="cross" style = {{marginHorizontal: 7}}
                                                 size={44} color="red" />
                                     </TouchableOpacity>
@@ -194,31 +193,38 @@ const FriendScreen = ({route, navigation }) => {
 
                     <View>
                         <Text style = {{alignSelf: 'center'}}>Incoming Requests!</Text>
-                        <FlatList
+                        <FlatList                                            
+                            refreshControl={
+                                <RefreshControl refreshing={refreshing} onRefresh={onRequestsRefresh} />
+                            }
                             keyExtractor = {(item) => item.sender}
                             data={friendRequestList}
                             renderItem={({ item }) => (
                                 <View style = {{marginVertical: 5}}>
-                                    <View style = {{flexDirection: 'row'}}>
+                                    <View style = {{flexDirection: 'column', alignSelf: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%'}}>
                                         <TouchableOpacity onPress = {() => goToProfile(item.sender)}>
                                             <ProfileImageAndName
                                                 style={styles.smallImageStyle}
                                                 userId={item.sender}
                                             />
                                         </TouchableOpacity> 
-                                        
-                                        <TouchableOpacity style = {{alignSelf: 'center'}}
-                                                          onPress = {() => acceptRequest(item)}>
-                                            <AntDesign name="check" style = {{marginHorizontal: 7}} 
-                                                size={44} color="green" />
-                                        </TouchableOpacity>
+                                        <View style = {{flexDirection: 'row', alignSelf: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%'}}>
+                                            
+                                            <TouchableOpacity style = {{flexDirection: 'row', alignItems: 'center'}} 
+                                                            onPress = {() => acceptRequest(item)}>
+                                                <Text>Accept</Text>
+                                                <AntDesign name="check" style = {{marginHorizontal: 7}} 
+                                                    size={44} color="green" />
+                                            </TouchableOpacity>
 
-                                        <TouchableOpacity style = {{alignSelf: 'center'}} 
-                                                          onPress = {() => rejectRequest(item)}>
-                                            <Entypo name="cross" style = {{marginHorizontal: 7}}
-                                                size={44} color="red" />
-                                        </TouchableOpacity>
-                                        
+                                            <TouchableOpacity style = {{flexDirection: 'row', alignItems: 'center'}} 
+                                                            onPress = {() => rejectRequest(item)}>
+                                                <Text>Reject</Text>
+                                                <Entypo name="cross" style = {{marginHorizontal: 7}}
+                                                    size={44} color="red" />
+                                            </TouchableOpacity>
+                                            
+                                        </View>
                                     </View>
                                 </View>
                             )}

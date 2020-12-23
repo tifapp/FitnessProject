@@ -1,0 +1,41 @@
+type FriendRequest @model
+@auth(
+  rules: [
+      { allow: owner, ownerField: "sender", operations: [create, delete, read] },
+      { allow: owner, ownerField: "receiver", operations: [create, delete, read] },
+      { allow: private, provider: iam, operations: [read, delete] },
+  ]
+)
+@key(fields: ["sender", "receiver"])
+@key(name: "ByReceiver", fields: ["receiver", "sender"], queryField: "friendRequestsByReceiver")
+{
+  sender: ID!
+  receiver: ID!
+}
+
+input CreateFriendRequestInput
+{
+  receiver: ID!
+}
+
+input UpdateFriendRequestInput
+{
+  receiver: ID!
+}
+
+type Friendship @model
+@auth(
+  rules: [
+      { allow: owner, ownerField: "user1", operations: [delete] },
+      { allow: owner, ownerField: "user2", operations: [delete] },
+      { allow: private, provider: iam, operations: [create, read, update] },
+  ]
+)
+@key(fields: ["user1", "user2"])
+@key(name: "BySecondUser", fields: ["user2", "user1"], queryField: "friendsBySecondUser")
+{
+  user1: ID!
+  user2: ID!
+  timestamp: AWSTimestamp!
+  hifives: Int
+}

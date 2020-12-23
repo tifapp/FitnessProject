@@ -111,7 +111,7 @@ const ProfileScreen = ({ navigation, route }) => {
             updateUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails, locationEnabled ? getLocation() : null)
                 .then((user) => {
                     if (route.params?.newUser) {
-                        route.params?.setUserIdFunction(userId);
+                        route.params?.setUserIdFunction(user.id);
                     }            
                     if (route.params?.fromLookup) {
                         navigation.setParams({fromLookup: false})

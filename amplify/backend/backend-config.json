@@ -19,7 +19,11 @@
               "userPoolId": "authfitnessprojecta8f49cfe"
             }
           },
-          "additionalAuthenticationProviders": []
+          "additionalAuthenticationProviders": [
+            {
+              "authenticationType": "AWS_IAM"
+            }
+          ]
         }
       }
     }
@@ -60,6 +64,21 @@
       "providerPlugin": "awscloudformation",
       "build": true,
       "dependsOn": []
+    },
+    "friendRequestResolver": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "api",
+          "resourceName": "fitnessproject",
+          "attributes": [
+            "GraphQLAPIIdOutput",
+            "GraphQLAPIEndpointOutput"
+          ]
+        }
+      ]
     }
   },
   "storage": {

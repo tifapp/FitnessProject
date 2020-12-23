@@ -6,21 +6,22 @@ import { ProfileImageAndName } from 'components/ProfileImageAndName'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import computeDistance from "hooks/computeDistance"
 import getLocation from 'hooks/useLocation';
-import { getUser } from "../src/graphql/queries";
-import { createPost, updatePost, deletePost, createFriend, deleteFriend } from "root/src/graphql/mutations";
-import { getFriend } from "root/src/graphql/queries";
+import printTime from 'hooks/printTime';
+import { getUser, getFriendRequest, getFriendship, } from "../src/graphql/queries";
+import { createFriendRequest, deleteFriendRequest, deleteFriendship } from "root/src/graphql/mutations";
 
 var styles = require('styles/stylesheet');
 
 const LookupUser = ({ route, navigation }) => {
 
-  const [friendRequest, setFriendRequest] = useState(false);
+  const [friendStatus, setFriendStatus] = useState("none"); //can be either "received", "sent", "friends", or "none". don't misspell!
+  const [hifiveSent, setHifiveSent] = useState(false); //can be either "received", "sent", or "none". don't misspell!
+  const [friendsSince, setFriendsSince] = useState("");
+  const [hifives, setHifives] = useState(0);
 
   const { user } = route.params;
   const { userId } = route.params;
   const { id } = route.params;
-  const { location } = route.params;
-  console.log(route.params)
   const checkUsersInfo = async () => {
     try {
       console.log("on the lookup screen, id is: ", userId);
@@ -42,62 +43,109 @@ const LookupUser = ({ route, navigation }) => {
   useEffect(() => {
     if (user == null) {
       checkUsersInfo();
-    } else {
-      checkFriendRequest();
     }
   }, []);
+  
+  useEffect(() => {
+    checkFriendStatus();
+  });
 
-  const checkFriendRequest = async () => {
+  const checkFriendStatus = async () => {
+    console.log("CHECKING FRIEND STATUS");
     try {
-      const friend = await API.graphql(
-        graphqlOperation(getFriend, { sender: route.params?.id, receiver: user.id })
+      let friendship = await API.graphql(
+        graphqlOperation(getFriendship, { 
+          user1: route.params?.id < user.id ? route.params?.id : user.id, 
+          user2: route.params?.id < user.id ? user.id : route.params?.id, 
+        })
       );
-      console.log(friend);
 
-      if (friend.data.getFriend == null) {
-        setFriendRequest(true);
+      if (friendship.data.getFriendship != null) {
+        setFriendStatus("friends");
+        setFriendsSince(printTime(friendship.data.getFriendship.timestamp * 1000));
+        setHifives(friendship.data.getFriendship.hifives);
+      } else {
+        console.log("YOU ARE NOT FRIENDS");
+        setFriendsSince("");
+
+        const sentFriendRequest = await API.graphql(
+          graphqlOperation(getFriendRequest, { sender: route.params?.id, receiver: user.id })
+        );
+
+        if (sentFriendRequest.data.getFriendRequest != null) {
+          setFriendStatus("sent");
+        } else {
+          const receivedFriendRequest = await API.graphql(
+            graphqlOperation(getFriendRequest, { sender: user.id, receiver: route.params?.id })
+          );
+
+          if (receivedFriendRequest.data.getFriendRequest != null) {
+            setFriendStatus("received");
+          } else {
+            setFriendStatus("none");
+          }
+        }
       }
-      else {
-        setFriendRequest(false);
-      }
-
-
     } catch (err) {
       console.log(err);
-      //console.log("error in finding user ", err);
-      setFriendRequest(true);
-      //console.log("check");
     }
   };
 
-  const addFriend = async () => {
-    Alert.alert('Submitting Friend Request...', '', [], { cancelable: false })
-
-    const newFriend = {
-      timestamp: Math.floor(Date.now() / 1000),
-      sender: route.params?.id,
-      receiver: user.id,
-      accepted: false //whoops
-    };
-    setFriendRequest(false);
-
+  const sendFriendRequest = async () => {
+    Alert.alert('Sending...', '', [], { cancelable: false })
+ 
     try {
-      await API.graphql(graphqlOperation(createFriend, { input: newFriend }));
+      await API.graphql(graphqlOperation(createFriendRequest, { input: { receiver: user.id, } }));
       console.log("success");
-      alert('Friend request submitted successfully!');
+      setFriendStatus("sent"); //if received, should change to "friends". do a check before this
+      alert('Sent successfully!');
     } catch (err) {
       console.log(err);
-      alert('Friend request could not be submitted! ');
+      alert('Could not be submitted!');
     }
   };
 
-  const deleteFriendRequest = async () => {
-    Alert.alert('Deleting Friend Request...', '', [], { cancelable: false })
-    console.log("hello");
+  const unsendFriendRequest = async () => {
+    Alert.alert('Unsending Friend Request...', '', [], { cancelable: false })
+
     try {
-      await API.graphql(graphqlOperation(deleteFriend, { input: { sender: route.params?.id, receiver: user.id } }));
-      setFriendRequest(true);
+      await API.graphql(graphqlOperation(deleteFriendRequest, { input: { sender: route.params?.id, receiver: user.id } }));
+      console.log("success");      
+      setFriendStatus("none");
+      alert('Friend request unsent successfully!');
+    } catch (err) {
+      console.log(err);
+      console.log("error in deleting post: ");
+    }
+  };
+  
+  const rejectFriendRequest = async () => {
+    Alert.alert('Rejecting Friend Request...', '', [], { cancelable: false })
+
+    try {
+      await API.graphql(graphqlOperation(deleteFriendRequest, { input: { sender: user.id, receiver: route.params?.id } }));
       console.log("success");
+      setFriendStatus("none");
+      alert('Friend request rejected successfully!');
+    } catch (err) {
+      console.log(err);
+      console.log("error in deleting post: ");
+    }
+  };
+  
+  const deleteFriend = async () => {
+    Alert.alert('Deleting Friend...', '', [], { cancelable: false })
+
+    try {
+      await API.graphql(graphqlOperation(deleteFriendship, { 
+        input: { 
+          user1: route.params?.id < user.id ? route.params?.id : user.id ,
+          user2: route.params?.id < user.id ? user.id : route.params?.id,
+        } 
+      }));
+      console.log("success");
+      setFriendStatus("none");
+      alert('Friend removed from friends list successfully!');
     } catch (err) {
       console.log(err);
       console.log("error in deleting post: ");
@@ -164,27 +212,53 @@ const LookupUser = ({ route, navigation }) => {
             </View>
             : null
         }
-        <View style={styles.buttonFormat}>
-          {friendRequest ?
-            <TouchableOpacity
-              onPress={() => {
-                addFriend()
-              }}
-              style={styles.submitButton}
-            >
-              <Text style={styles.buttonTextStyle}>Send Friend Request</Text>
-            </TouchableOpacity>
-            :
-            <TouchableOpacity
-              onPress={() => {
-                deleteFriendRequest()
-              }}
-              style={styles.unsendButton}
-            >
-              <Text style={styles.buttonTextStyle}>Unsend Friend Request</Text>
-            </TouchableOpacity>
-          }
-        </View>
+        {route.params?.id != user.id ?
+          <View style={styles.buttonFormat}>
+            {friendStatus == "none" ?
+              <TouchableOpacity
+                onPress={sendFriendRequest}
+                style={styles.submitButton}
+              >
+                <Text style={styles.buttonTextStyle}>Send Friend Request</Text>
+              </TouchableOpacity>
+              : friendStatus == "sent" ?
+              <TouchableOpacity
+                onPress={unsendFriendRequest}
+                style={styles.unsendButton}
+              >
+                <Text style={styles.buttonTextStyle}>Unsend Friend Request</Text>
+              </TouchableOpacity>
+              : friendStatus == "received" ?
+              <View>
+                <TouchableOpacity
+                  onPress={rejectFriendRequest}
+                  style={styles.unsendButton}
+                >
+                  <Text style={styles.buttonTextStyle}>Reject Friend Request</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={sendFriendRequest}
+                  style={styles.unsendButton}
+                >
+                  <Text style={styles.buttonTextStyle}>Accept Friend Request</Text>
+                </TouchableOpacity>
+              </View>
+              : 
+              <View>
+                <View style={styles.viewProfileScreen}>
+                  <Text>Friends for {friendsSince} </Text>
+                </View>
+                <TouchableOpacity
+                  onPress={deleteFriend}
+                  style={styles.unsendButton}
+                >
+                  <Text style={styles.buttonTextStyle}>Delete Friend</Text>
+                </TouchableOpacity>
+              </View>
+            }
+          </View>
+          : null
+        }
       </ScrollView>
   )
 }

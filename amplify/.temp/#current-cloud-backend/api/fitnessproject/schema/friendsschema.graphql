@@ -1,9 +1,0 @@
-type Friend @model
-@key(fields: ["sender", "receiver"])
-@key(name: "ByReceiver", fields: ["receiver", "sender"], queryField: "friendsByReceiver")
-{
-  timestamp: AWSTimestamp!
-  sender: ID!
-  receiver: ID!
-  accepted: Boolean!
-}

@@ -1,46 +1,42 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const createFriend = /* GraphQL */ `
-  mutation CreateFriend(
-    $input: CreateFriendInput!
-    $condition: ModelFriendConditionInput
+export const createFriendRequest = /* GraphQL */ `
+  mutation CreateFriendRequest(
+    $input: CreateFriendRequestInput!
+    $condition: ModelFriendRequestConditionInput
   ) {
-    createFriend(input: $input, condition: $condition) {
-      timestamp
+    createFriendRequest(input: $input, condition: $condition) {
       sender
       receiver
-      accepted
       createdAt
       updatedAt
     }
   }
 `;
-export const updateFriend = /* GraphQL */ `
-  mutation UpdateFriend(
-    $input: UpdateFriendInput!
-    $condition: ModelFriendConditionInput
+export const updateFriendRequest = /* GraphQL */ `
+  mutation UpdateFriendRequest(
+    $input: UpdateFriendRequestInput!
+    $condition: ModelFriendRequestConditionInput
   ) {
-    updateFriend(input: $input, condition: $condition) {
-      timestamp
+    updateFriendRequest(input: $input, condition: $condition) {
       sender
       receiver
-      accepted
       createdAt
       updatedAt
     }
   }
 `;
-export const deleteFriend = /* GraphQL */ `
-  mutation DeleteFriend(
-    $input: DeleteFriendInput!
-    $condition: ModelFriendConditionInput
+export const deleteFriendship = /* GraphQL */ `
+  mutation DeleteFriendship(
+    $input: DeleteFriendshipInput!
+    $condition: ModelFriendshipConditionInput
   ) {
-    deleteFriend(input: $input, condition: $condition) {
+    deleteFriendship(input: $input, condition: $condition) {
+      user1
+      user2
       timestamp
-      sender
-      receiver
-      accepted
+      hifives
       createdAt
       updatedAt
     }
@@ -206,6 +202,49 @@ export const deleteUser = /* GraphQL */ `
       goals
       latitude
       longitude
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteFriendRequest = /* GraphQL */ `
+  mutation DeleteFriendRequest(
+    $input: DeleteFriendRequestInput!
+    $condition: ModelFriendRequestConditionInput
+  ) {
+    deleteFriendRequest(input: $input, condition: $condition) {
+      sender
+      receiver
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const createFriendship = /* GraphQL */ `
+  mutation CreateFriendship(
+    $input: CreateFriendshipInput!
+    $condition: ModelFriendshipConditionInput
+  ) {
+    createFriendship(input: $input, condition: $condition) {
+      user1
+      user2
+      timestamp
+      hifives
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateFriendship = /* GraphQL */ `
+  mutation UpdateFriendship(
+    $input: UpdateFriendshipInput!
+    $condition: ModelFriendshipConditionInput
+  ) {
+    updateFriendship(input: $input, condition: $condition) {
+      user1
+      user2
+      timestamp
+      hifives
       createdAt
       updatedAt
     }
