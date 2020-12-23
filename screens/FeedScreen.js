@@ -84,7 +84,10 @@ export default function FeedScreen({ navigation, route }) {
     await API.graphql(graphqlOperation(onDeletePost)).subscribe({
       next: newPost => {
         if (!didUserPost) {
-          showPostsAsync();
+          //check if newpost is earlier than the earliest post in the array first.
+          //if so, we won't even need to rerender anything
+          //if not, loop through the posts array to find the one that matches newpost and replace it!
+          //showPostsAsync();
         } else {          
           setDidUserPost(false);
         }
@@ -93,7 +96,10 @@ export default function FeedScreen({ navigation, route }) {
     await API.graphql(graphqlOperation(onUpdatePost)).subscribe({
       next: newPost => {
         if (!didUserPost) {
-          showPostsAsync();
+          //check if newpost is earlier than the earliest post in the array first.
+          //if so, we won't even need to rerender anything
+          //if not, loop through the posts array to find the one that matches newpost and replace it!
+          //showPostsAsync();
         } else {          
           setDidUserPost(false);
         }
