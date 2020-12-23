@@ -75,24 +75,27 @@ export default function FeedScreen({ navigation, route }) {
     await API.graphql(graphqlOperation(onCreatePost)).subscribe({
       next: newPost => {
         if (!didUserPost) {
-          setDidUserPost(false);
           showPostsAsync();
+        } else {          
+          setDidUserPost(false);
         }
       }
     });
     await API.graphql(graphqlOperation(onDeletePost)).subscribe({
       next: newPost => {
         if (!didUserPost) {
-          setDidUserPost(false);
           showPostsAsync();
+        } else {          
+          setDidUserPost(false);
         }
       }
     });
     await API.graphql(graphqlOperation(onUpdatePost)).subscribe({
       next: newPost => {
         if (!didUserPost) {
-          setDidUserPost(false);
           showPostsAsync();
+        } else {          
+          setDidUserPost(false);
         }
       }
     });
