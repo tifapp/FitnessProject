@@ -1,17 +1,11 @@
 import React, { useState } from "react";
-import { Storage } from "aws-amplify";
 import {
   StyleSheet,
   View,
-  Button,
-  Image,
-  TextInput,
-  Text,
-  TouchableOpacity,
+  RefreshControl,
+  FlatList,
   ActivityIndicator,
 } from "react-native";
-import { useNavigation } from '@react-navigation/native';
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 var styles = require("../styles/stylesheet");
 
@@ -20,28 +14,20 @@ export default function PaginatedList(props) {
   const [nextToken, setNextToken] = useState(null); //for pagination
 
   const loadMore = () => {
-    setLoadingMore(true);
-    showMorePostsAsync()
-      .finally(() => { setLoadingMore(false) });
+    if (nextToken != null) { //if we don't check this, the list will repeat endlessly
+      setLoadingMore(true);
+      props.showDataFunction(nextToken, setNextToken)
+        .finally(() => { setLoadingMore(false) });
+    }
   }
 
   return (
     <View>
       <FlatList
-        data={posts}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        renderItem={({ item }) => (
-          <PostItem
-            item={item}
-            deletePostsAsync={deletePostsAsync}
-            writtenByYou={item.userId === route.params?.id}
-            setPostVal={setPostVal}
-            setUpdatePostID={setUpdatePostID}
-          />
-        )}
-        keyExtractor={(item, index) => item.timestamp.toString() + item.userId}
+        data={props.data}
+        refreshControl={props.refreshControl}
+        renderItem={props.renderItem}
+        keyExtractor={props.keyExtractor}
         onEndReached={loadMore}
         onEndReachedThreshold={1}
       />

@@ -48,12 +48,12 @@ export default function FeedScreen({ navigation, route }) {
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setAmountShown(initialAmount);
-    showPostsAsync(initialAmount);
+    showPostsAsync();
   }, []);
 
   useEffect(() => {
     isMounted.current = true;
-    showPostsAsync(amountShown);
+    showPostsAsync();
     waitForNewPostsAsync();
     checkInternetConnection();
     return () => {isMounted.current = false;}
@@ -82,7 +82,7 @@ export default function FeedScreen({ navigation, route }) {
       next: newPost => {
         if (!didUserPost) {
           setDidUserPost(false);
-          showPostsAsync(amountShown+1);
+          showPostsAsync();
           setAmountShown(amountShown+1);
         }
       }
@@ -91,7 +91,7 @@ export default function FeedScreen({ navigation, route }) {
       next: newPost => {
         if (!didUserPost) {
           setDidUserPost(false);
-          showPostsAsync(amountShown);
+          showPostsAsync();
         }
       }
     });
@@ -99,7 +99,7 @@ export default function FeedScreen({ navigation, route }) {
       next: newPost => {
         if (!didUserPost) {
           setDidUserPost(false);
-          showPostsAsync(amountShown);
+          showPostsAsync();
         }
       }
     });
@@ -149,42 +149,27 @@ export default function FeedScreen({ navigation, route }) {
     
   };
 
-  const showPostsAsync = async (amountShown) => {
+  const showPostsAsync = async (nextToken, setNextToken) => {
     //do not refetch if the user themselves added or updated a post
     //if new posts are being added don't refetch the entire batch, only append the new posts
     //if a post is being updated don't refetch the entire batch, only update that post
     //if a lot of new posts are being added dont save all of them, paginate them at like 100 posts
     try {
-      const query = await API.graphql(graphqlOperation(postsByGroup, {limit: amountShown, nextToken: null, group: group != null ? group.id : 'general', sortDirection: 'DESC'} ));
+      const query = await API.graphql(graphqlOperation(postsByGroup, { limit: amountShown, nextToken: nextToken, group: group != null ? group.id : 'general', sortDirection: 'DESC' }));
       //console.log('showing these posts: ', query);
 
       if (isMounted.current) {
-        setPosts(query.data.postsByGroup.items);
+        setPosts([...posts, ...query.data.postsByGroup.items]);
         setNextToken(query.data.postsByGroup.nextToken);
+        if (nextToken == null) {
+          setAmountShown(amountShown+additionalAmount);
+        }
       }
     } catch (err) {
       console.log("error in displaying posts: ", err);
     }
     setRefreshing(false);
   };
-  
-  const showMorePostsAsync = async () => {
-    try {
-      if (nextToken != null) {
-        const query = await API.graphql(graphqlOperation(postsByGroup, {limit: additionalAmount, nextToken: nextToken, group: group != null ? group.id : 'general', sortDirection: 'DESC'} ));
-  //
-        if (isMounted.current) {
-          setPosts([...posts, ...query.data.postsByGroup.items]);
-          setAmountShown(amountShown+additionalAmount);
-          setNextToken(query.data.postsByGroup.nextToken);
-          //console.log('nextToken: ', query.data.postsByGroup.nextToken);
-        }
-      }
-    } catch (err) {
-      console.log("error in displaying posts: ", err);
-    }
-  };
-
 
   const deletePostsAsync = async (timestamp) => {
     setDidUserPost(true);
@@ -238,6 +223,7 @@ export default function FeedScreen({ navigation, route }) {
       </View>
 
       <PaginatedList
+        showDataFunction={showPostsAsync}
         data={posts}
         refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -252,8 +238,6 @@ export default function FeedScreen({ navigation, route }) {
           />
         )}
         keyExtractor={(item, index) => item.timestamp.toString() + item.userId}
-        onEndReached={showMorePostsAsync}
-        onEndReachedThreshold={1}
       />
 
       <StatusBar style="auto" />
