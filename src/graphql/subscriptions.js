@@ -170,8 +170,8 @@ export const onDeleteFriendRequest = /* GraphQL */ `
   }
 `;
 export const onCreateFriendship = /* GraphQL */ `
-  subscription OnCreateFriendship($user1: String, $user2: String) {
-    onCreateFriendship(user1: $user1, user2: $user2) {
+  subscription OnCreateFriendship {
+    onCreateFriendship {
       user1
       user2
       timestamp
@@ -182,8 +182,8 @@ export const onCreateFriendship = /* GraphQL */ `
   }
 `;
 export const onUpdateFriendship = /* GraphQL */ `
-  subscription OnUpdateFriendship($user1: String, $user2: String) {
-    onUpdateFriendship(user1: $user1, user2: $user2) {
+  subscription OnUpdateFriendship {
+    onUpdateFriendship {
       user1
       user2
       timestamp
@@ -194,8 +194,8 @@ export const onUpdateFriendship = /* GraphQL */ `
   }
 `;
 export const onDeleteFriendship = /* GraphQL */ `
-  subscription OnDeleteFriendship($user1: String, $user2: String) {
-    onDeleteFriendship(user1: $user1, user2: $user2) {
+  subscription OnDeleteFriendship {
+    onDeleteFriendship {
       user1
       user2
       timestamp
