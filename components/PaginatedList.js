@@ -48,7 +48,7 @@ export default function PaginatedList(props) {
               position: 'absolute',
               left: 0,
               right: 0,
-              bottom: 20
+              bottom: 200
             }} />
           : null
       }

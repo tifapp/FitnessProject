@@ -156,9 +156,11 @@ export default function FeedScreen({ navigation, route }) {
       //console.log('showing these posts: ', query);
 
       setPosts([...posts, ...query.data.postsByGroup.items]);
-      setNextToken(query.data.postsByGroup.nextToken);
       if (nextToken == null) {
         setAmountShown(amountShown+additionalAmount);
+      }
+      if (setNextToken != null) {
+        setNextToken(query.data.postsByGroup.nextToken);
       }
     } catch (err) {
       console.log("error in displaying posts: ", err);
