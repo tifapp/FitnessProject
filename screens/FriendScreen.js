@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import {
     Alert,
     View,
-    FlatList,
     RefreshControl,
     Text,
     TouchableOpacity,
@@ -13,6 +12,7 @@ import { Amplify, API, graphqlOperation } from "aws-amplify";
 import { listFriendRequests, friendRequestsByReceiver, listFriendships, getFriendship, friendsBySecondUser} from "root/src/graphql/queries";
 import { createFriendRequest, deleteFriendRequest, deleteFriendship } from "root/src/graphql/mutations";
 import { ProfileImageAndName } from 'components/ProfileImageAndName'
+import PaginatedList from 'components/PaginatedList';
 
 import { AntDesign } from '@expo/vector-icons'; 
 import { Entypo } from '@expo/vector-icons'; 
@@ -20,6 +20,9 @@ import { Entypo } from '@expo/vector-icons';
 Amplify.configure(awsconfig);
 
 var styles = require('styles/stylesheet');
+
+const initialAmount = 10;
+const additionalAmount = 5;
 
 const FriendScreen = ({route, navigation }) => {
     const [friendsEnabled, setFriendsEnabled] = useState(true);
@@ -40,15 +43,11 @@ const FriendScreen = ({route, navigation }) => {
     const onFriendsRefresh = React.useCallback(() => {
         setRefreshing(true);
         collectFriends();
-        //setAmountShown(initialAmount);
-        //showPostsAsync(initialAmount);
     }, []);
     
     const onRequestsRefresh = React.useCallback(() => {
         setRefreshing(true);
         collectFriendRequests();
-        //setAmountShown(initialAmount);
-        //showPostsAsync(initialAmount);
     }, []);
 
     const removeFriendHandler = (item) => {
@@ -167,7 +166,8 @@ const FriendScreen = ({route, navigation }) => {
                     
                     <View>
                         <Text style = {{alignSelf: 'center'}}>Your awesome friends!</Text> 
-                        <FlatList                        
+                        <PaginatedList          
+                            showDataFunction={showPostsAsync}                 
                             refreshControl={
                                 <RefreshControl refreshing={refreshing} onRefresh={onFriendsRefresh} />
                             }
@@ -196,7 +196,8 @@ const FriendScreen = ({route, navigation }) => {
 
                     <View>
                         <Text style = {{alignSelf: 'center'}}>Incoming Requests!</Text>
-                        <FlatList                                            
+                        <PaginatedList        
+                            showDataFunction={showPostsAsync}                                    
                             refreshControl={
                                 <RefreshControl refreshing={refreshing} onRefresh={onRequestsRefresh} />
                             }

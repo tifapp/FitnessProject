@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
-  FlatList,
   RefreshControl,
   ActivityIndicator,
 } from "react-native";
@@ -39,7 +38,6 @@ export default function FeedScreen({ navigation, route }) {
   const [posts, setPosts] = useState([]);
   const numCharsLeft = 1000 - postVal.length;
   const [updatePostID, setUpdatePostID] = useState(0);
-  const [amountShown, setAmountShown] = useState(initialAmount);
   const [didUserPost, setDidUserPost] = useState(false);
   
   const [onlineCheck, setOnlineCheck] = useState(true);
@@ -47,7 +45,6 @@ export default function FeedScreen({ navigation, route }) {
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    setAmountShown(initialAmount);
     showPostsAsync();
   }, []);
 
@@ -80,7 +77,6 @@ export default function FeedScreen({ navigation, route }) {
         if (!didUserPost) {
           setDidUserPost(false);
           showPostsAsync();
-          setAmountShown(amountShown+1);
         }
       }
     });
@@ -136,7 +132,6 @@ export default function FeedScreen({ navigation, route }) {
       setPosts([newPost, ...posts]);
       try {
         await API.graphql(graphqlOperation(createPost, { input: newPost }));
-        setAmountShown(amountShown+1);
         console.log("success in making a new post, group is false? ", group == null);
       } catch (err) {
         console.log("error in creating post: ", err);
@@ -152,13 +147,10 @@ export default function FeedScreen({ navigation, route }) {
     //if a post is being updated don't refetch the entire batch, only update that post
     //if a lot of new posts are being added dont save all of them, paginate them at like 100 posts
     try {
-      const query = await API.graphql(graphqlOperation(postsByGroup, { limit: amountShown, nextToken: nextToken, group: group != null ? group.id : 'general', sortDirection: 'DESC' }));
+      const query = await API.graphql(graphqlOperation(postsByGroup, { limit: nextToken == null ? initialAmount : additionalAmount, nextToken: nextToken, group: group != null ? group.id : 'general', sortDirection: 'DESC' }));
       //console.log('showing these posts: ', query);
 
       setPosts([...posts, ...query.data.postsByGroup.items]);
-      if (nextToken != null) {
-        setAmountShown(amountShown+additionalAmount);
-      }
       if (setNextToken != null) {
         setNextToken(query.data.postsByGroup.nextToken);
       }
