@@ -24,6 +24,8 @@ import awsconfig from "../aws-exports"; // if you are using Amplify CLI
 import { Entypo } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 
+const { width } = Dimensions.get("screen");
+
 export default function NameField({ setName, nameVal }) {
   return (
     <View>
@@ -31,7 +33,7 @@ export default function NameField({ setName, nameVal }) {
         <Text>Name: </Text>
         <TextInput
           multine="true"
-          placeholder="Enter your name..."
+          placeholder="Enter your name ..."
           onChangeText={setName}
           value={nameVal}
         />
@@ -48,5 +50,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     paddingTop: 30,
     paddingBottom: 15,
+    width: width / 1.3
   },
 });

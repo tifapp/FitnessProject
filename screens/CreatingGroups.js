@@ -26,7 +26,6 @@ import CreatingHeader from "./GroupsHeader";
 import { Entypo } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import NameField from "components/NameField";
-import MaxUsers from "components/MaxUsers";
 import PrivacySettings from "components/Privacy";
 import SportCreation from "components/Sport";
 import GroupDescription from "components/Description";
@@ -36,7 +35,7 @@ export default function CreatingGroups({route}) {
   console.log(route.params?.id);
   const [nameVal, setName] = useState("");
   const [privacyVal, setPrivacy] = useState("Public");
-  const [totalUsersVal, setTotalUsers] = useState("");
+  //const [totalUsersVal, setTotalUsers] = useState("");
   const [sportVal, setSport] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [descriptionVal, setDescription] = useState("");
@@ -57,7 +56,7 @@ export default function CreatingGroups({route}) {
     const {group} = route.params;
     setName(group.name);
     setPrivacy(group.Privacy);
-    setTotalUsers(group.maxUsers)
+    //setTotalUsers(group.maxUsers)
     setSport(group.Sport);
     setDescription(group.Description);
   }
@@ -70,7 +69,7 @@ export default function CreatingGroups({route}) {
     const val = {
       userID: route.params?.id,
       name: nameVal,
-      maxUsers: totalUsersVal,
+      //maxUsers: totalUsersVal,
       Privacy: privacyVal,
       Sport: sportVal,
       Description: descriptionVal,
@@ -79,7 +78,7 @@ export default function CreatingGroups({route}) {
     setDescription("");
     setName("");
     setPrivacy("Public");
-    setTotalUsers("");
+    //setTotalUsers("");
     setSport("");
     setDescription("");
 
@@ -99,12 +98,12 @@ export default function CreatingGroups({route}) {
     setDescription("");
     setName("");
     setPrivacy("Public");
-    setTotalUsers("");
+    //setTotalUsers("");
     setSport("");
 
     try {
       const {group} = route.params;
-      const updatedGroup = { id: group.id, name: nameVal, maxUsers: totalUsersVal,
+      const updatedGroup = { id: group.id, name: nameVal,
         Privacy: privacyVal, Sport: sportVal, 
         Description: descriptionVal};
       await API.graphql(graphqlOperation(updateGroup, { input: updatedGroup }));
@@ -131,10 +130,6 @@ export default function CreatingGroups({route}) {
       <View>
         <View style={styles.border}>
           <NameField setName={setName} nameVal={nameVal} />
-          <MaxUsers
-            setTotalUsers={setTotalUsers}
-            totalUsersVal={totalUsersVal}
-          />
           <PrivacySettings
             setPrivacy={setPrivacy}
             privacyVal={privacyVal}
@@ -155,7 +150,6 @@ export default function CreatingGroups({route}) {
               onPress={() => {
                 nameVal != "" &&
                 privacyVal != "" &&
-                totalUsersVal != "" &&
                 sportVal != "" &&
                 descriptionVal != "" &&
                 descriptionVal.length <= characterCount

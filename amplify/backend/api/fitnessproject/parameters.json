@@ -1,11 +1,11 @@
 {
-  "AppSyncApiName": "fitnessproject",
-  "DynamoDBBillingMode": "PAY_PER_REQUEST",
-  "DynamoDBEnableServerSideEncryption": false,
-  "AuthCognitoUserPoolId": {
-    "Fn::GetAtt": [
-      "authfitnessprojecta8f49cfe",
-      "Outputs.UserPoolId"
-    ]
-  }
+    "AppSyncApiName": "fitnessproject",
+    "DynamoDBBillingMode": "PAY_PER_REQUEST",
+    "DynamoDBEnableServerSideEncryption": false,
+    "AuthCognitoUserPoolId": {
+        "Fn::GetAtt": [
+            "authfitnessprojecta8f49cfe",
+            "Outputs.UserPoolId"
+        ]
+    }
 }
