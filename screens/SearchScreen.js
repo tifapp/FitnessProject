@@ -68,8 +68,8 @@ export default function GroupSearchScreen({ navigation, route }) {
                         }
                     },]
                 }
-            }
-            ));
+            })
+            );
             return unformattedresults.data.listUsers.items;
         } catch (err) {
             console.log("error while searching: ", err);
@@ -96,10 +96,11 @@ export default function GroupSearchScreen({ navigation, route }) {
                 })
             );
 
+            console.log("group items are ", unformattedresults.data.listGroups.items);
             return unformattedresults.data.listGroups.items;
         } catch (err) {
             console.log("error while searching: ", err);
-            return err.data.listGroups.items; //since some users have string ages rather than int ages
+            //return err.data.listGroups.items; //since some users have string ages rather than int ages
         }
     }
     
@@ -119,32 +120,39 @@ export default function GroupSearchScreen({ navigation, route }) {
         if (matchingnames.data.length > 0) results.push(matchingnames);
         if (relevantdescriptions.data.length > 0) results.push(relevantdescriptions);
 
-        setResults(results);
+        return results;
     }
 
     useEffect(() => {        
-        setLoading(true);
         if (query !== "") {
+            setLoading(true);
             (async () => {
                 if (type == "group") {
                     return fetchGroupResultsAsync();
                 } else if (type == "user") {
                     return fetchUserResultsAsync();
                 } else {
-                    return fetchAllResultsAsync();
+                    //return fetchAllResultsAsync();
                 }
             })()
             .then(results => {
-                if (query === currentQuery.current.trim()) {
-                    formatresults(results);
+                if (results != null && query === currentQuery.current) {
+                    if (type == "group") {
+                        setGroupResults(formatresults(results));
+                    } else if (type == "user") {
+                        setUserResults(formatresults(results));
+                    } else {
+                    }
                 }
                 else {
                     console.log("ignoring!");
                 }
-                setLoading(false);
+            }).finally(()=>{
+                setLoading(false)
             });
         } else {            
-            setResults([]);
+            setUserResults([]);
+            setGroupResults([]);
         }
     }, [query, type]);
 
@@ -164,8 +172,8 @@ export default function GroupSearchScreen({ navigation, route }) {
                     ref={searchBarRef}
                     style={[styles.textInputStyle, { flexGrow: 1 }]}
                     placeholder="Search for names or keywords!"
-                    onChangeText={() => {
-                        setQuery(query.trim());
+                    onChangeText={(text) => {
+                        setQuery(text.trim());
                     }}
                     value={query}
                     clearButtonMode="always"
@@ -238,10 +246,10 @@ export default function GroupSearchScreen({ navigation, route }) {
                             justifyContent: "space-around",
                             padding: 10,
                         }} />
-                    : results.length > 0
+                    : (type == "group" && groupResults.length > 0) || (type == "user" && userResults.length > 0)
                         ? <SectionList
                             style={{ marginBottom: 80 }}
-                            sections={results}
+                            sections={(type == "group") ? groupResults : userResults}
                             renderItem={({ item }) =>
                                 (type == "group")
                                     ? <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} />
