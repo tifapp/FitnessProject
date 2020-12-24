@@ -270,6 +270,7 @@ const LookupUser = ({ route, navigation }) => {
           <View style={{ paddingBottom: 15 }}>
 
             <ProfileImageAndName
+              vertical={true}
               style={styles.imageStyle}
               userId={user.id}
               isFull={true}
