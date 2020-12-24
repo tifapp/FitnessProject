@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert, Button, Image, Dimensions } from 'react-native';
+import { ActivityIndicator, SafeAreaView, View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert, Button, Image, Dimensions, FlatList } from 'react-native';
 import { API, graphqlOperation } from "aws-amplify";
 import { StackActions, NavigationActions } from 'react-navigation';
 import { ProfileImageAndName } from 'components/ProfileImageAndName'
@@ -7,17 +7,26 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import computeDistance from "hooks/computeDistance"
 import getLocation from 'hooks/useLocation';
 import printTime from 'hooks/printTime';
-import { getUser, getFriendRequest, getFriendship, } from "../src/graphql/queries";
+import { getUser, getFriendRequest, getFriendship, listFriendships, friendsBySecondUser } from "../src/graphql/queries";
 import { createFriendRequest, deleteFriendRequest, deleteFriendship } from "root/src/graphql/mutations";
+import MutualFriends from "components/MutualFriendsList";
 
 var styles = require('styles/stylesheet');
 
+
 const LookupUser = ({ route, navigation }) => {
+
+  const goToProfile = (item) => {
+    console.log("check");
+    navigation.push('Lookup',
+      { userId: item})
+  }
 
   const [friendStatus, setFriendStatus] = useState("none"); //can be either "received", "sent", "friends", or "none". don't misspell!
   const [hifiveSent, setHifiveSent] = useState(false); //can be either "received", "sent", or "none". don't misspell!
   const [friendsSince, setFriendsSince] = useState("");
   const [hifives, setHifives] = useState(0);
+  const [mutualfriendList, setMutualFriendList] = useState([]);
 
   const { user } = route.params;
   const { userId } = route.params;
@@ -41,6 +50,7 @@ const LookupUser = ({ route, navigation }) => {
     }
   };
 
+
   useEffect(() => {
     if (user == null) {
       checkUsersInfo();
@@ -49,7 +59,57 @@ const LookupUser = ({ route, navigation }) => {
   
   useEffect(() => {
     checkFriendStatus();
-  });
+    collectMutualFriends();
+  }, []);
+
+
+
+
+  const collectMutualFriends = async () => {
+    let user1_items = [];
+    let user2_items = [];
+    let total_items = [];
+
+    console.log("Collecting Friends");
+
+    try{
+        const match_result_1 = await API.graphql(
+            graphqlOperation(listFriendships, {user1: user.id})
+        );
+        
+        user1_items = match_result_1.data.listFriendships.items;
+        
+
+        const match_result_2 = await API.graphql(
+          graphqlOperation(friendsBySecondUser, {user2: route.params?.id})
+        );
+
+        user2_items = match_result_2.data.friendsBySecondUser.items;
+        console.log("User 1's Friends!")
+        console.log(user1_items);
+        console.log("User 2's Friends!")
+        console.log(user2_items);
+
+        user1_items = user1_items.map((x) => x.user2);
+        user2_items = user2_items.map((x) => x.user1);
+
+        console.log(user1_items);
+        console.log("******************************************")
+        console.log(user2_items);
+
+        total_items = user1_items.filter((x) => (user2_items.includes(x)));
+        console.log("-----------------------------");
+        console.log(total_items);
+
+        setMutualFriendList(total_items);
+
+        //setFriendRequestList(items);
+        //setRefreshing(false);
+    }
+    catch(err){
+        console.log("error: ", err);
+    }
+}
 
   const checkFriendStatus = async () => {
     console.log("CHECKING FRIEND STATUS");
@@ -65,8 +125,14 @@ const LookupUser = ({ route, navigation }) => {
         setFriendStatus("friends");
         setFriendsSince(printTime(friendship.data.getFriendship.timestamp * 1000));
         setHifives(friendship.data.getFriendship.hifives);
+        console.log("check");
+        console.log(friendship.data.getFriendship);
+        //console.log(friendship.data.getFriendship.user2);
+
       } else {
         console.log("YOU ARE NOT FRIENDS");
+        console.log(friendship.data.getFriendship.user1);
+        console.log(friendship.data.getFriendship.user2);
         setFriendsSince("");
 
         const sentFriendRequest = await API.graphql(
@@ -88,6 +154,31 @@ const LookupUser = ({ route, navigation }) => {
         }
       }
     } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const checkMutualFriendStatus = async () => {
+    console.log("CHECKING MUTUAL FRIEND STATUS");
+    try {
+      let friendship = await API.graphql(
+        graphqlOperation(listFriendships, { 
+          user1: route.params?.id < user.id ? route.params?.id : user.id, 
+          user2: route.params?.id < user.id ? user.id : route.params?.id, 
+        })
+      );
+
+      if (friendship.data.listFriendships != null) {
+        console.log(friendship.data.listFriendships);
+
+      } else {
+        console.log("YOU ARE NOT MUTUAL FRIENDS");
+        console.log(friendship.data.getFriendship.user1);
+        console.log(friendship.data.getFriendship.user2);
+        setFriendsSince("");
+      }
+    }catch (err) {
+      console.log("Invalid");
       console.log(err);
     }
   };
@@ -155,6 +246,7 @@ const LookupUser = ({ route, navigation }) => {
 
   return (
     user == null ? null :
+    <View>
       <ScrollView>
         {
           user.id == id
@@ -204,7 +296,39 @@ const LookupUser = ({ route, navigation }) => {
         <View style={styles.viewProfileScreen}>
           <Text>Goals: </Text>
         </View>
+
         <Text style={styles.textBoxStyle}>{user.goals}</Text>
+        <View>
+
+        { (mutualfriendList.length != 0) ?
+        <View style={styles.viewProfileScreen}>
+          <Text>Mutual Friends: </Text>
+        </View>
+        : null
+        }
+
+        </View>
+        <View>
+        <SafeAreaView style={{flex: 1}}>
+            <FlatList
+            data={mutualfriendList}
+            //keyExtractor = {(item) => item.toString()}
+            keyExtractor = {(item, index) => item}
+            renderItem={({ item }) => (
+              <View style = {{marginVertical: 5}}>
+                  <View style = {{flexDirection: 'row', alignSelf: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%'}}>
+                      <TouchableOpacity onPress = {() => goToProfile(item)}>
+                          <ProfileImageAndName
+                              style={styles.smallImageStyle}
+                              userId={item}
+                          />
+                      </TouchableOpacity>
+                  </View> 
+              </View>
+            )}
+          />
+          </SafeAreaView>
+        </View>
         {
           getLocation() != null && user.latitude != null
             ?
@@ -261,6 +385,7 @@ const LookupUser = ({ route, navigation }) => {
           : null
         }
       </ScrollView>
+      </View>
   )
 }
 

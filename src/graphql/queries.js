@@ -7,7 +7,6 @@ export const getGroup = /* GraphQL */ `
       id
       userID
       name
-      maxUsers
       Privacy
       Sport
       Description
@@ -29,7 +28,6 @@ export const listGroups = /* GraphQL */ `
         id
         userID
         name
-        maxUsers
         Privacy
         Sport
         Description

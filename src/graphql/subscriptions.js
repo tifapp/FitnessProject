@@ -7,7 +7,6 @@ export const onCreateGroup = /* GraphQL */ `
       id
       userID
       name
-      maxUsers
       Privacy
       Sport
       Description
@@ -24,7 +23,6 @@ export const onUpdateGroup = /* GraphQL */ `
       id
       userID
       name
-      maxUsers
       Privacy
       Sport
       Description
@@ -41,7 +39,6 @@ export const onDeleteGroup = /* GraphQL */ `
       id
       userID
       name
-      maxUsers
       Privacy
       Sport
       Description

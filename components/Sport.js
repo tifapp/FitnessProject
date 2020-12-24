@@ -21,6 +21,8 @@ import { withAuthenticator } from "aws-amplify-react-native";
 import { Amplify, API, graphqlOperation, Auth } from "aws-amplify";
 import awsconfig from "../aws-exports"; // if you are using Amplify CLI
 
+const { width } = Dimensions.get("screen");
+
 export default function SportCreation({ setSport, sportVal }) {
   return (
     <View>
@@ -45,5 +47,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     paddingTop: 30,
     paddingBottom: 15,
+    width: width / 1.3
   },
 });
