@@ -42,12 +42,16 @@ const FriendScreen = ({route, navigation }) => {
     
     const onFriendsRefresh = React.useCallback(() => {
         setRefreshing(true);
-        collectFriends();
+        collectFriends()
+        .then(()=>{setRefreshing(false)})
+        .catch();
     }, []);
     
     const onRequestsRefresh = React.useCallback(() => {
         setRefreshing(true);
-        collectFriendRequests();
+        collectFriendRequests()
+        .then(()=>{setRefreshing(false)})
+        .catch();
     }, []);
 
     const removeFriendHandler = (item) => {
@@ -103,7 +107,7 @@ const FriendScreen = ({route, navigation }) => {
         collectFriendRequests();
     }
 
-    const collectFriends = async() => {
+    const collectFriends = async (nextToken, setNextToken) => {
         let items = [];
         // Not sure if I set up the friend filter correctly.
         // Will come back to it when I figure out accept/rejecting requests
@@ -118,22 +122,22 @@ const FriendScreen = ({route, navigation }) => {
             console.log("#########-Friends-###########");
             console.log(items);
             setFriendList(items);
-            setRefreshing(false);
         }
         catch(err){
             console.log("error: ", err);
         }
 
     }
-    const collectFriendRequests = async () => {
-        let items = [];
+    const collectFriendRequests = async (nextToken, setNextToken) => {
         try{
             const matchresult = await API.graphql(
-                graphqlOperation(friendRequestsByReceiver, {receiver: route.params?.id})
+                graphqlOperation(friendRequestsByReceiver, { limit: nextToken == null ? initialAmount : additionalAmount, nextToken: nextToken, receiver: route.params?.id})
             );
-            items = matchresult.data.friendRequestsByReceiver.items;
-            setFriendRequestList(items);
-            setRefreshing(false);
+            setFriendRequestList([...friendRequestList, ...matchresult.data.friendRequestsByReceiver.items]);
+
+            if (setNextToken != null) {
+              setNextToken(matchresult.data.friendRequestsByReceiver.nextToken);
+            }
         }
         catch(err){
             console.log("error: ", err);
@@ -166,8 +170,7 @@ const FriendScreen = ({route, navigation }) => {
                     
                     <View>
                         <Text style = {{alignSelf: 'center'}}>Your awesome friends!</Text> 
-                        <PaginatedList          
-                            showDataFunction={showPostsAsync}                 
+                        <FlatList                          
                             refreshControl={
                                 <RefreshControl refreshing={refreshing} onRefresh={onFriendsRefresh} />
                             }
@@ -197,7 +200,7 @@ const FriendScreen = ({route, navigation }) => {
                     <View>
                         <Text style = {{alignSelf: 'center'}}>Incoming Requests!</Text>
                         <PaginatedList        
-                            showDataFunction={showPostsAsync}                                    
+                            showDataFunction={collectFriendRequests}                                    
                             refreshControl={
                                 <RefreshControl refreshing={refreshing} onRefresh={onRequestsRefresh} />
                             }

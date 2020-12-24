@@ -45,7 +45,9 @@ export default function FeedScreen({ navigation, route }) {
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    showPostsAsync();
+    fetchPostsAsync()
+    .then(()=>{setRefreshing(false)})
+    .catch();
   }, []);
 
   useEffect(() => {
@@ -75,7 +77,7 @@ export default function FeedScreen({ navigation, route }) {
     await API.graphql(graphqlOperation(onCreatePost)).subscribe({
       next: newPost => {
         if (!didUserPost) {
-          showPostsAsync();
+          fetchPostsAsync();
         } else {          
           setDidUserPost(false);
         }
@@ -150,13 +152,15 @@ export default function FeedScreen({ navigation, route }) {
     
   };
 
-  const showPostsAsync = async (nextToken, setNextToken) => {
+  const fetchPostsAsync = async (nextToken, setNextToken) => {
     //do not refetch if the user themselves added or updated a post
     //if new posts are being added don't refetch the entire batch, only append the new posts
     //if a post is being updated don't refetch the entire batch, only update that post
     //if a lot of new posts are being added dont save all of them, paginate them at like 100 posts
     try {
-      const query = await API.graphql(graphqlOperation(postsByGroup, { limit: nextToken == null ? initialAmount : additionalAmount, nextToken: nextToken, group: group != null ? group.id : 'general', sortDirection: 'DESC' }));
+      const query = await API.graphql(
+        graphqlOperation(postsByGroup, { limit: nextToken == null ? initialAmount : additionalAmount, nextToken: nextToken, group: group != null ? group.id : 'general', sortDirection: 'DESC' })
+      );
       //console.log('showing these posts: ', query);
 
       setPosts([...posts, ...query.data.postsByGroup.items]);
@@ -166,7 +170,6 @@ export default function FeedScreen({ navigation, route }) {
     } catch (err) {
       console.log("error in displaying posts: ", err);
     }
-    setRefreshing(false);
   };
 
   const deletePostsAsync = async (timestamp) => {
@@ -221,7 +224,7 @@ export default function FeedScreen({ navigation, route }) {
       </View>
 
       <PaginatedList
-        showDataFunction={showPostsAsync}
+        showDataFunction={fetchPostsAsync}
         data={posts}
         refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
