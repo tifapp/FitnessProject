@@ -108,35 +108,61 @@ const FriendScreen = ({route, navigation }) => {
     }
 
     const collectFriends = async (nextToken, setNextToken) => {
-        let items = [];
-        // Not sure if I set up the friend filter correctly.
+        // Not sure if I set up the friend filter correctly. 
         // Will come back to it when I figure out accept/rejecting requests
         try{
-            const matchresult1 = await API.graphql(
-                graphqlOperation(listFriendships, {user1: route.params?.id})
+            const matchresult = await API.graphql(
+                graphqlOperation(listFriendships, { limit: nextToken == null ? initialAmount : additionalAmount, nextToken: nextToken, 
+                    filter: { //it's simply supposed to be "user1 == route.params.id OR user2 == route.params.id", but we have to use and's and not's since "or" for some reason doesn't work
+                        not: {
+                            and: {
+                                not: {
+                                    user1: {
+                                        eq: route.params?.id
+                                    }
+                                },
+                                and: {
+                                    not: {
+                                        user2: {
+                                            eq: route.params?.id
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                })
             );
-            const matchresult2 = await API.graphql(
-                graphqlOperation(friendsBySecondUser, {user2: route.params?.id})
-            );
-            items = [...matchresult1.data.listFriendships.items, ...matchresult2.data.friendsBySecondUser.items,];
             console.log("#########-Friends-###########");
-            console.log(items);
-            setFriendList(items);
+            console.log(matchresult.data.listFriendships.items);
+
+            if (nextToken != null)
+                setFriendList([...friendList, ...matchresult.data.listFriendships.items,]);
+            else
+                setFriendList(matchresult.data.listFriendships.items,);
+            
+            if (setNextToken != null) {
+                setNextToken(matchresult.data.listFriendships.nextToken);
+            }
         }
         catch(err){
             console.log("error: ", err);
         }
-
     }
+    
     const collectFriendRequests = async (nextToken, setNextToken) => {
         try{
             const matchresult = await API.graphql(
                 graphqlOperation(friendRequestsByReceiver, { limit: nextToken == null ? initialAmount : additionalAmount, nextToken: nextToken, receiver: route.params?.id})
             );
-            setFriendRequestList([...friendRequestList, ...matchresult.data.friendRequestsByReceiver.items]);
+            
+            if (nextToken != null)
+                setFriendRequestList([...friendRequestList, ...matchresult.data.friendRequestsByReceiver.items]);
+            else
+                setFriendRequestList(matchresult.data.friendRequestsByReceiver.items);
 
             if (setNextToken != null) {
-              setNextToken(matchresult.data.friendRequestsByReceiver.nextToken);
+                setNextToken(matchresult.data.friendRequestsByReceiver.nextToken);
             }
         }
         catch(err){
@@ -170,7 +196,8 @@ const FriendScreen = ({route, navigation }) => {
                     
                     <View>
                         <Text style = {{alignSelf: 'center'}}>Your awesome friends!</Text> 
-                        <FlatList                          
+                        <PaginatedList  
+                            showDataFunction={collectFriends}                                
                             refreshControl={
                                 <RefreshControl refreshing={refreshing} onRefresh={onFriendsRefresh} />
                             }

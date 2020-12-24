@@ -163,7 +163,10 @@ export default function FeedScreen({ navigation, route }) {
       );
       //console.log('showing these posts: ', query);
 
-      setPosts([...posts, ...query.data.postsByGroup.items]);
+      if (nextToken != null)
+        setPosts([...posts, ...query.data.postsByGroup.items]);
+      else
+        setPosts(query.data.postsByGroup.items);
       if (setNextToken != null) {
         setNextToken(query.data.postsByGroup.nextToken);
       }
