@@ -52,29 +52,21 @@ export default function GroupSearchScreen({ navigation, route }) {
             //also case insensitive search does not work for some reason.
             const unformattedresults = await API.graphql(graphqlOperation(listUsers, {
                 filter: {
-                    not: {
-                        and: {
-                            not: {
-                                name: {
-                                    beginsWith: query
-                                }
-                            },
-                            and: {
-                                not: {
-                                    and: {
-                                        bio: {
-                                            contains: query
-                                        }
-                                    },
-                                    not: {
-                                        goals: {
-                                            contains: query
-                                        }
-                                    },
-                                }
-                            }
+                    or: [{
+                        name: {
+                            beginsWith: query
                         }
-                    }
+                    },
+                    {
+                        bio: {
+                            contains: query
+                        }
+                    },
+                    {
+                        goals: {
+                            contains: query
+                        }
+                    },]
                 }
             }
             ));
@@ -90,22 +82,16 @@ export default function GroupSearchScreen({ navigation, route }) {
             const unformattedresults = await API.graphql(
                 graphqlOperation(listGroups, {
                     filter: {
-                        not: {
-                            and: {
-                                not: {
-                                    name: {
-                                        beginsWith: query
-                                    }
-                                },
-                                and: {
-                                    not: {
-                                        Sport: {
-                                            contains: query
-                                        }
-                                    }
-                                }
+                        or: [{
+                            name: {
+                                beginsWith: query
                             }
-                        }
+                        },
+                        {
+                            Sport: {
+                                contains: query
+                            }
+                        }]
                     },
                 })
             );
