@@ -36,134 +36,130 @@ var styles = require("styles/stylesheet");
 
 export default function GroupSearchScreen({ navigation, route }) {
     const [query, setQuery] = useState("");
-    const [results, setResults] = useState({});
+    const [userResults, setUserResults] = useState([]);
+    const [groupResults, setGroupResults] = useState([]);
     const [type, setType] = useState("user");
     const [loading, setLoading] = useState(false);
     const currentQuery = useRef();
     const searchBarRef = useRef();
 
-    const goGroupCreationScreen = () => {
-        navigation.navigate('Create Group')
-    }
-
     //still not 100% sure why this works, will have to come back to it. got from here: https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
     currentQuery.current = query;
 
-    const formatresults = (cleanText, items) => {
+    const fetchUserResultsAsync = async (nextToken, showNextToken) => {
+        try {
+            //for some darn reason the or operator doesn't work. and works, not works, but not OR!!!! So I have to use these dumb demorgans laws.
+            //also case insensitive search does not work for some reason.
+            const unformattedresults = await API.graphql(graphqlOperation(listUsers, {
+                filter: {
+                    not: {
+                        and: {
+                            not: {
+                                name: {
+                                    beginsWith: query
+                                }
+                            },
+                            and: {
+                                not: {
+                                    and: {
+                                        bio: {
+                                            contains: query
+                                        }
+                                    },
+                                    not: {
+                                        goals: {
+                                            contains: query
+                                        }
+                                    },
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            ));
+            return unformattedresults.data.listUsers.items;
+        } catch (err) {
+            console.log("error while searching: ", err);
+            return err.data.listUsers.items;
+        }
+    }
+    
+    const fetchGroupResultsAsync = async (nextToken, showNextToken) => {
+        try {
+            const unformattedresults = await API.graphql(
+                graphqlOperation(listGroups, {
+                    filter: {
+                        not: {
+                            and: {
+                                not: {
+                                    name: {
+                                        beginsWith: query
+                                    }
+                                },
+                                and: {
+                                    not: {
+                                        Sport: {
+                                            contains: query
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                })
+            );
+
+            return unformattedresults.data.listGroups.items;
+        } catch (err) {
+            console.log("error while searching: ", err);
+            return err.data.listGroups.items; //since some users have string ages rather than int ages
+        }
+    }
+    
+    const formatresults = (items) => {
         let matchingnames = { title: "Matching Names", key: "name", data: [] }
         let relevantdescriptions = { title: "Relevant Descriptions", key: "desc", data: [] }
         items.forEach(element => {
             console.log(element.name);
-            if (element.name.startsWith(cleanText)) {
+            if (element.name.startsWith(query)) {
                 matchingnames.data.push(element);
             } else {
                 relevantdescriptions.data.push(element);
             }
         });
 
-        const allresults = [];
-        if (matchingnames.data.length > 0) allresults.push(matchingnames);
-        if (relevantdescriptions.data.length > 0) allresults.push(relevantdescriptions);
+        const results = [];
+        if (matchingnames.data.length > 0) results.push(matchingnames);
+        if (relevantdescriptions.data.length > 0) results.push(relevantdescriptions);
 
-        if (cleanText === currentQuery.current.trim()) {
-            setResults(allresults);
-            console.log("here's some results! ", cleanText);
-        } else {
-            console.log("ignoring!");
-        }
+        setResults(results);
     }
 
-    const showResultsAsync = async (text) => {
-        let items = [];
-        /*
-        if(mode=="group"){
-          console.log("check");
-        }
-        */
-
-        if (text !== "") {
-            setLoading(true);
-            const cleanText = text.trim();
-            if (type == "group") {
-                try {
-                    const unformattedresults = await API.graphql(
-                        graphqlOperation(listGroups, {
-                            filter: {
-                                not: {
-                                    and: {
-                                        not: {
-                                            name: {
-                                                beginsWith: cleanText
-                                            }
-                                        },
-                                        and: {
-                                            not: {
-                                                Sport: {
-                                                    contains: cleanText
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                        })
-                    );
-
-                    formatresults(cleanText, unformattedresults.data.listGroups.items);
-                } catch (err) {
-                    formatresults(cleanText, err.data.listGroups.items);
-                    console.log("error: ", err);
+    useEffect(() => {        
+        setLoading(true);
+        if (query !== "") {
+            (async () => {
+                if (type == "group") {
+                    return fetchGroupResultsAsync();
+                } else if (type == "user") {
+                    return fetchUserResultsAsync();
+                } else {
+                    return fetchAllResultsAsync();
                 }
-            }
-            else {
-                try {
-                    //for some darn reason the or operator doesn't work. and works, not works, but not OR!!!! So I have to use these dumb demorgans laws.
-                    //also case insensitive search does not work for some reason.
-                    const unformattedresults = await API.graphql(graphqlOperation(listUsers, {
-                        filter: {
-                            not: {
-                                and: {
-                                    not: {
-                                        name: {
-                                            beginsWith: cleanText
-                                        }
-                                    },
-                                    and: {
-                                        not: {
-                                            and: {
-                                                bio: {
-                                                    contains: cleanText
-                                                }
-                                            },
-                                            not: {
-                                                goals: {
-                                                    contains: cleanText
-                                                }
-                                            },
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    ));
-
-                    formatresults(cleanText, unformattedresults.data.listUsers.items);
-                } catch (err) {
-                    formatresults(cleanText, err.data.listUsers.items);
-                    console.log("error while searching: ", err);
+            })()
+            .then(results => {
+                if (query === currentQuery.current.trim()) {
+                    formatresults(results);
                 }
-            }
+                else {
+                    console.log("ignoring!");
+                }
+                setLoading(false);
+            });
+        } else {            
+            setResults([]);
         }
-        else {
-            console.log("check");
-            setResults({});
-        }
-        setLoading(false);
-    };
-
-    useEffect(() => {
-        showResultsAsync(query);
     }, [query, type]);
 
     return (
@@ -182,7 +178,9 @@ export default function GroupSearchScreen({ navigation, route }) {
                     ref={searchBarRef}
                     style={[styles.textInputStyle, { flexGrow: 1 }]}
                     placeholder="Search for names or keywords!"
-                    onChangeText={setQuery}
+                    onChangeText={() => {
+                        setQuery(query.trim());
+                    }}
                     value={query}
                     clearButtonMode="always"
                 />
