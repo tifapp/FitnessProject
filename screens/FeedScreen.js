@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
-  FlatList,
   RefreshControl,
   ActivityIndicator,
 } from "react-native";
@@ -22,6 +21,7 @@ import { listPosts, postsByGroup } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
 import { onCreatePost, onDeletePost, onUpdatePost } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
+import PaginatedList from 'components/PaginatedList';
 
 require('root/androidtimerfix');
 
@@ -38,27 +38,21 @@ export default function FeedScreen({ navigation, route }) {
   const [posts, setPosts] = useState([]);
   const numCharsLeft = 1000 - postVal.length;
   const [updatePostID, setUpdatePostID] = useState(0);
-  const [nextToken, setNextToken] = useState(null); //for pagination
-  const [amountShown, setAmountShown] = useState(initialAmount);
   const [didUserPost, setDidUserPost] = useState(false);
   
-  const isMounted = useRef(); //this variable exists to eliminate the "updated state on an unmounted component" warning
   const [onlineCheck, setOnlineCheck] = useState(true);
 
   const [refreshing, setRefreshing] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    setAmountShown(initialAmount);
-    showPostsAsync(initialAmount);
+    fetchPostsAsync()
+    .then(()=>{setRefreshing(false)})
+    .catch();
   }, []);
 
   useEffect(() => {
-    isMounted.current = true;
-    showPostsAsync(amountShown);
     waitForNewPostsAsync();
     checkInternetConnection();
-    return () => {isMounted.current = false;}
   }, []);
   
   const checkInternetConnection = () => {
@@ -83,25 +77,33 @@ export default function FeedScreen({ navigation, route }) {
     await API.graphql(graphqlOperation(onCreatePost)).subscribe({
       next: newPost => {
         if (!didUserPost) {
+          fetchPostsAsync();
+        } else {          
           setDidUserPost(false);
-          showPostsAsync(amountShown+1);
-          setAmountShown(amountShown+1);
         }
       }
     });
     await API.graphql(graphqlOperation(onDeletePost)).subscribe({
       next: newPost => {
         if (!didUserPost) {
+          //check if newpost is earlier than the earliest post in the array first.
+          //if so, we won't even need to rerender anything
+          //if not, loop through the posts array to find the one that matches newpost and replace it!
+          //showPostsAsync();
+        } else {          
           setDidUserPost(false);
-          showPostsAsync(amountShown);
         }
       }
     });
     await API.graphql(graphqlOperation(onUpdatePost)).subscribe({
       next: newPost => {
         if (!didUserPost) {
+          //check if newpost is earlier than the earliest post in the array first.
+          //if so, we won't even need to rerender anything
+          //if not, loop through the posts array to find the one that matches newpost and replace it!
+          //showPostsAsync();
+        } else {          
           setDidUserPost(false);
-          showPostsAsync(amountShown);
         }
       }
     });
@@ -141,7 +143,6 @@ export default function FeedScreen({ navigation, route }) {
       setPosts([newPost, ...posts]);
       try {
         await API.graphql(graphqlOperation(createPost, { input: newPost }));
-        setAmountShown(amountShown+1);
         console.log("success in making a new post, group is false? ", group == null);
       } catch (err) {
         console.log("error in creating post: ", err);
@@ -151,44 +152,28 @@ export default function FeedScreen({ navigation, route }) {
     
   };
 
-  const showPostsAsync = async (amountShown) => {
+  const fetchPostsAsync = async (nextToken, setNextToken) => {
     //do not refetch if the user themselves added or updated a post
     //if new posts are being added don't refetch the entire batch, only append the new posts
     //if a post is being updated don't refetch the entire batch, only update that post
     //if a lot of new posts are being added dont save all of them, paginate them at like 100 posts
     try {
-      const query = await API.graphql(graphqlOperation(postsByGroup, {limit: amountShown, nextToken: null, group: group != null ? group.id : 'general', sortDirection: 'DESC'} ));
+      const query = await API.graphql(
+        graphqlOperation(postsByGroup, { limit: nextToken == null ? initialAmount : additionalAmount, nextToken: nextToken, group: group != null ? group.id : 'general', sortDirection: 'DESC' })
+      );
       //console.log('showing these posts: ', query);
 
-      if (isMounted.current) {
+      if (nextToken != null)
+        setPosts([...posts, ...query.data.postsByGroup.items]);
+      else
         setPosts(query.data.postsByGroup.items);
+      if (setNextToken != null) {
         setNextToken(query.data.postsByGroup.nextToken);
       }
     } catch (err) {
       console.log("error in displaying posts: ", err);
     }
-    setRefreshing(false);
   };
-  
-  const showMorePostsAsync = async () => {
-    try {
-      if (nextToken != null) {
-        setLoadingMore(true);
-        const query = await API.graphql(graphqlOperation(postsByGroup, {limit: additionalAmount, nextToken: nextToken, group: group != null ? group.id : 'general', sortDirection: 'DESC'} ));
-  //
-        if (isMounted.current) {
-          setPosts([...posts, ...query.data.postsByGroup.items]);
-          setAmountShown(amountShown+additionalAmount);
-          setNextToken(query.data.postsByGroup.nextToken);
-          //console.log('nextToken: ', query.data.postsByGroup.nextToken);
-        }
-      }
-    } catch (err) {
-      console.log("error in displaying posts: ", err);
-    }
-    setLoadingMore(false);
-  };
-
 
   const deletePostsAsync = async (timestamp) => {
     setDidUserPost(true);
@@ -241,7 +226,8 @@ export default function FeedScreen({ navigation, route }) {
         </View>
       </View>
 
-      <FlatList
+      <PaginatedList
+        showDataFunction={fetchPostsAsync}
         data={posts}
         refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -256,24 +242,7 @@ export default function FeedScreen({ navigation, route }) {
           />
         )}
         keyExtractor={(item, index) => item.timestamp.toString() + item.userId}
-        onEndReached={showMorePostsAsync}
-        onEndReachedThreshold={1}
       />
-
-      {
-        loadingMore
-          ? 
-          <ActivityIndicator
-              size="large"
-              color="#0000ff"
-              style={{
-                  position: 'absolute',
-                  left: 0,
-                  right: 0,
-                  bottom: 20
-              }} />
-          : null
-      }
 
       <StatusBar style="auto" />
     </View>

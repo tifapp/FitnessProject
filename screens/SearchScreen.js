@@ -36,134 +36,124 @@ var styles = require("styles/stylesheet");
 
 export default function GroupSearchScreen({ navigation, route }) {
     const [query, setQuery] = useState("");
-    const [results, setResults] = useState({});
+    const [userResults, setUserResults] = useState([]);
+    const [groupResults, setGroupResults] = useState([]);
     const [type, setType] = useState("user");
     const [loading, setLoading] = useState(false);
     const currentQuery = useRef();
     const searchBarRef = useRef();
 
-    const goGroupCreationScreen = () => {
-        navigation.navigate('Create Group')
-    }
-
     //still not 100% sure why this works, will have to come back to it. got from here: https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
     currentQuery.current = query;
 
-    const formatresults = (cleanText, items) => {
+    const fetchUserResultsAsync = async (nextToken, showNextToken) => {
+        try {
+            //for some darn reason the or operator doesn't work. and works, not works, but not OR!!!! So I have to use these dumb demorgans laws.
+            //also case insensitive search does not work for some reason.
+            const unformattedresults = await API.graphql(graphqlOperation(listUsers, {
+                filter: {
+                    or: [{
+                        name: {
+                            beginsWith: query
+                        }
+                    },
+                    {
+                        bio: {
+                            contains: query
+                        }
+                    },
+                    {
+                        goals: {
+                            contains: query
+                        }
+                    },]
+                }
+            })
+            );
+            return unformattedresults.data.listUsers.items;
+        } catch (err) {
+            console.log("error while searching: ", err);
+            return err.data.listUsers.items;
+        }
+    }
+    
+    const fetchGroupResultsAsync = async (nextToken, showNextToken) => {
+        try {
+            const unformattedresults = await API.graphql(
+                graphqlOperation(listGroups, {
+                    filter: {
+                        or: [{
+                            name: {
+                                beginsWith: query
+                            }
+                        },
+                        {
+                            Sport: {
+                                contains: query
+                            }
+                        }]
+                    },
+                })
+            );
+
+            console.log("group items are ", unformattedresults.data.listGroups.items);
+            return unformattedresults.data.listGroups.items;
+        } catch (err) {
+            console.log("error while searching: ", err);
+            //return err.data.listGroups.items; //since some users have string ages rather than int ages
+        }
+    }
+    
+    const formatresults = (items) => {
         let matchingnames = { title: "Matching Names", key: "name", data: [] }
         let relevantdescriptions = { title: "Relevant Descriptions", key: "desc", data: [] }
         items.forEach(element => {
             console.log(element.name);
-            if (element.name.startsWith(cleanText)) {
+            if (element.name.startsWith(query)) {
                 matchingnames.data.push(element);
             } else {
                 relevantdescriptions.data.push(element);
             }
         });
 
-        const allresults = [];
-        if (matchingnames.data.length > 0) allresults.push(matchingnames);
-        if (relevantdescriptions.data.length > 0) allresults.push(relevantdescriptions);
+        const results = [];
+        if (matchingnames.data.length > 0) results.push(matchingnames);
+        if (relevantdescriptions.data.length > 0) results.push(relevantdescriptions);
 
-        if (cleanText === currentQuery.current.trim()) {
-            setResults(allresults);
-            console.log("here's some results! ", cleanText);
-        } else {
-            console.log("ignoring!");
-        }
+        return results;
     }
 
-    const showResultsAsync = async (text) => {
-        let items = [];
-        /*
-        if(mode=="group"){
-          console.log("check");
-        }
-        */
-
-        if (text !== "") {
+    useEffect(() => {        
+        if (query !== "") {
             setLoading(true);
-            const cleanText = text.trim();
-            if (type == "group") {
-                try {
-                    const unformattedresults = await API.graphql(
-                        graphqlOperation(listGroups, {
-                            filter: {
-                                not: {
-                                    and: {
-                                        not: {
-                                            name: {
-                                                beginsWith: cleanText
-                                            }
-                                        },
-                                        and: {
-                                            not: {
-                                                Sport: {
-                                                    contains: cleanText
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                        })
-                    );
-
-                    formatresults(cleanText, unformattedresults.data.listGroups.items);
-                } catch (err) {
-                    formatresults(cleanText, err.data.listGroups.items);
-                    console.log("error: ", err);
+            (async () => {
+                if (type == "group") {
+                    return fetchGroupResultsAsync();
+                } else if (type == "user") {
+                    return fetchUserResultsAsync();
+                } else {
+                    //return fetchAllResultsAsync();
                 }
-            }
-            else {
-                try {
-                    //for some darn reason the or operator doesn't work. and works, not works, but not OR!!!! So I have to use these dumb demorgans laws.
-                    //also case insensitive search does not work for some reason.
-                    const unformattedresults = await API.graphql(graphqlOperation(listUsers, {
-                        filter: {
-                            not: {
-                                and: {
-                                    not: {
-                                        name: {
-                                            beginsWith: cleanText
-                                        }
-                                    },
-                                    and: {
-                                        not: {
-                                            and: {
-                                                bio: {
-                                                    contains: cleanText
-                                                }
-                                            },
-                                            not: {
-                                                goals: {
-                                                    contains: cleanText
-                                                }
-                                            },
-                                        }
-                                    }
-                                }
-                            }
-                        }
+            })()
+            .then(results => {
+                if (results != null && query === currentQuery.current) {
+                    if (type == "group") {
+                        setGroupResults(formatresults(results));
+                    } else if (type == "user") {
+                        setUserResults(formatresults(results));
+                    } else {
                     }
-                    ));
-
-                    formatresults(cleanText, unformattedresults.data.listUsers.items);
-                } catch (err) {
-                    formatresults(cleanText, err.data.listUsers.items);
-                    console.log("error while searching: ", err);
                 }
-            }
+                else {
+                    console.log("ignoring!");
+                }
+            }).finally(()=>{
+                setLoading(false)
+            });
+        } else {            
+            setUserResults([]);
+            setGroupResults([]);
         }
-        else {
-            console.log("check");
-            setResults({});
-        }
-        setLoading(false);
-    };
-
-    useEffect(() => {
-        showResultsAsync(query);
     }, [query, type]);
 
     return (
@@ -182,7 +172,9 @@ export default function GroupSearchScreen({ navigation, route }) {
                     ref={searchBarRef}
                     style={[styles.textInputStyle, { flexGrow: 1 }]}
                     placeholder="Search for names or keywords!"
-                    onChangeText={setQuery}
+                    onChangeText={(text) => {
+                        setQuery(text.trim());
+                    }}
                     value={query}
                     clearButtonMode="always"
                 />
@@ -254,10 +246,10 @@ export default function GroupSearchScreen({ navigation, route }) {
                             justifyContent: "space-around",
                             padding: 10,
                         }} />
-                    : results.length > 0
+                    : (type == "group" && groupResults.length > 0) || (type == "user" && userResults.length > 0)
                         ? <SectionList
                             style={{ marginBottom: 80 }}
-                            sections={results}
+                            sections={(type == "group") ? groupResults : userResults}
                             renderItem={({ item }) =>
                                 (type == "group")
                                     ? <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} />
