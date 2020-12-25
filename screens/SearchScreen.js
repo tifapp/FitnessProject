@@ -38,13 +38,14 @@ export default function GroupSearchScreen({ navigation, route }) {
     const [type, setType] = useState("user");
     const currentQuery = useRef();
     const searchBarRef = useRef();
+    const ListRef = useRef();
 
     //still not 100% sure why this works, will have to come back to it. got from here: https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
     currentQuery.current = query;
-    
+
     const formatresults = (items) => {
-        let matchingnames = { title: "Matching Names", key: "name", data: [] }
-        let relevantdescriptions = { title: "Relevant Descriptions", key: "desc", data: [] }
+        let matchingnames = { title: "Matching Names", key: "name", data: (type == "group") ? (groupResults.length == 0 ? [] : groupResults[0].data) : (userResults.length == 0 ? [] : userResults[0].data) }
+        let relevantdescriptions = { title: "Relevant Descriptions", key: "desc", data: (type == "group") ? (groupResults.length == 0 ? [] : groupResults[1].data) : (userResults.length == 0 ? [] : userResults[1].data) }
         items.forEach(element => {
             console.log(element.name);
             if (element.name.startsWith(query)) {
@@ -58,126 +59,164 @@ export default function GroupSearchScreen({ navigation, route }) {
         if (matchingnames.data.length > 0) results.push(matchingnames);
         if (relevantdescriptions.data.length > 0) results.push(relevantdescriptions);
 
+        console.log("finished formatting results: ");
+        console.log(results);
         return results;
     }
 
-    useEffect(() => {        
+    useEffect(() => {
         if (query !== "") {
             ListRef.current.fetchDataAsync()
-            .then(results => {
-                if (results != null && query === currentQuery.current) {
-                    ListRef.current.setDataFunction(formatresults(results));
-                }
-                else {
-                    console.log("ignoring!");
-                }
-            })
-        } else {            
+                .then(results => {
+                    console.log("query is ", query, " and currentquery is ", currentQuery.current);
+                    if (results != null && query === currentQuery.current) {
+                        console.log("going to format results");
+                        if (type == "group") {
+                            setGroupResults(formatresults(results));
+                        } else if (type == "user") {
+                            setUserResults(formatresults(results));
+                        } else {
+                        }
+                    }
+                    else {
+                        console.log("ignoring!");
+                    }
+                })
+        } else {
             setUserResults([]);
             setGroupResults([]);
         }
-    }, [query, type]);
+    }, [query]);
 
     return (
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <View style={styles.containerStyle}>
-            <TouchableOpacity style={[{
-                flexDirection: 'row',
-                marginTop: 10,
-                marginBottom: 10,
-            }]}
-                onPress={() => {
-                    searchBarRef.current.focus();
-                }}
-            >
-                <TextInput
-                    ref={searchBarRef}
-                    style={[styles.textInputStyle, { flexGrow: 1 }]}
-                    placeholder="Search for names or keywords!"
-                    onChangeText={(text) => {
-                        setQuery(text.trim());
+            <View style={styles.containerStyle}>
+                <TouchableOpacity style={[{
+                    flexDirection: 'row',
+                    marginTop: 10,
+                    marginBottom: 10,
+                }]}
+                    onPress={() => {
+                        searchBarRef.current.focus();
                     }}
-                    value={query}
-                    clearButtonMode="always"
-                />
-                <MaterialCommunityIcons name="magnify" size={28} color="gray"
-                    style={[{ marginRight: 10 }]} />
-            </TouchableOpacity>
+                >
+                    <TextInput
+                        ref={searchBarRef}
+                        style={[styles.textInputStyle, { flexGrow: 1 }]}
+                        placeholder="Search for names or keywords!"
+                        onChangeText={(text) => {
+                            setQuery(text.trim());
+                        }}
+                        value={query}
+                        clearButtonMode="always"
+                    />
+                    <MaterialCommunityIcons name="magnify" size={28} color="gray"
+                        style={[{ marginRight: 10 }]} />
+                </TouchableOpacity>
 
-            {
-                query !== ""
-                    ? <View>
-                        <View style={[styles.spacingTop, {
-                            flexDirection: 'row',
-                            justifyContent: 'center',
-                            zIndex: 1,
-                        }]}>
-                            <Text style={styles.outlineButtonTextStyle}>Show </Text>
+                {
+                    query !== ""
+                        ? <View>
+                            <View style={[styles.spacingTop, {
+                                flexDirection: 'row',
+                                justifyContent: 'center',
+                                zIndex: 1,
+                            }]}>
+                                <Text style={styles.outlineButtonTextStyle}>Show </Text>
 
-                            <TouchableOpacity
-                                style={(type == 'all') ? [styles.outlineButtonStyle, { borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type == 'all') ? "white" : "orange", }] : 
-                                [styles.unselectedButtonStyle, {backgroundColor: "lightgray", borderColor: "white", borderBottomColor: "orange"}]}
-                                onPress={() => {
-                                    setType("all")
-                                }}
-                            >
-                                <Text style={(type == 'all') ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, {color: "white"}]}>all</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={(type == 'user') ? [styles.outlineButtonStyle, { 
-                                    borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type == 'user') ? "white" : "orange", }] : 
-                                [styles.unselectedButtonStyle, {backgroundColor: "lightgray", borderColor: "white", borderBottomColor: "orange"}]}
-                                onPress={() => {
-                                    setType("user")
-                                }}
-                            >
-                                <Text style={(type == 'user') ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, {color: "white",
-                            },]}>users</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={(type == 'group') ? [styles.outlineButtonStyle, { borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type == 'group') ? "white" : "orange", }] : 
-                                [styles.unselectedButtonStyle, {backgroundColor: "lightgray", borderColor: "white", borderBottomColor: "orange"}]}
-                                onPress={() => {
-                                    setType("group")
-                                }}
-                            >
-                                <Text style={(type == 'group') ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, {color: "white"}]}>groups</Text>
-                            </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={(type == 'all') ? [styles.outlineButtonStyle, { borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type == 'all') ? "white" : "orange", }] :
+                                        [styles.unselectedButtonStyle, { backgroundColor: "lightgray", borderColor: "white", borderBottomColor: "orange" }]}
+                                    onPress={() => {
+                                        setType("all")
+                                    }}
+                                >
+                                    <Text style={(type == 'all') ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, { color: "white" }]}>all</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={(type == 'user') ? [styles.outlineButtonStyle, {
+                                        borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type == 'user') ? "white" : "orange",
+                                    }] :
+                                        [styles.unselectedButtonStyle, { backgroundColor: "lightgray", borderColor: "white", borderBottomColor: "orange" }]}
+                                    onPress={() => {
+                                        setType("user")
+                                    }}
+                                >
+                                    <Text style={(type == 'user') ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, {
+                                        color: "white",
+                                    },]}>users</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={(type == 'group') ? [styles.outlineButtonStyle, { borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type == 'group') ? "white" : "orange", }] :
+                                        [styles.unselectedButtonStyle, { backgroundColor: "lightgray", borderColor: "white", borderBottomColor: "orange" }]}
+                                    onPress={() => {
+                                        setType("group")
+                                    }}
+                                >
+                                    <Text style={(type == 'group') ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, { color: "white" }]}>groups</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={[{
+                                position: "relative",
+                                bottom: 2,
+                                borderBottomWidth: 2,
+                                borderColor: "orange",
+                                zIndex: 0,
+                            }]}>
+                            </View>
+                            {
+                                (type == "group" && groupResults.length > 0) || (type == "user" && userResults.length > 0)
+                                    ? <Text style={[styles.outlineButtonTextStyle, { marginTop: 15 }]}>No matching results</Text>
+                                    : null
+                            }
                         </View>
-                        <View style={[{
-                            position: "relative",
-                            bottom: 2,
-                            borderBottomWidth: 2,
-                            borderColor: "orange",
-                            zIndex: 0,
-                        }]}>
-                        </View>
-                    </View>
-                    : null
-            }
-            {
-                (type == "group" && groupResults.length > 0) || (type == "user" && userResults.length > 0)
-                ? <PaginatedList
+                        : null
+                }
+                <APIList
+                    ref={ListRef}
                     queryOperation={(type == "group") ? listGroups : listUsers}
-                    filter={{
-                        filter: {
-                            or: [{
-                                name: {
-                                    beginsWith: query
-                                }
-                            },
+                    filter={
+                        (type == "user") ?
                             {
-                                bio: {
-                                    contains: query
+                                filter: {
+                                    or: [{
+                                        name: {
+                                            beginsWith: query
+                                        }
+                                    },
+                                    {
+                                        bio: {
+                                            contains: query
+                                        }
+                                    },
+                                    {
+                                        goals: {
+                                            contains: query
+                                        }
+                                    },]
                                 }
-                            },
+                            }
+                            :
+
                             {
-                                goals: {
-                                    contains: query
+                                filter: {
+                                    or: [{
+                                        name: {
+                                            beginsWith: query
+                                        }
+                                    },
+                                    {
+                                        Sport: {
+                                            contains: query
+                                        }
+                                    },
+                                    {
+                                        Description: {
+                                            contains: query
+                                        }
+                                    },]
                                 }
-                            },]
-                        }
-                    }}
+                            }}
                     setDataFunction={(type == "group") ? setGroupResults : setUserResults}
                     sections={(type == "group") ? groupResults : userResults} //wait how would pagination work with sections
                     renderItem={({ item }) =>
@@ -191,13 +230,9 @@ export default function GroupSearchScreen({ navigation, route }) {
                     stickySectionHeadersEnabled={true}
                     keyExtractor={(item, index) => item.id}
                 />
-                : query !== "" 
-                    ? <Text style={[styles.outlineButtonTextStyle, { marginTop: 15 }]}>No matching results</Text>
-                    : null
-            }
 
-            <StatusBar style="auto" />
-        </View>
+                <StatusBar style="auto" />
+            </View>
         </TouchableWithoutFeedback>
     );
 }
