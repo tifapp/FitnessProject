@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { Component } from "react";
 import {
   StyleSheet,
   View,
@@ -6,6 +6,7 @@ import {
   FlatList,
   SectionList,
   ActivityIndicator,
+  Text,
 } from "react-native";
 import { API, graphqlOperation } from "aws-amplify";
 
@@ -14,120 +15,138 @@ var styles = require("../styles/stylesheet");
 const initialAmount = 10;
 const additionalAmount = 5;
 
-export default function APIList(props) {
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [nextToken, setNextToken] = useState(null); //for pagination
-  const [debounce, setDebounce] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-  const [loading, setLoading] = useState(false);
+class APIList extends Component { //we need to make this a class to use refs from the parent
+  constructor(props) {
+    super(props);
+    this.state = {
+      loadingMore: false,
+      nextToken: null,
+      refreshing: false,
+      loading: false,
+    };
+  }
 
-  const loadMore = () => {
-    if (!debounce && nextToken != null) { //if we don't check this, the list will repeat endlessly
-      setDebounce(true);
-      setLoadingMore(true);
-      fetchDataAsync()
-        .finally(() => { setLoadingMore(false); setDebounce(false); });
+  componentDidMount() {
+    this.setState({loading: true});
+    this.fetchDataAsync(true)
+    .finally(() => this.setState({loading: false}));
+  }
+
+  loadMore = () => {
+    if (!this.state.loadingMore && this.state.nextToken != null) { //if we don't check this, the list will repeat endlessly
+      this.setState({loadingMore: true});
+      this.fetchDataAsync(false)
+        .finally(() => { this.setState({loadingMore: false}); });
     }
   }
 
-  useEffect(() => {
-    fetchDataAsync();
-    if (props.ref != null) {
-      props.ref(this)
-    }
-  }, []);
-
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    fetchDataAsync()
-      .then(() => { setRefreshing(false) })
+  onRefresh = () => {
+    this.setState({refreshing: true});
+    this.fetchDataAsync(true)
+      .then(() => { this.setState({refreshing: false}) })
       .catch();
-  }, []);
-  
-  const fetchDataAsync = async () => {
+  };
+
+  myMethod() {
+    console.log("MyMethod called");
+  }
+
+  fetchDataAsync = async (beginning) => {
     //do not refetch if the user themselves added or updated a post
     //if new posts are being added don't refetch the entire batch, only append the new posts
     //if a post is being updated don't refetch the entire batch, only update that post
     //if a lot of new posts are being added dont save all of them, paginate them at like 100 posts
-    setLoading(true);
     try {
       const query = await API.graphql(
-        graphqlOperation(props.queryOperation, { limit: nextToken == null ? initialAmount : additionalAmount, nextToken: nextToken, sortDirection: props.sortDirection == null ? 'DESC' : props.sortDirection, ...props.filter || {}, })
+        graphqlOperation(this.props.queryOperation, { limit: this.state.nextToken == null ? initialAmount : additionalAmount, nextToken: beginning ? null : this.state.nextToken, ...this.props.filter || {}, })
       );
-      //console.log('showing these posts: ', query);
+      
+      console.log('showing this data: ', query);
+      
+      this.setState({nextToken: query.data[Object.keys(query.data)[0]].nextToken});
 
-      if (nextToken != null)
-        props.setDataFunction([...props.data, ...query.data[Object.keys(query.data)[0]].items]); //wont work with current sectionlist implementation
+      if (this.props.sections != null)
+        return query.data[Object.keys(query.data)[0]].items;
+
+      if (!beginning)
+        this.props.setDataFunction([...this.props.data, ...query.data[Object.keys(query.data)[0]].items]); //wont work with current sectionlist implementation
       else
-        props.setDataFunction(query.data[Object.keys(query.data)[0]].items);
-
-      if (setNextToken != null) {
-        setNextToken(query.data[Object.keys(query.data)[0]].nextToken);
-      }
+        this.props.setDataFunction(query.data[Object.keys(query.data)[0]].items);
 
     } catch (err) {
       console.log("error in displaying data: ", err);
     }
-    setLoading(false);
   };
 
-  return (
-    <View>
-      {
-        loading
-          ? <ActivityIndicator
-            size="large"
-            color="#0000ff"
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              flexDirection: "row",
-              justifyContent: "space-around",
-              padding: 10,
-            }} />
-          :
-          props.sections == null
-            ? <FlatList
-              data={props.data}
-              refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-              }
-              renderItem={props.renderItem}
-              keyExtractor={props.keyExtractor}
-              onEndReached={loadMore}
-              onEndReachedThreshold={1}
-            />
-            : <SectionList
-              refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-              }
-              renderItem={props.renderItem}
-              keyExtractor={props.keyExtractor}
-              onEndReached={loadMore}
-              onEndReachedThreshold={1}
+  render() {
+    return (
+      <View style={{
+        alignSelf: 'stretch',
+        flex: 1,
+        flexGrow: 1,
+        justifyContent: 'space-around',
+        justifyContent: "center",
+      }}>
+        {
+          this.state.loading
+            ? <ActivityIndicator
+              size="large"
+              color="#0000ff"
+              style={{
+                alignSelf: 'stretch',
+                flex: 1,
+                flexGrow: 1,
+                justifyContent: 'space-around',
+                justifyContent: "center",
+              }} />
+            :
+            this.props.sections == null
+              ? <FlatList
+                contentContainerStyle={{ flexGrow: 1 }}
+                data={this.props.data}
+                refreshControl={
+                  <RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh} />
+                }
+                renderItem={this.props.renderItem}
+                keyExtractor={this.props.keyExtractor}
+                onEndReached={this.loadMore}
+                onEndReachedThreshold={1}
+              />
+              : <SectionList
+                contentContainerStyle={{ flexGrow: 1 }}
+                refreshControl={
+                  <RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh} />
+                }
+                renderItem={this.props.renderItem}
+                keyExtractor={this.props.keyExtractor}
+                onEndReached={this.loadMore}
+                onEndReachedThreshold={1}
 
-              sections={props.sections}
-              renderSectionHeader={({ section: { title } }) => (
-                <Text style={[styles.outlineButtonTextStyle, { marginTop: 15 }]}>{title}</Text>
-              )}
-              stickySectionHeadersEnabled={true}
-            />
-      }
+                sections={this.props.sections}
+                renderSectionHeader={({ section: { title } }) => (
+                  <Text style={[styles.outlineButtonTextStyle, { marginTop: 15 }]}>{title}</Text>
+                )}
+                stickySectionHeadersEnabled={true}
+              />
+        }
 
-      {
-        loadingMore
-          ?
-          <ActivityIndicator
-            size="large"
-            color="#0000ff"
-            style={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              bottom: 200
-            }} />
-          : null
-      }
-    </View>
-  )
+        {
+          this.state.loadingMore
+            ?
+            <ActivityIndicator
+              size="large"
+              color="#0000ff"
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                bottom: 200
+              }} />
+            : null
+        }
+      </View>
+    )
+  }
 }
+
+export default APIList;

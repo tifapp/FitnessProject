@@ -20,9 +20,6 @@ Amplify.configure(awsconfig);
 
 var styles = require('styles/stylesheet');
 
-const initialAmount = 10;
-const additionalAmount = 5;
-
 const FriendScreen = ({ route, navigation }) => {
     const [friendsEnabled, setFriendsEnabled] = useState(true);
     const [friendList, setFriendList] = useState([]);
@@ -151,6 +148,7 @@ const FriendScreen = ({ route, navigation }) => {
                         <Text style={{ alignSelf: 'center' }}>Incoming Requests!</Text>
                         <APIList
                             queryOperation={friendRequestsByReceiver}
+                            filter={{receiver: route.params?.id}}
                             setDataFunction={setFriendRequestList}
                             keyExtractor={(item) => item.sender}
                             data={friendRequestList}

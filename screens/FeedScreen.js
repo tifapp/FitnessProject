@@ -195,7 +195,7 @@ export default function FeedScreen({ navigation, route }) {
         queryOperation={postsByGroup}
         setDataFunction={setPosts}
         data={posts}
-        filter={{group: group != null ? group.id : 'general'}}
+        filter={{group: group != null ? group.id : 'general', sortDirection: 'DESC'}}
         renderItem={({ item }) => (
           <PostItem
             item={item}
