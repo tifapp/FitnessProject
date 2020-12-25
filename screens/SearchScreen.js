@@ -67,21 +67,6 @@ export default function GroupSearchScreen({ navigation, route }) {
     useEffect(() => {
         if (query !== "") {
             ListRef.current.fetchDataAsync()
-                .then(results => {
-                    console.log("query is ", query, " and currentquery is ", currentQuery.current);
-                    if (results != null && query === currentQuery.current) {
-                        console.log("going to format results");
-                        if (type == "group") {
-                            setGroupResults(formatresults(results));
-                        } else if (type == "user") {
-                            setUserResults(formatresults(results));
-                        } else {
-                        }
-                    }
-                    else {
-                        console.log("ignoring!");
-                    }
-                })
         } else {
             setUserResults([]);
             setGroupResults([]);
@@ -165,7 +150,7 @@ export default function GroupSearchScreen({ navigation, route }) {
                             }]}>
                             </View>
                             {
-                                (type == "group" && groupResults.length > 0) || (type == "user" && userResults.length > 0)
+                                (type == "group" && groupResults.length == 0) || (type == "user" && userResults.length == 0)
                                     ? <Text style={[styles.outlineButtonTextStyle, { marginTop: 15 }]}>No matching results</Text>
                                     : null
                             }
@@ -218,16 +203,12 @@ export default function GroupSearchScreen({ navigation, route }) {
                                 }
                             }}
                     setDataFunction={(type == "group") ? setGroupResults : setUserResults}
-                    sections={(type == "group") ? groupResults : userResults} //wait how would pagination work with sections
+                    data={(type == "group") ? groupResults : userResults} //wait how would pagination work with sections
                     renderItem={({ item }) =>
                         (type == "group")
                             ? <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} />
                             : <UserListItem item={item} />
                     }
-                    renderSectionHeader={({ section: { title } }) => (
-                        <Text style={[styles.outlineButtonTextStyle, { marginTop: 15 }]}>{title}</Text>
-                    )}
-                    stickySectionHeadersEnabled={true}
                     keyExtractor={(item, index) => item.id}
                 />
 

@@ -65,9 +65,6 @@ class APIList extends Component { //we need to make this a class to use refs fro
       
       this.setState({nextToken: query.data[Object.keys(query.data)[0]].nextToken});
 
-      if (this.props.sections != null)
-        return query.data[Object.keys(query.data)[0]].items;
-
       if (!beginning)
         this.props.setDataFunction([...this.props.data, ...query.data[Object.keys(query.data)[0]].items]); //wont work with current sectionlist implementation
       else
