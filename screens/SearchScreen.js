@@ -36,10 +36,8 @@ export default function GroupSearchScreen({ navigation, route }) {
     const [userResults, setUserResults] = useState([]);
     const [groupResults, setGroupResults] = useState([]);
     const [type, setType] = useState("user");
-    const [loading, setLoading] = useState(false);
     const currentQuery = useRef();
     const searchBarRef = useRef();
-    const ListRef = useRef();
 
     //still not 100% sure why this works, will have to come back to it. got from here: https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
     currentQuery.current = query;
@@ -65,24 +63,15 @@ export default function GroupSearchScreen({ navigation, route }) {
 
     useEffect(() => {        
         if (query !== "") {
-            setLoading(true);
-            ref.fetchDataAsync()
+            ListRef.current.fetchDataAsync()
             .then(results => {
                 if (results != null && query === currentQuery.current) {
-                    if (type == "group") {
-                        setGroupResults(formatresults(results));
-                    } else if (type == "user") {
-                        setUserResults(formatresults(results));
-                    } else {
-                    }
+                    ListRef.current.setDataFunction(formatresults(results));
                 }
                 else {
                     console.log("ignoring!");
                 }
             })
-            .finally(()=>{
-                setLoading(false)
-            });
         } else {            
             setUserResults([]);
             setGroupResults([]);
@@ -166,58 +155,45 @@ export default function GroupSearchScreen({ navigation, route }) {
                     </View>
                     : null
             }
-
             {
-                loading
-                    ? <ActivityIndicator
-                        size="large"
-                        color="#0000ff"
-                        style={{
-                            flex: 1,
-                            justifyContent: "center",
-                            flexDirection: "row",
-                            justifyContent: "space-around",
-                            padding: 10,
-                        }} />
-                    : (type == "group" && groupResults.length > 0) || (type == "user" && userResults.length > 0)
-                        ? <PaginatedList
-                            ref={ListRef}
-                            queryOperation={(type == "group") ? listGroups : listUsers}
-                            filter={{
-                                filter: {
-                                    or: [{
-                                        name: {
-                                            beginsWith: query
-                                        }
-                                    },
-                                    {
-                                        bio: {
-                                            contains: query
-                                        }
-                                    },
-                                    {
-                                        goals: {
-                                            contains: query
-                                        }
-                                    },]
+                (type == "group" && groupResults.length > 0) || (type == "user" && userResults.length > 0)
+                ? <PaginatedList
+                    queryOperation={(type == "group") ? listGroups : listUsers}
+                    filter={{
+                        filter: {
+                            or: [{
+                                name: {
+                                    beginsWith: query
                                 }
-                            }}
-                            setDataFunction={(type == "group") ? setGroupResults : setUserResults}
-                            sections={(type == "group") ? groupResults : userResults} //wait how would pagination work with sections
-                            renderItem={({ item }) =>
-                                (type == "group")
-                                    ? <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} />
-                                    : <UserListItem item={item} />
-                            }
-                            renderSectionHeader={({ section: { title } }) => (
-                                <Text style={[styles.outlineButtonTextStyle, { marginTop: 15 }]}>{title}</Text>
-                            )}
-                            stickySectionHeadersEnabled={true}
-                            keyExtractor={(item, index) => item.id}
-                        />
-                        : query !== "" 
-                            ? <Text style={[styles.outlineButtonTextStyle, { marginTop: 15 }]}>No matching results</Text>
-                            : null
+                            },
+                            {
+                                bio: {
+                                    contains: query
+                                }
+                            },
+                            {
+                                goals: {
+                                    contains: query
+                                }
+                            },]
+                        }
+                    }}
+                    setDataFunction={(type == "group") ? setGroupResults : setUserResults}
+                    sections={(type == "group") ? groupResults : userResults} //wait how would pagination work with sections
+                    renderItem={({ item }) =>
+                        (type == "group")
+                            ? <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} />
+                            : <UserListItem item={item} />
+                    }
+                    renderSectionHeader={({ section: { title } }) => (
+                        <Text style={[styles.outlineButtonTextStyle, { marginTop: 15 }]}>{title}</Text>
+                    )}
+                    stickySectionHeadersEnabled={true}
+                    keyExtractor={(item, index) => item.id}
+                />
+                : query !== "" 
+                    ? <Text style={[styles.outlineButtonTextStyle, { marginTop: 15 }]}>No matching results</Text>
+                    : null
             }
 
             <StatusBar style="auto" />

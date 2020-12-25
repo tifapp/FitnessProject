@@ -18,6 +18,8 @@ export default function APIList(props) {
   const [loadingMore, setLoadingMore] = useState(false);
   const [nextToken, setNextToken] = useState(null); //for pagination
   const [debounce, setDebounce] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const loadMore = () => {
     if (!debounce && nextToken != null) { //if we don't check this, the list will repeat endlessly
@@ -30,11 +32,14 @@ export default function APIList(props) {
 
   useEffect(() => {
     fetchDataAsync();
+    if (props.ref != null) {
+      props.ref(this)
+    }
   }, []);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    fetchDataAsync
+    fetchDataAsync()
       .then(() => { setRefreshing(false) })
       .catch();
   }, []);
@@ -44,6 +49,7 @@ export default function APIList(props) {
     //if new posts are being added don't refetch the entire batch, only append the new posts
     //if a post is being updated don't refetch the entire batch, only update that post
     //if a lot of new posts are being added dont save all of them, paginate them at like 100 posts
+    setLoading(true);
     try {
       const query = await API.graphql(
         graphqlOperation(props.queryOperation, { limit: nextToken == null ? initialAmount : additionalAmount, nextToken: nextToken, sortDirection: props.sortDirection == null ? 'DESC' : props.sortDirection, ...props.filter || {}, })
@@ -59,43 +65,53 @@ export default function APIList(props) {
         setNextToken(query.data[Object.keys(query.data)[0]].nextToken);
       }
 
-      return query.data[Object.keys(query.data)[0]].items;
     } catch (err) {
       console.log("error in displaying data: ", err);
     }
+    setLoading(false);
   };
 
   return (
     <View>
       {
-        props.sections == null
-          ?
-          <FlatList
-            data={props.data}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-            renderItem={props.renderItem}
-            keyExtractor={props.keyExtractor}
-            onEndReached={loadMore}
-            onEndReachedThreshold={1}
-          />
+        loading
+          ? <ActivityIndicator
+            size="large"
+            color="#0000ff"
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              flexDirection: "row",
+              justifyContent: "space-around",
+              padding: 10,
+            }} />
           :
-          <SectionList
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-            renderItem={props.renderItem}
-            keyExtractor={props.keyExtractor}
-            onEndReached={loadMore}
-            onEndReachedThreshold={1}
+          props.sections == null
+            ? <FlatList
+              data={props.data}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+              renderItem={props.renderItem}
+              keyExtractor={props.keyExtractor}
+              onEndReached={loadMore}
+              onEndReachedThreshold={1}
+            />
+            : <SectionList
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+              renderItem={props.renderItem}
+              keyExtractor={props.keyExtractor}
+              onEndReached={loadMore}
+              onEndReachedThreshold={1}
 
-            sections={props.sections}
-            renderSectionHeader={({ section: { title } }) => (
-              <Text style={[styles.outlineButtonTextStyle, { marginTop: 15 }]}>{title}</Text>
-            )}
-            stickySectionHeadersEnabled={true}
-          />
+              sections={props.sections}
+              renderSectionHeader={({ section: { title } }) => (
+                <Text style={[styles.outlineButtonTextStyle, { marginTop: 15 }]}>{title}</Text>
+              )}
+              stickySectionHeadersEnabled={true}
+            />
       }
 
       {
