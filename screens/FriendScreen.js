@@ -11,7 +11,7 @@ import { Amplify, API, graphqlOperation } from "aws-amplify";
 import { listFriendRequests, friendRequestsByReceiver, listFriendships, getFriendship, friendsBySecondUser } from "root/src/graphql/queries";
 import { createFriendRequest, deleteFriendRequest, deleteFriendship } from "root/src/graphql/mutations";
 import { ProfileImageAndName } from 'components/ProfileImageAndName'
-import PaginatedList from 'components/PaginatedList';
+import APIList from 'components/APIList';
 
 import { AntDesign } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
@@ -56,7 +56,9 @@ const FriendScreen = ({ route, navigation }) => {
             console.log("error: ", err);
         }
         // update friendRequestList
-        collectFriendRequests();
+        setFriendRequestList((friendRequestList) => {
+            return friendRequestList.filter((validItem) => (validItem.sender != item.sender && validItem.receiver != item.receiver));
+        });//locally removes the item
     }
 
     const removeFriend = async (item) => {
@@ -68,7 +70,9 @@ const FriendScreen = ({ route, navigation }) => {
             console.log("error: ", err);
         }
         // update friendList
-        collectFriends();
+        setFriendList((friendList) => {
+            return friendList.filter((i) => (i.user1 != item.user1 && i.user2 != item.user2));
+        });
     }
 
     const acceptRequest = async (item) => {
@@ -83,77 +87,7 @@ const FriendScreen = ({ route, navigation }) => {
         setFriendRequestList((friendRequestList) => {
             return friendRequestList.filter((i) => (i.sender != item.sender));
         });
-        collectFriends();
     }
-
-    const displayFriendsAndRequests = () => {
-        collectFriends();
-        collectFriendRequests();
-    }
-
-    const collectFriends = async (nextToken, setNextToken) => {
-        // Not sure if I set up the friend filter correctly. 
-        // Will come back to it when I figure out accept/rejecting requests
-        try {
-            const matchresult = await API.graphql(
-                graphqlOperation(listFriendships, {
-                    limit: nextToken == null ? initialAmount : additionalAmount, nextToken: nextToken,
-                    filter: { 
-                        or: [{
-                            user1: {
-                                eq: route.params?.id
-                            }
-                        },
-                        {
-                            user2: {
-                                eq: route.params?.id
-                            }
-                        }]
-                    }
-                })
-            );
-            console.log("#########-Friends-###########");
-            console.log(matchresult.data.listFriendships.items);
-
-            if (nextToken != null)
-                setFriendList([...friendList, ...matchresult.data.listFriendships.items,]);
-            else
-                setFriendList(matchresult.data.listFriendships.items,);
-
-            if (setNextToken != null) {
-                setNextToken(matchresult.data.listFriendships.nextToken);
-            }
-        }
-        catch (err) {
-            console.log("error: ", err);
-        }
-    }
-
-    const collectFriendRequests = async (nextToken, setNextToken) => {
-        try {
-            const matchresult = await API.graphql(
-                graphqlOperation(friendRequestsByReceiver, { limit: nextToken == null ? initialAmount : additionalAmount, nextToken: nextToken, receiver: route.params?.id })
-            );
-
-            if (nextToken != null)
-                setFriendRequestList([...friendRequestList, ...matchresult.data.friendRequestsByReceiver.items]);
-            else
-                setFriendRequestList(matchresult.data.friendRequestsByReceiver.items);
-
-            if (setNextToken != null) {
-                setNextToken(matchresult.data.friendRequestsByReceiver.nextToken);
-            }
-        }
-        catch (err) {
-            console.log("error: ", err);
-        }
-        console.log("#########-Friend Requests-###########");
-        console.log(friendRequestList);
-    }
-
-    useEffect(() => {
-        displayFriendsAndRequests();
-    }, []);
 
     return (
         <View>
@@ -175,8 +109,21 @@ const FriendScreen = ({ route, navigation }) => {
 
                     <View>
                         <Text style={{ alignSelf: 'center' }}>Your awesome friends!</Text>
-                        <PaginatedList
-                            showDataFunction={collectFriends}
+                        <APIList
+                            queryOperation={listFriendships}
+                            filter={{filter: { 
+                                or: [{
+                                    user1: {
+                                        eq: route.params?.id
+                                    }
+                                },
+                                {
+                                    user2: {
+                                        eq: route.params?.id
+                                    }
+                                }]
+                            }}}
+                            setDataFunction={setFriendList}
                             keyExtractor={(item) => item.timestamp.toString()}
                             data={friendList}
                             renderItem={({ item }) => (
@@ -202,8 +149,9 @@ const FriendScreen = ({ route, navigation }) => {
 
                     <View>
                         <Text style={{ alignSelf: 'center' }}>Incoming Requests!</Text>
-                        <PaginatedList
-                            showDataFunction={collectFriendRequests}
+                        <APIList
+                            queryOperation={friendRequestsByReceiver}
+                            setDataFunction={setFriendRequestList}
                             keyExtractor={(item) => item.sender}
                             data={friendRequestList}
                             renderItem={({ item }) => (

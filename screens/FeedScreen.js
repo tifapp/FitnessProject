@@ -20,16 +20,13 @@ import { listPosts, postsByGroup } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
 import { onCreatePost, onDeletePost, onUpdatePost } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
-import PaginatedList from 'components/PaginatedList';
+import APIList from 'components/APIList';
 
 require('root/androidtimerfix');
 
 Amplify.configure(awsconfig);
 
 var styles = require('styles/stylesheet');
-
-const initialAmount = 10;
-const additionalAmount = 5;
 
 export default function FeedScreen({ navigation, route }) {
   const { group } = route.params;
@@ -143,29 +140,6 @@ export default function FeedScreen({ navigation, route }) {
     
   };
 
-  const fetchPostsAsync = async (nextToken, setNextToken) => {
-    //do not refetch if the user themselves added or updated a post
-    //if new posts are being added don't refetch the entire batch, only append the new posts
-    //if a post is being updated don't refetch the entire batch, only update that post
-    //if a lot of new posts are being added dont save all of them, paginate them at like 100 posts
-    try {
-      const query = await API.graphql(
-        graphqlOperation(postsByGroup, { limit: nextToken == null ? initialAmount : additionalAmount, nextToken: nextToken, group: group != null ? group.id : 'general', sortDirection: 'DESC' })
-      );
-      //console.log('showing these posts: ', query);
-
-      if (nextToken != null)
-        setPosts([...posts, ...query.data.postsByGroup.items]);
-      else
-        setPosts(query.data.postsByGroup.items);
-      if (setNextToken != null) {
-        setNextToken(query.data.postsByGroup.nextToken);
-      }
-    } catch (err) {
-      console.log("error in displaying posts: ", err);
-    }
-  };
-
   const deletePostsAsync = async (timestamp) => {
     setDidUserPost(true);
     checkInternetConnection();
@@ -217,9 +191,11 @@ export default function FeedScreen({ navigation, route }) {
         </View>
       </View>
 
-      <PaginatedList
-        showDataFunction={fetchPostsAsync}
+      <APIList
+        queryOperation={postsByGroup}
+        setDataFunction={setPosts}
         data={posts}
+        filter={{group: group != null ? group.id : 'general'}}
         renderItem={({ item }) => (
           <PostItem
             item={item}

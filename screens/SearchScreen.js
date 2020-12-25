@@ -11,24 +11,21 @@ import {
     TouchableOpacity,
     TouchableWithoutFeedback,
     Keyboard,
-    FlatList,
-    SectionList,
     ActivityIndicator,
 } from "react-native";
 // Get the aws resources configuration parameters
 import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
-import { Amplify, API, Auth, graphqlOperation } from "aws-amplify";
-import { createPost, updatePost, deletePost, createFriend } from "root/src/graphql/mutations";
+import { Amplify, } from "aws-amplify";
 import { DataStore, Predicates } from "@aws-amplify/datastore";
 import { listGroups } from "root/src/graphql/queries";
 import { listUsers } from "root/src/graphql/queries";
 import Header from "components/header";
-import AddPost from "components/AddPosts";
 import UserListItem from "components/UserListItem";
 import ListGroupItem from "components/ListGroupItem";
 import * as subscriptions from "root/src/graphql/subscriptions";
 import AgePicker from "components/basicInfoComponents/AgePicker";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import APIList from 'components/APIList';
 
 Amplify.configure(awsconfig);
 
@@ -42,67 +39,10 @@ export default function GroupSearchScreen({ navigation, route }) {
     const [loading, setLoading] = useState(false);
     const currentQuery = useRef();
     const searchBarRef = useRef();
+    const ListRef = useRef();
 
     //still not 100% sure why this works, will have to come back to it. got from here: https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
     currentQuery.current = query;
-
-    const fetchUserResultsAsync = async (nextToken, showNextToken) => {
-        try {
-            //for some darn reason the or operator doesn't work. and works, not works, but not OR!!!! So I have to use these dumb demorgans laws.
-            //also case insensitive search does not work for some reason.
-            const unformattedresults = await API.graphql(graphqlOperation(listUsers, {
-                filter: {
-                    or: [{
-                        name: {
-                            beginsWith: query
-                        }
-                    },
-                    {
-                        bio: {
-                            contains: query
-                        }
-                    },
-                    {
-                        goals: {
-                            contains: query
-                        }
-                    },]
-                }
-            })
-            );
-            return unformattedresults.data.listUsers.items;
-        } catch (err) {
-            console.log("error while searching: ", err);
-            return err.data.listUsers.items;
-        }
-    }
-    
-    const fetchGroupResultsAsync = async (nextToken, showNextToken) => {
-        try {
-            const unformattedresults = await API.graphql(
-                graphqlOperation(listGroups, {
-                    filter: {
-                        or: [{
-                            name: {
-                                beginsWith: query
-                            }
-                        },
-                        {
-                            Sport: {
-                                contains: query
-                            }
-                        }]
-                    },
-                })
-            );
-
-            console.log("group items are ", unformattedresults.data.listGroups.items);
-            return unformattedresults.data.listGroups.items;
-        } catch (err) {
-            console.log("error while searching: ", err);
-            //return err.data.listGroups.items; //since some users have string ages rather than int ages
-        }
-    }
     
     const formatresults = (items) => {
         let matchingnames = { title: "Matching Names", key: "name", data: [] }
@@ -126,15 +66,7 @@ export default function GroupSearchScreen({ navigation, route }) {
     useEffect(() => {        
         if (query !== "") {
             setLoading(true);
-            (async () => {
-                if (type == "group") {
-                    return fetchGroupResultsAsync();
-                } else if (type == "user") {
-                    return fetchUserResultsAsync();
-                } else {
-                    //return fetchAllResultsAsync();
-                }
-            })()
+            ref.fetchDataAsync()
             .then(results => {
                 if (results != null && query === currentQuery.current) {
                     if (type == "group") {
@@ -147,7 +79,8 @@ export default function GroupSearchScreen({ navigation, route }) {
                 else {
                     console.log("ignoring!");
                 }
-            }).finally(()=>{
+            })
+            .finally(()=>{
                 setLoading(false)
             });
         } else {            
@@ -247,9 +180,30 @@ export default function GroupSearchScreen({ navigation, route }) {
                             padding: 10,
                         }} />
                     : (type == "group" && groupResults.length > 0) || (type == "user" && userResults.length > 0)
-                        ? <SectionList
-                            style={{ marginBottom: 80 }}
-                            sections={(type == "group") ? groupResults : userResults}
+                        ? <PaginatedList
+                            ref={ListRef}
+                            queryOperation={(type == "group") ? listGroups : listUsers}
+                            filter={{
+                                filter: {
+                                    or: [{
+                                        name: {
+                                            beginsWith: query
+                                        }
+                                    },
+                                    {
+                                        bio: {
+                                            contains: query
+                                        }
+                                    },
+                                    {
+                                        goals: {
+                                            contains: query
+                                        }
+                                    },]
+                                }
+                            }}
+                            setDataFunction={(type == "group") ? setGroupResults : setUserResults}
+                            sections={(type == "group") ? groupResults : userResults} //wait how would pagination work with sections
                             renderItem={({ item }) =>
                                 (type == "group")
                                     ? <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} />
