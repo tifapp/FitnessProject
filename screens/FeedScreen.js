@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
-  RefreshControl,
   ActivityIndicator,
 } from "react-native";
 // Get the aws resources configuration parameters
@@ -41,14 +40,6 @@ export default function FeedScreen({ navigation, route }) {
   const [didUserPost, setDidUserPost] = useState(false);
   
   const [onlineCheck, setOnlineCheck] = useState(true);
-
-  const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    fetchPostsAsync()
-    .then(()=>{setRefreshing(false)})
-    .catch();
-  }, []);
 
   useEffect(() => {
     waitForNewPostsAsync();
@@ -229,9 +220,6 @@ export default function FeedScreen({ navigation, route }) {
       <PaginatedList
         showDataFunction={fetchPostsAsync}
         data={posts}
-        refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
         renderItem={({ item }) => (
           <PostItem
             item={item}

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
     Alert,
     View,
-    RefreshControl,
     Text,
     TouchableOpacity,
 } from "react-native";
@@ -28,7 +27,6 @@ const FriendScreen = ({ route, navigation }) => {
     const [friendsEnabled, setFriendsEnabled] = useState(true);
     const [friendList, setFriendList] = useState([]);
     const [friendRequestList, setFriendRequestList] = useState([]);
-    const [refreshing, setRefreshing] = useState(false);
 
     const goToProfile = (id) => {
         navigation.navigate('Lookup',
@@ -39,20 +37,6 @@ const FriendScreen = ({ route, navigation }) => {
         if (route.params?.id == item.user1) return item.user2;
         if (route.params?.id == item.user2) return item.user1;
     }
-
-    const onFriendsRefresh = React.useCallback(() => {
-        setRefreshing(true);
-        collectFriends()
-            .then(() => { setRefreshing(false) })
-            .catch();
-    }, []);
-
-    const onRequestsRefresh = React.useCallback(() => {
-        setRefreshing(true);
-        collectFriendRequests()
-            .then(() => { setRefreshing(false) })
-            .catch();
-    }, []);
 
     const removeFriendHandler = (item) => {
         const title = 'Are you sure you want to remove this friend?';
@@ -193,9 +177,6 @@ const FriendScreen = ({ route, navigation }) => {
                         <Text style={{ alignSelf: 'center' }}>Your awesome friends!</Text>
                         <PaginatedList
                             showDataFunction={collectFriends}
-                            refreshControl={
-                                <RefreshControl refreshing={refreshing} onRefresh={onFriendsRefresh} />
-                            }
                             keyExtractor={(item) => item.timestamp.toString()}
                             data={friendList}
                             renderItem={({ item }) => (
@@ -223,9 +204,6 @@ const FriendScreen = ({ route, navigation }) => {
                         <Text style={{ alignSelf: 'center' }}>Incoming Requests!</Text>
                         <PaginatedList
                             showDataFunction={collectFriendRequests}
-                            refreshControl={
-                                <RefreshControl refreshing={refreshing} onRefresh={onRequestsRefresh} />
-                            }
                             keyExtractor={(item) => item.sender}
                             data={friendRequestList}
                             renderItem={({ item }) => (

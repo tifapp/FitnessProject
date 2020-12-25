@@ -24,14 +24,23 @@ export default function PaginatedList(props) {
   }
   
   useEffect(() => {
-    props.showDataFunction(nextToken, setNextToken);
+    props.showDataFunction();
   }, []);
+  
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    props.showDataFunction()
+        .then(() => { setRefreshing(false) })
+        .catch();
+}, []);
 
   return (
     <View>
       <FlatList
         data={props.data}
-        refreshControl={props.refreshControl}
+        refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         renderItem={props.renderItem}
         keyExtractor={props.keyExtractor}
         onEndReached={loadMore}
