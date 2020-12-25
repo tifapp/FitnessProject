@@ -41,7 +41,7 @@ export default function ListGroupItem({ item}) {
             styles.check,
           ]}
         >
-          <MaterialCommunityIcons name="account-group" color="black" size={30}/>
+          <MaterialCommunityIcons name="account-group" color={matchingname ? "black" : "orange"} size={30}/>
           <Text>{item.name}</Text>
         </View>
       </View>

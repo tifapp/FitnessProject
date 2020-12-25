@@ -14,6 +14,7 @@ var styles = require('../styles/stylesheet');
 
 export default function UserListItem({
   item,
+  matchingname
 }) {
   const navigation = useNavigation();
 
@@ -33,7 +34,7 @@ export default function UserListItem({
         alignItems: 'center',
         marginHorizontal: 25,
       }, styles.check]}>
-        <AntDesign name="user" size={24} color="black" />
+        <AntDesign name="user" size={24} color={matchingname ? "black" : "orange"} />
         <ProfileImageAndName
           style={styles.smallImageStyle}
           userId={item.id}

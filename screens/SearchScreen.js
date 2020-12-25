@@ -206,8 +206,8 @@ export default function GroupSearchScreen({ navigation, route }) {
                     data={(type == "group") ? groupResults : userResults} //wait how would pagination work with sections
                     renderItem={({ item }) =>
                         (type == "group")
-                            ? <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} />
-                            : <UserListItem item={item} />
+                            ? <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} matchingname={item.name.startsWith(query)} />
+                            : <UserListItem item={item} matchingname={item.name.startsWith(query)} />
                     }
                     keyExtractor={(item, index) => item.id}
                 />
