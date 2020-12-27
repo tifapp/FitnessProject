@@ -10,6 +10,7 @@ import printTime from 'hooks/printTime';
 import { getUser, getFriendRequest, getFriendship, listFriendships, friendsBySecondUser } from "../src/graphql/queries";
 import { createFriendRequest, deleteFriendRequest, deleteFriendship } from "root/src/graphql/mutations";
 import MutualFriends from "components/MutualFriendsList";
+import APIList from "components/APIList"
 
 var styles = require('styles/stylesheet');
 
@@ -278,7 +279,7 @@ const LookupUser = ({ route, navigation }) => {
 
             {(mutualfriendList.length != 0) ?
               <View style={styles.viewProfileScreen}>
-                <Text>Mutual Friends: </Text>
+                <Text style={{fontSize: 20, fontWeight: 'bold'}}>Mutual Friends </Text>
               </View>
               : null
             }
@@ -324,7 +325,8 @@ const LookupUser = ({ route, navigation }) => {
                     <View style={{ flexDirection: 'row', alignSelf: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%' }}>
                       <TouchableOpacity onPress={() => goToProfile(item)}>
                         <ProfileImageAndName
-                          style={styles.smallImageStyle}
+                          vertical={true}
+                          style={[styles.smallImageStyle, {marginHorizontal: 20}]}
                           userId={item}
                         />
                       </TouchableOpacity>
