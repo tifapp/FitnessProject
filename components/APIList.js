@@ -12,9 +12,6 @@ import { API, graphqlOperation } from "aws-amplify";
 
 var styles = require("../styles/stylesheet");
 
-const initialAmount = 10;
-const additionalAmount = 5;
-
 class APIList extends Component { //we need to make this a class to use refs from the parent
   constructor(props) {
     super(props);
@@ -58,17 +55,23 @@ class APIList extends Component { //we need to make this a class to use refs fro
     //if a lot of new posts are being added dont save all of them, paginate them at like 100 posts
     try {
       const query = await API.graphql(
-        graphqlOperation(this.props.queryOperation, { limit: this.state.nextToken == null ? initialAmount : additionalAmount, nextToken: beginning ? null : this.state.nextToken, ...this.props.filter || {}, })
+        graphqlOperation(this.props.queryOperation, { limit: this.state.nextToken == null ? (this.props.initialAmount == null ? 10 : this.props.initialAmount) : (this.props.additionalAmount == null ? 5 : this.props.additionalAmount), nextToken: beginning ? null : this.state.nextToken, ...this.props.filter || {}, })
       );
       
       console.log('showing this data: ', query);
-      
+
       this.setState({nextToken: query.data[Object.keys(query.data)[0]].nextToken});
 
+      let results = query.data[Object.keys(query.data)[0]].items;
+
+      if (this.props.processingFunction != null) {
+        results = this.props.processingFunction(results);
+      }
+
       if (!beginning)
-        this.props.setDataFunction([...this.props.data, ...query.data[Object.keys(query.data)[0]].items]); //wont work with current sectionlist implementation
+        this.props.setDataFunction([...this.props.data, ...results]); //wont work with current sectionlist implementation
       else
-        this.props.setDataFunction(query.data[Object.keys(query.data)[0]].items);
+        this.props.setDataFunction(results);
 
     } catch (err) {
       console.log("error in displaying data: ", err);
@@ -99,6 +102,7 @@ class APIList extends Component { //we need to make this a class to use refs fro
             :
             this.props.sections == null
               ? <FlatList
+                horizontal={this.props.horizontal}
                 contentContainerStyle={{ flexGrow: 1 }}
                 data={this.props.data}
                 refreshControl={

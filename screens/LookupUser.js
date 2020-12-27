@@ -56,68 +56,43 @@ const LookupUser = ({ route, navigation }) => {
       checkUsersInfo();
     }
   }, []);
-  
+
   useEffect(() => {
     checkFriendStatus();
-    collectMutualFriends();
   }, []);
 
 
 
 
-  const collectMutualFriends = async () => {
-    let user1_items = [];
-    let user2_items = [];
-    let total_items = [];
+  const collectMutualFriends = (items) => {
+    //items is an array containing both user1 and user2's friendship objects
+    //we must figure out where the duplicates are. by duplicates we mean userids that both users share.
+    //why don't we just collect all the user id's that aren't user1 and user2 and pick out the duplicates?
+    //maybe one iteration could work
 
-    console.log("Collecting Friends");
+    let ids = []
+    let mutuals = []
 
-    try{
-        const match_result_1 = await API.graphql(
-            graphqlOperation(listFriendships, {user1: user.id})
-        );
-        
-        user1_items = match_result_1.data.listFriendships.items;
-        
+    items.forEach(element => {
+      if (element.user1 == route.params?.id || element.user1 == userId) {
+        if (ids.includes(element.user2)) mutuals.push(element.user2);
+        else ids.push(element.user2);
+      } else if (element.user2 == route.params?.id || element.user2 == userId) {
+        if (ids.includes(element.user1)) mutuals.push(element.user1);
+        else ids.push(element.user1);
+      }
+    });
 
-        const match_result_2 = await API.graphql(
-          graphqlOperation(friendsBySecondUser, {user2: route.params?.id})
-        );
-
-        user2_items = match_result_2.data.friendsBySecondUser.items;
-        console.log("User 1's Friends!")
-        console.log(user1_items);
-        console.log("User 2's Friends!")
-        console.log(user2_items);
-
-        user1_items = user1_items.map((x) => x.user2);
-        user2_items = user2_items.map((x) => x.user1);
-
-        console.log(user1_items);
-        console.log("******************************************")
-        console.log(user2_items);
-
-        total_items = user1_items.filter((x) => (user2_items.includes(x)));
-        console.log("-----------------------------");
-        console.log(total_items);
-
-        setMutualFriendList(total_items);
-
-        //setFriendRequestList(items);
-        //setRefreshing(false);
-    }
-    catch(err){
-        console.log("error: ", err);
-    }
-}
+    return mutuals;
+  }
 
   const checkFriendStatus = async () => {
     console.log("CHECKING FRIEND STATUS");
     try {
       let friendship = await API.graphql(
-        graphqlOperation(getFriendship, { 
-          user1: route.params?.id < user.id ? route.params?.id : user.id, 
-          user2: route.params?.id < user.id ? user.id : route.params?.id, 
+        graphqlOperation(getFriendship, {
+          user1: route.params?.id < user.id ? route.params?.id : user.id,
+          user2: route.params?.id < user.id ? user.id : route.params?.id,
         })
       );
 
@@ -162,9 +137,9 @@ const LookupUser = ({ route, navigation }) => {
     console.log("CHECKING MUTUAL FRIEND STATUS");
     try {
       let friendship = await API.graphql(
-        graphqlOperation(listFriendships, { 
-          user1: route.params?.id < user.id ? route.params?.id : user.id, 
-          user2: route.params?.id < user.id ? user.id : route.params?.id, 
+        graphqlOperation(listFriendships, {
+          user1: route.params?.id < user.id ? route.params?.id : user.id,
+          user2: route.params?.id < user.id ? user.id : route.params?.id,
         })
       );
 
@@ -177,7 +152,7 @@ const LookupUser = ({ route, navigation }) => {
         console.log(friendship.data.getFriendship.user2);
         setFriendsSince("");
       }
-    }catch (err) {
+    } catch (err) {
       console.log("Invalid");
       console.log(err);
     }
@@ -185,7 +160,7 @@ const LookupUser = ({ route, navigation }) => {
 
   const sendFriendRequest = async () => {
     Alert.alert('Sending...', '', [], { cancelable: false })
- 
+
     try {
       await API.graphql(graphqlOperation(createFriendRequest, { input: { receiver: user.id, } }));
       console.log("success");
@@ -202,7 +177,7 @@ const LookupUser = ({ route, navigation }) => {
 
     try {
       await API.graphql(graphqlOperation(deleteFriendRequest, { input: { sender: route.params?.id, receiver: user.id } }));
-      console.log("success");      
+      console.log("success");
       setFriendStatus("none");
       alert('Friend request unsent successfully!');
     } catch (err) {
@@ -210,7 +185,7 @@ const LookupUser = ({ route, navigation }) => {
       console.log("error in deleting post: ");
     }
   };
-  
+
   const rejectFriendRequest = async () => {
     Alert.alert('Rejecting Friend Request...', '', [], { cancelable: false })
 
@@ -224,16 +199,16 @@ const LookupUser = ({ route, navigation }) => {
       console.log("error in deleting post: ");
     }
   };
-  
+
   const deleteFriend = async () => {
     Alert.alert('Deleting Friend...', '', [], { cancelable: false })
 
     try {
-      await API.graphql(graphqlOperation(deleteFriendship, { 
-        input: { 
-          user1: route.params?.id < user.id ? route.params?.id : user.id ,
+      await API.graphql(graphqlOperation(deleteFriendship, {
+        input: {
+          user1: route.params?.id < user.id ? route.params?.id : user.id,
           user2: route.params?.id < user.id ? user.id : route.params?.id,
-        } 
+        }
       }));
       console.log("success");
       setFriendStatus("none");
@@ -246,146 +221,175 @@ const LookupUser = ({ route, navigation }) => {
 
   return (
     user == null ? null :
-    <View>
-      <ScrollView>
-        {
-          user.id == id
-            ? <TouchableOpacity
-              style={{ position: 'absolute', top: 25, right: 25, borderWidth: 1, borderRadius: 25, padding: 10 }}
-              onPress={() => navigation.navigate('Profile', {
-                screen: 'Profile',
-                params: { fromLookup: true },
-              })}>
-              <MaterialCommunityIcons style={styles.editIconStyle} name="dumbbell" size={24} color="black" />
-            </TouchableOpacity>
-            : null
-        }
-        <View style={styles.border}>
-          {/*
+      <View>
+        <ScrollView>
+          {
+            user.id == id
+              ? <TouchableOpacity
+                style={{ position: 'absolute', top: 25, right: 25, borderWidth: 1, borderRadius: 25, padding: 10 }}
+                onPress={() => navigation.navigate('Profile', {
+                  screen: 'Profile',
+                  params: { fromLookup: true },
+                })}>
+                <MaterialCommunityIcons style={styles.editIconStyle} name="dumbbell" size={24} color="black" />
+              </TouchableOpacity>
+              : null
+          }
+          <View style={styles.border}>
+            {/*
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.goBackButton}>
                     <Text style={styles.buttonTextStyle}>Go Back</Text>
                 </TouchableOpacity>
                  */}
 
-          <View style={{ paddingBottom: 15 }}>
+            <View style={{ paddingBottom: 15 }}>
 
-            <ProfileImageAndName
-              vertical={true}
-              style={styles.imageStyle}
-              userId={user.id}
-              isFull={true}
-            />
-          </View>
-
-          <View>
-            <View style={styles.viewProfileScreen}>
-              <Text>Name: {user.name}</Text>
+              <ProfileImageAndName
+                vertical={true}
+                style={styles.imageStyle}
+                userId={user.id}
+                isFull={true}
+              />
             </View>
-            <View style={styles.viewProfileScreen}>
-              <Text>Gender: {user.gender}</Text>
-            </View>
-            <View style={styles.viewProfileScreen}>
-              <Text>Age: {user.age}</Text>
-            </View>
-          </View>
 
-        </View>
-        <View style={styles.viewProfileScreen}>
-          <Text>Bio: </Text>
-        </View>
-        <Text style={styles.textBoxStyle}>{user.bio}</Text>
-        <View style={styles.viewProfileScreen}>
-          <Text>Goals: </Text>
-        </View>
-
-        <Text style={styles.textBoxStyle}>{user.goals}</Text>
-        <View>
-
-        { (mutualfriendList.length != 0) ?
-        <View style={styles.viewProfileScreen}>
-          <Text>Mutual Friends: </Text>
-        </View>
-        : null
-        }
-
-        </View>
-        <View>
-        <SafeAreaView style={{flex: 1}}>
-            <FlatList
-            data={mutualfriendList}
-            //keyExtractor = {(item) => item.toString()}
-            keyExtractor = {(item, index) => item}
-            renderItem={({ item }) => (
-              <View style = {{marginVertical: 5}}>
-                  <View style = {{flexDirection: 'row', alignSelf: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%'}}>
-                      <TouchableOpacity onPress = {() => goToProfile(item)}>
-                          <ProfileImageAndName
-                              style={styles.smallImageStyle}
-                              userId={item}
-                          />
-                      </TouchableOpacity>
-                  </View> 
+            <View>
+              <View style={styles.viewProfileScreen}>
+                <Text>Name: {user.name}</Text>
               </View>
-            )}
-          />
-          </SafeAreaView>
-        </View>
-        {
-          getLocation() != null && user.latitude != null
-            ?
-            <View style={styles.viewProfileScreen}>
-              <Text style={styles.viewProfileScreen}>{computeDistance([user.latitude, user.longitude])} mi. away</Text>
+              <View style={styles.viewProfileScreen}>
+                <Text>Gender: {user.gender}</Text>
+              </View>
+              <View style={styles.viewProfileScreen}>
+                <Text>Age: {user.age}</Text>
+              </View>
             </View>
-            : null
-        }
-        {route.params?.id != user.id ?
-          <View style={styles.buttonFormat}>
-            {friendStatus == "none" ?
-              <TouchableOpacity
-                onPress={sendFriendRequest}
-                style={styles.submitButton}
-              >
-                <Text style={styles.buttonTextStyle}>Send Friend Request</Text>
-              </TouchableOpacity>
-              : friendStatus == "sent" ?
-              <TouchableOpacity
-                onPress={unsendFriendRequest}
-                style={styles.unsendButton}
-              >
-                <Text style={styles.buttonTextStyle}>Unsend Friend Request</Text>
-              </TouchableOpacity>
-              : friendStatus == "received" ?
-              <View>
-                <TouchableOpacity
-                  onPress={rejectFriendRequest}
-                  style={styles.unsendButton}
-                >
-                  <Text style={styles.buttonTextStyle}>Reject Friend Request</Text>
-                </TouchableOpacity>
+
+          </View>
+          <View style={styles.viewProfileScreen}>
+            <Text>Bio: </Text>
+          </View>
+          <Text style={styles.textBoxStyle}>{user.bio}</Text>
+          <View style={styles.viewProfileScreen}>
+            <Text>Goals: </Text>
+          </View>
+
+          <Text style={styles.textBoxStyle}>{user.goals}</Text>
+          <View>
+
+            {(mutualfriendList.length != 0) ?
+              <View style={styles.viewProfileScreen}>
+                <Text>Mutual Friends: </Text>
+              </View>
+              : null
+            }
+
+          </View>
+          <View>
+            <SafeAreaView style={{ flex: 1 }}>
+              <APIList
+                initialAmount={10}
+                additionalAmount={20}
+                horizontal={true}
+                queryOperation={listFriendships}
+                data={mutualfriendList}
+                filter={{
+                  filter: {
+                    or: [{
+                      user1: {
+                        eq: route.params?.id
+                      }
+                    },
+                    {
+                      user2: {
+                        eq: route.params?.id
+                      }
+                    },
+                    {
+                      user1: {
+                        eq: userId
+                      }
+                    },
+                    {
+                      user2: {
+                        eq: userId
+                      }
+                    },]
+                  }
+                }}
+                setDataFunction={setMutualFriendList}
+                processingFunction={collectMutualFriends}
+                keyExtractor={(item, index) => item}
+                renderItem={({ item }) => (
+                  <View style={{ marginVertical: 5 }}>
+                    <View style={{ flexDirection: 'row', alignSelf: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%' }}>
+                      <TouchableOpacity onPress={() => goToProfile(item)}>
+                        <ProfileImageAndName
+                          style={styles.smallImageStyle}
+                          userId={item}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
+              />
+            </SafeAreaView>
+          </View>
+          {
+            getLocation() != null && user.latitude != null
+              ?
+              <View style={styles.viewProfileScreen}>
+                <Text style={styles.viewProfileScreen}>{computeDistance([user.latitude, user.longitude])} mi. away</Text>
+              </View>
+              : null
+          }
+          {route.params?.id != user.id ?
+            <View style={styles.buttonFormat}>
+              {friendStatus == "none" ?
                 <TouchableOpacity
                   onPress={sendFriendRequest}
-                  style={styles.unsendButton}
+                  style={styles.submitButton}
                 >
-                  <Text style={styles.buttonTextStyle}>Accept Friend Request</Text>
+                  <Text style={styles.buttonTextStyle}>Send Friend Request</Text>
                 </TouchableOpacity>
-              </View>
-              : 
-              <View>
-                <View style={styles.viewProfileScreen}>
-                  <Text>Friends for {friendsSince} </Text>
-                </View>
-                <TouchableOpacity
-                  onPress={deleteFriend}
-                  style={styles.unsendButton}
-                >
-                  <Text style={styles.buttonTextStyle}>Delete Friend</Text>
-                </TouchableOpacity>
-              </View>
-            }
-          </View>
-          : null
-        }
-      </ScrollView>
+                : friendStatus == "sent" ?
+                  <TouchableOpacity
+                    onPress={unsendFriendRequest}
+                    style={styles.unsendButton}
+                  >
+                    <Text style={styles.buttonTextStyle}>Unsend Friend Request</Text>
+                  </TouchableOpacity>
+                  : friendStatus == "received" ?
+                    <View>
+                      <TouchableOpacity
+                        onPress={rejectFriendRequest}
+                        style={styles.unsendButton}
+                      >
+                        <Text style={styles.buttonTextStyle}>Reject Friend Request</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={sendFriendRequest}
+                        style={styles.unsendButton}
+                      >
+                        <Text style={styles.buttonTextStyle}>Accept Friend Request</Text>
+                      </TouchableOpacity>
+                    </View>
+                    :
+                    <View>
+                      <View style={styles.viewProfileScreen}>
+                        <Text>Friends for {friendsSince} </Text>
+                      </View>
+                      <TouchableOpacity
+                        onPress={deleteFriend}
+                        style={styles.unsendButton}
+                      >
+                        <Text style={styles.buttonTextStyle}>Delete Friend</Text>
+                      </TouchableOpacity>
+                    </View>
+              }
+            </View>
+            : null
+          }
+        </ScrollView>
       </View>
   )
 }
