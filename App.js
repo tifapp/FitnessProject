@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import {
   ActivityIndicator,
   LogBox,
-  AsyncStorage
+  AsyncStorage,
+  Text
 } from "react-native";
 import { withAuthenticator } from "aws-amplify-react-native";
 // Get the aws resources configuration parameters
@@ -44,6 +45,9 @@ Cache.clear(); //will we have to do this for the next build?
 var styles = require("./styles/stylesheet");
 
 const App = () => {
+  Text.defaultProps = Text.defaultProps || {}
+  Text.defaultProps.style =  { fontFamily: 'Helvetica', fontSize: 15, fontWeight: 'bold' }
+
   const Tab = createBottomTabNavigator();
   const [userId, setUserId] = useState(''); //stores the user's id if logged in
 
