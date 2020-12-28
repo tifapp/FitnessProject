@@ -9,7 +9,6 @@ import getLocation from 'hooks/useLocation';
 import printTime from 'hooks/printTime';
 import { getUser, getFriendRequest, getFriendship, listFriendships, friendsBySecondUser } from "../src/graphql/queries";
 import { createFriendRequest, deleteFriendRequest, deleteFriendship } from "root/src/graphql/mutations";
-import MutualFriends from "components/MutualFriendsList";
 import APIList from "components/APIList"
 
 var styles = require('styles/stylesheet');
