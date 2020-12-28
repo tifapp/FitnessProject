@@ -3,12 +3,22 @@ import { View, StyleSheet, Image, TouchableOpacity, Alert, ActivityIndicator, Te
 import { Cache, Storage } from "aws-amplify";
 import { API, graphqlOperation } from "aws-amplify";
 import { getUser } from "../src/graphql/queries";
+import { useNavigation } from '@react-navigation/native';
 
 var styles = require('../styles/stylesheet');
 
 //currently the predicted behavior is that it will cache images but the links will be invalid after 15 minutes-1 hour. let's see.
 
 export const ProfileImageAndName = (props) => { //user is required in props. it's a type of object described in userschema.graphql
+    const navigation = useNavigation();
+    const goToProfile = () => {
+        if (props.navigation) {
+            navigation.navigate('Lookup',
+                { userId: props.userId })
+
+        }
+    }
+
     const [userInfo, setUserInfo] = useState(null);
 
     const addUserInfotoCache = () => {
@@ -64,9 +74,10 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
 
     useEffect(() => {
         Cache.getItem(props.userId, { callback: addUserInfotoCache }) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
-        .then((info)=>{
-            //console.log('cache hit! ', url.substring(0, 15), '...');
-            setUserInfo(info)}); //redundant???
+            .then((info) => {
+                //console.log('cache hit! ', url.substring(0, 15), '...');
+                setUserInfo(info)
+            }); //redundant???
         //return () => mounted = false;
     }, [props.user]);
 
@@ -78,26 +89,16 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
             />
         )
     } else {
-        if (props.vertical) {
-            return (
-                <View style = {{alignItems: 'center'}} >
-                <Image 
-                    style={[props.style, {marginBottom: 15}]}
+        return (
+            <TouchableOpacity
+                onPress={goToProfile}
+                style={{ flexDirection: props.vertical ? 'column' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Image
+                    style={[props.style, { marginBottom: 15 }]}
                     source={userInfo.imageURL === '' ? require('../assets/icon.png') : { uri: userInfo.imageURL }}
                 />
                 <Text>{userInfo.name}</Text>
-                </View>
-            )
-        } else {
-            return (
-                <View style = {{flexDirection: 'row', alignItems: 'center'}} >
-                <Image 
-                    style={[props.style, {marginRight: 15}]}
-                    source={userInfo.imageURL === '' ? require('../assets/icon.png') : { uri: userInfo.imageURL }}
-                />
-                <Text>{userInfo.name}</Text>
-                </View>
-            )
-        }
+            </TouchableOpacity>
+        )
     }
 }

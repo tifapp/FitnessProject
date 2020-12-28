@@ -24,20 +24,14 @@ export default function PostItem({
   setPostVal,
   setUpdatePostID,
 }) {  
-  const navigation = useNavigation();
-  const goToProfile = () => {
-    navigation.navigate('Lookup',
-      { userId: item.userId })
-  }
-
+  
   const displayTime = printTime(item.timestamp * 1000);
 
   //
   return (
     <View style={styles.secondaryContainerStyle}>
       <View style={styles.spaceAround}>
-        <TouchableOpacity 
-        onPress={goToProfile}
+        <View 
         style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
           <ProfileImageAndName
             style={styles.smallImageStyle}
@@ -46,7 +40,7 @@ export default function PostItem({
           <View style={{marginRight: 15}}>
             <Text>{displayTime}</Text>
           </View>
-        </TouchableOpacity>
+        </View>
         <Text style={styles.check}>{item.description}</Text>
       </View>
 

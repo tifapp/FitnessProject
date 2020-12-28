@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { ProfileImageAndName } from './ProfileImageAndName';
-import { useNavigation } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons'; 
 import computeDistance from "hooks/computeDistance";
 import getLocation from 'hooks/useLocation';
@@ -16,17 +15,10 @@ export default function UserListItem({
   item,
   matchingname
 }) {
-  const navigation = useNavigation();
-
-  const goToProfile = () => {
-    navigation.navigate('Lookup',
-      { user: item, })
-  }
-
   return (
-    <TouchableOpacity
+    <View
       style={[styles.secondaryContainerStyle]}
-      onPress={goToProfile}>
+      >
       <View style={[{
         flexBasis: 1,
         flexDirection: 'row',
@@ -45,6 +37,6 @@ export default function UserListItem({
           : null
         }
       </View>
-    </TouchableOpacity>
+    </View>
   );
 }
