@@ -25,11 +25,6 @@ const FriendScreen = ({ route, navigation }) => {
     const [friendList, setFriendList] = useState([]);
     const [friendRequestList, setFriendRequestList] = useState([]);
 
-    const goToProfile = (id) => {
-        navigation.navigate('Lookup',
-            { userId: id })
-    }
-
     const findFriendID = (item) => {
         if (route.params?.id == item.user1) return item.user2;
         if (route.params?.id == item.user2) return item.user1;
@@ -125,12 +120,10 @@ const FriendScreen = ({ route, navigation }) => {
                             data={friendList}
                             renderItem={({ item }) => (
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%' }}>
-                                    <TouchableOpacity onPress={() => goToProfile(findFriendID(item))}>
-                                        <ProfileImageAndName
-                                            style={styles.smallImageStyle}
-                                            userId={findFriendID(item)}
-                                        />
-                                    </TouchableOpacity>
+                                    <ProfileImageAndName
+                                        style={styles.smallImageStyle}
+                                        userId={findFriendID(item)}
+                                    />
                                     <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 15 }}
                                         onPress={() => removeFriendHandler(item)}>
                                         <Text>Delete</Text>
@@ -155,12 +148,10 @@ const FriendScreen = ({ route, navigation }) => {
                             renderItem={({ item }) => (
                                 <View style={{ marginVertical: 5 }}>
                                     <View style={{ flexDirection: 'column', alignSelf: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%' }}>
-                                        <TouchableOpacity onPress={() => goToProfile(item.sender)}>
-                                            <ProfileImageAndName
-                                                style={styles.smallImageStyle}
-                                                userId={item.sender}
-                                            />
-                                        </TouchableOpacity>
+                                        <ProfileImageAndName
+                                            style={styles.smallImageStyle}
+                                            userId={item.sender}
+                                        />
                                         <View style={{ flexDirection: 'row', alignSelf: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%' }}>
 
                                             <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}

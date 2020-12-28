@@ -16,13 +16,6 @@ var styles = require('styles/stylesheet');
 
 
 const LookupUser = ({ route, navigation }) => {
-
-  const goToProfile = (item) => {
-    console.log("check");
-    navigation.push('Lookup',
-      { userId: item})
-  }
-
   const [friendStatus, setFriendStatus] = useState("none"); //can be either "received", "sent", "friends", or "none". don't misspell!
   const [hifiveSent, setHifiveSent] = useState(false); //can be either "received", "sent", or "none". don't misspell!
   const [friendsSince, setFriendsSince] = useState("");
@@ -244,8 +237,8 @@ const LookupUser = ({ route, navigation }) => {
                  */}
 
             <View style={{ paddingBottom: 15 }}>
-
               <ProfileImageAndName
+                navigation={false}
                 vertical={true}
                 style={styles.imageStyle}
                 userId={user.id}
@@ -254,9 +247,6 @@ const LookupUser = ({ route, navigation }) => {
             </View>
 
             <View>
-              <View style={styles.viewProfileScreen}>
-                <Text>Name: {user.name}</Text>
-              </View>
               <View style={styles.viewProfileScreen}>
                 <Text>Gender: {user.gender}</Text>
               </View>
@@ -323,13 +313,11 @@ const LookupUser = ({ route, navigation }) => {
                 renderItem={({ item }) => (
                   <View style={{ marginVertical: 5 }}>
                     <View style={{ flexDirection: 'row', alignSelf: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%' }}>
-                      <TouchableOpacity onPress={() => goToProfile(item)}>
-                        <ProfileImageAndName
-                          vertical={true}
-                          style={[styles.smallImageStyle, {marginHorizontal: 20}]}
-                          userId={item}
-                        />
-                      </TouchableOpacity>
+                      <ProfileImageAndName
+                        vertical={true}
+                        style={[styles.smallImageStyle, {marginHorizontal: 20}]}
+                        userId={item}
+                      />
                     </View>
                   </View>
                 )}
