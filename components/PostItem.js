@@ -23,43 +23,49 @@ export default function PostItem({
   writtenByYou,
   setPostVal,
   setUpdatePostID,
-}) {  
-  
+}) {
+
   const displayTime = printTime(item.timestamp * 1000);
 
   //
   return (
     <View style={styles.secondaryContainerStyle}>
       <View style={styles.spaceAround}>
-        <View 
-        style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+        <View
+          style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <ProfileImageAndName
             style={styles.smallImageStyle}
             userId={item.userId}
           />
-          <View style={{marginRight: 15}}>
+          <View style={{ marginRight: 15 }}>
             <Text>{displayTime}</Text>
           </View>
         </View>
         <Text style={styles.check}>{item.description}</Text>
       </View>
 
-      {writtenByYou ? (
-        <View style = {{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly'}}>
-          
-          <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={() => (deletePostsAsync(item.timestamp))}>
-              <Text style={[styles.unselectedButtonTextStyle, {color: 'red'}]}>Delete</Text>
-          </TouchableOpacity>
+      <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
+        {writtenByYou ? (
+          <View>
+            <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={() => (deletePostsAsync(item.timestamp))}>
+              <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>Delete</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={[styles.unselectedButtonStyle, { borderColor: 'blue' }]} 
-            color="blue" 
-            onPress={() => (setPostVal(item.description), setUpdatePostID(item.timestamp))}>
-            <Text style={[styles.unselectedButtonTextStyle, {color: 'blue'}]}>Edit</Text>
-          </TouchableOpacity>
-        </View>
-        
-      ) : null}
+            <TouchableOpacity
+              style={[styles.unselectedButtonStyle, { borderColor: 'blue' }]}
+              color="blue"
+              onPress={() => (setPostVal(item.description), setUpdatePostID(item.timestamp))}>
+              <Text style={[styles.unselectedButtonTextStyle, { color: 'blue' }]}>Edit</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
+        <TouchableOpacity
+          style={[styles.unselectedButtonStyle, { borderColor: 'blue' }]}
+          color="blue"
+          onPress={() => {navigation.navigate('Lookup', { postId: props.id })}}>
+          <Text style={[styles.unselectedButtonTextStyle, { color: 'blue' }]}>Edit</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
