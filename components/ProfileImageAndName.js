@@ -13,7 +13,7 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
     const navigation = useNavigation();
     const goToProfile = () => {
         if (props.navigation == false) return;
-        navigation.navigate('Lookup',
+        navigation.push('Lookup',
             { userId: props.userId })
     }
 

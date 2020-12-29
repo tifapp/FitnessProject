@@ -34,7 +34,6 @@ export default function FeedScreen({ navigation, route }) {
   const [posts, setPosts] = useState([]);
   const numCharsLeft = 1000 - postVal.length;
   const [updatePostID, setUpdatePostID] = useState(0);
-  const [didUserPost, setDidUserPost] = useState(false);
   
   const [onlineCheck, setOnlineCheck] = useState(true);
 
@@ -63,11 +62,10 @@ export default function FeedScreen({ navigation, route }) {
 
   const waitForNewPostsAsync = async () => {
     await API.graphql(graphqlOperation(onCreatePost)).subscribe({
-      next: newPost => {
-        if (!didUserPost) {
-          fetchPostsAsync();
-        } else {          
-          setDidUserPost(false);
+      next: event => {
+        const newPost = event.value.data.onCreatePost
+        if (newPost.userId != route.params?.id) {
+          setPosts([newPost, ...posts]); //what if we have a lot of new posts at once?
         }
       }
     });
@@ -78,8 +76,6 @@ export default function FeedScreen({ navigation, route }) {
           //if so, we won't even need to rerender anything
           //if not, loop through the posts array to find the one that matches newpost and replace it!
           //showPostsAsync();
-        } else {          
-          setDidUserPost(false);
         }
       }
     });
@@ -90,8 +86,6 @@ export default function FeedScreen({ navigation, route }) {
           //if so, we won't even need to rerender anything
           //if not, loop through the posts array to find the one that matches newpost and replace it!
           //showPostsAsync();
-        } else {          
-          setDidUserPost(false);
         }
       }
     });
@@ -101,7 +95,6 @@ export default function FeedScreen({ navigation, route }) {
   // We can separate updating functionality from adding functionality if it
   // becomes an issue later on.
   const addPostAsync = async (val) => {
-    setDidUserPost(true);
     checkInternetConnection();
     if (updatePostID != 0) {
       //replace the post locally
@@ -141,7 +134,6 @@ export default function FeedScreen({ navigation, route }) {
   };
 
   const deletePostsAsync = async (timestamp) => {
-    setDidUserPost(true);
     checkInternetConnection();
 
     //locally removes the post

@@ -17,6 +17,7 @@ import ComplianceScreen from "./screens/ComplianceScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import BioScreen from "./screens/BioScreen";
 import GoalsScreen from "./screens/GoalsScreen";
+import SignInScreen from "./screens/SignInScreen";
 import SearchStack from "./SearchStack";
 
 import { NavigationContainer } from "@react-navigation/native";
@@ -170,4 +171,6 @@ function TabBarIcon({ name, color }) {
   );
 }
 
-export default withAuthenticator(App, {usernameAttributes: 'email'});
+export default withAuthenticator(App, false, [
+  <SignInScreen />
+]);
