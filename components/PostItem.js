@@ -46,7 +46,7 @@ export default function PostItem({
 
       <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
         {writtenByYou ? (
-          <View>
+          <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
             <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={() => (deletePostsAsync(item.timestamp))}>
               <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>Delete</Text>
             </TouchableOpacity>
@@ -59,12 +59,6 @@ export default function PostItem({
             </TouchableOpacity>
           </View>
         ) : null}
-        <TouchableOpacity
-          style={[styles.unselectedButtonStyle, { borderColor: 'blue' }]}
-          color="blue"
-          onPress={() => {navigation.navigate('Lookup', { postId: props.id })}}>
-          <Text style={[styles.unselectedButtonTextStyle, { color: 'blue' }]}>Edit</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );

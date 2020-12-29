@@ -94,7 +94,7 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
                 onPress={goToProfile}
                 style={{ flexDirection: props.vertical ? 'column' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Image
-                    style={[props.style, { marginBottom: 15 }]}
+                    style={[props.style, {marginBottom: props.vertical ? 15 : 0, marginRight: props.vertical ? 0 : 15}]}
                     source={userInfo.imageURL === '' ? require('../assets/icon.png') : { uri: userInfo.imageURL }}
                 />
                 <Text>{userInfo.name}</Text>

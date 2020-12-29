@@ -45,8 +45,8 @@ Cache.clear(); //will we have to do this for the next build?
 var styles = require("./styles/stylesheet");
 
 const App = () => {
-  Text.defaultProps = Text.defaultProps || {}
-  Text.defaultProps.style =  { fontFamily: 'Helvetica', fontSize: 15, fontWeight: 'bold' }
+  //Text.defaultProps = Text.defaultProps || {}
+  //Text.defaultProps.style =  { fontFamily: 'Helvetica', fontSize: 15, fontWeight: 'normal' }
 
   const Tab = createBottomTabNavigator();
   const [userId, setUserId] = useState(''); //stores the user's id if logged in
