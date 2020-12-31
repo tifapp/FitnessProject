@@ -43,27 +43,6 @@ export default function GroupSearchScreen({ navigation, route }) {
     //still not 100% sure why this works, will have to come back to it. got from here: https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
     currentQuery.current = query;
 
-    const formatresults = (items) => {
-        let matchingnames = { title: "Matching Names", key: "name", data: (type == "group") ? (groupResults.length == 0 ? [] : groupResults[0].data) : (userResults.length == 0 ? [] : userResults[0].data) }
-        let relevantdescriptions = { title: "Relevant Descriptions", key: "desc", data: (type == "group") ? (groupResults.length == 0 ? [] : groupResults[1].data) : (userResults.length == 0 ? [] : userResults[1].data) }
-        items.forEach(element => {
-            console.log(element.name);
-            if (element.name.startsWith(query)) {
-                matchingnames.data.push(element);
-            } else {
-                relevantdescriptions.data.push(element);
-            }
-        });
-
-        const results = [];
-        if (matchingnames.data.length > 0) results.push(matchingnames);
-        if (relevantdescriptions.data.length > 0) results.push(relevantdescriptions);
-
-        console.log("finished formatting results: ");
-        console.log(results);
-        return results;
-    }
-
     useEffect(() => {
         if (query !== "") {
             ListRef.current.fetchDataAsync()
