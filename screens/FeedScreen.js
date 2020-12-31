@@ -144,9 +144,10 @@ export default function FeedScreen({ navigation, route }) {
   const deletePostsAsync = async (timestamp) => {
     checkInternetConnection();
 
+    console.log("deleting the post with this timestamp: ", timestamp);
     //locally removes the post
     setPosts((posts) => {
-      return posts.filter((val) => (val.timestamp != timestamp && val.userId != route.params?.id));
+      return posts.filter((val) => (val.timestamp != timestamp || val.userId != route.params?.id));
     });
 
     //sends a request to remove the post from the server
