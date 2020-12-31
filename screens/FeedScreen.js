@@ -12,6 +12,7 @@ import {
   Keyboard,
   ActivityIndicator,
   ScrollView,
+  SafeAreaView
 } from "react-native";
 // Get the aws resources configuration parameters
 import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
@@ -161,6 +162,7 @@ export default function FeedScreen({ navigation, route }) {
   }
 
   return (
+    <SafeAreaView style={{flex: 1}} >
       <ScrollView style={styles.containerStyle} ref={scrollRef}>
           <DisplayInternetConnection />
           <View style={{}}>
@@ -211,13 +213,14 @@ export default function FeedScreen({ navigation, route }) {
         keyExtractor={(item, index) => item.timestamp.toString() + item.userId}
       />
       
+      <StatusBar style="auto" />
+      </ScrollView>
+
       <View style = {{marginBottom: 40, position: 'absolute', alignSelf: 'flex-end'}}>
           <TouchableOpacity onPress = {scrollToTop}>
             <AntDesign name="arrowup" size={38} color="black" />
           </TouchableOpacity>
       </View>
-
-      <StatusBar style="auto" />
-    </ScrollView>
+    </SafeAreaView>
   );
 };
