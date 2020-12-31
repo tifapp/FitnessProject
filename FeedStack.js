@@ -15,8 +15,8 @@ const Stack = createStackNavigator();
 
 export default function FeedStack({ navigation, route }) {
   return (
-    <Stack.Navigator initialRouteName='Wall' screenOptions={{ headerStyle: { backgroundColor: '#d3d3d3' } }}>
-      <Stack.Screen name='Wall' component={FeedScreen} initialParams={route.params}/>
+    <Stack.Navigator initialRouteName='Feed' screenOptions={{ headerStyle: { backgroundColor: '#d3d3d3' } }}>
+      <Stack.Screen name='Feed' component={FeedScreen} initialParams={route.params}/>
       <Stack.Screen name='Lookup' component={LookupUserScreen} initialParams={route.params} />
     </Stack.Navigator>
   );

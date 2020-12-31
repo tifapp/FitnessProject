@@ -43,19 +43,30 @@ export default function GroupSearchScreen({ navigation, route }) {
     currentQuery.current = query;
 
     useEffect(() => {
-        if (query !== "") { //does this change? let's test!
+        if (query !== "") {
+            (type === "group") ? setUserResults([]) : setGroupResults([]); //clears results for the tab you arent looking at 
             console.log("the query being checked is ", query);
-            // setTimeout(()=>{
-            //     if (query === currentQuery.current)
-            //         ListRef.current.fetchDataAsync()
-            // }, 100)
             ListRef.current.fetchDataAsync(true)
             .then(results => {if (currentQuery.current === query) {
                 console.log("results' length is ", results.length);
-                (type == "group") ? setGroupResults(results) : setUserResults(results)
+                (type === "group") ? setGroupResults(results) : setUserResults(results)
             }})
+        } else {
+            setUserResults([]);
+            setGroupResults([]);
         }
     }, [query]);
+    
+    useEffect(() => {
+        if (query !== "") {
+            if ((type === "group" && groupResults.length === 0) || (type === "user" && userResults.length === 0))
+            ListRef.current.fetchDataAsync(true) //only do this if switching to this tab for the first time. check if the results are empty? clear the results when switching between tabs? check if query is the same as the currentquery?
+            .then(results => {if (currentQuery.current === query) {
+                console.log("results' length is ", results.length);
+                (type === "group") ? setGroupResults(results) : setUserResults(results)
+            }})
+        }
+    }, [type]);
 
     return (
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
