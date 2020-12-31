@@ -23,7 +23,7 @@ import PostItem from "components/PostItem";
 import { onCreatePost, onDeletePost, onUpdatePost } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
 import APIList from 'components/APIList';
-import { AntDesign } from '@expo/vector-icons'; 
+import { AntDesign } from '@expo/vector-icons';
 
 require('root/androidtimerfix');
 
@@ -37,9 +37,9 @@ export default function FeedScreen({ navigation, route }) {
   const [posts, setPosts] = useState([]);
   const numCharsLeft = 1000 - postVal.length;
   const [updatePostID, setUpdatePostID] = useState(0);
-  
+
   const [onlineCheck, setOnlineCheck] = useState(true);
-  
+
   const currentPosts = useRef();
   const scrollRef = useRef(); // Used to help with automatic scrolling to top
 
@@ -47,16 +47,16 @@ export default function FeedScreen({ navigation, route }) {
     waitForNewPostsAsync();
     checkInternetConnection();
   }, []);
-  
+
   const checkInternetConnection = () => {
-    NetInfo.fetch().then(state => 
+    NetInfo.fetch().then(state =>
       setOnlineCheck(state.isConnected)
     );
   };
 
   const DisplayInternetConnection = () => {
     console.log(onlineCheck);
-    if(!onlineCheck){
+    if (!onlineCheck) {
       return (
         <View style={styles.offlineContainer}>
           <Text style={styles.offlineText}> Not Connected to the Internet</Text>
@@ -65,7 +65,7 @@ export default function FeedScreen({ navigation, route }) {
     }
     return null;
   }
-  
+
   currentPosts.current = posts;
 
   const waitForNewPostsAsync = async () => {
@@ -80,20 +80,20 @@ export default function FeedScreen({ navigation, route }) {
     await API.graphql(graphqlOperation(onDeletePost)).subscribe({
       next: newPost => {
         //if (!didUserPost) {
-          //check if newpost is earlier than the earliest post in the array first.
-          //if so, we won't even need to rerender anything
-          //if not, loop through the posts array to find the one that matches newpost and replace it!
-          //showPostsAsync();
+        //check if newpost is earlier than the earliest post in the array first.
+        //if so, we won't even need to rerender anything
+        //if not, loop through the posts array to find the one that matches newpost and replace it!
+        //showPostsAsync();
         //}
       }
     });
     await API.graphql(graphqlOperation(onUpdatePost)).subscribe({
       next: newPost => {
         //if (!didUserPost) {
-          //check if newpost is earlier than the earliest post in the array first.
-          //if so, we won't even need to rerender anything
-          //if not, loop through the posts array to find the one that matches newpost and replace it!
-          //showPostsAsync();
+        //check if newpost is earlier than the earliest post in the array first.
+        //if so, we won't even need to rerender anything
+        //if not, loop through the posts array to find the one that matches newpost and replace it!
+        //showPostsAsync();
         //}
       }
     });
@@ -111,24 +111,24 @@ export default function FeedScreen({ navigation, route }) {
       setPosts(tempposts);
 
       try {
-        await API.graphql(graphqlOperation(updatePost, { input: { timestamp: updatePostID, userId: route.params?.id, description: postVal }}));
+        await API.graphql(graphqlOperation(updatePost, { input: { timestamp: updatePostID, userId: route.params?.id, description: postVal } }));
         console.log("success in updating a post");
       } catch (err) {
         console.log("error in updating post: ", err);
       }
-      
+
       setPostVal("");
       setUpdatePostID(0);
     }
     else {
       const newPost = {
-        timestamp: Math.floor(Date.now()/1000),
+        timestamp: Math.floor(Date.now() / 1000),
         userId: route.params?.id,
         description: postVal,
         group: group != null ? group.id : 'general',
       };
       setPostVal("");
-  
+
       setPosts([newPost, ...posts]);
       try {
         await API.graphql(graphqlOperation(createPost, { input: newPost }));
@@ -138,7 +138,7 @@ export default function FeedScreen({ navigation, route }) {
       }
       //console.log("current time...", );
     }
-    
+
   };
 
   const deletePostsAsync = async (timestamp) => {
@@ -158,68 +158,71 @@ export default function FeedScreen({ navigation, route }) {
   };
 
   const scrollToTop = () => {
-    scrollRef.current?.scrollTo({x: 0, y: 0, animated: true})
+    scrollRef.current?.scrollToOffset({ offset: 0, animated: true })
   }
 
   return (
-    <SafeAreaView style={{flex: 1}} >
-      <ScrollView style={styles.containerStyle} ref={scrollRef}>
-          <DisplayInternetConnection />
-          <View style={{}}>
-            <Text style = {{marginTop: 20, marginLeft: 5}}> Characters remaining: {numCharsLeft} </Text>
-            <TextInput
-              style={[styles.textInputStyle, { marginTop: 5, marginBottom: 30 }]}
-              multiline={true}
-              placeholder="Start Typing..."
-              onChangeText={setPostVal}
-              value={postVal}
-              clearButtonMode="always"
-              maxLength={1000}
+    <SafeAreaView style={{ flex: 1 }} >
+        <APIList
+          ListRef={scrollRef}
+          ListHeaderComponent={
+            () => {
+              return (
+                <View style={{}}>
+                  <Text style={{ marginTop: 20, marginLeft: 5 }}> Characters remaining: {numCharsLeft} </Text>
+                  <TextInput
+                    style={[styles.textInputStyle, { marginTop: 5, marginBottom: 30 }]}
+                    multiline={true}
+                    placeholder="Start Typing..."
+                    onChangeText={setPostVal}
+                    value={postVal}
+                    clearButtonMode="always"
+                    maxLength={1000}
+                  />
+
+
+                  <View style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    marginBottom: 15,
+                  }}>
+                    <TouchableOpacity
+                      style={styles.buttonStyle}
+                      onPress={() => {
+                        postVal != ""
+                          ? (addPostAsync(updatePostID))
+                          : alert("No text detected in text field");
+                      }}
+                    >
+                      <Text style={styles.buttonTextStyle}>{updatePostID == 0 ? 'Add Post' : 'Edit Post'}</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              );
+            }
+          }
+          queryOperation={postsByGroup}
+          setDataFunction={setPosts}
+          data={posts}
+          filter={{ group: group != null ? group.id : 'general', sortDirection: 'DESC' }}
+          renderItem={({ item }) => (
+            <PostItem
+              item={item}
+              deletePostsAsync={deletePostsAsync}
+              writtenByYou={item.userId === route.params?.id}
+              setPostVal={setPostVal}
+              setUpdatePostID={setUpdatePostID}
             />
-            
+          )}
+          keyExtractor={(item, index) => item.timestamp.toString() + item.userId}
+        />
 
-            <View style={{
-              flexDirection: 'row',
-              justifyContent: 'center',
-              marginBottom: 15,
-            }}>
-              <TouchableOpacity
-                style={styles.buttonStyle}
-                onPress={() => {
-                  postVal != ""
-                    ? (addPostAsync(updatePostID))
-                    : alert("No text detected in text field");
-                }}
-              >
-                <Text style={styles.buttonTextStyle}>{updatePostID == 0 ? 'Add Post' : 'Edit Post'}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+        <StatusBar style="auto" />
 
-      <APIList
-        queryOperation={postsByGroup}
-        setDataFunction={setPosts}
-        data={posts}
-        filter={{group: group != null ? group.id : 'general', sortDirection: 'DESC'}}
-        renderItem={({ item }) => (
-          <PostItem
-            item={item}
-            deletePostsAsync={deletePostsAsync}
-            writtenByYou={item.userId === route.params?.id}
-            setPostVal={setPostVal}
-            setUpdatePostID={setUpdatePostID}
-          />
-        )}
-        keyExtractor={(item, index) => item.timestamp.toString() + item.userId}
-      />
-      
-      <StatusBar style="auto" />
-      </ScrollView>
-
-      <View style = {{marginBottom: 40, position: 'absolute', alignSelf: 'flex-end'}}>
-          <TouchableOpacity onPress = {scrollToTop}>
-            <AntDesign name="arrowup" size={38} color="black" />
-          </TouchableOpacity>
+      <View style={{ marginBottom: 40, position: 'absolute', alignSelf: 'flex-end' }}>
+        <TouchableOpacity onPress={scrollToTop}>
+          <AntDesign name="arrowup" size={38} color="black" />
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

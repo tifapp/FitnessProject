@@ -102,6 +102,8 @@ class APIList extends Component { //we need to make this a class to use refs fro
             :
             this.props.sections == null
               ? <FlatList
+                ref={this.props.ListRef}
+                ListHeaderComponent={this.props.ListHeaderComponent}
                 horizontal={this.props.horizontal}
                 contentContainerStyle={{ flexGrow: 1 }}
                 data={this.props.data}
