@@ -20,7 +20,7 @@ const LookupUser = ({ route, navigation }) => {
   const [friendsSince, setFriendsSince] = useState("");
   const [hifives, setHifives] = useState(0);
   const [mutualfriendList, setMutualFriendList] = useState([]);
-
+  
   const { user } = route.params;
   const { userId } = route.params;
   const { id } = route.params;
@@ -42,18 +42,16 @@ const LookupUser = ({ route, navigation }) => {
     }
   };
 
-
   useEffect(() => {
+    /*
     if (user == null) {
+      console.log("HEELELLLLLllLLLOOOOOOOOO")
       checkUsersInfo();
     }
-  }, []);
-
-  useEffect(() => {
+    */
+    checkUsersInfo();
     checkFriendStatus();
   }, []);
-
-
 
 
   const collectMutualFriends = (items) => {
@@ -83,11 +81,12 @@ const LookupUser = ({ route, navigation }) => {
     try {
       let friendship = await API.graphql(
         graphqlOperation(getFriendship, {
-          user1: route.params?.id < user.id ? route.params?.id : user.id,
-          user2: route.params?.id < user.id ? user.id : route.params?.id,
+          user1: route.params?.id < userId ? route.params?.id : userId,
+          user2: route.params?.id < userId ? userId : route.params?.id,
         })
       );
 
+      // If two people are friends
       if (friendship.data.getFriendship != null) {
         setFriendStatus("friends");
         setFriendsSince(printTime(friendship.data.getFriendship.timestamp * 1000));
@@ -95,22 +94,21 @@ const LookupUser = ({ route, navigation }) => {
         console.log("check");
         console.log(friendship.data.getFriendship);
         //console.log(friendship.data.getFriendship.user2);
-
       } else {
         console.log("YOU ARE NOT FRIENDS");
-        console.log(friendship.data.getFriendship.user1);
-        console.log(friendship.data.getFriendship.user2);
+        //console.log(friendship.data.getFriendship.user1);
+        //console.log(friendship.data.getFriendship.user2);
         setFriendsSince("");
 
         const sentFriendRequest = await API.graphql(
-          graphqlOperation(getFriendRequest, { sender: route.params?.id, receiver: user.id })
+          graphqlOperation(getFriendRequest, { sender: route.params?.id, receiver: userId })
         );
-
-        if (sentFriendRequest.data.getFriendRequest != null) {
+        // Outgoing request
+        if (sentFriendRequest.data.getFriendRequest != null) { 
           setFriendStatus("sent");
         } else {
           const receivedFriendRequest = await API.graphql(
-            graphqlOperation(getFriendRequest, { sender: user.id, receiver: route.params?.id })
+            graphqlOperation(getFriendRequest, { sender: userId, receiver: route.params?.id })
           );
 
           if (receivedFriendRequest.data.getFriendRequest != null) {
@@ -156,7 +154,12 @@ const LookupUser = ({ route, navigation }) => {
     try {
       await API.graphql(graphqlOperation(createFriendRequest, { input: { receiver: user.id, } }));
       console.log("success");
-      setFriendStatus("sent"); //if received, should change to "friends". do a check before this
+      if (friendStatus == 'received') {
+        setFriendStatus("friends")
+      }
+      else {
+        setFriendStatus("sent"); //if received, should change to "friends". do a check before this
+      }
       alert('Sent successfully!');
     } catch (err) {
       console.log(err);
