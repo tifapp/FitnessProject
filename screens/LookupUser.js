@@ -252,7 +252,7 @@ const LookupUser = ({ route, navigation }) => {
                   onPress={deleteFriend}
                   style={styles.unsendButton}
                 >
-                  <Text style={styles.buttonTextStyle}>Delete Friend</Text>
+                  <Text style={styles.buttonTextStyle}>Remove Friend</Text>
                 </TouchableOpacity>
               </View>
             }

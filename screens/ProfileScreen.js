@@ -103,9 +103,6 @@ const ProfileScreen = ({ navigation, route }) => {
         if (name == '') {
             Alert.alert('Please enter your name!')
         }
-        else if (!areFieldsUpdated()) {
-            Alert.alert('Profile is up to date!')
-        }
         else {
             Alert.alert('Submitting Profile...', '', [], { cancelable: false })
             updateUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails, locationEnabled ? getLocation() : null)
@@ -141,7 +138,7 @@ const ProfileScreen = ({ navigation, route }) => {
                         setImageURL(user.pictureURL);
                     }, err => {
                         setImageURL('');
-                    });
+                    });  
                 }
             })
             .finally(() => { setLoading(false); })
@@ -164,7 +161,7 @@ const ProfileScreen = ({ navigation, route }) => {
         )
     } else {
         return (
-            <ScrollView style={styles.containerStyle}>
+            <ScrollView style={styles.containerStyle} >
                 <View style={styles.signOutTop}>
                     <TouchableOpacity style={styles.unselectedButtonStyle} color="red" onPress={signOut}>
                         <Text style={styles.unselectedButtonTextStyle}>Sign Out</Text>
@@ -220,10 +217,14 @@ const ProfileScreen = ({ navigation, route }) => {
                         <Text style={styles.buttonTextStyle}>My Friends</Text>
                     </TouchableOpacity>
                 </View>
-                
-                <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25 }]} onPress={submitHandler} >
-                    <Text style={styles.buttonTextStyle}>Submit</Text>
-                </TouchableOpacity>
+            
+                {
+                    areFieldsUpdated() === true ?
+                        <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25 }]} onPress={submitHandler} >
+                            <Text style={styles.buttonTextStyle}>Submit</Text>
+                        </TouchableOpacity>
+                    : null
+                }
             </ScrollView>
         )
     }

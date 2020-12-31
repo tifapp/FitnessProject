@@ -13,6 +13,7 @@ import {
   FlatList,
   RefreshControl,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
 // Get the aws resources configuration parameters
 import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
@@ -22,6 +23,7 @@ import { listPosts, postsByGroup } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
 import { onCreatePost, onDeletePost, onUpdatePost } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
+import { AntDesign } from '@expo/vector-icons'; 
 
 require('root/androidtimerfix');
 
@@ -47,6 +49,9 @@ export default function FeedScreen({ navigation, route }) {
 
   const [refreshing, setRefreshing] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+
+  const scrollRef = useRef(); // Used to help with automatic scrolling to top
+
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setAmountShown(initialAmount);
@@ -207,75 +212,88 @@ export default function FeedScreen({ navigation, route }) {
     }
   };
 
+  const scrollToTop = () => {
+    scrollRef.current?.scrollTo({x: 0, y: 0, animated: true})
+  }
+
   return (
-    <View style={styles.containerStyle}>
-      <DisplayInternetConnection />
-      <View style={{}}>
-        <Text style = {{marginTop: 20, marginLeft: 5}}> Characters remaining: {numCharsLeft} </Text>
-        <TextInput
-          style={[styles.textInputStyle, { marginTop: 5, marginBottom: 30 }]}
-          multiline={true}
-          placeholder="Start Typing..."
-          onChangeText={setPostVal}
-          value={postVal}
-          clearButtonMode="always"
-          maxLength={1000}
-        />
-        
+    <View>
+      <ScrollView ref={scrollRef}>
+        <View style={styles.containerStyle}>
+          <DisplayInternetConnection />
+          <View style={{}}>
+            <Text style = {{marginTop: 20, marginLeft: 5}}> Characters remaining: {numCharsLeft} </Text>
+            <TextInput
+              style={[styles.textInputStyle, { marginTop: 5, marginBottom: 30 }]}
+              multiline={true}
+              placeholder="Start Typing..."
+              onChangeText={setPostVal}
+              value={postVal}
+              clearButtonMode="always"
+              maxLength={1000}
+            />
+            
 
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-          marginBottom: 15,
-        }}>
-          <TouchableOpacity
-            style={styles.buttonStyle}
-            onPress={() => {
-              postVal != ""
-                ? (addPostAsync(updatePostID))
-                : alert("No text detected in text field");
-            }}
-          >
-            <Text style={styles.buttonTextStyle}>{updatePostID == 0 ? 'Add Post' : 'Edit Post'}</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              marginBottom: 15,
+            }}>
+              <TouchableOpacity
+                style={styles.buttonStyle}
+                onPress={() => {
+                  postVal != ""
+                    ? (addPostAsync(updatePostID))
+                    : alert("No text detected in text field");
+                }}
+              >
+                <Text style={styles.buttonTextStyle}>{updatePostID == 0 ? 'Add Post' : 'Edit Post'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
 
-      <FlatList
-        data={posts}
-        refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        renderItem={({ item }) => (
-          <PostItem
-            item={item}
-            deletePostsAsync={deletePostsAsync}
-            writtenByYou={item.userId === route.params?.id}
-            setPostVal={setPostVal}
-            setUpdatePostID={setUpdatePostID}
+          <FlatList
+            data={posts}
+            refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+            renderItem={({ item }) => (
+              <PostItem
+                item={item}
+                deletePostsAsync={deletePostsAsync}
+                writtenByYou={item.userId === route.params?.id}
+                setPostVal={setPostVal}
+                setUpdatePostID={setUpdatePostID}
+              />
+            )}
+            keyExtractor={(item, index) => item.timestamp.toString() + item.userId}
+            onEndReached={showMorePostsAsync}
+            onEndReachedThreshold={1}
           />
-        )}
-        keyExtractor={(item, index) => item.timestamp.toString() + item.userId}
-        onEndReached={showMorePostsAsync}
-        onEndReachedThreshold={1}
-      />
 
-      {
-        loadingMore
-          ? 
-          <ActivityIndicator
-              size="large"
-              color="#0000ff"
-              style={{
-                  position: 'absolute',
-                  left: 0,
-                  right: 0,
-                  bottom: 20
-              }} />
-          : null
-      }
+          {
+            loadingMore
+              ? 
+              <ActivityIndicator
+                  size="large"
+                  color="#0000ff"
+                  style={{
+                      position: 'absolute',
+                      left: 0,
+                      right: 0,
+                      bottom: 20
+                  }} />
+              : null
+          }
 
-      <StatusBar style="auto" />
+          <StatusBar style="auto" />
+        </View>
+      </ScrollView>
+      <View style = {{marginBottom: 40, position: 'absolute', alignSelf: 'flex-end'}}>
+          <TouchableOpacity onPress = {scrollToTop}>
+            <AntDesign name="arrowup" size={38} color="black" />
+          </TouchableOpacity>
+      </View>
     </View>
   );
 };
