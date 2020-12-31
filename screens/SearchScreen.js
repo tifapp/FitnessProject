@@ -57,10 +57,6 @@ export default function GroupSearchScreen({ navigation, route }) {
         }
     }, [query]);
 
-    const checkIfResultsShouldBeIgnored = (items) => {
-        return items;
-    }
-
     return (
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
             <View style={styles.containerStyle}>
