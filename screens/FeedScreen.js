@@ -161,9 +161,7 @@ export default function FeedScreen({ navigation, route }) {
   }
 
   return (
-    <View>
-      <ScrollView ref={scrollRef}>
-        <View style={styles.containerStyle}>
+      <ScrollView style={styles.containerStyle} ref={scrollRef}>
           <DisplayInternetConnection />
           <View style={{}}>
             <Text style = {{marginTop: 20, marginLeft: 5}}> Characters remaining: {numCharsLeft} </Text>
@@ -220,6 +218,6 @@ export default function FeedScreen({ navigation, route }) {
       </View>
 
       <StatusBar style="auto" />
-    </View>
+    </ScrollView>
   );
 };
