@@ -145,7 +145,7 @@ class APIList extends Component { //we need to make this a class to use refs fro
                 position: 'absolute',
                 left: 0,
                 right: 0,
-                bottom: 200
+                bottom: 40
               }} />
             : null
         }
