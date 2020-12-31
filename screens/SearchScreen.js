@@ -36,21 +36,30 @@ export default function GroupSearchScreen({ navigation, route }) {
     const [userResults, setUserResults] = useState([]);
     const [groupResults, setGroupResults] = useState([]);
     const [type, setType] = useState("user");
-    const currentQuery = useRef();
     const searchBarRef = useRef();
     const ListRef = useRef();
+    const currentQuery = useRef();
 
-    //still not 100% sure why this works, will have to come back to it. got from here: https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
     currentQuery.current = query;
 
     useEffect(() => {
-        if (query !== "") {
-            ListRef.current.fetchDataAsync()
-        } else {
-            setUserResults([]);
-            setGroupResults([]);
+        if (query !== "") { //does this change? let's test!
+            console.log("the query being checked is ", query);
+            // setTimeout(()=>{
+            //     if (query === currentQuery.current)
+            //         ListRef.current.fetchDataAsync()
+            // }, 100)
+            ListRef.current.fetchDataAsync(true)
+            .then(results => {if (currentQuery.current === query) {
+                console.log("results' length is ", results.length);
+                (type == "group") ? setGroupResults(results) : setUserResults(results)
+            }})
         }
     }, [query]);
+
+    const checkIfResultsShouldBeIgnored = (items) => {
+        return items;
+    }
 
     return (
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -181,6 +190,9 @@ export default function GroupSearchScreen({ navigation, route }) {
                                     },]
                                 }
                             }}
+                    initialAmount={20}
+                    additionalAmount={10}
+                    returnResults={true}
                     setDataFunction={(type == "group") ? setGroupResults : setUserResults}
                     data={(type == "group") ? groupResults : userResults} //wait how would pagination work with sections
                     renderItem={({ item }) =>

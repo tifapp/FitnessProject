@@ -30,7 +30,9 @@ class APIList extends Component { //we need to make this a class to use refs fro
   }
 
   loadMore = () => {
+    console.log("can we load more???");
     if (!this.state.loadingMore && this.state.nextToken != null) { //if we don't check this, the list will repeat endlessly
+      console.log("yes we can");
       this.setState({loadingMore: true});
       this.fetchDataAsync(false)
         .finally(() => { this.setState({loadingMore: false}); });
@@ -44,10 +46,6 @@ class APIList extends Component { //we need to make this a class to use refs fro
       .catch();
   };
 
-  myMethod() {
-    console.log("MyMethod called");
-  }
-
   fetchDataAsync = async (beginning) => {
     //do not refetch if the user themselves added or updated a post
     //if new posts are being added don't refetch the entire batch, only append the new posts
@@ -58,17 +56,20 @@ class APIList extends Component { //we need to make this a class to use refs fro
         graphqlOperation(this.props.queryOperation, { limit: this.state.nextToken == null ? (this.props.initialAmount == null ? 10 : this.props.initialAmount) : (this.props.additionalAmount == null ? 5 : this.props.additionalAmount), nextToken: beginning ? null : this.state.nextToken, ...this.props.filter || {}, })
       );
       
-      console.log('showing this data: ', query);
+      //console.log('showing this data: ', query);
 
       this.setState({nextToken: query.data[Object.keys(query.data)[0]].nextToken});
 
       let results = query.data[Object.keys(query.data)[0]].items;
 
+      console.log("straight from the source, results length is ", results.length);
+
       if (this.props.processingFunction != null) {
         results = this.props.processingFunction(results);
       }
 
-      if (!beginning)
+      if (this.props.returnResults) return results;
+      else if (!beginning)
         this.props.setDataFunction([...this.props.data, ...results]); //wont work with current sectionlist implementation
       else
         this.props.setDataFunction(results);
