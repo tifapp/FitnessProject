@@ -62,7 +62,8 @@ class APIList extends Component { //we need to make this a class to use refs fro
 
       let results = query.data[Object.keys(query.data)[0]].items;
 
-      console.log("straight from the source, results length is ", results.length);
+      //console.log("using this filter: ", this.props.filter);
+      //console.log("straight from the source, results length is ", results.length);
 
       if (this.props.processingFunction != null) {
         results = this.props.processingFunction(results);

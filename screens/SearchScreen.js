@@ -150,17 +150,17 @@ export default function GroupSearchScreen({ navigation, route }) {
                                 filter: {
                                     or: [{
                                         name: {
-                                            beginsWith: query
+                                            beginsWith: currentQuery.current
                                         }
                                     },
                                     {
                                         bio: {
-                                            contains: query
+                                            contains: currentQuery.current
                                         }
                                     },
                                     {
                                         goals: {
-                                            contains: query
+                                            contains: currentQuery.current
                                         }
                                     },]
                                 }
@@ -171,17 +171,17 @@ export default function GroupSearchScreen({ navigation, route }) {
                                 filter: {
                                     or: [{
                                         name: {
-                                            beginsWith: query
+                                            beginsWith: currentQuery.current
                                         }
                                     },
                                     {
                                         Sport: {
-                                            contains: query
+                                            contains: currentQuery.current
                                         }
                                     },
                                     {
                                         Description: {
-                                            contains: query
+                                            contains: currentQuery.current
                                         }
                                     },]
                                 }
