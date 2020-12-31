@@ -11,6 +11,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
 // Get the aws resources configuration parameters
 import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
@@ -21,6 +22,7 @@ import PostItem from "components/PostItem";
 import { onCreatePost, onDeletePost, onUpdatePost } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
 import APIList from 'components/APIList';
+import { AntDesign } from '@expo/vector-icons'; 
 
 require('root/androidtimerfix');
 
@@ -38,6 +40,7 @@ export default function FeedScreen({ navigation, route }) {
   const [onlineCheck, setOnlineCheck] = useState(true);
   
   const currentPosts = useRef();
+  const scrollRef = useRef(); // Used to help with automatic scrolling to top
 
   useEffect(() => {
     waitForNewPostsAsync();
@@ -153,39 +156,45 @@ export default function FeedScreen({ navigation, route }) {
     }
   };
 
-  return (
-    <View style={styles.containerStyle}>
-      <DisplayInternetConnection />
-      <View style={{}}>
-        <Text style = {{marginTop: 20, marginLeft: 5}}> Characters remaining: {numCharsLeft} </Text>
-        <TextInput
-          style={[styles.textInputStyle, { marginTop: 5, marginBottom: 30 }]}
-          multiline={true}
-          placeholder="Start Typing..."
-          onChangeText={setPostVal}
-          value={postVal}
-          clearButtonMode="always"
-          maxLength={1000}
-        />
-        
+  const scrollToTop = () => {
+    scrollRef.current?.scrollTo({x: 0, y: 0, animated: true})
+  }
 
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-          marginBottom: 15,
-        }}>
-          <TouchableOpacity
-            style={styles.buttonStyle}
-            onPress={() => {
-              postVal != ""
-                ? (addPostAsync(updatePostID))
-                : alert("No text detected in text field");
-            }}
-          >
-            <Text style={styles.buttonTextStyle}>{updatePostID == 0 ? 'Add Post' : 'Edit Post'}</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+  return (
+    <View>
+      <ScrollView ref={scrollRef}>
+        <View style={styles.containerStyle}>
+          <DisplayInternetConnection />
+          <View style={{}}>
+            <Text style = {{marginTop: 20, marginLeft: 5}}> Characters remaining: {numCharsLeft} </Text>
+            <TextInput
+              style={[styles.textInputStyle, { marginTop: 5, marginBottom: 30 }]}
+              multiline={true}
+              placeholder="Start Typing..."
+              onChangeText={setPostVal}
+              value={postVal}
+              clearButtonMode="always"
+              maxLength={1000}
+            />
+            
+
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              marginBottom: 15,
+            }}>
+              <TouchableOpacity
+                style={styles.buttonStyle}
+                onPress={() => {
+                  postVal != ""
+                    ? (addPostAsync(updatePostID))
+                    : alert("No text detected in text field");
+                }}
+              >
+                <Text style={styles.buttonTextStyle}>{updatePostID == 0 ? 'Add Post' : 'Edit Post'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
 
       <APIList
         queryOperation={postsByGroup}
@@ -203,6 +212,12 @@ export default function FeedScreen({ navigation, route }) {
         )}
         keyExtractor={(item, index) => item.timestamp.toString() + item.userId}
       />
+      
+      <View style = {{marginBottom: 40, position: 'absolute', alignSelf: 'flex-end'}}>
+          <TouchableOpacity onPress = {scrollToTop}>
+            <AntDesign name="arrowup" size={38} color="black" />
+          </TouchableOpacity>
+      </View>
 
       <StatusBar style="auto" />
     </View>

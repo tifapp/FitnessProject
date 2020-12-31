@@ -126,7 +126,7 @@ const FriendScreen = ({ route, navigation }) => {
                                     />
                                     <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 15 }}
                                         onPress={() => removeFriendHandler(item)}>
-                                        <Text>Delete</Text>
+                                        <Text>Remove</Text>
                                         <Entypo name="cross" style={{ marginHorizontal: 7 }}
                                             size={44} color="red" />
                                     </TouchableOpacity>
