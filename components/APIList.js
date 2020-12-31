@@ -45,7 +45,7 @@ class APIList extends Component { //we need to make this a class to use refs fro
   };
 
   myMethod() {
-    console.log("MyMethod called");
+    //console.log("MyMethod called");
   }
 
   fetchDataAsync = async (beginning) => {
@@ -58,7 +58,7 @@ class APIList extends Component { //we need to make this a class to use refs fro
         graphqlOperation(this.props.queryOperation, { limit: this.state.nextToken == null ? (this.props.initialAmount == null ? 10 : this.props.initialAmount) : (this.props.additionalAmount == null ? 5 : this.props.additionalAmount), nextToken: beginning ? null : this.state.nextToken, ...this.props.filter || {}, })
       );
       
-      console.log('showing this data: ', query);
+      //console.log('showing this data: ', query);
 
       this.setState({nextToken: query.data[Object.keys(query.data)[0]].nextToken});
 
