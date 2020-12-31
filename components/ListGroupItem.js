@@ -14,7 +14,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 var styles = require("../styles/stylesheet");
 
-export default function ListGroupItem({ item}) {
+export default function ListGroupItem({ item, matchingname }) {
 
   const navigation = useNavigation();
 
@@ -41,7 +41,7 @@ export default function ListGroupItem({ item}) {
             styles.check,
           ]}
         >
-          <MaterialCommunityIcons name="account-group" color={matchingname ? "black" : "orange"} size={30}/>
+          <MaterialCommunityIcons name="account-group" color={matchingname == null || matchingname ? "black" : "orange"} size={30}/>
           <Text>{item.name}</Text>
         </View>
       </View>

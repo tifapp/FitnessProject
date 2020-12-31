@@ -36,6 +36,8 @@ export default function FeedScreen({ navigation, route }) {
   const [updatePostID, setUpdatePostID] = useState(0);
   
   const [onlineCheck, setOnlineCheck] = useState(true);
+  
+  const currentPosts = useRef();
 
   useEffect(() => {
     waitForNewPostsAsync();
@@ -59,34 +61,36 @@ export default function FeedScreen({ navigation, route }) {
     }
     return null;
   }
+  
+  currentPosts.current = posts;
 
   const waitForNewPostsAsync = async () => {
     await API.graphql(graphqlOperation(onCreatePost)).subscribe({
       next: event => {
         const newPost = event.value.data.onCreatePost
-        if (newPost.userId != route.params?.id) {
-          setPosts([newPost, ...posts]); //what if we have a lot of new posts at once?
+        if (newPost.userId != route.params?.id && (group != null ? newPost.group == group.id : 'general' == newPost.group)) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
+          setPosts([newPost, ...currentPosts.current]); //for some reason "posts" isn't the most uptodate version. will we need a ref???!?!?!? //what if we have a lot of new posts at once?
         }
       }
     });
     await API.graphql(graphqlOperation(onDeletePost)).subscribe({
       next: newPost => {
-        if (!didUserPost) {
+        //if (!didUserPost) {
           //check if newpost is earlier than the earliest post in the array first.
           //if so, we won't even need to rerender anything
           //if not, loop through the posts array to find the one that matches newpost and replace it!
           //showPostsAsync();
-        }
+        //}
       }
     });
     await API.graphql(graphqlOperation(onUpdatePost)).subscribe({
       next: newPost => {
-        if (!didUserPost) {
+        //if (!didUserPost) {
           //check if newpost is earlier than the earliest post in the array first.
           //if so, we won't even need to rerender anything
           //if not, loop through the posts array to find the one that matches newpost and replace it!
           //showPostsAsync();
-        }
+        //}
       }
     });
   }
