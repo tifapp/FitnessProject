@@ -35,7 +35,7 @@ export default function GroupSearchScreen({ navigation, route }) {
     const [query, setQuery] = useState("");
     const [userResults, setUserResults] = useState([]);
     const [groupResults, setGroupResults] = useState([]);
-    const [type, setType] = useState("user");
+    const [type, setType] = useState("user"); //refreshing tho
     const [isAll, setIsAll] = useState(false);
     const [isGroupsFetched, setIsGroupsFetched] = useState(false);
     const searchBarRef = useRef();
