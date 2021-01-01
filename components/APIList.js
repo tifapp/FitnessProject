@@ -24,9 +24,11 @@ class APIList extends Component { //we need to make this a class to use refs fro
   }
 
   componentDidMount() {
-    this.setState({loading: true});
-    this.fetchDataAsync(true)
-    .finally(() => this.setState({loading: false}));
+    if (!this.props.ignoreInitialLoad) {
+      this.setState({loading: true});
+      this.fetchDataAsync(true)
+      .finally(() => this.setState({loading: false}));
+    }
   }
 
   loadMore = () => {
@@ -46,7 +48,7 @@ class APIList extends Component { //we need to make this a class to use refs fro
       .catch();
   };
 
-  fetchDataAsync = async (beginning) => {
+  fetchDataAsync = async (beginning, secondProcessingFunction) => {
     //do not refetch if the user themselves added or updated a post
     //if new posts are being added don't refetch the entire batch, only append the new posts
     //if a post is being updated don't refetch the entire batch, only update that post
@@ -62,15 +64,18 @@ class APIList extends Component { //we need to make this a class to use refs fro
 
       let results = query.data[Object.keys(query.data)[0]].items;
 
-      //console.log("using this filter: ", this.props.filter);
-      //console.log("straight from the source, results length is ", results.length);
+      console.log("using this filter: ", this.props.filter);
+      console.log("straight from the source, results length is ", results.length);
 
       if (this.props.processingFunction != null) {
         results = this.props.processingFunction(results);
       }
 
-      if (this.props.returnResults) return results;
-      else if (!beginning)
+      if (secondProcessingFunction != null) {
+        if (secondProcessingFunction()) return;
+      }
+
+      if (!beginning)
         this.props.setDataFunction([...this.props.data, ...results]); //wont work with current sectionlist implementation
       else
         this.props.setDataFunction(results);

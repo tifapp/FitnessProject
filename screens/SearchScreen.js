@@ -36,6 +36,8 @@ export default function GroupSearchScreen({ navigation, route }) {
     const [userResults, setUserResults] = useState([]);
     const [groupResults, setGroupResults] = useState([]);
     const [type, setType] = useState("user");
+    const [isAll, setIsAll] = useState(false);
+    const [isGroupsFetched, setIsGroupsFetched] = useState(false);
     const searchBarRef = useRef();
     const ListRef = useRef();
     const currentQuery = useRef();
@@ -44,13 +46,16 @@ export default function GroupSearchScreen({ navigation, route }) {
 
     useEffect(() => {
         if (query !== "") {
-            (type === "group") ? setUserResults([]) : setGroupResults([]); //clears results for the tab you arent looking at 
+            if (type !== "all") (type === "group") ? setUserResults([]) : setGroupResults([]); //clears results for the tab you arent looking at 
+            console.log("START-----------------------");
             console.log("the query being checked is ", query);
-            ListRef.current.fetchDataAsync(true)
-            .then(results => {if (currentQuery.current === query) {
-                console.log("results' length is ", results.length);
-                (type === "group") ? setGroupResults(results) : setUserResults(results)
-            }})
+            ListRef.current.fetchDataAsync(true, ()=>{
+                return (currentQuery.current !== query)
+            })
+            if (type === "all" && groupResults.length === 0) {
+                setIsAll(true);
+                setType("group"); //because it will display user results by default
+            }
         } else {
             setUserResults([]);
             setGroupResults([]);
@@ -60,11 +65,22 @@ export default function GroupSearchScreen({ navigation, route }) {
     useEffect(() => {
         if (query !== "") {
             if ((type === "group" && groupResults.length === 0) || (type === "user" && userResults.length === 0))
-            ListRef.current.fetchDataAsync(true) //only do this if switching to this tab for the first time. check if the results are empty? clear the results when switching between tabs? check if query is the same as the currentquery?
-            .then(results => {if (currentQuery.current === query) {
-                console.log("results' length is ", results.length);
-                (type === "group") ? setGroupResults(results) : setUserResults(results)
-            }})
+            ListRef.current.fetchDataAsync(true, ()=>{
+                return (currentQuery.current !== query)
+            })
+            if (isAll) {
+                setIsAll(false);
+                setType("all"); //either set it AFTER groupresults have changed, or have a variable saying "don't come back to groups"
+            }
+            if (type === "all" && groupResults.length === 0) {
+                if (!isGroupsFetched) {
+                    setIsAll(true);
+                    setIsGroupsFetched(true);
+                    setType("group");
+                } else {
+                    setIsGroupsFetched(false);
+                }
+            }
         }
     }, [type]);
 
@@ -105,35 +121,35 @@ export default function GroupSearchScreen({ navigation, route }) {
                                 <Text style={styles.outlineButtonTextStyle}>Show </Text>
 
                                 <TouchableOpacity
-                                    style={(type == 'all') ? [styles.outlineButtonStyle, { borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type == 'all') ? "white" : "orange", }] :
+                                    style={(type === 'all' || isAll) ? [styles.outlineButtonStyle, { borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type === 'all' || isAll) ? "white" : "orange", }] :
                                         [styles.unselectedButtonStyle, { backgroundColor: "lightgray", borderColor: "white", borderBottomColor: "orange" }]}
                                     onPress={() => {
                                         setType("all")
                                     }}
                                 >
-                                    <Text style={(type == 'all') ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, { color: "white" }]}>all</Text>
+                                    <Text style={(type === 'all' || isAll) ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, { color: "white" }]}>all</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
-                                    style={(type == 'user') ? [styles.outlineButtonStyle, {
-                                        borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type == 'user') ? "white" : "orange",
+                                    style={(type === 'user') ? [styles.outlineButtonStyle, {
+                                        borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type === 'user') ? "white" : "orange",
                                     }] :
                                         [styles.unselectedButtonStyle, { backgroundColor: "lightgray", borderColor: "white", borderBottomColor: "orange" }]}
                                     onPress={() => {
                                         setType("user")
                                     }}
                                 >
-                                    <Text style={(type == 'user') ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, {
+                                    <Text style={(type === 'user') ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, {
                                         color: "white",
                                     },]}>users</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
-                                    style={(type == 'group') ? [styles.outlineButtonStyle, { borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type == 'group') ? "white" : "orange", }] :
+                                    style={(type === 'group' && !isAll) ? [styles.outlineButtonStyle, { borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type === 'group' && !isAll) ? "white" : "orange", }] :
                                         [styles.unselectedButtonStyle, { backgroundColor: "lightgray", borderColor: "white", borderBottomColor: "orange" }]}
                                     onPress={() => {
                                         setType("group")
                                     }}
                                 >
-                                    <Text style={(type == 'group') ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, { color: "white" }]}>groups</Text>
+                                    <Text style={(type === 'group' && !isAll) ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, { color: "white" }]}>groups</Text>
                                 </TouchableOpacity>
                             </View>
                             <View style={[{
@@ -145,7 +161,7 @@ export default function GroupSearchScreen({ navigation, route }) {
                             }]}>
                             </View>
                             {
-                                (type == "group" && groupResults.length == 0) || (type == "user" && userResults.length == 0)
+                                (type === "group" && groupResults.length === 0) || (type === "user" && userResults.length === 0)
                                     ? <Text style={[styles.outlineButtonTextStyle, { marginTop: 15 }]}>No matching results</Text>
                                     : null
                             }
@@ -154,9 +170,28 @@ export default function GroupSearchScreen({ navigation, route }) {
                 }
                 <APIList
                     ref={ListRef}
-                    queryOperation={(type == "group") ? listGroups : listUsers}
+                    queryOperation={(type === "group") ? listGroups : listUsers}
                     filter={
-                        (type == "user") ?
+                        (type === "group") ?
+                            {
+                                filter: {
+                                    or: [{
+                                        name: {
+                                            beginsWith: currentQuery.current
+                                        }
+                                    },
+                                    {
+                                        Sport: {
+                                            contains: currentQuery.current
+                                        }
+                                    },
+                                    {
+                                        Description: {
+                                            contains: currentQuery.current
+                                        }
+                                    },]
+                                }
+                            } :
                             {
                                 filter: {
                                     or: [{
@@ -176,34 +211,14 @@ export default function GroupSearchScreen({ navigation, route }) {
                                     },]
                                 }
                             }
-                            :
-
-                            {
-                                filter: {
-                                    or: [{
-                                        name: {
-                                            beginsWith: currentQuery.current
-                                        }
-                                    },
-                                    {
-                                        Sport: {
-                                            contains: currentQuery.current
-                                        }
-                                    },
-                                    {
-                                        Description: {
-                                            contains: currentQuery.current
-                                        }
-                                    },]
-                                }
-                            }}
+                    }
+                    ignoreInitialLoad={true}
                     initialAmount={20}
                     additionalAmount={10}
-                    returnResults={true}
-                    setDataFunction={(type == "group") ? setGroupResults : setUserResults}
-                    data={(type == "group") ? groupResults : userResults} //wait how would pagination work with sections
+                    setDataFunction={(type === "group") ? setGroupResults : setUserResults}
+                    data={(type === "all" || isAll) ? [...userResults, ...groupResults] : (type === "group") ? groupResults : userResults} //wait how would pagination work with sections
                     renderItem={({ item }) =>
-                        (type == "group")
+                        (item.userID != null)
                             ? <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} matchingname={item.name.startsWith(query)} />
                             : <UserListItem item={item} matchingname={item.name.startsWith(query)} />
                     }
