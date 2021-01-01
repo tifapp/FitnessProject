@@ -9,6 +9,7 @@ import {
 import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
 import { Amplify, API, graphqlOperation } from "aws-amplify";
 import { listFriendRequests, friendRequestsByReceiver, listFriendships, getFriendship, friendsBySecondUser } from "root/src/graphql/queries";
+import { onCreateFriendRequest, onCreateFriendship } from "root/src/graphql/subscriptions";
 import { createFriendRequest, deleteFriendRequest, deleteFriendship } from "root/src/graphql/mutations";
 import { ProfileImageAndName } from 'components/ProfileImageAndName'
 import APIList from 'components/APIList';
@@ -24,6 +25,35 @@ const FriendScreen = ({ route, navigation }) => {
     const [friendsEnabled, setFriendsEnabled] = useState(true);
     const [friendList, setFriendList] = useState([]);
     const [friendRequestList, setFriendRequestList] = useState([]);
+    
+    const currentFriends = useRef();
+    const currentFriendRequests = useRef();
+
+    currentFriends.current = friendList;
+    currentFriendRequests.current = friendRequestList;
+    
+    useEffect(() => {
+        waitForNewFriendsAsync();
+    }, []);
+    
+    const waitForNewFriendsAsync = async () => {
+        await API.graphql(graphqlOperation(onCreateFriendship)).subscribe({
+            next: event => {
+                const newFriend = event.value.data.onCreateFriendship
+                if (newFriend.user1 == route.params?.id || newFriend.user2 == route.params?.id) {
+                    setFriendList([newFriend, ...currentFriends.current]);
+                }
+            }
+        });
+        await API.graphql(graphqlOperation(onCreateFriendRequest)).subscribe({
+            next: event => {
+                const newFriendRequest = event.value.data.onCreateFriendRequest
+                if (newFriendRequest.receiver == route.params?.id) {
+                    setFriendRequestList([newFriendRequest, ...currentFriends.current]);
+                }
+            }
+        });
+    }
 
     const findFriendID = (item) => {
         if (route.params?.id == item.user1) return item.user2;
