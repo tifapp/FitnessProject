@@ -26,6 +26,7 @@ const FriendScreen = ({ route, navigation }) => {
     const [friendList, setFriendList] = useState([]);
     const [friendRequestList, setFriendRequestList] = useState([]);
     
+    const friendRequestListRef = useRef();
     const currentFriends = useRef();
     const currentFriendRequests = useRef();
 
@@ -35,6 +36,11 @@ const FriendScreen = ({ route, navigation }) => {
     useEffect(() => {
         waitForNewFriendsAsync();
     }, []);
+
+    useEffect(() => {
+        if (!friendsEnabled && friendRequestList.length === 0)
+            friendRequestListRef.current.fetchDataAsync(true);
+    }, [friendsEnabled])
     
     const waitForNewFriendsAsync = async () => {
         await API.graphql(graphqlOperation(onCreateFriendship)).subscribe({
@@ -45,14 +51,14 @@ const FriendScreen = ({ route, navigation }) => {
                 }
             }
         });
-        await API.graphql(graphqlOperation(onCreateFriendRequest)).subscribe({
-            next: event => {
-                const newFriendRequest = event.value.data.onCreateFriendRequest
-                if (newFriendRequest.receiver == route.params?.id) {
-                    setFriendRequestList([newFriendRequest, ...currentFriends.current]);
-                }
-            }
-        });
+        // await API.graphql(graphqlOperation(onCreateFriendRequest)).subscribe({
+        //     next: event => {
+        //         const newFriendRequest = event.value.data.onCreateFriendRequest
+        //         if (newFriendRequest.receiver == route.params?.id) {
+        //             setFriendRequestList([newFriendRequest, ...currentFriendRequests.current]);
+        //         }
+        //     }
+        // });
     }
 
     const findFriendID = (item) => {
@@ -170,6 +176,7 @@ const FriendScreen = ({ route, navigation }) => {
                     <View>
                         <Text style={{ alignSelf: 'center' }}>Incoming Requests!</Text>
                         <APIList
+                            ref={friendRequestListRef}
                             queryOperation={friendRequestsByReceiver}
                             filter={{receiver: route.params?.id}}
                             setDataFunction={setFriendRequestList}
