@@ -24,6 +24,7 @@ import { onCreatePost, onDeletePost, onUpdatePost } from 'root/src/graphql/subsc
 import NetInfo from '@react-native-community/netinfo';
 import APIList from 'components/APIList';
 import { AntDesign } from '@expo/vector-icons';
+import { lessThan } from "react-native-reanimated";
 
 require('root/androidtimerfix');
 
@@ -60,7 +61,8 @@ export default function FeedScreen({ navigation, route }) {
     let results = r;
     let parents = r;
 
-    console.log(results);
+    //console.log(results);
+    console.log("----------------------------------------------");
 
     parents = parents.filter((item) => item.parentId == null || item.parentId == "");
     let checker = 0;
@@ -224,21 +226,60 @@ export default function FeedScreen({ navigation, route }) {
 
   const deletePostsAsync = async (timestamp) => {
     checkInternetConnection();
+    /*
+    console.log("#############################################");
+    console.log(posts);
+    console.log("#############################################");
+    */
 
+    let parent_post = posts.find((item) => {
+      const time = timestamp.toString();
+      return item.parentId === time;
+    })
+
+    //console.log("parent post: " + parent_post);
+    let childPosts = [];
+
+    if(parent_post != null){
+      //console.log("checking");
+      const timeCheck = timestamp.toString();
+      childPosts = posts;
+
+      childPosts = childPosts.filter((val) => (val.parentId == timeCheck));
+      //console.log("Child Posts: ");
+      //console.log(childPosts);
+      //console.log(timeCheck);
+
+      setPosts((posts) => {
+        return posts.filter((val) => (val.timestamp != timestamp));
+      });
+
+      setPosts((posts) => {
+        return posts.filter((val) => (val.parentId != timeCheck));
+      });
+
+    }else{
     console.log("deleting the post with this timestamp: ", timestamp);
     //locally removes the post
     setPosts((posts) => {
       return posts.filter((val) => (val.timestamp != timestamp || val.userId != route.params?.id));
     });
+    }
 
     setUpdatePostID(0);
+
+    for (let post of childPosts) {
+      await API.graphql(graphqlOperation(deletePost, { input: { timestamp: post.timestamp, userId: route.params?.id }}));
+    }
 
     //sends a request to remove the post from the server
     try {
       await API.graphql(graphqlOperation(deletePost, { input: { timestamp: timestamp, userId: route.params?.id } }));
+
     } catch {
       console.log("error in deleting post: ");
     }
+
   };
 
   const scrollToTop = () => {
