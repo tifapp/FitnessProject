@@ -36,8 +36,8 @@ export default function FeedScreen({ navigation, route }) {
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
   const numCharsLeft = 1000 - postVal.length;
+  const [isReplying, setIsReplying] = useState(false);
   const [updatePostID, setUpdatePostID] = useState(0);
-  const [replyPostID, setReplyPostID] = useState(0);
 
   const [onlineCheck, setOnlineCheck] = useState(true);
 
@@ -216,8 +216,8 @@ export default function FeedScreen({ navigation, route }) {
       console.log("error in creating post: ", err);
     }
 
+    setIsReplying(false);
     setUpdatePostID(0);
-    setReplyPostID(0);
 
 
   };
@@ -250,8 +250,6 @@ export default function FeedScreen({ navigation, route }) {
       <APIList
         ListRef={scrollRef}
         ListHeaderComponent={
-          () => {
-            return (
               <View style={{}}>
                 <Text style={{ marginTop: 20, marginLeft: 5 }}> Characters remaining: {numCharsLeft} </Text>
                 <TextInput
@@ -269,7 +267,7 @@ export default function FeedScreen({ navigation, route }) {
                   justifyContent: 'center',
                   marginBottom: 15,
                 }}>
-                  {replyPostID == 0 ?
+                  {!isReplying ?
                     <TouchableOpacity
                       style={styles.buttonStyle}
                       onPress={() => {
@@ -301,7 +299,8 @@ export default function FeedScreen({ navigation, route }) {
                       <TouchableOpacity
                         style={styles.buttonStyle}
                         onPress={() => {
-                          setReplyPostID(0), setUpdatePostID(0)
+                          setIsReplying(false),
+                          setUpdatePostID(0)
                         }}
                       >
                         <Text style={styles.buttonTextStyle}>Cancel</Text>
@@ -310,8 +309,6 @@ export default function FeedScreen({ navigation, route }) {
                   }
                 </View>
               </View>
-            );
-          }
         }
         processingFunction={sortPosts}
         queryOperation={postsByGroup}
@@ -324,8 +321,8 @@ export default function FeedScreen({ navigation, route }) {
             deletePostsAsync={deletePostsAsync}
             writtenByYou={item.userId === route.params?.id}
             setPostVal={setPostVal}
+            setIsReplying={setIsReplying}
             setUpdatePostID={setUpdatePostID}
-            setReplyPostID={setReplyPostID}
             parentID={item.parentId}
           />
         )}

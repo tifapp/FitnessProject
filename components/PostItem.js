@@ -22,8 +22,8 @@ export default function PostItem({
   deletePostsAsync,
   writtenByYou,
   setPostVal,
+  setIsReplying,
   setUpdatePostID,
-  setReplyPostID,
   parentID
 }) {
 
@@ -73,14 +73,14 @@ export default function PostItem({
             <TouchableOpacity
               style={[styles.unselectedButtonStyle, { borderColor: 'blue' }]}
               color="blue"
-              onPress={() => (setPostVal(item.description), setUpdatePostID(item.userId + "#" + item.timestamp.toString()))}>
+              onPress={() => (setPostVal(item.description), setUpdatePostID(item.timestamp))}>
               <Text style={[styles.unselectedButtonTextStyle, { color: 'blue' }]}>Edit</Text>
             </TouchableOpacity>
 
           </View>
         ) : null}
           {  parentID == "" || parentID == null ?
-            <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'orange' }]} color="orange" onPress={() => (setPostVal(""), setReplyPostID(1), setUpdatePostID(item.timestamp))}>
+            <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'orange' }]} color="orange" onPress={() => (setPostVal(""), setIsReplying(true), setUpdatePostID(item.userId + "#" + item.timestamp.toString()))}>
               <Text style={[styles.unselectedButtonTextStyle, { color: 'orange' }]}>Reply</Text>
             </TouchableOpacity>
             : null
