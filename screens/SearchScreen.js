@@ -151,8 +151,47 @@ export default function GroupSearchScreen({ navigation, route }) {
                 }
                 <APIList
                     ref={ListRef}
-                    queryOperation={(type === "group") ? listGroups : listUsers}
+                    queryOperation={(type === "all") ? [listGroups, listUsers] : (type === "group") ? listGroups : listUsers}
                     filter={
+                        (type === "all") ?
+                        [ {
+                            filter: {
+                                or: [{
+                                    name: {
+                                        beginsWith: currentQuery.current
+                                    }
+                                },
+                                {
+                                    Sport: {
+                                        contains: currentQuery.current
+                                    }
+                                },
+                                {
+                                    Description: {
+                                        contains: currentQuery.current
+                                    }
+                                },]
+                            }
+                        },
+                        {
+                            filter: {
+                                or: [{
+                                    name: {
+                                        beginsWith: currentQuery.current
+                                    }
+                                },
+                                {
+                                    bio: {
+                                        contains: currentQuery.current
+                                    }
+                                },
+                                {
+                                    goals: {
+                                        contains: currentQuery.current
+                                    }
+                                },]
+                            }
+                        }] :
                         (type === "group") ?
                             {
                                 filter: {

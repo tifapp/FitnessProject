@@ -17,7 +17,7 @@ class APIList extends Component { //we need to make this a class to use refs fro
     super(props);
     this.state = {
       loadingMore: false,
-      nextToken: null,
+      nextTokens: [null],
       refreshing: false,
       loading: false,
     };
@@ -33,7 +33,7 @@ class APIList extends Component { //we need to make this a class to use refs fro
 
   loadMore = () => {
     console.log("can we load more???");
-    if (!this.state.loadingMore && this.state.nextToken != null) { //if we don't check this, the list will repeat endlessly
+    if (!this.state.loadingMore && (this.state.nextTokens.some(function (element) {element !== null}))) { //if we don't check this, the list will repeat endlessly
       console.log("yes we can");
       this.setState({loadingMore: true});
       this.fetchDataAsync(false)
@@ -53,9 +53,9 @@ class APIList extends Component { //we need to make this a class to use refs fro
     //if new posts are being added don't refetch the entire batch, only append the new posts
     //if a post is being updated don't refetch the entire batch, only update that post
     //if a lot of new posts are being added dont save all of them, paginate them at like 100 posts
-    try {
+    f = (queryOperation, index) => {    
       const query = await API.graphql(
-        graphqlOperation(this.props.queryOperation, { limit: this.state.nextToken == null ? (this.props.initialAmount == null ? 10 : this.props.initialAmount) : (this.props.additionalAmount == null ? 5 : this.props.additionalAmount), nextToken: beginning ? null : this.state.nextToken, ...this.props.filter || {}, })
+        graphqlOperation(queryOperation, { limit: this.state.nextTokens[index] == null ? (this.props.initialAmount == null ? 10 : this.props.initialAmount) : (this.props.additionalAmount == null ? 5 : this.props.additionalAmount), nextToken: beginning ? null : this.state.nextToken, ...this.props.filter || {}, })
       );
       
       //console.log('showing this data: ', query);
@@ -79,6 +79,16 @@ class APIList extends Component { //we need to make this a class to use refs fro
         this.props.setDataFunction([...this.props.data, ...results]); //wont work with current sectionlist implementation
       else
         this.props.setDataFunction(results);
+    }
+    
+    try {
+      if (Array.isArray(this.props.queryOperation)) {
+        for (i = 0; i < this.props.queryOperation.length; ++i) {
+          f(this.props.queryOperation[i], i);
+        }
+      } else {
+        f(this.props.queryOperation, 0);
+      }
 
     } catch (err) {
       console.log("error in displaying data: ", err);
