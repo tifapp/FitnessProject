@@ -23,13 +23,17 @@ export default function PostItem({
   writtenByYou,
   setPostVal,
   setUpdatePostID,
+  setReplyPostID,
+  parentID
 }) {
 
   const displayTime = printTime(item.timestamp * 1000);
+  //console.log(parentID);
 
   //
   return (
     <View style={styles.secondaryContainerStyle}>
+      { parentID == "" || parentID == null ?
       <View style={styles.spaceAround}>
         <View
           style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -42,7 +46,22 @@ export default function PostItem({
           </View>
         </View>
         <Text style={styles.check}>{item.description}</Text>
+      </View> :
+
+      <View style={styles.spaceAroundReply}>
+      <View
+        style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <ProfileImageAndName
+          style={styles.smallImageStyle}
+          userId={item.userId}
+        />
+        <View style={{ marginRight: 15 }}>
+          <Text>{displayTime}</Text>
+        </View>
       </View>
+      <Text style={styles.check}>{item.description}</Text>
+      </View>
+      }
 
       <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
         {writtenByYou ? (
@@ -54,11 +73,18 @@ export default function PostItem({
             <TouchableOpacity
               style={[styles.unselectedButtonStyle, { borderColor: 'blue' }]}
               color="blue"
-              onPress={() => (setPostVal(item.description), setUpdatePostID(item.timestamp))}>
+              onPress={() => (setPostVal(item.description), setUpdatePostID(item.userId + "#" + item.timestamp.toString()))}>
               <Text style={[styles.unselectedButtonTextStyle, { color: 'blue' }]}>Edit</Text>
             </TouchableOpacity>
+
           </View>
         ) : null}
+          {  parentID == "" || parentID == null ?
+            <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'orange' }]} color="orange" onPress={() => (setPostVal(""), setReplyPostID(1), setUpdatePostID(item.timestamp))}>
+              <Text style={[styles.unselectedButtonTextStyle, { color: 'orange' }]}>Reply</Text>
+            </TouchableOpacity>
+            : null
+          }
       </View>
     </View>
   );
