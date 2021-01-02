@@ -58,7 +58,12 @@ export default function FeedScreen({ navigation, route }) {
   const sortPosts = (r) => {
     console.log("Inside sortPosts");
     let results = r;
+    let parents = r;
+
     console.log(results);
+
+    parents = parents.filter((item) => item.parentId == null || item.parentId == "");
+    let checker = 0;
 
     for(let post of results){
       //console.log("inside loop");
@@ -70,6 +75,7 @@ export default function FeedScreen({ navigation, route }) {
       if(parent_post != null){
         var index = results.indexOf(results[results.findIndex(p => p.timestamp == post.parentId)]);
         var childIndex = results.indexOf(post);
+        checker = 1;
 
         results.splice(childIndex,1);
         results.splice(index+1, 0, post);
@@ -80,6 +86,11 @@ export default function FeedScreen({ navigation, route }) {
 
       }
     }
+    
+    if(checker==0){
+      return parents;
+    }
+
     return results;
   }
 
