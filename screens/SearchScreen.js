@@ -36,8 +36,6 @@ export default function GroupSearchScreen({ navigation, route }) {
     const [userResults, setUserResults] = useState([]);
     const [groupResults, setGroupResults] = useState([]);
     const [type, setType] = useState("user"); //refreshing tho
-    const [isAll, setIsAll] = useState(false);
-    const [isGroupsFetched, setIsGroupsFetched] = useState(false);
     const searchBarRef = useRef();
     const ListRef = useRef();
     const currentQuery = useRef();
@@ -52,10 +50,6 @@ export default function GroupSearchScreen({ navigation, route }) {
             ListRef.current.fetchDataAsync(true, ()=>{
                 return (currentQuery.current !== query)
             })
-            if (type === "all" && groupResults.length === 0) {
-                setIsAll(true);
-                setType("group"); //because it will display user results by default
-            }
         } else {
             setUserResults([]);
             setGroupResults([]);
@@ -64,23 +58,10 @@ export default function GroupSearchScreen({ navigation, route }) {
     
     useEffect(() => {
         if (query !== "") {
-            if ((type === "group" && groupResults.length === 0) || (type === "user" && userResults.length === 0))
+            if (((type === "group" || type === "all") && groupResults.length === 0) || ((type === "user" || type === "all") && userResults.length === 0))
             ListRef.current.fetchDataAsync(true, ()=>{
                 return (currentQuery.current !== query)
             })
-            if (isAll) {
-                setIsAll(false);
-                setType("all"); //either set it AFTER groupresults have changed, or have a variable saying "don't come back to groups"
-            }
-            if (type === "all" && groupResults.length === 0) {
-                if (!isGroupsFetched) {
-                    setIsAll(true);
-                    setIsGroupsFetched(true);
-                    setType("group");
-                } else {
-                    setIsGroupsFetched(false);
-                }
-            }
         }
     }, [type]);
 
@@ -121,13 +102,13 @@ export default function GroupSearchScreen({ navigation, route }) {
                                 <Text style={styles.outlineButtonTextStyle}>Show </Text>
 
                                 <TouchableOpacity
-                                    style={(type === 'all' || isAll) ? [styles.outlineButtonStyle, { borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type === 'all' || isAll) ? "white" : "orange", }] :
+                                    style={(type === 'all') ? [styles.outlineButtonStyle, { borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type === 'all') ? "white" : "orange", }] :
                                         [styles.unselectedButtonStyle, { backgroundColor: "lightgray", borderColor: "white", borderBottomColor: "orange" }]}
                                     onPress={() => {
                                         setType("all")
                                     }}
                                 >
-                                    <Text style={(type === 'all' || isAll) ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, { color: "white" }]}>all</Text>
+                                    <Text style={(type === 'all') ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, { color: "white" }]}>all</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={(type === 'user') ? [styles.outlineButtonStyle, {
@@ -215,8 +196,8 @@ export default function GroupSearchScreen({ navigation, route }) {
                     ignoreInitialLoad={true}
                     initialAmount={20}
                     additionalAmount={10}
-                    setDataFunction={(type === "group") ? setGroupResults : setUserResults}
-                    data={(type === "all" || isAll) ? [...userResults, ...groupResults] : (type === "group") ? groupResults : userResults} //wait how would pagination work with sections
+                    setDataFunction={(type === "all") ? [setGroupResults, setUserResults] : (type === "group") ? setGroupResults : setUserResults}
+                    data={(type === "all") ? [...userResults, ...groupResults] : (type === "group") ? groupResults : userResults} //wait how would pagination work with sections
                     renderItem={({ item }) =>
                         (item.userID != null)
                             ? <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} matchingname={item.name.startsWith(query)} />
