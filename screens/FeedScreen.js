@@ -33,9 +33,11 @@ var styles = require('styles/stylesheet');
 export default function FeedScreen({ navigation, route }) {
   const { group } = route.params;
   const [postVal, setPostVal] = useState("");
+  const [parentID, setParentID] = useState("");
   const [posts, setPosts] = useState([]);
   const numCharsLeft = 1000 - postVal.length;
   const [updatePostID, setUpdatePostID] = useState(0);
+  const [replyPostID, setReplyPostID] = useState(0);
   
   const [onlineCheck, setOnlineCheck] = useState(true);
   
@@ -52,6 +54,34 @@ export default function FeedScreen({ navigation, route }) {
       setOnlineCheck(state.isConnected)
     );
   };
+
+  const sortPosts = (r) => {
+    console.log("Inside sortPosts");
+    let results = r;
+    console.log(results);
+
+    for(let post of results){
+      //console.log("inside loop");
+      let parent_post = results.find((item) => {
+        const time_stamp = item.timestamp.toString();
+        return time_stamp === post.parentId;
+      })
+
+      if(parent_post != null){
+        var index = results.indexOf(results[results.findIndex(p => p.timestamp == post.parentId)]);
+        var childIndex = results.indexOf(post);
+
+        results.splice(childIndex,1);
+        results.splice(index+1, 0, post);
+
+        console.log("***********************************");
+        console.log(results);
+        console.log("***********************************");
+
+      }
+    }
+    return results;
+  }
 
   const DisplayInternetConnection = () => {
     console.log(onlineCheck);
@@ -71,7 +101,19 @@ export default function FeedScreen({ navigation, route }) {
     await API.graphql(graphqlOperation(onCreatePost)).subscribe({
       next: event => {
         const newPost = event.value.data.onCreatePost
-        if (newPost.userId != route.params?.id && (group != null ? newPost.group == group.id : 'general' == newPost.group)) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
+        if(newPost.parentId != "" && newPost.parentId != null){
+          /*
+          let tempposts = [...currentPosts.current];
+          var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId == newPost.parentId)]);
+          console.log("Index: " + index);
+
+          */
+         let tempposts = [...currentPosts.current];
+         var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.timestamp == newPost.parentId)]);
+         tempposts.splice(index+1, 0, newPost);
+         setPosts(tempposts);
+        }
+        else if(newPost.userId != route.params?.id && (group != null ? newPost.group == group.id : 'general' == newPost.group)) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
           setPosts([newPost, ...currentPosts.current]); //for some reason "posts" isn't the most uptodate version. will we need a ref???!?!?!? //what if we have a lot of new posts at once?
         }
       }
@@ -123,6 +165,7 @@ export default function FeedScreen({ navigation, route }) {
       const newPost = {
         timestamp: Math.floor(Date.now()/1000),
         userId: route.params?.id,
+        parentId: "",
         description: postVal,
         group: group != null ? group.id : 'general',
       };
@@ -140,6 +183,36 @@ export default function FeedScreen({ navigation, route }) {
     
   };
 
+  const replyPostAsync = async (postID) => {
+    checkInternetConnection();
+    console.log("I'm in reply");
+    console.log("*******************");
+
+    const timeID = postID.toString();
+
+    const newPost = {
+      timestamp: Math.floor(Date.now()/1000),
+      userId: route.params?.id,
+      parentId: timeID,
+      description: postVal,
+      group: group != null ? group.id : 'general',
+    };
+
+    setPostVal("");
+
+    try {
+      await API.graphql(graphqlOperation(createPost, { input: newPost }));
+      console.log("success in making a new post, group is false? ", group == null);
+    } catch (err) {
+      console.log("error in creating post: ", err);
+    }
+
+    setUpdatePostID(0);
+    setReplyPostID(0);
+
+    
+  };
+
   const deletePostsAsync = async (timestamp) => {
     checkInternetConnection();
 
@@ -147,6 +220,8 @@ export default function FeedScreen({ navigation, route }) {
     setPosts((posts) => {
       return posts.filter((val) => (val.timestamp != timestamp && val.userId != route.params?.id));
     });
+
+    setUpdatePostID(0);
 
     //sends a request to remove the post from the server
     try {
@@ -181,6 +256,7 @@ export default function FeedScreen({ navigation, route }) {
               justifyContent: 'center',
               marginBottom: 15,
             }}>
+              { replyPostID == 0 ?
               <TouchableOpacity
                 style={styles.buttonStyle}
                 onPress={() => {
@@ -190,11 +266,39 @@ export default function FeedScreen({ navigation, route }) {
                 }}
               >
                 <Text style={styles.buttonTextStyle}>{updatePostID == 0 ? 'Add Post' : 'Edit Post'}</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> :
+              <View style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  marginBottom: 15,
+                  marginHorizontal: 40,
+                  justifyContent: 'space-evenly'
+              }}>
+                  <TouchableOpacity
+                  style={[styles.buttonStyle]}
+                  onPress={() => {
+                    postVal != ""
+                      ? (replyPostAsync(updatePostID))
+                      : alert("No text detected in text field");
+                  }}
+                >
+                  <Text style={styles.buttonTextStyle}>Reply To Post</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                  style={styles.buttonStyle}
+                  onPress={() => {setReplyPostID(0), setUpdatePostID(0)
+                  }}
+                  >
+                  <Text style={styles.buttonTextStyle}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+              }
             </View>
           </View>
 
       <APIList
+        processingFunction = {sortPosts}
         queryOperation={postsByGroup}
         setDataFunction={setPosts}
         data={posts}
@@ -206,6 +310,8 @@ export default function FeedScreen({ navigation, route }) {
             writtenByYou={item.userId === route.params?.id}
             setPostVal={setPostVal}
             setUpdatePostID={setUpdatePostID}
+            setReplyPostID={setReplyPostID}
+            parentID = {item.parentId}
           />
         )}
         keyExtractor={(item, index) => item.timestamp.toString() + item.userId}

@@ -29,7 +29,7 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
                 if (user != null) {
                     const info = { name: user.name, imageURL: '' };
                     if (props.isFull) { //since this only runs during cache misses, we'll probably never see this. maybe we'll need a new index with a very low priority. it'll definitely need to be cached and shown when viewing someone's profile.
-                        console.log("showing full image");
+                        //console.log("showing full image");
                         Storage.get('profileimage.jpg', { level: 'protected', identityId: user.identityId }) //this will incur lots of repeated calls to the backend, idk how else to fix it right now
                             .then((imageURL) => {
                                 Image.getSize(imageURL, () => {
@@ -39,7 +39,7 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
                                     setUserInfo(info);
                                     //}
                                 }, err => {
-                                    console.log("couldn't find user's profile image");
+                                    //console.log("couldn't find user's profile image");
                                     Cache.setItem(props.userId, info, { expires: Date.now() + 86400000 });
                                     setUserInfo(info);
                                 });
@@ -47,7 +47,7 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
                             .catch((err) => { console.log("could not find image!", err) }) //should just use a "profilepic" component
                     } else {
                         //const region = aws_config.aws_user_files_s3_bucket_region;
-                        console.log("showing thumb image");
+                        //console.log("showing thumb image");
 
                         Storage.get(`thumbnails/${user.identityId}/thumbnail-profileimage.jpg`) //idk if this will work in other regions
                             .then((imageURL) => {
@@ -58,7 +58,7 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
                                     setUserInfo(info);
                                     //}
                                 }, err => {
-                                    console.log("couldn't find user's thumbnail");
+                                    //console.log("couldn't find user's thumbnail");
                                     Cache.setItem(props.userId, info, { expires: Date.now() + 86400000 });
                                     setUserInfo(info);
                                 });

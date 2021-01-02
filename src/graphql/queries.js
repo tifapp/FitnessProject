@@ -45,6 +45,7 @@ export const getPost = /* GraphQL */ `
     getPost(timestamp: $timestamp, userId: $userId) {
       timestamp
       userId
+      parentId
       description
       group
       createdAt
@@ -72,6 +73,7 @@ export const listPosts = /* GraphQL */ `
       items {
         timestamp
         userId
+        parentId
         description
         group
         createdAt
@@ -142,6 +144,7 @@ export const postsByGroup = /* GraphQL */ `
       items {
         timestamp
         userId
+        parentId
         description
         group
         createdAt

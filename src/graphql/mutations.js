@@ -107,6 +107,7 @@ export const createPost = /* GraphQL */ `
     createPost(input: $input, condition: $condition) {
       timestamp
       userId
+      parentId
       description
       group
       createdAt
@@ -122,6 +123,7 @@ export const updatePost = /* GraphQL */ `
     updatePost(input: $input, condition: $condition) {
       timestamp
       userId
+      parentId
       description
       group
       createdAt
@@ -137,6 +139,7 @@ export const deletePost = /* GraphQL */ `
     deletePost(input: $input, condition: $condition) {
       timestamp
       userId
+      parentId
       description
       group
       createdAt
