@@ -68,12 +68,12 @@ export default function FeedScreen({ navigation, route }) {
     for (let post of results) {
       //console.log("inside loop");
       let parent_post = results.find((item) => {
-        const id = item.userId + "#" + item.timestamp.toString();
+        const id = item.timestamp.toString();
         return id === post.parentId;
       })
 
       if (parent_post != null) {
-        var index = results.indexOf(results[results.findIndex(p => p.userId + "#" + p.timestamp.toString() == post.parentId)]);
+        var index = results.indexOf(results[results.findIndex(p => p.timestamp.toString() == post.parentId)]);
         var childIndex = results.indexOf(post);
         checker = 1;
 
@@ -120,7 +120,7 @@ export default function FeedScreen({ navigation, route }) {
 
           */
           let tempposts = [...currentPosts.current];
-          var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.userId + "#" + p.timestamp.toString() == newPost.parentId)]);
+          var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.timestamp.toString() == newPost.parentId)]); // p.userId + "#" + p.timestamp.toString()
           tempposts.splice(index + 1, 0, newPost);
           setPosts(tempposts);
         }

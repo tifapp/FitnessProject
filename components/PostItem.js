@@ -80,7 +80,7 @@ export default function PostItem({
           </View>
         ) : null}
           {  parentID == "" || parentID == null ?
-            <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'orange' }]} color="orange" onPress={() => (setPostVal(""), setIsReplying(true), setUpdatePostID(item.userId + "#" + item.timestamp.toString()))}>
+            <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'orange' }]} color="orange" onPress={() => (setPostVal(""), setIsReplying(true), setUpdatePostID(item.timestamp.toString()))}>
               <Text style={[styles.unselectedButtonTextStyle, { color: 'orange' }]}>Reply</Text>
             </TouchableOpacity>
             : null
