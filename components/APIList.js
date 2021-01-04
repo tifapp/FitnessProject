@@ -55,7 +55,7 @@ class APIList extends Component { //we need to make this a class to use refs fro
     //if a lot of new posts are being added dont save all of them, paginate them at like 100 posts
     try {
       const query = await API.graphql(
-        graphqlOperation(this.props.queryOperation, { limit: this.state.nextToken == null ? (this.props.initialAmount == null ? 10 : this.props.initialAmount) : (this.props.additionalAmount == null ? 5 : this.props.additionalAmount), nextToken: beginning ? null : this.state.nextToken, ...this.props.filter || {}, })
+        graphqlOperation(this.props.queryOperation, { limit: (this.state.nextToken == null || beginning) ? (this.props.initialAmount == null ? 10 : this.props.initialAmount) : (this.props.additionalAmount == null ? 5 : this.props.additionalAmount), nextToken: beginning ? null : this.state.nextToken, ...this.props.filter || {}, })
       );
       
       //console.log('showing this data: ', query);
