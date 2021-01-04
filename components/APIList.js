@@ -59,7 +59,7 @@ class APIList extends Component { //we need to make this a class to use refs fro
       .catch();
   };
 
-  fetchDataAsync = async (beginning, voidResultsFunction, nextTok, additionalAmountCounter) => {
+  fetchDataAsync = async (beginning, voidResultsFunction, nextTok) => {
     //do not refetch if the user themselves added or updated a post
     //if new posts are being added don't refetch the entire batch, only append the new posts
     //if a post is being updated don't refetch the entire batch, only update that post
@@ -74,8 +74,6 @@ class APIList extends Component { //we need to make this a class to use refs fro
       //console.log('showing this data: ', query);
 
       let results = query.data[Object.keys(query.data)[0]].items;
-
-      additionalAmountCounter += results.length;
 
       if (this.props.processingFunction != null) {
         results = this.props.processingFunction(results); //make sure this isn't undefined! in processingfunction return the results in the outermost layer!
@@ -92,8 +90,8 @@ class APIList extends Component { //we need to make this a class to use refs fro
 
       this.setState({ nextToken: query.data[Object.keys(query.data)[0]].nextToken });
 
-      if (additionalAmountCounter < (this.props.additionalAmount == null ? 5 : this.props.additionalAmount) && query.data[Object.keys(query.data)[0]].nextToken != null) { //will probably fail if additionalamount > initialamount
-        this.fetchDataAsync(false, ()=>{}, query.data[Object.keys(query.data)[0]].nextToken, additionalAmountCounter);
+      if (results.length < (this.props.additionalAmount == null ? 5 : this.props.additionalAmount) && query.data[Object.keys(query.data)[0]].nextToken != null) {
+        this.fetchDataAsync(false, ()=>{}, query.data[Object.keys(query.data)[0]].nextToken);
       }
 
     } catch (err) {
