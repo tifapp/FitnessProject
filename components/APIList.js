@@ -19,17 +19,26 @@ class APIList extends Component { //we need to make this a class to use refs fro
       loadingMore: false,
       nextToken: null,
       refreshing: false,
-      loading: false,
+      loadingInitial: false,
     };
   }
 
   componentDidMount() {
     if (!this.props.ignoreInitialLoad) {
-      this.setState({loading: true});
+      this.setState({loadingInitial: true});
       this.fetchDataAsync(true)
-      .finally(() => this.setState({loading: false}));
+      .finally(() => this.setState({loadingInitial: false}));
     }
   }
+
+  // componentDidUpdate(prevProps, prevState) {
+  //   if (this.props.data !== prevProps.data) {
+  //     if (!this.state.loadingMore && this.state.nextToken != null && this.props.data.length < (this.props.initialAmount == null ? 10 : this.props.initialAmount)) {
+  //       this.setState({ loadingMore: true });
+  //       this.loadMore(true);
+  //     }
+  //   }
+  // }
 
   loadMore = () => {
     console.log("can we load more???");
@@ -37,7 +46,9 @@ class APIList extends Component { //we need to make this a class to use refs fro
       console.log("yes we can");
       this.setState({loadingMore: true});
       this.fetchDataAsync(false)
-        .finally(() => { this.setState({loadingMore: false}); });
+        .finally(this.setState({loadingMore: false}));
+    } else {
+      this.setState({loadingMore: false}); 
     }
   }
 
@@ -48,37 +59,42 @@ class APIList extends Component { //we need to make this a class to use refs fro
       .catch();
   };
 
-  fetchDataAsync = async (beginning, secondProcessingFunction) => {
+  fetchDataAsync = async (beginning, voidResultsFunction, nextTok, additionalAmountCounter) => {
     //do not refetch if the user themselves added or updated a post
     //if new posts are being added don't refetch the entire batch, only append the new posts
     //if a post is being updated don't refetch the entire batch, only update that post
     //if a lot of new posts are being added dont save all of them, paginate them at like 100 posts
     try {
+      const nextToken = nextTok ?? this.state.nextToken;
+
       const query = await API.graphql(
-        graphqlOperation(this.props.queryOperation, { limit: (this.state.nextToken == null || beginning) ? (this.props.initialAmount == null ? 10 : this.props.initialAmount) : (this.props.additionalAmount == null ? 5 : this.props.additionalAmount), nextToken: beginning ? null : this.state.nextToken, ...this.props.filter || {}, })
+        graphqlOperation(this.props.queryOperation, { limit: (nextToken == null || beginning) ? (this.props.initialAmount == null ? 10 : this.props.initialAmount) : (this.props.additionalAmount == null ? 5 : this.props.additionalAmount), nextToken: beginning ? null : nextToken, ...this.props.filter || {}, })
       );
       
       //console.log('showing this data: ', query);
 
-      this.setState({nextToken: query.data[Object.keys(query.data)[0]].nextToken});
-
       let results = query.data[Object.keys(query.data)[0]].items;
 
-      console.log("using this filter: ", this.props.filter);
-      console.log("straight from the source, results length is ", results.length);
+      additionalAmountCounter += results.length;
 
       if (this.props.processingFunction != null) {
-        results = this.props.processingFunction(results);
+        results = this.props.processingFunction(results); //make sure this isn't undefined! in processingfunction return the results in the outermost layer!
       }
 
-      if (secondProcessingFunction != null) {
-        if (secondProcessingFunction()) return;
+      if (voidResultsFunction != null) {
+        if (voidResultsFunction()) return;
       }
 
       if (!beginning)
-        this.props.setDataFunction([...this.props.data, ...results]); //wont work with current sectionlist implementation
+        this.props.setDataFunction([...this.props.data, ...results]);
       else
         this.props.setDataFunction(results);
+
+      this.setState({ nextToken: query.data[Object.keys(query.data)[0]].nextToken });
+
+      if (additionalAmountCounter < (this.props.additionalAmount == null ? 5 : this.props.additionalAmount) && query.data[Object.keys(query.data)[0]].nextToken != null) { //will probably fail if additionalamount > initialamount
+        this.fetchDataAsync(false, ()=>{}, query.data[Object.keys(query.data)[0]].nextToken, additionalAmountCounter);
+      }
 
     } catch (err) {
       console.log("error in displaying data: ", err);
@@ -95,7 +111,7 @@ class APIList extends Component { //we need to make this a class to use refs fro
         justifyContent: "center",
       }}>
         {
-          this.state.loading
+          this.state.loadingInitial
             ? <ActivityIndicator
               size="large"
               color="#0000ff"
