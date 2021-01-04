@@ -24,7 +24,6 @@ import { onCreatePost, onDeletePost, onUpdatePost } from 'root/src/graphql/subsc
 import NetInfo from '@react-native-community/netinfo';
 import APIList from 'components/APIList';
 import { AntDesign } from '@expo/vector-icons';
-import { lessThan } from "react-native-reanimated";
 
 require('root/androidtimerfix');
 
@@ -35,11 +34,16 @@ var styles = require('styles/stylesheet');
 export default function FeedScreen({ navigation, route }) {
   const { group } = route.params;
   const [postVal, setPostVal] = useState("");
+  const [parentID, setParentID] = useState("");
   const [posts, setPosts] = useState([]);
   const numCharsLeft = 1000 - postVal.length;
-  const [isReplying, setIsReplying] = useState(false);
   const [updatePostID, setUpdatePostID] = useState(0);
+<<<<<<< HEAD
 
+=======
+  const [replyPostID, setReplyPostID] = useState(0);
+  
+>>>>>>> Reply_To_Post
   const [onlineCheck, setOnlineCheck] = useState(true);
 
   const currentPosts = useRef();
@@ -61,26 +65,25 @@ export default function FeedScreen({ navigation, route }) {
     let results = r;
     let parents = r;
 
-    //console.log(results);
-    console.log("----------------------------------------------");
+    console.log(results);
 
     parents = parents.filter((item) => item.parentId == null || item.parentId == "");
     let checker = 0;
 
-    for (let post of results) {
+    for(let post of results){
       //console.log("inside loop");
       let parent_post = results.find((item) => {
-        const id = item.timestamp.toString();
-        return id === post.parentId;
+        const time_stamp = item.timestamp.toString();
+        return time_stamp === post.parentId;
       })
 
-      if (parent_post != null) {
-        var index = results.indexOf(results[results.findIndex(p => p.timestamp.toString() == post.parentId)]);
+      if(parent_post != null){
+        var index = results.indexOf(results[results.findIndex(p => p.timestamp == post.parentId)]);
         var childIndex = results.indexOf(post);
         checker = 1;
 
-        results.splice(childIndex, 1);
-        results.splice(index + 1, 0, post);
+        results.splice(childIndex,1);
+        results.splice(index+1, 0, post);
 
         console.log("***********************************");
         console.log(results);
@@ -88,8 +91,8 @@ export default function FeedScreen({ navigation, route }) {
 
       }
     }
-
-    if (checker == 0) {
+    
+    if(checker==0){
       return parents;
     }
 
@@ -114,19 +117,19 @@ export default function FeedScreen({ navigation, route }) {
     await API.graphql(graphqlOperation(onCreatePost)).subscribe({
       next: event => {
         const newPost = event.value.data.onCreatePost
-        if (newPost.parentId != "" && newPost.parentId != null) {
+        if(newPost.parentId != "" && newPost.parentId != null){
           /*
           let tempposts = [...currentPosts.current];
           var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId == newPost.parentId)]);
           console.log("Index: " + index);
 
           */
-          let tempposts = [...currentPosts.current];
-          var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.timestamp.toString() == newPost.parentId)]); // p.userId + "#" + p.timestamp.toString()
-          tempposts.splice(index + 1, 0, newPost);
-          setPosts(tempposts);
+         let tempposts = [...currentPosts.current];
+         var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.timestamp == newPost.parentId)]);
+         tempposts.splice(index+1, 0, newPost);
+         setPosts(tempposts);
         }
-        else if (newPost.userId != route.params?.id && (group != null ? newPost.group == group.id : 'general' == newPost.group)) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
+        else if(newPost.userId != route.params?.id && (group != null ? newPost.group == group.id : 'general' == newPost.group)) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
           setPosts([newPost, ...currentPosts.current]); //for some reason "posts" isn't the most uptodate version. will we need a ref???!?!?!? //what if we have a lot of new posts at once?
         }
       }
@@ -201,10 +204,12 @@ export default function FeedScreen({ navigation, route }) {
     console.log("I'm in reply");
     console.log("*******************");
 
+    const timeID = postID.toString();
+
     const newPost = {
-      timestamp: Math.floor(Date.now() / 1000),
+      timestamp: Math.floor(Date.now()/1000),
       userId: route.params?.id,
-      parentId: postID.toString(),
+      parentId: timeID,
       description: postVal,
       group: group != null ? group.id : 'general',
     };
@@ -218,68 +223,29 @@ export default function FeedScreen({ navigation, route }) {
       console.log("error in creating post: ", err);
     }
 
-    setIsReplying(false);
     setUpdatePostID(0);
+    setReplyPostID(0);
 
-
+    
   };
 
   const deletePostsAsync = async (timestamp) => {
     checkInternetConnection();
-    /*
-    console.log("#############################################");
-    console.log(posts);
-    console.log("#############################################");
-    */
 
-    let parent_post = posts.find((item) => {
-      const time = timestamp.toString();
-      return item.parentId === time;
-    })
-
-    //console.log("parent post: " + parent_post);
-    let childPosts = [];
-
-    if(parent_post != null){
-      //console.log("checking");
-      const timeCheck = timestamp.toString();
-      childPosts = posts;
-
-      childPosts = childPosts.filter((val) => (val.parentId == timeCheck));
-      //console.log("Child Posts: ");
-      //console.log(childPosts);
-      //console.log(timeCheck);
-
-      setPosts((posts) => {
-        return posts.filter((val) => (val.timestamp != timestamp));
-      });
-
-      setPosts((posts) => {
-        return posts.filter((val) => (val.parentId != timeCheck));
-      });
-
-    }else{
     console.log("deleting the post with this timestamp: ", timestamp);
     //locally removes the post
     setPosts((posts) => {
       return posts.filter((val) => (val.timestamp != timestamp || val.userId != route.params?.id));
     });
-    }
 
     setUpdatePostID(0);
-
-    for (let post of childPosts) {
-      await API.graphql(graphqlOperation(deletePost, { input: { timestamp: post.timestamp, userId: route.params?.id }}));
-    }
 
     //sends a request to remove the post from the server
     try {
       await API.graphql(graphqlOperation(deletePost, { input: { timestamp: timestamp, userId: route.params?.id } }));
-
     } catch {
       console.log("error in deleting post: ");
     }
-
   };
 
   const scrollToTop = () => {
@@ -288,27 +254,29 @@ export default function FeedScreen({ navigation, route }) {
 
   return (
     <SafeAreaView style={{ flex: 1 }} >
-      <APIList
-        ListRef={scrollRef}
-        ListHeaderComponent={
-              <View style={{}}>
-                <Text style={{ marginTop: 20, marginLeft: 5 }}> Characters remaining: {numCharsLeft} </Text>
-                <TextInput
-                  style={[styles.textInputStyle, { marginTop: 5, marginBottom: 30 }]}
-                  multiline={true}
-                  placeholder="Start Typing..."
-                  onChangeText={setPostVal}
-                  value={postVal}
-                  clearButtonMode="always"
-                  maxLength={1000}
-                />
+        <APIList
+          ListRef={scrollRef}
+          ListHeaderComponent={
+            () => {
+              return (
+                <View style={{}}>
+                  <Text style={{ marginTop: 20, marginLeft: 5 }}> Characters remaining: {numCharsLeft} </Text>
+                  <TextInput
+                    style={[styles.textInputStyle, { marginTop: 5, marginBottom: 30 }]}
+                    multiline={true}
+                    placeholder="Start Typing..."
+                    onChangeText={setPostVal}
+                    value={postVal}
+                    clearButtonMode="always"
+                    maxLength={1000}
+                  />
 
-                <View style={{
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  marginBottom: 15,
-                }}>
-                  {!isReplying ?
+
+                  <View style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    marginBottom: 15,
+                  }}>
                     <TouchableOpacity
                       style={styles.buttonStyle}
                       onPress={() => {
@@ -318,59 +286,105 @@ export default function FeedScreen({ navigation, route }) {
                       }}
                     >
                       <Text style={styles.buttonTextStyle}>{updatePostID == 0 ? 'Add Post' : 'Edit Post'}</Text>
-                    </TouchableOpacity> :
-                    <View style={{
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                      marginBottom: 15,
-                      marginHorizontal: 40,
-                      justifyContent: 'space-evenly'
-                    }}>
-                      <TouchableOpacity
-                        style={[styles.buttonStyle]}
-                        onPress={() => {
-                          postVal != ""
-                            ? (replyPostAsync(updatePostID))
-                            : alert("No text detected in text field");
-                        }}
-                      >
-                        <Text style={styles.buttonTextStyle}>Reply To Post</Text>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        style={styles.buttonStyle}
-                        onPress={() => {
-                          setIsReplying(false),
-                          setUpdatePostID(0)
-                        }}
-                      >
-                        <Text style={styles.buttonTextStyle}>Cancel</Text>
-                      </TouchableOpacity>
-                    </View>
-                  }
+                    </TouchableOpacity>
+                  </View>
                 </View>
+              );
+            }
+          }
+          queryOperation={postsByGroup}
+          setDataFunction={setPosts}
+          data={posts}
+          filter={{ group: group != null ? group.id : 'general', sortDirection: 'DESC' }}
+          renderItem={({ item }) => (
+            <PostItem
+              item={item}
+              deletePostsAsync={deletePostsAsync}
+              writtenByYou={item.userId === route.params?.id}
+              setPostVal={setPostVal}
+              setUpdatePostID={setUpdatePostID}
+            />
+<<<<<<< HEAD
+          )}
+          keyExtractor={(item, index) => item.timestamp.toString() + item.userId}
+        />
+=======
+            
+
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              marginBottom: 15,
+            }}>
+              { replyPostID == 0 ?
+              <TouchableOpacity
+                style={styles.buttonStyle}
+                onPress={() => {
+                  postVal != ""
+                    ? (addPostAsync(updatePostID))
+                    : alert("No text detected in text field");
+                }}
+              >
+                <Text style={styles.buttonTextStyle}>{updatePostID == 0 ? 'Add Post' : 'Edit Post'}</Text>
+              </TouchableOpacity> :
+              <View style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  marginBottom: 15,
+                  marginHorizontal: 40,
+                  justifyContent: 'space-evenly'
+              }}>
+                  <TouchableOpacity
+                  style={[styles.buttonStyle]}
+                  onPress={() => {
+                    postVal != ""
+                      ? (replyPostAsync(updatePostID))
+                      : alert("No text detected in text field");
+                  }}
+                >
+                  <Text style={styles.buttonTextStyle}>Reply To Post</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                  style={styles.buttonStyle}
+                  onPress={() => {setReplyPostID(0), setUpdatePostID(0)
+                  }}
+                  >
+                  <Text style={styles.buttonTextStyle}>Cancel</Text>
+                </TouchableOpacity>
               </View>
-        }
-        processingFunction={sortPosts}
+              }
+            </View>
+          </View>
+
+      <APIList
+        processingFunction = {sortPosts}
         queryOperation={postsByGroup}
         setDataFunction={setPosts}
         data={posts}
-        filter={{ group: group != null ? group.id : 'general', sortDirection: 'DESC' }}
+        filter={{group: group != null ? group.id : 'general', sortDirection: 'DESC'}}
         renderItem={({ item }) => (
           <PostItem
             item={item}
             deletePostsAsync={deletePostsAsync}
             writtenByYou={item.userId === route.params?.id}
             setPostVal={setPostVal}
-            setIsReplying={setIsReplying}
             setUpdatePostID={setUpdatePostID}
-            parentID={item.parentId}
+            setReplyPostID={setReplyPostID}
+            parentID = {item.parentId}
           />
         )}
         keyExtractor={(item, index) => item.timestamp.toString() + item.userId}
       />
+      
+      <View style = {{marginBottom: 40, position: 'absolute', alignSelf: 'flex-end'}}>
+          <TouchableOpacity onPress = {scrollToTop}>
+            <AntDesign name="arrowup" size={38} color="black" />
+          </TouchableOpacity>
+      </View>
+>>>>>>> Reply_To_Post
 
-      <StatusBar style="auto" />
+        <StatusBar style="auto" />
 
       <View style={{ marginBottom: 40, position: 'absolute', alignSelf: 'flex-end' }}>
         <TouchableOpacity onPress={scrollToTop}>

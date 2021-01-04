@@ -54,6 +54,7 @@ export const onCreatePost = /* GraphQL */ `
     onCreatePost {
       timestamp
       userId
+      parentId
       description
       group
       createdAt
@@ -66,6 +67,7 @@ export const onUpdatePost = /* GraphQL */ `
     onUpdatePost {
       timestamp
       userId
+      parentId
       description
       group
       createdAt
@@ -78,6 +80,7 @@ export const onDeletePost = /* GraphQL */ `
     onDeletePost {
       timestamp
       userId
+      parentId
       description
       group
       createdAt

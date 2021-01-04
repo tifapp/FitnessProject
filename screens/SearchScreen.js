@@ -233,8 +233,8 @@ export default function GroupSearchScreen({ navigation, route }) {
                             }
                     }
                     ignoreInitialLoad={true}
-                    initialAmount={20}
-                    additionalAmount={10}
+                    initialAmount={200}
+                    additionalAmount={100}
                     setDataFunction={(type === "all") ? [setGroupResults, setUserResults] : (type === "group") ? setGroupResults : setUserResults}
                     data={(type === "all") ? [...userResults, ...groupResults] : (type === "group") ? groupResults : userResults} //wait how would pagination work with sections
                     renderItem={({ item }) =>

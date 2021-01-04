@@ -4,6 +4,7 @@ type Post @model
 {
   timestamp: AWSTimestamp!
   userId: String!
+  parentId: String
   description: String
   group: String
 }

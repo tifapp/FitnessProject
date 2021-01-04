@@ -56,6 +56,7 @@ module.exports = StyleSheet.create({
     backgroundColor: 'orange',
     padding: 10,
     borderRadius: 5,
+    marginHorizontal: 6
   },
   textButtonStyle: {
     alignSelf: 'center',
@@ -74,6 +75,13 @@ module.exports = StyleSheet.create({
     borderColor: "gray",
     alignSelf: 'center',
     backgroundColor: 'transparent',
+    padding: 9,
+    borderRadius: 5,
+    marginHorizontal: 10,
+  },
+  unselectedReplyStyle: {
+    borderWidth: 2,
+    alignSelf: 'center',
     padding: 9,
     borderRadius: 5,
     marginHorizontal: 10,
@@ -164,6 +172,10 @@ module.exports = StyleSheet.create({
   },
   spaceAround: {
     paddingHorizontal: 5,
+    paddingVertical: 15,
+  },
+  spaceAroundReply: {
+    paddingHorizontal: 60,
     paddingVertical: 15,
   },
   top: {
