@@ -46,7 +46,7 @@ class APIList extends Component { //we need to make this a class to use refs fro
       console.log("yes we can");
       this.setState({loadingMore: true});
       this.fetchDataAsync(false)
-        .finally(this.setState({loadingMore: false}));
+        .finally(() => {this.setState({loadingMore: false})});
     } else {
       this.setState({loadingMore: false}); 
     }
