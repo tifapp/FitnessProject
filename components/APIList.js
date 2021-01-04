@@ -37,7 +37,17 @@ class APIList extends Component { //we need to make this a class to use refs fro
       console.log("yes we can");
       this.setState({loadingMore: true});
       this.fetchDataAsync(false)
-        .finally(() => { this.setState({loadingMore: false}); });
+        .then(([resultslength, nextToken]) => {
+          if (nextToken != null && resultslength < (this.props.initialAmount == null ? 10 : this.props.initialAmount)) {
+            console.log("recursive load activated");
+            this.loadMore();
+          }
+          else
+            this.setState({loadingMore: false}); 
+        })
+        .catch(this.setState({loadingMore: false}));
+    } else {
+      this.setState({loadingMore: false}); 
     }
   }
 
@@ -60,15 +70,10 @@ class APIList extends Component { //we need to make this a class to use refs fro
       
       //console.log('showing this data: ', query);
 
-      this.setState({nextToken: query.data[Object.keys(query.data)[0]].nextToken});
-
       let results = query.data[Object.keys(query.data)[0]].items;
 
-      console.log("using this filter: ", this.props.filter);
-      console.log("straight from the source, results length is ", results.length);
-
       if (this.props.processingFunction != null) {
-        results = this.props.processingFunction(results);
+        results = this.props.processingFunction(results); //make sure this isn't undefined! in processingfunction return the results in the outermost layer!
       }
 
       if (secondProcessingFunction != null) {
@@ -80,6 +85,9 @@ class APIList extends Component { //we need to make this a class to use refs fro
       else
         this.props.setDataFunction(results);
 
+      this.setState({ nextToken: query.data[Object.keys(query.data)[0]].nextToken });
+
+      return [results.length, query.data[Object.keys(query.data)[0]].nextToken]
     } catch (err) {
       console.log("error in displaying data: ", err);
     }
