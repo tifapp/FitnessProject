@@ -90,9 +90,13 @@ class APIList extends Component { //we need to make this a class to use refs fro
 
       this.setState({ nextToken: query.data[Object.keys(query.data)[0]].nextToken });
 
-      if (results.length < (this.props.additionalAmount == null ? 5 : this.props.additionalAmount) && query.data[Object.keys(query.data)[0]].nextToken != null) {
-        this.fetchDataAsync(false, ()=>{}, query.data[Object.keys(query.data)[0]].nextToken);
-      }
+      // console.log("results are ", results.length, " and additionalamount value is ",  (this.props.additionalAmount == null ? 5 : this.props.additionalAmount) );
+      // if (results.length < (this.props.additionalAmount == null ? 5 : this.props.additionalAmount) && query.data[Object.keys(query.data)[0]].nextToken != null) {
+      //   console.log("recursively fetching!!!");
+      //   this.loadMore();
+      // } else {
+      //   return;
+      // }
 
     } catch (err) {
       console.log("error in displaying data: ", err);
