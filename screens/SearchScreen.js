@@ -50,7 +50,7 @@ export default function GroupSearchScreen({ navigation, route }) {
             console.log("START-----------------------");
             console.log("the query being checked is ", query);
             ListRef.current.fetchDataAsync(true, ()=>{
-                return (currentQuery.current !== query)
+                return (currentQuery.current !== query || query === "")
             })
             if (type === "all" && groupResults.length === 0) {
                 setIsAll(true);
@@ -66,7 +66,7 @@ export default function GroupSearchScreen({ navigation, route }) {
         if (query !== "") {
             if ((type === "group" && groupResults.length === 0) || (type === "user" && userResults.length === 0))
             ListRef.current.fetchDataAsync(true, ()=>{
-                return (currentQuery.current !== query)
+                return (currentQuery.current !== query || query === "")
             })
             if (isAll) {
                 setIsAll(false);
@@ -179,6 +179,10 @@ export default function GroupSearchScreen({ navigation, route }) {
                                         name: {
                                             beginsWith: currentQuery.current
                                         }
+                                    },{
+                                        name: {
+                                            contains: " " + currentQuery.current
+                                        }
                                     },
                                     {
                                         Sport: {
@@ -213,8 +217,8 @@ export default function GroupSearchScreen({ navigation, route }) {
                             }
                     }
                     ignoreInitialLoad={true}
-                    initialAmount={250}
-                    additionalAmount={150}
+                    initialAmount={25}
+                    additionalAmount={15}
                     setDataFunction={(type === "group") ? setGroupResults : setUserResults}
                     data={(type === "all" || isAll) ? [...userResults, ...groupResults] : (type === "group") ? groupResults : userResults} //wait how would pagination work with sections
                     renderItem={({ item }) =>

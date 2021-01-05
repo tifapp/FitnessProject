@@ -16,6 +16,7 @@ class APIList extends Component { //we need to make this a class to use refs fro
   constructor(props) {
     super(props);
     this.state = {
+      loading: false,
       loadingMore: false,
       nextToken: null,
       refreshing: false,
@@ -44,63 +45,67 @@ class APIList extends Component { //we need to make this a class to use refs fro
     console.log("can we load more???");
     if (!this.state.loadingMore && this.state.nextToken != null) { //if we don't check this, the list will repeat endlessly
       console.log("yes we can");
-      this.setState({loadingMore: true});
+      this.setState({ loadingMore: true });
       this.fetchDataAsync(false)
-        .finally(() => {this.setState({loadingMore: false})});
+        .finally(() => { this.setState({ loadingMore: false }) });
     } else {
-      this.setState({loadingMore: false}); 
+      this.setState({ loadingMore: false });
     }
   }
 
   onRefresh = () => {
-    this.setState({refreshing: true});
+    this.setState({ refreshing: true });
     this.fetchDataAsync(true)
-      .then(() => { this.setState({refreshing: false}) })
+      .then(() => { this.setState({ refreshing: false }) })
       .catch();
   };
 
-  fetchDataAsync = async (beginning, voidResultsFunction, nextTok) => {
+  fetchDataAsync = async (beginning, voidResultsFunction) => {
     //do not refetch if the user themselves added or updated a post
     //if new posts are being added don't refetch the entire batch, only append the new posts
     //if a post is being updated don't refetch the entire batch, only update that post
     //if a lot of new posts are being added dont save all of them, paginate them at like 100 posts
+
+    this.setState({ loading: true });
     try {
-      const nextToken = nextTok ?? this.state.nextToken;
+      let nextToken = this.state.nextToken;
+      let results = [];
 
-      const query = await API.graphql(
-        graphqlOperation(this.props.queryOperation, { limit: (nextToken == null || beginning) ? (this.props.initialAmount == null ? 10 : this.props.initialAmount) : (this.props.additionalAmount == null ? 5 : this.props.additionalAmount), nextToken: beginning ? null : nextToken, ...this.props.filter || {}, })
-      );
-      
-      //console.log('showing this data: ', query);
+      const wasBeginning = beginning;
+      const initialAmount = (this.props.initialAmount == null ? 10 : this.props.initialAmount);
+      const additionalAmount = (this.props.additionalAmount == null ? 5 : this.props.additionalAmount);
 
-      let results = query.data[Object.keys(query.data)[0]].items;
+      //if we're trying to chain queries until we reach the end of the database, this would be the most efficient way to do it
+      do {
+        const query = await API.graphql(
+          graphqlOperation(this.props.queryOperation, { limit: (nextToken == null || beginning) ? initialAmount : additionalAmount, nextToken: beginning ? null : nextToken, ...this.props.filter || {}, })
+        );
+
+        beginning = false;
+        nextToken = query.data[Object.keys(query.data)[0]].nextToken
+        results = [...query.data[Object.keys(query.data)[0]].items, ...results]
+        console.log("completed iteration of fetching, amount of results are ", results.length);
+      } while (results.length < (wasBeginning ? initialAmount : additionalAmount) && nextToken != null);
 
       if (this.props.processingFunction != null) {
         results = this.props.processingFunction(results); //make sure this isn't undefined! in processingfunction return the results in the outermost layer!
       }
 
       if (voidResultsFunction != null) {
-        if (voidResultsFunction()) return;
+        if (voidResultsFunction()) {this.setState({ loading: false }); return;}
       }
 
-      if (!beginning)
+      if (!wasBeginning)
         this.props.setDataFunction([...this.props.data, ...results]);
       else
         this.props.setDataFunction(results);
 
-      this.setState({ nextToken: query.data[Object.keys(query.data)[0]].nextToken });
-
-      // console.log("results are ", results.length, " and additionalamount value is ",  (this.props.additionalAmount == null ? 5 : this.props.additionalAmount) );
-      // if (results.length < (this.props.additionalAmount == null ? 5 : this.props.additionalAmount) && query.data[Object.keys(query.data)[0]].nextToken != null) {
-      //   console.log("recursively fetching!!!");
-      //   this.loadMore();
-      // } else {
-      //   return;
-      // }
+      this.setState({ nextToken: nextToken });
 
     } catch (err) {
       console.log("error in displaying data: ", err);
     }
+    this.setState({ loading: false });
   };
 
   render() {
@@ -113,7 +118,7 @@ class APIList extends Component { //we need to make this a class to use refs fro
         justifyContent: "center",
       }}>
         {
-          this.state.loadingInitial
+          this.state.loadingInitial || (this.state.loading && !this.state.loadingMore && !this.state.refreshing)
             ? <ActivityIndicator
               size="large"
               color="#0000ff"
