@@ -24,7 +24,8 @@
     },
     "android": {
       "package": "com.seanimo.FitnessApp",
-	  "useNextNotificationsApi": true
+	  "useNextNotificationsApi": true,
+	  "googleServicesFile": "./google-services.json"
     }
   }
 }

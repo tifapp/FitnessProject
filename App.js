@@ -75,15 +75,28 @@ const App = () => {
   };
 
   const requestAndSaveNotificationPermissions = async () => {
-    // There is no expoToken available yet, so we will request that and save it into the profile
-    const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-
-    if (status !== "granted") {
-      alert("No notification permissions!");
+    const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      alert('Failed to get push token for push notification!');
       return;
     }
+    const token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log(token);
+    this.setState({ expoPushToken: token });
 
-    let token = (await Notifications.getExpoPushTokenAsync()).data;
+    if (Platform.OS === 'android') {
+      Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
 
     // Only update the profile with the expoToken if it not exists yet
     if (token !== "") {

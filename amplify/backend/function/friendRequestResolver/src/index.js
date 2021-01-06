@@ -209,6 +209,7 @@ exports.handler = (event, context, callback) => {
             }
 
             if (senderUser.data.getUser.deviceToken != null && senderUser.data.getUser.deviceToken != '') {
+              console.log("creating notification for the sender");
               messages.push({
                 to: String(senderUser.data.getUser.deviceToken),
                 sound: "default",
@@ -217,6 +218,7 @@ exports.handler = (event, context, callback) => {
               });
             }
             if (receiverUser.data.getUser.deviceToken != null && receiverUser.data.getUser.deviceToken != '') {
+              console.log("creating notification for the receiver");
               messages.push({
                 to: String(receiverUser.data.getUser.deviceToken),
                 sound: "default",
