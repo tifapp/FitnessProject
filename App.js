@@ -87,7 +87,6 @@ const App = () => {
     }
     const token = (await Notifications.getExpoPushTokenAsync()).data;
     console.log(token);
-    this.setState({ expoPushToken: token });
 
     if (Platform.OS === 'android') {
       Notifications.setNotificationChannelAsync('default', {
