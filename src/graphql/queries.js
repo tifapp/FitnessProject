@@ -95,6 +95,7 @@ export const getUser = /* GraphQL */ `
       goals
       latitude
       longitude
+      deviceToken
       createdAt
       updatedAt
     }
@@ -117,6 +118,7 @@ export const listUsers = /* GraphQL */ `
         goals
         latitude
         longitude
+        deviceToken
         createdAt
         updatedAt
       }

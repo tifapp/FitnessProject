@@ -162,6 +162,7 @@ export const createUser = /* GraphQL */ `
       goals
       latitude
       longitude
+      deviceToken
       createdAt
       updatedAt
     }
@@ -182,6 +183,7 @@ export const updateUser = /* GraphQL */ `
       goals
       latitude
       longitude
+      deviceToken
       createdAt
       updatedAt
     }
@@ -202,6 +204,7 @@ export const deleteUser = /* GraphQL */ `
       goals
       latitude
       longitude
+      deviceToken
       createdAt
       updatedAt
     }

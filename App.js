@@ -19,10 +19,14 @@ import BioScreen from "./screens/BioScreen";
 import GoalsScreen from "./screens/GoalsScreen";
 import SignInScreen from "./screens/SignInScreen";
 import SearchStack from "./SearchStack";
+import { updateUser } from 'root/src/graphql/mutations.js'
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
+
+import * as Notifications from 'expo-notifications';
+import * as Permissions from 'expo-permissions';
 
 LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
@@ -50,11 +54,10 @@ const App = () => {
   //Text.defaultProps.style =  { fontFamily: 'Helvetica', fontSize: 15, fontWeight: 'normal' }
 
   const Tab = createBottomTabNavigator();
-  const [userId, setUserId] = useState(''); //stores the user's id if logged in
+  const [userId, setUserId] = useState('checking...'); //stores the user's id if logged in
 
   const checkIfUserExists = async () => {
     try {
-      setUserId('checking...');
       const query = await Auth.currentUserInfo();
       const user = await API.graphql(
         graphqlOperation(getUser, { id: query.attributes.sub })
@@ -71,9 +74,36 @@ const App = () => {
     }
   };
 
+  const requestAndSaveNotificationPermissions = async () => {
+    // There is no expoToken available yet, so we will request that and save it into the profile
+    if (user.expoToken === null) {
+      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+
+      if (status !== "granted") {
+        alert("No notification permissions!");
+        return;
+      }
+
+      let token = (await Notifications.getExpoPushTokenAsync()).data;
+
+      // Only update the profile with the expoToken if it not exists yet
+      if (token !== "") {
+        const inputParams = {
+          id: userId,
+          deviceToken: token
+        };
+        await API.graphql(graphqlOperation(updateUser, { input: inputParams }));
+      }
+    }
+  }
+
   useEffect(() => {
     checkIfUserExists();
   }, []);
+
+  useEffect(() => {
+    if (userId !== 'checking...' && userId !== '') requestAndSaveNotificationPermissions();
+  }, [userId])
 
   //console.log("App rerendered, userexists is... ", userId == '');
 

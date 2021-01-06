@@ -8,4 +8,5 @@ type User @model {
   goals: String
   latitude: Float
   longitude: Float
+  deviceToken: ID
 }
