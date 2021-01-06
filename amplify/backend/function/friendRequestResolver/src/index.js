@@ -140,6 +140,8 @@ exports.handler = (event, context, callback) => {
             console.log('couldnt find matching friend request');
             callback(null, result.data);
             return;
+          } else {
+            console.log('found matching friend request!');
           }
           console.log(result);
           await client.mutate({
