@@ -88,60 +88,6 @@ export const onDeletePost = /* GraphQL */ `
     }
   }
 `;
-export const onCreateUser = /* GraphQL */ `
-  subscription OnCreateUser {
-    onCreateUser {
-      id
-      identityId
-      name
-      age
-      gender
-      bio
-      goals
-      latitude
-      longitude
-      deviceToken
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const onUpdateUser = /* GraphQL */ `
-  subscription OnUpdateUser {
-    onUpdateUser {
-      id
-      identityId
-      name
-      age
-      gender
-      bio
-      goals
-      latitude
-      longitude
-      deviceToken
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const onDeleteUser = /* GraphQL */ `
-  subscription OnDeleteUser {
-    onDeleteUser {
-      id
-      identityId
-      name
-      age
-      gender
-      bio
-      goals
-      latitude
-      longitude
-      deviceToken
-      createdAt
-      updatedAt
-    }
-  }
-`;
 export const onCreateFriendRequest = /* GraphQL */ `
   subscription OnCreateFriendRequest($sender: String, $receiver: String) {
     onCreateFriendRequest(sender: $sender, receiver: $receiver) {
@@ -203,6 +149,60 @@ export const onDeleteFriendship = /* GraphQL */ `
       user2
       timestamp
       hifives
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onCreateUser = /* GraphQL */ `
+  subscription OnCreateUser {
+    onCreateUser {
+      id
+      identityId
+      name
+      age
+      gender
+      bio
+      goals
+      latitude
+      longitude
+      deviceToken
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdateUser = /* GraphQL */ `
+  subscription OnUpdateUser {
+    onUpdateUser {
+      id
+      identityId
+      name
+      age
+      gender
+      bio
+      goals
+      latitude
+      longitude
+      deviceToken
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteUser = /* GraphQL */ `
+  subscription OnDeleteUser {
+    onDeleteUser {
+      id
+      identityId
+      name
+      age
+      gender
+      bio
+      goals
+      latitude
+      longitude
+      deviceToken
       createdAt
       updatedAt
     }

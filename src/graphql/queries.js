@@ -83,49 +83,6 @@ export const listPosts = /* GraphQL */ `
     }
   }
 `;
-export const getUser = /* GraphQL */ `
-  query GetUser($id: ID!) {
-    getUser(id: $id) {
-      id
-      identityId
-      name
-      age
-      gender
-      bio
-      goals
-      latitude
-      longitude
-      deviceToken
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const listUsers = /* GraphQL */ `
-  query ListUsers(
-    $filter: ModelUserFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listUsers(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        identityId
-        name
-        age
-        gender
-        bio
-        goals
-        latitude
-        longitude
-        deviceToken
-        createdAt
-        updatedAt
-      }
-      nextToken
-    }
-  }
-`;
 export const postsByGroup = /* GraphQL */ `
   query PostsByGroup(
     $group: String
@@ -283,6 +240,49 @@ export const friendsBySecondUser = /* GraphQL */ `
         user2
         timestamp
         hifives
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const getUser = /* GraphQL */ `
+  query GetUser($id: ID!) {
+    getUser(id: $id) {
+      id
+      identityId
+      name
+      age
+      gender
+      bio
+      goals
+      latitude
+      longitude
+      deviceToken
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listUsers = /* GraphQL */ `
+  query ListUsers(
+    $filter: ModelUserFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listUsers(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        identityId
+        name
+        age
+        gender
+        bio
+        goals
+        latitude
+        longitude
+        deviceToken
         createdAt
         updatedAt
       }
