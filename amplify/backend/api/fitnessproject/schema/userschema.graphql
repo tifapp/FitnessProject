@@ -1,4 +1,11 @@
-type User @model {
+type User @model 
+@auth(
+  rules: [
+      { allow: private, operations: [read] },
+      { allow: owner, ownerField: "id" },
+      { allow: private, provider: iam, operations: [read] },
+  ]
+) {
   id: ID!
   identityId: String
   name: String!

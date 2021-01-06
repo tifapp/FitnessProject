@@ -76,24 +76,22 @@ const App = () => {
 
   const requestAndSaveNotificationPermissions = async () => {
     // There is no expoToken available yet, so we will request that and save it into the profile
-    if (user.expoToken === null) {
-      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+    const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
 
-      if (status !== "granted") {
-        alert("No notification permissions!");
-        return;
-      }
+    if (status !== "granted") {
+      alert("No notification permissions!");
+      return;
+    }
 
-      let token = (await Notifications.getExpoPushTokenAsync()).data;
+    let token = (await Notifications.getExpoPushTokenAsync()).data;
 
-      // Only update the profile with the expoToken if it not exists yet
-      if (token !== "") {
-        const inputParams = {
-          id: userId,
-          deviceToken: token
-        };
-        await API.graphql(graphqlOperation(updateUser, { input: inputParams }));
-      }
+    // Only update the profile with the expoToken if it not exists yet
+    if (token !== "") {
+      const inputParams = {
+        id: userId,
+        deviceToken: token
+      };
+      await API.graphql(graphqlOperation(updateUser, { input: inputParams }));
     }
   }
 
