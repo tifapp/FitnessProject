@@ -6,7 +6,7 @@ var apiPushAPIGraphQLAPIIdOutput = process.env.API_PUSHAPI_GRAPHQLAPIIDOUTPUT
 var apiPushAPIGraphQLAPIEndpointOutput = process.env.API_PUSHAPI_GRAPHQLAPIENDPOINTOUTPUT
 
 Amplify Params - DO NOT EDIT */ const {
-    Expo
+  Expo
 } = require("expo-server-sdk");
 
 // Create a new Expo SDK client

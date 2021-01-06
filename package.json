@@ -18,7 +18,9 @@
     "@react-navigation/stack": "^5.9.1",
     "aws-amplify": "^3.0.25",
     "aws-amplify-react-native": "^4.2.7",
+    "aws-sdk": "^2.822.0",
     "expo": "^39.0.4",
+    "expo-image-manipulator": "~8.3.0",
     "expo-image-picker": "~9.1.0",
     "expo-status-bar": "~1.0.2",
     "react": "16.13.1",
@@ -29,8 +31,7 @@
     "react-native-reanimated": "~1.13.0",
     "react-native-screens": "~2.10.1",
     "react-native-web": "~0.13.7",
-    "react-navigation": "^4.4.1",
-    "expo-image-manipulator": "~8.3.0"
+    "react-navigation": "^4.4.1"
   },
   "devDependencies": {
     "@babel/core": "^7.8.6",

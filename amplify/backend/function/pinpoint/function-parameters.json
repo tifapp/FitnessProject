@@ -1,7 +1,7 @@
 {
   "permissions": {
     "analytics": {
-      "fitnessproject": [
+      "pinpointAccess": [
         "create",
         "read",
         "update",

@@ -1,62 +1,61 @@
 {
-  "apisecure": {
-    "awscloudformation": {
-      "AuthRoleName": "amplify-fitnessproject-apisecure-231510-authRole",
-      "UnauthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-apisecure-231510-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-apisecure-231510-authRole",
-      "Region": "us-west-2",
-      "DeploymentBucketName": "amplify-fitnessproject-apisecure-231510-deployment",
-      "UnauthRoleName": "amplify-fitnessproject-apisecure-231510-unauthRole",
-      "StackName": "amplify-fitnessproject-apisecure-231510",
-      "StackId": "arn:aws:cloudformation:us-west-2:213277979580:stack/amplify-fitnessproject-apisecure-231510/9c275c50-3b80-11eb-b2b8-063f12b2282d",
-      "AmplifyAppId": "d19kzf7eu35pq1"
-    },
-    "categories": {
-      "auth": {
-        "fitnessprojecta8f49cfe": {}
-      },
-      "hosting": {
-        "amplifyhosting": {
-          "appId": "d19kzf7eu35pq1",
-          "type": "manual"
+    "apisecure": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-fitnessproject-apisecure-231510-authRole",
+            "UnauthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-apisecure-231510-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-apisecure-231510-authRole",
+            "Region": "us-west-2",
+            "DeploymentBucketName": "amplify-fitnessproject-apisecure-231510-deployment",
+            "UnauthRoleName": "amplify-fitnessproject-apisecure-231510-unauthRole",
+            "StackName": "amplify-fitnessproject-apisecure-231510",
+            "StackId": "arn:aws:cloudformation:us-west-2:213277979580:stack/amplify-fitnessproject-apisecure-231510/9c275c50-3b80-11eb-b2b8-063f12b2282d",
+            "AmplifyAppId": "d19kzf7eu35pq1"
+        },
+        "categories": {
+            "auth": {
+                "fitnessprojecta8f49cfe": {}
+            },
+            "hosting": {
+                "amplifyhosting": {
+                    "appId": "d19kzf7eu35pq1",
+                    "type": "manual"
+                }
+            },
+            "function": {
+                "pushNotification": {},
+                "pinpoint": {},
+                "S3Triggeref91c1ec": {},
+                "friendRequestResolver": {}
+            }
         }
-      },
-      "function": {
-        "pushNotification": {},
-        "pinpoint": {},
-        "S3Triggeref91c1ec": {},
-        "friendRequestResolver": {}
-      }
-    }
-  },
-  "dev": {
-    "awscloudformation": {
-      "AuthRoleName": "amplify-fitnessproject-dev-145229-authRole",
-      "UnauthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-dev-145229-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-dev-145229-authRole",
-      "Region": "us-west-2",
-      "DeploymentBucketName": "amplify-fitnessproject-dev-145229-deployment",
-      "UnauthRoleName": "amplify-fitnessproject-dev-145229-unauthRole",
-      "StackName": "amplify-fitnessproject-dev-145229",
-      "StackId": "arn:aws:cloudformation:us-west-2:213277979580:stack/amplify-fitnessproject-dev-145229/711c6b90-ec9d-11ea-9835-02c0a024eac5",
-      "AmplifyAppId": "d19kzf7eu35pq1"
     },
-    "categories": {
-      "auth": {
-        "fitnessprojecta8f49cfe": {}
-      },
-      "hosting": {
-        "amplifyhosting": {
-          "appId": "d19kzf7eu35pq1",
-          "type": "manual"
+    "dev": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-fitnessproject-dev-145229-authRole",
+            "UnauthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-dev-145229-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-dev-145229-authRole",
+            "Region": "us-west-2",
+            "DeploymentBucketName": "amplify-fitnessproject-dev-145229-deployment",
+            "UnauthRoleName": "amplify-fitnessproject-dev-145229-unauthRole",
+            "StackName": "amplify-fitnessproject-dev-145229",
+            "StackId": "arn:aws:cloudformation:us-west-2:213277979580:stack/amplify-fitnessproject-dev-145229/711c6b90-ec9d-11ea-9835-02c0a024eac5",
+            "AmplifyAppId": "d19kzf7eu35pq1"
+        },
+        "categories": {
+            "auth": {
+                "fitnessprojecta8f49cfe": {}
+            },
+            "hosting": {
+                "amplifyhosting": {
+                    "appId": "d19kzf7eu35pq1",
+                    "type": "manual"
+                }
+            },
+            "function": {
+                "friendRequestResolver": {},
+                "S3Triggeref91c1ec": {}
+            },
+            "notifications": {}
         }
-      },
-      "function": {
-        "friendRequestResolver": {},
-        "pushNotification": {},
-        "pinpoint": {},
-        "S3Triggeref91c1ec": {}
-      }
     }
-  }
 }

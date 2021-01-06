@@ -10,7 +10,7 @@ var analyticsAmplifypushappRegion = process.env.ANALYTICS_AMPLIFYPUSHAPP_REGION
 Amplify Params - DO NOT EDIT */
 
 const AWS = require("aws-sdk");
-AWS.config.region = "<REGION>"; // fill in your right region ******
+AWS.config.region = REGION; // fill in your right region ******
 const pinpoint = new AWS.Pinpoint();
 
 exports.handler = async (event, context) => {
@@ -19,6 +19,9 @@ exports.handler = async (event, context) => {
 
     // Create a AWS Pinpoint project
     const appID = await createApp();
+
+    // Enable the SES email address for the project
+    enableChannels(appID, event.email);
 
     // Create the endpoints for the Pinpoint project/app
     await createEndPoints(
@@ -51,7 +54,7 @@ async function createApp() {
   let params = {
     CreateApplicationRequest: {
       /* required */
-      Name: "FitnessProject" /* Campaign name, required */
+      Name: "tif" /* Campaign name, required */
     }
   };
 
@@ -64,6 +67,28 @@ async function createApp() {
         res(data.ApplicationResponse.Id); //console.log(data);// successful response
       }
     });
+  });
+}
+
+/*
+When you create a new pinpoint app you need to activate an emailaddress where the emails can be send from
+*/
+function enableChannels(appID, email) {
+  console.log(appID, email);
+  var params = {
+    ApplicationId: appID /* required */,
+    EmailChannelRequest: {
+      /* required */
+      FromAddress:
+        "<FROM EMAIL ADDRESS>" /* use the emailaddress that you activated in AWS SES, required  */,
+      Identity:
+        "arn:aws:ses:<REGION>:<ACCOUNTID>:identity/" + email /* required */,
+      Enabled: true
+    }
+  };
+  pinpoint.updateEmailChannel(params, function(err, data) {
+    if (err) console.log(err, err.stack);
+    else console.log(data); // successful response
   });
 }
 
@@ -162,7 +187,7 @@ async function createCampaign(appID, message, env, segmentID) {
             `<!DOCTYPE html>\n    <html lang="en">\n    <head>\n    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />\n</head>\n<body>\n<H2>Hallo {{User.UserAttributes.name}},</H2>\n\n <br />This is a Text Message from PinPoint. \n You have send this text: \n\n` +
             message +
             `\n</body>\n</html>`,
-          FromAddress: "seanim0920@gmail.com"
+          FromAddress: "<FROM EMAIL ADDRESS>"
         },
         DefaultMessage: {
           // you push message
