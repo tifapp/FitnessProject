@@ -23,7 +23,8 @@
       "favicon": "./assets/favicon.png"
     },
     "android": {
-      "package": "com.seanimo.FitnessApp"
+      "package": "com.seanimo.FitnessApp",
+	  "useNextNotificationsApi": true
     }
   }
 }
