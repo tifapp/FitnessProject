@@ -49,36 +49,6 @@
                     ]
                 }
             ]
-        },
-        "pushNotification": {
-            "build": true,
-            "providerPlugin": "awscloudformation",
-            "service": "Lambda",
-            "dependsOn": [
-                {
-                    "category": "api",
-                    "resourceName": "fitnessproject",
-                    "attributes": [
-                        "GraphQLAPIIdOutput",
-                        "GraphQLAPIEndpointOutput"
-                    ]
-                }
-            ]
-        },
-        "pinpoint": {
-            "build": true,
-            "providerPlugin": "awscloudformation",
-            "service": "Lambda",
-            "dependsOn": [
-                {
-                    "category": "analytics",
-                    "resourceName": "pinpointAccess",
-                    "attributes": [
-                        "Id",
-                        "Region"
-                    ]
-                }
-            ]
         }
     },
     "storage": {
@@ -105,16 +75,6 @@
             "type": "manual"
         }
     },
-    "analytics": {
-        "pinpointAccess": {
-            "service": "Pinpoint",
-            "providerPlugin": "awscloudformation"
-        }
-    },
-    "notifications": {
-        "pinpointAccess": {
-            "service": "Pinpoint",
-            "channels": []
-        }
-    }
+    "analytics": {},
+    "notifications": {}
 }

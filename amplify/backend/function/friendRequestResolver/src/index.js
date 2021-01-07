@@ -212,7 +212,7 @@ exports.handler = (event, context, callback) => {
           if (result.data.getFriendRequest == null) {
             console.log('couldnt find matching friend request');
             
-            sendNotification(receiverUser.data.getUser.deviceToken, senderUser.data.getUser.name + " sent a friend request!");
+            await sendNotification(receiverUser.data.getUser.deviceToken, senderUser.data.getUser.name + " sent a friend request!");
 
             callback(null, result.data);
             return;
