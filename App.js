@@ -28,6 +28,14 @@ import { createStackNavigator } from "@react-navigation/stack";
 import * as Notifications from 'expo-notifications';
 import * as Permissions from 'expo-permissions';
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
+
 LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
 ]);
@@ -45,7 +53,7 @@ const config = {
 };
 
 const myCacheConfig = Cache.configure(config);
-Cache.clear(); //will we have to do this for the next build?
+//Cache.clear(); //will we have to do this for the next build?
 
 var styles = require("./styles/stylesheet");
 
@@ -116,30 +124,6 @@ const App = () => {
   useEffect(() => {
     if (userId !== 'checking...' && userId !== '') {
       requestAndSaveNotificationPermissions();
-    
-      // This listener is fired whenever a notification is received while the app is foregrounded
-      notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-        console.log("YOU GOT MAIL!");
-        if (notification.remote) {
-          Vibration.vibrate();                                                  
-          const notificationId = Notifications.presentLocalNotificationAsync({      
-            title: "Follow @technoplato",  
-            body: "To learn yourself goodly (also follow PewDiePie)",                                             
-            ios: { _displayInForeground: true } // <-- HERE'S WHERE THE MAGIC HAPPENS                                
-          });                                                                       
-        }               
-      });
-  
-      // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
-      responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-        console.log(response);
-        console.log(response.notification);
-      });
-  
-      return () => {
-        Notifications.removeNotificationSubscription(notificationListener);
-        Notifications.removeNotificationSubscription(responseListener);
-      };
     }
   }, [userId])
 
