@@ -120,11 +120,20 @@ const App = () => {
       // This listener is fired whenever a notification is received while the app is foregrounded
       notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
         console.log("YOU GOT MAIL!");
+        if (notification.remote) {
+          Vibration.vibrate();                                                  
+          const notificationId = Notifications.presentLocalNotificationAsync({      
+            title: "Follow @technoplato",  
+            body: "To learn yourself goodly (also follow PewDiePie)",                                             
+            ios: { _displayInForeground: true } // <-- HERE'S WHERE THE MAGIC HAPPENS                                
+          });                                                                       
+        }               
       });
   
       // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
       responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
         console.log(response);
+        console.log(response.notification);
       });
   
       return () => {
