@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   ActivityIndicator,
   LogBox,
@@ -53,6 +53,8 @@ const App = () => {
   //Text.defaultProps = Text.defaultProps || {}
   //Text.defaultProps.style =  { fontFamily: 'Helvetica', fontSize: 15, fontWeight: 'normal' }
 
+  const notificationListener = useRef();
+  const responseListener = useRef();
   const Tab = createBottomTabNavigator();
   const [userId, setUserId] = useState('checking...'); //stores the user's id if logged in
 
@@ -109,25 +111,27 @@ const App = () => {
 
   useEffect(() => {
     checkIfUserExists();
-    
-    // This listener is fired whenever a notification is received while the app is foregrounded
-    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-      console.log("YOU GOT MAIL!");
-    });
-
-    // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log(response);
-    });
-
-    return () => {
-      Notifications.removeNotificationSubscription(notificationListener);
-      Notifications.removeNotificationSubscription(responseListener);
-    };
   }, []);
 
   useEffect(() => {
-    if (userId !== 'checking...' && userId !== '') requestAndSaveNotificationPermissions();
+    if (userId !== 'checking...' && userId !== '') {
+      requestAndSaveNotificationPermissions();
+    
+      // This listener is fired whenever a notification is received while the app is foregrounded
+      notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+        console.log("YOU GOT MAIL!");
+      });
+  
+      // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
+      responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+        console.log(response);
+      });
+  
+      return () => {
+        Notifications.removeNotificationSubscription(notificationListener);
+        Notifications.removeNotificationSubscription(responseListener);
+      };
+    }
   }, [userId])
 
   //console.log("App rerendered, userexists is... ", userId == '');
