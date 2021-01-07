@@ -116,7 +116,7 @@ const getUser =
   }
 `;
 
-function sendNotification(deviceToken, message) {
+async function sendNotification(deviceToken, message) {
   if (deviceToken == null || deviceToken == '') return;
 
   console.log("creating notification");
