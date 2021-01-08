@@ -1,3 +1,10 @@
+const {
+  Expo
+} = require("expo-server-sdk");
+
+// Create a new Expo SDK client
+let expo = new Expo();
+
 require('isomorphic-fetch');
 const AWS = require('aws-sdk/global');
 const AUTH_TYPE = require('aws-appsync').AUTH_TYPE;
@@ -89,6 +96,75 @@ const createFriendship =
   }
 `;
 
+const getUser =
+`
+  query GetUser($id: ID!) {
+    getUser(id: $id) {
+      id
+      identityId
+      name
+      age
+      gender
+      bio
+      goals
+      latitude
+      longitude
+      deviceToken
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+async function sendNotification(deviceToken, message) {
+  if (deviceToken == null || deviceToken == '') return;
+
+  console.log("creating notification");
+  const pushMessage = {
+    to: String(deviceToken),
+    sound: "default",
+    body: message,
+    data: { "status": "ok" }
+  };
+  try {
+    let tickets = await expo.sendPushNotificationsAsync([pushMessage]);
+    // NOTE: If a ticket contains an error code in ticket.details.error, you
+    // must handle it appropriately. The error codes are listed in the Expo
+    // documentation:
+    // https://docs.expo.io/versions/latest/guides/push-notifications#response-format
+    async () => {
+      // Like sending notifications, there are different strategies you could use
+      // to retrieve batches of receipts from the Expo service.
+      try {
+        let receipts = await expo.getPushNotificationReceiptsAsync(tickets[0].id);
+        console.log(receipts);
+
+        // The receipts specify whether Apple or Google successfully received the
+        // notification and information about an error, if one occurred.
+        for (let receipt of receipts) {
+          if (receipt.status === "ok") {
+            continue;
+          } else if (receipt.status === "error") {
+            console.error(
+              `There was an error sending a notification: ${receipt.message}`
+            );
+            if (receipt.details && receipt.details.error) {
+              // The error codes are listed in the Expo documentation:
+              // https://docs.expo.io/versions/latest/guides/push-notifications#response-format
+              // You must handle the errors appropriately.
+              console.error(`The error code is ${receipt.details.error}`);
+            }
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 const client = new AWSAppSyncClient(config);
 
 exports.handler = (event, context, callback) => {
@@ -109,10 +185,39 @@ exports.handler = (event, context, callback) => {
               receiver: sender,
             }
           });
+          
+          const senderUser = await client.query({
+            query: gql(getUser),
+            variables: {
+              id: sender
+            }
+          });
+          if (senderUser.data.getUser == null) {
+            console.log('couldnt find matching user');
+            callback(null, senderUser.data);
+            return;
+          }
+          const receiverUser = await client.query({
+            query: gql(getUser),
+            variables: {
+              id: receiver
+            }
+          });
+          if (receiverUser.data.getUser == null) {
+            console.log('couldnt find matching user');
+            callback(null, receiverUser.data);
+            return;
+          }
+
           if (result.data.getFriendRequest == null) {
             console.log('couldnt find matching friend request');
+            
+            await sendNotification(receiverUser.data.getUser.deviceToken, senderUser.data.getUser.name + " sent a friend request!");
+
             callback(null, result.data);
             return;
+          } else {
+            console.log('found matching friend request!');
           }
           console.log(result);
           await client.mutate({
@@ -142,6 +247,7 @@ exports.handler = (event, context, callback) => {
             }
           });
           if (friendshipcheck.data.getFriendship == null) {
+            //for making a new friendship
             await client.mutate({
               mutation: gql(createFriendship),
               variables: {
@@ -153,7 +259,10 @@ exports.handler = (event, context, callback) => {
                 }
               }
             });
+            
+            sendNotification(receiverUser.data.getUser.deviceToken, senderUser.data.getUser.name + " added you as a friend!");
           } else {
+            //for incrementing hi-fives
             await client.mutate({
               mutation: gql(updateFriendship),
               variables: {
