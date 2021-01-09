@@ -1,4 +1,4 @@
-type User @model 
+type User @model @searchable
 @auth(
   rules: [
       { allow: private, operations: [read] },

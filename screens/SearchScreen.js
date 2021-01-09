@@ -17,8 +17,8 @@ import {
 import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
 import { Amplify, } from "aws-amplify";
 import { DataStore, Predicates } from "@aws-amplify/datastore";
-import { listGroups } from "root/src/graphql/queries";
-import { listUsers } from "root/src/graphql/queries";
+import { searchGroups } from "root/src/graphql/queries";
+import { searchUsers } from "root/src/graphql/queries";
 import Header from "components/header";
 import UserListItem from "components/UserListItem";
 import ListGroupItem from "components/ListGroupItem";
@@ -170,28 +170,28 @@ export default function GroupSearchScreen({ navigation, route }) {
                 }
                 <APIList
                     ref={ListRef}
-                    queryOperation={(type === "group") ? listGroups : listUsers}
+                    queryOperation={(type === "group") ? searchGroups : searchUsers}
                     filter={
                         (type === "group") ?
                             {
                                 filter: {
                                     or: [{
                                         name: {
-                                            beginsWith: currentQuery.current
+                                            matchPhrasePrefix: currentQuery.current
                                         }
                                     },{
                                         name: {
-                                            contains: " " + currentQuery.current
+                                            exists: " " + currentQuery.current
                                         }
                                     },
                                     {
                                         Sport: {
-                                            contains: currentQuery.current
+                                            exists: currentQuery.current
                                         }
                                     },
                                     {
                                         Description: {
-                                            contains: currentQuery.current
+                                            exists: currentQuery.current
                                         }
                                     },]
                                 }
@@ -200,17 +200,22 @@ export default function GroupSearchScreen({ navigation, route }) {
                                 filter: {
                                     or: [{
                                         name: {
-                                            beginsWith: currentQuery.current
+                                            matchPhrasePrefix: currentQuery.current
+                                        }
+                                    },
+                                    {
+                                        name: {
+                                            exists: " " + currentQuery.current
                                         }
                                     },
                                     {
                                         bio: {
-                                            contains: currentQuery.current
+                                            exists: currentQuery.current
                                         }
                                     },
                                     {
                                         goals: {
-                                            contains: currentQuery.current
+                                            exists: currentQuery.current
                                         }
                                     },]
                                 }
