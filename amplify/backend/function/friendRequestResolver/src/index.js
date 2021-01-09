@@ -212,7 +212,7 @@ exports.handler = (event, context, callback) => {
           if (result.data.getFriendRequest == null) {
             console.log('couldnt find matching friend request');
             
-            await sendNotification(receiverUser.data.getUser.deviceToken, senderUser.data.getUser.name + " sent a friend request!");
+            await sendNotification(receiverUser.data.getUser.deviceToken, senderUser.data.getUser.name + " sent you a friend request!"); //truncate the sender's name!
 
             callback(null, result.data);
             return;
@@ -260,7 +260,7 @@ exports.handler = (event, context, callback) => {
               }
             });
             
-            sendNotification(receiverUser.data.getUser.deviceToken, senderUser.data.getUser.name + " added you as a friend!");
+            sendNotification(receiverUser.data.getUser.deviceToken, senderUser.data.getUser.name + " accepted your friend request!");
           } else {
             //for incrementing hi-fives
             await client.mutate({
