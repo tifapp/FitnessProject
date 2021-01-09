@@ -233,14 +233,19 @@ export default function FeedScreen({ navigation, route }) {
     */
 
     let parent_post = posts.find((item) => {
-      const time = timestamp.toString();
-      return item.parentId === time;
+      //const time = timestamp.toString();
+      return item.timestamp === timestamp;
     })
+
+    
+
+    console.log("parent post: " + parent_post.description);
 
     //console.log("parent post: " + parent_post);
     let childPosts = [];
 
-    if(parent_post != null){
+    if(parent_post.parentId == ""){
+      console.log("parent");
       //console.log("checking");
       const timeCheck = timestamp.toString();
       childPosts = posts;
@@ -257,6 +262,10 @@ export default function FeedScreen({ navigation, route }) {
       setPosts((posts) => {
         return posts.filter((val) => (val.parentId != timeCheck));
       });
+
+      console.log("##########################################");
+      console.log(posts);
+      console.log("******************************************");
 
     }else{
     console.log("deleting the post with this timestamp: ", timestamp);
