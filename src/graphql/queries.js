@@ -48,6 +48,7 @@ export const getPost = /* GraphQL */ `
       parentId
       description
       group
+      isReply
       createdAt
       updatedAt
     }
@@ -76,6 +77,7 @@ export const listPosts = /* GraphQL */ `
         parentId
         description
         group
+        isReply
         createdAt
         updatedAt
       }
@@ -86,7 +88,7 @@ export const listPosts = /* GraphQL */ `
 export const postsByGroup = /* GraphQL */ `
   query PostsByGroup(
     $group: String
-    $timestamp: ModelIntKeyConditionInput
+    $parentIdIsReplyTimestamp: ModelPostByGroupCompositeKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelPostFilterInput
     $limit: Int
@@ -94,7 +96,7 @@ export const postsByGroup = /* GraphQL */ `
   ) {
     postsByGroup(
       group: $group
-      timestamp: $timestamp
+      parentIdIsReplyTimestamp: $parentIdIsReplyTimestamp
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit
@@ -106,6 +108,7 @@ export const postsByGroup = /* GraphQL */ `
         parentId
         description
         group
+        isReply
         createdAt
         updatedAt
       }

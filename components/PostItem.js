@@ -24,7 +24,8 @@ export default function PostItem({
   setPostVal,
   setIsReplying,
   setUpdatePostID,
-  parentID
+  parentID,
+  isReply
 }) {
 
   const displayTime = printTime(item.timestamp * 1000);
@@ -33,7 +34,7 @@ export default function PostItem({
   //
   return (
     <View style={styles.secondaryContainerStyle}>
-      { parentID == "" || parentID == null ?
+      { item.isReply == 1 ?
       <View style={styles.spaceAround}>
         <View
           style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -79,8 +80,8 @@ export default function PostItem({
 
           </View>
         ) : null}
-          {  parentID == "" || parentID == null ?
-            <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'orange' }]} color="orange" onPress={() => (setPostVal(""), setIsReplying(true), setUpdatePostID(item.timestamp.toString()))}>
+          {  item.isReply == 1 ?
+            <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'orange' }]} color="orange" onPress={() => (setPostVal(""), setIsReplying(true), setUpdatePostID(item.timestamp.toString() + item.userId))}>
               <Text style={[styles.unselectedButtonTextStyle, { color: 'orange' }]}>Reply</Text>
             </TouchableOpacity>
             : null

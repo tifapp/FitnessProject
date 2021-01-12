@@ -110,6 +110,7 @@ export const createPost = /* GraphQL */ `
       parentId
       description
       group
+      isReply
       createdAt
       updatedAt
     }
@@ -126,6 +127,7 @@ export const updatePost = /* GraphQL */ `
       parentId
       description
       group
+      isReply
       createdAt
       updatedAt
     }
@@ -142,6 +144,7 @@ export const deletePost = /* GraphQL */ `
       parentId
       description
       group
+      isReply
       createdAt
       updatedAt
     }

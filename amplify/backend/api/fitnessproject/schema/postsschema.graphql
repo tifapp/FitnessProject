@@ -7,5 +7,5 @@ type Post @model
   parentId: String
   description: String
   group: String
-  isReply: Boolean
+  isReply: Int
 }

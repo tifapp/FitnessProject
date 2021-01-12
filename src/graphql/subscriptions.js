@@ -57,6 +57,7 @@ export const onCreatePost = /* GraphQL */ `
       parentId
       description
       group
+      isReply
       createdAt
       updatedAt
     }
@@ -70,6 +71,7 @@ export const onUpdatePost = /* GraphQL */ `
       parentId
       description
       group
+      isReply
       createdAt
       updatedAt
     }
@@ -83,6 +85,7 @@ export const onDeletePost = /* GraphQL */ `
       parentId
       description
       group
+      isReply
       createdAt
       updatedAt
     }

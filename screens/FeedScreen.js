@@ -56,46 +56,6 @@ export default function FeedScreen({ navigation, route }) {
     );
   };
 
-  const sortPosts = (r) => {
-    console.log("Inside sortPosts");
-    let results = r;
-    let parents = r;
-
-    //console.log(results);
-    console.log("----------------------------------------------");
-
-    parents = parents.filter((item) => item.parentId == null || item.parentId == "");
-    let checker = 0;
-
-    for (let post of results) {
-      //console.log("inside loop");
-      let parent_post = results.find((item) => {
-        const id = item.timestamp.toString();
-        return id === post.parentId;
-      })
-
-      if (parent_post != null) {
-        var index = results.indexOf(results[results.findIndex(p => p.timestamp.toString() == post.parentId)]);
-        var childIndex = results.indexOf(post);
-        checker = 1;
-
-        results.splice(childIndex, 1);
-        results.splice(index + 1, 0, post);
-
-        console.log("***********************************");
-        console.log(results);
-        console.log("***********************************");
-
-      }
-    }
-
-    if (checker == 0) {
-      return parents;
-    }
-
-    return results;
-  }
-
   const DisplayInternetConnection = () => {
     console.log(onlineCheck);
     if (!onlineCheck) {
@@ -114,20 +74,24 @@ export default function FeedScreen({ navigation, route }) {
     await API.graphql(graphqlOperation(onCreatePost)).subscribe({
       next: event => {
         const newPost = event.value.data.onCreatePost
-        if (newPost.parentId != "" && newPost.parentId != null) {
-          /*
-          let tempposts = [...currentPosts.current];
-          var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId == newPost.parentId)]);
-          console.log("Index: " + index);
-
-          */
-          let tempposts = [...currentPosts.current];
-          var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.timestamp.toString() == newPost.parentId)]); // p.userId + "#" + p.timestamp.toString()
-          tempposts.splice(index + 1, 0, newPost);
-          setPosts(tempposts);
-        }
-        else if (newPost.userId != route.params?.id && (group != null ? newPost.group == group.id : 'general' == newPost.group)) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
-          setPosts([newPost, ...currentPosts.current]); //for some reason "posts" isn't the most uptodate version. will we need a ref???!?!?!? //what if we have a lot of new posts at once?
+        console.log("found new post!", newPost);
+        console.log("made by us? ", newPost.userId == route.params?.id);
+        console.log("in our group? ", (group != null ? newPost.group == group.id : 'general' == newPost.group));
+        if (newPost.userId != route.params?.id && (group != null ? newPost.group == group.id : 'general' == newPost.group)) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
+          if (newPost.isReply == 0) {
+            /*
+            let tempposts = [...currentPosts.current];
+            var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId == newPost.parentId)]);
+            console.log("Index: " + index);
+  
+            */
+            let tempposts = [...currentPosts.current];
+            var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.timestamp.toString() + p.userId == newPost.parentId)]); // p.userId + "#" + p.timestamp.toString()
+            tempposts.splice(index + 1, 0, newPost);
+            setPosts(tempposts);
+          }
+          else
+            setPosts([newPost, ...currentPosts.current]); //for some reason "posts" isn't the most uptodate version. will we need a ref???!?!?!? //what if we have a lot of new posts at once?
         }
       }
     });
@@ -175,12 +139,14 @@ export default function FeedScreen({ navigation, route }) {
       setUpdatePostID(0);
     }
     else {
+      console.log("attempting to make new post");
       const newPost = {
         timestamp: Math.floor(Date.now() / 1000),
         userId: route.params?.id,
-        parentId: "",
+        parentId: Math.floor(Date.now() / 1000).toString() + route.params?.id,
         description: postVal,
         group: group != null ? group.id : 'general',
+        isReply: 1,
       };
       setPostVal("");
 
@@ -193,7 +159,6 @@ export default function FeedScreen({ navigation, route }) {
       }
       //console.log("current time...", );
     }
-
   };
 
   const replyPostAsync = async (postID) => {
@@ -207,6 +172,7 @@ export default function FeedScreen({ navigation, route }) {
       parentId: postID.toString(),
       description: postVal,
       group: group != null ? group.id : 'general',
+      isReply: 0,
     };
 
     setPostVal("");
@@ -221,6 +187,10 @@ export default function FeedScreen({ navigation, route }) {
     setIsReplying(false);
     setUpdatePostID(0);
 
+    let tempposts = [...currentPosts.current];
+    var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.timestamp.toString() + p.userId == newPost.parentId)]); // p.userId + "#" + p.timestamp.toString()
+    tempposts.splice(index + 1, 0, newPost);
+    setPosts(tempposts);
 
   };
 
@@ -268,11 +238,11 @@ export default function FeedScreen({ navigation, route }) {
       console.log("******************************************");
 
     }else{
-    console.log("deleting the post with this timestamp: ", timestamp);
-    //locally removes the post
-    setPosts((posts) => {
-      return posts.filter((val) => (val.timestamp != timestamp || val.userId != route.params?.id));
-    });
+      console.log("deleting the post with this timestamp: ", timestamp);
+      //locally removes the post
+      setPosts((posts) => {
+        return posts.filter((val) => (val.timestamp != timestamp || val.userId != route.params?.id));
+      });
     }
 
     setUpdatePostID(0);
@@ -360,7 +330,6 @@ export default function FeedScreen({ navigation, route }) {
                 </View>
               </View>
         }
-        processingFunction={sortPosts}
         queryOperation={postsByGroup}
         setDataFunction={setPosts}
         data={posts}
