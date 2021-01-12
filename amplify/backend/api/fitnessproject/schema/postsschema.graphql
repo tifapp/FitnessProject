@@ -1,10 +1,11 @@
 type Post @model
 @key(fields: ["timestamp", "userId"])
-@key(name: "ByGroup", fields: ["group", "timestamp"], queryField: "postsByGroup")
+@key(name: "ByGroup", fields: ["group", "parentId", "isReply", "timestamp"], queryField: "postsByGroup")
 {
   timestamp: AWSTimestamp!
   userId: String!
   parentId: String
   description: String
   group: String
+  isReply: Boolean
 }
