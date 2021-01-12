@@ -40,82 +40,6 @@ export const listGroups = /* GraphQL */ `
     }
   }
 `;
-export const getPost = /* GraphQL */ `
-  query GetPost($timestamp: AWSTimestamp!, $userId: String!) {
-    getPost(timestamp: $timestamp, userId: $userId) {
-      timestamp
-      userId
-      parentId
-      description
-      group
-      isReply
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const listPosts = /* GraphQL */ `
-  query ListPosts(
-    $timestamp: AWSTimestamp
-    $userId: ModelStringKeyConditionInput
-    $filter: ModelPostFilterInput
-    $limit: Int
-    $nextToken: String
-    $sortDirection: ModelSortDirection
-  ) {
-    listPosts(
-      timestamp: $timestamp
-      userId: $userId
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      sortDirection: $sortDirection
-    ) {
-      items {
-        timestamp
-        userId
-        parentId
-        description
-        group
-        isReply
-        createdAt
-        updatedAt
-      }
-      nextToken
-    }
-  }
-`;
-export const postsByGroup = /* GraphQL */ `
-  query PostsByGroup(
-    $group: String
-    $parentIdIsReplyTimestamp: ModelPostByGroupCompositeKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelPostFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    postsByGroup(
-      group: $group
-      parentIdIsReplyTimestamp: $parentIdIsReplyTimestamp
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        timestamp
-        userId
-        parentId
-        description
-        group
-        isReply
-        createdAt
-        updatedAt
-      }
-      nextToken
-    }
-  }
-`;
 export const searchGroups = /* GraphQL */ `
   query SearchGroups(
     $filter: SearchableGroupFilterInput
@@ -275,6 +199,113 @@ export const friendsBySecondUser = /* GraphQL */ `
         user2
         timestamp
         hifives
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const getPost = /* GraphQL */ `
+  query GetPost($timestamp: AWSTimestamp!, $userId: String!) {
+    getPost(timestamp: $timestamp, userId: $userId) {
+      timestamp
+      userId
+      parentId
+      description
+      group
+      isReply
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listPosts = /* GraphQL */ `
+  query ListPosts(
+    $timestamp: AWSTimestamp
+    $userId: ModelStringKeyConditionInput
+    $filter: ModelPostFilterInput
+    $limit: Int
+    $nextToken: String
+    $sortDirection: ModelSortDirection
+  ) {
+    listPosts(
+      timestamp: $timestamp
+      userId: $userId
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
+    ) {
+      items {
+        timestamp
+        userId
+        parentId
+        description
+        group
+        isReply
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const postsByGroup = /* GraphQL */ `
+  query PostsByGroup(
+    $group: String
+    $parentIdIsReplyTimestamp: ModelPostByGroupCompositeKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelPostFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    postsByGroup(
+      group: $group
+      parentIdIsReplyTimestamp: $parentIdIsReplyTimestamp
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        timestamp
+        userId
+        parentId
+        description
+        group
+        isReply
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const postsByParentId = /* GraphQL */ `
+  query PostsByParentId(
+    $parentId: String
+    $isReply: ModelIntKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelPostFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    postsByParentId(
+      parentId: $parentId
+      isReply: $isReply
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        timestamp
+        userId
+        parentId
+        description
+        group
+        isReply
         createdAt
         updatedAt
       }

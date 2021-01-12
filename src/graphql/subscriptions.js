@@ -49,48 +49,6 @@ export const onDeleteGroup = /* GraphQL */ `
     }
   }
 `;
-export const onCreatePost = /* GraphQL */ `
-  subscription OnCreatePost {
-    onCreatePost {
-      timestamp
-      userId
-      parentId
-      description
-      group
-      isReply
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const onUpdatePost = /* GraphQL */ `
-  subscription OnUpdatePost {
-    onUpdatePost {
-      timestamp
-      userId
-      parentId
-      description
-      group
-      isReply
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const onDeletePost = /* GraphQL */ `
-  subscription OnDeletePost {
-    onDeletePost {
-      timestamp
-      userId
-      parentId
-      description
-      group
-      isReply
-      createdAt
-      updatedAt
-    }
-  }
-`;
 export const onCreateFriendRequest = /* GraphQL */ `
   subscription OnCreateFriendRequest($sender: String, $receiver: String) {
     onCreateFriendRequest(sender: $sender, receiver: $receiver) {
@@ -152,6 +110,48 @@ export const onDeleteFriendship = /* GraphQL */ `
       user2
       timestamp
       hifives
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onCreatePost = /* GraphQL */ `
+  subscription OnCreatePost {
+    onCreatePost {
+      timestamp
+      userId
+      parentId
+      description
+      group
+      isReply
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdatePost = /* GraphQL */ `
+  subscription OnUpdatePost {
+    onUpdatePost {
+      timestamp
+      userId
+      parentId
+      description
+      group
+      isReply
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeletePost = /* GraphQL */ `
+  subscription OnDeletePost {
+    onDeletePost {
+      timestamp
+      userId
+      parentId
+      description
+      group
+      isReply
       createdAt
       updatedAt
     }
