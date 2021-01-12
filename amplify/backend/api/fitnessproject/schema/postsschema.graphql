@@ -1,6 +1,14 @@
 type Post @model
+@auth(
+  rules: [
+      { allow: private, operations: [read] },
+      { allow: owner, ownerField: "userId" },
+      { allow: private, provider: iam, operations: [read, delete] },
+  ]
+)
 @key(fields: ["timestamp", "userId"])
 @key(name: "ByGroup", fields: ["group", "parentId", "isReply", "timestamp"], queryField: "postsByGroup")
+@key(name: "ByParentId", fields: ["parentId", "isReply"], queryField: "postsByParentId")
 {
   timestamp: AWSTimestamp!
   userId: String!
