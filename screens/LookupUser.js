@@ -13,13 +13,13 @@ import APIList from "components/APIList"
 
 var styles = require('styles/stylesheet');
 
-
 const LookupUser = ({ route, navigation }) => {
-  const [friendStatus, setFriendStatus] = useState("none"); //can be either "received", "sent", "friends", or "none". don't misspell!
-  const [hifiveSent, setHifiveSent] = useState(false); //can be either "received", "sent", or "none". don't misspell!
+  const [friendStatus, setFriendStatus] = useState("loading"); //can be either "received", "sent", "friends", or "none". don't misspell!
   const [friendsSince, setFriendsSince] = useState("");
-  const [hifives, setHifives] = useState(0);
   const [mutualfriendList, setMutualFriendList] = useState([]);
+  
+  const [hifiveSent, setHifiveSent] = useState(false); //can be either "received", "sent", or "none". don't misspell!
+  const [hifives, setHifives] = useState(0);
   
   const { user } = route.params;
   const { userId } = route.params;
@@ -43,16 +43,9 @@ const LookupUser = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    /*
-    if (user == null) {
-      console.log("HEELELLLLLllLLLOOOOOOOOO")
-      checkUsersInfo();
-    }
-    */
     checkUsersInfo();
     checkFriendStatus();
   }, []);
-
 
   const collectMutualFriends = (items) => {
     //items is an array containing both user1 and user2's friendship objects
@@ -118,10 +111,34 @@ const LookupUser = ({ route, navigation }) => {
           }
         }
       }
+      waitForFriendUpdateAsync();
     } catch (err) {
       console.log(err);
     }
   };
+  
+  const waitForFriendUpdateAsync = async () => {
+    await API.graphql(graphqlOperation(onCreateFriendship)).subscribe({
+        next: event => {
+            const newFriend = event.value.data.onCreateFriendship
+            if ((newFriend.user1 == route.params?.id && newFriend.user2 == userId) || (newFriend.user2 == route.params?.id && newFriend.user1 == userId)) {
+                setFriendStatus("friends");
+            }
+        }
+    });
+    await API.graphql(graphqlOperation(onCreateFriendRequest)).subscribe({
+        next: event => {
+            const newFriendRequest = event.value.data.onCreateFriendRequest
+            if (newFriendRequest.receiver == route.params?.id) {
+              if (friendStatus == "sent") {
+                setFriendStatus("friends");
+              } else {
+                setFriendStatus("received");
+              }
+            }
+        }
+    });
+  }
 
   const checkMutualFriendStatus = async () => {
     console.log("CHECKING MUTUAL FRIEND STATUS");
@@ -335,7 +352,18 @@ const LookupUser = ({ route, navigation }) => {
           }
           {route.params?.id != user.id ?
             <View style={styles.buttonFormat}>
-              {friendStatus == "none" ?
+              {friendStatus == "loading" ?
+                <ActivityIndicator
+                  size="large"
+                  color="#0000ff"
+                  style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    flexDirection: "row",
+                    justifyContent: "space-around",
+                    padding: 10,
+                  }} />
+              : friendStatus == "none" ?
                 <TouchableOpacity
                   onPress={sendFriendRequest}
                   style={styles.submitButton}
