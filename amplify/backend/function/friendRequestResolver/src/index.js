@@ -21,6 +21,8 @@ const config = {
   disableOffline: true
 };
 
+const client = new AWSAppSyncClient(config);
+
 const getFriendRequest =
 `
   query GetFriendRequest($sender: ID!, $receiver: ID!) {
@@ -165,12 +167,7 @@ async function sendNotification(deviceToken, message) {
   }
 }
 
-const client = new AWSAppSyncClient(config);
-
 exports.handler = (event, context, callback) => {
-  const record = event.Records[0];
-  console.log(record);
-
   event.Records.forEach((record) => {
     if (record.eventName == "INSERT") {
       (async () => {

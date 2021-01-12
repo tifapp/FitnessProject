@@ -1,3 +1,4 @@
+require('isomorphic-fetch');
 const AWS = require('aws-sdk/global');
 const AUTH_TYPE = require('aws-appsync').AUTH_TYPE;
 const AWSAppSyncClient = require('aws-appsync').default;
@@ -12,6 +13,8 @@ const config = {
   },
   disableOffline: true
 };
+
+const client = new AWSAppSyncClient(config);
 
 const postsByParentId =
 /* GraphQL */ `
@@ -66,32 +69,40 @@ mutation DeletePost(
 
 exports.handler = event => {
   //eslint-disable-line
-  console.log(JSON.stringify(event, null, 2));
-  event.Records.forEach(record => {
+  event.Records.forEach((record) => {
     if (record.eventName == "REMOVE") {
       (async () => {
         try {
-          const parentId = record.dynamodb.NewImage.parentId.S;
-          const results = await client.query({
-            query: gql(postsByParentId),
-            variables: {
-              parentId: parentId
-            }
-          });
-
-          results.data.postsByParentId.forEach(post => {
-            await client.mutate({
-              mutation: gql(deletePost),
+          const parentId = record.dynamodb.OldImage.parentId.S;
+          console.log("did a reply get deleted? ", record.dynamodb.OldImage.isReply.N == 1);
+          console.log("string test: ", record.dynamodb.OldImage.isReply.N == "1");
+          if (record.dynamodb.OldImage.isReply.N == 1 || record.dynamodb.OldImage.isReply.N == "1") {
+            const results = await client.query({
+              query: gql(postsByParentId),
               variables: {
-                input: {
-                  timestamp: post.timestamp,
-                  userId: post.userId,
-                }
+                parentId: parentId
               }
             });
-          });
+
+            console.log("postsbyparentid results: ");
+            console.log(results);
+
+            results.data.postsByParentId.items.forEach(post => {
+              (async () => {
+                await client.mutate({
+                  mutation: gql(deletePost),
+                  variables: {
+                    input: {
+                      timestamp: post.timestamp,
+                      userId: post.userId,
+                    }
+                  }
+                });
+              })();
+            });
+          }
         } catch (e) {
-          console.warn('Error sending mutation: ',  e);
+          console.warn('Error sending mutation: ', e);
         }
       })();
     }

@@ -83,7 +83,7 @@
         "Timeout": "25",
         "Code": {
           "S3Bucket": "amplify-fitnessproject-dev-145229-deployment",
-          "S3Key": "amplify-builds/deleteRepliesOfPosts-6b2f7a492b4161506e61-build.zip"
+          "S3Key": "amplify-builds/deleteRepliesOfPosts-4a6856552f4155503531-build.zip"
         }
       }
     },
