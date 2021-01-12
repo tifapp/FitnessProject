@@ -9,6 +9,7 @@ import getLocation from 'hooks/useLocation';
 import printTime from 'hooks/printTime';
 import { getUser, getFriendRequest, getFriendship, listFriendships, friendsBySecondUser } from "../src/graphql/queries";
 import { createFriendRequest, deleteFriendRequest, deleteFriendship } from "root/src/graphql/mutations";
+import { onCreateFriendRequest, onCreateFriendship } from "root/src/graphql/subscriptions";
 import APIList from "components/APIList"
 
 var styles = require('styles/stylesheet');
@@ -123,20 +124,18 @@ const LookupUser = ({ route, navigation }) => {
             const newFriend = event.value.data.onCreateFriendship
             if ((newFriend.user1 == route.params?.id && newFriend.user2 == userId) || (newFriend.user2 == route.params?.id && newFriend.user1 == userId)) {
                 setFriendStatus("friends");
-            }
         }
+      }
     });
-    await API.graphql(graphqlOperation(onCreateFriendRequest)).subscribe({
-        next: event => {
-            const newFriendRequest = event.value.data.onCreateFriendRequest
-            if (newFriendRequest.receiver == route.params?.id) {
-              if (friendStatus == "sent") {
-                setFriendStatus("friends");
-              } else {
-                setFriendStatus("received");
-              }
-            }
+    await API.graphql(graphqlOperation(onCreateFriendRequest, { sender: userId, receiver: route.params?.id })).subscribe({
+      next: event => {
+        const newFriendRequest = event.value.data.onCreateFriendRequest
+        if (friendStatus == "sent") {
+          setFriendStatus("friends");
+        } else {
+          setFriendStatus("received");
         }
+      }
     });
   }
 

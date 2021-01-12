@@ -51,14 +51,12 @@ const FriendScreen = ({ route, navigation }) => {
                 }
             }
         });
-        // await API.graphql(graphqlOperation(onCreateFriendRequest)).subscribe({
-        //     next: event => {
-        //         const newFriendRequest = event.value.data.onCreateFriendRequest
-        //         if (newFriendRequest.receiver == route.params?.id) {
-        //             setFriendRequestList([newFriendRequest, ...currentFriendRequests.current]);
-        //         }
-        //     }
-        // });
+        await API.graphql(graphqlOperation(onCreateFriendRequest, {receiver: route.params?.id})).subscribe({
+            next: event => {
+                const newFriendRequest = event.value.data.onCreateFriendRequest
+                setFriendRequestList([newFriendRequest, ...currentFriendRequests.current]);
+            }
+        });
     }
 
     const findFriendID = (item) => {
