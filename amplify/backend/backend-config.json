@@ -8,7 +8,7 @@
     }
   },
   "api": {
-    "fitnessproject": {
+    "fitnessprojectapi": {
       "service": "AppSync",
       "providerPlugin": "awscloudformation",
       "output": {
@@ -42,22 +42,7 @@
       "dependsOn": [
         {
           "category": "api",
-          "resourceName": "fitnessproject",
-          "attributes": [
-            "GraphQLAPIIdOutput",
-            "GraphQLAPIEndpointOutput"
-          ]
-        }
-      ]
-    },
-    "deleteRepliesOfPosts": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": [
-        {
-          "category": "api",
-          "resourceName": "fitnessproject",
+          "resourceName": "fitnessprojectapi",
           "attributes": [
             "GraphQLAPIIdOutput",
             "GraphQLAPIEndpointOutput"

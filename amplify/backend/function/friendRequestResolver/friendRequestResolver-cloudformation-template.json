@@ -10,13 +10,13 @@
     "env": {
       "Type": "String"
     },
-    "apifitnessprojectGraphQLAPIIdOutput": {
+    "apifitnessprojectapiGraphQLAPIIdOutput": {
       "Type": "String",
-      "Default": "apifitnessprojectGraphQLAPIIdOutput"
+      "Default": "apifitnessprojectapiGraphQLAPIIdOutput"
     },
-    "apifitnessprojectGraphQLAPIEndpointOutput": {
+    "apifitnessprojectapiGraphQLAPIEndpointOutput": {
       "Type": "String",
-      "Default": "apifitnessprojectGraphQLAPIEndpointOutput"
+      "Default": "apifitnessprojectapiGraphQLAPIEndpointOutput"
     }
   },
   "Conditions": {
@@ -64,11 +64,11 @@
             "REGION": {
               "Ref": "AWS::Region"
             },
-            "API_FITNESSPROJECT_GRAPHQLAPIIDOUTPUT": {
-              "Ref": "apifitnessprojectGraphQLAPIIdOutput"
+            "API_FITNESSPROJECTAPI_GRAPHQLAPIIDOUTPUT": {
+              "Ref": "apifitnessprojectapiGraphQLAPIIdOutput"
             },
-            "API_FITNESSPROJECT_GRAPHQLAPIENDPOINTOUTPUT": {
-              "Ref": "apifitnessprojectGraphQLAPIEndpointOutput"
+            "API_FITNESSPROJECTAPI_GRAPHQLAPIENDPOINTOUTPUT": {
+              "Ref": "apifitnessprojectapiGraphQLAPIEndpointOutput"
             }
           }
         },
@@ -83,7 +83,7 @@
         "Timeout": "25",
         "Code": {
           "S3Bucket": "amplify-fitnessproject-dev-145229-deployment",
-          "S3Key": "amplify-builds/friendRequestResolver-71493570546662746c73-build.zip"
+          "S3Key": "amplify-builds/friendRequestResolver-437474546c4a6d585a34-build.zip"
         }
       }
     },
@@ -93,12 +93,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "fitnessprojectLambdaRole2a9a421a",
+            "fitnessprojectLambdaRolef2f20f70",
             {
               "Fn::Join": [
                 "",
                 [
-                  "fitnessprojectLambdaRole2a9a421a",
+                  "fitnessprojectLambdaRolef2f20f70",
                   "-",
                   {
                     "Ref": "env"
@@ -210,7 +210,7 @@
                       },
                       ":apis/",
                       {
-                        "Ref": "apifitnessprojectGraphQLAPIIdOutput"
+                        "Ref": "apifitnessprojectapiGraphQLAPIIdOutput"
                       },
                       "/*"
                     ]
@@ -247,7 +247,7 @@
               ],
               "Resource": {
                 "Fn::ImportValue": {
-                  "Fn::Sub": "${apifitnessprojectGraphQLAPIIdOutput}:GetAtt:FriendRequestTable:StreamArn"
+                  "Fn::Sub": "${apifitnessprojectapiGraphQLAPIIdOutput}:GetAtt:FriendRequestTable:StreamArn"
                 }
               }
             }
@@ -266,7 +266,7 @@
         "Enabled": true,
         "EventSourceArn": {
           "Fn::ImportValue": {
-            "Fn::Sub": "${apifitnessprojectGraphQLAPIIdOutput}:GetAtt:FriendRequestTable:StreamArn"
+            "Fn::Sub": "${apifitnessprojectapiGraphQLAPIIdOutput}:GetAtt:FriendRequestTable:StreamArn"
           }
         },
         "FunctionName": {

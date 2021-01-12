@@ -1,8 +1,8 @@
 projects:
-  fitnessproject:
-    schemaPath: amplify/backend/api/fitnessproject/build/schema.graphql
+  fitnessprojectapi:
+    schemaPath: src/graphql/schema.json
     includes:
-      - functions
+      - src/graphql/**/*.js
     excludes:
       - ./amplify/**
     extensions:
