@@ -220,7 +220,7 @@ export default function FeedScreen({ navigation, route }) {
       const timeCheck = timestamp.toString();
       childPosts = posts;
 
-      childPosts = childPosts.filter((val) => (val.parentId == timeCheck));
+      childPosts = childPosts.filter((val) => (val.parentId == timeCheck + parent_post.userId));
       //console.log("Child Posts: ");
       //console.log(childPosts);
       //console.log(timeCheck);
@@ -230,7 +230,7 @@ export default function FeedScreen({ navigation, route }) {
       });
 
       setPosts((posts) => {
-        return posts.filter((val) => (val.parentId != timeCheck));
+        return posts.filter((val) => (val.parentId != timeCheck + parent_post.userId));
       });
 
       console.log("##########################################");
