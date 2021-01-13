@@ -244,6 +244,7 @@ const LookupUser = ({ route, navigation }) => {
                 style={styles.imageStyle}
                 userId={user.id}
                 isFull={true}
+                fullname={true}
               />
             </View>
 
