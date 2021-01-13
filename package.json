@@ -17,7 +17,7 @@
     "@react-navigation/native": "^5.7.4",
     "@react-navigation/stack": "^5.9.1",
     "aws-amplify": "^3.0.25",
-    "aws-amplify-react-native": "^4.3.0",
+    "aws-amplify-react-native": "^4.2.7",
     "aws-sdk": "^2.822.0",
     "expo": "^39.0.4",
     "expo-image-manipulator": "~8.3.0",

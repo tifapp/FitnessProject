@@ -61,8 +61,6 @@ const App = () => {
   //Text.defaultProps = Text.defaultProps || {}
   //Text.defaultProps.style =  { fontFamily: 'Helvetica', fontSize: 15, fontWeight: 'normal' }
 
-  const notificationListener = useRef();
-  const responseListener = useRef();
   const Tab = createBottomTabNavigator();
   const [userId, setUserId] = useState('checking...'); //stores the user's id if logged in
 
