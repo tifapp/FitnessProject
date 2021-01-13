@@ -16,6 +16,7 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
         navigation.push('Lookup',
             { userId: props.userId })
     }
+    
 
     const [userInfo, setUserInfo] = useState(null);
 
@@ -90,12 +91,19 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
         return (
             <TouchableOpacity
                 onPress={goToProfile}
-                style={{ flexDirection: props.vertical ? 'column' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                style={{ flexDirection: props.vertical ? 'column' : 'row', alignItems: 'center', justifyContent: 'space-between'}}>
                 <Image
                     style={[props.style, {marginBottom: props.vertical ? 15 : 0, marginRight: props.vertical ? 0 : 15}]}
                     source={userInfo.imageURL === '' ? require('../assets/icon.png') : { uri: userInfo.imageURL }}
                 />
-                <Text>{userInfo.name}</Text>
+                { props.isFull ?
+                    <Text>{userInfo.name}</Text>
+                    :
+                    userInfo.name.length > 10 ?
+                    <Text>{userInfo.name.substring(0,10)} ...</Text>
+                    : <Text>{userInfo.name}</Text>
+                    
+                }
             </TouchableOpacity>
         )
     }
