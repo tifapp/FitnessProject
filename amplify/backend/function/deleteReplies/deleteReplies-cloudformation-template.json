@@ -41,12 +41,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "friendRequestResolver",
+            "deleteReplies",
             {
               "Fn::Join": [
                 "",
                 [
-                  "friendRequestResolver",
+                  "deleteReplies",
                   "-",
                   {
                     "Ref": "env"
@@ -83,7 +83,7 @@
         "Timeout": "25",
         "Code": {
           "S3Bucket": "amplify-fitnessproject-dev-145229-deployment",
-          "S3Key": "amplify-builds/friendRequestResolver-516c335871434f444142-build.zip"
+          "S3Key": "amplify-builds/deleteReplies-6e797063466a70515265-build.zip"
         }
       }
     },
@@ -93,12 +93,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "fitnessprojectLambdaRolef2f20f70",
+            "fitnessprojectLambdaRoled8e743b5",
             {
               "Fn::Join": [
                 "",
                 [
-                  "fitnessprojectLambdaRolef2f20f70",
+                  "fitnessprojectLambdaRoled8e743b5",
                   "-",
                   {
                     "Ref": "env"
@@ -222,13 +222,13 @@
         }
       }
     },
-    "LambdaTriggerPolicyFriendRequest": {
+    "LambdaTriggerPolicyPost": {
       "DependsOn": [
         "LambdaExecutionRole"
       ],
       "Type": "AWS::IAM::Policy",
       "Properties": {
-        "PolicyName": "amplify-lambda-execution-policy-FriendRequest",
+        "PolicyName": "amplify-lambda-execution-policy-Post",
         "Roles": [
           {
             "Ref": "LambdaExecutionRole"
@@ -247,7 +247,7 @@
               ],
               "Resource": {
                 "Fn::ImportValue": {
-                  "Fn::Sub": "${apifitnessprojectapiGraphQLAPIIdOutput}:GetAtt:FriendRequestTable:StreamArn"
+                  "Fn::Sub": "${apifitnessprojectapiGraphQLAPIIdOutput}:GetAtt:PostTable:StreamArn"
                 }
               }
             }
@@ -255,10 +255,10 @@
         }
       }
     },
-    "LambdaEventSourceMappingFriendRequest": {
+    "LambdaEventSourceMappingPost": {
       "Type": "AWS::Lambda::EventSourceMapping",
       "DependsOn": [
-        "LambdaTriggerPolicyFriendRequest",
+        "LambdaTriggerPolicyPost",
         "LambdaExecutionRole"
       ],
       "Properties": {
@@ -266,7 +266,7 @@
         "Enabled": true,
         "EventSourceArn": {
           "Fn::ImportValue": {
-            "Fn::Sub": "${apifitnessprojectapiGraphQLAPIIdOutput}:GetAtt:FriendRequestTable:StreamArn"
+            "Fn::Sub": "${apifitnessprojectapiGraphQLAPIIdOutput}:GetAtt:PostTable:StreamArn"
           }
         },
         "FunctionName": {

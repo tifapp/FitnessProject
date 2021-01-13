@@ -223,6 +223,4 @@ function TabBarIcon({ name, color }) {
   );
 }
 
-export default withAuthenticator(App, false, [
-  <SignInScreen />
-]);
+export default withAuthenticator(App);
