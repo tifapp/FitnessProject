@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { View, StyleSheet } from 'react-native'
-import { Picker } from '@react-native-community/picker'
+import { Picker } from '@react-native-picker/picker'
 
 const minAge = 18;
 const maxAge = 100;

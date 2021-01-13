@@ -12,7 +12,6 @@ import {
   TouchableOpacity,
   Linking,
   ScrollView,
-  Picker,
   Keyboard,
   Modal,
   Dimensions,
