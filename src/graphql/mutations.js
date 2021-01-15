@@ -1,6 +1,20 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const batchDeletePosts = /* GraphQL */ `
+  mutation BatchDeletePosts($posts: [DeletePostInput]) {
+    batchDeletePosts(posts: $posts) {
+      timestamp
+      userId
+      parentId
+      description
+      group
+      isReply
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const createFriendRequest = /* GraphQL */ `
   mutation CreateFriendRequest(
     $input: CreateFriendRequestInput!

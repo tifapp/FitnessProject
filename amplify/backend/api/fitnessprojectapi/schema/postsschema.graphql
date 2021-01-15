@@ -17,3 +17,12 @@ type Post @model
   group: String
   isReply: Int
 }
+
+input DeletePostInput {
+  timestamp: AWSTimestamp!
+  userId: String!
+}
+
+type Mutation {
+  batchDeletePosts(posts: [DeletePostInput]): [Post]
+}

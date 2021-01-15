@@ -1,0 +1,12 @@
+#set($postsdata = [])
+#foreach($item in ${ctx.args.posts})
+    $util.qr($postsdata.add($util.dynamodb.toMapValues($item)))
+#end
+
+{
+    "version" : "2018-05-29",
+    "operation" : "BatchDeleteItem",
+    "tables" : {
+        "Posts": $utils.toJson($postsdata)
+    }
+}
