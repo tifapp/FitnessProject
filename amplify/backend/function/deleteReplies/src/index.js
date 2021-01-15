@@ -82,7 +82,7 @@ exports.handler = (event, context, callback) => {
               }
             });
 
-            results.data.postsByParentId.items.forEach(post => {
+            results.data.postsByParentId.items.forEach(async (post) => {
               await client.mutate({
                 mutation: gql(deletePost),
                 variables: {
