@@ -196,65 +196,36 @@ export default function FeedScreen({ navigation, route }) {
 
   const deletePostsAsync = async (timestamp) => {
     checkInternetConnection();
-    /*
-    console.log("#############################################");
-    console.log(posts);
-    console.log("#############################################");
-    */
 
     let parent_post = posts.find((item) => {
       //const time = timestamp.toString();
       return item.timestamp === timestamp;
     })
 
-    
-
     console.log("parent post: " + parent_post.description);
 
     //console.log("parent post: " + parent_post);
     let childPosts = [];
 
-    if(parent_post.parentId == ""){
-      console.log("parent");
-      //console.log("checking");
-      const timeCheck = timestamp.toString();
-      childPosts = posts;
+    console.log("parent");
+    //console.log("checking");
+    const timeCheck = timestamp.toString();
+    childPosts = posts;
 
-      childPosts = childPosts.filter((val) => (val.parentId == timeCheck + parent_post.userId));
-      //console.log("Child Posts: ");
-      //console.log(childPosts);
-      //console.log(timeCheck);
+    childPosts = childPosts.filter((val) => (val.parentId == timeCheck + parent_post.userId));
 
-      setPosts((posts) => {
-        return posts.filter((val) => (val.timestamp != timestamp));
-      });
+    setPosts((posts) => {
+      return posts.filter((val) => (val.parentId != timeCheck + parent_post.userId));
+    });
 
-      setPosts((posts) => {
-        return posts.filter((val) => (val.parentId != timeCheck + parent_post.userId));
-      });
-
-      console.log("##########################################");
-      console.log(posts);
-      console.log("******************************************");
-
-    }else{
-      console.log("deleting the post with this timestamp: ", timestamp);
-      //locally removes the post
-      setPosts((posts) => {
-        return posts.filter((val) => (val.timestamp != timestamp || val.userId != route.params?.id));
-      });
-    }
+    console.log("##########################################");
+    console.log(posts);
+    console.log("******************************************");
 
     setUpdatePostID(0);
 
-    // for (let post of childPosts) {
-    //   await API.graphql(graphqlOperation(deletePost, { input: { timestamp: post.timestamp, userId: route.params?.id }}));
-    // }
-
-    //sends a request to remove the post from the server
     try {
       await API.graphql(graphqlOperation(deletePost, { input: { timestamp: timestamp, userId: route.params?.id } }));
-
     } catch {
       console.log("error in deleting post: ");
     }
