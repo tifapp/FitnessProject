@@ -1,1 +1,8 @@
-$util.toJson($ctx.result.data.Posts)
+## If there was an error with the invocation
+## there might have been partial results
+#if($ctx.error)
+    ## Append a GraphQL error for that field in the GraphQL response
+    $utils.appendError($ctx.error.message, $ctx.error.message)
+#end
+## Also return data for the field in the GraphQL response
+$utils.toJson($ctx.result.data)

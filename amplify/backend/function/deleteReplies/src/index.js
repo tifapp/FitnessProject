@@ -49,13 +49,10 @@ query PostsByParentId(
 }
 `;
 
-const deletePost =
+const batchDeletePosts =
 `
-  mutation DeletePost(
-    $input: DeletePostInput!
-    $condition: ModelPostConditionInput
-  ) {
-    deletePost(input: $input, condition: $condition) {
+  mutation BatchDeletePosts($posts: [DeletePostInput]) {
+    batchDeletePosts(posts: $posts) {
       timestamp
       userId
       parentId
@@ -82,17 +79,28 @@ exports.handler = (event, context, callback) => {
               }
             });
 
-            results.data.postsByParentId.items.forEach(async (post) => {
-              client.mutate({
-                mutation: gql(deletePost),
+            let replies = [];
+
+            results.data.postsByParentId.items.forEach(post => {
+              if (post.timestamp != null && post.userId != null) {
+                const postIDInfo = {
+                  timestamp: post.timestamp,
+                  userId: post.userId,
+                }
+                replies.push(postIDInfo);
+              }
+            });
+
+            console.log(replies);
+
+            if (replies.length > 0) {
+              await client.mutate({
+                mutation: gql(batchDeletePosts),
                 variables: {
-                  input: {
-                    timestamp: post.timestamp,
-                    userId: post.userId,
-                  }
+                  posts: replies
                 }
               });
-            });
+            }
 
           } catch (e) {
             console.warn('Error sending mutation: ', e);

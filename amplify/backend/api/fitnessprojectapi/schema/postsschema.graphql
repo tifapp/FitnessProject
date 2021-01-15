@@ -6,7 +6,6 @@ type Post @model
       { allow: private, provider: iam, operations: [read, delete] },
   ]
 )
-@key(fields: ["timestamp", "userId"])
 @key(name: "ByGroup", fields: ["group", "parentId", "isReply", "timestamp"], queryField: "postsByGroup")
 @key(name: "ByParentId", fields: ["parentId", "isReply"], queryField: "postsByParentId")
 {
@@ -24,5 +23,5 @@ input DeletePostInput {
 }
 
 type Mutation {
-  batchDeletePosts(posts: [DeletePostInput]): [Post]
+  batchDeletePosts(posts: [DeletePostInput]): [Post] @aws_iam
 }
