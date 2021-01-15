@@ -44,6 +44,51 @@ export default function GroupSearchScreen({ navigation, route }) {
 
     currentQuery.current = query;
 
+    const userFilter = {
+        or: [{
+            name: {
+                matchPhrasePrefix: currentQuery.current
+            }
+        },
+        {
+            name: {
+                exists: " " + currentQuery.current
+            }
+        },
+        {
+            bio: {
+                exists: currentQuery.current
+            }
+        },
+        {
+            goals: {
+                exists: currentQuery.current
+            }
+        },]
+    }
+
+    const groupFilter = {
+        or: [{
+            name: {
+                matchPhrasePrefix: currentQuery.current
+            }
+        },{
+            name: {
+                exists: " " + currentQuery.current
+            }
+        },
+        {
+            Sport: {
+                exists: currentQuery.current
+            }
+        },
+        {
+            Description: {
+                exists: currentQuery.current
+            }
+        },]
+    }
+
     useEffect(() => {
         if (query !== "") {
             if (type !== "all") (type === "group") ? setUserResults([]) : setGroupResults([]); //clears results for the tab you arent looking at 
@@ -173,53 +218,13 @@ export default function GroupSearchScreen({ navigation, route }) {
                     queryOperation={(type === "group") ? searchGroups : searchUsers}
                     filter={
                         (type === "group") ?
-                            {
-                                filter: {
-                                    or: [{
-                                        name: {
-                                            matchPhrasePrefix: currentQuery.current
-                                        }
-                                    },{
-                                        name: {
-                                            exists: " " + currentQuery.current
-                                        }
-                                    },
-                                    {
-                                        Sport: {
-                                            exists: currentQuery.current
-                                        }
-                                    },
-                                    {
-                                        Description: {
-                                            exists: currentQuery.current
-                                        }
-                                    },]
-                                }
-                            } :
-                            {
-                                filter: {
-                                    or: [{
-                                        name: {
-                                            matchPhrasePrefix: currentQuery.current
-                                        }
-                                    },
-                                    {
-                                        name: {
-                                            exists: " " + currentQuery.current
-                                        }
-                                    },
-                                    {
-                                        bio: {
-                                            exists: currentQuery.current
-                                        }
-                                    },
-                                    {
-                                        goals: {
-                                            exists: currentQuery.current
-                                        }
-                                    },]
-                                }
-                            }
+                            groupFilter
+                             : (type === "user") ?
+                            userFilter 
+                            :
+                            [
+                                groupFilter, userFilter
+                            ]
                     }
                     ignoreInitialLoad={true}
                     initialAmount={10}
