@@ -257,7 +257,7 @@ exports.handler = (event, context, callback) => {
               }
             });
             
-            sendNotification(receiverUser.data.getUser.deviceToken, senderUser.data.getUser.name + " accepted your friend request!");
+            await sendNotification(receiverUser.data.getUser.deviceToken, senderUser.data.getUser.name + " accepted your friend request!");
           } else {
             //for incrementing hi-fives
             await client.mutate({
