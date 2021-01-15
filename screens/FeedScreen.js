@@ -251,13 +251,13 @@ export default function FeedScreen({ navigation, route }) {
     //   await API.graphql(graphqlOperation(deletePost, { input: { timestamp: post.timestamp, userId: route.params?.id }}));
     // }
 
-    // //sends a request to remove the post from the server
-    // try {
-    //   await API.graphql(graphqlOperation(deletePost, { input: { timestamp: timestamp, userId: route.params?.id } }));
+    //sends a request to remove the post from the server
+    try {
+      await API.graphql(graphqlOperation(deletePost, { input: { timestamp: timestamp, userId: route.params?.id } }));
 
-    // } catch {
-    //   console.log("error in deleting post: ");
-    // }
+    } catch {
+      console.log("error in deleting post: ");
+    }
 
   };
 

@@ -5,7 +5,7 @@ const AWSAppSyncClient = require('aws-appsync').default;
 const gql = require('graphql-tag');
 
 const config = {
-  url: process.env.API_FITNESSPROJECT_GRAPHQLAPIENDPOINTOUTPUT,
+  url: "https://lsvxnu7alvawnjevasqpbwk6ni.appsync-api.us-west-2.amazonaws.com/graphql", //still not sure why the apigraphqlendpoint variable is undefined here but not in the friendrequestresolver function
   region: process.env.AWS_REGION,
   auth: {
     type: AUTH_TYPE.AWS_IAM,
@@ -16,95 +16,52 @@ const config = {
 
 const client = new AWSAppSyncClient(config);
 
-const getFriendRequest =
+const postsByParentId =
 `
-  query GetFriendRequest($sender: ID!, $receiver: ID!) {
-    getFriendRequest(sender: $sender, receiver: $receiver) {
-      sender
-      receiver
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-const getFriendship =
-`
-  query GetFriendship($user1: ID!, $user2: ID!) {
-    getFriendship(user1: $user1, user2: $user2) {
-      user1
-      user2
-      timestamp
-      hifives
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-const updateFriendship =
-`
-  mutation UpdateFriendship(
-    $input: UpdateFriendshipInput!
-    $condition: ModelFriendshipConditionInput
+query PostsByParentId(
+  $parentId: String
+  $isReply: ModelIntKeyConditionInput
+  $sortDirection: ModelSortDirection
+  $filter: ModelPostFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  postsByParentId(
+    parentId: $parentId
+    isReply: $isReply
+    sortDirection: $sortDirection
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
   ) {
-    updateFriendship(input: $input, condition: $condition) {
-      user1
-      user2
+    items {
       timestamp
-      hifives
+      userId
+      parentId
+      description
+      group
+      isReply
       createdAt
       updatedAt
     }
+    nextToken
   }
+}
 `;
 
-const deleteFriendRequest =
+const deletePost =
 `
-  mutation DeleteFriendRequest(
-    $input: DeleteFriendRequestInput!
-    $condition: ModelFriendRequestConditionInput
+  mutation DeletePost(
+    $input: DeletePostInput!
+    $condition: ModelPostConditionInput
   ) {
-    deleteFriendRequest(input: $input, condition: $condition) {
-      sender
-      receiver
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-const createFriendship =
-`
-  mutation CreateFriendship(
-    $input: CreateFriendshipInput!
-    $condition: ModelFriendshipConditionInput
-  ) {
-    createFriendship(input: $input, condition: $condition) {
-      user1
-      user2
+    deletePost(input: $input, condition: $condition) {
       timestamp
-      hifives
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-const getUser =
-`
-  query GetUser($id: ID!) {
-    getUser(id: $id) {
-      id
-      identityId
-      name
-      age
-      gender
-      bio
-      goals
-      latitude
-      longitude
-      deviceToken
+      userId
+      parentId
+      description
+      group
+      isReply
       createdAt
       updatedAt
     }
@@ -113,24 +70,35 @@ const getUser =
 
 exports.handler = (event, context, callback) => {
   event.Records.forEach((record) => {
-    if (record.eventName == "INSERT") {
-      (async () => {
-        try {
-          //console.log('getting a new object with a sender of ', JSON.stringify(record.dynamodb.NewImage.sender.S), 'seeing if an object exists with that receiver');
-          const userId = record.dynamodb.NewImage.userId.S;
-          const result = await client.query({
-            query: gql(getUser),
-            variables: {
-              id: userId,
-            }
-          });
+    if (record.eventName == "REMOVE") {
+      const parentId = record.dynamodb.OldImage.parentId.S;
+      if (record.dynamodb.OldImage.isReply.N == 1) {
+        (async () => {
+          try {
+            const results = await client.query({
+              query: gql(postsByParentId),
+              variables: {
+                parentId: parentId,
+              }
+            });
 
-          console.log(result);
-          
-        } catch (e) {
-          console.warn('Error sending mutation: ',  e);
-        }
-      })();
+            results.data.postsByParentId.items.forEach(post => {
+              await client.mutate({
+                mutation: gql(deletePost),
+                variables: {
+                  input: {
+                    timestamp: post.timestamp,
+                    userId: post.userId,
+                  }
+                }
+              });
+            });
+
+          } catch (e) {
+            console.warn('Error sending mutation: ', e);
+          }
+        })();
+      }
     }
   });
 };
