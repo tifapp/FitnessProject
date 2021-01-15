@@ -204,19 +204,16 @@ export default function FeedScreen({ navigation, route }) {
 
     console.log("parent post: " + parent_post.description);
 
-    //console.log("parent post: " + parent_post);
-    let childPosts = [];
-
-    console.log("parent");
-    //console.log("checking");
     const timeCheck = timestamp.toString();
-    childPosts = posts;
-
-    childPosts = childPosts.filter((val) => (val.parentId == timeCheck + parent_post.userId));
-
-    setPosts((posts) => {
-      return posts.filter((val) => (val.parentId != timeCheck + parent_post.userId));
-    });
+    if (parent_post.isReply == 1) {
+      setPosts((posts) => {
+        return posts.filter((val) => (val.parentId != timeCheck + parent_post.userId));
+      });
+    } else {
+      setPosts((posts) => {
+        return posts.filter((val) => (val.timestamp != parent_post.timestamp && val.userId != parent_post.userId));
+      });
+    }
 
     console.log("##########################################");
     console.log(posts);
