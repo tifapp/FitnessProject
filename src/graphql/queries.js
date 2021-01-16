@@ -206,6 +206,53 @@ export const friendsBySecondUser = /* GraphQL */ `
     }
   }
 `;
+export const getMessage = /* GraphQL */ `
+  query GetMessage($createdTimestamp: AWSTimestamp!, $userId: ID!) {
+    getMessage(createdTimestamp: $createdTimestamp, userId: $userId) {
+      createdTimestamp
+      updatedTimestamp
+      userId
+      parentId
+      description
+      receiver
+      isReply
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listMessages = /* GraphQL */ `
+  query ListMessages(
+    $createdTimestamp: AWSTimestamp
+    $userId: ModelIDKeyConditionInput
+    $filter: ModelMessageFilterInput
+    $limit: Int
+    $nextToken: String
+    $sortDirection: ModelSortDirection
+  ) {
+    listMessages(
+      createdTimestamp: $createdTimestamp
+      userId: $userId
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
+    ) {
+      items {
+        createdTimestamp
+        updatedTimestamp
+        userId
+        parentId
+        description
+        receiver
+        isReply
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
 export const getPost = /* GraphQL */ `
   query GetPost($timestamp: AWSTimestamp!, $userId: String!) {
     getPost(timestamp: $timestamp, userId: $userId) {

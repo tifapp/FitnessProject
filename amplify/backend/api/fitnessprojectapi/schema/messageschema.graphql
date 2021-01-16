@@ -1,0 +1,42 @@
+"""
+This is the data type used for the message screen.
+"""
+type Message @model
+@auth(
+  rules: [
+      { allow: owner, ownerField: "receiver", operations: [read] },
+      { allow: owner, ownerField: "userId", operations: [create, update, delete, read] },
+      { allow: private, provider: iam, operations: [read, delete] },
+  ]
+)
+@key(fields: ["createdTimestamp", "userId"])
+{
+  createdTimestamp: AWSTimestamp!
+  updatedTimestamp: AWSTimestamp
+  userId: ID!
+  parentId: String
+  description: String
+  receiver: ID!
+  isReply: Int
+}
+
+"""
+This allows us to fill in the missing fields ourselves rather than letting the user do it. Applies when creating a new message.
+"""
+input CreateMessageInput {
+  parentId: String
+  description: String
+  receiver: ID!
+  isReply: Int
+}
+
+"""
+This allows us to fill in the missing fields ourselves rather than letting the user do it. Applies when updating a message.
+"""
+input UpdateMessageInput {
+  createdTimestamp: AWSTimestamp!
+  parentId: String
+  description: String
+  receiver: ID!
+  isReply: Int
+}

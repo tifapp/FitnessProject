@@ -113,6 +113,42 @@ export const deleteGroup = /* GraphQL */ `
     }
   }
 `;
+export const createMessage = /* GraphQL */ `
+  mutation CreateMessage(
+    $input: CreateMessageInput!
+    $condition: ModelMessageConditionInput
+  ) {
+    createMessage(input: $input, condition: $condition) {
+      createdTimestamp
+      updatedTimestamp
+      userId
+      parentId
+      description
+      receiver
+      isReply
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateMessage = /* GraphQL */ `
+  mutation UpdateMessage(
+    $input: UpdateMessageInput!
+    $condition: ModelMessageConditionInput
+  ) {
+    updateMessage(input: $input, condition: $condition) {
+      createdTimestamp
+      updatedTimestamp
+      userId
+      parentId
+      description
+      receiver
+      isReply
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const createPost = /* GraphQL */ `
   mutation CreatePost(
     $input: CreatePostInput!
@@ -248,6 +284,24 @@ export const updateFriendship = /* GraphQL */ `
       user2
       timestamp
       hifives
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteMessage = /* GraphQL */ `
+  mutation DeleteMessage(
+    $input: DeleteMessageInput!
+    $condition: ModelMessageConditionInput
+  ) {
+    deleteMessage(input: $input, condition: $condition) {
+      createdTimestamp
+      updatedTimestamp
+      userId
+      parentId
+      description
+      receiver
+      isReply
       createdAt
       updatedAt
     }
