@@ -82,8 +82,8 @@
         "Layers": [],
         "Timeout": "25",
         "Code": {
-          "S3Bucket": "amplify-fitnessproject-dev-145229-deployment",
-          "S3Key": "amplify-builds/deleteReplies-774e4b623265575a4b6b-build.zip"
+          "S3Bucket": "amplify-fitnessproject-backup-181549-deployment",
+          "S3Key": "amplify-builds/deleteReplies-565870765169754d7335-build.zip"
         }
       }
     },
@@ -93,12 +93,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "fitnessprojectLambdaRoled8e743b5",
+            "fitnessprojectLambdaRole1b9f90e9",
             {
               "Fn::Join": [
                 "",
                 [
-                  "fitnessprojectLambdaRoled8e743b5",
+                  "fitnessprojectLambdaRole1b9f90e9",
                   "-",
                   {
                     "Ref": "env"
@@ -187,9 +187,6 @@
             {
               "Effect": "Allow",
               "Action": [
-                "appsync:Create*",
-                "appsync:StartSchemaCreation",
-                "appsync:GraphQL",
                 "appsync:Get*",
                 "appsync:List*",
                 "appsync:Update*",
