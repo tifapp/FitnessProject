@@ -7,7 +7,11 @@ type Post @model
   ]
 )
 @key(fields: ["timestamp", "userId"])
+
+"This query is used for the feed screen and group screen."
 @key(name: "ByGroup", fields: ["group", "parentId", "isReply", "timestamp"], queryField: "postsByGroup")
+
+"This query is used to delete replies of a specific post."
 @key(name: "ByParentId", fields: ["parentId", "isReply"], queryField: "postsByParentId")
 {
   timestamp: AWSTimestamp!
@@ -18,6 +22,31 @@ type Post @model
   isReply: Int
 }
 
+"""
+This is used for the message screen.
+"""
+type Message @model
+@auth(
+  rules: [
+      { allow: owner, ownerField: "receiver", operations: [read] },
+      { allow: owner, ownerField: "userId", operations: [create, update, delete, read] },
+      { allow: private, provider: iam, operations: [read, delete] },
+  ]
+)
+@key(fields: ["timestamp", "userId"])
+{
+  timestamp: AWSTimestamp!
+  userId: ID!
+  parentId: String
+  description: String
+  receiver: ID!
+  isReply: Int
+  wasUpdated: Boolean
+}
+
+"""
+This is used for batch deletion of posts (deleting multiple posts at once).
+"""
 input DeletePostInput {
   timestamp: AWSTimestamp!
   userId: String!

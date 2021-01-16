@@ -82,7 +82,7 @@
         "Layers": [],
         "Timeout": "25",
         "Code": {
-          "S3Bucket": "amplify-fitnessproject-backup-181549-deployment",
+          "S3Bucket": "amplify-fitnessproject-dev-231929-deployment",
           "S3Key": "amplify-builds/deleteReplies-565870765169754d7335-build.zip"
         }
       }
