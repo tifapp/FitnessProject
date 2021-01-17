@@ -6,9 +6,10 @@ export const batchDeletePosts = /* GraphQL */ `
     batchDeletePosts(posts: $posts) {
       timestamp
       userId
-      parentId
       description
       group
+      parentId
+      receiver
       isReply
       createdAt
       updatedAt
@@ -157,9 +158,10 @@ export const createPost = /* GraphQL */ `
     createPost(input: $input, condition: $condition) {
       timestamp
       userId
-      parentId
       description
       group
+      parentId
+      receiver
       isReply
       createdAt
       updatedAt
@@ -174,9 +176,10 @@ export const updatePost = /* GraphQL */ `
     updatePost(input: $input, condition: $condition) {
       timestamp
       userId
-      parentId
       description
       group
+      parentId
+      receiver
       isReply
       createdAt
       updatedAt
@@ -315,9 +318,10 @@ export const deletePost = /* GraphQL */ `
     deletePost(input: $input, condition: $condition) {
       timestamp
       userId
-      parentId
       description
       group
+      parentId
+      receiver
       isReply
       createdAt
       updatedAt

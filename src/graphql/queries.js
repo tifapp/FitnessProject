@@ -254,13 +254,14 @@ export const listMessages = /* GraphQL */ `
   }
 `;
 export const getPost = /* GraphQL */ `
-  query GetPost($timestamp: AWSTimestamp!, $userId: String!) {
+  query GetPost($timestamp: AWSTimestamp!, $userId: ID!) {
     getPost(timestamp: $timestamp, userId: $userId) {
       timestamp
       userId
-      parentId
       description
       group
+      parentId
+      receiver
       isReply
       createdAt
       updatedAt
@@ -270,7 +271,7 @@ export const getPost = /* GraphQL */ `
 export const listPosts = /* GraphQL */ `
   query ListPosts(
     $timestamp: AWSTimestamp
-    $userId: ModelStringKeyConditionInput
+    $userId: ModelIDKeyConditionInput
     $filter: ModelPostFilterInput
     $limit: Int
     $nextToken: String
@@ -287,9 +288,10 @@ export const listPosts = /* GraphQL */ `
       items {
         timestamp
         userId
-        parentId
         description
         group
+        parentId
+        receiver
         isReply
         createdAt
         updatedAt
@@ -300,7 +302,7 @@ export const listPosts = /* GraphQL */ `
 `;
 export const postsByGroup = /* GraphQL */ `
   query PostsByGroup(
-    $group: String
+    $group: ID
     $parentIdIsReplyTimestamp: ModelPostByGroupCompositeKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelPostFilterInput
@@ -318,9 +320,10 @@ export const postsByGroup = /* GraphQL */ `
       items {
         timestamp
         userId
-        parentId
         description
         group
+        parentId
+        receiver
         isReply
         createdAt
         updatedAt
@@ -349,9 +352,42 @@ export const postsByParentId = /* GraphQL */ `
       items {
         timestamp
         userId
-        parentId
         description
         group
+        parentId
+        receiver
+        isReply
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const postsByReceiver = /* GraphQL */ `
+  query PostsByReceiver(
+    $receiver: ID
+    $timestamp: ModelIntKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelPostFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    postsByReceiver(
+      receiver: $receiver
+      timestamp: $timestamp
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        timestamp
+        userId
+        description
+        group
+        parentId
+        receiver
         isReply
         createdAt
         updatedAt

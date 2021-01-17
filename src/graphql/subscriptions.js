@@ -165,9 +165,10 @@ export const onCreatePost = /* GraphQL */ `
     onCreatePost {
       timestamp
       userId
-      parentId
       description
       group
+      parentId
+      receiver
       isReply
       createdAt
       updatedAt
@@ -179,9 +180,10 @@ export const onUpdatePost = /* GraphQL */ `
     onUpdatePost {
       timestamp
       userId
-      parentId
       description
       group
+      parentId
+      receiver
       isReply
       createdAt
       updatedAt
@@ -193,9 +195,10 @@ export const onDeletePost = /* GraphQL */ `
     onDeletePost {
       timestamp
       userId
-      parentId
       description
       group
+      parentId
+      receiver
       isReply
       createdAt
       updatedAt

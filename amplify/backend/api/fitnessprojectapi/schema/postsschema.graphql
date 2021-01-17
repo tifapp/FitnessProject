@@ -14,12 +14,14 @@ type Post @model
 @key(fields: ["timestamp", "userId"])
 @key(name: "ByGroup", fields: ["group", "parentId", "isReply", "timestamp"], queryField: "postsByGroup")
 @key(name: "ByParentId", fields: ["parentId", "isReply"], queryField: "postsByParentId")
+@key(name: "ByReceiver", fields: ["receiver", "timestamp"], queryField: "postsByReceiver")
 {
   timestamp: AWSTimestamp!
-  userId: String!
-  parentId: String
+  userId: ID!
   description: String
-  group: String
+  group: ID
+  parentId: String
+  receiver: ID
   isReply: Int
 }
 
