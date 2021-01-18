@@ -18,7 +18,7 @@ import {
 import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
 import { Amplify, API, graphqlOperation } from "aws-amplify";
 import { createPost, updatePost, deletePost } from "root/src/graphql/mutations";
-import { listPosts, postsByGroup } from "root/src/graphql/queries";
+import { listPosts, postsByChannel } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
 import { onCreatePost, onDeletePost, onUpdatePost } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
@@ -120,7 +120,7 @@ export default function FeedScreen({ navigation, route }) {
       setPosts(tempposts);
 
       try {
-        await API.graphql(graphqlOperation(updatePost, { input: { createdAt: updatePostID, userId: route.params?.id, description: postVal } }));
+        await API.graphql(graphqlOperation(updatePost, { input: { createdAt: updatePostID, description: postVal } }));
         console.log("success in updating a post");
       } catch (err) {
         console.log("error in updating post: ", err);
@@ -132,7 +132,6 @@ export default function FeedScreen({ navigation, route }) {
     else {
       console.log("attempting to make new post");
       const newPost = {
-        userId: route.params?.id,
         parentId: Date.now().toString() + route.params?.id,
         description: postVal,
         channel: channel,
@@ -158,7 +157,6 @@ export default function FeedScreen({ navigation, route }) {
     console.log("*******************");
 
     const newPost = {
-      userId: route.params?.id,
       parentId: postID.toString(),
       description: postVal,
       channel: channel,
@@ -301,7 +299,6 @@ export default function FeedScreen({ navigation, route }) {
             setUpdatePostID={setUpdatePostID}
           />
         )}
-        keyExtractor={(item, index) => item.createdAt.toString() + item.userId}
       />
 
       <StatusBar style="auto" />

@@ -150,7 +150,6 @@ const FriendScreen = ({ route, navigation }) => {
                                 }]
                             }}}
                             setDataFunction={setFriendList}
-                            keyExtractor={(item) => item.timestamp.toString()}
                             data={friendList}
                             renderItem={({ item }) => (
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%' }}>
@@ -178,7 +177,6 @@ const FriendScreen = ({ route, navigation }) => {
                             queryOperation={friendRequestsByReceiver}
                             filter={{receiver: route.params?.id}}
                             setDataFunction={setFriendRequestList}
-                            keyExtractor={(item) => item.sender}
                             data={friendRequestList}
                             renderItem={({ item }) => (
                                 <View style={{ marginVertical: 5 }}>

@@ -327,7 +327,6 @@ const LookupUser = ({ route, navigation }) => {
                 }}
                 setDataFunction={setMutualFriendList}
                 processingFunction={collectMutualFriends}
-                keyExtractor={(item, index) => item}
                 renderItem={({ item }) => (
                   <View style={{ marginVertical: 5 }}>
                     <View style={{ flexDirection: 'row', alignSelf: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%' }}>
