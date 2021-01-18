@@ -115,51 +115,6 @@ export const onDeleteFriendship = /* GraphQL */ `
     }
   }
 `;
-export const onCreateMessage = /* GraphQL */ `
-  subscription OnCreateMessage($receiver: String, $userId: String) {
-    onCreateMessage(receiver: $receiver, userId: $userId) {
-      createdTimestamp
-      updatedTimestamp
-      userId
-      parentId
-      description
-      receiver
-      isReply
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const onUpdateMessage = /* GraphQL */ `
-  subscription OnUpdateMessage($receiver: String, $userId: String) {
-    onUpdateMessage(receiver: $receiver, userId: $userId) {
-      createdTimestamp
-      updatedTimestamp
-      userId
-      parentId
-      description
-      receiver
-      isReply
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const onDeleteMessage = /* GraphQL */ `
-  subscription OnDeleteMessage($receiver: String, $userId: String) {
-    onDeleteMessage(receiver: $receiver, userId: $userId) {
-      createdTimestamp
-      updatedTimestamp
-      userId
-      parentId
-      description
-      receiver
-      isReply
-      createdAt
-      updatedAt
-    }
-  }
-`;
 export const onCreatePost = /* GraphQL */ `
   subscription OnCreatePost {
     onCreatePost {

@@ -7,7 +7,8 @@ type Post @model
 @auth(
   rules: [
       { allow: private, operations: [read] },
-      { allow: owner, ownerField: "userId", operations: [create, update, delete, read] },
+      { allow: owner, ownerField: "userId" },
+      { allow: owner, ownerField: "receiver", operations: [delete, read] },
       { allow: private, provider: iam, operations: [read, delete] },
   ]
 )
