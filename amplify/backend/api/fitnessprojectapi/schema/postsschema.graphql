@@ -30,9 +30,10 @@ type Post @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
 This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when creating a new message.
 """
 input CreatePostInput {
-  parentId: String
   description: String
+  parentId: String
   channel: ID
+  isMessage: Boolean
   isParent: Int
 }
 
@@ -41,8 +42,8 @@ This allows us to fill in the missing fields in the backend rather than letting 
 """
 input UpdatePostInput {
   createdAt: AWSDateTime!
-  parentId: String
   description: String
+  parentId: String
   channel: ID
 }
 
