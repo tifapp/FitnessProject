@@ -4,15 +4,14 @@
 export const batchDeletePosts = /* GraphQL */ `
   mutation BatchDeletePosts($posts: [DeletePostInput]) {
     batchDeletePosts(posts: $posts) {
-      timestamp
-      userId
-      description
-      group
-      parentId
-      receiver
-      isReply
       createdAt
       updatedAt
+      userId
+      description
+      parentId
+      channel
+      isMessage
+      isParent
     }
   }
 `;
@@ -120,15 +119,14 @@ export const createPost = /* GraphQL */ `
     $condition: ModelPostConditionInput
   ) {
     createPost(input: $input, condition: $condition) {
-      timestamp
-      userId
-      description
-      group
-      parentId
-      receiver
-      isReply
       createdAt
       updatedAt
+      userId
+      description
+      parentId
+      channel
+      isMessage
+      isParent
     }
   }
 `;
@@ -138,15 +136,14 @@ export const updatePost = /* GraphQL */ `
     $condition: ModelPostConditionInput
   ) {
     updatePost(input: $input, condition: $condition) {
-      timestamp
-      userId
-      description
-      group
-      parentId
-      receiver
-      isReply
       createdAt
       updatedAt
+      userId
+      description
+      parentId
+      channel
+      isMessage
+      isParent
     }
   }
 `;
@@ -262,15 +259,14 @@ export const deletePost = /* GraphQL */ `
     $condition: ModelPostConditionInput
   ) {
     deletePost(input: $input, condition: $condition) {
-      timestamp
-      userId
-      description
-      group
-      parentId
-      receiver
-      isReply
       createdAt
       updatedAt
+      userId
+      description
+      parentId
+      channel
+      isMessage
+      isParent
     }
   }
 `;

@@ -207,23 +207,22 @@ export const friendsBySecondUser = /* GraphQL */ `
   }
 `;
 export const getPost = /* GraphQL */ `
-  query GetPost($timestamp: AWSTimestamp!, $userId: ID!) {
-    getPost(timestamp: $timestamp, userId: $userId) {
-      timestamp
-      userId
-      description
-      group
-      parentId
-      receiver
-      isReply
+  query GetPost($createdAt: AWSDateTime!, $userId: ID!) {
+    getPost(createdAt: $createdAt, userId: $userId) {
       createdAt
       updatedAt
+      userId
+      description
+      parentId
+      channel
+      isMessage
+      isParent
     }
   }
 `;
 export const listPosts = /* GraphQL */ `
   query ListPosts(
-    $timestamp: AWSTimestamp
+    $createdAt: AWSDateTime
     $userId: ModelIDKeyConditionInput
     $filter: ModelPostFilterInput
     $limit: Int
@@ -231,7 +230,7 @@ export const listPosts = /* GraphQL */ `
     $sortDirection: ModelSortDirection
   ) {
     listPosts(
-      timestamp: $timestamp
+      createdAt: $createdAt
       userId: $userId
       filter: $filter
       limit: $limit
@@ -239,47 +238,45 @@ export const listPosts = /* GraphQL */ `
       sortDirection: $sortDirection
     ) {
       items {
-        timestamp
-        userId
-        description
-        group
-        parentId
-        receiver
-        isReply
         createdAt
         updatedAt
+        userId
+        description
+        parentId
+        channel
+        isMessage
+        isParent
       }
       nextToken
     }
   }
 `;
-export const postsByGroup = /* GraphQL */ `
-  query PostsByGroup(
-    $group: ID
-    $parentIdIsReplyTimestamp: ModelPostByGroupCompositeKeyConditionInput
+export const postsByChannel = /* GraphQL */ `
+  query PostsByChannel(
+    $channel: ID
+    $parentIdIsParentCreatedAt: ModelPostByChannelCompositeKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelPostFilterInput
     $limit: Int
     $nextToken: String
   ) {
-    postsByGroup(
-      group: $group
-      parentIdIsReplyTimestamp: $parentIdIsReplyTimestamp
+    postsByChannel(
+      channel: $channel
+      parentIdIsParentCreatedAt: $parentIdIsParentCreatedAt
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit
       nextToken: $nextToken
     ) {
       items {
-        timestamp
-        userId
-        description
-        group
-        parentId
-        receiver
-        isReply
         createdAt
         updatedAt
+        userId
+        description
+        parentId
+        channel
+        isMessage
+        isParent
       }
       nextToken
     }
@@ -288,7 +285,7 @@ export const postsByGroup = /* GraphQL */ `
 export const postsByParentId = /* GraphQL */ `
   query PostsByParentId(
     $parentId: String
-    $isReply: ModelIntKeyConditionInput
+    $isParent: ModelIntKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelPostFilterInput
     $limit: Int
@@ -296,54 +293,21 @@ export const postsByParentId = /* GraphQL */ `
   ) {
     postsByParentId(
       parentId: $parentId
-      isReply: $isReply
+      isParent: $isParent
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit
       nextToken: $nextToken
     ) {
       items {
-        timestamp
-        userId
-        description
-        group
-        parentId
-        receiver
-        isReply
         createdAt
         updatedAt
-      }
-      nextToken
-    }
-  }
-`;
-export const postsByReceiver = /* GraphQL */ `
-  query PostsByReceiver(
-    $receiver: ID
-    $timestamp: ModelIntKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelPostFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    postsByReceiver(
-      receiver: $receiver
-      timestamp: $timestamp
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        timestamp
         userId
         description
-        group
         parentId
-        receiver
-        isReply
-        createdAt
-        updatedAt
+        channel
+        isMessage
+        isParent
       }
       nextToken
     }

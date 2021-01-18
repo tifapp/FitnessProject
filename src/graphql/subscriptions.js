@@ -118,45 +118,42 @@ export const onDeleteFriendship = /* GraphQL */ `
 export const onCreatePost = /* GraphQL */ `
   subscription OnCreatePost {
     onCreatePost {
-      timestamp
-      userId
-      description
-      group
-      parentId
-      receiver
-      isReply
       createdAt
       updatedAt
+      userId
+      description
+      parentId
+      channel
+      isMessage
+      isParent
     }
   }
 `;
 export const onUpdatePost = /* GraphQL */ `
   subscription OnUpdatePost {
     onUpdatePost {
-      timestamp
-      userId
-      description
-      group
-      parentId
-      receiver
-      isReply
       createdAt
       updatedAt
+      userId
+      description
+      parentId
+      channel
+      isMessage
+      isParent
     }
   }
 `;
 export const onDeletePost = /* GraphQL */ `
   subscription OnDeletePost {
     onDeletePost {
-      timestamp
-      userId
-      description
-      group
-      parentId
-      receiver
-      isReply
       createdAt
       updatedAt
+      userId
+      description
+      parentId
+      channel
+      isMessage
+      isParent
     }
   }
 `;

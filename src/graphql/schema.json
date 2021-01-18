@@ -470,14 +470,14 @@
           "name" : "getPost",
           "description" : null,
           "args" : [ {
-            "name" : "timestamp",
+            "name" : "createdAt",
             "description" : null,
             "type" : {
               "kind" : "NON_NULL",
               "name" : null,
               "ofType" : {
                 "kind" : "SCALAR",
-                "name" : "AWSTimestamp",
+                "name" : "AWSDateTime",
                 "ofType" : null
               }
             },
@@ -507,11 +507,11 @@
           "name" : "listPosts",
           "description" : null,
           "args" : [ {
-            "name" : "timestamp",
+            "name" : "createdAt",
             "description" : null,
             "type" : {
               "kind" : "SCALAR",
-              "name" : "AWSTimestamp",
+              "name" : "AWSDateTime",
               "ofType" : null
             },
             "defaultValue" : null
@@ -569,10 +569,10 @@
           "isDeprecated" : false,
           "deprecationReason" : null
         }, {
-          "name" : "postsByGroup",
+          "name" : "postsByChannel",
           "description" : null,
           "args" : [ {
-            "name" : "group",
+            "name" : "channel",
             "description" : null,
             "type" : {
               "kind" : "SCALAR",
@@ -581,11 +581,11 @@
             },
             "defaultValue" : null
           }, {
-            "name" : "parentIdIsReplyTimestamp",
+            "name" : "parentIdIsParentCreatedAt",
             "description" : null,
             "type" : {
               "kind" : "INPUT_OBJECT",
-              "name" : "ModelPostByGroupCompositeKeyConditionInput",
+              "name" : "ModelPostByChannelCompositeKeyConditionInput",
               "ofType" : null
             },
             "defaultValue" : null
@@ -646,72 +646,7 @@
             },
             "defaultValue" : null
           }, {
-            "name" : "isReply",
-            "description" : null,
-            "type" : {
-              "kind" : "INPUT_OBJECT",
-              "name" : "ModelIntKeyConditionInput",
-              "ofType" : null
-            },
-            "defaultValue" : null
-          }, {
-            "name" : "sortDirection",
-            "description" : null,
-            "type" : {
-              "kind" : "ENUM",
-              "name" : "ModelSortDirection",
-              "ofType" : null
-            },
-            "defaultValue" : null
-          }, {
-            "name" : "filter",
-            "description" : null,
-            "type" : {
-              "kind" : "INPUT_OBJECT",
-              "name" : "ModelPostFilterInput",
-              "ofType" : null
-            },
-            "defaultValue" : null
-          }, {
-            "name" : "limit",
-            "description" : null,
-            "type" : {
-              "kind" : "SCALAR",
-              "name" : "Int",
-              "ofType" : null
-            },
-            "defaultValue" : null
-          }, {
-            "name" : "nextToken",
-            "description" : null,
-            "type" : {
-              "kind" : "SCALAR",
-              "name" : "String",
-              "ofType" : null
-            },
-            "defaultValue" : null
-          } ],
-          "type" : {
-            "kind" : "OBJECT",
-            "name" : "ModelPostConnection",
-            "ofType" : null
-          },
-          "isDeprecated" : false,
-          "deprecationReason" : null
-        }, {
-          "name" : "postsByReceiver",
-          "description" : null,
-          "args" : [ {
-            "name" : "receiver",
-            "description" : null,
-            "type" : {
-              "kind" : "SCALAR",
-              "name" : "ID",
-              "ofType" : null
-            },
-            "defaultValue" : null
-          }, {
-            "name" : "timestamp",
+            "name" : "isParent",
             "description" : null,
             "type" : {
               "kind" : "INPUT_OBJECT",
@@ -2997,7 +2932,7 @@
         "name" : "Post",
         "description" : null,
         "fields" : [ {
-          "name" : "timestamp",
+          "name" : "createdAt",
           "description" : null,
           "args" : [ ],
           "type" : {
@@ -3005,7 +2940,22 @@
             "name" : null,
             "ofType" : {
               "kind" : "SCALAR",
-              "name" : "AWSTimestamp",
+              "name" : "AWSDateTime",
+              "ofType" : null
+            }
+          },
+          "isDeprecated" : false,
+          "deprecationReason" : null
+        }, {
+          "name" : "updatedAt",
+          "description" : null,
+          "args" : [ ],
+          "type" : {
+            "kind" : "NON_NULL",
+            "name" : null,
+            "ofType" : {
+              "kind" : "SCALAR",
+              "name" : "AWSDateTime",
               "ofType" : null
             }
           },
@@ -3038,17 +2988,6 @@
           "isDeprecated" : false,
           "deprecationReason" : null
         }, {
-          "name" : "group",
-          "description" : null,
-          "args" : [ ],
-          "type" : {
-            "kind" : "SCALAR",
-            "name" : "ID",
-            "ofType" : null
-          },
-          "isDeprecated" : false,
-          "deprecationReason" : null
-        }, {
           "name" : "parentId",
           "description" : null,
           "args" : [ ],
@@ -3060,7 +2999,7 @@
           "isDeprecated" : false,
           "deprecationReason" : null
         }, {
-          "name" : "receiver",
+          "name" : "channel",
           "description" : null,
           "args" : [ ],
           "type" : {
@@ -3071,43 +3010,24 @@
           "isDeprecated" : false,
           "deprecationReason" : null
         }, {
-          "name" : "isReply",
+          "name" : "isMessage",
+          "description" : null,
+          "args" : [ ],
+          "type" : {
+            "kind" : "SCALAR",
+            "name" : "Boolean",
+            "ofType" : null
+          },
+          "isDeprecated" : false,
+          "deprecationReason" : null
+        }, {
+          "name" : "isParent",
           "description" : null,
           "args" : [ ],
           "type" : {
             "kind" : "SCALAR",
             "name" : "Int",
             "ofType" : null
-          },
-          "isDeprecated" : false,
-          "deprecationReason" : null
-        }, {
-          "name" : "createdAt",
-          "description" : null,
-          "args" : [ ],
-          "type" : {
-            "kind" : "NON_NULL",
-            "name" : null,
-            "ofType" : {
-              "kind" : "SCALAR",
-              "name" : "AWSDateTime",
-              "ofType" : null
-            }
-          },
-          "isDeprecated" : false,
-          "deprecationReason" : null
-        }, {
-          "name" : "updatedAt",
-          "description" : null,
-          "args" : [ ],
-          "type" : {
-            "kind" : "NON_NULL",
-            "name" : null,
-            "ofType" : {
-              "kind" : "SCALAR",
-              "name" : "AWSDateTime",
-              "ofType" : null
-            }
           },
           "isDeprecated" : false,
           "deprecationReason" : null
@@ -3157,11 +3077,20 @@
         "description" : null,
         "fields" : null,
         "inputFields" : [ {
-          "name" : "timestamp",
+          "name" : "createdAt",
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
-            "name" : "ModelIntInput",
+            "name" : "ModelStringInput",
+            "ofType" : null
+          },
+          "defaultValue" : null
+        }, {
+          "name" : "updatedAt",
+          "description" : null,
+          "type" : {
+            "kind" : "INPUT_OBJECT",
+            "name" : "ModelStringInput",
             "ofType" : null
           },
           "defaultValue" : null
@@ -3184,15 +3113,6 @@
           },
           "defaultValue" : null
         }, {
-          "name" : "group",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelIDInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
           "name" : "parentId",
           "description" : null,
           "type" : {
@@ -3202,7 +3122,7 @@
           },
           "defaultValue" : null
         }, {
-          "name" : "receiver",
+          "name" : "channel",
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
@@ -3211,7 +3131,16 @@
           },
           "defaultValue" : null
         }, {
-          "name" : "isReply",
+          "name" : "isMessage",
+          "description" : null,
+          "type" : {
+            "kind" : "INPUT_OBJECT",
+            "name" : "ModelBooleanInput",
+            "ofType" : null
+          },
+          "defaultValue" : null
+        }, {
+          "name" : "isParent",
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
@@ -3260,7 +3189,52 @@
         "possibleTypes" : null
       }, {
         "kind" : "INPUT_OBJECT",
-        "name" : "ModelPostByGroupCompositeKeyConditionInput",
+        "name" : "ModelBooleanInput",
+        "description" : null,
+        "fields" : null,
+        "inputFields" : [ {
+          "name" : "ne",
+          "description" : null,
+          "type" : {
+            "kind" : "SCALAR",
+            "name" : "Boolean",
+            "ofType" : null
+          },
+          "defaultValue" : null
+        }, {
+          "name" : "eq",
+          "description" : null,
+          "type" : {
+            "kind" : "SCALAR",
+            "name" : "Boolean",
+            "ofType" : null
+          },
+          "defaultValue" : null
+        }, {
+          "name" : "attributeExists",
+          "description" : null,
+          "type" : {
+            "kind" : "SCALAR",
+            "name" : "Boolean",
+            "ofType" : null
+          },
+          "defaultValue" : null
+        }, {
+          "name" : "attributeType",
+          "description" : null,
+          "type" : {
+            "kind" : "ENUM",
+            "name" : "ModelAttributeTypes",
+            "ofType" : null
+          },
+          "defaultValue" : null
+        } ],
+        "interfaces" : null,
+        "enumValues" : null,
+        "possibleTypes" : null
+      }, {
+        "kind" : "INPUT_OBJECT",
+        "name" : "ModelPostByChannelCompositeKeyConditionInput",
         "description" : null,
         "fields" : null,
         "inputFields" : [ {
@@ -3268,7 +3242,7 @@
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
-            "name" : "ModelPostByGroupCompositeKeyInput",
+            "name" : "ModelPostByChannelCompositeKeyInput",
             "ofType" : null
           },
           "defaultValue" : null
@@ -3277,7 +3251,7 @@
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
-            "name" : "ModelPostByGroupCompositeKeyInput",
+            "name" : "ModelPostByChannelCompositeKeyInput",
             "ofType" : null
           },
           "defaultValue" : null
@@ -3286,7 +3260,7 @@
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
-            "name" : "ModelPostByGroupCompositeKeyInput",
+            "name" : "ModelPostByChannelCompositeKeyInput",
             "ofType" : null
           },
           "defaultValue" : null
@@ -3295,7 +3269,7 @@
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
-            "name" : "ModelPostByGroupCompositeKeyInput",
+            "name" : "ModelPostByChannelCompositeKeyInput",
             "ofType" : null
           },
           "defaultValue" : null
@@ -3304,7 +3278,7 @@
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
-            "name" : "ModelPostByGroupCompositeKeyInput",
+            "name" : "ModelPostByChannelCompositeKeyInput",
             "ofType" : null
           },
           "defaultValue" : null
@@ -3316,7 +3290,7 @@
             "name" : null,
             "ofType" : {
               "kind" : "INPUT_OBJECT",
-              "name" : "ModelPostByGroupCompositeKeyInput",
+              "name" : "ModelPostByChannelCompositeKeyInput",
               "ofType" : null
             }
           },
@@ -3326,7 +3300,7 @@
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
-            "name" : "ModelPostByGroupCompositeKeyInput",
+            "name" : "ModelPostByChannelCompositeKeyInput",
             "ofType" : null
           },
           "defaultValue" : null
@@ -3336,7 +3310,7 @@
         "possibleTypes" : null
       }, {
         "kind" : "INPUT_OBJECT",
-        "name" : "ModelPostByGroupCompositeKeyInput",
+        "name" : "ModelPostByChannelCompositeKeyInput",
         "description" : null,
         "fields" : null,
         "inputFields" : [ {
@@ -3349,7 +3323,7 @@
           },
           "defaultValue" : null
         }, {
-          "name" : "isReply",
+          "name" : "isParent",
           "description" : null,
           "type" : {
             "kind" : "SCALAR",
@@ -3358,11 +3332,11 @@
           },
           "defaultValue" : null
         }, {
-          "name" : "timestamp",
+          "name" : "createdAt",
           "description" : null,
           "type" : {
             "kind" : "SCALAR",
-            "name" : "Int",
+            "name" : "String",
             "ofType" : null
           },
           "defaultValue" : null
@@ -4567,14 +4541,14 @@
         "description" : null,
         "fields" : null,
         "inputFields" : [ {
-          "name" : "timestamp",
+          "name" : "createdAt",
           "description" : null,
           "type" : {
             "kind" : "NON_NULL",
             "name" : null,
             "ofType" : {
               "kind" : "SCALAR",
-              "name" : "AWSTimestamp",
+              "name" : "AWSDateTime",
               "ofType" : null
             }
           },
@@ -5098,29 +5072,12 @@
         "description" : null,
         "fields" : null,
         "inputFields" : [ {
-          "name" : "timestamp",
+          "name" : "parentId",
           "description" : null,
           "type" : {
-            "kind" : "NON_NULL",
-            "name" : null,
-            "ofType" : {
-              "kind" : "SCALAR",
-              "name" : "AWSTimestamp",
-              "ofType" : null
-            }
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "userId",
-          "description" : null,
-          "type" : {
-            "kind" : "NON_NULL",
-            "name" : null,
-            "ofType" : {
-              "kind" : "SCALAR",
-              "name" : "ID",
-              "ofType" : null
-            }
+            "kind" : "SCALAR",
+            "name" : "String",
+            "ofType" : null
           },
           "defaultValue" : null
         }, {
@@ -5133,7 +5090,7 @@
           },
           "defaultValue" : null
         }, {
-          "name" : "group",
+          "name" : "channel",
           "description" : null,
           "type" : {
             "kind" : "SCALAR",
@@ -5142,25 +5099,7 @@
           },
           "defaultValue" : null
         }, {
-          "name" : "parentId",
-          "description" : null,
-          "type" : {
-            "kind" : "SCALAR",
-            "name" : "String",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "receiver",
-          "description" : null,
-          "type" : {
-            "kind" : "SCALAR",
-            "name" : "ID",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "isReply",
+          "name" : "isParent",
           "description" : null,
           "type" : {
             "kind" : "SCALAR",
@@ -5178,7 +5117,7 @@
         "description" : null,
         "fields" : null,
         "inputFields" : [ {
-          "name" : "description",
+          "name" : "updatedAt",
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
@@ -5187,11 +5126,11 @@
           },
           "defaultValue" : null
         }, {
-          "name" : "group",
+          "name" : "description",
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
-            "name" : "ModelIDInput",
+            "name" : "ModelStringInput",
             "ofType" : null
           },
           "defaultValue" : null
@@ -5205,7 +5144,16 @@
           },
           "defaultValue" : null
         }, {
-          "name" : "isReply",
+          "name" : "isMessage",
+          "description" : null,
+          "type" : {
+            "kind" : "INPUT_OBJECT",
+            "name" : "ModelBooleanInput",
+            "ofType" : null
+          },
+          "defaultValue" : null
+        }, {
+          "name" : "isParent",
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
@@ -5258,47 +5206,16 @@
         "description" : null,
         "fields" : null,
         "inputFields" : [ {
-          "name" : "timestamp",
+          "name" : "createdAt",
           "description" : null,
           "type" : {
             "kind" : "NON_NULL",
             "name" : null,
             "ofType" : {
               "kind" : "SCALAR",
-              "name" : "AWSTimestamp",
+              "name" : "AWSDateTime",
               "ofType" : null
             }
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "userId",
-          "description" : null,
-          "type" : {
-            "kind" : "NON_NULL",
-            "name" : null,
-            "ofType" : {
-              "kind" : "SCALAR",
-              "name" : "ID",
-              "ofType" : null
-            }
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "description",
-          "description" : null,
-          "type" : {
-            "kind" : "SCALAR",
-            "name" : "String",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "group",
-          "description" : null,
-          "type" : {
-            "kind" : "SCALAR",
-            "name" : "ID",
-            "ofType" : null
           },
           "defaultValue" : null
         }, {
@@ -5311,20 +5228,20 @@
           },
           "defaultValue" : null
         }, {
-          "name" : "receiver",
+          "name" : "description",
           "description" : null,
           "type" : {
             "kind" : "SCALAR",
-            "name" : "ID",
+            "name" : "String",
             "ofType" : null
           },
           "defaultValue" : null
         }, {
-          "name" : "isReply",
+          "name" : "channel",
           "description" : null,
           "type" : {
             "kind" : "SCALAR",
-            "name" : "Int",
+            "name" : "ID",
             "ofType" : null
           },
           "defaultValue" : null
@@ -6052,51 +5969,6 @@
         } ],
         "inputFields" : null,
         "interfaces" : [ ],
-        "enumValues" : null,
-        "possibleTypes" : null
-      }, {
-        "kind" : "INPUT_OBJECT",
-        "name" : "ModelBooleanInput",
-        "description" : null,
-        "fields" : null,
-        "inputFields" : [ {
-          "name" : "ne",
-          "description" : null,
-          "type" : {
-            "kind" : "SCALAR",
-            "name" : "Boolean",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "eq",
-          "description" : null,
-          "type" : {
-            "kind" : "SCALAR",
-            "name" : "Boolean",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "attributeExists",
-          "description" : null,
-          "type" : {
-            "kind" : "SCALAR",
-            "name" : "Boolean",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "attributeType",
-          "description" : null,
-          "type" : {
-            "kind" : "ENUM",
-            "name" : "ModelAttributeTypes",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        } ],
-        "interfaces" : null,
         "enumValues" : null,
         "possibleTypes" : null
       }, {
@@ -6960,23 +6832,6 @@
         "onFragment" : false,
         "onField" : false
       }, {
-        "name" : "deprecated",
-        "description" : null,
-        "locations" : [ "FIELD_DEFINITION", "ENUM_VALUE" ],
-        "args" : [ {
-          "name" : "reason",
-          "description" : null,
-          "type" : {
-            "kind" : "SCALAR",
-            "name" : "String",
-            "ofType" : null
-          },
-          "defaultValue" : "\"No longer supported\""
-        } ],
-        "onOperation" : false,
-        "onFragment" : false,
-        "onField" : false
-      }, {
         "name" : "aws_auth",
         "description" : "Directs the schema to enforce authorization on a field",
         "locations" : [ "FIELD_DEFINITION" ],
@@ -6993,6 +6848,23 @@
             }
           },
           "defaultValue" : null
+        } ],
+        "onOperation" : false,
+        "onFragment" : false,
+        "onField" : false
+      }, {
+        "name" : "deprecated",
+        "description" : null,
+        "locations" : [ "FIELD_DEFINITION", "ENUM_VALUE" ],
+        "args" : [ {
+          "name" : "reason",
+          "description" : null,
+          "type" : {
+            "kind" : "SCALAR",
+            "name" : "String",
+            "ofType" : null
+          },
+          "defaultValue" : "\"No longer supported\""
         } ],
         "onOperation" : false,
         "onFragment" : false,

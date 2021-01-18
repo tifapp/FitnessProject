@@ -20,7 +20,7 @@ export default function ListGroupItem({ item, matchingname }) {
 
   const goToGroupPosts = () => {
     console.log(item);
-    navigation.navigate('Group Posts Screen', {group: item})
+    navigation.navigate('Group Posts Screen', {channel: item.id})
   }
 
   if (item.Privacy == "Public") {

@@ -186,7 +186,7 @@ const App = () => {
           <Tab.Screen
             name="Feed"
             component={FeedStack}
-            initialParams={{id: userId}}
+            initialParams={{id: userId, channel: 'general'}}
             options={{
               headerShown: false,
             }}

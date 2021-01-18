@@ -33,7 +33,7 @@ Amplify.configure(awsconfig);
 var styles = require('styles/stylesheet');
 
 export default function FeedScreen({ navigation, route }) {
-  const { group } = route.params;
+  const { channel, isMessage } = route.params; //either user id or group id
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
   const numCharsLeft = 1000 - postVal.length;
@@ -74,19 +74,10 @@ export default function FeedScreen({ navigation, route }) {
     await API.graphql(graphqlOperation(onCreatePost)).subscribe({
       next: event => {
         const newPost = event.value.data.onCreatePost
-        console.log("found new post!", newPost);
-        console.log("made by us? ", newPost.userId == route.params?.id);
-        console.log("in our group? ", (group != null ? newPost.group == group.id : 'general' == newPost.group));
-        if (newPost.userId != route.params?.id && (group != null ? newPost.group == group.id : 'general' == newPost.group)) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
-          if (newPost.isReply == 0) {
-            /*
+        if (newPost.userId != route.params?.id && newPost.channel == channel) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
+          if (newPost.isParent == 0 && currentPosts.current.find(post => post.parentId === newPost.parentId)) {
             let tempposts = [...currentPosts.current];
-            var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId == newPost.parentId)]);
-            console.log("Index: " + index);
-  
-            */
-            let tempposts = [...currentPosts.current];
-            var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.timestamp.toString() + p.userId == newPost.parentId)]); // p.userId + "#" + p.timestamp.toString()
+            var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId === newPost.parentId)]);
             tempposts.splice(index + 1, 0, newPost);
             setPosts(tempposts);
           }
@@ -120,16 +111,16 @@ export default function FeedScreen({ navigation, route }) {
   // This function now also has functionality for updating a post
   // We can separate updating functionality from adding functionality if it
   // becomes an issue later on.
-  const addPostAsync = async (val) => {
+  const addPostAsync = async () => {
     checkInternetConnection();
     if (updatePostID != 0) {
       //replace the post locally
       let tempposts = [...posts];
-      tempposts[tempposts.findIndex(p => p.timestamp == updatePostID && p.userId == route.params?.id)].description = postVal;
+      tempposts[tempposts.findIndex(p => p.createdAt == updatePostID && p.userId == route.params?.id)].description = postVal;
       setPosts(tempposts);
 
       try {
-        await API.graphql(graphqlOperation(updatePost, { input: { timestamp: updatePostID, userId: route.params?.id, description: postVal } }));
+        await API.graphql(graphqlOperation(updatePost, { input: { createdAt: updatePostID, userId: route.params?.id, description: postVal } }));
         console.log("success in updating a post");
       } catch (err) {
         console.log("error in updating post: ", err);
@@ -141,19 +132,19 @@ export default function FeedScreen({ navigation, route }) {
     else {
       console.log("attempting to make new post");
       const newPost = {
-        timestamp: Math.floor(Date.now() / 1000),
         userId: route.params?.id,
-        parentId: Math.floor(Date.now() / 1000).toString() + route.params?.id,
+        parentId: Date.now().toString() + route.params?.id,
         description: postVal,
-        group: group != null ? group.id : 'general',
-        isReply: 1,
+        channel: channel,
+        isMessage: isMessage,
+        isParent: 1,
       };
       setPostVal("");
 
       setPosts([newPost, ...posts]);
       try {
         await API.graphql(graphqlOperation(createPost, { input: newPost }));
-        console.log("success in making a new post, group is false? ", group == null);
+        console.log("success in making a new post, channel is false? ", channel == null);
       } catch (err) {
         console.log("error in creating post: ", err);
       }
@@ -167,19 +158,18 @@ export default function FeedScreen({ navigation, route }) {
     console.log("*******************");
 
     const newPost = {
-      timestamp: Math.floor(Date.now() / 1000),
       userId: route.params?.id,
       parentId: postID.toString(),
       description: postVal,
-      group: group != null ? group.id : 'general',
-      isReply: 0,
+      channel: channel,
+      isMessage: isMessage,
+      isParent: 0,
     };
 
     setPostVal("");
 
     try {
       await API.graphql(graphqlOperation(createPost, { input: newPost }));
-      console.log("success in making a new post, group is false? ", group == null);
     } catch (err) {
       console.log("error in creating post: ", err);
     }
@@ -188,7 +178,7 @@ export default function FeedScreen({ navigation, route }) {
     setUpdatePostID(0);
 
     let tempposts = [...currentPosts.current];
-    var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.timestamp.toString() + p.userId == newPost.parentId)]); // p.userId + "#" + p.timestamp.toString()
+    var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId == newPost.parentId)]);
     tempposts.splice(index + 1, 0, newPost);
     setPosts(tempposts);
 
@@ -199,19 +189,18 @@ export default function FeedScreen({ navigation, route }) {
 
     let parent_post = posts.find((item) => {
       //const time = timestamp.toString();
-      return item.timestamp === timestamp;
+      return item.createdAt === timestamp && item.userId === route.params?.id;
     })
 
     console.log("parent post: " + parent_post.description);
 
-    const timeCheck = timestamp.toString();
-    if (parent_post.isReply == 1) {
+    if (parent_post.isParent == 1) {
       setPosts((posts) => {
-        return posts.filter((val) => (val.parentId != timeCheck + parent_post.userId));
+        return posts.filter((val) => (val.parentId != parent_post.parentId));
       });
     } else {
       setPosts((posts) => {
-        return posts.filter((val) => (val.timestamp != parent_post.timestamp && val.userId != parent_post.userId));
+        return posts.filter((val) => (val.createdAt != parent_post.createdAt && val.userId != parent_post.userId));
       });
     }
 
@@ -222,7 +211,7 @@ export default function FeedScreen({ navigation, route }) {
     setUpdatePostID(0);
 
     try {
-      await API.graphql(graphqlOperation(deletePost, { input: { timestamp: timestamp, userId: route.params?.id } }));
+      await API.graphql(graphqlOperation(deletePost, { input: { createdAt: timestamp, userId: route.params?.id } }));
     } catch {
       console.log("error in deleting post: ");
     }
@@ -298,10 +287,10 @@ export default function FeedScreen({ navigation, route }) {
                 </View>
               </View>
         }
-        queryOperation={postsByGroup}
+        queryOperation={postsByChannel}
         setDataFunction={setPosts}
         data={posts}
-        filter={{ group: group != null ? group.id : 'general', sortDirection: 'DESC' }}
+        filter={{ channel: channel, sortDirection: 'DESC' }}
         renderItem={({ item }) => (
           <PostItem
             item={item}
@@ -310,10 +299,9 @@ export default function FeedScreen({ navigation, route }) {
             setPostVal={setPostVal}
             setIsReplying={setIsReplying}
             setUpdatePostID={setUpdatePostID}
-            parentID={item.parentId}
           />
         )}
-        keyExtractor={(item, index) => item.timestamp.toString() + item.userId}
+        keyExtractor={(item, index) => item.createdAt.toString() + item.userId}
       />
 
       <StatusBar style="auto" />
