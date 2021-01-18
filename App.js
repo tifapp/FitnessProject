@@ -8,8 +8,8 @@ import {
 } from "react-native";
 import { withAuthenticator } from "aws-amplify-react-native";
 // Get the aws resources configuration parameters
-import awsconfig from "./aws-exports"; // if you are using Amplify CLI
-import { Amplify, API, graphqlOperation, Auth, Cache } from "aws-amplify";
+import awsconfig from "./src/aws-exports"; // if you are using Amplify CLI
+import { Amplify, API, graphqlOperation, Auth, Cache, Storage } from "aws-amplify";
 import { getUser } from "./src/graphql/queries";
 import FeedStack from "./FeedStack";
 import ProfileTab from "./ProfileTab";
@@ -46,6 +46,9 @@ Amplify.configure({
     disabled: true,
   },
 }); //for some reason this removes the unhandled promise rejection error on startup
+Auth.configure(awsconfig);
+API.configure(awsconfig);
+Storage.configure(awsconfig);
 
 const config = {
   storage: AsyncStorage,

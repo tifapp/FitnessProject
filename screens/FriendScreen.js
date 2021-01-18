@@ -6,8 +6,7 @@ import {
     TouchableOpacity,
 } from "react-native";
 
-import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
-import { Amplify, API, graphqlOperation } from "aws-amplify";
+import { API, graphqlOperation } from "aws-amplify";
 import { listFriendRequests, friendRequestsByReceiver, listFriendships, getFriendship, friendsBySecondUser } from "root/src/graphql/queries";
 import { onCreateFriendRequest, onCreateFriendship } from "root/src/graphql/subscriptions";
 import { createFriendRequest, deleteFriendRequest, deleteFriendship } from "root/src/graphql/mutations";
@@ -16,8 +15,6 @@ import APIList from 'components/APIList';
 
 import { AntDesign } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
-
-Amplify.configure(awsconfig);
 
 var styles = require('styles/stylesheet');
 

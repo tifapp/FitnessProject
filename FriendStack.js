@@ -4,12 +4,6 @@ import FriendScreen from "screens/FriendScreen";
 
 import React from 'react';
 
-// Get the aws resources configuration parameters
-import awsconfig from 'root/aws-exports'; // if you are using Amplify CLI
-import { Amplify } from "aws-amplify";
-
-Amplify.configure(awsconfig);
-
 const Stack = createStackNavigator();
 
 export default function FriendStack({route}) {

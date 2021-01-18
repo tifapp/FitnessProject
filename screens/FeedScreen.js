@@ -15,8 +15,7 @@ import {
   SafeAreaView
 } from "react-native";
 // Get the aws resources configuration parameters
-import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
-import { Amplify, API, graphqlOperation } from "aws-amplify";
+import { API, graphqlOperation } from "aws-amplify";
 import { createPost, updatePost, deletePost } from "root/src/graphql/mutations";
 import { listPosts, postsByChannel } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
@@ -27,8 +26,6 @@ import { AntDesign } from '@expo/vector-icons';
 import { lessThan } from "react-native-reanimated";
 
 require('root/androidtimerfix');
-
-Amplify.configure(awsconfig);
 
 var styles = require('styles/stylesheet');
 

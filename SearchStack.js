@@ -7,12 +7,6 @@ import LookupUserScreen from "screens/LookupUser";
 
 import React from 'react';
 
-// Get the aws resources configuration parameters
-import awsconfig from 'root/aws-exports'; // if you are using Amplify CLI
-import { Amplify } from "aws-amplify";
-
-Amplify.configure(awsconfig);
-
 const Stack = createStackNavigator();
 
 export default function GroupSearchStack({route}) {

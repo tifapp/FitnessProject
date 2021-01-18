@@ -82,8 +82,8 @@
         "Layers": [],
         "Timeout": "25",
         "Code": {
-          "S3Bucket": "amplify-fitnessproject-messages-235206-deployment",
-          "S3Key": "amplify-builds/deleteReplies-565870765169754d7335-build.zip"
+          "S3Bucket": "amplify-fitnessproject-messagetwo-144938-deployment",
+          "S3Key": "amplify-builds/deleteReplies-6632644546582b5a3452-build.zip"
         }
       }
     },
