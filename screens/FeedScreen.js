@@ -254,7 +254,10 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
                           : alert("No text detected in text field");
                       }}
                     >
-                      <Text style={styles.buttonTextStyle}>{updatePostID == 0 ? 'Add Post' : 'Edit Post'}</Text>
+                      <Text style={styles.buttonTextStyle}>{
+                        receiver != null ? 'Send Message'
+                        : updatePostID == 0 ? 'Add Post' : 'Edit Post'
+                      }</Text>
                     </TouchableOpacity> :
                     <View style={{
                       flexDirection: 'row',
