@@ -38,6 +38,7 @@ export default function GroupPostsScreen({ navigation, route }) {
       <FeedScreen
         navigation={navigation}
         route={route}
+        channel={group.id}
       />
     </View>
   );

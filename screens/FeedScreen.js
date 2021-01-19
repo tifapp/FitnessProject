@@ -29,8 +29,7 @@ require('root/androidtimerfix');
 
 var styles = require('styles/stylesheet');
 
-export default function FeedScreen({ navigation, route }) {
-  const { channel, receiver } = route.params; //either user id or group id
+export default function FeedScreen({ navigation, route, receiver, channel }) {
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
   const numCharsLeft = 1000 - postVal.length;
@@ -41,6 +40,10 @@ export default function FeedScreen({ navigation, route }) {
 
   const currentPosts = useRef();
   const scrollRef = useRef(); // Used to help with automatic scrolling to top
+
+  const getChannel = () => {
+    return channel == null ? 'general' : channel
+  }
 
   useEffect(() => {
     waitForNewPostsAsync();
@@ -71,7 +74,7 @@ export default function FeedScreen({ navigation, route }) {
     await API.graphql(graphqlOperation(onCreatePost)).subscribe({
       next: event => {
         const newPost = event.value.data.onCreatePost
-        if (newPost.userId != route.params?.id && newPost.channel == channel) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
+        if (newPost.userId != route.params?.id && newPost.channel == getChannel()) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
           if (newPost.isParent == 0 && currentPosts.current.find(post => post.parentId === newPost.parentId)) {
             let tempposts = [...currentPosts.current];
             var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId === newPost.parentId)]);
@@ -133,7 +136,7 @@ export default function FeedScreen({ navigation, route }) {
       const newPost = {
         parentId: Date.now().toString() + route.params?.id,
         description: postVal,
-        channel: channel,
+        channel: getChannel(),
         isParent: 1,
       };
       if (receiver != null)
@@ -145,7 +148,6 @@ export default function FeedScreen({ navigation, route }) {
       setPosts([{ ...newPost, userId: route.params?.id, createdAt: Date.now() }, ...posts]);
       try {
         await API.graphql(graphqlOperation(createPost, { input: newPost }));
-        console.log("success in making a new post, channel is false? ", channel == null);
       } catch (err) {
         console.log("error in creating post: ", err);
       }
@@ -161,7 +163,7 @@ export default function FeedScreen({ navigation, route }) {
     const newPost = {
       parentId: postID.toString(),
       description: postVal,
-      channel: channel,
+      channel: getChannel(),
       isParent: 0,
     };
     if (receiver != null)
@@ -289,7 +291,7 @@ export default function FeedScreen({ navigation, route }) {
         queryOperation={postsByChannel}
         setDataFunction={setPosts}
         data={posts}
-        filter={{ channel: channel, sortDirection: 'DESC' }}
+        filter={{ channel: getChannel(), sortDirection: 'DESC' }}
         renderItem={({ item }) => (
           <PostItem
             item={item}

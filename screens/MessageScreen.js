@@ -1,4 +1,4 @@
-import React, { useState, useEffect, PureComponent} from "react";
+import React from "react";
 import {
   Text,
   View,
@@ -13,6 +13,7 @@ var styles = require('styles/stylesheet');
 
 export default function MessageScreen({ navigation, route }) {
   const { userId } = route.params;
+  
   //console.log(route.params);
   //console.log(route);
   //have a header with the person's name and profile pic also.
@@ -21,8 +22,8 @@ export default function MessageScreen({ navigation, route }) {
       <FeedScreen
         navigation={navigation}
         route={route}
-        initialParams={{channel: route.params?.id < userId ? route.params?.id+userId : userId+route.params?.id}}
         receiver={userId}
+        channel={route.params?.id < userId ? route.params?.id+userId : userId+route.params?.id}
       />
     </View>
   );
