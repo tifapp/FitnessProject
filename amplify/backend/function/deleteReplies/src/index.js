@@ -5,7 +5,7 @@ const AWSAppSyncClient = require('aws-appsync').default;
 const gql = require('graphql-tag');
 
 const config = {
-  url: "https://lsvxnu7alvawnjevasqpbwk6ni.appsync-api.us-west-2.amazonaws.com/graphql", //still not sure why the apigraphqlendpoint variable is undefined here but not in the friendrequestresolver function
+  url: process.env.API_FITNESSPROJECT_GRAPHQLAPIENDPOINTOUTPUT, //still not sure why the apigraphqlendpoint variable is undefined here but not in the friendrequestresolver function
   region: process.env.AWS_REGION,
   auth: {
     type: AUTH_TYPE.AWS_IAM,

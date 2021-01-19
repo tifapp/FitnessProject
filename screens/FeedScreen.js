@@ -116,8 +116,10 @@ export default function FeedScreen({ navigation, route }) {
       tempposts[tempposts.findIndex(p => p.createdAt == updatePostID && p.userId == route.params?.id)].description = postVal;
       setPosts(tempposts);
 
+      const post = tempposts.find(p => {return p.createdAt == updatePostID && p.userId == route.params?.id});
+
       try {
-        await API.graphql(graphqlOperation(updatePost, { input: { createdAt: updatePostID, description: postVal } }));
+        await API.graphql(graphqlOperation(updatePost, { input: { createdAt: updatePostID, description: postVal, parentId: post.parentId, isParent: post.isParent } }));
         console.log("success in updating a post");
       } catch (err) {
         console.log("error in updating post: ", err);
@@ -195,7 +197,7 @@ export default function FeedScreen({ navigation, route }) {
       });
     } else {
       setPosts((posts) => {
-        return posts.filter((val) => (val.createdAt != parent_post.createdAt && val.userId != parent_post.userId));
+        return posts.filter((val) => (val.createdAt != parent_post.createdAt || val.userId != parent_post.userId));
       });
     }
 

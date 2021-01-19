@@ -43,6 +43,8 @@ This allows us to fill in the missing fields in the backend rather than letting 
 input UpdatePostInput {
   createdAt: AWSDateTime!
   description: String
+  parentId: String
+  isParent: Int
 }
 
 """
