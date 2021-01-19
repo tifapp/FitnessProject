@@ -134,12 +134,13 @@ export default function FeedScreen({ navigation, route }) {
         parentId: Date.now().toString() + route.params?.id,
         description: postVal,
         channel: channel,
-        receiver: receiver,
         isParent: 1,
       };
+      if (receiver != null)
+        newPost.receiver = receiver;
       setPostVal("");
 
-      setPosts([{...newPost, userId: route.params?.id, createdAt: Date.now()}, ...posts]);
+      setPosts([{ ...newPost, userId: route.params?.id, createdAt: Date.now() }, ...posts]);
       try {
         await API.graphql(graphqlOperation(createPost, { input: newPost }));
         console.log("success in making a new post, channel is false? ", channel == null);
@@ -159,10 +160,10 @@ export default function FeedScreen({ navigation, route }) {
       parentId: postID.toString(),
       description: postVal,
       channel: channel,
-      receiver: receiver,
       isParent: 0,
     };
-
+    if (receiver != null)
+      newPost.receiver = receiver;
     setPostVal("");
 
     setIsReplying(false);
