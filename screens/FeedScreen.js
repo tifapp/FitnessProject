@@ -295,6 +295,7 @@ export default function FeedScreen({ navigation, route }) {
             setPostVal={setPostVal}
             setIsReplying={setIsReplying}
             setUpdatePostID={setUpdatePostID}
+            isMessage={isMessage}
           />
         )}
       />

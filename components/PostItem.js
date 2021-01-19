@@ -24,6 +24,7 @@ export default function PostItem({
   setPostVal,
   setIsReplying,
   setUpdatePostID,
+  isMessage
 }) {
 
   const displayTime = printTime(item.createdAt);
@@ -32,35 +33,25 @@ export default function PostItem({
   //
   return (
     <View style={styles.secondaryContainerStyle}>
-      { item.isParent == 1 ?
-      <View style={styles.spaceAround}>
+      <View style={item.isParent == 1 ? styles.spaceAround : styles.spaceAroundReply}>
         <View
           style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <ProfileImageAndName
-            style={styles.smallImageStyle}
-            userId={item.userId}
-          />
-          <View style={{ marginRight: 15 }}>
+          {
+            isMessage 
+            ?
+            null
+            :
+            <ProfileImageAndName
+              style={styles.smallImageStyle}
+              userId={item.userId}
+            />
+          }
+          <View style={isMessage && !writtenByYou ? { marginLeft: 15 } : { marginRight: 15 }}>
             <Text>{displayTime}</Text>
           </View>
         </View>
         <Text style={styles.check}>{item.description}</Text>
-      </View> 
-      :
-      <View style={styles.spaceAroundReply}>
-      <View
-        style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <ProfileImageAndName
-          style={styles.smallImageStyle}
-          userId={item.userId}
-        />
-        <View style={{ marginRight: 15 }}>
-          <Text>{displayTime}</Text>
-        </View>
       </View>
-      <Text style={styles.check}>{item.description}</Text>
-      </View>
-      }
 
       <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
         {writtenByYou ? (
@@ -78,12 +69,12 @@ export default function PostItem({
 
           </View>
         ) : null}
-          {  item.isParent == 1 ?
-            <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'orange' }]} color="orange" onPress={() => (setPostVal(""), setIsReplying(true), setUpdatePostID(item.parentId))}>
-              <Text style={[styles.unselectedButtonTextStyle, { color: 'orange' }]}>Reply</Text>
-            </TouchableOpacity>
-            : null
-          }
+        {item.isParent == 1 ?
+          <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'orange' }]} color="orange" onPress={() => (setPostVal(""), setIsReplying(true), setUpdatePostID(item.parentId))}>
+            <Text style={[styles.unselectedButtonTextStyle, { color: 'orange' }]}>Reply</Text>
+          </TouchableOpacity>
+          : null
+        }
       </View>
     </View>
   );

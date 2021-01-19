@@ -244,7 +244,11 @@ const LookupUser = ({ route, navigation }) => {
                 })}>
                 <MaterialCommunityIcons style={styles.editIconStyle} name="dumbbell" size={24} color="black" />
               </TouchableOpacity>
-              : null
+              : <TouchableOpacity
+              style={{ position: 'absolute', top: 25, right: 25, borderWidth: 1, borderRadius: 25, padding: 10 }}
+              onPress={() => navigation.navigate('Messages', {channel: userId})}>
+              <MaterialCommunityIcons style={styles.editIconStyle} name="chat-bubbles" size={24} color="black" />
+            </TouchableOpacity>
           }
           <View style={styles.border}>
             {/*

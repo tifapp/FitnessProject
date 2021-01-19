@@ -12,7 +12,7 @@ import FeedScreen from "screens/FeedScreen";
 var styles = require('styles/stylesheet');
 
 export default function MessageScreen({ navigation, route }) {
-  const { userId } = route.params;
+  const { channel } = route.params;
   //console.log(route.params);
   //console.log(route);
   //have a header with the person's name and profile pic also.
