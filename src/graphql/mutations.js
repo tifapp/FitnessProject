@@ -10,7 +10,7 @@ export const batchDeletePosts = /* GraphQL */ `
       description
       parentId
       channel
-      isMessage
+      receiver
       isParent
     }
   }
@@ -125,7 +125,7 @@ export const createPost = /* GraphQL */ `
       description
       parentId
       channel
-      isMessage
+      receiver
       isParent
     }
   }
@@ -142,7 +142,7 @@ export const updatePost = /* GraphQL */ `
       description
       parentId
       channel
-      isMessage
+      receiver
       isParent
     }
   }
@@ -265,7 +265,7 @@ export const deletePost = /* GraphQL */ `
       description
       parentId
       channel
-      isMessage
+      receiver
       isParent
     }
   }

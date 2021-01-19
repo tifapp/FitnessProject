@@ -38,7 +38,6 @@ export default function GroupPostsScreen({ navigation, route }) {
       <FeedScreen
         navigation={navigation}
         route={route}
-        initialParams={route.params}
       />
     </View>
   );

@@ -30,7 +30,7 @@ require('root/androidtimerfix');
 var styles = require('styles/stylesheet');
 
 export default function FeedScreen({ navigation, route }) {
-  const { channel, isMessage } = route.params; //either user id or group id
+  const { channel, receiver } = route.params; //either user id or group id
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
   const numCharsLeft = 1000 - postVal.length;
@@ -134,7 +134,7 @@ export default function FeedScreen({ navigation, route }) {
         parentId: Date.now().toString() + route.params?.id,
         description: postVal,
         channel: channel,
-        isMessage: isMessage,
+        receiver: receiver,
         isParent: 1,
       };
       setPostVal("");
@@ -159,7 +159,7 @@ export default function FeedScreen({ navigation, route }) {
       parentId: postID.toString(),
       description: postVal,
       channel: channel,
-      isMessage: isMessage,
+      receiver: receiver,
       isParent: 0,
     };
 
@@ -295,7 +295,7 @@ export default function FeedScreen({ navigation, route }) {
             setPostVal={setPostVal}
             setIsReplying={setIsReplying}
             setUpdatePostID={setUpdatePostID}
-            isMessage={isMessage}
+            receiver={receiver}
           />
         )}
       />

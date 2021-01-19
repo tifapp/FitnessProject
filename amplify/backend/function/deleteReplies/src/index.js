@@ -47,7 +47,7 @@ query PostsByParentId(
       description
       parentId
       channel
-      isMessage
+      receiver
       isParent
     }
     nextToken
@@ -68,7 +68,7 @@ const deletePost =
       description
       parentId
       channel
-      isMessage
+      receiver
       isParent
     }
   }

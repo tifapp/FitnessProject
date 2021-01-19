@@ -8,7 +8,7 @@ type Post @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
   rules: [
       { allow: private, operations: [read] },
       { allow: owner, ownerField: "userId" },
-      { allow: owner, ownerField: "channel", operations: [delete, read] },
+      { allow: owner, ownerField: "receiver", operations: [delete, read] },
       { allow: private, provider: iam, operations: [read, delete] },
   ]
 )
@@ -22,7 +22,7 @@ type Post @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
   description: String
   parentId: String
   channel: ID
-  isMessage: Boolean
+  receiver: ID
   isParent: Int
 }
 
@@ -33,7 +33,7 @@ input CreatePostInput {
   description: String
   parentId: String
   channel: ID
-  isMessage: Boolean
+  receiver: ID
   isParent: Int
 }
 

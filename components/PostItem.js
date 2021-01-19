@@ -24,7 +24,7 @@ export default function PostItem({
   setPostVal,
   setIsReplying,
   setUpdatePostID,
-  isMessage
+  receiver
 }) {
 
   const displayTime = printTime(item.createdAt);
@@ -37,7 +37,7 @@ export default function PostItem({
         <View
           style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           {
-            isMessage 
+            receiver == null 
             ?
             null
             :
@@ -46,7 +46,7 @@ export default function PostItem({
               userId={item.userId}
             />
           }
-          <View style={isMessage && !writtenByYou ? { marginLeft: 15 } : { marginRight: 15 }}>
+          <View style={receiver != null && !writtenByYou ? { marginLeft: 15 } : { marginRight: 15 }}>
             <Text>{displayTime}</Text>
           </View>
         </View>

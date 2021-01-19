@@ -124,7 +124,7 @@ export const onCreatePost = /* GraphQL */ `
       description
       parentId
       channel
-      isMessage
+      receiver
       isParent
     }
   }
@@ -138,7 +138,7 @@ export const onUpdatePost = /* GraphQL */ `
       description
       parentId
       channel
-      isMessage
+      receiver
       isParent
     }
   }
@@ -152,7 +152,7 @@ export const onDeletePost = /* GraphQL */ `
       description
       parentId
       channel
-      isMessage
+      receiver
       isParent
     }
   }

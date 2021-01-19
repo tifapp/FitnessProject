@@ -215,7 +215,7 @@ export const getPost = /* GraphQL */ `
       description
       parentId
       channel
-      isMessage
+      receiver
       isParent
     }
   }
@@ -244,7 +244,7 @@ export const listPosts = /* GraphQL */ `
         description
         parentId
         channel
-        isMessage
+        receiver
         isParent
       }
       nextToken
@@ -275,7 +275,7 @@ export const postsByChannel = /* GraphQL */ `
         description
         parentId
         channel
-        isMessage
+        receiver
         isParent
       }
       nextToken
@@ -306,7 +306,7 @@ export const postsByParentId = /* GraphQL */ `
         description
         parentId
         channel
-        isMessage
+        receiver
         isParent
       }
       nextToken

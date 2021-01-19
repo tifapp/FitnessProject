@@ -246,7 +246,7 @@ const LookupUser = ({ route, navigation }) => {
               </TouchableOpacity>
               : <TouchableOpacity
               style={{ position: 'absolute', top: 25, right: 25, borderWidth: 1, borderRadius: 25, padding: 10 }}
-              onPress={() => navigation.navigate('Messages', {channel: userId})}>
+              onPress={() => navigation.navigate('Messages', {userId: userId})}>
               <MaterialCommunityIcons style={styles.editIconStyle} name="chat-bubbles" size={24} color="black" />
             </TouchableOpacity>
           }
