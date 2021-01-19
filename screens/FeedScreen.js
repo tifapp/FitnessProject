@@ -165,12 +165,6 @@ export default function FeedScreen({ navigation, route }) {
 
     setPostVal("");
 
-    try {
-      await API.graphql(graphqlOperation(createPost, { input: newPost }));
-    } catch (err) {
-      console.log("error in creating post: ", err);
-    }
-
     setIsReplying(false);
     setUpdatePostID(0);
 
@@ -179,6 +173,11 @@ export default function FeedScreen({ navigation, route }) {
     tempposts.splice(index + 1, 0, {...newPost, userId: route.params?.id, createdAt: Date.now()});
     setPosts(tempposts);
 
+    try {
+      await API.graphql(graphqlOperation(createPost, { input: newPost }));
+    } catch (err) {
+      console.log("error in creating post: ", err);
+    }
   };
 
   const deletePostsAsync = async (timestamp) => {
