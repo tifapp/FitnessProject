@@ -12,11 +12,21 @@ var styles = require('../styles/stylesheet');
 export const ProfileImageAndName = (props) => { //user is required in props. it's a type of object described in userschema.graphql
     const navigation = useNavigation();
     const goToProfile = () => {
-        if (props.navigation == false) return;
-        navigation.push('Lookup',
-            { userId: props.userId })
+        if (props.navigation == false) {
+            if (props.you)
+                navigation.navigate('Profile', {
+                    screen: 'Profile',
+                    params: { fromLookup: true },
+                })
+            else
+                navigation.navigate('Messages', {userId: props.userId})
+        }
+        else {
+            navigation.push('Lookup',
+                { userId: props.userId })
+        }
     }
-    
+
 
     const [userInfo, setUserInfo] = useState(null);
 

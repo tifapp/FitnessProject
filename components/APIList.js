@@ -130,8 +130,7 @@ class APIList extends Component { //we need to make this a class to use refs fro
                 justifyContent: "center",
               }} />
             :
-            this.props.sections == null
-              ? <FlatList
+            <FlatList
                 ref={this.props.ListRef}
                 ListHeaderComponent={this.props.ListHeaderComponent}
                 horizontal={this.props.horizontal}
@@ -144,22 +143,6 @@ class APIList extends Component { //we need to make this a class to use refs fro
                 keyExtractor={this.props.keyExtractor}
                 onEndReached={this.loadMore}
                 onEndReachedThreshold={1}
-              />
-              : <SectionList
-                contentContainerStyle={{ flexGrow: 1 }}
-                refreshControl={
-                  <RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh} />
-                }
-                renderItem={this.props.renderItem}
-                keyExtractor={this.props.keyExtractor}
-                onEndReached={this.loadMore}
-                onEndReachedThreshold={1}
-
-                sections={this.props.sections}
-                renderSectionHeader={({ section: { title } }) => (
-                  <Text style={[styles.outlineButtonTextStyle, { marginTop: 15 }]}>{title}</Text>
-                )}
-                stickySectionHeadersEnabled={true}
               />
         }
 

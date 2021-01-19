@@ -28,54 +28,82 @@ export default function PostItem({
 }) {
 
   const displayTime = printTime(item.createdAt);
+  const isReceivedMessage = receiver != null && !writtenByYou;
   //console.log(parentID);
 
   //
-  return (
-    <View style={styles.secondaryContainerStyle}>
-      <View style={item.isParent == 1 ? styles.spaceAround : styles.spaceAroundReply}>
-        <View
-          style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          {
-            receiver == null 
-            ?
+  if (receiver == null)
+    return (
+      <View style={styles.secondaryContainerStyle}>
+        <View style={item.isParent == 1 ? styles.spaceAround : styles.spaceAroundReply}>
+          <View
+            style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <ProfileImageAndName
               style={styles.smallImageStyle}
               userId={item.userId}
             />
-            :
-            null
+            <View style={{ marginRight: 15 }}>
+              <Text>{displayTime}</Text>
+            </View>
+          </View>
+          <Text style={[styles.check]}>{item.description}</Text>
+        </View>
+
+        <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
+          {writtenByYou ? (
+            <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
+              <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={() => (deletePostsAsync(item.createdAt))}>
+                <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>Delete</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.unselectedButtonStyle, { borderColor: 'blue' }]}
+                color="blue"
+                onPress={() => (setPostVal(item.description), setUpdatePostID(item.createdAt))}>
+                <Text style={[styles.unselectedButtonTextStyle, { color: 'blue' }]}>Edit</Text>
+              </TouchableOpacity>
+
+            </View>
+          ) : null}
+          {item.isParent == 1 ?
+            <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'orange' }]} color="orange" onPress={() => (setPostVal(""), setIsReplying(true), setUpdatePostID(item.parentId))}>
+              <Text style={[styles.unselectedButtonTextStyle, { color: 'orange' }]}>Reply</Text>
+            </TouchableOpacity>
+            : null
           }
-          <View style={receiver != null && !writtenByYou ? { marginLeft: 15 } : { marginRight: 15 }}>
-            <Text>{displayTime}</Text>
+        </View>
+      </View>
+    );
+  else {
+    return (
+      <View style={styles.secondaryContainerStyle}>
+        <View style={item.isParent == 1 ? styles.spaceAround : styles.spaceAroundReply}>
+          <View
+            style={
+              {
+                alignSelf: isReceivedMessage ? 'flex-start' : 'flex-end',
+                backgroundColor: "#fff",
+                padding: 15,
+                
+                shadowColor: "#000",
+                shadowOffset: {
+                  width: 0,
+                  height: 3,
+                },
+                shadowOpacity: 0.27,
+                shadowRadius: 4.65,
+
+                elevation: 6,
+              }
+            }
+          >
+            <Text>{item.description}</Text>
+          </View>
+          <View>
+            <Text style={{color: '#fff', marginTop: 5, textAlign: isReceivedMessage ? 'left' : 'right' }}>{displayTime}</Text>
           </View>
         </View>
-        <Text style={styles.check}>{item.description}</Text>
       </View>
-
-      <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
-        {writtenByYou ? (
-          <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
-            <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={() => (deletePostsAsync(item.createdAt))}>
-              <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>Delete</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.unselectedButtonStyle, { borderColor: 'blue' }]}
-              color="blue"
-              onPress={() => (setPostVal(item.description), setUpdatePostID(item.createdAt))}>
-              <Text style={[styles.unselectedButtonTextStyle, { color: 'blue' }]}>Edit</Text>
-            </TouchableOpacity>
-
-          </View>
-        ) : null}
-        {item.isParent == 1 ?
-          <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'orange' }]} color="orange" onPress={() => (setPostVal(""), setIsReplying(true), setUpdatePostID(item.parentId))}>
-            <Text style={[styles.unselectedButtonTextStyle, { color: 'orange' }]}>Reply</Text>
-          </TouchableOpacity>
-          : null
-        }
-      </View>
-    </View>
-  );
+    );
+  }
 }
