@@ -39,12 +39,12 @@ export default function PostItem({
           {
             receiver == null 
             ?
-            null
-            :
             <ProfileImageAndName
               style={styles.smallImageStyle}
               userId={item.userId}
             />
+            :
+            null
           }
           <View style={receiver != null && !writtenByYou ? { marginLeft: 15 } : { marginRight: 15 }}>
             <Text>{displayTime}</Text>

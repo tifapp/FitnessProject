@@ -141,7 +141,7 @@ class APIList extends Component { //we need to make this a class to use refs fro
                   <RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh} />
                 }
                 renderItem={this.props.renderItem}
-                keyExtractor={(item, index) => index.toString()}
+                keyExtractor={this.props.keyExtractor}
                 onEndReached={this.loadMore}
                 onEndReachedThreshold={1}
               />
@@ -151,7 +151,7 @@ class APIList extends Component { //we need to make this a class to use refs fro
                   <RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh} />
                 }
                 renderItem={this.props.renderItem}
-                keyExtractor={(item, index) => index.toString()}
+                keyExtractor={this.props.keyExtractor}
                 onEndReached={this.loadMore}
                 onEndReachedThreshold={1}
 

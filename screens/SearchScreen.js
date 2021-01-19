@@ -227,6 +227,7 @@ export default function GroupSearchScreen({ navigation, route }) {
                             ? <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} matchingname={item.name.startsWith(query)} />
                             : <UserListItem item={item} matchingname={item.name.startsWith(query)} />
                     }
+                    keyExtractor={(item) => {item.id}}
                 />
 
                 <StatusBar style="auto" />

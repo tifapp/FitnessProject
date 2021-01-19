@@ -342,6 +342,7 @@ const LookupUser = ({ route, navigation }) => {
                     </View>
                   </View>
                 )}
+                keyExtractor={(item) => item}
               />
             </SafeAreaView>
           </View>

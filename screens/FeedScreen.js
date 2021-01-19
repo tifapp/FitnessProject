@@ -140,6 +140,8 @@ export default function FeedScreen({ navigation, route }) {
         newPost.receiver = receiver;
       setPostVal("");
 
+      console.log(route.params?.id + " just posted.");
+
       setPosts([{ ...newPost, userId: route.params?.id, createdAt: Date.now() }, ...posts]);
       try {
         await API.graphql(graphqlOperation(createPost, { input: newPost }));
@@ -299,6 +301,7 @@ export default function FeedScreen({ navigation, route }) {
             receiver={receiver}
           />
         )}
+        keyExtractor={(item) => {item.createdAt + item.userId}}
       />
 
       <StatusBar style="auto" />
