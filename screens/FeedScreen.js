@@ -139,7 +139,7 @@ export default function FeedScreen({ navigation, route }) {
       };
       setPostVal("");
 
-      setPosts([newPost, ...posts]);
+      setPosts([{...newPost, userId: route.params?.id, createdAt: Date.now()}, ...posts]);
       try {
         await API.graphql(graphqlOperation(createPost, { input: newPost }));
         console.log("success in making a new post, channel is false? ", channel == null);
@@ -176,7 +176,7 @@ export default function FeedScreen({ navigation, route }) {
 
     let tempposts = [...currentPosts.current];
     var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId == newPost.parentId)]);
-    tempposts.splice(index + 1, 0, newPost);
+    tempposts.splice(index + 1, 0, {...newPost, userId: route.params?.id, createdAt: Date.now()});
     setPosts(tempposts);
 
   };
