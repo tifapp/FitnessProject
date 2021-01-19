@@ -93,7 +93,7 @@ exports.handler = (event, context, callback) => {
                 mutation: gql(deletePost),
                 variables: {
                   input: {
-                    timestamp: post.timestamp,
+                    createdAt: post.createdAt,
                     userId: post.userId,
                   }
                 }

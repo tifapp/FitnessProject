@@ -83,7 +83,7 @@
         "Timeout": "25",
         "Code": {
           "S3Bucket": "amplify-fitnessproject-messagetwo-144938-deployment",
-          "S3Key": "amplify-builds/deleteReplies-56644441506241493358-build.zip"
+          "S3Key": "amplify-builds/deleteReplies-67423861513831703053-build.zip"
         }
       }
     },
@@ -187,6 +187,9 @@
             {
               "Effect": "Allow",
               "Action": [
+                "appsync:Create*",
+                "appsync:StartSchemaCreation",
+                "appsync:GraphQL",
                 "appsync:Get*",
                 "appsync:List*",
                 "appsync:Update*",
