@@ -12,7 +12,7 @@ const AWSAppSyncClient = require('aws-appsync').default;
 const gql = require('graphql-tag');
 
 const config = {
-  url: process.env.API_FITNESSPROJECT_GRAPHQLAPIENDPOINTOUTPUT,
+  url: process.env.API_FITNESSPROJECTAPI_GRAPHQLAPIENDPOINTOUTPUT,
   region: process.env.AWS_REGION,
   auth: {
     type: AUTH_TYPE.AWS_IAM,
