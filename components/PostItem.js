@@ -76,13 +76,13 @@ export default function PostItem({
     );
   else {
     return (
-      <View style={styles.secondaryContainerStyle}>
+      <View style={[styles.secondaryContainerStyle, {backgroundColor: '#fff'}]}>
         <View style={item.isParent == 1 ? styles.spaceAround : styles.spaceAroundReply}>
           <View
             style={
               {
                 alignSelf: isReceivedMessage ? 'flex-start' : 'flex-end',
-                backgroundColor: "#fff",
+                backgroundColor: "#efefef",
                 padding: 15,
                 
                 shadowColor: "#000",
@@ -97,10 +97,10 @@ export default function PostItem({
               }
             }
           >
-            <Text>{item.description}</Text>
+            <Text style={{color: '#000'}}>{item.description}</Text>
           </View>
           <View>
-            <Text style={{color: '#fff', marginTop: 5, textAlign: isReceivedMessage ? 'left' : 'right' }}>{displayTime}</Text>
+            <Text style={{color: '#000', marginTop: 15, textAlign: isReceivedMessage ? 'left' : 'right' }}>{displayTime}</Text>
           </View>
         </View>
       </View>
