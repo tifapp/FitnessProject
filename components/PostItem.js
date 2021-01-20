@@ -24,7 +24,9 @@ export default function PostItem({
   setPostVal,
   setIsReplying,
   setUpdatePostID,
-  receiver
+  receiver,
+  showTimestamp,
+  newSection
 }) {
 
   const displayTime = printTime(item.createdAt);
@@ -75,9 +77,28 @@ export default function PostItem({
       </View>
     );
   else {
+    /*
+    showTimestamp
+          ? {
+            paddingHorizontal: 25,
+            marginTop: 10,
+            marginBottom: 40,
+          }
+          : newSection
+            ? {
+              paddingHorizontal: 25,
+              marginTop: 40,
+              marginBottom: 10,
+            }
+            : {
+              paddingHorizontal: 25,
+              paddingTop: 10,
+              paddingBottom: 10,
+            }
+    */
     return (
-      <View style={[styles.secondaryContainerStyle, {backgroundColor: '#fff'}]}>
-        <View style={item.isParent == 1 ? styles.spaceAround : styles.spaceAroundReply}>
+      <View style={[styles.secondaryContainerStyle, { backgroundColor: '#fff' }]}>
+        <View style={[styles.spaceAround]}>
           <View
             style={
               {
@@ -97,10 +118,10 @@ export default function PostItem({
               }
             }
           >
-            <Text style={{color: '#000'}}>{item.description}</Text>
+            <Text style={{ color: '#000' }}>{item.description}</Text>
           </View>
           <View>
-            <Text style={{color: '#000', marginTop: 15, textAlign: isReceivedMessage ? 'left' : 'right' }}>{displayTime}</Text>
+            <Text style={{ color: '#000', marginTop: 15, textAlign: isReceivedMessage ? 'left' : 'right' }}>{displayTime}</Text>
           </View>
         </View>
       </View>

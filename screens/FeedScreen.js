@@ -50,6 +50,10 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
     checkInternetConnection();
   }, []);
 
+  const showTimestamp = (item, index) => {
+    return index >= posts.length-1 || ((((new Date(item.createdAt).getTime() - new Date(posts[index+1].createdAt).getTime()) / 1000) / 60) / 60 > 1);
+  }
+
   const checkInternetConnection = () => {
     NetInfo.fetch().then(state =>
       setOnlineCheck(state.isConnected)
@@ -75,11 +79,13 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
       next: event => {
         const newPost = event.value.data.onCreatePost
         if (newPost.userId != route.params?.id && newPost.channel == getChannel()) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
-          if (newPost.isParent == 0 && currentPosts.current.find(post => post.parentId === newPost.parentId)) {
-            let tempposts = [...currentPosts.current];
-            var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId === newPost.parentId)]);
-            tempposts.splice(index + 1, 0, newPost);
-            setPosts(tempposts);
+          if (newPost.isParent == 0) {
+            if (currentPosts.current.find(post => post.parentId === newPost.parentId)) {
+              let tempposts = [...currentPosts.current];
+              var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId === newPost.parentId)]);
+              tempposts.splice(index + 1, 0, newPost);
+              setPosts(tempposts);
+            }
           }
           else
             setPosts([newPost, ...currentPosts.current]); //for some reason "posts" isn't the most uptodate version. will we need a ref???!?!?!? //what if we have a lot of new posts at once?
@@ -295,7 +301,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
         setDataFunction={setPosts}
         data={posts}
         filter={{ channel: getChannel(), sortDirection: 'DESC' }}
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
           <PostItem
             item={item}
             deletePostsAsync={deletePostsAsync}
@@ -304,9 +310,11 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
             setIsReplying={setIsReplying}
             setUpdatePostID={setUpdatePostID}
             receiver={receiver}
+            showTimestamp={showTimestamp(item, index)}
+            newSection={index == 0 ? true : showTimestamp(posts[index-1], index-1)}
           />
         )}
-        keyExtractor={(item) => {item.createdAt + item.userId}}
+        keyExtractor={(item) => {return item.userId + item.createdAt}}
       />
 
       <StatusBar style="auto" />
