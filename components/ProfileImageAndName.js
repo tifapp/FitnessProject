@@ -31,7 +31,7 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
     const [userInfo, setUserInfo] = useState(null);
 
     const addUserInfotoCache = () => {
-        console.log('cache missed!', props.userId); //this isn't printing for some reason
+        //console.log('cache missed!', props.userId); //this isn't printing for some reason
         API.graphql(
             graphqlOperation(getUser, { id: props.userId })
         )
@@ -84,7 +84,7 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
     useEffect(() => {
         Cache.getItem(props.userId, { callback: addUserInfotoCache }) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
             .then((info) => {
-                console.log('cache hit! ', props.userId);
+                //console.log('cache hit! ', props.userId);
                 setUserInfo(info)
             }); //redundant???
         //return () => mounted = false;

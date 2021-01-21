@@ -42,9 +42,9 @@ class APIList extends Component { //we need to make this a class to use refs fro
   // }
 
   loadMore = () => {
-    console.log("can we load more???");
+    //console.log("can we load more???");
     if (!this.state.loadingMore && this.state.nextToken != null) { //if we don't check this, the list will repeat endlessly
-      console.log("yes we can");
+      //console.log("yes we can");
       this.setState({ loadingMore: true });
       this.fetchDataAsync(false)
         .finally(() => { this.setState({ loadingMore: false }) });
@@ -84,7 +84,7 @@ class APIList extends Component { //we need to make this a class to use refs fro
         beginning = false;
         nextToken = query.data[Object.keys(query.data)[0]].nextToken
         results = [...query.data[Object.keys(query.data)[0]].items, ...results]
-        console.log("completed iteration of fetching, amount of results are ", results.length);
+        //console.log("completed iteration of fetching, amount of results are ", results.length);
       } while (results.length < (wasBeginning ? initialAmount : additionalAmount) && nextToken != null);
 
       if (this.props.processingFunction != null) {

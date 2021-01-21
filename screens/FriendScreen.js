@@ -162,7 +162,7 @@ const FriendScreen = ({ route, navigation }) => {
                                     </TouchableOpacity>
                                 </View>
                             )}
-                            keyExtractor={(item) => {item.timestamp}}
+                            keyExtractor={(item) => item.timestamp.toString()}
                         />
                     </View>
 
@@ -203,7 +203,7 @@ const FriendScreen = ({ route, navigation }) => {
                                     </View>
                                 </View>
                             )}
-                            keyExtractor={(item) => {item.sender}}
+                            keyExtractor={(item) => item.sender}
                         />
                     </View>
                 }
