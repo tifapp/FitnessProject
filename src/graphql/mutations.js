@@ -21,10 +21,10 @@ export const createFriendRequest = /* GraphQL */ `
     $condition: ModelFriendRequestConditionInput
   ) {
     createFriendRequest(input: $input, condition: $condition) {
-      sender
-      receiver
       createdAt
       updatedAt
+      sender
+      receiver
     }
   }
 `;
@@ -34,10 +34,10 @@ export const updateFriendRequest = /* GraphQL */ `
     $condition: ModelFriendRequestConditionInput
   ) {
     updateFriendRequest(input: $input, condition: $condition) {
-      sender
-      receiver
       createdAt
       updatedAt
+      sender
+      receiver
     }
   }
 `;
@@ -47,12 +47,11 @@ export const deleteFriendship = /* GraphQL */ `
     $condition: ModelFriendshipConditionInput
   ) {
     deleteFriendship(input: $input, condition: $condition) {
-      user1
-      user2
-      timestamp
-      hifives
       createdAt
       updatedAt
+      user1
+      user2
+      hifives
     }
   }
 `;
@@ -216,10 +215,10 @@ export const deleteFriendRequest = /* GraphQL */ `
     $condition: ModelFriendRequestConditionInput
   ) {
     deleteFriendRequest(input: $input, condition: $condition) {
-      sender
-      receiver
       createdAt
       updatedAt
+      sender
+      receiver
     }
   }
 `;
@@ -229,12 +228,11 @@ export const createFriendship = /* GraphQL */ `
     $condition: ModelFriendshipConditionInput
   ) {
     createFriendship(input: $input, condition: $condition) {
-      user1
-      user2
-      timestamp
-      hifives
       createdAt
       updatedAt
+      user1
+      user2
+      hifives
     }
   }
 `;
@@ -244,12 +242,11 @@ export const updateFriendship = /* GraphQL */ `
     $condition: ModelFriendshipConditionInput
   ) {
     updateFriendship(input: $input, condition: $condition) {
-      user1
-      user2
-      timestamp
-      hifives
       createdAt
       updatedAt
+      user1
+      user2
+      hifives
     }
   }
 `;

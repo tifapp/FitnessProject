@@ -75,10 +75,10 @@ export const searchGroups = /* GraphQL */ `
 export const getFriendRequest = /* GraphQL */ `
   query GetFriendRequest($sender: ID!, $receiver: ID!) {
     getFriendRequest(sender: $sender, receiver: $receiver) {
-      sender
-      receiver
       createdAt
       updatedAt
+      sender
+      receiver
     }
   }
 `;
@@ -100,10 +100,10 @@ export const listFriendRequests = /* GraphQL */ `
       sortDirection: $sortDirection
     ) {
       items {
-        sender
-        receiver
         createdAt
         updatedAt
+        sender
+        receiver
       }
       nextToken
     }
@@ -127,10 +127,10 @@ export const friendRequestsByReceiver = /* GraphQL */ `
       nextToken: $nextToken
     ) {
       items {
-        sender
-        receiver
         createdAt
         updatedAt
+        sender
+        receiver
       }
       nextToken
     }
@@ -139,12 +139,11 @@ export const friendRequestsByReceiver = /* GraphQL */ `
 export const getFriendship = /* GraphQL */ `
   query GetFriendship($user1: ID!, $user2: ID!) {
     getFriendship(user1: $user1, user2: $user2) {
-      user1
-      user2
-      timestamp
-      hifives
       createdAt
       updatedAt
+      user1
+      user2
+      hifives
     }
   }
 `;
@@ -166,12 +165,11 @@ export const listFriendships = /* GraphQL */ `
       sortDirection: $sortDirection
     ) {
       items {
-        user1
-        user2
-        timestamp
-        hifives
         createdAt
         updatedAt
+        user1
+        user2
+        hifives
       }
       nextToken
     }
@@ -195,12 +193,11 @@ export const friendsBySecondUser = /* GraphQL */ `
       nextToken: $nextToken
     ) {
       items {
-        user1
-        user2
-        timestamp
-        hifives
         createdAt
         updatedAt
+        user1
+        user2
+        hifives
       }
       nextToken
     }
