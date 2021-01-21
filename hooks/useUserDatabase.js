@@ -35,27 +35,29 @@ export default () => {
   };
 
   const updateUserAsync = async (imageURL, name, age, gender, bioDetails, goalsDetails, location) => {
+    const saveProfilePicture = async (userId) => {
+      if (imageURL !== '') {
+        const resizedPhoto = await ImageManipulator.manipulateAsync(
+          imageURL,
+          [{ resize: { width: 200 } }], // resize to width of 300 and preserve aspect ratio 
+          { compress: 1, format: 'jpeg' },
+        );
+        const response = await fetch(resizedPhoto.uri);
+        const blob = await response.blob();
+
+        await Storage.put('profileimage.jpg', blob, { level: 'protected', contentType: 'image/jpeg' });
+
+        Cache.setItem(userId, { name: name, imageURL: imageURL }, { priority: 1, expires: Date.now() + 86400000 });
+      } else {
+        Storage.remove('profileimage.jpg', { level: 'protected' })
+          .then(result => console.log("removed profile image!", result))
+          .catch(err => console.log(err));
+        Cache.setItem(userId, { name: name, imageURL: '' }, { priority: 1, expires: Date.now() + 86400000 });
+      }
+    }
+
     const updateUserInDB = async (recurringUser) => {
       try {
-        if (imageURL !== '') {
-          const resizedPhoto = await ImageManipulator.manipulateAsync(
-            imageURL,
-            [{ resize: { width: 200 } }], // resize to width of 300 and preserve aspect ratio 
-            { compress: 1, format: 'jpeg' },
-          );
-          const response = await fetch(resizedPhoto.uri);
-          const blob = await response.blob();
-
-          await Storage.put('profileimage.jpg', blob, { level: 'protected', contentType: 'image/jpeg' });
-
-          const query = await Auth.currentUserInfo();
-          Cache.setItem(query.attributes.sub, { name: name, imageURL: imageURL }, { priority: 1, expires: Date.now() + 86400000 });
-        } else {
-          Storage.remove('profileimage.jpg', { level: 'protected' })
-            .then(result => console.log("removed profile image!", result))
-            .catch(err => console.log(err));
-          Cache.setItem(query.attributes.sub, { name: name, imageURL: '' }, { priority: 1, expires: Date.now() + 86400000 });
-        }
         await API.graphql(graphqlOperation(updateUser, { input: recurringUser }));
         console.log("updated user successfully");
       } catch (err) {
@@ -89,10 +91,11 @@ export default () => {
         gender: gender,
         bio: bioDetails,
         goals: goalsDetails,
-        latitude: location == null || location.latitude < 0 ? null : location.latitude,
-        longitude: location == null || location.latitude < 0 ? null : location.longitude
+        latitude: location == null || location.latitude == null || location.latitude < 0 ? null : location.latitude,
+        longitude: location == null || location.latitude == null || location.latitude < 0 ? null : location.longitude
       };
 
+      saveProfilePicture(query.attributes.sub);
       if (fields == null) {
         createUserInDB(ourUser)
       }
