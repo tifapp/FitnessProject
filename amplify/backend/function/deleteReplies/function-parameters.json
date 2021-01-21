@@ -2,6 +2,7 @@
   "permissions": {
     "api": {
       "fitnessprojectapi": [
+        "create",
         "read",
         "update",
         "delete"

@@ -4,14 +4,9 @@ import SearchScreen from "screens/SearchScreen";
 import CreatingGroups from "screens/CreatingGroups";
 import GroupPostsScreen from "screens/GroupPostsScreen";
 import LookupUserScreen from "screens/LookupUser";
+import MessageScreen from "screens/MessageScreen";
 
 import React from 'react';
-
-// Get the aws resources configuration parameters
-import awsconfig from 'root/aws-exports'; // if you are using Amplify CLI
-import { Amplify } from "aws-amplify";
-
-Amplify.configure(awsconfig);
 
 const Stack = createStackNavigator();
 
@@ -24,6 +19,7 @@ export default function GroupSearchStack({route}) {
       <Stack.Screen name='Lookup' component={LookupUserScreen} initialParams={route.params} />
       <Stack.Screen name='Create Group' component={CreatingGroups} initialParams={route.params}/>
       <Stack.Screen name='Group Posts Screen' component={GroupPostsScreen} initialParams={route.params}/>
+      <Stack.Screen name='Messages' component={MessageScreen} initialParams={route.params} />
     </Stack.Navigator>
   );
 }

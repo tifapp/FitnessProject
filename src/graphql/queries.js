@@ -75,10 +75,10 @@ export const searchGroups = /* GraphQL */ `
 export const getFriendRequest = /* GraphQL */ `
   query GetFriendRequest($sender: ID!, $receiver: ID!) {
     getFriendRequest(sender: $sender, receiver: $receiver) {
-      sender
-      receiver
       createdAt
       updatedAt
+      sender
+      receiver
     }
   }
 `;
@@ -100,10 +100,10 @@ export const listFriendRequests = /* GraphQL */ `
       sortDirection: $sortDirection
     ) {
       items {
-        sender
-        receiver
         createdAt
         updatedAt
+        sender
+        receiver
       }
       nextToken
     }
@@ -127,10 +127,10 @@ export const friendRequestsByReceiver = /* GraphQL */ `
       nextToken: $nextToken
     ) {
       items {
-        sender
-        receiver
         createdAt
         updatedAt
+        sender
+        receiver
       }
       nextToken
     }
@@ -139,12 +139,11 @@ export const friendRequestsByReceiver = /* GraphQL */ `
 export const getFriendship = /* GraphQL */ `
   query GetFriendship($user1: ID!, $user2: ID!) {
     getFriendship(user1: $user1, user2: $user2) {
-      user1
-      user2
-      timestamp
-      hifives
       createdAt
       updatedAt
+      user1
+      user2
+      hifives
     }
   }
 `;
@@ -166,12 +165,11 @@ export const listFriendships = /* GraphQL */ `
       sortDirection: $sortDirection
     ) {
       items {
-        user1
-        user2
-        timestamp
-        hifives
         createdAt
         updatedAt
+        user1
+        user2
+        hifives
       }
       nextToken
     }
@@ -195,42 +193,41 @@ export const friendsBySecondUser = /* GraphQL */ `
       nextToken: $nextToken
     ) {
       items {
-        user1
-        user2
-        timestamp
-        hifives
         createdAt
         updatedAt
+        user1
+        user2
+        hifives
       }
       nextToken
     }
   }
 `;
 export const getPost = /* GraphQL */ `
-  query GetPost($timestamp: AWSTimestamp!, $userId: String!) {
-    getPost(timestamp: $timestamp, userId: $userId) {
-      timestamp
-      userId
-      parentId
-      description
-      group
-      isReply
+  query GetPost($createdAt: AWSDateTime!, $userId: ID!) {
+    getPost(createdAt: $createdAt, userId: $userId) {
       createdAt
       updatedAt
+      userId
+      description
+      parentId
+      channel
+      receiver
+      isParent
     }
   }
 `;
 export const listPosts = /* GraphQL */ `
   query ListPosts(
-    $timestamp: AWSTimestamp
-    $userId: ModelStringKeyConditionInput
+    $createdAt: AWSDateTime
+    $userId: ModelIDKeyConditionInput
     $filter: ModelPostFilterInput
     $limit: Int
     $nextToken: String
     $sortDirection: ModelSortDirection
   ) {
     listPosts(
-      timestamp: $timestamp
+      createdAt: $createdAt
       userId: $userId
       filter: $filter
       limit: $limit
@@ -238,45 +235,45 @@ export const listPosts = /* GraphQL */ `
       sortDirection: $sortDirection
     ) {
       items {
-        timestamp
-        userId
-        parentId
-        description
-        group
-        isReply
         createdAt
         updatedAt
+        userId
+        description
+        parentId
+        channel
+        receiver
+        isParent
       }
       nextToken
     }
   }
 `;
-export const postsByGroup = /* GraphQL */ `
-  query PostsByGroup(
-    $group: String
-    $parentIdIsReplyTimestamp: ModelPostByGroupCompositeKeyConditionInput
+export const postsByChannel = /* GraphQL */ `
+  query PostsByChannel(
+    $channel: ID
+    $parentIdIsParentCreatedAt: ModelPostByChannelCompositeKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelPostFilterInput
     $limit: Int
     $nextToken: String
   ) {
-    postsByGroup(
-      group: $group
-      parentIdIsReplyTimestamp: $parentIdIsReplyTimestamp
+    postsByChannel(
+      channel: $channel
+      parentIdIsParentCreatedAt: $parentIdIsParentCreatedAt
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit
       nextToken: $nextToken
     ) {
       items {
-        timestamp
-        userId
-        parentId
-        description
-        group
-        isReply
         createdAt
         updatedAt
+        userId
+        description
+        parentId
+        channel
+        receiver
+        isParent
       }
       nextToken
     }
@@ -285,7 +282,7 @@ export const postsByGroup = /* GraphQL */ `
 export const postsByParentId = /* GraphQL */ `
   query PostsByParentId(
     $parentId: String
-    $isReply: ModelIntKeyConditionInput
+    $isParent: ModelIntKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelPostFilterInput
     $limit: Int
@@ -293,21 +290,21 @@ export const postsByParentId = /* GraphQL */ `
   ) {
     postsByParentId(
       parentId: $parentId
-      isReply: $isReply
+      isParent: $isParent
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit
       nextToken: $nextToken
     ) {
       items {
-        timestamp
-        userId
-        parentId
-        description
-        group
-        isReply
         createdAt
         updatedAt
+        userId
+        description
+        parentId
+        channel
+        receiver
+        isParent
       }
       nextToken
     }

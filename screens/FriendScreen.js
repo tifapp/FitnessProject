@@ -6,8 +6,7 @@ import {
     TouchableOpacity,
 } from "react-native";
 
-import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
-import { Amplify, API, graphqlOperation } from "aws-amplify";
+import { API, graphqlOperation } from "aws-amplify";
 import { listFriendRequests, friendRequestsByReceiver, listFriendships, getFriendship, friendsBySecondUser } from "root/src/graphql/queries";
 import { onCreateFriendRequest, onCreateFriendship } from "root/src/graphql/subscriptions";
 import { createFriendRequest, deleteFriendRequest, deleteFriendship } from "root/src/graphql/mutations";
@@ -16,8 +15,6 @@ import APIList from 'components/APIList';
 
 import { AntDesign } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
-
-Amplify.configure(awsconfig);
 
 var styles = require('styles/stylesheet');
 
@@ -150,7 +147,6 @@ const FriendScreen = ({ route, navigation }) => {
                                 }]
                             }}}
                             setDataFunction={setFriendList}
-                            keyExtractor={(item) => item.timestamp.toString()}
                             data={friendList}
                             renderItem={({ item }) => (
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%' }}>
@@ -166,6 +162,7 @@ const FriendScreen = ({ route, navigation }) => {
                                     </TouchableOpacity>
                                 </View>
                             )}
+                            keyExtractor={(item) => {item.timestamp}}
                         />
                     </View>
 
@@ -178,7 +175,6 @@ const FriendScreen = ({ route, navigation }) => {
                             queryOperation={friendRequestsByReceiver}
                             filter={{receiver: route.params?.id}}
                             setDataFunction={setFriendRequestList}
-                            keyExtractor={(item) => item.sender}
                             data={friendRequestList}
                             renderItem={({ item }) => (
                                 <View style={{ marginVertical: 5 }}>
@@ -207,6 +203,7 @@ const FriendScreen = ({ route, navigation }) => {
                                     </View>
                                 </View>
                             )}
+                            keyExtractor={(item) => {item.sender}}
                         />
                     </View>
                 }

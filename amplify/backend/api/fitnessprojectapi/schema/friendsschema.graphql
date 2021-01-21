@@ -1,4 +1,4 @@
-type FriendRequest @model
+type FriendRequest @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
 @auth(
   rules: [
       { allow: owner, ownerField: "sender", operations: [create, delete, read] },
@@ -9,6 +9,8 @@ type FriendRequest @model
 @key(fields: ["sender", "receiver"])
 @key(name: "ByReceiver", fields: ["receiver", "sender"], queryField: "friendRequestsByReceiver")
 {
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
   sender: ID!
   receiver: ID!
 }
@@ -23,7 +25,7 @@ input UpdateFriendRequestInput
   receiver: ID!
 }
 
-type Friendship @model
+type Friendship @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
 @auth(
   rules: [
       { allow: private, operations: [read] },
@@ -35,8 +37,21 @@ type Friendship @model
 @key(fields: ["user1", "user2"])
 @key(name: "BySecondUser", fields: ["user2", "user1"], queryField: "friendsBySecondUser")
 {
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
   user1: ID!
   user2: ID!
-  timestamp: AWSTimestamp!
+  hifives: Int
+}
+
+input CreateFriendshipInput {
+  user1: ID!
+  user2: ID!
+  hifives: Int
+}
+
+input UpdateFriendshipInput {
+  user1: ID!
+  user2: ID!
   hifives: Int
 }

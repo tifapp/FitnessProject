@@ -15,11 +15,8 @@ import {
     RefreshControl
 } from "react-native";
 import { listGroups } from "root/src/graphql/queries";
-import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
-import { Amplify, API, Auth, graphqlOperation } from "aws-amplify";
+import { API, Auth, graphqlOperation } from "aws-amplify";
 import ListGroupItem from "components/ListGroupItem";
-
-Amplify.configure(awsconfig);
 
 var styles = require("styles/stylesheet");
 

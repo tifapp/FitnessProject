@@ -12,7 +12,7 @@ const AWSAppSyncClient = require('aws-appsync').default;
 const gql = require('graphql-tag');
 
 const config = {
-  url: process.env.API_FITNESSPROJECT_GRAPHQLAPIENDPOINTOUTPUT,
+  url: process.env.API_FITNESSPROJECTAPI_GRAPHQLAPIENDPOINTOUTPUT,
   region: process.env.AWS_REGION,
   auth: {
     type: AUTH_TYPE.AWS_IAM,
@@ -27,10 +27,10 @@ const getFriendRequest =
 `
   query GetFriendRequest($sender: ID!, $receiver: ID!) {
     getFriendRequest(sender: $sender, receiver: $receiver) {
-      sender
-      receiver
       createdAt
       updatedAt
+      sender
+      receiver
     }
   }
 `;
@@ -39,12 +39,11 @@ const getFriendship =
 `
   query GetFriendship($user1: ID!, $user2: ID!) {
     getFriendship(user1: $user1, user2: $user2) {
-      user1
-      user2
-      timestamp
-      hifives
       createdAt
       updatedAt
+      user1
+      user2
+      hifives
     }
   }
 `;
@@ -56,12 +55,11 @@ const updateFriendship =
     $condition: ModelFriendshipConditionInput
   ) {
     updateFriendship(input: $input, condition: $condition) {
-      user1
-      user2
-      timestamp
-      hifives
       createdAt
       updatedAt
+      user1
+      user2
+      hifives
     }
   }
 `;
@@ -88,12 +86,11 @@ const createFriendship =
     $condition: ModelFriendshipConditionInput
   ) {
     createFriendship(input: $input, condition: $condition) {
-      user1
-      user2
-      timestamp
-      hifives
       createdAt
       updatedAt
+      user1
+      user2
+      hifives
     }
   }
 `;
@@ -251,7 +248,6 @@ exports.handler = (event, context, callback) => {
                 input: {
                   user1: receiver < sender ? receiver : sender,
                   user2: receiver < sender ? sender : receiver,
-                  timestamp: Date.now(),
                   hifives: 0
                 }
               }

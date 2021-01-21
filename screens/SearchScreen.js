@@ -14,8 +14,6 @@ import {
     ActivityIndicator,
 } from "react-native";
 // Get the aws resources configuration parameters
-import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
-import { Amplify, } from "aws-amplify";
 import { DataStore, Predicates } from "@aws-amplify/datastore";
 import { searchGroups } from "root/src/graphql/queries";
 import { searchUsers } from "root/src/graphql/queries";
@@ -26,8 +24,6 @@ import * as subscriptions from "root/src/graphql/subscriptions";
 import AgePicker from "components/basicInfoComponents/AgePicker";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import APIList from 'components/APIList';
-
-Amplify.configure(awsconfig);
 
 var styles = require("styles/stylesheet");
 
@@ -231,7 +227,7 @@ export default function GroupSearchScreen({ navigation, route }) {
                             ? <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} matchingname={item.name.startsWith(query)} />
                             : <UserListItem item={item} matchingname={item.name.startsWith(query)} />
                     }
-                    keyExtractor={(item, index) => item.id}
+                    keyExtractor={(item) => {item.id}}
                 />
 
                 <StatusBar style="auto" />

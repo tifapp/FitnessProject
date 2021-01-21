@@ -234,31 +234,15 @@ const LookupUser = ({ route, navigation }) => {
     user == null ? null :
       <View>
         <ScrollView>
-          {
-            user.id == id
-              ? <TouchableOpacity
-                style={{ position: 'absolute', top: 25, right: 25, borderWidth: 1, borderRadius: 25, padding: 10 }}
-                onPress={() => navigation.navigate('Profile', {
-                  screen: 'Profile',
-                  params: { fromLookup: true },
-                })}>
-                <MaterialCommunityIcons style={styles.editIconStyle} name="dumbbell" size={24} color="black" />
-              </TouchableOpacity>
-              : null
-          }
           <View style={styles.border}>
-            {/*
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.goBackButton}>
-                    <Text style={styles.buttonTextStyle}>Go Back</Text>
-                </TouchableOpacity>
-                 */}
 
             <View style={{ paddingBottom: 15 }}>
               <ProfileImageAndName
+                you={userId === route.params?.id}
                 navigation={false}
                 vertical={true}
                 style={styles.imageStyle}
-                userId={user.id}
+                userId={userId}
                 isFull={true}
                 fullname={true}
               />
@@ -327,7 +311,6 @@ const LookupUser = ({ route, navigation }) => {
                 }}
                 setDataFunction={setMutualFriendList}
                 processingFunction={collectMutualFriends}
-                keyExtractor={(item, index) => item}
                 renderItem={({ item }) => (
                   <View style={{ marginVertical: 5 }}>
                     <View style={{ flexDirection: 'row', alignSelf: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%' }}>
@@ -339,6 +322,7 @@ const LookupUser = ({ route, navigation }) => {
                     </View>
                   </View>
                 )}
+                keyExtractor={(item) => item}
               />
             </SafeAreaView>
           </View>

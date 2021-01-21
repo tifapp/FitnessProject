@@ -1,54 +1,57 @@
-type Post @model
+"""
+This data type is used on the feed screen, group screen and message screen.
+The "postsByChannel" query is used to find posts belonging to a specific group or directed to a specific user.
+The "postsByParentId" query is used to find replies belonging to a specific post.
+"""
+type Post @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
 @auth(
   rules: [
       { allow: private, operations: [read] },
-      { allow: owner, ownerField: "userId", operations: [create, update, delete, read] },
+      { allow: owner, ownerField: "userId" },
+      { allow: owner, ownerField: "receiver", operations: [delete, read] },
       { allow: private, provider: iam, operations: [read, delete] },
   ]
 )
-@key(fields: ["timestamp", "userId"])
-
-"This query is used for the feed screen and group screen."
-@key(name: "ByGroup", fields: ["group", "parentId", "isReply", "timestamp"], queryField: "postsByGroup")
-
-"This query is used to delete replies of a specific post."
-@key(name: "ByParentId", fields: ["parentId", "isReply"], queryField: "postsByParentId")
+@key(fields: ["createdAt", "userId"])
+@key(name: "ByChannel", fields: ["channel", "parentId", "isParent", "createdAt"], queryField: "postsByChannel")
+@key(name: "ByParentId", fields: ["parentId", "isParent"], queryField: "postsByParentId")
 {
-  timestamp: AWSTimestamp!
-  userId: String!
-  parentId: String
-  description: String
-  group: String
-  isReply: Int
-}
-
-"""
-This is used for the message screen.
-"""
-type Message @model
-@auth(
-  rules: [
-      { allow: owner, ownerField: "receiver", operations: [read] },
-      { allow: owner, ownerField: "userId", operations: [create, update, delete, read] },
-      { allow: private, provider: iam, operations: [read, delete] },
-  ]
-)
-@key(fields: ["timestamp", "userId"])
-{
-  timestamp: AWSTimestamp!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
   userId: ID!
-  parentId: String
   description: String
-  receiver: ID!
-  isReply: Int
-  wasUpdated: Boolean
+  parentId: String
+  channel: ID
+  receiver: ID
+  isParent: Int
 }
 
 """
-This is used for batch deletion of posts (deleting multiple posts at once).
+This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when creating a new message.
+"""
+input CreatePostInput {
+  description: String
+  parentId: String
+  channel: ID
+  receiver: ID
+  isParent: Int
+}
+
+"""
+This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when updating a message.
+"""
+input UpdatePostInput {
+  createdAt: AWSDateTime!
+  description: String
+  parentId: String
+  isParent: Int
+}
+
+"""
+This is used for batch deletion of posts.
 """
 input DeletePostInput {
-  timestamp: AWSTimestamp!
+  createdAt: AWSDateTime!
   userId: String!
 }
 

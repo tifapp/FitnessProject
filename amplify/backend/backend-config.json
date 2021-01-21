@@ -35,7 +35,7 @@
       "build": true,
       "dependsOn": []
     },
-    "friendRequestResolver": {
+    "deleteReplies": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda",
@@ -50,7 +50,7 @@
         }
       ]
     },
-    "deleteReplies": {
+    "friendRequestResolver": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda",

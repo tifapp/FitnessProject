@@ -1,4 +1,28 @@
 {
+  "messagetwo": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-fitnessproject-messagetwo-144938-authRole",
+      "UnauthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-messagetwo-144938-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-messagetwo-144938-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-fitnessproject-messagetwo-144938-deployment",
+      "UnauthRoleName": "amplify-fitnessproject-messagetwo-144938-unauthRole",
+      "StackName": "amplify-fitnessproject-messagetwo-144938",
+      "StackId": "arn:aws:cloudformation:us-west-2:213277979580:stack/amplify-fitnessproject-messagetwo-144938/73da2f70-59df-11eb-b5eb-0a37f738008d",
+      "AmplifyAppId": "d19kzf7eu35pq1"
+    },
+    "categories": {
+      "auth": {
+        "fitnessprojecta8f49cfe": {}
+      },
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d19kzf7eu35pq1",
+          "type": "manual"
+        }
+      }
+    }
+  },
   "dev": {
     "awscloudformation": {
       "AuthRoleName": "amplify-fitnessproject-dev-231929-authRole",
@@ -20,6 +44,9 @@
           "appId": "d19kzf7eu35pq1",
           "type": "manual"
         }
+      },
+      "function": {
+        "S3Triggeref91c1ec": {}
       }
     }
   }

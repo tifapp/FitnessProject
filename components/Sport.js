@@ -15,10 +15,6 @@ import {
   Modal,
   Dimensions,
 } from "react-native";
-import { withAuthenticator } from "aws-amplify-react-native";
-// Get the aws resources configuration parameters
-import { Amplify, API, graphqlOperation, Auth } from "aws-amplify";
-import awsconfig from "../aws-exports"; // if you are using Amplify CLI
 
 const { width } = Dimensions.get("screen");
 

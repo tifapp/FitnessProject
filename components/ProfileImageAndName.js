@@ -12,16 +12,26 @@ var styles = require('../styles/stylesheet');
 export const ProfileImageAndName = (props) => { //user is required in props. it's a type of object described in userschema.graphql
     const navigation = useNavigation();
     const goToProfile = () => {
-        if (props.navigation == false) return;
-        navigation.push('Lookup',
-            { userId: props.userId })
+        if (props.navigation == false) {
+            if (props.you)
+                navigation.navigate('Profile', {
+                    screen: 'Profile',
+                    params: { fromLookup: true },
+                })
+            else
+                navigation.navigate('Messages', {userId: props.userId})
+        }
+        else {
+            navigation.push('Lookup',
+                { userId: props.userId })
+        }
     }
-    
+
 
     const [userInfo, setUserInfo] = useState(null);
 
     const addUserInfotoCache = () => {
-        //console.log('cache missed!'); //this isn't printing for some reason
+        console.log('cache missed!', props.userId); //this isn't printing for some reason
         API.graphql(
             graphqlOperation(getUser, { id: props.userId })
         )
@@ -74,7 +84,7 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
     useEffect(() => {
         Cache.getItem(props.userId, { callback: addUserInfotoCache }) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
             .then((info) => {
-                //console.log('cache hit! ', url.substring(0, 15), '...');
+                console.log('cache hit! ', props.userId);
                 setUserInfo(info)
             }); //redundant???
         //return () => mounted = false;

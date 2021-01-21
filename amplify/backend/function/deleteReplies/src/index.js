@@ -1,3 +1,9 @@
+/* Amplify Params - DO NOT EDIT
+	API_FITNESSPROJECTAPI_GRAPHQLAPIENDPOINTOUTPUT
+	API_FITNESSPROJECTAPI_GRAPHQLAPIIDOUTPUT
+	ENV
+	REGION
+Amplify Params - DO NOT EDIT */
 require('isomorphic-fetch');
 const AWS = require('aws-sdk/global');
 const AUTH_TYPE = require('aws-appsync').AUTH_TYPE;
@@ -5,7 +11,7 @@ const AWSAppSyncClient = require('aws-appsync').default;
 const gql = require('graphql-tag');
 
 const config = {
-  url: "https://lsvxnu7alvawnjevasqpbwk6ni.appsync-api.us-west-2.amazonaws.com/graphql", //still not sure why the apigraphqlendpoint variable is undefined here but not in the friendrequestresolver function
+  url: process.env.API_FITNESSPROJECTAPI_GRAPHQLAPIENDPOINTOUTPUT, //still not sure why the apigraphqlendpoint variable is undefined here but not in the friendrequestresolver function
   region: process.env.AWS_REGION,
   auth: {
     type: AUTH_TYPE.AWS_IAM,
@@ -20,7 +26,7 @@ const postsByParentId =
 `
 query PostsByParentId(
   $parentId: String
-  $isReply: ModelIntKeyConditionInput
+  $isParent: ModelIntKeyConditionInput
   $sortDirection: ModelSortDirection
   $filter: ModelPostFilterInput
   $limit: Int
@@ -28,21 +34,21 @@ query PostsByParentId(
 ) {
   postsByParentId(
     parentId: $parentId
-    isReply: $isReply
+    isParent: $isParent
     sortDirection: $sortDirection
     filter: $filter
     limit: $limit
     nextToken: $nextToken
   ) {
     items {
-      timestamp
-      userId
-      parentId
-      description
-      group
-      isReply
       createdAt
       updatedAt
+      userId
+      description
+      parentId
+      channel
+      receiver
+      isParent
     }
     nextToken
   }
@@ -56,14 +62,14 @@ const deletePost =
     $condition: ModelPostConditionInput
   ) {
     deletePost(input: $input, condition: $condition) {
-      timestamp
-      userId
-      parentId
-      description
-      group
-      isReply
       createdAt
       updatedAt
+      userId
+      description
+      parentId
+      channel
+      receiver
+      isParent
     }
   }
 `;
@@ -72,7 +78,7 @@ exports.handler = (event, context, callback) => {
   event.Records.forEach((record) => {
     if (record.eventName == "REMOVE") {
       const parentId = record.dynamodb.OldImage.parentId.S;
-      if (record.dynamodb.OldImage.isReply.N == 1) {
+      if (record.dynamodb.OldImage.isParent.N == 1) {
         (async () => {
           try {
             const results = await client.query({
@@ -87,7 +93,7 @@ exports.handler = (event, context, callback) => {
                 mutation: gql(deletePost),
                 variables: {
                   input: {
-                    timestamp: post.timestamp,
+                    createdAt: post.createdAt,
                     userId: post.userId,
                   }
                 }

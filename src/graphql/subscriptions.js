@@ -52,108 +52,105 @@ export const onDeleteGroup = /* GraphQL */ `
 export const onCreateFriendRequest = /* GraphQL */ `
   subscription OnCreateFriendRequest($sender: String, $receiver: String) {
     onCreateFriendRequest(sender: $sender, receiver: $receiver) {
-      sender
-      receiver
       createdAt
       updatedAt
+      sender
+      receiver
     }
   }
 `;
 export const onUpdateFriendRequest = /* GraphQL */ `
   subscription OnUpdateFriendRequest($sender: String, $receiver: String) {
     onUpdateFriendRequest(sender: $sender, receiver: $receiver) {
-      sender
-      receiver
       createdAt
       updatedAt
+      sender
+      receiver
     }
   }
 `;
 export const onDeleteFriendRequest = /* GraphQL */ `
   subscription OnDeleteFriendRequest($sender: String, $receiver: String) {
     onDeleteFriendRequest(sender: $sender, receiver: $receiver) {
-      sender
-      receiver
       createdAt
       updatedAt
+      sender
+      receiver
     }
   }
 `;
 export const onCreateFriendship = /* GraphQL */ `
   subscription OnCreateFriendship {
     onCreateFriendship {
-      user1
-      user2
-      timestamp
-      hifives
       createdAt
       updatedAt
+      user1
+      user2
+      hifives
     }
   }
 `;
 export const onUpdateFriendship = /* GraphQL */ `
   subscription OnUpdateFriendship {
     onUpdateFriendship {
-      user1
-      user2
-      timestamp
-      hifives
       createdAt
       updatedAt
+      user1
+      user2
+      hifives
     }
   }
 `;
 export const onDeleteFriendship = /* GraphQL */ `
   subscription OnDeleteFriendship {
     onDeleteFriendship {
-      user1
-      user2
-      timestamp
-      hifives
       createdAt
       updatedAt
+      user1
+      user2
+      hifives
     }
   }
 `;
 export const onCreatePost = /* GraphQL */ `
   subscription OnCreatePost {
     onCreatePost {
-      timestamp
-      userId
-      parentId
-      description
-      group
-      isReply
       createdAt
       updatedAt
+      userId
+      description
+      parentId
+      channel
+      receiver
+      isParent
     }
   }
 `;
 export const onUpdatePost = /* GraphQL */ `
   subscription OnUpdatePost {
     onUpdatePost {
-      timestamp
-      userId
-      parentId
-      description
-      group
-      isReply
       createdAt
       updatedAt
+      userId
+      description
+      parentId
+      channel
+      receiver
+      isParent
     }
   }
 `;
 export const onDeletePost = /* GraphQL */ `
   subscription OnDeletePost {
     onDeletePost {
-      timestamp
-      userId
-      parentId
-      description
-      group
-      isReply
       createdAt
       updatedAt
+      userId
+      description
+      parentId
+      channel
+      receiver
+      isParent
     }
   }
 `;

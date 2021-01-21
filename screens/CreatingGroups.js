@@ -17,10 +17,8 @@ import {
   Dimensions,
   Alert
 } from "react-native";
-import { withAuthenticator } from "aws-amplify-react-native";
 // Get the aws resources configuration parameters
-import { Amplify, API, graphqlOperation, Auth } from "aws-amplify";
-import awsconfig from "root/aws-exports"; // if you are using Amplify CLI
+import { API, graphqlOperation } from "aws-amplify";
 import CreatingHeader from "./GroupsHeader";
 import { Entypo } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
