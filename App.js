@@ -118,7 +118,6 @@ const App = () => {
     // Only update the profile with the expoToken if it not exists yet
     if (token !== "") {
       const inputParams = {
-        id: userId,
         deviceToken: token
       };
       await API.graphql(graphqlOperation(updateUser, { input: inputParams }));
