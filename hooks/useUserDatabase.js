@@ -84,8 +84,6 @@ export default () => {
       console.log('returning users fields looks like', fields);
 
       const ourUser = {
-        id: query.attributes.sub,
-        identityId: identityId,
         name: name,
         age: age,
         gender: gender,

@@ -17,3 +17,25 @@ type User @model @searchable
   longitude: Float
   deviceToken: ID
 }
+
+input CreateUserInput {
+  name: String!
+  age: Int
+  gender: String
+  bio: String
+  goals: String
+  latitude: Float
+  longitude: Float
+  deviceToken: ID
+}
+
+input UpdateUserInput {
+  name: String
+  age: Int
+  gender: String
+  bio: String
+  goals: String
+  latitude: Float
+  longitude: Float
+  deviceToken: ID
+}
