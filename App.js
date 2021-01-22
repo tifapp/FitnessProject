@@ -240,4 +240,4 @@ export default withAuthenticator(App, false, [
   <VerifyContact/>,
   <ForgotPassword/>,
   <RequireNewPassword/>,
-], {usernameAttributes: 'email'});
+]);

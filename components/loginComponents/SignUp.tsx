@@ -189,9 +189,7 @@ export default class SignUp extends AuthPiece<ISignUpProps, ISignUpState> {
 		}
 
 		const signup_info = {
-			username: this.state.username.trim().toLowerCase().replace(function(c) {
-                return c === /[\p{L}\p{M}\p{S}\p{N}\p{P}]+/ ? c : '';
-            }).replace(/\s/g,''),
+			username: this.state.username,
 			password: this.state.password,
 			attributes: {},
 		};
@@ -214,14 +212,10 @@ export default class SignUp extends AuthPiece<ISignUpProps, ISignUpState> {
 
 		let labelCheck = false;
 		this.signUpFields.forEach(field => {
-			if (field.label === this.getUsernameLabel()) {
+			if (field.label === 'Email') {
 				logger.debug(`Changing the username to the value of ${field.label}`);
 				signup_info.username =
-					signup_info.attributes[field.key].trim().toLowerCase().replace(function(c) {
-                return c === /[\p{L}\p{M}\p{S}\p{N}\p{P}]+/ ? c : '';
-            }).replace(/\s/g,'') || signup_info.username.trim().toLowerCase().replace(function(c) {
-                return c === /[\p{L}\p{M}\p{S}\p{N}\p{P}]+/ ? c : '';
-            }).replace(/\s/g,'');
+					signup_info.attributes[field.key] || signup_info.username;
 				labelCheck = true;
 			}
 		});
@@ -265,7 +259,9 @@ export default class SignUp extends AuthPiece<ISignUpProps, ISignUpState> {
 									secureTextEntry={field.type === 'password'}
 									onChangeText={text => {
 										const stateObj = this.state;
-										stateObj[field.key] = text;
+										stateObj[field.key] = text.trim().toLowerCase().replace(function(c) {
+                return c === /[\p{L}\p{M}\p{S}\p{N}\p{P}]+/ ? c : '';
+            }).replace(/\s/g,'');
 										this.setState(stateObj);
 									}}
 									label={I18n.get(field.label)}
