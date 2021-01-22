@@ -101,7 +101,7 @@ export default () => {
         updateUserInDB(ourUser)
       }
 
-      return ourUser, query.attributes.sub;
+      return [ourUser, query.attributes.sub];
     }
     catch (err) {
       console.log("error: ", err);
