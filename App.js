@@ -17,9 +17,16 @@ import ComplianceScreen from "./screens/ComplianceScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import BioScreen from "./screens/BioScreen";
 import GoalsScreen from "./screens/GoalsScreen";
-import SignInScreen from "./screens/SignInScreen";
 import SearchStack from "./SearchStack";
 import { updateUser } from 'root/src/graphql/mutations.js'
+import SignIn from "root/components/loginComponents/SignIn.tsx";
+import SignUp from "root/components/loginComponents/SignUp.tsx";
+import RequireNewPassword from "root/components/loginComponents/RequireNewPassword.tsx";
+import ConfirmSignIn from "root/components/loginComponents/ConfirmSignIn.tsx";
+import ConfirmSignUp from "root/components/loginComponents/ConfirmSignUp.tsx";
+import ForgotPassword from "root/components/loginComponents/ForgotPassword.tsx";
+import VerifyContact from "root/components/loginComponents/VerifyContact.tsx";
+import Greetings from "root/components/loginComponents/Greetings.tsx";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -224,4 +231,13 @@ function TabBarIcon({ name, color }) {
   );
 }
 
-export default withAuthenticator(App);
+export default withAuthenticator(App, false, [
+  <Greetings/>,
+  <SignIn/>,
+  <SignUp/>,
+  <ConfirmSignIn/>,
+  <ConfirmSignUp/>,
+  <VerifyContact/>,
+  <ForgotPassword/>,
+  <RequireNewPassword/>,
+], {usernameAttributes: 'email'});
