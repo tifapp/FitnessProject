@@ -314,7 +314,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
             newSection={index == 0 ? true : showTimestamp(posts[index-1], index-1)}
           />
         )}
-        keyExtractor={item => item.createdAt + item.userId}
+        keyExtractor={item => item.createdAt.toString() + item.userId}
       />
 
       <StatusBar style="auto" />

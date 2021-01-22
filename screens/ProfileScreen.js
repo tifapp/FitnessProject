@@ -106,9 +106,9 @@ const ProfileScreen = ({ navigation, route }) => {
         else {
             Alert.alert('Submitting Profile...', '', [], { cancelable: false })
             updateUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails, locationEnabled ? getLocation() : null)
-                .then((user) => {
+                .then((user, id) => {
                     if (route.params?.newUser) {
-                        route.params?.setUserIdFunction(user.id);
+                        route.params?.setUserIdFunction(id);
                     }            
                     if (route.params?.fromLookup) {
                         navigation.setParams({fromLookup: false})
