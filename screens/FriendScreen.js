@@ -48,10 +48,12 @@ const FriendScreen = ({ route, navigation }) => {
                 }
             }
         });
-        await API.graphql(graphqlOperation(onCreateFriendRequest, {receiver: route.params?.id})).subscribe({
+        await API.graphql(graphqlOperation(onCreateFriendRequest)).subscribe({
             next: event => {
                 const newFriendRequest = event.value.data.onCreateFriendRequest
-                setFriendRequestList([newFriendRequest, ...currentFriendRequests.current]);
+                if (newFriendRequest.receiver == route.params?.id) {
+                    setFriendRequestList([newFriendRequest, ...currentFriendRequests.current]);
+                }
             }
         });
     }
@@ -162,7 +164,7 @@ const FriendScreen = ({ route, navigation }) => {
                                     </TouchableOpacity>
                                 </View>
                             )}
-                            keyExtractor={(item) => item.timestamp.toString()}
+                            keyExtractor={(item) => item.createdAt.toString()}
                         />
                     </View>
 

@@ -50,8 +50,8 @@ export const onDeleteGroup = /* GraphQL */ `
   }
 `;
 export const onCreateFriendRequest = /* GraphQL */ `
-  subscription OnCreateFriendRequest($sender: String, $receiver: String) {
-    onCreateFriendRequest(sender: $sender, receiver: $receiver) {
+  subscription OnCreateFriendRequest {
+    onCreateFriendRequest {
       createdAt
       updatedAt
       sender
@@ -60,8 +60,8 @@ export const onCreateFriendRequest = /* GraphQL */ `
   }
 `;
 export const onUpdateFriendRequest = /* GraphQL */ `
-  subscription OnUpdateFriendRequest($sender: String, $receiver: String) {
-    onUpdateFriendRequest(sender: $sender, receiver: $receiver) {
+  subscription OnUpdateFriendRequest {
+    onUpdateFriendRequest {
       createdAt
       updatedAt
       sender
@@ -70,8 +70,8 @@ export const onUpdateFriendRequest = /* GraphQL */ `
   }
 `;
 export const onDeleteFriendRequest = /* GraphQL */ `
-  subscription OnDeleteFriendRequest($sender: String, $receiver: String) {
-    onDeleteFriendRequest(sender: $sender, receiver: $receiver) {
+  subscription OnDeleteFriendRequest {
+    onDeleteFriendRequest {
       createdAt
       updatedAt
       sender

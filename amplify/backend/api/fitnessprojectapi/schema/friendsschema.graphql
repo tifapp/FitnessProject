@@ -1,6 +1,7 @@
 type FriendRequest @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
 @auth(
   rules: [
+      { allow: private, operations: [read] },
       { allow: owner, ownerField: "sender", operations: [create, delete, read] },
       { allow: owner, ownerField: "receiver", operations: [create, delete, read] },
       { allow: private, provider: iam, operations: [read, delete] },
