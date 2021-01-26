@@ -28,7 +28,8 @@
 	  "googleServicesFile": "./google-services.json"
     },
 	"splash": {
-		"image": "./assets/splash.png"
+		"image": "./assets/splash.png",
+		"backgroundColor": "#26C6A2"
 	}
   }
 }
