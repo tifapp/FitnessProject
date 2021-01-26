@@ -230,7 +230,7 @@ function TabBarIcon({ name, color }) {
   );
 }
 
-export default withAuthenticator(App, false, [
+export default withAuthenticator(App, false, [ //this is why we cant have splash screen
   <Greetings/>,
   <SignIn/>,
   <SignUp/>,
