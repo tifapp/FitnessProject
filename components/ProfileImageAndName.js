@@ -85,7 +85,7 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
         Cache.getItem(props.userId, { callback: addUserInfotoCache }) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
             .then((info) => {
                 //console.log('cache hit! ', props.userId);
-                if (props.isFull && !info.isFull) {
+                if (info.imageURL !== '' && props.isFull && !info.isFull) {
                     addUserInfotoCache();
                 } else {
                     setUserInfo(info);

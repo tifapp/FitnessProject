@@ -18,7 +18,7 @@ export default () => {
     if (fields == null) {
       console.log("user doesn't exist, they must be making their profile for the first time");
     } else {
-      Cache.setItem(query.attributes.sub, { name: fields.name, imageURL: imageURL }, { priority: 1, expires: Date.now() + 86400000 });
+      Cache.setItem(query.attributes.sub, { name: fields.name, imageURL: imageURL, isFull: true }, { priority: 1, expires: Date.now() + 86400000 });
       return {...fields, pictureURL: imageURL};
     }
   };
@@ -47,7 +47,7 @@ export default () => {
 
         await Storage.put('profileimage.jpg', blob, { level: 'protected', contentType: 'image/jpeg' });
 
-        Cache.setItem(userId, { name: name, imageURL: imageURL }, { priority: 1, expires: Date.now() + 86400000 });
+        Cache.setItem(userId, { name: name, imageURL: imageURL, isFull: true }, { priority: 1, expires: Date.now() + 86400000 });
       } else {
         Storage.remove('profileimage.jpg', { level: 'protected' })
           .then(result => console.log("removed profile image!", result))
