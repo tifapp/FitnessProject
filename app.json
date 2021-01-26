@@ -26,6 +26,9 @@
       "package": "com.seanimo.FitnessApp",
 	  "useNextNotificationsApi": true,
 	  "googleServicesFile": "./google-services.json"
-    }
+    },
+	"splash": {
+		"image": "./assets/splash.png"
+	}
   }
 }
