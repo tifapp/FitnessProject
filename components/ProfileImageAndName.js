@@ -38,7 +38,7 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
             .then((u) => {
                 const user = u.data.getUser;
                 if (user != null) {
-                    const info = { name: user.name, imageURL: '' };
+                    const info = { name: user.name, imageURL: '', isFull: props.isFull };
                     if (props.isFull) { //since this only runs during cache misses, we'll probably never see this. maybe we'll need a new index with a very low priority. it'll definitely need to be cached and shown when viewing someone's profile.
                         //console.log("showing full image");
                         Storage.get('profileimage.jpg', { level: 'protected', identityId: user.identityId }) //this will incur lots of repeated calls to the backend, idk how else to fix it right now
@@ -85,7 +85,11 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
         Cache.getItem(props.userId, { callback: addUserInfotoCache }) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
             .then((info) => {
                 //console.log('cache hit! ', props.userId);
-                setUserInfo(info)
+                if (props.isFull && !info.isFull) {
+                    addUserInfotoCache();
+                } else {
+                    setUserInfo(info);
+                }
             }); //redundant???
         //return () => mounted = false;
     }, [props.user]);
