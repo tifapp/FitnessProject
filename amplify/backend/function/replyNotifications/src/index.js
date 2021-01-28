@@ -24,7 +24,7 @@ const config = {
 const client = new AWSAppSyncClient(config);
 
 const getFriendRequest =
-`
+  `
   query GetFriendRequest($sender: ID!, $receiver: ID!) {
     getFriendRequest(sender: $sender, receiver: $receiver) {
       createdAt
@@ -36,7 +36,7 @@ const getFriendRequest =
 `;
 
 const getFriendship =
-`
+  `
   query GetFriendship($user1: ID!, $user2: ID!) {
     getFriendship(user1: $user1, user2: $user2) {
       createdAt
@@ -49,7 +49,7 @@ const getFriendship =
 `;
 
 const updateFriendship =
-`
+  `
   mutation UpdateFriendship(
     $input: UpdateFriendshipInput!
     $condition: ModelFriendshipConditionInput
@@ -65,7 +65,7 @@ const updateFriendship =
 `;
 
 const deleteFriendRequest =
-`
+  `
   mutation DeleteFriendRequest(
     $input: DeleteFriendRequestInput!
     $condition: ModelFriendRequestConditionInput
@@ -80,7 +80,7 @@ const deleteFriendRequest =
 `;
 
 const createFriendship =
-`
+  `
   mutation CreateFriendship(
     $input: CreateFriendshipInput!
     $condition: ModelFriendshipConditionInput
@@ -96,7 +96,7 @@ const createFriendship =
 `;
 
 const getUser =
-`
+  `
   query GetUser($id: ID!) {
     getUser(id: $id) {
       id
@@ -115,8 +115,8 @@ const getUser =
   }
 `;
 
-const getPost = 
-`
+const getPost =
+  `
   query GetPost($createdAt: AWSDateTime!, $userId: ID!) {
     getPost(createdAt: $createdAt, userId: $userId) {
       createdAt
@@ -131,7 +131,7 @@ const getPost =
   }
   `;
 
-  const postsByParentId =
+const postsByParentId =
   `
   query PostsByParentId(
     $parentId: String
@@ -232,14 +232,14 @@ exports.handler = (event, context, callback) => {
             }
           });
           */
-         const parentId = record.dynamodb.NewImage.parentId.S;
-         const childId = record.dynamodb.NewImage.userId.S;
+          const parentId = record.dynamodb.NewImage.parentId.S;
+          const childId = record.dynamodb.NewImage.userId.S;
 
-         console.log(record.dynamodb.NewImage);
+          console.log(record.dynamodb.NewImage);
 
-         if(parentId.isParent==1){
-           return;
-         }
+          if (record.dynamodb.NewImage.isParent.N == 1) {
+            return;
+          }
 
           const parents = await client.query({
             query: gql(postsByParentId),
@@ -258,7 +258,7 @@ exports.handler = (event, context, callback) => {
 
           const childPost = await client.query({
             query: gql(getUser),
-            variables : {
+            variables: {
               id: childId
             }
           });
@@ -267,18 +267,28 @@ exports.handler = (event, context, callback) => {
 
           const parentPost = await client.query({
             query: gql(getUser),
-            variables : {
+            variables: {
               id: uniqueParentNames.userId
             }
           });
 
-          await sendNotification(parentPost.data.getUser.deviceToken, childPost.data.getUser.name + " sent you a reply!"); //truncate the sender's name!
-          console.log("Finished Replying");
-          }
-          catch(e) {
-            console.warn('Error sending reply: ', e);
-          }
-        })();
+          // const friendshipcheck = await client.query({
+          //   query: gql(getFriendship),
+          //   variables: {
+          //     user1: childId < uniqueParentNames.userId ? childId : uniqueParentNames.userId,
+          //     user2: childId < uniqueParentNames.userId ? uniqueParentNames.userId : childId,
+          //   }
+          // });
+
+          //if (friendshipcheck.data.getFriendship != null) {
+            await sendNotification(parentPost.data.getUser.deviceToken, childPost.data.getUser.name + " sent you a reply!"); //truncate the sender's name!
+            console.log("Finished Replying");
+          //}
+        }
+        catch (e) {
+          console.warn('Error sending reply: ', e);
+        }
+      })();
     }
   });
 };
