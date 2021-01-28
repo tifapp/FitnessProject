@@ -218,6 +218,7 @@ exports.handler = (event, context, callback) => {
     if (record.eventName == "INSERT") {
       (async () => {
         try {
+          console.log("---------------------------------------------------------");
           //console.log('getting a new object with a sender of ', JSON.stringify(record.dynamodb.NewImage.sender.S), 'seeing if an object exists with that receiver');
           //const receiver = record.dynamodb.NewImage.receiver.S;
           //const sender = record.dynamodb.NewImage.sender.S;
@@ -231,8 +232,10 @@ exports.handler = (event, context, callback) => {
             }
           });
           */
-         const parentId = record.dynamodb.OldImage.parentId.S;
-         const childId = record.dynamodb.OldImage.userId.S;
+         const parentId = record.dynamodb.NewImage.parentId.S;
+         const childId = record.dynamodb.NewImage.userId.S;
+
+         console.log(record.dynamodb.NewImage);
 
          if(parentId.isParent==1){
            return;
@@ -242,35 +245,40 @@ exports.handler = (event, context, callback) => {
             query: gql(postsByParentId),
             variables: {
               parentId: parentId,
-              isParent: 1
+              sortDirection: 'DESC',
+              limit: 1
             }
           });
 
           const uniqueParentNames = parents.data.postsByParentId.items[0];
 
+          console.log("*************************************************");
           console.log(uniqueParentNames);
-          const parent_ID = uniqueParentNames.userId.toString();
+          console.log("*************************************************");
 
           const childPost = await client.query({
             query: gql(getUser),
-            varables : {
+            variables : {
               id: childId
             }
           });
 
+          console.log("fetched child post");
+
           const parentPost = await client.query({
             query: gql(getUser),
-            varables : {
-              id: parent_ID
+            variables : {
+              id: uniqueParentNames.userId
             }
           });
 
           await sendNotification(parentPost.data.getUser.deviceToken, childPost.data.getUser.name + " sent you a reply!"); //truncate the sender's name!
+          console.log("Finished Replying");
           }
           catch(e) {
             console.warn('Error sending reply: ', e);
           }
-        });
+        })();
     }
   });
 };
