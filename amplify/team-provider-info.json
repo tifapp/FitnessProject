@@ -80,5 +80,33 @@
         }
       }
     }
+  },
+  "likes": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-fitnessproject-likes-194109-authRole",
+      "UnauthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-likes-194109-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-likes-194109-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-fitnessproject-likes-194109-deployment",
+      "UnauthRoleName": "amplify-fitnessproject-likes-194109-unauthRole",
+      "StackName": "amplify-fitnessproject-likes-194109",
+      "StackId": "arn:aws:cloudformation:us-west-2:213277979580:stack/amplify-fitnessproject-likes-194109/aab2ca60-611a-11eb-a92e-0a5acb9a2d33",
+      "AmplifyAppId": "d19kzf7eu35pq1"
+    },
+    "categories": {
+      "auth": {
+        "fitnessprojecta8f49cfe": {}
+      },
+      "function": {
+        "S3Triggeref91c1ec": {},
+        "friendRequestResolver": {}
+      },
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d19kzf7eu35pq1",
+          "type": "manual"
+        }
+      }
+    }
   }
 }

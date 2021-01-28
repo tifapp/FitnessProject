@@ -12,12 +12,12 @@ type Post @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
       { allow: private, provider: iam, operations: [read, delete] },
   ]
 )
-@key(fields: ["createdAt", "userId"])
 @key(name: "ByChannel", fields: ["channel", "parentId", "isParent", "createdAt"], queryField: "postsByChannel")
 @key(name: "ByParentId", fields: ["parentId", "isParent"], queryField: "postsByParentId")
 {
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
+  id: ID!
   userId: ID!
   description: String
   parentId: String
@@ -47,8 +47,10 @@ input UpdatePostInput {
   isParent: Int
 }
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 """
-This is used for batch deletion of posts.
+(not working) This is used for batch deletion of posts.
 """
 input DeletePostInput {
   createdAt: AWSDateTime!
