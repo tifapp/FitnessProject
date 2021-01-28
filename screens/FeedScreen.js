@@ -88,7 +88,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
             }
           }
           else
-            setPosts([newPost, ...currentPosts.current]); //for some reason "posts" isn't the most uptodate version. will we need a ref???!?!?!? //what if we have a lot of new posts at once?
+            setPosts([newPost, ...currentPosts.current]); //what if we have a lot of new posts at once?
         }
       }
     });
