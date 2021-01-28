@@ -203,32 +203,28 @@ export const friendsBySecondUser = /* GraphQL */ `
     }
   }
 `;
-export const getPost = /* GraphQL */ `
-  query GetPost($createdAt: AWSDateTime!, $userId: ID!) {
-    getPost(createdAt: $createdAt, userId: $userId) {
+export const getLike = /* GraphQL */ `
+  query GetLike($userId: ID!, $postId: ID!) {
+    getLike(userId: $userId, postId: $postId) {
       createdAt
       updatedAt
       userId
-      description
-      parentId
-      channel
-      receiver
-      isParent
+      postId
     }
   }
 `;
-export const listPosts = /* GraphQL */ `
-  query ListPosts(
-    $createdAt: AWSDateTime
-    $userId: ModelIDKeyConditionInput
-    $filter: ModelPostFilterInput
+export const listLikes = /* GraphQL */ `
+  query ListLikes(
+    $userId: ID
+    $postId: ModelIDKeyConditionInput
+    $filter: ModelLikeFilterInput
     $limit: Int
     $nextToken: String
     $sortDirection: ModelSortDirection
   ) {
-    listPosts(
-      createdAt: $createdAt
+    listLikes(
       userId: $userId
+      postId: $postId
       filter: $filter
       limit: $limit
       nextToken: $nextToken
@@ -238,11 +234,7 @@ export const listPosts = /* GraphQL */ `
         createdAt
         updatedAt
         userId
-        description
-        parentId
-        channel
-        receiver
-        isParent
+        postId
       }
       nextToken
     }
@@ -274,6 +266,7 @@ export const postsByChannel = /* GraphQL */ `
         channel
         receiver
         isParent
+        likes
       }
       nextToken
     }
@@ -305,6 +298,54 @@ export const postsByParentId = /* GraphQL */ `
         channel
         receiver
         isParent
+        likes
+      }
+      nextToken
+    }
+  }
+`;
+export const getPost = /* GraphQL */ `
+  query GetPost($createdAt: AWSDateTime!, $userId: ID!) {
+    getPost(createdAt: $createdAt, userId: $userId) {
+      createdAt
+      updatedAt
+      userId
+      description
+      parentId
+      channel
+      receiver
+      isParent
+      likes
+    }
+  }
+`;
+export const listPosts = /* GraphQL */ `
+  query ListPosts(
+    $createdAt: AWSDateTime
+    $userId: ModelIDKeyConditionInput
+    $filter: ModelPostFilterInput
+    $limit: Int
+    $nextToken: String
+    $sortDirection: ModelSortDirection
+  ) {
+    listPosts(
+      createdAt: $createdAt
+      userId: $userId
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
+    ) {
+      items {
+        createdAt
+        updatedAt
+        userId
+        description
+        parentId
+        channel
+        receiver
+        isParent
+        likes
       }
       nextToken
     }

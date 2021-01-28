@@ -9,15 +9,21 @@ type Post @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
       { allow: private, operations: [read] },
       { allow: owner, ownerField: "userId" },
       { allow: owner, ownerField: "receiver", operations: [delete, read] },
-      { allow: private, provider: iam, operations: [read, delete] },
+      { allow: private, provider: iam, operations: [create, read, update, delete] },
   ]
 )
+@key(fields: ["createdAt", "userId"])
 @key(name: "ByChannel", fields: ["channel", "parentId", "isParent", "createdAt"], queryField: "postsByChannel")
 @key(name: "ByParentId", fields: ["parentId", "isParent"], queryField: "postsByParentId")
 {
+  likes: Int
+    @auth(
+      rules: [
+          { allow: private, provider: iam, operations: [read, create, update] },
+      ]
+    )
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
-  id: ID!
   userId: ID!
   description: String
   parentId: String
@@ -41,16 +47,15 @@ input CreatePostInput {
 This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when updating a message.
 """
 input UpdatePostInput {
+  likes: Int
   createdAt: AWSDateTime!
   description: String
   parentId: String
   isParent: Int
 }
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 """
-(not working) This is used for batch deletion of posts.
+This is used for batch deletion of posts.
 """
 input DeletePostInput {
   createdAt: AWSDateTime!

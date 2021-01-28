@@ -112,6 +112,36 @@ export const onDeleteFriendship = /* GraphQL */ `
     }
   }
 `;
+export const onCreateLike = /* GraphQL */ `
+  subscription OnCreateLike {
+    onCreateLike {
+      createdAt
+      updatedAt
+      userId
+      postId
+    }
+  }
+`;
+export const onUpdateLike = /* GraphQL */ `
+  subscription OnUpdateLike {
+    onUpdateLike {
+      createdAt
+      updatedAt
+      userId
+      postId
+    }
+  }
+`;
+export const onDeleteLike = /* GraphQL */ `
+  subscription OnDeleteLike {
+    onDeleteLike {
+      createdAt
+      updatedAt
+      userId
+      postId
+    }
+  }
+`;
 export const onCreatePost = /* GraphQL */ `
   subscription OnCreatePost {
     onCreatePost {
@@ -123,6 +153,7 @@ export const onCreatePost = /* GraphQL */ `
       channel
       receiver
       isParent
+      likes
     }
   }
 `;
@@ -137,6 +168,7 @@ export const onUpdatePost = /* GraphQL */ `
       channel
       receiver
       isParent
+      likes
     }
   }
 `;
@@ -151,6 +183,7 @@ export const onDeletePost = /* GraphQL */ `
       channel
       receiver
       isParent
+      likes
     }
   }
 `;

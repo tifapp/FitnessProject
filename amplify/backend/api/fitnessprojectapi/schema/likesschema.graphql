@@ -1,6 +1,3 @@
-"""
-
-"""
 type Like @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
 @auth(
   rules: [

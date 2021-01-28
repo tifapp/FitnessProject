@@ -12,6 +12,7 @@ export const batchDeletePosts = /* GraphQL */ `
       channel
       receiver
       isParent
+      likes
     }
   }
 `;
@@ -112,37 +113,42 @@ export const deleteGroup = /* GraphQL */ `
     }
   }
 `;
-export const createPost = /* GraphQL */ `
-  mutation CreatePost(
-    $input: CreatePostInput!
-    $condition: ModelPostConditionInput
+export const createLike = /* GraphQL */ `
+  mutation CreateLike(
+    $input: CreateLikeInput!
+    $condition: ModelLikeConditionInput
   ) {
-    createPost(input: $input, condition: $condition) {
+    createLike(input: $input, condition: $condition) {
       createdAt
       updatedAt
       userId
-      description
-      parentId
-      channel
-      receiver
-      isParent
+      postId
     }
   }
 `;
-export const updatePost = /* GraphQL */ `
-  mutation UpdatePost(
-    $input: UpdatePostInput!
-    $condition: ModelPostConditionInput
+export const updateLike = /* GraphQL */ `
+  mutation UpdateLike(
+    $input: UpdateLikeInput!
+    $condition: ModelLikeConditionInput
   ) {
-    updatePost(input: $input, condition: $condition) {
+    updateLike(input: $input, condition: $condition) {
       createdAt
       updatedAt
       userId
-      description
-      parentId
-      channel
-      receiver
-      isParent
+      postId
+    }
+  }
+`;
+export const deleteLike = /* GraphQL */ `
+  mutation DeleteLike(
+    $input: DeleteLikeInput!
+    $condition: ModelLikeConditionInput
+  ) {
+    deleteLike(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      userId
+      postId
     }
   }
 `;
@@ -264,6 +270,43 @@ export const deletePost = /* GraphQL */ `
       channel
       receiver
       isParent
+      likes
+    }
+  }
+`;
+export const createPost = /* GraphQL */ `
+  mutation CreatePost(
+    $input: CreatePostInput!
+    $condition: ModelPostConditionInput
+  ) {
+    createPost(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      userId
+      description
+      parentId
+      channel
+      receiver
+      isParent
+      likes
+    }
+  }
+`;
+export const updatePost = /* GraphQL */ `
+  mutation UpdatePost(
+    $input: UpdatePostInput!
+    $condition: ModelPostConditionInput
+  ) {
+    updatePost(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      userId
+      description
+      parentId
+      channel
+      receiver
+      isParent
+      likes
     }
   }
 `;

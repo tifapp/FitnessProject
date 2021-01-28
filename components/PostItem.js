@@ -54,6 +54,10 @@ export default function PostItem({
         <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
           {writtenByYou ? (
             <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
+              <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={() => {}}>
+                <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>Like</Text>
+              </TouchableOpacity>
+
               <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={() => (deletePostsAsync(item.createdAt))}>
                 <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>Delete</Text>
               </TouchableOpacity>
