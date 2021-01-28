@@ -48,12 +48,12 @@ export default () => {
         await Storage.put('profileimage.jpg', blob, { level: 'protected', contentType: 'image/jpeg' });
 
         console.log("changing cached profile pic");
-        Cache.setItem(userId, { name: name, imageURL: imageURL, isFull: true }, { priority: 1, expires: Date.now() + 86400000 });
+        Cache.setItem(userId, { name: name, imageURL: imageURL, isFull: true, changed: true }, { priority: 1, expires: Date.now() + 86400000 });
       } else {
         Storage.remove('profileimage.jpg', { level: 'protected' })
           .then(result => console.log("removed profile image!", result))
           .catch(err => console.log(err));
-        Cache.setItem(userId, { name: name, imageURL: '' }, { priority: 1, expires: Date.now() + 86400000 });
+        Cache.setItem(userId, { name: name, imageURL: '', changed: true }, { priority: 1, expires: Date.now() + 86400000 });
       }
     }
 
