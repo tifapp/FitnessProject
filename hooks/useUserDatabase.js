@@ -47,6 +47,7 @@ export default () => {
 
         await Storage.put('profileimage.jpg', blob, { level: 'protected', contentType: 'image/jpeg' });
 
+        console.log("changing cached profile pic");
         Cache.setItem(userId, { name: name, imageURL: imageURL, isFull: true }, { priority: 1, expires: Date.now() + 86400000 });
       } else {
         Storage.remove('profileimage.jpg', { level: 'protected' })
@@ -95,6 +96,7 @@ export default () => {
 
       saveProfilePicture(query.attributes.sub);
       if (fields == null) {
+        ourUser.identityId = identityId;
         createUserInDB(ourUser)
       }
       else {

@@ -1,6 +1,5 @@
 ## [Start] Set default values. **
 $util.qr($context.args.input.put("id", $util.defaultIfNull($ctx.args.input.id, $ctx.identity.sub)))
-$util.qr($context.args.input.put("identityId", $util.defaultIfNull($ctx.args.input.identityId, $ctx.identity.cognitoIdentityId)))
 #set( $createdAt = $util.time.nowISO8601() )
 ## Automatically set the createdAt timestamp. **
 $util.qr($context.args.input.put("createdAt", $util.defaultIfNull($ctx.args.input.createdAt, $createdAt)))
