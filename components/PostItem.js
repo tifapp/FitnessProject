@@ -11,7 +11,8 @@ import {
 } from "react-native";
 import { getUser } from "../src/graphql/queries";
 import { ProfileImageAndName } from './ProfileImageAndName'
-import { Amplify, API, graphqlOperation } from "aws-amplify";
+import { API, graphqlOperation } from "aws-amplify";
+import { createLike, deleteLike } from "root/src/graphql/mutations";
 import { useNavigation } from '@react-navigation/native';
 import printTime from 'hooks/printTime';
 
@@ -26,8 +27,24 @@ export default function PostItem({
   setUpdatePostID,
   receiver,
   showTimestamp,
-  newSection
+  newSection,
+  liked
 }) {
+  
+  const likePostAsync = async () => {
+    try {
+      if (liked) {
+        await API.graphql(graphqlOperation(createLike, { input: { postId: item.createdAt + item.userId, } })); //this won't work for new posts since they use Date.now() (int) instead of the iso string date
+        console.log("success in liking post");
+      } else {
+        await API.graphql(graphqlOperation(deleteLike, { input: { postId: item.createdAt + item.userId, } })); //remember to modify the mutations so they fill in userId automatically
+        console.log("success in liking post");
+      }
+    } catch (err) {
+      console.log(err);
+      alert('Could not be submitted!');
+    }
+  }
 
   const displayTime = printTime(item.createdAt);
   const isReceivedMessage = receiver != null && !writtenByYou;
@@ -54,7 +71,7 @@ export default function PostItem({
         <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
           {writtenByYou ? (
             <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
-              <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={() => {}}>
+              <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={likePostAsync}>
                 <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>Like</Text>
               </TouchableOpacity>
 
