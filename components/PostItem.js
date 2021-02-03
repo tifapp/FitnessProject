@@ -33,11 +33,12 @@ export default function PostItem({
   
   const likePostAsync = async () => {
     try {
+      liked = !liked;
       if (liked) {
         await API.graphql(graphqlOperation(createLike, { input: { postId: item.createdAt + item.userId, } })); //this won't work for new posts since they use Date.now() (int) instead of the iso string date
         console.log("success in liking post");
       } else {
-        await API.graphql(graphqlOperation(deleteLike, { input: { postId: item.createdAt + item.userId, } })); //remember to modify the mutations so they fill in userId automatically
+        await API.graphql(graphqlOperation(deleteLike, { input: { postId: item.createdAt + item.userId, } }));
         console.log("success in liking post");
       }
     } catch (err) {
@@ -71,9 +72,16 @@ export default function PostItem({
         <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
           {writtenByYou ? (
             <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
-              <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={likePostAsync}>
-                <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>Like</Text>
-              </TouchableOpacity>
+              {
+                liked ?
+                  <TouchableOpacity style={[styles.buttonStyle, { backgroundColor: 'red' }]} color="red" onPress={likePostAsync}>
+                    <Text style={[styles.unselectedButtonTextStyle, { color: 'white' }]}>Liked</Text>
+                  </TouchableOpacity>
+                  :
+                  <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={likePostAsync}>
+                    <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>Like</Text>
+                  </TouchableOpacity>
+              }
 
               <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={() => (deletePostsAsync(item.createdAt))}>
                 <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>Delete</Text>
