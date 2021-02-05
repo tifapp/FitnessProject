@@ -20,3 +20,7 @@ This allows us to fill in the missing fields in the backend rather than letting 
 input CreateLikeInput {
   postId: ID!
 }
+
+type Query {
+  batchGetLikes(likes: [CreateLikeInput]): [Like]
+}

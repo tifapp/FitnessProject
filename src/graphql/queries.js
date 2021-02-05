@@ -1,6 +1,16 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const batchGetLikes = /* GraphQL */ `
+  query BatchGetLikes($likes: [CreateLikeInput]) {
+    batchGetLikes(likes: $likes) {
+      createdAt
+      updatedAt
+      userId
+      postId
+    }
+  }
+`;
 export const getGroup = /* GraphQL */ `
   query GetGroup($id: ID!) {
     getGroup(id: $id) {
