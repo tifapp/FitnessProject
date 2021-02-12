@@ -24,6 +24,12 @@ function LikeButton({
   postId
 }) {
   const [liked, setLiked] = useState(likedByYou);
+
+  useEffect(() => {
+    if (liked) {
+      likes = likes - 1;
+    }
+  }, [])
   
   const likePostAsync = async () => {
     try {
@@ -44,7 +50,7 @@ function LikeButton({
   if (liked) {
     return (
       <TouchableOpacity style={[styles.buttonStyle, { backgroundColor: 'red' }]} color="red" onPress={likePostAsync}>
-        <Text style={[styles.unselectedButtonTextStyle, { color: 'white' }]}>{likes ? likes : 0}</Text>
+        <Text style={[styles.unselectedButtonTextStyle, { color: 'white' }]}>{likes ? likes + 1 : 0}</Text>
       </TouchableOpacity>
     )
   } else {
@@ -65,8 +71,7 @@ export default function PostItem({
   setUpdatePostID,
   receiver,
   showTimestamp,
-  newSection,
-  likedByYou
+  newSection
 }) {
   const displayTime = printTime(item.createdAt);
   const isReceivedMessage = receiver != null && !writtenByYou;
@@ -95,7 +100,7 @@ export default function PostItem({
             <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
               <LikeButton
                 likes={item.likes}
-                likedByYou={likedByYou}
+                likedByYou={item.likedByYou}
                 postId={item.createdAt + item.userId}
               />
 
