@@ -166,7 +166,7 @@ const FriendScreen = ({ route, navigation }) => {
                                         <Entypo name="cross" style={{ marginHorizontal: 7 }}
                                             size={44} color="red" />
                                     </TouchableOpacity>
-                                    <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'blue' }]} color="orange" onPress={() => goToProfile(item.userId)}>
+                                    <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'blue' }]} color="orange" onPress={() => goToProfile(findFriendID(item))}>
                                         <Text style={[styles.unselectedButtonTextStyle, { color: 'blue' }]}>Message</Text>
                                     </TouchableOpacity>
                                 </View>
