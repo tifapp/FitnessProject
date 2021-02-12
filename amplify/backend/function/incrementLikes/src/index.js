@@ -1,3 +1,38 @@
+require('isomorphic-fetch');
+const AWS = require('aws-sdk/global');
+const AUTH_TYPE = require('aws-appsync').AUTH_TYPE;
+const AWSAppSyncClient = require('aws-appsync').default;
+const gql = require('graphql-tag');
+
+const config = {
+  url: process.env.API_FITNESSPROJECTAPI_GRAPHQLAPIENDPOINTOUTPUT,
+  region: process.env.AWS_REGION,
+  auth: {
+    type: AUTH_TYPE.AWS_IAM,
+    credentials: AWS.config.credentials,
+  },
+  disableOffline: true
+};
+
+const client = new AWSAppSyncClient(config);
+
+const incrementLikes =
+`
+  mutation IncrementLikes($post: incrementLikesInput) {
+    incrementLikes(post: $post) {
+      createdAt
+      updatedAt
+      userId
+      description
+      parentId
+      channel
+      receiver
+      isParent
+      likes
+    }
+  }
+`;
+
 exports.handler = event => {
   //eslint-disable-line
   console.log(JSON.stringify(event, null, 2));
@@ -27,7 +62,7 @@ exports.handler = event => {
           }
 
           client.mutate({
-            mutation: gql(incrementPostLikes),
+            mutation: gql(incrementLikes),
             variables: {
               input: inputVariables
             }
@@ -39,5 +74,4 @@ exports.handler = event => {
       })();
     }
   });
-  return Promise.resolve('Successfully processed DynamoDB record');
 };
