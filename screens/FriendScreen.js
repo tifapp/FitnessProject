@@ -29,7 +29,11 @@ const FriendScreen = ({ route, navigation }) => {
 
     currentFriends.current = friendList;
     currentFriendRequests.current = friendRequestList;
-    
+
+    const goToProfile = (item) => {
+        navigation.navigate('Messages', {userId: item})
+    }
+
     useEffect(() => {
         waitForNewFriendsAsync();
     }, []);
@@ -161,6 +165,9 @@ const FriendScreen = ({ route, navigation }) => {
                                         <Text>Remove</Text>
                                         <Entypo name="cross" style={{ marginHorizontal: 7 }}
                                             size={44} color="red" />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'blue' }]} color="orange" onPress={() => goToProfile(item.userId)}>
+                                        <Text style={[styles.unselectedButtonTextStyle, { color: 'blue' }]}>Message</Text>
                                     </TouchableOpacity>
                                 </View>
                             )}
