@@ -2,10 +2,16 @@ import React from "react";
 import {
   Text,
   View,
-  TouchableOpacity
+  TouchableOpacity,
+  useState, 
+  useEffect, 
+  useRef, 
+  PureComponent
 } from "react-native";
 // Get the aws resources configuration parameters
 import FeedScreen from "screens/FeedScreen";
+import { useFocusEffect } from '@react-navigation/native';
+import * as Notifications from 'expo-notifications';
 
 //const { width } = Dimensions.get('window');
 
@@ -13,6 +19,38 @@ var styles = require('styles/stylesheet');
 
 export default function MessageScreen({ navigation, route }) {
   const { userId } = route.params;
+
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log("Testing"), 
+      Notifications.setNotificationHandler({
+        handleNotification: async (notification) => {
+          console.log("Incoming notification looks like ", notification),
+          notification.request.content.subtitle.includes("message")
+          ?{
+            shouldShowAlert: false,
+            shouldPlaySound: true,
+            shouldSetBadge: false
+          }
+          : {
+            shouldShowAlert: true,
+            shouldPlaySound: true,
+            shouldSetBadge: true
+          }
+
+          return(() => {
+            Notifications.setNotificationHandler({
+              handleNotification: async () => ({
+                shouldShowAlert: true,
+                shouldPlaySound: true,
+                shouldSetBadge: true
+              })
+            })
+          });
+        },
+      });
+    }, [])
+  );
   
   //console.log(route.params);
   //console.log(route);
