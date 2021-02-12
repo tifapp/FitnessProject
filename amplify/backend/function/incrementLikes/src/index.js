@@ -3,27 +3,33 @@ exports.handler = event => {
   console.log(JSON.stringify(event, null, 2));
   event.Records.forEach(record => {
     if (record.eventName == "INSERT" || record.eventName == "REMOVE") {
-      let postId = record.dynamodb.NewImage.postId.S;
-      if (record.eventName == "REMOVE") {
-        postId = record.dynamodb.OldImage.postId.S;
-      }
+      const postId = record.eventName == "REMOVE" ? postId = record.dynamodb.OldImage.postId.S : record.dynamodb.NewImage.postId.S;
 
       (async () => {
         try {
-          const post = await client.query({
-            query: gql(postsByParentId),
-            variables: {
-              parentId: parentId,
-            }
-          });
+          //increment or decrement the post's likes
+          //use the "ADD" function of the update resolver
+
+          const timestamp = postId.substring(0, 24);
+          const userId = postId.substring(25);
+
+          console.log("postid is ", postId);
+          console.log("created at ", timestamp);
+          console.log("made by ", userId);
+
+          const inputVariables = {
+            createdAt: timestamp,
+            userId: userId,
+          }
+
+          if (record.eventName == "REMOVE") {
+            inputVariables.decrement = true;
+          }
 
           client.mutate({
-            mutation: record.eventName == "INSERT" ? gql(incrementPostLikes) : record.eventName == "REMOVE" ? gql(decrementPostLikes) : null,
+            mutation: gql(incrementPostLikes),
             variables: {
-              input: {
-                createdAt: post.createdAt,
-                userId: post.userId,
-              }
+              input: inputVariables
             }
           });
 

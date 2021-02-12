@@ -54,6 +54,12 @@ input UpdatePostInput {
   isParent: Int
 }
 
+input incrementLikesInput {
+  createdAt: AWSDateTime!
+  userId: String!
+  decrement: Boolean
+}
+
 """
 This is used for batch deletion of posts.
 """
@@ -64,4 +70,5 @@ input DeletePostInput {
 
 type Mutation {
   batchDeletePosts(posts: [DeletePostInput]): [Post] @aws_iam
+  incrementLikes(post: incrementLikesInput): Post @aws_iam
 }

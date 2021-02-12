@@ -16,6 +16,21 @@ export const batchDeletePosts = /* GraphQL */ `
     }
   }
 `;
+export const incrementLikes = /* GraphQL */ `
+  mutation IncrementLikes($post: incrementLikesInput) {
+    incrementLikes(post: $post) {
+      createdAt
+      updatedAt
+      userId
+      description
+      parentId
+      channel
+      receiver
+      isParent
+      likes
+    }
+  }
+`;
 export const createFriendRequest = /* GraphQL */ `
   mutation CreateFriendRequest(
     $input: CreateFriendRequestInput!

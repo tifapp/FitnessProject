@@ -20,6 +20,12 @@
           "appId": "d19kzf7eu35pq1",
           "type": "manual"
         }
+      },
+      "function": {
+        "S3Triggeref91c1ec": {},
+        "deleteReplies": {},
+        "friendRequestResolver": {},
+        "incrementLikes": {}
       }
     }
   }
