@@ -83,7 +83,7 @@
         "Timeout": "25",
         "Code": {
           "S3Bucket": "amplify-fitnessproject-likestwo-211757-deployment",
-          "S3Key": "amplify-builds/messageNotification-5a39334d496732566845-build.zip"
+          "S3Key": "amplify-builds/messageNotification-34336149714d6e73676a-build.zip"
         }
       }
     },

@@ -37,7 +37,6 @@ const AWS = require('aws-sdk/global');
 const AUTH_TYPE = require('aws-appsync').AUTH_TYPE;
 const AWSAppSyncClient = require('aws-appsync').default;
 const gql = require('graphql-tag');
-const { addNotificationReceivedListener } = require("expo-notifications");
 
 const config = {
   url: process.env.API_FITNESSPROJECTAPI_GRAPHQLAPIENDPOINTOUTPUT,
@@ -50,78 +49,6 @@ const config = {
 };
 
 const client = new AWSAppSyncClient(config);
-
-const getFriendRequest =
-  `
-  query GetFriendRequest($sender: ID!, $receiver: ID!) {
-    getFriendRequest(sender: $sender, receiver: $receiver) {
-      createdAt
-      updatedAt
-      sender
-      receiver
-    }
-  }
-`;
-
-const getFriendship =
-  `
-  query GetFriendship($user1: ID!, $user2: ID!) {
-    getFriendship(user1: $user1, user2: $user2) {
-      createdAt
-      updatedAt
-      user1
-      user2
-      hifives
-    }
-  }
-`;
-
-const updateFriendship =
-  `
-  mutation UpdateFriendship(
-    $input: UpdateFriendshipInput!
-    $condition: ModelFriendshipConditionInput
-  ) {
-    updateFriendship(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      user1
-      user2
-      hifives
-    }
-  }
-`;
-
-const deleteFriendRequest =
-  `
-  mutation DeleteFriendRequest(
-    $input: DeleteFriendRequestInput!
-    $condition: ModelFriendRequestConditionInput
-  ) {
-    deleteFriendRequest(input: $input, condition: $condition) {
-      sender
-      receiver
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-const createFriendship =
-  `
-  mutation CreateFriendship(
-    $input: CreateFriendshipInput!
-    $condition: ModelFriendshipConditionInput
-  ) {
-    createFriendship(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      user1
-      user2
-      hifives
-    }
-  }
-`;
 
 const getUser =
   `
@@ -142,55 +69,6 @@ const getUser =
     }
   }
 `;
-
-const getPost =
-  `
-  query GetPost($createdAt: AWSDateTime!, $userId: ID!) {
-    getPost(createdAt: $createdAt, userId: $userId) {
-      createdAt
-      updatedAt
-      userId
-      description
-      parentId
-      channel
-      receiver
-      isParent
-    }
-  }
-  `;
-
-const postsByParentId =
-  `
-  query PostsByParentId(
-    $parentId: String
-    $isParent: ModelIntKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelPostFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    postsByParentId(
-      parentId: $parentId
-      isParent: $isParent
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        createdAt
-        updatedAt
-        userId
-        description
-        parentId
-        channel
-        receiver
-        isParent
-      }
-      nextToken
-    }
-  }
-  `;
 
 async function sendNotification(deviceToken, message) {
   if (deviceToken == null || deviceToken == '') return;
@@ -241,36 +119,36 @@ async function sendNotification(deviceToken, message) {
   }
 }
 
-exports.handler = async(event, context, callback) => {
+exports.handler = async (event, context, callback) => {
   event.Records.forEach((record) => {
     if (record.eventName == "INSERT") {
       (async () => {
         try {
-         console.log("---------------------------------------------------------");
-         const receiver = record.dynamodb.NewImage.receiver.S;
-         const sender = record.dynamodb.NewImage.sender.S;
+          console.log("---------------------------------------------------------");
+          const receiver = record.dynamodb.NewImage.receiver.S;
+          const sender = record.dynamodb.NewImage.sender.S;
 
-         if(receiver == null){
-           return;
-         }
-
-         const receiverName = await client.query({
-          query: gql(getUser),
-          variables: {
-            id: receiver
+          if (receiver == null) {
+            return;
           }
-        });
 
-        const senderName = await client.query({
-          query: gql(getUser),
-          variables: {
-            id: sender
-          }
-        });
+          const receiverName = await client.query({
+            query: gql(getUser),
+            variables: {
+              id: receiver
+            }
+          });
+
+          const senderName = await client.query({
+            query: gql(getUser),
+            variables: {
+              id: sender
+            }
+          });
 
           //if (friendshipcheck.data.getFriendship != null) {
-            await sendNotification(receiverName.data.getUser.deviceToken, senderName.data.getUser.name + " sent you a message!"); //truncate the sender's name!
-            console.log("Finished Messaging");
+          await sendNotification(receiverName.data.getUser.deviceToken, senderName.data.getUser.name + " sent you a message!"); //truncate the sender's name!
+          console.log("Finished Messaging");
           //}
         }
         catch (e) {
