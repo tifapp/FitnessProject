@@ -55,30 +55,26 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
       let newPosts = items;
       let postIds = [];
 
-      console.log("new posts are");
-      console.log(newPosts);
-      
       newPosts.forEach(item => {
         postIds.push({postId: item.createdAt + item.userId});
       });
 
-      (async () => {
-        try {
-          const likes = await API.graphql(graphqlOperation(batchGetLikes, { likes: postIds }));
-          console.log("looking for likes: ", likes);
-          //returns an array of like objects or nulls corresponding with the array of newposts
-          for (i = 0; i < newPosts.length; ++i) {
-            if (likes[i] != null) {
-              newPosts[i].likedByYou = true;
-            } else {
-              newPosts[i].likedByYou = false;
-            }
+      try {
+        const likes = await API.graphql(graphqlOperation(batchGetLikes, { likes: postIds }));
+        console.log("looking for likes: ", likes);
+        //returns an array of like objects or nulls corresponding with the array of newposts
+        for (i = 0; i < newPosts.length; ++i) {
+          if (likes.data.batchGetLikes[i] != null) {
+            console.log("found liked post");
+            newPosts[i].likedByYou = true;
+          } else {
+            newPosts[i].likedByYou = false;
           }
-          return newPosts;
-        } catch (err) {
-          console.log("error in detecting likes: ", err);
         }
-      })();
+        return newPosts;
+      } catch (err) {
+        console.log("error in detecting likes: ", err);
+      }
     }
   }
 

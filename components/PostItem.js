@@ -26,6 +26,7 @@ function LikeButton({
   const [liked, setLiked] = useState(likedByYou);
 
   useEffect(() => {
+    console.log("has the user liked this post? ", likedByYou);
     if (liked) {
       likes = likes - 1;
     }
@@ -50,7 +51,7 @@ function LikeButton({
   if (liked) {
     return (
       <TouchableOpacity style={[styles.buttonStyle, { backgroundColor: 'red' }]} color="red" onPress={likePostAsync}>
-        <Text style={[styles.unselectedButtonTextStyle, { color: 'white' }]}>{likes ? likes + 1 : 0}</Text>
+        <Text style={[styles.unselectedButtonTextStyle, { color: 'white' }]}>{likes ? likes + 1 : 1}</Text>
       </TouchableOpacity>
     )
   } else {
