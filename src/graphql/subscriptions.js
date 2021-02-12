@@ -113,8 +113,8 @@ export const onDeleteFriendship = /* GraphQL */ `
   }
 `;
 export const onCreateLike = /* GraphQL */ `
-  subscription OnCreateLike {
-    onCreateLike {
+  subscription OnCreateLike($userId: String) {
+    onCreateLike(userId: $userId) {
       createdAt
       updatedAt
       userId
@@ -123,8 +123,8 @@ export const onCreateLike = /* GraphQL */ `
   }
 `;
 export const onUpdateLike = /* GraphQL */ `
-  subscription OnUpdateLike {
-    onUpdateLike {
+  subscription OnUpdateLike($userId: String) {
+    onUpdateLike(userId: $userId) {
       createdAt
       updatedAt
       userId
@@ -133,8 +133,8 @@ export const onUpdateLike = /* GraphQL */ `
   }
 `;
 export const onDeleteLike = /* GraphQL */ `
-  subscription OnDeleteLike {
-    onDeleteLike {
+  subscription OnDeleteLike($userId: String) {
+    onDeleteLike(userId: $userId) {
       createdAt
       updatedAt
       userId

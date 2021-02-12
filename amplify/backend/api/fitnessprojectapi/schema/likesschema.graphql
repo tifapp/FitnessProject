@@ -1,7 +1,6 @@
 type Like @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
 @auth(
   rules: [
-      { allow: private, operations: [read] },
       { allow: owner, ownerField: "userId", operations: [create, read, delete] },
       { allow: private, provider: iam, operations: [read] },
   ]

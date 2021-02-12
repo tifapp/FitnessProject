@@ -82,7 +82,7 @@
         "Layers": [],
         "Timeout": "25",
         "Code": {
-          "S3Bucket": "amplify-fitnessproject-likestwo-211757-deployment",
+          "S3Bucket": "amplify-fitnessproject-dev-231929-deployment",
           "S3Key": "amplify-builds/replyNotifications-4b75716f465671356b31-build.zip"
         }
       }
