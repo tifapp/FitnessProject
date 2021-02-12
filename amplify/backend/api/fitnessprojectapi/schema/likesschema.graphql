@@ -21,6 +21,10 @@ input CreateLikeInput {
   postId: ID!
 }
 
+input DeleteLikeInput {
+  postId: ID!
+}
+
 type Query {
   batchGetLikes(likes: [CreateLikeInput]): [Like]
 }

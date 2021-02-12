@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef, PureComponent } from "react";
 import { Storage } from "aws-amplify";
 import {
   StyleSheet,
@@ -18,6 +18,44 @@ import printTime from 'hooks/printTime';
 
 var styles = require('../styles/stylesheet');
 
+function LikeButton({
+  likes,
+  likedByYou,
+  postId
+}) {
+  const [liked, setLiked] = useState(likedByYou);
+  
+  const likePostAsync = async () => {
+    try {
+      if (liked) {
+        await API.graphql(graphqlOperation(deleteLike, { input: { userId: "0", postId: postId, } }));
+        console.log("success in unliking post");
+      } else {
+        await API.graphql(graphqlOperation(createLike, { input: { postId: postId, } })); //this won't work for new posts since they use Date.now() (int) instead of the iso string date
+        console.log("success in liking post");
+      }
+      setLiked(!liked);
+    } catch (err) {
+      console.log(err);
+      alert('Could not be submitted!');
+    }
+  }
+
+  if (liked) {
+    return (
+      <TouchableOpacity style={[styles.buttonStyle, { backgroundColor: 'red' }]} color="red" onPress={likePostAsync}>
+        <Text style={[styles.unselectedButtonTextStyle, { color: 'white' }]}>{likes ? likes : 0}</Text>
+      </TouchableOpacity>
+    )
+  } else {
+    return (
+      <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={likePostAsync}>
+        <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>{likes ? likes : 0}</Text>
+      </TouchableOpacity>
+    )
+  }
+}
+
 export default function PostItem({
   item,
   deletePostsAsync,
@@ -28,25 +66,8 @@ export default function PostItem({
   receiver,
   showTimestamp,
   newSection,
-  liked
+  likedByYou
 }) {
-  
-  const likePostAsync = async () => {
-    try {
-      liked = !liked;
-      if (liked) {
-        await API.graphql(graphqlOperation(createLike, { input: { postId: item.createdAt + item.userId, } })); //this won't work for new posts since they use Date.now() (int) instead of the iso string date
-        console.log("success in liking post");
-      } else {
-        await API.graphql(graphqlOperation(deleteLike, { input: { postId: item.createdAt + item.userId, } }));
-        console.log("success in liking post");
-      }
-    } catch (err) {
-      console.log(err);
-      alert('Could not be submitted!');
-    }
-  }
-
   const displayTime = printTime(item.createdAt);
   const isReceivedMessage = receiver != null && !writtenByYou;
   //console.log(parentID);
@@ -72,16 +93,11 @@ export default function PostItem({
         <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
           {writtenByYou ? (
             <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
-              {
-                liked ?
-                  <TouchableOpacity style={[styles.buttonStyle, { backgroundColor: 'red' }]} color="red" onPress={likePostAsync}>
-                    <Text style={[styles.unselectedButtonTextStyle, { color: 'white' }]}>Liked</Text>
-                  </TouchableOpacity>
-                  :
-                  <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={likePostAsync}>
-                    <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>Like</Text>
-                  </TouchableOpacity>
-              }
+              <LikeButton
+                likes={item.likes}
+                likedByYou={likedByYou}
+                postId={item.createdAt + item.userId}
+              />
 
               <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={() => (deletePostsAsync(item.createdAt))}>
                 <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>Delete</Text>

@@ -17,7 +17,7 @@ import {
 // Get the aws resources configuration parameters
 import { API, graphqlOperation } from "aws-amplify";
 import { createPost, updatePost, deletePost } from "root/src/graphql/mutations";
-import { listPosts, postsByChannel } from "root/src/graphql/queries";
+import { listPosts, postsByChannel, batchGetLikes } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
 import { onCreatePost, onDeletePost, onUpdatePost } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
@@ -39,6 +39,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
   const [onlineCheck, setOnlineCheck] = useState(true);
 
   const currentPosts = useRef();
+  const previousPosts = useRef();
   const scrollRef = useRef(); // Used to help with automatic scrolling to top
 
   const getChannel = () => {
@@ -49,6 +50,34 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
     waitForNewPostsAsync();
     checkInternetConnection();
   }, []);
+  
+  useEffect(() => {
+    if (posts.length > 0 && (previousPosts.current == null || posts.length > previousPosts.current.length)) {
+      let newPosts = posts;
+      if (previousPosts.current != null) {
+        newPosts = posts.filter(post => !previousPosts.current.includes(post));
+      }
+      let postIds = [];
+
+      console.log("new posts are");
+      console.log(newPosts);
+      
+      newPosts.forEach(item => {
+        postIds.push({postId: item.createdAt + item.userId});
+      });
+
+      (async () => {
+        try {
+          const likes = await API.graphql(graphqlOperation(batchGetLikes, { likes: postIds }));
+          console.log("looking for likes: ", likes);
+          //returns an array of like objects or nulls corresponding with the array of newposts
+        } catch (err) {
+          console.log("error in detecting likes: ", err);
+        }
+      })();
+    }
+    previousPosts.current = posts;
+  }, [posts]);
 
   const showTimestamp = (item, index) => {
     return index >= posts.length-1 || ((((new Date(item.createdAt).getTime() - new Date(posts[index+1].createdAt).getTime()) / 1000) / 60) / 60 > 1);
@@ -312,6 +341,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
             receiver={receiver}
             showTimestamp={showTimestamp(item, index)}
             newSection={index == 0 ? true : showTimestamp(posts[index-1], index-1)}
+            likedByYou={false}
           />
         )}
         keyExtractor={item => item.createdAt.toString() + item.userId}
