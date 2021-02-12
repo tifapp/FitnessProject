@@ -38,7 +38,7 @@ function LikeButton({
         await API.graphql(graphqlOperation(deleteLike, { input: { userId: "0", postId: postId, } }));
         console.log("success in unliking post");
       } else {
-        await API.graphql(graphqlOperation(createLike, { input: { postId: postId, } })); //this won't work for new posts since they use Date.now() (int) instead of the iso string date
+        await API.graphql(graphqlOperation(createLike, { input: { postId: postId, } }));
         console.log("success in liking post");
       }
       setLiked(!liked);
@@ -97,14 +97,13 @@ export default function PostItem({
         </View>
 
         <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
+          <LikeButton
+            likes={item.likes}
+            likedByYou={item.likedByYou}
+            postId={item.createdAt + item.userId}
+          />
           {writtenByYou ? (
             <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
-              <LikeButton
-                likes={item.likes}
-                likedByYou={item.likedByYou}
-                postId={item.createdAt + item.userId}
-              />
-
               <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={() => (deletePostsAsync(item.createdAt))}>
                 <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>Delete</Text>
               </TouchableOpacity>
