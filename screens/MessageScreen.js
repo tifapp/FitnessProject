@@ -20,6 +20,9 @@ var styles = require('styles/stylesheet');
 export default function MessageScreen({ navigation, route }) {
   const { userId } = route.params;
 
+  console.log("Here is the user!");
+  console.log(userId);
+
   useFocusEffect(
     React.useCallback(() => {
       console.log("Testing"), 

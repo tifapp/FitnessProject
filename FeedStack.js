@@ -3,6 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import FeedScreen from "screens/FeedScreen";
 import LookupUserScreen from "screens/LookupUser";
 import MessageScreen from "screens/MessageScreen";
+import ImageScreen from "screens/ImageScreen";
 
 import React from 'react';
 
@@ -14,6 +15,7 @@ export default function FeedStack({ navigation, route }) {
       <Stack.Screen name='Feed' component={FeedScreen} initialParams={route.params}/>
       <Stack.Screen name='Lookup' component={LookupUserScreen} initialParams={route.params} />
       <Stack.Screen name='Messages' component={MessageScreen} initialParams={route.params} />
+      <Stack.Screen name='Image' component={ImageScreen} initialParams={route.params} />
     </Stack.Navigator>
   );
 }
