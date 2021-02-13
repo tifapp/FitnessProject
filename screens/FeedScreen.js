@@ -168,7 +168,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
     else {
       console.log("attempting to make new post");
       const newPost = {
-        parentId: Date.now().toString() + route.params?.id,
+        parentId: (new Date(Date.now())).toISOString() + route.params?.id,
         description: postVal,
         channel: getChannel(),
         isParent: 1,
@@ -179,7 +179,11 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
 
       console.log(route.params?.id + " just posted.");
 
-      setPosts([{ ...newPost, userId: route.params?.id, createdAt: (new Date(Date.now())).toISOString() }, ...posts]);
+      if (posts != null && posts.length > 0)
+        setPosts([{ ...newPost, userId: route.params?.id, createdAt: (new Date(Date.now())).toISOString() }, ...posts]);
+      else
+        setPosts([{ ...newPost, userId: route.params?.id, createdAt: (new Date(Date.now())).toISOString() }]);
+      
       try {
         await API.graphql(graphqlOperation(createPost, { input: newPost }));
       } catch (err) {

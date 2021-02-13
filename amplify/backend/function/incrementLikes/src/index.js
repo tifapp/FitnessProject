@@ -46,7 +46,7 @@ exports.handler = event => {
           //use the "ADD" function of the update resolver
 
           const timestamp = postId.substring(0, 24);
-          const userId = postId.substring(25);
+          const userId = postId.substring(24);
 
           console.log("postid is ", postId);
           console.log("created at ", timestamp);

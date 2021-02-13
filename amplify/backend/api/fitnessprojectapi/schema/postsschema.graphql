@@ -57,7 +57,7 @@ input UpdatePostInput {
 
 input incrementLikesInput {
   createdAt: AWSDateTime!
-  userId: String!
+  userId: ID!
   decrement: Boolean
 }
 
