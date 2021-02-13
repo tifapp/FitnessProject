@@ -179,7 +179,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
 
       console.log(route.params?.id + " just posted.");
 
-      setPosts([{ ...newPost, userId: route.params?.id, createdAt: format(Date.now(), 'YYYY-MM-DD[T]HH:mm:ssZZ') }, ...posts]);
+      setPosts([{ ...newPost, userId: route.params?.id, createdAt: (new Date(Date.now())).toISOString() }, ...posts]);
       try {
         await API.graphql(graphqlOperation(createPost, { input: newPost }));
       } catch (err) {
@@ -209,7 +209,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
 
     let tempposts = [...currentPosts.current];
     var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId == newPost.parentId)]);
-    tempposts.splice(index + 1, 0, {...newPost, userId: route.params?.id, createdAt: format(Date.now(), 'YYYY-MM-DD[T]HH:mm:ssZZ')});
+    tempposts.splice(index + 1, 0, {...newPost, userId: route.params?.id, createdAt: (new Date(Date.now())).toISOString() });
     setPosts(tempposts);
 
     try {
