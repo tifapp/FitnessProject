@@ -16,6 +16,8 @@ import { createLike, deleteLike } from "root/src/graphql/mutations";
 import { useNavigation } from '@react-navigation/native';
 import printTime from 'hooks/printTime';
 
+import * as Haptics from 'expo-haptics';
+
 var styles = require('../styles/stylesheet');
 
 function LikeButton({
@@ -33,6 +35,7 @@ function LikeButton({
   }, [])
   
   const likePostAsync = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     try {
       if (liked) {
         await API.graphql(graphqlOperation(deleteLike, { input: { userId: "0", postId: postId, } }));
