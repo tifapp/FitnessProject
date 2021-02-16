@@ -100,7 +100,7 @@ const FriendScreen = ({ route, navigation }) => {
         }
         // update friendList
         setFriendList((friendList) => {
-            return friendList.filter((i) => (i.user1 != item.user1 && i.user2 != item.user2));
+            return friendList.filter((i) => (i.user1 != item.user1 || i.user2 != item.user2));
         });
     }
 
