@@ -18,8 +18,8 @@ const client = new AWSAppSyncClient(config);
 
 const incrementLikes =
 `
-  mutation IncrementLikes($post: incrementLikesInput) {
-    incrementLikes(post: $post) {
+  mutation IncrementLikes($input: incrementLikesInput!) {
+    incrementLikes(input: $input) {
       createdAt
       updatedAt
       userId

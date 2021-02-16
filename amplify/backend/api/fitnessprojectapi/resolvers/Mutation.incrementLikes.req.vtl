@@ -198,6 +198,9 @@ $util.qr($context.args.input.put("__typename", "Post"))
   #end
 #end
 #set( $update = {} )
+$util.qr($expValues.put(":s", $util.dynamodb.toDynamoDB("")))
+$util.qr($update.put("expression", "ADD channel :s"))
+$util.qr($update.put("expression", "ADD parentId :s"))
 #if( $util.isNullOrEmpty($ctx.args.input.decrement) )
 	$util.qr($expValues.put(":d", $util.dynamodb.toDynamoDB(1)))
 	$util.qr($update.put("expression", "ADD likes :d"))

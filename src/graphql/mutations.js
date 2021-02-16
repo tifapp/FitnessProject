@@ -17,8 +17,8 @@ export const batchDeletePosts = /* GraphQL */ `
   }
 `;
 export const incrementLikes = /* GraphQL */ `
-  mutation IncrementLikes($post: incrementLikesInput) {
-    incrementLikes(post: $post) {
+  mutation IncrementLikes($input: incrementLikesInput!) {
+    incrementLikes(input: $input) {
       createdAt
       updatedAt
       userId

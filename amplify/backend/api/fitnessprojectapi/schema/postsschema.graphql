@@ -71,5 +71,5 @@ input DeletePostInput {
 
 type Mutation {
   batchDeletePosts(posts: [DeletePostInput]): [Post] @aws_iam
-  incrementLikes(post: incrementLikesInput): Post @aws_iam
+  incrementLikes(input: incrementLikesInput!): Post @aws_iam
 }
