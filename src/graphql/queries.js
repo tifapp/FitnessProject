@@ -253,7 +253,7 @@ export const listLikes = /* GraphQL */ `
 export const postsByChannel = /* GraphQL */ `
   query PostsByChannel(
     $channel: ID
-    $parentId: ModelStringKeyConditionInput
+    $parentIdIsParentCreatedAt: ModelPostByChannelCompositeKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelPostFilterInput
     $limit: Int
@@ -261,7 +261,7 @@ export const postsByChannel = /* GraphQL */ `
   ) {
     postsByChannel(
       channel: $channel
-      parentId: $parentId
+      parentIdIsParentCreatedAt: $parentIdIsParentCreatedAt
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit
