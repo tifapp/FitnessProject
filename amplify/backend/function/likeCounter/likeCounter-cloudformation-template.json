@@ -41,12 +41,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "incrementLikes",
+            "likeCounter",
             {
               "Fn::Join": [
                 "",
                 [
-                  "incrementLikes",
+                  "likeCounter",
                   "-",
                   {
                     "Ref": "env"
@@ -83,7 +83,7 @@
         "Timeout": "25",
         "Code": {
           "S3Bucket": "amplify-fitnessproject-dev-231929-deployment",
-          "S3Key": "amplify-builds/incrementLikes-53336f634e4233676e4c-build.zip"
+          "S3Key": "amplify-builds/likeCounter-416e443462514c587537-build.zip"
         }
       }
     },
@@ -93,12 +93,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "fitnessprojectLambdaRolebc5b0172",
+            "fitnessprojectLambdaRolebe0dabe5",
             {
               "Fn::Join": [
                 "",
                 [
-                  "fitnessprojectLambdaRolebc5b0172",
+                  "fitnessprojectLambdaRolebe0dabe5",
                   "-",
                   {
                     "Ref": "env"

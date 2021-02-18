@@ -35,10 +35,14 @@ const incrementLikes =
 
 exports.handler = event => {
   //eslint-disable-line
-  console.log(JSON.stringify(event, null, 2));
   event.Records.forEach(record => {
     if (record.eventName == "INSERT" || record.eventName == "REMOVE") {
-      const postId = record.eventName == "REMOVE" ? record.dynamodb.OldImage.postId.S : record.dynamodb.NewImage.postId.S;
+      console.log("record is ", record);
+      let postId = "placeholder";
+      if (record.eventName == "REMOVE")
+        postId = record.dynamodb.OldImage.postId.S;
+      else 
+        postId = record.dynamodb.NewImage.postId.S;
 
       (async () => {
         try {
@@ -54,8 +58,6 @@ exports.handler = event => {
           const isParent = ids[4];
 
           console.log("postid is ", postId);
-          console.log("created at ", timestamp);
-          console.log("made by ", userId);
 
           const inputVariables = {
             createdAt: timestamp,
