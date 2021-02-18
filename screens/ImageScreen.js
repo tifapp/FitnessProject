@@ -13,17 +13,15 @@ var styles = require('../styles/stylesheet');
 
 const ImageScreen = ({route, navigation}) => {
     //const { uri } = route.params;
-    const { userInfo } = route.params;
-    const { props } = route.params;
+    const { uri } = route.params;
     console.log("testing");
-    console.log(userInfo);
 
     return (
         <View>
                 <Image
                     style={{
                         width: '100%', height: '100%'}}
-                    source={userInfo.imageURL === '' ? require('../assets/icon.png') : { uri: userInfo.imageURL }}
+                    source={uri === '' ? require('../assets/icon.png') : { uri: uri }}
                 />
         </View>
     )

@@ -20,7 +20,7 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
                     params: { fromLookup: true },
                 })
             else
-                navigation.navigate('Image', { uri: userInfo.imageURL, userInfo: userInfo, props: props })
+                navigation.navigate('Image', { uri: userInfo.imageURL })
         }
         else {
             navigation.push('Lookup',

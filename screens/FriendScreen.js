@@ -118,6 +118,12 @@ const FriendScreen = ({ route, navigation }) => {
         });
     }
 
+    const checkIfPendingFriend = async (items) => {
+        if (items != null && items.length > 0) {
+            items.forEach();
+        }
+    }
+
     return (
         <View>
             <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 25 }}>
