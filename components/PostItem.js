@@ -35,14 +35,14 @@ function LikeButton({
   }, [])
   
   const likePostAsync = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     try {
       if (liked) {
         await API.graphql(graphqlOperation(deleteLike, { input: { userId: "0", postId: postId, } }));
         console.log("success in unliking post");
       } else {
         await API.graphql(graphqlOperation(createLike, { input: { postId: postId, } }));
-        console.log("success in liking post");
+        console.log("success in liking post, id is ", postId);
       }
       setLiked(!liked);
     } catch (err) {
@@ -103,7 +103,7 @@ export default function PostItem({
           <LikeButton
             likes={item.likes}
             likedByYou={item.likedByYou}
-            postId={item.createdAt + item.userId}
+            postId={item.createdAt + "#" + item.userId + "#" + item.channel + "#" + item.parentId + "#" + item.isParent}
           />
           {writtenByYou ? (
             <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>

@@ -83,7 +83,7 @@
         "Timeout": "25",
         "Code": {
           "S3Bucket": "amplify-fitnessproject-dev-231929-deployment",
-          "S3Key": "amplify-builds/incrementLikes-614e5776723761326d76-build.zip"
+          "S3Key": "amplify-builds/incrementLikes-53336f634e4233676e4c-build.zip"
         }
       }
     },
@@ -93,12 +93,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "fitnessprojectLambdaRole3f5dd9af",
+            "fitnessprojectLambdaRolebc5b0172",
             {
               "Fn::Join": [
                 "",
                 [
-                  "fitnessprojectLambdaRole3f5dd9af",
+                  "fitnessprojectLambdaRolebc5b0172",
                   "-",
                   {
                     "Ref": "env"

@@ -38,15 +38,20 @@ exports.handler = event => {
   console.log(JSON.stringify(event, null, 2));
   event.Records.forEach(record => {
     if (record.eventName == "INSERT" || record.eventName == "REMOVE") {
-      const postId = record.eventName == "REMOVE" ? postId = record.dynamodb.OldImage.postId.S : record.dynamodb.NewImage.postId.S;
+      const postId = record.eventName == "REMOVE" ? record.dynamodb.OldImage.postId.S : record.dynamodb.NewImage.postId.S;
 
       (async () => {
         try {
+          
           //increment or decrement the post's likes
           //use the "ADD" function of the update resolver
 
-          const timestamp = postId.substring(0, 24);
-          const userId = postId.substring(24);
+          const ids = postId.split("#");
+          const timestamp = ids[0];
+          const userId = ids[1];
+          const channel = ids[2];
+          const parentId = ids[3];
+          const isParent = ids[4];
 
           console.log("postid is ", postId);
           console.log("created at ", timestamp);
@@ -55,6 +60,9 @@ exports.handler = event => {
           const inputVariables = {
             createdAt: timestamp,
             userId: userId,
+            channel: channel,
+            parentId: parentId,
+            isParent: isParent
           }
 
           if (record.eventName == "REMOVE") {

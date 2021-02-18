@@ -197,17 +197,43 @@ $util.qr($context.args.input.put("__typename", "Post"))
     $util.qr($expValues.put(":$entryKeyAttributeName", $util.dynamodb.toDynamoDB($entry.value)))
   #end
 #end
+#set( $expression = "" )
+#if( !$expSet.isEmpty() )
+  #set( $expression = "SET" )
+  #foreach( $entry in $expSet.entrySet() )
+    #set( $expression = "$expression $entry.key = $entry.value" )
+    #if( $foreach.hasNext() )
+      #set( $expression = "$expression," )
+    #end
+  #end
+#end
+#if( !$expAdd.isEmpty() )
+  #set( $expression = "$expression ADD" )
+  #foreach( $entry in $expAdd.entrySet() )
+    #set( $expression = "$expression $entry.key $entry.value" )
+    #if( $foreach.hasNext() )
+      #set( $expression = "$expression," )
+    #end
+  #end
+#end
+#if( !$expRemove.isEmpty() )
+  #set( $expression = "$expression REMOVE" )
+  #foreach( $entry in $expRemove )
+    #set( $expression = "$expression $entry" )
+    #if( $foreach.hasNext() )
+      #set( $expression = "$expression," )
+    #end
+  #end
+#end
 #set( $update = {} )
-$util.qr($expValues.put(":s", $util.dynamodb.toDynamoDB("")))
-$util.qr($update.put("expression", "ADD channel :s"))
-$util.qr($update.put("expression", "ADD parentId :s"))
+
 #if( $util.isNullOrEmpty($ctx.args.input.decrement) )
 	$util.qr($expValues.put(":d", $util.dynamodb.toDynamoDB(1)))
-	$util.qr($update.put("expression", "ADD likes :d"))
 #else
 	$util.qr($expValues.put(":d", $util.dynamodb.toDynamoDB(-1)))
-	$util.qr($update.put("expression", "ADD likes :d"))
 #end
+#set( $expression = "$expression ADD likes :d" )
+$util.qr($update.put("expression", "$expression"))
 #if( !$expNames.isEmpty() )
   $util.qr($update.put("expressionNames", $expNames))
 #end
