@@ -26,13 +26,6 @@ function LikeButton({
   postId
 }) {
   const [liked, setLiked] = useState(likedByYou);
-
-  useEffect(() => {
-    console.log("has the user liked this post? ", likedByYou);
-    if (liked) {
-      likes = likes - 1;
-    }
-  }, [])
   
   const likePostAsync = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
@@ -54,13 +47,13 @@ function LikeButton({
   if (liked) {
     return (
       <TouchableOpacity style={[styles.buttonStyle, { backgroundColor: 'red' }]} color="red" onPress={likePostAsync}>
-        <Text style={[styles.unselectedButtonTextStyle, { color: 'white' }]}>{likes ? likes + 1 : 1}</Text>
+        <Text style={[styles.unselectedButtonTextStyle, { color: 'white' }]}>{likes ? likedByYou ? likes : likes + 1 : 1}</Text>
       </TouchableOpacity>
     )
   } else {
     return (
       <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={likePostAsync}>
-        <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>{likes ? likes : 0}</Text>
+        <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>{likes ? likedByYou ? likes - 1 : likes : 0}</Text>
       </TouchableOpacity>
     )
   }
