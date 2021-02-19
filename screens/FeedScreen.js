@@ -130,14 +130,43 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
         //}
       }
     });
-    await API.graphql(graphqlOperation(onUpdatePost)).subscribe({
-      next: newPost => {
-        //if (!didUserPost) {
-        //check if newpost is earlier than the earliest post in the array first.
-        //if so, we won't even need to rerender anything
-        //if not, loop through the posts array to find the one that matches newpost and replace it!
-        //showPostsAsync();
-        //}
+    await API.graphql(graphqlOperation(onUpdatePost)).subscribe({ //nvm we dont have a subscription event for incrementlike
+      next: event => {
+        console.log("post has been updated");
+      }
+    });
+    /*
+    await API.graphql(graphqlOperation(onCreateLike, {userId: route.params?.id})).subscribe({ //nvm we dont have a subscription event for incrementlike
+      next: event => {
+        const newLike = event.value.data.onCreateLike;
+        if (newLike.userId != route.params?.id) {
+          const ids = newLike.postId.split("#");
+          const createdAt = ids[0];
+          const userId = ids[1];
+          //we can even display the last user that liked this post.
+  
+          const localUpdatedPostIndex = posts.findIndex(post => post.createdAt === createdAt && post.userId === userId);
+          if (localUpdatedPostIndex > -1) {
+            currentPosts.current[localUpdatedPostIndex].likes += 1;
+            setPosts([...currentPosts.current]); //make sure this doesn't run when you like posts, only when other people do. probably use a local variable to check, that would be fastest
+          }
+        }
+      }
+    });
+    await API.graphql(graphqlOperation(onDeleteLike, {userId: route.params?.id})).subscribe({ //nvm we dont have a subscription event for incrementlike
+      next: event => {
+        const removedLike = event.value.data.onDeleteLike;
+        if (removedLike.userId != route.params?.id) {
+          const ids = removedLike.postId.split("#");
+          const createdAt = ids[0];
+          const userId = ids[1];
+  
+          const localUpdatedPostIndex = posts.findIndex(post => post.createdAt === createdAt && post.userId === userId);
+          if (localUpdatedPostIndex > -1) {
+            currentPosts.current[localUpdatedPostIndex].likes -= 1;
+            setPosts([...currentPosts.current]); //make sure this doesn't run when you like posts, only when other people do. probably use a local variable to check, that would be fastest
+          }
+        }
       }
     });
   }
