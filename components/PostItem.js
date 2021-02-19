@@ -1,3 +1,35 @@
+/*
+                  {!isReplying ?:
+                    <View style={{
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      marginBottom: 15,
+                      marginHorizontal: 40,
+                      justifyContent: 'space-evenly'
+                    }}>
+                      <TouchableOpacity
+                        style={[styles.buttonStyle]}
+                        onPress={() => {
+                          postVal != ""
+                            ? (replyPostAsync(updatePostID))
+                            : alert("No text detected in text field");
+                        }}
+                      >
+                        <Text style={styles.buttonTextStyle}>Reply To Post</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={styles.buttonStyle}
+                        onPress={() => {
+                          setIsReplying(false),
+                        }}
+                      >
+                        <Text style={styles.buttonTextStyle}>Cancel</Text>
+                      </TouchableOpacity>
+                    </View>
+                  }
+*/
+
 import React, { useState, useEffect, useRef, PureComponent } from "react";
 import { Storage } from "aws-amplify";
 import {
@@ -63,13 +95,15 @@ export default function PostItem({
   item,
   deletePostsAsync,
   writtenByYou,
-  setPostVal,
-  setIsReplying,
-  setUpdatePostID,
+  editButtonHandler,
+  replyButtonHandler,
   receiver,
   showTimestamp,
   newSection
 }) {
+  const [isReplying, setIsReplying] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedText, setEditedText] = useState("");
   const displayTime = printTime(item.createdAt);
   const isReceivedMessage = receiver != null && !writtenByYou;
   //console.log(parentID);
@@ -89,8 +123,38 @@ export default function PostItem({
               <Text>{displayTime}</Text>
             </View>
           </View>
-          <Text style={[styles.check]}>{item.description}</Text>
+          {
+            isEditing
+            ? <TextInput style={[styles.check, {borderColor: 'orange'}]}
+              onChangeText={setEditedText}
+              autoFocus={true}>{item.description}</TextInput>
+            : <Text style={[styles.check]}>{item.description}</Text>
+          }
         </View>
+        
+        {
+          isEditing
+            ? editedText === ""
+              ? <TouchableOpacity
+                style={styles.unselectedButtonStyle}
+                onPress={() => {
+                  alert("Edit the post");
+                }}
+              >
+                <Text style={[styles.buttonTextStyle, { color: 'gray' }]}>{
+                  'Edit Post'
+                }</Text>
+              </TouchableOpacity>
+              : <TouchableOpacity
+                style={styles.buttonStyle}
+                onPress={() => { editButtonHandler(item.createdAt, editedText), setEditedText("") }}
+              >
+                <Text style={styles.buttonTextStyle}>{
+                  'Edit Post'
+                }</Text>
+              </TouchableOpacity>
+            : null
+        }
 
         <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
           <LikeButton
@@ -107,14 +171,14 @@ export default function PostItem({
               <TouchableOpacity
                 style={[styles.unselectedButtonStyle, { borderColor: 'blue' }]}
                 color="blue"
-                onPress={() => (setPostVal(item.description), setUpdatePostID(item.createdAt))}>
+                onPress={() => (setIsEditing(!isEditing))}>
                 <Text style={[styles.unselectedButtonTextStyle, { color: 'blue' }]}>Edit</Text>
               </TouchableOpacity>
 
             </View>
           ) : null}
           {item.isParent == 1 ?
-            <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'orange' }]} color="orange" onPress={() => (setPostVal(""), setIsReplying(true), setUpdatePostID(item.parentId))}>
+            <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'orange' }]} color="orange" onPress={() => (setIsReplying(!isReplying))}>
               <Text style={[styles.unselectedButtonTextStyle, { color: 'orange' }]}>Reply</Text>
             </TouchableOpacity>
             : null

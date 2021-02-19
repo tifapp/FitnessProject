@@ -77,5 +77,5 @@ type Mutation {
 }
 
 type Subscription {
-  onIncrementLikes(): Post @aws_subscribe(mutations: ["incrementLikes"]) @aws_cognito_user_pools
+  onIncrementLikes: Post @aws_subscribe(mutations: ["incrementLikes"]) @aws_cognito_user_pools
 }
