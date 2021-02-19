@@ -19,7 +19,7 @@ import { API, graphqlOperation } from "aws-amplify";
 import { createPost, updatePost, deletePost } from "root/src/graphql/mutations";
 import { listPosts, postsByChannel, batchGetLikes } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
-import { onCreatePost, onDeletePost, onUpdatePost } from 'root/src/graphql/subscriptions';
+import { onCreatePost, onDeletePost, onUpdatePost, onCreateLike, onDeleteLike, onIncrementLikes } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
 import APIList from 'components/APIList';
 import { AntDesign } from '@expo/vector-icons';
@@ -33,8 +33,6 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
   const numCharsLeft = 1000 - postVal.length;
-  const [isReplying, setIsReplying] = useState(false);
-  const [updatePostID, setUpdatePostID] = useState(0);
 
   const [onlineCheck, setOnlineCheck] = useState(true);
 
@@ -169,62 +167,55 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
         }
       }
     });
+    */
   }
 
-  // This function now also has functionality for updating a post
-  // We can separate updating functionality from adding functionality if it
-  // becomes an issue later on.
+  const updatePostAsync = async (createdAt) => {
+    //replace the post locally
+    let tempposts = [...posts];
+    tempposts[tempposts.findIndex(p => p.createdAt == createdAt && p.userId == route.params?.id)].description = postVal;
+    setPosts(tempposts);
+
+    const post = tempposts.find(p => {return p.createdAt == createdAt && p.userId == route.params?.id});
+
+    try {
+      await API.graphql(graphqlOperation(updatePost, { input: { createdAt: createdAt, description: postVal, parentId: post.parentId, isParent: post.isParent } }));
+      console.log("success in updating a post");
+    } catch (err) {
+      console.log("error in updating post: ", err);
+    }
+  }
+
   const addPostAsync = async () => {
     checkInternetConnection();
-    if (updatePostID != 0) {
-      //replace the post locally
-      let tempposts = [...posts];
-      tempposts[tempposts.findIndex(p => p.createdAt == updatePostID && p.userId == route.params?.id)].description = postVal;
-      setPosts(tempposts);
+    console.log("attempting to make new post");
+    const newPost = {
+      parentId: (new Date(Date.now())).toISOString() + route.params?.id,
+      description: postVal,
+      channel: getChannel(),
+      isParent: 1,
+    };
+    if (receiver != null)
+      newPost.receiver = receiver;
+    setPostVal("");
 
-      const post = tempposts.find(p => {return p.createdAt == updatePostID && p.userId == route.params?.id});
+    console.log(route.params?.id + " just posted.");
 
-      try {
-        await API.graphql(graphqlOperation(updatePost, { input: { createdAt: updatePostID, description: postVal, parentId: post.parentId, isParent: post.isParent } }));
-        console.log("success in updating a post");
-      } catch (err) {
-        console.log("error in updating post: ", err);
-      }
-
-      setPostVal("");
-      setUpdatePostID(0);
-    }
-    else {
-      console.log("attempting to make new post");
-      const newPost = {
-        parentId: (new Date(Date.now())).toISOString() + route.params?.id,
-        description: postVal,
-        channel: getChannel(),
-        isParent: 1,
-      };
-      if (receiver != null)
-        newPost.receiver = receiver;
-      setPostVal("");
-
-      console.log(route.params?.id + " just posted.");
-
-      if (posts != null && posts.length > 0)
-        setPosts([{ ...newPost, userId: route.params?.id, createdAt: (new Date(Date.now())).toISOString() }, ...posts]);
-      else
-        setPosts([{ ...newPost, userId: route.params?.id, createdAt: (new Date(Date.now())).toISOString() }]);
-      
-      try {
-        await API.graphql(graphqlOperation(createPost, { input: newPost }));
-      } catch (err) {
-        console.log("error in creating post: ", err);
-      }
-      //console.log("current time...", );
+    if (posts != null && posts.length > 0)
+      setPosts([{ ...newPost, userId: route.params?.id, createdAt: (new Date(Date.now())).toISOString() }, ...posts]);
+    else
+      setPosts([{ ...newPost, userId: route.params?.id, createdAt: (new Date(Date.now())).toISOString() }]);
+    
+    try {
+      await API.graphql(graphqlOperation(createPost, { input: newPost }));
+    } catch (err) {
+      console.log("error in creating post: ", err);
     }
   };
 
-  const replyPostAsync = async (postID) => {
+  const replyPostAsync = async (parentID) => {
     checkInternetConnection();
-    console.log("I'm in reply");
+    console.log("sent reply");
     console.log("*******************");
 
     const newPost = {
@@ -235,10 +226,6 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
     };
     if (receiver != null)
       newPost.receiver = receiver;
-    setPostVal("");
-
-    setIsReplying(false);
-    setUpdatePostID(0);
 
     let tempposts = [...currentPosts.current];
     var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId == newPost.parentId)]);
@@ -276,8 +263,6 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
     console.log(posts);
     console.log("******************************************");
 
-    setUpdatePostID(0);
-
     try {
       await API.graphql(graphqlOperation(deletePost, { input: { createdAt: timestamp, userId: route.params?.id } }));
     } catch {
@@ -295,68 +280,48 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
       <APIList
         ListRef={scrollRef}
         ListHeaderComponent={
-              <View style={{}}>
-                <Text style={{ marginTop: 20, marginLeft: 5 }}> Characters remaining: {numCharsLeft} </Text>
-                <TextInput
-                  style={[styles.textInputStyle, { marginTop: 5, marginBottom: 30 }]}
-                  multiline={true}
-                  placeholder="Start Typing..."
-                  onChangeText={setPostVal}
-                  value={postVal}
-                  clearButtonMode="always"
-                  maxLength={1000}
-                />
+          <View style={{}}>
+            <Text style={{ marginTop: 20, marginLeft: 5 }}> Characters remaining: {numCharsLeft} </Text>
+            <TextInput
+              style={[styles.textInputStyle, { marginTop: 5, marginBottom: 30 }]}
+              multiline={true}
+              placeholder="Start Typing..."
+              onChangeText={setPostVal}
+              value={postVal}
+              clearButtonMode="always"
+              maxLength={1000}
+            />
 
-                <View style={{
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  marginBottom: 15,
-                }}>
-                  {!isReplying ?
-                    <TouchableOpacity
-                      style={styles.buttonStyle}
-                      onPress={() => {
-                        postVal != ""
-                          ? (addPostAsync(updatePostID))
-                          : alert("No text detected in text field");
-                      }}
-                    >
-                      <Text style={styles.buttonTextStyle}>{
-                        receiver != null ? 'Send Message'
-                        : updatePostID == 0 ? 'Add Post' : 'Edit Post'
-                      }</Text>
-                    </TouchableOpacity> :
-                    <View style={{
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                      marginBottom: 15,
-                      marginHorizontal: 40,
-                      justifyContent: 'space-evenly'
-                    }}>
-                      <TouchableOpacity
-                        style={[styles.buttonStyle]}
-                        onPress={() => {
-                          postVal != ""
-                            ? (replyPostAsync(updatePostID))
-                            : alert("No text detected in text field");
-                        }}
-                      >
-                        <Text style={styles.buttonTextStyle}>Reply To Post</Text>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        style={styles.buttonStyle}
-                        onPress={() => {
-                          setIsReplying(false),
-                          setUpdatePostID(0)
-                        }}
-                      >
-                        <Text style={styles.buttonTextStyle}>Cancel</Text>
-                      </TouchableOpacity>
-                    </View>
-                  }
-                </View>
-              </View>
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              marginBottom: 15,
+            }}>
+              {
+                postVal === ""
+                ? <TouchableOpacity
+                  style={styles.unselectedButtonStyle}
+                  onPress={() => {
+                    alert("No text detected in text field");
+                  }}
+                >
+                  <Text style={[styles.buttonTextStyle, {color: 'gray'}]}>{
+                    receiver != null ? 'Send Message'
+                      : 'Add Post'
+                  }</Text>
+                </TouchableOpacity>
+                : <TouchableOpacity
+                  style={styles.buttonStyle}
+                  onPress={addPostAsync}
+                >
+                  <Text style={styles.buttonTextStyle}>{
+                    receiver != null ? 'Send Message'
+                      : 'Add Post'
+                  }</Text>
+                </TouchableOpacity>
+              }
+            </View>
+          </View>
         }
         processingFunction={getLikedPosts}
         queryOperation={postsByChannel}
@@ -368,9 +333,8 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
             item={item}
             deletePostsAsync={deletePostsAsync}
             writtenByYou={item.userId === route.params?.id}
-            setPostVal={setPostVal}
-            setIsReplying={setIsReplying}
-            setUpdatePostID={setUpdatePostID}
+            editButtonHandler={updatePostAsync}
+            replyButtonHandler={replyPostAsync}
             receiver={receiver}
             showTimestamp={showTimestamp(item, index)}
             newSection={index == 0 ? true : showTimestamp(posts[index-1], index-1)}
