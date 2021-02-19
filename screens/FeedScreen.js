@@ -170,16 +170,16 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
     */
   }
 
-  const updatePostAsync = async (createdAt) => {
+  const updatePostAsync = async (createdAt, editedText) => {
     //replace the post locally
     let tempposts = [...posts];
-    tempposts[tempposts.findIndex(p => p.createdAt == createdAt && p.userId == route.params?.id)].description = postVal;
+    tempposts[tempposts.findIndex(p => p.createdAt == createdAt && p.userId == route.params?.id)].description = editedText;
     setPosts(tempposts);
 
     const post = tempposts.find(p => {return p.createdAt == createdAt && p.userId == route.params?.id});
 
     try {
-      await API.graphql(graphqlOperation(updatePost, { input: { createdAt: createdAt, description: postVal, parentId: post.parentId, isParent: post.isParent } }));
+      await API.graphql(graphqlOperation(updatePost, { input: { createdAt: createdAt, description: editedText, parentId: post.parentId, isParent: post.isParent } }));
       console.log("success in updating a post");
     } catch (err) {
       console.log("error in updating post: ", err);
