@@ -19,7 +19,7 @@ import { API, graphqlOperation } from "aws-amplify";
 import { createPost, updatePost, deletePost } from "root/src/graphql/mutations";
 import { listPosts, postsByChannel, batchGetLikes } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
-import { onCreatePost, onDeletePost, onUpdatePost, onCreateLike, onDeleteLike, onIncrementLikes } from 'root/src/graphql/subscriptions';
+import { onCreatePost, onDeletePost, onUpdatePost, onCreateLike, onDeleteLike, didIncrementLikes } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
 import APIList from 'components/APIList';
 import { AntDesign } from '@expo/vector-icons';
@@ -133,6 +133,11 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
         console.log("post has been updated");
       }
     });
+    await API.graphql(graphqlOperation(didIncrementLikes)).subscribe({ //nvm we dont have a subscription event for incrementlike
+      next: event => {
+        console.log("post has been liked");
+      }
+    });
     /*
     await API.graphql(graphqlOperation(onCreateLike, {userId: route.params?.id})).subscribe({ //nvm we dont have a subscription event for incrementlike
       next: event => {
@@ -213,14 +218,14 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
     }
   };
 
-  const replyPostAsync = async (parentID) => {
+  const replyPostAsync = async (parentID, replyingText) => {
     checkInternetConnection();
     console.log("sent reply");
     console.log("*******************");
 
     const newPost = {
-      parentId: postID.toString(),
-      description: postVal,
+      parentId: parentID.toString(),
+      description: replyingText,
       channel: getChannel(),
       isParent: 0,
     };

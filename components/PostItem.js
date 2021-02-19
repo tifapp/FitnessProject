@@ -104,6 +104,7 @@ export default function PostItem({
   const [isReplying, setIsReplying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState("");
+  const [replyingText, setReplyingText] = useState("");
   const displayTime = printTime(item.createdAt);
   const isReceivedMessage = receiver != null && !writtenByYou;
   //console.log(parentID);
@@ -147,7 +148,7 @@ export default function PostItem({
               </TouchableOpacity>
               : <TouchableOpacity
                 style={styles.buttonStyle}
-                onPress={() => { editButtonHandler(item.createdAt, editedText), setEditedText("") }}
+                onPress={() => { editButtonHandler(item.createdAt, editedText), setEditedText(""), setIsEditing(false) }}
               >
                 <Text style={styles.buttonTextStyle}>{
                   'Edit Post'
@@ -184,6 +185,37 @@ export default function PostItem({
             : null
           }
         </View>
+
+        {
+          isReplying
+            ? <View>
+              <TextInput style={[styles.check, { borderColor: 'orange' }]}
+                onChangeText={setReplyingText}
+                autoFocus={true} />
+                {
+                  replyingText === ""
+                  ? <TouchableOpacity
+                    style={styles.unselectedButtonStyle}
+                    onPress={() => {
+                      alert("Reply can't be empty");
+                    }}
+                  >
+                    <Text style={[styles.buttonTextStyle, { color: 'gray' }]}>{
+                      'Submit Reply'
+                    }</Text>
+                  </TouchableOpacity>
+                  : <TouchableOpacity
+                    style={styles.buttonStyle}
+                    onPress={() => { replyButtonHandler(item.parentId, replyingText), setReplyingText(""), setIsReplying(false) }}
+                  >
+                    <Text style={styles.buttonTextStyle}>{
+                      'Submit Reply'
+                    }</Text>
+                  </TouchableOpacity>
+                }
+            </View>
+            : null
+        }
       </View>
     );
   else {
