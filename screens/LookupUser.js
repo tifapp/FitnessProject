@@ -130,10 +130,13 @@ const LookupUser = ({ route, navigation }) => {
     await API.graphql(graphqlOperation(onCreateFriendRequest, { sender: userId, receiver: route.params?.id })).subscribe({
       next: event => {
         const newFriendRequest = event.value.data.onCreateFriendRequest
-        if (friendStatus == "sent") {
-          setFriendStatus("friends");
-        } else {
-          setFriendStatus("received");
+        console.log("received friend request: ", newFriendRequest)
+        if (newFriendRequest.sender === userId && newFriendRequest.receiver === route.params?.id) {
+          if (friendStatus == "sent") {
+            setFriendStatus("friends");
+          } else {
+            setFriendStatus("received");
+          }
         }
       }
     });
