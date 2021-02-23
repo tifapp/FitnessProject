@@ -187,8 +187,7 @@ exports.handler = (event, context, callback) => {
             }
           });
           if (senderUser.data.getUser == null) {
-            console.log('couldnt find matching user');
-            callback(null, senderUser.data);
+            callback(null, 'couldnt find matching user');
             return;
           }
           const receiverUser = await client.query({
@@ -198,8 +197,7 @@ exports.handler = (event, context, callback) => {
             }
           });
           if (receiverUser.data.getUser == null) {
-            console.log('couldnt find matching user');
-            callback(null, receiverUser.data);
+            callback(null, 'couldnt find matching user');
             return;
           }
 
@@ -208,12 +206,12 @@ exports.handler = (event, context, callback) => {
             
             await sendNotification(receiverUser.data.getUser.deviceToken, senderUser.data.getUser.name + " sent you a friend request!"); //truncate the sender's name!
 
-            callback(null, result.data);
+            callback(null, "Successfully sent friend request notification");
             return;
           } else {
             console.log('found matching friend request!');
           }
-          console.log(result);
+
           await client.mutate({
             mutation: gql(deleteFriendRequest),
             variables: {
@@ -254,6 +252,8 @@ exports.handler = (event, context, callback) => {
             });
             
             await sendNotification(receiverUser.data.getUser.deviceToken, senderUser.data.getUser.name + " accepted your friend request!");
+            callback(null, "Successfully formed a friendship and notified both users");
+            return;
           } else {
             //for incrementing hi-fives
             await client.mutate({
@@ -266,9 +266,14 @@ exports.handler = (event, context, callback) => {
                 }
               }
             });
+            
+            callback(null, "Successfully incremented friendship level");
+            return;
           }
         } catch (e) {
-          console.warn('Error sending mutation: ',  e);
+          console.warn('Error processing friend requests: ',  e);
+          callback(Error(e));
+          return;
         }
       })();
     }

@@ -16,8 +16,7 @@ const config = {
 
 const client = new AWSAppSyncClient(config);
 
-const incrementLikes =
-`
+const incrementLikes = `
   mutation IncrementLikes($input: incrementLikesInput!) {
     incrementLikes(input: $input) {
       createdAt
@@ -33,20 +32,18 @@ const incrementLikes =
   }
 `;
 
-exports.handler = event => {
+exports.handler = (event, context, callback) => {
   //eslint-disable-line
-  event.Records.forEach(record => {
+  event.Records.forEach((record) => {
     if (record.eventName == "INSERT" || record.eventName == "REMOVE") {
       console.log("record is ", record);
       let postId = "placeholder";
       if (record.eventName == "REMOVE")
         postId = record.dynamodb.OldImage.postId.S;
-      else 
-        postId = record.dynamodb.NewImage.postId.S;
+      else postId = record.dynamodb.NewImage.postId.S;
 
       (async () => {
         try {
-          
           //increment or decrement the post's likes
           //use the "ADD" function of the update resolver
 
@@ -64,24 +61,31 @@ exports.handler = event => {
             userId: userId,
             channel: channel,
             parentId: parentId,
-            isParent: isParent
-          }
+            isParent: isParent,
+          };
 
           if (record.eventName == "REMOVE") {
             inputVariables.decrement = true;
           }
 
-          client.mutate({
+          await client.mutate({
             mutation: gql(incrementLikes),
             variables: {
-              input: inputVariables
-            }
+              input: inputVariables,
+            },
           });
-
+          
+          callback(null, "Successfully incremented like counter");
+          return;
         } catch (e) {
-          console.warn('Error sending mutation: ', e);
+          console.warn("Error sending mutation: ", e);
+          callback(Error(e));
+          return;
         }
       })();
+    } else {
+      callback(null, "Like was not inserted or deleted");
+      return;
     }
   });
 };

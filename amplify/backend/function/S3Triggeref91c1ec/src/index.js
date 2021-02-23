@@ -27,7 +27,7 @@ exports.handler = (event, context, callback) => {
       Sharp(image.Body).resize(60).toBuffer()
         .then((buffer) => {
           s3.putObject({ Bucket: BUCKET, Body: buffer, Key: `public/thumbnails/${PARTS[1]}/thumbnail-${FILE}` }).promise()
-            .then(() => { callback(null) })
+            .then(() => { callback(null, "Successfully generated profile image thumbnail") })
             .catch(err => {
               console.log('error storing and resizing image: ', err)
               callback(err)

@@ -1,30 +1,3 @@
-/*
-const {
-  Expo
-} = require("expo-server-sdk");
-
-// Create a new Expo SDK client
-let expo = new Expo();
-
-require('isomorphic-fetch');
-const AWS = require('aws-sdk/global');
-const AUTH_TYPE = require('aws-appsync').AUTH_TYPE;
-const AWSAppSyncClient = require('aws-appsync').default;
-const gql = require('graphql-tag');
-
-
-exports.handler = event => {
-  //eslint-disable-line
-  console.log(JSON.stringify(event, null, 2));
-  event.Records.forEach(record => {
-    console.log(record.eventID);
-    console.log(record.eventName);
-    console.log('DynamoDB Record: %j', record.dynamodb);
-  });
-  return Promise.resolve('Successfully processed DynamoDB record');
-};
-*/
-
 const {
   Expo
 } = require("expo-server-sdk");
@@ -129,6 +102,7 @@ exports.handler = async (event, context, callback) => {
           const sender = record.dynamodb.NewImage.sender.S;
 
           if (receiver == null) {
+            callback(null, "Not a message");
             return;
           }
 
@@ -148,11 +122,14 @@ exports.handler = async (event, context, callback) => {
 
           //if (friendshipcheck.data.getFriendship != null) {
           await sendNotification(receiverName.data.getUser.deviceToken, senderName.data.getUser.name + " sent you a message!"); //truncate the sender's name!
-          console.log("Finished Messaging");
+          callback(null, "Successfully sent messaging notification");
+          return;
           //}
         }
         catch (e) {
           console.warn('Error sending reply: ', e);
+          callback(Error(e));
+          return;
         }
       })();
     }
