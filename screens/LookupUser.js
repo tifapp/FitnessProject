@@ -83,7 +83,7 @@ const LookupUser = ({ route, navigation }) => {
       // If two people are friends
       if (friendship.data.getFriendship != null) {
         setFriendStatus("friends");
-        setFriendsSince(printTime(friendship.data.getFriendship.timestamp * 1000));
+        setFriendsSince(printTime(friendship.data.getFriendship.createdAt));
         setHifives(friendship.data.getFriendship.hifives);
         console.log("check");
         console.log(friendship.data.getFriendship);
