@@ -11,6 +11,16 @@ export const batchGetLikes = /* GraphQL */ `
     }
   }
 `;
+export const batchGetFriendRequests = /* GraphQL */ `
+  query BatchGetFriendRequests($friendrequests: [CreateFriendRequestInput]) {
+    batchGetFriendRequests(friendrequests: $friendrequests) {
+      createdAt
+      updatedAt
+      sender
+      receiver
+    }
+  }
+`;
 export const getGroup = /* GraphQL */ `
   query GetGroup($id: ID!) {
     getGroup(id: $id) {
