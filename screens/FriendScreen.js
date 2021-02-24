@@ -7,7 +7,7 @@ import {
 } from "react-native";
 
 import { API, graphqlOperation } from "aws-amplify";
-import { listFriendRequests, friendRequestsByReceiver, listFriendships, getFriendship, friendsBySecondUser } from "root/src/graphql/queries";
+import { listFriendRequests, friendRequestsByReceiver, listFriendships, getFriendship, friendsBySecondUser, batchGetFriendRequests } from "root/src/graphql/queries";
 import { onCreateFriendRequest, onCreateFriendship } from "root/src/graphql/subscriptions";
 import { createFriendRequest, deleteFriendRequest, deleteFriendship } from "root/src/graphql/mutations";
 import { ProfileImageAndName } from 'components/ProfileImageAndName'
@@ -39,7 +39,7 @@ const FriendScreen = ({ route, navigation }) => {
     }, []);
 
     useEffect(() => {
-        if (!friendsEnabled && friendRequestList.length === 0)
+        if (!friendsEnabled && (friendRequestList == null || friendRequestList.length === 0))
             friendRequestListRef.current.fetchDataAsync(true);
     }, [friendsEnabled])
     
@@ -52,6 +52,7 @@ const FriendScreen = ({ route, navigation }) => {
                 }
             }
         });
+        /*
         await API.graphql(graphqlOperation(onCreateFriendRequest)).subscribe({
             next: event => {
                 const newFriendRequest = event.value.data.onCreateFriendRequest
@@ -60,6 +61,7 @@ const FriendScreen = ({ route, navigation }) => {
                 }
             }
         });
+        */
     }
 
     const findFriendID = (item) => {
@@ -118,114 +120,231 @@ const FriendScreen = ({ route, navigation }) => {
         });
     }
 
-    const checkIfPendingFriend = async (items) => {
-        if (items != null && items.length > 0) {
-            items.forEach();
+    const getNonPendingFriends = async (items) => {
+      if (items != null && items.length > 0) {
+        let senders = [];
+
+        items.forEach((item) => {
+          senders.push({
+            receiver: item.sender,
+          });
+        });
+
+        try {
+          const frs = await API.graphql(
+            graphqlOperation(batchGetFriendRequests, {
+              friendrequests: senders,
+            })
+          );
+          console.log("looking for matching senders: ", frs);
+
+          let validRequests = [];
+          for (i = 0; i < items.length; ++i) {
+            if (frs.data.batchGetFriendRequests[i] == null) {
+              validRequests.push(items[i]);
+            }
+          }
+          console.log("--------------")
+          console.log(validRequests)
+          return validRequests;
+        } catch (err) {
+          console.log("error in detecting likes: ", err);
         }
-    }
+      }
+    };
 
     return (
-        <View>
-            <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 25 }}>
-                <TouchableOpacity
-                    style={(friendsEnabled) ? styles.outlineButtonStyle : styles.unselectedButtonStyle}
-                    onPress={() => setFriendsEnabled(true)}>
-                    <Text style={(friendsEnabled) ? styles.outlineButtonTextStyle : styles.unselectedButtonTextStyle}>Friends</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={(friendsEnabled) ? styles.unselectedButtonStyle : styles.outlineButtonStyle}
-                    onPress={() => setFriendsEnabled(false)}>
-                    <Text style={(friendsEnabled) ? styles.unselectedButtonTextStyle : styles.outlineButtonTextStyle}>Requests</Text>
-                </TouchableOpacity>
-
-            </View>
-            <View style={{ marginTop: 25, alignSelf: 'center' }}>
-                {friendsEnabled ?
-
-                    <View>
-                        <Text style={{ alignSelf: 'center' }}>Your awesome friends!</Text>
-                        <APIList
-                            queryOperation={listFriendships}
-                            filter={{filter: { 
-                                or: [{
-                                    user1: {
-                                        eq: route.params?.id
-                                    }
-                                },
-                                {
-                                    user2: {
-                                        eq: route.params?.id
-                                    }
-                                }]
-                            }}}
-                            setDataFunction={setFriendList}
-                            data={friendList}
-                            renderItem={({ item }) => (
-                                <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%' }}>
-                                    <ProfileImageAndName
-                                        style={styles.smallImageStyle}
-                                        userId={findFriendID(item)}
-                                    />
-                                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 15 }}
-                                        onPress={() => removeFriendHandler(item)}>
-                                        <Text>Remove</Text>
-                                        <Entypo name="cross" style={{ marginHorizontal: 7 }}
-                                            size={44} color="red" />
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'blue' }]} color="orange" onPress={() => goToProfile(findFriendID(item))}>
-                                        <Text style={[styles.unselectedButtonTextStyle, { color: 'blue' }]}>Message</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            )}
-                            keyExtractor={(item) => item.createdAt.toString()}
-                        />
-                    </View>
-
-                    :
-
-                    <View>
-                        <Text style={{ alignSelf: 'center' }}>Incoming Requests!</Text>
-                        <APIList
-                            ref={friendRequestListRef}
-                            queryOperation={friendRequestsByReceiver}
-                            filter={{receiver: route.params?.id}}
-                            setDataFunction={setFriendRequestList}
-                            data={friendRequestList}
-                            renderItem={({ item }) => (
-                                <View style={{ marginVertical: 5 }}>
-                                    <View style={{ flexDirection: 'column', alignSelf: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%' }}>
-                                        <ProfileImageAndName
-                                            style={styles.smallImageStyle}
-                                            userId={item.sender}
-                                        />
-                                        <View style={{ flexDirection: 'row', alignSelf: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%' }}>
-
-                                            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}
-                                                onPress={() => acceptRequest(item)}>
-                                                <Text>Accept</Text>
-                                                <AntDesign name="check" style={{ marginHorizontal: 7 }}
-                                                    size={44} color="green" />
-                                            </TouchableOpacity>
-
-                                            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}
-                                                onPress={() => rejectRequest(item)}>
-                                                <Text>Reject</Text>
-                                                <Entypo name="cross" style={{ marginHorizontal: 7 }}
-                                                    size={44} color="red" />
-                                            </TouchableOpacity>
-
-                                        </View>
-                                    </View>
-                                </View>
-                            )}
-                            keyExtractor={(item) => item.sender}
-                        />
-                    </View>
-                }
-            </View>
-
+      <View>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            marginTop: 25,
+          }}
+        >
+          <TouchableOpacity
+            style={
+              friendsEnabled
+                ? styles.outlineButtonStyle
+                : styles.unselectedButtonStyle
+            }
+            onPress={() => setFriendsEnabled(true)}
+          >
+            <Text
+              style={
+                friendsEnabled
+                  ? styles.outlineButtonTextStyle
+                  : styles.unselectedButtonTextStyle
+              }
+            >
+              Friends
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={
+              friendsEnabled
+                ? styles.unselectedButtonStyle
+                : styles.outlineButtonStyle
+            }
+            onPress={() => setFriendsEnabled(false)}
+          >
+            <Text
+              style={
+                friendsEnabled
+                  ? styles.unselectedButtonTextStyle
+                  : styles.outlineButtonTextStyle
+              }
+            >
+              Requests
+            </Text>
+          </TouchableOpacity>
         </View>
-    )
+        <View style={{ marginTop: 25, alignSelf: "center" }}>
+          {friendsEnabled ? (
+            <View>
+              <Text style={{ alignSelf: "center" }}>Your awesome friends!</Text>
+              <APIList
+                queryOperation={listFriendships}
+                filter={{
+                  filter: {
+                    or: [
+                      {
+                        user1: {
+                          eq: route.params?.id,
+                        },
+                      },
+                      {
+                        user2: {
+                          eq: route.params?.id,
+                        },
+                      },
+                    ],
+                  },
+                }}
+                setDataFunction={setFriendList}
+                data={friendList}
+                renderItem={({ item }) => (
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginVertical: 5,
+                      justifyContent: "space-between",
+                      width: "80%",
+                    }}
+                  >
+                    <ProfileImageAndName
+                      style={styles.smallImageStyle}
+                      userId={findFriendID(item)}
+                    />
+                    <TouchableOpacity
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginHorizontal: 15,
+                      }}
+                      onPress={() => removeFriendHandler(item)}
+                    >
+                      <Text>Remove</Text>
+                      <Entypo
+                        name="cross"
+                        style={{ marginHorizontal: 7 }}
+                        size={44}
+                        color="red"
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[
+                        styles.unselectedButtonStyle,
+                        { borderColor: "blue" },
+                      ]}
+                      color="orange"
+                      onPress={() => goToProfile(findFriendID(item))}
+                    >
+                      <Text
+                        style={[
+                          styles.unselectedButtonTextStyle,
+                          { color: "blue" },
+                        ]}
+                      >
+                        Message
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+                keyExtractor={(item) => item.createdAt.toString()}
+              />
+            </View>
+          ) : (
+            <View>
+              <Text style={{ alignSelf: "center" }}>Incoming Requests!</Text>
+              <APIList
+                ref={friendRequestListRef}
+                processingFunction={getNonPendingFriends}
+                queryOperation={friendRequestsByReceiver}
+                filter={{ receiver: route.params?.id }}
+                setDataFunction={setFriendRequestList}
+                data={friendRequestList}
+                renderItem={({ item }) => (
+                  <View style={{ marginVertical: 5 }}>
+                    <View
+                      style={{
+                        flexDirection: "column",
+                        alignSelf: "center",
+                        marginVertical: 5,
+                        justifyContent: "space-between",
+                        width: "80%",
+                      }}
+                    >
+                      <ProfileImageAndName
+                        style={styles.smallImageStyle}
+                        userId={item.sender}
+                      />
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignSelf: "center",
+                          marginVertical: 5,
+                          justifyContent: "space-between",
+                          width: "80%",
+                        }}
+                      >
+                        <TouchableOpacity
+                          style={{ flexDirection: "row", alignItems: "center" }}
+                          onPress={() => acceptRequest(item)}
+                        >
+                          <Text>Accept</Text>
+                          <AntDesign
+                            name="check"
+                            style={{ marginHorizontal: 7 }}
+                            size={44}
+                            color="green"
+                          />
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={{ flexDirection: "row", alignItems: "center" }}
+                          onPress={() => rejectRequest(item)}
+                        >
+                          <Text>Reject</Text>
+                          <Entypo
+                            name="cross"
+                            style={{ marginHorizontal: 7 }}
+                            size={44}
+                            color="red"
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+                )}
+                keyExtractor={(item) => item.sender}
+              />
+            </View>
+          )}
+        </View>
+      </View>
+    );
 }
 
 export default FriendScreen;
