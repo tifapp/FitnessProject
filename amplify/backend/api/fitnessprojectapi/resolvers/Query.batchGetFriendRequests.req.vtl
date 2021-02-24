@@ -1,0 +1,16 @@
+#set( $userId = $context.identity.sub )
+#set($friendrequestsdata = [])
+#foreach($item in ${ctx.args.friendrequests})
+	$util.qr($item.put("userId", $util.defaultIfNull($item.userId, $userId)))
+    $util.qr($friendrequestsdata.add($util.dynamodb.toMapValues($item)))
+#end
+
+{
+    "version" : "2018-05-29",
+    "operation" : "BatchGetItem",
+    "tables" : {
+        "FriendRequest-4lwfnmtnpvb55mcushmhexhjgu-dev": {
+			"keys": $utils.toJson($friendrequestsdata)
+		}
+    }
+}
