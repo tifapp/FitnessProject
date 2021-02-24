@@ -99,7 +99,7 @@ exports.handler = async (event, context, callback) => {
         try {
           console.log("---------------------------------------------------------");
           const receiver = record.dynamodb.NewImage.receiver.S;
-          const sender = record.dynamodb.NewImage.sender.S;
+          const sender = record.dynamodb.NewImage.userId.S;
 
           if (receiver == null) {
             callback(null, "Not a message");
