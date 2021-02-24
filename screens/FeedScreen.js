@@ -107,7 +107,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
         if (newPost.userId != route.params?.id && newPost.channel == getChannel()) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
           if (newPost.isParent == 0) {
             if (currentPosts.current.find(post => post.parentId === newPost.parentId)) {
-              let tempposts = [...currentPosts.current];
+              let tempposts = currentPosts.current;
               var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId === newPost.parentId)]);
               tempposts.splice(index + 1, 0, newPost);
               setPosts(tempposts);
@@ -177,7 +177,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
 
   const updatePostAsync = async (createdAt, editedText) => {
     //replace the post locally
-    let tempposts = [...posts];
+    let tempposts = posts;
     tempposts[tempposts.findIndex(p => p.createdAt == createdAt && p.userId == route.params?.id)].description = editedText;
     setPosts(tempposts);
 
@@ -232,7 +232,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
     if (receiver != null)
       newPost.receiver = receiver;
 
-    let tempposts = [...currentPosts.current];
+    let tempposts = currentPosts.current;
     var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId == newPost.parentId)]);
     tempposts.splice(index + 1, 0, {...newPost, userId: route.params?.id, createdAt: (new Date(Date.now())).toISOString() });
     setPosts(tempposts);
