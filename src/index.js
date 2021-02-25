@@ -1,10 +1,3 @@
-const {
-  Expo
-} = require("expo-server-sdk");
-
-// Create a new Expo SDK client
-let expo = new Expo();
-
 require('isomorphic-fetch');
 const AWS = require('aws-sdk/global');
 const AUTH_TYPE = require('aws-appsync').AUTH_TYPE;
@@ -23,22 +16,18 @@ const config = {
 
 const client = new AWSAppSyncClient(config);
 
-const getUser =
-  `
-  query GetUser($id: ID!) {
-    getUser(id: $id) {
-      id
-      identityId
-      name
-      age
-      gender
-      bio
-      goals
-      latitude
-      longitude
-      deviceToken
+const incrementLikes = `
+  mutation IncrementLikes($input: incrementLikesInput!) {
+    incrementLikes(input: $input) {
       createdAt
       updatedAt
+      userId
+      description
+      parentId
+      channel
+      receiver
+      isParent
+      likes
     }
   }
 `;
@@ -92,46 +81,85 @@ async function sendNotification(deviceToken, message) {
   }
 }
 
-exports.handler = async (event, context, callback) => {
+exports.handler = (event, context, callback) => {
+  //eslint-disable-line
   event.Records.forEach((record) => {
-    if (record.eventName == "INSERT") {
+    let check = 0;
+    if (record.eventName == "INSERT" || record.eventName == "REMOVE") {
+      console.log("record is ", record);
+      let postId = "placeholder";
+      let likerUserId = "";
+      if (record.eventName == "REMOVE")
+        postId = record.dynamodb.OldImage.postId.S;
+      else{
+        postId = record.dynamodb.NewImage.postId.S;
+        likerUserId = record.dynamodb.NewImage.userId.S;
+        check = 1;
+      } 
+      
+
       (async () => {
         try {
-          console.log("---------------------------------------------------------");
-          const receiver = record.dynamodb.NewImage.receiver.S;
-          const sender = record.dynamodb.NewImage.userId.S;
+          //increment or decrement the post's likes
+          //use the "ADD" function of the update resolver
 
-          if (receiver == null) {
-            callback(null, "Not a message");
-            return;
+          const ids = postId.split("#");
+          const timestamp = ids[0];
+          const userId = ids[1];
+          const channel = ids[2];
+          const parentId = ids[3];
+          const isParent = ids[4];
+
+          console.log("postid is ", postId);
+
+          const inputVariables = {
+            createdAt: timestamp,
+            userId: userId,
+            channel: channel,
+            parentId: parentId,
+            isParent: isParent,
+          };
+
+          if (record.eventName == "REMOVE") {
+            inputVariables.decrement = true;
           }
 
-          const receiverName = await client.query({
+          await client.mutate({
+            mutation: gql(incrementLikes),
+            variables: {
+              input: inputVariables,
+            },
+          });
+
+          const authorName = await client.query({
             query: gql(getUser),
             variables: {
-              id: receiver
+              id: postId
             }
           });
 
-          const senderName = await client.query({
+          const likerUserName = await client.query({
             query: gql(getUser),
             variables: {
-              id: sender
+              id: likerUserId
             }
           });
 
-          //if (friendshipcheck.data.getFriendship != null) {
-          await sendNotification(receiverName.data.getUser.deviceToken, senderName.data.getUser.name + " sent you a message!"); //truncate the sender's name!
-          callback(null, "Successfully sent messaging notification");
+          if(check){
+            await sendNotification(authorName.data.getUser.deviceToken, likerUserName.data.getUser.name + " liked your message!"); //truncate the sender's name!
+          }
+
+          callback(null, "Successfully incremented like counter");
           return;
-          //}
-        }
-        catch (e) {
-          console.warn('Error sending reply: ', e);
+        } catch (e) {
+          console.warn("Error sending mutation: ", e);
           callback(Error(e));
           return;
         }
       })();
+    } else {
+      callback(null, "Like was not inserted or deleted");
+      return;
     }
   });
 };

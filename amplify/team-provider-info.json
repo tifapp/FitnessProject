@@ -1,14 +1,14 @@
 {
-  "likestwo": {
+  "likenotify": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-fitnessproject-likestwo-211757-authRole",
-      "UnauthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-likestwo-211757-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-likestwo-211757-authRole",
+      "AuthRoleName": "amplify-fitnessproject-likenotify-142152-authRole",
+      "UnauthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-likenotify-142152-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-likenotify-142152-authRole",
       "Region": "us-west-2",
-      "DeploymentBucketName": "amplify-fitnessproject-likestwo-211757-deployment",
-      "UnauthRoleName": "amplify-fitnessproject-likestwo-211757-unauthRole",
-      "StackName": "amplify-fitnessproject-likestwo-211757",
-      "StackId": "arn:aws:cloudformation:us-west-2:213277979580:stack/amplify-fitnessproject-likestwo-211757/305efe10-6128-11eb-998d-0223035e111b",
+      "DeploymentBucketName": "amplify-fitnessproject-likenotify-142152-deployment",
+      "UnauthRoleName": "amplify-fitnessproject-likenotify-142152-unauthRole",
+      "StackName": "amplify-fitnessproject-likenotify-142152",
+      "StackId": "arn:aws:cloudformation:us-west-2:213277979580:stack/amplify-fitnessproject-likenotify-142152/b2db90c0-76ee-11eb-8de7-0a37f738008d",
       "AmplifyAppId": "d19kzf7eu35pq1"
     },
     "categories": {
@@ -22,42 +22,30 @@
         }
       },
       "function": {
-        "S3Triggeref91c1ec": {},
-        "deleteReplies": {},
-        "friendRequestResolver": {},
-        "incrementLikes": {}
-      }
-    }
-  },
-  "dev": {
-    "awscloudformation": {
-      "AuthRoleName": "amplify-fitnessproject-dev-231929-authRole",
-      "UnauthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-dev-231929-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-dev-231929-authRole",
-      "Region": "us-west-2",
-      "DeploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-      "UnauthRoleName": "amplify-fitnessproject-dev-231929-unauthRole",
-      "StackName": "amplify-fitnessproject-dev-231929",
-      "StackId": "arn:aws:cloudformation:us-west-2:213277979580:stack/amplify-fitnessproject-dev-231929/2ddbf6e0-57cb-11eb-84c4-06f2b9198e79",
-      "AmplifyAppId": "d19kzf7eu35pq1"
-    },
-    "categories": {
-      "auth": {
-        "fitnessprojecta8f49cfe": {}
-      },
-      "hosting": {
-        "amplifyhosting": {
-          "appId": "d19kzf7eu35pq1",
-          "type": "manual"
+        "S3Triggeref91c1ec": {
+          "deploymentBucketName": "amplify-fitnessproject-likenotify-142152-deployment",
+          "s3Key": "amplify-builds/S3Triggeref91c1ec-4a4d6c62786e4e667657-build.zip"
+        },
+        "deleteReplies": {
+          "deploymentBucketName": "amplify-fitnessproject-likenotify-142152-deployment",
+          "s3Key": "amplify-builds/deleteReplies-7242393646514256646e-build.zip"
+        },
+        "friendRequestResolver": {
+          "deploymentBucketName": "amplify-fitnessproject-likenotify-142152-deployment",
+          "s3Key": "amplify-builds/friendRequestResolver-39663832316159345453-build.zip"
+        },
+        "messageNotification": {
+          "deploymentBucketName": "amplify-fitnessproject-likenotify-142152-deployment",
+          "s3Key": "amplify-builds/messageNotification-66393971355268742f39-build.zip"
+        },
+        "replyNotifications": {
+          "deploymentBucketName": "amplify-fitnessproject-likenotify-142152-deployment",
+          "s3Key": "amplify-builds/replyNotifications-5347384448334c705848-build.zip"
+        },
+        "likeCounter": {
+          "deploymentBucketName": "amplify-fitnessproject-likenotify-142152-deployment",
+          "s3Key": "amplify-builds/likeCounter-672b745062454966675a-build.zip"
         }
-      },
-      "function": {
-        "S3Triggeref91c1ec": {},
-        "deleteReplies": {},
-        "friendRequestResolver": {},
-        "incrementLikes": {},
-        "messageNotification": {},
-        "replyNotifications": {}
       }
     }
   }

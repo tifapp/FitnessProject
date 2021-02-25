@@ -17,6 +17,12 @@
     "apifitnessprojectapiGraphQLAPIEndpointOutput": {
       "Type": "String",
       "Default": "apifitnessprojectapiGraphQLAPIEndpointOutput"
+    },
+    "deploymentBucketName": {
+      "Type": "String"
+    },
+    "s3Key": {
+      "Type": "String"
     }
   },
   "Conditions": {
@@ -41,12 +47,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "incrementLikes",
+            "likeCounter",
             {
               "Fn::Join": [
                 "",
                 [
-                  "incrementLikes",
+                  "likeCounter",
                   "-",
                   {
                     "Ref": "env"
@@ -82,8 +88,12 @@
         "Layers": [],
         "Timeout": "25",
         "Code": {
-          "S3Bucket": "amplify-fitnessproject-dev-231929-deployment",
-          "S3Key": "amplify-builds/incrementLikes-784b4841746b4d314e62-build.zip"
+          "S3Bucket": {
+            "Ref": "deploymentBucketName"
+          },
+          "S3Key": {
+            "Ref": "s3Key"
+          }
         }
       }
     },
@@ -93,12 +103,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "fitnessprojectLambdaRole3f5dd9af",
+            "fitnessprojectLambdaRolebe0dabe5",
             {
               "Fn::Join": [
                 "",
                 [
-                  "fitnessprojectLambdaRole3f5dd9af",
+                  "fitnessprojectLambdaRolebe0dabe5",
                   "-",
                   {
                     "Ref": "env"

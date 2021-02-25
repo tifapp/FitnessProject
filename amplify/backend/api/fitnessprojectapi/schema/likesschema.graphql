@@ -26,4 +26,5 @@ input DeleteLikeInput {
 
 type Query {
   batchGetLikes(likes: [CreateLikeInput]): [Like]
+  batchGetFriendRequests(friendrequests: [CreateFriendRequestInput]): [FriendRequest]
 }

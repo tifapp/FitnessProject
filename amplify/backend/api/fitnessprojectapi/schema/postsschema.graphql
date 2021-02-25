@@ -48,7 +48,6 @@ input CreatePostInput {
 This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when updating a message.
 """
 input UpdatePostInput {
-  likes: Int
   createdAt: AWSDateTime!
   description: String
   parentId: String
@@ -59,6 +58,9 @@ input incrementLikesInput {
   createdAt: AWSDateTime!
   userId: ID!
   decrement: Boolean
+  parentId: String
+  isParent: Int
+  channel: ID
 }
 
 """
@@ -71,5 +73,9 @@ input DeletePostInput {
 
 type Mutation {
   batchDeletePosts(posts: [DeletePostInput]): [Post] @aws_iam
-  incrementLikes(post: incrementLikesInput): Post @aws_iam
+  incrementLikes(input: incrementLikesInput!): Post @aws_iam
+}
+
+type Subscription {
+  onIncrementLikes: Post @aws_subscribe(mutations: ["incrementLikes"]) @aws_cognito_user_pools
 }

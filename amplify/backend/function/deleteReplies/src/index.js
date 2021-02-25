@@ -88,7 +88,7 @@ exports.handler = (event, context, callback) => {
               }
             });
 
-            results.data.postsByParentId.items.forEach(async (post) => {
+            await Promise.all(results.data.postsByParentId.items.map(async (post) => {
               client.mutate({
                 mutation: gql(deletePost),
                 variables: {
@@ -98,10 +98,14 @@ exports.handler = (event, context, callback) => {
                   }
                 }
               });
-            });
+            }));
 
+            callback(null, "successfully deleted replies");
+            return;
           } catch (e) {
-            console.warn('Error sending mutation: ', e);
+            console.warn('Error deleting replies: ', e);
+            callback(Error(e));
+            return;
           }
         })();
       }

@@ -238,6 +238,7 @@ exports.handler = (event, context, callback) => {
           console.log(record.dynamodb.NewImage);
 
           if (record.dynamodb.NewImage.isParent.N == 1) {
+            callback(null, "Not a reply");
             return;
           }
 
@@ -282,11 +283,12 @@ exports.handler = (event, context, callback) => {
 
           //if (friendshipcheck.data.getFriendship != null) {
             await sendNotification(parentPost.data.getUser.deviceToken, childPost.data.getUser.name + " sent you a reply!"); //truncate the sender's name!
-            console.log("Finished Replying");
+            callback(null, "Finished Replying");
           //}
         }
         catch (e) {
           console.warn('Error sending reply: ', e);
+          callback(Error(e));
         }
       })();
     }

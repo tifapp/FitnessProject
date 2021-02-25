@@ -100,7 +100,7 @@ export default function PostItem({
           <LikeButton
             likes={item.likes}
             likedByYou={item.likedByYou}
-            postId={item.createdAt + item.userId}
+            postId={item.createdAt + "#" + item.userId + "#" + item.channel + "#" + item.parentId + "#" + item.isParent}
           />
           {writtenByYou ? (
             <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
