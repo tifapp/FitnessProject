@@ -113,8 +113,12 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
               setPosts(tempposts);
             }
           }
-          else
-            setPosts([newPost, ...currentPosts.current]); //what if we have a lot of new posts at once?
+          else {
+            if (currentPosts.current.length != null && currentPosts.current.length > 0)
+              setPosts([newPost, ...currentPosts.current]); //what if we have a lot of new posts at once?
+            else
+              setPosts([newPost]); //what if we have a lot of new posts at once?
+          }
         }
       }
     });

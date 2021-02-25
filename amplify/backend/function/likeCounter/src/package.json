@@ -7,6 +7,7 @@
   "dependencies": {
     "aws-appsync": "^4.0.3",
     "aws-sdk": "^2.842.0",
+    "expo-server-sdk": "^3.6.0",
     "graphql": "^15.5.0",
     "graphql-tag": "^2.11.0",
     "isomorphic-fetch": "^3.0.0"

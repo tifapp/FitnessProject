@@ -23,6 +23,7 @@ export default function MessageScreen({ navigation, route }) {
   console.log("Here is the user!");
   console.log(userId);
 
+  /*
   useFocusEffect(
     React.useCallback(() => {
       console.log("Testing"), 
@@ -54,6 +55,7 @@ export default function MessageScreen({ navigation, route }) {
       });
     }, [])
   );
+  */
   
   //console.log(route.params);
   //console.log(route);
