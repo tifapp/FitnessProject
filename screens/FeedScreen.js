@@ -106,15 +106,17 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
         const newPost = event.value.data.onCreatePost
         if (newPost.userId != route.params?.id && newPost.channel == getChannel()) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
           if (newPost.isParent == 0) {
-            if (currentPosts.current.find(post => post.parentId === newPost.parentId)) {
-              let tempposts = currentPosts.current;
-              var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId === newPost.parentId)]);
-              tempposts.splice(index + 1, 0, newPost);
-              setPosts(tempposts);
+            if (currentPosts.current != null && currentPosts.current.length > 0) {
+              if (currentPosts.current.find(post => post.parentId === newPost.parentId)) {
+                let tempposts = currentPosts.current;
+                var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId === newPost.parentId)]);
+                tempposts.splice(index + 1, 0, newPost);
+                setPosts(tempposts);
+              }
             }
           }
           else {
-            if (currentPosts.current.length != null && currentPosts.current.length > 0)
+            if (currentPosts.current != null && currentPosts.current.length > 0)
               setPosts([newPost, ...currentPosts.current]); //what if we have a lot of new posts at once?
             else
               setPosts([newPost]); //what if we have a lot of new posts at once?
@@ -123,13 +125,16 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
       }
     });
     await API.graphql(graphqlOperation(onDeletePost)).subscribe({
-      next: newPost => {
-        //if (!didUserPost) {
-        //check if newpost is earlier than the earliest post in the array first.
-        //if so, we won't even need to rerender anything
-        //if not, loop through the posts array to find the one that matches newpost and replace it!
-        //showPostsAsync();
-        //}
+      next: event => {
+        const deletedPost = event.value.data.onDeletePost
+        if (deletedPost.userId != route.params?.id && deletedPost.channel == getChannel()) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
+          if (currentPosts.current.find(post => post.userId === deletedPost.userId && post.createdAt === deletedPost.createdAt)) {
+            let tempposts = currentPosts.current;
+            var index = tempposts.findIndex(post => post.userId === deletedPost.userId && post.createdAt === deletedPost.createdAt);
+            tempposts.splice(index, 1);
+            setPosts(tempposts);
+          }
+        }
       }
     });
     await API.graphql(graphqlOperation(onUpdatePost)).subscribe({ //nvm we dont have a subscription event for incrementlike

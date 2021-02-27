@@ -48,7 +48,9 @@ const FriendScreen = ({ route, navigation }) => {
             next: event => {
                 const newFriend = event.value.data.onCreateFriendship
                 if (newFriend.user1 == route.params?.id || newFriend.user2 == route.params?.id) {
+                  if (currentFriends.current.find(elem => (elem.user1 === route.params?.id && elem.user2 === newFriend.user2) || (elem.user2 === route.params?.id && elem.user1 === newFriend.user1) ) === undefined) {
                     setFriendList([newFriend, ...currentFriends.current]);
+                  }
                 }
             }
         });
