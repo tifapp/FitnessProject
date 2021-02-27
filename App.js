@@ -27,10 +27,12 @@ import ConfirmSignUp from "root/components/loginComponents/ConfirmSignUp.tsx";
 import ForgotPassword from "root/components/loginComponents/ForgotPassword.tsx";
 import VerifyContact from "root/components/loginComponents/VerifyContact.tsx";
 import Greetings from "root/components/loginComponents/Greetings.tsx";
+import CustomSidebarMenu from 'root/screens/CustomSidebarMenu';
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
+import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import * as Notifications from 'expo-notifications';
 import * as Permissions from 'expo-permissions';
@@ -137,6 +139,7 @@ const App = () => {
   //console.log("App rerendered, userexists is... ", userId == '');
 
   const Stack = createStackNavigator();
+  const Drawer = createDrawerNavigator();
 
   if (userId == 'checking...') {
     return (
@@ -178,6 +181,22 @@ const App = () => {
   } else {
     return (
       <NavigationContainer>
+        <Drawer.Navigator
+          drawerContentOptions={{
+            activeTintColor: "#e91e63",
+            itemStyle: { marginVertical: 5 },
+          }}
+          drawerContent={(props) => <CustomSidebarMenu myId={userId} {...props} />}
+        >
+          <Drawer.Screen
+            name="Profile"
+            component={ProfileTab}
+            initialParams={{ id: userId, fromLookup: false }}
+            options={{
+              headerShown: false,
+            }}
+          />
+        </Drawer.Navigator>
         <Tab.Navigator
           tabBarOptions={{
             activeTintColor: "orange",
@@ -195,23 +214,15 @@ const App = () => {
           <Tab.Screen
             name="Feed"
             component={FeedStack}
-            initialParams={{id: userId}}
+            initialParams={{ id: userId }}
             options={{
               headerShown: false,
             }}
           />
-          <Tab.Screen 
+          <Tab.Screen
             name="Search"
             component={SearchStack}
-            initialParams={{id: userId}}
-            options={{
-              headerShown: false,
-            }}
-          />
-          <Tab.Screen 
-            name="Profile"
-            component={ProfileTab}
-            initialParams={{id: userId, fromLookup: false}}
+            initialParams={{ id: userId }}
             options={{
               headerShown: false,
             }}

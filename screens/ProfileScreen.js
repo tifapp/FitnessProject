@@ -31,10 +31,6 @@ const ProfileScreen = ({ navigation, route }) => {
         navigation.navigate('My Groups')
     }
 
-    const goToFriendScreen = () => {
-        navigation.navigate('Friend Screen')
-    }
-
     async function signOut() {
         console.log("user is signing out.");
         if (areFieldsUpdated()) {
@@ -212,9 +208,6 @@ const ProfileScreen = ({ navigation, route }) => {
                 <View style = {{flexDirection: 'row', justifyContent: 'center'}}>
                     <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25, marginHorizontal: 5}]} onPress={goToMyGroups} >
                         <Text style={styles.buttonTextStyle}>My Groups</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25, marginHorizontal: 5}]} onPress={goToFriendScreen} >
-                        <Text style={styles.buttonTextStyle}>My Friends</Text>
                     </TouchableOpacity>
                 </View>
             

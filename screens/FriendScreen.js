@@ -37,11 +37,6 @@ const FriendScreen = ({ route, navigation }) => {
     useEffect(() => {
         waitForNewFriendsAsync();
     }, []);
-
-    useEffect(() => {
-        if (!friendsEnabled && (friendRequestList == null || friendRequestList.length === 0))
-            friendRequestListRef.current.fetchDataAsync(true);
-    }, [friendsEnabled])
     
     const waitForNewFriendsAsync = async () => {
         await API.graphql(graphqlOperation(onCreateFriendship)).subscribe({
@@ -120,7 +115,7 @@ const FriendScreen = ({ route, navigation }) => {
         });
     }
 
-    const getNonPendingFriends = async (items) => {
+    const getNonPendingRequests = async (items) => {
       if (items != null && items.length > 0) {
         let senders = [];
 
@@ -280,7 +275,7 @@ const FriendScreen = ({ route, navigation }) => {
               <Text style={{ alignSelf: "center" }}>Incoming Requests!</Text>
               <APIList
                 ref={friendRequestListRef}
-                processingFunction={getNonPendingFriends}
+                processingFunction={getNonPendingRequests}
                 queryOperation={friendRequestsByReceiver}
                 filter={{ receiver: route.params?.id }}
                 setDataFunction={setFriendRequestList}
