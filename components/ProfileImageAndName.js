@@ -10,7 +10,7 @@ var styles = require('../styles/stylesheet');
 //currently the predicted behavior is that it will cache images but the links will be invalid after 15 minutes-1 hour. let's see.
 
 export const ProfileImageAndName = (props) => { //user is required in props. it's a type of object described in userschema.graphql
-    const navigation = useNavigation();
+    const navigation = props.navigationObject ?? useNavigation();
 
     const goToProfile = () => {
         if (props.navigation == false) {

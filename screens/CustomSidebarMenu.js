@@ -7,6 +7,10 @@ import {
   Text,
   Linking,
 } from 'react-native';
+import { API, graphqlOperation } from "aws-amplify";
+import { listFriendRequests, friendRequestsByReceiver, listFriendships, getFriendship, friendsBySecondUser, batchGetFriendRequests } from "root/src/graphql/queries";
+import { onCreateFriendRequest, onCreateFriendship } from "root/src/graphql/subscriptions";
+import { createFriendRequest, deleteFriendRequest, deleteFriendship } from "root/src/graphql/mutations";
 
 import { ProfileImageAndName } from 'components/ProfileImageAndName'
 import {
@@ -17,7 +21,10 @@ import {
 import { listFriendRequests, friendRequestsByReceiver, listFriendships, getFriendship, friendsBySecondUser, batchGetFriendRequests } from "root/src/graphql/queries";
 import APIList from 'components/APIList';
 
-const CustomSidebarMenu = ({myId}) => {
+import { AntDesign } from '@expo/vector-icons';
+import { Entypo } from '@expo/vector-icons';
+
+const CustomSidebarMenu = ({navigation, myId}) => {
   const [friendList, setFriendList] = useState([]);
   const [friendRequestList, setFriendRequestList] = useState([]);
 
@@ -78,6 +85,7 @@ const CustomSidebarMenu = ({myId}) => {
     <SafeAreaView style={{ flex: 1 }}>
       {/*Top Large Image */}
       <ProfileImageAndName
+        navigationObject={navigation}
         you={true}
         navigation={false}
         vertical={true}
@@ -126,6 +134,7 @@ const CustomSidebarMenu = ({myId}) => {
             }}
           >
             <ProfileImageAndName
+              navigationObject={navigation}
               style={styles.smallImageStyle}
               userId={findFriendID(item)}
             />

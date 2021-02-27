@@ -11,13 +11,12 @@ import { withAuthenticator } from "aws-amplify-react-native";
 import awsconfig from "./src/aws-exports"; // if you are using Amplify CLI
 import { Amplify, API, graphqlOperation, Auth, Cache, Storage } from "aws-amplify";
 import { getUser } from "./src/graphql/queries";
-import FeedStack from "./FeedStack";
-import ProfileTab from "./ProfileTab";
-import ComplianceScreen from "./screens/ComplianceScreen";
-import ProfileScreen from "./screens/ProfileScreen";
-import BioScreen from "./screens/BioScreen";
-import GoalsScreen from "./screens/GoalsScreen";
-import SearchStack from "./SearchStack";
+import ProfileStack from "stacks/ProfileStack";
+import MainTabs from "./MainTabs";
+import ComplianceScreen from "screens/ComplianceScreen";
+import ProfileScreen from "screens/ProfileScreen";
+import BioScreen from "screens/BioScreen";
+import GoalsScreen from "screens/GoalsScreen";
 import { updateUser } from 'root/src/graphql/mutations.js'
 import SignIn from "root/components/loginComponents/SignIn.tsx";
 import SignUp from "root/components/loginComponents/SignUp.tsx";
@@ -30,7 +29,6 @@ import Greetings from "root/components/loginComponents/Greetings.tsx";
 import CustomSidebarMenu from 'root/screens/CustomSidebarMenu';
 
 import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
@@ -69,11 +67,13 @@ Cache.clear(); //will we have to do this for the next build?
 
 var styles = require("./styles/stylesheet");
 
+const Stack = createStackNavigator();
+const Drawer = createDrawerNavigator();
+
 const App = () => {
   //Text.defaultProps = Text.defaultProps || {}
   //Text.defaultProps.style =  { fontFamily: 'Helvetica', fontSize: 15, fontWeight: 'normal' }
 
-  const Tab = createBottomTabNavigator();
   const [userId, setUserId] = useState('checking...'); //stores the user's id if logged in
 
   const checkIfUserExists = async () => {
@@ -138,9 +138,6 @@ const App = () => {
 
   //console.log("App rerendered, userexists is... ", userId == '');
 
-  const Stack = createStackNavigator();
-  const Drawer = createDrawerNavigator();
-
   if (userId == 'checking...') {
     return (
       <ActivityIndicator 
@@ -186,48 +183,28 @@ const App = () => {
             activeTintColor: "#e91e63",
             itemStyle: { marginVertical: 5 },
           }}
-          drawerContent={(props) => <CustomSidebarMenu myId={userId} {...props} />}
+          drawerContent={(props) => (
+            <CustomSidebarMenu myId={userId} {...props} />
+          )}
+          initialRouteName="MainTabs"
         >
+          <Drawer.Screen //this gets loaded first
+            name="MainTabs"
+            component={MainTabs}
+            initialParams={{ id: userId, fromLookup: false }}
+            options={{
+              headerShown: false,
+            }}
+          />
           <Drawer.Screen
             name="Profile"
-            component={ProfileTab}
+            component={ProfileStack}
             initialParams={{ id: userId, fromLookup: false }}
             options={{
               headerShown: false,
             }}
           />
         </Drawer.Navigator>
-        <Tab.Navigator
-          tabBarOptions={{
-            activeTintColor: "orange",
-            labelStyle: {
-              fontSize: 20,
-              fontWeight: "bold",
-              margin: 0,
-              padding: 0,
-            },
-            tabStyle: {
-              height: 47,
-            },
-          }}
-        >
-          <Tab.Screen
-            name="Feed"
-            component={FeedStack}
-            initialParams={{ id: userId }}
-            options={{
-              headerShown: false,
-            }}
-          />
-          <Tab.Screen
-            name="Search"
-            component={SearchStack}
-            initialParams={{ id: userId }}
-            options={{
-              headerShown: false,
-            }}
-          />
-        </Tab.Navigator>
       </NavigationContainer>
     );
   }

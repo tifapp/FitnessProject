@@ -27,7 +27,6 @@ export default function ProfileTab({route}) {
       <Stack.Screen name='My Groups' component={MyGroupsScreen} initialParams={route.params}/>
       <Stack.Screen name='Create Group' component={CreatingGroups} initialParams={route.params}/>
       <Stack.Screen name='Group Posts Screen' component={GroupPostsScreen} initialParams={route.params}/>
-      <Stack.Screen name='Friend Screen' component={FriendScreen} initialParams={route.params}/>
       <Stack.Screen name='Lookup' component={LookupUserScreen} initialParams={route.params} />
       <Stack.Screen name='Messages' component={MessageScreen} initialParams={route.params} />
     </Stack.Navigator>
