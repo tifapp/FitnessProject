@@ -110,19 +110,9 @@ async function sendNotification(deviceToken, message) {
 exports.handler = (event, context, callback) => {
   //eslint-disable-line
   event.Records.forEach((record) => {
-    let check = 0;
     if (record.eventName == "INSERT" || record.eventName == "REMOVE") {
       console.log("record is ", record);
-      let postId = "placeholder";
-      let likerUserId = "";
-      if (record.eventName == "REMOVE")
-        postId = record.dynamodb.OldImage.postId.S;
-      else{
-        postId = record.dynamodb.NewImage.postId.S;
-        likerUserId = record.dynamodb.NewImage.userId.S;
-        check = 1;
-      } 
-      
+      const postId = record.eventName == "INSERT" ? record.dynamodb.NewImage.postId.S : record.dynamodb.OldImage.postId.S;
 
       (async () => {
         try {
@@ -130,7 +120,7 @@ exports.handler = (event, context, callback) => {
           //use the "ADD" function of the update resolver
 
           const ids = postId.split("#");
-          const timestamp = ids[0];
+          const createdAt = ids[0];
           const userId = ids[1];
           const channel = ids[2];
           const parentId = ids[3];
@@ -139,11 +129,11 @@ exports.handler = (event, context, callback) => {
           console.log("postid is ", postId);
 
           const inputVariables = {
-            createdAt: timestamp,
+            createdAt: createdAt,
             userId: userId,
-            channel: channel,
             parentId: parentId,
             isParent: isParent,
+            channel: channel,
           };
 
           if (record.eventName == "REMOVE") {
@@ -157,35 +147,31 @@ exports.handler = (event, context, callback) => {
             },
           });
 
-          const authorName = await client.query({
-            query: gql(getUser),
-            variables: {
-              id: userId
-            }
-          });
-
-          const likerUserName = await client.query({
-            query: gql(getUser),
-            variables: {
-              id: likerUserId
-            }
-          });
-
-          if(check){
+          if (record.eventName == "INSERT") {
+            const likerUserId = record.dynamodb.NewImage.userId.S;      
+  
+            const authorName = await client.query({
+              query: gql(getUser),
+              variables: {
+                id: userId
+              }
+            });
+  
+            const likerUserName = await client.query({
+              query: gql(getUser),
+              variables: {
+                id: likerUserId
+              }
+            });
+  
             await sendNotification(authorName.data.getUser.deviceToken, likerUserName.data.getUser.name + " liked your post!"); //truncate the sender's name!
           }
-
           callback(null, "Successfully incremented like counter");
-          return;
         } catch (e) {
           console.warn("Error sending mutation: ", e);
           callback(Error(e));
-          return;
         }
       })();
-    } else {
-      callback(null, "Like was not inserted or deleted");
-      return;
     }
   });
 };

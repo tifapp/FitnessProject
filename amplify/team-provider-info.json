@@ -34,7 +34,7 @@
         },
         "likeCounter": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/likeCounter-674b533377346755502b-build.zip"
+          "s3Key": "amplify-builds/likeCounter-2f6f46616c5633504e31-build.zip"
         }
       },
       "hosting": {
