@@ -135,41 +135,44 @@ export default function CustomSidebarMenu({ navigation, myId }) {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       {/*Top Large Image */}
-      <ProfileImageAndName
-        navigationObject={navigation}
-        you={true}
-        navigation={false}
-        userId={myId}
-        isFull={true}
-        fullname={true}
-        imageStyle={{
-          resizeMode: "center",
-          width: 50,
-          height: 50,
-          borderRadius: 0,
-          alignSelf: "center",
-          marginTop: 0,
-        }}
-        textStyle={{
-          marginLeft: 15,
-          fontWeight: "bold",
-          fontSize: 20,
-          color: "gray",
-        }}
-      />
+      <View
+        style={{
+          backgroundColor: "#aa0000",
+          paddingTop: 15
+        }}>
+        <ProfileImageAndName
+          navigationObject={navigation}
+          you={true}
+          navigation={false}
+          userId={myId}
+          isFull={true}
+          fullname={true}
+          imageStyle={{
+            resizeMode: "cover",
+            width: 50,
+            height: 50,
+            borderRadius: 0,
+            alignSelf: "center",
+            marginTop: 0,
+          }}
+          textStyle={{
+            marginLeft: 15,
+            fontWeight: "bold",
+            fontSize: 20,
+            color: "white",
+          }}
+        />
+      </View>
 
       <Accordion
         headerText={"Friend Requests"}
         headerTextStyle={{
           fontSize: 16,
-          textAlign: "center",
           color: "blue",
-          marginTop: 20,
         }}
       >
         <APIList
-          style={{
-          }}
+          style={{}}
           ref={friendRequestListRef}
           processingFunction={getNonPendingRequests}
           queryOperation={friendRequestsByReceiver}
@@ -191,9 +194,7 @@ export default function CustomSidebarMenu({ navigation, myId }) {
         headerText={"Friends"}
         headerTextStyle={{
           fontSize: 16,
-          textAlign: "center",
           color: "grey",
-          marginTop: 20,
         }}
       >
         <APIList

@@ -34,6 +34,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import * as Notifications from 'expo-notifications';
 import * as Permissions from 'expo-permissions';
+import { StatusBar } from "expo-status-bar";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -178,9 +179,9 @@ const App = () => {
   } else {
     return (
       <NavigationContainer>
+        <StatusBar style="light" />
         <Drawer.Navigator
-          drawerStyle={{
-          }}
+          drawerStyle={{}}
           drawerContentOptions={{
             activeTintColor: "#e91e63",
             itemStyle: { marginVertical: 5 },
@@ -196,17 +197,11 @@ const App = () => {
             name="MainTabs"
             component={MainTabs}
             initialParams={{ id: userId, fromLookup: false }}
-            options={{
-              headerShown: false,
-            }}
           />
           <Drawer.Screen
             name="Profile"
             component={ProfileStack}
             initialParams={{ id: userId, fromLookup: false }}
-            options={{
-              headerShown: false,
-            }}
           />
         </Drawer.Navigator>
       </NavigationContainer>

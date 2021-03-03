@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import React, { useState, useEffect, useRef, PureComponent } from "react";
 import {
   StyleSheet,
@@ -356,8 +355,6 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
         )}
         keyExtractor={item => item.createdAt.toString() + item.userId}
       />
-
-      <StatusBar style="auto" />
 
       <View style={{ marginBottom: 40, position: 'absolute', alignSelf: 'flex-end' }}>
         <TouchableOpacity onPress={scrollToTop}>

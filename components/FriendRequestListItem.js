@@ -16,13 +16,14 @@ export default function FriendListItem({ item, navigation, myId }) {
       style={{
         flex: 1,
         flexDirection: "column",
+        overflow: "hidden",
       }}
     >
       <ProfileImageAndName
         navigationObject={navigation}
         userId={item.sender}
         imageStyle={{
-          resizeMode: "center",
+          resizeMode: "cover",
           width: 50,
           height: 50,
           borderRadius: 0,
@@ -32,40 +33,57 @@ export default function FriendListItem({ item, navigation, myId }) {
         textStyle={{
           marginLeft: 15,
           fontWeight: "normal",
-          fontSize: 10,
-          color: "gray",
+          fontSize: 15,
+          color: "black",
         }}
-      />
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-evenly",
-        }}
-      >
-        <TouchableOpacity
-          style={{ flexDirection: "column", alignItems: "center" }}
-        >
-          <MaterialIcons
-            name="check-circle"
-            style={{ marginHorizontal: 7 }}
-            size={40}
-            color="green"
-          />
-          <Text>Accept</Text>
-        </TouchableOpacity>
+        subtitleComponent={
+          <View
+            style={{
+              flexDirection: "row",
+              //justifyContent: "space-between",
+              //flexShrink: 1
+            }}
+          >
+            <TouchableOpacity
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: 12,
+              }}
+            >
+              <MaterialIcons name="check" size={20} color="green" style={{marginRight: 4}} />
+              <Text
+                style={{
+                  color: "green",
+                  fontSize: 15,
+                  fontWeight: "bold",
+                }}
+              >
+                Accept
+              </Text>
+            </TouchableOpacity>
 
-        <TouchableOpacity
-          style={{ flexDirection: "column", alignItems: "center" }}
-        >
-          <MaterialIcons
-            name="cancel"
-            style={{ marginHorizontal: 7 }}
-            size={40}
-            color="red"
-          />
-          <Text>Reject</Text>
-        </TouchableOpacity>
-      </View>
+            <TouchableOpacity
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: 12,
+              }}
+            >
+              <MaterialIcons name="clear" size={20} color="red" style={{marginRight: 5}} />
+              <Text
+                style={{
+                  color: "red",
+                  fontSize: 15,
+                  fontWeight: "bold",
+                }}
+              >
+                Reject
+              </Text>
+            </TouchableOpacity>
+          </View>
+        }
+      />
     </View>
   );
 }

@@ -25,10 +25,26 @@ class APIList extends Component { //we need to make this a class to use refs fro
   }
 
   componentDidMount() {
-    if (!this.props.ignoreInitialLoad) {
-      this.setState({loadingInitial: true});
-      this.fetchDataAsync(true)
-      .finally(() => this.setState({loadingInitial: false}));
+    if (this.props.initialState != null) {
+      console.log("children state was saved");
+      console.log(this.props.initialState);
+      this.setState(this.props.initialState);
+    } else {
+      console.log("children state was not saved");
+      if (!this.props.ignoreInitialLoad) {
+        console.log("fetching again");
+        this.setState({loadingInitial: true});
+        this.fetchDataAsync(true)
+        .finally(() => this.setState({loadingInitial: false}));
+      }
+    }
+  }
+  
+  componentWillUnmount() {
+    console.log("list is unmounting");
+    if (this.props.saveState != null) {
+      console.log("saving list state");
+      this.props.saveState(this.state);
     }
   }
 
@@ -44,7 +60,6 @@ class APIList extends Component { //we need to make this a class to use refs fro
   loadMore = () => {
     //console.log("can we load more???");
     if (!this.state.loadingMore && this.state.nextToken != null) { //if we don't check this, the list will repeat endlessly
-      //console.log("yes we can");
       this.setState({ loadingMore: true });
       this.fetchDataAsync(false)
         .finally(() => { this.setState({ loadingMore: false }) });
@@ -110,7 +125,12 @@ class APIList extends Component { //we need to make this a class to use refs fro
 
   render() {
     return (
-      <View style={this.props.style}>
+      <View style={this.props.style ?? {
+        alignSelf: "stretch",
+        flex: 1,
+        flexGrow: 1,
+        justifyContent: "center",
+      }}>
         {
           this.state.loadingInitial || (this.state.loading && !this.state.loadingMore && !this.state.refreshing)
             ? <ActivityIndicator

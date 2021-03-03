@@ -23,8 +23,12 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
                 navigation.navigate('Image', { uri: userInfo.imageURL })
         }
         else {
-            navigation.push('Lookup',
-                { userId: props.userId })
+            if (!navigation.push)
+                navigation.navigate('Lookup',
+                    { userId: props.userId })
+            else
+                navigation.navigate('Lookup',
+                    { userId: props.userId })
         }
     }
 
@@ -108,27 +112,42 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
     });
 
     if (userInfo == null) {
-        return (
-            <ActivityIndicator
-                color="#0000ff"
-                style={[props.style]}
-            />
-        )
+      return <ActivityIndicator color="#0000ff" style={[props.style]} />;
     } else {
-        return (
-            <TouchableOpacity
-                onPress={goToProfile}
-                style={{ flexDirection: props.vertical ? 'column' : 'row', alignItems: 'center', alignContent: 'flex-start', justifyContent: 'flex-start', padding: 15}}>
-                <Image
-                    style={props.imageStyle}
-                    source={userInfo.imageURL === '' ? require('../assets/icon.png') : { uri: userInfo.imageURL }}
-                />
-                { props.isFull || userInfo.name.length <= 40 ?
-                    <Text style={[props.textStyle, {flex: 1, flexWrap: 'wrap', }]}>{userInfo.name}</Text>
-                    :
-                    <Text style={props.textStyle, {flex: 1, flexWrap: 'wrap', }}>{userInfo.name.substring(0,40)} ...</Text>
-                }
-            </TouchableOpacity>
-        )
+      return (
+        <TouchableOpacity
+          onPress={goToProfile}
+          style={{
+            flexDirection: props.vertical ? "column" : "row",
+            alignItems: "center",
+            alignContent: "flex-start",
+            justifyContent: "flex-start",
+            padding: 15,
+          }}
+        >
+          <Image
+            style={props.imageStyle}
+            source={
+              userInfo.imageURL === ""
+                ? require("../assets/icon.png")
+                : { uri: userInfo.imageURL }
+            }
+          />
+          <View>
+            {props.isFull || userInfo.name.length <= 40 ? (
+              <Text style={[props.textStyle, { flex: 1, flexWrap: "wrap" }]}>
+                {userInfo.name}
+              </Text>
+            ) : (
+              <Text style={(props.textStyle, { flex: 1, flexWrap: "wrap" })}>
+                {userInfo.name.substring(0, 40)} ...
+              </Text>
+            )}
+            {
+                props.subtitleComponent
+            }
+          </View>
+        </TouchableOpacity>
+      );
     }
 }
