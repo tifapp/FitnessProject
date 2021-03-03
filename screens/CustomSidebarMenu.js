@@ -6,25 +6,39 @@ import {
   Image,
   Text,
   Linking,
-} from 'react-native';
+  TouchableOpacity
+} from "react-native";
 import { API, graphqlOperation } from "aws-amplify";
-import { listFriendRequests, friendRequestsByReceiver, listFriendships, getFriendship, friendsBySecondUser, batchGetFriendRequests } from "root/src/graphql/queries";
-import { onCreateFriendRequest, onCreateFriendship } from "root/src/graphql/subscriptions";
-import { createFriendRequest, deleteFriendRequest, deleteFriendship } from "root/src/graphql/mutations";
+import {
+  listFriendRequests,
+  friendRequestsByReceiver,
+  listFriendships,
+  getFriendship,
+  friendsBySecondUser,
+  batchGetFriendRequests,
+} from "root/src/graphql/queries";
+import {
+  onCreateFriendRequest,
+  onCreateFriendship,
+} from "root/src/graphql/subscriptions";
+import {
+  createFriendRequest,
+  deleteFriendRequest,
+  deleteFriendship,
+} from "root/src/graphql/mutations";
 
-import { ProfileImageAndName } from 'components/ProfileImageAndName'
+import { ProfileImageAndName } from "components/ProfileImageAndName";
 import {
   DrawerContentScrollView,
   DrawerItemList,
   DrawerItem,
-} from '@react-navigation/drawer';
-import { listFriendRequests, friendRequestsByReceiver, listFriendships, getFriendship, friendsBySecondUser, batchGetFriendRequests } from "root/src/graphql/queries";
-import APIList from 'components/APIList';
+} from "@react-navigation/drawer";
+import APIList from "components/APIList";
+import Accordion from "components/Accordion";
+import FriendListItem from "components/FriendListItem";
+import FriendRequestListItem from "components/FriendRequestListItem";
 
-import { AntDesign } from '@expo/vector-icons';
-import { Entypo } from '@expo/vector-icons';
-
-const CustomSidebarMenu = ({navigation, myId}) => {
+export default function CustomSidebarMenu({ navigation, myId }) {
   const [friendList, setFriendList] = useState([]);
   const [friendRequestList, setFriendRequestList] = useState([]);
 
@@ -35,10 +49,6 @@ const CustomSidebarMenu = ({navigation, myId}) => {
   currentFriends.current = friendList;
   currentFriendRequests.current = friendRequestList;
 
-  const goToMessages = (item) => {
-    navigation.navigate("Messages", { userId: item });
-  };
-
   useEffect(() => {
     waitForNewFriendsAsync();
   }, []);
@@ -47,10 +57,7 @@ const CustomSidebarMenu = ({navigation, myId}) => {
     await API.graphql(graphqlOperation(onCreateFriendship)).subscribe({
       next: (event) => {
         const newFriend = event.value.data.onCreateFriendship;
-        if (
-          newFriend.user1 == myId ||
-          newFriend.user2 == myId
-        ) {
+        if (newFriend.user1 == myId || newFriend.user2 == myId) {
           setFriendList([newFriend, ...currentFriends.current]);
         }
       },
@@ -67,9 +74,53 @@ const CustomSidebarMenu = ({navigation, myId}) => {
         */
   };
 
-  const findFriendID = (item) => {
-    if (myId == item.user1) return item.user2;
-    if (myId == item.user2) return item.user1;
+  const getNonPendingRequests = async (items) => {
+    if (items != null && items.length > 0) {
+      let senders = [];
+
+      items.forEach((item) => {
+        senders.push({
+          receiver: item.sender,
+        });
+      });
+
+      try {
+        const frs = await API.graphql(
+          graphqlOperation(batchGetFriendRequests, {
+            friendrequests: senders,
+          })
+        );
+
+        let validRequests = [];
+        for (i = 0; i < items.length; ++i) {
+          if (frs.data.batchGetFriendRequests[i] == null) {
+            validRequests.push(items[i]);
+          }
+        }
+        return validRequests;
+      } catch (err) {
+        console.log("error in getting valid friend requests: ", err);
+      }
+    }
+  };
+
+  const removeFriend = async (item) => {
+    // delete friend object
+    try {
+      await API.graphql(
+        graphqlOperation(deleteFriendship, {
+          input: { user1: item.user1, user2: item.user2 },
+        })
+      );
+    } catch (err) {
+      console.log("error: ", err);
+    }
+    // update friendList
+    setFriendList((friendList) => {
+      return friendList.filter(
+        (i) => i.user1 != item.user1 || i.user2 != item.user2
+      );
+    });
   };
 
   const removeFriendHandler = (item) => {
@@ -88,109 +139,94 @@ const CustomSidebarMenu = ({navigation, myId}) => {
         navigationObject={navigation}
         you={true}
         navigation={false}
-        vertical={true}
-        style={styles.imageStyle}
         userId={myId}
         isFull={true}
         fullname={true}
+        imageStyle={{
+          resizeMode: "center",
+          width: 50,
+          height: 50,
+          borderRadius: 0,
+          alignSelf: "center",
+          marginTop: 0,
+        }}
+        textStyle={{
+          marginLeft: 15,
+          fontWeight: "bold",
+          fontSize: 20,
+          color: "gray",
+        }}
       />
-      <Text
-        style={{
+
+      <Accordion
+        headerText={"Friend Requests"}
+        headerTextStyle={{
+          fontSize: 16,
+          textAlign: "center",
+          color: "blue",
+          marginTop: 20,
+        }}
+      >
+        <APIList
+          style={{
+          }}
+          ref={friendRequestListRef}
+          processingFunction={getNonPendingRequests}
+          queryOperation={friendRequestsByReceiver}
+          filter={{ receiver: myId }}
+          setDataFunction={setFriendRequestList}
+          data={friendRequestList}
+          renderItem={({ item }) => (
+            <FriendRequestListItem
+              navigation={navigation}
+              item={item}
+              removeFriendHandler={removeFriendHandler}
+              myId={myId}
+            />
+          )}
+          keyExtractor={(item) => item.sender}
+        />
+      </Accordion>
+      <Accordion
+        headerText={"Friends"}
+        headerTextStyle={{
           fontSize: 16,
           textAlign: "center",
           color: "grey",
+          marginTop: 20,
         }}
       >
-        Friends
-      </Text>
-      <APIList
-        queryOperation={listFriendships}
-        filter={{
-          filter: {
-            or: [
-              {
-                user1: {
-                  eq: myId,
+        <APIList
+          queryOperation={listFriendships}
+          filter={{
+            filter: {
+              or: [
+                {
+                  user1: {
+                    eq: myId,
+                  },
                 },
-              },
-              {
-                user2: {
-                  eq: myId,
+                {
+                  user2: {
+                    eq: myId,
+                  },
                 },
-              },
-            ],
-          },
-        }}
-        setDataFunction={setFriendList}
-        data={friendList}
-        renderItem={({ item }) => (
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginVertical: 5,
-              justifyContent: "space-between",
-              width: "80%",
-            }}
-          >
-            <ProfileImageAndName
-              navigationObject={navigation}
-              style={styles.smallImageStyle}
-              userId={findFriendID(item)}
+              ],
+            },
+          }}
+          setDataFunction={setFriendList}
+          data={friendList}
+          renderItem={({ item }) => (
+            <FriendListItem
+              navigation={navigation}
+              item={item}
+              removeFriendHandler={removeFriendHandler}
+              myId={myId}
             />
-            <TouchableOpacity
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginHorizontal: 15,
-              }}
-              onPress={() => removeFriendHandler(item)}
-            >
-              <Text>Remove</Text>
-              <Entypo
-                name="cross"
-                style={{ marginHorizontal: 7 }}
-                size={44}
-                color="red"
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.unselectedButtonStyle, { borderColor: "blue" }]}
-              color="orange"
-              onPress={() => goToProfile(findFriendID(item))}
-            >
-              <Text
-                style={[styles.unselectedButtonTextStyle, { color: "blue" }]}
-              >
-                Message
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
-        keyExtractor={(item) => item.createdAt.toString()}
-      />
+          )}
+          keyExtractor={(item) => item.createdAt.toString()}
+        />
+      </Accordion>
     </SafeAreaView>
   );
-};
-
-const styles = StyleSheet.create({
-  sideMenuProfileIcon: {
-    resizeMode: "center",
-    width: 100,
-    height: 100,
-    borderRadius: 100 / 2,
-    alignSelf: "center",
-  },
-  iconStyle: {
-    width: 15,
-    height: 15,
-    marginHorizontal: 5,
-  },
-  customItem: {
-    padding: 16,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-});
-
-export default CustomSidebarMenu;
+}

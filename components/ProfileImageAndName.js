@@ -118,18 +118,15 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
         return (
             <TouchableOpacity
                 onPress={goToProfile}
-                style={{ flexDirection: props.vertical ? 'column' : 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+                style={{ flexDirection: props.vertical ? 'column' : 'row', alignItems: 'center', alignContent: 'flex-start', justifyContent: 'flex-start', padding: 15}}>
                 <Image
-                    style={[props.style, {marginBottom: props.vertical ? 15 : 0, marginRight: props.vertical ? 0 : 15}]}
+                    style={props.imageStyle}
                     source={userInfo.imageURL === '' ? require('../assets/icon.png') : { uri: userInfo.imageURL }}
                 />
-                { props.isFull ?
-                    <Text>{userInfo.name}</Text>
+                { props.isFull || userInfo.name.length <= 40 ?
+                    <Text style={[props.textStyle, {flex: 1, flexWrap: 'wrap', }]}>{userInfo.name}</Text>
                     :
-                    userInfo.name.length > 10 ?
-                    <Text>{userInfo.name.substring(0,10)} ...</Text>
-                    : <Text>{userInfo.name}</Text>
-                    
+                    <Text style={props.textStyle, {flex: 1, flexWrap: 'wrap', }}>{userInfo.name.substring(0,40)} ...</Text>
                 }
             </TouchableOpacity>
         )

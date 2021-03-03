@@ -110,13 +110,7 @@ class APIList extends Component { //we need to make this a class to use refs fro
 
   render() {
     return (
-      <View style={{
-        alignSelf: 'stretch',
-        flex: 1,
-        flexGrow: 1,
-        justifyContent: 'space-around',
-        justifyContent: "center",
-      }}>
+      <View style={this.props.style}>
         {
           this.state.loadingInitial || (this.state.loading && !this.state.loadingMore && !this.state.refreshing)
             ? <ActivityIndicator

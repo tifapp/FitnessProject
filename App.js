@@ -179,6 +179,8 @@ const App = () => {
     return (
       <NavigationContainer>
         <Drawer.Navigator
+          drawerStyle={{
+          }}
           drawerContentOptions={{
             activeTintColor: "#e91e63",
             itemStyle: { marginVertical: 5 },
@@ -186,6 +188,8 @@ const App = () => {
           drawerContent={(props) => (
             <CustomSidebarMenu myId={userId} {...props} />
           )}
+          backBehavior="initialRoute"
+          edgeWidth={100}
           initialRouteName="MainTabs"
         >
           <Drawer.Screen //this gets loaded first
