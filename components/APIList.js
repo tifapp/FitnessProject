@@ -7,6 +7,7 @@ import {
   SectionList,
   ActivityIndicator,
   Text,
+  LayoutAnimation,
 } from "react-native";
 import { API, graphqlOperation } from "aws-amplify";
 
@@ -110,6 +111,11 @@ class APIList extends Component { //we need to make this a class to use refs fro
         if (voidResultsFunction()) {this.setState({ loading: false }); return;}
       }
 
+      if (this.state.loadingInitial && this.props.initialLoadFunction != null) {
+        this.props.initialLoadFunction(results);
+      }
+
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       if (!wasBeginning)
         this.props.setDataFunction([...this.props.data, ...results]);
       else

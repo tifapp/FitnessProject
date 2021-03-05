@@ -7,7 +7,7 @@ type FriendRequest @model(timestamps: { createdAt: "createdAt", updatedAt: "upda
   ]
 )
 @key(fields: ["sender", "receiver"])
-@key(name: "ByReceiver", fields: ["receiver", "sender"], queryField: "friendRequestsByReceiver")
+@key(name: "ByReceiver", fields: ["receiver", "createdAt", "sender"], queryField: "friendRequestsByReceiver")
 {
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!

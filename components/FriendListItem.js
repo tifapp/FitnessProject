@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Alert } from "react-native";
 import { ProfileImageAndName } from "./ProfileImageAndName";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -7,12 +7,17 @@ import getLocation from "hooks/useLocation";
 
 var styles = require("../styles/stylesheet");
 
-export default function FriendListItem({ item, navigation, removeFriendHandler, myId }) {
+export default function FriendListItem({
+  item,
+  navigation,
+  removeFriendHandler,
+  myId,
+}) {
   const findFriendID = (item) => {
     if (myId == item.user1) return item.user2;
     if (myId == item.user2) return item.user1;
   };
-  
+
   const goToMessages = (item) => {
     navigation.navigate("Messages", { userId: item });
   };
@@ -22,10 +27,13 @@ export default function FriendListItem({ item, navigation, removeFriendHandler, 
   const alertOptions = {
     cancelable: true,
     onDismiss: () => setIsSelected(false),
-  }
+  };
 
   return (
-    <View style={isSelected && { backgroundColor: "orange" }}>
+    <View style={[isSelected && { backgroundColor: "orange" }]}>
+      <View
+        style={{ height: 1, backgroundColor: "#efefef", marginHorizontal: 12 }}
+      ></View>
       <ProfileImageAndName
         navigationObject={navigation}
         imageStyle={{
@@ -68,7 +76,12 @@ export default function FriendListItem({ item, navigation, removeFriendHandler, 
                       const title =
                         "Are you sure you want to remove this friend?";
                       const options = [
-                        { text: "Yes", onPress: () => {removeFriendHandler(item), setIsSelected(false)} },
+                        {
+                          text: "Yes",
+                          onPress: () => {
+                            removeFriendHandler(item), setIsSelected(false);
+                          },
+                        },
                         {
                           text: "Cancel",
                           type: "cancel",
@@ -124,6 +137,9 @@ export default function FriendListItem({ item, navigation, removeFriendHandler, 
           </View>
         }
       />
+      <View
+        style={{ height: 1, backgroundColor: "#efefef", marginHorizontal: 12 }}
+      ></View>
     </View>
   );
 }

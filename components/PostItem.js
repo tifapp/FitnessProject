@@ -30,6 +30,7 @@ function LikeButton({
   const likePostAsync = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     try {
+      setLiked(!liked);
       if (liked) {
         await API.graphql(graphqlOperation(deleteLike, { input: { userId: "0", postId: postId, } }));
         console.log("success in unliking post");
@@ -37,7 +38,6 @@ function LikeButton({
         await API.graphql(graphqlOperation(createLike, { input: { postId: postId, } }));
         console.log("success in liking post, id is ", postId);
       }
-      setLiked(!liked);
     } catch (err) {
       console.log(err);
       alert('Could not be submitted!');
@@ -86,6 +86,7 @@ export default function PostItem({
             style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <ProfileImageAndName
               imageStyle={[styles.smallImageStyle, {marginRight: 15}]}
+              textLayoutStyle={{flex: 1}}
               userId={item.userId}
             />
             <View style={{ marginRight: 15 }}>

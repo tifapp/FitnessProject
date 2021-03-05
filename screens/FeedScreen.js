@@ -11,7 +11,8 @@ import {
   Keyboard,
   ActivityIndicator,
   ScrollView,
-  SafeAreaView
+  SafeAreaView,
+  LayoutAnimation,
 } from "react-native";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation } from "aws-amplify";
@@ -53,11 +54,13 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
               if (currentPosts.current.length > 0 && currentPosts.current.find(post => post.parentId === newPost.parentId)) {
                 let tempposts = currentPosts.current;
                 var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId === newPost.parentId)]);
-                tempposts.splice(index + 1, 0, newPost);
+                tempposts.splice(index + 1, 0, newPost);                
+                LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
                 setPosts(tempposts);
               }
           }
           else {
+            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
             setPosts([newPost, ...currentPosts.current]); //what if we have a lot of new posts at once?
           }
         }
@@ -71,6 +74,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
             let tempposts = currentPosts.current;
             var index = tempposts.findIndex(post => post.userId === deletedPost.userId && post.createdAt === deletedPost.createdAt);
             tempposts.splice(index, 1);
+            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
             setPosts(tempposts);
           }
         }
@@ -147,6 +151,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
     //replace the post locally
     let tempposts = posts;
     tempposts[tempposts.findIndex(p => p.createdAt == createdAt && p.userId == route.params?.id)].description = editedText;
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setPosts(tempposts);
 
     const post = tempposts.find(p => {return p.createdAt == createdAt && p.userId == route.params?.id});
@@ -174,6 +179,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
 
     console.log(route.params?.id + " just posted.");
 
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setPosts([{ ...newPost, userId: route.params?.id, createdAt: (new Date(Date.now())).toISOString() }, ...posts]);
     
     try {
@@ -200,6 +206,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
     let tempposts = currentPosts.current;
     var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId == newPost.parentId)]);
     tempposts.splice(index + 1, 0, {...newPost, userId: route.params?.id, createdAt: (new Date(Date.now())).toISOString() });
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setPosts(tempposts);
 
     try {
@@ -219,6 +226,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
 
     console.log("parent post: " + parent_post.description);
 
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     if (parent_post.isParent == 1) {
       setPosts((posts) => {
         return posts.filter((val) => (val.parentId != parent_post.parentId));

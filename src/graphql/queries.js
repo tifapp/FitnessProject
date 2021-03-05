@@ -132,7 +132,7 @@ export const listFriendRequests = /* GraphQL */ `
 export const friendRequestsByReceiver = /* GraphQL */ `
   query FriendRequestsByReceiver(
     $receiver: ID
-    $sender: ModelIDKeyConditionInput
+    $createdAtSender: ModelFriendRequestByReceiverCompositeKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelFriendRequestFilterInput
     $limit: Int
@@ -140,7 +140,7 @@ export const friendRequestsByReceiver = /* GraphQL */ `
   ) {
     friendRequestsByReceiver(
       receiver: $receiver
-      sender: $sender
+      createdAtSender: $createdAtSender
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit

@@ -20,8 +20,10 @@ import * as Haptics from "expo-haptics";
 var styles = require("../styles/stylesheet");
 
 export default function Accordion(props) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(props.open);
   const animatedController = useRef(new Animated.Value(0)).current;
+
+  useEffect(()=>{if (open !== props.open) toggleCollapse()}, [props.open])
 
   const arrowAngle = animatedController.interpolate({
     inputRange: [0, 1],
@@ -54,11 +56,13 @@ export default function Accordion(props) {
     <View style={props.style}>
       <TouchableWithoutFeedback style={{flex: 1}} onPress={toggleCollapse}>
         <View
-          style={{
+          style={[{
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "center",
-          }}
+            paddingVertical: 15,
+            backgroundColor: "white",
+          }]}
         >
           <Text
             style={[props.headerTextStyle, open ? { color: "black" } : null]}

@@ -7,6 +7,7 @@ import ImageScreen from "screens/ImageScreen";
 import DrawerButton from "components/headerComponents/DrawerButton";
 
 import React from "react";
+import { Platform } from "react-native";
 
 const Stack = createStackNavigator();
 
@@ -20,7 +21,7 @@ export default function FeedStack({ navigation, route }) {
         ),
         headerStyle: { backgroundColor: "orange" },
         headerTintColor: "#000",
-        headerTitleStyle: { fontWeight: "normal", fontSize: 20, },
+        headerTitleStyle: { fontWeight: Platform.OS === 'android' ? "normal" : "bold", fontSize: 20, },
         headerTitleAlign: "center"
       }}
     >

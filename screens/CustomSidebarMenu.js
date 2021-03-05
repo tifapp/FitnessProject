@@ -21,6 +21,7 @@ import {
 import {
   onMyNewFriendRequests,
   onCreateFriendship,
+  onDeleteFriendship,
 } from "root/src/graphql/subscriptions";
 import {
   createFriendRequest,
@@ -49,6 +50,7 @@ export default function CustomSidebarMenu({ navigation, myId }) {
   const currentFriends = useRef();
   const currentFriendRequests = useRef();
   const currentNewFriendRequestCount = useRef();
+  const currentFriendRequestListRef = useRef();
 
   currentFriends.current = friendList;
   currentFriendRequests.current = friendRequestList;
@@ -66,7 +68,21 @@ export default function CustomSidebarMenu({ navigation, myId }) {
       next: (event) => {
         const newFriend = event.value.data.onCreateFriendship;
         if ((newFriend.user1 == myId || newFriend.user2 == myId) && (currentFriends.current.length == 0 || !currentFriends.current.find(item => item.user1 === newFriend.user1 && item.user2 === newFriend.user2))) {
+          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
           setFriendList([newFriend, ...currentFriends.current]);
+        }
+      },
+    });
+    const removedFriendSubscription = API.graphql(
+      graphqlOperation(onDeleteFriendship)
+    ).subscribe({
+      next: (event) => {
+        const deletedFriend = event.value.data.onDeleteFriendship;
+        if (currentFriends.current.length > 0 && currentFriends.current.find(item => item.user1 === deletedFriend.user1 && item.user2 === deletedFriend.user2)) {
+          var index = currentFriends.current.findIndex(item => item.user1 === deletedFriend.user1 && item.user2 === deletedFriend.user2);
+          currentFriends.current.splice(index, 1);
+          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+          setFriendList(currentFriends.current);
         }
       },
     });
@@ -77,6 +93,7 @@ export default function CustomSidebarMenu({ navigation, myId }) {
         const newFriendRequest = event.value.data.onMyNewFriendRequests;
         if (newFriendRequest.receiver == myId && (currentFriendRequests.current.length == 0 || !currentFriendRequests.current.find(item => item.sender === newFriendRequest.sender))) {
           setNewFriendRequests(currentNewFriendRequestCount.current+1);
+          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
           setFriendRequestList([
             newFriendRequest,
             ...currentFriendRequests.current,
@@ -85,18 +102,11 @@ export default function CustomSidebarMenu({ navigation, myId }) {
       },
     });
     return () => {
+      removedFriendSubscription.unsubscribe();
       friendSubscription.unsubscribe();
       friendRequestSubscription.unsubscribe();
     };
   }, []);
-
-  useEffect(()=>{
-    //load the friend request list again
-  },[lastOnlineTime])
-
-  useEffect(()=>{
-    if (friendRequestList.length == 0) playSound("celebrate");
-  },[friendRequestList])
 
   const getNonPendingRequests = async (items) => {
     let senders = [];
@@ -121,8 +131,6 @@ export default function CustomSidebarMenu({ navigation, myId }) {
         }
       }
 
-      checkNewRequests(validRequests); //only when the component mounts
-
       return validRequests;
     } catch (err) {
       console.log("error in getting valid friend requests: ", err);
@@ -132,7 +140,7 @@ export default function CustomSidebarMenu({ navigation, myId }) {
   const checkNewRequests = (items) => {
     items.forEach((item) => {
       if (lastOnlineTime > 0 && new Date(item.createdAt).getTime() > lastOnlineTime) {
-        setNewFriendRequests(newFriendRequests+1);
+        setNewFriendRequests(newFriendRequests+1); //do we ever want to increase the number when loading more requests?
       }
     });
   };
@@ -173,6 +181,7 @@ export default function CustomSidebarMenu({ navigation, myId }) {
   };
   
   const removeFriendRequestListItem = async (item, isNew) => {
+    if (friendRequestList.length == 1) playSound("celebrate");
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     if (isNew) setNewFriendRequests(newFriendRequests - 1);
     setFriendRequestList(friendRequestList.filter((i) => item.sender != i.sender || item.receiver != i.receiver
@@ -205,8 +214,8 @@ export default function CustomSidebarMenu({ navigation, myId }) {
       {/*Top Large Image */}
       <View
         style={{
-          backgroundColor: "orange",
-          paddingTop: 15
+          backgroundColor: "white",
+          paddingTop: 15,
         }}>
         <ProfileImageAndName
           navigationObject={navigation}
@@ -215,6 +224,7 @@ export default function CustomSidebarMenu({ navigation, myId }) {
           userId={myId}
           isFull={true}
           fullname={true}
+          textLayoutStyle={{flex: 1}}
           imageStyle={{
             resizeMode: "cover",
             width: 50,
@@ -225,7 +235,7 @@ export default function CustomSidebarMenu({ navigation, myId }) {
           }}
           textStyle={{
             marginLeft: 15,
-            fontWeight: "normal",
+            fontWeight: "bold",
             fontSize: 20,
             color: "black",
           }}
@@ -233,7 +243,7 @@ export default function CustomSidebarMenu({ navigation, myId }) {
       </View>
 
       <Accordion
-        style={{marginTop: 15, paddingVertical: 15}}
+        style={{marginTop: 0}}
         headerText={"Friend Requests" + (newFriendRequests > 0 ? " (" + (newFriendRequests <= 20 ? newFriendRequests : "20+") + ")" : "")} //would be nice if we had a total friend request count. but then you'd be able to see when people revoke their friend requests.
         headerTextStyle={{
           fontSize: 18,
@@ -246,7 +256,9 @@ export default function CustomSidebarMenu({ navigation, myId }) {
       >
         <APIList
           style={{}}
+          ref={currentFriendRequestListRef}
           processingFunction={getNonPendingRequests}
+          initialLoadFunction={checkNewRequests}
           queryOperation={friendRequestsByReceiver}
           filter={{ receiver: myId }}
           setDataFunction={setFriendRequestList}
@@ -266,11 +278,13 @@ export default function CustomSidebarMenu({ navigation, myId }) {
         />
       </Accordion>
       <Accordion
-        style={{paddingVertical: 15}}
+        style={{}}
+        open={friendList.length > 0}
         headerText={"Friends"}
         headerTextStyle={{
           fontSize: 18,
           color: "grey",
+          textDecorationLine: friendList.length > 0 ? 'none' : 'line-through',
         }}
       >
         <APIList
