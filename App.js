@@ -96,6 +96,7 @@ const App = () => {
       );
       if (user.data.getUser != null) {
         setUserId(query.attributes.sub);
+        global.id = query.attributes.sub;
       } else {
         setUserId('');
       }

@@ -38,6 +38,7 @@ import APIList from "components/APIList";
 import Accordion from "components/Accordion";
 import FriendListItem from "components/FriendListItem";
 import FriendRequestListItem from "components/FriendRequestListItem";
+import playSound from "../hooks/playSound";
 
 export default function CustomSidebarMenu({ navigation, myId }) {
   const [lastOnlineTime, setLastOnlineTime] = useState(0);
@@ -57,7 +58,7 @@ export default function CustomSidebarMenu({ navigation, myId }) {
     Cache.getItem("lastOnline", {callback: ()=>{setLastOnlineTime(-1)}}) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
         .then((time) => {
           setLastOnlineTime(time);
-        }); //redundant???
+        })
         
     const friendSubscription = API.graphql(
       graphqlOperation(onCreateFriendship)
@@ -89,6 +90,14 @@ export default function CustomSidebarMenu({ navigation, myId }) {
     };
   }, []);
 
+  useEffect(()=>{
+    //load the friend request list again
+  },[lastOnlineTime])
+
+  useEffect(()=>{
+    if (friendRequestList.length == 0) playSound("celebrate");
+  },[friendRequestList])
+
   const getNonPendingRequests = async (items) => {
     let senders = [];
 
@@ -112,7 +121,7 @@ export default function CustomSidebarMenu({ navigation, myId }) {
         }
       }
 
-      checkNewRequests(validRequests);
+      checkNewRequests(validRequests); //only when the component mounts
 
       return validRequests;
     } catch (err) {

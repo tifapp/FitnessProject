@@ -11,6 +11,7 @@ import { ProfileImageAndName } from "./ProfileImageAndName";
 import { MaterialIcons } from "@expo/vector-icons";
 import computeDistance from "hooks/computeDistance";
 import getLocation from "hooks/useLocation";
+import playSound from "hooks/playSound";
 
 var styles = require("../styles/stylesheet");
 
@@ -131,7 +132,7 @@ export default function FriendRequestListItem({
 
               <TouchableOpacity
                 style={styles.subtitleButton}
-                onPress={() => removeFriendRequestListItemHandler(item, isNew)}
+                onPress={() => {removeFriendRequestListItemHandler(item, isNew), playSound("complete")}}
               >
                 <MaterialIcons
                   name="check"
@@ -191,7 +192,7 @@ export default function FriendRequestListItem({
 
               <TouchableOpacity
                 style={styles.subtitleButton}
-                onPress={() => respondRequestHandler(item, false)}
+                onPress={() => {respondRequestHandler(item, false), playSound("confirm-down")}}
               >
                 <MaterialIcons
                   name="clear"
@@ -212,7 +213,7 @@ export default function FriendRequestListItem({
 
               <TouchableOpacity
                 style={styles.subtitleButton}
-                onPress={() => respondRequestHandler(item, true)}
+                onPress={() => {respondRequestHandler(item, true), playSound("confirm-up")}}
               >
                 <MaterialIcons
                   name="check"
