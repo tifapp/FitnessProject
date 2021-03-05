@@ -244,7 +244,7 @@ const LookupUser = ({ route, navigation }) => {
                 you={userId === route.params?.id}
                 navigation={false}
                 vertical={true}
-                style={styles.imageStyle}
+                imageStyle={styles.imageStyle}
                 userId={userId}
                 isFull={true}
                 fullname={true}
@@ -319,7 +319,7 @@ const LookupUser = ({ route, navigation }) => {
                     <View style={{ flexDirection: 'row', alignSelf: 'center', marginVertical: 5, justifyContent: 'space-between', width: '80%' }}>
                       <ProfileImageAndName
                         vertical={true}
-                        style={[styles.smallImageStyle, {marginHorizontal: 20}]}
+                        imageStyle={[styles.smallImageStyle, {marginHorizontal: 20}]}
                         userId={item}
                       />
                     </View>

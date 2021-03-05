@@ -16,6 +16,16 @@ export const onIncrementLikes = /* GraphQL */ `
     }
   }
 `;
+export const onMyNewFriendRequests = /* GraphQL */ `
+  subscription OnMyNewFriendRequests($receiver: ID) {
+    onMyNewFriendRequests(receiver: $receiver) {
+      createdAt
+      updatedAt
+      sender
+      receiver
+    }
+  }
+`;
 export const onCreateGroup = /* GraphQL */ `
   subscription OnCreateGroup {
     onCreateGroup {

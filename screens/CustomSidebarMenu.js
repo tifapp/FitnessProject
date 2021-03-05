@@ -6,9 +6,10 @@ import {
   Image,
   Text,
   Linking,
-  TouchableOpacity
+  TouchableOpacity,
+  LayoutAnimation
 } from "react-native";
-import { API, graphqlOperation } from "aws-amplify";
+import { API, graphqlOperation, Cache } from "aws-amplify";
 import {
   listFriendRequests,
   friendRequestsByReceiver,
@@ -18,7 +19,7 @@ import {
   batchGetFriendRequests,
 } from "root/src/graphql/queries";
 import {
-  onCreateFriendRequest,
+  onMyNewFriendRequests,
   onCreateFriendship,
 } from "root/src/graphql/subscriptions";
 import {
@@ -39,72 +40,145 @@ import FriendListItem from "components/FriendListItem";
 import FriendRequestListItem from "components/FriendRequestListItem";
 
 export default function CustomSidebarMenu({ navigation, myId }) {
+  const [lastOnlineTime, setLastOnlineTime] = useState(0);
   const [friendList, setFriendList] = useState([]);
   const [friendRequestList, setFriendRequestList] = useState([]);
+  const [newFriendRequests, setNewFriendRequests] = useState(0); //should persist across sessions (ex. if you receive new friend requests while logged out)
 
-  const friendRequestListRef = useRef();
   const currentFriends = useRef();
   const currentFriendRequests = useRef();
+  const currentNewFriendRequestCount = useRef();
 
   currentFriends.current = friendList;
   currentFriendRequests.current = friendRequestList;
+  currentNewFriendRequestCount.current = newFriendRequests;
 
   useEffect(() => {
-    waitForNewFriendsAsync();
-  }, []);
-
-  const waitForNewFriendsAsync = async () => {
-    await API.graphql(graphqlOperation(onCreateFriendship)).subscribe({
+    Cache.getItem("lastOnline", {callback: ()=>{setLastOnlineTime(-1)}}) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
+        .then((time) => {
+          setLastOnlineTime(time);
+        }); //redundant???
+        
+    const friendSubscription = API.graphql(
+      graphqlOperation(onCreateFriendship)
+    ).subscribe({
       next: (event) => {
         const newFriend = event.value.data.onCreateFriendship;
-        if (newFriend.user1 == myId || newFriend.user2 == myId) {
+        if ((newFriend.user1 == myId || newFriend.user2 == myId) && (currentFriends.current.length == 0 || !currentFriends.current.find(item => item.user1 === newFriend.user1 && item.user2 === newFriend.user2))) {
           setFriendList([newFriend, ...currentFriends.current]);
         }
       },
     });
-    /*
-        await API.graphql(graphqlOperation(onCreateFriendRequest)).subscribe({
-            next: event => {
-                const newFriendRequest = event.value.data.onCreateFriendRequest
-                if (newFriendRequest.receiver == myId) {
-                    setFriendRequestList([newFriendRequest, ...currentFriendRequests.current]);
-                }
-            }
-        });
-        */
-  };
+    const friendRequestSubscription = API.graphql(
+      graphqlOperation(onMyNewFriendRequests, { receiver: myId })
+    ).subscribe({
+      next: (event) => {
+        const newFriendRequest = event.value.data.onMyNewFriendRequests;
+        if (newFriendRequest.receiver == myId && (currentFriendRequests.current.length == 0 || !currentFriendRequests.current.find(item => item.sender === newFriendRequest.sender))) {
+          setNewFriendRequests(currentNewFriendRequestCount.current+1);
+          setFriendRequestList([
+            newFriendRequest,
+            ...currentFriendRequests.current,
+          ]);
+        }
+      },
+    });
+    return () => {
+      friendSubscription.unsubscribe();
+      friendRequestSubscription.unsubscribe();
+    };
+  }, []);
 
   const getNonPendingRequests = async (items) => {
-    if (items != null && items.length > 0) {
-      let senders = [];
+    let senders = [];
 
-      items.forEach((item) => {
-        senders.push({
-          receiver: item.sender,
-        });
+    items.forEach((item) => {
+      senders.push({
+        receiver: item.sender,
       });
+    });
 
-      try {
-        const frs = await API.graphql(
-          graphqlOperation(batchGetFriendRequests, {
-            friendrequests: senders,
-          })
-        );
+    try {
+      const frs = await API.graphql(
+        graphqlOperation(batchGetFriendRequests, {
+          friendrequests: senders,
+        })
+      );
 
-        let validRequests = [];
-        for (i = 0; i < items.length; ++i) {
-          if (frs.data.batchGetFriendRequests[i] == null) {
-            validRequests.push(items[i]);
-          }
+      let validRequests = [];
+      for (i = 0; i < items.length; ++i) {
+        if (frs.data.batchGetFriendRequests[i] == null) {
+          validRequests.push(items[i]);
         }
-        return validRequests;
-      } catch (err) {
-        console.log("error in getting valid friend requests: ", err);
       }
+
+      checkNewRequests(validRequests);
+
+      return validRequests;
+    } catch (err) {
+      console.log("error in getting valid friend requests: ", err);
     }
   };
 
+  const checkNewRequests = (items) => {
+    items.forEach((item) => {
+      if (lastOnlineTime > 0 && new Date(item.createdAt).getTime() > lastOnlineTime) {
+        setNewFriendRequests(newFriendRequests+1);
+      }
+    });
+  };
+
+  const respondToRequest = async (item, accepted) => {
+    // delete friend object
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setFriendRequestList(
+      friendRequestList.map(function (i) {
+        if (i.sender == item.sender && i.receiver == item.receiver) {
+          if (accepted) {
+            i.accepted = true;
+          } else {
+            i.rejected = true;
+          }
+        }
+        return i;
+      })
+    ); //locally removes the item
+    
+    try {
+      if (accepted) {
+        await API.graphql(
+          graphqlOperation(createFriendRequest, {
+            input: { receiver: item.sender },
+          })
+        );
+      } else {
+        await API.graphql(
+          graphqlOperation(deleteFriendRequest, {
+            input: { sender: item.sender, receiver: item.receiver },
+          })
+        );
+      }
+    } catch (err) {
+      console.log("error: ", err);
+    }
+  };
+  
+  const removeFriendRequestListItem = async (item, isNew) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    if (isNew) setNewFriendRequests(newFriendRequests - 1);
+    setFriendRequestList(friendRequestList.filter((i) => item.sender != i.sender || item.receiver != i.receiver
+    )); //locally removes the item
+  };
+
   const removeFriend = async (item) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    // update friendList
+    setFriendList((friendList) => {
+      return friendList.filter(
+        (i) => i.user1 != item.user1 || i.user2 != item.user2
+      );
+    });
+
     // delete friend object
     try {
       await API.graphql(
@@ -115,21 +189,6 @@ export default function CustomSidebarMenu({ navigation, myId }) {
     } catch (err) {
       console.log("error: ", err);
     }
-    // update friendList
-    setFriendList((friendList) => {
-      return friendList.filter(
-        (i) => i.user1 != item.user1 || i.user2 != item.user2
-      );
-    });
-  };
-
-  const removeFriendHandler = (item) => {
-    const title = "Are you sure you want to remove this friend?";
-    const options = [
-      { text: "Yes", onPress: () => removeFriend(item) },
-      { text: "Cancel", type: "cancel" },
-    ];
-    Alert.alert(title, "", options, { cancelable: true });
   };
 
   return (
@@ -137,7 +196,7 @@ export default function CustomSidebarMenu({ navigation, myId }) {
       {/*Top Large Image */}
       <View
         style={{
-          backgroundColor: "#aa0000",
+          backgroundColor: "orange",
           paddingTop: 15
         }}>
         <ProfileImageAndName
@@ -157,47 +216,56 @@ export default function CustomSidebarMenu({ navigation, myId }) {
           }}
           textStyle={{
             marginLeft: 15,
-            fontWeight: "bold",
+            fontWeight: "normal",
             fontSize: 20,
-            color: "white",
+            color: "black",
           }}
         />
       </View>
 
       <Accordion
-        headerText={"Friend Requests"}
+        style={{marginTop: 15, paddingVertical: 15}}
+        headerText={"Friend Requests" + (newFriendRequests > 0 ? " (" + (newFriendRequests <= 20 ? newFriendRequests : "20+") + ")" : "")} //would be nice if we had a total friend request count. but then you'd be able to see when people revoke their friend requests.
         headerTextStyle={{
-          fontSize: 16,
-          color: "blue",
+          fontSize: 18,
+          color: newFriendRequests > 0 ? "blue" : "gray",
+          textDecorationLine: friendRequestList.length > 0 ? 'none' : 'line-through',
         }}
+        iconColor={newFriendRequests > 0 ? "blue" : "gray"}
+        closeFunction={() => {setNewFriendRequests(0)}}
+        empty={friendRequestList.length == 0}
       >
         <APIList
           style={{}}
-          ref={friendRequestListRef}
           processingFunction={getNonPendingRequests}
           queryOperation={friendRequestsByReceiver}
           filter={{ receiver: myId }}
           setDataFunction={setFriendRequestList}
           data={friendRequestList}
-          renderItem={({ item }) => (
+          initialAmount={21}
+          renderItem={({ item, index }) => (
             <FriendRequestListItem
               navigation={navigation}
               item={item}
-              removeFriendHandler={removeFriendHandler}
+              respondRequestHandler={respondToRequest}
+              removeFriendRequestListItemHandler={removeFriendRequestListItem}
               myId={myId}
+              isNew={index < newFriendRequests}
             />
           )}
           keyExtractor={(item) => item.sender}
         />
       </Accordion>
       <Accordion
+        style={{paddingVertical: 15}}
         headerText={"Friends"}
         headerTextStyle={{
-          fontSize: 16,
+          fontSize: 18,
           color: "grey",
         }}
       >
         <APIList
+          style={{}}
           queryOperation={listFriendships}
           filter={{
             filter: {
@@ -220,8 +288,8 @@ export default function CustomSidebarMenu({ navigation, myId }) {
           renderItem={({ item }) => (
             <FriendListItem
               navigation={navigation}
+              removeFriendHandler={removeFriend}
               item={item}
-              removeFriendHandler={removeFriendHandler}
               myId={myId}
             />
           )}

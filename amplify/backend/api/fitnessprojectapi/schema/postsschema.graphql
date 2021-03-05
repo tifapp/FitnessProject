@@ -78,4 +78,5 @@ type Mutation {
 
 type Subscription {
   onIncrementLikes: Post @aws_subscribe(mutations: ["incrementLikes"]) @aws_cognito_user_pools
+  onMyNewFriendRequests(receiver: ID): FriendRequest @aws_subscribe(mutations: ["createFriendRequest"])
 }

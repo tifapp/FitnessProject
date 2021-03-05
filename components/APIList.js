@@ -103,7 +103,7 @@ class APIList extends Component { //we need to make this a class to use refs fro
       } while (results.length < (wasBeginning ? initialAmount : additionalAmount) && nextToken != null);
 
       if (this.props.processingFunction != null) {
-        results = await Promise.resolve(this.props.processingFunction(results)); //make sure this isn't undefined! in processingfunction return the results in the outermost layer!
+        results = await Promise.resolve(this.props.processingFunction(results ?? [])); //make sure this isn't undefined! in processingfunction return the results in the outermost layer!
       }
 
       if (voidResultsFunction != null) {
@@ -113,7 +113,7 @@ class APIList extends Component { //we need to make this a class to use refs fro
       if (!wasBeginning)
         this.props.setDataFunction([...this.props.data, ...results]);
       else
-        this.props.setDataFunction(results);
+        this.props.setDataFunction(results ?? []);
 
       this.setState({ nextToken: nextToken });
 

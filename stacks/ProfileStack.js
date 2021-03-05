@@ -6,7 +6,6 @@ import GoalsScreen from 'screens/GoalsScreen'
 import MyGroupsScreen from 'screens/MyGroupsScreen'
 import GroupPostsScreen from "screens/GroupPostsScreen";
 import CreatingGroups from "screens/CreatingGroups";
-import FriendScreen from "screens/FriendScreen";
 import LookupUserScreen from "screens/LookupUser";
 import MessageScreen from "screens/MessageScreen";
 
@@ -18,10 +17,7 @@ const Stack = createStackNavigator();
 export default function ProfileTab({route}) {
   return (
     <Stack.Navigator initialRouteName='Profile' screenOptions={{ headerStyle: { backgroundColor: '#d3d3d3' } }}>
-      <Stack.Screen name='Profile' component={ProfileScreen} initialParams={route.params}
-            options={{
-              headerShown: false,
-            }} />
+      <Stack.Screen name='Profile' component={ProfileScreen} initialParams={route.params} />
       <Stack.Screen name='Bio' component={BioScreen} />
       <Stack.Screen name='Goals' component={GoalsScreen} />
       <Stack.Screen name='My Groups' component={MyGroupsScreen} initialParams={route.params}/>

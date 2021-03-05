@@ -28,7 +28,7 @@ export default function DrawerButton (props) {
   return (
     <View style={{ flexDirection: 'row' }}>
       <TouchableOpacity onPress={toggleDrawer}>
-        <MaterialIcons name="menu" size={30} color="white" style={{paddingLeft: 15}} />
+        <MaterialIcons name="menu" size={30} color="black" style={{paddingLeft: 15}} />
       </TouchableOpacity>
     </View>
   );

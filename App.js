@@ -1,11 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState, useEffect, useRef } from "react";
 import {
+  AppState,
   ActivityIndicator,
   LogBox,
-  AsyncStorage,
+  UIManager,
   Text
 } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { withAuthenticator } from "aws-amplify-react-native";
 // Get the aws resources configuration parameters
 import awsconfig from "./src/aws-exports"; // if you are using Amplify CLI
@@ -36,6 +38,13 @@ import * as Notifications from 'expo-notifications';
 import * as Permissions from 'expo-permissions';
 import { StatusBar } from "expo-status-bar";
 
+if (
+  Platform.OS === "android" &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -64,7 +73,7 @@ const config = {
 };
 
 const myCacheConfig = Cache.configure(config);
-Cache.clear(); //will we have to do this for the next build?
+//Cache.clear(); //will we have to do this for the next build?
 
 var styles = require("./styles/stylesheet");
 
@@ -74,6 +83,8 @@ const Drawer = createDrawerNavigator();
 const App = () => {
   //Text.defaultProps = Text.defaultProps || {}
   //Text.defaultProps.style =  { fontFamily: 'Helvetica', fontSize: 15, fontWeight: 'normal' }
+  const appState = useRef(AppState.currentState);
+  const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
   const [userId, setUserId] = useState('checking...'); //stores the user's id if logged in
 
@@ -128,8 +139,25 @@ const App = () => {
   }
 
   useEffect(() => {
+    AppState.addEventListener("change", _handleAppStateChange);
     checkIfUserExists();
+
+    return () => {
+      AppState.removeEventListener("change", _handleAppStateChange);
+    };
   }, []);
+
+  const _handleAppStateChange = (nextAppState) => {
+    if (
+      nextAppState.match(/inactive|background/) &&
+      appState.current === "active"
+    ) {      
+      Cache.setItem("lastOnline", Date.now(), { priority: 1 });
+    }
+
+    appState.current = nextAppState;
+    setAppStateVisible(appState.current);
+  };
 
   useEffect(() => {
     if (userId !== 'checking...' && userId !== '') {
@@ -179,7 +207,7 @@ const App = () => {
   } else {
     return (
       <NavigationContainer>
-        <StatusBar style="light" />
+        <StatusBar style="dark" />
         <Drawer.Navigator
           drawerStyle={{}}
           drawerContentOptions={{

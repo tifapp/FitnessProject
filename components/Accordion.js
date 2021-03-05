@@ -19,16 +19,7 @@ import * as Haptics from "expo-haptics";
 
 var styles = require("../styles/stylesheet");
 
-if (
-  Platform.OS === "android" &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
-
 export default function Accordion(props) {
-  const [savedChildrenState, setSavedChildrenState] = useState(null);
-  const [savedChildren, setSavedChildren] = useState(null);
   const [open, setOpen] = useState(false);
   const animatedController = useRef(new Animated.Value(0)).current;
 
@@ -40,6 +31,7 @@ export default function Accordion(props) {
   const toggleCollapse = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     if (open) {
+      if (props.closeFunction != null) props.closeFunction();
       Animated.timing(animatedController, {
         duration: 250,
         toValue: 0,
@@ -47,17 +39,7 @@ export default function Accordion(props) {
         useNativeDriver: true,
       }).start();
     } else {
-      const childrenWithProps = React.Children.map(props.children, child => {
-        // checking isValidElement is the safe way and avoids a typescript error too
-        if (React.isValidElement(child)) {
-           //so we can only save the state of one child at a time
-          return React.cloneElement(child, {saveState: setSavedChildrenState, initialState: savedChildrenState});
-        }
-        return child;
-      });
-  
-      setSavedChildren(childrenWithProps);
-
+      if (props.openFunction != null) props.openFunction();
       Animated.timing(animatedController, {
         duration: 250,
         toValue: 1,
@@ -69,24 +51,36 @@ export default function Accordion(props) {
   };
 
   return (
-    <View>
-      <TouchableWithoutFeedback
-        onPress={toggleCollapse}
-      >
+    <View style={props.style}>
+      <TouchableWithoutFeedback style={{flex: 1}} onPress={toggleCollapse}>
         <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-        }}>
-          <Text style={props.headerTextStyle}>{props.headerText}</Text>
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text
+            style={[props.headerTextStyle, open ? { color: "black" } : null]}
+          >
+            {props.headerText}
+          </Text>
           <Animated.View style={{ transform: [{ rotateZ: arrowAngle }] }}>
-            <MaterialIcons name="arrow-drop-down" size={30} color="grey" />
+            <MaterialIcons
+              name="arrow-drop-down"
+              size={30}
+              color={open ? "black" : props.iconColor ?? "gray"}
+            />
           </Animated.View>
         </View>
       </TouchableWithoutFeedback>
-      <View>
-        {open ? savedChildren : null}
+      <View style={{ flex: open ? 0 : 1 }}>
+        {props.empty ? (
+          <View style={{height: 25}}>
+          </View>
+        ) : (
+          props.children
+        )}
       </View>
     </View>
   );

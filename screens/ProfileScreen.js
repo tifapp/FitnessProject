@@ -34,8 +34,8 @@ const ProfileScreen = ({ navigation, route }) => {
     async function signOut() {
         console.log("user is signing out.");
         if (areFieldsUpdated()) {
-            const title = 'Your profile has unsubmitted changes!';
-            const message = '';
+            const title = 'Your profile has unsaved changes!';
+            const message = 'Signing out will remove these changes';
             const options = [
                 { text: 'Submit changes', onPress: () => {submitHandler()} }, //if submithandler fails user won't know
                 { text: 'Just sign out', onPress: () => {Auth.signOut()} },

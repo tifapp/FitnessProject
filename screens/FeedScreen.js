@@ -37,41 +37,87 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
 
   const currentPosts = useRef();
   const scrollRef = useRef(); // Used to help with automatic scrolling to top
+  
+  currentPosts.current = posts;
 
   const getChannel = () => {
     return channel == null ? 'general' : channel
   }
 
   useEffect(() => {
-    waitForNewPostsAsync();
+    const createPostSubscription = API.graphql(graphqlOperation(onCreatePost)).subscribe({
+      next: event => {
+        const newPost = event.value.data.onCreatePost
+        if (newPost.userId != route.params?.id && newPost.channel == getChannel() && (currentPosts.current.length == 0 || !currentPosts.current.find(post => post.userId === newPost.userId && post.createdAt === newPost.createdAt))) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
+          if (newPost.isParent == 0) {
+              if (currentPosts.current.length > 0 && currentPosts.current.find(post => post.parentId === newPost.parentId)) {
+                let tempposts = currentPosts.current;
+                var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId === newPost.parentId)]);
+                tempposts.splice(index + 1, 0, newPost);
+                setPosts(tempposts);
+              }
+          }
+          else {
+            setPosts([newPost, ...currentPosts.current]); //what if we have a lot of new posts at once?
+          }
+        }
+      }
+    });
+    const deletePostSubscription = API.graphql(graphqlOperation(onDeletePost)).subscribe({
+      next: event => {
+        const deletedPost = event.value.data.onDeletePost
+        if (deletedPost.userId != route.params?.id && deletedPost.channel == getChannel()) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
+          if (currentPosts.current.length > 0 && currentPosts.current.find(post => post.userId === deletedPost.userId && post.createdAt === deletedPost.createdAt)) {
+            let tempposts = currentPosts.current;
+            var index = tempposts.findIndex(post => post.userId === deletedPost.userId && post.createdAt === deletedPost.createdAt);
+            tempposts.splice(index, 1);
+            setPosts(tempposts);
+          }
+        }
+      }
+    });
+    const updatePostSubscription = API.graphql(graphqlOperation(onUpdatePost)).subscribe({ //nvm we dont have a subscription event for incrementlike
+      next: event => {
+        console.log("post has been updated");
+      }
+    });
+    // const incrementLikeSubscription = API.graphql(graphqlOperation(didIncrementLikes)).subscribe({ //nvm we dont have a subscription event for incrementlike
+    //   next: event => {
+    //     console.log("post has been liked");
+    //   }
+    // });
     checkInternetConnection();
+    return () => {
+      createPostSubscription.unsubscribe();
+      deletePostSubscription.unsubscribe();
+      updatePostSubscription.unsubscribe();
+      //incrementLikeSubscription.unsubscribe();
+    }
   }, []);
 
   const getLikedPosts = async (items) => {
-    if (items != null && items.length > 0) {
-      let newPosts = items;
-      let postIds = [];
+    let newPosts = items;
+    let postIds = [];
 
-      newPosts.forEach(item => {
-        postIds.push({postId: item.createdAt + "#" + item.userId + "#" + item.channel + "#" + item.parentId + "#" + item.isParent});
-      });
+    newPosts.forEach(item => {
+      postIds.push({postId: item.createdAt + "#" + item.userId + "#" + item.channel + "#" + item.parentId + "#" + item.isParent});
+    });
 
-      try {
-        const likes = await API.graphql(graphqlOperation(batchGetLikes, { likes: postIds }));
-        console.log("looking for likes: ", likes);
-        //returns an array of like objects or nulls corresponding with the array of newposts
-        for (i = 0; i < newPosts.length; ++i) {
-          if (likes.data.batchGetLikes[i] != null) {
-            console.log("found liked post");
-            newPosts[i].likedByYou = true;
-          } else {
-            newPosts[i].likedByYou = false;
-          }
+    try {
+      const likes = await API.graphql(graphqlOperation(batchGetLikes, { likes: postIds }));
+      console.log("looking for likes: ", likes);
+      //returns an array of like objects or nulls corresponding with the array of newposts
+      for (i = 0; i < newPosts.length; ++i) {
+        if (likes.data.batchGetLikes[i] != null) {
+          console.log("found liked post");
+          newPosts[i].likedByYou = true;
+        } else {
+          newPosts[i].likedByYou = false;
         }
-        return newPosts;
-      } catch (err) {
-        console.log("error in detecting likes: ", err);
       }
+      return newPosts;
+    } catch (err) {
+      console.log("error in detecting likes: ", err);
     }
   }
 
@@ -95,92 +141,6 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
       );
     }
     return null;
-  }
-
-  currentPosts.current = posts;
-
-  const waitForNewPostsAsync = async () => {
-    await API.graphql(graphqlOperation(onCreatePost)).subscribe({
-      next: event => {
-        const newPost = event.value.data.onCreatePost
-        if (newPost.userId != route.params?.id && newPost.channel == getChannel()) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
-          if (newPost.isParent == 0) {
-            if (currentPosts.current != null && currentPosts.current.length > 0) {
-              if (currentPosts.current.find(post => post.parentId === newPost.parentId)) {
-                let tempposts = currentPosts.current;
-                var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId === newPost.parentId)]);
-                tempposts.splice(index + 1, 0, newPost);
-                setPosts(tempposts);
-              }
-            }
-          }
-          else {
-            if (currentPosts.current != null && currentPosts.current.length > 0)
-              setPosts([newPost, ...currentPosts.current]); //what if we have a lot of new posts at once?
-            else
-              setPosts([newPost]); //what if we have a lot of new posts at once?
-          }
-        }
-      }
-    });
-    await API.graphql(graphqlOperation(onDeletePost)).subscribe({
-      next: event => {
-        const deletedPost = event.value.data.onDeletePost
-        if (deletedPost.userId != route.params?.id && deletedPost.channel == getChannel()) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
-          if (currentPosts.current.find(post => post.userId === deletedPost.userId && post.createdAt === deletedPost.createdAt)) {
-            let tempposts = currentPosts.current;
-            var index = tempposts.findIndex(post => post.userId === deletedPost.userId && post.createdAt === deletedPost.createdAt);
-            tempposts.splice(index, 1);
-            setPosts(tempposts);
-          }
-        }
-      }
-    });
-    await API.graphql(graphqlOperation(onUpdatePost)).subscribe({ //nvm we dont have a subscription event for incrementlike
-      next: event => {
-        console.log("post has been updated");
-      }
-    });
-    await API.graphql(graphqlOperation(didIncrementLikes)).subscribe({ //nvm we dont have a subscription event for incrementlike
-      next: event => {
-        console.log("post has been liked");
-      }
-    });
-    /*
-    await API.graphql(graphqlOperation(onCreateLike, {userId: route.params?.id})).subscribe({ //nvm we dont have a subscription event for incrementlike
-      next: event => {
-        const newLike = event.value.data.onCreateLike;
-        if (newLike.userId != route.params?.id) {
-          const ids = newLike.postId.split("#");
-          const createdAt = ids[0];
-          const userId = ids[1];
-          //we can even display the last user that liked this post.
-  
-          const localUpdatedPostIndex = posts.findIndex(post => post.createdAt === createdAt && post.userId === userId);
-          if (localUpdatedPostIndex > -1) {
-            currentPosts.current[localUpdatedPostIndex].likes += 1;
-            setPosts([...currentPosts.current]); //make sure this doesn't run when you like posts, only when other people do. probably use a local variable to check, that would be fastest
-          }
-        }
-      }
-    });
-    await API.graphql(graphqlOperation(onDeleteLike, {userId: route.params?.id})).subscribe({ //nvm we dont have a subscription event for incrementlike
-      next: event => {
-        const removedLike = event.value.data.onDeleteLike;
-        if (removedLike.userId != route.params?.id) {
-          const ids = removedLike.postId.split("#");
-          const createdAt = ids[0];
-          const userId = ids[1];
-  
-          const localUpdatedPostIndex = posts.findIndex(post => post.createdAt === createdAt && post.userId === userId);
-          if (localUpdatedPostIndex > -1) {
-            currentPosts.current[localUpdatedPostIndex].likes -= 1;
-            setPosts([...currentPosts.current]); //make sure this doesn't run when you like posts, only when other people do. probably use a local variable to check, that would be fastest
-          }
-        }
-      }
-    });
-    */
   }
 
   const updatePostAsync = async (createdAt, editedText) => {
@@ -214,10 +174,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
 
     console.log(route.params?.id + " just posted.");
 
-    if (posts != null && posts.length > 0)
-      setPosts([{ ...newPost, userId: route.params?.id, createdAt: (new Date(Date.now())).toISOString() }, ...posts]);
-    else
-      setPosts([{ ...newPost, userId: route.params?.id, createdAt: (new Date(Date.now())).toISOString() }]);
+    setPosts([{ ...newPost, userId: route.params?.id, createdAt: (new Date(Date.now())).toISOString() }, ...posts]);
     
     try {
       await API.graphql(graphqlOperation(createPost, { input: newPost }));

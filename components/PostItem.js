@@ -1,35 +1,3 @@
-/*
-                  {!isReplying ?:
-                    <View style={{
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                      marginBottom: 15,
-                      marginHorizontal: 40,
-                      justifyContent: 'space-evenly'
-                    }}>
-                      <TouchableOpacity
-                        style={[styles.buttonStyle]}
-                        onPress={() => {
-                          postVal != ""
-                            ? (replyPostAsync(updatePostID))
-                            : alert("No text detected in text field");
-                        }}
-                      >
-                        <Text style={styles.buttonTextStyle}>Reply To Post</Text>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        style={styles.buttonStyle}
-                        onPress={() => {
-                          setIsReplying(false),
-                        }}
-                      >
-                        <Text style={styles.buttonTextStyle}>Cancel</Text>
-                      </TouchableOpacity>
-                    </View>
-                  }
-*/
-
 import React, { useState, useEffect, useRef, PureComponent } from "react";
 import { Storage } from "aws-amplify";
 import {
@@ -117,7 +85,7 @@ export default function PostItem({
           <View
             style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <ProfileImageAndName
-              style={styles.smallImageStyle}
+              imageStyle={[styles.smallImageStyle, {marginRight: 15}]}
               userId={item.userId}
             />
             <View style={{ marginRight: 15 }}>

@@ -117,35 +117,44 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
       return (
         <TouchableOpacity
           onPress={goToProfile}
-          style={{
-            flexDirection: props.vertical ? "column" : "row",
-            alignItems: "center",
-            alignContent: "flex-start",
-            justifyContent: "flex-start",
-            padding: 15,
-          }}
+          style={[
+            props.style,
+            {
+              flexShrink: 1,
+              flexDirection: props.vertical ? "column" : "row",
+              alignItems: "center",
+              alignContent: "flex-start",
+              justifyContent: "flex-start",
+              padding: 15,
+            },
+          ]}
         >
-          <Image
-            style={props.imageStyle}
-            source={
-              userInfo.imageURL === ""
-                ? require("../assets/icon.png")
-                : { uri: userInfo.imageURL }
-            }
-          />
           <View>
+            <Image
+              style={props.imageStyle}
+              source={
+                userInfo.imageURL === ""
+                  ? require("../assets/icon.png")
+                  : { uri: userInfo.imageURL }
+              }
+            />
+            {props.imageOverlay}
+          </View>
+          <View style={props.textLayoutStyle}>
             {props.isFull || userInfo.name.length <= 40 ? (
-              <Text style={[props.textStyle, { flex: 1, flexWrap: "wrap" }]}>
+              <Text
+                style={[props.textStyle, { flexWrap: "wrap", flexShrink: 1 }]}
+              >
                 {userInfo.name}
               </Text>
             ) : (
-              <Text style={(props.textStyle, { flex: 1, flexWrap: "wrap" })}>
+              <Text
+                style={[props.textStyle, { flexWrap: "wrap", flexShrink: 1 }]}
+              >
                 {userInfo.name.substring(0, 40)} ...
               </Text>
             )}
-            {
-                props.subtitleComponent
-            }
+            {props.subtitleComponent}
           </View>
         </TouchableOpacity>
       );

@@ -1,10 +1,8 @@
-'use strict';
+"use strict";
 
-var React = require('react-native');
+var React = require("react-native");
 
-var {
-  StyleSheet,
-} = React;
+var { StyleSheet } = React;
 
 module.exports = StyleSheet.create({
   header: {
@@ -13,10 +11,16 @@ module.exports = StyleSheet.create({
     backgroundColor: "coral",
     borderRadius: 5,
     marginHorizontal: 10,
-    marginTop: 10
+    marginTop: 10,
+  },
+  subtitleButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingTop: 8,
+    paddingHorizontal: 4,
   },
   spacingTop: {
-    marginTop: 10
+    marginTop: 10,
   },
   title: {
     textAlign: "center",
@@ -25,12 +29,12 @@ module.exports = StyleSheet.create({
     fontWeight: "bold",
   },
   offlineContainer: {
-    backgroundColor: '#b52424',
+    backgroundColor: "#b52424",
     height: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
-  offlineText: { color: '#fff' },
+  offlineText: { color: "#fff" },
   submitButton: {
     marginTop: 20,
     alignSelf: "center",
@@ -48,71 +52,71 @@ module.exports = StyleSheet.create({
   },
 
   secondaryContainerStyle: {
-    backgroundColor: '#fefefe',
+    backgroundColor: "#fefefe",
   },
 
   buttonStyle: {
-    alignSelf: 'center',
-    backgroundColor: 'orange',
+    alignSelf: "center",
+    backgroundColor: "orange",
     padding: 10,
     borderRadius: 5,
-    marginHorizontal: 6
+    marginHorizontal: 6,
   },
   textButtonStyle: {
-    alignSelf: 'center',
-    backgroundColor: '#ffffff',
+    alignSelf: "center",
+    backgroundColor: "#ffffff",
     padding: 9,
     borderRadius: 5,
   },
   textButtonTextStyle: {
-    color: 'orange',
-    alignSelf: 'center',
+    color: "orange",
+    alignSelf: "center",
     marginBottom: 2,
     marginHorizontal: 6,
   },
   unselectedButtonStyle: {
     borderWidth: 2,
     borderColor: "gray",
-    alignSelf: 'center',
-    backgroundColor: 'transparent',
+    alignSelf: "center",
+    backgroundColor: "transparent",
     padding: 9,
     borderRadius: 5,
     marginHorizontal: 10,
   },
   unselectedReplyStyle: {
     borderWidth: 2,
-    alignSelf: 'center',
+    alignSelf: "center",
     padding: 9,
     borderRadius: 5,
     marginHorizontal: 10,
   },
   unselectedButtonTextStyle: {
-    color: 'gray',
-    alignSelf: 'center',
+    color: "gray",
+    alignSelf: "center",
     marginBottom: 2,
     marginHorizontal: 6,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   outlineButtonStyle: {
     borderWidth: 2,
     borderColor: "orange",
-    alignSelf: 'center',
-    backgroundColor: 'transparent',
+    alignSelf: "center",
+    backgroundColor: "transparent",
     padding: 9,
     borderRadius: 5,
     marginHorizontal: 10,
   },
   outlineButtonTextStyle: {
-    color: 'orange',
-    alignSelf: 'center',
+    color: "orange",
+    alignSelf: "center",
     marginBottom: 2,
     marginHorizontal: 6,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   buttonTextStyle: {
-    color: 'white',
-    alignSelf: 'center',
-    fontWeight: 'bold',
+    color: "white",
+    alignSelf: "center",
+    fontWeight: "bold",
     fontSize: 20,
     marginBottom: 2,
     marginHorizontal: 6,
@@ -120,27 +124,26 @@ module.exports = StyleSheet.create({
 
   containerStyle: {
     flex: 1,
-    backgroundColor: '#fffffd'
+    backgroundColor: "#fffffd",
   },
   floatingContainerStyle: {
     borderBottomWidth: 1,
   },
   upperScreenStyle: {
-    backgroundColor: '#ffffff',
+    backgroundColor: "#ffffff",
     marginBottom: 30,
   },
   rowContainerStyle: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
   },
 
-
   editIconStyle: {
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
     marginRight: 3,
   },
   textBoxStyle: {
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
     borderWidth: 2,
     borderColor: "gray",
     borderRadius: 20,
@@ -151,15 +154,14 @@ module.exports = StyleSheet.create({
     paddingLeft: 12,
     marginBottom: 30,
     flex: 1,
-    backgroundColor: 'transparent'
+    backgroundColor: "transparent",
   },
-
 
   textInputStyle: {
     marginHorizontal: 10,
     height: 30,
     borderBottomWidth: 2,
-    borderBottomColor: 'gray',
+    borderBottomColor: "gray",
   },
 
   val: {
@@ -213,11 +215,11 @@ module.exports = StyleSheet.create({
     padding: 25,
   },
   secondaryContainerStyle: {
-    backgroundColor: '#fdfffe',
+    backgroundColor: "#fdfffe",
   },
 
   imageStyle: {
-    alignSelf: 'center',
+    alignSelf: "center",
     marginTop: 30,
     height: 110,
     width: 110,
@@ -238,14 +240,14 @@ module.exports = StyleSheet.create({
   border: {
     alignItems: "center",
   },
-  viewProfileScreen : {
+  viewProfileScreen: {
     alignItems: "center",
     marginTop: 20,
-    marginBottom: 20
+    marginBottom: 20,
   },
   boxFormat: {
     paddingHorizontal: 8,
     paddingTop: 30,
     paddingBottom: 15,
-  }
+  },
 });
