@@ -1,4 +1,5 @@
 import 'react-native-gesture-handler';
+import { Button } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import ProfileScreen from 'screens/ProfileScreen'
 import BioScreen from 'screens/BioScreen'
@@ -14,9 +15,16 @@ import React from 'react';
 
 const Stack = createStackNavigator();
 
-export default function ProfileTab({route}) {
+export default function ProfileTab({navigation, route}) {
   return (
-    <Stack.Navigator initialRouteName='Profile' screenOptions={{ headerStyle: { backgroundColor: '#d3d3d3' } }}>
+    <Stack.Navigator initialRouteName='Profile' screenOptions={{ 
+      headerStyle: { backgroundColor: "#efefef" },
+      headerTintColor: "#000",
+      headerTitleStyle: { fontWeight: Platform.OS === 'android' ? "normal" : "bold", fontSize: 20, },
+      headerTitleAlign: "center",  
+      headerLeft: () => (
+      <Button title="< Back" onPress={() => navigation.goBack()} />
+    ), }}>
       <Stack.Screen name='Profile' component={ProfileScreen} initialParams={route.params} />
       <Stack.Screen name='Bio' component={BioScreen} />
       <Stack.Screen name='Goals' component={GoalsScreen} />

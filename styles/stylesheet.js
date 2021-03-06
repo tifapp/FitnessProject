@@ -226,9 +226,9 @@ module.exports = StyleSheet.create({
     borderRadius: 10,
   },
   smallImageStyle: {
-    height: 60,
-    width: 60,
-    borderRadius: 5,
+    resizeMode: "cover",
+    height: 50,
+    width: 50,
   },
   goBackButton: {
     alignSelf: "center",

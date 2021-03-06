@@ -19,7 +19,7 @@ export default function FeedStack({ navigation, route }) {
         headerLeft: () => (
           <DrawerButton navigationProps={navigation} />
         ),
-        headerStyle: { backgroundColor: "orange" },
+        headerStyle: { backgroundColor: "#efefef" },
         headerTintColor: "#000",
         headerTitleStyle: { fontWeight: Platform.OS === 'android' ? "normal" : "bold", fontSize: 20, },
         headerTitleAlign: "center"

@@ -15,6 +15,7 @@ import { API, graphqlOperation } from "aws-amplify";
 import { createLike, deleteLike } from "root/src/graphql/mutations";
 import { useNavigation } from '@react-navigation/native';
 import printTime from 'hooks/printTime';
+import { MaterialIcons } from "@expo/vector-icons";
 
 import * as Haptics from 'expo-haptics';
 
@@ -46,13 +47,25 @@ function LikeButton({
 
   if (liked) {
     return (
-      <TouchableOpacity style={[styles.buttonStyle, { backgroundColor: 'red' }]} color="red" onPress={likePostAsync}>
-        <Text style={[styles.unselectedButtonTextStyle, { color: 'white' }]}>{likes ? likedByYou ? likes : likes + 1 : 1}</Text>
+      <TouchableOpacity style={[{ alignItems: "flex-end", flexDirection: "row" }]} onPress={likePostAsync}>
+        <MaterialIcons
+                name="favorite"
+                size={18}
+                color={"red"}
+                style={{ marginRight: 0 }}
+              />
+        <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>{likes ? likedByYou ? likes : likes + 1 : 1}</Text>
       </TouchableOpacity>
     )
   } else {
     return (
-      <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={likePostAsync}>
+      <TouchableOpacity style={[{ flexDirection: "row", borderColor: 'red', borderWidth: 0 }]} color="red" onPress={likePostAsync}>
+      <MaterialIcons
+              name="favorite-outline"
+              size={18}
+              color={"red"}
+              style={{ marginRight: 0 }}
+            />
         <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>{likes ? likedByYou ? likes - 1 : likes : 0}</Text>
       </TouchableOpacity>
     )
@@ -81,110 +94,183 @@ export default function PostItem({
   if (receiver == null)
     return (
       <View style={styles.secondaryContainerStyle}>
-        <View style={item.isParent == 1 ? styles.spaceAround : styles.spaceAroundReply}>
+        <View
+          style={
+            item.isParent == 1 ? styles.spaceAround : styles.spaceAroundReply
+          }
+        >
           <View
-            style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              backgroundColor: "white",
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 1,
+              },
+              shadowOpacity: 0.18,
+              shadowRadius: 1.0,
+
+              elevation: 1,
+            }}
+          >
             <ProfileImageAndName
-              imageStyle={[styles.smallImageStyle, {marginRight: 15}]}
-              textLayoutStyle={{flex: 1}}
+              imageStyle={[styles.smallImageStyle, { marginRight: 15 }]}
+              textLayoutStyle={{ flex: 1 }}
+              textStyle={{
+                fontSize: 15,
+                flex: 1,
+              }}
               userId={item.userId}
+              subtitleComponent={
+                <View style={{}}>
+                  <Text>{displayTime}</Text>
+                </View>
+              }
             />
-            <View style={{ marginRight: 15 }}>
-              <Text>{displayTime}</Text>
+            <View
+              style={{
+                marginHorizontal: 30,
+                flexDirection: "column",
+                justifyContent: "space-evenly",
+              }}
+            >
+              <LikeButton
+                likes={item.likes}
+                likedByYou={item.likedByYou}
+                postId={
+                  item.createdAt +
+                  "#" +
+                  item.userId +
+                  "#" +
+                  item.channel +
+                  "#" +
+                  item.parentId +
+                  "#" +
+                  item.isParent
+                }
+              />
+              {writtenByYou ? (
+                <View
+                  style={{
+                    marginHorizontal: 30,
+                    flexDirection: "row",
+                    justifyContent: "space-evenly",
+                  }}
+                >
+                  <TouchableOpacity
+                    style={[styles.unselectedButtonStyle, { borderColor: "red" }]}
+                    color="red"
+                    onPress={() => deletePostsAsync(item.createdAt)}
+                  >
+                    <Text
+                      style={[styles.unselectedButtonTextStyle, { color: "red" }]}
+                    >
+                      Delete
+                    </Text>
+                  </TouchableOpacity>
+    
+                  <TouchableOpacity
+                    style={[styles.unselectedButtonStyle, { borderColor: "blue" }]}
+                    color="blue"
+                    onPress={() => setIsEditing(!isEditing)}
+                  >
+                    <Text
+                      style={[styles.unselectedButtonTextStyle, { color: "blue" }]}
+                    >
+                      Edit
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              ) : null}
+              {item.isParent == 1 ? (
+                <TouchableOpacity
+                  style={[styles.unselectedButtonStyle, { borderWidth: 0 }]}
+                  color="orange"
+                  onPress={() => setIsReplying(!isReplying)}
+                >
+                  <Text
+                    style={[styles.unselectedButtonTextStyle, { color: "blue" }]}
+                  >
+                    Reply
+                  </Text>
+                </TouchableOpacity>
+              ) : null}
             </View>
           </View>
-          {
-            isEditing
-            ? <TextInput style={[styles.check, {borderColor: 'orange'}]}
+          {isEditing ? (
+            <TextInput
+              style={[styles.check, { borderColor: "orange" }]}
               onChangeText={setEditedText}
-              autoFocus={true}>{item.description}</TextInput>
-            : <Text style={[styles.check]}>{item.description}</Text>
-          }
+              autoFocus={true}
+            >
+              {item.description}
+            </TextInput>
+          ) : (
+            <Text style={{flex: 1}}>{item.description}</Text>
+          )}
         </View>
-        
-        {
-          isEditing
-            ? editedText === ""
-              ? <TouchableOpacity
+
+        {isEditing ? (
+          editedText === "" ? (
+            <TouchableOpacity
+              style={styles.unselectedButtonStyle}
+              onPress={() => {
+                alert("Edit the post");
+              }}
+            >
+              <Text style={[styles.buttonTextStyle, { color: "gray" }]}>
+                {"Edit Post"}
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={styles.buttonStyle}
+              onPress={() => {
+                editButtonHandler(item.createdAt, editedText),
+                  setEditedText(""),
+                  setIsEditing(false);
+              }}
+            >
+              <Text style={styles.buttonTextStyle}>{"Edit Post"}</Text>
+            </TouchableOpacity>
+          )
+        ) : null}
+
+        {isReplying ? (
+          <View>
+            <TextInput
+              style={[styles.check, { borderColor: "orange" }]}
+              onChangeText={setReplyingText}
+              autoFocus={true}
+            />
+            {replyingText === "" ? (
+              <TouchableOpacity
                 style={styles.unselectedButtonStyle}
                 onPress={() => {
-                  alert("Edit the post");
+                  alert("Reply can't be empty");
                 }}
               >
-                <Text style={[styles.buttonTextStyle, { color: 'gray' }]}>{
-                  'Edit Post'
-                }</Text>
+                <Text style={[styles.buttonTextStyle, { color: "gray" }]}>
+                  {"Submit Reply"}
+                </Text>
               </TouchableOpacity>
-              : <TouchableOpacity
-                style={styles.buttonStyle}
-                onPress={() => { editButtonHandler(item.createdAt, editedText), setEditedText(""), setIsEditing(false) }}
-              >
-                <Text style={styles.buttonTextStyle}>{
-                  'Edit Post'
-                }</Text>
-              </TouchableOpacity>
-            : null
-        }
-
-        <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
-          <LikeButton
-            likes={item.likes}
-            likedByYou={item.likedByYou}
-            postId={item.createdAt + "#" + item.userId + "#" + item.channel + "#" + item.parentId + "#" + item.isParent}
-          />
-          {writtenByYou ? (
-            <View style={{ marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-evenly' }}>
-              <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'red' }]} color="red" onPress={() => (deletePostsAsync(item.createdAt))}>
-                <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>Delete</Text>
-              </TouchableOpacity>
-
+            ) : (
               <TouchableOpacity
-                style={[styles.unselectedButtonStyle, { borderColor: 'blue' }]}
-                color="blue"
-                onPress={() => (setIsEditing(!isEditing))}>
-                <Text style={[styles.unselectedButtonTextStyle, { color: 'blue' }]}>Edit</Text>
+                style={styles.buttonStyle}
+                onPress={() => {
+                  replyButtonHandler(item.parentId, replyingText),
+                    setReplyingText(""),
+                    setIsReplying(false);
+                }}
+              >
+                <Text style={styles.buttonTextStyle}>{"Submit Reply"}</Text>
               </TouchableOpacity>
-
-            </View>
-          ) : null}
-          {item.isParent == 1 ?
-            <TouchableOpacity style={[styles.unselectedButtonStyle, { borderColor: 'orange' }]} color="orange" onPress={() => (setIsReplying(!isReplying))}>
-              <Text style={[styles.unselectedButtonTextStyle, { color: 'orange' }]}>Reply</Text>
-            </TouchableOpacity>
-            : null
-          }
-        </View>
-
-        {
-          isReplying
-            ? <View>
-              <TextInput style={[styles.check, { borderColor: 'orange' }]}
-                onChangeText={setReplyingText}
-                autoFocus={true} />
-                {
-                  replyingText === ""
-                  ? <TouchableOpacity
-                    style={styles.unselectedButtonStyle}
-                    onPress={() => {
-                      alert("Reply can't be empty");
-                    }}
-                  >
-                    <Text style={[styles.buttonTextStyle, { color: 'gray' }]}>{
-                      'Submit Reply'
-                    }</Text>
-                  </TouchableOpacity>
-                  : <TouchableOpacity
-                    style={styles.buttonStyle}
-                    onPress={() => { replyButtonHandler(item.parentId, replyingText), setReplyingText(""), setIsReplying(false) }}
-                  >
-                    <Text style={styles.buttonTextStyle}>{
-                      'Submit Reply'
-                    }</Text>
-                  </TouchableOpacity>
-                }
-            </View>
-            : null
-        }
+            )}
+          </View>
+        ) : null}
       </View>
     );
   else {

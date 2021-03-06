@@ -32,8 +32,6 @@ export default function FriendRequestListItem({
 
   return (
     <View style={{}}>
-      <View style={{height: 1, backgroundColor: "#efefef", marginHorizontal: 12}}>
-      </View>
       <ProfileImageAndName
         navigationObject={navigation}
         userId={item.sender}

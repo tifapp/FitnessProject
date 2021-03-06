@@ -31,9 +31,6 @@ export default function FriendListItem({
 
   return (
     <View style={[isSelected && { backgroundColor: "orange" }]}>
-      <View
-        style={{ height: 1, backgroundColor: "#efefef", marginHorizontal: 12 }}
-      ></View>
       <ProfileImageAndName
         navigationObject={navigation}
         imageStyle={{

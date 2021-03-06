@@ -16,6 +16,7 @@ import {
   listFriendships,
   getFriendship,
   friendsBySecondUser,
+  getFriendRequest,
   batchGetFriendRequests,
 } from "root/src/graphql/queries";
 import {
@@ -67,7 +68,8 @@ export default function CustomSidebarMenu({ navigation, myId }) {
     ).subscribe({
       next: (event) => {
         const newFriend = event.value.data.onCreateFriendship;
-        if ((newFriend.user1 == myId || newFriend.user2 == myId) && (currentFriends.current.length == 0 || !currentFriends.current.find(item => item.user1 === newFriend.user1 && item.user2 === newFriend.user2))) {
+        if ((newFriend.user1 === myId || newFriend.user2 === myId) && (currentFriends.current.length === 0 || !currentFriends.current.find(item => item.user1 === newFriend.user1 && item.user2 === newFriend.user2))
+        && (currentFriendRequests.current.length === 0 || !currentFriendRequests.current.find(item => item.sender !== newFriend.user1 && item.sender !== newFriend.user2))) {
           LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
           setFriendList([newFriend, ...currentFriends.current]);
         }
@@ -91,13 +93,23 @@ export default function CustomSidebarMenu({ navigation, myId }) {
     ).subscribe({
       next: (event) => {
         const newFriendRequest = event.value.data.onMyNewFriendRequests;
-        if (newFriendRequest.receiver == myId && (currentFriendRequests.current.length == 0 || !currentFriendRequests.current.find(item => item.sender === newFriendRequest.sender))) {
-          setNewFriendRequests(currentNewFriendRequestCount.current+1);
-          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-          setFriendRequestList([
-            newFriendRequest,
-            ...currentFriendRequests.current,
-          ]);
+        if (newFriendRequest.receiver === myId && (currentFriendRequests.current.length === 0 || !currentFriendRequests.current.find(item => item.sender === newFriendRequest.sender))
+        (currentFriends.current.length === 0 || !currentFriends.current.find(item => item.user1 !== newFriendRequest.sender || item.user2 !== newFriendRequest.sender))) {
+          console.log("incoming friend request ",newFriendRequest, " my id is: ",myId);
+          //make sure it's a valid friend request
+
+          API.graphql(
+            graphqlOperation(getFriendRequest, { sender: myId, receiver: newFriendRequest.sender })
+          ).then(fr => {
+            if (fr.data.getFriendRequest == null) {
+              setNewFriendRequests(currentNewFriendRequestCount.current+1);
+              LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+              setFriendRequestList([
+                newFriendRequest,
+                ...currentFriendRequests.current,
+              ]);
+            }
+          });
         }
       },
     });
@@ -184,8 +196,20 @@ export default function CustomSidebarMenu({ navigation, myId }) {
     if (friendRequestList.length == 1) playSound("celebrate");
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     if (isNew) setNewFriendRequests(newFriendRequests - 1);
-    setFriendRequestList(friendRequestList.filter((i) => item.sender != i.sender || item.receiver != i.receiver
-    )); //locally removes the item
+    setFriendRequestList(
+      friendRequestList.filter(
+        (i) => item.sender != i.sender || item.receiver != i.receiver
+      )
+    ); //locally removes the item
+    if (item.accepted && (friendList.length == 0 || !friendList.find(item => item.user1 !== item.sender && item.user2 !== item.sender))) {
+      setFriendList([{
+        createdAt: (new Date(Date.now())).toISOString(),
+        updatedAt: (new Date(Date.now())).toISOString(),
+        user1: item.receiver < item.sender ? item.receiver : item.sender,
+        user2: item.receiver < item.sender ? item.sender : item.receiver,
+        hifives: 0
+      }, ...friendList]);
+    }
   };
 
   const removeFriend = async (item) => {
@@ -216,7 +240,8 @@ export default function CustomSidebarMenu({ navigation, myId }) {
         style={{
           backgroundColor: "white",
           paddingTop: 15,
-        }}>
+        }}
+      >
         <ProfileImageAndName
           navigationObject={navigation}
           you={true}
@@ -224,7 +249,7 @@ export default function CustomSidebarMenu({ navigation, myId }) {
           userId={myId}
           isFull={true}
           fullname={true}
-          textLayoutStyle={{flex: 1}}
+          textLayoutStyle={{ flex: 1 }}
           imageStyle={{
             resizeMode: "cover",
             width: 50,
@@ -243,15 +268,29 @@ export default function CustomSidebarMenu({ navigation, myId }) {
       </View>
 
       <Accordion
-        style={{marginTop: 0}}
-        headerText={"Friend Requests" + (newFriendRequests > 0 ? " (" + (newFriendRequests <= 20 ? newFriendRequests : "20+") + ")" : "")} //would be nice if we had a total friend request count. but then you'd be able to see when people revoke their friend requests.
+        style={{ marginTop: 0 }}
+        open={friendRequestList.length > 0}
+        headerText={
+          "Friend Requests" +
+          (newFriendRequests > 0
+            ? " (" + (newFriendRequests <= 20 ? newFriendRequests : "20+") + ")"
+            : "")
+        } //would be nice if we had a total friend request count. but then you'd be able to see when people revoke their friend requests.
         headerTextStyle={{
           fontSize: 18,
           color: newFriendRequests > 0 ? "blue" : "gray",
-          textDecorationLine: friendRequestList.length > 0 ? 'none' : 'line-through',
+          textDecorationLine:
+            friendRequestList.length > 0 ? "none" : "line-through",
         }}
         iconColor={newFriendRequests > 0 ? "blue" : "gray"}
-        closeFunction={() => {setNewFriendRequests(0)}}
+        closeFunction={() => {
+          setNewFriendRequests(0);
+          const newlist = friendRequestList.filter((i) => !i.accepted && !i.rejected);
+          setFriendRequestList(
+            newlist
+          );
+          if (newlist.length == 0 && friendRequestList.length > 0) playSound("celebrate");
+        }}
         empty={friendRequestList.length == 0}
       >
         <APIList
@@ -284,7 +323,7 @@ export default function CustomSidebarMenu({ navigation, myId }) {
         headerTextStyle={{
           fontSize: 18,
           color: "grey",
-          textDecorationLine: friendList.length > 0 ? 'none' : 'line-through',
+          textDecorationLine: friendList.length > 0 ? "none" : "line-through",
         }}
       >
         <APIList

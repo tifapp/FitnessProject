@@ -22,7 +22,7 @@ import PostItem from "components/PostItem";
 import { onCreatePost, onDeletePost, onUpdatePost, onCreateLike, onDeleteLike, didIncrementLikes } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
 import APIList from 'components/APIList';
-import { AntDesign } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { lessThan } from "react-native-reanimated";
 
 require('root/androidtimerfix');
@@ -254,14 +254,20 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }} >
+    <SafeAreaView style={{ flex: 1 }}>
       <APIList
         ListRef={scrollRef}
         ListHeaderComponent={
           <View style={{}}>
-            <Text style={{ marginTop: 20, marginLeft: 5 }}> Characters remaining: {numCharsLeft} </Text>
+            <Text style={{ marginTop: 20, marginLeft: 5 }}>
+              {" "}
+              Characters remaining: {numCharsLeft}{" "}
+            </Text>
             <TextInput
-              style={[styles.textInputStyle, { marginTop: 5, marginBottom: 30 }]}
+              style={[
+                styles.textInputStyle,
+                { marginTop: 5, marginBottom: 30 },
+              ]}
               multiline={true}
               placeholder="Start Typing..."
               onChangeText={setPostVal}
@@ -270,34 +276,43 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
               maxLength={1000}
             />
 
-            <View style={{
-              flexDirection: 'row',
-              justifyContent: 'center',
-              marginBottom: 15,
-            }}>
-              {
-                postVal === ""
-                ? <TouchableOpacity
-                  style={styles.unselectedButtonStyle}
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                marginBottom: 15,
+              }}
+            >
+              {postVal === "" ? (
+                <TouchableOpacity
+                  style={[
+                    styles.unselectedButtonStyle,
+                    { flexDirection: "row" },
+                  ]}
                   onPress={() => {
                     alert("No text detected in text field");
                   }}
                 >
-                  <Text style={[styles.buttonTextStyle, {color: 'gray'}]}>{
-                    receiver != null ? 'Send Message'
-                      : 'Add Post'
-                  }</Text>
+                  <MaterialIcons
+                    name="add-circle"
+                    size={40}
+                    color={"gray"}
+                    style={{ marginRight: 4 }}
+                  />
+                  <Text style={[styles.buttonTextStyle, { color: "gray" }]}>
+                    {receiver != null ? "Send Message" : "Add Post"}
+                  </Text>
                 </TouchableOpacity>
-                : <TouchableOpacity
+              ) : (
+                <TouchableOpacity
                   style={styles.buttonStyle}
                   onPress={addPostAsync}
                 >
-                  <Text style={styles.buttonTextStyle}>{
-                    receiver != null ? 'Send Message'
-                      : 'Add Post'
-                  }</Text>
+                  <Text style={styles.buttonTextStyle}>
+                    {receiver != null ? "Send Message" : "Add Post"}
+                  </Text>
                 </TouchableOpacity>
-              }
+              )}
             </View>
           </View>
         }
@@ -305,7 +320,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
         queryOperation={postsByChannel}
         setDataFunction={setPosts}
         data={posts}
-        filter={{ channel: getChannel(), sortDirection: 'DESC' }}
+        filter={{ channel: getChannel(), sortDirection: "DESC" }}
         renderItem={({ item, index }) => (
           <PostItem
             item={item}
@@ -315,15 +330,23 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
             replyButtonHandler={replyPostAsync}
             receiver={receiver}
             showTimestamp={showTimestamp(item, index)}
-            newSection={index == 0 ? true : showTimestamp(posts[index-1], index-1)}
+            newSection={
+              index == 0 ? true : showTimestamp(posts[index - 1], index - 1)
+            }
           />
         )}
-        keyExtractor={item => item.createdAt.toString() + item.userId}
+        keyExtractor={(item) => item.createdAt.toString() + item.userId}
       />
 
-      <View style={{ marginBottom: 40, position: 'absolute', alignSelf: 'flex-end' }}>
+      <View
+        style={{
+          marginBottom: 40,
+          position: "absolute",
+          alignSelf: "flex-end",
+        }}
+      >
         <TouchableOpacity onPress={scrollToTop}>
-          <AntDesign name="arrowup" size={38} color="black" />
+          <MaterialIcons name="arrow-upward" size={38} color="black" />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
