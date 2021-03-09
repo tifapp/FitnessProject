@@ -8,68 +8,77 @@ import {
   TextInput,
   Text,
   TouchableOpacity,
+  LayoutAnimation,
 } from "react-native";
 import { getUser } from "../src/graphql/queries";
-import { ProfileImageAndName } from './ProfileImageAndName'
+import { ProfileImageAndName } from "./ProfileImageAndName";
 import { API, graphqlOperation } from "aws-amplify";
 import { createLike, deleteLike } from "root/src/graphql/mutations";
-import { useNavigation } from '@react-navigation/native';
-import printTime from 'hooks/printTime';
+import { useNavigation } from "@react-navigation/native";
+import printTime from "hooks/printTime";
 import { MaterialIcons } from "@expo/vector-icons";
 
-import * as Haptics from 'expo-haptics';
+import * as Haptics from "expo-haptics";
 
-var styles = require('../styles/stylesheet');
+var styles = require("../styles/stylesheet");
 
-function LikeButton({
-  likes,
-  likedByYou,
-  postId
-}) {
+function LikeButton({ likes, likedByYou, postId }) {
   const [liked, setLiked] = useState(likedByYou);
-  
+
   const likePostAsync = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     try {
       setLiked(!liked);
       if (liked) {
-        await API.graphql(graphqlOperation(deleteLike, { input: { userId: "0", postId: postId, } }));
+        await API.graphql(
+          graphqlOperation(deleteLike, {
+            input: { userId: "0", postId: postId },
+          })
+        );
         console.log("success in unliking post");
       } else {
-        await API.graphql(graphqlOperation(createLike, { input: { postId: postId, } }));
+        await API.graphql(
+          graphqlOperation(createLike, { input: { postId: postId } })
+        );
         console.log("success in liking post, id is ", postId);
       }
     } catch (err) {
       console.log(err);
-      alert('Could not be submitted!');
+      alert("Could not be submitted!");
     }
-  }
+  };
 
-  if (liked) {
-    return (
-      <TouchableOpacity style={[{ alignItems: "flex-end", flexDirection: "row" }]} onPress={likePostAsync}>
-        <MaterialIcons
-                name="favorite"
-                size={18}
-                color={"red"}
-                style={{ marginRight: 0 }}
-              />
-        <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>{likes ? likedByYou ? likes : likes + 1 : 1}</Text>
-      </TouchableOpacity>
-    )
-  } else {
-    return (
-      <TouchableOpacity style={[{ flexDirection: "row", borderColor: 'red', borderWidth: 0 }]} color="red" onPress={likePostAsync}>
+  return (
+    <TouchableOpacity
+      style={[{ flex: 1, flexDirection: "row",
+      paddingHorizontal: 15, paddingTop: 15, }]}
+      onPress={likePostAsync}
+    >
+      <Text
+        style={[
+          { marginRight: 6, fontWeight: "bold", color: liked ? "red" : "gray" },
+        ]}
+      >
+        {liked
+          ? likes
+            ? likedByYou
+              ? likes
+              : likes + 1
+            : 1
+          : likes
+          ? likedByYou
+            ? likes - 1
+            : likes
+          : 0}
+      </Text>
       <MaterialIcons
-              name="favorite-outline"
-              size={18}
-              color={"red"}
-              style={{ marginRight: 0 }}
-            />
-        <Text style={[styles.unselectedButtonTextStyle, { color: 'red' }]}>{likes ? likedByYou ? likes - 1 : likes : 0}</Text>
-      </TouchableOpacity>
-    )
-  }
+        name={liked ? "favorite" : "favorite-outline"}
+        size={17}
+        color={liked ? "red" : "gray"}
+        style={{ marginRight: 0 }}
+      />
+    </TouchableOpacity>
+  );
 }
 
 export default function PostItem({
@@ -80,7 +89,7 @@ export default function PostItem({
   replyButtonHandler,
   receiver,
   showTimestamp,
-  newSection
+  newSection,
 }) {
   const [isReplying, setIsReplying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -99,104 +108,188 @@ export default function PostItem({
             item.isParent == 1 ? styles.spaceAround : styles.spaceAroundReply
           }
         >
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              backgroundColor: "white",
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 1,
-              },
-              shadowOpacity: 0.18,
-              shadowRadius: 1.0,
-
-              elevation: 1,
-            }}
-          >
+          <View>
             <ProfileImageAndName
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                backgroundColor: "white",
+                shadowColor: "#000",
+                shadowOffset: {
+                  width: 0,
+                  height: 1,
+                },
+                shadowOpacity: 0.18,
+                shadowRadius: 1.0,
+
+                elevation: 1,
+              }}
               imageStyle={[styles.smallImageStyle, { marginRight: 15 }]}
-              textLayoutStyle={{ flex: 1 }}
+              textLayoutStyle={{ flex: 1, marginTop: 15, marginBottom: 15 }}
               textStyle={{
-                fontSize: 15,
                 flex: 1,
               }}
               userId={item.userId}
               subtitleComponent={
                 <View style={{}}>
-                  <Text>{displayTime}</Text>
+                  <Text style={{ color: "gray" }}>{displayTime}</Text>
+                </View>
+              }
+              sibling={
+                <View
+                  style={{
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    alignItems: "flex-end",
+                    flex: 1,
+                  }}
+                >
+                  <LikeButton
+                    likes={item.likes}
+                    likedByYou={item.likedByYou}
+                    postId={
+                      item.createdAt +
+                      "#" +
+                      item.userId +
+                      "#" +
+                      item.channel +
+                      "#" +
+                      item.parentId +
+                      "#" +
+                      item.isParent
+                    }
+                  />
+                  <TouchableOpacity
+                    style={[
+                      {
+                        paddingHorizontal: 15,
+                        paddingBottom: 15,
+                        flex: 1,
+                        borderWidth: 0,
+                        flexDirection: "row",
+                        alignItems: "flex-end",
+                      },
+                    ]}
+                    onPress={() => setIsReplying(!isReplying)}
+                  >
+                    <Text
+                      style={[
+                        {
+                          paddingRight: 6,
+                          fontWeight: "bold",
+                          color: isReplying ? "blue" : "gray",
+                        },
+                      ]}
+                    >
+                      0
+                    </Text>
+                    <MaterialIcons
+                      name="chat-bubble-outline"
+                      size={17}
+                      color={isReplying ? "blue" : "gray"}
+                      style={{ marginRight: 0 }}
+                    />
+                  </TouchableOpacity>
                 </View>
               }
             />
+            {isReplying ? (
+              <View
+                style={[
+                  {
+                    shadowColor: "#000",
+                    shadowOffset: {
+                      width: 0,
+                      height: 1,
+                    },
+                    shadowOpacity: 0.22,
+                    shadowRadius: 2.22,
+
+                    elevation: 3,
+                    position: "absolute",
+                    top: -18,
+                    left: -18,
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                  },
+                ]}
+              >
+                <View
+                  style={{
+                    backgroundColor: "blue",
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <MaterialIcons
+                    name="chat-bubble"
+                    size={17}
+                    color={"white"}
+                    style={{ padding: 6 }}
+                  />
+                  <Text
+                    style={[
+                      { marginRight: 6, fontWeight: "bold", color: "white" },
+                    ]}
+                  >
+                    Replying to
+                  </Text>
+                </View>
+              </View>
+            ) : null}
             <View
               style={{
-                marginHorizontal: 30,
+                marginHorizontal: 24,
                 flexDirection: "column",
-                justifyContent: "space-evenly",
+                justifyContent: "space-between",
+                alignItems: "stretch",
               }}
             >
-              <LikeButton
-                likes={item.likes}
-                likedByYou={item.likedByYou}
-                postId={
-                  item.createdAt +
-                  "#" +
-                  item.userId +
-                  "#" +
-                  item.channel +
-                  "#" +
-                  item.parentId +
-                  "#" +
-                  item.isParent
-                }
-              />
               {writtenByYou ? (
                 <View
                   style={{
-                    marginHorizontal: 30,
+                    marginHorizontal: 24,
                     flexDirection: "row",
                     justifyContent: "space-evenly",
                   }}
                 >
                   <TouchableOpacity
-                    style={[styles.unselectedButtonStyle, { borderColor: "red" }]}
+                    style={[
+                      styles.unselectedButtonStyle,
+                      { borderColor: "red" },
+                    ]}
                     color="red"
                     onPress={() => deletePostsAsync(item.createdAt)}
                   >
                     <Text
-                      style={[styles.unselectedButtonTextStyle, { color: "red" }]}
+                      style={[
+                        styles.unselectedButtonTextStyle,
+                        { color: "red" },
+                      ]}
                     >
                       Delete
                     </Text>
                   </TouchableOpacity>
-    
+
                   <TouchableOpacity
-                    style={[styles.unselectedButtonStyle, { borderColor: "blue" }]}
+                    style={[
+                      styles.unselectedButtonStyle,
+                      { borderColor: "blue" },
+                    ]}
                     color="blue"
                     onPress={() => setIsEditing(!isEditing)}
                   >
                     <Text
-                      style={[styles.unselectedButtonTextStyle, { color: "blue" }]}
+                      style={[
+                        styles.unselectedButtonTextStyle,
+                        { color: "blue" },
+                      ]}
                     >
                       Edit
                     </Text>
                   </TouchableOpacity>
                 </View>
-              ) : null}
-              {item.isParent == 1 ? (
-                <TouchableOpacity
-                  style={[styles.unselectedButtonStyle, { borderWidth: 0 }]}
-                  color="orange"
-                  onPress={() => setIsReplying(!isReplying)}
-                >
-                  <Text
-                    style={[styles.unselectedButtonTextStyle, { color: "blue" }]}
-                  >
-                    Reply
-                  </Text>
-                </TouchableOpacity>
               ) : null}
             </View>
           </View>
@@ -209,7 +302,17 @@ export default function PostItem({
               {item.description}
             </TextInput>
           ) : (
-            <Text style={{flex: 1}}>{item.description}</Text>
+            <Text
+              style={{
+                flex: 1,
+                paddingTop: 24,
+                paddingBottom: 36,
+                paddingLeft: 12,
+                fontSize: 16,
+              }}
+            >
+              {item.description}
+            </Text>
           )}
         </View>
 
@@ -242,35 +345,69 @@ export default function PostItem({
         {isReplying ? (
           <View>
             <TextInput
-              style={[styles.check, { borderColor: "orange" }]}
+              style={[
+                styles.check,
+                {
+                  borderColor: "blue",
+                  backgroundColor: "#efefef",
+                  marginHorizontal: 24,
+                  paddingVertical: 12,
+                },
+              ]}
               onChangeText={setReplyingText}
               autoFocus={true}
             />
             {replyingText === "" ? (
               <TouchableOpacity
-                style={styles.unselectedButtonStyle}
+                style={[styles.unselectedButtonStyle, { flexDirection: "row", margin: 15 }]}
                 onPress={() => {
                   alert("Reply can't be empty");
                 }}
               >
+                <MaterialIcons
+                  name="add-circle"
+                  size={30}
+                  color={"gray"}
+                  style={{ marginRight: 0 }}
+                />
                 <Text style={[styles.buttonTextStyle, { color: "gray" }]}>
-                  {"Submit Reply"}
+                  {"Add Reply"}
                 </Text>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
-                style={styles.buttonStyle}
+                style={[styles.buttonStyle, {
+                  backgroundColor: "orange",
+                  padding: 10,
+                  borderRadius: 5,
+                  margin: 15,
+                flexDirection: "row"}]}
                 onPress={() => {
                   replyButtonHandler(item.parentId, replyingText),
                     setReplyingText(""),
                     setIsReplying(false);
                 }}
               >
-                <Text style={styles.buttonTextStyle}>{"Submit Reply"}</Text>
+              <MaterialIcons
+                name="add-circle"
+                size={30}
+                color={"white"}
+                style={{ marginRight: 0 }}
+              />
+              <Text style={[styles.buttonTextStyle]}>
+                {"Add Reply"}
+              </Text>
               </TouchableOpacity>
             )}
           </View>
         ) : null}
+        <View
+          style={{
+            height: 1,
+            backgroundColor: "#efefef",
+            marginHorizontal: 12,
+          }}
+        ></View>
       </View>
     );
   else {
@@ -294,31 +431,39 @@ export default function PostItem({
             }
     */
     return (
-      <View style={[styles.secondaryContainerStyle, { backgroundColor: '#fff' }]}>
+      <View
+        style={[styles.secondaryContainerStyle, { backgroundColor: "#fff" }]}
+      >
         <View style={[styles.spaceAround]}>
           <View
-            style={
-              {
-                alignSelf: isReceivedMessage ? 'flex-start' : 'flex-end',
-                backgroundColor: "#efefef",
-                padding: 15,
-                
-                shadowColor: "#000",
-                shadowOffset: {
-                  width: 0,
-                  height: 3,
-                },
-                shadowOpacity: 0.27,
-                shadowRadius: 4.65,
+            style={{
+              alignSelf: isReceivedMessage ? "flex-start" : "flex-end",
+              backgroundColor: "#efefef",
+              padding: 15,
 
-                elevation: 6,
-              }
-            }
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 3,
+              },
+              shadowOpacity: 0.27,
+              shadowRadius: 4.65,
+
+              elevation: 6,
+            }}
           >
-            <Text style={{ color: '#000' }}>{item.description}</Text>
+            <Text style={{ color: "#000" }}>{item.description}</Text>
           </View>
           <View>
-            <Text style={{ color: '#000', marginTop: 15, textAlign: isReceivedMessage ? 'left' : 'right' }}>{displayTime}</Text>
+            <Text
+              style={{
+                color: "#000",
+                marginTop: 15,
+                textAlign: isReceivedMessage ? "left" : "right",
+              }}
+            >
+              {displayTime}
+            </Text>
           </View>
         </View>
       </View>

@@ -115,23 +115,22 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
       return <ActivityIndicator color="#0000ff" style={[props.style]} />;
     } else {
       return (
-        <TouchableOpacity
-          onPress={goToProfile}
+        <View
           style={[
             props.style,
             {
-              flexShrink: 1,
               flexDirection: props.vertical ? "column" : "row",
               alignItems: "center",
               alignContent: "flex-start",
               justifyContent: "flex-start",
-              padding: 15,
             },
           ]}
         >
-          <View>
+          <TouchableOpacity
+          onPress={goToProfile}>
             <Image
-              style={props.imageStyle}
+              style={[props.imageStyle, {
+                margin: 15,}]}
               source={
                 userInfo.imageURL === ""
                   ? require("../assets/icon.png")
@@ -139,7 +138,7 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
               }
             />
             {props.imageOverlay}
-          </View>
+          </TouchableOpacity>
           <View style={props.textLayoutStyle}>
             {props.isFull || userInfo.name.length <= 40 ? (
               <Text
@@ -156,7 +155,8 @@ export const ProfileImageAndName = (props) => { //user is required in props. it'
             )}
             {props.subtitleComponent}
           </View>
-        </TouchableOpacity>
+          {props.sibling}
+        </View>
       );
     }
 }

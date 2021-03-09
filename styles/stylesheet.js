@@ -173,12 +173,14 @@ module.exports = StyleSheet.create({
     fontWeight: "bold",
   },
   spaceAround: {
-    paddingHorizontal: 5,
-    paddingVertical: 15,
+    paddingLeft: 24,
+    paddingTop: 24,
+    paddingRight: 24,
+    paddingBottom: 0,
   },
   spaceAroundReply: {
     paddingHorizontal: 60,
-    paddingVertical: 15,
+    paddingTop: 24,
   },
   top: {
     alignItems: "center",
@@ -209,10 +211,6 @@ module.exports = StyleSheet.create({
     borderColor: "#bbb",
     borderWidth: 2,
     borderStyle: "solid",
-    borderRadius: 10,
-  },
-  spaceAround: {
-    padding: 25,
   },
   secondaryContainerStyle: {
     backgroundColor: "#fdfffe",

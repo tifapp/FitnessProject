@@ -295,9 +295,9 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
                 >
                   <MaterialIcons
                     name="add-circle"
-                    size={40}
+                    size={30}
                     color={"gray"}
-                    style={{ marginRight: 4 }}
+                    style={{ marginRight: 0 }}
                   />
                   <Text style={[styles.buttonTextStyle, { color: "gray" }]}>
                     {receiver != null ? "Send Message" : "Add Post"}
@@ -305,9 +305,19 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity
-                  style={styles.buttonStyle}
+                  style={styles.buttonStyle, {flexDirection: "row", 
+                  backgroundColor: "orange",
+                  padding: 10,
+                  borderRadius: 5,
+                  marginHorizontal: 6,}}
                   onPress={addPostAsync}
                 >
+                <MaterialIcons
+                  name="add-circle"
+                  size={30}
+                  color={"white"}
+                  style={{ marginRight: 0 }}
+                />
                   <Text style={styles.buttonTextStyle}>
                     {receiver != null ? "Send Message" : "Add Post"}
                   </Text>

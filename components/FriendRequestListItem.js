@@ -43,7 +43,6 @@ export default function FriendRequestListItem({
           alignSelf: "center",
         }}
         textStyle={{
-          marginLeft: 15,
           fontWeight: "normal",
           fontSize: 15,
           color:

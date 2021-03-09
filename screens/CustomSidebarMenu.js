@@ -256,10 +256,8 @@ export default function CustomSidebarMenu({ navigation, myId }) {
             height: 50,
             borderRadius: 0,
             alignSelf: "center",
-            marginTop: 0,
           }}
           textStyle={{
-            marginLeft: 15,
             fontWeight: "bold",
             fontSize: 20,
             color: "black",
@@ -279,10 +277,12 @@ export default function CustomSidebarMenu({ navigation, myId }) {
         headerTextStyle={{
           fontSize: 18,
           color: newFriendRequests > 0 ? "blue" : "gray",
+          openColor: newFriendRequests > 0 ? "blue" : "black",
           textDecorationLine:
             friendRequestList.length > 0 ? "none" : "line-through",
         }}
         iconColor={newFriendRequests > 0 ? "blue" : "gray"}
+        iconOpenColor={newFriendRequests > 0 ? "blue" : "black"}
         closeFunction={() => {
           setNewFriendRequests(0);
           const newlist = friendRequestList.filter((i) => !i.accepted && !i.rejected);
@@ -345,7 +345,7 @@ export default function CustomSidebarMenu({ navigation, myId }) {
               ],
             },
           }}
-          setDataFunction={setFriendList}
+          setDataFunction={setFriendList} //a batch function should be used to grab message previews. that would also make it easy to exclude any.
           data={friendList}
           renderItem={({ item }) => (
             <FriendListItem

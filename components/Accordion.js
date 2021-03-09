@@ -65,7 +65,7 @@ export default function Accordion(props) {
           }]}
         >
           <Text
-            style={[props.headerTextStyle, open ? { color: "black" } : null]}
+            style={[props.headerTextStyle, open ? ( { color: props.headerTextStyle.openColor ?? "black" }) : null]}
           >
             {props.headerText}
           </Text>
@@ -73,7 +73,7 @@ export default function Accordion(props) {
             <MaterialIcons
               name="arrow-drop-down"
               size={30}
-              color={open ? "black" : props.iconColor ?? "gray"}
+              color={open ? (props.iconOpenColor ?? "black") : props.iconColor ?? "gray"}
             />
           </Animated.View>
         </View>
