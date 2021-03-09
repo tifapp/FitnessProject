@@ -129,6 +129,7 @@ export default function PostItem({
               textLayoutStyle={{ flex: 1, marginTop: 15, marginBottom: 15 }}
               textStyle={{
                 flex: 1,
+                fontWeight: writtenByYou ? "bold" : "normal"
               }}
               userId={item.userId}
               subtitleComponent={
