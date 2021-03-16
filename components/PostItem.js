@@ -19,6 +19,7 @@ import printTime from "hooks/printTime";
 import { MaterialIcons } from "@expo/vector-icons";
 
 import * as Haptics from "expo-haptics";
+import playSound from "../hooks/playSound";
 
 var styles = require("../styles/stylesheet");
 
@@ -26,6 +27,7 @@ function LikeButton({ likes, likedByYou, postId }) {
   const [liked, setLiked] = useState(likedByYou);
 
   const likePostAsync = async () => {
+    liked ? playSound("unlike") : playSound("like"); 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     try {
       setLiked(!liked);

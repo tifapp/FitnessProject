@@ -200,7 +200,7 @@ export const ProfileImageAndName = (props) => {
               >
                 {userInfo.name.substring(0, 40)} ...
               </Text>
-            )}
+            ))}
             {props.subtitleComponent}
           </View>
           {props.sibling}
