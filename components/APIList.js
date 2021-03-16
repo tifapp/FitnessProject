@@ -7,7 +7,6 @@ import {
   SectionList,
   ActivityIndicator,
   Text,
-  LayoutAnimation,
 } from "react-native";
 import { API, graphqlOperation } from "aws-amplify";
 
@@ -27,13 +26,10 @@ class APIList extends Component { //we need to make this a class to use refs fro
 
   componentDidMount() {
     if (this.props.initialState != null) {
-      console.log("children state was saved");
       console.log(this.props.initialState);
       this.setState(this.props.initialState);
     } else {
-      console.log("children state was not saved");
       if (!this.props.ignoreInitialLoad) {
-        console.log("fetching again");
         this.setState({loadingInitial: true});
         this.fetchDataAsync(true)
         .finally(() => this.setState({loadingInitial: false}));
@@ -115,7 +111,6 @@ class APIList extends Component { //we need to make this a class to use refs fro
         this.props.initialLoadFunction(results);
       }
 
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       if (!wasBeginning)
         this.props.setDataFunction([...this.props.data, ...results]);
       else

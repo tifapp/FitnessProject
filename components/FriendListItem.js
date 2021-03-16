@@ -33,7 +33,7 @@ export default function FriendListItem({
     <View>
       <View
         style={[
-          { flexDirection: "row" },
+          { flexDirection: "row", alignItems: "flex-start" },
           isSelected && { backgroundColor: "orange" },
         ]}
       >
@@ -43,11 +43,11 @@ export default function FriendListItem({
             const message = "";
             const options = [
               {
-                text: "Block    ",
+                text: "Block",
                 onPress: () => {},
               }, //if submithandler fails user won't know
               {
-                text: "Unfriend    ",
+                text: "Unfriend",
                 onPress: () => {
                   const title = "Are you sure you want to remove this friend?";
                   const options = [
@@ -69,7 +69,7 @@ export default function FriendListItem({
                 },
               }, //if submithandler fails user won't know
               {
-                text: "    Cancel",
+                text: "Cancel",
                 type: "cancel",
                 onPress: () => {
                   setIsSelected(false);
@@ -79,7 +79,7 @@ export default function FriendListItem({
             Alert.alert(title, message, options, alertOptions);
             setIsSelected(true);
           }}
-          style={{ alignSelf: "center", paddingHorizontal: 8, }}
+          style={{ alignSelf: "center", paddingHorizontal: 8}}
         >
           <MaterialIcons
             name="more-vert"
@@ -91,13 +91,12 @@ export default function FriendListItem({
           navigationObject={navigation}
           style={{ flex: 1 }}
           imageStyle={{
-            marginLeft: 0,
             resizeMode: "cover",
             width: 50,
             height: 50,
-            borderRadius: 0,
             alignSelf: "center",
           }}
+          imageLayoutStyle={{marginLeft: 0}}
           textStyle={{
             fontWeight: "normal",
             fontSize: 15,

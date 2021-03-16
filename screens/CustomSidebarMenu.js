@@ -41,18 +41,21 @@ import Accordion from "components/Accordion";
 import FriendListItem from "components/FriendListItem";
 import FriendRequestListItem from "components/FriendRequestListItem";
 import playSound from "../hooks/playSound";
+import { useIsDrawerOpen } from '@react-navigation/drawer';
 
-export default function CustomSidebarMenu({ navigation, myId }) {
+export default function CustomSidebarMenu({ navigation, state, progress, myId }) {
   const [lastOnlineTime, setLastOnlineTime] = useState(0);
   const [friendList, setFriendList] = useState([]);
   const [friendRequestList, setFriendRequestList] = useState([]);
   const [newFriendRequests, setNewFriendRequests] = useState(0); //should persist across sessions (ex. if you receive new friend requests while logged out)
 
+  const isDrawerOpen = useRef();
   const currentFriends = useRef();
   const currentFriendRequests = useRef();
   const currentNewFriendRequestCount = useRef();
   const currentFriendRequestListRef = useRef();
 
+  isDrawerOpen.current = useIsDrawerOpen();
   currentFriends.current = friendList;
   currentFriendRequests.current = friendRequestList;
   currentNewFriendRequestCount.current = newFriendRequests;
@@ -80,6 +83,7 @@ export default function CustomSidebarMenu({ navigation, myId }) {
     ).subscribe({
       next: (event) => {
         const deletedFriend = event.value.data.onDeleteFriendship;
+        console.log("friend deleted ", deletedFriend);
         if (currentFriends.current.length > 0 && currentFriends.current.find(item => item.user1 === deletedFriend.user1 && item.user2 === deletedFriend.user2)) {
           var index = currentFriends.current.findIndex(item => item.user1 === deletedFriend.user1 && item.user2 === deletedFriend.user2);
           currentFriends.current.splice(index, 1);
@@ -92,16 +96,22 @@ export default function CustomSidebarMenu({ navigation, myId }) {
       graphqlOperation(onMyNewFriendRequests, { receiver: myId })
     ).subscribe({
       next: (event) => {
+        //console.log("is drawer open? ", isDrawerOpen.current);
         const newFriendRequest = event.value.data.onMyNewFriendRequests;
-        if (newFriendRequest.receiver === myId && (currentFriendRequests.current.length === 0 || !currentFriendRequests.current.find(item => item.sender === newFriendRequest.sender))
-        (currentFriends.current.length === 0 || !currentFriends.current.find(item => item.user1 !== newFriendRequest.sender || item.user2 !== newFriendRequest.sender))) {
-          console.log("incoming friend request ",newFriendRequest, " my id is: ",myId);
+
+        if ((currentFriendRequests.current.length === 0 || !currentFriendRequests.current.find(item => item.sender === newFriendRequest.sender))
+        && (currentFriends.current.length === 0 || !currentFriends.current.find(item => item.user1 === newFriendRequest.sender || item.user2 === newFriendRequest.sender))) {
+          //console.log("incoming friend request ",newFriendRequest, " my id is: ",myId);
           //make sure it's a valid friend request
 
           API.graphql(
             graphqlOperation(getFriendRequest, { sender: myId, receiver: newFriendRequest.sender })
           ).then(fr => {
             if (fr.data.getFriendRequest == null) {
+              if (!isDrawerOpen.current) {
+                console.log("incrementing counter");
+                global.incrementNotificationCount();
+              }
               setNewFriendRequests(currentNewFriendRequestCount.current+1);
               LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
               setFriendRequestList([
@@ -119,6 +129,15 @@ export default function CustomSidebarMenu({ navigation, myId }) {
       friendRequestSubscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    if (isDrawerOpen.current) {
+      playSound("collapse");
+      global.resetNotificationCount();
+    } else {
+      playSound("expand");
+    }
+  }, [isDrawerOpen.current]);
 
   const getNonPendingRequests = async (items) => {
     let senders = [];
@@ -260,7 +279,7 @@ export default function CustomSidebarMenu({ navigation, myId }) {
           textStyle={{
             fontWeight: "bold",
             fontSize: 20,
-            color: "black",
+            color: (state.index === state.routes.length-1 && state.routes[state.routes.length-1].name === "Profile") ? "blue" : "black",
           }}
         />
       </View>
@@ -277,10 +296,10 @@ export default function CustomSidebarMenu({ navigation, myId }) {
         headerTextStyle={{
           fontSize: 18,
           color: newFriendRequests > 0 ? "blue" : "gray",
-          openColor: newFriendRequests > 0 ? "blue" : "black",
           textDecorationLine:
             friendRequestList.length > 0 ? "none" : "line-through",
         }}
+        openTextColor={newFriendRequests > 0 ? "blue" : "black"}
         iconColor={newFriendRequests > 0 ? "blue" : "gray"}
         iconOpenColor={newFriendRequests > 0 ? "blue" : "black"}
         closeFunction={() => {

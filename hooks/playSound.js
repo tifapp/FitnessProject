@@ -8,6 +8,14 @@ export default async function playSound(soundName) {
     require('audio/confirm-down.wav') :
     soundName == "complete" ?
     require("audio/complete.wav") :
+    soundName == "like" ?
+    require("audio/like.wav") :
+    soundName == "unlike" ?
+    require("audio/unlike.wav") :
+    soundName == "expand" ?
+    require("audio/expand.wav") :
+    soundName == "collapse" ?
+    require("audio/collapse.wav") :
     require("audio/celebrate.wav")
   );
   sound.playAsync();

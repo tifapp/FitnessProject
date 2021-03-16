@@ -14,6 +14,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import playSound from "../hooks/playSound";
 
 import * as Haptics from "expo-haptics";
 
@@ -65,7 +66,7 @@ export default function Accordion(props) {
           }]}
         >
           <Text
-            style={[props.headerTextStyle, open ? ( { color: props.headerTextStyle.openColor ?? "black" }) : null]}
+            style={[props.headerTextStyle, open ? ( { color: props.openTextColor ?? "black" }) : null]}
           >
             {props.headerText}
           </Text>

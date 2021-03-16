@@ -248,6 +248,7 @@ const LookupUser = ({ route, navigation }) => {
                 userId={userId}
                 isFull={true}
                 fullname={true}
+                callback={(info)=>{navigation.setOptions({title: info.name})}}
               />
             </View>
 

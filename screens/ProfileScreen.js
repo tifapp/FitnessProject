@@ -166,7 +166,7 @@ const ProfileScreen = ({ navigation, route }) => {
                         <Text style={styles.unselectedButtonTextStyle}>Delete Account</Text>
                     </TouchableOpacity>
                 </View>
-                <View style={{ paddingBottom: 15 }}>
+                <View style={{ padding: 15 }}>
                     <ProfilePic imageURL={imageURL} setImageURL={setImageURL} setImageChanged={setImageChanged} />
                     <BasicInfo
                         name={name}

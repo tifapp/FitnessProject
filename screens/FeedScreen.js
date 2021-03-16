@@ -24,6 +24,7 @@ import NetInfo from '@react-native-community/netinfo';
 import APIList from 'components/APIList';
 import { MaterialIcons } from '@expo/vector-icons';
 import { lessThan } from "react-native-reanimated";
+import { ProfileImageAndName } from "components/ProfileImageAndName";
 
 require('root/androidtimerfix');
 
@@ -259,10 +260,27 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
         ListRef={scrollRef}
         ListHeaderComponent={
           <View style={{}}>
+            <View style={{flexDirection: "row"}}>
+            <ProfileImageAndName
+              you={true}
+              navigation={false}
+              userId={route.params?.id}
+              isFull={true}
+              fullname={true}
+              hidename={true}
+              imageStyle={{
+                resizeMode: "cover",
+                width: 50,
+                height: 50,
+                borderRadius: 0,
+                alignSelf: "center",
+              }}
+            />
             <Text style={{ marginTop: 20, marginLeft: 5 }}>
               {" "}
               Characters remaining: {numCharsLeft}{" "}
             </Text>
+            </View>
             <TextInput
               style={[
                 styles.textInputStyle,
