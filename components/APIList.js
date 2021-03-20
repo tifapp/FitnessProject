@@ -96,20 +96,25 @@ class APIList extends Component { //we need to make this a class to use refs fro
         beginning = false;
         nextToken = query.data[Object.keys(query.data)[0]].nextToken
         results = [...query.data[Object.keys(query.data)[0]].items, ...results]
+        console.log(results);
         //console.log("completed iteration of fetching, amount of results are ", results.length);
       } while (results.length < (wasBeginning ? initialAmount : additionalAmount) && nextToken != null);
 
-      if (this.props.processingFunction != null) {
-        results = await Promise.resolve(this.props.processingFunction(results ?? [])); //make sure this isn't undefined! in processingfunction return the results in the outermost layer!
+      if (this.props.processingFunction != null && results != null && results.length > 0) {
+        results = await Promise.resolve(this.props.processingFunction(results)); //make sure this isn't undefined! in processingfunction return the results in the outermost layer!
       }
 
       if (voidResultsFunction != null) {
         if (voidResultsFunction()) {this.setState({ loading: false }); return;}
       }
 
+      console.log("starting initial function")
+
       if (this.state.loadingInitial && this.props.initialLoadFunction != null) {
         this.props.initialLoadFunction(results);
       }
+
+      console.log("finished initial function")
 
       if (!wasBeginning)
         this.props.setDataFunction([...this.props.data, ...results]);

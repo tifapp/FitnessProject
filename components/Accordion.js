@@ -81,15 +81,12 @@ export default function Accordion(props) {
       </TouchableWithoutFeedback>
       <View style={{ flex: open ? 0 : 1 }}>
         {
-          open && !props.empty ? 
+          open ? 
           <View
             style={{ height: 1, backgroundColor: "#efefef", marginHorizontal: 12 }}
           ></View> : null
         }
-        {props.empty ? (
-          <View style={{height: 25}}>
-          </View>
-        ) : (
+        {(
           props.children
         )}
       </View>

@@ -72,7 +72,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
       next: (event) => {
         const newFriend = event.value.data.onCreateFriendship;
         if ((newFriend.user1 === myId || newFriend.user2 === myId) && (currentFriends.current.length === 0 || !currentFriends.current.find(item => item.user1 === newFriend.user1 && item.user2 === newFriend.user2))
-        && (currentFriendRequests.current.length === 0 || !currentFriendRequests.current.find(item => item.sender !== newFriend.user1 && item.sender !== newFriend.user2))) {
+        && (currentFriendRequests.current.length === 0 || !currentFriendRequests.current.find(item => item.sender === newFriend.user1 || item.sender === newFriend.user2))) {
           LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
           setFriendList([newFriend, ...currentFriends.current]);
         }
@@ -98,10 +98,10 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
       next: (event) => {
         //console.log("is drawer open? ", isDrawerOpen.current);
         const newFriendRequest = event.value.data.onMyNewFriendRequests;
+        console.log("incoming friend request ",newFriendRequest, " my id is: ",myId);
 
         if ((currentFriendRequests.current.length === 0 || !currentFriendRequests.current.find(item => item.sender === newFriendRequest.sender))
         && (currentFriends.current.length === 0 || !currentFriends.current.find(item => item.user1 === newFriendRequest.sender || item.user2 === newFriendRequest.sender))) {
-          //console.log("incoming friend request ",newFriendRequest, " my id is: ",myId);
           //make sure it's a valid friend request
 
           API.graphql(
@@ -123,6 +123,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
         }
       },
     });
+
     return () => {
       removedFriendSubscription.unsubscribe();
       friendSubscription.unsubscribe();
@@ -140,20 +141,25 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
   }, [isDrawerOpen.current]);
 
   const getNonPendingRequests = async (items) => {
+    console.log("getting non pending requests");
+    console.log(items);
     let senders = [];
 
     items.forEach((item) => {
+      console.log("ANALYZING ", item)
       senders.push({
         receiver: item.sender,
       });
     });
 
     try {
+      console.log("starting batchgetfriendrequests operation");
       const frs = await API.graphql(
         graphqlOperation(batchGetFriendRequests, {
           friendrequests: senders,
         })
       );
+      console.log("finished batchgetfriendrequests operation");
 
       let validRequests = [];
       for (i = 0; i < items.length; ++i) {
@@ -177,7 +183,6 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
   };
 
   const respondToRequest = async (item, accepted) => {
-    // delete friend object
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setFriendRequestList(
       friendRequestList.map(function (i) {
@@ -316,9 +321,9 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
           style={{}}
           ref={currentFriendRequestListRef}
           processingFunction={getNonPendingRequests}
-          initialLoadFunction={checkNewRequests}
+          //initialLoadFunction={checkNewRequests}
           queryOperation={friendRequestsByReceiver}
-          filter={{ receiver: myId }}
+          filter={{ receiver: myId, sortDirection: "DESC" }}
           setDataFunction={setFriendRequestList}
           data={friendRequestList}
           initialAmount={21}
