@@ -1,57 +1,38 @@
-type FriendRequest @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
-@auth(
-  rules: [
-      { allow: owner, ownerField: "sender", operations: [create, delete, read] },
-      { allow: owner, ownerField: "receiver", operations: [create, delete, read] },
-      { allow: private, provider: iam, operations: [read, delete] },
-  ]
-)
-@key(fields: ["sender", "receiver"])
-@key(name: "ByReceiver", fields: ["receiver", "createdAt"], queryField: "friendRequestsByReceiver")
-{
-  createdAt: AWSDateTime!
-  updatedAt: AWSDateTime!
-  sender: ID!
-  receiver: ID!
-}
-
-input CreateFriendRequestInput
-{
-  receiver: ID!
-}
-
-input UpdateFriendRequestInput
-{
-  receiver: ID!
-}
+"""
+Should be private when accepted is empty, and public when accepted is true
+"""
 
 type Friendship @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
 @auth(
   rules: [
       { allow: private, operations: [read] },
-      { allow: owner, ownerField: "user1", operations: [delete, read] },
-      { allow: owner, ownerField: "user2", operations: [delete, read] },
-      { allow: private, provider: iam, operations: [create, read, update] },
+      { allow: owner, ownerField: "sender", operations: [create, delete, read] },
+      { allow: owner, ownerField: "receiver", operations: [delete, read] },
   ]
 )
-@key(fields: ["user1", "user2"])
-@key(name: "BySecondUser", fields: ["user2", "user1"], queryField: "friendsBySecondUser")
+@key(fields: ["sender", "receiver"])
+@key(name: "ByReceiver", fields: ["receiver", "createdAt"], queryField: "friendsByReceiver")
 {
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
-  user1: ID!
-  user2: ID!
-  hifives: Int
+  sender: ID!
+  receiver: ID!
+  accepted: Boolean
+    @auth(
+      rules: [
+          { allow: owner, ownerField: "sender", operations: [read] },
+          { allow: owner, ownerField: "receiver", operations: [create, read] },
+      ]
+    )
 }
 
-input CreateFriendshipInput {
-  user1: ID!
-  user2: ID!
-  hifives: Int
+input CreateFriendshipInput
+{
+  receiver: ID!
 }
 
-input UpdateFriendshipInput {
-  user1: ID!
-  user2: ID!
-  hifives: Int
+input UpdateFriendshipInput
+{
+  sender: ID!
+  accepted: Boolean
 }

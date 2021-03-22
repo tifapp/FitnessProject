@@ -8,7 +8,7 @@ import computeDistance from "hooks/computeDistance"
 import getLocation from 'hooks/useLocation';
 import printTime from 'hooks/printTime';
 import { getUser, getFriendRequest, getFriendship, listFriendships, friendsBySecondUser } from "../src/graphql/queries";
-import { createFriendRequest, deleteFriendRequest, deleteFriendship } from "root/src/graphql/mutations";
+import { createFriendRequest, deleteFriendRequest, deleteFriendship, createFriendship, updateFriendship } from "root/src/graphql/mutations";
 import { onCreateFriendRequest, onCreateFriendship } from "root/src/graphql/subscriptions";
 import APIList from "components/APIList"
 
@@ -19,12 +19,13 @@ const LookupUser = ({ route, navigation }) => {
   const [friendsSince, setFriendsSince] = useState("");
   const [mutualfriendList, setMutualFriendList] = useState([]);
   
-  const [hifiveSent, setHifiveSent] = useState(false); //can be either "received", "sent", or "none". don't misspell!
-  const [hifives, setHifives] = useState(0);
+  //const [hifiveSent, setHifiveSent] = useState(false); //can be either "received", "sent", or "none". don't misspell!
+  //const [hifives, setHifives] = useState(0);
   
   const { user } = route.params;
   const { userId } = route.params;
   const { id } = route.params;
+
   const checkUsersInfo = async () => {
     try {
       console.log("on the lookup screen, id is: ", userId);
@@ -75,18 +76,28 @@ const LookupUser = ({ route, navigation }) => {
     try {
       let friendship = await API.graphql(
         graphqlOperation(getFriendship, {
-          user1: route.params?.id < userId ? route.params?.id : userId,
-          user2: route.params?.id < userId ? userId : route.params?.id,
+          sender: route.params?.id,
+          receiver: userId 
         })
       );
 
+
+      if(friendship.data.getFriendship == null){
+        friendship = await API.graphql(
+        graphqlOperation(getFriendship, {
+          sender: userId,
+          receiver: route.params?.id 
+        })
+      );
+      }
+
       // If two people are friends
-      if (friendship.data.getFriendship != null) {
+      if (friendship.data.getFriendship != null && friendship.data.getFriendship.accepted == true) {
         setFriendStatus("friends");
         setFriendsSince(printTime(friendship.data.getFriendship.createdAt));
-        setHifives(friendship.data.getFriendship.hifives);
+        //setHifives(friendship.data.getFriendship.hifives);
         console.log("check");
-        console.log(friendship.data.getFriendship);
+        //console.log(friendship.data.getFriendship);
         //console.log(friendship.data.getFriendship.user2);
       } else {
         console.log("YOU ARE NOT FRIENDS");
@@ -94,25 +105,22 @@ const LookupUser = ({ route, navigation }) => {
         //console.log(friendship.data.getFriendship.user2);
         setFriendsSince("");
 
+        /*
         const sentFriendRequest = await API.graphql(
-          graphqlOperation(getFriendRequest, { sender: route.params?.id, receiver: userId })
+          graphqlOperation(getFriendship, { sender: route.params?.id, receiver: userId })
         );
-        // Outgoing request
-        if (sentFriendRequest.data.getFriendRequest != null) { 
-          setFriendStatus("sent");
-        } else {
-          const receivedFriendRequest = await API.graphql(
-            graphqlOperation(getFriendRequest, { sender: userId, receiver: route.params?.id })
-          );
+        */
 
-          if (receivedFriendRequest.data.getFriendRequest != null) {
-            setFriendStatus("received");
-          } else {
-            setFriendStatus("none");
-          }
+        // Outgoing request
+        if (friendship.data.getFriendship != null && friendship.data.getFriendship.sender == route.params?.id) { 
+          setFriendStatus("sent");
+        }else if(friendship.data.getFriendship != null && friendship.data.getFriendship.receiver == route.params?.id){
+          setFriendStatus("received");
+        }else{
+          setFriendStatus("none");
         }
       }
-      waitForFriendUpdateAsync();
+      //waitForFriendUpdateAsync();
     } catch (err) {
       console.log(err);
     }
@@ -171,7 +179,7 @@ const LookupUser = ({ route, navigation }) => {
     Alert.alert('Sending...', '', [], { cancelable: false })
 
     try {
-      await API.graphql(graphqlOperation(createFriendRequest, { input: { receiver: user.id, } }));
+      await API.graphql(graphqlOperation(createFriendship, { input: { receiver: user.id} }));
       console.log("success");
       if (friendStatus == 'received') {
         setFriendStatus("friends")
@@ -186,28 +194,62 @@ const LookupUser = ({ route, navigation }) => {
     }
   };
 
-  const unsendFriendRequest = async () => {
-    Alert.alert('Unsending Friend Request...', '', [], { cancelable: false })
+  const acceptFriendRequest = async () => {
+    Alert.alert('Accepting...', '', [], { cancelable: false })
 
     try {
-      await API.graphql(graphqlOperation(deleteFriendRequest, { input: { sender: route.params?.id, receiver: user.id } }));
+      await API.graphql(graphqlOperation(updateFriendship, { input: { sender: user.id, accepted: true} }));
+      console.log("success");
+      if (friendStatus == 'received') {
+        setFriendStatus("friends")
+      }
+      else {
+        setFriendStatus("sent"); //if received, should change to "friends". do a check before this
+      }
+      alert('Accepted successfully!');
+    } catch (err) {
+      console.log(err);
+      alert('Could not be accepted');
+    }
+  };
+
+
+
+  const unsendFriendRequest = async (temp) => {
+    if(temp!= true){
+      Alert.alert('Unsending Friend Request...', '', [], { cancelable: false })
+    }
+    //console.log(temp);
+    try {
+      await API.graphql(graphqlOperation(deleteFriendship, { input: { sender: route.params?.id, receiver: user.id} }));
       console.log("success");
       setFriendStatus("none");
-      alert('Friend request unsent successfully!');
+
+      if(temp != true){
+        alert('Friend request unsent successfully!');
+      }
+      
     } catch (err) {
       console.log(err);
       console.log("error in deleting post: ");
     }
   };
 
-  const rejectFriendRequest = async () => {
-    Alert.alert('Rejecting Friend Request...', '', [], { cancelable: false })
+  const rejectFriendRequest = async (temp) => {
+
+    if(temp!= true){
+      Alert.alert('Rejected Friend Request...', '', [], { cancelable: false })
+    }
 
     try {
-      await API.graphql(graphqlOperation(deleteFriendRequest, { input: { sender: user.id, receiver: route.params?.id } }));
+      await API.graphql(graphqlOperation(deleteFriendship, { input: { sender: user.id , receiver: route.params?.id} }));
       console.log("success");
       setFriendStatus("none");
-      alert('Friend request rejected successfully!');
+
+      if(temp != true){
+        alert('Friend request rejected successfully!');
+      }
+
     } catch (err) {
       console.log(err);
       console.log("error in deleting post: ");
@@ -218,15 +260,12 @@ const LookupUser = ({ route, navigation }) => {
     Alert.alert('Deleting Friend...', '', [], { cancelable: false })
 
     try {
-      await API.graphql(graphqlOperation(deleteFriendship, {
-        input: {
-          user1: route.params?.id < user.id ? route.params?.id : user.id,
-          user2: route.params?.id < user.id ? user.id : route.params?.id,
-        }
-      }));
-      console.log("success");
-      setFriendStatus("none");
-      alert('Friend removed from friends list successfully!');
+
+      let check = true;
+      rejectFriendRequest(check);
+      unsendFriendRequest(check);
+
+      alert('Deleted Friend successfully!');
     } catch (err) {
       console.log(err);
       console.log("error in deleting post: ");
@@ -374,7 +413,7 @@ const LookupUser = ({ route, navigation }) => {
                         <Text style={styles.buttonTextStyle}>Reject Friend Request</Text>
                       </TouchableOpacity>
                       <TouchableOpacity
-                        onPress={sendFriendRequest}
+                        onPress={acceptFriendRequest}
                         style={styles.unsendButton}
                       >
                         <Text style={styles.buttonTextStyle}>Accept Friend Request</Text>

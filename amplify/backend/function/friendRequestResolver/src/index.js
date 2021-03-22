@@ -23,78 +23,6 @@ const config = {
 
 const client = new AWSAppSyncClient(config);
 
-const getFriendRequest =
-`
-  query GetFriendRequest($sender: ID!, $receiver: ID!) {
-    getFriendRequest(sender: $sender, receiver: $receiver) {
-      createdAt
-      updatedAt
-      sender
-      receiver
-    }
-  }
-`;
-
-const getFriendship =
-`
-  query GetFriendship($user1: ID!, $user2: ID!) {
-    getFriendship(user1: $user1, user2: $user2) {
-      createdAt
-      updatedAt
-      user1
-      user2
-      hifives
-    }
-  }
-`;
-
-const updateFriendship =
-`
-  mutation UpdateFriendship(
-    $input: UpdateFriendshipInput!
-    $condition: ModelFriendshipConditionInput
-  ) {
-    updateFriendship(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      user1
-      user2
-      hifives
-    }
-  }
-`;
-
-const deleteFriendRequest =
-`
-  mutation DeleteFriendRequest(
-    $input: DeleteFriendRequestInput!
-    $condition: ModelFriendRequestConditionInput
-  ) {
-    deleteFriendRequest(input: $input, condition: $condition) {
-      sender
-      receiver
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-const createFriendship =
-`
-  mutation CreateFriendship(
-    $input: CreateFriendshipInput!
-    $condition: ModelFriendshipConditionInput
-  ) {
-    createFriendship(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      user1
-      user2
-      hifives
-    }
-  }
-`;
-
 const getUser =
 `
   query GetUser($id: ID!) {
@@ -172,13 +100,6 @@ exports.handler = (event, context, callback) => {
           //console.log('getting a new object with a sender of ', JSON.stringify(record.dynamodb.NewImage.sender.S), 'seeing if an object exists with that receiver');
           const receiver = record.dynamodb.NewImage.receiver.S;
           const sender = record.dynamodb.NewImage.sender.S;
-          const result = await client.query({
-            query: gql(getFriendRequest),
-            variables: {
-              sender: receiver,
-              receiver: sender,
-            }
-          });
           
           const senderUser = await client.query({
             query: gql(getUser),
@@ -212,25 +133,6 @@ exports.handler = (event, context, callback) => {
             console.log('found matching friend request!');
           }
 
-          await client.mutate({
-            mutation: gql(deleteFriendRequest),
-            variables: {
-              input: {
-                sender: receiver,
-                receiver: sender,
-              }
-            }
-          });
-          await client.mutate({
-            mutation: gql(deleteFriendRequest),
-            variables: {
-              input: {
-                sender: sender,
-                receiver: receiver,
-              }
-            }
-          });
-
           const friendshipcheck = await client.query({
             query: gql(getFriendship),
             variables: {
@@ -247,6 +149,24 @@ exports.handler = (event, context, callback) => {
                   user1: receiver < sender ? receiver : sender,
                   user2: receiver < sender ? sender : receiver,
                   hifives: 0
+                }
+              }
+            });
+            await client.mutate({
+              mutation: gql(deleteFriendRequest),
+              variables: {
+                input: {
+                  sender: sender,
+                  receiver: receiver,
+                }
+              }
+            });
+            await client.mutate({
+              mutation: gql(deleteFriendRequest),
+              variables: {
+                input: {
+                  sender: receiver,
+                  receiver: sender,
                 }
               }
             });

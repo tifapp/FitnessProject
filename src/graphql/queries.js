@@ -11,13 +11,42 @@ export const batchGetLikes = /* GraphQL */ `
     }
   }
 `;
-export const batchGetFriendRequests = /* GraphQL */ `
-  query BatchGetFriendRequests($friendrequests: [CreateFriendRequestInput]) {
-    batchGetFriendRequests(friendrequests: $friendrequests) {
+export const getFriendship = /* GraphQL */ `
+  query GetFriendship($sender: ID!, $receiver: ID!) {
+    getFriendship(sender: $sender, receiver: $receiver) {
       createdAt
       updatedAt
       sender
       receiver
+      accepted
+    }
+  }
+`;
+export const listFriendships = /* GraphQL */ `
+  query ListFriendships(
+    $sender: ID
+    $receiver: ModelIDKeyConditionInput
+    $filter: ModelFriendshipFilterInput
+    $limit: Int
+    $nextToken: String
+    $sortDirection: ModelSortDirection
+  ) {
+    listFriendships(
+      sender: $sender
+      receiver: $receiver
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
+    ) {
+      items {
+        createdAt
+        updatedAt
+        sender
+        receiver
+        accepted
+      }
+      nextToken
     }
   }
 `;
@@ -60,6 +89,34 @@ export const listGroups = /* GraphQL */ `
     }
   }
 `;
+export const friendsByReceiver = /* GraphQL */ `
+  query FriendsByReceiver(
+    $receiver: ID
+    $createdAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelFriendshipFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    friendsByReceiver(
+      receiver: $receiver
+      createdAt: $createdAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        createdAt
+        updatedAt
+        sender
+        receiver
+        accepted
+      }
+      nextToken
+    }
+  }
+`;
 export const searchGroups = /* GraphQL */ `
   query SearchGroups(
     $filter: SearchableGroupFilterInput
@@ -89,137 +146,6 @@ export const searchGroups = /* GraphQL */ `
       }
       nextToken
       total
-    }
-  }
-`;
-export const getFriendRequest = /* GraphQL */ `
-  query GetFriendRequest($sender: ID!, $receiver: ID!) {
-    getFriendRequest(sender: $sender, receiver: $receiver) {
-      createdAt
-      updatedAt
-      sender
-      receiver
-    }
-  }
-`;
-export const listFriendRequests = /* GraphQL */ `
-  query ListFriendRequests(
-    $sender: ID
-    $receiver: ModelIDKeyConditionInput
-    $filter: ModelFriendRequestFilterInput
-    $limit: Int
-    $nextToken: String
-    $sortDirection: ModelSortDirection
-  ) {
-    listFriendRequests(
-      sender: $sender
-      receiver: $receiver
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      sortDirection: $sortDirection
-    ) {
-      items {
-        createdAt
-        updatedAt
-        sender
-        receiver
-      }
-      nextToken
-    }
-  }
-`;
-export const friendRequestsByReceiver = /* GraphQL */ `
-  query FriendRequestsByReceiver(
-    $receiver: ID
-    $createdAt: ModelStringKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelFriendRequestFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    friendRequestsByReceiver(
-      receiver: $receiver
-      createdAt: $createdAt
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        createdAt
-        updatedAt
-        sender
-        receiver
-      }
-      nextToken
-    }
-  }
-`;
-export const getFriendship = /* GraphQL */ `
-  query GetFriendship($user1: ID!, $user2: ID!) {
-    getFriendship(user1: $user1, user2: $user2) {
-      createdAt
-      updatedAt
-      user1
-      user2
-      hifives
-    }
-  }
-`;
-export const listFriendships = /* GraphQL */ `
-  query ListFriendships(
-    $user1: ID
-    $user2: ModelIDKeyConditionInput
-    $filter: ModelFriendshipFilterInput
-    $limit: Int
-    $nextToken: String
-    $sortDirection: ModelSortDirection
-  ) {
-    listFriendships(
-      user1: $user1
-      user2: $user2
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      sortDirection: $sortDirection
-    ) {
-      items {
-        createdAt
-        updatedAt
-        user1
-        user2
-        hifives
-      }
-      nextToken
-    }
-  }
-`;
-export const friendsBySecondUser = /* GraphQL */ `
-  query FriendsBySecondUser(
-    $user2: ID
-    $user1: ModelIDKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelFriendshipFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    friendsBySecondUser(
-      user2: $user2
-      user1: $user1
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        createdAt
-        updatedAt
-        user1
-        user2
-        hifives
-      }
-      nextToken
     }
   }
 `;

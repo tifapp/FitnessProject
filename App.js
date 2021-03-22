@@ -215,9 +215,6 @@ const App = () => {
             activeTintColor: "#e91e63",
             itemStyle: { marginVertical: 5 },
           }}
-          drawerContent={(props) => (
-            <CustomSidebarMenu myId={userId} {...props} />
-          )}
           backBehavior="initialRoute"
           edgeWidth={100}
           initialRouteName="MainTabs"
