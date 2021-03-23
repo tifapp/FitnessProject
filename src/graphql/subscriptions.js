@@ -16,13 +16,36 @@ export const onIncrementLikes = /* GraphQL */ `
     }
   }
 `;
-export const onMyNewFriendRequests = /* GraphQL */ `
-  subscription OnMyNewFriendRequests($receiver: ID) {
-    onMyNewFriendRequests(receiver: $receiver) {
+export const onCreateFriendship = /* GraphQL */ `
+  subscription OnCreateFriendship {
+    onCreateFriendship {
       createdAt
       updatedAt
       sender
       receiver
+      accepted
+    }
+  }
+`;
+export const onUpdateFriendship = /* GraphQL */ `
+  subscription OnUpdateFriendship {
+    onUpdateFriendship {
+      createdAt
+      updatedAt
+      sender
+      receiver
+      accepted
+    }
+  }
+`;
+export const onDeleteFriendship = /* GraphQL */ `
+  subscription OnDeleteFriendship {
+    onDeleteFriendship {
+      createdAt
+      updatedAt
+      sender
+      receiver
+      accepted
     }
   }
 `;
@@ -71,69 +94,6 @@ export const onDeleteGroup = /* GraphQL */ `
       latitude
       createdAt
       updatedAt
-    }
-  }
-`;
-export const onCreateFriendRequest = /* GraphQL */ `
-  subscription OnCreateFriendRequest($sender: String, $receiver: String) {
-    onCreateFriendRequest(sender: $sender, receiver: $receiver) {
-      createdAt
-      updatedAt
-      sender
-      receiver
-    }
-  }
-`;
-export const onUpdateFriendRequest = /* GraphQL */ `
-  subscription OnUpdateFriendRequest($sender: String, $receiver: String) {
-    onUpdateFriendRequest(sender: $sender, receiver: $receiver) {
-      createdAt
-      updatedAt
-      sender
-      receiver
-    }
-  }
-`;
-export const onDeleteFriendRequest = /* GraphQL */ `
-  subscription OnDeleteFriendRequest($sender: String, $receiver: String) {
-    onDeleteFriendRequest(sender: $sender, receiver: $receiver) {
-      createdAt
-      updatedAt
-      sender
-      receiver
-    }
-  }
-`;
-export const onCreateFriendship = /* GraphQL */ `
-  subscription OnCreateFriendship {
-    onCreateFriendship {
-      createdAt
-      updatedAt
-      user1
-      user2
-      hifives
-    }
-  }
-`;
-export const onUpdateFriendship = /* GraphQL */ `
-  subscription OnUpdateFriendship {
-    onUpdateFriendship {
-      createdAt
-      updatedAt
-      user1
-      user2
-      hifives
-    }
-  }
-`;
-export const onDeleteFriendship = /* GraphQL */ `
-  subscription OnDeleteFriendship {
-    onDeleteFriendship {
-      createdAt
-      updatedAt
-      user1
-      user2
-      hifives
     }
   }
 `;

@@ -107,6 +107,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
           API.graphql(
             graphqlOperation(getFriendRequest, { sender: myId, receiver: newFriendRequest.sender })
           ).then(fr => {
+            console.log(fr.data.getFriendRequest);
             if (fr.data.getFriendRequest == null) {
               if (!isDrawerOpen.current) {
                 console.log("incrementing counter");

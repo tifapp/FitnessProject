@@ -1,0 +1,12 @@
+type Mutation {
+  batchDeletePosts(posts: [DeletePostInput]): [Post] @aws_iam
+  incrementLikes(input: incrementLikesInput!): Post @aws_iam
+}
+
+type Subscription {
+  onIncrementLikes: Post @aws_subscribe(mutations: ["incrementLikes"]) @aws_cognito_user_pools
+}
+
+type Query {
+  batchGetLikes(likes: [CreateLikeInput]): [Like]
+}

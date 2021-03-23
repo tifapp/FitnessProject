@@ -23,8 +23,3 @@ input CreateLikeInput {
 input DeleteLikeInput {
   postId: ID!
 }
-
-type Query {
-  batchGetLikes(likes: [CreateLikeInput]): [Like]
-  batchGetFriendRequests(friendrequests: [CreateFriendRequestInput]): [FriendRequest]
-}
