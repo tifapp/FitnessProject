@@ -8,8 +8,8 @@ import computeDistance from "hooks/computeDistance"
 import getLocation from 'hooks/useLocation';
 import printTime from 'hooks/printTime';
 import { getUser, getFriendRequest, getFriendship, listFriendships, friendsBySecondUser } from "../src/graphql/queries";
-import { createFriendRequest, deleteFriendRequest, deleteFriendship, createFriendship, updateFriendship } from "root/src/graphql/mutations";
-import { onCreateFriendRequest, onCreateFriendship } from "root/src/graphql/subscriptions";
+import { deleteFriendship, createFriendship, updateFriendship } from "root/src/graphql/mutations";
+import { onCreateFriendship, onUpdateFriendship, onDeleteFriendship } from "root/src/graphql/subscriptions";
 import APIList from "components/APIList"
 
 var styles = require('styles/stylesheet');
@@ -47,6 +47,7 @@ const LookupUser = ({ route, navigation }) => {
   useEffect(() => {
     checkUsersInfo();
     checkFriendStatus();
+    waitForFriendUpdateAsync();
   }, []);
 
   const collectMutualFriends = (items) => {
@@ -57,14 +58,14 @@ const LookupUser = ({ route, navigation }) => {
 
     let ids = []
     let mutuals = []
-
+    
     items.forEach(element => {
-      if (element.user1 == route.params?.id || element.user1 == userId) {
-        if (ids.includes(element.user2)) mutuals.push(element.user2);
-        else ids.push(element.user2);
-      } else if (element.user2 == route.params?.id || element.user2 == userId) {
-        if (ids.includes(element.user1)) mutuals.push(element.user1);
-        else ids.push(element.user1);
+      if ((element.sender == route.params?.id || element.sender == userId) && element.accepted) {
+        if (ids.includes(element.receiver)) mutuals.push(element.receiver);
+        else ids.push(element.receiver);
+      } else if ((element.receiver == route.params?.id || element.receiver == userId) && element.accepted) {
+        if (ids.includes(element.sender)) mutuals.push(element.sender);
+        else ids.push(element.sender);
       }
     });
 
@@ -127,24 +128,33 @@ const LookupUser = ({ route, navigation }) => {
   };
   
   const waitForFriendUpdateAsync = async () => {
+    // Case 1: Sender sends friend request to receiver. Update receiver's side to reject and accept buttons.
     await API.graphql(graphqlOperation(onCreateFriendship)).subscribe({
-        next: event => {
-            const newFriend = event.value.data.onCreateFriendship
-            if ((newFriend.user1 == route.params?.id && newFriend.user2 == userId) || (newFriend.user2 == route.params?.id && newFriend.user1 == userId)) {
-                setFriendStatus("friends");
+      next: event => {
+        const newFriendRequest = event.value.data.onCreateFriendship
+        if (newFriendRequest.sender == userId && newFriendRequest.receiver == route.params?.id) {
+          setFriendStatus("received");
         }
       }
     });
-    await API.graphql(graphqlOperation(onCreateFriendRequest, { sender: userId, receiver: route.params?.id })).subscribe({
+
+    // Case 2: Receiver accepts friend request. Update the sender's side to delete button.
+    await API.graphql(graphqlOperation(onUpdateFriendship)).subscribe({
       next: event => {
-        const newFriendRequest = event.value.data.onCreateFriendRequest
-        console.log("received friend request: ", newFriendRequest)
-        if (newFriendRequest.sender === userId && newFriendRequest.receiver === route.params?.id) {
-          if (friendStatus == "sent") {
-            setFriendStatus("friends");
-          } else {
-            setFriendStatus("received");
-          }
+        const newFriend = event.value.data.onUpdateFriendship
+        if (newFriend.sender == route.params?.id && newFriend.receiver == userId && newFriend.accepted) {
+          setFriendStatus("friends");
+        }
+      }
+    });
+    
+    // Case 3: Receiver rejects friend request. Update the sender's side to send button.
+    // Case 4: Friendship is deleted by either sender or receiver. Update the other party's side to send button.
+    await API.graphql(graphqlOperation(onDeleteFriendship)).subscribe({
+      next: event => {
+        const exFriend = event.value.data.onDeleteFriendship
+        if (exFriend.sender == userId || exFriend.receiver == userId) {
+          setFriendStatus("none");
         }
       }
     });
@@ -328,30 +338,6 @@ const LookupUser = ({ route, navigation }) => {
                 horizontal={true}
                 queryOperation={listFriendships}
                 data={mutualfriendList}
-                filter={{
-                  filter: {
-                    or: [{
-                      user1: {
-                        eq: route.params?.id
-                      }
-                    },
-                    {
-                      user2: {
-                        eq: route.params?.id
-                      }
-                    },
-                    {
-                      user1: {
-                        eq: userId
-                      }
-                    },
-                    {
-                      user2: {
-                        eq: userId
-                      }
-                    },]
-                  }
-                }}
                 setDataFunction={setMutualFriendList}
                 processingFunction={collectMutualFriends}
                 renderItem={({ item }) => (

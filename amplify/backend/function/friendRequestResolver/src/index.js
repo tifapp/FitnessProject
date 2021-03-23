@@ -43,6 +43,18 @@ const getUser =
   }
 `;
 
+const getFriendship = /* GraphQL */ `
+  query GetFriendship($sender: ID!, $receiver: ID!) {
+    getFriendship(sender: $sender, receiver: $receiver) {
+      createdAt
+      updatedAt
+      sender
+      receiver
+      accepted
+    }
+  }
+`;
+
 async function sendNotification(deviceToken, message) {
   if (deviceToken == null || deviceToken == '') return;
 
@@ -94,10 +106,10 @@ async function sendNotification(deviceToken, message) {
 
 exports.handler = (event, context, callback) => {
   event.Records.forEach((record) => {
-    if (record.eventName == "INSERT") {
+    if (record.eventName == "INSERT" || record.eventName == "MODIFY") {
       (async () => {
         try {
-          //console.log('getting a new object with a sender of ', JSON.stringify(record.dynamodb.NewImage.sender.S), 'seeing if an object exists with that receiver');
+          console.log('getting a new object with a sender of ', JSON.stringify(record.dynamodb.NewImage.sender.S), 'seeing if an object exists with that receiver');
           const receiver = record.dynamodb.NewImage.receiver.S;
           const sender = record.dynamodb.NewImage.sender.S;
           
@@ -122,7 +134,7 @@ exports.handler = (event, context, callback) => {
             return;
           }
 
-          if (result.data.getFriendRequest == null) {
+          if (record.eventName == "INSERT") {
             console.log('couldnt find matching friend request');
             
             await sendNotification(receiverUser.data.getUser.deviceToken, senderUser.data.getUser.name + " sent you a friend request!"); //truncate the sender's name!
@@ -130,64 +142,9 @@ exports.handler = (event, context, callback) => {
             callback(null, "Successfully sent friend request notification");
             return;
           } else {
-            console.log('found matching friend request!');
-          }
+            await sendNotification(senderUser.data.getUser.deviceToken, receiverUser.data.getUser.name + " accepted your friend request!"); //truncate the sender's name!
 
-          const friendshipcheck = await client.query({
-            query: gql(getFriendship),
-            variables: {
-              user1: receiver < sender ? receiver : sender,
-              user2: receiver < sender ? sender : receiver,
-            }
-          });
-          if (friendshipcheck.data.getFriendship == null) {
-            //for making a new friendship
-            await client.mutate({
-              mutation: gql(createFriendship),
-              variables: {
-                input: {
-                  user1: receiver < sender ? receiver : sender,
-                  user2: receiver < sender ? sender : receiver,
-                  hifives: 0
-                }
-              }
-            });
-            await client.mutate({
-              mutation: gql(deleteFriendRequest),
-              variables: {
-                input: {
-                  sender: sender,
-                  receiver: receiver,
-                }
-              }
-            });
-            await client.mutate({
-              mutation: gql(deleteFriendRequest),
-              variables: {
-                input: {
-                  sender: receiver,
-                  receiver: sender,
-                }
-              }
-            });
-            
-            await sendNotification(receiverUser.data.getUser.deviceToken, senderUser.data.getUser.name + " accepted your friend request!");
-            callback(null, "Successfully formed a friendship and notified both users");
-            return;
-          } else {
-            //for incrementing hi-fives
-            await client.mutate({
-              mutation: gql(updateFriendship),
-              variables: {
-                input: {
-                  user1: friendshipcheck.data.getFriendship.user1,
-                  user2: friendshipcheck.data.getFriendship.user2,
-                  hifives: friendshipcheck.data.getFriendship.hifives + 1
-                }
-              }
-            });
-            
-            callback(null, "Successfully incremented friendship level");
+            callback(null, "Successfully accepted friend request notification");
             return;
           }
         } catch (e) {
