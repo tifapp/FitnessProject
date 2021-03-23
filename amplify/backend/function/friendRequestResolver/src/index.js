@@ -109,7 +109,7 @@ exports.handler = (event, context, callback) => {
     if (record.eventName == "INSERT" || record.eventName == "MODIFY") {
       (async () => {
         try {
-          //console.log('getting a new object with a sender of ', JSON.stringify(record.dynamodb.NewImage.sender.S), 'seeing if an object exists with that receiver');
+          console.log('getting a new object with a sender of ', JSON.stringify(record.dynamodb.NewImage.sender.S), 'seeing if an object exists with that receiver');
           const receiver = record.dynamodb.NewImage.receiver.S;
           const sender = record.dynamodb.NewImage.sender.S;
           

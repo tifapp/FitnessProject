@@ -34,7 +34,7 @@
         },
         "friendRequestResolver": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/friendRequestResolver-6735752b746b47587166-build.zip"
+          "s3Key": "amplify-builds/friendRequestResolver-4d42574f6b615336666e-build.zip"
         }
       },
       "hosting": {
