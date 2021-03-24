@@ -186,7 +186,7 @@ const LookupUser = ({ route, navigation }) => {
   };
 
   const sendFriendRequest = async () => {
-    Alert.alert('Sending...', '', [], { cancelable: false })
+    alert('Sending friend request...');
 
     try {
       await API.graphql(graphqlOperation(createFriendship, { input: { receiver: user.id} }));
@@ -205,7 +205,7 @@ const LookupUser = ({ route, navigation }) => {
   };
 
   const acceptFriendRequest = async () => {
-    Alert.alert('Accepting...', '', [], { cancelable: false })
+    alert('Accepting friend request...');
 
     try {
       await API.graphql(graphqlOperation(updateFriendship, { input: { sender: user.id, accepted: true} }));
@@ -227,7 +227,7 @@ const LookupUser = ({ route, navigation }) => {
 
   const unsendFriendRequest = async (temp) => {
     if(temp!= true){
-      Alert.alert('Unsending Friend Request...', '', [], { cancelable: false })
+      alert('Unsending friend request...');
     }
     //console.log(temp);
     try {
@@ -246,9 +246,8 @@ const LookupUser = ({ route, navigation }) => {
   };
 
   const rejectFriendRequest = async (temp) => {
-
     if(temp!= true){
-      Alert.alert('Rejected Friend Request...', '', [], { cancelable: false })
+      alert('Rejecting friend request...');
     }
 
     try {
@@ -267,7 +266,7 @@ const LookupUser = ({ route, navigation }) => {
   };
 
   const deleteFriend = async () => {
-    Alert.alert('Deleting Friend...', '', [], { cancelable: false })
+    alert('Unfriending...');
 
     try {
 
