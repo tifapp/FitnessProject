@@ -25,6 +25,9 @@ const LookupUser = ({ route, navigation }) => {
   const { user } = route.params;
   const { userId } = route.params;
   const { id } = route.params;
+  let waitForFriend = "";
+  let onUpdate = "";
+  let onDelete = "";
 
   const checkUsersInfo = async () => {
     try {
@@ -48,6 +51,12 @@ const LookupUser = ({ route, navigation }) => {
     checkUsersInfo();
     checkFriendStatus();
     waitForFriendUpdateAsync();
+
+    return () => {
+      waitForFriend.unsubscribe();
+      onUpdate.unsubscribe();
+      onDelete.unsubscribe();
+    }
   }, []);
 
   const collectMutualFriends = (items) => {
@@ -129,7 +138,7 @@ const LookupUser = ({ route, navigation }) => {
   
   const waitForFriendUpdateAsync = async () => {
     // Case 1: Sender sends friend request to receiver. Update receiver's side to reject and accept buttons.
-    await API.graphql(graphqlOperation(onCreateFriendship)).subscribe({
+    waitForFriend = API.graphql(graphqlOperation(onCreateFriendship)).subscribe({
       next: event => {
         const newFriendRequest = event.value.data.onCreateFriendship
         if (newFriendRequest.sender == userId && newFriendRequest.receiver == route.params?.id) {
@@ -139,7 +148,7 @@ const LookupUser = ({ route, navigation }) => {
     });
 
     // Case 2: Receiver accepts friend request. Update the sender's side to delete button.
-    await API.graphql(graphqlOperation(onUpdateFriendship)).subscribe({
+    onUpdate = API.graphql(graphqlOperation(onUpdateFriendship)).subscribe({
       next: event => {
         const newFriend = event.value.data.onUpdateFriendship
         if (newFriend.sender == route.params?.id && newFriend.receiver == userId && newFriend.accepted) {
@@ -150,7 +159,7 @@ const LookupUser = ({ route, navigation }) => {
     
     // Case 3: Receiver rejects friend request. Update the sender's side to send button.
     // Case 4: Friendship is deleted by either sender or receiver. Update the other party's side to send button.
-    await API.graphql(graphqlOperation(onDeleteFriendship)).subscribe({
+    onDelete = API.graphql(graphqlOperation(onDeleteFriendship)).subscribe({
       next: event => {
         const exFriend = event.value.data.onDeleteFriendship
         if (exFriend.sender == userId || exFriend.receiver == userId) {
