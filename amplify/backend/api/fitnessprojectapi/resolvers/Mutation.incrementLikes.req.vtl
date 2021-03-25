@@ -108,7 +108,7 @@ $util.qr($ctx.args.input.put("parentId#isParent#createdAt","${ctx.args.input.par
 ## [Start] Set the primary @key. **
 #set( $modelObjectKey = {
   "createdAt": $util.dynamodb.toDynamoDB($ctx.args.input.createdAt),
-  "userId": $util.dynamodb.toDynamoDB($ctx.args.input.userId)
+  "userId": $util.dynamodb.toDynamoDB($context.identity.sub)
 } )
 ## [End] Set the primary @key. **
 
