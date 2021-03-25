@@ -17,8 +17,8 @@ export const onIncrementLikes = /* GraphQL */ `
   }
 `;
 export const onCreateFriendship = /* GraphQL */ `
-  subscription OnCreateFriendship($sender: String!, $receiver: String!) {
-    onCreateFriendship(sender: $sender, receiver: $receiver) {
+  subscription OnCreateFriendship {
+    onCreateFriendship {
       createdAt
       updatedAt
       sender
@@ -28,8 +28,8 @@ export const onCreateFriendship = /* GraphQL */ `
   }
 `;
 export const onUpdateFriendship = /* GraphQL */ `
-  subscription OnUpdateFriendship($sender: String!, $receiver: String!) {
-    onUpdateFriendship(sender: $sender, receiver: $receiver) {
+  subscription OnUpdateFriendship {
+    onUpdateFriendship {
       createdAt
       updatedAt
       sender
@@ -39,8 +39,8 @@ export const onUpdateFriendship = /* GraphQL */ `
   }
 `;
 export const onDeleteFriendship = /* GraphQL */ `
-  subscription OnDeleteFriendship($sender: String!, $receiver: String!) {
-    onDeleteFriendship(sender: $sender, receiver: $receiver) {
+  subscription OnDeleteFriendship {
+    onDeleteFriendship {
       createdAt
       updatedAt
       sender

@@ -5,6 +5,7 @@ Should be private when accepted is empty, and public when accepted is true
 type Friendship @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
 @auth(
   rules: [
+      { allow: private, operations: [read] },
       { allow: owner, ownerField: "sender", operations: [create, delete, read] },
       { allow: owner, ownerField: "receiver", operations: [delete, read] },
   ]

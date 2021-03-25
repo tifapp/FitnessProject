@@ -20,7 +20,7 @@ const ImageScreen = ({route, navigation}) => {
         <View>
                 <Image
                     style={{
-                        width: '100%', height: '100%'}}
+                        width: '100%' }}
                     source={uri === '' ? require('../assets/icon.png') : { uri: uri }}
                 />
         </View>
