@@ -25,9 +25,8 @@ import {
   onDeleteFriendship,
 } from "root/src/graphql/subscriptions";
 import {
-  createFriendRequest,
-  deleteFriendRequest,
   deleteFriendship,
+  updateFriendship
 } from "root/src/graphql/mutations";
 
 import { ProfileImageAndName } from "components/ProfileImageAndName";
@@ -60,12 +59,64 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
   currentFriendRequests.current = friendRequestList;
   currentNewFriendRequestCount.current = newFriendRequests;
 
+/*
+  waitForFriend = API.graphql(graphqlOperation(onCreateFriendship)).subscribe({
+    next: event => {
+      const newFriendRequest = event.value.data.onCreateFriendship
+      if (newFriendRequest.sender == userId && newFriendRequest.receiver == route.params?.id) {
+        setFriendStatus("received");
+      }
+    }
+  });
+
+  // Case 2: Receiver accepts friend request. Update the sender's side to delete button.
+  onUpdate = API.graphql(graphqlOperation(onUpdateFriendship)).subscribe({
+    next: event => {
+      const newFriend = event.value.data.onUpdateFriendship
+      if (newFriend.sender == route.params?.id && newFriend.receiver == userId && newFriend.accepted) {
+        setFriendStatus("friends");
+      }
+    }
+  });
+  */
+
   useEffect(() => {
     Cache.getItem("lastOnline", {callback: ()=>{setLastOnlineTime(-1)}}) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
         .then((time) => {
           setLastOnlineTime(time);
         })
-        
+
+        // Executes when a user receieves a friend request
+        // listening for new friend requests
+      const friendRequestSubscription = API.graphql(
+          graphqlOperation(onCreateFriendship)
+        ).subscribe({
+          next: (event) => {
+            //console.log("is drawer open? ", isDrawerOpen.current);
+            const newFriendRequest = event.value.data.onCreateFriendship;
+            console.log("incoming friend request ", newFriendRequest, " my id is: ",myId);
+    
+            if (((currentFriendRequests.current.length === 0 || !currentFriendRequests.current.find(item => item.sender === newFriendRequest.sender)) && 
+            newFriendRequest.receiver === myId
+            && (currentFriends.current.length === 0 || !currentFriends.current.find(item => item.sender === newFriendRequest.sender || item.receiver === newFriendRequest.sender)))) {
+              //make sure it's a valid friend request
+
+                  if (!isDrawerOpen.current) {
+                    console.log("incrementing counter");
+                    global.incrementNotificationCount();
+                  }
+
+                  setNewFriendRequests(currentNewFriendRequestCount.current+1);
+                  LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                  setFriendRequestList([
+                    newFriendRequest,
+                    ...currentFriendRequests.current,
+                  ]);
+            }
+          },
+        });
+    
+    /*
     const friendSubscription = API.graphql(
       graphqlOperation(onCreateFriendship)
     ).subscribe({
@@ -78,6 +129,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
         }
       },
     });
+
     const removedFriendSubscription = API.graphql(
       graphqlOperation(onDeleteFriendship)
     ).subscribe({
@@ -92,42 +144,12 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
         }
       },
     });
-    const friendRequestSubscription = API.graphql(
-      graphqlOperation(onMyNewFriendRequests, { receiver: myId })
-    ).subscribe({
-      next: (event) => {
-        //console.log("is drawer open? ", isDrawerOpen.current);
-        const newFriendRequest = event.value.data.onMyNewFriendRequests;
-        console.log("incoming friend request ",newFriendRequest, " my id is: ",myId);
+    */
 
-        if ((currentFriendRequests.current.length === 0 || !currentFriendRequests.current.find(item => item.sender === newFriendRequest.sender))
-        && (currentFriends.current.length === 0 || !currentFriends.current.find(item => item.user1 === newFriendRequest.sender || item.user2 === newFriendRequest.sender))) {
-          //make sure it's a valid friend request
-
-          API.graphql(
-            graphqlOperation(getFriendRequest, { sender: myId, receiver: newFriendRequest.sender })
-          ).then(fr => {
-            console.log(fr.data.getFriendRequest);
-            if (fr.data.getFriendRequest == null) {
-              if (!isDrawerOpen.current) {
-                console.log("incrementing counter");
-                global.incrementNotificationCount();
-              }
-              setNewFriendRequests(currentNewFriendRequestCount.current+1);
-              LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-              setFriendRequestList([
-                newFriendRequest,
-                ...currentFriendRequests.current,
-              ]);
-            }
-          });
-        }
-      },
-    });
-
+    
     return () => {
-      removedFriendSubscription.unsubscribe();
-      friendSubscription.unsubscribe();
+      //removedFriendSubscription.unsubscribe();
+      //friendSubscription.unsubscribe();
       friendRequestSubscription.unsubscribe();
     };
   }, []);
@@ -201,13 +223,14 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
     try {
       if (accepted) {
         await API.graphql(
-          graphqlOperation(createFriendRequest, {
-            input: { receiver: item.sender },
+          graphqlOperation(updateFriendship, {
+            input: { sender: item.sender, accepted: true}
           })
         );
+        //console.log("accepted: " + accepted);
       } else {
         await API.graphql(
-          graphqlOperation(deleteFriendRequest, {
+          graphqlOperation(deleteFriendship, {
             input: { sender: item.sender, receiver: item.receiver },
           })
         );
@@ -217,6 +240,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
     }
   };
   
+  // runs when either for accepting or rejecting a friend request
   const removeFriendRequestListItem = async (item, isNew) => {
     if (friendRequestList.length == 1) playSound("celebrate");
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -226,13 +250,17 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
         (i) => item.sender != i.sender || item.receiver != i.receiver
       )
     ); //locally removes the item
-    if (item.accepted && (friendList.length == 0 || !friendList.find(item => item.user1 !== item.sender && item.user2 !== item.sender))) {
+
+    console.log()
+
+    if (item.accepted && (friendList.length == 0 || !friendList.find(item1 => item1.sender == item.sender && item1.receiver == item.receiver))) {
+      console.log("Inside removeFriendRequestListItem");
+
       setFriendList([{
         createdAt: (new Date(Date.now())).toISOString(),
         updatedAt: (new Date(Date.now())).toISOString(),
-        user1: item.receiver < item.sender ? item.receiver : item.sender,
-        user2: item.receiver < item.sender ? item.sender : item.receiver,
-        hifives: 0
+        sender: item.sender,
+        receiver: item.receiver,
       }, ...friendList]);
     }
   };

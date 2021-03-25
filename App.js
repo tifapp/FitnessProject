@@ -218,6 +218,9 @@ const App = () => {
           backBehavior="initialRoute"
           edgeWidth={100}
           initialRouteName="MainTabs"
+          drawerContent={(props) => (
+            <CustomSidebarMenu myId={userId} {...props} />
+          )}
         >
           <Drawer.Screen //this gets loaded first
             name="MainTabs"
