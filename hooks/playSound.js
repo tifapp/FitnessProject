@@ -16,7 +16,9 @@ export default async function playSound(soundName) {
     require("audio/expand.wav") :
     soundName == "collapse" ?
     require("audio/collapse.wav") :
-    require("audio/celebrate.wav")
+    require("audio/celebrate.wav"),
+    {},
+    (status) => {status.didJustFinish ? sound.unloadAsync() : null}
   );
   sound.playAsync();
 }
