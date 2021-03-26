@@ -46,7 +46,7 @@
 
 
   ## [Start] Throw if unauthorized **
-  #if( $isStaticGroupAuthorized == false && $isOwnerAuthorized == false && $util.isNullOrEmpty($ctx.args.accepted) )
+  #if( $isStaticGroupAuthorized == false && $isOwnerAuthorized == false )
     $util.unauthorized()
   #end
   ## [End] Throw if unauthorized **

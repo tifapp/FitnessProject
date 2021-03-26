@@ -138,20 +138,18 @@ const LookupUser = ({ route, navigation }) => {
   
   const waitForFriendUpdateAsync = async () => {
     // Case 1: Sender sends friend request to receiver. Update receiver's side to reject and accept buttons.
-    waitForFriend = API.graphql(graphqlOperation(onCreateFriendship)).subscribe({
+    waitForFriend = API.graphql(graphqlOperation(onCreateFriendship, {sender: userId, receiver: route.params?.id})).subscribe({
       next: event => {
         const newFriendRequest = event.value.data.onCreateFriendship
-        if (newFriendRequest.sender == userId && newFriendRequest.receiver == route.params?.id) {
-          setFriendStatus("received");
-        }
+        setFriendStatus("received");
       }
     });
 
     // Case 2: Receiver accepts friend request. Update the sender's side to delete button.
-    onUpdate = API.graphql(graphqlOperation(onUpdateFriendship)).subscribe({
+    onUpdate = API.graphql(graphqlOperation(onUpdateFriendship, {sender: route.params?.id, receiver: userId})).subscribe({
       next: event => {
         const newFriend = event.value.data.onUpdateFriendship
-        if (newFriend.sender == route.params?.id && newFriend.receiver == userId && newFriend.accepted) {
+        if (newFriend.accepted) {
           setFriendStatus("friends");
         }
       }
