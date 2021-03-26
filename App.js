@@ -88,7 +88,7 @@ const App = () => {
 
   const [userId, setUserId] = useState('checking...'); //stores the user's id if logged in
 
-  const checkIfUserExists = async () => {
+  const checkIfUserSignedUp = async () => {
     try {
       const query = await Auth.currentUserInfo();
       const user = await API.graphql(
@@ -141,7 +141,7 @@ const App = () => {
 
   useEffect(() => {
     AppState.addEventListener("change", _handleAppStateChange);
-    checkIfUserExists();
+    checkIfUserSignedUp();
 
     return () => {
       AppState.removeEventListener("change", _handleAppStateChange);
@@ -195,7 +195,7 @@ const App = () => {
           <Stack.Screen
             name="Profile"
             component={ProfileScreen}
-            initialParams={{ newUser: true, id: userId, setUserIdFunction: setUserId }}
+            initialParams={{ newUser: true, myId: userId, setUserIdFunction: setUserId }}
             options={{
               headerShown: false,
             }}
@@ -225,12 +225,12 @@ const App = () => {
           <Drawer.Screen //this gets loaded first
             name="MainTabs"
             component={MainTabs}
-            initialParams={{ id: userId, fromLookup: false }}
+            initialParams={{ myId: userId, fromLookup: false }}
           />
           <Drawer.Screen
             name="Profile"
             component={ProfileStack}
-            initialParams={{ id: userId, fromLookup: false }}
+            initialParams={{ myId: userId, fromLookup: false }}
           />
         </Drawer.Navigator>
       </NavigationContainer>

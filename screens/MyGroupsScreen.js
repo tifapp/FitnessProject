@@ -30,7 +30,6 @@ export default function MyGroups({navigation, route}) {
     }, []);
     //const stateRef = useRef();
     //const [query, setQuery] = useState("");
-    //const { id } = route.params.id;
     //console.log(id);
 
     const showResultsAsync = async () => {
@@ -40,7 +39,7 @@ export default function MyGroups({navigation, route}) {
                 graphqlOperation(listGroups, {
                     filter: {
                         userID: {
-                            eq: route.params?.id
+                            eq: route.params?.myId
                         }
                     }
                 })

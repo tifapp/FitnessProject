@@ -50,7 +50,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
     const createPostSubscription = API.graphql(graphqlOperation(onCreatePost)).subscribe({
       next: event => {
         const newPost = event.value.data.onCreatePost
-        if (newPost.userId != route.params?.id && newPost.channel == getChannel() && (currentPosts.current.length == 0 || !currentPosts.current.find(post => post.userId === newPost.userId && post.createdAt === newPost.createdAt))) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
+        if (newPost.userId != route.params?.myId && newPost.channel == getChannel() && (currentPosts.current.length == 0 || !currentPosts.current.find(post => post.userId === newPost.userId && post.createdAt === newPost.createdAt))) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
           if (newPost.isParent == 0) {
               if (currentPosts.current.length > 0 && currentPosts.current.find(post => post.parentId === newPost.parentId)) {
                 let tempposts = currentPosts.current;
@@ -70,7 +70,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
     const deletePostSubscription = API.graphql(graphqlOperation(onDeletePost)).subscribe({
       next: event => {
         const deletedPost = event.value.data.onDeletePost
-        if (deletedPost.userId != route.params?.id && deletedPost.channel == getChannel()) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
+        if (deletedPost.userId != route.params?.myId && deletedPost.channel == getChannel()) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
           if (currentPosts.current.length > 0 && currentPosts.current.find(post => post.userId === deletedPost.userId && post.createdAt === deletedPost.createdAt)) {
             let tempposts = currentPosts.current;
             var index = tempposts.findIndex(post => post.userId === deletedPost.userId && post.createdAt === deletedPost.createdAt);
@@ -151,11 +151,11 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
   const updatePostAsync = async (createdAt, editedText) => {
     //replace the post locally
     let tempposts = posts;
-    tempposts[tempposts.findIndex(p => p.createdAt == createdAt && p.userId == route.params?.id)].description = editedText;
+    tempposts[tempposts.findIndex(p => p.createdAt == createdAt && p.userId == route.params?.myId)].description = editedText;
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setPosts(tempposts);
 
-    const post = tempposts.find(p => {return p.createdAt == createdAt && p.userId == route.params?.id});
+    const post = tempposts.find(p => {return p.createdAt == createdAt && p.userId == route.params?.myId});
 
     try {
       await API.graphql(graphqlOperation(updatePost, { input: { createdAt: createdAt, description: editedText, parentId: post.parentId, isParent: post.isParent } }));
@@ -169,7 +169,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
     checkInternetConnection();
     console.log("attempting to make new post");
     const newPost = {
-      parentId: (new Date(Date.now())).toISOString() + route.params?.id,
+      parentId: (new Date(Date.now())).toISOString() + route.params?.myId,
       description: postVal,
       channel: getChannel(),
       isParent: 1,
@@ -178,10 +178,10 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
       newPost.receiver = receiver;
     setPostVal("");
 
-    console.log(route.params?.id + " just posted.");
+    console.log(route.params?.myId + " just posted.");
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setPosts([{ ...newPost, userId: route.params?.id, createdAt: (new Date(Date.now())).toISOString() }, ...posts]);
+    setPosts([{ ...newPost, userId: route.params?.myId, createdAt: (new Date(Date.now())).toISOString() }, ...posts]);
     
     try {
       await API.graphql(graphqlOperation(createPost, { input: newPost }));
@@ -206,7 +206,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
 
     let tempposts = currentPosts.current;
     var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId == newPost.parentId)]);
-    tempposts.splice(index + 1, 0, {...newPost, userId: route.params?.id, createdAt: (new Date(Date.now())).toISOString() });
+    tempposts.splice(index + 1, 0, {...newPost, userId: route.params?.myId, createdAt: (new Date(Date.now())).toISOString() });
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setPosts(tempposts);
 
@@ -222,7 +222,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
 
     let parent_post = posts.find((item) => {
       //const time = timestamp.toString();
-      return item.createdAt === timestamp && item.userId === route.params?.id;
+      return item.createdAt === timestamp && item.userId === route.params?.myId;
     })
 
     console.log("parent post: " + parent_post.description);
@@ -243,7 +243,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
     console.log("******************************************");
 
     try {
-      await API.graphql(graphqlOperation(deletePost, { input: { createdAt: timestamp, userId: route.params?.id } }));
+      await API.graphql(graphqlOperation(deletePost, { input: { createdAt: timestamp, userId: route.params?.myId } }));
     } catch {
       console.log("error in deleting post: ");
     }
@@ -264,7 +264,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
             <ProfileImageAndName
               you={true}
               navigation={false}
-              userId={route.params?.id}
+              userId={route.params?.myId}
               isFull={true}
               fullname={true}
               hidename={true}
@@ -353,7 +353,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
           <PostItem
             item={item}
             deletePostsAsync={deletePostsAsync}
-            writtenByYou={item.userId === route.params?.id}
+            writtenByYou={item.userId === route.params?.myId}
             editButtonHandler={updatePostAsync}
             replyButtonHandler={replyPostAsync}
             receiver={receiver}

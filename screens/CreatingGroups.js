@@ -29,7 +29,7 @@ import GroupDescription from "components/Description";
 import { useNavigation } from '@react-navigation/native';
 
 export default function CreatingGroups({route}) {
-  console.log(route.params?.id);
+  console.log(route.params?.myId);
   const [nameVal, setName] = useState("");
   const [privacyVal, setPrivacy] = useState("Public");
   //const [totalUsersVal, setTotalUsers] = useState("");
@@ -37,9 +37,7 @@ export default function CreatingGroups({route}) {
   const [modalOpen, setModalOpen] = useState(false);
   const [descriptionVal, setDescription] = useState("");
   const [characterCount, setCharacterCount] = useState(1000);
-  const [myID, setMyID] = useState(route.params?.id);
 
-  //console.log(myID);
   const navigation = useNavigation();
 
   console.log(route);
@@ -64,7 +62,7 @@ export default function CreatingGroups({route}) {
     Alert.alert('Submitting Group...', '', [], {cancelable: false})
 
     const val = {
-      userID: route.params?.id,
+      userID: route.params?.myId,
       name: nameVal,
       //maxUsers: totalUsersVal,
       Privacy: privacyVal,
@@ -106,7 +104,7 @@ export default function CreatingGroups({route}) {
       await API.graphql(graphqlOperation(updateGroup, { input: updatedGroup }));
       console.log("success");
       alert('Group submitted successfully!');
-      updatedGroup.userID = route.params?.id;
+      updatedGroup.userID = route.params?.myId;
       navigation.navigate('Search', {
         updatedGroup: updatedGroup,
       });

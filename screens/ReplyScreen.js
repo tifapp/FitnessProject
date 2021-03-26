@@ -19,7 +19,7 @@ export default function ReplyScreen({ navigation, route }) {
       <PostItem
         item={item}
         deletePostsAsync={deletePostsAsync}
-        writtenByYou={item.userId === route.params?.id}
+        writtenByYou={item.userId === route.params?.myId}
         setPostVal={setPostVal}
         setUpdatePostID={setUpdatePostID}
       />

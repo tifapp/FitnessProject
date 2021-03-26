@@ -69,10 +69,10 @@ const LookupUser = ({ route, navigation }) => {
     let mutuals = []
     
     items.forEach(element => {
-      if ((element.sender == route.params?.id || element.sender == userId) && element.accepted) {
+      if ((element.sender == route.params?.myId || element.sender == userId) && element.accepted) {
         if (ids.includes(element.receiver)) mutuals.push(element.receiver);
         else ids.push(element.receiver);
-      } else if ((element.receiver == route.params?.id || element.receiver == userId) && element.accepted) {
+      } else if ((element.receiver == route.params?.myId || element.receiver == userId) && element.accepted) {
         if (ids.includes(element.sender)) mutuals.push(element.sender);
         else ids.push(element.sender);
       }
@@ -86,7 +86,7 @@ const LookupUser = ({ route, navigation }) => {
     try {
       let friendship = await API.graphql(
         graphqlOperation(getFriendship, {
-          sender: route.params?.id,
+          sender: route.params?.myId,
           receiver: userId 
         })
       );
@@ -96,7 +96,7 @@ const LookupUser = ({ route, navigation }) => {
         friendship = await API.graphql(
         graphqlOperation(getFriendship, {
           sender: userId,
-          receiver: route.params?.id 
+          receiver: route.params?.myId
         })
       );
       }
@@ -105,26 +105,15 @@ const LookupUser = ({ route, navigation }) => {
       if (friendship.data.getFriendship != null && friendship.data.getFriendship.accepted == true) {
         setFriendStatus("friends");
         setFriendsSince(printTime(friendship.data.getFriendship.createdAt));
-        //setHifives(friendship.data.getFriendship.hifives);
-        console.log("check");
-        //console.log(friendship.data.getFriendship);
-        //console.log(friendship.data.getFriendship.user2);
+        //console.log("check");
       } else {
         console.log("YOU ARE NOT FRIENDS");
-        //console.log(friendship.data.getFriendship.user1);
-        //console.log(friendship.data.getFriendship.user2);
         setFriendsSince("");
 
-        /*
-        const sentFriendRequest = await API.graphql(
-          graphqlOperation(getFriendship, { sender: route.params?.id, receiver: userId })
-        );
-        */
-
         // Outgoing request
-        if (friendship.data.getFriendship != null && friendship.data.getFriendship.sender == route.params?.id) { 
+        if (friendship.data.getFriendship != null && friendship.data.getFriendship.sender == route.params?.myId) { 
           setFriendStatus("sent");
-        }else if(friendship.data.getFriendship != null && friendship.data.getFriendship.receiver == route.params?.id){
+        }else if(friendship.data.getFriendship != null && friendship.data.getFriendship.receiver == route.params?.myId){
           setFriendStatus("received");
         }else{
           setFriendStatus("none");
@@ -138,7 +127,7 @@ const LookupUser = ({ route, navigation }) => {
   
   const waitForFriendUpdateAsync = async () => {
     // Case 1: Sender sends friend request to receiver. Update receiver's side to reject and accept buttons.
-    waitForFriend = API.graphql(graphqlOperation(onCreateFriendship, {sender: userId, receiver: route.params?.id})).subscribe({
+    waitForFriend = API.graphql(graphqlOperation(onCreateFriendship, {sender: userId, receiver: route.params?.myId})).subscribe({
       next: event => {
         const newFriendRequest = event.value.data.onCreateFriendship
         //console.log(newFriendRequest);
@@ -147,7 +136,7 @@ const LookupUser = ({ route, navigation }) => {
     });
 
     // Case 2: Receiver accepts friend request. Update the sender's side to delete button.
-    onUpdate = API.graphql(graphqlOperation(onUpdateFriendship, {sender: route.params?.id, receiver: userId})).subscribe({
+    onUpdate = API.graphql(graphqlOperation(onUpdateFriendship, {sender: route.params?.myId, receiver: userId})).subscribe({
       next: event => {
         const newFriend = event.value.data.onUpdateFriendship
         //console.log(newFriend);
@@ -169,31 +158,6 @@ const LookupUser = ({ route, navigation }) => {
       }
     });
   }
-
-  const checkMutualFriendStatus = async () => {
-    console.log("CHECKING MUTUAL FRIEND STATUS");
-    try {
-      let friendship = await API.graphql(
-        graphqlOperation(listFriendships, {
-          user1: route.params?.id < user.id ? route.params?.id : user.id,
-          user2: route.params?.id < user.id ? user.id : route.params?.id,
-        })
-      );
-
-      if (friendship.data.listFriendships != null) {
-        console.log(friendship.data.listFriendships);
-
-      } else {
-        console.log("YOU ARE NOT MUTUAL FRIENDS");
-        console.log(friendship.data.getFriendship.user1);
-        console.log(friendship.data.getFriendship.user2);
-        setFriendsSince("");
-      }
-    } catch (err) {
-      console.log("Invalid");
-      console.log(err);
-    }
-  };
 
   const sendFriendRequest = async () => {
     alert('Sending friend request...');
@@ -241,7 +205,7 @@ const LookupUser = ({ route, navigation }) => {
     }
     //console.log(temp);
     try {
-      await API.graphql(graphqlOperation(deleteFriendship, { input: { sender: route.params?.id, receiver: user.id} }));
+      await API.graphql(graphqlOperation(deleteFriendship, { input: { sender: route.params?.myId, receiver: user.id} }));
       console.log("success");
       setFriendStatus("none");
 
@@ -261,7 +225,7 @@ const LookupUser = ({ route, navigation }) => {
     }
 
     try {
-      await API.graphql(graphqlOperation(deleteFriendship, { input: { sender: user.id , receiver: route.params?.id} }));
+      await API.graphql(graphqlOperation(deleteFriendship, { input: { sender: user.id , receiver: route.params?.myId} }));
       console.log("success");
       setFriendStatus("none");
 
@@ -299,7 +263,7 @@ const LookupUser = ({ route, navigation }) => {
 
             <View style={{ paddingBottom: 15 }}>
               <ProfileImageAndName
-                you={userId === route.params?.id}
+                you={userId === route.params?.myId}
                 navigation={false}
                 vertical={true}
                 imageStyle={styles.imageStyle}
@@ -372,7 +336,7 @@ const LookupUser = ({ route, navigation }) => {
               </View>
               : null
           }
-          {route.params?.id != user.id ?
+          {route.params?.myId != user.id ?
             <View style={styles.buttonFormat}>
               {friendStatus == "loading" ?
                 <ActivityIndicator

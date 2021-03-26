@@ -27,7 +27,7 @@ export default function MainTabs({ navigation, route }) {
       <Tab.Screen
         name="Feed"
         component={FeedStack}
-        initialParams={{ id: route.params?.id }}
+        initialParams={{ myId: route.params?.myId }}
         options={{
           headerShown: false,
         }}
@@ -35,7 +35,7 @@ export default function MainTabs({ navigation, route }) {
       <Tab.Screen
         name="Search"
         component={SearchStack}
-        initialParams={{ id: route.params?.id }}
+        initialParams={{ myId: route.params?.myId }}
         options={{
           headerShown: false,
         }}

@@ -66,7 +66,7 @@ export default function MessageScreen({ navigation, route }) {
         navigation={navigation}
         route={route}
         receiver={userId}
-        channel={route.params?.id < userId ? route.params?.id+userId : userId+route.params?.id}
+        channel={route.params?.myId < userId ? route.params?.myId+userId : userId+route.params?.myId}
       />
     </View>
   );

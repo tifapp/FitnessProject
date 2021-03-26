@@ -23,7 +23,7 @@ export default function GroupPostsScreen({ navigation, route }) {
   return (
     <View style={styles.containerStyle}>
 
-      {route.params.id == group.userID ? 
+      {route.params.myId == group.userID ? 
       <TouchableOpacity onPress ={goEditGroupScreen}>
         <AntDesign style = {{alignSelf: "flex-end", marginTop: 10, marginRight: 15}} name="edit" size={30} color="black" />
       </TouchableOpacity> : 
