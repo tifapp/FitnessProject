@@ -4,7 +4,9 @@ type Mutation {
 }
 
 type Subscription {
-  onIncrementLikes: Post @aws_subscribe(mutations: ["incrementLikes"]) @aws_cognito_user_pools
+  onIncrementLikes: Post @aws_subscribe(mutations: ["incrementLikes"]) @aws_cognito_user_pools  
+  onMyNewFriendRequests(receiver: ID!): Friendship @aws_subscribe(mutations: ["createFriendship"])
+  onAllDeletedFriendships: Friendship @aws_subscribe(mutations: ["deleteFriendship"])
 }
 
 type Query {

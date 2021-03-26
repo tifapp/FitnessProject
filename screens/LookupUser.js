@@ -9,7 +9,7 @@ import getLocation from 'hooks/useLocation';
 import printTime from 'hooks/printTime';
 import { getUser, getFriendRequest, getFriendship, listFriendships, friendsBySecondUser } from "../src/graphql/queries";
 import { deleteFriendship, createFriendship, updateFriendship } from "root/src/graphql/mutations";
-import { onCreateFriendship, onUpdateFriendship, onDeleteFriendship } from "root/src/graphql/subscriptions";
+import { onCreateFriendship, onUpdateFriendship, onDeleteFriendship, onAllDeletedFriendships } from "root/src/graphql/subscriptions";
 import APIList from "components/APIList"
 
 var styles = require('styles/stylesheet');
@@ -24,7 +24,7 @@ const LookupUser = ({ route, navigation }) => {
   
   const { user } = route.params;
   const { userId } = route.params;
-  const { id } = route.params;
+  
   let waitForFriend = "";
   let onUpdate = "";
   let onDelete = "";
@@ -141,6 +141,7 @@ const LookupUser = ({ route, navigation }) => {
     waitForFriend = API.graphql(graphqlOperation(onCreateFriendship, {sender: userId, receiver: route.params?.id})).subscribe({
       next: event => {
         const newFriendRequest = event.value.data.onCreateFriendship
+        //console.log(newFriendRequest);
         setFriendStatus("received");
       }
     });
@@ -149,6 +150,7 @@ const LookupUser = ({ route, navigation }) => {
     onUpdate = API.graphql(graphqlOperation(onUpdateFriendship, {sender: route.params?.id, receiver: userId})).subscribe({
       next: event => {
         const newFriend = event.value.data.onUpdateFriendship
+        //console.log(newFriend);
         if (newFriend.accepted) {
           setFriendStatus("friends");
         }
@@ -157,9 +159,10 @@ const LookupUser = ({ route, navigation }) => {
     
     // Case 3: Receiver rejects friend request. Update the sender's side to send button.
     // Case 4: Friendship is deleted by either sender or receiver. Update the other party's side to send button.
-    onDelete = API.graphql(graphqlOperation(onDeleteFriendship)).subscribe({
+    onDelete = API.graphql(graphqlOperation(onAllDeletedFriendships)).subscribe({
       next: event => {
-        const exFriend = event.value.data.onDeleteFriendship
+        const exFriend = event.value.data.onAllDeletedFriendships
+        //console.log(exFriend);
         if (exFriend.sender == userId || exFriend.receiver == userId) {
           setFriendStatus("none");
         }

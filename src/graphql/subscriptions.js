@@ -16,6 +16,28 @@ export const onIncrementLikes = /* GraphQL */ `
     }
   }
 `;
+export const onMyNewFriendRequests = /* GraphQL */ `
+  subscription OnMyNewFriendRequests($receiver: ID!) {
+    onMyNewFriendRequests(receiver: $receiver) {
+      createdAt
+      updatedAt
+      sender
+      receiver
+      accepted
+    }
+  }
+`;
+export const onAllDeletedFriendships = /* GraphQL */ `
+  subscription OnAllDeletedFriendships {
+    onAllDeletedFriendships {
+      createdAt
+      updatedAt
+      sender
+      receiver
+      accepted
+    }
+  }
+`;
 export const onCreateFriendship = /* GraphQL */ `
   subscription OnCreateFriendship($sender: String!, $receiver: String!) {
     onCreateFriendship(sender: $sender, receiver: $receiver) {
