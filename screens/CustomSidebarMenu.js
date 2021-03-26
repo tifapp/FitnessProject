@@ -7,7 +7,7 @@ import {
   Text,
   Linking,
   TouchableOpacity,
-  LayoutAnimation
+  LayoutAnimation,
 } from "react-native";
 import { API, graphqlOperation, Cache } from "aws-amplify";
 import {
@@ -24,10 +24,7 @@ import {
   onCreateFriendship,
   onDeleteFriendship,
 } from "root/src/graphql/subscriptions";
-import {
-  deleteFriendship,
-  updateFriendship
-} from "root/src/graphql/mutations";
+import { deleteFriendship, updateFriendship } from "root/src/graphql/mutations";
 
 import { ProfileImageAndName } from "components/ProfileImageAndName";
 import {
@@ -59,7 +56,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
   currentFriendRequests.current = friendRequestList;
   currentNewFriendRequestCount.current = newFriendRequests;
 
-/*
+  /*
   waitForFriend = API.graphql(graphqlOperation(onCreateFriendship)).subscribe({
     next: event => {
       const newFriendRequest = event.value.data.onCreateFriendship
@@ -81,41 +78,55 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
   */
 
   useEffect(() => {
-    Cache.getItem("lastOnline", {callback: ()=>{setLastOnlineTime(-1)}}) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
-        .then((time) => {
-          setLastOnlineTime(time);
-        })
+    Cache.getItem("lastOnline", {
+      callback: () => {
+        setLastOnlineTime(-1);
+      },
+    }) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
+      .then((time) => {
+        setLastOnlineTime(time);
+      });
 
-        // Executes when a user receieves a friend request
-        // listening for new friend requests
-      const friendRequestSubscription = API.graphql(
-          graphqlOperation(onCreateFriendship)
-        ).subscribe({
-          next: (event) => {
-            //console.log("is drawer open? ", isDrawerOpen.current);
-            const newFriendRequest = event.value.data.onCreateFriendship;
-            console.log("incoming friend request ", newFriendRequest, " my id is: ",myId);
-    
-            if (((currentFriendRequests.current.length === 0 || !currentFriendRequests.current.find(item => item.sender === newFriendRequest.sender)) && 
-            newFriendRequest.receiver === myId
-            && (currentFriends.current.length === 0 || !currentFriends.current.find(item => item.sender === newFriendRequest.sender || item.receiver === newFriendRequest.sender)))) {
-              //make sure it's a valid friend request
+    // Executes when a user receieves a friend request
+    // listening for new friend requests
+    const friendRequestSubscription = API.graphql(
+      graphqlOperation(onMyNewFriendRequests, { receiver: myId })
+    ).subscribe({
+      next: (event) => {
+        //IMPORTANT: don't use "friendList" or "friendRequestList" variables in this scope, instead use "currentFriends.current" and "currentFriendRequests.current"
 
-                  if (!isDrawerOpen.current) {
-                    console.log("incrementing counter");
-                    global.incrementNotificationCount();
-                  }
+        //console.log("is drawer open? ", isDrawerOpen.current);
+        const newFriendRequest = event.value.data.onMyNewFriendRequests;
+        console.log("incoming friend request ", newFriendRequest, " my id is: ", myId);
 
-                  setNewFriendRequests(currentNewFriendRequestCount.current+1);
-                  LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-                  setFriendRequestList([
-                    newFriendRequest,
-                    ...currentFriendRequests.current,
-                  ]);
-            }
-          },
-        });
-    
+        //if this new request is coming from someone already in your local friends list, remove them from your local friends list
+        if (currentFriends.current.find((item) => item.sender === newFriendRequest.sender)) {
+          setFriendList(
+            currentFriends.current.filter(
+              (i) => item.sender != i.sender
+            )
+          );
+        }
+
+        //if this new request is not already in your local friend request list, add it to your local friend request list
+        if (!currentFriendRequests.current.find((item) => item.sender === newFriendRequest.sender)) {
+
+          //if the drawer is closed, show the blue dot in the corner
+          if (!isDrawerOpen.current) {
+            console.log("incrementing counter");
+            global.incrementNotificationCount();
+          }
+
+          setNewFriendRequests(currentNewFriendRequestCount.current + 1);
+          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+          setFriendRequestList([
+            newFriendRequest,
+            ...currentFriendRequests.current,
+          ]);
+        }
+      },
+    });
+
     /*
     const friendSubscription = API.graphql(
       graphqlOperation(onCreateFriendship)
