@@ -11,15 +11,10 @@ export default function FriendListItem({
   item,
   navigation,
   removeFriendHandler,
-  myId,
+  friendId,
 }) {
-  const findFriendID = (item) => {
-    if (myId == item.user1) return item.user2;
-    if (myId == item.user2) return item.user1;
-  };
-
-  const goToMessages = (item) => {
-    navigation.navigate("Messages", { userId: item });
+  const goToMessages = (id) => {
+    navigation.navigate("Messages", { userId: id });
   };
 
   const [isSelected, setIsSelected] = useState(false);
@@ -102,7 +97,7 @@ export default function FriendListItem({
             fontSize: 15,
             color: "black",
           }}
-          userId={findFriendID(item)}
+          userId={friendId}
           textLayoutStyle={{ flex: 1, flexGrow: 1 }}
           subtitleComponent={
             <View
@@ -112,7 +107,7 @@ export default function FriendListItem({
             >
               <TouchableOpacity
                 style={styles.subtitleButton}
-                onPress={() => goToMessages(findFriendID(item))}
+                onPress={() => goToMessages(friendId)}
               >
                 <MaterialIcons
                   name="chat"

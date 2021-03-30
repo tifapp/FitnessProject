@@ -27,6 +27,17 @@ export const onMyNewFriendRequests = /* GraphQL */ `
     }
   }
 `;
+export const onMyNewFriendships = /* GraphQL */ `
+  subscription OnMyNewFriendships {
+    onMyNewFriendships {
+      createdAt
+      updatedAt
+      sender
+      receiver
+      accepted
+    }
+  }
+`;
 export const onAllDeletedFriendships = /* GraphQL */ `
   subscription OnAllDeletedFriendships {
     onAllDeletedFriendships {

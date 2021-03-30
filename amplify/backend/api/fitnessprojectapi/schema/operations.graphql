@@ -6,6 +6,7 @@ type Mutation {
 type Subscription {
   onIncrementLikes: Post @aws_subscribe(mutations: ["incrementLikes"]) @aws_cognito_user_pools  
   onMyNewFriendRequests(receiver: ID!): Friendship @aws_subscribe(mutations: ["createFriendship"])
+  onMyNewFriendships: Friendship @aws_subscribe(mutations: ["updateFriendship"])
   onAllDeletedFriendships: Friendship @aws_subscribe(mutations: ["deleteFriendship"])
 }
 
