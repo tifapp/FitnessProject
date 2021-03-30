@@ -12,7 +12,7 @@ import {
 import { API, graphqlOperation, Cache } from "aws-amplify";
 import {
   listFriendRequests,
-  friendRequestsByReceiver,
+  friendsByReceiver,
   listFriendships,
   getFriendship,
   friendsBySecondUser,
@@ -21,6 +21,7 @@ import {
 } from "root/src/graphql/queries";
 import {
   onMyNewFriendRequests,
+  onMyNewFriendships,
   onCreateFriendship,
   onDeleteFriendship,
 } from "root/src/graphql/subscriptions";
@@ -97,7 +98,8 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
 
         //console.log("is drawer open? ", isDrawerOpen.current);
         const newFriendRequest = event.value.data.onMyNewFriendRequests;
-        console.log("incoming friend request ", newFriendRequest, " my id is: ", myId);
+        if (newFriendRequest.sender !== myId && newFriendRequest.receiver !== myId)
+          console.log("security error with incoming friend request");
 
         //if this new request is coming from someone already in your local friends list, remove them from your local friends list
         if (currentFriends.current.find((item) => item.sender === newFriendRequest.sender)) {
@@ -127,20 +129,23 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
       },
     });
 
-    /*
     const friendSubscription = API.graphql(
-      graphqlOperation(onCreateFriendship)
+      graphqlOperation(onMyNewFriendships)
     ).subscribe({
       next: (event) => {
-        const newFriend = event.value.data.onCreateFriendship;
-        if ((newFriend.user1 === myId || newFriend.user2 === myId) && (currentFriends.current.length === 0 || !currentFriends.current.find(item => item.user1 === newFriend.user1 && item.user2 === newFriend.user2))
-        && (currentFriendRequests.current.length === 0 || !currentFriendRequests.current.find(item => item.sender === newFriend.user1 || item.sender === newFriend.user2))) {
-          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-          setFriendList([newFriend, ...currentFriends.current]);
+        const newFriend = event.value.data.onMyNewFriendships;
+        //we can see all friend requests being accepted, so we just have to make sure it's one of ours.
+        if (newFriend.sender === myId || newFriend.receiver === myId) {
+          if (!currentFriends.current.find(item => item.sender === newFriend.sender || item.receiver === newFriend.receiver)
+          && !currentFriendRequests.current.find(item => item.sender === newFriend.sender || item.sender === newFriend.receiver)) {
+            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+            setFriendList([newFriend, ...currentFriends.current]);
+          }
         }
       },
     });
 
+      /*
     const removedFriendSubscription = API.graphql(
       graphqlOperation(onDeleteFriendship)
     ).subscribe({
@@ -160,7 +165,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
     
     return () => {
       //removedFriendSubscription.unsubscribe();
-      //friendSubscription.unsubscribe();
+      friendSubscription.unsubscribe();
       friendRequestSubscription.unsubscribe();
     };
   }, []);
@@ -173,40 +178,6 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
       playSound("expand");
     }
   }, [isDrawerOpen.current]);
-
-  const getNonPendingRequests = async (items) => {
-    console.log("getting non pending requests");
-    console.log(items);
-    let senders = [];
-
-    items.forEach((item) => {
-      console.log("ANALYZING ", item)
-      senders.push({
-        receiver: item.sender,
-      });
-    });
-
-    try {
-      console.log("starting batchgetfriendrequests operation");
-      const frs = await API.graphql(
-        graphqlOperation(batchGetFriendRequests, {
-          friendrequests: senders,
-        })
-      );
-      console.log("finished batchgetfriendrequests operation");
-
-      let validRequests = [];
-      for (i = 0; i < items.length; ++i) {
-        if (frs.data.batchGetFriendRequests[i] == null) {
-          validRequests.push(items[i]);
-        }
-      }
-
-      return validRequests;
-    } catch (err) {
-      console.log("error in getting valid friend requests: ", err);
-    }
-  };
 
   const checkNewRequests = (items) => {
     items.forEach((item) => {
@@ -250,6 +221,9 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
       console.log("error: ", err);
     }
   };
+
+  const undoRequestResponse = () => {
+  }
   
   // runs when either for accepting or rejecting a friend request
   const removeFriendRequestListItem = async (item, isNew) => {
@@ -258,7 +232,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
     if (isNew) setNewFriendRequests(newFriendRequests - 1);
     setFriendRequestList(
       friendRequestList.filter(
-        (i) => item.sender != i.sender || item.receiver != i.receiver
+        (i) => item.sender !== i.sender || item.receiver !== i.receiver
       )
     ); //locally removes the item
 
@@ -281,7 +255,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
     // update friendList
     setFriendList((friendList) => {
       return friendList.filter(
-        (i) => i.user1 != item.user1 || i.user2 != item.user2
+        (i) => i.sender !== item.sender || i.receiver !== item.receiver
       );
     });
 
@@ -289,7 +263,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
     try {
       await API.graphql(
         graphqlOperation(deleteFriendship, {
-          input: { user1: item.user1, user2: item.user2 },
+          input: { sender: item.sender, receiver: item.receiver },
         })
       );
     } catch (err) {
@@ -360,18 +334,23 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
         <APIList
           style={{}}
           ref={currentFriendRequestListRef}
-          processingFunction={getNonPendingRequests}
           //initialLoadFunction={checkNewRequests}
-          queryOperation={friendRequestsByReceiver}
-          filter={{ receiver: myId, sortDirection: "DESC" }}
+          queryOperation={friendsByReceiver}
+          filter={{ receiver: myId, sortDirection: "DESC", filter: {
+                accepted: {
+                  attributeExists: false,
+                },
+          }, }}
           setDataFunction={setFriendRequestList}
           data={friendRequestList}
           initialAmount={21}
+          additionalAmount={15}
           renderItem={({ item, index }) => (
             <FriendRequestListItem
               navigation={navigation}
               item={item}
               respondRequestHandler={respondToRequest}
+              //undoResponseHandler={()=>{}}
               removeFriendRequestListItemHandler={removeFriendRequestListItem}
               myId={myId}
               isNew={index < newFriendRequests}
@@ -395,28 +374,39 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
           queryOperation={listFriendships}
           filter={{
             filter: {
-              or: [
+              and: [
                 {
-                  user1: {
-                    eq: myId,
-                  },
+                  or: [
+                    {
+                      sender: {
+                        eq: myId,
+                      },
+                    },
+                    {
+                      receiver: {
+                        eq: myId,
+                      },
+                    },
+                  ],
                 },
                 {
-                  user2: {
-                    eq: myId,
+                  accepted: {
+                    eq: true,
                   },
                 },
-              ],
+              ]
             },
           }}
           setDataFunction={setFriendList} //a batch function should be used to grab message previews. that would also make it easy to exclude any.
           data={friendList}
+          initialAmount={15}
+          additionalAmount={15}
           renderItem={({ item }) => (
             <FriendListItem
               navigation={navigation}
               removeFriendHandler={removeFriend}
               item={item}
-              myId={myId}
+              friendId={item.sender === myId ? item.receiver : item.sender}
             />
           )}
           keyExtractor={(item) => item.createdAt.toString()}
