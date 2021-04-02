@@ -297,6 +297,38 @@ export const postsByReceiver = /* GraphQL */ `
     }
   }
 `;
+export const postsByChannelLatest = /* GraphQL */ `
+  query PostsByChannelLatest(
+    $channel: ID
+    $createdAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelPostFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    postsByChannelLatest(
+      channel: $channel
+      createdAt: $createdAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        createdAt
+        updatedAt
+        userId
+        description
+        parentId
+        channel
+        receiver
+        isParent
+        likes
+      }
+      nextToken
+    }
+  }
+`;
 export const getPost = /* GraphQL */ `
   query GetPost($createdAt: AWSDateTime!, $userId: ID!) {
     getPost(createdAt: $createdAt, userId: $userId) {
