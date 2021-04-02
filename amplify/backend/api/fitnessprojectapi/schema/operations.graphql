@@ -12,4 +12,5 @@ type Subscription {
 
 type Query {
   batchGetLikes(likes: [CreateLikeInput]): [Like]
+  batchGetMessages(posts: [DeletePostInput]): [Post]
 }

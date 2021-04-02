@@ -17,7 +17,6 @@ import {
   getFriendship,
   friendsBySecondUser,
   getFriendRequest,
-  batchGetFriendRequests,
 } from "root/src/graphql/queries";
 import {
   onMyNewFriendRequests,
