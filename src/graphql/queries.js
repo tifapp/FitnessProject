@@ -11,6 +11,21 @@ export const batchGetLikes = /* GraphQL */ `
     }
   }
 `;
+export const batchGetMessages = /* GraphQL */ `
+  query BatchGetMessages($posts: [DeletePostInput]) {
+    batchGetMessages(posts: $posts) {
+      createdAt
+      updatedAt
+      userId
+      description
+      parentId
+      channel
+      receiver
+      isParent
+      likes
+    }
+  }
+`;
 export const getFriendship = /* GraphQL */ `
   query GetFriendship($sender: ID!, $receiver: ID!) {
     getFriendship(sender: $sender, receiver: $receiver) {
@@ -230,6 +245,38 @@ export const postsByParentId = /* GraphQL */ `
     postsByParentId(
       parentId: $parentId
       isParent: $isParent
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        createdAt
+        updatedAt
+        userId
+        description
+        parentId
+        channel
+        receiver
+        isParent
+        likes
+      }
+      nextToken
+    }
+  }
+`;
+export const postsByReceiver = /* GraphQL */ `
+  query PostsByReceiver(
+    $receiver: ID
+    $createdAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelPostFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    postsByReceiver(
+      receiver: $receiver
+      createdAt: $createdAt
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit
