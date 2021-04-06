@@ -166,6 +166,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
       //removedFriendSubscription.unsubscribe();
       friendSubscription.unsubscribe();
       friendRequestSubscription.unsubscribe();
+      friendRequestList.forEach(item => {if (item.rejected || item.accepted) confirmResponse(item);});
     };
   }, []);
 
@@ -186,7 +187,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
     });
   };
 
-  const respondToRequest = async (item, accepted) => {
+  const respondToRequest = (item, accepted) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setFriendRequestList(
       friendRequestList.map(function (i) {
@@ -200,9 +201,45 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
         return i;
       })
     ); //locally removes the item
+  };
+
+  const undoResponse = (item) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setFriendRequestList(
+      friendRequestList.map(function (i) {
+        if (i.sender == item.sender && i.receiver == item.receiver) {
+          i.accepted = false;
+          i.rejected = false;
+        }
+        return i;
+      })
+    ); //locally removes the item
+  }
+  
+  // runs when either for accepting or rejecting a friend request
+  const confirmResponse = async (item, isNew) => {
+    if (friendRequestList.length == 1) playSound("celebrate");
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    if (isNew) setNewFriendRequests(newFriendRequests - 1);
+    setFriendRequestList(
+      friendRequestList.filter(
+        (i) => item.sender !== i.sender || item.receiver !== i.receiver
+      )
+    ); //locally removes the item
+
+    if (item.accepted && (friendList.length == 0 || !friendList.find(item1 => item1.sender == item.sender && item1.receiver == item.receiver))) {
+      console.log("Inside removeFriendRequestListItem");
+
+      setFriendList([{
+        createdAt: (new Date(Date.now())).toISOString(),
+        updatedAt: (new Date(Date.now())).toISOString(),
+        sender: item.sender,
+        receiver: item.receiver,
+      }, ...friendList]);
+    }
     
     try {
-      if (accepted) {
+      if (item.accepted) {
         await API.graphql(
           graphqlOperation(updateFriendship, {
             input: { sender: item.sender, accepted: true}
@@ -217,35 +254,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
         );
       }
     } catch (err) {
-      console.log("error: ", err);
-    }
-  };
-
-  const undoRequestResponse = () => {
-  }
-  
-  // runs when either for accepting or rejecting a friend request
-  const removeFriendRequestListItem = async (item, isNew) => {
-    if (friendRequestList.length == 1) playSound("celebrate");
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    if (isNew) setNewFriendRequests(newFriendRequests - 1);
-    setFriendRequestList(
-      friendRequestList.filter(
-        (i) => item.sender !== i.sender || item.receiver !== i.receiver
-      )
-    ); //locally removes the item
-
-    console.log()
-
-    if (item.accepted && (friendList.length == 0 || !friendList.find(item1 => item1.sender == item.sender && item1.receiver == item.receiver))) {
-      console.log("Inside removeFriendRequestListItem");
-
-      setFriendList([{
-        createdAt: (new Date(Date.now())).toISOString(),
-        updatedAt: (new Date(Date.now())).toISOString(),
-        sender: item.sender,
-        receiver: item.receiver,
-      }, ...friendList]);
+      console.log("error responding to request: ", err);
     }
   };
 
@@ -322,6 +331,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
         iconColor={newFriendRequests > 0 ? "blue" : "gray"}
         iconOpenColor={newFriendRequests > 0 ? "blue" : "black"}
         closeFunction={() => {
+          friendRequestList.forEach(item => {if (item.rejected || item.accepted) confirmResponse(item);});
           setNewFriendRequests(0);
           const newlist = friendRequestList.filter((i) => !i.accepted && !i.rejected);
           setFriendRequestList(
@@ -350,8 +360,8 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
               navigation={navigation}
               item={item}
               respondRequestHandler={respondToRequest}
-              //undoResponseHandler={()=>{}}
-              removeFriendRequestListItemHandler={removeFriendRequestListItem}
+              undoResponseHandler={undoResponse}
+              confirmResponseHandler={confirmResponse}
               myId={myId}
               isNew={index < newFriendRequests}
             />

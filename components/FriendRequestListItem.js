@@ -18,7 +18,8 @@ var styles = require("../styles/stylesheet");
 export default function FriendRequestListItem({
   item,
   respondRequestHandler,
-  removeFriendRequestListItemHandler,
+  confirmResponseHandler,
+  undoResponseHandler,
   navigation,
   isNew,
   myId,
@@ -44,11 +45,11 @@ export default function FriendRequestListItem({
             const message = "";
             const options = [
               {
-                text: "Block    ",
+                text: "Block",
                 onPress: () => {},
               }, //if submithandler fails user won't know
               {
-                text: "    Cancel",
+                text: "Cancel",
                 type: "cancel",
                 onPress: () => {
                   setIsSelected(false);
@@ -149,7 +150,9 @@ export default function FriendRequestListItem({
               >
                 <TouchableOpacity
                   style={styles.subtitleButton}
-                  onPress={() => {}}
+                  onPress={() => {
+                    undoResponseHandler(item),
+                  }}
                 >
                   <MaterialIcons
                     name="undo"
@@ -171,7 +174,7 @@ export default function FriendRequestListItem({
                 <TouchableOpacity
                   style={styles.subtitleButton}
                   onPress={() => {
-                    removeFriendRequestListItemHandler(item, isNew),
+                    confirmResponseHandler(item, isNew),
                       playSound("complete");
                   }}
                 >
