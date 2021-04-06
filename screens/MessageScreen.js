@@ -12,6 +12,7 @@ import {
 import FeedScreen from "screens/FeedScreen";
 import { useFocusEffect } from '@react-navigation/native';
 import * as Notifications from 'expo-notifications';
+import { ProfileImageAndName } from "components/ProfileImageAndName";
 
 //const { width } = Dimensions.get('window');
 
@@ -63,6 +64,21 @@ export default function MessageScreen({ navigation, route }) {
   return (
     <View style={styles.containerStyle}>  
       <FeedScreen
+        headerComponent={
+          <ProfileImageAndName
+            you={userId === route.params?.myId}
+            navigation={false}
+            vertical={true}
+            imageStyle={[styles.imageStyle, {marginVertical: 15}]}
+            imageLayoutStyle={{margin: 0}}
+            userId={userId}
+            isFull={true}
+            hidename={true}
+            callback={(info) => {
+              navigation.setOptions({ title: info.name });
+            }}
+          />
+        }
         navigation={navigation}
         route={route}
         receiver={userId}

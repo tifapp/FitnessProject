@@ -30,7 +30,7 @@ require('root/androidtimerfix');
 
 var styles = require('styles/stylesheet');
 
-export default function FeedScreen({ navigation, route, receiver, channel }) {
+export default function FeedScreen({ navigation, route, receiver, channel, headerComponent }) {
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
   const numCharsLeft = 1000 - postVal.length;
@@ -260,6 +260,7 @@ export default function FeedScreen({ navigation, route, receiver, channel }) {
         ListRef={scrollRef}
         ListHeaderComponent={
           <View style={{}}>
+            {headerComponent}
             <View style={{flexDirection: "row"}}>
             <ProfileImageAndName
               you={true}

@@ -158,6 +158,8 @@ export const ProfileImageAndName = (props) => {
 
   if (userInfo == null) {
     return <ActivityIndicator color="#0000ff" style={[props.style]} />;
+  } else if (props.hideall) {
+    return null;
   } else {
     return (
       <View
