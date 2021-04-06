@@ -150,9 +150,7 @@ export default function FriendRequestListItem({
               >
                 <TouchableOpacity
                   style={styles.subtitleButton}
-                  onPress={() => {
-                    undoResponseHandler(item),
-                  }}
+                  onPress={() => undoResponseHandler(item)}
                 >
                   <MaterialIcons
                     name="undo"
