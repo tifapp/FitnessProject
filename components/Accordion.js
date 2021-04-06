@@ -79,7 +79,7 @@ export default function Accordion(props) {
           </Animated.View>
         </View>
       </TouchableWithoutFeedback>
-      <View style={{ flex: open ? 0 : 1 }}>
+      <View style={{ flex: open ? 0 : 1, maxHeight: props.maxHeight }}>
         {
           open ? 
           <View

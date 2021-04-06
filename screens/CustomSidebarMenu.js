@@ -305,6 +305,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
       <Accordion
         style={{ marginTop: 0 }}
         open={friendRequestList.length > 0}
+        maxHeight={255}
         headerText={
           "Friend Requests" +
           (newFriendRequests > 0
@@ -360,6 +361,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
       </Accordion>
       <Accordion
         style={{}}
+        maxHeight={255}
         open={friendList.length > 0}
         headerText={"Friends"}
         headerTextStyle={{
