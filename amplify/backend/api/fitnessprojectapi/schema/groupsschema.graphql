@@ -1,4 +1,4 @@
-type Group @model @searchable {
+type Group @model {
   id: ID!
   userID: ID!
   name: String!

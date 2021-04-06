@@ -132,38 +132,6 @@ export const friendsByReceiver = /* GraphQL */ `
     }
   }
 `;
-export const searchGroups = /* GraphQL */ `
-  query SearchGroups(
-    $filter: SearchableGroupFilterInput
-    $sort: SearchableGroupSortInput
-    $limit: Int
-    $nextToken: String
-    $from: Int
-  ) {
-    searchGroups(
-      filter: $filter
-      sort: $sort
-      limit: $limit
-      nextToken: $nextToken
-      from: $from
-    ) {
-      items {
-        id
-        userID
-        name
-        Privacy
-        Sport
-        Description
-        characterCount
-        latitude
-        createdAt
-        updatedAt
-      }
-      nextToken
-      total
-    }
-  }
-`;
 export const getLike = /* GraphQL */ `
   query GetLike($userId: ID!, $postId: ID!) {
     getLike(userId: $userId, postId: $postId) {
@@ -416,40 +384,6 @@ export const listUsers = /* GraphQL */ `
         updatedAt
       }
       nextToken
-    }
-  }
-`;
-export const searchUsers = /* GraphQL */ `
-  query SearchUsers(
-    $filter: SearchableUserFilterInput
-    $sort: SearchableUserSortInput
-    $limit: Int
-    $nextToken: String
-    $from: Int
-  ) {
-    searchUsers(
-      filter: $filter
-      sort: $sort
-      limit: $limit
-      nextToken: $nextToken
-      from: $from
-    ) {
-      items {
-        id
-        identityId
-        name
-        age
-        gender
-        bio
-        goals
-        latitude
-        longitude
-        deviceToken
-        createdAt
-        updatedAt
-      }
-      nextToken
-      total
     }
   }
 `;
