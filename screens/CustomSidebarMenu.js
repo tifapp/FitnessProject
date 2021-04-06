@@ -406,6 +406,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
               removeFriendHandler={removeFriend}
               item={item}
               friendId={item.sender === myId ? item.receiver : item.sender}
+              myId={myId}
             />
           )}
           keyExtractor={(item) => item.createdAt.toString()}

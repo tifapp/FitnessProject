@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
+  TextInput,
   TouchableOpacity,
   Alert,
   LayoutAnimation,
@@ -10,6 +11,7 @@ import { ProfileImageAndName } from "./ProfileImageAndName";
 import { MaterialIcons } from "@expo/vector-icons";
 import computeDistance from "hooks/computeDistance";
 import getLocation from "hooks/useLocation";
+import PostItem from "components/PostItem";
 
 import { API, graphqlOperation } from "aws-amplify";
 import { postsByChannelLatest } from "root/src/graphql/queries";
@@ -21,6 +23,7 @@ export default function FriendListItem({
   navigation,
   removeFriendHandler,
   friendId,
+  myId,
 }) {
   const goToMessages = (id) => {
     navigation.navigate("Messages", { userId: id });
@@ -29,7 +32,8 @@ export default function FriendListItem({
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
 
   const [isMessageOpen, setIsMessageOpen] = useState(false);
-  const [lastMessage, setLastMessage] = useState("");
+  const [lastMessage, setLastMessage] = useState(null);
+  const [postVal, setPostVal] = useState("");
 
   const alertOptions = {
     cancelable: true,
@@ -39,21 +43,24 @@ export default function FriendListItem({
   useEffect(() => {
     (async () => {
       const query = await API.graphql(
-        graphqlOperation(postsByChannelLatest, { limit: 1, channel: myId > friendId ? ,})
+        graphqlOperation(postsByChannelLatest, {
+          limit: 1,
+          channel: myId < friendId ? myId + friendId : friendId + myId,
+          sortDirection: "DESC"
+        })
       );
 
-      nextToken = query.data[Object.keys(query.data)[0]].nextToken
-      results = [...query.data[Object.keys(query.data)[0]].items, ...results]
-      console.log(results);
-      setLastMessage(); //truncate the beginning of the message if it's too long
+      console.log("latest message is...");
+      console.log(query.data[Object.keys(query.data)[0]].items[0]);
+      setLastMessage(query.data[Object.keys(query.data)[0]].items[0]); //truncate the beginning of the message if it's too long
     })();
-  },[])
+  }, []);
 
   return (
     <View>
       <View
         style={[
-          { flexDirection: "row", alignItems: "flex-start" },
+          { flex: 1, flexDirection: "row", alignItems: "flex-start", justifyContent: "flex-start" },
           isOptionsOpen && { backgroundColor: "orange" },
         ]}
       >
@@ -131,78 +138,36 @@ export default function FriendListItem({
               }}
             >
               <TouchableOpacity
-                style={styles.subtitleButton}
+                style={[styles.subtitleButton, {
+                  alignItems: "flex-start",
+                  paddingTop: lastMessage != null && lastMessage.description.length > 34 ? 0 : 8
+                }]}
                 onPress={() => {
-                  LayoutAnimation.configureNext(
-                    LayoutAnimation.Presets.easeInEaseOut
-                  );
-                  setIsMessageOpen(!isMessageOpen);
+                  console.log("message pressed, " + isMessageOpen);
+                  goToMessages(friendId);
                 }}
               >
-                <MaterialIcons
-                  name="chat"
-                  size={20}
-                  color={isOptionsOpen ? "black" : "blue"}
-                  style={{ marginRight: 6 }}
-                />
                 <Text
                   style={{
                     color: isOptionsOpen ? "black" : "blue",
                     fontSize: 15,
                     fontWeight: "bold",
+                    fontStyle: lastMessage == null ? "italic" : "normal", 
+                    marginRight: 10,
                   }}
+                  numberOfLines={2}
                 >
-                  Message
+                <MaterialIcons
+                  name="chat"
+                  size={15}
+                  color={isOptionsOpen ? "black" : "blue"}
+                />
+                  {"  " + (lastMessage == null ? "Message" : lastMessage.description)}
                 </Text>
               </TouchableOpacity>
             </View>
           }
         />
-      </View>
-      <View style={{ flex: open ? 0 : 1 }}>
-        {isMessageOpen ? (
-          <View>
-            <TouchableOpacity
-              style={styles.subtitleButton}
-              onPress={() => goToMessages(friendId)}
-            >
-              <Text
-                style={{
-                  color: isOptionsOpen ? "black" : "blue",
-                  fontSize: 15,
-                  fontWeight: "bold",
-                }}
-              >
-                View More
-              </Text>
-            </TouchableOpacity>
-            <View
-              style={{
-                flexDirection: "column",
-                justifyContent: "center",
-              }}
-            >
-              <TextInput
-                style={[
-                  styles.textInputStyle,
-                  { marginTop: 5, marginBottom: 30 },
-                ]}
-                multiline={true}
-                placeholder="Start Typing..."
-                onChangeText={setPostVal}
-                value={postVal}
-                clearButtonMode="always"
-                maxLength={1000}
-              />
-              <MaterialIcons
-                name="add-circle"
-                size={30}
-                color={"gray"}
-                style={{ marginRight: 0 }}
-              />
-            </View>
-          </View>
-        ) : null}
       </View>
       <View
         style={{ height: 1, backgroundColor: "#efefef", marginHorizontal: 12 }}
