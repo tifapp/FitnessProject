@@ -104,7 +104,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
         if (currentFriends.current.find((item) => item.sender === newFriendRequest.sender)) {
           setFriendList(
             currentFriends.current.filter(
-              (i) => item.sender != i.sender
+              (item) => item.sender != newFriendRequest.sender && item.receiver != newFriendRequest.sender
             )
           );
         }
