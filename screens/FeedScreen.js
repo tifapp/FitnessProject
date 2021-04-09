@@ -182,9 +182,17 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setPosts([{ ...newPost, userId: route.params?.myId, createdAt: (new Date(Date.now())).toISOString() }, ...posts]);
-    
+
     try {
-      await API.graphql(graphqlOperation(createPost, { input: newPost }));
+      API.graphql(graphqlOperation(createPost, { input: newPost }));
+      if (receiver != null) {
+        //when sending a message, create conversation using specified channel if posts is empty. if not, update conversation with the specified channel.
+        if (posts.length == 0) {
+          API.graphql(graphqlOperation(createConversation, { input: {id: channel, users: [route.params?.myId, receiver], lastMessage: postVal} }));
+        } else {
+          API.graphql(graphqlOperation(updateConveration, { input: {id: channel, lastMessage: postVal} }));
+        }
+      }
     } catch (err) {
       console.log("error in creating post: ", err);
     }
@@ -319,7 +327,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
                     style={{ marginRight: 0 }}
                   />
                   <Text style={[styles.buttonTextStyle, { color: "gray" }]}>
-                    {receiver != null ? "Send Message" : "Add Post"}
+                    {receiver != null ? "Send Message" : "Add Post" }
                   </Text>
                 </TouchableOpacity>
               ) : (

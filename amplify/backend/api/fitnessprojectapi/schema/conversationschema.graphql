@@ -7,13 +7,13 @@ type Conversation @model(timestamps: { createdAt: "createdAt", updatedAt: "updat
       { allow: owner, ownerField: "users", operations: [create, update, read] }
   ]
 )
-@key(fields: ["updatedAt", "id"])
+@key(name: "lastUpdated", fields: ["updatedAt"], queryField: "conversationsByLastUpdated")
 {
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
   id: ID!
   users: [ID!]!
-  lastMessage: String
+  lastMessage: String!
 }
 
 """
@@ -22,6 +22,7 @@ This allows us to fill in the missing fields in the backend rather than letting 
 input CreateConversationInput {
   id: ID!
   users: [ID!]!
+  lastMessage: String!
 }
 
 """

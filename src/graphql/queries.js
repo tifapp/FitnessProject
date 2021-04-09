@@ -27,8 +27,8 @@ export const batchGetMessages = /* GraphQL */ `
   }
 `;
 export const getConversation = /* GraphQL */ `
-  query GetConversation($updatedAt: AWSDateTime!, $id: ID!) {
-    getConversation(updatedAt: $updatedAt, id: $id) {
+  query GetConversation($id: ID!) {
+    getConversation(id: $id) {
       createdAt
       updatedAt
       id
@@ -39,21 +39,11 @@ export const getConversation = /* GraphQL */ `
 `;
 export const listConversations = /* GraphQL */ `
   query ListConversations(
-    $updatedAt: AWSDateTime
-    $id: ModelIDKeyConditionInput
     $filter: ModelConversationFilterInput
     $limit: Int
     $nextToken: String
-    $sortDirection: ModelSortDirection
   ) {
-    listConversations(
-      updatedAt: $updatedAt
-      id: $id
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      sortDirection: $sortDirection
-    ) {
+    listConversations(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         createdAt
         updatedAt
@@ -138,6 +128,32 @@ export const listGroups = /* GraphQL */ `
         latitude
         createdAt
         updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const conversationsByLastUpdated = /* GraphQL */ `
+  query ConversationsByLastUpdated(
+    $updatedAt: AWSDateTime
+    $sortDirection: ModelSortDirection
+    $filter: ModelConversationFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    conversationsByLastUpdated(
+      updatedAt: $updatedAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        createdAt
+        updatedAt
+        id
+        users
+        lastMessage
       }
       nextToken
     }
