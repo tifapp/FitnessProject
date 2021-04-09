@@ -29,8 +29,6 @@ input CreateConversationInput {
 This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when updating a Conversation.
 """
 input UpdateConversationInput {
-  updatedAt: AWSDateTime!
   id: ID!
-  users: [ID!]!
   lastMessage: String
 }

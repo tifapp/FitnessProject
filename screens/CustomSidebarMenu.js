@@ -162,22 +162,22 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
     });
     */
 
-    const conversationSubscription = API.graphql(
-      graphqlOperation(onUpdateConversation)
-    ).subscribe({
-      next: (event) => {
-        const updatedConversation = event.value.data.onUpdateConversation;
-        //no need for security checks here
-        //foreach users in conversation, if it's not myid and it's in friend list, update friend list, and push it to the top.
-        //alternatively for message screen, for each user in message screen, if it's in conversation push it to the top. otherwise just put this conversation at the top of the list.
-      },
-    });
+    // const conversationSubscription = API.graphql(
+    //   graphqlOperation(onUpdateConversation)
+    // ).subscribe({
+    //   next: (event) => {
+    //     const updatedConversation = event.value.data.onUpdateConversation;
+    //     //no need for security checks here
+    //     //foreach users in conversation, if it's not myid and it's in friend list, update friend list, and push it to the top.
+    //     //alternatively for message screen, for each user in message screen, if it's in conversation push it to the top. otherwise just put this conversation at the top of the list.
+    //   },
+    // });
     
     return () => {
       //removedFriendSubscription.unsubscribe();
       friendSubscription.unsubscribe();
       friendRequestSubscription.unsubscribe();
-      conversationSubscription.unsubscribe();
+      //conversationSubscription.unsubscribe();
       friendRequestList.forEach(item => {if (item.rejected || item.accepted) confirmResponse(item);});
     };
   }, []);

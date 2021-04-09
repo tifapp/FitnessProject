@@ -16,7 +16,7 @@ import {
 } from "react-native";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation } from "aws-amplify";
-import { createPost, updatePost, deletePost } from "root/src/graphql/mutations";
+import { createPost, updatePost, deletePost, createConversation, updateConveration } from "root/src/graphql/mutations";
 import { listPosts, postsByChannel, batchGetLikes } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
 import { onCreatePost, onDeletePost, onUpdatePost, onCreateLike, onDeleteLike, didIncrementLikes } from 'root/src/graphql/subscriptions';
