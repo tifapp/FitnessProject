@@ -31,6 +31,48 @@ export const incrementLikes = /* GraphQL */ `
     }
   }
 `;
+export const createConversation = /* GraphQL */ `
+  mutation CreateConversation(
+    $input: CreateConversationInput!
+    $condition: ModelConversationConditionInput
+  ) {
+    createConversation(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      id
+      users
+      lastMessage
+    }
+  }
+`;
+export const updateConversation = /* GraphQL */ `
+  mutation UpdateConversation(
+    $input: UpdateConversationInput!
+    $condition: ModelConversationConditionInput
+  ) {
+    updateConversation(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      id
+      users
+      lastMessage
+    }
+  }
+`;
+export const deleteConversation = /* GraphQL */ `
+  mutation DeleteConversation(
+    $input: DeleteConversationInput!
+    $condition: ModelConversationConditionInput
+  ) {
+    deleteConversation(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      id
+      users
+      lastMessage
+    }
+  }
+`;
 export const createFriendship = /* GraphQL */ `
   mutation CreateFriendship(
     $input: CreateFriendshipInput!

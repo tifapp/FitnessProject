@@ -26,6 +26,45 @@ export const batchGetMessages = /* GraphQL */ `
     }
   }
 `;
+export const getConversation = /* GraphQL */ `
+  query GetConversation($updatedAt: AWSDateTime!, $id: ID!) {
+    getConversation(updatedAt: $updatedAt, id: $id) {
+      createdAt
+      updatedAt
+      id
+      users
+      lastMessage
+    }
+  }
+`;
+export const listConversations = /* GraphQL */ `
+  query ListConversations(
+    $updatedAt: AWSDateTime
+    $id: ModelIDKeyConditionInput
+    $filter: ModelConversationFilterInput
+    $limit: Int
+    $nextToken: String
+    $sortDirection: ModelSortDirection
+  ) {
+    listConversations(
+      updatedAt: $updatedAt
+      id: $id
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
+    ) {
+      items {
+        createdAt
+        updatedAt
+        id
+        users
+        lastMessage
+      }
+      nextToken
+    }
+  }
+`;
 export const getFriendship = /* GraphQL */ `
   query GetFriendship($sender: ID!, $receiver: ID!) {
     getFriendship(sender: $sender, receiver: $receiver) {

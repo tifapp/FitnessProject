@@ -1,0 +1,35 @@
+"""
+Thankfully we won't need a secondary index key since only the users can see conversations they're a part of. Meaning a "listall" will only list conversations the user is a part of, and no others.
+"""
+type Conversation @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
+@auth(
+  rules: [
+      { allow: owner, ownerField: "users", operations: [create, update, read] }
+  ]
+)
+@key(fields: ["updatedAt", "id"])
+{
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+  id: ID!
+  users: [ID!]!
+  lastMessage: String
+}
+
+"""
+This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when creating a new Conversation.
+"""
+input CreateConversationInput {
+  id: ID!
+  users: [ID!]!
+}
+
+"""
+This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when updating a Conversation.
+"""
+input UpdateConversationInput {
+  updatedAt: AWSDateTime!
+  id: ID!
+  users: [ID!]!
+  lastMessage: String
+}
