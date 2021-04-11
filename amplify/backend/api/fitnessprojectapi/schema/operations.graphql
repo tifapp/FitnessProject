@@ -8,9 +8,10 @@ type Subscription {
   onMyNewFriendRequests(receiver: ID!): Friendship @aws_subscribe(mutations: ["createFriendship"])
   onMyNewFriendships: Friendship @aws_subscribe(mutations: ["updateFriendship"])
   onAllDeletedFriendships: Friendship @aws_subscribe(mutations: ["deleteFriendship"])
+  onNewMessage: Conversation @aws_subscribe(mutations: ["updateConversation"])
 }
 
 type Query {
   batchGetLikes(likes: [CreateLikeInput]): [Like]
-  batchGetMessages(posts: [DeletePostInput]): [Post]
+  batchGetConversations(ids: [DeleteConversationInput]): [Conversation]
 }

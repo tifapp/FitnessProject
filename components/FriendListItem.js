@@ -13,9 +13,6 @@ import computeDistance from "hooks/computeDistance";
 import getLocation from "hooks/useLocation";
 import PostItem from "components/PostItem";
 
-import { API, graphqlOperation } from "aws-amplify";
-import { postsByChannelLatest } from "root/src/graphql/queries";
-
 var styles = require("../styles/stylesheet");
 
 export default function FriendListItem({
@@ -24,37 +21,23 @@ export default function FriendListItem({
   removeFriendHandler,
   friendId,
   myId,
+  lastMessage,
 }) {
   const goToMessages = (id) => {
-    navigation.navigate("Messages", { userId: id });
+    if (!navigation.push)
+      navigation.navigate("Messages", { userId: id });
+    else navigation.push("Messages", { userId: id });
   };
 
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
 
   const [isMessageOpen, setIsMessageOpen] = useState(false);
-  const [lastMessage, setLastMessage] = useState(null);
   const [postVal, setPostVal] = useState("");
 
   const alertOptions = {
     cancelable: true,
     onDismiss: () => setIsOptionsOpen(false),
   };
-
-  useEffect(() => {
-    (async () => {
-      const query = await API.graphql(
-        graphqlOperation(postsByChannelLatest, {
-          limit: 1,
-          channel: myId < friendId ? myId + friendId : friendId + myId,
-          sortDirection: "DESC"
-        })
-      );
-
-      console.log("latest message is...");
-      console.log(query.data[Object.keys(query.data)[0]].items[0]);
-      setLastMessage(query.data[Object.keys(query.data)[0]].items[0]); //truncate the beginning of the message if it's too long
-    })();
-  }, []);
 
   return (
     <View>
@@ -140,7 +123,7 @@ export default function FriendListItem({
               <TouchableOpacity
                 style={[styles.subtitleButton, {
                   alignItems: "flex-start",
-                  paddingTop: lastMessage != null && lastMessage.description.length > 34 ? 0 : 8
+                  paddingTop: lastMessage != null && lastMessage.length > 34 ? 0 : 8
                 }]}
                 onPress={() => {
                   console.log("message pressed, " + isMessageOpen);
@@ -162,7 +145,7 @@ export default function FriendListItem({
                   size={15}
                   color={isOptionsOpen ? "black" : "blue"}
                 />
-                  {"  " + (lastMessage == null ? "Message" : lastMessage.description)}
+                  {"  " + (lastMessage == null ? "Message" : lastMessage)}
                 </Text>
               </TouchableOpacity>
             </View>

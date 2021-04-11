@@ -23,7 +23,7 @@ import {
   onMyNewFriendships,
   onCreateFriendship,
   onDeleteFriendship,
-  onUpdateConversation
+  onNewMessage
 } from "root/src/graphql/subscriptions";
 import { deleteFriendship, updateFriendship } from "root/src/graphql/mutations";
 
@@ -39,6 +39,7 @@ import FriendListItem from "components/FriendListItem";
 import FriendRequestListItem from "components/FriendRequestListItem";
 import playSound from "../hooks/playSound";
 import { useIsDrawerOpen } from '@react-navigation/drawer';
+import { batchGetConversations } from "../src/graphql/queries";
 
 export default function CustomSidebarMenu({ navigation, state, progress, myId }) {
   const [lastOnlineTime, setLastOnlineTime] = useState(0);
@@ -162,22 +163,29 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
     });
     */
 
-    // const conversationSubscription = API.graphql(
-    //   graphqlOperation(onUpdateConversation)
-    // ).subscribe({
-    //   next: (event) => {
-    //     const updatedConversation = event.value.data.onUpdateConversation;
-    //     //no need for security checks here
-    //     //foreach users in conversation, if it's not myid and it's in friend list, update friend list, and push it to the top.
-    //     //alternatively for message screen, for each user in message screen, if it's in conversation push it to the top. otherwise just put this conversation at the top of the list.
-    //   },
-    // });
+    const conversationSubscription = API.graphql(
+      graphqlOperation(onNewMessage)
+    ).subscribe({
+      next: (event) => {
+        const updatedConversation = event.value.data.onNewMessage;
+        console.log("new message, this is what it looks like ", updatedConversation, " and this is you: ", myId);
+        //no need for security checks here
+        currentFriends.current.map(function (i) {
+          if (updatedConversation.users.find(user => user !== myId && (i.sender === user || i.receiver === user))) {
+            i.lastMessage = updatedConversation.lastMessage;
+          }
+          return i;
+        })
+        //foreach users in conversation, if it's not myid and it's in friend list, update friend list, and push it to the top.
+        //alternatively for message screen, for each user in message screen, if it's in conversation push it to the top. otherwise just put this conversation at the top of the list.
+      },
+    });
     
     return () => {
       //removedFriendSubscription.unsubscribe();
       friendSubscription.unsubscribe();
       friendRequestSubscription.unsubscribe();
-      //conversationSubscription.unsubscribe();
+      conversationSubscription.unsubscribe();
       friendRequestList.forEach(item => {if (item.rejected || item.accepted) confirmResponse(item);});
     };
   }, []);
@@ -197,6 +205,31 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
         setNewFriendRequests(newFriendRequests+1); //do we ever want to increase the number when loading more requests?
       }
     });
+  };
+  
+  const fetchLatestMessages = async (items) => {
+    let conversationIds = [];
+
+    items.forEach((item) => {
+      conversationIds.push({id: item.sender < item.receiver ? item.sender+item.receiver : item.receiver+item.sender});
+    });
+    
+    try {
+      const conversations = await API.graphql(graphqlOperation(batchGetConversations, { ids: conversationIds }));
+      //console.log("looking for likes: ", likes);
+      //returns an array of like objects or nulls corresponding with the array of newposts
+      for (i = 0; i < items.length; ++i) {
+        if (conversations.data.batchGetConversations[i] != null) {
+          console.log("found conversation");
+          items[i].lastMessage = conversations.data.batchGetConversations[i].lastMessage;
+        } else {
+          items[i].lastMessage = null;
+        }
+      }
+      return items;
+    } catch (err) {
+      console.log("error in getting latest messages: ", err);
+    }
   };
 
   const respondToRequest = (item, accepted) => {
@@ -421,6 +454,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
             },
           }}
           setDataFunction={setFriendList} //a batch function should be used to grab message previews. that would also make it easy to exclude any.
+          processingFunction={fetchLatestMessages}
           data={friendList}
           initialAmount={15}
           additionalAmount={15}
@@ -431,6 +465,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
               item={item}
               friendId={item.sender === myId ? item.receiver : item.sender}
               myId={myId}
+              lastMessage={item.lastMessage}
             />
           )}
           keyExtractor={(item) => item.createdAt.toString()}

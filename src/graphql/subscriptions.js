@@ -49,6 +49,17 @@ export const onAllDeletedFriendships = /* GraphQL */ `
     }
   }
 `;
+export const onNewMessage = /* GraphQL */ `
+  subscription OnNewMessage {
+    onNewMessage {
+      createdAt
+      updatedAt
+      id
+      users
+      lastMessage
+    }
+  }
+`;
 export const onCreateConversation = /* GraphQL */ `
   subscription OnCreateConversation($users: String!) {
     onCreateConversation(users: $users) {

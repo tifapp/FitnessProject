@@ -12,7 +12,7 @@ type Conversation @model(timestamps: { createdAt: "createdAt", updatedAt: "updat
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
   id: ID!
-  users: [ID!]!
+  users: [String]!
   lastMessage: String!
 }
 
@@ -21,7 +21,7 @@ This allows us to fill in the missing fields in the backend rather than letting 
 """
 input CreateConversationInput {
   id: ID!
-  users: [ID!]!
+  users: [String]!
   lastMessage: String!
 }
 
@@ -31,4 +31,8 @@ This allows us to fill in the missing fields in the backend rather than letting 
 input UpdateConversationInput {
   id: ID!
   lastMessage: String
+}
+
+input DeleteConversationInput {
+  id: ID!
 }

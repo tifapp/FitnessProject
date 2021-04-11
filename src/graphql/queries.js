@@ -11,18 +11,14 @@ export const batchGetLikes = /* GraphQL */ `
     }
   }
 `;
-export const batchGetMessages = /* GraphQL */ `
-  query BatchGetMessages($posts: [DeletePostInput]) {
-    batchGetMessages(posts: $posts) {
+export const batchGetConversations = /* GraphQL */ `
+  query BatchGetConversations($ids: [DeleteConversationInput]) {
+    batchGetConversations(ids: $ids) {
       createdAt
       updatedAt
-      userId
-      description
-      parentId
-      channel
-      receiver
-      isParent
-      likes
+      id
+      users
+      lastMessage
     }
   }
 `;
