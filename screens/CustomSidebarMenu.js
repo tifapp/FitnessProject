@@ -23,7 +23,8 @@ import {
   onMyNewFriendships,
   onCreateFriendship,
   onDeleteFriendship,
-  onNewMessage
+  onNewMessage,
+  onNewConversation
 } from "root/src/graphql/subscriptions";
 import { deleteFriendship, updateFriendship } from "root/src/graphql/mutations";
 
@@ -40,6 +41,7 @@ import FriendRequestListItem from "components/FriendRequestListItem";
 import playSound from "../hooks/playSound";
 import { useIsDrawerOpen } from '@react-navigation/drawer';
 import { batchGetConversations } from "../src/graphql/queries";
+import { onCreateConversation, onUpdateConversation } from "../src/graphql/subscriptions";
 
 export default function CustomSidebarMenu({ navigation, state, progress, myId }) {
   const [lastOnlineTime, setLastOnlineTime] = useState(0);
@@ -163,11 +165,11 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
     });
     */
 
-    const conversationSubscription = API.graphql(
-      graphqlOperation(onNewMessage)
+    const conversationUpdateSubscription = API.graphql(
+      graphqlOperation(onUpdateConversation, {users: myId})
     ).subscribe({
       next: (event) => {
-        const updatedConversation = event.value.data.onNewMessage;
+        const updatedConversation = event.value.data.onUpdateConversation;
         console.log("new message, this is what it looks like ", updatedConversation, " and this is you: ", myId);
         //no need for security checks here
         currentFriends.current.map(function (i) {
@@ -181,11 +183,30 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
       },
     });
     
+    const conversationCreateSubscription = API.graphql(
+      graphqlOperation(onCreateConversation, {users: myId})
+    ).subscribe({
+      next: (event) => {
+        const updatedConversation = event.value.data.onCreateConversation;
+        console.log("new message, this is what it looks like ", updatedConversation, " and this is you: ", myId);
+        //no need for security checks here
+        currentFriends.current.map(function (i) {
+          if (updatedConversation.users.find(user => user !== myId && (i.sender === user || i.receiver === user))) {
+            i.lastMessage = updatedConversation.lastMessage;
+          }
+          return i;
+        })
+        //foreach users in conversation, if it's not myid and it's in friend list, update friend list, and push it to the top.
+        //alternatively for message screen, for each user in message screen, if it's in conversation push it to the top. otherwise just put this conversation at the top of the list.
+      },
+    });
+
     return () => {
       //removedFriendSubscription.unsubscribe();
       friendSubscription.unsubscribe();
       friendRequestSubscription.unsubscribe();
-      conversationSubscription.unsubscribe();
+      conversationUpdateSubscription.unsubscribe();
+      conversationCreateSubscription.unsubscribe();
       friendRequestList.forEach(item => {if (item.rejected || item.accepted) confirmResponse(item);});
     };
   }, []);
