@@ -19,7 +19,7 @@ import {
   getFriendRequest,
 } from "root/src/graphql/queries";
 import {
-  onMyNewFriendRequests,
+  onNewFriendRequest,
   onMyNewFriendships,
   onCreateFriendship,
   onDeleteFriendship,
@@ -93,7 +93,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
     // Executes when a user receieves a friend request
     // listening for new friend requests
     const friendRequestSubscription = API.graphql(
-      graphqlOperation(onMyNewFriendRequests, { receiver: myId })
+      graphqlOperation(onNewFriendRequest, { receiver: myId })
     ).subscribe({
       next: (event) => {
         //IMPORTANT: don't use "friendList" or "friendRequestList" variables in this scope, instead use "currentFriends.current" and "currentFriendRequests.current"
