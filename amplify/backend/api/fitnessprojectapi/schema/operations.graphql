@@ -5,11 +5,11 @@ type Mutation {
 
 type Subscription {
   onIncrementLikes: Post @aws_subscribe(mutations: ["incrementLikes"]) @aws_cognito_user_pools  
-  onMyNewFriendRequests(receiver: ID!): Friendship @aws_subscribe(mutations: ["createFriendship"])
   onMyNewFriendships: Friendship @aws_subscribe(mutations: ["updateFriendship"])
   onAllDeletedFriendships: Friendship @aws_subscribe(mutations: ["deleteFriendship"])
-  onNewMessage(users: ID!): Conversation @aws_subscribe(mutations: ["updateConversation"]) @auth(rules: [{ allow: owner, ownerField: "users" }])
-  onNewConversation(users: ID!): Conversation @aws_subscribe(mutations: ["createConversation"]) @auth(rules: [{ allow: owner, ownerField: "users" }])
+
+  onNewFriendRequest(receiver: ID!): Friendship @aws_subscribe(mutations: ["createFriendship"])
+  onNewMessage(users: [ID!]!): Conversation @aws_subscribe(mutations: ["createConversation", "updateConversation"])
 }
 
 type Query {

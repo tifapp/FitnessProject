@@ -31,6 +31,76 @@ export const incrementLikes = /* GraphQL */ `
     }
   }
 `;
+export const createGroup = /* GraphQL */ `
+  mutation CreateGroup(
+    $input: CreateGroupInput!
+    $condition: ModelGroupConditionInput
+  ) {
+    createGroup(input: $input, condition: $condition) {
+      id
+      userID
+      name
+      Privacy
+      Sport
+      Description
+      characterCount
+      latitude
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateGroup = /* GraphQL */ `
+  mutation UpdateGroup(
+    $input: UpdateGroupInput!
+    $condition: ModelGroupConditionInput
+  ) {
+    updateGroup(input: $input, condition: $condition) {
+      id
+      userID
+      name
+      Privacy
+      Sport
+      Description
+      characterCount
+      latitude
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteGroup = /* GraphQL */ `
+  mutation DeleteGroup(
+    $input: DeleteGroupInput!
+    $condition: ModelGroupConditionInput
+  ) {
+    deleteGroup(input: $input, condition: $condition) {
+      id
+      userID
+      name
+      Privacy
+      Sport
+      Description
+      characterCount
+      latitude
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateLike = /* GraphQL */ `
+  mutation UpdateLike(
+    $input: UpdateLikeInput!
+    $condition: ModelLikeConditionInput
+  ) {
+    updateLike(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      userId
+      postId
+    }
+  }
+`;
 export const createConversation = /* GraphQL */ `
   mutation CreateConversation(
     $input: CreateConversationInput!
@@ -115,82 +185,12 @@ export const deleteFriendship = /* GraphQL */ `
     }
   }
 `;
-export const createGroup = /* GraphQL */ `
-  mutation CreateGroup(
-    $input: CreateGroupInput!
-    $condition: ModelGroupConditionInput
-  ) {
-    createGroup(input: $input, condition: $condition) {
-      id
-      userID
-      name
-      Privacy
-      Sport
-      Description
-      characterCount
-      latitude
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const updateGroup = /* GraphQL */ `
-  mutation UpdateGroup(
-    $input: UpdateGroupInput!
-    $condition: ModelGroupConditionInput
-  ) {
-    updateGroup(input: $input, condition: $condition) {
-      id
-      userID
-      name
-      Privacy
-      Sport
-      Description
-      characterCount
-      latitude
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const deleteGroup = /* GraphQL */ `
-  mutation DeleteGroup(
-    $input: DeleteGroupInput!
-    $condition: ModelGroupConditionInput
-  ) {
-    deleteGroup(input: $input, condition: $condition) {
-      id
-      userID
-      name
-      Privacy
-      Sport
-      Description
-      characterCount
-      latitude
-      createdAt
-      updatedAt
-    }
-  }
-`;
 export const createLike = /* GraphQL */ `
   mutation CreateLike(
     $input: CreateLikeInput!
     $condition: ModelLikeConditionInput
   ) {
     createLike(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      userId
-      postId
-    }
-  }
-`;
-export const updateLike = /* GraphQL */ `
-  mutation UpdateLike(
-    $input: UpdateLikeInput!
-    $condition: ModelLikeConditionInput
-  ) {
-    updateLike(input: $input, condition: $condition) {
       createdAt
       updatedAt
       userId
@@ -208,6 +208,60 @@ export const deleteLike = /* GraphQL */ `
       updatedAt
       userId
       postId
+    }
+  }
+`;
+export const createPost = /* GraphQL */ `
+  mutation CreatePost(
+    $input: CreatePostInput!
+    $condition: ModelPostConditionInput
+  ) {
+    createPost(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      userId
+      description
+      parentId
+      channel
+      receiver
+      isParent
+      likes
+    }
+  }
+`;
+export const updatePost = /* GraphQL */ `
+  mutation UpdatePost(
+    $input: UpdatePostInput!
+    $condition: ModelPostConditionInput
+  ) {
+    updatePost(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      userId
+      description
+      parentId
+      channel
+      receiver
+      isParent
+      likes
+    }
+  }
+`;
+export const deletePost = /* GraphQL */ `
+  mutation DeletePost(
+    $input: DeletePostInput!
+    $condition: ModelPostConditionInput
+  ) {
+    deletePost(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      userId
+      description
+      parentId
+      channel
+      receiver
+      isParent
+      likes
     }
   }
 `;
@@ -271,60 +325,6 @@ export const deleteUser = /* GraphQL */ `
       deviceToken
       createdAt
       updatedAt
-    }
-  }
-`;
-export const deletePost = /* GraphQL */ `
-  mutation DeletePost(
-    $input: DeletePostInput!
-    $condition: ModelPostConditionInput
-  ) {
-    deletePost(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      userId
-      description
-      parentId
-      channel
-      receiver
-      isParent
-      likes
-    }
-  }
-`;
-export const createPost = /* GraphQL */ `
-  mutation CreatePost(
-    $input: CreatePostInput!
-    $condition: ModelPostConditionInput
-  ) {
-    createPost(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      userId
-      description
-      parentId
-      channel
-      receiver
-      isParent
-      likes
-    }
-  }
-`;
-export const updatePost = /* GraphQL */ `
-  mutation UpdatePost(
-    $input: UpdatePostInput!
-    $condition: ModelPostConditionInput
-  ) {
-    updatePost(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      userId
-      description
-      parentId
-      channel
-      receiver
-      isParent
-      likes
     }
   }
 `;

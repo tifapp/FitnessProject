@@ -16,17 +16,6 @@ export const onIncrementLikes = /* GraphQL */ `
     }
   }
 `;
-export const onMyNewFriendRequests = /* GraphQL */ `
-  subscription OnMyNewFriendRequests($receiver: ID!) {
-    onMyNewFriendRequests(receiver: $receiver) {
-      createdAt
-      updatedAt
-      sender
-      receiver
-      accepted
-    }
-  }
-`;
 export const onMyNewFriendships = /* GraphQL */ `
   subscription OnMyNewFriendships {
     onMyNewFriendships {
@@ -49,80 +38,25 @@ export const onAllDeletedFriendships = /* GraphQL */ `
     }
   }
 `;
+export const onNewFriendRequest = /* GraphQL */ `
+  subscription OnNewFriendRequest($receiver: ID!) {
+    onNewFriendRequest(receiver: $receiver) {
+      createdAt
+      updatedAt
+      sender
+      receiver
+      accepted
+    }
+  }
+`;
 export const onNewMessage = /* GraphQL */ `
-  subscription OnNewMessage {
-    onNewMessage {
+  subscription OnNewMessage($users: [ID!]!) {
+    onNewMessage(users: $users) {
       createdAt
       updatedAt
       id
       users
       lastMessage
-    }
-  }
-`;
-export const onCreateConversation = /* GraphQL */ `
-  subscription OnCreateConversation($users: String!) {
-    onCreateConversation(users: $users) {
-      createdAt
-      updatedAt
-      id
-      users
-      lastMessage
-    }
-  }
-`;
-export const onUpdateConversation = /* GraphQL */ `
-  subscription OnUpdateConversation($users: String!) {
-    onUpdateConversation(users: $users) {
-      createdAt
-      updatedAt
-      id
-      users
-      lastMessage
-    }
-  }
-`;
-export const onDeleteConversation = /* GraphQL */ `
-  subscription OnDeleteConversation($users: String!) {
-    onDeleteConversation(users: $users) {
-      createdAt
-      updatedAt
-      id
-      users
-      lastMessage
-    }
-  }
-`;
-export const onCreateFriendship = /* GraphQL */ `
-  subscription OnCreateFriendship($sender: String!, $receiver: String!) {
-    onCreateFriendship(sender: $sender, receiver: $receiver) {
-      createdAt
-      updatedAt
-      sender
-      receiver
-      accepted
-    }
-  }
-`;
-export const onUpdateFriendship = /* GraphQL */ `
-  subscription OnUpdateFriendship($sender: String!, $receiver: String!) {
-    onUpdateFriendship(sender: $sender, receiver: $receiver) {
-      createdAt
-      updatedAt
-      sender
-      receiver
-      accepted
-    }
-  }
-`;
-export const onDeleteFriendship = /* GraphQL */ `
-  subscription OnDeleteFriendship($sender: String!, $receiver: String!) {
-    onDeleteFriendship(sender: $sender, receiver: $receiver) {
-      createdAt
-      updatedAt
-      sender
-      receiver
-      accepted
     }
   }
 `;
@@ -171,6 +105,72 @@ export const onDeleteGroup = /* GraphQL */ `
       latitude
       createdAt
       updatedAt
+    }
+  }
+`;
+export const onCreateConversation = /* GraphQL */ `
+  subscription OnCreateConversation($users: String) {
+    onCreateConversation(users: $users) {
+      createdAt
+      updatedAt
+      id
+      users
+      lastMessage
+    }
+  }
+`;
+export const onUpdateConversation = /* GraphQL */ `
+  subscription OnUpdateConversation($users: String) {
+    onUpdateConversation(users: $users) {
+      createdAt
+      updatedAt
+      id
+      users
+      lastMessage
+    }
+  }
+`;
+export const onDeleteConversation = /* GraphQL */ `
+  subscription OnDeleteConversation($users: String) {
+    onDeleteConversation(users: $users) {
+      createdAt
+      updatedAt
+      id
+      users
+      lastMessage
+    }
+  }
+`;
+export const onCreateFriendship = /* GraphQL */ `
+  subscription OnCreateFriendship($sender: String, $receiver: String) {
+    onCreateFriendship(sender: $sender, receiver: $receiver) {
+      createdAt
+      updatedAt
+      sender
+      receiver
+      accepted
+    }
+  }
+`;
+export const onUpdateFriendship = /* GraphQL */ `
+  subscription OnUpdateFriendship($sender: String, $receiver: String) {
+    onUpdateFriendship(sender: $sender, receiver: $receiver) {
+      createdAt
+      updatedAt
+      sender
+      receiver
+      accepted
+    }
+  }
+`;
+export const onDeleteFriendship = /* GraphQL */ `
+  subscription OnDeleteFriendship($sender: String, $receiver: String) {
+    onDeleteFriendship(sender: $sender, receiver: $receiver) {
+      createdAt
+      updatedAt
+      sender
+      receiver
+      accepted
     }
   }
 `;

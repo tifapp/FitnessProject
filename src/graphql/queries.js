@@ -22,74 +22,6 @@ export const batchGetConversations = /* GraphQL */ `
     }
   }
 `;
-export const getConversation = /* GraphQL */ `
-  query GetConversation($id: ID!) {
-    getConversation(id: $id) {
-      createdAt
-      updatedAt
-      id
-      users
-      lastMessage
-    }
-  }
-`;
-export const listConversations = /* GraphQL */ `
-  query ListConversations(
-    $filter: ModelConversationFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listConversations(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        createdAt
-        updatedAt
-        id
-        users
-        lastMessage
-      }
-      nextToken
-    }
-  }
-`;
-export const getFriendship = /* GraphQL */ `
-  query GetFriendship($sender: ID!, $receiver: ID!) {
-    getFriendship(sender: $sender, receiver: $receiver) {
-      createdAt
-      updatedAt
-      sender
-      receiver
-      accepted
-    }
-  }
-`;
-export const listFriendships = /* GraphQL */ `
-  query ListFriendships(
-    $sender: ID
-    $receiver: ModelIDKeyConditionInput
-    $filter: ModelFriendshipFilterInput
-    $limit: Int
-    $nextToken: String
-    $sortDirection: ModelSortDirection
-  ) {
-    listFriendships(
-      sender: $sender
-      receiver: $receiver
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      sortDirection: $sortDirection
-    ) {
-      items {
-        createdAt
-        updatedAt
-        sender
-        receiver
-        accepted
-      }
-      nextToken
-    }
-  }
-`;
 export const getGroup = /* GraphQL */ `
   query GetGroup($id: ID!) {
     getGroup(id: $id) {
@@ -124,6 +56,35 @@ export const listGroups = /* GraphQL */ `
         latitude
         createdAt
         updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const getConversation = /* GraphQL */ `
+  query GetConversation($id: ID!) {
+    getConversation(id: $id) {
+      createdAt
+      updatedAt
+      id
+      users
+      lastMessage
+    }
+  }
+`;
+export const listConversations = /* GraphQL */ `
+  query ListConversations(
+    $filter: ModelConversationFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listConversations(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        createdAt
+        updatedAt
+        id
+        users
+        lastMessage
       }
       nextToken
     }
@@ -171,6 +132,45 @@ export const friendsByReceiver = /* GraphQL */ `
       filter: $filter
       limit: $limit
       nextToken: $nextToken
+    ) {
+      items {
+        createdAt
+        updatedAt
+        sender
+        receiver
+        accepted
+      }
+      nextToken
+    }
+  }
+`;
+export const getFriendship = /* GraphQL */ `
+  query GetFriendship($sender: ID!, $receiver: ID!) {
+    getFriendship(sender: $sender, receiver: $receiver) {
+      createdAt
+      updatedAt
+      sender
+      receiver
+      accepted
+    }
+  }
+`;
+export const listFriendships = /* GraphQL */ `
+  query ListFriendships(
+    $sender: ID
+    $receiver: ModelIDKeyConditionInput
+    $filter: ModelFriendshipFilterInput
+    $limit: Int
+    $nextToken: String
+    $sortDirection: ModelSortDirection
+  ) {
+    listFriendships(
+      sender: $sender
+      receiver: $receiver
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
     ) {
       items {
         createdAt

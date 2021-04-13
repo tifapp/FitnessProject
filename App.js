@@ -37,6 +37,8 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import * as Notifications from 'expo-notifications';
 import * as Permissions from 'expo-permissions';
 import { StatusBar } from "expo-status-bar";
+import MessageScreen from "./screens/MessageScreen";
+import ConversationScreen from "./screens/ConversationScreen";
 
 if (
   Platform.OS === "android" &&
@@ -231,6 +233,16 @@ const App = () => {
             name="Profile"
             component={ProfileStack}
             initialParams={{ myId: userId, fromLookup: false }}
+          />
+          <Drawer.Screen
+            name="Messages"
+            component={MessageScreen}
+            initialParams={{ myId: userId }}
+          />
+          <Drawer.Screen
+            name="Conversations"
+            component={ConversationScreen}
+            initialParams={{ myId: userId }}
           />
         </Drawer.Navigator>
       </NavigationContainer>
