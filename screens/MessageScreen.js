@@ -3,9 +3,6 @@ import {
   Text,
   View,
   TouchableOpacity,
-  useState, 
-  useEffect, 
-  useRef, 
   PureComponent
 } from "react-native";
 // Get the aws resources configuration parameters

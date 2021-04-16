@@ -26,7 +26,6 @@ export default function FriendListItem({
   lastUser
 }) {
   const goToMessages = (id) => {
-    navigation.dispatch(CommonActions.setParams({ userId: id }));
     if (!navigation.push)
       navigation.navigate("Messages", { userId: id });
     else navigation.push("Messages", { userId: id });

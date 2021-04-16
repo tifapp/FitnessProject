@@ -137,7 +137,7 @@ export const ProfileImageAndName = (props) => {
         }); //redundant???
     }
     //return () => mounted = false;
-  }, [props.user, imageChanged]);
+  }, [props.user, imageChanged]); //there is no props.user
 
   useEffect(() => {
     Cache.getItem(props.userId) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
