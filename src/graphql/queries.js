@@ -18,6 +18,7 @@ export const batchGetConversations = /* GraphQL */ `
       updatedAt
       id
       users
+      lastUser
       lastMessage
     }
   }
@@ -68,6 +69,7 @@ export const getConversation = /* GraphQL */ `
       updatedAt
       id
       users
+      lastUser
       lastMessage
     }
   }
@@ -84,6 +86,7 @@ export const listConversations = /* GraphQL */ `
         updatedAt
         id
         users
+        lastUser
         lastMessage
       }
       nextToken
@@ -110,6 +113,7 @@ export const conversationsByLastUpdated = /* GraphQL */ `
         updatedAt
         id
         users
+        lastUser
         lastMessage
       }
       nextToken

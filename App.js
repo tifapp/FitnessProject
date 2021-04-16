@@ -234,6 +234,8 @@ const App = () => {
             component={ProfileStack}
             initialParams={{ myId: userId, fromLookup: false }}
           />
+          {
+            /*
           <Drawer.Screen
             name="Messages"
             component={MessageScreen}
@@ -244,6 +246,8 @@ const App = () => {
             component={ConversationScreen}
             initialParams={{ myId: userId }}
           />
+            */
+          }
         </Drawer.Navigator>
       </NavigationContainer>
     );

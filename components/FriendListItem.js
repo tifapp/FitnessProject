@@ -12,6 +12,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import computeDistance from "hooks/computeDistance";
 import getLocation from "hooks/useLocation";
 import PostItem from "components/PostItem";
+import { CommonActions } from '@react-navigation/native';
 
 var styles = require("../styles/stylesheet");
 
@@ -22,8 +23,10 @@ export default function FriendListItem({
   friendId,
   myId,
   lastMessage,
+  lastUser
 }) {
   const goToMessages = (id) => {
+    navigation.dispatch(CommonActions.setParams({ userId: id }));
     if (!navigation.push)
       navigation.navigate("Messages", { userId: id });
     else navigation.push("Messages", { userId: id });
@@ -132,7 +135,7 @@ export default function FriendListItem({
               >
                 <Text
                   style={{
-                    color: isOptionsOpen ? "black" : "blue",
+                    color: isOptionsOpen ? "black" : lastUser === myId ? "gray" : "blue",
                     fontSize: 15,
                     fontWeight: "bold",
                     fontStyle: lastMessage == null ? "italic" : "normal", 
@@ -143,7 +146,7 @@ export default function FriendListItem({
                 <MaterialIcons
                   name="chat"
                   size={15}
-                  color={isOptionsOpen ? "black" : "blue"}
+                  color={isOptionsOpen ? "black" : lastUser === myId ? "gray" : "blue"}
                 />
                   {"  " + (lastMessage == null ? "Message" : lastMessage)}
                 </Text>

@@ -6,7 +6,7 @@ type Friendship @model(timestamps: { createdAt: "createdAt", updatedAt: "updated
 @auth(
   rules: [
       { allow: owner, ownerField: "sender", operations: [create, delete, read] },
-      { allow: owner, ownerField: "receiver", operations: [delete, read] },
+      { allow: owner, ownerField: "receiver", operations: [update, delete, read] },
   ]
 )
 @key(fields: ["sender", "receiver"])

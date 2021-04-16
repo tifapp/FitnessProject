@@ -99,7 +99,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
         //IMPORTANT: don't use "friendList" or "friendRequestList" variables in this scope, instead use "currentFriends.current" and "currentFriendRequests.current"
 
         //console.log("is drawer open? ", isDrawerOpen.current);
-        const newFriendRequest = event.value.data.onMyNewFriendRequests;
+        const newFriendRequest = event.value.data.onNewFriendRequest;
         if (newFriendRequest.sender !== myId && newFriendRequest.receiver !== myId)
           console.log("security error with incoming friend request");
 
@@ -207,30 +207,30 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
     
     try {
       const conversations = await API.graphql(graphqlOperation(batchGetConversations, { ids: conversationIds }));
-      //console.log("looking for likes: ", likes);
-      //returns an array of like objects or nulls corresponding with the array of newposts
+      //console.log("looking for conversations: ", conversations);
+      //returns an array of like objects or nulls corresponding with the array of conversations
       for (i = 0; i < items.length; ++i) {
-        if (conversations.data.batchGetConversations[i] != null) {
-          console.log("found conversation");
-          items[i].lastMessage = conversations.data.batchGetConversations[i].lastMessage;
-          
-          (async () => {
-            subscriptions.push(
-              await API.graphql(
-                graphqlOperation(onNewMessage, {
-                  users: conversations.data.batchGetConversations[i].users,
-                })
-              ).subscribe({
-                next: (event) => {
-                  const updatedConversation =
-                    event.value.data.onNewMessage;
-                  console.log(
-                    "new message, this is what it looks like ",
-                    updatedConversation,
-                    " and this is you: ",
-                    myId
-                  );
-                  //no need for security checks here
+        console.log("friend list item: ", items[i]);
+        const friendslistarray = items[i].sender < items[i].receiver ? [items[i].sender,items[i].receiver] : [items[i].receiver,items[i].sender];
+        console.log("friend list array: ", friendslistarray);
+        (async () => {
+          subscriptions.push(
+            await API.graphql(
+              graphqlOperation(onNewMessage, {
+                users: friendslistarray
+              })
+            ).subscribe({
+              next: (event) => {
+                const updatedConversation =
+                  event.value.data.onNewMessage;
+                console.log(
+                  "new message, this is what it looks like ",
+                  updatedConversation,
+                  " and this is you: ",
+                  myId
+                );
+                //no need for security checks here
+                setFriendList(
                   currentFriends.current.map(function (i) {
                     if (
                       updatedConversation.users.find(
@@ -240,18 +240,21 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
                       )
                     ) {
                       i.lastMessage = updatedConversation.lastMessage;
+                      i.lastUser = updatedConversation.lastUser;
                     }
                     return i;
-                  });
-                  //foreach users in conversation, if it's not myid and it's in friend list, update friend list, and push it to the top.
-                  //alternatively for message screen, for each user in message screen, if it's in conversation push it to the top. otherwise just put this conversation at the top of the list.
-                },
-              })
-            );
-          })();
+                  }));
+                //foreach users in conversation, if it's not myid and it's in friend list, update friend list, and push it to the top.
+                //alternatively for message screen, for each user in message screen, if it's in conversation push it to the top. otherwise just put this conversation at the top of the list.
+              },
+            })
+          );
+        })();
 
-        } else {
-          items[i].lastMessage = null;
+        if (conversations.data.batchGetConversations[i] != null) {
+          console.log("found conversation");
+          items[i].lastMessage = conversations.data.batchGetConversations[i].lastMessage;
+          items[i].lastUser = conversations.data.batchGetConversations[i].lastUser; //could also store the index of lastuser from the users array rather than the full string
         }
       }
       return items;
@@ -493,6 +496,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
               friendId={item.sender === myId ? item.receiver : item.sender}
               myId={myId}
               lastMessage={item.lastMessage}
+              lastUser={item.lastUser}
             />
           )}
           keyExtractor={(item) => item.createdAt.toString()}

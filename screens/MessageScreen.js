@@ -13,6 +13,8 @@ import FeedScreen from "screens/FeedScreen";
 import { useFocusEffect } from '@react-navigation/native';
 import * as Notifications from 'expo-notifications';
 import { ProfileImageAndName } from "components/ProfileImageAndName";
+import { API, graphqlOperation } from "aws-amplify";
+import { createReadReceipt } from "root/src/graphql/mutations";
 
 //const { width } = Dimensions.get('window');
 
@@ -23,6 +25,11 @@ export default function MessageScreen({ navigation, route }) {
 
   console.log("Here is the user!");
   console.log(userId);
+
+  /*
+  useEffect(() => {
+    API.graphql(graphqlOperation(createReadReceipt, { input: {id: channel} })); //don't do this if there are no new messages
+  },[]);
 
   /*
   useFocusEffect(

@@ -32,9 +32,55 @@
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
           "s3Key": "amplify-builds/likeCounter-2f6f46616c5633504e31-build.zip"
         },
-        "friendRequestResolver": {
+        "friendNotifications": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/friendRequestResolver-4d42574f6b615336666e-build.zip"
+          "s3Key": "amplify-builds/friendNotifications-6a46704b394446717134-build.zip"
+        }
+      },
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d19kzf7eu35pq1",
+          "type": "manual"
+        }
+      }
+    }
+  },
+  "layer": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-fitnessproject-layer-10925-authRole",
+      "UnauthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-layer-10925-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-layer-10925-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-fitnessproject-layer-10925-deployment",
+      "UnauthRoleName": "amplify-fitnessproject-layer-10925-unauthRole",
+      "StackName": "amplify-fitnessproject-layer-10925",
+      "StackId": "arn:aws:cloudformation:us-west-2:213277979580:stack/amplify-fitnessproject-layer-10925/c8fcb840-9cf8-11eb-9bba-0a347e4a10eb",
+      "AmplifyAppId": "d19kzf7eu35pq1"
+    },
+    "categories": {
+      "auth": {
+        "fitnessprojecta8f49cfe": {}
+      },
+      "function": {
+        "S3Triggeref91c1ec": {
+          "deploymentBucketName": "amplify-fitnessproject-layer-10925-deployment",
+          "s3Key": "amplify-builds/S3Triggeref91c1ec-4a4d6c62786e4e667657-build.zip"
+        },
+        "deleteReplies": {
+          "deploymentBucketName": "amplify-fitnessproject-layer-10925-deployment",
+          "s3Key": "amplify-builds/deleteReplies-7242393646514256646e-build.zip"
+        },
+        "replyNotifications": {
+          "deploymentBucketName": "amplify-fitnessproject-layer-10925-deployment",
+          "s3Key": "amplify-builds/replyNotifications-627a6376564773315138-build.zip"
+        },
+        "likeCounter": {
+          "deploymentBucketName": "amplify-fitnessproject-layer-10925-deployment",
+          "s3Key": "amplify-builds/likeCounter-2f6f46616c5633504e31-build.zip"
+        },
+        "friendNotifications": {
+          "deploymentBucketName": "amplify-fitnessproject-layer-10925-deployment",
+          "s3Key": "amplify-builds/friendNotifications-6a46704b394446717134-build.zip"
         }
       },
       "hosting": {

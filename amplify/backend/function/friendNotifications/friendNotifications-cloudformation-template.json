@@ -55,12 +55,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "friendRequestResolver",
+            "friendNotifications",
             {
               "Fn::Join": [
                 "",
                 [
-                  "friendRequestResolver",
+                  "friendNotifications",
                   "-",
                   {
                     "Ref": "env"
@@ -103,12 +103,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "fitnessprojectLambdaRolefcf85980",
+            "fitnessprojectLambdaRolee799469d",
             {
               "Fn::Join": [
                 "",
                 [
-                  "fitnessprojectLambdaRolefcf85980",
+                  "fitnessprojectLambdaRolee799469d",
                   "-",
                   {
                     "Ref": "env"
@@ -197,7 +197,13 @@
             {
               "Effect": "Allow",
               "Action": [
-                "appsync:GraphQL"
+                "appsync:Create*",
+                "appsync:StartSchemaCreation",
+                "appsync:GraphQL",
+                "appsync:Get*",
+                "appsync:List*",
+                "appsync:Update*",
+                "appsync:Delete*"
               ],
               "Resource": [
                 {
@@ -216,7 +222,7 @@
                       {
                         "Ref": "apifitnessprojectapiGraphQLAPIIdOutput"
                       },
-                      "/types/create/*"
+                      "/*"
                     ]
                   ]
                 },
@@ -235,48 +241,7 @@
                       ":apis/",
                       {
                         "Ref": "apifitnessprojectapiGraphQLAPIIdOutput"
-                      },
-                      "/types/read/*"
-                    ]
-                  ]
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:aws:appsync:",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      ":",
-                      {
-                        "Ref": "AWS::AccountId"
-                      },
-                      ":apis/",
-                      {
-                        "Ref": "apifitnessprojectapiGraphQLAPIIdOutput"
-                      },
-                      "/types/update/*"
-                    ]
-                  ]
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:aws:appsync:",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      ":",
-                      {
-                        "Ref": "AWS::AccountId"
-                      },
-                      ":apis/",
-                      {
-                        "Ref": "apifitnessprojectapiGraphQLAPIIdOutput"
-                      },
-                      "/types/delete/*"
+                      }
                     ]
                   ]
                 }

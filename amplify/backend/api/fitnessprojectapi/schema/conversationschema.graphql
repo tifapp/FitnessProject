@@ -13,6 +13,7 @@ type Conversation @model(timestamps: { createdAt: "createdAt", updatedAt: "updat
   updatedAt: AWSDateTime!
   id: ID!
   users: [ID!]!
+  lastUser: ID!
   lastMessage: String!
 }
 

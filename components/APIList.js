@@ -96,7 +96,7 @@ class APIList extends Component { //we need to make this a class to use refs fro
         beginning = false;
         nextToken = query.data[Object.keys(query.data)[0]].nextToken
         results = [...query.data[Object.keys(query.data)[0]].items, ...results]
-        console.log(results);
+        //console.log(results);
         //console.log("completed iteration of fetching, amount of results are ", results.length);
       } while (results.length < (wasBeginning ? initialAmount : additionalAmount) && nextToken != null);
 

@@ -110,7 +110,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
 
     try {
       const likes = await API.graphql(graphqlOperation(batchGetLikes, { likes: postIds }));
-      console.log("looking for likes: ", likes);
+      //console.log("looking for likes: ", likes);
       //returns an array of like objects or nulls corresponding with the array of newposts
       for (i = 0; i < newPosts.length; ++i) {
         if (likes.data.batchGetLikes[i] != null) {
@@ -188,7 +188,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       if (receiver != null) {
         //when sending a message, create conversation using specified channel if posts is empty. if not, update conversation with the specified channel.
         if (posts.length == 0) {
-          API.graphql(graphqlOperation(createConversation, { input: {id: channel, users: [route.params?.myId, receiver], lastMessage: postVal} }));
+          API.graphql(graphqlOperation(createConversation, { input: {id: channel, users: route.params?.myId<receiver ? [route.params?.myId, receiver]:[receiver, route.params?.myId], lastMessage: postVal} }));
         } else {
           API.graphql(graphqlOperation(updateConversation, { input: {id: channel, lastMessage: postVal} }));
         }
@@ -245,10 +245,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         return posts.filter((val) => (val.createdAt != parent_post.createdAt || val.userId != parent_post.userId));
       });
     }
-
-    console.log("##########################################");
-    console.log(posts);
-    console.log("******************************************");
 
     try {
       await API.graphql(graphqlOperation(deletePost, { input: { createdAt: timestamp, userId: route.params?.myId } }));

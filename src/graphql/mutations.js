@@ -111,6 +111,7 @@ export const createConversation = /* GraphQL */ `
       updatedAt
       id
       users
+      lastUser
       lastMessage
     }
   }
@@ -125,6 +126,7 @@ export const updateConversation = /* GraphQL */ `
       updatedAt
       id
       users
+      lastUser
       lastMessage
     }
   }
@@ -139,6 +141,7 @@ export const deleteConversation = /* GraphQL */ `
       updatedAt
       id
       users
+      lastUser
       lastMessage
     }
   }
