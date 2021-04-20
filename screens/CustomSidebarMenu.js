@@ -113,21 +113,25 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
         }
 
         //if this new request is not already in your local friend request list, add it to your local friend request list
-        if (!currentFriendRequests.current.find((item) => item.sender === newFriendRequest.sender)) {
-
-          //if the drawer is closed, show the blue dot in the corner
-          if (!isDrawerOpen.current) {
-            console.log("incrementing counter");
-            global.incrementNotificationCount();
-          }
-
-          setNewFriendRequests(currentNewFriendRequestCount.current + 1);
-          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-          setFriendRequestList([
-            newFriendRequest,
-            ...currentFriendRequests.current,
-          ]);
+        if (currentFriendRequests.current.find((item) => item.sender === newFriendRequest.sender)) {
+          setFriendRequestList(
+            currentFriendRequests.current.filter(
+              (item) => item.sender != newFriendRequest.sender || item.receiver != newFriendRequest.sender
+          ));
         }
+
+        //if the drawer is closed, show the blue dot in the corner
+        if (!isDrawerOpen.current) {
+          console.log("incrementing counter");
+          global.incrementNotificationCount();
+        }
+        
+        setNewFriendRequests(currentNewFriendRequestCount.current + 1);
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setFriendRequestList([
+          newFriendRequest,
+          ...currentFriendRequests.current,
+        ]);
       },
     });
 
