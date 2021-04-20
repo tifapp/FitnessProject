@@ -1,11 +1,10 @@
-import React from "react";
+import React, { useState, 
+  useEffect, 
+  useRef } from "react";
 import {
   Text,
   View,
   TouchableOpacity,
-  useState, 
-  useEffect, 
-  useRef, 
   PureComponent
 } from "react-native";
 import { conversationsByLastUpdated } from "../src/graphql/queries";
