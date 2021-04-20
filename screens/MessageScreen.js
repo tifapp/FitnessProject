@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {
   Text,
   View,
@@ -22,6 +22,10 @@ export default function MessageScreen({ navigation, route }) {
 
   console.log("Here is the user!");
   console.log(userId);
+
+  useEffect(()=>{
+    API.graphql(graphqlOperation(createReadReceipt, { input: {conversationId: route.params?.myId < userId ? route.params?.myId+userId : userId+route.params?.myId} })); //don't do this if there are no new messages
+  },[userId])
 
   /*
   useEffect(() => {

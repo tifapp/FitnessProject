@@ -15,4 +15,5 @@ type Subscription {
 type Query {
   batchGetLikes(likes: [CreateLikeInput]): [Like]
   batchGetConversations(ids: [DeleteConversationInput]): [Conversation]
+  batchGetReadReceipts(receipts: [CreateReadReceiptInput]): [ReadReceipt]
 }

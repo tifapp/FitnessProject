@@ -1,0 +1,16 @@
+#set( $userId = $context.identity.sub )
+#set($receiptsdata = [])
+#foreach($item in ${ctx.args.receipts})
+	$util.qr($item.put("userId", $util.defaultIfNull($item.userId, $userId)))
+    $util.qr($receiptsdata.add($util.dynamodb.toMapValues($item)))
+#end
+
+{
+    "version" : "2018-05-29",
+    "operation" : "BatchGetItem",
+    "tables" : {
+        "ReadReceipt-4lwfnmtnpvb55mcushmhexhjgu-dev": {
+			"keys": $utils.toJson($receiptsdata)
+		}
+    }
+}

@@ -101,6 +101,19 @@ export const updateLike = /* GraphQL */ `
     }
   }
 `;
+export const deleteReadReceipt = /* GraphQL */ `
+  mutation DeleteReadReceipt(
+    $input: DeleteReadReceiptInput!
+    $condition: ModelReadReceiptConditionInput
+  ) {
+    deleteReadReceipt(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      userId
+      conversationId
+    }
+  }
+`;
 export const createConversation = /* GraphQL */ `
   mutation CreateConversation(
     $input: CreateConversationInput!
@@ -265,6 +278,32 @@ export const deletePost = /* GraphQL */ `
       receiver
       isParent
       likes
+    }
+  }
+`;
+export const createReadReceipt = /* GraphQL */ `
+  mutation CreateReadReceipt(
+    $input: CreateReadReceiptInput!
+    $condition: ModelReadReceiptConditionInput
+  ) {
+    createReadReceipt(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      userId
+      conversationId
+    }
+  }
+`;
+export const updateReadReceipt = /* GraphQL */ `
+  mutation UpdateReadReceipt(
+    $input: UpdateReadReceiptInput!
+    $condition: ModelReadReceiptConditionInput
+  ) {
+    updateReadReceipt(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      userId
+      conversationId
     }
   }
 `;

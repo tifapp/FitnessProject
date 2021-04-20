@@ -253,6 +253,36 @@ export const onDeletePost = /* GraphQL */ `
     }
   }
 `;
+export const onCreateReadReceipt = /* GraphQL */ `
+  subscription OnCreateReadReceipt($userId: String) {
+    onCreateReadReceipt(userId: $userId) {
+      createdAt
+      updatedAt
+      userId
+      conversationId
+    }
+  }
+`;
+export const onUpdateReadReceipt = /* GraphQL */ `
+  subscription OnUpdateReadReceipt($userId: String) {
+    onUpdateReadReceipt(userId: $userId) {
+      createdAt
+      updatedAt
+      userId
+      conversationId
+    }
+  }
+`;
+export const onDeleteReadReceipt = /* GraphQL */ `
+  subscription OnDeleteReadReceipt($userId: String) {
+    onDeleteReadReceipt(userId: $userId) {
+      createdAt
+      updatedAt
+      userId
+      conversationId
+    }
+  }
+`;
 export const onCreateUser = /* GraphQL */ `
   subscription OnCreateUser {
     onCreateUser {
