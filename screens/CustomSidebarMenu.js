@@ -40,6 +40,8 @@ import FriendRequestListItem from "components/FriendRequestListItem";
 import playSound from "../hooks/playSound";
 import { useIsDrawerOpen } from '@react-navigation/drawer';
 import { batchGetConversations } from "../src/graphql/queries";
+import { batchGetReadReceipts } from "../src/graphql/queries";
+//import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const subscriptions = [];
 
@@ -204,19 +206,22 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
     subscriptions.length = 0;
 
     let conversationIds = [];
+    let receiptIds = [];
 
     items.forEach((item) => {
       conversationIds.push({id: item.sender < item.receiver ? item.sender+item.receiver : item.receiver+item.sender});
+      receiptIds.push({conversationId: item.sender < item.receiver ? item.sender+item.receiver : item.receiver+item.sender});
     });
     
     try {
       const conversations = await API.graphql(graphqlOperation(batchGetConversations, { ids: conversationIds }));
+      const receipts = await API.graphql(graphqlOperation(batchGetReadReceipts, { receipts: receiptIds }));
       //console.log("looking for conversations: ", conversations);
       //returns an array of like objects or nulls corresponding with the array of conversations
       for (i = 0; i < items.length; ++i) {
-        console.log("friend list item: ", items[i]);
+        //console.log("friend list item: ", items[i]);
         const friendslistarray = items[i].sender < items[i].receiver ? [items[i].sender,items[i].receiver] : [items[i].receiver,items[i].sender];
-        console.log("friend list array: ", friendslistarray);
+        //console.log("friend list array: ", friendslistarray);
         (async () => {
           subscriptions.push(
             await API.graphql(
@@ -245,6 +250,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
                     ) {
                       i.lastMessage = updatedConversation.lastMessage;
                       i.lastUser = updatedConversation.lastUser;
+                      i.isRead = null;
                     }
                     return i;
                   }));
@@ -255,10 +261,16 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
           );
         })();
 
+        console.log(receipts);
         if (conversations.data.batchGetConversations[i] != null) {
           console.log("found conversation");
           items[i].lastMessage = conversations.data.batchGetConversations[i].lastMessage;
           items[i].lastUser = conversations.data.batchGetConversations[i].lastUser; //could also store the index of lastuser from the users array rather than the full string
+
+          if (receipts.data.batchGetReadReceipts[i] != null && new Date(conversations.data.batchGetConversations[i].updatedAt) < new Date(receipts.data.batchGetReadReceipts[i].updatedAt)) {
+            console.log("found receipt");
+            items[i].isRead = true;
+          }
         }
       }
       return items;
@@ -385,7 +397,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
           }}
           textStyle={{
             fontWeight: "bold",
-            fontSize: 20,
+            fontSize: 26,
             color: (state.index === state.routes.length-1 && state.routes[state.routes.length-1].name === "Profile") ? "blue" : "black",
           }}
         />

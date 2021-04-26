@@ -16,7 +16,7 @@ import {
 } from "react-native";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation } from "aws-amplify";
-import { createPost, updatePost, deletePost, createConversation, updateConversation } from "root/src/graphql/mutations";
+import { createPost, updatePost, deletePost, createConversation, updateConversation, createReadReceipt, deleteReadReceipt } from "root/src/graphql/mutations";
 import { listPosts, postsByChannel, batchGetLikes } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
 import { onCreatePost, onDeletePost, onUpdatePost, onCreateLike, onDeleteLike, didIncrementLikes } from 'root/src/graphql/subscriptions';
@@ -64,6 +64,12 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
           else {
             LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
             setPosts([newPost, ...currentPosts.current]); //what if we have a lot of new posts at once?
+            if (newPost.receiver == route.params?.myId) {
+              (async () => {
+                await API.graphql(graphqlOperation(deleteReadReceipt, { input: {conversationId: channel, userId: route.params?.myId} }));
+                API.graphql(graphqlOperation(createReadReceipt, { input: {conversationId: channel} }));
+              })();
+            }
           }
         }
       }
@@ -101,7 +107,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     }
   }, []);
 
-  useEffect(()=>{listRef.current.onRefresh()},[receiver])
+  useEffect(()=>{listRef.current.onRefresh()},[receiver]) //this could incur heavy costs. we may need to cache the messages and load them in rather than refreshing when switching between profiles quickly
 
   const getLikedPosts = async (items) => {
     let newPosts = items;

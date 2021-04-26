@@ -110,9 +110,10 @@ export default function FriendListItem({
           }}
           imageLayoutStyle={{ marginLeft: 0 }}
           textStyle={{
-            fontWeight: "normal",
-            fontSize: 15,
+            fontWeight: "bold",
+            fontSize: 16,
             color: "black",
+            textDecorationLine: 'underline'
           }}
           userId={friendId}
           textLayoutStyle={{ flex: 1, flexGrow: 1 }}
@@ -129,25 +130,36 @@ export default function FriendListItem({
                 }]}
                 onPress={() => {
                   console.log("message pressed, " + isMessageOpen);
+                  item.isRead = true;
                   goToMessages(friendId);
                 }}
               >
                 <Text
                   style={{
-                    color: isOptionsOpen ? "black" : lastUser === myId ? "gray" : "blue",
+                    color: isOptionsOpen ? "black" : item.isRead || lastUser == myId ? "black" : "blue",
                     fontSize: 15,
-                    fontWeight: "bold",
+                    fontWeight: item.isRead || lastUser == myId ? "normal" : "bold",
                     fontStyle: lastMessage == null ? "italic" : "normal", 
                     marginRight: 10,
                   }}
                   numberOfLines={2}
                 >
-                <MaterialIcons
-                  name="chat"
-                  size={15}
-                  color={isOptionsOpen ? "black" : lastUser === myId ? "gray" : "blue"}
-                />
-                  {"  " + (lastMessage == null ? "Message" : lastMessage)}
+                {
+                  lastUser == myId ? null :
+                  <MaterialIcons
+                    name={item.isRead ? "messenger-outline" : "messenger"}
+                    size={15}
+                    color={isOptionsOpen ? "black" : item.isRead || lastUser == myId ? "black" : "blue"}
+                  />
+                }
+                {
+                  lastUser == myId ?
+                  "You: " :
+                  item.isRead ?
+                  "  " :
+                  "  "
+                }
+                {(lastMessage == null ? "Message" : lastMessage)}
                 </Text>
               </TouchableOpacity>
             </View>
