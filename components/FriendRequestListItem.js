@@ -20,6 +20,7 @@ export default function FriendRequestListItem({
   respondRequestHandler,
   confirmResponseHandler,
   undoResponseHandler,
+  removeFriendHandler,
   navigation,
   isNew,
   myId,
@@ -46,7 +47,25 @@ export default function FriendRequestListItem({
             const options = [
               {
                 text: "Block",
-                onPress: () => {},
+                onPress: () => {
+                  const title = "Are you sure you want to block this friend? This will stop them from messaging you and sending you friend requests.";
+                  const options = [
+                    {
+                      text: "Yes",
+                      onPress: () => {
+                        removeFriendHandler(item, true), confirmResponseHandler(item, isNew), setIsOptionsOpen(false);
+                      },
+                    },
+                    {
+                      text: "Cancel",
+                      type: "cancel",
+                      onPress: () => {
+                        setIsOptionsOpen(false);
+                      },
+                    },
+                  ];
+                  Alert.alert(title, "", options, alertOptions);
+                },
               }, //if submithandler fails user won't know
               {
                 text: "Cancel",

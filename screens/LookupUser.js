@@ -26,6 +26,7 @@ import {
   getFriendship,
   listFriendships,
   friendsBySecondUser,
+  getBlock
 } from "../src/graphql/queries";
 import {
   deleteFriendship,
@@ -117,6 +118,15 @@ const LookupUser = ({ route, navigation }) => {
   const checkFriendStatus = async () => {
     console.log("CHECKING FRIEND STATUS");
     try {
+      let blocked = await API.graphql(
+        graphqlOperation(getBlock, {
+          userId: userId,
+          blockee: route.params?.myId,
+        })
+      );
+
+      if (blocked != null) {setFriendStatus("blocked"); return;}
+
       let friendship = await API.graphql(
         graphqlOperation(getFriendship, {
           sender: route.params?.myId,
@@ -406,7 +416,8 @@ const LookupUser = ({ route, navigation }) => {
                   padding: 10,
                 }}
               />
-            ) : friendStatus == "none" ? (
+            ) : friendStatus == "blocked" ? null
+            : friendStatus == "none" ? (
               <TouchableOpacity
                 onPress={sendFriendRequest}
                 style={styles.submitButton}

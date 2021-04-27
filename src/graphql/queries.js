@@ -72,6 +72,43 @@ export const listGroups = /* GraphQL */ `
     }
   }
 `;
+export const getBlock = /* GraphQL */ `
+  query GetBlock($userId: ID!, $createdAt: AWSDateTime!) {
+    getBlock(userId: $userId, createdAt: $createdAt) {
+      createdAt
+      userId
+      blockee
+      updatedAt
+    }
+  }
+`;
+export const listBlocks = /* GraphQL */ `
+  query ListBlocks(
+    $userId: ID
+    $createdAt: ModelStringKeyConditionInput
+    $filter: ModelBlockFilterInput
+    $limit: Int
+    $nextToken: String
+    $sortDirection: ModelSortDirection
+  ) {
+    listBlocks(
+      userId: $userId
+      createdAt: $createdAt
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
+    ) {
+      items {
+        createdAt
+        userId
+        blockee
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
 export const getConversation = /* GraphQL */ `
   query GetConversation($id: ID!) {
     getConversation(id: $id) {

@@ -56,12 +56,30 @@ export default function FriendListItem({
             const options = [
               {
                 text: "Block",
-                onPress: () => {},
-              }, //if submithandler fails user won't know
+                onPress: () => {
+                  const title = "Are you sure you want to block this friend? This will unfriend them and delete all messages.";
+                  const options = [
+                    {
+                      text: "Yes",
+                      onPress: () => {
+                        removeFriendHandler(item, true), setIsOptionsOpen(false);
+                      },
+                    },
+                    {
+                      text: "Cancel",
+                      type: "cancel",
+                      onPress: () => {
+                        setIsOptionsOpen(false);
+                      },
+                    },
+                  ];
+                  Alert.alert(title, "", options, alertOptions);
+                },
+              },
               {
                 text: "Unfriend",
                 onPress: () => {
-                  const title = "Are you sure you want to remove this friend?";
+                  const title = "Are you sure you want to remove this friend? This will delete all messages.";
                   const options = [
                     {
                       text: "Yes",

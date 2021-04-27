@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useState, useEffect} from "react";
 import {
   Text,
   View,
@@ -12,7 +12,7 @@ import * as Notifications from 'expo-notifications';
 import { ProfileImageAndName } from "components/ProfileImageAndName";
 import { API, graphqlOperation } from "aws-amplify";
 import { createReadReceipt, deleteReadReceipt } from "root/src/graphql/mutations";
-
+import { getBlock } from "../src/graphql/queries";
 //const { width } = Dimensions.get('window');
 
 var styles = require('styles/stylesheet');
@@ -20,10 +20,23 @@ var styles = require('styles/stylesheet');
 export default function MessageScreen({ navigation, route }) {
   const { userId } = route.params;
 
-  console.log("Here is the user!");
-  console.log(userId);
+  const [blocked, setBlocked] = useState(false);
+
+  //console.log("Here is the user!");
+  //console.log(userId);
 
   useEffect(()=>{
+    (async() => {
+      let block = await API.graphql(
+        graphqlOperation(getBlock, {
+          userId: userId,
+          blockee: route.params?.myId,
+        })
+      );
+      if (block != null) {
+        setBlocked(true);
+      }
+    })();
     API.graphql(graphqlOperation(deleteReadReceipt, { input: {conversationId: route.params?.myId < userId ? route.params?.myId+userId : userId+route.params?.myId, userId: route.params?.myId} }));
     API.graphql(graphqlOperation(createReadReceipt, { input: {conversationId: route.params?.myId < userId ? route.params?.myId+userId : userId+route.params?.myId} }));
   },[userId])
@@ -72,6 +85,9 @@ export default function MessageScreen({ navigation, route }) {
   //have a header with the person's name and profile pic also.
   return (
     <View style={styles.containerStyle}>  
+    {
+      blocked ?
+      null :
       <FeedScreen
         headerComponent={
           <ProfileImageAndName
@@ -93,6 +109,7 @@ export default function MessageScreen({ navigation, route }) {
         receiver={userId}
         channel={route.params?.myId < userId ? route.params?.myId+userId : userId+route.params?.myId}
       />
+    }
     </View>
   );
 };

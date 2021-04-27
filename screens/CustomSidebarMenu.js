@@ -25,7 +25,7 @@ import {
   onDeleteFriendship,
   onNewMessage,
 } from "root/src/graphql/subscriptions";
-import { deleteFriendship, updateFriendship } from "root/src/graphql/mutations";
+import { deleteFriendship, updateFriendship, createBlock } from "root/src/graphql/mutations";
 
 import { ProfileImageAndName } from "components/ProfileImageAndName";
 import {
@@ -350,7 +350,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
     }
   };
 
-  const removeFriend = async (item) => {
+  const removeFriend = async (item, blocked) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     // update friendList
     setFriendList((friendList) => {
@@ -361,6 +361,13 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
 
     // delete friend object
     try {
+      if (blocked) {
+        API.graphql(
+          graphqlOperation(createBlock, {
+            input: { blockee: item.receiver == myId ? item.sender : item.receiver },
+          })
+        );
+      }
       await API.graphql(
         graphqlOperation(deleteFriendship, {
           input: { sender: item.sender, receiver: item.receiver },
@@ -453,6 +460,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
               respondRequestHandler={respondToRequest}
               undoResponseHandler={undoResponse}
               confirmResponseHandler={confirmResponse}
+              removeFriendHandler={removeFriend}
               myId={myId}
               isNew={index < newFriendRequests}
             />
@@ -521,6 +529,10 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
       <TouchableOpacity
       onPress={()=>{navigation.navigate("Conversations")}}>
         <Text>Conversations</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+      onPress={()=>{navigation.navigate("Settings")}}>
+        <Text>Settings</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );

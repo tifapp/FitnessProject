@@ -35,6 +35,10 @@
         "friendNotifications": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
           "s3Key": "amplify-builds/friendNotifications-6a46704b394446717134-build.zip"
+        },
+        "removeMessagesWhenUnfriend": {
+          "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
+          "s3Key": "amplify-builds/removeMessagesWhenUnfriend-2b32364247514d2b4464-build.zip"
         }
       },
       "hosting": {

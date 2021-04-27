@@ -109,6 +109,36 @@ export const onDeleteGroup = /* GraphQL */ `
     }
   }
 `;
+export const onCreateBlock = /* GraphQL */ `
+  subscription OnCreateBlock($userId: String) {
+    onCreateBlock(userId: $userId) {
+      createdAt
+      userId
+      blockee
+      updatedAt
+    }
+  }
+`;
+export const onUpdateBlock = /* GraphQL */ `
+  subscription OnUpdateBlock($userId: String) {
+    onUpdateBlock(userId: $userId) {
+      createdAt
+      userId
+      blockee
+      updatedAt
+    }
+  }
+`;
+export const onDeleteBlock = /* GraphQL */ `
+  subscription OnDeleteBlock($userId: String) {
+    onDeleteBlock(userId: $userId) {
+      createdAt
+      userId
+      blockee
+      updatedAt
+    }
+  }
+`;
 export const onCreateConversation = /* GraphQL */ `
   subscription OnCreateConversation($users: String) {
     onCreateConversation(users: $users) {

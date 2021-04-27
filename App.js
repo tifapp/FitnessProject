@@ -15,6 +15,7 @@ import { Amplify, API, graphqlOperation, Auth, Cache, Storage } from "aws-amplif
 import { getUser } from "./src/graphql/queries";
 import ProfileStack from "stacks/ProfileStack";
 import MainTabs from "./MainTabs";
+import SettingsScreen from "screens/SettingsScreen";
 import ComplianceScreen from "screens/ComplianceScreen";
 import ProfileScreen from "screens/ProfileScreen";
 import BioScreen from "screens/BioScreen";
@@ -232,6 +233,11 @@ const App = () => {
           <Drawer.Screen
             name="Profile"
             component={ProfileStack}
+            initialParams={{ myId: userId, fromLookup: false }}
+          />
+          <Drawer.Screen
+            name="Settings"
+            component={SettingsScreen}
             initialParams={{ myId: userId, fromLookup: false }}
           />
           {
