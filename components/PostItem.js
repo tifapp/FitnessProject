@@ -23,10 +23,11 @@ import playSound from "../hooks/playSound";
 
 var styles = require("../styles/stylesheet");
 
-function LikeButton({ likes, likedByYou, postId }) {
+function LikeButton({ likes, likedByYou, postId, callback }) {
   const [liked, setLiked] = useState(likedByYou);
 
   const likePostAsync = async () => {
+    callback();
     liked ? playSound("unlike") : playSound("like"); 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     try {
@@ -162,6 +163,7 @@ export default function PostItem({
                       "#" +
                       item.isParent
                     }
+                    callback={() => {item.likeDebounce = true}}
                   />
                   <TouchableOpacity
                     style={[

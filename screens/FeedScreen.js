@@ -19,7 +19,7 @@ import { API, graphqlOperation } from "aws-amplify";
 import { createPost, updatePost, deletePost, createConversation, updateConversation, createReadReceipt, deleteReadReceipt } from "root/src/graphql/mutations";
 import { listPosts, postsByChannel, batchGetLikes } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
-import { onCreatePost, onDeletePost, onUpdatePost, onCreateLike, onDeleteLike, didIncrementLikes } from 'root/src/graphql/subscriptions';
+import { onCreatePost, onDeletePost, onUpdatePost, onCreateLike, onDeleteLike, onIncrementLikes } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
 import APIList from 'components/APIList';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -78,7 +78,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       next: event => {
         const deletedPost = event.value.data.onDeletePost
         if (deletedPost.userId != route.params?.myId && deletedPost.channel == getChannel()) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
-          if (currentPosts.current.length > 0 && currentPosts.current.find(post => post.userId === deletedPost.userId && post.createdAt === deletedPost.createdAt)) {
+          if (currentPosts.current.find(post => post.userId === deletedPost.userId && post.createdAt === deletedPost.createdAt)) {
             let tempposts = currentPosts.current;
             var index = tempposts.findIndex(post => post.userId === deletedPost.userId && post.createdAt === deletedPost.createdAt);
             tempposts.splice(index, 1);
@@ -93,17 +93,23 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         console.log("post has been updated");
       }
     });
-    // const incrementLikeSubscription = API.graphql(graphqlOperation(didIncrementLikes)).subscribe({ //nvm we dont have a subscription event for incrementlike
-    //   next: event => {
-    //     console.log("post has been liked");
-    //   }
-    // });
+    const incrementLikeSubscription = API.graphql(graphqlOperation(onIncrementLikes)).subscribe({ //nvm we dont have a subscription event for incrementlike
+      next: event => {
+        const likedPost = event.value.data.onIncrementLikes
+        console.log("newly liked post");
+        console.log(likedPost);
+        if (currentPosts.current.find(post => post.userId === likedPost.userId && post.createdAt === likedPost.createdAt)) {
+          if (currentPosts.current.find(post => post.userId === likedPost.userId && post.createdAt === likedPost.createdAt && post.likeDebounce)) currentPosts.current.map(post => {if (post.userId === likedPost.userId && post.createdAt === likedPost.createdAt && post.likeDebounce) {post.likeDebounce = null} return post});
+          else setPosts(currentPosts.current.map(post => {if (post.userId === likedPost.userId && post.createdAt === likedPost.createdAt) {post.likes = likedPost.likes + post.likedByYou ? 1 : 0} return post}));
+        }
+      }
+    });
     checkInternetConnection();
     return () => {
       createPostSubscription.unsubscribe();
       deletePostSubscription.unsubscribe();
       updatePostSubscription.unsubscribe();
-      //incrementLikeSubscription.unsubscribe();
+      incrementLikeSubscription.unsubscribe();
     }
   }, []);
 

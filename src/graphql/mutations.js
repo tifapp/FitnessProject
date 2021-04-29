@@ -13,6 +13,7 @@ export const batchDeletePosts = /* GraphQL */ `
       receiver
       isParent
       likes
+      replies
     }
   }
 `;
@@ -28,6 +29,7 @@ export const incrementLikes = /* GraphQL */ `
       receiver
       isParent
       likes
+      replies
     }
   }
 `;
@@ -281,6 +283,7 @@ export const createPost = /* GraphQL */ `
       receiver
       isParent
       likes
+      replies
     }
   }
 `;
@@ -299,6 +302,7 @@ export const updatePost = /* GraphQL */ `
       receiver
       isParent
       likes
+      replies
     }
   }
 `;
@@ -317,6 +321,7 @@ export const deletePost = /* GraphQL */ `
       receiver
       isParent
       likes
+      replies
     }
   }
 `;

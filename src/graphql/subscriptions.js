@@ -13,6 +13,7 @@ export const onIncrementLikes = /* GraphQL */ `
       receiver
       isParent
       likes
+      replies
     }
   }
 `;
@@ -250,6 +251,7 @@ export const onCreatePost = /* GraphQL */ `
       receiver
       isParent
       likes
+      replies
     }
   }
 `;
@@ -265,6 +267,7 @@ export const onUpdatePost = /* GraphQL */ `
       receiver
       isParent
       likes
+      replies
     }
   }
 `;
@@ -280,6 +283,7 @@ export const onDeletePost = /* GraphQL */ `
       receiver
       isParent
       likes
+      replies
     }
   }
 `;

@@ -325,6 +325,7 @@ export const postsByChannel = /* GraphQL */ `
         receiver
         isParent
         likes
+        replies
       }
       nextToken
     }
@@ -357,6 +358,7 @@ export const postsByParentId = /* GraphQL */ `
         receiver
         isParent
         likes
+        replies
       }
       nextToken
     }
@@ -389,6 +391,7 @@ export const postsByReceiver = /* GraphQL */ `
         receiver
         isParent
         likes
+        replies
       }
       nextToken
     }
@@ -421,6 +424,7 @@ export const postsByChannelLatest = /* GraphQL */ `
         receiver
         isParent
         likes
+        replies
       }
       nextToken
     }
@@ -438,6 +442,7 @@ export const getPost = /* GraphQL */ `
       receiver
       isParent
       likes
+      replies
     }
   }
 `;
@@ -468,6 +473,7 @@ export const listPosts = /* GraphQL */ `
         receiver
         isParent
         likes
+        replies
       }
       nextToken
     }
