@@ -17,6 +17,22 @@ export const onIncrementLikes = /* GraphQL */ `
     }
   }
 `;
+export const onDecrementLikes = /* GraphQL */ `
+  subscription OnDecrementLikes {
+    onDecrementLikes {
+      createdAt
+      updatedAt
+      userId
+      description
+      parentId
+      channel
+      receiver
+      isParent
+      likes
+      replies
+    }
+  }
+`;
 export const onMyNewFriendships = /* GraphQL */ `
   subscription OnMyNewFriendships {
     onMyNewFriendships {

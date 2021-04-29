@@ -23,6 +23,22 @@ const config = {
 
 const client = new AWSAppSyncClient(config);
 
+const decrementLikes = `
+  mutation DecrementLikes($input: incrementLikesInput!) {
+    DecrementLikes(input: $input) {
+      createdAt
+      updatedAt
+      userId
+      description
+      parentId
+      channel
+      receiver
+      isParent
+      likes
+    }
+  }
+`;
+
 const incrementLikes = `
   mutation IncrementLikes($input: incrementLikesInput!) {
     incrementLikes(input: $input) {
@@ -137,15 +153,20 @@ exports.handler = (event, context, callback) => {
           };
 
           if (record.eventName == "REMOVE") {
-            inputVariables.decrement = true;
+            client.mutate({
+              mutation: gql(decrementLikes),
+              variables: {
+                input: inputVariables,
+              },
+            });
+          } else {
+            client.mutate({
+              mutation: gql(incrementLikes),
+              variables: {
+                input: inputVariables,
+              },
+            });
           }
-
-          await client.mutate({
-            mutation: gql(incrementLikes),
-            variables: {
-              input: inputVariables,
-            },
-          });
 
           if (record.eventName == "INSERT") {
             const likerUserId = record.dynamodb.NewImage.userId.S;      

@@ -33,6 +33,22 @@ export const incrementLikes = /* GraphQL */ `
     }
   }
 `;
+export const decrementLikes = /* GraphQL */ `
+  mutation DecrementLikes($input: incrementLikesInput!) {
+    decrementLikes(input: $input) {
+      createdAt
+      updatedAt
+      userId
+      description
+      parentId
+      channel
+      receiver
+      isParent
+      likes
+      replies
+    }
+  }
+`;
 export const createGroup = /* GraphQL */ `
   mutation CreateGroup(
     $input: CreateGroupInput!

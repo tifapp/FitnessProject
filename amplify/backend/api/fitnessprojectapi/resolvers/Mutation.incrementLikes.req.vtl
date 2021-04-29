@@ -227,10 +227,7 @@ $util.qr($context.args.input.put("__typename", "Post"))
 #end
 #set( $update = {} )
 
-#if( $util.isNullOrEmpty($ctx.args.input.decrement) )
-	$util.qr($expValues.put(":d", $util.dynamodb.toDynamoDB(1)))
-#else
-	$util.qr($expValues.put(":d", $util.dynamodb.toDynamoDB(-1)))
+$util.qr($expValues.put(":d", $util.dynamodb.toDynamoDB(1)))
 #end
 #set( $expression = "$expression ADD likes :d" )
 $util.qr($update.put("expression", "$expression"))
