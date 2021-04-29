@@ -74,6 +74,22 @@ const deletePost =
   }
 `;
 
+const batchDeletePosts = /* GraphQL */ `
+  mutation BatchDeletePosts($posts: [DeletePostInput]) {
+    batchDeletePosts(posts: $posts) {
+      createdAt
+      updatedAt
+      userId
+      description
+      parentId
+      channel
+      receiver
+      isParent
+      likes
+    }
+  }
+`;
+
 exports.handler = (event, context, callback) => {
   event.Records.forEach((record) => {
     if (record.eventName == "REMOVE") {

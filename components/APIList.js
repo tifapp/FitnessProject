@@ -157,12 +157,14 @@ class APIList extends Component { //we need to make this a class to use refs fro
                 contentContainerStyle={{ flexGrow: 1 }}
                 data={this.props.data}
                 refreshControl={
+                  this.props.notRefreshable ? null :
                   <RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh} />
                 }
                 renderItem={this.props.renderItem}
                 keyExtractor={this.props.keyExtractor}
                 onEndReached={this.loadMore}
                 onEndReachedThreshold={1}
+                ListEmptyComponent={this.props.ListEmptyComponent}
               />
         }
 

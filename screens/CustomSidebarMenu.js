@@ -44,6 +44,7 @@ import { batchGetReadReceipts } from "../src/graphql/queries";
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const subscriptions = [];
+global.blocklist = [];
 
 export default function CustomSidebarMenu({ navigation, state, progress, myId }) {
   const [lastOnlineTime, setLastOnlineTime] = useState(0);
@@ -109,7 +110,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
         if (currentFriends.current.find((item) => item.sender === newFriendRequest.sender)) {
           setFriendList(
             currentFriends.current.filter(
-              (item) => item.sender != newFriendRequest.sender && item.receiver != newFriendRequest.sender
+              (item) => item.sender != newFriendRequest.sender || item.receiver != newFriendRequest.sender
             )
           );
         }
@@ -153,15 +154,15 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
       },
     });
 
-      /*
+    /*
     const removedFriendSubscription = API.graphql(
       graphqlOperation(onDeleteFriendship)
     ).subscribe({
       next: (event) => {
-        const deletedFriend = event.value.data.onDeleteFriendship;
+        const deletedFriend = event.value.data.onDeleteFriendship; //check the security on this one. if possible, should only fire for the sender or receiver.
         console.log("friend deleted ", deletedFriend);
-        if (currentFriends.current.length > 0 && currentFriends.current.find(item => item.user1 === deletedFriend.user1 && item.user2 === deletedFriend.user2)) {
-          var index = currentFriends.current.findIndex(item => item.user1 === deletedFriend.user1 && item.user2 === deletedFriend.user2);
+        if (currentFriends.current.find(item => item.sender === deletedFriend.sender && item.sender === deletedFriend.sender)) {
+          var index = currentFriends.current.findIndex(item => item.sender === deletedFriend.sender && item.sender === deletedFriend.sender);
           currentFriends.current.splice(index, 1);
           LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
           setFriendList(currentFriends.current);
@@ -362,6 +363,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
     // delete friend object
     try {
       if (blocked) {
+        global.blocklist = [...global.blocklist, {userId: myId , blockee: item.receiver == myId ? item.sender : item.receiver}];
         API.graphql(
           graphqlOperation(createBlock, {
             input: { blockee: item.receiver == myId ? item.sender : item.receiver },
@@ -531,7 +533,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
         <Text>Conversations</Text>
       </TouchableOpacity>
       <TouchableOpacity
-      onPress={()=>{navigation.navigate("Settings")}}>
+      onPress={()=>{navigation.navigate("Settings"), {blocklist: global.blocklist}}}>
         <Text>Settings</Text>
       </TouchableOpacity>
     </SafeAreaView>

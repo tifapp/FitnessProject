@@ -33,7 +33,7 @@ export default function MessageScreen({ navigation, route }) {
           blockee: route.params?.myId,
         })
       );
-      if (block != null) {
+      if (block.data.getBlock != null) {
         setBlocked(true);
       }
     })();

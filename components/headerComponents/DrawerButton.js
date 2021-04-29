@@ -46,7 +46,7 @@ export default function DrawerButton(props) {
           style={{ paddingLeft: 15 }}
         />
         {notificationCount > 0 ? (
-          <MaterialIcons name="circle" size={10} color={"blue"} style={{position: "absolute", top: -2, right: -6}} />
+          <MaterialIcons name="circle" size={10} color={"red"} style={{position: "absolute", top: -2, right: -6}} />
         ) : null}
       </TouchableOpacity>
     </View>

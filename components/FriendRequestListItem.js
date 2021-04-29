@@ -53,14 +53,13 @@ export default function FriendRequestListItem({
                     {
                       text: "Yes",
                       onPress: () => {
-                        removeFriendHandler(item, true), confirmResponseHandler(item, isNew), setIsOptionsOpen(false);
+                        removeFriendHandler(item, true), confirmResponseHandler(item, isNew);
                       },
                     },
                     {
                       text: "Cancel",
                       type: "cancel",
                       onPress: () => {
-                        setIsOptionsOpen(false);
                       },
                     },
                   ];

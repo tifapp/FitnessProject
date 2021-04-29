@@ -73,8 +73,8 @@ export const listGroups = /* GraphQL */ `
   }
 `;
 export const getBlock = /* GraphQL */ `
-  query GetBlock($userId: ID!, $createdAt: AWSDateTime!) {
-    getBlock(userId: $userId, createdAt: $createdAt) {
+  query GetBlock($userId: ID!, $blockee: ID!) {
+    getBlock(userId: $userId, blockee: $blockee) {
       createdAt
       userId
       blockee
@@ -85,7 +85,7 @@ export const getBlock = /* GraphQL */ `
 export const listBlocks = /* GraphQL */ `
   query ListBlocks(
     $userId: ID
-    $createdAt: ModelStringKeyConditionInput
+    $blockee: ModelIDKeyConditionInput
     $filter: ModelBlockFilterInput
     $limit: Int
     $nextToken: String
@@ -93,11 +93,38 @@ export const listBlocks = /* GraphQL */ `
   ) {
     listBlocks(
       userId: $userId
-      createdAt: $createdAt
+      blockee: $blockee
       filter: $filter
       limit: $limit
       nextToken: $nextToken
       sortDirection: $sortDirection
+    ) {
+      items {
+        createdAt
+        userId
+        blockee
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const blocksByDate = /* GraphQL */ `
+  query BlocksByDate(
+    $userId: ID
+    $createdAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelBlockFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    blocksByDate(
+      userId: $userId
+      createdAt: $createdAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
     ) {
       items {
         createdAt

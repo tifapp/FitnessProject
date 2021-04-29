@@ -125,7 +125,7 @@ const LookupUser = ({ route, navigation }) => {
         })
       );
 
-      if (blocked != null) {setFriendStatus("blocked"); return;}
+      if (blocked.data.getBlock != null) {setFriendStatus("blocked"); return;}
 
       let friendship = await API.graphql(
         graphqlOperation(getFriendship, {
