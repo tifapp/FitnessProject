@@ -23,6 +23,10 @@
     "apifitnessprojectapiGraphQLAPIEndpointOutput": {
       "Type": "String",
       "Default": "apifitnessprojectapiGraphQLAPIEndpointOutput"
+    },
+    "functionbackendResourcesArn": {
+      "Type": "String",
+      "Default": "functionbackendResourcesArn"
     }
   },
   "Conditions": {
@@ -93,7 +97,11 @@
           ]
         },
         "Runtime": "nodejs14.x",
-        "Layers": [],
+        "Layers": [
+          {
+            "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:backendResources-dev:4"
+          }
+        ],
         "Timeout": "25"
       }
     },

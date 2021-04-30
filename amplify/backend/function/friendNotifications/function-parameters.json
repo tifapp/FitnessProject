@@ -9,5 +9,11 @@
       ]
     }
   },
-  "lambdaLayers": []
+  "lambdaLayers": [
+    {
+      "type": "ProjectLayer",
+      "resourceName": "backendResources",
+      "version": 4
+    }
+  ]
 }

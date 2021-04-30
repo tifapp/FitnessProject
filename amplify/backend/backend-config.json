@@ -41,6 +41,13 @@
       "service": "Lambda",
       "dependsOn": [
         {
+          "category": "function",
+          "resourceName": "backendResources",
+          "attributes": [
+            "Arn"
+          ]
+        },
+        {
           "category": "api",
           "resourceName": "fitnessprojectapi",
           "attributes": [
@@ -55,6 +62,13 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda",
       "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "backendResources",
+          "attributes": [
+            "Arn"
+          ]
+        },
         {
           "category": "api",
           "resourceName": "fitnessprojectapi",
@@ -71,6 +85,13 @@
       "service": "Lambda",
       "dependsOn": [
         {
+          "category": "function",
+          "resourceName": "backendResources",
+          "attributes": [
+            "Arn"
+          ]
+        },
+        {
           "category": "api",
           "resourceName": "fitnessprojectapi",
           "attributes": [
@@ -85,6 +106,13 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda",
       "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "backendResources",
+          "attributes": [
+            "Arn"
+          ]
+        },
         {
           "category": "api",
           "resourceName": "fitnessprojectapi",
@@ -101,6 +129,13 @@
       "service": "Lambda",
       "dependsOn": [
         {
+          "category": "function",
+          "resourceName": "backendResources",
+          "attributes": [
+            "Arn"
+          ]
+        },
+        {
           "category": "api",
           "resourceName": "fitnessprojectapi",
           "attributes": [
@@ -109,6 +144,11 @@
           ]
         }
       ]
+    },
+    "backendResources": {
+      "providerPlugin": "awscloudformation",
+      "service": "LambdaLayer",
+      "build": true
     }
   },
   "storage": {
