@@ -156,7 +156,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       //console.log("looking for likes: ", likes);
       //returns an array of like objects or nulls corresponding with the array of newposts
       for (i = 0; i < newPosts.length; ++i) {
-        if (!newPosts[i].likes) {
+        if (newPosts[i].likes == null) {
           newPosts[i].likes = 0;
         }
         if (likes.data.batchGetLikes[i] != null) {

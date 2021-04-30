@@ -24,28 +24,42 @@ import playSound from "../hooks/playSound";
 var styles = require("../styles/stylesheet");
 
 var myTimeout;
+var timerIsRunning = false;
 
 function LikeButton({ likes, likedByYou, postId, callback }) {
   const [liked, setLiked] = useState(likedByYou);
+  const likeRef = useRef();
 
   const resetTimeout = () => {
+    //if there's already a timeout running do not update ref
+    //if there isn't, update ref
+    if (!timerIsRunning) {
+      likeRef.current = liked;
+    }
+    timerIsRunning = true;
     clearTimeout(myTimeout);
     myTimeout = setTimeout(sendAPICall, 1000);
   }
 
   const sendAPICall = () => {
-    console.log("sent API call, hopefully debounce works. was it liked? " + liked);
-    if (!liked) {
-      API.graphql(
-        graphqlOperation(createLike, { input: { postId: postId } })
-      );
+    if (liked == likeRef.current) {
+      console.log("sent API call, hopefully debounce works.");
+      if (!liked) {
+        API.graphql(
+          graphqlOperation(createLike, { input: { postId: postId } })
+        );
+      } else {
+        API.graphql(
+          graphqlOperation(deleteLike, {
+            input: { userId: "0", postId: postId },
+          })
+        );
+      }
     } else {
-      API.graphql(
-        graphqlOperation(deleteLike, {
-          input: { userId: "0", postId: postId },
-        })
-      );
+      console.log("you repeated yourself");
     }
+
+    timerIsRunning = false;
   }
 
   const likePostAsync = async () => {
