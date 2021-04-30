@@ -34,23 +34,14 @@ exports.handler = (event, context, callback) => {
             channel: channel,
           };
 
-          if (record.eventName == "REMOVE") {
-            client.mutate({
-              mutation: gql(decrementLikes),
-              variables: {
-                input: inputVariables,
-              },
-            });
-          } else {
+          if (record.eventName == "INSERT") {
             client.mutate({
               mutation: gql(incrementLikes),
               variables: {
                 input: inputVariables,
               },
             });
-          }
-
-          if (record.eventName == "INSERT") {
+            
             const likerUserId = record.dynamodb.NewImage.userId.S;      
   
             const authorName = await client.query({
@@ -68,6 +59,13 @@ exports.handler = (event, context, callback) => {
             });
   
             await sendNotification(authorName.data.getUser.deviceToken, likerUserName.data.getUser.name + " liked your post!"); //truncate the sender's name!
+          } else {
+            client.mutate({
+              mutation: gql(decrementLikes),
+              variables: {
+                input: inputVariables,
+              },
+            });
           }
           callback(null, "Successfully incremented like counter");
         } catch (e) {

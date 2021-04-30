@@ -23,8 +23,30 @@ import playSound from "../hooks/playSound";
 
 var styles = require("../styles/stylesheet");
 
+var myTimeout;
+
 function LikeButton({ likes, likedByYou, postId, callback }) {
   const [liked, setLiked] = useState(likedByYou);
+
+  const resetTimeout = () => {
+    clearTimeout(myTimeout);
+    myTimeout = setTimeout(sendAPICall, 1000);
+  }
+
+  const sendAPICall = () => {
+    console.log("sent API call, hopefully debounce works. was it liked? " + liked);
+    if (!liked) {
+      API.graphql(
+        graphqlOperation(createLike, { input: { postId: postId } })
+      );
+    } else {
+      API.graphql(
+        graphqlOperation(deleteLike, {
+          input: { userId: "0", postId: postId },
+        })
+      );
+    }
+  }
 
   const likePostAsync = async () => {
     callback();
@@ -32,19 +54,7 @@ function LikeButton({ likes, likedByYou, postId, callback }) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     try {
       setLiked(!liked);
-      if (liked) {
-        await API.graphql(
-          graphqlOperation(deleteLike, {
-            input: { userId: "0", postId: postId },
-          })
-        );
-        console.log("success in unliking post");
-      } else {
-        await API.graphql(
-          graphqlOperation(createLike, { input: { postId: postId } })
-        );
-        console.log("success in liking post, id is ", postId);
-      }
+      resetTimeout();
     } catch (err) {
       console.log(err);
       alert("Could not be submitted!");

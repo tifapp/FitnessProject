@@ -52,6 +52,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       next: event => {
         const newPost = event.value.data.onCreatePost
         if (newPost.userId != route.params?.myId && newPost.channel == getChannel() && (currentPosts.current.length == 0 || !currentPosts.current.find(post => post.userId === newPost.userId && post.createdAt === newPost.createdAt))) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
+          newPost.likes = newPost.likes ?? 0;
           if (newPost.isParent == 0) {
               if (currentPosts.current.length > 0 && currentPosts.current.find(post => post.parentId === newPost.parentId)) {
                 let tempposts = currentPosts.current;
@@ -97,19 +98,36 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       next: event => {
         const likedPost = event.value.data.onIncrementLikes
         console.log("newly liked post");
-        console.log(likedPost);
-        if (currentPosts.current.find(post => post.userId === likedPost.userId && post.createdAt === likedPost.createdAt)) {
-          if (currentPosts.current.find(post => post.userId === likedPost.userId && post.createdAt === likedPost.createdAt && post.likeDebounce)) currentPosts.current.map(post => {if (post.userId === likedPost.userId && post.createdAt === likedPost.createdAt && post.likeDebounce) {post.likeDebounce = null} return post});
-          else setPosts(currentPosts.current.map(post => {if (post.userId === likedPost.userId && post.createdAt === likedPost.createdAt) {post.likes = likedPost.likes + post.likedByYou ? 1 : 0} return post}));
+        const localLikedPost = currentPosts.current.find(post => post.userId === likedPost.userId && post.createdAt === likedPost.createdAt);
+        if (localLikedPost != null) {
+          if (localLikedPost.likeDebounce) 
+          {
+            localLikedPost.likeDebounce = null;
+          }
+          else setPosts(currentPosts.current.map(post => {if (post.userId === likedPost.userId && post.createdAt === likedPost.createdAt) {
+            console.log("adding a like");
+            post.likes = post.likes + 1
+          } return post}));
         }
       }
     });
     const decrementLikeSubscription = API.graphql(graphqlOperation(onDecrementLikes)).subscribe({ //nvm we dont have a subscription event for incrementlike
       next: event => {
         const unlikedPost = event.value.data.onDecrementLikes
-        if (currentPosts.current.find(post => post.userId === unlikedPost.userId && post.createdAt === unlikedPost.createdAt)) {
-          if (currentPosts.current.find(post => post.userId === unlikedPost.userId && post.createdAt === unlikedPost.createdAt && post.likeDebounce)) currentPosts.current.map(post => {if (post.userId === unlikedPost.userId && post.createdAt === unlikedPost.createdAt && post.likeDebounce) {post.likeDebounce = null} return post});
-          else setPosts(currentPosts.current.map(post => {if (post.userId === unlikedPost.userId && post.createdAt === unlikedPost.createdAt) {post.likes = likedPost.likes + post.likedByYou ? 1 : 0} return post}));
+        //console.log(unlikedPost)
+        console.log("newly unliked post");
+        const localUnlikedPost = currentPosts.current.find(post => post.userId === unlikedPost.userId && post.createdAt === unlikedPost.createdAt);
+        if (localUnlikedPost != null) {
+          //console.log("the copy is loaded");
+          if (localUnlikedPost.likeDebounce) 
+          {
+            //console.log("you did this");
+            localUnlikedPost.likeDebounce = null;
+          }
+          else setPosts(currentPosts.current.map(post => {if (post.userId === unlikedPost.userId && post.createdAt === unlikedPost.createdAt) {
+            console.log("removing a like");
+            post.likes = post.likes - 1;
+          } return post}));
         }
       }
     });
@@ -138,6 +156,9 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       //console.log("looking for likes: ", likes);
       //returns an array of like objects or nulls corresponding with the array of newposts
       for (i = 0; i < newPosts.length; ++i) {
+        if (!newPosts[i].likes) {
+          newPosts[i].likes = 0;
+        }
         if (likes.data.batchGetLikes[i] != null) {
           console.log("found liked post");
           newPosts[i].likedByYou = true;
