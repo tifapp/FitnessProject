@@ -19,7 +19,7 @@ import { API, graphqlOperation } from "aws-amplify";
 import { createPost, updatePost, deletePost, createConversation, updateConversation, createReadReceipt, deleteReadReceipt } from "root/src/graphql/mutations";
 import { listPosts, postsByChannel, batchGetLikes } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
-import { onCreatePost, onDeletePost, onUpdatePost, onCreateLike, onDeleteLike, onIncrementLikes } from 'root/src/graphql/subscriptions';
+import { onCreatePost, onDeletePost, onUpdatePost, onCreateLike, onDeleteLike, onIncrementLikes, onDecrementLikes } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
 import APIList from 'components/APIList';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -104,12 +104,22 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         }
       }
     });
+    const decrementLikeSubscription = API.graphql(graphqlOperation(onDecrementLikes)).subscribe({ //nvm we dont have a subscription event for incrementlike
+      next: event => {
+        const unlikedPost = event.value.data.onDecrementLikes
+        if (currentPosts.current.find(post => post.userId === unlikedPost.userId && post.createdAt === unlikedPost.createdAt)) {
+          if (currentPosts.current.find(post => post.userId === unlikedPost.userId && post.createdAt === unlikedPost.createdAt && post.likeDebounce)) currentPosts.current.map(post => {if (post.userId === unlikedPost.userId && post.createdAt === unlikedPost.createdAt && post.likeDebounce) {post.likeDebounce = null} return post});
+          else setPosts(currentPosts.current.map(post => {if (post.userId === unlikedPost.userId && post.createdAt === unlikedPost.createdAt) {post.likes = likedPost.likes + post.likedByYou ? 1 : 0} return post}));
+        }
+      }
+    });
     checkInternetConnection();
     return () => {
       createPostSubscription.unsubscribe();
       deletePostSubscription.unsubscribe();
       updatePostSubscription.unsubscribe();
       incrementLikeSubscription.unsubscribe();
+      decrementLikeSubscription.unsubscribe();
     }
   }, []);
 

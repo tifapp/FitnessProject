@@ -22,23 +22,23 @@
         },
         "deleteReplies": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/deleteReplies-6233744964686446764d-build.zip"
+          "s3Key": "amplify-builds/deleteReplies-6c6f70784a4f6c6d704b-build.zip"
         },
         "replyNotifications": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/replyNotifications-59484f57677977495938-build.zip"
+          "s3Key": "amplify-builds/replyNotifications-35434c2b4a7672635369-build.zip"
         },
         "likeCounter": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/likeCounter-327067676d346637764c-build.zip"
+          "s3Key": "amplify-builds/likeCounter-6e7a7667485846675263-build.zip"
         },
         "friendNotifications": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/friendNotifications-5a65374d3254322b624f-build.zip"
+          "s3Key": "amplify-builds/friendNotifications-2f5069482f6b61486c49-build.zip"
         },
         "removeMessagesWhenUnfriend": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/removeMessagesWhenUnfriend-2b2f7847377a6f725059-build.zip"
+          "s3Key": "amplify-builds/removeMessagesWhenUnfriend-79726a47503163774269-build.zip"
         },
         "backendResources": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
@@ -87,6 +87,14 @@
                 }
               ],
               "hash": "fX/zSuMoQtYnxnidvgZQboE9Axi2gK1Tu1Ca0uTR0Ds="
+            },
+            "5": {
+              "permissions": [
+                {
+                  "type": "private"
+                }
+              ],
+              "hash": "D8yNrYtMZkcEnGfeHAfwK0rN1pkrXOELDMhSeoMSmoE="
             }
           }
         }

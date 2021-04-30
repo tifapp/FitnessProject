@@ -189,7 +189,7 @@
         },
         "DataSourceName": "PostTable",
         "TypeName": "Mutation",
-        "FieldName": "incrementLikes",
+        "FieldName": "decrementLikes",
         "RequestMappingTemplateS3Location": {
           "Fn::Sub": [
             "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Mutation.decrementLikes.req.vtl",
