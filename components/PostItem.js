@@ -23,22 +23,21 @@ import playSound from "../hooks/playSound";
 
 var styles = require("../styles/stylesheet");
 
-var myTimeout;
-var timerIsRunning = false;
-
 function LikeButton({ likes, likedByYou, postId, callback }) {
   const [liked, setLiked] = useState(likedByYou);
   const likeRef = useRef();
+  const timerIsRunning = useRef();
+  const likeTimeout = useRef();
 
   const resetTimeout = () => {
     //if there's already a timeout running do not update ref
     //if there isn't, update ref
-    if (!timerIsRunning) {
+    if (!timerIsRunning.current) {
       likeRef.current = liked;
     }
-    timerIsRunning = true;
-    clearTimeout(myTimeout);
-    myTimeout = setTimeout(sendAPICall, 1000);
+    timerIsRunning.current = true;
+    clearTimeout(likeTimeout.current);
+    likeTimeout.current = setTimeout(sendAPICall, 1000);
   }
 
   const sendAPICall = () => {
@@ -59,7 +58,7 @@ function LikeButton({ likes, likedByYou, postId, callback }) {
       console.log("you repeated yourself");
     }
 
-    timerIsRunning = false;
+    timerIsRunning.current = false;
   }
 
   const likePostAsync = async () => {
@@ -86,17 +85,14 @@ function LikeButton({ likes, likedByYou, postId, callback }) {
           { marginRight: 6, fontWeight: "bold", color: liked ? "red" : "gray" },
         ]}
       >
-        {liked
-          ? likes
-            ? likedByYou
-              ? likes
-              : likes + 1
-            : 1
-          : likes
-          ? likedByYou
+        {likedByYou
+          ? likeRef.current
+            ? likes
+            : likes + 1
+          : likeRef.current
             ? likes - 1
             : likes
-          : 0}
+          }
       </Text>
       <MaterialIcons
         name={liked ? "favorite" : "favorite-outline"}
