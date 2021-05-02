@@ -21,14 +21,14 @@ type Post @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
   likes: Int
     @auth(
       rules: [
-          { allow: private, operations: [read, create, delete] },
+          { allow: private, operations: [read] },
           { allow: private, provider: iam, operations: [read, create, update] },
       ]
     )
   replies: Int
     @auth(
       rules: [
-          { allow: private, operations: [read, create, update] },
+          { allow: private, operations: [read] },
           { allow: private, provider: iam, operations: [read, create, update] },
       ]
     )

@@ -1,6 +1,8 @@
 ## [Start] Set default values. **
 #set( $createdAt = $util.time.nowISO8601() )
 #set( $userId = $context.identity.sub )
+$util.qr($context.args.input.put("likes", 0))
+$util.qr($context.args.input.put("replies", 0))
 ## Automatically set the createdAt timestamp. **
 $util.qr($context.args.input.put("createdAt", $util.defaultIfNull($ctx.args.input.createdAt, $createdAt)))
 ## Automatically set the updatedAt timestamp. **

@@ -179,13 +179,7 @@ export default function PostItem({
                     postId={
                       item.createdAt +
                       "#" +
-                      item.userId +
-                      "#" +
-                      item.channel +
-                      "#" +
-                      item.parentId +
-                      "#" +
-                      item.isParent
+                      item.userId
                     }
                     callback={() => {item.likeDebounce = true}}
                   />

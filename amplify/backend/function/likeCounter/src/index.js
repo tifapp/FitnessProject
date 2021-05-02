@@ -29,9 +29,6 @@ exports.handler = (event, context, callback) => {
           const inputVariables = {
             createdAt: createdAt,
             userId: userId,
-            parentId: parentId,
-            isParent: isParent,
-            channel: channel,
           };
 
           if (record.eventName == "INSERT") {
