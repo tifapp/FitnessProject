@@ -41,6 +41,7 @@ function LikeButton({ likes, likedByYou, postId, callback }) {
   }
 
   const sendAPICall = () => {
+    callback();
     if (liked == likeRef.current) {
       console.log("sent API call, hopefully debounce works.");
       if (!liked) {
@@ -62,7 +63,6 @@ function LikeButton({ likes, likedByYou, postId, callback }) {
   }
 
   const likePostAsync = async () => {
-    callback();
     liked ? playSound("unlike") : playSound("like"); 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     try {
@@ -85,14 +85,12 @@ function LikeButton({ likes, likedByYou, postId, callback }) {
           { marginRight: 6, fontWeight: "bold", color: liked ? "red" : "gray" },
         ]}
       >
-        {likedByYou
-          ? likeRef.current
-            ? likes
-            : likes + 1
-          : likeRef.current
-            ? likes - 1
-            : likes
-          }
+      {likedByYou && !liked 
+        ? likes - 1 
+        : !likedByYou && liked
+          ? likes + 1
+          : likes
+      }
       </Text>
       <MaterialIcons
         name={liked ? "favorite" : "favorite-outline"}
