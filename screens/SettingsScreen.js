@@ -32,6 +32,14 @@ const SettingsScreen = ({ navigation, route }) => {
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   const [blockList, setBlockList] = useState([]);
   
+  const { localBlockList } = route.params;
+  
+  useEffect(()=>{
+    console.log("local block list was changed");
+    console.log("local block list is " + localBlockList);
+    console.log("block list is " + blockList);
+  },[localBlockList])
+  
   const alertOptions = {
     cancelable: true,
     onDismiss: () => setIsOptionsOpen(false),
@@ -45,6 +53,7 @@ const SettingsScreen = ({ navigation, route }) => {
         onPress: () => {
           console.log("about to delete this user: ", blockeeId)
           setBlockList(blockList.filter((item) => item.blockee != blockeeId));
+          localBlockList.filter((item) => item.blockee != blockeeId);
           API.graphql(
             graphqlOperation(deleteBlock, { input: { userId: route.params?.myId, blockee: blockeeId} })
           );
@@ -108,7 +117,7 @@ const SettingsScreen = ({ navigation, route }) => {
           />
         </View>
       )}
-      nonRefreshable={true}
+      //notRefreshable={true}
       filter={{ userId: route.params?.myId }}
       contentContainerStyle={{ flexGrow: 1, flex: 1, justifyContent: 'center', alignContent: "center", alignItems: "center", alignSelf: "center", }}
       keyExtractor={(item) => item.blockee}

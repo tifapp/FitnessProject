@@ -63,6 +63,8 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
               }
           }
           else {
+            console.log("receiving a post!");
+            console.log(newPost);
             LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
             setPosts([newPost, ...currentPosts.current]); //what if we have a lot of new posts at once?
             if (newPost.receiver == route.params?.myId) {

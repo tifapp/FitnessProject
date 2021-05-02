@@ -43,8 +43,8 @@ import { batchGetConversations } from "../src/graphql/queries";
 import { batchGetReadReceipts } from "../src/graphql/queries";
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const subscriptions = [];
-global.blocklist = [];
+var subscriptions = [];
+var localBlockList = [];
 
 export default function CustomSidebarMenu({ navigation, state, progress, myId }) {
   const [lastOnlineTime, setLastOnlineTime] = useState(0);
@@ -101,6 +101,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
       next: (event) => {
         //IMPORTANT: don't use "friendList" or "friendRequestList" variables in this scope, instead use "currentFriends.current" and "currentFriendRequests.current"
 
+        console.log("receiving new request")
         //console.log("is drawer open? ", isDrawerOpen.current);
         const newFriendRequest = event.value.data.onNewFriendRequest;
         if (newFriendRequest.sender !== myId && newFriendRequest.receiver !== myId)
@@ -363,7 +364,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
     // delete friend object
     try {
       if (blocked) {
-        global.blocklist = [...global.blocklist, {userId: myId , blockee: item.receiver == myId ? item.sender : item.receiver}];
+        localBlockList.push({createdAt: (new Date(Date.now())).toISOString(), userId: myId, blockee: item.receiver == myId ? item.sender : item.receiver});
         API.graphql(
           graphqlOperation(createBlock, {
             input: { blockee: item.receiver == myId ? item.sender : item.receiver },
@@ -468,6 +469,18 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
             />
           )}
           keyExtractor={(item) => item.sender}
+          ListEmptyComponent={
+            <Text
+            style={{
+              alignSelf: "center",
+              justifyContent: "center",
+              color: "gray",
+              marginVertical: 15,
+              fontSize: 15,
+            }}>
+              No new requests.
+            </Text>
+          }
         />
       </Accordion>
       <Accordion
@@ -526,6 +539,18 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
             />
           )}
           keyExtractor={(item) => item.createdAt.toString()}
+          ListEmptyComponent={
+            <Text
+            style={{
+              alignSelf: "center",
+              justifyContent: "center",
+              color: "gray",
+              marginVertical: 15,
+              fontSize: 15,
+            }}>
+              No friends yet!
+            </Text>
+          }
         />
       </Accordion>
       <TouchableOpacity
@@ -533,7 +558,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
         <Text>Conversations</Text>
       </TouchableOpacity>
       <TouchableOpacity
-      onPress={()=>{navigation.navigate("Settings"), {blocklist: global.blocklist}}}>
+      onPress={()=>{navigation.navigate("Settings", {localBlockList: localBlockList})}}>
         <Text>Settings</Text>
       </TouchableOpacity>
     </SafeAreaView>
