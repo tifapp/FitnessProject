@@ -148,7 +148,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     let postIds = [];
 
     newPosts.forEach(item => {
-      postIds.push({postId: item.createdAt + "#" + item.userId + "#" + item.channel + "#" + item.parentId + "#" + item.isParent});
+      postIds.push({postId: item.createdAt + "#" + item.userId});
     });
 
     try {
