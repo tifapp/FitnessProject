@@ -30,7 +30,7 @@
         },
         "likeCounter": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/likeCounter-6c554674376b4f2b444e-build.zip"
+          "s3Key": "amplify-builds/likeCounter-6c565276696752323838-build.zip"
         },
         "friendNotifications": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
@@ -38,7 +38,7 @@
         },
         "removeMessagesWhenUnfriend": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/removeMessagesWhenUnfriend-79726a47503163774269-build.zip"
+          "s3Key": "amplify-builds/removeMessagesWhenUnfriend-65586c6769466f454c73-build.zip"
         },
         "backendResources": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",

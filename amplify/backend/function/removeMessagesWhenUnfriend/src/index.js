@@ -8,7 +8,7 @@ require('isomorphic-fetch');
 const gql = require('graphql-tag');
 
 const {client} = require('/opt/backendResources');
-const {deletePost} = require('/opt/mutations');
+const {deletePost, deleteConversation} = require('/opt/mutations');
 const {postsByChannel} = require('/opt/queries');
 
 exports.handler = (event, context, callback) => {
@@ -17,8 +17,23 @@ exports.handler = (event, context, callback) => {
       const sender = record.dynamodb.OldImage.sender.S;
       const receiver = record.dynamodb.OldImage.receiver.S;
 
+      console.log("sender is ", sender);
+      console.log("receiver is ", receiver);
+
+      let elements = [sender, receiver];
+      elements.sort();
+
         (async () => {
           try {
+            client.mutate({
+              mutation: gql(deleteConversation),
+              variables: {
+                input: {
+                  id: sender<receiver ? sender+receiver:receiver+sender,
+                }
+              }
+            });
+
             const results = await client.query({
               query: gql(postsByChannel),
               variables: {
@@ -26,7 +41,7 @@ exports.handler = (event, context, callback) => {
               }
             });
 
-            await Promise.all(results.data.postsByChannel.items.map(async (post) => {
+            Promise.all(results.data.postsByChannel.items.map(async (post) => {
               client.mutate({
                 mutation: gql(deletePost),
                 variables: {
@@ -36,6 +51,7 @@ exports.handler = (event, context, callback) => {
                   }
                 }
               });
+              console.log("post ", post);
             }));
 
             callback(null, "successfully deleted messages");
