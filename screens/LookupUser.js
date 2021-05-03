@@ -32,6 +32,7 @@ import {
   deleteFriendship,
   createFriendship,
   updateFriendship,
+  deleteBlock
 } from "root/src/graphql/mutations";
 import {
   onCreateFriendship,
@@ -126,6 +127,15 @@ const LookupUser = ({ route, navigation }) => {
       );
 
       if (blocked.data.getBlock != null) {setFriendStatus("blocked"); return;}
+
+      let blocker = await API.graphql(
+        graphqlOperation(getBlock, {
+          userId: route.params?.myId,
+          blockee: userId,
+        })
+      );
+
+      if (blocker.data.getBlock != null) {setFriendStatus("blocker"); return;}
 
       let friendship = await API.graphql(
         graphqlOperation(getFriendship, {
@@ -313,6 +323,18 @@ const LookupUser = ({ route, navigation }) => {
     }
   };
 
+  const unblockFriend = async () => {
+    try {
+      API.graphql(
+        graphqlOperation(deleteBlock, { input: { userId: route.params?.myId, blockee: userId} })
+      );
+      setFriendStatus("none");
+    } catch (err) {
+      console.log(err);
+      console.log("error when unblocking");
+    }
+  }
+
   return user == null ? null : (
     <View>
       <ScrollView>
@@ -417,6 +439,14 @@ const LookupUser = ({ route, navigation }) => {
                 }}
               />
             ) : friendStatus == "blocked" ? null
+            : friendStatus == "blocker" ? (
+              <TouchableOpacity
+                onPress={unblockFriend}
+                style={styles.unblockButton}
+              >
+                <Text style={styles.buttonTextStyle}>Unblock</Text>
+              </TouchableOpacity>
+            )
             : friendStatus == "none" ? (
               <TouchableOpacity
                 onPress={sendFriendRequest}

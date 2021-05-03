@@ -42,7 +42,13 @@ module.exports = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
   },
-
+  unblockButton: {
+    marginTop: 20,
+    alignSelf: "center",
+    backgroundColor: "black",
+    padding: 10,
+    borderRadius: 5,
+  },
   unsendButton: {
     marginTop: 20,
     alignSelf: "center",
