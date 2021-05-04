@@ -32,7 +32,8 @@ import {
   deleteFriendship,
   createFriendship,
   updateFriendship,
-  deleteBlock
+  deleteBlock,
+  createBlock
 } from "root/src/graphql/mutations";
 import {
   onCreateFriendship,
@@ -283,7 +284,7 @@ const LookupUser = ({ route, navigation }) => {
       }
     } catch (err) {
       console.log(err);
-      console.log("error in deleting post: ");
+      console.log("error in unsending request: ");
     }
   };
 
@@ -304,7 +305,7 @@ const LookupUser = ({ route, navigation }) => {
       }
     } catch (err) {
       console.log(err);
-      console.log("error in deleting post: ");
+      console.log("error in rejecting friend: ");
     }
   };
 
@@ -319,16 +320,28 @@ const LookupUser = ({ route, navigation }) => {
       alert("Deleted Friend successfully!");
     } catch (err) {
       console.log(err);
-      console.log("error in deleting post: ");
+      console.log("error in deleting friend: ");
     }
   };
 
-  const unblockFriend = async () => {
+  const unblockUser = async () => {
     try {
       API.graphql(
         graphqlOperation(deleteBlock, { input: { userId: route.params?.myId, blockee: userId} })
       );
       setFriendStatus("none");
+    } catch (err) {
+      console.log(err);
+      console.log("error when unblocking");
+    }
+  }
+  
+  const blockUser = async () => {
+    try {
+      API.graphql(
+        graphqlOperation(createBlock, { input: { blockee: userId} })
+      );
+      setFriendStatus("blocker");
     } catch (err) {
       console.log(err);
       console.log("error when unblocking");
@@ -441,19 +454,27 @@ const LookupUser = ({ route, navigation }) => {
             ) : friendStatus == "blocked" ? null
             : friendStatus == "blocker" ? (
               <TouchableOpacity
-                onPress={unblockFriend}
+                onPress={unblockUser}
                 style={styles.unblockButton}
               >
                 <Text style={styles.buttonTextStyle}>Unblock</Text>
               </TouchableOpacity>
             )
             : friendStatus == "none" ? (
-              <TouchableOpacity
-                onPress={sendFriendRequest}
-                style={styles.submitButton}
-              >
-                <Text style={styles.buttonTextStyle}>Send Friend Request</Text>
-              </TouchableOpacity>
+              <View>
+                <TouchableOpacity
+                  onPress={sendFriendRequest}
+                  style={styles.submitButton}
+                >
+                  <Text style={styles.buttonTextStyle}>Send Friend Request</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={blockUser}
+                  style={styles.unblockButton}
+                >
+                  <Text style={styles.buttonTextStyle}>Block</Text>
+                </TouchableOpacity>
+              </View>
             ) : friendStatus == "sending" ? (
               <Text style={[styles.buttonTextStyle, { color: "red" }]}>
                 Sending Friend Request...

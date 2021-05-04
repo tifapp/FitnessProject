@@ -304,6 +304,21 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     scrollRef.current?.scrollToOffset({ offset: 0, animated: true })
   }
 
+  const renderPostItem = ({ item, index }) => (
+    <PostItem
+      item={item}
+      deletePostsAsync={deletePostsAsync}
+      writtenByYou={item.userId === route.params?.myId}
+      editButtonHandler={updatePostAsync}
+      replyButtonHandler={replyPostAsync}
+      receiver={receiver}
+      showTimestamp={showTimestamp(item, index)}
+      newSection={
+        index == 0 ? true : showTimestamp(posts[index - 1], index - 1)
+      }
+    />
+  )
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <APIList
@@ -401,20 +416,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         setDataFunction={setPosts}
         data={posts}
         filter={{ channel: getChannel(), sortDirection: "DESC" }}
-        renderItem={({ item, index }) => (
-          <PostItem
-            item={item}
-            deletePostsAsync={deletePostsAsync}
-            writtenByYou={item.userId === route.params?.myId}
-            editButtonHandler={updatePostAsync}
-            replyButtonHandler={replyPostAsync}
-            receiver={receiver}
-            showTimestamp={showTimestamp(item, index)}
-            newSection={
-              index == 0 ? true : showTimestamp(posts[index - 1], index - 1)
-            }
-          />
-        )}
+        renderItem={renderPostItem}
         keyExtractor={(item) => item.createdAt.toString() + item.userId}
       />
 
