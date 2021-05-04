@@ -50,12 +50,12 @@ export const ProfileImageAndName = (props) => {
           isFull: props.isFull,
           changed: false,
         };
-        let imageKey = "profileimage.jpg";
+        let imageKey = `thumbnails/${user.identityId}/thumbnail-profileimage.jpg`;
         let imageConfig = {
           expires: 86400,
         };
         if (props.isFull) {
-          imageKey = `thumbnails/${user.identityId}/thumbnail-profileimage.jpg`;
+          imageKey = "profileimage.jpg";
           imageConfig.identityId = user.identityId;
           imageConfig.level = "protected";
         }
