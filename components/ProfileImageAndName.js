@@ -129,7 +129,37 @@ export const ProfileImageAndName = (props) => {
   }, [userInfo]);
 
   if (userInfo == null) {
-    return <ActivityIndicator color="#0000ff" style={[props.style]} />;
+    return (
+    <View
+      style={[
+        {
+          flexDirection: props.vertical ? "column" : "row",
+          alignItems: "center",
+          alignContent: "flex-start",
+          justifyContent: "flex-start",
+        },
+        props.style,
+      ]}
+    >
+      <Image
+        style={[props.imageStyle, { margin: 15 }]}
+        source={require("../assets/icon.png")}
+      />
+      <View
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <ActivityIndicator color="#0000ff" />
+      </View>
+    </View>
+    );
   } else if (props.hideall) {
     return null;
   } else {
