@@ -38,7 +38,7 @@
         },
         "removeMessagesWhenUnfriend": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/removeMessagesWhenUnfriend-65586c6769466f454c73-build.zip"
+          "s3Key": "amplify-builds/removeMessagesWhenUnfriend-7262382b6d4a5064434f-build.zip"
         },
         "backendResources": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",

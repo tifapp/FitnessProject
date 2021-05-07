@@ -468,6 +468,18 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
             />
           )}
           keyExtractor={(item) => item.sender}
+          ListEmptyComponent={
+            <Text
+            style={{
+              alignSelf: "center",
+              justifyContent: "center",
+              color: "gray",
+              marginVertical: 15,
+              fontSize: 15,
+            }}>
+              No new requests!
+            </Text>
+          }
         />
       </Accordion>
       <Accordion
@@ -526,6 +538,18 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
             />
           )}
           keyExtractor={(item) => item.createdAt.toString()}
+          ListEmptyComponent={
+            <Text
+            style={{
+              alignSelf: "center",
+              justifyContent: "center",
+              color: "gray",
+              marginVertical: 15,
+              fontSize: 15,
+            }}>
+              No friends yet!
+            </Text>
+          }
         />
       </Accordion>
       <TouchableOpacity
