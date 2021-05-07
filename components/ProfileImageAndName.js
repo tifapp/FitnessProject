@@ -99,14 +99,14 @@ export const ProfileImageAndName = (props) => {
       .then((info) => {
         console.log("info is ", info)
         if (info != null) {
-          setUserInfo(info);
           if (
-            info != null &&
             props.isFull &&
             !info.isFull &&
             info.imageURL !== ""
           ) {
             addUserInfotoCache();
+          } else {
+            setUserInfo(info);
           }
         }
       }); //redundant???
