@@ -359,7 +359,7 @@ const LookupUser = ({ route, navigation }) => {
           <View style={{ paddingBottom: 15 }}>
             <ProfileImageAndName
               you={userId === route.params?.myId}
-              navigation={false}
+              navigateToProfile={false}
               vertical={true}
               imageStyle={styles.imageStyle}
               userId={userId}

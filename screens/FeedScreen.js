@@ -330,7 +330,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
             <View style={{flexDirection: "row"}}>
             <ProfileImageAndName
               you={true}
-              navigation={false}
+              navigateToProfile={false}
               userId={route.params?.myId}
               isFull={true}
               fullname={true}

@@ -22,7 +22,7 @@ export const ProfileImageAndName = (props) => {
   const navigation = props.navigationObject ?? useNavigation();
 
   const goToProfile = () => {
-    if (props.navigation == false) {
+    if (props.navigateToProfile == false) {
       if (props.you)
         navigation.navigate("Profile", {
           screen: "Profile",
@@ -160,25 +160,20 @@ export const ProfileImageAndName = (props) => {
           {props.imageOverlay}
         </TouchableOpacity>
         <View style={props.textLayoutStyle}>
-          {props.hidename ? null
-           : (
-            props.isFull || userInfo.name.length <= 40 ? (
+          {props.hidename ? null : (
               <Text
+                onPress={goToProfile}
                 style={[props.textStyle, { flexWrap: "wrap", flexShrink: 1 }]}
               >
-                {userInfo.name}
+                {props.isFull || userInfo.name.length <= 40
+                  ? userInfo.name
+                  : userInfo.name.substring(0, 40)}
               </Text>
-            ) : (
-              <Text
-                style={[props.textStyle, { flexWrap: "wrap", flexShrink: 1 }]}
-              >
-                {userInfo.name.substring(0, 40)} ...
-              </Text>
-            ))}
-            {props.subtitleComponent}
-          </View>
-          {props.sibling}
+          )}
+          {props.subtitleComponent}
         </View>
-      );
-    }
-}
+        {props.sibling}
+      </View>
+    );
+  }
+};

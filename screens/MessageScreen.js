@@ -92,7 +92,6 @@ export default function MessageScreen({ navigation, route }) {
         headerComponent={
           <ProfileImageAndName
             you={userId === route.params?.myId}
-            navigation={false}
             vertical={true}
             imageStyle={[styles.imageStyle, {marginVertical: 15}]}
             imageLayoutStyle={{margin: 0}}

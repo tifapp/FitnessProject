@@ -392,7 +392,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
         <ProfileImageAndName
           navigationObject={navigation}
           you={true}
-          navigation={false}
+          navigateToProfile={false}
           userId={myId}
           isFull={true}
           fullname={true}
