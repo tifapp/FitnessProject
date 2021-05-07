@@ -75,7 +75,7 @@ const config = {
   capacityInBytes: 5000000,
 };
 
-const myCacheConfig = Cache.configure(config);
+Cache.configure(config);
 //Cache.clear(); //will we have to do this for the next build?
 
 var styles = require("./styles/stylesheet");

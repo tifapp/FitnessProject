@@ -50,6 +50,12 @@ export const ProfileImageAndName = (props) => {
           isFull: props.isFull,
           changed: false,
         };
+        Cache.setItem(props.userId, info, {
+          expires: Date.now() + 86400000,
+        });
+        setUserInfo(info);
+        console.log("adding name to cache")
+        if (props.callback) props.callback(info); 
         let imageKey = `thumbnails/${user.identityId}/thumbnail-profileimage.jpg`;
         let imageConfig = {
           expires: 86400,
@@ -67,18 +73,16 @@ export const ProfileImageAndName = (props) => {
               () => {
                 //if (mounted) {
                 info.imageURL = imageURL;
-                Cache.setItem(props.userId, info, {
-                  expires: Date.now() + 86400000,
-                });
+                Cache.setItem(props.userId, info);
                 setUserInfo(info);
+                console.log("adding photo to cache")
                 //}
               },
               (err) => {
                 //console.log("couldn't find user's profile image");
-                Cache.setItem(props.userId, info, {
-                  expires: Date.now() + 86400000,
-                });
+                Cache.setItem(props.userId, info);
                 setUserInfo(info);
+                console.log("adding photo to cache")
               }
             );
           })
@@ -91,11 +95,11 @@ export const ProfileImageAndName = (props) => {
   };
 
   useEffect(() => {
-    if (imageChanged) {
-      Cache.getItem(props.userId, { callback: addUserInfotoCache }) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
-        .then((info) => {
-          setImageChanged(false);
-          //console.log('cache hit! ', props.userId);
+    Cache.getItem(props.userId, { callback: addUserInfotoCache }) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
+      .then((info) => {
+        console.log("info is ", info)
+        if (info != null) {
+          setUserInfo(info);
           if (
             info != null &&
             props.isFull &&
@@ -103,30 +107,23 @@ export const ProfileImageAndName = (props) => {
             info.imageURL !== ""
           ) {
             addUserInfotoCache();
-          } else {
-            setUserInfo(info);
           }
-        }); //redundant???
-    }
-    //return () => mounted = false;
-  }, [props.user, imageChanged]); //there is no props.user
-
-  useEffect(() => {
-    Cache.getItem(props.userId) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
-      .then((info) => {
-        if (
-          userInfo != null &&
-          info != null &&
-          userInfo.imageURL !== info.imageURL
-        ) {
-          setImageChanged(true);
         }
-      });
-  });
+      }); //redundant???
+  }, []);
 
-  useEffect(() => {
-    if (props.callback && userInfo != null) props.callback(userInfo);
-  }, [userInfo]);
+  // useEffect(() => {
+  //   Cache.getItem(props.userId) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
+  //     .then((info) => {
+  //       if (
+  //         userInfo != null &&
+  //         info != null &&
+  //         userInfo.imageURL !== info.imageURL
+  //       ) {
+  //         setImageChanged(true);
+  //       }
+  //     });
+  // });
 
   if (userInfo == null) {
     return (
@@ -180,6 +177,7 @@ export const ProfileImageAndName = (props) => {
           style={[{ margin: 15 }, props.imageLayoutStyle]}
         >
           <Image
+            onError={addUserInfotoCache}
             style={[props.imageStyle]}
             source={
               userInfo.imageURL === ""
