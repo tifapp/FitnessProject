@@ -9,6 +9,7 @@ import {
   Alert,
   Image,
   Linking,
+  LayoutAnimation
 } from "react-native";
 import ProfilePic from "components/ProfileImagePicker";
 import BasicInfo from "components/basicInfoComponents/BasicInfo";
@@ -44,6 +45,8 @@ const SettingsScreen = ({ navigation, route }) => {
         text: "Yes",
         onPress: () => {
           console.log("about to delete this user: ", blockeeId)
+          global.localBlockList = global.localBlockList.filter((item) => item.blockee != blockeeId);
+          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
           setBlockList(blockList.filter((item) => item.blockee != blockeeId));
           API.graphql(
             graphqlOperation(deleteBlock, { input: { userId: route.params?.myId, blockee: blockeeId} })
@@ -64,9 +67,7 @@ const SettingsScreen = ({ navigation, route }) => {
   useEffect(() => {
     const onFocus = navigation.addListener('focus', () => {
       console.log("got to settings", global.localBlockList);
-      console.log("got to settings", blockList);
-      setBlockList([...blockList, ...global.localBlockList]);
-      global.localBlockList = [];
+      setBlockList([...global.localBlockList]);
     });
 
     // Return the function to unsubscribe from the event so it gets removed on unmount
@@ -79,7 +80,7 @@ const SettingsScreen = ({ navigation, route }) => {
       additionalAmount={20}
       queryOperation={blocksByDate}
       data={blockList}
-      setDataFunction={setBlockList}
+      setDataFunction={(results) => {global.localBlockList = results, setBlockList(results)}}
       renderItem={({ item }) => (
         <View
           style={{
@@ -120,7 +121,7 @@ const SettingsScreen = ({ navigation, route }) => {
           />
         </View>
       )}
-      nonRefreshable={true}
+      notRefreshable={true}
       filter={{ userId: route.params?.myId }}
       contentContainerStyle={{ flexGrow: 1, flex: 1, justifyContent: 'center', alignContent: "center", alignItems: "center", alignSelf: "center", }}
       keyExtractor={(item) => item.blockee}
