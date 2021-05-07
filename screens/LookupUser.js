@@ -329,6 +329,8 @@ const LookupUser = ({ route, navigation }) => {
       API.graphql(
         graphqlOperation(deleteBlock, { input: { userId: route.params?.myId, blockee: userId} })
       );
+      global.localBlockList = global.localBlockList.filter(i => i.blockee !== userId);
+      console.log(global.localBlockList);
       setFriendStatus("none");
     } catch (err) {
       console.log(err);
@@ -341,6 +343,8 @@ const LookupUser = ({ route, navigation }) => {
       API.graphql(
         graphqlOperation(createBlock, { input: { blockee: userId} })
       );
+      global.localBlockList.push({createdAt: (new Date(Date.now())).toISOString(), userId: route.params?.myId , blockee: userId});
+      console.log(global.localBlockList);
       setFriendStatus("blocker");
     } catch (err) {
       console.log(err);

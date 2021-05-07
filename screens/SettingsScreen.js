@@ -61,6 +61,18 @@ const SettingsScreen = ({ navigation, route }) => {
     Alert.alert(title, "", options, alertOptions);
   };
 
+  useEffect(() => {
+    const onFocus = navigation.addListener('focus', () => {
+      console.log("got to settings", global.localBlockList);
+      console.log("got to settings", blockList);
+      setBlockList([...blockList, ...global.localBlockList]);
+      global.localBlockList = [];
+    });
+
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return onFocus;
+  }, [navigation])
+
   return (
     <APIList
       initialAmount={10}

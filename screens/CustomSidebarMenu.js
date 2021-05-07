@@ -43,8 +43,8 @@ import { batchGetConversations } from "../src/graphql/queries";
 import { batchGetReadReceipts } from "../src/graphql/queries";
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const subscriptions = [];
-global.blocklist = [];
+var subscriptions = [];
+global.localBlockList = [];
 
 export default function CustomSidebarMenu({ navigation, state, progress, myId }) {
   const [lastOnlineTime, setLastOnlineTime] = useState(0);
@@ -363,7 +363,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
     // delete friend object
     try {
       if (blocked) {
-        global.blocklist = [...global.blocklist, {userId: myId , blockee: item.receiver == myId ? item.sender : item.receiver}];
+        global.localBlockList.push({createdAt: (new Date(Date.now())).toISOString(), userId: myId , blockee: item.receiver == myId ? item.sender : item.receiver});
         API.graphql(
           graphqlOperation(createBlock, {
             input: { blockee: item.receiver == myId ? item.sender : item.receiver },
@@ -533,7 +533,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
         <Text>Conversations</Text>
       </TouchableOpacity>
       <TouchableOpacity
-      onPress={()=>{navigation.navigate("Settings"), {blocklist: global.blocklist}}}>
+      onPress={()=>{console.log("going to settings"), navigation.navigate("Settings")}}>
         <Text>Settings</Text>
       </TouchableOpacity>
     </SafeAreaView>
