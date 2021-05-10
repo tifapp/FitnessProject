@@ -268,7 +268,8 @@ const LookupUser = ({ route, navigation }) => {
   };
 
   const unsendFriendRequest = async (temp) => {
-    setFriendStatus("unsending");
+    if (!temp)
+      setFriendStatus("unsending");
     //console.log(temp);
     try {
       await API.graphql(
@@ -277,9 +278,9 @@ const LookupUser = ({ route, navigation }) => {
         })
       );
       console.log("success");
-      setFriendStatus("none");
 
       if (temp != true) {
+        setFriendStatus("none");
         alert("Friend request unsent successfully!");
       }
     } catch (err) {
@@ -289,7 +290,8 @@ const LookupUser = ({ route, navigation }) => {
   };
 
   const rejectFriendRequest = async (temp) => {
-    setFriendStatus("rejecting");
+    if (!temp)
+      setFriendStatus("rejecting");
 
     try {
       await API.graphql(
@@ -298,9 +300,9 @@ const LookupUser = ({ route, navigation }) => {
         })
       );
       console.log("success");
-      setFriendStatus("none");
 
       if (temp != true) {
+        setFriendStatus("none");
         alert("Friend request rejected successfully!");
       }
     } catch (err) {
@@ -309,13 +311,16 @@ const LookupUser = ({ route, navigation }) => {
     }
   };
 
-  const deleteFriend = async () => {
-    setFriendStatus("deleting");
+  const deleteFriend = async (temp) => {
+    if (!temp)
+      setFriendStatus("deleting");
 
     try {
       let check = true;
       rejectFriendRequest(check);
       unsendFriendRequest(check);
+      if (!temp)
+        setFriendStatus("none");
 
       alert("Deleted Friend successfully!");
     } catch (err) {
@@ -340,6 +345,7 @@ const LookupUser = ({ route, navigation }) => {
   
   const blockUser = async () => {
     try {
+      deleteFriend(true);
       API.graphql(
         graphqlOperation(createBlock, { input: { blockee: userId} })
       );
@@ -514,6 +520,12 @@ const LookupUser = ({ route, navigation }) => {
                     Accept Friend Request
                   </Text>
                 </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={blockUser}
+                  style={styles.unblockButton}
+                >
+                  <Text style={styles.buttonTextStyle}>Block</Text>
+                </TouchableOpacity>
               </View>
             ) : friendStatus == "rejecting" ? (
               <Text style={[styles.buttonTextStyle, { color: "red" }]}>
@@ -537,6 +549,12 @@ const LookupUser = ({ route, navigation }) => {
                   style={styles.unsendButton}
                 >
                   <Text style={styles.buttonTextStyle}>Unfriend</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={blockUser}
+                  style={styles.unblockButton}
+                >
+                  <Text style={styles.buttonTextStyle}>Block</Text>
                 </TouchableOpacity>
               </View>
             )}

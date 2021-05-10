@@ -106,6 +106,7 @@ export const ProfileImageAndName = (props) => {
           ) {
             addUserInfotoCache();
           } else {
+            if (props.callback) props.callback(info); 
             setUserInfo(info);
           }
         }
