@@ -7,7 +7,7 @@ import {
   Text,
   Linking,
   TouchableOpacity,
-  LayoutAnimation,
+  LayoutAnimation
 } from "react-native";
 import { API, graphqlOperation, Cache } from "aws-amplify";
 import {

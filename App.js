@@ -247,12 +247,13 @@ const App = () => {
             component={MessageScreen}
             initialParams={{ myId: userId }}
           />
+          */
           <Drawer.Screen
             name="Conversations"
             component={ConversationScreen}
             initialParams={{ myId: userId }}
           />
-            */
+            
           }
         </Drawer.Navigator>
       </NavigationContainer>
