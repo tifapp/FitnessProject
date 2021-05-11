@@ -132,6 +132,11 @@ module.exports = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fffffd",
   },
+  containerStyleMessage: {
+    flex: 1,
+    backgroundColor: "#fffffd",
+    borderColor: "black",
+  },
   floatingContainerStyle: {
     borderBottomWidth: 1,
   },
