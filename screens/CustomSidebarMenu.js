@@ -553,12 +553,32 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
         />
       </Accordion>
       <TouchableOpacity
+      style={[{
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        paddingVertical: 15,
+        backgroundColor: "white",
+      }]}
       onPress={()=>{navigation.navigate("Conversations")}}>
-        <Text>Conversations</Text>
+        <Text style={{
+          fontSize: 18,
+          color: "grey",
+        }}>Conversations</Text>
       </TouchableOpacity>
       <TouchableOpacity
+      style={[{
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        paddingVertical: 15,
+        backgroundColor: "white",
+      }]}
       onPress={()=>{console.log("going to settings"), navigation.navigate("Settings")}}>
-        <Text>Settings</Text>
+        <Text style={{
+          fontSize: 18,
+          color: "grey",
+        }}>Settings</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
