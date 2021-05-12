@@ -240,6 +240,11 @@ const App = () => {
             component={SettingsStack}
             initialParams={{ myId: userId, fromLookup: false }}
           />
+          <Drawer.Screen
+            name="Conversations"
+            component={ConversationScreen}
+            initialParams={{ myId: userId }}
+          />
           {
             /*
           <Drawer.Screen
@@ -248,11 +253,6 @@ const App = () => {
             initialParams={{ myId: userId }}
           />
           */
-          <Drawer.Screen
-            name="Conversations"
-            component={ConversationScreen}
-            initialParams={{ myId: userId }}
-          />
             
           }
         </Drawer.Navigator>
