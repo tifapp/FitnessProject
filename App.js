@@ -91,6 +91,8 @@ const App = () => {
 
   const [userId, setUserId] = useState('checking...'); //stores the user's id if logged in
 
+  const [friendIds, setFriendIds] = useState([]);
+
   const checkIfUserSignedUp = async () => {
     try {
       const query = await Auth.currentUserInfo();
@@ -222,7 +224,11 @@ const App = () => {
           edgeWidth={100}
           initialRouteName="MainTabs"
           drawerContent={(props) => (
-            <CustomSidebarMenu myId={userId} {...props} />
+            <CustomSidebarMenu
+              myId={userId}
+              setFriendIds={setFriendIds}
+              {...props}
+            />
           )}
         >
           <Drawer.Screen //this gets loaded first
@@ -245,15 +251,13 @@ const App = () => {
             component={ConversationScreen}
             initialParams={{ myId: userId }}
           />
-          {
-            friendslist.map((friend) =>
-              <Drawer.Screen
-                name="Messages"
-                component={MessageScreen}
-                initialParams={{ myId: friend.id }}
-              />
-            )            
-          }
+          {friendIds.map((friendId) => (
+            <Drawer.Screen
+              name={friendId}
+              component={MessageScreen}
+              initialParams={{ myId: friendId }}
+            />
+          ))}
         </Drawer.Navigator>
       </NavigationContainer>
     );
