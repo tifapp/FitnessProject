@@ -166,7 +166,7 @@ const App = () => {
   };
 
   const setUniqueFriendIds = (items) => {
-    if (JSON.stringify(friendIds.sort()) === JSON.stringify(items.sort())) //will work when objects are shuffled, but all items will probably refresh still if there's one extra item added to the list
+    if (JSON.stringify(friendIds.sort()) !== JSON.stringify(items.sort())) //will work when objects are shuffled, but all items will probably refresh still if there's one extra item added to the list
       setFriendIds(items);
   }
 
@@ -236,12 +236,12 @@ const App = () => {
             />
           )}
         >
-          <Drawer.Screen //this gets loaded first
+          <Drawer.Screen
             name="MainTabs"
-            component={MainTabs}
             initialParams={{ myId: userId, fromLookup: false }}
-            friendIds={friendIds}
-          />
+          >
+            {(props) => <MainTabs {...props} friendIds={friendIds} />  }          
+          </Drawer.Screen>
         </Drawer.Navigator>
       </NavigationContainer>
     );

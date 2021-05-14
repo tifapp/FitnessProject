@@ -44,29 +44,29 @@ export default function MainStack({ navigation, route, friendIds }) {
         component={ImageScreen}
         initialParams={route.params}
       />
+      <Stack.Screen
+        name="Profile"
+        component={ProfileStack}
+        initialParams={route.params, { fromLookup: false }}
+      />
+      <Stack.Screen
+        name="Settings"
+        component={SettingsStack}
+        initialParams={route.params, { fromLookup: false }}
+      />
+      <Stack.Screen
+        name="Conversations"
+        component={ConversationScreen}
+        initialParams={route.params}
+      />
       {friendIds.map((friendId) => (
         <Stack.Screen
           key={friendId}
           name={friendId}
           component={MessageScreen}
-          initialParams={{ myId: userId, userId: friendId }}
+          initialParams={{ myId: route.params?.myId, userId: friendId }}
         />
       ))}
-      <Stack.Screen
-        name="Profile"
-        component={ProfileStack}
-        initialParams={{ myId: userId, fromLookup: false }}
-      />
-      <Stack.Screen
-        name="Settings"
-        component={SettingsStack}
-        initialParams={{ myId: userId, fromLookup: false }}
-      />
-      <Stack.Screen
-        name="Conversations"
-        component={ConversationScreen}
-        initialParams={{ myId: userId }}
-      />
     </Stack.Navigator>
   );
 }

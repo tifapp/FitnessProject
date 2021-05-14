@@ -4,11 +4,13 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import MainStack from "stacks/MainStack";
 import SearchStack from "stacks/SearchStack";
 
-import React from "react";
+import React, { useEffect } from "react";
 
 const Tab = createBottomTabNavigator();
 
 export default function MainTabs({ navigation, route, friendIds }) {
+  useEffect(() => {console.log("in tabs, friend ids are ", friendIds)}, [friendIds])
+
   return (
     <Tab.Navigator
       tabBarOptions={{
@@ -26,17 +28,16 @@ export default function MainTabs({ navigation, route, friendIds }) {
     >
       <Tab.Screen
         name="Feed"
-        component={MainStack}
-        initialParams={{ myId: route.params?.myId }}
+        initialParams={route.params}
         options={{
           headerShown: false,
-        }}
-        friendIds={friendIds}
-      />
+        }}>
+          {(props) => <MainStack {...props} friendIds={friendIds} />  }   
+      </Tab.Screen>
       <Tab.Screen
         name="Search"
         component={SearchStack}
-        initialParams={{ myId: route.params?.myId }}
+        initialParams={route.params}
         options={{
           headerShown: false,
         }}
