@@ -40,6 +40,7 @@ import * as Permissions from 'expo-permissions';
 import { StatusBar } from "expo-status-bar";
 import MessageScreen from "./screens/MessageScreen";
 import ConversationScreen from "./screens/ConversationScreen";
+import DrawerButton from "components/headerComponents/DrawerButton";
 
 if (
   Platform.OS === "android" &&
@@ -235,13 +236,31 @@ const App = () => {
               {...props}
             />
           )}
+          screenOptions={{
+            headerLeft: (props) => <DrawerButton {...props} />,
+            headerStyle: { backgroundColor: "#efefef" },
+            headerTintColor: "#000",
+            headerTitleStyle: {
+              fontWeight: Platform.OS === "android" ? "normal" : "bold",
+              fontSize: 20,
+            },
+            headerShown: true,
+            headerTitleAlign: "center",
+          }}
         >
           <Drawer.Screen
-            name="MainTabs"
+            name="Feed"
+            component={MainTabs}
             initialParams={{ myId: userId, fromLookup: false }}
-          >
-            {(props) => <MainTabs {...props} friendIds={friendIds} />  }          
-          </Drawer.Screen>
+          />
+          {friendIds.map((friendId) => (
+            <Drawer.Screen
+              key={friendId}
+              name={friendId}
+              component={MessageScreen}
+              initialParams={{ myId: userId, userId: friendId }}
+            />
+          ))}
         </Drawer.Navigator>
       </NavigationContainer>
     );

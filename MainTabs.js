@@ -8,9 +8,7 @@ import React, { useEffect } from "react";
 
 const Tab = createBottomTabNavigator();
 
-export default function MainTabs({ navigation, route, friendIds }) {
-  useEffect(() => {console.log("in tabs, friend ids are ", friendIds)}, [friendIds])
-
+export default function MainTabs({ navigation, route }) {
   return (
     <Tab.Navigator
       tabBarOptions={{
@@ -29,18 +27,12 @@ export default function MainTabs({ navigation, route, friendIds }) {
       <Tab.Screen
         name="Feed"
         initialParams={route.params}
-        options={{
-          headerShown: false,
-        }}>
-          {(props) => <MainStack {...props} friendIds={friendIds} />  }   
-      </Tab.Screen>
+        component={MainStack}
+      />
       <Tab.Screen
         name="Search"
         component={SearchStack}
         initialParams={route.params}
-        options={{
-          headerShown: false,
-        }}
       />
     </Tab.Navigator>
   );
