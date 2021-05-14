@@ -12,19 +12,14 @@ import MessageScreen from "screens/MessageScreen";
 
 
 import React from 'react';
+import { headerOptions } from '../components/headerComponents/headerOptions';
 
 const Stack = createStackNavigator();
 
 export default function ProfileTab({navigation, route}) {
   return (
-    <Stack.Navigator initialRouteName='Profile' screenOptions={{ 
-      headerStyle: { backgroundColor: "#efefef" },
-      headerTintColor: "#000",
-      headerTitleStyle: { fontWeight: Platform.OS === 'android' ? "normal" : "bold", fontSize: 20, },
-      headerTitleAlign: "center",  
-      headerLeft: () => (
-      <Button title="< Back" onPress={() => navigation.goBack()} />
-    ), }}>
+    <Stack.Navigator initialRouteName='Profile' 
+    screenOptions={headerOptions} >
       <Stack.Screen name='Profile' component={ProfileScreen} initialParams={route.params} />
       <Stack.Screen name='Bio' component={BioScreen} />
       <Stack.Screen name='Goals' component={GoalsScreen} />

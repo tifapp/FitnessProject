@@ -40,7 +40,7 @@ export default function DrawerButton(props) {
           name="menu"
           size={30}
           color={"black"}
-          style={{ paddingLeft: 15 }}
+          style={{ paddingRight: 15 }}
         />
         {notificationCount > 0 ? (
           <MaterialIcons name="circle" size={10} color={"red"} style={{position: "absolute", top: -2, right: -6}} />

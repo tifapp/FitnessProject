@@ -15,7 +15,8 @@ import { Amplify, API, graphqlOperation, Auth, Cache, Storage } from "aws-amplif
 import { getUser } from "./src/graphql/queries";
 import ProfileStack from "stacks/ProfileStack";
 import MainTabs from "./MainTabs";
-import SettingsStack from "stacks/SettingsStack";
+import SettingsScreen from "screens/SettingsScreen";
+import ConversationScreen from "screens/ConversationScreen";
 import ComplianceScreen from "screens/ComplianceScreen";
 import ProfileScreen from "screens/ProfileScreen";
 import BioScreen from "screens/BioScreen";
@@ -39,8 +40,8 @@ import * as Notifications from 'expo-notifications';
 import * as Permissions from 'expo-permissions';
 import { StatusBar } from "expo-status-bar";
 import MessageScreen from "./screens/MessageScreen";
-import ConversationScreen from "./screens/ConversationScreen";
-import DrawerButton from "components/headerComponents/DrawerButton";
+import LookupUserScreen from "screens/LookupUser";
+import {headerOptions} from "components/headerComponents/headerOptions"
 
 if (
   Platform.OS === "android" &&
@@ -236,22 +237,29 @@ const App = () => {
               {...props}
             />
           )}
-          screenOptions={{
-            headerLeft: (props) => <DrawerButton {...props} />,
-            headerStyle: { backgroundColor: "#efefef" },
-            headerTintColor: "#000",
-            headerTitleStyle: {
-              fontWeight: Platform.OS === "android" ? "normal" : "bold",
-              fontSize: 20,
-            },
-            headerShown: true,
-            headerTitleAlign: "center",
-          }}
+          screenOptions={headerOptions}
         >
           <Drawer.Screen
             name="Feed"
             component={MainTabs}
             initialParams={{ myId: userId, fromLookup: false }}
+            options={{headerShown: false}}
+          />
+          <Drawer.Screen
+            name="Profile"
+            component={ProfileStack}
+            initialParams={{ myId: userId }}
+            options={{headerShown: false}}
+          />
+          <Drawer.Screen
+            name="Conversations"
+            component={ConversationScreen}
+            initialParams={{ myId: userId }}
+          />
+          <Drawer.Screen
+            name="Settings"
+            component={SettingsScreen}
+            initialParams={{ myId: userId }}
           />
           {friendIds.map((friendId) => (
             <Drawer.Screen

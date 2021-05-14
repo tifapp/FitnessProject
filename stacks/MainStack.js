@@ -6,6 +6,7 @@ import ImageScreen from "screens/ImageScreen";
 import ProfileStack from "stacks/ProfileStack";
 import SettingsStack from "stacks/SettingsStack";
 import ConversationScreen from "screens/ConversationScreen";
+import {headerOptions} from "components/headerComponents/headerOptions"
 
 import React from "react";
 import { Platform } from "react-native";
@@ -16,9 +17,7 @@ export default function MainStack({ navigation, route }) {
   return (
     <Stack.Navigator
       initialRouteName="Feed"
-      screenOptions={{
-        headerShown: false,
-      }}
+      screenOptions={headerOptions}
     >
       <Stack.Screen
         name="Feed"
@@ -33,21 +32,6 @@ export default function MainStack({ navigation, route }) {
       <Stack.Screen
         name="Image"
         component={ImageScreen}
-        initialParams={route.params}
-      />
-      <Stack.Screen
-        name="Profile"
-        component={ProfileStack}
-        initialParams={route.params, { fromLookup: false }}
-      />
-      <Stack.Screen
-        name="Settings"
-        component={SettingsStack}
-        initialParams={route.params, { fromLookup: false }}
-      />
-      <Stack.Screen
-        name="Conversations"
-        component={ConversationScreen}
         initialParams={route.params}
       />
     </Stack.Navigator>
