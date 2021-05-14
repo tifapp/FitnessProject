@@ -46,6 +46,22 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     return channel == null ? 'general' : channel
   }
 
+  
+  useEffect(() => {
+    const onFocus = navigation.addListener('focus', () => {
+      if (receiver == null) {
+        navigation.setOptions({ headerLeft: () => 
+          <TouchableOpacity onPress={scrollToTop}>
+            <MaterialIcons name="arrow-upward" size={30} color="black"
+          style={{ paddingLeft: 10 }} />
+          </TouchableOpacity>
+       })
+      }
+    });
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return onFocus;
+  }, [navigation])
+
   useEffect(() => {
     const createPostSubscription = API.graphql(graphqlOperation(onCreatePost)).subscribe({
       next: event => {
@@ -415,18 +431,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         renderItem={renderPostItem}
         keyExtractor={(item) => item.createdAt.toString() + item.userId}
       />
-
-      <View
-        style={{
-          marginBottom: 40,
-          position: "absolute",
-          alignSelf: "flex-end",
-        }}
-      >
-        <TouchableOpacity onPress={scrollToTop}>
-          <MaterialIcons name="arrow-upward" size={38} color="black" />
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 };

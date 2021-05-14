@@ -13,7 +13,6 @@ export default function DrawerButton(props) {
   const isDrawerOpen = useIsDrawerOpen();
   
   return (
-    navigation.canGoBack() && !isDrawerOpen ? (
       <TouchableOpacity onPress={navigation.goBack} style={{ flexDirection: "row", alignItems: "center" }}>
         <MaterialIcons
           name="arrow-back"
@@ -23,6 +22,5 @@ export default function DrawerButton(props) {
         />
         <Text style={{ paddingLeft: 5, fontSize: 15, fontWeight: "bold" }}>Feed</Text>
       </TouchableOpacity>
-    ) : null
   );
 }
