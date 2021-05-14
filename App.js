@@ -253,9 +253,10 @@ const App = () => {
           />
           {friendIds.map((friendId) => (
             <Drawer.Screen
+              key={friendId}
               name={friendId}
               component={MessageScreen}
-              initialParams={{ myId: friendId }}
+              initialParams={{ myId: userId, userId: friendId }}
             />
           ))}
         </Drawer.Navigator>

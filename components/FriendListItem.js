@@ -27,8 +27,8 @@ export default function FriendListItem({
 }) {
   const goToMessages = (id) => {
     if (!navigation.push)
-      navigation.navigate(id, { userId: id });
-    else navigation.push(id, { userId: id });
+      navigation.navigate(id);
+    else navigation.push(id);
   };
 
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);

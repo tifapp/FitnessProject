@@ -39,7 +39,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
 
   const currentPosts = useRef();
   const scrollRef = useRef(); // Used to help with automatic scrolling to top
-  const listRef = useRef();
   
   currentPosts.current = posts;
 
@@ -140,8 +139,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       decrementLikeSubscription.unsubscribe();
     }
   }, []);
-
-  useEffect(()=>{listRef.current.onRefresh()},[receiver]) //this could incur heavy costs. we may need to cache the messages and load them in rather than refreshing when switching between profiles quickly
 
   const getLikedPosts = async (items) => {
     let newPosts = items;
@@ -322,7 +319,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <APIList
-        ref={listRef}
         ListRef={scrollRef}
         ListHeaderComponent={
           <View style={{}}>
