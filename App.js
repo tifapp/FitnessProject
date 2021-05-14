@@ -240,30 +240,8 @@ const App = () => {
             name="MainTabs"
             component={MainTabs}
             initialParams={{ myId: userId, fromLookup: false }}
+            friendIds={friendIds}
           />
-          <Drawer.Screen
-            name="Profile"
-            component={ProfileStack}
-            initialParams={{ myId: userId, fromLookup: false }}
-          />
-          <Drawer.Screen
-            name="Settings"
-            component={SettingsStack}
-            initialParams={{ myId: userId, fromLookup: false }}
-          />
-          <Drawer.Screen
-            name="Conversations"
-            component={ConversationScreen}
-            initialParams={{ myId: userId }}
-          />
-          {friendIds.map((friendId) => (
-            <Drawer.Screen
-              key={friendId}
-              name={friendId}
-              component={MessageScreen}
-              initialParams={{ myId: userId, userId: friendId }}
-            />
-          ))}
         </Drawer.Navigator>
       </NavigationContainer>
     );

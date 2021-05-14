@@ -1,14 +1,14 @@
 import "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import FeedStack from "stacks/FeedStack";
+import MainStack from "stacks/MainStack";
 import SearchStack from "stacks/SearchStack";
 
 import React from "react";
 
 const Tab = createBottomTabNavigator();
 
-export default function MainTabs({ navigation, route }) {
+export default function MainTabs({ navigation, route, friendIds }) {
   return (
     <Tab.Navigator
       tabBarOptions={{
@@ -26,11 +26,12 @@ export default function MainTabs({ navigation, route }) {
     >
       <Tab.Screen
         name="Feed"
-        component={FeedStack}
+        component={MainStack}
         initialParams={{ myId: route.params?.myId }}
         options={{
           headerShown: false,
         }}
+        friendIds={friendIds}
       />
       <Tab.Screen
         name="Search"
