@@ -165,6 +165,11 @@ const App = () => {
     setAppStateVisible(appState.current);
   };
 
+  const setUniqueFriendIds = (items) => {
+    if (JSON.stringify(friendIds.sort()) === JSON.stringify(items.sort())) //will work when objects are shuffled, but all items will probably refresh still if there's one extra item added to the list
+      setFriendIds(items);
+  }
+
   useEffect(() => {
     if (userId !== 'checking...' && userId !== '') {
       requestAndSaveNotificationPermissions();
@@ -226,7 +231,7 @@ const App = () => {
           drawerContent={(props) => (
             <CustomSidebarMenu
               myId={userId}
-              setFriendIds={setFriendIds}
+              setFriendIds={setUniqueFriendIds}
               {...props}
             />
           )}
