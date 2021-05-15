@@ -17,6 +17,7 @@ import { createLike, deleteLike } from "root/src/graphql/mutations";
 import { useNavigation } from "@react-navigation/native";
 import printTime from "hooks/printTime";
 import { MaterialIcons } from "@expo/vector-icons";
+import ExpandingTextInput from "components/ExpandingTextInput";
 
 import * as Haptics from "expo-haptics";
 import playSound from "../hooks/playSound";
@@ -288,36 +289,19 @@ export default function PostItem({
                       Delete
                     </Text>
                   </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[
-                      styles.unselectedButtonStyle,
-                      { borderColor: "blue" },
-                    ]}
-                    color="blue"
-                    onPress={() => setIsEditing(!isEditing)}
-                  >
-                    <Text
-                      style={[
-                        styles.unselectedButtonTextStyle,
-                        { color: "blue" },
-                      ]}
-                    >
-                      Edit
-                    </Text>
-                  </TouchableOpacity>
                 </View>
               ) : null}
             </View>
           </View>
           {isEditing ? (
-            <TextInput
+            <ExpandingTextInput
               style={[styles.check, { borderColor: "orange" }]}
               onChangeText={setEditedText}
               autoFocus={true}
+              onBlur={() => setIsEditing(!isEditing)}
             >
               {item.description}
-            </TextInput>
+            </ExpandingTextInput>
           ) : (
             <Text
               style={{
@@ -327,6 +311,7 @@ export default function PostItem({
                 paddingLeft: 12,
                 fontSize: 16,
               }}
+              onPress={() => setIsEditing(!isEditing)}
             >
               {item.description}
             </Text>
@@ -334,29 +319,33 @@ export default function PostItem({
         </View>
 
         {isEditing ? (
-          editedText === "" ? (
-            <TouchableOpacity
-              style={styles.unselectedButtonStyle}
-              onPress={() => {
-                alert("Edit the post");
-              }}
-            >
-              <Text style={[styles.buttonTextStyle, { color: "gray" }]}>
-                {"Edit Post"}
-              </Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              style={styles.buttonStyle}
-              onPress={() => {
-                editButtonHandler(item.createdAt, editedText),
-                  setEditedText(""),
-                  setIsEditing(false);
-              }}
-            >
-              <Text style={styles.buttonTextStyle}>{"Edit Post"}</Text>
-            </TouchableOpacity>
-          )
+          <View>
+            {
+              editedText === "" ? (
+                <TouchableOpacity
+                  style={styles.unselectedButtonStyle}
+                  onPress={() => {
+                    alert("Edit the post");
+                  }}
+                >
+                  <Text style={[styles.buttonTextStyle, { color: "gray" }]}>
+                    {"Edit Post"}
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={styles.buttonStyle}
+                  onPress={() => {
+                    editButtonHandler(item.createdAt, editedText),
+                      setEditedText(""),
+                      setIsEditing(false);
+                  }}
+                >
+                  <Text style={styles.buttonTextStyle}>{"Edit Post"}</Text>
+                </TouchableOpacity>
+              )
+            }
+          </View>
         ) : null}
 
         {isReplying ? (
