@@ -25,6 +25,7 @@ import APIList from 'components/APIList';
 import { MaterialIcons } from '@expo/vector-icons';
 import { lessThan } from "react-native-reanimated";
 import { ProfileImageAndName } from "components/ProfileImageAndName";
+import ExpandingTextInput from "components/ExpandingTextInput";
 
 require('root/androidtimerfix');
 
@@ -33,7 +34,7 @@ var styles = require('styles/stylesheet');
 export default function FeedScreen({ navigation, route, receiver, channel, headerComponent }) {
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
-  const numCharsLeft = 1000 - postVal.length;
+  //const numCharsLeft = 1000 - postVal.length;
 
   const [onlineCheck, setOnlineCheck] = useState(true);
 
@@ -50,10 +51,21 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     const onFocus = navigation.addListener('focus', () => {
       if (receiver == null) {
         navigation.setOptions({ headerLeft: () => 
-          <TouchableOpacity onPress={scrollToTop}>
-            <MaterialIcons name="arrow-upward" size={30} color="black"
-          style={{ paddingLeft: 10 }} />
-          </TouchableOpacity>
+          <ProfileImageAndName
+            you={true}
+            navigateToProfile={false}
+            userId={route.params?.myId}
+            isFull={true}
+            fullname={true}
+            hidename={true}
+            imageStyle={{
+              resizeMode: "cover",
+              width: 35,
+              height: 35,
+              borderRadius: 0,
+              alignSelf: "center",
+            }}
+          />
        })
       }
     });
@@ -345,28 +357,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         ListHeaderComponent={
           <View style={{}}>
             {headerComponent}
-            <View style={{flexDirection: "row"}}>
-            <ProfileImageAndName
-              you={true}
-              navigateToProfile={false}
-              userId={route.params?.myId}
-              isFull={true}
-              fullname={true}
-              hidename={true}
-              imageStyle={{
-                resizeMode: "cover",
-                width: 50,
-                height: 50,
-                borderRadius: 0,
-                alignSelf: "center",
-              }}
-            />
-            <Text style={{ marginTop: 20, marginLeft: 5 }}>
-              {" "}
-              Characters remaining: {numCharsLeft}{" "}
-            </Text>
-            </View>
-            <TextInput
+            <ExpandingTextInput
               style={[
                 styles.textInputStyle,
                 { marginTop: 5, marginBottom: 30 },
