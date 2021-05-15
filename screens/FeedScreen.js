@@ -45,7 +45,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   const getChannel = () => {
     return channel == null ? 'general' : channel
   }
-
   
   useEffect(() => {
     const onFocus = navigation.addListener('focus', () => {
@@ -66,9 +65,16 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     const createPostSubscription = API.graphql(graphqlOperation(onCreatePost)).subscribe({
       next: event => {
         const newPost = event.value.data.onCreatePost
-        if (newPost.userId != route.params?.myId && newPost.channel == getChannel() && (currentPosts.current.length == 0 || !currentPosts.current.find(post => post.userId === newPost.userId && post.createdAt === newPost.createdAt))) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
+        if (newPost.channel === getChannel() && (currentPosts.current.length == 0 || !currentPosts.current.find(post => post.userId === newPost.userId && post.createdAt === newPost.createdAt))) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
           newPost.likes = newPost.likes ?? 0;
-          if (newPost.isParent == 0) {
+          if (newPost.userId === route.params?.myId) {
+            console.log("received own post again")
+            setPosts(currentPosts.current.map(post => {
+              if (post.userId === route.params?.myId && post.createdAt == "null") return newPost
+              else return post;
+            }));
+          }
+          else if (newPost.isParent == 0) {
               if (currentPosts.current.length > 0 && currentPosts.current.find(post => post.parentId === newPost.parentId)) {
                 let tempposts = currentPosts.current;
                 var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId === newPost.parentId)]);
@@ -240,7 +246,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     console.log(route.params?.myId + " just posted.");
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setPosts([{ ...newPost, userId: route.params?.myId, createdAt: (new Date(Date.now())).toISOString() }, ...posts]);
+    setPosts([{ ...newPost, userId: route.params?.myId, createdAt: "null" }, ...posts]);
 
     try {
       API.graphql(graphqlOperation(createPost, { input: newPost }));
