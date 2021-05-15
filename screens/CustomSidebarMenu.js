@@ -527,6 +527,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
           initialAmount={15}
           additionalAmount={15}
           renderItem={({ item }) => (
+            !item.isRead ?
             <FriendListItem
               navigation={navigation}
               removeFriendHandler={removeFriend}
@@ -535,7 +536,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
               myId={myId}
               lastMessage={item.lastMessage}
               lastUser={item.lastUser}
-            />
+            />: null
           )}
           keyExtractor={(item) => item.createdAt.toString()}
           ListEmptyComponent={
