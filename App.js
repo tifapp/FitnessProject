@@ -5,7 +5,8 @@ import {
   ActivityIndicator,
   LogBox,
   UIManager,
-  Text
+  Text,
+  useWindowDimensions
 } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { withAuthenticator } from "aws-amplify-react-native";
@@ -179,6 +180,7 @@ const App = () => {
   }, [userId])
 
   //console.log("App rerendered, userexists is... ", userId == '');
+  const dimensions = useWindowDimensions();
 
   if (userId == 'checking...') {
     return (
@@ -222,7 +224,8 @@ const App = () => {
       <NavigationContainer>
         <StatusBar style="dark" />
         <Drawer.Navigator
-          drawerStyle={{}}
+          drawerPosition={"right"}
+          drawerStyle={{width: dimensions.width}}
           drawerContentOptions={{
             activeTintColor: "#e91e63",
             itemStyle: { marginVertical: 5 },
