@@ -16,15 +16,12 @@ import {
 
 import * as Haptics from "expo-haptics";
 import playSound from "hooks/playSound";
+import { useNavigation } from '@react-navigation/native';
 
 import { MaterialIcons } from "@expo/vector-icons";
 
 export default function DrawerButton(props) {
-  //Structure for the navigatin Drawer
-  const toggleDrawer = () => {
-    //Props to open/close the drawer
-    props.navigationProps.toggleDrawer();
-  };
+  const navigation = useNavigation();
 
   const [notificationCount, setNotificationCount] = useState(0);
 
@@ -38,12 +35,12 @@ export default function DrawerButton(props) {
   
   return (
     <View style={{ flexDirection: "row" }}>
-      <TouchableOpacity onPress={toggleDrawer}>
+      <TouchableOpacity onPress={navigation.toggleDrawer}>
         <MaterialIcons
           name="menu"
           size={30}
           color={"black"}
-          style={{ paddingLeft: 15 }}
+          style={{ paddingRight: 15 }}
         />
         {notificationCount > 0 ? (
           <MaterialIcons name="circle" size={10} color={"red"} style={{position: "absolute", top: -2, right: -6}} />

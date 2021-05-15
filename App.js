@@ -5,7 +5,8 @@ import {
   ActivityIndicator,
   LogBox,
   UIManager,
-  Text
+  Text,
+  useWindowDimensions
 } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { withAuthenticator } from "aws-amplify-react-native";
@@ -15,7 +16,8 @@ import { Amplify, API, graphqlOperation, Auth, Cache, Storage } from "aws-amplif
 import { getUser } from "./src/graphql/queries";
 import ProfileStack from "stacks/ProfileStack";
 import MainTabs from "./MainTabs";
-import SettingsStack from "stacks/SettingsStack";
+import SettingsScreen from "screens/SettingsScreen";
+import ConversationScreen from "screens/ConversationScreen";
 import ComplianceScreen from "screens/ComplianceScreen";
 import ProfileScreen from "screens/ProfileScreen";
 import BioScreen from "screens/BioScreen";
@@ -39,7 +41,8 @@ import * as Notifications from 'expo-notifications';
 import * as Permissions from 'expo-permissions';
 import { StatusBar } from "expo-status-bar";
 import MessageScreen from "./screens/MessageScreen";
-import ConversationScreen from "./screens/ConversationScreen";
+import LookupUserScreen from "screens/LookupUser";
+import {headerOptions} from "components/headerComponents/headerOptions"
 
 if (
   Platform.OS === "android" &&
@@ -90,6 +93,8 @@ const App = () => {
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
   const [userId, setUserId] = useState('checking...'); //stores the user's id if logged in
+
+  const [friendIds, setFriendIds] = useState([]);
 
   const checkIfUserSignedUp = async () => {
     try {
@@ -163,6 +168,11 @@ const App = () => {
     setAppStateVisible(appState.current);
   };
 
+  const setUniqueFriendIds = (items) => {
+    if (JSON.stringify(friendIds.sort()) !== JSON.stringify(items.sort())) //will work when objects are shuffled, but all items will probably refresh still if there's one extra item added to the list
+      setFriendIds(items);
+  }
+
   useEffect(() => {
     if (userId !== 'checking...' && userId !== '') {
       requestAndSaveNotificationPermissions();
@@ -170,6 +180,7 @@ const App = () => {
   }, [userId])
 
   //console.log("App rerendered, userexists is... ", userId == '');
+  const dimensions = useWindowDimensions();
 
   if (userId == 'checking...') {
     return (
@@ -213,7 +224,8 @@ const App = () => {
       <NavigationContainer>
         <StatusBar style="dark" />
         <Drawer.Navigator
-          drawerStyle={{}}
+          drawerPosition={"right"}
+          drawerStyle={{width: dimensions.width}}
           drawerContentOptions={{
             activeTintColor: "#e91e63",
             itemStyle: { marginVertical: 5 },
@@ -222,39 +234,44 @@ const App = () => {
           edgeWidth={100}
           initialRouteName="MainTabs"
           drawerContent={(props) => (
-            <CustomSidebarMenu myId={userId} {...props} />
+            <CustomSidebarMenu
+              myId={userId}
+              setFriendIds={setUniqueFriendIds}
+              {...props}
+            />
           )}
+          screenOptions={headerOptions}
         >
-          <Drawer.Screen //this gets loaded first
-            name="MainTabs"
+          <Drawer.Screen
+            name="Feed"
             component={MainTabs}
             initialParams={{ myId: userId, fromLookup: false }}
+            options={{headerShown: false}}
           />
           <Drawer.Screen
             name="Profile"
             component={ProfileStack}
-            initialParams={{ myId: userId, fromLookup: false }}
-          />
-          <Drawer.Screen
-            name="Settings"
-            component={SettingsStack}
-            initialParams={{ myId: userId, fromLookup: false }}
-          />
-          {
-            /*
-          <Drawer.Screen
-            name="Messages"
-            component={MessageScreen}
             initialParams={{ myId: userId }}
+            options={{headerShown: false}}
           />
-          */
           <Drawer.Screen
             name="Conversations"
             component={ConversationScreen}
             initialParams={{ myId: userId }}
           />
-            
-          }
+          <Drawer.Screen
+            name="Settings"
+            component={SettingsScreen}
+            initialParams={{ myId: userId }}
+          />
+          {friendIds.map((friendId) => (
+            <Drawer.Screen
+              key={friendId}
+              name={friendId}
+              component={MessageScreen}
+              initialParams={{ myId: userId, userId: friendId }}
+            />
+          ))}
         </Drawer.Navigator>
       </NavigationContainer>
     );

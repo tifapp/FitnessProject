@@ -25,6 +25,7 @@ import APIList from 'components/APIList';
 import { MaterialIcons } from '@expo/vector-icons';
 import { lessThan } from "react-native-reanimated";
 import { ProfileImageAndName } from "components/ProfileImageAndName";
+import ExpandingTextInput from "components/ExpandingTextInput";
 
 require('root/androidtimerfix');
 
@@ -33,27 +34,59 @@ var styles = require('styles/stylesheet');
 export default function FeedScreen({ navigation, route, receiver, channel, headerComponent }) {
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
-  const numCharsLeft = 1000 - postVal.length;
+  //const numCharsLeft = 1000 - postVal.length;
 
   const [onlineCheck, setOnlineCheck] = useState(true);
 
   const currentPosts = useRef();
   const scrollRef = useRef(); // Used to help with automatic scrolling to top
-  const listRef = useRef();
   
   currentPosts.current = posts;
 
   const getChannel = () => {
     return channel == null ? 'general' : channel
   }
+  
+  useEffect(() => {
+    const onFocus = navigation.addListener('focus', () => {
+      if (receiver == null) {
+        navigation.setOptions({ headerLeft: () => 
+          <ProfileImageAndName
+            you={true}
+            navigateToProfile={false}
+            userId={route.params?.myId}
+            isFull={true}
+            fullname={true}
+            hidename={true}
+            imageStyle={{
+              resizeMode: "cover",
+              width: 35,
+              height: 35,
+              borderRadius: 0,
+              alignSelf: "center",
+            }}
+          />
+       })
+      }
+    });
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return onFocus;
+  }, [navigation])
 
   useEffect(() => {
     const createPostSubscription = API.graphql(graphqlOperation(onCreatePost)).subscribe({
       next: event => {
         const newPost = event.value.data.onCreatePost
-        if (newPost.userId != route.params?.myId && newPost.channel == getChannel() && (currentPosts.current.length == 0 || !currentPosts.current.find(post => post.userId === newPost.userId && post.createdAt === newPost.createdAt))) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
+        if (newPost.channel === getChannel() && (currentPosts.current.length == 0 || !currentPosts.current.find(post => post.userId === newPost.userId && post.createdAt === newPost.createdAt))) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
           newPost.likes = newPost.likes ?? 0;
-          if (newPost.isParent == 0) {
+          if (newPost.userId === route.params?.myId) {
+            console.log("received own post again")
+            setPosts(currentPosts.current.map(post => {
+              if (post.userId === route.params?.myId && post.createdAt == "null") return newPost
+              else return post;
+            }));
+          }
+          else if (newPost.isParent == 0) {
               if (currentPosts.current.length > 0 && currentPosts.current.find(post => post.parentId === newPost.parentId)) {
                 let tempposts = currentPosts.current;
                 var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId === newPost.parentId)]);
@@ -141,8 +174,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     }
   }, []);
 
-  useEffect(()=>{listRef.current.onRefresh()},[receiver]) //this could incur heavy costs. we may need to cache the messages and load them in rather than refreshing when switching between profiles quickly
-
   const getLikedPosts = async (items) => {
     let newPosts = items;
     let postIds = [];
@@ -227,7 +258,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     console.log(route.params?.myId + " just posted.");
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setPosts([{ ...newPost, userId: route.params?.myId, createdAt: (new Date(Date.now())).toISOString() }, ...posts]);
+    setPosts([{ ...newPost, userId: route.params?.myId, createdAt: "null" }, ...posts]);
 
     try {
       API.graphql(graphqlOperation(createPost, { input: newPost }));
@@ -322,33 +353,11 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <APIList
-        ref={listRef}
         ListRef={scrollRef}
         ListHeaderComponent={
           <View style={{}}>
             {headerComponent}
-            <View style={{flexDirection: "row"}}>
-            <ProfileImageAndName
-              you={true}
-              navigateToProfile={false}
-              userId={route.params?.myId}
-              isFull={true}
-              fullname={true}
-              hidename={true}
-              imageStyle={{
-                resizeMode: "cover",
-                width: 50,
-                height: 50,
-                borderRadius: 0,
-                alignSelf: "center",
-              }}
-            />
-            <Text style={{ marginTop: 20, marginLeft: 5 }}>
-              {" "}
-              Characters remaining: {numCharsLeft}{" "}
-            </Text>
-            </View>
-            <TextInput
+            <ExpandingTextInput
               style={[
                 styles.textInputStyle,
                 { marginTop: 5, marginBottom: 30 },
@@ -419,18 +428,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         renderItem={renderPostItem}
         keyExtractor={(item) => item.createdAt.toString() + item.userId}
       />
-
-      <View
-        style={{
-          marginBottom: 40,
-          position: "absolute",
-          alignSelf: "flex-end",
-        }}
-      >
-        <TouchableOpacity onPress={scrollToTop}>
-          <MaterialIcons name="arrow-upward" size={38} color="black" />
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 };

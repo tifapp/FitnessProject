@@ -46,7 +46,7 @@ import { batchGetReadReceipts } from "../src/graphql/queries";
 var subscriptions = [];
 global.localBlockList = [];
 
-export default function CustomSidebarMenu({ navigation, state, progress, myId }) {
+export default function CustomSidebarMenu({ navigation, state, progress, myId, setFriendIds }) {
   const [lastOnlineTime, setLastOnlineTime] = useState(0);
   const [friendList, setFriendList] = useState([]);
   const [friendRequestList, setFriendRequestList] = useState([]);
@@ -61,6 +61,12 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
   currentFriends.current = friendList;
   currentFriendRequests.current = friendRequestList;
   currentNewFriendRequestCount.current = newFriendRequests;
+
+  useEffect(() => {
+    const friendIds = [];
+    friendList.forEach(friend => friendIds.push(friend.sender == myId ? friend.receiver : friend.sender));
+    setFriendIds(friendIds);
+  }, [friendList]) //we must extract just the array of ids
 
   /*
   waitForFriend = API.graphql(graphqlOperation(onCreateFriendship)).subscribe({
@@ -554,12 +560,32 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
         />
       </Accordion>
       <TouchableOpacity
+      style={[{
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        paddingVertical: 15,
+        backgroundColor: "white",
+      }]}
       onPress={()=>{navigation.navigate("Conversations")}}>
-        <Text>Conversations</Text>
+        <Text style={{
+          fontSize: 18,
+          color: "grey",
+        }}>Conversations</Text>
       </TouchableOpacity>
       <TouchableOpacity
+      style={[{
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        paddingVertical: 15,
+        backgroundColor: "white",
+      }]}
       onPress={()=>{console.log("going to settings"), navigation.navigate("Settings")}}>
-        <Text>Settings</Text>
+        <Text style={{
+          fontSize: 18,
+          color: "grey",
+        }}>Settings</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );

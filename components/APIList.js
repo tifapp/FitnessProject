@@ -151,6 +151,8 @@ class APIList extends Component { //we need to make this a class to use refs fro
               }} />
             :
             <FlatList
+                onScroll={this.props.onScroll}
+                scrollEventThrottle={0}
                 ref={this.props.ListRef}
                 ListHeaderComponent={this.props.ListHeaderComponent}
                 horizontal={this.props.horizontal}
