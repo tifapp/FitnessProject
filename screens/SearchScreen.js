@@ -27,7 +27,7 @@ import APIList from 'components/APIList';
 
 var styles = require("styles/stylesheet");
 
-export default function GroupSearchScreen({ navigation, route }) {
+export default function SearchScreen({ navigation, route }) {
     const [query, setQuery] = useState("");
     const [userResults, setUserResults] = useState([]);
     const [groupResults, setGroupResults] = useState([]);
