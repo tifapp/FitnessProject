@@ -298,6 +298,33 @@ export const listLikes = /* GraphQL */ `
     }
   }
 `;
+export const likesByPost = /* GraphQL */ `
+  query LikesByPost(
+    $postId: ID
+    $userId: ModelIDKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelLikeFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    likesByPost(
+      postId: $postId
+      userId: $userId
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        createdAt
+        updatedAt
+        userId
+        postId
+      }
+      nextToken
+    }
+  }
+`;
 export const postsByChannel = /* GraphQL */ `
   query PostsByChannel(
     $channel: ID

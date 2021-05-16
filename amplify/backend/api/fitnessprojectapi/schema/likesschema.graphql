@@ -6,6 +6,7 @@ type Like @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
   ]
 )
 @key(fields: ["userId", "postId"])
+@key(name: "ByPost", fields: ["postId", "userId"], queryField: "likesByPost")
 {
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!

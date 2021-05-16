@@ -34,7 +34,7 @@
         },
         "friendNotifications": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/friendNotifications-2f5069482f6b61486c49-build.zip"
+          "s3Key": "amplify-builds/friendNotifications-616e4939393159666b30-build.zip"
         },
         "removeMessagesWhenUnfriend": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
@@ -95,6 +95,14 @@
                 }
               ],
               "hash": "D8yNrYtMZkcEnGfeHAfwK0rN1pkrXOELDMhSeoMSmoE="
+            },
+            "6": {
+              "permissions": [
+                {
+                  "type": "private"
+                }
+              ],
+              "hash": "nP/UUZWjfNAMEANlmQ+mOyC1VogiR4wSdPf0kGRZNu0="
             }
           }
         }
