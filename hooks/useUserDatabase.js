@@ -5,6 +5,7 @@ import { getUser } from '../src/graphql/queries.js'
 import { API, graphqlOperation, Storage, Cache } from "aws-amplify";
 import { Image } from 'react-native';
 import * as ImageManipulator from 'expo-image-manipulator';
+import {saveCapitals, loadCapitals} from 'hooks/stringConversion'
 
 export default () => {
 
@@ -19,6 +20,9 @@ export default () => {
       console.log("user doesn't exist, they must be making their profile for the first time");
     } else {
       Cache.setItem(query.attributes.sub, { name: fields.name, imageURL: imageURL, isFull: true }, { priority: 1, expires: Date.now() + 86400000 });
+      fields.name = loadCapitals(fields.name)
+      fields.bio = loadCapitals(fields.bio)
+      fields.goals = loadCapitals(fields.goals)
       return {...fields, pictureURL: imageURL};
     }
   };
@@ -85,11 +89,11 @@ export default () => {
       console.log('returning users fields looks like', fields);
 
       const ourUser = {
-        name: name,
+        name: saveCapitals(name),
         age: age,
-        gender: gender,
-        bio: bioDetails,
-        goals: goalsDetails,
+        gender: gender, //should be using an enum
+        bio: saveCapitals(bioDetails),
+        goals: saveCapitals(goalsDetails),
         latitude: location == null || location.latitude == null || location.latitude < 0 ? null : location.latitude,
         longitude: location == null || location.latitude == null || location.latitude < 0 ? null : location.longitude
       };

@@ -12,6 +12,7 @@ import { Cache, Storage } from "aws-amplify";
 import { API, graphqlOperation } from "aws-amplify";
 import { getUser } from "../src/graphql/queries";
 import { useNavigation } from "@react-navigation/native";
+import {loadCapitals} from 'hooks/stringConversion'
 
 var styles = require("../styles/stylesheet");
 
@@ -45,7 +46,7 @@ export const ProfileImageAndName = (props) => {
       const user = u.data.getUser;
       if (user != null) {
         const info = {
-          name: user.name,
+          name: loadCapitals(user.name),
           imageURL: "",
           isFull: props.isFull,
           changed: false,
