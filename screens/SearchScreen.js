@@ -15,8 +15,8 @@ import {
 } from "react-native";
 // Get the aws resources configuration parameters
 import { DataStore, Predicates } from "@aws-amplify/datastore";
-import { searchGroups } from "root/src/graphql/queries";
-import { searchUsers } from "root/src/graphql/queries";
+import { listGroups } from "root/src/graphql/queries";
+import { listUsers } from "root/src/graphql/queries";
 import Header from "components/header";
 import UserListItem from "components/UserListItem";
 import ListGroupItem from "components/ListGroupItem";
@@ -38,7 +38,7 @@ export default function GroupSearchScreen({ navigation, route }) {
     const ListRef = useRef();
     const currentQuery = useRef();
 
-    currentQuery.current = query;
+    currentQuery.current = query.toLowerCase();
 
     useEffect(() => {
         if (query !== "") {
@@ -46,7 +46,7 @@ export default function GroupSearchScreen({ navigation, route }) {
             console.log("START-----------------------");
             console.log("the query being checked is ", query);
             ListRef.current.fetchDataAsync(true, ()=>{
-                return (currentQuery.current !== query || query === "")
+                return (currentQuery.current !== query.toLowerCase() || query === "")
             })
             if (type === "all" && groupResults.length === 0) {
                 setIsAll(true);
@@ -62,7 +62,7 @@ export default function GroupSearchScreen({ navigation, route }) {
         if (query !== "") {
             if ((type === "group" && groupResults.length === 0) || (type === "user" && userResults.length === 0))
             ListRef.current.fetchDataAsync(true, ()=>{
-                return (currentQuery.current !== query || query === "")
+                return (currentQuery.current !== query.toLowerCase() || query === "")
             })
             if (isAll) {
                 setIsAll(false);
@@ -166,28 +166,28 @@ export default function GroupSearchScreen({ navigation, route }) {
                 }
                 <APIList
                     ref={ListRef}
-                    queryOperation={(type === "group") ? searchGroups : searchUsers}
+                    queryOperation={(type === "group") ? listGroups : listUsers}
                     filter={
                         (type === "group") ?
                             {
                                 filter: {
                                     or: [{
                                         name: {
-                                            matchPhrasePrefix: currentQuery.current
+                                            beginsWith: currentQuery.current
                                         }
                                     },{
                                         name: {
-                                            exists: " " + currentQuery.current
+                                            contains: " " + currentQuery.current
                                         }
                                     },
                                     {
                                         Sport: {
-                                            exists: currentQuery.current
+                                            contains: currentQuery.current
                                         }
                                     },
                                     {
                                         Description: {
-                                            exists: currentQuery.current
+                                            contains: currentQuery.current
                                         }
                                     },]
                                 }
@@ -196,22 +196,22 @@ export default function GroupSearchScreen({ navigation, route }) {
                                 filter: {
                                     or: [{
                                         name: {
-                                            matchPhrasePrefix: currentQuery.current
+                                            beginsWith: currentQuery.current
                                         }
                                     },
                                     {
                                         name: {
-                                            exists: " " + currentQuery.current
+                                            contains: " " + currentQuery.current
                                         }
                                     },
                                     {
                                         bio: {
-                                            exists: currentQuery.current
+                                            contains: currentQuery.current
                                         }
                                     },
                                     {
                                         goals: {
-                                            exists: currentQuery.current
+                                            contains: currentQuery.current
                                         }
                                     },]
                                 }
