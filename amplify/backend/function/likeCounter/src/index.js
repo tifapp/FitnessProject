@@ -4,6 +4,7 @@ const gql = require('graphql-tag');
 const { incrementLikes, decrementLikes } = require('/opt/mutations');
 const {getUser} = require('/opt/queries');
 const { client, sendNotification } = require('/opt/backendResources');
+const {loadCapitals} = require('/opt/stringConversion');
 
 exports.handler = (event, context, callback) => {
   //eslint-disable-line
@@ -55,7 +56,7 @@ exports.handler = (event, context, callback) => {
               }
             });
   
-            await sendNotification(authorName.data.getUser.deviceToken, likerUserName.data.getUser.name + " liked your post!"); //truncate the sender's name!
+            await sendNotification(authorName.data.getUser.deviceToken, loadCapitals(likerUserName.data.getUser.name) + " liked your post!"); //truncate the sender's name!
           } else {
             client.mutate({
               mutation: gql(decrementLikes),

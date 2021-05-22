@@ -19,7 +19,7 @@ export default () => {
     if (fields == null) {
       console.log("user doesn't exist, they must be making their profile for the first time");
     } else {
-      Cache.setItem(query.attributes.sub, { name: fields.name, imageURL: imageURL, isFull: true }, { priority: 1, expires: Date.now() + 86400000 });
+      Cache.setItem(query.attributes.sub, { name: loadCapitals(fields.name), imageURL: imageURL, isFull: true }, { priority: 1, expires: Date.now() + 86400000 });
       fields.name = loadCapitals(fields.name)
       fields.bio = loadCapitals(fields.bio)
       fields.goals = loadCapitals(fields.goals)

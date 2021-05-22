@@ -3,6 +3,7 @@ const gql = require('graphql-tag');
 
 const { client, sendNotification } = require('/opt/backendResources');
 const {getUser, postsByParentId} = require('/opt/queries');
+const {loadCapitals} = require('/opt/stringConversion');
 
 exports.handler = (event, context, callback) => {
   event.Records.forEach((record) => {
@@ -34,7 +35,7 @@ exports.handler = (event, context, callback) => {
             console.log(receiverName.data.getUser)
             console.log(senderName.data.getUser)
   
-            await sendNotification(receiverName.data.getUser.deviceToken, senderName.data.getUser.name + " sent you a message!"); //truncate the sender's name!
+            await sendNotification(receiverName.data.getUser.deviceToken, loadCapitals(senderName.data.getUser.name) + " sent you a message!"); //truncate the sender's name!
             console.log("sent notifications finished")
             callback(null, "Successfully sent messaging notification");
           } else if (record.dynamodb.NewImage.isParent.N == 0) {
@@ -84,7 +85,7 @@ exports.handler = (event, context, callback) => {
             // });
   
             //if (friendshipcheck.data.getFriendship != null) {
-              await sendNotification(parentPost.data.getUser.deviceToken, childPost.data.getUser.name + " sent you a reply!"); //truncate the sender's name!
+              await sendNotification(parentPost.data.getUser.deviceToken, loadCapitals(childPost.data.getUser.name) + " sent you a reply!"); //truncate the sender's name!
               callback(null, "Finished Replying");
             //}
           } else {

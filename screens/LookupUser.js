@@ -42,6 +42,7 @@ import {
   onAllDeletedFriendships,
 } from "root/src/graphql/subscriptions";
 import APIList from "components/APIList";
+import {saveCapitals, loadCapitals} from 'hooks/stringConversion';
 
 var styles = require("styles/stylesheet");
 
@@ -389,12 +390,12 @@ const LookupUser = ({ route, navigation }) => {
         <View style={styles.viewProfileScreen}>
           <Text>Bio: </Text>
         </View>
-        <Text style={styles.textBoxStyle}>{user.bio}</Text>
+        <Text style={styles.textBoxStyle}>{loadCapitals(user.bio)}</Text>
         <View style={styles.viewProfileScreen}>
           <Text>Goals: </Text>
         </View>
 
-        <Text style={styles.textBoxStyle}>{user.goals}</Text>
+        <Text style={styles.textBoxStyle}>{loadCapitals(user.goals)}</Text>
         <View>
           {mutualfriendList.length != 0 ? (
             <View style={styles.viewProfileScreen}>

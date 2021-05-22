@@ -3,13 +3,14 @@ const gql = require('graphql-tag');
 
 const { client, sendNotification } = require('/opt/backendResources');
 const { getUser } = require('/opt/queries');
+const {loadCapitals} = require('/opt/stringConversion');
 
 exports.handler = (event, context, callback) => {
   event.Records.forEach((record) => {
     if (record.eventName == "INSERT" || record.eventName == "MODIFY") {
       (async () => {
         try {
-          console.log('getting a new object with a sender of ', JSON.stringify(record.dynamodb.NewImage.sender.S), 'seeing if an object exists with that receiver');
+          console.log('getting a new object with a sender of ', loadCapitals(JSON.stringify(record.dynamodb.NewImage.sender.S)), 'seeing if an object exists with that receiver');
           const receiver = record.dynamodb.NewImage.receiver.S;
           const sender = record.dynamodb.NewImage.sender.S;
           
@@ -35,9 +36,9 @@ exports.handler = (event, context, callback) => {
           if (record.eventName == "INSERT") {
             console.log('couldnt find matching friend request');
             
-            await sendNotification(receiverUser.data.getUser.deviceToken, senderUser.data.getUser.name + " sent you a friend request!"); //truncate the sender's name!
+            await sendNotification(receiverUser.data.getUser.deviceToken, loadCapitals(JSON.stringify(senderUser.data.getUser.name)) + " sent you a friend request!"); //truncate the sender's name!
           } else {
-            await sendNotification(senderUser.data.getUser.deviceToken, receiverUser.data.getUser.name + " accepted your friend request!"); //truncate the sender's name!
+            await sendNotification(senderUser.data.getUser.deviceToken, loadCapitals(JSON.stringify(receiverUser.data.getUser.name)) + " accepted your friend request!"); //truncate the sender's name!
           }
           callback(null, "Successfully sent friend request notification");
         }
