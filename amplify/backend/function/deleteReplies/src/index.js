@@ -29,6 +29,8 @@ exports.handler = (event, context, callback) => {
               }
             });
 
+            if (results.length <= 0) break;
+
             likes = likes - results.length
 
             results.data.likesByPost.items.map((like) => {

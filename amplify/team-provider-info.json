@@ -22,7 +22,7 @@
         },
         "deleteReplies": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/deleteReplies-6662616f574f755a7464-build.zip"
+          "s3Key": "amplify-builds/deleteReplies-573458784c7947567765-build.zip"
         },
         "replyNotifications": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
