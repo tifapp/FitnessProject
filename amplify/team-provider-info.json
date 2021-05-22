@@ -46,7 +46,7 @@
         },
         "deleteUserData": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/deleteUserData-30502f4444566652524a-build.zip"
+          "s3Key": "amplify-builds/deleteUserData-656c482b456e65657232-build.zip"
         }
       },
       "hosting": {
