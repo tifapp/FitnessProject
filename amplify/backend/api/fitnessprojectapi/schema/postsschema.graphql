@@ -13,6 +13,7 @@ type Post @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
   ]
 )
 @key(fields: ["createdAt", "userId"])
+@key(name: "ByUser", fields: ["userId", "createdAt"], queryField: "postsByUser")
 @key(name: "ByChannel", fields: ["channel", "parentId", "isParent", "createdAt"], queryField: "postsByChannel")
 @key(name: "ByParentId", fields: ["parentId", "isParent"], queryField: "postsByParentId")
 @key(name: "ByReceiver", fields: ["receiver", "createdAt"], queryField: "postsByReceiver")

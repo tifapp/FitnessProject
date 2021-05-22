@@ -16,12 +16,11 @@ exports.handler = (event, context, callback) => {
     if (record.eventName == "REMOVE") {
       const parentId = record.dynamodb.OldImage.parentId.S;
 
-      const likes = record.dynamodb.OldImage.likes.N;
       const createdAt = record.dynamodb.OldImage.createdAt.S;
       const userId = record.dynamodb.OldImage.userId.S;
       (async () => {
         try {
-          while (likes > 0) {
+          while (true) {
             const results = await client.query({
               query: gql(likesByPost),
               variables: {
@@ -30,8 +29,6 @@ exports.handler = (event, context, callback) => {
             });
 
             if (results.length <= 0) break;
-
-            likes = likes - results.length
 
             results.data.likesByPost.items.map((like) => {
               client.mutate({
@@ -56,24 +53,28 @@ exports.handler = (event, context, callback) => {
       if (record.dynamodb.OldImage.isParent.N == 1) {
         (async () => {
           try {
-            const results = await client.query({
-              query: gql(postsByParentId),
-              variables: {
-                parentId: parentId,
-              }
-            });
-
-            results.data.postsByParentId.items.map((post) => {
-              client.mutate({
-                mutation: gql(deletePost),
+            while (true) {
+              const results = await client.query({
+                query: gql(postsByParentId),
                 variables: {
-                  input: {
-                    createdAt: post.createdAt,
-                    userId: post.userId,
-                  }
+                  parentId: parentId,
                 }
               });
-            });
+              
+              if (results.length <= 0) break;
+
+              results.data.postsByParentId.items.map((post) => {
+                client.mutate({
+                  mutation: gql(deletePost),
+                  variables: {
+                    input: {
+                      createdAt: post.createdAt,
+                      userId: post.userId,
+                    }
+                  }
+                });
+              });
+            }
 
             callback(null, "successfully deleted replies");
           } catch (e) {

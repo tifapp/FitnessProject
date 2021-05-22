@@ -325,6 +325,39 @@ export const likesByPost = /* GraphQL */ `
     }
   }
 `;
+export const postsByUser = /* GraphQL */ `
+  query PostsByUser(
+    $userId: ID
+    $createdAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelPostFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    postsByUser(
+      userId: $userId
+      createdAt: $createdAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        createdAt
+        updatedAt
+        userId
+        description
+        parentId
+        channel
+        receiver
+        isParent
+        likes
+        replies
+      }
+      nextToken
+    }
+  }
+`;
 export const postsByChannel = /* GraphQL */ `
   query PostsByChannel(
     $channel: ID

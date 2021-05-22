@@ -22,7 +22,7 @@
         },
         "deleteReplies": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/deleteReplies-573458784c7947567765-build.zip"
+          "s3Key": "amplify-builds/deleteReplies-5862734c35496b417659-build.zip"
         },
         "replyNotifications": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
@@ -43,6 +43,10 @@
         "backendResources": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
           "s3Key": "amplify-builds/backendResources-build.zip"
+        },
+        "deleteUserData": {
+          "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
+          "s3Key": "amplify-builds/deleteUserData-30502f4444566652524a-build.zip"
         }
       },
       "hosting": {
