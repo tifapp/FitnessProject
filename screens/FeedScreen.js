@@ -26,6 +26,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { lessThan } from "react-native-reanimated";
 import { ProfileImageAndName } from "components/ProfileImageAndName";
 import ExpandingTextInput from "components/ExpandingTextInput";
+import SpamButton from "components/SpamButton";
 
 require('root/androidtimerfix');
 
@@ -428,6 +429,15 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         renderItem={renderPostItem}
         keyExtractor={(item) => item.createdAt.toString() + item.userId}
       />
+      <View
+        style={{
+          top: 50,
+          position: "absolute",
+          alignSelf: "flex-end",
+        }}
+      >
+        <SpamButton func={addPostAsync} />
+      </View>
     </SafeAreaView>
   );
 };
