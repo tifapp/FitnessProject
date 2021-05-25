@@ -360,7 +360,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
             <ExpandingTextInput
               style={[
                 styles.textInputStyle,
-                { marginTop: 5, marginBottom: 30 },
+                { marginTop: 5, marginBottom: 5 },
               ]}
               multiline={true}
               placeholder="Start Typing..."
@@ -373,50 +373,28 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
             <View
               style={{
                 flexDirection: "row",
-                justifyContent: "center",
-                marginBottom: 15,
+                justifyContent: "flex-end",
+                marginBottom: 10,
               }}
             >
-              {postVal === "" ? (
                 <TouchableOpacity
                   style={[
-                    styles.unselectedButtonStyle,
-                    { flexDirection: "row" },
+                    { flexDirection: "row", marginRight: 15 },
                   ]}
-                  onPress={() => {
+                  onPress={postVal === "" ? () => {
                     alert("No text detected in text field");
-                  }}
+                  } : addPostAsync}
                 >
                   <MaterialIcons
-                    name="add-circle"
-                    size={30}
-                    color={"gray"}
-                    style={{ marginRight: 0 }}
+                    name={postVal === "" ? "add-circle-outline" : "add-circle"}
+                    size={15}
+                    color={postVal === "" ? "gray" : "blue"}
+                    style={{ marginRight: 5, marginTop: 2 }}
                   />
-                  <Text style={[styles.buttonTextStyle, { color: "gray" }]}>
+                  <Text style={[{ fontWeight: "bold", fontSize: 15, color: postVal === "" ? "gray" : "blue"}]}>
                     {receiver != null ? "Send Message" : "Add Post" }
                   </Text>
                 </TouchableOpacity>
-              ) : (
-                <TouchableOpacity
-                  style={styles.buttonStyle, {flexDirection: "row", 
-                  backgroundColor: "orange",
-                  padding: 10,
-                  borderRadius: 5,
-                  marginHorizontal: 6,}}
-                  onPress={addPostAsync}
-                >
-                <MaterialIcons
-                  name="add-circle"
-                  size={30}
-                  color={"white"}
-                  style={{ marginRight: 0 }}
-                />
-                  <Text style={styles.buttonTextStyle}>
-                    {receiver != null ? "Send Message" : "Add Post"}
-                  </Text>
-                </TouchableOpacity>
-              )}
             </View>
           </View>
         }
