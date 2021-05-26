@@ -21,9 +21,9 @@ exports.handler = event => {
               }
             });
 
-            if (results.length <= 0) break;
+            if (results.data.postsByUser.items.length <= 0) break;
 
-            results.data.postsByUser.items.map((post) => {
+            await Promise.all(results.data.postsByUser.items.map(async (post) => {
               client.mutate({
                 mutation: gql(deletePost),
                 variables: {
@@ -33,7 +33,7 @@ exports.handler = event => {
                   }
                 }
               });
-            });
+            }));
           }
 
           callback(null, "successfully deleted posts");
@@ -85,9 +85,9 @@ exports.handler = event => {
               }
             });
 
-            if (results.length <= 0) break;
+            if (results.data.friendsByReceiver.items.length <= 0) break;
 
-            results.data.friendsByReceiver.items.map((friendship) => {
+            await Promise.all(results.data.friendsByReceiver.items.map(async (friendship) => {
               client.mutate({
                 mutation: gql(deleteFriendship),
                 variables: {
@@ -97,7 +97,7 @@ exports.handler = event => {
                   }
                 }
               });
-            });
+            }));
           }
 
           callback(null, "successfully deleted posts");
