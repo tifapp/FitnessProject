@@ -28,9 +28,9 @@ exports.handler = (event, context, callback) => {
               }
             });
 
-            if (results.length <= 0) break;
+            if (results.data.likesByPost.items.length <= 0) break;
 
-            results.data.likesByPost.items.map((like) => {
+            await Promise.all(results.data.likesByPost.items.map(async (like) => {
               client.mutate({
                 mutation: gql(deleteLike),
                 variables: {
@@ -40,7 +40,7 @@ exports.handler = (event, context, callback) => {
                   }
                 }
               });
-            });
+            }));
           }
 
           callback(null, "successfully deleted likes");
@@ -61,9 +61,9 @@ exports.handler = (event, context, callback) => {
                 }
               });
               
-              if (results.length <= 0) break;
+              if (results.data.postsByParentId.items.length <= 0) break;
 
-              results.data.postsByParentId.items.map((post) => {
+              await Promise.all(results.data.postsByParentId.items.map(async (post) => {
                 client.mutate({
                   mutation: gql(deletePost),
                   variables: {
@@ -73,7 +73,7 @@ exports.handler = (event, context, callback) => {
                     }
                   }
                 });
-              });
+              }));
             }
 
             callback(null, "successfully deleted replies");
