@@ -156,18 +156,18 @@
       "service": "Lambda",
       "dependsOn": [
         {
+          "category": "function",
+          "resourceName": "backendResources",
+          "attributes": [
+            "Arn"
+          ]
+        },
+        {
           "category": "api",
           "resourceName": "fitnessprojectapi",
           "attributes": [
             "GraphQLAPIIdOutput",
             "GraphQLAPIEndpointOutput"
-          ]
-        },
-        {
-          "category": "function",
-          "resourceName": "backendResources",
-          "attributes": [
-            "Arn"
           ]
         }
       ]

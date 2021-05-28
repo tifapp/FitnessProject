@@ -5,7 +5,7 @@ const { postsByUser, listFriendships, friendsByReceiver } = require('/opt/querie
 const { deletePost, deleteFriendship } = require('/opt/mutations');
 const { client } = require('/opt/backendResources');
 
-exports.handler = event => {
+exports.handler = (event, context, callback) => {
   //eslint-disable-line
   event.Records.forEach((record) => {
     if (record.eventName == "REMOVE") {
@@ -21,8 +21,6 @@ exports.handler = event => {
               }
             });
 
-            if (results.data.postsByUser.items.length <= 0) break;
-
             await Promise.all(results.data.postsByUser.items.map(async (post) => {
               client.mutate({
                 mutation: gql(deletePost),
@@ -34,6 +32,8 @@ exports.handler = event => {
                 }
               });
             }));
+            
+            if (results.data.postsByUser.nextToken == null) break;
           }
 
           callback(null, "successfully deleted posts");
@@ -85,8 +85,6 @@ exports.handler = event => {
               }
             });
 
-            if (results.data.friendsByReceiver.items.length <= 0) break;
-
             await Promise.all(results.data.friendsByReceiver.items.map(async (friendship) => {
               client.mutate({
                 mutation: gql(deleteFriendship),
@@ -98,6 +96,8 @@ exports.handler = event => {
                 }
               });
             }));
+
+            if (results.data.friendsByReceiver.nextToken == null) break;
           }
 
           callback(null, "successfully deleted posts");
