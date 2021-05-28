@@ -243,14 +243,14 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     }
   }
 
-  const addPostAsync = async () => {
+  const addPostAsync = async (parentID, replyText) => {
     checkInternetConnection();
     console.log("attempting to make new post");
     const newPost = {
-      parentId: (new Date(Date.now())).toISOString() + route.params?.myId,
-      description: postVal,
+      parentId: replyText != null ? parentID.toString() : (new Date(Date.now())).toISOString() + route.params?.myId,
+      description: replyText ?? postVal,
       channel: getChannel(),
-      isParent: 1,
+      isParent: replyText != null ? 0 : 1,
     };
     if (receiver != null)
       newPost.receiver = receiver;
@@ -258,8 +258,20 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
 
     console.log(route.params?.myId + " just posted.");
 
+    const localNewPost = { ...newPost, userId: route.params?.myId, createdAt: "null" }
+
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setPosts([{ ...newPost, userId: route.params?.myId, createdAt: "null" }, ...posts]);
+    if (replyText == null) {
+      console.log("posting a WHOLE NEW POST")
+      setPosts([localNewPost, ...posts]);
+    }
+    else {
+      console.log("posting a reply"  + replyText)
+      let tempposts = currentPosts.current;
+      var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId == newPost.parentId)]);
+      tempposts.splice(index + 1, 0, localNewPost);
+      setPosts(tempposts);
+    }
 
     try {
       API.graphql(graphqlOperation(createPost, { input: newPost }));
@@ -271,33 +283,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
           API.graphql(graphqlOperation(updateConversation, { input: {id: channel, lastMessage: postVal} }));
         }
       }
-    } catch (err) {
-      console.log("error in creating post: ", err);
-    }
-  };
-
-  const replyPostAsync = async (parentID, replyingText) => {
-    checkInternetConnection();
-    console.log("sent reply");
-    console.log("*******************");
-
-    const newPost = {
-      parentId: parentID.toString(),
-      description: replyingText,
-      channel: getChannel(),
-      isParent: 0,
-    };
-    if (receiver != null)
-      newPost.receiver = receiver;
-
-    let tempposts = currentPosts.current;
-    var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId == newPost.parentId)]);
-    tempposts.splice(index + 1, 0, {...newPost, userId: route.params?.myId, createdAt: (new Date(Date.now())).toISOString() });
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setPosts(tempposts);
-
-    try {
-      await API.graphql(graphqlOperation(createPost, { input: newPost }));
     } catch (err) {
       console.log("error in creating post: ", err);
     }
@@ -342,7 +327,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       deletePostsAsync={deletePostsAsync}
       writtenByYou={item.userId === route.params?.myId}
       editButtonHandler={updatePostAsync}
-      replyButtonHandler={replyPostAsync}
+      replyButtonHandler={addPostAsync}
       receiver={receiver}
       showTimestamp={showTimestamp(item, index)}
       newSection={
