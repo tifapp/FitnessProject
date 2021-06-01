@@ -1,3 +1,5 @@
+import Hyperlink from 'react-native-hyperlink';
+
 import React, { useState, useEffect, useRef, PureComponent } from "react";
 import { Storage } from "aws-amplify";
 import {
@@ -8,6 +10,7 @@ import {
   TextInput,
   Text,
   TouchableOpacity,
+  Linking,
   LayoutAnimation,
 } from "react-native";
 import { getUser } from "../src/graphql/queries";
@@ -319,17 +322,39 @@ export default function PostItem({
               {item.description}
             </TextInput>
           ) : (
-            <Text
-              style={{
-                flex: 1,
-                paddingTop: 24,
-                paddingBottom: 36,
-                paddingLeft: 12,
-                fontSize: 16,
+            <Hyperlink
+              linkStyle={{ color: "#2980b9" }}
+              onPress={(url, text) => {
+                const title = "This link will take you to an external site (" + url + "). Do you want to continue?";
+                const options = [
+                  {
+                    text: "Yes",
+                    onPress: () => {
+                      Linking.openURL(
+                          url
+                      )
+                    },
+                  },
+                  {
+                    text: "Cancel",
+                    type: "cancel",
+                  },
+                ];
+                Alert.alert(title, "", options, alertOptions);
               }}
             >
-              {item.description}
-            </Text>
+              <Text
+                style={{
+                  flex: 1,
+                  paddingTop: 24,
+                  paddingBottom: 36,
+                  paddingLeft: 12,
+                  fontSize: 16,
+                }}
+              >
+                {item.description}
+              </Text>
+            </Hyperlink>
           )}
         </View>
 
