@@ -1,4 +1,5 @@
 import Hyperlink from 'react-native-hyperlink';
+import RNUrlPreview from 'react-native-url-preview';
 
 import React, { useState, useEffect, useRef, PureComponent } from "react";
 import { Storage } from "aws-amplify";
@@ -12,6 +13,7 @@ import {
   TouchableOpacity,
   Linking,
   LayoutAnimation,
+  Alert
 } from "react-native";
 import { getUser } from "../src/graphql/queries";
 import { ProfileImageAndName } from "./ProfileImageAndName";
@@ -153,7 +155,7 @@ export default function PostItem({
               textLayoutStyle={{ flex: 1, marginTop: 15, marginBottom: 15 }}
               textStyle={{
                 flex: 1,
-                fontWeight: writtenByYou ? "bold" : "normal"
+                fontWeight: writtenByYou ? "bold" : "normal",
               }}
               userId={item.userId}
               subtitleComponent={
@@ -173,12 +175,10 @@ export default function PostItem({
                   <LikeButton
                     likes={item.likes}
                     likedByYou={item.likedByYou}
-                    postId={
-                      item.createdAt +
-                      "#" +
-                      item.userId
-                    }
-                    callback={() => {item.likeDebounce = true}}
+                    postId={item.createdAt + "#" + item.userId}
+                    callback={() => {
+                      item.likeDebounce = true;
+                    }}
                   />
                   <TouchableOpacity
                     style={[
@@ -322,39 +322,43 @@ export default function PostItem({
               {item.description}
             </TextInput>
           ) : (
-            <Hyperlink
-              linkStyle={{ color: "#2980b9" }}
-              onPress={(url, text) => {
-                const title = "This link will take you to an external site (" + url + "). Do you want to continue?";
-                const options = [
-                  {
-                    text: "Yes",
-                    onPress: () => {
-                      Linking.openURL(
-                          url
-                      )
+            <View>
+              <Hyperlink
+                linkStyle={{ color: "#2980b9" }}
+                onPress={(url, text) => {
+                  const title =
+                    "This link will take you to an external site (" +
+                    url +
+                    "). Do you want to continue?";
+                  const options = [
+                    {
+                      text: "Yes",
+                      onPress: () => {
+                        Linking.openURL(url);
+                      },
                     },
-                  },
-                  {
-                    text: "Cancel",
-                    type: "cancel",
-                  },
-                ];
-                Alert.alert(title, "", options, alertOptions);
-              }}
-            >
-              <Text
-                style={{
-                  flex: 1,
-                  paddingTop: 24,
-                  paddingBottom: 36,
-                  paddingLeft: 12,
-                  fontSize: 16,
+                    {
+                      text: "Cancel",
+                      type: "cancel",
+                    },
+                  ];
+                  Alert.alert(title, "", options);
                 }}
               >
-                {item.description}
-              </Text>
-            </Hyperlink>
+                <Text
+                  style={{
+                    flex: 1,
+                    paddingTop: 24,
+                    paddingBottom: 36,
+                    paddingLeft: 12,
+                    fontSize: 16,
+                  }}
+                >
+                  {item.description}
+                </Text>
+              </Hyperlink>
+              <RNUrlPreview text={item.description} descriptionNumberOfLines={2} />
+            </View>
           )}
         </View>
 
@@ -401,7 +405,10 @@ export default function PostItem({
             />
             {replyingText === "" ? (
               <TouchableOpacity
-                style={[styles.unselectedButtonStyle, { flexDirection: "row", margin: 15 }]}
+                style={[
+                  styles.unselectedButtonStyle,
+                  { flexDirection: "row", margin: 15 },
+                ]}
                 onPress={() => {
                   alert("Reply can't be empty");
                 }}
@@ -418,27 +425,29 @@ export default function PostItem({
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
-                style={[styles.buttonStyle, {
-                  backgroundColor: "orange",
-                  padding: 10,
-                  borderRadius: 5,
-                  margin: 15,
-                flexDirection: "row"}]}
+                style={[
+                  styles.buttonStyle,
+                  {
+                    backgroundColor: "orange",
+                    padding: 10,
+                    borderRadius: 5,
+                    margin: 15,
+                    flexDirection: "row",
+                  },
+                ]}
                 onPress={() => {
                   replyButtonHandler(item.parentId, replyingText),
                     setReplyingText(""),
                     setIsReplying(false);
                 }}
               >
-              <MaterialIcons
-                name="add-circle"
-                size={30}
-                color={"white"}
-                style={{ marginRight: 0 }}
-              />
-              <Text style={[styles.buttonTextStyle]}>
-                {"Add Reply"}
-              </Text>
+                <MaterialIcons
+                  name="add-circle"
+                  size={30}
+                  color={"white"}
+                  style={{ marginRight: 0 }}
+                />
+                <Text style={[styles.buttonTextStyle]}>{"Add Reply"}</Text>
               </TouchableOpacity>
             )}
           </View>
