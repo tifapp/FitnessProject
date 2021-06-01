@@ -24,9 +24,11 @@ export default function ConversationScreen({ navigation, route }) {
       console.log(conversations[i])
     }
   }, [conversations])
-
+  
   const goToMessages = (id) => {
-      navigation.navigate("Messages", { userId: id });
+    if (!navigation.push)
+      navigation.navigate(id);
+    else navigation.push(id);
   };
 
   return (

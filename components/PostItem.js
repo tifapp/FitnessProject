@@ -107,24 +107,7 @@ function LikeButton({ likes, likedByYou, postId, callback }) {
   );
 }
 
-export default function PostItem({
-  item,
-  deletePostsAsync,
-  writtenByYou,
-  editButtonHandler,
-  replyButtonHandler,
-  receiver,
-  showTimestamp,
-  newSection,
-}) {
-  const [isReplying, setIsReplying] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedText, setEditedText] = useState("");
-  const [replyingText, setReplyingText] = useState("");
-  const displayTime = printTime(item.createdAt);
-  const isReceivedMessage = receiver != null && !writtenByYou;
-  //console.log(parentID);
-
+function LinkableText(props) {
   const warnExternalSite = (url, text) => {
     const title =
       "This link will take you to an external site (" +
@@ -144,6 +127,48 @@ export default function PostItem({
     ];
     Alert.alert(title, "", options);
   }
+
+  return (
+    <View>
+      <View
+        style={props.style}
+      >
+        <Hyperlink linkStyle={{ color: "#2980b9" }} onPress={warnExternalSite}>
+          <Text
+            style={{
+              fontSize: 16,
+            }}
+          >
+            {props.children}
+          </Text>
+        </Hyperlink>
+      </View>
+      <RNUrlPreview
+        text={props.children}
+        descriptionNumberOfLines={2}
+        onPress={warnExternalSite}
+      />
+    </View>
+  );
+}
+
+export default function PostItem({
+  item,
+  deletePostsAsync,
+  writtenByYou,
+  editButtonHandler,
+  replyButtonHandler,
+  receiver,
+  showTimestamp,
+  newSection,
+}) {
+  const [isReplying, setIsReplying] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedText, setEditedText] = useState("");
+  const [replyingText, setReplyingText] = useState("");
+  const displayTime = printTime(item.createdAt);
+  const isReceivedMessage = receiver != null && !writtenByYou;
+  //console.log(parentID);
 
   //
   if (receiver == null)
@@ -342,28 +367,12 @@ export default function PostItem({
               {item.description}
             </TextInput>
           ) : (
-            <View>
-            <View style={{
+            <LinkableText style={{
               flex: 1,
               paddingTop: 24,
               paddingBottom: 36,
               paddingLeft: 12,
-              }}>
-              <Hyperlink
-                linkStyle={{ color: "#2980b9" }}
-                onPress={warnExternalSite}
-              >
-                <Text
-                  style={{
-                    fontSize: 16,
-                  }}
-                >
-                  {item.description}
-                </Text>
-              </Hyperlink>
-            </View>
-              <RNUrlPreview text={item.description} descriptionNumberOfLines={2} onPress={warnExternalSite} />
-            </View>
+            }}>{item.description}</LinkableText>
           )}
         </View>
 
@@ -491,7 +500,7 @@ export default function PostItem({
         style={[styles.secondaryContainerStyle, { backgroundColor: "#fff" }]}
       >
         <View style={[styles.spaceAround]}>
-          <View
+          <LinkableText
             style={{
               alignSelf: isReceivedMessage ? "flex-start" : "flex-end",
               backgroundColor: "#efefef",
@@ -508,8 +517,8 @@ export default function PostItem({
               elevation: 6,
             }}
           >
-            <Text style={{ color: "#000" }}>{item.description}</Text>
-          </View>
+            {item.description}
+          </LinkableText>
           <View>
             <Text
               style={{
