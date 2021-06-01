@@ -125,6 +125,26 @@ export default function PostItem({
   const isReceivedMessage = receiver != null && !writtenByYou;
   //console.log(parentID);
 
+  const warnExternalSite = (url, text) => {
+    const title =
+      "This link will take you to an external site (" +
+      url +
+      "). Do you want to continue?";
+    const options = [
+      {
+        text: "Yes",
+        onPress: () => {
+          Linking.openURL(url);
+        },
+      },
+      {
+        text: "Cancel",
+        type: "cancel",
+      },
+    ];
+    Alert.alert(title, "", options);
+  }
+
   //
   if (receiver == null)
     return (
@@ -323,41 +343,26 @@ export default function PostItem({
             </TextInput>
           ) : (
             <View>
+            <View style={{
+              flex: 1,
+              paddingTop: 24,
+              paddingBottom: 36,
+              paddingLeft: 12,
+              }}>
               <Hyperlink
                 linkStyle={{ color: "#2980b9" }}
-                onPress={(url, text) => {
-                  const title =
-                    "This link will take you to an external site (" +
-                    url +
-                    "). Do you want to continue?";
-                  const options = [
-                    {
-                      text: "Yes",
-                      onPress: () => {
-                        Linking.openURL(url);
-                      },
-                    },
-                    {
-                      text: "Cancel",
-                      type: "cancel",
-                    },
-                  ];
-                  Alert.alert(title, "", options);
-                }}
+                onPress={warnExternalSite}
               >
                 <Text
                   style={{
-                    flex: 1,
-                    paddingTop: 24,
-                    paddingBottom: 36,
-                    paddingLeft: 12,
                     fontSize: 16,
                   }}
                 >
                   {item.description}
                 </Text>
               </Hyperlink>
-              <RNUrlPreview text={item.description} descriptionNumberOfLines={2} />
+            </View>
+              <RNUrlPreview text={item.description} descriptionNumberOfLines={2} onPress={warnExternalSite} />
             </View>
           )}
         </View>

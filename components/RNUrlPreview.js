@@ -10,6 +10,7 @@ export default class RNUrlPreview extends React.PureComponent {
     super(props);
     this.state = {
       isUri: false,
+      link: undefined,
       linkTitle: undefined,
       linkDesc: undefined,
       linkFavicon: undefined,
@@ -21,11 +22,13 @@ export default class RNUrlPreview extends React.PureComponent {
   getPreview = (text, options) => {
     const {onError, onLoad} = this.props;
     if (linkify.pretest(text) && linkify.test(text)) {
-        getLinkPreview(linkify.match(text)[0].url, options)
+        const url = linkify.match(text)[0].url
+        getLinkPreview(url, options)
           .then(data => {
             onLoad(data);
             this.setState({
               isUri: true,
+              link: url,
               linkTitle: data.title ? data.title : undefined,
               linkDesc: data.description ? data.description : undefined,
               linkImg:
@@ -53,7 +56,7 @@ export default class RNUrlPreview extends React.PureComponent {
   }
 
   _onLinkPressed = () => {
-    this.props.onPress ?? Linking.openURL(this.props.text.match(REGEX)[0]);
+    this.props.onPress && this.state.isUri ? this.props.onPress(this.state.link) : Linking.openURL(this.state.link);
   };
 
   renderImage = (imageLink, faviconLink, imageStyle, faviconStyle, imageProps) => {
