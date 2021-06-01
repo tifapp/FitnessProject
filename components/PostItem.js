@@ -1,5 +1,5 @@
 import Hyperlink from 'react-native-hyperlink';
-import RNUrlPreview from 'react-native-url-preview';
+import RNUrlPreview from 'components/RNUrlPreview';
 
 import React, { useState, useEffect, useRef, PureComponent } from "react";
 import { Storage } from "aws-amplify";
