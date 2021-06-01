@@ -35,16 +35,7 @@ exports.handler = (event, context, callback) => {
             
             if (results.data.postsByUser.nextToken == null) break;
           }
-
-          callback(null, "successfully deleted posts");
-        } catch (e) {
-          console.warn('Error deleting posts: ', e);
-          callback(Error(e));
-        }
-      })();
-      
-      (async () => {
-        try {
+          
           while (true) {
             const results = await client.query({
               query: gql(listFriendships),
@@ -52,8 +43,6 @@ exports.handler = (event, context, callback) => {
                 sender: userId,
               }
             });
-
-            if (results.length <= 0) break;
 
             results.data.listFriendships.items.map((friendship) => {
               client.mutate({
@@ -66,17 +55,10 @@ exports.handler = (event, context, callback) => {
                 }
               });
             });
+            
+            if (results.data.listFriendships.nextToken == null) break;
           }
-
-          callback(null, "successfully deleted posts");
-        } catch (e) {
-          console.warn('Error deleting posts: ', e);
-          callback(Error(e));
-        }
-      })();
-      
-      (async () => {
-        try {
+          
           while (true) {
             const results = await client.query({
               query: gql(friendsByReceiver),
