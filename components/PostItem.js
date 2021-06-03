@@ -1,5 +1,5 @@
-import Hyperlink from 'react-native-hyperlink';
-import RNUrlPreview from 'components/RNUrlPreview';
+import Hyperlink from "react-native-hyperlink";
+import RNUrlPreview from "components/RNUrlPreview";
 
 import React, { useState, useEffect, useRef, PureComponent } from "react";
 import { Storage } from "aws-amplify";
@@ -13,7 +13,7 @@ import {
   TouchableOpacity,
   Linking,
   LayoutAnimation,
-  Alert
+  Alert,
 } from "react-native";
 import { getUser } from "../src/graphql/queries";
 import { ProfileImageAndName } from "./ProfileImageAndName";
@@ -43,7 +43,7 @@ function LikeButton({ likes, likedByYou, postId, callback }) {
     timerIsRunning.current = true;
     clearTimeout(likeTimeout.current);
     likeTimeout.current = setTimeout(sendAPICall, 1000);
-  }
+  };
 
   const sendAPICall = () => {
     callback();
@@ -65,10 +65,10 @@ function LikeButton({ likes, likedByYou, postId, callback }) {
     }
 
     timerIsRunning.current = false;
-  }
+  };
 
   const likePostAsync = async () => {
-    liked ? playSound("unlike") : playSound("like"); 
+    liked ? playSound("unlike") : playSound("like");
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     try {
       setLiked(!liked);
@@ -81,8 +81,14 @@ function LikeButton({ likes, likedByYou, postId, callback }) {
 
   return (
     <TouchableOpacity
-      style={[{ flex: 1, flexDirection: "row",
-      paddingHorizontal: 15, paddingTop: 15, }]}
+      style={[
+        {
+          flex: 1,
+          flexDirection: "row",
+          paddingHorizontal: 15,
+          paddingTop: 15,
+        },
+      ]}
       onPress={likePostAsync}
     >
       <Text
@@ -90,12 +96,11 @@ function LikeButton({ likes, likedByYou, postId, callback }) {
           { marginRight: 6, fontWeight: "bold", color: liked ? "red" : "gray" },
         ]}
       >
-      {likedByYou && !liked 
-        ? likes - 1 
-        : !likedByYou && liked
+        {likedByYou && !liked
+          ? likes - 1
+          : !likedByYou && liked
           ? likes + 1
-          : likes
-      }
+          : likes}
       </Text>
       <MaterialIcons
         name={liked ? "favorite" : "favorite-outline"}
@@ -126,13 +131,11 @@ function LinkableText(props) {
       },
     ];
     Alert.alert(title, "", options);
-  }
+  };
 
   return (
     <View>
-      <View
-        style={props.style}
-      >
+      <View style={props.style}>
         <Hyperlink linkStyle={{ color: "#2980b9" }} onPress={warnExternalSite}>
           <Text
             style={{
@@ -166,198 +169,40 @@ export default function PostItem({
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState("");
   const [replyingText, setReplyingText] = useState("");
-  const displayTime = printTime(item.createdAt);
   const isReceivedMessage = receiver != null && !writtenByYou;
   //console.log(parentID);
 
   //
   if (receiver == null)
     return (
-      <View style={styles.secondaryContainerStyle}>
+      <View style={[styles.secondaryContainerStyle, {
+        backgroundColor: "#efefef",}]}>
         <View
           style={
-            item.isParent == 1 ? styles.spaceAround : styles.spaceAroundReply
+            [item.isParent == 1 ? styles.spaceAround : styles.spaceAroundReply,
+            {
+              marginBottom: 10,
+              marginHorizontal: 10,
+              backgroundColor: "white",
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 1,
+              },
+              shadowOpacity: 0.18,
+              shadowRadius: 1.0,
+      
+              elevation: 1,}]
           }
         >
-          <View>
-            <ProfileImageAndName
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                backgroundColor: "white",
-                shadowColor: "#000",
-                shadowOffset: {
-                  width: 0,
-                  height: 1,
-                },
-                shadowOpacity: 0.18,
-                shadowRadius: 1.0,
-
-                elevation: 1,
-              }}
-              imageStyle={[styles.smallImageStyle, { marginRight: 15 }]}
-              textLayoutStyle={{ flex: 1, marginTop: 15, marginBottom: 15 }}
-              textStyle={{
-                flex: 1,
-                fontWeight: writtenByYou ? "bold" : "normal",
-              }}
-              userId={item.userId}
-              subtitleComponent={
-                <View style={{}}>
-                  <Text style={{ color: "gray" }}>{displayTime}</Text>
-                </View>
-              }
-              sibling={
-                <View
-                  style={{
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    alignItems: "flex-end",
-                    flex: 1,
-                  }}
-                >
-                  <LikeButton
-                    likes={item.likes}
-                    likedByYou={item.likedByYou}
-                    postId={item.createdAt + "#" + item.userId}
-                    callback={() => {
-                      item.likeDebounce = true;
-                    }}
-                  />
-                  <TouchableOpacity
-                    style={[
-                      {
-                        paddingHorizontal: 15,
-                        paddingBottom: 15,
-                        flex: 1,
-                        borderWidth: 0,
-                        flexDirection: "row",
-                        alignItems: "flex-end",
-                      },
-                    ]}
-                    onPress={() => setIsReplying(!isReplying)}
-                  >
-                    <Text
-                      style={[
-                        {
-                          paddingRight: 6,
-                          fontWeight: "bold",
-                          color: isReplying ? "blue" : "gray",
-                        },
-                      ]}
-                    >
-                      0
-                    </Text>
-                    <MaterialIcons
-                      name="chat-bubble-outline"
-                      size={17}
-                      color={isReplying ? "blue" : "gray"}
-                      style={{ marginRight: 0 }}
-                    />
-                  </TouchableOpacity>
-                </View>
-              }
-            />
-            {isReplying ? (
-              <View
-                style={[
-                  {
-                    shadowColor: "#000",
-                    shadowOffset: {
-                      width: 0,
-                      height: 1,
-                    },
-                    shadowOpacity: 0.22,
-                    shadowRadius: 2.22,
-
-                    elevation: 3,
-                    position: "absolute",
-                    top: -18,
-                    left: -18,
-                    flexDirection: "column",
-                    alignItems: "flex-start",
-                  },
-                ]}
-              >
-                <View
-                  style={{
-                    backgroundColor: "blue",
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
-                >
-                  <MaterialIcons
-                    name="chat-bubble"
-                    size={17}
-                    color={"white"}
-                    style={{ padding: 6 }}
-                  />
-                  <Text
-                    style={[
-                      { marginRight: 6, fontWeight: "bold", color: "white" },
-                    ]}
-                  >
-                    Replying to
-                  </Text>
-                </View>
-              </View>
-            ) : null}
-            <View
-              style={{
-                marginHorizontal: 24,
-                flexDirection: "column",
-                justifyContent: "space-between",
-                alignItems: "stretch",
-              }}
-            >
-              {writtenByYou ? (
-                <View
-                  style={{
-                    marginHorizontal: 24,
-                    flexDirection: "row",
-                    justifyContent: "space-evenly",
-                  }}
-                >
-                  <TouchableOpacity
-                    style={[
-                      styles.unselectedButtonStyle,
-                      { borderColor: "red" },
-                    ]}
-                    color="red"
-                    onPress={() => deletePostsAsync(item.createdAt)}
-                  >
-                    <Text
-                      style={[
-                        styles.unselectedButtonTextStyle,
-                        { color: "red" },
-                      ]}
-                    >
-                      Delete
-                    </Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[
-                      styles.unselectedButtonStyle,
-                      { borderColor: "blue" },
-                    ]}
-                    color="blue"
-                    onPress={() => setIsEditing(!isEditing)}
-                  >
-                    <Text
-                      style={[
-                        styles.unselectedButtonTextStyle,
-                        { color: "blue" },
-                      ]}
-                    >
-                      Edit
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              ) : null}
-            </View>
-          </View>
+          <PostHeader
+            item={item}
+            deletePostsAsync={deletePostsAsync}
+            writtenByYou={writtenByYou}
+            setIsEditing={setIsEditing}
+            isReplying={isReplying}
+            setIsReplying={setIsReplying}
+          />
           {isEditing ? (
             <TextInput
               style={[styles.check, { borderColor: "orange" }]}
@@ -367,12 +212,16 @@ export default function PostItem({
               {item.description}
             </TextInput>
           ) : (
-            <LinkableText style={{
-              flex: 1,
-              paddingTop: 24,
-              paddingBottom: 36,
-              paddingLeft: 12,
-            }}>{item.description}</LinkableText>
+            <LinkableText
+              style={{
+                flex: 1,
+                paddingTop: 8,
+                paddingBottom: 22,
+                paddingLeft: 22,
+              }}
+            >
+              {item.description}
+            </LinkableText>
           )}
         </View>
 
@@ -466,13 +315,6 @@ export default function PostItem({
             )}
           </View>
         ) : null}
-        <View
-          style={{
-            height: 1,
-            backgroundColor: "#efefef",
-            marginHorizontal: 12,
-          }}
-        ></View>
       </View>
     );
   else {
@@ -534,4 +376,165 @@ export default function PostItem({
       </View>
     );
   }
+}
+
+function PostHeader({item, writtenByYou, isReplying, deletePostsAsync, setIsReplying, setIsEditing}) {
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}
+    >
+      <ProfileImageAndName
+        imageStyle={[styles.smallImageStyle, { marginRight: 5 }]}
+        textLayoutStyle={{ flex: 1, marginTop: 15, marginBottom: 15 }}
+        textStyle={{
+          flex: 1,
+          fontWeight: writtenByYou ? "bold" : "normal",
+        }}
+        userId={item.userId}
+        subtitleComponent={
+          <View style={{}}>
+            <Text style={{ color: "gray" }}>{printTime(item.createdAt)}</Text>
+          </View>
+        }
+        sibling={
+          <View
+            style={{
+              flexDirection: "column",
+              justifyContent: "space-between",
+              alignItems: "flex-end",
+              flex: 1,
+            }}
+          >
+            <LikeButton
+              likes={item.likes}
+              likedByYou={item.likedByYou}
+              postId={item.createdAt + "#" + item.userId}
+              callback={() => {
+                item.likeDebounce = true;
+              }}
+            />
+            <TouchableOpacity
+              style={[
+                {
+                  paddingHorizontal: 15,
+                  paddingBottom: 15,
+                  flex: 1,
+                  borderWidth: 0,
+                  flexDirection: "row",
+                  alignItems: "flex-end",
+                },
+              ]}
+              onPress={() => setIsReplying(!isReplying)}
+            >
+              <Text
+                style={[
+                  {
+                    paddingRight: 6,
+                    fontWeight: "bold",
+                    color: isReplying ? "blue" : "gray",
+                  },
+                ]}
+              >
+                0
+              </Text>
+              <MaterialIcons
+                name="chat-bubble-outline"
+                size={17}
+                color={isReplying ? "blue" : "gray"}
+                style={{ marginRight: 0 }}
+              />
+            </TouchableOpacity>
+          </View>
+        }
+      />
+      {isReplying ? (
+        <View
+          style={[
+            {
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 1,
+              },
+              shadowOpacity: 0.22,
+              shadowRadius: 2.22,
+
+              elevation: 3,
+              position: "absolute",
+              top: -18,
+              left: -18,
+              flexDirection: "column",
+              alignItems: "flex-start",
+            },
+          ]}
+        >
+          <View
+            style={{
+              backgroundColor: "blue",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <MaterialIcons
+              name="chat-bubble"
+              size={17}
+              color={"white"}
+              style={{ padding: 6 }}
+            />
+            <Text
+              style={[{ marginRight: 6, fontWeight: "bold", color: "white" }]}
+            >
+              Replying to
+            </Text>
+          </View>
+        </View>
+      ) : null}
+      <View
+        style={{
+          marginHorizontal: 24,
+          flexDirection: "column",
+          justifyContent: "space-between",
+          alignItems: "stretch",
+        }}
+      >
+        {writtenByYou ? (
+          <View
+            style={{
+              marginHorizontal: 24,
+              flexDirection: "row",
+              justifyContent: "space-evenly",
+            }}
+          >
+            <TouchableOpacity
+              style={[styles.unselectedButtonStyle, { borderColor: "red" }]}
+              color="red"
+              onPress={() => deletePostsAsync(item.createdAt)}
+            >
+              <Text
+                style={[styles.unselectedButtonTextStyle, { color: "red" }]}
+              >
+                Delete
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.unselectedButtonStyle, { borderColor: "blue" }]}
+              color="blue"
+              onPress={() => setIsEditing(!isEditing)}
+            >
+              <Text
+                style={[styles.unselectedButtonTextStyle, { color: "blue" }]}
+              >
+                Edit
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
+      </View>
+    </View>
+  );
 }

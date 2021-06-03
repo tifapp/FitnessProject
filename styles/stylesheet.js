@@ -184,9 +184,9 @@ module.exports = StyleSheet.create({
     fontWeight: "bold",
   },
   spaceAround: {
-    paddingLeft: 24,
-    paddingTop: 24,
-    paddingRight: 24,
+    paddingLeft: 0,
+    paddingTop: 0,
+    paddingRight: 0,
     paddingBottom: 0,
   },
   spaceAroundReply: {
