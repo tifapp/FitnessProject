@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import {
   StyleSheet,
   View,
@@ -12,7 +12,7 @@ import { API, graphqlOperation } from "aws-amplify";
 
 var styles = require("../styles/stylesheet");
 
-class APIList extends Component { //we need to make this a class to use refs from the parent
+class APIList extends PureComponent { //we need to make this a class to use refs from the parent
   constructor(props) {
     super(props);
     this.state = {
@@ -165,8 +165,9 @@ class APIList extends Component { //we need to make this a class to use refs fro
                 renderItem={this.props.renderItem}
                 keyExtractor={this.props.keyExtractor}
                 onEndReached={this.loadMore}
-                onEndReachedThreshold={1}
+                onEndReachedThreshold={this.props.onEndReachedThreshold ?? 1}
                 ListEmptyComponent={this.props.ListEmptyComponent}
+                getItemLayout={this.props.getItemLayout}
               />
         }
 

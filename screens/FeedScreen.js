@@ -15,7 +15,7 @@ import {
   LayoutAnimation,
 } from "react-native";
 // Get the aws resources configuration parameters
-import { API, graphqlOperation } from "aws-amplify";
+import { API, graphqlOperation, Cache } from "aws-amplify";
 import { createPost, updatePost, deletePost, createConversation, updateConversation, createReadReceipt, deleteReadReceipt } from "root/src/graphql/mutations";
 import { listPosts, postsByChannel, batchGetLikes } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
@@ -175,8 +175,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     }
   }, []);
 
-  const getLikedPosts = async (items) => {
-    let newPosts = items;
+  const getLikedPosts = async (newPosts) => {
     let postIds = [];
 
     newPosts.forEach(item => {
@@ -198,7 +197,23 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
           newPosts[i].likedByYou = false;
         }
       }
+      
+      await Promise.all(newPosts.map((post) => Cache.getItem(post.userId))).then((results) => {
+        console.log("all are complete")
+        for (i = 0; i < newPosts.length; ++i) {
+          if (results[i]) {
+            newPosts[i].info = results[i];
+          } else {            
+            newPosts[i].info = {error: true}
+          }
+        }
+      })
+
       return newPosts;
+
+      //we can also fetch the profile image uri and name of each person here rather than making a bunch of different threads with each postitem to do it
+      //we can also check if the item contains a link and load the link preview data through here as well, and insert it into the postitem
+      //link previews should have a fixed height btw, or at least a max height. but then it could vary between 0 and the max height
     } catch (err) {
       console.log("error in detecting likes: ", err);
     }
@@ -321,8 +336,9 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     scrollRef.current?.scrollToOffset({ offset: 0, animated: true })
   }
 
-  const renderPostItem = ({ item, index }) => (
+  const renderPostItem = React.useCallback(({ item, index }) => (
     <PostItem
+      index={index}
       item={item}
       deletePostsAsync={deletePostsAsync}
       writtenByYou={item.userId === route.params?.myId}
@@ -334,7 +350,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         index == 0 ? true : showTimestamp(posts[index - 1], index - 1)
       }
     />
-  )
+  ), [])
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -384,6 +400,8 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
             </View>
           </View>
         }
+        initialAmount={20}
+        additionalAmount={15}
         processingFunction={getLikedPosts}
         queryOperation={postsByChannel}
         setDataFunction={setPosts}
@@ -391,6 +409,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         filter={{ channel: getChannel(), sortDirection: "DESC" }}
         renderItem={renderPostItem}
         keyExtractor={(item) => item.createdAt.toString() + item.userId}
+        onEndReachedThreshold={2}
       />
       <View
         style={{

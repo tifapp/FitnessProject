@@ -155,7 +155,7 @@ function LinkableText(props) {
   );
 }
 
-export default function PostItem({
+export default React.memo(function PostItem({
   item,
   deletePostsAsync,
   writtenByYou,
@@ -164,6 +164,7 @@ export default function PostItem({
   receiver,
   showTimestamp,
   newSection,
+  index
 }) {
   const [isReplying, setIsReplying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -171,6 +172,11 @@ export default function PostItem({
   const [replyingText, setReplyingText] = useState("");
   const isReceivedMessage = receiver != null && !writtenByYou;
   //console.log(parentID);
+  
+
+  // useEffect(() => {
+  //   console.log("re-rendering postItem: ", index)
+  // });
 
   //
   if (receiver == null)
@@ -376,7 +382,7 @@ export default function PostItem({
       </View>
     );
   }
-}
+})
 
 function PostHeader({item, writtenByYou, isReplying, deletePostsAsync, setIsReplying, setIsEditing}) {
   return (
@@ -388,6 +394,7 @@ function PostHeader({item, writtenByYou, isReplying, deletePostsAsync, setIsRepl
       }}
     >
       <ProfileImageAndName
+        info={item.info}
         imageStyle={[styles.smallImageStyle, { marginRight: 5 }]}
         textLayoutStyle={{ flex: 1, marginTop: 15, marginBottom: 15 }}
         textStyle={{

@@ -18,7 +18,7 @@ var styles = require("../styles/stylesheet");
 
 //currently the predicted behavior is that it will cache images but the links will be invalid after 1 day. let's see.
 
-export const ProfileImageAndName = (props) => {
+export const ProfileImageAndName = React.memo(function(props) {
   //user is required in props. it's a type of object described in userschema.graphql
   const navigation = props.navigationObject ?? useNavigation();
 
@@ -37,8 +37,7 @@ export const ProfileImageAndName = (props) => {
     }
   };
 
-  const [userInfo, setUserInfo] = useState(null);
-  const [imageChanged, setImageChanged] = useState(true);
+  const [userInfo, setUserInfo] = useState(props.info);
 
   const addUserInfotoCache = () => {
     //console.log('cache missed!', props.userId); //this isn't printing for some reason
@@ -96,8 +95,10 @@ export const ProfileImageAndName = (props) => {
   };
 
   useEffect(() => {
-    Cache.getItem(props.userId, { callback: addUserInfotoCache }) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
-      .then((info) => {
+    if (userInfo == null) {
+      //we didn't preload
+      Cache.getItem(props.userId, { callback: addUserInfotoCache }) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
+      .then((info) => { //will have to check if this gets called after the above callback, aka if setuserinfo is called twice.
         //console.log("info is ", info)
         if (info != null) {
           if (
@@ -111,55 +112,14 @@ export const ProfileImageAndName = (props) => {
             setUserInfo(info);
           }
         }
-      }); //redundant???
+      });
+    } else if (userInfo.error) {
+      //we tried to preload and the data was not in the cache
+      addUserInfotoCache(); //will fetch the profile image (either thumbnail or fullsize based on the props) and the user's name
+    }
   }, []);
 
-  // useEffect(() => {
-  //   Cache.getItem(props.userId) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
-  //     .then((info) => {
-  //       if (
-  //         userInfo != null &&
-  //         info != null &&
-  //         userInfo.imageURL !== info.imageURL
-  //       ) {
-  //         setImageChanged(true);
-  //       }
-  //     });
-  // });
-
-  if (userInfo == null) {
-    return (
-    <View
-      style={[
-        {
-          flexDirection: props.vertical ? "column" : "row",
-          alignItems: "center",
-          alignContent: "flex-start",
-          justifyContent: "flex-start",
-        },
-        props.style,
-      ]}
-    >
-      <Image
-        style={[props.imageStyle, { margin: 15 }]}
-        source={require("../assets/icon.png")}
-      />
-      <View
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <ActivityIndicator color="#0000ff" />
-      </View>
-    </View>
-    );
-  } else if (props.hideall) {
+  if (props.hideall) {
     return null;
   } else {
     return (
@@ -182,12 +142,29 @@ export const ProfileImageAndName = (props) => {
             onError={addUserInfotoCache}
             style={[props.imageStyle]}
             source={
-              userInfo.imageURL === ""
-                ? require("../assets/icon.png")
-                : { uri: userInfo.imageURL }
+              (userInfo == null || userInfo.imageURL === "") ?
+                require("../assets/icon.png")
+              : { uri: userInfo.imageURL }
             }
           />
           {props.imageOverlay}
+          {
+          userInfo == null ?
+          <View
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <ActivityIndicator color="#0000ff" />
+          </View>
+          : null
+          }
         </TouchableOpacity>
         <View style={props.textLayoutStyle}>
           {props.hidename ? null : (
@@ -195,9 +172,11 @@ export const ProfileImageAndName = (props) => {
                 onPress={goToProfile}
                 style={[props.textStyle, { flexWrap: "wrap", flexShrink: 1 }]}
               >
-                {props.isFull || userInfo.name.length <= 40
-                  ? userInfo.name
-                  : userInfo.name.substring(0, 40)}
+                {userInfo != null
+                    ? userInfo.isFull || userInfo.name.length <= 40
+                    ? userInfo.name
+                    : userInfo.name.substring(0, 40)
+                    : "Loading..."}
               </Text>
           )}
           {props.subtitleComponent}
@@ -206,4 +185,4 @@ export const ProfileImageAndName = (props) => {
       </View>
     );
   }
-};
+});
