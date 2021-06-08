@@ -132,6 +132,8 @@ function LinkableText(props) {
     ];
     Alert.alert(title, "", options);
   };
+  
+  //console.log("the url we're passing to preview is ", props.urlPreview)
 
   return (
     <View>
@@ -147,7 +149,7 @@ function LinkableText(props) {
         </Hyperlink>
       </View>
       <RNUrlPreview
-        text={props.children}
+        urlPreview={props.urlPreview}
         descriptionNumberOfLines={2}
         onPress={warnExternalSite}
       />
@@ -225,6 +227,7 @@ export default React.memo(function PostItem({
                 paddingBottom: 22,
                 paddingLeft: 22,
               }}
+              urlPreview={item.urlPreview}
             >
               {item.description}
             </LinkableText>
@@ -382,7 +385,7 @@ export default React.memo(function PostItem({
       </View>
     );
   }
-})
+}, (oldProps,newProps)=>oldProps.item == newProps.item)
 
 function PostHeader({item, writtenByYou, isReplying, deletePostsAsync, setIsReplying, setIsEditing}) {
   return (

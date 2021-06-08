@@ -27,10 +27,19 @@ import { lessThan } from "react-native-reanimated";
 import { ProfileImageAndName } from "components/ProfileImageAndName";
 import ExpandingTextInput from "components/ExpandingTextInput";
 import SpamButton from "components/SpamButton";
+import {getLinkPreview} from 'link-preview-js';
+
+const linkify = require('linkify-it')()
+linkify
+  .tlds(require('tlds'))          // Reload with full tlds list
+  .tlds('mobi', true)            // Add unofficial `.onion` domain
+
 
 require('root/androidtimerfix');
 
 var styles = require('styles/stylesheet');
+
+var allSettled = require('promise.allsettled');
 
 export default function FeedScreen({ navigation, route, receiver, channel, headerComponent }) {
   const [postVal, setPostVal] = useState("");
@@ -81,7 +90,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         if (newPost.channel === getChannel() && (currentPosts.current.length == 0 || !currentPosts.current.find(post => post.userId === newPost.userId && post.createdAt === newPost.createdAt))) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
           newPost.likes = newPost.likes ?? 0;
           if (newPost.userId === route.params?.myId) {
-            console.log("received own post again")
+            //console.log("received own post again")
             setPosts(currentPosts.current.map(post => {
               if (post.userId === route.params?.myId && post.createdAt == "null") return newPost
               else return post;
@@ -125,13 +134,13 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     });
     const updatePostSubscription = API.graphql(graphqlOperation(onUpdatePost)).subscribe({ //nvm we dont have a subscription event for incrementlike
       next: event => {
-        console.log("post has been updated");
+        //console.log("post has been updated");
       }
     });
     const incrementLikeSubscription = API.graphql(graphqlOperation(onIncrementLikes)).subscribe({ //nvm we dont have a subscription event for incrementlike
       next: event => {
         const likedPost = event.value.data.onIncrementLikes
-        console.log("newly liked post");
+        //console.log("newly liked post");
         const localLikedPost = currentPosts.current.find(post => post.userId === likedPost.userId && post.createdAt === likedPost.createdAt);
         if (localLikedPost != null) {
           if (localLikedPost.likeDebounce) 
@@ -139,7 +148,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
             localLikedPost.likeDebounce = null;
           }
           else setPosts(currentPosts.current.map(post => {if (post.userId === likedPost.userId && post.createdAt === likedPost.createdAt) {
-            console.log("adding a like");
+            //console.log("adding a like");
             post.likes = post.likes + 1
           } return post}));
         }
@@ -149,7 +158,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       next: event => {
         const unlikedPost = event.value.data.onDecrementLikes
         //console.log(unlikedPost)
-        console.log("newly unliked post");
+        //console.log("newly unliked post");
         const localUnlikedPost = currentPosts.current.find(post => post.userId === unlikedPost.userId && post.createdAt === unlikedPost.createdAt);
         if (localUnlikedPost != null) {
           //console.log("the copy is loaded");
@@ -159,7 +168,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
             localUnlikedPost.likeDebounce = null;
           }
           else setPosts(currentPosts.current.map(post => {if (post.userId === unlikedPost.userId && post.createdAt === unlikedPost.createdAt) {
-            console.log("removing a like");
+            //console.log("removing a like");
             post.likes = post.likes - 1;
           } return post}));
         }
@@ -182,36 +191,54 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       postIds.push({postId: item.createdAt + "#" + item.userId});
     });
 
-    try {
-      const likes = await API.graphql(graphqlOperation(batchGetLikes, { likes: postIds }));
-      //console.log("looking for likes: ", likes);
-      //returns an array of like objects or nulls corresponding with the array of newposts
-      for (i = 0; i < newPosts.length; ++i) {
-        if (newPosts[i].likes == null) {
-          newPosts[i].likes = 0;
-        }
-        if (likes.data.batchGetLikes[i] != null) {
-          console.log("found liked post");
-          newPosts[i].likedByYou = true;
-        } else {
-          newPosts[i].likedByYou = false;
-        }
-      }
-      
-      await Promise.all(newPosts.map((post) => Cache.getItem(post.userId))).then((results) => {
-        console.log("all are complete")
-        for (i = 0; i < newPosts.length; ++i) {
-          if (results[i]) {
-            newPosts[i].info = results[i];
-          } else {            
-            newPosts[i].info = {error: true}
+    try {      
+      await allSettled([
+        API.graphql(graphqlOperation(batchGetLikes, { likes: postIds })).then((likes) => {
+          //console.log("looking for likes: ", likes);
+          //returns an array of like objects or nulls corresponding with the array of newposts
+          for (i = 0; i < newPosts.length; ++i) {
+            if (newPosts[i].likes == null) {
+              newPosts[i].likes = 0;
+            }
+            if (likes.data.batchGetLikes[i] != null) {
+              //console.log("found liked post");
+              newPosts[i].likedByYou = true;
+            } else {
+              newPosts[i].likedByYou = false;
+            }
           }
-        }
-      })
+        }),
+        
+        allSettled(newPosts.map((post) => Cache.getItem(post.userId))).then((results) => {
+          //console.log("all are complete")
+          for (i = 0; i < newPosts.length; ++i) {
+            if (results[i].status === "fulfilled") {
+              newPosts[i].info = results[i].value;
+            } else {            
+              newPosts[i].info = {error: true}
+            }
+          }
+        }),
+        
+        allSettled(newPosts.map((post) => {
+          if (linkify.pretest(post.description) && linkify.test(post.description))
+            return getLinkPreview(linkify.match(post.description)[0].url)
+          else
+            return Promise.reject()
+          })).then((results) => {
+          //console.log(results)
+          for (i = 0; i < newPosts.length; ++i) {
+            if (results[i].status === "fulfilled") {
+              newPosts[i].urlPreview = results[i].value;
+            }
+          }
+        }),
+      ]);
+
+      //console.log(newPosts[0])
 
       return newPosts;
 
-      //we can also fetch the profile image uri and name of each person here rather than making a bunch of different threads with each postitem to do it
       //we can also check if the item contains a link and load the link preview data through here as well, and insert it into the postitem
       //link previews should have a fixed height btw, or at least a max height. but then it could vary between 0 and the max height
     } catch (err) {
@@ -260,7 +287,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
 
   const addPostAsync = async (parentID, replyText) => {
     checkInternetConnection();
-    console.log("attempting to make new post");
+    //console.log("attempting to make new post");
     const newPost = {
       parentId: replyText != null ? parentID.toString() : (new Date(Date.now())).toISOString() + route.params?.myId,
       description: replyText ?? postVal,
@@ -271,17 +298,17 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       newPost.receiver = receiver;
     setPostVal("");
 
-    console.log(route.params?.myId + " just posted.");
+    //console.log(route.params?.myId + " just posted.");
 
     const localNewPost = { ...newPost, userId: route.params?.myId, createdAt: "null" }
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     if (replyText == null) {
-      console.log("posting a WHOLE NEW POST")
+      //console.log("posting a WHOLE NEW POST")
       setPosts([localNewPost, ...posts]);
     }
     else {
-      console.log("posting a reply"  + replyText)
+      //console.log("posting a reply"  + replyText)
       let tempposts = currentPosts.current;
       var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId == newPost.parentId)]);
       tempposts.splice(index + 1, 0, localNewPost);
@@ -311,7 +338,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       return item.createdAt === timestamp && item.userId === route.params?.myId;
     })
 
-    console.log("parent post: " + parent_post.description);
+    //console.log("parent post: " + parent_post.description);
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     if (parent_post.isParent == 1) {
@@ -400,8 +427,8 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
             </View>
           </View>
         }
-        initialAmount={20}
-        additionalAmount={15}
+        initialAmount={5}
+        additionalAmount={5} //change number based on device specs
         processingFunction={getLikedPosts}
         queryOperation={postsByChannel}
         setDataFunction={setPosts}

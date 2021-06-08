@@ -97,6 +97,7 @@ export const ProfileImageAndName = React.memo(function(props) {
   useEffect(() => {
     if (userInfo == null) {
       //we didn't preload
+      console.log("didnt preload")
       Cache.getItem(props.userId, { callback: addUserInfotoCache }) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
       .then((info) => { //will have to check if this gets called after the above callback, aka if setuserinfo is called twice.
         //console.log("info is ", info)
@@ -115,6 +116,7 @@ export const ProfileImageAndName = React.memo(function(props) {
       });
     } else if (userInfo.error) {
       //we tried to preload and the data was not in the cache
+      console.log("data was not found in the cache")
       addUserInfotoCache(); //will fetch the profile image (either thumbnail or fullsize based on the props) and the user's name
     }
   }, []);
@@ -172,7 +174,7 @@ export const ProfileImageAndName = React.memo(function(props) {
                 onPress={goToProfile}
                 style={[props.textStyle, { flexWrap: "wrap", flexShrink: 1 }]}
               >
-                {userInfo != null
+                {userInfo != null && userInfo.name
                     ? userInfo.isFull || userInfo.name.length <= 40
                     ? userInfo.name
                     : userInfo.name.substring(0, 40)

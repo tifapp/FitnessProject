@@ -26,7 +26,7 @@ class APIList extends PureComponent { //we need to make this a class to use refs
 
   componentDidMount() {
     if (this.props.initialState != null) {
-      console.log(this.props.initialState);
+      //console.log(this.props.initialState);
       this.setState(this.props.initialState);
     } else {
       if (!this.props.ignoreInitialLoad) {
@@ -84,13 +84,11 @@ class APIList extends PureComponent { //we need to make this a class to use refs
       let results = [];
 
       const wasBeginning = beginning;
-      const initialAmount = (this.props.initialAmount == null ? 10 : this.props.initialAmount);
-      const additionalAmount = (this.props.additionalAmount == null ? 5 : this.props.additionalAmount);
 
       //if we're trying to chain queries until we reach the end of the database, this would be the most efficient way to do it
       do {
         const query = await API.graphql(
-          graphqlOperation(this.props.queryOperation, { limit: (nextToken == null || beginning) ? initialAmount : additionalAmount, nextToken: beginning ? null : nextToken, ...this.props.filter || {}, })
+          graphqlOperation(this.props.queryOperation, { limit: (nextToken == null || beginning) ? this.props.initialAmount : this.props.additionalAmount, nextToken: beginning ? null : nextToken, ...this.props.filter || {}, })
         );
 
         beginning = false;
@@ -98,7 +96,7 @@ class APIList extends PureComponent { //we need to make this a class to use refs
         results = [...query.data[Object.keys(query.data)[0]].items, ...results]
         //console.log(results);
         //console.log("completed iteration of fetching, amount of results are ", results.length);
-      } while (results.length < (wasBeginning ? initialAmount : additionalAmount) && nextToken != null);
+      } while (results.length < (wasBeginning ? this.props.initialAmount : this.props.additionalAmount) && nextToken != null);
 
       if (this.props.processingFunction != null && results != null && results.length > 0) {
         results = await Promise.resolve(this.props.processingFunction(results)); //make sure this isn't undefined! in processingfunction return the results in the outermost layer!
@@ -131,12 +129,7 @@ class APIList extends PureComponent { //we need to make this a class to use refs
 
   render() {
     return (
-      <View style={this.props.style ?? {
-        alignSelf: "stretch",
-        flex: 1,
-        flexGrow: 1,
-        justifyContent: "center",
-      }}>
+      <View style={this.props.style}>
         {
           this.state.loadingInitial || (this.state.loading && !this.state.loadingMore && !this.state.refreshing)
             ? <ActivityIndicator
@@ -165,9 +158,13 @@ class APIList extends PureComponent { //we need to make this a class to use refs
                 renderItem={this.props.renderItem}
                 keyExtractor={this.props.keyExtractor}
                 onEndReached={this.loadMore}
-                onEndReachedThreshold={this.props.onEndReachedThreshold ?? 1}
+                onEndReachedThreshold={this.props.onEndReachedThreshold}
                 ListEmptyComponent={this.props.ListEmptyComponent}
                 getItemLayout={this.props.getItemLayout}
+                maxToRenderPerBatch={this.props.additionalAmount} //we'll have to do more tests with these numbers. maxrender 6 and batchingperiod 60 with an additionalamount of 10 and lower caused frequent restarting on my android. seems to be the items have to be rendered first, if they render afterwards (show up as blank, then pop in) then they cause the list to crash.
+                //removeClippedSubviews={true} //documentation says this may reduce crashing but causes glitches on ios
+                updateCellsBatchingPeriod={15}//numbers could vary based on device and size of memory. this one should be as big as possible, but 50 and above is too large.
+                windowSize={11}
               />
         }
 
@@ -187,6 +184,18 @@ class APIList extends PureComponent { //we need to make this a class to use refs
         }
       </View>
     )
+  }
+}
+
+APIList.defaultProps = {
+  onEndReachedThreshold: 0,
+  initialAmount: 10,
+  additionalAmount: 15, //should be larger than initialamount to reduce scrolling/delay and for the sake of maxrenderperbatch to reduce blank spaces on initial batch
+  style: {
+    alignSelf: "stretch",
+    flex: 1,
+    flexGrow: 1,
+    justifyContent: "center",
   }
 }
 
