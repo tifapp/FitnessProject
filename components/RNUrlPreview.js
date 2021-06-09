@@ -12,16 +12,17 @@ export default class RNUrlPreview extends React.PureComponent {
   };
 
   renderImage = (imageLink, faviconLink, imageStyle, faviconStyle, imageProps) => {
+    console.log("preview looks like ", this.props.urlPreview)
     return imageLink ? (
       <Image style={{
-        height: 63,
-        width: 112,          
+        height: 81,
+        width: 144,          
         resizeMode: "cover",
       }} source={{uri: imageLink}} {...imageProps} />
     ) : faviconLink ? (
       <Image style={{
-        height: 63,
-        width: 63,          
+        height: 72,
+        width: 72,          
         resizeMode: "cover",
       }} source={{uri: faviconLink}} {...imageProps} />
     ) : null;
@@ -141,14 +142,14 @@ RNUrlPreview.defaultProps = {
   },
   textContainerStyle: {
     flex: 1,
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     alignItems: 'flex-start',
-    padding: 10,
+    paddingHorizontal: 10,
   },
   title: true,
   description: true,
   titleStyle: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#000',
     marginRight: 0,
     marginBottom: 0,

@@ -222,7 +222,11 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         
         allSettled(newPosts.map((post) => {
           if (linkify.pretest(post.description) && linkify.test(post.description))
-            return getLinkPreview(linkify.match(post.description)[0].url)
+            return getLinkPreview(linkify.match(post.description)[0].url, {
+              headers: {
+                "user-agent": "googlebot" // fetches with googlebot crawler user agent
+              }
+            })
           else
             return Promise.reject()
           })).then((results) => {
