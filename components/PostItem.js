@@ -189,7 +189,7 @@ export default React.memo(function PostItem({
           style={
             [item.isParent == 1 ? styles.spaceAround : styles.spaceAroundReply,
             {
-              marginBottom: 10,
+              marginBottom: 20,
               marginHorizontal: 10,
               backgroundColor: "white",
               shadowColor: "#000",
