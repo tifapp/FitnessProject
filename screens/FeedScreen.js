@@ -432,7 +432,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
           </View>
         }
         initialAmount={5}
-        additionalAmount={5} //change number based on device specs
+        additionalAmount={7} //change number based on device specs
         processingFunction={getLikedPosts}
         queryOperation={postsByChannel}
         setDataFunction={setPosts}
@@ -440,7 +440,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         filter={{ channel: getChannel(), sortDirection: "DESC" }}
         renderItem={renderPostItem}
         keyExtractor={(item) => item.createdAt.toString() + item.userId}
-        onEndReachedThreshold={2}
+        onEndReachedThreshold={0.5}
       />
       <View
         style={{

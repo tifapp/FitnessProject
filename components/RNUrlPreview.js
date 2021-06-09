@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Image, Linking, Platform, Text, TouchableOpacity, View, ViewPropTypes, ActivityIndicator} from 'react-native';
+import ImageResizeMode from 'react-native/Libraries/Image/ImageResizeMode'
 
 export default class RNUrlPreview extends React.PureComponent {
   constructor(props) {
@@ -12,19 +13,18 @@ export default class RNUrlPreview extends React.PureComponent {
   };
 
   renderImage = (imageLink, faviconLink, imageStyle, faviconStyle, imageProps) => {
-    console.log("preview looks like ", this.props.urlPreview)
     return imageLink ? (
       <Image style={{
         height: 81,
         width: 144,          
         resizeMode: "cover",
-      }} source={{uri: imageLink}} {...imageProps} />
+      }} resizeMode="cover" source={{uri: imageLink}} {...imageProps} />
     ) : faviconLink ? (
       <Image style={{
         height: 72,
         width: 72,          
         resizeMode: "cover",
-      }} source={{uri: faviconLink}} {...imageProps} />
+      }} resizeMode="cover" source={{uri: faviconLink}} {...imageProps} />
     ) : null;
   };
 

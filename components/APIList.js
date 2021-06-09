@@ -164,7 +164,7 @@ class APIList extends PureComponent { //we need to make this a class to use refs
                 maxToRenderPerBatch={this.props.additionalAmount} //we'll have to do more tests with these numbers. maxrender 6 and batchingperiod 60 with an additionalamount of 10 and lower caused frequent restarting on my android. seems to be the items have to be rendered first, if they render afterwards (show up as blank, then pop in) then they cause the list to crash.
                 //removeClippedSubviews={true} //documentation says this may reduce crashing but causes glitches on ios
                 updateCellsBatchingPeriod={15}//numbers could vary based on device and size of memory. this one should be as big as possible, but 50 and above is too large.
-                windowSize={11}
+                windowSize={21}
               />
         }
 
