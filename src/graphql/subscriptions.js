@@ -8,7 +8,6 @@ export const onIncrementLikes = /* GraphQL */ `
       updatedAt
       userId
       description
-      parentId
       channel
       receiver
       isParent
@@ -24,7 +23,6 @@ export const onDecrementLikes = /* GraphQL */ `
       updatedAt
       userId
       description
-      parentId
       channel
       receiver
       isParent
@@ -262,7 +260,6 @@ export const onCreatePost = /* GraphQL */ `
       updatedAt
       userId
       description
-      parentId
       channel
       receiver
       isParent
@@ -278,7 +275,6 @@ export const onUpdatePost = /* GraphQL */ `
       updatedAt
       userId
       description
-      parentId
       channel
       receiver
       isParent
@@ -294,7 +290,6 @@ export const onDeletePost = /* GraphQL */ `
       updatedAt
       userId
       description
-      parentId
       channel
       receiver
       isParent

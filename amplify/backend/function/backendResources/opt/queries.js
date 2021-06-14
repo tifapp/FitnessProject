@@ -325,18 +325,18 @@ exports.likesByPost = /* GraphQL */ `
     }
   }
 `;
-exports.postsByChannel = /* GraphQL */ `
-  query PostsByChannel(
-    $channel: ID
-    $parentIdIsParentCreatedAt: ModelPostByChannelCompositeKeyConditionInput
+exports.postsByUser = /* GraphQL */ `
+  query PostsByUser(
+    $userId: ID
+    $createdAt: ModelStringKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelPostFilterInput
     $limit: Int
     $nextToken: String
   ) {
-    postsByChannel(
-      channel: $channel
-      parentIdIsParentCreatedAt: $parentIdIsParentCreatedAt
+    postsByUser(
+      userId: $userId
+      createdAt: $createdAt
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit
@@ -347,40 +347,6 @@ exports.postsByChannel = /* GraphQL */ `
         updatedAt
         userId
         description
-        parentId
-        channel
-        receiver
-        isParent
-        likes
-        replies
-      }
-      nextToken
-    }
-  }
-`;
-exports.postsByParentId = /* GraphQL */ `
-  query PostsByParentId(
-    $parentId: String
-    $isParent: ModelIntKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelPostFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    postsByParentId(
-      parentId: $parentId
-      isParent: $isParent
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        createdAt
-        updatedAt
-        userId
-        description
-        parentId
         channel
         receiver
         isParent
@@ -413,7 +379,6 @@ exports.postsByReceiver = /* GraphQL */ `
         updatedAt
         userId
         description
-        parentId
         channel
         receiver
         isParent
@@ -424,8 +389,8 @@ exports.postsByReceiver = /* GraphQL */ `
     }
   }
 `;
-exports.postsByChannelLatest = /* GraphQL */ `
-  query PostsByChannelLatest(
+exports.postsByChannel = /* GraphQL */ `
+  query PostsByChannel(
     $channel: ID
     $createdAt: ModelStringKeyConditionInput
     $sortDirection: ModelSortDirection
@@ -433,7 +398,7 @@ exports.postsByChannelLatest = /* GraphQL */ `
     $limit: Int
     $nextToken: String
   ) {
-    postsByChannelLatest(
+    postsByChannel(
       channel: $channel
       createdAt: $createdAt
       sortDirection: $sortDirection
@@ -446,7 +411,6 @@ exports.postsByChannelLatest = /* GraphQL */ `
         updatedAt
         userId
         description
-        parentId
         channel
         receiver
         isParent
@@ -464,7 +428,6 @@ exports.getPost = /* GraphQL */ `
       updatedAt
       userId
       description
-      parentId
       channel
       receiver
       isParent
@@ -495,7 +458,6 @@ exports.listPosts = /* GraphQL */ `
         updatedAt
         userId
         description
-        parentId
         channel
         receiver
         isParent

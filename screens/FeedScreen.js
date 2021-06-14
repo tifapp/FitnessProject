@@ -97,9 +97,9 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
             }));
           }
           else if (newPost.isParent == 0) {
-              if (currentPosts.current.length > 0 && currentPosts.current.find(post => post.parentId === newPost.parentId)) {
+              if (currentPosts.current.length > 0 && currentPosts.current.find(post => post.channel === newPost.channel)) {
                 let tempposts = currentPosts.current;
-                var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId === newPost.parentId)]);
+                var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.channel === newPost.channel)]);
                 tempposts.splice(index + 1, 0, newPost);                
                 LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
                 setPosts(tempposts);
@@ -282,7 +282,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     const post = tempposts.find(p => {return p.createdAt == createdAt && p.userId == route.params?.myId});
 
     try {
-      await API.graphql(graphqlOperation(updatePost, { input: { createdAt: createdAt, description: editedText, parentId: post.parentId, isParent: post.isParent } }));
+      await API.graphql(graphqlOperation(updatePost, { input: { createdAt: createdAt, description: editedText, isParent: post.isParent } }));
       console.log("success in updating a post");
     } catch (err) {
       console.log("error in updating post: ", err);
@@ -293,9 +293,8 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     checkInternetConnection();
     //console.log("attempting to make new post");
     const newPost = {
-      parentId: replyText != null ? parentID.toString() : (new Date(Date.now())).toISOString() + route.params?.myId,
       description: replyText ?? postVal,
-      channel: getChannel(),
+      channel: replyText != null ? parentID.toString() : getChannel(),
       isParent: replyText != null ? 0 : 1,
     };
     if (receiver != null)
@@ -314,7 +313,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     else {
       //console.log("posting a reply"  + replyText)
       let tempposts = currentPosts.current;
-      var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.parentId == newPost.parentId)]);
+      var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.channel == newPost.channel)]);
       tempposts.splice(index + 1, 0, localNewPost);
       setPosts(tempposts);
     }
@@ -347,7 +346,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     if (parent_post.isParent == 1) {
       setPosts((posts) => {
-        return posts.filter((val) => (val.parentId != parent_post.parentId));
+        return posts.filter((val) => (val.channel != parent_post.channel));
       });
     } else {
       setPosts((posts) => {

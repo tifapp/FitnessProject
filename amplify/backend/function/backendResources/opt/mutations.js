@@ -8,7 +8,6 @@ exports.batchDeletePosts = /* GraphQL */ `
       updatedAt
       userId
       description
-      parentId
       channel
       receiver
       isParent
@@ -24,7 +23,6 @@ exports.incrementLikes = /* GraphQL */ `
       updatedAt
       userId
       description
-      parentId
       channel
       receiver
       isParent
@@ -40,7 +38,6 @@ exports.decrementLikes = /* GraphQL */ `
       updatedAt
       userId
       description
-      parentId
       channel
       receiver
       isParent
@@ -294,7 +291,6 @@ exports.createPost = /* GraphQL */ `
       updatedAt
       userId
       description
-      parentId
       channel
       receiver
       isParent
@@ -313,7 +309,6 @@ exports.updatePost = /* GraphQL */ `
       updatedAt
       userId
       description
-      parentId
       channel
       receiver
       isParent
@@ -332,7 +327,6 @@ exports.deletePost = /* GraphQL */ `
       updatedAt
       userId
       description
-      parentId
       channel
       receiver
       isParent

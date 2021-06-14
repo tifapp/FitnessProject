@@ -172,8 +172,8 @@ export default React.memo(function PostItem({
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState("");
   const [replyingText, setReplyingText] = useState("");
+  const displayTime = printTime(item.createdAt);
   const isReceivedMessage = receiver != null && !writtenByYou;
-  //console.log(parentID);
   
 
   // useEffect(() => {
@@ -308,7 +308,7 @@ export default React.memo(function PostItem({
                   },
                 ]}
                 onPress={() => {
-                  replyButtonHandler(item.parentId, replyingText),
+                  replyButtonHandler(item.channel, replyingText),
                     setReplyingText(""),
                     setIsReplying(false);
                 }}
@@ -373,7 +373,7 @@ export default React.memo(function PostItem({
           <View>
             <Text
               style={{
-                color: "#000",
+                color: "gray",
                 marginTop: 15,
                 textAlign: isReceivedMessage ? "left" : "right",
               }}
