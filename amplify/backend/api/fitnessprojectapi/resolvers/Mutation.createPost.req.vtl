@@ -59,7 +59,7 @@ $util.qr($context.args.input.put("userId", $util.defaultIfNull($ctx.args.input.u
 
 ## [Start] Validate create mutation for @key 'ByChannel'. **
 #set( $hasSeenSomeKeyArg = false )
-#set( $keyFieldNames = ["parentId", "isParent", "createdAt"] )
+#set( $keyFieldNames = ["isParent", "createdAt"] )
 #foreach( $keyFieldName in $keyFieldNames )
 #if( $ctx.args.input.containsKey("$keyFieldName") ) #set( $hasSeenSomeKeyArg = true ) #end
 #end
@@ -71,12 +71,12 @@ $util.qr($context.args.input.put("userId", $util.defaultIfNull($ctx.args.input.u
 ## [End] Validate create mutation for @key 'ByChannel'. **
 #if( $util.isNull($dynamodbNameOverrideMap) )
   #set( $dynamodbNameOverrideMap = {
-  "parentId#isParent#createdAt": "parentIdIsParentCreatedAt"
+  "isParent#createdAt": "IsParentCreatedAt"
 } )
 #else
-  $util.qr($dynamodbNameOverrideMap.put("parentId#isParent#createdAt", "parentIdIsParentCreatedAt"))
+  $util.qr($dynamodbNameOverrideMap.put("isParent#createdAt", "IsParentCreatedAt"))
 #end
-$util.qr($ctx.args.input.put("parentId#isParent#createdAt","${ctx.args.input.parentId}#${ctx.args.input.isParent}#${ctx.args.input.createdAt}"))
+$util.qr($ctx.args.input.put("isParent#createdAt","${ctx.args.input.isParent}#${ctx.args.input.createdAt}"))
 ## [Start] Set the primary @key. **
 #set( $modelObjectKey = {
   "createdAt": $util.dynamodb.toDynamoDB($ctx.args.input.createdAt),

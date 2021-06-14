@@ -26,19 +26,19 @@
         },
         "replyNotifications": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/replyNotifications-5264424370716c423851-build.zip"
+          "s3Key": "amplify-builds/replyNotifications-4f2f7a6f66584f7a4853-build.zip"
         },
         "likeCounter": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/likeCounter-7a6b6873694a31615952-build.zip"
+          "s3Key": "amplify-builds/likeCounter-59362f524b6c546e6f6e-build.zip"
         },
         "friendNotifications": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/friendNotifications-46756b4674702b4f5039-build.zip"
+          "s3Key": "amplify-builds/friendNotifications-48484a4f716a33646e59-build.zip"
         },
         "removeMessagesWhenUnfriend": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/removeMessagesWhenUnfriend-7262382b6d4a5064434f-build.zip"
+          "s3Key": "amplify-builds/removeMessagesWhenUnfriend-76456441636757715437-build.zip"
         },
         "backendResources": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
@@ -46,11 +46,11 @@
         },
         "deleteUserData": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/deleteUserData-77596d386a6843586e43-build.zip"
+          "s3Key": "amplify-builds/deleteUserData-4238464c74414e5a6a52-build.zip"
         },
         "deletePostData": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/deletePostData-6b4831494c352f6c416b-build.zip"
+          "s3Key": "amplify-builds/deletePostData-354a6f37485537797a30-build.zip"
         }
       },
       "hosting": {
@@ -127,6 +127,14 @@
                 }
               ],
               "hash": "ad4uJFnbk0XbNY54eeDgCXH2Wjecj2gUMFO93BnpijQ="
+            },
+            "9": {
+              "permissions": [
+                {
+                  "type": "private"
+                }
+              ],
+              "hash": "8MuSdnUJAHn7Oc+YKRYe9eaHVLAzAtYBupmR021vdBg="
             }
           }
         }
