@@ -14,6 +14,7 @@ import {
   Linking,
   LayoutAnimation,
   Alert,
+  Modal
 } from "react-native";
 import { getUser } from "../src/graphql/queries";
 import { ProfileImageAndName } from "./ProfileImageAndName";
@@ -261,7 +262,15 @@ export default React.memo(function PostItem({
         ) : null}
 
         {isReplying ? (
-          <View>
+            <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            Alert.alert("Modal has been closed.");
+            setModalVisible(!modalVisible);
+          }}
+        >
             <TextInput
               style={[
                 styles.check,
@@ -322,7 +331,7 @@ export default React.memo(function PostItem({
                 <Text style={[styles.buttonTextStyle]}>{"Add Reply"}</Text>
               </TouchableOpacity>
             )}
-          </View>
+            </Modal>
         ) : null}
       </View>
     );
