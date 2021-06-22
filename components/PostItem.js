@@ -20,7 +20,7 @@ import { getUser } from "../src/graphql/queries";
 import { ProfileImageAndName } from "./ProfileImageAndName";
 import { API, graphqlOperation } from "aws-amplify";
 import { createLike, deleteLike } from "root/src/graphql/mutations";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import printTime from "hooks/printTime";
 import SHA256 from "hooks/hash";
 import FeedScreen from "screens/FeedScreen";
@@ -172,6 +172,7 @@ export default React.memo(function PostItem({
   index
 }) {
   const navigation = useNavigation();
+  const route = useRoute();
 
   const [areRepliesVisible, setAreRepliesVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -214,6 +215,7 @@ export default React.memo(function PostItem({
             writtenByYou={writtenByYou}
             setIsEditing={setIsEditing}
             repliesPressed={() => setAreRepliesVisible(!areRepliesVisible)}
+            areRepliesVisible={areRepliesVisible}
           />
           {isEditing ? (
             <TextInput
@@ -267,15 +269,25 @@ export default React.memo(function PostItem({
         <Modal
           animationType="slide"
           transparent={true}
+          statusBarTranslucent={true}
           visible={areRepliesVisible}
           onRequestClose={() => {
             setAreRepliesVisible(false);
           }}
         >
-          <FeedScreen
-            navigation={navigation}
-            channel={SHA256(item.userId+item.createdAt)} //unique id
-          />
+          <TouchableOpacity onPress={()=>setAreRepliesVisible(false)} style={{width: "100%", height: "100%", position: "absolute", backgroundColor: "#00000033"}}> 
+          </TouchableOpacity>
+          <View style={{marginTop: "auto", flex: 0.65, backgroundColor: "white"}}> 
+            <View style={{height: 1, width: "100%", alignSelf: "center", backgroundColor: "lightgray"}}>
+            </View>
+            <View style={{margin: 10, width: 25, height: 2, alignSelf: "center", backgroundColor: "lightgray"}}>
+            </View>
+            <FeedScreen
+              navigation={navigation}
+              route={route}
+              channel={SHA256(item.userId+item.createdAt)} //unique id
+            />
+          </View>
         </Modal>
       </View>
     );
@@ -340,7 +352,7 @@ export default React.memo(function PostItem({
   }
 }, (oldProps,newProps)=>oldProps.item == newProps.item)
 
-function PostHeader({item, writtenByYou, repliesPressed, deletePostsAsync, setIsEditing}) {
+function PostHeader({item, writtenByYou, repliesPressed, deletePostsAsync, setIsEditing, areRepliesVisible}) {
   return (
     <View
       style={{
@@ -398,7 +410,7 @@ function PostHeader({item, writtenByYou, repliesPressed, deletePostsAsync, setIs
                   {
                     paddingRight: 6,
                     fontWeight: "bold",
-                    color: isReplying ? "blue" : "gray",
+                    color: areRepliesVisible ? "blue" : "gray",
                   },
                 ]}
               >
@@ -407,14 +419,14 @@ function PostHeader({item, writtenByYou, repliesPressed, deletePostsAsync, setIs
               <MaterialIcons
                 name="chat-bubble-outline"
                 size={17}
-                color={isReplying ? "blue" : "gray"}
+                color={areRepliesVisible ? "blue" : "gray"}
                 style={{ marginRight: 0 }}
               />
             </TouchableOpacity>
           </View>
         }
       />
-      {isReplying ? (
+      {areRepliesVisible ? (
         <View
           style={[
             {
