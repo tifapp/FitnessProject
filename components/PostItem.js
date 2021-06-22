@@ -22,6 +22,7 @@ import { API, graphqlOperation } from "aws-amplify";
 import { createLike, deleteLike } from "root/src/graphql/mutations";
 import { useNavigation } from "@react-navigation/native";
 import printTime from "hooks/printTime";
+import SHA256 from "hooks/hash";
 import FeedScreen from "screens/FeedScreen";
 import { MaterialIcons } from "@expo/vector-icons";
 
@@ -170,6 +171,8 @@ export default React.memo(function PostItem({
   newSection,
   index
 }) {
+  const navigation = useNavigation();
+
   const [areRepliesVisible, setAreRepliesVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState("");
@@ -271,9 +274,7 @@ export default React.memo(function PostItem({
         >
           <FeedScreen
             navigation={navigation}
-            route={route}
-            receiver={userId}
-            channel={} //unique id
+            channel={SHA256(item.userId+item.createdAt)} //unique id
           />
         </Modal>
       </View>
