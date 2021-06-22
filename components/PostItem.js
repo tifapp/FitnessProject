@@ -22,6 +22,7 @@ import { API, graphqlOperation } from "aws-amplify";
 import { createLike, deleteLike } from "root/src/graphql/mutations";
 import { useNavigation } from "@react-navigation/native";
 import printTime from "hooks/printTime";
+import FeedScreen from "screens/FeedScreen";
 import { MaterialIcons } from "@expo/vector-icons";
 
 import * as Haptics from "expo-haptics";
@@ -169,7 +170,7 @@ export default React.memo(function PostItem({
   newSection,
   index
 }) {
-  const [isReplying, setIsReplying] = useState(false);
+  const [areRepliesVisible, setAreRepliesVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState("");
   const [replyingText, setReplyingText] = useState("");
@@ -209,8 +210,7 @@ export default React.memo(function PostItem({
             deletePostsAsync={deletePostsAsync}
             writtenByYou={writtenByYou}
             setIsEditing={setIsEditing}
-            isReplying={isReplying}
-            setIsReplying={setIsReplying}
+            repliesPressed={() => setAreRepliesVisible(!areRepliesVisible)}
           />
           {isEditing ? (
             <TextInput
@@ -261,78 +261,21 @@ export default React.memo(function PostItem({
           )
         ) : null}
 
-        {isReplying ? (
-            <Modal
+        <Modal
           animationType="slide"
           transparent={true}
-          visible={modalVisible}
+          visible={areRepliesVisible}
           onRequestClose={() => {
-            Alert.alert("Modal has been closed.");
-            setModalVisible(!modalVisible);
+            setAreRepliesVisible(false);
           }}
         >
-            <TextInput
-              style={[
-                styles.check,
-                {
-                  borderColor: "blue",
-                  backgroundColor: "#efefef",
-                  marginHorizontal: 24,
-                  paddingVertical: 12,
-                },
-              ]}
-              onChangeText={setReplyingText}
-              autoFocus={true}
-            />
-            {replyingText === "" ? (
-              <TouchableOpacity
-                style={[
-                  styles.unselectedButtonStyle,
-                  { flexDirection: "row", margin: 15 },
-                ]}
-                onPress={() => {
-                  alert("Reply can't be empty");
-                }}
-              >
-                <MaterialIcons
-                  name="add-circle"
-                  size={30}
-                  color={"gray"}
-                  style={{ marginRight: 0 }}
-                />
-                <Text style={[styles.buttonTextStyle, { color: "gray" }]}>
-                  {"Add Reply"}
-                </Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                style={[
-                  styles.buttonStyle,
-                  {
-                    backgroundColor: "orange",
-                    padding: 10,
-                    borderRadius: 5,
-                    margin: 15,
-                    flexDirection: "row",
-                  },
-                ]}
-                onPress={() => {
-                  replyButtonHandler(item.channel, replyingText),
-                    setReplyingText(""),
-                    setIsReplying(false);
-                }}
-              >
-                <MaterialIcons
-                  name="add-circle"
-                  size={30}
-                  color={"white"}
-                  style={{ marginRight: 0 }}
-                />
-                <Text style={[styles.buttonTextStyle]}>{"Add Reply"}</Text>
-              </TouchableOpacity>
-            )}
-            </Modal>
-        ) : null}
+          <FeedScreen
+            navigation={navigation}
+            route={route}
+            receiver={userId}
+            channel={} //unique id
+          />
+        </Modal>
       </View>
     );
   else {
@@ -396,7 +339,7 @@ export default React.memo(function PostItem({
   }
 }, (oldProps,newProps)=>oldProps.item == newProps.item)
 
-function PostHeader({item, writtenByYou, isReplying, deletePostsAsync, setIsReplying, setIsEditing}) {
+function PostHeader({item, writtenByYou, repliesPressed, deletePostsAsync, setIsEditing}) {
   return (
     <View
       style={{
@@ -447,7 +390,7 @@ function PostHeader({item, writtenByYou, isReplying, deletePostsAsync, setIsRepl
                   alignItems: "flex-end",
                 },
               ]}
-              onPress={() => setIsReplying(!isReplying)}
+              onPress={repliesPressed}
             >
               <Text
                 style={[
