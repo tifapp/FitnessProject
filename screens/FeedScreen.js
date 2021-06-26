@@ -41,7 +41,7 @@ var styles = require('styles/stylesheet');
 
 var allSettled = require('promise.allsettled');
 
-export default function FeedScreen({ navigation, route, receiver, channel, headerComponent }) {
+export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, originalParentId }) {
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
   //const numCharsLeft = 1000 - postVal.length;
@@ -296,8 +296,10 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       description: replyText ?? postVal,
       channel: replyText != null ? parentId.toString() : getChannel(),
     };
-    if (replyText != null) {  
-      newPost.parentId = parentId.toString()
+    if (originalParentId != null) {  
+      newPost.parentId = originalParentId
+    } else if (replyText != null) {
+      newPost.parentId = parentId
     }
     if (receiver != null) {
       newPost.receiver = receiver;
