@@ -94,7 +94,7 @@ const App = () => {
 
   const [userId, setUserId] = useState('checking...'); //stores the user's id if logged in
 
-  const [friendIds, setFriendIds] = useState([]);
+  const [conversationIds, setConversationIds] = useState([]);
 
   const checkIfUserSignedUp = async () => {
     try {
@@ -168,9 +168,9 @@ const App = () => {
     setAppStateVisible(appState.current);
   };
 
-  const setUniqueFriendIds = (items) => {
-    if (JSON.stringify(friendIds.sort()) !== JSON.stringify(items.sort())) //will work when objects are shuffled, but all items will probably refresh still if there's one extra item added to the list
-      setFriendIds(items);
+  const setUniqueConversationIds = (items) => {
+    if (JSON.stringify(conversationIds.sort()) !== JSON.stringify(items.sort())) //will work when objects are shuffled, but all items will probably refresh still if there's one extra item added to the list
+      setConversationIds(items);
   }
 
   useEffect(() => {
@@ -236,7 +236,7 @@ const App = () => {
           drawerContent={(props) => (
             <CustomSidebarMenu
               myId={userId}
-              setFriendIds={setUniqueFriendIds}
+              setConversationIds={setUniqueConversationIds}
               {...props}
             />
           )}
@@ -264,12 +264,12 @@ const App = () => {
             component={SettingsScreen}
             initialParams={{ myId: userId }}
           />
-          {friendIds.map((friendId) => (
+          {conversationIds.map((conversationId) => (
             <Drawer.Screen
-              key={friendId}
-              name={friendId}
+              key={conversationId}
+              name={conversationId}
               component={MessageScreen}
-              initialParams={{ myId: userId, userId: friendId }}
+              initialParams={{ myId: userId, userId: conversationId }}
             />
           ))}
         </Drawer.Navigator>

@@ -46,7 +46,7 @@ import { batchGetReadReceipts } from "../src/graphql/queries";
 var subscriptions = [];
 global.localBlockList = [];
 
-export default function CustomSidebarMenu({ navigation, state, progress, myId, setFriendIds }) {
+export default function CustomSidebarMenu({ navigation, state, progress, myId, setConversationIds }) {
   const [lastOnlineTime, setLastOnlineTime] = useState(0);
   const [friendList, setFriendList] = useState([]);
   const [friendRequestList, setFriendRequestList] = useState([]);
@@ -65,7 +65,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
   useEffect(() => {
     const friendIds = [];
     friendList.forEach(friend => friendIds.push(friend.sender == myId ? friend.receiver : friend.sender));
-    setFriendIds(friendIds);
+    setConversationIds(friendIds);
   }, [friendList]) //we must extract just the array of ids
 
   /*

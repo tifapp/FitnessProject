@@ -61,6 +61,12 @@ const LookupUser = ({ route, navigation }) => {
   let onUpdate = "";
   let onDelete = "";
 
+  const goToMessages = (id) => {
+    if (!navigation.push)
+      navigation.navigate(id);
+    else navigation.push(id);
+  };
+
   const checkUsersInfo = async () => {
     try {
       console.log("on the lookup screen, id is: ", userId);
@@ -544,6 +550,11 @@ const LookupUser = ({ route, navigation }) => {
               <View>
                 <View style={styles.viewProfileScreen}>
                   <Text>Friends for {friendsSince} </Text>
+                </View>
+                <View style={styles.messageButton}>
+                  <Text>
+                    Message
+                  </Text>
                 </View>
                 <TouchableOpacity
                   onPress={deleteFriend}
