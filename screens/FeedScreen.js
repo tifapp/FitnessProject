@@ -96,7 +96,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
               else return post;
             }));
           }
-          else if (newPost.isParent == 0) {
+          else if (newPost.parentId != null) {
               if (currentPosts.current.length > 0 && currentPosts.current.find(post => post.channel === newPost.channel)) {
                 let tempposts = currentPosts.current;
                 var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.channel === newPost.channel)]);
@@ -282,23 +282,26 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     const post = tempposts.find(p => {return p.createdAt == createdAt && p.userId == route.params?.myId});
 
     try {
-      await API.graphql(graphqlOperation(updatePost, { input: { createdAt: createdAt, description: editedText, isParent: post.isParent } }));
+      await API.graphql(graphqlOperation(updatePost, { input: { createdAt: createdAt, description: editedText } }));
       console.log("success in updating a post");
     } catch (err) {
       console.log("error in updating post: ", err);
     }
   }
 
-  const addPostAsync = async (parentID, replyText) => {
+  const addPostAsync = async (parentId, replyText) => {
     checkInternetConnection();
     //console.log("attempting to make new post");
     const newPost = {
       description: replyText ?? postVal,
-      channel: replyText != null ? parentID.toString() : getChannel(),
-      isParent: replyText != null ? 0 : 1,
+      channel: replyText != null ? parentId.toString() : getChannel(),
     };
-    if (receiver != null)
+    if (replyText != null) {  
+      newPost.parentId = parentId.toString()
+    }
+    if (receiver != null) {
       newPost.receiver = receiver;
+    }
     setPostVal("");
 
     //console.log(route.params?.myId + " just posted.");
@@ -344,7 +347,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     //console.log("parent post: " + parent_post.description);
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    if (parent_post.isParent == 1) {
+    if (parent_post.parentId == null) {
       setPosts((posts) => {
         return posts.filter((val) => (val.channel != parent_post.channel));
       });

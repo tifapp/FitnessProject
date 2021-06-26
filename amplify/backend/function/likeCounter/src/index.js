@@ -10,7 +10,7 @@ exports.handler = (event, context, callback) => {
   //eslint-disable-line
   event.Records.forEach((record) => {
     if (record.eventName == "INSERT" || record.eventName == "REMOVE") {
-      console.log("record is ", record);
+      //console.log("record is ", record);
       const postId = record.eventName == "INSERT" ? record.dynamodb.NewImage.postId.S : record.dynamodb.OldImage.postId.S;
 
       (async () => {
@@ -21,11 +21,6 @@ exports.handler = (event, context, callback) => {
           const ids = postId.split("#");
           const createdAt = ids[0];
           const userId = ids[1];
-          const channel = ids[2];
-          const parentId = ids[3];
-          const isParent = ids[4];
-
-          console.log("postid is ", postId);
 
           const inputVariables = {
             createdAt: createdAt,

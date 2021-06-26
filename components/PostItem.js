@@ -193,7 +193,7 @@ export default React.memo(function PostItem({
         backgroundColor: "#efefef",}]}>
         <View
           style={
-            [item.isParent == 1 ? styles.spaceAround : styles.spaceAroundReply,
+            [styles.spaceAround,
             {
               marginBottom: 20,
               marginHorizontal: 10,

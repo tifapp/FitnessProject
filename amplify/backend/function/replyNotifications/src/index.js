@@ -1,8 +1,9 @@
 require('isomorphic-fetch');
 const gql = require('graphql-tag');
 
+const { incrementComments, decrementComments } = require('/opt/mutations');
+const {getUser} = require('/opt/queries');
 const { client, sendNotification } = require('/opt/backendResources');
-const {getUser, postsByParentId} = require('/opt/queries');
 const {loadCapitals} = require('/opt/stringConversion');
 
 exports.handler = (event, context, callback) => {
@@ -12,11 +13,8 @@ exports.handler = (event, context, callback) => {
         try {
           if (record.dynamodb.NewImage.receiver != null) {
             //message notifications
-            console.log("the new post is indeed a message")
             const receiver = record.dynamodb.NewImage.receiver.S;
             const sender = record.dynamodb.NewImage.userId.S;
-            
-            console.log("successfully saved receiver and sender variables")
   
             const receiverName = await client.query({
               query: gql(getUser),
@@ -32,47 +30,44 @@ exports.handler = (event, context, callback) => {
               }
             });
   
-            console.log(receiverName.data.getUser)
-            console.log(senderName.data.getUser)
+            //console.log(receiverName.data.getUser)
+            //console.log(senderName.data.getUser)
   
             await sendNotification(receiverName.data.getUser.deviceToken, loadCapitals(senderName.data.getUser.name) + " sent you a message!"); //truncate the sender's name!
-            console.log("sent notifications finished")
+            //console.log("sent notifications finished")
             callback(null, "Successfully sent messaging notification");
-          } else if (record.dynamodb.NewImage.isParent.N == 0) {
+          } else if (record.dynamodb.NewImage.parentId != null) {
             //reply notifications
-            const parentId = record.dynamodb.NewImage.parentId.S;
-            const childId = record.dynamodb.NewImage.userId.S;
-  
-            console.log(record.dynamodb.NewImage);
-  
-            const parents = await client.query({
-              query: gql(postsByParentId),
+            const parentPostId = record.dynamodb.NewImage.parentId.S;
+            const replierId = record.dynamodb.NewImage.userId.S;
+            
+            const ids = parentPostId.split("#");
+            const createdAt = ids[0];
+            const userId = ids[1];
+            
+            const inputVariables = {
+              createdAt: createdAt,
+              userId: userId,
+            };
+            
+            client.mutate({
+              mutation: gql(incrementComments),
               variables: {
-                parentId: parentId,
-                sortDirection: 'DESC',
-                limit: 1
+                input: inputVariables,
+              },
+            });
+  
+            const replier = await client.query({
+              query: gql(getUser),
+              variables: {
+                id: replierId
               }
             });
   
-            const uniqueParentNames = parents.data.postsByParentId.items[0];
-  
-            console.log("*************************************************");
-            console.log(uniqueParentNames);
-            console.log("*************************************************");
-  
-            const childPost = await client.query({
+            const parent = await client.query({
               query: gql(getUser),
               variables: {
-                id: childId
-              }
-            });
-  
-            console.log("fetched child post");
-  
-            const parentPost = await client.query({
-              query: gql(getUser),
-              variables: {
-                id: uniqueParentNames.userId
+                id: userId
               }
             });
   
@@ -85,7 +80,7 @@ exports.handler = (event, context, callback) => {
             // });
   
             //if (friendshipcheck.data.getFriendship != null) {
-              await sendNotification(parentPost.data.getUser.deviceToken, loadCapitals(childPost.data.getUser.name) + " sent you a reply!"); //truncate the sender's name!
+              await sendNotification(parent.data.getUser.deviceToken, loadCapitals(replier.data.getUser.name) + " sent you a reply!"); //truncate the sender's name!
               callback(null, "Finished Replying");
             //}
           } else {
@@ -93,7 +88,40 @@ exports.handler = (event, context, callback) => {
           }
         }
         catch (e) {
-          console.warn('Error sending reply: ', e);
+          //console.warn('Error sending reply: ', e);
+          callback(Error(e));
+        }
+      })();
+    } else if (record.eventName == "REMOVE") {
+      (async () => {
+        try {
+          if (record.dynamodb.OldImage.parentId != null) {
+            //reply notifications
+            const parentPostId = record.dynamodb.OldImage.parentId.S;
+            
+            const ids = parentPostId.split("#");
+            const createdAt = ids[0];
+            const userId = ids[1];
+            
+            const inputVariables = {
+              createdAt: createdAt,
+              userId: userId,
+            };
+            
+            client.mutate({
+              mutation: gql(decrementComments),
+              variables: {
+                input: inputVariables,
+              },
+            });
+            
+            callback(null, "Finished Replying");
+          } else {
+            callback(null, "not a message or reply");
+          }
+        }
+        catch (e) {
+          //console.warn('Error sending reply: ', e);
           callback(Error(e));
         }
       })();
