@@ -21,9 +21,6 @@ exports.handler = (event, context, callback) => {
           const ids = postId.split("#");
           const createdAt = ids[0];
           const userId = ids[1];
-          const channel = ids[2];
-          const parentId = ids[3];
-          const isParent = ids[4];
 
           console.log("postid is ", postId);
 
