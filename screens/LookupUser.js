@@ -384,6 +384,13 @@ const LookupUser = ({ route, navigation }) => {
             />
           </View>
 
+          <TouchableOpacity
+                  style={styles.messageButton}
+                >
+                  <Text style={styles.buttonTextStyle}>Message</Text>
+                </TouchableOpacity>
+
+
           <View>
             <View style={styles.viewProfileScreen}>
               <Text>Gender: {user.gender}</Text>
@@ -550,11 +557,6 @@ const LookupUser = ({ route, navigation }) => {
               <View>
                 <View style={styles.viewProfileScreen}>
                   <Text>Friends for {friendsSince} </Text>
-                </View>
-                <View style={styles.messageButton}>
-                  <Text>
-                    Message
-                  </Text>
                 </View>
                 <TouchableOpacity
                   onPress={deleteFriend}
