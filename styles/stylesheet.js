@@ -56,7 +56,13 @@ module.exports = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
   },
-
+  messageButton: {
+    marginTop: 20,
+    alignSelf: "center",
+    backgroundColor: "blue",
+    padding: 10,
+    borderRadius: 5
+  },
   secondaryContainerStyle: {
     backgroundColor: "#fefefe",
   },
