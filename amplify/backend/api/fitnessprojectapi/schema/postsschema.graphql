@@ -36,7 +36,7 @@ type Post @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
   description: String
   channel: ID
   receiver: ID
-  isParent: Int
+  parentId: ID
 }
 
 """
@@ -46,7 +46,7 @@ input CreatePostInput {
   description: String
   channel: ID
   receiver: ID
-  isParent: Int
+  parentId: ID
 }
 
 """
@@ -55,14 +55,11 @@ This allows us to fill in the missing fields in the backend rather than letting 
 input UpdatePostInput {
   createdAt: AWSDateTime!
   description: String
-  isParent: Int
 }
 
 input incrementLikesInput {
   createdAt: AWSDateTime!
   userId: ID!
-  isParent: Int
-  channel: ID
 }
 
 """

@@ -10,7 +10,7 @@ export const onIncrementLikes = /* GraphQL */ `
       description
       channel
       receiver
-      isParent
+      parentId
       likes
       replies
     }
@@ -25,7 +25,7 @@ export const onDecrementLikes = /* GraphQL */ `
       description
       channel
       receiver
-      isParent
+      parentId
       likes
       replies
     }
@@ -262,7 +262,7 @@ export const onCreatePost = /* GraphQL */ `
       description
       channel
       receiver
-      isParent
+      parentId
       likes
       replies
     }
@@ -277,7 +277,7 @@ export const onUpdatePost = /* GraphQL */ `
       description
       channel
       receiver
-      isParent
+      parentId
       likes
       replies
     }
@@ -292,7 +292,7 @@ export const onDeletePost = /* GraphQL */ `
       description
       channel
       receiver
-      isParent
+      parentId
       likes
       replies
     }
