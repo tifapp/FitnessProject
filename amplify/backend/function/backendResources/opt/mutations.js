@@ -10,7 +10,7 @@ exports.batchDeletePosts = /* GraphQL */ `
       description
       channel
       receiver
-      isParent
+      parentId
       likes
       replies
     }
@@ -25,7 +25,7 @@ exports.incrementLikes = /* GraphQL */ `
       description
       channel
       receiver
-      isParent
+      parentId
       likes
       replies
     }
@@ -40,7 +40,37 @@ exports.decrementLikes = /* GraphQL */ `
       description
       channel
       receiver
-      isParent
+      parentId
+      likes
+      replies
+    }
+  }
+`;
+exports.incrementReplies = /* GraphQL */ `
+  mutation IncrementReplies($input: incrementLikesInput!) {
+    incrementReplies(input: $input) {
+      createdAt
+      updatedAt
+      userId
+      description
+      channel
+      receiver
+      parentId
+      likes
+      replies
+    }
+  }
+`;
+exports.decrementReplies = /* GraphQL */ `
+  mutation DecrementReplies($input: incrementLikesInput!) {
+    decrementReplies(input: $input) {
+      createdAt
+      updatedAt
+      userId
+      description
+      channel
+      receiver
+      parentId
       likes
       replies
     }
@@ -100,32 +130,6 @@ exports.deleteGroup = /* GraphQL */ `
       latitude
       createdAt
       updatedAt
-    }
-  }
-`;
-exports.updateLike = /* GraphQL */ `
-  mutation UpdateLike(
-    $input: UpdateLikeInput!
-    $condition: ModelLikeConditionInput
-  ) {
-    updateLike(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      userId
-      postId
-    }
-  }
-`;
-exports.deleteReadReceipt = /* GraphQL */ `
-  mutation DeleteReadReceipt(
-    $input: DeleteReadReceiptInput!
-    $condition: ModelReadReceiptConditionInput
-  ) {
-    deleteReadReceipt(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      userId
-      conversationId
     }
   }
 `;
@@ -268,6 +272,19 @@ exports.createLike = /* GraphQL */ `
     }
   }
 `;
+exports.updateLike = /* GraphQL */ `
+  mutation UpdateLike(
+    $input: UpdateLikeInput!
+    $condition: ModelLikeConditionInput
+  ) {
+    updateLike(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      userId
+      postId
+    }
+  }
+`;
 exports.deleteLike = /* GraphQL */ `
   mutation DeleteLike(
     $input: DeleteLikeInput!
@@ -278,6 +295,24 @@ exports.deleteLike = /* GraphQL */ `
       updatedAt
       userId
       postId
+    }
+  }
+`;
+exports.deletePost = /* GraphQL */ `
+  mutation DeletePost(
+    $input: DeletePostInput!
+    $condition: ModelPostConditionInput
+  ) {
+    deletePost(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      userId
+      description
+      channel
+      receiver
+      parentId
+      likes
+      replies
     }
   }
 `;
@@ -293,7 +328,7 @@ exports.createPost = /* GraphQL */ `
       description
       channel
       receiver
-      isParent
+      parentId
       likes
       replies
     }
@@ -311,25 +346,7 @@ exports.updatePost = /* GraphQL */ `
       description
       channel
       receiver
-      isParent
-      likes
-      replies
-    }
-  }
-`;
-exports.deletePost = /* GraphQL */ `
-  mutation DeletePost(
-    $input: DeletePostInput!
-    $condition: ModelPostConditionInput
-  ) {
-    deletePost(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      userId
-      description
-      channel
-      receiver
-      isParent
+      parentId
       likes
       replies
     }
@@ -354,6 +371,19 @@ exports.updateReadReceipt = /* GraphQL */ `
     $condition: ModelReadReceiptConditionInput
   ) {
     updateReadReceipt(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      userId
+      conversationId
+    }
+  }
+`;
+exports.deleteReadReceipt = /* GraphQL */ `
+  mutation DeleteReadReceipt(
+    $input: DeleteReadReceiptInput!
+    $condition: ModelReadReceiptConditionInput
+  ) {
+    deleteReadReceipt(input: $input, condition: $condition) {
       createdAt
       updatedAt
       userId

@@ -1,7 +1,7 @@
 require('isomorphic-fetch');
 const gql = require('graphql-tag');
 
-const { incrementComments, decrementComments } = require('/opt/mutations');
+const { incrementReplies, decrementReplies } = require('/opt/mutations');
 const {getUser} = require('/opt/queries');
 const { client, sendNotification } = require('/opt/backendResources');
 const {loadCapitals} = require('/opt/stringConversion');
@@ -51,7 +51,7 @@ exports.handler = (event, context, callback) => {
             };
             
             client.mutate({
-              mutation: gql(incrementComments),
+              mutation: gql(incrementReplies),
               variables: {
                 input: inputVariables,
               },
@@ -109,7 +109,7 @@ exports.handler = (event, context, callback) => {
             };
             
             client.mutate({
-              mutation: gql(decrementComments),
+              mutation: gql(decrementReplies),
               variables: {
                 input: inputVariables,
               },

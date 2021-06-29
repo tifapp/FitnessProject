@@ -194,34 +194,6 @@ exports.conversationsByLastUpdated = /* GraphQL */ `
     }
   }
 `;
-exports.friendsByReceiver = /* GraphQL */ `
-  query FriendsByReceiver(
-    $receiver: ID
-    $createdAt: ModelStringKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelFriendshipFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    friendsByReceiver(
-      receiver: $receiver
-      createdAt: $createdAt
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        createdAt
-        updatedAt
-        sender
-        receiver
-        accepted
-      }
-      nextToken
-    }
-  }
-`;
 exports.getFriendship = /* GraphQL */ `
   query GetFriendship($sender: ID!, $receiver: ID!) {
     getFriendship(sender: $sender, receiver: $receiver) {
@@ -249,6 +221,34 @@ exports.listFriendships = /* GraphQL */ `
       limit: $limit
       nextToken: $nextToken
       sortDirection: $sortDirection
+    ) {
+      items {
+        createdAt
+        updatedAt
+        sender
+        receiver
+        accepted
+      }
+      nextToken
+    }
+  }
+`;
+exports.friendsByReceiver = /* GraphQL */ `
+  query FriendsByReceiver(
+    $receiver: ID
+    $createdAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelFriendshipFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    friendsByReceiver(
+      receiver: $receiver
+      createdAt: $createdAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
     ) {
       items {
         createdAt
@@ -349,7 +349,7 @@ exports.postsByUser = /* GraphQL */ `
         description
         channel
         receiver
-        isParent
+        parentId
         likes
         replies
       }
@@ -381,7 +381,7 @@ exports.postsByReceiver = /* GraphQL */ `
         description
         channel
         receiver
-        isParent
+        parentId
         likes
         replies
       }
@@ -413,7 +413,7 @@ exports.postsByChannel = /* GraphQL */ `
         description
         channel
         receiver
-        isParent
+        parentId
         likes
         replies
       }
@@ -430,7 +430,7 @@ exports.getPost = /* GraphQL */ `
       description
       channel
       receiver
-      isParent
+      parentId
       likes
       replies
     }
@@ -460,7 +460,7 @@ exports.listPosts = /* GraphQL */ `
         description
         channel
         receiver
-        isParent
+        parentId
         likes
         replies
       }

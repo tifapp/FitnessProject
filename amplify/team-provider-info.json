@@ -26,7 +26,7 @@
         },
         "replyNotifications": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/replyNotifications-5536612b4c2f54394e53-build.zip"
+          "s3Key": "amplify-builds/replyNotifications-41695559324d536c4448-build.zip"
         },
         "likeCounter": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
@@ -42,7 +42,7 @@
         },
         "backendResources": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/backendResources-build.zip"
+          "s3Key": "amplify-builds/backendResources-LambdaLayerVersiondbf0a6fb-build.zip"
         },
         "deleteUserData": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
@@ -57,86 +57,6 @@
         "amplifyhosting": {
           "appId": "d19kzf7eu35pq1",
           "type": "manual"
-        }
-      }
-    },
-    "nonCFNdata": {
-      "function": {
-        "backendResources": {
-          "layerVersionMap": {
-            "1": {
-              "permissions": [
-                {
-                  "type": "private"
-                }
-              ],
-              "hash": "WQIJy2I/uBiysLTOHewNTi6xvwTeYrENuFbt3zMB4lU="
-            },
-            "2": {
-              "permissions": [
-                {
-                  "type": "private"
-                }
-              ],
-              "hash": "aqU0yeoKUBQ/kh/R91LQhVnOz9xwyyEnbh1OEcdIKn0="
-            },
-            "3": {
-              "permissions": [
-                {
-                  "type": "private"
-                }
-              ],
-              "hash": "Fbscgm9pCQKHMvX70/xEuPaC8HBjp2KTsJS4IymOg6w="
-            },
-            "4": {
-              "permissions": [
-                {
-                  "type": "private"
-                }
-              ],
-              "hash": "fX/zSuMoQtYnxnidvgZQboE9Axi2gK1Tu1Ca0uTR0Ds="
-            },
-            "5": {
-              "permissions": [
-                {
-                  "type": "private"
-                }
-              ],
-              "hash": "D8yNrYtMZkcEnGfeHAfwK0rN1pkrXOELDMhSeoMSmoE="
-            },
-            "6": {
-              "permissions": [
-                {
-                  "type": "private"
-                }
-              ],
-              "hash": "nP/UUZWjfNAMEANlmQ+mOyC1VogiR4wSdPf0kGRZNu0="
-            },
-            "7": {
-              "permissions": [
-                {
-                  "type": "private"
-                }
-              ],
-              "hash": "HKr6Bn6cCXOIohVIyU4HpdEcq1aBOilI7jRJWml/efU="
-            },
-            "8": {
-              "permissions": [
-                {
-                  "type": "private"
-                }
-              ],
-              "hash": "ad4uJFnbk0XbNY54eeDgCXH2Wjecj2gUMFO93BnpijQ="
-            },
-            "9": {
-              "permissions": [
-                {
-                  "type": "private"
-                }
-              ],
-              "hash": "8MuSdnUJAHn7Oc+YKRYe9eaHVLAzAtYBupmR021vdBg="
-            }
-          }
         }
       }
     }

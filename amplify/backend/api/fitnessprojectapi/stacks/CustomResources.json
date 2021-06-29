@@ -26,199 +26,275 @@
       "Description": "An S3 key relative to the S3DeploymentBucket that points to the root\nof the deployment directory."
     }
   },
-  "Resources": {
-    "EmptyResource": {
-      "Type": "Custom::EmptyResource",
-      "Condition": "AlwaysFalse"
-    },
-    "batchGetLikesResolver": {
-      "Type": "AWS::AppSync::Resolver",
-      "Properties": {
-        "ApiId": {
-          "Ref": "AppSyncApiId"
+    "Resources": {
+        "EmptyResource": {
+            "Type": "Custom::EmptyResource",
+            "Condition": "AlwaysFalse"
         },
-        "DataSourceName": "LikeTable",
-        "TypeName": "Query",
-        "FieldName": "batchGetLikes",
-        "RequestMappingTemplateS3Location": {
-          "Fn::Sub": [
-            "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Query.batchGetLikes.req.vtl",
-            {
-              "S3DeploymentBucket": {
-                "Ref": "S3DeploymentBucket"
-              },
-              "S3DeploymentRootKey": {
-                "Ref": "S3DeploymentRootKey"
-              }
+        "batchGetLikesResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Ref": "AppSyncApiId"
+                },
+                "DataSourceName": "LikeTable",
+                "TypeName": "Query",
+                "FieldName": "batchGetLikes",
+                "RequestMappingTemplateS3Location": {
+                    "Fn::Sub": [
+                        "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Query.batchGetLikes.req.vtl",
+                        {
+                            "S3DeploymentBucket": {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "S3DeploymentRootKey": {
+                                "Ref": "S3DeploymentRootKey"
+                            }
+                        }
+                    ]
+                },
+                "ResponseMappingTemplateS3Location": {
+                    "Fn::Sub": [
+                        "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Query.batchGetLikes.res.vtl",
+                        {
+                            "S3DeploymentBucket": {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "S3DeploymentRootKey": {
+                                "Ref": "S3DeploymentRootKey"
+                            }
+                        }
+                    ]
+                }
             }
-          ]
         },
-        "ResponseMappingTemplateS3Location": {
-          "Fn::Sub": [
-            "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Query.batchGetLikes.res.vtl",
-            {
-              "S3DeploymentBucket": {
-                "Ref": "S3DeploymentBucket"
-              },
-              "S3DeploymentRootKey": {
-                "Ref": "S3DeploymentRootKey"
-              }
+        "batchGetReadReceiptsResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Ref": "AppSyncApiId"
+                },
+                "DataSourceName": "ReadReceiptTable",
+                "TypeName": "Query",
+                "FieldName": "batchGetReadReceipts",
+                "RequestMappingTemplateS3Location": {
+                    "Fn::Sub": [
+                        "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Query.batchGetReadReceipts.req.vtl",
+                        {
+                            "S3DeploymentBucket": {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "S3DeploymentRootKey": {
+                                "Ref": "S3DeploymentRootKey"
+                            }
+                        }
+                    ]
+                },
+                "ResponseMappingTemplateS3Location": {
+                    "Fn::Sub": [
+                        "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Query.batchGetReadReceipts.res.vtl",
+                        {
+                            "S3DeploymentBucket": {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "S3DeploymentRootKey": {
+                                "Ref": "S3DeploymentRootKey"
+                            }
+                        }
+                    ]
+                }
             }
-          ]
-        }
-      }
-    },
-    "batchGetReadReceiptsResolver": {
-      "Type": "AWS::AppSync::Resolver",
-      "Properties": {
-        "ApiId": {
-          "Ref": "AppSyncApiId"
         },
-        "DataSourceName": "ReadReceiptTable",
-        "TypeName": "Query",
-        "FieldName": "batchGetReadReceipts",
-        "RequestMappingTemplateS3Location": {
-          "Fn::Sub": [
-            "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Query.batchGetReadReceipts.req.vtl",
-            {
-              "S3DeploymentBucket": {
-                "Ref": "S3DeploymentBucket"
-              },
-              "S3DeploymentRootKey": {
-                "Ref": "S3DeploymentRootKey"
-              }
+        "batchGetConversationsResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Ref": "AppSyncApiId"
+                },
+                "DataSourceName": "ConversationTable",
+                "TypeName": "Query",
+                "FieldName": "batchGetConversations",
+                "RequestMappingTemplateS3Location": {
+                    "Fn::Sub": [
+                        "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Query.batchGetConversations.req.vtl",
+                        {
+                            "S3DeploymentBucket": {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "S3DeploymentRootKey": {
+                                "Ref": "S3DeploymentRootKey"
+                            }
+                        }
+                    ]
+                },
+                "ResponseMappingTemplateS3Location": {
+                    "Fn::Sub": [
+                        "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Query.batchGetConversations.res.vtl",
+                        {
+                            "S3DeploymentBucket": {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "S3DeploymentRootKey": {
+                                "Ref": "S3DeploymentRootKey"
+                            }
+                        }
+                    ]
+                }
             }
-          ]
         },
-        "ResponseMappingTemplateS3Location": {
-          "Fn::Sub": [
-            "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Query.batchGetReadReceipts.res.vtl",
-            {
-              "S3DeploymentBucket": {
-                "Ref": "S3DeploymentBucket"
-              },
-              "S3DeploymentRootKey": {
-                "Ref": "S3DeploymentRootKey"
-              }
-            }
-          ]
-        }
-      }
-    },
-    "batchGetConversationsResolver": {
-      "Type": "AWS::AppSync::Resolver",
-      "Properties": {
-        "ApiId": {
-          "Ref": "AppSyncApiId"
-        },
-        "DataSourceName": "ConversationTable",
-        "TypeName": "Query",
-        "FieldName": "batchGetConversations",
-        "RequestMappingTemplateS3Location": {
-          "Fn::Sub": [
-            "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Query.batchGetConversations.req.vtl",
-            {
-              "S3DeploymentBucket": {
-                "Ref": "S3DeploymentBucket"
-              },
-              "S3DeploymentRootKey": {
-                "Ref": "S3DeploymentRootKey"
-              }
-            }
-          ]
-        },
-        "ResponseMappingTemplateS3Location": {
-          "Fn::Sub": [
-            "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Query.batchGetConversations.res.vtl",
-            {
-              "S3DeploymentBucket": {
-                "Ref": "S3DeploymentBucket"
-              },
-              "S3DeploymentRootKey": {
-                "Ref": "S3DeploymentRootKey"
-              }
-            }
-          ]
-        }
-      }
-    },
 
-    "incrementLikesResolver": {
-      "Type": "AWS::AppSync::Resolver",
-      "Properties": {
-        "ApiId": {
-          "Ref": "AppSyncApiId"
-        },
-        "DataSourceName": "PostTable",
-        "TypeName": "Mutation",
-        "FieldName": "incrementLikes",
-        "RequestMappingTemplateS3Location": {
-          "Fn::Sub": [
-            "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Mutation.incrementLikes.req.vtl",
-            {
-              "S3DeploymentBucket": {
-                "Ref": "S3DeploymentBucket"
-              },
-              "S3DeploymentRootKey": {
-                "Ref": "S3DeploymentRootKey"
-              }
+        "incrementLikesResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Ref": "AppSyncApiId"
+                },
+                "DataSourceName": "PostTable",
+                "TypeName": "Mutation",
+                "FieldName": "incrementLikes",
+                "RequestMappingTemplateS3Location": {
+                    "Fn::Sub": [
+                        "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Mutation.incrementLikes.req.vtl",
+                        {
+                            "S3DeploymentBucket": {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "S3DeploymentRootKey": {
+                                "Ref": "S3DeploymentRootKey"
+                            }
+                        }
+                    ]
+                },
+                "ResponseMappingTemplateS3Location": {
+                    "Fn::Sub": [
+                        "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Mutation.incrementLikes.res.vtl",
+                        {
+                            "S3DeploymentBucket": {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "S3DeploymentRootKey": {
+                                "Ref": "S3DeploymentRootKey"
+                            }
+                        }
+                    ]
+                }
             }
-          ]
         },
-        "ResponseMappingTemplateS3Location": {
-          "Fn::Sub": [
-            "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Mutation.incrementLikes.res.vtl",
-            {
-              "S3DeploymentBucket": {
-                "Ref": "S3DeploymentBucket"
-              },
-              "S3DeploymentRootKey": {
-                "Ref": "S3DeploymentRootKey"
-              }
+
+        "decrementLikesResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Ref": "AppSyncApiId"
+                },
+                "DataSourceName": "PostTable",
+                "TypeName": "Mutation",
+                "FieldName": "decrementLikes",
+                "RequestMappingTemplateS3Location": {
+                    "Fn::Sub": [
+                        "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Mutation.decrementLikes.req.vtl",
+                        {
+                            "S3DeploymentBucket": {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "S3DeploymentRootKey": {
+                                "Ref": "S3DeploymentRootKey"
+                            }
+                        }
+                    ]
+                },
+                "ResponseMappingTemplateS3Location": {
+                    "Fn::Sub": [
+                        "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Mutation.decrementLikes.res.vtl",
+                        {
+                            "S3DeploymentBucket": {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "S3DeploymentRootKey": {
+                                "Ref": "S3DeploymentRootKey"
+                            }
+                        }
+                    ]
+                }
             }
-          ]
+        },
+
+        "incrementRepliesResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Ref": "AppSyncApiId"
+                },
+                "DataSourceName": "PostTable",
+                "TypeName": "Mutation",
+                "FieldName": "incrementReplies",
+                "RequestMappingTemplateS3Location": {
+                    "Fn::Sub": [
+                        "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Mutation.incrementReplies.req.vtl",
+                        {
+                            "S3DeploymentBucket": {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "S3DeploymentRootKey": {
+                                "Ref": "S3DeploymentRootKey"
+                            }
+                        }
+                    ]
+                },
+                "ResponseMappingTemplateS3Location": {
+                    "Fn::Sub": [
+                        "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Mutation.incrementReplies.res.vtl",
+                        {
+                            "S3DeploymentBucket": {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "S3DeploymentRootKey": {
+                                "Ref": "S3DeploymentRootKey"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+
+        "decrementRepliesResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Ref": "AppSyncApiId"
+                },
+                "DataSourceName": "PostTable",
+                "TypeName": "Mutation",
+                "FieldName": "decrementReplies",
+                "RequestMappingTemplateS3Location": {
+                    "Fn::Sub": [
+                        "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Mutation.decrementReplies.req.vtl",
+                        {
+                            "S3DeploymentBucket": {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "S3DeploymentRootKey": {
+                                "Ref": "S3DeploymentRootKey"
+                            }
+                        }
+                    ]
+                },
+                "ResponseMappingTemplateS3Location": {
+                    "Fn::Sub": [
+                        "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Mutation.decrementReplies.res.vtl",
+                        {
+                            "S3DeploymentBucket": {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "S3DeploymentRootKey": {
+                                "Ref": "S3DeploymentRootKey"
+                            }
+                        }
+                    ]
+                }
+            }
         }
-      }
     },
-    
-    "decrementLikesResolver": {
-      "Type": "AWS::AppSync::Resolver",
-      "Properties": {
-        "ApiId": {
-          "Ref": "AppSyncApiId"
-        },
-        "DataSourceName": "PostTable",
-        "TypeName": "Mutation",
-        "FieldName": "decrementLikes",
-        "RequestMappingTemplateS3Location": {
-          "Fn::Sub": [
-            "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Mutation.decrementLikes.req.vtl",
-            {
-              "S3DeploymentBucket": {
-                "Ref": "S3DeploymentBucket"
-              },
-              "S3DeploymentRootKey": {
-                "Ref": "S3DeploymentRootKey"
-              }
-            }
-          ]
-        },
-        "ResponseMappingTemplateS3Location": {
-          "Fn::Sub": [
-            "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Mutation.decrementLikes.res.vtl",
-            {
-              "S3DeploymentBucket": {
-                "Ref": "S3DeploymentBucket"
-              },
-              "S3DeploymentRootKey": {
-                "Ref": "S3DeploymentRootKey"
-              }
-            }
-          ]
-        }
-      }
-    }
-  },
   "Conditions": {
     "HasEnvironmentParameter": {
       "Fn::Not": [
