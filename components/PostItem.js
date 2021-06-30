@@ -415,7 +415,7 @@ function PostHeader({item, writtenByYou, repliesPressed, deletePostsAsync, setIs
                   },
                 ]}
               >
-                0
+                {item.replies}
               </Text>
               <MaterialIcons
                 name="chat-bubble-outline"

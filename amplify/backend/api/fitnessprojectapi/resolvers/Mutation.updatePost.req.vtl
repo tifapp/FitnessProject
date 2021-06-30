@@ -85,26 +85,10 @@
 
 
 
-## [Start] Validate update mutation for @key 'ByChannel'. **
-#set( $hasSeenSomeKeyArg = false )
-#set( $keyFieldNames = ["isParent", "createdAt"] )
-#foreach( $keyFieldName in $keyFieldNames )
-#if( $ctx.args.input.containsKey("$keyFieldName") ) #set( $hasSeenSomeKeyArg = true ) #end
-#end
-#foreach( $keyFieldName in $keyFieldNames )
-  #if( $hasSeenSomeKeyArg && !$ctx.args.input.containsKey("$keyFieldName") )
-    $util.error("When updating any part of the composite sort key for @key 'ByChannel', you must provide all fields for the key. Missing key: '$keyFieldName'.")
-  #end
-#end
-## [End] Validate update mutation for @key 'ByChannel'. **
-#if( $util.isNull($dynamodbNameOverrideMap) )
-  #set( $dynamodbNameOverrideMap = {
-  "isParent#createdAt": "IsParentCreatedAt"
-} )
-#else
-  $util.qr($dynamodbNameOverrideMap.put("isParent#createdAt", "IsParentCreatedAt"))
-#end
-$util.qr($ctx.args.input.put("isParent#createdAt","${ctx.args.input.isParent}#${ctx.args.input.createdAt}"))
+
+
+
+
 ## [Start] Set the primary @key. **
 #set( $modelObjectKey = {
   "createdAt": $util.dynamodb.toDynamoDB($ctx.args.input.createdAt),
@@ -112,6 +96,12 @@ $util.qr($ctx.args.input.put("isParent#createdAt","${ctx.args.input.isParent}#${
 } )
 ## [End] Set the primary @key. **
 
+#set( $optionalNonNullableFields = ["createdAt", "updatedAt", "userId"] )
+#foreach( $field in $optionalNonNullableFields )
+  #if( $context.arguments.input.keySet().contains($field) && $util.isNull($context.args.input.get($field)) )
+$util.error("An argument you marked as Non-Null is set to Null in the query or the body of your request.")
+  #end
+#end
 #if( $authCondition && $authCondition.expression != "" )
   #set( $condition = $authCondition )
   #if( $modelObjectKey )

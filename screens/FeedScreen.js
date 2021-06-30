@@ -89,6 +89,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         const newPost = event.value.data.onCreatePost
         if (newPost.channel === getChannel() && (currentPosts.current.length == 0 || !currentPosts.current.find(post => post.userId === newPost.userId && post.createdAt === newPost.createdAt))) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
           newPost.likes = newPost.likes ?? 0;
+          newPost.replies = newPost.replies ?? 0;
           if (newPost.userId === route.params?.myId) {
             //console.log("received own post again")
             setPosts(currentPosts.current.map(post => {
@@ -140,9 +141,10 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     const incrementLikeSubscription = API.graphql(graphqlOperation(onIncrementLikes)).subscribe({ //nvm we dont have a subscription event for incrementlike
       next: event => {
         const likedPost = event.value.data.onIncrementLikes
-        //console.log("newly liked post");
+        console.log("newly liked post ", likedPost);
         const localLikedPost = currentPosts.current.find(post => post.userId === likedPost.userId && post.createdAt === likedPost.createdAt);
         if (localLikedPost != null) {
+          console.log("found liked post");
           if (localLikedPost.likeDebounce) 
           {
             localLikedPost.likeDebounce = null;
@@ -151,6 +153,8 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
             //console.log("adding a like");
             post.likes = post.likes + 1
           } return post}));
+        } else {
+          console.log("couldn't find liked post");
         }
       }
     });
