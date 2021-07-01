@@ -31,6 +31,36 @@ export const onDecrementLikes = /* GraphQL */ `
     }
   }
 `;
+export const onIncrementReplies = /* GraphQL */ `
+  subscription OnIncrementReplies {
+    onIncrementReplies {
+      createdAt
+      updatedAt
+      userId
+      description
+      channel
+      receiver
+      parentId
+      likes
+      replies
+    }
+  }
+`;
+export const onDecrementReplies = /* GraphQL */ `
+  subscription OnDecrementReplies {
+    onDecrementReplies {
+      createdAt
+      updatedAt
+      userId
+      description
+      channel
+      receiver
+      parentId
+      likes
+      replies
+    }
+  }
+`;
 export const onMyNewFriendships = /* GraphQL */ `
   subscription OnMyNewFriendships {
     onMyNewFriendships {

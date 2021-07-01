@@ -2,11 +2,15 @@ type Mutation {
   batchDeletePosts(posts: [DeletePostInput]): [Post] @aws_iam
   incrementLikes(input: incrementLikesInput!): Post @aws_iam
   decrementLikes(input: incrementLikesInput!): Post @aws_iam
+  incrementReplies(input: incrementLikesInput!): Post @aws_iam
+  decrementReplies(input: incrementLikesInput!): Post @aws_iam
 }
 
 type Subscription {
   onIncrementLikes: Post @aws_subscribe(mutations: ["incrementLikes"]) 
   onDecrementLikes: Post @aws_subscribe(mutations: ["decrementLikes"])
+  onIncrementReplies: Post @aws_subscribe(mutations: ["incrementReplies"]) 
+  onDecrementReplies: Post @aws_subscribe(mutations: ["decrementReplies"])
   onMyNewFriendships: Friendship @aws_subscribe(mutations: ["updateFriendship"])
   onAllDeletedFriendships: Friendship @aws_subscribe(mutations: ["deleteFriendship"])
 

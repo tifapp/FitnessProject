@@ -286,6 +286,7 @@ export default React.memo(function PostItem({
               navigation={navigation}
               route={route}
               channel={SHA256(item.userId+item.createdAt)} //unique id
+              originalParentId={item.createdAt + "#" + item.userId}
             />
           </View>
         </Modal>
@@ -414,7 +415,7 @@ function PostHeader({item, writtenByYou, repliesPressed, deletePostsAsync, setIs
                   },
                 ]}
               >
-                0
+                {item.replies}
               </Text>
               <MaterialIcons
                 name="chat-bubble-outline"

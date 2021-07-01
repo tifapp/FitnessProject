@@ -46,6 +46,36 @@ export const decrementLikes = /* GraphQL */ `
     }
   }
 `;
+export const incrementReplies = /* GraphQL */ `
+  mutation IncrementReplies($input: incrementLikesInput!) {
+    incrementReplies(input: $input) {
+      createdAt
+      updatedAt
+      userId
+      description
+      channel
+      receiver
+      parentId
+      likes
+      replies
+    }
+  }
+`;
+export const decrementReplies = /* GraphQL */ `
+  mutation DecrementReplies($input: incrementLikesInput!) {
+    decrementReplies(input: $input) {
+      createdAt
+      updatedAt
+      userId
+      description
+      channel
+      receiver
+      parentId
+      likes
+      replies
+    }
+  }
+`;
 export const createGroup = /* GraphQL */ `
   mutation CreateGroup(
     $input: CreateGroupInput!
