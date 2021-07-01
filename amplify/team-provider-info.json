@@ -85,7 +85,7 @@
         "deleteReplies": {},
         "friendNotifications": {
           "deploymentBucketName": "amplify-fitnessproject-securesubs-171413-deployment",
-          "s3Key": "amplify-builds/friendNotifications-78587062353863774a30-build.zip"
+          "s3Key": "amplify-builds/friendNotifications-334a466f333654347a71-build.zip"
         },
         "deleteUserData": {
           "deploymentBucketName": "amplify-fitnessproject-securesubs-171413-deployment",

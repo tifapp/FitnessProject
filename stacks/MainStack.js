@@ -6,7 +6,7 @@ import ImageScreen from "screens/ImageScreen";
 import ProfileStack from "stacks/ProfileStack";
 import SettingsStack from "stacks/SettingsStack";
 import ConversationScreen from "screens/ConversationScreen";
-import {headerOptions} from "components/headerComponents/headerOptions"
+import { headerOptions } from "components/headerComponents/headerOptions"
 
 import React from "react";
 import { Platform } from "react-native";
@@ -20,10 +20,13 @@ export default function MainStack({ navigation, route }) {
       screenOptions={headerOptions}
     >
       <Stack.Screen
-        name="Feed"
-        component={FeedScreen}
-        initialParams={route.params}
-      />
+      name="Feed"
+      initialParams={route.params}>
+        {(props) => <FeedScreen
+          {...props}
+          channel={"general"}
+        />}
+      </Stack.Screen>
       <Stack.Screen
         name="Lookup"
         component={LookupUserScreen}

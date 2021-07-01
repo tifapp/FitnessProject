@@ -1,6 +1,81 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const onCreatePostFromChannel = /* GraphQL */ `
+  subscription OnCreatePostFromChannel($channel: ID!) {
+    onCreatePostFromChannel(channel: $channel) {
+      createdAt
+      updatedAt
+      userId
+      description
+      channel
+      receiver
+      parentId
+      likes
+      replies
+    }
+  }
+`;
+export const onCreatePostForReceiver = /* GraphQL */ `
+  subscription OnCreatePostForReceiver($receiver: ID!) {
+    onCreatePostForReceiver(receiver: $receiver) {
+      createdAt
+      updatedAt
+      userId
+      description
+      channel
+      receiver
+      parentId
+      likes
+      replies
+    }
+  }
+`;
+export const onCreatePostByUser = /* GraphQL */ `
+  subscription OnCreatePostByUser($userId: ID!) {
+    onCreatePostByUser(userId: $userId) {
+      createdAt
+      updatedAt
+      userId
+      description
+      channel
+      receiver
+      parentId
+      likes
+      replies
+    }
+  }
+`;
+export const onUpdatePostFromChannel = /* GraphQL */ `
+  subscription OnUpdatePostFromChannel($channel: ID!) {
+    onUpdatePostFromChannel(channel: $channel) {
+      createdAt
+      updatedAt
+      userId
+      description
+      channel
+      receiver
+      parentId
+      likes
+      replies
+    }
+  }
+`;
+export const onDeletePostFromChannel = /* GraphQL */ `
+  subscription OnDeletePostFromChannel($channel: ID!) {
+    onDeletePostFromChannel(channel: $channel) {
+      createdAt
+      updatedAt
+      userId
+      description
+      channel
+      receiver
+      parentId
+      likes
+      replies
+    }
+  }
+`;
 export const onIncrementLikes = /* GraphQL */ `
   subscription OnIncrementLikes {
     onIncrementLikes {
@@ -280,51 +355,6 @@ export const onDeleteLike = /* GraphQL */ `
       updatedAt
       userId
       postId
-    }
-  }
-`;
-export const onCreatePost = /* GraphQL */ `
-  subscription OnCreatePost {
-    onCreatePost {
-      createdAt
-      updatedAt
-      userId
-      description
-      channel
-      receiver
-      parentId
-      likes
-      replies
-    }
-  }
-`;
-export const onUpdatePost = /* GraphQL */ `
-  subscription OnUpdatePost {
-    onUpdatePost {
-      createdAt
-      updatedAt
-      userId
-      description
-      channel
-      receiver
-      parentId
-      likes
-      replies
-    }
-  }
-`;
-export const onDeletePost = /* GraphQL */ `
-  subscription OnDeletePost {
-    onDeletePost {
-      createdAt
-      updatedAt
-      userId
-      description
-      channel
-      receiver
-      parentId
-      likes
-      replies
     }
   }
 `;

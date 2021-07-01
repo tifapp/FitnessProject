@@ -11,7 +11,8 @@ import {
 } from "react-native";
 import { listConversations } from "../src/graphql/queries";
 import {
-  onCreatePost
+  onCreatePostForReceiver,
+  onCreatePostByUser
 } from "root/src/graphql/subscriptions";
 import APIList from "../components/APIList"
 import { API, graphqlOperation} from "aws-amplify";
@@ -21,136 +22,68 @@ var styles = require('styles/stylesheet');
 
 export default function ConversationScreen({ navigation, route }) {
 
+  const updateConversationList = (newPost) => {
+    const conversation = {id: newPost.channel, users: [newPost.userId, newPost.receiver], lastUser: newPost.userId, lastMessage: newPost.description}
+
+    console.log("++++++++++++++++++++++++++++++++")
+    console.log(conversation);
+    console.log("++++++++++++++++++++++++++++++++")
+
+    let tempConversations =  currentConversations.current;
+
+    let index = tempConversations.findIndex(item => newPost.channel === item.id);
+
+    // Testing for new conversations being created
+    console.log("|||||||||||||||||||||||");
+    console.log(index);
+    console.log("|||||||||||||||||||||||");
+
+    console.log("================================");
+    console.log(tempConversations);
+    console.log("================================");
+
+    if(index != -1){
+      tempConversations.splice(index, 1); //removes 1 item from the current Conversations at the specified index
+    }
+      
+    console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+    console.log(tempConversations);
+    console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+
+    tempConversations.unshift(conversation);
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    //setConversations([conversation, ...currentConversations.current]);
+    setConversations([...tempConversations]);
+  }
+
   useEffect(() => {
 
     // Executes when a user receieves a friend request
     // listening for new friend requests
 
-    const conversationSubscription = API.graphql(
-      graphqlOperation(onCreatePost)
+    const receivedConversationSubscription = API.graphql(
+      graphqlOperation(onCreatePostForReceiver, {receiver: route.params.myId})
     ).subscribe({
       next: (event) => {
-        const newPost = event.value.data.onCreatePost;
-        
-        console.log("########################################")
-        console.log("########################################")
-        console.log("########################################")
-        console.log("########################################")
-        console.log("########################################")
-        console.log("newPost " + newPost.userId);
-        console.log("########################################")
-        console.log("########################################")
-        console.log("########################################")
-        console.log("########################################")
-        console.log("########################################")
+        const newPost = event.value.data.onCreatePostForReceiver;
 
-        //conversation already exists
-        
-        /*
-        let conversation = currentConversations.current.find((item) => {
-          //const time = timestamp.toString();
-          return newPost.channel === item.id;
-        })
-        */
-
-        console.log("Checking");
-        
-        if(newPost.receiver == route.params.myId || (newPost.userId == route.params.myId && newPost.receiver != null)){
-          console.log("Testing");
-          //conversation = {id: newPost.channel, users: newPost.userId, lastUser: newPost.userId,  lastMessage: newPost.description}
-          const conversation = {id: newPost.channel, users: [newPost.userId, newPost.receiver], lastUser: newPost.userId, lastMessage: newPost.description}
-
-          console.log("++++++++++++++++++++++++++++++++")
-          console.log(conversation);
-          console.log("++++++++++++++++++++++++++++++++")
-
-          let tempConversations =  currentConversations.current;
-
-          let index = tempConversations.findIndex(item => newPost.channel === item.id);
-
-          // Testing for new conversations being created
-          console.log("|||||||||||||||||||||||");
-          console.log(index);
-          console.log("|||||||||||||||||||||||");
-
-          console.log("================================");
-          console.log(tempConversations);
-          console.log("================================");
-
-          if(index != -1){
-            tempConversations.splice(index, 1); //removes 1 item from the current Conversations at the specified index
-          }
-           
-          console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-          console.log(tempConversations);
-          console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-
-          tempConversations.unshift(conversation);
-          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-          //setConversations([conversation, ...currentConversations.current]);
-          setConversations([...tempConversations]);
-        }
-        
-
-        /*
-        //we can see all friend requests being accepted, so we just have to make sure it's one of ours.
-        if(conversation == null){
-          conversation = {id: newPost.channel, users: newPost.userId, lastMessage: newPost.description}
-          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-          setConversations([conversation, ...currentConversations.current]);
-        }
-        else{
-          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-          let index = currentConversations.current.findIndex(item => newPost.channel === item.id)
-
-          console.log("------------------------------------------")
-          console.log(index)
-          console.log("------------------------------------------")
-
-          //var index = currentConversations.current.indexOf(currentConversations.current[currentConversations.current.findIndex(item => newPost.channel === item.id)]);
-          console.log("index: " + index);
-
-          let tempConversations =  currentConversations.current;
-
-          tempConversations.splice(index, 1); //removes 1 item from the current Conversations at the specified index
-          //currentConversations.current.splice(0, 0, conversation); // adds the conversation at index 0    
-          //currentConversations.current.unshift(conversation);
-          tempConversations.unshift(conversation);
-          setConversations([...tempConversations]);
-
-          //let cutOut = currentConversations.current.splice(index, 1) [0]; // cut the element at index 'from'
-          //conversations.splice(0, 0, cutOut);            // insert it at index 'to'
-          //currentConversations.current.splice(0, 0, cutOut)
-
-          console.log("*****************************************")
-          console.log(currentConversations.current)
-          console.log("*****************************************")
-
-          //tempposts.splice(index + 1, 0, newPost); 
-        }
-        */
+        updateConversationList(newPost);
       },
     });
-
-    /*
-    const removedFriendSubscription = API.graphql(
-      graphqlOperation(onDeleteFriendship)
+    
+    const sentConversationSubscription = API.graphql(
+      graphqlOperation(onCreatePostByUser, {userId: route.params.myId})
     ).subscribe({
       next: (event) => {
-        const deletedFriend = event.value.data.onDeleteFriendship; //check the security on this one. if possible, should only fire for the sender or receiver.
-        console.log("friend deleted ", deletedFriend);
-        if (currentFriends.current.find(item => item.sender === deletedFriend.sender && item.sender === deletedFriend.sender)) {
-          var index = currentFriends.current.findIndex(item => item.sender === deletedFriend.sender && item.sender === deletedFriend.sender);
-          currentFriends.current.splice(index, 1);
-          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-          setFriendList(currentFriends.current);
-        }
+        const newPost = event.value.data.onCreatePostByUser;
+
+        updateConversationList(newPost);
       },
     });
-    */
 
     return () => {
-      conversationSubscription.unsubscribe()
+      receivedConversationSubscription.unsubscribe()
+      sentConversationSubscription.unsubscribe()
     };
   }, []);
 

@@ -2,7 +2,7 @@
 This data type is used on the feed screen, group screen and message screen.
 The "postsByChannel" query is used to find posts belonging to a specific group or directed to a specific user.
 """
-type Post @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
+type Post @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" }, subscriptions: null)
 @auth(
   rules: [
       { allow: private, operations: [read] },

@@ -19,7 +19,7 @@ import { API, graphqlOperation, Cache } from "aws-amplify";
 import { createPost, updatePost, deletePost, createConversation, updateConversation, createReadReceipt, deleteReadReceipt } from "root/src/graphql/mutations";
 import { listPosts, postsByChannel, batchGetLikes } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
-import { onCreatePost, onDeletePost, onUpdatePost, onCreateLike, onDeleteLike, onIncrementLikes, onDecrementLikes } from 'root/src/graphql/subscriptions';
+import { onCreatePostFromChannel, onDeletePostFromChannel, onUpdatePostFromChannel, onCreateLike, onDeleteLike, onIncrementLikes, onDecrementLikes } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
 import APIList from 'components/APIList';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -52,10 +52,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   const scrollRef = useRef(); // Used to help with automatic scrolling to top
   
   currentPosts.current = posts;
-
-  const getChannel = () => {
-    return channel == null ? 'general' : channel
-  }
   
   useEffect(() => {
     const onFocus = navigation.addListener('focus', () => {
@@ -84,10 +80,10 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   }, [navigation])
 
   useEffect(() => {
-    const createPostSubscription = API.graphql(graphqlOperation(onCreatePost)).subscribe({
+    const createPostSubscription = API.graphql(graphqlOperation(onCreatePostFromChannel, { channel: channel })).subscribe({
       next: event => {
-        const newPost = event.value.data.onCreatePost
-        if (newPost.channel === getChannel() && (currentPosts.current.length == 0 || !currentPosts.current.find(post => post.userId === newPost.userId && post.createdAt === newPost.createdAt))) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
+        const newPost = event.value.data.onCreatePostFromChannel
+        if (!currentPosts.current.find(post => post.userId === newPost.userId && post.createdAt === newPost.createdAt)) { //acts as validation, maybe disable textinput while this happens
           newPost.likes = newPost.likes ?? 0;
           newPost.replies = newPost.replies ?? 0;
           if (newPost.userId === route.params?.myId) {
@@ -119,10 +115,10 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         }
       }
     });
-    const deletePostSubscription = API.graphql(graphqlOperation(onDeletePost)).subscribe({
+    const deletePostSubscription = API.graphql(graphqlOperation(onDeletePostFromChannel, {channel: channel})).subscribe({
       next: event => {
         const deletedPost = event.value.data.onDeletePost
-        if (deletedPost.userId != route.params?.myId && deletedPost.channel == getChannel()) { //uhoh security issue, we shouldnt be able to see other group's posts //acts as validation, maybe disable textinput while this happens
+        if (deletedPost.userId != route.params?.myId) {//acts as validation, maybe disable textinput while this happens
           if (currentPosts.current.find(post => post.userId === deletedPost.userId && post.createdAt === deletedPost.createdAt)) {
             let tempposts = currentPosts.current;
             var index = tempposts.findIndex(post => post.userId === deletedPost.userId && post.createdAt === deletedPost.createdAt);
@@ -133,7 +129,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         }
       }
     });
-    const updatePostSubscription = API.graphql(graphqlOperation(onUpdatePost)).subscribe({ //nvm we dont have a subscription event for incrementlike
+    const updatePostSubscription = API.graphql(graphqlOperation(onUpdatePostFromChannel, {channel: channel})).subscribe({ //nvm we dont have a subscription event for incrementlike
       next: event => {
         //console.log("post has been updated");
       }
@@ -298,7 +294,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     //console.log("attempting to make new post");
     const newPost = {
       description: replyText ?? postVal,
-      channel: replyText != null ? parentId.toString() : getChannel(),
+      channel: replyText != null ? parentId.toString() : channel,
     };
     if (originalParentId != null) {  
       newPost.parentId = originalParentId
@@ -445,7 +441,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         queryOperation={postsByChannel}
         setDataFunction={setPosts}
         data={posts}
-        filter={{ channel: getChannel(), sortDirection: "DESC" }}
+        filter={{ channel: channel, sortDirection: "DESC" }}
         renderItem={renderPostItem}
         keyExtractor={(item) => item.createdAt.toString() + item.userId}
         onEndReachedThreshold={0.5}
