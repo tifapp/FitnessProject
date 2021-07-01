@@ -7,7 +7,13 @@
       "Default": "NONE",
       "Description": " Schedule Expression"
     },
+    "deploymentBucketName": {
+      "Type": "String"
+    },
     "env": {
+      "Type": "String"
+    },
+    "s3Key": {
       "Type": "String"
     },
     "apifitnessprojectapiGraphQLAPIIdOutput": {
@@ -17,12 +23,6 @@
     "apifitnessprojectapiGraphQLAPIEndpointOutput": {
       "Type": "String",
       "Default": "apifitnessprojectapiGraphQLAPIEndpointOutput"
-    },
-    "deploymentBucketName": {
-      "Type": "String"
-    },
-    "s3Key": {
-      "Type": "String"
     },
     "functionbackendResourcesArn": {
       "Type": "String",
@@ -47,16 +47,24 @@
         "aws:asset:property": "Code"
       },
       "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "deploymentBucketName"
+          },
+          "S3Key": {
+            "Ref": "s3Key"
+          }
+        },
         "Handler": "index.handler",
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "likeCounter",
+            "likeNotifications",
             {
               "Fn::Join": [
                 "",
                 [
-                  "likeCounter",
+                  "likeNotifications",
                   "-",
                   {
                     "Ref": "env"
@@ -88,21 +96,13 @@
             "Arn"
           ]
         },
-        "Runtime": "nodejs12.x",
+        "Runtime": "nodejs14.x",
         "Layers": [
           {
             "Ref": "functionbackendResourcesArn"
           }
         ],
-        "Timeout": "25",
-        "Code": {
-          "S3Bucket": {
-            "Ref": "deploymentBucketName"
-          },
-          "S3Key": {
-            "Ref": "s3Key"
-          }
-        }
+        "Timeout": "25"
       }
     },
     "LambdaExecutionRole": {
@@ -111,12 +111,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "fitnessprojectLambdaRolebe0dabe5",
+            "fitnessprojectLambdaRolec3f178ab",
             {
               "Fn::Join": [
                 "",
                 [
-                  "fitnessprojectLambdaRolebe0dabe5",
+                  "fitnessprojectLambdaRolec3f178ab",
                   "-",
                   {
                     "Ref": "env"
@@ -231,6 +231,25 @@
                         "Ref": "apifitnessprojectapiGraphQLAPIIdOutput"
                       },
                       "/*"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:appsync:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":apis/",
+                      {
+                        "Ref": "apifitnessprojectapiGraphQLAPIIdOutput"
+                      }
                     ]
                   ]
                 }
