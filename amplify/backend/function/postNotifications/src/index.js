@@ -1,10 +1,11 @@
 require('isomorphic-fetch');
 const gql = require('graphql-tag');
 
-const { incrementReplies, decrementReplies } = require('/opt/mutations');
-const {getUser} = require('/opt/queries');
+const { incrementReplies, decrementReplies, deleteLike, deletePost } = require('/opt/mutations');
+const {getUser, postsByChannel, likesByPost} = require('/opt/queries');
 const { client, sendNotification } = require('/opt/backendResources');
 const {loadCapitals} = require('/opt/stringConversion');
+const SHA256 = require('/opt/hash');
 
 exports.handler = (event, context, callback) => {
   event.Records.forEach((record) => {
@@ -92,11 +93,67 @@ exports.handler = (event, context, callback) => {
           callback(Error(e));
         }
       })();
-    } else if (record.eventName == "REMOVE") {
+    } else {
       (async () => {
-        try {
+        try {          
+          //delete like objects, if any
+          if (record.dynamodb.OldImage.likes.N > 0) {
+            //check if there are likes to delete
+            while (true) {
+              //fetch likes
+              const results = await client.query({
+                query: gql(likesByPost),
+                variables: {
+                  postId: record.dynamodb.OldImage.createdAt.S + "#" + record.dynamodb.OldImage.userId.S,
+                }
+              });
+  
+              //delete likes
+              await Promise.all(results.data.likesByPost.items.map(async (like) => {
+                client.mutate({
+                  mutation: gql(deleteLike),
+                  variables: {
+                    input: {
+                      userId: like.userId,
+                      postId: like.postId
+                    }
+                  }
+                });
+              }));
+  
+              //loop if there are more likes
+              if (results.data.likesByPost.nextToken == null) break;
+            }
+          }
+
+          //delete replies, if any
+          if (record.dynamodb.OldImage.replies.N > 0) {
+            while (true) {
+              const results = await client.query({
+                query: gql(postsByChannel),
+                variables: {
+                  channel: SHA256(record.dynamodb.OldImage.userId.S+record.dynamodb.OldImage.createdAt.S),
+                }
+              });
+
+              await Promise.all(results.data.postsByChannel.items.map(async (post) => {
+                client.mutate({
+                  mutation: gql(deletePost),
+                  variables: {
+                    input: {
+                      createdAt: post.createdAt,
+                      userId: post.userId,
+                    }
+                  }
+                });
+              }));
+
+              if (results.data.postsByChannel.nextToken == null) break;
+            }
+          }
+
           if (record.dynamodb.OldImage.parentId != null) {
-            //reply notifications
+            //decrement parent post's reply counter
             const parentPostId = record.dynamodb.OldImage.parentId.S;
             
             const ids = parentPostId.split("#");
