@@ -18,88 +18,30 @@
       "function": {
         "S3Triggeref91c1ec": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/S3Triggeref91c1ec-4a4d6c62786e4e667657-build.zip"
+          "s3Key": "amplify-builds/S3Triggeref91c1ec-336f69563533434d704a-build.zip"
         },
         "deleteReplies": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
           "s3Key": "amplify-builds/deleteReplies-4643726c57424f393577-build.zip"
         },
-        "replyNotifications": {
-          "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/replyNotifications-41695559324d536c4448-build.zip"
-        },
-        "likeCounter": {
-          "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/likeCounter-4f485251744a4c353264-build.zip"
-        },
         "friendNotifications": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/friendNotifications-48484a4f716a33646e59-build.zip"
-        },
-        "removeMessagesWhenUnfriend": {
-          "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/removeMessagesWhenUnfriend-76456441636757715437-build.zip"
-        },
-        "backendResources": {
-          "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/backendResources-LambdaLayerVersiondbf0a6fb-build.zip"
-        },
-        "deleteUserData": {
-          "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/deleteUserData-4238464c74414e5a6a52-build.zip"
-        },
-        "deletePostData": {
-          "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/deletePostData-354a6f37485537797a30-build.zip"
-        }
-      },
-      "hosting": {
-        "amplifyhosting": {
-          "appId": "d19kzf7eu35pq1",
-          "type": "manual"
-        }
-      }
-    }
-  },
-  "securesubs": {
-    "awscloudformation": {
-      "AuthRoleName": "amplify-fitnessproject-securesubs-171413-authRole",
-      "UnauthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-securesubs-171413-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-securesubs-171413-authRole",
-      "Region": "us-west-2",
-      "DeploymentBucketName": "amplify-fitnessproject-securesubs-171413-deployment",
-      "UnauthRoleName": "amplify-fitnessproject-securesubs-171413-unauthRole",
-      "StackName": "amplify-fitnessproject-securesubs-171413",
-      "StackId": "arn:aws:cloudformation:us-west-2:213277979580:stack/amplify-fitnessproject-securesubs-171413/45aa8e40-da01-11eb-b6e1-02960e14bc35",
-      "AmplifyAppId": "d19kzf7eu35pq1"
-    },
-    "categories": {
-      "auth": {
-        "fitnessprojecta8f49cfe": {}
-      },
-      "function": {
-        "S3Triggeref91c1ec": {
-          "deploymentBucketName": "amplify-fitnessproject-securesubs-171413-deployment",
-          "s3Key": "amplify-builds/S3Triggeref91c1ec-336f69563533434d704a-build.zip"
-        },
-        "friendNotifications": {
-          "deploymentBucketName": "amplify-fitnessproject-securesubs-171413-deployment",
           "s3Key": "amplify-builds/friendNotifications-334a466f333654347a71-build.zip"
         },
         "backendResources": {
-          "deploymentBucketName": "amplify-fitnessproject-securesubs-171413-deployment",
-          "s3Key": "amplify-builds/backendResources-LambdaLayerVersionb4296f28-build.zip"
+          "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
+          "s3Key": "amplify-builds/backendResources-LambdaLayerVersionbab98dbd-build.zip"
         },
         "deleteUserData": {
-          "deploymentBucketName": "amplify-fitnessproject-securesubs-171413-deployment",
+          "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
           "s3Key": "amplify-builds/deleteUserData-4238464c74414e5a6a52-build.zip"
         },
         "postNotifications": {
-          "deploymentBucketName": "amplify-fitnessproject-securesubs-171413-deployment",
+          "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
           "s3Key": "amplify-builds/postNotifications-56714e7770432b4f614f-build.zip"
         },
         "likeNotifications": {
-          "deploymentBucketName": "amplify-fitnessproject-securesubs-171413-deployment",
+          "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
           "s3Key": "amplify-builds/likeNotifications-4f485251744a4c353264-build.zip"
         }
       },
