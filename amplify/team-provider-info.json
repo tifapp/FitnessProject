@@ -82,18 +82,17 @@
           "deploymentBucketName": "amplify-fitnessproject-securesubs-171413-deployment",
           "s3Key": "amplify-builds/S3Triggeref91c1ec-336f69563533434d704a-build.zip"
         },
-        "deleteReplies": {},
         "friendNotifications": {
           "deploymentBucketName": "amplify-fitnessproject-securesubs-171413-deployment",
           "s3Key": "amplify-builds/friendNotifications-334a466f333654347a71-build.zip"
         },
-        "deleteUserData": {
-          "deploymentBucketName": "amplify-fitnessproject-securesubs-171413-deployment",
-          "s3Key": "amplify-builds/deleteUserData-4238464c74414e5a6a52-build.zip"
-        },
         "backendResources": {
           "deploymentBucketName": "amplify-fitnessproject-securesubs-171413-deployment",
           "s3Key": "amplify-builds/backendResources-LambdaLayerVersionb4296f28-build.zip"
+        },
+        "deleteUserData": {
+          "deploymentBucketName": "amplify-fitnessproject-securesubs-171413-deployment",
+          "s3Key": "amplify-builds/deleteUserData-4238464c74414e5a6a52-build.zip"
         },
         "postNotifications": {
           "deploymentBucketName": "amplify-fitnessproject-securesubs-171413-deployment",

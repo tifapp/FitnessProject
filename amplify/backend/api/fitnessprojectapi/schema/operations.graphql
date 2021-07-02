@@ -17,11 +17,12 @@ type Subscription {
   onDecrementLikes: Post @aws_subscribe(mutations: ["decrementLikes"])
   onIncrementReplies: Post @aws_subscribe(mutations: ["incrementReplies"]) 
   onDecrementReplies: Post @aws_subscribe(mutations: ["decrementReplies"])
-  onMyNewFriendships: Friendship @aws_subscribe(mutations: ["updateFriendship"])
-  onAllDeletedFriendships: Friendship @aws_subscribe(mutations: ["deleteFriendship"])
 
-  onNewFriendRequest(receiver: ID!): Friendship @aws_subscribe(mutations: ["createFriendship"])
-  onNewMessage(users: [ID!]!): Conversation @aws_subscribe(mutations: ["createConversation", "updateConversation"])
+  onAcceptedFriendship: Friendship @aws_subscribe(mutations: ["updateFriendship"])
+  onDeleteFriendship: Friendship @aws_subscribe(mutations: ["deleteFriendship"])
+  onCreateFriendRequestForReceiver(receiver: ID!): Friendship @aws_subscribe(mutations: ["createFriendship"])
+
+  onCreateOrUpdateConversation(users: [ID!]!): Conversation @aws_subscribe(mutations: ["createConversation", "updateConversation"])
 }
 
 type Query {

@@ -19,11 +19,10 @@ import {
   getFriendRequest,
 } from "root/src/graphql/queries";
 import {
-  onNewFriendRequest,
-  onMyNewFriendships,
-  onCreateFriendship,
+  onCreateFriendRequestForReceiver,
+  onAcceptedFriendship,
   onDeleteFriendship,
-  onNewMessage,
+  onCreateOrUpdateConversation,
 } from "root/src/graphql/subscriptions";
 import { deleteFriendship, updateFriendship, createBlock } from "root/src/graphql/mutations";
 
@@ -102,7 +101,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
     // Executes when a user receieves a friend request
     // listening for new friend requests
     const friendRequestSubscription = API.graphql(
-      graphqlOperation(onNewFriendRequest, { receiver: myId })
+      graphqlOperation(onCreateFriendRequestForReceiver, { receiver: myId })
     ).subscribe({
       next: (event) => {
         //IMPORTANT: don't use "friendList" or "friendRequestList" variables in this scope, instead use "currentFriends.current" and "currentFriendRequests.current"
@@ -145,7 +144,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
     });
 
     const friendSubscription = API.graphql(
-      graphqlOperation(onMyNewFriendships)
+      graphqlOperation(onAcceptedFriendship)
     ).subscribe({
       next: (event) => {
         const newFriend = event.value.data.onMyNewFriendships;
@@ -232,7 +231,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
         (async () => {
           subscriptions.push(
             await API.graphql(
-              graphqlOperation(onNewMessage, {
+              graphqlOperation(onCreateOrUpdateConversation, {
                 users: friendslistarray
               })
             ).subscribe({
