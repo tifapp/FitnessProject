@@ -95,6 +95,26 @@ const App = () => {
   const [userId, setUserId] = useState('checking...'); //stores the user's id if logged in
 
   const [conversationIds, setConversationIds] = useState([]);
+  
+  global.addConversationIds = (id) => {
+    console.log("(((((((((((((((((((((((((((((((((");
+    
+    const found = conversationIds.find(element => element == id);
+    console.log("(((((((((((((((((((((((((((((((((");
+    console.log(found);
+    
+
+    if(found == undefined){
+      console.log("inside");
+      
+      let tempConversationsIds =  conversationIds;
+      tempConversationsIds.unshift(id);
+      setConversationIds([...tempConversationsIds]);
+    }
+    
+
+  };
+  
 
   const checkIfUserSignedUp = async () => {
     try {

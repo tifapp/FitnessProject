@@ -61,10 +61,29 @@ const LookupUser = ({ route, navigation }) => {
   let onDelete = "";
   let onDelete2 = "";
 
+  const addConversation = (id) => {
+  /*
+  if (!navigation.push)
+    navigation.navigate(id);
+  else navigation.push(id);
+  */
+
+  /*
+   if(friendStatus == "friends"){
+    navigation.navigate(id);
+   }
+   else{
+    global.addConversationIds(id);
+    navigation.navigate(id);
+   }
+  */
+ console.log(id);
+ console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+   global.addConversationIds(id);
+  };
+
   const goToMessages = (id) => {
-    if (!navigation.push)
-      navigation.navigate(id);
-    else navigation.push(id);
+    navigation.navigate(id);
   };
 
   const checkUsersInfo = async () => {
@@ -87,6 +106,7 @@ const LookupUser = ({ route, navigation }) => {
     checkUsersInfo();
     checkFriendStatus();
     waitForFriendUpdateAsync();
+    addConversation(userId);
 
     return () => {
       waitForFriend.unsubscribe();
@@ -402,6 +422,15 @@ const LookupUser = ({ route, navigation }) => {
               }}
             />
           </View>
+          {route.params?.myId != user.id ?
+          <TouchableOpacity
+                  style={styles.messageButton}
+                  onPress = {() => {goToMessages(userId)}}
+                >
+                  <Text style={styles.buttonTextStyle}>Message</Text>
+                </TouchableOpacity> : null
+          }
+
 
           <View>
             <View style={styles.viewProfileScreen}>
@@ -569,11 +598,6 @@ const LookupUser = ({ route, navigation }) => {
               <View>
                 <View style={styles.viewProfileScreen}>
                   <Text>Friends for {friendsSince} </Text>
-                </View>
-                <View style={styles.messageButton}>
-                  <Text>
-                    Message
-                  </Text>
                 </View>
                 <TouchableOpacity
                   onPress={deleteFriend}

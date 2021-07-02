@@ -17,6 +17,7 @@ import {
 import APIList from "../components/APIList"
 import { API, graphqlOperation} from "aws-amplify";
 import {ProfileImageAndName} from "../components/ProfileImageAndName"
+import FriendListItem from "components/FriendListItem"
 
 var styles = require('styles/stylesheet');
 
@@ -104,17 +105,9 @@ export default function ConversationScreen({ navigation, route }) {
     else navigation.push(id);
   };
 
-  return (
-          <SafeAreaView style={{ flex: 1 }}>
-            <APIList
-              initialAmount={10}
-              additionalAmount={20}
-              queryOperation={listConversations}
-              data={conversations}
-              setDataFunction={setConversations}
-              renderItem={({ item }) => (
-                
-                <View style= {[styles.containerStyle, {marginVertical: 5}]}>
+/*
+  <View style= {[styles.containerStyle, {marginVertical: 5}]}>
+                  
                   <ProfileImageAndName
                     imageStyle={[styles.smallImageStyle, { marginHorizontal: 20 }]}
                     userId={ item.users[0] == route.params.myId ? item.users[1] : item.users[0]}
@@ -130,7 +123,29 @@ export default function ConversationScreen({ navigation, route }) {
                         </Text>
                       </TouchableOpacity>}
                   />
+                  
                 </View>
+  */
+
+  return (
+          <SafeAreaView style={{ flex: 1 }}>
+            <APIList
+              initialAmount={10}
+              additionalAmount={20}
+              queryOperation={listConversations}
+              data={conversations}
+              setDataFunction={setConversations}
+              renderItem={({ item }) => (
+                <FriendListItem
+                navigation={navigation}
+                //removeFriendHandler={removeFriend}
+                item={item}
+                //friendId={item.sender === myId ? item.receiver : item.sender}
+                friendId={ item.users[0] == route.params.myId ? item.users[1] : item.users[0]}
+                myId={route.params.myId}
+                lastMessage={item.lastMessage}
+                lastUser={item.lastUser}
+                />
               )}
               keyExtractor={(item) => item.id}
             />
