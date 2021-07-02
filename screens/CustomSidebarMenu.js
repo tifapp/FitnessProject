@@ -21,7 +21,6 @@ import {
 import {
   onCreateFriendRequestForReceiver,
   onAcceptedFriendship,
-  onDeleteFriendship,
   onCreateOrUpdateConversation,
 } from "root/src/graphql/subscriptions";
 import { deleteFriendship, updateFriendship, createBlock } from "root/src/graphql/mutations";
@@ -107,7 +106,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
         //IMPORTANT: don't use "friendList" or "friendRequestList" variables in this scope, instead use "currentFriends.current" and "currentFriendRequests.current"
 
         //console.log("is drawer open? ", isDrawerOpen.current);
-        const newFriendRequest = event.value.data.onNewFriendRequest;
+        const newFriendRequest = event.value.data.onCreateFriendRequestForReceiver;
         if (newFriendRequest.sender !== myId && newFriendRequest.receiver !== myId)
           console.log("security error with incoming friend request");
 
@@ -147,7 +146,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
       graphqlOperation(onAcceptedFriendship)
     ).subscribe({
       next: (event) => {
-        const newFriend = event.value.data.onMyNewFriendships;
+        const newFriend = event.value.data.onAcceptedFriendship;
         //we can see all friend requests being accepted, so we just have to make sure it's one of ours.
         if (newFriend.sender === myId || newFriend.receiver === myId) {
           if (!currentFriends.current.find(item => item.sender === newFriend.sender || item.receiver === newFriend.receiver)
@@ -237,7 +236,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
             ).subscribe({
               next: (event) => {
                 const updatedConversation =
-                  event.value.data.onNewMessage;
+                  event.value.data.onCreateOrUpdateConversation;
                 console.log(
                   "new message, this is what it looks like ",
                   updatedConversation,

@@ -2,7 +2,7 @@
 Should be private when accepted is empty, and public when accepted is true
 """
 
-type Friendship @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" }, subscriptions: null)
+type Friendship @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
 @auth(
   rules: [
       { allow: owner, ownerField: "sender", operations: [create, delete, read] },

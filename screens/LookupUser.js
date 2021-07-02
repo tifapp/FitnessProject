@@ -39,7 +39,6 @@ import {
   onCreateFriendship,
   onUpdateFriendship,
   onDeleteFriendship,
-  onAllDeletedFriendships,
 } from "root/src/graphql/subscriptions";
 import APIList from "components/APIList";
 import {saveCapitals, loadCapitals} from 'hooks/stringConversion';
@@ -60,6 +59,7 @@ const LookupUser = ({ route, navigation }) => {
   let waitForFriend = "";
   let onUpdate = "";
   let onDelete = "";
+  let onDelete2 = "";
 
   const goToMessages = (id) => {
     if (!navigation.push)
@@ -92,6 +92,7 @@ const LookupUser = ({ route, navigation }) => {
       waitForFriend.unsubscribe();
       onUpdate.unsubscribe();
       onDelete.unsubscribe();
+      onDelete2.unsubscribe();
     };
   }, []);
 
@@ -227,10 +228,28 @@ const LookupUser = ({ route, navigation }) => {
 
     // Case 3: Receiver rejects friend request. Update the sender's side to send button.
     // Case 4: Friendship is deleted by either sender or receiver. Update the other party's side to send button.
-    onDelete = API.graphql(graphqlOperation(onAllDeletedFriendships)).subscribe(
+    onDelete = API.graphql(graphqlOperation(onDeleteFriendship, {
+      sender: route.params?.myId,
+      receiver: userId,
+    })).subscribe(
       {
         next: (event) => {
-          const exFriend = event.value.data.onAllDeletedFriendships;
+          const exFriend = event.value.data.onDeleteFriendship;
+          //console.log(exFriend);
+          if (exFriend.sender == userId || exFriend.receiver == userId) {
+            setFriendStatus("none");
+          }
+        },
+      }
+    )
+    
+    onDelete2 = API.graphql(graphqlOperation(onDeleteFriendship, {
+      sender: userId,
+      receiver: route.params?.myId,
+    })).subscribe(
+      {
+        next: (event) => {
+          const exFriend = event.value.data.onDeleteFriendship;
           //console.log(exFriend);
           if (exFriend.sender == userId || exFriend.receiver == userId) {
             setFriendStatus("none");

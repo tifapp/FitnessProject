@@ -19,7 +19,6 @@ type Subscription {
   onDecrementReplies: Post @aws_subscribe(mutations: ["decrementReplies"])
 
   onAcceptedFriendship: Friendship @aws_subscribe(mutations: ["updateFriendship"])
-  onDeleteFriendship: Friendship @aws_subscribe(mutations: ["deleteFriendship"])
   onCreateFriendRequestForReceiver(receiver: ID!): Friendship @aws_subscribe(mutations: ["createFriendship"])
 
   onCreateOrUpdateConversation(users: [ID!]!): Conversation @aws_subscribe(mutations: ["createConversation", "updateConversation"])
