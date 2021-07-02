@@ -5,7 +5,6 @@ The "postsByChannel" query is used to find posts belonging to a specific group o
 type Post @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" }, subscriptions: null)
 @auth(
   rules: [
-      { allow: private, operations: [read] },
       { allow: owner, ownerField: "userId" },
       { allow: owner, ownerField: "receiver", operations: [delete, read] },
       { allow: private, provider: iam, operations: [create, read, update, delete] },
