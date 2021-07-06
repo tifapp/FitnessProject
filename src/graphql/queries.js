@@ -20,6 +20,7 @@ export const batchGetConversations = /* GraphQL */ `
       users
       lastUser
       lastMessage
+      dummy
     }
   }
 `;
@@ -145,6 +146,7 @@ export const getConversation = /* GraphQL */ `
       users
       lastUser
       lastMessage
+      dummy
     }
   }
 `;
@@ -162,6 +164,7 @@ export const listConversations = /* GraphQL */ `
         users
         lastUser
         lastMessage
+        dummy
       }
       nextToken
     }
@@ -169,13 +172,15 @@ export const listConversations = /* GraphQL */ `
 `;
 export const conversationsByLastUpdated = /* GraphQL */ `
   query ConversationsByLastUpdated(
-    $updatedAt: AWSDateTime
+    $dummy: Int
+    $updatedAt: ModelStringKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelConversationFilterInput
     $limit: Int
     $nextToken: String
   ) {
     conversationsByLastUpdated(
+      dummy: $dummy
       updatedAt: $updatedAt
       sortDirection: $sortDirection
       filter: $filter
@@ -189,6 +194,7 @@ export const conversationsByLastUpdated = /* GraphQL */ `
         users
         lastUser
         lastMessage
+        dummy
       }
       nextToken
     }

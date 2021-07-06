@@ -167,6 +167,7 @@ export const onCreateOrUpdateConversation = /* GraphQL */ `
       users
       lastUser
       lastMessage
+      dummy
     }
   }
 `;
@@ -257,6 +258,7 @@ export const onCreateConversation = /* GraphQL */ `
       users
       lastUser
       lastMessage
+      dummy
     }
   }
 `;
@@ -269,6 +271,7 @@ export const onUpdateConversation = /* GraphQL */ `
       users
       lastUser
       lastMessage
+      dummy
     }
   }
 `;
@@ -281,6 +284,7 @@ export const onDeleteConversation = /* GraphQL */ `
       users
       lastUser
       lastMessage
+      dummy
     }
   }
 `;
