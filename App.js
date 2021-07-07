@@ -98,8 +98,11 @@ const App = () => {
   
   global.addConversationIds = (id) => {
     console.log("(((((((((((((((((((((((((((((((((");
+    console.log(id);
     
     const found = conversationIds.find(element => element == id);
+    
+    console.log(conversationIds);
     console.log("(((((((((((((((((((((((((((((((((");
     console.log(found);
     
