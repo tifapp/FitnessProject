@@ -322,13 +322,16 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       tempposts.splice(index + 1, 0, localNewPost);
       setPosts(tempposts);
     }
+    
+    let users = [route.params?.myId, receiver];
+    users.sort();
 
     try {
       API.graphql(graphqlOperation(createPost, { input: newPost }));
       if (receiver != null) {
         //when sending a message, create conversation using specified channel if posts is empty. if not, update conversation with the specified channel.
         if (posts.length == 0) {
-          API.graphql(graphqlOperation(createConversation, { input: {id: channel, users: route.params?.myId<receiver ? [route.params?.myId, receiver]:[receiver, route.params?.myId], lastMessage: postVal} }));
+          API.graphql(graphqlOperation(createConversation, { input: {id: channel, users: users, lastMessage: postVal} }));
         } else {
           API.graphql(graphqlOperation(updateConversation, { input: {id: channel, lastMessage: postVal} }));
         }
