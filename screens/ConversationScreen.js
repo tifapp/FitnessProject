@@ -9,7 +9,7 @@ import {
   SafeAreaView,
   LayoutAnimation
 } from "react-native";
-import { listConversations } from "../src/graphql/queries";
+import { conversationsByLastUpdated } from "../src/graphql/queries";
 import {
   onCreatePostForReceiver,
   onCreatePostByUser
@@ -132,7 +132,7 @@ export default function ConversationScreen({ navigation, route }) {
             <APIList
               initialAmount={10}
               additionalAmount={20}
-              queryOperation={listConversations}
+              queryOperation={conversationsByLastUpdated}
               data={conversations}
               setDataFunction={setConversations}
               renderItem={({ item }) => (
@@ -147,6 +147,7 @@ export default function ConversationScreen({ navigation, route }) {
                 lastUser={item.lastUser}
                 />
               )}
+              filter={{dummy: 0}}
               keyExtractor={(item) => item.id}
             />
           </SafeAreaView>
