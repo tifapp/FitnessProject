@@ -147,7 +147,7 @@ export default function ConversationScreen({ navigation, route }) {
                 lastUser={item.lastUser}
                 />
               )}
-              filter={{dummy: 0}}
+              filter={{dummy: 0, sortDirection: "DESC"}}
               keyExtractor={(item) => item.id}
             />
           </SafeAreaView>
