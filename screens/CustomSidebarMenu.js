@@ -22,6 +22,7 @@ import {
   onCreateFriendRequestForReceiver,
   onAcceptedFriendship,
   onCreateOrUpdateConversation,
+  onCreatePostForReceiver
 } from "root/src/graphql/subscriptions";
 import { deleteFriendship, updateFriendship, createBlock } from "root/src/graphql/mutations";
 
@@ -49,6 +50,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
   const [friendList, setFriendList] = useState([]);
   const [friendRequestList, setFriendRequestList] = useState([]);
   const [newFriendRequests, setNewFriendRequests] = useState(0); //should persist across sessions (ex. if you receive new friend requests while logged out)
+  const [newConversations, setNewConversations] = useState(0); //should persist across sessions (ex. if you receive new friend requests while logged out)
 
   const isDrawerOpen = useRef();
   const currentFriends = useRef();
@@ -96,6 +98,17 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
       .then((time) => {
         setLastOnlineTime(time);
       });
+    
+    const receivedConversationSubscription = API.graphql(
+      graphqlOperation(onCreatePostForReceiver, {receiver: myId})
+    ).subscribe({
+      next: (event) => {
+        const newPost = event.value.data.onCreatePostForReceiver;
+
+        global.showNotificationDot();
+        setNewConversations(newConversations + 1);
+      },
+    });
 
     // Executes when a user receieves a friend request
     // listening for new friend requests
@@ -181,7 +194,8 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
       friendRequestSubscription.unsubscribe();
       subscriptions.forEach(element => {
         element.unsubscribe();
-      });
+      });      
+      receivedConversationSubscription.unsubscribe();
       //conversationUpdateSubscription.unsubscribe();
       currentFriendRequests.current.forEach(item => {if (item.rejected || item.accepted) confirmResponse(item);});
     };
@@ -411,7 +425,8 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
           textStyle={{
             fontWeight: "bold",
             fontSize: 26,
-            color: (state.index === state.routes.length-1 && state.routes[state.routes.length-1].name === "Profile") ? "blue" : "black",
+            color: "black",
+            textDecorationLine: (state.routes[state.index].name === "Profile") ? "underline" : "none"
           }}
         />
       </View>
@@ -566,11 +581,14 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
         paddingVertical: 15,
         backgroundColor: "white",
       }]}
-      onPress={()=>{navigation.navigate("Conversations")}}>
+      onPress={()=>{setNewConversations(0); navigation.navigate("Conversations")}}>
         <Text style={{
           fontSize: 18,
-          color: "grey",
-        }}>Conversations</Text>
+          color: (state.routes[state.index].name === "Conversations") ? "black" : newConversations > 0 ? "blue" : "grey",
+          textDecorationLine: (state.routes[state.index].name === "Conversations") ? "underline" : "none",
+        }}>Conversations {(newConversations > 0
+            ? " (" + (newConversations <= 20 ? newConversations : "20+") + ")"
+            : "")}</Text>
       </TouchableOpacity>
       <TouchableOpacity
       style={[{
@@ -583,7 +601,8 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
       onPress={()=>{console.log("going to settings"), navigation.navigate("Settings")}}>
         <Text style={{
           fontSize: 18,
-          color: "grey",
+          color: (state.routes[state.index].name === "Settings") ? "black" : "grey",
+          textDecorationLine: (state.routes[state.index].name === "Settings") ? "underline" : "none",
         }}>Settings</Text>
       </TouchableOpacity>
     </SafeAreaView>
