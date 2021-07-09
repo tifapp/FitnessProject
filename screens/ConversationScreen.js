@@ -68,6 +68,7 @@ export default function ConversationScreen({ navigation, route }) {
       next: (event) => {
         const newPost = event.value.data.onCreatePostForReceiver;
 
+        global.showNotificationDot();
         updateConversationList(newPost);
       },
     });

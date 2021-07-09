@@ -129,8 +129,8 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
 
         //if the drawer is closed, show the blue dot in the corner
         if (!isDrawerOpen.current) {
-          console.log("incrementing counter");
-          global.incrementNotificationCount();
+          //console.log("incrementing counter");
+          global.showNotificationDot();
         }
         
         setNewFriendRequests(currentNewFriendRequestCount.current + 1);
@@ -190,7 +190,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
   useEffect(() => {
     if (isDrawerOpen.current) {
       playSound("collapse");
-      global.resetNotificationCount();
+      global.hideNotificationDot();
     } else {
       playSound("expand");
     }
