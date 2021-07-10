@@ -375,7 +375,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       deletePostsAsync={deletePostsAsync}
       writtenByYou={item.userId === route.params?.myId}
       editButtonHandler={updatePostAsync}
-      replyButtonHandler={addPostAsync}
       receiver={receiver}
       showTimestamp={showTimestamp(item, index)}
       newSection={
@@ -443,6 +442,8 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         keyExtractor={(item) => item.createdAt.toString() + item.userId}
         onEndReachedThreshold={0.5}
       />
+      {
+        /*
       <View
         style={{
           top: 50,
@@ -452,6 +453,8 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       >
         <SpamButton func={addPostAsync} />
       </View>
+        */
+      }
     </SafeAreaView>
   );
 };

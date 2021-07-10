@@ -194,7 +194,7 @@ export default React.memo(function PostItem({
         <View
           style={
             [styles.spaceAround,
-            {
+            replyButtonHandler ? {} : {
               marginBottom: 20,
               marginHorizontal: 10,
               backgroundColor: "white",
@@ -214,7 +214,7 @@ export default React.memo(function PostItem({
             deletePostsAsync={deletePostsAsync}
             writtenByYou={writtenByYou}
             setIsEditing={setIsEditing}
-            repliesPressed={() => setAreRepliesVisible(!areRepliesVisible)}
+            repliesPressed={() => replyButtonHandler ? replyButtonHandler() : setAreRepliesVisible(!areRepliesVisible)}
             areRepliesVisible={areRepliesVisible}
           />
           {isEditing ? (
@@ -277,12 +277,63 @@ export default React.memo(function PostItem({
         >
           <TouchableOpacity onPress={()=>setAreRepliesVisible(false)} style={{width: "100%", height: "100%", position: "absolute", backgroundColor: "#00000033"}}> 
           </TouchableOpacity>
-          <View style={{marginTop: "auto", flex: 0.65, backgroundColor: "white"}}> 
+          <View style={{marginTop: "auto", flex: 0.8, backgroundColor: "#efefef"}}> 
             <View style={{height: 1, width: "100%", alignSelf: "center", backgroundColor: "lightgray"}}>
             </View>
             <View style={{margin: 10, width: 25, height: 2, alignSelf: "center", backgroundColor: "lightgray"}}>
             </View>
+        <View
+          style={[
+            {
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 1,
+              },
+              shadowOpacity: 0.22,
+              shadowRadius: 2.22,
+
+              elevation: 3,
+              position: "absolute",
+              top: -18,
+              flexDirection: "column",
+              alignItems: "flex-start",
+            },
+          ]}
+        >
+          <View
+            style={{
+              backgroundColor: "blue",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <MaterialIcons
+              name="chat-bubble"
+              size={17}
+              color={"white"}
+              style={{ padding: 6 }}
+            />
+            <Text
+              style={[{ marginRight: 6, fontWeight: "bold", color: "white" }]}
+            >
+              Replying to
+            </Text>
+          </View>
+        </View>
             <FeedScreen
+              headerComponent={
+                <PostItem
+                  index={index}
+                  item={item}
+                  //deletePostsAsync={deletePostsAsync}
+                  writtenByYou={item.userId === route.params?.myId}
+                  //editButtonHandler={updatePostAsync}
+                  replyButtonHandler={() => {
+                    setAreRepliesVisible(false);
+                  }}
+                />
+              }
               navigation={navigation}
               route={route}
               channel={SHA256(item.userId+item.createdAt)} //unique id
@@ -427,48 +478,6 @@ function PostHeader({item, writtenByYou, repliesPressed, deletePostsAsync, setIs
           </View>
         }
       />
-      {areRepliesVisible ? (
-        <View
-          style={[
-            {
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 1,
-              },
-              shadowOpacity: 0.22,
-              shadowRadius: 2.22,
-
-              elevation: 3,
-              position: "absolute",
-              top: -18,
-              left: -18,
-              flexDirection: "column",
-              alignItems: "flex-start",
-            },
-          ]}
-        >
-          <View
-            style={{
-              backgroundColor: "blue",
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <MaterialIcons
-              name="chat-bubble"
-              size={17}
-              color={"white"}
-              style={{ padding: 6 }}
-            />
-            <Text
-              style={[{ marginRight: 6, fontWeight: "bold", color: "white" }]}
-            >
-              Replying to
-            </Text>
-          </View>
-        </View>
-      ) : null}
       <View
         style={{
           marginHorizontal: 24,
