@@ -7,9 +7,10 @@ const { deleteConversation, deletePost } = require('/opt/mutations');
 
 exports.handler = (event, context, callback) => {
   //eslint-disable-line
-  console.log(JSON.stringify(event, null, 2));
+  //console.log(JSON.stringify(event, null, 2));
   event.Records.forEach(record => {
     if (record.eventName == "REMOVE") {
+      //console.log(record)
       (async () => {
         try {
           while (true) {
@@ -19,6 +20,8 @@ exports.handler = (event, context, callback) => {
                 channel: record.dynamodb.OldImage.id.S,
               }
             });
+
+            //console.log(results.data)
 
             await Promise.all(results.data.postsByChannel.items.map(async (post) => {
               client.mutate({
