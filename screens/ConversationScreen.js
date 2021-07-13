@@ -93,6 +93,54 @@ export default function ConversationScreen({ navigation, route }) {
   const currentConversations = useRef();
   currentConversations.current = conversations;
 
+  const deleteConversation = async (item) => {
+    /*
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    // update friendList
+    setFriendList((friendList) => {
+      return friendList.filter(
+        (i) => i.sender !== item.sender || i.receiver !== item.receiver
+      );
+    });
+    */
+
+    // update ConversationList
+
+    setConversations((conversations) => {
+      return conversations.filter(
+        (i) => i.users[0] !== friendId || i.users[1] !== friendId
+      );
+    });
+
+
+    await API.graphql(
+      graphqlOperation(deleteConversation, {
+        input: { id: item.id},
+      })
+    );
+
+    /*
+    // delete friend object
+    try {
+      if (blocked) {
+        global.localBlockList.push({createdAt: (new Date(Date.now())).toISOString(), userId: myId , blockee: item.receiver == myId ? item.sender : item.receiver});
+        API.graphql(
+          graphqlOperation(createBlock, {
+            input: { blockee: item.receiver == myId ? item.sender : item.receiver },
+          })
+        );
+      }
+      await API.graphql(
+        graphqlOperation(deleteFriendship, {
+          input: { sender: item.sender, receiver: item.receiver },
+        })
+      );
+    } catch (err) {
+      console.log("error: ", err);
+    }
+    */
+  };
+
   useEffect(() => {
     for(let i = 0; i < conversations.length; i++){
       console.log(route.params.myId)
@@ -154,6 +202,7 @@ export default function ConversationScreen({ navigation, route }) {
               renderItem={({ item }) => (
                 <FriendListItem
                 navigation={navigation}
+                deleteConversation = {deleteConversation}
                 //removeFriendHandler={removeFriend}
                 item={item}
                 //friendId={item.sender === myId ? item.receiver : item.sender}

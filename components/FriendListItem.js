@@ -20,6 +20,7 @@ export default function FriendListItem({
   item,
   navigation,
   removeFriendHandler,
+  deleteConversation,
   friendId,
   myId,
   lastMessage,
@@ -84,7 +85,7 @@ export default function FriendListItem({
                     {
                       text: "Yes",
                       onPress: () => {
-                        removeFriendHandler(item), setIsOptionsOpen(false);
+                        removeFriendHandler(item), setIsOptionsOpen(false)
                       },
                     },
                     {
