@@ -77,8 +77,8 @@ export const onDeletePostFromChannel = /* GraphQL */ `
   }
 `;
 export const onIncrementLikes = /* GraphQL */ `
-  subscription OnIncrementLikes {
-    onIncrementLikes {
+  subscription OnIncrementLikes($createdAt: AWSDateTime!, $userId: ID!) {
+    onIncrementLikes(createdAt: $createdAt, userId: $userId) {
       createdAt
       updatedAt
       userId
@@ -92,8 +92,8 @@ export const onIncrementLikes = /* GraphQL */ `
   }
 `;
 export const onDecrementLikes = /* GraphQL */ `
-  subscription OnDecrementLikes {
-    onDecrementLikes {
+  subscription OnDecrementLikes($createdAt: AWSDateTime!, $userId: ID!) {
+    onDecrementLikes(createdAt: $createdAt, userId: $userId) {
       createdAt
       updatedAt
       userId
@@ -107,8 +107,8 @@ export const onDecrementLikes = /* GraphQL */ `
   }
 `;
 export const onIncrementReplies = /* GraphQL */ `
-  subscription OnIncrementReplies {
-    onIncrementReplies {
+  subscription OnIncrementReplies($createdAt: AWSDateTime!, $userId: ID!) {
+    onIncrementReplies(createdAt: $createdAt, userId: $userId) {
       createdAt
       updatedAt
       userId
@@ -122,8 +122,8 @@ export const onIncrementReplies = /* GraphQL */ `
   }
 `;
 export const onDecrementReplies = /* GraphQL */ `
-  subscription OnDecrementReplies {
-    onDecrementReplies {
+  subscription OnDecrementReplies($createdAt: AWSDateTime!, $userId: ID!) {
+    onDecrementReplies(createdAt: $createdAt, userId: $userId) {
       createdAt
       updatedAt
       userId

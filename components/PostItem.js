@@ -24,7 +24,7 @@ import printTime from "hooks/printTime";
 import SHA256 from "hooks/hash";
 import FeedScreen from "screens/FeedScreen";
 import { MaterialIcons } from "@expo/vector-icons";
-import { onIncrementLikes, onDecrementLikes } from 'root/src/graphql/subscriptions';
+import { onIncrementLikes, onDecrementLikes, onIncrementReplies, onDecrementReplies } from 'root/src/graphql/subscriptions';
 import * as Haptics from "expo-haptics";
 import playSound from "../hooks/playSound";
 
@@ -413,41 +413,43 @@ function PostHeader({item, writtenByYou, repliesPressed, deletePostsAsync, setIs
   const likeDebounce = useRef(false);
 
   useEffect(() => {
-    const incrementLikeSubscription = API.graphql(graphqlOperation(onIncrementLikes)).subscribe({ //nvm we dont have a subscription event for incrementlike
+    const incrementLikeSubscription = API.graphql(graphqlOperation(onIncrementLikes, {createdAt: item.createdAt, userId: item.userId})).subscribe({ //nvm we dont have a subscription event for incrementlike
       next: event => {
-        const likedPost = event.value.data.onIncrementLikes
-        console.log("newly liked post ", likedPost);
-        if (likedPost.userId == item.userId && likedPost.createdAt == item.createdAt) {
-          console.log("found liked post");
-          if (likeDebounce.current) 
-          {
-            likeDebounce.current = false;
-          }
-          else setLikes(currentLikes.current + 1);
-        } else {
-          console.log("couldn't find liked post");
+        console.log("liked post!")
+        if (likeDebounce.current) 
+        {
+          console.log("you liked post!")
+          likeDebounce.current = false;
         }
+        else setLikes(currentLikes.current + 1);
       }
     });
-    const decrementLikeSubscription = API.graphql(graphqlOperation(onDecrementLikes)).subscribe({ //nvm we dont have a subscription event for incrementlike
+    const decrementLikeSubscription = API.graphql(graphqlOperation(onDecrementLikes, {createdAt: item.createdAt, userId: item.userId})).subscribe({ //nvm we dont have a subscription event for incrementlike
       next: event => {
-        const unlikedPost = event.value.data.onDecrementLikes
-        //console.log(unlikedPost)
-        //console.log("newly unliked post");
-        if (unlikedPost.userId == item.userId && unlikedPost.createdAt == item.createdAt) {
-          //console.log("the copy is loaded");
-          if (likeDebounce.current) 
-          {
-            likeDebounce.current = false;
-          }
-          else setLikes(currentLikes.current - 1);
+        console.log("unliked post!")
+        if (likeDebounce.current) 
+        {
+          likeDebounce.current = false;
         }
+        else setLikes(currentLikes.current - 1);
+      }
+    });
+    const incrementReplySubscription = API.graphql(graphqlOperation(onIncrementReplies, {createdAt: item.createdAt, userId: item.userId})).subscribe({ //nvm we dont have a subscription event for incrementlike
+      next: event => {
+        setReplies(currentReplies.current + 1);
+      }
+    });
+    const decrementReplySubscription = API.graphql(graphqlOperation(onDecrementReplies, {createdAt: item.createdAt, userId: item.userId})).subscribe({ //nvm we dont have a subscription event for incrementlike
+      next: event => {
+        setReplies(currentReplies.current - 1);
       }
     });
     
     return () => {
       incrementLikeSubscription.unsubscribe();
       decrementLikeSubscription.unsubscribe();
+      incrementReplySubscription.unsubscribe();
+      decrementReplySubscription.unsubscribe();
     }
   } ,[])
   
