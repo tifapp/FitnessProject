@@ -11,7 +11,6 @@ import { useFocusEffect } from '@react-navigation/native';
 import * as Notifications from 'expo-notifications';
 import { ProfileImageAndName } from "components/ProfileImageAndName";
 import { API, graphqlOperation } from "aws-amplify";
-import { createReadReceipt, deleteReadReceipt } from "root/src/graphql/mutations";
 import { getBlock } from "../src/graphql/queries";
 //const { width } = Dimensions.get('window');
 
@@ -37,8 +36,6 @@ export default function MessageScreen({ navigation, route }) {
         setBlocked(true);
       }
     })();
-    API.graphql(graphqlOperation(deleteReadReceipt, { input: {conversationId: route.params?.myId < userId ? route.params?.myId+userId : userId+route.params?.myId, userId: route.params?.myId} }));
-    API.graphql(graphqlOperation(createReadReceipt, { input: {conversationId: route.params?.myId < userId ? route.params?.myId+userId : userId+route.params?.myId} }));
   },[userId])
 
   /*

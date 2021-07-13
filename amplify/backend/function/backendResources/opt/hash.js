@@ -4,7 +4,7 @@
 * Original code by Angel Marin, Paul Johnston
 **/
 
-export default function SHA256(s){
+exports.SHA256 = (string) => {
     var chrsz = 8;
     var hexcase = 0;
    
@@ -117,6 +117,6 @@ export default function SHA256(s){
     return str;
     }
    
-    s = Utf8Encode(s);
-    return binb2hex(core_sha256(str2binb(s), s.length * chrsz));
+    string = Utf8Encode(string);
+    return binb2hex(core_sha256(str2binb(string), string.length * chrsz));
    }

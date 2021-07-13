@@ -16,7 +16,7 @@ import {
 } from "react-native";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation, Cache } from "aws-amplify";
-import { createPost, updatePost, deletePost, createConversation, updateConversation, createReadReceipt, deleteReadReceipt } from "root/src/graphql/mutations";
+import { createPost, updatePost, deletePost, createConversation, updateConversation } from "root/src/graphql/mutations";
 import { listPosts, postsByChannel, batchGetLikes } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
 import { onCreatePostFromChannel, onDeletePostFromChannel, onUpdatePostFromChannel, onCreateLike, onDeleteLike, onIncrementLikes, onDecrementLikes } from 'root/src/graphql/subscriptions';
@@ -105,12 +105,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
           else {
             LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
             setPosts([newPost, ...currentPosts.current]); //what if we have a lot of new posts at once?
-            if (newPost.receiver == route.params?.myId) {
-              (async () => {
-                await API.graphql(graphqlOperation(deleteReadReceipt, { input: {conversationId: channel, userId: route.params?.myId} }));
-                API.graphql(graphqlOperation(createReadReceipt, { input: {conversationId: channel} }));
-              })();
-            }
           }
         }
       }
@@ -322,13 +316,16 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       tempposts.splice(index + 1, 0, localNewPost);
       setPosts(tempposts);
     }
+    
+    let users = [route.params?.myId, receiver];
+    users.sort();
 
     try {
       API.graphql(graphqlOperation(createPost, { input: newPost }));
       if (receiver != null) {
         //when sending a message, create conversation using specified channel if posts is empty. if not, update conversation with the specified channel.
         if (posts.length == 0) {
-          API.graphql(graphqlOperation(createConversation, { input: {id: channel, users: route.params?.myId<receiver ? [route.params?.myId, receiver]:[receiver, route.params?.myId], lastMessage: postVal} }));
+          API.graphql(graphqlOperation(createConversation, { input: {id: channel, users: users, lastMessage: postVal} }));
         } else {
           API.graphql(graphqlOperation(updateConversation, { input: {id: channel, lastMessage: postVal} }));
         }
@@ -378,7 +375,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       deletePostsAsync={deletePostsAsync}
       writtenByYou={item.userId === route.params?.myId}
       editButtonHandler={updatePostAsync}
-      replyButtonHandler={addPostAsync}
       receiver={receiver}
       showTimestamp={showTimestamp(item, index)}
       newSection={
@@ -446,6 +442,8 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         keyExtractor={(item) => item.createdAt.toString() + item.userId}
         onEndReachedThreshold={0.5}
       />
+      {
+        /*
       <View
         style={{
           top: 50,
@@ -455,6 +453,8 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       >
         <SpamButton func={addPostAsync} />
       </View>
+        */
+      }
     </SafeAreaView>
   );
 };

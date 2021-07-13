@@ -5,6 +5,7 @@ $util.qr($context.args.input.put("id", $util.defaultIfNull($ctx.args.input.id, $
 $util.qr($context.args.input.put("createdAt", $util.defaultIfNull($ctx.args.input.createdAt, $createdAt)))
 ## Automatically set the updatedAt timestamp. **
 $util.qr($context.args.input.put("updatedAt", $util.defaultIfNull($ctx.args.input.updatedAt, $createdAt)))
+$util.qr($context.args.input.put("dummy", $util.defaultIfNull($ctx.args.input.dummy, 0)))
 ## [End] Set default values. **
 ## [Start] Determine request authentication mode **
 #if( $util.isNullOrEmpty($authMode) && !$util.isNull($ctx.identity) && !$util.isNull($ctx.identity.sub) && !$util.isNull($ctx.identity.issuer) && !$util.isNull($ctx.identity.username) && !$util.isNull($ctx.identity.claims) && !$util.isNull($ctx.identity.sourceIp) && !$util.isNull($ctx.identity.defaultAuthStrategy) )

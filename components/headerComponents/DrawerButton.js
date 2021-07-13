@@ -25,11 +25,11 @@ export default function DrawerButton(props) {
 
   const [notificationCount, setNotificationCount] = useState(0);
 
-  global.incrementNotificationCount = () => {
+  global.showNotificationDot = () => {
     setNotificationCount(notificationCount + 1);
   };
 
-  global.resetNotificationCount = () => {
+  global.hideNotificationDot = () => {
     setNotificationCount(0);
   };
   
@@ -43,7 +43,7 @@ export default function DrawerButton(props) {
           style={{ paddingRight: 15 }}
         />
         {notificationCount > 0 ? (
-          <MaterialIcons name="circle" size={10} color={"red"} style={{position: "absolute", top: -2, right: -6}} />
+          <MaterialIcons name="circle" size={10} color={"red"} style={{position: "absolute", top: -2, right: 10 }} />
         ) : null}
       </TouchableOpacity>
     </View>

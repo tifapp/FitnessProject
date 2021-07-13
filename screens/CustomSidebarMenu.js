@@ -22,6 +22,7 @@ import {
   onCreateFriendRequestForReceiver,
   onAcceptedFriendship,
   onCreateOrUpdateConversation,
+  onCreatePostForReceiver
 } from "root/src/graphql/subscriptions";
 import { deleteFriendship, updateFriendship, createBlock } from "root/src/graphql/mutations";
 
@@ -38,7 +39,6 @@ import FriendRequestListItem from "components/FriendRequestListItem";
 import playSound from "../hooks/playSound";
 import { useIsDrawerOpen } from '@react-navigation/drawer';
 import { batchGetConversations } from "../src/graphql/queries";
-import { batchGetReadReceipts } from "../src/graphql/queries";
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 
 var subscriptions = [];
@@ -49,6 +49,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
   const [friendList, setFriendList] = useState([]);
   const [friendRequestList, setFriendRequestList] = useState([]);
   const [newFriendRequests, setNewFriendRequests] = useState(0); //should persist across sessions (ex. if you receive new friend requests while logged out)
+  const [newConversations, setNewConversations] = useState(0); //should persist across sessions (ex. if you receive new friend requests while logged out)
 
   const isDrawerOpen = useRef();
   const currentFriends = useRef();
@@ -96,6 +97,17 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
       .then((time) => {
         setLastOnlineTime(time);
       });
+    
+    const receivedConversationSubscription = API.graphql(
+      graphqlOperation(onCreatePostForReceiver, {receiver: myId})
+    ).subscribe({
+      next: (event) => {
+        const newPost = event.value.data.onCreatePostForReceiver;
+
+        global.showNotificationDot();
+        setNewConversations(newConversations + 1);
+      },
+    });
 
     // Executes when a user receieves a friend request
     // listening for new friend requests
@@ -129,8 +141,8 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
 
         //if the drawer is closed, show the blue dot in the corner
         if (!isDrawerOpen.current) {
-          console.log("incrementing counter");
-          global.incrementNotificationCount();
+          //console.log("incrementing counter");
+          global.showNotificationDot();
         }
         
         setNewFriendRequests(currentNewFriendRequestCount.current + 1);
@@ -181,7 +193,8 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
       friendRequestSubscription.unsubscribe();
       subscriptions.forEach(element => {
         element.unsubscribe();
-      });
+      });      
+      receivedConversationSubscription.unsubscribe();
       //conversationUpdateSubscription.unsubscribe();
       currentFriendRequests.current.forEach(item => {if (item.rejected || item.accepted) confirmResponse(item);});
     };
@@ -190,7 +203,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
   useEffect(() => {
     if (isDrawerOpen.current) {
       playSound("collapse");
-      global.resetNotificationCount();
+      global.hideNotificationDot();
     } else {
       playSound("expand");
     }
@@ -211,16 +224,13 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
     subscriptions.length = 0;
 
     let conversationIds = [];
-    let receiptIds = [];
 
     items.forEach((item) => {
       conversationIds.push({id: item.sender < item.receiver ? item.sender+item.receiver : item.receiver+item.sender});
-      receiptIds.push({conversationId: item.sender < item.receiver ? item.sender+item.receiver : item.receiver+item.sender});
     });
     
     try {
       const conversations = await API.graphql(graphqlOperation(batchGetConversations, { ids: conversationIds }));
-      const receipts = await API.graphql(graphqlOperation(batchGetReadReceipts, { receipts: receiptIds }));
       //console.log("looking for conversations: ", conversations);
       //returns an array of like objects or nulls corresponding with the array of conversations
       for (i = 0; i < items.length; ++i) {
@@ -266,16 +276,10 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
           );
         })();
 
-        console.log(receipts);
         if (conversations.data.batchGetConversations[i] != null) {
           console.log("found conversation");
           items[i].lastMessage = conversations.data.batchGetConversations[i].lastMessage;
           items[i].lastUser = conversations.data.batchGetConversations[i].lastUser; //could also store the index of lastuser from the users array rather than the full string
-
-          if (receipts.data.batchGetReadReceipts[i] != null && new Date(conversations.data.batchGetConversations[i].updatedAt) < new Date(receipts.data.batchGetReadReceipts[i].updatedAt)) {
-            console.log("found receipt");
-            items[i].isRead = true;
-          }
         }
       }
       return items;
@@ -411,7 +415,8 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
           textStyle={{
             fontWeight: "bold",
             fontSize: 26,
-            color: (state.index === state.routes.length-1 && state.routes[state.routes.length-1].name === "Profile") ? "blue" : "black",
+            color: "black",
+            textDecorationLine: (state.routes[state.index].name === "Profile") ? "underline" : "none"
           }}
         />
       </View>
@@ -566,11 +571,14 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
         paddingVertical: 15,
         backgroundColor: "white",
       }]}
-      onPress={()=>{navigation.navigate("Conversations")}}>
+      onPress={()=>{setNewConversations(0); navigation.navigate("Conversations")}}>
         <Text style={{
           fontSize: 18,
-          color: "grey",
-        }}>Conversations</Text>
+          color: (state.routes[state.index].name === "Conversations") ? "black" : newConversations > 0 ? "blue" : "grey",
+          textDecorationLine: (state.routes[state.index].name === "Conversations") ? "underline" : "none",
+        }}>Conversations {(newConversations > 0
+            ? " (" + (newConversations <= 20 ? newConversations : "20+") + ")"
+            : "")}</Text>
       </TouchableOpacity>
       <TouchableOpacity
       style={[{
@@ -583,7 +591,8 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
       onPress={()=>{console.log("going to settings"), navigation.navigate("Settings")}}>
         <Text style={{
           fontSize: 18,
-          color: "grey",
+          color: (state.routes[state.index].name === "Settings") ? "black" : "grey",
+          textDecorationLine: (state.routes[state.index].name === "Settings") ? "underline" : "none",
         }}>Settings</Text>
       </TouchableOpacity>
     </SafeAreaView>
