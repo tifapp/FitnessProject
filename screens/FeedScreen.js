@@ -389,7 +389,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
             </View>
           </View>
         }
-        initialAmount={5}
+        initialAmount={7}
         additionalAmount={7} //change number based on device specs
         processingFunction={getLikedPosts}
         queryOperation={postsByChannel}

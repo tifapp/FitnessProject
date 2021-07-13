@@ -235,7 +235,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
       //returns an array of like objects or nulls corresponding with the array of conversations
       for (i = 0; i < items.length; ++i) {
         //console.log("friend list item: ", items[i]);
-        const friendslistarray = items[i].sender < items[i].receiver ? [items[i].sender,items[i].receiver] : [items[i].receiver,items[i].sender];
+        const friendslistarray = [items[i].sender,items[i].receiver].sort();
         //console.log("friend list array: ", friendslistarray);
         (async () => {
           subscriptions.push(
