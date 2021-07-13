@@ -5,7 +5,7 @@ const { client, sendNotification } = require('/opt/backendResources');
 const { getUser, postsByChannel } = require('/opt/queries');
 const { deleteConversation, deletePost } = require('/opt/mutations');
 
-exports.handler = event => {
+exports.handler = (event, context, callback) => {
   //eslint-disable-line
   console.log(JSON.stringify(event, null, 2));
   event.Records.forEach(record => {
