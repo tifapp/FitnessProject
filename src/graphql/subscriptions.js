@@ -171,6 +171,19 @@ export const onCreateOrUpdateConversation = /* GraphQL */ `
     }
   }
 `;
+export const onDeleteConversation = /* GraphQL */ `
+  subscription OnDeleteConversation($users: [ID!]!) {
+    onDeleteConversation(users: $users) {
+      createdAt
+      updatedAt
+      id
+      users
+      lastUser
+      lastMessage
+      dummy
+    }
+  }
+`;
 export const onCreateGroup = /* GraphQL */ `
   subscription OnCreateGroup {
     onCreateGroup {
@@ -249,45 +262,6 @@ export const onDeleteBlock = /* GraphQL */ `
     }
   }
 `;
-export const onCreateConversation = /* GraphQL */ `
-  subscription OnCreateConversation($users: String) {
-    onCreateConversation(users: $users) {
-      createdAt
-      updatedAt
-      id
-      users
-      lastUser
-      lastMessage
-      dummy
-    }
-  }
-`;
-export const onUpdateConversation = /* GraphQL */ `
-  subscription OnUpdateConversation($users: String) {
-    onUpdateConversation(users: $users) {
-      createdAt
-      updatedAt
-      id
-      users
-      lastUser
-      lastMessage
-      dummy
-    }
-  }
-`;
-export const onDeleteConversation = /* GraphQL */ `
-  subscription OnDeleteConversation($users: String) {
-    onDeleteConversation(users: $users) {
-      createdAt
-      updatedAt
-      id
-      users
-      lastUser
-      lastMessage
-      dummy
-    }
-  }
-`;
 export const onCreateFriendship = /* GraphQL */ `
   subscription OnCreateFriendship($sender: String, $receiver: String) {
     onCreateFriendship(sender: $sender, receiver: $receiver) {
@@ -348,36 +322,6 @@ export const onDeleteLike = /* GraphQL */ `
       updatedAt
       userId
       postId
-    }
-  }
-`;
-export const onCreateReadReceipt = /* GraphQL */ `
-  subscription OnCreateReadReceipt($userId: String) {
-    onCreateReadReceipt(userId: $userId) {
-      createdAt
-      updatedAt
-      userId
-      conversationId
-    }
-  }
-`;
-export const onUpdateReadReceipt = /* GraphQL */ `
-  subscription OnUpdateReadReceipt($userId: String) {
-    onUpdateReadReceipt(userId: $userId) {
-      createdAt
-      updatedAt
-      userId
-      conversationId
-    }
-  }
-`;
-export const onDeleteReadReceipt = /* GraphQL */ `
-  subscription OnDeleteReadReceipt($userId: String) {
-    onDeleteReadReceipt(userId: $userId) {
-      createdAt
-      updatedAt
-      userId
-      conversationId
     }
   }
 `;

@@ -355,45 +355,6 @@ export const updatePost = /* GraphQL */ `
     }
   }
 `;
-export const createReadReceipt = /* GraphQL */ `
-  mutation CreateReadReceipt(
-    $input: CreateReadReceiptInput!
-    $condition: ModelReadReceiptConditionInput
-  ) {
-    createReadReceipt(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      userId
-      conversationId
-    }
-  }
-`;
-export const updateReadReceipt = /* GraphQL */ `
-  mutation UpdateReadReceipt(
-    $input: UpdateReadReceiptInput!
-    $condition: ModelReadReceiptConditionInput
-  ) {
-    updateReadReceipt(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      userId
-      conversationId
-    }
-  }
-`;
-export const deleteReadReceipt = /* GraphQL */ `
-  mutation DeleteReadReceipt(
-    $input: DeleteReadReceiptInput!
-    $condition: ModelReadReceiptConditionInput
-  ) {
-    deleteReadReceipt(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      userId
-      conversationId
-    }
-  }
-`;
 export const createUser = /* GraphQL */ `
   mutation CreateUser(
     $input: CreateUserInput!
