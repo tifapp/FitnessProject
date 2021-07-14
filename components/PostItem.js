@@ -30,7 +30,7 @@ import playSound from "../hooks/playSound";
 
 var styles = require("../styles/stylesheet");
 
-function LikeButton({ likes, likedByYou, postId, likeDebounceRef }) {
+function LikeButton({ setLikes, likes, likedByYou, postId, likeDebounceRef }) {
   const [liked, setLiked] = useState(likedByYou);
   const likeRef = useRef();
   const timerIsRunning = useRef();
@@ -50,7 +50,7 @@ function LikeButton({ likes, likedByYou, postId, likeDebounceRef }) {
   const sendAPICall = () => {
     likeDebounceRef.current = true;
     if (liked == likeRef.current) {
-      console.log("sent API call, hopefully debounce works.");
+      //console.log("sent API call, hopefully debounce works.");
       if (!liked) {
         API.graphql(
           graphqlOperation(createLike, { input: { postId: postId } })
@@ -62,8 +62,6 @@ function LikeButton({ likes, likedByYou, postId, likeDebounceRef }) {
           })
         );
       }
-    } else {
-      console.log("you repeated yourself");
     }
 
     timerIsRunning.current = false;
@@ -73,6 +71,7 @@ function LikeButton({ likes, likedByYou, postId, likeDebounceRef }) {
     liked ? playSound("unlike") : playSound("like");
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     try {
+      liked ? setLikes(likes-1) : setLikes(likes+1); 
       setLiked(!liked);
       resetTimeout();
     } catch (err) {
@@ -98,11 +97,7 @@ function LikeButton({ likes, likedByYou, postId, likeDebounceRef }) {
           { marginRight: 6, fontWeight: "bold", color: liked ? "red" : "gray" },
         ]}
       >
-        {likedByYou && !liked
-          ? likes - 1
-          : !likedByYou && liked
-          ? likes + 1
-          : likes}
+        {likes}
       </Text>
       <MaterialIcons
         name={liked ? "favorite" : "favorite-outline"}
@@ -179,11 +174,6 @@ export default React.memo(function PostItem({
   const [replyingText, setReplyingText] = useState("");
   const displayTime = printTime(item.createdAt);
   const isReceivedMessage = receiver != null && !writtenByYou;
-  
-
-  // useEffect(() => {
-  //   console.log("re-rendering postItem: ", index)
-  // });
 
   //
   if (receiver == null)
@@ -485,6 +475,7 @@ function PostHeader({item, writtenByYou, repliesPressed, deletePostsAsync, setIs
             }}
           >
             <LikeButton
+              setLikes={setLikes}
               likes={likes}
               likedByYou={item.likedByYou}
               postId={item.createdAt + "#" + item.userId}
