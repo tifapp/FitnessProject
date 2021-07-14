@@ -163,18 +163,29 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
         const newFriend = event.value.data.onAcceptedFriendship;
         //we can see all friend requests being accepted, so we just have to make sure it's one of ours.
         if (newFriend.sender === myId || newFriend.receiver === myId) {
-          if (!currentFriends.current.find(item => item.sender === newFriend.sender || item.receiver === newFriend.receiver)
-            && !currentFriendRequests.current.find(item => item.sender === newFriend.sender || item.sender === newFriend.receiver)) {
+          if (currentFriendRequests.current.find(item => item.sender === newFriend.sender || item.sender === newFriend.receiver)) {
+            setFriendRequestList(
+              currentFriendRequests.current.filter(
+                (item) => item.sender != newFriendRequest.sender || item.receiver != newFriendRequest.sender
+            ));
+          }
+
+          console.log("someone accepted us")
+
+          const friendlistarray = [newFriend.sender, newFriend.receiver].sort();
+
+          if (!currentFriends.current.find(item => item.sender === newFriend.sender && item.receiver === newFriend.receiver)) {
             (async () => {
               //check if a convo already exists between the two users
               const convo = await API.graphql(
-                graphqlOperation(getConversation, { users: [newFriend.sender, newFriend.receiver].sort() })
+                graphqlOperation(getConversation, { id: friendlistarray[0] + friendlistarray[1] })
               );
 
               if (convo.data.getConversation != null) {
+                console.log("found old condo")
                 newFriend.lastMessage = convo.data.getConversation.lastMessage
                 newFriend.lastUser = convo.data.getConversation.lastUser
-              }
+              } else {console.log("couldnt find condo")}
 
               LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
               setFriendList([newFriend, ...currentFriends.current]);
@@ -380,13 +391,65 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
 
     if (item.accepted && (friendList.length == 0 || !friendList.find(item1 => item1.sender == item.sender && item1.receiver == item.receiver))) {
       console.log("Inside removeFriendRequestListItem");
-
-      setFriendList([{
+      
+      var newFriend = {
         createdAt: (new Date(Date.now())).toISOString(),
         updatedAt: (new Date(Date.now())).toISOString(),
         sender: item.sender,
         receiver: item.receiver,
-      }, ...friendList]);
+      };
+      
+      (async () => {
+        //check if a convo already exists between the two users
+        const convo = await API.graphql(
+          graphqlOperation(getConversation, { id: friendlistarray[0] + friendlistarray[1] })
+        );
+
+        if (convo.data.getConversation != null) {
+          console.log("found old condo")
+          newFriend.lastMessage = convo.data.getConversation.lastMessage
+          newFriend.lastUser = convo.data.getConversation.lastUser
+        } else {console.log("couldnt find condo")}
+
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setFriendList([newFriend, ...currentFriends.current]);
+        subscriptions.push(
+          await API.graphql(
+            graphqlOperation(onCreateOrUpdateConversation, {
+              users: [newFriend.sender, newFriend.receiver].sort()
+            })
+          ).subscribe({
+            next: (event) => {
+              const updatedConversation =
+                event.value.data.onCreateOrUpdateConversation;
+              console.log(
+                "new message, this is what it looks like ",
+                updatedConversation,
+                " and this is you: ",
+                myId
+              );
+              //no need for security checks here
+              setFriendList(
+                currentFriends.current.map(function (i) {
+                  if (
+                    updatedConversation.users.find(
+                      (user) =>
+                        user !== myId &&
+                        (i.sender === user || i.receiver === user)
+                    )
+                  ) {
+                    i.lastMessage = updatedConversation.lastMessage;
+                    i.lastUser = updatedConversation.lastUser;
+                    i.isRead = null;
+                  }
+                  return i;
+                }));
+              //foreach users in conversation, if it's not myid and it's in friend list, update friend list, and push it to the top.
+              //alternatively for message screen, for each user in message screen, if it's in conversation push it to the top. otherwise just put this conversation at the top of the list.
+            },
+          })
+        );
+      })();
     }
     
     try {

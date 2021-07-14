@@ -24,6 +24,19 @@ export const batchGetConversations = /* GraphQL */ `
     }
   }
 `;
+export const getConversationByUsers = /* GraphQL */ `
+  query GetConversationByUsers($users: [ID!]!) {
+    getConversationByUsers(users: $users) {
+      createdAt
+      updatedAt
+      id
+      users
+      lastUser
+      lastMessage
+      dummy
+    }
+  }
+`;
 export const getGroup = /* GraphQL */ `
   query GetGroup($id: ID!) {
     getGroup(id: $id) {

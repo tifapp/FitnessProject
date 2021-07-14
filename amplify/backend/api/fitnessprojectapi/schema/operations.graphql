@@ -28,4 +28,5 @@ type Subscription {
 type Query {
   batchGetLikes(likes: [CreateLikeInput]): [Like]
   batchGetConversations(ids: [DeleteConversationInput]): [Conversation]
+  getConversationByUsers(users: [ID!]!): Conversation
 }
