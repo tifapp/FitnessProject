@@ -109,6 +109,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         }
       }
     });
+    /*
     const deletePostSubscription = API.graphql(graphqlOperation(onDeletePostFromChannel, {channel: channel})).subscribe({
       next: event => {
         const deletedPost = event.value.data.onDeletePost
@@ -123,6 +124,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         }
       }
     });
+    */
     const updatePostSubscription = API.graphql(graphqlOperation(onUpdatePostFromChannel, {channel: channel})).subscribe({ //nvm we dont have a subscription event for incrementlike
       next: event => {
         //console.log("post has been updated");
@@ -131,7 +133,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     checkInternetConnection();
     return () => {
       createPostSubscription.unsubscribe();
-      deletePostSubscription.unsubscribe();
+      //deletePostSubscription.unsubscribe();
       updatePostSubscription.unsubscribe();
     }
   }, []);

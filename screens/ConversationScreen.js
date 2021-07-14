@@ -10,9 +10,11 @@ import {
   LayoutAnimation
 } from "react-native";
 import { conversationsByLastUpdated } from "../src/graphql/queries";
+import { deleteConversation } from "root/src/graphql/mutations";
 import {
   onCreatePostForReceiver,
-  onCreatePostByUser
+  onCreatePostByUser,
+  onDeleteConversation
 } from "root/src/graphql/subscriptions";
 import APIList from "../components/APIList"
 import { API, graphqlOperation} from "aws-amplify";
@@ -20,6 +22,7 @@ import {ProfileImageAndName} from "../components/ProfileImageAndName"
 import FriendListItem from "components/FriendListItem"
 
 var styles = require('styles/stylesheet');
+var subscriptions = [];
 
 export default function ConversationScreen({ navigation, route }) {
 
@@ -86,6 +89,9 @@ export default function ConversationScreen({ navigation, route }) {
     return () => {
       receivedConversationSubscription.unsubscribe()
       sentConversationSubscription.unsubscribe()
+      subscriptions.forEach(element => {
+        element.unsubscribe();
+      });
     };
   }, []);
 
@@ -93,7 +99,7 @@ export default function ConversationScreen({ navigation, route }) {
   const currentConversations = useRef();
   currentConversations.current = conversations;
 
-  const deleteConversation = async (item) => {
+  const deleteConversationFromConvo = async (item, friendID) => {
     /*
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     // update friendList
@@ -106,16 +112,25 @@ export default function ConversationScreen({ navigation, route }) {
 
     // update ConversationList
 
+    console.log("((((((((((((((((((((((((((((((((");
+    console.log("((((((((((((((((((((((()");
+    console.log(friendID);
+    console.log("((((((((((((((((((((((((((((((((");
+
     setConversations((conversations) => {
       return conversations.filter(
-        (i) => i.users[0] !== friendId || i.users[1] !== friendId
+        (i) => i.users[0] !== friendID || i.users[1] !== friendID
       );
     });
+
+    console.log("*******************");
+    console.log(item);
+    console.log("*******************");
 
 
     await API.graphql(
       graphqlOperation(deleteConversation, {
-        input: { id: item.id},
+        input: { id: item.id}
       })
     );
 
@@ -140,6 +155,27 @@ export default function ConversationScreen({ navigation, route }) {
     }
     */
   };
+
+  useEffect(() => {
+      console.log("Inside delete Conversation Subscription");
+      for(let i = 0; i < conversations.length; i++){
+        (async () => {
+        subscriptions.push(
+          await API.graphql(
+            graphqlOperation(onDeleteConversation, {users: conversations[i].users})
+          ).subscribe({
+            next: (event) => {
+              const conversation = event.value.data.onDeleteConversation;
+              const filteredConversations = conversations.filter((convo) => 
+                convo.id != conversation.id
+              );
+              setConversations(filteredConversations);
+            },
+          })
+        )
+        })();
+      }
+    });
 
   useEffect(() => {
     for(let i = 0; i < conversations.length; i++){
@@ -202,7 +238,7 @@ export default function ConversationScreen({ navigation, route }) {
               renderItem={({ item }) => (
                 <FriendListItem
                 navigation={navigation}
-                deleteConversation = {deleteConversation}
+                deleteConversationFromConvo = {deleteConversationFromConvo}
                 //removeFriendHandler={removeFriend}
                 item={item}
                 //friendId={item.sender === myId ? item.receiver : item.sender}

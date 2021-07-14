@@ -20,7 +20,7 @@ export default function FriendListItem({
   item,
   navigation,
   removeFriendHandler,
-  deleteConversation,
+  deleteConversationFromConvo,
   friendId,
   myId,
   lastMessage,
@@ -50,74 +50,100 @@ export default function FriendListItem({
           isOptionsOpen && { backgroundColor: "orange" },
         ]}
       >
-        <TouchableOpacity
-          onPress={() => {
-            const title = "More Options";
-            const message = "";
-            const options = [
-              {
-                text: "Block",
-                onPress: () => {
-                  const title = "Are you sure you want to block this friend? This will unfriend them and delete all messages.";
-                  const options = [
-                    {
-                      text: "Yes",
-                      onPress: () => {
-                        removeFriendHandler(item, true), setIsOptionsOpen(false);
+          <TouchableOpacity
+            onPress={() => {
+              const title = "More Options";
+              const message = "";
+              const options = [
+                {
+                  text: "Block",
+                  onPress: () => {
+                    const title = "Are you sure you want to block this friend? This will unfriend them and delete all messages.";
+                    const options = [
+                      {
+                        text: "Yes",
+                        onPress: () => {
+                          removeFriendHandler(item, true), setIsOptionsOpen(false);
+                        },
                       },
-                    },
-                    {
-                      text: "Cancel",
-                      type: "cancel",
-                      onPress: () => {
-                        setIsOptionsOpen(false);
+                      {
+                        text: "Cancel",
+                        type: "cancel",
+                        onPress: () => {
+                          setIsOptionsOpen(false);
+                        },
                       },
-                    },
-                  ];
-                  Alert.alert(title, "", options, alertOptions);
+                    ];
+                    Alert.alert(title, "", options, alertOptions);
+                  },
                 },
-              },
-              {
-                text: "Unfriend",
-                onPress: () => {
-                  const title = "Are you sure you want to remove this friend? This will delete all messages.";
-                  const options = [
-                    {
-                      text: "Yes",
-                      onPress: () => {
-                        removeFriendHandler(item), setIsOptionsOpen(false)
+                deleteConversationFromConvo != undefined ?
+                {
+                  text: "Delete Conversation",
+                  onPress: () => {
+                    const title = "Are you sure you want to delete this conversation? This will delete all messages.";
+                    const options = [
+                      {
+                        text: "Yes",
+                        onPress: () => {
+                          console.log("Test");
+                          deleteConversationFromConvo(item,friendId), setIsOptionsOpen(false)
+                        },
                       },
-                    },
-                    {
-                      text: "Cancel",
-                      type: "cancel",
-                      onPress: () => {
-                        setIsOptionsOpen(false);
+                      {
+                        text: "Cancel",
+                        type: "cancel",
+                        onPress: () => {
+                          setIsOptionsOpen(false);
+                        },
                       },
-                    },
-                  ];
-                  Alert.alert(title, "", options, alertOptions);
+                    ];
+                    Alert.alert(title, "", options, alertOptions);
+                  },
+                } : 
+                {
+                  text: "Unfriend",
+                  onPress: () => {
+                    const title = "Are you sure you want to remove this friend? This will delete all messages.";
+                    const options = [
+                      {
+                        text: "Yes",
+                        onPress: () => {
+                          removeFriendHandler(item), setIsOptionsOpen(false)
+                        },
+                      },
+                      {
+                        text: "Cancel",
+                        type: "cancel",
+                        onPress: () => {
+                          setIsOptionsOpen(false);
+                        },
+                      },
+                    ];
+                    Alert.alert(title, "", options, alertOptions);
+                  },
+                }
+                , //if submithandler fails user won't know
+                {
+                  text: "Cancel",
+                  type: "cancel",
+                  onPress: () => {
+                    setIsOptionsOpen(false);
+                  },
                 },
-              }, //if submithandler fails user won't know
-              {
-                text: "Cancel",
-                type: "cancel",
-                onPress: () => {
-                  setIsOptionsOpen(false);
-                },
-              },
-            ];
-            Alert.alert(title, message, options, alertOptions);
-            setIsOptionsOpen(true);
-          }}
-          style={{ alignSelf: "center", paddingHorizontal: 8 }}
-        >
+              ];
+              Alert.alert(title, message, options, alertOptions);
+              setIsOptionsOpen(true);
+            }}
+            style={{ alignSelf: "center", paddingHorizontal: 8 }}
+          > 
           <MaterialIcons
             name="more-vert"
             size={20}
             color={isOptionsOpen ? "black" : "gray"}
           />
         </TouchableOpacity>
+
         <ProfileImageAndName
           navigationObject={navigation}
           style={{ flex: 1 }}
