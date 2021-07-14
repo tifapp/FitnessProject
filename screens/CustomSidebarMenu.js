@@ -38,7 +38,7 @@ import FriendListItem from "components/FriendListItem";
 import FriendRequestListItem from "components/FriendRequestListItem";
 import playSound from "../hooks/playSound";
 import { useIsDrawerOpen } from '@react-navigation/drawer';
-import { batchGetConversations } from "../src/graphql/queries";
+import { batchGetConversations, getConversation } from "../src/graphql/queries";
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 
 var subscriptions = [];
@@ -164,9 +164,57 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
         //we can see all friend requests being accepted, so we just have to make sure it's one of ours.
         if (newFriend.sender === myId || newFriend.receiver === myId) {
           if (!currentFriends.current.find(item => item.sender === newFriend.sender || item.receiver === newFriend.receiver)
-          && !currentFriendRequests.current.find(item => item.sender === newFriend.sender || item.sender === newFriend.receiver)) {
-            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-            setFriendList([newFriend, ...currentFriends.current]);
+            && !currentFriendRequests.current.find(item => item.sender === newFriend.sender || item.sender === newFriend.receiver)) {
+            (async () => {
+              //check if a convo already exists between the two users
+              const convo = await API.graphql(
+                graphqlOperation(getConversation, { users: [newFriend.sender, newFriend.receiver].sort() })
+              );
+
+              if (convo.data.getConversation != null) {
+                newFriend.lastMessage = convo.data.getConversation.lastMessage
+                newFriend.lastUser = convo.data.getConversation.lastUser
+              }
+
+              LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+              setFriendList([newFriend, ...currentFriends.current]);
+              subscriptions.push(
+                await API.graphql(
+                  graphqlOperation(onCreateOrUpdateConversation, {
+                    users: [newFriend.sender, newFriend.receiver].sort()
+                  })
+                ).subscribe({
+                  next: (event) => {
+                    const updatedConversation =
+                      event.value.data.onCreateOrUpdateConversation;
+                    console.log(
+                      "new message, this is what it looks like ",
+                      updatedConversation,
+                      " and this is you: ",
+                      myId
+                    );
+                    //no need for security checks here
+                    setFriendList(
+                      currentFriends.current.map(function (i) {
+                        if (
+                          updatedConversation.users.find(
+                            (user) =>
+                              user !== myId &&
+                              (i.sender === user || i.receiver === user)
+                          )
+                        ) {
+                          i.lastMessage = updatedConversation.lastMessage;
+                          i.lastUser = updatedConversation.lastUser;
+                          i.isRead = null;
+                        }
+                        return i;
+                      }));
+                    //foreach users in conversation, if it's not myid and it's in friend list, update friend list, and push it to the top.
+                    //alternatively for message screen, for each user in message screen, if it's in conversation push it to the top. otherwise just put this conversation at the top of the list.
+                  },
+                })
+              );
+            })();
           }
         }
       },
