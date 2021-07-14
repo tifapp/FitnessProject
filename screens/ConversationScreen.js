@@ -106,6 +106,20 @@ export default function ConversationScreen({ navigation, route }) {
     else navigation.push(id);
   };
 
+  const collectConversations = (items) => {
+    items.forEach((element) => {
+      let temp = null;
+      if(element.users[0] != route.params.myId){
+        temp = element.users[0];
+      }
+      else{
+        temp = element.users[1];
+      }
+      global.addConversationIds(temp);
+    });
+    return items;
+  };
+
 /*
   <View style= {[styles.containerStyle, {marginVertical: 5}]}>
                   
@@ -136,6 +150,7 @@ export default function ConversationScreen({ navigation, route }) {
               queryOperation={conversationsByLastUpdated}
               data={conversations}
               setDataFunction={setConversations}
+              processingFunction={collectConversations}
               renderItem={({ item }) => (
                 <FriendListItem
                 navigation={navigation}
