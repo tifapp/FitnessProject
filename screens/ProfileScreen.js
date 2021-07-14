@@ -105,11 +105,7 @@ const ProfileScreen = ({ navigation, route }) => {
                 .then(([user, id]) => {
                     if (route.params?.newUser) {
                         route.params?.setUserIdFunction(id);
-                    }            
-                    if (route.params?.fromLookup) {
-                        navigation.setParams({fromLookup: false})
-                        navigation.navigate('Lookup', {user: user});
-                    }         
+                    } 
                     Alert.alert("Profile submitted successfully!");
                 })
             setInitialFields([name, age, gender, bioDetails, goalsDetails, locationEnabled])
