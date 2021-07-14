@@ -55,11 +55,13 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
   const currentFriends = useRef();
   const currentFriendRequests = useRef();
   const currentNewFriendRequestCount = useRef();
+  const currentNewConversations = useRef();
 
   isDrawerOpen.current = useIsDrawerOpen();
   currentFriends.current = friendList;
   currentFriendRequests.current = friendRequestList;
   currentNewFriendRequestCount.current = newFriendRequests;
+  currentNewConversations.current = newConversations;
 
   useEffect(() => {
     const friendIds = [];
@@ -105,7 +107,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
         const newPost = event.value.data.onCreatePostForReceiver;
 
         global.showNotificationDot();
-        setNewConversations(newConversations + 1);
+        setNewConversations(currentNewConversations.current + 1);
       },
     });
 
@@ -235,7 +237,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
       //returns an array of like objects or nulls corresponding with the array of conversations
       for (i = 0; i < items.length; ++i) {
         //console.log("friend list item: ", items[i]);
-        const friendslistarray = items[i].sender < items[i].receiver ? [items[i].sender,items[i].receiver] : [items[i].receiver,items[i].sender];
+        const friendslistarray = [items[i].sender,items[i].receiver].sort();
         //console.log("friend list array: ", friendslistarray);
         (async () => {
           subscriptions.push(

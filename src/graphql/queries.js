@@ -24,16 +24,6 @@ export const batchGetConversations = /* GraphQL */ `
     }
   }
 `;
-export const batchGetReadReceipts = /* GraphQL */ `
-  query BatchGetReadReceipts($receipts: [CreateReadReceiptInput]) {
-    batchGetReadReceipts(receipts: $receipts) {
-      createdAt
-      updatedAt
-      userId
-      conversationId
-    }
-  }
-`;
 export const getGroup = /* GraphQL */ `
   query GetGroup($id: ID!) {
     getGroup(id: $id) {
@@ -469,43 +459,6 @@ export const listPosts = /* GraphQL */ `
         parentId
         likes
         replies
-      }
-      nextToken
-    }
-  }
-`;
-export const getReadReceipt = /* GraphQL */ `
-  query GetReadReceipt($userId: ID!, $conversationId: ID!) {
-    getReadReceipt(userId: $userId, conversationId: $conversationId) {
-      createdAt
-      updatedAt
-      userId
-      conversationId
-    }
-  }
-`;
-export const listReadReceipts = /* GraphQL */ `
-  query ListReadReceipts(
-    $userId: ID
-    $conversationId: ModelIDKeyConditionInput
-    $filter: ModelReadReceiptFilterInput
-    $limit: Int
-    $nextToken: String
-    $sortDirection: ModelSortDirection
-  ) {
-    listReadReceipts(
-      userId: $userId
-      conversationId: $conversationId
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      sortDirection: $sortDirection
-    ) {
-      items {
-        createdAt
-        updatedAt
-        userId
-        conversationId
       }
       nextToken
     }

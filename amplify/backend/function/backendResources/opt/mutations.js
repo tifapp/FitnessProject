@@ -184,6 +184,7 @@ exports.createConversation = /* GraphQL */ `
       users
       lastUser
       lastMessage
+      dummy
     }
   }
 `;
@@ -199,6 +200,7 @@ exports.updateConversation = /* GraphQL */ `
       users
       lastUser
       lastMessage
+      dummy
     }
   }
 `;
@@ -214,6 +216,7 @@ exports.deleteConversation = /* GraphQL */ `
       users
       lastUser
       lastMessage
+      dummy
     }
   }
 `;
@@ -349,45 +352,6 @@ exports.updatePost = /* GraphQL */ `
       parentId
       likes
       replies
-    }
-  }
-`;
-exports.createReadReceipt = /* GraphQL */ `
-  mutation CreateReadReceipt(
-    $input: CreateReadReceiptInput!
-    $condition: ModelReadReceiptConditionInput
-  ) {
-    createReadReceipt(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      userId
-      conversationId
-    }
-  }
-`;
-exports.updateReadReceipt = /* GraphQL */ `
-  mutation UpdateReadReceipt(
-    $input: UpdateReadReceiptInput!
-    $condition: ModelReadReceiptConditionInput
-  ) {
-    updateReadReceipt(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      userId
-      conversationId
-    }
-  }
-`;
-exports.deleteReadReceipt = /* GraphQL */ `
-  mutation DeleteReadReceipt(
-    $input: DeleteReadReceiptInput!
-    $condition: ModelReadReceiptConditionInput
-  ) {
-    deleteReadReceipt(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      userId
-      conversationId
     }
   }
 `;

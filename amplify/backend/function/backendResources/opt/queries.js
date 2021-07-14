@@ -20,16 +20,7 @@ exports.batchGetConversations = /* GraphQL */ `
       users
       lastUser
       lastMessage
-    }
-  }
-`;
-exports.batchGetReadReceipts = /* GraphQL */ `
-  query BatchGetReadReceipts($receipts: [CreateReadReceiptInput]) {
-    batchGetReadReceipts(receipts: $receipts) {
-      createdAt
-      updatedAt
-      userId
-      conversationId
+      dummy
     }
   }
 `;
@@ -145,6 +136,7 @@ exports.getConversation = /* GraphQL */ `
       users
       lastUser
       lastMessage
+      dummy
     }
   }
 `;
@@ -162,6 +154,7 @@ exports.listConversations = /* GraphQL */ `
         users
         lastUser
         lastMessage
+        dummy
       }
       nextToken
     }
@@ -169,13 +162,15 @@ exports.listConversations = /* GraphQL */ `
 `;
 exports.conversationsByLastUpdated = /* GraphQL */ `
   query ConversationsByLastUpdated(
-    $updatedAt: AWSDateTime
+    $dummy: Int
+    $updatedAt: ModelStringKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelConversationFilterInput
     $limit: Int
     $nextToken: String
   ) {
     conversationsByLastUpdated(
+      dummy: $dummy
       updatedAt: $updatedAt
       sortDirection: $sortDirection
       filter: $filter
@@ -189,6 +184,7 @@ exports.conversationsByLastUpdated = /* GraphQL */ `
         users
         lastUser
         lastMessage
+        dummy
       }
       nextToken
     }
@@ -463,43 +459,6 @@ exports.listPosts = /* GraphQL */ `
         parentId
         likes
         replies
-      }
-      nextToken
-    }
-  }
-`;
-exports.getReadReceipt = /* GraphQL */ `
-  query GetReadReceipt($userId: ID!, $conversationId: ID!) {
-    getReadReceipt(userId: $userId, conversationId: $conversationId) {
-      createdAt
-      updatedAt
-      userId
-      conversationId
-    }
-  }
-`;
-exports.listReadReceipts = /* GraphQL */ `
-  query ListReadReceipts(
-    $userId: ID
-    $conversationId: ModelIDKeyConditionInput
-    $filter: ModelReadReceiptFilterInput
-    $limit: Int
-    $nextToken: String
-    $sortDirection: ModelSortDirection
-  ) {
-    listReadReceipts(
-      userId: $userId
-      conversationId: $conversationId
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      sortDirection: $sortDirection
-    ) {
-      items {
-        createdAt
-        updatedAt
-        userId
-        conversationId
       }
       nextToken
     }

@@ -65,31 +65,7 @@ exports.handler = (event, context, callback) => {
               }
             }
           });
-
-          while (true) {
-            const results = await client.query({
-              query: gql(postsByChannel),
-              variables: {
-                channel: elements[0] + elements[1],
-              }
-            });
-
-            await Promise.all(results.data.postsByChannel.items.map(async (post) => {
-              client.mutate({
-                mutation: gql(deletePost),
-                variables: {
-                  input: {
-                    createdAt: post.createdAt,
-                    userId: post.userId,
-                  }
-                }
-              });
-            }));
-
-            if (results.data.postsByChannel.nextToken == null) break;
-          }
-
-          callback(null, "successfully deleted messages");
+          callback(null, "successfully deleted friend and conversation");
           return;
         } catch (e) {
           console.warn('Error deleting replies: ', e);

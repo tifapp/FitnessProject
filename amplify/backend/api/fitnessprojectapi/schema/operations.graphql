@@ -13,15 +13,16 @@ type Subscription {
   onUpdatePostFromChannel(channel: ID!): Post @aws_subscribe(mutations: ["updatePost"]) 
   onDeletePostFromChannel(channel: ID!): Post @aws_subscribe(mutations: ["deletePost"]) 
 
-  onIncrementLikes: Post @aws_subscribe(mutations: ["incrementLikes"]) 
-  onDecrementLikes: Post @aws_subscribe(mutations: ["decrementLikes"])
-  onIncrementReplies: Post @aws_subscribe(mutations: ["incrementReplies"]) 
-  onDecrementReplies: Post @aws_subscribe(mutations: ["decrementReplies"])
+  onIncrementLikes(createdAt: AWSDateTime!, userId: ID!): Post @aws_subscribe(mutations: ["incrementLikes"]) 
+  onDecrementLikes(createdAt: AWSDateTime!, userId: ID!): Post @aws_subscribe(mutations: ["decrementLikes"])
+  onIncrementReplies(createdAt: AWSDateTime!, userId: ID!): Post @aws_subscribe(mutations: ["incrementReplies"]) 
+  onDecrementReplies(createdAt: AWSDateTime!, userId: ID!): Post @aws_subscribe(mutations: ["decrementReplies"])
 
   onAcceptedFriendship: Friendship @aws_subscribe(mutations: ["updateFriendship"])
   onCreateFriendRequestForReceiver(receiver: ID!): Friendship @aws_subscribe(mutations: ["createFriendship"])
 
   onCreateOrUpdateConversation(users: [ID!]!): Conversation @aws_subscribe(mutations: ["createConversation", "updateConversation"])
+  onDeleteConversation(users: [ID!]!): Conversation @aws_subscribe(mutations: ["deleteConversation"])
 }
 
 type Query {

@@ -1,6 +1,5 @@
 import Hyperlink from "react-native-hyperlink";
 import RNUrlPreview from "components/RNUrlPreview";
-
 import React, { useState, useEffect, useRef, PureComponent } from "react";
 import { Storage } from "aws-amplify";
 import {
@@ -25,13 +24,13 @@ import printTime from "hooks/printTime";
 import SHA256 from "hooks/hash";
 import FeedScreen from "screens/FeedScreen";
 import { MaterialIcons } from "@expo/vector-icons";
-
+import { onIncrementLikes, onDecrementLikes, onIncrementReplies, onDecrementReplies } from 'root/src/graphql/subscriptions';
 import * as Haptics from "expo-haptics";
 import playSound from "../hooks/playSound";
 
 var styles = require("../styles/stylesheet");
 
-function LikeButton({ likes, likedByYou, postId, callback }) {
+function LikeButton({ likes, likedByYou, postId, likeDebounceRef }) {
   const [liked, setLiked] = useState(likedByYou);
   const likeRef = useRef();
   const timerIsRunning = useRef();
@@ -49,7 +48,7 @@ function LikeButton({ likes, likedByYou, postId, callback }) {
   };
 
   const sendAPICall = () => {
-    callback();
+    likeDebounceRef.current = true;
     if (liked == likeRef.current) {
       console.log("sent API call, hopefully debounce works.");
       if (!liked) {
@@ -405,6 +404,55 @@ export default React.memo(function PostItem({
 }, (oldProps,newProps)=>oldProps.item == newProps.item)
 
 function PostHeader({item, writtenByYou, repliesPressed, deletePostsAsync, setIsEditing, areRepliesVisible}) {
+  const [likes, setLikes] = useState(item.likes);
+  const currentLikes = useRef();
+  currentLikes.current = likes;
+  const [replies, setReplies] = useState(item.replies);
+  const currentReplies = useRef();
+  currentReplies.current = replies;
+  const likeDebounce = useRef(false);
+
+  useEffect(() => {
+    const incrementLikeSubscription = API.graphql(graphqlOperation(onIncrementLikes, {createdAt: item.createdAt, userId: item.userId})).subscribe({ //nvm we dont have a subscription event for incrementlike
+      next: event => {
+        console.log("liked post!")
+        if (likeDebounce.current) 
+        {
+          console.log("you liked post!")
+          likeDebounce.current = false;
+        }
+        else setLikes(currentLikes.current + 1);
+      }
+    });
+    const decrementLikeSubscription = API.graphql(graphqlOperation(onDecrementLikes, {createdAt: item.createdAt, userId: item.userId})).subscribe({ //nvm we dont have a subscription event for incrementlike
+      next: event => {
+        console.log("unliked post!")
+        if (likeDebounce.current) 
+        {
+          likeDebounce.current = false;
+        }
+        else setLikes(currentLikes.current - 1);
+      }
+    });
+    const incrementReplySubscription = API.graphql(graphqlOperation(onIncrementReplies, {createdAt: item.createdAt, userId: item.userId})).subscribe({ //nvm we dont have a subscription event for incrementlike
+      next: event => {
+        setReplies(currentReplies.current + 1);
+      }
+    });
+    const decrementReplySubscription = API.graphql(graphqlOperation(onDecrementReplies, {createdAt: item.createdAt, userId: item.userId})).subscribe({ //nvm we dont have a subscription event for incrementlike
+      next: event => {
+        setReplies(currentReplies.current - 1);
+      }
+    });
+    
+    return () => {
+      incrementLikeSubscription.unsubscribe();
+      decrementLikeSubscription.unsubscribe();
+      incrementReplySubscription.unsubscribe();
+      decrementReplySubscription.unsubscribe();
+    }
+  } ,[])
+  
   return (
     <View
       style={{
@@ -437,12 +485,10 @@ function PostHeader({item, writtenByYou, repliesPressed, deletePostsAsync, setIs
             }}
           >
             <LikeButton
-              likes={item.likes}
+              likes={likes}
               likedByYou={item.likedByYou}
               postId={item.createdAt + "#" + item.userId}
-              callback={() => {
-                item.likeDebounce = true;
-              }}
+              likeDebounceRef={likeDebounce}
             />
             <TouchableOpacity
               style={[
@@ -466,7 +512,7 @@ function PostHeader({item, writtenByYou, repliesPressed, deletePostsAsync, setIs
                   },
                 ]}
               >
-                {item.replies}
+                {replies}
               </Text>
               <MaterialIcons
                 name="chat-bubble-outline"

@@ -128,53 +128,11 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         //console.log("post has been updated");
       }
     });
-    const incrementLikeSubscription = API.graphql(graphqlOperation(onIncrementLikes)).subscribe({ //nvm we dont have a subscription event for incrementlike
-      next: event => {
-        const likedPost = event.value.data.onIncrementLikes
-        console.log("newly liked post ", likedPost);
-        const localLikedPost = currentPosts.current.find(post => post.userId === likedPost.userId && post.createdAt === likedPost.createdAt);
-        if (localLikedPost != null) {
-          console.log("found liked post");
-          if (localLikedPost.likeDebounce) 
-          {
-            localLikedPost.likeDebounce = null;
-          }
-          else setPosts(currentPosts.current.map(post => {if (post.userId === likedPost.userId && post.createdAt === likedPost.createdAt) {
-            //console.log("adding a like");
-            post.likes = post.likes + 1
-          } return post}));
-        } else {
-          console.log("couldn't find liked post");
-        }
-      }
-    });
-    const decrementLikeSubscription = API.graphql(graphqlOperation(onDecrementLikes)).subscribe({ //nvm we dont have a subscription event for incrementlike
-      next: event => {
-        const unlikedPost = event.value.data.onDecrementLikes
-        //console.log(unlikedPost)
-        //console.log("newly unliked post");
-        const localUnlikedPost = currentPosts.current.find(post => post.userId === unlikedPost.userId && post.createdAt === unlikedPost.createdAt);
-        if (localUnlikedPost != null) {
-          //console.log("the copy is loaded");
-          if (localUnlikedPost.likeDebounce) 
-          {
-            //console.log("you did this");
-            localUnlikedPost.likeDebounce = null;
-          }
-          else setPosts(currentPosts.current.map(post => {if (post.userId === unlikedPost.userId && post.createdAt === unlikedPost.createdAt) {
-            //console.log("removing a like");
-            post.likes = post.likes - 1;
-          } return post}));
-        }
-      }
-    });
     checkInternetConnection();
     return () => {
       createPostSubscription.unsubscribe();
       deletePostSubscription.unsubscribe();
       updatePostSubscription.unsubscribe();
-      incrementLikeSubscription.unsubscribe();
-      decrementLikeSubscription.unsubscribe();
     }
   }, []);
 
@@ -431,7 +389,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
             </View>
           </View>
         }
-        initialAmount={5}
+        initialAmount={7}
         additionalAmount={7} //change number based on device specs
         processingFunction={getLikedPosts}
         queryOperation={postsByChannel}
