@@ -2,7 +2,7 @@ import { Alert, Linking } from 'react-native';
 import * as Location from 'expo-location';
 
 async function locateUser(ask) {
-  let { status } = await Location.requestPermissionsAsync();
+  let { status } = await Location.requestForegroundPermissionsAsync();
   if (status !== 'granted') {
     if (ask) {
       Alert.alert(
