@@ -55,11 +55,13 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
   const currentFriends = useRef();
   const currentFriendRequests = useRef();
   const currentNewFriendRequestCount = useRef();
+  const currentNewConversations = useRef();
 
   isDrawerOpen.current = useIsDrawerOpen();
   currentFriends.current = friendList;
   currentFriendRequests.current = friendRequestList;
   currentNewFriendRequestCount.current = newFriendRequests;
+  currentNewConversations.current = newConversations;
 
   useEffect(() => {
     const friendIds = [];
@@ -105,7 +107,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
         const newPost = event.value.data.onCreatePostForReceiver;
 
         global.showNotificationDot();
-        setNewConversations(newConversations + 1);
+        setNewConversations(currentNewConversations.current + 1);
       },
     });
 
