@@ -109,10 +109,9 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         }
       }
     });
-    /*
     const deletePostSubscription = API.graphql(graphqlOperation(onDeletePostFromChannel, {channel: channel})).subscribe({
       next: event => {
-        const deletedPost = event.value.data.onDeletePost
+        const deletedPost = event.value.data.onDeletePostFromChannel
         if (deletedPost.userId != route.params?.myId) {//acts as validation, maybe disable textinput while this happens
           if (currentPosts.current.find(post => post.userId === deletedPost.userId && post.createdAt === deletedPost.createdAt)) {
             let tempposts = currentPosts.current;
@@ -124,7 +123,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         }
       }
     });
-    */
     const updatePostSubscription = API.graphql(graphqlOperation(onUpdatePostFromChannel, {channel: channel})).subscribe({ //nvm we dont have a subscription event for incrementlike
       next: event => {
         //console.log("post has been updated");
@@ -133,7 +131,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     checkInternetConnection();
     return () => {
       createPostSubscription.unsubscribe();
-      //deletePostSubscription.unsubscribe();
+      deletePostSubscription.unsubscribe();
       updatePostSubscription.unsubscribe();
     }
   }, []);
