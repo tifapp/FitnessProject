@@ -71,6 +71,7 @@ export default function ConversationScreen({ navigation, route }) {
       next: (event) => {
         const newPost = event.value.data.onCreatePostForReceiver;
 
+        global.addConversationIds(newPost.userId);
         global.showNotificationDot();
         updateConversationList(newPost);
       },
@@ -191,15 +192,16 @@ export default function ConversationScreen({ navigation, route }) {
   };
 
   const collectConversations = (items) => {
+    //what if conversations array shrinks? we should remove from the conversationids array
     items.forEach((element) => {
-      let temp = null;
+      let userId = null;
       if(element.users[0] != route.params.myId){
-        temp = element.users[0];
+        userId = element.users[0];
       }
       else{
-        temp = element.users[1];
+        userId = element.users[1];
       }
-      global.addConversationIds(temp);
+      global.addConversationIds(userId);
     });
     return items;
   };
