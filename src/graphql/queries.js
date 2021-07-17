@@ -310,7 +310,7 @@ export const listLikes = /* GraphQL */ `
 export const likesByPost = /* GraphQL */ `
   query LikesByPost(
     $postId: ID
-    $userId: ModelIDKeyConditionInput
+    $createdAt: ModelStringKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelLikeFilterInput
     $limit: Int
@@ -318,7 +318,7 @@ export const likesByPost = /* GraphQL */ `
   ) {
     likesByPost(
       postId: $postId
-      userId: $userId
+      createdAt: $createdAt
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit
