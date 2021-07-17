@@ -22,19 +22,19 @@ export default function printTime(dateInMilliseconds) {
     else if (minuteDifference >= 1 && minuteDifference < 60) {
       minuteDifference = Math.floor(minuteDifference);
       if (minuteDifference == 1) {
-        displayTime = minuteDifference + " minute";
+        displayTime = minuteDifference + " min";
       }
       else {
-        displayTime = minuteDifference + " minutes";
+        displayTime = minuteDifference + " mins";
       }
     }
     else if (hourDifference >= 1 && hourDifference < 24) {
       hourDifference = Math.floor(hourDifference);
       if (hourDifference == 1) {
-        displayTime = hourDifference + " hour";
+        displayTime = hourDifference + " hr";
       }
       else {
-        displayTime = hourDifference + " hours";
+        displayTime = hourDifference + " hrs";
       }
     }
     else if (dayDifference >= 1 && dayDifference < 31) {
@@ -49,19 +49,19 @@ export default function printTime(dateInMilliseconds) {
     else if (monthDifference >= 1 && monthDifference < 12) {
       monthDifference = Math.floor(monthDifference);
       if (monthDifference == 1) {
-        displayTime = monthDifference + " month";
+        displayTime = monthDifference + " m";
       }
       else {
-        displayTime = dayDifference + " months";
+        displayTime = dayDifference + " m";
       }
     }
     else if (yearDifference >= 1) {
       yearDifference = Math.floor(yearDifference);
       if (yearDifference == 1) {
-        displayTime = yearDifference + " year";
+        displayTime = yearDifference + " y";
       }
       else {
-        displayTime = yearDifference + " years";
+        displayTime = yearDifference + " y";
       }
     }
 

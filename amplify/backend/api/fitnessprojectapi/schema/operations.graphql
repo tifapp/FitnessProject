@@ -7,6 +7,9 @@ type Mutation {
 }
 
 type Subscription {
+  onCreateLikeForPost(postId: ID!): Like @aws_subscribe(mutations: ["createLike"]) 
+  onDeleteLikeForPost(postId: ID!): Like @aws_subscribe(mutations: ["deleteLike"]) 
+
   onCreatePostFromChannel(channel: ID!): Post @aws_subscribe(mutations: ["createPost"]) 
   onCreatePostForReceiver(receiver: ID!): Post @aws_subscribe(mutations: ["createPost"]) 
   onCreatePostByUser(userId: ID!): Post @aws_subscribe(mutations: ["createPost"]) 

@@ -1,4 +1,4 @@
-type Like @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
+type Like @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" }, subscriptions: null)
 @auth(
   rules: [
       { allow: owner, ownerField: "userId", operations: [create, read, delete] },
@@ -6,7 +6,7 @@ type Like @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" })
   ]
 )
 @key(fields: ["userId", "postId"])
-@key(name: "ByPost", fields: ["postId", "userId"], queryField: "likesByPost")
+@key(name: "ByPost", fields: ["postId", "createdAt"], queryField: "likesByPost")
 {
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!

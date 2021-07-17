@@ -22,6 +22,7 @@ import { createLike, deleteLike } from "root/src/graphql/mutations";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import printTime from "hooks/printTime";
 import SHA256 from "hooks/hash";
+import LikesList from "components/LikesList";
 import FeedScreen from "screens/FeedScreen";
 import { MaterialIcons } from "@expo/vector-icons";
 import { onIncrementLikes, onDecrementLikes, onIncrementReplies, onDecrementReplies } from 'root/src/graphql/subscriptions';
@@ -71,7 +72,7 @@ function LikeButton({ setLikes, likes, likedByYou, postId, likeDebounceRef }) {
     liked ? playSound("unlike") : playSound("like");
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     try {
-      liked ? setLikes(likes-1) : setLikes(likes+1); 
+      liked ? setLikes(likes - 1) : setLikes(likes + 1);
       setLiked(!liked);
       resetTimeout();
     } catch (err) {
@@ -129,7 +130,7 @@ function LinkableText(props) {
     ];
     Alert.alert(title, "", options);
   };
-  
+
   //console.log("the url we're passing to preview is ", props.urlPreview)
 
   return (
@@ -179,7 +180,8 @@ export default React.memo(function PostItem({
   if (receiver == null)
     return (
       <View style={[styles.secondaryContainerStyle, {
-        backgroundColor: "#efefef",}]}>
+        backgroundColor: "#efefef",
+      }]}>
         <View
           style={
             [styles.spaceAround,
@@ -194,8 +196,9 @@ export default React.memo(function PostItem({
               },
               shadowOpacity: 0.18,
               shadowRadius: 1.0,
-      
-              elevation: 1,}]
+
+              elevation: 1,
+            }]
           }
         >
           <PostHeader
@@ -264,54 +267,55 @@ export default React.memo(function PostItem({
             setAreRepliesVisible(false);
           }}
         >
-          <TouchableOpacity onPress={()=>setAreRepliesVisible(false)} style={{width: "100%", height: "100%", position: "absolute", backgroundColor: "#00000033"}}> 
+          <TouchableOpacity onPress={() => setAreRepliesVisible(false)} style={{ width: "100%", height: "100%", position: "absolute", backgroundColor: "#00000033" }}>
           </TouchableOpacity>
-          <View style={{marginTop: "auto", flex: 0.8, backgroundColor: "#efefef"}}> 
-            <View style={{height: 1, width: "100%", alignSelf: "center", backgroundColor: "lightgray"}}>
+          <View style={{ marginTop: "auto", flex: 0.8, backgroundColor: "#efefef" }}>
+            <View style={{ height: 1, width: "100%", alignSelf: "center", backgroundColor: "lightgray" }}>
             </View>
-            <View style={{margin: 10, width: 25, height: 2, alignSelf: "center", backgroundColor: "lightgray"}}>
+            <View style={{ margin: 10, width: 25, height: 2, alignSelf: "center", backgroundColor: "lightgray" }}>
             </View>
-        <View
-          style={[
-            {
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 1,
-              },
-              shadowOpacity: 0.22,
-              shadowRadius: 2.22,
+            <View
+              style={[
+                {
+                  shadowColor: "#000",
+                  shadowOffset: {
+                    width: 0,
+                    height: 1,
+                  },
+                  shadowOpacity: 0.22,
+                  shadowRadius: 2.22,
 
-              elevation: 3,
-              position: "absolute",
-              top: -18,
-              flexDirection: "column",
-              alignItems: "flex-start",
-            },
-          ]}
-        >
-          <View
-            style={{
-              backgroundColor: "blue",
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <MaterialIcons
-              name="chat-bubble"
-              size={17}
-              color={"white"}
-              style={{ padding: 6 }}
-            />
-            <Text
-              style={[{ marginRight: 6, fontWeight: "bold", color: "white" }]}
+                  elevation: 3,
+                  position: "absolute",
+                  top: -18,
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                },
+              ]}
             >
-              Replying to
-            </Text>
-          </View>
-        </View>
+              <View
+                style={{
+                  backgroundColor: "blue",
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <MaterialIcons
+                  name="chat-bubble"
+                  size={17}
+                  color={"white"}
+                  style={{ padding: 6 }}
+                />
+                <Text
+                  style={[{ marginRight: 6, fontWeight: "bold", color: "white" }]}
+                >
+                  Replying to
+                </Text>
+              </View>
+            </View>
             <FeedScreen
               headerComponent={
+                <View>
                 <PostItem
                   index={index}
                   item={item}
@@ -322,10 +326,12 @@ export default React.memo(function PostItem({
                     setAreRepliesVisible(false);
                   }}
                 />
+                <LikesList postId={item.createdAt + "#" + item.userId} />
+                </View>
               }
               navigation={navigation}
               route={route}
-              channel={SHA256(item.userId+item.createdAt)} //unique id
+              channel={SHA256(item.userId + item.createdAt)} //unique id
               originalParentId={item.createdAt + "#" + item.userId}
             />
           </View>
@@ -391,9 +397,9 @@ export default React.memo(function PostItem({
       </View>
     );
   }
-}, (oldProps,newProps)=>oldProps.item == newProps.item)
+}, (oldProps, newProps) => oldProps.item == newProps.item)
 
-function PostHeader({item, writtenByYou, repliesPressed, deletePostsAsync, setIsEditing, areRepliesVisible}) {
+function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, setIsEditing, areRepliesVisible }) {
   const [likes, setLikes] = useState(item.likes);
   const currentLikes = useRef();
   currentLikes.current = likes;
@@ -403,46 +409,44 @@ function PostHeader({item, writtenByYou, repliesPressed, deletePostsAsync, setIs
   const likeDebounce = useRef(false);
 
   useEffect(() => {
-    const incrementLikeSubscription = API.graphql(graphqlOperation(onIncrementLikes, {createdAt: item.createdAt, userId: item.userId})).subscribe({ //nvm we dont have a subscription event for incrementlike
+    const incrementLikeSubscription = API.graphql(graphqlOperation(onIncrementLikes, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
       next: event => {
         console.log("liked post!")
-        if (likeDebounce.current) 
-        {
+        if (likeDebounce.current) {
           console.log("you liked post!")
           likeDebounce.current = false;
         }
         else setLikes(currentLikes.current + 1);
       }
     });
-    const decrementLikeSubscription = API.graphql(graphqlOperation(onDecrementLikes, {createdAt: item.createdAt, userId: item.userId})).subscribe({ //nvm we dont have a subscription event for incrementlike
+    const decrementLikeSubscription = API.graphql(graphqlOperation(onDecrementLikes, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
       next: event => {
         console.log("unliked post!")
-        if (likeDebounce.current) 
-        {
+        if (likeDebounce.current) {
           likeDebounce.current = false;
         }
         else setLikes(currentLikes.current - 1);
       }
     });
-    const incrementReplySubscription = API.graphql(graphqlOperation(onIncrementReplies, {createdAt: item.createdAt, userId: item.userId})).subscribe({ //nvm we dont have a subscription event for incrementlike
+    const incrementReplySubscription = API.graphql(graphqlOperation(onIncrementReplies, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
       next: event => {
         setReplies(currentReplies.current + 1);
       }
     });
-    const decrementReplySubscription = API.graphql(graphqlOperation(onDecrementReplies, {createdAt: item.createdAt, userId: item.userId})).subscribe({ //nvm we dont have a subscription event for incrementlike
+    const decrementReplySubscription = API.graphql(graphqlOperation(onDecrementReplies, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
       next: event => {
         setReplies(currentReplies.current - 1);
       }
     });
-    
+
     return () => {
       incrementLikeSubscription.unsubscribe();
       decrementLikeSubscription.unsubscribe();
       incrementReplySubscription.unsubscribe();
       decrementReplySubscription.unsubscribe();
     }
-  } ,[])
-  
+  }, [])
+
   return (
     <View
       style={{

@@ -1,6 +1,26 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const onCreateLikeForPost = /* GraphQL */ `
+  subscription OnCreateLikeForPost($postId: ID!) {
+    onCreateLikeForPost(postId: $postId) {
+      createdAt
+      updatedAt
+      userId
+      postId
+    }
+  }
+`;
+export const onDeleteLikeForPost = /* GraphQL */ `
+  subscription OnDeleteLikeForPost($postId: ID!) {
+    onDeleteLikeForPost(postId: $postId) {
+      createdAt
+      updatedAt
+      userId
+      postId
+    }
+  }
+`;
 export const onCreatePostFromChannel = /* GraphQL */ `
   subscription OnCreatePostFromChannel($channel: ID!) {
     onCreatePostFromChannel(channel: $channel) {
@@ -292,36 +312,6 @@ export const onDeleteFriendship = /* GraphQL */ `
       sender
       receiver
       accepted
-    }
-  }
-`;
-export const onCreateLike = /* GraphQL */ `
-  subscription OnCreateLike($userId: String) {
-    onCreateLike(userId: $userId) {
-      createdAt
-      updatedAt
-      userId
-      postId
-    }
-  }
-`;
-export const onUpdateLike = /* GraphQL */ `
-  subscription OnUpdateLike($userId: String) {
-    onUpdateLike(userId: $userId) {
-      createdAt
-      updatedAt
-      userId
-      postId
-    }
-  }
-`;
-export const onDeleteLike = /* GraphQL */ `
-  subscription OnDeleteLike($userId: String) {
-    onDeleteLike(userId: $userId) {
-      createdAt
-      updatedAt
-      userId
-      postId
     }
   }
 `;
