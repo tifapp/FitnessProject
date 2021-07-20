@@ -409,41 +409,43 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, setI
   const likeDebounce = useRef(false);
 
   useEffect(() => {
-    const incrementLikeSubscription = API.graphql(graphqlOperation(onIncrementLikes, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
-      next: event => {
-        console.log("liked post!")
-        if (likeDebounce.current) {
-          console.log("you liked post!")
-          likeDebounce.current = false;
+    if (!item.loading) {
+      const incrementLikeSubscription = API.graphql(graphqlOperation(onIncrementLikes, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
+        next: event => {
+          console.log("liked post!")
+          if (likeDebounce.current) {
+            console.log("you liked post!")
+            likeDebounce.current = false;
+          }
+          else setLikes(currentLikes.current + 1);
         }
-        else setLikes(currentLikes.current + 1);
-      }
-    });
-    const decrementLikeSubscription = API.graphql(graphqlOperation(onDecrementLikes, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
-      next: event => {
-        console.log("unliked post!")
-        if (likeDebounce.current) {
-          likeDebounce.current = false;
+      });
+      const decrementLikeSubscription = API.graphql(graphqlOperation(onDecrementLikes, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
+        next: event => {
+          console.log("unliked post!")
+          if (likeDebounce.current) {
+            likeDebounce.current = false;
+          }
+          else setLikes(currentLikes.current - 1);
         }
-        else setLikes(currentLikes.current - 1);
-      }
-    });
-    const incrementReplySubscription = API.graphql(graphqlOperation(onIncrementReplies, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
-      next: event => {
-        setReplies(currentReplies.current + 1);
-      }
-    });
-    const decrementReplySubscription = API.graphql(graphqlOperation(onDecrementReplies, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
-      next: event => {
-        setReplies(currentReplies.current - 1);
-      }
-    });
+      });
+      const incrementReplySubscription = API.graphql(graphqlOperation(onIncrementReplies, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
+        next: event => {
+          setReplies(currentReplies.current + 1);
+        }
+      });
+      const decrementReplySubscription = API.graphql(graphqlOperation(onDecrementReplies, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
+        next: event => {
+          setReplies(currentReplies.current - 1);
+        }
+      });
 
-    return () => {
-      incrementLikeSubscription.unsubscribe();
-      decrementLikeSubscription.unsubscribe();
-      incrementReplySubscription.unsubscribe();
-      decrementReplySubscription.unsubscribe();
+      return () => {
+        incrementLikeSubscription.unsubscribe();
+        decrementLikeSubscription.unsubscribe();
+        incrementReplySubscription.unsubscribe();
+        decrementReplySubscription.unsubscribe();
+      }
     }
   }, [])
 
@@ -470,6 +472,7 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, setI
           </View>
         }
         sibling={
+          !item.loading ?
           <View
             style={{
               flexDirection: "column",
@@ -517,6 +520,7 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, setI
               />
             </TouchableOpacity>
           </View>
+          : null
         }
       />
       <View

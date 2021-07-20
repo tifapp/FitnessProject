@@ -260,7 +260,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
 
     //console.log(route.params?.myId + " just posted.");
 
-    const localNewPost = { ...newPost, userId: route.params?.myId, createdAt: "null" }
+    const localNewPost = { ...newPost, userId: route.params?.myId, createdAt: "null", loading: true }
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     if (replyText == null) {
