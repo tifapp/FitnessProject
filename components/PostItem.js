@@ -468,6 +468,7 @@ function PostHeader({item, writtenByYou, repliesPressed, deletePostsAsync, setIs
           </View>
         }
         sibling={
+          !item.loading ?
           <View
             style={{
               flexDirection: "column",
@@ -515,6 +516,7 @@ function PostHeader({item, writtenByYou, repliesPressed, deletePostsAsync, setIs
               />
             </TouchableOpacity>
           </View>
+          : null
         }
       />
       <View
