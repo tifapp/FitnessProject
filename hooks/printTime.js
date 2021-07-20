@@ -17,7 +17,7 @@ export default function printTime(dateInMilliseconds) {
 
     let displayTime = "";
     if (secondDifference < 60) {
-      displayTime = "Just recently";
+      displayTime = "Just now";
     }
     else if (minuteDifference >= 1 && minuteDifference < 60) {
       minuteDifference = Math.floor(minuteDifference);

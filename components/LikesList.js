@@ -35,11 +35,11 @@ export default function LikesList({ postId }) {
       next: event => {
         const deletedLike = event.value.data.onDeleteLikeForPost
         if (currentLikedUsers.current.find(like => like.userId === deletedLike.userId)) {
-          let templikes = currentLikedUsers.current;
+          let templikes = [...currentLikedUsers.current];
           var index = templikes.findIndex(like => like.userId === deletedLike.userId);
           templikes.splice(index, 1);
           LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-          setLikes(templikes);
+          setLikedUsers(templikes);
         }
       }
     });
