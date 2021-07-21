@@ -56,10 +56,9 @@ export default function LikesList({ postId }) {
         additionalAmount={20}
         horizontal={true}
         queryOperation={likesByPost}
-        filter={{ postId: postId }}
+        filter={{ postId: postId, sortDirection: "DESC" }}
         data={likedUsers}
         setDataFunction={setLikedUsers}
-        processingFunction={(items) => {console.log("trying to poop"); console.log(items); return items;}}
         renderItem={({ item }) => (
           <View>
             <ProfileImageAndName
