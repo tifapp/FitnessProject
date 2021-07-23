@@ -79,7 +79,7 @@ const LookupUser = ({ route, navigation }) => {
   */
  console.log(id);
  console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-   global.addConversationIds(id);
+global.addConversationIds(id);
   };
 
   const goToMessages = (id) => {

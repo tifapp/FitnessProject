@@ -17,7 +17,7 @@ import {
 // Get the aws resources configuration parameters
 import { API, graphqlOperation, Cache } from "aws-amplify";
 import { createPost, updatePost, deletePost, createConversation, updateConversation } from "root/src/graphql/mutations";
-import { listPosts, postsByChannel, batchGetLikes } from "root/src/graphql/queries";
+import { listPosts, postsByChannel, batchGetLikes, getFriendship} from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
 import { onCreatePostFromChannel, onDeletePostFromChannel, onUpdatePostFromChannel, onCreateLike, onDeleteLike, onIncrementLikes, onDecrementLikes } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
@@ -280,10 +280,28 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
 
     try {
       API.graphql(graphqlOperation(createPost, { input: newPost }));
+
+      const friend1 = await API.graphql(graphqlOperation(getFriendship, {sender: route.params?.myId, receiver: receiver}));
+      const friend2 = await API.graphql(graphqlOperation(getFriendship, {sender: receiver, receiver: route.params?.myId}));
+
+      console.log(friend1);
+      console.log(friend2);
+
+      if(friend1.data.getFriendship == undefined && friend2.data.getFriendship == undefined){
+        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        await API.graphql(graphqlOperation(createConversation, { input: {id: channel, users: users, lastMessage: postVal, Accepted: 0} }));
+        console.log("##############################");
+      }
+      else{
+        console.log("******************************");
+        await API.graphql(graphqlOperation(createConversation, { input: {id: channel, users: users, lastMessage: postVal, Accepted: 1} }));
+        console.log("******************************");
+      }
+
       if (receiver != null) {
         //when sending a message, create conversation using specified channel if posts is empty. if not, update conversation with the specified channel.
         if (posts.length == 0) {
-          API.graphql(graphqlOperation(createConversation, { input: {id: channel, users: users, lastMessage: postVal} }));
+          //API.graphql(graphqlOperation(createConversation, { input: {id: channel, users: users, lastMessage: postVal} }));
         } else {
           API.graphql(graphqlOperation(updateConversation, { input: {id: channel, lastMessage: postVal} }));
         }

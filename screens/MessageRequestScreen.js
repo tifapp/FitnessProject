@@ -24,15 +24,15 @@ import FriendListItem from "components/FriendListItem"
 var styles = require('styles/stylesheet');
 var subscriptions = [];
 
-export default function ConversationScreen({ navigation, route }) {
+export default function MessageRequestScreen({ navigation, route }) {
 
   const updateConversationList = (newPost) => {
 
-      const conversation = {id: newPost.channel, users: [newPost.userId, newPost.receiver], lastUser: newPost.userId, lastMessage: newPost.description, Accepted: 1}
+      const conversation = {id: newPost.channel, users: [newPost.userId, newPost.receiver], lastUser: newPost.userId, lastMessage: newPost.description, Accepted: 0}
 
-      console.log("++++++++++++++++++++++++++++++++")
+      console.log("================================")
       console.log(conversation);
-      console.log("++++++++++++++++++++++++++++++++")
+      console.log("================================")
 
       let tempConversations =  currentConversations.current;
 
@@ -58,6 +58,12 @@ export default function ConversationScreen({ navigation, route }) {
     ).subscribe({
       next: (event) => {
         const newPost = event.value.data.onCreatePostForReceiver;
+
+        console.log("$$$$$$$$$$$$$$$")
+        //console.log(newPost);
+        console.log(conversations);
+        console.log("$$$$$$$$$$$$$$$")
+
         global.addConversationIds(newPost.userId);
         global.showNotificationDot();
         updateConversationList(newPost);
@@ -69,7 +75,7 @@ export default function ConversationScreen({ navigation, route }) {
     ).subscribe({
       next: (event) => {
         const newPost = event.value.data.onCreatePostByUser;
-
+        //console.log("^^^^^^^^^^^^^^^^^^^^^^^");
         updateConversationList(newPost);
       },
     });
@@ -173,7 +179,7 @@ export default function ConversationScreen({ navigation, route }) {
   const collectConversations = (items) => {
     //what if conversations array shrinks? we should remove from the conversationids array
 
-    console.log("1. Inside collect Conversations");
+    console.log("2. Inside collect Conversations");
     console.log(items);
 
     items.forEach((element) => {
@@ -219,7 +225,7 @@ export default function ConversationScreen({ navigation, route }) {
               queryOperation={conversationsByLastUpdated}
               data={conversations}
               setDataFunction={setConversations}
-              //processingFunction={collectConversations}
+              processingFunction={collectConversations}
               renderItem={({ item }) => (
                 <FriendListItem
                 navigation={navigation}

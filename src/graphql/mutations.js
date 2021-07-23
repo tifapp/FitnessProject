@@ -185,6 +185,7 @@ export const createConversation = /* GraphQL */ `
       lastUser
       lastMessage
       dummy
+      Accepted
     }
   }
 `;
@@ -201,6 +202,7 @@ export const updateConversation = /* GraphQL */ `
       lastUser
       lastMessage
       dummy
+      Accepted
     }
   }
 `;
@@ -217,6 +219,7 @@ export const deleteConversation = /* GraphQL */ `
       lastUser
       lastMessage
       dummy
+      Accepted
     }
   }
 `;

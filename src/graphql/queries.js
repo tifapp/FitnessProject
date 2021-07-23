@@ -21,6 +21,7 @@ export const batchGetConversations = /* GraphQL */ `
       lastUser
       lastMessage
       dummy
+      Accepted
     }
   }
 `;
@@ -34,6 +35,7 @@ export const getConversationByUsers = /* GraphQL */ `
       lastUser
       lastMessage
       dummy
+      Accepted
     }
   }
 `;
@@ -150,6 +152,7 @@ export const getConversation = /* GraphQL */ `
       lastUser
       lastMessage
       dummy
+      Accepted
     }
   }
 `;
@@ -168,6 +171,7 @@ export const listConversations = /* GraphQL */ `
         lastUser
         lastMessage
         dummy
+        Accepted
       }
       nextToken
     }
@@ -176,7 +180,7 @@ export const listConversations = /* GraphQL */ `
 export const conversationsByLastUpdated = /* GraphQL */ `
   query ConversationsByLastUpdated(
     $dummy: Int
-    $updatedAt: ModelStringKeyConditionInput
+    $acceptedUpdatedAt: ModelConversationLastUpdatedCompositeKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelConversationFilterInput
     $limit: Int
@@ -184,7 +188,7 @@ export const conversationsByLastUpdated = /* GraphQL */ `
   ) {
     conversationsByLastUpdated(
       dummy: $dummy
-      updatedAt: $updatedAt
+      acceptedUpdatedAt: $acceptedUpdatedAt
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit
@@ -198,6 +202,7 @@ export const conversationsByLastUpdated = /* GraphQL */ `
         lastUser
         lastMessage
         dummy
+        Accepted
       }
       nextToken
     }

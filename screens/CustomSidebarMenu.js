@@ -636,6 +636,21 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
         paddingVertical: 15,
         backgroundColor: "white",
       }]}
+      onPress={()=>{navigation.navigate("Message Requests")}}>
+        <Text style={{
+          fontSize: 18,
+          color: (state.routes[state.index].name === "Message Requests") ? "black" : newConversations > 0 ? "blue" : "grey",
+          textDecorationLine: (state.routes[state.index].name === "Message Requests") ? "underline" : "none",
+        }}>Message Requests</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+      style={[{
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        paddingVertical: 15,
+        backgroundColor: "white",
+      }]}
       onPress={()=>{setNewConversations(0); navigation.navigate("Conversations")}}>
         <Text style={{
           fontSize: 18,
