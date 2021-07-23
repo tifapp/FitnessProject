@@ -208,6 +208,37 @@ export const conversationsByLastUpdated = /* GraphQL */ `
     }
   }
 `;
+export const getConversations = /* GraphQL */ `
+  query GetConversations(
+    $Accepted: Int
+    $updatedAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelConversationFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    getConversations(
+      Accepted: $Accepted
+      updatedAt: $updatedAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        createdAt
+        updatedAt
+        id
+        users
+        lastUser
+        lastMessage
+        dummy
+        Accepted
+      }
+      nextToken
+    }
+  }
+`;
 export const getFriendship = /* GraphQL */ `
   query GetFriendship($sender: ID!, $receiver: ID!) {
     getFriendship(sender: $sender, receiver: $receiver) {
