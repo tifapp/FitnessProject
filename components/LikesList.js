@@ -54,24 +54,22 @@ export default function LikesList({ postId }) {
       <APIList
         initialAmount={10}
         additionalAmount={20}
-        horizontal={true}
         queryOperation={likesByPost}
         filter={{ postId: postId, sortDirection: "DESC" }}
         data={likedUsers}
         setDataFunction={setLikedUsers}
         renderItem={({ item }) => (
-          <View>
-            <ProfileImageAndName
-              vertical={true}
-              hidename={true}
-              imageStyle={[
-                styles.smallImageStyle,
-                { marginHorizontal: 0 },
-              ]}
-              userId={item.userId}
-            />
-            <Text style={{ color: "gray", alignSelf: "center" }}>{printTime(item.createdAt)}</Text>
-          </View>
+          <ProfileImageAndName
+            vertical={true}
+            imageStyle={[
+              styles.smallImageStyle,
+              { marginHorizontal: 0 },
+            ]}
+            userId={item.userId}
+            subtitleComponent={
+              <Text style={{ color: "gray" }}>{printTime(item.createdAt)}</Text>
+            }
+          />
         )}
         keyExtractor={(item) => item.userId}
       />

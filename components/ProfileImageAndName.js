@@ -137,7 +137,7 @@ export const ProfileImageAndName = React.memo(function(props) {
         ]}
       >
         <TouchableOpacity
-          onPress={goToProfile}
+          onPress={props.onPress ?? goToProfile}
           style={[{ margin: 15 }, props.imageLayoutStyle]}
         >
           <Image
