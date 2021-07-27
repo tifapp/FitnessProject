@@ -17,7 +17,7 @@ import {
 // Get the aws resources configuration parameters
 import { API, graphqlOperation, Cache } from "aws-amplify";
 import { createPost, updatePost, deletePost, createConversation, updateConversation } from "root/src/graphql/mutations";
-import { listPosts, postsByChannel, batchGetLikes, getFriendship} from "root/src/graphql/queries";
+import { listPosts, postsByChannel, batchGetLikes, getFriendship, getConversations } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
 import { onCreatePostFromChannel, onDeletePostFromChannel, onUpdatePostFromChannel, onCreateLike, onDeleteLike, onIncrementLikes, onDecrementLikes } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
@@ -27,7 +27,7 @@ import { lessThan } from "react-native-reanimated";
 import { ProfileImageAndName } from "components/ProfileImageAndName";
 import ExpandingTextInput from "components/ExpandingTextInput";
 import SpamButton from "components/SpamButton";
-import {getLinkPreview} from 'link-preview-js';
+import { getLinkPreview } from 'link-preview-js';
 
 const linkify = require('linkify-it')()
 linkify
@@ -50,29 +50,30 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
 
   const currentPosts = useRef();
   const scrollRef = useRef(); // Used to help with automatic scrolling to top
-  
+
   currentPosts.current = posts;
-  
+
   useEffect(() => {
     const onFocus = navigation.addListener('focus', () => {
       if (receiver == null) {
-        navigation.setOptions({ headerLeft: () => 
-          <ProfileImageAndName
-            you={true}
-            navigateToProfile={false}
-            userId={route.params?.myId}
-            isFull={true}
-            fullname={true}
-            hidename={true}
-            imageStyle={{
-              resizeMode: "cover",
-              width: 35,
-              height: 35,
-              borderRadius: 0,
-              alignSelf: "center",
-            }}
-          />
-       })
+        navigation.setOptions({
+          headerLeft: () =>
+            <ProfileImageAndName
+              you={true}
+              navigateToProfile={false}
+              userId={route.params?.myId}
+              isFull={true}
+              fullname={true}
+              hidename={true}
+              imageStyle={{
+                resizeMode: "cover",
+                width: 35,
+                height: 35,
+                borderRadius: 0,
+                alignSelf: "center",
+              }}
+            />
+        })
       }
     });
     // Return the function to unsubscribe from the event so it gets removed on unmount
@@ -94,13 +95,13 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
             }));
           }
           else if (newPost.parentId != null) {
-              if (currentPosts.current.length > 0 && currentPosts.current.find(post => post.channel === newPost.channel)) {
-                let tempposts = currentPosts.current;
-                var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.channel === newPost.channel)]);
-                tempposts.splice(index + 1, 0, newPost);                
-                LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-                setPosts(tempposts);
-              }
+            if (currentPosts.current.length > 0 && currentPosts.current.find(post => post.channel === newPost.channel)) {
+              let tempposts = currentPosts.current;
+              var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.channel === newPost.channel)]);
+              tempposts.splice(index + 1, 0, newPost);
+              LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+              setPosts(tempposts);
+            }
           }
           else {
             LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -109,7 +110,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         }
       }
     });
-    const deletePostSubscription = API.graphql(graphqlOperation(onDeletePostFromChannel, {channel: channel})).subscribe({
+    const deletePostSubscription = API.graphql(graphqlOperation(onDeletePostFromChannel, { channel: channel })).subscribe({
       next: event => {
         const deletedPost = event.value.data.onDeletePostFromChannel
         if (deletedPost.userId != route.params?.myId) {//acts as validation, maybe disable textinput while this happens
@@ -123,7 +124,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         }
       }
     });
-    const updatePostSubscription = API.graphql(graphqlOperation(onUpdatePostFromChannel, {channel: channel})).subscribe({ //nvm we dont have a subscription event for incrementlike
+    const updatePostSubscription = API.graphql(graphqlOperation(onUpdatePostFromChannel, { channel: channel })).subscribe({ //nvm we dont have a subscription event for incrementlike
       next: event => {
         //console.log("post has been updated");
       }
@@ -140,10 +141,10 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     let postIds = [];
 
     newPosts.forEach(item => {
-      postIds.push({postId: item.createdAt + "#" + item.userId});
+      postIds.push({ postId: item.createdAt + "#" + item.userId });
     });
 
-    try {      
+    try {
       await allSettled([
         API.graphql(graphqlOperation(batchGetLikes, { likes: postIds })).then((likes) => {
           //console.log("looking for likes: ", likes);
@@ -160,18 +161,18 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
             }
           }
         }),
-        
+
         allSettled(newPosts.map((post) => Cache.getItem(post.userId))).then((results) => {
           //console.log("all are complete")
           for (i = 0; i < newPosts.length; ++i) {
             if (results[i].status === "fulfilled") {
               newPosts[i].info = results[i].value;
-            } else {            
-              newPosts[i].info = {error: true}
+            } else {
+              newPosts[i].info = { error: true }
             }
           }
         }),
-        
+
         allSettled(newPosts.map((post) => {
           if (linkify.pretest(post.description) && linkify.test(post.description))
             return getLinkPreview(linkify.match(post.description)[0].url, {
@@ -181,7 +182,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
             })
           else
             return Promise.reject()
-          })).then((results) => {
+        })).then((results) => {
           //console.log(results)
           for (i = 0; i < newPosts.length; ++i) {
             if (results[i].status === "fulfilled") {
@@ -203,7 +204,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   }
 
   const showTimestamp = (item, index) => {
-    return index >= posts.length-1 || ((((new Date(item.createdAt).getTime() - new Date(posts[index+1].createdAt).getTime()) / 1000) / 60) / 60 > 1);
+    return index >= posts.length - 1 || ((((new Date(item.createdAt).getTime() - new Date(posts[index + 1].createdAt).getTime()) / 1000) / 60) / 60 > 1);
   }
 
   const checkInternetConnection = () => {
@@ -231,7 +232,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setPosts(tempposts);
 
-    const post = tempposts.find(p => {return p.createdAt == createdAt && p.userId == route.params?.myId});
+    const post = tempposts.find(p => { return p.createdAt == createdAt && p.userId == route.params?.myId });
 
     try {
       await API.graphql(graphqlOperation(updatePost, { input: { createdAt: createdAt, description: editedText } }));
@@ -248,7 +249,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       description: replyText ?? postVal,
       channel: replyText != null ? parentId.toString() : channel,
     };
-    if (originalParentId != null) {  
+    if (originalParentId != null) {
       newPost.parentId = originalParentId
     } else if (replyText != null) {
       newPost.parentId = parentId
@@ -274,28 +275,51 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       tempposts.splice(index + 1, 0, localNewPost);
       setPosts(tempposts);
     }
-    
+
     let users = [route.params?.myId, receiver];
     users.sort();
 
     try {
       API.graphql(graphqlOperation(createPost, { input: newPost }));
 
-      const friend1 = await API.graphql(graphqlOperation(getFriendship, {sender: route.params?.myId, receiver: receiver}));
-      const friend2 = await API.graphql(graphqlOperation(getFriendship, {sender: receiver, receiver: route.params?.myId}));
+      const friend1 = await API.graphql(graphqlOperation(getFriendship, { sender: route.params?.myId, receiver: receiver }));
+      const friend2 = await API.graphql(graphqlOperation(getFriendship, { sender: receiver, receiver: route.params?.myId }));
 
-      console.log(friend1);
-      console.log(friend2);
+      let newConversations1 = await API.graphql(graphqlOperation(getConversations, { Accepted: 1 }))
+      let newConversations2 = await API.graphql(graphqlOperation(getConversations, { Accepted: 0 }))
 
-      if(friend1.data.getFriendship == undefined && friend2.data.getFriendship == undefined){
-        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        await API.graphql(graphqlOperation(createConversation, { input: {id: channel, users: users, lastMessage: postVal, Accepted: 0} }));
-        console.log("##############################");
+      console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+      console.log(newConversations1);
+      console.log(newConversations2);
+      console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+
+      newConversations1 = newConversations1.data.getConversations.items
+      newConversations2 = newConversations2.data.getConversations.items
+
+      let checkConversationExists = newConversations1.find(item => item.id === newPost.channel);
+
+      if (checkConversationExists == null) {
+        checkConversationExists = newConversations2.find(item => item.id === newPost.channel);
       }
-      else{
-        console.log("******************************");
-        await API.graphql(graphqlOperation(createConversation, { input: {id: channel, users: users, lastMessage: postVal, Accepted: 1} }));
-        console.log("******************************");
+
+      if (checkConversationExists == null) {
+        if (friend1.data.getFriendship == undefined && friend2.data.getFriendship == undefined) {
+          console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+          await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postVal, Accepted: 0 } }));
+          console.log("##############################");
+        }
+        else {
+          console.log("******************************");
+          await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postVal, Accepted: 1 } }));
+          console.log("******************************");
+        }
+      }
+      else if (newPost.id != checkConversationExists.lastUser) {
+        console.log("testing");
+        await API.graphql(graphqlOperation(updateConversation, { input: { id: newPost.channel, lastMessage: postVal, Accepted: 1 } }));
+      }
+      else {
+        await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, lastMessage: postVal } }));
       }
 
       if (receiver != null) {
@@ -303,7 +327,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         if (posts.length == 0) {
           //API.graphql(graphqlOperation(createConversation, { input: {id: channel, users: users, lastMessage: postVal} }));
         } else {
-          API.graphql(graphqlOperation(updateConversation, { input: {id: channel, lastMessage: postVal} }));
+          await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, lastMessage: postVal } }));
         }
       }
     } catch (err) {
@@ -386,24 +410,24 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
                 marginBottom: 10,
               }}
             >
-                <TouchableOpacity
-                  style={[
-                    { flexDirection: "row", marginRight: 15 },
-                  ]}
-                  onPress={postVal === "" ? () => {
-                    alert("No text detected in text field");
-                  } : addPostAsync}
-                >
-                  <MaterialIcons
-                    name={postVal === "" ? "add-circle-outline" : "add-circle"}
-                    size={15}
-                    color={postVal === "" ? "gray" : "blue"}
-                    style={{ marginRight: 5, marginTop: 2 }}
-                  />
-                  <Text style={[{ fontWeight: "bold", fontSize: 15, color: postVal === "" ? "gray" : "blue"}]}>
-                    {receiver != null ? "Send Message" : "Add Post" }
-                  </Text>
-                </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  { flexDirection: "row", marginRight: 15 },
+                ]}
+                onPress={postVal === "" ? () => {
+                  alert("No text detected in text field");
+                } : addPostAsync}
+              >
+                <MaterialIcons
+                  name={postVal === "" ? "add-circle-outline" : "add-circle"}
+                  size={15}
+                  color={postVal === "" ? "gray" : "blue"}
+                  style={{ marginRight: 5, marginTop: 2 }}
+                />
+                <Text style={[{ fontWeight: "bold", fontSize: 15, color: postVal === "" ? "gray" : "blue" }]}>
+                  {receiver != null ? "Send Message" : "Add Post"}
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
         }

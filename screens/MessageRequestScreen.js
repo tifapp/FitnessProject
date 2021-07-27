@@ -33,15 +33,30 @@ export default function MessageRequestScreen({ navigation, route }) {
 
     let tempConversations = currentConversations.current;
 
-    tempConversations.filter(item => newPost.channel === item.channel);
+    let newConversation = tempConversations.find(item => newPost.channel === item.id);
 
-    let newConversation = null;
+    console.log("inside update");
 
-    if (tempConversations.length == 0) {
+    if (newConversation === undefined) {
       newConversation = await API.graphql(graphqlOperation(getConversations, { Accepted: 0, limit: 1 }));
+
+      console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+      console.log(newConversation.data.getConversations);
+      console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+
+      if (newConversation != null) {
+        newConversation = { id: newConversation.data.channel }
+      }
+      else {
+        newConversation = { id: null }
+      }
     }
 
-    if (newPost.channel == newConversation.data.channel) {
+    //tempConversations.filter(item => newPost.channel === item.id);
+
+    //let newConversation = null;
+
+    if (newConversation.id === newPost.channel) {
       const conversation = { id: newPost.channel, users: [newPost.userId, newPost.receiver], lastUser: newPost.userId, lastMessage: newPost.description, Accepted: 0 }
 
       tempConversations = currentConversations.current;

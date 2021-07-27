@@ -33,20 +33,25 @@ export default function ConversationScreen({ navigation, route }) {
 
     let tempConversations = currentConversations.current;
 
-    tempConversations.filter(item => newPost.channel === item.channel);
+    let newConversation = tempConversations.find(item => newPost.channel === item.id);
 
-    let newConversation = null;
-
-    if (tempConversations.length == 0) {
+    if (newConversation === undefined) {
       newConversation = await API.graphql(graphqlOperation(getConversations, { Accepted: 1, limit: 1 }));
+
+      if (newConversation != null) {
+        newConversation = { id: newConversation.data.channel }
+      }
+      else {
+        newConversation = { id: null }
+      }
     }
 
-    if (newPost.channel == newConversation.data.channel) {
+    if (newConversation.id === newPost.channel) {
       const conversation = { id: newPost.channel, users: [newPost.userId, newPost.receiver], lastUser: newPost.userId, lastMessage: newPost.description, Accepted: 1 }
 
-      //console.log("++++++++++++++++++++++++++++++++")
-      //console.log(conversation);
-      //console.log("++++++++++++++++++++++++++++++++")
+      console.log("++++++++++++++++++++++++++++++++")
+      console.log(conversation);
+      console.log("++++++++++++++++++++++++++++++++")
 
       let tempConversations = currentConversations.current;
 
