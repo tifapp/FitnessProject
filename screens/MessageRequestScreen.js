@@ -41,11 +41,11 @@ export default function MessageRequestScreen({ navigation, route }) {
       newConversation = await API.graphql(graphqlOperation(getConversations, { Accepted: 0, limit: 1 }));
 
       console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-      console.log(newConversation.data.getConversations);
+      console.log(newConversation.data.getConversations.items);
       console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
       if (newConversation != null) {
-        newConversation = { id: newConversation.data.channel }
+        newConversation = { id: newConversation.data.id }
       }
       else {
         newConversation = { id: null }
@@ -55,6 +55,10 @@ export default function MessageRequestScreen({ navigation, route }) {
     //tempConversations.filter(item => newPost.channel === item.id);
 
     //let newConversation = null;
+
+    console.log(":::::::::::::::::::::::::::::")
+    console.log(newConversation)
+    console.log(":::::::::::::::::::::::::::::")
 
     if (newConversation.id === newPost.channel) {
       const conversation = { id: newPost.channel, users: [newPost.userId, newPost.receiver], lastUser: newPost.userId, lastMessage: newPost.description, Accepted: 0 }
@@ -94,9 +98,23 @@ export default function MessageRequestScreen({ navigation, route }) {
         console.log(conversations);
         console.log("$$$$$$$$$$$$$$$")
 
+        /*
+
+        let checkConversationExists = conversations.find(item => item.id === newPost.channel);
+
+        if (route.params?.myId != checkConversationExists.lastUser) {
+          setConversations((conversations) => {
+            return conversations.filter(
+              (i) => i.users[0] !== checkConversationExists.lastUser || i.users[1] !== checkConversationExists.lastUser
+            );
+          });
+        }
+        */
+
         global.addConversationIds(newPost.userId);
         global.showNotificationDot();
         updateConversationList(newPost);
+
       },
     });
 

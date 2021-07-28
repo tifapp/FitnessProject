@@ -314,8 +314,10 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
           console.log("******************************");
         }
       }
-      else if (newPost.id != checkConversationExists.lastUser) {
+      else if (localNewPost.userId != checkConversationExists.lastUser) {
         console.log("testing");
+        console.log(newPost.channel);
+        console.log(checkConversationExists);
         await API.graphql(graphqlOperation(updateConversation, { input: { id: newPost.channel, lastMessage: postVal, Accepted: 1 } }));
       }
       else {

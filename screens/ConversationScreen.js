@@ -39,7 +39,7 @@ export default function ConversationScreen({ navigation, route }) {
       newConversation = await API.graphql(graphqlOperation(getConversations, { Accepted: 1, limit: 1 }));
 
       if (newConversation != null) {
-        newConversation = { id: newConversation.data.channel }
+        newConversation = { id: newConversation.data.id }
       }
       else {
         newConversation = { id: null }
@@ -239,7 +239,7 @@ export default function ConversationScreen({ navigation, route }) {
         queryOperation={getConversations}
         data={conversations}
         setDataFunction={setConversations}
-        //processingFunction={collectConversations}
+        processingFunction={collectConversations}
         renderItem={({ item }) => (
           <FriendListItem
             navigation={navigation}

@@ -16,11 +16,6 @@ type Conversation
     ]
   )
   @key(
-    name: "lastUpdated",
-    fields: ["dummy", "Accepted", "updatedAt"],
-    queryField: "conversationsByLastUpdated"
-  )
-  @key(
     name: "getConversations",
     fields: ["Accepted", "updatedAt"],
     queryField: "getConversations"

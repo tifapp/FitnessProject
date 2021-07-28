@@ -177,37 +177,6 @@ export const listConversations = /* GraphQL */ `
     }
   }
 `;
-export const conversationsByLastUpdated = /* GraphQL */ `
-  query ConversationsByLastUpdated(
-    $dummy: Int
-    $acceptedUpdatedAt: ModelConversationLastUpdatedCompositeKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelConversationFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    conversationsByLastUpdated(
-      dummy: $dummy
-      acceptedUpdatedAt: $acceptedUpdatedAt
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        createdAt
-        updatedAt
-        id
-        users
-        lastUser
-        lastMessage
-        dummy
-        Accepted
-      }
-      nextToken
-    }
-  }
-`;
 export const getConversations = /* GraphQL */ `
   query GetConversations(
     $Accepted: Int
