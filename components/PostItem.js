@@ -17,6 +17,7 @@ import {
 } from "react-native";
 import { getUser } from "../src/graphql/queries";
 import { ProfileImageAndName } from "./ProfileImageAndName";
+import { batchGetLikes, likesByPost } from "root/src/graphql/queries";
 import { API, graphqlOperation } from "aws-amplify";
 import { createLike, deleteLike } from "root/src/graphql/mutations";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -28,6 +29,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { onIncrementLikes, onDecrementLikes, onIncrementReplies, onDecrementReplies } from 'root/src/graphql/subscriptions';
 import * as Haptics from "expo-haptics";
 import playSound from "../hooks/playSound";
+import APIList from 'components/APIList';
 
 var styles = require("../styles/stylesheet");
 
@@ -174,6 +176,10 @@ export default React.memo(function PostItem({
   const [editedText, setEditedText] = useState("");
   const displayTime = printTime(item.createdAt);
   const isReceivedMessage = receiver != null && !writtenByYou;
+  
+  const [areLikesVisible, setAreLikesVisible] = useState(false);
+
+  const [likedUsers, setLikedUsers] = useState([]);
 
   if (receiver == null)
     return (
@@ -194,6 +200,7 @@ export default React.memo(function PostItem({
               },
               shadowOpacity: 0.18,
               shadowRadius: 1.0,
+              paddingBottom: likedUsers.length > 0 ? 0 : 22,
 
               elevation: 1,
             }]
@@ -219,8 +226,7 @@ export default React.memo(function PostItem({
             <LinkableText
               style={{
                 flex: 1,
-                paddingTop: 8,
-                paddingBottom: 22,
+                paddingTop: 4,
                 paddingLeft: 22,
               }}
               urlPreview={item.urlPreview}
@@ -228,6 +234,122 @@ export default React.memo(function PostItem({
               {item.description}
             </LinkableText>
           )}
+
+            <TouchableOpacity style={{flexDirection: "row", alignItems: "center", marginTop: likedUsers.length > 0 ? 6 : 0}} onPress={() => setAreLikesVisible(true)}>
+              <APIList
+                style={{ margin: 0, padding: 0 }}
+                horizontal={true}
+                queryOperation={likesByPost}
+                filter={{ postId: item.createdAt + "#" + item.userId, sortDirection: "DESC", }}
+                initialAmount={1}
+                additionalAmount={0}
+                data={likedUsers}
+                setDataFunction={setLikedUsers}
+                renderItem={({ item }) => (
+                  <ProfileImageAndName
+                    style={{
+                      alignContent: "flex-start",
+                      alignItems: "center",
+                      alignSelf: "flex-end",
+                      justifyContent: "flex-start",
+                      flexDirection: "row",
+                      marginLeft: 5,
+                    }}
+                    imageLayoutStyle={{ marginHorizontal: 10 }}
+                    imageStyle={[
+                      styles.smallestImageStyle,
+                    ]}
+                    userId={item.userId}
+                    onPress={() => setAreLikesVisible(true)}
+                  />
+                )}
+                keyExtractor={(item) => item.userId}
+              />
+              {
+                likedUsers.length > 1 ?
+              <Text>
+              and others
+              </Text> : null
+              }
+              {
+                likedUsers.length > 0 ?
+                <Text style={{marginTop: 1}}>
+                 {" liked this post"}
+                </Text> : null
+              }
+            </TouchableOpacity>
+          
+      <Modal
+        animationType="slide"
+        transparent={true}
+        statusBarTranslucent={true}
+        visible={areLikesVisible}
+        onRequestClose={() => {
+          setAreLikesVisible(false);
+        }}
+      >
+        <TouchableOpacity onPress={() => setAreLikesVisible(false)} style={{ width: "100%", height: "100%", position: "absolute", backgroundColor: "#00000033" }}>
+        </TouchableOpacity>
+        <View style={{ marginTop: "auto", flex: 0.8, backgroundColor: "#efefef" }}>
+          <View style={{ height: 1, width: "100%", alignSelf: "center", backgroundColor: "lightgray" }}>
+          </View>
+          <View style={{ margin: 10, width: 25, height: 2, alignSelf: "center", backgroundColor: "lightgray" }}>
+          </View>
+          <View
+            style={[
+              {
+                shadowColor: "#000",
+                shadowOffset: {
+                  width: 0,
+                  height: 1,
+                },
+                shadowOpacity: 0.22,
+                shadowRadius: 2.22,
+
+                elevation: 3,
+                position: "absolute",
+                top: -18,
+                flexDirection: "column",
+                alignItems: "flex-start",
+              },
+            ]}
+          >
+            <View
+              style={{
+                backgroundColor: "red",
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <MaterialIcons
+                name="favorite"
+                size={17}
+                color={"white"}
+                style={{ padding: 6 }}
+              />
+              <Text
+                style={[{ marginRight: 6, fontWeight: "bold", color: "white" }]}
+              >
+                Liked by
+              </Text>
+            </View>
+          </View>
+          {
+            /*
+          <PostItem
+            index={index}
+            item={item}
+            //deletePostsAsync={deletePostsAsync}
+            writtenByYou={item.userId === route.params?.myId}
+            //editButtonHandler={updatePostAsync}
+            replyButtonHandler={() => {
+              setAreRepliesVisible(false);
+            }}
+          /> */
+          }
+          <LikesList postId={item.createdAt + "#" + item.userId} />
+        </View>
+      </Modal>
         </View>
 
         {isEditing ? (
@@ -314,16 +436,16 @@ export default React.memo(function PostItem({
             <FeedScreen
               headerComponent={
                 <View>
-                <PostItem
-                  index={index}
-                  item={item}
-                  //deletePostsAsync={deletePostsAsync}
-                  writtenByYou={item.userId === route.params?.myId}
-                  //editButtonHandler={updatePostAsync}
-                  replyButtonHandler={() => {
-                    setAreRepliesVisible(false);
-                  }}
-                />
+                  <PostItem
+                    index={index}
+                    item={item}
+                    //deletePostsAsync={deletePostsAsync}
+                    writtenByYou={item.userId === route.params?.myId}
+                    //editButtonHandler={updatePostAsync}
+                    replyButtonHandler={() => {
+                      setAreRepliesVisible(false);
+                    }}
+                  />
                 </View>
               }
               navigation={navigation}
@@ -396,7 +518,7 @@ export default React.memo(function PostItem({
   }
 }, (oldProps, newProps) => oldProps.item == newProps.item)
 
-function PostHeader({ item, writtenByYou, setAreLikesVisible, repliesPressed, deletePostsAsync, setIsEditing, areRepliesVisible }) {
+function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, setIsEditing, areRepliesVisible }) {
   const [likes, setLikes] = useState(item.likes);
   const currentLikes = useRef();
   currentLikes.current = likes;
@@ -404,11 +526,10 @@ function PostHeader({ item, writtenByYou, setAreLikesVisible, repliesPressed, de
   const currentReplies = useRef();
   currentReplies.current = replies;
   const likeDebounce = useRef(false);
-  
-  const [areLikesVisible, setAreLikesVisible] = useState(false);
 
   useEffect(() => {
     if (!item.loading) {
+      /*
       const incrementLikeSubscription = API.graphql(graphqlOperation(onIncrementLikes, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
         next: event => {
           console.log("liked post!")
@@ -438,12 +559,13 @@ function PostHeader({ item, writtenByYou, setAreLikesVisible, repliesPressed, de
           setReplies(currentReplies.current - 1);
         }
       });
+      */
 
       return () => {
-        incrementLikeSubscription.unsubscribe();
-        decrementLikeSubscription.unsubscribe();
-        incrementReplySubscription.unsubscribe();
-        decrementReplySubscription.unsubscribe();
+        //incrementLikeSubscription.unsubscribe();
+        //decrementLikeSubscription.unsubscribe();
+        //incrementReplySubscription.unsubscribe();
+        //decrementReplySubscription.unsubscribe();
       }
     }
   }, [])
@@ -470,70 +592,54 @@ function PostHeader({ item, writtenByYou, setAreLikesVisible, repliesPressed, de
         }
         sibling={
           !item.loading ?
-          <View
-            style={{
-              flexDirection: "column",
-              justifyContent: "space-between",
-              alignItems: "flex-end",
-              flex: 1,
-            }}
-          >
             <View
               style={{
-                flexDirection: "row",
+                flexDirection: "column",
+                justifyContent: "space-between",
                 alignItems: "flex-end",
+                flex: 1,
               }}
-            >            
-            <ProfileImageAndName
-              hideName={true}
-              imageStyle={[
-                styles.smallerImageStyle,
-                { marginHorizontal: 0 },
-              ]}
-              userId={item.userId}
-              onPress={() => setAreLikesVisible(true)}
-            />
-            <LikeButton
-              setLikes={setLikes}
-              likes={likes}
-              likedByYou={item.likedByYou}
-              postId={item.createdAt + "#" + item.userId}
-              likeDebounceRef={likeDebounce}
-            />
-            </View>
-            <TouchableOpacity
-              style={[
-                {
-                  paddingHorizontal: 15,
-                  paddingBottom: 15,
-                  flex: 1,
-                  borderWidth: 0,
-                  flexDirection: "row",
-                  alignItems: "flex-end",
-                },
-              ]}
-              onPress={repliesPressed}
             >
-              <Text
+              <LikeButton
+                setLikes={setLikes}
+                likes={likes}
+                likedByYou={item.likedByYou}
+                postId={item.createdAt + "#" + item.userId}
+                likeDebounceRef={likeDebounce}
+              />
+              <TouchableOpacity
                 style={[
                   {
-                    paddingRight: 6,
-                    fontWeight: "bold",
-                    color: areRepliesVisible ? "blue" : "gray",
+                    paddingHorizontal: 15,
+                    paddingBottom: 15,
+                    flex: 1,
+                    borderWidth: 0,
+                    flexDirection: "row",
+                    alignItems: "flex-end",
                   },
                 ]}
+                onPress={repliesPressed}
               >
-                {replies}
-              </Text>
-              <MaterialIcons
-                name="chat-bubble-outline"
-                size={17}
-                color={areRepliesVisible ? "blue" : "gray"}
-                style={{ marginRight: 0 }}
-              />
-            </TouchableOpacity>
-          </View>
-          : null
+                <Text
+                  style={[
+                    {
+                      paddingRight: 6,
+                      fontWeight: "bold",
+                      color: areRepliesVisible ? "blue" : "gray",
+                    },
+                  ]}
+                >
+                  {replies}
+                </Text>
+                <MaterialIcons
+                  name="chat-bubble-outline"
+                  size={17}
+                  color={areRepliesVisible ? "blue" : "gray"}
+                  style={{ marginRight: 0 }}
+                />
+              </TouchableOpacity>
+            </View>
+            : null
         }
       />
       <View
@@ -578,78 +684,7 @@ function PostHeader({ item, writtenByYou, setAreLikesVisible, repliesPressed, de
           </View>
         ) : null}
       </View>
-      
-      <Modal
-          animationType="slide"
-          transparent={true}
-          statusBarTranslucent={true}
-          visible={areLikesVisible}
-          onRequestClose={() => {
-            setAreLikesVisible(false);
-          }}
-        >
-          <TouchableOpacity onPress={() => setAreLikesVisible(false)} style={{ width: "100%", height: "100%", position: "absolute", backgroundColor: "#00000033" }}>
-          </TouchableOpacity>
-          <View style={{ marginTop: "auto", flex: 0.8, backgroundColor: "#efefef" }}>
-            <View style={{ height: 1, width: "100%", alignSelf: "center", backgroundColor: "lightgray" }}>
-            </View>
-            <View style={{ margin: 10, width: 25, height: 2, alignSelf: "center", backgroundColor: "lightgray" }}>
-            </View>
-            <View
-              style={[
-                {
-                  shadowColor: "#000",
-                  shadowOffset: {
-                    width: 0,
-                    height: 1,
-                  },
-                  shadowOpacity: 0.22,
-                  shadowRadius: 2.22,
 
-                  elevation: 3,
-                  position: "absolute",
-                  top: -18,
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                },
-              ]}
-            >
-              <View
-                style={{
-                  backgroundColor: "red",
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
-                <MaterialIcons
-                  name="chat-bubble"
-                  size={17}
-                  color={"white"}
-                  style={{ padding: 6 }}
-                />
-                <Text
-                  style={[{ marginRight: 6, fontWeight: "bold", color: "white" }]}
-                >
-                  Liked by
-                </Text>
-              </View>
-            </View>
-            {
-              /*
-            <PostItem
-              index={index}
-              item={item}
-              //deletePostsAsync={deletePostsAsync}
-              writtenByYou={item.userId === route.params?.myId}
-              //editButtonHandler={updatePostAsync}
-              replyButtonHandler={() => {
-                setAreRepliesVisible(false);
-              }}
-            /> */
-            }
-            <LikesList postId={item.createdAt + "#" + item.userId} />
-          </View>
-        </Modal>
     </View>
   );
 }

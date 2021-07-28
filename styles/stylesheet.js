@@ -250,6 +250,11 @@ module.exports = StyleSheet.create({
     height: 35,
     width: 35,
   },
+  smallestImageStyle: {
+    resizeMode: "cover",
+    height: 19,
+    width: 19,
+  },
   goBackButton: {
     alignSelf: "center",
     backgroundColor: "orange",

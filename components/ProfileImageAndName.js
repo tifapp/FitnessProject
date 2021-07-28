@@ -171,7 +171,7 @@ export const ProfileImageAndName = React.memo(function(props) {
         <View style={props.textLayoutStyle}>
           {props.hidename ? null : (
               <Text
-                onPress={goToProfile}
+                onPress={props.onPress ?? goToProfile}
                 style={[props.textStyle, { flexWrap: "wrap", flexShrink: 1 }]}
               >
                 {userInfo != null && userInfo.name

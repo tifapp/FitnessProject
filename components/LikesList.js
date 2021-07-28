@@ -60,7 +60,6 @@ export default function LikesList({ postId }) {
         setDataFunction={setLikedUsers}
         renderItem={({ item }) => (
           <ProfileImageAndName
-            vertical={true}
             imageStyle={[
               styles.smallImageStyle,
               { marginHorizontal: 0 },
