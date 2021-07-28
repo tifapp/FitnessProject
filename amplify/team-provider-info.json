@@ -52,5 +52,59 @@
         }
       }
     }
+  },
+  "testing": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-fitnessproject-testing-223805-authRole",
+      "UnauthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-testing-223805-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::213277979580:role/amplify-fitnessproject-testing-223805-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-fitnessproject-testing-223805-deployment",
+      "UnauthRoleName": "amplify-fitnessproject-testing-223805-unauthRole",
+      "StackName": "amplify-fitnessproject-testing-223805",
+      "StackId": "arn:aws:cloudformation:us-west-2:213277979580:stack/amplify-fitnessproject-testing-223805/296e8e80-e6c1-11eb-a5d1-061858c75b4d",
+      "AmplifyAppId": "d19kzf7eu35pq1"
+    },
+    "categories": {
+      "auth": {
+        "fitnessprojecta8f49cfe": {}
+      },
+      "function": {
+        "S3Triggeref91c1ec": {
+          "deploymentBucketName": "amplify-fitnessproject-testing-223805-deployment",
+          "s3Key": "amplify-builds/S3Triggeref91c1ec-4a4d6c62786e4e667657-build.zip"
+        },
+        "friendNotifications": {
+          "deploymentBucketName": "amplify-fitnessproject-testing-223805-deployment",
+          "s3Key": "amplify-builds/friendNotifications-3077416e6a6746463035-build.zip"
+        },
+        "deleteUserData": {
+          "deploymentBucketName": "amplify-fitnessproject-testing-223805-deployment",
+          "s3Key": "amplify-builds/deleteUserData-77596d386a6843586e43-build.zip"
+        },
+        "postNotifications": {
+          "deploymentBucketName": "amplify-fitnessproject-testing-223805-deployment",
+          "s3Key": "amplify-builds/postNotifications-594242414f5457526f54-build.zip"
+        },
+        "likeNotifications": {
+          "deploymentBucketName": "amplify-fitnessproject-testing-223805-deployment",
+          "s3Key": "amplify-builds/likeNotifications-74387539724a446e4654-build.zip"
+        },
+        "conversationEvents": {
+          "deploymentBucketName": "amplify-fitnessproject-testing-223805-deployment",
+          "s3Key": "amplify-builds/conversationEvents-68435a426f676a776646-build.zip"
+        },
+        "backendResources": {
+          "deploymentBucketName": "amplify-fitnessproject-testing-223805-deployment",
+          "s3Key": "amplify-builds/backendResources-LambdaLayerVersion75fb5ecb-build.zip"
+        }
+      },
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d19kzf7eu35pq1",
+          "type": "manual"
+        }
+      }
+    }
   }
 }

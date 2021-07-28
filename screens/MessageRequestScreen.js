@@ -11,7 +11,7 @@ import {
   SafeAreaView,
   LayoutAnimation
 } from "react-native";
-import { conversationsByLastUpdated, listConversations, getConversations } from "../src/graphql/queries";
+import { conversationsByLastUpdated, getConversationByUsers, getConversations } from "../src/graphql/queries";
 import { deleteConversation } from "root/src/graphql/mutations";
 import {
   onCreatePostForReceiver,
@@ -22,12 +22,12 @@ import APIList from "../components/APIList"
 import { API, graphqlOperation } from "aws-amplify";
 import { ProfileImageAndName } from "../components/ProfileImageAndName"
 import FriendListItem from "components/FriendListItem"
-//import { listConversations } from "../amplify/#current-cloud-backend/function/backendResources/opt/queries";
+import { getConversation } from "../amplify/backend/function/backendResources/opt/queries";
 
 var styles = require('styles/stylesheet');
 var subscriptions = [];
 
-export default function ConversationScreen({ navigation, route }) {
+export default function MessageRequestScreen({ navigation, route }) {
 
   const updateConversationList = async (newPost) => {
 
@@ -35,8 +35,14 @@ export default function ConversationScreen({ navigation, route }) {
 
     let newConversation = tempConversations.find(item => newPost.channel === item.id);
 
+    console.log("inside update");
+
     if (newConversation === undefined) {
-      newConversation = await API.graphql(graphqlOperation(getConversations, { Accepted: 1, limit: 1 }));
+      newConversation = await API.graphql(graphqlOperation(getConversations, { Accepted: 0, limit: 1 }));
+
+      console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+      console.log(newConversation.data.getConversations.items);
+      console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
       if (newConversation != null) {
         newConversation = { id: newConversation.data.id }
@@ -46,14 +52,22 @@ export default function ConversationScreen({ navigation, route }) {
       }
     }
 
+    //tempConversations.filter(item => newPost.channel === item.id);
+
+    //let newConversation = null;
+
+    console.log(":::::::::::::::::::::::::::::")
+    console.log(newConversation)
+    console.log(":::::::::::::::::::::::::::::")
+
     if (newConversation.id === newPost.channel) {
-      const conversation = { id: newPost.channel, users: [newPost.userId, newPost.receiver], lastUser: newPost.userId, lastMessage: newPost.description, Accepted: 1 }
+      const conversation = { id: newPost.channel, users: [newPost.userId, newPost.receiver], lastUser: newPost.userId, lastMessage: newPost.description, Accepted: 0 }
 
-      console.log("++++++++++++++++++++++++++++++++")
+      tempConversations = currentConversations.current;
+
+      console.log("================================")
       console.log(conversation);
-      console.log("++++++++++++++++++++++++++++++++")
-
-      let tempConversations = currentConversations.current;
+      console.log("================================")
 
       let index = tempConversations.findIndex(item => newPost.channel === item.id);
 
@@ -78,9 +92,29 @@ export default function ConversationScreen({ navigation, route }) {
     ).subscribe({
       next: (event) => {
         const newPost = event.value.data.onCreatePostForReceiver;
+
+        console.log("$$$$$$$$$$$$$$$")
+        //console.log(newPost);
+        console.log(conversations);
+        console.log("$$$$$$$$$$$$$$$")
+
+        /*
+
+        let checkConversationExists = conversations.find(item => item.id === newPost.channel);
+
+        if (route.params?.myId != checkConversationExists.lastUser) {
+          setConversations((conversations) => {
+            return conversations.filter(
+              (i) => i.users[0] !== checkConversationExists.lastUser || i.users[1] !== checkConversationExists.lastUser
+            );
+          });
+        }
+        */
+
         global.addConversationIds(newPost.userId);
         global.showNotificationDot();
         updateConversationList(newPost);
+
       },
     });
 
@@ -89,7 +123,7 @@ export default function ConversationScreen({ navigation, route }) {
     ).subscribe({
       next: (event) => {
         const newPost = event.value.data.onCreatePostByUser;
-
+        //console.log("^^^^^^^^^^^^^^^^^^^^^^^");
         updateConversationList(newPost);
       },
     });
@@ -193,7 +227,7 @@ export default function ConversationScreen({ navigation, route }) {
   const collectConversations = (items) => {
     //what if conversations array shrinks? we should remove from the conversationids array
 
-    console.log("1. Inside collect Conversations");
+    console.log("2. Inside collect Conversations");
     console.log(items);
 
     items.forEach((element) => {
@@ -253,7 +287,7 @@ export default function ConversationScreen({ navigation, route }) {
             lastUser={item.lastUser}
           />
         )}
-        filter={{ Accepted: 1 }}
+        filter={{ Accepted: 0 }}
         keyExtractor={(item) => item.id}
       />
     </SafeAreaView>
