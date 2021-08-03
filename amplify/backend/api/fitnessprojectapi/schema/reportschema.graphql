@@ -1,0 +1,16 @@
+type Report @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" }, subscriptions: null)
+@auth(
+  rules: [
+      { allow: owner, ownerField: "userId", operations: [create, read, delete] },
+      { allow: groups, groups: ["Admins"], operations: [create, read, delete] },
+      { allow: private, provider: iam, operations: [read, delete] },
+  ]
+)
+@key(fields: ["postId", "userId"])
+{
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+  userId: ID!
+  postId: ID!
+  message: String
+}

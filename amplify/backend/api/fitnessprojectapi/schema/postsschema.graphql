@@ -8,6 +8,7 @@ type Post @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" },
       { allow: owner, ownerField: "userId" },
       { allow: owner, ownerField: "receiver", operations: [delete, read] },
       { allow: private, provider: iam, operations: [create, read, update, delete] },
+      { allow: groups, groups: ["Admins"], operations: [create, read, update, delete] },
   ]
 )
 @key(fields: ["createdAt", "userId"])

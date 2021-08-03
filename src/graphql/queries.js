@@ -482,6 +482,45 @@ export const listPosts = /* GraphQL */ `
     }
   }
 `;
+export const getReport = /* GraphQL */ `
+  query GetReport($postId: ID!, $userId: ID!) {
+    getReport(postId: $postId, userId: $userId) {
+      createdAt
+      updatedAt
+      userId
+      postId
+      message
+    }
+  }
+`;
+export const listReports = /* GraphQL */ `
+  query ListReports(
+    $postId: ID
+    $userId: ModelIDKeyConditionInput
+    $filter: ModelReportFilterInput
+    $limit: Int
+    $nextToken: String
+    $sortDirection: ModelSortDirection
+  ) {
+    listReports(
+      postId: $postId
+      userId: $userId
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
+    ) {
+      items {
+        createdAt
+        updatedAt
+        userId
+        postId
+        message
+      }
+      nextToken
+    }
+  }
+`;
 export const getUser = /* GraphQL */ `
   query GetUser($id: ID!) {
     getUser(id: $id) {
