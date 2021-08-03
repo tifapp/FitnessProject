@@ -176,7 +176,7 @@ export default React.memo(function PostItem({
   const [editedText, setEditedText] = useState("");
   const displayTime = printTime(item.createdAt);
   const isReceivedMessage = receiver != null && !writtenByYou;
-  
+
   const [areLikesVisible, setAreLikesVisible] = useState(false);
 
   const [likedUsers, setLikedUsers] = useState([]);
@@ -235,121 +235,121 @@ export default React.memo(function PostItem({
             </LinkableText>
           )}
 
-            <TouchableOpacity style={{flexDirection: "row", alignItems: "center", marginTop: likedUsers.length > 0 ? 6 : 0}} onPress={() => setAreLikesVisible(true)}>
-              <APIList
-                style={{ margin: 0, padding: 0 }}
-                horizontal={true}
-                queryOperation={likesByPost}
-                filter={{ postId: item.createdAt + "#" + item.userId, sortDirection: "DESC", }}
-                initialAmount={1}
-                additionalAmount={0}
-                data={likedUsers}
-                setDataFunction={setLikedUsers}
-                renderItem={({ item }) => (
-                  <ProfileImageAndName
-                    style={{
-                      alignContent: "flex-start",
-                      alignItems: "center",
-                      alignSelf: "flex-end",
-                      justifyContent: "flex-start",
-                      flexDirection: "row",
-                      marginLeft: 5,
-                    }}
-                    imageLayoutStyle={{ marginHorizontal: 10 }}
-                    imageStyle={[
-                      styles.smallestImageStyle,
-                    ]}
-                    userId={item.userId}
-                    onPress={() => setAreLikesVisible(true)}
-                  />
-                )}
-                keyExtractor={(item) => item.userId}
-              />
-              {
-                likedUsers.length > 1 ?
-              <Text>
-              and others
-              </Text> : null
-              }
-              {
-                likedUsers.length > 0 ?
-                <Text style={{marginTop: 1}}>
-                 {" liked this post"}
+          <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", marginTop: likedUsers.length > 0 ? 6 : 0 }} onPress={() => setAreLikesVisible(true)}>
+            <APIList
+              style={{ margin: 0, padding: 0 }}
+              horizontal={true}
+              queryOperation={likesByPost}
+              filter={{ postId: item.createdAt + "#" + item.userId, sortDirection: "DESC", }}
+              initialAmount={1}
+              additionalAmount={0}
+              data={likedUsers}
+              setDataFunction={setLikedUsers}
+              renderItem={({ item }) => (
+                <ProfileImageAndName
+                  style={{
+                    alignContent: "flex-start",
+                    alignItems: "center",
+                    alignSelf: "flex-end",
+                    justifyContent: "flex-start",
+                    flexDirection: "row",
+                    marginLeft: 5,
+                  }}
+                  imageLayoutStyle={{ marginHorizontal: 10 }}
+                  imageStyle={[
+                    styles.smallestImageStyle,
+                  ]}
+                  userId={item.userId}
+                  onPress={() => setAreLikesVisible(true)}
+                />
+              )}
+              keyExtractor={(item) => item.userId}
+            />
+            {
+              likedUsers.length > 1 ?
+                <Text>
+                  and others
                 </Text> : null
-              }
-            </TouchableOpacity>
-          
-      <Modal
-        animationType="slide"
-        transparent={true}
-        statusBarTranslucent={true}
-        visible={areLikesVisible}
-        onRequestClose={() => {
-          setAreLikesVisible(false);
-        }}
-      >
-        <TouchableOpacity onPress={() => setAreLikesVisible(false)} style={{ width: "100%", height: "100%", position: "absolute", backgroundColor: "#00000033" }}>
-        </TouchableOpacity>
-        <View style={{ marginTop: "auto", flex: 0.8, backgroundColor: "#efefef" }}>
-          <View style={{ height: 1, width: "100%", alignSelf: "center", backgroundColor: "lightgray" }}>
-          </View>
-          <View style={{ margin: 10, width: 25, height: 2, alignSelf: "center", backgroundColor: "lightgray" }}>
-          </View>
-          <View
-            style={[
-              {
-                shadowColor: "#000",
-                shadowOffset: {
-                  width: 0,
-                  height: 1,
-                },
-                shadowOpacity: 0.22,
-                shadowRadius: 2.22,
+            }
+            {
+              likedUsers.length > 0 ?
+                <Text style={{ marginTop: 1 }}>
+                  {" liked this post"}
+                </Text> : null
+            }
+          </TouchableOpacity>
 
-                elevation: 3,
-                position: "absolute",
-                top: -18,
-                flexDirection: "column",
-                alignItems: "flex-start",
-              },
-            ]}
-          >
-            <View
-              style={{
-                backgroundColor: "red",
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <MaterialIcons
-                name="favorite"
-                size={17}
-                color={"white"}
-                style={{ padding: 6 }}
-              />
-              <Text
-                style={[{ marginRight: 6, fontWeight: "bold", color: "white" }]}
-              >
-                Liked by
-              </Text>
-            </View>
-          </View>
-          {
-            /*
-          <PostItem
-            index={index}
-            item={item}
-            //deletePostsAsync={deletePostsAsync}
-            writtenByYou={item.userId === route.params?.myId}
-            //editButtonHandler={updatePostAsync}
-            replyButtonHandler={() => {
-              setAreRepliesVisible(false);
+          <Modal
+            animationType="slide"
+            transparent={true}
+            statusBarTranslucent={true}
+            visible={areLikesVisible}
+            onRequestClose={() => {
+              setAreLikesVisible(false);
             }}
-          /> */
-          }
-          <LikesList postId={item.createdAt + "#" + item.userId} />
-        </View>
-      </Modal>
+          >
+            <TouchableOpacity onPress={() => setAreLikesVisible(false)} style={{ width: "100%", height: "100%", position: "absolute", backgroundColor: "#00000033" }}>
+            </TouchableOpacity>
+            <View style={{ marginTop: "auto", flex: 0.8, backgroundColor: "#efefef" }}>
+              <View style={{ height: 1, width: "100%", alignSelf: "center", backgroundColor: "lightgray" }}>
+              </View>
+              <View style={{ margin: 10, width: 25, height: 2, alignSelf: "center", backgroundColor: "lightgray" }}>
+              </View>
+              <View
+                style={[
+                  {
+                    shadowColor: "#000",
+                    shadowOffset: {
+                      width: 0,
+                      height: 1,
+                    },
+                    shadowOpacity: 0.22,
+                    shadowRadius: 2.22,
+
+                    elevation: 3,
+                    position: "absolute",
+                    top: -18,
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                  },
+                ]}
+              >
+                <View
+                  style={{
+                    backgroundColor: "red",
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <MaterialIcons
+                    name="favorite"
+                    size={17}
+                    color={"white"}
+                    style={{ padding: 6 }}
+                  />
+                  <Text
+                    style={[{ marginRight: 6, fontWeight: "bold", color: "white" }]}
+                  >
+                    Liked by
+                  </Text>
+                </View>
+              </View>
+              {
+                /*
+              <PostItem
+                index={index}
+                item={item}
+                //deletePostsAsync={deletePostsAsync}
+                writtenByYou={item.userId === route.params?.myId}
+                //editButtonHandler={updatePostAsync}
+                replyButtonHandler={() => {
+                  setAreRepliesVisible(false);
+                }}
+              /> */
+              }
+              <LikesList postId={item.createdAt + "#" + item.userId} />
+            </View>
+          </Modal>
         </View>
 
         {isEditing ? (
@@ -588,7 +588,65 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, setI
         }}
         userId={item.userId}
         subtitleComponent={
-          <Text style={{ color: "gray" }}>{printTime(item.createdAt)}</Text>
+          <View style={{flexDirection: "row"}}>
+            <Text style={{ color: "gray", paddingRight: 12 }}>{printTime(item.createdAt)}</Text>
+            
+            {writtenByYou ? (
+            <TouchableOpacity
+              style={[
+                {
+                  borderWidth: 0,
+                  flexDirection: "row",
+                  paddingRight: 12
+                },
+              ]}
+              onPress={() => deletePostsAsync(item.createdAt)}
+            >
+              <MaterialIcons
+                name="delete-forever"
+                size={15}
+                color={"red"}
+              />
+              <Text
+                style={[
+                  {
+                    color: "red",
+                  },
+                ]}
+              >
+                Delete
+              </Text>
+            </TouchableOpacity>
+            ) : null }
+            
+            {writtenByYou ? (
+            <TouchableOpacity
+              style={[
+                {
+                  borderWidth: 0,
+                  flexDirection: "row",
+                  paddingRight: 12
+                },
+              ]}
+              onPress={() => setIsEditing(!isEditing)}
+            >
+              <MaterialIcons
+                name="edit"
+                size={15}
+                color={"blue"}
+              />
+              <Text
+                style={[
+                  {
+                    color: "blue",
+                  },
+                ]}
+              >
+                Edit
+              </Text>
+            </TouchableOpacity>
+            ) : null }
+          </View>
         }
         sibling={
           !item.loading ?
@@ -642,49 +700,6 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, setI
             : null
         }
       />
-      <View
-        style={{
-          marginHorizontal: 24,
-          flexDirection: "column",
-          justifyContent: "space-between",
-          alignItems: "stretch",
-        }}
-      >
-        {writtenByYou ? (
-          <View
-            style={{
-              marginHorizontal: 24,
-              flexDirection: "row",
-              justifyContent: "space-evenly",
-            }}
-          >
-            <TouchableOpacity
-              style={[styles.unselectedButtonStyle, { borderColor: "red" }]}
-              color="red"
-              onPress={() => deletePostsAsync(item.createdAt)}
-            >
-              <Text
-                style={[styles.unselectedButtonTextStyle, { color: "red" }]}
-              >
-                Delete
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.unselectedButtonStyle, { borderColor: "blue" }]}
-              color="blue"
-              onPress={() => setIsEditing(!isEditing)}
-            >
-              <Text
-                style={[styles.unselectedButtonTextStyle, { color: "blue" }]}
-              >
-                Edit
-              </Text>
-            </TouchableOpacity>
-          </View>
-        ) : null}
-      </View>
-
     </View>
   );
 }

@@ -340,23 +340,12 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   const deletePostsAsync = async (timestamp) => {
     checkInternetConnection();
 
-    let parent_post = posts.find((item) => {
-      //const time = timestamp.toString();
-      return item.createdAt === timestamp && item.userId === route.params?.myId;
-    })
-
-    //console.log("parent post: " + parent_post.description);
+    console.log("BARRY BONDS ", timestamp)
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    if (parent_post.parentId == null) {
-      setPosts((posts) => {
-        return posts.filter((val) => (val.channel != parent_post.channel));
-      });
-    } else {
-      setPosts((posts) => {
-        return posts.filter((val) => (val.createdAt != parent_post.createdAt || val.userId != parent_post.userId));
-      });
-    }
+    setPosts((posts) => {
+      return posts.filter((post) => (post.createdAt !== timestamp || post.userId !== route.params?.myId));
+    });
 
     try {
       await API.graphql(graphqlOperation(deletePost, { input: { createdAt: timestamp, userId: route.params?.myId } }));
