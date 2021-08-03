@@ -227,12 +227,10 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
 
   const updatePostAsync = async (createdAt, editedText) => {
     //replace the post locally
-    let tempposts = posts;
-    tempposts[tempposts.findIndex(p => p.createdAt == createdAt && p.userId == route.params?.myId)].description = editedText;
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setPosts(tempposts);
-
-    const post = tempposts.find(p => { return p.createdAt == createdAt && p.userId == route.params?.myId });
+    setPosts((posts) => {
+      posts.find(p => { return p.createdAt == createdAt && p.userId == route.params?.myId }).description = editedText;
+      return posts;
+    });
 
     try {
       await API.graphql(graphqlOperation(updatePost, { input: { createdAt: createdAt, description: editedText } }));
@@ -339,8 +337,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
 
   const deletePostsAsync = async (timestamp) => {
     checkInternetConnection();
-
-    console.log("BARRY BONDS ", timestamp)
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setPosts((posts) => {

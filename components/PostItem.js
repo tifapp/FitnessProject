@@ -210,7 +210,7 @@ export default React.memo(function PostItem({
             item={item}
             deletePostsAsync={deletePostsAsync}
             writtenByYou={writtenByYou}
-            setIsEditing={setIsEditing}
+            toggleEditing={() => setIsEditing(!isEditing)}
             repliesPressed={() => replyButtonHandler ? replyButtonHandler() : setAreRepliesVisible(!areRepliesVisible)}
             areRepliesVisible={areRepliesVisible}
           />
@@ -357,7 +357,7 @@ export default React.memo(function PostItem({
             <TouchableOpacity
               style={styles.unselectedButtonStyle}
               onPress={() => {
-                alert("Edit the post");
+                alert("Post is empty!");
               }}
             >
               <Text style={[styles.buttonTextStyle, { color: "gray" }]}>
@@ -518,7 +518,7 @@ export default React.memo(function PostItem({
   }
 }, (oldProps, newProps) => oldProps.item == newProps.item)
 
-function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, setIsEditing, areRepliesVisible }) {
+function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, toggleEditing, areRepliesVisible }) {
   const [likes, setLikes] = useState(item.likes);
   const currentLikes = useRef();
   currentLikes.current = likes;
@@ -591,33 +591,6 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, setI
           <View style={{flexDirection: "row"}}>
             <Text style={{ color: "gray", paddingRight: 12 }}>{printTime(item.createdAt)}</Text>
             
-            {writtenByYou ? (
-            <TouchableOpacity
-              style={[
-                {
-                  borderWidth: 0,
-                  flexDirection: "row",
-                  paddingRight: 12
-                },
-              ]}
-              onPress={() => deletePostsAsync(item.createdAt)}
-            >
-              <MaterialIcons
-                name="delete-forever"
-                size={15}
-                color={"red"}
-              />
-              <Text
-                style={[
-                  {
-                    color: "red",
-                  },
-                ]}
-              >
-                Delete
-              </Text>
-            </TouchableOpacity>
-            ) : null }
             
             {writtenByYou ? (
             <TouchableOpacity
@@ -625,10 +598,9 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, setI
                 {
                   borderWidth: 0,
                   flexDirection: "row",
-                  paddingRight: 12
                 },
               ]}
-              onPress={() => setIsEditing(!isEditing)}
+              onPress={() => {console.log("PRESSED EDIT EEEE"), toggleEditing()}}
             >
               <MaterialIcons
                 name="edit"
