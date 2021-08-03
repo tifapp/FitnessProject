@@ -589,18 +589,44 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, togg
         userId={item.userId}
         subtitleComponent={
           <View style={{flexDirection: "row"}}>
-            <Text style={{ color: "gray", paddingRight: 12 }}>{printTime(item.createdAt)}</Text>
-            
+            <Text style={{ color: "gray" }}>{printTime(item.createdAt)}</Text>
             
             {writtenByYou ? (
             <TouchableOpacity
               style={[
                 {
-                  borderWidth: 0,
+                  marginLeft: 12,
                   flexDirection: "row",
                 },
               ]}
-              onPress={() => {console.log("PRESSED EDIT EEEE"), toggleEditing()}}
+              onPress={() => deletePostsAsync(item.createdAt)}
+            >
+              <MaterialIcons
+                name="delete-forever"
+                size={15}
+                color={"red"}
+              />
+              <Text
+                style={[
+                  {
+                    color: "red",
+                  },
+                ]}
+              >
+                Delete
+              </Text>
+            </TouchableOpacity>
+            ) : null }
+            
+            {writtenByYou ? (
+            <TouchableOpacity
+              style={[
+                {
+                  marginLeft: 12,
+                  flexDirection: "row",
+                },
+              ]}
+              onPress={() => toggleEditing()}
             >
               <MaterialIcons
                 name="edit"
