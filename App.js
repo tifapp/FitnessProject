@@ -247,17 +247,16 @@ const App = () => {
       </NavigationContainer>
     );
   } else if (isAdmin) {
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Report List"
-          component={ReportScreen} //should be in a separate app, not this one. we'll make a different app to view reports.
-          options={{
-            headerShown: false,
-          }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    return (
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Report List"
+            component={ReportScreen} //should be in a separate app, not this one. we'll make a different app to view reports.
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    );
   } else {
     return (
       <NavigationContainer>
