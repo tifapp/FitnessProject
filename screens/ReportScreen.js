@@ -51,7 +51,6 @@ export default function ReportScreen() {
         initialAmount={10}
         additionalAmount={20}
         queryOperation={listReports}
-        filter={{ sortDirection: "DESC" }}
         data={reports}
         setDataFunction={setReports}
         renderItem={({ item }) => (
