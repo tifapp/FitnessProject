@@ -16,6 +16,7 @@ import { Amplify, API, graphqlOperation, Auth, Cache, Storage } from "aws-amplif
 import { getUser } from "./src/graphql/queries";
 import ProfileStack from "stacks/ProfileStack";
 import MainTabs from "./MainTabs";
+import ReportScreen from "screens/ReportScreen";
 import SettingsScreen from "screens/SettingsScreen";
 import ConversationScreen from "screens/ConversationScreen";
 import ComplianceScreen from "screens/ComplianceScreen";
@@ -93,6 +94,7 @@ const App = () => {
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
   const [userId, setUserId] = useState('checking...'); //stores the user's id if logged in
+  const [isAdmin, setIsAdmin] = useState(false); //seems insecure
 
   const [conversationIds, setConversationIds] = useState([]);
   
@@ -123,8 +125,7 @@ const App = () => {
     try {
       const query = await Auth.currentAuthenticatedUser();
       const groups = query.signInUserSession.idToken.payload["cognito:groups"];
-      console.log("groups are: ")
-      console.log(groups)
+      setIsAdmin(groups.includes("Admins"));
       const user = await API.graphql(
         graphqlOperation(getUser, { id: query.attributes.sub })
       );
@@ -245,6 +246,18 @@ const App = () => {
         </Stack.Navigator>
       </NavigationContainer>
     );
+  } else if (isAdmin) {
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Report List"
+          component={ReportScreen} //should be in a separate app, not this one. we'll make a different app to view reports.
+          options={{
+            headerShown: false,
+          }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   } else {
     return (
       <NavigationContainer>

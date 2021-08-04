@@ -6,7 +6,7 @@ type Report @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" 
       { allow: private, provider: iam, operations: [read, delete] },
   ]
 )
-@key(fields: ["postId", "userId"])
+@key(fields: ["createdAt", "postId"])
 {
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!

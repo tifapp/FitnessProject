@@ -166,6 +166,7 @@ export default React.memo(function PostItem({
   receiver,
   showTimestamp,
   newSection,
+  reportPost,
   index
 }) {
   const navigation = useNavigation();
@@ -213,6 +214,7 @@ export default React.memo(function PostItem({
             toggleEditing={() => setIsEditing(!isEditing)}
             repliesPressed={() => replyButtonHandler ? replyButtonHandler() : setAreRepliesVisible(!areRepliesVisible)}
             areRepliesVisible={areRepliesVisible}
+            reportPost={reportPost}
           />
           {isEditing ? (
             <TextInput
@@ -518,7 +520,7 @@ export default React.memo(function PostItem({
   }
 }, (oldProps, newProps) => oldProps.item == newProps.item)
 
-function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, toggleEditing, areRepliesVisible }) {
+function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, toggleEditing, areRepliesVisible, reportPost }) {
   const [likes, setLikes] = useState(item.likes);
   const currentLikes = useRef();
   currentLikes.current = likes;
@@ -590,6 +592,33 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, togg
         subtitleComponent={
           <View style={{flexDirection: "row"}}>
             <Text style={{ color: "gray" }}>{printTime(item.createdAt)}</Text>
+
+            {!writtenByYou ? (
+            <TouchableOpacity
+              style={[
+                {
+                  marginLeft: 12,
+                  flexDirection: "row",
+                },
+              ]}
+              onPress={() => reportPost(item.createdAt, item.userId)}
+            >
+              <MaterialIcons
+                name="report"
+                size={15}
+                color={"gray"}
+              />
+              <Text
+                style={[
+                  {
+                    color: "gray",
+                  },
+                ]}
+              >
+                Report
+              </Text>
+            </TouchableOpacity>
+            ) : null }
             
             {writtenByYou ? (
             <TouchableOpacity

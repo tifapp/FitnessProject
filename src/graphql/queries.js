@@ -483,8 +483,8 @@ export const listPosts = /* GraphQL */ `
   }
 `;
 export const getReport = /* GraphQL */ `
-  query GetReport($postId: ID!, $userId: ID!) {
-    getReport(postId: $postId, userId: $userId) {
+  query GetReport($createdAt: AWSDateTime!, $postId: ID!) {
+    getReport(createdAt: $createdAt, postId: $postId) {
       createdAt
       updatedAt
       userId
@@ -495,16 +495,16 @@ export const getReport = /* GraphQL */ `
 `;
 export const listReports = /* GraphQL */ `
   query ListReports(
-    $postId: ID
-    $userId: ModelIDKeyConditionInput
+    $createdAt: AWSDateTime
+    $postId: ModelIDKeyConditionInput
     $filter: ModelReportFilterInput
     $limit: Int
     $nextToken: String
     $sortDirection: ModelSortDirection
   ) {
     listReports(
+      createdAt: $createdAt
       postId: $postId
-      userId: $userId
       filter: $filter
       limit: $limit
       nextToken: $nextToken

@@ -348,8 +348,20 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     } catch {
       console.log("error in deleting post: ");
     }
-
   };
+
+  const reportPost = async (timestamp, author) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setPosts((posts) => {
+      return posts.filter((post) => (post.createdAt !== timestamp || post.userId !== route.params?.myId));
+    });
+    
+    try {
+      await API.graphql(graphqlOperation(createReport, { input: { postId: timestamp + "#" + author, userId: route.params?.myId } }));
+    } catch {
+      console.log("error in deleting post: ");
+    }
+  }
 
   const scrollToTop = () => {
     scrollRef.current?.scrollToOffset({ offset: 0, animated: true })
@@ -364,6 +376,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       editButtonHandler={updatePostAsync}
       receiver={receiver}
       showTimestamp={showTimestamp(item, index)}
+      reportPost={reportPost}
       newSection={
         index == 0 ? true : showTimestamp(posts[index - 1], index - 1)
       }
