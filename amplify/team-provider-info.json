@@ -13,7 +13,8 @@
     },
     "categories": {
       "auth": {
-        "fitnessprojecta8f49cfe": {}
+        "fitnessprojecta8f49cfe": {},
+        "userPoolGroups": {}
       },
       "function": {
         "S3Triggeref91c1ec": {
@@ -26,7 +27,7 @@
         },
         "backendResources": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/backendResources-LambdaLayerVersion89cbb2eb-build.zip"
+          "s3Key": "amplify-builds/backendResources-LambdaLayerVersion1e19d968-build.zip"
         },
         "deleteUserData": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",

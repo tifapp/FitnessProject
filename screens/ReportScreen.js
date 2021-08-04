@@ -20,29 +20,40 @@ var allSettled = require('promise.allsettled');
 export default function ReportScreen() {
   const [reports, setReports] = useState([]);
   
-  const deletePost = async (timestamp, userId) => {
-    checkInternetConnection();
+  const deletePost = async (report, ignore) => {
+    const ids = report.postId.split("#");
+    const createdAt = ids[0];
+    const userId = ids[1];
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setPosts((posts) => {
-      return posts.filter((post) => (post.createdAt !== timestamp || post.userId !== route.params?.myId));
+    setReports((reports) => {
+      return reports.filter((report) => (report.post.createdAt !== createdAt || report.post.userId !== userId));
     });
 
     try {
-      await API.graphql(graphqlOperation(deletePost, { input: { createdAt: timestamp, userId: route.params?.myId } }));
+      if (!ignore) API.graphql(graphqlOperation(deletePost, { input: { createdAt: createdAt, userId: userId } }));
+      API.graphql(graphqlOperation(deleteReport, { input: { createdAt: report.createdAt, postId: report.postId } }));
     } catch {
       console.log("error in deleting post: ");
     }
   };
 
   const attachPosts = async (newReports) => {
-    /*
-    const posts = await allSettled(newReports.map((report) => API.graphql(graphqlOperation(getPost, { createdAt: report.createdAt, userId: report.userId }))));
+    console.log(newReports);
 
-    return posts;
-    */
-   
-    return newReports;
+    const posts = await allSettled(newReports.map((report) => {
+      const ids = report.postId.split("#");
+      const createdAt = ids[0];
+      const userId = ids[1];
+      return API.graphql(graphqlOperation(getPost, { createdAt: createdAt, userId: userId }))
+    }
+    ));
+
+    newReports.forEach((report, index) => {
+      report.post = posts[index]; //amplify connection would probably be good here
+    });
+
+    return newReports; //what if there are duplicates?
   }
 
   return (
@@ -55,17 +66,29 @@ export default function ReportScreen() {
         setDataFunction={setReports}
         renderItem={({ item }) => (
           <View>
-          <Text>
-            this is a report!
-          </Text>
-          
-          <TouchableOpacity
+            <Text>
+              this is a report!
+            </Text>
+
+            <TouchableOpacity
+              onPress={() => deletePost(item, false)}
             >
+              <Text>
+                Delete post.
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => deletePost(item, true)}
+            >
+              <Text>
+                Ignore.
+              </Text>
             </TouchableOpacity>
           </View>
         )}
         processingFunction={attachPosts}
-        keyExtractor={(item) => item.userId}
+        keyExtractor={(item) => item.userId + item.createdAt}
       />
     </SafeAreaView>
   );
