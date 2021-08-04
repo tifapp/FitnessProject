@@ -16,7 +16,7 @@ import {
 } from "react-native";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation, Cache } from "aws-amplify";
-import { createPost, updatePost, deletePost, createConversation, updateConversation } from "root/src/graphql/mutations";
+import { createReport, createPost, updatePost, deletePost, createConversation, updateConversation } from "root/src/graphql/mutations";
 import { listPosts, postsByChannel, batchGetLikes, getFriendship, getConversations } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
 import { onCreatePostFromChannel, onDeletePostFromChannel, onUpdatePostFromChannel, onCreateLike, onDeleteLike, onIncrementLikes, onDecrementLikes } from 'root/src/graphql/subscriptions';
@@ -353,13 +353,13 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   const reportPost = async (timestamp, author) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setPosts((posts) => {
-      return posts.filter((post) => (post.createdAt !== timestamp || post.userId !== route.params?.myId));
+      return posts.filter((post) => (post.createdAt !== timestamp || post.userId !== author));
     });
     
     try {
       await API.graphql(graphqlOperation(createReport, { input: { postId: timestamp + "#" + author, userId: route.params?.myId } }));
-    } catch {
-      console.log("error in deleting post: ");
+    } catch (err) {
+      console.log("error in reporting post: ", err);
     }
   }
 

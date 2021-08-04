@@ -4,14 +4,16 @@ import {
   View,
   SafeAreaView,
   LayoutAnimation,
+  TouchableOpacity,
 } from "react-native";
 // Get the aws resources configuration parameters
-import { API, graphqlOperation, Cache } from "aws-amplify";
+import { API, graphqlOperation, Cache, Auth } from "aws-amplify";
 import { listReports, getPost } from "root/src/graphql/queries";
-import { onCreateLikeForPost, onDeleteLikeForPost, } from 'root/src/graphql/subscriptions';
+import { deletePost, deleteReport } from "root/src/graphql/mutations";
 import { ProfileImageAndName } from "components/ProfileImageAndName";
 import printTime from "hooks/printTime";
 import APIList from 'components/APIList';
+import PostItem from "components/PostItem";
 
 var styles = require('styles/stylesheet');
 
@@ -20,7 +22,8 @@ var allSettled = require('promise.allsettled');
 export default function ReportScreen() {
   const [reports, setReports] = useState([]);
   
-  const deletePost = async (report, ignore) => {
+  const deletePostAndReport = async (report, ignore) => {
+    if (!report.post) return;
     const ids = report.postId.split("#");
     const createdAt = ids[0];
     const userId = ids[1];
@@ -31,10 +34,12 @@ export default function ReportScreen() {
     });
 
     try {
-      if (!ignore) API.graphql(graphqlOperation(deletePost, { input: { createdAt: createdAt, userId: userId } }));
+      if (!ignore) {
+        API.graphql(graphqlOperation(deletePost, { input: { createdAt: createdAt, userId: userId } }))
+      };
       API.graphql(graphqlOperation(deleteReport, { input: { createdAt: report.createdAt, postId: report.postId } }));
-    } catch {
-      console.log("error in deleting post: ");
+    } catch (err) {
+      console.log("error in deleting post: ", err);
     }
   };
 
@@ -48,12 +53,18 @@ export default function ReportScreen() {
       return API.graphql(graphqlOperation(getPost, { createdAt: createdAt, userId: userId }))
     }
     ));
+    
+    console.log(posts);
 
     newReports.forEach((report, index) => {
-      report.post = posts[index]; //amplify connection would probably be good here
+      report.post = posts[index].value.data.getPost; //amplify connection would probably be good here
     });
 
     return newReports; //what if there are duplicates?
+  }
+  
+  async function signOut() {
+    Auth.signOut();
   }
 
   return (
@@ -64,14 +75,21 @@ export default function ReportScreen() {
         queryOperation={listReports}
         data={reports}
         setDataFunction={setReports}
-        renderItem={({ item }) => (
-          <View>
+        ListHeaderComponent={
+          <TouchableOpacity
+            onPress={signOut}
+          >
             <Text>
-              this is a report!
+              Log out
             </Text>
+          </TouchableOpacity>
+        }
+        renderItem={({ item, index }) => (
+          <View>
+            <View style={{flexDirection: "row", justifyContent: "space-around"}}>
 
             <TouchableOpacity
-              onPress={() => deletePost(item, false)}
+              onPress={() => deletePostAndReport(item, false)}
             >
               <Text>
                 Delete post.
@@ -79,12 +97,21 @@ export default function ReportScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => deletePost(item, true)}
+              onPress={() => deletePostAndReport(item, true)}
             >
               <Text>
                 Ignore.
               </Text>
             </TouchableOpacity>
+            </View>
+            {
+              item.post ? 
+              <PostItem
+                index={index}
+                item={item.post}
+              /> : null
+            }
+
           </View>
         )}
         processingFunction={attachPosts}

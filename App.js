@@ -124,8 +124,8 @@ const App = () => {
   const checkIfUserSignedUp = async () => {
     try {
       const query = await Auth.currentAuthenticatedUser();
-      const groups = query.signInUserSession.idToken.payload["cognito:groups"];
-      setIsAdmin(groups.includes("Admins"));
+      if (query.signInUserSession.idToken.payload["cognito:groups"])
+        setIsAdmin(query.signInUserSession.idToken.payload["cognito:groups"].includes("Admins"));
       const user = await API.graphql(
         graphqlOperation(getUser, { id: query.attributes.sub })
       );
