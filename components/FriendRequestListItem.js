@@ -3,14 +3,11 @@ import {
   View,
   Text,
   TouchableOpacity,
-  LayoutAnimation,
-  Easing,
   Alert,
 } from "react-native";
 import { ProfileImageAndName } from "./ProfileImageAndName";
+import IconButton from "./IconButton";
 import { MaterialIcons } from "@expo/vector-icons";
-import computeDistance from "hooks/computeDistance";
-import getLocation from "hooks/useLocation";
 import playSound from "hooks/playSound";
 
 var styles = require("../styles/stylesheet");
@@ -77,7 +74,7 @@ export default function FriendRequestListItem({
             Alert.alert(title, message, options, alertOptions);
             setIsSelected(true);
           }}
-          style={{ alignSelf: "center", paddingHorizontal: 8}}
+          style={{ alignSelf: "center", paddingHorizontal: 8 }}
         >
           <MaterialIcons
             name="more-vert"
@@ -96,7 +93,7 @@ export default function FriendRequestListItem({
             borderRadius: 0,
             alignSelf: "center",
           }}
-          imageLayoutStyle={{marginLeft: 0}}
+          imageLayoutStyle={{ marginLeft: 0 }}
           textStyle={{
             fontWeight: "normal",
             fontSize: 15,
@@ -104,58 +101,49 @@ export default function FriendRequestListItem({
               item.accepted || item.rejected
                 ? "gray"
                 : isNew
-                ? "blue"
-                : "black",
+                  ? "blue"
+                  : "black",
           }}
           textLayoutStyle={{ flex: 1, flexGrow: 1 }}
           imageOverlay={
-            item.accepted ? (
-              <View
-                style={{
-                  backgroundColor: "#00ff0080",
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  height: 50,
-                  width: 50,
-                }}
-              >
-                <MaterialIcons
-                  name="check"
-                  size={40}
-                  color="white"
-                  style={{
-                    position: "absolute",
-                    top: 5,
-                    left: 5,
-                    alignItems: "center",
-                  }}
-                />
-              </View>
-            ) : item.rejected ? (
-              <View
-                style={{
-                  backgroundColor: "#ff000080",
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  height: 50,
-                  width: 50,
-                }}
-              >
-                <MaterialIcons
-                  name="clear"
-                  size={40}
-                  color="white"
-                  style={{
-                    position: "absolute",
-                    top: 5,
-                    left: 5,
-                    alignItems: "center",
-                  }}
-                />
-              </View>
-            ) : null
+            item.accepted || item.rejected ?
+            <View
+              style={{
+                backgroundColor: item.accepted ? "#00ff0080" : "#ff000080",
+                position: "absolute",
+                top: 0,
+                left: 0,
+                height: 50,
+                width: 50,
+              }}
+            > {
+                item.accepted ?
+                  <MaterialIcons
+                    name="check"
+                    size={40}
+                    color="white"
+                    style={{
+                      position: "absolute",
+                      top: 5,
+                      left: 5,
+                      alignItems: "center",
+                    }}
+                  />
+                  : item.rejected ?
+                    <MaterialIcons
+                      name="clear"
+                      size={40}
+                      color="white"
+                      style={{
+                        position: "absolute",
+                        top: 5,
+                        left: 5,
+                        alignItems: "center",
+                      }}
+                    /> : null
+              }
+            </View>
+            : null
           }
           subtitleComponent={
             item.accepted || item.rejected ? (
@@ -166,50 +154,20 @@ export default function FriendRequestListItem({
                   //flexShrink: 1
                 }}
               >
-                <TouchableOpacity
-                  style={styles.subtitleButton}
+                <IconButton
+                  iconName={"undo"}
+                  size={20}
+                  color={"black"}
                   onPress={() => undoResponseHandler(item)}
-                >
-                  <MaterialIcons
-                    name="undo"
-                    size={20}
-                    color="black"
-                    style={{ marginRight: 5 }}
-                  />
-                  <Text
-                    style={{
-                      color: "black",
-                      fontSize: 15,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Undo
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.subtitleButton}
-                  onPress={() => {
-                    confirmResponseHandler(item, isNew),
-                      playSound("complete");
-                  }}
-                >
-                  <MaterialIcons
-                    name="check"
-                    size={20}
-                    color="blue"
-                    style={{ marginRight: 5 }}
-                  />
-                  <Text
-                    style={{
-                      color: "blue",
-                      fontSize: 15,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Done
-                  </Text>
-                </TouchableOpacity>
+                  label={"Undo"}
+                />
+                <IconButton
+                  iconName={"check"}
+                  size={20}
+                  color={"blue"}
+                  onPress={() => {confirmResponseHandler(item, isNew), playSound("complete")}}
+                  label={"Done"}
+                />
               </View>
             ) : (
               <View
@@ -219,52 +177,20 @@ export default function FriendRequestListItem({
                   //flexShrink: 1
                 }}
               >
-                <TouchableOpacity
-                  style={styles.subtitleButton}
-                  onPress={() => {
-                    respondRequestHandler(item, false),
-                      playSound("confirm-down");
-                  }}
-                >
-                  <MaterialIcons
-                    name="clear"
-                    size={20}
-                    color="red"
-                    style={{ marginRight: 5 }}
-                  />
-                  <Text
-                    style={{
-                      color: "red",
-                      fontSize: 15,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Reject
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.subtitleButton}
-                  onPress={() => {
-                    respondRequestHandler(item, true), playSound("confirm-up");
-                  }}
-                >
-                  <MaterialIcons
-                    name="check"
-                    size={20}
-                    color="green"
-                    style={{ marginRight: 4 }}
-                  />
-                  <Text
-                    style={{
-                      color: "green",
-                      fontSize: 15,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Accept
-                  </Text>
-                </TouchableOpacity>
+                <IconButton
+                  iconName={"clear"}
+                  size={20}
+                  color={"red"}
+                  onPress={() => {respondRequestHandler(item, false), playSound("confirm-down")}}
+                  label={"Reject"}
+                />
+                <IconButton
+                  iconName={"check"}
+                  size={20}
+                  color={"green"}
+                  onPress={() => {respondRequestHandler(item, true), playSound("confirm-up")}}
+                  label={"Accept"}
+                />
               </View>
             )
           }

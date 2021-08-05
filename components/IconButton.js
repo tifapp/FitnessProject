@@ -6,15 +6,13 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
-export default function IconButton({ onPress, iconName, style, color, label, size, isLabelFirst }) {
+export default function IconButton({ onPress, iconName, style, color, label, size, margin, isLabelFirst }) {
   return (
     <TouchableOpacity
       style={[
         {
           flex: 1,
           flexDirection: "row",
-          paddingHorizontal: 15,
-          paddingTop: 15,
         },
         style
       ]}
@@ -24,7 +22,7 @@ export default function IconButton({ onPress, iconName, style, color, label, siz
         isLabelFirst && label ?
           <Text
             style={[
-              { fontWeight: "bold", color: color },
+              { fontWeight: "bold", color: color, marginRight: margin ?? 5 },
             ]}
           >
             {label}
@@ -39,7 +37,7 @@ export default function IconButton({ onPress, iconName, style, color, label, siz
         isLabelFirst && label ?
           null : <Text
             style={[
-              { fontWeight: "bold", color: color },
+              { fontWeight: "bold", color: color, marginLeft: margin ?? 5 },
             ]}
           >
             {label}
