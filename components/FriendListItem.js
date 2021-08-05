@@ -145,8 +145,7 @@ export default function FriendListItem({
         />
         <ProfileImageAndName
           navigationObject={navigation}
-          style={{ flex: 1 }}
-          imageLayoutStyle={{ marginLeft: 0 }}
+          style={{ flex: 1, marginVertical: 15 }}
           textStyle={{
             fontWeight: "bold",
             fontSize: 16,
@@ -159,7 +158,6 @@ export default function FriendListItem({
             <TouchableOpacity
               style={[styles.subtitleButton, {
                 alignItems: "flex-start",
-                paddingTop: lastMessage != null && lastMessage.length > 34 ? 0 : 8
               }]}
               onPress={() => {
                 console.log("message pressed, " + isMessageOpen);

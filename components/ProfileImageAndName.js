@@ -129,9 +129,8 @@ export const ProfileImageAndName = React.memo(function (props) {
         style={[
           {
             flexDirection: props.vertical ? "column" : "row",
-            alignItems: "center",
-            alignContent: "flex-start",
             justifyContent: "flex-start",
+            alignItems: "stretch",
           },
           props.style,
         ]}
@@ -171,11 +170,11 @@ export const ProfileImageAndName = React.memo(function (props) {
             </View>
             : null
         }
-        <View style={props.textLayoutStyle}>
-          {props.hidename ? null : (
+        {props.hidename ? null : (
+          <View style={[{ justifyContent: "space-between" }, props.textLayoutStyle]}>
             <Text
               onPress={props.onPress ?? goToProfile}
-              style={[props.textStyle, { flexWrap: "wrap", flexShrink: 1 }]}
+              style={[props.textStyle, { flexWrap: "wrap", }]}
             >
               {userInfo != null && userInfo.name
                 ? userInfo.isFull || userInfo.name.length <= 40
@@ -183,9 +182,9 @@ export const ProfileImageAndName = React.memo(function (props) {
                   : userInfo.name.substring(0, 40)
                 : "Loading..."}
             </Text>
-          )}
-          {props.subtitleComponent}
-        </View>
+            {props.subtitleComponent}
+          </View>
+        )}
       </TouchableOpacity>
     );
   }

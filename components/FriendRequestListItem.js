@@ -83,16 +83,8 @@ export default function FriendRequestListItem({
         />
         <ProfileImageAndName
           navigationObject={navigation}
-          style={{ flex: 1 }}
+          style={{ flex: 1, marginVertical: 15 }}
           userId={item.sender}
-          imageStyle={{
-            resizeMode: "cover",
-            width: 50,
-            height: 50,
-            borderRadius: 0,
-            alignSelf: "center",
-          }}
-          imageLayoutStyle={{ marginLeft: 0 }}
           textStyle={{
             fontWeight: "normal",
             fontSize: 15,
@@ -115,32 +107,18 @@ export default function FriendRequestListItem({
                 height: 50,
                 width: 50,
               }}
-            > {
-                item.accepted ?
-                  <MaterialIcons
-                    name="check"
-                    size={40}
-                    color="white"
-                    style={{
-                      position: "absolute",
-                      top: 5,
-                      left: 5,
-                      alignItems: "center",
-                    }}
-                  />
-                  : item.rejected ?
-                    <MaterialIcons
-                      name="clear"
-                      size={40}
-                      color="white"
-                      style={{
-                        position: "absolute",
-                        top: 5,
-                        left: 5,
-                        alignItems: "center",
-                      }}
-                    /> : null
-              }
+            >
+              <MaterialIcons
+                name={item.accepted ? "check" : "clear"}
+                size={40}
+                color="white"
+                style={{
+                  position: "absolute",
+                  top: 5,
+                  left: 5,
+                  alignItems: "center",
+                }}
+              />
             </View>
             : null
           }
@@ -154,6 +132,7 @@ export default function FriendRequestListItem({
                 }}
               >
                 <IconButton
+                  style={{marginRight: 15}}
                   iconName={"undo"}
                   size={20}
                   color={"black"}
@@ -177,6 +156,7 @@ export default function FriendRequestListItem({
                 }}
               >
                 <IconButton
+                  style={{marginRight: 15}}
                   iconName={"clear"}
                   size={20}
                   color={"red"}

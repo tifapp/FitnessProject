@@ -12,6 +12,7 @@ export default function IconButton({ onPress, iconName, style, color, label, siz
       style={[
         {
           flexDirection: "row",
+          alignItems: "center",
         },
         style
       ]}
