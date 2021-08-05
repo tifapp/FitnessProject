@@ -194,6 +194,8 @@ export default React.memo(function PostItem({
 
   const [likedUsers, setLikedUsers] = useState([]);
 
+  let likes = item.likes;
+
   if (receiver == null)
     return (
       <View style={[styles.secondaryContainerStyle, {
@@ -260,34 +262,28 @@ export default React.memo(function PostItem({
               data={likedUsers}
               setDataFunction={setLikedUsers}
               renderItem={({ item }) => (
-                <ProfileImageAndName
-                  style={{
-                    alignContent: "flex-start",
-                    alignItems: "center",
-                    alignSelf: "flex-end",
-                    justifyContent: "flex-start",
-                    flexDirection: "row",
-                    marginLeft: 15,
-                  }}
-                  imageSize={20}
-                  userId={item.userId}
-                  onPress={() => setAreLikesVisible(true)}
-                />
+                <View style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
+                  <ProfileImageAndName
+                    style={{
+                      alignContent: "flex-start",
+                      alignItems: "center",
+                      alignSelf: "flex-end",
+                      justifyContent: "flex-start",
+                      flexDirection: "row",
+                      marginLeft: 15,
+                      marginRight: 5,
+                    }}
+                    imageSize={20}
+                    userId={item.userId}
+                    onPress={() => setAreLikesVisible(true)}
+                  />
+                  <Text>
+                    {likes > 1 ? "and others" : ""} liked this post
+                  </Text>
+                </View>
               )}
               keyExtractor={(item) => item.userId}
             />
-            {
-              likedUsers.length > 1 ?
-                <Text>
-                  and others
-                </Text> : null
-            }
-            {
-              likedUsers.length > 0 ?
-                <Text style={{ marginTop: 1 }}>
-                  {" liked this post"}
-                </Text> : null
-            }
           </TouchableOpacity>
 
           <Modal
