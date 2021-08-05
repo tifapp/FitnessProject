@@ -12,13 +12,13 @@ import { Cache, Storage } from "aws-amplify";
 import { API, graphqlOperation } from "aws-amplify";
 import { getUser } from "../src/graphql/queries";
 import { useNavigation } from "@react-navigation/native";
-import {loadCapitals} from 'hooks/stringConversion'
+import { loadCapitals } from 'hooks/stringConversion'
 
 var styles = require("../styles/stylesheet");
 
 //currently the predicted behavior is that it will cache images but the links will be invalid after 1 day. let's see.
 
-export const ProfileImageAndName = React.memo(function(props) {
+export const ProfileImageAndName = React.memo(function (props) {
   //user is required in props. it's a type of object described in userschema.graphql
   const navigation = props.navigationObject ?? useNavigation();
 
@@ -55,7 +55,7 @@ export const ProfileImageAndName = React.memo(function(props) {
         });
         setUserInfo(info);
         console.log("adding name to cache")
-        if (props.callback) props.callback(info); 
+        if (props.callback) props.callback(info);
         let imageKey = `thumbnails/${user.identityId}/thumbnail-profileimage.jpg`;
         let imageConfig = {
           expires: 86400,
@@ -99,21 +99,21 @@ export const ProfileImageAndName = React.memo(function(props) {
       //we didn't preload
       console.log("didnt preload")
       Cache.getItem(props.userId, { callback: addUserInfotoCache }) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
-      .then((info) => { //will have to check if this gets called after the above callback, aka if setuserinfo is called twice.
-        //console.log("info is ", info)
-        if (info != null) {
-          if (
-            props.isFull &&
-            !info.isFull &&
-            info.imageURL !== ""
-          ) {
-            addUserInfotoCache();
-          } else {
-            if (props.callback) props.callback(info); 
-            setUserInfo(info);
+        .then((info) => { //will have to check if this gets called after the above callback, aka if setuserinfo is called twice.
+          //console.log("info is ", info)
+          if (info != null) {
+            if (
+              props.isFull &&
+              !info.isFull &&
+              info.imageURL !== ""
+            ) {
+              addUserInfotoCache();
+            } else {
+              if (props.callback) props.callback(info);
+              setUserInfo(info);
+            }
           }
-        }
-      });
+        });
     } else if (userInfo.error) {
       //we tried to preload and the data was not in the cache
       console.log("data was not found in the cache")
@@ -125,7 +125,7 @@ export const ProfileImageAndName = React.memo(function(props) {
     return null;
   } else {
     return (
-      <View
+      <TouchableOpacity
         style={[
           {
             flexDirection: props.vertical ? "column" : "row",
@@ -135,56 +135,58 @@ export const ProfileImageAndName = React.memo(function(props) {
           },
           props.style,
         ]}
+        onPress={props.onPress ?? goToProfile}
       >
-        <TouchableOpacity
-          onPress={props.onPress ?? goToProfile}
-          style={[{ margin: 15 }, props.imageLayoutStyle]}
-        >
-          <Image
-            onError={addUserInfotoCache}
-            style={[props.imageStyle]}
-            source={
-              (userInfo == null || userInfo.imageURL === "") ?
-                require("../assets/icon.png")
+        <Image
+          onError={addUserInfotoCache}
+          style={[{
+            resizeMode: "cover",
+            width: props.imageSize ?? 50,
+            height: props.imageSize ?? 50,
+            marginRight: !props.vertical ? props.margin ?? 15 : 0,
+            marginBottom: props.vertical ? props.margin ?? 15 : 0,
+            alignSelf: "center",
+          }, props.imageStyle]}
+          source={
+            (userInfo == null || userInfo.imageURL === "") ?
+              require("../assets/icon.png")
               : { uri: userInfo.imageURL }
-            }
-          />
-          {props.imageOverlay}
-          {
-          userInfo == null ?
-          <View
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <ActivityIndicator color="#0000ff" />
-          </View>
-          : null
           }
-        </TouchableOpacity>
+        />
+        {props.imageOverlay}
+        {
+          userInfo == null ?
+            <View
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <ActivityIndicator color="#0000ff" />
+            </View>
+            : null
+        }
         <View style={props.textLayoutStyle}>
           {props.hidename ? null : (
-              <Text
-                onPress={props.onPress ?? goToProfile}
-                style={[props.textStyle, { flexWrap: "wrap", flexShrink: 1 }]}
-              >
-                {userInfo != null && userInfo.name
-                    ? userInfo.isFull || userInfo.name.length <= 40
-                    ? userInfo.name
-                    : userInfo.name.substring(0, 40)
-                    : "Loading..."}
-              </Text>
+            <Text
+              onPress={props.onPress ?? goToProfile}
+              style={[props.textStyle, { flexWrap: "wrap", flexShrink: 1 }]}
+            >
+              {userInfo != null && userInfo.name
+                ? userInfo.isFull || userInfo.name.length <= 40
+                  ? userInfo.name
+                  : userInfo.name.substring(0, 40)
+                : "Loading..."}
+            </Text>
           )}
           {props.subtitleComponent}
         </View>
-        {props.sibling}
-      </View>
+      </TouchableOpacity>
     );
   }
 });

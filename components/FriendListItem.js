@@ -146,12 +146,6 @@ export default function FriendListItem({
         <ProfileImageAndName
           navigationObject={navigation}
           style={{ flex: 1 }}
-          imageStyle={{
-            resizeMode: "cover",
-            width: 50,
-            height: 50,
-            alignSelf: "center",
-          }}
           imageLayoutStyle={{ marginLeft: 0 }}
           textStyle={{
             fontWeight: "bold",
@@ -162,51 +156,45 @@ export default function FriendListItem({
           userId={friendId}
           textLayoutStyle={{ flex: 1, flexGrow: 1 }}
           subtitleComponent={
-            <View
-              style={{
-                flexDirection: "row",
+            <TouchableOpacity
+              style={[styles.subtitleButton, {
+                alignItems: "flex-start",
+                paddingTop: lastMessage != null && lastMessage.length > 34 ? 0 : 8
+              }]}
+              onPress={() => {
+                console.log("message pressed, " + isMessageOpen);
+                item.isRead = true;
+                goToMessages(friendId);
               }}
             >
-              <TouchableOpacity
-                style={[styles.subtitleButton, {
-                  alignItems: "flex-start",
-                  paddingTop: lastMessage != null && lastMessage.length > 34 ? 0 : 8
-                }]}
-                onPress={() => {
-                  console.log("message pressed, " + isMessageOpen);
-                  item.isRead = true;
-                  goToMessages(friendId);
+              <Text
+                style={{
+                  color: isOptionsOpen ? "black" : item.isRead || lastUser == myId ? "black" : "blue",
+                  fontSize: 15,
+                  fontWeight: item.isRead || lastUser == myId ? "normal" : "bold",
+                  fontStyle: lastMessage == null ? "italic" : "normal",
+                  marginRight: 10,
                 }}
+                numberOfLines={2}
               >
-                <Text
-                  style={{
-                    color: isOptionsOpen ? "black" : item.isRead || lastUser == myId ? "black" : "blue",
-                    fontSize: 15,
-                    fontWeight: item.isRead || lastUser == myId ? "normal" : "bold",
-                    fontStyle: lastMessage == null ? "italic" : "normal",
-                    marginRight: 10,
-                  }}
-                  numberOfLines={2}
-                >
-                  {
-                    lastUser == myId ? null :
-                      <MaterialIcons
-                        name={item.isRead ? "messenger-outline" : "messenger"}
-                        size={15}
-                        color={isOptionsOpen ? "black" : item.isRead || lastUser == myId ? "black" : "blue"}
-                      />
-                  }
-                  {
-                    lastUser == myId ?
-                      "You: " :
-                      item.isRead ?
-                        "  " :
-                        "  "
-                  }
-                  {(lastMessage == null ? "Message" : lastMessage)}
-                </Text>
-              </TouchableOpacity>
-            </View>
+                {
+                  lastUser == myId ? null :
+                    <MaterialIcons
+                      name={item.isRead ? "messenger-outline" : "messenger"}
+                      size={15}
+                      color={isOptionsOpen ? "black" : item.isRead || lastUser == myId ? "black" : "blue"}
+                    />
+                }
+                {
+                  lastUser == myId ?
+                    "You: " :
+                    item.isRead ?
+                      "  " :
+                      "  "
+                }
+                {(lastMessage == null ? "Message" : lastMessage)}
+              </Text>
+            </TouchableOpacity>
           }
         />
       </View>
