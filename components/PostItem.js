@@ -17,6 +17,7 @@ import {
 } from "react-native";
 import { getUser } from "../src/graphql/queries";
 import { ProfileImageAndName } from "./ProfileImageAndName";
+import IconButton from "./IconButton";
 import { batchGetLikes, likesByPost } from "root/src/graphql/queries";
 import { API, graphqlOperation } from "aws-amplify";
 import { createLike, deleteLike } from "root/src/graphql/mutations";
@@ -30,6 +31,34 @@ import { onIncrementLikes, onDecrementLikes, onIncrementReplies, onDecrementRepl
 import * as Haptics from "expo-haptics";
 import playSound from "../hooks/playSound";
 import APIList from 'components/APIList';
+
+/*
+            {!writtenByYou ? (
+            <IconButton
+              iconName={"report"}
+              size={17}
+              color={"gray"}
+              onPress={() => deletePostsAsync(item.createdAt)}
+            />
+            ) : null }
+            
+            {writtenByYou ? (
+            <IconButton
+              iconName={"delete-forever"}
+              size={17}
+              color={"gray"}
+              onPress={() => deletePostsAsync(item.createdAt)}
+            />
+            ) : null }
+            
+            {writtenByYou ? (
+            <IconButton
+              iconName={"edit"}
+              size={17}
+              color={"gray"}
+              onPress={toggleEditing}
+            />
+            ) : null } */
 
 var styles = require("../styles/stylesheet");
 
@@ -84,31 +113,14 @@ function LikeButton({ setLikes, likes, likedByYou, postId, likeDebounceRef }) {
   };
 
   return (
-    <TouchableOpacity
-      style={[
-        {
-          flex: 1,
-          flexDirection: "row",
-          paddingHorizontal: 15,
-          paddingTop: 15,
-        },
-      ]}
+    <IconButton
+      iconName={liked ? "favorite" : "favorite-outline"}
+      size={17}
+      color={liked ? "red" : "gray"}
+      label={likes + ""}
+      isLabelFirst={true}
       onPress={likePostAsync}
-    >
-      <Text
-        style={[
-          { marginRight: 6, fontWeight: "bold", color: liked ? "red" : "gray" },
-        ]}
-      >
-        {likes}
-      </Text>
-      <MaterialIcons
-        name={liked ? "favorite" : "favorite-outline"}
-        size={17}
-        color={liked ? "red" : "gray"}
-        style={{ marginRight: 0 }}
-      />
-    </TouchableOpacity>
+    />
   );
 }
 
@@ -201,7 +213,6 @@ export default React.memo(function PostItem({
               },
               shadowOpacity: 0.18,
               shadowRadius: 1.0,
-              paddingBottom: likedUsers.length > 0 ? 0 : 22,
 
               elevation: 1,
             }]
@@ -230,6 +241,7 @@ export default React.memo(function PostItem({
                 flex: 1,
                 paddingTop: 4,
                 paddingLeft: 22,
+                paddingBottom: 16,
               }}
               urlPreview={item.urlPreview}
             >
@@ -237,7 +249,7 @@ export default React.memo(function PostItem({
             </LinkableText>
           )}
 
-          <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", marginTop: likedUsers.length > 0 ? 6 : 0 }} onPress={() => setAreLikesVisible(true)}>
+          <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", marginTop: likedUsers.length > 0 ? 8 : 0, marginBottom: likedUsers.length > 0 ? 16 : 0 }} onPress={() => setAreLikesVisible(true)}>
             <APIList
               style={{ margin: 0, padding: 0 }}
               horizontal={true}
@@ -255,12 +267,9 @@ export default React.memo(function PostItem({
                     alignSelf: "flex-end",
                     justifyContent: "flex-start",
                     flexDirection: "row",
-                    marginLeft: 5,
+                    marginLeft: 15,
                   }}
-                  imageLayoutStyle={{ marginHorizontal: 10 }}
-                  imageStyle={[
-                    styles.smallestImageStyle,
-                  ]}
+                  imageSize={20}
                   userId={item.userId}
                   onPress={() => setAreLikesVisible(true)}
                 />
@@ -575,158 +584,53 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, togg
   return (
     <View
       style={{
+        padding: 15,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
       }}
     >
       <ProfileImageAndName
+        imageSize={45}
         info={item.info}
-        imageStyle={[styles.smallImageStyle, { marginRight: 5 }]}
-        textLayoutStyle={{ flex: 1, marginTop: 15, marginBottom: 15 }}
         textStyle={{
-          flex: 1,
           fontWeight: writtenByYou ? "bold" : "normal",
         }}
         userId={item.userId}
         subtitleComponent={
-          <View style={{flexDirection: "row"}}>
-            <Text style={{ color: "gray" }}>{printTime(item.createdAt)}</Text>
-
-            {!writtenByYou ? (
-            <TouchableOpacity
-              style={[
-                {
-                  marginLeft: 12,
-                  flexDirection: "row",
-                },
-              ]}
-              onPress={() => reportPost(item.createdAt, item.userId)}
-            >
-              <MaterialIcons
-                name="report"
-                size={15}
-                color={"gray"}
-              />
-              <Text
-                style={[
-                  {
-                    color: "gray",
-                  },
-                ]}
-              >
-                Report
-              </Text>
-            </TouchableOpacity>
-            ) : null }
-            
-            {writtenByYou ? (
-            <TouchableOpacity
-              style={[
-                {
-                  marginLeft: 12,
-                  flexDirection: "row",
-                },
-              ]}
-              onPress={() => deletePostsAsync(item.createdAt)}
-            >
-              <MaterialIcons
-                name="delete-forever"
-                size={15}
-                color={"red"}
-              />
-              <Text
-                style={[
-                  {
-                    color: "red",
-                  },
-                ]}
-              >
-                Delete
-              </Text>
-            </TouchableOpacity>
-            ) : null }
-            
-            {writtenByYou ? (
-            <TouchableOpacity
-              style={[
-                {
-                  marginLeft: 12,
-                  flexDirection: "row",
-                },
-              ]}
-              onPress={() => toggleEditing()}
-            >
-              <MaterialIcons
-                name="edit"
-                size={15}
-                color={"blue"}
-              />
-              <Text
-                style={[
-                  {
-                    color: "blue",
-                  },
-                ]}
-              >
-                Edit
-              </Text>
-            </TouchableOpacity>
-            ) : null }
-          </View>
-        }
-        sibling={
-          !item.loading ?
-            <View
-              style={{
-                flexDirection: "column",
-                justifyContent: "space-between",
-                alignItems: "flex-end",
-                flex: 1,
-              }}
-            >
-              <LikeButton
-                setLikes={setLikes}
-                likes={likes}
-                likedByYou={item.likedByYou}
-                postId={item.createdAt + "#" + item.userId}
-                likeDebounceRef={likeDebounce}
-              />
-              <TouchableOpacity
-                style={[
-                  {
-                    paddingHorizontal: 15,
-                    paddingBottom: 15,
-                    flex: 1,
-                    borderWidth: 0,
-                    flexDirection: "row",
-                    alignItems: "flex-end",
-                  },
-                ]}
-                onPress={repliesPressed}
-              >
-                <Text
-                  style={[
-                    {
-                      paddingRight: 6,
-                      fontWeight: "bold",
-                      color: areRepliesVisible ? "blue" : "gray",
-                    },
-                  ]}
-                >
-                  {replies}
-                </Text>
-                <MaterialIcons
-                  name="chat-bubble-outline"
-                  size={17}
-                  color={areRepliesVisible ? "blue" : "gray"}
-                  style={{ marginRight: 0 }}
-                />
-              </TouchableOpacity>
-            </View>
-            : null
+          <Text style={{ color: "gray" }}>{printTime(item.createdAt)}</Text>
         }
       />
+      
+      {
+        
+        !item.loading ?
+        <View
+          style={{
+            flexDirection: "column",
+            justifyContent: "space-between",
+            alignSelf: "stretch"
+          }}
+        >
+          <LikeButton
+            setLikes={setLikes}
+            likes={likes}
+            likedByYou={item.likedByYou}
+            postId={item.createdAt + "#" + item.userId}
+            likeDebounceRef={likeDebounce}
+          />
+          <IconButton
+            iconName={"chat-bubble-outline"}
+            size={17}
+            color={areRepliesVisible ? "blue" : "gray"}
+            label={replies + ""}
+            isLabelFirst={true}
+            onPress={repliesPressed}
+          />
+        </View>
+        : null
+      }
+
     </View>
   );
 }

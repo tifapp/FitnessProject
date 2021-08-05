@@ -411,9 +411,10 @@ global.addConversationIds(id);
           <View style={{ paddingBottom: 15 }}>
             <ProfileImageAndName
               you={userId === route.params?.myId}
+              style={{marginTop: 15}}
+              imageSize={110}
               navigateToProfile={false}
               vertical={true}
-              imageStyle={styles.imageStyle}
               userId={userId}
               isFull={true}
               fullname={true}
@@ -470,26 +471,11 @@ global.addConversationIds(id);
               setDataFunction={setMutualFriendList}
               processingFunction={collectMutualFriends}
               renderItem={({ item }) => (
-                <View style={{ marginVertical: 5 }}>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignSelf: "center",
-                      marginVertical: 5,
-                      justifyContent: "space-between",
-                      width: "80%",
-                    }}
-                  >
-                    <ProfileImageAndName
-                      vertical={true}
-                      imageStyle={[
-                        styles.smallImageStyle,
-                        { marginHorizontal: 20 },
-                      ]}
-                      userId={item}
-                    />
-                  </View>
-                </View>
+                <ProfileImageAndName
+                  style={{ marginHorizontal: 20 }}
+                  vertical={true}
+                  userId={item}
+                />
               )}
               keyExtractor={(item) => item}
             />

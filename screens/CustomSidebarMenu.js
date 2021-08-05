@@ -469,14 +469,8 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
           userId={myId}
           isFull={true}
           fullname={true}
-          textLayoutStyle={{ flex: 1 }}
-          imageStyle={{
-            resizeMode: "cover",
-            width: 50,
-            height: 50,
-            borderRadius: 0,
-            alignSelf: "center",
-          }}
+          style={{marginLeft: 15}}
+          textLayoutStyle={{ alignSelf: "center" }}
           textStyle={{
             fontWeight: "bold",
             fontSize: 26,

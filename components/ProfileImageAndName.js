@@ -171,7 +171,7 @@ export const ProfileImageAndName = React.memo(function (props) {
             : null
         }
         {props.hidename ? null : (
-          <View style={[{ justifyContent: "space-between" }, props.textLayoutStyle]}>
+          <View style={[{ justifyContent: "space-between" }, props.vertical ? {alignItems: "center"} : {},  props.textLayoutStyle]}>
             <Text
               onPress={props.onPress ?? goToProfile}
               style={[props.textStyle, { flexWrap: "wrap", }]}

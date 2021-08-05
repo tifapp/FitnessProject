@@ -34,14 +34,15 @@ export default function IconButton({ onPress, iconName, style, color, label, siz
         color={color}
       />
       {
-        isLabelFirst && label ?
-          null : <Text
+        !isLabelFirst && label ?
+          <Text
             style={[
               { fontWeight: "bold", color: color, marginLeft: margin ?? 5 },
             ]}
           >
             {label}
           </Text>
+          : null
       }
     </TouchableOpacity>
   );

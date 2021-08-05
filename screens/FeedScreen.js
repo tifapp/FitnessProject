@@ -65,13 +65,8 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
               isFull={true}
               fullname={true}
               hidename={true}
-              imageStyle={{
-                resizeMode: "cover",
-                width: 35,
-                height: 35,
-                borderRadius: 0,
-                alignSelf: "center",
-              }}
+              imageSize={30}
+              style={{marginLeft: 15}}
             />
         })
       }
