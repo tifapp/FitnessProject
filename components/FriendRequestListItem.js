@@ -36,7 +36,7 @@ export default function FriendRequestListItem({
       {
         text: "Block",
         onPress: () => {
-          const title = "Are you sure you want to block this friend? This will stop them from messaging you and sending you friend requests.";
+          const title = "Are you sure you want to block this friend? This will unfriend them and stop them from sending you messages and friend requests.";
           const options = [
             {
               text: "Yes",

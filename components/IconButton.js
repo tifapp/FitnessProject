@@ -11,7 +11,6 @@ export default function IconButton({ onPress, iconName, style, color, label, siz
     <TouchableOpacity
       style={[
         {
-          flex: 1,
           flexDirection: "row",
         },
         style
