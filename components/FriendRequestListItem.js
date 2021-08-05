@@ -28,6 +28,43 @@ export default function FriendRequestListItem({
     cancelable: true,
     onDismiss: () => setIsSelected(false),
   };
+  
+  const openOptionsDialog = () => {
+    const title = "More Options";
+    const message = "";
+    const options = [
+      {
+        text: "Block",
+        onPress: () => {
+          const title = "Are you sure you want to block this friend? This will stop them from messaging you and sending you friend requests.";
+          const options = [
+            {
+              text: "Yes",
+              onPress: () => {
+                removeFriendHandler(item, true), confirmResponseHandler(item, isNew);
+              },
+            },
+            {
+              text: "Cancel",
+              type: "cancel",
+              onPress: () => {
+              },
+            },
+          ];
+          Alert.alert(title, "", options, alertOptions);
+        },
+      }, //if submithandler fails user won't know
+      {
+        text: "Cancel",
+        type: "cancel",
+        onPress: () => {
+          setIsSelected(false);
+        },
+      },
+    ];
+    Alert.alert(title, message, options, alertOptions);
+    setIsSelected(true);
+  }
 
   return (
     <View style={{}}>
@@ -37,51 +74,13 @@ export default function FriendRequestListItem({
           isSelected && { backgroundColor: "orange" },
         ]}
       >
-        <TouchableOpacity
-          onPress={() => {
-            const title = "More Options";
-            const message = "";
-            const options = [
-              {
-                text: "Block",
-                onPress: () => {
-                  const title = "Are you sure you want to block this friend? This will stop them from messaging you and sending you friend requests.";
-                  const options = [
-                    {
-                      text: "Yes",
-                      onPress: () => {
-                        removeFriendHandler(item, true), confirmResponseHandler(item, isNew);
-                      },
-                    },
-                    {
-                      text: "Cancel",
-                      type: "cancel",
-                      onPress: () => {
-                      },
-                    },
-                  ];
-                  Alert.alert(title, "", options, alertOptions);
-                },
-              }, //if submithandler fails user won't know
-              {
-                text: "Cancel",
-                type: "cancel",
-                onPress: () => {
-                  setIsSelected(false);
-                },
-              },
-            ];
-            Alert.alert(title, message, options, alertOptions);
-            setIsSelected(true);
-          }}
+        <IconButton
+          iconName={"more-vert"}
+          size={20}
+          color={isSelected ? "black" : "gray"}
+          onPress={openOptionsDialog}
           style={{ alignSelf: "center", paddingHorizontal: 8 }}
-        >
-          <MaterialIcons
-            name="more-vert"
-            size={20}
-            color={isSelected ? "black" : "gray"}
-          />
-        </TouchableOpacity>
+        />
         <ProfileImageAndName
           navigationObject={navigation}
           style={{ flex: 1 }}
