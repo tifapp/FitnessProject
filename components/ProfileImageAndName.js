@@ -140,8 +140,8 @@ export const ProfileImageAndName = React.memo(function (props) {
           onError={addUserInfotoCache}
           style={[{
             resizeMode: "cover",
-            width: props.imageSize ?? 50,
-            height: props.imageSize ?? 50,
+            width: props.imageSize ?? 45,
+            height: props.imageSize ?? 45,
             marginRight: !props.vertical ? props.margin ?? 15 : 0,
             marginBottom: props.vertical ? props.margin ?? 15 : 0,
             alignSelf: "center",
