@@ -224,18 +224,19 @@ export default React.memo(function PostItem({
             </LinkableText>
             )}
 
-            <View style={{flexDirection: "row", alignItems: "flex-start", marginRight: 15}}>
+            <View style={{flexDirection: "column", alignItems: "flex-start", marginRight: 15}}>
               {!writtenByYou ? (
                 <IconButton
                   iconName={"report"}
                   size={20}
                   color={"gray"}
-                  onPress={() => deletePostsAsync(item.createdAt)}
+                  onPress={() => reportPost(item.createdAt, item.userId)}
                 />
               ) : null}
 
               {writtenByYou ? (
                 <IconButton
+                  style={{marginBottom: 10}}
                   iconName={"delete-forever"}
                   size={20}
                   color={"gray"}
@@ -245,7 +246,7 @@ export default React.memo(function PostItem({
 
               {writtenByYou ? (
                 <IconButton
-                  style={{marginLeft: 5}}
+                  style={{marginBottom: 15}}
                   iconName={"edit"}
                   size={20}
                   color={"gray"}
