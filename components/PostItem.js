@@ -32,34 +32,6 @@ import * as Haptics from "expo-haptics";
 import playSound from "../hooks/playSound";
 import APIList from 'components/APIList';
 
-/*
-            {!writtenByYou ? (
-            <IconButton
-              iconName={"report"}
-              size={17}
-              color={"gray"}
-              onPress={() => deletePostsAsync(item.createdAt)}
-            />
-            ) : null }
-            
-            {writtenByYou ? (
-            <IconButton
-              iconName={"delete-forever"}
-              size={17}
-              color={"gray"}
-              onPress={() => deletePostsAsync(item.createdAt)}
-            />
-            ) : null }
-            
-            {writtenByYou ? (
-            <IconButton
-              iconName={"edit"}
-              size={17}
-              color={"gray"}
-              onPress={toggleEditing}
-            />
-            ) : null } */
-
 var styles = require("../styles/stylesheet");
 
 function LikeButton({ setLikes, likes, likedByYou, postId, likeDebounceRef }) {
@@ -229,6 +201,7 @@ export default React.memo(function PostItem({
             areRepliesVisible={areRepliesVisible}
             reportPost={reportPost}
           />
+          <View style={{flexDirection: "row", justifyContent: "space-between"}}>
           {isEditing ? (
             <TextInput
               style={[styles.check, { borderColor: "orange" }]}
@@ -249,9 +222,40 @@ export default React.memo(function PostItem({
             >
               {item.description}
             </LinkableText>
-          )}
+            )}
 
-          <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", marginTop: likedUsers.length > 0 ? 8 : 0, marginBottom: likedUsers.length > 0 ? 16 : 0 }} onPress={() => setAreLikesVisible(true)}>
+            <View style={{flexDirection: "row", alignItems: "flex-start", marginRight: 15}}>
+              {!writtenByYou ? (
+                <IconButton
+                  iconName={"report"}
+                  size={20}
+                  color={"gray"}
+                  onPress={() => deletePostsAsync(item.createdAt)}
+                />
+              ) : null}
+
+              {writtenByYou ? (
+                <IconButton
+                  iconName={"delete-forever"}
+                  size={20}
+                  color={"gray"}
+                  onPress={() => deletePostsAsync(item.createdAt)}
+                />
+              ) : null}
+
+              {writtenByYou ? (
+                <IconButton
+                  style={{marginLeft: 5}}
+                  iconName={"edit"}
+                  size={20}
+                  color={"gray"}
+                  onPress={() => setIsEditing(!isEditing)}
+                />
+              ) : null}
+            </View>
+          </View>
+
+          <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: likedUsers.length > 0 ? 8 : 0, marginBottom: likedUsers.length > 0 ? 16 : 0 }} onPress={() => setAreLikesVisible(true)}>
             <APIList
               style={{ margin: 0, padding: 0 }}
               horizontal={true}
@@ -262,7 +266,7 @@ export default React.memo(function PostItem({
               data={likedUsers}
               setDataFunction={setLikedUsers}
               renderItem={({ item }) => (
-                <View style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
+                <View style={{flexDirection: "row", alignItems: "center"}}>
                   <ProfileImageAndName
                     style={{
                       alignContent: "flex-start",
@@ -278,7 +282,7 @@ export default React.memo(function PostItem({
                     onPress={() => setAreLikesVisible(true)}
                   />
                   <Text>
-                    {likes > 1 ? "and others" : ""} liked this post
+                    {likes > 1 ? "and " + (likes-1) + " others" : ""} liked this post
                   </Text>
                 </View>
               )}
@@ -587,7 +591,6 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, togg
       }}
     >
       <ProfileImageAndName
-        imageSize={45}
         info={item.info}
         textStyle={{
           fontWeight: writtenByYou ? "bold" : "normal",
