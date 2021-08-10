@@ -28,6 +28,7 @@ import { ProfileImageAndName } from "components/ProfileImageAndName";
 import ExpandingTextInput from "components/ExpandingTextInput";
 import SpamButton from "components/SpamButton";
 import { getLinkPreview } from 'link-preview-js';
+import IconButton from "components/IconButton";
 
 const linkify = require('linkify-it')()
 linkify
@@ -398,31 +399,35 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
               maxLength={1000}
             />
 
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "flex-end",
-                marginBottom: 10,
-              }}
-            >
-              <TouchableOpacity
-                style={[
-                  { flexDirection: "row", marginRight: 15 },
-                ]}
+            <View style={{flexDirection: "row", justifyContent: "space-between", marginHorizontal: 15, marginTop: 2, marginBottom: 10}}>
+              <View style={{flexDirection: "row"}}>
+                <IconButton
+                  iconName={"insert-photo"}
+                  size={20}
+                  color={postVal === "" ? "gray" : "blue"}
+                  style={{marginRight: 6}}
+                  onPress={postVal === "" ? () => {
+                    alert("No text detected in text field");
+                  } : addPostAsync}
+                />
+                <IconButton
+                  iconName={"camera-alt"}
+                  size={20}
+                  color={postVal === "" ? "gray" : "blue"}
+                  onPress={postVal === "" ? () => {
+                    alert("No text detected in text field");
+                  } : addPostAsync}
+                />
+              </View>
+              <IconButton
+                iconName={postVal === "" ? "add-circle-outline" : "add-circle"}
+                size={15}
+                color={postVal === "" ? "gray" : "blue"}
+                label={receiver != null ? "Send Message" : "Add Post"}
                 onPress={postVal === "" ? () => {
                   alert("No text detected in text field");
                 } : addPostAsync}
-              >
-                <MaterialIcons
-                  name={postVal === "" ? "add-circle-outline" : "add-circle"}
-                  size={15}
-                  color={postVal === "" ? "gray" : "blue"}
-                  style={{ marginRight: 5, marginTop: 2 }}
-                />
-                <Text style={[{ fontWeight: "bold", fontSize: 15, color: postVal === "" ? "gray" : "blue" }]}>
-                  {receiver != null ? "Send Message" : "Add Post"}
-                </Text>
-              </TouchableOpacity>
+              />
             </View>
           </View>
         }
