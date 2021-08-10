@@ -302,16 +302,32 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         checkConversationExists = newConversations2.find(item => item.id === newPost.channel);
       }
 
+      const friendCheck = () => {
+        return (friend1 != null ? friend1 : friend2);
+      }
+
+      const friend = friendCheck();
+      //console.log("[[[[[[[[[[[[[[[[[[[[[[[");
+      //console.log(friend.data.getFriendship);
+      //console.log("[[[[[[[[[[[[[[[[[[[[[[[");
+
+
       if (checkConversationExists == null) {
-        if (friend1.data.getFriendship == undefined && friend2.data.getFriendship == undefined) {
-          console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        console.log("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\");
+        if (friend1.data.getFriendship === null && friend2.data.getFriendship === null){
+          //console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
           await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postVal, Accepted: 0 } }));
-          console.log("##############################");
+          //console.log("##############################");
+        }
+        else if(friend.data.getFriendship.accepted === null){
+          console.log(":::::::::::::::::::::::::::")
+          await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postVal, Accepted: 0 } }));
+          console.log(":::::::::::::::::::::::::::")
         }
         else {
-          console.log("******************************");
+          //console.log("******************************");
           await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postVal, Accepted: 1 } }));
-          console.log("******************************");
+          //console.log("******************************");
         }
       }
       else if (localNewPost.userId != checkConversationExists.lastUser) {

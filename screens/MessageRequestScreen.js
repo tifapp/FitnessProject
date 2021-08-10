@@ -98,22 +98,24 @@ export default function MessageRequestScreen({ navigation, route }) {
         console.log(conversations);
         console.log("$$$$$$$$$$$$$$$")
 
-        /*
+
 
         let checkConversationExists = conversations.find(item => item.id === newPost.channel);
 
-        if (route.params?.myId != checkConversationExists.lastUser) {
+        if (checkConversationExists != null && route.params?.myId != checkConversationExists.lastUser) {
           setConversations((conversations) => {
             return conversations.filter(
               (i) => i.users[0] !== checkConversationExists.lastUser || i.users[1] !== checkConversationExists.lastUser
             );
           });
         }
-        */
+        else {
+          updateConversationList(newPost);
+        }
+
 
         global.addConversationIds(newPost.userId);
         global.showNotificationDot();
-        updateConversationList(newPost);
 
       },
     });
@@ -123,8 +125,21 @@ export default function MessageRequestScreen({ navigation, route }) {
     ).subscribe({
       next: (event) => {
         const newPost = event.value.data.onCreatePostByUser;
-        //console.log("^^^^^^^^^^^^^^^^^^^^^^^");
-        updateConversationList(newPost);
+        console.log("^^^^^^^^^^^^^^^^^^^^^^^");
+        let checkConversationExists = conversations.find(item => item.id === newPost.channel);
+        console.log(checkConversationExists);
+
+        if (checkConversationExists != null && route.params?.myId != checkConversationExists.lastUser) {
+          setConversations((conversations) => {
+            return conversations.filter(
+              (i) => i.users[0] !== checkConversationExists.lastUser || i.users[1] !== checkConversationExists.lastUser
+            );
+          });
+        }
+        else {
+          updateConversationList(newPost);
+        }
+        //updateConversationList(newPost);
       },
     });
 
