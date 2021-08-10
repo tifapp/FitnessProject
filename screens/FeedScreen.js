@@ -43,9 +43,7 @@ var styles = require('styles/stylesheet');
 var allSettled = require('promise.allsettled');
 
 export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, originalParentId }) {
-  const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
-  //const numCharsLeft = 1000 - postVal.length;
 
   const [onlineCheck, setOnlineCheck] = useState(true);
 
@@ -84,7 +82,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
           newPost.likes = newPost.likes ?? 0;
           newPost.replies = newPost.replies ?? 0;
           if (newPost.userId === route.params?.myId) {
-            //console.log("received own post again")
+            console.log("received own post again")
             setPosts(currentPosts.current.map(post => {
               if (post.userId === route.params?.myId && post.createdAt == "null") return newPost
               else return post;
@@ -236,101 +234,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     }
   }
 
-  const addPostAsync = async (parentId, replyText) => {
-    checkInternetConnection();
-    //console.log("attempting to make new post");
-    const newPost = {
-      description: replyText ?? postVal,
-      channel: replyText != null ? parentId.toString() : channel,
-    };
-    if (originalParentId != null) {
-      newPost.parentId = originalParentId
-    } else if (replyText != null) {
-      newPost.parentId = parentId
-    }
-    if (receiver != null) {
-      newPost.receiver = receiver;
-    }
-    setPostVal("");
-
-    //console.log(route.params?.myId + " just posted.");
-
-    const localNewPost = { ...newPost, userId: route.params?.myId, createdAt: "null", loading: true }
-
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    if (replyText == null) {
-      //console.log("posting a WHOLE NEW POST")
-      setPosts([localNewPost, ...posts]);
-    }
-    else {
-      //console.log("posting a reply"  + replyText)
-      let tempposts = currentPosts.current;
-      var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.channel == newPost.channel)]);
-      tempposts.splice(index + 1, 0, localNewPost);
-      setPosts(tempposts);
-    }
-
-    let users = [route.params?.myId, receiver];
-    users.sort();
-
-    try {
-      API.graphql(graphqlOperation(createPost, { input: newPost }));
-
-      const friend1 = await API.graphql(graphqlOperation(getFriendship, { sender: route.params?.myId, receiver: receiver }));
-      const friend2 = await API.graphql(graphqlOperation(getFriendship, { sender: receiver, receiver: route.params?.myId }));
-
-      let newConversations1 = await API.graphql(graphqlOperation(getConversations, { Accepted: 1 }))
-      let newConversations2 = await API.graphql(graphqlOperation(getConversations, { Accepted: 0 }))
-
-      console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-      console.log(newConversations1);
-      console.log(newConversations2);
-      console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-
-      newConversations1 = newConversations1.data.getConversations.items
-      newConversations2 = newConversations2.data.getConversations.items
-
-      let checkConversationExists = newConversations1.find(item => item.id === newPost.channel);
-
-      if (checkConversationExists == null) {
-        checkConversationExists = newConversations2.find(item => item.id === newPost.channel);
-      }
-
-      if (checkConversationExists == null) {
-        if (friend1.data.getFriendship == undefined && friend2.data.getFriendship == undefined) {
-          console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-          await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postVal, Accepted: 0 } }));
-          console.log("##############################");
-        }
-        else {
-          console.log("******************************");
-          await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postVal, Accepted: 1 } }));
-          console.log("******************************");
-        }
-      }
-      else if (localNewPost.userId != checkConversationExists.lastUser) {
-        console.log("testing");
-        console.log(newPost.channel);
-        console.log(checkConversationExists);
-        await API.graphql(graphqlOperation(updateConversation, { input: { id: newPost.channel, lastMessage: postVal, Accepted: 1 } }));
-      }
-      else {
-        await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, lastMessage: postVal } }));
-      }
-
-      if (receiver != null) {
-        //when sending a message, create conversation using specified channel if posts is empty. if not, update conversation with the specified channel.
-        if (posts.length == 0) {
-          //API.graphql(graphqlOperation(createConversation, { input: {id: channel, users: users, lastMessage: postVal} }));
-        } else {
-          await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, lastMessage: postVal } }));
-        }
-      }
-    } catch (err) {
-      console.log("error in creating post: ", err);
-    }
-  };
-
   const deletePostsAsync = async (timestamp) => {
     checkInternetConnection();
 
@@ -384,52 +287,14 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       <APIList
         ListRef={scrollRef}
         ListHeaderComponent={
-          <View style={{}}>
-            {headerComponent}
-            <ExpandingTextInput
-              style={[
-                styles.textInputStyle,
-                { marginTop: 5, marginBottom: 5 },
-              ]}
-              multiline={true}
-              placeholder="Start Typing..."
-              onChangeText={setPostVal}
-              value={postVal}
-              clearButtonMode="always"
-              maxLength={1000}
-            />
-
-            <View style={{flexDirection: "row", justifyContent: "space-between", marginHorizontal: 15, marginTop: 2, marginBottom: 10}}>
-              <View style={{flexDirection: "row"}}>
-                <IconButton
-                  iconName={"insert-photo"}
-                  size={20}
-                  color={postVal === "" ? "gray" : "blue"}
-                  style={{marginRight: 6}}
-                  onPress={postVal === "" ? () => {
-                    alert("No text detected in text field");
-                  } : addPostAsync}
-                />
-                <IconButton
-                  iconName={"camera-alt"}
-                  size={20}
-                  color={postVal === "" ? "gray" : "blue"}
-                  onPress={postVal === "" ? () => {
-                    alert("No text detected in text field");
-                  } : addPostAsync}
-                />
-              </View>
-              <IconButton
-                iconName={postVal === "" ? "add-circle-outline" : "add-circle"}
-                size={15}
-                color={postVal === "" ? "gray" : "blue"}
-                label={receiver != null ? "Send Message" : "Add Post"}
-                onPress={postVal === "" ? () => {
-                  alert("No text detected in text field");
-                } : addPostAsync}
-              />
-            </View>
-          </View>
+          <PostInputField
+          channel={channel}
+          headerComponent={headerComponent}
+          receiver={receiver}
+          myId={route.params?.myId}
+          originalParentId={originalParentId}
+          pushLocalPost={(localNewPost) => setPosts((posts) => [localNewPost, ...posts])}
+          />
         }
         initialAmount={7}
         additionalAmount={7} //change number based on device specs
@@ -458,3 +323,126 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     </SafeAreaView>
   );
 };
+
+function PostInputField({channel, headerComponent, receiver, myId, originalParentId, pushLocalPost}) {
+  const [postInput, setPostInput] = useState("");
+  
+  const addPostAsync = async () => {
+    const newPost = {
+      description: postInput,
+      channel: channel,
+    };
+    const localNewPost = {
+      ...newPost,
+      userId: myId, 
+      createdAt: "null", 
+      loading: true
+    }
+    if (originalParentId != null) {
+      localNewPost.parentId = originalParentId
+    }
+    if (receiver != null) {
+      localNewPost.receiver = receiver;
+    }
+    setPostInput("");
+
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    pushLocalPost(localNewPost);
+
+    let users = [myId, receiver].sort();
+
+    try {
+      API.graphql(graphqlOperation(createPost, { input: newPost }));
+
+      const friend1 = await API.graphql(graphqlOperation(getFriendship, { sender: myId, receiver: receiver }));
+      const friend2 = await API.graphql(graphqlOperation(getFriendship, { sender: receiver, receiver: myId }));
+
+      let newConversations1 = await API.graphql(graphqlOperation(getConversations, { Accepted: 1 }))
+      let newConversations2 = await API.graphql(graphqlOperation(getConversations, { Accepted: 0 }))
+
+      newConversations1 = newConversations1.data.getConversations.items
+      newConversations2 = newConversations2.data.getConversations.items
+
+      let checkConversationExists = newConversations1.find(item => item.id === channel);
+
+      if (checkConversationExists == null) {
+        checkConversationExists = newConversations2.find(item => item.id === channel);
+      }
+
+      if (checkConversationExists == null) {
+        if (friend1.data.getFriendship == undefined && friend2.data.getFriendship == undefined) {
+          await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postInput, Accepted: 0 } }));
+        }
+        else {
+          await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postInput, Accepted: 1 } }));
+        }
+      }
+      else if (localNewPost.userId != checkConversationExists.lastUser) {
+        await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, lastMessage: postInput, Accepted: 1 } }));
+      }
+      else {
+        await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, lastMessage: postInput } }));
+      }
+
+      if (receiver != null) {
+        //when sending a message, create conversation using specified channel if posts is empty. if not, update conversation with the specified channel.
+        if (posts.length == 0) {
+          //API.graphql(graphqlOperation(createConversation, { input: {id: channel, users: users, lastMessage: postInput} }));
+        } else {
+          await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, lastMessage: postInput } }));
+        }
+      }
+    } catch (err) {
+      console.log("error in creating post: ", err);
+    }
+  };
+
+  return (  
+    <View>
+      {headerComponent}
+      <ExpandingTextInput
+        style={[
+          styles.textInputStyle,
+          { marginTop: 5, marginBottom: 5 },
+        ]}
+        multiline={true}
+        placeholder="Start Typing..."
+        onChangeText={setPostInput}
+        value={postInput}
+        clearButtonMode="always"
+        maxLength={1000}
+      />
+
+      <View style={{flexDirection: "row", justifyContent: "space-between", marginHorizontal: 15, marginTop: 2, marginBottom: 10}}>
+        <View style={{flexDirection: "row"}}>
+          <IconButton
+            iconName={"insert-photo"}
+            size={20}
+            color={postInput === "" ? "gray" : "blue"}
+            style={{marginRight: 6}}
+            onPress={postInput === "" ? () => {
+              alert("No text detected in text field");
+            } : addPostAsync}
+          />
+          <IconButton
+            iconName={"camera-alt"}
+            size={20}
+            color={postInput === "" ? "gray" : "blue"}
+            onPress={postInput === "" ? () => {
+              alert("No text detected in text field");
+            } : addPostAsync}
+          />
+        </View>
+        <IconButton
+          iconName={postInput === "" ? "add-circle-outline" : "add-circle"}
+          size={15}
+          color={postInput === "" ? "gray" : "blue"}
+          label={receiver != null ? "Send Message" : "Add Post"}
+          onPress={postInput === "" ? () => {
+            alert("No text detected in text field");
+          } : addPostAsync}
+        />
+      </View>
+    </View>
+  )
+}
