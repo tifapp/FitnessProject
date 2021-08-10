@@ -37,6 +37,7 @@ type Post @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" },
   channel: ID
   receiver: ID
   parentId: ID
+  hasImage: Boolean
 }
 
 """
@@ -47,6 +48,7 @@ input CreatePostInput {
   channel: ID
   receiver: ID
   parentId: ID
+  hasImage: Boolean
 }
 
 """

@@ -1,3 +1,7 @@
+"""
+//should be a secondary key instead of the main key so people cant spam report
+"""
+
 type Report @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" }, subscriptions: null)
 @auth(
   rules: [
@@ -6,7 +10,7 @@ type Report @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" 
       { allow: private, provider: iam, operations: [read, delete] },
   ]
 )
-@key(fields: ["createdAt", "postId"]) //should be a query instead of the main key so people cant spam report
+@key(fields: ["createdAt", "postId"]) 
 {
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
