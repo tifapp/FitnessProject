@@ -1,23 +1,15 @@
 import React, { useState, useEffect, useRef, PureComponent } from "react";
 import {
-  StyleSheet,
   Text,
-  Button,
   Image,
   View,
-  TextInput,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  Keyboard,
-  ActivityIndicator,
-  ScrollView,
   SafeAreaView,
   LayoutAnimation,
 } from "react-native";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation, Cache } from "aws-amplify";
 import { createReport, createPost, updatePost, deletePost, createConversation, updateConversation } from "root/src/graphql/mutations";
-import { listPosts, postsByChannel, batchGetLikes, getFriendship, getConversations } from "root/src/graphql/queries";
+import { postsByChannel, batchGetLikes, getFriendship, getConversations } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
 import { onCreatePostFromChannel, onDeletePostFromChannel, onUpdatePostFromChannel, onCreateLike, onDeleteLike, onIncrementLikes, onDecrementLikes } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
@@ -329,7 +321,7 @@ import usePhotos from '../hooks/usePhotos';
 function PostInputField({channel, headerComponent, receiver, myId, originalParentId, pushLocalPost}) {
   const [pickFromGallery, pickFromCamera] = usePhotos();
   const [postInput, setPostInput] = useState("");
-  const [imageURL, setImageURL] = useState("");
+  const [imageURL, setImageURL] = useState(null);
   
   const addPostAsync = async () => {
     const newPost = {
@@ -404,6 +396,20 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
   return (  
     <View>
       {headerComponent}
+
+      {
+        imageURL !== null ?
+        <Image
+          style={{
+            resizeMode: "cover",
+            width: 450,
+            height: 450,
+            alignSelf: "center",
+          }}
+          source={{ uri: imageURL }} //need a way to delete the image too
+        /> : null
+      }
+
       <ExpandingTextInput
         style={[
           styles.textInputStyle,
@@ -422,15 +428,15 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
           <IconButton
             iconName={"insert-photo"}
             size={20}
-            color={postInput === "" ? "gray" : "blue"}
+            color={imageURL === null ? "gray" : "blue"}
             style={{marginRight: 6}}
-            onPress={() => pickFromGallery(setImageURL, setImageChanged)}
+            onPress={() => pickFromGallery(setImageURL)}
           />
           <IconButton
             iconName={"camera-alt"}
             size={20}
-            color={postInput === "" ? "gray" : "blue"}
-            onPress={() => pickFromCamera(setImageURL, setImageChanged)}
+            color={imageURL === null ? "gray" : "blue"}
+            onPress={() => pickFromCamera(setImageURL)}
           />
         </View>
         <IconButton
