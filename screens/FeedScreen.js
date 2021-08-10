@@ -7,7 +7,7 @@ import {
   LayoutAnimation,
 } from "react-native";
 // Get the aws resources configuration parameters
-import { API, graphqlOperation, Cache } from "aws-amplify";
+import { API, graphqlOperation, Cache, Storage } from "aws-amplify";
 import { createReport, createPost, updatePost, deletePost, createConversation, updateConversation } from "root/src/graphql/mutations";
 import { postsByChannel, batchGetLikes, getFriendship, getConversations } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
@@ -317,6 +317,8 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
 };
 
 import usePhotos from '../hooks/usePhotos';
+import * as ImageManipulator from 'expo-image-manipulator';
+import SHA256 from "hooks/hash";
 
 function PostInputField({channel, headerComponent, receiver, myId, originalParentId, pushLocalPost}) {
   const [pickFromGallery, pickFromCamera] = usePhotos();
@@ -324,21 +326,26 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
   const [imageURL, setImageURL] = useState(null);
   
   const addPostAsync = async () => {
+    const imageID = SHA256(Date.now());
+
     const newPost = {
       description: postInput,
       channel: channel,
     };
+    if (receiver != null) {
+      newPost.receiver = receiver;
+    }
+    if (originalParentId != null) {
+      newPost.parentId = originalParentId;
+    }
+    if (imageURL !== null) {
+      newPost.imageURL = imageID;
+    }
     const localNewPost = {
       ...newPost,
       userId: myId, 
       createdAt: "null", 
       loading: true
-    }
-    if (originalParentId != null) {
-      localNewPost.parentId = originalParentId
-    }
-    if (receiver != null) {
-      localNewPost.receiver = receiver;
     }
     setPostInput("");
 
@@ -348,6 +355,19 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
     let users = [myId, receiver].sort();
 
     try {
+      //first, we must upload the image if any
+      if (imageURL !== null) {
+        const resizedPhoto = await ImageManipulator.manipulateAsync(
+          imageURL,
+          [{ resize: { width: 500 } }],
+          { compress: 1, format: 'jpeg' },
+        );
+        const response = await fetch(resizedPhoto.uri);
+        const blob = await response.blob();
+  
+        await Storage.put(`${imageID}.jpg`, blob, { level: 'public', contentType: 'image/jpeg' }); //make sure people can't overwrite other people's photos, and preferrably not be able to list all the photos in s3 using brute force. may need security on s3
+      }
+
       API.graphql(graphqlOperation(createPost, { input: newPost }));
 
       const friend1 = await API.graphql(graphqlOperation(getFriendship, { sender: myId, receiver: receiver }));

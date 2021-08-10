@@ -37,18 +37,19 @@ type Post @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" },
   channel: ID
   receiver: ID
   parentId: ID
-  hasImage: Boolean
+  imageURL: ID
 }
 
 """
 This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when creating a new message.
 """
 input CreatePostInput {
+  createdAt: AWSDateTime
   description: String
   channel: ID
   receiver: ID
   parentId: ID
-  hasImage: Boolean
+  imageURL: ID
 }
 
 """

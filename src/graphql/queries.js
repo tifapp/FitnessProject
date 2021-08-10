@@ -103,7 +103,7 @@ export const postsByUser = /* GraphQL */ `
         channel
         receiver
         parentId
-        hasImage
+        imageURL
         likes
         replies
       }
@@ -136,7 +136,7 @@ export const postsByReceiver = /* GraphQL */ `
         channel
         receiver
         parentId
-        hasImage
+        imageURL
         likes
         replies
       }
@@ -169,7 +169,7 @@ export const postsByChannel = /* GraphQL */ `
         channel
         receiver
         parentId
-        hasImage
+        imageURL
         likes
         replies
       }
@@ -448,7 +448,7 @@ export const getPost = /* GraphQL */ `
       channel
       receiver
       parentId
-      hasImage
+      imageURL
       likes
       replies
     }
