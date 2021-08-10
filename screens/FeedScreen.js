@@ -324,8 +324,12 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   );
 };
 
+import usePhotos from '../hooks/usePhotos';
+
 function PostInputField({channel, headerComponent, receiver, myId, originalParentId, pushLocalPost}) {
+  const [pickFromGallery, pickFromCamera] = usePhotos();
   const [postInput, setPostInput] = useState("");
+  const [imageURL, setImageURL] = useState("");
   
   const addPostAsync = async () => {
     const newPost = {
@@ -420,17 +424,13 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
             size={20}
             color={postInput === "" ? "gray" : "blue"}
             style={{marginRight: 6}}
-            onPress={postInput === "" ? () => {
-              alert("No text detected in text field");
-            } : addPostAsync}
+            onPress={() => pickFromGallery(setImageURL, setImageChanged)}
           />
           <IconButton
             iconName={"camera-alt"}
             size={20}
             color={postInput === "" ? "gray" : "blue"}
-            onPress={postInput === "" ? () => {
-              alert("No text detected in text field");
-            } : addPostAsync}
+            onPress={() => pickFromCamera(setImageURL, setImageChanged)}
           />
         </View>
         <IconButton

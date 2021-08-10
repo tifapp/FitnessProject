@@ -15,7 +15,7 @@ export default () => {
             })
             if (!response.cancelled) {
                 setImageURL(response.uri)
-                setImageChanged(true)
+                if (setImageChanged) setImageChanged(true)
             }
             
             console.log(response)
@@ -37,7 +37,7 @@ export default () => {
             })
             if (!response.cancelled) {
                 setImageURL(response.uri)
-                setImageChanged(true)
+                if (setImageChanged) setImageChanged(true)
             }
             
             console.log(response)
