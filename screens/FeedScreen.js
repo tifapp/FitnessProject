@@ -326,7 +326,7 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
   const [imageURL, setImageURL] = useState(null);
   
   const addPostAsync = async () => {
-    const imageID = SHA256(Date.now());
+    const imageID = SHA256(Date.now().toString());
 
     const newPost = {
       description: postInput,
@@ -365,7 +365,8 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
         const response = await fetch(resizedPhoto.uri);
         const blob = await response.blob();
   
-        await Storage.put(`${imageID}.jpg`, blob, { level: 'public', contentType: 'image/jpeg' }); //make sure people can't overwrite other people's photos, and preferrably not be able to list all the photos in s3 using brute force. may need security on s3
+        await Storage.put(`feed/${imageID}.jpg`, blob, { level: 'public', contentType: 'image/jpeg' }); //make sure people can't overwrite other people's photos, and preferrably not be able to list all the photos in s3 using brute force. may need security on s3
+        setImageURL(null);
       }
 
       API.graphql(graphqlOperation(createPost, { input: newPost }));
@@ -460,11 +461,11 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
           />
         </View>
         <IconButton
-          iconName={postInput === "" ? "add-circle-outline" : "add-circle"}
+          iconName={postInput === "" && imageURL === null ? "add-circle-outline" : "add-circle"}
           size={15}
-          color={postInput === "" ? "gray" : "blue"}
+          color={postInput === "" && imageURL === null ? "gray" : "blue"}
           label={receiver != null ? "Send Message" : "Add Post"}
-          onPress={postInput === "" ? () => {
+          onPress={postInput === "" && imageURL === null ? () => {
             alert("No text detected in text field");
           } : addPostAsync}
         />

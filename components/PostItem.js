@@ -202,7 +202,9 @@ export default React.memo(function PostItem({
             reportPost={reportPost}
           />
           
-          <PostImage/>
+          <PostImage
+          imageID={item.imageURL}
+          />
 
           <View style={{flexDirection: "row", justifyContent: "space-between"}}>
           {isEditing ? (
@@ -638,86 +640,50 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, togg
   );
 }
 
-function PostImage() {
-  const navigation = props.navigationObject ?? useNavigation();
-  const [userInfo, setUserInfo] = useState(props.info);
-
-  const addUserInfotoCache = () => {
-    //console.log('cache missed!', props.userId); //this isn't printing for some reason
-    let imageKey = `thumbnails/${user.identityId}/thumbnail-profileimage.jpg`;
-    let imageConfig = {
-      expires: 86400,
-    };
-    Storage.get(imageKey, imageConfig) //this will incur lots of repeated calls to the backend, idk how else to fix it right now
-      .then((imageURL) => {
-        Image.getSize(
-          imageURL,
-          () => {
-            //if (mounted) {
-            info.imageURL = imageURL;
-            Cache.setItem(props.userId, info);
-            setUserInfo(info);
-            console.log("adding photo to cache")
-            //}
-          },
-          (err) => {
-            //console.log("couldn't find user's profile image");
-            Cache.setItem(props.userId, info);
-            setUserInfo(info);
-            console.log("adding photo to cache")
-          }
-        );
-      })
-      .catch((err) => {
-        console.log("could not find image!", err);
-      }); //should just use a "profilepic" component
-
-    return null;
+function PostImage({imageID}) {
+  const [imageURL, setImageURL] = useState(null);
+  
+  let imageKey = `feed/${imageID}.jpg`;
+  let imageConfig = {
+    expires: 86400,
   };
 
   useEffect(() => {
-    if (userInfo == null) {
-      //we didn't preload
-      console.log("didnt preload")
-      Cache.getItem(props.userId, { callback: addUserInfotoCache }) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
-        .then((info) => { //will have to check if this gets called after the above callback, aka if setuserinfo is called twice.
-          //console.log("info is ", info)
-          if (info != null) {
-            if (
-              props.isFull &&
-              !info.isFull &&
-              info.imageURL !== ""
-            ) {
-              addUserInfotoCache();
-            } else {
-              if (props.callback) props.callback(info);
-              setUserInfo(info);
-            }
-          }
-        });
-    } else if (userInfo.error) {
-      //we tried to preload and the data was not in the cache
-      console.log("data was not found in the cache")
-      addUserInfotoCache(); //will fetch the profile image (either thumbnail or fullsize based on the props) and the user's name
-    }
-  }, []);
+    console.log(imageID);
+    Storage.get(imageKey, imageConfig) //this will incur lots of repeated calls to the backend, idk how else to fix it right now
+          .then((imageURL) => {
+            Image.getSize(
+              imageURL,
+              () => {
+                setImageURL(imageURL);
+              },
+              (err) => {
+                setImageURL(null);
+              }
+            );
+          })
+          .catch((err) => {
+            console.log("could not find image!", err);
+          }); //should just use a "profilepic" component
+  }, [])
 
-  return (
-    <Image
-    onError={addUserInfotoCache}
-    style={[{
-      resizeMode: "cover",
-      width: props.imageSize ?? 45,
-      height: props.imageSize ?? 45,
-      marginRight: !props.vertical ? props.margin ?? 15 : 0,
-      marginBottom: props.vertical ? props.margin ?? 15 : 0,
-      alignSelf: "center",
-    }, props.imageStyle]}
-    source={
-      (userInfo == null || userInfo.imageURL === "") ?
-        require("../assets/icon.png")
-        : { uri: userInfo.imageURL }
-    }
-  />
-  )
+  if (imageID) {
+    return (
+      <Image
+      //onError={addUserInfotoCache}
+      style={{
+        resizeMode: "cover",
+        width: 370,
+        height: 370,
+        alignSelf: "center",
+        marginBottom: 15,
+      }}
+      source={
+          (imageURL == null || imageURL === "") ?
+            require("../assets/icon.png")
+            : { uri: imageURL }
+      }
+    />
+    )
+  } else return null;
 }
