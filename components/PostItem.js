@@ -13,7 +13,8 @@ import {
   Linking,
   LayoutAnimation,
   Alert,
-  Modal
+  Modal,
+  Dimensions
 } from "react-native";
 import { getUser } from "../src/graphql/queries";
 import { ProfileImageAndName } from "./ProfileImageAndName";
@@ -673,8 +674,8 @@ function PostImage({imageID}) {
       //onError={addUserInfotoCache}
       style={{
         resizeMode: "cover",
-        width: 370,
-        height: 370,
+        width: Dimensions.get('window').width - 20,
+        height: Dimensions.get('window').width - 20,
         alignSelf: "center",
         marginBottom: 15,
       }}
