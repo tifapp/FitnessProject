@@ -11,6 +11,8 @@ const config = {
   disableOffline: true,
 };
 
+exports.s3 = new AWS.S3();
+
 exports.client = new AWSAppSyncClient(config);
 
 const {

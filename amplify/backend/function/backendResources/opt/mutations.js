@@ -11,6 +11,7 @@ exports.batchDeletePosts = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -26,6 +27,7 @@ exports.incrementLikes = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -41,6 +43,7 @@ exports.decrementLikes = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -56,6 +59,7 @@ exports.incrementReplies = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -71,6 +75,7 @@ exports.decrementReplies = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -185,6 +190,7 @@ exports.createConversation = /* GraphQL */ `
       lastUser
       lastMessage
       dummy
+      Accepted
     }
   }
 `;
@@ -201,6 +207,7 @@ exports.updateConversation = /* GraphQL */ `
       lastUser
       lastMessage
       dummy
+      Accepted
     }
   }
 `;
@@ -217,6 +224,7 @@ exports.deleteConversation = /* GraphQL */ `
       lastUser
       lastMessage
       dummy
+      Accepted
     }
   }
 `;
@@ -314,6 +322,7 @@ exports.deletePost = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -332,6 +341,7 @@ exports.createPost = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -350,8 +360,51 @@ exports.updatePost = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
+    }
+  }
+`;
+exports.createReport = /* GraphQL */ `
+  mutation CreateReport(
+    $input: CreateReportInput!
+    $condition: ModelReportConditionInput
+  ) {
+    createReport(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      userId
+      postId
+      message
+    }
+  }
+`;
+exports.updateReport = /* GraphQL */ `
+  mutation UpdateReport(
+    $input: UpdateReportInput!
+    $condition: ModelReportConditionInput
+  ) {
+    updateReport(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      userId
+      postId
+      message
+    }
+  }
+`;
+exports.deleteReport = /* GraphQL */ `
+  mutation DeleteReport(
+    $input: DeleteReportInput!
+    $condition: ModelReportConditionInput
+  ) {
+    deleteReport(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      userId
+      postId
+      message
     }
   }
 `;

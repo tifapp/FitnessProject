@@ -1,9 +1,15 @@
-require('isomorphic-fetch');
+/* Amplify Params - DO NOT EDIT
+	API_FITNESSPROJECTAPI_GRAPHQLAPIENDPOINTOUTPUT
+	API_FITNESSPROJECTAPI_GRAPHQLAPIIDOUTPUT
+	ENV
+	REGION
+	process.env.STORAGE_MEDIA_BUCKETNAME,
+Amplify Params - DO NOT EDIT */require('isomorphic-fetch');
 const gql = require('graphql-tag');
 
 const { incrementReplies, decrementReplies, deleteLike, deletePost } = require('/opt/mutations');
 const {getUser, postsByChannel, likesByPost} = require('/opt/queries');
-const { client, sendNotification } = require('/opt/backendResources');
+const { client, sendNotification, s3 } = require('/opt/backendResources');
 const {loadCapitals} = require('/opt/stringConversion');
 const SHA256 = require('/opt/hash');
 
@@ -96,6 +102,10 @@ exports.handler = (event, context, callback) => {
     } else {
       (async () => {
         try {          
+          if (record.dynamodb.OldImage.imageURL.S != null && record.dynamodb.OldImage.imageURL.S !== '') {
+            await s3.deleteObject({ Bucket: process.env.STORAGE_MEDIA_BUCKETNAME, Key: `public/feed/${record.dynamodb.OldImage.imageURL.S}.jpg` }).promise()
+          }
+
           //delete like objects, if any
           if (record.dynamodb.OldImage.likes.N > 0) {
             //check if there are likes to delete

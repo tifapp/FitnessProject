@@ -27,6 +27,10 @@
     "functionbackendResourcesArn": {
       "Type": "String",
       "Default": "functionbackendResourcesArn"
+    },
+    "storagemediaBucketName": {
+      "Type": "String",
+      "Default": "storagemediaBucketName"
     }
   },
   "Conditions": {
@@ -87,6 +91,9 @@
             },
             "API_FITNESSPROJECTAPI_GRAPHQLAPIENDPOINTOUTPUT": {
               "Ref": "apifitnessprojectapiGraphQLAPIEndpointOutput"
+            },
+            "STORAGE_MEDIA_BUCKETNAME": {
+              "Ref": "storagemediaBucketName"
             }
           }
         },
@@ -250,6 +257,45 @@
                       {
                         "Ref": "apifitnessprojectapiGraphQLAPIIdOutput"
                       }
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": "s3:ListBucket",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Ref": "storagemediaBucketName"
+                      }
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:DeleteObject"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Ref": "storagemediaBucketName"
+                      },
+                      "/*"
                     ]
                   ]
                 }
