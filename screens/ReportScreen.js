@@ -30,7 +30,7 @@ export default function ReportScreen() {
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setReports((reports) => {
-      return reports.filter((report) => (report.post.createdAt !== createdAt || report.post.userId !== userId));
+      return reports.filter((report) => {if (report.post) return (report.post.createdAt !== createdAt || report.post.userId !== userId)});
     });
 
     try {
