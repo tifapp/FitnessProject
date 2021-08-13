@@ -24,7 +24,7 @@ import {
   onCreateOrUpdateConversation,
   onCreatePostForReceiver
 } from "root/src/graphql/subscriptions";
-import { deleteFriendship, updateFriendship, createBlock } from "root/src/graphql/mutations";
+import { deleteFriendship, updateFriendship, createBlock, updateConversation } from "root/src/graphql/mutations";
 
 import { ProfileImageAndName } from "components/ProfileImageAndName";
 import {
@@ -38,7 +38,7 @@ import FriendListItem from "components/FriendListItem";
 import FriendRequestListItem from "components/FriendRequestListItem";
 import playSound from "../hooks/playSound";
 import { useIsDrawerOpen } from '@react-navigation/drawer';
-import { batchGetConversations, getConversation } from "../src/graphql/queries";
+import { batchGetConversations, getConversation, getConversations } from "../src/graphql/queries";
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 
 var subscriptions = [];
@@ -406,6 +406,21 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
     
     try {
       if (item.accepted) {
+        
+        const friend_sender = item.sender;
+        const friend_receiver = item.receiver;
+
+        let newConversations1 = await API.graphql(graphqlOperation(getConversations, { Accepted: 0 }))
+        newConversations1 = newConversations1.data.getConversations.items
+
+        let checkConversationExists = newConversations1.find(item => 
+          (item.users[0] == friend_sender && item.users[1] == friend_receiver) || (item.users[0] == friend_receiver && item.users[1] == friend_sender));
+
+        if(checkConversationExists != null){
+          channel = checkConversationExists.id;
+          await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, Accepted: 1 } }));
+        }
+
         await API.graphql(
           graphqlOperation(updateFriendship, {
             input: { sender: item.sender, accepted: true}
