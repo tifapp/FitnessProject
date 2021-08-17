@@ -38,6 +38,7 @@ type Post @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" },
   receiver: ID
   parentId: ID
   imageURL: ID
+  videoURL: ID
 }
 
 """
@@ -50,6 +51,7 @@ input CreatePostInput {
   receiver: ID
   parentId: ID
   imageURL: ID
+  videoURL: ID
 }
 
 """

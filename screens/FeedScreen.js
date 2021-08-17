@@ -319,11 +319,13 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
 import usePhotos from '../hooks/usePhotos';
 import * as ImageManipulator from 'expo-image-manipulator';
 import SHA256 from "hooks/hash";
+import { Video, AVPlaybackStatus } from 'expo-av';
 
 function PostInputField({channel, headerComponent, receiver, myId, originalParentId, pushLocalPost}) {
-  const [pickFromGallery, pickFromCamera] = usePhotos();
+  const [pickFromGallery, pickFromCamera] = usePhotos(true);
   const [postInput, setPostInput] = useState("");
   const [imageURL, setImageURL] = useState(null);
+  const [isVideo, setIsVideo] = useState(null);
   
   const addPostAsync = async () => {
     const imageID = SHA256(Date.now().toString());
@@ -339,7 +341,8 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
       newPost.parentId = originalParentId;
     }
     if (imageURL !== null) {
-      newPost.imageURL = imageID;
+      if (isVideo) newPost.videoURL = imageID;
+      else newPost.imageURL = imageID;
     }
     const localNewPost = {
       ...newPost,
@@ -363,15 +366,24 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
     try {
       //first, we must upload the image if any
       if (imageURL !== null) {
-        const resizedPhoto = await ImageManipulator.manipulateAsync(
-          imageURL,
-          [{ resize: { width: 500 } }],
-          { compress: 1, format: 'jpeg' },
-        );
-        const response = await fetch(resizedPhoto.uri);
-        const blob = await response.blob();
+        let blob;
+        if (!isVideo) {
+          const resizedPhoto = await ImageManipulator.manipulateAsync(
+            imageURL,
+            [{ resize: { width: 500 } }],
+            { compress: 1, format: 'jpeg' },
+          );
+          const response = await fetch(resizedPhoto.uri);
+          blob = await response.blob();
+        } else {
+          const response = await fetch(imageURL);
+          blob = await response.blob();
+        }
   
-        await Storage.put(`feed/${imageID}.jpg`, blob, { level: 'public', contentType: 'image/jpeg' }); //make sure people can't overwrite other people's photos, and preferrably not be able to list all the photos in s3 using brute force. may need security on s3
+        //scan the uri and check filetype. maybe console log the uri first
+        const re = /(?:\.([^.]+))?$/;
+        const videoExtension = re.exec(imageURL)[1];
+        await Storage.put(`feed/${imageID}.${isVideo?videoExtension:'jpg'}`, blob, { level: 'public', contentType: isVideo ? 'video/' + videoExtension : 'image/jpeg' }); //make sure people can't overwrite other people's photos, and preferrably not be able to list all the photos in s3 using brute force. may need security on s3
         setImageURL(null);
       }
 
@@ -454,13 +466,27 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
 
       {
         imageURL !== null ?
+        isVideo ?
+        <Video
+          style={{
+            resizeMode: "cover",
+            width: 450,
+            height: 450,
+            alignSelf: "center",
+          }} //check if this should be an image or a video?
+          useNativeControls
+          isLooping
+          shouldPlay
+          source={{ uri: imageURL }} //need a way to delete the image too
+          posterSource={require("../assets/icon.png")}
+        /> :
         <Image
           style={{
             resizeMode: "cover",
             width: 450,
             height: 450,
             alignSelf: "center",
-          }}
+          }} //check if this should be an image or a video?
           source={{ uri: imageURL }} //need a way to delete the image too
         /> : null
       }
@@ -485,13 +511,13 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
             size={20}
             color={imageURL === null ? "gray" : "blue"}
             style={{marginRight: 6}}
-            onPress={() => pickFromGallery(setImageURL)}
+            onPress={() => pickFromGallery(setImageURL, null, setIsVideo)}
           />
           <IconButton
             iconName={"camera-alt"}
             size={20}
             color={imageURL === null ? "gray" : "blue"}
-            onPress={() => pickFromCamera(setImageURL)}
+            onPress={() => pickFromCamera(setImageURL, null, setIsVideo)}
           />
         </View>
         <IconButton
