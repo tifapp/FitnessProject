@@ -187,20 +187,6 @@ export const onCreateFriendRequestForReceiver = /* GraphQL */ `
     }
   }
 `;
-export const onCreateOrUpdateConversation = /* GraphQL */ `
-  subscription OnCreateOrUpdateConversation($users: [ID!]!) {
-    onCreateOrUpdateConversation(users: $users) {
-      createdAt
-      updatedAt
-      id
-      users
-      lastUser
-      lastMessage
-      dummy
-      Accepted
-    }
-  }
-`;
 export const onDeleteConversation = /* GraphQL */ `
   subscription OnDeleteConversation($users: [ID!]!) {
     onDeleteConversation(users: $users) {

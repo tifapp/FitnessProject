@@ -21,7 +21,6 @@ import {
 import {
   onCreateFriendRequestForReceiver,
   onAcceptedFriendship,
-  onCreateOrUpdateConversation,
   onCreatePostForReceiver
 } from "root/src/graphql/subscriptions";
 import { deleteFriendship, updateFriendship, createBlock, updateConversation } from "root/src/graphql/mutations";
@@ -41,7 +40,6 @@ import { useIsDrawerOpen } from '@react-navigation/drawer';
 import { batchGetConversations, getConversation, getConversations } from "../src/graphql/queries";
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 
-var subscriptions = [];
 global.localBlockList = [];
 
 export default function CustomSidebarMenu({ navigation, state, progress, myId, setConversationIds }) {
@@ -69,27 +67,6 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
     setConversationIds(friendIds);
   }, [friendList]) //we must extract just the array of ids
 
-  /*
-  waitForFriend = API.graphql(graphqlOperation(onCreateFriendship)).subscribe({
-    next: event => {
-      const newFriendRequest = event.value.data.onCreateFriendship
-      if (newFriendRequest.sender == userId && newFriendRequest.receiver == route.params?.id) {
-        setFriendStatus("received");
-      }
-    }
-  });
-
-  // Case 2: Receiver accepts friend request. Update the sender's side to delete button.
-  onUpdate = API.graphql(graphqlOperation(onUpdateFriendship)).subscribe({
-    next: event => {
-      const newFriend = event.value.data.onUpdateFriendship
-      if (newFriend.sender == route.params?.id && newFriend.receiver == userId && newFriend.accepted) {
-        setFriendStatus("friends");
-      }
-    }
-  });
-  */
-
   const loadLastMessageAndListenForNewOnes = async (newFriend) => {
     //check if a convo already exists between the two users
     const friendlistarray = [newFriend.sender, newFriend.receiver].sort();
@@ -106,42 +83,6 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setFriendList([newFriend, ...currentFriends.current]);
-    subscriptions.push(
-      await API.graphql(
-        graphqlOperation(onCreateOrUpdateConversation, {
-          users: [newFriend.sender, newFriend.receiver].sort()
-        })
-      ).subscribe({
-        next: (event) => {
-          const updatedConversation =
-            event.value.data.onCreateOrUpdateConversation;
-          console.log(
-            "new message, this is what it looks like ",
-            updatedConversation,
-            " and this is you: ",
-            myId
-          );
-          //no need for security checks here
-          setFriendList(
-            currentFriends.current.map(function (i) {
-              if (
-                updatedConversation.users.find(
-                  (user) =>
-                    user !== myId &&
-                    (i.sender === user || i.receiver === user)
-                )
-              ) {
-                i.lastMessage = updatedConversation.lastMessage;
-                i.lastUser = updatedConversation.lastUser;
-                i.isRead = null;
-              }
-              return i;
-            }));
-          //foreach users in conversation, if it's not myid and it's in friend list, update friend list, and push it to the top.
-          //alternatively for message screen, for each user in message screen, if it's in conversation push it to the top. otherwise just put this conversation at the top of the list.
-        },
-      })
-    );
   }
 
   useEffect(() => {
@@ -162,6 +103,23 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
 
         global.showNotificationDot();
         setNewConversations(currentNewConversations.current + 1);
+
+        //no need for security checks here
+        setFriendList((friends) => {
+          return friends.map((friend) => {
+            if (
+              newPost.sender === friend.sender || newPost.receiver === friend.receiver
+            ) {
+              //will only work for received messages, not sent messages
+              friend.lastMessage = newPost.description;
+              friend.lastUser = newPost.userId;
+              friend.isRead = null;
+            }
+            return i;
+          })
+        });
+        //foreach users in conversation, if it's not myid and it's in friend list, update friend list, and push it to the top.
+        //alternatively for message screen, for each user in message screen, if it's in conversation push it to the top. otherwise just put this conversation at the top of the list.
       },
     });
 
@@ -254,9 +212,6 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
       //removedFriendSubscription.unsubscribe();
       friendSubscription.unsubscribe();
       friendRequestSubscription.unsubscribe();
-      subscriptions.forEach(element => {
-        element.unsubscribe();
-      });      
       receivedConversationSubscription.unsubscribe();
       //conversationUpdateSubscription.unsubscribe();
       currentFriendRequests.current.forEach(item => {if (item.rejected || item.accepted) confirmResponse(item);});
@@ -281,11 +236,6 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
   };
   
   const fetchLatestMessages = async (items) => {
-    subscriptions.forEach(element => {
-      element.unsubscribe();
-    });
-    subscriptions.length = 0;
-
     let conversationIds = [];
 
     items.forEach((item) => {
@@ -297,48 +247,6 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
       //console.log("looking for conversations: ", conversations);
       //returns an array of like objects or nulls corresponding with the array of conversations
       for (i = 0; i < items.length; ++i) {
-        //console.log("friend list item: ", items[i]);
-        const friendslistarray = [items[i].sender,items[i].receiver].sort();
-        //console.log("friend list array: ", friendslistarray);
-        (async () => {
-          subscriptions.push(
-            await API.graphql(
-              graphqlOperation(onCreateOrUpdateConversation, {
-                users: friendslistarray
-              })
-            ).subscribe({
-              next: (event) => {
-                const updatedConversation =
-                  event.value.data.onCreateOrUpdateConversation;
-                console.log(
-                  "new message, this is what it looks like ",
-                  updatedConversation,
-                  " and this is you: ",
-                  myId
-                );
-                //no need for security checks here
-                setFriendList(
-                  currentFriends.current.map(function (i) {
-                    if (
-                      updatedConversation.users.find(
-                        (user) =>
-                          user !== myId &&
-                          (i.sender === user || i.receiver === user)
-                      )
-                    ) {
-                      i.lastMessage = updatedConversation.lastMessage;
-                      i.lastUser = updatedConversation.lastUser;
-                      i.isRead = null;
-                    }
-                    return i;
-                  }));
-                //foreach users in conversation, if it's not myid and it's in friend list, update friend list, and push it to the top.
-                //alternatively for message screen, for each user in message screen, if it's in conversation push it to the top. otherwise just put this conversation at the top of the list.
-              },
-            })
-          );
-        })();
-
         if (conversations.data.batchGetConversations[i] != null) {
           console.log("found conversation");
           items[i].lastMessage = conversations.data.batchGetConversations[i].lastMessage;
