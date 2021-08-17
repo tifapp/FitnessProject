@@ -61,6 +61,20 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
   currentNewFriendRequestCount.current = newFriendRequests;
   currentNewConversations.current = newConversations;
 
+  global.updateFriendsListWithMyNewMessage = (newPost) => {
+    setFriendList((friends) => {
+      return friends.map((friend) => {
+        if (
+          newPost.receiver === friend.receiver || newPost.receiver === friend.sender
+        ) {
+          friend.lastMessage = newPost.description;
+          friend.lastUser = myId;
+        }
+        return friend;
+      })
+    });
+  }
+
   useEffect(() => {
     const friendIds = [];
     friendList.forEach(friend => friendIds.push(friend.sender == myId ? friend.receiver : friend.sender));
@@ -108,14 +122,13 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
         setFriendList((friends) => {
           return friends.map((friend) => {
             if (
-              newPost.sender === friend.sender || newPost.receiver === friend.receiver
+              newPost.userId === friend.sender || newPost.userId === friend.receiver
             ) {
-              //will only work for received messages, not sent messages
               friend.lastMessage = newPost.description;
               friend.lastUser = newPost.userId;
               friend.isRead = null;
             }
-            return i;
+            return friend;
           })
         });
         //foreach users in conversation, if it's not myid and it's in friend list, update friend list, and push it to the top.

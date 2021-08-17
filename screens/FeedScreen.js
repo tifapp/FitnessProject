@@ -354,6 +354,12 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
 
     let users = [myId, receiver].sort();
 
+    if (newPost.receiver) global.updateFriendsListWithMyNewMessage(newPost);
+    //if (global.updatemessagescreen)
+    //global.updateMessageScreen
+    //if global.updateconversationscreen
+    //global.updateConversationScreen
+
     try {
       //first, we must upload the image if any
       if (imageURL !== null) {
