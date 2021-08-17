@@ -328,6 +328,7 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
   const [isVideo, setIsVideo] = useState(null);
   
   const addPostAsync = async () => {
+    console.log("current date is ", Date.now());
     const imageID = SHA256(Date.now().toString());
 
     const newPost = {
