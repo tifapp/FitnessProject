@@ -103,7 +103,8 @@ exports.handler = (event, context, callback) => {
       (async () => {
         try {          
           if (record.dynamodb.OldImage.imageURL.S != null && record.dynamodb.OldImage.imageURL.S !== '') {
-            await s3.deleteObject({ Bucket: process.env.STORAGE_MEDIA_BUCKETNAME, Key: `public/feed/${record.dynamodb.OldImage.imageURL.S}.jpg` }).promise()
+            console.log("attempting to delete image");
+            await s3.deleteObject({ Bucket: process.env.STORAGE_MEDIA_BUCKETNAME, Key: `public/feed/${record.dynamodb.OldImage.imageURL.S}` }).promise();
           }
 
           //delete like objects, if any

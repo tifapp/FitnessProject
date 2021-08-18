@@ -645,50 +645,62 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, togg
   );
 }
 
+import { Video, AVPlaybackStatus } from 'expo-av';
+
+const re = /(?:\.([^.]+))?$/;
+
 function PostImage({imageID}) {
   const [imageURL, setImageURL] = useState(null);
   
-  let imageKey = `feed/${imageID}.jpg`;
+  let imageKey = `feed/${imageID}`;
   let imageConfig = {
     expires: 86400,
   };
 
   useEffect(() => {
-    //console.log(imageID);
+    console.log("image id is ", imageID);
     Storage.get(imageKey, imageConfig) //this will incur lots of repeated calls to the backend, idk how else to fix it right now
-          .then((imageURL) => {
-            Image.getSize(
-              imageURL,
-              () => {
-                setImageURL(imageURL);
-              },
-              (err) => {
-                setImageURL(null);
-              }
-            );
-          })
-          .catch((err) => {
-            console.log("could not find image!", err);
-          }); //should just use a "profilepic" component
+      .then((imageURL) => {
+        setImageURL(imageURL);
+      })
+      .catch((err) => {
+        console.log("could not find image!", err);
+        setImageURL(null);
+      }); //should just use a "profilepic" component
   }, [])
 
   if (imageID) {
     return (
-      <Image
-      //onError={addUserInfotoCache}
-      style={{
-        resizeMode: "cover",
-        width: Dimensions.get('window').width - 20,
-        height: Dimensions.get('window').width - 20,
-        alignSelf: "center",
-        marginBottom: 15,
-      }}
-      source={
-          (imageURL == null || imageURL === "") ?
-            require("../assets/icon.png")
-            : { uri: imageURL }
-      }
-    />
+      (re.exec(imageID)[1] === 'jpg') ?
+        <Image
+          //onError={addUserInfotoCache}
+          style={{
+            resizeMode: "cover",
+            width: Dimensions.get('window').width - 20,
+            height: Dimensions.get('window').width - 20,
+            alignSelf: "center",
+            marginBottom: 15,
+          }}
+          source={
+            (imageURL == null || imageURL === "") ?
+              require("../assets/icon.png")
+              : { uri: imageURL }
+          }
+        /> : <Video
+          //onError={addUserInfotoCache}
+          style={{
+            resizeMode: "cover",
+            width: Dimensions.get('window').width - 20,
+            height: Dimensions.get('window').width - 20,
+            alignSelf: "center",
+            marginBottom: 15,
+          }}
+          source={{ uri: imageURL }}
+          posterSource={require("../assets/icon.png")}
+          useNativeControls
+          isLooping
+          shouldPlay
+        />
     )
   } else return null;
 }

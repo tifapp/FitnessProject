@@ -12,7 +12,6 @@ export const batchDeletePosts = /* GraphQL */ `
       receiver
       parentId
       imageURL
-      videoURL
       likes
       replies
     }
@@ -29,7 +28,6 @@ export const incrementLikes = /* GraphQL */ `
       receiver
       parentId
       imageURL
-      videoURL
       likes
       replies
     }
@@ -46,7 +44,6 @@ export const decrementLikes = /* GraphQL */ `
       receiver
       parentId
       imageURL
-      videoURL
       likes
       replies
     }
@@ -63,7 +60,6 @@ export const incrementReplies = /* GraphQL */ `
       receiver
       parentId
       imageURL
-      videoURL
       likes
       replies
     }
@@ -80,7 +76,6 @@ export const decrementReplies = /* GraphQL */ `
       receiver
       parentId
       imageURL
-      videoURL
       likes
       replies
     }
@@ -328,7 +323,6 @@ export const deletePost = /* GraphQL */ `
       receiver
       parentId
       imageURL
-      videoURL
       likes
       replies
     }
@@ -348,7 +342,6 @@ export const createPost = /* GraphQL */ `
       receiver
       parentId
       imageURL
-      videoURL
       likes
       replies
     }
@@ -368,7 +361,6 @@ export const updatePost = /* GraphQL */ `
       receiver
       parentId
       imageURL
-      videoURL
       likes
       replies
     }

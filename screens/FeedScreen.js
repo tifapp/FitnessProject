@@ -342,8 +342,10 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
       newPost.parentId = originalParentId;
     }
     if (imageURL !== null) {
-      if (isVideo) newPost.videoURL = imageID;
-      else newPost.imageURL = imageID;
+      const re = /(?:\.([^.]+))?$/;
+      const videoExtension = re.exec(imageURL)[1];
+
+      newPost.imageURL = `${imageID}.${isVideo ? videoExtension : 'jpg'}`;
     }
     const localNewPost = {
       ...newPost,
