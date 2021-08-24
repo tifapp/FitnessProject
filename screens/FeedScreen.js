@@ -392,16 +392,11 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
 
       API.graphql(graphqlOperation(createPost, { input: newPost }));
       
-      const friend1 = await API.graphql(graphqlOperation(getFriendship, { sender: route.params?.myId, receiver: receiver }));
-      const friend2 = await API.graphql(graphqlOperation(getFriendship, { sender: receiver, receiver: route.params?.myId }));
+      const friend1 = await API.graphql(graphqlOperation(getFriendship, { sender: myId, receiver: receiver }));
+      const friend2 = await API.graphql(graphqlOperation(getFriendship, { sender: receiver, receiver: myId }));
 
       let newConversations1 = await API.graphql(graphqlOperation(getConversations, { Accepted: 1 }))
       let newConversations2 = await API.graphql(graphqlOperation(getConversations, { Accepted: 0 }))
-
-      console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-      console.log(newConversations1);
-      console.log(newConversations2);
-      console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 
       newConversations1 = newConversations1.data.getConversations.items
       newConversations2 = newConversations2.data.getConversations.items
@@ -417,49 +412,26 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
       }
 
       const friend = friendCheck();
-      //console.log("[[[[[[[[[[[[[[[[[[[[[[[");
-      //console.log(friend.data.getFriendship);
-      //console.log("[[[[[[[[[[[[[[[[[[[[[[[");
-
 
       if (checkConversationExists == null) {
-        console.log("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\");
-        if (friend1.data.getFriendship === null && friend2.data.getFriendship === null){
-          //console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-          await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postVal, Accepted: 0 } }));
-          //console.log("##############################");
+        if (friend1.data.getFriendship === null && friend2.data.getFriendship === null) {
+          await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postInput, Accepted: 0 } }));
         }
-        else if(friend.data.getFriendship.accepted === null){
-          console.log(":::::::::::::::::::::::::::")
-          await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postVal, Accepted: 0 } }));
-          console.log(":::::::::::::::::::::::::::")
+        else if(friend.data.getFriendship.accepted === null) {
+          await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postInput, Accepted: 0 } }));
         }
         else {
-          //console.log("******************************");
-          await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postVal, Accepted: 1 } }));
-          //console.log("******************************");
+          await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postInput, Accepted: 1 } }));
         }
       }
       else if (localNewPost.userId != checkConversationExists.lastUser) {
-        console.log("testing");
-        console.log(newPost.channel);
-        console.log(checkConversationExists);
-        await API.graphql(graphqlOperation(updateConversation, { input: { id: newPost.channel, lastMessage: postVal, Accepted: 1 } }));
+        await API.graphql(graphqlOperation(updateConversation, { input: { id: newPost.channel, lastMessage: postInput, Accepted: 1 } }));
       }
       else {
-        await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, lastMessage: postVal } }));
-      }
-
-      if (receiver != null) {
-        //when sending a message, create conversation using specified channel if posts is empty. if not, update conversation with the specified channel.
-        if (posts.length == 0) {
-          //API.graphql(graphqlOperation(createConversation, { input: {id: channel, users: users, lastMessage: postVal} }));
-        } else {
-          await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, lastMessage: postVal } }));
-        }
+        await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, lastMessage: postInput } }));
       }
     } catch (err) {
-      console.log("error in creating post: ", err);
+      console.warn("error in creating post: ", err);
     }
   };
 
