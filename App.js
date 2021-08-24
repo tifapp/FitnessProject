@@ -44,6 +44,7 @@ import { StatusBar } from "expo-status-bar";
 import MessageScreen from "./screens/MessageScreen";
 import LookupUserScreen from "screens/LookupUser";
 import {headerOptions} from "components/headerComponents/headerOptions"
+import { Audio } from 'expo-av';
 
 if (
   Platform.OS === "android" &&
@@ -143,6 +144,11 @@ const App = () => {
   };
 
   const requestAndSaveNotificationPermissions = async () => {
+    await Audio.requestPermissionsAsync();
+    await Audio.setAudioModeAsync({
+      playsInSilentModeIOS: true,
+    }); 
+
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
     if (existingStatus !== 'granted') {
