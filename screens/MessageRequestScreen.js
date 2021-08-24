@@ -80,6 +80,14 @@ export default function MessageRequestScreen({ navigation, route }) {
       //setConversations([conversation, ...currentConversations.current]);
       setConversations([...tempConversations]);
     }
+    else{
+      const conversation = { id: newPost.channel, users: [newPost.userId, newPost.receiver], lastUser: newPost.userId, lastMessage: newPost.description, Accepted: 0 }
+      tempConversations = currentConversations.current;
+      tempConversations.unshift(conversation);
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      //setConversations([conversation, ...currentConversations.current]);
+      setConversations([...tempConversations]);
+    }
   }
 
   useEffect(() => {
@@ -91,21 +99,22 @@ export default function MessageRequestScreen({ navigation, route }) {
       graphqlOperation(onCreatePostForReceiver, { receiver: route.params.myId })
     ).subscribe({
       next: (event) => {
+
+        
         const newPost = event.value.data.onCreatePostForReceiver;
+        const conversations_temp = currentConversations.current;
 
-        console.log("$$$$$$$$$$$$$$$")
-        //console.log(newPost);
-        console.log(conversations);
-        console.log("$$$$$$$$$$$$$$$")
+        let checkConversationExists =  conversations_temp.find(item => item.id === newPost.channel);
+
+        console.log("----------");
+        console.log(checkConversationExists);
+        console.log("----------");
 
 
-
-        let checkConversationExists = conversations.find(item => item.id === newPost.channel);
-
-        if (checkConversationExists != null && route.params?.myId != checkConversationExists.lastUser) {
+        if (checkConversationExists != null && route.params?.myId != newPost.userId) {
           setConversations((conversations) => {
             return conversations.filter(
-              (i) => i.users[0] !== checkConversationExists.lastUser || i.users[1] !== checkConversationExists.lastUser
+              (i) => i !== checkConversationExists
             );
           });
         }
@@ -116,7 +125,6 @@ export default function MessageRequestScreen({ navigation, route }) {
 
         global.addConversationIds(newPost.userId);
         global.showNotificationDot();
-
       },
     });
 
@@ -125,21 +133,27 @@ export default function MessageRequestScreen({ navigation, route }) {
     ).subscribe({
       next: (event) => {
         const newPost = event.value.data.onCreatePostByUser;
-        console.log("^^^^^^^^^^^^^^^^^^^^^^^");
-        let checkConversationExists = conversations.find(item => item.id === newPost.channel);
-        console.log(checkConversationExists);
+        const conversations_temp = currentConversations.current;
+        console.log("+++++++++");
 
-        if (checkConversationExists != null && route.params?.myId != checkConversationExists.lastUser) {
+        let checkConversationExists = conversations_temp.find(item => item.id === newPost.channel);
+
+        if (checkConversationExists != null && route.params?.myId != newPost.userId) {
+
           setConversations((conversations) => {
             return conversations.filter(
-              (i) => i.users[0] !== checkConversationExists.lastUser || i.users[1] !== checkConversationExists.lastUser
+              (i) => i !== checkConversationExists
             );
-          });
+          });  
+
         }
         else {
           updateConversationList(newPost);
         }
-        //updateConversationList(newPost);
+
+        global.addConversationIds(newPost.userId);
+        global.showNotificationDot();
+        
       },
     });
 
