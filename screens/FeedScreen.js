@@ -88,7 +88,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
           newPost.likes = newPost.likes ?? 0;
           newPost.replies = newPost.replies ?? 0;
           if (newPost.userId === route.params?.myId) {
-            //console.log("received own post again")
+            ////console("received own post again")
             setPosts(currentPosts.current.map(post => {
               if (post.userId === route.params?.myId && post.createdAt == "null") return newPost
               else return post;
@@ -126,7 +126,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     });
     const updatePostSubscription = API.graphql(graphqlOperation(onUpdatePostFromChannel, { channel: channel })).subscribe({ //nvm we dont have a subscription event for incrementlike
       next: event => {
-        //console.log("post has been updated");
+        ////console("post has been updated");
       }
     });
     checkInternetConnection();
@@ -147,14 +147,14 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     try {
       await allSettled([
         API.graphql(graphqlOperation(batchGetLikes, { likes: postIds })).then((likes) => {
-          //console.log("looking for likes: ", likes);
+          ////console("looking for likes: ", likes);
           //returns an array of like objects or nulls corresponding with the array of newposts
           for (i = 0; i < newPosts.length; ++i) {
             if (newPosts[i].likes == null) {
               newPosts[i].likes = 0;
             }
             if (likes.data.batchGetLikes[i] != null) {
-              //console.log("found liked post");
+              ////console("found liked post");
               newPosts[i].likedByYou = true;
             } else {
               newPosts[i].likedByYou = false;
@@ -163,7 +163,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         }),
 
         allSettled(newPosts.map((post) => Cache.getItem(post.userId))).then((results) => {
-          //console.log("all are complete")
+          ////console("all are complete")
           for (i = 0; i < newPosts.length; ++i) {
             if (results[i].status === "fulfilled") {
               newPosts[i].info = results[i].value;
@@ -183,7 +183,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
           else
             return Promise.reject()
         })).then((results) => {
-          //console.log(results)
+          ////console(results)
           for (i = 0; i < newPosts.length; ++i) {
             if (results[i].status === "fulfilled") {
               newPosts[i].urlPreview = results[i].value;
@@ -192,14 +192,14 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         }),
       ]);
 
-      //console.log(newPosts[0])
+      ////console(newPosts[0])
 
       return newPosts;
 
       //we can also check if the item contains a link and load the link preview data through here as well, and insert it into the postitem
       //link previews should have a fixed height btw, or at least a max height. but then it could vary between 0 and the max height
     } catch (err) {
-      console.log("error in detecting likes: ", err);
+      //console("error in detecting likes: ", err);
     }
   }
 
@@ -214,7 +214,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   };
 
   const DisplayInternetConnection = () => {
-    console.log(onlineCheck);
+    //console(onlineCheck);
     if (!onlineCheck) {
       return (
         <View style={styles.offlineContainer}>
@@ -236,15 +236,15 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
 
     try {
       await API.graphql(graphqlOperation(updatePost, { input: { createdAt: createdAt, description: editedText } }));
-      console.log("success in updating a post");
+      //console("success in updating a post");
     } catch (err) {
-      console.log("error in updating post: ", err);
+      //console("error in updating post: ", err);
     }
   }
 
   const addPostAsync = async (parentId, replyText) => {
     checkInternetConnection();
-    //console.log("attempting to make new post");
+    ////console("attempting to make new post");
     const newPost = {
       description: replyText ?? postVal,
       channel: replyText != null ? parentId.toString() : channel,
@@ -259,17 +259,17 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     }
     setPostVal("");
 
-    //console.log(route.params?.myId + " just posted.");
+    ////console(route.params?.myId + " just posted.");
 
     const localNewPost = { ...newPost, userId: route.params?.myId, createdAt: "null", loading: true }
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     if (replyText == null) {
-      //console.log("posting a WHOLE NEW POST")
+      ////console("posting a WHOLE NEW POST")
       setPosts([localNewPost, ...posts]);
     }
     else {
-      //console.log("posting a reply"  + replyText)
+      ////console("posting a reply"  + replyText)
       let tempposts = currentPosts.current;
       var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.channel == newPost.channel)]);
       tempposts.splice(index + 1, 0, localNewPost);
@@ -288,10 +288,10 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       let newConversations1 = await API.graphql(graphqlOperation(getConversations, { Accepted: 1 }))
       let newConversations2 = await API.graphql(graphqlOperation(getConversations, { Accepted: 0 }))
 
-      console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-      console.log(newConversations1);
-      console.log(newConversations2);
-      console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+      //console("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+      //console(newConversations1);
+      //console(newConversations2);
+      //console("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 
       newConversations1 = newConversations1.data.getConversations.items
       newConversations2 = newConversations2.data.getConversations.items
@@ -307,33 +307,33 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       }
 
       const friend = friendCheck();
-      //console.log("[[[[[[[[[[[[[[[[[[[[[[[");
-      //console.log(friend.data.getFriendship);
-      //console.log("[[[[[[[[[[[[[[[[[[[[[[[");
+      ////console("[[[[[[[[[[[[[[[[[[[[[[[");
+      ////console(friend.data.getFriendship);
+      ////console("[[[[[[[[[[[[[[[[[[[[[[[");
 
 
       if (checkConversationExists == null) {
-        console.log("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\");
+        //console("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\");
         if (friend1.data.getFriendship === null && friend2.data.getFriendship === null){
-          //console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+          ////console("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
           await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postVal, Accepted: 0 } }));
-          //console.log("##############################");
+          ////console("##############################");
         }
         else if(friend.data.getFriendship.accepted === null){
-          console.log(":::::::::::::::::::::::::::")
+          //console(":::::::::::::::::::::::::::")
           await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postVal, Accepted: 0 } }));
-          console.log(":::::::::::::::::::::::::::")
+          //console(":::::::::::::::::::::::::::")
         }
         else {
-          //console.log("******************************");
+          ////console("******************************");
           await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postVal, Accepted: 1 } }));
-          //console.log("******************************");
+          ////console("******************************");
         }
       }
       else if (localNewPost.userId != checkConversationExists.lastUser) {
-        console.log("testing");
-        console.log(newPost.channel);
-        console.log(checkConversationExists);
+        //console("testing");
+        //console(newPost.channel);
+        //console(checkConversationExists);
         await API.graphql(graphqlOperation(updateConversation, { input: { id: newPost.channel, lastMessage: postVal, Accepted: 1 } }));
       }
       else {
@@ -349,7 +349,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         }
       }
     } catch (err) {
-      console.log("error in creating post: ", err);
+      //console("error in creating post: ", err);
     }
   };
 
@@ -361,7 +361,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       return item.createdAt === timestamp && item.userId === route.params?.myId;
     })
 
-    //console.log("parent post: " + parent_post.description);
+    ////console("parent post: " + parent_post.description);
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     if (parent_post.parentId == null) {
@@ -377,7 +377,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     try {
       await API.graphql(graphqlOperation(deletePost, { input: { createdAt: timestamp, userId: route.params?.myId } }));
     } catch {
-      console.log("error in deleting post: ");
+      //console("error in deleting post: ");
     }
 
   };

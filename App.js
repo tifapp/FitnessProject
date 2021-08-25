@@ -97,18 +97,18 @@ const App = () => {
   const [conversationIds, setConversationIds] = useState([]);
   
   global.addConversationIds = (id) => {
-    console.log("(((((((((((((((((((((((((((((((((");
-    console.log(id);
+    //console("(((((((((((((((((((((((((((((((((");
+    //console(id);
     
     const found = conversationIds.find(element => element == id);
     
-    console.log(conversationIds);
-    console.log("(((((((((((((((((((((((((((((((((");
-    console.log(found);
+    //console(conversationIds);
+    //console("(((((((((((((((((((((((((((((((((");
+    //console(found);
     
 
     if(found == undefined){
-      console.log("inside");
+      //console("inside");
       
       let tempConversationsIds =  conversationIds;
       tempConversationsIds.unshift(id);
@@ -132,9 +132,9 @@ const App = () => {
         setUserId('');
       }
 
-      console.log("success, user is ", user);
+      //console("success, user is ", user);
     } catch (err) {
-      console.log("error: ", err);
+      //console("error: ", err);
     }
   };
 
@@ -150,7 +150,7 @@ const App = () => {
       return;
     }
     const token = (await Notifications.getExpoPushTokenAsync()).data;
-    console.log(token);
+    //console(token);
 
     if (Platform.OS === 'android') {
       Notifications.setNotificationChannelAsync('default', {
@@ -202,7 +202,7 @@ const App = () => {
     }
   }, [userId])
 
-  //console.log("App rerendered, userexists is... ", userId == '');
+  ////console("App rerendered, userexists is... ", userId == '');
   const dimensions = useWindowDimensions();
 
   if (userId == 'checking...') {

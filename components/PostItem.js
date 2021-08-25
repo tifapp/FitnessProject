@@ -53,7 +53,7 @@ function LikeButton({ setLikes, likes, likedByYou, postId, likeDebounceRef }) {
   const sendAPICall = () => {
     likeDebounceRef.current = true;
     if (liked == likeRef.current) {
-      //console.log("sent API call, hopefully debounce works.");
+      ////console("sent API call, hopefully debounce works.");
       if (!liked) {
         API.graphql(
           graphqlOperation(createLike, { input: { postId: postId } })
@@ -78,7 +78,7 @@ function LikeButton({ setLikes, likes, likedByYou, postId, likeDebounceRef }) {
       setLiked(!liked);
       resetTimeout();
     } catch (err) {
-      console.log(err);
+      //console(err);
       alert("Could not be submitted!");
     }
   };
@@ -133,7 +133,7 @@ function LinkableText(props) {
     Alert.alert(title, "", options);
   };
 
-  //console.log("the url we're passing to preview is ", props.urlPreview)
+  ////console("the url we're passing to preview is ", props.urlPreview)
 
   return (
     <View>
@@ -532,9 +532,9 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, setI
       /*
       const incrementLikeSubscription = API.graphql(graphqlOperation(onIncrementLikes, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
         next: event => {
-          console.log("liked post!")
+          //console("liked post!")
           if (likeDebounce.current) {
-            console.log("you liked post!")
+            //console("you liked post!")
             likeDebounce.current = false;
           }
           else setLikes(currentLikes.current + 1);
@@ -542,7 +542,7 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, setI
       });
       const decrementLikeSubscription = API.graphql(graphqlOperation(onDecrementLikes, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
         next: event => {
-          console.log("unliked post!")
+          //console("unliked post!")
           if (likeDebounce.current) {
             likeDebounce.current = false;
           }

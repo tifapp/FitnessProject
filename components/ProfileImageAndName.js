@@ -40,7 +40,7 @@ export const ProfileImageAndName = React.memo(function(props) {
   const [userInfo, setUserInfo] = useState(props.info);
 
   const addUserInfotoCache = () => {
-    //console.log('cache missed!', props.userId); //this isn't printing for some reason
+    ////console('cache missed!', props.userId); //this isn't printing for some reason
     API.graphql(graphqlOperation(getUser, { id: props.userId })).then((u) => {
       const user = u.data.getUser;
       if (user != null) {
@@ -54,7 +54,7 @@ export const ProfileImageAndName = React.memo(function(props) {
           expires: Date.now() + 86400000,
         });
         setUserInfo(info);
-        console.log("adding name to cache")
+        //console("adding name to cache")
         if (props.callback) props.callback(info); 
         let imageKey = `thumbnails/${user.identityId}/thumbnail-profileimage.jpg`;
         let imageConfig = {
@@ -65,7 +65,7 @@ export const ProfileImageAndName = React.memo(function(props) {
           imageConfig.identityId = user.identityId;
           imageConfig.level = "protected";
         }
-        //console.log("showing full image");
+        ////console("showing full image");
         Storage.get(imageKey, imageConfig) //this will incur lots of repeated calls to the backend, idk how else to fix it right now
           .then((imageURL) => {
             Image.getSize(
@@ -75,19 +75,19 @@ export const ProfileImageAndName = React.memo(function(props) {
                 info.imageURL = imageURL;
                 Cache.setItem(props.userId, info);
                 setUserInfo(info);
-                console.log("adding photo to cache")
+                //console("adding photo to cache")
                 //}
               },
               (err) => {
-                //console.log("couldn't find user's profile image");
+                ////console("couldn't find user's profile image");
                 Cache.setItem(props.userId, info);
                 setUserInfo(info);
-                console.log("adding photo to cache")
+                //console("adding photo to cache")
               }
             );
           })
           .catch((err) => {
-            console.log("could not find image!", err);
+            //console("could not find image!", err);
           }); //should just use a "profilepic" component
       }
     });
@@ -97,10 +97,10 @@ export const ProfileImageAndName = React.memo(function(props) {
   useEffect(() => {
     if (userInfo == null) {
       //we didn't preload
-      console.log("didnt preload")
+      //console("didnt preload")
       Cache.getItem(props.userId, { callback: addUserInfotoCache }) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
       .then((info) => { //will have to check if this gets called after the above callback, aka if setuserinfo is called twice.
-        //console.log("info is ", info)
+        ////console("info is ", info)
         if (info != null) {
           if (
             props.isFull &&
@@ -116,7 +116,7 @@ export const ProfileImageAndName = React.memo(function(props) {
       });
     } else if (userInfo.error) {
       //we tried to preload and the data was not in the cache
-      console.log("data was not found in the cache")
+      //console("data was not found in the cache")
       addUserInfotoCache(); //will fetch the profile image (either thumbnail or fullsize based on the props) and the user's name
     }
   }, []);

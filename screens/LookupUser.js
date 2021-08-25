@@ -77,8 +77,8 @@ const LookupUser = ({ route, navigation }) => {
     navigation.navigate(id);
    }
   */
- console.log(id);
- console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+ //console(id);
+ //console("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
 global.addConversationIds(id);
   };
 
@@ -88,17 +88,17 @@ global.addConversationIds(id);
 
   const checkUsersInfo = async () => {
     try {
-      console.log("on the lookup screen, id is: ", userId);
+      //console("on the lookup screen, id is: ", userId);
       const u = await API.graphql(graphqlOperation(getUser, { id: userId }));
-      console.log(u.data.getUser);
+      //console(u.data.getUser);
       if (u.data.getUser != null) {
-        //console.log("this post is...", item.description, "and the author is...", user.data.getUser);
+        ////console("this post is...", item.description, "and the author is...", user.data.getUser);
         navigation.setParams({ user: u.data.getUser });
       }
 
-      //console.log("success, user is ", user);
+      ////console("success, user is ", user);
     } catch (err) {
-      console.log("error in finding user ", err);
+      //console("error in finding user ", err);
     }
   };
 
@@ -146,7 +146,7 @@ global.addConversationIds(id);
   };
 
   const checkFriendStatus = async () => {
-    console.log("CHECKING FRIEND STATUS");
+    //console("CHECKING FRIEND STATUS");
     try {
       let blocked = await API.graphql(
         graphqlOperation(getBlock, {
@@ -189,9 +189,9 @@ global.addConversationIds(id);
       ) {
         setFriendStatus("friends");
         setFriendsSince(printTime(friendship.data.getFriendship.createdAt));
-        //console.log("check");
+        ////console("check");
       } else {
-        console.log("YOU ARE NOT FRIENDS");
+        //console("YOU ARE NOT FRIENDS");
         setFriendsSince("");
 
         // Outgoing request
@@ -211,7 +211,7 @@ global.addConversationIds(id);
       }
       //waitForFriendUpdateAsync();
     } catch (err) {
-      console.log(err);
+      //console(err);
     }
   };
 
@@ -225,7 +225,7 @@ global.addConversationIds(id);
     ).subscribe({
       next: (event) => {
         const newFriendRequest = event.value.data.onCreateFriendship;
-        //console.log(newFriendRequest);
+        ////console(newFriendRequest);
         setFriendStatus("received");
       },
     });
@@ -239,7 +239,7 @@ global.addConversationIds(id);
     ).subscribe({
       next: (event) => {
         const newFriend = event.value.data.onUpdateFriendship;
-        //console.log(newFriend);
+        ////console(newFriend);
         if (newFriend.accepted) {
           setFriendStatus("friends");
         }
@@ -255,7 +255,7 @@ global.addConversationIds(id);
       {
         next: (event) => {
           const exFriend = event.value.data.onDeleteFriendship;
-          //console.log(exFriend);
+          ////console(exFriend);
           if (exFriend.sender == userId || exFriend.receiver == userId) {
             setFriendStatus("none");
           }
@@ -270,7 +270,7 @@ global.addConversationIds(id);
       {
         next: (event) => {
           const exFriend = event.value.data.onDeleteFriendship;
-          //console.log(exFriend);
+          ////console(exFriend);
           if (exFriend.sender == userId || exFriend.receiver == userId) {
             setFriendStatus("none");
           }
@@ -286,11 +286,11 @@ global.addConversationIds(id);
       await API.graphql(
         graphqlOperation(createFriendship, { input: { receiver: user.id } })
       );
-      console.log("success");
+      //console("success");
       setFriendStatus("sent"); //if received, should change to "friends". do a check before this
       alert("Sent successfully!");
     } catch (err) {
-      console.log(err);
+      //console(err);
       alert("Could not be submitted!");
     }
   };
@@ -304,11 +304,11 @@ global.addConversationIds(id);
           input: { sender: user.id, accepted: true },
         })
       );
-      console.log("success");
+      //console("success");
       setFriendStatus("friends");
       alert("Accepted successfully!");
     } catch (err) {
-      console.log(err);
+      //console(err);
       alert("Could not be accepted");
     }
   };
@@ -316,22 +316,22 @@ global.addConversationIds(id);
   const unsendFriendRequest = async (temp) => {
     if (!temp)
       setFriendStatus("unsending");
-    //console.log(temp);
+    ////console(temp);
     try {
       await API.graphql(
         graphqlOperation(deleteFriendship, {
           input: { sender: route.params?.myId, receiver: user.id },
         })
       );
-      console.log("success");
+      //console("success");
 
       if (temp != true) {
         setFriendStatus("none");
         alert("Friend request unsent successfully!");
       }
     } catch (err) {
-      console.log(err);
-      console.log("error in unsending request: ");
+      //console(err);
+      //console("error in unsending request: ");
     }
   };
 
@@ -345,15 +345,15 @@ global.addConversationIds(id);
           input: { sender: user.id, receiver: route.params?.myId },
         })
       );
-      console.log("success");
+      //console("success");
 
       if (temp != true) {
         setFriendStatus("none");
         alert("Friend request rejected successfully!");
       }
     } catch (err) {
-      console.log(err);
-      console.log("error in rejecting friend: ");
+      //console(err);
+      //console("error in rejecting friend: ");
     }
   };
 
@@ -370,8 +370,8 @@ global.addConversationIds(id);
 
       alert("Deleted Friend successfully!");
     } catch (err) {
-      console.log(err);
-      console.log("error in deleting friend: ");
+      //console(err);
+      //console("error in deleting friend: ");
     }
   };
 
@@ -381,11 +381,11 @@ global.addConversationIds(id);
         graphqlOperation(deleteBlock, { input: { userId: route.params?.myId, blockee: userId} })
       );
       global.localBlockList = global.localBlockList.filter(i => i.blockee !== userId);
-      console.log(global.localBlockList);
+      //console(global.localBlockList);
       setFriendStatus("none");
     } catch (err) {
-      console.log(err);
-      console.log("error when unblocking");
+      //console(err);
+      //console("error when unblocking");
     }
   }
   
@@ -396,11 +396,11 @@ global.addConversationIds(id);
         graphqlOperation(createBlock, { input: { blockee: userId} })
       );
       global.localBlockList.push({createdAt: (new Date(Date.now())).toISOString(), userId: route.params?.myId , blockee: userId});
-      console.log(global.localBlockList);
+      //console(global.localBlockList);
       setFriendStatus("blocker");
     } catch (err) {
-      console.log(err);
-      console.log("error when unblocking");
+      //console(err);
+      //console("error when unblocking");
     }
   }
 

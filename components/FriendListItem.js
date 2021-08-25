@@ -86,7 +86,7 @@ export default function FriendListItem({
                       {
                         text: "Yes",
                         onPress: () => {
-                          console.log("Test");
+                          //console("Test");
                           deleteConversationFromConvo(item,friendId), setIsOptionsOpen(false)
                         },
                       },
@@ -174,7 +174,7 @@ export default function FriendListItem({
                   paddingTop: lastMessage != null && lastMessage.length > 34 ? 0 : 8
                 }]}
                 onPress={() => {
-                  console.log("message pressed, " + isMessageOpen);
+                  //console("message pressed, " + isMessageOpen);
                   item.isRead = true;
                   goToMessages(friendId);
                 }}

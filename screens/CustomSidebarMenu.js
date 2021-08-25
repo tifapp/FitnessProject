@@ -99,10 +99,11 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
     );
 
     if (convo.data.getConversation != null) {
-      console.log("found old condo")
+      //console("found old condo")
       newFriend.lastMessage = convo.data.getConversation.lastMessage
       newFriend.lastUser = convo.data.getConversation.lastUser
-    } else {console.log("couldnt find condo")}
+    } else {//console("couldnt find condo")
+    }
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setFriendList([newFriend, ...currentFriends.current]);
@@ -115,12 +116,12 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
         next: (event) => {
           const updatedConversation =
             event.value.data.onCreateOrUpdateConversation;
-          console.log(
-            "new message, this is what it looks like ",
-            updatedConversation,
-            " and this is you: ",
-            myId
-          );
+          //console(
+          //  "new message, this is what it looks like ",
+          //  updatedConversation,
+          //  " and this is you: ",
+          //  myId
+          // );
           //no need for security checks here
           setFriendList(
             currentFriends.current.map(function (i) {
@@ -173,10 +174,10 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
       next: (event) => {
         //IMPORTANT: don't use "friendList" or "friendRequestList" variables in this scope, instead use "currentFriends.current" and "currentFriendRequests.current"
 
-        //console.log("is drawer open? ", isDrawerOpen.current);
+        ////console("is drawer open? ", isDrawerOpen.current);
         const newFriendRequest = event.value.data.onCreateFriendRequestForReceiver;
         if (newFriendRequest.sender !== myId && newFriendRequest.receiver !== myId)
-          console.log("security error with incoming friend request");
+          //console("security error with incoming friend request");
 
         //if this new request is coming from someone already in your local friends list, remove them from your local friends list
         if (currentFriends.current.find((item) => item.sender === newFriendRequest.sender)) {
@@ -197,7 +198,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
 
         //if the drawer is closed, show the blue dot in the corner
         if (!isDrawerOpen.current) {
-          //console.log("incrementing counter");
+          ////console("incrementing counter");
           global.showNotificationDot();
         }
         
@@ -224,7 +225,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
             ));
           }
 
-          console.log("someone accepted us")
+          //console("someone accepted us")
 
           if (!currentFriends.current.find(item => item.sender === newFriend.sender && item.receiver === newFriend.receiver)) {
             loadLastMessageAndListenForNewOnes(newFriend);
@@ -239,7 +240,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
     ).subscribe({
       next: (event) => {
         const deletedFriend = event.value.data.onDeleteFriendship; //check the security on this one. if possible, should only fire for the sender or receiver.
-        console.log("friend deleted ", deletedFriend);
+        //console("friend deleted ", deletedFriend);
         if (currentFriends.current.find(item => item.sender === deletedFriend.sender && item.sender === deletedFriend.sender)) {
           var index = currentFriends.current.findIndex(item => item.sender === deletedFriend.sender && item.sender === deletedFriend.sender);
           currentFriends.current.splice(index, 1);
@@ -294,12 +295,12 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
     
     try {
       const conversations = await API.graphql(graphqlOperation(batchGetConversations, { ids: conversationIds }));
-      //console.log("looking for conversations: ", conversations);
+      ////console("looking for conversations: ", conversations);
       //returns an array of like objects or nulls corresponding with the array of conversations
       for (i = 0; i < items.length; ++i) {
-        //console.log("friend list item: ", items[i]);
+        ////console("friend list item: ", items[i]);
         const friendslistarray = [items[i].sender,items[i].receiver].sort();
-        //console.log("friend list array: ", friendslistarray);
+        ////console("friend list array: ", friendslistarray);
         (async () => {
           subscriptions.push(
             await API.graphql(
@@ -310,12 +311,12 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
               next: (event) => {
                 const updatedConversation =
                   event.value.data.onCreateOrUpdateConversation;
-                console.log(
-                  "new message, this is what it looks like ",
-                  updatedConversation,
-                  " and this is you: ",
-                  myId
-                );
+                //console(
+                //  "new message, this is what it looks like ",
+                //  updatedConversation,
+                //  " and this is you: ",
+                //  myId
+                // );
                 //no need for security checks here
                 setFriendList(
                   currentFriends.current.map(function (i) {
@@ -340,14 +341,14 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
         })();
 
         if (conversations.data.batchGetConversations[i] != null) {
-          console.log("found conversation");
+          //console("found conversation");
           items[i].lastMessage = conversations.data.batchGetConversations[i].lastMessage;
           items[i].lastUser = conversations.data.batchGetConversations[i].lastUser; //could also store the index of lastuser from the users array rather than the full string
         }
       }
       return items;
     } catch (err) {
-      console.log("error in getting latest messages: ", err);
+      //console("error in getting latest messages: ", err);
     }
   };
 
@@ -392,7 +393,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
     ); //locally removes the item
 
     if (item.accepted && (friendList.length == 0 || !friendList.find(item1 => item1.sender == item.sender && item1.receiver == item.receiver))) {
-      console.log("Inside removeFriendRequestListItem");
+      //console("Inside removeFriendRequestListItem");
       
       var newFriend = {
         createdAt: (new Date(Date.now())).toISOString(),
@@ -426,7 +427,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
             input: { sender: item.sender, accepted: true}
           })
         );
-        //console.log("accepted: " + accepted);
+        ////console("accepted: " + accepted);
       } else {
         await API.graphql(
           graphqlOperation(deleteFriendship, {
@@ -435,7 +436,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
         );
       }
     } catch (err) {
-      console.log("error responding to request: ", err);
+      //console("error responding to request: ", err);
     }
   };
 
@@ -464,7 +465,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
         })
       );
     } catch (err) {
-      console.log("error: ", err);
+      //console("error: ", err);
     }
   };
 
@@ -683,7 +684,8 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
         paddingVertical: 15,
         backgroundColor: "white",
       }]}
-      onPress={()=>{console.log("going to settings"), navigation.navigate("Settings")}}>
+      onPress={()=>{//console("going to settings"), 
+        navigation.navigate("Settings")}}>
         <Text style={{
           fontSize: 18,
           color: (state.routes[state.index].name === "Settings") ? "black" : "grey",
