@@ -31,15 +31,22 @@ export default function ConversationScreen({ navigation, route }) {
 
   const updateConversationList = async (newPost) => {
 
+    global.checkFriendshipConversation = (conversation) => {
+
+      let tempConversations = currentConversations.current;
+
+      tempConversations.unshift(conversation);
+
+      setConversations([...tempConversations]);
+    }  
+
     let tempConversations = currentConversations.current;
 
     let newConversation = tempConversations.find(item => newPost.channel === item.id);
 
-    let newConversationCheck = await API.graphql(graphqlOperation(getConversations, { Accepted: 0}));
+    let newConversationCheck = await API.graphql(graphqlOperation(getConversations, { Accepted: 0, sortDirection: 'DESC'}));
     console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
     console.log(newConversationCheck);
-    console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-    console.log(newPost);
     console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 
     if(newConversationCheck.data.getConversations.items.length != 0){
@@ -47,14 +54,16 @@ export default function ConversationScreen({ navigation, route }) {
       //console.log(newConversationCheck.data.getConversations.items);
       //console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||")
 
-      console.log(newConversationCheck.data.getConversations.items[0].id)
+      //console.log(newConversationCheck.data.getConversations.items[0].id)
 
       newConversationCheck = newConversationCheck.data.getConversations.items[0].id === newPost.channel;
 
+      /*
       console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
       console.log(newPost.channel);
       console.log(newConversationCheck);
       console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+      */
 
       if(newConversationCheck){
         console.log("Conversation already exists");
@@ -203,6 +212,11 @@ export default function ConversationScreen({ navigation, route }) {
           ).subscribe({
             next: (event) => {
               const conversation = event.value.data.onDeleteConversation;
+
+              console.log("[[[[[[[[[[[[[[[[[");
+              console.log(conversation);
+              console.log("]]]]]]]]]]]]]]]]]");
+
               const filteredConversations = conversations.filter((convo) =>
                 convo.id != conversation.id
               );

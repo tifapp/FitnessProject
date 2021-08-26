@@ -280,7 +280,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     users.sort();
 
     try {
-      API.graphql(graphqlOperation(createPost, { input: newPost }));
 
       const friend1 = await API.graphql(graphqlOperation(getFriendship, { sender: route.params?.myId, receiver: receiver }));
       const friend2 = await API.graphql(graphqlOperation(getFriendship, { sender: receiver, receiver: route.params?.myId }));
@@ -348,6 +347,8 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
           await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, lastMessage: postVal } }));
         }
       }
+
+      API.graphql(graphqlOperation(createPost, { input: newPost }));
     } catch (err) {
       //console("error in creating post: ", err);
     }

@@ -17,6 +17,7 @@ import {
   getFriendship,
   friendsBySecondUser,
   getFriendRequest,
+  getConversationByUsers
 } from "root/src/graphql/queries";
 import {
   onCreateFriendRequestForReceiver,
@@ -214,7 +215,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
     const friendSubscription = API.graphql(
       graphqlOperation(onAcceptedFriendship)
     ).subscribe({
-      next: (event) => {
+      next: async (event) => {
         const newFriend = event.value.data.onAcceptedFriendship;
         //we can see all friend requests being accepted, so we just have to make sure it's one of ours.
         if (newFriend.sender === myId || newFriend.receiver === myId) {
@@ -230,6 +231,20 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
           if (!currentFriends.current.find(item => item.sender === newFriend.sender && item.receiver === newFriend.receiver)) {
             loadLastMessageAndListenForNewOnes(newFriend);
           }
+        }
+
+        if(global.checkFriendshipMessage !== undefined){
+          let backupConversation = await API.graphql(graphqlOperation(getConversationByUsers, { users: [newFriend.sender,newFriend.receiver].sort()}));
+          console.log("Message Screen is unopened");
+
+          backupConversation = backupConversation.data.getConversationByUsers.items[0];
+          global.checkFriendshipMessage(backupConversation);
+        }
+
+        if(global.checkFriendshipMessage !== undefined && global.checkFriendshipConversation !== undefined){
+          console.log("Both the Message Screen and Conversation Screens are opened");
+          let conversation = global.checkFriendshipMessage(newFriend.sender, newFriend.receiver);
+          global.checkFriendshipConversation(conversation);
         }
       },
     });

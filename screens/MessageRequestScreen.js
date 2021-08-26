@@ -29,6 +29,26 @@ var subscriptions = [];
 
 export default function MessageRequestScreen({ navigation, route }) {
 
+  global.checkFriendshipMessage = (sender, receiver) => {
+
+    let tempConversations = currentConversations.current;
+
+    let index = tempConversations.findIndex(item => console.log(item),
+    (item.users[0] == sender && item.users[1] == receiver) 
+    || (item.users[0] == receiver && item.users[1] == sender));
+
+    let conversation = tempConversations[index];
+
+    if (index != -1) {
+      tempConversations.splice(index, 1); //removes 1 item from the current Conversations at the specified index
+    }
+
+    setConversations([...tempConversations]);
+
+    return conversation;
+
+  }
+
   const updateConversationList = async (newPost) => {
 
     //console.log("----- updateConversationList ------ ");
@@ -36,8 +56,11 @@ export default function MessageRequestScreen({ navigation, route }) {
     let tempConversations = currentConversations.current;
     let newConversation = tempConversations.find(item => newPost.channel === item.id);
 
-    let newConversationCheck = await API.graphql(graphqlOperation(getConversations, { Accepted: 1}));
-    //console.log(newConversationCheck);
+    let newConversationCheck = await API.graphql(graphqlOperation(getConversations, { Accepted: 1, sortDirection: 'DESC'}));
+
+    console.log("==============================");
+    console.log(newConversationCheck);
+    console.log("===============================");
 
     if(newConversationCheck.data.getConversations.items.length != 0){
       //console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||")
@@ -55,7 +78,6 @@ export default function MessageRequestScreen({ navigation, route }) {
     ////console("inside update");
 
     if (newConversation === undefined) {
-
       newConversation = await API.graphql(graphqlOperation(getConversations, { Accepted: 0, limit: 1 }));
 
       ////console("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
