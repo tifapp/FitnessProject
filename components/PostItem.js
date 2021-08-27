@@ -201,6 +201,7 @@ export default React.memo(function PostItem({
             repliesPressed={() => replyButtonHandler ? replyButtonHandler() : setAreRepliesVisible(!areRepliesVisible)}
             areRepliesVisible={areRepliesVisible}
             reportPost={reportPost}
+            isVisible={item.isVisible}
           />
           
           <PostImage
@@ -536,61 +537,70 @@ export default React.memo(function PostItem({
   }
 }, (oldProps, newProps) => oldProps.item == newProps.item)
 
-function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, toggleEditing, areRepliesVisible, reportPost }) {
+function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, toggleEditing, areRepliesVisible, reportPost, isVisible }) {
   const [likes, setLikes] = useState(item.likes);
-  const currentLikes = useRef();
-  currentLikes.current = likes;
   const [replies, setReplies] = useState(item.replies);
-  const currentReplies = useRef();
-  currentReplies.current = replies;
   const likeDebounce = useRef(false);
+  let incrementLikeSubscription, decrementLikeSubscription, incrementReplySubscription, decrementReplySubscription;
 
   useEffect(() => {
     if (!item.loading) {
-      console.log("creating subscriptions and post info is: ", item.userId)
-      const incrementLikeSubscription = API.graphql(graphqlOperation(onIncrementLikes, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
-        next: event => {
-          console.log("liked post!")
-          if (likeDebounce.current) {
-            console.log("you liked post!")
-            likeDebounce.current = false;
+      if (isVisible) { //should be true by default
+        incrementLikeSubscription = API.graphql(graphqlOperation(onIncrementLikes, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
+          next: event => {
+            console.log("liked post!")
+            if (likeDebounce.current) {
+              console.log("you liked post!")
+              likeDebounce.current = false;
+            }
+            else setLikes(event.value.data.onIncrementLikes.likes);
+          },
+          error: error => console.warn(error)
+        });
+        decrementLikeSubscription = API.graphql(graphqlOperation(onDecrementLikes, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
+          next: event => {
+            console.log("unliked post!")
+            if (likeDebounce.current) {
+              likeDebounce.current = false;
+            }
+            else setLikes(event.value.data.onDecrementLikes.likes);
+          },
+          error: error => console.warn(error)
+        });
+        incrementReplySubscription = API.graphql(graphqlOperation(onIncrementReplies, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
+          next: event => {
+            setReplies(event.value.data.onIncrementReplies.replies);
           }
-          else setLikes(currentLikes.current + 1);
-        },
-        error: error => console.warn(error)
-      });
-      const decrementLikeSubscription = API.graphql(graphqlOperation(onDecrementLikes, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
-        next: event => {
-          console.log("unliked post!")
-          if (likeDebounce.current) {
-            likeDebounce.current = false;
+        });
+        decrementReplySubscription = API.graphql(graphqlOperation(onDecrementReplies, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
+          next: event => {
+            setReplies(event.value.data.onDecrementReplies.replies);
           }
-          else setLikes(currentLikes.current - 1);
-        },
-        error: error => console.warn(error)
-      });
-      /*
-      const incrementReplySubscription = API.graphql(graphqlOperation(onIncrementReplies, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
-        next: event => {
-          setReplies(currentReplies.current + 1);
-        }
-      });
-      const decrementReplySubscription = API.graphql(graphqlOperation(onDecrementReplies, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
-        next: event => {
-          setReplies(currentReplies.current - 1);
-        }
-      });
-      */
+        });
+      } else {
+        if (incrementLikeSubscription)
+          incrementLikeSubscription.unsubscribe();
+        if (decrementLikeSubscription)
+          decrementLikeSubscription.unsubscribe();
+        if (incrementReplySubscription)
+          incrementReplySubscription.unsubscribe();
+        if (decrementReplySubscription)
+          decrementReplySubscription.unsubscribe();
+      }
 
       return () => {
         console.log("removing subscriptions and post info is: ", item.userId, "\n")
-        incrementLikeSubscription.unsubscribe();
-        decrementLikeSubscription.unsubscribe();
-        //incrementReplySubscription.unsubscribe();
-        //decrementReplySubscription.unsubscribe();
+        if (incrementLikeSubscription)
+          incrementLikeSubscription.unsubscribe();
+        if (decrementLikeSubscription)
+          decrementLikeSubscription.unsubscribe();
+        if (incrementReplySubscription)
+          incrementReplySubscription.unsubscribe();
+        if (decrementReplySubscription)
+          decrementReplySubscription.unsubscribe();
       }
     }
-  }, [])
+  }, [isVisible])
 
   return (
     <View

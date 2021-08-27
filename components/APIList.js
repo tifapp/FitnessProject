@@ -165,6 +165,7 @@ class APIList extends PureComponent { //we need to make this a class to use refs
                 //removeClippedSubviews={true} //documentation says this may reduce crashing but causes glitches on ios
                 updateCellsBatchingPeriod={20}//numbers could vary based on device and size of memory. this one should be as big as possible, but 50 and above is too large.
                 windowSize={21}
+                onViewableItemsChanged={this.props.onViewableItemsChanged}
               />
         }
 

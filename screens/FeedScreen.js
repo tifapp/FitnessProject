@@ -298,6 +298,13 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         renderItem={renderPostItem}
         keyExtractor={(item) => item.createdAt.toString() + item.userId}
         onEndReachedThreshold={0.5}
+        onViewableItemsChanged={(viewableItems, changed) => {
+          //would be easy if we could trigger a function from here to subscribe or unsubscribe from within the item
+          //the easiest way to affect the items is by changing the posts array
+          //but we only want this to happen once. changing a property may lead to repeated subscriptions if we arent careful.
+          //if we had an "onvisibilitychanged" prop for the postitem that would be super helpful.
+          //we could use a useeffect that listens for the "visibility" prop in the item to change. that could work.
+        }}
       />
       {
         /*
