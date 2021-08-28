@@ -280,7 +280,6 @@ const App = () => {
           drawerContent={(props) => (
             <CustomSidebarMenu
               myId={userId}
-              setConversationIds={setUniqueConversationIds}
               {...props}
             />
           )}

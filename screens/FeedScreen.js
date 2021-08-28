@@ -412,6 +412,8 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
         }
   
         const friend = friendCheck();
+
+        let users = [myId, receiver].sort();
   
         if (checkConversationExists == null) {
           if (friend1.data.getFriendship === null && friend2.data.getFriendship === null) {

@@ -42,7 +42,7 @@ import { batchGetConversations, getConversation, getConversations } from "../src
 
 global.localBlockList = [];
 
-export default function CustomSidebarMenu({ navigation, state, progress, myId, setConversationIds }) {
+export default function CustomSidebarMenu({ navigation, state, progress, myId }) {
   const [lastOnlineTime, setLastOnlineTime] = useState(0);
   const [friendList, setFriendList] = useState([]);
   const [friendRequestList, setFriendRequestList] = useState([]);
@@ -76,9 +76,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
   }
 
   useEffect(() => {
-    const friendIds = [];
-    friendList.forEach(friend => friendIds.push(friend.sender == myId ? friend.receiver : friend.sender));
-    setConversationIds(friendIds);
+    friendList.forEach(friend => global.addConversationIds(friend.sender == myId ? friend.receiver : friend.sender));
   }, [friendList]) //we must extract just the array of ids
 
   const loadLastMessageAndListenForNewOnes = async (newFriend) => {
