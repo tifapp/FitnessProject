@@ -571,12 +571,14 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, togg
         incrementReplySubscription = API.graphql(graphqlOperation(onIncrementReplies, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
           next: event => {
             setReplies(event.value.data.onIncrementReplies.replies);
-          }
+          },          
+          error: error => console.warn(error)
         });
         decrementReplySubscription = API.graphql(graphqlOperation(onDecrementReplies, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
           next: event => {
             setReplies(event.value.data.onDecrementReplies.replies);
-          }
+          },
+          error: error => console.warn(error)
         });
       } else {
         if (incrementLikeSubscription)

@@ -59,12 +59,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "conversationTrigger",
+            "conversationEvents",
             {
               "Fn::Join": [
                 "",
                 [
-                  "conversationTrigger",
+                  "conversationEvents",
                   "-",
                   {
                     "Ref": "env"
@@ -111,12 +111,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "fitnessprojectLambdaRoleefc40b24",
+            "fitnessprojectLambdaRole8c0a97f2",
             {
               "Fn::Join": [
                 "",
                 [
-                  "fitnessprojectLambdaRoleefc40b24",
+                  "fitnessprojectLambdaRole8c0a97f2",
                   "-",
                   {
                     "Ref": "env"
