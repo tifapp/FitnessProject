@@ -361,8 +361,6 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     pushLocalPost(localNewPost);
 
-    let users = [myId, receiver].sort();
-
     if (newPost.receiver) global.updateFriendsListWithMyNewMessage(newPost);
     //if (global.updatemessagescreen)
     //global.updateMessageScreen
@@ -392,47 +390,49 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
         await Storage.put(`feed/${imageID}.${isVideo?videoExtension:'jpg'}`, blob, { level: 'public', contentType: isVideo ? 'video/' + videoExtension : 'image/jpeg' }); //make sure people can't overwrite other people's photos, and preferrably not be able to list all the photos in s3 using brute force. may need security on s3
         setImageURL(null);
       }
-
-      API.graphql(graphqlOperation(createPost, { input: newPost }));
       
-      const friend1 = await API.graphql(graphqlOperation(getFriendship, { sender: myId, receiver: receiver }));
-      const friend2 = await API.graphql(graphqlOperation(getFriendship, { sender: receiver, receiver: myId }));
-
-      let newConversations1 = await API.graphql(graphqlOperation(getConversations, { Accepted: 1 }))
-      let newConversations2 = await API.graphql(graphqlOperation(getConversations, { Accepted: 0 }))
-
-      newConversations1 = newConversations1.data.getConversations.items
-      newConversations2 = newConversations2.data.getConversations.items
-
-      let checkConversationExists = newConversations1.find(item => item.id === newPost.channel);
-
-      if (checkConversationExists == null) {
-        checkConversationExists = newConversations2.find(item => item.id === newPost.channel);
-      }
-
-      const friendCheck = () => {
-        return (friend1 != null ? friend1 : friend2);
-      }
-
-      const friend = friendCheck();
-
-      if (checkConversationExists == null) {
-        if (friend1.data.getFriendship === null && friend2.data.getFriendship === null) {
-          await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postInput, Accepted: 0 } }));
+      if (receiver) {
+        const friend1 = await API.graphql(graphqlOperation(getFriendship, { sender: myId, receiver: receiver }));
+        const friend2 = await API.graphql(graphqlOperation(getFriendship, { sender: receiver, receiver: myId }));
+  
+        let newConversations1 = await API.graphql(graphqlOperation(getConversations, { Accepted: 1 }))
+        let newConversations2 = await API.graphql(graphqlOperation(getConversations, { Accepted: 0 }))
+  
+        newConversations1 = newConversations1.data.getConversations.items
+        newConversations2 = newConversations2.data.getConversations.items
+  
+        let checkConversationExists = newConversations1.find(item => item.id === newPost.channel);
+  
+        if (checkConversationExists == null) {
+          checkConversationExists = newConversations2.find(item => item.id === newPost.channel);
         }
-        else if(friend.data.getFriendship.accepted === null) {
-          await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postInput, Accepted: 0 } }));
+  
+        const friendCheck = () => {
+          return (friend1 != null ? friend1 : friend2);
+        }
+  
+        const friend = friendCheck();
+  
+        if (checkConversationExists == null) {
+          if (friend1.data.getFriendship === null && friend2.data.getFriendship === null) {
+            await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postInput, Accepted: 0 } }));
+          }
+          else if(friend.data.getFriendship.accepted === null) {
+            await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postInput, Accepted: 0 } }));
+          }
+          else {
+            await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postInput, Accepted: 1 } }));
+          }
+        }
+        else if (localNewPost.userId != checkConversationExists.lastUser) {
+          await API.graphql(graphqlOperation(updateConversation, { input: { id: newPost.channel, lastMessage: postInput, Accepted: 1 } }));
         }
         else {
-          await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postInput, Accepted: 1 } }));
+          await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, lastMessage: postInput } }));
         }
       }
-      else if (localNewPost.userId != checkConversationExists.lastUser) {
-        await API.graphql(graphqlOperation(updateConversation, { input: { id: newPost.channel, lastMessage: postInput, Accepted: 1 } }));
-      }
-      else {
-        await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, lastMessage: postInput } }));
-      }
+      
+      API.graphql(graphqlOperation(createPost, { input: newPost }));
     } catch (err) {
       console.warn("error in creating post: ", err);
     }
