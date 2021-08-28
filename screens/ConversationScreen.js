@@ -31,9 +31,47 @@ export default function ConversationScreen({ navigation, route }) {
 
   const updateConversationList = async (newPost) => {
 
+    global.checkFriendshipConversation = (conversation) => {
+
+      let tempConversations = currentConversations.current;
+
+      tempConversations.unshift(conversation);
+
+      setConversations([...tempConversations]);
+    }  
+
     let tempConversations = currentConversations.current;
 
     let newConversation = tempConversations.find(item => newPost.channel === item.id);
+
+    let newConversationCheck = await API.graphql(graphqlOperation(getConversations, { Accepted: 0, sortDirection: 'DESC'}));
+    console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+    console.log(newConversationCheck);
+    console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+
+    if(newConversationCheck.data.getConversations.items.length != 0){
+      //console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||")
+      //console.log(newConversationCheck.data.getConversations.items);
+      //console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||")
+
+      //console.log(newConversationCheck.data.getConversations.items[0].id)
+
+      newConversationCheck = newConversationCheck.data.getConversations.items[0].id === newPost.channel;
+
+      /*
+      console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+      console.log(newPost.channel);
+      console.log(newConversationCheck);
+      console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+      */
+
+      if(newConversationCheck){
+        console.log("Conversation already exists");
+        return;
+      }
+    }
+
+    console.log("Outside");
 
     if (newConversation === undefined) {
       newConversation = await API.graphql(graphqlOperation(getConversations, { Accepted: 1, limit: 1 }));
@@ -49,9 +87,9 @@ export default function ConversationScreen({ navigation, route }) {
     if (newConversation.id === newPost.channel) {
       const conversation = { id: newPost.channel, users: [newPost.userId, newPost.receiver], lastUser: newPost.userId, lastMessage: newPost.description, Accepted: 1 }
 
-      console.log("++++++++++++++++++++++++++++++++")
-      console.log(conversation);
-      console.log("++++++++++++++++++++++++++++++++")
+      //console.log("++++++++++++++++++++++++++++++++");
+      //console.log(conversation);
+      //console.log("++++++++++++++++++++++++++++++++");
 
       let tempConversations = currentConversations.current;
 
@@ -61,6 +99,14 @@ export default function ConversationScreen({ navigation, route }) {
         tempConversations.splice(index, 1); //removes 1 item from the current Conversations at the specified index
       }
 
+      tempConversations.unshift(conversation);
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      //setConversations([conversation, ...currentConversations.current]);
+      setConversations([...tempConversations]);
+    }
+    else{
+      const conversation = { id: newPost.channel, users: [newPost.userId, newPost.receiver], lastUser: newPost.userId, lastMessage: newPost.description, Accepted: 0 }
+      tempConversations = currentConversations.current;
       tempConversations.unshift(conversation);
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       //setConversations([conversation, ...currentConversations.current]);
@@ -151,13 +197,13 @@ export default function ConversationScreen({ navigation, route }) {
         })
       );
     } catch (err) {
-      console.log("error: ", err);
+      //console("error: ", err);
     }
     */
   };
 
   useEffect(() => {
-    console.log("Inside delete Conversation Subscription");
+    //console("Inside delete Conversation Subscription");
     for (let i = 0; i < conversations.length; i++) {
       (async () => {
         subscriptions.push(
@@ -166,6 +212,11 @@ export default function ConversationScreen({ navigation, route }) {
           ).subscribe({
             next: (event) => {
               const conversation = event.value.data.onDeleteConversation;
+
+              console.log("[[[[[[[[[[[[[[[[[");
+              console.log(conversation);
+              console.log("]]]]]]]]]]]]]]]]]");
+
               const filteredConversations = conversations.filter((convo) =>
                 convo.id != conversation.id
               );
@@ -179,8 +230,8 @@ export default function ConversationScreen({ navigation, route }) {
 
   useEffect(() => {
     for (let i = 0; i < conversations.length; i++) {
-      console.log(route.params.myId)
-      console.log(conversations[i])
+      //console(route.params.myId)
+      //console(conversations[i])
     }
   }, [conversations])
 
@@ -193,8 +244,8 @@ export default function ConversationScreen({ navigation, route }) {
   const collectConversations = (items) => {
     //what if conversations array shrinks? we should remove from the conversationids array
 
-    console.log("1. Inside collect Conversations");
-    console.log(items);
+    //console("1. Inside collect Conversations");
+    //console(items);
 
     items.forEach((element) => {
       let userId = null;
@@ -217,7 +268,7 @@ export default function ConversationScreen({ navigation, route }) {
                       userId={ item.users[0] == route.params.myId ? item.users[1] : item.users[0]}
                       subtitleComponent = {<TouchableOpacity
                         onPress={() => {
-                          console.log("message pressed, ");
+                          //console("message pressed, ");
                           item.isRead = true;
                           item.users[0] == route.params.myId ? goToMessages(item.users[1]) : goToMessages(item.users[0]) 
                         }}

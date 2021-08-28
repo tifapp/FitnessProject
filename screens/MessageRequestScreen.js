@@ -29,20 +29,60 @@ var subscriptions = [];
 
 export default function MessageRequestScreen({ navigation, route }) {
 
-  const updateConversationList = async (newPost) => {
+  global.checkFriendshipMessage = (sender, receiver) => {
 
     let tempConversations = currentConversations.current;
 
+    let index = tempConversations.findIndex(item => console.log(item),
+    (item.users[0] == sender && item.users[1] == receiver) 
+    || (item.users[0] == receiver && item.users[1] == sender));
+
+    let conversation = tempConversations[index];
+
+    if (index != -1) {
+      tempConversations.splice(index, 1); //removes 1 item from the current Conversations at the specified index
+    }
+
+    setConversations([...tempConversations]);
+
+    return conversation;
+
+  }
+
+  const updateConversationList = async (newPost) => {
+
+    //console.log("----- updateConversationList ------ ");
+
+    let tempConversations = currentConversations.current;
     let newConversation = tempConversations.find(item => newPost.channel === item.id);
 
-    console.log("inside update");
+    let newConversationCheck = await API.graphql(graphqlOperation(getConversations, { Accepted: 1, sortDirection: 'DESC'}));
+
+    console.log("==============================");
+    console.log(newConversationCheck);
+    console.log("===============================");
+
+    if(newConversationCheck.data.getConversations.items.length != 0){
+      //console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||")
+      //console.log(newConversationCheck.data.getConversations.items);
+      //console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||")
+
+      newConversationCheck = newConversationCheck.data.getConversations.items[0].id === newPost.channel;
+
+      if(newConversationCheck){
+        //console.log("Conversation already exists");
+        return;
+      }
+    }
+
+    ////console("inside update");
 
     if (newConversation === undefined) {
       newConversation = await API.graphql(graphqlOperation(getConversations, { Accepted: 0, limit: 1 }));
 
-      console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-      console.log(newConversation.data.getConversations.items);
-      console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+      ////console("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+      ////console(newConversation.data.getConversations.items);
+      ////console("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
       if (newConversation != null) {
         newConversation = { id: newConversation.data.id }
@@ -56,18 +96,18 @@ export default function MessageRequestScreen({ navigation, route }) {
 
     //let newConversation = null;
 
-    console.log(":::::::::::::::::::::::::::::")
-    console.log(newConversation)
-    console.log(":::::::::::::::::::::::::::::")
+    ////console(":::::::::::::::::::::::::::::")
+    ////console(newConversation)
+    ////console(":::::::::::::::::::::::::::::")
 
     if (newConversation.id === newPost.channel) {
       const conversation = { id: newPost.channel, users: [newPost.userId, newPost.receiver], lastUser: newPost.userId, lastMessage: newPost.description, Accepted: 0 }
 
       tempConversations = currentConversations.current;
 
-      console.log("================================")
-      console.log(conversation);
-      console.log("================================")
+      ////console("================================")
+      ////console(conversation);
+      ////console("================================")
 
       let index = tempConversations.findIndex(item => newPost.channel === item.id);
 
@@ -106,12 +146,12 @@ export default function MessageRequestScreen({ navigation, route }) {
 
         let checkConversationExists =  conversations_temp.find(item => item.id === newPost.channel);
 
-        console.log("----------");
-        console.log(checkConversationExists);
-        console.log("----------");
+        ////console("----------");
+        ////console(checkConversationExists);
+        ////console("----------");
 
 
-        if (checkConversationExists != null && route.params?.myId != newPost.userId) {
+        if (checkConversationExists != null && checkConversationExists.lastUser != newPost.userId) {
           setConversations((conversations) => {
             return conversations.filter(
               (i) => i !== checkConversationExists
@@ -119,6 +159,7 @@ export default function MessageRequestScreen({ navigation, route }) {
           });
         }
         else {
+          ////console("Inside the receiver subscription");
           updateConversationList(newPost);
         }
 
@@ -134,11 +175,10 @@ export default function MessageRequestScreen({ navigation, route }) {
       next: (event) => {
         const newPost = event.value.data.onCreatePostByUser;
         const conversations_temp = currentConversations.current;
-        console.log("+++++++++");
 
         let checkConversationExists = conversations_temp.find(item => item.id === newPost.channel);
 
-        if (checkConversationExists != null && route.params?.myId != newPost.userId) {
+        if (checkConversationExists != null && checkConversationExists.lastUser != newPost.userId) {
 
           setConversations((conversations) => {
             return conversations.filter(
@@ -214,13 +254,13 @@ export default function MessageRequestScreen({ navigation, route }) {
         })
       );
     } catch (err) {
-      console.log("error: ", err);
+      //console("error: ", err);
     }
     */
   };
 
   useEffect(() => {
-    console.log("Inside delete Conversation Subscription");
+    //console("Inside delete Conversation Subscription");
     for (let i = 0; i < conversations.length; i++) {
       (async () => {
         subscriptions.push(
@@ -242,8 +282,8 @@ export default function MessageRequestScreen({ navigation, route }) {
 
   useEffect(() => {
     for (let i = 0; i < conversations.length; i++) {
-      console.log(route.params.myId)
-      console.log(conversations[i])
+      //console(route.params.myId)
+      //console(conversations[i])
     }
   }, [conversations])
 
@@ -256,8 +296,8 @@ export default function MessageRequestScreen({ navigation, route }) {
   const collectConversations = (items) => {
     //what if conversations array shrinks? we should remove from the conversationids array
 
-    console.log("2. Inside collect Conversations");
-    console.log(items);
+    //console("2. Inside collect Conversations");
+    //console(items);
 
     items.forEach((element) => {
       let userId = null;
@@ -280,7 +320,7 @@ export default function MessageRequestScreen({ navigation, route }) {
                       userId={ item.users[0] == route.params.myId ? item.users[1] : item.users[0]}
                       subtitleComponent = {<TouchableOpacity
                         onPress={() => {
-                          console.log("message pressed, ");
+                          //console("message pressed, ");
                           item.isRead = true;
                           item.users[0] == route.params.myId ? goToMessages(item.users[1]) : goToMessages(item.users[0]) 
                         }}
