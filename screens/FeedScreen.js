@@ -75,23 +75,14 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
           newPost.replies = newPost.replies ?? 0;
           if (newPost.userId === route.params?.myId) {
             console.log("received own post again")
-            setPosts(currentPosts.current.map(post => {
+            setPosts(posts => posts.map(post => {
               if (post.userId === route.params?.myId && post.createdAt == "null") return newPost
               else return post;
             }));
           }
-          else if (newPost.parentId != null) {
-            if (currentPosts.current.length > 0 && currentPosts.current.find(post => post.channel === newPost.channel)) {
-              let tempposts = currentPosts.current;
-              var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.channel === newPost.channel)]);
-              tempposts.splice(index + 1, 0, newPost);
-              LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-              setPosts(tempposts);
-            }
-          }
           else {
             LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-            setPosts([newPost, ...currentPosts.current]); //what if we have a lot of new posts at once?
+            setPosts(posts => [newPost, ...posts]); //what if we have a lot of new posts at once?
           }
         }
       }
@@ -101,11 +92,12 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         const deletedPost = event.value.data.onDeletePostFromChannel
         if (deletedPost.userId != route.params?.myId) {//acts as validation, maybe disable textinput while this happens
           if (currentPosts.current.find(post => post.userId === deletedPost.userId && post.createdAt === deletedPost.createdAt)) {
-            let tempposts = currentPosts.current;
-            var index = tempposts.findIndex(post => post.userId === deletedPost.userId && post.createdAt === deletedPost.createdAt);
-            tempposts.splice(index, 1);
             LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-            setPosts(tempposts);
+            setPosts(posts => {
+              var index = posts.findIndex(post => post.userId === deletedPost.userId && post.createdAt === deletedPost.createdAt);
+              posts.splice(index, 1);
+              return posts;
+            });
           }
         }
       }
@@ -271,8 +263,18 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       newSection={
         index == 0 ? true : showTimestamp(posts[index - 1], index - 1)
       }
+      isVisible={item.isVisible}
     />
   ), [])
+
+  const onViewableItemsChanged = React.useCallback(({viewableItems, changedItems}) => {
+    setPosts(posts => posts.map(post => {
+      post.isVisible = false;
+      if (viewableItems.find(item => item.key === post.key))
+        post.isVisible = true;
+      return post;
+    }));
+  }, [])
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -298,13 +300,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         renderItem={renderPostItem}
         keyExtractor={(item) => item.createdAt.toString() + item.userId}
         onEndReachedThreshold={0.5}
-        onViewableItemsChanged={(viewableItems, changed) => {
-          //would be easy if we could trigger a function from here to subscribe or unsubscribe from within the item
-          //the easiest way to affect the items is by changing the posts array
-          //but we only want this to happen once. changing a property may lead to repeated subscriptions if we arent careful.
-          //if we had an "onvisibilitychanged" prop for the postitem that would be super helpful.
-          //we could use a useeffect that listens for the "visibility" prop in the item to change. that could work.
-        }}
+        onViewableItemsChanged={onViewableItemsChanged}
       />
       {
         /*

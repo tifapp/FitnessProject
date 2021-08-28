@@ -152,6 +152,7 @@ export default React.memo(function PostItem({
   showTimestamp,
   newSection,
   reportPost,
+  isVisible,
   index
 }) {
   const navigation = useNavigation();
@@ -201,7 +202,7 @@ export default React.memo(function PostItem({
             repliesPressed={() => replyButtonHandler ? replyButtonHandler() : setAreRepliesVisible(!areRepliesVisible)}
             areRepliesVisible={areRepliesVisible}
             reportPost={reportPost}
-            isVisible={item.isVisible}
+            isVisible={isVisible}
           />
           
           <PostImage

@@ -6,7 +6,7 @@ const config = {
   region: process.env.AWS_REGION,
   auth: {
     type: AUTH_TYPE.AWS_IAM,
-    credentials: AWS.config.credentials,
+    credentials: AWS.config.credentials, 
   },
   disableOffline: true,
 };

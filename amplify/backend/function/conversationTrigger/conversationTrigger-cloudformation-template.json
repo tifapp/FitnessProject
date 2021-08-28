@@ -59,12 +59,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "conversationEvents",
+            "conversationTrigger",
             {
               "Fn::Join": [
                 "",
                 [
-                  "conversationEvents",
+                  "conversationTrigger",
                   "-",
                   {
                     "Ref": "env"
@@ -102,7 +102,7 @@
             "Ref": "functionbackendResourcesArn"
           }
         ],
-        "Timeout": "25"
+        "Timeout": 25
       }
     },
     "LambdaExecutionRole": {
@@ -111,12 +111,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "fitnessprojectLambdaRole5e3e6a61",
+            "fitnessprojectLambdaRoleefc40b24",
             {
               "Fn::Join": [
                 "",
                 [
-                  "fitnessprojectLambdaRole5e3e6a61",
+                  "fitnessprojectLambdaRoleefc40b24",
                   "-",
                   {
                     "Ref": "env"
