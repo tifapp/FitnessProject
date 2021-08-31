@@ -355,19 +355,6 @@ export default React.memo(function PostItem({
                   </Text>
                 </View>
               </View>
-              {
-                /*
-              <PostItem
-                index={index}
-                item={item}
-                //deletePostsAsync={deletePostsAsync}
-                writtenByYou={item.userId === route.params?.myId}
-                //editButtonHandler={updatePostAsync}
-                replyButtonHandler={() => {
-                  setAreRepliesVisible(false);
-                }}
-              /> */
-              }
               <LikesList postId={item.createdAt + "#" + item.userId} />
             </View>
           </Modal>
@@ -466,6 +453,7 @@ export default React.memo(function PostItem({
                     replyButtonHandler={() => {
                       setAreRepliesVisible(false);
                     }}
+                    isVisible={true}
                   />
                 </View>
               }
@@ -550,10 +538,9 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, togg
       if (isVisible === true) { //should be true by default
         incrementLikeSubscription = API.graphql(graphqlOperation(onIncrementLikes, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
           next: event => {
-            console.log("liked post!")
             if (likeDebounce.current) {
-              console.log("you liked post!")
               likeDebounce.current = false;
+              if (event.value.data.onIncrementLikes.likes != likes) setLikes(event.value.data.onIncrementLikes.likes);
             }
             else setLikes(event.value.data.onIncrementLikes.likes);
           },
@@ -561,9 +548,9 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, togg
         });
         decrementLikeSubscription = API.graphql(graphqlOperation(onDecrementLikes, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
           next: event => {
-            console.log("unliked post!")
             if (likeDebounce.current) {
               likeDebounce.current = false;
+              if (event.value.data.onDecrementLikes.likes != likes) setLikes(event.value.data.onDecrementLikes.likes);
             }
             else setLikes(event.value.data.onDecrementLikes.likes);
           },
