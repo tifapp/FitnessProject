@@ -536,7 +536,7 @@ export default React.memo(function PostItem({
       </View>
     );
   }
-}, (oldProps, newProps) => oldProps.item == newProps.item)
+})
 
 function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, toggleEditing, areRepliesVisible, reportPost, isVisible }) {
   const [likes, setLikes] = useState(item.likes);
@@ -546,7 +546,7 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, togg
 
   useEffect(() => {
     if (!item.loading) {
-      if (isVisible) { //should be true by default
+      if (isVisible === true) { //should be true by default
         incrementLikeSubscription = API.graphql(graphqlOperation(onIncrementLikes, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
           next: event => {
             console.log("liked post!")
@@ -580,7 +580,7 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, togg
           },
           error: error => console.warn(error)
         });
-      } else {
+      } else if (isVisible === false) {
         if (incrementLikeSubscription)
           incrementLikeSubscription.unsubscribe();
         if (decrementLikeSubscription)
@@ -590,9 +590,11 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, togg
         if (decrementReplySubscription)
           decrementReplySubscription.unsubscribe();
       }
+      
+      //console.log("visibility changed ", isVisible)
 
       return () => {
-        console.log("removing subscriptions and post info is: ", item.userId, "\n")
+        //console.log("removing subscriptions and post info is: ", item.userId, "\n")
         if (incrementLikeSubscription)
           incrementLikeSubscription.unsubscribe();
         if (decrementLikeSubscription)
@@ -671,15 +673,17 @@ function PostImage({imageID}) {
   };
 
   useEffect(() => {
-    console.log("image id is ", imageID);
-    Storage.get(imageKey, imageConfig) //this will incur lots of repeated calls to the backend, idk how else to fix it right now
-      .then((imageURL) => {
-        setImageURL(imageURL);
-      })
-      .catch((err) => {
-        console.log("could not find image!", err);
-        setImageURL(null);
-      }); //should just use a "profilepic" component
+    //console.log("image id is ", imageID);
+    if (imageID) {
+      Storage.get(imageKey, imageConfig) //this will incur lots of repeated calls to the backend, idk how else to fix it right now
+        .then((imageURL) => {
+          setImageURL(imageURL);
+        })
+        .catch((err) => {
+          console.log("could not find image!", err);
+          setImageURL(null);
+        }); //should just use a "profilepic" component
+    }
   }, [])
 
   if (imageID) {

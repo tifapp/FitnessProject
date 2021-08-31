@@ -144,6 +144,7 @@ class APIList extends PureComponent { //we need to make this a class to use refs
               }} />
             :
             <FlatList
+                viewabilityConfig={this.props.viewabilityConfig}
                 onScroll={this.props.onScroll}
                 scrollEventThrottle={0}
                 ref={this.props.ListRef}

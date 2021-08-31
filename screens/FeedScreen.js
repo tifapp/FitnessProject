@@ -34,6 +34,12 @@ var styles = require('styles/stylesheet');
 
 var allSettled = require('promise.allsettled');
 
+const viewabilityConfig = {
+  minimumViewTime: 300,
+  itemVisiblePercentThreshold: 50,
+  waitForInteraction: false,
+}
+
 export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, originalParentId }) {
   const [posts, setPosts] = useState([]);
 
@@ -268,10 +274,15 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   ), [])
 
   const onViewableItemsChanged = React.useCallback(({viewableItems, changedItems}) => {
+    //console.log("viewable items have changed")
+    let currentIndex = 0;
     setPosts(posts => posts.map(post => {
       post.isVisible = false;
-      if (viewableItems.find(item => item.key === post.key))
+      if (viewableItems[currentIndex] && viewableItems[currentIndex].key === post.createdAt.toString() + post.userId) {
+        //console.log("turning post visible")
+        ++currentIndex;
         post.isVisible = true;
+      }
       return post;
     }));
   }, [])
@@ -279,6 +290,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <APIList
+        viewabilityConfig={viewabilityConfig}
         ListRef={scrollRef}
         ListHeaderComponent={
           <PostInputField
@@ -302,19 +314,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         onEndReachedThreshold={0.5}
         onViewableItemsChanged={onViewableItemsChanged}
       />
-      {
-        /*
-      <View
-        style={{
-          top: 50,
-          position: "absolute",
-          alignSelf: "flex-end",
-        }}
-      >
-        <SpamButton func={addPostAsync} />
-      </View>
-        */
-      }
     </SafeAreaView>
   );
 };
@@ -510,6 +509,19 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
           } : addPostAsync}
         />
       </View>
+      {
+        /*
+      <View
+        style={{
+          top: 50,
+          position: "absolute",
+          alignSelf: "flex-end",
+        }}
+      >
+        <SpamButton func={addPostAsync} />
+      </View>
+      */
+      }
     </View>
   )
 }
