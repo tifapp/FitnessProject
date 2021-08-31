@@ -206,7 +206,8 @@ export default React.memo(function PostItem({
           />
           
           <PostImage
-          imageID={item.imageURL}
+            imageID={item.imageURL}
+            isVisible={isVisible}
           />
 
           <View style={{flexDirection: "row", justifyContent: "space-between"}}>
@@ -591,7 +592,6 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, togg
           decrementReplySubscription.unsubscribe();
       }
       
-      //console.log("visibility changed ", isVisible)
 
       return () => {
         //console.log("removing subscriptions and post info is: ", item.userId, "\n")
@@ -664,8 +664,9 @@ import { Video, AVPlaybackStatus } from 'expo-av';
 
 const re = /(?:\.([^.]+))?$/;
 
-function PostImage({imageID}) {
+function PostImage({imageID, isVisible}) {
   const [imageURL, setImageURL] = useState(null);
+  const video = useRef(null);
   
   let imageKey = `feed/${imageID}`;
   let imageConfig = {
@@ -686,6 +687,16 @@ function PostImage({imageID}) {
     }
   }, [])
 
+  useEffect(() => {
+    if (video.current) {
+      if (isVisible === true) {
+        video.current.playAsync();
+      } else if (isVisible === false) {
+        video.current.pauseAsync();
+      }
+    }
+  }, [isVisible])
+
   if (imageID) {
     return (
       (re.exec(imageID)[1] === 'jpg') ?
@@ -705,6 +716,7 @@ function PostImage({imageID}) {
           }
         /> : <Video
           //onError={addUserInfotoCache}
+          ref={video}
           style={{
             resizeMode: "cover",
             width: Dimensions.get('window').width - 20,
@@ -716,7 +728,6 @@ function PostImage({imageID}) {
           posterSource={require("../assets/icon.png")}
           useNativeControls
           isLooping
-          shouldPlay
         />
     )
   } else return null;

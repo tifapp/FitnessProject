@@ -35,8 +35,8 @@ var styles = require('styles/stylesheet');
 var allSettled = require('promise.allsettled');
 
 const viewabilityConfig = {
-  minimumViewTime: 300,
-  itemVisiblePercentThreshold: 50,
+  minimumViewTime: 150,
+  itemVisiblePercentThreshold: 66,
   waitForInteraction: false,
 }
 
