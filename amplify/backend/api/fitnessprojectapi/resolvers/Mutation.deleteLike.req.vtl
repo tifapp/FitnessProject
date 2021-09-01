@@ -3,6 +3,7 @@
   #set( $authMode = "userPools" )
 #end
 ## [End] Determine request authentication mode **
+$util.qr($context.args.input.put("userId", $util.defaultIfNull($ctx.args.input.userId, $ctx.identity.sub)))
 ## [Start] Check authMode and execute owner/group checks **
 #if( $authMode == "userPools" )
   ## No Static Group Authorization Rules **
@@ -83,9 +84,10 @@
 #end
 ## [End] Check authMode and execute owner/group checks **
 
+
 ## [Start] Set the primary @key. **
 #set( $modelObjectKey = {
-  "userId": $util.dynamodb.toDynamoDB($context.identity.sub),
+  "userId": $util.dynamodb.toDynamoDB($ctx.args.input.userId),
   "postId": $util.dynamodb.toDynamoDB($ctx.args.input.postId)
 } )
 ## [End] Set the primary @key. **
@@ -104,7 +106,8 @@
   #if( $modelObjectKey )
     #set( $condition = {
   "expression": "",
-  "expressionNames": {}
+  "expressionNames": {},
+  "expressionValues": {}
 } )
     #foreach( $entry in $modelObjectKey.entrySet() )
       #if( $velocityCount == 1 )
@@ -119,7 +122,8 @@
   "expression": "attribute_exists(#id)",
   "expressionNames": {
       "#id": "id"
-  }
+  },
+  "expressionValues": {}
 } )
   #end
 #end

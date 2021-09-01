@@ -35,7 +35,7 @@
         },
         "postNotifications": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/postNotifications-705353354b6133793034-build.zip"
+          "s3Key": "amplify-builds/postNotifications-6c63526134436d33322f-build.zip"
         },
         "likeNotifications": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",

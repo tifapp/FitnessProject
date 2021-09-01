@@ -13,10 +13,9 @@ const { client, sendNotification, s3 } = require('/opt/backendResources');
 const {loadCapitals} = require('/opt/stringConversion');
 const SHA256 = require('/opt/hash');
 
-exports.handler = (event, context, callback) => {
-  event.Records.forEach((record) => {
+exports.handler = async (event, context, callback) => {
+  return await Promise.all(event.Records.map(async (record) => {
     if (record.eventName == "INSERT") {
-      (async () => {
         try {
           if (record.dynamodb.NewImage.receiver != null) {
             //message notifications
@@ -42,7 +41,7 @@ exports.handler = (event, context, callback) => {
   
             await sendNotification(receiverName.data.getUser.deviceToken, loadCapitals(senderName.data.getUser.name) + " sent you a message!"); //truncate the sender's name!
             //console.log("sent notifications finished")
-            callback(null, "Successfully sent messaging notification");
+            return "Successfully sent messaging notification";
           } else if (record.dynamodb.NewImage.parentId != null) {
             //reply notifications
             const parentPostId = record.dynamodb.NewImage.parentId.S;
@@ -88,22 +87,20 @@ exports.handler = (event, context, callback) => {
   
             //if (friendshipcheck.data.getFriendship != null) {
               await sendNotification(parent.data.getUser.deviceToken, loadCapitals(replier.data.getUser.name) + " sent you a reply!"); //truncate the sender's name!
-              callback(null, "Finished Replying");
+              return "Finished Replying";
             //}
           } else {
-            callback(null, "not a message or reply");
+            return "not a message or reply";
           }
         }
         catch (e) {
-          //console.warn('Error sending reply: ', e);
-          callback(Error(e));
+          console.warn('Error sending reply: ', e);
+          return Error(e);
         }
-      })();
     } else {
-      (async () => {
         try {          
           if (record.dynamodb.OldImage.imageURL && record.dynamodb.OldImage.imageURL.S !== '') {
-            console.log("attempting to delete image");
+            //console.log("attempting to delete image");
             await s3.deleteObject({ Bucket: process.env.STORAGE_MEDIA_BUCKETNAME, Key: `public/feed/${record.dynamodb.OldImage.imageURL.S}` }).promise();
           }
 
@@ -183,16 +180,15 @@ exports.handler = (event, context, callback) => {
               },
             });
             
-            callback(null, "Finished Replying");
+            return "Finished Replying";
           } else {
-            callback(null, "not a message or reply");
+            return "not a message or reply";
           }
         }
         catch (e) {
           //console.warn('Error sending reply: ', e);
-          callback(Error(e));
+          return Error(e);
         }
-      })();
     }
-  });
+  }));
 };

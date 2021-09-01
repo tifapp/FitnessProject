@@ -22,5 +22,6 @@ input CreateLikeInput {
 }
 
 input DeleteLikeInput {
+  userId: ID
   postId: ID!
 }
