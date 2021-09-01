@@ -279,6 +279,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     setPosts(posts => posts.map(post => {
       post.isVisible = false;
       if (viewableItems[currentIndex] && viewableItems[currentIndex].key === post.createdAt.toString() + post.userId) {
+        //grab the middle of the index, that's the video that should be playing (if there is any)
         //console.log("turning post visible")
         ++currentIndex;
         post.isVisible = true;
@@ -510,7 +511,6 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
         />
       </View>
       {
-        /*
       <View
         style={{
           top: 50,
@@ -520,7 +520,6 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
       >
         <SpamButton func={addPostAsync} />
       </View>
-      */
       }
     </View>
   )

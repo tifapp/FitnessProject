@@ -25,7 +25,7 @@ let expo = new Expo();
 exports.sendNotification = async (deviceToken, message) => {
   if (deviceToken == null || deviceToken == "") return;
 
-  console.log("creating notification");
+  ////console.log("creating notification");
   const pushMessage = {
     to: String(deviceToken),
     sound: "default",
@@ -45,7 +45,7 @@ exports.sendNotification = async (deviceToken, message) => {
         let receipts = await expo.getPushNotificationReceiptsAsync(
           tickets[0].id
         );
-        console.log(receipts);
+        //console.log(receipts);
 
         // The receipts specify whether Apple or Google successfully received the
         // notification and information about an error, if one occurred.

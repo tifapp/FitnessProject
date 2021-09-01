@@ -11,7 +11,7 @@ const { incrementReplies, decrementReplies, deleteLike, deletePost } = require('
 const {getUser, postsByChannel, likesByPost} = require('/opt/queries');
 const { client, sendNotification, s3 } = require('/opt/backendResources');
 const {loadCapitals} = require('/opt/stringConversion');
-const SHA256 = require('/opt/hash');
+const {SHA256} = require('/opt/hash');
 
 exports.handler = async (event, context, callback) => {
   return await Promise.all(event.Records.map(async (record) => {
@@ -98,26 +98,28 @@ exports.handler = async (event, context, callback) => {
           return Error(e);
         }
     } else {
-        try {          
+        try {
           if (record.dynamodb.OldImage.imageURL && record.dynamodb.OldImage.imageURL.S !== '') {
             //console.log("attempting to delete image");
-            await s3.deleteObject({ Bucket: process.env.STORAGE_MEDIA_BUCKETNAME, Key: `public/feed/${record.dynamodb.OldImage.imageURL.S}` }).promise();
+            s3.deleteObject({ Bucket: process.env.STORAGE_MEDIA_BUCKETNAME, Key: `public/feed/${record.dynamodb.OldImage.imageURL.S}` }).promise();
           }
 
           //delete like objects, if any
-          if (record.dynamodb.OldImage.likes.N > 0) {
+          if (record.dynamodb.OldImage.likes && record.dynamodb.OldImage.likes.N > 0) {
             //check if there are likes to delete
+            let nextToken = null;
             while (true) {
               //fetch likes
               const results = await client.query({
                 query: gql(likesByPost),
                 variables: {
                   postId: record.dynamodb.OldImage.createdAt.S + "#" + record.dynamodb.OldImage.userId.S,
+                  nextToken: nextToken,
                 }
               });
   
               //delete likes
-              await Promise.all(results.data.likesByPost.items.map(async (like) => {
+              results.data.likesByPost.items.forEach((like) => {
                 client.mutate({
                   mutation: gql(deleteLike),
                   variables: {
@@ -127,24 +129,28 @@ exports.handler = async (event, context, callback) => {
                     }
                   }
                 });
-              }));
+              });
   
               //loop if there are more likes
-              if (results.data.likesByPost.nextToken == null) break;
+              nextToken = results.data.likesByPost.nextToken;
+              if (nextToken == null) break;
             }
           }
 
           //delete replies, if any
-          if (record.dynamodb.OldImage.replies.N > 0) {
+          if (record.dynamodb.OldImage.replies && record.dynamodb.OldImage.replies.N > 0) {
+            const channel = SHA256(record.dynamodb.OldImage.userId.S+record.dynamodb.OldImage.createdAt.S);
+            let nextToken = null;
             while (true) {
               const results = await client.query({
                 query: gql(postsByChannel),
                 variables: {
-                  channel: SHA256(record.dynamodb.OldImage.userId.S+record.dynamodb.OldImage.createdAt.S),
+                  channel: channel,
+                  nextToken: nextToken,
                 }
               });
 
-              await Promise.all(results.data.postsByChannel.items.map(async (post) => {
+              results.data.postsByChannel.items.forEach((post) => {
                 client.mutate({
                   mutation: gql(deletePost),
                   variables: {
@@ -154,9 +160,10 @@ exports.handler = async (event, context, callback) => {
                     }
                   }
                 });
-              }));
+              });
 
-              if (results.data.postsByChannel.nextToken == null) break;
+              nextToken = results.data.postsByChannel.nextToken;
+              if (nextToken == null) break;
             }
           }
 
@@ -186,7 +193,7 @@ exports.handler = async (event, context, callback) => {
           }
         }
         catch (e) {
-          //console.warn('Error sending reply: ', e);
+          console.warn('Error deleting post: ', e);
           return Error(e);
         }
     }

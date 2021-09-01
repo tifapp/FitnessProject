@@ -16,15 +16,18 @@ exports.handler = async (event) => {
   return await Promise.all(event.Records.map(async record => {
     if (record.eventName == "REMOVE") {
       try {
+        let nextToken = null;
         while (true) {
           const results = await client.query({
             query: gql(postsByChannel),
             variables: {
               channel: record.dynamodb.OldImage.id.S,
+              limit: Math.floor(Math.random() * (1000 - 100) + 100),
+              nextToken: nextToken,
             }
           });
 
-          //console.log(results.data)
+          console.log(results.data)
 
           await Promise.all(results.data.postsByChannel.items.map(async (post) => {
             client.mutate({
@@ -38,7 +41,8 @@ exports.handler = async (event) => {
             });
           }));
 
-          if (results.data.postsByChannel.nextToken == null) break;
+          nextToken = results.data.postsByChannel.nextToken;
+          if (nextToken == null) break;
         }
 
         return "successfully deleted messages";
