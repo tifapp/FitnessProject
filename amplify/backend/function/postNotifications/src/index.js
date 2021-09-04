@@ -97,7 +97,7 @@ exports.handler = async (event, context, callback) => {
           console.warn('Error sending reply: ', e);
           return Error(e);
         }
-    } else {
+    } else if (record.eventName == "REMOVE") {
         try {
           if (record.dynamodb.OldImage.imageURL && record.dynamodb.OldImage.imageURL.S !== '') {
             //console.log("attempting to delete image");
