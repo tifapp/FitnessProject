@@ -270,13 +270,29 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         index == 0 ? true : showTimestamp(posts[index - 1], index - 1)
       }
       isVisible={item.isVisible}
+      shouldSubscribe={item.shouldSubscribe}
     />
   ), [])
 
   const onViewableItemsChanged = React.useCallback(({viewableItems, changedItems}) => {
-    //console.log("viewable items have changed")
+    console.log("viewable items have changed")
+
+    if (viewableItems.length <= 0) return;
+
+    //find the index in the posts array of the first item in viewableitems.
+    const firstViewableIndex = posts.findIndex(post => viewableItems[0].key === post.createdAt.toString() + post.userId); //use currentposts?
+    //record that starting index
+
+    //loop through the posts array until we hit startingindex - 20 and turn off subscription flags
+    //turn on subscription flags until we hit startingindex + viewableitems.length + 20
     let currentIndex = 0;
-    setPosts(posts => posts.map(post => {
+    setPosts(posts => posts.map((post, index) => {
+      if (index >= firstViewableIndex - 20 && index <= firstViewableIndex + viewableItems.length + 20) {
+        post.shouldSubscribe = true;
+      } else {
+        post.shouldSubscribe = false;
+      }
+
       post.isVisible = false;
       if (viewableItems[currentIndex] && viewableItems[currentIndex].key === post.createdAt.toString() + post.userId) {
         //grab the middle of the index, that's the video that should be playing (if there is any)
@@ -284,8 +300,11 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         ++currentIndex;
         post.isVisible = true;
       }
+
       return post;
     }));
+
+    //in the postitem have a useeffect listening for the subscription flag to turn on and off subscriptions for that post
   }, [])
 
   return (

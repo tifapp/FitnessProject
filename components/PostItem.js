@@ -153,6 +153,7 @@ export default React.memo(function PostItem({
   newSection,
   reportPost,
   isVisible,
+  shouldSubscribe,
   index
 }) {
   const navigation = useNavigation();
@@ -202,7 +203,7 @@ export default React.memo(function PostItem({
             repliesPressed={() => replyButtonHandler ? replyButtonHandler() : setAreRepliesVisible(!areRepliesVisible)}
             areRepliesVisible={areRepliesVisible}
             reportPost={reportPost}
-            isVisible={isVisible}
+            shouldSubscribe={shouldSubscribe}
           />
           
           <PostImage
@@ -527,7 +528,7 @@ export default React.memo(function PostItem({
   }
 })
 
-function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, toggleEditing, areRepliesVisible, reportPost, isVisible }) {
+function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, toggleEditing, areRepliesVisible, reportPost, shouldSubscribe }) {
   const [likes, setLikes] = useState(item.likes);
   const [replies, setReplies] = useState(item.replies);
   const likeDebounce = useRef(false);
@@ -535,7 +536,7 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, togg
 
   useEffect(() => {
     if (!item.loading) {
-      if (isVisible === true) { //should be true by default
+      if (shouldSubscribe === true) { //should be true by default
         incrementLikeSubscription = API.graphql(graphqlOperation(onIncrementLikes, { createdAt: item.createdAt, userId: item.userId })).subscribe({ //nvm we dont have a subscription event for incrementlike
           next: event => {
             if (likeDebounce.current) {
@@ -568,7 +569,7 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, togg
           },
           error: error => console.warn(error)
         });
-      } else if (isVisible === false) {
+      } else if (shouldSubscribe === false) {
         if (incrementLikeSubscription)
           incrementLikeSubscription.unsubscribe();
         if (decrementLikeSubscription)
@@ -592,7 +593,7 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, togg
           decrementReplySubscription.unsubscribe();
       }
     }
-  }, [isVisible])
+  }, [shouldSubscribe])
 
   return (
     <View
