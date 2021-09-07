@@ -45,15 +45,6 @@ class APIList extends PureComponent { //we need to make this a class to use refs
     }
   }
 
-  // componentDidUpdate(prevProps, prevState) {
-  //   if (this.props.data !== prevProps.data) {
-  //     if (!this.state.loadingMore && this.state.nextToken != null && this.props.data.length < (this.props.initialAmount == null ? 10 : this.props.initialAmount)) {
-  //       this.setState({ loadingMore: true });
-  //       this.loadMore(true);
-  //     }
-  //   }
-  // }
-
   loadMore = () => {
     //console.log("can we load more???");
     if (!this.state.loadingMore && this.state.nextToken != null) { //if we don't check this, the list will repeat endlessly
