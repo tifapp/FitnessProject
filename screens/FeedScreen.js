@@ -520,9 +520,19 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
           <IconButton
             iconName={"camera-alt"}
             size={20}
+            style={{marginRight: 6}}
             color={imageURL === null || postIsLoading ? "gray" : "blue"}
             onPress={() => pickFromCamera(setImageURL, null, setIsVideo)}
           />
+          {
+            imageURL != null ? 
+            <IconButton
+              iconName={"close"}
+              size={20}
+              color={imageURL === null || postIsLoading ? "gray" : "blue"}
+              onPress={() => setImageURL(null)}
+            /> : null
+          }
         </View>
         <IconButton
           iconName={(postInput === "" && imageURL === null) || postIsLoading ? "add-circle-outline" : "add-circle"}
