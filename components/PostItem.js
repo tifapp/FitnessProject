@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   Linking,
   LayoutAnimation,
+  ActivityIndicator,
   Alert,
   Modal,
   Dimensions
@@ -171,7 +172,19 @@ export default React.memo(function PostItem({
 
   let likes = item.likes;
 
-  if (receiver == null)
+  if (item.loading) return (
+    <ActivityIndicator 
+    size="large" 
+    color="#0000ff"
+    style={{
+      flex: 1,
+      justifyContent: "center",
+      flexDirection: "row",
+      justifyContent: "space-around",
+      padding: 20,
+    }} />
+  )
+  else if (receiver == null)
     return (
       <View style={[styles.secondaryContainerStyle, {
         backgroundColor: "#efefef",
@@ -266,40 +279,43 @@ export default React.memo(function PostItem({
             </View>
           </View>
 
-          <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: likedUsers.length > 0 ? 8 : 0, marginBottom: likedUsers.length > 0 ? 16 : 0 }} onPress={() => setAreLikesVisible(true)}>
-            <APIList
-              style={{ margin: 0, padding: 0 }}
-              horizontal={true}
-              queryOperation={likesByPost}
-              filter={{ postId: item.createdAt + "#" + item.userId, sortDirection: "DESC", }}
-              initialAmount={1}
-              additionalAmount={0}
-              data={likedUsers}
-              setDataFunction={setLikedUsers}
-              renderItem={({ item }) => (
-                <View style={{flexDirection: "row", alignItems: "center"}}>
-                  <ProfileImageAndName
-                    style={{
-                      alignContent: "flex-start",
-                      alignItems: "center",
-                      alignSelf: "flex-end",
-                      justifyContent: "flex-start",
-                      flexDirection: "row",
-                      marginLeft: 15,
-                      marginRight: 5,
-                    }}
-                    imageSize={20}
-                    userId={item.userId}
-                    onPress={() => setAreLikesVisible(true)}
-                  />
-                  <Text>
-                    {likes > 1 ? "and " + (likes-1) + " others" : ""} liked this post
-                  </Text>
-                </View>
-              )}
-              keyExtractor={(item) => item.userId}
-            />
-          </TouchableOpacity>
+          {
+            item.loading ??
+            <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: likedUsers.length > 0 ? 8 : 0, marginBottom: likedUsers.length > 0 ? 16 : 0 }} onPress={() => setAreLikesVisible(true)}>
+              <APIList
+                style={{ margin: 0, padding: 0 }}
+                horizontal={true}
+                queryOperation={likesByPost}
+                filter={{ postId: item.createdAt + "#" + item.userId, sortDirection: "DESC", }}
+                initialAmount={1}
+                additionalAmount={0}
+                data={likedUsers}
+                setDataFunction={setLikedUsers}
+                renderItem={({ item }) => (
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <ProfileImageAndName
+                      style={{
+                        alignContent: "flex-start",
+                        alignItems: "center",
+                        alignSelf: "flex-end",
+                        justifyContent: "flex-start",
+                        flexDirection: "row",
+                        marginLeft: 15,
+                        marginRight: 5,
+                      }}
+                      imageSize={20}
+                      userId={item.userId}
+                      onPress={() => setAreLikesVisible(true)}
+                    />
+                    <Text>
+                      {likes > 1 ? "and " + (likes - 1) + " others" : ""} liked this post
+                    </Text>
+                  </View>
+                )}
+                keyExtractor={(item) => item.userId}
+              />
+            </TouchableOpacity>
+          }
 
           <Modal
             animationType="slide"

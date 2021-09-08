@@ -348,9 +348,12 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
   const [postInput, setPostInput] = useState("");
   const [imageURL, setImageURL] = useState(null);
   const [isVideo, setIsVideo] = useState(null);
+  const [postIsLoading, setPostIsLoading] = useState(false);
   
   const addPostAsync = async () => {
-    console.log("current date is ", Date.now());
+    //console.log("current date is ", Date.now());
+    setPostIsLoading(true);
+
     const imageID = SHA256(Date.now().toString());
 
     const newPost = {
@@ -457,6 +460,8 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
     } catch (err) {
       console.warn("error in creating post: ", err);
     }
+
+    setPostIsLoading(false);
   };
 
   return (  
@@ -508,23 +513,25 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
           <IconButton
             iconName={"insert-photo"}
             size={20}
-            color={imageURL === null ? "gray" : "blue"}
+            color={imageURL === null || postIsLoading ? "gray" : "blue"}
             style={{marginRight: 6}}
             onPress={() => pickFromGallery(setImageURL, null, setIsVideo)}
           />
           <IconButton
             iconName={"camera-alt"}
             size={20}
-            color={imageURL === null ? "gray" : "blue"}
+            color={imageURL === null || postIsLoading ? "gray" : "blue"}
             onPress={() => pickFromCamera(setImageURL, null, setIsVideo)}
           />
         </View>
         <IconButton
-          iconName={postInput === "" && imageURL === null ? "add-circle-outline" : "add-circle"}
+          iconName={(postInput === "" && imageURL === null) || postIsLoading ? "add-circle-outline" : "add-circle"}
           size={15}
-          color={postInput === "" && imageURL === null ? "gray" : "blue"}
+          color={(postInput === "" && imageURL === null) || postIsLoading ? "gray" : "blue"}
           label={receiver != null ? "Send Message" : "Add Post"}
-          onPress={postInput === "" && imageURL === null ? () => {
+          onPress={postIsLoading ? () => {
+            alert("Currently uploading a post");
+          } : postInput === "" && imageURL === null ? () => {
             alert("No text detected in text field");
           } : addPostAsync}
         />
