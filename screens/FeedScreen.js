@@ -262,6 +262,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       item={item}
       deletePostsAsync={deletePostsAsync}
       writtenByYou={item.userId === route.params?.myId}
+      myId={route.params?.myId}
       editButtonHandler={updatePostAsync}
       receiver={receiver}
       showTimestamp={showTimestamp(item, index)}

@@ -36,7 +36,7 @@ import APIList from 'components/APIList';
 
 var styles = require("../styles/stylesheet");
 
-function LikeButton({ setLikes, likes, likedByYou, postId, likeDebounceRef }) {
+function LikeButton({ setLikes, likes, myId, likedByYou, postId, likeDebounceRef }) {
   const [liked, setLiked] = useState(likedByYou);
   const likeRef = useRef();
   const timerIsRunning = useRef();
@@ -64,7 +64,7 @@ function LikeButton({ setLikes, likes, likedByYou, postId, likeDebounceRef }) {
       } else {
         API.graphql(
           graphqlOperation(deleteLike, {
-            input: { userId: "0", postId: postId },
+            input: { userId: myId, postId: postId },
           })
         );
       }
@@ -155,6 +155,7 @@ export default React.memo(function PostItem({
   reportPost,
   isVisible,
   shouldSubscribe,
+  myId,
   index
 }) {
   const navigation = useNavigation();
@@ -210,6 +211,7 @@ export default React.memo(function PostItem({
         >
           <PostHeader
             item={item}
+            myId={myId}
             deletePostsAsync={deletePostsAsync}
             writtenByYou={writtenByYou}
             toggleEditing={() => setIsEditing(!isEditing)}
@@ -544,7 +546,7 @@ export default React.memo(function PostItem({
   }
 })
 
-function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, toggleEditing, areRepliesVisible, reportPost, shouldSubscribe }) {
+function PostHeader({ item, myId, writtenByYou, repliesPressed, deletePostsAsync, toggleEditing, areRepliesVisible, reportPost, shouldSubscribe }) {
   const [likes, setLikes] = useState(item.likes);
   const [replies, setReplies] = useState(item.replies);
   const likeDebounce = useRef(false);
@@ -642,6 +644,7 @@ function PostHeader({ item, writtenByYou, repliesPressed, deletePostsAsync, togg
           }}
         >
           <LikeButton
+            myId={myId}
             setLikes={setLikes}
             likes={likes}
             likedByYou={item.likedByYou}
