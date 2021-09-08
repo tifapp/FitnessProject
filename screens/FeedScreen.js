@@ -260,6 +260,8 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     <PostItem
       index={index}
       item={item}
+      likes={item.likes}
+      replies={item.replies}
       deletePostsAsync={deletePostsAsync}
       writtenByYou={item.userId === route.params?.myId}
       myId={route.params?.myId}

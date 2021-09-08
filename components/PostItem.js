@@ -156,6 +156,8 @@ export default React.memo(function PostItem({
   isVisible,
   shouldSubscribe,
   myId,
+  likes,
+  replies,
   index
 }) {
   const navigation = useNavigation();
