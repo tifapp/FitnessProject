@@ -5,6 +5,7 @@ import {
   View,
   SafeAreaView,
   LayoutAnimation,
+  Animated,
 } from "react-native";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation, Cache, Storage } from "aws-amplify";
@@ -278,7 +279,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   ), [])
 
   const onViewableItemsChanged = React.useCallback(({viewableItems, changedItems}) => {
-    console.log("viewable items have changed")
+    //console.log("viewable items have changed")
 
     if (viewableItems.length <= 0) return;
 
@@ -352,6 +353,22 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
   const [imageURL, setImageURL] = useState(null);
   const [isVideo, setIsVideo] = useState(null);
   const [postIsLoading, setPostIsLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  let animation = useRef(new Animated.Value(0));
+
+  useEffect(() => {
+    Animated.timing(animation.current, {
+      toValue: progress,
+      duration: 200
+    }).start();
+  },[progress])
+
+  const width = animation.current.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0%", "100%"],
+    extrapolate: "clamp"
+  })
   
   const addPostAsync = async () => {
     //console.log("current date is ", Date.now());
@@ -408,11 +425,18 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
           const response = await fetch(imageURL);
           blob = await response.blob();
         }
-  
+
         //scan the uri and check filetype. maybe console log the uri first
         const re = /(?:\.([^.]+))?$/;
         const videoExtension = re.exec(imageURL)[1];
-        await Storage.put(`feed/${imageID}.${isVideo?videoExtension:'jpg'}`, blob, { level: 'public', contentType: isVideo ? 'video/' + videoExtension : 'image/jpeg' }); //make sure people can't overwrite other people's photos, and preferrably not be able to list all the photos in s3 using brute force. may need security on s3
+        await Storage.put(`feed/${imageID}.${isVideo ? videoExtension : 'jpg'}`, blob, {
+          progressCallback(progress) {
+            setProgress(progress.loaded / progress.total);
+            //console.log(progress); //what is "part"
+          },
+          level: 'public', contentType: isVideo ? 'video/' + videoExtension : 'image/jpeg'
+        }); //make sure people can't overwrite other people's photos, and preferrably not be able to list all the photos in s3 using brute force. may need security on s3
+        setProgress(0);
         setImageURL(null);
       }
       
@@ -549,16 +573,35 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
           } : addPostAsync}
         />
       </View>
+
       {
-      <View
-        style={{
-          top: 50,
-          position: "absolute",
-          alignSelf: "flex-end",
-        }}
-      >
-        <SpamButton func={addPostAsync} />
-      </View>
+        progress > 0 ?
+          <View style={{
+            height: 20,
+            backgroundColor: 'white',
+            margin: 15,
+            borderRadius: 5,
+          }}>
+            <Animated.View style={[{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0
+            }, { backgroundColor: "#8BED4F", width }]} />
+          </View> : null
+      }
+
+      {
+        <View
+          style={{
+            top: 50,
+            position: "absolute",
+            alignSelf: "flex-end",
+          }}
+        >
+          <SpamButton func={addPostAsync} />
+        </View>
       }
     </View>
   )
