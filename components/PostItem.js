@@ -36,7 +36,7 @@ import APIList from 'components/APIList';
 
 var styles = require("../styles/stylesheet");
 
-function LikeButton({ setLikes, likes, myId, likedByYou, postId, likeDebounceRef }) {
+function LikeButton({ onTap, likes, myId, likedByYou, postId, likeDebounceRef }) {
   const [liked, setLiked] = useState(likedByYou);
   const likeRef = useRef();
   const timerIsRunning = useRef();
@@ -77,7 +77,7 @@ function LikeButton({ setLikes, likes, myId, likedByYou, postId, likeDebounceRef
     liked ? playSound("unlike") : playSound("like");
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     try {
-      liked ? setLikes(likes - 1) : setLikes(likes + 1);
+      onTap(liked);
       setLiked(!liked);
       resetTimeout();
     } catch (err) {
@@ -172,8 +172,6 @@ export default React.memo(function PostItem({
   const [areLikesVisible, setAreLikesVisible] = useState(false);
 
   const [likedUsers, setLikedUsers] = useState([]);
-
-  let likes = item.likes;
 
   if (item.loading) return (
     <ActivityIndicator 
@@ -531,17 +529,15 @@ export default React.memo(function PostItem({
           >
             {item.description}
           </LinkableText>
-          <View>
-            <Text
-              style={{
-                color: "gray",
-                marginTop: 15,
-                textAlign: isReceivedMessage ? "left" : "right",
-              }}
-            >
-              {displayTime}
-            </Text>
-          </View>
+          <Text
+            style={{
+              color: "gray",
+              marginTop: 15,
+              textAlign: isReceivedMessage ? "left" : "right",
+            }}
+          >
+            {displayTime}
+          </Text>
         </View>
       </View>
     );
@@ -615,6 +611,9 @@ function PostHeader({ item, myId, writtenByYou, repliesPressed, deletePostsAsync
     }
   }, [shouldSubscribe])
 
+  useEffect(() => {item.likes = likes}, [likes])
+  useEffect(() => {item.replies = replies}, [replies])
+
   return (
     <View
       style={{
@@ -647,11 +646,19 @@ function PostHeader({ item, myId, writtenByYou, repliesPressed, deletePostsAsync
         >
           <LikeButton
             myId={myId}
-            setLikes={setLikes}
             likes={likes}
             likedByYou={item.likedByYou}
             postId={item.createdAt + "#" + item.userId}
             likeDebounceRef={likeDebounce}
+            onTap={(liked) => {
+              if (liked) {
+                setLikes(likes => likes - 1);
+                item.likedByYou = false;
+              } else {
+                setLikes(likes => likes + 1);
+                item.likedByYou = true;
+              }
+            }}
           />
           <IconButton
             iconName={"chat-bubble-outline"}
