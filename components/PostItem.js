@@ -36,11 +36,15 @@ import APIList from 'components/APIList';
 
 var styles = require("../styles/stylesheet");
 
-function LikeButton({ onTap, likes, myId, likedByYou, postId, likeDebounceRef }) {
-  const [liked, setLiked] = useState(likedByYou);
+function LikeButton({ onTap, likes, myId, item, postId, likeDebounceRef }) {
+  const [liked, setLiked] = useState(item.likedByYou);
   const likeRef = useRef();
   const timerIsRunning = useRef();
   const likeTimeout = useRef();
+
+  useEffect(() => {
+    setLiked(item.likedByYou)
+  }, [item.likedByYou])
 
   const resetTimeout = () => {
     //if there's already a timeout running do not update ref
@@ -462,19 +466,18 @@ export default React.memo(function PostItem({
             </View>
             <FeedScreen
               headerComponent={
-                <View>
-                  <PostItem
-                    index={index}
-                    item={item}
-                    //deletePostsAsync={deletePostsAsync}
-                    writtenByYou={item.userId === route.params?.myId}
-                    //editButtonHandler={updatePostAsync}
-                    replyButtonHandler={() => {
-                      setAreRepliesVisible(false);
-                    }}
-                    isVisible={true}
-                  />
-                </View>
+                <PostItem
+                  index={index}
+                  item={item}
+                  myId={myId}
+                  //deletePostsAsync={deletePostsAsync}
+                  writtenByYou={item.userId === route.params?.myId}
+                  //editButtonHandler={updatePostAsync} deleting a post while on the reply screen?
+                  replyButtonHandler={() => {
+                    setAreRepliesVisible(false);
+                  }}
+                  shouldSubscribe={true}
+                />
               }
               navigation={navigation}
               route={route}
@@ -634,8 +637,7 @@ function PostHeader({ item, myId, writtenByYou, repliesPressed, deletePostsAsync
         }
       />
       
-      {
-        
+      {        
         !item.loading ?
         <View
           style={{
@@ -647,7 +649,7 @@ function PostHeader({ item, myId, writtenByYou, repliesPressed, deletePostsAsync
           <LikeButton
             myId={myId}
             likes={likes}
-            likedByYou={item.likedByYou}
+            item={item}
             postId={item.createdAt + "#" + item.userId}
             likeDebounceRef={likeDebounce}
             onTap={(liked) => {
