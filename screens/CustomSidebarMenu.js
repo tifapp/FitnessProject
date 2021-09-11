@@ -94,7 +94,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
   const loadLastMessageAndListenForNewOnes = async (newFriend) => {
     //check if a convo already exists between the two users
     const friendlistarray = [newFriend.sender, newFriend.receiver].sort();
-    
+
     const convo = await API.graphql(
       graphqlOperation(getConversation, { id: friendlistarray[0] + friendlistarray[1] })
     );
@@ -155,9 +155,9 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
       .then((time) => {
         setLastOnlineTime(time);
       });
-    
+
     const receivedConversationSubscription = API.graphql(
-      graphqlOperation(onCreatePostForReceiver, {receiver: myId})
+      graphqlOperation(onCreatePostForReceiver, { receiver: myId })
     ).subscribe({
       next: (event) => {
         const newPost = event.value.data.onCreatePostForReceiver;
@@ -180,21 +180,21 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
         if (newFriendRequest.sender !== myId && newFriendRequest.receiver !== myId)
           //console("security error with incoming friend request");
 
-        //if this new request is coming from someone already in your local friends list, remove them from your local friends list
-        if (currentFriends.current.find((item) => item.sender === newFriendRequest.sender)) {
-          setFriendList(
-            currentFriends.current.filter(
-              (item) => item.sender != newFriendRequest.sender || item.receiver != newFriendRequest.sender
-            )
-          );
-        }
+          //if this new request is coming from someone already in your local friends list, remove them from your local friends list
+          if (currentFriends.current.find((item) => item.sender === newFriendRequest.sender)) {
+            setFriendList(
+              currentFriends.current.filter(
+                (item) => item.sender != newFriendRequest.sender || item.receiver != newFriendRequest.sender
+              )
+            );
+          }
 
         //if this new request is not already in your local friend request list, add it to your local friend request list
         if (currentFriendRequests.current.find((item) => item.sender === newFriendRequest.sender)) {
           setFriendRequestList(
             currentFriendRequests.current.filter(
               (item) => item.sender != newFriendRequest.sender || item.receiver != newFriendRequest.sender
-          ));
+            ));
         }
 
         //if the drawer is closed, show the blue dot in the corner
@@ -202,7 +202,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
           ////console("incrementing counter");
           global.showNotificationDot();
         }
-        
+
         setNewFriendRequests(currentNewFriendRequestCount.current + 1);
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         setFriendRequestList([
@@ -223,7 +223,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
             setFriendRequestList(
               currentFriendRequests.current.filter(
                 (item) => item.sender != newFriendRequest.sender || item.receiver != newFriendRequest.sender
-            ));
+              ));
           }
 
           //console("someone accepted us")
@@ -233,15 +233,15 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
           }
         }
 
-        if(global.checkFriendshipMessage !== undefined){
-          let backupConversation = await API.graphql(graphqlOperation(getConversationByUsers, { users: [newFriend.sender,newFriend.receiver].sort()}));
+        if (global.checkFriendshipMessage !== undefined) {
+          let backupConversation = await API.graphql(graphqlOperation(getConversationByUsers, { users: [newFriend.sender, newFriend.receiver].sort() }));
           console.log("Message Screen is unopened");
 
           backupConversation = backupConversation.data.getConversationByUsers.items[0];
           global.checkFriendshipMessage(backupConversation);
         }
 
-        if(global.checkFriendshipMessage !== undefined && global.checkFriendshipConversation !== undefined){
+        if (global.checkFriendshipMessage !== undefined && global.checkFriendshipConversation !== undefined) {
           console.log("Both the Message Screen and Conversation Screens are opened");
           let conversation = global.checkFriendshipMessage(newFriend.sender, newFriend.receiver);
           global.checkFriendshipConversation(conversation);
@@ -272,10 +272,10 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
       friendRequestSubscription.unsubscribe();
       subscriptions.forEach(element => {
         element.unsubscribe();
-      });      
+      });
       receivedConversationSubscription.unsubscribe();
       //conversationUpdateSubscription.unsubscribe();
-      currentFriendRequests.current.forEach(item => {if (item.rejected || item.accepted) confirmResponse(item);});
+      currentFriendRequests.current.forEach(item => { if (item.rejected || item.accepted) confirmResponse(item); });
     };
   }, []);
 
@@ -291,11 +291,11 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
   const checkNewRequests = (items) => {
     items.forEach((item) => {
       if (lastOnlineTime > 0 && new Date(item.createdAt).getTime() > lastOnlineTime) {
-        setNewFriendRequests(newFriendRequests+1); //do we ever want to increase the number when loading more requests?
+        setNewFriendRequests(newFriendRequests + 1); //do we ever want to increase the number when loading more requests?
       }
     });
   };
-  
+
   const fetchLatestMessages = async (items) => {
     subscriptions.forEach(element => {
       element.unsubscribe();
@@ -305,16 +305,16 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
     let conversationIds = [];
 
     items.forEach((item) => {
-      conversationIds.push({id: item.sender < item.receiver ? item.sender+item.receiver : item.receiver+item.sender});
+      conversationIds.push({ id: item.sender < item.receiver ? item.sender + item.receiver : item.receiver + item.sender });
     });
-    
+
     try {
       const conversations = await API.graphql(graphqlOperation(batchGetConversations, { ids: conversationIds }));
       ////console("looking for conversations: ", conversations);
       //returns an array of like objects or nulls corresponding with the array of conversations
       for (i = 0; i < items.length; ++i) {
         ////console("friend list item: ", items[i]);
-        const friendslistarray = [items[i].sender,items[i].receiver].sort();
+        const friendslistarray = [items[i].sender, items[i].receiver].sort();
         ////console("friend list array: ", friendslistarray);
         (async () => {
           subscriptions.push(
@@ -395,7 +395,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
       })
     ); //locally removes the item
   }
-  
+
   // runs when either for accepting or rejecting a friend request
   const confirmResponse = async (item, isNew) => {
     if (friendRequestList.length == 1) playSound("celebrate");
@@ -409,7 +409,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
 
     if (item.accepted && (friendList.length == 0 || !friendList.find(item1 => item1.sender == item.sender && item1.receiver == item.receiver))) {
       //console("Inside removeFriendRequestListItem");
-      
+
       var newFriend = {
         createdAt: (new Date(Date.now())).toISOString(),
         updatedAt: (new Date(Date.now())).toISOString(),
@@ -419,27 +419,27 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
 
       loadLastMessageAndListenForNewOnes(newFriend);
     }
-    
+
     try {
       if (item.accepted) {
-        
+
         const friend_sender = item.sender;
         const friend_receiver = item.receiver;
 
         let newConversations1 = await API.graphql(graphqlOperation(getConversations, { Accepted: 0 }))
         newConversations1 = newConversations1.data.getConversations.items
 
-        let checkConversationExists = newConversations1.find(item => 
+        let checkConversationExists = newConversations1.find(item =>
           (item.users[0] == friend_sender && item.users[1] == friend_receiver) || (item.users[0] == friend_receiver && item.users[1] == friend_sender));
 
-        if(checkConversationExists != null){
+        if (checkConversationExists != null) {
           channel = checkConversationExists.id;
           await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, Accepted: 1 } }));
         }
 
         await API.graphql(
           graphqlOperation(updateFriendship, {
-            input: { sender: item.sender, accepted: true}
+            input: { sender: item.sender, accepted: true }
           })
         );
         ////console("accepted: " + accepted);
@@ -467,7 +467,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
     // delete friend object
     try {
       if (blocked) {
-        global.localBlockList.push({createdAt: (new Date(Date.now())).toISOString(), userId: myId , blockee: item.receiver == myId ? item.sender : item.receiver});
+        global.localBlockList.push({ createdAt: (new Date(Date.now())).toISOString(), userId: myId, blockee: item.receiver == myId ? item.sender : item.receiver });
         API.graphql(
           graphqlOperation(createBlock, {
             input: { blockee: item.receiver == myId ? item.sender : item.receiver },
@@ -537,7 +537,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
         iconColor={newFriendRequests > 0 ? "blue" : "gray"}
         iconOpenColor={newFriendRequests > 0 ? "blue" : "black"}
         closeFunction={() => {
-          friendRequestList.forEach(item => {if (item.rejected || item.accepted) confirmResponse(item);});
+          friendRequestList.forEach(item => { if (item.rejected || item.accepted) confirmResponse(item); });
           setNewFriendRequests(0);
           const newlist = friendRequestList.filter((i) => !i.accepted && !i.rejected);
           setFriendRequestList(
@@ -551,11 +551,13 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
           style={{}}
           //initialLoadFunction={checkNewRequests}
           queryOperation={friendsByReceiver}
-          filter={{ receiver: myId, sortDirection: "DESC", filter: {
-                accepted: {
-                  attributeExists: false,
-                },
-          }, }}
+          filter={{
+            receiver: myId, sortDirection: "DESC", filter: {
+              accepted: {
+                attributeExists: false,
+              },
+            },
+          }}
           setDataFunction={setFriendRequestList}
           data={friendRequestList}
           initialAmount={21}
@@ -575,13 +577,13 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
           keyExtractor={(item) => item.sender}
           ListEmptyComponent={
             <Text
-            style={{
-              alignSelf: "center",
-              justifyContent: "center",
-              color: "gray",
-              marginVertical: 15,
-              fontSize: 15,
-            }}>
+              style={{
+                alignSelf: "center",
+                justifyContent: "center",
+                color: "gray",
+                marginVertical: 15,
+                fontSize: 15,
+              }}>
               No new requests!
             </Text>
           }
@@ -637,6 +639,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
               navigation={navigation}
               removeFriendHandler={removeFriend}
               item={item}
+              sidebar={true}
               friendId={item.sender === myId ? item.receiver : item.sender}
               myId={myId}
               lastMessage={item.lastMessage}
@@ -647,60 +650,67 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
           keyExtractor={(item) => item.createdAt.toString()}
           ListEmptyComponent={
             <Text
-            style={{
-              alignSelf: "center",
-              justifyContent: "center",
-              color: "gray",
-              marginVertical: 15,
-              fontSize: 15,
-            }}>
+              style={{
+                alignSelf: "center",
+                justifyContent: "center",
+                color: "gray",
+                marginVertical: 15,
+                fontSize: 15,
+              }}>
               No friends yet!
             </Text>
           }
         />
       </Accordion>
+      {
+        /*
+       <TouchableOpacity
+       style={[{
+         flexDirection: "row",
+         alignItems: "center",
+         justifyContent: "center",
+         paddingVertical: 15,
+         backgroundColor: "white",
+       }]}
+       onPress={()=>{navigation.navigate("Message Requests")}}>
+         <Text style={{
+           fontSize: 18,
+           color: (state.routes[state.index].name === "Message Requests") ? "black" : newConversations > 0 ? "blue" : "grey",
+           textDecorationLine: (state.routes[state.index].name === "Message Requests") ? "underline" : "none",
+         }}>Message Requests</Text>
+       </TouchableOpacity>
+       */
+      }
+
+
       <TouchableOpacity
-      style={[{
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        paddingVertical: 15,
-        backgroundColor: "white",
-      }]}
-      onPress={()=>{navigation.navigate("Message Requests")}}>
-        <Text style={{
-          fontSize: 18,
-          color: (state.routes[state.index].name === "Message Requests") ? "black" : newConversations > 0 ? "blue" : "grey",
-          textDecorationLine: (state.routes[state.index].name === "Message Requests") ? "underline" : "none",
-        }}>Message Requests</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-      style={[{
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        paddingVertical: 15,
-        backgroundColor: "white",
-      }]}
-      onPress={()=>{setNewConversations(0); navigation.navigate("Conversations")}}>
+        style={[{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          paddingVertical: 15,
+          backgroundColor: "white",
+        }]}
+        onPress={() => { setNewConversations(0); navigation.navigate("Conversations") }}>
         <Text style={{
           fontSize: 18,
           color: (state.routes[state.index].name === "Conversations") ? "black" : newConversations > 0 ? "blue" : "grey",
           textDecorationLine: (state.routes[state.index].name === "Conversations") ? "underline" : "none",
         }}>Conversations {(newConversations > 0
-            ? " (" + (newConversations <= 20 ? newConversations : "20+") + ")"
-            : "")}</Text>
+          ? " (" + (newConversations <= 20 ? newConversations : "20+") + ")"
+          : "")}</Text>
       </TouchableOpacity>
       <TouchableOpacity
-      style={[{
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        paddingVertical: 15,
-        backgroundColor: "white",
-      }]}
-      onPress={()=>{//console("going to settings"), 
-        navigation.navigate("Settings")}}>
+        style={[{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          paddingVertical: 15,
+          backgroundColor: "white",
+        }]}
+        onPress={() => {//console("going to settings"), 
+          navigation.navigate("Settings")
+        }}>
         <Text style={{
           fontSize: 18,
           color: (state.routes[state.index].name === "Settings") ? "black" : "grey",

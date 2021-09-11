@@ -56,6 +56,26 @@ module.exports = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
   },
+  acceptMessageButton: {
+    borderWidth: 2,
+    borderColor: "gray",
+    alignSelf: "center",
+    backgroundColor: "transparent",
+    padding: 9,
+    borderRadius: 5,
+    marginHorizontal: 10,
+    flexDirection: "row"
+  },
+  rejectMessageButton: {
+    borderWidth: 2,
+    borderColor: "red",
+    alignSelf: "center",
+    backgroundColor: "transparent",
+    padding: 9,
+    borderRadius: 5,
+    marginHorizontal: 10,
+    flexDirection: "row"
+  },
   messageButton: {
     marginTop: 20,
     alignSelf: "center",
@@ -104,6 +124,26 @@ module.exports = StyleSheet.create({
   },
   unselectedButtonTextStyle: {
     color: "gray",
+    alignSelf: "center",
+    marginBottom: 2,
+    marginHorizontal: 6,
+    fontWeight: "bold",
+  },
+  acceptButtonTextStyle: {
+    color: "gray",
+    alignSelf: "center",
+    marginBottom: 2,
+    marginHorizontal: 6,
+    fontWeight: "bold",
+  },
+  rejectButtonTextStyle: {
+    color: "red",
+    alignSelf: "center",
+    marginBottom: 2,
+    marginHorizontal: 6,
+    fontWeight: "bold",
+  },
+  unselectedRejectButtonTextStyle: {
     alignSelf: "center",
     marginBottom: 2,
     marginHorizontal: 6,

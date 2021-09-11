@@ -24,12 +24,15 @@ export default function FriendListItem({
   friendId,
   myId,
   lastMessage,
-  lastUser
+  lastUser,
+  Accepted,
+  sidebar
 }) {
-  const goToMessages = (id) => {
+
+  const goToMessages = (id, Accepted, lastUser, sidebar) => {
     if (!navigation.push)
-      navigation.navigate(id);
-    else navigation.push(id);
+      navigation.navigate(id, { Accepted: Accepted, lastUser: lastUser, sidebar: sidebar, id: item.id });
+    else navigation.push(id, { Accepted: Accepted, lastUser: lastUser, sidebar: sidebar, id: item.id });
   };
 
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
@@ -50,34 +53,34 @@ export default function FriendListItem({
           isOptionsOpen && { backgroundColor: "orange" },
         ]}
       >
-          <TouchableOpacity
-            onPress={() => {
-              const title = "More Options";
-              const message = "";
-              const options = [
-                {
-                  text: "Block",
-                  onPress: () => {
-                    const title = "Are you sure you want to block this friend? This will unfriend them and delete all messages.";
-                    const options = [
-                      {
-                        text: "Yes",
-                        onPress: () => {
-                          removeFriendHandler(item, true), setIsOptionsOpen(false);
-                        },
+        <TouchableOpacity
+          onPress={() => {
+            const title = "More Options";
+            const message = "";
+            const options = [
+              {
+                text: "Block",
+                onPress: () => {
+                  const title = "Are you sure you want to block this friend? This will unfriend them and delete all messages.";
+                  const options = [
+                    {
+                      text: "Yes",
+                      onPress: () => {
+                        removeFriendHandler(item, true), setIsOptionsOpen(false);
                       },
-                      {
-                        text: "Cancel",
-                        type: "cancel",
-                        onPress: () => {
-                          setIsOptionsOpen(false);
-                        },
+                    },
+                    {
+                      text: "Cancel",
+                      type: "cancel",
+                      onPress: () => {
+                        setIsOptionsOpen(false);
                       },
-                    ];
-                    Alert.alert(title, "", options, alertOptions);
-                  },
+                    },
+                  ];
+                  Alert.alert(title, "", options, alertOptions);
                 },
-                deleteConversationFromConvo != undefined ?
+              },
+              deleteConversationFromConvo != undefined ?
                 {
                   text: "Delete Conversation",
                   onPress: () => {
@@ -87,7 +90,7 @@ export default function FriendListItem({
                         text: "Yes",
                         onPress: () => {
                           //console("Test");
-                          deleteConversationFromConvo(item,friendId), setIsOptionsOpen(false)
+                          deleteConversationFromConvo(item, friendId), setIsOptionsOpen(false)
                         },
                       },
                       {
@@ -100,7 +103,7 @@ export default function FriendListItem({
                     ];
                     Alert.alert(title, "", options, alertOptions);
                   },
-                } : 
+                } :
                 {
                   text: "Unfriend",
                   onPress: () => {
@@ -123,20 +126,20 @@ export default function FriendListItem({
                     Alert.alert(title, "", options, alertOptions);
                   },
                 }
-                , //if submithandler fails user won't know
-                {
-                  text: "Cancel",
-                  type: "cancel",
-                  onPress: () => {
-                    setIsOptionsOpen(false);
-                  },
+              , //if submithandler fails user won't know
+              {
+                text: "Cancel",
+                type: "cancel",
+                onPress: () => {
+                  setIsOptionsOpen(false);
                 },
-              ];
-              Alert.alert(title, message, options, alertOptions);
-              setIsOptionsOpen(true);
-            }}
-            style={{ alignSelf: "center", paddingHorizontal: 8 }}
-          > 
+              },
+            ];
+            Alert.alert(title, message, options, alertOptions);
+            setIsOptionsOpen(true);
+          }}
+          style={{ alignSelf: "center", paddingHorizontal: 8 }}
+        >
           <MaterialIcons
             name="more-vert"
             size={20}
@@ -176,7 +179,7 @@ export default function FriendListItem({
                 onPress={() => {
                   //console("message pressed, " + isMessageOpen);
                   item.isRead = true;
-                  goToMessages(friendId);
+                  goToMessages(friendId, Accepted, lastUser, sidebar);
                 }}
               >
                 <Text
@@ -184,27 +187,27 @@ export default function FriendListItem({
                     color: isOptionsOpen ? "black" : item.isRead || lastUser == myId ? "black" : "blue",
                     fontSize: 15,
                     fontWeight: item.isRead || lastUser == myId ? "normal" : "bold",
-                    fontStyle: lastMessage == null ? "italic" : "normal", 
+                    fontStyle: lastMessage == null ? "italic" : "normal",
                     marginRight: 10,
                   }}
                   numberOfLines={2}
                 >
-                {
-                  lastUser == myId ? null :
-                  <MaterialIcons
-                    name={item.isRead ? "messenger-outline" : "messenger"}
-                    size={15}
-                    color={isOptionsOpen ? "black" : item.isRead || lastUser == myId ? "black" : "blue"}
-                  />
-                }
-                {
-                  lastUser == myId ?
-                  "You: " :
-                  item.isRead ?
-                  "  " :
-                  "  "
-                }
-                {(lastMessage == null ? "Message" : lastMessage)}
+                  {
+                    lastUser == myId ? null :
+                      <MaterialIcons
+                        name={item.isRead ? "messenger-outline" : "messenger"}
+                        size={15}
+                        color={isOptionsOpen ? "black" : item.isRead || lastUser == myId ? "black" : "blue"}
+                      />
+                  }
+                  {
+                    lastUser == myId ?
+                      "You: " :
+                      item.isRead ?
+                        "  " :
+                        "  "
+                  }
+                  {(lastMessage == null ? "Message" : lastMessage)}
                 </Text>
               </TouchableOpacity>
             </View>

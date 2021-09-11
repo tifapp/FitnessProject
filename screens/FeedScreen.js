@@ -16,7 +16,7 @@ import {
 } from "react-native";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation, Cache } from "aws-amplify";
-import { createPost, updatePost, deletePost, createConversation, updateConversation } from "root/src/graphql/mutations";
+import { createPost, updatePost, deletePost, createConversation, updateConversation, deleteConversation } from "root/src/graphql/mutations";
 import { listPosts, postsByChannel, batchGetLikes, getFriendship, getConversations } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
 import { onCreatePostFromChannel, onDeletePostFromChannel, onUpdatePostFromChannel, onCreateLike, onDeleteLike, onIncrementLikes, onDecrementLikes } from 'root/src/graphql/subscriptions';
@@ -41,12 +41,20 @@ var styles = require('styles/stylesheet');
 
 var allSettled = require('promise.allsettled');
 
-export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, originalParentId }) {
+export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, originalParentId, Accepted, lastUser, sidebar, id }) {
   const [postVal, setPostVal] = useState("");
   const [posts, setPosts] = useState([]);
+
+  /*
+  console.log("^^^^^^^^^^^^^^^^^^^^^^");
+  console.log(lastUser);
+  console.log("^^^^^^^^^^^^^^^^^^^^^^");
+  */
+
   //const numCharsLeft = 1000 - postVal.length;
 
   const [onlineCheck, setOnlineCheck] = useState(true);
+  const [ButtonCheck, setButtonCheck] = useState(false);
 
   const currentPosts = useRef();
   const scrollRef = useRef(); // Used to help with automatic scrolling to top
@@ -54,6 +62,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   currentPosts.current = posts;
 
   useEffect(() => {
+
     const onFocus = navigation.addListener('focus', () => {
       if (receiver == null) {
         navigation.setOptions({
@@ -81,6 +90,13 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   }, [navigation])
 
   useEffect(() => {
+
+    /*
+    if (Accepted) {
+      setAcceptedCheck(true);
+    }
+    */
+
     const createPostSubscription = API.graphql(graphqlOperation(onCreatePostFromChannel, { channel: channel })).subscribe({
       next: event => {
         const newPost = event.value.data.onCreatePostFromChannel
@@ -242,6 +258,20 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     }
   }
 
+  const acceptMessageRequest = async () => {
+    await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, Accepted: 1 } }));
+    setButtonCheck(true);
+  }
+
+  const rejectMessageRequest = async () => {
+    await API.graphql(
+      graphqlOperation(deleteConversation, {
+        input: { id: id }
+      })
+    );
+    setButtonCheck(true);
+  }
+
   const addPostAsync = async (parentId, replyText) => {
     checkInternetConnection();
     ////console("attempting to make new post");
@@ -313,12 +343,12 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
 
       if (checkConversationExists == null) {
         //console("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\");
-        if (friend1.data.getFriendship === null && friend2.data.getFriendship === null){
+        if (friend1.data.getFriendship === null && friend2.data.getFriendship === null) {
           ////console("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
           await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postVal, Accepted: 0 } }));
           ////console("##############################");
         }
-        else if(friend.data.getFriendship.accepted === null){
+        else if (friend.data.getFriendship.accepted === null) {
           //console(":::::::::::::::::::::::::::")
           await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postVal, Accepted: 0 } }));
           //console(":::::::::::::::::::::::::::")
@@ -404,23 +434,53 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+
       <APIList
         ListRef={scrollRef}
         ListHeaderComponent={
+
           <View style={{}}>
             {headerComponent}
-            <ExpandingTextInput
-              style={[
-                styles.textInputStyle,
-                { marginTop: 5, marginBottom: 5 },
-              ]}
-              multiline={true}
-              placeholder="Start Typing..."
-              onChangeText={setPostVal}
-              value={postVal}
-              clearButtonMode="always"
-              maxLength={1000}
-            />
+            <View style={styles.signOutTop}>
+              {lastUser != route.params.myId && lastUser != null && receiver != null && !ButtonCheck ?
+                <TouchableOpacity
+                  onPress={acceptMessageRequest}
+                  style={styles.acceptMessageButton}
+                >
+                  <Text style={styles.acceptButtonTextStyle}>
+                    Accept
+                  </Text>
+                </TouchableOpacity>
+                : null
+              }
+
+              {lastUser != route.params.myId && lastUser != null && receiver != null && !ButtonCheck ?
+                <TouchableOpacity
+                  onPress={rejectMessageRequest}
+                  style={styles.rejectMessageButton}
+                >
+                  <Text style={styles.rejectButtonTextStyle}>
+                    Reject
+                  </Text>
+                </TouchableOpacity>
+                : null
+              }
+            </View>
+
+            {Accepted || ButtonCheck || receiver == null || lastUser == route.params.myId || sidebar || lastUser == undefined ?
+              <ExpandingTextInput
+                style={[
+                  styles.textInputStyle,
+                  { marginTop: 5, marginBottom: 5 },
+                ]}
+                multiline={true}
+                placeholder="Start Typing..."
+                onChangeText={setPostVal}
+                value={postVal}
+                clearButtonMode="always"
+                maxLength={1000}
+              /> : null
+            }
 
             <View
               style={{
@@ -429,24 +489,27 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
                 marginBottom: 10,
               }}
             >
-              <TouchableOpacity
-                style={[
-                  { flexDirection: "row", marginRight: 15 },
-                ]}
-                onPress={postVal === "" ? () => {
-                  alert("No text detected in text field");
-                } : addPostAsync}
-              >
-                <MaterialIcons
-                  name={postVal === "" ? "add-circle-outline" : "add-circle"}
-                  size={15}
-                  color={postVal === "" ? "gray" : "blue"}
-                  style={{ marginRight: 5, marginTop: 2 }}
-                />
-                <Text style={[{ fontWeight: "bold", fontSize: 15, color: postVal === "" ? "gray" : "blue" }]}>
-                  {receiver != null ? "Send Message" : "Add Post"}
-                </Text>
-              </TouchableOpacity>
+              {
+                Accepted || ButtonCheck || receiver == null || lastUser == route.params.myId || lastUser == undefined || sidebar ?
+                  <TouchableOpacity
+                    style={[
+                      { flexDirection: "row", marginRight: 15 },
+                    ]}
+                    onPress={postVal === "" ? () => {
+                      alert("No text detected in text field");
+                    } : addPostAsync}
+                  >
+                    <MaterialIcons
+                      name={postVal === "" ? "add-circle-outline" : "add-circle"}
+                      size={15}
+                      color={postVal === "" ? "gray" : "blue"}
+                      style={{ marginRight: 5, marginTop: 2 }}
+                    />
+                    <Text style={[{ fontWeight: "bold", fontSize: 15, color: postVal === "" ? "gray" : "blue" }]}>
+                      {receiver != null ? "Send Message" : "Add Post"}
+                    </Text>
+                  </TouchableOpacity> : null
+              }
             </View>
           </View>
         }

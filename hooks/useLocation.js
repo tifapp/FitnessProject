@@ -1,6 +1,7 @@
 import { Alert, Linking } from 'react-native';
 import * as Location from 'expo-location';
 
+/*
 async function locateUser(ask) {
   let { status } = await Location.requestForegroundPermissionsAsync();
   if (status !== 'granted') {
@@ -22,10 +23,11 @@ async function locateUser(ask) {
     global.location = { latitude: location.coords.latitude, longitude: location.coords.longitude };
   }
 }
+*/
 
 export default function getLocation(ask = false) {
   if (global.location == null) {
-    locateUser(ask);
+    //locateUser(ask);
   }
 
   return global.location;
