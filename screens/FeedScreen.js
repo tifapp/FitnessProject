@@ -429,6 +429,7 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
         //scan the uri and check filetype. maybe console log the uri first
         const re = /(?:\.([^.]+))?$/;
         const videoExtension = re.exec(imageURL)[1];
+        setProgress(0.01);
         await Storage.put(`feed/${imageID}.${isVideo ? videoExtension : 'jpg'}`, blob, {
           progressCallback(progress) {
             setProgress(progress.loaded / progress.total);
