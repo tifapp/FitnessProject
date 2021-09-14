@@ -15,6 +15,7 @@ import {
   ActivityIndicator,
   Alert,
   Modal,
+  KeyboardAvoidingView,
   Dimensions
 } from "react-native";
 import { getUser } from "../src/graphql/queries";
@@ -420,7 +421,9 @@ export default React.memo(function PostItem({
         >
           <TouchableOpacity onPress={() => setAreRepliesVisible(false)} style={{ width: "100%", height: "100%", position: "absolute", backgroundColor: "#00000033" }}>
           </TouchableOpacity>
-          <View style={{ marginTop: "auto", flex: 0.8, backgroundColor: "#efefef" }}>
+          <KeyboardAvoidingView 
+           behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ marginTop: "auto", flex: 0.8, backgroundColor: "#efefef" }}>
             <View style={{ height: 1, width: "100%", alignSelf: "center", backgroundColor: "lightgray" }}>
             </View>
             <View style={{ margin: 10, width: 25, height: 2, alignSelf: "center", backgroundColor: "lightgray" }}>
@@ -479,12 +482,13 @@ export default React.memo(function PostItem({
                   shouldSubscribe={true}
                 />
               }
+              autoFocus={true}
               navigation={navigation}
               route={route}
               channel={SHA256(item.userId + item.createdAt)} //unique id
               originalParentId={item.createdAt + "#" + item.userId}
             />
-          </View>
+          </KeyboardAvoidingView>
         </Modal>
       </View>
     );

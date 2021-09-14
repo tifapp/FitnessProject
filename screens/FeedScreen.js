@@ -41,7 +41,7 @@ const viewabilityConfig = {
   waitForInteraction: false,
 }
 
-export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, originalParentId }) {
+export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, originalParentId, autoFocus = false }) {
   const [posts, setPosts] = useState([]);
 
   const [onlineCheck, setOnlineCheck] = useState(true);
@@ -291,7 +291,8 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     //turn on subscription flags until we hit startingindex + viewableitems.length + 20
     let currentIndex = 0;
     setPosts(posts => posts.map((post, index) => {
-      if (index >= firstViewableIndex - 20 && index <= firstViewableIndex + viewableItems.length + 20) {
+      //we'll activate real time updates for posts just out of view
+      if ((index < firstViewableIndex && index >= firstViewableIndex - 10) || (index > firstViewableIndex + viewableItems.length && index <= firstViewableIndex + viewableItems.length + 10)) {
         post.shouldSubscribe = true;
       } else {
         post.shouldSubscribe = false;
@@ -324,6 +325,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
           myId={route.params?.myId}
           originalParentId={originalParentId}
           pushLocalPost={(localNewPost) => setPosts((posts) => [localNewPost, ...posts])}
+          autoFocus={autoFocus}
           />
         }
         initialAmount={7}
@@ -347,7 +349,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import SHA256 from "hooks/hash";
 import { Video, AVPlaybackStatus } from 'expo-av';
 
-function PostInputField({channel, headerComponent, receiver, myId, originalParentId, pushLocalPost}) {
+function PostInputField({channel, headerComponent, receiver, myId, originalParentId, pushLocalPost, autoFocus = false}) {
   const [pickFromGallery, pickFromCamera] = usePhotos(true);
   const [postInput, setPostInput] = useState("");
   const [imageURL, setImageURL] = useState(null);
@@ -360,7 +362,8 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
   useEffect(() => {
     Animated.timing(animation.current, {
       toValue: progress,
-      duration: 200
+      duration: 200,
+      useNativeDriver: false // Add This line
     }).start();
   },[progress])
 
@@ -528,6 +531,7 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
           styles.textInputStyle,
           { marginTop: 5, marginBottom: 5 },
         ]}
+        autoFocus={autoFocus}
         multiline={true}
         placeholder="Start Typing..."
         onChangeText={setPostInput}
