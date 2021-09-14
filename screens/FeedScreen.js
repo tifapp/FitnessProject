@@ -257,7 +257,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     scrollRef.current?.scrollToOffset({ offset: 0, animated: true })
   }
 
-  const renderPostItem = React.useCallback(({ item, index }) => (
+  const renderPostItem = ({ item, index }) => (
     <PostItem
       index={index}
       item={item}
@@ -276,7 +276,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       isVisible={item.isVisible}
       shouldSubscribe={item.shouldSubscribe}
     />
-  ), [])
+  )
 
   const onViewableItemsChanged = React.useCallback(({viewableItems, changedItems}) => {
     //console.log("viewable items have changed")

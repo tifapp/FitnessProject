@@ -560,9 +560,11 @@ function PostHeader({ item, myId, writtenByYou, repliesPressed, deletePostsAsync
           next: event => {
             if (likeDebounce.current) {
               likeDebounce.current = false;
-              if (event.value.data.onIncrementLikes.likes != likes) setLikes(event.value.data.onIncrementLikes.likes);
             }
-            else setLikes(event.value.data.onIncrementLikes.likes);
+            else {
+              setLikes(event.value.data.onIncrementLikes.likes);
+              item.likes = event.value.data.onIncrementLikes.likes;
+            }
           },
           error: error => console.warn(error)
         });
@@ -570,9 +572,11 @@ function PostHeader({ item, myId, writtenByYou, repliesPressed, deletePostsAsync
           next: event => {
             if (likeDebounce.current) {
               likeDebounce.current = false;
-              if (event.value.data.onDecrementLikes.likes != likes) setLikes(event.value.data.onDecrementLikes.likes);
             }
-            else setLikes(event.value.data.onDecrementLikes.likes);
+            else {
+              setLikes(event.value.data.onDecrementLikes.likes);
+              item.likes = event.value.data.onDecrementLikes.likes;
+            }
           },
           error: error => console.warn(error)
         });
@@ -614,8 +618,8 @@ function PostHeader({ item, myId, writtenByYou, repliesPressed, deletePostsAsync
     }
   }, [shouldSubscribe])
 
-  useEffect(() => {item.likes = likes}, [likes])
-  useEffect(() => {item.replies = replies}, [replies])
+  useEffect(() => {setLikes(item.likes)}, [item.likes]) //to change the feed screen
+  useEffect(() => {setReplies(item.replies)}, [item.replies])
 
   return (
     <View
@@ -655,9 +659,11 @@ function PostHeader({ item, myId, writtenByYou, repliesPressed, deletePostsAsync
             onTap={(liked) => {
               if (liked) {
                 setLikes(likes => likes - 1);
+                item.likes -= 1;
                 item.likedByYou = false;
               } else {
                 setLikes(likes => likes + 1);
+                item.likes += 1;
                 item.likedByYou = true;
               }
             }}
