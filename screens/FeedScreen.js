@@ -269,7 +269,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         input: { id: id }
       })
     );
-    setButtonCheck(true);
+    navigation.navigate("Conversations");
   }
 
   const addPostAsync = async (parentId, replyText) => {
