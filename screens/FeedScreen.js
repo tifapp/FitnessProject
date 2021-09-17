@@ -593,7 +593,7 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
               right: 0,
               top: 0,
               bottom: 0
-            }, { backgroundColor: "#8BED4F", width }]} />
+            }, { backgroundColor: "#26c6a2", width }]} />
           </View> : null
       }
 
