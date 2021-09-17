@@ -644,6 +644,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
               myId={myId}
               lastMessage={item.lastMessage}
               lastUser={item.lastUser}
+              Accepted={item.Accepted}
             />
             //: null
           )}

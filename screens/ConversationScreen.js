@@ -158,6 +158,7 @@ export default function ConversationScreen({ navigation, route }) {
   const [conversations, setConversations] = useState([]);
   const currentConversations = useRef();
   currentConversations.current = conversations;
+  //const [button, setButton] = useRef();
 
   const deleteConversationFromConvo = async (item, friendID) => {
     /*
@@ -184,6 +185,8 @@ export default function ConversationScreen({ navigation, route }) {
         input: { id: item.id }
       })
     );
+
+    //setButton(false);
 
     /*
     // delete friend object

@@ -17,7 +17,7 @@ import {
 // Get the aws resources configuration parameters
 import { API, graphqlOperation, Cache } from "aws-amplify";
 import { createPost, updatePost, deletePost, createConversation, updateConversation, deleteConversation } from "root/src/graphql/mutations";
-import { listPosts, postsByChannel, batchGetLikes, getFriendship, getConversations } from "root/src/graphql/queries";
+import { listPosts, postsByChannel, batchGetLikes, getFriendship, getConversations, getConversation } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
 import { onCreatePostFromChannel, onDeletePostFromChannel, onUpdatePostFromChannel, onCreateLike, onDeleteLike, onIncrementLikes, onDecrementLikes } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
@@ -89,14 +89,51 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     return onFocus;
   }, [navigation])
 
-  useEffect(() => {
+  const checkButton = async () => {
 
-    /*
-    if (Accepted) {
-      setAcceptedCheck(true);
+    let namesArray = [route.params?.myId, receiver];
+    namesArray.sort();
+
+    let temp = namesArray[0] + namesArray[1];
+
+    let newConversations1 = await API.graphql(graphqlOperation(getConversation, { id: temp }));
+
+    newConversations1 = newConversations1.data.getConversation;
+
+    if (newConversations1 == null) {
+      setButtonCheck(true);
     }
+    else if (newConversations1.Accepted) {
+      setButtonCheck(true);
+    }
+    else {
+      setButtonCheck(false);
+    }
+
+
+    //let checkConversationExists = newConversations1.find(item => (item.users[0] === route.params?.myId && item.users[1] === receiver) || (item.users[0] === receiver && item.users[1] === route.params?.myId));
+    //let checkMessageRequestExists = newConversations2.find(item => (item.users[0] === route.params?.myId && item.users[1] === receiver) || (item.users[0] === receiver && item.users[1] === route.params?.myId));
+  }
+
+  useEffect(() => {
+    const onFocus = navigation.addListener('focus', () => {
+      checkButton();
+    });
+
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return onFocus;
+  }, [navigation])
+
+  /*
+    useEffect(() => {
+      console.log("hello");
+      checkButton();
+    }, [])
     */
 
+
+
+  useEffect(() => {
     const createPostSubscription = API.graphql(graphqlOperation(onCreatePostFromChannel, { channel: channel })).subscribe({
       next: event => {
         const newPost = event.value.data.onCreatePostFromChannel
@@ -317,17 +354,15 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       let newConversations1 = await API.graphql(graphqlOperation(getConversations, { Accepted: 1 }))
       let newConversations2 = await API.graphql(graphqlOperation(getConversations, { Accepted: 0 }))
 
-      //console("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-      //console(newConversations1);
-      //console(newConversations2);
-      //console("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-
       newConversations1 = newConversations1.data.getConversations.items
       newConversations2 = newConversations2.data.getConversations.items
 
       let checkConversationExists = newConversations1.find(item => item.id === newPost.channel);
 
-      if (checkConversationExists == null) {
+      if (checkConversationExists != null) {
+        setButtonCheck(true);
+      }
+      else {
         checkConversationExists = newConversations2.find(item => item.id === newPost.channel);
       }
 
