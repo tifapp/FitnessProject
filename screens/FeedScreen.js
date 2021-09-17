@@ -533,7 +533,7 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
         ]}
         autoFocus={autoFocus}
         multiline={true}
-        placeholder="Start Typing..."
+        placeholder={progress > 0 ? "Upload in progress..." : "Start typing..."}
         onChangeText={setPostInput}
         value={postInput}
         clearButtonMode="always"
