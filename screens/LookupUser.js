@@ -493,7 +493,7 @@ global.addConversationIds(id);
             {friendStatus == "loading" ? (
               <ActivityIndicator
                 size="large"
-                color="#0000ff"
+                color="#26c6a2"
                 style={{
                   flex: 1,
                   justifyContent: "center",

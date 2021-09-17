@@ -181,7 +181,7 @@ export default React.memo(function PostItem({
   if (item.loading) return (
     <ActivityIndicator 
     size="large" 
-    color="#0000ff"
+    color="#26c6a2"
     style={{
       flex: 1,
       justifyContent: "center",

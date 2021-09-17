@@ -166,7 +166,7 @@ export const ProfileImageAndName = React.memo(function (props) {
                 alignItems: "center",
               }}
             >
-              <ActivityIndicator color="#0000ff" />
+              <ActivityIndicator color="#26c6a2" />
             </View>
             : null
         }
