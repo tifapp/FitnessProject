@@ -45,15 +45,6 @@ class APIList extends PureComponent { //we need to make this a class to use refs
     }
   }
 
-  // componentDidUpdate(prevProps, prevState) {
-  //   if (this.props.data !== prevProps.data) {
-  //     if (!this.state.loadingMore && this.state.nextToken != null && this.props.data.length < (this.props.initialAmount == null ? 10 : this.props.initialAmount)) {
-  //       this.setState({ loadingMore: true });
-  //       this.loadMore(true);
-  //     }
-  //   }
-  // }
-
   loadMore = () => {
     //console.log("can we load more???");
     if (!this.state.loadingMore && this.state.nextToken != null) { //if we don't check this, the list will repeat endlessly
@@ -134,7 +125,7 @@ class APIList extends PureComponent { //we need to make this a class to use refs
           this.state.loadingInitial || (this.state.loading && !this.state.loadingMore && !this.state.refreshing)
             ? <ActivityIndicator
               size="large"
-              color="#0000ff"
+              color="#26c6a2"
               style={{
                 alignSelf: 'stretch',
                 flex: 1,
@@ -144,6 +135,7 @@ class APIList extends PureComponent { //we need to make this a class to use refs
               }} />
             :
             <FlatList
+                viewabilityConfig={this.props.viewabilityConfig}
                 onScroll={this.props.onScroll}
                 scrollEventThrottle={0}
                 ref={this.props.ListRef}
@@ -165,6 +157,7 @@ class APIList extends PureComponent { //we need to make this a class to use refs
                 //removeClippedSubviews={true} //documentation says this may reduce crashing but causes glitches on ios
                 updateCellsBatchingPeriod={20}//numbers could vary based on device and size of memory. this one should be as big as possible, but 50 and above is too large.
                 windowSize={21}
+                onViewableItemsChanged={this.props.onViewableItemsChanged}
               />
         }
 
@@ -173,7 +166,7 @@ class APIList extends PureComponent { //we need to make this a class to use refs
             ?
             <ActivityIndicator
               size="large"
-              color="#0000ff"
+              color="#26c6a2"
               style={{
                 position: 'absolute',
                 left: 0,

@@ -21,6 +21,21 @@ exports.batchGetConversations = /* GraphQL */ `
       lastUser
       lastMessage
       dummy
+      Accepted
+    }
+  }
+`;
+exports.getConversationByUsers = /* GraphQL */ `
+  query GetConversationByUsers($users: [ID!]!) {
+    getConversationByUsers(users: $users) {
+      createdAt
+      updatedAt
+      id
+      users
+      lastUser
+      lastMessage
+      dummy
+      Accepted
     }
   }
 `;
@@ -58,6 +73,105 @@ exports.listGroups = /* GraphQL */ `
         latitude
         createdAt
         updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+exports.postsByUser = /* GraphQL */ `
+  query PostsByUser(
+    $userId: ID
+    $createdAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelPostFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    postsByUser(
+      userId: $userId
+      createdAt: $createdAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        createdAt
+        updatedAt
+        userId
+        description
+        channel
+        receiver
+        parentId
+        imageURL
+        likes
+        replies
+      }
+      nextToken
+    }
+  }
+`;
+exports.postsByReceiver = /* GraphQL */ `
+  query PostsByReceiver(
+    $receiver: ID
+    $createdAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelPostFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    postsByReceiver(
+      receiver: $receiver
+      createdAt: $createdAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        createdAt
+        updatedAt
+        userId
+        description
+        channel
+        receiver
+        parentId
+        imageURL
+        likes
+        replies
+      }
+      nextToken
+    }
+  }
+`;
+exports.postsByChannel = /* GraphQL */ `
+  query PostsByChannel(
+    $channel: ID
+    $createdAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelPostFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    postsByChannel(
+      channel: $channel
+      createdAt: $createdAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        createdAt
+        updatedAt
+        userId
+        description
+        channel
+        receiver
+        parentId
+        imageURL
+        likes
+        replies
       }
       nextToken
     }
@@ -137,6 +251,7 @@ exports.getConversation = /* GraphQL */ `
       lastUser
       lastMessage
       dummy
+      Accepted
     }
   }
 `;
@@ -155,22 +270,23 @@ exports.listConversations = /* GraphQL */ `
         lastUser
         lastMessage
         dummy
+        Accepted
       }
       nextToken
     }
   }
 `;
-exports.conversationsByLastUpdated = /* GraphQL */ `
-  query ConversationsByLastUpdated(
-    $dummy: Int
+exports.getConversations = /* GraphQL */ `
+  query GetConversations(
+    $Accepted: Int
     $updatedAt: ModelStringKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelConversationFilterInput
     $limit: Int
     $nextToken: String
   ) {
-    conversationsByLastUpdated(
-      dummy: $dummy
+    getConversations(
+      Accepted: $Accepted
       updatedAt: $updatedAt
       sortDirection: $sortDirection
       filter: $filter
@@ -185,6 +301,7 @@ exports.conversationsByLastUpdated = /* GraphQL */ `
         lastUser
         lastMessage
         dummy
+        Accepted
       }
       nextToken
     }
@@ -297,7 +414,7 @@ exports.listLikes = /* GraphQL */ `
 exports.likesByPost = /* GraphQL */ `
   query LikesByPost(
     $postId: ID
-    $userId: ModelIDKeyConditionInput
+    $createdAt: ModelStringKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelLikeFilterInput
     $limit: Int
@@ -305,7 +422,7 @@ exports.likesByPost = /* GraphQL */ `
   ) {
     likesByPost(
       postId: $postId
-      userId: $userId
+      createdAt: $createdAt
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit
@@ -321,102 +438,6 @@ exports.likesByPost = /* GraphQL */ `
     }
   }
 `;
-exports.postsByUser = /* GraphQL */ `
-  query PostsByUser(
-    $userId: ID
-    $createdAt: ModelStringKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelPostFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    postsByUser(
-      userId: $userId
-      createdAt: $createdAt
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        createdAt
-        updatedAt
-        userId
-        description
-        channel
-        receiver
-        parentId
-        likes
-        replies
-      }
-      nextToken
-    }
-  }
-`;
-exports.postsByReceiver = /* GraphQL */ `
-  query PostsByReceiver(
-    $receiver: ID
-    $createdAt: ModelStringKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelPostFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    postsByReceiver(
-      receiver: $receiver
-      createdAt: $createdAt
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        createdAt
-        updatedAt
-        userId
-        description
-        channel
-        receiver
-        parentId
-        likes
-        replies
-      }
-      nextToken
-    }
-  }
-`;
-exports.postsByChannel = /* GraphQL */ `
-  query PostsByChannel(
-    $channel: ID
-    $createdAt: ModelStringKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelPostFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    postsByChannel(
-      channel: $channel
-      createdAt: $createdAt
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        createdAt
-        updatedAt
-        userId
-        description
-        channel
-        receiver
-        parentId
-        likes
-        replies
-      }
-      nextToken
-    }
-  }
-`;
 exports.getPost = /* GraphQL */ `
   query GetPost($createdAt: AWSDateTime!, $userId: ID!) {
     getPost(createdAt: $createdAt, userId: $userId) {
@@ -427,23 +448,35 @@ exports.getPost = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
   }
 `;
-exports.listPosts = /* GraphQL */ `
-  query ListPosts(
+exports.getReport = /* GraphQL */ `
+  query GetReport($createdAt: AWSDateTime!, $postId: ID!) {
+    getReport(createdAt: $createdAt, postId: $postId) {
+      createdAt
+      updatedAt
+      userId
+      postId
+      message
+    }
+  }
+`;
+exports.listReports = /* GraphQL */ `
+  query ListReports(
     $createdAt: AWSDateTime
-    $userId: ModelIDKeyConditionInput
-    $filter: ModelPostFilterInput
+    $postId: ModelIDKeyConditionInput
+    $filter: ModelReportFilterInput
     $limit: Int
     $nextToken: String
     $sortDirection: ModelSortDirection
   ) {
-    listPosts(
+    listReports(
       createdAt: $createdAt
-      userId: $userId
+      postId: $postId
       filter: $filter
       limit: $limit
       nextToken: $nextToken
@@ -453,12 +486,8 @@ exports.listPosts = /* GraphQL */ `
         createdAt
         updatedAt
         userId
-        description
-        channel
-        receiver
-        parentId
-        likes
-        replies
+        postId
+        message
       }
       nextToken
     }

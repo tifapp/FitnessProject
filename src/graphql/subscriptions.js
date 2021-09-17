@@ -31,6 +31,7 @@ export const onCreatePostFromChannel = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -46,6 +47,7 @@ export const onCreatePostForReceiver = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -61,6 +63,7 @@ export const onCreatePostByUser = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -76,6 +79,7 @@ export const onUpdatePostFromChannel = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -91,6 +95,7 @@ export const onDeletePostFromChannel = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -106,6 +111,7 @@ export const onIncrementLikes = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -121,6 +127,7 @@ export const onDecrementLikes = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -136,6 +143,7 @@ export const onIncrementReplies = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -151,6 +159,7 @@ export const onDecrementReplies = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -175,20 +184,6 @@ export const onCreateFriendRequestForReceiver = /* GraphQL */ `
       sender
       receiver
       accepted
-    }
-  }
-`;
-export const onCreateOrUpdateConversation = /* GraphQL */ `
-  subscription OnCreateOrUpdateConversation($users: [ID!]!) {
-    onCreateOrUpdateConversation(users: $users) {
-      createdAt
-      updatedAt
-      id
-      users
-      lastUser
-      lastMessage
-      dummy
-      Accepted
     }
   }
 `;
@@ -330,6 +325,8 @@ export const onCreateUser = /* GraphQL */ `
       latitude
       longitude
       deviceToken
+      friendRequestPrivacy
+      messagesPrivacy
       createdAt
       updatedAt
     }
@@ -348,6 +345,8 @@ export const onUpdateUser = /* GraphQL */ `
       latitude
       longitude
       deviceToken
+      friendRequestPrivacy
+      messagesPrivacy
       createdAt
       updatedAt
     }
@@ -366,6 +365,8 @@ export const onDeleteUser = /* GraphQL */ `
       latitude
       longitude
       deviceToken
+      friendRequestPrivacy
+      messagesPrivacy
       createdAt
       updatedAt
     }

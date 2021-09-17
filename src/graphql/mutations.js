@@ -11,6 +11,7 @@ export const batchDeletePosts = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -26,6 +27,7 @@ export const incrementLikes = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -41,6 +43,7 @@ export const decrementLikes = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -56,6 +59,7 @@ export const incrementReplies = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -71,6 +75,7 @@ export const decrementReplies = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -317,6 +322,7 @@ export const deletePost = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -335,6 +341,7 @@ export const createPost = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -353,8 +360,51 @@ export const updatePost = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
+    }
+  }
+`;
+export const createReport = /* GraphQL */ `
+  mutation CreateReport(
+    $input: CreateReportInput!
+    $condition: ModelReportConditionInput
+  ) {
+    createReport(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      userId
+      postId
+      message
+    }
+  }
+`;
+export const updateReport = /* GraphQL */ `
+  mutation UpdateReport(
+    $input: UpdateReportInput!
+    $condition: ModelReportConditionInput
+  ) {
+    updateReport(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      userId
+      postId
+      message
+    }
+  }
+`;
+export const deleteReport = /* GraphQL */ `
+  mutation DeleteReport(
+    $input: DeleteReportInput!
+    $condition: ModelReportConditionInput
+  ) {
+    deleteReport(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      userId
+      postId
+      message
     }
   }
 `;
@@ -374,6 +424,8 @@ export const createUser = /* GraphQL */ `
       latitude
       longitude
       deviceToken
+      friendRequestPrivacy
+      messagesPrivacy
       createdAt
       updatedAt
     }
@@ -395,6 +447,8 @@ export const updateUser = /* GraphQL */ `
       latitude
       longitude
       deviceToken
+      friendRequestPrivacy
+      messagesPrivacy
       createdAt
       updatedAt
     }
@@ -416,6 +470,8 @@ export const deleteUser = /* GraphQL */ `
       latitude
       longitude
       deviceToken
+      friendRequestPrivacy
+      messagesPrivacy
       createdAt
       updatedAt
     }

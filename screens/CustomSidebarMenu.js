@@ -17,12 +17,10 @@ import {
   getFriendship,
   friendsBySecondUser,
   getFriendRequest,
-  getConversationByUsers
 } from "root/src/graphql/queries";
 import {
   onCreateFriendRequestForReceiver,
   onAcceptedFriendship,
-  onCreateOrUpdateConversation,
   onCreatePostForReceiver
 } from "root/src/graphql/subscriptions";
 import { deleteFriendship, updateFriendship, createBlock, updateConversation } from "root/src/graphql/mutations";
@@ -42,10 +40,9 @@ import { useIsDrawerOpen } from '@react-navigation/drawer';
 import { batchGetConversations, getConversation, getConversations } from "../src/graphql/queries";
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 
-var subscriptions = [];
 global.localBlockList = [];
 
-export default function CustomSidebarMenu({ navigation, state, progress, myId, setConversationIds }) {
+export default function CustomSidebarMenu({ navigation, state, progress, myId }) {
   const [lastOnlineTime, setLastOnlineTime] = useState(0);
   const [friendList, setFriendList] = useState([]);
   const [friendRequestList, setFriendRequestList] = useState([]);
@@ -64,32 +61,23 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
   currentNewFriendRequestCount.current = newFriendRequests;
   currentNewConversations.current = newConversations;
 
+  global.updateFriendsListWithMyNewMessage = (newPost) => {
+    setFriendList((friends) => {
+      return friends.map((friend) => {
+        if (
+          newPost.receiver === friend.receiver || newPost.receiver === friend.sender
+        ) {
+          friend.lastMessage = newPost.description;
+          friend.lastUser = myId;
+        }
+        return friend;
+      })
+    });
+  }
+
   useEffect(() => {
-    const friendIds = [];
-    friendList.forEach(friend => friendIds.push(friend.sender == myId ? friend.receiver : friend.sender));
-    setConversationIds(friendIds);
+    friendList.forEach(friend => global.addConversationIds(friend.sender == myId ? friend.receiver : friend.sender));
   }, [friendList]) //we must extract just the array of ids
-
-  /*
-  waitForFriend = API.graphql(graphqlOperation(onCreateFriendship)).subscribe({
-    next: event => {
-      const newFriendRequest = event.value.data.onCreateFriendship
-      if (newFriendRequest.sender == userId && newFriendRequest.receiver == route.params?.id) {
-        setFriendStatus("received");
-      }
-    }
-  });
-
-  // Case 2: Receiver accepts friend request. Update the sender's side to delete button.
-  onUpdate = API.graphql(graphqlOperation(onUpdateFriendship)).subscribe({
-    next: event => {
-      const newFriend = event.value.data.onUpdateFriendship
-      if (newFriend.sender == route.params?.id && newFriend.receiver == userId && newFriend.accepted) {
-        setFriendStatus("friends");
-      }
-    }
-  });
-  */
 
   const loadLastMessageAndListenForNewOnes = async (newFriend) => {
     //check if a convo already exists between the two users
@@ -100,50 +88,13 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
     );
 
     if (convo.data.getConversation != null) {
-      //console("found old condo")
+      console.log("found old condo")
       newFriend.lastMessage = convo.data.getConversation.lastMessage
       newFriend.lastUser = convo.data.getConversation.lastUser
-    } else {//console("couldnt find condo")
-    }
+    } else { console.log("couldnt find condo") }
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setFriendList([newFriend, ...currentFriends.current]);
-    subscriptions.push(
-      await API.graphql(
-        graphqlOperation(onCreateOrUpdateConversation, {
-          users: [newFriend.sender, newFriend.receiver].sort()
-        })
-      ).subscribe({
-        next: (event) => {
-          const updatedConversation =
-            event.value.data.onCreateOrUpdateConversation;
-          //console(
-          //  "new message, this is what it looks like ",
-          //  updatedConversation,
-          //  " and this is you: ",
-          //  myId
-          // );
-          //no need for security checks here
-          setFriendList(
-            currentFriends.current.map(function (i) {
-              if (
-                updatedConversation.users.find(
-                  (user) =>
-                    user !== myId &&
-                    (i.sender === user || i.receiver === user)
-                )
-              ) {
-                i.lastMessage = updatedConversation.lastMessage;
-                i.lastUser = updatedConversation.lastUser;
-                i.isRead = null;
-              }
-              return i;
-            }));
-          //foreach users in conversation, if it's not myid and it's in friend list, update friend list, and push it to the top.
-          //alternatively for message screen, for each user in message screen, if it's in conversation push it to the top. otherwise just put this conversation at the top of the list.
-        },
-      })
-    );
   }
 
   useEffect(() => {
@@ -164,6 +115,22 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
 
         global.showNotificationDot();
         setNewConversations(currentNewConversations.current + 1);
+
+        //no need for security checks here
+        setFriendList((friends) => {
+          return friends.map((friend) => {
+            if (
+              newPost.userId === friend.sender || newPost.userId === friend.receiver
+            ) {
+              friend.lastMessage = newPost.description;
+              friend.lastUser = newPost.userId;
+              friend.isRead = null;
+            }
+            return friend;
+          })
+        });
+        //foreach users in conversation, if it's not myid and it's in friend list, update friend list, and push it to the top.
+        //alternatively for message screen, for each user in message screen, if it's in conversation push it to the top. otherwise just put this conversation at the top of the list.
       },
     });
 
@@ -175,19 +142,19 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
       next: (event) => {
         //IMPORTANT: don't use "friendList" or "friendRequestList" variables in this scope, instead use "currentFriends.current" and "currentFriendRequests.current"
 
-        ////console("is drawer open? ", isDrawerOpen.current);
+        //console.log("is drawer open? ", isDrawerOpen.current);
         const newFriendRequest = event.value.data.onCreateFriendRequestForReceiver;
         if (newFriendRequest.sender !== myId && newFriendRequest.receiver !== myId)
-          //console("security error with incoming friend request");
+          console.log("security error with incoming friend request");
 
-          //if this new request is coming from someone already in your local friends list, remove them from your local friends list
-          if (currentFriends.current.find((item) => item.sender === newFriendRequest.sender)) {
-            setFriendList(
-              currentFriends.current.filter(
-                (item) => item.sender != newFriendRequest.sender || item.receiver != newFriendRequest.sender
-              )
-            );
-          }
+        //if this new request is coming from someone already in your local friends list, remove them from your local friends list
+        if (currentFriends.current.find((item) => item.sender === newFriendRequest.sender)) {
+          setFriendList(
+            currentFriends.current.filter(
+              (item) => item.sender != newFriendRequest.sender || item.receiver != newFriendRequest.sender
+            )
+          );
+        }
 
         //if this new request is not already in your local friend request list, add it to your local friend request list
         if (currentFriendRequests.current.find((item) => item.sender === newFriendRequest.sender)) {
@@ -199,7 +166,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
 
         //if the drawer is closed, show the blue dot in the corner
         if (!isDrawerOpen.current) {
-          ////console("incrementing counter");
+          //console.log("incrementing counter");
           global.showNotificationDot();
         }
 
@@ -215,7 +182,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
     const friendSubscription = API.graphql(
       graphqlOperation(onAcceptedFriendship)
     ).subscribe({
-      next: async (event) => {
+      next: (event) => {
         const newFriend = event.value.data.onAcceptedFriendship;
         //we can see all friend requests being accepted, so we just have to make sure it's one of ours.
         if (newFriend.sender === myId || newFriend.receiver === myId) {
@@ -226,7 +193,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
               ));
           }
 
-          //console("someone accepted us")
+          console.log("someone accepted us")
 
           if (!currentFriends.current.find(item => item.sender === newFriend.sender && item.receiver === newFriend.receiver)) {
             loadLastMessageAndListenForNewOnes(newFriend);
@@ -255,7 +222,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
     ).subscribe({
       next: (event) => {
         const deletedFriend = event.value.data.onDeleteFriendship; //check the security on this one. if possible, should only fire for the sender or receiver.
-        //console("friend deleted ", deletedFriend);
+        console.log("friend deleted ", deletedFriend);
         if (currentFriends.current.find(item => item.sender === deletedFriend.sender && item.sender === deletedFriend.sender)) {
           var index = currentFriends.current.findIndex(item => item.sender === deletedFriend.sender && item.sender === deletedFriend.sender);
           currentFriends.current.splice(index, 1);
@@ -270,9 +237,6 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
       //removedFriendSubscription.unsubscribe();
       friendSubscription.unsubscribe();
       friendRequestSubscription.unsubscribe();
-      subscriptions.forEach(element => {
-        element.unsubscribe();
-      });
       receivedConversationSubscription.unsubscribe();
       //conversationUpdateSubscription.unsubscribe();
       currentFriendRequests.current.forEach(item => { if (item.rejected || item.accepted) confirmResponse(item); });
@@ -297,11 +261,6 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
   };
 
   const fetchLatestMessages = async (items) => {
-    subscriptions.forEach(element => {
-      element.unsubscribe();
-    });
-    subscriptions.length = 0;
-
     let conversationIds = [];
 
     items.forEach((item) => {
@@ -310,60 +269,18 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
 
     try {
       const conversations = await API.graphql(graphqlOperation(batchGetConversations, { ids: conversationIds }));
-      ////console("looking for conversations: ", conversations);
+      //console.log("looking for conversations: ", conversations);
       //returns an array of like objects or nulls corresponding with the array of conversations
       for (i = 0; i < items.length; ++i) {
-        ////console("friend list item: ", items[i]);
-        const friendslistarray = [items[i].sender, items[i].receiver].sort();
-        ////console("friend list array: ", friendslistarray);
-        (async () => {
-          subscriptions.push(
-            await API.graphql(
-              graphqlOperation(onCreateOrUpdateConversation, {
-                users: friendslistarray
-              })
-            ).subscribe({
-              next: (event) => {
-                const updatedConversation =
-                  event.value.data.onCreateOrUpdateConversation;
-                //console(
-                //  "new message, this is what it looks like ",
-                //  updatedConversation,
-                //  " and this is you: ",
-                //  myId
-                // );
-                //no need for security checks here
-                setFriendList(
-                  currentFriends.current.map(function (i) {
-                    if (
-                      updatedConversation.users.find(
-                        (user) =>
-                          user !== myId &&
-                          (i.sender === user || i.receiver === user)
-                      )
-                    ) {
-                      i.lastMessage = updatedConversation.lastMessage;
-                      i.lastUser = updatedConversation.lastUser;
-                      i.isRead = null;
-                    }
-                    return i;
-                  }));
-                //foreach users in conversation, if it's not myid and it's in friend list, update friend list, and push it to the top.
-                //alternatively for message screen, for each user in message screen, if it's in conversation push it to the top. otherwise just put this conversation at the top of the list.
-              },
-            })
-          );
-        })();
-
         if (conversations.data.batchGetConversations[i] != null) {
-          //console("found conversation");
+          console.log("found conversation");
           items[i].lastMessage = conversations.data.batchGetConversations[i].lastMessage;
           items[i].lastUser = conversations.data.batchGetConversations[i].lastUser; //could also store the index of lastuser from the users array rather than the full string
         }
       }
       return items;
     } catch (err) {
-      //console("error in getting latest messages: ", err);
+      console.log("error in getting latest messages: ", err);
     }
   };
 
@@ -408,7 +325,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
     ); //locally removes the item
 
     if (item.accepted && (friendList.length == 0 || !friendList.find(item1 => item1.sender == item.sender && item1.receiver == item.receiver))) {
-      //console("Inside removeFriendRequestListItem");
+      console.log("Inside removeFriendRequestListItem");
 
       var newFriend = {
         createdAt: (new Date(Date.now())).toISOString(),
@@ -442,7 +359,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
             input: { sender: item.sender, accepted: true }
           })
         );
-        ////console("accepted: " + accepted);
+        //console.log("accepted: " + accepted);
       } else {
         await API.graphql(
           graphqlOperation(deleteFriendship, {
@@ -451,7 +368,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
         );
       }
     } catch (err) {
-      //console("error responding to request: ", err);
+      console.log("error responding to request: ", err);
     }
   };
 
@@ -480,7 +397,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
         })
       );
     } catch (err) {
-      //console("error: ", err);
+      console.log("error: ", err);
     }
   };
 
@@ -500,14 +417,8 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
           userId={myId}
           isFull={true}
           fullname={true}
-          textLayoutStyle={{ flex: 1 }}
-          imageStyle={{
-            resizeMode: "cover",
-            width: 50,
-            height: 50,
-            borderRadius: 0,
-            alignSelf: "center",
-          }}
+          style={{ marginLeft: 15 }}
+          textLayoutStyle={{ alignSelf: "center" }}
           textStyle={{
             fontWeight: "bold",
             fontSize: 26,
@@ -709,9 +620,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId, s
           paddingVertical: 15,
           backgroundColor: "white",
         }]}
-        onPress={() => {//console("going to settings"), 
-          navigation.navigate("Settings")
-        }}>
+        onPress={() => { console.log("going to settings"), navigation.navigate("Settings") }}>
         <Text style={{
           fontSize: 18,
           color: (state.routes[state.index].name === "Settings") ? "black" : "grey",

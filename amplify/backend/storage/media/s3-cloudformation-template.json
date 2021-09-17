@@ -94,6 +94,14 @@
         "functionS3Triggeref91c1ecLambdaExecutionRole": {
             "Type": "String",
             "Default": "functionS3Triggeref91c1ecLambdaExecutionRole"
+        },
+        "authfitnessprojecta8f49cfeUserPoolId": {
+            "Type": "String",
+            "Default": "authfitnessprojecta8f49cfeUserPoolId"
+        },
+        "authuserPoolGroupsAdminsGroupRole": {
+            "Type": "String",
+            "Default": "authuserPoolGroupsAdminsGroupRole"
         }
     },
     "Conditions": {
@@ -810,6 +818,70 @@
                                 ]
                             }
                         ]
+                    ]
+                }
+            }
+        },
+        "AdminsGroupPolicy": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+                "PolicyName": "Admins-group-s3-policy",
+                "Roles": [
+                    {
+                        "Fn::Join": [
+                            "",
+                            [
+                                {
+                                    "Ref": "authfitnessprojecta8f49cfeUserPoolId"
+                                },
+                                "-AdminsGroupRole"
+                            ]
+                        ]
+                    }
+                ],
+                "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "s3:PutObject",
+                                "s3:GetObject",
+                                "s3:ListBucket",
+                                "s3:DeleteObject"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:s3:::",
+                                            {
+                                                "Ref": "S3Bucket"
+                                            },
+                                            "/*"
+                                        ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": "s3:ListBucket",
+                            "Resource": [
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:s3:::",
+                                            {
+                                                "Ref": "S3Bucket"
+                                            }
+                                        ]
+                                    ]
+                                }
+                            ]
+                        }
                     ]
                 }
             }

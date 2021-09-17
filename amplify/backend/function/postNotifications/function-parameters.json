@@ -7,6 +7,14 @@
         "update",
         "delete"
       ]
+    },
+    "storage": {
+      "media": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ]
     }
   },
   "lambdaLayers": [

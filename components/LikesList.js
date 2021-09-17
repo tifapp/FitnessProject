@@ -60,10 +60,7 @@ export default function LikesList({ postId }) {
         setDataFunction={setLikedUsers}
         renderItem={({ item }) => (
           <ProfileImageAndName
-            imageStyle={[
-              styles.smallImageStyle,
-              { marginHorizontal: 0 },
-            ]}
+            style={{ margin: 15 }}
             userId={item.userId}
             subtitleComponent={
               <Text style={{ color: "gray" }}>{printTime(item.createdAt)}</Text>

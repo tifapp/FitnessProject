@@ -16,6 +16,7 @@ import { Amplify, API, graphqlOperation, Auth, Cache, Storage } from "aws-amplif
 import { getUser } from "./src/graphql/queries";
 import ProfileStack from "stacks/ProfileStack";
 import MainTabs from "./MainTabs";
+import ReportScreen from "screens/ReportScreen";
 import SettingsScreen from "screens/SettingsScreen";
 import ConversationScreen from "screens/ConversationScreen";
 import ComplianceScreen from "screens/ComplianceScreen";
@@ -43,6 +44,7 @@ import { StatusBar } from "expo-status-bar";
 import MessageScreen from "./screens/MessageScreen";
 import LookupUserScreen from "screens/LookupUser";
 import {headerOptions} from "components/headerComponents/headerOptions"
+import { Audio } from 'expo-av';
 
 if (
   Platform.OS === "android" &&
@@ -93,6 +95,7 @@ const App = () => {
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
   const [userId, setUserId] = useState('checking...'); //stores the user's id if logged in
+  const [isAdmin, setIsAdmin] = useState(false); //seems insecure
 
   const [conversationIds, setConversationIds] = useState([]);
   
@@ -121,7 +124,9 @@ const App = () => {
 
   const checkIfUserSignedUp = async () => {
     try {
-      const query = await Auth.currentUserInfo();
+      const query = await Auth.currentAuthenticatedUser();
+      if (query.signInUserSession.idToken.payload["cognito:groups"])
+        setIsAdmin(query.signInUserSession.idToken.payload["cognito:groups"].includes("Admins"));
       const user = await API.graphql(
         graphqlOperation(getUser, { id: query.attributes.sub })
       );
@@ -139,6 +144,11 @@ const App = () => {
   };
 
   const requestAndSaveNotificationPermissions = async () => {
+    await Audio.requestPermissionsAsync();
+    await Audio.setAudioModeAsync({
+      playsInSilentModeIOS: true,
+    }); 
+
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
     if (existingStatus !== 'granted') {
@@ -209,7 +219,7 @@ const App = () => {
     return (
       <ActivityIndicator 
       size="large" 
-      color="#0000ff"
+      color="#26c6a2"
       style={{
         flex: 1,
         justifyContent: "center",
@@ -242,6 +252,17 @@ const App = () => {
         </Stack.Navigator>
       </NavigationContainer>
     );
+  } else if (isAdmin) {
+    return (
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Report List"
+            component={ReportScreen} //should be in a separate app, not this one. we'll make a different app to view reports.
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    );
   } else {
     return (
       <NavigationContainer>
@@ -259,7 +280,6 @@ const App = () => {
           drawerContent={(props) => (
             <CustomSidebarMenu
               myId={userId}
-              setConversationIds={setUniqueConversationIds}
               {...props}
             />
           )}

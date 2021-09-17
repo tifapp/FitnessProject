@@ -1,23 +1,16 @@
 import React, { useState, useEffect, useRef, PureComponent } from "react";
 import {
-  StyleSheet,
   Text,
-  Button,
   Image,
   View,
-  TextInput,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  Keyboard,
-  ActivityIndicator,
-  ScrollView,
   SafeAreaView,
   LayoutAnimation,
+  Animated,
 } from "react-native";
 // Get the aws resources configuration parameters
-import { API, graphqlOperation, Cache } from "aws-amplify";
-import { createPost, updatePost, deletePost, createConversation, updateConversation, deleteConversation } from "root/src/graphql/mutations";
-import { listPosts, postsByChannel, batchGetLikes, getFriendship, getConversations, getConversation } from "root/src/graphql/queries";
+import { API, graphqlOperation, Cache, Storage } from "aws-amplify";
+import { createReport, createPost, updatePost, deletePost, createConversation, updateConversation } from "root/src/graphql/mutations";
+import { postsByChannel, batchGetLikes, getFriendship, getConversations, getConversation } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
 import { onCreatePostFromChannel, onDeletePostFromChannel, onUpdatePostFromChannel, onCreateLike, onDeleteLike, onIncrementLikes, onDecrementLikes } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
@@ -28,6 +21,7 @@ import { ProfileImageAndName } from "components/ProfileImageAndName";
 import ExpandingTextInput from "components/ExpandingTextInput";
 import SpamButton from "components/SpamButton";
 import { getLinkPreview } from 'link-preview-js';
+import IconButton from "components/IconButton";
 
 const linkify = require('linkify-it')()
 linkify
@@ -41,17 +35,14 @@ var styles = require('styles/stylesheet');
 
 var allSettled = require('promise.allsettled');
 
-export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, originalParentId, Accepted, lastUser, sidebar, id }) {
-  const [postVal, setPostVal] = useState("");
+const viewabilityConfig = {
+  minimumViewTime: 150,
+  itemVisiblePercentThreshold: 66,
+  waitForInteraction: false,
+}
+
+export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, originalParentId, autoFocus = false }) {
   const [posts, setPosts] = useState([]);
-
-  /*
-  console.log("^^^^^^^^^^^^^^^^^^^^^^");
-  console.log(lastUser);
-  console.log("^^^^^^^^^^^^^^^^^^^^^^");
-  */
-
-  //const numCharsLeft = 1000 - postVal.length;
 
   const [onlineCheck, setOnlineCheck] = useState(true);
   const [ButtonCheck, setButtonCheck] = useState(false);
@@ -74,13 +65,8 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
               isFull={true}
               fullname={true}
               hidename={true}
-              imageStyle={{
-                resizeMode: "cover",
-                width: 35,
-                height: 35,
-                borderRadius: 0,
-                alignSelf: "center",
-              }}
+              imageSize={30}
+              style={{ marginLeft: 15 }}
             />
         })
       }
@@ -141,24 +127,15 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
           newPost.likes = newPost.likes ?? 0;
           newPost.replies = newPost.replies ?? 0;
           if (newPost.userId === route.params?.myId) {
-            ////console("received own post again")
-            setPosts(currentPosts.current.map(post => {
+            console.log("received own post again")
+            setPosts(posts => posts.map(post => {
               if (post.userId === route.params?.myId && post.createdAt == "null") return newPost
               else return post;
             }));
           }
-          else if (newPost.parentId != null) {
-            if (currentPosts.current.length > 0 && currentPosts.current.find(post => post.channel === newPost.channel)) {
-              let tempposts = currentPosts.current;
-              var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.channel === newPost.channel)]);
-              tempposts.splice(index + 1, 0, newPost);
-              LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-              setPosts(tempposts);
-            }
-          }
           else {
             LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-            setPosts([newPost, ...currentPosts.current]); //what if we have a lot of new posts at once?
+            setPosts(posts => [newPost, ...posts]); //what if we have a lot of new posts at once?
           }
         }
       }
@@ -168,18 +145,19 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         const deletedPost = event.value.data.onDeletePostFromChannel
         if (deletedPost.userId != route.params?.myId) {//acts as validation, maybe disable textinput while this happens
           if (currentPosts.current.find(post => post.userId === deletedPost.userId && post.createdAt === deletedPost.createdAt)) {
-            let tempposts = currentPosts.current;
-            var index = tempposts.findIndex(post => post.userId === deletedPost.userId && post.createdAt === deletedPost.createdAt);
-            tempposts.splice(index, 1);
             LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-            setPosts(tempposts);
+            setPosts(posts => {
+              var index = posts.findIndex(post => post.userId === deletedPost.userId && post.createdAt === deletedPost.createdAt);
+              posts.splice(index, 1);
+              return posts;
+            });
           }
         }
       }
     });
     const updatePostSubscription = API.graphql(graphqlOperation(onUpdatePostFromChannel, { channel: channel })).subscribe({ //nvm we dont have a subscription event for incrementlike
       next: event => {
-        ////console("post has been updated");
+        //console.log("post has been updated");
       }
     });
     checkInternetConnection();
@@ -200,14 +178,14 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     try {
       await allSettled([
         API.graphql(graphqlOperation(batchGetLikes, { likes: postIds })).then((likes) => {
-          ////console("looking for likes: ", likes);
+          //console.log("looking for likes: ", likes);
           //returns an array of like objects or nulls corresponding with the array of newposts
           for (i = 0; i < newPosts.length; ++i) {
             if (newPosts[i].likes == null) {
               newPosts[i].likes = 0;
             }
             if (likes.data.batchGetLikes[i] != null) {
-              ////console("found liked post");
+              //console.log("found liked post");
               newPosts[i].likedByYou = true;
             } else {
               newPosts[i].likedByYou = false;
@@ -216,7 +194,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         }),
 
         allSettled(newPosts.map((post) => Cache.getItem(post.userId))).then((results) => {
-          ////console("all are complete")
+          //console.log("all are complete")
           for (i = 0; i < newPosts.length; ++i) {
             if (results[i].status === "fulfilled") {
               newPosts[i].info = results[i].value;
@@ -236,7 +214,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
           else
             return Promise.reject()
         })).then((results) => {
-          ////console(results)
+          //console.log(results)
           for (i = 0; i < newPosts.length; ++i) {
             if (results[i].status === "fulfilled") {
               newPosts[i].urlPreview = results[i].value;
@@ -245,14 +223,14 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         }),
       ]);
 
-      ////console(newPosts[0])
+      //console.log(newPosts[0])
 
       return newPosts;
 
       //we can also check if the item contains a link and load the link preview data through here as well, and insert it into the postitem
       //link previews should have a fixed height btw, or at least a max height. but then it could vary between 0 and the max height
     } catch (err) {
-      //console("error in detecting likes: ", err);
+      console.log("error in detecting likes: ", err);
     }
   }
 
@@ -267,7 +245,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   };
 
   const DisplayInternetConnection = () => {
-    //console(onlineCheck);
+    console.log(onlineCheck);
     if (!onlineCheck) {
       return (
         <View style={styles.offlineContainer}>
@@ -280,18 +258,16 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
 
   const updatePostAsync = async (createdAt, editedText) => {
     //replace the post locally
-    let tempposts = posts;
-    tempposts[tempposts.findIndex(p => p.createdAt == createdAt && p.userId == route.params?.myId)].description = editedText;
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setPosts(tempposts);
-
-    const post = tempposts.find(p => { return p.createdAt == createdAt && p.userId == route.params?.myId });
+    setPosts((posts) => {
+      posts.find(p => { return p.createdAt == createdAt && p.userId == route.params?.myId }).description = editedText;
+      return posts;
+    });
 
     try {
       await API.graphql(graphqlOperation(updatePost, { input: { createdAt: createdAt, description: editedText } }));
-      //console("success in updating a post");
+      console.log("success in updating a post");
     } catch (err) {
-      //console("error in updating post: ", err);
+      console.log("error in updating post: ", err);
     }
   }
 
@@ -311,166 +287,96 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
 
   const addPostAsync = async (parentId, replyText) => {
     checkInternetConnection();
-    ////console("attempting to make new post");
-    const newPost = {
-      description: replyText ?? postVal,
-      channel: replyText != null ? parentId.toString() : channel,
-    };
-    if (originalParentId != null) {
-      newPost.parentId = originalParentId
-    } else if (replyText != null) {
-      newPost.parentId = parentId
-    }
-    if (receiver != null) {
-      newPost.receiver = receiver;
-    }
-    setPostVal("");
-
-    ////console(route.params?.myId + " just posted.");
-
-    const localNewPost = { ...newPost, userId: route.params?.myId, createdAt: "null", loading: true }
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    if (replyText == null) {
-      ////console("posting a WHOLE NEW POST")
-      setPosts([localNewPost, ...posts]);
-    }
-    else {
-      ////console("posting a reply"  + replyText)
-      let tempposts = currentPosts.current;
-      var index = tempposts.indexOf(tempposts[tempposts.findIndex(p => p.channel == newPost.channel)]);
-      tempposts.splice(index + 1, 0, localNewPost);
-      setPosts(tempposts);
-    }
-
-    let users = [route.params?.myId, receiver];
-    users.sort();
-
-    try {
-
-      const friend1 = await API.graphql(graphqlOperation(getFriendship, { sender: route.params?.myId, receiver: receiver }));
-      const friend2 = await API.graphql(graphqlOperation(getFriendship, { sender: receiver, receiver: route.params?.myId }));
-
-      let newConversations1 = await API.graphql(graphqlOperation(getConversations, { Accepted: 1 }))
-      let newConversations2 = await API.graphql(graphqlOperation(getConversations, { Accepted: 0 }))
-
-      newConversations1 = newConversations1.data.getConversations.items
-      newConversations2 = newConversations2.data.getConversations.items
-
-      let checkConversationExists = newConversations1.find(item => item.id === newPost.channel);
-
-      if (checkConversationExists != null) {
-        setButtonCheck(true);
-      }
-      else {
-        checkConversationExists = newConversations2.find(item => item.id === newPost.channel);
-      }
-
-      const friendCheck = () => {
-        return (friend1 != null ? friend1 : friend2);
-      }
-
-      const friend = friendCheck();
-      ////console("[[[[[[[[[[[[[[[[[[[[[[[");
-      ////console(friend.data.getFriendship);
-      ////console("[[[[[[[[[[[[[[[[[[[[[[[");
-
-
-      if (checkConversationExists == null) {
-        //console("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\");
-        if (friend1.data.getFriendship === null && friend2.data.getFriendship === null) {
-          ////console("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-          await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postVal, Accepted: 0 } }));
-          ////console("##############################");
-        }
-        else if (friend.data.getFriendship.accepted === null) {
-          //console(":::::::::::::::::::::::::::")
-          await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postVal, Accepted: 0 } }));
-          //console(":::::::::::::::::::::::::::")
-        }
-        else {
-          ////console("******************************");
-          await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postVal, Accepted: 1 } }));
-          ////console("******************************");
-        }
-      }
-      else if (localNewPost.userId != checkConversationExists.lastUser) {
-        //console("testing");
-        //console(newPost.channel);
-        //console(checkConversationExists);
-        await API.graphql(graphqlOperation(updateConversation, { input: { id: newPost.channel, lastMessage: postVal, Accepted: 1 } }));
-      }
-      else {
-        await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, lastMessage: postVal } }));
-      }
-
-      if (receiver != null) {
-        //when sending a message, create conversation using specified channel if posts is empty. if not, update conversation with the specified channel.
-        if (posts.length == 0) {
-          //API.graphql(graphqlOperation(createConversation, { input: {id: channel, users: users, lastMessage: postVal} }));
-        } else {
-          await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, lastMessage: postVal } }));
-        }
-      }
-
-      API.graphql(graphqlOperation(createPost, { input: newPost }));
-    } catch (err) {
-      //console("error in creating post: ", err);
-    }
-  };
-
-  const deletePostsAsync = async (timestamp) => {
-    checkInternetConnection();
-
-    let parent_post = posts.find((item) => {
-      //const time = timestamp.toString();
-      return item.createdAt === timestamp && item.userId === route.params?.myId;
-    })
-
-    ////console("parent post: " + parent_post.description);
-
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    if (parent_post.parentId == null) {
-      setPosts((posts) => {
-        return posts.filter((val) => (val.channel != parent_post.channel));
-      });
-    } else {
-      setPosts((posts) => {
-        return posts.filter((val) => (val.createdAt != parent_post.createdAt || val.userId != parent_post.userId));
-      });
-    }
+    setPosts((posts) => {
+      return posts.filter((post) => (post.createdAt !== timestamp || post.userId !== route.params?.myId));
+    });
 
     try {
       await API.graphql(graphqlOperation(deletePost, { input: { createdAt: timestamp, userId: route.params?.myId } }));
     } catch {
-      //console("error in deleting post: ");
+      console.log("error in deleting post: ");
     }
-
   };
+
+  const reportPost = async (timestamp, author) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setPosts((posts) => {
+      return posts.filter((post) => (post.createdAt !== timestamp || post.userId !== author));
+    });
+
+    try {
+      await API.graphql(graphqlOperation(createReport, { input: { postId: timestamp + "#" + author, userId: route.params?.myId } }));
+    } catch (err) {
+      console.log("error in reporting post: ", err);
+    }
+  }
 
   const scrollToTop = () => {
     scrollRef.current?.scrollToOffset({ offset: 0, animated: true })
   }
 
-  const renderPostItem = React.useCallback(({ item, index }) => (
+  const renderPostItem = ({ item, index }) => (
     <PostItem
       index={index}
       item={item}
+      likes={item.likes}
+      replies={item.replies}
       deletePostsAsync={deletePostsAsync}
       writtenByYou={item.userId === route.params?.myId}
+      myId={route.params?.myId}
       editButtonHandler={updatePostAsync}
       receiver={receiver}
       showTimestamp={showTimestamp(item, index)}
+      reportPost={reportPost}
       newSection={
         index == 0 ? true : showTimestamp(posts[index - 1], index - 1)
       }
+      isVisible={item.isVisible}
+      shouldSubscribe={item.shouldSubscribe}
     />
-  ), [])
+  )
+
+  const onViewableItemsChanged = React.useCallback(({ viewableItems, changedItems }) => {
+    //console.log("viewable items have changed")
+
+    if (viewableItems.length <= 0) return;
+
+    //find the index in the posts array of the first item in viewableitems.
+    const firstViewableIndex = posts.findIndex(post => viewableItems[0].key === post.createdAt.toString() + post.userId); //use currentposts?
+    //record that starting index
+
+    //loop through the posts array until we hit startingindex - 20 and turn off subscription flags
+    //turn on subscription flags until we hit startingindex + viewableitems.length + 20
+    let currentIndex = 0;
+    setPosts(posts => posts.map((post, index) => {
+      //we'll activate real time updates for posts just out of view
+      if ((index < firstViewableIndex && index >= firstViewableIndex - 10) || (index > firstViewableIndex + viewableItems.length && index <= firstViewableIndex + viewableItems.length + 10)) {
+        post.shouldSubscribe = true;
+      } else {
+        post.shouldSubscribe = false;
+      }
+
+      post.isVisible = false;
+      if (viewableItems[currentIndex] && viewableItems[currentIndex].key === post.createdAt.toString() + post.userId) {
+        //grab the middle of the index, that's the video that should be playing (if there is any)
+        //console.log("turning post visible")
+        ++currentIndex;
+        post.isVisible = true;
+      }
+
+      return post;
+    }));
+
+    //in the postitem have a useeffect listening for the subscription flag to turn on and off subscriptions for that post
+  }, [])
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
 
       <APIList
+        viewabilityConfig={viewabilityConfig}
         ListRef={scrollRef}
         ListHeaderComponent={
 
@@ -503,49 +409,16 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
             </View>
 
             {Accepted || ButtonCheck || receiver == null || lastUser == route.params.myId || sidebar || lastUser == undefined ?
-              <ExpandingTextInput
-                style={[
-                  styles.textInputStyle,
-                  { marginTop: 5, marginBottom: 5 },
-                ]}
-                multiline={true}
-                placeholder="Start Typing..."
-                onChangeText={setPostVal}
-                value={postVal}
-                clearButtonMode="always"
-                maxLength={1000}
+              <PostInputField
+                channel={channel}
+                headerComponent={headerComponent}
+                receiver={receiver}
+                myId={route.params?.myId}
+                originalParentId={originalParentId}
+                pushLocalPost={(localNewPost) => setPosts((posts) => [localNewPost, ...posts])}
+                autoFocus={autoFocus}
               /> : null
             }
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "flex-end",
-                marginBottom: 10,
-              }}
-            >
-              {
-                Accepted || ButtonCheck || receiver == null || lastUser == route.params.myId || lastUser == undefined || sidebar ?
-                  <TouchableOpacity
-                    style={[
-                      { flexDirection: "row", marginRight: 15 },
-                    ]}
-                    onPress={postVal === "" ? () => {
-                      alert("No text detected in text field");
-                    } : addPostAsync}
-                  >
-                    <MaterialIcons
-                      name={postVal === "" ? "add-circle-outline" : "add-circle"}
-                      size={15}
-                      color={postVal === "" ? "gray" : "blue"}
-                      style={{ marginRight: 5, marginTop: 2 }}
-                    />
-                    <Text style={[{ fontWeight: "bold", fontSize: 15, color: postVal === "" ? "gray" : "blue" }]}>
-                      {receiver != null ? "Send Message" : "Add Post"}
-                    </Text>
-                  </TouchableOpacity> : null
-              }
-            </View>
           </View>
         }
         initialAmount={7}
@@ -558,20 +431,276 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         renderItem={renderPostItem}
         keyExtractor={(item) => item.createdAt.toString() + item.userId}
         onEndReachedThreshold={0.5}
+        onViewableItemsChanged={onViewableItemsChanged}
       />
-      {
-        /*
-      <View
-        style={{
-          top: 50,
-          position: "absolute",
-          alignSelf: "flex-end",
-        }}
-      >
-        <SpamButton func={addPostAsync} />
-      </View>
-        */
-      }
     </SafeAreaView>
   );
 };
+
+import usePhotos from '../hooks/usePhotos';
+import * as ImageManipulator from 'expo-image-manipulator';
+import SHA256 from "hooks/hash";
+import { Video, AVPlaybackStatus } from 'expo-av';
+
+function PostInputField({ channel, headerComponent, receiver, myId, originalParentId, pushLocalPost, autoFocus = false }) {
+  const [pickFromGallery, pickFromCamera] = usePhotos(true);
+  const [postInput, setPostInput] = useState("");
+  const [imageURL, setImageURL] = useState(null);
+  const [isVideo, setIsVideo] = useState(null);
+  const [postIsLoading, setPostIsLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  let animation = useRef(new Animated.Value(0));
+
+  useEffect(() => {
+    Animated.timing(animation.current, {
+      toValue: progress,
+      duration: 200,
+      useNativeDriver: false // Add This line
+    }).start();
+  }, [progress])
+
+  const width = animation.current.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0%", "100%"],
+    extrapolate: "clamp"
+  })
+
+  const addPostAsync = async () => {
+    //console.log("current date is ", Date.now());
+    setPostIsLoading(true);
+
+    const imageID = SHA256(Date.now().toString());
+
+    const newPost = {
+      description: postInput,
+      channel: channel,
+    };
+    if (receiver != null) {
+      newPost.receiver = receiver;
+    }
+    if (originalParentId != null) {
+      newPost.parentId = originalParentId;
+    }
+    if (imageURL !== null) {
+      const re = /(?:\.([^.]+))?$/;
+      const videoExtension = re.exec(imageURL)[1];
+
+      newPost.imageURL = `${imageID}.${isVideo ? videoExtension : 'jpg'}`;
+    }
+    const localNewPost = {
+      ...newPost,
+      userId: myId,
+      createdAt: "null",
+      loading: true
+    }
+    setPostInput("");
+
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    pushLocalPost(localNewPost);
+
+    if (newPost.receiver) global.updateFriendsListWithMyNewMessage(newPost);
+    //if (global.updatemessagescreen)
+    //global.updateMessageScreen
+    //if global.updateconversationscreen
+    //global.updateConversationScreen
+
+    try {
+      //first, we must upload the image if any
+      if (imageURL !== null) {
+        let blob;
+        if (!isVideo) {
+          const resizedPhoto = await ImageManipulator.manipulateAsync(
+            imageURL,
+            [{ resize: { width: 500 } }],
+            { compress: 1, format: 'jpeg' },
+          );
+          const response = await fetch(resizedPhoto.uri);
+          blob = await response.blob();
+        } else {
+          const response = await fetch(imageURL);
+          blob = await response.blob();
+        }
+
+        //scan the uri and check filetype. maybe console log the uri first
+        const re = /(?:\.([^.]+))?$/;
+        const videoExtension = re.exec(imageURL)[1];
+        setProgress(0.01);
+        await Storage.put(`feed/${imageID}.${isVideo ? videoExtension : 'jpg'}`, blob, {
+          progressCallback(progress) {
+            setProgress(progress.loaded / progress.total);
+            //console.log(progress); //what is "part"
+          },
+          level: 'public', contentType: isVideo ? 'video/' + videoExtension : 'image/jpeg'
+        }); //make sure people can't overwrite other people's photos, and preferrably not be able to list all the photos in s3 using brute force. may need security on s3
+        setProgress(0);
+        setImageURL(null);
+      }
+
+      if (receiver) {
+        const friend1 = await API.graphql(graphqlOperation(getFriendship, { sender: myId, receiver: receiver }));
+        const friend2 = await API.graphql(graphqlOperation(getFriendship, { sender: receiver, receiver: myId }));
+
+        let newConversations1 = await API.graphql(graphqlOperation(getConversations, { Accepted: 1 }))
+        let newConversations2 = await API.graphql(graphqlOperation(getConversations, { Accepted: 0 }))
+
+        newConversations1 = newConversations1.data.getConversations.items
+        newConversations2 = newConversations2.data.getConversations.items
+
+        let checkConversationExists = newConversations1.find(item => item.id === newPost.channel);
+
+        if (checkConversationExists == null) {
+          checkConversationExists = newConversations2.find(item => item.id === newPost.channel);
+        }
+
+        const friendCheck = () => {
+          return (friend1 != null ? friend1 : friend2);
+        }
+
+        const friend = friendCheck();
+
+        let users = [myId, receiver].sort();
+
+        if (checkConversationExists == null) {
+          if (friend1.data.getFriendship === null && friend2.data.getFriendship === null) {
+            await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postInput, Accepted: 0 } }));
+          }
+          else if (friend.data.getFriendship.accepted === null) {
+            await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postInput, Accepted: 0 } }));
+          }
+          else {
+            await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postInput, Accepted: 1 } }));
+          }
+        }
+        else if (localNewPost.userId != checkConversationExists.lastUser) {
+          await API.graphql(graphqlOperation(updateConversation, { input: { id: newPost.channel, lastMessage: postInput, Accepted: 1 } }));
+        }
+        else {
+          await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, lastMessage: postInput } }));
+        }
+      }
+
+      API.graphql(graphqlOperation(createPost, { input: newPost }));
+    } catch (err) {
+      console.warn("error in creating post: ", err);
+    }
+
+    setPostIsLoading(false);
+  };
+
+  return (
+    <View>
+      {headerComponent}
+
+      {
+        imageURL !== null ?
+          isVideo ?
+            <Video
+              style={{
+                resizeMode: "cover",
+                width: 450,
+                height: 450,
+                alignSelf: "center",
+              }} //check if this should be an image or a video?
+              useNativeControls
+              isLooping
+              shouldPlay
+              source={{ uri: imageURL }} //need a way to delete the image too
+              posterSource={require("../assets/icon.png")}
+            /> :
+            <Image
+              style={{
+                resizeMode: "cover",
+                width: 450,
+                height: 450,
+                alignSelf: "center",
+              }} //check if this should be an image or a video?
+              source={{ uri: imageURL }} //need a way to delete the image too
+            /> : null
+      }
+
+      <ExpandingTextInput
+        style={[
+          styles.textInputStyle,
+          { marginTop: 5, marginBottom: 5 },
+        ]}
+        autoFocus={autoFocus}
+        multiline={true}
+        placeholder={progress > 0 ? "Upload in progress..." : "Start typing..."}
+        onChangeText={setPostInput}
+        value={postInput}
+        clearButtonMode="always"
+        maxLength={1000}
+      />
+
+      <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 15, marginTop: 2, marginBottom: 10 }}>
+        <View style={{ flexDirection: "row" }}>
+          <IconButton
+            iconName={"insert-photo"}
+            size={20}
+            color={imageURL === null || postIsLoading ? "gray" : "blue"}
+            style={{ marginRight: 6 }}
+            onPress={() => pickFromGallery(setImageURL, null, setIsVideo)}
+          />
+          <IconButton
+            iconName={"camera-alt"}
+            size={20}
+            style={{ marginRight: 6 }}
+            color={imageURL === null || postIsLoading ? "gray" : "blue"}
+            onPress={() => pickFromCamera(setImageURL, null, setIsVideo)}
+          />
+          {
+            imageURL != null ?
+              <IconButton
+                iconName={"close"}
+                size={20}
+                color={imageURL === null || postIsLoading ? "gray" : "blue"}
+                onPress={() => setImageURL(null)}
+              /> : null
+          }
+        </View>
+        <IconButton
+          iconName={(postInput === "" && imageURL === null) || postIsLoading ? "add-circle-outline" : "add-circle"}
+          size={15}
+          color={(postInput === "" && imageURL === null) || postIsLoading ? "gray" : "blue"}
+          label={receiver != null ? "Send Message" : "Add Post"}
+          onPress={postIsLoading ? () => {
+            alert("Currently uploading a post");
+          } : postInput === "" && imageURL === null ? () => {
+            alert("No text detected in text field");
+          } : addPostAsync}
+        />
+      </View>
+
+      {
+        progress > 0 ?
+          <View style={{
+            height: 20,
+            backgroundColor: 'white',
+            margin: 15,
+            borderRadius: 5,
+          }}>
+            <Animated.View style={[{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0
+            }, { backgroundColor: "#26c6a2", width }]} />
+          </View> : null
+      }
+
+      {
+        <View
+          style={{
+            top: 50,
+            position: "absolute",
+            alignSelf: "flex-end",
+          }}
+        >
+          <SpamButton func={addPostAsync} />
+        </View>
+      }
+    </View>
+  )
+}

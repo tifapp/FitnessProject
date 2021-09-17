@@ -25,7 +25,7 @@ exports.loadCapitals = (string) => {
   while (i >= 0) {
     if (!isNaN(string[i] * 1)) {
       capitalIndex = parseInt(string[i] + (capitalIndex > 0 ? capitalIndex.toString() : ""));
-    	console.log("current capitalIndex is ", capitalIndex, " and current int is ", string[i])
+    	//////console.log("current capitalIndex is ", capitalIndex, " and current int is ", string[i])
     } else {
       string = string.substring(0, capitalIndex) +
       string[capitalIndex].toUpperCase() +

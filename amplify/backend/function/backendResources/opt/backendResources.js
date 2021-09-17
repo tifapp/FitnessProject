@@ -6,10 +6,12 @@ const config = {
   region: process.env.AWS_REGION,
   auth: {
     type: AUTH_TYPE.AWS_IAM,
-    credentials: AWS.config.credentials,
+    credentials: AWS.config.credentials, 
   },
   disableOffline: true,
 };
+
+exports.s3 = new AWS.S3();
 
 exports.client = new AWSAppSyncClient(config);
 
@@ -23,7 +25,7 @@ let expo = new Expo();
 exports.sendNotification = async (deviceToken, message) => {
   if (deviceToken == null || deviceToken == "") return;
 
-  console.log("creating notification");
+  ////console.log("creating notification");
   const pushMessage = {
     to: String(deviceToken),
     sound: "default",
@@ -43,7 +45,7 @@ exports.sendNotification = async (deviceToken, message) => {
         let receipts = await expo.getPushNotificationReceiptsAsync(
           tickets[0].id
         );
-        console.log(receipts);
+        //console.log(receipts);
 
         // The receipts specify whether Apple or Google successfully received the
         // notification and information about an error, if one occurred.

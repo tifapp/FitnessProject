@@ -5,6 +5,22 @@
       "providerPlugin": "awscloudformation",
       "dependsOn": [],
       "customAuth": false
+    },
+    "userPoolGroups": {
+      "service": "Cognito-UserPool-Groups",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [
+        {
+          "category": "auth",
+          "resourceName": "fitnessprojecta8f49cfe",
+          "attributes": [
+            "UserPoolId",
+            "AppClientIDWeb",
+            "AppClientID",
+            "IdentityPoolId"
+          ]
+        }
+      ]
     }
   },
   "api": {
@@ -98,6 +114,13 @@
           ]
         },
         {
+          "category": "storage",
+          "resourceName": "media",
+          "attributes": [
+            "BucketName"
+          ]
+        },
+        {
           "category": "function",
           "resourceName": "backendResources",
           "attributes": [
@@ -163,6 +186,20 @@
             "Name",
             "Arn",
             "LambdaExecutionRole"
+          ]
+        },
+        {
+          "category": "auth",
+          "resourceName": "fitnessprojecta8f49cfe",
+          "attributes": [
+            "UserPoolId"
+          ]
+        },
+        {
+          "category": "auth",
+          "resourceName": "userPoolGroups",
+          "attributes": [
+            "AdminsGroupRole"
           ]
         }
       ]

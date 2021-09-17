@@ -28,7 +28,7 @@ export default function UserListItem({
       }, styles.check]}>
         <AntDesign name="user" size={24} color={matchingname ? "black" : "orange"} />
         <ProfileImageAndName
-          imageStyle={styles.smallImageStyle}
+          textLayoutStyle={{alignSelf: "center"}}
           userId={item.id}
         />
         {

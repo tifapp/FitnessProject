@@ -364,6 +364,7 @@ export const postsByUser = /* GraphQL */ `
         channel
         receiver
         parentId
+        imageURL
         likes
         replies
       }
@@ -396,6 +397,7 @@ export const postsByReceiver = /* GraphQL */ `
         channel
         receiver
         parentId
+        imageURL
         likes
         replies
       }
@@ -428,6 +430,7 @@ export const postsByChannel = /* GraphQL */ `
         channel
         receiver
         parentId
+        imageURL
         likes
         replies
       }
@@ -445,6 +448,7 @@ export const getPost = /* GraphQL */ `
       channel
       receiver
       parentId
+      imageURL
       likes
       replies
     }
@@ -475,8 +479,48 @@ export const listPosts = /* GraphQL */ `
         channel
         receiver
         parentId
+        imageURL
         likes
         replies
+      }
+      nextToken
+    }
+  }
+`;
+export const getReport = /* GraphQL */ `
+  query GetReport($createdAt: AWSDateTime!, $postId: ID!) {
+    getReport(createdAt: $createdAt, postId: $postId) {
+      createdAt
+      updatedAt
+      userId
+      postId
+      message
+    }
+  }
+`;
+export const listReports = /* GraphQL */ `
+  query ListReports(
+    $createdAt: AWSDateTime
+    $postId: ModelIDKeyConditionInput
+    $filter: ModelReportFilterInput
+    $limit: Int
+    $nextToken: String
+    $sortDirection: ModelSortDirection
+  ) {
+    listReports(
+      createdAt: $createdAt
+      postId: $postId
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
+    ) {
+      items {
+        createdAt
+        updatedAt
+        userId
+        postId
+        message
       }
       nextToken
     }
@@ -495,6 +539,8 @@ export const getUser = /* GraphQL */ `
       latitude
       longitude
       deviceToken
+      friendRequestPrivacy
+      messagesPrivacy
       createdAt
       updatedAt
     }
@@ -518,6 +564,8 @@ export const listUsers = /* GraphQL */ `
         latitude
         longitude
         deviceToken
+        friendRequestPrivacy
+        messagesPrivacy
         createdAt
         updatedAt
       }

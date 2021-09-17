@@ -123,7 +123,7 @@ export default () => {
       console.log('returning users fields looks like', fields);
 
       const ourUser = {
-        id: query.attributes.sub,
+        //id: query.attributes.sub,
         latitude: location == null || location.latitude < 0 ? null : location.latitude,
         longitude: location == null || location.latitude < 0 ? null : location.longitude
       };

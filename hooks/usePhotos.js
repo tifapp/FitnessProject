@@ -2,20 +2,21 @@ import {Alert} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
 
-export default () => {
+export default (allowVideo = false) => {
 
-    const pickFromGallery = async(setImageURL, setImageChanged) => {
-        const {granted} = await Permissions.askAsync(Permissions.CAMERA_ROLL)
+    const pickFromGallery = async(setImageURL, setImageChanged, setIsVideo) => {
+        const {granted} = await Permissions.askAsync(Permissions.MEDIA_LIBRARY)
         if (granted) {
             let response = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                mediaTypes: allowVideo ? ImagePicker.MediaTypeOptions.All : ImagePicker.MediaTypeOptions.Images,
                 allowsEditing: true,
                 aspect: [1, 1],
                 quality: 1
             })
             if (!response.cancelled) {
                 setImageURL(response.uri)
-                setImageChanged(true)
+                if (setImageChanged) setImageChanged(true)
+                if (setIsVideo) setIsVideo(response.type === 'video')
             }
             
             console.log(response)
@@ -26,18 +27,19 @@ export default () => {
         
     }
 
-    const pickFromCamera = async(setImageURL, setImageChanged) => {
+    const pickFromCamera = async(setImageURL, setImageChanged, setIsVideo) => {
         const {granted} = await Permissions.askAsync(Permissions.CAMERA)
         if (granted) {
             let response = await ImagePicker.launchCameraAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                mediaTypes: allowVideo ? ImagePicker.MediaTypeOptions.All : ImagePicker.MediaTypeOptions.Images,
                 allowsEditing: true,
                 aspect: [1, 1],
                 quality: 1
             })
             if (!response.cancelled) {
                 setImageURL(response.uri)
-                setImageChanged(true)
+                if (setImageChanged) setImageChanged(true)
+                if (setIsVideo) setIsVideo(response.type === 'video')
             }
             
             console.log(response)

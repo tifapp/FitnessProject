@@ -1,16 +1,21 @@
-require('isomorphic-fetch');
+/* Amplify Params - DO NOT EDIT
+	API_FITNESSPROJECTAPI_GRAPHQLAPIENDPOINTOUTPUT
+	API_FITNESSPROJECTAPI_GRAPHQLAPIIDOUTPUT
+	ENV
+	REGION
+	process.env.STORAGE_MEDIA_BUCKETNAME,
+Amplify Params - DO NOT EDIT */require('isomorphic-fetch');
 const gql = require('graphql-tag');
 
 const { incrementReplies, decrementReplies, deleteLike, deletePost } = require('/opt/mutations');
 const {getUser, postsByChannel, likesByPost} = require('/opt/queries');
-const { client, sendNotification } = require('/opt/backendResources');
+const { client, sendNotification, s3 } = require('/opt/backendResources');
 const {loadCapitals} = require('/opt/stringConversion');
-const SHA256 = require('/opt/hash');
+const {SHA256} = require('/opt/hash');
 
-exports.handler = (event, context, callback) => {
-  event.Records.forEach((record) => {
+exports.handler = async (event, context, callback) => {
+  return await Promise.all(event.Records.map(async (record) => {
     if (record.eventName == "INSERT") {
-      (async () => {
         try {
           if (record.dynamodb.NewImage.receiver != null) {
             //message notifications
@@ -36,7 +41,7 @@ exports.handler = (event, context, callback) => {
   
             await sendNotification(receiverName.data.getUser.deviceToken, loadCapitals(senderName.data.getUser.name) + " sent you a message!"); //truncate the sender's name!
             //console.log("sent notifications finished")
-            callback(null, "Successfully sent messaging notification");
+            return "Successfully sent messaging notification";
           } else if (record.dynamodb.NewImage.parentId != null) {
             //reply notifications
             const parentPostId = record.dynamodb.NewImage.parentId.S;
@@ -82,34 +87,39 @@ exports.handler = (event, context, callback) => {
   
             //if (friendshipcheck.data.getFriendship != null) {
               await sendNotification(parent.data.getUser.deviceToken, loadCapitals(replier.data.getUser.name) + " sent you a reply!"); //truncate the sender's name!
-              callback(null, "Finished Replying");
+              return "Finished Replying";
             //}
           } else {
-            callback(null, "not a message or reply");
+            return "not a message or reply";
           }
         }
         catch (e) {
-          //console.warn('Error sending reply: ', e);
-          callback(Error(e));
+          console.warn('Error sending reply: ', e);
+          return Error(e);
         }
-      })();
-    } else {
-      (async () => {
-        try {          
+    } else if (record.eventName == "REMOVE") {
+        try {
+          if (record.dynamodb.OldImage.imageURL && record.dynamodb.OldImage.imageURL.S !== '') {
+            //console.log("attempting to delete image");
+            s3.deleteObject({ Bucket: process.env.STORAGE_MEDIA_BUCKETNAME, Key: `public/feed/${record.dynamodb.OldImage.imageURL.S}` }).promise();
+          }
+
           //delete like objects, if any
-          if (record.dynamodb.OldImage.likes.N > 0) {
+          if (record.dynamodb.OldImage.likes && record.dynamodb.OldImage.likes.N > 0) {
             //check if there are likes to delete
+            let nextToken = null;
             while (true) {
               //fetch likes
               const results = await client.query({
                 query: gql(likesByPost),
                 variables: {
                   postId: record.dynamodb.OldImage.createdAt.S + "#" + record.dynamodb.OldImage.userId.S,
+                  nextToken: nextToken,
                 }
               });
   
               //delete likes
-              await Promise.all(results.data.likesByPost.items.map(async (like) => {
+              results.data.likesByPost.items.forEach((like) => {
                 client.mutate({
                   mutation: gql(deleteLike),
                   variables: {
@@ -119,24 +129,28 @@ exports.handler = (event, context, callback) => {
                     }
                   }
                 });
-              }));
+              });
   
               //loop if there are more likes
-              if (results.data.likesByPost.nextToken == null) break;
+              nextToken = results.data.likesByPost.nextToken;
+              if (nextToken == null) break;
             }
           }
 
           //delete replies, if any
-          if (record.dynamodb.OldImage.replies.N > 0) {
+          if (record.dynamodb.OldImage.replies && record.dynamodb.OldImage.replies.N > 0) {
+            const channel = SHA256(record.dynamodb.OldImage.userId.S+record.dynamodb.OldImage.createdAt.S);
+            let nextToken = null;
             while (true) {
               const results = await client.query({
                 query: gql(postsByChannel),
                 variables: {
-                  channel: SHA256(record.dynamodb.OldImage.userId.S+record.dynamodb.OldImage.createdAt.S),
+                  channel: channel,
+                  nextToken: nextToken,
                 }
               });
 
-              await Promise.all(results.data.postsByChannel.items.map(async (post) => {
+              results.data.postsByChannel.items.forEach((post) => {
                 client.mutate({
                   mutation: gql(deletePost),
                   variables: {
@@ -146,9 +160,10 @@ exports.handler = (event, context, callback) => {
                     }
                   }
                 });
-              }));
+              });
 
-              if (results.data.postsByChannel.nextToken == null) break;
+              nextToken = results.data.postsByChannel.nextToken;
+              if (nextToken == null) break;
             }
           }
 
@@ -172,16 +187,15 @@ exports.handler = (event, context, callback) => {
               },
             });
             
-            callback(null, "Finished Replying");
+            return "Finished Replying";
           } else {
-            callback(null, "not a message or reply");
+            return "not a message or reply";
           }
         }
         catch (e) {
-          //console.warn('Error sending reply: ', e);
-          callback(Error(e));
+          console.warn('Error deleting post: ', e);
+          return Error(e);
         }
-      })();
     }
-  });
+  }));
 };
