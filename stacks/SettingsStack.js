@@ -1,14 +1,14 @@
 import 'react-native-gesture-handler';
 import { Button } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
-import SettingsScreen from "screens/SettingsScreen";
+import BlockListScreen from "screens/BlockListScreen";
 import LookupUserScreen from "screens/LookupUser";
 
 import React from 'react';
 
 const Stack = createStackNavigator();
 
-export default function GroupSearchStack({navigation, route}) {
+export default function SettingsStack({navigation, route}) {
   const {id} = route.params
   
   return (
@@ -20,7 +20,8 @@ export default function GroupSearchStack({navigation, route}) {
       headerLeft: () => (
       <Button title="< Back" onPress={() => navigation.goBack()} />
     ), }}>
-      <Stack.Screen name='Block List' component={SettingsScreen} initialParams={route.params} />
+      <Stack.Screen name='Settings' component={SettingsScreen} initialParams={route.params} />
+      <Stack.Screen name='Block List' component={BlockListScreen} initialParams={route.params} />
       <Stack.Screen
         name="Lookup"
         component={LookupUserScreen}
