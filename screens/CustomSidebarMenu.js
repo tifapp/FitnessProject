@@ -182,7 +182,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
     const friendSubscription = API.graphql(
       graphqlOperation(onAcceptedFriendship)
     ).subscribe({
-      next: (event) => {
+      next: async (event) => {
         const newFriend = event.value.data.onAcceptedFriendship;
         //we can see all friend requests being accepted, so we just have to make sure it's one of ours.
         if (newFriend.sender === myId || newFriend.receiver === myId) {

@@ -6,10 +6,11 @@ import {
   SafeAreaView,
   LayoutAnimation,
   Animated,
+  TouchableOpacity
 } from "react-native";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation, Cache, Storage } from "aws-amplify";
-import { createReport, createPost, updatePost, deletePost, createConversation, updateConversation } from "root/src/graphql/mutations";
+import { createReport, createPost, updatePost, deletePost, createConversation, updateConversation, deleteConversation } from "root/src/graphql/mutations";
 import { postsByChannel, batchGetLikes, getFriendship, getConversations, getConversation } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
 import { onCreatePostFromChannel, onDeletePostFromChannel, onUpdatePostFromChannel, onCreateLike, onDeleteLike, onIncrementLikes, onDecrementLikes } from 'root/src/graphql/subscriptions';
@@ -41,7 +42,8 @@ const viewabilityConfig = {
   waitForInteraction: false,
 }
 
-export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, originalParentId, autoFocus = false }) {
+export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, originalParentId, Accepted, lastUser, sidebar, id, autoFocus = false }
+) {
   const [posts, setPosts] = useState([]);
 
   const [onlineCheck, setOnlineCheck] = useState(true);
@@ -285,6 +287,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     navigation.navigate("Conversations");
   }
 
+  /*
   const addPostAsync = async (parentId, replyText) => {
     checkInternetConnection();
 
@@ -299,6 +302,37 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       console.log("error in deleting post: ");
     }
   };
+  */
+
+  const deletePostsAsync = async (timestamp) => {
+    checkInternetConnection();
+
+    let parent_post = posts.find((item) => {
+      //const time = timestamp.toString();
+      return item.createdAt === timestamp && item.userId === route.params?.myId;
+    })
+
+    ////console("parent post: " + parent_post.description);
+
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    if (parent_post.parentId == null) {
+      setPosts((posts) => {
+        return posts.filter((val) => (val.channel != parent_post.channel));
+      });
+    } else {
+      setPosts((posts) => {
+        return posts.filter((val) => (val.createdAt != parent_post.createdAt || val.userId != parent_post.userId));
+      });
+    }
+
+    try {
+      await API.graphql(graphqlOperation(deletePost, { input: { createdAt: timestamp, userId: route.params?.myId } }));
+    } catch {
+      //console("error in deleting post: ");
+    }
+
+  };
+
 
   const reportPost = async (timestamp, author) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -590,7 +624,11 @@ function PostInputField({ channel, headerComponent, receiver, myId, originalPare
 
   return (
     <View>
-      {headerComponent}
+
+      {
+        //headerComponent
+      }
+
 
       {
         imageURL !== null ?
