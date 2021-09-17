@@ -539,6 +539,8 @@ export const getUser = /* GraphQL */ `
       latitude
       longitude
       deviceToken
+      friendRequestPrivacy
+      messagesPrivacy
       createdAt
       updatedAt
     }
@@ -562,6 +564,8 @@ export const listUsers = /* GraphQL */ `
         latitude
         longitude
         deviceToken
+        friendRequestPrivacy
+        messagesPrivacy
         createdAt
         updatedAt
       }

@@ -424,6 +424,8 @@ export const createUser = /* GraphQL */ `
       latitude
       longitude
       deviceToken
+      friendRequestPrivacy
+      messagesPrivacy
       createdAt
       updatedAt
     }
@@ -445,6 +447,8 @@ export const updateUser = /* GraphQL */ `
       latitude
       longitude
       deviceToken
+      friendRequestPrivacy
+      messagesPrivacy
       createdAt
       updatedAt
     }
@@ -466,6 +470,8 @@ export const deleteUser = /* GraphQL */ `
       latitude
       longitude
       deviceToken
+      friendRequestPrivacy
+      messagesPrivacy
       createdAt
       updatedAt
     }
