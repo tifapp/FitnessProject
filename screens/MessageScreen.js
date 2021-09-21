@@ -109,6 +109,7 @@ export default function MessageScreen({ navigation, route }) {
             lastUser={lastUser}
             sidebar={sidebar}
             id={id}
+            autoFocus={true}
           />
       }
     </View>
