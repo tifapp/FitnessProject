@@ -6,13 +6,15 @@ import {
   SafeAreaView,
   LayoutAnimation,
   Animated,
-  TouchableOpacity
+  TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation, Cache, Storage } from "aws-amplify";
 import { createReport, createPost, updatePost, deletePost, createConversation, updateConversation, deleteConversation } from "root/src/graphql/mutations";
 import { postsByChannel, batchGetLikes, getFriendship, getConversations, getConversation } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
+import MessageItem from "components/MessageItem";
 import { onCreatePostFromChannel, onDeletePostFromChannel, onUpdatePostFromChannel, onCreateLike, onDeleteLike, onIncrementLikes, onDecrementLikes } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
 import APIList from 'components/APIList';
@@ -338,26 +340,60 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     scrollRef.current?.scrollToOffset({ offset: 0, animated: true })
   }
 
-  const renderPostItem = ({ item, index }) => (
-    <PostItem
-      index={index}
-      item={item}
-      likes={item.likes}
-      replies={item.replies}
-      deletePostsAsync={deletePostsAsync}
-      writtenByYou={item.userId === route.params?.myId}
-      myId={route.params?.myId}
-      editButtonHandler={updatePostAsync}
-      receiver={receiver}
-      showTimestamp={showTimestamp(item, index)}
-      reportPost={reportPost}
-      newSection={
-        index == 0 ? true : showTimestamp(posts[index - 1], index - 1)
-      }
-      isVisible={item.isVisible}
-      shouldSubscribe={item.shouldSubscribe}
-    />
-  )
+  const renderPostItem = ({ item, index }) => {
+    if (item.loading) return (
+      <ActivityIndicator 
+      size="large" 
+      color="#26c6a2"
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        flexDirection: "row",
+        justifyContent: "space-around",
+        padding: 20,
+      }} />
+    )
+    else if (receiver != null) return (
+      <MessageItem
+        index={index}
+        item={item}
+        likes={item.likes}
+        replies={item.replies}
+        deletePostsAsync={deletePostsAsync}
+        writtenByYou={item.userId === route.params?.myId}
+        myId={route.params?.myId}
+        editButtonHandler={updatePostAsync}
+        receiver={receiver}
+        showTimestamp={showTimestamp(item, index)}
+        reportPost={reportPost}
+        newSection={
+          index == 0 ? true : showTimestamp(posts[index - 1], index - 1)
+        }
+        isVisible={item.isVisible}
+        shouldSubscribe={item.shouldSubscribe}
+      />
+    )
+    else return (
+      <PostItem
+        index={index}
+        item={item}
+        likes={item.likes}
+        replies={item.replies}
+        deletePostsAsync={deletePostsAsync}
+        writtenByYou={item.userId === route.params?.myId}
+        myId={route.params?.myId}
+        editButtonHandler={updatePostAsync}
+        receiver={receiver}
+        showTimestamp={showTimestamp(item, index)}
+        reportPost={reportPost}
+        newSection={
+          index == 0 ? true : showTimestamp(posts[index - 1], index - 1)
+        }
+        isVisible={item.isVisible}
+        shouldSubscribe={item.shouldSubscribe}
+      />
+    )
+  }
 
   const onViewableItemsChanged = React.useCallback(({ viewableItems, changedItems }) => {
     //console.log("viewable items have changed")

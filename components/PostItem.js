@@ -1,5 +1,3 @@
-import Hyperlink from "react-native-hyperlink";
-import RNUrlPreview from "components/RNUrlPreview";
 import React, { useState, useEffect, useRef, PureComponent } from "react";
 import { Storage } from "aws-amplify";
 import {
@@ -12,7 +10,6 @@ import {
   TouchableOpacity,
   Linking,
   LayoutAnimation,
-  ActivityIndicator,
   Alert,
   Modal,
   KeyboardAvoidingView,
@@ -27,6 +24,7 @@ import { createLike, deleteLike } from "root/src/graphql/mutations";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import printTime from "hooks/printTime";
 import SHA256 from "hooks/hash";
+import LinkableText from "components/LinkableText";
 import LikesList from "components/LikesList";
 import FeedScreen from "screens/FeedScreen";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -103,51 +101,6 @@ function LikeButton({ onTap, likes, myId, item, postId, likeDebounceRef }) {
   );
 }
 
-function LinkableText(props) {
-  const warnExternalSite = (url, text) => {
-    const title =
-      "This link will take you to an external site (" +
-      url +
-      "). Do you want to continue?";
-    const options = [
-      {
-        text: "Yes",
-        onPress: () => {
-          Linking.openURL(url);
-        },
-      },
-      {
-        text: "Cancel",
-        type: "cancel",
-      },
-    ];
-    Alert.alert(title, "", options);
-  };
-
-  //console.log("the url we're passing to preview is ", props.urlPreview)
-
-  return (
-    <View>
-      <View style={props.style}>
-        <Hyperlink linkStyle={{ color: "#2980b9" }} onPress={warnExternalSite}>
-          <Text
-            style={{
-              fontSize: 16,
-            }}
-          >
-            {props.children}
-          </Text>
-        </Hyperlink>
-      </View>
-      <RNUrlPreview
-        urlPreview={props.urlPreview}
-        descriptionNumberOfLines={2}
-        onPress={warnExternalSite}
-      />
-    </View>
-  );
-}
-
 export default React.memo(function PostItem({
   item,
   deletePostsAsync,
@@ -171,26 +124,11 @@ export default React.memo(function PostItem({
   const [areRepliesVisible, setAreRepliesVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState("");
-  const displayTime = printTime(item.createdAt);
-  const isReceivedMessage = receiver != null && !writtenByYou;
 
   const [areLikesVisible, setAreLikesVisible] = useState(false);
 
   const [likedUsers, setLikedUsers] = useState([]);
 
-  if (item.loading) return (
-    <ActivityIndicator 
-    size="large" 
-    color="#26c6a2"
-    style={{
-      flex: 1,
-      justifyContent: "center",
-      flexDirection: "row",
-      justifyContent: "space-around",
-      padding: 20,
-    }} />
-  )
-  else if (receiver == null)
     return (
       <View style={[styles.secondaryContainerStyle, {
         backgroundColor: "#efefef",
@@ -492,63 +430,6 @@ export default React.memo(function PostItem({
         </Modal>
       </View>
     );
-  else {
-    /*
-    showTimestamp
-          ? {
-            paddingHorizontal: 25,
-            marginTop: 10,
-            marginBottom: 40,
-          }
-          : newSection
-            ? {
-              paddingHorizontal: 25,
-              marginTop: 40,
-              marginBottom: 10,
-            }
-            : {
-              paddingHorizontal: 25,
-              paddingTop: 10,
-              paddingBottom: 10,
-            }
-    */
-    return (
-      <View
-        style={[styles.secondaryContainerStyle, { backgroundColor: "#fff" }]}
-      >
-        <View style={[styles.spaceAround]}>
-          <LinkableText
-            style={{
-              alignSelf: isReceivedMessage ? "flex-start" : "flex-end",
-              backgroundColor: "#efefef",
-              padding: 15,
-
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 3,
-              },
-              shadowOpacity: 0.27,
-              shadowRadius: 4.65,
-
-              elevation: 6,
-            }}
-          >
-            {item.description}
-          </LinkableText>
-          <Text
-            style={{
-              color: "gray",
-              marginTop: 15,
-              textAlign: isReceivedMessage ? "left" : "right",
-            }}
-          >
-            {displayTime}
-          </Text>
-        </View>
-      </View>
-    );
-  }
 })
 
 function PostHeader({ item, myId, writtenByYou, repliesPressed, deletePostsAsync, toggleEditing, areRepliesVisible, reportPost, shouldSubscribe }) {
