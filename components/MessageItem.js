@@ -45,6 +45,7 @@ export default React.memo(function MessageItem({
         >
             <View
                 style={{
+                    maxWidth: Dimensions.get('window').width - 60,
                     alignSelf: isReceivedMessage ? "flex-start" : "flex-end",
                     backgroundColor: isReceivedMessage ? "#a9efe0" : "#efefef",
                     padding: 15,
