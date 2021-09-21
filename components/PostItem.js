@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, PureComponent } from "react";
-import { Storage } from "aws-amplify";
 import {
   StyleSheet,
   View,
@@ -24,6 +23,7 @@ import { createLike, deleteLike } from "root/src/graphql/mutations";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import printTime from "hooks/printTime";
 import SHA256 from "hooks/hash";
+import PostImage from "components/PostImage";
 import LinkableText from "components/LinkableText";
 import LikesList from "components/LikesList";
 import FeedScreen from "screens/FeedScreen";
@@ -163,8 +163,15 @@ export default React.memo(function PostItem({
             reportPost={reportPost}
             shouldSubscribe={shouldSubscribe}
           />
-          
+
           <PostImage
+            style={{
+              resizeMode: "cover",
+              width: Dimensions.get('window').width - 20,
+              height: Dimensions.get('window').width - 20,
+              alignSelf: "center",
+              marginBottom: 15,
+            }}
             imageID={item.imageURL}
             isVisible={isVisible}
           />
@@ -569,77 +576,4 @@ function PostHeader({ item, myId, writtenByYou, repliesPressed, deletePostsAsync
 
     </View>
   );
-}
-
-import { Video, AVPlaybackStatus } from 'expo-av';
-
-const re = /(?:\.([^.]+))?$/;
-
-function PostImage({imageID, isVisible}) {
-  const [imageURL, setImageURL] = useState(null);
-  const video = useRef(null);
-  
-  let imageKey = `feed/${imageID}`;
-  let imageConfig = {
-    expires: 86400,
-  };
-
-  useEffect(() => {
-    //console.log("image id is ", imageID);
-    if (imageID) {
-      Storage.get(imageKey, imageConfig) //this will incur lots of repeated calls to the backend, idk how else to fix it right now
-        .then((imageURL) => {
-          setImageURL(imageURL);
-        })
-        .catch((err) => {
-          console.log("could not find image!", err);
-          setImageURL(null);
-        }); //should just use a "profilepic" component
-    }
-  }, [])
-
-  useEffect(() => {
-    if (video.current) {
-      if (isVisible === true) {
-        video.current.playAsync();
-      } else if (isVisible === false) {
-        video.current.pauseAsync();
-      }
-    }
-  }, [isVisible])
-
-  if (imageID) {
-    return (
-      (re.exec(imageID)[1] === 'jpg') ?
-        <Image
-          //onError={addUserInfotoCache}
-          style={{
-            resizeMode: "cover",
-            width: Dimensions.get('window').width - 20,
-            height: Dimensions.get('window').width - 20,
-            alignSelf: "center",
-            marginBottom: 15,
-          }}
-          source={
-            (imageURL == null || imageURL === "") ?
-              require("../assets/icon.png")
-              : { uri: imageURL }
-          }
-        /> : <Video
-          //onError={addUserInfotoCache}
-          ref={video}
-          style={{
-            resizeMode: "cover",
-            width: Dimensions.get('window').width - 20,
-            height: Dimensions.get('window').width - 20,
-            alignSelf: "center",
-            marginBottom: 15,
-          }}
-          source={{ uri: imageURL }}
-          posterSource={require("../assets/icon.png")}
-          useNativeControls
-          isLooping
-        />
-    )
-  } else return null;
 }

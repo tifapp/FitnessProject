@@ -1,22 +1,22 @@
 import React, { useState, useEffect, useRef, PureComponent } from "react";
-import { Storage } from "aws-amplify";
 import {
-  StyleSheet,
-  View,
-  Button,
-  Image,
-  TextInput,
-  Text,
-  TouchableOpacity,
-  Linking,
-  LayoutAnimation,
-  Alert,
-  Modal,
-  KeyboardAvoidingView,
-  Dimensions
+    StyleSheet,
+    View,
+    Button,
+    Image,
+    TextInput,
+    Text,
+    TouchableOpacity,
+    Linking,
+    LayoutAnimation,
+    Alert,
+    Modal,
+    KeyboardAvoidingView,
+    Dimensions
 } from "react-native";
 import LinkableText from "components/LinkableText";
 import printTime from "hooks/printTime";
+import PostImage from "components/PostImage";
 
 var styles = require('styles/stylesheet');
 
@@ -41,37 +41,51 @@ export default React.memo(function MessageItem({
 
     return (
         <View
-            style={[styles.secondaryContainerStyle, { backgroundColor: "#fff" }]}
+            style={[styles.secondaryContainerStyle, { backgroundColor: "#fff", marginTop: 21, marginHorizontal: 15, }]}
         >
-            <View style={[styles.spaceAround]}>
-                <LinkableText
+            <View
+                style={{
+                    alignSelf: isReceivedMessage ? "flex-start" : "flex-end",
+                    backgroundColor: isReceivedMessage ? "#a9efe0" : "#efefef",
+                    padding: 15,
+
+                    shadowColor: "#000",
+                    shadowOffset: {
+                        width: 0,
+                        height: 3,
+                    },
+                    shadowOpacity: 0.27,
+                    shadowRadius: 4.65,
+
+                    elevation: 6,
+                }}>
+                <PostImage
                     style={{
-                        alignSelf: isReceivedMessage ? "flex-start" : "flex-end",
-                        backgroundColor: "#efefef",
-                        padding: 15,
-
-                        shadowColor: "#000",
-                        shadowOffset: {
-                            width: 0,
-                            height: 3,
-                        },
-                        shadowOpacity: 0.27,
-                        shadowRadius: 4.65,
-
-                        elevation: 6,
+                        resizeMode: "cover",
+                        width: Dimensions.get('window').width / 2,
+                        height: Dimensions.get('window').width / 2,
+                        alignSelf: "center",
+                        marginBottom: 15,
                     }}
+                    imageID={item.imageURL}
+                    isVisible={isVisible}
+                />
+                <LinkableText
+                style={{
+                    alignSelf: isReceivedMessage ? "flex-start" : "flex-end",
+                    marginBottom: 15,
+                }}
                 >
                     {item.description}
                 </LinkableText>
-                <Text
-                    style={{
-                        color: "gray",
-                        marginTop: 15,
-                        textAlign: isReceivedMessage ? "left" : "right",
-                    }}
-                >
-                    {printTime(item.createdAt)}
-                </Text>
+            <Text
+                style={{
+                    color: isReceivedMessage ? "#136351" : "gray",
+                    textAlign: isReceivedMessage ? "left" : "right",
+                }}
+            >
+                {printTime(item.createdAt)}
+            </Text>
             </View>
         </View>
     );
