@@ -176,7 +176,7 @@ export default React.memo(function PostItem({
             isVisible={isVisible}
           />
 
-          <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+          <View style={{flexDirection: "row", justifyContent: "space-between", minHeight: writtenByYou ? 60 : 30,}}>
           {isEditing ? (
             <TextInput
               style={[styles.check, { borderColor: "orange" }]}
@@ -189,17 +189,22 @@ export default React.memo(function PostItem({
             <LinkableText
               style={{
                 flex: 1,
-                paddingTop: 4,
-                paddingLeft: 22,
-                paddingBottom: 16,
               }}
+              textStyle={
+                {
+                  paddingTop: 4,
+                  paddingBottom: 16,
+                  marginLeft: 22,
+                  maxWidth: Dimensions.get('window').width - 90,
+                }
+              }
               urlPreview={item.urlPreview}
             >
               {item.description}
             </LinkableText>
             )}
 
-            <View style={{flexDirection: "column", alignItems: "flex-start", marginRight: 15}}>
+            <View style={{flexDirection: "column", position: "absolute", right: 15}}>
               {!writtenByYou ? (
                 <IconButton
                   iconName={"report"}

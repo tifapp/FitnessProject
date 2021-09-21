@@ -41,24 +41,27 @@ export default function LinkableText(props) {
   
     //console.log("the url we're passing to preview is ", props.urlPreview)
   
-    return (
-      <View>
+    if (props.children) {
+      return (
         <View style={props.style}>
-          <Hyperlink linkStyle={{ color: "#2980b9" }} onPress={warnExternalSite}>
-            <Text
-              style={{
-                fontSize: 16,
-              }}
-            >
-              {props.children}
-            </Text>
-          </Hyperlink>
+          <View>
+            <Hyperlink linkStyle={{ color: "#0000ff" }} onPress={warnExternalSite}>
+              <Text
+                style={[{
+                  fontSize: 16,
+                }, props.textStyle]}
+              >
+                {props.children}
+              </Text>
+            </Hyperlink>
+          </View>
+          <RNUrlPreview
+            urlPreview={props.urlPreview}
+            descriptionNumberOfLines={2}
+            onPress={warnExternalSite}
+          />
         </View>
-        <RNUrlPreview
-          urlPreview={props.urlPreview}
-          descriptionNumberOfLines={2}
-          onPress={warnExternalSite}
-        />
-      </View>
-    );
+      );
+    }
+    else return null;
   }

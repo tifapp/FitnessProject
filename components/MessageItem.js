@@ -74,8 +74,12 @@ export default React.memo(function MessageItem({
                 <LinkableText
                 style={{
                     alignSelf: isReceivedMessage ? "flex-start" : "flex-end",
-                    marginBottom: 15,
                 }}
+                textStyle={
+                  {
+                    marginBottom: 15,
+                  }
+                }
                 urlPreview={item.urlPreview}
                 >
                     {item.description}
