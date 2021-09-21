@@ -735,20 +735,31 @@ function PostInputField({ channel, headerComponent, receiver, myId, originalPare
 
       {
         progress > 0 ?
-          <View style={{
-            height: 20,
-            backgroundColor: 'white',
-            margin: 15,
-            borderRadius: 5,
-          }}>
-            <Animated.View style={[{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              top: 0,
-              bottom: 0
-            }, { backgroundColor: "#26c6a2", width }]} />
-          </View> : null
+        <View style={{
+          height: 30,
+          backgroundColor: 'white',
+          margin: 15,
+          borderRadius: 5,
+        }}>
+          <Animated.View style={[{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0
+          }, { backgroundColor: "#26c6a2", width }]} />
+          <Text
+            style={{
+              alignSelf: "center",
+              justifyContent: "center",
+              color: "black",
+              fontWeight: "bold",
+              fontSize: 15,
+              marginTop: 5,
+            }}>
+            Upload in progress...
+          </Text>
+        </View> : null
       }
 
       {
