@@ -76,6 +76,16 @@ module.exports = StyleSheet.create({
     marginHorizontal: 10,
     flexDirection: "row"
   },
+  blockMessageButton: {
+    borderWidth: 2,
+    borderColor: "black",
+    alignSelf: "center",
+    backgroundColor: "transparent",
+    padding: 9,
+    borderRadius: 5,
+    marginHorizontal: 10,
+    flexDirection: "row"
+  },
   messageButton: {
     marginTop: 20,
     alignSelf: "center",
@@ -138,6 +148,13 @@ module.exports = StyleSheet.create({
   },
   rejectButtonTextStyle: {
     color: "red",
+    alignSelf: "center",
+    marginBottom: 2,
+    marginHorizontal: 6,
+    fontWeight: "bold",
+  },
+  blockButtonTextStyle: {
+    color: "black",
     alignSelf: "center",
     marginBottom: 2,
     marginHorizontal: 6,

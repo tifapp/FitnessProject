@@ -10,7 +10,7 @@ import {
 } from "react-native";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation, Cache, Storage } from "aws-amplify";
-import { createReport, createPost, updatePost, deletePost, createConversation, updateConversation, deleteConversation } from "root/src/graphql/mutations";
+import { createReport, createPost, updatePost, deletePost, createConversation, updateConversation, deleteConversation, createBlock } from "root/src/graphql/mutations";
 import { postsByChannel, batchGetLikes, getFriendship, getConversations, getConversation } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
 import { onCreatePostFromChannel, onDeletePostFromChannel, onUpdatePostFromChannel, onCreateLike, onDeleteLike, onIncrementLikes, onDecrementLikes } from 'root/src/graphql/subscriptions';
@@ -287,6 +287,21 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     navigation.navigate("Conversations");
   }
 
+  const blockMessageRequest = async () => {
+    await API.graphql(
+      graphqlOperation(deleteConversation, {
+        input: { id: id }
+      })
+    );
+
+    API.graphql(
+      graphqlOperation(createBlock, { input: { blockee: id } })
+    );
+    localBlockList.push({ createdAt: (new Date(Date.now())).toISOString(), userId: route.params?.myId, blockee: id });
+
+    navigation.navigate("Conversations");
+  }
+
   /*
   const addPostAsync = async (parentId, replyText) => {
     checkInternetConnection();
@@ -436,6 +451,18 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
                 >
                   <Text style={styles.rejectButtonTextStyle}>
                     Reject
+                  </Text>
+                </TouchableOpacity>
+                : null
+              }
+
+              {lastUser != route.params.myId && lastUser != null && receiver != null && !ButtonCheck ?
+                <TouchableOpacity
+                  onPress={blockMessageRequest}
+                  style={styles.blockMessageButton}
+                >
+                  <Text style={styles.blockButtonTextStyle}>
+                    Block
                   </Text>
                 </TouchableOpacity>
                 : null
