@@ -131,14 +131,13 @@ export default React.memo(function PostItem({
 
     return (
       <View style={[styles.secondaryContainerStyle, {
-        backgroundColor: "#efefef",
+        backgroundColor: "#a9efe0",
       }]}>
         <View
           style={
             [styles.spaceAround,
             replyButtonHandler ? {} : {
               marginBottom: 20,
-              marginHorizontal: 10,
               backgroundColor: "white",
               shadowColor: "#000",
               shadowOffset: {
@@ -167,8 +166,8 @@ export default React.memo(function PostItem({
           <PostImage
             style={{
               resizeMode: "cover",
-              width: Dimensions.get('window').width - 20,
-              height: Dimensions.get('window').width - 20,
+              width: Dimensions.get('window').width,
+              height: Dimensions.get('window').width,
               alignSelf: "center",
               marginBottom: 15,
             }}
@@ -176,7 +175,7 @@ export default React.memo(function PostItem({
             isVisible={isVisible}
           />
 
-          <View style={{flexDirection: "row", justifyContent: "space-between", minHeight: writtenByYou ? 60 : 30,}}>
+          <View style={{flexDirection: "row", justifyContent: "space-between", minHeight: writtenByYou ? 70 : 35,}}>
           {isEditing ? (
             <TextInput
               style={[styles.check, { borderColor: "orange" }]}

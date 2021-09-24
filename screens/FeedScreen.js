@@ -646,7 +646,7 @@ function PostInputField({ channel, headerComponent, receiver, myId, originalPare
   };
 
   return (
-    <View>
+    <View style={{backgroundColor: "#a9efe0"}}>
 
       {
         //headerComponent
@@ -687,7 +687,7 @@ function PostInputField({ channel, headerComponent, receiver, myId, originalPare
         ]}
         autoFocus={autoFocus}
         multiline={true}
-        placeholder={progress > 0 ? "Upload in progress..." : "Start typing..."}
+        placeholder={progress > 0 ? "Uploading..." : "Start typing..."}
         onChangeText={setPostInput}
         value={postInput}
         clearButtonMode="always"
@@ -757,7 +757,7 @@ function PostInputField({ channel, headerComponent, receiver, myId, originalPare
               fontSize: 15,
               marginTop: 5,
             }}>
-            Upload in progress...
+            Uploading...
           </Text>
         </View> : null
       }

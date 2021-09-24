@@ -45,10 +45,11 @@ export default React.memo(function MessageItem({
         >
             <View
                 style={{
-                    maxWidth: Dimensions.get('window').width - 60,
+                    maxWidth: Dimensions.get('window').width - 80,
                     alignSelf: isReceivedMessage ? "flex-start" : "flex-end",
-                    backgroundColor: isReceivedMessage ? "#a9efe0" : "#efefef",
+                    backgroundColor: isReceivedMessage ? "#efefef" : "#a9efe0",
                     padding: 15,
+                    paddingBottom: 0,
 
                     shadowColor: "#000",
                     shadowOffset: {
@@ -75,24 +76,23 @@ export default React.memo(function MessageItem({
                 style={{
                     alignSelf: isReceivedMessage ? "flex-start" : "flex-end",
                 }}
-                textStyle={
-                  {
-                    marginBottom: 15,
-                  }
-                }
+                textStyle={{
+                    paddingBottom: 15,
+                }}
                 urlPreview={item.urlPreview}
                 >
                     {item.description}
                 </LinkableText>
+            </View>
             <Text
                 style={{
-                    color: isReceivedMessage ? "#136351" : "gray",
+                    color: isReceivedMessage ? "gray" : "#136351",
                     textAlign: isReceivedMessage ? "left" : "right",
+                    marginTop: 5,
                 }}
             >
                 {printTime(item.createdAt)}
             </Text>
-            </View>
         </View>
     );
 })
