@@ -18,15 +18,18 @@ const SettingsScreen = ({ navigation, route }) => {
   const [isFriendRequestsEnabled, setIsFriendRequestsEnabled] = useState(false);
   const [isMessagesEnabled, setIsMessagesEnabled] = useState(false);
 
-  useEffect(async () => {
-    const user = await API.graphql(graphqlOperation(getUser, { id: route.params?.myId }));
-    if (user.data.getUser.friendRequestPrivacy) {
-      setIsFriendRequestsEnabled(true);
-    }
-    if (user.data.getUser.messagesPrivacy) {
-      setIsMessagesEnabled(true);
-    }
-    setIsLoading(false);
+  useEffect(() => {
+    (async() => {
+      //console.log("your id is ", route.params?.myId)
+      const user = await API.graphql(graphqlOperation(getUser, { id: route.params?.myId }));
+      if (user.data.getUser.friendRequestPrivacy) {
+        setIsFriendRequestsEnabled(true);
+      }
+      if (user.data.getUser.messagesPrivacy) {
+        setIsMessagesEnabled(true);
+      }
+      setIsLoading(false);
+    })();
   }, [])
 
   if (isLoading) return null;

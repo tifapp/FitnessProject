@@ -8,9 +8,7 @@ import React from 'react';
 
 const Stack = createStackNavigator();
 
-export default function SettingsStack({navigation, route}) {
-  const {id} = route.params
-  
+export default function SettingsStack({navigation, route}) {  
   return (
     <Stack.Navigator screenOptions={{ 
       headerStyle: { backgroundColor: "#efefef" },
