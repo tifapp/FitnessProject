@@ -306,7 +306,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   };
   */
 
-  
+
   const deletePostsAsync = async (timestamp) => {
     checkInternetConnection();
 
@@ -342,16 +342,16 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
 
   const renderPostItem = ({ item, index }) => {
     if (item.loading) return (
-      <ActivityIndicator 
-      size="large" 
-      color="#26c6a2"
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        flexDirection: "row",
-        justifyContent: "space-around",
-        padding: 20,
-      }} />
+      <ActivityIndicator
+        size="large"
+        color="#26c6a2"
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          flexDirection: "row",
+          justifyContent: "space-around",
+          padding: 20,
+        }} />
     )
     else if (receiver != null) return (
       <MessageItem
@@ -439,8 +439,8 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
 
           <View style={{}}>
             {headerComponent}
-            <View style={styles.signOutTop}>
-              {lastUser != route.params.myId && lastUser != null && receiver != null && !ButtonCheck ?
+            {lastUser != route.params.myId && lastUser != null && receiver != null && !ButtonCheck ?
+              <View style={styles.signOutTop}>
                 <TouchableOpacity
                   onPress={acceptMessageRequest}
                   style={styles.acceptMessageButton}
@@ -449,10 +449,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
                     Accept
                   </Text>
                 </TouchableOpacity>
-                : null
-              }
-
-              {lastUser != route.params.myId && lastUser != null && receiver != null && !ButtonCheck ?
                 <TouchableOpacity
                   onPress={rejectMessageRequest}
                   style={styles.rejectMessageButton}
@@ -461,9 +457,9 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
                     Reject
                   </Text>
                 </TouchableOpacity>
-                : null
-              }
-            </View>
+              </View>
+              : null
+            }
 
             {Accepted || ButtonCheck || receiver == null || lastUser == route.params.myId || sidebar || lastUser == undefined ?
               <PostInputField
@@ -646,7 +642,7 @@ function PostInputField({ channel, headerComponent, receiver, myId, originalPare
   };
 
   return (
-    <View style={{backgroundColor: "#a9efe0"}}>
+    <View style={{ backgroundColor: "#a9efe0" }}>
 
       {
         //headerComponent
@@ -735,31 +731,31 @@ function PostInputField({ channel, headerComponent, receiver, myId, originalPare
 
       {
         progress > 0 ?
-        <View style={{
-          height: 30,
-          backgroundColor: 'white',
-          margin: 15,
-          borderRadius: 5,
-        }}>
-          <Animated.View style={[{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0
-          }, { backgroundColor: "#26c6a2", width }]} />
-          <Text
-            style={{
-              alignSelf: "center",
-              justifyContent: "center",
-              color: "black",
-              fontWeight: "bold",
-              fontSize: 15,
-              marginTop: 5,
-            }}>
-            Uploading...
-          </Text>
-        </View> : null
+          <View style={{
+            height: 30,
+            backgroundColor: 'white',
+            margin: 15,
+            borderRadius: 5,
+          }}>
+            <Animated.View style={[{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0
+            }, { backgroundColor: "#26c6a2", width }]} />
+            <Text
+              style={{
+                alignSelf: "center",
+                justifyContent: "center",
+                color: "black",
+                fontWeight: "bold",
+                fontSize: 15,
+                marginTop: 5,
+              }}>
+              Uploading...
+            </Text>
+          </View> : null
       }
 
       {
