@@ -8,12 +8,29 @@ import {
   LayoutAnimation
 } from "react-native";
 import { updateUser } from "root/src/graphql/mutations";
+import { getUser } from 'root/src/graphql/queries'
 import { API, graphqlOperation } from "aws-amplify";
 
 var styles = require("styles/stylesheet");
 
 const SettingsScreen = ({ navigation, route }) => {
-  return (
+  const [isLoading, setIsLoading] = useState(true);
+  const [isFriendRequestsEnabled, setIsFriendRequestsEnabled] = useState(false);
+  const [isMessagesEnabled, setIsMessagesEnabled] = useState(false);
+
+  useEffect(async () => {
+    const user = await API.graphql(graphqlOperation(getUser, { id: route.params?.myId }));
+    if (user.data.getUser.friendRequestPrivacy) {
+      setIsFriendRequestsEnabled(true);
+    }
+    if (user.data.getUser.messagesPrivacy) {
+      setIsMessagesEnabled(true);
+    }
+    setIsLoading(false);
+  }, [])
+
+  if (isLoading) return null;
+  else return (
     <View>
       <Text style={{
         fontSize: 18,
@@ -25,7 +42,7 @@ const SettingsScreen = ({ navigation, route }) => {
           apicall={            
             () => 
             API.graphql(
-              graphqlOperation(updateUser, { input: { friendRequestPrivacy: isEnabled } })
+              graphqlOperation(updateUser, { input: { friendRequestPrivacy: isFriendRequestsEnabled } })
             )
           }
         />
@@ -43,7 +60,7 @@ const SettingsScreen = ({ navigation, route }) => {
           apicall={            
             () => 
             API.graphql(
-              graphqlOperation(updateUser, { input: { messagesPrivacy: isEnabled } })
+              graphqlOperation(updateUser, { input: { messagesPrivacy: isMessagesEnabled } })
             )
           }
         />
@@ -58,6 +75,7 @@ const SettingsScreen = ({ navigation, route }) => {
     </View>
   );
 };
+
 function APISwitch({ initialState, apicall }) {
   const [isEnabled, setIsEnabled] = useState(initialState); //should fetch from backend
   const enabledRef = useRef();
