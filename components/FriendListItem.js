@@ -25,12 +25,15 @@ export default function FriendListItem({
   friendId,
   myId,
   lastMessage,
-  lastUser
+  lastUser,
+  Accepted,
+  sidebar
 }) {
-  const goToMessages = (id) => {
+
+  const goToMessages = (id, Accepted, lastUser, sidebar) => {
     if (!navigation.push)
-      navigation.navigate(id);
-    else navigation.push(id);
+      navigation.navigate(id, { Accepted: Accepted, lastUser: lastUser, sidebar: sidebar, id: item.id });
+    else navigation.push(id, { Accepted: Accepted, lastUser: lastUser, sidebar: sidebar, id: item.id });
   };
 
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
@@ -162,7 +165,7 @@ export default function FriendListItem({
               onPress={() => {
                 console.log("message pressed, " + isMessageOpen);
                 item.isRead = true;
-                goToMessages(friendId);
+                goToMessages(friendId, Accepted, lastUser, sidebar);
               }}
             >
               <Text

@@ -6,12 +6,15 @@ import {
   SafeAreaView,
   LayoutAnimation,
   Animated,
+  TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation, Cache, Storage } from "aws-amplify";
-import { createReport, createPost, updatePost, deletePost, createConversation, updateConversation } from "root/src/graphql/mutations";
-import { postsByChannel, batchGetLikes, getFriendship, getConversations } from "root/src/graphql/queries";
+import { createReport, createPost, updatePost, deletePost, createConversation, updateConversation, deleteConversation } from "root/src/graphql/mutations";
+import { postsByChannel, batchGetLikes, getFriendship, getConversations, getConversation } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
+import MessageItem from "components/MessageItem";
 import { onCreatePostFromChannel, onDeletePostFromChannel, onUpdatePostFromChannel, onCreateLike, onDeleteLike, onIncrementLikes, onDecrementLikes } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
 import APIList from 'components/APIList';
@@ -41,10 +44,12 @@ const viewabilityConfig = {
   waitForInteraction: false,
 }
 
-export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, originalParentId, autoFocus = false }) {
+export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, originalParentId, Accepted, lastUser, sidebar, id, autoFocus = false }
+) {
   const [posts, setPosts] = useState([]);
 
   const [onlineCheck, setOnlineCheck] = useState(true);
+  const [ButtonCheck, setButtonCheck] = useState(false);
 
   const currentPosts = useRef();
   const scrollRef = useRef(); // Used to help with automatic scrolling to top
@@ -52,6 +57,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   currentPosts.current = posts;
 
   useEffect(() => {
+
     const onFocus = navigation.addListener('focus', () => {
       if (receiver == null) {
         navigation.setOptions({
@@ -64,7 +70,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
               fullname={true}
               hidename={true}
               imageSize={30}
-              style={{marginLeft: 15}}
+              style={{ marginLeft: 15 }}
             />
         })
       }
@@ -72,6 +78,50 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     // Return the function to unsubscribe from the event so it gets removed on unmount
     return onFocus;
   }, [navigation])
+
+  const checkButton = async () => {
+
+    let namesArray = [route.params?.myId, receiver];
+    namesArray.sort();
+
+    let temp = namesArray[0] + namesArray[1];
+
+    let newConversations1 = await API.graphql(graphqlOperation(getConversation, { id: temp }));
+
+    newConversations1 = newConversations1.data.getConversation;
+
+    if (newConversations1 == null) {
+      setButtonCheck(true);
+    }
+    else if (newConversations1.Accepted) {
+      setButtonCheck(true);
+    }
+    else {
+      setButtonCheck(false);
+    }
+
+
+    //let checkConversationExists = newConversations1.find(item => (item.users[0] === route.params?.myId && item.users[1] === receiver) || (item.users[0] === receiver && item.users[1] === route.params?.myId));
+    //let checkMessageRequestExists = newConversations2.find(item => (item.users[0] === route.params?.myId && item.users[1] === receiver) || (item.users[0] === receiver && item.users[1] === route.params?.myId));
+  }
+
+  useEffect(() => {
+    const onFocus = navigation.addListener('focus', () => {
+      checkButton();
+    });
+
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return onFocus;
+  }, [navigation])
+
+  /*
+    useEffect(() => {
+      console.log("hello");
+      checkButton();
+    }, [])
+    */
+
+
 
   useEffect(() => {
     const createPostSubscription = API.graphql(graphqlOperation(onCreatePostFromChannel, { channel: channel })).subscribe({
@@ -225,6 +275,38 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     }
   }
 
+  const acceptMessageRequest = async () => {
+    await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, Accepted: 1 } }));
+    setButtonCheck(true);
+  }
+
+  const rejectMessageRequest = async () => {
+    await API.graphql(
+      graphqlOperation(deleteConversation, {
+        input: { id: id }
+      })
+    );
+    navigation.navigate("Conversations");
+  }
+
+  /*
+  const addPostAsync = async (parentId, replyText) => {
+    checkInternetConnection();
+
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setPosts((posts) => {
+      return posts.filter((post) => (post.createdAt !== timestamp || post.userId !== route.params?.myId));
+    });
+
+    try {
+      await API.graphql(graphqlOperation(deletePost, { input: { createdAt: timestamp, userId: route.params?.myId } }));
+    } catch {
+      console.log("error in deleting post: ");
+    }
+  };
+  */
+
+
   const deletePostsAsync = async (timestamp) => {
     checkInternetConnection();
 
@@ -240,12 +322,13 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     }
   };
 
+
   const reportPost = async (timestamp, author) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setPosts((posts) => {
       return posts.filter((post) => (post.createdAt !== timestamp || post.userId !== author));
     });
-    
+
     try {
       await API.graphql(graphqlOperation(createReport, { input: { postId: timestamp + "#" + author, userId: route.params?.myId } }));
     } catch (err) {
@@ -257,28 +340,62 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     scrollRef.current?.scrollToOffset({ offset: 0, animated: true })
   }
 
-  const renderPostItem = ({ item, index }) => (
-    <PostItem
-      index={index}
-      item={item}
-      likes={item.likes}
-      replies={item.replies}
-      deletePostsAsync={deletePostsAsync}
-      writtenByYou={item.userId === route.params?.myId}
-      myId={route.params?.myId}
-      editButtonHandler={updatePostAsync}
-      receiver={receiver}
-      showTimestamp={showTimestamp(item, index)}
-      reportPost={reportPost}
-      newSection={
-        index == 0 ? true : showTimestamp(posts[index - 1], index - 1)
-      }
-      isVisible={item.isVisible}
-      shouldSubscribe={item.shouldSubscribe}
-    />
-  )
+  const renderPostItem = ({ item, index }) => {
+    if (item.loading) return (
+      <ActivityIndicator
+        size="large"
+        color="#26c6a2"
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          flexDirection: "row",
+          justifyContent: "space-around",
+          padding: 20,
+        }} />
+    )
+    else if (receiver != null) return (
+      <MessageItem
+        index={index}
+        item={item}
+        likes={item.likes}
+        replies={item.replies}
+        deletePostsAsync={deletePostsAsync}
+        writtenByYou={item.userId === route.params?.myId}
+        myId={route.params?.myId}
+        editButtonHandler={updatePostAsync}
+        receiver={receiver}
+        showTimestamp={showTimestamp(item, index)}
+        reportPost={reportPost}
+        newSection={
+          index == 0 ? true : showTimestamp(posts[index - 1], index - 1)
+        }
+        isVisible={item.isVisible}
+        shouldSubscribe={item.shouldSubscribe}
+      />
+    )
+    else return (
+      <PostItem
+        index={index}
+        item={item}
+        likes={item.likes}
+        replies={item.replies}
+        deletePostsAsync={deletePostsAsync}
+        writtenByYou={item.userId === route.params?.myId}
+        myId={route.params?.myId}
+        editButtonHandler={updatePostAsync}
+        receiver={receiver}
+        showTimestamp={showTimestamp(item, index)}
+        reportPost={reportPost}
+        newSection={
+          index == 0 ? true : showTimestamp(posts[index - 1], index - 1)
+        }
+        isVisible={item.isVisible}
+        shouldSubscribe={item.shouldSubscribe}
+      />
+    )
+  }
 
-  const onViewableItemsChanged = React.useCallback(({viewableItems, changedItems}) => {
+  const onViewableItemsChanged = React.useCallback(({ viewableItems, changedItems }) => {
     //console.log("viewable items have changed")
 
     if (viewableItems.length <= 0) return;
@@ -314,19 +431,48 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+
       <APIList
         viewabilityConfig={viewabilityConfig}
         ListRef={scrollRef}
         ListHeaderComponent={
-          <PostInputField
-          channel={channel}
-          headerComponent={headerComponent}
-          receiver={receiver}
-          myId={route.params?.myId}
-          originalParentId={originalParentId}
-          pushLocalPost={(localNewPost) => setPosts((posts) => [localNewPost, ...posts])}
-          autoFocus={autoFocus}
-          />
+
+          <View style={{}}>
+            {headerComponent}
+            {lastUser != route.params.myId && lastUser != null && receiver != null && !ButtonCheck ?
+              <View style={styles.signOutTop}>
+                <TouchableOpacity
+                  onPress={acceptMessageRequest}
+                  style={styles.acceptMessageButton}
+                >
+                  <Text style={styles.acceptButtonTextStyle}>
+                    Accept
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={rejectMessageRequest}
+                  style={styles.rejectMessageButton}
+                >
+                  <Text style={styles.rejectButtonTextStyle}>
+                    Reject
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              : null
+            }
+
+            {Accepted || ButtonCheck || receiver == null || lastUser == route.params.myId || sidebar || lastUser == undefined ?
+              <PostInputField
+                channel={channel}
+                headerComponent={headerComponent}
+                receiver={receiver}
+                myId={route.params?.myId}
+                originalParentId={originalParentId}
+                pushLocalPost={(localNewPost) => setPosts((posts) => [localNewPost, ...posts])}
+                autoFocus={autoFocus}
+              /> : null
+            }
+          </View>
         }
         initialAmount={7}
         additionalAmount={7} //change number based on device specs
@@ -349,7 +495,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import SHA256 from "hooks/hash";
 import { Video, AVPlaybackStatus } from 'expo-av';
 
-function PostInputField({channel, headerComponent, receiver, myId, originalParentId, pushLocalPost, autoFocus = false}) {
+function PostInputField({ channel, headerComponent, receiver, myId, originalParentId, pushLocalPost, autoFocus = false }) {
   const [pickFromGallery, pickFromCamera] = usePhotos(true);
   const [postInput, setPostInput] = useState("");
   const [imageURL, setImageURL] = useState(null);
@@ -365,14 +511,14 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
       duration: 200,
       useNativeDriver: false // Add This line
     }).start();
-  },[progress])
+  }, [progress])
 
   const width = animation.current.interpolate({
     inputRange: [0, 1],
     outputRange: ["0%", "100%"],
     extrapolate: "clamp"
   })
-  
+
   const addPostAsync = async () => {
     //console.log("current date is ", Date.now());
     setPostIsLoading(true);
@@ -397,8 +543,8 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
     }
     const localNewPost = {
       ...newPost,
-      userId: myId, 
-      createdAt: "null", 
+      userId: myId,
+      createdAt: "null",
       loading: true
     }
     setPostInput("");
@@ -443,36 +589,36 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
         setProgress(0);
         setImageURL(null);
       }
-      
+
       if (receiver) {
         const friend1 = await API.graphql(graphqlOperation(getFriendship, { sender: myId, receiver: receiver }));
         const friend2 = await API.graphql(graphqlOperation(getFriendship, { sender: receiver, receiver: myId }));
-  
+
         let newConversations1 = await API.graphql(graphqlOperation(getConversations, { Accepted: 1 }))
         let newConversations2 = await API.graphql(graphqlOperation(getConversations, { Accepted: 0 }))
-  
+
         newConversations1 = newConversations1.data.getConversations.items
         newConversations2 = newConversations2.data.getConversations.items
-  
+
         let checkConversationExists = newConversations1.find(item => item.id === newPost.channel);
-  
+
         if (checkConversationExists == null) {
           checkConversationExists = newConversations2.find(item => item.id === newPost.channel);
         }
-  
+
         const friendCheck = () => {
           return (friend1 != null ? friend1 : friend2);
         }
-  
+
         const friend = friendCheck();
 
         let users = [myId, receiver].sort();
-  
+
         if (checkConversationExists == null) {
           if (friend1.data.getFriendship === null && friend2.data.getFriendship === null) {
             await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postInput, Accepted: 0 } }));
           }
-          else if(friend.data.getFriendship.accepted === null) {
+          else if (friend.data.getFriendship.accepted === null) {
             await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postInput, Accepted: 0 } }));
           }
           else {
@@ -486,7 +632,7 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
           await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, lastMessage: postInput } }));
         }
       }
-      
+
       API.graphql(graphqlOperation(createPost, { input: newPost }));
     } catch (err) {
       console.warn("error in creating post: ", err);
@@ -495,35 +641,39 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
     setPostIsLoading(false);
   };
 
-  return (  
-    <View>
-      {headerComponent}
+  return (
+    <View style={{ backgroundColor: "#a9efe0" }}>
+
+      {
+        //headerComponent
+      }
+
 
       {
         imageURL !== null ?
-        isVideo ?
-        <Video
-          style={{
-            resizeMode: "cover",
-            width: 450,
-            height: 450,
-            alignSelf: "center",
-          }} //check if this should be an image or a video?
-          useNativeControls
-          isLooping
-          shouldPlay
-          source={{ uri: imageURL }} //need a way to delete the image too
-          posterSource={require("../assets/icon.png")}
-        /> :
-        <Image
-          style={{
-            resizeMode: "cover",
-            width: 450,
-            height: 450,
-            alignSelf: "center",
-          }} //check if this should be an image or a video?
-          source={{ uri: imageURL }} //need a way to delete the image too
-        /> : null
+          isVideo ?
+            <Video
+              style={{
+                resizeMode: "cover",
+                width: 450,
+                height: 450,
+                alignSelf: "center",
+              }} //check if this should be an image or a video?
+              useNativeControls
+              isLooping
+              shouldPlay
+              source={{ uri: imageURL }} //need a way to delete the image too
+              posterSource={require("../assets/icon.png")}
+            /> :
+            <Image
+              style={{
+                resizeMode: "cover",
+                width: 450,
+                height: 450,
+                alignSelf: "center",
+              }} //check if this should be an image or a video?
+              source={{ uri: imageURL }} //need a way to delete the image too
+            /> : null
       }
 
       <ExpandingTextInput
@@ -533,37 +683,37 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
         ]}
         autoFocus={autoFocus}
         multiline={true}
-        placeholder={progress > 0 ? "Upload in progress..." : "Start typing..."}
+        placeholder={progress > 0 ? "Uploading..." : "Start typing..."}
         onChangeText={setPostInput}
         value={postInput}
         clearButtonMode="always"
         maxLength={1000}
       />
 
-      <View style={{flexDirection: "row", justifyContent: "space-between", marginHorizontal: 15, marginTop: 2, marginBottom: 10}}>
-        <View style={{flexDirection: "row"}}>
+      <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 15, marginTop: 2, marginBottom: 10 }}>
+        <View style={{ flexDirection: "row" }}>
           <IconButton
             iconName={"insert-photo"}
             size={20}
             color={imageURL === null || postIsLoading ? "gray" : "blue"}
-            style={{marginRight: 6}}
+            style={{ marginRight: 6 }}
             onPress={() => pickFromGallery(setImageURL, null, setIsVideo)}
           />
           <IconButton
             iconName={"camera-alt"}
             size={20}
-            style={{marginRight: 6}}
+            style={{ marginRight: 6 }}
             color={imageURL === null || postIsLoading ? "gray" : "blue"}
             onPress={() => pickFromCamera(setImageURL, null, setIsVideo)}
           />
           {
-            imageURL != null ? 
-            <IconButton
-              iconName={"close"}
-              size={20}
-              color={imageURL === null || postIsLoading ? "gray" : "blue"}
-              onPress={() => setImageURL(null)}
-            /> : null
+            imageURL != null ?
+              <IconButton
+                iconName={"close"}
+                size={20}
+                color={imageURL === null || postIsLoading ? "gray" : "blue"}
+                onPress={() => setImageURL(null)}
+              /> : null
           }
         </View>
         <IconButton
@@ -582,7 +732,7 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
       {
         progress > 0 ?
           <View style={{
-            height: 20,
+            height: 30,
             backgroundColor: 'white',
             margin: 15,
             borderRadius: 5,
@@ -594,6 +744,17 @@ function PostInputField({channel, headerComponent, receiver, myId, originalParen
               top: 0,
               bottom: 0
             }, { backgroundColor: "#26c6a2", width }]} />
+            <Text
+              style={{
+                alignSelf: "center",
+                justifyContent: "center",
+                color: "black",
+                fontWeight: "bold",
+                fontSize: 15,
+                marginTop: 5,
+              }}>
+              Uploading...
+            </Text>
           </View> : null
       }
 

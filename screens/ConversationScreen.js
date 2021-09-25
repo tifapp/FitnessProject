@@ -31,6 +31,7 @@ export default function ConversationScreen({ navigation, route }) {
 
   const updateConversationList = async (newPost) => {
 
+    /*
     global.checkFriendshipConversation = (conversation) => {
 
       let tempConversations = currentConversations.current;
@@ -39,39 +40,43 @@ export default function ConversationScreen({ navigation, route }) {
 
       setConversations([...tempConversations]);
     }  
+    */
 
     let tempConversations = currentConversations.current;
 
     let newConversation = tempConversations.find(item => newPost.channel === item.id);
 
+    /*
+
     let newConversationCheck = await API.graphql(graphqlOperation(getConversations, { Accepted: 0, sortDirection: 'DESC'}));
     console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
     console.log(newConversationCheck);
     console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+    */
 
-    if(newConversationCheck.data.getConversations.items.length != 0){
-      //console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||")
-      //console.log(newConversationCheck.data.getConversations.items);
-      //console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||")
+    //if(newConversationCheck.data.getConversations.items.length != 0){
+    //console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||")
+    //console.log(newConversationCheck.data.getConversations.items);
+    //console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||")
 
-      //console.log(newConversationCheck.data.getConversations.items[0].id)
+    //console.log(newConversationCheck.data.getConversations.items[0].id)
 
-      newConversationCheck = newConversationCheck.data.getConversations.items[0].id === newPost.channel;
+    //newConversationCheck = newConversationCheck.data.getConversations.items[0].id === newPost.channel;
 
-      /*
-      console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-      console.log(newPost.channel);
-      console.log(newConversationCheck);
-      console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-      */
+    /*
+    console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+    console.log(newPost.channel);
+    console.log(newConversationCheck);
+    console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+    */
 
-      if(newConversationCheck){
-        console.log("Conversation already exists");
-        return;
-      }
-    }
+    //if(newConversationCheck){
+    //console.log("Conversation already exists");
+    //return;
+    //}
+    //}
 
-    console.log("Outside");
+    //console.log("Outside");
 
     if (newConversation === undefined) {
       newConversation = await API.graphql(graphqlOperation(getConversations, { Accepted: 1, limit: 1 }));
@@ -104,7 +109,7 @@ export default function ConversationScreen({ navigation, route }) {
       //setConversations([conversation, ...currentConversations.current]);
       setConversations([...tempConversations]);
     }
-    else{
+    else {
       const conversation = { id: newPost.channel, users: [newPost.userId, newPost.receiver], lastUser: newPost.userId, lastMessage: newPost.description, Accepted: 0 }
       tempConversations = currentConversations.current;
       tempConversations.unshift(conversation);
@@ -153,6 +158,7 @@ export default function ConversationScreen({ navigation, route }) {
   const [conversations, setConversations] = useState([]);
   const currentConversations = useRef();
   currentConversations.current = conversations;
+  //const [button, setButton] = useRef();
 
   const deleteConversationFromConvo = async (item, friendID) => {
     /*
@@ -179,6 +185,8 @@ export default function ConversationScreen({ navigation, route }) {
         input: { id: item.id }
       })
     );
+
+    //setButton(false);
 
     /*
     // delete friend object
@@ -287,11 +295,12 @@ export default function ConversationScreen({ navigation, route }) {
       <APIList
         initialAmount={10}
         additionalAmount={20}
-        queryOperation={getConversations}
+        queryOperation={listConversations}
         data={conversations}
         setDataFunction={setConversations}
         processingFunction={collectConversations}
         renderItem={({ item }) => (
+          //console.log(";;;;;;;"), console.log(item),
           <FriendListItem
             navigation={navigation}
             deleteConversationFromConvo={deleteConversationFromConvo}
@@ -302,9 +311,9 @@ export default function ConversationScreen({ navigation, route }) {
             myId={route.params.myId}
             lastMessage={item.lastMessage}
             lastUser={item.lastUser}
+            Accepted={item.Accepted}
           />
         )}
-        filter={{ Accepted: 1 }}
         keyExtractor={(item) => item.id}
       />
     </SafeAreaView>

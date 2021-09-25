@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   View,
@@ -18,14 +18,15 @@ var styles = require('styles/stylesheet');
 
 export default function MessageScreen({ navigation, route }) {
   const { userId } = route.params;
+  const { Accepted, lastUser, sidebar, id } = route.params;
 
   const [blocked, setBlocked] = useState(false);
 
   //console.log("Here is the user!");
   //console.log(userId);
 
-  useEffect(()=>{
-    (async() => {
+  useEffect(() => {
+    (async () => {
       let block = await API.graphql(
         graphqlOperation(getBlock, {
           userId: userId,
@@ -36,7 +37,7 @@ export default function MessageScreen({ navigation, route }) {
         setBlocked(true);
       }
     })();
-  },[userId])
+  }, [userId])
 
   /*
   useEffect(() => {
@@ -76,36 +77,41 @@ export default function MessageScreen({ navigation, route }) {
     }, [])
   );
   */
-  
+
   //console.log(route.params);
   //console.log(route);
   //have a header with the person's name and profile pic also.
   return (
-    <View style={styles.containerStyle}>  
-    {
-      blocked ?
-      null :
-      <FeedScreen
-        headerComponent={
-          <ProfileImageAndName
-            you={userId === route.params?.myId}
-            vertical={true}
-            imageStyle={[styles.imageStyle, {marginVertical: 15}]}
-            imageLayoutStyle={{margin: 0}}
-            userId={userId}
-            isFull={true}
-            hidename={true}
-            callback={(info) => {
-              navigation.setOptions({ title: info.name });
-            }}
+    <View style={styles.containerStyle}>
+      {
+        blocked ?
+          null :
+          <FeedScreen
+            headerComponent={
+              <ProfileImageAndName
+                you={userId === route.params?.myId}
+                vertical={true}
+                imageStyle={[styles.imageStyle, { marginVertical: 15 }]}
+                imageLayoutStyle={{ margin: 0 }}
+                userId={userId}
+                isFull={true}
+                hidename={true}
+                callback={(info) => {
+                  navigation.setOptions({ title: info.name });
+                }}
+              />
+            }
+            navigation={navigation}
+            route={route}
+            Accepted={Accepted}
+            receiver={userId}
+            channel={route.params?.myId < userId ? route.params?.myId + userId : userId + route.params?.myId}
+            lastUser={lastUser}
+            sidebar={sidebar}
+            id={id}
+            autoFocus={true}
           />
-        }
-        navigation={navigation}
-        route={route}
-        receiver={userId}
-        channel={route.params?.myId < userId ? route.params?.myId+userId : userId+route.params?.myId}
-      />
-    }
+      }
     </View>
   );
 };

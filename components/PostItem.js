@@ -1,7 +1,4 @@
-import Hyperlink from "react-native-hyperlink";
-import RNUrlPreview from "components/RNUrlPreview";
 import React, { useState, useEffect, useRef, PureComponent } from "react";
-import { Storage } from "aws-amplify";
 import {
   StyleSheet,
   View,
@@ -12,7 +9,6 @@ import {
   TouchableOpacity,
   Linking,
   LayoutAnimation,
-  ActivityIndicator,
   Alert,
   Modal,
   KeyboardAvoidingView,
@@ -27,6 +23,8 @@ import { createLike, deleteLike } from "root/src/graphql/mutations";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import printTime from "hooks/printTime";
 import SHA256 from "hooks/hash";
+import PostImage from "components/PostImage";
+import LinkableText from "components/LinkableText";
 import LikesList from "components/LikesList";
 import FeedScreen from "screens/FeedScreen";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -103,51 +101,6 @@ function LikeButton({ onTap, likes, myId, item, postId, likeDebounceRef }) {
   );
 }
 
-function LinkableText(props) {
-  const warnExternalSite = (url, text) => {
-    const title =
-      "This link will take you to an external site (" +
-      url +
-      "). Do you want to continue?";
-    const options = [
-      {
-        text: "Yes",
-        onPress: () => {
-          Linking.openURL(url);
-        },
-      },
-      {
-        text: "Cancel",
-        type: "cancel",
-      },
-    ];
-    Alert.alert(title, "", options);
-  };
-
-  //console.log("the url we're passing to preview is ", props.urlPreview)
-
-  return (
-    <View>
-      <View style={props.style}>
-        <Hyperlink linkStyle={{ color: "#2980b9" }} onPress={warnExternalSite}>
-          <Text
-            style={{
-              fontSize: 16,
-            }}
-          >
-            {props.children}
-          </Text>
-        </Hyperlink>
-      </View>
-      <RNUrlPreview
-        urlPreview={props.urlPreview}
-        descriptionNumberOfLines={2}
-        onPress={warnExternalSite}
-      />
-    </View>
-  );
-}
-
 export default React.memo(function PostItem({
   item,
   deletePostsAsync,
@@ -171,36 +124,20 @@ export default React.memo(function PostItem({
   const [areRepliesVisible, setAreRepliesVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState("");
-  const displayTime = printTime(item.createdAt);
-  const isReceivedMessage = receiver != null && !writtenByYou;
 
   const [areLikesVisible, setAreLikesVisible] = useState(false);
 
   const [likedUsers, setLikedUsers] = useState([]);
 
-  if (item.loading) return (
-    <ActivityIndicator 
-    size="large" 
-    color="#26c6a2"
-    style={{
-      flex: 1,
-      justifyContent: "center",
-      flexDirection: "row",
-      justifyContent: "space-around",
-      padding: 20,
-    }} />
-  )
-  else if (receiver == null)
     return (
       <View style={[styles.secondaryContainerStyle, {
-        backgroundColor: "#efefef",
+        backgroundColor: "#a9efe0",
       }]}>
         <View
           style={
             [styles.spaceAround,
             replyButtonHandler ? {} : {
               marginBottom: 20,
-              marginHorizontal: 10,
               backgroundColor: "white",
               shadowColor: "#000",
               shadowOffset: {
@@ -225,13 +162,20 @@ export default React.memo(function PostItem({
             reportPost={reportPost}
             shouldSubscribe={shouldSubscribe}
           />
-          
+
           <PostImage
+            style={{
+              resizeMode: "cover",
+              width: Dimensions.get('window').width,
+              height: Dimensions.get('window').width,
+              alignSelf: "center",
+              marginBottom: 15,
+            }}
             imageID={item.imageURL}
             isVisible={isVisible}
           />
 
-          <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+          <View style={{flexDirection: "row", justifyContent: "space-between", minHeight: writtenByYou ? 70 : 35,}}>
           {isEditing ? (
             <TextInput
               style={[styles.check, { borderColor: "orange" }]}
@@ -244,17 +188,22 @@ export default React.memo(function PostItem({
             <LinkableText
               style={{
                 flex: 1,
-                paddingTop: 4,
-                paddingLeft: 22,
-                paddingBottom: 16,
               }}
+              textStyle={
+                {
+                  paddingTop: 4,
+                  paddingBottom: 16,
+                  marginLeft: 22,
+                  maxWidth: Dimensions.get('window').width - 90,
+                }
+              }
               urlPreview={item.urlPreview}
             >
               {item.description}
             </LinkableText>
             )}
 
-            <View style={{flexDirection: "column", alignItems: "flex-start", marginRight: 15}}>
+            <View style={{flexDirection: "column", position: "absolute", right: 15}}>
               {!writtenByYou ? (
                 <IconButton
                   iconName={"report"}
@@ -492,63 +441,6 @@ export default React.memo(function PostItem({
         </Modal>
       </View>
     );
-  else {
-    /*
-    showTimestamp
-          ? {
-            paddingHorizontal: 25,
-            marginTop: 10,
-            marginBottom: 40,
-          }
-          : newSection
-            ? {
-              paddingHorizontal: 25,
-              marginTop: 40,
-              marginBottom: 10,
-            }
-            : {
-              paddingHorizontal: 25,
-              paddingTop: 10,
-              paddingBottom: 10,
-            }
-    */
-    return (
-      <View
-        style={[styles.secondaryContainerStyle, { backgroundColor: "#fff" }]}
-      >
-        <View style={[styles.spaceAround]}>
-          <LinkableText
-            style={{
-              alignSelf: isReceivedMessage ? "flex-start" : "flex-end",
-              backgroundColor: "#efefef",
-              padding: 15,
-
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 3,
-              },
-              shadowOpacity: 0.27,
-              shadowRadius: 4.65,
-
-              elevation: 6,
-            }}
-          >
-            {item.description}
-          </LinkableText>
-          <Text
-            style={{
-              color: "gray",
-              marginTop: 15,
-              textAlign: isReceivedMessage ? "left" : "right",
-            }}
-          >
-            {displayTime}
-          </Text>
-        </View>
-      </View>
-    );
-  }
 })
 
 function PostHeader({ item, myId, writtenByYou, repliesPressed, deletePostsAsync, toggleEditing, areRepliesVisible, reportPost, shouldSubscribe }) {
@@ -688,77 +580,4 @@ function PostHeader({ item, myId, writtenByYou, repliesPressed, deletePostsAsync
 
     </View>
   );
-}
-
-import { Video, AVPlaybackStatus } from 'expo-av';
-
-const re = /(?:\.([^.]+))?$/;
-
-function PostImage({imageID, isVisible}) {
-  const [imageURL, setImageURL] = useState(null);
-  const video = useRef(null);
-  
-  let imageKey = `feed/${imageID}`;
-  let imageConfig = {
-    expires: 86400,
-  };
-
-  useEffect(() => {
-    //console.log("image id is ", imageID);
-    if (imageID) {
-      Storage.get(imageKey, imageConfig) //this will incur lots of repeated calls to the backend, idk how else to fix it right now
-        .then((imageURL) => {
-          setImageURL(imageURL);
-        })
-        .catch((err) => {
-          console.log("could not find image!", err);
-          setImageURL(null);
-        }); //should just use a "profilepic" component
-    }
-  }, [])
-
-  useEffect(() => {
-    if (video.current) {
-      if (isVisible === true) {
-        video.current.playAsync();
-      } else if (isVisible === false) {
-        video.current.pauseAsync();
-      }
-    }
-  }, [isVisible])
-
-  if (imageID) {
-    return (
-      (re.exec(imageID)[1] === 'jpg') ?
-        <Image
-          //onError={addUserInfotoCache}
-          style={{
-            resizeMode: "cover",
-            width: Dimensions.get('window').width - 20,
-            height: Dimensions.get('window').width - 20,
-            alignSelf: "center",
-            marginBottom: 15,
-          }}
-          source={
-            (imageURL == null || imageURL === "") ?
-              require("../assets/icon.png")
-              : { uri: imageURL }
-          }
-        /> : <Video
-          //onError={addUserInfotoCache}
-          ref={video}
-          style={{
-            resizeMode: "cover",
-            width: Dimensions.get('window').width - 20,
-            height: Dimensions.get('window').width - 20,
-            alignSelf: "center",
-            marginBottom: 15,
-          }}
-          source={{ uri: imageURL }}
-          posterSource={require("../assets/icon.png")}
-          useNativeControls
-          isLooping
-        />
-    )
-  } else return null;
 }
