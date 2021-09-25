@@ -13,16 +13,6 @@ import { API, graphqlOperation } from "aws-amplify";
 var styles = require("styles/stylesheet");
 
 const SettingsScreen = ({ navigation, route }) => {
-  useEffect(() => {
-    const onFocus = navigation.addListener('focus', () => {
-      console.log("got to settings", global.localBlockList);
-      setBlockList([...global.localBlockList]);
-    });
-
-    // Return the function to unsubscribe from the event so it gets removed on unmount
-    return onFocus;
-  }, [navigation])
-
   return (
     <View>
       <Text style={{
@@ -31,6 +21,7 @@ const SettingsScreen = ({ navigation, route }) => {
       }}>Privacy</Text>
       <View style={{flexDirection: "row"}}>
         <APISwitch
+          initialState={false}
           apicall={            
             () => 
             API.graphql(
@@ -48,6 +39,7 @@ const SettingsScreen = ({ navigation, route }) => {
       </View>
       <View style={{flexDirection: "row"}}>
         <APISwitch
+          initialState={false}
           apicall={            
             () => 
             API.graphql(
@@ -66,8 +58,8 @@ const SettingsScreen = ({ navigation, route }) => {
     </View>
   );
 };
-function APISwitch({ apicall }) {
-  const [isEnabled, setIsEnabled] = useState(false); //should fetch from backend
+function APISwitch({ initialState, apicall }) {
+  const [isEnabled, setIsEnabled] = useState(initialState); //should fetch from backend
   const enabledRef = useRef();
   const timerIsRunning = useRef();
   const enabledTimeout = useRef();
