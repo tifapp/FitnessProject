@@ -15,25 +15,18 @@ import * as Haptics from "expo-haptics";
 var styles = require("styles/stylesheet");
 
 const SettingsScreen = ({ navigation, route }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isFriendRequestsEnabled, setIsFriendRequestsEnabled] = useState(false);
-  const [isMessagesEnabled, setIsMessagesEnabled] = useState(false);
+  const [previousSettings, setPreviousSettings] = useState();
 
   useEffect(() => {
     (async() => {
       //console.log("your id is ", route.params?.myId)
       const user = await API.graphql(graphqlOperation(getUser, { id: route.params?.myId }));
-      if (user.data.getUser.friendRequestPrivacy) {
-        setIsFriendRequestsEnabled(true);
-      }
-      if (user.data.getUser.messagesPrivacy) {
-        setIsMessagesEnabled(true);
-      }
-      setIsLoading(false);
+      //console.log(user.data.getUser);
+      setPreviousSettings(user.data.getUser);
     })();
   }, [])
 
-  if (isLoading) return null;
+  if (!previousSettings) return null;
   else return (
     <View>
       <Text style={{
@@ -42,7 +35,7 @@ const SettingsScreen = ({ navigation, route }) => {
       }}>Privacy</Text>
       <View style={{flexDirection: "row"}}>
         <APISwitch
-          initialState={false}
+          initialState={previousSettings.messagesPrivacy}
           apicall={            
             () => 
             API.graphql(
@@ -60,7 +53,7 @@ const SettingsScreen = ({ navigation, route }) => {
       </View>
       <View style={{flexDirection: "row"}}>
         <APISwitch
-          initialState={false}
+          initialState={previousSettings.friendRequestPrivacy}
           apicall={            
             () => 
             API.graphql(
