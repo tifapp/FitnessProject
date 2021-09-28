@@ -10,6 +10,7 @@ import {
 import { updateUser } from "root/src/graphql/mutations";
 import { getUser } from 'root/src/graphql/queries'
 import { API, graphqlOperation } from "aws-amplify";
+import * as Haptics from "expo-haptics";
 
 var styles = require("styles/stylesheet");
 
@@ -54,7 +55,7 @@ const SettingsScreen = ({ navigation, route }) => {
             fontSize: 16,
           }}
         >
-          Allow strangers to message you
+          Don't allow strangers to message you
         </Text>
       </View>
       <View style={{flexDirection: "row"}}>
@@ -72,7 +73,7 @@ const SettingsScreen = ({ navigation, route }) => {
             fontSize: 16,
           }}
         >
-          Allow strangers to send you friend requests (will still allow mutual friends)
+          Don't allow strangers to send you friend requests (will still allow mutual friends)
         </Text>
       </View>
     </View>
@@ -100,6 +101,7 @@ function APISwitch({ initialState, apicall }) {
     if (isEnabled == enabledRef.current) {
       //console.log("sent API call, hopefully debounce works.");
       apicall();
+      console.log("SENDING API CALL")
     }
 
     timerIsRunning.current = false;

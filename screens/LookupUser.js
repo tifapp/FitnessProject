@@ -94,6 +94,7 @@ global.addConversationIds(id);
       if (u.data.getUser != null) {
         ////console("this post is...", item.description, "and the author is...", user.data.getUser);
         navigation.setParams({ user: u.data.getUser });
+        console.log(u.data.getUser);
       }
 
       ////console("success, user is ", user);
@@ -423,7 +424,7 @@ global.addConversationIds(id);
               }}
             />
           </View>
-          {route.params?.myId != user.id ?
+          {route.params?.myId != user.id && !user.messagesPrivacy ?
           <TouchableOpacity
                   style={styles.messageButton}
                   onPress = {() => {goToMessages(userId)}}
@@ -511,7 +512,7 @@ global.addConversationIds(id);
                 <Text style={styles.buttonTextStyle}>Unblock</Text>
               </TouchableOpacity>
             )
-            : friendStatus == "none" ? (
+            : friendStatus == "none" && !user.friendRequestPrivacy ? (
               <View>
                 <TouchableOpacity
                   onPress={sendFriendRequest}
