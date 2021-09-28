@@ -28,52 +28,40 @@ const SettingsScreen = ({ navigation, route }) => {
 
   if (!previousSettings) return null;
   else return (
-    <View>
+    <View
+    style={{
+      margin: 16,
+    }}>
       <Text style={{
-        fontSize: 18,
+        fontSize: 20,
         color: "black",
+        marginBottom: 18,
       }}>Privacy</Text>
-      <View style={{flexDirection: "row"}}>
         <APISwitch
           initialState={previousSettings.messagesPrivacy}
           apicall={            
-            () => 
+            (enabled) => 
             API.graphql(
-              graphqlOperation(updateUser, { input: { friendRequestPrivacy: isFriendRequestsEnabled } })
+              graphqlOperation(updateUser, { input: { friendRequestPrivacy: enabled } })
             )
           }
+          label="Don't allow strangers to send you friend requests (will still allow mutual friends)"
         />
-        <Text
-          style={{
-            fontSize: 16,
-          }}
-        >
-          Don't allow strangers to message you
-        </Text>
-      </View>
-      <View style={{flexDirection: "row"}}>
         <APISwitch
           initialState={previousSettings.friendRequestPrivacy}
           apicall={            
-            () => 
+            (enabled) => 
             API.graphql(
-              graphqlOperation(updateUser, { input: { messagesPrivacy: isMessagesEnabled } })
+              graphqlOperation(updateUser, { input: { messagesPrivacy: enabled } })
             )
           }
+          label="Don't allow strangers to message you"
         />
-        <Text
-          style={{
-            fontSize: 16,
-          }}
-        >
-          Don't allow strangers to send you friend requests (will still allow mutual friends)
-        </Text>
-      </View>
     </View>
   );
 };
 
-function APISwitch({ initialState, apicall }) {
+function APISwitch({ initialState, apicall, label }) {
   const [isEnabled, setIsEnabled] = useState(initialState); //should fetch from backend
   const enabledRef = useRef();
   const timerIsRunning = useRef();
@@ -93,8 +81,7 @@ function APISwitch({ initialState, apicall }) {
   const sendAPICall = () => {
     if (isEnabled == enabledRef.current) {
       //console.log("sent API call, hopefully debounce works.");
-      apicall();
-      console.log("SENDING API CALL")
+      apicall(!isEnabled);
     }
 
     timerIsRunning.current = false;
@@ -113,6 +100,7 @@ function APISwitch({ initialState, apicall }) {
   };
 
   return (
+    <View style={{flexDirection: "row", marginBottom: 8, alignItems: "center"}}>
     <Switch
       trackColor={{ false: "#efefef", true: "#26c6a2" }}
       thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
@@ -120,6 +108,15 @@ function APISwitch({ initialState, apicall }) {
       onValueChange={toggleAsync}
       value={isEnabled}
     />
+    <Text
+      style={{
+        fontSize: 16,
+        marginLeft: 12,
+      }}
+    >
+      {label}
+    </Text>
+    </View>
   );
 }
 
