@@ -504,102 +504,101 @@ global.addConversationIds(id);
                 }}
               />
             ) : friendStatus == "blocked" ? null
-            : friendStatus == "blocker" ? (
-              <TouchableOpacity
-                onPress={unblockUser}
-                style={styles.unblockButton}
-              >
-                <Text style={styles.buttonTextStyle}>Unblock</Text>
-              </TouchableOpacity>
-            )
-            : friendStatus == "none" && (!user.friendRequestPrivacy || user.friendRequestPrivacy === 0 || (mutualfriendList.length > 0 && user.friendRequestPrivacy === 1) || (friendStatus === "friends" && user.friendRequestPrivacy >= 1)) ? (
-              <View>
+              : friendStatus == "blocker" ? (
                 <TouchableOpacity
-                  onPress={sendFriendRequest}
-                  style={styles.submitButton}
+                  onPress={unblockUser}
+                  style={styles.unblockButton}
                 >
-                  <Text style={styles.buttonTextStyle}>Send Friend Request</Text>
+                  <Text style={styles.buttonTextStyle}>Unblock</Text>
                 </TouchableOpacity>
+              )
+                :
                 <TouchableOpacity
                   onPress={blockUser}
                   style={styles.unblockButton}
                 >
                   <Text style={styles.buttonTextStyle}>Block</Text>
                 </TouchableOpacity>
-              </View>
-            ) : friendStatus == "sending" ? (
-              <Text style={[styles.buttonTextStyle, { color: "red" }]}>
-                Sending Friend Request...
-              </Text>
-            ) : friendStatus == "sent" ? (
-              <TouchableOpacity
-                onPress={unsendFriendRequest}
-                style={styles.unsendButton}
-              >
-                <Text style={styles.buttonTextStyle}>
-                  Unsend Friend Request
-                </Text>
-              </TouchableOpacity>
-            ) : friendStatus == "unsending" ? (
-              <Text style={[styles.buttonTextStyle, { color: "red" }]}>
-                Unsending Friend Request...
-              </Text>
-            ) : friendStatus == "received" ? (
-              <View>
-                <TouchableOpacity
-                  onPress={rejectFriendRequest}
-                  style={styles.unsendButton}
-                >
-                  <Text style={styles.buttonTextStyle}>
-                    Reject Friend Request
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={acceptFriendRequest}
-                  style={styles.unsendButton}
-                >
-                  <Text style={styles.buttonTextStyle}>
-                    Accept Friend Request
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={blockUser}
-                  style={styles.unblockButton}
-                >
-                  <Text style={styles.buttonTextStyle}>Block</Text>
-                </TouchableOpacity>
-              </View>
-            ) : friendStatus == "rejecting" ? (
-              <Text style={[styles.buttonTextStyle, { color: "red" }]}>
-                Rejecting Friend Request...
-              </Text>
-            ) : friendStatus == "accepting" ? (
-              <Text style={[styles.buttonTextStyle, { color: "red" }]}>
-                Accepting Friend Request...
-              </Text>
-            ) : friendStatus == "deleting" ? (
-              <Text style={[styles.buttonTextStyle, { color: "red" }]}>
-                Unfriending...
-              </Text>
-            ) : (
-              <View>
-                <View style={styles.viewProfileScreen}>
-                  <Text>Friends for {friendsSince} </Text>
+            }
+            {
+              (!user.friendRequestPrivacy || user.friendRequestPrivacy === 0 || (mutualfriendList.length > 0 && user.friendRequestPrivacy === 1) || (friendStatus === "friends" && user.friendRequestPrivacy >= 1)) ?                
+              friendStatus == "none" ? (
+                <View>
+                  <TouchableOpacity
+                    onPress={sendFriendRequest}
+                    style={styles.submitButton}
+                  >
+                    <Text style={styles.buttonTextStyle}>Send Friend Request</Text>
+                  </TouchableOpacity>
                 </View>
+              ) : friendStatus == "sending" ? (
+                <Text style={[styles.buttonTextStyle, { color: "red" }]}>
+                  Sending Friend Request...
+                </Text>
+              ) : friendStatus == "sent" ? (
                 <TouchableOpacity
-                  onPress={deleteFriend}
+                  onPress={unsendFriendRequest}
                   style={styles.unsendButton}
                 >
-                  <Text style={styles.buttonTextStyle}>Unfriend</Text>
+                  <Text style={styles.buttonTextStyle}>
+                    Unsend Friend Request
+                  </Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={blockUser}
-                  style={styles.unblockButton}
-                >
-                  <Text style={styles.buttonTextStyle}>Block</Text>
-                </TouchableOpacity>
-              </View>
-            )}
+              ) : friendStatus == "unsending" ? (
+                <Text style={[styles.buttonTextStyle, { color: "red" }]}>
+                  Unsending Friend Request...
+                </Text>
+              ) : friendStatus == "received" ? (
+                <View>
+                  <TouchableOpacity
+                    onPress={rejectFriendRequest}
+                    style={styles.unsendButton}
+                  >
+                    <Text style={styles.buttonTextStyle}>
+                      Reject Friend Request
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={acceptFriendRequest}
+                    style={styles.unsendButton}
+                  >
+                    <Text style={styles.buttonTextStyle}>
+                      Accept Friend Request
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={blockUser}
+                    style={styles.unblockButton}
+                  >
+                    <Text style={styles.buttonTextStyle}>Block</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : friendStatus === "rejecting" ? (
+                <Text style={[styles.buttonTextStyle, { color: "red" }]}>
+                  Rejecting Friend Request...
+                </Text>
+              ) : friendStatus === "accepting" ? (
+                <Text style={[styles.buttonTextStyle, { color: "red" }]}>
+                  Accepting Friend Request...
+                </Text>
+              ) : friendStatus === "deleting" ? (
+                <Text style={[styles.buttonTextStyle, { color: "red" }]}>
+                  Unfriending...
+                </Text>
+              ) : friendStatus === "friends" ? (
+                <View>
+                  <View style={styles.viewProfileScreen}>
+                    <Text>Friends for {friendsSince} </Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={deleteFriend}
+                    style={styles.unsendButton}
+                  >
+                    <Text style={styles.buttonTextStyle}>Unfriend</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : null : null
+            }
           </View>
         ) : null}
       </ScrollView>
