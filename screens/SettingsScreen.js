@@ -4,13 +4,13 @@ import {
   Text,
   TouchableOpacity,
   Alert,
-  Switch,
   LayoutAnimation
 } from "react-native";
 import { updateUser } from "root/src/graphql/mutations";
 import { getUser } from 'root/src/graphql/queries'
 import { API, graphqlOperation } from "aws-amplify";
 import * as Haptics from "expo-haptics";
+import {Picker} from '@react-native-picker/picker';
 
 var styles = require("styles/stylesheet");
 
@@ -21,7 +21,7 @@ const SettingsScreen = ({ navigation, route }) => {
     (async() => {
       //console.log("your id is ", route.params?.myId)
       const user = await API.graphql(graphqlOperation(getUser, { id: route.params?.myId }));
-      //console.log(user.data.getUser);
+      console.log(user.data.getUser);
       setPreviousSettings(user.data.getUser);
     })();
   }, [])
@@ -45,7 +45,7 @@ const SettingsScreen = ({ navigation, route }) => {
               graphqlOperation(updateUser, { input: { friendRequestPrivacy: enabled } })
             )
           }
-          label="Don't allow strangers to send you friend requests (will still allow mutual friends)"
+          label="Who can send you friend requests?"
         />
         <APISwitch
           initialState={previousSettings.friendRequestPrivacy}
@@ -55,44 +55,22 @@ const SettingsScreen = ({ navigation, route }) => {
               graphqlOperation(updateUser, { input: { messagesPrivacy: enabled } })
             )
           }
-          label="Don't allow strangers to message you"
+          label="Who can message you?"
         />
     </View>
   );
 };
 
 function APISwitch({ initialState, apicall, label }) {
-  const [isEnabled, setIsEnabled] = useState(initialState); //should fetch from backend
-  const enabledRef = useRef();
-  const timerIsRunning = useRef();
-  const enabledTimeout = useRef();
+  const [selectedSetting, setSelectedSetting] = useState(initialState ?? 0); //should fetch from backend
 
-  const resetTimeout = () => {
-    //if there's already a timeout running do not update ref
-    //if there isn't, update ref
-    if (!timerIsRunning.current) {
-      enabledRef.current = isEnabled;
-    }
-    timerIsRunning.current = true;
-    clearTimeout(enabledTimeout.current);
-    enabledTimeout.current = setTimeout(sendAPICall, 1000);
-  };
-
-  const sendAPICall = () => {
-    if (isEnabled == enabledRef.current) {
-      //console.log("sent API call, hopefully debounce works.");
-      apicall(!isEnabled);
-    }
-
-    timerIsRunning.current = false;
-  };
-
-  const toggleAsync = async () => {
+  const toggleAsync = (itemValue, itemIndex) => {
     //liked ? playSound("unlike") : playSound("like");
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     try {
-      setIsEnabled(!isEnabled);
-      resetTimeout();
+      setSelectedSetting(itemValue);
+      apicall(itemValue);
+      console.log(itemValue);
     } catch (err) {
       console.log(err);
       alert("Could not be submitted!");
@@ -100,22 +78,26 @@ function APISwitch({ initialState, apicall, label }) {
   };
 
   return (
-    <View style={{flexDirection: "row", marginBottom: 8, alignItems: "center"}}>
-    <Switch
-      trackColor={{ false: "#efefef", true: "#26c6a2" }}
-      thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
-      ios_backgroundColor="#3e3e3e"
-      onValueChange={toggleAsync}
-      value={isEnabled}
-    />
+    <View style={{marginBottom: 12}}>
     <Text
       style={{
         fontSize: 16,
-        marginLeft: 12,
+        alignSelf: "center",
+        top: 20,
       }}
     >
       {label}
     </Text>
+    <Picker
+      numberOfLines={2}
+      selectedValue={selectedSetting}
+      onValueChange={toggleAsync}
+      itemStyle={{fontSize: 16, color: "blue"}}>
+      <Picker.Item label="Anybody" value={0} />
+      <Picker.Item label="Friends and mutuals" value={1} />
+      <Picker.Item label="Friends only" value={2} />
+      <Picker.Item label="Nobody" value={3} />
+    </Picker>
     </View>
   );
 }

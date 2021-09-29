@@ -424,7 +424,7 @@ global.addConversationIds(id);
               }}
             />
           </View>
-          {route.params?.myId != user.id && !user.messagesPrivacy ?
+          {route.params?.myId != user.id && (!user.messagesPrivacy || user.messagesPrivacy === 0 || (mutualfriendList.length > 0 && user.messagesPrivacy === 1) || (friendStatus === "friends" && user.messagesPrivacy >= 1)) ?
           <TouchableOpacity
                   style={styles.messageButton}
                   onPress = {() => {goToMessages(userId)}}
@@ -512,7 +512,7 @@ global.addConversationIds(id);
                 <Text style={styles.buttonTextStyle}>Unblock</Text>
               </TouchableOpacity>
             )
-            : friendStatus == "none" && !user.friendRequestPrivacy ? (
+            : friendStatus == "none" && (!user.friendRequestPrivacy || user.friendRequestPrivacy === 0 || (mutualfriendList.length > 0 && user.friendRequestPrivacy === 1) || (friendStatus === "friends" && user.friendRequestPrivacy >= 1)) ? (
               <View>
                 <TouchableOpacity
                   onPress={sendFriendRequest}
