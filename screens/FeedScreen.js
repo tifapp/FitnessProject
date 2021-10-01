@@ -19,7 +19,6 @@ import { onCreatePostFromChannel, onDeletePostFromChannel, onUpdatePostFromChann
 import NetInfo from '@react-native-community/netinfo';
 import APIList from 'components/APIList';
 import { MaterialIcons } from '@expo/vector-icons';
-import { lessThan } from "react-native-reanimated";
 import { ProfileImageAndName } from "components/ProfileImageAndName";
 import ExpandingTextInput from "components/ExpandingTextInput";
 import SpamButton from "components/SpamButton";
