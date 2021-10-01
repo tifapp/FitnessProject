@@ -48,7 +48,7 @@ export default function ListGroupItem({ item, matchingname }) {
         onPress={goToGroupPosts}>
         <View style={{ flexDirection: "row", alignItems: "center", paddingTop: 10 }}>
 
-          <MaterialCommunityIcons name="account-group" style={{ marginLeft: 20 }} color={matchingname == null || matchingname ? "black" : "orange"} size={30} />
+          <MaterialCommunityIcons name="account-group" style={{ marginLeft: 20 }} color={matchingname == null || matchingname ? "black" : "#a9efe0"} size={30} />
           <Text style={
             {
               marginLeft: 20,
