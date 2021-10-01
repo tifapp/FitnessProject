@@ -46,6 +46,7 @@ const SettingsScreen = ({ navigation, route }) => {
             )
           }
           label="Who can send you friend requests?"
+          options={[{label: "Anybody", value: 0}, {label: "Mutual friends", value: 1}, {label: "Nobody", value: 3}]}
         />
         <APISwitch
           initialState={previousSettings.friendRequestPrivacy}
@@ -56,12 +57,13 @@ const SettingsScreen = ({ navigation, route }) => {
             )
           }
           label="Who can message you?"
+          options={[{label: "Anybody", value: 0}, {label: "Friends and mutuals", value: 1}, {label: "Friends only", value: 2}]}
         />
     </View>
   );
 };
 
-function APISwitch({ initialState, apicall, label }) {
+function APISwitch({ initialState, apicall, label, options }) {
   const [selectedSetting, setSelectedSetting] = useState(initialState ?? 0); //should fetch from backend
 
   const toggleAsync = (itemValue, itemIndex) => {
@@ -93,10 +95,7 @@ function APISwitch({ initialState, apicall, label }) {
       selectedValue={selectedSetting}
       onValueChange={toggleAsync}
       itemStyle={{fontSize: 16, color: "blue"}}>
-      <Picker.Item label="Anybody" value={0} />
-      <Picker.Item label="Friends and mutuals" value={1} />
-      <Picker.Item label="Friends only" value={2} />
-      <Picker.Item label="Nobody" value={3} />
+        {options.map(option => <Picker.Item label={option.label} value={option.value} />)}
     </Picker>
     </View>
   );
