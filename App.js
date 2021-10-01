@@ -15,7 +15,7 @@ import awsconfig from "./src/aws-exports"; // if you are using Amplify CLI
 import { Amplify, API, graphqlOperation, Auth, Cache, Storage } from "aws-amplify";
 import { getUser } from "./src/graphql/queries";
 import ProfileStack from "stacks/ProfileStack";
-import MainTabs from "./MainTabs";
+import MainStack from "stacks/MainStack";
 import ReportScreen from "screens/ReportScreen";
 import SettingsScreen from "screens/SettingsScreen";
 import ConversationScreen from "screens/ConversationScreen";
@@ -271,7 +271,6 @@ const App = () => {
           drawerPosition={"right"}
           drawerStyle={{width: dimensions.width}}
           drawerContentOptions={{
-            activeTintColor: "#e91e63",
             itemStyle: { marginVertical: 5 },
           }}
           backBehavior="initialRoute"
@@ -287,7 +286,7 @@ const App = () => {
         >
           <Drawer.Screen
             name="Feed"
-            component={MainTabs}
+            component={MainStack}
             initialParams={{ myId: userId, fromLookup: false }}
             options={{headerShown: false}}
           />

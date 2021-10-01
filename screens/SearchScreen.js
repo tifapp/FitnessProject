@@ -82,7 +82,8 @@ export default function SearchScreen({ navigation, route }) {
 
     return (
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-            <View style={styles.containerStyle}>
+            <View
+            style={{backgroundColor: "#a9efe0", flex: 1}}>
                 <TouchableOpacity style={[{
                     flexDirection: 'row',
                     marginTop: 10,
@@ -114,51 +115,38 @@ export default function SearchScreen({ navigation, route }) {
                                 justifyContent: 'center',
                                 zIndex: 1,
                             }]}>
-                                <Text style={styles.outlineButtonTextStyle}>Show </Text>
-
-                                <TouchableOpacity
-                                    style={(type === 'all' || isAll) ? [styles.outlineButtonStyle, { borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type === 'all' || isAll) ? "white" : "orange", }] :
-                                        [styles.unselectedButtonStyle, { backgroundColor: "lightgray", borderColor: "white", borderBottomColor: "orange" }]}
-                                    onPress={() => {
-                                        setType("all")
-                                    }}
-                                >
-                                    <Text style={(type === 'all' || isAll) ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, { color: "white" }]}>all</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={(type === 'user') ? [styles.outlineButtonStyle, {
-                                        borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type === 'user') ? "white" : "orange",
-                                    }] :
-                                        [styles.unselectedButtonStyle, { backgroundColor: "lightgray", borderColor: "white", borderBottomColor: "orange" }]}
-                                    onPress={() => {
-                                        setType("user")
-                                    }}
-                                >
-                                    <Text style={(type === 'user') ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, {
-                                        color: "white",
-                                    },]}>users</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={(type === 'group' && !isAll) ? [styles.outlineButtonStyle, { borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type === 'group' && !isAll) ? "white" : "orange", }] :
-                                        [styles.unselectedButtonStyle, { backgroundColor: "lightgray", borderColor: "white", borderBottomColor: "orange" }]}
-                                    onPress={() => {
-                                        setType("group")
-                                    }}
-                                >
-                                    <Text style={(type === 'group' && !isAll) ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, { color: "white" }]}>groups</Text>
-                                </TouchableOpacity>
-                            </View>
-                            <View style={[{
-                                position: "relative",
-                                bottom: 2,
-                                borderBottomWidth: 2,
-                                borderColor: "orange",
-                                zIndex: 0,
-                            }]}>
+                                <Tab
+                                label={"all"}
+                                onPress={() => {
+                                    setType("all")
+                                }}
+                                isSelected={(type === 'all' || isAll)}
+                                />
+                                <Tab
+                                label={"users"}
+                                onPress={() => {
+                                    setType("user")
+                                }}
+                                isSelected={(type === 'user' && !isAll)}
+                                />
+                                <Tab
+                                label={"groups"}
+                                onPress={() => {
+                                    setType("group")
+                                }}
+                                isSelected={(type === 'group' && !isAll)}
+                                />
                             </View>
                             {
                                 (type === "group" && groupResults.length === 0) || (type === "user" && userResults.length === 0)
-                                    ? <Text style={[styles.outlineButtonTextStyle, { marginTop: 15 }]}>No matching results</Text>
+                                    ? <Text style={{ 
+                                        marginTop: 15, 
+                                        fontSize: 16 ,
+                                        color: "black",
+                                        alignSelf: "center",
+                                        marginBottom: 2,
+                                        marginHorizontal: 6,
+                                        fontWeight: "bold",}}>No matching results</Text>
                                     : null
                             }
                         </View>
@@ -228,10 +216,33 @@ export default function SearchScreen({ navigation, route }) {
                             : <UserListItem item={item} matchingname={item.name.startsWith(query)} />
                     }
                     keyExtractor={(item) => item.id}
+                    style={{backgroundColor: "#a9efe0", flex: 1}}
                 />
-
-                <StatusBar style="auto" />
             </View>
         </TouchableWithoutFeedback>
     );
+}
+
+function Tab({label, onPress, isSelected}) {
+    return (
+        <TouchableOpacity
+            style={{
+                borderBottomWidth: isSelected ? 3 : 0,
+                backgroundColor: "transparent",
+                padding: 9,
+                marginHorizontal: 10,
+                marginBottom: isSelected ? 12 : 0,
+              }}
+            onPress={onPress}
+        >
+            <Text style={{
+                color: isSelected ? "black" : "gray",
+                alignSelf: "center",
+                marginBottom: 2,
+                marginHorizontal: 6,
+                fontWeight: "bold",
+                fontSize: 20,
+            }}>{label}</Text>
+        </TouchableOpacity>
+    )
 }

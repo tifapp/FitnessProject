@@ -3,9 +3,9 @@ import { createStackNavigator } from "@react-navigation/stack";
 import FeedScreen from "screens/FeedScreen";
 import LookupUserScreen from "screens/LookupUser";
 import ImageScreen from "screens/ImageScreen";
-import ProfileStack from "stacks/ProfileStack";
-import SettingsStack from "stacks/SettingsStack";
-import ConversationScreen from "screens/ConversationScreen";
+import SearchScreen from "screens/SearchScreen";
+import CreatingGroups from "screens/CreatingGroups";
+import GroupPostsScreen from "screens/GroupPostsScreen";
 import { headerOptions } from "components/headerComponents/headerOptions"
 
 import React from "react";
@@ -37,6 +37,9 @@ export default function MainStack({ navigation, route }) {
         component={ImageScreen}
         initialParams={route.params}
       />
+      <Stack.Screen name='Search' component={SearchScreen} />
+      <Stack.Screen name='Create Group' component={CreatingGroups} initialParams={route.params}/>
+      <Stack.Screen name='Group Posts Screen' component={GroupPostsScreen} initialParams={route.params}/>
     </Stack.Navigator>
   );
 }

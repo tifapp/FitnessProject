@@ -125,7 +125,7 @@ class APIList extends PureComponent { //we need to make this a class to use refs
           this.state.loadingInitial || (this.state.loading && !this.state.loadingMore && !this.state.refreshing)
             ? <ActivityIndicator
               size="large"
-              color="#26c6a2"
+              color="#000000"
               style={{
                 alignSelf: 'stretch',
                 flex: 1,

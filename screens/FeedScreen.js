@@ -25,6 +25,7 @@ import ExpandingTextInput from "components/ExpandingTextInput";
 import SpamButton from "components/SpamButton";
 import { getLinkPreview } from 'link-preview-js';
 import IconButton from "components/IconButton";
+import DrawerButton from "components/headerComponents/DrawerButton";
 
 const linkify = require('linkify-it')()
 linkify
@@ -59,7 +60,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   useEffect(() => {
 
     const onFocus = navigation.addListener('focus', () => {
-      if (receiver == null) {
+      if (receiver == null && channel === "general") {
         navigation.setOptions({
           headerLeft: () =>
             <ProfileImageAndName
@@ -71,7 +72,20 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
               hidename={true}
               imageSize={30}
               style={{ marginLeft: 15 }}
-            />
+            />,
+            headerRight: () =>
+              <View
+                style={{ flexDirection: "row" }}>
+                <TouchableOpacity onPress={() => {navigation.navigate("Search")}}>
+                  <MaterialIcons
+                    name={"search"}
+                    size={30}
+                    color={"black"}
+                    style={{ paddingRight: 15 }}
+                  />
+                </TouchableOpacity>
+                <DrawerButton/>
+              </View>
         })
       }
     });
@@ -433,6 +447,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     <SafeAreaView style={{ flex: 1 }}>
 
       <APIList
+        style={receiver == null ? {backgroundColor: "#a9efe0"} : {}}
         viewabilityConfig={viewabilityConfig}
         ListRef={scrollRef}
         ListHeaderComponent={
