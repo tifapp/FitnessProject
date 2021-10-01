@@ -183,7 +183,7 @@ export default function SearchScreen({ navigation, route }) {
                         <UserListItem item={item} matchingname={item.name.startsWith(query)} />
                     }
                     keyExtractor={(item) => item.id}
-                    style={{ backgroundColor: "#a9efe0", flex: (searchType === "user" || searchType === "all") && query.length > 0 ? 1 : 0 }}
+                    style={{ backgroundColor: "#a9efe0", flex: (searchType === "user" || searchType === "all") && query.length > 0 && userResults.length > 0 ? 1 : 0 }}
                 />
                 <APIList
                     ref={GroupListRef}
@@ -241,7 +241,7 @@ export default function SearchScreen({ navigation, route }) {
                         <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} matchingname={item.name.startsWith(query)} />
                     }
                     keyExtractor={(item) => item.id}
-                    style={{ backgroundColor: "#a9efe0", flex: (searchType === "group" || searchType === "all") && query.length > 0 ? 1 : 0 }}
+                    style={{ backgroundColor: "#a9efe0", flex: (searchType === "group" || searchType === "all") && query.length > 0 && groupResults.length > 0 ? 1 : 0 }}
                 />
             </View>
         </TouchableWithoutFeedback>
