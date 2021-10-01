@@ -26,25 +26,34 @@ export default function ListGroupItem({ item, matchingname }) {
   if (item.Privacy == "Public") {
     return (
       <TouchableOpacity
-      style={[styles.secondaryContainerStyle]}
+      style={[
+        {
+          flexDirection: "row",
+          justifyContent: "flex-start",
+          alignItems: "center",
+          marginHorizontal: 20,
+          marginTop: 20,
+          backgroundColor: "white",
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: 1,
+          },
+          shadowOpacity: 0.18,
+          shadowRadius: 1.0,
+
+          elevation: 1,
+        },
+      ]}
       onPress={goToGroupPosts}>
-      <View style={styles.secondaryContainerStyle}>
-        <View
-          style={[
-            {
-              flexBasis: 1,
-              flexDirection: "row",
-              justifyContent: "space-evenly",
-              alignItems: "center",
-              marginHorizontal: 25,
-            },
-            styles.check,
-          ]}
-        >
-          <MaterialCommunityIcons name="account-group" color={matchingname == null || matchingname ? "black" : "orange"} size={30}/>
-          <Text>{item.name}</Text>
-        </View>
-      </View>
+          <MaterialCommunityIcons name="account-group" style={{marginLeft: 20}} color={matchingname == null || matchingname ? "black" : "orange"} size={30}/>
+          <Text style={
+                {
+                  paddingTop: 15,
+                  paddingBottom: 15,
+                  marginLeft: 20,
+                  fontSize: 16,
+                }}>{item.name}</Text>
       </TouchableOpacity>
     );
   } else {

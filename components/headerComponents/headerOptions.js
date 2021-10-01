@@ -5,7 +5,7 @@ import BackButton from "components/headerComponents/BackButton";
 export const headerOptions = {
   headerLeft: (props) => <BackButton {...props} />,
   headerRight: (props) => <DrawerButton {...props} />,
-  headerStyle: { backgroundColor: "#efefef" },
+  headerStyle: { backgroundColor: "#a9efe0" },
   headerTintColor: "#000",
   headerTitleStyle: {
     fontWeight: Platform.OS === "android" ? "normal" : "bold",

@@ -60,7 +60,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   useEffect(() => {
 
     const onFocus = navigation.addListener('focus', () => {
-      if (receiver == null) {
+      if (receiver == null && channel === "general") {
         navigation.setOptions({
           headerLeft: () =>
             <ProfileImageAndName
@@ -447,6 +447,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     <SafeAreaView style={{ flex: 1 }}>
 
       <APIList
+        style={receiver == null ? {backgroundColor: "#a9efe0"} : {}}
         viewabilityConfig={viewabilityConfig}
         ListRef={scrollRef}
         ListHeaderComponent={

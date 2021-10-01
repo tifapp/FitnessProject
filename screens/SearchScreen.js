@@ -82,7 +82,8 @@ export default function SearchScreen({ navigation, route }) {
 
     return (
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-            <View style={styles.containerStyle}>
+            <View
+            style={{backgroundColor: "#a9efe0", flex: 1}}>
                 <TouchableOpacity style={[{
                     flexDirection: 'row',
                     marginTop: 10,
@@ -228,9 +229,8 @@ export default function SearchScreen({ navigation, route }) {
                             : <UserListItem item={item} matchingname={item.name.startsWith(query)} />
                     }
                     keyExtractor={(item) => item.id}
+                    style={{backgroundColor: "#a9efe0", flex: 1}}
                 />
-
-                <StatusBar style="auto" />
             </View>
         </TouchableWithoutFeedback>
     );
