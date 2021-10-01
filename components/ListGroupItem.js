@@ -28,9 +28,9 @@ export default function ListGroupItem({ item, matchingname }) {
       <TouchableOpacity
       style={[
         {
-          flexDirection: "row",
+          flexDirection: "column",
           justifyContent: "flex-start",
-          alignItems: "center",
+          alignItems: "flex-start",
           marginHorizontal: 20,
           marginTop: 20,
           backgroundColor: "white",
@@ -42,18 +42,31 @@ export default function ListGroupItem({ item, matchingname }) {
           shadowOpacity: 0.18,
           shadowRadius: 1.0,
 
-          elevation: 1,
-        },
-      ]}
-      onPress={goToGroupPosts}>
-          <MaterialCommunityIcons name="account-group" style={{marginLeft: 20}} color={matchingname == null || matchingname ? "black" : "orange"} size={30}/>
+            elevation: 1,
+          },
+        ]}
+        onPress={goToGroupPosts}>
+        <View style={{ flexDirection: "row", alignItems: "center", paddingTop: 10 }}>
+
+          <MaterialCommunityIcons name="account-group" style={{ marginLeft: 20 }} color={matchingname == null || matchingname ? "black" : "orange"} size={30} />
           <Text style={
-                {
-                  paddingTop: 15,
-                  paddingBottom: 15,
-                  marginLeft: 20,
-                  fontSize: 16,
-                }}>{item.name}</Text>
+            {
+              marginLeft: 20,
+              fontSize: 16,
+            }}>{item.name}</Text>
+        </View>
+        {
+          item.Description.length > 0 ?
+          <Text style={
+            {
+              paddingTop: 7,
+              paddingBottom: 15,
+              marginLeft: 20,
+              marginRight: 20,
+              fontSize: 12,
+            }}
+            numberOfLines={1}>"{item.Description}"</Text> : null
+        }
       </TouchableOpacity>
     );
   } else {

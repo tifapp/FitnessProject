@@ -5,9 +5,9 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { ProfileImageAndName } from './ProfileImageAndName';
-import { AntDesign } from '@expo/vector-icons'; 
 import computeDistance from "hooks/computeDistance";
 import getLocation from 'hooks/useLocation';
+import {loadCapitals} from 'hooks/stringConversion';
 
 var styles = require('../styles/stylesheet');
 
@@ -16,27 +16,39 @@ export default function UserListItem({
   matchingname
 }) {
   return (
-    <View
-      style={[styles.secondaryContainerStyle]}
-      >
-      <View style={[{
-        flexBasis: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        marginHorizontal: 25,
-      }, styles.check]}>
-        <AntDesign name="user" size={24} color={matchingname ? "black" : "orange"} />
         <ProfileImageAndName
           textLayoutStyle={{alignSelf: "center"}}
           userId={item.id}
+          imageSize={60}
+          textStyle={{fontSize: 16, fontWeight: "bold"}}
+          style={[
+            {
+              justifyContent: "flex-start",
+              alignItems: "flex-start",
+              marginHorizontal: 20,
+              marginTop: 20,
+              backgroundColor: "white",
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 1,
+              },
+              shadowOpacity: 0.18,
+              shadowRadius: 1.0,
+      
+                elevation: 1,
+              },
+            ]}
+            subtitleComponent={
+              loadCapitals(item.bio).length > 0 ?
+              <Text style={
+                {
+                  paddingTop: 7,
+                  paddingBottom: 2,
+                  fontSize: 12,
+                }}
+                numberOfLines={1}>"{loadCapitals(item.bio)}"</Text> : null
+            }
         />
-        {
-          getLocation() != null && item.latitude != null
-          ? <Text>{computeDistance([item.latitude, item.longitude])} mi.</Text>
-          : null
-        }
-      </View>
-    </View>
   );
 }
