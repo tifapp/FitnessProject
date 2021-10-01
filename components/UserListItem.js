@@ -36,19 +36,29 @@ export default function UserListItem({
               shadowOpacity: 0.18,
               shadowRadius: 1.0,
       
-                elevation: 1,
-              },
-            ]}
-            subtitleComponent={
-              loadCapitals(item.bio).length > 0 ?
+          elevation: 1,
+        },
+      ]}
+      subtitleComponent={
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          {
+            getLocation() != null && item.latitude != null
+              ? <Text>{computeDistance([item.latitude, item.longitude])} mi.</Text>
+              : null
+          }{
+
+            loadCapitals(item.bio).length > 0 ?
               <Text style={
                 {
                   paddingTop: 7,
                   paddingBottom: 2,
                   fontSize: 12,
                 }}
-                numberOfLines={1}>"{loadCapitals(item.bio)}"</Text> : null
-            }
-        />
+                numberOfLines={1}> "{loadCapitals(item.bio)}"</Text> 
+                : null
+          }
+        </View>
+      }
+    />
   );
 }
