@@ -20,7 +20,9 @@ export default function DrawerButton(props) {
           color={"black"}
           style={{ paddingLeft: 10 }}
         />
-        <Text style={{ paddingLeft: 5, fontSize: 15, fontWeight: "bold" }}>Feed</Text>
+        {
+           //<Text style={{ paddingLeft: 5, fontSize: 15, fontWeight: "bold" }}>Feed</Text>
+        }
       </TouchableOpacity>
   );
 }

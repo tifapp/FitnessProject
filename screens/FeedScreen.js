@@ -357,7 +357,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     if (item.loading) return (
       <ActivityIndicator
         size="large"
-        color="#26c6a2"
+        color="#000000"
         style={{
           flex: 1,
           justifyContent: "center",
@@ -446,7 +446,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     <SafeAreaView style={{ flex: 1 }}>
 
       <APIList
-        style={receiver == null ? {backgroundColor: "#a9efe0"} : {}}
+        style={[{flex: 1}, receiver == null ? {backgroundColor: "#a9efe0"} : {}]}
         viewabilityConfig={viewabilityConfig}
         ListRef={scrollRef}
         ListHeaderComponent={

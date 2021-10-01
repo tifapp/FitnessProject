@@ -20,8 +20,13 @@ export default function GroupPostsScreen({ navigation, route }) {
   const goEditGroupScreen = () => {
     navigation.navigate('Create Group', {group: group, check: true});
   }
+
+  useEffect(() => {
+    navigation.setOptions({ title: group.name });
+  }, [])
+
   return (
-    <View style={styles.containerStyle}>
+    <View style={{flex: 1, backgroundColor: "#a9efe0"}}>
 
       {route.params.myId == group.userID ? 
       <TouchableOpacity onPress ={goEditGroupScreen}>
@@ -29,11 +34,7 @@ export default function GroupPostsScreen({ navigation, route }) {
       </TouchableOpacity> : 
       null}
       
-      <View style={styles.header}>
-        
-        <Text style={styles.title}>{group.name}</Text>
-        <Text style = {{alignSelf :'center'}}>"{group.Description}"</Text>
-      </View>
+      <Text style = {{alignSelf :'center'}}>"{group.Description}"</Text>
 
       <FeedScreen
         navigation={navigation}

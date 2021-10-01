@@ -11,7 +11,6 @@ import {
   TouchableOpacity,
   Linking,
   LayoutAnimation,
-  ActivityIndicator,
   Alert,
   Modal,
   KeyboardAvoidingView,

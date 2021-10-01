@@ -6,7 +6,8 @@ import {
   LogBox,
   UIManager,
   Text,
-  useWindowDimensions
+  useWindowDimensions,
+  View
 } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { withAuthenticator } from "aws-amplify-react-native";
@@ -217,9 +218,10 @@ const App = () => {
 
   if (userId == 'checking...') {
     return (
+      <View style={{flex: 1, backgroundColor: "#a9efe0"}}>
       <ActivityIndicator 
       size="large" 
-      color="#26c6a2"
+      color="#000000"
       style={{
         flex: 1,
         justifyContent: "center",
@@ -227,6 +229,7 @@ const App = () => {
         justifyContent: "space-around",
         padding: 10,
       }} />
+      </View>
     )
   } else if (userId == '') {
     return (
