@@ -620,7 +620,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
           paddingVertical: 15,
           backgroundColor: "white",
         }]}
-        onPress={() => { console.log("going to settings"), navigation.navigate("Settings") }}>
+        onPress={() => { navigation.navigate("Settings", {myId: myId}) }}>
         <Text style={{
           fontSize: 18,
           color: (state.routes[state.index].name === "Settings") ? "black" : "grey",

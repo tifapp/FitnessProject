@@ -100,6 +100,7 @@ const LookupUser = ({ route, navigation }) => {
       if (u.data.getUser != null) {
         ////console("this post is...", item.description, "and the author is...", user.data.getUser);
         navigation.setParams({ user: u.data.getUser });
+        console.log(u.data.getUser);
       }
 
       ////console("success, user is ", user);
@@ -429,7 +430,7 @@ const LookupUser = ({ route, navigation }) => {
               }}
             />
           </View>
-          {route.params?.myId != user.id ?
+          {route.params?.myId != user.id && (!user.messagesPrivacy || user.messagesPrivacy === 0 || (mutualfriendList.length > 0 && user.messagesPrivacy === 1) || (friendStatus === "friends" && user.messagesPrivacy >= 1)) ?
             <TouchableOpacity
               style={styles.messageButton}
               onPress={() => { goToMessages(userId) }}
@@ -515,21 +516,16 @@ const LookupUser = ({ route, navigation }) => {
                   style={styles.unblockButton}
                 >
                   <Text style={styles.buttonTextStyle}>Unblock</Text>
-                </TouchableOpacity>
-              )
-                : friendStatus == "none" ? (
+                </TouchableOpacity>) : null}
+            {
+              (!user.friendRequestPrivacy || user.friendRequestPrivacy === 0 || (mutualfriendList.length > 0 && user.friendRequestPrivacy === 1) || (friendStatus === "friends" && user.friendRequestPrivacy >= 1)) ?
+                friendStatus == "none" ? (
                   <View>
                     <TouchableOpacity
                       onPress={sendFriendRequest}
                       style={styles.submitButton}
                     >
                       <Text style={styles.buttonTextStyle}>Send Friend Request</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={blockUser}
-                      style={styles.unblockButton}
-                    >
-                      <Text style={styles.buttonTextStyle}>Block</Text>
                     </TouchableOpacity>
                   </View>
                 ) : friendStatus == "sending" ? (
@@ -574,19 +570,19 @@ const LookupUser = ({ route, navigation }) => {
                       <Text style={styles.buttonTextStyle}>Block</Text>
                     </TouchableOpacity>
                   </View>
-                ) : friendStatus == "rejecting" ? (
+                ) : friendStatus === "rejecting" ? (
                   <Text style={[styles.buttonTextStyle, { color: "red" }]}>
                     Rejecting Friend Request...
                   </Text>
-                ) : friendStatus == "accepting" ? (
+                ) : friendStatus === "accepting" ? (
                   <Text style={[styles.buttonTextStyle, { color: "red" }]}>
                     Accepting Friend Request...
                   </Text>
-                ) : friendStatus == "deleting" ? (
+                ) : friendStatus === "deleting" ? (
                   <Text style={[styles.buttonTextStyle, { color: "red" }]}>
                     Unfriending...
                   </Text>
-                ) : (
+                ) : friendStatus === "friends" ? (
                   <View>
                     <View style={styles.viewProfileScreen}>
                       <Text>Friends for {friendsSince} </Text>
@@ -597,14 +593,9 @@ const LookupUser = ({ route, navigation }) => {
                     >
                       <Text style={styles.buttonTextStyle}>Unfriend</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={blockUser}
-                      style={styles.unblockButton}
-                    >
-                      <Text style={styles.buttonTextStyle}>Block</Text>
-                    </TouchableOpacity>
                   </View>
-                )}
+                ) : null : null
+            }
           </View>
         ) : null}
       </ScrollView>

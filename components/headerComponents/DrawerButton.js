@@ -34,7 +34,6 @@ export default function DrawerButton(props) {
   };
   
   return (
-    <View style={{ flexDirection: "row" }}>
       <TouchableOpacity onPress={navigation.toggleDrawer}>
         <MaterialIcons
           name="menu"
@@ -46,6 +45,5 @@ export default function DrawerButton(props) {
           <MaterialIcons name="circle" size={10} color={"red"} style={{position: "absolute", top: -2, right: 10 }} />
         ) : null}
       </TouchableOpacity>
-    </View>
   );
 }

@@ -6,23 +6,25 @@ import {
   SafeAreaView,
   LayoutAnimation,
   Animated,
-  TouchableOpacity
+  TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation, Cache, Storage } from "aws-amplify";
 import { createReport, createPost, updatePost, deletePost, createConversation, updateConversation, deleteConversation, createBlock } from "root/src/graphql/mutations";
 import { postsByChannel, batchGetLikes, getFriendship, getConversations, getConversation } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
+import MessageItem from "components/MessageItem";
 import { onCreatePostFromChannel, onDeletePostFromChannel, onUpdatePostFromChannel, onCreateLike, onDeleteLike, onIncrementLikes, onDecrementLikes } from 'root/src/graphql/subscriptions';
 import NetInfo from '@react-native-community/netinfo';
 import APIList from 'components/APIList';
 import { MaterialIcons } from '@expo/vector-icons';
-import { lessThan } from "react-native-reanimated";
 import { ProfileImageAndName } from "components/ProfileImageAndName";
 import ExpandingTextInput from "components/ExpandingTextInput";
 import SpamButton from "components/SpamButton";
 import { getLinkPreview } from 'link-preview-js';
 import IconButton from "components/IconButton";
+import DrawerButton from "components/headerComponents/DrawerButton";
 
 const linkify = require('linkify-it')()
 linkify
@@ -57,7 +59,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   useEffect(() => {
 
     const onFocus = navigation.addListener('focus', () => {
-      if (receiver == null) {
+      if (receiver == null && channel === "general") {
         navigation.setOptions({
           headerLeft: () =>
             <ProfileImageAndName
@@ -69,7 +71,20 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
               hidename={true}
               imageSize={30}
               style={{ marginLeft: 15 }}
-            />
+            />,
+          headerRight: () =>
+            <View
+              style={{ flexDirection: "row" }}>
+              <TouchableOpacity onPress={() => { navigation.navigate("Search") }}>
+                <MaterialIcons
+                  name={"search"}
+                  size={30}
+                  color={"black"}
+                  style={{ paddingRight: 15 }}
+                />
+              </TouchableOpacity>
+              <DrawerButton />
+            </View>
         })
       }
     });
@@ -319,33 +334,20 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   };
   */
 
+
   const deletePostsAsync = async (timestamp) => {
     checkInternetConnection();
 
-    let parent_post = posts.find((item) => {
-      //const time = timestamp.toString();
-      return item.createdAt === timestamp && item.userId === route.params?.myId;
-    })
-
-    ////console("parent post: " + parent_post.description);
-
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    if (parent_post.parentId == null) {
-      setPosts((posts) => {
-        return posts.filter((val) => (val.channel != parent_post.channel));
-      });
-    } else {
-      setPosts((posts) => {
-        return posts.filter((val) => (val.createdAt != parent_post.createdAt || val.userId != parent_post.userId));
-      });
-    }
+    setPosts((posts) => {
+      return posts.filter((post) => (post.createdAt !== timestamp || post.userId !== route.params?.myId));
+    });
 
     try {
       await API.graphql(graphqlOperation(deletePost, { input: { createdAt: timestamp, userId: route.params?.myId } }));
     } catch {
-      //console("error in deleting post: ");
+      console.log("error in deleting post: ");
     }
-
   };
 
 
@@ -366,26 +368,60 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     scrollRef.current?.scrollToOffset({ offset: 0, animated: true })
   }
 
-  const renderPostItem = ({ item, index }) => (
-    <PostItem
-      index={index}
-      item={item}
-      likes={item.likes}
-      replies={item.replies}
-      deletePostsAsync={deletePostsAsync}
-      writtenByYou={item.userId === route.params?.myId}
-      myId={route.params?.myId}
-      editButtonHandler={updatePostAsync}
-      receiver={receiver}
-      showTimestamp={showTimestamp(item, index)}
-      reportPost={reportPost}
-      newSection={
-        index == 0 ? true : showTimestamp(posts[index - 1], index - 1)
-      }
-      isVisible={item.isVisible}
-      shouldSubscribe={item.shouldSubscribe}
-    />
-  )
+  const renderPostItem = ({ item, index }) => {
+    if (item.loading) return (
+      <ActivityIndicator
+        size="large"
+        color="#000000"
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          flexDirection: "row",
+          justifyContent: "space-around",
+          padding: 20,
+        }} />
+    )
+    else if (receiver != null) return (
+      <MessageItem
+        index={index}
+        item={item}
+        likes={item.likes}
+        replies={item.replies}
+        deletePostsAsync={deletePostsAsync}
+        writtenByYou={item.userId === route.params?.myId}
+        myId={route.params?.myId}
+        editButtonHandler={updatePostAsync}
+        receiver={receiver}
+        showTimestamp={showTimestamp(item, index)}
+        reportPost={reportPost}
+        newSection={
+          index == 0 ? true : showTimestamp(posts[index - 1], index - 1)
+        }
+        isVisible={item.isVisible}
+        shouldSubscribe={item.shouldSubscribe}
+      />
+    )
+    else return (
+      <PostItem
+        index={index}
+        item={item}
+        likes={item.likes}
+        replies={item.replies}
+        deletePostsAsync={deletePostsAsync}
+        writtenByYou={item.userId === route.params?.myId}
+        myId={route.params?.myId}
+        editButtonHandler={updatePostAsync}
+        receiver={receiver}
+        showTimestamp={showTimestamp(item, index)}
+        reportPost={reportPost}
+        newSection={
+          index == 0 ? true : showTimestamp(posts[index - 1], index - 1)
+        }
+        isVisible={item.isVisible}
+        shouldSubscribe={item.shouldSubscribe}
+      />
+    )
+  }
 
   const onViewableItemsChanged = React.useCallback(({ viewableItems, changedItems }) => {
     //console.log("viewable items have changed")
@@ -425,14 +461,14 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     <SafeAreaView style={{ flex: 1 }}>
 
       <APIList
+        style={[{ flex: 1 }, receiver == null ? { backgroundColor: "#a9efe0" } : {}]}
         viewabilityConfig={viewabilityConfig}
         ListRef={scrollRef}
         ListHeaderComponent={
-
           <View style={{}}>
             {headerComponent}
-            <View style={styles.signOutTop}>
-              {lastUser != route.params.myId && lastUser != null && receiver != null && !ButtonCheck ?
+            {lastUser != route.params.myId && lastUser != null && receiver != null && !ButtonCheck ?
+              <View style={styles.signOutTop}>
                 <TouchableOpacity
                   onPress={acceptMessageRequest}
                   style={styles.acceptMessageButton}
@@ -441,10 +477,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
                     Accept
                   </Text>
                 </TouchableOpacity>
-                : null
-              }
-
-              {lastUser != route.params.myId && lastUser != null && receiver != null && !ButtonCheck ?
                 <TouchableOpacity
                   onPress={rejectMessageRequest}
                   style={styles.rejectMessageButton}
@@ -453,21 +485,21 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
                     Reject
                   </Text>
                 </TouchableOpacity>
-                : null
-              }
+              </View>
+              : null
+            }
 
-              {lastUser != route.params.myId && lastUser != null && receiver != null && !ButtonCheck ?
-                <TouchableOpacity
-                  onPress={blockMessageRequest}
-                  style={styles.blockMessageButton}
-                >
-                  <Text style={styles.blockButtonTextStyle}>
-                    Block
-                  </Text>
-                </TouchableOpacity>
-                : null
-              }
-            </View>
+            {lastUser != route.params.myId && lastUser != null && receiver != null && !ButtonCheck ?
+              <TouchableOpacity
+                onPress={blockMessageRequest}
+                style={styles.blockMessageButton}
+              >
+                <Text style={styles.blockButtonTextStyle}>
+                  Block
+                </Text>
+              </TouchableOpacity>
+              : null
+            }
 
             {Accepted || ButtonCheck || receiver == null || lastUser == route.params.myId || sidebar || lastUser == undefined ?
               <PostInputField
@@ -478,8 +510,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
                 originalParentId={originalParentId}
                 pushLocalPost={(localNewPost) => setPosts((posts) => [localNewPost, ...posts])}
                 autoFocus={autoFocus}
-              /> : null
-            }
+              /> : null}
           </View>
         }
         initialAmount={7}
@@ -494,7 +525,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         onEndReachedThreshold={0.5}
         onViewableItemsChanged={onViewableItemsChanged}
       />
-    </SafeAreaView>
+    </SafeAreaView >
   );
 };
 
@@ -650,7 +681,7 @@ function PostInputField({ channel, headerComponent, receiver, myId, originalPare
   };
 
   return (
-    <View>
+    <View style={{ backgroundColor: "#a9efe0" }}>
 
       {
         //headerComponent
@@ -691,7 +722,7 @@ function PostInputField({ channel, headerComponent, receiver, myId, originalPare
         ]}
         autoFocus={autoFocus}
         multiline={true}
-        placeholder={progress > 0 ? "Upload in progress..." : "Start typing..."}
+        placeholder={progress > 0 ? "Uploading..." : "Start typing..."}
         onChangeText={setPostInput}
         value={postInput}
         clearButtonMode="always"
@@ -740,7 +771,7 @@ function PostInputField({ channel, headerComponent, receiver, myId, originalPare
       {
         progress > 0 ?
           <View style={{
-            height: 20,
+            height: 30,
             backgroundColor: 'white',
             margin: 15,
             borderRadius: 5,
@@ -752,6 +783,17 @@ function PostInputField({ channel, headerComponent, receiver, myId, originalPare
               top: 0,
               bottom: 0
             }, { backgroundColor: "#26c6a2", width }]} />
+            <Text
+              style={{
+                alignSelf: "center",
+                justifyContent: "center",
+                color: "black",
+                fontWeight: "bold",
+                fontSize: 15,
+                marginTop: 5,
+              }}>
+              Uploading...
+            </Text>
           </View> : null
       }
 

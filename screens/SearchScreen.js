@@ -22,7 +22,7 @@ import UserListItem from "components/UserListItem";
 import ListGroupItem from "components/ListGroupItem";
 import * as subscriptions from "root/src/graphql/subscriptions";
 import AgePicker from "components/basicInfoComponents/AgePicker";
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import APIList from 'components/APIList';
 
 var styles = require("styles/stylesheet");
@@ -31,58 +31,46 @@ export default function SearchScreen({ navigation, route }) {
     const [query, setQuery] = useState("");
     const [userResults, setUserResults] = useState([]);
     const [groupResults, setGroupResults] = useState([]);
-    const [type, setType] = useState("user"); //refreshing tho
-    const [isAll, setIsAll] = useState(false);
-    const [isGroupsFetched, setIsGroupsFetched] = useState(false);
+    const [searchType, setSearchType] = useState("all"); //refreshing tho
     const searchBarRef = useRef();
-    const ListRef = useRef();
+    const UserListRef = useRef();
+    const GroupListRef = useRef();
+    const PostListRef = useRef();
     const currentQuery = useRef();
 
     currentQuery.current = query.toLowerCase();
 
     useEffect(() => {
         if (query !== "") {
-            if (type !== "all") (type === "group") ? setUserResults([]) : setGroupResults([]); //clears results for the tab you arent looking at 
-            console.log("START-----------------------");
-            console.log("the query being checked is ", query);
-            ListRef.current.fetchDataAsync(true, ()=>{
+            UserListRef.current.fetchDataAsync(true, () => {
                 return (currentQuery.current !== query.toLowerCase() || query === "")
             })
-            if (type === "all" && groupResults.length === 0) {
-                setIsAll(true);
-                setType("group"); //because it will display user results by default
-            }
+            GroupListRef.current.fetchDataAsync(true, () => {
+                return (currentQuery.current !== query.toLowerCase() || query === "")
+            })
         } else {
             setUserResults([]);
             setGroupResults([]);
         }
     }, [query]);
-    
-    useEffect(() => {
-        if (query !== "") {
-            if ((type === "group" && groupResults.length === 0) || (type === "user" && userResults.length === 0))
-            ListRef.current.fetchDataAsync(true, ()=>{
-                return (currentQuery.current !== query.toLowerCase() || query === "")
-            })
-            if (isAll) {
-                setIsAll(false);
-                setType("all"); //either set it AFTER groupresults have changed, or have a variable saying "don't come back to groups"
-            }
-            if (type === "all" && groupResults.length === 0) {
-                if (!isGroupsFetched) {
-                    setIsAll(true);
-                    setIsGroupsFetched(true);
-                    setType("group");
-                } else {
-                    setIsGroupsFetched(false);
-                }
-            }
-        }
-    }, [type]);
+
+    const emptyComponent = React.useCallback(() =>
+        <Text style={{
+            marginTop: 15,
+            fontSize: 16,
+            color: "black",
+            alignSelf: "center",
+            marginBottom: 2,
+            marginHorizontal: 6,
+            fontWeight: "bold",
+        }}>
+            No matching results
+        </Text>
+        , [])
 
     return (
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-            <View style={styles.containerStyle}>
+            <View style={{ backgroundColor: "#a9efe0", flex: 1 }}>
                 <TouchableOpacity style={[{
                     flexDirection: 'row',
                     marginTop: 10,
@@ -102,136 +90,184 @@ export default function SearchScreen({ navigation, route }) {
                         value={query}
                         clearButtonMode="always"
                     />
-                    <MaterialCommunityIcons name="magnify" size={28} color="gray"
+                    <MaterialIcons name="search" size={28} color="gray"
                         style={[{ marginRight: 10 }]} />
                 </TouchableOpacity>
 
                 {
                     query !== ""
-                        ? <View>
-                            <View style={[styles.spacingTop, {
-                                flexDirection: 'row',
-                                justifyContent: 'center',
-                                zIndex: 1,
-                            }]}>
-                                <Text style={styles.outlineButtonTextStyle}>Show </Text>
-
-                                <TouchableOpacity
-                                    style={(type === 'all' || isAll) ? [styles.outlineButtonStyle, { borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type === 'all' || isAll) ? "white" : "orange", }] :
-                                        [styles.unselectedButtonStyle, { backgroundColor: "lightgray", borderColor: "white", borderBottomColor: "orange" }]}
-                                    onPress={() => {
-                                        setType("all")
-                                    }}
-                                >
-                                    <Text style={(type === 'all' || isAll) ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, { color: "white" }]}>all</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={(type === 'user') ? [styles.outlineButtonStyle, {
-                                        borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type === 'user') ? "white" : "orange",
-                                    }] :
-                                        [styles.unselectedButtonStyle, { backgroundColor: "lightgray", borderColor: "white", borderBottomColor: "orange" }]}
-                                    onPress={() => {
-                                        setType("user")
-                                    }}
-                                >
-                                    <Text style={(type === 'user') ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, {
-                                        color: "white",
-                                    },]}>users</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={(type === 'group' && !isAll) ? [styles.outlineButtonStyle, { borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomColor: (type === 'group' && !isAll) ? "white" : "orange", }] :
-                                        [styles.unselectedButtonStyle, { backgroundColor: "lightgray", borderColor: "white", borderBottomColor: "orange" }]}
-                                    onPress={() => {
-                                        setType("group")
-                                    }}
-                                >
-                                    <Text style={(type === 'group' && !isAll) ? styles.outlineButtonTextStyle : [styles.unselectedButtonTextStyle, { color: "white" }]}>groups</Text>
-                                </TouchableOpacity>
-                            </View>
-                            <View style={[{
-                                position: "relative",
-                                bottom: 2,
-                                borderBottomWidth: 2,
-                                borderColor: "orange",
-                                zIndex: 0,
-                            }]}>
-                            </View>
-                            {
-                                (type === "group" && groupResults.length === 0) || (type === "user" && userResults.length === 0)
-                                    ? <Text style={[styles.outlineButtonTextStyle, { marginTop: 15 }]}>No matching results</Text>
-                                    : null
-                            }
+                        ?
+                        <View style={[styles.spacingTop, {
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                            zIndex: 1,
+                        }]}>
+                            <Tab
+                                label={"all"}
+                                onPress={() => {
+                                    setSearchType("all")
+                                }}
+                                isSelected={(searchType === 'all')}
+                            />
+                            <Tab
+                                label={"users"}
+                                onPress={() => {
+                                    setSearchType("user")
+                                }}
+                                isSelected={(searchType === 'user')}
+                            />
+                            <Tab
+                                label={"groups"}
+                                onPress={() => {
+                                    setSearchType("group")
+                                }}
+                                isSelected={(searchType === 'group')}
+                            />
                         </View>
                         : null
                 }
                 <APIList
-                    ref={ListRef}
-                    queryOperation={(type === "group") ? listGroups : listUsers}
+                    ref={UserListRef}
+                    queryOperation={listUsers}
+                    ListHeaderComponent={
+                        searchType === "all" && query.length > 0 ?
+                        <Text style={{
+                            marginTop: 15,
+                            fontSize: 20,
+                            color: "black",
+                            alignSelf: "center",
+                            marginBottom: 2,
+                            marginHorizontal: 6,
+                            fontWeight: "bold",
+                        }}>
+                            Users
+                        </Text>
+                        : null
+                    }
+                    ListEmptyComponent={
+                        (searchType === "user" || searchType === "all") && query.length > 0 ?
+                        emptyComponent : null
+                    }
                     filter={
-                        (type === "group") ?
-                            {
-                                filter: {
-                                    or: [{
-                                        name: {
-                                            beginsWith: currentQuery.current
-                                        }
-                                    },{
-                                        name: {
-                                            contains: " " + currentQuery.current
-                                        }
-                                    },
-                                    {
-                                        Sport: {
-                                            contains: currentQuery.current
-                                        }
-                                    },
-                                    {
-                                        Description: {
-                                            contains: currentQuery.current
-                                        }
-                                    },]
-                                }
-                            } :
-                            {
-                                filter: {
-                                    or: [{
-                                        name: {
-                                            beginsWith: currentQuery.current
-                                        }
-                                    },
-                                    {
-                                        name: {
-                                            contains: " " + currentQuery.current
-                                        }
-                                    },
-                                    {
-                                        bio: {
-                                            contains: currentQuery.current
-                                        }
-                                    },
-                                    {
-                                        goals: {
-                                            contains: currentQuery.current
-                                        }
-                                    },]
-                                }
+                        {
+                            filter: {
+                                or: [{
+                                    name: {
+                                        beginsWith: currentQuery.current
+                                    }
+                                },
+                                {
+                                    name: {
+                                        contains: " " + currentQuery.current
+                                    }
+                                },
+                                {
+                                    bio: {
+                                        contains: currentQuery.current
+                                    }
+                                },
+                                {
+                                    goals: {
+                                        contains: currentQuery.current
+                                    }
+                                },]
                             }
+                        }
                     }
                     ignoreInitialLoad={true}
                     initialAmount={10}
                     additionalAmount={20}
-                    setDataFunction={(type === "group") ? setGroupResults : setUserResults}
-                    data={(type === "all" || isAll) ? [...userResults, ...groupResults] : (type === "group") ? groupResults : userResults} //wait how would pagination work with sections
+                    setDataFunction={setUserResults}
+                    data={(searchType === "user" || searchType === "all") && query.length > 0 ? userResults : []} //wait how would pagination work with sections
                     renderItem={({ item }) =>
-                        (item.userID != null)
-                            ? <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} matchingname={item.name.startsWith(query)} />
-                            : <UserListItem item={item} matchingname={item.name.startsWith(query)} />
+                        <UserListItem item={item} matchingname={item.name.startsWith(query)} />
                     }
                     keyExtractor={(item) => item.id}
+                    style={{ backgroundColor: "#a9efe0", flex: (searchType === "user" || searchType === "all") && query.length > 0 && userResults.length > 0 ? 1 : 0 }}
                 />
-
-                <StatusBar style="auto" />
+                <APIList
+                    ref={GroupListRef}
+                    queryOperation={listGroups}
+                    ListHeaderComponent={
+                        searchType === "all" && query.length > 0 ?
+                        <Text style={{
+                            marginTop: 15,
+                            fontSize: 20,
+                            color: "black",
+                            alignSelf: "center",
+                            marginBottom: 2,
+                            marginHorizontal: 6,
+                            fontWeight: "bold",
+                        }}>
+                            Groups
+                        </Text>
+                        : null
+                    }
+                    ListEmptyComponent={
+                        (searchType === "group" || searchType === "all") && query.length > 0 ?
+                        emptyComponent : null
+                    }
+                    filter={
+                        {
+                            filter: {
+                                or: [{
+                                    name: {
+                                        beginsWith: currentQuery.current
+                                    }
+                                }, {
+                                    name: {
+                                        contains: " " + currentQuery.current
+                                    }
+                                },
+                                {
+                                    Sport: {
+                                        contains: currentQuery.current
+                                    }
+                                },
+                                {
+                                    Description: {
+                                        contains: currentQuery.current
+                                    }
+                                },]
+                            }
+                        }
+                    }
+                    ignoreInitialLoad={true}
+                    initialAmount={10}
+                    additionalAmount={20}
+                    setDataFunction={setGroupResults}
+                    data={(searchType === "group" || searchType === "all") && query.length > 0 ? groupResults : []} //wait how would pagination work with sections
+                    renderItem={({ item }) =>
+                        <ListGroupItem item={route.params?.updatedGroup == null ? item : route.params?.updatedGroup} matchingname={item.name.startsWith(query)} />
+                    }
+                    keyExtractor={(item) => item.id}
+                    style={{ backgroundColor: "#a9efe0", flex: (searchType === "group" || searchType === "all") && query.length > 0 && groupResults.length > 0 ? 1 : 0 }}
+                />
             </View>
         </TouchableWithoutFeedback>
     );
+}
+
+function Tab({ label, onPress, isSelected }) {
+    return (
+        <TouchableOpacity
+            style={{
+                borderBottomWidth: isSelected ? 3 : 0,
+                backgroundColor: "transparent",
+                padding: 9,
+                marginHorizontal: 10,
+                marginBottom: isSelected ? 12 : 0,
+            }}
+            onPress={onPress}
+        >
+            <Text style={{
+                color: isSelected ? "black" : "gray",
+                alignSelf: "center",
+                marginBottom: 2,
+                marginHorizontal: 6,
+                fontWeight: "bold",
+                fontSize: 20,
+            }}>{label}</Text>
+        </TouchableOpacity>
+    )
 }
