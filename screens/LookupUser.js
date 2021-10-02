@@ -83,13 +83,7 @@ const LookupUser = ({ route, navigation }) => {
   };
 
   const goToMessages = (id) => {
-    if (friendStatus === "blocked" || friendStatus === "blocker") {
-      console.log("test");
-      alert("Unable to message user");
-    }
-    else {
-      navigation.navigate(id);
-    }
+    navigation.navigate(id);
   };
 
   const checkUsersInfo = async () => {
@@ -153,7 +147,8 @@ const LookupUser = ({ route, navigation }) => {
   };
 
   const checkFriendStatus = async () => {
-    //console("CHECKING FRIEND STATUS");
+    console.log("Checking Friend Status");
+
     try {
       let blocked = await API.graphql(
         graphqlOperation(getBlock, {
@@ -162,7 +157,7 @@ const LookupUser = ({ route, navigation }) => {
         })
       );
 
-      if (blocked.data.getBlock != null) { setFriendStatus("blocked"); return; }
+      if (blocked.data.getBlock != null) { setFriendStatus("blocked"); console.log("You are blocked by this user"); return; }
 
       let blocker = await API.graphql(
         graphqlOperation(getBlock, {
@@ -430,7 +425,7 @@ const LookupUser = ({ route, navigation }) => {
               }}
             />
           </View>
-          {route.params?.myId != user.id && (!user.messagesPrivacy || user.messagesPrivacy === 0 || (mutualfriendList.length > 0 && user.messagesPrivacy === 1) || (friendStatus === "friends" && user.messagesPrivacy >= 1)) ?
+          {!(friendStatus == "blocker" || friendStatus == "blocked") && route.params?.myId != user.id && (!user.messagesPrivacy || user.messagesPrivacy === 0 || (mutualfriendList.length > 0 && user.messagesPrivacy === 1) || (friendStatus === "friends" && user.messagesPrivacy >= 1)) ?
             <TouchableOpacity
               style={styles.messageButton}
               onPress={() => { goToMessages(userId) }}

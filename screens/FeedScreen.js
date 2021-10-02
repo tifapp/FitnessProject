@@ -44,7 +44,7 @@ const viewabilityConfig = {
   waitForInteraction: false,
 }
 
-export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, originalParentId, Accepted, lastUser, sidebar, id, autoFocus = false }
+export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, originalParentId, Accepted, AcceptedMessage, lastUser, sidebar, id, autoFocus = false }
 ) {
   const [posts, setPosts] = useState([]);
 
@@ -104,7 +104,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     newConversations1 = newConversations1.data.getConversation;
 
     if (newConversations1 == null) {
-      setButtonCheck(true);
+      setButtonCheck(false);
     }
     else if (newConversations1.Accepted) {
       setButtonCheck(true);
@@ -120,6 +120,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
 
   useEffect(() => {
     const onFocus = navigation.addListener('focus', () => {
+      console.log("Inside the Use Effect for check button");
       checkButton();
     });
 
@@ -133,8 +134,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       checkButton();
     }, [])
     */
-
-
 
   useEffect(() => {
     const createPostSubscription = API.graphql(graphqlOperation(onCreatePostFromChannel, { channel: channel })).subscribe({
@@ -309,9 +308,16 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       })
     );
 
-    API.graphql(
-      graphqlOperation(createBlock, { input: { blockee: id } })
-    );
+    try {
+      await API.graphql(
+        graphqlOperation(createBlock, { input: { blockee: receiver } })
+      );
+      console.log("Inside the create block");
+    }
+    catch (err) {
+      console.log("error in blocking user: ", err);
+    }
+
     localBlockList.push({ createdAt: (new Date(Date.now())).toISOString(), userId: route.params?.myId, blockee: id });
 
     navigation.navigate("Conversations");

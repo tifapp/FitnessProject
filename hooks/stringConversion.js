@@ -25,11 +25,11 @@ export function loadCapitals(string) {
   while (i >= 0) {
     if (!isNaN(string[i] * 1)) {
       capitalIndex = parseInt(string[i] + (capitalIndex > 0 ? capitalIndex.toString() : ""));
-    	console.log("current capitalIndex is ", capitalIndex, " and current int is ", string[i])
+      //console.log("current capitalIndex is ", capitalIndex, " and current int is ", string[i])
     } else {
       string = string.substring(0, capitalIndex) +
-      string[capitalIndex].toUpperCase() +
-      string.substring(capitalIndex + 1)
+        string[capitalIndex].toUpperCase() +
+        string.substring(capitalIndex + 1)
       capitalIndex = 0;
       if (string[i] == "|") break;
     }
