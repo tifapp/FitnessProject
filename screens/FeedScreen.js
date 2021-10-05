@@ -8,6 +8,7 @@ import {
   Animated,
   TouchableOpacity,
   ActivityIndicator,
+  KeyboardAvoidingView,
 } from "react-native";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation, Cache, Storage } from "aws-amplify";
@@ -464,7 +465,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   }, [])
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={90} style={{ flex: 1 }}>
 
       <APIList
         style={[{ flex: 1 }, receiver == null ? { backgroundColor: "#a9efe0" } : {}]}
@@ -508,7 +509,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
               : null
             }
 
-            {Accepted || ButtonCheck || receiver == null || lastUser == route.params.myId || sidebar || lastUser == undefined ?
+            {receiver == null ?
               <PostInputField
                 channel={channel}
                 headerComponent={headerComponent}
@@ -532,7 +533,17 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         onEndReachedThreshold={0.5}
         onViewableItemsChanged={onViewableItemsChanged}
       />
-    </SafeAreaView >
+      {receiver != null && (Accepted || ButtonCheck || lastUser == route.params.myId || sidebar || lastUser == undefined) ?
+        <PostInputField
+          channel={channel}
+          headerComponent={headerComponent}
+          receiver={receiver}
+          myId={route.params?.myId}
+          originalParentId={originalParentId}
+          pushLocalPost={(localNewPost) => setPosts((posts) => [localNewPost, ...posts])}
+          autoFocus={autoFocus}
+        /> : null}
+    </KeyboardAvoidingView >
   );
 };
 
@@ -802,18 +813,6 @@ function PostInputField({ channel, headerComponent, receiver, myId, originalPare
               Uploading...
             </Text>
           </View> : null
-      }
-
-      {
-        <View
-          style={{
-            top: 50,
-            position: "absolute",
-            alignSelf: "flex-end",
-          }}
-        >
-          <SpamButton func={addPostAsync} />
-        </View>
       }
     </View>
   )

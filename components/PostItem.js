@@ -370,8 +370,7 @@ export default React.memo(function PostItem({
         >
           <TouchableOpacity onPress={() => setAreRepliesVisible(false)} style={{ width: "100%", height: "100%", position: "absolute", backgroundColor: "#00000033" }}>
           </TouchableOpacity>
-          <KeyboardAvoidingView 
-           behavior={Platform.OS === "ios" ? "padding" : "height"}
+          <View 
           style={{ marginTop: "auto", flex: 0.8, backgroundColor: "#efefef" }}>
             <View style={{ height: 1, width: "100%", alignSelf: "center", backgroundColor: "lightgray" }}>
             </View>
@@ -437,7 +436,7 @@ export default React.memo(function PostItem({
               channel={SHA256(item.userId + item.createdAt)} //unique id
               originalParentId={item.createdAt + "#" + item.userId}
             />
-          </KeyboardAvoidingView>
+          </View>
         </Modal>
       </View>
     );
