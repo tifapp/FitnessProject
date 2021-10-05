@@ -11,7 +11,7 @@ import {
 } from "react-native";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation, Cache, Storage } from "aws-amplify";
-import { createReport, createPost, updatePost, deletePost, createConversation, updateConversation, deleteConversation } from "root/src/graphql/mutations";
+import { createReport, createPost, updatePost, deletePost, createConversation, updateConversation, deleteConversation, createBlock } from "root/src/graphql/mutations";
 import { postsByChannel, batchGetLikes, getFriendship, getConversations, getConversation } from "root/src/graphql/queries";
 import PostItem from "components/PostItem";
 import MessageItem from "components/MessageItem";
@@ -44,7 +44,7 @@ const viewabilityConfig = {
   waitForInteraction: false,
 }
 
-export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, originalParentId, Accepted, lastUser, sidebar, id, autoFocus = false }
+export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, originalParentId, Accepted, AcceptedMessage, lastUser, sidebar, id, autoFocus = false }
 ) {
   const [posts, setPosts] = useState([]);
 
@@ -72,19 +72,19 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
               imageSize={30}
               style={{ marginLeft: 15 }}
             />,
-            headerRight: () =>
-              <View
-                style={{ flexDirection: "row" }}>
-                <TouchableOpacity onPress={() => {navigation.navigate("Search")}}>
-                  <MaterialIcons
-                    name={"search"}
-                    size={30}
-                    color={"black"}
-                    style={{ paddingRight: 15 }}
-                  />
-                </TouchableOpacity>
-                <DrawerButton/>
-              </View>
+          headerRight: () =>
+            <View
+              style={{ flexDirection: "row" }}>
+              <TouchableOpacity onPress={() => { navigation.navigate("Search") }}>
+                <MaterialIcons
+                  name={"search"}
+                  size={30}
+                  color={"black"}
+                  style={{ paddingRight: 15 }}
+                />
+              </TouchableOpacity>
+              <DrawerButton />
+            </View>
         })
       }
     });
@@ -104,7 +104,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     newConversations1 = newConversations1.data.getConversation;
 
     if (newConversations1 == null) {
-      setButtonCheck(true);
+      setButtonCheck(false);
     }
     else if (newConversations1.Accepted) {
       setButtonCheck(true);
@@ -120,6 +120,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
 
   useEffect(() => {
     const onFocus = navigation.addListener('focus', () => {
+      console.log("Inside the Use Effect for check button");
       checkButton();
     });
 
@@ -133,8 +134,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       checkButton();
     }, [])
     */
-
-
 
   useEffect(() => {
     const createPostSubscription = API.graphql(graphqlOperation(onCreatePostFromChannel, { channel: channel })).subscribe({
@@ -302,6 +301,28 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     navigation.navigate("Conversations");
   }
 
+  const blockMessageRequest = async () => {
+    await API.graphql(
+      graphqlOperation(deleteConversation, {
+        input: { id: id }
+      })
+    );
+
+    try {
+      await API.graphql(
+        graphqlOperation(createBlock, { input: { blockee: receiver } })
+      );
+      console.log("Inside the create block");
+    }
+    catch (err) {
+      console.log("error in blocking user: ", err);
+    }
+
+    localBlockList.push({ createdAt: (new Date(Date.now())).toISOString(), userId: route.params?.myId, blockee: id });
+
+    navigation.navigate("Conversations");
+  }
+
   /*
   const addPostAsync = async (parentId, replyText) => {
     checkInternetConnection();
@@ -446,11 +467,10 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     <SafeAreaView style={{ flex: 1 }}>
 
       <APIList
-        style={[{flex: 1}, receiver == null ? {backgroundColor: "#a9efe0"} : {}]}
+        style={[{ flex: 1 }, receiver == null ? { backgroundColor: "#a9efe0" } : {}]}
         viewabilityConfig={viewabilityConfig}
         ListRef={scrollRef}
         ListHeaderComponent={
-
           <View style={{}}>
             {headerComponent}
             {lastUser != route.params.myId && lastUser != null && receiver != null && !ButtonCheck ?
@@ -475,6 +495,18 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
               : null
             }
 
+            {lastUser != route.params.myId && lastUser != null && receiver != null && !ButtonCheck ?
+              <TouchableOpacity
+                onPress={blockMessageRequest}
+                style={styles.blockMessageButton}
+              >
+                <Text style={styles.blockButtonTextStyle}>
+                  Block
+                </Text>
+              </TouchableOpacity>
+              : null
+            }
+
             {Accepted || ButtonCheck || receiver == null || lastUser == route.params.myId || sidebar || lastUser == undefined ?
               <PostInputField
                 channel={channel}
@@ -484,8 +516,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
                 originalParentId={originalParentId}
                 pushLocalPost={(localNewPost) => setPosts((posts) => [localNewPost, ...posts])}
                 autoFocus={autoFocus}
-              /> : null
-            }
+              /> : null}
           </View>
         }
         initialAmount={7}
@@ -500,7 +531,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         onEndReachedThreshold={0.5}
         onViewableItemsChanged={onViewableItemsChanged}
       />
-    </SafeAreaView>
+    </SafeAreaView >
   );
 };
 

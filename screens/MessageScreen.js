@@ -11,7 +11,10 @@ import { useFocusEffect } from '@react-navigation/native';
 import * as Notifications from 'expo-notifications';
 import { ProfileImageAndName } from "components/ProfileImageAndName";
 import { API, graphqlOperation } from "aws-amplify";
-import { getBlock } from "../src/graphql/queries";
+import { getBlock, getConversation } from "../src/graphql/queries";
+import {
+  onDeleteConversation
+} from "root/src/graphql/subscriptions";
 //const { width } = Dimensions.get('window');
 
 var styles = require('styles/stylesheet');
@@ -21,9 +24,41 @@ export default function MessageScreen({ navigation, route }) {
   const { Accepted, lastUser, sidebar, id } = route.params;
 
   const [blocked, setBlocked] = useState(false);
+  const [AcceptedMessage, setAcceptedMessage] = useState(0);
 
   //console.log("Here is the user!");
   //console.log(userId);
+
+  useEffect(() => {
+    const friendlistarray = [route.params?.myId, userId].sort();
+
+    (async () => {
+      const convo = await API.graphql(
+        graphqlOperation(getConversation, { id: friendlistarray[0] + friendlistarray[1] })
+      );
+
+      if (convo != null) {
+        setAcceptedMessage(convo.data.getConversation.Accepted);
+      }
+    })()
+  }, [])
+
+  useEffect(() => {
+    let conversationFromUsers = [route.params?.myId, userId];
+    conversationFromUsers.sort();
+
+    try {
+      API.graphql(
+        graphqlOperation(onDeleteConversation, { users: conversationFromUsers })
+      ).subscribe({
+        next: (event) => {
+          navigation.navigate("Conversations");
+        }
+      })
+    } catch (err) {
+      console.log("Error in the delete conversation subscription", err);
+    }
+  })
 
   useEffect(() => {
     (async () => {
@@ -104,6 +139,7 @@ export default function MessageScreen({ navigation, route }) {
             navigation={navigation}
             route={route}
             Accepted={Accepted}
+            AcceptedMessage={AcceptedMessage}
             receiver={userId}
             channel={route.params?.myId < userId ? route.params?.myId + userId : userId + route.params?.myId}
             lastUser={lastUser}

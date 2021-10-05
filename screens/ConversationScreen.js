@@ -220,11 +220,7 @@ export default function ConversationScreen({ navigation, route }) {
           ).subscribe({
             next: (event) => {
               const conversation = event.value.data.onDeleteConversation;
-
-              console.log("[[[[[[[[[[[[[[[[[");
-              console.log(conversation);
-              console.log("]]]]]]]]]]]]]]]]]");
-
+              console.log("Inside the onDeleteConversation Subscription");
               const filteredConversations = conversations.filter((convo) =>
                 convo.id != conversation.id
               );

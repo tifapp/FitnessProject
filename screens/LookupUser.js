@@ -41,7 +41,7 @@ import {
   onDeleteFriendship,
 } from "root/src/graphql/subscriptions";
 import APIList from "components/APIList";
-import {saveCapitals, loadCapitals} from 'hooks/stringConversion';
+import { saveCapitals, loadCapitals } from 'hooks/stringConversion';
 
 var styles = require("styles/stylesheet");
 
@@ -62,24 +62,24 @@ const LookupUser = ({ route, navigation }) => {
   let onDelete2 = "";
 
   const addConversation = (id) => {
-  /*
-  if (!navigation.push)
-    navigation.navigate(id);
-  else navigation.push(id);
-  */
+    /*
+    if (!navigation.push)
+      navigation.navigate(id);
+    else navigation.push(id);
+    */
 
-  /*
-   if(friendStatus == "friends"){
-    navigation.navigate(id);
-   }
-   else{
+    /*
+     if(friendStatus == "friends"){
+      navigation.navigate(id);
+     }
+     else{
+      global.addConversationIds(id);
+      navigation.navigate(id);
+     }
+    */
+    //console(id);
+    //console("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
     global.addConversationIds(id);
-    navigation.navigate(id);
-   }
-  */
- //console(id);
- //console("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-global.addConversationIds(id);
   };
 
   const goToMessages = (id) => {
@@ -147,7 +147,8 @@ global.addConversationIds(id);
   };
 
   const checkFriendStatus = async () => {
-    //console("CHECKING FRIEND STATUS");
+    console.log("Checking Friend Status");
+
     try {
       let blocked = await API.graphql(
         graphqlOperation(getBlock, {
@@ -156,7 +157,7 @@ global.addConversationIds(id);
         })
       );
 
-      if (blocked.data.getBlock != null) {setFriendStatus("blocked"); return;}
+      if (blocked.data.getBlock != null) { setFriendStatus("blocked"); console.log("You are blocked by this user"); return; }
 
       let blocker = await API.graphql(
         graphqlOperation(getBlock, {
@@ -165,7 +166,7 @@ global.addConversationIds(id);
         })
       );
 
-      if (blocker.data.getBlock != null) {setFriendStatus("blocker"); return;}
+      if (blocker.data.getBlock != null) { setFriendStatus("blocker"); return; }
 
       let friendship = await API.graphql(
         graphqlOperation(getFriendship, {
@@ -263,7 +264,7 @@ global.addConversationIds(id);
         },
       }
     )
-    
+
     onDelete2 = API.graphql(graphqlOperation(onDeleteFriendship, {
       sender: userId,
       receiver: route.params?.myId,
@@ -379,7 +380,7 @@ global.addConversationIds(id);
   const unblockUser = async () => {
     try {
       API.graphql(
-        graphqlOperation(deleteBlock, { input: { userId: route.params?.myId, blockee: userId} })
+        graphqlOperation(deleteBlock, { input: { userId: route.params?.myId, blockee: userId } })
       );
       global.localBlockList = global.localBlockList.filter(i => i.blockee !== userId);
       //console(global.localBlockList);
@@ -389,14 +390,14 @@ global.addConversationIds(id);
       //console("error when unblocking");
     }
   }
-  
+
   const blockUser = async () => {
     try {
       deleteFriend(true);
       API.graphql(
-        graphqlOperation(createBlock, { input: { blockee: userId} })
+        graphqlOperation(createBlock, { input: { blockee: userId } })
       );
-      global.localBlockList.push({createdAt: (new Date(Date.now())).toISOString(), userId: route.params?.myId , blockee: userId});
+      global.localBlockList.push({ createdAt: (new Date(Date.now())).toISOString(), userId: route.params?.myId, blockee: userId });
       //console(global.localBlockList);
       setFriendStatus("blocker");
     } catch (err) {
@@ -412,7 +413,7 @@ global.addConversationIds(id);
           <View style={{ paddingBottom: 15 }}>
             <ProfileImageAndName
               you={userId === route.params?.myId}
-              style={{marginTop: 15}}
+              style={{ marginTop: 15 }}
               imageSize={110}
               navigateToProfile={false}
               vertical={true}
@@ -424,13 +425,13 @@ global.addConversationIds(id);
               }}
             />
           </View>
-          {route.params?.myId != user.id && (!user.messagesPrivacy || user.messagesPrivacy === 0 || (mutualfriendList.length > 0 && user.messagesPrivacy === 1) || (friendStatus === "friends" && user.messagesPrivacy >= 1)) ?
-          <TouchableOpacity
-                  style={styles.messageButton}
-                  onPress = {() => {goToMessages(userId)}}
-                >
-                  <Text style={styles.buttonTextStyle}>Message</Text>
-                </TouchableOpacity> : null
+          {!(friendStatus == "blocker" || friendStatus == "blocked") && route.params?.myId != user.id && (!user.messagesPrivacy || user.messagesPrivacy === 0 || (mutualfriendList.length > 0 && user.messagesPrivacy === 1) || (friendStatus === "friends" && user.messagesPrivacy >= 1)) ?
+            <TouchableOpacity
+              style={styles.messageButton}
+              onPress={() => { goToMessages(userId) }}
+            >
+              <Text style={styles.buttonTextStyle}>Message</Text>
+            </TouchableOpacity> : null
           }
 
 
@@ -510,94 +511,85 @@ global.addConversationIds(id);
                   style={styles.unblockButton}
                 >
                   <Text style={styles.buttonTextStyle}>Unblock</Text>
-                </TouchableOpacity>
-              )
-                :
-                <TouchableOpacity
-                  onPress={blockUser}
-                  style={styles.unblockButton}
-                >
-                  <Text style={styles.buttonTextStyle}>Block</Text>
-                </TouchableOpacity>
-            }
+                </TouchableOpacity>) : null}
             {
-              (!user.friendRequestPrivacy || user.friendRequestPrivacy === 0 || (mutualfriendList.length > 0 && user.friendRequestPrivacy === 1) || (friendStatus === "friends" && user.friendRequestPrivacy >= 1)) ?                
-              friendStatus == "none" ? (
-                <View>
-                  <TouchableOpacity
-                    onPress={sendFriendRequest}
-                    style={styles.submitButton}
-                  >
-                    <Text style={styles.buttonTextStyle}>Send Friend Request</Text>
-                  </TouchableOpacity>
-                </View>
-              ) : friendStatus == "sending" ? (
-                <Text style={[styles.buttonTextStyle, { color: "red" }]}>
-                  Sending Friend Request...
-                </Text>
-              ) : friendStatus == "sent" ? (
-                <TouchableOpacity
-                  onPress={unsendFriendRequest}
-                  style={styles.unsendButton}
-                >
-                  <Text style={styles.buttonTextStyle}>
-                    Unsend Friend Request
-                  </Text>
-                </TouchableOpacity>
-              ) : friendStatus == "unsending" ? (
-                <Text style={[styles.buttonTextStyle, { color: "red" }]}>
-                  Unsending Friend Request...
-                </Text>
-              ) : friendStatus == "received" ? (
-                <View>
-                  <TouchableOpacity
-                    onPress={rejectFriendRequest}
-                    style={styles.unsendButton}
-                  >
-                    <Text style={styles.buttonTextStyle}>
-                      Reject Friend Request
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={acceptFriendRequest}
-                    style={styles.unsendButton}
-                  >
-                    <Text style={styles.buttonTextStyle}>
-                      Accept Friend Request
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={blockUser}
-                    style={styles.unblockButton}
-                  >
-                    <Text style={styles.buttonTextStyle}>Block</Text>
-                  </TouchableOpacity>
-                </View>
-              ) : friendStatus === "rejecting" ? (
-                <Text style={[styles.buttonTextStyle, { color: "red" }]}>
-                  Rejecting Friend Request...
-                </Text>
-              ) : friendStatus === "accepting" ? (
-                <Text style={[styles.buttonTextStyle, { color: "red" }]}>
-                  Accepting Friend Request...
-                </Text>
-              ) : friendStatus === "deleting" ? (
-                <Text style={[styles.buttonTextStyle, { color: "red" }]}>
-                  Unfriending...
-                </Text>
-              ) : friendStatus === "friends" ? (
-                <View>
-                  <View style={styles.viewProfileScreen}>
-                    <Text>Friends for {friendsSince} </Text>
+              (!user.friendRequestPrivacy || user.friendRequestPrivacy === 0 || (mutualfriendList.length > 0 && user.friendRequestPrivacy === 1) || (friendStatus === "friends" && user.friendRequestPrivacy >= 1)) ?
+                friendStatus == "none" ? (
+                  <View>
+                    <TouchableOpacity
+                      onPress={sendFriendRequest}
+                      style={styles.submitButton}
+                    >
+                      <Text style={styles.buttonTextStyle}>Send Friend Request</Text>
+                    </TouchableOpacity>
                   </View>
+                ) : friendStatus == "sending" ? (
+                  <Text style={[styles.buttonTextStyle, { color: "red" }]}>
+                    Sending Friend Request...
+                  </Text>
+                ) : friendStatus == "sent" ? (
                   <TouchableOpacity
-                    onPress={deleteFriend}
+                    onPress={unsendFriendRequest}
                     style={styles.unsendButton}
                   >
-                    <Text style={styles.buttonTextStyle}>Unfriend</Text>
+                    <Text style={styles.buttonTextStyle}>
+                      Unsend Friend Request
+                    </Text>
                   </TouchableOpacity>
-                </View>
-              ) : null : null
+                ) : friendStatus == "unsending" ? (
+                  <Text style={[styles.buttonTextStyle, { color: "red" }]}>
+                    Unsending Friend Request...
+                  </Text>
+                ) : friendStatus == "received" ? (
+                  <View>
+                    <TouchableOpacity
+                      onPress={rejectFriendRequest}
+                      style={styles.unsendButton}
+                    >
+                      <Text style={styles.buttonTextStyle}>
+                        Reject Friend Request
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={acceptFriendRequest}
+                      style={styles.unsendButton}
+                    >
+                      <Text style={styles.buttonTextStyle}>
+                        Accept Friend Request
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={blockUser}
+                      style={styles.unblockButton}
+                    >
+                      <Text style={styles.buttonTextStyle}>Block</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : friendStatus === "rejecting" ? (
+                  <Text style={[styles.buttonTextStyle, { color: "red" }]}>
+                    Rejecting Friend Request...
+                  </Text>
+                ) : friendStatus === "accepting" ? (
+                  <Text style={[styles.buttonTextStyle, { color: "red" }]}>
+                    Accepting Friend Request...
+                  </Text>
+                ) : friendStatus === "deleting" ? (
+                  <Text style={[styles.buttonTextStyle, { color: "red" }]}>
+                    Unfriending...
+                  </Text>
+                ) : friendStatus === "friends" ? (
+                  <View>
+                    <View style={styles.viewProfileScreen}>
+                      <Text>Friends for {friendsSince} </Text>
+                    </View>
+                    <TouchableOpacity
+                      onPress={deleteFriend}
+                      style={styles.unsendButton}
+                    >
+                      <Text style={styles.buttonTextStyle}>Unfriend</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : null : null
             }
           </View>
         ) : null}
