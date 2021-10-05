@@ -1,23 +1,25 @@
 export function saveCapitals(string) {
   //possible improvements: use a dash instead of a comma if there are consecutive capitals. if there are more uppercase than lowercase characters, flip the script and add a signifier.
-  length = string.length;
-  string = string + "|";
-  for (let i = 0; i < length; ++i) {
-    if (isNaN(string[i] * 1) && string[i] == string[i].toUpperCase()) {
-      //check if the character is a letter, and check if it's uppercase
-      string =
-        string.substring(0, i) +
-        string[i].toLowerCase() +
-        string.substring(i + 1) +
-        (string.length > length + 1 ? "," : "") +
-        i.toString();
+  let lowercaseString = string.toLowerCase();
+  if (string.length > 0) {
+    lowercaseString = lowercaseString + "|";
+    for (let i = 0; i < string.length; ++i) {
+      if (isNaN(string[i] * 1) && string[i] !== lowercaseString[i]) {
+        //check if the character is a letter, and check if it's uppercase
+        lowercaseString += i.toString() + ",";
+      }
+    }
+    if (lowercaseString[lowercaseString.length-1] === ",") {
+      lowercaseString = lowercaseString.slice(0, -1); 
     }
   }
 
-  return string;
+  console.log("saved string is, ", lowercaseString)
+  return lowercaseString;
 }
 
 export function loadCapitals(string) {
+  console.log(string);
   //capitalize the characters in the actual string according to the indexes at the end
   //start from the end, move to the front until you hit the "|" character.
   i = string.length - 1;
@@ -31,7 +33,7 @@ export function loadCapitals(string) {
         string[capitalIndex].toUpperCase() +
         string.substring(capitalIndex + 1)
       capitalIndex = 0;
-      if (string[i] == "|") break;
+      if (string[i] === "|") break;
     }
     --i;
   }

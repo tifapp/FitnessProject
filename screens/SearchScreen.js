@@ -104,21 +104,21 @@ export default function SearchScreen({ navigation, route }) {
                             zIndex: 1,
                         }]}>
                             <Tab
-                                label={"all"}
+                                label={"All"}
                                 onPress={() => {
                                     setSearchType("all")
                                 }}
                                 isSelected={(searchType === 'all')}
                             />
                             <Tab
-                                label={"users"}
+                                label={"Users"}
                                 onPress={() => {
                                     setSearchType("user")
                                 }}
                                 isSelected={(searchType === 'user')}
                             />
                             <Tab
-                                label={"groups"}
+                                label={"Groups"}
                                 onPress={() => {
                                     setSearchType("group")
                                 }}
