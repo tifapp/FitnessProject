@@ -81,6 +81,7 @@ export default function SearchScreen({ navigation, route }) {
                     }}
                 >
                     <TextInput
+                        autoFocus={true}
                         ref={searchBarRef}
                         style={[styles.textInputStyle, { flexGrow: 1 }]}
                         placeholder="Search for names or keywords!"
