@@ -17,7 +17,7 @@ export default function UserListItem({
 }) {
   return (
         <ProfileImageAndName
-          textLayoutStyle={{alignSelf: "center"}}
+          textLayoutStyle={{alignSelf: "center", flex: 1}}
           userId={item.id}
           imageSize={60}
           textStyle={{fontSize: 16, fontWeight: "bold"}}
@@ -53,6 +53,7 @@ export default function UserListItem({
                   paddingTop: 7,
                   paddingBottom: 2,
                   fontSize: 12,
+                  marginRight: 15,
                 }}
                 numberOfLines={1}> "{loadCapitals(item.bio)}"</Text> 
                 : null
