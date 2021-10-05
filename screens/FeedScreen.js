@@ -474,36 +474,37 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
           <View style={{}}>
             {headerComponent}
             {lastUser != route.params.myId && lastUser != null && receiver != null && !ButtonCheck ?
-              <View style={styles.signOutTop}>
-                <TouchableOpacity
+              <View style={{flexDirection: "row", justifyContent: "center", marginVertical: 15}}>
+                <IconButton
+                  iconName={"check"}
+                  size={22}
+                  color={"green"}
                   onPress={acceptMessageRequest}
-                  style={styles.acceptMessageButton}
-                >
-                  <Text style={styles.acceptButtonTextStyle}>
-                    Accept
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={rejectMessageRequest}
-                  style={styles.rejectMessageButton}
-                >
-                  <Text style={styles.rejectButtonTextStyle}>
-                    Reject
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              : null
-            }
+                  style={{ paddingHorizontal: 12 }}
+                  label={"Accept"}
+                  fontSize={18}
+                />
 
-            {lastUser != route.params.myId && lastUser != null && receiver != null && !ButtonCheck ?
-              <TouchableOpacity
-                onPress={blockMessageRequest}
-                style={styles.blockMessageButton}
-              >
-                <Text style={styles.blockButtonTextStyle}>
-                  Block
-                </Text>
-              </TouchableOpacity>
+                <IconButton
+                  iconName={"clear"}
+                  size={22}
+                  color={"red"}
+                  onPress={rejectMessageRequest}
+                  style={{ paddingHorizontal: 12 }}
+                  label={"Reject"}
+                  fontSize={18}
+                />
+                
+                <IconButton
+                  iconName={"block"}
+                  size={22}
+                  color={"black"}
+                  onPress={blockMessageRequest}
+                  style={{ paddingHorizontal: 12 }}
+                  label={"Block"}
+                  fontSize={18}
+                />
+              </View>
               : null
             }
 
