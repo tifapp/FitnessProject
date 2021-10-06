@@ -427,7 +427,7 @@ export default React.memo(function PostItem({
                   replyButtonHandler={() => {
                     setAreRepliesVisible(false);
                   }}
-                  isVisible={true}
+                  isVisible={false}
                   shouldSubscribe={true}
                 />
               }
