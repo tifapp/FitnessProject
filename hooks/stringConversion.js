@@ -14,29 +14,29 @@ export function saveCapitals(string) {
     }
   }
 
-  console.log("saved string is, ", lowercaseString)
   return lowercaseString;
 }
 
 export function loadCapitals(string) {
-  console.log(string);
   //capitalize the characters in the actual string according to the indexes at the end
   //start from the end, move to the front until you hit the "|" character.
-  i = string.length - 1;
-  capitalIndex = 0;
-  while (i >= 0) {
-    if (!isNaN(string[i] * 1)) {
-      capitalIndex = parseInt(string[i] + (capitalIndex > 0 ? capitalIndex.toString() : ""));
-      //console.log("current capitalIndex is ", capitalIndex, " and current int is ", string[i])
-    } else {
-      string = string.substring(0, capitalIndex) +
-        string[capitalIndex].toUpperCase() +
-        string.substring(capitalIndex + 1)
-      capitalIndex = 0;
-      if (string[i] === "|") break;
+  let stringTokens = string.split("|");
+  let capitalIndices = stringTokens.pop().split(",").map(item => parseInt(item));
+  let result = stringTokens.join("");
+  let capitalizedString = "";
+  let capitalIndicesIndex = 0;
+  for (let index in result) {
+    if (capitalIndicesIndex >= capitalIndices.length) {
+      capitalizedString += result.substring(index);
+      break;
     }
-    --i;
+    if (index == capitalIndices[capitalIndicesIndex]) {
+      capitalizedString += result[index].toUpperCase();
+      ++capitalIndicesIndex;
+    } else {
+      capitalizedString += result[index];
+    }
   }
-  string = string.substring(0, i);
-  return string;
+
+  return capitalizedString;
 }
