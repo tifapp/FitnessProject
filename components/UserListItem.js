@@ -51,7 +51,6 @@ export default function UserListItem({
               <Text style={
                 {
                   paddingTop: 7,
-                  paddingBottom: 2,
                   fontSize: 12,
                   marginRight: 15,
                 }}
