@@ -11,7 +11,7 @@ export default function IconButton({ onPress, iconName, style, color, label, siz
     <TouchableOpacity
       style={[
         {
-          flexDirection: "row",
+          flexDirection: isLabelFirst ? "row" : "row-reverse",
           alignItems: "center",
         },
         style
@@ -19,10 +19,11 @@ export default function IconButton({ onPress, iconName, style, color, label, siz
       onPress={onPress}
     >
       {
-        isLabelFirst && label ?
+        label ?
           <Text
             style={[
-              { fontWeight: "bold", color: color, marginRight: margin ?? 5, fontSize: fontSize ?? 14 },
+              { fontWeight: "bold", color: color, fontSize: fontSize ?? 14 },
+              isLabelFirst ? {marginRight: margin ?? 5} : {marginLeft: margin ?? 5},
             ]}
           >
             {label}
@@ -33,17 +34,6 @@ export default function IconButton({ onPress, iconName, style, color, label, siz
         size={size ?? 17}
         color={color}
       />
-      {
-        !isLabelFirst && label ?
-          <Text
-            style={[
-              { fontWeight: "bold", color: color, marginLeft: margin ?? 5, fontSize: fontSize ?? 14 },
-            ]}
-          >
-            {label}
-          </Text>
-          : null
-      }
     </TouchableOpacity>
   );
 }
