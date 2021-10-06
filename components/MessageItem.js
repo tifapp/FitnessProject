@@ -70,7 +70,7 @@ export default React.memo(function MessageItem({
                         marginBottom: 15,
                     }}
                     imageID={item.imageURL}
-                    isVisible={isVisible}
+                    isVisible={false}
                 />
                 <LinkableText
                 style={{
