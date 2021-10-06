@@ -45,7 +45,7 @@ const viewabilityConfig = {
   waitForInteraction: false,
 }
 
-export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, originalParentId, Accepted, AcceptedMessage, lastUser, sidebar, id, autoFocus = false }
+export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, originalParentId, Accepted, AcceptedMessage, lastUser, sidebar, id, isFocused, autoFocus = false }
 ) {
   const [posts, setPosts] = useState([]);
 
@@ -404,7 +404,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         newSection={
           index == 0 ? true : showTimestamp(posts[index - 1], index - 1)
         }
-        isVisible={item.isVisible}
+        isVisible={item.isVisible && isFocused}
         shouldSubscribe={item.shouldSubscribe}
       />
     )

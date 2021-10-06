@@ -26,6 +26,8 @@ export default function MessageScreen({ navigation, route }) {
   const [blocked, setBlocked] = useState(false);
   const [AcceptedMessage, setAcceptedMessage] = useState(0);
 
+  const [isFocused, setIsFocused] = useState(false);
+
   //console.log("Here is the user!");
   //console.log(userId);
 
@@ -41,6 +43,20 @@ export default function MessageScreen({ navigation, route }) {
         setAcceptedMessage(convo.data.getConversation.Accepted);
       }
     })()
+
+    const onFocus = navigation.addListener('focus', () => {
+      //console.log("got to settings", global.localBlockList);
+      setIsFocused(true);
+    });
+    
+    const onBlur = navigation.addListener('blur', () => {
+      //console.log("got to settings", global.localBlockList);
+      setIsFocused(false);
+    });
+
+
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return onFocus, onBlur;
   }, [])
 
   useEffect(() => {
@@ -146,6 +162,7 @@ export default function MessageScreen({ navigation, route }) {
             sidebar={sidebar}
             id={id}
             autoFocus={true}
+            isFocused={isFocused}
           />
       }
     </View>
