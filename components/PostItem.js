@@ -172,7 +172,7 @@ export default React.memo(function PostItem({
               marginBottom: 15,
             }}
             imageID={item.imageURL}
-            isVisible={isVisible}
+            isVisible={isVisible && !areRepliesVisible}
           />
 
           <View style={{flexDirection: "row", justifyContent: "space-between", minHeight: writtenByYou ? 70 : 35,}}>
@@ -284,7 +284,7 @@ export default React.memo(function PostItem({
           >
             <TouchableOpacity onPress={() => setAreLikesVisible(false)} style={{ width: "100%", height: "100%", position: "absolute", backgroundColor: "#00000033" }}>
             </TouchableOpacity>
-            <View style={{ marginTop: "auto", flex: 0.8, backgroundColor: "#efefef" }}>
+            <View style={{ marginTop: "auto", flex: 0.8, backgroundColor: "#a9efe0" }}>
               <View style={{ height: 1, width: "100%", alignSelf: "center", backgroundColor: "lightgray" }}>
               </View>
               <View style={{ margin: 10, width: 25, height: 2, alignSelf: "center", backgroundColor: "lightgray" }}>
@@ -371,7 +371,7 @@ export default React.memo(function PostItem({
           <TouchableOpacity onPress={() => setAreRepliesVisible(false)} style={{ width: "100%", height: "100%", position: "absolute", backgroundColor: "#00000033" }}>
           </TouchableOpacity>
           <View 
-          style={{ marginTop: "auto", flex: 0.8, backgroundColor: "#efefef" }}>
+          style={{ marginTop: "auto", flex: 0.8, backgroundColor: "#a9efe0" }}>
             <View style={{ height: 1, width: "100%", alignSelf: "center", backgroundColor: "lightgray" }}>
             </View>
             <View style={{ margin: 10, width: 25, height: 2, alignSelf: "center", backgroundColor: "lightgray" }}>
@@ -427,6 +427,7 @@ export default React.memo(function PostItem({
                   replyButtonHandler={() => {
                     setAreRepliesVisible(false);
                   }}
+                  isVisible={true}
                   shouldSubscribe={true}
                 />
               }
