@@ -24,7 +24,6 @@ const DetailedInfoDetails = ({ label, field, setField, goalsDetailMaxLength, bio
 
             <TextInput
                 //onFocus={goToTextBox}
-                style={[styles.textBoxStyle, {minHeight: 100}]}
                 placeholder={`Enter your ${label}!`}
                 multiline={true}
                 autoCorrect={false}

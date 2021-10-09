@@ -38,9 +38,9 @@ export default () => {
     return 'successfully deleted';
   };
 
-  const updateUserAsync = async (imageURL, name, age, gender, bioDetails, goalsDetails, location) => {
+  const updateUserAsync = async (profileInfo, isNewUser) => {
     const saveProfilePicture = async (userId) => {
-      if (imageURL !== '') {
+      if (profileInfo.imageURL) {
         const resizedPhoto = await ImageManipulator.manipulateAsync(
           imageURL,
           [{ resize: { width: 200 } }], // resize to width of 300 and preserve aspect ratio 
@@ -52,62 +52,34 @@ export default () => {
         await Storage.put('profileimage.jpg', blob, { level: 'protected', contentType: 'image/jpeg' });
 
         console.log("changing cached profile pic");
-        Cache.setItem(userId, { name: name, imageURL: imageURL, isFull: true, changed: true }, { priority: 1, expires: Date.now() + 86400000 });
+        Cache.setItem(userId, { name: profileInfo.name, imageURL: profileInfo.imageURL, isFull: true, changed: true }, { priority: 1, expires: Date.now() + 86400000 });
       } else {
         Storage.remove('profileimage.jpg', { level: 'protected' })
           .then(result => console.log("removed profile image!", result))
           .catch(err => console.log(err));
-        Cache.setItem(userId, { name: name, imageURL: '', changed: true }, { priority: 1, expires: Date.now() + 86400000 });
-      }
-    }
-
-    const updateUserInDB = async (recurringUser) => {
-      try {
-        await API.graphql(graphqlOperation(updateUser, { input: recurringUser }));
-        console.log("updated user successfully");
-      } catch (err) {
-        Alert.alert("Could not submit profile! Error: ", err.errors[0].message);
-        console.log("error when updating user: ", err);
-      }
-    }
-
-    const createUserInDB = async (newUser) => {
-      try {
-        await API.graphql(graphqlOperation(createUser, { input: newUser }));
-        console.log("success");
-      } catch (err) {
-        console.log("error: ", err);
+        Cache.setItem(userId, { name: profileInfo.name, imageURL: '', changed: true }, { priority: 1, expires: Date.now() + 86400000 });
       }
     }
 
     //if user doesn't exist, make one
     try {
-      const { identityId } = await Auth.currentCredentials();
       const query = await Auth.currentUserInfo();
-      const user = await API.graphql(graphqlOperation(getUser, { id: query.attributes.sub }));
-      const fields = user.data.getUser;
-      console.log('returning users fields looks like', fields);
-
-      const ourUser = {
-        name: saveCapitals(name),
-        age: age,
-        gender: gender, //should be using an enum
-        bio: saveCapitals(bioDetails),
-        goals: saveCapitals(goalsDetails),
-        latitude: location == null || location.latitude == null || location.latitude < 0 ? null : location.latitude,
-        longitude: location == null || location.latitude == null || location.latitude < 0 ? null : location.longitude
-      };
 
       saveProfilePicture(query.attributes.sub);
-      if (fields == null) {
-        ourUser.identityId = identityId;
-        createUserInDB(ourUser)
+      if (isNewUser) {
+        const { identityId } = await Auth.currentCredentials();
+        profileInfo.identityId = identityId;
       }
-      else {
-        updateUserInDB(ourUser)
+      
+      try {
+        await API.graphql(graphqlOperation(isNewUser ? createUser : updateUser, { input: profileInfo }));
+        //console.log("updated user successfully");
+      } catch (err) {
+        Alert.alert("Could not submit profile! Error: ", err.errors[0].message);
+        //console.log("error when updating user: ", err);
       }
 
-      return [ourUser, query.attributes.sub];
+      return [profileInfo, query.attributes.sub];
     }
     catch (err) {
       console.log("error: ", err);
@@ -124,7 +96,7 @@ export default () => {
 
       const ourUser = {
         //id: query.attributes.sub,
-        latitude: location == null || location.latitude < 0 ? null : location.latitude,
+        latitude: location == null || location.latitude < 0 ? null : location.latitude, //we need to do this in the createuser/updateuser operations as well
         longitude: location == null || location.latitude < 0 ? null : location.longitude
       };
 

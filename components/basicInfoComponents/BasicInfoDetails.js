@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import {Text, View, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 //import { Entypo } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons'; 
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Selector from './Selector'
 
 const BasicInfoDetails = ({ label, field, updateField }) => {
@@ -9,40 +9,20 @@ const BasicInfoDetails = ({ label, field, updateField }) => {
 
     return (
         <View>
-            {label != 'name'
-                ? <Selector
-                    label={label}
-                    modalOpen={modalOpen}
-                    setModalOpen={setModalOpen}
-                    field={field}
-                    updateField={updateField} />
-                : null}
+            <Selector
+                label={label}
+                modalOpen={modalOpen}
+                setModalOpen={setModalOpen}
+                field={field}
+                updateField={updateField} />
 
-            {label == 'name' ?
-                <TouchableOpacity style={styles.textBoxStyle}>
-                    <TextInput
-                        style={field === '' ? styles.emptyTextInputStyle : styles.textInputStyle}
-                        placeholder={`Enter your ${label}`}
-                        autoCorrect={false}
-                        value={field.toString()}
-                        onChangeText={updateField}
-                    />
+            <TouchableOpacity style={[styles.textBoxStyle, { borderBottomColor: 'gray', borderBottomWidth: 1 }]} onPress={() => setModalOpen(true)}>
+                <View>
+                    <Text style={{ marginLeft: 5 }}> {field}</Text>
+                </View>
 
-                    {/* <MaterialCommunityIcons name="dumbbell" size={24} color="black" /> */}
-                </TouchableOpacity> 
-
-                :
-
-                <TouchableOpacity style={[styles.textBoxStyle, {borderBottomColor: 'gray', borderBottomWidth: 1}]} onPress={()=>setModalOpen(true)}>
-                    <View>
-                        <Text style = {{marginLeft: 5}}> {field}</Text>
-                    </View>
-
-                    {/* <MaterialCommunityIcons name="dumbbell" size={24} color="black" /> */}
-                </TouchableOpacity> 
-            }
-            
-
+                {/* <MaterialCommunityIcons name="dumbbell" size={24} color="black" /> */}
+            </TouchableOpacity>
         </View>
     )
 }
