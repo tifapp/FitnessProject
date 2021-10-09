@@ -23,7 +23,6 @@ const ProfileScreen = ({ navigation, route }) => {
     const [goalsDetails, setGoalsDetails] = useState('');
     const [bioDetailsMaxLength, setBioDetailsMaxLength] = useState(1000);
     const [goalsDetailsMaxLength, setGoalsDetailsMaxLength] = useState(1000);
-    const [initialFields, setInitialFields] = useState([]);
     const [locationEnabled, setLocationEnabled] = useState(false);
     const [loadUserAsync, updateUserAsync, updateUserLocationAsync, deleteUserAsync] = useUserDatabase();
     
@@ -32,19 +31,7 @@ const ProfileScreen = ({ navigation, route }) => {
     }
 
     async function signOut() {
-        console.log("user is signing out.");
-        if (areFieldsUpdated()) {
-            const title = 'Your profile has unsaved changes!';
-            const message = 'Signing out will remove these changes';
-            const options = [
-                { text: 'Submit changes', onPress: () => {submitHandler()} }, //if submithandler fails user won't know
-                { text: 'Just sign out', onPress: () => {Auth.signOut()} },
-                { text: 'Cancel', type: 'cancel', },
-            ];
-            Alert.alert(title, message, options, { cancelable: true });
-        } else {
-            Auth.signOut();
-        }
+        Auth.signOut();
     }
 
     async function deleteAccount() {
@@ -81,21 +68,14 @@ const ProfileScreen = ({ navigation, route }) => {
         }
     }
 
-    const areFieldsUpdated = () => {
-        console.log(initialFields);
-        if (name == initialFields[0] &&
-            age == initialFields[1] &&
-            gender == initialFields[2] &&
-            bioDetails == initialFields[3] &&
-            goalsDetails == initialFields[4] &&
-            locationEnabled == initialFields[5] &&
-            !imageChanged) {
-            return false;
+    useEffect(() => {
+        if (!route.params?.newUser && !imageChanged) {
+            updateUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails, locationEnabled ? getLocation() : null) //add a debounce on the textinput, or just when the keyboard is dismissed
+            setImageChanged(false)
         }
-        return true;
-    }
+    }, [name, age, gender, bioDetails, goalsDetails, locationEnabled, imageChanged])
 
-    const submitHandler = () => {
+    const createNewUser = () => {
         if (name == '') {
             Alert.alert('Please enter your name!')
         }
@@ -103,12 +83,9 @@ const ProfileScreen = ({ navigation, route }) => {
             Alert.alert('Submitting Profile...', '', [], { cancelable: false })
             updateUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails, locationEnabled ? getLocation() : null)
                 .then(([user, id]) => {
-                    if (route.params?.newUser) {
-                        route.params?.setUserIdFunction(id);
-                    } 
+                    route.params?.setUserIdFunction(id);
                     Alert.alert("Profile submitted successfully!");
                 })
-            setInitialFields([name, age, gender, bioDetails, goalsDetails, locationEnabled])
             setImageChanged(false)
         }
     }
@@ -125,7 +102,6 @@ const ProfileScreen = ({ navigation, route }) => {
                     setBioDetails(user.bio);
                     setGoalsDetails(user.goals);
                     setLocationEnabled(user.latitude != null);
-                    setInitialFields([user.name, user.age, user.gender, user.bio, user.goals, user.latitude != null]);
                     Image.getSize(user.pictureURL, () => {
                         setImageURL(user.pictureURL);
                     }, err => {
@@ -206,10 +182,9 @@ const ProfileScreen = ({ navigation, route }) => {
                         <Text style={styles.buttonTextStyle}>My Groups</Text>
                     </TouchableOpacity>
                 </View>
-            
                 {
-                    areFieldsUpdated() === true ?
-                        <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25 }]} onPress={submitHandler} >
+                    route.params?.newUser ? //if name is blank?
+                        <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25 }]} onPress={createNewUser} >
                             <Text style={styles.buttonTextStyle}>Submit</Text>
                         </TouchableOpacity>
                     : null
