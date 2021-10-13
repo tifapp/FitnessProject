@@ -22,7 +22,6 @@ const ProfilePic = ({imageURL, setImageURL, setImageChanged} ) => {
     }
 
     return (
-        <View>
             <TouchableOpacity
                 onPress = {() => promptUser()}
             >
@@ -31,7 +30,6 @@ const ProfilePic = ({imageURL, setImageURL, setImageChanged} ) => {
                     source = {imageURL === '' ? require('../assets/icon.png') : { uri: imageURL }}
                 />
             </TouchableOpacity>     
-        </View>
     )
 }
 

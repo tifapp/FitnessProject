@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { ActivityIndicator, View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert, Image, Linking } from 'react-native';
 import ProfilePic from 'components/ProfileImagePicker'
-import BasicInfo from 'components/basicInfoComponents/BasicInfo'
 import DetailedInfo from 'components/detailedInfoComponents/DetailedInfo';
 import useUserDatabase from 'hooks/useUserDatabase';
 import { Auth } from "aws-amplify";
-import { Platform } from 'react-native';
+import { Platform, TextInput } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import CheckBox from '@react-native-community/checkbox'; //when ios is supported, we'll use this
 import getLocation from 'hooks/useLocation';
+import {saveCapitals, loadCapitals} from 'hooks/stringConversion'
+import BasicInfoDetails from '../components/basicInfoComponents/BasicInfoDetails';
 
 var styles = require('styles/stylesheet');
 
@@ -18,7 +19,7 @@ const ProfileScreen = ({ navigation, route }) => {
     const [imageURL, setImageURL] = useState('');
     const [name, setName] = useState('');
     const [age, setAge] = useState(18);
-    const [gender, setGender] = useState('');
+    const [gender, setGender] = useState('Male');
     const [bioDetails, setBioDetails] = useState('');
     const [goalsDetails, setGoalsDetails] = useState('');
     const [bioDetailsMaxLength, setBioDetailsMaxLength] = useState(1000);
@@ -69,11 +70,11 @@ const ProfileScreen = ({ navigation, route }) => {
     }
 
     useEffect(() => {
-        if (!route.params?.newUser && !imageChanged) {
-            updateUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails, locationEnabled ? getLocation() : null) //add a debounce on the textinput, or just when the keyboard is dismissed
+        if (!route.params?.newUser) {
+            updateUserAsync({age: age, gender: gender, bio: saveCapitals(bioDetails), goals: saveCapitals(goalsDetails), latitude: locationEnabled ? getLocation().latitude : null, longitude: locationEnabled ? getLocation().longitude : null}, imageChanged ? imageURL : null) //add a debounce on the textinput, or just when the keyboard is dismissed
             setImageChanged(false)
         }
-    }, [name, age, gender, bioDetails, goalsDetails, locationEnabled, imageChanged])
+    }, [age, gender, bioDetails, goalsDetails, locationEnabled, imageChanged])
 
     const createNewUser = () => {
         if (name == '') {
@@ -81,7 +82,7 @@ const ProfileScreen = ({ navigation, route }) => {
         }
         else {
             Alert.alert('Submitting Profile...', '', [], { cancelable: false })
-            updateUserAsync(imageURL, name, age, gender, bioDetails, goalsDetails, locationEnabled ? getLocation() : null)
+            updateUserAsync({name: name, age: age, gender: gender, bio: saveCapitals(bioDetails), goals: saveCapitals(goalsDetails), latitude: locationEnabled ? getLocation().latitude : null, longitude: locationEnabled ? getLocation().longitude : null}, imageChanged ? imageURL : null, true) //add a debounce on the textinput, or just when the keyboard is dismissed
                 .then(([user, id]) => {
                     route.params?.setUserIdFunction(id);
                     Alert.alert("Profile submitted successfully!");
@@ -129,7 +130,7 @@ const ProfileScreen = ({ navigation, route }) => {
         )
     } else {
         return (
-            <ScrollView style={styles.containerStyle} >
+            <ScrollView style={[styles.containerStyle, {backgroundColor: "#a9efe0"}]} >
                 <View style={styles.signOutTop}>
                     <TouchableOpacity style={styles.unselectedButtonStyle} color="red" onPress={signOut}>
                         <Text style={styles.unselectedButtonTextStyle}>Sign Out</Text>
@@ -138,16 +139,37 @@ const ProfileScreen = ({ navigation, route }) => {
                         <Text style={styles.unselectedButtonTextStyle}>Delete Account</Text>
                     </TouchableOpacity>
                 </View>
-                <View style={{ padding: 15 }}>
+                <View style={{ 
+                    backgroundColor: "white",
+                    shadowColor: "#000",
+                    shadowOffset: {
+                      width: 0,
+                      height: 1,
+                    },
+                    shadowOpacity: 0.18,
+                    shadowRadius: 1.0,
+      
+                    elevation: 1,
+                    flexDirection: "row", alignItems: "center",  flex: 1, margin: 20,
+                }}>
                     <ProfilePic imageURL={imageURL} setImageURL={setImageURL} setImageChanged={setImageChanged} />
-                    <BasicInfo
-                        name={name}
-                        setName={setName}
-                        age={age}
-                        setAge={setAge}
-                        gender={gender}
-                        setGender={setGender}
+                    <View style={{marginLeft: 15}}>
+                    <TextInput
+                        style={[name === '' ? styles.emptyTextInputStyle : {fontSize: 18, marginBottom: 15, flex: 1, alignSelf: "center"}]}
+                        placeholder={`Enter your name!`}
+                        autoCorrect={false}
+                        value={name}
+                        onChangeText={setName}
+                        onEndEditing={() => {
+                            if (!route.params?.newUser)
+                                updateUserAsync({ name: saveCapitals(name) }) //should be doing savecapitals in the backend
+                        }}
                     />
+                    <View style={{ flexDirection: "row", justifyContent: "center" }}>
+                        <BasicInfoDetails label='age' field={age} updateField={setAge} />
+                        <BasicInfoDetails label='gender' field={gender} updateField={setGender} />
+                    </View>
+                        </View>
                 </View>
                 <DetailedInfo
                     bioDetails={bioDetails}

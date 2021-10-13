@@ -3,17 +3,6 @@ import {View} from 'react-native'
 import { Picker } from '@react-native-picker/picker'
 
 const GenderPicker = ({field, selectedValue, setSelectedValue}) => {
-    const fieldHandler = () => {
-        if (field == '') {
-            setSelectedValue("Male")
-        }
-        else {
-            setSelectedValue(field)
-        }
-    }
-
-    useEffect(() => fieldHandler(), [ ])
-
     return (
         <View>
             <Picker

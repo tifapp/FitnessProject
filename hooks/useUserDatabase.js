@@ -38,9 +38,9 @@ export default () => {
     return 'successfully deleted';
   };
 
-  const updateUserAsync = async (profileInfo, isNewUser) => {
+  const updateUserAsync = async (profileInfo, imageURL, isNewUser) => {
     const saveProfilePicture = async (userId) => {
-      if (profileInfo.imageURL) {
+      if (imageURL) {
         const resizedPhoto = await ImageManipulator.manipulateAsync(
           imageURL,
           [{ resize: { width: 200 } }], // resize to width of 300 and preserve aspect ratio 

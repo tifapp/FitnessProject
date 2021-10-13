@@ -233,7 +233,6 @@ module.exports = StyleSheet.create({
 
   textInputStyle: {
     marginHorizontal: 10,
-    height: 30,
     borderBottomWidth: 2,
     borderBottomColor: "gray",
   },
@@ -292,10 +291,8 @@ module.exports = StyleSheet.create({
 
   imageStyle: {
     alignSelf: "center",
-    marginTop: 30,
-    height: 110,
-    width: 110,
-    borderRadius: 10,
+    height: 125,
+    width: 125,
   },
   smallImageStyle: {
     resizeMode: "cover",

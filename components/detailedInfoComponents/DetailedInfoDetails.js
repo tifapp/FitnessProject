@@ -16,11 +16,26 @@ const DetailedInfoDetails = ({ label, field, setField, goalsDetailMaxLength, bio
     }
 
     return (
-        <View>
-            <TouchableOpacity onPress={goToTextBox}
-            >
-                <MaterialCommunityIcons style={styles.editIconStyle}name="dumbbell" size={24} color="black" />
+        <View style={{
+            backgroundColor: "white",
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 1,
+            },
+            shadowOpacity: 0.18,
+            shadowRadius: 1.0,
+            marginBottom: 20,
+            marginHorizontal: 20,
+
+            elevation: 1,
+            padding: 15,
+            flex: 0
+        }}>
+            <TouchableOpacity onPress={goToTextBox}>
+                <MaterialCommunityIcons style={styles.editIconStyle} name="dumbbell" size={24} color="black" />
             </TouchableOpacity>
+
 
             <TextInput
                 //onFocus={goToTextBox}
@@ -30,6 +45,7 @@ const DetailedInfoDetails = ({ label, field, setField, goalsDetailMaxLength, bio
                 value={field}
                 onChangeText={setField}
                 editable={false}
+                style={{fontSize: 18}}
             />
         </View>
     )

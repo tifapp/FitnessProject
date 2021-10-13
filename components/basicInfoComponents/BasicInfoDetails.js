@@ -33,10 +33,8 @@ const styles = new StyleSheet.create({
         height: 35,
         marginTop: 5,
         marginBottom: 8,
-        marginHorizontal: 60,
-        borderRadius: 10,
         alignItems: 'center',
-
+        paddingRight: 10,
     },
     textInputStyle: {
         fontSize: 15,
