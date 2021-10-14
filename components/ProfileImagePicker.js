@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, Image, TouchableOpacity, Alert} from 'react-native';
+import {View, StyleSheet, Image, TouchableOpacity, Alert, Dimensions} from 'react-native';
 import usePhotos from '../hooks/usePhotos';
 
 var styles = require('../styles/stylesheet');
@@ -26,7 +26,11 @@ const ProfilePic = ({imageURL, setImageURL, setImageChanged} ) => {
                 onPress = {() => promptUser()}
             >
                 <Image 
-                    style = {styles.imageStyle}
+                    style = {{
+                        alignSelf: "center",
+                        width: Dimensions.get('window').width - 40,
+                        height: Dimensions.get('window').width - 40,
+                    }}
                     source = {imageURL === '' ? require('../assets/icon.png') : { uri: imageURL }}
                 />
             </TouchableOpacity>     

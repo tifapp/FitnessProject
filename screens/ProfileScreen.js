@@ -8,13 +8,13 @@ import { Platform, TextInput } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import CheckBox from '@react-native-community/checkbox'; //when ios is supported, we'll use this
 import getLocation from 'hooks/useLocation';
-import {saveCapitals, loadCapitals} from 'hooks/stringConversion'
+import { saveCapitals, loadCapitals } from 'hooks/stringConversion'
 import BasicInfoDetails from '../components/basicInfoComponents/BasicInfoDetails';
 
 var styles = require('styles/stylesheet');
 
 const ProfileScreen = ({ navigation, route }) => {
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [imageChanged, setImageChanged] = useState(false);
     const [imageURL, setImageURL] = useState('');
     const [name, setName] = useState('');
@@ -26,7 +26,7 @@ const ProfileScreen = ({ navigation, route }) => {
     const [goalsDetailsMaxLength, setGoalsDetailsMaxLength] = useState(1000);
     const [locationEnabled, setLocationEnabled] = useState(false);
     const [loadUserAsync, updateUserAsync, updateUserLocationAsync, deleteUserAsync] = useUserDatabase();
-    
+
     const goToMyGroups = () => {
         navigation.navigate('My Groups')
     }
@@ -70,8 +70,8 @@ const ProfileScreen = ({ navigation, route }) => {
     }
 
     useEffect(() => {
-        if (!route.params?.newUser) {
-            updateUserAsync({age: age, gender: gender, bio: saveCapitals(bioDetails), goals: saveCapitals(goalsDetails), latitude: locationEnabled ? getLocation().latitude : null, longitude: locationEnabled ? getLocation().longitude : null}, imageChanged ? imageURL : null) //add a debounce on the textinput, or just when the keyboard is dismissed
+        if (!route.params?.newUser && !loading) {
+            updateUserAsync({ age: age, gender: gender, bio: saveCapitals(bioDetails), goals: saveCapitals(goalsDetails), latitude: locationEnabled ? getLocation().latitude : null, longitude: locationEnabled ? getLocation().longitude : null }, imageChanged ? imageURL : null) //add a debounce on the textinput, or just when the keyboard is dismissed
             setImageChanged(false)
         }
     }, [age, gender, bioDetails, goalsDetails, locationEnabled, imageChanged])
@@ -82,7 +82,7 @@ const ProfileScreen = ({ navigation, route }) => {
         }
         else {
             Alert.alert('Submitting Profile...', '', [], { cancelable: false })
-            updateUserAsync({name: name, age: age, gender: gender, bio: saveCapitals(bioDetails), goals: saveCapitals(goalsDetails), latitude: locationEnabled ? getLocation().latitude : null, longitude: locationEnabled ? getLocation().longitude : null}, imageChanged ? imageURL : null, true) //add a debounce on the textinput, or just when the keyboard is dismissed
+            updateUserAsync({ name: name, age: age, gender: gender, bio: saveCapitals(bioDetails), goals: saveCapitals(goalsDetails), latitude: locationEnabled ? getLocation().latitude : null, longitude: locationEnabled ? getLocation().longitude : null }, imageChanged ? imageURL : null, true) //add a debounce on the textinput, or just when the keyboard is dismissed
                 .then(([user, id]) => {
                     route.params?.setUserIdFunction(id);
                     Alert.alert("Profile submitted successfully!");
@@ -93,7 +93,6 @@ const ProfileScreen = ({ navigation, route }) => {
 
     useEffect(() => {
         if (locationEnabled) updateUserLocationAsync(getLocation(true));
-        setLoading(true);
         loadUserAsync()
             .then(user => {
                 if (user != null) {
@@ -107,7 +106,7 @@ const ProfileScreen = ({ navigation, route }) => {
                         setImageURL(user.pictureURL);
                     }, err => {
                         setImageURL('');
-                    });  
+                    });
                 }
             })
             .finally(() => { setLoading(false); })
@@ -130,46 +129,28 @@ const ProfileScreen = ({ navigation, route }) => {
         )
     } else {
         return (
-            <ScrollView style={[styles.containerStyle, {backgroundColor: "#a9efe0"}]} >
-                <View style={styles.signOutTop}>
-                    <TouchableOpacity style={styles.unselectedButtonStyle} color="red" onPress={signOut}>
-                        <Text style={styles.unselectedButtonTextStyle}>Sign Out</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.unselectedButtonStyle} color="red" onPress={deleteAccount}>
-                        <Text style={styles.unselectedButtonTextStyle}>Delete Account</Text>
-                    </TouchableOpacity>
-                </View>
-                <View style={{ 
-                    backgroundColor: "white",
-                    shadowColor: "#000",
-                    shadowOffset: {
-                      width: 0,
-                      height: 1,
-                    },
-                    shadowOpacity: 0.18,
-                    shadowRadius: 1.0,
-      
-                    elevation: 1,
-                    flexDirection: "row", alignItems: "center",  flex: 1, margin: 20,
+            <ScrollView style={[styles.containerStyle, { backgroundColor: "#efefef" }]} >
+                <View style={{
+                    alignItems: "center", flex: 1, margin: 20,
                 }}>
                     <ProfilePic imageURL={imageURL} setImageURL={setImageURL} setImageChanged={setImageChanged} />
-                    <View style={{marginLeft: 15}}>
-                    <TextInput
-                        style={[name === '' ? styles.emptyTextInputStyle : {fontSize: 18, marginBottom: 15, flex: 1, alignSelf: "center"}]}
-                        placeholder={`Enter your name!`}
-                        autoCorrect={false}
-                        value={name}
-                        onChangeText={setName}
-                        onEndEditing={() => {
-                            if (!route.params?.newUser)
-                                updateUserAsync({ name: saveCapitals(name) }) //should be doing savecapitals in the backend
-                        }}
-                    />
-                    <View style={{ flexDirection: "row", justifyContent: "center" }}>
-                        <BasicInfoDetails label='age' field={age} updateField={setAge} />
-                        <BasicInfoDetails label='gender' field={gender} updateField={setGender} />
-                    </View>
+                    <View style={{ marginLeft: 15, flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+                        <TextInput
+                            style={[name === '' ? styles.emptyTextInputStyle : { fontSize: 20, fontWeight: "bold", marginBottom: 15, flex: 1, alignSelf: "center" }]}
+                            placeholder={`Enter your name!`}
+                            autoCorrect={false}
+                            value={name}
+                            onChangeText={setName}
+                            onEndEditing={() => {
+                                if (!route.params?.newUser)
+                                    updateUserAsync({ name: saveCapitals(name) }) //should be doing savecapitals in the backend
+                            }}
+                        />
+                        <View style={{ flexDirection: "row", justifyContent: "center" }}>
+                            <BasicInfoDetails label='age' field={age} updateField={setAge} />
+                            <BasicInfoDetails label='gender' field={gender} updateField={setGender} />
                         </View>
+                    </View>
                 </View>
                 <DetailedInfo
                     bioDetails={bioDetails}
@@ -179,28 +160,28 @@ const ProfileScreen = ({ navigation, route }) => {
                     setBioDetails={setBioDetails}
                     setGoalsDetails={setGoalsDetails}
                 />
-                <TouchableOpacity style={[styles.rowContainerStyle, {marginBottom: 20}]} onPress={() => {setLocationEnabled(!locationEnabled)}} >
+                <TouchableOpacity style={[styles.rowContainerStyle, { marginBottom: 20 }]} onPress={() => { setLocationEnabled(!locationEnabled) }} >
                     {
                         locationEnabled === true && getLocation(true) == null
-                        ? <ActivityIndicator
-                            size="small"
-                            color="#26c6a2"
-                            style={{
-                                padding: 6,
-                            }} />
-                        : Platform.OS === 'android' 
-                        ? <CheckBox
-                            disabled={true}
-                            value={locationEnabled}
-                        />
-                        : locationEnabled === false
-                        ? <Ionicons size={16} style={{ marginBottom: 0 }} name="md-square-outline" color="orange" />
-                        : <Ionicons size={16} style={{ marginBottom: 0 }} name="md-checkbox-outline" color="orange" />
+                            ? <ActivityIndicator
+                                size="small"
+                                color="#26c6a2"
+                                style={{
+                                    padding: 6,
+                                }} />
+                            : Platform.OS === 'android'
+                                ? <CheckBox
+                                    disabled={true}
+                                    value={locationEnabled}
+                                />
+                                : locationEnabled === false
+                                    ? <Ionicons size={16} style={{ marginBottom: 0 }} name="md-square-outline" color="orange" />
+                                    : <Ionicons size={16} style={{ marginBottom: 0 }} name="md-checkbox-outline" color="orange" />
                     }
                     <Text style={styles.textButtonTextStyle}>{locationEnabled === true && getLocation(true) == null ? 'Locating user' : 'Let others see your location'}</Text>
                 </TouchableOpacity>
-                <View style = {{flexDirection: 'row', justifyContent: 'center'}}>
-                    <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25, marginHorizontal: 5}]} onPress={goToMyGroups} >
+                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                    <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25, marginHorizontal: 5 }]} onPress={goToMyGroups} >
                         <Text style={styles.buttonTextStyle}>My Groups</Text>
                     </TouchableOpacity>
                 </View>
@@ -209,7 +190,7 @@ const ProfileScreen = ({ navigation, route }) => {
                         <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25 }]} onPress={createNewUser} >
                             <Text style={styles.buttonTextStyle}>Submit</Text>
                         </TouchableOpacity>
-                    : null
+                        : null
                 }
             </ScrollView>
         )
