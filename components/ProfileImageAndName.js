@@ -144,7 +144,7 @@ export const ProfileImageAndName = React.memo(function (props) {
             height: props.imageSize ?? 45,
             marginRight: !props.vertical ? props.margin ?? 15 : 0,
             marginBottom: props.vertical ? props.margin ?? 15 : 0,
-            alignSelf: "center",
+            alignSelf: "flex-start",
           }, props.imageStyle]}
           source={
             (userInfo == null || userInfo.imageURL === "") ?
@@ -178,9 +178,10 @@ export const ProfileImageAndName = React.memo(function (props) {
             >
               {userInfo != null && userInfo.name
                 ? userInfo.isFull || userInfo.name.length <= 40
-                  ? userInfo.name
+                  ? userInfo.name + (props.spaceAfterName ? " " : "")
                   : userInfo.name.substring(0, 40)
                 : "Loading..."}
+                {props.nameComponent}
             </Text>
             {props.subtitleComponent}
           </View>

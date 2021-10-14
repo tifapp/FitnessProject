@@ -1,27 +1,29 @@
 import React, { useState } from 'react';
-import { Text, View, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, TextInput, TouchableOpacity, Modal } from 'react-native';
 //import { Entypo } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import Selector from './Selector'
+import AgePicker from './AgePicker'
+import GenderPicker from './GenderPicker'
 
-const BasicInfoDetails = ({ label, field, updateField }) => {
+const BasicInfoDetails = ({ age, gender, setAge, setGender }) => {
+
     const [modalOpen, setModalOpen] = useState(false)
 
     return (
         <View>
-            <Selector
-                label={label}
-                modalOpen={modalOpen}
-                setModalOpen={setModalOpen}
-                field={field}
-                updateField={updateField} />
-
-            <TouchableOpacity style={[styles.textBoxStyle, { borderBottomColor: 'gray', borderBottomWidth: 1 }]} onPress={() => setModalOpen(true)}>
-                <View>
-                    <Text style={{ marginLeft: 5 }}> {field}</Text>
+            <Modal transparent={true} visible={modalOpen} animationType='slide'>
+                <View style={{flex: 1}}>
+                    <TouchableOpacity style={{ flex: 1 }} onPress={() => setModalOpen(false)}>
+                    </TouchableOpacity>
+                    <View style={{ flexDirection: "row", justifyContent: "center", backgroundColor: "white", alignItems: "flex-end", marginTop: "auto" }} >
+                        <AgePicker selectedValue={age} setSelectedValue={setAge} />
+                        <GenderPicker selectedValue={gender} setSelectedValue={setGender} />
+                    </View>
                 </View>
+            </Modal>
 
-                {/* <MaterialCommunityIcons name="dumbbell" size={24} color="black" /> */}
+            <TouchableOpacity style={[styles.textBoxStyle]} onPress={() => setModalOpen(true)}>
+                <Text style={{ fontSize: 16, color: "black" }}>{`(${age}, ${gender})`}</Text>
             </TouchableOpacity>
         </View>
     )
@@ -31,7 +33,6 @@ const styles = new StyleSheet.create({
     textBoxStyle: {
         flexDirection: 'row',
         height: 35,
-        marginTop: 5,
         marginBottom: 8,
         alignItems: 'center',
         paddingRight: 10,

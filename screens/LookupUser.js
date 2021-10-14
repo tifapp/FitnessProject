@@ -20,6 +20,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import computeDistance from "hooks/computeDistance";
 import getLocation from "hooks/useLocation";
 import printTime from "hooks/printTime";
+import IconButton from "components/IconButton";
 import {
   getUser,
   getFriendRequest,
@@ -80,10 +81,6 @@ const LookupUser = ({ route, navigation }) => {
     //console(id);
     //console("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
     global.addConversationIds(id);
-  };
-
-  const goToMessages = (id) => {
-    navigation.navigate(id);
   };
 
   const checkUsersInfo = async () => {
@@ -407,194 +404,195 @@ const LookupUser = ({ route, navigation }) => {
   }
 
   return user == null ? null : (
-    <View>
-      <ScrollView>
-        <View style={styles.border}>
-          <View style={{ paddingBottom: 15 }}>
-            <ProfileImageAndName
-              you={userId === route.params?.myId}
-              style={{ marginTop: 15 }}
-              imageSize={110}
-              navigateToProfile={false}
-              vertical={true}
-              userId={userId}
-              isFull={true}
-              fullname={true}
-              callback={(info) => {
-                navigation.setOptions({ title: info.name });
-              }}
-            />
-          </View>
-          {!(friendStatus == "blocker" || friendStatus == "blocked") && route.params?.myId != user.id && (!user.messagesPrivacy || user.messagesPrivacy === 0 || (mutualfriendList.length > 0 && user.messagesPrivacy === 1) || (friendStatus === "friends" && user.messagesPrivacy >= 1)) ?
-            <TouchableOpacity
-              style={styles.messageButton}
-              onPress={() => { goToMessages(userId) }}
-            >
-              <Text style={styles.buttonTextStyle}>Message</Text>
-            </TouchableOpacity> : null
-          }
+    <ScrollView>
+      <View style={{}}>
+        <View style={{ flex: 1 }}>
+          <ProfileImageAndName
+            you={userId === route.params?.myId}
+            style={{ margin: 20 }}
+            imageSize={Dimensions.get('window').width / 2 - 30}
+            textStyle={{ fontWeight: "bold", fontSize: 24 }}
+            textLayoutStyle={{ flex: 1 }}
+            navigateToProfile={false}
+            userId={userId}
+            isFull={true}
+            fullname={true}
+            callback={(info) => {
+              navigation.setOptions({ title: info.name });
+            }}
+            nameComponent={
+              <View><Text style={{marginTop: 6, fontSize: 16}}>{`(${user.age}, ${user.gender})`}</Text></View>
+            }
+            spaceAfterName={true}
+            subtitleComponent={
+              !(friendStatus == "blocker" || friendStatus == "blocked") && route.params?.myId != user.id ?
+                <View style={{ alignItems: "flex-start" }}>
+                  {(!user.messagesPrivacy || user.messagesPrivacy === 0 || (mutualfriendList.length > 0 && user.messagesPrivacy === 1) || (friendStatus === "friends" && user.messagesPrivacy >= 1)) ?
+                    <IconButton
+                      style={{ marginBottom: 10 }}
+                      iconName={"message"}
+                      size={24}
+                      fontSize={18}
+                      color={"blue"}
+                      onPress={() => {
+                        navigation.navigate(userId);
+                      }}
+                      label={"Message"}
+                    />
+                    : null}
+                  {(!user.friendRequestPrivacy || user.friendRequestPrivacy === 0 || (mutualfriendList.length > 0 && user.friendRequestPrivacy === 1) || (friendStatus === "friends" && user.friendRequestPrivacy >= 1)) ?
+                    friendStatus === "none" ?
+                      <IconButton
+                        iconName={"person-add"}
+                        size={24}
+                        fontSize={18}
+                        color={"blue"}
+                        onPress={sendFriendRequest}
+                        label={"Add Friend"}
+                      />
+                      : friendStatus === "sending" ?
+                      <Text style={{fontWeight: "bold", fontSize: 18, marginTop: 2}}>
+                        Sending Request...
+                      </Text>
+                        : friendStatus === "sent" ?
+                        <IconButton
+                          iconName={"person-remove"}
+                          size={24}
+                          fontSize={18}
+                          color={"red"}
+                          onPress={unsendFriendRequest}
+                          label={"Unsend Request"}
+                        />
+                          : friendStatus === "unsending" ?
+                          <Text style={{fontWeight: "bold", fontSize: 18, marginTop: 2}}>
+                              Unsending Request...
+                            </Text>
+                            : friendStatus == "received" ? (
+                              <View style={{ alignItems: "flex-start" }}>
+                                <IconButton
+                                  iconName={"person-add"}
+                                  size={24}
+                                  fontSize={18}
+                                  color={"green"}
+                                  onPress={acceptFriendRequest}
+                                  label={"Accept Friend"}
+                                  style={{ marginBottom: 10 }}
+                                />
+                                <IconButton
+                                  iconName={"person-remove"}
+                                  size={24}
+                                  fontSize={18}
+                                  color={"red"}
+                                  onPress={rejectFriendRequest}
+                                  label={"Reject Friend"}
+                                />
+                              </View>
+                            )
+                              : friendStatus === "rejecting" ? (
+                                <Text style={{fontWeight: "bold", fontSize: 18, marginTop: 2}}>
+                                    Rejecting Request...
+                                  </Text>
+                              ) : friendStatus === "accepting" ? (
+                                <Text style={{fontWeight: "bold", fontSize: 18, marginTop: 2}}>
+                                    Accepting Request...
+                                  </Text>
+                              ) : friendStatus === "deleting" ? (
+                                <Text style={{fontWeight: "bold", fontSize: 18, marginTop: 2}}>
+                                    Removing Friend...
+                                  </Text>
+                              ) : friendStatus === "friends" ? (
+                                <View>
+                                  <View style={styles.viewProfileScreen}>
+                                    <Text>Friends for {friendsSince} </Text>
+                                  </View>
+                                  <IconButton
+                                    iconName={"person-remove"}
+                                    size={24}
+                                    fontSize={18}
+                                    color={"red"}
+                                    onPress={deleteFriend}
+                                    label={"Unfriend"}
+                                  />
+                                </View>
+                              )
+                                : null
+                    : null
+                  }
+                </View> : null
+            }
+          />
+        </View>
+      </View>
+      <View style={{marginHorizontal: 20}}>
+        <Text style={{fontSize: 18, color: "gray"}}>Bio    <Text style={{fontSize: 16, color: "black"}}>{loadCapitals(user.bio)}</Text></Text>
+      </View>
+      
+      <View style={{marginHorizontal: 20, marginTop: 20}}>
+        <Text style={{fontSize: 18, color: "gray"}}>Goals    <Text style={{fontSize: 16, color: "black"}}>{loadCapitals(user.goals)}</Text></Text>
+      </View>
 
-
-          <View>
-            <View style={styles.viewProfileScreen}>
-              <Text>Gender: {user.gender}</Text>
-            </View>
-            <View style={styles.viewProfileScreen}>
-              <Text>Age: {user.age}</Text>
-            </View>
-          </View>
-        </View>
-        <View style={styles.viewProfileScreen}>
-          <Text>Bio: </Text>
-        </View>
-        <Text style={styles.textBoxStyle}>{loadCapitals(user.bio)}</Text>
-        <View style={styles.viewProfileScreen}>
-          <Text>Goals: </Text>
-        </View>
-
-        <Text style={styles.textBoxStyle}>{loadCapitals(user.goals)}</Text>
-        <View>
-          {mutualfriendList.length != 0 ? (
-            <View style={styles.viewProfileScreen}>
-              <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-                Mutual Friends{" "}
-              </Text>
-            </View>
-          ) : null}
-        </View>
-        <View>
-          <SafeAreaView style={{ flex: 1 }}>
-            <APIList
-              initialAmount={10}
-              additionalAmount={20}
-              horizontal={true}
-              queryOperation={listFriendships}
-              data={mutualfriendList}
-              setDataFunction={setMutualFriendList}
-              processingFunction={collectMutualFriends}
-              renderItem={({ item }) => (
-                <ProfileImageAndName
-                  style={{ marginHorizontal: 20 }}
-                  vertical={true}
-                  userId={item}
-                />
-              )}
-              keyExtractor={(item) => item}
-            />
-          </SafeAreaView>
-        </View>
-        {getLocation() != null && user.latitude != null ? (
+      <View>
+        {mutualfriendList.length != 0 ? (
           <View style={styles.viewProfileScreen}>
-            <Text style={styles.viewProfileScreen}>
-              {computeDistance([user.latitude, user.longitude])} mi. away
+            <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+              Mutual Friends{" "}
             </Text>
           </View>
         ) : null}
-        {route.params?.myId != user.id ? (
-          <View style={styles.buttonFormat}>
-            {friendStatus == "loading" ? (
-              <ActivityIndicator
-                size="large"
-                color="#26c6a2"
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  flexDirection: "row",
-                  justifyContent: "space-around",
-                  padding: 10,
-                }}
+      </View>
+      <View>
+        <SafeAreaView style={{ flex: 1 }}>
+          <APIList
+            initialAmount={10}
+            additionalAmount={20}
+            horizontal={true}
+            queryOperation={listFriendships}
+            data={mutualfriendList}
+            setDataFunction={setMutualFriendList}
+            processingFunction={collectMutualFriends}
+            renderItem={({ item }) => (
+              <ProfileImageAndName
+                style={{ marginHorizontal: 20 }}
+                vertical={true}
+                userId={item}
               />
-            ) : friendStatus == "blocked" ? null
-              : friendStatus == "blocker" ? (
-                <TouchableOpacity
-                  onPress={unblockUser}
-                  style={styles.unblockButton}
-                >
-                  <Text style={styles.buttonTextStyle}>Unblock</Text>
-                </TouchableOpacity>) : null}
-            {
-              (!user.friendRequestPrivacy || user.friendRequestPrivacy === 0 || (mutualfriendList.length > 0 && user.friendRequestPrivacy === 1) || (friendStatus === "friends" && user.friendRequestPrivacy >= 1)) ?
-                friendStatus == "none" ? (
-                  <View>
-                    <TouchableOpacity
-                      onPress={sendFriendRequest}
-                      style={styles.submitButton}
-                    >
-                      <Text style={styles.buttonTextStyle}>Send Friend Request</Text>
-                    </TouchableOpacity>
-                  </View>
-                ) : friendStatus == "sending" ? (
-                  <Text style={[styles.buttonTextStyle, { color: "red" }]}>
-                    Sending Friend Request...
-                  </Text>
-                ) : friendStatus == "sent" ? (
-                  <TouchableOpacity
-                    onPress={unsendFriendRequest}
-                    style={styles.unsendButton}
-                  >
-                    <Text style={styles.buttonTextStyle}>
-                      Unsend Friend Request
-                    </Text>
-                  </TouchableOpacity>
-                ) : friendStatus == "unsending" ? (
-                  <Text style={[styles.buttonTextStyle, { color: "red" }]}>
-                    Unsending Friend Request...
-                  </Text>
-                ) : friendStatus == "received" ? (
-                  <View>
-                    <TouchableOpacity
-                      onPress={rejectFriendRequest}
-                      style={styles.unsendButton}
-                    >
-                      <Text style={styles.buttonTextStyle}>
-                        Reject Friend Request
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={acceptFriendRequest}
-                      style={styles.unsendButton}
-                    >
-                      <Text style={styles.buttonTextStyle}>
-                        Accept Friend Request
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={blockUser}
-                      style={styles.unblockButton}
-                    >
-                      <Text style={styles.buttonTextStyle}>Block</Text>
-                    </TouchableOpacity>
-                  </View>
-                ) : friendStatus === "rejecting" ? (
-                  <Text style={[styles.buttonTextStyle, { color: "red" }]}>
-                    Rejecting Friend Request...
-                  </Text>
-                ) : friendStatus === "accepting" ? (
-                  <Text style={[styles.buttonTextStyle, { color: "red" }]}>
-                    Accepting Friend Request...
-                  </Text>
-                ) : friendStatus === "deleting" ? (
-                  <Text style={[styles.buttonTextStyle, { color: "red" }]}>
-                    Unfriending...
-                  </Text>
-                ) : friendStatus === "friends" ? (
-                  <View>
-                    <View style={styles.viewProfileScreen}>
-                      <Text>Friends for {friendsSince} </Text>
-                    </View>
-                    <TouchableOpacity
-                      onPress={deleteFriend}
-                      style={styles.unsendButton}
-                    >
-                      <Text style={styles.buttonTextStyle}>Unfriend</Text>
-                    </TouchableOpacity>
-                  </View>
-                ) : null : null
-            }
-          </View>
-        ) : null}
-      </ScrollView>
-    </View>
+            )}
+            keyExtractor={(item) => item}
+          />
+        </SafeAreaView>
+      </View>
+      {getLocation() != null && user.latitude != null ? (
+        <View style={styles.viewProfileScreen}>
+          <Text style={styles.viewProfileScreen}>
+            {computeDistance([user.latitude, user.longitude])} mi. away
+          </Text>
+        </View>
+      ) : null}
+      {route.params?.myId != user.id ? (
+        <View style={styles.buttonFormat}>
+          {friendStatus == "loading" ? (
+            <ActivityIndicator
+              size="large"
+              color="#26c6a2"
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                flexDirection: "row",
+                justifyContent: "space-around",
+                padding: 10,
+              }}
+            />
+          ) : friendStatus == "blocked" ? null
+            : friendStatus == "blocker" ? (
+              <TouchableOpacity
+                onPress={unblockUser}
+                style={styles.unblockButton}
+              >
+                <Text style={styles.buttonTextStyle}>Unblock</Text>
+              </TouchableOpacity>) : null}
+        </View>
+      ) : null}
+    </ScrollView>
   );
 };
 

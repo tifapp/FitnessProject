@@ -10,6 +10,7 @@ import CheckBox from '@react-native-community/checkbox'; //when ios is supported
 import getLocation from 'hooks/useLocation';
 import { saveCapitals, loadCapitals } from 'hooks/stringConversion'
 import BasicInfoDetails from '../components/basicInfoComponents/BasicInfoDetails';
+import IconButton from "../components/IconButton";
 
 var styles = require('styles/stylesheet');
 
@@ -130,25 +131,41 @@ const ProfileScreen = ({ navigation, route }) => {
     } else {
         return (
             <ScrollView style={[styles.containerStyle, { backgroundColor: "#efefef" }]} >
-                <View style={{
-                    alignItems: "center", flex: 1, margin: 20,
-                }}>
+                <View style={{ margin: 20, flexDirection: "row" }}>
                     <ProfilePic imageURL={imageURL} setImageURL={setImageURL} setImageChanged={setImageChanged} />
-                    <View style={{ marginLeft: 15, flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
-                        <TextInput
-                            style={[name === '' ? styles.emptyTextInputStyle : { fontSize: 20, fontWeight: "bold", marginBottom: 15, flex: 1, alignSelf: "center" }]}
-                            placeholder={`Enter your name!`}
-                            autoCorrect={false}
-                            value={name}
-                            onChangeText={setName}
-                            onEndEditing={() => {
-                                if (!route.params?.newUser)
-                                    updateUserAsync({ name: saveCapitals(name) }) //should be doing savecapitals in the backend
-                            }}
-                        />
-                        <View style={{ flexDirection: "row", justifyContent: "center" }}>
-                            <BasicInfoDetails label='age' field={age} updateField={setAge} />
-                            <BasicInfoDetails label='gender' field={gender} updateField={setGender} />
+
+                    <View style={{ alignItems: "flex-start", justifyContent: "space-between", marginLeft: 15, flex: 1 }}>
+                        <View>
+                            <TextInput
+                                style={[name === '' ? styles.emptyTextInputStyle : { fontSize: 24, fontWeight: "bold" }]}
+                                multiline={true}
+                                placeholder={`Enter your name!`}
+                                autoCorrect={false}
+                                value={name}
+                                onChangeText={setName}
+                                onEndEditing={() => {
+                                    if (!route.params?.newUser)
+                                        updateUserAsync({ name: saveCapitals(name) }) //should be doing savecapitals in the backend
+                                }}>
+                            </TextInput>
+
+                            <BasicInfoDetails
+                                age={age}
+                                setAge={setAge}
+                                gender={gender}
+                                setGender={setGender} />
+                        </View>
+
+                        <View style={{ alignItems: "flex-start" }}>
+                            <IconButton
+                                style={{ marginBottom: 10 }}
+                                iconName={"message"}
+                                size={24}
+                                fontSize={18}
+                                color={"blue"}
+                                onPress={() => undoResponseHandler(item)}
+                                label={"Message"}
+                            />
                         </View>
                     </View>
                 </View>

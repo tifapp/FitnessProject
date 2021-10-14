@@ -2,12 +2,12 @@ import React, {useEffect} from 'react'
 import {View} from 'react-native'
 import { Picker } from '@react-native-picker/picker'
 
-const GenderPicker = ({field, selectedValue, setSelectedValue}) => {
+const GenderPicker = ({selectedValue, setSelectedValue}) => {
     return (
         <View>
             <Picker
                 selectedValue={selectedValue}
-                itemStyle={{height: 200, width: '100%'}}
+                itemStyle={{ width: 200 }}
                 onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
             >
                 <Picker.Item label = "Male" value = "Male" />

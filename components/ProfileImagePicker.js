@@ -27,9 +27,9 @@ const ProfilePic = ({imageURL, setImageURL, setImageChanged} ) => {
             >
                 <Image 
                     style = {{
-                        alignSelf: "center",
-                        width: Dimensions.get('window').width - 40,
-                        height: Dimensions.get('window').width - 40,
+                        alignSelf: "flex-start",
+                        width: Dimensions.get('window').width/2 - 30,
+                        height: Dimensions.get('window').width/2 - 30,
                     }}
                     source = {imageURL === '' ? require('../assets/icon.png') : { uri: imageURL }}
                 />
