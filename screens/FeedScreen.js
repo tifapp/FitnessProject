@@ -475,7 +475,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
           <View style={{}}>
             {headerComponent}
             {lastUser != route.params.myId && lastUser != null && receiver != null && !ButtonCheck ?
-              <View style={{flexDirection: "row", justifyContent: "center", marginVertical: 15}}>
+              <View style={{ flexDirection: "row", justifyContent: "center", marginVertical: 15 }}>
                 <IconButton
                   iconName={"check"}
                   size={22}
@@ -495,7 +495,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
                   label={"Reject"}
                   fontSize={18}
                 />
-                
+
                 <IconButton
                   iconName={"block"}
                   size={22}
@@ -651,17 +651,17 @@ function PostInputField({ channel, headerComponent, receiver, myId, originalPare
         const friend1 = await API.graphql(graphqlOperation(getFriendship, { sender: myId, receiver: receiver }));
         const friend2 = await API.graphql(graphqlOperation(getFriendship, { sender: receiver, receiver: myId }));
 
-        let newConversations1 = await API.graphql(graphqlOperation(getConversations, { Accepted: 1 }))
-        let newConversations2 = await API.graphql(graphqlOperation(getConversations, { Accepted: 0 }))
+        //let newConversations1 = await API.graphql(graphqlOperation(getConversations, { Accepted: 1 }))
+        //let newConversations2 = await API.graphql(graphqlOperation(getConversations, { Accepted: 0 }))
 
-        newConversations1 = newConversations1.data.getConversations.items
-        newConversations2 = newConversations2.data.getConversations.items
+        //newConversations1 = newConversations1.data.getConversations.items
+        //newConversations2 = newConversations2.data.getConversations.items
 
-        let checkConversationExists = newConversations1.find(item => item.id === newPost.channel);
+        //let checkConversationExists = newConversations1.find(item => item.id === newPost.channel);
 
-        if (checkConversationExists == null) {
-          checkConversationExists = newConversations2.find(item => item.id === newPost.channel);
-        }
+        //if (checkConversationExists == null) {
+        // checkConversationExists = newConversations2.find(item => item.id === newPost.channel);
+        //}
 
         const friendCheck = () => {
           return (friend1 != null ? friend1 : friend2);

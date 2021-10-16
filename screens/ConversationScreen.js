@@ -311,6 +311,7 @@ export default function ConversationScreen({ navigation, route }) {
           <FriendListItem
             navigation={navigation}
             deleteConversationFromConvo={deleteConversationFromConvo}
+            imageURL={item.imageURL}
             //removeFriendHandler={removeFriend}
             item={item}
             //friendId={item.sender === myId ? item.receiver : item.sender}
@@ -321,7 +322,6 @@ export default function ConversationScreen({ navigation, route }) {
             Accepted={item.Accepted}
           />
         )}
-        filter={{ dummy: 0, Accepted: 0 }}
         keyExtractor={(item) => item.id}
       />
     </SafeAreaView>

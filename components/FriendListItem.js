@@ -27,7 +27,8 @@ export default function FriendListItem({
   lastMessage,
   lastUser,
   Accepted,
-  sidebar
+  sidebar,
+  imageURL
 }) {
 
   const goToMessages = (id, Accepted, lastUser, sidebar) => {
@@ -152,7 +153,7 @@ export default function FriendListItem({
           textStyle={{
             fontWeight: "bold",
             fontSize: 16,
-            color: "black",
+            color: Accepted === 0 ? "blue" : "black",
             textDecorationLine: 'underline'
           }}
           userId={friendId}
@@ -193,7 +194,9 @@ export default function FriendListItem({
                       "  " :
                       "  "
                 }
-                {(lastMessage == null ? "Message" : lastMessage)}
+                {(lastMessage == null ? "Message" : imageURL[imageURL.size() - 3] == 'j'
+                  && imageURL[imageURL.size() - 2] == 'p' && imageURL[imageURL.size() - 1] == 'g'
+                  ? "Image sent" : "Video sent")}
               </Text>
             </TouchableOpacity>
           }

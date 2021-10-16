@@ -17,6 +17,7 @@ import {
 import LinkableText from "components/LinkableText";
 import printTime from "hooks/printTime";
 import PostImage from "components/PostImage";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 var styles = require('styles/stylesheet');
 
@@ -38,6 +39,7 @@ export default React.memo(function MessageItem({
     index
 }) {
     const isReceivedMessage = receiver != null && !writtenByYou;
+    const navigation = useNavigation();
 
     return (
         <View
@@ -61,25 +63,29 @@ export default React.memo(function MessageItem({
 
                     elevation: 6,
                 }}>
-                <PostImage
-                    style={{
-                        resizeMode: "cover",
-                        width: Dimensions.get('window').width / 2,
-                        height: Dimensions.get('window').width / 2,
-                        alignSelf: "center",
-                        marginBottom: 15,
-                    }}
-                    imageID={item.imageURL}
-                    isVisible={false}
-                />
+                <TouchableOpacity
+                    onPress={() => navigation.navigate("Image", { uri: item.imageURL })}
+                >
+                    <PostImage
+                        style={{
+                            resizeMode: "cover",
+                            width: Dimensions.get('window').width / 2,
+                            height: Dimensions.get('window').width / 2,
+                            alignSelf: "center",
+                            marginBottom: 15,
+                        }}
+                        imageID={item.imageURL}
+                        isVisible={false}
+                    />
+                </TouchableOpacity>
                 <LinkableText
-                style={{
-                    alignSelf: isReceivedMessage ? "flex-start" : "flex-end",
-                }}
-                textStyle={{
-                    paddingBottom: 15,
-                }}
-                urlPreview={item.urlPreview}
+                    style={{
+                        alignSelf: isReceivedMessage ? "flex-start" : "flex-end",
+                    }}
+                    textStyle={{
+                        paddingBottom: 15,
+                    }}
+                    urlPreview={item.urlPreview}
                 >
                     {item.description}
                 </LinkableText>
