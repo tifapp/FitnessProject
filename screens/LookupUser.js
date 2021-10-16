@@ -523,13 +523,48 @@ const LookupUser = ({ route, navigation }) => {
           />
         </View>
       </View>
-      <View style={{marginHorizontal: 20}}>
-        <Text style={{fontSize: 18, color: "gray"}}>Bio    <Text style={{fontSize: 16, color: "black"}}>{loadCapitals(user.bio)}</Text></Text>
-      </View>
       
-      <View style={{marginHorizontal: 20, marginTop: 20}}>
-        <Text style={{fontSize: 18, color: "gray"}}>Goals    <Text style={{fontSize: 16, color: "black"}}>{loadCapitals(user.goals)}</Text></Text>
-      </View>
+      <View style={{
+            backgroundColor: "white",
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 1,
+            },
+            shadowOpacity: 0.18,
+            shadowRadius: 1.0,
+            marginBottom: 20,
+            marginHorizontal: 20,
+
+            elevation: 1,
+            padding: 15,
+            flex: 0
+        }}>
+            <Text style={{fontSize: 18, color: "gray", marginBottom: 5}}>Biography</Text>
+
+            <Text style={{fontSize: 18, color: "black"}}>{loadCapitals(user.bio)}</Text>
+        </View>
+        
+      <View style={{
+            backgroundColor: "white",
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 1,
+            },
+            shadowOpacity: 0.18,
+            shadowRadius: 1.0,
+            marginBottom: 20,
+            marginHorizontal: 20,
+
+            elevation: 1,
+            padding: 15,
+            flex: 0
+        }}>
+            <Text style={{fontSize: 18, color: "gray", marginBottom: 5}}>Goals</Text>
+
+            <Text style={{fontSize: 18, color: "black"}}>{loadCapitals(user.goals)}</Text>
+        </View>
 
       <View>
         {mutualfriendList.length != 0 ? (

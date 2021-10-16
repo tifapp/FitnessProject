@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
+import { View, StyleSheet, TextInput, Text, TouchableOpacity } from 'react-native'
 //import { Entypo } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
@@ -16,7 +16,7 @@ const DetailedInfoDetails = ({ label, field, setField, goalsDetailMaxLength, bio
     }
 
     return (
-        <View style={{
+        <TouchableOpacity style={{
             backgroundColor: "white",
             shadowColor: "#000",
             shadowOffset: {
@@ -31,10 +31,9 @@ const DetailedInfoDetails = ({ label, field, setField, goalsDetailMaxLength, bio
             elevation: 1,
             padding: 15,
             flex: 0
-        }}>
-            <TouchableOpacity onPress={goToTextBox}>
-                <MaterialCommunityIcons style={styles.editIconStyle} name="dumbbell" size={24} color="black" />
-            </TouchableOpacity>
+        }}
+        onPress={goToTextBox}>
+            <Text style={{fontSize: 18, color: "gray", marginBottom: 5}}>{label === 'bio' ? "Biography" : "Goals"}</Text>
 
 
             <TextInput
@@ -47,7 +46,7 @@ const DetailedInfoDetails = ({ label, field, setField, goalsDetailMaxLength, bio
                 editable={false}
                 style={{fontSize: 18}}
             />
-        </View>
+        </TouchableOpacity>
     )
 }
 

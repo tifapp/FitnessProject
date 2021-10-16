@@ -155,18 +155,6 @@ const ProfileScreen = ({ navigation, route }) => {
                                 gender={gender}
                                 setGender={setGender} />
                         </View>
-
-                        <View style={{ alignItems: "flex-start" }}>
-                            <IconButton
-                                style={{ marginBottom: 10 }}
-                                iconName={"message"}
-                                size={24}
-                                fontSize={18}
-                                color={"blue"}
-                                onPress={() => undoResponseHandler(item)}
-                                label={"Message"}
-                            />
-                        </View>
                     </View>
                 </View>
                 <DetailedInfo
