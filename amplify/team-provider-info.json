@@ -27,7 +27,7 @@
         },
         "backendResources": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/backendResources-LambdaLayerVersionbd4a9476-build.zip"
+          "s3Key": "amplify-builds/backendResources-LambdaLayerVersion13053215-build.zip"
         },
         "deleteUserData": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",

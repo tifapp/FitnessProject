@@ -23,20 +23,16 @@
     "LambdaLayerVersionbd4a9476": {
       "Type": "AWS::Lambda::LayerVersion",
       "Properties": {
-        "CompatibleRuntimes": {
-          "Ref": "runtimes"
-        },
+        "CompatibleRuntimes": [
+          "nodejs14.x"
+        ],
         "Content": {
           "S3Bucket": {
             "Ref": "deploymentBucketName"
           },
-          "S3Key": {
-            "Ref": "s3Key"
-          }
+          "S3Key": "amplify-builds/backendResources-LambdaLayerVersionbd4a9476-build.zip"
         },
-        "Description": {
-          "Ref": "description"
-        },
+        "Description": "Updated layer version 2021-10-06T06:04:48.844Z",
         "LayerName": {
           "Fn::Sub": [
             "backendResources-${env}",
@@ -55,9 +51,7 @@
       "Type": "AWS::Lambda::LayerVersionPermission",
       "Properties": {
         "Action": "lambda:GetLayerVersion",
-        "LayerVersionArn": {
-          "Ref": "LambdaLayerVersionbd4a9476"
-        },
+        "LayerVersionArn": "arn:aws:lambda:us-west-2:213277979580:layer:backendResources-dev:23",
         "Principal": {
           "Ref": "AWS::AccountId"
         }

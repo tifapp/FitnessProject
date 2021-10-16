@@ -16,9 +16,9 @@ type Conversation
     ]
   )
   @key(
-    name: "getConversations",
-    fields: ["Accepted", "updatedAt"],
-    queryField: "getConversations"
+    name: "getSortedConversations",
+    fields: ["dummy","Accepted", "updatedAt"],
+    queryField: "getSortedConversations"
   ) 
   {
   createdAt: AWSDateTime!

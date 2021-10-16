@@ -177,18 +177,18 @@ export const listConversations = /* GraphQL */ `
     }
   }
 `;
-export const getConversations = /* GraphQL */ `
-  query GetConversations(
-    $Accepted: Int
-    $updatedAt: ModelStringKeyConditionInput
+export const getSortedConversations = /* GraphQL */ `
+  query GetSortedConversations(
+    $dummy: Int
+    $acceptedUpdatedAt: ModelConversationGetSortedConversationsCompositeKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelConversationFilterInput
     $limit: Int
     $nextToken: String
   ) {
-    getConversations(
-      Accepted: $Accepted
-      updatedAt: $updatedAt
+    getSortedConversations(
+      dummy: $dummy
+      acceptedUpdatedAt: $acceptedUpdatedAt
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit

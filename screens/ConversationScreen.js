@@ -11,7 +11,7 @@ import {
   SafeAreaView,
   LayoutAnimation
 } from "react-native";
-import { conversationsByLastUpdated, listConversations, getConversations } from "../src/graphql/queries";
+import { conversationsByLastUpdated, getSortedConversations, getConversations, listConversations } from "../src/graphql/queries";
 import { deleteConversation } from "root/src/graphql/mutations";
 import {
   onCreatePostForReceiver,
@@ -79,7 +79,7 @@ export default function ConversationScreen({ navigation, route }) {
     //console.log("Outside");
 
     if (newConversation === undefined) {
-      newConversation = await API.graphql(graphqlOperation(getConversations, { Accepted: 1, limit: 1 }));
+      newConversation = await API.graphql(graphqlOperation(getSortedConversations, { dummy: 0, Accepted: 1, limit: 1 }));
 
       if (newConversation != null) {
         newConversation = { id: newConversation.data.id }
@@ -233,11 +233,22 @@ export default function ConversationScreen({ navigation, route }) {
   });
 
   useEffect(() => {
-    for (let i = 0; i < conversations.length; i++) {
-      //console(route.params.myId)
-      //console(conversations[i])
-    }
-  }, [conversations])
+    (async () => {
+      try {
+        const conversation = await API.graphql(graphqlOperation(listConversations));
+        const conversation1 = await API.graphql(graphqlOperation(getSortedConversations, { dummy: 0 }));
+
+        console.log(conversation);
+        console.log("########################");
+        console.log(conversation1);
+
+        console.log("Use Effect for getSortedConversations");
+      }
+      catch (err) {
+        console.log("error: ", err);
+      }
+    })();
+  }, [])
 
   const goToMessages = (id) => {
     if (!navigation.push)
@@ -296,7 +307,7 @@ export default function ConversationScreen({ navigation, route }) {
         setDataFunction={setConversations}
         processingFunction={collectConversations}
         renderItem={({ item }) => (
-          //console.log(";;;;;;;"), console.log(item),
+          console.log(";;;;;;;"), console.log(item),
           <FriendListItem
             navigation={navigation}
             deleteConversationFromConvo={deleteConversationFromConvo}
@@ -310,6 +321,7 @@ export default function ConversationScreen({ navigation, route }) {
             Accepted={item.Accepted}
           />
         )}
+        filter={{ dummy: 0, Accepted: 0 }}
         keyExtractor={(item) => item.id}
       />
     </SafeAreaView>
