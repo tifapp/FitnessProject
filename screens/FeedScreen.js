@@ -45,7 +45,7 @@ const viewabilityConfig = {
   waitForInteraction: false,
 }
 
-export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, originalParentId, Accepted, AcceptedMessage, lastUser, sidebar, id, isFocused, autoFocus = false }
+export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, originalParentId, Accepted, lastUser, sidebar, id, isFocused, autoFocus = false }
 ) {
   const [posts, setPosts] = useState([]);
 
@@ -651,31 +651,19 @@ function PostInputField({ channel, headerComponent, receiver, myId, originalPare
         const friend1 = await API.graphql(graphqlOperation(getFriendship, { sender: myId, receiver: receiver }));
         const friend2 = await API.graphql(graphqlOperation(getFriendship, { sender: receiver, receiver: myId }));
 
-        let newConversations1 = await API.graphql(graphqlOperation(getConversations, { Accepted: 1 }))
-        let newConversations2 = await API.graphql(graphqlOperation(getConversations, { Accepted: 0 }))
+        let checkConversationExists = await API.graphql(graphqlOperation(getConversation, { id: newPost.channel }));
+        checkConversationExists = checkConversationExists.data.getConversation;
 
-        newConversations1 = newConversations1.data.getConversations.items
-        newConversations2 = newConversations2.data.getConversations.items
-
-        let checkConversationExists = newConversations1.find(item => item.id === newPost.channel);
-
-        if (checkConversationExists == null) {
-          checkConversationExists = newConversations2.find(item => item.id === newPost.channel);
-        }
-
-        const friendCheck = () => {
-          return (friend1 != null ? friend1 : friend2);
-        }
-
-        const friend = friendCheck();
+        const friend = friend1 ?? friend2;
 
         let users = [myId, receiver].sort();
 
         if (checkConversationExists == null) {
-          if (friend1.data.getFriendship === null && friend2.data.getFriendship === null) {
+          console.log("convo doesnt exist")
+          if (friend1.data.getFriendship == null && friend2.data.getFriendship == null) {
             await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postInput, Accepted: 0 } }));
           }
-          else if (friend.data.getFriendship.accepted === null) {
+          else if (friend.data.getFriendship && friend.data.getFriendship.accepted == null) {
             await API.graphql(graphqlOperation(createConversation, { input: { id: channel, users: users, lastMessage: postInput, Accepted: 0 } }));
           }
           else {
