@@ -21,7 +21,6 @@ import ReportScreen from "screens/ReportScreen";
 import SettingsScreen from "screens/SettingsScreen";
 import ConversationScreen from "screens/ConversationScreen";
 import ComplianceScreen from "screens/ComplianceScreen";
-import MessageRequestScreen from "screens/MessageRequestScreen";
 import ProfileScreen from "screens/ProfileScreen";
 import BioScreen from "screens/BioScreen";
 import GoalsScreen from "screens/GoalsScreen";
@@ -303,11 +302,6 @@ const App = () => {
           <Drawer.Screen
             name="Conversations"
             component={ConversationScreen}
-            initialParams={{ myId: userId }}
-          />
-          <Drawer.Screen
-            name="Message Requests"
-            component={MessageRequestScreen}
             initialParams={{ myId: userId }}
           />
           <Drawer.Screen

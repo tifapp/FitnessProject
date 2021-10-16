@@ -24,7 +24,6 @@ export default function MessageScreen({ navigation, route }) {
   const { Accepted, lastUser, sidebar, id } = route.params;
 
   const [blocked, setBlocked] = useState(false);
-  const [AcceptedMessage, setAcceptedMessage] = useState(0);
 
   const [isFocused, setIsFocused] = useState(false);
 
@@ -38,10 +37,6 @@ export default function MessageScreen({ navigation, route }) {
       const convo = await API.graphql(
         graphqlOperation(getConversation, { id: friendlistarray[0] + friendlistarray[1] })
       );
-
-      if (convo != null) {
-        setAcceptedMessage(convo.data.getConversation.Accepted);
-      }
     })()
 
     const onFocus = navigation.addListener('focus', () => {
@@ -156,7 +151,6 @@ export default function MessageScreen({ navigation, route }) {
             navigation={navigation}
             route={route}
             Accepted={Accepted}
-            AcceptedMessage={AcceptedMessage}
             receiver={userId}
             channel={route.params?.myId < userId ? route.params?.myId + userId : userId + route.params?.myId}
             lastUser={lastUser}

@@ -17,7 +17,7 @@ type Conversation
   )
   @key(
     name: "getSortedConversations",
-    fields: ["dummy","Accepted", "updatedAt"],
+    fields: ["dummy","Accepted","updatedAt"],
     queryField: "getSortedConversations"
   ) 
   {

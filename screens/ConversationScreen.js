@@ -11,7 +11,7 @@ import {
   SafeAreaView,
   LayoutAnimation
 } from "react-native";
-import { conversationsByLastUpdated, getSortedConversations, getConversations, listConversations } from "../src/graphql/queries";
+import { getSortedConversations, listConversations } from "../src/graphql/queries";
 import { deleteConversation } from "root/src/graphql/mutations";
 import {
   onCreatePostForReceiver,
@@ -236,7 +236,7 @@ export default function ConversationScreen({ navigation, route }) {
     (async () => {
       try {
         const conversation = await API.graphql(graphqlOperation(listConversations));
-        const conversation1 = await API.graphql(graphqlOperation(getSortedConversations, { dummy: 0 }));
+        const conversation1 = await API.graphql(graphqlOperation(getSortedConversations, { dummy: 0, Accepted: 0 }));
 
         console.log(conversation);
         console.log("########################");
