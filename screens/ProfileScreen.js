@@ -72,7 +72,7 @@ const ProfileScreen = ({ navigation, route }) => {
 
     useEffect(() => {
         if (!route.params?.newUser && !loading) {
-            updateUserAsync({ age: age, gender: gender, bio: saveCapitals(bioDetails), goals: saveCapitals(goalsDetails), latitude: locationEnabled ? getLocation().latitude : null, longitude: locationEnabled ? getLocation().longitude : null }, imageChanged ? imageURL : null) //add a debounce on the textinput, or just when the keyboard is dismissed
+            updateUserAsync({ age: age, gender: gender, bio: saveCapitals(bioDetails), goals: saveCapitals(goalsDetails), latitude: locationEnabled ? getLocation().latitude : null, longitude: locationEnabled ? getLocation().longitude : null }, imageChanged ? imageURL : null, imageURL) //add a debounce on the textinput, or just when the keyboard is dismissed
             setImageChanged(false)
         }
     }, [age, gender, bioDetails, goalsDetails, locationEnabled, imageChanged])
@@ -83,7 +83,7 @@ const ProfileScreen = ({ navigation, route }) => {
         }
         else {
             Alert.alert('Submitting Profile...', '', [], { cancelable: false })
-            updateUserAsync({ name: name, age: age, gender: gender, bio: saveCapitals(bioDetails), goals: saveCapitals(goalsDetails), latitude: locationEnabled ? getLocation().latitude : null, longitude: locationEnabled ? getLocation().longitude : null }, imageChanged ? imageURL : null, true) //add a debounce on the textinput, or just when the keyboard is dismissed
+            updateUserAsync({ name: name, age: age, gender: gender, bio: saveCapitals(bioDetails), goals: saveCapitals(goalsDetails), latitude: locationEnabled ? getLocation().latitude : null, longitude: locationEnabled ? getLocation().longitude : null }, imageChanged ? imageURL : null, null, true) //add a debounce on the textinput, or just when the keyboard is dismissed
                 .then(([user, id]) => {
                     route.params?.setUserIdFunction(id);
                     Alert.alert("Profile submitted successfully!");
