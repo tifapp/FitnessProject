@@ -6,7 +6,7 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
-export default function IconButton({ onPress, iconName, style, color, label, size, margin, isLabelFirst, fontSize }) {
+export default function IconButton({ onPress, iconName, style, color, label, size, margin, isLabelFirst, fontSize, fontWeight }) {
   return (
     <TouchableOpacity
       style={[
@@ -22,7 +22,7 @@ export default function IconButton({ onPress, iconName, style, color, label, siz
         label ?
           <Text
             style={[
-              { fontWeight: "bold", color: color, fontSize: fontSize ?? 14 },
+              { fontWeight: fontWeight ?? "bold", color: color, fontSize: fontSize ?? 14 },
               isLabelFirst ? {marginRight: margin ?? 5} : {marginLeft: margin ?? 5},
             ]}
           >

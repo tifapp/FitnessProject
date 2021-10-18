@@ -431,12 +431,13 @@ const LookupUser = ({ route, navigation }) => {
                     <IconButton
                       style={{ marginBottom: 10 }}
                       iconName={"message"}
-                      size={24}
+                      size={20}
                       fontSize={18}
                       color={"blue"}
                       onPress={() => {
                         navigation.navigate(userId);
                       }}
+                      fontWeight={"normal"}
                       label={"Message"}
                     />
                     : null}
@@ -444,7 +445,8 @@ const LookupUser = ({ route, navigation }) => {
                     friendStatus === "none" ?
                       <IconButton
                         iconName={"person-add"}
-                        size={24}
+                        size={20}
+                        fontWeight={"normal"}
                         fontSize={18}
                         color={"blue"}
                         onPress={sendFriendRequest}
@@ -457,7 +459,8 @@ const LookupUser = ({ route, navigation }) => {
                         : friendStatus === "sent" ?
                         <IconButton
                           iconName={"person-remove"}
-                          size={24}
+                          size={20}
+                          fontWeight={"normal"}
                           fontSize={18}
                           color={"red"}
                           onPress={unsendFriendRequest}
@@ -471,7 +474,8 @@ const LookupUser = ({ route, navigation }) => {
                               <View style={{ alignItems: "flex-start" }}>
                                 <IconButton
                                   iconName={"person-add"}
-                                  size={24}
+                                  size={20}
+                                  fontWeight={"normal"}
                                   fontSize={18}
                                   color={"green"}
                                   onPress={acceptFriendRequest}
@@ -480,7 +484,8 @@ const LookupUser = ({ route, navigation }) => {
                                 />
                                 <IconButton
                                   iconName={"person-remove"}
-                                  size={24}
+                                  size={20}
+                                  fontWeight={"normal"}
                                   fontSize={18}
                                   color={"red"}
                                   onPress={rejectFriendRequest}
@@ -507,7 +512,8 @@ const LookupUser = ({ route, navigation }) => {
                                   </View>
                                   <IconButton
                                     iconName={"person-remove"}
-                                    size={24}
+                                    size={20}
+                                    fontWeight={"normal"}
                                     fontSize={18}
                                     color={"red"}
                                     onPress={deleteFriend}
