@@ -11,9 +11,9 @@ import {
   } from "react-native";
 
 const GoalsScreen = ({route}) => {
-    const {field, goals} = route.params;
+    const {field} = route.params;
     const [text, setText] = useState(field)
-    const totalCharsRemaining = goals - text.length;
+    const totalCharsRemaining = 1000 - text.length;
 
     return (
         <View>

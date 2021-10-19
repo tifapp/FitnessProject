@@ -48,7 +48,6 @@ export const ProfileImageAndName = React.memo(function (props) {
           name: loadCapitals(user.name),
           imageURL: "",
           isFull: props.isFull,
-          changed: false,
         };
         Cache.setItem(props.userId, info, {
           expires: Date.now() + 86400000,

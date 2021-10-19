@@ -11,9 +11,9 @@ import {
   } from "react-native";
 
 const BioScreen = ({route}) => {
-    const {field, bio} = route.params;
+    const {field} = route.params;
     const [text, setText] = useState(field)
-    const totalCharsRemaining = bio-text.length;
+    const totalCharsRemaining = 1000-text.length;
     
     return (
         <View>
