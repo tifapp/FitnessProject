@@ -29,18 +29,21 @@ export default async function fetchProfileImageAsync(identityId) {
   //if it's there, compare the lastmodified date with the newest lastmodified date
   //if it's not there or if it was recently modified according to storage.list, storage.get it and return the link
 
+  const lastModified = await getLastModifiedAsync(identityId);
+  const imageURL = await getLatestProfileImageAsync(identityId);
+  
   try {
     const cachedInfo = await Cache.getItem(identityId, { callback: async () => {
-      const lastModified = await getLastModifiedAsync(identityId);
-      const imageURL = await getLatestProfileImageAsync(identityId);
+      //const lastModified = await getLastModifiedAsync(identityId);
+      //const imageURL = await getLatestProfileImageAsync(identityId);
       Cache.setItem(identityId, {lastModified: lastModified, imageURL: imageURL});
     } });
   
     if (cachedInfo != null) { //will have to check if this gets called after the above callback, aka if setuserinfo is called twice.
       //fetch lastmodified date
-      const lastModified = await getLastModifiedAsync(identityId);
+      //const lastModified = await getLastModifiedAsync(identityId);
       if (lastModified && lastModified > cachedInfo.lastModified) {
-        const imageURL = await getLatestProfileImageAsync(identityId);
+        //const imageURL = await getLatestProfileImageAsync(identityId);
         Cache.setItem(identityId, {lastModified: lastModified, imageURL: imageURL});
         return imageURL;
       } else {
@@ -48,7 +51,7 @@ export default async function fetchProfileImageAsync(identityId) {
       }
     }
   } catch (e) {
-    const imageURL = await getLatestProfileImageAsync(identityId);
+    //const imageURL = await getLatestProfileImageAsync(identityId);
     return imageURL; //dunno how else we can return from callback so we may need to do this twice or pass another param
   }
 }
