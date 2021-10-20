@@ -27,8 +27,9 @@ export const ProfileImageAndName = React.memo(function (props) {
           const {name, identityId} = await fetchUserAsync(props.userId);
           const profileimageurl = await fetchProfileImageAsync(identityId);
           global.savedUsers[props.userId] = {name: name, imageURL: profileimageurl}
+          //console.log("saved profileimageandname to local cache, should update")
           //will this trigger the second use effect or will we have to do this again?
-          //setUserInfo(global.savedUsers[props.userId]);
+          setUserInfo(global.savedUsers[props.userId]);
         } catch (e) {
           console.log("couldn't get the user's info of ", props.userId ," :(")
         }
@@ -42,13 +43,14 @@ export const ProfileImageAndName = React.memo(function (props) {
       Image.getSize(
         global.savedUsers[props.userId].imageURL,
         () => {
-          console.log("adding photo to cache")
+          //console.log("adding photo to cache")
         },
         (err) => {
-          console.log("photo didnt work ", err)
+          //console.log("photo didnt work ", err)
         }
       );
     }
+    //console.log("updating profileimageandname")
     setUserInfo(global.savedUsers[props.userId]);
   }, [global.savedUsers[props.userId]])
 
