@@ -474,7 +474,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
           <View style={{}}>
             {headerComponent}
             {lastUser != route.params.myId && lastUser != null && receiver != null && !ButtonCheck ?
-              <View style={{flexDirection: "row", justifyContent: "center", marginVertical: 15}}>
+              <View style={{ flexDirection: "row", justifyContent: "center", marginVertical: 15 }}>
                 <IconButton
                   iconName={"check"}
                   size={22}
@@ -494,7 +494,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
                   label={"Reject"}
                   fontSize={18}
                 />
-                
+
                 <IconButton
                   iconName={"block"}
                   size={22}

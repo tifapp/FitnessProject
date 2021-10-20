@@ -43,7 +43,7 @@ export default function MessageScreen({ navigation, route }) {
       //console.log("got to settings", global.localBlockList);
       setIsFocused(true);
     });
-    
+
     const onBlur = navigation.addListener('blur', () => {
       //console.log("got to settings", global.localBlockList);
       setIsFocused(false);
@@ -140,6 +140,7 @@ export default function MessageScreen({ navigation, route }) {
                 imageStyle={[styles.imageStyle, { marginVertical: 15 }]}
                 imageLayoutStyle={{ margin: 0 }}
                 userId={userId}
+                navigateToProfile={false}
                 isFull={true}
                 hidename={true}
                 callback={(info) => {

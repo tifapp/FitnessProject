@@ -43,8 +43,9 @@ import * as Notifications from 'expo-notifications';
 import { StatusBar } from "expo-status-bar";
 import MessageScreen from "./screens/MessageScreen";
 import LookupUserScreen from "screens/LookupUser";
-import {headerOptions} from "components/headerComponents/headerOptions"
+import { headerOptions } from "components/headerComponents/headerOptions"
 import { Audio } from 'expo-av';
+import ImageScreen from "./screens/ImageScreen";
 
 if (
   Platform.OS === "android" &&
@@ -98,29 +99,29 @@ const App = () => {
   const [isAdmin, setIsAdmin] = useState(false); //seems insecure
 
   const [conversationIds, setConversationIds] = useState([]);
-  
+
   global.addConversationIds = (id) => {
     //console("(((((((((((((((((((((((((((((((((");
     //console(id);
-    
+
     const found = conversationIds.find(element => element == id);
-    
+
     //console(conversationIds);
     //console("(((((((((((((((((((((((((((((((((");
     //console(found);
-    
 
-    if(found == undefined){
+
+    if (found == undefined) {
       //console("inside");
-      
-      let tempConversationsIds =  conversationIds;
+
+      let tempConversationsIds = conversationIds;
       tempConversationsIds.unshift(id);
       setConversationIds([...tempConversationsIds]);
     }
-    
+
 
   };
-  
+
 
   const checkIfUserSignedUp = async () => {
     try {
@@ -147,7 +148,7 @@ const App = () => {
     await Audio.requestPermissionsAsync();
     await Audio.setAudioModeAsync({
       playsInSilentModeIOS: true,
-    }); 
+    });
 
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
@@ -193,7 +194,7 @@ const App = () => {
     if (
       nextAppState.match(/inactive|background/) &&
       appState.current === "active"
-    ) {      
+    ) {
       Cache.setItem("lastOnline", Date.now(), { priority: 1 });
     }
 
@@ -217,17 +218,17 @@ const App = () => {
 
   if (userId == 'checking...') {
     return (
-      <View style={{flex: 1, backgroundColor: "#a9efe0"}}>
-      <ActivityIndicator 
-      size="large" 
-      color="#000000"
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        flexDirection: "row",
-        justifyContent: "space-around",
-        padding: 10,
-      }} />
+      <View style={{ flex: 1, backgroundColor: "#a9efe0" }}>
+        <ActivityIndicator
+          size="large"
+          color="#000000"
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            flexDirection: "row",
+            justifyContent: "space-around",
+            padding: 10,
+          }} />
       </View>
     )
   } else if (userId == '') {
@@ -271,7 +272,7 @@ const App = () => {
         <StatusBar style="dark" />
         <Drawer.Navigator
           drawerPosition={"right"}
-          drawerStyle={{width: dimensions.width}}
+          drawerStyle={{ width: dimensions.width }}
           drawerContentOptions={{
             itemStyle: { marginVertical: 5 },
           }}
@@ -290,13 +291,13 @@ const App = () => {
             name="Feed"
             component={MainStack}
             initialParams={{ myId: userId, fromLookup: false }}
-            options={{headerShown: false}}
+            options={{ headerShown: false }}
           />
           <Drawer.Screen
             name="Profile"
             component={ProfileStack}
             initialParams={{ myId: userId }}
-            options={{headerShown: false}}
+            options={{ headerShown: false }}
           />
           <Drawer.Screen
             name="Conversations"
@@ -306,6 +307,11 @@ const App = () => {
           <Drawer.Screen
             name="Settings"
             component={SettingsScreen}
+            initialParams={{ myId: userId }}
+          />
+          <Drawer.Screen
+            name="Image"
+            component={ImageScreen}
             initialParams={{ myId: userId }}
           />
           {conversationIds.map((conversationId) => (
@@ -331,12 +337,12 @@ function TabBarIcon({ name, color }) {
 }
 
 export default withAuthenticator(App, false, [ //this is why we cant have splash screen
-  <Greetings/>,
-  <SignIn/>,
-  <SignUp/>,
-  <ConfirmSignIn/>,
-  <ConfirmSignUp/>,
-  <VerifyContact/>,
-  <ForgotPassword/>,
-  <RequireNewPassword/>,
+  <Greetings />,
+  <SignIn />,
+  <SignUp />,
+  <ConfirmSignIn />,
+  <ConfirmSignUp />,
+  <VerifyContact />,
+  <ForgotPassword />,
+  <RequireNewPassword />,
 ]);
