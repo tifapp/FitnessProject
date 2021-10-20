@@ -8,117 +8,47 @@ import {
   ActivityIndicator,
   Text,
 } from "react-native";
-import { Cache, Storage } from "aws-amplify";
-import { API, graphqlOperation } from "aws-amplify";
-import { getUser } from "../src/graphql/queries";
 import { useNavigation } from "@react-navigation/native";
-import { loadCapitals } from 'hooks/stringConversion'
+import fetchUserAsync from 'hooks/fetchName';
+import fetchProfileImageAsync from 'hooks/fetchProfileImage';
 
 var styles = require("../styles/stylesheet");
 
-//currently the predicted behavior is that it will cache images but the links will be invalid after 1 day. let's see.
+global.savedUsers = {};
+//objects will look like {name: [name], imageURL: [imageURL]}
 
-export const ProfileImageAndName = React.memo(function (props) {
-  //user is required in props. it's a type of object described in userschema.graphql
+export const ProfileImageAndName = React.memo(function (props) {  
+  const [userInfo, setUserInfo] = useState(); //an object containing the name and imageurl
+
+  useEffect(() => {
+    if (!global.savedUsers[props.userId]) {
+      (async() => {
+        try {
+          const {name, identityId} = await fetchUserAsync(props.userId);
+          const profileimageurl = await fetchProfileImageAsync(identityId);
+          global.savedUsers[props.userId] = {name: name, imageURL: profileimageurl}
+          //will this trigger the second use effect or will we have to do this again?
+          //setUserInfo(global.savedUsers[props.userId]);
+        } catch (e) {
+          console.log("couldn't get the user's info of ", props.userId ," :(")
+        }
+      })();
+    }
+  }, []);
+
+  useEffect(() => {
+    //this will also run when the component is first mounted, remember
+    setUserInfo(global.savedUsers[props.userId]);
+  }, [global.savedUsers[props.userId]])
+
   const navigation = props.navigationObject ?? useNavigation();
 
   const goToProfile = () => {
-    if (props.navigateToProfile == false) {
-      if (props.you)
-        navigation.navigate("Profile", {
-          screen: "Profile",
-          params: { fromLookup: true },
-        });
-      else navigation.navigate("Image", { uri: userInfo.imageURL });
-    } else {
-      if (!navigation.push)
-        navigation.navigate("Lookup", { userId: props.userId });
-      else navigation.push("Lookup", { userId: props.userId });
-    }
+    if (navigation.push)
+      navigation.push("Lookup", { userId: props.userId });
+    else
+      navigation.navigate("Lookup", { userId: props.userId });
   };
-
-  const [userInfo, setUserInfo] = useState(props.info);
-
-  const addUserInfotoCache = () => {
-    //console.log('cache missed!', props.userId); //this isn't printing for some reason
-    API.graphql(graphqlOperation(getUser, { id: props.userId })).then((u) => {
-      const user = u.data.getUser;
-      if (user != null) {
-        const info = {
-          name: loadCapitals(user.name),
-          imageURL: "",
-          isFull: props.isFull,
-        };
-        Cache.setItem(props.userId, info, {
-          expires: Date.now() + 86400000,
-        });
-        setUserInfo(info);
-        console.log("adding name to cache")
-        if (props.callback) props.callback(info);
-        let imageKey = `thumbnails/${user.identityId}/thumbnail-profileimage.jpg`;
-        let imageConfig = {
-          expires: 86400,
-        };
-        if (props.isFull) {
-          imageKey = "profileimage.jpg";
-          imageConfig.identityId = user.identityId;
-          imageConfig.level = "protected";
-        }
-        //console.log("showing full image");
-        Storage.get(imageKey, imageConfig) //this will incur lots of repeated calls to the backend, idk how else to fix it right now
-          .then((imageURL) => {
-            Image.getSize(
-              imageURL,
-              () => {
-                //if (mounted) {
-                info.imageURL = imageURL;
-                Cache.setItem(props.userId, info);
-                setUserInfo(info);
-                console.log("adding photo to cache")
-                //}
-              },
-              (err) => {
-                //console.log("couldn't find user's profile image");
-                Cache.setItem(props.userId, info);
-                setUserInfo(info);
-                console.log("adding photo to cache")
-              }
-            );
-          })
-          .catch((err) => {
-            console.log("could not find image!", err);
-          }); //should just use a "profilepic" component
-      }
-    });
-    return null;
-  };
-
-  useEffect(() => {
-    if (userInfo == null) {
-      //we didn't preload
-      console.log("didnt preload")
-      Cache.getItem(props.userId, { callback: addUserInfotoCache }) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
-        .then((info) => { //will have to check if this gets called after the above callback, aka if setuserinfo is called twice.
-          //console.log("info is ", info)
-          if (info != null) {
-            if (
-              props.isFull &&
-              !info.isFull &&
-              info.imageURL !== ""
-            ) {
-              addUserInfotoCache();
-            } else {
-              if (props.callback) props.callback(info);
-              setUserInfo(info);
-            }
-          }
-        });
-    } else if (userInfo.error) {
-      //we tried to preload and the data was not in the cache
-      console.log("data was not found in the cache")
-      addUserInfotoCache(); //will fetch the profile image (either thumbnail or fullsize based on the props) and the user's name
-    }
-  }, []);
 
   if (props.hideall) {
     return null;
@@ -133,11 +63,10 @@ export const ProfileImageAndName = React.memo(function (props) {
           },
           props.style,
         ]}
-        onPress={props.onPress ?? goToProfile}
+        onPress={props.onPress ? () => {props.onPress(userInfo.imageURL)} : goToProfile}
       >
         <Image
-          onError={addUserInfotoCache}
-          style={[{
+          style={[{ // onError={addUserInfotoCache}
             resizeMode: "cover",
             width: props.imageSize ?? 45,
             height: props.imageSize ?? 45,
@@ -161,8 +90,8 @@ export const ProfileImageAndName = React.memo(function (props) {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                justifyContent: "center",
-                alignItems: "center",
+                width: "100%",
+                height: "100%"
               }}
             >
               <ActivityIndicator color="#26c6a2" />
@@ -172,7 +101,7 @@ export const ProfileImageAndName = React.memo(function (props) {
         {props.hidename ? null : (
           <View style={[{ justifyContent: "space-between" }, props.vertical ? {alignItems: "center"} : {},  props.textLayoutStyle]}>
             <Text
-              onPress={props.onPress ?? goToProfile}
+              onPress={props.onPress ? () => {props.onPress(userInfo.imageURL)} : goToProfile}
               style={[props.textStyle, { flexWrap: "wrap", }]}
             >
               {userInfo != null && userInfo.name
