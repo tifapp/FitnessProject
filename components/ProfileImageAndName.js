@@ -38,6 +38,17 @@ export const ProfileImageAndName = React.memo(function (props) {
 
   useEffect(() => {
     //this will also run when the component is first mounted, remember
+    if (global.savedUsers[props.userId]) {
+      Image.getSize(
+        global.savedUsers[props.userId].imageURL,
+        () => {
+          console.log("adding photo to cache")
+        },
+        (err) => {
+          console.log("photo didnt work ", err)
+        }
+      );
+    }
     setUserInfo(global.savedUsers[props.userId]);
   }, [global.savedUsers[props.userId]])
 
