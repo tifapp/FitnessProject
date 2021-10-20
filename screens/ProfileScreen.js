@@ -42,7 +42,7 @@ const ProfileScreen = ({ navigation, route }) => {
                 console.log("user doesn't exist, they must be making their profile for the first time");
             } else {
                 Cache.setItem(fields.identityId, {lastModified: "3000", imageURL: imageURL});
-                global.savedUsers[route.params?.myId] = {name: fields.name, imageURL: imageURL};
+                global.savedUsers[route.params?.myId] = {name: loadCapitals(fields.name), imageURL: imageURL};
                 
                 setIdentityId(fields.identityId);
                 setName(loadCapitals(fields.name));
