@@ -104,8 +104,8 @@ export default function FriendRequestListItem({
                 position: "absolute",
                 top: 0,
                 left: 0,
-                height: 50,
-                width: 50,
+                height: "100%",
+                width: "100%",
               }}
             >
               <MaterialIcons
