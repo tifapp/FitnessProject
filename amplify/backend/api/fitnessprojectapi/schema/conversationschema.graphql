@@ -16,9 +16,29 @@ type Conversation
     ]
   )
   @key(
-    name: "getSortedConversations",
+    name: "ByAcceptedAndDate",
     fields: ["dummy","Accepted","updatedAt"],
-    queryField: "getSortedConversations"
+    queryField: "conversationsByAcceptedAndDate"
+  ) 
+  @key(
+    name: "ByDateAndAccepted",
+    fields: ["dummy","updatedAt","Accepted"],
+    queryField: "conversationsByDateAndAccepted"
+  ) 
+  @key(
+    name: "ByAcceptedThenDate",
+    fields: ["Accepted","updatedAt"],
+    queryField: "conversationsByAcceptedThenDate"
+  ) 
+  @key(
+    name: "ByAccepted",
+    fields: ["dummy","Accepted"],
+    queryField: "conversationsByAccepted"
+  ) 
+  @key(
+    name: "ByDate",
+    fields: ["dummy","updatedAt"],
+    queryField: "conversationsByDate"
   ) 
   {
   createdAt: AWSDateTime!
