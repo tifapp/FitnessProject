@@ -194,9 +194,9 @@ export default function FriendListItem({
                       "  " :
                       "  "
                 }
-                {(lastMessage == null ? "Message" : imageURL[imageURL.size() - 3] == 'j'
+                {/*(lastMessage == null ? "Message" : imageURL[imageURL.size() - 3] == 'j'
                   && imageURL[imageURL.size() - 2] == 'p' && imageURL[imageURL.size() - 1] == 'g'
-                  ? "Image sent" : "Video sent")}
+              ? "Image sent" : "Video sent")*/}
               </Text>
             </TouchableOpacity>
           }
