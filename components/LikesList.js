@@ -6,7 +6,7 @@ import {
   LayoutAnimation,
 } from "react-native";
 // Get the aws resources configuration parameters
-import { API, graphqlOperation, Cache } from "aws-amplify";
+import { API, graphqlOperation } from "aws-amplify";
 import { batchGetLikes, likesByPost } from "root/src/graphql/queries";
 import { onCreateLikeForPost, onDeleteLikeForPost, } from 'root/src/graphql/subscriptions';
 import { ProfileImageAndName } from "components/ProfileImageAndName";

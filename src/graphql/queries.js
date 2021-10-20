@@ -177,18 +177,142 @@ export const listConversations = /* GraphQL */ `
     }
   }
 `;
-export const getSortedConversations = /* GraphQL */ `
-  query GetSortedConversations(
+export const conversationsByAcceptedAndDate = /* GraphQL */ `
+  query ConversationsByAcceptedAndDate(
     $dummy: Int
-    $acceptedUpdatedAt: ModelConversationGetSortedConversationsCompositeKeyConditionInput
+    $acceptedUpdatedAt: ModelConversationByAcceptedAndDateCompositeKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelConversationFilterInput
     $limit: Int
     $nextToken: String
   ) {
-    getSortedConversations(
+    conversationsByAcceptedAndDate(
       dummy: $dummy
       acceptedUpdatedAt: $acceptedUpdatedAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        createdAt
+        updatedAt
+        id
+        users
+        lastUser
+        lastMessage
+        dummy
+        Accepted
+      }
+      nextToken
+    }
+  }
+`;
+export const conversationsByDateAndAccepted = /* GraphQL */ `
+  query ConversationsByDateAndAccepted(
+    $dummy: Int
+    $updatedAtAccepted: ModelConversationByDateAndAcceptedCompositeKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelConversationFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    conversationsByDateAndAccepted(
+      dummy: $dummy
+      updatedAtAccepted: $updatedAtAccepted
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        createdAt
+        updatedAt
+        id
+        users
+        lastUser
+        lastMessage
+        dummy
+        Accepted
+      }
+      nextToken
+    }
+  }
+`;
+export const conversationsByAcceptedThenDate = /* GraphQL */ `
+  query ConversationsByAcceptedThenDate(
+    $Accepted: Int
+    $updatedAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelConversationFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    conversationsByAcceptedThenDate(
+      Accepted: $Accepted
+      updatedAt: $updatedAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        createdAt
+        updatedAt
+        id
+        users
+        lastUser
+        lastMessage
+        dummy
+        Accepted
+      }
+      nextToken
+    }
+  }
+`;
+export const conversationsByAccepted = /* GraphQL */ `
+  query ConversationsByAccepted(
+    $dummy: Int
+    $Accepted: ModelIntKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelConversationFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    conversationsByAccepted(
+      dummy: $dummy
+      Accepted: $Accepted
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        createdAt
+        updatedAt
+        id
+        users
+        lastUser
+        lastMessage
+        dummy
+        Accepted
+      }
+      nextToken
+    }
+  }
+`;
+export const conversationsByDate = /* GraphQL */ `
+  query ConversationsByDate(
+    $dummy: Int
+    $updatedAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelConversationFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    conversationsByDate(
+      dummy: $dummy
+      updatedAt: $updatedAt
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit

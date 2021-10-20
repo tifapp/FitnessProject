@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
-  Image,
+  Image, ImageBackground,
 } from "react-native";
 import { Storage } from "aws-amplify";
 import { Video, AVPlaybackStatus } from 'expo-av';
@@ -43,8 +43,7 @@ export default function PostImage({style, imageID, isVisible}) {
   if (imageID) {
     return (
       (re.exec(imageID)[1] === 'jpg') ?
-        <Image
-          //onError={addUserInfotoCache}
+        <ImageBackground
           style={style}
           source={
             (imageURL == null || imageURL === "") ?
@@ -52,7 +51,6 @@ export default function PostImage({style, imageID, isVisible}) {
               : { uri: imageURL }
           }
         /> : <Video
-          //onError={addUserInfotoCache}
           ref={video}
           style={style}
           source={{ uri: imageURL }}
