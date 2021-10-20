@@ -44,7 +44,9 @@ export const ProfileImageAndName = React.memo(function (props) {
   const navigation = props.navigationObject ?? useNavigation();
 
   const goToProfile = () => {
-    if (navigation.push)
+    if (props.you)
+      navigation.navigate("Profile");
+    else if (navigation.push)
       navigation.push("Lookup", { userId: props.userId });
     else
       navigation.navigate("Lookup", { userId: props.userId });

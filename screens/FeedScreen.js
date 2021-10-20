@@ -65,7 +65,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
           headerLeft: () =>
             <ProfileImageAndName
               you={true}
-              navigateToProfile={false}
               userId={route.params?.myId}
               isFull={true}
               fullname={true}

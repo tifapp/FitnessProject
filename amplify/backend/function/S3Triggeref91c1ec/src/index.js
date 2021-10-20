@@ -19,7 +19,7 @@ exports.handler = (event, context, callback) => {
   /* Stores the main file name in a variable */
   let FILE = PARTS[PARTS.length - 1]
 
-  console.log("attempting to get the image with this key: ", KEY, "in this bucket: ", BUCKET);
+  //console.log("attempting to get the image with this key: ", KEY, "in this bucket: ", BUCKET);
 
   s3.getObject({ Bucket: BUCKET, Key: KEY }).promise()
     .then(image => {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ActivityIndicator, View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert, Image, Linking, Platform, TextInput } from 'react-native';
 import ProfilePic from 'components/ProfileImagePicker'
 import DetailedInfo from 'components/detailedInfoComponents/DetailedInfo';
-import { Auth, API, graphqlOperation } from "aws-amplify";
+import { Auth, API, graphqlOperation, Cache, Storage } from "aws-amplify";
 import { Ionicons } from "@expo/vector-icons";
 import CheckBox from '@react-native-community/checkbox'; //when ios is supported, we'll use this
 import getLocation from 'hooks/useLocation';
@@ -11,6 +11,7 @@ import { getUser } from '../src/graphql/queries'
 import { saveCapitals, loadCapitals } from 'hooks/stringConversion'
 import BasicInfoDetails from '../components/basicInfoComponents/BasicInfoDetails';
 import fetchProfileImageAsync from 'hooks/fetchProfileImage';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 var styles = require('styles/stylesheet');
 
@@ -32,14 +33,13 @@ const ProfileScreen = ({ navigation, route }) => {
             const user = await API.graphql(graphqlOperation(getUser, { id: route.params?.myId }));
             const fields = user.data.getUser;
             const imageURL = await fetchProfileImageAsync(fields.identityId);
+
+            console.log(fields);
     
             if (fields == null) {
                 console.log("user doesn't exist, they must be making their profile for the first time");
             } else {
-                Cache.setItem(query.attributes.sub, { name: loadCapitals(fields.name), imageURL: imageURL, isFull: true }, { priority: 1 });
-                fields.name = loadCapitals(fields.name)
-                fields.bio = loadCapitals(fields.bio)
-                fields.goals = loadCapitals(fields.goals)
+                Cache.setItem(route.params?.myId, { name: loadCapitals(fields.name), imageURL: imageURL, isFull: true }, { priority: 1 });
                 
                 setName(loadCapitals(fields.name));
                 setAge(fields.age);
@@ -60,8 +60,7 @@ const ProfileScreen = ({ navigation, route }) => {
     }, [age, gender, bioDetails, goalsDetails, locationEnabled])
 
     const deleteUserAsync = async () => {
-        const query = await Auth.currentUserInfo();
-        await API.graphql(graphqlOperation(deleteUser, { input: { id: query.attributes.sub } }));
+        await API.graphql(graphqlOperation(deleteUser, { input: { id: route.params?.myId} }));
 
         await Storage.remove('profileimage.jpg', { level: 'protected' })
             .then(result => console.log("removed profile image!", result))
@@ -83,20 +82,18 @@ const ProfileScreen = ({ navigation, route }) => {
             await Storage.put('profileimage.jpg', blob, { level: 'protected', contentType: 'image/jpeg' });
 
             console.log("changing cached profile pic");
-            Cache.setItem(userId, { name: name, imageURL: imageURL, isFull: true }, { priority: 1 });
+            Cache.setItem(route.params?.myId, { name: name, imageURL: imageURL, isFull: true }, { priority: 1 });
         } else {
             Storage.remove('profileimage.jpg', { level: 'protected' })
                 .then(result => console.log("removed profile image!", result))
                 .catch(err => console.log(err));
-            Cache.setItem(userId, { name: name, imageURL: '' }, { priority: 1 });
+            Cache.setItem(route.params?.myId, { name: name, imageURL: '' }, { priority: 1 });
         }
     }
 
     const updateUserAsync = async (profileInfo, isNewUser) => {
         //if user doesn't exist, make one
         try {
-            const query = await Auth.currentUserInfo();
-
             if (isNewUser) {
                 const { identityId } = await Auth.currentCredentials();
                 profileInfo.identityId = identityId;
@@ -110,7 +107,7 @@ const ProfileScreen = ({ navigation, route }) => {
                 //console.log("error when updating user: ", err);
             }
 
-            return [profileInfo, query.attributes.sub];
+            return [profileInfo, route.params?.myId];
         }
         catch (err) {
             console.log("error: ", err);
@@ -120,8 +117,7 @@ const ProfileScreen = ({ navigation, route }) => {
     const updateUserLocationAsync = async (location) => {
         //if user doesn't exist, make one
         try {
-            const query = await Auth.currentUserInfo();
-            const user = await API.graphql(graphqlOperation(getUser, { id: query.attributes.sub }));
+            const user = await API.graphql(graphqlOperation(getUser, { id: route.params?.myId }));
             const fields = user.data.getUser;
             console.log('returning users fields looks like', fields);
 
@@ -189,7 +185,7 @@ const ProfileScreen = ({ navigation, route }) => {
         }
     }
 
-    useEffect(() => { saveProfilePicture(), setImageChanged(false) }, [imageChanged])
+    useEffect(() => { if (!loading) {saveProfilePicture(), setImageChanged(false)} }, [imageChanged])
     useEffect(() => { updateDetailedInfo() }, [route.params?.updatedField])
 
     if (loading) {
@@ -223,7 +219,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                 onEndEditing={() => {
                                     if (!route.params?.newUser) {
                                         updateUserAsync({ name: saveCapitals(name) }) //should be doing savecapitals in the backend
-                                        Cache.setItem(userId, { name: name, imageURL: imageURL, isFull: true }, { priority: 1 });
+                                        Cache.setItem(route.params?.myId, { name: name, imageURL: imageURL, isFull: true }, { priority: 1 });
                                     }
                                 }}>
                             </TextInput>
