@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert, Image, Linking } from 'react-native';
+import { ActivityIndicator, View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert, Image, Linking, Platform, TextInput } from 'react-native';
 import ProfilePic from 'components/ProfileImagePicker'
 import DetailedInfo from 'components/detailedInfoComponents/DetailedInfo';
-import { Auth } from "aws-amplify";
-import { Platform, TextInput } from 'react-native';
+import { Auth, API, graphqlOperation } from "aws-amplify";
 import { Ionicons } from "@expo/vector-icons";
 import CheckBox from '@react-native-community/checkbox'; //when ios is supported, we'll use this
 import getLocation from 'hooks/useLocation';
 import { createUser, updateUser, deleteUser } from '../src/graphql/mutations'
+import { getUser } from '../src/graphql/queries'
 import { saveCapitals, loadCapitals } from 'hooks/stringConversion'
 import BasicInfoDetails from '../components/basicInfoComponents/BasicInfoDetails';
+import fetchProfileImageAsync from 'hooks/fetchProfileImage';
 
 var styles = require('styles/stylesheet');
 
@@ -27,11 +28,10 @@ const ProfileScreen = ({ navigation, route }) => {
     useEffect(() => {
         if (locationEnabled) updateUserLocationAsync(getLocation(true));
 
-        (async()=>{
+        (async()=>{            
             const user = await API.graphql(graphqlOperation(getUser, { id: route.params?.myId }));
-            const imageURL = await Storage.get('profileimage.jpg', { level: 'protected' });
-    
             const fields = user.data.getUser;
+            const imageURL = await fetchProfileImageAsync(fields.identityId);
     
             if (fields == null) {
                 console.log("user doesn't exist, they must be making their profile for the first time");
@@ -47,11 +47,6 @@ const ProfileScreen = ({ navigation, route }) => {
                 setBioDetails(loadCapitals(fields.bio));
                 setGoalsDetails(loadCapitals(fields.goals));
                 setLocationEnabled(fields.latitude != null);
-                Image.getSize(fields.pictureURL, () => {
-                    setImageURL(fields.pictureURL);
-                }, err => {
-                    setImageURL('');
-                });
             }
 
             setLoading(false);

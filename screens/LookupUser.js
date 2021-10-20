@@ -408,12 +408,18 @@ const LookupUser = ({ route, navigation }) => {
       <View style={{}}>
         <View style={{ flex: 1 }}>
           <ProfileImageAndName
-            you={userId === route.params?.myId}
+            onPress={(imageURL) => {
+              userId === route.params?.myId ?
+              navigation.navigate("Profile", {
+                screen: "Profile",
+                params: { fromLookup: true },
+              })
+              : navigation.navigate("Image", { uri: imageURL });
+            }}
             style={{ margin: 20 }}
             imageSize={Dimensions.get('window').width / 2 - 30}
             textStyle={{ fontWeight: "bold", fontSize: 24 }}
             textLayoutStyle={{ flex: 1 }}
-            navigateToProfile={false}
             userId={userId}
             isFull={true}
             fullname={true}
