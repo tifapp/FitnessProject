@@ -20,6 +20,7 @@ const ProfileScreen = ({ navigation, route }) => {
     const [imageChanged, setImageChanged] = useState(false);
     const [imageURL, setImageURL] = useState('');
     const [name, setName] = useState('');
+    const [identityId, setIdentityId] = useState();
     const [age, setAge] = useState(18);
     const [gender, setGender] = useState('Male');
     const [bioDetails, setBioDetails] = useState('');
@@ -39,8 +40,10 @@ const ProfileScreen = ({ navigation, route }) => {
             if (fields == null) {
                 console.log("user doesn't exist, they must be making their profile for the first time");
             } else {
-                Cache.setItem(route.params?.myId, { name: loadCapitals(fields.name), imageURL: imageURL, isFull: true }, { priority: 1 });
+                Cache.setItem(fields.identityId, {lastModified: "3000", imageURL: imageURL});
+                global.savedUsers[route.params?.myId] = {name: fields.name, imageURL: imageURL};
                 
+                setIdentityId(fields.identityId);
                 setName(loadCapitals(fields.name));
                 setAge(fields.age);
                 setGender(fields.gender);
@@ -82,12 +85,14 @@ const ProfileScreen = ({ navigation, route }) => {
             await Storage.put('profileimage.jpg', blob, { level: 'protected', contentType: 'image/jpeg' });
 
             console.log("changing cached profile pic");
-            Cache.setItem(route.params?.myId, { name: name, imageURL: imageURL, isFull: true }, { priority: 1 });
+            Cache.setItem(identityId, { lastModified: "3000", imageURL: imageURL });
+            global.savedUsers[route.params?.myId] = { name: name, imageURL: imageURL };
         } else {
             Storage.remove('profileimage.jpg', { level: 'protected' })
                 .then(result => console.log("removed profile image!", result))
                 .catch(err => console.log(err));
-            Cache.setItem(route.params?.myId, { name: name, imageURL: '' }, { priority: 1 });
+            Cache.setItem(identityId, { lastModified: "3000", imageURL: '' });
+            global.savedUsers[route.params?.myId] = { name: name, imageURL: '' };
         }
     }
 
@@ -210,7 +215,7 @@ const ProfileScreen = ({ navigation, route }) => {
                     <View style={{ alignItems: "flex-start", justifyContent: "space-between", marginLeft: 15, flex: 1 }}>
                         <View>
                             <TextInput
-                                style={[name === '' ? styles.emptyTextInputStyle : { fontSize: 24, fontWeight: "bold" }]}
+                                style={[name === '' ? styles.emptyTextInputStyle : { fontSize: 24, fontWeight: "bold", margin: 0, padding: 0}]}
                                 multiline={true}
                                 placeholder={`Enter your name!`}
                                 autoCorrect={false}
@@ -219,7 +224,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                 onEndEditing={() => {
                                     if (!route.params?.newUser) {
                                         updateUserAsync({ name: saveCapitals(name) }) //should be doing savecapitals in the backend
-                                        Cache.setItem(route.params?.myId, { name: name, imageURL: imageURL, isFull: true }, { priority: 1 });
+                                        global.savedUsers[route.params?.myId] = { name: name, imageURL: imageURL };
                                     }
                                 }}>
                             </TextInput>
