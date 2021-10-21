@@ -75,9 +75,9 @@ const ProfileScreen = ({ navigation, route }) => {
 
     const saveProfilePicture = async () => {
         if (imageURL != '') {
-            const resizedPhoto = await ImageManipulator.manipulateAsync(
+            const resizedPhoto = await ImageManipulator.manipulateAsync( //should be doing this in the backend
                 imageURL,
-                [{ resize: { width: 200 } }], // resize to width of 300 and preserve aspect ratio 
+                [{ resize: { width: 300 } }], // resize to width of 300 and preserve aspect ratio 
                 { compress: 1, format: 'jpeg' },
             );
             const response = await fetch(resizedPhoto.uri);

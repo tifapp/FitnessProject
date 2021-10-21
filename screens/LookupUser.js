@@ -408,13 +408,7 @@ const LookupUser = ({ route, navigation }) => {
       <View style={{}}>
         <View style={{ flex: 1 }}>
           <ProfileImageAndName
-            onPress={(imageURL) => {
-              userId === route.params?.myId ?
-              navigation.navigate("Profile", {
-                screen: "Profile",
-                params: { fromLookup: true },
-              })
-              : navigation.navigate("Image", { uri: imageURL });
+            onPress={(imageURL) => { navigation.navigate("Image", { uri: imageURL });
             }}
             style={{ margin: 20 }}
             imageSize={Dimensions.get('window').width / 2 - 30}
@@ -422,7 +416,6 @@ const LookupUser = ({ route, navigation }) => {
             textLayoutStyle={{ flex: 1 }}
             userId={userId}
             isFullSize={true}
-            fullname={true}
             callback={(info) => {
               navigation.setOptions({ title: info.name });
             }}

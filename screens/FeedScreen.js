@@ -64,10 +64,8 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
         navigation.setOptions({
           headerLeft: () =>
             <ProfileImageAndName
-              you={true}
               userId={route.params?.myId}
               isFullSize={true}
-              fullname={true}
               hidename={true}
               imageSize={30}
               style={{ marginLeft: 15 }}

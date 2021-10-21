@@ -412,11 +412,9 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
       >
         <ProfileImageAndName
           navigationObject={navigation}
-          you={true}
           navigateToProfile={false}
           userId={myId}
           isFullSize={true}
-          fullname={true}
           style={{ marginLeft: 15 }}
           textLayoutStyle={{ alignSelf: "center" }}
           textStyle={{
