@@ -15,32 +15,33 @@ import fetchProfileImageAsync from 'hooks/fetchProfileImage';
 var styles = require("../styles/stylesheet");
 
 global.savedUsers = {};
-//objects will look like {name: [name], imageURL: [imageURL]}
+//objects will look like {name: [name], imageURL: [imageURL], isFullSize: [bool]}
 
 export const ProfileImageAndName = React.memo(function (props) {  
   const [userInfo, setUserInfo] = useState(); //an object containing the name and imageurl
 
   useEffect(() => {
-    if (!global.savedUsers[props.userId]) {
+    console.log("are we fetching the full size? ", (!global.savedUsers[props.userId] || (!!props.isFullSize && !global.savedUsers[props.userId].isFullSize)))
+    if (!global.savedUsers[props.userId] || (!!props.isFullSize && !global.savedUsers[props.userId].isFullSize)) {
       (async() => {
         try {
           const {name, identityId} = await fetchUserAsync(props.userId);
-          const profileimageurl = await fetchProfileImageAsync(identityId, props.isFull);
+          const profileimageurl = await fetchProfileImageAsync(identityId, props.isFullSize);
 
           Image.getSize(
             profileimageurl,
             () => {
               //if (mounted) {
-              global.savedUsers[props.userId] = { name: name, imageURL: profileimageurl }
-              console.log("saved profileimageandname to local cache, should update")
+              global.savedUsers[props.userId] = { name: name, imageURL: profileimageurl, isFullSize: props.isFullSize }
+              //console.log("saved profileimageandname to local cache, should update")
               //will this trigger the second use effect or will we have to do this again?
               setUserInfo(global.savedUsers[props.userId]);
               //}
             },
             (err) => {
               //console.log("couldn't find user's profile image");
-              global.savedUsers[props.userId] = { name: name, imageURL: '' }
-              console.log("saved profileimageandname to local cache, should update")
+              global.savedUsers[props.userId] = { name: name, imageURL: '', isFullSize: props.isFullSize } //use DPI to figure out what resolution we should save at
+              //console.log("saved profileimageandname to local cache, should update")
               //will this trigger the second use effect or will we have to do this again?
               setUserInfo(global.savedUsers[props.userId]);
             }
@@ -53,18 +54,6 @@ export const ProfileImageAndName = React.memo(function (props) {
   }, []);
 
   useEffect(() => {
-    //this will also run when the component is first mounted, remember
-    if (global.savedUsers[props.userId]) {
-      Image.getSize(
-        global.savedUsers[props.userId].imageURL,
-        () => {
-          //console.log("adding photo to cache")
-        },
-        (err) => {
-          //console.log("photo didnt work ", err)
-        }
-      );
-    }
     //console.log("updating profileimageandname")
     setUserInfo(global.savedUsers[props.userId]);
   }, [global.savedUsers[props.userId]])
@@ -135,7 +124,7 @@ export const ProfileImageAndName = React.memo(function (props) {
               style={[props.textStyle, { flexWrap: "wrap", }]}
             >
               {userInfo != null && userInfo.name
-                ? userInfo.isFull || userInfo.name.length <= 40
+                ? userInfo.isFullSize || userInfo.name.length <= 40
                   ? userInfo.name + (props.spaceAfterName ? " " : "")
                   : userInfo.name.substring(0, 40)
                 : "Loading..."}

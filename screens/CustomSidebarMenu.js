@@ -415,7 +415,7 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
           you={true}
           navigateToProfile={false}
           userId={myId}
-          isFull={true}
+          isFullSize={true}
           fullname={true}
           style={{ marginLeft: 15 }}
           textLayoutStyle={{ alignSelf: "center" }}

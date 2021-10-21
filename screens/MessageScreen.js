@@ -141,7 +141,7 @@ export default function MessageScreen({ navigation, route }) {
                 imageLayoutStyle={{ margin: 0 }}
                 userId={userId}
                 navigateToProfile={false}
-                isFull={true}
+                isFullSize={true}
                 hidename={true}
                 callback={(info) => {
                   navigation.setOptions({ title: info.name });

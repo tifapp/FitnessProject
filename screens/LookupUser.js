@@ -421,7 +421,7 @@ const LookupUser = ({ route, navigation }) => {
             textStyle={{ fontWeight: "bold", fontSize: 24 }}
             textLayoutStyle={{ flex: 1 }}
             userId={userId}
-            isFull={true}
+            isFullSize={true}
             fullname={true}
             callback={(info) => {
               navigation.setOptions({ title: info.name });

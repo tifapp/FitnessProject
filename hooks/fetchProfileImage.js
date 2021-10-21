@@ -4,12 +4,12 @@ import { loadCapitals } from 'hooks/stringConversion';
 
 //cache stores objects like this {identityId: {imageURL, lastModified}}
 
-const getLatestProfileImageAsync = async (identityId, isFull) => {
+const getLatestProfileImageAsync = async (identityId, isFullSize) => {
   let imageKey = `thumbnails/${identityId}/thumbnail-profileimage.jpg`;
   let imageConfig = {
     expires: 86400,
   };
-  if (isFull) {
+  if (isFullSize) {
     imageKey = "profileimage.jpg";
     imageConfig.identityId = identityId;
     imageConfig.level = "protected";
@@ -26,13 +26,13 @@ const getLastModifiedAsync = async (identityId) => {
   if (results.length > 0) return results[0].lastModified; else return;
 }
 
-export default async function fetchProfileImageAsync(identityId) {
+export default async function fetchProfileImageAsync(identityId, isFullSize) {
   //first check the cache
   //if it's there, compare the lastmodified date with the newest lastmodified date
   //if it's not there or if it was recently modified according to storage.list, storage.get it and return the link
 
   const lastModified = await getLastModifiedAsync(identityId);
-  const imageURL = await getLatestProfileImageAsync(identityId);
+  const imageURL = await getLatestProfileImageAsync(identityId, isFullSize);
 
   console.log(lastModified);
   
