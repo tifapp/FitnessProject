@@ -2,7 +2,7 @@ import { API, graphqlOperation, Cache, Storage } from "aws-amplify";
 import { getUser } from '../src/graphql/queries';
 import { loadCapitals } from 'hooks/stringConversion';
 
-//cache stores objects like this {identityId: {imageURL, lastModified}}
+//cache stores objects like this {identityId: {imageURL, lastModified, isFullSize}}
 
 const getLatestProfileImageAsync = async (identityId, isFullSize) => {
   let imageKey = `thumbnails/${identityId}/thumbnail-profileimage.jpg`;
@@ -40,17 +40,17 @@ export default async function fetchProfileImageAsync(identityId, isFullSize) {
     const cachedInfo = await Cache.getItem(identityId);
     //console.log("checked cache");
   
-    if (cachedInfo != null && cachedInfo.imageURL) { //will have to check if this gets called after the above callback, aka if setuserinfo is called twice.
+    if (cachedInfo != null) { //will have to check if this gets called after the above callback, aka if setuserinfo is called twice.
       //console.log("is in cache");
       //fetch lastmodified date
       //const lastModified = await getLastModifiedAsync(identityId);
-      if (lastModified && lastModified > cachedInfo.lastModified) {
-        //console.log("returning updated image");
+      if ((lastModified && lastModified > cachedInfo.lastModified) || (isFullSize && !cachedInfo.isFullSize)) {
+        console.log("returning updated image");
         //const imageURL = await getLatestProfileImageAsync(identityId);
-        Cache.setItem(identityId, {lastModified: lastModified, imageURL: imageURL});
+        Cache.setItem(identityId, {lastModified: lastModified, imageURL: imageURL, isFullSize: isFullSize});
         return imageURL;
       } else {
-        //console.log("returning cached image: ", cachedInfo.imageURL);
+        console.log("returning cached image: ", cachedInfo.imageURL);
         return cachedInfo.imageURL;
       }
     } else {
@@ -58,7 +58,7 @@ export default async function fetchProfileImageAsync(identityId, isFullSize) {
     }
   } catch (e) {
     //console.log("not in cache, returning updated image");
-    Cache.setItem(identityId, {lastModified: lastModified, imageURL: imageURL});
+    Cache.setItem(identityId, {lastModified: lastModified, imageURL: imageURL, isFullSize: isFullSize});
     //const imageURL = await getLatestProfileImageAsync(identityId);
     return imageURL; //dunno how else we can return from callback so we may need to do this twice or pass another param
   }
