@@ -33,7 +33,7 @@ const ProfileScreen = ({ navigation, route }) => {
         (async()=>{            
             const user = await API.graphql(graphqlOperation(getUser, { id: route.params?.myId }));
             const fields = user.data.getUser;
-            const imageURL = await fetchProfileImageAsync(fields.identityId);
+            const imageURL = await fetchProfileImageAsync(fields.identityId, true);
             setImageURL(imageURL);
 
             console.log(fields);
