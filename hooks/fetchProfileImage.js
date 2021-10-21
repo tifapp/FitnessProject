@@ -6,15 +6,16 @@ import { loadCapitals } from 'hooks/stringConversion';
 
 const getLatestProfileImageAsync = async (identityId, isFull) => {
   let imageKey = `thumbnails/${identityId}/thumbnail-profileimage.jpg`;
-  let imageConfig = {};
+  let imageConfig = {
+    expires: 86400,
+  };
   if (isFull) {
     imageKey = "profileimage.jpg";
     imageConfig.identityId = identityId;
     imageConfig.level = "protected";
-    console.log("showing full image");
   }
-  
-  return await Storage.get(imageKey, imageConfig); //dunno if this will work on deleted profile pics cause of the image.getsize workaround, but we'll see
+  //console.log("showing full image");
+  return await Storage.get(imageKey, imageConfig)
 };
 
 const getLastModifiedAsync = async (identityId) => {
