@@ -2,10 +2,7 @@ const Sharp = require('sharp');
 const aws = require('aws-sdk');
 const s3 = new aws.S3();
 
-const WIDTH = 100;
-const HEIGHT = 100;
-
-exports.handler = (event, context, callback) => {
+exports.handler = async (event, context, callback) => {
   const BUCKET = event.Records[0].s3.bucket.name;
 
   /* Get the image data we will use from the first record in the event object */
@@ -21,45 +18,16 @@ exports.handler = (event, context, callback) => {
 
   //console.log("attempting to get the image with this key: ", KEY, "in this bucket: ", BUCKET);
 
-  s3.getObject({ Bucket: BUCKET, Key: KEY }).promise()
-    .then(image => {
-      // Use the Sharp module to resize the image and save in a buffer.
-      s3.headObject({ Key: KEY, Bucket: BUCKET })
-        .promise()
-        .then(res => {
-          if (res.ContentLength > 83700) {
-            Sharp(image.Body).resize(300).toBuffer()
-              .then((buffer) => {
-                s3.putObject({ Bucket: BUCKET, Body: buffer, Key: KEY }).promise()
-                  .catch(err => {
-                    console.log('error storing and resizing image: ', err)
-                    callback(err)
-                  })
-              })
-              .catch(err => {
-                console.log('error in step 2 of resizing image: ', err)
-                callback(err)
-              })
-          }
-        })
-        .finally(() => {
-          Sharp(image.Body).resize(60).toBuffer()
-            .then((buffer) => {
-              s3.putObject({ Bucket: BUCKET, Body: buffer, Key: `public/thumbnails/${PARTS[1]}/thumbnail-${FILE}` }).promise()
-                .then(() => { callback(null, "Successfully generated profile image thumbnail") })
-                .catch(err => {
-                  console.log('error storing and resizing image: ', err)
-                  callback(err)
-                })
-            })
-            .catch(err => {
-              console.log('error in step 2 of resizing image: ', err)
-              callback(err)
-            })
-        })
-    })
-    .catch(err => {
-      console.log('error resizing image: ', err)
-      callback(err)
-    })
+  const image = await s3.getObject({ Bucket: BUCKET, Key: KEY }).promise();
+
+  try {
+    const res = await s3.headObject({ Key: KEY, Bucket: BUCKET }).promise()
+    if (res.ContentLength > 83700) {
+      const buffer = Sharp(image.Body).resize(300).toBuffer()
+      await s3.putObject({ Bucket: BUCKET, Body: buffer, Key: KEY }).promise()
+    }
+  } finally {
+    const buffer = await Sharp(image.Body).resize(60).toBuffer();
+    return await s3.putObject({ Bucket: BUCKET, Body: buffer, Key: `public/thumbnails/${PARTS[1]}/thumbnail-${FILE}` }).promise();
+  }
 }
