@@ -75,7 +75,7 @@ const ProfileScreen = ({ navigation, route }) => {
 
     const saveProfilePicture = async () => {
         if (imageURL != '') {
-            const resizedPhoto = await ImageManipulator.manipulateAsync( //should be doing this in the backend
+            const resizedPhoto = await ImageManipulator.manipulateAsync( //should be doing this in the backend. but if we can just make sure they're using the app to upload and not a third party app, maybe we wont need it?
                 imageURL,
                 [{ resize: { width: 300 } }], // resize to width of 300 and preserve aspect ratio 
                 { compress: 1, format: 'jpeg' },
