@@ -4,6 +4,17 @@ import { loadCapitals } from 'hooks/stringConversion';
 
 //cache stores objects like this {identityId: {imageURL, lastModified, isFullSize}}
 
+function getExpiryTime(imageLink) {
+  console.log("starting calc")
+  let date = imageLink.substring(imageLink.indexOf('Date=') + 5, imageLink.indexOf('&X-Amz-Expires='));
+  let formattedDate = date.slice(0, 4) + "-" + date.slice(4, 6) + "-" + date.slice(6, 11) + ":" + date.slice(11,13) + ":" + date.slice(13);
+  let dateObj = new Date(formattedDate);
+  let expires = parseInt(imageLink.substring(imageLink.indexOf('Expires=') + 8, imageLink.indexOf('&X-Amz-Security-Token')));
+  dateObj.setSeconds(expires);
+
+  return dateObj;
+}
+
 const getLatestProfileImageAsync = async (identityId, isFullSize) => {
   let imageKey = `thumbnails/${identityId}/thumbnail-profileimage.jpg`;
   let imageConfig = {
@@ -50,8 +61,14 @@ export default async function fetchProfileImageAsync(identityId, isFullSize) {
         Cache.setItem(identityId, {lastModified: lastModified, imageURL: imageURL, isFullSize: isFullSize});
         return imageURL;
       } else {
-        console.log("returning cached image: ", cachedInfo.imageURL);
-        return cachedInfo.imageURL;
+        console.log("calculating expiry")
+        if (Date.now() > getExpiryTime(cachedInfo.imageURL)) {
+          console.log("returning new image")
+          return imageURL;
+        } else {
+          console.log("returning old image")
+          return cachedInfo.imageURL;
+        }
       }
     } else {
       throw "not in cache"
