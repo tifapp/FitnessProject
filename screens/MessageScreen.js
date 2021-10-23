@@ -69,7 +69,11 @@ export default function MessageScreen({ navigation, route }) {
     } catch (err) {
       console.log("Error in the delete conversation subscription", err);
     }
-  })
+  }, [])
+
+  useEffect(() => {    
+    navigation.setOptions({ title: global.savedUsers[userId].name });
+  }, [])
 
   useEffect(() => {
     (async () => {
@@ -142,9 +146,6 @@ export default function MessageScreen({ navigation, route }) {
                 navigateToProfile={false}
                 isFullSize={true}
                 hidename={true}
-                callback={(info) => {
-                  navigation.setOptions({ title: info.name });
-                }}
               />
             }
             navigation={navigation}
