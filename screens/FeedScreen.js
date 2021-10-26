@@ -46,7 +46,7 @@ const viewabilityConfig = {
   waitForInteraction: false,
 }
 
-export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, originalParentId, Accepted, lastUser, sidebar, id, isFocused, autoFocus = false }
+export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, footerComponent, originalParentId, Accepted, lastUser, sidebar, id, isFocused, autoFocus = false }
 ) {
   const [posts, setPosts] = useState([]);
 
@@ -463,49 +463,55 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   }, [])
 
   return (
-      <APIList
-        style={[{ flex: 1 }, receiver == null ? { backgroundColor: "#a9efe0" } : {}]}
-        viewabilityConfig={viewabilityConfig}
-        ListRef={scrollRef}
-        ListHeaderComponent={
-          <View style={{}}>
-            {headerComponent}
-            {lastUser != route.params.myId && lastUser != null && receiver != null && !ButtonCheck ?
-              <View style={{ flexDirection: "row", justifyContent: "center", marginVertical: 15 }}>
-                <IconButton
-                  iconName={"check"}
-                  size={22}
-                  color={"green"}
-                  onPress={acceptMessageRequest}
-                  style={{ paddingHorizontal: 12 }}
-                  label={"Accept"}
-                  fontSize={18}
-                />
+    <APIList
+      inverted={receiver != null}
+      style={[{ flex: 1 }, receiver == null ? { backgroundColor: "#a9efe0" } : {}]}
+      viewabilityConfig={viewabilityConfig}
+      ListRef={scrollRef}
+      ListFooterComponent={
+        footerComponent
+      }
+      ListHeaderComponent={
+        <View style={{}}>
+          {headerComponent}
+          {lastUser != route.params.myId && lastUser != null && receiver != null && !ButtonCheck ?
+            <View style={{ flexDirection: "row", justifyContent: "center", marginVertical: 15 }}>
+              <IconButton
+                iconName={"check"}
+                size={22}
+                color={"green"}
+                onPress={acceptMessageRequest}
+                style={{ paddingHorizontal: 12 }}
+                label={"Accept"}
+                fontSize={18}
+              />
 
-                <IconButton
-                  iconName={"clear"}
-                  size={22}
-                  color={"red"}
-                  onPress={rejectMessageRequest}
-                  style={{ paddingHorizontal: 12 }}
-                  label={"Reject"}
-                  fontSize={18}
-                />
+              <IconButton
+                iconName={"clear"}
+                size={22}
+                color={"red"}
+                onPress={rejectMessageRequest}
+                style={{ paddingHorizontal: 12 }}
+                label={"Reject"}
+                fontSize={18}
+              />
 
-                <IconButton
-                  iconName={"block"}
-                  size={22}
-                  color={"black"}
-                  onPress={blockMessageRequest}
-                  style={{ paddingHorizontal: 12 }}
-                  label={"Block"}
-                  fontSize={18}
-                />
-              </View>
-              : null
-            }
+              <IconButton
+                iconName={"block"}
+                size={22}
+                color={"black"}
+                onPress={blockMessageRequest}
+                style={{ paddingHorizontal: 12 }}
+                label={"Block"}
+                fontSize={18}
+              />
+            </View>
+            : null
+          }
 
-            {receiver == null ?
+          {
+            receiver == null ? 
+            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "position" : "height"} keyboardVerticalOffset={90} style={{ flex: 1 }}>
               <PostInputField
                 channel={channel}
                 headerComponent={headerComponent}
@@ -514,21 +520,33 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
                 originalParentId={originalParentId}
                 pushLocalPost={(localNewPost) => setPosts((posts) => [localNewPost, ...posts])}
                 autoFocus={autoFocus}
-              /> : null}
-          </View>
-        }
-        initialAmount={7}
-        additionalAmount={7} //change number based on device specs
-        processingFunction={getLikedPosts}
-        queryOperation={postsByChannel}
-        setDataFunction={setPosts}
-        data={posts}
-        filter={{ channel: channel, sortDirection: "DESC" }}
-        renderItem={renderPostItem}
-        keyExtractor={(item) => item.createdAt.toString() + item.userId}
-        onEndReachedThreshold={0.5}
-        onViewableItemsChanged={onViewableItemsChanged}
-      />
+              />
+            </KeyboardAvoidingView>
+            :
+            <PostInputField
+              channel={channel}
+              headerComponent={headerComponent}
+              receiver={receiver}
+              myId={route.params?.myId}
+              originalParentId={originalParentId}
+              pushLocalPost={(localNewPost) => setPosts((posts) => [localNewPost, ...posts])}
+              autoFocus={autoFocus}
+            />
+          }
+        </View>
+      }
+      initialAmount={7}
+      additionalAmount={7} //change number based on device specs
+      processingFunction={getLikedPosts}
+      queryOperation={postsByChannel}
+      setDataFunction={setPosts}
+      data={posts}
+      filter={{ channel: channel, sortDirection: "DESC" }}
+      renderItem={renderPostItem}
+      keyExtractor={(item) => item.createdAt.toString() + item.userId}
+      onEndReachedThreshold={0.5}
+      onViewableItemsChanged={onViewableItemsChanged}
+    />
   );
 };
 
@@ -537,7 +555,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import SHA256 from "hooks/hash";
 import { Video, AVPlaybackStatus } from 'expo-av';
 
-function PostInputField({ channel, headerComponent, receiver, myId, originalParentId, pushLocalPost, autoFocus = false }) {
+function PostInputField({ channel, receiver, myId, originalParentId, pushLocalPost, autoFocus = false }) {
   const [pickFromGallery, pickFromCamera] = usePhotos(true);
   const [postInput, setPostInput] = useState("");
   const [imageURL, setImageURL] = useState(null);
@@ -672,7 +690,7 @@ function PostInputField({ channel, headerComponent, receiver, myId, originalPare
   };
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "position" : "height"} keyboardVerticalOffset={90 } style={{ flex: 1 }}>
+    <View>
       {
         //headerComponent
       }
@@ -786,6 +804,6 @@ function PostInputField({ channel, headerComponent, receiver, myId, originalPare
             </Text>
           </View> : null
       }
-    </KeyboardAvoidingView>
+    </View>
   )
 }

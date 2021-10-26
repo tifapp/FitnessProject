@@ -135,11 +135,13 @@ class APIList extends PureComponent { //we need to make this a class to use refs
               }} />
             :
             <FlatList
+                inverted={this.props.inverted}
                 viewabilityConfig={this.props.viewabilityConfig}
                 onScroll={this.props.onScroll}
                 scrollEventThrottle={0}
                 ref={this.props.ListRef}
                 ListHeaderComponent={this.props.ListHeaderComponent}
+                ListFooterComponent={this.props.ListFooterComponent}
                 horizontal={this.props.horizontal}
                 contentContainerStyle={{ flexGrow: 1 }}
                 data={this.props.data}

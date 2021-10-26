@@ -3,7 +3,8 @@ import {
   Text,
   View,
   TouchableOpacity,
-  PureComponent
+  PureComponent,
+  KeyboardAvoidingView
 } from "react-native";
 // Get the aws resources configuration parameters
 import FeedScreen from "screens/FeedScreen";
@@ -132,12 +133,12 @@ export default function MessageScreen({ navigation, route }) {
   //console.log(route);
   //have a header with the person's name and profile pic also.
   return (
-    <View style={styles.containerStyle}>
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={0} style={{ flex: 1, backgroundColor: "white" }}>
       {
         blocked ?
           null :
           <FeedScreen
-            headerComponent={
+            footerComponent={
               <ProfileImageAndName
                 vertical={true}
                 imageStyle={[styles.imageStyle, { marginVertical: 15 }]}
@@ -160,6 +161,6 @@ export default function MessageScreen({ navigation, route }) {
             isFocused={isFocused}
           />
       }
-    </View>
+    </KeyboardAvoidingView>
   );
 };
