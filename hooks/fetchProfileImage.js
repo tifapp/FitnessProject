@@ -18,7 +18,7 @@ function getExpiryTime(imageLink) {
 const getLatestProfileImageAsync = async (identityId, isFullSize) => {
   let imageKey = `thumbnails/${identityId}/thumbnail-profileimage.jpg`;
   let imageConfig = {
-    expires: 86400,
+    expires: 21600, //can wem ake this longer? 6 hours currently because seomtimes links still expire before the expiry date
   };
   if (isFullSize) {
     imageKey = "profileimage.jpg";
@@ -62,7 +62,9 @@ export default async function fetchProfileImageAsync(identityId, isFullSize) {
         return imageURL;
       } else {
         console.log("calculating expiry")
-        if (Date.now() > getExpiryTime(cachedInfo.imageURL)) {
+        console.log("current date is ", new Date(Date.now()))
+        console.log("expiry date is ", getExpiryTime(cachedInfo.imageURL))
+        if (new Date(Date.now()) >= getExpiryTime(cachedInfo.imageURL)) {
           console.log("returning new image")
           return imageURL;
         } else {
