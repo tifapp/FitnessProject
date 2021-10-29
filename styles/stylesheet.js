@@ -99,7 +99,7 @@ module.exports = StyleSheet.create({
 
   buttonStyle: {
     alignSelf: "center",
-    backgroundColor: "orange",
+    backgroundColor: "blue",
     padding: 10,
     borderRadius: 5,
     marginHorizontal: 6,

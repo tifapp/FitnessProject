@@ -264,11 +264,6 @@ const ProfileScreen = ({ navigation, route }) => {
                     }
                     <Text style={styles.textButtonTextStyle}>{locationEnabled === true && getLocation(true) == null ? 'Locating user' : 'Let others see your location'}</Text>
                 </TouchableOpacity>
-                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                    <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25, marginHorizontal: 5 }]} onPress={() => {navigation.navigate('My Groups')}} >
-                        <Text style={styles.buttonTextStyle}>My Groups</Text>
-                    </TouchableOpacity>
-                </View>
                 {
                     route.params?.newUser ? //if name is blank?
                         <TouchableOpacity style={[styles.buttonStyle, { marginBottom: 25 }]} onPress={createNewUser} >

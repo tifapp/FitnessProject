@@ -27,6 +27,7 @@ import GoalsScreen from "screens/GoalsScreen";
 import { updateUser } from 'root/src/graphql/mutations.js'
 import SignIn from "root/components/loginComponents/SignIn.tsx";
 import SignUp from "root/components/loginComponents/SignUp.tsx";
+import MyGroupsScreen from 'screens/MyGroupsScreen'
 import RequireNewPassword from "root/components/loginComponents/RequireNewPassword.tsx";
 import ConfirmSignIn from "root/components/loginComponents/ConfirmSignIn.tsx";
 import ConfirmSignUp from "root/components/loginComponents/ConfirmSignUp.tsx";
@@ -299,6 +300,7 @@ const App = () => {
             initialParams={{ myId: userId }}
             options={{ headerShown: false }}
           />
+          <Drawer.Screen name='My Groups' component={MyGroupsScreen} initialParams={{ myId: userId }}/>
           <Drawer.Screen
             name="Conversations"
             component={ConversationScreen}

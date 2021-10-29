@@ -625,6 +625,21 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
           textDecorationLine: (state.routes[state.index].name === "Settings") ? "underline" : "none",
         }}>Settings</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        style={[{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          paddingVertical: 15,
+          backgroundColor: "white",
+        }]}
+        onPress={() => { navigation.navigate("My Groups", {myId: myId}) }}>
+        <Text style={{
+          fontSize: 18,
+          color: (state.routes[state.index].name === "Settings") ? "black" : "grey",
+          textDecorationLine: (state.routes[state.index].name === "Settings") ? "underline" : "none",
+        }}>My Groups</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
