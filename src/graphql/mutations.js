@@ -421,8 +421,10 @@ export const createUser = /* GraphQL */ `
       gender
       bio
       goals
-      latitude
-      longitude
+      location {
+        latitude
+        longitude
+      }
       deviceToken
       friendRequestPrivacy
       messagesPrivacy
@@ -444,8 +446,10 @@ export const updateUser = /* GraphQL */ `
       gender
       bio
       goals
-      latitude
-      longitude
+      location {
+        latitude
+        longitude
+      }
       deviceToken
       friendRequestPrivacy
       messagesPrivacy
@@ -467,8 +471,10 @@ export const deleteUser = /* GraphQL */ `
       gender
       bio
       goals
-      latitude
-      longitude
+      location {
+        latitude
+        longitude
+      }
       deviceToken
       friendRequestPrivacy
       messagesPrivacy

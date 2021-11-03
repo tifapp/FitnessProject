@@ -660,8 +660,10 @@ export const getUser = /* GraphQL */ `
       gender
       bio
       goals
-      latitude
-      longitude
+      location {
+        latitude
+        longitude
+      }
       deviceToken
       friendRequestPrivacy
       messagesPrivacy
@@ -685,8 +687,10 @@ export const listUsers = /* GraphQL */ `
         gender
         bio
         goals
-        latitude
-        longitude
+        location {
+          latitude
+          longitude
+        }
         deviceToken
         friendRequestPrivacy
         messagesPrivacy

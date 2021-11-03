@@ -1,3 +1,8 @@
+type Location {
+  latitude: Float
+  longitude: Float
+}
+
 type User @model
 @auth(
   rules: [
@@ -13,33 +18,7 @@ type User @model
   gender: String
   bio: String
   goals: String
-  latitude: Float
-  longitude: Float
-  deviceToken: ID
-  friendRequestPrivacy: Int
-  messagesPrivacy: Int
-}
-
-input CreateUserInput {
-  identityId: ID
-  name: String!
-  age: Int
-  gender: String
-  bio: String
-  goals: String
-  latitude: Float
-  longitude: Float
-  deviceToken: ID
-}
-
-input UpdateUserInput {
-  name: String
-  age: Int
-  gender: String
-  bio: String
-  goals: String
-  latitude: Float
-  longitude: Float
+  location: Location
   deviceToken: ID
   friendRequestPrivacy: Int
   messagesPrivacy: Int

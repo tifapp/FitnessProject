@@ -111,7 +111,7 @@ module.exports = StyleSheet.create({
     borderRadius: 5,
   },
   textButtonTextStyle: {
-    color: "orange",
+    color: "blue",
     alignSelf: "center",
     marginBottom: 2,
     marginHorizontal: 6,
