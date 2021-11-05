@@ -18,7 +18,7 @@ import { getUser } from "./src/graphql/queries";
 import ProfileStack from "stacks/ProfileStack";
 import MainStack from "stacks/MainStack";
 import ReportScreen from "screens/ReportScreen";
-import SettingsScreen from "screens/SettingsScreen";
+import SettingsStack from "stacks/SettingsStack";
 import ConversationScreen from "screens/ConversationScreen";
 import ComplianceScreen from "screens/ComplianceScreen";
 import ProfileScreen from "screens/ProfileScreen";
@@ -308,7 +308,7 @@ const App = () => {
           />
           <Drawer.Screen
             name="Settings"
-            component={SettingsScreen}
+            component={SettingsStack}
             initialParams={{ myId: userId }}
           />
           <Drawer.Screen

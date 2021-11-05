@@ -11,14 +11,6 @@ import {
   Linking,
   LayoutAnimation
 } from "react-native";
-import ProfilePic from "components/ProfileImagePicker";
-import BasicInfo from "components/basicInfoComponents/BasicInfo";
-import DetailedInfo from "components/detailedInfoComponents/DetailedInfo";
-import useUserDatabase from "hooks/useUserDatabase";
-import { Auth } from "aws-amplify";
-import { Platform } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import CheckBox from "@react-native-community/checkbox"; //when ios is supported, we'll use this
 import getLocation from "hooks/useLocation";
 import APIList from "components/APIList";
 import { ProfileImageAndName } from "components/ProfileImageAndName";

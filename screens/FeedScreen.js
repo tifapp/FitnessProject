@@ -71,19 +71,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
               imageSize={30}
               style={{ marginLeft: 15 }}
             />,
-          headerRight: () =>
-            <View
-              style={{ flexDirection: "row" }}>
-              <TouchableOpacity onPress={() => { navigation.navigate("Search") }}>
-                <MaterialIcons
-                  name={"search"}
-                  size={30}
-                  color={"black"}
-                  style={{ paddingRight: 15 }}
-                />
-              </TouchableOpacity>
-              <DrawerButton />
-            </View>
         })
       }
     });

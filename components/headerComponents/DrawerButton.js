@@ -33,21 +33,35 @@ export default function DrawerButton(props) {
     setNotificationCount(0);
   };
   
+  //should separate drawer and search buttons into their own components
+  //search button should accept an argument that changes what the default tab is for the friends and groups screens
   return (
-      <TouchableOpacity onPress={navigation.toggleDrawer}>
-        <MaterialIcons
-          name="menu"
-          size={30}
-          color={"black"}
-          style={{ paddingRight: 15 }}
-      />
-
-      {notificationCount > 0 ? (
-        <>
-          <MaterialIcons name="circle" size={19} color={"red"} style={{ position: "absolute", top: -2, right: 9 }} />
-          <Text style={{ position: "absolute", top: 0, right: 14, fontWeight: "bold", color: "white", fontSize: 12 }}>{notificationCount}</Text>
-        </>
-      ) : null}
-    </TouchableOpacity>
+      <View
+        style={{ flexDirection: "row" }}>
+        <TouchableOpacity onPress={() => { navigation.navigate("Search") }}>
+          <MaterialIcons
+            name={"search"}
+            size={30}
+            color={"black"}
+            style={{ paddingRight: 15 }}
+          />
+        </TouchableOpacity>
+        
+        <TouchableOpacity onPress={navigation.toggleDrawer}>
+          <MaterialIcons
+            name="menu"
+            size={30}
+            color={"black"}
+            style={{ paddingRight: 15 }}
+        />
+  
+        {notificationCount > 0 ? (
+          <>
+            <MaterialIcons name="circle" size={19} color={"red"} style={{ position: "absolute", top: -2, right: 9 }} />
+            <Text style={{ position: "absolute", top: 0, right: 14, fontWeight: "bold", color: "white", fontSize: 12 }}>{notificationCount}</Text>
+          </>
+        ) : null}
+      </TouchableOpacity>
+      </View>
   );
 }

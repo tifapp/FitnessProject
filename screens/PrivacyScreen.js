@@ -14,7 +14,7 @@ import {Picker} from '@react-native-picker/picker';
 
 var styles = require("styles/stylesheet");
 
-const SettingsScreen = ({ navigation, route }) => {
+const PrivacyScreen = ({ navigation, route }) => {
   const [previousSettings, setPreviousSettings] = useState();
 
   useEffect(() => {
@@ -94,11 +94,11 @@ function APISwitch({ initialState, apicall, label, options }) {
       numberOfLines={2}
       selectedValue={selectedSetting}
       onValueChange={toggleAsync}
-      itemStyle={{fontSize: 16, color: "blue"}}>
+      itemStyle={{fontSize: 16, color: "blue", height: 100}}>
         {options.map(option => <Picker.Item label={option.label} value={option.value} />)}
     </Picker>
     </View>
   );
 }
 
-export default SettingsScreen;
+export default PrivacyScreen;

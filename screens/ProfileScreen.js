@@ -63,16 +63,6 @@ const ProfileScreen = ({ navigation, route }) => {
         }
     }, [age, gender, bioDetails, goalsDetails, locationEnabled])
 
-    const deleteUserAsync = async () => {
-        await API.graphql(graphqlOperation(deleteUser, { input: { id: route.params?.myId} }));
-
-        await Storage.remove('profileimage.jpg', { level: 'protected' })
-            .then(result => console.log("removed profile image!", result))
-            .catch(err => console.log(err));
-
-        return 'successfully deleted';
-    };
-
     const saveProfilePicture = async () => {
         if (imageURL != '') {
             const resizedPhoto = await ImageManipulator.manipulateAsync( //should be doing this in the backend. but if we can just make sure they're using the app to upload and not a third party app, maybe we wont need it?
@@ -103,11 +93,11 @@ const ProfileScreen = ({ navigation, route }) => {
             if (isNewUser) {
                 const { identityId } = await Auth.currentCredentials();
                 profileInfo.identityId = identityId;
-                profileInfo.name = name;
             }
 
             try {
                 await API.graphql(graphqlOperation(isNewUser ? createUser : updateUser, { input: profileInfo }));
+                if (isNewUser) Alert.alert("Profile submitted successfully!");
                 //console.log("updated user successfully");
             } catch (err) {
                 Alert.alert("Could not submit profile! Error: ", err.errors[0].message);
@@ -143,27 +133,6 @@ const ProfileScreen = ({ navigation, route }) => {
         }
     }
 
-    async function deleteAccount() {
-        const title = 'Are you sure you want to delete your account?';
-        const message = '';
-        const options = [
-            {
-                text: 'Yes', onPress: () => {
-                    Alert.alert('Are you REALLY sure you want to delete your account?', '', [
-                        {
-                            text: 'Yes', onPress: () => {
-                                deleteUserAsync().then(() => { Auth.signOut() }).catch()
-                            }
-                        }, //if submithandler fails user won't know
-                        { text: 'Cancel', type: 'cancel', },
-                    ], { cancelable: true });
-                }
-            }, //if submithandler fails user won't know
-            { text: 'Cancel', type: 'cancel', },
-        ];
-        Alert.alert(title, message, options, { cancelable: true });
-    }
-
     const updateDetailedInfo = () => {
         if (route.params?.updatedField) {
             const label = route.params.label
@@ -183,10 +152,9 @@ const ProfileScreen = ({ navigation, route }) => {
         }
         else {
             Alert.alert('Submitting Profile...', '', [], { cancelable: false })
-            updateUserAsync({ name: name, age: age, gender: gender, bio: saveCapitals(bioDetails), goals: saveCapitals(goalsDetails), latitude: locationEnabled ? getLocation().latitude : null, longitude: locationEnabled ? getLocation().longitude : null }, true) //add a debounce on the textinput, or just when the keyboard is dismissed
+            updateUserAsync({ name: saveCapitals(name), age: age, gender: gender, bio: saveCapitals(bioDetails), goals: saveCapitals(goalsDetails), latitude: locationEnabled ? getLocation().latitude : null, longitude: locationEnabled ? getLocation().longitude : null }, true) //add a debounce on the textinput, or just when the keyboard is dismissed
                 .then(([user, id]) => {
                     route.params?.setUserIdFunction(id);
-                    Alert.alert("Profile submitted successfully!");
                 })
             setImageChanged(false)
         }
