@@ -97,6 +97,7 @@ const App = () => {
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
   const [userId, setUserId] = useState('checking...'); //stores the user's id if logged in
+  const [isNewUser, setIsNewUser] = useState(false); //stores the user's id if logged in
   const [isAdmin, setIsAdmin] = useState(false); //seems insecure
 
   const [conversationIds, setConversationIds] = useState([]);
@@ -132,16 +133,15 @@ const App = () => {
       const user = await API.graphql(
         graphqlOperation(getUser, { id: query.attributes.sub })
       );
-      if (user.data.getUser != null) {
-        setUserId(query.attributes.sub);
-        global.id = query.attributes.sub;
-      } else {
-        setUserId('');
+      setUserId(query.attributes.sub);
+      global.id = query.attributes.sub;
+      if (user.data.getUser == null) {
+        setIsNewUser(true);
       }
 
       //console("success, user is ", user);
     } catch (err) {
-      //console("error: ", err);
+      console("error checking user signed up: ", err);
     }
   };
 
@@ -232,7 +232,7 @@ const App = () => {
           }} />
       </View>
     )
-  } else if (userId == '') {
+  } else if (isNewUser) {
     return (
       <NavigationContainer>
         <Stack.Navigator>
@@ -246,9 +246,9 @@ const App = () => {
           <Stack.Screen
             name="Profile"
             component={ProfileScreen}
-            initialParams={{ newUser: true, myId: userId, setUserIdFunction: setUserId }}
+            initialParams={{ newUser: true, myId: userId, setUserIdFunction: () => setIsNewUser(false) }}
             options={{
-              headerShown: false,
+              //headerShown: false,
             }}
           />
           <Stack.Screen name="Bio" component={BioScreen} />

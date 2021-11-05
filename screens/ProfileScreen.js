@@ -33,14 +33,14 @@ const ProfileScreen = ({ navigation, route }) => {
         (async()=>{            
             const user = await API.graphql(graphqlOperation(getUser, { id: route.params?.myId }));
             const fields = user.data.getUser;
-            const imageURL = await fetchProfileImageAsync(fields.identityId, true);
-            setImageURL(imageURL);
 
             console.log(fields);
     
             if (fields == null) {
                 console.log("user doesn't exist, they must be making their profile for the first time");
             } else {
+                const imageURL = await fetchProfileImageAsync(fields.identityId, true);
+                setImageURL(imageURL);
                 Cache.setItem(fields.identityId, {lastModified: "3000", imageURL: imageURL});
                 global.savedUsers[route.params?.myId] = {name: loadCapitals(fields.name), imageURL: imageURL};
                 
@@ -103,6 +103,7 @@ const ProfileScreen = ({ navigation, route }) => {
             if (isNewUser) {
                 const { identityId } = await Auth.currentCredentials();
                 profileInfo.identityId = identityId;
+                profileInfo.name = name;
             }
 
             try {
