@@ -5,27 +5,34 @@ import BlockListScreen from "screens/BlockListScreen";
 import LookupUserScreen from "screens/LookupUser";
 import PrivacyScreen from "screens/PrivacyScreen";
 
-import React from 'react';
+import React, { useState } from 'react';
 
 import {
   View,
   Text,
   TouchableOpacity,
   Alert,
-  LayoutAnimation
+  LayoutAnimation,
+  Modal,
+  TextInput
 } from "react-native";
 import { Auth, API, graphqlOperation, Cache, Storage } from "aws-amplify";
 import { createUser, updateUser, deleteUser } from '../src/graphql/mutations'
+import Accordion from '../components/Accordion';
 
-function Settings({navigation, route}) {
+function Settings({navigation, route}) {  
   const deleteUserAsync = async () => {
-    console.log("my id is", route.params?.myId)
-
     await API.graphql(graphqlOperation(deleteUser, { input: { id: route.params?.myId } }));
-
+    
     await Storage.remove('profileimage.jpg', { level: 'protected' })
         .then(result => console.log("removed profile image!", result))
         .catch(err => console.log(err));
+
+    const user = await Auth.currentAuthenticatedUser();
+
+    await new Promise((res, rej) => user.deleteUser((err, result) => err ? rej(err) : res(result)));
+
+    Auth.signOut();
 
     return 'successfully deleted';
   };
@@ -38,9 +45,7 @@ function Settings({navigation, route}) {
               text: 'Yes', onPress: () => {
                   Alert.alert('Are you REALLY sure you want to delete your account?', '', [
                       {
-                          text: 'Yes', onPress: () => {
-                              deleteUserAsync().then(() => { Auth.signOut() }).catch()
-                          }
+                          text: 'Yes', onPress: deleteUserAsync
                       }, //if submithandler fails user won't know
                       { text: 'Cancel', type: 'cancel', },
                   ], { cancelable: true });
@@ -51,8 +56,28 @@ function Settings({navigation, route}) {
       Alert.alert(title, message, options, { cancelable: true });
   }
 
+  function signOut() {
+    const title = 'Are you sure you want to sign out?';
+    const message = '';
+    const options = [
+        {
+            text: 'Yes', onPress: () => {
+              Auth.signOut();
+            }
+        }, //if submithandler fails user won't know
+        { text: 'Cancel', type: 'cancel', },
+    ];
+    Alert.alert(title, message, options, { cancelable: true });
+  }
+  
+  const [isOpen, setIsOpen] = useState(false);
+
+  function changePassword() {
+
+  }
+
   return (
-    <View>
+    <View style={{backgroundColor: "white", flex: 1}}>
     <PrivacyScreen
     route={route}
     />
@@ -66,25 +91,71 @@ function Settings({navigation, route}) {
       Block List
     </Text>
     </TouchableOpacity>
-    <TouchableOpacity onPress={() => { Auth.signOut() } //should be an "account actions" screen
-    }>
-      <Text
-      style={{
-        fontSize: 15,
-        margin: 20,
-      }}>
-        Log Out
-      </Text>
-    </TouchableOpacity>
-    <TouchableOpacity onPress={deleteAccount}>
-      <Text
-      style={{
-        fontSize: 15,
-        margin: 20,
-      }}>
-        Delete User
-      </Text>
-    </TouchableOpacity>
+    <Accordion
+      headerText={
+        "Account Actions"
+      } //would be nice if we had a total friend request count. but then you'd be able to see when people revoke their friend requests.
+      headerTextStyle={{
+        fontSize: 18,
+        color: "gray",
+        textDecorationLine: "none",
+        marginLeft: 18,
+      }}
+      openTextColor={"black"}
+      iconColor={"gray"}
+      iconOpenColor={"black"}>
+      <TouchableOpacity onPress={signOut
+      }>
+        <Text
+        style={{
+          fontSize: 15,
+          margin: 20,
+        }}>
+          Log Out
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => setIsOpen(true)
+      }>
+        <Text
+        style={{
+          fontSize: 15,
+          margin: 20,
+        }}>
+          Change Password
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={deleteAccount}>
+        <Text
+        style={{
+          fontSize: 15,
+          margin: 20,
+        }}>
+          Delete Account
+        </Text>
+      </TouchableOpacity>
+    </Accordion>
+    <Modal
+      animationType="slide"
+      transparent={true}
+      statusBarTranslucent={true}
+      visible={isOpen}
+      onRequestClose={() => {
+        setIsOpen(false);
+      }}
+    >
+      <TouchableOpacity onPress={() => setIsOpen(false)} style={{ width: "100%", height: "100%", position: "absolute", backgroundColor: "#00000033" }}>
+      </TouchableOpacity>
+      <View style={{ marginTop: "auto", flex: 0.8, backgroundColor: "#efefef" }}>
+        <View style={{ height: 1, width: "100%", alignSelf: "center", backgroundColor: "lightgray" }}>
+        </View>
+        <View style={{ margin: 10, width: 25, height: 2, alignSelf: "center", backgroundColor: "lightgray" }}>
+        </View>
+      <TextInput
+      />
+      <TextInput
+      />
+      </View>
+    </Modal>
     </View>
   )
 }

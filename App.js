@@ -19,6 +19,7 @@ import ProfileStack from "stacks/ProfileStack";
 import MainStack from "stacks/MainStack";
 import ReportScreen from "screens/ReportScreen";
 import SettingsStack from "stacks/SettingsStack";
+import FriendScreen from "screens/FriendScreen";
 import ConversationScreen from "screens/ConversationScreen";
 import ComplianceScreen from "screens/ComplianceScreen";
 import ProfileScreen from "screens/ProfileScreen";
@@ -301,6 +302,11 @@ const App = () => {
             options={{ headerShown: false }}
           />
           <Drawer.Screen name='My Groups' component={MyGroupsScreen} initialParams={{ myId: userId }}/>
+          <Drawer.Screen
+            name="Friends"
+            component={FriendScreen}
+            initialParams={{ myId: userId }}
+          />
           <Drawer.Screen
             name="Conversations"
             component={ConversationScreen}

@@ -60,7 +60,7 @@ export default function Accordion(props) {
           style={[{
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: "center",
+            justifyContent: "flex-start",
             paddingVertical: 15,
             backgroundColor: "white",
           }]}
@@ -72,8 +72,8 @@ export default function Accordion(props) {
           </Text>
           <Animated.View style={{ transform: [{ rotateZ: arrowAngle }] }}>
             <MaterialIcons
-              name="arrow-drop-down"
-              size={30}
+              name="expand-more"
+              size={25}
               color={open ? (props.iconOpenColor ?? "black") : props.iconColor ?? "gray"}
             />
           </Animated.View>
