@@ -201,6 +201,17 @@ export const onDeleteConversation = /* GraphQL */ `
     }
   }
 `;
+export const onDeleteFriendship = /* GraphQL */ `
+  subscription OnDeleteFriendship {
+    onDeleteFriendship {
+      createdAt
+      updatedAt
+      sender
+      receiver
+      accepted
+    }
+  }
+`;
 export const onCreateGroup = /* GraphQL */ `
   subscription OnCreateGroup {
     onCreateGroup {
@@ -276,39 +287,6 @@ export const onDeleteBlock = /* GraphQL */ `
       userId
       blockee
       updatedAt
-    }
-  }
-`;
-export const onCreateFriendship = /* GraphQL */ `
-  subscription OnCreateFriendship($sender: String, $receiver: String) {
-    onCreateFriendship(sender: $sender, receiver: $receiver) {
-      createdAt
-      updatedAt
-      sender
-      receiver
-      accepted
-    }
-  }
-`;
-export const onUpdateFriendship = /* GraphQL */ `
-  subscription OnUpdateFriendship($sender: String, $receiver: String) {
-    onUpdateFriendship(sender: $sender, receiver: $receiver) {
-      createdAt
-      updatedAt
-      sender
-      receiver
-      accepted
-    }
-  }
-`;
-export const onDeleteFriendship = /* GraphQL */ `
-  subscription OnDeleteFriendship($sender: String, $receiver: String) {
-    onDeleteFriendship(sender: $sender, receiver: $receiver) {
-      createdAt
-      updatedAt
-      sender
-      receiver
-      accepted
     }
   }
 `;

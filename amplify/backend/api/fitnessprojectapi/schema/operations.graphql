@@ -25,6 +25,7 @@ type Subscription {
   onCreateFriendRequestForReceiver(receiver: ID!): Friendship @aws_subscribe(mutations: ["createFriendship"])
 
   onDeleteConversation(users: [ID!]!): Conversation @aws_subscribe(mutations: ["deleteConversation"])
+  onDeleteFriendship: Friendship @aws_subscribe(mutations: ["deleteFriendship"])
 }
 
 type Query {
