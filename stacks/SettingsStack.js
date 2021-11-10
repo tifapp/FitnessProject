@@ -71,9 +71,23 @@ function Settings({navigation, route}) {
   }
   
   const [isOpen, setIsOpen] = useState(false);
+  const [oldPassword, setOldPassword] = useState();
+  const [newPassword, setNewPassword] = useState();
 
-  function changePassword() {
-
+  async function changePassword() {
+    try {
+      const currentUser = await Auth.currentAuthenticatedUser();
+      console.log(newPassword)
+      await Auth.changePassword(
+        currentUser,
+        oldPassword,
+        newPassword
+      );
+      alert("Password changed successfully!")
+      setIsOpen(false);
+    } catch (e) {
+      alert(JSON.stringify(e))
+    }
   }
 
   return (
@@ -150,10 +164,29 @@ function Settings({navigation, route}) {
         </View>
         <View style={{ margin: 10, width: 25, height: 2, alignSelf: "center", backgroundColor: "lightgray" }}>
         </View>
+      <Text>
+        Old Password
+      </Text>
       <TextInput
+      secureTextEntry
+      textContentType="password"
+      style={{backgroundColor: "lightgray"}}
+      onChangeText={setOldPassword}
+      value={oldPassword}
       />
+      <Text>
+        New Password
+      </Text>
       <TextInput
+      secureTextEntry
+      textContentType="newPassword"
+      style={{backgroundColor: "lightgray"}}
+      onChangeText={setNewPassword}
+      value={newPassword}
       />
+      <Text onPress={changePassword}>
+        Confirm
+      </Text>
       </View>
     </Modal>
     </View>
