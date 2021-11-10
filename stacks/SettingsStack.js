@@ -19,6 +19,7 @@ import {
 import { Auth, API, graphqlOperation, Cache, Storage } from "aws-amplify";
 import { createUser, updateUser, deleteUser } from '../src/graphql/mutations'
 import Accordion from '../components/Accordion';
+import IconButton from "components/IconButton";
 
 function Settings({navigation, route}) {  
   const deleteUserAsync = async () => {
@@ -73,11 +74,14 @@ function Settings({navigation, route}) {
   const [isOpen, setIsOpen] = useState(false);
   const [oldPassword, setOldPassword] = useState();
   const [newPassword, setNewPassword] = useState();
+  const [confirmNewPassword, setConfirmNewPassword] = useState();
 
   async function changePassword() {
     try {
       const currentUser = await Auth.currentAuthenticatedUser();
-      console.log(newPassword)
+      if (newPassword != confirmNewPassword) {
+        throw "New passwords don't match";
+      }
       await Auth.changePassword(
         currentUser,
         oldPassword,
@@ -86,7 +90,7 @@ function Settings({navigation, route}) {
       alert("Password changed successfully!")
       setIsOpen(false);
     } catch (e) {
-      alert(JSON.stringify(e))
+      alert(e.message ? e.message : e)
     }
   }
 
@@ -164,29 +168,59 @@ function Settings({navigation, route}) {
         </View>
         <View style={{ margin: 10, width: 25, height: 2, alignSelf: "center", backgroundColor: "lightgray" }}>
         </View>
-      <Text>
+        <Text
+        style={{
+          fontSize: 15,
+          margin: 20,
+          marginBottom: 0,
+        }}>
         Old Password
       </Text>
       <TextInput
       secureTextEntry
       textContentType="password"
-      style={{backgroundColor: "lightgray"}}
+      style={{borderBottomWidth: 1, fontSize: 18, margin: 20}}
       onChangeText={setOldPassword}
       value={oldPassword}
       />
-      <Text>
+      <Text
+      style={{
+        fontSize: 15,
+        margin: 20,
+        marginBottom: 0,
+      }}>
         New Password
       </Text>
       <TextInput
       secureTextEntry
       textContentType="newPassword"
-      style={{backgroundColor: "lightgray"}}
+      style={{borderBottomWidth: 1, fontSize: 18, margin: 20}}
       onChangeText={setNewPassword}
       value={newPassword}
       />
-      <Text onPress={changePassword}>
-        Confirm
+      <Text
+      style={{
+        fontSize: 15,
+        margin: 20,
+        marginBottom: 0,
+      }}>
+        Confirm New Password
       </Text>
+      <TextInput
+      secureTextEntry
+      textContentType="newPassword"
+      style={{borderBottomWidth: 1, fontSize: 18, margin: 20}}
+      onChangeText={setConfirmNewPassword}
+      value={confirmNewPassword}
+      />
+      <IconButton
+      fontSize={18}
+      size={20}
+      style={{marginTop: 20, alignSelf: "center"}}
+      iconName={"check"}
+      onPress={changePassword}
+      label="Submit"
+      />
       </View>
     </Modal>
     </View>
