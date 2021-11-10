@@ -5,89 +5,96 @@ const { postsByUser, listFriendships, friendsByReceiver } = require('/opt/querie
 const { deletePost, deleteFriendship } = require('/opt/mutations');
 const { client } = require('/opt/backendResources');
 
-exports.handler = (event, context, callback) => {
+exports.handler = async (event, context, callback) => {
   //eslint-disable-line
-  event.Records.forEach((record) => {
+  return await Promise.all(event.Records.map(async record => {
     if (record.eventName == "REMOVE") {
       const userId = record.dynamodb.OldImage.id.S;
 
-      (async () => {
-        try {
-          while (true) {
-            const results = await client.query({
-              query: gql(postsByUser),
+      try {
+        let nextToken = null;
+
+        while (true) {
+          const results = await client.query({
+            query: gql(postsByUser),
+            variables: {
+              userId: userId,
+            }
+          });
+
+          console.log(results.data.postsByUser);
+          nextToken = results.data.postsByUser.nextToken;
+
+          await Promise.all(results.data.postsByUser.items.map(async (post) => {
+            client.mutate({
+              mutation: gql(deletePost),
               variables: {
-                userId: userId,
+                input: {
+                  userId: post.userId,
+                  createdAt: post.createdAt
+                }
               }
             });
+          }));
 
-            await Promise.all(results.data.postsByUser.items.map(async (post) => {
-              client.mutate({
-                mutation: gql(deletePost),
-                variables: {
-                  input: {
-                    userId: post.userId,
-                    createdAt: post.createdAt
-                  }
-                }
-              });
-            }));
-            
-            if (results.data.postsByUser.nextToken == null) break;
-          }
-          
-          while (true) {
-            const results = await client.query({
-              query: gql(listFriendships),
-              variables: {
-                sender: userId,
-              }
-            });
-
-            results.data.listFriendships.items.map((friendship) => {
-              client.mutate({
-                mutation: gql(deleteFriendship),
-                variables: {
-                  input: {
-                    sender: friendship.sender,
-                    receiver: friendship.receiver
-                  }
-                }
-              });
-            });
-            
-            if (results.data.listFriendships.nextToken == null) break;
-          }
-          
-          while (true) {
-            const results = await client.query({
-              query: gql(friendsByReceiver),
-              variables: {
-                receiver: userId,
-              }
-            });
-
-            await Promise.all(results.data.friendsByReceiver.items.map(async (friendship) => {
-              client.mutate({
-                mutation: gql(deleteFriendship),
-                variables: {
-                  input: {
-                    sender: friendship.sender,
-                    receiver: friendship.receiver
-                  }
-                }
-              });
-            }));
-
-            if (results.data.friendsByReceiver.nextToken == null) break;
-          }
-
-          callback(null, "successfully deleted posts");
-        } catch (e) {
-          console.warn('Error deleting posts: ', e);
-          callback(Error(e));
+          if (nextToken == null) break;
         }
-      })();
+
+        while (true) {
+          const results = await client.query({
+            query: gql(listFriendships),
+            variables: {
+              sender: userId,
+            }
+          });
+          
+          nextToken = results.data.listFriendships.nextToken;
+
+          results.data.listFriendships.items.map((friendship) => {
+            client.mutate({
+              mutation: gql(deleteFriendship),
+              variables: {
+                input: {
+                  sender: friendship.sender,
+                  receiver: friendship.receiver
+                }
+              }
+            });
+          });
+
+          if (nextToken == null) break;
+        }
+
+        while (true) {
+          const results = await client.query({
+            query: gql(friendsByReceiver),
+            variables: {
+              receiver: userId,
+            }
+          });
+
+          nextToken = results.data.friendsByReceiver.nextToken;
+
+          await Promise.all(results.data.friendsByReceiver.items.map(async (friendship) => {
+            client.mutate({
+              mutation: gql(deleteFriendship),
+              variables: {
+                input: {
+                  sender: friendship.sender,
+                  receiver: friendship.receiver
+                }
+              }
+            });
+          }));
+
+          if (results.data.friendsByReceiver.nextToken == null) break;
+        }
+
+        return "successfully deleted posts";
+      } catch (e) {
+        console.warn('Error deleting posts: ', e);
+        return e;
+      }
     }
-  });
+  }));
 };
