@@ -15,16 +15,13 @@ import { withAuthenticator } from "aws-amplify-react-native";
 import awsconfig from "./src/aws-exports"; // if you are using Amplify CLI
 import { Amplify, API, graphqlOperation, Auth, Cache, Storage } from "aws-amplify";
 import { getUser } from "./src/graphql/queries";
-import ProfileStack from "stacks/ProfileStack";
+import ProfileScreen from "screens/ProfileScreen";
 import MainStack from "stacks/MainStack";
 import ReportScreen from "screens/ReportScreen";
 import SettingsStack from "stacks/SettingsStack";
 import FriendScreen from "screens/FriendScreen";
 import ConversationScreen from "screens/ConversationScreen";
 import ComplianceScreen from "screens/ComplianceScreen";
-import ProfileScreen from "screens/ProfileScreen";
-import BioScreen from "screens/BioScreen";
-import GoalsScreen from "screens/GoalsScreen";
 import { updateUser } from 'root/src/graphql/mutations.js'
 import SignIn from "root/components/loginComponents/SignIn.tsx";
 import SignUp from "root/components/loginComponents/SignUp.tsx";
@@ -252,8 +249,6 @@ const App = () => {
               //headerShown: false,
             }}
           />
-          <Stack.Screen name="Bio" component={BioScreen} />
-          <Stack.Screen name="Goals" component={GoalsScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     );
@@ -297,7 +292,7 @@ const App = () => {
           />
           <Drawer.Screen
             name="Profile"
-            component={ProfileStack}
+            component={ProfileScreen}
             initialParams={{ myId: userId }}
             options={{ headerShown: false }}
           />

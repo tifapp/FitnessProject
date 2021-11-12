@@ -4,28 +4,20 @@ import { Text, View, StyleSheet, TextInput, TouchableOpacity, Modal } from 'reac
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AgePicker from './AgePicker'
 import GenderPicker from './GenderPicker'
+import TouchableWithModal from 'components/TouchableWithModal'
 
 const BasicInfoDetails = ({ age, gender, setAge, setGender }) => {
-
-    const [modalOpen, setModalOpen] = useState(false)
-
     return (
-        <View>
-            <Modal transparent={true} visible={modalOpen} animationType='slide'>
-                <View style={{flex: 1}}>
-                    <TouchableOpacity style={{ flex: 1 }} onPress={() => setModalOpen(false)}>
-                    </TouchableOpacity>
-                    <View style={{ flexDirection: "row", justifyContent: "center", backgroundColor: "white", alignItems: "flex-end", marginTop: "auto" }} >
-                        <AgePicker selectedValue={age} setSelectedValue={setAge} />
-                        <GenderPicker selectedValue={gender} setSelectedValue={setGender} />
-                    </View>
+        <TouchableWithModal
+            modalComponent={
+                <View style={{ flexDirection: "row", justifyContent: "center", backgroundColor: "white", alignItems: "flex-end", marginTop: "auto" }} >
+                    <AgePicker selectedValue={age} setSelectedValue={setAge} />
+                    <GenderPicker selectedValue={gender} setSelectedValue={setGender} />
                 </View>
-            </Modal>
-
-            <TouchableOpacity style={[styles.textBoxStyle]} onPress={() => setModalOpen(true)}>
-                <Text style={{ fontSize: 16, color: "black" }}>{`(${age}, ${gender})`}</Text>
-            </TouchableOpacity>
-        </View>
+            }
+        >
+            <Text style={{ fontSize: 16, color: "black" }}>{`(${age}, ${gender})`}</Text>
+        </TouchableWithModal>
     )
 }
 

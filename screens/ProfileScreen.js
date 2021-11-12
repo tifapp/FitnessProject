@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert, Image, Linking, Platform, TextInput } from 'react-native';
-import ProfilePic from 'components/ProfileImagePicker'
-import DetailedInfo from 'components/detailedInfoComponents/DetailedInfo';
+import { ActivityIndicator, View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert, Image, Linking, Platform, TextInput, Keyboard, SafeAreaView } from 'react-native';
+import ProfilePic from 'components/ProfileImagePicker';
 import { Auth, API, graphqlOperation, Cache, Storage } from "aws-amplify";
 import { Ionicons } from "@expo/vector-icons";
 import CheckBox from '@react-native-community/checkbox'; //when ios is supported, we'll use this
@@ -12,6 +11,7 @@ import { saveCapitals, loadCapitals } from 'hooks/stringConversion'
 import BasicInfoDetails from '../components/basicInfoComponents/BasicInfoDetails';
 import fetchProfileImageAsync from 'hooks/fetchProfileImage';
 import * as ImageManipulator from 'expo-image-manipulator';
+import TouchableWithModal from 'components/TouchableWithModal';
 
 var styles = require('styles/stylesheet');
 
@@ -133,19 +133,6 @@ const ProfileScreen = ({ navigation, route }) => {
         }
     }
 
-    const updateDetailedInfo = () => {
-        if (route.params?.updatedField) {
-            const label = route.params.label
-            const updatedField = route.params.updatedField
-            if (label == 'bio') {
-                setBioDetails(updatedField)
-            }
-            else if (label == 'goals') {
-                setGoalsDetails(updatedField)
-            }
-        }
-    }
-
     const createNewUser = () => {
         if (name == '') {
             Alert.alert('Please enter your name!')
@@ -161,7 +148,6 @@ const ProfileScreen = ({ navigation, route }) => {
     }
 
     useEffect(() => { if (!loading) {saveProfilePicture(), setImageChanged(false)} }, [imageChanged])
-    useEffect(() => { updateDetailedInfo() }, [route.params?.updatedField])
 
     if (loading) {
         return (
@@ -179,6 +165,7 @@ const ProfileScreen = ({ navigation, route }) => {
     } else {
         return (
             <ScrollView style={[styles.containerStyle, { backgroundColor: "#efefef" }]} >
+            <SafeAreaView>
                 <View style={{ margin: 20, flexDirection: "row" }}>
                     <ProfilePic imageURL={imageURL} setImageURL={setImageURL} setImageChanged={setImageChanged} />
 
@@ -207,12 +194,85 @@ const ProfileScreen = ({ navigation, route }) => {
                         </View>
                     </View>
                 </View>
-                <DetailedInfo
-                    bioDetails={bioDetails}
-                    goalsDetails={goalsDetails}
-                    setBioDetails={setBioDetails}
-                    setGoalsDetails={setGoalsDetails}
-                />
+
+                <TouchableWithModal
+                    style={{
+                        backgroundColor: "white",
+                        shadowColor: "#000",
+                        shadowOffset: {
+                            width: 0,
+                            height: 1,
+                        },
+                        shadowOpacity: 0.18,
+                        shadowRadius: 1.0,
+                        marginBottom: 20,
+                        marginHorizontal: 20,
+
+                        elevation: 1,
+                        padding: 15,
+                        flex: 0
+                    }}
+                    modalComponent={<Text style={{
+                        fontWeight: 'bold',
+                        marginHorizontal: '5%',
+                        marginVertical: '2%'
+                    }}>{'Tell other users a little bit about yourself! Mention information such as your favorite exercises, sports, music, food, etc to connect with others!'}</Text>}
+                >
+                    <Text style={{ fontSize: 18, color: "gray", marginBottom: 5 }}>{"Biography"}</Text>
+                    <TextInput
+                        placeholder={`Enter your biography!`}
+                        multiline={true}
+                        autoCorrect={false}
+                        value={bioDetails}
+                        onChangeText={setBioDetails}
+                        style={{ fontSize: 18 }}
+                        onEndEditing={() => {
+                            if (!route.params?.newUser) {
+                                updateUserAsync({ bio: saveCapitals(bioDetails) }) //should be doing savecapitals in the backend
+                            }
+                        }}
+                    />
+                </TouchableWithModal>
+
+                <TouchableWithModal
+                    style={{
+                    backgroundColor: "white",
+                    shadowColor: "#000",
+                    shadowOffset: {
+                        width: 0,
+                        height: 1,
+                    },
+                    shadowOpacity: 0.18,
+                    shadowRadius: 1.0,
+                    marginBottom: 20,
+                    marginHorizontal: 20,
+                
+                    elevation: 1,
+                    padding: 15,
+                    flex: 0
+                }}
+                modalComponent={<Text style={{
+                    fontWeight: 'bold',
+                    marginHorizontal: '5%',
+                    marginVertical: '2%'
+                }}>{'Tell other users about your goals! By mentioning your goals, you can find like-minded people to work with!'}</Text>}
+                >                   
+                    <Text style={{ fontSize: 18, color: "gray", marginBottom: 5 }}>{"Goals"}</Text>
+                    <TextInput
+                        placeholder={`Enter your goals!`}
+                        multiline={true}
+                        autoCorrect={false}
+                        value={goalsDetails}
+                        onChangeText={setGoalsDetails}
+                        style={{ fontSize: 18 }}
+                        onEndEditing={() => {
+                            if (!route.params?.newUser) {
+                                updateUserAsync({ goals: saveCapitals(goalsDetails) }) //should be doing savecapitals in the backend
+                            }
+                        }}
+                    />
+                </TouchableWithModal>                
+
                 <TouchableOpacity style={[styles.rowContainerStyle, { marginBottom: 20 }]} onPress={() => { setLocationEnabled(!locationEnabled) }} >
                     {
                         locationEnabled === true && getLocation(true) == null
@@ -240,6 +300,7 @@ const ProfileScreen = ({ navigation, route }) => {
                         </TouchableOpacity>
                         : null
                 }
+                </SafeAreaView>
             </ScrollView>
         )
     }
