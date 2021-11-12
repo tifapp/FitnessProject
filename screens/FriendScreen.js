@@ -50,7 +50,7 @@ function FriendList({navigation, route}) {
   
   useEffect(() => {    
     const receivedConversationSubscription = API.graphql(
-      graphqlOperation(onCreatePostForReceiver, { receiver: myId })
+      graphqlOperation(onCreatePostForReceiver, { receiver: route.params?.myId })
     ).subscribe({
       next: (event) => {
         //no need for security checks here
