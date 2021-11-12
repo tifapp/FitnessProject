@@ -22,7 +22,7 @@ exports.handler = async (event, context, callback) => {
             }
           });
 
-          console.log(results.data.postsByUser);
+          //console.log(results.data.postsByUser);
           nextToken = results.data.postsByUser.nextToken;
 
           await Promise.all(results.data.postsByUser.items.map(async (post) => {
