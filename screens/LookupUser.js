@@ -107,7 +107,7 @@ const LookupUser = ({ route, navigation }) => {
     addConversation(userId);
 
     return () => {
-      waitForFriend.unsubscribe();
+      if (waitForFriend) waitForFriend.unsubscribe();
       onUpdate.unsubscribe();
       onDelete.unsubscribe();
       onDelete2.unsubscribe();

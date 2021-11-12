@@ -599,7 +599,7 @@ function PostInputField({ channel, receiver, myId, originalParentId, pushLocalPo
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     pushLocalPost(localNewPost);
 
-    if (newPost.receiver) global.updateFriendsListWithMyNewMessage(newPost);
+    if (newPost.receiver && global.updateFriendsListWithMyNewMessage) global.updateFriendsListWithMyNewMessage(newPost);
     //if (global.updatemessagescreen)
     //global.updateMessageScreen
     //if global.updateconversationscreen
@@ -762,6 +762,8 @@ function PostInputField({ channel, receiver, myId, originalParentId, pushLocalPo
           } : addPostAsync}
         />
       </View>
+
+      <SpamButton func={addPostAsync}/>
 
       {
         progress > 0 ?

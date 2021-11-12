@@ -22,32 +22,30 @@ exports.handler = async (event) => {
             query: gql(postsByChannel),
             variables: {
               channel: record.dynamodb.OldImage.id.S,
-              limit: Math.floor(Math.random() * (1000 - 100) + 100),
-              nextToken: nextToken,
             }
           });
 
-          console.log(results.data)
+          //console.log(results.data)
+          nextToken = results.data.postsByChannel.nextToken;
 
           await Promise.all(results.data.postsByChannel.items.map(async (post) => {
             client.mutate({
               mutation: gql(deletePost),
               variables: {
                 input: {
-                  createdAt: post.createdAt,
                   userId: post.userId,
+                  createdAt: post.createdAt,
                 }
               }
             });
           }));
 
-          nextToken = results.data.postsByChannel.nextToken;
           if (nextToken == null) break;
         }
 
         return "successfully deleted messages";
       } catch (e) {
-        console.warn('Error deleting replies: ', e);
+        console.warn('Error deleting messages: ', e);
         return e;
       }
     }

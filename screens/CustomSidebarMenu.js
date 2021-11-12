@@ -64,20 +64,6 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
 
         global.showNotificationDot();
         setNewConversations(currentNewConversations.current + 1);
-
-        //no need for security checks here
-        setFriendList((friends) => {
-          return friends.map((friend) => {
-            if (
-              newPost.userId === friend.sender || newPost.userId === friend.receiver
-            ) {
-              friend.lastMessage = newPost.description;
-              friend.lastUser = newPost.userId;
-              friend.isRead = null;
-            }
-            return friend;
-          })
-        });
         //foreach users in conversation, if it's not myid and it's in friend list, update friend list, and push it to the top.
         //alternatively for message screen, for each user in message screen, if it's in conversation push it to the top. otherwise just put this conversation at the top of the list.
       },
