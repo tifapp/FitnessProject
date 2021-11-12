@@ -1,8 +1,8 @@
 require('isomorphic-fetch');
 const gql = require('graphql-tag');
 
-const { postsByUser, listFriendships, friendsByReceiver } = require('/opt/queries');
-const { deletePost, deleteFriendship } = require('/opt/mutations');
+const { postsByUser, listFriendships, friendsByReceiver, listLikes } = require('/opt/queries');
+const { deletePost, deleteFriendship, deleteLike } = require('/opt/mutations');
 const { client } = require('/opt/backendResources');
 
 exports.handler = async (event, context, callback) => {
@@ -25,7 +25,7 @@ exports.handler = async (event, context, callback) => {
           //console.log(results.data.postsByUser);
           nextToken = results.data.postsByUser.nextToken;
 
-          await Promise.all(results.data.postsByUser.items.map(async (post) => {
+          await Promise.all(results.data.postsByUser.items.map(async (post) => 
             client.mutate({
               mutation: gql(deletePost),
               variables: {
@@ -34,8 +34,8 @@ exports.handler = async (event, context, callback) => {
                   createdAt: post.createdAt
                 }
               }
-            });
-          }));
+            })
+          ));
 
           if (nextToken == null) break;
         }
@@ -50,7 +50,7 @@ exports.handler = async (event, context, callback) => {
           
           nextToken = results.data.listFriendships.nextToken;
 
-          results.data.listFriendships.items.map((friendship) => {
+          await Promise.all(results.data.listFriendships.items.map((friendship) =>
             client.mutate({
               mutation: gql(deleteFriendship),
               variables: {
@@ -59,8 +59,8 @@ exports.handler = async (event, context, callback) => {
                   receiver: friendship.receiver
                 }
               }
-            });
-          });
+            })
+          ));
 
           if (nextToken == null) break;
         }
@@ -75,7 +75,7 @@ exports.handler = async (event, context, callback) => {
 
           nextToken = results.data.friendsByReceiver.nextToken;
 
-          await Promise.all(results.data.friendsByReceiver.items.map(async (friendship) => {
+          await Promise.all(results.data.friendsByReceiver.items.map(async (friendship) =>
             client.mutate({
               mutation: gql(deleteFriendship),
               variables: {
@@ -84,10 +84,35 @@ exports.handler = async (event, context, callback) => {
                   receiver: friendship.receiver
                 }
               }
-            });
-          }));
+            })
+          ));
 
-          if (results.data.friendsByReceiver.nextToken == null) break;
+          if (nextToken == null) break;
+        }
+        
+        while (true) {
+          const results = await client.query({
+            query: gql(listLikes),
+            variables: {
+              userId: userId,
+            }
+          });
+
+          nextToken = results.data.listLikes.nextToken;
+
+          await Promise.all(results.data.listLikes.items.map(async (like) =>
+            client.mutate({
+              mutation: gql(deleteLike),
+              variables: {
+                input: {
+                  userId: userId,
+                  postId: like.postId
+                }
+              }
+            })
+          ));
+
+          if (nextToken == null) break;
         }
 
         return "successfully deleted posts";

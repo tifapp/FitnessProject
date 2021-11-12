@@ -18,17 +18,18 @@ exports.handler = async (event) => {
       try {
         let nextToken = null;
         while (true) {
-          const results = await client.query({
+          let results = null;
+          results = await client.query({
             query: gql(postsByChannel),
             variables: {
               channel: record.dynamodb.OldImage.id.S,
             }
           });
 
-          //console.log(results.data)
+          //console.log(results.data.postsByChannel);
           nextToken = results.data.postsByChannel.nextToken;
 
-          await Promise.all(results.data.postsByChannel.items.map(async (post) => {
+          await Promise.all(results.data.postsByChannel.items.map(async (post) =>
             client.mutate({
               mutation: gql(deletePost),
               variables: {
@@ -37,8 +38,8 @@ exports.handler = async (event) => {
                   createdAt: post.createdAt,
                 }
               }
-            });
-          }));
+            })
+          ));
 
           if (nextToken == null) break;
         }

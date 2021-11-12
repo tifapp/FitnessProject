@@ -80,7 +80,7 @@ function Settings({navigation, route}) {
     try {
       const currentUser = await Auth.currentAuthenticatedUser();
       if (newPassword != confirmNewPassword) {
-        throw "New passwords don't match";
+        throw "Passwords don't match";
       }
       await Auth.changePassword(
         currentUser,
@@ -189,7 +189,7 @@ function Settings({navigation, route}) {
         margin: 20,
         marginBottom: 0,
       }}>
-        New Password
+        New Password (at least eight characters)
       </Text>
       <TextInput
       secureTextEntry
