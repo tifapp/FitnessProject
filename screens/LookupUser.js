@@ -108,9 +108,9 @@ const LookupUser = ({ route, navigation }) => {
 
     return () => {
       if (waitForFriend) waitForFriend.unsubscribe();
-      onUpdate.unsubscribe();
-      onDelete.unsubscribe();
-      onDelete2.unsubscribe();
+      if (onUpdate) onUpdate.unsubscribe();
+      if (onDelete) onDelete.unsubscribe();
+      if (onDelete2) onDelete2.unsubscribe();
     };
   }, []);
 
