@@ -19,6 +19,7 @@ exports.handler = async (event, context, callback) => {
             query: gql(postsByUser),
             variables: {
               userId: userId,
+              nextToken: nextToken,
             }
           });
 
@@ -45,6 +46,7 @@ exports.handler = async (event, context, callback) => {
             query: gql(listFriendships),
             variables: {
               sender: userId,
+              nextToken: nextToken,
             }
           });
           
@@ -70,6 +72,7 @@ exports.handler = async (event, context, callback) => {
             query: gql(friendsByReceiver),
             variables: {
               receiver: userId,
+              nextToken: nextToken,
             }
           });
 
@@ -95,6 +98,7 @@ exports.handler = async (event, context, callback) => {
             query: gql(listLikes),
             variables: {
               userId: userId,
+              nextToken: nextToken,
             }
           });
 
