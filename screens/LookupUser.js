@@ -529,7 +529,9 @@ const LookupUser = ({ route, navigation }) => {
         </View>
       </View>
       
-      <View style={{
+      {
+        user.bio ?
+          <View style={{
             backgroundColor: "white",
             shadowColor: "#000",
             shadowOffset: {
@@ -544,13 +546,17 @@ const LookupUser = ({ route, navigation }) => {
             elevation: 1,
             padding: 15,
             flex: 0
-        }}>
-            <Text style={{fontSize: 18, color: "gray", marginBottom: 5}}>Biography</Text>
+          }}>
+            <Text style={{ fontSize: 18, color: "gray", marginBottom: 5 }}>Biography</Text>
 
-            <Text style={{fontSize: 18, color: "black"}}>{loadCapitals(user.bio)}</Text>
-        </View>
-        
-      <View style={{
+            <Text style={{ fontSize: 18, color: "black" }}>{loadCapitals(user.bio)}</Text>
+          </View>
+          : null
+      }
+
+      {
+        user.goals ?
+          <View style={{
             backgroundColor: "white",
             shadowColor: "#000",
             shadowOffset: {
@@ -565,11 +571,13 @@ const LookupUser = ({ route, navigation }) => {
             elevation: 1,
             padding: 15,
             flex: 0
-        }}>
-            <Text style={{fontSize: 18, color: "gray", marginBottom: 5}}>Goals</Text>
+          }}>
+            <Text style={{ fontSize: 18, color: "gray", marginBottom: 5 }}>Goals</Text>
 
-            <Text style={{fontSize: 18, color: "black"}}>{loadCapitals(user.goals)}</Text>
-        </View>
+            <Text style={{ fontSize: 18, color: "black" }}>{loadCapitals(user.goals)}</Text>
+          </View>
+          : null
+      }
 
       <View>
         {mutualfriendList.length != 0 ? (
