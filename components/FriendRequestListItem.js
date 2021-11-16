@@ -17,7 +17,6 @@ export default function FriendRequestListItem({
   respondRequestHandler,
   confirmResponseHandler,
   undoResponseHandler,
-  removeFriendHandler,
   navigation,
   isNew,
   myId,
@@ -41,7 +40,7 @@ export default function FriendRequestListItem({
             {
               text: "Yes",
               onPress: () => {
-                removeFriendHandler(item, true), confirmResponseHandler(item, isNew);
+                confirmResponseHandler(item, isNew);
               },
             },
             {
@@ -132,7 +131,7 @@ export default function FriendRequestListItem({
                 }}
               >
                 <IconButton
-                  style={{marginRight: 15}}
+                  style={{marginLeft: 15}}
                   iconName={"undo"}
                   size={20}
                   color={"black"}
@@ -156,7 +155,7 @@ export default function FriendRequestListItem({
                 }}
               >
                 <IconButton
-                  style={{marginRight: 15}}
+                  style={{marginLeft: 15}}
                   iconName={"clear"}
                   size={20}
                   color={"red"}

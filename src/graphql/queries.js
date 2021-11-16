@@ -662,6 +662,7 @@ export const getUser = /* GraphQL */ `
       goals
       latitude
       longitude
+      status
       deviceToken
       friendRequestPrivacy
       messagesPrivacy
@@ -687,6 +688,7 @@ export const listUsers = /* GraphQL */ `
         goals
         latitude
         longitude
+        status
         deviceToken
         friendRequestPrivacy
         messagesPrivacy

@@ -11,8 +11,8 @@ import {
   SafeAreaView,
   LayoutAnimation
 } from "react-native";
-import { getSortedConversations, listConversations, batchGetConversations } from "../src/graphql/queries";
-import { deleteConversation } from "root/src/graphql/mutations";
+import { getSortedConversations, listConversations, batchGetConversations, getConversation } from "../src/graphql/queries";
+import { deleteConversation, updateFriendship, deleteFriendship } from "root/src/graphql/mutations";
 import Accordion from "components/Accordion";
 import {
   onCreatePostForReceiver,
@@ -43,6 +43,25 @@ var subscriptions = [];
 
 function FriendList({navigation, route}) {
   const [friendList, setFriendList] = useState([]);
+  
+  const loadLastMessageAndListenForNewOnes = async (newFriend) => {
+    //if (currentFriends.current.find(item => item.sender === newFriend.sender && item.receiver === newFriend.receiver)) return;
+    //check if a convo already exists between the two users
+    const friendlistarray = [newFriend.sender, newFriend.receiver].sort();
+
+    const convo = await API.graphql(
+      graphqlOperation(getConversation, { id: friendlistarray[0] + friendlistarray[1] })
+    );
+
+    if (convo.data.getConversation != null) {
+      console.log("found old condo")
+      newFriend.lastMessage = convo.data.getConversation.lastMessage
+      newFriend.lastUser = convo.data.getConversation.lastUser
+    } else { console.log("couldnt find condo") }
+
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setFriendList(currentFriends => [newFriend, ...currentFriends]);
+  }
   
   useEffect(() => {
     friendList.forEach(friend => global.addConversationIds(friend.sender == route.params?.myId ? friend.receiver : friend.sender));
@@ -75,6 +94,8 @@ function FriendList({navigation, route}) {
       graphqlOperation(onAcceptedFriendship)
     ).subscribe({
       next: async (event) => {
+        console.log("friend subscription fired ")
+
         const newFriend = event.value.data.onAcceptedFriendship;
         //we can see all friend requests being accepted, so we just have to make sure it's one of ours.
         if (newFriend.sender === route.params?.myId || newFriend.receiver === route.params?.myId) {
@@ -288,34 +309,16 @@ export default function FriendScreen({ navigation, route }) {
       )
     ); //locally removes the item
 
-    if (item.accepted && (friendList.length == 0 || !friendList.find(item1 => item1.sender == item.sender && item1.receiver == item.receiver))) {
-      console.log("Inside removeFriendRequestListItem");
-
-      var newFriend = {
-        createdAt: (new Date(Date.now())).toISOString(),
-        updatedAt: (new Date(Date.now())).toISOString(),
-        sender: item.sender,
-        receiver: item.receiver,
-      };
-
-      loadLastMessageAndListenForNewOnes(newFriend);
-    }
-
     try {
       if (item.accepted) {
+        const conversationId = [item.sender, item.receiver].sort().join();
 
-        const friend_sender = item.sender;
-        const friend_receiver = item.receiver;
+        let newConversation = await API.graphql(graphqlOperation(getConversation, { id: conversationId }))
 
-        let newConversations1 = await API.graphql(graphqlOperation(getConversations, { Accepted: 0 }))
-        newConversations1 = newConversations1.data.getConversations.items
+        console.log(newConversation);
 
-        let checkConversationExists = newConversations1.find(item =>
-          (item.users[0] == friend_sender && item.users[1] == friend_receiver) || (item.users[0] == friend_receiver && item.users[1] == friend_sender));
-
-        if (checkConversationExists != null) {
-          channel = checkConversationExists.id;
-          await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, Accepted: 1 } }));
+        if (newConversation.data.getConversation != null) {
+          await API.graphql(graphqlOperation(updateConversation, { input: { id: conversationId, Accepted: 1 } }));
         }
 
         await API.graphql(
@@ -335,25 +338,6 @@ export default function FriendScreen({ navigation, route }) {
       console.log("error responding to request: ", err);
     }
   };
-
-  const loadLastMessageAndListenForNewOnes = async (newFriend) => {
-    //if (currentFriends.current.find(item => item.sender === newFriend.sender && item.receiver === newFriend.receiver)) return;
-    //check if a convo already exists between the two users
-    const friendlistarray = [newFriend.sender, newFriend.receiver].sort();
-
-    const convo = await API.graphql(
-      graphqlOperation(getConversation, { id: friendlistarray[0] + friendlistarray[1] })
-    );
-
-    if (convo.data.getConversation != null) {
-      console.log("found old condo")
-      newFriend.lastMessage = convo.data.getConversation.lastMessage
-      newFriend.lastUser = convo.data.getConversation.lastUser
-    } else { console.log("couldnt find condo") }
-
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setFriendList([newFriend, ...currentFriends.current]);
-  }
 
   global.updateFriendsListWithMyNewMessage = (newPost) => {
     setFriendList((friends) => {
@@ -395,13 +379,13 @@ export default function FriendScreen({ navigation, route }) {
           console.log("security error with incoming friend request");
 
         //if this new request is coming from someone already in your local friends list, remove them from your local friends list
-        if (currentFriends.current.find((item) => item.sender === newFriendRequest.sender)) {
+        //if (currentFriends.current.find((item) => item.sender === newFriendRequest.sender)) {
           setFriendList(
-            currentFriends.current.filter(
+            currentFriends => currentFriends.filter(
               (item) => item.sender != newFriendRequest.sender || item.receiver != newFriendRequest.sender
             )
           );
-        }
+        //}
 
         //if this new request is not already in your local friend request list, add it to your local friend request list
         if (currentFriendRequests.current.find((item) => item.sender === newFriendRequest.sender)) {
@@ -524,7 +508,6 @@ export default function FriendScreen({ navigation, route }) {
             respondRequestHandler={respondToRequest}
             undoResponseHandler={undoResponse}
             confirmResponseHandler={confirmResponse}
-            removeFriendHandler={removeFriend}
             myId={route.params?.myId}
             isNew={index //< route.params.newfriendrequests
               < 20}

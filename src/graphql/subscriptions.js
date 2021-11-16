@@ -302,6 +302,7 @@ export const onCreateUser = /* GraphQL */ `
       goals
       latitude
       longitude
+      status
       deviceToken
       friendRequestPrivacy
       messagesPrivacy
@@ -322,6 +323,7 @@ export const onUpdateUser = /* GraphQL */ `
       goals
       latitude
       longitude
+      status
       deviceToken
       friendRequestPrivacy
       messagesPrivacy
@@ -342,6 +344,7 @@ export const onDeleteUser = /* GraphQL */ `
       goals
       latitude
       longitude
+      status
       deviceToken
       friendRequestPrivacy
       messagesPrivacy
