@@ -337,7 +337,7 @@ export default function FriendScreen({ navigation, route }) {
   };
 
   const loadLastMessageAndListenForNewOnes = async (newFriend) => {
-    if (currentFriends.current.find(item => item.sender === newFriend.sender && item.receiver === newFriend.receiver)) return;
+    //if (currentFriends.current.find(item => item.sender === newFriend.sender && item.receiver === newFriend.receiver)) return;
     //check if a convo already exists between the two users
     const friendlistarray = [newFriend.sender, newFriend.receiver].sort();
 
