@@ -44,6 +44,20 @@ var subscriptions = [];
 function FriendList({navigation, route}) {
   const [friendList, setFriendList] = useState([]);
   
+  global.updateFriendsListWithMyNewMessage = (newPost) => {
+    setFriendList((friends) => {
+      return friends.map((friend) => {
+        if (
+          newPost.receiver === friend.receiver || newPost.receiver === friend.sender
+        ) {
+          friend.lastMessage = newPost.description;
+          friend.lastUser = route.params?.myId;
+        }
+        return friend;
+      })
+    });
+  }
+  
   const loadLastMessageAndListenForNewOnes = async (newFriend) => {
     //if (currentFriends.current.find(item => item.sender === newFriend.sender && item.receiver === newFriend.receiver)) return;
     //check if a convo already exists between the two users
@@ -73,7 +87,7 @@ function FriendList({navigation, route}) {
     ).subscribe({
       next: (event) => {
         //no need for security checks here
-        setFriendList((friends) => {
+        setFriendList(friends => {
           return friends.map((friend) => {
             if (
               newPost.userId === friend.sender || newPost.userId === friend.receiver
@@ -338,20 +352,6 @@ export default function FriendScreen({ navigation, route }) {
       console.log("error responding to request: ", err);
     }
   };
-
-  global.updateFriendsListWithMyNewMessage = (newPost) => {
-    setFriendList((friends) => {
-      return friends.map((friend) => {
-        if (
-          newPost.receiver === friend.receiver || newPost.receiver === friend.sender
-        ) {
-          friend.lastMessage = newPost.description;
-          friend.lastUser = route.params?.myId;
-        }
-        return friend;
-      })
-    });
-  }
 
   useEffect(() => {
     /*
