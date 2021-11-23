@@ -11,6 +11,8 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import fetchUserAsync from 'hooks/fetchName';
 import fetchProfileImageAsync from 'hooks/fetchProfileImage';
+import { MaterialIcons } from "@expo/vector-icons";
+import StatusColors from 'hooks/statusColors';
 
 var styles = require("../styles/stylesheet");
 
@@ -25,14 +27,14 @@ export const ProfileImageAndName = React.memo(function (props) {
     if (!global.savedUsers[props.userId] || (!!props.isFullSize && !global.savedUsers[props.userId].isFullSize)) {
       (async() => {
         try {
-          const {name, identityId} = await fetchUserAsync(props.userId);
+          const {name, identityId, status} = await fetchUserAsync(props.userId);
           const profileimageurl = await fetchProfileImageAsync(identityId, props.isFullSize);
 
           Image.getSize(
             profileimageurl,
             () => {
               //if (mounted) {
-              global.savedUsers[props.userId] = { name: name, imageURL: profileimageurl, isFullSize: props.isFullSize }
+              global.savedUsers[props.userId] = { name: name, imageURL: profileimageurl, isFullSize: props.isFullSize, status: status }
               //console.log("saved profileimageandname to local cache, should update")
               //will this trigger the second use effect or will we have to do this again?
               setUserInfo(global.savedUsers[props.userId]);
@@ -40,7 +42,7 @@ export const ProfileImageAndName = React.memo(function (props) {
             },
             (err) => {
               //console.log("couldn't find user's profile image");
-              global.savedUsers[props.userId] = { name: name, imageURL: '', isFullSize: props.isFullSize } //use DPI to figure out what resolution we should save at
+              global.savedUsers[props.userId] = { name: name, imageURL: '', isFullSize: props.isFullSize, status: status } //use DPI to figure out what resolution we should save at
               //console.log("saved profileimageandname to local cache, should update")
               //will this trigger the second use effect or will we have to do this again?
               setUserInfo(global.savedUsers[props.userId]);
@@ -99,6 +101,7 @@ export const ProfileImageAndName = React.memo(function (props) {
               : { uri: userInfo.imageURL }
           }
         />
+        {userInfo && userInfo.status ? <MaterialIcons name="circle" size={10} color={StatusColors[userInfo.status]} style={{position: "absolute", bottom: -5, left: -5}} /> : null}
         {props.imageOverlay}
         {
           userInfo == null ?

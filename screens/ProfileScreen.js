@@ -12,6 +12,8 @@ import BasicInfoDetails from '../components/basicInfoComponents/BasicInfoDetails
 import fetchProfileImageAsync from 'hooks/fetchProfileImage';
 import * as ImageManipulator from 'expo-image-manipulator';
 import TouchableWithModal from 'components/TouchableWithModal';
+import StatusPicker from 'components/basicInfoComponents/StatusPicker';
+import StatusIndicator from 'components/StatusIndicator';
 
 var styles = require('styles/stylesheet');
 
@@ -23,6 +25,7 @@ const ProfileScreen = ({ navigation, route }) => {
     const [identityId, setIdentityId] = useState();
     const [age, setAge] = useState(18);
     const [gender, setGender] = useState('Male');
+    const [status, setStatus] = useState();
     const [bioDetails, setBioDetails] = useState('');
     const [goalsDetails, setGoalsDetails] = useState('');
     const [locationEnabled, setLocationEnabled] = useState(false);
@@ -50,6 +53,7 @@ const ProfileScreen = ({ navigation, route }) => {
                 setGender(fields.gender);
                 setBioDetails(loadCapitals(fields.bio));
                 setGoalsDetails(loadCapitals(fields.goals));
+                setStatus(fields.status);
                 setLocationEnabled(fields.latitude != null);
             }
 
@@ -192,6 +196,16 @@ const ProfileScreen = ({ navigation, route }) => {
                                 gender={gender}
                                 setGender={setGender} />
                         </View>
+                            
+                        <TouchableWithModal
+                            modalComponent={
+                                <View style={{ flexDirection: "row", justifyContent: "center", backgroundColor: "white", alignItems: "flex-end", marginTop: "auto" }} >
+                                    <StatusPicker selectedValue={status} setSelectedValue={val => {setStatus(val), updateUserAsync({ status: val })}} />
+                                </View>
+                            }
+                        >
+                            <StatusIndicator status={status} shouldShow={true} />
+                        </TouchableWithModal>
                     </View>
                 </View>
 

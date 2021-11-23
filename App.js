@@ -294,7 +294,6 @@ const App = () => {
             name="Profile"
             component={ProfileScreen}
             initialParams={{ myId: userId }}
-            options={{ headerShown: false }}
           />
           <Drawer.Screen name='My Groups' component={MyGroupsScreen} initialParams={{ myId: userId }}/>
           <Drawer.Screen

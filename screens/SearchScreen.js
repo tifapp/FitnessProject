@@ -156,6 +156,10 @@ export default function SearchScreen({ navigation, route }) {
                                     name: {
                                         beginsWith: currentQuery.current
                                     }
+                                },{
+                                    status: {
+                                        beginsWith: currentQuery.current
+                                    }
                                 },
                                 {
                                     name: {

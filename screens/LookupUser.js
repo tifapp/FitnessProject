@@ -43,6 +43,7 @@ import {
 } from "root/src/graphql/subscriptions";
 import APIList from "components/APIList";
 import { saveCapitals, loadCapitals } from 'hooks/stringConversion';
+import StatusIndicator from 'components/StatusIndicator';
 
 var styles = require("styles/stylesheet");
 
@@ -424,106 +425,7 @@ const LookupUser = ({ route, navigation }) => {
             }
             spaceAfterName={true}
             subtitleComponent={
-              !(friendStatus == "blocker" || friendStatus == "blocked") && route.params?.myId != user.id ?
-                <View style={{ alignItems: "flex-start" }}>
-                  {(!user.messagesPrivacy || user.messagesPrivacy === 0 || (mutualfriendList.length > 0 && user.messagesPrivacy === 1) || (friendStatus === "friends" && user.messagesPrivacy >= 1)) ?
-                    <IconButton
-                      style={{ marginBottom: 10 }}
-                      iconName={"message"}
-                      size={20}
-                      fontSize={18}
-                      color={"blue"}
-                      onPress={() => {
-                        navigation.navigate(userId);
-                      }}
-                      fontWeight={"normal"}
-                      label={"Message"}
-                    />
-                    : null}
-                  {(!user.friendRequestPrivacy || user.friendRequestPrivacy === 0 || (mutualfriendList.length > 0 && user.friendRequestPrivacy === 1) || (friendStatus === "friends" && user.friendRequestPrivacy >= 1)) ?
-                    friendStatus === "none" ?
-                      <IconButton
-                        iconName={"person-add"}
-                        size={20}
-                        fontWeight={"normal"}
-                        fontSize={18}
-                        color={"blue"}
-                        onPress={sendFriendRequest}
-                        label={"Add Friend"}
-                      />
-                      : friendStatus === "sending" ?
-                      <Text style={{fontWeight: "bold", fontSize: 18, marginTop: 2}}>
-                        Sending Request...
-                      </Text>
-                        : friendStatus === "sent" ?
-                        <IconButton
-                          iconName={"person-remove"}
-                          size={20}
-                          fontWeight={"normal"}
-                          fontSize={18}
-                          color={"red"}
-                          onPress={unsendFriendRequest}
-                          label={"Unsend Request"}
-                        />
-                          : friendStatus === "unsending" ?
-                          <Text style={{fontWeight: "bold", fontSize: 18, marginTop: 2}}>
-                              Unsending Request...
-                            </Text>
-                            : friendStatus == "received" ? (
-                              <View style={{ alignItems: "flex-start" }}>
-                                <IconButton
-                                  iconName={"person-add"}
-                                  size={20}
-                                  fontWeight={"normal"}
-                                  fontSize={18}
-                                  color={"green"}
-                                  onPress={acceptFriendRequest}
-                                  label={"Accept Friend"}
-                                  style={{ marginBottom: 10 }}
-                                />
-                                <IconButton
-                                  iconName={"person-remove"}
-                                  size={20}
-                                  fontWeight={"normal"}
-                                  fontSize={18}
-                                  color={"red"}
-                                  onPress={rejectFriendRequest}
-                                  label={"Reject Friend"}
-                                />
-                              </View>
-                            )
-                              : friendStatus === "rejecting" ? (
-                                <Text style={{fontWeight: "bold", fontSize: 18, marginTop: 2}}>
-                                    Rejecting Request...
-                                  </Text>
-                              ) : friendStatus === "accepting" ? (
-                                <Text style={{fontWeight: "bold", fontSize: 18, marginTop: 2}}>
-                                    Accepting Request...
-                                  </Text>
-                              ) : friendStatus === "deleting" ? (
-                                <Text style={{fontWeight: "bold", fontSize: 18, marginTop: 2}}>
-                                    Removing Friend...
-                                  </Text>
-                              ) : friendStatus === "friends" ? (
-                                <View>
-                                  <View style={styles.viewProfileScreen}>
-                                    <Text>Friends for {friendsSince} </Text>
-                                  </View>
-                                  <IconButton
-                                    iconName={"person-remove"}
-                                    size={20}
-                                    fontWeight={"normal"}
-                                    fontSize={18}
-                                    color={"red"}
-                                    onPress={deleteFriend}
-                                    label={"Unfriend"}
-                                  />
-                                </View>
-                              )
-                                : null
-                    : null
-                  }
-                </View> : null
+              <StatusIndicator status={user.status} />
             }
           />
         </View>
