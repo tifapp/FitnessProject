@@ -20,6 +20,7 @@ import MainStack from "stacks/MainStack";
 import ReportScreen from "screens/ReportScreen";
 import SettingsStack from "stacks/SettingsStack";
 import FriendScreen from "screens/FriendScreen";
+import VerificationScreen from "screens/VerificationScreen";
 import ConversationScreen from "screens/ConversationScreen";
 import ComplianceScreen from "screens/ComplianceScreen";
 import { updateUser } from 'root/src/graphql/mutations.js'
@@ -293,6 +294,11 @@ const App = () => {
           <Drawer.Screen
             name="Profile"
             component={ProfileScreen}
+            initialParams={{ myId: userId }}
+          />
+          <Drawer.Screen
+            name="Verification"
+            component={VerificationScreen}
             initialParams={{ myId: userId }}
           />
           <Drawer.Screen name='My Groups' component={MyGroupsScreen} initialParams={{ myId: userId }}/>

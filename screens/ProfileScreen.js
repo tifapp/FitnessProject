@@ -200,7 +200,14 @@ const ProfileScreen = ({ navigation, route }) => {
                         <TouchableWithModal
                             modalComponent={
                                 <View style={{ flexDirection: "row", justifyContent: "center", backgroundColor: "white", alignItems: "flex-end", marginTop: "auto" }} >
-                                    <StatusPicker selectedValue={status} setSelectedValue={val => {setStatus(val), updateUserAsync({ status: val })}} />
+                                    <StatusPicker selectedValue={status} setSelectedValue={val => {
+                                        if (val === "Health Professional") {
+                                            navigation.navigate("Verification");
+                                        } 
+                                        else {
+                                            setStatus(val), updateUserAsync({ status: val })}
+                                        }
+                                        } />
                                 </View>
                             }
                         >
