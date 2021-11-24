@@ -101,7 +101,6 @@ export const ProfileImageAndName = React.memo(function (props) {
               : { uri: userInfo.imageURL }
           }
         />
-        {userInfo && userInfo.status ? <MaterialIcons name="circle" size={10} color={StatusColors[userInfo.status]} style={{position: "absolute", bottom: -5, left: -5}} /> : null}
         {props.imageOverlay}
         {
           userInfo == null ?
@@ -126,6 +125,12 @@ export const ProfileImageAndName = React.memo(function (props) {
               onPress={props.onPress ? () => {props.onPress(userInfo.imageURL)} : goToProfile}
               style={[props.textStyle, { flexWrap: "wrap", }]}
             >
+              {!props.isFullSize
+              && userInfo 
+              && userInfo.status 
+              ? <MaterialIcons name="circle" size={10} color={StatusColors[userInfo.status]}/> 
+              : null}
+              {" "}
               {userInfo != null && userInfo.name
                 ? userInfo.isFullSize || userInfo.name.length <= 40
                   ? userInfo.name + (props.spaceAfterName ? " " : "")
