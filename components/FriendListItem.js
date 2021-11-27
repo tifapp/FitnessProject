@@ -154,7 +154,6 @@ export default function FriendListItem({
             fontWeight: "bold",
             fontSize: 16,
             color: Accepted === 0 ? "blue" : "black",
-            textDecorationLine: 'underline'
           }}
           userId={friendId}
           textLayoutStyle={{ flex: 1, flexGrow: 1 }}

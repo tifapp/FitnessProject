@@ -480,6 +480,109 @@ const LookupUser = ({ route, navigation }) => {
           </View>
           : null
       }
+      
+      {
+        !(friendStatus == "blocker" || friendStatus == "blocked") && route.params?.myId != user.id ?
+          <View style={{ alignItems: "center", justifyContent: "space-around", flexDirection: "row", marginBottom: 20 }}>
+            {(!user.messagesPrivacy || user.messagesPrivacy === 0 || (mutualfriendList.length > 0 && user.messagesPrivacy === 1) || (friendStatus === "friends" && user.messagesPrivacy >= 1)) ?
+              <IconButton
+                style={{}}
+                iconName={"message"}
+                size={20}
+                fontSize={18}
+                color={"blue"}
+                onPress={() => {
+                  navigation.navigate(userId);
+                }}
+                fontWeight={"normal"}
+                label={"Message"}
+              />
+              : null}
+            {(!user.friendRequestPrivacy || user.friendRequestPrivacy === 0 || (mutualfriendList.length > 0 && user.friendRequestPrivacy === 1) || (friendStatus === "friends" && user.friendRequestPrivacy >= 1)) ?
+              friendStatus === "none" ?
+                <IconButton
+                  iconName={"person-add"}
+                  size={20}
+                  fontWeight={"normal"}
+                  fontSize={18}
+                  color={"blue"}
+                  onPress={sendFriendRequest}
+                  label={"Add Friend"}
+                />
+                : friendStatus === "sending" ?
+                  <Text style={{ fontWeight: "bold", fontSize: 18, marginTop: 2 }}>
+                    Sending Request...
+                  </Text>
+                  : friendStatus === "sent" ?
+                    <IconButton
+                      iconName={"person-remove"}
+                      size={20}
+                      fontWeight={"normal"}
+                      fontSize={18}
+                      color={"red"}
+                      onPress={unsendFriendRequest}
+                      label={"Unsend Request"}
+                    />
+                    : friendStatus === "unsending" ?
+                      <Text style={{ fontWeight: "bold", fontSize: 18, marginTop: 2 }}>
+                        Unsending Request...
+                      </Text>
+                      : friendStatus == "received" ? (
+                        <View style={{ alignItems: "flex-start" }}>
+                          <IconButton
+                            iconName={"person-add"}
+                            size={20}
+                            fontWeight={"normal"}
+                            fontSize={18}
+                            color={"green"}
+                            onPress={acceptFriendRequest}
+                            label={"Accept Friend"}
+                            style={{ marginBottom: 10 }}
+                          />
+                          <IconButton
+                            iconName={"person-remove"}
+                            size={20}
+                            fontWeight={"normal"}
+                            fontSize={18}
+                            color={"red"}
+                            onPress={rejectFriendRequest}
+                            label={"Reject Friend"}
+                          />
+                        </View>
+                      )
+                        : friendStatus === "rejecting" ? (
+                          <Text style={{ fontWeight: "bold", fontSize: 18, marginTop: 2 }}>
+                            Rejecting Request...
+                          </Text>
+                        ) : friendStatus === "accepting" ? (
+                          <Text style={{ fontWeight: "bold", fontSize: 18, marginTop: 2 }}>
+                            Accepting Request...
+                          </Text>
+                        ) : friendStatus === "deleting" ? (
+                          <Text style={{ fontWeight: "bold", fontSize: 18, marginTop: 2 }}>
+                            Removing Friend...
+                          </Text>
+                        ) : friendStatus === "friends" ? (
+                          <View>
+                            <View style={styles.viewProfileScreen}>
+                              <Text>Friends for {friendsSince} </Text>
+                            </View>
+                            <IconButton
+                              iconName={"person-remove"}
+                              size={20}
+                              fontWeight={"normal"}
+                              fontSize={18}
+                              color={"red"}
+                              onPress={deleteFriend}
+                              label={"Unfriend"}
+                            />
+                          </View>
+                        )
+                          : null
+              : null
+            }
+          </View> : null
+      }
 
       <View>
         {mutualfriendList.length != 0 ? (
@@ -491,7 +594,6 @@ const LookupUser = ({ route, navigation }) => {
         ) : null}
       </View>
       <View>
-        <SafeAreaView style={{ flex: 1 }}>
           <APIList
             initialAmount={10}
             additionalAmount={20}
@@ -509,8 +611,9 @@ const LookupUser = ({ route, navigation }) => {
             )}
             keyExtractor={(item) => item}
           />
-        </SafeAreaView>
       </View>
+      
+
       {getLocation() != null && user.latitude != null ? (
         <View style={styles.viewProfileScreen}>
           <Text style={styles.viewProfileScreen}>
