@@ -6,7 +6,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 export default function StatusIndicator({status, shouldShow}) {
     if (status || shouldShow)
     return(        
-        <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "white", padding: 5, paddingRight: 8, borderRadius: 15 }}>
+        <View style={{ flexDirection: "row" }}>
             <MaterialIcons name="circle" size={16} color={status ? StatusColors[status] : "gray"} />
             <Text style={{ fontSize: 16, color: status ? "black" : "gray", marginLeft: 5 }}>{`${status ? status : "Set your status!"}`}</Text>
         </View>
