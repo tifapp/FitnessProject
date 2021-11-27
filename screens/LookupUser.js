@@ -403,6 +403,39 @@ const LookupUser = ({ route, navigation }) => {
       //console("error when unblocking");
     }
   }
+  
+  const alertOptions = {
+    cancelable: true,
+  };
+  
+  const openOptionsDialog = () => {
+    const title = "More Options";
+    const message = "";
+    const options = [
+      {
+        text: "Block",
+        onPress: () => {
+          const title = "Are you sure you want to block this friend? This will unfriend them and delete all messages.";
+          const options = [
+            {
+              text: "Yes",
+              onPress: blockUser,
+            },
+            {
+              text: "Cancel",
+              type: "cancel",
+            },
+          ];
+          Alert.alert(title, "", options, alertOptions);
+        },
+      },
+      {
+        text: "Cancel",
+        type: "cancel",
+      },
+    ];
+    Alert.alert(title, message, options, alertOptions);
+  }
 
   return user == null ? null : (
     <ScrollView>
@@ -483,25 +516,11 @@ const LookupUser = ({ route, navigation }) => {
       
       {
         !(friendStatus == "blocker" || friendStatus == "blocked") && route.params?.myId != user.id ?
-          <View style={{ alignItems: "center", justifyContent: "space-between", flexDirection: "row", marginHorizontal: 20, marginTop: 5, }}>
-            {(!user.messagesPrivacy || user.messagesPrivacy === 0 || (mutualfriendList.length > 0 && user.messagesPrivacy === 1) || (friendStatus === "friends" && user.messagesPrivacy >= 1)) ?
-              <IconButton
-                style={{flex: 1, borderColor: "blue", borderWidth: 1, padding: 15, marginLeft: 10, justifyContent: "center"}}
-                iconName={"message"}
-                size={24}
-                fontSize={20}
-                color={"blue"}
-                onPress={() => {
-                  navigation.navigate(userId);
-                }}
-                fontWeight={"bold"}
-                label={"Message"}
-              />
-              : null}
+          <View style={{ alignItems: "stretch", justifyContent: "space-between", flexDirection: "row", marginHorizontal: 20, marginTop: 5, }}>
             {(!user.friendRequestPrivacy || user.friendRequestPrivacy === 0 || (mutualfriendList.length > 0 && user.friendRequestPrivacy === 1) || (friendStatus === "friends" && user.friendRequestPrivacy >= 1)) ?
               friendStatus === "none" ?
                 <IconButton
-                  style={{flex: 1, borderColor: "blue", borderWidth: 1, padding: 15, marginRight: 10, marginLeft: 10, justifyContent: "center"}}
+                  style={{flex: 1, borderColor: "blue", borderWidth: 1, padding: 15, marginLeft: 10, justifyContent: "center"}}
                   iconName={"person-add"}
                   size={24}
                   fontWeight={"bold"}
@@ -511,43 +530,35 @@ const LookupUser = ({ route, navigation }) => {
                   label={"Add Friend"}
                 />
                 : friendStatus === "sending" ?
-                  <Text style={{ fontWeight: "bold", fontSize: 18, marginTop: 2 }}>
+                  <Text style={{ fontWeight: "bold", fontSize: 18, marginTop: 2, alignSelf: "center" }}>
                     Sending Request...
                   </Text>
                   : friendStatus === "sent" ?
                     <IconButton
+                    style={{flex: 1, borderColor: "red", borderWidth: 1, padding: 15, paddingVertical: 5, marginLeft: 10, justifyContent: "center"}}
                       iconName={"person-remove"}
-                      size={20}
-                      fontWeight={"normal"}
+                      size={24}
+                      fontWeight={"bold"}
                       fontSize={18}
                       color={"red"}
                       onPress={unsendFriendRequest}
                       label={"Unsend Request"}
                     />
                     : friendStatus === "unsending" ?
-                      <Text style={{ fontWeight: "bold", fontSize: 18, marginTop: 2 }}>
+                      <Text style={{ fontWeight: "bold", fontSize: 18, marginTop: 2, alignSelf: "center" }}>
                         Unsending Request...
                       </Text>
                       : friendStatus == "received" ? (
                         <View style={{ alignItems: "flex-start" }}>
                           <IconButton
+                    style={{flex: 1, borderColor: "green", borderWidth: 1, padding: 15, paddingVertical: 5, marginLeft: 10, justifyContent: "center"}}
                             iconName={"person-add"}
-                            size={20}
-                            fontWeight={"normal"}
-                            fontSize={18}
+                            size={24}
+                            fontWeight={"bold"}
+                            fontSize={20}
                             color={"green"}
                             onPress={acceptFriendRequest}
-                            label={"Accept Friend"}
-                            style={{ marginBottom: 10 }}
-                          />
-                          <IconButton
-                            iconName={"person-remove"}
-                            size={20}
-                            fontWeight={"normal"}
-                            fontSize={18}
-                            color={"red"}
-                            onPress={rejectFriendRequest}
-                            label={"Reject Friend"}
+                            label={"Accept Request"}
                           />
                         </View>
                       )
@@ -582,14 +593,26 @@ const LookupUser = ({ route, navigation }) => {
                           : null
               : null
             }
+            {(!user.messagesPrivacy || user.messagesPrivacy === 0 || (mutualfriendList.length > 0 && user.messagesPrivacy === 1) || (friendStatus === "friends" && user.messagesPrivacy >= 1)) ?
+              <IconButton
+                style={{flex: 1, borderColor: "blue", borderWidth: 1, padding: 15, marginHorizontal: 10, justifyContent: "center"}}
+                iconName={"message"}
+                size={24}
+                fontSize={20}
+                color={"blue"}
+                onPress={() => {
+                  navigation.navigate(userId);
+                }}
+                fontWeight={"bold"}
+                label={"Message"}
+              />
+              : null}
             <IconButton
                 iconName={"more-vert"}
                 size={24}
                 fontSize={20}
                 color={"black"}
-                onPress={() => {
-                  navigation.navigate(userId);
-                }}
+                onPress={openOptionsDialog}
                 fontWeight={"bold"}
               />
           </View> : null
@@ -650,9 +673,9 @@ const LookupUser = ({ route, navigation }) => {
             : friendStatus == "blocker" ? (
               <TouchableOpacity
                 onPress={unblockUser}
-                style={styles.unblockButton}
+                style={{borderColor: "black", borderWidth: 1, padding: 15, alignItems: "center", margin: 20}}
               >
-                <Text style={styles.buttonTextStyle}>Unblock</Text>
+                <Text style={{color: "black", fontWeight: "bold", fontSize: 20}}>Unblock</Text>
               </TouchableOpacity>) : null}
         </View>
       ) : null}
