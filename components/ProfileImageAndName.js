@@ -128,9 +128,13 @@ export const ProfileImageAndName = React.memo(function (props) {
               {!props.isFullSize
               && userInfo 
               && userInfo.status 
+              ? " "
+              : null}
+              {!props.isFullSize
+              && userInfo 
+              && userInfo.status 
               ? <MaterialIcons name="circle" size={10} color={StatusColors[userInfo.status]}/> 
               : null}
-              {" "}
               {userInfo != null && userInfo.name
                 ? userInfo.isFullSize || userInfo.name.length <= 40
                   ? userInfo.name + (props.spaceAfterName ? " " : "")

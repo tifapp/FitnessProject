@@ -483,28 +483,29 @@ const LookupUser = ({ route, navigation }) => {
       
       {
         !(friendStatus == "blocker" || friendStatus == "blocked") && route.params?.myId != user.id ?
-          <View style={{ alignItems: "center", justifyContent: "space-around", flexDirection: "row", marginBottom: 20 }}>
+          <View style={{ alignItems: "center", justifyContent: "space-between", flexDirection: "row", marginHorizontal: 20, marginTop: 5, }}>
             {(!user.messagesPrivacy || user.messagesPrivacy === 0 || (mutualfriendList.length > 0 && user.messagesPrivacy === 1) || (friendStatus === "friends" && user.messagesPrivacy >= 1)) ?
               <IconButton
-                style={{}}
+                style={{flex: 1, borderColor: "blue", borderWidth: 1, padding: 15, marginLeft: 10, justifyContent: "center"}}
                 iconName={"message"}
-                size={20}
-                fontSize={18}
+                size={24}
+                fontSize={20}
                 color={"blue"}
                 onPress={() => {
                   navigation.navigate(userId);
                 }}
-                fontWeight={"normal"}
+                fontWeight={"bold"}
                 label={"Message"}
               />
               : null}
             {(!user.friendRequestPrivacy || user.friendRequestPrivacy === 0 || (mutualfriendList.length > 0 && user.friendRequestPrivacy === 1) || (friendStatus === "friends" && user.friendRequestPrivacy >= 1)) ?
               friendStatus === "none" ?
                 <IconButton
+                  style={{flex: 1, borderColor: "blue", borderWidth: 1, padding: 15, marginRight: 10, marginLeft: 10, justifyContent: "center"}}
                   iconName={"person-add"}
-                  size={20}
-                  fontWeight={"normal"}
-                  fontSize={18}
+                  size={24}
+                  fontWeight={"bold"}
+                  fontSize={20}
                   color={"blue"}
                   onPress={sendFriendRequest}
                   label={"Add Friend"}
@@ -581,13 +582,23 @@ const LookupUser = ({ route, navigation }) => {
                           : null
               : null
             }
+            <IconButton
+                iconName={"more-vert"}
+                size={24}
+                fontSize={20}
+                color={"black"}
+                onPress={() => {
+                  navigation.navigate(userId);
+                }}
+                fontWeight={"bold"}
+              />
           </View> : null
       }
 
       <View>
         {mutualfriendList.length != 0 ? (
           <View style={styles.viewProfileScreen}>
-            <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+            <Text style={{ fontSize: 20, fontWeight: "normal", marginTop: 30 }}>
               Mutual Friends{" "}
             </Text>
           </View>
