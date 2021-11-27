@@ -13,6 +13,10 @@ export default function TouchableWithModal({ modalComponent, style, children, do
     const showModal = useCallback(() => {
         setIsModalOpen(true)
     }, []);
+    
+    const hideModal = useCallback(() => {
+        setIsModalOpen(false)
+    }, []);
 
     return (
         <>
@@ -22,10 +26,14 @@ export default function TouchableWithModal({ modalComponent, style, children, do
 
             <Modal transparent={true} visible={isModalOpen} animationType='slide'>
                 <View style={{ flex: 1 }}>
-                    <TouchableOpacity style={{ flex: 1 }} onPress={() => setIsModalOpen(false)}>
+                    <TouchableOpacity style={{ flex: 1 }} onPress={hideModal}>
                     </TouchableOpacity>
                     <View style={{ flexDirection: "row", justifyContent: "center", backgroundColor: "white", alignItems: "flex-end", marginTop: "auto" }} >
-                        {modalComponent}
+                        {
+                            typeof(modalComponent) === 'function' ?
+                            modalComponent(hideModal)
+                            : modalComponent
+                        }
                     </View>
                 </View>
             </Modal>

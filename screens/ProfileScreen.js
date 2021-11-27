@@ -193,26 +193,30 @@ const ProfileScreen = ({ navigation, route }) => {
                             <BasicInfoDetails
                                 age={age}
                                 setAge={setAge}
-                                gender={gender}
-                                setGender={setGender} />
-                        </View>
-                            
-                        <TouchableWithModal
-                            modalComponent={
-                                <View style={{ flexDirection: "row", justifyContent: "center", backgroundColor: "white", alignItems: "flex-end", marginTop: "auto" }} >
-                                    <StatusPicker selectedValue={status} setSelectedValue={val => {
-                                        if (val === "Health Professional") {
-                                            navigation.navigate("Verification");
-                                        } 
-                                        else {
-                                            setStatus(val), updateUserAsync({ status: val })}
-                                        }
-                                        } />
-                                </View>
-                            }
-                        >
-                            <StatusIndicator status={status} shouldShow={true} />
-                        </TouchableWithModal>
+                                    gender={gender}
+                                    setGender={setGender} />
+                            </View>
+
+                            <TouchableWithModal
+                                modalComponent={
+                                    hideModal =>
+                                        <View style={{ flexDirection: "row", justifyContent: "center", backgroundColor: "white", alignItems: "flex-end", marginTop: "auto" }} >
+                                            <StatusPicker selectedValue={status} setSelectedValue={val => {
+                                                if (val === "Health Professional") {
+                                                    hideModal();
+                                                    navigation.navigate("Verification");
+                                                }
+                                                else {
+                                                    setStatus(val), updateUserAsync({ status: val })
+                                                }
+                                            }
+                                            } />
+                                        </View>
+
+                                }
+                            >
+                                <StatusIndicator status={status} shouldShow={true} />
+                            </TouchableWithModal>
                     </View>
                 </View>
 
