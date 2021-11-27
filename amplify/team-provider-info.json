@@ -19,7 +19,7 @@
       "function": {
         "S3Triggeref91c1ec": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/S3Triggeref91c1ec-3271586e6b4c67526f6a-build.zip"
+          "s3Key": "amplify-builds/S3Triggeref91c1ec-4e79616538642f37657a-build.zip"
         },
         "friendNotifications": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",

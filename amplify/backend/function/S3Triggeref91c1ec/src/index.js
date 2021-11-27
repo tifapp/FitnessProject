@@ -11,7 +11,6 @@ exports.handler = async (event, context, callback) => {
 
   /* Check to see if the base folder is already set to thumbnails, if it is we return so we do not have a recursive call. */
   const BASE_FOLDER = PARTS[1];
-  if (BASE_FOLDER === 'thumbnails') return
 
   /* Stores the main file name in a variable */
   let FILE = PARTS[PARTS.length - 1]
