@@ -87,6 +87,7 @@ Cache.configure(config);
 var styles = require("./styles/stylesheet");
 
 const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 
 const App = () => {
@@ -256,12 +257,16 @@ const App = () => {
   } else if (isAdmin) {
     return (
       <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
+        <Tab.Navigator>
+          <Tab.Screen
             name="Report List"
             component={ReportScreen} //should be in a separate app, not this one. we'll make a different app to view reports.
           />
-        </Stack.Navigator>
+          <Tab.Screen
+            name="Verification Requests"
+            component={VerificationRequestsScreen} //should be in a separate app, not this one. we'll make a different app to view reports.
+          />
+        </Tab.Navigator>
       </NavigationContainer>
     );
   } else {
