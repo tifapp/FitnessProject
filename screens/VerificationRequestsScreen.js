@@ -24,13 +24,17 @@ export default function VerificationRequestsScreen() {
   const [requests, setRequests] = useState([]);
   
   const getFilesAsync = async (id) => {
-    const directory = `public/verification/${id}/`; //later on change this to be in a folder only admins and the requester can access
+    const directory = `verification/${id}/`; //later on change this to be in a folder only admins and the requester can access
 
     const results = await Storage.list(directory);
 
-    return results.map((value) => {
-      return value.key;
-    })
+    console.log(directory);
+    console.log(results);
+
+    return await allSettled(results.map(async (value) => {
+      return Storage.get(value.key);
+    }
+    ));
   }
   
   const deleteRequest = async (request, approve) => {
@@ -59,8 +63,10 @@ export default function VerificationRequestsScreen() {
     ));
 
     newRequests.forEach((request, index) => {
-      request.files = files[index]; //amplify connection would probably be good here
+      request.files = files[index].value; //amplify connection would probably be good here
     });
+
+    console.log(newRequests);
 
     return newRequests; //what if there are duplicates?
   }
@@ -87,7 +93,7 @@ export default function VerificationRequestsScreen() {
           </TouchableOpacity>
         }
         renderItem={({ item, index }) => (
-          <View style={{backgroundColor: "teal", marginBottom: 15}}>
+          <View style={{backgroundColor: "white", marginBottom: 15}}>
             <View style={{flexDirection: "row", justifyContent: "space-around"}}>
 
             <TouchableOpacity
@@ -106,17 +112,16 @@ export default function VerificationRequestsScreen() {
               </Text>
             </TouchableOpacity>
             </View>
+
             {
-              item.files ?
-                item.files.map((fileURL, index) => <Text
-                  key={fileURL}
+              item.files.map((fileURL, index) => {return <Text
+                  key={fileURL.value}
                   onPress={() => Linking.openURL(
-                    fileURL
+                    fileURL.value
                   )}>
                   Document {index}
-                </Text>) : null
+                </Text>})
             }
-
           </View>
         )}
         processingFunction={attachFiles}
