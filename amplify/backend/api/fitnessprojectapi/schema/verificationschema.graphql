@@ -4,6 +4,7 @@ type Verification @model
       { allow: private, operations: [read] },
       { allow: owner, ownerField: "id" },
       { allow: private, provider: iam, operations: [read, update, delete] },
+      { allow: groups, groups: ["Admins"], operations: [read, update, delete] },
   ]
 ) {
   id: ID!

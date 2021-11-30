@@ -24,10 +24,13 @@ const VerificationScreen = ({ navigation, route }) => {
         if (result.type === "success") {
             const response = await fetch(result.uri);
             blob = await response.blob();
+            
+            const re = /(?:\.([^.]+))?$/;
+            const extension = re.exec(result.uri)[1];
 
             setProgress(0.01);
             try {
-                await Storage.put(`verification/${route.params?.myId}/${Date.now()}`, blob, { //we may have to deal with people spamming requests after being denied
+                await Storage.put(`verification/${route.params?.myId}/${Date.now()}.${extension}`, blob, { //we may have to deal with people spamming requests after being denied
                     progressCallback(progress) {
                         setProgress(progress.loaded / progress.total);
                     },

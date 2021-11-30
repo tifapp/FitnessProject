@@ -18,6 +18,7 @@ import { getUser } from "./src/graphql/queries";
 import ProfileScreen from "screens/ProfileScreen";
 import MainStack from "stacks/MainStack";
 import ReportScreen from "screens/ReportScreen";
+import VerificationRequestsScreen from "screens/VerificationRequestsScreen";
 import SettingsStack from "stacks/SettingsStack";
 import FriendScreen from "screens/FriendScreen";
 import VerificationScreen from "screens/VerificationScreen";
@@ -38,6 +39,7 @@ import CustomSidebarMenu from 'root/screens/CustomSidebarMenu';
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import * as Notifications from 'expo-notifications';
 import { StatusBar } from "expo-status-bar";
