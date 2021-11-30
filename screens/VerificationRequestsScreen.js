@@ -93,25 +93,28 @@ export default function VerificationRequestsScreen() {
           </TouchableOpacity>
         }
         renderItem={({ item, index }) => (
-          <View style={{backgroundColor: "white", marginBottom: 15}}>
-            <View style={{flexDirection: "row", justifyContent: "space-around"}}>
+          <View style={{ backgroundColor: "white", marginBottom: 15 }}>
 
-            <TouchableOpacity
-              onPress={() => deleteRequest(item, true)}
-            >
-              <Text>
-                Accept.
-              </Text>
-            </TouchableOpacity>
+            {
+              !item.isVerified ?
+                <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+                  <TouchableOpacity
+                    onPress={() => deleteRequest(item, true)}
+                  >
+                    <Text>
+                      Accept.
+                    </Text>
+                  </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => deleteRequest(item, false)}
-            >
-              <Text>
-                Reject.
-              </Text>
-            </TouchableOpacity>
-            </View>
+                  <TouchableOpacity
+                    onPress={() => deleteRequest(item, false)}
+                  >
+                    <Text>
+                      Reject.
+                    </Text>
+                  </TouchableOpacity>
+                </View> : null
+            }
 
             {
               item.files.map((fileURL, index) => {return <Text
