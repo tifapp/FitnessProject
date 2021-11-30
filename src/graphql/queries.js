@@ -699,3 +699,30 @@ export const listUsers = /* GraphQL */ `
     }
   }
 `;
+export const getVerification = /* GraphQL */ `
+  query GetVerification($id: ID!) {
+    getVerification(id: $id) {
+      id
+      isVerified
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listVerifications = /* GraphQL */ `
+  query ListVerifications(
+    $filter: ModelVerificationFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listVerifications(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        isVerified
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;

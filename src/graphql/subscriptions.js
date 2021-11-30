@@ -353,3 +353,33 @@ export const onDeleteUser = /* GraphQL */ `
     }
   }
 `;
+export const onCreateVerification = /* GraphQL */ `
+  subscription OnCreateVerification {
+    onCreateVerification {
+      id
+      isVerified
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdateVerification = /* GraphQL */ `
+  subscription OnUpdateVerification {
+    onUpdateVerification {
+      id
+      isVerified
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteVerification = /* GraphQL */ `
+  subscription OnDeleteVerification {
+    onDeleteVerification {
+      id
+      isVerified
+      createdAt
+      updatedAt
+    }
+  }
+`;

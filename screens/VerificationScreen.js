@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ActivityIndicator, View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert, Animated, Image, Linking, Platform, TextInput, Keyboard, SafeAreaView } from 'react-native';
 import { Auth, API, graphqlOperation, Cache, Storage } from "aws-amplify";
+import {
+  createVerification,
+} from "root/src/graphql/mutations";
 import SHA256 from "hooks/hash";
 
 import * as DocumentPicker from 'expo-document-picker';
@@ -30,6 +33,9 @@ const VerificationScreen = ({ navigation, route }) => {
                     },
                     level: 'public'
                 });
+                await API.graphql(
+                  graphqlOperation(createVerification, { input: { id: route.params?.myId } })
+                );
             } catch (e) {
                 console.log(e);
             }
