@@ -57,3 +57,7 @@ input UpdateUserInput {
   messagesPrivacy: Int
   isVerified: Boolean
 }
+
+input verifyUserInput {
+  id: ID!
+}

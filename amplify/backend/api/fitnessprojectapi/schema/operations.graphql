@@ -1,5 +1,6 @@
 type Mutation {
   batchDeletePosts(posts: [DeletePostInput]): [Post] @aws_iam
+  verifyUser(input: verifyUserInput!): User @aws_iam @aws_cognito_user_pools
   incrementLikes(input: incrementLikesInput!): Post @aws_iam
   decrementLikes(input: incrementLikesInput!): Post @aws_iam
   incrementReplies(input: incrementLikesInput!): Post @aws_iam

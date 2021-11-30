@@ -17,6 +17,28 @@ export const batchDeletePosts = /* GraphQL */ `
     }
   }
 `;
+export const verifyUser = /* GraphQL */ `
+  mutation VerifyUser($input: verifyUserInput!) {
+    verifyUser(input: $input) {
+      id
+      identityId
+      name
+      age
+      gender
+      bio
+      goals
+      latitude
+      longitude
+      status
+      deviceToken
+      friendRequestPrivacy
+      messagesPrivacy
+      createdAt
+      updatedAt
+      isVerified
+    }
+  }
+`;
 export const incrementLikes = /* GraphQL */ `
   mutation IncrementLikes($input: incrementLikesInput!) {
     incrementLikes(input: $input) {
