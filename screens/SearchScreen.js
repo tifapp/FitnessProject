@@ -27,6 +27,17 @@ import APIList from 'components/APIList';
 
 var styles = require("styles/stylesheet");
 
+function titleCase(str) {
+    var splitStr = str.toLowerCase().split(' ');
+    for (var i = 0; i < splitStr.length; i++) {
+        // You do not need to check if i is larger than splitStr length, as your for does that for you
+        // Assign it back to the array
+        splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);     
+    }
+    // Directly return the joined string
+    return splitStr.join(' '); 
+ }
+
 export default function SearchScreen({ navigation, route }) {
     const [query, setQuery] = useState("");
     const [userResults, setUserResults] = useState([]);
@@ -158,7 +169,7 @@ export default function SearchScreen({ navigation, route }) {
                                     }
                                 },{
                                     status: {
-                                        beginsWith: currentQuery.current
+                                        beginsWith: titleCase(currentQuery.current) //statuses should really be stored as lowercase strings to make this easier, but no time for that rn
                                     }
                                 },
                                 {
