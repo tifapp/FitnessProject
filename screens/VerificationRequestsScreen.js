@@ -123,7 +123,7 @@ export default function VerificationRequestsScreen() {
                   onPress={() => Linking.openURL(
                     fileURL.value
                   )}>
-                  Document {index}
+                  Document {index + 1}
                 </Text>})
             }
           </View>
