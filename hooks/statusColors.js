@@ -1,4 +1,5 @@
 const StatusColors = {
+    "None" : "gray",
     "Networker" : "red",
     "Workout Partner" : "gold",
     "Sports Player" : "green",

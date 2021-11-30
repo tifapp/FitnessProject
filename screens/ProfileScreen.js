@@ -206,6 +206,9 @@ const ProfileScreen = ({ navigation, route }) => {
                                                     hideModal();
                                                     navigation.navigate("Verification");
                                                 }
+                                                else if (val === "None") {
+                                                    setStatus(), updateUserAsync({ status: null })
+                                                }
                                                 else {
                                                     setStatus(val), updateUserAsync({ status: val })
                                                 }
