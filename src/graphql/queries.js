@@ -668,6 +668,7 @@ export const getUser = /* GraphQL */ `
       messagesPrivacy
       createdAt
       updatedAt
+      isVerified
     }
   }
 `;
@@ -694,6 +695,7 @@ export const listUsers = /* GraphQL */ `
         messagesPrivacy
         createdAt
         updatedAt
+        isVerified
       }
       nextToken
     }

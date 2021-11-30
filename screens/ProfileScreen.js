@@ -197,29 +197,33 @@ const ProfileScreen = ({ navigation, route }) => {
                                     setGender={setGender} />
                             </View>
 
-                            <TouchableWithModal
-                                modalComponent={
-                                    hideModal =>
-                                        <View style={{ flexDirection: "row", justifyContent: "center", backgroundColor: "white", alignItems: "flex-end", marginTop: "auto" }} >
-                                            <StatusPicker selectedValue={status} setSelectedValue={val => {
-                                                if (val === "Health Professional") {
-                                                    hideModal();
-                                                    navigation.navigate("Verification");
+                            {
+                                status != "Health Professional" ?
+                                <TouchableWithModal
+                                    modalComponent={
+                                        hideModal =>
+                                            <View style={{ flexDirection: "row", justifyContent: "center", backgroundColor: "white", alignItems: "flex-end", marginTop: "auto" }} >
+                                                <StatusPicker selectedValue={status} setSelectedValue={val => {
+                                                    if (val === "Health Professional") {
+                                                        hideModal();
+                                                        navigation.navigate("Verification");
+                                                    }
+                                                    else if (val === "None") {
+                                                        setStatus(), updateUserAsync({ status: null })
+                                                    }
+                                                    else {
+                                                        setStatus(val), updateUserAsync({ status: val })
+                                                    }
                                                 }
-                                                else if (val === "None") {
-                                                    setStatus(), updateUserAsync({ status: null })
-                                                }
-                                                else {
-                                                    setStatus(val), updateUserAsync({ status: val })
-                                                }
-                                            }
-                                            } />
-                                        </View>
-
-                                }
-                            >
-                                <StatusIndicator status={status} shouldShow={true} />
-                            </TouchableWithModal>
+                                                } />
+                                            </View>
+    
+                                    }
+                                >
+                                    <StatusIndicator status={status} shouldShow={true} />
+                                </TouchableWithModal>
+                                : <StatusIndicator status={status}/>
+                            }
                     </View>
                 </View>
 

@@ -308,6 +308,7 @@ export const onCreateUser = /* GraphQL */ `
       messagesPrivacy
       createdAt
       updatedAt
+      isVerified
     }
   }
 `;
@@ -329,6 +330,7 @@ export const onUpdateUser = /* GraphQL */ `
       messagesPrivacy
       createdAt
       updatedAt
+      isVerified
     }
   }
 `;
@@ -350,6 +352,7 @@ export const onDeleteUser = /* GraphQL */ `
       messagesPrivacy
       createdAt
       updatedAt
+      isVerified
     }
   }
 `;

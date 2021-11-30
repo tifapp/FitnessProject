@@ -4,6 +4,7 @@ type User @model
       { allow: private, operations: [read] },
       { allow: owner, ownerField: "id" },
       { allow: private, provider: iam, operations: [read] },
+      { allow: groups, groups: ["Admins"], operations: [read, update, delete] },
   ]
 ) {
   id: ID!
@@ -19,6 +20,14 @@ type User @model
   deviceToken: ID
   friendRequestPrivacy: Int
   messagesPrivacy: Int
+  isVerified: Boolean
+    @auth(
+      rules: [
+          { allow: private, operations: [read] },
+          { allow: private, provider: iam, operations: [read, create, update, delete] },
+          { allow: groups, groups: ["Admins"], operations: [read, create, update, delete] },
+      ]
+    )
 }
 
 input CreateUserInput {
@@ -46,4 +55,5 @@ input UpdateUserInput {
   deviceToken: ID
   friendRequestPrivacy: Int
   messagesPrivacy: Int
+  isVerified: Boolean
 }

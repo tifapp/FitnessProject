@@ -10,7 +10,7 @@ import {
 // Get the aws resources configuration parameters
 import { API, graphqlOperation, Cache, Auth, Storage } from "aws-amplify";
 import { listVerifications } from "root/src/graphql/queries";
-import { deleteVerification, updateVerification } from "root/src/graphql/mutations";
+import { deleteVerification, updateVerification, updateUser } from "root/src/graphql/mutations";
 import { ProfileImageAndName } from "components/ProfileImageAndName";
 import printTime from "hooks/printTime";
 import APIList from 'components/APIList';
@@ -48,6 +48,7 @@ export default function VerificationRequestsScreen() {
     try {
       if (approve) {
         API.graphql(graphqlOperation(updateVerification, { input: { id: request.id, isVerified: true } }))
+        API.graphql(graphqlOperation(updateUser, { input: { id: request.id, isVerified: true } }))
       } else {
         API.graphql(graphqlOperation(deleteVerification, { input: { id: request.id } }));
       }

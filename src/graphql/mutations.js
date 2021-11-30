@@ -429,6 +429,7 @@ export const createUser = /* GraphQL */ `
       messagesPrivacy
       createdAt
       updatedAt
+      isVerified
     }
   }
 `;
@@ -453,6 +454,7 @@ export const updateUser = /* GraphQL */ `
       messagesPrivacy
       createdAt
       updatedAt
+      isVerified
     }
   }
 `;
@@ -477,6 +479,7 @@ export const deleteUser = /* GraphQL */ `
       messagesPrivacy
       createdAt
       updatedAt
+      isVerified
     }
   }
 `;
