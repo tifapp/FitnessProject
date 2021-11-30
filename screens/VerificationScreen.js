@@ -27,7 +27,7 @@ const VerificationScreen = ({ navigation, route }) => {
 
             setProgress(0.01);
             try {
-                await Storage.put(`verification/${route.params?.myId}/${result.uri}`, blob, {
+                await Storage.put(`verification/${route.params?.myId}/${Date.now()}`, blob, { //we may have to deal with people spamming requests after being denied
                     progressCallback(progress) {
                         setProgress(progress.loaded / progress.total);
                     },
