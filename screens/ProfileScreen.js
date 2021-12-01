@@ -28,16 +28,16 @@ const ProfileScreen = ({ navigation, route }) => {
     const [status, setStatus] = useState();
     const [bioDetails, setBioDetails] = useState('');
     const [goalsDetails, setGoalsDetails] = useState('');
-    const [locationEnabled, setLocationEnabled] = useState(false);
+    const [location, setLocation] = useState();
 
     useEffect(() => {
-        if (locationEnabled) updateUserLocationAsync(getLocation(true));
-
         (async()=>{            
+            console.log("user's id is ", route.params?.myId)
+
             const user = await API.graphql(graphqlOperation(getUser, { id: route.params?.myId }));
             const fields = user.data.getUser;
 
-            console.log(fields);
+            console.log("fetched user result is ", fields);
     
             if (fields == null) {
                 console.log("user doesn't exist, they must be making their profile for the first time");
@@ -54,7 +54,10 @@ const ProfileScreen = ({ navigation, route }) => {
                 setBioDetails(loadCapitals(fields.bio));
                 setGoalsDetails(loadCapitals(fields.goals));
                 setStatus(fields.status);
-                setLocationEnabled(fields.latitude != null);
+                //setLocationEnabled(fields.latitude != null);
+                if (fields.location != null) {
+                    updateUserLocationAsync(getLocation(true));
+                };
             }
 
             setLoading(false);
@@ -63,9 +66,13 @@ const ProfileScreen = ({ navigation, route }) => {
     
     useEffect(() => {
         if (!route.params?.newUser && !loading) {
-            updateUserAsync({ age: age, gender: gender, bio: saveCapitals(bioDetails), goals: saveCapitals(goalsDetails), latitude: locationEnabled ? getLocation().latitude : null, longitude: locationEnabled ? getLocation().longitude : null }) //add a debounce on the textinput, or just when the keyboard is dismissed
+            updateUserAsync({ age: age, gender: gender, bio: saveCapitals(bioDetails), goals: saveCapitals(goalsDetails), location: location }) //add a debounce on the textinput, or just when the keyboard is dismissed
         }
-    }, [age, gender, bioDetails, goalsDetails, locationEnabled])
+    }, [age, gender, bioDetails, goalsDetails, location])
+
+    useEffect(() => {
+        setLocation(getLocation(true));
+    }, [global.location])
 
     const saveProfilePicture = async () => {
         if (imageURL != '') {
@@ -93,6 +100,7 @@ const ProfileScreen = ({ navigation, route }) => {
 
     const updateUserAsync = async (profileInfo, isNewUser) => {
         //if user doesn't exist, make one
+        profileInfo.id = "placeholder";
         try {
             if (isNewUser) {
                 const { identityId } = await Auth.currentCredentials();
@@ -123,9 +131,8 @@ const ProfileScreen = ({ navigation, route }) => {
             console.log('returning users fields looks like', fields);
 
             const ourUser = {
-                //id: query.attributes.sub,
-                latitude: location == null || location.latitude < 0 ? null : location.latitude, //we need to do this in the createuser/updateuser operations as well
-                longitude: location == null || location.latitude < 0 ? null : location.longitude
+                id: query.attributes.sub,
+                location: location
             };
 
             if (fields != null) {
@@ -143,7 +150,7 @@ const ProfileScreen = ({ navigation, route }) => {
         }
         else {
             Alert.alert('Submitting Profile...', '', [], { cancelable: false })
-            updateUserAsync({ name: saveCapitals(name), age: age, gender: gender, bio: saveCapitals(bioDetails), goals: saveCapitals(goalsDetails), latitude: locationEnabled ? getLocation().latitude : null, longitude: locationEnabled ? getLocation().longitude : null }, true) //add a debounce on the textinput, or just when the keyboard is dismissed
+            updateUserAsync({ name: saveCapitals(name), age: age, gender: gender, bio: saveCapitals(bioDetails), goals: saveCapitals(goalsDetails), location: location }, true) //add a debounce on the textinput, or just when the keyboard is dismissed
                 .then(([user, id]) => {
                     route.params?.setUserIdFunction(id);
                 })
@@ -305,25 +312,28 @@ const ProfileScreen = ({ navigation, route }) => {
                     />
                 </TouchableWithModal>                
 
-                <TouchableOpacity style={[styles.rowContainerStyle, { marginBottom: 20 }]} onPress={() => { setLocationEnabled(!locationEnabled) }} >
+                <TouchableOpacity style={[styles.rowContainerStyle, { marginBottom: 20 }]} onPress={() => { 
+                    if (location == null) getLocation(true), setLocation("loading") 
+                    else setLocation(null) 
+                }} >
                     {
-                        locationEnabled === true && getLocation(true) == null
+                        location === "loading"
                             ? <ActivityIndicator
                                 size="small"
-                                color="#26c6a2"
+                                color="blue"
                                 style={{
                                     padding: 6,
                                 }} />
                             : Platform.OS === 'android'
                                 ? <CheckBox
                                     disabled={true}
-                                    value={locationEnabled}
+                                    value={location != null}
                                 />
-                                : locationEnabled === false
-                                    ? <Ionicons size={16} style={{ marginBottom: 0 }} name="md-square-outline" color="orange" />
-                                    : <Ionicons size={16} style={{ marginBottom: 0 }} name="md-checkbox-outline" color="orange" />
+                                : location == null
+                                    ? <Ionicons size={16} style={{ marginBottom: 0 }} name="md-square-outline" color="blue" />
+                                    : <Ionicons size={16} style={{ marginBottom: 0 }} name="md-checkbox-outline" color="blue" />
                     }
-                    <Text style={styles.textButtonTextStyle}>{locationEnabled === true && getLocation(true) == null ? 'Locating user' : 'Let others see your location'}</Text>
+                    <Text style={styles.textButtonTextStyle}>{location === "loading" ? 'Locating user' : 'Let others see your location'}</Text>
                 </TouchableOpacity>
                 {
                     route.params?.newUser ? //if name is blank?
