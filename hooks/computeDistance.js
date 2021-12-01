@@ -1,11 +1,11 @@
 import getLocation from 'hooks/useLocation';
 
-export default function computeDistance([lat2, long2]) {
-    const location = getLocation();
+export default function computeDistance(otherLocation) {
+    const location = getLocation(true);
     const prevLatInRad = toRad(location.latitude);
     const prevLongInRad = toRad(location.longitude);
-    const latInRad = toRad(lat2);
-    const longInRad = toRad(long2);
+    const latInRad = toRad(otherLocation.latitude);
+    const longInRad = toRad(otherLocation.longitude);
 
     const distance = 3963 * //3963 miles is the radius of earth
         Math.acos(

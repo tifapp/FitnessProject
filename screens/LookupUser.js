@@ -475,7 +475,7 @@ const LookupUser = ({ route, navigation }) => {
               navigation.setOptions({ title: info.name });
             }}
             nameComponent={
-              <View><Text style={{marginTop: 6, fontSize: 16}}>{`(${user.age}, ${user.gender})`}</Text></View>
+              <View><Text style={{marginTop: 6, fontSize: 16}}>{`(${user.age}, ${user.gender}${user.location ? `${computeDistance(user.location)} mi. away` : ""})`}</Text></View>
             }
             spaceAfterName={true}
             subtitleComponent={
