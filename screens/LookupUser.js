@@ -516,7 +516,7 @@ const LookupUser = ({ route, navigation }) => {
       
       {
         !(friendStatus == "blocker" || friendStatus == "blocked") && route.params?.myId != user.id ?
-          <View style={{ alignItems: "stretch", justifyContent: "space-between", flexDirection: "row", marginHorizontal: 20, marginTop: 5, }}>
+          <View style={{ alignItems: "stretch", flexDirection: "column", marginHorizontal: 20, marginTop: 5, }}>
             {(!user.friendRequestPrivacy || user.friendRequestPrivacy === 0 || (mutualfriendList.length > 0 && user.friendRequestPrivacy === 1) || (friendStatus === "friends" && user.friendRequestPrivacy >= 1)) ?
               friendStatus === "none" ?
                 <IconButton
@@ -560,6 +560,16 @@ const LookupUser = ({ route, navigation }) => {
                             onPress={acceptFriendRequest}
                             label={"Accept Request"}
                           />
+                          <IconButton
+                    style={{flex: 1, borderColor: "red", borderWidth: 1, padding: 15, paddingVertical: 5, marginLeft: 10, justifyContent: "center"}}
+                            iconName={"person-remove"}
+                            size={24}
+                            fontWeight={"bold"}
+                            fontSize={20}
+                            color={"red"}
+                            onPress={rejectFriendRequest}
+                            label={"Reject Request"}
+                          />
                         </View>
                       )
                         : friendStatus === "rejecting" ? (
@@ -576,7 +586,7 @@ const LookupUser = ({ route, navigation }) => {
                           </Text>
                         ) : friendStatus === "friends" ? (
                           <View>
-                            <View style={styles.viewProfileScreen}>
+                            <View style={[styles.viewProfileScreen, {fontSize: 20, fontWeight: "bold",}]}>
                               <Text>Friends for {friendsSince} </Text>
                             </View>
                             <IconButton
