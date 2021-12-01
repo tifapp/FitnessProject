@@ -100,7 +100,6 @@ const ProfileScreen = ({ navigation, route }) => {
 
     const updateUserAsync = async (profileInfo, isNewUser) => {
         //if user doesn't exist, make one
-        profileInfo.id = "placeholder";
         try {
             if (isNewUser) {
                 const { identityId } = await Auth.currentCredentials();
@@ -131,7 +130,6 @@ const ProfileScreen = ({ navigation, route }) => {
             console.log('returning users fields looks like', fields);
 
             const ourUser = {
-                id: query.attributes.sub,
                 location: location
             };
 
