@@ -429,11 +429,32 @@ const LookupUser = ({ route, navigation }) => {
           Alert.alert(title, "", options, alertOptions);
         },
       },
+    ];
+    if (status === "friends")
+    options.push({
+      text: "Unfriend",
+      onPress: () => {
+        const title = "Are you sure you want to unfriend?";
+        const options = [
+          {
+            text: "Yes",
+            onPress: deleteFriend,
+          },
+          {
+            text: "Cancel",
+            type: "cancel",
+          },
+        ];
+        Alert.alert(title, "", options, alertOptions);
+      },
+    },
+    )
+    options.push(
       {
         text: "Cancel",
         type: "cancel",
-      },
-    ];
+      }
+    )
     Alert.alert(title, message, options, alertOptions);
   }
 
@@ -549,7 +570,7 @@ const LookupUser = ({ route, navigation }) => {
                         Unsending Request...
                       </Text>
                       : friendStatus == "received" ? (
-                        <View style={{ alignItems: "flex-start" }}>
+                        <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
                           <IconButton
                     style={{flex: 1, borderColor: "green", borderWidth: 1, padding: 15, paddingVertical: 5, marginLeft: 10, justifyContent: "center"}}
                             iconName={"person-add"}
@@ -558,7 +579,6 @@ const LookupUser = ({ route, navigation }) => {
                             fontSize={20}
                             color={"green"}
                             onPress={acceptFriendRequest}
-                            label={"Accept Request"}
                           />
                           <IconButton
                     style={{flex: 1, borderColor: "red", borderWidth: 1, padding: 15, paddingVertical: 5, marginLeft: 10, justifyContent: "center"}}
@@ -568,7 +588,6 @@ const LookupUser = ({ route, navigation }) => {
                             fontSize={20}
                             color={"red"}
                             onPress={rejectFriendRequest}
-                            label={"Reject Request"}
                           />
                         </View>
                       )
@@ -589,15 +608,6 @@ const LookupUser = ({ route, navigation }) => {
                             <View style={[styles.viewProfileScreen, {fontSize: 20, fontWeight: "bold",}]}>
                               <Text>Friends for {friendsSince} </Text>
                             </View>
-                            <IconButton
-                              iconName={"person-remove"}
-                              size={20}
-                              fontWeight={"normal"}
-                              fontSize={18}
-                              color={"red"}
-                              onPress={deleteFriend}
-                              label={"Unfriend"}
-                            />
                           </View>
                         )
                           : null
