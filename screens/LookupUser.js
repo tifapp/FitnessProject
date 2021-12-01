@@ -430,7 +430,7 @@ const LookupUser = ({ route, navigation }) => {
         },
       },
     ];
-    if (status === "friends")
+    if (friendStatus === "friends")
     options.push({
       text: "Unfriend",
       onPress: () => {
@@ -551,12 +551,12 @@ const LookupUser = ({ route, navigation }) => {
                   label={"Add Friend"}
                 />
                 : friendStatus === "sending" ?
-                  <Text style={{ fontWeight: "bold", fontSize: 18, marginTop: 2, alignSelf: "center" }}>
+                  <Text style={{ fontWeight: "bold", fontSize: 18, marginTop: 2, padding: 16, alignSelf: "center" }}>
                     Sending Request...
                   </Text>
                   : friendStatus === "sent" ?
                     <IconButton
-                    style={{flex: 1, borderColor: "red", borderWidth: 1, padding: 15, paddingVertical: 5, marginLeft: 10, justifyContent: "center"}}
+                    style={{flex: 1, borderColor: "red", borderWidth: 1, padding: 15, marginLeft: 10, justifyContent: "center"}}
                       iconName={"person-remove"}
                       size={24}
                       fontWeight={"bold"}
@@ -605,17 +605,18 @@ const LookupUser = ({ route, navigation }) => {
                           </Text>
                         ) : friendStatus === "friends" ? (
                           <View>
-                            <View style={[styles.viewProfileScreen, {fontSize: 20, fontWeight: "bold",}]}>
-                              <Text>Friends for {friendsSince} </Text>
+                            <View style={[styles.viewProfileScreen]}>
+                              <Text style={{fontSize: 16,}} >Friends for {friendsSince} </Text>
                             </View>
                           </View>
                         )
                           : null
               : null
             }
+            <View style={{flexDirection: "row", marginTop: friendStatus === "friends" ? 0 : 20}}>
             {(!user.messagesPrivacy || user.messagesPrivacy === 0 || (mutualfriendList.length > 0 && user.messagesPrivacy === 1) || (friendStatus === "friends" && user.messagesPrivacy >= 1)) ?
               <IconButton
-                style={{flex: 1, borderColor: "blue", borderWidth: 1, padding: 15, marginHorizontal: 10, justifyContent: "center"}}
+                style={{flex: 1, borderColor: "blue", borderWidth: 1, padding: 15, marginLeft: 10, justifyContent: "center"}}
                 iconName={"message"}
                 size={24}
                 fontSize={20}
@@ -635,6 +636,8 @@ const LookupUser = ({ route, navigation }) => {
                 onPress={openOptionsDialog}
                 fontWeight={"bold"}
               />
+
+            </View>
           </View> : null
       }
 
