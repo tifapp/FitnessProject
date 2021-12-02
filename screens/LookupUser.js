@@ -541,7 +541,7 @@ const LookupUser = ({ route, navigation }) => {
             {(!user.friendRequestPrivacy || user.friendRequestPrivacy === 0 || (mutualfriendList.length > 0 && user.friendRequestPrivacy === 1) || (friendStatus === "friends" && user.friendRequestPrivacy >= 1)) ?
               friendStatus === "none" ?
                 <IconButton
-                  style={{flex: 1, borderColor: "blue", borderWidth: 1, padding: 15, marginLeft: 10, justifyContent: "center"}}
+                  style={{flex: 1, borderColor: "blue", borderWidth: 1, padding: 15, justifyContent: "center"}}
                   iconName={"person-add"}
                   size={24}
                   fontWeight={"bold"}
@@ -556,7 +556,7 @@ const LookupUser = ({ route, navigation }) => {
                   </Text>
                   : friendStatus === "sent" ?
                     <IconButton
-                    style={{flex: 1, borderColor: "red", borderWidth: 1, padding: 15, marginLeft: 10, justifyContent: "center"}}
+                    style={{flex: 1, borderColor: "red", borderWidth: 1, padding: 15, justifyContent: "center"}}
                       iconName={"person-remove"}
                       size={24}
                       fontWeight={"bold"}
@@ -572,7 +572,7 @@ const LookupUser = ({ route, navigation }) => {
                       : friendStatus == "received" ? (
                         <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
                           <IconButton
-                    style={{flex: 1, borderColor: "green", borderWidth: 1, padding: 15, paddingVertical: 5, marginLeft: 10, justifyContent: "center"}}
+                    style={{flex: 1, borderColor: "green", borderWidth: 1, padding: 15, paddingVertical: 5, marginRight: 10, justifyContent: "center"}}
                             iconName={"person-add"}
                             size={24}
                             fontWeight={"bold"}
