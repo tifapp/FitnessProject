@@ -17,13 +17,13 @@
       "**/*"
     ],
     "ios": {
-      "bundleIdentifier": "com.seanimo.FitnessApp"
+      "bundleIdentifier": "com.tifapp.FitnessApp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "android": {
-      "package": "com.seanimo.FitnessApp",
+      "package": "com.tifapp.FitnessApp",
 	  "useNextNotificationsApi": true,
 	  "googleServicesFile": "./google-services.json"
     },
