@@ -49,8 +49,6 @@ export default function VerificationRequestsScreen() {
       if (approve) {
         API.graphql(graphqlOperation(updateVerification, { input: { id: request.id, isVerified: true } }))
         API.graphql(graphqlOperation(verifyUser, { input: { id: request.id } }))
-      } else {
-        API.graphql(graphqlOperation(deleteVerification, { input: { id: request.id } }));
       }
     } catch (err) {
       console.log("error in deleting request: ", err);
