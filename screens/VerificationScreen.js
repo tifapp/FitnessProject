@@ -3,51 +3,86 @@ import { ActivityIndicator, View, StyleSheet, Text, ScrollView, TouchableOpacity
 import { Auth, API, graphqlOperation, Cache, Storage } from "aws-amplify";
 import {
   createVerification,
+  updateVerification
 } from "root/src/graphql/mutations";
+import {
+  getVerification,
+} from "root/src/graphql/queries";
 import SHA256 from "hooks/hash";
 
 import * as DocumentPicker from 'expo-document-picker';
 
+/*onPress={() => Linking.openURL(
+                fileURL.value
+              )}
+*/
+
 var styles = require('styles/stylesheet');
 
+var allSettled = require('promise.allsettled');
+
 const VerificationScreen = ({ navigation, route }) => {
-    const [progress, setProgress] = useState(0);
-    const [isUploading, setIsUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [title, setTitle] = useState();
+  const [files, setFiles] = useState([]);
+  const [pendingVerification, setPendingVerification] = useState();
+  
+  const getFilesAsync = async (id) => {
+    const directory = `verification/${id}/`; //later on change this to be in a folder only admins and the requester can access
 
-    const uploadDocument = useCallback(async () => {
-        setIsUploading(true);
+    const results = await Storage.list(directory);
 
-        console.log("JFAWPEOIFJ")
+    console.log(directory);
+    console.log(results);
 
-        const result = await DocumentPicker.getDocumentAsync();
+    return await allSettled(results.map(async (value) => {
+      return Storage.get(value.key);
+    }
+    ));
+  }
 
-        if (result.type === "success") {
-            const response = await fetch(result.uri);
-            blob = await response.blob();
-            
-            const re = /(?:\.([^.]+))?$/;
-            const extension = re.exec(result.uri)[1];
+  const uploadDocument = useCallback(async () => {
+    setIsUploading(true);
 
-            setProgress(0.01);
-            try {
-                await Storage.put(`verification/${route.params?.myId}/${Date.now()}.${extension}`, blob, { //we may have to deal with people spamming requests after being denied
-                    progressCallback(progress) {
-                        setProgress(progress.loaded / progress.total);
-                    },
-                    level: 'public'
-                });
-                await API.graphql(
-                  graphqlOperation(createVerification, { input: { id: route.params?.myId } })
-                );
-            } catch (e) {
-                console.log(e);
-            }
-            setProgress(0);
-        }
+    const result = await DocumentPicker.getDocumentAsync();
 
-        setIsUploading(false);
-    }, []);
-    
+    if (result.type === "success") {
+      const response = await fetch(result.uri);
+      blob = await response.blob();
+
+      const re = /(?:\.([^.]+))?$/;
+      const extension = re.exec(result.uri)[1];
+
+      setProgress(0.01);
+      try {
+        const result = await Storage.put(`verification/${route.params?.myId}/${Date.now()}.${extension}`, blob, { //we may have to deal with people spamming requests after being denied
+          progressCallback(progress) {
+            setProgress(progress.loaded / progress.total);
+          },
+          level: 'public'
+        });
+        files.push({value: result});
+      } catch (e) {
+        console.log(e);
+      }
+      setProgress(0);
+    }
+
+    setIsUploading(false);
+  }, []);
+
+  useEffect(() => {
+    (async() => {
+      const pending = await API.graphql(
+        graphqlOperation(getVerification, { id: route.params?.myId })
+      )
+      setPendingVerification(pending.data.getVerification);
+      const files = await getFilesAsync(route.params?.myId);
+      setFiles(files);
+    })();
+  }, [])
+
   let animation = useRef(new Animated.Value(0));
   useEffect(() => {
     Animated.timing(animation.current, {
@@ -63,72 +98,123 @@ const VerificationScreen = ({ navigation, route }) => {
     extrapolate: "clamp"
   })
 
-    return (
-        <ScrollView style={[styles.containerStyle, { backgroundColor: "#efefef" }]} >
-            <SafeAreaView>
-                <Text
-                style={{padding: 15, fontSize: 16}}>
-                    You need to be verified in order to become a Health Professional.
-                    Upload supporting documents here.
-                </Text>
-                <TouchableOpacity
-                onPress={
-                    uploadDocument
-                }
-                disabled={
-                    isUploading
-                }
-                >
-                    <Text
-                    style={{padding: 15, fontSize: 18, fontWeight: "bold", color: "blue", alignSelf: "center"}}>
-                        Upload
-                    </Text>
-                </TouchableOpacity>
-                {
-                    isUploading
-                    ? <ActivityIndicator
-                    size="large"
-                    color="#000000"
-                    style={{
-                      flex: 1,
-                      justifyContent: "center",
-                      flexDirection: "row",
-                      justifyContent: "space-around",
-                      padding: 20,
-                    }} />
-                    : null
-                }
-                {
-                  progress > 0 ?
-                    <View style={{
-                      height: 30,
-                      backgroundColor: 'white',
-                      margin: 15,
-                      borderRadius: 5,
-                    }}>
-                      <Animated.View style={[{
-                        position: 'absolute',
-                        left: 0,
-                        right: 0,
-                        top: 0,
-                        bottom: 0
-                      }, { backgroundColor: "#26c6a2", width }]} />
-                      <Text
-                        style={{
-                          alignSelf: "center",
-                          justifyContent: "center",
-                          color: "black",
-                          fontWeight: "bold",
-                          fontSize: 15,
-                          marginTop: 5,
-                        }}>
-                        Uploading...
-                      </Text>
-                    </View> : null
-                }
-            </SafeAreaView>
-        </ScrollView>
-    )
+  return (
+    <ScrollView style={[styles.containerStyle, { backgroundColor: "#efefef" }]} >
+      <SafeAreaView>
+        <Text
+          style={{ padding: 15, fontSize: 16 }}>
+          {
+            pendingVerification ? "Your verification request is pending. Change your requested title or submit more supporting documents here."
+              : "You need to be verified in order to become a Health Professional. Upload supporting documents here."
+          }
+        </Text>
+        <View style={{ flexDirection: "row" }}>
+          <Text
+            style={{ padding: 15, fontSize: 16 }}>
+            Title:
+          </Text>
+          <TextInput
+            defaultValue={pendingVerification && pendingVerification.title ? pendingVerification.title : "Health Professional"}
+            value={title}
+            onChangeText={setTitle}
+            style={{ fontSize: 18, fontWeight: "bold", color: "black", textDecorationLine: "underline" }} />
+        </View>
+        <Text
+          style={{ padding: 15, fontSize: 16 }}>
+          Documents:
+        </Text>
+
+        {
+          files.map((fileURL, index) => {
+            return <Text
+              key={fileURL.value}
+              style={{fontSize: 16, padding: 15, paddingTop: 0, alignSelf: "center"}}
+              >
+              Document {index + 1}
+            </Text>
+          })
+        }
+
+        <TouchableOpacity
+          onPress={
+            uploadDocument
+          }
+          disabled={
+            isUploading
+          }
+        >
+          <Text
+            style={{ padding: 15, fontSize: 18, fontWeight: "normal", color: "blue", alignSelf: "center" }}>
+            Upload
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={
+            async () => {              
+              try {
+                await API.graphql(
+                  graphqlOperation(pendingVerification ? updateVerification : createVerification, { input: { id: route.params?.myId, title: title ?? "Health Professional" } })
+                )
+                setPendingVerification({ id: route.params?.myId, title: title ?? "Health Professional" });
+              } catch(e) {
+                alert(e)
+              }
+            }
+          }
+          disabled={
+            isUploading
+          }
+        >
+          <Text
+            style={{ padding: 15, fontSize: 18, fontWeight: "bold", color: "blue", alignSelf: "center" }}>
+            Submit
+          </Text>
+        </TouchableOpacity>
+        {
+          isUploading
+            ? <ActivityIndicator
+              size="large"
+              color="#000000"
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                flexDirection: "row",
+                justifyContent: "space-around",
+                padding: 20,
+              }} />
+            : null
+        }
+        {
+          progress > 0 ?
+            <View style={{
+              height: 30,
+              backgroundColor: 'white',
+              margin: 15,
+              borderRadius: 5,
+            }}>
+              <Animated.View style={[{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 0
+              }, { backgroundColor: "#26c6a2", width }]} />
+              <Text
+                style={{
+                  alignSelf: "center",
+                  justifyContent: "center",
+                  color: "black",
+                  fontWeight: "bold",
+                  fontSize: 15,
+                  marginTop: 5,
+                }}>
+                Uploading...
+              </Text>
+            </View> : null
+        }
+      </SafeAreaView>
+    </ScrollView>
+  )
 }
 
 export default VerificationScreen;
