@@ -5,7 +5,8 @@ import {
   SafeAreaView,
   LayoutAnimation,
   TouchableOpacity,
-  Linking
+  Linking,
+  TextInput
 } from "react-native";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation, Cache, Auth, Storage } from "aws-amplify";
@@ -20,9 +21,42 @@ var styles = require('styles/stylesheet');
 
 var allSettled = require('promise.allsettled');
 
+function VerificationRequestItem({deleteRequest, item}) {
+  const [title, setTitle] = useState(item.title);
+
+  return (
+    <View>
+      <TextInput
+        defaultValue={item.title}
+        value={title}
+        onChangeText={setTitle}
+        style={{ fontSize: 18, fontWeight: "bold", color: "black", textDecorationLine: "underline"}}
+      />
+      <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+        <TouchableOpacity
+        onPress={() => deleteRequest(item, true, title)}
+        disabled={!title}
+      >
+        <Text>
+          Accept.
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => deleteRequest(item, false)}
+      >
+        <Text>
+          Reject.
+        </Text>
+      </TouchableOpacity>
+    </View>
+    </View>
+  )
+}
+
 export default function VerificationRequestsScreen() {
   const [requests, setRequests] = useState([]);
-  
+
   const getFilesAsync = async (id) => {
     const directory = `verification/${id}/`; //later on change this to be in a folder only admins and the requester can access
 
@@ -36,19 +70,19 @@ export default function VerificationRequestsScreen() {
     }
     ));
   }
-  
-  const deleteRequest = async (request, approve) => {
+
+  const deleteRequest = async (request, approve, title) => {
     if (!request.files) return;
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setRequests((requests) => {
-      return requests.filter((r) => {if (r.files) return (r.id !== request.id)});
+      return requests.filter((r) => { if (r.files) return (r.id !== request.id) });
     });
 
     try {
       if (approve) {
-        API.graphql(graphqlOperation(updateVerification, { input: { id: request.id, isVerified: true } }))
-        API.graphql(graphqlOperation(verifyUser, { input: { id: request.id } }))
+        await API.graphql(graphqlOperation(updateVerification, { input: { id: request.id, isVerified: true, title: title } }))
+        await API.graphql(graphqlOperation(verifyUser, { input: { id: request.id, title: title } }))
       }
     } catch (err) {
       console.log("error in deleting request: ", err);
@@ -69,7 +103,7 @@ export default function VerificationRequestsScreen() {
 
     return newRequests; //what if there are duplicates?
   }
-  
+
   async function signOut() {
     Auth.signOut();
   }
@@ -96,33 +130,21 @@ export default function VerificationRequestsScreen() {
 
             {
               !item.isVerified ?
-                <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-                  <TouchableOpacity
-                    onPress={() => deleteRequest(item, true)}
-                  >
-                    <Text>
-                      Accept.
-                    </Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    onPress={() => deleteRequest(item, false)}
-                  >
-                    <Text>
-                      Reject.
-                    </Text>
-                  </TouchableOpacity>
-                </View> : null
+                <VerificationRequestItem
+                deleteRequest={deleteRequest}
+                item={item} /> : null
             }
 
             {
-              item.files.map((fileURL, index) => {return <Text
+              item.files.map((fileURL, index) => {
+                return <Text
                   key={fileURL.value}
                   onPress={() => Linking.openURL(
                     fileURL.value
                   )}>
                   Document {index + 1}
-                </Text>})
+                </Text>
+              })
             }
           </View>
         )}
