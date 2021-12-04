@@ -26,6 +26,7 @@ const ProfileScreen = ({ navigation, route }) => {
     const [age, setAge] = useState(18);
     const [gender, setGender] = useState('Male');
     const [status, setStatus] = useState();
+    const [isVerified, setIsVerified] = useState();
     const [bioDetails, setBioDetails] = useState('');
     const [goalsDetails, setGoalsDetails] = useState('');
     const [location, setLocation] = useState();
@@ -45,7 +46,7 @@ const ProfileScreen = ({ navigation, route }) => {
                 const imageURL = await fetchProfileImageAsync(fields.identityId, true);
                 setImageURL(imageURL);
                 Cache.setItem(fields.identityId, {lastModified: "3000", imageURL: imageURL});
-                global.savedUsers[route.params?.myId] = {name: loadCapitals(fields.name), imageURL: imageURL};
+                global.savedUsers[route.params?.myId] = {name: loadCapitals(fields.name), imageURL: imageURL, status: fields.status, isVerified: fields.isVerified};
                 
                 setIdentityId(fields.identityId);
                 setName(loadCapitals(fields.name));
@@ -54,6 +55,7 @@ const ProfileScreen = ({ navigation, route }) => {
                 setBioDetails(loadCapitals(fields.bio));
                 setGoalsDetails(loadCapitals(fields.goals));
                 setStatus(fields.status);
+                setIsVerified(fields.isVerified);
                 //setLocationEnabled(fields.latitude != null);
                 if (fields.location != null) {
                     updateUserLocationAsync(getLocation(true));
@@ -88,13 +90,13 @@ const ProfileScreen = ({ navigation, route }) => {
 
             console.log("changing cached profile pic");
             Cache.setItem(identityId, { lastModified: "3000", imageURL: imageURL });
-            global.savedUsers[route.params?.myId] = { name: name, imageURL: imageURL };
+            global.savedUsers[route.params?.myId].imageURL = imageURL;
         } else {
             Storage.remove('profileimage.jpg', { level: 'protected' })
                 .then(result => console.log("removed profile image!", result))
                 .catch(err => console.log(err));
             Cache.setItem(identityId, { lastModified: "3000", imageURL: '' });
-            global.savedUsers[route.params?.myId] = { name: name, imageURL: '' };
+            global.savedUsers[route.params?.myId].imageURL = '';
         }
     }
 
@@ -190,7 +192,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                 onEndEditing={() => {
                                     if (!route.params?.newUser) {
                                         updateUserAsync({ name: saveCapitals(name) }) //should be doing savecapitals in the backend
-                                        global.savedUsers[route.params?.myId] = { name: name, imageURL: imageURL };
+                                        global.savedUsers[route.params?.myId].name = name;
                                     }
                                 }}>
                             </TextInput>
@@ -203,7 +205,7 @@ const ProfileScreen = ({ navigation, route }) => {
                             </View>
 
                             {
-                                status != "Health Professional" ?
+                                !isVerified ?
                                 <TouchableWithModal
                                     modalComponent={
                                         hideModal =>
@@ -227,7 +229,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                 >
                                     <StatusIndicator status={status} shouldShow={true} />
                                 </TouchableWithModal>
-                                : <StatusIndicator status={status}/>
+                                : <StatusIndicator status={status} isVerified={isVerified}/>
                             }
                     </View>
                 </View>

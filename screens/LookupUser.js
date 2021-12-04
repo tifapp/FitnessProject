@@ -479,7 +479,7 @@ const LookupUser = ({ route, navigation }) => {
             }
             spaceAfterName={true}
             subtitleComponent={
-              <StatusIndicator status={user.status} />
+              <StatusIndicator status={user.status} isVerified={user.isVerified} />
             }
           />
         </View>

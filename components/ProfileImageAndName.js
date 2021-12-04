@@ -27,14 +27,14 @@ export const ProfileImageAndName = React.memo(function (props) {
     if (!global.savedUsers[props.userId] || (!!props.isFullSize && !global.savedUsers[props.userId].isFullSize)) {
       (async() => {
         try {
-          const {name, identityId, status} = await fetchUserAsync(props.userId);
+          const {name, identityId, status, isVerified} = await fetchUserAsync(props.userId);
           const profileimageurl = await fetchProfileImageAsync(identityId, props.isFullSize);
 
           Image.getSize(
             profileimageurl,
             () => {
               //if (mounted) {
-              global.savedUsers[props.userId] = { name: name, imageURL: profileimageurl, isFullSize: props.isFullSize, status: status }
+              global.savedUsers[props.userId] = { name: name, imageURL: profileimageurl, isFullSize: props.isFullSize, status: status, isVerified: isVerified }
               //console.log("saved profileimageandname to local cache, should update")
               //will this trigger the second use effect or will we have to do this again?
               setUserInfo(global.savedUsers[props.userId]);
@@ -42,7 +42,7 @@ export const ProfileImageAndName = React.memo(function (props) {
             },
             (err) => {
               //console.log("couldn't find user's profile image");
-              global.savedUsers[props.userId] = { name: name, imageURL: '', isFullSize: props.isFullSize, status: status } //use DPI to figure out what resolution we should save at
+              global.savedUsers[props.userId] = { name: name, imageURL: '', isFullSize: props.isFullSize, status: status, isVerified: isVerified } //use DPI to figure out what resolution we should save at
               //console.log("saved profileimageandname to local cache, should update")
               //will this trigger the second use effect or will we have to do this again?
               setUserInfo(global.savedUsers[props.userId]);
@@ -128,7 +128,7 @@ export const ProfileImageAndName = React.memo(function (props) {
               {!props.isFullSize
               && userInfo 
               && userInfo.status 
-              ? <MaterialIcons name="circle" size={10} color={StatusColors[userInfo.status]}/> 
+              ? <MaterialIcons name={userInfo.isVerified ? "check-circle" : "circle"} size={10} color={userInfo.isVerified ? "black" : StatusColors[userInfo.status]}/> 
               : null}
               {!props.isFullSize
               && userInfo 

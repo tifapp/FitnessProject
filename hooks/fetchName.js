@@ -9,6 +9,6 @@ export default async function fetchUserAsync(userId) {
   if (fields == null) {
       return null;
   } else {
-      return {name: loadCapitals(fields.name), identityId: fields.identityId, status: fields.status}; //should we make a separate query/table just for the name?
+      return {name: loadCapitals(fields.name), identityId: fields.identityId, status: fields.status, isVerified: fields.isVerified}; //should we make a separate query/table just for the name?
   }
 }
