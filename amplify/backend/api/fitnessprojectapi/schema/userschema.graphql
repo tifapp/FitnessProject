@@ -67,4 +67,5 @@ input UpdateUserInput {
 
 input verifyUserInput {
   id: ID!
+  title: String!
 }

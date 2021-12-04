@@ -520,6 +520,7 @@ export const createVerification = /* GraphQL */ `
   ) {
     createVerification(input: $input, condition: $condition) {
       id
+      title
       isVerified
       createdAt
       updatedAt
@@ -533,6 +534,7 @@ export const updateVerification = /* GraphQL */ `
   ) {
     updateVerification(input: $input, condition: $condition) {
       id
+      title
       isVerified
       createdAt
       updatedAt
@@ -546,6 +548,7 @@ export const deleteVerification = /* GraphQL */ `
   ) {
     deleteVerification(input: $input, condition: $condition) {
       id
+      title
       isVerified
       createdAt
       updatedAt

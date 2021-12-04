@@ -363,9 +363,10 @@ export const onDeleteUser = /* GraphQL */ `
   }
 `;
 export const onCreateVerification = /* GraphQL */ `
-  subscription OnCreateVerification {
-    onCreateVerification {
+  subscription OnCreateVerification($id: String) {
+    onCreateVerification(id: $id) {
       id
+      title
       isVerified
       createdAt
       updatedAt
@@ -373,9 +374,10 @@ export const onCreateVerification = /* GraphQL */ `
   }
 `;
 export const onUpdateVerification = /* GraphQL */ `
-  subscription OnUpdateVerification {
-    onUpdateVerification {
+  subscription OnUpdateVerification($id: String) {
+    onUpdateVerification(id: $id) {
       id
+      title
       isVerified
       createdAt
       updatedAt
@@ -383,9 +385,10 @@ export const onUpdateVerification = /* GraphQL */ `
   }
 `;
 export const onDeleteVerification = /* GraphQL */ `
-  subscription OnDeleteVerification {
-    onDeleteVerification {
+  subscription OnDeleteVerification($id: String) {
+    onDeleteVerification(id: $id) {
       id
+      title
       isVerified
       createdAt
       updatedAt

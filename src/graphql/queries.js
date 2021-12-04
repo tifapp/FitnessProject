@@ -709,6 +709,7 @@ export const getVerification = /* GraphQL */ `
   query GetVerification($id: ID!) {
     getVerification(id: $id) {
       id
+      title
       isVerified
       createdAt
       updatedAt
@@ -724,6 +725,7 @@ export const listVerifications = /* GraphQL */ `
     listVerifications(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
+        title
         isVerified
         createdAt
         updatedAt
