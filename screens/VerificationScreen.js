@@ -108,16 +108,16 @@ const VerificationScreen = ({ navigation, route }) => {
               : "You need to be verified in order to become a Health Professional. Upload supporting documents here."
           }
         </Text>
-        <View style={{ flexDirection: "row" }}>
+        <View style={{ flexDirection: "column" }}>
           <Text
             style={{ padding: 15, fontSize: 16 }}>
-            Title:
+            Your Preferred Title:
           </Text>
           <TextInput
-            defaultValue={pendingVerification && pendingVerification.title ? pendingVerification.title : "Health Professional"}
+            placeholder={"Please enter your preferred title here."}
             value={title}
             onChangeText={setTitle}
-            style={{ fontSize: 18, fontWeight: "bold", color: "black", textDecorationLine: "underline" }} />
+            style={{ fontSize: 16, fontWeight: "normal", color: "black", fontWeight: "bold", alignSelf: "center", textDecorationLine: "underline" }} />
         </View>
         <Text
           style={{ padding: 15, fontSize: 16 }}>
@@ -151,13 +151,17 @@ const VerificationScreen = ({ navigation, route }) => {
         <TouchableOpacity
           onPress={
             async () => {              
-              try {
-                await API.graphql(
-                  graphqlOperation(pendingVerification ? updateVerification : createVerification, { input: { id: route.params?.myId, title: title ?? "Health Professional" } })
-                )
-                setPendingVerification({ id: route.params?.myId, title: title ?? "Health Professional" });
-              } catch(e) {
-                alert(e)
+              if (title) {
+                try {
+                  await API.graphql(
+                    graphqlOperation(pendingVerification ? updateVerification : createVerification, { input: { id: route.params?.myId, title: title ?? "Health Professional" } })
+                  )
+                  setPendingVerification({ id: route.params?.myId, title: title ?? "Health Professional" });
+                } catch(e) {
+                  alert(e)
+                }
+              } else {
+                alert("Please enter your preferred title!")
               }
             }
           }
