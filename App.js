@@ -276,6 +276,10 @@ const App = () => {
       <NavigationContainer>
         <StatusBar style="dark" />
         <Drawer.Navigator
+          onNavigationStateChange={() => {
+            //stop playing all videos when navigating somewhere else
+            global.currentVideo = null;
+          }}
           drawerPosition={"right"}
           drawerStyle={{ width: dimensions.width }}
           drawerContentOptions={{

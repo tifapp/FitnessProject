@@ -7,6 +7,8 @@ import { Video, AVPlaybackStatus } from 'expo-av';
 
 const re = /(?:\.([^.]+))?$/;
 
+global.currentVideo;
+
 export default function PostImage({style, imageID, isVisible}) {
   const [imageURL, setImageURL] = useState(null);
   const video = useRef(null);
@@ -29,13 +31,26 @@ export default function PostImage({style, imageID, isVisible}) {
         }); //should just use a "profilepic" component
     }
   }, [])
+  
+  useEffect(() => {
+    //console.log("image id is ", imageID);
+    if (video.current) {
+      if (global.currentVideo !== imageURL) {
+        video.current.pauseAsync();
+      }
+    }
+  }, [global.currentVideo])
 
   useEffect(() => {
     if (video.current) {
       if (isVisible === true) {
         video.current.playAsync();
+        global.currentVideo = imageURL;
       } else if (isVisible === false) {
         video.current.pauseAsync();
+        if (global.currentVideo === imageURL) {
+          global.currentVideo = null;
+        }
       }
     }
   }, [isVisible])
