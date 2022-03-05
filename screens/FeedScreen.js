@@ -46,12 +46,11 @@ const viewabilityConfig = {
   waitForInteraction: false,
 }
 
-export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, footerComponent, originalParentId, Accepted, lastUser, sidebar, id, isFocused, autoFocus = false }
+export default function FeedScreen({ navigation, route, receiver, channel, headerComponent, footerComponent, originalParentId, isFocused, autoFocus = false }
 ) {
   const [posts, setPosts] = useState([]);
 
   const [onlineCheck, setOnlineCheck] = useState(true);
-  const [ButtonCheck, setButtonCheck] = useState(false);
 
   const currentPosts = useRef();
   const scrollRef = useRef(); // Used to help with automatic scrolling to top
@@ -59,7 +58,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
   currentPosts.current = posts;
 
   useEffect(() => {
-
     const onFocus = navigation.addListener('focus', () => {
       if (receiver == null && channel === "general") {
         navigation.setOptions({
@@ -77,49 +75,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     // Return the function to unsubscribe from the event so it gets removed on unmount
     return onFocus;
   }, [navigation])
-
-  const checkButton = async () => {
-
-    let namesArray = [route.params?.myId, receiver];
-    namesArray.sort();
-
-    let temp = namesArray[0] + namesArray[1];
-
-    let newConversations1 = await API.graphql(graphqlOperation(getConversation, { id: temp }));
-
-    newConversations1 = newConversations1.data.getConversation;
-
-    if (newConversations1 == null) {
-      setButtonCheck(false);
-    }
-    else if (newConversations1.Accepted) {
-      setButtonCheck(true);
-    }
-    else {
-      setButtonCheck(false);
-    }
-
-
-    //let checkConversationExists = newConversations1.find(item => (item.users[0] === route.params?.myId && item.users[1] === receiver) || (item.users[0] === receiver && item.users[1] === route.params?.myId));
-    //let checkMessageRequestExists = newConversations2.find(item => (item.users[0] === route.params?.myId && item.users[1] === receiver) || (item.users[0] === receiver && item.users[1] === route.params?.myId));
-  }
-
-  useEffect(() => {
-    const onFocus = navigation.addListener('focus', () => {
-      console.log("Inside the Use Effect for check button");
-      checkButton();
-    });
-
-    // Return the function to unsubscribe from the event so it gets removed on unmount
-    return onFocus;
-  }, [navigation])
-
-  /*
-    useEffect(() => {
-      console.log("hello");
-      checkButton();
-    }, [])
-    */
 
   useEffect(() => {
     const createPostSubscription = API.graphql(graphqlOperation(onCreatePostFromChannel, { channel: channel })).subscribe({
@@ -273,42 +228,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
     }
   }
 
-  const acceptMessageRequest = async () => {
-    await API.graphql(graphqlOperation(updateConversation, { input: { id: channel, Accepted: 1 } }));
-    setButtonCheck(true);
-  }
-
-  const rejectMessageRequest = async () => {
-    await API.graphql(
-      graphqlOperation(deleteConversation, {
-        input: { id: id }
-      })
-    );
-    navigation.navigate("Conversations");
-  }
-
-  const blockMessageRequest = async () => {
-    await API.graphql(
-      graphqlOperation(deleteConversation, {
-        input: { id: id }
-      })
-    );
-
-    try {
-      await API.graphql(
-        graphqlOperation(createBlock, { input: { blockee: receiver } })
-      );
-      console.log("Inside the create block");
-    }
-    catch (err) {
-      console.log("error in blocking user: ", err);
-    }
-
-    localBlockList.push({ createdAt: (new Date(Date.now())).toISOString(), userId: route.params?.myId, blockee: id });
-
-    navigation.navigate("Conversations");
-  }
-
   /*
   const addPostAsync = async (parentId, replyText) => {
     checkInternetConnection();
@@ -460,42 +379,6 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
       }
       ListHeaderComponent={
         <View style={{}}>
-          {headerComponent}
-          {lastUser != route.params.myId && lastUser != null && receiver != null && !ButtonCheck ?
-            <View style={{ flexDirection: "row", justifyContent: "center", marginVertical: 15 }}>
-              <IconButton
-                iconName={"check"}
-                size={22}
-                color={"green"}
-                onPress={acceptMessageRequest}
-                style={{ paddingHorizontal: 12 }}
-                label={"Accept"}
-                fontSize={18}
-              />
-
-              <IconButton
-                iconName={"clear"}
-                size={22}
-                color={"red"}
-                onPress={rejectMessageRequest}
-                style={{ paddingHorizontal: 12 }}
-                label={"Reject"}
-                fontSize={18}
-              />
-
-              <IconButton
-                iconName={"block"}
-                size={22}
-                color={"black"}
-                onPress={blockMessageRequest}
-                style={{ paddingHorizontal: 12 }}
-                label={"Block"}
-                fontSize={18}
-              />
-            </View>
-            : null
-          }
-
           {
             receiver == null ? 
             <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "position" : "height"} keyboardVerticalOffset={90} style={{ flex: 1 }}>
@@ -520,6 +403,7 @@ export default function FeedScreen({ navigation, route, receiver, channel, heade
               autoFocus={autoFocus}
             />
           }
+          {headerComponent}
         </View>
       }
       initialAmount={7}

@@ -16,13 +16,14 @@ import { getBlock, getConversation } from "../src/graphql/queries";
 import {
   onDeleteConversation
 } from "root/src/graphql/subscriptions";
+import AcceptMessageButtons from "../components/AcceptMessageButtons";
 //const { width } = Dimensions.get('window');
 
 var styles = require('styles/stylesheet');
 
 export default function MessageScreen({ navigation, route }) {
   const { userId } = route.params;
-  const { Accepted, lastUser, sidebar, id } = route.params;
+  const { lastUser, id } = route.params;
 
   const [blocked, setBlocked] = useState(false);
 
@@ -139,6 +140,8 @@ export default function MessageScreen({ navigation, route }) {
           null :
           <FeedScreen
             footerComponent={
+              <View>
+                
               <ProfileImageAndName
                 vertical={true}
                 imageStyle={[styles.imageStyle, { marginVertical: 15 }]}
@@ -148,15 +151,21 @@ export default function MessageScreen({ navigation, route }) {
                 isFullSize={true}
                 hidename={true}
               />
+              {lastUser != route.params.myId && lastUser != null && receiver != null && 
+                <AcceptMessageButtons
+                route={route}
+                id={id}
+                channel={channel}
+                receiver={receiver}
+                />
+              }
+              </View>
             }
             navigation={navigation}
             route={route}
-            Accepted={Accepted}
             receiver={userId}
             channel={route.params?.myId < userId ? route.params?.myId + userId : userId + route.params?.myId}
             lastUser={lastUser}
-            sidebar={sidebar}
-            id={id}
             autoFocus={true}
             isFocused={isFocused}
           />
