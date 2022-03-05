@@ -71,7 +71,15 @@ export default function PostImage({style, imageID, isVisible}) {
           source={{ uri: imageURL }}
           posterSource={require("../assets/icon.png")}
           useNativeControls
-          isLooping
+          onPlaybackStatusUpdate={status => {
+            (async () => {
+
+              if (status.didJustFinish) {
+                video.current.setStatusAsync({ shouldPlay: false, positionMillis: 0});
+              }
+             
+             })();
+          }}
         />
     )
   } else return null;

@@ -64,7 +64,10 @@ export default React.memo(function MessageItem({
                     elevation: 6,
                 }}>
                 <TouchableOpacity
-                    onPress={() => navigation.navigate("Image", { uri: item.imageURL })}
+                    disabled={item.imageURL && !item.imageURL.match('jpg')}
+                    onPress={() => 
+                                navigation.navigate("Image", { uri: item.imageURL })
+                            }
                 >
                     <PostImage
                         style={{
