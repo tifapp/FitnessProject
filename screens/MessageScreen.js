@@ -12,7 +12,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import * as Notifications from 'expo-notifications';
 import { ProfileImageAndName } from "components/ProfileImageAndName";
 import { API, graphqlOperation } from "aws-amplify";
-import { getBlock, getConversation } from "../src/graphql/queries";
+import { getBlock, getConversation, getUser } from "../src/graphql/queries";
 import {
   onDeleteConversation
 } from "root/src/graphql/subscriptions";
@@ -25,6 +25,7 @@ export default function MessageScreen({ navigation, route }) {
   const { userId } = route.params;
   const { lastUser, id } = route.params;
 
+  const [isLoading, setIsLoading] = useState(true);
   const [blocked, setBlocked] = useState(false);
 
   const [isFocused, setIsFocused] = useState(false);
@@ -57,10 +58,41 @@ export default function MessageScreen({ navigation, route }) {
   }, [])
 
   useEffect(() => {
-    let conversationFromUsers = [route.params?.myId, userId];
-    conversationFromUsers.sort();
+    navigation.setOptions({ title: global.savedUsers[userId].name });
+
+    (async () => {
+      let user = await API.graphql(
+        graphqlOperation(getUser, {
+          id: userId,
+        })
+      );
+      if (user.data.getUser == null) {
+        await API.graphql(
+          graphqlOperation(deleteConversation, {
+            input: { id: id }
+          })
+        );
+        
+        navigation.goBack();
+      }
+      
+      let block = await API.graphql(
+        graphqlOperation(getBlock, {
+          userId: userId,
+          blockee: route.params?.myId,
+        })
+      );
+      if (block.data.getBlock != null) {
+        setBlocked(true);
+      }
+
+      setIsLoading(false);
+    })();
 
     try {
+      let conversationFromUsers = [route.params?.myId, userId];
+      conversationFromUsers.sort();
+
       API.graphql(
         graphqlOperation(onDeleteConversation, { users: conversationFromUsers })
       ).subscribe({
@@ -72,24 +104,6 @@ export default function MessageScreen({ navigation, route }) {
       console.log("Error in the delete conversation subscription", err);
     }
   }, [])
-
-  useEffect(() => {    
-    navigation.setOptions({ title: global.savedUsers[userId].name });
-  }, [])
-
-  useEffect(() => {
-    (async () => {
-      let block = await API.graphql(
-        graphqlOperation(getBlock, {
-          userId: userId,
-          blockee: route.params?.myId,
-        })
-      );
-      if (block.data.getBlock != null) {
-        setBlocked(true);
-      }
-    })();
-  }, [userId])
 
   /*
   useEffect(() => {
@@ -136,8 +150,7 @@ export default function MessageScreen({ navigation, route }) {
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={0} style={{ flex: 1, backgroundColor: "white" }}>
       {
-        blocked ?
-          null :
+        !isLoading && !blocked && 
           <FeedScreen
             footerComponent={
               <View>
@@ -151,12 +164,13 @@ export default function MessageScreen({ navigation, route }) {
                 isFullSize={true}
                 hidename={true}
               />
-              {lastUser != route.params.myId && lastUser != null && receiver != null && 
+              {lastUser != route.params.myId && lastUser != null && 
                 <AcceptMessageButtons
+                navigation={navigation}
                 route={route}
                 id={id}
-                channel={channel}
-                receiver={receiver}
+                channel={[route.params?.myId, userId].sort().join('')}
+                receiver={userId}
                 />
               }
               </View>
@@ -164,7 +178,7 @@ export default function MessageScreen({ navigation, route }) {
             navigation={navigation}
             route={route}
             receiver={userId}
-            channel={route.params?.myId < userId ? route.params?.myId + userId : userId + route.params?.myId}
+            channel={[route.params?.myId, userId].sort().join('')}
             lastUser={lastUser}
             autoFocus={true}
             isFocused={isFocused}

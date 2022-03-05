@@ -15,12 +15,16 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import playSound from "../hooks/playSound";
+import { API, graphqlOperation } from "aws-amplify";
+import { getBlock, getConversation, getUser } from "../src/graphql/queries";
+import { updateConversation, deleteConversation, createBlock} from "../src/graphql/mutations";
+import IconButton from "components/IconButton";
 
 import * as Haptics from "expo-haptics";
 
 var styles = require("../styles/stylesheet");
 
-export default function AcceptMessageButtons({route, id, channel, receiver}) {
+export default function AcceptMessageButtons({navigation, route, id, channel, receiver}) {
   
   const [ButtonCheck, setButtonCheck] = useState(false);
   
