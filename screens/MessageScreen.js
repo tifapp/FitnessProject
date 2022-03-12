@@ -4,24 +4,23 @@ import {
   View,
   TouchableOpacity,
   PureComponent,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
 } from "react-native";
 // Get the aws resources configuration parameters
 import FeedScreen from "screens/FeedScreen";
-import { useFocusEffect } from '@react-navigation/native';
-import * as Notifications from 'expo-notifications';
+import { useFocusEffect } from "@react-navigation/native";
+import * as Notifications from "expo-notifications";
 import { ProfileImageAndName } from "components/ProfileImageAndName";
 import { API, graphqlOperation } from "aws-amplify";
 import { getBlock, getConversation, getUser } from "../src/graphql/queries";
-import {
-  onDeleteConversation
-} from "root/src/graphql/subscriptions";
+import { onDeleteConversation } from "root/src/graphql/subscriptions";
 import AcceptMessageButtons from "../components/AcceptMessageButtons";
 //const { width } = Dimensions.get('window');
 
-var styles = require('styles/stylesheet');
+var styles = require("styles/stylesheet");
 
 export default function MessageScreen({ navigation, route }) {
+  //console.log(red);
   const { userId } = route.params;
   const { lastUser, id } = route.params;
 
@@ -38,24 +37,25 @@ export default function MessageScreen({ navigation, route }) {
 
     (async () => {
       const convo = await API.graphql(
-        graphqlOperation(getConversation, { id: friendlistarray[0] + friendlistarray[1] })
+        graphqlOperation(getConversation, {
+          id: friendlistarray[0] + friendlistarray[1],
+        })
       );
-    })()
+    })();
 
-    const onFocus = navigation.addListener('focus', () => {
+    const onFocus = navigation.addListener("focus", () => {
       //console.log("got to settings", global.localBlockList);
       setIsFocused(true);
     });
 
-    const onBlur = navigation.addListener('blur', () => {
+    const onBlur = navigation.addListener("blur", () => {
       //console.log("got to settings", global.localBlockList);
       setIsFocused(false);
     });
 
-
     // Return the function to unsubscribe from the event so it gets removed on unmount
     return onFocus, onBlur;
-  }, [])
+  }, []);
 
   useEffect(() => {
     navigation.setOptions({ title: global.savedUsers[userId].name });
@@ -69,13 +69,13 @@ export default function MessageScreen({ navigation, route }) {
       if (user.data.getUser == null) {
         await API.graphql(
           graphqlOperation(deleteConversation, {
-            input: { id: id }
+            input: { id: id },
           })
         );
-        
+
         navigation.goBack();
       }
-      
+
       let block = await API.graphql(
         graphqlOperation(getBlock, {
           userId: userId,
@@ -98,12 +98,12 @@ export default function MessageScreen({ navigation, route }) {
       ).subscribe({
         next: (event) => {
           navigation.navigate("Conversations");
-        }
-      })
+        },
+      });
     } catch (err) {
       console.log("Error in the delete conversation subscription", err);
     }
-  }, [])
+  }, []);
 
   /*
   useEffect(() => {
@@ -148,13 +148,15 @@ export default function MessageScreen({ navigation, route }) {
   //console.log(route);
   //have a header with the person's name and profile pic also.
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={0} style={{ flex: 1, backgroundColor: "white" }}>
-      {
-        !isLoading && !blocked && 
-          <FeedScreen
-            footerComponent={
-              <View>
-                
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={0}
+      style={{ flex: 1, backgroundColor: "white" }}
+    >
+      {!isLoading && !blocked && (
+        <FeedScreen
+          footerComponent={
+            <View>
               <ProfileImageAndName
                 vertical={true}
                 imageStyle={[styles.imageStyle, { marginVertical: 15 }]}
@@ -164,26 +166,26 @@ export default function MessageScreen({ navigation, route }) {
                 isFullSize={true}
                 hidename={true}
               />
-              {lastUser != route.params.myId && lastUser != null && 
+              {lastUser != route.params.myId && lastUser != null && (
                 <AcceptMessageButtons
-                navigation={navigation}
-                route={route}
-                id={id}
-                channel={[route.params?.myId, userId].sort().join('')}
-                receiver={userId}
+                  navigation={navigation}
+                  route={route}
+                  id={id}
+                  channel={[route.params?.myId, userId].sort().join("")}
+                  receiver={userId}
                 />
-              }
-              </View>
-            }
-            navigation={navigation}
-            route={route}
-            receiver={userId}
-            channel={[route.params?.myId, userId].sort().join('')}
-            lastUser={lastUser}
-            autoFocus={true}
-            isFocused={isFocused}
-          />
-      }
+              )}
+            </View>
+          }
+          navigation={navigation}
+          route={route}
+          receiver={userId}
+          channel={[route.params?.myId, userId].sort().join("")}
+          lastUser={lastUser}
+          autoFocus={true}
+          isFocused={isFocused}
+        />
+      )}
     </KeyboardAvoidingView>
   );
-};
+}
