@@ -22,8 +22,8 @@ import { API, graphqlOperation } from "aws-amplify";
 var styles = require("styles/stylesheet");
 
 const BlockListScreen = ({ navigation, route }) => {
+  const listRef = useRef();
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
-  const [blockList, setBlockList] = useState([]);
   
   const alertOptions = {
     cancelable: true,
@@ -39,7 +39,11 @@ const BlockListScreen = ({ navigation, route }) => {
           console.log("about to delete this user: ", blockeeId)
           global.localBlockList = global.localBlockList.filter((item) => item.blockee != blockeeId);
           LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-          setBlockList(blockList.filter((item) => item.blockee != blockeeId));
+          listRef.mutateData(blocklist => {
+            const results = blocklist.filter((item) => item.blockee != blockeeId);
+            global.localBlockList = results;
+            return results;
+          });
           API.graphql(
             graphqlOperation(deleteBlock, { input: { userId: route.params?.myId, blockee: blockeeId} })
           );
@@ -59,7 +63,8 @@ const BlockListScreen = ({ navigation, route }) => {
   useEffect(() => {
     const onFocus = navigation.addListener('focus', () => {
       //console.log("got to settings", global.localBlockList);
-      setBlockList([...global.localBlockList]);
+      //we just want to save a copy of the data
+      listRef.mutateData(() => [...global.localBlockList]);
     });
 
     // Return the function to unsubscribe from the event so it gets removed on unmount
@@ -71,8 +76,7 @@ const BlockListScreen = ({ navigation, route }) => {
       initialAmount={10}
       additionalAmount={20}
       queryOperation={blocksByDate}
-      data={blockList}
-      setDataFunction={(results) => {global.localBlockList = results, setBlockList(results)}}
+      ref={listRef}
       renderItem={({ item }) => (
         <View
           style={{
