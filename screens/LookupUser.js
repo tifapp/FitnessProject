@@ -27,14 +27,14 @@ import {
   getFriendship,
   listFriendships,
   friendsBySecondUser,
-  getBlock
+  getBlock,
 } from "../src/graphql/queries";
 import {
   deleteFriendship,
   createFriendship,
   updateFriendship,
   deleteBlock,
-  createBlock
+  createBlock,
 } from "root/src/graphql/mutations";
 import {
   onCreateFriendship,
@@ -42,15 +42,15 @@ import {
   onDeleteFriendship,
 } from "root/src/graphql/subscriptions";
 import APIList from "components/APIList";
-import { saveCapitals, loadCapitals } from 'hooks/stringConversion';
-import StatusIndicator from 'components/StatusIndicator';
+import { saveCapitals, loadCapitals } from "hooks/stringConversion";
+import StatusIndicator from "components/StatusIndicator";
 
 var styles = require("styles/stylesheet");
 
 const LookupUser = ({ route, navigation }) => {
   const [friendStatus, setFriendStatus] = useState("loading"); //can be either "received", "sent", "friends", or "none". don't misspell!
   const [friendsSince, setFriendsSince] = useState("");
-  const [mutualfriendList, setMutualFriendList] = useState([]);
+  const listRef = useRef();
 
   //const [hifiveSent, setHifiveSent] = useState(false); //can be either "received", "sent", or "none". don't misspell!
   //const [hifives, setHifives] = useState(0);
@@ -155,7 +155,11 @@ const LookupUser = ({ route, navigation }) => {
         })
       );
 
-      if (blocked.data.getBlock != null) { setFriendStatus("blocked"); console.log("You are blocked by this user"); return; }
+      if (blocked.data.getBlock != null) {
+        setFriendStatus("blocked");
+        console.log("You are blocked by this user");
+        return;
+      }
 
       let blocker = await API.graphql(
         graphqlOperation(getBlock, {
@@ -164,7 +168,10 @@ const LookupUser = ({ route, navigation }) => {
         })
       );
 
-      if (blocker.data.getBlock != null) { setFriendStatus("blocker"); return; }
+      if (blocker.data.getBlock != null) {
+        setFriendStatus("blocker");
+        return;
+      }
 
       let friendship = await API.graphql(
         graphqlOperation(getFriendship, {
@@ -248,35 +255,35 @@ const LookupUser = ({ route, navigation }) => {
 
     // Case 3: Receiver rejects friend request. Update the sender's side to send button.
     // Case 4: Friendship is deleted by either sender or receiver. Update the other party's side to send button.
-    onDelete = API.graphql(graphqlOperation(onDeleteFriendship, {
-      sender: route.params?.myId,
-      receiver: userId,
-    })).subscribe(
-      {
-        next: (event) => {
-          const exFriend = event.value.data.onDeleteFriendship;
-          ////console(exFriend);
-          if (exFriend.sender == userId || exFriend.receiver == userId) {
-            setFriendStatus("none");
-          }
-        },
-      }
-    )
+    onDelete = API.graphql(
+      graphqlOperation(onDeleteFriendship, {
+        sender: route.params?.myId,
+        receiver: userId,
+      })
+    ).subscribe({
+      next: (event) => {
+        const exFriend = event.value.data.onDeleteFriendship;
+        ////console(exFriend);
+        if (exFriend.sender == userId || exFriend.receiver == userId) {
+          setFriendStatus("none");
+        }
+      },
+    });
 
-    onDelete2 = API.graphql(graphqlOperation(onDeleteFriendship, {
-      sender: userId,
-      receiver: route.params?.myId,
-    })).subscribe(
-      {
-        next: (event) => {
-          const exFriend = event.value.data.onDeleteFriendship;
-          ////console(exFriend);
-          if (exFriend.sender == userId || exFriend.receiver == userId) {
-            setFriendStatus("none");
-          }
-        },
-      }
-    );
+    onDelete2 = API.graphql(
+      graphqlOperation(onDeleteFriendship, {
+        sender: userId,
+        receiver: route.params?.myId,
+      })
+    ).subscribe({
+      next: (event) => {
+        const exFriend = event.value.data.onDeleteFriendship;
+        ////console(exFriend);
+        if (exFriend.sender == userId || exFriend.receiver == userId) {
+          setFriendStatus("none");
+        }
+      },
+    });
   };
 
   const sendFriendRequest = async () => {
@@ -314,8 +321,7 @@ const LookupUser = ({ route, navigation }) => {
   };
 
   const unsendFriendRequest = async (temp) => {
-    if (!temp)
-      setFriendStatus("unsending");
+    if (!temp) setFriendStatus("unsending");
     ////console(temp);
     try {
       await API.graphql(
@@ -336,8 +342,7 @@ const LookupUser = ({ route, navigation }) => {
   };
 
   const rejectFriendRequest = async (temp) => {
-    if (!temp)
-      setFriendStatus("rejecting");
+    if (!temp) setFriendStatus("rejecting");
 
     try {
       await API.graphql(
@@ -358,15 +363,13 @@ const LookupUser = ({ route, navigation }) => {
   };
 
   const deleteFriend = async (temp) => {
-    if (!temp)
-      setFriendStatus("deleting");
+    if (!temp) setFriendStatus("deleting");
 
     try {
       let check = true;
       rejectFriendRequest(check);
       unsendFriendRequest(check);
-      if (!temp)
-        setFriendStatus("none");
+      if (!temp) setFriendStatus("none");
 
       alert("Deleted Friend successfully!");
     } catch (err) {
@@ -378,16 +381,20 @@ const LookupUser = ({ route, navigation }) => {
   const unblockUser = async () => {
     try {
       API.graphql(
-        graphqlOperation(deleteBlock, { input: { userId: route.params?.myId, blockee: userId } })
+        graphqlOperation(deleteBlock, {
+          input: { userId: route.params?.myId, blockee: userId },
+        })
       );
-      global.localBlockList = global.localBlockList.filter(i => i.blockee !== userId);
+      global.localBlockList = global.localBlockList.filter(
+        (i) => i.blockee !== userId
+      );
       //console(global.localBlockList);
       setFriendStatus("none");
     } catch (err) {
       //console(err);
       //console("error when unblocking");
     }
-  }
+  };
 
   const blockUser = async () => {
     try {
@@ -395,19 +402,23 @@ const LookupUser = ({ route, navigation }) => {
       API.graphql(
         graphqlOperation(createBlock, { input: { blockee: userId } })
       );
-      global.localBlockList.push({ createdAt: (new Date(Date.now())).toISOString(), userId: route.params?.myId, blockee: userId });
+      global.localBlockList.push({
+        createdAt: new Date(Date.now()).toISOString(),
+        userId: route.params?.myId,
+        blockee: userId,
+      });
       //console(global.localBlockList);
       setFriendStatus("blocker");
     } catch (err) {
       //console(err);
       //console("error when unblocking");
     }
-  }
-  
+  };
+
   const alertOptions = {
     cancelable: true,
   };
-  
+
   const openOptionsDialog = () => {
     const title = "More Options";
     const message = "";
@@ -415,7 +426,8 @@ const LookupUser = ({ route, navigation }) => {
       {
         text: "Block",
         onPress: () => {
-          const title = "Are you sure you want to block this friend? This will unfriend them and delete all messages.";
+          const title =
+            "Are you sure you want to block this friend? This will unfriend them and delete all messages.";
           const options = [
             {
               text: "Yes",
@@ -431,42 +443,40 @@ const LookupUser = ({ route, navigation }) => {
       },
     ];
     if (friendStatus === "friends")
+      options.push({
+        text: "Unfriend",
+        onPress: () => {
+          const title = "Are you sure you want to unfriend?";
+          const options = [
+            {
+              text: "Yes",
+              onPress: deleteFriend,
+            },
+            {
+              text: "Cancel",
+              type: "cancel",
+            },
+          ];
+          Alert.alert(title, "", options, alertOptions);
+        },
+      });
     options.push({
-      text: "Unfriend",
-      onPress: () => {
-        const title = "Are you sure you want to unfriend?";
-        const options = [
-          {
-            text: "Yes",
-            onPress: deleteFriend,
-          },
-          {
-            text: "Cancel",
-            type: "cancel",
-          },
-        ];
-        Alert.alert(title, "", options, alertOptions);
-      },
-    },
-    )
-    options.push(
-      {
-        text: "Cancel",
-        type: "cancel",
-      }
-    )
+      text: "Cancel",
+      type: "cancel",
+    });
     Alert.alert(title, message, options, alertOptions);
-  }
+  };
 
   return user == null ? null : (
     <ScrollView>
       <View style={{}}>
         <View style={{ flex: 1 }}>
           <ProfileImageAndName
-            onPress={(imageURL) => { navigation.navigate("Image", { uri: imageURL });
+            onPress={(imageURL) => {
+              navigation.navigate("Image", { uri: imageURL });
             }}
             style={{ margin: 20 }}
-            imageSize={Dimensions.get('window').width / 2 - 30}
+            imageSize={Dimensions.get("window").width / 2 - 30}
             textStyle={{ fontWeight: "bold", fontSize: 24 }}
             textLayoutStyle={{ flex: 1 }}
             userId={userId}
@@ -475,19 +485,30 @@ const LookupUser = ({ route, navigation }) => {
               navigation.setOptions({ title: info.name });
             }}
             nameComponent={
-              <View><Text style={{marginTop: 6, fontSize: 16}}>{`(${user.age}, ${user.gender}${user.location ? `${computeDistance(user.location)} mi. away` : ""})`}</Text></View>
+              <View>
+                <Text style={{ marginTop: 6, fontSize: 16 }}>{`(${user.age}, ${
+                  user.gender
+                }${
+                  user.location
+                    ? `${computeDistance(user.location)} mi. away`
+                    : ""
+                })`}</Text>
+              </View>
             }
             spaceAfterName={true}
             subtitleComponent={
-              <StatusIndicator status={user.status} isVerified={user.isVerified} />
+              <StatusIndicator
+                status={user.status}
+                isVerified={user.isVerified}
+              />
             }
           />
         </View>
       </View>
-      
-      {
-        user.bio ?
-          <View style={{
+
+      {user.bio ? (
+        <View
+          style={{
             backgroundColor: "white",
             shadowColor: "#000",
             shadowOffset: {
@@ -501,18 +522,22 @@ const LookupUser = ({ route, navigation }) => {
 
             elevation: 1,
             padding: 15,
-            flex: 0
-          }}>
-            <Text style={{ fontSize: 18, color: "gray", marginBottom: 5 }}>Biography</Text>
+            flex: 0,
+          }}
+        >
+          <Text style={{ fontSize: 18, color: "gray", marginBottom: 5 }}>
+            Biography
+          </Text>
 
-            <Text style={{ fontSize: 18, color: "black" }}>{loadCapitals(user.bio)}</Text>
-          </View>
-          : null
-      }
+          <Text style={{ fontSize: 18, color: "black" }}>
+            {loadCapitals(user.bio)}
+          </Text>
+        </View>
+      ) : null}
 
-      {
-        user.goals ?
-          <View style={{
+      {user.goals ? (
+        <View
+          style={{
             backgroundColor: "white",
             shadowColor: "#000",
             shadowOffset: {
@@ -526,97 +551,168 @@ const LookupUser = ({ route, navigation }) => {
 
             elevation: 1,
             padding: 15,
-            flex: 0
-          }}>
-            <Text style={{ fontSize: 18, color: "gray", marginBottom: 5 }}>Goals</Text>
+            flex: 0,
+          }}
+        >
+          <Text style={{ fontSize: 18, color: "gray", marginBottom: 5 }}>
+            Goals
+          </Text>
 
-            <Text style={{ fontSize: 18, color: "black" }}>{loadCapitals(user.goals)}</Text>
-          </View>
-          : null
-      }
-      
-      {
-        !(friendStatus == "blocker" || friendStatus == "blocked") && route.params?.myId != user.id ?
-          <View style={{ alignItems: "stretch", flexDirection: "column", marginHorizontal: 20, marginTop: 5, }}>
-            {(!user.friendRequestPrivacy || user.friendRequestPrivacy === 0 || (mutualfriendList.length > 0 && user.friendRequestPrivacy === 1) || (friendStatus === "friends" && user.friendRequestPrivacy >= 1)) ?
-              friendStatus === "none" ?
+          <Text style={{ fontSize: 18, color: "black" }}>
+            {loadCapitals(user.goals)}
+          </Text>
+        </View>
+      ) : null}
+
+      {!(friendStatus == "blocker" || friendStatus == "blocked") &&
+      route.params?.myId != user.id ? (
+        <View
+          style={{
+            alignItems: "stretch",
+            flexDirection: "column",
+            marginHorizontal: 20,
+            marginTop: 5,
+          }}
+        >
+          {!user.friendRequestPrivacy ||
+          user.friendRequestPrivacy === 0 ||
+          (mutualfriendList.length > 0 && user.friendRequestPrivacy === 1) ||
+          (friendStatus === "friends" && user.friendRequestPrivacy >= 1) ? (
+            friendStatus === "none" ? (
+              <IconButton
+                style={{
+                  flex: 1,
+                  borderColor: "blue",
+                  borderWidth: 1,
+                  padding: 15,
+                  justifyContent: "center",
+                }}
+                iconName={"person-add"}
+                size={24}
+                fontWeight={"bold"}
+                fontSize={20}
+                color={"blue"}
+                onPress={sendFriendRequest}
+                label={"Add Friend"}
+              />
+            ) : friendStatus === "sending" ? (
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  fontSize: 18,
+                  marginTop: 2,
+                  padding: 16,
+                  alignSelf: "center",
+                }}
+              >
+                Sending Request...
+              </Text>
+            ) : friendStatus === "sent" ? (
+              <IconButton
+                style={{
+                  flex: 1,
+                  borderColor: "red",
+                  borderWidth: 1,
+                  padding: 15,
+                  justifyContent: "center",
+                }}
+                iconName={"person-remove"}
+                size={24}
+                fontWeight={"bold"}
+                fontSize={18}
+                color={"red"}
+                onPress={unsendFriendRequest}
+                label={"Unsend Request"}
+              />
+            ) : friendStatus === "unsending" ? (
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  fontSize: 18,
+                  marginTop: 2,
+                  alignSelf: "center",
+                }}
+              >
+                Unsending Request...
+              </Text>
+            ) : friendStatus == "received" ? (
+              <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
                 <IconButton
-                  style={{flex: 1, borderColor: "blue", borderWidth: 1, padding: 15, justifyContent: "center"}}
+                  style={{
+                    flex: 1,
+                    borderColor: "green",
+                    borderWidth: 1,
+                    padding: 15,
+                    paddingVertical: 5,
+                    marginRight: 10,
+                    justifyContent: "center",
+                  }}
                   iconName={"person-add"}
                   size={24}
                   fontWeight={"bold"}
                   fontSize={20}
-                  color={"blue"}
-                  onPress={sendFriendRequest}
-                  label={"Add Friend"}
+                  color={"green"}
+                  onPress={acceptFriendRequest}
                 />
-                : friendStatus === "sending" ?
-                  <Text style={{ fontWeight: "bold", fontSize: 18, marginTop: 2, padding: 16, alignSelf: "center" }}>
-                    Sending Request...
+                <IconButton
+                  style={{
+                    flex: 1,
+                    borderColor: "red",
+                    borderWidth: 1,
+                    padding: 15,
+                    paddingVertical: 5,
+                    marginLeft: 10,
+                    justifyContent: "center",
+                  }}
+                  iconName={"person-remove"}
+                  size={24}
+                  fontWeight={"bold"}
+                  fontSize={20}
+                  color={"red"}
+                  onPress={rejectFriendRequest}
+                />
+              </View>
+            ) : friendStatus === "rejecting" ? (
+              <Text style={{ fontWeight: "bold", fontSize: 18, marginTop: 2 }}>
+                Rejecting Request...
+              </Text>
+            ) : friendStatus === "accepting" ? (
+              <Text style={{ fontWeight: "bold", fontSize: 18, marginTop: 2 }}>
+                Accepting Request...
+              </Text>
+            ) : friendStatus === "deleting" ? (
+              <Text style={{ fontWeight: "bold", fontSize: 18, marginTop: 2 }}>
+                Removing Friend...
+              </Text>
+            ) : friendStatus === "friends" ? (
+              <View>
+                <View style={[styles.viewProfileScreen]}>
+                  <Text style={{ fontSize: 16 }}>
+                    Friends for {friendsSince}{" "}
                   </Text>
-                  : friendStatus === "sent" ?
-                    <IconButton
-                    style={{flex: 1, borderColor: "red", borderWidth: 1, padding: 15, justifyContent: "center"}}
-                      iconName={"person-remove"}
-                      size={24}
-                      fontWeight={"bold"}
-                      fontSize={18}
-                      color={"red"}
-                      onPress={unsendFriendRequest}
-                      label={"Unsend Request"}
-                    />
-                    : friendStatus === "unsending" ?
-                      <Text style={{ fontWeight: "bold", fontSize: 18, marginTop: 2, alignSelf: "center" }}>
-                        Unsending Request...
-                      </Text>
-                      : friendStatus == "received" ? (
-                        <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
-                          <IconButton
-                    style={{flex: 1, borderColor: "green", borderWidth: 1, padding: 15, paddingVertical: 5, marginRight: 10, justifyContent: "center"}}
-                            iconName={"person-add"}
-                            size={24}
-                            fontWeight={"bold"}
-                            fontSize={20}
-                            color={"green"}
-                            onPress={acceptFriendRequest}
-                          />
-                          <IconButton
-                    style={{flex: 1, borderColor: "red", borderWidth: 1, padding: 15, paddingVertical: 5, marginLeft: 10, justifyContent: "center"}}
-                            iconName={"person-remove"}
-                            size={24}
-                            fontWeight={"bold"}
-                            fontSize={20}
-                            color={"red"}
-                            onPress={rejectFriendRequest}
-                          />
-                        </View>
-                      )
-                        : friendStatus === "rejecting" ? (
-                          <Text style={{ fontWeight: "bold", fontSize: 18, marginTop: 2 }}>
-                            Rejecting Request...
-                          </Text>
-                        ) : friendStatus === "accepting" ? (
-                          <Text style={{ fontWeight: "bold", fontSize: 18, marginTop: 2 }}>
-                            Accepting Request...
-                          </Text>
-                        ) : friendStatus === "deleting" ? (
-                          <Text style={{ fontWeight: "bold", fontSize: 18, marginTop: 2 }}>
-                            Removing Friend...
-                          </Text>
-                        ) : friendStatus === "friends" ? (
-                          <View>
-                            <View style={[styles.viewProfileScreen]}>
-                              <Text style={{fontSize: 16,}} >Friends for {friendsSince} </Text>
-                            </View>
-                          </View>
-                        )
-                          : null
-              : null
-            }
-            <View style={{flexDirection: "row", marginTop: friendStatus === "friends" ? 0 : 20}}>
-            {(!user.messagesPrivacy || user.messagesPrivacy === 0 || (mutualfriendList.length > 0 && user.messagesPrivacy === 1) || (friendStatus === "friends" && user.messagesPrivacy >= 1)) ?
+                </View>
+              </View>
+            ) : null
+          ) : null}
+          <View
+            style={{
+              flexDirection: "row",
+              marginTop: friendStatus === "friends" ? 0 : 20,
+            }}
+          >
+            {!user.messagesPrivacy ||
+            user.messagesPrivacy === 0 ||
+            (mutualfriendList.length > 0 && user.messagesPrivacy === 1) ||
+            (friendStatus === "friends" && user.messagesPrivacy >= 1) ? (
               <IconButton
-                style={{flex: 1, borderColor: "blue", borderWidth: 1, padding: 15, marginLeft: 10, justifyContent: "center"}}
+                style={{
+                  flex: 1,
+                  borderColor: "blue",
+                  borderWidth: 1,
+                  padding: 15,
+                  marginLeft: 10,
+                  justifyContent: "center",
+                }}
                 iconName={"message"}
                 size={24}
                 fontSize={20}
@@ -627,19 +723,18 @@ const LookupUser = ({ route, navigation }) => {
                 fontWeight={"bold"}
                 label={"Message"}
               />
-              : null}
+            ) : null}
             <IconButton
-                iconName={"more-vert"}
-                size={24}
-                fontSize={20}
-                color={"black"}
-                onPress={openOptionsDialog}
-                fontWeight={"bold"}
-              />
-
-            </View>
-          </View> : null
-      }
+              iconName={"more-vert"}
+              size={24}
+              fontSize={20}
+              color={"black"}
+              onPress={openOptionsDialog}
+              fontWeight={"bold"}
+            />
+          </View>
+        </View>
+      ) : null}
 
       <View>
         {mutualfriendList.length != 0 ? (
@@ -651,25 +746,23 @@ const LookupUser = ({ route, navigation }) => {
         ) : null}
       </View>
       <View>
-          <APIList
-            initialAmount={10}
-            additionalAmount={20}
-            horizontal={true}
-            queryOperation={listFriendships}
-            data={mutualfriendList}
-            setDataFunction={setMutualFriendList}
-            processingFunction={collectMutualFriends}
-            renderItem={({ item }) => (
-              <ProfileImageAndName
-                style={{ marginHorizontal: 20 }}
-                vertical={true}
-                userId={item}
-              />
-            )}
-            keyExtractor={(item) => item}
-          />
+        <APIList
+          ref={listRef}
+          initialAmount={10}
+          additionalAmount={20}
+          horizontal={true}
+          queryOperation={listFriendships}
+          processingFunction={collectMutualFriends}
+          renderItem={({ item }) => (
+            <ProfileImageAndName
+              style={{ marginHorizontal: 20 }}
+              vertical={true}
+              userId={item}
+            />
+          )}
+          keyExtractor={(item) => item}
+        />
       </View>
-      
 
       {getLocation() != null && user.latitude != null ? (
         <View style={styles.viewProfileScreen}>
@@ -692,14 +785,24 @@ const LookupUser = ({ route, navigation }) => {
                 padding: 10,
               }}
             />
-          ) : friendStatus == "blocked" ? null
-            : friendStatus == "blocker" ? (
-              <TouchableOpacity
-                onPress={unblockUser}
-                style={{borderColor: "black", borderWidth: 1, padding: 15, alignItems: "center", margin: 20}}
+          ) : friendStatus == "blocked" ? null : friendStatus == "blocker" ? (
+            <TouchableOpacity
+              onPress={unblockUser}
+              style={{
+                borderColor: "black",
+                borderWidth: 1,
+                padding: 15,
+                alignItems: "center",
+                margin: 20,
+              }}
+            >
+              <Text
+                style={{ color: "black", fontWeight: "bold", fontSize: 20 }}
               >
-                <Text style={{color: "black", fontWeight: "bold", fontSize: 20}}>Unblock</Text>
-              </TouchableOpacity>) : null}
+                Unblock
+              </Text>
+            </TouchableOpacity>
+          ) : null}
         </View>
       ) : null}
     </ScrollView>

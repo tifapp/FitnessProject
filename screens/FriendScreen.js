@@ -48,10 +48,10 @@ var styles = require("styles/stylesheet");
 var subscriptions = [];
 
 function FriendList({ navigation, route }) {
-  const [friendList, setFriendList] = useState([]);
+  const listRef = useRef();
 
   global.updateFriendsListWithMyNewMessage = (newPost) => {
-    setFriendList((friends) => {
+    listRef.mutateData((friends) => {
       return friends.map((friend) => {
         if (
           newPost.receiver === friend.receiver ||
@@ -85,9 +85,10 @@ function FriendList({ navigation, route }) {
     }
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setFriendList((currentFriends) => [newFriend, ...currentFriends]);
+    listRef.mutateData((currentFriends) => [newFriend, ...currentFriends]);
   };
 
+  /*
   useEffect(() => {
     friendList.forEach((friend) =>
       global.addConversationIds(
@@ -95,6 +96,7 @@ function FriendList({ navigation, route }) {
       )
     );
   }, [friendList]); //we must extract just the array of ids
+  */
 
   useEffect(() => {
     const receivedConversationSubscription = API.graphql(
@@ -104,7 +106,7 @@ function FriendList({ navigation, route }) {
     ).subscribe({
       next: (event) => {
         //no need for security checks here
-        setFriendList((friends) => {
+        listRef.mutateData((friends) => {
           return friends.map((friend) => {
             if (
               newPost.userId === friend.sender ||
@@ -171,7 +173,7 @@ function FriendList({ navigation, route }) {
     ).subscribe({
       next: (event) => {
         const deletedFriend = event.value.data.onDeleteFriendship; //check the security on this one. if possible, should only fire for the sender or receiver.
-        setFriendList((currentFriends) => {
+        listRef.mutateData((currentFriends) => {
           let index = currentFriends.findIndex(
             (item) =>
               item.sender === deletedFriend.sender &&
@@ -227,7 +229,7 @@ function FriendList({ navigation, route }) {
   const removeFriend = async (item, blocked) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     // update friendList
-    setFriendList((friendList) => {
+    listRef.mutateData((friendList) => {
       return friendList.filter(
         (i) => i.sender !== item.sender || i.receiver !== item.receiver
       );
@@ -277,6 +279,7 @@ function FriendList({ navigation, route }) {
         </Text>
       }
       style={{}}
+      ref={listRef}
       queryOperation={listFriendships}
       filter={{
         filter: {
@@ -302,10 +305,8 @@ function FriendList({ navigation, route }) {
             },
           ],
         },
-      }}
-      setDataFunction={setFriendList} //a batch function should be used to grab message previews. that would also make it easy to exclude any.
+      }} //a batch function should be used to grab message previews. that would also make it easy to exclude any.
       processingFunction={fetchLatestMessagesFromFriends}
-      data={friendList}
       initialAmount={15}
       additionalAmount={15}
       renderItem={({ item }) => (
@@ -343,14 +344,11 @@ function FriendList({ navigation, route }) {
 }
 
 export default function FriendScreen({ navigation, route }) {
-  const [friendRequestList, setFriendRequestList] = useState([]);
-
-  const currentFriendRequests = useRef();
-  currentFriendRequests.current = friendRequestList;
+  const listRef = useRef();
 
   const respondToRequest = (item, accepted) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setFriendRequestList(
+    listRef.mutateData((friendRequestList) =>
       friendRequestList.map(function (i) {
         if (i.sender == item.sender && i.receiver == item.receiver) {
           if (accepted) {
@@ -366,7 +364,7 @@ export default function FriendScreen({ navigation, route }) {
 
   const undoResponse = (item) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setFriendRequestList(
+    listRef.mutateData((friendRequestList) =>
       friendRequestList.map(function (i) {
         if (i.sender == item.sender && i.receiver == item.receiver) {
           i.accepted = false;
@@ -379,9 +377,9 @@ export default function FriendScreen({ navigation, route }) {
 
   // runs when either for accepting or rejecting a friend request
   const confirmResponse = async (item, isNew) => {
-    if (friendRequestList.length == 1) playSound("celebrate");
+    //if (listRef.getData().length == 1) playSound("celebrate");
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setFriendRequestList(
+    listRef.mutateData((friendRequestList) =>
       friendRequestList.filter(
         (i) => item.sender !== i.sender || item.receiver !== i.receiver
       )
@@ -456,7 +454,8 @@ export default function FriendScreen({ navigation, route }) {
 
         //if this new request is coming from someone already in your local friends list, remove them from your local friends list
         //if (currentFriends.current.find((item) => item.sender === newFriendRequest.sender)) {
-        setFriendList((currentFriends) =>
+        /*
+        listRef.mutateData((currentFriends) =>
           currentFriends.filter(
             (item) =>
               item.sender != newFriendRequest.sender ||
@@ -464,6 +463,7 @@ export default function FriendScreen({ navigation, route }) {
           )
         );
         //}
+        */
 
         //if this new request is not already in your local friend request list, add it to your local friend request list
         if (
@@ -471,7 +471,7 @@ export default function FriendScreen({ navigation, route }) {
             (item) => item.sender === newFriendRequest.sender
           )
         ) {
-          setFriendRequestList(
+          listRef.mutateData((currentFriendRequests) =>
             currentFriendRequests.current.filter(
               (item) =>
                 item.sender != newFriendRequest.sender ||
@@ -484,9 +484,9 @@ export default function FriendScreen({ navigation, route }) {
         global.showNotificationDot();
 
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        setFriendRequestList([
+        listRef.mutateData((currentFriendRequests) => [
           newFriendRequest,
-          ...currentFriendRequests.current,
+          ...currentFriendRequests,
         ]);
       },
     });
@@ -552,7 +552,10 @@ export default function FriendScreen({ navigation, route }) {
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <Accordion
         style={{ marginTop: 0 }}
-        open={friendRequestList.length > 0}
+        open={
+          //friendRequestList.length > 0
+          false
+        }
         headerText={"Friend Requests"} //would be nice if we had a total friend request count. but then you'd be able to see when people revoke their friend requests.
         headerTextStyle={{
           fontSize: 18,
@@ -563,18 +566,7 @@ export default function FriendScreen({ navigation, route }) {
         openTextColor={"black"}
         iconColor={"gray"}
         iconOpenColor={"black"}
-        closeFunction={() => {
-          friendRequestList.forEach((item) => {
-            if (item.rejected || item.accepted) confirmResponse(item);
-          });
-          const newlist = friendRequestList.filter(
-            (i) => !i.accepted && !i.rejected
-          );
-          setFriendRequestList(newlist);
-          if (newlist.length == 0 && friendRequestList.length > 0)
-            playSound("celebrate");
-        }}
-        empty={friendRequestList.length == 0}
+        empty={false}
       >
         <APIList
           style={{}}
@@ -589,8 +581,7 @@ export default function FriendScreen({ navigation, route }) {
               },
             },
           }}
-          setDataFunction={setFriendRequestList}
-          data={friendRequestList}
+          ref={listRef}
           initialAmount={21}
           additionalAmount={15}
           renderItem={({ item, index }) => (

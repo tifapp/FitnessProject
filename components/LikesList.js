@@ -18,29 +18,28 @@ require('root/androidtimerfix');
 var styles = require('styles/stylesheet');
 
 export default function LikesList({ postId }) {
-  const [likedUsers, setLikedUsers] = useState([]);
-  const currentLikedUsers = useRef();
-  
-  currentLikedUsers.current = likedUsers;
+  const listRef = useRef();
 
   useEffect(() => {
     const createLikeSubscription = API.graphql(graphqlOperation(onCreateLikeForPost, { postId: postId })).subscribe({
       next: event => {
         const newLike = event.value.data.onCreateLikeForPost
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        setLikedUsers([newLike, ...currentLikedUsers.current]);
+        listRef.mutateData(data => [newLike, ...data]);
       }
     });
     const deleteLikeSubscription = API.graphql(graphqlOperation(onDeleteLikeForPost, { postId: postId })).subscribe({
       next: event => {
         const deletedLike = event.value.data.onDeleteLikeForPost
-        if (currentLikedUsers.current.find(like => like.userId === deletedLike.userId)) {
-          let templikes = [...currentLikedUsers.current];
-          var index = templikes.findIndex(like => like.userId === deletedLike.userId);
-          templikes.splice(index, 1);
-          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-          setLikedUsers(templikes);
-        }
+        listRef.mutateData(data => {
+          if (data.find(like => like.userId === deletedLike.userId)) {
+            let templikes = [...data];
+            var index = templikes.findIndex(like => like.userId === deletedLike.userId);
+            templikes.splice(index, 1);
+            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+            return templikes;
+          }
+        });
       }
     });
     return () => {
@@ -52,12 +51,11 @@ export default function LikesList({ postId }) {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <APIList
+        ref={listRef}
         initialAmount={10}
         additionalAmount={20}
         queryOperation={likesByPost}
         filter={{ postId: postId, sortDirection: "DESC" }}
-        data={likedUsers}
-        setDataFunction={setLikedUsers}
         renderItem={({ item }) => (
           <ProfileImageAndName
             style={{ margin: 15 }}
