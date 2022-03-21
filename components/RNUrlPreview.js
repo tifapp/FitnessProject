@@ -1,7 +1,16 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import {Image, Linking, Platform, Text, TouchableOpacity, View, ViewPropTypes, ActivityIndicator} from 'react-native';
-import ImageResizeMode from 'react-native/Libraries/Image/ImageResizeMode'
+import React from "react";
+import PropTypes from "prop-types";
+import {
+  Image,
+  Linking,
+  Platform,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewPropTypes,
+  ActivityIndicator,
+} from "react-native";
+import ImageResizeMode from "react-native/Libraries/Image/ImageResizeMode";
 
 export default class RNUrlPreview extends React.PureComponent {
   constructor(props) {
@@ -9,26 +18,54 @@ export default class RNUrlPreview extends React.PureComponent {
   }
 
   _onLinkPressed = () => {
-    this.props.onPress ? this.props.onPress(this.props.urlPreview.url) : Linking.openURL(this.props.urlPreview.url);
+    this.props.onPress
+      ? this.props.onPress(this.props.urlPreview.url)
+      : Linking.openURL(this.props.urlPreview.url);
   };
 
-  renderImage = (imageLink, faviconLink, imageStyle, faviconStyle, imageProps) => {
+  renderImage = (
+    imageLink,
+    faviconLink,
+    imageStyle,
+    faviconStyle,
+    imageProps
+  ) => {
     return imageLink ? (
-      <Image style={{
-        height: 81,
-        width: 144,          
-        resizeMode: "cover",
-      }} resizeMode="cover" source={{uri: imageLink}} {...imageProps} />
+      <Image
+        style={{
+          height: 81,
+          width: 144,
+          resizeMode: "cover",
+        }}
+        resizeMode="cover"
+        source={{ uri: imageLink }}
+        {...imageProps}
+      />
     ) : faviconLink ? (
-      <Image style={{
-        height: 81,
-        width: 81,          
-        resizeMode: "cover",
-      }} resizeMode="cover" source={{uri: faviconLink}} {...imageProps} />
+      <Image
+        style={{
+          height: 81,
+          width: 81,
+          resizeMode: "cover",
+        }}
+        resizeMode="cover"
+        source={{ uri: faviconLink }}
+        {...imageProps}
+      />
     ) : null;
   };
 
-  renderText = (showTitle, showDescription, title, description, textContainerStyle, titleStyle, descriptionStyle, titleNumberOfLines, descriptionNumberOfLines) => {
+  renderText = (
+    showTitle,
+    showDescription,
+    title,
+    description,
+    textContainerStyle,
+    titleStyle,
+    descriptionStyle,
+    titleNumberOfLines,
+    descriptionNumberOfLines
+  ) => {
     return (
       <View style={textContainerStyle}>
         {showTitle && (
@@ -60,12 +97,32 @@ export default class RNUrlPreview extends React.PureComponent {
     descriptionStyle,
     titleNumberOfLines,
     descriptionNumberOfLines,
-    imageProps,
+    imageProps
   ) => {
     return (
-      <TouchableOpacity style={[styles.containerStyle, containerStyle]} activeOpacity={0.9} onPress={() => this._onLinkPressed()}>
-        {this.renderImage(imageLink, faviconLink, imageStyle, faviconStyle, imageProps)}
-        {this.renderText(showTitle, showDescription, title, description, textContainerStyle, titleStyle, descriptionStyle, titleNumberOfLines, descriptionNumberOfLines)}
+      <TouchableOpacity
+        style={[styles.containerStyle, containerStyle]}
+        activeOpacity={0.9}
+        onPress={() => this._onLinkPressed()}
+      >
+        {this.renderImage(
+          imageLink,
+          faviconLink,
+          imageStyle,
+          faviconStyle,
+          imageProps
+        )}
+        {this.renderText(
+          showTitle,
+          showDescription,
+          title,
+          description,
+          textContainerStyle,
+          titleStyle,
+          descriptionStyle,
+          titleNumberOfLines,
+          descriptionNumberOfLines
+        )}
       </TouchableOpacity>
     );
   };
@@ -88,34 +145,44 @@ export default class RNUrlPreview extends React.PureComponent {
     } = this.props;
     return this.props.urlPreview
       ? this.renderLinkPreview(
-        containerStyle,
-        this.props.urlPreview.images && this.props.urlPreview.images.length > 0
-        ? this.props.urlPreview.images.find(function(element) {
-            return element.includes('.png') || element.includes('.jpg') || element.includes('.jpeg');
-          })
-        : undefined,
-        this.props.urlPreview.favicons && this.props.urlPreview.favicons.length > 0 ? this.props.urlPreview.favicons[this.props.urlPreview.favicons.length - 1] : undefined,
-        imageStyle,
-        faviconStyle,
-        title,
-        description,
-        this.props.urlPreview.title ?? undefined,
-        this.props.urlPreview.description ?? undefined,
-        textContainerStyle,
-        titleStyle,
-        descriptionStyle,
-        titleNumberOfLines,
-        descriptionNumberOfLines,
-        imageProps,
-        onPress,
-      )
+          containerStyle,
+          this.props.urlPreview.images &&
+            this.props.urlPreview.images.length > 0
+            ? this.props.urlPreview.images.find(function (element) {
+                return (
+                  element.includes(".png") ||
+                  element.includes(".jpg") ||
+                  element.includes(".jpeg")
+                );
+              })
+            : undefined,
+          this.props.urlPreview.favicons &&
+            this.props.urlPreview.favicons.length > 0
+            ? this.props.urlPreview.favicons[
+                this.props.urlPreview.favicons.length - 1
+              ]
+            : undefined,
+          imageStyle,
+          faviconStyle,
+          title,
+          description,
+          this.props.urlPreview.title ?? undefined,
+          this.props.urlPreview.description ?? undefined,
+          textContainerStyle,
+          titleStyle,
+          descriptionStyle,
+          titleNumberOfLines,
+          descriptionNumberOfLines,
+          imageProps,
+          onPress
+        )
       : null;
   }
 }
 
 const styles = {
   containerStyle: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
 };
 
@@ -125,8 +192,8 @@ RNUrlPreview.defaultProps = {
   text: null,
   requestOptions: {},
   containerStyle: {
-    backgroundColor: 'rgba(239, 239, 244,0.62)',
-    alignItems: 'center',
+    backgroundColor: "rgba(239, 239, 244,0.62)",
+    alignItems: "center",
   },
   imageStyle: {
     width: Platform.isPad ? 160 : 110,
@@ -142,28 +209,28 @@ RNUrlPreview.defaultProps = {
   },
   textContainerStyle: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
+    justifyContent: "center",
+    alignItems: "flex-start",
     paddingHorizontal: 10,
   },
   title: true,
   description: true,
   titleStyle: {
     fontSize: 14,
-    color: '#000',
+    color: "#000",
     marginRight: 0,
     marginBottom: 0,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   titleNumberOfLines: 2,
   descriptionStyle: {
     fontSize: 12,
-    color: '#81848A',
+    color: "#81848A",
     marginRight: 0,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   descriptionNumberOfLines: Platform.isPad ? 4 : 3,
-  imageProps: {resizeMode: 'contain'},
+  imageProps: { resizeMode: "contain" },
 };
 
 RNUrlPreview.propTypes = {
@@ -183,7 +250,7 @@ RNUrlPreview.propTypes = {
   requestOptions: PropTypes.shape({
     headers: PropTypes.objectOf(PropTypes.string),
     imagesPropertyType: PropTypes.string,
-    proxyUrl: PropTypes.string 
+    proxyUrl: PropTypes.string,
   }),
   onPress: PropTypes.func,
 };

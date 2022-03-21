@@ -1,4 +1,4 @@
-import { Auth, } from "aws-amplify";
+import { Auth } from "aws-amplify";
 
 async function setMyId() {
   const query = await Auth.currentUserInfo();

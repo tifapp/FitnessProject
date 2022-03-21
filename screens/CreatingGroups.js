@@ -1,7 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState, useEffect } from "react";
-import { createGroup, updateGroup} from "root/src/graphql/mutations";
+import { createGroup, updateGroup } from "root/src/graphql/mutations";
 import {
   StyleSheet,
   Text,
@@ -15,7 +15,7 @@ import {
   Keyboard,
   Modal,
   Dimensions,
-  Alert
+  Alert,
 } from "react-native";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation } from "aws-amplify";
@@ -26,9 +26,9 @@ import NameField from "components/NameField";
 import PrivacySettings from "components/Privacy";
 import SportCreation from "components/Sport";
 import GroupDescription from "components/Description";
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from "@react-navigation/native";
 
-export default function CreatingGroups({route}) {
+export default function CreatingGroups({ route }) {
   console.log(route.params?.myId);
   const [nameVal, setName] = useState("");
   const [privacyVal, setPrivacy] = useState("Public");
@@ -43,23 +43,21 @@ export default function CreatingGroups({route}) {
   console.log(route);
   if (route.params.check !== undefined) {
     useEffect(() => {
-      setFields()
+      setFields();
     }, [route.params]);
   }
-  
+
   const setFields = () => {
-    const {group} = route.params;
+    const { group } = route.params;
     setName(group.name);
     setPrivacy(group.Privacy);
     //setTotalUsers(group.maxUsers)
     setSport(group.Sport);
     setDescription(group.Description);
-  }
-  
-  
+  };
 
   const addGroup = async () => {
-    Alert.alert('Submitting Group...', '', [], {cancelable: false})
+    Alert.alert("Submitting Group...", "", [], { cancelable: false });
 
     const val = {
       userID: route.params?.myId,
@@ -80,15 +78,15 @@ export default function CreatingGroups({route}) {
     try {
       await API.graphql(graphqlOperation(createGroup, { input: val }));
       console.log("success");
-      alert('Group submitted successfully!');
+      alert("Group submitted successfully!");
     } catch (err) {
       console.log(err);
-      alert('Group could not be submitted! ' + err.errors[0].message);
+      alert("Group could not be submitted! " + err.errors[0].message);
     }
   };
 
   const updtGroup = async () => {
-    Alert.alert('Updating Group...', '', [], {cancelable: false})
+    Alert.alert("Updating Group...", "", [], { cancelable: false });
 
     setDescription("");
     setName("");
@@ -97,23 +95,27 @@ export default function CreatingGroups({route}) {
     setSport("");
 
     try {
-      const {group} = route.params;
-      const updatedGroup = { id: group.id, name: nameVal,
-        Privacy: privacyVal, Sport: sportVal, 
-        Description: descriptionVal};
+      const { group } = route.params;
+      const updatedGroup = {
+        id: group.id,
+        name: nameVal,
+        Privacy: privacyVal,
+        Sport: sportVal,
+        Description: descriptionVal,
+      };
       await API.graphql(graphqlOperation(updateGroup, { input: updatedGroup }));
       console.log("success");
-      alert('Group submitted successfully!');
+      alert("Group submitted successfully!");
       updatedGroup.userID = route.params?.myId;
-      navigation.navigate('Search', {
+      navigation.navigate("Search", {
         updatedGroup: updatedGroup,
       });
-      navigation.navigate('Group Posts Screen', {
+      navigation.navigate("Group Posts Screen", {
         group: updatedGroup,
       });
     } catch (err) {
       console.log(err);
-      alert('Group could not be submitted! ' + err.errors[0].message);
+      alert("Group could not be submitted! " + err.errors[0].message);
     }
   };
 
@@ -137,7 +139,7 @@ export default function CreatingGroups({route}) {
           <GroupDescription
             setDescription={setDescription}
             descriptionVal={descriptionVal}
-            characterCount = {characterCount}
+            characterCount={characterCount}
           />
 
           <View style={styles.buttonFormat}>
@@ -148,16 +150,18 @@ export default function CreatingGroups({route}) {
                 sportVal != "" &&
                 descriptionVal != "" &&
                 descriptionVal.length <= characterCount
-                  ? (route.params.check !== undefined 
-                     ? updtGroup() : 
-                     addGroup())
+                  ? route.params.check !== undefined
+                    ? updtGroup()
+                    : addGroup()
                   : alert("Please fill out all available fields");
               }}
               style={styles.submitButton}
             >
-              {route.params.check !== undefined ?
-               <Text style={styles.buttonTextStyle}>Save</Text> :
-              <Text style={styles.buttonTextStyle}>Submit</Text>}
+              {route.params.check !== undefined ? (
+                <Text style={styles.buttonTextStyle}>Save</Text>
+              ) : (
+                <Text style={styles.buttonTextStyle}>Submit</Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>

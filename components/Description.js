@@ -19,7 +19,11 @@ import {
 
 const { width } = Dimensions.get("screen");
 
-export default function GroupDescription({ setDescription, descriptionVal, characterCount }) {
+export default function GroupDescription({
+  setDescription,
+  descriptionVal,
+  characterCount,
+}) {
   var totalCharsRemaining = characterCount - descriptionVal.length;
   return (
     <View>
@@ -32,7 +36,7 @@ export default function GroupDescription({ setDescription, descriptionVal, chara
           onChangeText={setDescription}
           placeholder="Enter a description for your group ...."
           value={descriptionVal}
-          maxLength = {1000}
+          maxLength={1000}
         />
       </View>
     </View>

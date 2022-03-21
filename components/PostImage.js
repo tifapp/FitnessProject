@@ -1,18 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  Image, ImageBackground,
-} from "react-native";
+import { Image, ImageBackground } from "react-native";
 import { Storage } from "aws-amplify";
-import { Video, AVPlaybackStatus } from 'expo-av';
+import { Video, AVPlaybackStatus } from "expo-av";
 
 const re = /(?:\.([^.]+))?$/;
 
 global.currentVideo;
 
-export default function PostImage({style, imageID, isVisible}) {
+export default function PostImage({ style, imageID, isVisible }) {
   const [imageURL, setImageURL] = useState(null);
   const video = useRef(null);
-  
+
   let imageKey = `feed/${imageID}`;
   let imageConfig = {
     expires: 86400,
@@ -30,8 +28,8 @@ export default function PostImage({style, imageID, isVisible}) {
           setImageURL(null);
         }); //should just use a "profilepic" component
     }
-  }, [])
-  
+  }, []);
+
   useEffect(() => {
     //console.log("image id is ", imageID);
     if (video.current) {
@@ -39,7 +37,7 @@ export default function PostImage({style, imageID, isVisible}) {
         video.current.pauseAsync();
       }
     }
-  }, [global.currentVideo])
+  }, [global.currentVideo]);
 
   useEffect(() => {
     if (video.current) {
@@ -53,34 +51,36 @@ export default function PostImage({style, imageID, isVisible}) {
         }
       }
     }
-  }, [isVisible])
+  }, [isVisible]);
 
   if (imageID) {
-    return (
-      (re.exec(imageID)[1] === 'jpg') ?
-        <ImageBackground
-          style={style}
-          source={
-            (imageURL == null || imageURL === "") ?
-              require("../assets/icon.png")
-              : { uri: imageURL }
-          }
-        /> : <Video
-          ref={video}
-          style={style}
-          source={{ uri: imageURL }}
-          posterSource={require("../assets/icon.png")}
-          useNativeControls
-          onPlaybackStatusUpdate={status => {
-            (async () => {
-
-              if (status.didJustFinish) {
-                video.current.setStatusAsync({ shouldPlay: false, positionMillis: 0});
-              }
-             
-             })();
-          }}
-        />
-    )
+    return re.exec(imageID)[1] === "jpg" ? (
+      <ImageBackground
+        style={style}
+        source={
+          imageURL == null || imageURL === ""
+            ? require("../assets/icon.png")
+            : { uri: imageURL }
+        }
+      />
+    ) : (
+      <Video
+        ref={video}
+        style={style}
+        source={{ uri: imageURL }}
+        posterSource={require("../assets/icon.png")}
+        useNativeControls
+        onPlaybackStatusUpdate={(status) => {
+          (async () => {
+            if (status.didJustFinish) {
+              video.current.setStatusAsync({
+                shouldPlay: false,
+                positionMillis: 0,
+              });
+            }
+          })();
+        }}
+      />
+    );
   } else return null;
 }

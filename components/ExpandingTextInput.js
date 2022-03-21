@@ -1,19 +1,19 @@
-import React from 'react'
-import { TextInput } from 'react-native'
+import React from "react";
+import { TextInput } from "react-native";
 
 export default class ExpandingTextInput extends React.Component {
-  constructor (props) {
-    super(props)
+  constructor(props) {
+    super(props);
     this.state = {
-      height: 0
-    }
+      height: 0,
+    };
   }
 
-  focus () {
-    this.textInput && this.textInput.focus()
+  focus() {
+    this.textInput && this.textInput.focus();
   }
 
-  render () {
+  render() {
     return (
       <TextInput
         {...this.props}
@@ -22,13 +22,14 @@ export default class ExpandingTextInput extends React.Component {
         onContentSizeChange={(event) => {
           if (event && event.nativeEvent && event.nativeEvent.contentSize) {
             this.setState({
-              height: event.nativeEvent.contentSize.height
-            })
+              height: event.nativeEvent.contentSize.height,
+            });
           }
-          this.props.onContentSizeChange && this.props.onContentSizeChange(event)
+          this.props.onContentSizeChange &&
+            this.props.onContentSizeChange(event);
         }}
         style={[this.props.style, { height: Math.max(35, this.state.height) }]}
       />
-    )
+    );
   }
 }

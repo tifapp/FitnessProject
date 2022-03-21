@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
-import * as Location from 'expo-location';
+import React, { useState, useEffect } from "react";
+import { Text, View, StyleSheet } from "react-native";
+import * as Location from "expo-location";
 
 export default function App() {
   const [location, setLocation] = useState(null);
@@ -9,8 +9,8 @@ export default function App() {
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
       }
 
       let location = await Location.getCurrentPositionAsync({ accuracy: 1 });
@@ -18,11 +18,14 @@ export default function App() {
     })();
   }, []);
 
-  let text = 'Waiting..';
+  let text = "Waiting..";
   if (errorMsg) {
     text = errorMsg;
   } else if (location) {
-    text = JSON.stringify(location.coords.longitude) + ', ' + JSON.stringify(location.coords.latitude);
+    text =
+      JSON.stringify(location.coords.longitude) +
+      ", " +
+      JSON.stringify(location.coords.latitude);
   }
 
   return (

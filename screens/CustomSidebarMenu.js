@@ -7,15 +7,20 @@ import {
   Text,
   Linking,
   TouchableOpacity,
-  LayoutAnimation
+  LayoutAnimation,
 } from "react-native";
 import { API, graphqlOperation, Cache } from "aws-amplify";
 import {
   onCreateFriendRequestForReceiver,
   onAcceptedFriendship,
-  onCreatePostForReceiver
+  onCreatePostForReceiver,
 } from "root/src/graphql/subscriptions";
-import { deleteFriendship, updateFriendship, createBlock, updateConversation } from "root/src/graphql/mutations";
+import {
+  deleteFriendship,
+  updateFriendship,
+  createBlock,
+  updateConversation,
+} from "root/src/graphql/mutations";
 
 import { ProfileImageAndName } from "components/ProfileImageAndName";
 import {
@@ -27,13 +32,22 @@ import APIList from "components/APIList";
 import FriendListItem from "components/FriendListItem";
 import FriendRequestListItem from "components/FriendRequestListItem";
 import playSound from "../hooks/playSound";
-import { useIsDrawerOpen } from '@react-navigation/drawer';
-import { batchGetConversations, getConversation, getConversations } from "../src/graphql/queries";
+import { useIsDrawerOpen } from "@react-navigation/drawer";
+import {
+  batchGetConversations,
+  getConversation,
+  getConversations,
+} from "../src/graphql/queries";
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 
 global.localBlockList = [];
 
-export default function CustomSidebarMenu({ navigation, state, progress, myId }) {
+export default function CustomSidebarMenu({
+  navigation,
+  state,
+  progress,
+  myId,
+}) {
   const [lastOnlineTime, setLastOnlineTime] = useState(0);
   const [newFriendRequests, setNewFriendRequests] = useState(0); //should persist across sessions (ex. if you receive new friend requests while logged out)
   const [newConversations, setNewConversations] = useState(0); //should persist across sessions (ex. if you receive new friend requests while logged out)
@@ -124,7 +138,10 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
 
   const checkNewRequests = (items) => {
     items.forEach((item) => {
-      if (lastOnlineTime > 0 && new Date(item.createdAt).getTime() > lastOnlineTime) {
+      if (
+        lastOnlineTime > 0 &&
+        new Date(item.createdAt).getTime() > lastOnlineTime
+      ) {
         setNewFriendRequests(newFriendRequests + 1); //do we ever want to increase the number when loading more requests?
       }
     });
@@ -150,74 +167,141 @@ export default function CustomSidebarMenu({ navigation, state, progress, myId })
             fontWeight: "bold",
             fontSize: 26,
             color: "black",
-            textDecorationLine: (state.routes[state.index].name === "Profile") ? "underline" : "none"
+            textDecorationLine:
+              state.routes[state.index].name === "Profile"
+                ? "underline"
+                : "none",
           }}
         />
       </View>
 
       <TouchableOpacity
-        style={[{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          paddingVertical: 15,
-          backgroundColor: "white",
-        }]}
-        onPress={() => { setNewFriendRequests(0); navigation.navigate("Friends") }}>
-        <Text style={{
-          fontSize: 18,
-          color: (state.routes[state.index].name === "Friends") ? "black" : newConversations > 0 ? "blue" : "grey",
-          textDecorationLine: (state.routes[state.index].name === "Friends") ? "underline" : "none",
-        }}>Friends {(newFriendRequests > 0
-          ? " (" + (newFriendRequests <= 20 ? newFriendRequests : "20+") + ")"
-          : "")}</Text>
+        style={[
+          {
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            paddingVertical: 15,
+            backgroundColor: "white",
+          },
+        ]}
+        onPress={() => {
+          setNewFriendRequests(0);
+          navigation.navigate("Friends");
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 18,
+            color:
+              state.routes[state.index].name === "Friends"
+                ? "black"
+                : newConversations > 0
+                ? "blue"
+                : "grey",
+            textDecorationLine:
+              state.routes[state.index].name === "Friends"
+                ? "underline"
+                : "none",
+          }}
+        >
+          Friends{" "}
+          {newFriendRequests > 0
+            ? " (" + (newFriendRequests <= 20 ? newFriendRequests : "20+") + ")"
+            : ""}
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={[{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          paddingVertical: 15,
-          backgroundColor: "white",
-        }]}
-        onPress={() => { setNewConversations(0); navigation.navigate("Conversations") }}>
-        <Text style={{
-          fontSize: 18,
-          color: (state.routes[state.index].name === "Conversations") ? "black" : newConversations > 0 ? "blue" : "grey",
-          textDecorationLine: (state.routes[state.index].name === "Conversations") ? "underline" : "none",
-        }}>Conversations {(newConversations > 0
-          ? " (" + (newConversations <= 20 ? newConversations : "20+") + ")"
-          : "")}</Text>
+        style={[
+          {
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            paddingVertical: 15,
+            backgroundColor: "white",
+          },
+        ]}
+        onPress={() => {
+          setNewConversations(0);
+          navigation.navigate("Conversations");
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 18,
+            color:
+              state.routes[state.index].name === "Conversations"
+                ? "black"
+                : newConversations > 0
+                ? "blue"
+                : "grey",
+            textDecorationLine:
+              state.routes[state.index].name === "Conversations"
+                ? "underline"
+                : "none",
+          }}
+        >
+          Conversations{" "}
+          {newConversations > 0
+            ? " (" + (newConversations <= 20 ? newConversations : "20+") + ")"
+            : ""}
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={[{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          paddingVertical: 15,
-          backgroundColor: "white",
-        }]}
-        onPress={() => { navigation.navigate("Settings", {myId: myId}) }}>
-        <Text style={{
-          fontSize: 18,
-          color: (state.routes[state.index].name === "Settings") ? "black" : "grey",
-          textDecorationLine: (state.routes[state.index].name === "Settings") ? "underline" : "none",
-        }}>Settings</Text>
+        style={[
+          {
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            paddingVertical: 15,
+            backgroundColor: "white",
+          },
+        ]}
+        onPress={() => {
+          navigation.navigate("Settings", { myId: myId });
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 18,
+            color:
+              state.routes[state.index].name === "Settings" ? "black" : "grey",
+            textDecorationLine:
+              state.routes[state.index].name === "Settings"
+                ? "underline"
+                : "none",
+          }}
+        >
+          Settings
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={[{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          paddingVertical: 15,
-          backgroundColor: "white",
-        }]}
-        onPress={() => { navigation.navigate("My Groups", {myId: myId}) }}>
-        <Text style={{
-          fontSize: 18,
-          color: (state.routes[state.index].name === "My Groups") ? "black" : "grey",
-          textDecorationLine: (state.routes[state.index].name === "My Groups") ? "underline" : "none",
-        }}>My Groups</Text>
+        style={[
+          {
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            paddingVertical: 15,
+            backgroundColor: "white",
+          },
+        ]}
+        onPress={() => {
+          navigation.navigate("My Groups", { myId: myId });
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 18,
+            color:
+              state.routes[state.index].name === "My Groups" ? "black" : "grey",
+            textDecorationLine:
+              state.routes[state.index].name === "My Groups"
+                ? "underline"
+                : "none",
+          }}
+        >
+          My Groups
+        </Text>
       </TouchableOpacity>
     </SafeAreaView>
   );

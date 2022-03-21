@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Text,
   View,
@@ -6,22 +6,26 @@ import {
   LayoutAnimation,
   TouchableOpacity,
   Linking,
-  TextInput
+  TextInput,
 } from "react-native";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation, Cache, Auth, Storage } from "aws-amplify";
 import { listVerifications } from "root/src/graphql/queries";
-import { deleteVerification, updateVerification, verifyUser } from "root/src/graphql/mutations";
+import {
+  deleteVerification,
+  updateVerification,
+  verifyUser,
+} from "root/src/graphql/mutations";
 import { ProfileImageAndName } from "components/ProfileImageAndName";
 import printTime from "hooks/printTime";
-import APIList from 'components/APIList';
+import APIList from "components/APIList";
 import PostItem from "components/PostItem";
 
-var styles = require('styles/stylesheet');
+var styles = require("styles/stylesheet");
 
-var allSettled = require('promise.allsettled');
+var allSettled = require("promise.allsettled");
 
-function VerificationRequestItem({deleteRequest, item}) {
+function VerificationRequestItem({ deleteRequest, item }) {
   const [title, setTitle] = useState(item.title);
 
   return (
@@ -30,28 +34,27 @@ function VerificationRequestItem({deleteRequest, item}) {
         defaultValue={item.title}
         value={title}
         onChangeText={setTitle}
-        style={{ fontSize: 18, fontWeight: "bold", color: "black", textDecorationLine: "underline"}}
+        style={{
+          fontSize: 18,
+          fontWeight: "bold",
+          color: "black",
+          textDecorationLine: "underline",
+        }}
       />
       <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
         <TouchableOpacity
-        onPress={() => deleteRequest(item, true, title)}
-        disabled={!title}
-      >
-        <Text>
-          Accept.
-        </Text>
-      </TouchableOpacity>
+          onPress={() => deleteRequest(item, true, title)}
+          disabled={!title}
+        >
+          <Text>Accept.</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        onPress={() => deleteRequest(item, false)}
-      >
-        <Text>
-          Reject.
-        </Text>
-      </TouchableOpacity>
+        <TouchableOpacity onPress={() => deleteRequest(item, false)}>
+          <Text>Reject.</Text>
+        </TouchableOpacity>
+      </View>
     </View>
-    </View>
-  )
+  );
 }
 
 export default function VerificationRequestsScreen() {
@@ -65,24 +68,35 @@ export default function VerificationRequestsScreen() {
     console.log(directory);
     console.log(results);
 
-    return await allSettled(results.map(async (value) => {
-      return Storage.get(value.key);
-    }
-    ));
-  }
+    return await allSettled(
+      results.map(async (value) => {
+        return Storage.get(value.key);
+      })
+    );
+  };
 
   const deleteRequest = async (request, approve, title) => {
     if (!request.files) return;
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setRequests((requests) => {
-      return requests.filter((r) => { if (r.files) return (r.id !== request.id) });
+      return requests.filter((r) => {
+        if (r.files) return r.id !== request.id;
+      });
     });
 
     try {
       if (approve) {
-        await API.graphql(graphqlOperation(updateVerification, { input: { id: request.id, isVerified: true, title: title } }))
-        await API.graphql(graphqlOperation(verifyUser, { input: { id: request.id, title: title } }))
+        await API.graphql(
+          graphqlOperation(updateVerification, {
+            input: { id: request.id, isVerified: true, title: title },
+          })
+        );
+        await API.graphql(
+          graphqlOperation(verifyUser, {
+            input: { id: request.id, title: title },
+          })
+        );
       }
     } catch (err) {
       console.log("error in deleting request: ", err);
@@ -90,10 +104,11 @@ export default function VerificationRequestsScreen() {
   };
 
   const attachFiles = async (newRequests) => {
-    const files = await allSettled(newRequests.map(async (request) => {
-      return getFilesAsync(request.id);
-    }
-    ));
+    const files = await allSettled(
+      newRequests.map(async (request) => {
+        return getFilesAsync(request.id);
+      })
+    );
 
     newRequests.forEach((request, index) => {
       request.files = files[index].value; //amplify connection would probably be good here
@@ -102,7 +117,7 @@ export default function VerificationRequestsScreen() {
     console.log(newRequests);
 
     return newRequests; //what if there are duplicates?
-  }
+  };
 
   async function signOut() {
     Auth.signOut();
@@ -117,35 +132,29 @@ export default function VerificationRequestsScreen() {
         data={requests}
         setDataFunction={setRequests}
         ListHeaderComponent={
-          <TouchableOpacity
-            onPress={signOut}
-          >
-            <Text>
-              Log out
-            </Text>
+          <TouchableOpacity onPress={signOut}>
+            <Text>Log out</Text>
           </TouchableOpacity>
         }
         renderItem={({ item, index }) => (
           <View style={{ backgroundColor: "white", marginBottom: 15 }}>
-
-            {
-              !item.isVerified ?
-                <VerificationRequestItem
+            {!item.isVerified ? (
+              <VerificationRequestItem
                 deleteRequest={deleteRequest}
-                item={item} /> : null
-            }
+                item={item}
+              />
+            ) : null}
 
-            {
-              item.files.map((fileURL, index) => {
-                return <Text
+            {item.files.map((fileURL, index) => {
+              return (
+                <Text
                   key={fileURL.value}
-                  onPress={() => Linking.openURL(
-                    fileURL.value
-                  )}>
+                  onPress={() => Linking.openURL(fileURL.value)}
+                >
                   Document {index + 1}
                 </Text>
-              })
-            }
+              );
+            })}
           </View>
         )}
         processingFunction={attachFiles}
@@ -153,4 +162,4 @@ export default function VerificationRequestsScreen() {
       />
     </SafeAreaView>
   );
-};
+}

@@ -1,51 +1,57 @@
-import React, { useState, useEffect, useRef, } from "react";
-import {
-  Text,
-  View,
-  SafeAreaView,
-  LayoutAnimation,
-} from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import { Text, View, SafeAreaView, LayoutAnimation } from "react-native";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation } from "aws-amplify";
 import { batchGetLikes, likesByPost } from "root/src/graphql/queries";
-import { onCreateLikeForPost, onDeleteLikeForPost, } from 'root/src/graphql/subscriptions';
+import {
+  onCreateLikeForPost,
+  onDeleteLikeForPost,
+} from "root/src/graphql/subscriptions";
 import { ProfileImageAndName } from "components/ProfileImageAndName";
 import printTime from "hooks/printTime";
-import APIList from 'components/APIList';
+import APIList from "components/APIList";
 
-require('root/androidtimerfix');
+require("root/androidtimerfix");
 
-var styles = require('styles/stylesheet');
+var styles = require("styles/stylesheet");
 
 export default function LikesList({ postId }) {
   const listRef = useRef();
 
   useEffect(() => {
-    const createLikeSubscription = API.graphql(graphqlOperation(onCreateLikeForPost, { postId: postId })).subscribe({
-      next: event => {
-        const newLike = event.value.data.onCreateLikeForPost
+    const createLikeSubscription = API.graphql(
+      graphqlOperation(onCreateLikeForPost, { postId: postId })
+    ).subscribe({
+      next: (event) => {
+        const newLike = event.value.data.onCreateLikeForPost;
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        listRef.mutateData(data => [newLike, ...data]);
-      }
+        listRef.mutateData((data) => [newLike, ...data]);
+      },
     });
-    const deleteLikeSubscription = API.graphql(graphqlOperation(onDeleteLikeForPost, { postId: postId })).subscribe({
-      next: event => {
-        const deletedLike = event.value.data.onDeleteLikeForPost
-        listRef.mutateData(data => {
-          if (data.find(like => like.userId === deletedLike.userId)) {
+    const deleteLikeSubscription = API.graphql(
+      graphqlOperation(onDeleteLikeForPost, { postId: postId })
+    ).subscribe({
+      next: (event) => {
+        const deletedLike = event.value.data.onDeleteLikeForPost;
+        listRef.mutateData((data) => {
+          if (data.find((like) => like.userId === deletedLike.userId)) {
             let templikes = [...data];
-            var index = templikes.findIndex(like => like.userId === deletedLike.userId);
+            var index = templikes.findIndex(
+              (like) => like.userId === deletedLike.userId
+            );
             templikes.splice(index, 1);
-            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+            LayoutAnimation.configureNext(
+              LayoutAnimation.Presets.easeInEaseOut
+            );
             return templikes;
           }
         });
-      }
+      },
     });
     return () => {
       createLikeSubscription.unsubscribe();
       deleteLikeSubscription.unsubscribe();
-    }
+    };
   }, []);
 
   return (
@@ -69,4 +75,4 @@ export default function LikesList({ postId }) {
       />
     </SafeAreaView>
   );
-};
+}

@@ -4,13 +4,13 @@ import {
   Text,
   TouchableOpacity,
   Alert,
-  LayoutAnimation
+  LayoutAnimation,
 } from "react-native";
 import { updateUser } from "root/src/graphql/mutations";
-import { getUser } from 'root/src/graphql/queries'
+import { getUser } from "root/src/graphql/queries";
 import { API, graphqlOperation } from "aws-amplify";
 import * as Haptics from "expo-haptics";
-import {Picker} from '@react-native-picker/picker';
+import { Picker } from "@react-native-picker/picker";
 
 var styles = require("styles/stylesheet");
 
@@ -18,49 +18,67 @@ const PrivacyScreen = ({ navigation, route }) => {
   const [previousSettings, setPreviousSettings] = useState();
 
   useEffect(() => {
-    (async() => {
+    (async () => {
       //console.log("your id is ", route.params?.myId)
-      const user = await API.graphql(graphqlOperation(getUser, { id: route.params?.myId }));
+      const user = await API.graphql(
+        graphqlOperation(getUser, { id: route.params?.myId })
+      );
       console.log(user.data.getUser);
       setPreviousSettings(user.data.getUser);
     })();
-  }, [])
+  }, []);
 
   if (!previousSettings) return null;
-  else return (
-    <View
-    style={{
-      margin: 16,
-    }}>
-      <Text style={{
-        fontSize: 20,
-        color: "black",
-        marginBottom: 18,
-      }}>Privacy</Text>
+  else
+    return (
+      <View
+        style={{
+          margin: 16,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 20,
+            color: "black",
+            marginBottom: 18,
+          }}
+        >
+          Privacy
+        </Text>
         <APISwitch
           initialState={previousSettings.messagesPrivacy}
-          apicall={            
-            (enabled) => 
+          apicall={(enabled) =>
             API.graphql(
-              graphqlOperation(updateUser, { input: { friendRequestPrivacy: enabled } })
+              graphqlOperation(updateUser, {
+                input: { friendRequestPrivacy: enabled },
+              })
             )
           }
           label="Who can send you friend requests?"
-          options={[{label: "Anybody", value: 0}, {label: "Mutual friends", value: 1}, {label: "Nobody", value: 3}]}
+          options={[
+            { label: "Anybody", value: 0 },
+            { label: "Mutual friends", value: 1 },
+            { label: "Nobody", value: 3 },
+          ]}
         />
         <APISwitch
           initialState={previousSettings.friendRequestPrivacy}
-          apicall={            
-            (enabled) => 
+          apicall={(enabled) =>
             API.graphql(
-              graphqlOperation(updateUser, { input: { messagesPrivacy: enabled } })
+              graphqlOperation(updateUser, {
+                input: { messagesPrivacy: enabled },
+              })
             )
           }
           label="Who can message you?"
-          options={[{label: "Anybody", value: 0}, {label: "Friends and mutuals", value: 1}, {label: "Friends only", value: 2}]}
+          options={[
+            { label: "Anybody", value: 0 },
+            { label: "Friends and mutuals", value: 1 },
+            { label: "Friends only", value: 2 },
+          ]}
         />
-    </View>
-  );
+      </View>
+    );
 };
 
 function APISwitch({ initialState, apicall, label, options }) {
@@ -80,23 +98,26 @@ function APISwitch({ initialState, apicall, label, options }) {
   };
 
   return (
-    <View style={{marginBottom: 12}}>
-    <Text
-      style={{
-        fontSize: 16,
-        alignSelf: "center",
-        top: 20,
-      }}
-    >
-      {label}
-    </Text>
-    <Picker
-      numberOfLines={2}
-      selectedValue={selectedSetting}
-      onValueChange={toggleAsync}
-      itemStyle={{fontSize: 16, color: "blue", height: 100}}>
-        {options.map(option => <Picker.Item label={option.label} value={option.value} />)}
-    </Picker>
+    <View style={{ marginBottom: 12 }}>
+      <Text
+        style={{
+          fontSize: 16,
+          alignSelf: "center",
+          top: 20,
+        }}
+      >
+        {label}
+      </Text>
+      <Picker
+        numberOfLines={2}
+        selectedValue={selectedSetting}
+        onValueChange={toggleAsync}
+        itemStyle={{ fontSize: 16, color: "blue", height: 100 }}
+      >
+        {options.map((option) => (
+          <Picker.Item label={option.label} value={option.value} />
+        ))}
+      </Picker>
     </View>
   );
 }

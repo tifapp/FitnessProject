@@ -1,15 +1,32 @@
 import { API, graphqlOperation, Cache, Storage } from "aws-amplify";
-import { getUser } from '../src/graphql/queries';
-import { loadCapitals } from 'hooks/stringConversion';
+import { getUser } from "../src/graphql/queries";
+import { loadCapitals } from "hooks/stringConversion";
 
 //cache stores objects like this {identityId: {imageURL, lastModified, isFullSize}}
 
 function getExpiryTime(imageLink) {
-  console.log("starting calc")
-  let date = imageLink.substring(imageLink.indexOf('Date=') + 5, imageLink.indexOf('&X-Amz-Expires='));
-  let formattedDate = date.slice(0, 4) + "-" + date.slice(4, 6) + "-" + date.slice(6, 11) + ":" + date.slice(11,13) + ":" + date.slice(13);
+  console.log("starting calc");
+  let date = imageLink.substring(
+    imageLink.indexOf("Date=") + 5,
+    imageLink.indexOf("&X-Amz-Expires=")
+  );
+  let formattedDate =
+    date.slice(0, 4) +
+    "-" +
+    date.slice(4, 6) +
+    "-" +
+    date.slice(6, 11) +
+    ":" +
+    date.slice(11, 13) +
+    ":" +
+    date.slice(13);
   let dateObj = new Date(formattedDate);
-  let expires = parseInt(imageLink.substring(imageLink.indexOf('Expires=') + 8, imageLink.indexOf('&X-Amz-Security-Token')));
+  let expires = parseInt(
+    imageLink.substring(
+      imageLink.indexOf("Expires=") + 8,
+      imageLink.indexOf("&X-Amz-Security-Token")
+    )
+  );
   dateObj.setSeconds(expires);
 
   return dateObj;
@@ -26,7 +43,7 @@ const getLatestProfileImageAsync = async (identityId, isFullSize) => {
     imageConfig.level = "protected";
   }
   //console.log("showing full image");
-  return await Storage.get(imageKey, imageConfig)
+  return await Storage.get(imageKey, imageConfig);
 };
 
 const getLastModifiedAsync = async (identityId) => {
@@ -34,8 +51,9 @@ const getLastModifiedAsync = async (identityId) => {
 
   const results = await Storage.list(directory);
 
-  if (results.length > 0) return results[0].lastModified; else return;
-}
+  if (results.length > 0) return results[0].lastModified;
+  else return;
+};
 
 export default async function fetchProfileImageAsync(identityId, isFullSize) {
   //first check the cache
@@ -46,38 +64,50 @@ export default async function fetchProfileImageAsync(identityId, isFullSize) {
   const imageURL = await getLatestProfileImageAsync(identityId, isFullSize);
 
   console.log(lastModified);
-  
+
   try {
     const cachedInfo = await Cache.getItem(identityId);
     //console.log("checked cache");
-  
-    if (cachedInfo != null) { //will have to check if this gets called after the above callback, aka if setuserinfo is called twice.
+
+    if (cachedInfo != null) {
+      //will have to check if this gets called after the above callback, aka if setuserinfo is called twice.
       //console.log("is in cache");
       //fetch lastmodified date
       //const lastModified = await getLastModifiedAsync(identityId);
-      if ((lastModified && lastModified > cachedInfo.lastModified) || (isFullSize && !cachedInfo.isFullSize)) {
+      if (
+        (lastModified && lastModified > cachedInfo.lastModified) ||
+        (isFullSize && !cachedInfo.isFullSize)
+      ) {
         console.log("returning updated image");
         //const imageURL = await getLatestProfileImageAsync(identityId);
-        Cache.setItem(identityId, {lastModified: lastModified, imageURL: imageURL, isFullSize: isFullSize});
+        Cache.setItem(identityId, {
+          lastModified: lastModified,
+          imageURL: imageURL,
+          isFullSize: isFullSize,
+        });
         return imageURL;
       } else {
-        console.log("calculating expiry")
-        console.log("current date is ", new Date(Date.now()))
-        console.log("expiry date is ", getExpiryTime(cachedInfo.imageURL))
+        console.log("calculating expiry");
+        console.log("current date is ", new Date(Date.now()));
+        console.log("expiry date is ", getExpiryTime(cachedInfo.imageURL));
         if (new Date(Date.now()) >= getExpiryTime(cachedInfo.imageURL)) {
-          console.log("returning new image")
+          console.log("returning new image");
           return imageURL;
         } else {
-          console.log("returning old image")
+          console.log("returning old image");
           return cachedInfo.imageURL;
         }
       }
     } else {
-      throw "not in cache"
+      throw "not in cache";
     }
   } catch (e) {
     //console.log("not in cache, returning updated image");
-    Cache.setItem(identityId, {lastModified: lastModified, imageURL: imageURL, isFullSize: isFullSize});
+    Cache.setItem(identityId, {
+      lastModified: lastModified,
+      imageURL: imageURL,
+      isFullSize: isFullSize,
+    });
     //const imageURL = await getLatestProfileImageAsync(identityId);
     return imageURL; //dunno how else we can return from callback so we may need to do this twice or pass another param
   }

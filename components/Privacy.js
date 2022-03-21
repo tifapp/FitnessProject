@@ -17,7 +17,7 @@ import {
 } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
-import { Picker } from '@react-native-picker/picker'
+import { Picker } from "@react-native-picker/picker";
 
 export default function PrivacySettings({
   setPrivacy,

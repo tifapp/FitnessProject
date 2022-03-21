@@ -24,7 +24,9 @@ export default function Accordion(props) {
   const [open, setOpen] = useState(props.open);
   const animatedController = useRef(new Animated.Value(0)).current;
 
-  useEffect(()=>{if (open !== props.open) toggleCollapse()}, [props.open])
+  useEffect(() => {
+    if (open !== props.open) toggleCollapse();
+  }, [props.open]);
 
   const arrowAngle = animatedController.interpolate({
     inputRange: [0, 1],
@@ -55,18 +57,23 @@ export default function Accordion(props) {
 
   return (
     <View style={props.style}>
-      <TouchableWithoutFeedback style={{flex: 1}} onPress={toggleCollapse}>
+      <TouchableWithoutFeedback style={{ flex: 1 }} onPress={toggleCollapse}>
         <View
-          style={[{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            paddingVertical: 15,
-            backgroundColor: "white",
-          }]}
+          style={[
+            {
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              paddingVertical: 15,
+              backgroundColor: "white",
+            },
+          ]}
         >
           <Text
-            style={[props.headerTextStyle, open ? ( { color: props.openTextColor ?? "black" }) : null]}
+            style={[
+              props.headerTextStyle,
+              open ? { color: props.openTextColor ?? "black" } : null,
+            ]}
           >
             {props.headerText}
           </Text>
@@ -74,21 +81,31 @@ export default function Accordion(props) {
             <MaterialIcons
               name="expand-more"
               size={25}
-              color={open ? (props.iconOpenColor ?? "black") : props.iconColor ?? "gray"}
+              color={
+                open
+                  ? props.iconOpenColor ?? "black"
+                  : props.iconColor ?? "gray"
+              }
             />
           </Animated.View>
         </View>
       </TouchableWithoutFeedback>
-      <View style={[{ flex: open ? 0 : 1,}, props.maxHeight ? {maxHeight: props.maxHeight } : null]}>
-        {
-          open ? 
+      <View
+        style={[
+          { flex: open ? 0 : 1 },
+          props.maxHeight ? { maxHeight: props.maxHeight } : null,
+        ]}
+      >
+        {open ? (
           <View
-            style={{ height: 1, backgroundColor: "#efefef", marginHorizontal: 12 }}
-          ></View> : null
-        }
-        {(
-          props.children
-        )}
+            style={{
+              height: 1,
+              backgroundColor: "#efefef",
+              marginHorizontal: 12,
+            }}
+          ></View>
+        ) : null}
+        {props.children}
       </View>
     </View>
   );

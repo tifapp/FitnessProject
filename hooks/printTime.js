@@ -1,71 +1,61 @@
 export default function printTime(dateInMilliseconds) {
-    const dateInfo = new Date(dateInMilliseconds);
+  const dateInfo = new Date(dateInMilliseconds);
 
-    var hourVal = dateInfo.getHours();
-    var totalTime = dateInfo.getTime();
+  var hourVal = dateInfo.getHours();
+  var totalTime = dateInfo.getTime();
 
-    var currentTotalTime = Date.now();
+  var currentTotalTime = Date.now();
 
-    var timeDifference = currentTotalTime - totalTime;
+  var timeDifference = currentTotalTime - totalTime;
 
-    var secondDifference = timeDifference / 1000;
-    var minuteDifference = secondDifference / 60;
-    var hourDifference = minuteDifference / 60;
-    var dayDifference = hourDifference / 24;
-    var monthDifference = dayDifference / 30;
-    var yearDifference = monthDifference / 12;
+  var secondDifference = timeDifference / 1000;
+  var minuteDifference = secondDifference / 60;
+  var hourDifference = minuteDifference / 60;
+  var dayDifference = hourDifference / 24;
+  var monthDifference = dayDifference / 30;
+  var yearDifference = monthDifference / 12;
 
-    let displayTime = "";
-    if (secondDifference < 60) {
-      displayTime = "Just now";
+  let displayTime = "";
+  if (secondDifference < 60) {
+    displayTime = "Just now";
+  } else if (minuteDifference >= 1 && minuteDifference < 60) {
+    minuteDifference = Math.floor(minuteDifference);
+    if (minuteDifference == 1) {
+      displayTime = minuteDifference + " min";
+    } else {
+      displayTime = minuteDifference + " mins";
     }
-    else if (minuteDifference >= 1 && minuteDifference < 60) {
-      minuteDifference = Math.floor(minuteDifference);
-      if (minuteDifference == 1) {
-        displayTime = minuteDifference + " min";
-      }
-      else {
-        displayTime = minuteDifference + " mins";
-      }
+  } else if (hourDifference >= 1 && hourDifference < 24) {
+    hourDifference = Math.floor(hourDifference);
+    if (hourDifference == 1) {
+      displayTime = hourDifference + " hr";
+    } else {
+      displayTime = hourDifference + " hrs";
     }
-    else if (hourDifference >= 1 && hourDifference < 24) {
-      hourDifference = Math.floor(hourDifference);
-      if (hourDifference == 1) {
-        displayTime = hourDifference + " hr";
-      }
-      else {
-        displayTime = hourDifference + " hrs";
-      }
+  } else if (dayDifference >= 1 && dayDifference < 31) {
+    dayDifference = Math.floor(dayDifference);
+    if (dayDifference == 1) {
+      displayTime = dayDifference + " day";
+    } else {
+      displayTime = dayDifference + " days";
     }
-    else if (dayDifference >= 1 && dayDifference < 31) {
-      dayDifference = Math.floor(dayDifference);
-      if (dayDifference == 1) {
-        displayTime = dayDifference + " day";
-      }
-      else {
-        displayTime = dayDifference + " days";
-      }
+  } else if (monthDifference >= 1 && monthDifference < 12) {
+    monthDifference = Math.floor(monthDifference);
+    if (monthDifference == 1) {
+      displayTime = monthDifference + " m";
+    } else {
+      displayTime = dayDifference + " m";
     }
-    else if (monthDifference >= 1 && monthDifference < 12) {
-      monthDifference = Math.floor(monthDifference);
-      if (monthDifference == 1) {
-        displayTime = monthDifference + " m";
-      }
-      else {
-        displayTime = dayDifference + " m";
-      }
+  } else if (yearDifference >= 1) {
+    yearDifference = Math.floor(yearDifference);
+    if (yearDifference == 1) {
+      displayTime = yearDifference + " y";
+    } else {
+      displayTime = yearDifference + " y";
     }
-    else if (yearDifference >= 1) {
-      yearDifference = Math.floor(yearDifference);
-      if (yearDifference == 1) {
-        displayTime = yearDifference + " y";
-      }
-      else {
-        displayTime = yearDifference + " y";
-      }
-    }
+  }
 
-    return displayTime;
+  return displayTime;
 }
 
 /*

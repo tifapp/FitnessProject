@@ -42,6 +42,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     paddingTop: 30,
     paddingBottom: 15,
-    width: width / 1.3
+    width: width / 1.3,
   },
 });

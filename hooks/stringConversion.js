@@ -7,10 +7,10 @@ export function saveCapitals(string) {
       if (isNaN(string[i] * 1) && string[i] !== lowercaseString[i]) {
         //check if the character is a letter, and check if it's uppercase
         lowercaseString += i.toString() + ",";
-      } 
+      }
     }
-    if (lowercaseString[lowercaseString.length-1] === ",") {
-      lowercaseString = lowercaseString.slice(0, -1); 
+    if (lowercaseString[lowercaseString.length - 1] === ",") {
+      lowercaseString = lowercaseString.slice(0, -1);
     }
   }
 
@@ -21,7 +21,10 @@ export function loadCapitals(string) {
   //capitalize the characters in the actual string according to the indexes at the end
   //start from the end, move to the front until you hit the "|" character.
   let stringTokens = string.split("|");
-  let capitalIndices = stringTokens.pop().split(",").map(item => parseInt(item));
+  let capitalIndices = stringTokens
+    .pop()
+    .split(",")
+    .map((item) => parseInt(item));
   let result = stringTokens.join("");
   let capitalizedString = "";
   let capitalIndicesIndex = 0;
