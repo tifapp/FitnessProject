@@ -197,7 +197,20 @@ class APIList extends PureComponent {
               this.props.additionalAmount > 0 ? this.loadMore : () => {}
             }
             onEndReachedThreshold={this.props.onEndReachedThreshold}
-            ListEmptyComponent={this.props.ListEmptyComponent}
+            ListEmptyComponent={
+              <Text
+                style={{
+                  alignSelf: "center",
+                  justifyContent: "center",
+                  color: "gray",
+                  marginVertical: 30,
+                  fontSize: 15,
+                  fontWeight: "bold",
+                }}
+              >
+                {this.props.ListEmptyMessage}
+              </Text>
+            }
             getItemLayout={this.props.getItemLayout}
             maxToRenderPerBatch={
               this.props.additionalAmount > 0 ? this.props.additionalAmount : 1

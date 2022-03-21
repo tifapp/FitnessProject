@@ -45,7 +45,6 @@ export default function SearchScreen({ navigation, route }) {
   const searchBarRef = useRef();
   const UserListRef = useRef();
   const GroupListRef = useRef();
-  const PostListRef = useRef();
   const currentQuery = useRef();
 
   currentQuery.current = query.toLowerCase();
@@ -63,25 +62,6 @@ export default function SearchScreen({ navigation, route }) {
       if (GroupListRef && GroupListRef.mutateData) GroupListRef.mutateData([]);
     }
   }, [query]);
-
-  const emptyComponent = React.useCallback(
-    () => (
-      <Text
-        style={{
-          marginTop: 15,
-          fontSize: 16,
-          color: "black",
-          alignSelf: "center",
-          marginBottom: 2,
-          marginHorizontal: 6,
-          fontWeight: "bold",
-        }}
-      >
-        No matching results
-      </Text>
-    ),
-    []
-  );
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -171,10 +151,10 @@ export default function SearchScreen({ navigation, route }) {
               </Text>
             ) : null
           }
-          ListEmptyComponent={
+          ListEmptyMessage={
             (searchType === "user" || searchType === "all") && query.length > 0
-              ? emptyComponent
-              : null
+              ? "No matching results"
+              : ""
           }
           filter={{
             filter: {
@@ -250,10 +230,10 @@ export default function SearchScreen({ navigation, route }) {
               </Text>
             ) : null
           }
-          ListEmptyComponent={
+          ListEmptyMessage={
             (searchType === "group" || searchType === "all") && query.length > 0
-              ? emptyComponent
-              : null
+              ? "No matching results"
+              : ""
           }
           filter={{
             filter: {

@@ -9,7 +9,7 @@ import {
   Alert,
   Image,
   Linking,
-  LayoutAnimation
+  LayoutAnimation,
 } from "react-native";
 import getLocation from "hooks/useLocation";
 import APIList from "components/APIList";
@@ -24,7 +24,7 @@ var styles = require("styles/stylesheet");
 const BlockListScreen = ({ navigation, route }) => {
   const listRef = useRef();
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
-  
+
   const alertOptions = {
     cancelable: true,
     onDismiss: () => setIsOptionsOpen(false),
@@ -36,16 +36,22 @@ const BlockListScreen = ({ navigation, route }) => {
       {
         text: "Yes",
         onPress: () => {
-          console.log("about to delete this user: ", blockeeId)
-          global.localBlockList = global.localBlockList.filter((item) => item.blockee != blockeeId);
+          console.log("about to delete this user: ", blockeeId);
+          global.localBlockList = global.localBlockList.filter(
+            (item) => item.blockee != blockeeId
+          );
           LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-          listRef.mutateData(blocklist => {
-            const results = blocklist.filter((item) => item.blockee != blockeeId);
+          listRef.mutateData((blocklist) => {
+            const results = blocklist.filter(
+              (item) => item.blockee != blockeeId
+            );
             global.localBlockList = results;
             return results;
           });
           API.graphql(
-            graphqlOperation(deleteBlock, { input: { userId: route.params?.myId, blockee: blockeeId} })
+            graphqlOperation(deleteBlock, {
+              input: { userId: route.params?.myId, blockee: blockeeId },
+            })
           );
         },
       },
@@ -61,7 +67,7 @@ const BlockListScreen = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    const onFocus = navigation.addListener('focus', () => {
+    const onFocus = navigation.addListener("focus", () => {
       //console.log("got to settings", global.localBlockList);
       //we just want to save a copy of the data
       listRef.mutateData(() => [...global.localBlockList]);
@@ -69,7 +75,7 @@ const BlockListScreen = ({ navigation, route }) => {
 
     // Return the function to unsubscribe from the event so it gets removed on unmount
     return onFocus;
-  }, [navigation])
+  }, [navigation]);
 
   return (
     <APIList
@@ -90,7 +96,6 @@ const BlockListScreen = ({ navigation, route }) => {
           <ProfileImageAndName
             imageStyle={[styles.smallImageStyle, { marginHorizontal: 20 }]}
             userId={item.blockee}
-            
             sibling={
               <View
                 style={{
@@ -101,17 +106,21 @@ const BlockListScreen = ({ navigation, route }) => {
                   marginHorizontal: 30,
                 }}
               >
-              <Text style={{marginHorizontal: 16, color: "gray"}}>{printTime(item.createdAt)}</Text>
-    
-              <TouchableOpacity onPress={() => unblock(item.blockee, item.createdAt)}>
-                <Text>
-                  unblock
-                  {
-                    //then ask to verify the unblocking, like with friend requests
-                    //should disappear from the list when confirming, or just fade out? maybe jump to bottom with the option to reblock that person
-                  }
+                <Text style={{ marginHorizontal: 16, color: "gray" }}>
+                  {printTime(item.createdAt)}
                 </Text>
-              </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => unblock(item.blockee, item.createdAt)}
+                >
+                  <Text>
+                    unblock
+                    {
+                      //then ask to verify the unblocking, like with friend requests
+                      //should disappear from the list when confirming, or just fade out? maybe jump to bottom with the option to reblock that person
+                    }
+                  </Text>
+                </TouchableOpacity>
               </View>
             }
           />
@@ -119,20 +128,16 @@ const BlockListScreen = ({ navigation, route }) => {
       )}
       notRefreshable={true}
       filter={{ userId: route.params?.myId }}
-      contentContainerStyle={{ flexGrow: 1, flex: 1, justifyContent: 'center', alignContent: "center", alignItems: "center", alignSelf: "center", }}
+      contentContainerStyle={{
+        flexGrow: 1,
+        flex: 1,
+        justifyContent: "center",
+        alignContent: "center",
+        alignItems: "center",
+        alignSelf: "center",
+      }}
       keyExtractor={(item) => item.blockee}
-      ListEmptyComponent={
-        <Text
-        style={{
-          alignSelf: "center",
-          justifyContent: "center",
-          color: "gray",
-          marginVertical: 30,
-          fontSize: 15,
-        }}>
-          You haven't blocked anyone.
-        </Text>
-      }
+      ListEmptyMessage={"You haven't blocked anyone."}
     />
   );
 };

@@ -327,18 +327,7 @@ function FriendList({ navigation, route }) {
         //: null
       )}
       keyExtractor={(item) => item.createdAt.toString()}
-      ListEmptyComponent={
-        <Text
-          style={{
-            alignSelf: "center",
-            justifyContent: "center",
-            color: "gray",
-            fontSize: 15,
-          }}
-        >
-          No friends yet!
-        </Text>
-      }
+      ListEmptyMessage={"No friends yet!"}
     />
   );
 }
@@ -599,19 +588,7 @@ export default function FriendScreen({ navigation, route }) {
             />
           )}
           keyExtractor={(item) => item.sender}
-          ListEmptyComponent={
-            <Text
-              style={{
-                alignSelf: "center",
-                justifyContent: "center",
-                color: "gray",
-                marginVertical: 15,
-                fontSize: 15,
-              }}
-            >
-              No new requests!
-            </Text>
-          }
+          ListEmptyMessage={"No new requests!"}
         />
       </Accordion>
       <FriendList navigation={navigation} route={route} />
