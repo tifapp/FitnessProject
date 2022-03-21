@@ -1,29 +1,17 @@
-import { StatusBar } from "expo-status-bar";
-import React, { useState, useEffect, useRef } from "react";
-import {
-  StyleSheet,
-  Text,
-  Button,
-  Image,
-  View,
-  TextInput,
-  ScrollView,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  Keyboard,
-  ActivityIndicator,
-} from "react-native";
-// Get the aws resources configuration parameters
-import { DataStore, Predicates } from "@aws-amplify/datastore";
-import { listGroups } from "root/src/graphql/queries";
-import { listUsers } from "root/src/graphql/queries";
-import Header from "components/header";
-import UserListItem from "components/UserListItem";
-import ListGroupItem from "components/ListGroupItem";
-import * as subscriptions from "root/src/graphql/subscriptions";
-import AgePicker from "components/basicInfoComponents/AgePicker";
 import { MaterialIcons } from "@expo/vector-icons";
 import APIList from "components/APIList";
+import ListGroupItem from "components/ListGroupItem";
+import UserListItem from "components/UserListItem";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  Keyboard,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+import { listGroups, listUsers } from "root/src/graphql/queries";
 
 var styles = require("styles/stylesheet");
 

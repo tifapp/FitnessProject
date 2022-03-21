@@ -1,9 +1,9 @@
-import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
-import { ProfileImageAndName } from "./ProfileImageAndName";
 import computeDistance from "hooks/computeDistance";
-import getLocation from "hooks/useLocation";
 import { loadCapitals } from "hooks/stringConversion";
+import getLocation from "hooks/useLocation";
+import React from "react";
+import { Text, View } from "react-native";
+import { ProfileImageAndName } from "./ProfileImageAndName";
 
 var styles = require("../styles/stylesheet");
 

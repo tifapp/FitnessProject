@@ -1,26 +1,18 @@
-import React, { useState, useEffect, useRef } from "react";
+import { API, graphqlOperation } from "aws-amplify";
+import FriendListItem from "components/FriendListItem";
+import React, { useEffect, useRef } from "react";
+import { LayoutAnimation, SafeAreaView } from "react-native";
+import { deleteConversation } from "root/src/graphql/mutations";
 import {
-  Text,
-  View,
-  TouchableOpacity,
-  PureComponent,
-  SafeAreaView,
-  LayoutAnimation,
-} from "react-native";
+  onCreatePostByUser,
+  onCreatePostForReceiver,
+  onDeleteConversation,
+} from "root/src/graphql/subscriptions";
+import APIList from "../components/APIList";
 import {
   getSortedConversations,
   listConversations,
 } from "../src/graphql/queries";
-import { deleteConversation } from "root/src/graphql/mutations";
-import {
-  onCreatePostForReceiver,
-  onCreatePostByUser,
-  onDeleteConversation,
-} from "root/src/graphql/subscriptions";
-import APIList from "../components/APIList";
-import { API, graphqlOperation } from "aws-amplify";
-import { ProfileImageAndName } from "../components/ProfileImageAndName";
-import FriendListItem from "components/FriendListItem";
 
 var styles = require("styles/stylesheet");
 var subscriptions = [];

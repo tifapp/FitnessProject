@@ -1,14 +1,12 @@
+import { API, graphqlOperation } from "aws-amplify";
 import React, { PureComponent } from "react";
 import {
-  StyleSheet,
-  View,
-  RefreshControl,
-  FlatList,
-  SectionList,
   ActivityIndicator,
+  FlatList,
+  RefreshControl,
   Text,
+  View,
 } from "react-native";
-import { API, graphqlOperation } from "aws-amplify";
 
 var styles = require("../styles/stylesheet");
 

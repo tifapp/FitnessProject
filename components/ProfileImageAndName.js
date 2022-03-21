@@ -1,18 +1,16 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  Text,
-} from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import fetchUserAsync from "hooks/fetchName";
 import fetchProfileImageAsync from "hooks/fetchProfileImage";
-import { MaterialIcons } from "@expo/vector-icons";
 import StatusColors from "hooks/statusColors";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 var styles = require("../styles/stylesheet");
 

@@ -1,49 +1,40 @@
-import React, { useState, useEffect } from "react";
+import { API, graphqlOperation } from "aws-amplify";
+import APIList from "components/APIList";
+import IconButton from "components/IconButton";
+import { ProfileImageAndName } from "components/ProfileImageAndName";
+import StatusIndicator from "components/StatusIndicator";
+import computeDistance from "hooks/computeDistance";
+import printTime from "hooks/printTime";
+import { loadCapitals } from "hooks/stringConversion";
+import getLocation from "hooks/useLocation";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  SafeAreaView,
-  View,
-  StyleSheet,
-  Text,
-  ScrollView,
-  TouchableOpacity,
   Alert,
-  Button,
-  Image,
   Dimensions,
-  FlatList,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { API, graphqlOperation } from "aws-amplify";
-import { StackActions, NavigationActions } from "react-navigation";
-import { ProfileImageAndName } from "components/ProfileImageAndName";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import computeDistance from "hooks/computeDistance";
-import getLocation from "hooks/useLocation";
-import printTime from "hooks/printTime";
-import IconButton from "components/IconButton";
 import {
-  getUser,
-  getFriendRequest,
-  getFriendship,
-  listFriendships,
-  friendsBySecondUser,
-  getBlock,
-} from "../src/graphql/queries";
-import {
-  deleteFriendship,
-  createFriendship,
-  updateFriendship,
-  deleteBlock,
   createBlock,
+  createFriendship,
+  deleteBlock,
+  deleteFriendship,
+  updateFriendship,
 } from "root/src/graphql/mutations";
 import {
   onCreateFriendship,
-  onUpdateFriendship,
   onDeleteFriendship,
+  onUpdateFriendship,
 } from "root/src/graphql/subscriptions";
-import APIList from "components/APIList";
-import { saveCapitals, loadCapitals } from "hooks/stringConversion";
-import StatusIndicator from "components/StatusIndicator";
+import {
+  getBlock,
+  getFriendship,
+  getUser,
+  listFriendships,
+} from "../src/graphql/queries";
 
 var styles = require("styles/stylesheet");
 

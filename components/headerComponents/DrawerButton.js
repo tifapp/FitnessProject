@@ -1,24 +1,7 @@
-import React, { useState, useEffect, useRef, PureComponent } from "react";
-import {
-  StyleSheet,
-  View,
-  Button,
-  Image,
-  TextInput,
-  Text,
-  TouchableOpacity,
-  Animated,
-  LayoutAnimation,
-  UIManager,
-  Easing,
-  TouchableWithoutFeedback,
-} from "react-native";
-
-import * as Haptics from "expo-haptics";
-import playSound from "hooks/playSound";
-import { useNavigation } from "@react-navigation/native";
-
 import { MaterialIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import React, { useState } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 
 export default function DrawerButton(props) {
   const navigation = useNavigation();

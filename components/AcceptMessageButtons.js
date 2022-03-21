@@ -1,30 +1,13 @@
-import React, { useState, useEffect, useRef, PureComponent } from "react";
-import {
-  StyleSheet,
-  View,
-  Button,
-  Image,
-  TextInput,
-  Text,
-  TouchableOpacity,
-  Animated,
-  LayoutAnimation,
-  UIManager,
-  Easing,
-  TouchableWithoutFeedback,
-} from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
-import playSound from "../hooks/playSound";
 import { API, graphqlOperation } from "aws-amplify";
-import { getBlock, getConversation, getUser } from "../src/graphql/queries";
-import {
-  updateConversation,
-  deleteConversation,
-  createBlock,
-} from "../src/graphql/mutations";
 import IconButton from "components/IconButton";
-
-import * as Haptics from "expo-haptics";
+import React, { useEffect, useState } from "react";
+import { View } from "react-native";
+import {
+  createBlock,
+  deleteConversation,
+  updateConversation,
+} from "../src/graphql/mutations";
+import { getConversation } from "../src/graphql/queries";
 
 var styles = require("../styles/stylesheet");
 

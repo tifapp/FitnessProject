@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef, PureComponent } from "react";
-import { TouchableOpacity, Text, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useIsDrawerOpen } from "@react-navigation/drawer";
+import { useNavigation } from "@react-navigation/native";
+import React from "react";
+import { TouchableOpacity } from "react-native";
 
 export default function DrawerButton(props) {
   const navigation = useNavigation();

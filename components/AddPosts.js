@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Button, TextInput } from "react-native";
+import { StyleSheet, TextInput, View } from "react-native";
 
 export default function AddPost({ addUserAsync }) {
   const [text, setText] = useState("");

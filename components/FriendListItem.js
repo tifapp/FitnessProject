@@ -1,19 +1,8 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-  LayoutAnimation,
-} from "react-native";
-import { ProfileImageAndName } from "./ProfileImageAndName";
-import IconButton from "./IconButton";
 import { MaterialIcons } from "@expo/vector-icons";
-import computeDistance from "hooks/computeDistance";
-import getLocation from "hooks/useLocation";
-import PostItem from "components/PostItem";
-import { CommonActions } from "@react-navigation/native";
+import React, { useState } from "react";
+import { Alert, Text, TouchableOpacity, View } from "react-native";
+import IconButton from "./IconButton";
+import { ProfileImageAndName } from "./ProfileImageAndName";
 
 var styles = require("../styles/stylesheet");
 

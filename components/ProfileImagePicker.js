@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  View,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  Alert,
-  Dimensions,
-} from "react-native";
+import { Alert, Dimensions, Image, TouchableOpacity } from "react-native";
 import usePhotos from "../hooks/usePhotos";
 
 var styles = require("../styles/stylesheet");

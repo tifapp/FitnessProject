@@ -1,5 +1,5 @@
-import React from "react";
 import PropTypes from "prop-types";
+import React from "react";
 import {
   Image,
   Linking,
@@ -8,9 +8,7 @@ import {
   TouchableOpacity,
   View,
   ViewPropTypes,
-  ActivityIndicator,
 } from "react-native";
-import ImageResizeMode from "react-native/Libraries/Image/ImageResizeMode";
 
 export default class RNUrlPreview extends React.PureComponent {
   constructor(props) {

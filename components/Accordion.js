@@ -1,22 +1,13 @@
-import React, { useState, useEffect, useRef, PureComponent } from "react";
-import {
-  StyleSheet,
-  View,
-  Button,
-  Image,
-  TextInput,
-  Text,
-  TouchableOpacity,
-  Animated,
-  LayoutAnimation,
-  UIManager,
-  Easing,
-  TouchableWithoutFeedback,
-} from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import playSound from "../hooks/playSound";
-
-import * as Haptics from "expo-haptics";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  Animated,
+  Easing,
+  LayoutAnimation,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 
 var styles = require("../styles/stylesheet");
 

@@ -1,14 +1,5 @@
-import React, { useState, useEffect } from "react";
-import {
-  ActivityIndicator,
-  View,
-  StyleSheet,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Linking,
-  Alert,
-} from "react-native";
+import React from "react";
+import { Linking, Text, TouchableOpacity, View } from "react-native";
 
 var styles = require("styles/stylesheet");
 

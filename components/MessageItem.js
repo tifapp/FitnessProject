@@ -1,23 +1,9 @@
-import React, { useState, useEffect, useRef, PureComponent } from "react";
-import {
-  StyleSheet,
-  View,
-  Button,
-  Image,
-  TextInput,
-  Text,
-  TouchableOpacity,
-  Linking,
-  LayoutAnimation,
-  Alert,
-  Modal,
-  KeyboardAvoidingView,
-  Dimensions,
-} from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import LinkableText from "components/LinkableText";
-import printTime from "hooks/printTime";
 import PostImage from "components/PostImage";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import printTime from "hooks/printTime";
+import React from "react";
+import { Dimensions, Text, TouchableOpacity, View } from "react-native";
 
 var styles = require("styles/stylesheet");
 

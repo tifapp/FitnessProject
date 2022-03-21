@@ -1,23 +1,7 @@
-import { StatusBar } from "expo-status-bar";
-import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  Text,
-  Button,
-  Image,
-  View,
-  TextInput,
-  TouchableOpacity,
-  Linking,
-  ScrollView,
-  Keyboard,
-  Modal,
-  Dimensions,
-} from "react-native";
-import { Entypo } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Entypo } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
+import React from "react";
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function PrivacySettings({
   setPrivacy,

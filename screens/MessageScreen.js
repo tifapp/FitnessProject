@@ -1,20 +1,12 @@
-import React, { useState, useEffect } from "react";
-import {
-  Text,
-  View,
-  TouchableOpacity,
-  PureComponent,
-  KeyboardAvoidingView,
-} from "react-native";
+import { API, graphqlOperation } from "aws-amplify";
+import { ProfileImageAndName } from "components/ProfileImageAndName";
+import React, { useEffect, useState } from "react";
+import { KeyboardAvoidingView, View } from "react-native";
+import { onDeleteConversation } from "root/src/graphql/subscriptions";
 // Get the aws resources configuration parameters
 import FeedScreen from "screens/FeedScreen";
-import { useFocusEffect } from "@react-navigation/native";
-import * as Notifications from "expo-notifications";
-import { ProfileImageAndName } from "components/ProfileImageAndName";
-import { API, graphqlOperation } from "aws-amplify";
-import { getBlock, getConversation, getUser } from "../src/graphql/queries";
-import { onDeleteConversation } from "root/src/graphql/subscriptions";
 import AcceptMessageButtons from "../components/AcceptMessageButtons";
+import { getBlock, getConversation, getUser } from "../src/graphql/queries";
 //const { width } = Dimensions.get('window');
 
 var styles = require("styles/stylesheet");

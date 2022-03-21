@@ -1,25 +1,18 @@
-import React, { useState, useEffect, useRef } from "react";
-import {
-  Text,
-  View,
-  SafeAreaView,
-  LayoutAnimation,
-  TouchableOpacity,
-  Linking,
-  TextInput,
-} from "react-native";
 // Get the aws resources configuration parameters
-import { API, graphqlOperation, Cache, Auth, Storage } from "aws-amplify";
-import { listVerifications } from "root/src/graphql/queries";
-import {
-  deleteVerification,
-  updateVerification,
-  verifyUser,
-} from "root/src/graphql/mutations";
-import { ProfileImageAndName } from "components/ProfileImageAndName";
-import printTime from "hooks/printTime";
+import { API, Auth, graphqlOperation, Storage } from "aws-amplify";
 import APIList from "components/APIList";
-import PostItem from "components/PostItem";
+import React, { useState } from "react";
+import {
+  LayoutAnimation,
+  Linking,
+  SafeAreaView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { updateVerification, verifyUser } from "root/src/graphql/mutations";
+import { listVerifications } from "root/src/graphql/queries";
 
 var styles = require("styles/stylesheet");
 

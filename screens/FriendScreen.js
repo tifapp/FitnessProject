@@ -1,46 +1,24 @@
-import React, { useState, useEffect, useRef } from "react";
-import {
-  Text,
-  View,
-  TouchableOpacity,
-  PureComponent,
-  SafeAreaView,
-  LayoutAnimation,
-} from "react-native";
-import {
-  getSortedConversations,
-  listConversations,
-  batchGetConversations,
-  getConversation,
-} from "../src/graphql/queries";
-import {
-  deleteConversation,
-  updateFriendship,
-  deleteFriendship,
-} from "root/src/graphql/mutations";
+import { API, graphqlOperation } from "aws-amplify";
 import Accordion from "components/Accordion";
+import FriendListItem from "components/FriendListItem";
+import FriendRequestListItem from "components/FriendRequestListItem";
+import React, { useEffect, useRef } from "react";
+import { LayoutAnimation, SafeAreaView, Text } from "react-native";
+import { deleteFriendship, updateFriendship } from "root/src/graphql/mutations";
+import { friendsByReceiver, listFriendships } from "root/src/graphql/queries";
 import {
-  onCreatePostForReceiver,
-  onCreatePostByUser,
-  onCreateFriendRequestForReceiver,
   onAcceptedFriendship,
-  onDeleteConversation,
+  onCreateFriendRequestForReceiver,
+  onCreatePostForReceiver,
   onDeleteFriendship,
 } from "root/src/graphql/subscriptions";
-import FriendRequestListItem from "components/FriendRequestListItem";
 import APIList from "../components/APIList";
-import { API, graphqlOperation, Cache } from "aws-amplify";
-import { ProfileImageAndName } from "../components/ProfileImageAndName";
-import FriendListItem from "components/FriendListItem";
-import playSound from "../hooks/playSound";
 import {
-  listFriendRequests,
-  friendsByReceiver,
-  listFriendships,
-  getFriendship,
-  friendsBySecondUser,
-  getFriendRequest,
-} from "root/src/graphql/queries";
+  batchGetConversations,
+  getConversation,
+  getSortedConversations,
+  listConversations,
+} from "../src/graphql/queries";
 //import { listConversations } from "../amplify/#current-cloud-backend/function/backendResources/opt/queries";
 //conversations and friends should be deleted when user is deleted
 

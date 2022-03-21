@@ -1,16 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Alert,
-  LayoutAnimation,
-} from "react-native";
-import { updateUser } from "root/src/graphql/mutations";
-import { getUser } from "root/src/graphql/queries";
+import { Picker } from "@react-native-picker/picker";
 import { API, graphqlOperation } from "aws-amplify";
 import * as Haptics from "expo-haptics";
-import { Picker } from "@react-native-picker/picker";
+import React, { useEffect, useState } from "react";
+import { Text, View } from "react-native";
+import { updateUser } from "root/src/graphql/mutations";
+import { getUser } from "root/src/graphql/queries";
 
 var styles = require("styles/stylesheet");
 

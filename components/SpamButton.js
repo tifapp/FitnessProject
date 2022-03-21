@@ -1,9 +1,6 @@
-import React, { useState, useRef } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
-import { ProfileImageAndName } from "./ProfileImageAndName";
 import { MaterialIcons } from "@expo/vector-icons";
-import computeDistance from "hooks/computeDistance";
-import getLocation from "hooks/useLocation";
+import React, { useRef, useState } from "react";
+import { TouchableOpacity } from "react-native";
 
 var styles = require("../styles/stylesheet");
 

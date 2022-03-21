@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { View, StyleSheet, Modal } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { Modal, StyleSheet, View } from "react-native";
 import AgePicker from "./AgePicker";
 import GenderPicker from "./GenderPicker";
 

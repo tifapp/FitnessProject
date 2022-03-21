@@ -1,8 +1,8 @@
-import React, { useState, useEffect, PureComponent } from "react";
-import { Text, View, TouchableOpacity } from "react-native";
+import PostItem from "components/PostItem";
+import React from "react";
+import { View } from "react-native";
 // Get the aws resources configuration parameters
 import FeedScreen from "screens/FeedScreen";
-import PostItem from "components/PostItem";
 
 var styles = require("styles/stylesheet");
 

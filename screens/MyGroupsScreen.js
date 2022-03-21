@@ -1,22 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
-import { StatusBar } from "expo-status-bar";
+import { API, graphqlOperation } from "aws-amplify";
+import ListGroupItem from "components/ListGroupItem";
+import React, { useEffect, useState } from "react";
 import {
-  StyleSheet,
-  Text,
-  Button,
-  Image,
-  View,
-  TextInput,
-  ScrollView,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  Keyboard,
   FlatList,
   RefreshControl,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { listGroups } from "root/src/graphql/queries";
-import { API, Auth, graphqlOperation } from "aws-amplify";
-import ListGroupItem from "components/ListGroupItem";
 
 var styles = require("styles/stylesheet");
 

@@ -1,21 +1,7 @@
-import React, { useState, useEffect, useRef, PureComponent } from "react";
-import Hyperlink from "react-native-hyperlink";
 import RNUrlPreview from "components/RNUrlPreview";
-import {
-  StyleSheet,
-  View,
-  Button,
-  Image,
-  TextInput,
-  Text,
-  TouchableOpacity,
-  Linking,
-  LayoutAnimation,
-  Alert,
-  Modal,
-  KeyboardAvoidingView,
-  Dimensions,
-} from "react-native";
+import React from "react";
+import { Alert, Linking, Text, View } from "react-native";
+import Hyperlink from "react-native-hyperlink";
 
 export default function LinkableText(props) {
   const warnExternalSite = (url, text) => {

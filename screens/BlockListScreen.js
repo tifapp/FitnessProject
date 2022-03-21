@@ -1,23 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
-import {
-  ActivityIndicator,
-  View,
-  StyleSheet,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-  Image,
-  Linking,
-  LayoutAnimation,
-} from "react-native";
-import getLocation from "hooks/useLocation";
+import { API, graphqlOperation } from "aws-amplify";
 import APIList from "components/APIList";
 import { ProfileImageAndName } from "components/ProfileImageAndName";
-import { blocksByDate } from "root/src/graphql/queries";
-import { deleteBlock } from "root/src/graphql/mutations";
 import printTime from "hooks/printTime";
-import { API, graphqlOperation } from "aws-amplify";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  Alert,
+  LayoutAnimation,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { deleteBlock } from "root/src/graphql/mutations";
+import { blocksByDate } from "root/src/graphql/queries";
 
 var styles = require("styles/stylesheet");
 

@@ -1,29 +1,21 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import { API, graphqlOperation, Storage } from "aws-amplify";
+import * as DocumentPicker from "expo-document-picker";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
-  View,
-  StyleSheet,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
   Animated,
-  Image,
-  Linking,
-  Platform,
-  TextInput,
-  Keyboard,
   SafeAreaView,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { Auth, API, graphqlOperation, Cache, Storage } from "aws-amplify";
 import {
   createVerification,
   updateVerification,
 } from "root/src/graphql/mutations";
 import { getVerification } from "root/src/graphql/queries";
-import SHA256 from "hooks/hash";
-
-import * as DocumentPicker from "expo-document-picker";
 
 /*onPress={() => Linking.openURL(
                 fileURL.value

@@ -1,33 +1,29 @@
-import React, { useState, useEffect } from "react";
-import {
-  ActivityIndicator,
-  View,
-  StyleSheet,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-  Image,
-  Linking,
-  Platform,
-  TextInput,
-  Keyboard,
-  SafeAreaView,
-} from "react-native";
-import ProfilePic from "components/ProfileImagePicker";
-import { Auth, API, graphqlOperation, Cache, Storage } from "aws-amplify";
 import { Ionicons } from "@expo/vector-icons";
 import CheckBox from "@react-native-community/checkbox"; //when ios is supported, we'll use this
-import getLocation from "hooks/useLocation";
-import { createUser, updateUser, deleteUser } from "../src/graphql/mutations";
-import { getUser } from "../src/graphql/queries";
-import { saveCapitals, loadCapitals } from "hooks/stringConversion";
-import BasicInfoDetails from "../components/basicInfoComponents/BasicInfoDetails";
-import fetchProfileImageAsync from "hooks/fetchProfileImage";
-import * as ImageManipulator from "expo-image-manipulator";
-import TouchableWithModal from "components/TouchableWithModal";
+import { API, Auth, Cache, graphqlOperation, Storage } from "aws-amplify";
 import StatusPicker from "components/basicInfoComponents/StatusPicker";
+import ProfilePic from "components/ProfileImagePicker";
 import StatusIndicator from "components/StatusIndicator";
+import TouchableWithModal from "components/TouchableWithModal";
+import * as ImageManipulator from "expo-image-manipulator";
+import fetchProfileImageAsync from "hooks/fetchProfileImage";
+import { loadCapitals, saveCapitals } from "hooks/stringConversion";
+import getLocation from "hooks/useLocation";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import BasicInfoDetails from "../components/basicInfoComponents/BasicInfoDetails";
+import { createUser, updateUser } from "../src/graphql/mutations";
+import { getUser } from "../src/graphql/queries";
 
 var styles = require("styles/stylesheet");
 

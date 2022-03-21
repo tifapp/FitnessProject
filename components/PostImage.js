@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Image, ImageBackground } from "react-native";
 import { Storage } from "aws-amplify";
-import { Video, AVPlaybackStatus } from "expo-av";
+import { Video } from "expo-av";
+import React, { useEffect, useRef, useState } from "react";
+import { ImageBackground } from "react-native";
 
 const re = /(?:\.([^.]+))?$/;
 

@@ -1,43 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useIsDrawerOpen } from "@react-navigation/drawer";
+import { API, Cache, graphqlOperation } from "aws-amplify";
+import { ProfileImageAndName } from "components/ProfileImageAndName";
+import React, { useEffect, useRef, useState } from "react";
+import { SafeAreaView, Text, TouchableOpacity, View } from "react-native";
 import {
-  SafeAreaView,
-  View,
-  StyleSheet,
-  Image,
-  Text,
-  Linking,
-  TouchableOpacity,
-  LayoutAnimation,
-} from "react-native";
-import { API, graphqlOperation, Cache } from "aws-amplify";
-import {
-  onCreateFriendRequestForReceiver,
   onAcceptedFriendship,
+  onCreateFriendRequestForReceiver,
   onCreatePostForReceiver,
 } from "root/src/graphql/subscriptions";
-import {
-  deleteFriendship,
-  updateFriendship,
-  createBlock,
-  updateConversation,
-} from "root/src/graphql/mutations";
-
-import { ProfileImageAndName } from "components/ProfileImageAndName";
-import {
-  DrawerContentScrollView,
-  DrawerItemList,
-  DrawerItem,
-} from "@react-navigation/drawer";
-import APIList from "components/APIList";
-import FriendListItem from "components/FriendListItem";
-import FriendRequestListItem from "components/FriendRequestListItem";
 import playSound from "../hooks/playSound";
-import { useIsDrawerOpen } from "@react-navigation/drawer";
-import {
-  batchGetConversations,
-  getConversation,
-  getConversations,
-} from "../src/graphql/queries";
+
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 
 global.localBlockList = [];

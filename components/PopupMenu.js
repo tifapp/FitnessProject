@@ -1,20 +1,5 @@
-import React, { useState, useEffect, useRef, PureComponent } from "react";
-import {
-  StyleSheet,
-  View,
-  Button,
-  Image,
-  TextInput,
-  Text,
-  TouchableOpacity,
-  Animated,
-  LayoutAnimation,
-  UIManager,
-  Easing,
-  TouchableWithoutFeedback,
-  Modal,
-} from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 //var styles = require("../styles/stylesheet");
 

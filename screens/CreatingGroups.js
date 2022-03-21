@@ -1,32 +1,20 @@
-import { StatusBar } from "expo-status-bar";
-import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useEffect } from "react";
-import { createGroup, updateGroup } from "root/src/graphql/mutations";
-import {
-  StyleSheet,
-  Text,
-  Button,
-  Image,
-  View,
-  TextInput,
-  TouchableOpacity,
-  Linking,
-  ScrollView,
-  Keyboard,
-  Modal,
-  Dimensions,
-  Alert,
-} from "react-native";
+import { useNavigation } from "@react-navigation/native";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation } from "aws-amplify";
-import CreatingHeader from "./GroupsHeader";
-import { Entypo } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
+import GroupDescription from "components/Description";
 import NameField from "components/NameField";
 import PrivacySettings from "components/Privacy";
 import SportCreation from "components/Sport";
-import GroupDescription from "components/Description";
-import { useNavigation } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { createGroup, updateGroup } from "root/src/graphql/mutations";
 
 export default function CreatingGroups({ route }) {
   console.log(route.params?.myId);

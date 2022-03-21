@@ -1,21 +1,5 @@
-import { StatusBar } from "expo-status-bar";
-import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useEffect } from "react";
-import { createGroup } from "../src/graphql/mutations";
-import {
-  StyleSheet,
-  Text,
-  Button,
-  Image,
-  View,
-  TextInput,
-  TouchableOpacity,
-  Linking,
-  ScrollView,
-  Keyboard,
-  Modal,
-  Dimensions,
-} from "react-native";
+import React from "react";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 
 export default function MaxUsers({ setTotalUsers, totalUsersVal }) {
   return (

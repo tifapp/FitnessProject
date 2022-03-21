@@ -1,17 +1,8 @@
-import React, { useState } from "react";
-import {
-  Text,
-  View,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  Modal,
-} from "react-native";
-//import { Entypo } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import TouchableWithModal from "components/TouchableWithModal";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
 import AgePicker from "./AgePicker";
 import GenderPicker from "./GenderPicker";
-import TouchableWithModal from "components/TouchableWithModal";
 
 const BasicInfoDetails = ({ age, gender, setAge, setGender }) => {
   return (

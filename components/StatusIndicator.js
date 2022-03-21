@@ -1,14 +1,7 @@
-import React, { useState } from "react";
-import {
-  Text,
-  View,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  Modal,
-} from "react-native";
-import StatusColors from "hooks/statusColors";
 import { MaterialIcons } from "@expo/vector-icons";
+import StatusColors from "hooks/statusColors";
+import React from "react";
+import { Text, View } from "react-native";
 
 export default function StatusIndicator({ status, shouldShow, isVerified }) {
   if (status || shouldShow)

@@ -1,9 +1,8 @@
-import React, { useState, useEffect, PureComponent } from "react";
-import { Text, View, TouchableOpacity } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
+import React, { useEffect } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 // Get the aws resources configuration parameters
 import FeedScreen from "screens/FeedScreen";
-import { Amplify } from "aws-amplify";
-import { AntDesign } from "@expo/vector-icons";
 
 //const { width } = Dimensions.get('window');
 

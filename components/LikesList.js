@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Text, View, SafeAreaView, LayoutAnimation } from "react-native";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation } from "aws-amplify";
-import { batchGetLikes, likesByPost } from "root/src/graphql/queries";
+import APIList from "components/APIList";
+import { ProfileImageAndName } from "components/ProfileImageAndName";
+import printTime from "hooks/printTime";
+import React, { useEffect, useRef } from "react";
+import { LayoutAnimation, SafeAreaView, Text } from "react-native";
+import { likesByPost } from "root/src/graphql/queries";
 import {
   onCreateLikeForPost,
   onDeleteLikeForPost,
 } from "root/src/graphql/subscriptions";
-import { ProfileImageAndName } from "components/ProfileImageAndName";
-import printTime from "hooks/printTime";
-import APIList from "components/APIList";
 
 require("root/androidtimerfix");
 

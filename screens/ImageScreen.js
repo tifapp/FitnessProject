@@ -1,8 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Alert, View, Text, TouchableOpacity, Image } from "react-native";
+import React from "react";
+import { Image, View } from "react-native";
 
-import { AntDesign } from "@expo/vector-icons";
-import { Entypo } from "@expo/vector-icons";
 var styles = require("../styles/stylesheet");
 
 const ImageScreen = ({ route, navigation }) => {

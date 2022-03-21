@@ -1,55 +1,49 @@
-import React, { useState, useEffect, useRef, PureComponent } from "react";
-import {
-  Text,
-  Image,
-  View,
-  SafeAreaView,
-  LayoutAnimation,
-  Animated,
-  TouchableOpacity,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Dimensions,
-} from "react-native";
+import NetInfo from "@react-native-community/netinfo";
 // Get the aws resources configuration parameters
-import { API, graphqlOperation, Cache, Storage } from "aws-amplify";
+import { API, Cache, graphqlOperation, Storage } from "aws-amplify";
+import APIList from "components/APIList";
+import ExpandingTextInput from "components/ExpandingTextInput";
+import IconButton from "components/IconButton";
+import MessageItem from "components/MessageItem";
+import PostItem from "components/PostItem";
+import { ProfileImageAndName } from "components/ProfileImageAndName";
+import SpamButton from "components/SpamButton";
+import { Video } from "expo-av";
+import * as ImageManipulator from "expo-image-manipulator";
+import SHA256 from "hooks/hash";
+import { getLinkPreview } from "link-preview-js";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  createReport,
-  createPost,
-  updatePost,
-  deletePost,
-  createConversation,
-  updateConversation,
-  deleteConversation,
+  ActivityIndicator,
+  Animated,
+  Image,
+  KeyboardAvoidingView,
+  LayoutAnimation,
+  Text,
+  View,
+} from "react-native";
+import {
   createBlock,
+  createConversation,
+  createPost,
+  createReport,
+  deleteConversation,
+  deletePost,
+  updateConversation,
+  updatePost,
 } from "root/src/graphql/mutations";
 import {
-  postsByChannel,
   batchGetLikes,
-  getFriendship,
-  getConversations,
   getConversation,
+  getFriendship,
+  postsByChannel,
 } from "root/src/graphql/queries";
-import PostItem from "components/PostItem";
-import MessageItem from "components/MessageItem";
 import {
   onCreatePostFromChannel,
   onDeletePostFromChannel,
   onUpdatePostFromChannel,
-  onCreateLike,
-  onDeleteLike,
-  onIncrementLikes,
-  onDecrementLikes,
 } from "root/src/graphql/subscriptions";
-import NetInfo from "@react-native-community/netinfo";
-import APIList from "components/APIList";
-import { MaterialIcons } from "@expo/vector-icons";
-import { ProfileImageAndName } from "components/ProfileImageAndName";
-import ExpandingTextInput from "components/ExpandingTextInput";
-import SpamButton from "components/SpamButton";
-import { getLinkPreview } from "link-preview-js";
-import IconButton from "components/IconButton";
-import DrawerButton from "components/headerComponents/DrawerButton";
+import usePhotos from "../hooks/usePhotos";
 
 const linkify = require("linkify-it")();
 linkify
@@ -661,11 +655,6 @@ export default function FeedScreen({
     />
   );
 }
-
-import usePhotos from "../hooks/usePhotos";
-import * as ImageManipulator from "expo-image-manipulator";
-import SHA256 from "hooks/hash";
-import { Video, AVPlaybackStatus } from "expo-av";
 
 function PostInputField({
   channel,

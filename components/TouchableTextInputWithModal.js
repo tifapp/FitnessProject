@@ -1,14 +1,5 @@
-import React, { useState, useCallback } from "react";
-import {
-  ActivityIndicator,
-  View,
-  Modal,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  TextInput,
-  Keyboard,
-  Text,
-} from "react-native";
+import React, { useCallback, useState } from "react";
+import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 var styles = require("styles/stylesheet");
 

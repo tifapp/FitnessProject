@@ -1,6 +1,5 @@
-import React, { useEffect } from "react";
-import { View, StyleSheet } from "react-native";
 import { Picker } from "@react-native-picker/picker";
+import React from "react";
 
 const minAge = 18;
 const maxAge = 100;
