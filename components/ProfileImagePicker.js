@@ -39,6 +39,7 @@ const ProfilePic = ({ imageURL, setImageURL, setImageChanged }) => {
           height: Dimensions.get("window").width / 2 - 30,
         }}
         source={
+          // @ts-ignore
           imageURL === "" ? require("../assets/icon.png") : { uri: imageURL }
         }
       />

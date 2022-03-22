@@ -1,4 +1,4 @@
-import RNUrlPreview from "components/RNUrlPreview";
+import RNUrlPreview from "@components/RNUrlPreview";
 import React from "react";
 import { Alert, Linking, Text, View } from "react-native";
 import Hyperlink from "react-native-hyperlink";

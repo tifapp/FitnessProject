@@ -1,14 +1,15 @@
+// @ts-nocheck
+import StatusPicker from "@components/basicInfoComponents/StatusPicker";
+import ProfilePic from "@components/ProfileImagePicker";
+import StatusIndicator from "@components/StatusIndicator";
+import TouchableWithModal from "@components/TouchableWithModal";
 import { Ionicons } from "@expo/vector-icons";
+import fetchProfileImageAsync from "@hooks/fetchProfileImage";
+import { loadCapitals, saveCapitals } from "@hooks/stringConversion";
+import getLocation from "@hooks/useLocation";
 import CheckBox from "@react-native-community/checkbox"; //when ios is supported, we'll use this
 import { API, Auth, Cache, graphqlOperation, Storage } from "aws-amplify";
-import StatusPicker from "components/basicInfoComponents/StatusPicker";
-import ProfilePic from "components/ProfileImagePicker";
-import StatusIndicator from "components/StatusIndicator";
-import TouchableWithModal from "components/TouchableWithModal";
 import * as ImageManipulator from "expo-image-manipulator";
-import fetchProfileImageAsync from "hooks/fetchProfileImage";
-import { loadCapitals, saveCapitals } from "hooks/stringConversion";
-import getLocation from "hooks/useLocation";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,

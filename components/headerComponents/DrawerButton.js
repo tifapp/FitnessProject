@@ -8,10 +8,12 @@ export default function DrawerButton(props) {
 
   const [notificationCount, setNotificationCount] = useState(0);
 
+  // @ts-ignore
   global.showNotificationDot = () => {
     setNotificationCount(notificationCount + 1);
   };
 
+  // @ts-ignore
   global.hideNotificationDot = () => {
     setNotificationCount(0);
   };
@@ -33,7 +35,12 @@ export default function DrawerButton(props) {
         />
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={navigation.toggleDrawer}>
+      <TouchableOpacity
+        onPress={
+          // @ts-ignore
+          navigation.toggleDrawer
+        }
+      >
         <MaterialIcons
           name="menu"
           size={30}

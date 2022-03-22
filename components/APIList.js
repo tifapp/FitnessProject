@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { API, graphqlOperation } from "aws-amplify";
 import React, { PureComponent } from "react";
 import {
@@ -165,7 +166,6 @@ class APIList extends PureComponent {
               alignSelf: "stretch",
               flex: 1,
               flexGrow: 1,
-              justifyContent: "space-around",
               justifyContent: "center",
             }}
           />

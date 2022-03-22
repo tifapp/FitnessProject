@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Audio } from "expo-av";
 
 export default async function playSound(soundName) {

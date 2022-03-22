@@ -1,7 +1,8 @@
+// @ts-nocheck
+import LinkableText from "@components/LinkableText";
+import PostImage from "@components/PostImage";
+import printTime from "@hooks/printTime";
 import { useNavigation } from "@react-navigation/native";
-import LinkableText from "components/LinkableText";
-import PostImage from "components/PostImage";
-import printTime from "hooks/printTime";
 import React from "react";
 import { Dimensions, Text, TouchableOpacity, View } from "react-native";
 

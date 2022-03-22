@@ -1,6 +1,6 @@
-import { Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as Permissions from "expo-permissions";
+import { Alert } from "react-native";
 
 export default (allowVideo = false) => {
   const pickFromGallery = async (setImageURL, setImageChanged, setIsVideo) => {
@@ -15,8 +15,10 @@ export default (allowVideo = false) => {
         quality: 1,
       });
       if (!response.cancelled) {
+        // @ts-ignore
         setImageURL(response.uri);
         if (setImageChanged) setImageChanged(true);
+        // @ts-ignore
         if (setIsVideo) setIsVideo(response.type === "video");
       }
 
@@ -38,8 +40,10 @@ export default (allowVideo = false) => {
         quality: 1,
       });
       if (!response.cancelled) {
+        // @ts-ignore
         setImageURL(response.uri);
         if (setImageChanged) setImageChanged(true);
+        // @ts-ignore
         if (setIsVideo) setIsVideo(response.type === "video");
       }
 

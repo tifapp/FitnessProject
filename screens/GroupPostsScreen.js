@@ -1,11 +1,12 @@
 import { AntDesign } from "@expo/vector-icons";
+// Get the aws resources configuration parameters
+import FeedScreen from "@screens/FeedScreen";
 import React, { useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-// Get the aws resources configuration parameters
-import FeedScreen from "screens/FeedScreen";
 
 //const { width } = Dimensions.get('window');
 
+// @ts-ignore
 var styles = require("styles/stylesheet");
 
 export default function GroupPostsScreen({ navigation, route }) {
@@ -35,7 +36,20 @@ export default function GroupPostsScreen({ navigation, route }) {
 
       <Text style={{ alignSelf: "center" }}>"{group.Description}"</Text>
 
-      <FeedScreen navigation={navigation} route={route} channel={group.id} />
+      <FeedScreen
+        navigation={navigation}
+        route={route}
+        channel={group.id}
+        receiver={undefined}
+        headerComponent={undefined}
+        footerComponent={undefined}
+        originalParentId={undefined}
+        Accepted={undefined}
+        lastUser={undefined}
+        sidebar={undefined}
+        id={undefined}
+        isFocused={undefined}
+      />
     </View>
   );
 }

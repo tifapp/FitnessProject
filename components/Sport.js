@@ -9,7 +9,7 @@ export default function SportCreation({ setSport, sportVal }) {
       <View style={styles.nameFormat}>
         <Text>Sport: </Text>
         <TextInput
-          multine="true"
+          multiline={true}
           onChangeText={setSport}
           placeholder="Enter your sport..."
           value={sportVal}

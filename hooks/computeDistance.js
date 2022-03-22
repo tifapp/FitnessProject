@@ -1,4 +1,4 @@
-import getLocation from "hooks/useLocation";
+import getLocation from "@hooks/useLocation";
 
 export default function computeDistance(otherLocation) {
   const location = getLocation(true);

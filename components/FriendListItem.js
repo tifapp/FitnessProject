@@ -155,6 +155,7 @@ export default function FriendListItem({
           style={{ alignSelf: "center", paddingHorizontal: 8 }}
         />
         <ProfileImageAndName
+          // @ts-ignore
           navigationObject={navigation}
           style={{ flex: 1, marginVertical: 15 }}
           textStyle={{

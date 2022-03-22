@@ -1,3 +1,6 @@
+// @ts-nocheck
+import { createVerification, updateVerification } from "@graphql/mutations";
+import { getVerification } from "@graphql/queries";
 import { API, graphqlOperation, Storage } from "aws-amplify";
 import * as DocumentPicker from "expo-document-picker";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -11,17 +14,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  createVerification,
-  updateVerification,
-} from "root/src/graphql/mutations";
-import { getVerification } from "root/src/graphql/queries";
 
 /*onPress={() => Linking.openURL(
                 fileURL.value
               )}
 */
 
+// @ts-ignore
 var styles = require("styles/stylesheet");
 
 var allSettled = require("promise.allsettled");

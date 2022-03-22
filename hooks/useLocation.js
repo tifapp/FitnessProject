@@ -1,5 +1,5 @@
-import { Alert, Linking } from "react-native";
 import * as Location from "expo-location";
+import { Alert, Linking } from "react-native";
 
 async function locateUser(ask) {
   let { status } = await Location.requestForegroundPermissionsAsync();
@@ -16,9 +16,11 @@ async function locateUser(ask) {
       );
     }
 
+    // @ts-ignore
     global.location = null;
   } else {
     let location = await Location.getCurrentPositionAsync({ accuracy: 3 });
+    // @ts-ignore
     global.location = {
       latitude: location.coords.latitude,
       longitude: location.coords.longitude,
@@ -27,9 +29,11 @@ async function locateUser(ask) {
 }
 
 export default function getLocation(ask = false) {
+  // @ts-ignore
   if (global.location == null) {
     locateUser(ask);
   }
 
+  // @ts-ignore
   return global.location;
 }

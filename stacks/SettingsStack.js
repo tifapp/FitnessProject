@@ -1,6 +1,12 @@
+// @ts-nocheck
+import Accordion from "@components/Accordion";
+import IconButton from "@components/common/IconButton";
+import { deleteUser } from "@graphql/mutations";
 import { createStackNavigator } from "@react-navigation/stack";
+import BlockListScreen from "@screens/BlockListScreen";
+import LookupUserScreen from "@screens/LookupUser";
+import PrivacyScreen from "@screens/PrivacyScreen";
 import { API, Auth, graphqlOperation, Storage } from "aws-amplify";
-import IconButton from "components/common/IconButton";
 import React, { useState } from "react";
 import {
   Alert,
@@ -11,11 +17,6 @@ import {
   View,
 } from "react-native";
 import "react-native-gesture-handler";
-import BlockListScreen from "screens/BlockListScreen";
-import LookupUserScreen from "screens/LookupUser";
-import PrivacyScreen from "screens/PrivacyScreen";
-import Accordion from "../components/Accordion";
-import { deleteUser } from "../src/graphql/mutations";
 
 function Settings({ navigation, route }) {
   const deleteUserAsync = async () => {

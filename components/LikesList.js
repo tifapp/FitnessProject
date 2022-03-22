@@ -1,15 +1,16 @@
+// @ts-nocheck
 // Get the aws resources configuration parameters
-import { API, graphqlOperation } from "aws-amplify";
-import APIList from "components/APIList";
-import { ProfileImageAndName } from "components/ProfileImageAndName";
-import printTime from "hooks/printTime";
-import React, { useEffect, useRef } from "react";
-import { LayoutAnimation, SafeAreaView, Text } from "react-native";
-import { likesByPost } from "root/src/graphql/queries";
+import APIList from "@components/APIList";
+import { ProfileImageAndName } from "@components/ProfileImageAndName";
+import { likesByPost } from "@graphql/queries";
 import {
   onCreateLikeForPost,
   onDeleteLikeForPost,
-} from "root/src/graphql/subscriptions";
+} from "@graphql/subscriptions";
+import printTime from "@hooks/printTime";
+import { API, graphqlOperation } from "aws-amplify";
+import React, { useEffect, useRef } from "react";
+import { LayoutAnimation, SafeAreaView, Text } from "react-native";
 
 require("root/androidtimerfix");
 

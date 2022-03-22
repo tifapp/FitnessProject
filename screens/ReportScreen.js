@@ -1,7 +1,10 @@
+// @ts-nocheck
 // Get the aws resources configuration parameters
+import APIList from "@components/APIList";
+import PostItem from "@components/PostItem";
+import { deletePost, deleteReport } from "@graphql/mutations";
+import { getPost, listReports } from "@graphql/queries";
 import { API, Auth, graphqlOperation } from "aws-amplify";
-import APIList from "components/APIList";
-import PostItem from "components/PostItem";
 import React, { useState } from "react";
 import {
   LayoutAnimation,
@@ -10,8 +13,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { deletePost, deleteReport } from "root/src/graphql/mutations";
-import { getPost, listReports } from "root/src/graphql/queries";
 
 var styles = require("styles/stylesheet");
 

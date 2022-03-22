@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Storage } from "aws-amplify";
 import { Video } from "expo-av";
 import React, { useEffect, useRef, useState } from "react";
@@ -5,6 +6,7 @@ import { ImageBackground } from "react-native";
 
 const re = /(?:\.([^.]+))?$/;
 
+// @ts-ignore
 global.currentVideo;
 
 export default function PostImage({ style, imageID, isVisible }) {

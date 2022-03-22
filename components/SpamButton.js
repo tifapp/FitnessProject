@@ -9,6 +9,7 @@ export default function SpamButton({ func }) {
   const timeoutFunction = useRef();
 
   const spam = () => {
+    // @ts-ignore
     func(), (timeoutFunction.current = setTimeout(spam, 1000));
   };
 

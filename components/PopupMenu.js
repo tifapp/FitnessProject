@@ -13,6 +13,7 @@ export default function PopupMenu(props) {
         transparent={false}
         visible={modalVisible}
         onRequestClose={() => {
+          // @ts-ignore
           Alert.alert("Modal has been closed.");
         }}
       >

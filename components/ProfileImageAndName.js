@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import fetchUserAsync from "hooks/fetchName";
@@ -14,6 +15,7 @@ import {
 
 var styles = require("../styles/stylesheet");
 
+// @ts-ignore
 global.savedUsers = {};
 //objects will look like {name: [name], imageURL: [imageURL], isFullSize: [bool]}
 

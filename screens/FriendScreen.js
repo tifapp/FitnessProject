@@ -1,27 +1,29 @@
-import { API, graphqlOperation } from "aws-amplify";
-import Accordion from "components/Accordion";
-import FriendListItem from "components/FriendListItem";
-import FriendRequestListItem from "components/FriendRequestListItem";
-import React, { useEffect, useRef } from "react";
-import { LayoutAnimation, SafeAreaView, Text } from "react-native";
-import { deleteFriendship, updateFriendship } from "root/src/graphql/mutations";
-import { friendsByReceiver, listFriendships } from "root/src/graphql/queries";
+// @ts-nocheck
+import Accordion from "@components/Accordion";
+import FriendListItem from "@components/FriendListItem";
+import FriendRequestListItem from "@components/FriendRequestListItem";
+import { deleteFriendship, updateFriendship } from "@graphql/mutations";
+import { friendsByReceiver, listFriendships } from "@graphql/queries";
 import {
   onAcceptedFriendship,
   onCreateFriendRequestForReceiver,
   onCreatePostForReceiver,
   onDeleteFriendship,
-} from "root/src/graphql/subscriptions";
+} from "@graphql/subscriptions";
+import { API, graphqlOperation } from "aws-amplify";
+import React, { useEffect, useRef } from "react";
+import { LayoutAnimation, SafeAreaView, Text } from "react-native";
 import APIList from "../components/APIList";
 import {
   batchGetConversations,
   getConversation,
-  getSortedConversations,
+  //getSortedConversations,
   listConversations,
 } from "../src/graphql/queries";
 //import { listConversations } from "../amplify/#current-cloud-backend/function/backendResources/opt/queries";
 //conversations and friends should be deleted when user is deleted
 
+// @ts-ignore
 var styles = require("styles/stylesheet");
 var subscriptions = [];
 

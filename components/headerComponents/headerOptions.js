@@ -1,6 +1,7 @@
-import BackButton from "components/headerComponents/BackButton";
-import DrawerButton from "components/headerComponents/DrawerButton";
+import BackButton from "@components/headerComponents/BackButton";
+import DrawerButton from "@components/headerComponents/DrawerButton";
 import React from "react";
+import { Platform } from "react-native";
 
 export const headerOptions = {
   headerLeft: (props) => <BackButton {...props} />,

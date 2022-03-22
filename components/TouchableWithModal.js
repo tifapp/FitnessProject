@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { Modal, TouchableOpacity, View } from "react-native";
 
+// @ts-ignore
 var styles = require("styles/stylesheet");
 
 //currently this is just used in the profile screen for the bio and goals descriptions

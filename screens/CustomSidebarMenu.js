@@ -1,13 +1,14 @@
-import { useIsDrawerOpen } from "@react-navigation/drawer";
-import { API, Cache, graphqlOperation } from "aws-amplify";
-import { ProfileImageAndName } from "components/ProfileImageAndName";
-import React, { useEffect, useRef, useState } from "react";
-import { SafeAreaView, Text, TouchableOpacity, View } from "react-native";
+// @ts-nocheck
+import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import {
   onAcceptedFriendship,
   onCreateFriendRequestForReceiver,
   onCreatePostForReceiver,
-} from "root/src/graphql/subscriptions";
+} from "@graphql/subscriptions";
+import { useIsDrawerOpen } from "@react-navigation/drawer";
+import { API, Cache, graphqlOperation } from "aws-amplify";
+import React, { useEffect, useRef, useState } from "react";
+import { SafeAreaView, Text, TouchableOpacity, View } from "react-native";
 import playSound from "../hooks/playSound";
 
 //import AsyncStorage from '@react-native-async-storage/async-storage';

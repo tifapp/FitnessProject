@@ -1,10 +1,12 @@
+// @ts-nocheck
+import GroupDescription from "@components/Description";
+import NameField from "@components/NameField";
+import PrivacySettings from "@components/Privacy";
+import SportCreation from "@components/Sport";
+import { createGroup, updateGroup } from "@graphql/mutations";
 import { useNavigation } from "@react-navigation/native";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation } from "aws-amplify";
-import GroupDescription from "components/Description";
-import NameField from "components/NameField";
-import PrivacySettings from "components/Privacy";
-import SportCreation from "components/Sport";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -14,7 +16,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { createGroup, updateGroup } from "root/src/graphql/mutations";
 
 export default function CreatingGroups({ route }) {
   console.log(route.params?.myId);
@@ -110,7 +111,7 @@ export default function CreatingGroups({ route }) {
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
-      keyboardShouldPersistsTaps="handled"
+      keyboardShouldPersistTaps="handled"
     >
       <View>
         <View style={styles.border}>

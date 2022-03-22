@@ -123,6 +123,7 @@ export default function SHA256(s) {
     m[l >> 5] |= 0x80 << (24 - (l % 32));
     m[(((l + 64) >> 9) << 4) + 15] = l;
 
+    // @ts-ignore
     for (var i = 0; i < m.length; i += 16) {
       a = HASH[0];
       b = HASH[1];
@@ -133,6 +134,7 @@ export default function SHA256(s) {
       g = HASH[6];
       h = HASH[7];
 
+      // @ts-ignore
       for (var j = 0; j < 64; j++) {
         if (j < 16) W[j] = m[j + i];
         else

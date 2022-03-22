@@ -1,5 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import StatusColors from "hooks/statusColors";
+import StatusColors from "@hooks/statusColors";
 import React from "react";
 import { Text, View } from "react-native";
 

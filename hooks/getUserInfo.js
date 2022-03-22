@@ -1,6 +1,6 @@
-import { Cache, Storage } from "aws-amplify";
+// @ts-nocheck
+import { API, Auth, Cache, graphqlOperation, Storage } from "aws-amplify";
 import { loadCapitals } from "hooks/stringConversion";
-import { API, graphqlOperation } from "aws-amplify";
 import { getUser } from "../src/graphql/queries";
 
 async function setMyId() {

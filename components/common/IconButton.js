@@ -3,16 +3,16 @@ import React from "react";
 import { Text, TouchableOpacity } from "react-native";
 
 export default function IconButton({
-  onPress,
+  onPress = () => {},
   iconName,
-  style,
+  style = {},
   color,
-  label,
+  label = "",
   size,
-  margin,
-  isLabelFirst,
-  fontSize,
-  fontWeight,
+  margin = 6,
+  isLabelFirst = false,
+  fontSize = 14,
+  fontWeight = "normal",
 }) {
   return (
     <TouchableOpacity
@@ -28,10 +28,11 @@ export default function IconButton({
       {label ? (
         <Text
           style={[
+            // @ts-ignore
             {
-              fontWeight: fontWeight ?? "bold",
+              fontWeight: fontWeight,
               color: color,
-              fontSize: fontSize ?? 14,
+              fontSize: fontSize,
             },
             isLabelFirst
               ? { marginRight: margin ?? 5 }

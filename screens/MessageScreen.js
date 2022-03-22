@@ -1,14 +1,16 @@
+// @ts-nocheck
+import AcceptMessageButtons from "@components/AcceptMessageButtons";
+import { ProfileImageAndName } from "@components/ProfileImageAndName";
+import { getBlock, getConversation, getUser } from "@graphql/queries";
+import { onDeleteConversation } from "@graphql/subscriptions";
+// Get the aws resources configuration parameters
+import FeedScreen from "@screens/FeedScreen";
 import { API, graphqlOperation } from "aws-amplify";
-import { ProfileImageAndName } from "components/ProfileImageAndName";
 import React, { useEffect, useState } from "react";
 import { KeyboardAvoidingView, View } from "react-native";
-import { onDeleteConversation } from "root/src/graphql/subscriptions";
-// Get the aws resources configuration parameters
-import FeedScreen from "screens/FeedScreen";
-import AcceptMessageButtons from "../components/AcceptMessageButtons";
-import { getBlock, getConversation, getUser } from "../src/graphql/queries";
 //const { width } = Dimensions.get('window');
 
+// @ts-ignore
 var styles = require("styles/stylesheet");
 
 export default function MessageScreen({ navigation, route }) {

@@ -7,7 +7,7 @@ export default function MaxUsers({ setTotalUsers, totalUsersVal }) {
       <View style={styles.nameFormat}>
         <Text>Max amount of Users: </Text>
         <TextInput
-          multine="true"
+          multiline={true}
           onChangeText={setTotalUsers}
           keyboardType={"numeric"}
           placeholder="Enter # of users"

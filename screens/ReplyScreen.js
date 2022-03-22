@@ -1,8 +1,9 @@
-import PostItem from "components/PostItem";
+// @ts-nocheck
+import PostItem from "@components/PostItem";
+// Get the aws resources configuration parameters
+import FeedScreen from "@screens/FeedScreen";
 import React from "react";
 import { View } from "react-native";
-// Get the aws resources configuration parameters
-import FeedScreen from "screens/FeedScreen";
 
 var styles = require("styles/stylesheet");
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { API, graphqlOperation } from "aws-amplify";
 import ListGroupItem from "components/ListGroupItem";
 import React, { useEffect, useState } from "react";

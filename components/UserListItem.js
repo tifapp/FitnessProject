@@ -1,6 +1,6 @@
-import computeDistance from "hooks/computeDistance";
-import { loadCapitals } from "hooks/stringConversion";
-import getLocation from "hooks/useLocation";
+import computeDistance from "@hooks/computeDistance";
+import { loadCapitals } from "@hooks/stringConversion";
+import getLocation from "@hooks/useLocation";
 import React from "react";
 import { Text, View } from "react-native";
 import { ProfileImageAndName } from "./ProfileImageAndName";
@@ -10,6 +10,7 @@ var styles = require("../styles/stylesheet");
 export default function UserListItem({ item, matchingname }) {
   return (
     <ProfileImageAndName
+      // @ts-ignore
       textLayoutStyle={{ alignSelf: "center", flex: 1 }}
       userId={item.id}
       imageSize={60}

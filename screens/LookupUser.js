@@ -1,13 +1,31 @@
+// @ts-nocheck
+import APIList from "@components/APIList";
+import IconButton from "@components/common/IconButton";
+import { ProfileImageAndName } from "@components/ProfileImageAndName";
+import StatusIndicator from "@components/StatusIndicator";
+import {
+  createBlock,
+  createFriendship,
+  deleteBlock,
+  deleteFriendship,
+  updateFriendship,
+} from "@graphql/mutations";
+import {
+  getBlock,
+  getFriendship,
+  getUser,
+  listFriendships,
+} from "@graphql/queries";
+import {
+  //onCreateFriendship,
+  onDeleteFriendship,
+} from "@graphql/subscriptions";
+import computeDistance from "@hooks/computeDistance";
+import printTime from "@hooks/printTime";
+import { loadCapitals } from "@hooks/stringConversion";
+import getLocation from "@hooks/useLocation";
 import { API, graphqlOperation } from "aws-amplify";
-import APIList from "components/APIList";
-import IconButton from "components/common/IconButton";
-import { ProfileImageAndName } from "components/ProfileImageAndName";
-import StatusIndicator from "components/StatusIndicator";
-import computeDistance from "hooks/computeDistance";
-import printTime from "hooks/printTime";
-import { loadCapitals } from "hooks/stringConversion";
-import getLocation from "hooks/useLocation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -17,25 +35,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  createBlock,
-  createFriendship,
-  deleteBlock,
-  deleteFriendship,
-  updateFriendship,
-} from "root/src/graphql/mutations";
-import {
-  onCreateFriendship,
-  onDeleteFriendship,
-  onUpdateFriendship,
-} from "root/src/graphql/subscriptions";
-import {
-  getBlock,
-  getFriendship,
-  getUser,
-  listFriendships,
-} from "../src/graphql/queries";
 
+// @ts-ignore
 var styles = require("styles/stylesheet");
 
 const LookupUser = ({ route, navigation }) => {

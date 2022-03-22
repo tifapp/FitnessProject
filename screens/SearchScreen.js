@@ -1,7 +1,9 @@
+// @ts-nocheck
+import APIList from "@components/APIList";
+import ListGroupItem from "@components/ListGroupItem";
+import UserListItem from "@components/UserListItem";
 import { MaterialIcons } from "@expo/vector-icons";
-import APIList from "components/APIList";
-import ListGroupItem from "components/ListGroupItem";
-import UserListItem from "components/UserListItem";
+import { listGroups, listUsers } from "@graphql/queries";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Keyboard,
@@ -11,8 +13,8 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { listGroups, listUsers } from "root/src/graphql/queries";
 
+// @ts-ignore
 var styles = require("styles/stylesheet");
 
 function titleCase(str) {

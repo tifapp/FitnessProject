@@ -1,6 +1,8 @@
 // Get the aws resources configuration parameters
+import APIList from "@components/APIList";
+import { updateVerification, verifyUser } from "@graphql/mutations";
+import { listVerifications } from "@graphql/queries";
 import { API, Auth, graphqlOperation, Storage } from "aws-amplify";
-import APIList from "components/APIList";
 import React, { useState } from "react";
 import {
   LayoutAnimation,
@@ -11,9 +13,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { updateVerification, verifyUser } from "root/src/graphql/mutations";
-import { listVerifications } from "root/src/graphql/queries";
 
+// @ts-ignore
 var styles = require("styles/stylesheet");
 
 var allSettled = require("promise.allsettled");

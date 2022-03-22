@@ -1,16 +1,38 @@
+// @ts-nocheck
+import APIList from "@components/APIList";
+import IconButton from "@components/common/IconButton";
+import ExpandingTextInput from "@components/ExpandingTextInput";
+import MessageItem from "@components/MessageItem";
+import PostItem from "@components/PostItem";
+import { ProfileImageAndName } from "@components/ProfileImageAndName";
+import SpamButton from "@components/SpamButton";
+import {
+  createBlock,
+  createConversation,
+  createPost,
+  createReport,
+  deleteConversation,
+  deletePost,
+  updateConversation,
+  updatePost,
+} from "@graphql/mutations";
+import {
+  batchGetLikes,
+  getConversation,
+  getFriendship,
+  postsByChannel,
+} from "@graphql/queries";
+import {
+  onCreatePostFromChannel,
+  onDeletePostFromChannel,
+  onUpdatePostFromChannel,
+} from "@graphql/subscriptions";
+import SHA256 from "@hooks/hash";
 import NetInfo from "@react-native-community/netinfo";
 // Get the aws resources configuration parameters
 import { API, Cache, graphqlOperation, Storage } from "aws-amplify";
-import APIList from "components/APIList";
-import ExpandingTextInput from "components/ExpandingTextInput";
-import IconButton from "components/common/IconButton";
-import MessageItem from "components/MessageItem";
-import PostItem from "components/PostItem";
-import { ProfileImageAndName } from "components/ProfileImageAndName";
-import SpamButton from "components/SpamButton";
 import { Video } from "expo-av";
 import * as ImageManipulator from "expo-image-manipulator";
-import SHA256 from "hooks/hash";
 import { getLinkPreview } from "link-preview-js";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -22,27 +44,6 @@ import {
   Text,
   View,
 } from "react-native";
-import {
-  createBlock,
-  createConversation,
-  createPost,
-  createReport,
-  deleteConversation,
-  deletePost,
-  updateConversation,
-  updatePost,
-} from "root/src/graphql/mutations";
-import {
-  batchGetLikes,
-  getConversation,
-  getFriendship,
-  postsByChannel,
-} from "root/src/graphql/queries";
-import {
-  onCreatePostFromChannel,
-  onDeletePostFromChannel,
-  onUpdatePostFromChannel,
-} from "root/src/graphql/subscriptions";
 import usePhotos from "../hooks/usePhotos";
 
 const linkify = require("linkify-it")();

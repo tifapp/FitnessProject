@@ -1,19 +1,21 @@
-import { API, graphqlOperation } from "aws-amplify";
-import FriendListItem from "components/FriendListItem";
-import React, { useEffect, useRef } from "react";
-import { LayoutAnimation, SafeAreaView } from "react-native";
-import { deleteConversation } from "root/src/graphql/mutations";
+// @ts-nocheck
+import APIList from "@components/APIList";
+import FriendListItem from "@components/FriendListItem";
+import { deleteConversation } from "@graphql/mutations";
 import {
   onCreatePostByUser,
   onCreatePostForReceiver,
   onDeleteConversation,
-} from "root/src/graphql/subscriptions";
-import APIList from "../components/APIList";
+} from "@graphql/subscriptions";
+import { API, graphqlOperation } from "aws-amplify";
+import React, { useEffect, useRef } from "react";
+import { LayoutAnimation, SafeAreaView } from "react-native";
 import {
-  getSortedConversations,
+  //getSortedConversations,
   listConversations,
 } from "../src/graphql/queries";
 
+// @ts-ignore
 var styles = require("styles/stylesheet");
 var subscriptions = [];
 
@@ -326,6 +328,8 @@ export default function ConversationScreen({ navigation, route }) {
               lastMessage={item.lastMessage}
               lastUser={item.lastUser}
               Accepted={item.Accepted}
+              removeFriendHandler={undefined}
+              sidebar={undefined}
             />
           )
         )}

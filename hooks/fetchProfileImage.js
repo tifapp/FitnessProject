@@ -1,6 +1,4 @@
-import { API, graphqlOperation, Cache, Storage } from "aws-amplify";
-import { getUser } from "../src/graphql/queries";
-import { loadCapitals } from "hooks/stringConversion";
+import { Cache, Storage } from "aws-amplify";
 
 //cache stores objects like this {identityId: {imageURL, lastModified, isFullSize}}
 

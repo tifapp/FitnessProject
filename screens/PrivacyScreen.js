@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Picker } from "@react-native-picker/picker";
 import { API, graphqlOperation } from "aws-amplify";
 import * as Haptics from "expo-haptics";

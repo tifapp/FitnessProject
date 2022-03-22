@@ -1,5 +1,6 @@
+// @ts-nocheck
+import IconButton from "@components/common/IconButton";
 import { API, graphqlOperation } from "aws-amplify";
-import IconButton from "components/common/IconButton";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import {

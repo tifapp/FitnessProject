@@ -1,53 +1,58 @@
+// @ts-nocheck
+import { headerOptions } from "@components/headerComponents/headerOptions";
+import ConfirmSignIn from "@components/loginComponents/ConfirmSignIn";
+import ConfirmSignUp from "@components/loginComponents/ConfirmSignUp";
+import ForgotPassword from "@components/loginComponents/ForgotPassword";
+import Greetings from "@components/loginComponents/Greetings";
+import RequireNewPassword from "@components/loginComponents/RequireNewPassword";
+import SignIn from "@components/loginComponents/SignIn";
+import SignUp from "@components/loginComponents/SignUp";
+import VerifyContact from "@components/loginComponents/VerifyContact";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useEffect, useRef } from "react";
-import {
-  AppState,
-  ActivityIndicator,
-  LogBox,
-  UIManager,
-  Text,
-  useWindowDimensions,
-  View
-} from "react-native";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { withAuthenticator } from "aws-amplify-react-native";
-// Get the aws resources configuration parameters
-import awsconfig from "./src/aws-exports"; // if you are using Amplify CLI
-import { Amplify, API, graphqlOperation, Auth, Cache, Storage } from "aws-amplify";
-import { getUser } from "./src/graphql/queries";
-import ProfileScreen from "screens/ProfileScreen";
-import MainStack from "stacks/MainStack";
-import ReportScreen from "screens/ReportScreen";
-import VerificationRequestsScreen from "screens/VerificationRequestsScreen";
-import SettingsStack from "stacks/SettingsStack";
-import FriendScreen from "screens/FriendScreen";
-import VerificationScreen from "screens/VerificationScreen";
-import ConversationScreen from "screens/ConversationScreen";
-import ComplianceScreen from "screens/ComplianceScreen";
-import { updateUser } from 'root/src/graphql/mutations.js'
-import SignIn from "root/components/loginComponents/SignIn.tsx";
-import SignUp from "root/components/loginComponents/SignUp.tsx";
-import MyGroupsScreen from 'screens/MyGroupsScreen'
-import RequireNewPassword from "root/components/loginComponents/RequireNewPassword.tsx";
-import ConfirmSignIn from "root/components/loginComponents/ConfirmSignIn.tsx";
-import ConfirmSignUp from "root/components/loginComponents/ConfirmSignUp.tsx";
-import ForgotPassword from "root/components/loginComponents/ForgotPassword.tsx";
-import VerifyContact from "root/components/loginComponents/VerifyContact.tsx";
-import Greetings from "root/components/loginComponents/Greetings.tsx";
-import CustomSidebarMenu from 'root/screens/CustomSidebarMenu';
-
+import { updateUser } from "@graphql/mutations.js";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createDrawerNavigator } from "@react-navigation/drawer";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-
-import * as Notifications from 'expo-notifications';
+import ComplianceScreen from "@screens/ComplianceScreen";
+import ConversationScreen from "@screens/ConversationScreen";
+import CustomSidebarMenu from "@screens/CustomSidebarMenu";
+import FriendScreen from "@screens/FriendScreen";
+import ImageScreen from "@screens/ImageScreen";
+import MessageScreen from "@screens/MessageScreen";
+import MyGroupsScreen from "@screens/MyGroupsScreen";
+import ProfileScreen from "@screens/ProfileScreen";
+import ReportScreen from "@screens/ReportScreen";
+import VerificationRequestsScreen from "@screens/VerificationRequestsScreen";
+import VerificationScreen from "@screens/VerificationScreen";
+import MainStack from "@stacks/MainStack";
+import SettingsStack from "@stacks/SettingsStack";
+import {
+  Amplify,
+  API,
+  Auth,
+  Cache,
+  graphqlOperation,
+  Storage,
+} from "aws-amplify";
+import { withAuthenticator } from "aws-amplify-react-native";
+import { Audio } from "expo-av";
+import * as Notifications from "expo-notifications";
 import { StatusBar } from "expo-status-bar";
-import MessageScreen from "./screens/MessageScreen";
-import LookupUserScreen from "screens/LookupUser";
-import { headerOptions } from "components/headerComponents/headerOptions"
-import { Audio } from 'expo-av';
-import ImageScreen from "./screens/ImageScreen";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  AppState,
+  LogBox,
+  Platform,
+  UIManager,
+  useWindowDimensions,
+  View,
+} from "react-native";
+// Get the aws resources configuration parameters
+import awsconfig from "./src/aws-exports"; // if you are using Amplify CLI
+import { getUser } from "./src/graphql/queries";
 
 if (
   Platform.OS === "android" &&
@@ -65,7 +70,7 @@ Notifications.setNotificationHandler({
 });
 
 LogBox.ignoreLogs([
-  'Non-serializable values were found in the navigation state',
+  "Non-serializable values were found in the navigation state",
 ]);
 
 Amplify.configure({
@@ -98,7 +103,7 @@ const App = () => {
   const appState = useRef(AppState.currentState);
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
-  const [userId, setUserId] = useState('checking...'); //stores the user's id if logged in
+  const [userId, setUserId] = useState("checking..."); //stores the user's id if logged in
   const [isNewUser, setIsNewUser] = useState(false); //stores the user's id if logged in
   const [isAdmin, setIsAdmin] = useState(false); //seems insecure
 
@@ -108,12 +113,11 @@ const App = () => {
     //console("(((((((((((((((((((((((((((((((((");
     //console(id);
 
-    const found = conversationIds.find(element => element == id);
+    const found = conversationIds.find((element) => element == id);
 
     //console(conversationIds);
     //console("(((((((((((((((((((((((((((((((((");
     //console(found);
-
 
     if (found == undefined) {
       //console("inside");
@@ -122,16 +126,17 @@ const App = () => {
       tempConversationsIds.unshift(id);
       setConversationIds([...tempConversationsIds]);
     }
-
-
   };
-
 
   const checkIfUserSignedUp = async () => {
     try {
       const query = await Auth.currentAuthenticatedUser();
       if (query.signInUserSession.idToken.payload["cognito:groups"])
-        setIsAdmin(query.signInUserSession.idToken.payload["cognito:groups"].includes("Admins"));
+        setIsAdmin(
+          query.signInUserSession.idToken.payload["cognito:groups"].includes(
+            "Admins"
+          )
+        );
       const user = await API.graphql(
         graphqlOperation(getUser, { id: query.attributes.sub })
       );
@@ -143,7 +148,7 @@ const App = () => {
 
       //console("success, user is ", user);
     } catch (err) {
-      console("error checking user signed up: ", err);
+      console.log("error checking user signed up: ", err);
     }
   };
 
@@ -153,36 +158,37 @@ const App = () => {
       playsInSilentModeIOS: true,
     });
 
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
+    if (existingStatus !== "granted") {
       const { status } = await Notifications.requestPermissionsAsync();
       finalStatus = status;
     }
-    if (finalStatus !== 'granted') {
-      alert('Failed to get push token for push notification!');
+    if (finalStatus !== "granted") {
+      alert("Failed to get push token for push notification!");
       return;
     }
     const token = (await Notifications.getExpoPushTokenAsync()).data;
     //console(token);
 
-    if (Platform.OS === 'android') {
-      Notifications.setNotificationChannelAsync('default', {
-        name: 'default',
+    if (Platform.OS === "android") {
+      Notifications.setNotificationChannelAsync("default", {
+        name: "default",
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#FF231F7C',
+        lightColor: "#FF231F7C",
       });
     }
 
     // Only update the profile with the expoToken if it not exists yet
     if (token !== "") {
       const inputParams = {
-        deviceToken: token
+        deviceToken: token,
       };
       await API.graphql(graphqlOperation(updateUser, { input: inputParams }));
     }
-  }
+  };
 
   useEffect(() => {
     AppState.addEventListener("change", _handleAppStateChange);
@@ -206,20 +212,21 @@ const App = () => {
   };
 
   const setUniqueConversationIds = (items) => {
-    if (JSON.stringify(conversationIds.sort()) !== JSON.stringify(items.sort())) //will work when objects are shuffled, but all items will probably refresh still if there's one extra item added to the list
+    if (JSON.stringify(conversationIds.sort()) !== JSON.stringify(items.sort()))
+      //will work when objects are shuffled, but all items will probably refresh still if there's one extra item added to the list
       setConversationIds(items);
-  }
+  };
 
   useEffect(() => {
-    if (userId !== 'checking...' && userId !== '') {
+    if (userId !== "checking..." && userId !== "") {
       requestAndSaveNotificationPermissions();
     }
-  }, [userId])
+  }, [userId]);
 
   ////console("App rerendered, userexists is... ", userId == '');
   const dimensions = useWindowDimensions();
 
-  if (userId == 'checking...') {
+  if (userId == "checking...") {
     return (
       <View style={{ flex: 1, backgroundColor: "#a9efe0" }}>
         <ActivityIndicator
@@ -229,11 +236,11 @@ const App = () => {
             flex: 1,
             justifyContent: "center",
             flexDirection: "row",
-            justifyContent: "space-around",
             padding: 10,
-          }} />
+          }}
+        />
       </View>
-    )
+    );
   } else if (isNewUser) {
     return (
       <NavigationContainer>
@@ -248,10 +255,16 @@ const App = () => {
           <Stack.Screen
             name="Profile"
             component={ProfileScreen}
-            initialParams={{ newUser: true, myId: userId, setUserIdFunction: () => setIsNewUser(false) }}
-            options={{
-              //headerShown: false,
+            initialParams={{
+              newUser: true,
+              myId: userId,
+              setUserIdFunction: () => setIsNewUser(false),
             }}
+            options={
+              {
+                //headerShown: false,
+              }
+            }
           />
         </Stack.Navigator>
       </NavigationContainer>
@@ -289,10 +302,7 @@ const App = () => {
           edgeWidth={100}
           initialRouteName="MainTabs"
           drawerContent={(props) => (
-            <CustomSidebarMenu
-              myId={userId}
-              {...props}
-            />
+            <CustomSidebarMenu myId={userId} {...props} />
           )}
           screenOptions={headerOptions}
         >
@@ -312,7 +322,11 @@ const App = () => {
             component={VerificationScreen}
             initialParams={{ myId: userId }}
           />
-          <Drawer.Screen name='My Groups' component={MyGroupsScreen} initialParams={{ myId: userId }}/>
+          <Drawer.Screen
+            name="My Groups"
+            component={MyGroupsScreen}
+            initialParams={{ myId: userId }}
+          />
           <Drawer.Screen
             name="Friends"
             component={FriendScreen}
@@ -355,7 +369,8 @@ function TabBarIcon({ name, color }) {
   );
 }
 
-export default withAuthenticator(App, false, [ //this is why we cant have splash screen
+export default withAuthenticator(App, false, [
+  //this is why we cant have splash screen
   <Greetings />,
   <SignIn />,
   <SignUp />,

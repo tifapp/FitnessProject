@@ -1,7 +1,10 @@
+// @ts-nocheck
+import APIList from "@components/APIList";
+import { ProfileImageAndName } from "@components/ProfileImageAndName";
+import { deleteBlock } from "@graphql/mutations";
+import { blocksByDate } from "@graphql/queries";
+import printTime from "@hooks/printTime";
 import { API, graphqlOperation } from "aws-amplify";
-import APIList from "components/APIList";
-import { ProfileImageAndName } from "components/ProfileImageAndName";
-import printTime from "hooks/printTime";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
@@ -10,9 +13,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { deleteBlock } from "root/src/graphql/mutations";
-import { blocksByDate } from "root/src/graphql/queries";
 
+// @ts-ignore
 var styles = require("styles/stylesheet");
 
 const BlockListScreen = ({ navigation, route }) => {
@@ -104,9 +106,7 @@ const BlockListScreen = ({ navigation, route }) => {
                   {printTime(item.createdAt)}
                 </Text>
 
-                <TouchableOpacity
-                  onPress={() => unblock(item.blockee, item.createdAt)}
-                >
+                <TouchableOpacity onPress={() => unblock(item.blockee)}>
                   <Text>
                     unblock
                     {

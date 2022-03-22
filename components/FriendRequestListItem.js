@@ -1,5 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import playSound from "hooks/playSound";
+import playSound from "@hooks/playSound";
 import React, { useState } from "react";
 import { Alert, View } from "react-native";
 import IconButton from "./common/IconButton";
@@ -76,6 +76,7 @@ export default function FriendRequestListItem({
           style={{ alignSelf: "center", paddingHorizontal: 8 }}
         />
         <ProfileImageAndName
+          // @ts-ignore
           navigationObject={navigation}
           style={{ flex: 1, marginVertical: 15 }}
           userId={item.sender}

@@ -1,6 +1,7 @@
 import React from "react";
 import { Linking, Text, TouchableOpacity, View } from "react-native";
 
+// @ts-ignore
 var styles = require("styles/stylesheet");
 
 const ComplianceScreen = ({ navigation }) => {

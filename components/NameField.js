@@ -9,7 +9,7 @@ export default function NameField({ setName, nameVal }) {
       <View style={styles.nameFormat}>
         <Text>Name: </Text>
         <TextInput
-          multine="true"
+          multiline={true}
           placeholder="Enter your name ..."
           onChangeText={setName}
           value={nameVal}
