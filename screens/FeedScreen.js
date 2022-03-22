@@ -3,7 +3,7 @@ import NetInfo from "@react-native-community/netinfo";
 import { API, Cache, graphqlOperation, Storage } from "aws-amplify";
 import APIList from "components/APIList";
 import ExpandingTextInput from "components/ExpandingTextInput";
-import IconButton from "components/IconButton";
+import IconButton from "components/common/IconButton";
 import MessageItem from "components/MessageItem";
 import PostItem from "components/PostItem";
 import { ProfileImageAndName } from "components/ProfileImageAndName";

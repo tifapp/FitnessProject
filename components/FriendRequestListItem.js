@@ -2,7 +2,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import playSound from "hooks/playSound";
 import React, { useState } from "react";
 import { Alert, View } from "react-native";
-import IconButton from "./IconButton";
+import IconButton from "./common/IconButton";
 import { ProfileImageAndName } from "./ProfileImageAndName";
 
 var styles = require("../styles/stylesheet");

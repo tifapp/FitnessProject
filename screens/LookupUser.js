@@ -1,6 +1,6 @@
 import { API, graphqlOperation } from "aws-amplify";
 import APIList from "components/APIList";
-import IconButton from "components/IconButton";
+import IconButton from "components/common/IconButton";
 import { ProfileImageAndName } from "components/ProfileImageAndName";
 import StatusIndicator from "components/StatusIndicator";
 import computeDistance from "hooks/computeDistance";

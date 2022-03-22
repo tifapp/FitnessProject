@@ -1,7 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
-import IconButton from "./IconButton";
+import IconButton from "./common/IconButton";
 import { ProfileImageAndName } from "./ProfileImageAndName";
 
 var styles = require("../styles/stylesheet");

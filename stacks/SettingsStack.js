@@ -1,6 +1,6 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import { API, Auth, graphqlOperation, Storage } from "aws-amplify";
-import IconButton from "components/IconButton";
+import IconButton from "components/common/IconButton";
 import React, { useState } from "react";
 import {
   Alert,
