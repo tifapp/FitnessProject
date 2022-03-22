@@ -1,5 +1,5 @@
+import StatusColors from "@hooks/statusColors";
 import { Picker } from "@react-native-picker/picker";
-import StatusColors from "hooks/statusColors";
 import React from "react";
 
 const StatusPicker = ({ selectedValue, setSelectedValue }) => {

@@ -1,4 +1,4 @@
-import TouchableWithModal from "components/TouchableWithModal";
+import TouchableWithModal from "@components/TouchableWithModal";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import AgePicker from "./AgePicker";
@@ -29,7 +29,7 @@ const BasicInfoDetails = ({ age, gender, setAge, setGender }) => {
   );
 };
 
-const styles = new StyleSheet.create({
+const styles = StyleSheet.create({
   textBoxStyle: {
     flexDirection: "row",
     height: 35,

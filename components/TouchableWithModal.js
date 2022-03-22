@@ -8,9 +8,9 @@ var styles = require("styles/stylesheet");
 
 export default function TouchableWithModal({
   modalComponent,
-  style,
+  style = {},
   children,
-  dontShowModalOnPress,
+  dontShowModalOnPress = false,
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 

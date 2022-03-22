@@ -26,13 +26,11 @@ const Selector = ({ label, modalOpen, setModalOpen, field, updateField }) => {
 
         {label == "age" ? (
           <AgePicker
-            field={field}
             selectedValue={selectedValue}
             setSelectedValue={setSelectedValue}
           />
         ) : (
           <GenderPicker
-            field={field}
             selectedValue={selectedValue}
             setSelectedValue={setSelectedValue}
           />
