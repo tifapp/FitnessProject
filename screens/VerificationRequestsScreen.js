@@ -14,9 +14,6 @@ import {
   View,
 } from "react-native";
 
-// @ts-ignore
-var styles = require("styles/stylesheet");
-
 var allSettled = require("promise.allsettled");
 
 function VerificationRequestItem({ deleteRequest, item }) {

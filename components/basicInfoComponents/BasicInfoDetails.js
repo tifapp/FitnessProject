@@ -1,6 +1,6 @@
 import TouchableWithModal from "@components/TouchableWithModal";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import AgePicker from "./AgePicker";
 import GenderPicker from "./GenderPicker";
 
@@ -28,31 +28,5 @@ const BasicInfoDetails = ({ age, gender, setAge, setGender }) => {
     </TouchableWithModal>
   );
 };
-
-const styles = StyleSheet.create({
-  textBoxStyle: {
-    flexDirection: "row",
-    height: 35,
-    marginBottom: 8,
-    alignItems: "center",
-    paddingRight: 10,
-  },
-  textInputStyle: {
-    fontSize: 15,
-    marginHorizontal: 10,
-    height: 30,
-    flex: 1,
-    borderBottomWidth: 1,
-    borderBottomColor: "gray",
-  },
-  emptyTextInputStyle: {
-    fontSize: 15,
-    marginHorizontal: 10,
-    height: 30,
-    flex: 1,
-    borderBottomWidth: 1,
-    borderBottomColor: "red",
-  },
-});
 
 export default BasicInfoDetails;

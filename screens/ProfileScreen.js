@@ -26,8 +26,6 @@ import BasicInfoDetails from "../components/basicInfoComponents/BasicInfoDetails
 import { createUser, updateUser } from "../src/graphql/mutations";
 import { getUser } from "../src/graphql/queries";
 
-var styles = require("styles/stylesheet");
-
 const ProfileScreen = ({ navigation, route }) => {
   const [loading, setLoading] = useState(true);
   const [imageChanged, setImageChanged] = useState(false);
@@ -465,3 +463,36 @@ const ProfileScreen = ({ navigation, route }) => {
 };
 
 export default ProfileScreen;
+
+const styles = StyleSheet.create({
+  containerStyle: {
+    flex: 1,
+    backgroundColor: "#fffffd",
+  },
+  emptyTextInputStyle: {},
+  rowContainerStyle: {
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  textButtonTextStyle: {
+    color: "blue",
+    alignSelf: "center",
+    marginBottom: 2,
+    marginHorizontal: 6,
+  },
+  buttonStyle: {
+    alignSelf: "center",
+    backgroundColor: "blue",
+    padding: 10,
+    borderRadius: 5,
+    marginHorizontal: 6,
+  },
+  buttonTextStyle: {
+    color: "white",
+    alignSelf: "center",
+    fontWeight: "bold",
+    fontSize: 20,
+    marginBottom: 2,
+    marginHorizontal: 6,
+  },
+});

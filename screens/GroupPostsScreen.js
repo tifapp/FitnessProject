@@ -6,9 +6,6 @@ import { Text, TouchableOpacity, View } from "react-native";
 
 //const { width } = Dimensions.get('window');
 
-// @ts-ignore
-var styles = require("styles/stylesheet");
-
 export default function GroupPostsScreen({ navigation, route }) {
   const { group } = route.params;
   //console.log(route.params);

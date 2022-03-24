@@ -31,13 +31,11 @@ import {
   Alert,
   Dimensions,
   ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-
-// @ts-ignore
-var styles = require("styles/stylesheet");
 
 const LookupUser = ({ route, navigation }) => {
   const [friendStatus, setFriendStatus] = useState("loading"); //can be either "received", "sent", "friends", or "none". don't misspell!
@@ -802,3 +800,12 @@ const LookupUser = ({ route, navigation }) => {
 };
 
 export default LookupUser;
+
+const styles = StyleSheet.create({
+  viewProfileScreen: {
+    alignItems: "center",
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  buttonFormat: {},
+});

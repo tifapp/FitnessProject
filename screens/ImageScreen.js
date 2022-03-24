@@ -2,8 +2,6 @@
 import React from "react";
 import { Image, View } from "react-native";
 
-var styles = require("../styles/stylesheet");
-
 const ImageScreen = ({ route, navigation }) => {
   //const { uri } = route.params;
   const { uri } = route.params;
