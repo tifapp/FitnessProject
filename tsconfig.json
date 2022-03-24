@@ -15,6 +15,7 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
+    "plugins": [],
     "paths": {
       "@screens/*": [
         "./screens/*"
