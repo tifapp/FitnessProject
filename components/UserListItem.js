@@ -5,8 +5,6 @@ import React from "react";
 import { Text, View } from "react-native";
 import { ProfileImageAndName } from "./ProfileImageAndName";
 
-var styles = require("../styles/stylesheet");
-
 export default function UserListItem({ item, matchingname }) {
   return (
     <ProfileImageAndName

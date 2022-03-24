@@ -10,10 +10,8 @@ import {
   Image,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
-
-var styles = require("../styles/stylesheet");
 
 // @ts-ignore
 global.savedUsers = {};

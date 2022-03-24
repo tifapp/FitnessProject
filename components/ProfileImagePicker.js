@@ -2,8 +2,6 @@ import React from "react";
 import { Alert, Dimensions, Image, TouchableOpacity } from "react-native";
 import usePhotos from "../hooks/usePhotos";
 
-var styles = require("../styles/stylesheet");
-
 const ProfilePic = ({ imageURL, setImageURL, setImageChanged }) => {
   const [pickFromGallery, pickFromCamera] = usePhotos();
 

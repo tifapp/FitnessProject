@@ -6,10 +6,8 @@ import {
   FlatList,
   RefreshControl,
   Text,
-  View,
+  View
 } from "react-native";
-
-var styles = require("../styles/stylesheet");
 
 class APIList extends PureComponent {
   //we need to make this a class to use refs from the parent

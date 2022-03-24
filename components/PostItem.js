@@ -11,7 +11,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import IconButton from "./common/IconButton";
 import Modal from "./common/Modal";
@@ -248,4 +248,10 @@ export default React.memo(function PostItem({
       ) : null}
     </View>
   );
+});
+
+const styles = StyleSheet.create({
+  secondaryContainerStyle: {
+    backgroundColor: "#fefefe",
+  }
 });

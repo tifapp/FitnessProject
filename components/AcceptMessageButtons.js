@@ -6,11 +6,9 @@ import { View } from "react-native";
 import {
   createBlock,
   deleteConversation,
-  updateConversation,
+  updateConversation
 } from "../src/graphql/mutations";
 import { getConversation } from "../src/graphql/queries";
-
-var styles = require("../styles/stylesheet");
 
 export default function AcceptMessageButtons({
   navigation,

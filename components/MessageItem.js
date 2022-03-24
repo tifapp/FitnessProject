@@ -94,3 +94,9 @@ export default React.memo(function MessageItem({
     </View>
   );
 });
+
+const styles = StyleSheet.create({
+  secondaryContainerStyle: {
+    backgroundColor: "#fefefe",
+  }
+});
