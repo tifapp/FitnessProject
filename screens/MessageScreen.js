@@ -7,11 +7,8 @@ import { onDeleteConversation } from "@graphql/subscriptions";
 import FeedScreen from "@screens/FeedScreen";
 import { API, graphqlOperation } from "aws-amplify";
 import React, { useEffect, useState } from "react";
-import { KeyboardAvoidingView, View } from "react-native";
+import { KeyboardAvoidingView, StyleSheet, View } from "react-native";
 //const { width } = Dimensions.get('window');
-
-// @ts-ignore
-var styles = require("styles/stylesheet");
 
 export default function MessageScreen({ navigation, route }) {
   //console.log(red);
@@ -153,7 +150,7 @@ export default function MessageScreen({ navigation, route }) {
             <View>
               <ProfileImageAndName
                 vertical={true}
-                imageStyle={[styles.imageStyle, { marginVertical: 15 }]}
+                imageStyle={styles.imageStyle}
                 imageLayoutStyle={{ margin: 0 }}
                 userId={userId}
                 navigateToProfile={false}
@@ -183,3 +180,12 @@ export default function MessageScreen({ navigation, route }) {
     </KeyboardAvoidingView>
   );
 }
+
+const styles = StyleSheet.create({
+  imageStyle: {
+    marginVertical: 15,
+    alignSelf: "center",
+    height: 125,
+    width: 125,
+  },
+});

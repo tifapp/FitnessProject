@@ -53,8 +53,6 @@ linkify
 
 require("root/androidtimerfix");
 
-var styles = require("styles/stylesheet");
-
 var allSettled = require("promise.allsettled");
 
 const viewabilityConfig = {
@@ -996,3 +994,18 @@ function PostInputField({
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  textInputStyle: {
+    marginHorizontal: 10,
+    borderBottomWidth: 2,
+    borderBottomColor: "gray",
+  },
+  offlineContainer: {
+    backgroundColor: "#b52424",
+    height: 30,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  offlineText: { color: "#fff" },
+});

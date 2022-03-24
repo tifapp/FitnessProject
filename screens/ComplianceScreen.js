@@ -1,8 +1,11 @@
 import React from "react";
-import { Linking, Text, TouchableOpacity, View } from "react-native";
-
-// @ts-ignore
-var styles = require("styles/stylesheet");
+import {
+  Linking,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const ComplianceScreen = ({ navigation }) => {
   return (
@@ -68,3 +71,21 @@ const ComplianceScreen = ({ navigation }) => {
 };
 
 export default ComplianceScreen;
+
+const styles = StyleSheet.create({
+  buttonStyle: {
+    alignSelf: "center",
+    backgroundColor: "blue",
+    padding: 10,
+    borderRadius: 5,
+    marginHorizontal: 6,
+  },
+  buttonTextStyle: {
+    color: "white",
+    alignSelf: "center",
+    fontWeight: "bold",
+    fontSize: 20,
+    marginBottom: 2,
+    marginHorizontal: 6,
+  },
+});

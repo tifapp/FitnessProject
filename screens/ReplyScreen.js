@@ -5,8 +5,6 @@ import FeedScreen from "@screens/FeedScreen";
 import React from "react";
 import { View } from "react-native";
 
-var styles = require("styles/stylesheet");
-
 export default function ReplyScreen({ navigation, route }) {
   const { op } = route.params;
 
@@ -28,3 +26,10 @@ export default function ReplyScreen({ navigation, route }) {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  containerStyle: {
+    flex: 1,
+    backgroundColor: "#fffffd",
+  },
+});

@@ -7,8 +7,6 @@ import { Text, View } from "react-native";
 import { updateUser } from "root/src/graphql/mutations";
 import { getUser } from "root/src/graphql/queries";
 
-var styles = require("styles/stylesheet");
-
 const PrivacyScreen = ({ navigation, route }) => {
   const [previousSettings, setPreviousSettings] = useState();
 

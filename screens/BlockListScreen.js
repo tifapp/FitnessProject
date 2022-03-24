@@ -1,4 +1,3 @@
-// @ts-nocheck
 import APIList from "@components/APIList";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import { deleteBlock } from "@graphql/mutations";
@@ -9,16 +8,15 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   LayoutAnimation,
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 
-// @ts-ignore
-var styles = require("styles/stylesheet");
-
 const BlockListScreen = ({ navigation, route }) => {
   const listRef = useRef();
+  // @ts-ignore
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
 
   const alertOptions = {
@@ -33,14 +31,17 @@ const BlockListScreen = ({ navigation, route }) => {
         text: "Yes",
         onPress: () => {
           console.log("about to delete this user: ", blockeeId);
+          // @ts-ignore
           global.localBlockList = global.localBlockList.filter(
             (item) => item.blockee != blockeeId
           );
           LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+          // @ts-ignore
           listRef.mutateData((blocklist) => {
             const results = blocklist.filter(
               (item) => item.blockee != blockeeId
             );
+            // @ts-ignore
             global.localBlockList = results;
             return results;
           });
@@ -66,6 +67,7 @@ const BlockListScreen = ({ navigation, route }) => {
     const onFocus = navigation.addListener("focus", () => {
       //console.log("got to settings", global.localBlockList);
       //we just want to save a copy of the data
+      // @ts-ignore
       listRef.mutateData(() => [...global.localBlockList]);
     });
 
@@ -90,6 +92,7 @@ const BlockListScreen = ({ navigation, route }) => {
           }}
         >
           <ProfileImageAndName
+            // @ts-ignore
             imageStyle={[styles.smallImageStyle, { marginHorizontal: 20 }]}
             userId={item.blockee}
             sibling={
@@ -137,3 +140,11 @@ const BlockListScreen = ({ navigation, route }) => {
 };
 
 export default BlockListScreen;
+
+const styles = StyleSheet.create({
+  smallImageStyle: {
+    resizeMode: "cover",
+    height: 50,
+    width: 50,
+  },
+});

@@ -20,9 +20,6 @@ import {
               )}
 */
 
-// @ts-ignore
-var styles = require("styles/stylesheet");
-
 var allSettled = require("promise.allsettled");
 
 const VerificationScreen = ({ navigation, route }) => {
@@ -261,3 +258,10 @@ const VerificationScreen = ({ navigation, route }) => {
 };
 
 export default VerificationScreen;
+
+const styles = StyleSheet.create({
+  containerStyle: {
+    flex: 1,
+    backgroundColor: "#fffffd",
+  },
+});

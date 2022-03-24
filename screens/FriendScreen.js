@@ -23,8 +23,6 @@ import {
 //import { listConversations } from "../amplify/#current-cloud-backend/function/backendResources/opt/queries";
 //conversations and friends should be deleted when user is deleted
 
-// @ts-ignore
-var styles = require("styles/stylesheet");
 var subscriptions = [];
 
 function FriendList({ navigation, route }) {

@@ -7,15 +7,13 @@ import { listGroups, listUsers } from "@graphql/queries";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Keyboard,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-
-// @ts-ignore
-var styles = require("styles/stylesheet");
 
 function titleCase(str) {
   var splitStr = str.toLowerCase().split(" ");
@@ -310,3 +308,14 @@ function Tab({ label, onPress, isSelected }) {
     </TouchableOpacity>
   );
 }
+
+const styles = StyleSheet.create({
+  textInputStyle: {
+    marginHorizontal: 10,
+    borderBottomWidth: 2,
+    borderBottomColor: "gray",
+  },
+  spacingTop: {
+    marginTop: 10,
+  },
+});

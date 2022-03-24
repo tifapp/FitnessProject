@@ -14,8 +14,6 @@ import {
   View,
 } from "react-native";
 
-var styles = require("styles/stylesheet");
-
 var allSettled = require("promise.allsettled");
 
 export default function ReportScreen() {

@@ -15,8 +15,6 @@ import {
   listConversations,
 } from "../src/graphql/queries";
 
-// @ts-ignore
-var styles = require("styles/stylesheet");
 var subscriptions = [];
 
 export default function ConversationScreen({ navigation, route }) {
