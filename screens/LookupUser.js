@@ -23,7 +23,6 @@ import {
 import computeDistance from "@hooks/computeDistance";
 import printTime from "@hooks/printTime";
 import { loadCapitals } from "@hooks/stringConversion";
-import getLocation from "@hooks/useLocation";
 import { API, graphqlOperation } from "aws-amplify";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -754,12 +753,10 @@ const LookupUser = ({ route, navigation }) => {
         />
       </View>
 
-      {getLocation() != null && user.latitude != null ? (
-        <View style={styles.viewProfileScreen}>
-          <Text style={styles.viewProfileScreen}>
-            {computeDistance([user.latitude, user.longitude])} mi. away
-          </Text>
-        </View>
+      {global.location != null && user.location != null ? (
+        <Text style={styles.viewProfileScreen}>
+          {computeDistance(user.location)} mi. away
+        </Text>
       ) : null}
       {route.params?.myId != user.id ? (
         <View style={styles.buttonFormat}>

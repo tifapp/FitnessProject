@@ -1,7 +1,6 @@
-import getLocation from "@hooks/useLocation";
-
 export default function computeDistance(otherLocation) {
-  const location = getLocation(true);
+  // @ts-ignore
+  const location = global.location;
   const prevLatInRad = toRad(location.latitude);
   const prevLongInRad = toRad(location.longitude);
   const latInRad = toRad(otherLocation.latitude);

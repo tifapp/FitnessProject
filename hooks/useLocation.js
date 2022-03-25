@@ -16,24 +16,24 @@ async function locateUser(ask) {
       );
     }
 
-    // @ts-ignore
-    global.location = null;
+    return null;
   } else {
     let location = await Location.getCurrentPositionAsync({ accuracy: 3 });
-    // @ts-ignore
-    global.location = {
+    return {
       latitude: location.coords.latitude,
       longitude: location.coords.longitude,
     };
   }
 }
 
-export default function getLocation(ask = false) {
+export default async function getLocationAsync(ask = false, callback) {
+  let location;
   // @ts-ignore
   if (global.location == null) {
-    locateUser(ask);
+    location = await locateUser(ask);
+    // @ts-ignore
+    global.location = location;
   }
 
-  // @ts-ignore
-  return global.location;
+  callback(location);
 }

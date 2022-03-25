@@ -3,7 +3,11 @@ import StatusColors from "@hooks/statusColors";
 import React from "react";
 import { Text, View } from "react-native";
 
-export default function StatusIndicator({ status, shouldShow, isVerified }) {
+export default function StatusIndicator({
+  status,
+  shouldShow,
+  isVerified = null,
+}) {
   if (status || shouldShow)
     return (
       <View style={{ flexDirection: "row" }}>

@@ -1,6 +1,5 @@
 import computeDistance from "@hooks/computeDistance";
 import { loadCapitals } from "@hooks/stringConversion";
-import getLocation from "@hooks/useLocation";
 import React from "react";
 import { Text, View } from "react-native";
 import { ProfileImageAndName } from "./ProfileImageAndName";
@@ -33,9 +32,12 @@ export default function UserListItem({ item, matchingname }) {
       ]}
       subtitleComponent={
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          {getLocation() != null && item.latitude != null ? (
-            <Text>{computeDistance([item.latitude, item.longitude])} mi.</Text>
-          ) : null}
+          {
+            // @ts-ignore
+            global.location != null && item.location != null ? (
+              <Text>{computeDistance(item.location)} mi.</Text>
+            ) : null
+          }
           {loadCapitals(item.bio).length > 0 ? (
             <Text
               style={{

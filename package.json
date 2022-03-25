@@ -25,6 +25,7 @@
     "expo": "^41.0.0",
     "expo-app-loading": "^1.0.1",
     "expo-av": "~9.1.2",
+    "expo-document-picker": "~9.1.2",
     "expo-haptics": "~10.0.0",
     "expo-image-manipulator": "~9.1.0",
     "expo-image-picker": "~10.1.4",
@@ -46,8 +47,7 @@
     "react-native-screens": "~3.0.0",
     "react-native-web": "~0.13.12",
     "react-navigation": "^4.4.1",
-    "tlds": "^1.221.1",
-    "expo-document-picker": "~9.1.2"
+    "tlds": "^1.221.1"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0",

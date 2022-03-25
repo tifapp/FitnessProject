@@ -1,22 +1,20 @@
-// @ts-nocheck
 import StatusPicker from "@components/basicInfoComponents/StatusPicker";
+import LocationButton from "@components/LocationButton";
 import ProfilePic from "@components/ProfileImagePicker";
 import StatusIndicator from "@components/StatusIndicator";
 import TouchableWithModal from "@components/TouchableWithModal";
-import { Ionicons } from "@expo/vector-icons";
 import fetchProfileImageAsync from "@hooks/fetchProfileImage";
 import { loadCapitals, saveCapitals } from "@hooks/stringConversion";
-import getLocation from "@hooks/useLocation";
-import CheckBox from "@react-native-community/checkbox"; //when ios is supported, we'll use this
 import { API, Auth, Cache, graphqlOperation, Storage } from "aws-amplify";
 import * as ImageManipulator from "expo-image-manipulator";
+import { SaveFormat } from "expo-image-manipulator";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Platform,
   SafeAreaView,
   ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -34,11 +32,11 @@ const ProfileScreen = ({ navigation, route }) => {
   const [identityId, setIdentityId] = useState();
   const [age, setAge] = useState(18);
   const [gender, setGender] = useState("Male");
-  const [status, setStatus] = useState();
+  const [status, setStatus] = useState("");
   const [isVerified, setIsVerified] = useState();
   const [bioDetails, setBioDetails] = useState("");
   const [goalsDetails, setGoalsDetails] = useState("");
-  const [location, setLocation] = useState();
+  const [locationEnabled, setLocationEnabled] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -47,6 +45,7 @@ const ProfileScreen = ({ navigation, route }) => {
       const user = await API.graphql(
         graphqlOperation(getUser, { id: route.params?.myId })
       );
+      // @ts-ignore
       const fields = user.data.getUser;
 
       console.log("fetched user result is ", fields);
@@ -62,6 +61,7 @@ const ProfileScreen = ({ navigation, route }) => {
           lastModified: "3000",
           imageURL: imageURL,
         });
+        // @ts-ignore
         global.savedUsers[route.params?.myId] = {
           name: loadCapitals(fields.name),
           imageURL: imageURL,
@@ -77,10 +77,7 @@ const ProfileScreen = ({ navigation, route }) => {
         setGoalsDetails(loadCapitals(fields.goals));
         setStatus(fields.status);
         setIsVerified(fields.isVerified);
-        //setLocationEnabled(fields.latitude != null);
-        if (fields.location != null) {
-          updateUserLocationAsync(getLocation(true));
-        }
+        setLocationEnabled(fields.location != null);
       }
 
       setLoading(false);
@@ -94,14 +91,9 @@ const ProfileScreen = ({ navigation, route }) => {
         gender: gender,
         bio: saveCapitals(bioDetails),
         goals: saveCapitals(goalsDetails),
-        location: location,
       }); //add a debounce on the textinput, or just when the keyboard is dismissed
     }
-  }, [age, gender, bioDetails, goalsDetails, location]);
-
-  useEffect(() => {
-    setLocation(getLocation(true));
-  }, [global.location]);
+  }, [age, gender, bioDetails, goalsDetails]);
 
   const saveProfilePicture = async () => {
     if (imageURL != "") {
@@ -109,7 +101,7 @@ const ProfileScreen = ({ navigation, route }) => {
         //should be doing this in the backend. but if we can just make sure they're using the app to upload and not a third party app, maybe we wont need it?
         imageURL,
         [{ resize: { width: 300 } }], // resize to width of 300 and preserve aspect ratio
-        { compress: 1, format: "jpeg" }
+        { compress: 1, format: SaveFormat.JPEG }
       );
       const response = await fetch(resizedPhoto.uri);
       const blob = await response.blob();
@@ -121,12 +113,14 @@ const ProfileScreen = ({ navigation, route }) => {
 
       console.log("changing cached profile pic");
       Cache.setItem(identityId, { lastModified: "3000", imageURL: imageURL });
+      // @ts-ignore
       global.savedUsers[route.params?.myId].imageURL = imageURL;
     } else {
       Storage.remove("profileimage.jpg", { level: "protected" })
         .then((result) => console.log("removed profile image!", result))
         .catch((err) => console.log(err));
       Cache.setItem(identityId, { lastModified: "3000", imageURL: "" });
+      // @ts-ignore
       global.savedUsers[route.params?.myId].imageURL = "";
     }
   };
@@ -159,21 +153,27 @@ const ProfileScreen = ({ navigation, route }) => {
   };
 
   const updateUserLocationAsync = async (location) => {
+    if (location == null) setLocationEnabled(false);
     //if user doesn't exist, make one
     try {
       const user = await API.graphql(
         graphqlOperation(getUser, { id: route.params?.myId })
       );
+      //do we need the id? can't remember if this is generated
+      // @ts-ignore
       const fields = user.data.getUser;
-      console.log("returning users fields looks like", fields);
-
-      const ourUser = {
-        location: location,
-      };
 
       if (fields != null) {
-        await API.graphql(graphqlOperation(updateUser, { input: ourUser }));
+        await API.graphql(
+          graphqlOperation(updateUser, {
+            input: {
+              location: location,
+            },
+          })
+        );
       }
+
+      setLocationEnabled(true);
     } catch (err) {
       console.log("error: ", err);
     }
@@ -191,7 +191,6 @@ const ProfileScreen = ({ navigation, route }) => {
           gender: gender,
           bio: saveCapitals(bioDetails),
           goals: saveCapitals(goalsDetails),
-          location: location,
         },
         true
       ) //add a debounce on the textinput, or just when the keyboard is dismissed
@@ -217,7 +216,6 @@ const ProfileScreen = ({ navigation, route }) => {
           flex: 1,
           justifyContent: "center",
           flexDirection: "row",
-          justifyContent: "space-around",
           padding: 10,
         }}
       />
@@ -263,6 +261,7 @@ const ProfileScreen = ({ navigation, route }) => {
                   onEndEditing={() => {
                     if (!route.params?.newUser) {
                       updateUserAsync({ name: saveCapitals(name) }); //should be doing savecapitals in the backend
+                      // @ts-ignore
                       global.savedUsers[route.params?.myId].name = name;
                     }
                   }}
@@ -295,7 +294,7 @@ const ProfileScreen = ({ navigation, route }) => {
                             hideModal();
                             navigation.navigate("Verification");
                           } else if (val === "None") {
-                            setStatus(), updateUserAsync({ status: null });
+                            setStatus(null), updateUserAsync({ status: null });
                           } else {
                             setStatus(val), updateUserAsync({ status: val });
                           }
@@ -307,7 +306,11 @@ const ProfileScreen = ({ navigation, route }) => {
                   <StatusIndicator status={status} shouldShow={true} />
                 </TouchableWithModal>
               ) : (
-                <StatusIndicator status={status} isVerified={isVerified} />
+                <StatusIndicator
+                  status={status}
+                  isVerified={isVerified}
+                  shouldShow={false}
+                />
               )}
             </View>
           </View>
@@ -410,44 +413,10 @@ const ProfileScreen = ({ navigation, route }) => {
             />
           </TouchableWithModal>
 
-          <TouchableOpacity
-            style={[styles.rowContainerStyle, { marginBottom: 20 }]}
-            onPress={() => {
-              if (location == null) getLocation(true), setLocation("loading");
-              else setLocation(null);
-            }}
-          >
-            {location === "loading" ? (
-              <ActivityIndicator
-                size="small"
-                color="blue"
-                style={{
-                  padding: 6,
-                }}
-              />
-            ) : Platform.OS === "android" ? (
-              <CheckBox disabled={true} value={location != null} />
-            ) : location == null ? (
-              <Ionicons
-                size={16}
-                style={{ marginBottom: 0 }}
-                name="md-square-outline"
-                color="blue"
-              />
-            ) : (
-              <Ionicons
-                size={16}
-                style={{ marginBottom: 0 }}
-                name="md-checkbox-outline"
-                color="blue"
-              />
-            )}
-            <Text style={styles.textButtonTextStyle}>
-              {location === "loading"
-                ? "Locating user"
-                : "Let others see your location"}
-            </Text>
-          </TouchableOpacity>
+          <LocationButton
+            locationEnabled={locationEnabled}
+            setLocationFunction={updateUserLocationAsync}
+          />
           {route.params?.newUser ? ( //if name is blank?
             <TouchableOpacity
               style={[styles.buttonStyle, { marginBottom: 25 }]}
