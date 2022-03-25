@@ -4,9 +4,13 @@ import PostImage from "@components/PostImage";
 import printTime from "@hooks/printTime";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
-import { Dimensions, Text, TouchableOpacity, View } from "react-native";
-
-var styles = require("styles/stylesheet");
+import {
+  Dimensions,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default React.memo(function MessageItem({
   item,
@@ -98,5 +102,5 @@ export default React.memo(function MessageItem({
 const styles = StyleSheet.create({
   secondaryContainerStyle: {
     backgroundColor: "#fefefe",
-  }
+  },
 });

@@ -1,6 +1,7 @@
 // @ts-nocheck
+import ListGroupItem from "@components/ListGroupItem";
+import { listGroups } from "@graphql/queries";
 import { API, graphqlOperation } from "aws-amplify";
-import ListGroupItem from "components/ListGroupItem";
 import React, { useEffect, useState } from "react";
 import {
   FlatList,
@@ -10,7 +11,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { listGroups } from "root/src/graphql/queries";
 
 export default function MyGroups({ navigation, route }) {
   const [users, setUsers] = useState([]);

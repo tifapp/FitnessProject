@@ -15,6 +15,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import ReportScreen from "@screens/adminScreens/ReportScreen";
+import VerificationRequestsScreen from "@screens/adminScreens/VerificationRequestsScreen";
 import ComplianceScreen from "@screens/ComplianceScreen";
 import ConversationScreen from "@screens/ConversationScreen";
 import CustomSidebarMenu from "@screens/CustomSidebarMenu";
@@ -23,8 +25,6 @@ import ImageScreen from "@screens/ImageScreen";
 import MessageScreen from "@screens/MessageScreen";
 import MyGroupsScreen from "@screens/MyGroupsScreen";
 import ProfileScreen from "@screens/ProfileScreen";
-import ReportScreen from "@screens/ReportScreen";
-import VerificationRequestsScreen from "@screens/VerificationRequestsScreen";
 import VerificationScreen from "@screens/VerificationScreen";
 import MainStack from "@stacks/MainStack";
 import SettingsStack from "@stacks/SettingsStack";
@@ -90,8 +90,6 @@ const config = {
 
 Cache.configure(config);
 //Cache.clear(); //will we have to do this for the next build?
-
-var styles = require("./styles/stylesheet");
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();

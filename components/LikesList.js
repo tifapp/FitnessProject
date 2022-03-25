@@ -14,8 +14,6 @@ import { LayoutAnimation, SafeAreaView, Text } from "react-native";
 
 require("root/androidtimerfix");
 
-var styles = require("styles/stylesheet");
-
 export default function LikesList({ postId }) {
   const listRef = useRef();
 

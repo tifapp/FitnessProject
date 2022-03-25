@@ -9,8 +9,6 @@ import {
   View,
 } from "react-native";
 
-var styles = require("../styles/stylesheet");
-
 export default function Accordion(props) {
   const [open, setOpen] = useState(props.open);
   const animatedController = useRef(new Animated.Value(0)).current;

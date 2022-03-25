@@ -5,8 +5,6 @@ import { Alert, View } from "react-native";
 import IconButton from "./common/IconButton";
 import { ProfileImageAndName } from "./ProfileImageAndName";
 
-var styles = require("../styles/stylesheet");
-
 export default function FriendRequestListItem({
   item,
   respondRequestHandler,

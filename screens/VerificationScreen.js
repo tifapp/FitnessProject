@@ -9,6 +9,7 @@ import {
   Animated,
   SafeAreaView,
   ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,

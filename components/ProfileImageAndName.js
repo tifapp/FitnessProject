@@ -1,16 +1,16 @@
 // @ts-nocheck
 import { MaterialIcons } from "@expo/vector-icons";
+import fetchUserAsync from "@hooks/fetchName";
+import fetchProfileImageAsync from "@hooks/fetchProfileImage";
+import StatusColors from "@hooks/statusColors";
 import { useNavigation } from "@react-navigation/native";
-import fetchUserAsync from "hooks/fetchName";
-import fetchProfileImageAsync from "hooks/fetchProfileImage";
-import StatusColors from "hooks/statusColors";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 
 // @ts-ignore

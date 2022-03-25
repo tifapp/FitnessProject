@@ -1,10 +1,8 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { Alert, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import IconButton from "./common/IconButton";
 import { ProfileImageAndName } from "./ProfileImageAndName";
-
-var styles = require("../styles/stylesheet");
 
 export default function FriendListItem({
   item,
@@ -167,12 +165,7 @@ export default function FriendListItem({
           textLayoutStyle={{ flex: 1, flexGrow: 1 }}
           subtitleComponent={
             <TouchableOpacity
-              style={[
-                styles.subtitleButton,
-                {
-                  alignItems: "flex-start",
-                },
-              ]}
+              style={styles.subtitleButton}
               onPress={() => {
                 console.log("message pressed, " + isMessageOpen);
                 item.isRead = true;
@@ -222,3 +215,12 @@ export default function FriendListItem({
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  subtitleButton: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    paddingTop: 8,
+    paddingHorizontal: 4,
+  },
+});

@@ -8,18 +8,17 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useRef, useState } from "react";
 import {
   Dimensions,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import IconButton from "./common/IconButton";
 import Modal from "./common/Modal";
 import CommentsModal from "./postComponents/CommentsModal";
 import LikesModal from "./postComponents/LikesModal";
 import { ProfileImageAndName } from "./ProfileImageAndName";
-
-var styles = require("../styles/stylesheet");
 
 export default React.memo(function PostItem({
   item,
@@ -47,32 +46,23 @@ export default React.memo(function PostItem({
   const [editedText, setEditedText] = useState("");
 
   return (
-    <View
-      style={[
-        styles.secondaryContainerStyle,
-        {
-          backgroundColor: "#a9efe0",
-        },
-      ]}
-    >
+    <View style={styles.secondaryContainerStyle}>
       <View
         style={[
           styles.spaceAround,
-          replyButtonHandler
-            ? {}
-            : {
-                marginBottom: 20,
-                backgroundColor: "white",
-                shadowColor: "#000",
-                shadowOffset: {
-                  width: 0,
-                  height: 1,
-                },
-                shadowOpacity: 0.18,
-                shadowRadius: 1.0,
+          replyButtonHandler ?? {
+            marginBottom: 20,
+            backgroundColor: "white",
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 1,
+            },
+            shadowOpacity: 0.18,
+            shadowRadius: 1.0,
 
-                elevation: 1,
-              },
+            elevation: 1,
+          },
         ]}
       >
         <PostHeader
@@ -252,6 +242,43 @@ export default React.memo(function PostItem({
 
 const styles = StyleSheet.create({
   secondaryContainerStyle: {
-    backgroundColor: "#fefefe",
-  }
+    backgroundColor: "#a9efe0",
+  },
+  spaceAround: {
+    paddingLeft: 0,
+    paddingTop: 0,
+    paddingRight: 0,
+    paddingBottom: 0,
+  },
+  check: {
+    padding: 25,
+    marginTop: 16,
+    borderColor: "#bbb",
+    borderWidth: 2,
+    borderStyle: "solid",
+  },
+  unselectedButtonStyle: {
+    borderWidth: 2,
+    borderColor: "gray",
+    alignSelf: "center",
+    backgroundColor: "transparent",
+    padding: 9,
+    borderRadius: 5,
+    marginHorizontal: 10,
+  },
+  buttonTextStyle: {
+    color: "white",
+    alignSelf: "center",
+    fontWeight: "bold",
+    fontSize: 20,
+    marginBottom: 2,
+    marginHorizontal: 6,
+  },
+  buttonStyle: {
+    alignSelf: "center",
+    backgroundColor: "blue",
+    padding: 10,
+    borderRadius: 5,
+    marginHorizontal: 6,
+  },
 });

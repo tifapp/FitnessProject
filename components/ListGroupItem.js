@@ -3,8 +3,6 @@ import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
-var styles = require("../styles/stylesheet");
-
 export default function ListGroupItem({ item, matchingname }) {
   const navigation = useNavigation();
 
