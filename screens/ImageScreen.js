@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React from "react";
-import { Image, View } from "react-native";
+import { Image } from "react-native";
 
 const ImageScreen = ({ route, navigation }) => {
   //const { uri } = route.params;
@@ -8,17 +8,15 @@ const ImageScreen = ({ route, navigation }) => {
   console.log("testing");
 
   return (
-    <View>
-      <Image
-        style={{
-          resizeMode: "contain",
-          resizeMethod: "scale",
-          height: "100%",
-          width: "100%",
-        }}
-        source={uri === "" ? require("../assets/icon.png") : { uri: uri }}
-      />
-    </View>
+    <Image
+      style={{
+        resizeMode: "contain",
+        resizeMethod: "scale",
+        height: "100%",
+        width: "100%",
+      }}
+      source={uri === "" ? require("../assets/icon.png") : { uri: uri }}
+    />
   );
 };
 
