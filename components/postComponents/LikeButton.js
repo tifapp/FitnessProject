@@ -76,6 +76,7 @@ export default function LikeButton({
       label={likes + ""}
       isLabelFirst={true}
       onPress={likePostAsync}
+      fontWeight={"bold"}
     />
   );
 }

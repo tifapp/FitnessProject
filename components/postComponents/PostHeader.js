@@ -177,6 +177,7 @@ export default function PostHeader({
             label={replies + ""}
             isLabelFirst={true}
             onPress={repliesPressed}
+            fontWeight={"bold"}
           />
         </View>
       ) : null}

@@ -72,7 +72,6 @@ export default React.memo(function PostItem({
           writtenByYou={writtenByYou}
           toggleEditing={() => setIsEditing(!isEditing)}
           repliesPressed={repliesModalRef.current?.showModal}
-          areRepliesVisible={areRepliesVisible}
           reportPost={reportPost}
           shouldSubscribe={shouldSubscribe}
         />
@@ -86,7 +85,10 @@ export default React.memo(function PostItem({
             marginBottom: 15,
           }}
           imageID={item.imageURL}
-          isVisible={isVisible && !areRepliesVisible}
+          isVisible={
+            isVisible
+            // && !areRepliesVisible
+          }
         />
 
         <View
