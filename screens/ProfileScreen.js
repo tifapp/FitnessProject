@@ -5,6 +5,7 @@ import StatusIndicator from "@components/StatusIndicator";
 import TouchableWithModal from "@components/TouchableWithModal";
 import fetchProfileImageAsync from "@hooks/fetchProfileImage";
 import { loadCapitals, saveCapitals } from "@hooks/stringConversion";
+import getLocationAsync from "@hooks/useLocation";
 import { API, Auth, Cache, graphqlOperation, Storage } from "aws-amplify";
 import * as ImageManipulator from "expo-image-manipulator";
 import { SaveFormat } from "expo-image-manipulator";
@@ -77,7 +78,12 @@ const ProfileScreen = ({ navigation, route }) => {
         setGoalsDetails(loadCapitals(fields.goals));
         setStatus(fields.status);
         setIsVerified(fields.isVerified);
-        setLocationEnabled(fields.location != null);
+        if (fields.location != null) {
+          setLocationEnabled(true);
+          getLocationAsync(true, (location) => {
+            updateUserLocationAsync(location);
+          });
+        }
       }
 
       setLoading(false);
@@ -151,6 +157,11 @@ const ProfileScreen = ({ navigation, route }) => {
       console.log("error: ", err);
     }
   };
+
+  useEffect(() => {
+    console.log("IS THE KOCATION BUTTON ENABLED");
+    console.log(locationEnabled);
+  }, [locationEnabled]);
 
   const updateUserLocationAsync = async (location) => {
     if (location == null) setLocationEnabled(false);

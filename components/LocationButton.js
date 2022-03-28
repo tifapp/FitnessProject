@@ -18,17 +18,12 @@ export default function LocationButton({
 
   const updateLocation = () => {
     getLocationAsync(true, (location) => {
+      console.log("LOCATION IS SET");
       setLocationFunction(location);
       setIsLoading(false);
     }),
       setIsLoading(true);
   };
-
-  useEffect(() => {
-    if (locationEnabled) {
-      updateLocation(); //may make an extra call on startup
-    }
-  }, [locationEnabled]);
 
   return (
     <TouchableOpacity
