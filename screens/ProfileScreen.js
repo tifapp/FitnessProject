@@ -19,7 +19,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import BasicInfoDetails from "../components/basicInfoComponents/BasicInfoDetails";
 import { createUser, updateUser } from "../src/graphql/mutations";
@@ -159,7 +159,7 @@ const ProfileScreen = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    console.log("IS THE KOCATION BUTTON ENABLED");
+    console.log("IS THE LOCATION BUTTON ENABLED");
     console.log(locationEnabled);
   }, [locationEnabled]);
 
@@ -184,7 +184,7 @@ const ProfileScreen = ({ navigation, route }) => {
         );
       }
 
-      setLocationEnabled(true);
+      //setLocationEnabled(true);
     } catch (err) {
       console.log("error: ", err);
     }
@@ -426,6 +426,7 @@ const ProfileScreen = ({ navigation, route }) => {
 
           <LocationButton
             locationEnabled={locationEnabled}
+            setLocationEnabled = {setLocationEnabled}
             setLocationFunction={updateUserLocationAsync}
           />
           {route.params?.newUser ? ( //if name is blank?

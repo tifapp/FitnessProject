@@ -1,36 +1,43 @@
 import { Ionicons } from "@expo/vector-icons";
 import getLocationAsync from "@hooks/useLocation";
 import CheckBox from "@react-native-community/checkbox"; //when ios is supported, we'll use this
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   Platform,
   StyleSheet,
   Text,
-  TouchableOpacity,
+  TouchableOpacity
 } from "react-native";
 
 export default function LocationButton({
   locationEnabled,
+  setLocationEnabled,
   setLocationFunction,
 }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const updateLocation = () => {
+    setIsLoading(true);
     getLocationAsync(true, (location) => {
       console.log("LOCATION IS SET");
       setLocationFunction(location);
       setIsLoading(false);
-    }),
-      setIsLoading(true);
+    });
+    setLocationEnabled(true);
   };
 
   return (
     <TouchableOpacity
       style={[styles.rowContainerStyle, { marginBottom: 20 }]}
       onPress={() => {
-        if (!locationEnabled) updateLocation();
-        else setLocationFunction(null);
+        if(locationEnabled) {
+          setLocationFunction(null);
+        }
+        else {
+          updateLocation();
+        }
+        
       }}
     >
       {isLoading ? (
@@ -47,14 +54,14 @@ export default function LocationButton({
         <Ionicons
           size={16}
           style={{ marginBottom: 0 }}
-          name="md-square-outline"
+          name="md-checkbox-outline"
           color="blue"
         />
       ) : (
         <Ionicons
           size={16}
           style={{ marginBottom: 0 }}
-          name="md-checkbox-outline"
+          name="md-square-outline"
           color="blue"
         />
       )}

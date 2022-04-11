@@ -34,6 +34,5 @@ export default async function getLocationAsync(ask = false, callback) {
     // @ts-ignore
     global.location = location;
   }
-
   callback(location);
 }
