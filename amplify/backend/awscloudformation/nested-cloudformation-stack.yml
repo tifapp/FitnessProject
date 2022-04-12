@@ -1,0 +1,687 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Root Stack for AWS Amplify Console",
+  "Parameters": {
+    "DeploymentBucketName": {
+      "Description": "Name of the common deployment bucket provided by the parent stack",
+      "Type": "String",
+      "Default": "DeploymentBucket"
+    },
+    "AuthRoleName": {
+      "Type": "String",
+      "Default": "AuthRoleName"
+    },
+    "UnauthRoleName": {
+      "Type": "String",
+      "Default": "UnauthRoleName"
+    }
+  },
+  "Resources": {
+    "DeploymentBucket": {
+      "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "BucketName": {
+          "Ref": "DeploymentBucketName"
+        }
+      }
+    },
+    "AuthRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": {
+          "Ref": "AuthRoleName"
+        },
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "",
+              "Effect": "Deny",
+              "Principal": {
+                "Federated": "cognito-identity.amazonaws.com"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity"
+            }
+          ]
+        }
+      }
+    },
+    "UnauthRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": {
+          "Ref": "UnauthRoleName"
+        },
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "",
+              "Effect": "Deny",
+              "Principal": {
+                "Federated": "cognito-identity.amazonaws.com"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity"
+            }
+          ]
+        }
+      }
+    },
+    "authfitnessprojecta8f49cfe": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/amplify-fitnessproject-dev-231929-deployment/amplify-cfn-templates/auth/fitnessprojecta8f49cfe-cloudformation-template.yml",
+        "Parameters": {
+          "identityPoolName": "fitnessprojecta8f49cfe_identitypool_a8f49cfe",
+          "allowUnauthenticatedIdentities": true,
+          "resourceNameTruncated": "fitnesa8f49cfe",
+          "userPoolName": "fitnessprojecta8f49cfe_userpool_a8f49cfe",
+          "autoVerifiedAttributes": "email",
+          "mfaConfiguration": "OFF",
+          "mfaTypes": "SMS Text Message",
+          "smsAuthenticationMessage": "Your authentication code is {####}",
+          "smsVerificationMessage": "Your verification code is {####}",
+          "emailVerificationSubject": "Your verification code",
+          "emailVerificationMessage": "Your verification code is {####}",
+          "defaultPasswordPolicy": false,
+          "passwordPolicyMinLength": 8,
+          "passwordPolicyCharacters": "",
+          "requiredAttributes": "email",
+          "userpoolClientGenerateSecret": true,
+          "userpoolClientRefreshTokenValidity": 30,
+          "userpoolClientWriteAttributes": "email",
+          "userpoolClientReadAttributes": "email",
+          "userpoolClientLambdaRole": "fitnesa8f49cfe_userpoolclient_lambda_role",
+          "userpoolClientSetAttributes": false,
+          "sharedId": "a8f49cfe",
+          "resourceName": "fitnessprojecta8f49cfe",
+          "authSelections": "identityPoolAndUserPool",
+          "authRoleArn": {
+            "Fn::GetAtt": [
+              "AuthRole",
+              "Arn"
+            ]
+          },
+          "unauthRoleArn": {
+            "Fn::GetAtt": [
+              "UnauthRole",
+              "Arn"
+            ]
+          },
+          "useDefault": "default",
+          "usernameAttributes": "email, phone_number",
+          "triggers": "{}",
+          "userPoolGroupList": "",
+          "parentStack": {
+            "Ref": "AWS::StackId"
+          },
+          "permissions": "",
+          "dependsOn": "",
+          "env": "dev"
+        }
+      }
+    },
+    "authuserPoolGroups": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/amplify-fitnessproject-dev-231929-deployment/amplify-cfn-templates/auth/template.json",
+        "Parameters": {
+          "AuthRoleArn": {
+            "Fn::GetAtt": [
+              "AuthRole",
+              "Arn"
+            ]
+          },
+          "UnauthRoleArn": {
+            "Fn::GetAtt": [
+              "UnauthRole",
+              "Arn"
+            ]
+          },
+          "authfitnessprojecta8f49cfeUserPoolId": {
+            "Fn::GetAtt": [
+              "authfitnessprojecta8f49cfe",
+              "Outputs.UserPoolId"
+            ]
+          },
+          "authfitnessprojecta8f49cfeAppClientIDWeb": {
+            "Fn::GetAtt": [
+              "authfitnessprojecta8f49cfe",
+              "Outputs.AppClientIDWeb"
+            ]
+          },
+          "authfitnessprojecta8f49cfeAppClientID": {
+            "Fn::GetAtt": [
+              "authfitnessprojecta8f49cfe",
+              "Outputs.AppClientID"
+            ]
+          },
+          "authfitnessprojecta8f49cfeIdentityPoolId": {
+            "Fn::GetAtt": [
+              "authfitnessprojecta8f49cfe",
+              "Outputs.IdentityPoolId"
+            ]
+          },
+          "env": "dev"
+        }
+      }
+    },
+    "apifitnessprojectapi": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/amplify-fitnessproject-dev-231929-deployment/amplify-cfn-templates/api/cloudformation-template.json",
+        "Parameters": {
+          "CreateAPIKey": 0,
+          "AppSyncApiName": "fitnessprojectapi",
+          "DynamoDBBillingMode": "PAY_PER_REQUEST",
+          "DynamoDBEnableServerSideEncryption": false,
+          "AuthCognitoUserPoolId": {
+            "Fn::GetAtt": [
+              "authfitnessprojecta8f49cfe",
+              "Outputs.UserPoolId"
+            ]
+          },
+          "authRoleName": {
+            "Ref": "AuthRoleName"
+          },
+          "S3DeploymentBucket": "amplify-fitnessproject-dev-231929-deployment",
+          "S3DeploymentRootKey": "amplify-appsync-files/75920ac84005d2691dfe133466c62cdffe2a5894",
+          "env": "dev"
+        }
+      }
+    },
+    "functionS3Triggeref91c1ec": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/amplify-fitnessproject-dev-231929-deployment/amplify-cfn-templates/function/S3Triggeref91c1ec-cloudformation-template.json",
+        "Parameters": {
+          "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
+          "s3Key": "amplify-builds/S3Triggeref91c1ec-4e79616538642f37657a-build.zip",
+          "env": "dev"
+        }
+      }
+    },
+    "functionfriendNotifications": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/amplify-fitnessproject-dev-231929-deployment/amplify-cfn-templates/function/friendNotifications-cloudformation-template.json",
+        "Parameters": {
+          "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
+          "s3Key": "amplify-builds/friendNotifications-463269696c726b564278-build.zip",
+          "functionbackendResourcesArn": {
+            "Fn::GetAtt": [
+              "functionbackendResources",
+              "Outputs.Arn"
+            ]
+          },
+          "apifitnessprojectapiGraphQLAPIIdOutput": {
+            "Fn::GetAtt": [
+              "apifitnessprojectapi",
+              "Outputs.GraphQLAPIIdOutput"
+            ]
+          },
+          "apifitnessprojectapiGraphQLAPIEndpointOutput": {
+            "Fn::GetAtt": [
+              "apifitnessprojectapi",
+              "Outputs.GraphQLAPIEndpointOutput"
+            ]
+          },
+          "env": "dev"
+        }
+      }
+    },
+    "functionbackendResources": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/amplify-fitnessproject-dev-231929-deployment/amplify-cfn-templates/function/backendResources-awscloudformation-template.json",
+        "Parameters": {
+          "runtimes": "nodejs14.x",
+          "description": "Updated layer version 2021-11-03T00:37:12.893Z",
+          "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
+          "s3Key": "amplify-builds/backendResources-LambdaLayerVersion80a3e3d8-build.zip",
+          "env": "dev"
+        }
+      }
+    },
+    "functiondeleteUserData": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/amplify-fitnessproject-dev-231929-deployment/amplify-cfn-templates/function/deleteUserData-cloudformation-template.json",
+        "Parameters": {
+          "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
+          "s3Key": "amplify-builds/deleteUserData-757a425348482b436848-build.zip",
+          "functionbackendResourcesArn": {
+            "Fn::GetAtt": [
+              "functionbackendResources",
+              "Outputs.Arn"
+            ]
+          },
+          "apifitnessprojectapiGraphQLAPIIdOutput": {
+            "Fn::GetAtt": [
+              "apifitnessprojectapi",
+              "Outputs.GraphQLAPIIdOutput"
+            ]
+          },
+          "apifitnessprojectapiGraphQLAPIEndpointOutput": {
+            "Fn::GetAtt": [
+              "apifitnessprojectapi",
+              "Outputs.GraphQLAPIEndpointOutput"
+            ]
+          },
+          "env": "dev"
+        }
+      }
+    },
+    "functionpostNotifications": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/amplify-fitnessproject-dev-231929-deployment/amplify-cfn-templates/function/postNotifications-cloudformation-template.json",
+        "Parameters": {
+          "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
+          "s3Key": "amplify-builds/postNotifications-597a6a546b704179566f-build.zip",
+          "apifitnessprojectapiGraphQLAPIIdOutput": {
+            "Fn::GetAtt": [
+              "apifitnessprojectapi",
+              "Outputs.GraphQLAPIIdOutput"
+            ]
+          },
+          "apifitnessprojectapiGraphQLAPIEndpointOutput": {
+            "Fn::GetAtt": [
+              "apifitnessprojectapi",
+              "Outputs.GraphQLAPIEndpointOutput"
+            ]
+          },
+          "storagemediaBucketName": {
+            "Fn::GetAtt": [
+              "storagemedia",
+              "Outputs.BucketName"
+            ]
+          },
+          "functionbackendResourcesArn": {
+            "Fn::GetAtt": [
+              "functionbackendResources",
+              "Outputs.Arn"
+            ]
+          },
+          "env": "dev"
+        }
+      }
+    },
+    "functionlikeNotifications": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/amplify-fitnessproject-dev-231929-deployment/amplify-cfn-templates/function/likeNotifications-cloudformation-template.json",
+        "Parameters": {
+          "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
+          "s3Key": "amplify-builds/likeNotifications-4f485251744a4c353264-build.zip",
+          "apifitnessprojectapiGraphQLAPIIdOutput": {
+            "Fn::GetAtt": [
+              "apifitnessprojectapi",
+              "Outputs.GraphQLAPIIdOutput"
+            ]
+          },
+          "apifitnessprojectapiGraphQLAPIEndpointOutput": {
+            "Fn::GetAtt": [
+              "apifitnessprojectapi",
+              "Outputs.GraphQLAPIEndpointOutput"
+            ]
+          },
+          "functionbackendResourcesArn": {
+            "Fn::GetAtt": [
+              "functionbackendResources",
+              "Outputs.Arn"
+            ]
+          },
+          "env": "dev"
+        }
+      }
+    },
+    "functionconversationEvents": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/amplify-fitnessproject-dev-231929-deployment/amplify-cfn-templates/function/conversationEvents-cloudformation-template.json",
+        "Parameters": {
+          "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
+          "s3Key": "amplify-builds/conversationEvents-4870344e426430436a56-build.zip",
+          "apifitnessprojectapiGraphQLAPIIdOutput": {
+            "Fn::GetAtt": [
+              "apifitnessprojectapi",
+              "Outputs.GraphQLAPIIdOutput"
+            ]
+          },
+          "apifitnessprojectapiGraphQLAPIEndpointOutput": {
+            "Fn::GetAtt": [
+              "apifitnessprojectapi",
+              "Outputs.GraphQLAPIEndpointOutput"
+            ]
+          },
+          "functionbackendResourcesArn": {
+            "Fn::GetAtt": [
+              "functionbackendResources",
+              "Outputs.Arn"
+            ]
+          },
+          "env": "dev"
+        }
+      }
+    },
+    "storagemedia": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/amplify-fitnessproject-dev-231929-deployment/amplify-cfn-templates/storage/s3-cloudformation-template.json",
+        "Parameters": {
+          "bucketName": "fitnessproject990b7c5f3b1e4687a61074386ec11c28",
+          "authPolicyName": "s3_amplify_bf572cfe",
+          "unauthPolicyName": "s3_amplify_bf572cfe",
+          "authRoleName": {
+            "Ref": "AuthRoleName"
+          },
+          "unauthRoleName": {
+            "Ref": "UnauthRoleName"
+          },
+          "selectedGuestPermissions": "s3:GetObject,s3:ListBucket",
+          "selectedAuthenticatedPermissions": "s3:PutObject,s3:GetObject,s3:ListBucket,s3:DeleteObject",
+          "s3PermissionsAuthenticatedPublic": "s3:PutObject,s3:GetObject,s3:DeleteObject",
+          "s3PublicPolicy": "Public_policy_71fd1451",
+          "s3PermissionsAuthenticatedUploads": "s3:PutObject",
+          "s3UploadsPolicy": "Uploads_policy_71fd1451",
+          "s3PermissionsAuthenticatedProtected": "s3:PutObject,s3:GetObject,s3:DeleteObject",
+          "s3ProtectedPolicy": "Protected_policy_71fd1451",
+          "s3PermissionsAuthenticatedPrivate": "s3:PutObject,s3:GetObject,s3:DeleteObject",
+          "s3PrivatePolicy": "Private_policy_71fd1451",
+          "AuthenticatedAllowList": "ALLOW",
+          "s3ReadPolicy": "read_policy_71fd1451",
+          "s3PermissionsGuestPublic": "DISALLOW",
+          "s3PermissionsGuestUploads": "DISALLOW",
+          "GuestAllowList": "DISALLOW",
+          "triggerFunction": "S3Triggeref91c1ec",
+          "functionS3Triggeref91c1ecName": {
+            "Fn::GetAtt": [
+              "functionS3Triggeref91c1ec",
+              "Outputs.Name"
+            ]
+          },
+          "functionS3Triggeref91c1ecArn": {
+            "Fn::GetAtt": [
+              "functionS3Triggeref91c1ec",
+              "Outputs.Arn"
+            ]
+          },
+          "functionS3Triggeref91c1ecLambdaExecutionRole": {
+            "Fn::GetAtt": [
+              "functionS3Triggeref91c1ec",
+              "Outputs.LambdaExecutionRole"
+            ]
+          },
+          "authfitnessprojecta8f49cfeUserPoolId": {
+            "Fn::GetAtt": [
+              "authfitnessprojecta8f49cfe",
+              "Outputs.UserPoolId"
+            ]
+          },
+          "authuserPoolGroupsAdminsGroupRole": {
+            "Fn::GetAtt": [
+              "authuserPoolGroups",
+              "Outputs.AdminsGroupRole"
+            ]
+          },
+          "env": "dev"
+        }
+      }
+    },
+    "hostingamplifyhosting": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/amplify-fitnessproject-dev-231929-deployment/amplify-cfn-templates/hosting/amplifyhosting-template.json",
+        "Parameters": {
+          "appId": "d19kzf7eu35pq1",
+          "type": "manual",
+          "env": "dev"
+        }
+      }
+    },
+    "UpdateRolesWithIDPFunction": {
+      "DependsOn": [
+        "AuthRole",
+        "UnauthRole",
+        "authfitnessprojecta8f49cfe"
+      ],
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "const response = require('cfn-response');",
+                "const aws = require('aws-sdk');",
+                "let responseData = {};",
+                "exports.handler = function(event, context) {",
+                "  try {",
+                "    let authRoleName = event.ResourceProperties.authRoleName;",
+                "    let unauthRoleName = event.ResourceProperties.unauthRoleName;",
+                "    let idpId = event.ResourceProperties.idpId;",
+                "    let promises = [];",
+                "    let authParamsJson = { 'Version': '2012-10-17','Statement': [{'Effect': 'Allow','Principal': {'Federated': 'cognito-identity.amazonaws.com'},'Action': 'sts:AssumeRoleWithWebIdentity','Condition': {'StringEquals': {'cognito-identity.amazonaws.com:aud': idpId},'ForAnyValue:StringLike': {'cognito-identity.amazonaws.com:amr': 'authenticated'}}}]};",
+                "    let unauthParamsJson = { 'Version': '2012-10-17','Statement': [{'Effect': 'Allow','Principal': {'Federated': 'cognito-identity.amazonaws.com'},'Action': 'sts:AssumeRoleWithWebIdentity','Condition': {'StringEquals': {'cognito-identity.amazonaws.com:aud': idpId},'ForAnyValue:StringLike': {'cognito-identity.amazonaws.com:amr': 'unauthenticated'}}}]};",
+                "    if (event.RequestType == 'Delete') {",
+                "        delete authParamsJson.Statement[0].Condition;",
+                "        delete unauthParamsJson.Statement[0].Condition;",
+                "        let authParams = { PolicyDocument: JSON.stringify(authParamsJson),RoleName: authRoleName};",
+                "        let unauthParams = {PolicyDocument: JSON.stringify(unauthParamsJson),RoleName: unauthRoleName};",
+                "        const iam = new aws.IAM({ apiVersion: '2010-05-08', region: event.ResourceProperties.region});",
+                "        promises.push(iam.updateAssumeRolePolicy(authParams).promise());",
+                "        promises.push(iam.updateAssumeRolePolicy(unauthParams).promise());",
+                "        Promise.all(promises)",
+                "         .then((res) => {",
+                "            console.log(\"delete response data\" + JSON.stringify(res));",
+                "            response.send(event, context, response.SUCCESS, {});",
+                "         });",
+                "    }",
+                "    if (event.RequestType == 'Update' || event.RequestType == 'Create') {",
+                "       const iam = new aws.IAM({ apiVersion: '2010-05-08', region: event.ResourceProperties.region});",
+                "        let authParams = { PolicyDocument: JSON.stringify(authParamsJson),RoleName: authRoleName};",
+                "        let unauthParams = {PolicyDocument: JSON.stringify(unauthParamsJson),RoleName: unauthRoleName};",
+                "        promises.push(iam.updateAssumeRolePolicy(authParams).promise());",
+                "        promises.push(iam.updateAssumeRolePolicy(unauthParams).promise());",
+                "        Promise.all(promises)",
+                "         .then((res) => {",
+                "            console.log(\"createORupdate\" + res);",
+                "            console.log(\"response data\" + JSON.stringify(res));",
+                "            response.send(event, context, response.SUCCESS, {});",
+                "         });",
+                "    }",
+                "  } catch(err) {",
+                "       console.log(err.stack);",
+                "       responseData = {Error: err};",
+                "       response.send(event, context, response.FAILED, responseData);",
+                "       throw err;",
+                "  }",
+                "};"
+              ]
+            ]
+          }
+        },
+        "Handler": "index.handler",
+        "Runtime": "nodejs12.x",
+        "Timeout": 300,
+        "Role": {
+          "Fn::GetAtt": [
+            "UpdateRolesWithIDPFunctionRole",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "UpdateRolesWithIDPFunctionOutputs": {
+      "Type": "Custom::LambdaCallout",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "UpdateRolesWithIDPFunction",
+            "Arn"
+          ]
+        },
+        "region": {
+          "Ref": "AWS::Region"
+        },
+        "idpId": {
+          "Fn::GetAtt": [
+            "authfitnessprojecta8f49cfe",
+            "Outputs.IdentityPoolId"
+          ]
+        },
+        "authRoleName": {
+          "Ref": "AuthRoleName"
+        },
+        "unauthRoleName": {
+          "Ref": "UnauthRoleName"
+        }
+      }
+    },
+    "UpdateRolesWithIDPFunctionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "AuthRoleName"
+              },
+              "-idp"
+            ]
+          ]
+        },
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "UpdateRolesWithIDPFunctionPolicy",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": "arn:aws:logs:*:*:*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "iam:UpdateAssumeRolePolicy",
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "AuthRole",
+                      "Arn"
+                    ]
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "iam:UpdateAssumeRolePolicy",
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "UnauthRole",
+                      "Arn"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "Region": {
+      "Description": "CloudFormation provider root stack Region",
+      "Value": {
+        "Ref": "AWS::Region"
+      },
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-Region"
+        }
+      }
+    },
+    "StackName": {
+      "Description": "CloudFormation provider root stack ID",
+      "Value": {
+        "Ref": "AWS::StackName"
+      },
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-StackName"
+        }
+      }
+    },
+    "StackId": {
+      "Description": "CloudFormation provider root stack name",
+      "Value": {
+        "Ref": "AWS::StackId"
+      },
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-StackId"
+        }
+      }
+    },
+    "DeploymentBucketName": {
+      "Description": "CloudFormation provider root stack deployment bucket name",
+      "Value": {
+        "Ref": "DeploymentBucketName"
+      },
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-DeploymentBucketName"
+        }
+      }
+    },
+    "AuthRoleArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "AuthRole",
+          "Arn"
+        ]
+      }
+    },
+    "UnauthRoleArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "UnauthRole",
+          "Arn"
+        ]
+      }
+    },
+    "AuthRoleName": {
+      "Value": {
+        "Ref": "AuthRole"
+      }
+    },
+    "UnauthRoleName": {
+      "Value": {
+        "Ref": "UnauthRole"
+      }
+    }
+  }
+}

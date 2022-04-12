@@ -6,7 +6,7 @@ import {
   FlatList,
   RefreshControl,
   Text,
-  View
+  View,
 } from "react-native";
 
 class APIList extends PureComponent {

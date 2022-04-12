@@ -5,7 +5,6 @@ import StatusIndicator from "@components/StatusIndicator";
 import TouchableWithModal from "@components/TouchableWithModal";
 import fetchProfileImageAsync from "@hooks/fetchProfileImage";
 import { loadCapitals, saveCapitals } from "@hooks/stringConversion";
-import getLocationAsync from "@hooks/useLocation";
 import { API, Auth, Cache, graphqlOperation, Storage } from "aws-amplify";
 import * as ImageManipulator from "expo-image-manipulator";
 import { SaveFormat } from "expo-image-manipulator";
@@ -19,7 +18,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import BasicInfoDetails from "../components/basicInfoComponents/BasicInfoDetails";
 import { createUser, updateUser } from "../src/graphql/mutations";
@@ -37,7 +36,6 @@ const ProfileScreen = ({ navigation, route }) => {
   const [isVerified, setIsVerified] = useState();
   const [bioDetails, setBioDetails] = useState("");
   const [goalsDetails, setGoalsDetails] = useState("");
-  const [locationEnabled, setLocationEnabled] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -78,12 +76,6 @@ const ProfileScreen = ({ navigation, route }) => {
         setGoalsDetails(loadCapitals(fields.goals));
         setStatus(fields.status);
         setIsVerified(fields.isVerified);
-        if (fields.location != null) {
-          setLocationEnabled(true);
-          getLocationAsync(true, (location) => {
-            updateUserLocationAsync(location);
-          });
-        }
       }
 
       setLoading(false);
@@ -158,13 +150,8 @@ const ProfileScreen = ({ navigation, route }) => {
     }
   };
 
-  useEffect(() => {
-    console.log("IS THE LOCATION BUTTON ENABLED");
-    console.log(locationEnabled);
-  }, [locationEnabled]);
-
   const updateUserLocationAsync = async (location) => {
-    if (location == null) setLocationEnabled(false);
+    if (location == null) throw new Error();
     //if user doesn't exist, make one
     try {
       const user = await API.graphql(
@@ -425,8 +412,7 @@ const ProfileScreen = ({ navigation, route }) => {
           </TouchableWithModal>
 
           <LocationButton
-            locationEnabled={locationEnabled}
-            setLocationEnabled = {setLocationEnabled}
+            id={route.params?.id}
             setLocationFunction={updateUserLocationAsync}
           />
           {route.params?.newUser ? ( //if name is blank?

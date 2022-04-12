@@ -212,6 +212,42 @@ export const onDeleteFriendship = /* GraphQL */ `
     }
   }
 `;
+export const onCreateChallenge = /* GraphQL */ `
+  subscription OnCreateChallenge {
+    onCreateChallenge {
+      id
+      name
+      Description
+      open
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdateChallenge = /* GraphQL */ `
+  subscription OnUpdateChallenge {
+    onUpdateChallenge {
+      id
+      name
+      Description
+      open
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteChallenge = /* GraphQL */ `
+  subscription OnDeleteChallenge {
+    onDeleteChallenge {
+      id
+      name
+      Description
+      open
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const onCreateGroup = /* GraphQL */ `
   subscription OnCreateGroup {
     onCreateGroup {

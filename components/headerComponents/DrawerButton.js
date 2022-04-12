@@ -24,6 +24,19 @@ export default function DrawerButton(props) {
     <View style={{ flexDirection: "row" }}>
       <TouchableOpacity
         onPress={() => {
+          navigation.navigate("Challenge List");
+        }}
+      >
+        <MaterialIcons
+          name={"timer"}
+          size={30}
+          color={"black"}
+          style={{ paddingRight: 15 }}
+        />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => {
           navigation.navigate("Search");
         }}
       >

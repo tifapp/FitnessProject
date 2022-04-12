@@ -105,6 +105,51 @@ export const decrementReplies = /* GraphQL */ `
     }
   }
 `;
+export const createChallenge = /* GraphQL */ `
+  mutation CreateChallenge(
+    $input: CreateChallengeInput!
+    $condition: ModelChallengeConditionInput
+  ) {
+    createChallenge(input: $input, condition: $condition) {
+      id
+      name
+      Description
+      open
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateChallenge = /* GraphQL */ `
+  mutation UpdateChallenge(
+    $input: UpdateChallengeInput!
+    $condition: ModelChallengeConditionInput
+  ) {
+    updateChallenge(input: $input, condition: $condition) {
+      id
+      name
+      Description
+      open
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteChallenge = /* GraphQL */ `
+  mutation DeleteChallenge(
+    $input: DeleteChallengeInput!
+    $condition: ModelChallengeConditionInput
+  ) {
+    deleteChallenge(input: $input, condition: $condition) {
+      id
+      name
+      Description
+      open
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const createGroup = /* GraphQL */ `
   mutation CreateGroup(
     $input: CreateGroupInput!

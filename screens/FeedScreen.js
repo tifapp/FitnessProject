@@ -21,6 +21,7 @@ import {
   getConversation,
   getFriendship,
   postsByChannel,
+  postsByLikes,
 } from "@graphql/queries";
 import {
   onCreatePostFromChannel,
@@ -75,6 +76,7 @@ export default function FeedScreen({
   sidebar,
   id,
   isFocused,
+  challenge,
   autoFocus = false,
 }) {
   const [onlineCheck, setOnlineCheck] = useState(true);
@@ -646,7 +648,7 @@ export default function FeedScreen({
       initialAmount={7}
       additionalAmount={7} //change number based on device specs
       processingFunction={getLikedPosts}
-      queryOperation={postsByChannel}
+      queryOperation={challenge ? postsByLikes : postsByChannel}
       filter={{ channel: channel, sortDirection: "DESC" }}
       renderItem={renderPostItem}
       keyExtractor={(item) => item.createdAt.toString() + item.userId}

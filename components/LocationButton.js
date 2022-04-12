@@ -1,43 +1,58 @@
 import { Ionicons } from "@expo/vector-icons";
+import { getUser } from "@graphql/queries";
 import getLocationAsync from "@hooks/useLocation";
 import CheckBox from "@react-native-community/checkbox"; //when ios is supported, we'll use this
-import React, { useState } from "react";
+import { API, graphqlOperation } from "aws-amplify";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Platform,
   StyleSheet,
   Text,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
 
-export default function LocationButton({
-  locationEnabled,
-  setLocationEnabled,
-  setLocationFunction,
-}) {
-  const [isLoading, setIsLoading] = useState(false);
+export default function LocationButton({ setLocationFunction, id }) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [locationEnabled, setLocationEnabled] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const user = await API.graphql(graphqlOperation(getUser, { id }));
+      // @ts-ignore
+      const fields = user.data.getUser;
+
+      if (fields != null && fields.location != null) {
+        updateLocation();
+      } else {
+        setIsLoading(false);
+      }
+    })();
+  }, []);
 
   const updateLocation = () => {
     setIsLoading(true);
-    getLocationAsync(true, (location) => {
+    getLocationAsync(true, async (location) => {
       console.log("LOCATION IS SET");
-      setLocationFunction(location);
+      try {
+        await setLocationFunction(location);
+        setLocationEnabled(true);
+      } catch {
+        setLocationEnabled(false);
+      }
       setIsLoading(false);
     });
-    setLocationEnabled(true);
   };
 
   return (
     <TouchableOpacity
       style={[styles.rowContainerStyle, { marginBottom: 20 }]}
       onPress={() => {
-        if(locationEnabled) {
+        if (locationEnabled) {
           setLocationFunction(null);
-        }
-        else {
+        } else {
           updateLocation();
         }
-        
       }}
     >
       {isLoading ? (

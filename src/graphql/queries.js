@@ -39,6 +39,37 @@ export const getConversationByUsers = /* GraphQL */ `
     }
   }
 `;
+export const getChallenge = /* GraphQL */ `
+  query GetChallenge($id: ID!) {
+    getChallenge(id: $id) {
+      id
+      name
+      Description
+      open
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listChallenges = /* GraphQL */ `
+  query ListChallenges(
+    $filter: ModelChallengeFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listChallenges(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        name
+        Description
+        open
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
 export const getGroup = /* GraphQL */ `
   query GetGroup($id: ID!) {
     getGroup(id: $id) {
@@ -541,6 +572,39 @@ export const postsByChannel = /* GraphQL */ `
     postsByChannel(
       channel: $channel
       createdAt: $createdAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        createdAt
+        updatedAt
+        userId
+        description
+        channel
+        receiver
+        parentId
+        imageURL
+        likes
+        replies
+      }
+      nextToken
+    }
+  }
+`;
+export const postsByLikes = /* GraphQL */ `
+  query PostsByLikes(
+    $likes: Int
+    $channel: ModelIDKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelPostFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    postsByLikes(
+      likes: $likes
+      channel: $channel
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit

@@ -1,0 +1,6 @@
+type Challenge @model {
+  id: ID!
+  name: String!
+  Description: String!
+  open: Boolean
+}

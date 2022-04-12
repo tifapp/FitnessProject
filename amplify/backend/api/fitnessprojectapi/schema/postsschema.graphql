@@ -15,6 +15,7 @@ type Post @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" },
 @key(name: "ByUser", fields: ["userId", "createdAt"], queryField: "postsByUser")
 @key(name: "ByReceiver", fields: ["receiver", "createdAt"], queryField: "postsByReceiver")
 @key(name: "ByChannel", fields: ["channel", "createdAt"], queryField: "postsByChannel")
+@key(name: "ByLikes", fields: ["likes", "channel"], queryField: "postsByLikes")
 {
   likes: Int
     @auth(
