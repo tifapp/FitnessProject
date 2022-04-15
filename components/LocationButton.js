@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { updateUser } from "@graphql/mutations";
 import { getUser } from "@graphql/queries";
 import getLocationAsync from "@hooks/useLocation";
 import CheckBox from "@react-native-community/checkbox"; //when ios is supported, we'll use this
@@ -12,9 +13,33 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-export default function LocationButton({ setLocationFunction, id }) {
+export default function LocationButton({ id }) {
   const [isLoading, setIsLoading] = useState(true);
   const [locationEnabled, setLocationEnabled] = useState(false);
+
+  const updateUserLocationAsync = async (location) => {
+    //function to send user's location to database
+    if (location == null) throw new Error();
+    try {
+      const user = await API.graphql(graphqlOperation(getUser, { id }));
+      // @ts-ignore
+      const fields = user.data.getUser;
+
+      if (fields != null) {
+        await API.graphql(
+          graphqlOperation(updateUser, {
+            input: {
+              location: location,
+            },
+          })
+        );
+      }
+
+      //setLocationEnabled(true);
+    } catch (err) {
+      console.log("error: ", err);
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -33,11 +58,13 @@ export default function LocationButton({ setLocationFunction, id }) {
   const updateLocation = () => {
     setIsLoading(true);
     getLocationAsync(true, async (location) => {
+      //function call to get location from device
       console.log("LOCATION IS SET");
       try {
-        await setLocationFunction(location);
+        await updateUserLocationAsync(location); //send location to database
         setLocationEnabled(true);
       } catch {
+        //alert pop up if there was an error sending the location to the database
         setLocationEnabled(false);
       }
       setIsLoading(false);
@@ -49,9 +76,9 @@ export default function LocationButton({ setLocationFunction, id }) {
       style={[styles.rowContainerStyle, { marginBottom: 20 }]}
       onPress={() => {
         if (locationEnabled) {
-          setLocationFunction(null);
+          updateUserLocationAsync(null);
         } else {
-          updateLocation();
+          updateLocation(); //checkbox should be enabled if the user gives permission to use their location AND location is successfully sent to database
         }
       }}
     >

@@ -150,33 +150,6 @@ const ProfileScreen = ({ navigation, route }) => {
     }
   };
 
-  const updateUserLocationAsync = async (location) => {
-    if (location == null) throw new Error();
-    //if user doesn't exist, make one
-    try {
-      const user = await API.graphql(
-        graphqlOperation(getUser, { id: route.params?.myId })
-      );
-      //do we need the id? can't remember if this is generated
-      // @ts-ignore
-      const fields = user.data.getUser;
-
-      if (fields != null) {
-        await API.graphql(
-          graphqlOperation(updateUser, {
-            input: {
-              location: location,
-            },
-          })
-        );
-      }
-
-      //setLocationEnabled(true);
-    } catch (err) {
-      console.log("error: ", err);
-    }
-  };
-
   const createNewUser = () => {
     if (name == "") {
       Alert.alert("Please enter your name!");
@@ -411,10 +384,7 @@ const ProfileScreen = ({ navigation, route }) => {
             />
           </TouchableWithModal>
 
-          <LocationButton
-            id={route.params?.id}
-            setLocationFunction={updateUserLocationAsync}
-          />
+          <LocationButton id={route.params?.id} />
           {route.params?.newUser ? ( //if name is blank?
             <TouchableOpacity
               style={[styles.buttonStyle, { marginBottom: 25 }]}
