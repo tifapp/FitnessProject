@@ -46,8 +46,8 @@ export default function SearchScreen({ navigation, route }) {
         return currentQuery.current !== query.toLowerCase() || query === "";
       });
     } else {
-      if (UserListRef && UserListRef.mutateData) UserListRef.mutateData([]);
-      if (GroupListRef && GroupListRef.mutateData) GroupListRef.mutateData([]);
+      if (UserListRef) UserListRef.current.mutateData([]);
+      if (GroupListRef) GroupListRef.current.mutateData([]);
     }
   }, [query]);
 

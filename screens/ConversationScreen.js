@@ -33,7 +33,7 @@ export default function ConversationScreen({ navigation, route }) {
     */
 
     /*
-    let tempConversations = listRef.getData();
+    let tempConversations = listRef.current.getData();
 
     let newConversation = tempConversations.find(
       (item) => newPost.channel === item.id
@@ -103,7 +103,7 @@ export default function ConversationScreen({ navigation, route }) {
       //console.log(conversation);
       //console.log("++++++++++++++++++++++++++++++++");
 
-      listRef.mutateData((conversations) => {
+      listRef.current.mutateData((conversations) => {
         let tempConversations = conversations;
 
         let index = tempConversations.findIndex(
@@ -171,7 +171,7 @@ export default function ConversationScreen({ navigation, route }) {
 
     // update ConversationList
 
-    listRef.mutateData((conversations) => {
+    listRef.current.mutateData((conversations) => {
       return conversations.filter(
         (i) => i.users[0] !== friendID || i.users[1] !== friendID
       );
@@ -220,7 +220,7 @@ export default function ConversationScreen({ navigation, route }) {
             next: (event) => {
               const conversation = event.value.data.onDeleteConversation;
               //console.log("Inside the onDeleteConversation Subscription");
-              listRef.mutateData((conversations) => {
+              listRef.current.mutateData((conversations) => {
                 return conversations.filter(
                   (convo) => convo.id != conversation.id
                 );

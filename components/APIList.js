@@ -4,6 +4,7 @@ import React, { PureComponent } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  LayoutAnimation,
   RefreshControl,
   Text,
   View,
@@ -75,7 +76,17 @@ class APIList extends PureComponent {
     }
   };
 
-  getData = () => this.state.data;
+  addItem = (newItem, alreadyExists) => {
+    if (!newItem || !alreadyExists || this.state.data.find(alreadyExists))
+      return;
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    this.setState({ data: [newItem, ...this.state.data] });
+  };
+
+  removeItem = (toRemove) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    this.setState({ data: this.state.data.filter((item) => !toRemove(item)) });
+  };
 
   fetchDataAsync = async (beginning, voidResultsFunction) => {
     //do not refetch if the user themselves added or updated a post
@@ -215,21 +226,22 @@ class APIList extends PureComponent {
             updateCellsBatchingPeriod={20} //numbers could vary based on device and size of memory. this one should be as big as possible, but 50 and above is too large.
             windowSize={21}
             onViewableItemsChanged={this.props.onViewableItemsChanged}
+            ListFooterComponent={
+              this.state.loadingMore ? (
+                <ActivityIndicator
+                  size="large"
+                  color="#26c6a2"
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    right: 0,
+                    bottom: 40,
+                  }}
+                />
+              ) : null
+            }
           />
         )}
-
-        {this.state.loadingMore ? (
-          <ActivityIndicator
-            size="large"
-            color="#26c6a2"
-            style={{
-              position: "absolute",
-              left: 0,
-              right: 0,
-              bottom: 40,
-            }}
-          />
-        ) : null}
       </View>
     );
   }

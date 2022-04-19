@@ -3,7 +3,7 @@ import { Cache, Storage } from "aws-amplify";
 //cache stores objects like this {identityId: {imageURL, lastModified, isFullSize}}
 
 function getExpiryTime(imageLink) {
-  console.log("starting calc");
+  //console.log("starting calc");
   let date = imageLink.substring(
     imageLink.indexOf("Date=") + 5,
     imageLink.indexOf("&X-Amz-Expires=")
@@ -61,7 +61,7 @@ export default async function fetchProfileImageAsync(identityId, isFullSize) {
   const lastModified = await getLastModifiedAsync(identityId);
   const imageURL = await getLatestProfileImageAsync(identityId, isFullSize);
 
-  console.log(lastModified);
+  //console.log(lastModified);
 
   try {
     const cachedInfo = await Cache.getItem(identityId);
@@ -76,7 +76,7 @@ export default async function fetchProfileImageAsync(identityId, isFullSize) {
         (lastModified && lastModified > cachedInfo.lastModified) ||
         (isFullSize && !cachedInfo.isFullSize)
       ) {
-        console.log("returning updated image");
+        //console.log("returning updated image");
         //const imageURL = await getLatestProfileImageAsync(identityId);
         Cache.setItem(identityId, {
           lastModified: lastModified,
@@ -85,14 +85,14 @@ export default async function fetchProfileImageAsync(identityId, isFullSize) {
         });
         return imageURL;
       } else {
-        console.log("calculating expiry");
-        console.log("current date is ", new Date(Date.now()));
-        console.log("expiry date is ", getExpiryTime(cachedInfo.imageURL));
+        //console.log("calculating expiry");
+        //console.log("current date is ", new Date(Date.now()));
+        //console.log("expiry date is ", getExpiryTime(cachedInfo.imageURL));
         if (new Date(Date.now()) >= getExpiryTime(cachedInfo.imageURL)) {
-          console.log("returning new image");
+          //console.log("returning new image");
           return imageURL;
         } else {
-          console.log("returning old image");
+          //console.log("returning old image");
           return cachedInfo.imageURL;
         }
       }

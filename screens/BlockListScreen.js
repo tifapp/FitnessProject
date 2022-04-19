@@ -37,7 +37,7 @@ const BlockListScreen = ({ navigation, route }) => {
           );
           LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
           // @ts-ignore
-          listRef.mutateData((blocklist) => {
+          listRef.current.mutateData((blocklist) => {
             const results = blocklist.filter(
               (item) => item.blockee != blockeeId
             );
@@ -68,7 +68,7 @@ const BlockListScreen = ({ navigation, route }) => {
       //console.log("got to settings", global.localBlockList);
       //we just want to save a copy of the data
       // @ts-ignore
-      listRef.mutateData(() => [...global.localBlockList]);
+      listRef.current.mutateData(() => [...global.localBlockList]);
     });
 
     // Return the function to unsubscribe from the event so it gets removed on unmount

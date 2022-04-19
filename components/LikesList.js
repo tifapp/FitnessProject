@@ -24,7 +24,7 @@ export default function LikesList({ postId }) {
       next: (event) => {
         const newLike = event.value.data.onCreateLikeForPost;
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        listRef.mutateData((data) => [newLike, ...data]);
+        listRef.current.mutateData((data) => [newLike, ...data]);
       },
     });
     const deleteLikeSubscription = API.graphql(
@@ -32,7 +32,7 @@ export default function LikesList({ postId }) {
     ).subscribe({
       next: (event) => {
         const deletedLike = event.value.data.onDeleteLikeForPost;
-        listRef.mutateData((data) => {
+        listRef.current.mutateData((data) => {
           if (data.find((like) => like.userId === deletedLike.userId)) {
             let templikes = [...data];
             var index = templikes.findIndex(

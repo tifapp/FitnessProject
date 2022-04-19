@@ -1,38 +1,13 @@
 // @ts-nocheck
-import { listGroups } from "@graphql/queries";
-import { API, graphqlOperation } from "aws-amplify";
-import React, { useEffect } from "react";
+import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import FeedScreen from "./FeedScreen";
 
-export default function MyGroups({ navigation, route }) {
+export default function ChallengeScreen({ navigation, route }) {
   //const stateRef = useRef();
   //const [query, setQuery] = useState("");
   //console.log(id);
 
-  const showResultsAsync = async () => {
-    let items = [];
-    try {
-      const namematchresult = await API.graphql(
-        graphqlOperation(listGroups, {
-          filter: {
-            userID: {
-              eq: route.params?.myId,
-            },
-          },
-        })
-      );
-      items = [...namematchresult.data.listGroups.items];
-      setUsers(items);
-    } catch (err) {
-      console.log("error: ", err);
-    }
-    setUsers(items);
-  };
-
-  useEffect(() => {
-    showResultsAsync();
-  });
 
   return (
     <View style={{ flex: 1 }}>

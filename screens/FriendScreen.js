@@ -29,7 +29,7 @@ function FriendList({ navigation, route }) {
   const listRef = useRef();
 
   global.updateFriendsListWithMyNewMessage = (newPost) => {
-    listRef.mutateData((friends) => {
+    listRef.current.mutateData((friends) => {
       return friends.map((friend) => {
         if (
           newPost.receiver === friend.receiver ||
@@ -63,7 +63,10 @@ function FriendList({ navigation, route }) {
     }
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    listRef.mutateData((currentFriends) => [newFriend, ...currentFriends]);
+    listRef.current.mutateData((currentFriends) => [
+      newFriend,
+      ...currentFriends,
+    ]);
   };
 
   /*
@@ -84,7 +87,7 @@ function FriendList({ navigation, route }) {
     ).subscribe({
       next: (event) => {
         //no need for security checks here
-        listRef.mutateData((friends) => {
+        listRef.current.mutateData((friends) => {
           return friends.map((friend) => {
             if (
               newPost.userId === friend.sender ||
@@ -151,7 +154,7 @@ function FriendList({ navigation, route }) {
     ).subscribe({
       next: (event) => {
         const deletedFriend = event.value.data.onDeleteFriendship; //check the security on this one. if possible, should only fire for the sender or receiver.
-        listRef.mutateData((currentFriends) => {
+        listRef.current.mutateData((currentFriends) => {
           let index = currentFriends.findIndex(
             (item) =>
               item.sender === deletedFriend.sender &&
@@ -207,7 +210,7 @@ function FriendList({ navigation, route }) {
   const removeFriend = async (item, blocked) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     // update friendList
-    listRef.mutateData((friendList) => {
+    listRef.current.mutateData((friendList) => {
       return friendList.filter(
         (i) => i.sender !== item.sender || i.receiver !== item.receiver
       );
@@ -315,7 +318,7 @@ export default function FriendScreen({ navigation, route }) {
 
   const respondToRequest = (item, accepted) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    listRef.mutateData((friendRequestList) =>
+    listRef.current.mutateData((friendRequestList) =>
       friendRequestList.map(function (i) {
         if (i.sender == item.sender && i.receiver == item.receiver) {
           if (accepted) {
@@ -331,7 +334,7 @@ export default function FriendScreen({ navigation, route }) {
 
   const undoResponse = (item) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    listRef.mutateData((friendRequestList) =>
+    listRef.current.mutateData((friendRequestList) =>
       friendRequestList.map(function (i) {
         if (i.sender == item.sender && i.receiver == item.receiver) {
           i.accepted = false;
@@ -344,9 +347,9 @@ export default function FriendScreen({ navigation, route }) {
 
   // runs when either for accepting or rejecting a friend request
   const confirmResponse = async (item, isNew) => {
-    //if (listRef.getData().length == 1) playSound("celebrate");
+    //if (listRef.current.getData().length == 1) playSound("celebrate");
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    listRef.mutateData((friendRequestList) =>
+    listRef.current.mutateData((friendRequestList) =>
       friendRequestList.filter(
         (i) => item.sender !== i.sender || item.receiver !== i.receiver
       )
@@ -422,7 +425,7 @@ export default function FriendScreen({ navigation, route }) {
         //if this new request is coming from someone already in your local friends list, remove them from your local friends list
         //if (currentFriends.current.find((item) => item.sender === newFriendRequest.sender)) {
         /*
-        listRef.mutateData((currentFriends) =>
+        listRef.current.mutateData((currentFriends) =>
           currentFriends.filter(
             (item) =>
               item.sender != newFriendRequest.sender ||
@@ -438,7 +441,7 @@ export default function FriendScreen({ navigation, route }) {
             (item) => item.sender === newFriendRequest.sender
           )
         ) {
-          listRef.mutateData((currentFriendRequests) =>
+          listRef.current.mutateData((currentFriendRequests) =>
             currentFriendRequests.current.filter(
               (item) =>
                 item.sender != newFriendRequest.sender ||
@@ -451,7 +454,7 @@ export default function FriendScreen({ navigation, route }) {
         global.showNotificationDot();
 
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        listRef.mutateData((currentFriendRequests) => [
+        listRef.current.mutateData((currentFriendRequests) => [
           newFriendRequest,
           ...currentFriendRequests,
         ]);

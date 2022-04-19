@@ -595,16 +595,16 @@ export const postsByChannel = /* GraphQL */ `
 `;
 export const postsByLikes = /* GraphQL */ `
   query PostsByLikes(
-    $likes: Int
-    $channel: ModelIDKeyConditionInput
+    $channel: ID
+    $likes: ModelIntKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelPostFilterInput
     $limit: Int
     $nextToken: String
   ) {
     postsByLikes(
-      likes: $likes
       channel: $channel
+      likes: $likes
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit

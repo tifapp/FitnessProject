@@ -150,65 +150,26 @@ export default function FeedScreen({
       graphqlOperation(onCreatePostFromChannel, { channel: channel })
     ).subscribe({
       next: (event) => {
-        const newPost = event.value.data.onCreatePostFromChannel;
-        listRef.mutateData((posts) => {
-          if (
-            !posts.find(
-              (post) =>
-                post.userId === newPost.userId &&
-                post.createdAt === newPost.createdAt
-            )
-          ) {
-            //acts as validation, maybe disable textinput while this happens
-            newPost.likes = newPost.likes ?? 0;
-            newPost.replies = newPost.replies ?? 0;
-            if (newPost.userId === route.params?.myId) {
-              return posts.map((post) => {
-                if (
-                  post.userId === route.params?.myId &&
-                  post.createdAt == "null"
-                )
-                  return newPost;
-                else return post;
-              });
-            } else {
-              LayoutAnimation.configureNext(
-                LayoutAnimation.Presets.easeInEaseOut
-              );
-              return [newPost, ...posts]; //what if we have a lot of new posts at once?
-            }
-          }
-        });
+        const newPost = event.value?.data?.onCreatePostFromChannel;
+        listRef.current.addItem(
+          newPost,
+          (post) =>
+            post.userId === newPost.userId &&
+            post.createdAt === newPost.createdAt
+        );
       },
     });
     const deletePostSubscription = API.graphql(
       graphqlOperation(onDeletePostFromChannel, { channel: channel })
     ).subscribe({
       next: (event) => {
-        const deletedPost = event.value.data.onDeletePostFromChannel;
-        if (deletedPost.userId != route.params?.myId) {
-          //acts as validation, maybe disable textinput while this happens
-          listRef.mutateData((posts) => {
-            if (
-              currentPosts.current.find(
-                (post) =>
-                  post.userId === deletedPost.userId &&
-                  post.createdAt === deletedPost.createdAt
-              )
-            ) {
-              LayoutAnimation.configureNext(
-                LayoutAnimation.Presets.easeInEaseOut
-              );
-              var index = posts.findIndex(
-                (post) =>
-                  post.userId === deletedPost.userId &&
-                  post.createdAt === deletedPost.createdAt
-              );
-              posts.splice(index, 1);
-              return posts;
-            }
-          });
-        }
+        const deletedPost = event?.value?.data?.onDeletePostFromChannel;
+        if (!deletedPost) return;
+        listRef.current.removeItem(
+          (post) =>
+            post.userId === deletedPost.userId &&
+            post.createdAt === deletedPost.createdAt
+        );
       },
     });
     const updatePostSubscription = API.graphql(
@@ -323,7 +284,7 @@ export default function FeedScreen({
 
   const updatePostAsync = async (createdAt, editedText) => {
     //replace the post locally
-    listRef.mutateData((posts) => {
+    listRef.current.mutateData((posts) => {
       posts.find((p) => {
         return p.createdAt == createdAt && p.userId == route.params?.myId;
       }).description = editedText;
@@ -390,7 +351,7 @@ export default function FeedScreen({
     checkInternetConnection();
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    listRef.mutateData((posts) => {
+    listRef.current.mutateData((posts) => {
       return posts.filter((post) => (post.createdAt !== timestamp || post.userId !== route.params?.myId));
     });
 
@@ -406,12 +367,10 @@ export default function FeedScreen({
     checkInternetConnection();
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    listRef.mutateData((posts) => {
-      return posts.filter(
-        (post) =>
-          post.createdAt !== timestamp || post.userId !== route.params?.myId
-      );
-    });
+    listRef.current.removeItem(
+      (post) =>
+        post.createdAt === timestamp && post.userId === route.params?.myId
+    );
 
     try {
       await API.graphql(
@@ -425,12 +384,9 @@ export default function FeedScreen({
   };
 
   const reportPost = async (timestamp, author) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    listRef.mutateData((posts) => {
-      return posts.filter(
-        (post) => post.createdAt !== timestamp || post.userId !== author
-      );
-    });
+    listRef.current.removeItem(
+      (post) => post.createdAt === timestamp && post.userId === author
+    );
 
     try {
       await API.graphql(
@@ -520,7 +476,7 @@ export default function FeedScreen({
       let currentIndex = 0;
 
       /*
-      listRef.mutateData((posts) => {
+      listRef.current.mutateData((posts) => {
         return posts.map((post, index) => {
           //we'll activate real time updates for posts just out of view
           if (
@@ -624,9 +580,6 @@ export default function FeedScreen({
                 receiver={receiver}
                 myId={route.params?.myId}
                 originalParentId={originalParentId}
-                pushLocalPost={(localNewPost) =>
-                  listRef.mutateData((posts) => [localNewPost, ...posts])
-                }
                 autoFocus={autoFocus}
               />
             </KeyboardAvoidingView>
@@ -637,9 +590,6 @@ export default function FeedScreen({
               receiver={receiver}
               myId={route.params?.myId}
               originalParentId={originalParentId}
-              pushLocalPost={(localNewPost) =>
-                listRef.mutateData((posts) => [localNewPost, ...posts])
-              }
               autoFocus={autoFocus}
             />
           )}
@@ -663,7 +613,6 @@ function PostInputField({
   receiver,
   myId,
   originalParentId,
-  pushLocalPost,
   autoFocus = false,
 }) {
   const [pickFromGallery, pickFromCamera] = usePhotos(true);
@@ -719,8 +668,9 @@ function PostInputField({
     };
     setPostInput("");
 
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    pushLocalPost(localNewPost);
+
+    //LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    //pushLocalPost(localNewPost);
 
     if (newPost.receiver && global.updateFriendsListWithMyNewMessage)
       global.updateFriendsListWithMyNewMessage(newPost);
