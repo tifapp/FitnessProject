@@ -6,8 +6,7 @@ import CheckBox from "@react-native-community/checkbox"; //when ios is supported
 import { API, graphqlOperation } from "aws-amplify";
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Platform,
+  ActivityIndicator, Platform,
   StyleSheet,
   Text,
   TouchableOpacity
@@ -46,10 +45,6 @@ export default function LocationButton({ id }) {
       const user = await API.graphql(graphqlOperation(getUser, { id }));
       // @ts-ignore
       const fields = user.data.getUser;
-
-      console.log("---------------\n");
-      console.log(fields.location);
-      console.log("---------------\n");
       
       if (fields != null && fields.location != null) {
         updateLocation();
@@ -65,10 +60,13 @@ export default function LocationButton({ id }) {
       //function call to get location from device
       console.log("LOCATION IS SET");
       try {
+        if (location == null)
+          throw new Error("Location Permisssion Denied");
         await updateUserLocationAsync(location); //send location to database
         setLocationEnabled(true);
-      } catch {
+      } catch (e) {
         //alert pop up if there was an error sending the location to the database
+        alert(e);
         setLocationEnabled(false);
       }
       setIsLoading(false);
