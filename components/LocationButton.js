@@ -10,7 +10,7 @@ import {
   Platform,
   StyleSheet,
   Text,
-  TouchableOpacity,
+  TouchableOpacity
 } from "react-native";
 
 export default function LocationButton({ id }) {
@@ -19,7 +19,7 @@ export default function LocationButton({ id }) {
 
   const updateUserLocationAsync = async (location) => {
     //function to send user's location to database
-    if (location == null) throw new Error();
+    //if (location == null) throw new Error();
     try {
       const user = await API.graphql(graphqlOperation(getUser, { id }));
       // @ts-ignore
@@ -47,6 +47,10 @@ export default function LocationButton({ id }) {
       // @ts-ignore
       const fields = user.data.getUser;
 
+      console.log("---------------\n");
+      console.log(fields.location);
+      console.log("---------------\n");
+      
       if (fields != null && fields.location != null) {
         updateLocation();
       } else {
@@ -77,6 +81,7 @@ export default function LocationButton({ id }) {
       onPress={() => {
         if (locationEnabled) {
           updateUserLocationAsync(null);
+          setLocationEnabled(false);
         } else {
           updateLocation(); //checkbox should be enabled if the user gives permission to use their location AND location is successfully sent to database
         }

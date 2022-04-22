@@ -18,7 +18,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import BasicInfoDetails from "../components/basicInfoComponents/BasicInfoDetails";
 import { createUser, updateUser } from "../src/graphql/mutations";
@@ -384,7 +384,7 @@ const ProfileScreen = ({ navigation, route }) => {
             />
           </TouchableWithModal>
 
-          <LocationButton id={route.params?.id} />
+          <LocationButton id={route.params?.myId} />
           {route.params?.newUser ? ( //if name is blank?
             <TouchableOpacity
               style={[styles.buttonStyle, { marginBottom: 25 }]}
