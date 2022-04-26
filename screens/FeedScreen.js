@@ -7,11 +7,9 @@ import PostItem from "@components/PostItem";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import SpamButton from "@components/SpamButton";
 import {
-  createBlock,
   createConversation,
   createPost,
   createReport,
-  deleteConversation,
   deletePost,
   updateConversation,
   updatePost,
@@ -103,48 +101,6 @@ export default function FeedScreen({
       }
     }, [])
   );
-
-  const checkButton = async () => {
-    let namesArray = [myId, receiver];
-    namesArray.sort();
-
-    let temp = namesArray[0] + namesArray[1];
-
-    let newConversations1 = await API.graphql(
-      graphqlOperation(getConversation, { id: temp })
-    );
-
-    newConversations1 = newConversations1.data.getConversation;
-
-    if (newConversations1 == null) {
-      setButtonCheck(false);
-    } else if (newConversations1.Accepted) {
-      setButtonCheck(true);
-    } else {
-      setButtonCheck(false);
-    }
-
-    //let checkConversationExists = newConversations1.find(item => (item.users[0] === myId && item.users[1] === receiver) || (item.users[0] === receiver && item.users[1] === myId));
-    //let checkMessageRequestExists = newConversations2.find(item => (item.users[0] === myId && item.users[1] === receiver) || (item.users[0] === receiver && item.users[1] === myId));
-  };
-
-  /*
-  useEffect(() => {
-    const onFocus = navigation.addListener("focus", () => {
-      console.log("Inside the Use Effect for check button");
-      checkButton();
-    });
-
-    // Return the function to unsubscribe from the event so it gets removed on unmount
-    return onFocus;
-  }, [navigation]);
-
-  /*
-    useEffect(() => {
-      console.log("hello");
-      checkButton();
-    }, [])
-    */
 
   useEffect(() => {
     const createPostSubscription = API.graphql(
@@ -302,49 +258,6 @@ export default function FeedScreen({
     } catch (err) {
       console.log("error in updating post: ", err);
     }
-  };
-
-  const acceptMessageRequest = async () => {
-    await API.graphql(
-      graphqlOperation(updateConversation, {
-        input: { id: channel, Accepted: 1 },
-      })
-    );
-    setButtonCheck(true);
-  };
-
-  const rejectMessageRequest = async () => {
-    await API.graphql(
-      graphqlOperation(deleteConversation, {
-        input: { id: id },
-      })
-    );
-    navigation.navigate("Conversations");
-  };
-
-  const blockMessageRequest = async () => {
-    await API.graphql(
-      graphqlOperation(deleteConversation, {
-        input: { id: id },
-      })
-    );
-
-    try {
-      await API.graphql(
-        graphqlOperation(createBlock, { input: { blockee: receiver } })
-      );
-      console.log("Inside the create block");
-    } catch (err) {
-      console.log("error in blocking user: ", err);
-    }
-
-    localBlockList.push({
-      createdAt: new Date(Date.now()).toISOString(),
-      userId: myId,
-      blockee: id,
-    });
-
-    navigation.navigate("Conversations");
   };
 
   /*
@@ -524,67 +437,12 @@ export default function FeedScreen({
       ListFooterComponent={footerComponent}
       ListHeaderComponent={
         <View style={{}}>
-          {headerComponent}
-          {lastUser != myId &&
-          lastUser != null &&
-          receiver != null &&
-          !ButtonCheck ? (
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                marginVertical: 15,
-              }}
-            >
-              <IconButton
-                iconName={"check"}
-                size={22}
-                color={"green"}
-                onPress={acceptMessageRequest}
-                style={{ paddingHorizontal: 12 }}
-                label={"Accept"}
-                fontSize={18}
-              />
-
-              <IconButton
-                iconName={"clear"}
-                size={22}
-                color={"red"}
-                onPress={rejectMessageRequest}
-                style={{ paddingHorizontal: 12 }}
-                label={"Reject"}
-                fontSize={18}
-              />
-
-              <IconButton
-                iconName={"block"}
-                size={22}
-                color={"black"}
-                onPress={blockMessageRequest}
-                style={{ paddingHorizontal: 12 }}
-                label={"Block"}
-                fontSize={18}
-              />
-            </View>
-          ) : null}
-
-          {receiver == null ? (
-            <KeyboardAvoidingView
-              behavior={Platform.OS === "ios" ? "position" : "height"}
-              keyboardVerticalOffset={90}
-              style={{ flex: 1 }}
-            >
-              <PostInputField
-                channel={channel}
-                headerComponent={headerComponent}
-                receiver={receiver}
-                myId={myId}
-                originalParentId={originalParentId}
-                autoFocus={autoFocus}
-                isChallenge={isChallenge}
-              />
-            </KeyboardAvoidingView>
-          ) : (
+          <KeyboardAvoidingView
+            enabled={receiver != null}
+            behavior={Platform.OS === "ios" ? "position" : "height"}
+            keyboardVerticalOffset={90}
+            style={{ flex: 1 }}
+          >
             <PostInputField
               channel={channel}
               headerComponent={headerComponent}
@@ -594,7 +452,8 @@ export default function FeedScreen({
               autoFocus={autoFocus}
               isChallenge={isChallenge}
             />
-          )}
+          </KeyboardAvoidingView>
+          {headerComponent}
         </View>
       }
       initialAmount={7}
