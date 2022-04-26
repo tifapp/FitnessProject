@@ -30,6 +30,7 @@ import {
 } from "@graphql/subscriptions";
 import SHA256 from "@hooks/hash";
 import NetInfo from "@react-native-community/netinfo";
+import { useFocusEffect } from "@react-navigation/native";
 // Get the aws resources configuration parameters
 import { API, Cache, graphqlOperation, Storage } from "aws-amplify";
 import { Video } from "expo-av";
@@ -65,7 +66,6 @@ const viewabilityConfig = {
 
 export default function FeedScreen({
   navigation,
-  route,
   receiver,
   channel,
   headerComponent,
@@ -74,23 +74,25 @@ export default function FeedScreen({
   Accepted,
   lastUser,
   sidebar,
+  myId,
   id,
   isFocused,
   challenge,
   autoFocus = false,
+  isChallenge = false,
 }) {
   const [onlineCheck, setOnlineCheck] = useState(true);
 
   const scrollRef = useRef(); // Used to help with automatic scrolling to top
   const listRef = useRef();
 
-  useEffect(() => {
-    const onFocus = navigation.addListener("focus", () => {
+  useFocusEffect(
+    React.useCallback(() => {
       if (receiver == null && channel === "general") {
         navigation.setOptions({
           headerLeft: () => (
             <ProfileImageAndName
-              userId={route.params?.myId}
+              userId={myId}
               isFullSize={true}
               hidename={true}
               imageSize={30}
@@ -99,13 +101,11 @@ export default function FeedScreen({
           ),
         });
       }
-    });
-    // Return the function to unsubscribe from the event so it gets removed on unmount
-    return onFocus;
-  }, [navigation]);
+    }, [])
+  );
 
   const checkButton = async () => {
-    let namesArray = [route.params?.myId, receiver];
+    let namesArray = [myId, receiver];
     namesArray.sort();
 
     let temp = namesArray[0] + namesArray[1];
@@ -124,10 +124,11 @@ export default function FeedScreen({
       setButtonCheck(false);
     }
 
-    //let checkConversationExists = newConversations1.find(item => (item.users[0] === route.params?.myId && item.users[1] === receiver) || (item.users[0] === receiver && item.users[1] === route.params?.myId));
-    //let checkMessageRequestExists = newConversations2.find(item => (item.users[0] === route.params?.myId && item.users[1] === receiver) || (item.users[0] === receiver && item.users[1] === route.params?.myId));
+    //let checkConversationExists = newConversations1.find(item => (item.users[0] === myId && item.users[1] === receiver) || (item.users[0] === receiver && item.users[1] === myId));
+    //let checkMessageRequestExists = newConversations2.find(item => (item.users[0] === myId && item.users[1] === receiver) || (item.users[0] === receiver && item.users[1] === myId));
   };
 
+  /*
   useEffect(() => {
     const onFocus = navigation.addListener("focus", () => {
       console.log("Inside the Use Effect for check button");
@@ -286,7 +287,7 @@ export default function FeedScreen({
     //replace the post locally
     listRef.current.mutateData((posts) => {
       posts.find((p) => {
-        return p.createdAt == createdAt && p.userId == route.params?.myId;
+        return p.createdAt == createdAt && p.userId == myId;
       }).description = editedText;
       return posts;
     });
@@ -339,7 +340,7 @@ export default function FeedScreen({
 
     localBlockList.push({
       createdAt: new Date(Date.now()).toISOString(),
-      userId: route.params?.myId,
+      userId: myId,
       blockee: id,
     });
 
@@ -352,11 +353,11 @@ export default function FeedScreen({
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     listRef.current.mutateData((posts) => {
-      return posts.filter((post) => (post.createdAt !== timestamp || post.userId !== route.params?.myId));
+      return posts.filter((post) => (post.createdAt !== timestamp || post.userId !== myId));
     });
 
     try {
-      await API.graphql(graphqlOperation(deletePost, { input: { createdAt: timestamp, userId: route.params?.myId } }));
+      await API.graphql(graphqlOperation(deletePost, { input: { createdAt: timestamp, userId: myId } }));
     } catch {
       console.log("error in deleting post: ");
     }
@@ -368,14 +369,13 @@ export default function FeedScreen({
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     listRef.current.removeItem(
-      (post) =>
-        post.createdAt === timestamp && post.userId === route.params?.myId
+      (post) => post.createdAt === timestamp && post.userId === myId
     );
 
     try {
       await API.graphql(
         graphqlOperation(deletePost, {
-          input: { createdAt: timestamp, userId: route.params?.myId },
+          input: { createdAt: timestamp, userId: myId },
         })
       );
     } catch {
@@ -393,7 +393,7 @@ export default function FeedScreen({
         graphqlOperation(createReport, {
           input: {
             postId: timestamp + "#" + author,
-            userId: route.params?.myId,
+            userId: myId,
           },
         })
       );
@@ -429,8 +429,8 @@ export default function FeedScreen({
           likes={item.likes}
           replies={item.replies}
           deletePostsAsync={deletePostsAsync}
-          writtenByYou={item.userId === route.params?.myId}
-          myId={route.params?.myId}
+          writtenByYou={item.userId === myId}
+          myId={myId}
           editButtonHandler={updatePostAsync}
           receiver={receiver}
           showTimestamp={showTimestamp(item, index)}
@@ -448,8 +448,8 @@ export default function FeedScreen({
           likes={item.likes}
           replies={item.replies}
           deletePostsAsync={deletePostsAsync}
-          writtenByYou={item.userId === route.params?.myId}
-          myId={route.params?.myId}
+          writtenByYou={item.userId === myId}
+          myId={myId}
           editButtonHandler={updatePostAsync}
           receiver={receiver}
           showTimestamp={showTimestamp(item, index)}
@@ -525,7 +525,7 @@ export default function FeedScreen({
       ListHeaderComponent={
         <View style={{}}>
           {headerComponent}
-          {lastUser != route.params.myId &&
+          {lastUser != myId &&
           lastUser != null &&
           receiver != null &&
           !ButtonCheck ? (
@@ -578,9 +578,10 @@ export default function FeedScreen({
                 channel={channel}
                 headerComponent={headerComponent}
                 receiver={receiver}
-                myId={route.params?.myId}
+                myId={myId}
                 originalParentId={originalParentId}
                 autoFocus={autoFocus}
+                isChallenge={isChallenge}
               />
             </KeyboardAvoidingView>
           ) : (
@@ -588,9 +589,10 @@ export default function FeedScreen({
               channel={channel}
               headerComponent={headerComponent}
               receiver={receiver}
-              myId={route.params?.myId}
+              myId={myId}
               originalParentId={originalParentId}
               autoFocus={autoFocus}
+              isChallenge={isChallenge}
             />
           )}
         </View>
@@ -614,8 +616,9 @@ function PostInputField({
   myId,
   originalParentId,
   autoFocus = false,
+  isChallenge = false,
 }) {
-  const [pickFromGallery, pickFromCamera] = usePhotos(true);
+  const [pickFromGallery, pickFromCamera] = usePhotos(!isChallenge, true);
   const [postInput, setPostInput] = useState("");
   const [imageURL, setImageURL] = useState(null);
   const [isVideo, setIsVideo] = useState(null);
@@ -667,7 +670,6 @@ function PostInputField({
       loading: true,
     };
     setPostInput("");
-
 
     //LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     //pushLocalPost(localNewPost);
@@ -836,16 +838,18 @@ function PostInputField({
         )
       ) : null}
 
-      <ExpandingTextInput
-        style={[styles.textInputStyle, { marginTop: 5, marginBottom: 5 }]}
-        autoFocus={autoFocus}
-        multiline={true}
-        placeholder={progress > 0 ? "Uploading..." : "Start typing..."}
-        onChangeText={setPostInput}
-        value={postInput}
-        clearButtonMode="always"
-        maxLength={1000}
-      />
+      {!isChallenge && (
+        <ExpandingTextInput
+          style={[styles.textInputStyle, { marginTop: 5, marginBottom: 5 }]}
+          autoFocus={autoFocus}
+          multiline={true}
+          placeholder={progress > 0 ? "Uploading..." : "Start typing..."}
+          onChangeText={setPostInput}
+          value={postInput}
+          clearButtonMode="always"
+          maxLength={1000}
+        />
+      )}
 
       <View
         style={{

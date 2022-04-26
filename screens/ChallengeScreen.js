@@ -8,7 +8,6 @@ export default function ChallengeScreen({ navigation, route }) {
   //const [query, setQuery] = useState("");
   //console.log(id);
 
-
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.header}>
@@ -16,6 +15,7 @@ export default function ChallengeScreen({ navigation, route }) {
       </View>
       <View style={{ flex: 1 }}>
         <FeedScreen
+          isChallenge={true}
           navigation={navigation}
           route={route}
           channel={route.params?.channel}

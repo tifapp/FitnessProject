@@ -2,17 +2,24 @@ import * as ImagePicker from "expo-image-picker";
 import * as Permissions from "expo-permissions";
 import { Alert } from "react-native";
 
-export default (allowVideo = false) => {
+export default (allowPics = true, allowVideo = false) => {
+  const imageOptions = {
+    mediaTypes: allowPics
+      ? allowVideo
+        ? ImagePicker.MediaTypeOptions.All
+        : ImagePicker.MediaTypeOptions.Images
+      : ImagePicker.MediaTypeOptions.Videos,
+    allowsEditing: true,
+    aspect: [1, 1],
+    quality: 1,
+  };
+
   const pickFromGallery = async (setImageURL, setImageChanged, setIsVideo) => {
     const { granted } = await Permissions.askAsync(Permissions.MEDIA_LIBRARY);
     if (granted) {
       let response = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: allowVideo
-          ? ImagePicker.MediaTypeOptions.All
-          : ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
+        ...imageOptions,
         aspect: [1, 1],
-        quality: 1,
       });
       if (!response.cancelled) {
         // @ts-ignore
@@ -32,12 +39,8 @@ export default (allowVideo = false) => {
     const { granted } = await Permissions.askAsync(Permissions.CAMERA);
     if (granted) {
       let response = await ImagePicker.launchCameraAsync({
-        mediaTypes: allowVideo
-          ? ImagePicker.MediaTypeOptions.All
-          : ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
+        ...imageOptions,
         aspect: [1, 1],
-        quality: 1,
       });
       if (!response.cancelled) {
         // @ts-ignore

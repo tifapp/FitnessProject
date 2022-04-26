@@ -4,7 +4,6 @@ import LinkableText from "@components/LinkableText";
 import PostHeader from "@components/postComponents/PostHeader";
 import PostImage from "@components/PostImage";
 import { likesByPost } from "@graphql/queries";
-import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useRef, useState } from "react";
 import {
   Dimensions,
@@ -37,9 +36,6 @@ export default React.memo(function PostItem({
   replies,
   index,
 }) {
-  const navigation = useNavigation();
-  const route = useRoute();
-
   const likesModalRef = useRef();
   const repliesModalRef = useRef();
   const [isEditing, setIsEditing] = useState(false);
@@ -48,22 +44,7 @@ export default React.memo(function PostItem({
   return (
     <View style={styles.secondaryContainerStyle}>
       <View
-        style={[
-          styles.spaceAround,
-          replyButtonHandler ?? {
-            marginBottom: 20,
-            backgroundColor: "white",
-            shadowColor: "#000",
-            shadowOffset: {
-              width: 0,
-              height: 1,
-            },
-            shadowOpacity: 0.18,
-            shadowRadius: 1.0,
-
-            elevation: 1,
-          },
-        ]}
+        style={[styles.spaceAround, replyButtonHandler ?? styles.nestedReply]}
       >
         <PostHeader
           item={item}
@@ -71,7 +52,9 @@ export default React.memo(function PostItem({
           deletePostsAsync={deletePostsAsync}
           writtenByYou={writtenByYou}
           toggleEditing={() => setIsEditing(!isEditing)}
-          repliesPressed={repliesModalRef.current?.showModal}
+          repliesPressed={() => {
+            repliesModalRef.current?.showModal();
+          }}
           reportPost={reportPost}
           shouldSubscribe={shouldSubscribe}
         />
@@ -166,7 +149,9 @@ export default React.memo(function PostItem({
               marginTop: 8,
               marginBottom: 16,
             }}
-            onPress={likesModalRef.current?.showModal()}
+            onPress={() => {
+              likesModalRef.current?.showModal();
+            }}
           >
             <APIList
               style={{ margin: 0, padding: 0 }}
@@ -192,7 +177,7 @@ export default React.memo(function PostItem({
                     }}
                     imageSize={20}
                     userId={item.userId}
-                    onPress={likesModalRef.current?.showModal()}
+                    onPress={likesModalRef.current?.showModal}
                   />
                   <Text>
                     {likes > 1 ? "and " + (likes - 1) + " others" : ""} liked
@@ -205,11 +190,11 @@ export default React.memo(function PostItem({
           </TouchableOpacity>
         )}
 
-        <Modal>
-          <LikesModal ref={likesModalRef} item={item} />
+        <Modal ref={likesModalRef}>
+          <LikesModal item={item} />
         </Modal>
-        <Modal>
-          <CommentsModal ref={repliesModalRef} item={item} myId={myId} />
+        <Modal ref={repliesModalRef}>
+          <CommentsModal item={item} myId={myId} />
         </Modal>
       </View>
 
@@ -282,5 +267,18 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginHorizontal: 6,
+  },
+  nestedReply: {
+    marginBottom: 20,
+    backgroundColor: "white",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.18,
+    shadowRadius: 1.0,
+
+    elevation: 1,
   },
 });

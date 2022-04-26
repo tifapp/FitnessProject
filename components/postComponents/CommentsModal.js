@@ -7,7 +7,7 @@ import { View } from "react-native";
 import ElevatedView from "../common/ElevatedView";
 import IconButton from "../common/IconButton";
 
-export default function CommentsModal({ item, myId, navigation, route }) {
+export default function CommentsModal({ item, myId, navigation }) {
   return (
     <>
       <ElevatedView
@@ -45,7 +45,7 @@ export default function CommentsModal({ item, myId, navigation, route }) {
             item={item}
             myId={myId}
             //deletePostsAsync={deletePostsAsync}
-            writtenByYou={item.userId === route.params?.myId}
+            writtenByYou={item.userId === myId}
             //editButtonHandler={updatePostAsync} deleting a post while on the reply screen?
             //replyButtonHandler={() => {
             //setAreRepliesVisible(false);
@@ -56,7 +56,7 @@ export default function CommentsModal({ item, myId, navigation, route }) {
         }
         autoFocus={true}
         navigation={navigation}
-        route={route}
+        myId={myId}
         channel={SHA256(item.userId + item.createdAt)} //unique id
         originalParentId={item.createdAt + "#" + item.userId}
       />

@@ -18,7 +18,13 @@ export default function MainStack({ navigation, route }) {
   return (
     <Stack.Navigator initialRouteName="Feed" screenOptions={headerOptions}>
       <Stack.Screen name="Feed" initialParams={route.params}>
-        {(props) => <FeedScreen {...props} channel={"general"} />}
+        {(props) => (
+          <FeedScreen
+            {...props}
+            channel={"general"}
+            myId={route.params?.myId}
+          />
+        )}
       </Stack.Screen>
       <Stack.Screen
         name="Lookup"
