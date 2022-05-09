@@ -17,7 +17,7 @@ export default function ChallengeScreen({ navigation, route }) {
         <FeedScreen
           isChallenge={true}
           navigation={navigation}
-          route={route}
+          myId={route.params?.myId}
           channel={route.params?.channel}
           challenge={true}
         />

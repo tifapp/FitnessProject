@@ -2,7 +2,6 @@
 import APIList from "@components/APIList";
 import IconButton from "@components/common/IconButton";
 import ExpandingTextInput from "@components/ExpandingTextInput";
-import MessageItem from "@components/MessageItem";
 import PostItem from "@components/PostItem";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import SpamButton from "@components/SpamButton";
@@ -64,7 +63,6 @@ const viewabilityConfig = {
 
 export default function FeedScreen({
   navigation,
-  receiver,
   channel,
   headerComponent,
   footerComponent,
@@ -76,8 +74,12 @@ export default function FeedScreen({
   id,
   isFocused,
   challenge,
+  style,
+  postButtonLabel,
+  renderItem = PostItem,
   autoFocus = false,
   isChallenge = false,
+  ...rest
 }) {
   const [onlineCheck, setOnlineCheck] = useState(true);
 
@@ -86,7 +88,7 @@ export default function FeedScreen({
 
   useFocusEffect(
     React.useCallback(() => {
-      if (receiver == null && channel === "general") {
+      if (channel === "general") {
         navigation.setOptions({
           headerLeft: () => (
             <ProfileImageAndName
@@ -260,23 +262,6 @@ export default function FeedScreen({
     }
   };
 
-  /*
-  const addPostAsync = async (parentId, replyText) => {
-    checkInternetConnection();
-
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    listRef.current.mutateData((posts) => {
-      return posts.filter((post) => (post.createdAt !== timestamp || post.userId !== myId));
-    });
-
-    try {
-      await API.graphql(graphqlOperation(deletePost, { input: { createdAt: timestamp, userId: myId } }));
-    } catch {
-      console.log("error in deleting post: ");
-    }
-  };
-  */
-
   const deletePostsAsync = async (timestamp) => {
     checkInternetConnection();
 
@@ -334,111 +319,67 @@ export default function FeedScreen({
           }}
         />
       );
-    else if (receiver != null)
-      return (
-        <MessageItem
-          index={index}
-          item={item}
-          likes={item.likes}
-          replies={item.replies}
-          deletePostsAsync={deletePostsAsync}
-          writtenByYou={item.userId === myId}
-          myId={myId}
-          editButtonHandler={updatePostAsync}
-          receiver={receiver}
-          showTimestamp={showTimestamp(item, index)}
-          reportPost={reportPost}
-          newSection={true}
-          isVisible={item.isVisible && isFocused}
-          shouldSubscribe={item.shouldSubscribe}
-        />
-      );
     else
-      return (
-        <PostItem
-          index={index}
-          item={item}
-          likes={item.likes}
-          replies={item.replies}
-          deletePostsAsync={deletePostsAsync}
-          writtenByYou={item.userId === myId}
-          myId={myId}
-          editButtonHandler={updatePostAsync}
-          receiver={receiver}
-          showTimestamp={showTimestamp(item, index)}
-          reportPost={reportPost}
-          newSection={true}
-          isVisible={item.isVisible}
-          shouldSubscribe={item.shouldSubscribe}
-        />
-      );
+      return renderItem({
+        index,
+        item,
+        likes: item.likes,
+        replies: item.replies,
+        deletePostsAsync,
+        writtenByYou: item.userId === myId,
+        myId,
+        editButtonHandler: updatePostAsync,
+        receiver,
+        showTimestamp: showTimestamp(item, index),
+        reportPost,
+        newSection: true,
+        isVisible: item.isVisible && isFocused,
+      });
   };
 
   const onViewableItemsChanged = React.useCallback(
     ({ viewableItems, changedItems }) => {
-      //console.log("viewable items have changed")
-
       if (viewableItems.length <= 0) return;
 
-      //find the index in the posts array of the first item in viewableitems.
-      const firstViewableIndex = 0;
-      //record that starting index
-
-      //loop through the posts array until we hit startingindex - 20 and turn off subscription flags
-      //turn on subscription flags until we hit startingindex + viewableitems.length + 20
       let currentIndex = 0;
 
-      /*
-      listRef.current.mutateData((posts) => {
-        return posts.map((post, index) => {
-          //we'll activate real time updates for posts just out of view
-          if (
-            (index < firstViewableIndex && index >= firstViewableIndex - 10) ||
-            (index > firstViewableIndex + viewableItems.length &&
-              index <= firstViewableIndex + viewableItems.length + 10)
-          ) {
-            post.shouldSubscribe = true;
-          } else {
-            post.shouldSubscribe = false;
-          }
+      listRef.current.filterItems((post) => {
+        post.isVisible = false;
+        if (
+          viewableItems[currentIndex] &&
+          viewableItems[currentIndex].key ===
+            post.createdAt.toString() + post.userId
+        ) {
+          //grab the middle of the index, that's the video that should be playing (if there is any)
+          //console.log("turning post visible")
+          ++currentIndex;
+          post.isVisible = true;
+        }
 
-          post.isVisible = false;
-          if (
-            viewableItems[currentIndex] &&
-            viewableItems[currentIndex].key ===
-              post.createdAt.toString() + post.userId
-          ) {
-            //grab the middle of the index, that's the video that should be playing (if there is any)
-            //console.log("turning post visible")
-            ++currentIndex;
-            post.isVisible = true;
-          }
-
-          return post;
-        });
+        return post;
       });
-      */
 
       //in the postitem have a useeffect listening for the subscription flag to turn on and off subscriptions for that post
     },
     []
   );
 
+  const viewabilityConfigCallbackPairs = useRef([
+    { viewabilityConfig, onViewableItemsChanged },
+  ]);
+
   return (
     <APIList
+      {...rest}
       ref={listRef}
-      inverted={receiver != null}
-      style={[
-        { flex: 1 },
-        receiver == null ? { backgroundColor: "#a9efe0" } : {},
-      ]}
-      viewabilityConfig={viewabilityConfig}
+      style={[{ flex: 1 }, style]}
+      viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
       ListRef={scrollRef}
       ListFooterComponent={footerComponent}
       ListHeaderComponent={
         <View style={{}}>
           <KeyboardAvoidingView
-            enabled={receiver != null}
+            enabled={rest.inverted}
             behavior={Platform.OS === "ios" ? "position" : "height"}
             keyboardVerticalOffset={90}
             style={{ flex: 1 }}
@@ -451,6 +392,7 @@ export default function FeedScreen({
               originalParentId={originalParentId}
               autoFocus={autoFocus}
               isChallenge={isChallenge}
+              label={postButtonLabel}
             />
           </KeyboardAvoidingView>
           {headerComponent}
@@ -464,14 +406,13 @@ export default function FeedScreen({
       renderItem={renderPostItem}
       keyExtractor={(item) => item.createdAt.toString() + item.userId}
       onEndReachedThreshold={0.5}
-      onViewableItemsChanged={onViewableItemsChanged}
     />
   );
 }
 
 function PostInputField({
   channel,
-  receiver,
+  label,
   myId,
   originalParentId,
   autoFocus = false,
@@ -755,7 +696,7 @@ function PostInputField({
               ? "gray"
               : "blue"
           }
-          label={receiver != null ? "Send Message" : "Add Post"}
+          label={label ?? "Add Post"}
           onPress={
             postIsLoading
               ? () => {

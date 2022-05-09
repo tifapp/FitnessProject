@@ -162,8 +162,9 @@ class APIList extends PureComponent {
   };
 
   render() {
+    const { style, ListRef, ...rest } = this.props;
     return (
-      <View style={this.props.style}>
+      <View style={style}>
         {this.state.loadingInitial ||
         (this.state.loading &&
           !this.state.loadingMore &&
@@ -180,14 +181,9 @@ class APIList extends PureComponent {
           />
         ) : (
           <FlatList
-            inverted={this.props.inverted}
-            viewabilityConfig={this.props.viewabilityConfig}
-            onScroll={this.props.onScroll}
+            {...rest}
             scrollEventThrottle={0}
-            ref={this.props.ListRef}
-            ListHeaderComponent={this.props.ListHeaderComponent}
-            ListFooterComponent={this.props.ListFooterComponent}
-            horizontal={this.props.horizontal}
+            ref={ListRef}
             contentContainerStyle={{ flexGrow: 1 }}
             data={this.state.data}
             refreshControl={
@@ -198,12 +194,9 @@ class APIList extends PureComponent {
                 />
               )
             }
-            renderItem={this.props.renderItem}
-            keyExtractor={this.props.keyExtractor}
             onEndReached={
               this.props.additionalAmount > 0 ? this.loadMore : () => {}
             }
-            onEndReachedThreshold={this.props.onEndReachedThreshold}
             ListEmptyComponent={
               <Text
                 style={{
@@ -218,14 +211,12 @@ class APIList extends PureComponent {
                 {this.props.ListEmptyMessage}
               </Text>
             }
-            getItemLayout={this.props.getItemLayout}
             maxToRenderPerBatch={
               this.props.additionalAmount > 0 ? this.props.additionalAmount : 1
             } //we'll have to do more tests with these numbers. maxrender 6 and batchingperiod 60 with an additionalamount of 10 and lower caused frequent restarting on my android. seems to be the items have to be rendered first, if they render afterwards (show up as blank, then pop in) then they cause the list to crash.
             //removeClippedSubviews={true} //documentation says this may reduce crashing but causes glitches on ios
             updateCellsBatchingPeriod={20} //numbers could vary based on device and size of memory. this one should be as big as possible, but 50 and above is too large.
             windowSize={21}
-            onViewableItemsChanged={this.props.onViewableItemsChanged}
             ListFooterComponent={
               this.state.loadingMore ? (
                 <ActivityIndicator

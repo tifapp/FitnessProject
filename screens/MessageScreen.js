@@ -1,5 +1,6 @@
 // @ts-nocheck
 import AcceptMessageButtons from "@components/AcceptMessageButtons";
+import MessageItem from "@components/MessageItem";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import { getBlock, getConversation, getUser } from "@graphql/queries";
 import { onDeleteConversation } from "@graphql/subscriptions";
@@ -146,6 +147,9 @@ export default function MessageScreen({ navigation, route }) {
     >
       {!isLoading && !blocked && (
         <FeedScreen
+          inverted={true}
+          style={{ backgroundColor: "#a9efe0" }}
+          postButtonLabel={"Send Message"}
           footerComponent={
             <View>
               <ProfileImageAndName
@@ -168,6 +172,7 @@ export default function MessageScreen({ navigation, route }) {
               )}
             </View>
           }
+          renderItem={MessageItem}
           navigation={navigation}
           route={route}
           receiver={userId}
