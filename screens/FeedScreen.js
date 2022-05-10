@@ -76,7 +76,8 @@ export default function FeedScreen({
   challenge,
   style,
   postButtonLabel,
-  renderItem = PostItem,
+  receiver,
+  renderItem,
   autoFocus = false,
   isChallenge = false,
   ...rest
@@ -320,7 +321,24 @@ export default function FeedScreen({
         />
       );
     else
-      return renderItem({
+      return (
+        <PostItem
+          index={index}
+          item={item}
+          likes={item.likes}
+          replies={item.replies}
+          deletePostsAsync={deletePostsAsync}
+          writtenByYou={item.userId === myId}
+          myId={myId}
+          editButtonHandler={updatePostAsync}
+          receiver={receiver}
+          showTimestamp={showTimestamp(item, index)}
+          reportPost={reportPost}
+          newSection={true}
+          isVisible={item.isVisible && isFocused}
+        />
+      );
+    /*return renderItem({
         index,
         item,
         likes: item.likes,
@@ -334,7 +352,7 @@ export default function FeedScreen({
         reportPost,
         newSection: true,
         isVisible: item.isVisible && isFocused,
-      });
+      });*/
   };
 
   const onViewableItemsChanged = React.useCallback(
@@ -343,6 +361,7 @@ export default function FeedScreen({
 
       let currentIndex = 0;
 
+      /*
       listRef.current.filterItems((post) => {
         post.isVisible = false;
         if (
@@ -358,6 +377,7 @@ export default function FeedScreen({
 
         return post;
       });
+      */
 
       //in the postitem have a useeffect listening for the subscription flag to turn on and off subscriptions for that post
     },
