@@ -1,5 +1,6 @@
+import { Camera } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
-import * as Permissions from "expo-permissions";
+import * as MediaLibrary from "expo-media-library";
 import { Alert } from "react-native";
 
 export default (allowPics = true, allowVideo = false) => {
@@ -15,7 +16,7 @@ export default (allowPics = true, allowVideo = false) => {
   };
 
   const pickFromGallery = async (setImageURL, setImageChanged, setIsVideo) => {
-    const { granted } = await Permissions.askAsync(Permissions.MEDIA_LIBRARY);
+    const { granted } = await MediaLibrary.requestPermissionsAsync();
     if (granted) {
       let response = await ImagePicker.launchImageLibraryAsync({
         ...imageOptions,
@@ -36,7 +37,7 @@ export default (allowPics = true, allowVideo = false) => {
   };
 
   const pickFromCamera = async (setImageURL, setImageChanged, setIsVideo) => {
-    const { granted } = await Permissions.askAsync(Permissions.CAMERA);
+    const { granted } = await Camera.requestCameraPermissionsAsync();
     if (granted) {
       let response = await ImagePicker.launchCameraAsync({
         ...imageOptions,
