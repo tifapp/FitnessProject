@@ -30,9 +30,14 @@ export default async function getLocationAsync(ask = false, callback) {
   let location;
   // @ts-ignore
   if (global.location == null) {
-    location = await locateUser(ask);
-    // @ts-ignore
-    global.location = location;
+    try {
+      location = await locateUser(ask);
+      // @ts-ignore
+      global.location = location;
+    }
+    catch (error) {
+      callback(null, error);
+    }
   }
   callback(location);
 }
