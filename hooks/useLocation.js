@@ -31,7 +31,7 @@ export default async function getLocationAsync(ask = false, callback) {
   // @ts-ignore
   if (global.location == null) {
     try {
-      location = await locateUser(ask);
+      location = await locateUser(ask); // Not sure if this function call will throw an error
       // @ts-ignore
       global.location = location;
     }
