@@ -6,20 +6,12 @@ import PostItem from "@components/PostItem";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import SpamButton from "@components/SpamButton";
 import {
-  createConversation,
   createPost,
   createReport,
   deletePost,
-  updateConversation,
   updatePost,
 } from "@graphql/mutations";
-import {
-  batchGetLikes,
-  getConversation,
-  getFriendship,
-  postsByChannel,
-  postsByLikes,
-} from "@graphql/queries";
+import { batchGetLikes, postsByChannel, postsByLikes } from "@graphql/queries";
 import {
   onCreatePostFromChannel,
   onDeletePostFromChannel,
@@ -32,6 +24,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { API, Cache, graphqlOperation, Storage } from "aws-amplify";
 import { Video } from "expo-av";
 import * as ImageManipulator from "expo-image-manipulator";
+import { SaveFormat } from "expo-image-manipulator";
 import { getLinkPreview } from "link-preview-js";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -40,6 +33,7 @@ import {
   Image,
   KeyboardAvoidingView,
   LayoutAnimation,
+  Platform,
   StyleSheet,
   Text,
   View,
@@ -76,10 +70,10 @@ export default function FeedScreen({
   challenge,
   style,
   postButtonLabel,
-  receiver,
   renderItem,
   autoFocus = false,
   isChallenge = false,
+  onPostAdded,
   ...rest
 }) {
   const [onlineCheck, setOnlineCheck] = useState(true);
@@ -161,7 +155,7 @@ export default function FeedScreen({
           (likes) => {
             //console.log("looking for likes: ", likes);
             //returns an array of like objects or nulls corresponding with the array of newposts
-            for (i = 0; i < newPosts.length; ++i) {
+            for (let i = 0; i < newPosts.length; ++i) {
               if (newPosts[i].likes == null) {
                 newPosts[i].likes = 0;
               }
@@ -178,7 +172,7 @@ export default function FeedScreen({
         allSettled(newPosts.map((post) => Cache.getItem(post.userId))).then(
           (results) => {
             //console.log("all are complete")
-            for (i = 0; i < newPosts.length; ++i) {
+            for (let i = 0; i < newPosts.length; ++i) {
               if (results[i].status === "fulfilled") {
                 newPosts[i].info = results[i].value;
               } else {
@@ -203,7 +197,7 @@ export default function FeedScreen({
           })
         ).then((results) => {
           //console.log(results)
-          for (i = 0; i < newPosts.length; ++i) {
+          for (let i = 0; i < newPosts.length; ++i) {
             if (results[i].status === "fulfilled") {
               newPosts[i].urlPreview = results[i].value;
             }
@@ -315,7 +309,6 @@ export default function FeedScreen({
             flex: 1,
             justifyContent: "center",
             flexDirection: "row",
-            justifyContent: "space-around",
             padding: 20,
           }}
         />
@@ -331,7 +324,6 @@ export default function FeedScreen({
           writtenByYou={item.userId === myId}
           myId={myId}
           editButtonHandler={updatePostAsync}
-          receiver={receiver}
           showTimestamp={showTimestamp(item, index)}
           reportPost={reportPost}
           newSection={true}
@@ -405,9 +397,8 @@ export default function FeedScreen({
             style={{ flex: 1 }}
           >
             <PostInputField
+              onPostAdded={onPostAdded}
               channel={channel}
-              headerComponent={headerComponent}
-              receiver={receiver}
               myId={myId}
               originalParentId={originalParentId}
               autoFocus={autoFocus}
@@ -437,6 +428,7 @@ function PostInputField({
   originalParentId,
   autoFocus = false,
   isChallenge = false,
+  onPostAdded,
 }) {
   const [pickFromGallery, pickFromCamera] = usePhotos(!isChallenge, true);
   const [postInput, setPostInput] = useState("");
@@ -471,9 +463,6 @@ function PostInputField({
       description: postInput,
       channel: channel,
     };
-    if (receiver != null) {
-      newPost.receiver = receiver;
-    }
     if (originalParentId != null) {
       newPost.parentId = originalParentId;
     }
@@ -494,8 +483,6 @@ function PostInputField({
     //LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     //pushLocalPost(localNewPost);
 
-    if (newPost.receiver && global.updateFriendsListWithMyNewMessage)
-      global.updateFriendsListWithMyNewMessage(newPost);
     //if (global.updatemessagescreen)
     //global.updateMessageScreen
     //if global.updateconversationscreen
@@ -509,7 +496,7 @@ function PostInputField({
           const resizedPhoto = await ImageManipulator.manipulateAsync(
             imageURL,
             [{ resize: { width: 500 } }],
-            { compress: 1, format: "jpeg" }
+            { compress: 1, format: SaveFormat.JPEG }
           );
           const response = await fetch(resizedPhoto.uri);
           blob = await response.blob();
@@ -538,83 +525,7 @@ function PostInputField({
         setImageURL(null);
       }
 
-      if (receiver) {
-        const friend1 = await API.graphql(
-          graphqlOperation(getFriendship, { sender: myId, receiver: receiver })
-        );
-        const friend2 = await API.graphql(
-          graphqlOperation(getFriendship, { sender: receiver, receiver: myId })
-        );
-
-        let checkConversationExists = await API.graphql(
-          graphqlOperation(getConversation, { id: newPost.channel })
-        );
-        checkConversationExists = checkConversationExists.data.getConversation;
-
-        const friend = friend1 ?? friend2;
-
-        let users = [myId, receiver].sort();
-
-        if (checkConversationExists == null) {
-          console.log("convo doesnt exist");
-          if (
-            friend1.data.getFriendship == null &&
-            friend2.data.getFriendship == null
-          ) {
-            await API.graphql(
-              graphqlOperation(createConversation, {
-                input: {
-                  id: channel,
-                  users: users,
-                  lastMessage: postInput,
-                  Accepted: 0,
-                },
-              })
-            );
-          } else if (
-            friend.data.getFriendship &&
-            friend.data.getFriendship.accepted == null
-          ) {
-            await API.graphql(
-              graphqlOperation(createConversation, {
-                input: {
-                  id: channel,
-                  users: users,
-                  lastMessage: postInput,
-                  Accepted: 0,
-                },
-              })
-            );
-          } else {
-            await API.graphql(
-              graphqlOperation(createConversation, {
-                input: {
-                  id: channel,
-                  users: users,
-                  lastMessage: postInput,
-                  Accepted: 1,
-                },
-              })
-            );
-          }
-        } else if (localNewPost.userId != checkConversationExists.lastUser) {
-          await API.graphql(
-            graphqlOperation(updateConversation, {
-              input: {
-                id: newPost.channel,
-                lastMessage: postInput,
-                Accepted: 1,
-              },
-            })
-          );
-        } else {
-          await API.graphql(
-            graphqlOperation(updateConversation, {
-              input: { id: channel, lastMessage: postInput },
-            })
-          );
-        }
-      }
+      onPostAdded?.(newPost); //should go before or after api operation?
 
       API.graphql(graphqlOperation(createPost, { input: newPost }));
     } catch (err) {

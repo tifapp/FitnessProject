@@ -2,13 +2,23 @@
 import AcceptMessageButtons from "@components/AcceptMessageButtons";
 import MessageItem from "@components/MessageItem";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
-import { getBlock, getConversation, getUser } from "@graphql/queries";
+import {
+  createConversation,
+  deleteConversation,
+  updateConversation,
+} from "@graphql/mutations";
+import {
+  getBlock,
+  getConversation,
+  getFriendship,
+  getUser,
+} from "@graphql/queries";
 import { onDeleteConversation } from "@graphql/subscriptions";
 // Get the aws resources configuration parameters
 import FeedScreen from "@screens/FeedScreen";
 import { API, graphqlOperation } from "aws-amplify";
-import React, { useEffect, useState } from "react";
-import { KeyboardAvoidingView, StyleSheet, View } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
 //const { width } = Dimensions.get('window');
 
 export default function MessageScreen({ navigation, route }) {
@@ -136,6 +146,91 @@ export default function MessageScreen({ navigation, route }) {
   );
   */
 
+  const onPostAdded = useCallback(async (newPost) => {
+    newPost.receiver = userId;
+
+    if (global.updateFriendsListWithMyNewMessage)
+      global.updateFriendsListWithMyNewMessage(newPost);
+
+    const myId = route.params?.myId;
+
+    const friend1 = await API.graphql(
+      graphqlOperation(getFriendship, { sender: myId, receiver: userId })
+    );
+    const friend2 = await API.graphql(
+      graphqlOperation(getFriendship, { sender: userId, receiver: myId })
+    );
+
+    let checkConversationExists = await API.graphql(
+      graphqlOperation(getConversation, { id: newPost.channel })
+    );
+    checkConversationExists = checkConversationExists.data.getConversation;
+
+    const friend = friend1 ?? friend2;
+
+    let users = [myId, userId].sort();
+
+    if (checkConversationExists == null) {
+      console.log("convo doesnt exist");
+      if (
+        friend1.data.getFriendship == null &&
+        friend2.data.getFriendship == null
+      ) {
+        await API.graphql(
+          graphqlOperation(createConversation, {
+            input: {
+              id: newPost.channel,
+              users: users,
+              lastMessage: newPost.description,
+              Accepted: 0,
+            },
+          })
+        );
+      } else if (
+        friend.data.getFriendship &&
+        friend.data.getFriendship.accepted == null
+      ) {
+        await API.graphql(
+          graphqlOperation(createConversation, {
+            input: {
+              id: newPost.channel,
+              users: users,
+              lastMessage: newPost.description,
+              Accepted: 0,
+            },
+          })
+        );
+      } else {
+        await API.graphql(
+          graphqlOperation(createConversation, {
+            input: {
+              id: newPost.channel,
+              users: users,
+              lastMessage: newPost.description,
+              Accepted: 1,
+            },
+          })
+        );
+      }
+    } else if (myId != checkConversationExists.lastUser) {
+      await API.graphql(
+        graphqlOperation(updateConversation, {
+          input: {
+            id: newPost.channel,
+            lastMessage: newPost.description,
+            Accepted: 1,
+          },
+        })
+      );
+    } else {
+      await API.graphql(
+        graphqlOperation(updateConversation, {
+          input: { id: newPost.channel, lastMessage: newPost.description },
+        })
+      );
+    }
+  }, []);
+
   //console.log(route.params);
   //console.log(route);
   //have a header with the person's name and profile pic also.
@@ -180,6 +275,7 @@ export default function MessageScreen({ navigation, route }) {
           lastUser={lastUser}
           autoFocus={true}
           isFocused={isFocused}
+          onPostAdded={onPostAdded}
         />
       )}
     </KeyboardAvoidingView>
