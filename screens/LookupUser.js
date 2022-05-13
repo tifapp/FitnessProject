@@ -37,6 +37,7 @@ import {
 } from "react-native";
 
 const LookupUser = ({ route, navigation }) => {
+  const [areMutualFriends, setAreMutualFriends] = useState();
   const [friendStatus, setFriendStatus] = useState("loading"); //can be either "received", "sent", "friends", or "none". don't misspell!
   const [friendsSince, setFriendsSince] = useState("");
   const listRef = useRef();
@@ -129,6 +130,8 @@ const LookupUser = ({ route, navigation }) => {
         else ids.push(element.sender);
       }
     });
+
+    if (mutuals.length > 0) setAreMutualFriends(true);
 
     return mutuals;
   };
@@ -565,7 +568,7 @@ const LookupUser = ({ route, navigation }) => {
         >
           {!user.friendRequestPrivacy ||
           user.friendRequestPrivacy === 0 ||
-          (mutualfriendList.length > 0 && user.friendRequestPrivacy === 1) ||
+          (areMutualFriends && user.friendRequestPrivacy === 1) ||
           (friendStatus === "friends" && user.friendRequestPrivacy >= 1) ? (
             friendStatus === "none" ? (
               <IconButton
@@ -691,7 +694,7 @@ const LookupUser = ({ route, navigation }) => {
           >
             {!user.messagesPrivacy ||
             user.messagesPrivacy === 0 ||
-            (mutualfriendList.length > 0 && user.messagesPrivacy === 1) ||
+            (areMutualFriends && user.messagesPrivacy === 1) ||
             (friendStatus === "friends" && user.messagesPrivacy >= 1) ? (
               <IconButton
                 style={{
@@ -726,7 +729,7 @@ const LookupUser = ({ route, navigation }) => {
       ) : null}
 
       <View>
-        {mutualfriendList.length != 0 ? (
+        {areMutualFriends ? (
           <View style={styles.viewProfileScreen}>
             <Text style={{ fontSize: 20, fontWeight: "normal", marginTop: 30 }}>
               Mutual Friends{" "}
