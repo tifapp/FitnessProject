@@ -56,12 +56,12 @@ export default function LocationButton({ id }) {
 
   const updateLocation = () => {
     setIsLoading(true);
-    getLocationAsync(true, async (location) => {
+    getLocationAsync(true, async (location, error) => {
       //function call to get location from device
       console.log("LOCATION IS SET");
       try {
-        if (location == null)
-          throw new Error("Location Permisssion Denied");
+        if (error)
+          throw error;
         await updateUserLocationAsync(location); //send location to database
         setLocationEnabled(true);
       } catch (e) {
