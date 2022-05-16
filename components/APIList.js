@@ -85,7 +85,18 @@ class APIList extends PureComponent {
 
   removeItem = (toRemove) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    this.setState({ data: this.state.data.filter((item) => !toRemove(item)) });
+
+    if (typeof toRemove === "number") {
+      const array = [...this.state.data];
+      array.splice(toRemove, 1);
+      this.setState({
+        data: array,
+      });
+    } else {
+      this.setState({
+        data: this.state.data.filter((item) => !toRemove(item)),
+      });
+    }
   };
 
   fetchDataAsync = async (beginning, voidResultsFunction) => {

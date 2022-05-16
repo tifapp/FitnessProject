@@ -5,11 +5,10 @@ import { deleteConversation } from "@graphql/mutations";
 import {
   onCreatePostByUser,
   onCreatePostForReceiver,
-  onDeleteConversation,
 } from "@graphql/subscriptions";
 import { API, graphqlOperation } from "aws-amplify";
 import React, { useEffect, useRef } from "react";
-import { LayoutAnimation, SafeAreaView } from "react-native";
+import { SafeAreaView } from "react-native";
 import {
   //getSortedConversations,
   listConversations,
@@ -103,21 +102,8 @@ export default function ConversationScreen({ navigation, route }) {
       //console.log(conversation);
       //console.log("++++++++++++++++++++++++++++++++");
 
-      listRef.current.mutateData((conversations) => {
-        let tempConversations = conversations;
-
-        let index = tempConversations.findIndex(
-          (item) => newPost.channel === item.id
-        );
-
-        if (index != -1) {
-          tempConversations.splice(index, 1); //removes 1 item from the current Conversations at the specified index
-        }
-
-        tempConversations.unshift(conversation);
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        return [...tempConversations];
-      });
+      listRef.current.removeItem((item) => newPost.channel === item.id);
+      listRef.current.addItem(conversation);
     } else {
     }
   };
@@ -171,11 +157,10 @@ export default function ConversationScreen({ navigation, route }) {
 
     // update ConversationList
 
-    listRef.current.mutateData((conversations) => {
-      return conversations.filter(
-        (i) => i.users[0] !== friendID || i.users[1] !== friendID
-      );
-    });
+    listRef.current.removeItem(
+      (conversation) =>
+        conversation.users[0] !== friendID || conversation.users[1] !== friendID
+    );
 
     await API.graphql(
       graphqlOperation(deleteConversation, {
@@ -207,6 +192,7 @@ export default function ConversationScreen({ navigation, route }) {
     */
   };
 
+  /*
   useEffect(() => {
     //console("Inside delete Conversation Subscription");
     for (let i = 0; i < conversations.length; i++) {
@@ -231,6 +217,7 @@ export default function ConversationScreen({ navigation, route }) {
       })();
     }
   });
+  */
 
   useEffect(() => {
     (async () => {
