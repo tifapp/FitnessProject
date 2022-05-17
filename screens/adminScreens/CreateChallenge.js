@@ -1,11 +1,6 @@
-// @ts-nocheck
 import GroupDescription from "@components/Description";
 import NameField from "@components/NameField";
-import PrivacySettings from "@components/Privacy";
-import SportCreation from "@components/Sport";
-import { createGroup, updateGroup } from "@graphql/mutations";
-import { useNavigation } from "@react-navigation/native";
-// Get the aws resources configuration parameters
+import { createChallenge, updateChallenge } from "@graphql/mutations";
 import { API, graphqlOperation } from "aws-amplify";
 import React, { useEffect, useState } from "react";
 import {
@@ -17,17 +12,12 @@ import {
   View,
 } from "react-native";
 
-export default function CreatingGroups({ route }) {
-  console.log(route.params?.myId);
+//should create generic component form to update and create aws objects
+
+export default function CreateChallenge({ navigation, route }) {
   const [nameVal, setName] = useState("");
-  const [privacyVal, setPrivacy] = useState("Public");
-  //const [totalUsersVal, setTotalUsers] = useState("");
-  const [sportVal, setSport] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [descriptionVal, setDescription] = useState("");
-  const [characterCount, setCharacterCount] = useState(1000);
-
-  const navigation = useNavigation();
 
   console.log(route);
   if (route.params.check !== undefined) {
@@ -46,26 +36,20 @@ export default function CreatingGroups({ route }) {
   };
 
   const addGroup = async () => {
-    Alert.alert("Submitting Group...", "", [], { cancelable: false });
+    Alert.alert("Creating Challenge", "", [], { cancelable: false });
 
     const val = {
-      userID: route.params?.myId,
       name: nameVal,
-      //maxUsers: totalUsersVal,
-      Privacy: privacyVal,
-      Sport: sportVal,
+      open: true,
       Description: descriptionVal,
     };
 
     setDescription("");
     setName("");
-    setPrivacy("Public");
-    //setTotalUsers("");
-    setSport("");
     setDescription("");
 
     try {
-      await API.graphql(graphqlOperation(createGroup, { input: val }));
+      await API.graphql(graphqlOperation(createChallenge, { input: val }));
       console.log("success");
       alert("Group submitted successfully!");
     } catch (err) {
@@ -79,20 +63,18 @@ export default function CreatingGroups({ route }) {
 
     setDescription("");
     setName("");
-    setPrivacy("Public");
-    //setTotalUsers("");
-    setSport("");
 
     try {
+      //try catch block for api calls should be a hook
       const { group } = route.params;
       const updatedGroup = {
         id: group.id,
         name: nameVal,
-        Privacy: privacyVal,
-        Sport: sportVal,
         Description: descriptionVal,
       };
-      await API.graphql(graphqlOperation(updateGroup, { input: updatedGroup }));
+      await API.graphql(
+        graphqlOperation(updateChallenge, { input: updatedGroup })
+      );
       console.log("success");
       alert("Group submitted successfully!");
       updatedGroup.userID = route.params?.myId;
@@ -116,33 +98,20 @@ export default function CreatingGroups({ route }) {
       <View>
         <View style={styles.border}>
           <NameField setName={setName} nameVal={nameVal} />
-          <PrivacySettings //need a generic modal picker component with multiple optional rows and stylable
-            setPrivacy={setPrivacy}
-            privacyVal={privacyVal}
-            modalOpen={modalOpen}
-            setModalOpen={setModalOpen}
-          />
-
-          <SportCreation setSport={setSport} sportVal={sportVal} />
 
           <GroupDescription
             setDescription={setDescription}
             descriptionVal={descriptionVal}
-            characterCount={characterCount}
           />
 
           <View style={styles.buttonFormat}>
             <TouchableOpacity
               onPress={() => {
                 nameVal != "" &&
-                privacyVal != "" &&
-                sportVal != "" &&
                 descriptionVal != "" &&
-                descriptionVal.length <= characterCount
-                  ? route.params.check !== undefined
-                    ? updtGroup()
-                    : addGroup()
-                  : alert("Please fill out all available fields");
+                route.params.check !== undefined
+                  ? updtGroup()
+                  : addGroup();
               }}
               style={styles.submitButton}
             >
@@ -160,6 +129,35 @@ export default function CreatingGroups({ route }) {
 }
 
 const styles = StyleSheet.create({
+  header: {
+    height: 80,
+    paddingTop: 25,
+    backgroundColor: "coral",
+    borderRadius: 5,
+    marginHorizontal: 10,
+    marginTop: 10,
+  },
+  title: {
+    textAlign: "center",
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  submitButton: {
+    marginTop: 20,
+    alignSelf: "center",
+    backgroundColor: "orange",
+    padding: 10,
+    borderRadius: 5,
+  },
+  buttonTextStyle: {
+    color: "white",
+    alignSelf: "center",
+    fontWeight: "bold",
+    fontSize: 20,
+    marginBottom: 2,
+    marginHorizontal: 6,
+  },
   border: {
     alignItems: "center",
   },

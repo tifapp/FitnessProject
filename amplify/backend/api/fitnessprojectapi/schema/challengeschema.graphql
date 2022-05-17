@@ -4,3 +4,9 @@ type Challenge @model {
   Description: String!
   open: Boolean
 }
+
+input CreateChallengeInput {
+  name: String!
+  Description: String!
+  open: Boolean
+}
