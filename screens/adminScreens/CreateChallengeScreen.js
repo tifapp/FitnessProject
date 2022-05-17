@@ -2,7 +2,7 @@ import GroupDescription from "@components/Description";
 import NameField from "@components/NameField";
 import { createChallenge, updateChallenge } from "@graphql/mutations";
 import { API, graphqlOperation } from "aws-amplify";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Alert,
   ScrollView,
@@ -18,22 +18,6 @@ export default function CreateChallenge({ navigation, route }) {
   const [nameVal, setName] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [descriptionVal, setDescription] = useState("");
-
-  console.log(route);
-  if (route.params.check !== undefined) {
-    useEffect(() => {
-      setFields();
-    }, [route.params]);
-  }
-
-  const setFields = () => {
-    const { group } = route.params;
-    setName(group.name);
-    setPrivacy(group.Privacy);
-    //setTotalUsers(group.maxUsers)
-    setSport(group.Sport);
-    setDescription(group.Description);
-  };
 
   const addGroup = async () => {
     Alert.alert("Creating Challenge", "", [], { cancelable: false });
@@ -77,13 +61,14 @@ export default function CreateChallenge({ navigation, route }) {
       );
       console.log("success");
       alert("Group submitted successfully!");
-      updatedGroup.userID = route.params?.myId;
+      /*
       navigation.navigate("Search", {
         updatedGroup: updatedGroup,
       });
       navigation.navigate("Group Posts Screen", {
         group: updatedGroup,
       });
+      */
     } catch (err) {
       console.log(err);
       alert("Group could not be submitted! " + err.errors[0].message);
@@ -109,13 +94,13 @@ export default function CreateChallenge({ navigation, route }) {
               onPress={() => {
                 nameVal != "" &&
                 descriptionVal != "" &&
-                route.params.check !== undefined
+                route.params?.check !== undefined
                   ? updtGroup()
                   : addGroup();
               }}
               style={styles.submitButton}
             >
-              {route.params.check !== undefined ? (
+              {route.params?.check !== undefined ? (
                 <Text style={styles.buttonTextStyle}>Save</Text>
               ) : (
                 <Text style={styles.buttonTextStyle}>Submit</Text>

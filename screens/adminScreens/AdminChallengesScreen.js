@@ -3,12 +3,12 @@ import ListChallengeItem from "@components/ListChallengeItem";
 import { deleteChallenge } from "@graphql/mutations";
 import { listChallenges } from "@graphql/queries";
 import { API, graphqlOperation } from "aws-amplify";
-import React from "react";
+import React, { useRef } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 export default function Challenges({ navigation, route }) {
-  //const stateRef = useRef();
+  const listRef = useRef();
   //const [query, setQuery] = useState("");
   //console.log(id);
 
@@ -17,9 +17,6 @@ export default function Challenges({ navigation, route }) {
       <View style={styles.header}>
         <Text style={styles.title}>Challenges</Text>
       </View>
-      <View style={styles.header}>
-        <Text style={styles.title}>Active Challenges</Text>
-      </View>
       <TouchableOpacity
         style={[styles.submitButton]}
         onPress={() => navigation.navigate("Create Challenge")} //should have a generic "create item" screen where the fields can be filled in
@@ -27,6 +24,7 @@ export default function Challenges({ navigation, route }) {
         <Text style={styles.buttonTextStyle}>Create Challenge</Text>
       </TouchableOpacity>
       <APIList
+        ref={listRef}
         style={{}}
         queryOperation={listChallenges}
         initialAmount={21}
@@ -38,12 +36,14 @@ export default function Challenges({ navigation, route }) {
             <ListChallengeItem item={item} />
             <TouchableOpacity
               onPress={() => {
+                //this block of code (deleting from the database and the local list) should have a hook, maybe within apilist itself
                 API.graphql(
                   graphqlOperation(deleteChallenge, { input: { id: item.id } })
                 );
+                listRef.current?.removeItem((i) => i.id === item.id);
               }}
             >
-              <Text style={styles.buttonTextStyle}>Close Challenge</Text>
+              <Text style={styles.textButtonStyle}>Close Challenge</Text>
             </TouchableOpacity>
           </View>
         )} //add option to close challenge
@@ -78,6 +78,14 @@ const styles = StyleSheet.create({
   },
   buttonTextStyle: {
     color: "white",
+    alignSelf: "center",
+    fontWeight: "bold",
+    fontSize: 20,
+    marginBottom: 2,
+    marginHorizontal: 6,
+  },
+  textButtonStyle: {
+    color: "black",
     alignSelf: "center",
     fontWeight: "bold",
     fontSize: 20,
