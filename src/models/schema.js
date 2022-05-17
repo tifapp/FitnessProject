@@ -152,6 +152,13 @@ export const schema = {
                     "type": "Int",
                     "isRequired": false,
                     "attributes": []
+                },
+                "Accepted": {
+                    "name": "Accepted",
+                    "isArray": false,
+                    "type": "Int",
+                    "isRequired": true,
+                    "attributes": []
                 }
             },
             "syncable": true,
@@ -170,12 +177,58 @@ export const schema = {
                 {
                     "type": "key",
                     "properties": {
-                        "name": "lastUpdated",
+                        "name": "ByAcceptedAndDate",
+                        "fields": [
+                            "dummy",
+                            "Accepted",
+                            "updatedAt"
+                        ],
+                        "queryField": "conversationsByAcceptedAndDate"
+                    }
+                },
+                {
+                    "type": "key",
+                    "properties": {
+                        "name": "ByDateAndAccepted",
+                        "fields": [
+                            "dummy",
+                            "updatedAt",
+                            "Accepted"
+                        ],
+                        "queryField": "conversationsByDateAndAccepted"
+                    }
+                },
+                {
+                    "type": "key",
+                    "properties": {
+                        "name": "ByAcceptedThenDate",
+                        "fields": [
+                            "Accepted",
+                            "updatedAt"
+                        ],
+                        "queryField": "conversationsByAcceptedThenDate"
+                    }
+                },
+                {
+                    "type": "key",
+                    "properties": {
+                        "name": "ByAccepted",
+                        "fields": [
+                            "dummy",
+                            "Accepted"
+                        ],
+                        "queryField": "conversationsByAccepted"
+                    }
+                },
+                {
+                    "type": "key",
+                    "properties": {
+                        "name": "ByDate",
                         "fields": [
                             "dummy",
                             "updatedAt"
                         ],
-                        "queryField": "conversationsByLastUpdated"
+                        "queryField": "conversationsByDate"
                     }
                 },
                 {
@@ -271,6 +324,13 @@ export const schema = {
                     "type": "ID",
                     "isRequired": false,
                     "attributes": []
+                },
+                "imageURL": {
+                    "name": "imageURL",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
                 }
             },
             "syncable": true,
@@ -329,6 +389,17 @@ export const schema = {
                     }
                 },
                 {
+                    "type": "key",
+                    "properties": {
+                        "name": "ByLikes",
+                        "fields": [
+                            "channel",
+                            "likes"
+                        ],
+                        "queryField": "postsByLikes"
+                    }
+                },
+                {
                     "type": "auth",
                     "properties": {
                         "rules": [
@@ -359,6 +430,171 @@ export const schema = {
                                 "provider": "iam",
                                 "operations": [
                                     "create",
+                                    "read",
+                                    "update",
+                                    "delete"
+                                ]
+                            },
+                            {
+                                "groupClaim": "cognito:groups",
+                                "provider": "userPools",
+                                "allow": "groups",
+                                "groups": [
+                                    "Admins"
+                                ],
+                                "operations": [
+                                    "create",
+                                    "read",
+                                    "update",
+                                    "delete"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        "User": {
+            "name": "User",
+            "fields": {
+                "id": {
+                    "name": "id",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "identityId": {
+                    "name": "identityId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "name": {
+                    "name": "name",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "age": {
+                    "name": "age",
+                    "isArray": false,
+                    "type": "Int",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "gender": {
+                    "name": "gender",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "bio": {
+                    "name": "bio",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "goals": {
+                    "name": "goals",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "location": {
+                    "name": "location",
+                    "isArray": false,
+                    "type": {
+                        "nonModel": "Location"
+                    },
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "status": {
+                    "name": "status",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "deviceToken": {
+                    "name": "deviceToken",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "friendRequestPrivacy": {
+                    "name": "friendRequestPrivacy",
+                    "isArray": false,
+                    "type": "Int",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "messagesPrivacy": {
+                    "name": "messagesPrivacy",
+                    "isArray": false,
+                    "type": "Int",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "isVerified": {
+                    "name": "isVerified",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": false,
+                    "attributes": []
+                }
+            },
+            "syncable": true,
+            "pluralName": "Users",
+            "attributes": [
+                {
+                    "type": "model",
+                    "properties": {}
+                },
+                {
+                    "type": "auth",
+                    "properties": {
+                        "rules": [
+                            {
+                                "allow": "private",
+                                "operations": [
+                                    "read"
+                                ]
+                            },
+                            {
+                                "provider": "userPools",
+                                "ownerField": "id",
+                                "allow": "owner",
+                                "identityClaim": "cognito:username",
+                                "operations": [
+                                    "create",
+                                    "update",
+                                    "delete",
+                                    "read"
+                                ]
+                            },
+                            {
+                                "allow": "private",
+                                "provider": "iam",
+                                "operations": [
+                                    "read"
+                                ]
+                            },
+                            {
+                                "groupClaim": "cognito:groups",
+                                "provider": "userPools",
+                                "allow": "groups",
+                                "groups": [
+                                    "Admins"
+                                ],
+                                "operations": [
                                     "read",
                                     "update",
                                     "delete"
@@ -424,7 +660,8 @@ export const schema = {
                         "timestamps": {
                             "createdAt": "createdAt",
                             "updatedAt": "updatedAt"
-                        }
+                        },
+                        "subscriptions": null
                     }
                 },
                 {
@@ -562,6 +799,47 @@ export const schema = {
                 }
             ]
         },
+        "Challenge": {
+            "name": "Challenge",
+            "fields": {
+                "id": {
+                    "name": "id",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "name": {
+                    "name": "name",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "Description": {
+                    "name": "Description",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "open": {
+                    "name": "open",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": false,
+                    "attributes": []
+                }
+            },
+            "syncable": true,
+            "pluralName": "Challenges",
+            "attributes": [
+                {
+                    "type": "model",
+                    "properties": {}
+                }
+            ]
+        },
         "Group": {
             "name": "Group",
             "fields": {
@@ -631,8 +909,8 @@ export const schema = {
                 }
             ]
         },
-        "User": {
-            "name": "User",
+        "Report": {
+            "name": "Report",
             "fields": {
                 "id": {
                     "name": "id",
@@ -641,72 +919,132 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
-                "identityId": {
-                    "name": "identityId",
+                "createdAt": {
+                    "name": "createdAt",
                     "isArray": false,
-                    "type": "ID",
-                    "isRequired": false,
-                    "attributes": []
-                },
-                "name": {
-                    "name": "name",
-                    "isArray": false,
-                    "type": "String",
+                    "type": "AWSDateTime",
                     "isRequired": true,
                     "attributes": []
                 },
-                "age": {
-                    "name": "age",
+                "updatedAt": {
+                    "name": "updatedAt",
                     "isArray": false,
-                    "type": "Int",
-                    "isRequired": false,
+                    "type": "AWSDateTime",
+                    "isRequired": true,
                     "attributes": []
                 },
-                "gender": {
-                    "name": "gender",
-                    "isArray": false,
-                    "type": "String",
-                    "isRequired": false,
-                    "attributes": []
-                },
-                "bio": {
-                    "name": "bio",
-                    "isArray": false,
-                    "type": "String",
-                    "isRequired": false,
-                    "attributes": []
-                },
-                "goals": {
-                    "name": "goals",
-                    "isArray": false,
-                    "type": "String",
-                    "isRequired": false,
-                    "attributes": []
-                },
-                "latitude": {
-                    "name": "latitude",
-                    "isArray": false,
-                    "type": "Float",
-                    "isRequired": false,
-                    "attributes": []
-                },
-                "longitude": {
-                    "name": "longitude",
-                    "isArray": false,
-                    "type": "Float",
-                    "isRequired": false,
-                    "attributes": []
-                },
-                "deviceToken": {
-                    "name": "deviceToken",
+                "userId": {
+                    "name": "userId",
                     "isArray": false,
                     "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "postId": {
+                    "name": "postId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "message": {
+                    "name": "message",
+                    "isArray": false,
+                    "type": "String",
                     "isRequired": false,
                     "attributes": []
                 }
             },
             "syncable": true,
-            "pluralName": "Users",
+            "pluralName": "Reports",
+            "attributes": [
+                {
+                    "type": "model",
+                    "properties": {
+                        "timestamps": {
+                            "createdAt": "createdAt",
+                            "updatedAt": "updatedAt"
+                        },
+                        "subscriptions": null
+                    }
+                },
+                {
+                    "type": "key",
+                    "properties": {
+                        "fields": [
+                            "createdAt",
+                            "postId"
+                        ]
+                    }
+                },
+                {
+                    "type": "auth",
+                    "properties": {
+                        "rules": [
+                            {
+                                "provider": "userPools",
+                                "ownerField": "userId",
+                                "allow": "owner",
+                                "operations": [
+                                    "create",
+                                    "read",
+                                    "delete"
+                                ],
+                                "identityClaim": "cognito:username"
+                            },
+                            {
+                                "groupClaim": "cognito:groups",
+                                "provider": "userPools",
+                                "allow": "groups",
+                                "groups": [
+                                    "Admins"
+                                ],
+                                "operations": [
+                                    "create",
+                                    "read",
+                                    "delete"
+                                ]
+                            },
+                            {
+                                "allow": "private",
+                                "provider": "iam",
+                                "operations": [
+                                    "read",
+                                    "delete"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        "Verification": {
+            "name": "Verification",
+            "fields": {
+                "id": {
+                    "name": "id",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "title": {
+                    "name": "title",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "isVerified": {
+                    "name": "isVerified",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": false,
+                    "attributes": []
+                }
+            },
+            "syncable": true,
+            "pluralName": "Verifications",
             "attributes": [
                 {
                     "type": "model",
@@ -716,12 +1054,6 @@ export const schema = {
                     "type": "auth",
                     "properties": {
                         "rules": [
-                            {
-                                "allow": "private",
-                                "operations": [
-                                    "read"
-                                ]
-                            },
                             {
                                 "provider": "userPools",
                                 "ownerField": "id",
@@ -738,7 +1070,22 @@ export const schema = {
                                 "allow": "private",
                                 "provider": "iam",
                                 "operations": [
-                                    "read"
+                                    "read",
+                                    "update",
+                                    "delete"
+                                ]
+                            },
+                            {
+                                "groupClaim": "cognito:groups",
+                                "provider": "userPools",
+                                "allow": "groups",
+                                "groups": [
+                                    "Admins"
+                                ],
+                                "operations": [
+                                    "read",
+                                    "update",
+                                    "delete"
                                 ]
                             }
                         ]
@@ -748,6 +1095,26 @@ export const schema = {
         }
     },
     "enums": {},
-    "nonModels": {},
-    "version": "bea126c89a15df31477c4e4d0c44402a"
+    "nonModels": {
+        "Location": {
+            "name": "Location",
+            "fields": {
+                "latitude": {
+                    "name": "latitude",
+                    "isArray": false,
+                    "type": "Float",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "longitude": {
+                    "name": "longitude",
+                    "isArray": false,
+                    "type": "Float",
+                    "isRequired": false,
+                    "attributes": []
+                }
+            }
+        }
+    },
+    "version": "f822562cd078f5118dabb8987f8a6ad4"
 };
