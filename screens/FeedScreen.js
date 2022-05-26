@@ -1,4 +1,3 @@
-// @ts-nocheck
 import APIList from "@components/APIList";
 import IconButton from "@components/common/IconButton";
 import ExpandingTextInput from "@components/ExpandingTextInput";
@@ -29,6 +28,7 @@ import { getLinkPreview } from "link-preview-js";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Animated,
   Image,
   KeyboardAvoidingView,
@@ -454,7 +454,6 @@ function PostInputField({
   });
 
   const addPostAsync = async () => {
-    //console.log("current date is ", Date.now());
     setPostIsLoading(true);
 
     const imageID = SHA256(Date.now().toString());
@@ -544,12 +543,7 @@ function PostInputField({
       {imageURL !== null ? (
         isVideo ? (
           <Video
-            style={{
-              resizeMode: "cover",
-              width: 450,
-              height: 450,
-              alignSelf: "center",
-            }} //check if this should be an image or a video?
+            style={styles.postVideo} //check if this should be an image or a video?
             useNativeControls
             isLooping
             shouldPlay
@@ -631,11 +625,11 @@ function PostInputField({
           onPress={
             postIsLoading
               ? () => {
-                  alert("Currently uploading a post");
+                  Alert.alert("Currently uploading a post");
                 }
               : postInput === "" && imageURL === null
               ? () => {
-                  alert("No text detected in text field");
+                  Alert.alert("No text detected in text field");
                 }
               : addPostAsync
           }
@@ -696,4 +690,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   offlineText: { color: "#fff" },
+  postVideo: {
+    resizeMode: "cover",
+    width: 450,
+    height: 450,
+    alignSelf: "center",
+  },
 });
