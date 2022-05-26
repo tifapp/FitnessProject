@@ -39,5 +39,4 @@
   },
   "extends": "expo/tsconfig.base",
   "exclude": [ "node_modules", "amplify/#current-cloud-backend" ],
-  "include": [ "index.d.ts" ]
 }
