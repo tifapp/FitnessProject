@@ -520,6 +520,7 @@ export const postsByUser = /* GraphQL */ `
         receiver
         parentId
         imageURL
+        taggedUsers
         likes
         replies
       }
@@ -553,6 +554,7 @@ export const postsByReceiver = /* GraphQL */ `
         receiver
         parentId
         imageURL
+        taggedUsers
         likes
         replies
       }
@@ -586,6 +588,7 @@ export const postsByChannel = /* GraphQL */ `
         receiver
         parentId
         imageURL
+        taggedUsers
         likes
         replies
       }
@@ -619,6 +622,7 @@ export const postsByLikes = /* GraphQL */ `
         receiver
         parentId
         imageURL
+        taggedUsers
         likes
         replies
       }
@@ -637,6 +641,7 @@ export const getPost = /* GraphQL */ `
       receiver
       parentId
       imageURL
+      taggedUsers
       likes
       replies
     }
@@ -668,6 +673,7 @@ export const listPosts = /* GraphQL */ `
         receiver
         parentId
         imageURL
+        taggedUsers
         likes
         replies
       }

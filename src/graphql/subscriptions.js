@@ -32,6 +32,7 @@ export const onCreatePostFromChannel = /* GraphQL */ `
       receiver
       parentId
       imageURL
+      taggedUsers
       likes
       replies
     }
@@ -48,6 +49,7 @@ export const onCreatePostForReceiver = /* GraphQL */ `
       receiver
       parentId
       imageURL
+      taggedUsers
       likes
       replies
     }
@@ -64,6 +66,7 @@ export const onCreatePostByUser = /* GraphQL */ `
       receiver
       parentId
       imageURL
+      taggedUsers
       likes
       replies
     }
@@ -80,6 +83,7 @@ export const onUpdatePostFromChannel = /* GraphQL */ `
       receiver
       parentId
       imageURL
+      taggedUsers
       likes
       replies
     }
@@ -96,6 +100,7 @@ export const onDeletePostFromChannel = /* GraphQL */ `
       receiver
       parentId
       imageURL
+      taggedUsers
       likes
       replies
     }
@@ -112,6 +117,7 @@ export const onIncrementLikes = /* GraphQL */ `
       receiver
       parentId
       imageURL
+      taggedUsers
       likes
       replies
     }
@@ -128,6 +134,7 @@ export const onDecrementLikes = /* GraphQL */ `
       receiver
       parentId
       imageURL
+      taggedUsers
       likes
       replies
     }
@@ -144,6 +151,7 @@ export const onIncrementReplies = /* GraphQL */ `
       receiver
       parentId
       imageURL
+      taggedUsers
       likes
       replies
     }
@@ -160,6 +168,7 @@ export const onDecrementReplies = /* GraphQL */ `
       receiver
       parentId
       imageURL
+      taggedUsers
       likes
       replies
     }

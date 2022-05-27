@@ -39,6 +39,7 @@ type Post @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" },
   receiver: ID
   parentId: ID
   imageURL: ID
+  taggedUsers: [ID!]
 }
 
 """
@@ -51,6 +52,7 @@ input CreatePostInput {
   receiver: ID
   parentId: ID
   imageURL: ID
+  taggedUsers: [ID!]
 }
 
 """
@@ -59,6 +61,7 @@ This allows us to fill in the missing fields in the backend rather than letting 
 input UpdatePostInput {
   createdAt: AWSDateTime!
   description: String
+  taggedUsers: [ID!]
 }
 
 input incrementLikesInput {
