@@ -1,6 +1,6 @@
 import APIList from "@components/APIList";
 import IconButton from "@components/common/IconButton";
-import ExpandingTextInput from "@components/ExpandingTextInput";
+import ExpandingTextInputWithNameInput from "@components/ExpandingTextInputWithNameInput";
 import PostItem from "@components/PostItem";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import SpamButton from "@components/SpamButton";
@@ -30,6 +30,7 @@ import {
   ActivityIndicator,
   Alert,
   Animated,
+  FlatList,
   Image,
   KeyboardAvoidingView,
   LayoutAnimation,
@@ -437,6 +438,8 @@ function PostInputField({
   const [postIsLoading, setPostIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
 
+  const [taggedUsers, setTaggedUsers] = useState([]);
+
   let animation = useRef(new Animated.Value(0));
 
   useEffect(() => {
@@ -461,6 +464,7 @@ function PostInputField({
     const newPost = {
       description: postInput,
       channel: channel,
+      taggedUsers,
     };
     if (originalParentId != null) {
       newPost.parentId = originalParentId;
@@ -477,6 +481,8 @@ function PostInputField({
       createdAt: "null",
       loading: true,
     };
+
+    setTaggedUsers([]);
     setPostInput("");
 
     //LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -564,7 +570,7 @@ function PostInputField({
       ) : null}
 
       {!isChallenge && (
-        <ExpandingTextInput
+        <ExpandingTextInputWithNameInput
           style={[styles.textInputStyle, { marginTop: 5, marginBottom: 5 }]}
           autoFocus={autoFocus}
           multiline={true}
@@ -573,8 +579,32 @@ function PostInputField({
           value={postInput}
           clearButtonMode="always"
           maxLength={1000}
+          onAdd={(userId) =>
+            !taggedUsers.includes(userId) &&
+            setTaggedUsers([...taggedUsers, userId])
+          }
         />
       )}
+
+      <FlatList
+        data={taggedUsers}
+        keyExtractor={(item) => item}
+        renderItem={({ item }) => (
+          <ProfileImageAndName
+            style={{
+              alignContent: "flex-start",
+              alignItems: "center",
+              alignSelf: "flex-start",
+              justifyContent: "flex-start",
+              flexDirection: "row",
+              marginLeft: 15,
+              marginRight: 5,
+            }}
+            imageSize={20}
+            userId={item}
+          />
+        )}
+      />
 
       <View
         style={{

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import APIList from "@components/APIList";
 import LinkableText from "@components/LinkableText";
 import PostHeader from "@components/postComponents/PostHeader";
@@ -7,6 +6,7 @@ import { likesByPost } from "@graphql/queries";
 import React, { useRef, useState } from "react";
 import {
   Dimensions,
+  FlatList,
   StyleSheet,
   Text,
   TextInput,
@@ -40,6 +40,8 @@ export default React.memo(function PostItem({
   const repliesModalRef = useRef();
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState("");
+
+  console.log(item.taggedUsers);
 
   return (
     <View style={styles.secondaryContainerStyle}>
@@ -189,6 +191,26 @@ export default React.memo(function PostItem({
             />
           </TouchableOpacity>
         )}
+
+        <FlatList
+          data={item.taggedUsers}
+          keyExtractor={(item) => item}
+          renderItem={({ item }) => (
+            <ProfileImageAndName
+              style={{
+                alignContent: "flex-start",
+                alignItems: "center",
+                alignSelf: "flex-start",
+                justifyContent: "flex-start",
+                flexDirection: "row",
+                marginLeft: 15,
+                marginRight: 5,
+              }}
+              imageSize={20}
+              userId={item}
+            />
+          )}
+        />
 
         <Modal ref={likesModalRef}>
           <LikesModal item={item} />
