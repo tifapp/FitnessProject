@@ -31,7 +31,8 @@ export default function ExpandingTextInputWithNameInput({
           query={text.substring(showUsers)}
           onAdd={(userId) => {
             setShowUsers();
-            setText("@" + global.savedUsers[props.userId].name);
+            console.log(global.savedUsers);
+            setText("@" + global.savedUsers[userId].name);
             onAdd(userId);
             //save selection
           }}
