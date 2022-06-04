@@ -24,6 +24,7 @@ export default function ExpandingTextInputWithNameInput({
             setShowUsers();
           }
         }}
+        value={text}
       />
       {showUsers && (
         <UserTagInput
