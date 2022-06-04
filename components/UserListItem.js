@@ -35,7 +35,7 @@ export default function UserListItem({ item, matchingname }) {
           {
             // @ts-ignore
             global.location != null && item.location != null ? (
-              <Text>{computeDistance(item.location)} mi.</Text>
+              <Text>{computeDistance(item.location)}</Text>
             ) : null
           }
           {loadCapitals(item.bio).length > 0 ? (

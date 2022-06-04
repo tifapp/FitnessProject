@@ -480,11 +480,7 @@ const LookupUser = ({ route, navigation }) => {
               <View>
                 <Text style={{ marginTop: 6, fontSize: 16 }}>{`(${user.age}, ${
                   user.gender
-                }${
-                  user.location
-                    ? `${computeDistance(user.location)} mi. away`
-                    : ""
-                })`}</Text>
+                } ${computeDistance(user.location)})`}</Text>
               </View>
             }
             spaceAfterName={true}
@@ -758,7 +754,7 @@ const LookupUser = ({ route, navigation }) => {
 
       {global.location != null && user.location != null ? (
         <Text style={styles.viewProfileScreen}>
-          {computeDistance(user.location)} mi. away
+          {computeDistance(user.location)}
         </Text>
       ) : null}
       {route.params?.myId != user.id ? (

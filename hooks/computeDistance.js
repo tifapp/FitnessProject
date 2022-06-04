@@ -1,6 +1,9 @@
 export default function computeDistance(otherLocation) {
   // @ts-ignore
   const location = global.location;
+  if (!location || !otherLocation) {
+    return "";
+  }
   const prevLatInRad = toRad(location.latitude);
   const prevLongInRad = toRad(location.longitude);
   const latInRad = toRad(otherLocation.latitude);
@@ -17,7 +20,7 @@ export default function computeDistance(otherLocation) {
 
   return (
     // In kilometers
-    distance.toFixed(0)
+    `${distance.toFixed(0)} mi. away`
   );
 }
 
