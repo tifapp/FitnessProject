@@ -32,7 +32,7 @@ export default function ExpandingTextInputWithNameInput({
           onAdd={(userId) => {
             setShowUsers();
             console.log(global.savedUsers);
-            setText("@" + global.savedUsers[userId].name);
+            setText(text+ " @" + global.savedUsers[userId].name);
             onAdd(userId);
             //save selection
           }}
