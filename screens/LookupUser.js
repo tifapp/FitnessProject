@@ -4,21 +4,21 @@ import IconButton from "@components/common/IconButton";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import StatusIndicator from "@components/StatusIndicator";
 import {
-  createBlock,
-  createFriendship,
-  deleteBlock,
-  deleteFriendship,
-  updateFriendship,
+    createBlock,
+    createFriendship,
+    deleteBlock,
+    deleteFriendship,
+    updateFriendship
 } from "@graphql/mutations";
 import {
-  getBlock,
-  getFriendship,
-  getUser,
-  listFriendships,
+    getBlock,
+    getFriendship,
+    getUser,
+    listFriendships
 } from "@graphql/queries";
 import {
-  //onCreateFriendship,
-  onDeleteFriendship,
+    //onCreateFriendship,
+    onDeleteFriendship
 } from "@graphql/subscriptions";
 import computeDistance from "@hooks/computeDistance";
 import printTime from "@hooks/printTime";
@@ -26,14 +26,14 @@ import { loadCapitals } from "@hooks/stringConversion";
 import { API, graphqlOperation } from "aws-amplify";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  Dimensions,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    Dimensions,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from "react-native";
 
 const LookupUser = ({ route, navigation }) => {
@@ -480,7 +480,11 @@ const LookupUser = ({ route, navigation }) => {
               <View>
                 <Text style={{ marginTop: 6, fontSize: 16 }}>{`(${user.age}, ${
                   user.gender
-                } ${computeDistance(user.location)})`}</Text>
+                }${
+                  user.location
+                    ? `${computeDistance(user.location)} mi. away`
+                    : ""
+                })`}</Text>
               </View>
             }
             spaceAfterName={true}
@@ -754,7 +758,7 @@ const LookupUser = ({ route, navigation }) => {
 
       {global.location != null && user.location != null ? (
         <Text style={styles.viewProfileScreen}>
-          {computeDistance(user.location)}
+          {computeDistance(user.location)} mi. away
         </Text>
       ) : null}
       {route.params?.myId != user.id ? (

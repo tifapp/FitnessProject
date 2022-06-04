@@ -10,11 +10,11 @@ import {
   Image,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 // @ts-ignore
-global.savedUsers = {};
+global.savedUsers = {}; // Does this global variable get initialized when the app loads or when this component first gets rendered
 //objects will look like {name: [name], imageURL: [imageURL], isFullSize: [bool]}
 
 export const ProfileImageAndName = React.memo(function (props) {
