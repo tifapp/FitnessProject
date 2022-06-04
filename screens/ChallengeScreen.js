@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import FeedScreen from "./FeedScreen";
@@ -15,6 +16,11 @@ export default function ChallengeScreen({ navigation, route }) {
       </View>
       <View style={{ flex: 1 }}>
         <FeedScreen
+          headerComponent={
+            <View>
+              <ProfileImageAndName userId={route.params?.winner} />
+            </View>
+          }
           isChallenge={true}
           navigation={navigation}
           myId={route.params?.myId}

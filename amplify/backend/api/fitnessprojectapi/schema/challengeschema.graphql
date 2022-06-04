@@ -3,6 +3,7 @@ type Challenge @model {
   name: String!
   Description: String!
   open: Boolean
+  winner: ID
 }
 
 input CreateChallengeInput {

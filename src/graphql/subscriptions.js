@@ -228,6 +228,7 @@ export const onCreateChallenge = /* GraphQL */ `
       name
       Description
       open
+      winner
       createdAt
       updatedAt
     }
@@ -240,6 +241,7 @@ export const onUpdateChallenge = /* GraphQL */ `
       name
       Description
       open
+      winner
       createdAt
       updatedAt
     }
@@ -252,6 +254,7 @@ export const onDeleteChallenge = /* GraphQL */ `
       name
       Description
       open
+      winner
       createdAt
       updatedAt
     }

@@ -1,5 +1,6 @@
 import APIList from "@components/APIList";
 import ListChallengeItem from "@components/ListChallengeItem";
+import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import { deleteChallenge } from "@graphql/mutations";
 import { listChallenges } from "@graphql/queries";
 import { API, graphqlOperation } from "aws-amplify";
@@ -34,6 +35,9 @@ export default function Challenges({ navigation, route }) {
         ) => (
           <View>
             <ListChallengeItem item={item} />
+            <Text>
+              Winner: <ProfileImageAndName userId={item.winner} />
+            </Text>
             <TouchableOpacity
               onPress={() => {
                 //this block of code (deleting from the database and the local list) should have a hook, maybe within apilist itself

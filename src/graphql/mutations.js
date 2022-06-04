@@ -120,6 +120,7 @@ export const createChallenge = /* GraphQL */ `
       name
       Description
       open
+      winner
       createdAt
       updatedAt
     }
@@ -135,6 +136,7 @@ export const updateChallenge = /* GraphQL */ `
       name
       Description
       open
+      winner
       createdAt
       updatedAt
     }
@@ -150,6 +152,7 @@ export const deleteChallenge = /* GraphQL */ `
       name
       Description
       open
+      winner
       createdAt
       updatedAt
     }

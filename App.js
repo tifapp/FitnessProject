@@ -15,8 +15,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import ChallengesScreen from "@screens/adminScreens/AdminChallengesScreen";
-import CreateChallengeScreen from "@screens/adminScreens/CreateChallengeScreen";
+import ChallengeStack from "@screens/adminScreens/ChallengeStack";
 import ReportScreen from "@screens/adminScreens/ReportScreen";
 import VerificationRequestsScreen from "@screens/adminScreens/VerificationRequestsScreen";
 import ComplianceScreen from "@screens/ComplianceScreen";
@@ -283,11 +282,7 @@ const App = () => {
           />
           <Tab.Screen
             name="Challenges"
-            component={ChallengesScreen} //should be in a separate app, not this one. we'll make a different app to view reports.
-          />
-          <Tab.Screen
-            name="Create Challenge"
-            component={CreateChallengeScreen} //should be in a separate app, not this one. we'll make a different app to view reports.
+            component={ChallengeStack} //should be in a separate app, not this one. we'll make a different app to view reports.
           />
         </Tab.Navigator>
       </NavigationContainer>

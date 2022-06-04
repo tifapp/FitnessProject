@@ -91,7 +91,7 @@ export const ProfileImageAndName = React.memo(function (props) {
     else navigation.navigate("Lookup", { userId: props.userId });
   };
 
-  if (props.hideall) {
+  if (props.hideall || !props.userId) {
     return null;
   } else {
     return (
