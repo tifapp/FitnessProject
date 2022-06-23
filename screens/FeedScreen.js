@@ -8,13 +8,13 @@ import {
   createPost,
   createReport,
   deletePost,
-  updatePost,
+  updatePost
 } from "@graphql/mutations";
 import { batchGetLikes, postsByChannel, postsByLikes } from "@graphql/queries";
 import {
   onCreatePostFromChannel,
   onDeletePostFromChannel,
-  onUpdatePostFromChannel,
+  onUpdatePostFromChannel
 } from "@graphql/subscriptions";
 import SHA256 from "@hooks/hash";
 import NetInfo from "@react-native-community/netinfo";
@@ -37,7 +37,7 @@ import {
   Platform,
   StyleSheet,
   Text,
-  View,
+  View
 } from "react-native";
 import usePhotos from "../hooks/usePhotos";
 
@@ -538,6 +538,7 @@ function PostInputField({
     }
 
     setPostIsLoading(false);
+    setPostInput("");
   };
 
   return (
@@ -582,6 +583,10 @@ function PostInputField({
           onAdd={(userId) =>
             !taggedUsers.includes(userId) &&
             setTaggedUsers([...taggedUsers, userId])
+          }
+          onDelete={(userId) => 
+            taggedUsers.includes(userId) && 
+            setTaggedUsers(taggedUsers.filter((user) => user != userId))
           }
         />
       )}
