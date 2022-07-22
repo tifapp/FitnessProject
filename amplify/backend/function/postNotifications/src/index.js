@@ -3,6 +3,12 @@
 	API_FITNESSPROJECTAPI_GRAPHQLAPIIDOUTPUT
 	ENV
 	REGION
+	STORAGE_MEDIA_BUCKETNAME
+Amplify Params - DO NOT EDIT */ /* Amplify Params - DO NOT EDIT
+	API_FITNESSPROJECTAPI_GRAPHQLAPIENDPOINTOUTPUT
+	API_FITNESSPROJECTAPI_GRAPHQLAPIIDOUTPUT
+	ENV
+	REGION
 	process.env.STORAGE_MEDIA_BUCKETNAME,
 Amplify Params - DO NOT EDIT */ require("isomorphic-fetch");
 const gql = require("graphql-tag");
@@ -33,20 +39,23 @@ exports.handler = async (event, context, callback) => {
               },
             });
 
-            console.log(record.dynamodb.NewImage.taggedUsers);
+            console.log(record.dynamodb.NewImage.taggedUsers.L);
 
             for (
               let i = 0;
-              i < record.dynamodb.NewImage.taggedUsers.length;
+              i < record.dynamodb.NewImage.taggedUsers.L.length;
               i++
             ) {
-              const receiver = record.dynamodb.NewImage.taggedUsers[i].S;
+              console.log(record.dynamodb.NewImage.taggedUsers.L[i]);
+              const receiver = record.dynamodb.NewImage.taggedUsers.L[i].S;
               const receiverName = await client.query({
                 query: gql(getUser),
                 variables: {
                   id: receiver,
                 },
               });
+
+              console.log(receiverName);
 
               await sendNotification(
                 receiverName.data.getUser.deviceToken,
