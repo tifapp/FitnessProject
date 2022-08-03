@@ -538,7 +538,6 @@ function PostInputField({
     }
 
     setPostIsLoading(false);
-    setPostInput("");
   };
 
   return (
@@ -580,7 +579,7 @@ function PostInputField({
           value={postInput}
           clearButtonMode="always"
           maxLength={1000}
-          onAdd={(userId) =>
+          onSubmit={(userId) =>
             !taggedUsers.includes(userId) &&
             setTaggedUsers([...taggedUsers, userId])
           }
