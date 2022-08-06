@@ -536,7 +536,7 @@ function PostInputField({
     } catch (err) {
       console.warn("error in creating post: ", err);
     }
-
+    
     setPostIsLoading(false);
   };
 

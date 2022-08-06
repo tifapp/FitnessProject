@@ -12,6 +12,8 @@ export default function ExpandingTextInputWithNameInput({
   const [text, setText] = useState("");
   const [cursorPosition, setCursorPosition] = useState([]);
   const [showList, setShowList] = useState(false);
+  const [atCount, setAtCount] = useState(0);
+
 
 
   return (
@@ -22,20 +24,27 @@ export default function ExpandingTextInputWithNameInput({
           setCursorPosition([event.nativeEvent.selection.start, event.nativeEvent.selection.end]);
         }}
         onChangeText={(newText) => {
-          onSubmit(newText);
+          //onSubmit(newText);
           onChangeText(newText);
           setText(newText);
 
           // Ignore any non tagged user text
-          // If user typed in an '@' sign then we need to display the options
+          // If user typed in an '@' sign then we need to display the 
 
-          if (!showList && newText.slice(-1) === '@') {
+          // Check if a new '@' sign was added to the text input
+          const newLocalText = [...newText];
+          const atList = newLocalText.filter((newChar) =>  newChar == '@');
+          const localAtCount = atList.length;
+          
+
+          //console.log("Length of list " + localAtCount);
+          if (!showList && localAtCount !== atCount) {
             //localize?
-            setSignPosition(newText.lastIndexOf("@") + 1);
+            setSignPosition(newText.lastIndexOf("@", cursorPosition) + 1);
             setShowList(true);
           }
 
-        }}
+        }}         
         value={text}
       />
       { showList && (
@@ -43,10 +52,10 @@ export default function ExpandingTextInputWithNameInput({
           query={text.slice(SignPosition, cursorPosition[0])}
           onAdd={(userId) => {
             setShowList(false);
-            //console.log(text.substring(SignPosition));
-            //setSignPosition(null);
-            setText(`${text.substring(0,text.lastIndexOf("@", SignPosition))}@${global.savedUsers[userId].name}\u200b${text.substring(cursorPosition[0])}`);
-            onChangeText(`${text.substring(0,text.lastIndexOf("@", SignPosition))}@${global.savedUsers[userId].name}\u200b${text.substring(cursorPosition[0])}`);
+            setAtCount(atCount + 1);
+
+            setText(`${text.substring(0,text.lastIndexOf("@", SignPosition))}\u200a@${global.savedUsers[userId].name}\u200b${text.substring(cursorPosition[0])}`);
+            onChangeText(`${text.substring(0,text.lastIndexOf("@", SignPosition))}\u200a@${global.savedUsers[userId].name}\u200b${text.substring(cursorPosition[0])}`);
             onSubmit(userId);
             
             // Test
