@@ -12,8 +12,6 @@ export default function ExpandingTextInputWithNameInput({
   const [text, setText] = useState("");
   const [cursorPosition, setCursorPosition] = useState([]);
   const [showList, setShowList] = useState(false);
-  const [atCount, setAtCount] = useState(0);
-
 
 
   return (
@@ -31,18 +29,18 @@ export default function ExpandingTextInputWithNameInput({
           // Ignore any non tagged user text
           // If user typed in an '@' sign then we need to display the 
 
-          // Check if a new '@' sign was added to the text input
-          const newLocalText = [...newText];
-          const atList = newLocalText.filter((newChar) =>  newChar == '@');
-          const localAtCount = atList.length;
-          
+          // Check if the cursor is next to the '@' sign string
+          const index = newText.lastIndexOf("@", cursorPosition);
 
-          //console.log("Length of list " + localAtCount);
-          if (!showList && localAtCount !== atCount) {
-            //localize?
-            setSignPosition(newText.lastIndexOf("@", cursorPosition) + 1);
-            setShowList(true);
+          for (let i = index; i <= cursorPosition; i++) {
+            if (i === -1 || newText[i] === ' ') {
+              setShowList(false);
+              return;
+            }
           }
+
+          setSignPosition(newText.lastIndexOf("@", cursorPosition) + 1);
+          setShowList(true);
 
         }}         
         value={text}
@@ -54,8 +52,8 @@ export default function ExpandingTextInputWithNameInput({
             setShowList(false);
             setAtCount(atCount + 1);
 
-            setText(`${text.substring(0,text.lastIndexOf("@", SignPosition))}\u200a@${global.savedUsers[userId].name}\u200b${text.substring(cursorPosition[0])}`);
-            onChangeText(`${text.substring(0,text.lastIndexOf("@", SignPosition))}\u200a@${global.savedUsers[userId].name}\u200b${text.substring(cursorPosition[0])}`);
+            setText(`${text.substring(0,text.lastIndexOf("@", SignPosition))}\u200a${global.savedUsers[userId].name}\u200b${text.substring(cursorPosition[0])}`);
+            onChangeText(`${text.substring(0,text.lastIndexOf("@", SignPosition))}\u200a${global.savedUsers[userId].name}\u200b${text.substring(cursorPosition[0])}`);
             onSubmit(userId);
             
             // Test
