@@ -1,12 +1,12 @@
-const AWS = require('aws-sdk/global');
-const AUTH_TYPE = require('aws-appsync').AUTH_TYPE;
-const AWSAppSyncClient = require('aws-appsync').default;
+const AWS = require("aws-sdk");
+const AUTH_TYPE = require("aws-appsync").AUTH_TYPE;
+const AWSAppSyncClient = require("aws-appsync").default;
 const config = {
   url: process.env.API_FITNESSPROJECTAPI_GRAPHQLAPIENDPOINTOUTPUT,
   region: process.env.AWS_REGION,
   auth: {
     type: AUTH_TYPE.AWS_IAM,
-    credentials: AWS.config.credentials, 
+    credentials: AWS.config.credentials,
   },
   disableOffline: true,
 };
@@ -17,10 +17,8 @@ exports.s3 = new AWS.S3();
 
 exports.client = new AWSAppSyncClient(config);
 
-const {
-    Expo
-} = require("expo-server-sdk");
-  
+const { Expo } = require("expo-server-sdk");
+
 // Create a new Expo SDK client
 let expo = new Expo();
 
@@ -73,4 +71,4 @@ exports.sendNotification = async (deviceToken, message) => {
   } catch (error) {
     console.error(error);
   }
-}
+};

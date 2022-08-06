@@ -12,8 +12,33 @@ exports.batchDeletePosts = /* GraphQL */ `
       receiver
       parentId
       imageURL
+      taggedUsers
       likes
       replies
+    }
+  }
+`;
+exports.verifyUser = /* GraphQL */ `
+  mutation VerifyUser($input: verifyUserInput!) {
+    verifyUser(input: $input) {
+      id
+      identityId
+      name
+      age
+      gender
+      bio
+      goals
+      location {
+        latitude
+        longitude
+      }
+      status
+      deviceToken
+      friendRequestPrivacy
+      messagesPrivacy
+      createdAt
+      updatedAt
+      isVerified
     }
   }
 `;
@@ -28,6 +53,7 @@ exports.incrementLikes = /* GraphQL */ `
       receiver
       parentId
       imageURL
+      taggedUsers
       likes
       replies
     }
@@ -44,6 +70,7 @@ exports.decrementLikes = /* GraphQL */ `
       receiver
       parentId
       imageURL
+      taggedUsers
       likes
       replies
     }
@@ -60,6 +87,7 @@ exports.incrementReplies = /* GraphQL */ `
       receiver
       parentId
       imageURL
+      taggedUsers
       likes
       replies
     }
@@ -76,8 +104,57 @@ exports.decrementReplies = /* GraphQL */ `
       receiver
       parentId
       imageURL
+      taggedUsers
       likes
       replies
+    }
+  }
+`;
+exports.createChallenge = /* GraphQL */ `
+  mutation CreateChallenge(
+    $input: CreateChallengeInput!
+    $condition: ModelChallengeConditionInput
+  ) {
+    createChallenge(input: $input, condition: $condition) {
+      id
+      name
+      Description
+      open
+      winner
+      createdAt
+      updatedAt
+    }
+  }
+`;
+exports.updateChallenge = /* GraphQL */ `
+  mutation UpdateChallenge(
+    $input: UpdateChallengeInput!
+    $condition: ModelChallengeConditionInput
+  ) {
+    updateChallenge(input: $input, condition: $condition) {
+      id
+      name
+      Description
+      open
+      winner
+      createdAt
+      updatedAt
+    }
+  }
+`;
+exports.deleteChallenge = /* GraphQL */ `
+  mutation DeleteChallenge(
+    $input: DeleteChallengeInput!
+    $condition: ModelChallengeConditionInput
+  ) {
+    deleteChallenge(input: $input, condition: $condition) {
+      id
+      name
+      Description
+      open
+      winner
+      createdAt
+      updatedAt
     }
   }
 `;
@@ -323,6 +400,7 @@ exports.deletePost = /* GraphQL */ `
       receiver
       parentId
       imageURL
+      taggedUsers
       likes
       replies
     }
@@ -342,6 +420,7 @@ exports.createPost = /* GraphQL */ `
       receiver
       parentId
       imageURL
+      taggedUsers
       likes
       replies
     }
@@ -361,6 +440,7 @@ exports.updatePost = /* GraphQL */ `
       receiver
       parentId
       imageURL
+      taggedUsers
       likes
       replies
     }
@@ -421,11 +501,17 @@ exports.createUser = /* GraphQL */ `
       gender
       bio
       goals
-      latitude
-      longitude
+      location {
+        latitude
+        longitude
+      }
+      status
       deviceToken
+      friendRequestPrivacy
+      messagesPrivacy
       createdAt
       updatedAt
+      isVerified
     }
   }
 `;
@@ -442,11 +528,17 @@ exports.updateUser = /* GraphQL */ `
       gender
       bio
       goals
-      latitude
-      longitude
+      location {
+        latitude
+        longitude
+      }
+      status
       deviceToken
+      friendRequestPrivacy
+      messagesPrivacy
       createdAt
       updatedAt
+      isVerified
     }
   }
 `;
@@ -463,9 +555,57 @@ exports.deleteUser = /* GraphQL */ `
       gender
       bio
       goals
-      latitude
-      longitude
+      location {
+        latitude
+        longitude
+      }
+      status
       deviceToken
+      friendRequestPrivacy
+      messagesPrivacy
+      createdAt
+      updatedAt
+      isVerified
+    }
+  }
+`;
+exports.createVerification = /* GraphQL */ `
+  mutation CreateVerification(
+    $input: CreateVerificationInput!
+    $condition: ModelVerificationConditionInput
+  ) {
+    createVerification(input: $input, condition: $condition) {
+      id
+      title
+      isVerified
+      createdAt
+      updatedAt
+    }
+  }
+`;
+exports.updateVerification = /* GraphQL */ `
+  mutation UpdateVerification(
+    $input: UpdateVerificationInput!
+    $condition: ModelVerificationConditionInput
+  ) {
+    updateVerification(input: $input, condition: $condition) {
+      id
+      title
+      isVerified
+      createdAt
+      updatedAt
+    }
+  }
+`;
+exports.deleteVerification = /* GraphQL */ `
+  mutation DeleteVerification(
+    $input: DeleteVerificationInput!
+    $condition: ModelVerificationConditionInput
+  ) {
+    deleteVerification(input: $input, condition: $condition) {
+      id
+      title
+      isVerified
       createdAt
       updatedAt
     }
