@@ -22,7 +22,7 @@ export default function ExpandingTextInputWithNameInput({
           setCursorPosition([event.nativeEvent.selection.start, event.nativeEvent.selection.end]);
         }}
         onChangeText={(newText) => {
-          //onSubmit(newText);
+          
           onChangeText(newText);
           setText(newText);
 
@@ -32,8 +32,12 @@ export default function ExpandingTextInputWithNameInput({
           // Check if the cursor is next to the '@' sign string
           const index = newText.lastIndexOf("@", cursorPosition);
 
-          for (let i = index; i <= cursorPosition; i++) {
-            if (i === -1 || newText[i] === ' ') {
+          if (index == -1 ) {
+            return;
+          }
+
+          for (let i = index; i < cursorPosition; i++) {
+            if (newText[i] === ' ') {
               setShowList(false);
               return;
             }
@@ -50,8 +54,6 @@ export default function ExpandingTextInputWithNameInput({
           query={text.slice(SignPosition, cursorPosition[0])}
           onAdd={(userId) => {
             setShowList(false);
-            setAtCount(atCount + 1);
-
             setText(`${text.substring(0,text.lastIndexOf("@", SignPosition))}\u200a${global.savedUsers[userId].name}\u200b${text.substring(cursorPosition[0])}`);
             onChangeText(`${text.substring(0,text.lastIndexOf("@", SignPosition))}\u200a${global.savedUsers[userId].name}\u200b${text.substring(cursorPosition[0])}`);
             onSubmit(userId);
