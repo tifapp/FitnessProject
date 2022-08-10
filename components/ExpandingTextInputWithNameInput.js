@@ -20,32 +20,31 @@ export default function ExpandingTextInputWithNameInput({
         {...props}
         onSelectionChange={(event) => {
           setCursorPosition([event.nativeEvent.selection.start, event.nativeEvent.selection.end]);
-        }}
-        onChangeText={(newText) => {
-          
-          onChangeText(newText);
-          setText(newText);
-          
+
           // Ignore any non tagged user text
           // If user typed in an '@' sign then we need to display the 
 
           // Check if the cursor is next to the '@' sign string
-          const index = newText.lastIndexOf("@", cursorPosition[0]);
+          const index = text.lastIndexOf("@", cursorPosition[0]);
 
           if (index == -1 ) {
             return;
           }
 
           for (let i = index; i < cursorPosition[0]; i++) {
-            if (newText[i] === ' ') {
+            if (text[i] === ' ') {
               setShowList(false);
-              console.log("There is a space");
               return;
             }
           }
 
-          setSignPosition(newText.lastIndexOf("@", cursorPosition[0]) + 1);
+          setSignPosition(text.lastIndexOf("@", cursorPosition[0]) + 1);
           setShowList(true);
+        }}
+        onChangeText={(newText) => {
+          
+          onChangeText(newText);
+          setText(newText);
 
         }}         
         value={text}
