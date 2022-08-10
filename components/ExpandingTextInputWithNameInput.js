@@ -25,25 +25,26 @@ export default function ExpandingTextInputWithNameInput({
           
           onChangeText(newText);
           setText(newText);
-
+          
           // Ignore any non tagged user text
           // If user typed in an '@' sign then we need to display the 
 
           // Check if the cursor is next to the '@' sign string
-          const index = newText.lastIndexOf("@", cursorPosition);
+          const index = newText.lastIndexOf("@", cursorPosition[0]);
 
           if (index == -1 ) {
             return;
           }
 
-          for (let i = index; i < cursorPosition; i++) {
+          for (let i = index; i < cursorPosition[0]; i++) {
             if (newText[i] === ' ') {
               setShowList(false);
+              console.log("There is a space");
               return;
             }
           }
 
-          setSignPosition(newText.lastIndexOf("@", cursorPosition) + 1);
+          setSignPosition(newText.lastIndexOf("@", cursorPosition[0]) + 1);
           setShowList(true);
 
         }}         
@@ -54,8 +55,8 @@ export default function ExpandingTextInputWithNameInput({
           query={text.slice(SignPosition, cursorPosition[0])}
           onAdd={(userId) => {
             setShowList(false);
-            setText(`${text.substring(0,text.lastIndexOf("@", SignPosition))}\u200a${global.savedUsers[userId].name}\u200b${text.substring(cursorPosition[0])}`);
-            onChangeText(`${text.substring(0,text.lastIndexOf("@", SignPosition))}\u200a${global.savedUsers[userId].name}\u200b${text.substring(cursorPosition[0])}`);
+            setText(`${text.substring(0,text.lastIndexOf("@", SignPosition))}\u200a@${global.savedUsers[userId].name}\u200b${text.substring(cursorPosition[0])}`);
+            onChangeText(`${text.substring(0,text.lastIndexOf("@", SignPosition))}\u200a@${global.savedUsers[userId].name}\u200b${text.substring(cursorPosition[0])}`);
             onSubmit(userId);
             
             // Test
