@@ -84,6 +84,7 @@ export default function UserTagInput({
           <ProfileImageAndName
             onPress={() => {
               onAdd(item.id);
+              console.log(item.id);
             }}
             style={{
               alignContent: "flex-start",

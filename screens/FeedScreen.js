@@ -576,6 +576,8 @@ function PostInputField({
           multiline={true}
           placeholder={progress > 0 ? "Uploading..." : "Start typing..."}
           onChangeText={setPostInput}
+          taggedUsers = {taggedUsers}
+          setTaggedUsers = {setTaggedUsers}
           value={postInput}
           clearButtonMode="always"
           maxLength={1000}
