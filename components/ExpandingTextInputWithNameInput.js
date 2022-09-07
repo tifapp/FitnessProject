@@ -93,6 +93,7 @@ export default function ExpandingTextInputWithNameInput({
           if(!modifyText) {
             isCursorInside(event.nativeEvent.selection.start);
           } else {
+            setNewCursorPosition(undefined);
             setModifyText(false);
           }
 
@@ -118,7 +119,7 @@ export default function ExpandingTextInputWithNameInput({
           setShowList(true);
         }}
         onChangeText={(newText) => {
-          setNewCursorPosition(undefined);
+        
           if(newTaggedUserText === null) {
             onChangeText(newText);
             setText(newText);
@@ -132,7 +133,6 @@ export default function ExpandingTextInputWithNameInput({
         onKeyPress={({nativeEvent}) => {
           if (nativeEvent.key === 'Backspace') {
             setModifyText(true);
-            setNewCursorPosition(undefined);
 
             // Check if the cursor is within or next to the tagged user
             // Count the number of tagged users that are within the text input
