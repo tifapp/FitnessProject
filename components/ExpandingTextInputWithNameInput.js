@@ -16,19 +16,34 @@ export default function ExpandingTextInputWithNameInput({
   const [cursorPosition, setCursorPosition] = useState([]);
   const [newCursorPosition, setNewCursorPosition] = useState(undefined);
   const [showList, setShowList] = useState(false);
+  const [modifyText, setModifyText] = useState(false);
 
-  /*
-  const setNewCursorPosition = async (event) => {
-    await setCursorPosition([event.nativeEvent.selection.start, event.nativeEvent.selection.end]);
-    return new Promise((resolve) => {resolve()});
+  const findTaggedUser = (position) => {
+    let count = 0;
+    for(let i = 0; i < position; i++) {
+      if(text[i] === '\u200a') {
+        count++;
+      }
+    }
+    return count;
   }
-  */
 
-  const checkCursorInside = (position) => {
+  // Potential Issue the onChange text callback needs to be called before the onSelectionChange callback
+  // Since the text is not updated by the time this function calls, the cursor position is within the tagged user text
+  // This is where the main problem is occurring
+  // If we are adding text or deleting a char we do not want to go inside this function
+
+  const isCursorInside = (position) => {
     let insideTaggedUser = false;
+
+    if(position < 1) {
+      setNewCursorPosition(undefined);
+      return;
+    }
+
     let startInvisible = text.lastIndexOf('\u200a', position);
     let endInvisible = text.indexOf('\u200b', position);
-
+     
     if(startInvisible != -1 && endInvisible != -1) {
       let count = 0;
       
@@ -52,16 +67,17 @@ export default function ExpandingTextInputWithNameInput({
       if(distanceToEnd < distanceToStart) {
         let newPosition = endInvisible + 1;
         setNewCursorPosition({start: newPosition, end: newPosition});
+        setCursorPosition([newPosition, newPosition]);
       }
       else {
         let newPosition = startInvisible;
         setNewCursorPosition({start: newPosition, end: newPosition});
+        setCursorPosition([newPosition, newPosition]);
       }
     }
     else {
       setNewCursorPosition(undefined);
     }
-
   }
 
   return (
@@ -70,15 +86,19 @@ export default function ExpandingTextInputWithNameInput({
         {...props}
         selection={newCursorPosition}
         onSelectionChange={(event) => {
-          //console.log("onSelectionChange");
-          //setCursorPosition([event.nativeEvent.selection.start, event.nativeEvent.selection.end]);
           // Ignore any non tagged user text
           // If user typed in an '@' sign then we need to display the
-          //console.log("Start position is " + event.nativeEvent.selection.start);
-          //console.log("End position is " + event.nativeEvent.selection.end);
           setCursorPosition([event.nativeEvent.selection.start, event.nativeEvent.selection.end]);
-          checkCursorInside(event.nativeEvent.selection.start);
-          
+
+          if(!modifyText) {
+            isCursorInside(event.nativeEvent.selection.start);
+          } else {
+            setModifyText(false);
+          }
+
+          // When deleting a tagged user using the old cursor position is best 
+          // Whereas updating the cursor position inside tagged user text it is best to use the event.nativeEvent.selection.start  
+
           // Check if the cursor is next to the '@' sign string
           const index = text.lastIndexOf("@", cursorPosition[0]);
 
@@ -86,8 +106,9 @@ export default function ExpandingTextInputWithNameInput({
             return;
           }
 
+          // Fixed: Need to determine the difference between a newly tagged user and about to tag a user
           for (let i = index; i < cursorPosition[0]; i++) {
-            if (text[i] === ' ') {
+            if (text[i] === ' ' || text[i] === '\u200b') {
               setShowList(false);
               return;
             }
@@ -97,7 +118,7 @@ export default function ExpandingTextInputWithNameInput({
           setShowList(true);
         }}
         onChangeText={(newText) => {
-          //console.log("onChangeText");
+          setNewCursorPosition(undefined);
           if(newTaggedUserText === null) {
             onChangeText(newText);
             setText(newText);
@@ -110,26 +131,24 @@ export default function ExpandingTextInputWithNameInput({
         }}
         onKeyPress={({nativeEvent}) => {
           if (nativeEvent.key === 'Backspace') {
-            let count = 0;
+            setModifyText(true);
+            setNewCursorPosition(undefined);
 
             // Check if the cursor is within or next to the tagged user
             // Count the number of tagged users that are within the text input
 
-            
-            for(let i = 0; i <= cursorPosition[0]; i++) {
-              if(text[i] === '\u200a') {
-                count++;
-              }
+            if(cursorPosition[0] == 0) {
+              return;
             }
 
-            let startInvisible = text.lastIndexOf('\u200a', cursorPosition[0]);
-            let endInvisible = text.lastIndexOf('\u200b', cursorPosition[0]);
-
+            let startInvisible = text.lastIndexOf('\u200a', cursorPosition[0]-1);
+            let endInvisible = text.lastIndexOf('\u200b', cursorPosition[0]-1);
 
             // Check if character to the left of the cursor is an invisible character
             if(cursorPosition[0] === endInvisible + 1) {
               // Delete the tagged user from the array
-              taggedUsers.splice(count-1, 1);
+              let indexTaggedUser = findTaggedUser(cursorPosition[0]);
+              taggedUsers.splice(indexTaggedUser-1, 1);
               setTaggedUsers(taggedUsers);
 
               // Modify the text input string to remove the tagged user text
