@@ -89,7 +89,7 @@ export default function ExpandingTextInputWithNameInput({
           // Ignore any non tagged user text
           // If user typed in an '@' sign then we need to display the
           setCursorPosition([event.nativeEvent.selection.start, event.nativeEvent.selection.end]);
-
+          // Error in this section of the code
           if(!modifyText) {
             isCursorInside(event.nativeEvent.selection.start);
           } else {
@@ -119,7 +119,7 @@ export default function ExpandingTextInputWithNameInput({
           setShowList(true);
         }}
         onChangeText={(newText) => {
-        
+
           if(newTaggedUserText === null) {
             onChangeText(newText);
             setText(newText);
@@ -131,8 +131,9 @@ export default function ExpandingTextInputWithNameInput({
 
         }}
         onKeyPress={({nativeEvent}) => {
+          setModifyText(true);
+          
           if (nativeEvent.key === 'Backspace') {
-            setModifyText(true);
 
             // Check if the cursor is within or next to the tagged user
             // Count the number of tagged users that are within the text input
