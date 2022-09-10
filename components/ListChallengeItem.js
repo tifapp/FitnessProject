@@ -10,6 +10,7 @@ export default function ListChallengeItem({ item, matchingname }) {
     console.log(item);
     navigation.navigate("Challenge", {
       channel: item.id,
+      open: item.open,
       winner: item.winner,
     });
   };
@@ -43,8 +44,8 @@ export default function ListChallengeItem({ item, matchingname }) {
         <MaterialCommunityIcons
           name="account-group"
           style={{ marginLeft: 20 }}
-          color={matchingname == null || matchingname ? "black" : "#a9efe0"}
-          size={30}
+          color={item.open ? "black" : "#a9efe0"}
+          size={30} //include end date in the challenge description, have an autoclose/winner function as a lambda trigger
         />
         <Text
           style={{
