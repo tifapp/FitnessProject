@@ -21,11 +21,10 @@ export default function ChallengeScreen({ navigation, route }) {
               <ProfileImageAndName userId={route.params?.winner} />
             </View>
           }
-          isChallenge={true}
+          isChallenge={!route.params.open}
           navigation={navigation}
           myId={route.params?.myId}
           channel={route.params?.channel}
-          challenge={true}
         />
       </View>
     </View>
