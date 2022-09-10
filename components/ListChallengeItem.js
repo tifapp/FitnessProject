@@ -10,6 +10,7 @@ export default function ListChallengeItem({ item, matchingname }) {
     console.log(item);
     navigation.navigate("Challenge", {
       channel: item.id,
+      open: item.open,
       winner: item.winner,
     });
   };

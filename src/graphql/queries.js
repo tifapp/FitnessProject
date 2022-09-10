@@ -530,40 +530,6 @@ export const postsByUser = /* GraphQL */ `
     }
   }
 `;
-export const postsByReceiver = /* GraphQL */ `
-  query PostsByReceiver(
-    $receiver: ID
-    $createdAt: ModelStringKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelPostFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    postsByReceiver(
-      receiver: $receiver
-      createdAt: $createdAt
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        createdAt
-        updatedAt
-        userId
-        description
-        channel
-        receiver
-        parentId
-        imageURL
-        taggedUsers
-        likes
-        replies
-      }
-      nextToken
-    }
-  }
-`;
 export const postsByChannel = /* GraphQL */ `
   query PostsByChannel(
     $channel: ID
@@ -610,6 +576,40 @@ export const postsByLikes = /* GraphQL */ `
     postsByLikes(
       channel: $channel
       likes: $likes
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        createdAt
+        updatedAt
+        userId
+        description
+        channel
+        receiver
+        parentId
+        imageURL
+        taggedUsers
+        likes
+        replies
+      }
+      nextToken
+    }
+  }
+`;
+export const postsByUserId = /* GraphQL */ `
+  query PostsByUserId(
+    $channel: ID
+    $userId: ModelIDKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelPostFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    postsByUserId(
+      channel: $channel
+      userId: $userId
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit
