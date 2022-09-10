@@ -8,13 +8,13 @@ import {
   createPost,
   createReport,
   deletePost,
-  updatePost
+  updatePost,
 } from "@graphql/mutations";
 import { batchGetLikes, postsByChannel, postsByLikes } from "@graphql/queries";
 import {
   onCreatePostFromChannel,
   onDeletePostFromChannel,
-  onUpdatePostFromChannel
+  onUpdatePostFromChannel,
 } from "@graphql/subscriptions";
 import SHA256 from "@hooks/hash";
 import NetInfo from "@react-native-community/netinfo";
@@ -37,7 +37,7 @@ import {
   Platform,
   StyleSheet,
   Text,
-  View
+  View,
 } from "react-native";
 import usePhotos from "../hooks/usePhotos";
 
@@ -68,7 +68,6 @@ export default function FeedScreen({
   myId,
   id,
   isFocused,
-  challenge,
   style,
   postButtonLabel,
   renderItem,
@@ -413,7 +412,7 @@ export default function FeedScreen({
       initialAmount={7}
       additionalAmount={7} //change number based on device specs
       processingFunction={getLikedPosts}
-      queryOperation={challenge ? postsByLikes : postsByChannel}
+      queryOperation={isChallenge ? postsByLikes : postsByChannel}
       filter={{ channel: channel, sortDirection: "DESC" }}
       renderItem={renderPostItem}
       keyExtractor={(item) => item.createdAt.toString() + item.userId}
@@ -462,7 +461,7 @@ function PostInputField({
     const imageID = SHA256(Date.now().toString());
 
     const newPost = {
-      description: postInput,
+      description: "",
       channel: channel,
       taggedUsers,
     };
@@ -536,7 +535,7 @@ function PostInputField({
     } catch (err) {
       console.warn("error in creating post: ", err);
     }
-    
+
     setPostIsLoading(false);
   };
 
@@ -576,8 +575,8 @@ function PostInputField({
           multiline={true}
           placeholder={progress > 0 ? "Uploading..." : "Start typing..."}
           onChangeText={setPostInput}
-          taggedUsers = {taggedUsers}
-          setTaggedUsers = {setTaggedUsers}
+          taggedUsers={taggedUsers}
+          setTaggedUsers={setTaggedUsers}
           value={postInput}
           clearButtonMode="always"
           maxLength={1000}
@@ -585,8 +584,8 @@ function PostInputField({
             !taggedUsers.includes(userId) &&
             setTaggedUsers([...taggedUsers, userId])
           }
-          onDelete={(userId) => 
-            taggedUsers.includes(userId) && 
+          onDelete={(userId) =>
+            taggedUsers.includes(userId) &&
             setTaggedUsers(taggedUsers.filter((user) => user != userId))
           }
         />

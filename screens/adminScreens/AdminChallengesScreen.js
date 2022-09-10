@@ -1,7 +1,7 @@
 import APIList from "@components/APIList";
 import ListChallengeItem from "@components/ListChallengeItem";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
-import { deleteChallenge } from "@graphql/mutations";
+import { updateChallenge } from "@graphql/mutations";
 import { listChallenges } from "@graphql/queries";
 import { API, graphqlOperation } from "aws-amplify";
 import React, { useRef } from "react";
@@ -35,19 +35,26 @@ export default function Challenges({ navigation, route }) {
         ) => (
           <View>
             <ListChallengeItem item={item} />
-            <Text>
-              Winner: <ProfileImageAndName userId={item.winner} />
-            </Text>
+            {item.winner && (
+              <Text>
+                Winner: <ProfileImageAndName userId={item.winner} />
+              </Text>
+            )}
             <TouchableOpacity
               onPress={() => {
                 //this block of code (deleting from the database and the local list) should have a hook, maybe within apilist itself
                 API.graphql(
-                  graphqlOperation(deleteChallenge, { input: { id: item.id } })
+                  graphqlOperation(updateChallenge, {
+                    input: { id: item.id, open: false },
+                  })
                 );
-                listRef.current?.removeItem((i) => i.id === item.id);
               }}
             >
-              <Text style={styles.textButtonStyle}>Close Challenge</Text>
+              {item.open ? (
+                <Text style={styles.textButtonStyle}>End Challenge</Text>
+              ) : (
+                <Text style={styles.textButtonStyle}>Challenge closed</Text>
+              )}
             </TouchableOpacity>
           </View>
         )} //add option to close challenge
