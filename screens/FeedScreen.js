@@ -461,7 +461,7 @@ function PostInputField({
     const imageID = SHA256(Date.now().toString());
 
     const newPost = {
-      description: "",
+      description: postInput,
       channel: channel,
       taggedUsers,
     };
