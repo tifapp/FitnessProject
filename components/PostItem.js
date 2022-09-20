@@ -3,7 +3,8 @@ import LinkableText from "@components/LinkableText";
 import PostHeader from "@components/postComponents/PostHeader";
 import PostImage from "@components/PostImage";
 import { likesByPost } from "@graphql/queries";
-import React, { useRef, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Dimensions,
   FlatList,
@@ -11,7 +12,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import IconButton from "./common/IconButton";
 import Modal from "./common/Modal";
@@ -40,8 +41,57 @@ export default React.memo(function PostItem({
   const repliesModalRef = useRef();
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState("");
+  const [textComponents, setTextComponents] = useState([]);
 
-  console.log(item.taggedUsers);
+  //console.log(item.taggedUsers);
+
+  const navigation = useNavigation();
+
+  const goToProfile = (taggedUserId) => {
+    if (global.id === taggedUserId) {
+      navigation.navigate("Profile");
+    } else {
+      navigation.navigate("Lookup", { userId: taggedUserId });
+    }
+  };
+
+  const findTaggedUser = (taggedUser) => {
+    let taggedUserIndex = 0;
+
+    for(let i in textComponents) {
+      if(textComponents[i] === taggedUser) {
+        break;
+      }
+      else if(textComponents[i].includes('\u200a')) {
+        taggedUserIndex++;
+      }
+    }
+
+    goToProfile(item.taggedUsers[taggedUserIndex]);
+  }
+
+  useEffect(() => {
+    let subString = "";
+    let text = [...item.description];
+    let textInputs = [];
+
+    for(let i in text) {
+      if(text[i] === '\u200a') {
+        textInputs.push(subString);
+        subString = text[i];
+      } else if(text[i] === '\u200b') {
+        subString += text[i];
+        textInputs.push(subString);
+        subString = "";
+      } else {
+        subString += text[i];
+      }
+    }
+
+    subString != "" ? textInputs.push(subString) : null;
+
+    setTextComponents(textInputs);
+  },[]);
 
   return (
     <View style={styles.secondaryContainerStyle}>
@@ -104,7 +154,7 @@ export default React.memo(function PostItem({
               }}
               urlPreview={item.urlPreview}
             >
-              {item.description}
+              {textComponents.map((textInput) => textInput.includes('\u200a') ? <Text onPress = {() => findTaggedUser(textInput)} style={{color: "blue"}}>{textInput}</Text> : <Text>{textInput}</Text>)}
             </LinkableText>
           )}
 
