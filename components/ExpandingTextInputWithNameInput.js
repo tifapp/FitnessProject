@@ -5,13 +5,15 @@ import ExpandingTextInput from "./ExpandingTextInput";
 export default function ExpandingTextInputWithNameInput({
   onSubmit,
   onChangeText,
+  setText,
+  text,
   onDelete,
   taggedUsers,
   setTaggedUsers,
   ...props
 }) {
   const [SignPosition, setSignPosition] = useState(null);
-  const [text, setText] = useState("");
+  //const [text, setText] = useState("");
   const [newTaggedUserText, setNewTaggedUserText] = useState(null);
   const [cursorPosition, setCursorPosition] = useState([]);
   const [newCursorPosition, setNewCursorPosition] = useState(undefined);
