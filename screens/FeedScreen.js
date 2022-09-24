@@ -8,13 +8,13 @@ import {
   createPost,
   createReport,
   deletePost,
-  updatePost,
+  updatePost
 } from "@graphql/mutations";
 import { batchGetLikes, postsByChannel, postsByLikes } from "@graphql/queries";
 import {
   onCreatePostFromChannel,
   onDeletePostFromChannel,
-  onUpdatePostFromChannel,
+  onUpdatePostFromChannel
 } from "@graphql/subscriptions";
 import SHA256 from "@hooks/hash";
 import NetInfo from "@react-native-community/netinfo";
@@ -37,7 +37,7 @@ import {
   Platform,
   StyleSheet,
   Text,
-  View,
+  View
 } from "react-native";
 import usePhotos from "../hooks/usePhotos";
 
@@ -432,6 +432,7 @@ function PostInputField({
 }) {
   const [pickFromGallery, pickFromCamera] = usePhotos(!isChallenge, true);
   const [postInput, setPostInput] = useState("");
+  const [text, setText] = useState("");
   const [imageURL, setImageURL] = useState(null);
   const [isVideo, setIsVideo] = useState(null);
   const [postIsLoading, setPostIsLoading] = useState(false);
@@ -483,6 +484,7 @@ function PostInputField({
 
     setTaggedUsers([]);
     setPostInput("");
+    setText("");
 
     //LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     //pushLocalPost(localNewPost);
@@ -575,6 +577,8 @@ function PostInputField({
           multiline={true}
           placeholder={progress > 0 ? "Uploading..." : "Start typing..."}
           onChangeText={setPostInput}
+          setText={setText}
+          text={text}
           taggedUsers={taggedUsers}
           setTaggedUsers={setTaggedUsers}
           value={postInput}
