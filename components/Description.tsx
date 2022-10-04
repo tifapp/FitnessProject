@@ -3,11 +3,13 @@ import { Dimensions, StyleSheet, Text, TextInput, View } from "react-native";
 
 const { width } = Dimensions.get("screen");
 
-export default function GroupDescription({
-  setDescription,
-  descriptionVal,
-  characterCount,
-}) {
+interface Props {
+  setDescription: (s: string) => void,
+  descriptionVal: string,
+  characterCount: number,
+}
+
+const GroupDescription: React.FC<Props> = ({setDescription, descriptionVal, characterCount}) => {
   var totalCharsRemaining = characterCount - descriptionVal.length;
   return (
     <View>
@@ -26,6 +28,8 @@ export default function GroupDescription({
     </View>
   );
 }
+
+export default GroupDescription;
 
 const styles = StyleSheet.create({
   boxFormat: {
