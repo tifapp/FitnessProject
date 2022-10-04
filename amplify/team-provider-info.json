@@ -51,7 +51,7 @@
         },
         "onChallengeUpdate": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/onChallengeUpdate-61534139384554626432-build.zip"
+          "s3Key": "amplify-builds/onChallengeUpdate-364b33772b5659695155-build.zip"
         }
       },
       "hosting": {
