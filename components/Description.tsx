@@ -9,7 +9,7 @@ interface Props {
   characterCount: number,
 }
 
-const GroupDescription: React.FC<Props> = ({setDescription, descriptionVal, characterCount}) => {
+export default function GroupDescription({setDescription, descriptionVal, characterCount}: Props) {
   var totalCharsRemaining = characterCount - descriptionVal.length;
   return (
     <View>
@@ -28,8 +28,6 @@ const GroupDescription: React.FC<Props> = ({setDescription, descriptionVal, char
     </View>
   );
 }
-
-export default GroupDescription;
 
 const styles = StyleSheet.create({
   boxFormat: {
