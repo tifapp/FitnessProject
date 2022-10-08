@@ -1,17 +1,17 @@
-// @ts-nocheck
 import { Storage } from "aws-amplify";
 import { Video } from "expo-av";
 import React, { useEffect, useRef, useState } from "react";
-import { ImageBackground } from "react-native";
+import { ImageBackground, StyleProp, ViewStyle } from "react-native";
+
+interface Props {style: StyleProp<ViewStyle>, imageID: string, isVisible: boolean}
 
 const re = /(?:\.([^.]+))?$/;
 
-// @ts-ignore
 global.currentVideo;
 
-export default function PostImage({ style, imageID, isVisible }) {
-  const [imageURL, setImageURL] = useState(null);
-  const video = useRef(null);
+export default function PostImage({ style, imageID, isVisible }: Props) {
+  const [imageURL, setImageURL] = useState<string | null>();
+  const video = useRef<Video>(null);
 
   let imageKey = `feed/${imageID}`;
   let imageConfig = {
@@ -23,7 +23,7 @@ export default function PostImage({ style, imageID, isVisible }) {
     if (imageID) {
       Storage.get(imageKey, imageConfig) //this will incur lots of repeated calls to the backend, idk how else to fix it right now
         .then((imageURL) => {
-          setImageURL(imageURL);
+          setImageURL(imageURL as string);
         })
         .catch((err) => {
           console.log("could not find image!", err);
@@ -56,7 +56,7 @@ export default function PostImage({ style, imageID, isVisible }) {
   }, [isVisible]);
 
   if (imageID) {
-    return re.exec(imageID)[1] === "jpg" ? (
+    return re.exec(imageID)?.[1] === "jpg" ? (
       <ImageBackground
         style={style}
         source={
@@ -69,13 +69,13 @@ export default function PostImage({ style, imageID, isVisible }) {
       <Video
         ref={video}
         style={style}
-        source={{ uri: imageURL }}
+        source={{ uri: imageURL ?? "" }}
         posterSource={require("../assets/icon.png")}
         useNativeControls
         onPlaybackStatusUpdate={(status) => {
           (async () => {
-            if (status.didJustFinish) {
-              video.current.setStatusAsync({
+            if (status.isLoaded && status.didJustFinish) {
+              video.current?.setStatusAsync({
                 shouldPlay: false,
                 positionMillis: 0,
               });
