@@ -7,7 +7,7 @@ interface Props {
   setSelectedValue: (s:string) => void
 }
 
-const GenderPicker = ({ selectedValue, setSelectedValue }: Props) => {
+export default ({ selectedValue, setSelectedValue }: Props) => {
   return (
     <View>
       <Picker
@@ -23,5 +23,3 @@ const GenderPicker = ({ selectedValue, setSelectedValue }: Props) => {
     </View>
   );
 };
-
-export default GenderPicker;
