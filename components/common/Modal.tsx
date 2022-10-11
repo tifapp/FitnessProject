@@ -1,7 +1,12 @@
 import React, { forwardRef, useImperativeHandle, useState } from "react";
 import { Modal, Pressable, View } from "react-native";
 
-const StyledModal = forwardRef(({ children }, ref) => {
+interface Props {
+  children: React.ReactNode,
+  ref: React.ForwardedRef<unknown>
+}
+
+export default forwardRef(({ children, ref }: Props) => {
   const [visible, setVisible] = useState(false);
 
   useImperativeHandle(ref, () => ({
@@ -57,5 +62,3 @@ const StyledModal = forwardRef(({ children }, ref) => {
     </Modal>
   );
 });
-
-export default StyledModal;
