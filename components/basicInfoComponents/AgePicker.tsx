@@ -1,14 +1,19 @@
 import { Picker } from "@react-native-picker/picker";
 import React from "react";
 
-const minAge = 18;
-const maxAge = 100;
-const ageRange = Array.from(
+const minAge: number = 18;
+const maxAge: number = 100;
+const ageRange: number[] = Array.from(
   { length: maxAge - minAge + 1 },
   (_, i) => i + minAge
 );
 
-const AgePicker = ({ selectedValue, setSelectedValue }) => {
+interface Props {
+  selectedValue: number,
+  setSelectedValue: (n: number) => void
+}
+
+export default function AgePicker({ selectedValue, setSelectedValue }: Props) {
   return (
     <Picker
       selectedValue={selectedValue}
@@ -21,5 +26,3 @@ const AgePicker = ({ selectedValue, setSelectedValue }) => {
     </Picker>
   );
 };
-
-export default AgePicker;

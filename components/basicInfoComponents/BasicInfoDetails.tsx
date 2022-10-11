@@ -4,7 +4,14 @@ import { Text, View } from "react-native";
 import AgePicker from "./AgePicker";
 import GenderPicker from "./GenderPicker";
 
-const BasicInfoDetails = ({ age, gender, setAge, setGender }) => {
+interface Props {
+  age: number, 
+  gender: string, 
+  setAge: (n:number) => void, 
+  setGender: (s:string) => void
+}
+
+const BasicInfoDetails = ({ age, gender, setAge, setGender }: Props) => {
   return (
     <TouchableWithModal
       modalComponent={
