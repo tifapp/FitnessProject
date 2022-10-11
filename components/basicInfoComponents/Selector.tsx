@@ -4,8 +4,16 @@ import { Modal, StyleSheet, View } from "react-native";
 import AgePicker from "./AgePicker";
 import GenderPicker from "./GenderPicker";
 
-const Selector = ({ label, modalOpen, setModalOpen, field, updateField }) => {
-  const [selectedValue, setSelectedValue] = useState("");
+interface Props {
+  label: string,
+  modalOpen: boolean,
+  setModalOpen: (b: boolean) => void,
+  field: string,
+  updateField: (s:string | number) => void
+}
+
+const Selector = ({ label, modalOpen, setModalOpen, field, updateField }: Props) => {
+  const [selectedValue, setSelectedValue] = useState<number | string>("");
 
   const fieldHandler = () => {
     if (selectedValue != field) {
@@ -13,6 +21,7 @@ const Selector = ({ label, modalOpen, setModalOpen, field, updateField }) => {
     }
     setModalOpen(false);
   };
+  
   return (
     <Modal transparent={true} visible={modalOpen} animationType="slide">
       <View style={styles.modalStyle}>
@@ -26,12 +35,12 @@ const Selector = ({ label, modalOpen, setModalOpen, field, updateField }) => {
 
         {label == "age" ? (
           <AgePicker
-            selectedValue={selectedValue}
+            selectedValue={selectedValue as number} // Come back to later to find workaround the explicit type conversion
             setSelectedValue={setSelectedValue}
           />
         ) : (
           <GenderPicker
-            selectedValue={selectedValue}
+            selectedValue={selectedValue as string} // Come back to later to find workaround the explicit type conversion
             setSelectedValue={setSelectedValue}
           />
         )}

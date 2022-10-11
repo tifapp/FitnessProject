@@ -2,7 +2,12 @@ import { Picker } from "@react-native-picker/picker";
 import React from "react";
 import { View } from "react-native";
 
-const GenderPicker = ({ selectedValue, setSelectedValue }) => {
+interface Props {
+  selectedValue: string,
+  setSelectedValue: (s:string) => void
+}
+
+const GenderPicker = ({ selectedValue, setSelectedValue }: Props) => {
   return (
     <View>
       <Picker
