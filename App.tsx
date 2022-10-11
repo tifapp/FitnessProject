@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { headerOptions } from "@components/headerComponents/headerOptions";
 import ConfirmSignIn from "@components/loginComponents/ConfirmSignIn";
 import ConfirmSignUp from "@components/loginComponents/ConfirmSignUp";
@@ -35,7 +34,7 @@ import {
   Auth,
   Cache,
   graphqlOperation,
-  Storage,
+  Storage
 } from "aws-amplify";
 import { withAuthenticator } from "aws-amplify-react-native";
 import { Audio } from "expo-av";
@@ -44,12 +43,13 @@ import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   AppState,
   LogBox,
   Platform,
   UIManager,
   useWindowDimensions,
-  View,
+  View
 } from "react-native";
 // Get the aws resources configuration parameters
 import awsconfig from "./src/aws-exports"; // if you are using Amplify CLI
@@ -102,9 +102,9 @@ const App = () => {
   const appState = useRef(AppState.currentState);
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
-  const [userId, setUserId] = useState("checking..."); //stores the user's id if logged in
-  const [isNewUser, setIsNewUser] = useState(false); //stores the user's id if logged in
-  const [isAdmin, setIsAdmin] = useState(false); //seems insecure
+  const [userId, setUserId] = useState<string>("checking..."); //stores the user's id if logged in
+  const [isNewUser, setIsNewUser] = useState<boolean>(false); //stores the user's id if logged in
+  const [isAdmin, setIsAdmin] = useState<boolean>(false); //seems insecure
 
   const [conversationIds, setConversationIds] = useState([]);
 
@@ -140,7 +140,7 @@ const App = () => {
         graphqlOperation(getUser, { id: query.attributes.sub })
       );
       setUserId(query.attributes.sub);
-      global.id = query.attributes.sub;
+      globalThis.myId = query.attributes.sub;
       if (user.data.getUser == null) {
         setIsNewUser(true);
       }
@@ -165,7 +165,7 @@ const App = () => {
       finalStatus = status;
     }
     if (finalStatus !== "granted") {
-      alert("Failed to get push token for push notification!");
+      Alert.alert("Failed to get push token for push notification!");
       return;
     }
     const token = (await Notifications.getExpoPushTokenAsync()).data;
