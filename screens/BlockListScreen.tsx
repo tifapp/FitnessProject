@@ -3,6 +3,7 @@ import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import { deleteBlock } from "@graphql/mutations";
 import { blocksByDate } from "@graphql/queries";
 import printTime from "@hooks/printTime";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { API, graphqlOperation } from "aws-amplify";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -11,12 +12,13 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
-const BlockListScreen = ({ navigation, route }) => {
-  const listRef = useRef();
-  // @ts-ignore
+const BlockListScreen = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const listRef = useRef<APIList>(null);
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
 
   const alertOptions = {
@@ -24,30 +26,27 @@ const BlockListScreen = ({ navigation, route }) => {
     onDismiss: () => setIsOptionsOpen(false),
   };
 
-  const unblock = async (blockeeId) => {
+  const unblock = async (blockeeId: string) => {
     const title = "Are you sure you want to unblock this friend?";
     const options = [
       {
         text: "Yes",
         onPress: () => {
           console.log("about to delete this user: ", blockeeId);
-          // @ts-ignore
-          global.localBlockList = global.localBlockList.filter(
+          globalThis.localBlockList = globalThis.localBlockList.filter(
             (item) => item.blockee != blockeeId
           );
           LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-          // @ts-ignore
-          listRef.current.mutateData((blocklist) => {
+          listRef.current?.mutateData((blocklist) => { //needs api list template type
             const results = blocklist.filter(
               (item) => item.blockee != blockeeId
             );
-            // @ts-ignore
             global.localBlockList = results;
             return results;
           });
           API.graphql(
             graphqlOperation(deleteBlock, {
-              input: { userId: route.params?.myId, blockee: blockeeId },
+              input: { userId: globalThis.myId, blockee: blockeeId },
             })
           );
         },
@@ -67,8 +66,7 @@ const BlockListScreen = ({ navigation, route }) => {
     const onFocus = navigation.addListener("focus", () => {
       //console.log("got to settings", global.localBlockList);
       //we just want to save a copy of the data
-      // @ts-ignore
-      listRef.current.mutateData(() => [...global.localBlockList]);
+      listRef.current?.mutateData(() => [...global.localBlockList]);
     });
 
     // Return the function to unsubscribe from the event so it gets removed on unmount
@@ -81,7 +79,7 @@ const BlockListScreen = ({ navigation, route }) => {
       additionalAmount={20}
       queryOperation={blocksByDate}
       ref={listRef}
-      renderItem={({ item }) => (
+      renderItem={({ item }) => ( //needs API list template type
         <View
           style={{
             flexDirection: "row",
@@ -92,7 +90,6 @@ const BlockListScreen = ({ navigation, route }) => {
           }}
         >
           <ProfileImageAndName
-            // @ts-ignore
             imageStyle={[styles.smallImageStyle, { marginHorizontal: 20 }]}
             userId={item.blockee}
             sibling={
@@ -124,7 +121,7 @@ const BlockListScreen = ({ navigation, route }) => {
         </View>
       )}
       notRefreshable={true}
-      filter={{ userId: route.params?.myId }}
+      filter={{ userId: globalThis.myId }}
       contentContainerStyle={{
         flexGrow: 1,
         flex: 1,
@@ -133,7 +130,7 @@ const BlockListScreen = ({ navigation, route }) => {
         alignItems: "center",
         alignSelf: "center",
       }}
-      keyExtractor={(item) => item.blockee}
+      keyExtractor={(item) => item.blockee} //needs template type. see how tesla does it
       ListEmptyMessage={"You haven't blocked anyone."}
     />
   );

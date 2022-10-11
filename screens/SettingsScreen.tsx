@@ -1,10 +1,7 @@
-// @ts-nocheck
 import Accordion from "@components/Accordion";
 import IconButton from "@components/common/IconButton";
 import { deleteUser } from "@graphql/mutations";
-import { createStackNavigator } from "@react-navigation/stack";
-import BlockListScreen from "@screens/BlockListScreen";
-import LookupUserScreen from "@screens/LookupUser";
+import { useNavigation } from "@react-navigation/native";
 import PrivacyScreen from "@screens/PrivacyScreen";
 import { API, Auth, graphqlOperation, Storage } from "aws-amplify";
 import React, { useState } from "react";
@@ -14,14 +11,16 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import "react-native-gesture-handler";
 
-function Settings({ navigation, route }) {
+export default function Settings() {
+  const navigation = useNavigation();
+
   const deleteUserAsync = async () => {
     await API.graphql(
-      graphqlOperation(deleteUser, { input: { id: route.params?.myId } })
+      graphqlOperation(deleteUser, { input: { id: globalThis.myId } })
     );
 
     await Storage.remove("profileimage.jpg", { level: "protected" })
@@ -54,7 +53,7 @@ function Settings({ navigation, route }) {
                 text: "Yes",
                 onPress: deleteUserAsync,
               }, //if submithandler fails user won't know
-              { text: "Cancel", type: "cancel" },
+              { text: "Cancel", style: "cancel" },
             ],
             { cancelable: true }
           );
@@ -68,22 +67,21 @@ function Settings({ navigation, route }) {
   function signOut() {
     const title = "Are you sure you want to sign out?";
     const message = "";
-    const options = [
+    Alert.alert(title, message, [
       {
         text: "Yes",
         onPress: () => {
           Auth.signOut();
         },
       }, //if submithandler fails user won't know
-      { text: "Cancel", type: "cancel" },
-    ];
-    Alert.alert(title, message, options, { cancelable: true });
+      { text: "Cancel", style: "cancel" },
+    ], { cancelable: true });
   }
 
-  const [isOpen, setIsOpen] = useState(false);
-  const [oldPassword, setOldPassword] = useState();
-  const [newPassword, setNewPassword] = useState();
-  const [confirmNewPassword, setConfirmNewPassword] = useState();
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [oldPassword, setOldPassword] = useState<string>("");
+  const [newPassword, setNewPassword] = useState<string>("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState<string>();
 
   async function changePassword() {
     try {
@@ -92,16 +90,16 @@ function Settings({ navigation, route }) {
         throw "Passwords don't match";
       }
       await Auth.changePassword(currentUser, oldPassword, newPassword);
-      alert("Password changed successfully!");
+      Alert.alert("Password changed successfully!");
       setIsOpen(false);
     } catch (e) {
-      alert(e.message ? e.message : e);
+      Alert.alert(e.message ? e.message : e);
     }
   }
 
   return (
     <View style={{ backgroundColor: "white", flex: 1 }}>
-      <PrivacyScreen route={route} />
+      <PrivacyScreen />
       <TouchableOpacity
         onPress={() => {
           navigation.navigate("Block List");
@@ -256,34 +254,5 @@ function Settings({ navigation, route }) {
         </View>
       </Modal>
     </View>
-  );
-}
-
-const Stack = createStackNavigator();
-
-export default function SettingsStack({ navigation, route }) {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen
-        name="Settings"
-        component={Settings}
-        initialParams={route.params}
-      />
-      <Stack.Screen
-        options={{ headerShown: true }}
-        name="Block List"
-        component={BlockListScreen}
-        initialParams={route.params}
-      />
-      <Stack.Screen
-        name="Lookup"
-        component={LookupUserScreen}
-        initialParams={route.params}
-      />
-    </Stack.Navigator>
   );
 }

@@ -1,20 +1,19 @@
-// @ts-nocheck
 import { Picker } from "@react-native-picker/picker";
 import { API, graphqlOperation } from "aws-amplify";
 import * as Haptics from "expo-haptics";
 import React, { useEffect, useState } from "react";
 import { Text, View } from "react-native";
-import { updateUser } from "root/src/graphql/mutations";
-import { getUser } from "root/src/graphql/queries";
+import { updateUser } from "../src/graphql/mutations";
+import { getUser } from "../src/graphql/queries";
 
-const PrivacyScreen = ({ navigation, route }) => {
+const PrivacyScreen = () => {
   const [previousSettings, setPreviousSettings] = useState();
 
   useEffect(() => {
     (async () => {
       //console.log("your id is ", route.params?.myId)
       const user = await API.graphql(
-        graphqlOperation(getUser, { id: route.params?.myId })
+        graphqlOperation(getUser, { id: global.myId })
       );
       console.log(user.data.getUser);
       setPreviousSettings(user.data.getUser);
