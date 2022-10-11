@@ -1,7 +1,7 @@
 import React from "react";
-import { View } from "react-native";
+import { View, ViewProps } from "react-native";
 
-export default function ElevatedView({ children, ...rest }) {
+export default function ElevatedView({ children, ...rest } : ViewProps) {
   return (
     <View
       style={[
