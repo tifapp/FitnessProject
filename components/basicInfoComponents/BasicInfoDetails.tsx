@@ -11,7 +11,7 @@ interface Props {
   setGender: (s:string) => void
 }
 
-export default ({ age, gender, setAge, setGender }: Props) => {
+const BasicInfoDetails = ({ age, gender, setAge, setGender }: Props) => {
   return (
     <TouchableWithModal
       modalComponent={
@@ -35,3 +35,5 @@ export default ({ age, gender, setAge, setGender }: Props) => {
     </TouchableWithModal>
   );
 };
+
+export default BasicInfoDetails;

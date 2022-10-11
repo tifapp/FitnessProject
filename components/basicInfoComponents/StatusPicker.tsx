@@ -7,7 +7,7 @@ interface Props {
   setSelectedValue: (s:string) => void
 }
 
-export default ({ selectedValue, setSelectedValue }: Props) => {
+const StatusPicker = ({ selectedValue, setSelectedValue }: Props) => {
   return (
     <Picker
       selectedValue={selectedValue}
@@ -20,4 +20,6 @@ export default ({ selectedValue, setSelectedValue }: Props) => {
     </Picker>
   );
 };
+
+export default StatusPicker;
 
