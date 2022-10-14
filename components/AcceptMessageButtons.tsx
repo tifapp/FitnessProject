@@ -1,5 +1,5 @@
-// @ts-nocheck
 import IconButton from "@components/common/IconButton";
+import { useNavigation } from "@react-navigation/native";
 import { API, graphqlOperation } from "aws-amplify";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
@@ -11,13 +11,13 @@ import {
 import { getConversation } from "../src/graphql/queries";
 
 export default function AcceptMessageButtons({
-  navigation,
-  route,
   id,
   channel,
   receiver,
+  route
 }) {
   const [ButtonCheck, setButtonCheck] = useState(false);
+  const navigation = useNavigation();
 
   const acceptMessageRequest = async () => {
     await API.graphql(
@@ -77,9 +77,9 @@ export default function AcceptMessageButtons({
       console.log("error in blocking user: ", err);
     }
 
-    global.localBlockList.push({
+    globalThis.localBlockList.push({
       createdAt: new Date(Date.now()).toISOString(),
-      userId: route.params?.myId,
+      userId: route.myId,
       blockee: id,
     });
 
@@ -112,8 +112,7 @@ export default function AcceptMessageButtons({
           onPress={acceptMessageRequest}
           style={{ paddingHorizontal: 12 }}
           label={"Accept"}
-          fontSize={18}
-        />
+          fontSize={18} margin={0} isLabelFirst={false} fontWeight={""}        />
 
         <IconButton
           iconName={"clear"}
@@ -122,8 +121,7 @@ export default function AcceptMessageButtons({
           onPress={rejectMessageRequest}
           style={{ paddingHorizontal: 12 }}
           label={"Reject"}
-          fontSize={18}
-        />
+          fontSize={18} margin={0} isLabelFirst={false} fontWeight={""}        />
 
         <IconButton
           iconName={"block"}
@@ -132,8 +130,7 @@ export default function AcceptMessageButtons({
           onPress={blockMessageRequest}
           style={{ paddingHorizontal: 12 }}
           label={"Block"}
-          fontSize={18}
-        />
+          fontSize={18} margin={0} isLabelFirst={false} fontWeight={""}        />
       </View>
     )
   );

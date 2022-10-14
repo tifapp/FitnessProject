@@ -2,7 +2,13 @@ import React from "react";
 import { Alert, Dimensions, Image, TouchableOpacity } from "react-native";
 import usePhotos from "../hooks/usePhotos";
 
-const ProfilePic = ({ imageURL, setImageURL, setImageChanged }) => {
+interface Props {
+  imageURL: string,
+  setImageURL: React.Dispatch<React.SetStateAction<string>>,
+  setImageChanged: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+const ProfilePic = ({ imageURL, setImageURL, setImageChanged } : Props) => {
   const [pickFromGallery, pickFromCamera] = usePhotos();
 
   const promptUser = () => {
@@ -37,7 +43,6 @@ const ProfilePic = ({ imageURL, setImageURL, setImageChanged }) => {
           height: Dimensions.get("window").width / 2 - 30,
         }}
         source={
-          // @ts-ignore
           imageURL === "" ? require("../assets/icon.png") : { uri: imageURL }
         }
       />

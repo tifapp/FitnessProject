@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { createLike, deleteLike } from "@graphql/mutations";
 import { API, graphqlOperation } from "aws-amplify";
 import * as Haptics from "expo-haptics";
@@ -6,14 +5,22 @@ import React, { useEffect, useRef, useState } from "react";
 import playSound from "../../hooks/playSound";
 import IconButton from "../common/IconButton";
 
+interface Props {
+  likes: number,
+  item: {userId: string, createdAt: string, likes: number, 
+    replies: number, loading: boolean, likedByYou: boolean, info: React.NamedExoticComponent<object>}
+  onTap: (b: boolean) => void,
+  postId: string,
+  likeDebounceRef: React.MutableRefObject<boolean>
+}
+
 export default function LikeButton({
   onTap,
   likes,
-  myId,
   item,
   postId,
   likeDebounceRef,
-}) {
+} : Props) {
   const [liked, setLiked] = useState(item.likedByYou);
   const likeRef = useRef();
   const timerIsRunning = useRef();
@@ -45,7 +52,7 @@ export default function LikeButton({
       } else {
         API.graphql(
           graphqlOperation(deleteLike, {
-            input: { userId: myId, postId: postId },
+            input: { userId: globalThis.myId, postId: postId },
           })
         );
       }
@@ -76,7 +83,10 @@ export default function LikeButton({
       label={likes + ""}
       isLabelFirst={true}
       onPress={likePostAsync}
-      fontWeight={"bold"}
+      fontWeight={"bold"} 
+      style
+      margin={0} 
+      fontSize={0}
     />
   );
 }

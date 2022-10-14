@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { MaterialIcons } from "@expo/vector-icons";
 import fetchUserAsync from "@hooks/fetchName";
 import fetchProfileImageAsync from "@hooks/fetchProfileImage";

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import PropTypes from "prop-types";
 import React from "react";
 import {
@@ -8,7 +7,7 @@ import {
   Text,
   TouchableOpacity,
   View,
-  ViewPropTypes,
+  ViewPropTypes
 } from "react-native";
 
 export default class RNUrlPreview extends React.PureComponent {

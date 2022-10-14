@@ -1,11 +1,10 @@
-// @ts-nocheck
 import LikeButton from "@components/postComponents/LikeButton";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import {
   onDecrementLikes,
   onDecrementReplies,
   onIncrementLikes,
-  onIncrementReplies,
+  onIncrementReplies
 } from "@graphql/subscriptions";
 import printTime from "@hooks/printTime";
 import { API, graphqlOperation } from "aws-amplify";
@@ -13,17 +12,23 @@ import React, { useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
 import IconButton from "../common/IconButton";
 
+interface Props {
+  likes: number,
+  item: {userId: string, createdAt: string, likes: number, 
+        replies: number, loading: boolean, likedByYou: boolean, info: React.NamedExoticComponent<object>},
+  writtenByYou: boolean,
+  repliesPressed: () => {},
+  areRepliesVisible: boolean,
+  shouldSubscribe: boolean
+}
+
 export default function PostHeader({
   item,
-  myId,
   writtenByYou,
   repliesPressed,
-  deletePostsAsync,
-  toggleEditing,
   areRepliesVisible,
-  reportPost,
   shouldSubscribe,
-}) {
+} : Props) {
   const [likes, setLikes] = useState(item.likes);
   const [replies, setReplies] = useState(item.replies);
   const likeDebounce = useRef(false);
@@ -153,7 +158,6 @@ export default function PostHeader({
           }}
         >
           <LikeButton
-            myId={myId}
             likes={likes}
             item={item}
             postId={item.createdAt + "#" + item.userId}
@@ -178,7 +182,9 @@ export default function PostHeader({
             isLabelFirst={true}
             onPress={repliesPressed}
             fontWeight={"bold"}
-          />
+            margin={0}
+            fontSize={0} 
+            style />
         </View>
       ) : null}
     </View>

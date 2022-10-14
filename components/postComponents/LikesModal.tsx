@@ -4,7 +4,12 @@ import LikesList from "@components/LikesList";
 import React from "react";
 import { View } from "react-native";
 
-export default function LikesModal({ item }) {
+interface Props {
+  likes: number,
+  item: {userId: string, createdAt: string}
+}
+
+export default function LikesModal({ item } : Props) {
   return (
     <>
       <ElevatedView
