@@ -1,13 +1,14 @@
-// @ts-nocheck
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import FeedScreen from "./FeedScreen";
 
-export default function ChallengeScreen({ navigation, route }) {
+export default function ChallengeScreen() {
   //const stateRef = useRef();
   //const [query, setQuery] = useState("");
   //console.log(id);
+
+  const {params} = useRoute();
 
   return (
     <View style={{ flex: 1 }}>
@@ -18,13 +19,11 @@ export default function ChallengeScreen({ navigation, route }) {
         <FeedScreen
           headerComponent={
             <View>
-              <ProfileImageAndName userId={route.params?.winner} />
+              <ProfileImageAndName userId={params?.winner} />
             </View>
           }
-          isChallenge={!route.params.open}
-          navigation={navigation}
-          myId={route.params?.myId}
-          channel={route.params?.channel}
+          isChallenge={!params.open}
+          channel={params?.channel}
         />
       </View>
     </View>

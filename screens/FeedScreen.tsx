@@ -18,9 +18,10 @@ import {
 } from "@graphql/subscriptions";
 import SHA256 from "@hooks/hash";
 import NetInfo from "@react-native-community/netinfo";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 // Get the aws resources configuration parameters
 import { API, Cache, graphqlOperation, Storage } from "aws-amplify";
+import { Progress } from "aws-sdk/lib/request";
 import { Video } from "expo-av";
 import * as ImageManipulator from "expo-image-manipulator";
 import { SaveFormat } from "expo-image-manipulator";
@@ -35,10 +36,13 @@ import {
   KeyboardAvoidingView,
   LayoutAnimation,
   Platform,
+  StyleProp,
   StyleSheet,
   Text,
-  View
+  View,
+  ViewStyle
 } from "react-native";
+import { Post } from "src/models";
 import usePhotos from "../hooks/usePhotos";
 
 const linkify = require("linkify-it")();
@@ -46,7 +50,7 @@ linkify
   .tlds(require("tlds")) // Reload with full tlds list
   .tlds("mobi", true); // Add unofficial `.onion` domain
 
-require("root/androidtimerfix");
+require("../androidtimerfix");
 
 var allSettled = require("promise.allsettled");
 
@@ -56,8 +60,24 @@ const viewabilityConfig = {
   waitForInteraction: false,
 };
 
+interface Props {
+  channel: string;
+  headerComponent: React.ReactNode;
+  footerComponent: React.ReactNode;
+  originalParentId: string;
+  Accepted: boolean;
+  lastUser?: string;
+  sidebar: boolean;
+  isFocused: boolean;
+  postButtonLabel: string;
+  renderItem: (i: Post) => React.ReactNode;
+  style: StyleProp<ViewStyle>;
+  autoFocus: boolean;
+  isChallenge: boolean;
+  onPostAdded: () => void;
+}
+
 export default function FeedScreen({
-  navigation,
   channel,
   headerComponent,
   footerComponent,
@@ -65,8 +85,6 @@ export default function FeedScreen({
   Accepted,
   lastUser,
   sidebar,
-  myId,
-  id,
   isFocused,
   style,
   postButtonLabel,
@@ -75,11 +93,12 @@ export default function FeedScreen({
   isChallenge = false,
   onPostAdded,
   ...rest
-}) {
+}: Props) {
+  const navigation = useNavigation();
   const [onlineCheck, setOnlineCheck] = useState(true);
 
   const scrollRef = useRef(); // Used to help with automatic scrolling to top
-  const listRef = useRef();
+  const listRef = useRef<APIList>(null);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -87,7 +106,6 @@ export default function FeedScreen({
         navigation.setOptions({
           headerLeft: () => (
             <ProfileImageAndName
-              userId={myId}
               isFullSize={true}
               hidename={true}
               imageSize={30}
@@ -105,7 +123,7 @@ export default function FeedScreen({
     ).subscribe({
       next: (event) => {
         const newPost = event.value?.data?.onCreatePostFromChannel;
-        listRef.current.addItem(
+        listRef.current?.addItem(
           newPost,
           (post) =>
             post.userId === newPost.userId &&
@@ -119,7 +137,7 @@ export default function FeedScreen({
       next: (event) => {
         const deletedPost = event?.value?.data?.onDeletePostFromChannel;
         if (!deletedPost) return;
-        listRef.current.removeItem(
+        listRef.current?.removeItem(
           (post) =>
             post.userId === deletedPost.userId &&
             post.createdAt === deletedPost.createdAt
@@ -236,11 +254,11 @@ export default function FeedScreen({
     return null;
   };
 
-  const updatePostAsync = async (createdAt, editedText) => {
+  const updatePostAsync = async (createdAt: string, editedText: string) => {
     //replace the post locally
-    listRef.current.mutateData((posts) => {
+    listRef.current?.mutateData((posts) => {
       posts.find((p) => {
-        return p.createdAt == createdAt && p.userId == myId;
+        return p.createdAt == createdAt && p.userId == globalThis.myId;
       }).description = editedText;
       return posts;
     });
@@ -261,14 +279,14 @@ export default function FeedScreen({
     checkInternetConnection();
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    listRef.current.removeItem(
-      (post) => post.createdAt === timestamp && post.userId === myId
+    listRef.current?.removeItem(
+      (post) => post.createdAt === timestamp && post.userId === globalThis.myId
     );
 
     try {
       await API.graphql(
         graphqlOperation(deletePost, {
-          input: { createdAt: timestamp, userId: myId },
+          input: { createdAt: timestamp, userId: globalThis.myId },
         })
       );
     } catch {
@@ -277,7 +295,7 @@ export default function FeedScreen({
   };
 
   const reportPost = async (timestamp, author) => {
-    listRef.current.removeItem(
+    listRef.current?.removeItem(
       (post) => post.createdAt === timestamp && post.userId === author
     );
 
@@ -286,7 +304,7 @@ export default function FeedScreen({
         graphqlOperation(createReport, {
           input: {
             postId: timestamp + "#" + author,
-            userId: myId,
+            userId: globalThis.myId,
           },
         })
       );
@@ -321,8 +339,7 @@ export default function FeedScreen({
           likes={item.likes}
           replies={item.replies}
           deletePostsAsync={deletePostsAsync}
-          writtenByYou={item.userId === myId}
-          myId={myId}
+          writtenByYou={item.userId === globalThis.myId}
           editButtonHandler={updatePostAsync}
           showTimestamp={showTimestamp(item, index)}
           reportPost={reportPost}
@@ -399,7 +416,6 @@ export default function FeedScreen({
             <PostInputField
               onPostAdded={onPostAdded}
               channel={channel}
-              myId={myId}
               originalParentId={originalParentId}
               autoFocus={autoFocus}
               isChallenge={isChallenge}
@@ -424,7 +440,6 @@ export default function FeedScreen({
 function PostInputField({
   channel,
   label,
-  myId,
   originalParentId,
   autoFocus = false,
   isChallenge = false,
@@ -438,7 +453,7 @@ function PostInputField({
   const [postIsLoading, setPostIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  const [taggedUsers, setTaggedUsers] = useState([]);
+  const [taggedUsers, setTaggedUsers] = useState<string>();
 
   let animation = useRef(new Animated.Value(0));
 
@@ -461,7 +476,7 @@ function PostInputField({
 
     const imageID = SHA256(Date.now().toString());
 
-    const newPost = {
+    const newPost: Partial<Post> = {
       description: postInput,
       channel: channel,
       taggedUsers,
@@ -477,7 +492,7 @@ function PostInputField({
     }
     const localNewPost = {
       ...newPost,
-      userId: myId,
+      userId: globalThis.myId,
       createdAt: "null",
       loading: true,
     };
@@ -519,7 +534,7 @@ function PostInputField({
           `feed/${imageID}.${isVideo ? videoExtension : "jpg"}`,
           blob,
           {
-            progressCallback(progress) {
+            progressCallback(progress: Progress) {
               setProgress(progress.loaded / progress.total);
               //console.log(progress); //what is "part"
             },

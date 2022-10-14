@@ -1,46 +1,48 @@
-// @ts-nocheck
 import APIList from "@components/APIList";
 import IconButton from "@components/common/IconButton";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import StatusIndicator from "@components/StatusIndicator";
 import {
-    createBlock,
-    createFriendship,
-    deleteBlock,
-    deleteFriendship,
-    updateFriendship
+  createBlock,
+  createFriendship,
+  deleteBlock,
+  deleteFriendship,
+  updateFriendship
 } from "@graphql/mutations";
 import {
-    getBlock,
-    getFriendship,
-    getUser,
-    listFriendships
+  getBlock,
+  getFriendship,
+  getUser,
+  listFriendships
 } from "@graphql/queries";
 import {
-    //onCreateFriendship,
-    onDeleteFriendship
+  //onCreateFriendship,
+  onDeleteFriendship
 } from "@graphql/subscriptions";
 import computeDistance from "@hooks/computeDistance";
 import printTime from "@hooks/printTime";
 import { loadCapitals } from "@hooks/stringConversion";
+import { useNavigation } from "@react-navigation/native";
 import { API, graphqlOperation } from "aws-amplify";
 import React, { useEffect, useRef, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Dimensions,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  Alert,
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 
-const LookupUser = ({ route, navigation }) => {
+const LookupUser = () => {
   const [areMutualFriends, setAreMutualFriends] = useState();
   const [friendStatus, setFriendStatus] = useState("loading"); //can be either "received", "sent", "friends", or "none". don't misspell!
   const [friendsSince, setFriendsSince] = useState("");
   const listRef = useRef();
+
+  const navigation = useNavigation();
 
   //const [hifiveSent, setHifiveSent] = useState(false); //can be either "received", "sent", or "none". don't misspell!
   //const [hifives, setHifives] = useState(0);
@@ -116,13 +118,13 @@ const LookupUser = ({ route, navigation }) => {
 
     items.forEach((element) => {
       if (
-        (element.sender == route.params?.myId || element.sender == userId) &&
+        (element.sender == globalThis.myId || element.sender == userId) &&
         element.accepted
       ) {
         if (ids.includes(element.receiver)) mutuals.push(element.receiver);
         else ids.push(element.receiver);
       } else if (
-        (element.receiver == route.params?.myId ||
+        (element.receiver == globalThis.myId ||
           element.receiver == userId) &&
         element.accepted
       ) {
@@ -143,7 +145,7 @@ const LookupUser = ({ route, navigation }) => {
       let blocked = await API.graphql(
         graphqlOperation(getBlock, {
           userId: userId,
-          blockee: route.params?.myId,
+          blockee: globalThis.myId,
         })
       );
 
@@ -155,7 +157,7 @@ const LookupUser = ({ route, navigation }) => {
 
       let blocker = await API.graphql(
         graphqlOperation(getBlock, {
-          userId: route.params?.myId,
+          userId: globalThis.myId,
           blockee: userId,
         })
       );
@@ -167,7 +169,7 @@ const LookupUser = ({ route, navigation }) => {
 
       let friendship = await API.graphql(
         graphqlOperation(getFriendship, {
-          sender: route.params?.myId,
+          sender: globalThis.myId,
           receiver: userId,
         })
       );
@@ -176,7 +178,7 @@ const LookupUser = ({ route, navigation }) => {
         friendship = await API.graphql(
           graphqlOperation(getFriendship, {
             sender: userId,
-            receiver: route.params?.myId,
+            receiver: globalThis.myId,
           })
         );
       }
@@ -196,12 +198,12 @@ const LookupUser = ({ route, navigation }) => {
         // Outgoing request
         if (
           friendship.data.getFriendship != null &&
-          friendship.data.getFriendship.sender == route.params?.myId
+          friendship.data.getFriendship.sender == globalThis.myId
         ) {
           setFriendStatus("sent");
         } else if (
           friendship.data.getFriendship != null &&
-          friendship.data.getFriendship.receiver == route.params?.myId
+          friendship.data.getFriendship.receiver == globalThis.myId
         ) {
           setFriendStatus("received");
         } else {
@@ -217,9 +219,9 @@ const LookupUser = ({ route, navigation }) => {
   const waitForFriendUpdateAsync = async () => {
     // Case 1: Sender sends friend request to receiver. Update receiver's side to reject and accept buttons.
     waitForFriend = API.graphql(
-      graphqlOperation(onCreateFriendship, {
+      graphqlOperation(createFriendship, {
         sender: userId,
-        receiver: route.params?.myId,
+        receiver: globalThis.myId,
       })
     ).subscribe({
       next: (event) => {
@@ -231,8 +233,8 @@ const LookupUser = ({ route, navigation }) => {
 
     // Case 2: Receiver accepts friend request. Update the sender's side to delete button.
     onUpdate = API.graphql(
-      graphqlOperation(onUpdateFriendship, {
-        sender: route.params?.myId,
+      graphqlOperation(updateFriendship, {
+        sender: globalThis.myId,
         receiver: userId,
       })
     ).subscribe({
@@ -249,7 +251,7 @@ const LookupUser = ({ route, navigation }) => {
     // Case 4: Friendship is deleted by either sender or receiver. Update the other party's side to send button.
     onDelete = API.graphql(
       graphqlOperation(onDeleteFriendship, {
-        sender: route.params?.myId,
+        sender: globalThis.myId,
         receiver: userId,
       })
     ).subscribe({
@@ -265,7 +267,7 @@ const LookupUser = ({ route, navigation }) => {
     onDelete2 = API.graphql(
       graphqlOperation(onDeleteFriendship, {
         sender: userId,
-        receiver: route.params?.myId,
+        receiver: globalThis.myId,
       })
     ).subscribe({
       next: (event) => {
@@ -287,10 +289,10 @@ const LookupUser = ({ route, navigation }) => {
       );
       //console("success");
       setFriendStatus("sent"); //if received, should change to "friends". do a check before this
-      alert("Sent successfully!");
+      Alert.alert("Sent successfully!");
     } catch (err) {
       //console(err);
-      alert("Could not be submitted!");
+      Alert.alert("Could not be submitted!");
     }
   };
 
@@ -305,10 +307,10 @@ const LookupUser = ({ route, navigation }) => {
       );
       //console("success");
       setFriendStatus("friends");
-      alert("Accepted successfully!");
+      Alert.alert("Accepted successfully!");
     } catch (err) {
       //console(err);
-      alert("Could not be accepted");
+      Alert.alert("Could not be accepted");
     }
   };
 
@@ -318,14 +320,14 @@ const LookupUser = ({ route, navigation }) => {
     try {
       await API.graphql(
         graphqlOperation(deleteFriendship, {
-          input: { sender: route.params?.myId, receiver: user.id },
+          input: { sender: globalThis.myId, receiver: user.id },
         })
       );
       //console("success");
 
       if (temp != true) {
         setFriendStatus("none");
-        alert("Friend request unsent successfully!");
+        Alert.alert("Friend request unsent successfully!");
       }
     } catch (err) {
       //console(err);
@@ -339,14 +341,14 @@ const LookupUser = ({ route, navigation }) => {
     try {
       await API.graphql(
         graphqlOperation(deleteFriendship, {
-          input: { sender: user.id, receiver: route.params?.myId },
+          input: { sender: user.id, receiver: globalThis.myId },
         })
       );
       //console("success");
 
       if (temp != true) {
         setFriendStatus("none");
-        alert("Friend request rejected successfully!");
+        Alert.alert("Friend request rejected successfully!");
       }
     } catch (err) {
       //console(err);
@@ -363,7 +365,7 @@ const LookupUser = ({ route, navigation }) => {
       unsendFriendRequest(check);
       if (!temp) setFriendStatus("none");
 
-      alert("Deleted Friend successfully!");
+      Alert.alert("Deleted Friend successfully!");
     } catch (err) {
       //console(err);
       //console("error in deleting friend: ");
@@ -374,7 +376,7 @@ const LookupUser = ({ route, navigation }) => {
     try {
       API.graphql(
         graphqlOperation(deleteBlock, {
-          input: { userId: route.params?.myId, blockee: userId },
+          input: { userId: globalThis.myId, blockee: userId },
         })
       );
       global.localBlockList = global.localBlockList.filter(
@@ -396,7 +398,7 @@ const LookupUser = ({ route, navigation }) => {
       );
       global.localBlockList.push({
         createdAt: new Date(Date.now()).toISOString(),
-        userId: route.params?.myId,
+        userId: globalThis.myId,
         blockee: userId,
       });
       //console(global.localBlockList);
@@ -557,7 +559,7 @@ const LookupUser = ({ route, navigation }) => {
       ) : null}
 
       {!(friendStatus == "blocker" || friendStatus == "blocked") &&
-      route.params?.myId != user.id ? (
+      globalThis.myId != user.id ? (
         <View
           style={{
             alignItems: "stretch",
@@ -761,7 +763,7 @@ const LookupUser = ({ route, navigation }) => {
           {computeDistance(user.location)} mi. away
         </Text>
       ) : null}
-      {route.params?.myId != user.id ? (
+      {globalThis.myId != user.id ? (
         <View style={styles.buttonFormat}>
           {friendStatus == "loading" ? (
             <ActivityIndicator
