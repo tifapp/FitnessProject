@@ -3,7 +3,12 @@ import { Dimensions, StyleSheet, Text, TextInput, View } from "react-native";
 
 const { width } = Dimensions.get("screen");
 
-export default function NameField({ setName, nameVal }) {
+interface Props {
+  nameVal: string,
+  setName: React.Dispatch<React.SetStateAction<string>>
+}
+
+export default function NameField({ setName, nameVal } : Props) {
   return (
     <View>
       <View style={styles.nameFormat}>

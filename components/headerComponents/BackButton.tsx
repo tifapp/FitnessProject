@@ -1,12 +1,10 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { useIsDrawerOpen } from "@react-navigation/drawer";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import { TouchableOpacity } from "react-native";
 
-export default function DrawerButton(props) {
+export default function BackButton() {
   const navigation = useNavigation();
-  const isDrawerOpen = useIsDrawerOpen();
 
   return (
     <TouchableOpacity

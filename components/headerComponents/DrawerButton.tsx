@@ -3,18 +3,16 @@ import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
-export default function DrawerButton(props) {
+export default function DrawerButton() {
   const navigation = useNavigation();
 
   const [notificationCount, setNotificationCount] = useState(0);
 
-  // @ts-ignore
-  global.showNotificationDot = () => {
+  globalThis.showNotificationDot = () => {
     setNotificationCount(notificationCount + 1);
   };
 
-  // @ts-ignore
-  global.hideNotificationDot = () => {
+  globalThis.hideNotificationDot = () => {
     setNotificationCount(0);
   };
 

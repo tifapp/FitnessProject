@@ -16,7 +16,7 @@ interface Props {
 }
 
 export default function IconButton({
-  onPress = () => {},
+  onPress,
   iconName,
   style = {},
   color,
@@ -26,7 +26,7 @@ export default function IconButton({
   isLabelFirst = false,
   fontSize = 14,
   fontWeight = "normal",
-}) {
+}: Props) {
   return (
     <TouchableOpacity
       style={[

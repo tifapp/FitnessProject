@@ -3,7 +3,12 @@ import { Dimensions, StyleSheet, Text, TextInput, View } from "react-native";
 
 const { width } = Dimensions.get("screen");
 
-export default function SportCreation({ setSport, sportVal }) {
+interface Props {
+  sportVal: string,
+  setSport: (s : string) => void
+}
+
+export default function SportCreation({ setSport, sportVal } : Props) {
   return (
     <View>
       <View style={styles.nameFormat}>

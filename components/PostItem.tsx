@@ -20,6 +20,13 @@ import CommentsModal from "./postComponents/CommentsModal";
 import LikesModal from "./postComponents/LikesModal";
 import { ProfileImageAndName } from "./ProfileImageAndName";
 
+interface Props {
+  item: Object,
+  writtenByYou: boolean,
+  isVisible: boolean,
+  shouldSubscribe: boolean
+}
+
 export default React.memo(function PostItem({
   item,
   deletePostsAsync,
@@ -32,11 +39,10 @@ export default React.memo(function PostItem({
   reportPost,
   isVisible,
   shouldSubscribe,
-  myId,
   likes,
   replies,
   index,
-}) {
+} : Props) {
   const likesModalRef = useRef();
   const repliesModalRef = useRef();
   const [isEditing, setIsEditing] = useState(false);
@@ -100,7 +106,6 @@ export default React.memo(function PostItem({
       >
         <PostHeader
           item={item}
-          myId={myId}
           deletePostsAsync={deletePostsAsync}
           writtenByYou={writtenByYou}
           toggleEditing={() => setIsEditing(!isEditing)}
@@ -266,7 +271,7 @@ export default React.memo(function PostItem({
           <LikesModal item={item} />
         </Modal>
         <Modal ref={repliesModalRef}>
-          <CommentsModal item={item} myId={myId} />
+          <CommentsModal item={item}/>
         </Modal>
       </View>
 
