@@ -38,6 +38,7 @@
     "expo-status-bar": "~1.2.0",
     "link-preview-js": "^2.1.6",
     "linkify-it": "^3.0.2",
+    "lodash.isnil": "^4.0.0",
     "promise.allsettled": "^1.0.4",
     "react": "17.0.1",
     "react-dom": "17.0.1",
