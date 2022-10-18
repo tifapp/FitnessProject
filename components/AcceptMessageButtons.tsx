@@ -1,5 +1,5 @@
 import IconButton from "@components/common/IconButton";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { API, graphqlOperation } from "aws-amplify";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
@@ -10,14 +10,20 @@ import {
 } from "../src/graphql/mutations";
 import { getConversation } from "../src/graphql/queries";
 
+interface Props {
+  id: string,
+  channel: string,
+  receiver: string
+}
+
 export default function AcceptMessageButtons({
   id,
   channel,
-  receiver,
-  route
-}) {
+  receiver
+} : Props) {
   const [ButtonCheck, setButtonCheck] = useState(false);
   const navigation = useNavigation();
+  const route = useRoute();
 
   const acceptMessageRequest = async () => {
     await API.graphql(
@@ -38,7 +44,7 @@ export default function AcceptMessageButtons({
   };
 
   const checkButton = async () => {
-    let namesArray = [route.params?.myId, receiver];
+    let namesArray = [globalThis.myId, receiver];
     namesArray.sort();
 
     let temp = namesArray[0] + namesArray[1];
@@ -79,7 +85,7 @@ export default function AcceptMessageButtons({
 
     globalThis.localBlockList.push({
       createdAt: new Date(Date.now()).toISOString(),
-      userId: route.myId,
+      userId: globalThis.myId,
       blockee: id,
     });
 
