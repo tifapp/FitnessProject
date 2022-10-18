@@ -1,11 +1,10 @@
-// @ts-nocheck
 // Get the aws resources configuration parameters
 import APIList from "@components/APIList";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import { likesByPost } from "@graphql/queries";
 import {
   onCreateLikeForPost,
-  onDeleteLikeForPost,
+  onDeleteLikeForPost
 } from "@graphql/subscriptions";
 import printTime from "@hooks/printTime";
 import { API, graphqlOperation } from "aws-amplify";

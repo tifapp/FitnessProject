@@ -4,8 +4,8 @@ import React from "react";
 import { Platform } from "react-native";
 
 export const headerOptions = {
-  headerLeft: (props) => <BackButton {...props} />,
-  headerRight: (props) => <DrawerButton {...props} />,
+  headerLeft: () => <BackButton />,
+  headerRight: () => <DrawerButton />,
   headerStyle: { backgroundColor: "#a9efe0" },
   headerTintColor: "#000",
   headerTitleStyle: {

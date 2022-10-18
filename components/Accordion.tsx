@@ -6,7 +6,7 @@ import {
   LayoutAnimation,
   Text,
   TouchableWithoutFeedback,
-  View,
+  View
 } from "react-native";
 
 export default function Accordion(props) {

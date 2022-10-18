@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { API, graphqlOperation } from "aws-amplify";
 import React, { PureComponent } from "react";
 import {
@@ -7,7 +6,7 @@ import {
   LayoutAnimation,
   RefreshControl,
   Text,
-  View,
+  View
 } from "react-native";
 
 class APIList extends PureComponent {

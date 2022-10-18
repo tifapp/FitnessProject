@@ -1,8 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
 
-// @ts-ignore
-
 //currently this is just used in the profile screen for the bio and goals descriptions
 //later we can make this a generic touchable that causes a transparent modal to appear at the bottom of the screen, and pass in the children from the parent
 
