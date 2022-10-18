@@ -22,9 +22,9 @@ export default function LikeButton({
   likeDebounceRef,
 } : Props) {
   const [liked, setLiked] = useState(item.likedByYou);
-  const likeRef = useRef();
-  const timerIsRunning = useRef();
-  const likeTimeout = useRef();
+  const likeRef = useRef<boolean>();
+  const timerIsRunning = useRef<boolean>();
+  const likeTimeout = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     setLiked(item.likedByYou);

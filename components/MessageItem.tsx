@@ -1,34 +1,29 @@
-// @ts-nocheck
 import LinkableText from "@components/LinkableText";
 import PostImage from "@components/PostImage";
 import printTime from "@hooks/printTime";
 import { useNavigation } from "@react-navigation/native";
+import falsey from "falsey";
 import React from "react";
 import {
   Dimensions,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
+import { Post } from "src/models";
 
-export default React.memo(function MessageItem({
+interface Props {
+  item: Post,
+  writtenByYou: boolean,
+  receiver: string
+}
+
+function MessageItem({
   item,
-  deletePostsAsync,
   writtenByYou,
-  editButtonHandler,
-  replyButtonHandler,
-  receiver,
-  showTimestamp,
-  newSection,
-  reportPost,
-  isVisible,
-  shouldSubscribe,
-  myId,
-  likes,
-  replies,
-  index,
-}) {
+  receiver
+} : Props) {
   const isReceivedMessage = receiver != null && !writtenByYou;
   const navigation = useNavigation();
 
@@ -59,7 +54,7 @@ export default React.memo(function MessageItem({
         }}
       >
         <TouchableOpacity
-          disabled={item.imageURL && !item.imageURL.match("jpg")}
+          disabled={falsey(item.imageURL?.match("jpg"))}
           onPress={() => navigation.navigate("Image", { uri: item.imageURL })}
         >
           <PostImage
@@ -70,7 +65,7 @@ export default React.memo(function MessageItem({
               alignSelf: "center",
               marginBottom: 15,
             }}
-            imageID={item.imageURL}
+            imageURL={item.imageURL}
             isVisible={false}
           />
         </TouchableOpacity>
@@ -81,7 +76,7 @@ export default React.memo(function MessageItem({
           textStyle={{
             paddingBottom: 15,
           }}
-          urlPreview={item.urlPreview}
+          urlPreview={urlPreview}
         >
           {item.description}
         </LinkableText>
@@ -97,7 +92,9 @@ export default React.memo(function MessageItem({
       </Text>
     </View>
   );
-});
+}
+
+export default React.memo(MessageItem);
 
 const styles = StyleSheet.create({
   secondaryContainerStyle: {

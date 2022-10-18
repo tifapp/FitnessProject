@@ -3,4 +3,5 @@ export declare global {
   var localBlockList: Block[];
   function showNotificationDot() : void
   function hideNotificationDot() : void
+  var localBlockList: Block[];
 }

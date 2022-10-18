@@ -2,7 +2,11 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React, { useRef, useState } from "react";
 import { TouchableOpacity } from "react-native";
 
-export default function SpamButton({ func }) {
+interface Props {
+  func : () => Promise<void>
+}
+
+export default function SpamButton({ func } : Props) {
   const [spamming, setSpamming] = useState(false);
   const timeoutFunction = useRef();
 
