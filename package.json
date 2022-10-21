@@ -9,6 +9,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@aws-amplify/api": "^4.0.57",
     "@expo/ngrok": "^4.1.0",
     "@react-native-async-storage/async-storage": "~1.15.0",
     "@react-native-community/checkbox": "^0.5.5",
@@ -19,7 +20,7 @@
     "@react-navigation/drawer": "^5.12.4",
     "@react-navigation/native": "^5.9.2",
     "@react-navigation/stack": "^5.9.1",
-    "aws-amplify": "^3.3.21",
+    "aws-amplify": "^3.4.3",
     "aws-amplify-react-native": "^4.2.7",
     "aws-sdk": "^2.822.0",
     "expo": "^44.0.0",

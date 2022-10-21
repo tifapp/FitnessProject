@@ -29,9 +29,7 @@ export default function Settings() {
 
     const user = await Auth.currentAuthenticatedUser();
 
-    await new Promise((res, rej) =>
-      user.deleteUser((err, result) => (err ? rej(err) : res(result)))
-    );
+    await user.deleteUser();  //test this again: 10-17-22
 
     Auth.signOut();
 

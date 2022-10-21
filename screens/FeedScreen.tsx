@@ -20,7 +20,8 @@ import SHA256 from "@hooks/hash";
 import NetInfo from "@react-native-community/netinfo";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 // Get the aws resources configuration parameters
-import { API, Cache, graphqlOperation, Storage } from "aws-amplify";
+import API, { GraphQLSubscription } from "@aws-amplify/api";
+import { Cache, graphqlOperation, Storage } from "aws-amplify";
 import { Progress } from "aws-sdk/lib/request";
 import { Video } from "expo-av";
 import * as ImageManipulator from "expo-image-manipulator";
@@ -36,6 +37,7 @@ import {
   KeyboardAvoidingView,
   LayoutAnimation,
   Platform,
+  ScrollView,
   StyleProp,
   StyleSheet,
   Text,
@@ -62,8 +64,8 @@ const viewabilityConfig = {
 
 interface Props {
   channel: string;
-  headerComponent: React.ReactNode;
-  footerComponent: React.ReactNode;
+  headerComponent?: React.ReactNode;
+  footerComponent?: React.ReactNode;
   originalParentId: string;
   Accepted: boolean;
   lastUser?: string;
@@ -97,7 +99,7 @@ export default function FeedScreen({
   const navigation = useNavigation();
   const [onlineCheck, setOnlineCheck] = useState(true);
 
-  const scrollRef = useRef(); // Used to help with automatic scrolling to top
+  const scrollRef = useRef<ScrollView>(); // Used to help with automatic scrolling to top
   const listRef = useRef<APIList>(null);
 
   useFocusEffect(
@@ -118,7 +120,7 @@ export default function FeedScreen({
   );
 
   useEffect(() => {
-    const createPostSubscription = API.graphql(
+    const createPostSubscription = API.graphql<GraphQLSubscription<{onCreatePostFromChannel: Post}>>(
       graphqlOperation(onCreatePostFromChannel, { channel: channel })
     ).subscribe({
       next: (event) => {
@@ -131,7 +133,8 @@ export default function FeedScreen({
         );
       },
     });
-    const deletePostSubscription = API.graphql(
+
+    const deletePostSubscription = API.graphql<GraphQLSubscription<{onDeletePostFromChannel: Post}>>(
       graphqlOperation(onDeletePostFromChannel, { channel: channel })
     ).subscribe({
       next: (event) => {
@@ -144,7 +147,7 @@ export default function FeedScreen({
         );
       },
     });
-    const updatePostSubscription = API.graphql(
+    const updatePostSubscription = API.graphql<GraphQLSubscription<{onUpdatePostFromChannel: Post}>>(
       graphqlOperation(onUpdatePostFromChannel, { channel: channel })
     ).subscribe({
       //nvm we dont have a subscription event for incrementlike
@@ -234,7 +237,7 @@ export default function FeedScreen({
     }
   };
 
-  const showTimestamp = (item, index) => {
+  const showTimestamp = (item: Post, index: number) => {
     return true;
   };
 
@@ -275,7 +278,7 @@ export default function FeedScreen({
     }
   };
 
-  const deletePostsAsync = async (timestamp) => {
+  const deletePostsAsync = async (timestamp: string) => {
     checkInternetConnection();
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -294,7 +297,7 @@ export default function FeedScreen({
     }
   };
 
-  const reportPost = async (timestamp, author) => {
+  const reportPost = async (timestamp: string, author: string) => {
     listRef.current?.removeItem(
       (post) => post.createdAt === timestamp && post.userId === author
     );

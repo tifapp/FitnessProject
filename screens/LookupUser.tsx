@@ -22,19 +22,26 @@ import {
 import computeDistance from "@hooks/computeDistance";
 import printTime from "@hooks/printTime";
 import { loadCapitals } from "@hooks/stringConversion";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { API, graphqlOperation } from "aws-amplify";
+import falsey from "falsey";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   Dimensions,
   ScrollView,
+  StyleProp,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  ViewStyle
 } from "react-native";
+
+interface p {
+  s: StyleProp<ViewStyle>;
+}
 
 const LookupUser = () => {
   const [areMutualFriends, setAreMutualFriends] = useState();
@@ -47,8 +54,9 @@ const LookupUser = () => {
   //const [hifiveSent, setHifiveSent] = useState(false); //can be either "received", "sent", or "none". don't misspell!
   //const [hifives, setHifives] = useState(0);
 
-  const { user } = route.params;
-  const { userId } = route.params;
+  const {params: { userId }} = useRoute();
+
+  const faljse = falsey("");
 
   let waitForFriend = "";
   let onUpdate = "";

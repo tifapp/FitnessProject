@@ -3,7 +3,7 @@ import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import { deleteBlock } from "@graphql/mutations";
 import { blocksByDate } from "@graphql/queries";
 import printTime from "@hooks/printTime";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { API, graphqlOperation } from "aws-amplify";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -17,7 +17,6 @@ import {
 
 const BlockListScreen = () => {
   const navigation = useNavigation();
-  const route = useRoute();
   const listRef = useRef<APIList>(null);
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
 

@@ -13,10 +13,25 @@ import "react-native-gesture-handler";
 
 const Stack = createStackNavigator();
 
+export enum MainScreenNames {
+  FEED = "Feed",
+  LOOKUP = "Lookup",
+  IMAGE = "Image",
+  SEARCH = "Search",
+  CREATE_GROUP = "Create Group",
+  GROUP_FEED = "Group Feed",
+  CHALLENGE = "Challenge",
+  CHALLENGE_MENU = "Challenge Menu",
+}
+
+export type MainStackParamList = {
+  [MainScreenNames.CHALLENGE_MENU] : { userId: string };
+};
+
 export default function MainStack() {
   return (
-    <Stack.Navigator initialRouteName="Feed" screenOptions={headerOptions}>
-      <Stack.Screen name="Feed">
+    <Stack.Navigator initialRouteName={MainScreenNames.FEED} screenOptions={headerOptions}>
+      <Stack.Screen name={MainScreenNames.FEED}>
         {(props) => (
           <FeedScreen
             {...props}
@@ -25,28 +40,28 @@ export default function MainStack() {
         )}
       </Stack.Screen>
       <Stack.Screen
-        name="Lookup"
+        name={MainScreenNames.LOOKUP}
         component={LookupUserScreen}
       />
       <Stack.Screen
-        name="Image"
+        name={MainScreenNames.IMAGE}
         component={ImageScreen}
       />
-      <Stack.Screen name="Search" component={SearchScreen} />
+      <Stack.Screen name={MainScreenNames.SEARCH} component={SearchScreen} />
       <Stack.Screen
-        name="Create Group"
+        name={MainScreenNames.CREATE_GROUP}
         component={CreatingGroups}
       />
       <Stack.Screen
-        name="Group Posts Screen"
+        name={MainScreenNames.GROUP_FEED}
         component={GroupPostsScreen}
       />
       <Stack.Screen
-        name="Challenge"
+        name={MainScreenNames.CHALLENGE}
         component={ChallengeScreen}
       />
       <Stack.Screen
-        name="Challenge List"
+        name={MainScreenNames.CHALLENGE_MENU}
         component={ChallengeListScreen}
       />
     </Stack.Navigator>
