@@ -119,7 +119,7 @@ export const createChallenge = /* GraphQL */ `
       id
       name
       Description
-      open
+      endDate
       winner
       createdAt
       updatedAt
@@ -135,7 +135,7 @@ export const updateChallenge = /* GraphQL */ `
       id
       name
       Description
-      open
+      endDate
       winner
       createdAt
       updatedAt
@@ -151,7 +151,7 @@ export const deleteChallenge = /* GraphQL */ `
       id
       name
       Description
-      open
+      endDate
       winner
       createdAt
       updatedAt
