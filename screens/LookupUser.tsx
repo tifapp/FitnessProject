@@ -23,6 +23,7 @@ import computeDistance from "@hooks/computeDistance";
 import printTime from "@hooks/printTime";
 import { loadCapitals } from "@hooks/stringConversion";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { LookupScreenRouteProps } from "@stacks/MainStack";
 import { API, graphqlOperation } from "aws-amplify";
 import falsey from "falsey";
 import React, { useEffect, useRef, useState } from "react";
@@ -30,18 +31,11 @@ import {
   ActivityIndicator,
   Alert,
   Dimensions,
-  ScrollView,
-  StyleProp,
-  StyleSheet,
+  ScrollView, StyleSheet,
   Text,
   TouchableOpacity,
-  View,
-  ViewStyle
+  View
 } from "react-native";
-
-interface p {
-  s: StyleProp<ViewStyle>;
-}
 
 const LookupUser = () => {
   const [areMutualFriends, setAreMutualFriends] = useState();
@@ -54,7 +48,7 @@ const LookupUser = () => {
   //const [hifiveSent, setHifiveSent] = useState(false); //can be either "received", "sent", or "none". don't misspell!
   //const [hifives, setHifives] = useState(0);
 
-  const {params: { userId }} = useRoute();
+  const {params: { userId }} = useRoute<LookupScreenRouteProps>();
 
   const faljse = falsey("");
 
