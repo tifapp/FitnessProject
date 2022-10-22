@@ -1,4 +1,4 @@
-import API, { GraphQLSubscription } from "@aws-amplify/api";
+// @ts-nocheck
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import {
   onAcceptedFriendship,
@@ -6,32 +6,28 @@ import {
   onCreatePostForReceiver
 } from "@graphql/subscriptions";
 import { useIsDrawerOpen } from "@react-navigation/drawer";
-import { useNavigation, useNavigationState } from "@react-navigation/native";
-import { Cache, graphqlOperation } from "aws-amplify";
+import { API, Cache, graphqlOperation } from "aws-amplify";
 import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaView, Text, TouchableOpacity, View } from "react-native";
-import { Friendship, Post } from "src/models";
 import playSound from "../hooks/playSound";
 
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 
-interface Props {
-  progress: number;
-}
+global.localBlockList = [];
 
 export default function CustomSidebarMenu({
+  navigation,
+  state,
   progress,
-}: Props) {
-  const {navigate} = useNavigation();
+  myId,
+}) {
   const [lastOnlineTime, setLastOnlineTime] = useState(0);
   const [newFriendRequests, setNewFriendRequests] = useState(0); //should persist across sessions (ex. if you receive new friend requests while logged out)
   const [newConversations, setNewConversations] = useState(0); //should persist across sessions (ex. if you receive new friend requests while logged out)
-  const routes = useNavigationState(state => state.routes);
-  const index = useNavigationState(state => state.index);
 
-  const isDrawerOpen = useRef<boolean>();
-  const currentNewFriendRequestCount = useRef<number>(0);
-  const currentNewConversations = useRef<number>(0);
+  const isDrawerOpen = useRef();
+  const currentNewFriendRequestCount = useRef();
+  const currentNewConversations = useRef();
 
   isDrawerOpen.current = useIsDrawerOpen();
   currentNewFriendRequestCount.current = newFriendRequests;
@@ -43,34 +39,34 @@ export default function CustomSidebarMenu({
         setLastOnlineTime(-1);
       },
     }) //we'll check if this user's profile image url was stored in the cache, if not we'll look for it
-      .then((time: number) => {
+      .then((time) => {
         setLastOnlineTime(time);
       });
 
-    const receivedConversationSubscription = API.graphql<GraphQLSubscription<{onCreatePostForReceiver: Post}>>(
-      graphqlOperation(onCreatePostForReceiver, { receiver: globalThis.myId })
+    const receivedConversationSubscription = API.graphql(
+      graphqlOperation(onCreatePostForReceiver, { receiver: myId })
     ).subscribe({
       next: (event) => {
-        const newPost = event.value.data?.onCreatePostForReceiver;
+        const newPost = event.value.data.onCreatePostForReceiver;
 
         global.showNotificationDot();
         setNewConversations(currentNewConversations.current + 1);
-        //foreach users in conversation, if it's not globalThis.myId and it's in friend list, update friend list, and push it to the top.
+        //foreach users in conversation, if it's not myid and it's in friend list, update friend list, and push it to the top.
         //alternatively for message screen, for each user in message screen, if it's in conversation push it to the top. otherwise just put this conversation at the top of the list.
       },
     });
 
     // Executes when a user receieves a friend request
     // listening for new friend requests
-    const friendRequestSubscription = API.graphql<GraphQLSubscription<{onCreateFriendRequestForReceiver: Friendship}>>(
-      graphqlOperation(onCreateFriendRequestForReceiver, { receiver: globalThis.myId })
+    const friendRequestSubscription = API.graphql(
+      graphqlOperation(onCreateFriendRequestForReceiver, { receiver: myId })
     ).subscribe({
       next: (event) => {
         //increment notificaiton counter
       },
     });
 
-    const friendSubscription = API.graphql<GraphQLSubscription<{onAcceptedFriendship: Friendship}>>(
+    const friendSubscription = API.graphql(
       graphqlOperation(onAcceptedFriendship)
     ).subscribe({
       next: async (event) => {
@@ -113,7 +109,7 @@ export default function CustomSidebarMenu({
     }
   }, [isDrawerOpen.current]);
 
-  const checkNewRequests = (items: [Friendship]) => {
+  const checkNewRequests = (items) => {
     items.forEach((item) => {
       if (
         lastOnlineTime > 0 &&
@@ -134,8 +130,9 @@ export default function CustomSidebarMenu({
         }}
       >
         <ProfileImageAndName
+          navigationObject={navigation}
           navigateToProfile={false}
-          userId={globalThis.myId}
+          userId={myId}
           isFullSize={true}
           style={{ marginLeft: 15 }}
           textLayoutStyle={{ alignSelf: "center" }}
@@ -144,7 +141,7 @@ export default function CustomSidebarMenu({
             fontSize: 26,
             color: "black",
             textDecorationLine:
-              routes[index].name === "Profile"
+              state.routes[state.index].name === "Profile"
                 ? "underline"
                 : "none",
           }}
@@ -163,20 +160,20 @@ export default function CustomSidebarMenu({
         ]}
         onPress={() => {
           setNewFriendRequests(0);
-          navigate("Friends");
+          navigation.navigate("Friends");
         }}
       >
         <Text
           style={{
             fontSize: 18,
             color:
-              routes[index].name === "Friends"
+              state.routes[state.index].name === "Friends"
                 ? "black"
                 : newConversations > 0
                 ? "blue"
                 : "grey",
             textDecorationLine:
-              routes[index].name === "Friends"
+              state.routes[state.index].name === "Friends"
                 ? "underline"
                 : "none",
           }}
@@ -199,20 +196,20 @@ export default function CustomSidebarMenu({
         ]}
         onPress={() => {
           setNewConversations(0);
-          navigate("Conversations");
+          navigation.navigate("Conversations");
         }}
       >
         <Text
           style={{
             fontSize: 18,
             color:
-              routes[index].name === "Conversations"
+              state.routes[state.index].name === "Conversations"
                 ? "black"
                 : newConversations > 0
                 ? "blue"
                 : "grey",
             textDecorationLine:
-              routes[index].name === "Conversations"
+              state.routes[state.index].name === "Conversations"
                 ? "underline"
                 : "none",
           }}
@@ -234,16 +231,16 @@ export default function CustomSidebarMenu({
           },
         ]}
         onPress={() => {
-          navigate("Settings", { myId: globalThis.myId });
+          navigation.navigate("Settings", { myId: myId });
         }}
       >
         <Text
           style={{
             fontSize: 18,
             color:
-              routes[index].name === "Settings" ? "black" : "grey",
+              state.routes[state.index].name === "Settings" ? "black" : "grey",
             textDecorationLine:
-              routes[index].name === "Settings"
+              state.routes[state.index].name === "Settings"
                 ? "underline"
                 : "none",
           }}
@@ -262,16 +259,16 @@ export default function CustomSidebarMenu({
           },
         ]}
         onPress={() => {
-          navigate("My Groups", { myId: globalThis.myId });
+          navigation.navigate("My Groups", { myId: myId });
         }}
       >
         <Text
           style={{
             fontSize: 18,
             color:
-              routes[index].name === "My Groups" ? "black" : "grey",
+              state.routes[state.index].name === "My Groups" ? "black" : "grey",
             textDecorationLine:
-              routes[index].name === "My Groups"
+              state.routes[state.index].name === "My Groups"
                 ? "underline"
                 : "none",
           }}
