@@ -1,3 +1,4 @@
+import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import {
   Linking,
@@ -7,7 +8,9 @@ import {
   View,
 } from "react-native";
 
-const ComplianceScreen = ({ navigation }) => {
+const ComplianceScreen = () => {
+  const { navigate } = useNavigation();
+
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Text
@@ -62,7 +65,7 @@ const ComplianceScreen = ({ navigation }) => {
       </Text>
       <TouchableOpacity
         style={[styles.buttonStyle, { marginTop: 20 }]}
-        onPress={() => navigation.navigate("Profile")}
+        onPress={() => navigate("Profile")}
       >
         <Text style={styles.buttonTextStyle}>Continue</Text>
       </TouchableOpacity>

@@ -449,14 +449,14 @@ function PostInputField({
   onPostAdded,
 }) {
   const [pickFromGallery, pickFromCamera] = usePhotos(!isChallenge, true);
-  const [postInput, setPostInput] = useState("");
-  const [text, setText] = useState("");
-  const [imageURL, setImageURL] = useState(null);
+  const [postInput, setPostInput] = useState<string>("");
+  const [text, setText] = useState<string>("");
+  const [imageURL, setImageURL] = useState<string | null>(null);
   const [isVideo, setIsVideo] = useState(null);
   const [postIsLoading, setPostIsLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState<number>(0);
 
-  const [taggedUsers, setTaggedUsers] = useState<string>();
+  const [taggedUsers, setTaggedUsers] = useState<[string]>();
 
   let animation = useRef(new Animated.Value(0));
 
@@ -478,21 +478,21 @@ function PostInputField({
     setPostIsLoading(true);
 
     const imageID = SHA256(Date.now().toString());
+    
+    if (imageURL !== null) {
+      const re = /(?:\.([^.]+))?$/;
+      const videoExtension = re.exec(imageURL)?.[1];
+
+      newPost.imageURL = `${imageID}.${isVideo ? videoExtension : "jpg"}`;
+    }
 
     const newPost: Partial<Post> = {
       description: postInput,
       channel: channel,
+      parentId: originalParentId ?? undefined,
       taggedUsers,
     };
-    if (originalParentId != null) {
-      newPost.parentId = originalParentId;
-    }
-    if (imageURL !== null) {
-      const re = /(?:\.([^.]+))?$/;
-      const videoExtension = re.exec(imageURL)[1];
-
-      newPost.imageURL = `${imageID}.${isVideo ? videoExtension : "jpg"}`;
-    }
+    
     const localNewPost = {
       ...newPost,
       userId: globalThis.myId,
@@ -531,7 +531,7 @@ function PostInputField({
 
         //scan the uri and check filetype. maybe console log the uri first
         const re = /(?:\.([^.]+))?$/;
-        const videoExtension = re.exec(imageURL)[1];
+        const videoExtension = re.exec(imageURL)?.[1];
         setProgress(0.01);
         await Storage.put(
           `feed/${imageID}.${isVideo ? videoExtension : "jpg"}`,
