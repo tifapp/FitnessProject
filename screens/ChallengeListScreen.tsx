@@ -1,11 +1,10 @@
-// @ts-nocheck
 import APIList from "@components/APIList";
 import ListChallengeItem from "@components/ListChallengeItem";
 import { listChallenges } from "@graphql/queries";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-export default function MyGroups({ navigation, route }) {
+export default function MyGroups() {
   //const stateRef = useRef();
   //const [query, setQuery] = useState("");
   //console.log(id);

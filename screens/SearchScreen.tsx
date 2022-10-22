@@ -1,9 +1,9 @@
-// @ts-nocheck
 import APIList from "@components/APIList";
 import ListGroupItem from "@components/ListGroupItem";
 import UserListItem from "@components/UserListItem";
 import { MaterialIcons } from "@expo/vector-icons";
 import { listGroups, listUsers } from "@graphql/queries";
+import { useRoute } from "@react-navigation/native";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Keyboard,
@@ -11,11 +11,12 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableOpacityProps,
   TouchableWithoutFeedback,
-  View,
+  View
 } from "react-native";
 
-function titleCase(str) {
+function titleCase(str: string) {
   var splitStr = str.toLowerCase().split(" ");
   for (var i = 0; i < splitStr.length; i++) {
     // You do not need to check if i is larger than splitStr length, as your for does that for you
@@ -27,27 +28,28 @@ function titleCase(str) {
   return splitStr.join(" ");
 }
 
-export default function SearchScreen({ navigation, route }) {
+export default function SearchScreen() {
   const [query, setQuery] = useState("");
   const [searchType, setSearchType] = useState("all"); //refreshing tho
-  const searchBarRef = useRef();
-  const UserListRef = useRef();
-  const GroupListRef = useRef();
-  const currentQuery = useRef();
+  const searchBarRef = useRef<TextInput | null>(null);
+  const UserListRef = useRef<APIList>();
+  const GroupListRef = useRef<APIList>();
+  const currentQuery = useRef<string>();
+  const route = useRoute();
 
   currentQuery.current = query.toLowerCase();
 
   useEffect(() => {
     if (query !== "") {
-      UserListRef.current.fetchDataAsync(true, () => {
+      UserListRef.current?.fetchDataAsync(true, () => {
         return currentQuery.current !== query.toLowerCase() || query === "";
       });
-      GroupListRef.current.fetchDataAsync(true, () => {
+      GroupListRef.current?.fetchDataAsync(true, () => {
         return currentQuery.current !== query.toLowerCase() || query === "";
       });
     } else {
-      if (UserListRef) UserListRef.current.mutateData([]);
-      if (GroupListRef) GroupListRef.current.mutateData([]);
+      if (UserListRef) UserListRef.current?.mutateData([]);
+      if (GroupListRef) GroupListRef.current?.mutateData([]);
     }
   }, [query]);
 
@@ -63,7 +65,7 @@ export default function SearchScreen({ navigation, route }) {
             },
           ]}
           onPress={() => {
-            searchBarRef.current.focus();
+            searchBarRef.current?.focus();
           }}
         >
           <TextInput
@@ -281,7 +283,13 @@ export default function SearchScreen({ navigation, route }) {
   );
 }
 
-function Tab({ label, onPress, isSelected }) {
+interface TabProps extends Pick<TouchableOpacityProps, "onPress">
+  { 
+    label: string;
+    isSelected: boolean;
+  }
+
+function Tab({ label, onPress, isSelected }: TabProps) {
   return (
     <TouchableOpacity
       style={{
