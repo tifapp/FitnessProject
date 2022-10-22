@@ -106,9 +106,9 @@ const App = () => {
   const [isNewUser, setIsNewUser] = useState<boolean>(false); //stores the user's id if logged in
   const [isAdmin, setIsAdmin] = useState<boolean>(false); //seems insecure
 
-  const [conversationIds, setConversationIds] = useState([]);
+  const [conversationIds, setConversationIds] = useState<[string]>([""]); // May cause error 10/21/2022
 
-  global.addConversationIds = (id) => {
+  globalThis.addConversationIds = (id) => {
     //console("(((((((((((((((((((((((((((((((((");
     //console(id);
 
@@ -198,7 +198,7 @@ const App = () => {
     };
   }, []);
 
-  const _handleAppStateChange = (nextAppState) => {
+  const _handleAppStateChange = (nextAppState: string) => {
     if (
       nextAppState.match(/inactive|background/) &&
       appState.current === "active"
@@ -210,7 +210,7 @@ const App = () => {
     setAppStateVisible(appState.current);
   };
 
-  const setUniqueConversationIds = (items) => {
+  const setUniqueConversationIds = (items: [string]) => {
     if (JSON.stringify(conversationIds.sort()) !== JSON.stringify(items.sort()))
       //will work when objects are shuffled, but all items will probably refresh still if there's one extra item added to the list
       setConversationIds(items);
@@ -366,7 +366,7 @@ const App = () => {
 
 // You can explore the built-in icon families and icons on the web at:
 // https://icons.expo.fyi/
-function TabBarIcon({ name, color }) {
+function TabBarIcon({ name, color}) {
   return (
     <Ionicons size={50} style={{ marginBottom: 0 }} {...{ name, color }} />
   );
