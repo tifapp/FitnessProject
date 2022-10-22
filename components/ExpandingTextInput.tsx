@@ -6,12 +6,17 @@ interface Props extends TextInputProps {
 }
 
 class ExpandingTextInput extends React.Component<Props> {
+  private textInput : TextInput | null;
   constructor(prop: Props) {
     super(prop);
     this.state = {
       height: 0,
     };
   }
+
+
+
+  
 
   focus() {
     this.textInput && this.textInput.focus();
