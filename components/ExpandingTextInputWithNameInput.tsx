@@ -1,6 +1,18 @@
 import UserTagInput from "@screens/UserTagInput";
 import React, { useState } from "react";
+import { TextInputProps } from "react-native";
 import ExpandingTextInput from "./ExpandingTextInput";
+
+interface Props extends TextInputProps {
+  onSubmit: (s : string) => void,
+  setText: React.Dispatch<React.SetStateAction<string>>,
+  text: string,
+  onDelete: (s : string) => void,
+  taggedUsers: [string] | undefined,
+  setTaggedUsers: React.Dispatch<React.SetStateAction<[string] | undefined>>,
+  onChangeText: React.Dispatch<React.SetStateAction<string>>
+}
+
 
 export default function ExpandingTextInputWithNameInput({
   onSubmit,
@@ -11,16 +23,16 @@ export default function ExpandingTextInputWithNameInput({
   taggedUsers,
   setTaggedUsers,
   ...props
-}) {
-  const [SignPosition, setSignPosition] = useState(null);
+} : Props) {
+  const [SignPosition, setSignPosition] = useState<number>(0); // May cause error setting default to 0 10/22/2022 
   //const [text, setText] = useState("");
-  const [newTaggedUserText, setNewTaggedUserText] = useState(null);
-  const [cursorPosition, setCursorPosition] = useState([]);
-  const [newCursorPosition, setNewCursorPosition] = useState(undefined);
+  const [newTaggedUserText, setNewTaggedUserText] = useState<string | null>(null); // May cause error 10/22/2022
+  const [cursorPosition, setCursorPosition] = useState<[number, number]>([0,0]); // Test for possible issue 10/20/2022
+  const [newCursorPosition, setNewCursorPosition] = useState<TextInputProps["selection"]>(undefined);
   const [showList, setShowList] = useState(false);
   const [modifyText, setModifyText] = useState(false);
 
-  const findTaggedUser = (position) => {
+  const findTaggedUser = (position: number) => {
     let count = 0;
     for(let i = 0; i < position; i++) {
       if(text[i] === '\u200a') {
@@ -35,7 +47,7 @@ export default function ExpandingTextInputWithNameInput({
   // This is where the main problem is occurring
   // If we are adding text or deleting a char we do not want to go inside this function
 
-  const isCursorInside = (position) => {
+  const isCursorInside = (position:number) => {
     let insideTaggedUser = false;
 
     if(position < 1) {
@@ -151,7 +163,7 @@ export default function ExpandingTextInputWithNameInput({
             if(cursorPosition[0] === endInvisible + 1) {
               // Delete the tagged user from the array
               let indexTaggedUser = findTaggedUser(cursorPosition[0]);
-              taggedUsers.splice(indexTaggedUser-1, 1);
+              taggedUsers?.splice(indexTaggedUser-1, 1);
               setTaggedUsers(taggedUsers);
 
               // Modify the text input string to remove the tagged user text
@@ -169,14 +181,20 @@ export default function ExpandingTextInputWithNameInput({
           query={text.slice(SignPosition, cursorPosition[0])}
           onAdd={(userId) => {
             setShowList(false);
-            setText(`${text.substring(0,text.lastIndexOf("@", SignPosition))}\u200a@${global.savedUsers[userId].name}\u200b${text.substring(cursorPosition[0])}`);
-            onChangeText(`${text.substring(0,text.lastIndexOf("@", SignPosition))}\u200a@${global.savedUsers[userId].name}\u200b${text.substring(cursorPosition[0])}`);
+            setText(`${text.substring(0, text.lastIndexOf("@", SignPosition))}\u200a@${globalThis.savedUsers[userId].name}\u200b${text.substring(cursorPosition[0])}`);
+            onChangeText(`${text.substring(0, text.lastIndexOf("@", SignPosition))}\u200a@${globalThis.savedUsers[userId].name}\u200b${text.substring(cursorPosition[0])}`);
             onSubmit(userId);
-            
+
             // Test
             //save selection
-          }}
-        />
+          } } 
+          navigation={undefined} 
+          route={undefined} 
+          placeholder={undefined}  
+          /*
+          Remove the top 3 props later since we are not using them but were required 10/20/2022
+          */      
+          />
       )}
     </>
   );

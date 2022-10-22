@@ -4,6 +4,11 @@ import { listUsers } from "@graphql/queries";
 import React, { useEffect, useRef } from "react";
 import { StyleSheet, View } from "react-native";
 
+interface Props {
+  onAdd: (s : string) => void,
+  query: string
+}
+
 function titleCase(str) {
   var splitStr = str.toLowerCase().split(" ");
   for (var i = 0; i < splitStr.length; i++) {
@@ -22,7 +27,7 @@ export default function UserTagInput({
   placeholder,
   onAdd,
   query,
-}) {
+} : Props) {
   // const [taggedUsers, setTaggedUsers] = useState([]); in the future access using a ref
   const searchBarRef = useRef();
   const UserListRef = useRef();
