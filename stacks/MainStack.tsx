@@ -1,5 +1,5 @@
 import { headerOptions } from "@components/headerComponents/headerOptions";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createStackNavigator, StackScreenProps } from "@react-navigation/stack";
 import ChallengeListScreen from "@screens/ChallengeListScreen";
 import ChallengeScreen from "@screens/ChallengeScreen";
 import CreatingGroups from "@screens/CreatingGroups";
@@ -10,6 +10,7 @@ import LookupUserScreen from "@screens/LookupUser";
 import SearchScreen from "@screens/SearchScreen";
 import React from "react";
 import "react-native-gesture-handler";
+import { Group } from "src/models";
 
 const Stack = createStackNavigator();
 
@@ -20,13 +21,23 @@ export enum MainScreenNames {
   SEARCH = "Search",
   CREATE_GROUP = "Create Group",
   GROUP_FEED = "Group Feed",
-  CHALLENGE = "Challenge",
+  CHALLENGE_FEED = "Challenge",
   CHALLENGE_MENU = "Challenge Menu",
 }
 
 export type MainStackParamList = {
-  [MainScreenNames.CHALLENGE_MENU] : { userId: string };
+  [MainScreenNames.LOOKUP] : { userId: string };
+  [MainScreenNames.IMAGE] : { uri: string };
+  [MainScreenNames.CREATE_GROUP]: {checkFields?: boolean; group: Group;}
+  [MainScreenNames.GROUP_FEED]: {group: Group;}
+  [MainScreenNames.CHALLENGE_FEED]: {channel: string; open: boolean; winner: string;}
 };
+
+export type LookupScreenRouteProps = StackScreenProps<MainStackParamList, MainScreenNames.LOOKUP>['route'];
+export type ImageScreenRouteProps = StackScreenProps<MainStackParamList, MainScreenNames.IMAGE>['route'];
+export type CreateGroupScreenRouteProps = StackScreenProps<MainStackParamList, MainScreenNames.CREATE_GROUP>['route'];
+export type GroupFeedScreenRouteProps = StackScreenProps<MainStackParamList, MainScreenNames.GROUP_FEED>['route'];
+export type ChallengeFeedScreenRouteProps = StackScreenProps<MainStackParamList, MainScreenNames.CHALLENGE_FEED>['route'];
 
 export default function MainStack() {
   return (
@@ -57,7 +68,7 @@ export default function MainStack() {
         component={GroupPostsScreen}
       />
       <Stack.Screen
-        name={MainScreenNames.CHALLENGE}
+        name={MainScreenNames.CHALLENGE_FEED}
         component={ChallengeScreen}
       />
       <Stack.Screen

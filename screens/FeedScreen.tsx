@@ -100,7 +100,7 @@ export default function FeedScreen({
   const [onlineCheck, setOnlineCheck] = useState(true);
 
   const scrollRef = useRef<ScrollView>(); // Used to help with automatic scrolling to top
-  const listRef = useRef<APIList>(null);
+  const listRef = useRef<APIList | null>(null);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -125,6 +125,7 @@ export default function FeedScreen({
     ).subscribe({
       next: (event) => {
         const newPost = event.value?.data?.onCreatePostFromChannel;
+        if (!newPost) return;
         listRef.current?.addItem(
           newPost,
           (post) =>

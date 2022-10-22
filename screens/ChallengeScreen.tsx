@@ -1,4 +1,6 @@
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
+import { useRoute } from "@react-navigation/native";
+import { ChallengeFeedScreenRouteProps } from "@stacks/MainStack";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import FeedScreen from "./FeedScreen";
@@ -8,7 +10,7 @@ export default function ChallengeScreen() {
   //const [query, setQuery] = useState("");
   //console.log(id);
 
-  const {params} = useRoute();
+  const {winner, open, channel} = useRoute<ChallengeFeedScreenRouteProps>().params;
 
   return (
     <View style={{ flex: 1 }}>
@@ -19,11 +21,11 @@ export default function ChallengeScreen() {
         <FeedScreen
           headerComponent={
             <View>
-              <ProfileImageAndName userId={params?.winner} />
+              <ProfileImageAndName userId={winner} />
             </View>
           }
-          isChallenge={!params.open}
-          channel={params?.channel}
+          isChallenge={open}
+          channel={channel}
         />
       </View>
     </View>

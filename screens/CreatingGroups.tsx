@@ -1,10 +1,10 @@
-// @ts-nocheck
 import GroupDescription from "@components/Description";
 import NameField from "@components/NameField";
 import PrivacySettings from "@components/Privacy";
 import SportCreation from "@components/Sport";
 import { createGroup, updateGroup } from "@graphql/mutations";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { CreateGroupScreenRouteProps } from "@stacks/MainStack";
 // Get the aws resources configuration parameters
 import { API, graphqlOperation } from "aws-amplify";
 import React, { useEffect, useState } from "react";
@@ -14,11 +14,11 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
+import { Group } from "src/models";
 
-export default function CreatingGroups({ route }) {
-  console.log(route.params?.myId);
+export default function CreatingGroups() {
   const [nameVal, setName] = useState("");
   const [privacyVal, setPrivacy] = useState("Public");
   //const [totalUsersVal, setTotalUsers] = useState("");
@@ -28,16 +28,15 @@ export default function CreatingGroups({ route }) {
   const [characterCount, setCharacterCount] = useState(1000);
 
   const navigation = useNavigation();
+  const {checkFields, group} = useRoute<CreateGroupScreenRouteProps>().params;
 
-  console.log(route);
-  if (route.params.check !== undefined) {
-    useEffect(() => {
+  useEffect(() => {
+    if (checkFields !== undefined) {
       setFields();
-    }, [route.params]);
-  }
+    }
+  }, []);
 
   const setFields = () => {
-    const { group } = route.params;
     setName(group.name);
     setPrivacy(group.Privacy);
     //setTotalUsers(group.maxUsers)
@@ -49,7 +48,7 @@ export default function CreatingGroups({ route }) {
     Alert.alert("Submitting Group...", "", [], { cancelable: false });
 
     const val = {
-      userID: route.params?.myId,
+      userID: globalThis.myId,
       name: nameVal,
       //maxUsers: totalUsersVal,
       Privacy: privacyVal,
@@ -67,10 +66,10 @@ export default function CreatingGroups({ route }) {
     try {
       await API.graphql(graphqlOperation(createGroup, { input: val }));
       console.log("success");
-      alert("Group submitted successfully!");
+      Alert.alert("Group submitted successfully!");
     } catch (err) {
       console.log(err);
-      alert("Group could not be submitted! " + err.errors[0].message);
+      Alert.alert("Group could not be submitted! " + err.errors[0].message);
     }
   };
 
@@ -84,8 +83,7 @@ export default function CreatingGroups({ route }) {
     setSport("");
 
     try {
-      const { group } = route.params;
-      const updatedGroup = {
+      const updatedGroup: Omit<Group, "userID"> = {
         id: group.id,
         name: nameVal,
         Privacy: privacyVal,
@@ -94,17 +92,16 @@ export default function CreatingGroups({ route }) {
       };
       await API.graphql(graphqlOperation(updateGroup, { input: updatedGroup }));
       console.log("success");
-      alert("Group submitted successfully!");
-      updatedGroup.userID = route.params?.myId;
+      Alert.alert("Group submitted successfully!");
       navigation.navigate("Search", {
-        updatedGroup: updatedGroup,
+        updatedGroup: {...updatedGroup, userID: globalThis.myId},
       });
       navigation.navigate("Group Posts Screen", {
-        group: updatedGroup,
+        group: {...updatedGroup, userID: globalThis.myId},
       });
     } catch (err) {
       console.log(err);
-      alert("Group could not be submitted! " + err.errors[0].message);
+      Alert.alert("Group could not be submitted! " + err.errors[0].message);
     }
   };
 
@@ -139,14 +136,14 @@ export default function CreatingGroups({ route }) {
                 sportVal != "" &&
                 descriptionVal != "" &&
                 descriptionVal.length <= characterCount
-                  ? route.params.check !== undefined
+                  ? checkFields !== undefined
                     ? updtGroup()
                     : addGroup()
-                  : alert("Please fill out all available fields");
+                  : Alert.alert("Please fill out all available fields");
               }}
               style={styles.submitButton}
             >
-              {route.params.check !== undefined ? (
+              {checkFields !== undefined ? (
                 <Text style={styles.buttonTextStyle}>Save</Text>
               ) : (
                 <Text style={styles.buttonTextStyle}>Submit</Text>

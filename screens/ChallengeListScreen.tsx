@@ -4,7 +4,7 @@ import { listChallenges } from "@graphql/queries";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-export default function MyGroups() {
+export default function ChalengeList() {
   //const stateRef = useRef();
   //const [query, setQuery] = useState("");
   //console.log(id);

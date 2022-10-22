@@ -1,7 +1,8 @@
-// @ts-nocheck
+import API, { GraphQLQuery } from "@aws-amplify/api";
 import ListGroupItem from "@components/ListGroupItem";
 import { listGroups } from "@graphql/queries";
-import { API, graphqlOperation } from "aws-amplify";
+import { useNavigation } from "@react-navigation/native";
+import { graphqlOperation } from "aws-amplify";
 import React, { useEffect, useState } from "react";
 import {
   FlatList,
@@ -9,11 +10,13 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
+import { Group } from "src/models";
 
-export default function MyGroups({ navigation, route }) {
-  const [users, setUsers] = useState([]);
+export default function MyGroups() {
+  const {navigate} = useNavigation();
+  const [groups, setGroups] = useState<[Group]>();
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = React.useCallback(() => {
@@ -24,23 +27,20 @@ export default function MyGroups({ navigation, route }) {
   //console.log(id);
 
   const showResultsAsync = async () => {
-    let items = [];
     try {
-      const namematchresult = await API.graphql(
+      const namematchresult = await API.graphql<GraphQLQuery<{listGroups: {items: [Group]}}>>(
         graphqlOperation(listGroups, {
           filter: {
             userID: {
-              eq: route.params?.myId,
+              eq: globalThis.myId,
             },
           },
         })
       );
-      items = [...namematchresult.data.listGroups.items];
-      setUsers(items);
+      setGroups(namematchresult.data?.listGroups.items);
     } catch (err) {
       console.log("error: ", err);
     }
-    setUsers(items);
     setRefreshing(false);
   };
 
@@ -58,14 +58,14 @@ export default function MyGroups({ navigation, route }) {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
-          data={users}
+          data={groups}
           renderItem={({ item }) => <ListGroupItem item={item} />}
         />
       </View>
 
       <TouchableOpacity
         style={[styles.submitButton]}
-        onPress={() => navigation.navigate("Create Group")}
+        onPress={() => navigate("Create Group")}
       >
         <Text style={styles.buttonTextStyle}>Create Group</Text>
       </TouchableOpacity>
