@@ -187,10 +187,7 @@ export default function ExpandingTextInputWithNameInput({
 
             // Test
             //save selection
-          } } 
-          navigation={undefined} 
-          route={undefined} 
-          placeholder={undefined}  
+          } }  
           /*
           Remove the top 3 props later since we are not using them but were required 10/20/2022
           */      
