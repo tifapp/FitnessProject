@@ -3,4 +3,5 @@ export declare global {
   function showNotificationDot() : void
   function hideNotificationDot() : void
   var localBlockList: Block[];
+  var savedUsers : Record<string, {name: string, imageURL: string, isFullSize: boolean}>
 }

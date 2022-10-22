@@ -1,9 +1,13 @@
 import React from "react";
-import { TextInput } from "react-native";
+import { TextInput, TextInputProps } from "react-native";
 
-export default class ExpandingTextInput extends React.Component {
-  constructor(props) {
-    super(props);
+interface Props extends TextInputProps {
+
+}
+
+class ExpandingTextInput extends React.Component<Props> {
+  constructor(prop: Props) {
+    super(prop);
     this.state = {
       height: 0,
     };
@@ -33,3 +37,5 @@ export default class ExpandingTextInput extends React.Component {
     );
   }
 }
+
+export default ExpandingTextInput; 
