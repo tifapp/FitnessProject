@@ -1,11 +1,12 @@
-// @ts-nocheck
+import API, { GraphQLQuery } from "@aws-amplify/api";
 import { createVerification, updateVerification } from "@graphql/mutations";
 import { getVerification } from "@graphql/queries";
-import { API, graphqlOperation, Storage } from "aws-amplify";
+import { graphqlOperation, Storage } from "aws-amplify";
 import * as DocumentPicker from "expo-document-picker";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Animated,
   SafeAreaView,
   ScrollView,
@@ -13,8 +14,9 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
+import { Verification } from "src/models";
 
 /*onPress={() => Linking.openURL(
                 fileURL.value
@@ -23,14 +25,14 @@ import {
 
 var allSettled = require("promise.allsettled");
 
-const VerificationScreen = ({ navigation, route }) => {
+const VerificationScreen = () => {
   const [progress, setProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
-  const [title, setTitle] = useState();
-  const [files, setFiles] = useState([]);
-  const [pendingVerification, setPendingVerification] = useState();
+  const [title, setTitle] = useState<string>();
+  const [files, setFiles] = useState<[{value: Object}]>();
+  const [pendingVerification, setPendingVerification] = useState<Verification>();
 
-  const getFilesAsync = async (id) => {
+  const getFilesAsync = async (id: string) => {
     const directory = `verification/${id}/`; //later on change this to be in a folder only admins and the requester can access
 
     const results = await Storage.list(directory);
@@ -39,7 +41,7 @@ const VerificationScreen = ({ navigation, route }) => {
     console.log(results);
 
     return await allSettled(
-      results.map(async (value) => {
+      results.map(async (value: any) => {
         return Storage.get(value.key);
       })
     );
@@ -52,25 +54,25 @@ const VerificationScreen = ({ navigation, route }) => {
 
     if (result.type === "success") {
       const response = await fetch(result.uri);
-      blob = await response.blob();
+      const blob = await response.blob();
 
       const re = /(?:\.([^.]+))?$/;
-      const extension = re.exec(result.uri)[1];
+      const extension = re.exec(result.uri)?.[1];
 
       setProgress(0.01);
       try {
         const result = await Storage.put(
-          `verification/${route.params?.myId}/${Date.now()}.${extension}`,
+          `verification/${globalThis.myId}/${Date.now()}.${extension}`,
           blob,
           {
             //we may have to deal with people spamming requests after being denied
-            progressCallback(progress) {
+            progressCallback(progress: {loaded: number, total: number}) {
               setProgress(progress.loaded / progress.total);
             },
             level: "public",
           }
         );
-        files.push({ value: result });
+        files?.push({ value: result });
       } catch (e) {
         console.log(e);
       }
@@ -82,11 +84,11 @@ const VerificationScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     (async () => {
-      const pending = await API.graphql(
-        graphqlOperation(getVerification, { id: route.params?.myId })
+      const pending = await API.graphql<GraphQLQuery<{getVerification: Verification}>> (
+        graphqlOperation(getVerification, { id: globalThis.myId })
       );
-      setPendingVerification(pending.data.getVerification);
-      const files = await getFilesAsync(route.params?.myId);
+      setPendingVerification(pending.data?.getVerification);
+      const files = await getFilesAsync(globalThis.myId);
       setFiles(files);
     })();
   }, []);
@@ -124,7 +126,6 @@ const VerificationScreen = ({ navigation, route }) => {
             onChangeText={setTitle}
             style={{
               fontSize: 16,
-              fontWeight: "normal",
               color: "black",
               fontWeight: "bold",
               alignSelf: "center",
@@ -134,10 +135,10 @@ const VerificationScreen = ({ navigation, route }) => {
         </View>
         <Text style={{ padding: 15, fontSize: 16 }}>Documents:</Text>
 
-        {files.map((fileURL, index) => {
+        {files?.map((fileURL, index) => {
           return (
             <Text
-              key={fileURL.value}
+              key={fileURL.value.toString()}
               style={{
                 fontSize: 16,
                 padding: 15,
@@ -174,21 +175,21 @@ const VerificationScreen = ({ navigation, route }) => {
                       : createVerification,
                     {
                       input: {
-                        id: route.params?.myId,
+                        id: globalThis.myId,
                         title: title ?? "Health Professional",
                       },
                     }
                   )
                 );
                 setPendingVerification({
-                  id: route.params?.myId,
+                  id: globalThis.myId,
                   title: title ?? "Health Professional",
                 });
               } catch (e) {
-                alert(e);
+                Alert.alert(e);
               }
             } else {
-              alert("Please enter your preferred title!");
+              Alert.alert("Please enter your preferred title!");
             }
           }}
           disabled={isUploading}
@@ -211,7 +212,6 @@ const VerificationScreen = ({ navigation, route }) => {
             color="#000000"
             style={{
               flex: 1,
-              justifyContent: "center",
               flexDirection: "row",
               justifyContent: "space-around",
               padding: 20,
