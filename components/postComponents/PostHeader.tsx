@@ -17,7 +17,7 @@ interface Props {
   item: {userId: string, createdAt: string, likes: number, 
         replies: number, loading: boolean, likedByYou: boolean, info: React.NamedExoticComponent<object>},
   writtenByYou: boolean,
-  repliesPressed: () => {},
+  repliesPressed: () => void,
   areRepliesVisible: boolean,
   shouldSubscribe: boolean
 }

@@ -106,7 +106,7 @@ const App = () => {
   const [isNewUser, setIsNewUser] = useState<boolean>(false); //stores the user's id if logged in
   const [isAdmin, setIsAdmin] = useState<boolean>(false); //seems insecure
 
-  const [conversationIds, setConversationIds] = useState([]);
+  const [conversationIds, setConversationIds] = useState<string[]>([]);
 
   globalThis.addConversationIds = (id) => {
     //console("(((((((((((((((((((((((((((((((((");
