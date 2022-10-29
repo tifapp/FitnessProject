@@ -102,6 +102,7 @@ export default React.memo(function PostItem({
           writtenByYou={writtenByYou}
           toggleEditing={() => setIsEditing(!isEditing)}
           repliesPressed={() => {
+            console.log("Inside the function");
             repliesModalRef.current?.showModal();
           }}
           reportPost={reportPost}

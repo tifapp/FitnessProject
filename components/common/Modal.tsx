@@ -6,7 +6,7 @@ interface Props {
   ref: React.ForwardedRef<unknown>
 }
 
-export default forwardRef(({ children, ref }: Props) => {
+export default forwardRef(({ children} : Props , ref) => {
   const [visible, setVisible] = useState(false);
 
   useImperativeHandle(ref, () => ({

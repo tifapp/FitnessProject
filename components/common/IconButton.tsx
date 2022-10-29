@@ -26,7 +26,7 @@ export default function IconButton({
   isLabelFirst = false,
   fontSize = 14,
   fontWeight = "normal",
-}: Props) {
+} : Props) {
   return (
     <TouchableOpacity
       style={[
