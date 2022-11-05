@@ -56,6 +56,8 @@ const viewabilityConfig = {
   waitForInteraction: false,
 };
 
+const comment = "jenkins test";
+
 export default function FeedScreen({
   navigation,
   channel,
