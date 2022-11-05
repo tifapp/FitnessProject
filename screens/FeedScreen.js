@@ -8,13 +8,13 @@ import {
   createPost,
   createReport,
   deletePost,
-  updatePost
+  updatePost,
 } from "@graphql/mutations";
 import { batchGetLikes, postsByChannel, postsByLikes } from "@graphql/queries";
 import {
   onCreatePostFromChannel,
   onDeletePostFromChannel,
-  onUpdatePostFromChannel
+  onUpdatePostFromChannel,
 } from "@graphql/subscriptions";
 import SHA256 from "@hooks/hash";
 import NetInfo from "@react-native-community/netinfo";
@@ -37,7 +37,7 @@ import {
   Platform,
   StyleSheet,
   Text,
-  View
+  View,
 } from "react-native";
 import usePhotos from "../hooks/usePhotos";
 
@@ -55,6 +55,8 @@ const viewabilityConfig = {
   itemVisiblePercentThreshold: 66,
   waitForInteraction: false,
 };
+
+//ccccccc
 
 export default function FeedScreen({
   navigation,
