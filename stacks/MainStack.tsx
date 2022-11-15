@@ -26,6 +26,7 @@ export enum MainScreenNames {
 }
 
 export type MainStackParamList = {
+  [MainScreenNames.FEED] : { channel: string };
   [MainScreenNames.LOOKUP] : { userId: string };
   [MainScreenNames.IMAGE] : { uri: string };
   [MainScreenNames.CREATE_GROUP]: {checkFields?: boolean; group: Group;}
@@ -33,6 +34,7 @@ export type MainStackParamList = {
   [MainScreenNames.CHALLENGE_FEED]: {channel: string; open: boolean; winner: string;}
 };
 
+export type FeedScreenRouteProps = StackScreenProps<MainStackParamList, MainScreenNames.FEED>['route'];
 export type LookupScreenRouteProps = StackScreenProps<MainStackParamList, MainScreenNames.LOOKUP>['route'];
 export type ImageScreenRouteProps = StackScreenProps<MainStackParamList, MainScreenNames.IMAGE>['route'];
 export type CreateGroupScreenRouteProps = StackScreenProps<MainStackParamList, MainScreenNames.CREATE_GROUP>['route'];

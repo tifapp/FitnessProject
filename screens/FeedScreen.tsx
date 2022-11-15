@@ -20,8 +20,8 @@ import SHA256 from "@hooks/hash";
 import NetInfo from "@react-native-community/netinfo";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 // Get the aws resources configuration parameters
-import API, { GraphQLSubscription } from "@aws-amplify/api";
-import { Cache, graphqlOperation, Storage } from "aws-amplify";
+import API, { GraphQLQuery, GraphQLSubscription } from "@aws-amplify/api";
+import { graphqlOperation, Storage } from "aws-amplify";
 import { Progress } from "aws-sdk/lib/request";
 import { Video } from "expo-av";
 import * as ImageManipulator from "expo-image-manipulator";
@@ -38,13 +38,11 @@ import {
   LayoutAnimation,
   Platform,
   ScrollView,
-  StyleProp,
-  StyleSheet,
-  Text,
+  StyleProp, StyleSheet, Text,
   View,
   ViewStyle
 } from "react-native";
-import { Post } from "src/models";
+import { Like, Post } from "src/models";
 import usePhotos from "../hooks/usePhotos";
 
 const linkify = require("linkify-it")();
@@ -66,17 +64,14 @@ interface Props {
   channel: string;
   headerComponent?: React.ReactNode;
   footerComponent?: React.ReactNode;
-  originalParentId: string;
-  Accepted: boolean;
-  lastUser?: string;
-  sidebar: boolean;
-  isFocused: boolean;
-  postButtonLabel: string;
-  renderItem: (i: Post) => React.ReactNode;
-  style: StyleProp<ViewStyle>;
-  autoFocus: boolean;
-  isChallenge: boolean;
-  onPostAdded: () => void;
+  originalParentId?: string
+  isFocused?: boolean;
+  postButtonLabel?: string;
+  renderItem?: (i: Post) => React.ReactNode;
+  style?: StyleProp<ViewStyle>;
+  autoFocus?: boolean;
+  isChallenge?: boolean;
+  onPostAdded?: () => void;
 }
 
 export default function FeedScreen({
@@ -84,10 +79,7 @@ export default function FeedScreen({
   headerComponent,
   footerComponent,
   originalParentId,
-  Accepted,
-  lastUser,
-  sidebar,
-  isFocused,
+  isFocused = true,
   style,
   postButtonLabel,
   renderItem,
