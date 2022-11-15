@@ -16,23 +16,23 @@ import {
 global.savedUsers = {}; // Does this global variable get initialized when the app loads or when this component first gets rendered
 //objects will look like {name: [name], imageURL: [imageURL], isFullSize: [bool]}
 
-export const ProfileImageAndName = React.memo(function (props) {
+export const ProfileImageAndName = React.memo(function ({userId = globalThis.myId, ...props}) {
   const [userInfo, setUserInfo] = useState(); //an object containing the name and imageurl
 
   useEffect(() => {
     console.log(
       "are we fetching the full size? ",
-      !global.savedUsers[props.userId] ||
-        (!!props.isFullSize && !global.savedUsers[props.userId].isFullSize)
+      !global.savedUsers[userId] ||
+        (!!props.isFullSize && !global.savedUsers[userId].isFullSize)
     );
     if (
-      !global.savedUsers[props.userId] ||
-      (!!props.isFullSize && !global.savedUsers[props.userId].isFullSize)
+      !global.savedUsers[userId] ||
+      (!!props.isFullSize && !global.savedUsers[userId].isFullSize)
     ) {
       (async () => {
         try {
           const { name, identityId, status, isVerified } = await fetchUserAsync(
-            props.userId
+            userId
           );
           const profileimageurl = await fetchProfileImageAsync(
             identityId,
@@ -43,7 +43,7 @@ export const ProfileImageAndName = React.memo(function (props) {
             profileimageurl,
             () => {
               //if (mounted) {
-              global.savedUsers[props.userId] = {
+              global.savedUsers[userId] = {
                 name: name,
                 imageURL: profileimageurl,
                 isFullSize: props.isFullSize,
@@ -52,12 +52,12 @@ export const ProfileImageAndName = React.memo(function (props) {
               };
               //console.log("saved profileimageandname to local cache, should update")
               //will this trigger the second use effect or will we have to do this again?
-              setUserInfo(global.savedUsers[props.userId]);
+              setUserInfo(global.savedUsers[userId]);
               //}
             },
             (err) => {
               //console.log("couldn't find user's profile image");
-              global.savedUsers[props.userId] = {
+              global.savedUsers[userId] = {
                 name: name,
                 imageURL: "",
                 isFullSize: props.isFullSize,
@@ -66,7 +66,7 @@ export const ProfileImageAndName = React.memo(function (props) {
               }; //use DPI to figure out what resolution we should save at
               //console.log("saved profileimageandname to local cache, should update")
               //will this trigger the second use effect or will we have to do this again?
-              setUserInfo(global.savedUsers[props.userId]);
+              setUserInfo(global.savedUsers[userId]);
             }
           );
         } catch (e) {
@@ -78,19 +78,19 @@ export const ProfileImageAndName = React.memo(function (props) {
 
   useEffect(() => {
     //console.log("updating profileimageandname")
-    setUserInfo(global.savedUsers[props.userId]);
-  }, [global.savedUsers[props.userId]]);
+    setUserInfo(global.savedUsers[userId]);
+  }, [global.savedUsers[userId]]);
 
   const navigation = props.navigationObject ?? useNavigation();
 
   const goToProfile = () => {
-    if (global.id === props.userId) navigation.navigate("Profile");
+    if (globalThis.myId === userId) navigation.navigate("Profile");
     else if (navigation.push)
-      navigation.push("Lookup", { userId: props.userId });
-    else navigation.navigate("Lookup", { userId: props.userId });
+      navigation.push("Lookup", { userId: userId });
+    else navigation.navigate("Lookup", { userId: userId });
   };
 
-  if (props.hideall || !props.userId) {
+  if (props.hideall) {
     return null;
   } else {
     return (

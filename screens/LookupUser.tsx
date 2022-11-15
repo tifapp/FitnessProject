@@ -43,6 +43,7 @@ const LookupUser = () => {
   const listRef = useRef();
 
   const navigation = useNavigation();
+  const route = useRoute();
 
   //const [hifiveSent, setHifiveSent] = useState(false); //can be either "received", "sent", or "none". don't misspell!
   //const [hifives, setHifives] = useState(0);

@@ -404,7 +404,7 @@ function PostInputField({
   const [postIsLoading, setPostIsLoading] = useState(false);
   const [progress, setProgress] = useState<number>(0);
 
-  const [taggedUsers, setTaggedUsers] = useState<[string]>();
+  const [taggedUsers, setTaggedUsers] = useState<string[]>();
 
   let animation = useRef(new Animated.Value(0));
 
