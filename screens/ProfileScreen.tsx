@@ -5,7 +5,6 @@ import StatusIndicator from "@components/StatusIndicator";
 import TouchableWithModal from "@components/TouchableWithModal";
 import fetchProfileImageAsync from "@hooks/fetchProfileImage";
 import { loadCapitals, saveCapitals } from "@hooks/stringConversion";
-import { useNavigation, useRoute } from "@react-navigation/native";
 import { API, Auth, Cache, graphqlOperation, Storage } from "aws-amplify";
 import * as ImageManipulator from "expo-image-manipulator";
 import { SaveFormat } from "expo-image-manipulator";
@@ -21,31 +20,29 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import { User } from "src/models";
 import BasicInfoDetails from "../components/basicInfoComponents/BasicInfoDetails";
 import { createUser, updateUser } from "../src/graphql/mutations";
 import { getUser } from "../src/graphql/queries";
 
-const ProfileScreen = () => {
+const ProfileScreen = ({ navigation, route }) => {
   const [loading, setLoading] = useState(true);
   const [imageChanged, setImageChanged] = useState(false);
   const [imageURL, setImageURL] = useState("");
   const [name, setName] = useState("");
-  const [identityId, setIdentityId] = useState<string>("");
+  const [identityId, setIdentityId] = useState();
   const [age, setAge] = useState(18);
   const [gender, setGender] = useState("Male");
   const [status, setStatus] = useState("");
-  const [isVerified, setIsVerified] = useState<boolean>(false);
+  const [isVerified, setIsVerified] = useState();
   const [bioDetails, setBioDetails] = useState("");
   const [goalsDetails, setGoalsDetails] = useState("");
 
-  const {navigate} = useNavigation();
-  const {params} = useRoute();
-
   useEffect(() => {
     (async () => {
+      console.log("user's id is ", route.params?.myId);
+
       const user = await API.graphql(
-        graphqlOperation(getUser, { id: globalThis.myId })
+        graphqlOperation(getUser, { id: route.params?.myId })
       );
       // @ts-ignore
       const fields = user.data.getUser;
@@ -86,7 +83,7 @@ const ProfileScreen = () => {
   }, []);
 
   useEffect(() => {
-    if (!params?.newUser && !loading) {
+    if (!route.params?.newUser && !loading) {
       updateUserAsync({
         age: age,
         gender: gender,
@@ -126,12 +123,12 @@ const ProfileScreen = () => {
     }
   };
 
-  const updateUserAsync = async (profileInfo: Partial<User>, isNewUser?: boolean) => {
+  const updateUserAsync = async (profileInfo, isNewUser) => {
     //if user doesn't exist, make one
     try {
       if (isNewUser) {
         const { identityId } = await Auth.currentCredentials();
-        profileInfo = {...profileInfo, identityId};
+        profileInfo.identityId = identityId;
       }
 
       try {
@@ -147,7 +144,7 @@ const ProfileScreen = () => {
         //console.log("error when updating user: ", err);
       }
 
-      return [profileInfo, globalThis.myId];
+      return [profileInfo, route.params?.myId];
     } catch (err) {
       console.log("error: ", err);
     }
@@ -233,7 +230,7 @@ const ProfileScreen = () => {
                   value={name}
                   onChangeText={setName}
                   onEndEditing={() => {
-                    if (!params?.newUser) {
+                    if (!route.params?.newUser) {
                       updateUserAsync({ name: saveCapitals(name) }); //should be doing savecapitals in the backend
                       // @ts-ignore
                       global.savedUsers[route.params?.myId].name = name;
@@ -266,7 +263,7 @@ const ProfileScreen = () => {
                         setSelectedValue={(val) => {
                           if (val === "Health Professional") {
                             hideModal();
-                            navigate("Verification");
+                            navigation.navigate("Verification");
                           } else if (val === "None") {
                             setStatus(null), updateUserAsync({ status: null });
                           } else {
@@ -387,7 +384,7 @@ const ProfileScreen = () => {
             />
           </TouchableWithModal>
 
-          <LocationButton id={globalThis.myId} />
+          <LocationButton id={route.params?.myId} />
           {route.params?.newUser ? ( //if name is blank?
             <TouchableOpacity
               style={[styles.buttonStyle, { marginBottom: 25 }]}
