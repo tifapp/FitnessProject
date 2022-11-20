@@ -1,9 +1,9 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import React from "react";
+import React, { ComponentProps } from "react";
 import { Text, TouchableOpacity } from "react-native";
 
 interface Props {
-  onPress: () => {},
+  onPress: () => void,
   iconName: string,
   color: string,
   style: Object,
@@ -55,7 +55,7 @@ export default function IconButton({
           {label}
         </Text>
       ) : null}
-      <MaterialIcons name={iconName} size={size ?? 17} color={color} />
+      <MaterialIcons name={iconName as ComponentProps<typeof MaterialIcons>['name']} size={size ?? 17} color={color} />
     </TouchableOpacity>
   );
 }

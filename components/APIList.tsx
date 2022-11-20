@@ -1,184 +1,216 @@
+import { GraphQLQuery } from "@aws-amplify/api";
 import { API, graphqlOperation } from "aws-amplify";
-import React, { PureComponent } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
-  LayoutAnimation,
+  FlatListProps,
+  LayoutAnimation, ListRenderItemInfo,
   RefreshControl,
   Text,
   View
 } from "react-native";
 
-class APIList extends PureComponent {
-  //we need to make this a class to use refs from the parent
-  constructor(props) {
-    super(props);
-    this.state = {
-      loading: false,
-      loadingMore: false,
-      nextToken: null,
-      refreshing: false,
-      loadingInitial: false,
-      data: [],
-    };
-  }
+export type APIListRefType<T> = {
+  addItem: (newItem: T, alreadyExists?: (item: T) => boolean) => T[];
+  removeItem: (toRemove: number | ((_: T) => boolean)) => T[];
+  replaceItem: (itemMatcher: ((_: T) => boolean), newItem: T) => T[];
+  replaceList: (newList: T[]) => T[];
+  refresh: (shouldInvalidateResults?: () => boolean) => void;
+} | null;
 
-  componentDidMount() {
-    if (this.props.initialState != null) {
-      //console.log(this.props.initialState);
-      this.setState(this.props.initialState);
-    } else {
-      if (!this.props.ignoreInitialLoad) {
-        this.setState({ loadingInitial: true });
-        this.fetchDataAsync(true).finally(() =>
-          this.setState({ loadingInitial: false })
-        );
-      }
+export interface APIListOperations<T> {
+  removeItem: () => void;
+  replaceItem: (newItem: Partial<T>) => void;
+}
+
+export type APIListRenderItemInfo<T> = (info: ListRenderItemInfo<T>, operations: APIListOperations<T>) => React.ReactElement | null;
+
+interface Props<T> extends Omit<FlatListProps<T>, "data" | "renderItem"> {
+  queryOperation: string;
+  queryOperationName: string;
+  initialAmount?: number;
+  additionalAmount?: number;
+  ignoreInitialLoad?: boolean;
+  notRefreshable?: boolean;
+
+  processingFunction?: (_: T[]) => T[];
+  initialLoadFunction?: (_: T[]) => void;
+  ListRef?: React.RefObject<FlatList>;
+  ListEmptyMessage?: string;
+  filter?: any; //see amplify docs
+  renderItem: APIListRenderItemInfo<any>;
+}
+
+const APIList = <T,S>({
+  ignoreInitialLoad,
+  initialLoadFunction,
+  processingFunction,
+  initialAmount = 10,
+  additionalAmount = 15, //should be larger than initialamount to reduce scrolling/delay and for the sake of maxrenderperbatch to reduce blank spaces on initial batch
+  style = {
+    alignSelf: "stretch",
+    flex: 1,
+    flexGrow: 1,
+    justifyContent: "center",
+  },
+  queryOperation,
+  queryOperationName,
+  notRefreshable,
+  ListEmptyMessage,
+  ListRef,
+  filter,
+  renderItem,
+  keyExtractor,
+  ...rest
+}: Props<T>, ref: React.Ref<APIListRefType<T>>) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
+  const [nextToken, setNextToken] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [isInitiallyLoading, setIsInitiallyLoading] = useState<boolean>(false);
+  const [data, setData] = useState<T[]>([]);
+
+  useEffect(() => {
+    if (!ignoreInitialLoad) {
+      setIsInitiallyLoading(true);
+      fetchDataAsync(true).finally(() => {
+        setIsInitiallyLoading(false);
+      });
     }
-  }
+  });
 
-  componentWillUnmount() {
-    console.log("list is unmounting");
-    if (this.props.saveState != null) {
-      console.log("saving list state");
-      this.props.saveState(this.state);
-    }
-  }
-
-  loadMore = () => {
-    //console.log("can we load more???");
-    if (!this.state.loadingMore && this.state.nextToken != null) {
-      //if we don't check this, the list will repeat endlessly
-      this.setState({ loadingMore: true });
-      this.fetchDataAsync(false).finally(() => {
-        this.setState({ loadingMore: false });
+  const loadMore = () => {
+    if (!isLoadingMore && nextToken != null) {
+      setIsLoadingMore(true);
+      fetchDataAsync(false).finally(() => {
+        setIsLoadingMore(false);
       });
     } else {
-      this.setState({ loadingMore: false });
+      setIsLoadingMore(false);
     }
   };
 
-  onRefresh = () => {
-    this.setState({ refreshing: true });
-    this.fetchDataAsync(true)
+  const refresh = (shouldInvalidateResults?: () => boolean) => {
+    setIsRefreshing(true);
+    fetchDataAsync(true, shouldInvalidateResults)
       .then(() => {
-        this.setState({ refreshing: false });
+        setIsRefreshing(false);
       })
       .catch();
   };
+  
+  useImperativeHandle(ref, () => ({
+    addItem(newItem: T, alreadyExists?: (item: T) => boolean): T[] {
+      if (!newItem || !alreadyExists || data.find(alreadyExists))
+        return data;
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      const results = [newItem, ...data];
+      setData(results);
+      return results;
+    },
 
-  mutateData = (newData) => {
-    if (typeof newData === "function") {
-      this.setState({ data: newData(this.state.data) });
-    } else {
-      this.setState({ data: newData });
-    }
-  };
+    removeItem(toRemove: number | ((_: T) => boolean)): T[] {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+  
+      if (typeof toRemove === "number") {
+        const results = data.slice(toRemove, 1);
+        setData(results);
+        return results;
+      } else {
+        const results = data.filter((item) => !toRemove(item));
+        setData(results);
+        return results;
+      }
+    },
 
-  addItem = (newItem, alreadyExists) => {
-    if (!newItem || !alreadyExists || this.state.data.find(alreadyExists))
-      return;
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    this.setState({ data: [newItem, ...this.state.data] });
-  };
+    replaceItem(itemMatcher: ((_: T) => boolean), newItem: Partial<T>): T[] {
+      const results = data.map((item) => itemMatcher(item) ? {...item, ...newItem} : item);
+      setData(results);
+      return results;
+    },
+    
+    replaceList(newList: T[]): T[] {
+      setData(newList);
+      return newList;
+    },
 
-  removeItem = (toRemove) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    refresh,
+  }));
 
-    if (typeof toRemove === "number") {
-      const array = [...this.state.data];
-      array.splice(toRemove, 1);
-      this.setState({
-        data: array,
-      });
-    } else {
-      this.setState({
-        data: this.state.data.filter((item) => !toRemove(item)),
-      });
-    }
-  };
-
-  fetchDataAsync = async (beginning, voidResultsFunction) => {
+  const fetchDataAsync = async (isFirstFetch: boolean, shouldInvalidateResults?: () => boolean) => {
     //do not refetch if the user themselves added or updated a post
     //if new posts are being added don't refetch the entire batch, only append the new posts
     //if a post is being updated don't refetch the entire batch, only update that post
     //if a lot of new posts are being added dont save all of them, paginate them at like 100 posts
 
-    this.setState({ loading: true });
+    setIsLoading(true);
     try {
-      let nextToken = this.state.nextToken;
-      let results = [];
+      let toBeNextToken = nextToken;
+      let results: T[] = [];
 
-      const wasBeginning = beginning;
+      const wasFirstFetch = isFirstFetch;
 
-      //if we're trying to chain queries until we reach the end of the database, this would be the most efficient way to do it
       do {
-        const query = await API.graphql(
-          graphqlOperation(this.props.queryOperation, {
+        //@ts-ignore
+        const query = await API.graphql<GraphQLQuery<{[queryOperationName]: [S]}>>(
+          graphqlOperation(queryOperation, {
             limit:
-              nextToken == null || beginning
-                ? this.props.initialAmount
-                : this.props.additionalAmount,
-            nextToken: beginning ? null : nextToken,
-            ...(this.props.filter || {}),
+              toBeNextToken == null || isFirstFetch
+                ? initialAmount
+                : additionalAmount,
+            nextToken: isFirstFetch ? null : toBeNextToken,
+            ...(filter || {}),
           })
         );
 
-        beginning = false;
-        nextToken = query.data[Object.keys(query.data)[0]].nextToken;
-        results = [...query.data[Object.keys(query.data)[0]].items, ...results];
-        //console.log(results);
-        //console.log("completed iteration of fetching, amount of results are ", results.length);
+        isFirstFetch = false;
+        //@ts-ignore
+        toBeNextToken = query.data?.[queryOperationName].nextToken;
+        //@ts-ignore
+        results = [...query.data?.[queryOperationName].items, ...results];
       } while (
         results.length <
-          (wasBeginning
-            ? this.props.initialAmount
-            : this.props.additionalAmount) &&
+          (wasFirstFetch
+            ? initialAmount
+            : additionalAmount) &&
         nextToken != null
       );
 
       if (
-        this.props.processingFunction != null &&
+        processingFunction != null &&
         results != null &&
         results.length > 0
       ) {
-        results = await Promise.resolve(this.props.processingFunction(results)); //make sure this isn't undefined! in processingfunction return the results in the outermost layer!
+        results = await Promise.resolve(processingFunction(results));
+      }
+      
+      if (shouldInvalidateResults?.()) {
+        setIsLoading(false);
+        return;
       }
 
-      if (voidResultsFunction != null) {
-        if (voidResultsFunction()) {
-          this.setState({ loading: false });
-          return;
-        }
+      if (isInitiallyLoading && initialLoadFunction != null) {
+        initialLoadFunction(results);
       }
 
-      console.log("starting initial function");
+      if (!wasFirstFetch)
+        setData(data => [...data, ...results]);
+      else setData( results ?? [] );
 
-      if (this.state.loadingInitial && this.props.initialLoadFunction != null) {
-        this.props.initialLoadFunction(results);
-      }
-
-      console.log("finished initial function");
-
-      if (!wasBeginning)
-        this.setState({ data: [...this.state.data, ...results] });
-      else this.setState({ data: results ?? [] });
-
-      this.setState({ nextToken: nextToken });
+      setNextToken(toBeNextToken);
     } catch (err) {
-      console.log("error in displaying data: ", err);
+      console.warn("error in displaying data: ", err);
     }
-    this.setState({ loading: false });
+    setIsLoading(false);
   };
 
-  render() {
-    const { style, ListRef, ...rest } = this.props;
-    return (
-      <View style={style}>
-        {this.state.loadingInitial ||
-        (this.state.loading &&
-          !this.state.loadingMore &&
-          !this.state.refreshing) ? (
+  return (
+    <View style={style}>
+      {isInitiallyLoading ||
+        (isLoading &&
+          !isLoadingMore &&
+          !isRefreshing) ? (
           <ActivityIndicator
             size="large"
             color="#000000"
@@ -195,17 +227,17 @@ class APIList extends PureComponent {
             scrollEventThrottle={0}
             ref={ListRef}
             contentContainerStyle={{ flexGrow: 1 }}
-            data={this.state.data}
+            data={data}
             refreshControl={
-              this.props.notRefreshable ? null : (
+              notRefreshable ? undefined : (
                 <RefreshControl
-                  refreshing={this.state.refreshing}
-                  onRefresh={this.onRefresh}
+                  refreshing={isRefreshing}
+                  onRefresh={refresh}
                 />
               )
             }
             onEndReached={
-              this.props.additionalAmount > 0 ? this.loadMore : () => {}
+              additionalAmount > 0 ? loadMore : null
             }
             ListEmptyComponent={
               <Text
@@ -218,17 +250,17 @@ class APIList extends PureComponent {
                   fontWeight: "bold",
                 }}
               >
-                {this.props.ListEmptyMessage}
+                {ListEmptyMessage}
               </Text>
             }
             maxToRenderPerBatch={
-              this.props.additionalAmount > 0 ? this.props.additionalAmount : 1
+              additionalAmount > 0 ? additionalAmount : 1
             } //we'll have to do more tests with these numbers. maxrender 6 and batchingperiod 60 with an additionalamount of 10 and lower caused frequent restarting on my android. seems to be the items have to be rendered first, if they render afterwards (show up as blank, then pop in) then they cause the list to crash.
             //removeClippedSubviews={true} //documentation says this may reduce crashing but causes glitches on ios
             updateCellsBatchingPeriod={20} //numbers could vary based on device and size of memory. this one should be as big as possible, but 50 and above is too large.
             windowSize={21}
             ListFooterComponent={
-              this.state.loadingMore ? (
+              isLoadingMore ? (
                 <ActivityIndicator
                   size="large"
                   color="#26c6a2"
@@ -241,23 +273,21 @@ class APIList extends PureComponent {
                 />
               ) : null
             }
+            renderItem={(info) => renderItem(info, {
+              removeItem: () => {
+                LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+              
+                setData(data => data.filter((item, index) => keyExtractor?.(item, index) !== keyExtractor?.(info.item, info.index)));
+              },
+              replaceItem: (newItem: Partial<T>) => {
+                setData(data => data.map((item, index) => keyExtractor?.(item, index) === keyExtractor?.(info.item, info.index) ? {...item, ...newItem} : item));
+              }
+            })}
+            keyExtractor={keyExtractor}
           />
         )}
-      </View>
-    );
-  }
-}
-
-APIList.defaultProps = {
-  onEndReachedThreshold: 0,
-  initialAmount: 10,
-  additionalAmount: 15, //should be larger than initialamount to reduce scrolling/delay and for the sake of maxrenderperbatch to reduce blank spaces on initial batch
-  style: {
-    alignSelf: "stretch",
-    flex: 1,
-    flexGrow: 1,
-    justifyContent: "center",
-  },
+    </View>
+  );
 };
 
-export default APIList;
+export default forwardRef(APIList);

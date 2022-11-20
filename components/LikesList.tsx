@@ -1,5 +1,6 @@
 // Get the aws resources configuration parameters
-import APIList from "@components/APIList";
+import API, { GraphQLSubscription } from "@aws-amplify/api";
+import APIList, { APIListRefType } from "@components/APIList";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import { likesByPost } from "@graphql/queries";
 import {
@@ -7,43 +8,37 @@ import {
   onDeleteLikeForPost
 } from "@graphql/subscriptions";
 import printTime from "@hooks/printTime";
-import { API, graphqlOperation } from "aws-amplify";
+import { graphqlOperation } from "aws-amplify";
 import React, { useEffect, useRef } from "react";
-import { LayoutAnimation, SafeAreaView, Text } from "react-native";
+import { SafeAreaView, Text } from "react-native";
+import { Like } from "src/models";
 
 require("root/androidtimerfix");
 
-export default function LikesList({ postId }) {
-  const listRef = useRef();
+interface Props {
+  postId: string,
+}
+
+export default function LikesList({ postId }: Props) {
+  const listRef = useRef<APIListRefType<Like>>(null);
 
   useEffect(() => {
-    const createLikeSubscription = API.graphql(
+    const createLikeSubscription = API.graphql<GraphQLSubscription<{onCreateLikeForPost: Like}>>(
       graphqlOperation(onCreateLikeForPost, { postId: postId })
     ).subscribe({
       next: (event) => {
-        const newLike = event.value.data.onCreateLikeForPost;
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        listRef.current.mutateData((data) => [newLike, ...data]);
+        const newLike = event.value.data?.onCreateLikeForPost;
+        if (!newLike) return;
+        listRef.current?.addItem(newLike);
       },
     });
-    const deleteLikeSubscription = API.graphql(
+    const deleteLikeSubscription = API.graphql<GraphQLSubscription<{onDeleteLikeForPost: Like}>>(
       graphqlOperation(onDeleteLikeForPost, { postId: postId })
     ).subscribe({
       next: (event) => {
-        const deletedLike = event.value.data.onDeleteLikeForPost;
-        listRef.current.mutateData((data) => {
-          if (data.find((like) => like.userId === deletedLike.userId)) {
-            let templikes = [...data];
-            var index = templikes.findIndex(
-              (like) => like.userId === deletedLike.userId
-            );
-            templikes.splice(index, 1);
-            LayoutAnimation.configureNext(
-              LayoutAnimation.Presets.easeInEaseOut
-            );
-            return templikes;
-          }
-        });
+        const deletedLike = event.value.data?.onDeleteLikeForPost;
+        if (!deletedLike) return;
+        listRef.current?.removeItem((like) => like.userId === deletedLike.userId);
       },
     });
     return () => {
@@ -59,8 +54,9 @@ export default function LikesList({ postId }) {
         initialAmount={10}
         additionalAmount={20}
         queryOperation={likesByPost}
+        queryOperationName={"likesByPost"}
         filter={{ postId: postId, sortDirection: "DESC" }}
-        renderItem={({ item }) => (
+        renderItem={({ item }: { item: Like }) => (
           <ProfileImageAndName
             style={{ margin: 15 }}
             userId={item.userId}
@@ -69,7 +65,7 @@ export default function LikesList({ postId }) {
             }
           />
         )}
-        keyExtractor={(item) => item.userId}
+        keyExtractor={(item: Like) => item.userId}
       />
     </SafeAreaView>
   );

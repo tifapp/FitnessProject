@@ -17,7 +17,7 @@ import {
   listConversations
 } from "../src/graphql/queries";
 
-var subscriptions = [];
+const subscriptions = [];
 
 export default function ConversationScreen() {
   const {navigate, push} = useNavigation<StackNavigationProp<any>>();
@@ -305,7 +305,7 @@ export default function ConversationScreen() {
             item={item}
             //friendId={item.sender === myId ? item.receiver : item.sender}
             friendId={
-              item.users[0] == route.params.myId ? item.users[1] : item.users[0]
+              item.users[0] == globalThis.myId ? item.users[1] : item.users[0]
             }
             myId={globalThis.myId}
             lastMessage={item.lastMessage}
@@ -315,7 +315,7 @@ export default function ConversationScreen() {
             sidebar={undefined}
           />
         )}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item: Conversation) => item.id}
       />
     </SafeAreaView>
   );

@@ -3,6 +3,7 @@ import ListChallengeItem from "@components/ListChallengeItem";
 import { listChallenges } from "@graphql/queries";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { Challenge } from "src/models";
 
 export default function ChalengeList() {
   //const stateRef = useRef();
@@ -17,8 +18,9 @@ export default function ChalengeList() {
       <APIList
         style={{}}
         queryOperation={listChallenges}
+        queryOperationName={"listChallenges"}
         //only allow admins to make challenges
-        /*
+        /* maybe part of the search bar. also not sure if we want to show closed challenges or not
         filter={{
           sortDirection: "DESC",
           filter: {
@@ -30,8 +32,9 @@ export default function ChalengeList() {
         */
         initialAmount={21}
         additionalAmount={15}
+        //@ts-ignore
         renderItem={({ item, index }) => <ListChallengeItem item={item} />}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item: Challenge) => item.id}
         ListEmptyMessage={"No new challenges!"}
       />
     </View>

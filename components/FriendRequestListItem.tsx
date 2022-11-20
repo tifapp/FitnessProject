@@ -2,18 +2,25 @@ import { MaterialIcons } from "@expo/vector-icons";
 import playSound from "@hooks/playSound";
 import React, { useState } from "react";
 import { Alert, View } from "react-native";
+import { Friendship } from "src/models";
+import { APIListOperations } from "./APIList";
 import IconButton from "./common/IconButton";
 import { ProfileImageAndName } from "./ProfileImageAndName";
 
+interface Props {
+  item: Friendship;
+  operations: APIListOperations<Friendship>;
+  confirmResponseHandler: (item: Friendship, isNew?: boolean) => Promise<void>;
+  isNew: boolean;
+}
+
 export default function FriendRequestListItem({
   item,
-  respondRequestHandler,
+  operations,
   confirmResponseHandler,
-  undoResponseHandler,
-  navigation,
   isNew,
-  myId,
-}) {
+}: Props) {
+  const {replaceItem, removeItem} = operations;
   const [isSelected, setIsSelected] = useState(false);
 
   const alertOptions = {
@@ -26,7 +33,7 @@ export default function FriendRequestListItem({
     const message = "";
     const options = [
       {
-        text: "Block",
+        text: "Block", //should appear as options, maybe as part of profileimageandname component
         onPress: () => {
           const title =
             "Are you sure you want to block this friend? This will unfriend them and stop them from sending you messages and friend requests.";
@@ -34,13 +41,13 @@ export default function FriendRequestListItem({
             {
               text: "Yes",
               onPress: () => {
+                removeItem();
                 confirmResponseHandler(item, isNew);
               },
             },
             {
               text: "Cancel",
               type: "cancel",
-              onPress: () => {},
             },
           ];
           Alert.alert(title, "", options, alertOptions);
@@ -74,23 +81,21 @@ export default function FriendRequestListItem({
           style={{ alignSelf: "center", paddingHorizontal: 8 }}
         />
         <ProfileImageAndName
-          // @ts-ignore
-          navigationObject={navigation}
           style={{ flex: 1, marginVertical: 15 }}
           userId={item.sender}
           textStyle={{
             fontWeight: "normal",
             fontSize: 15,
             color:
-              item.accepted || item.rejected
-                ? "gray"
-                : isNew
+            item.accepted != null
+              ? "gray"
+              : isNew
                 ? "blue"
                 : "black",
           }}
           textLayoutStyle={{ flex: 1, flexGrow: 1 }}
           imageOverlay={
-            item.accepted || item.rejected ? (
+            item.accepted != null ? (
               <View
                 style={{
                   backgroundColor: item.accepted ? "#00ff0080" : "#ff000080",
@@ -116,7 +121,7 @@ export default function FriendRequestListItem({
             ) : null
           }
           subtitleComponent={
-            item.accepted || item.rejected ? (
+            item.accepted != null ? (
               <View
                 style={{
                   flexDirection: "row",
@@ -129,7 +134,7 @@ export default function FriendRequestListItem({
                   iconName={"undo"}
                   size={20}
                   color={"black"}
-                  onPress={() => undoResponseHandler(item)}
+                  onPress={() => replaceItem({accepted: null})}
                   label={"Undo"}
                 />
                 <IconButton
@@ -137,7 +142,9 @@ export default function FriendRequestListItem({
                   size={20}
                   color={"blue"}
                   onPress={() => {
-                    confirmResponseHandler(item, isNew), playSound("complete");
+                    removeItem();
+                    confirmResponseHandler(item, isNew);
+                    playSound("complete");
                   }}
                   label={"Done"}
                 />
@@ -156,8 +163,8 @@ export default function FriendRequestListItem({
                   size={20}
                   color={"red"}
                   onPress={() => {
-                    respondRequestHandler(item, false),
-                      playSound("confirm-down");
+                    replaceItem({accepted: false});
+                    playSound("confirm-down");
                   }}
                   label={"Reject"}
                 />
@@ -166,7 +173,8 @@ export default function FriendRequestListItem({
                   size={20}
                   color={"green"}
                   onPress={() => {
-                    respondRequestHandler(item, true), playSound("confirm-up");
+                    replaceItem({accepted: true});
+                    playSound("confirm-up");
                   }}
                   label={"Accept"}
                 />
