@@ -1,42 +1,44 @@
-// @ts-nocheck
+import API, { GraphQLQuery } from "@aws-amplify/api";
 import Accordion from "@components/Accordion";
 import FriendListItem from "@components/FriendListItem";
 import FriendRequestListItem from "@components/FriendRequestListItem";
-import { deleteFriendship, updateFriendship } from "@graphql/mutations";
+import { createBlock, deleteFriendship, updateConversation, updateFriendship } from "@graphql/mutations";
 import { friendsByReceiver, listFriendships } from "@graphql/queries";
 import {
   onAcceptedFriendship,
   onCreateFriendRequestForReceiver,
   onCreatePostForReceiver,
-  onDeleteFriendship,
+  onDeleteFriendship
 } from "@graphql/subscriptions";
-import { API, graphqlOperation } from "aws-amplify";
+import { useNavigation } from "@react-navigation/native";
+import { graphqlOperation } from "aws-amplify";
 import React, { useEffect, useRef } from "react";
 import { LayoutAnimation, SafeAreaView, Text } from "react-native";
-import APIList from "../components/APIList";
+import { Conversation, Friendship } from "src/models";
+import APIList, { APIListRefType } from "../components/APIList";
 import {
   batchGetConversations,
   getConversation,
   //getSortedConversations,
-  listConversations,
+  listConversations
 } from "../src/graphql/queries";
 //import { listConversations } from "../amplify/#current-cloud-backend/function/backendResources/opt/queries";
 //conversations and friends should be deleted when user is deleted
 
-var subscriptions = [];
+const subscriptions = [];
 
-function FriendList({ navigation, route }) {
-  const listRef = useRef();
+function FriendList() {
+  const listRef = useRef<APIListRefType<Friendship>>(null);
 
   global.updateFriendsListWithMyNewMessage = (newPost) => {
-    listRef.current.mutateData((friends) => {
+    listRef.current?.mutateData((friends) => {
       return friends.map((friend) => {
         if (
           newPost.receiver === friend.receiver ||
           newPost.receiver === friend.sender
         ) {
           friend.lastMessage = newPost.description;
-          friend.lastUser = route.params?.myId;
+          friend.lastUser = globalThis.myId;
         }
         return friend;
       });
@@ -63,17 +65,14 @@ function FriendList({ navigation, route }) {
     }
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    listRef.current.mutateData((currentFriends) => [
-      newFriend,
-      ...currentFriends,
-    ]);
+    listRef.current?.addItem(newFriend);
   };
 
   /*
   useEffect(() => {
     friendList.forEach((friend) =>
       global.addConversationIds(
-        friend.sender == route.params?.myId ? friend.receiver : friend.sender
+        friend.sender == globalThis.myId ? friend.receiver : friend.sender
       )
     );
   }, [friendList]); //we must extract just the array of ids
@@ -82,7 +81,7 @@ function FriendList({ navigation, route }) {
   useEffect(() => {
     const receivedConversationSubscription = API.graphql(
       graphqlOperation(onCreatePostForReceiver, {
-        receiver: route.params?.myId,
+        receiver: globalThis.myId,
       })
     ).subscribe({
       next: (event) => {
@@ -114,8 +113,8 @@ function FriendList({ navigation, route }) {
         const newFriend = event.value.data.onAcceptedFriendship;
         //we can see all friend requests being accepted, so we just have to make sure it's one of ours.
         if (
-          newFriend.sender === route.params?.myId ||
-          newFriend.receiver === route.params?.myId
+          newFriend.sender === globalThis.myId ||
+          newFriend.receiver === globalThis.myId
         ) {
           loadLastMessageAndListenForNewOnes(newFriend);
         }
@@ -140,7 +139,7 @@ function FriendList({ navigation, route }) {
           console.log(
             "Both the Message Screen and Conversation Screens are opened"
           );
-          let conversation = global.checkFriendshipMessage(
+          const conversation = global.checkFriendshipMessage(
             newFriend.sender,
             newFriend.receiver
           );
@@ -155,7 +154,7 @@ function FriendList({ navigation, route }) {
       next: (event) => {
         const deletedFriend = event.value.data.onDeleteFriendship; //check the security on this one. if possible, should only fire for the sender or receiver.
         listRef.current.mutateData((currentFriends) => {
-          let index = currentFriends.findIndex(
+          const index = currentFriends.findIndex(
             (item) =>
               item.sender === deletedFriend.sender &&
               item.sender === deletedFriend.sender
@@ -172,10 +171,10 @@ function FriendList({ navigation, route }) {
     });
   }, []);
 
-  const fetchLatestMessagesFromFriends = async (items) => {
+  const fetchLatestMessagesFromFriends = async (items: Friendship[]) => {
     console.log(items);
 
-    let conversationIds = [];
+    const conversationIds: {id: string}[] = [];
 
     items.forEach((item) => {
       conversationIds.push({
@@ -187,12 +186,12 @@ function FriendList({ navigation, route }) {
     });
 
     try {
-      const conversations = await API.graphql(
+      const conversations = await API.graphql<GraphQLQuery<{batchGetConversations: [Conversation]}>>(
         graphqlOperation(batchGetConversations, { ids: conversationIds })
       );
       //console.log("looking for conversations: ", conversations);
       //returns an array of like objects or nulls corresponding with the array of conversations
-      for (i = 0; i < items.length; ++i) {
+      for (let i = 0; i < items.length; ++i) {
         if (conversations.data.batchGetConversations[i] != null) {
           console.log("found conversation");
           items[i].lastMessage =
@@ -210,26 +209,22 @@ function FriendList({ navigation, route }) {
   const removeFriend = async (item, blocked) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     // update friendList
-    listRef.current.mutateData((friendList) => {
-      return friendList.filter(
-        (i) => i.sender !== item.sender || i.receiver !== item.receiver
-      );
-    });
+    listRef.current?.removeItem((i) => i.sender === item.sender && i.receiver === item.receiver);
 
     // delete friend object
     try {
       if (blocked) {
         global.localBlockList.push({
           createdAt: new Date(Date.now()).toISOString(),
-          userId: route.params?.myId,
+          userId: globalThis.myId,
           blockee:
-            item.receiver == route.params?.myId ? item.sender : item.receiver,
+            item.receiver == globalThis.myId ? item.sender : item.receiver,
         });
         API.graphql(
           graphqlOperation(createBlock, {
             input: {
               blockee:
-                item.receiver == route.params?.myId
+                item.receiver == globalThis.myId
                   ? item.sender
                   : item.receiver,
             },
@@ -269,12 +264,12 @@ function FriendList({ navigation, route }) {
               or: [
                 {
                   sender: {
-                    eq: route.params?.myId,
+                    eq: globalThis.myId,
                   },
                 },
                 {
                   receiver: {
-                    eq: route.params?.myId,
+                    eq: globalThis.myId,
                   },
                 },
               ],
@@ -293,73 +288,38 @@ function FriendList({ navigation, route }) {
       renderItem={({ item }) => (
         //!item.isRead ?
         <FriendListItem
-          navigation={navigation}
           removeFriendHandler={removeFriend}
           item={item}
           sidebar={true}
           friendId={
-            item.sender === route.params?.myId ? item.receiver : item.sender
+            item.sender === globalThis.myId ? item.receiver : item.sender
           }
-          myId={route.params?.myId}
+          myId={globalThis.myId}
           lastMessage={item.lastMessage}
           lastUser={item.lastUser}
           Accepted={item.Accepted}
         />
         //: null
       )}
-      keyExtractor={(item) => item.createdAt.toString()}
+      keyExtractor={(item: Friendship) => item.createdAt.toString()}
       ListEmptyMessage={"No friends yet!"}
     />
   );
 }
 
-export default function FriendScreen({ navigation, route }) {
-  const listRef = useRef();
-
-  const respondToRequest = (item, accepted) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    listRef.current.mutateData((friendRequestList) =>
-      friendRequestList.map(function (i) {
-        if (i.sender == item.sender && i.receiver == item.receiver) {
-          if (accepted) {
-            i.accepted = true;
-          } else {
-            i.rejected = true;
-          }
-        }
-        return i;
-      })
-    ); //locally removes the item
-  };
-
-  const undoResponse = (item) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    listRef.current.mutateData((friendRequestList) =>
-      friendRequestList.map(function (i) {
-        if (i.sender == item.sender && i.receiver == item.receiver) {
-          i.accepted = false;
-          i.rejected = false;
-        }
-        return i;
-      })
-    ); //locally removes the item
-  };
+export default function FriendScreen() {
+  const navigation = useNavigation();
+  const listRef = useRef<APIListRefType<Friendship>>(null);
 
   // runs when either for accepting or rejecting a friend request
-  const confirmResponse = async (item, isNew) => {
+  const confirmResponse = async (item: Friendship, isNew?: boolean) => {
     //if (listRef.current.getData().length == 1) playSound("celebrate");
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    listRef.current.mutateData((friendRequestList) =>
-      friendRequestList.filter(
-        (i) => item.sender !== i.sender || item.receiver !== i.receiver
-      )
-    ); //locally removes the item
 
     try {
       if (item.accepted) {
         const conversationId = [item.sender, item.receiver].sort().join();
 
-        let newConversation = await API.graphql(
+        const newConversation = await API.graphql(
           graphqlOperation(getConversation, { id: conversationId })
         );
 
@@ -407,7 +367,7 @@ export default function FriendScreen({ navigation, route }) {
     // listening for new friend requests
     const friendRequestSubscription = API.graphql(
       graphqlOperation(onCreateFriendRequestForReceiver, {
-        receiver: route.params?.myId,
+        receiver: globalThis.myId,
       })
     ).subscribe({
       next: (event) => {
@@ -417,8 +377,8 @@ export default function FriendScreen({ navigation, route }) {
         const newFriendRequest =
           event.value.data.onCreateFriendRequestForReceiver;
         if (
-          newFriendRequest.sender !== route.params?.myId &&
-          newFriendRequest.receiver !== route.params?.myId
+          newFriendRequest.sender !== globalThis.myId &&
+          newFriendRequest.receiver !== globalThis.myId
         )
           console.log("security error with incoming friend request");
 
@@ -463,7 +423,7 @@ export default function FriendScreen({ navigation, route }) {
 
     return () => {
       currentFriendRequests.current.forEach((item) => {
-        if (item.rejected || item.accepted) confirmResponse(item);
+        if (item.accepted != null) confirmResponse(item);
       }); //or have this in the blur event
     };
   }, []);
@@ -474,10 +434,10 @@ export default function FriendScreen({ navigation, route }) {
   // delete friend object
   try {
     if (blocked) {
-      global.localBlockList.push({createdAt: (new Date(Date.now())).toISOString(), userId: route.params?.myId , blockee: item.receiver == route.params?.myId ? item.sender : item.receiver});
+      global.localBlockList.push({createdAt: (new Date(Date.now())).toISOString(), userId: globalThis.myId , blockee: item.receiver == globalThis.myId ? item.sender : item.receiver});
       API.graphql(
         graphqlOperation(createBlock, {
-          input: { blockee: item.receiver == route.params?.myId ? item.sender : item.receiver },
+          input: { blockee: item.receiver == globalThis.myId ? item.sender : item.receiver },
         })
       );
     }
@@ -512,7 +472,7 @@ export default function FriendScreen({ navigation, route }) {
     })();
   }, []);
 
-  const goToMessages = (id) => {
+  const goToMessages = (id: string) => {
     if (!navigation.push) navigation.navigate(id);
     else navigation.push(id);
   };
@@ -542,8 +502,9 @@ export default function FriendScreen({ navigation, route }) {
           style={{}}
           //initialLoadFunction={checkNewRequests}
           queryOperation={friendsByReceiver}
+          queryOperationName={"friendsByReceiver"}
           filter={{
-            receiver: route.params?.myId,
+            receiver: globalThis.myId,
             sortDirection: "DESC",
             filter: {
               accepted: {
@@ -554,25 +515,23 @@ export default function FriendScreen({ navigation, route }) {
           ref={listRef}
           initialAmount={21}
           additionalAmount={15}
-          renderItem={({ item, index }) => (
+          renderItem={({ item, index }, operations) => (
             <FriendRequestListItem
-              navigation={navigation}
               item={item}
-              respondRequestHandler={respondToRequest}
-              undoResponseHandler={undoResponse}
+              operations={operations}
               confirmResponseHandler={confirmResponse}
-              myId={route.params?.myId}
+              myId={globalThis.myId}
               isNew={
                 index < //< route.params.newfriendrequests
                 20
               }
             />
           )}
-          keyExtractor={(item) => item.sender}
+          keyExtractor={(item: Friendship) => item.sender}
           ListEmptyMessage={"No new requests!"}
         />
       </Accordion>
-      <FriendList navigation={navigation} route={route} />
+      <FriendList />
     </SafeAreaView>
   );
 }

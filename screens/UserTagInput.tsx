@@ -1,17 +1,18 @@
-import APIList from "@components/APIList";
+import APIList, { APIListRefType } from "@components/APIList";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import { listUsers } from "@graphql/queries";
 import React, { useEffect, useRef } from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
+import { User } from "src/models";
 
 interface Props {
   onAdd: (s : string) => void,
   query: string
 }
 
-function titleCase(str) {
-  var splitStr = str.toLowerCase().split(" ");
-  for (var i = 0; i < splitStr.length; i++) {
+function titleCase(str: string) {
+  const splitStr = str.toLowerCase().split(" ");
+  for (let i = 0; i < splitStr.length; i++) {
     // You do not need to check if i is larger than splitStr length, as your for does that for you
     // Assign it back to the array
     splitStr[i] =
@@ -22,26 +23,20 @@ function titleCase(str) {
 }
 
 export default function UserTagInput({
-  navigation,
-  route,
-  placeholder,
   onAdd,
   query,
 } : Props) {
   // const [taggedUsers, setTaggedUsers] = useState([]); in the future access using a ref
-  const searchBarRef = useRef();
-  const UserListRef = useRef();
-  const currentQuery = useRef();
+  const UserListRef = useRef<APIListRefType<User>>(null);
+  const currentQuery = useRef<string>();
 
   currentQuery.current = query.toLowerCase();
 
   useEffect(() => {
     if (query !== "") {
-      UserListRef.current.fetchDataAsync(true, () => {
-        return currentQuery.current !== query.toLowerCase() || query === "";
-      });
+      UserListRef.current?.refresh(() => currentQuery.current !== query.toLowerCase() || query === "");
     } else {
-      if (UserListRef) UserListRef.current.mutateData([]);
+      if (UserListRef) UserListRef.current?.replaceList([]);
     }
   }, [query]);
 
@@ -104,16 +99,10 @@ export default function UserTagInput({
             userId={item.id}
           />
         )}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item: User) => item.id}
       />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  textInputStyle: {
-    marginHorizontal: 10,
-    borderBottomWidth: 2,
-    borderBottomColor: "gray",
-  },
-});
+

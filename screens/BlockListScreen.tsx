@@ -1,4 +1,4 @@
-import APIList from "@components/APIList";
+import APIList, { APIListRefType } from "@components/APIList";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import { deleteBlock } from "@graphql/mutations";
 import { blocksByDate } from "@graphql/queries";
@@ -7,17 +7,16 @@ import { useNavigation } from "@react-navigation/native";
 import { API, graphqlOperation } from "aws-amplify";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Alert,
-  LayoutAnimation,
-  StyleSheet,
+  Alert, StyleSheet,
   Text,
   TouchableOpacity,
   View
 } from "react-native";
+import { Block } from "src/models";
 
 const BlockListScreen = () => {
   const navigation = useNavigation();
-  const listRef = useRef<APIList>(null);
+  const listRef = useRef<APIListRefType<Block> | null>(null);
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
 
   const alertOptions = {
@@ -35,14 +34,7 @@ const BlockListScreen = () => {
           globalThis.localBlockList = globalThis.localBlockList.filter(
             (item) => item.blockee != blockeeId
           );
-          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-          listRef.current?.mutateData((blocklist) => { //needs api list template type
-            const results = blocklist.filter(
-              (item) => item.blockee != blockeeId
-            );
-            global.localBlockList = results;
-            return results;
-          });
+          global.localBlockList = listRef.current?.removeItem((item) => item.blockee === blockeeId) ?? [];
           API.graphql(
             graphqlOperation(deleteBlock, {
               input: { userId: globalThis.myId, blockee: blockeeId },
@@ -65,7 +57,7 @@ const BlockListScreen = () => {
     const onFocus = navigation.addListener("focus", () => {
       //console.log("got to settings", global.localBlockList);
       //we just want to save a copy of the data
-      listRef.current?.mutateData(() => [...global.localBlockList]);
+      listRef.current?.replaceList([...global.localBlockList]);
     });
 
     // Return the function to unsubscribe from the event so it gets removed on unmount
@@ -77,6 +69,7 @@ const BlockListScreen = () => {
       initialAmount={10}
       additionalAmount={20}
       queryOperation={blocksByDate}
+      queryOperationName={"blocksByDate"}
       ref={listRef}
       renderItem={({ item }) => ( //needs API list template type
         <View
@@ -129,7 +122,7 @@ const BlockListScreen = () => {
         alignItems: "center",
         alignSelf: "center",
       }}
-      keyExtractor={(item) => item.blockee} //needs template type. see how tesla does it
+      keyExtractor={(item: Block) => item.blockee} //needs template type. see how tesla does it
       ListEmptyMessage={"You haven't blocked anyone."}
     />
   );

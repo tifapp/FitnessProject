@@ -1,11 +1,13 @@
-import APIList from "@components/APIList";
-import LinkableText from "@components/LinkableText";
+import API, { graphqlOperation } from "@aws-amplify/api";
+import APIList, { APIListOperations } from "@components/APIList";
 import PostHeader from "@components/postComponents/PostHeader";
 import PostImage from "@components/PostImage";
+import { deletePost, updatePost } from "@graphql/mutations";
 import { likesByPost } from "@graphql/queries";
 import { useNavigation } from "@react-navigation/native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
+  Alert,
   Dimensions,
   FlatList,
   StyleSheet,
@@ -14,40 +16,69 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import { Like, Post } from "src/models";
 import IconButton from "./common/IconButton";
 import Modal from "./common/Modal";
 import CommentsModal from "./postComponents/CommentsModal";
 import LikesModal from "./postComponents/LikesModal";
 import { ProfileImageAndName } from "./ProfileImageAndName";
+import TextWithTaggedUsers from "./TextWithTaggedUsers";
+
+
+const updatePostAWS = async (createdAt: string, editedText: string) => {
+  try {
+    await API.graphql(
+      graphqlOperation(updatePost, {
+        input: { createdAt: createdAt, description: editedText },
+      })
+    );
+    console.log("success in updating a post");
+  } catch (err) {
+    console.warn("error in updating post: ", err);
+  }
+};
+
+const deletePostAWS = async (createdAt: string) => {
+  try {
+    await API.graphql(
+      graphqlOperation(deletePost, {
+        input: { createdAt: createdAt, userId: globalThis.myId },
+      })
+    );
+    console.log("success in deleting a post");
+  } catch {
+    console.log("error in deleting post: ");
+  }
+};
 
 interface Props {
-  item: Object,
+  item: Post,
   writtenByYou: boolean,
   isVisible: boolean,
-  shouldSubscribe: boolean
+  shouldSubscribe: boolean,
+  operations: APIListOperations<Post>,
 }
 
 export default React.memo(function PostItem({
   item,
-  deletePostsAsync,
   writtenByYou,
-  editButtonHandler,
   replyButtonHandler,
-  receiver,
-  showTimestamp,
-  newSection,
+  //receiver,
+  //showTimestamp,
+  //newSection,
   reportPost,
   isVisible,
   shouldSubscribe,
   likes,
-  replies,
-  index,
+  //replies,
+  //index,
+  operations,
 } : Props) {
+  const {removeItem, replaceItem} = operations;
   const likesModalRef = useRef();
   const repliesModalRef = useRef();
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState("");
-  const [textComponents, setTextComponents] = useState([]);
 
   //console.log(item.taggedUsers);
 
@@ -60,45 +91,7 @@ export default React.memo(function PostItem({
       navigation.navigate("Lookup", { userId: taggedUserId });
     }
   };
-
-  const findTaggedUser = (taggedUser) => {
-    let taggedUserIndex = 0;
-
-    for(let i in textComponents) {
-      if(textComponents[i] === taggedUser) {
-        break;
-      }
-      else if(textComponents[i].includes('\u200a')) {
-        taggedUserIndex++;
-      }
-    }
-
-    goToProfile(item.taggedUsers[taggedUserIndex]);
-  }
-
-  useEffect(() => {
-    let subString = "";
-    let text = [...item.description];
-    let textInputs = [];
-
-    for(let i in text) {
-      if(text[i] === '\u200a') {
-        textInputs.push(subString);
-        subString = text[i];
-      } else if(text[i] === '\u200b') {
-        subString += text[i];
-        textInputs.push(subString);
-        subString = "";
-      } else {
-        subString += text[i];
-      }
-    }
-
-    subString != "" ? textInputs.push(subString) : null;
-
-    setTextComponents(textInputs);
-  },[]);
-
+  
   return (
     <View style={styles.secondaryContainerStyle}>
       <View
@@ -106,7 +99,6 @@ export default React.memo(function PostItem({
       >
         <PostHeader
           item={item}
-          deletePostsAsync={deletePostsAsync}
           writtenByYou={writtenByYou}
           toggleEditing={() => setIsEditing(!isEditing)}
           repliesPressed={() => {
@@ -147,20 +139,7 @@ export default React.memo(function PostItem({
               {item.description}
             </TextInput>
           ) : (
-            <LinkableText
-              style={{
-                flex: 1,
-              }}
-              textStyle={{
-                paddingTop: 4,
-                paddingBottom: 16,
-                marginLeft: 22,
-                maxWidth: Dimensions.get("window").width - 90,
-              }}
-              urlPreview={item.urlPreview}
-            >
-              {textComponents.map((textInput) => textInput.includes('\u200a') ? <Text onPress = {() => findTaggedUser(textInput)} style={{color: "blue"}}>{textInput}</Text> : <Text>{textInput}</Text>)}
-            </LinkableText>
+            <TextWithTaggedUsers textInput={item.description}/>
           )}
 
           <View
@@ -181,7 +160,7 @@ export default React.memo(function PostItem({
                 iconName={"delete-forever"}
                 size={20}
                 color={"gray"}
-                onPress={() => deletePostsAsync(item.createdAt)}
+                onPress={() => {removeItem(), deletePostAWS(item.createdAt);}}
               />
             ) : null}
 
@@ -214,6 +193,7 @@ export default React.memo(function PostItem({
               style={{ margin: 0, padding: 0 }}
               horizontal={true}
               queryOperation={likesByPost}
+              queryOperationName={"likesByPost"}
               filter={{
                 postId: item.createdAt + "#" + item.userId,
                 sortDirection: "DESC",
@@ -242,7 +222,7 @@ export default React.memo(function PostItem({
                   </Text>
                 </View>
               )}
-              keyExtractor={(item) => item.userId}
+              keyExtractor={(item: Like) => item.userId}
             />
           </TouchableOpacity>
         )}
@@ -280,7 +260,7 @@ export default React.memo(function PostItem({
           <TouchableOpacity
             style={styles.unselectedButtonStyle}
             onPress={() => {
-              alert("Post is empty!");
+              Alert.alert("Post is empty!");
             }}
           >
             <Text style={[styles.buttonTextStyle, { color: "gray" }]}>
@@ -291,9 +271,10 @@ export default React.memo(function PostItem({
           <TouchableOpacity
             style={styles.buttonStyle}
             onPress={() => {
-              editButtonHandler(item.createdAt, editedText),
-                setEditedText(""),
-                setIsEditing(false);
+              replaceItem({description: editedText}),
+              updatePostAWS(item.createdAt, editedText),
+              setEditedText(""),
+              setIsEditing(false);
             }}
           >
             <Text style={styles.buttonTextStyle}>{"Edit Post"}</Text>

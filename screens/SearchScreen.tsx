@@ -1,4 +1,4 @@
-import APIList from "@components/APIList";
+import APIList, { APIListRefType } from "@components/APIList";
 import ListGroupItem from "@components/ListGroupItem";
 import UserListItem from "@components/UserListItem";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -15,10 +15,11 @@ import {
   TouchableWithoutFeedback,
   View
 } from "react-native";
+import { Group, User } from "src/models";
 
 function titleCase(str: string) {
-  var splitStr = str.toLowerCase().split(" ");
-  for (var i = 0; i < splitStr.length; i++) {
+  const splitStr = str.toLowerCase().split(" ");
+  for (let i = 0; i < splitStr.length; i++) {
     // You do not need to check if i is larger than splitStr length, as your for does that for you
     // Assign it back to the array
     splitStr[i] =
@@ -32,8 +33,8 @@ export default function SearchScreen() {
   const [query, setQuery] = useState("");
   const [searchType, setSearchType] = useState("all"); //refreshing tho
   const searchBarRef = useRef<TextInput | null>(null);
-  const UserListRef = useRef<APIList>();
-  const GroupListRef = useRef<APIList>();
+  const UserListRef = useRef<APIListRefType<User>>(null);
+  const GroupListRef = useRef<APIListRefType<Group>>(null);
   const currentQuery = useRef<string>();
   const route = useRoute();
 
@@ -41,15 +42,11 @@ export default function SearchScreen() {
 
   useEffect(() => {
     if (query !== "") {
-      UserListRef.current?.fetchDataAsync(true, () => {
-        return currentQuery.current !== query.toLowerCase() || query === "";
-      });
-      GroupListRef.current?.fetchDataAsync(true, () => {
-        return currentQuery.current !== query.toLowerCase() || query === "";
-      });
+      UserListRef.current?.refresh(() => currentQuery.current !== query.toLowerCase() || query === "");
+      GroupListRef.current?.refresh(() => currentQuery.current !== query.toLowerCase() || query === "");
     } else {
-      if (UserListRef) UserListRef.current?.mutateData([]);
-      if (GroupListRef) GroupListRef.current?.mutateData([]);
+      if (UserListRef) UserListRef.current?.replaceList([]);
+      if (GroupListRef) GroupListRef.current?.replaceList([]);
     }
   }, [query]);
 
@@ -185,13 +182,13 @@ export default function SearchScreen() {
               ? results
               : []
           }
-          renderItem={({ item }) => (
+          renderItem={({ item }: {item: User}) => (
             <UserListItem
               item={item}
               matchingname={item.name.startsWith(query)}
             />
           )}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item: User) => item.id}
           style={{
             backgroundColor: "#a9efe0",
             flex:
@@ -259,17 +256,17 @@ export default function SearchScreen() {
               ? results
               : []
           }
-          renderItem={({ item }) => (
+          renderItem={({ item }: {item: Group}) => (
             <ListGroupItem
               item={
-                route.params?.updatedGroup == null
+                route.params?.updatedGroup == null //I forgot what "updatedgroup" prop is. Is it when the user updates their own group? Probably better ways to handle that to be flexible with multiple screens rather than just the search screen
                   ? item
                   : route.params?.updatedGroup
               }
               matchingname={item.name.startsWith(query)}
             />
           )}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item: Group) => item.id}
           style={{
             backgroundColor: "#a9efe0",
             flex:

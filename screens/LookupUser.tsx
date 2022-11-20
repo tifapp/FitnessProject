@@ -25,7 +25,6 @@ import { loadCapitals } from "@hooks/stringConversion";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { LookupScreenRouteProps } from "@stacks/MainStack";
 import { API, graphqlOperation } from "aws-amplify";
-import falsey from "falsey";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -49,8 +48,6 @@ const LookupUser = () => {
   //const [hifives, setHifives] = useState(0);
 
   const {params: { userId }} = useRoute<LookupScreenRouteProps>();
-
-  const faljse = falsey("");
 
   let waitForFriend = "";
   let onUpdate = "";

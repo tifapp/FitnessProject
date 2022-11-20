@@ -1,4 +1,4 @@
-import APIList from "@components/APIList";
+import APIList, { APIListRefType, APIListRenderItemInfo } from "@components/APIList";
 import IconButton from "@components/common/IconButton";
 import ExpandingTextInputWithNameInput from "@components/ExpandingTextInputWithNameInput";
 import PostItem from "@components/PostItem";
@@ -6,9 +6,7 @@ import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import SpamButton from "@components/SpamButton";
 import {
   createPost,
-  createReport,
-  deletePost,
-  updatePost
+  createReport
 } from "@graphql/mutations";
 import { batchGetLikes, postsByChannel, postsByLikes } from "@graphql/queries";
 import {
@@ -20,7 +18,7 @@ import SHA256 from "@hooks/hash";
 import NetInfo from "@react-native-community/netinfo";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 // Get the aws resources configuration parameters
-import API, { GraphQLQuery, GraphQLSubscription } from "@aws-amplify/api";
+import API, { GraphQLSubscription } from "@aws-amplify/api";
 import { graphqlOperation, Storage } from "aws-amplify";
 import { Progress } from "aws-sdk/lib/request";
 import { Video } from "expo-av";
@@ -34,15 +32,13 @@ import {
   Animated,
   FlatList,
   Image,
-  KeyboardAvoidingView,
-  LayoutAnimation,
-  Platform,
+  KeyboardAvoidingView, Platform,
   ScrollView,
   StyleProp, StyleSheet, Text,
   View,
   ViewStyle
 } from "react-native";
-import { Like, Post } from "src/models";
+import { Post } from "src/models";
 import usePhotos from "../hooks/usePhotos";
 
 const linkify = require("linkify-it")();
@@ -92,7 +88,7 @@ export default function FeedScreen({
   const [onlineCheck, setOnlineCheck] = useState(true);
 
   const scrollRef = useRef<ScrollView>(); // Used to help with automatic scrolling to top
-  const listRef = useRef<APIList | null>(null);
+  const listRef = useRef<APIListRefType<Post>>(null);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -250,46 +246,6 @@ export default function FeedScreen({
     return null;
   };
 
-  const updatePostAsync = async (createdAt: string, editedText: string) => {
-    //replace the post locally
-    listRef.current?.mutateData((posts) => {
-      posts.find((p) => {
-        return p.createdAt == createdAt && p.userId == globalThis.myId;
-      }).description = editedText;
-      return posts;
-    });
-
-    try {
-      await API.graphql(
-        graphqlOperation(updatePost, {
-          input: { createdAt: createdAt, description: editedText },
-        })
-      );
-      console.log("success in updating a post");
-    } catch (err) {
-      console.log("error in updating post: ", err);
-    }
-  };
-
-  const deletePostsAsync = async (timestamp: string) => {
-    checkInternetConnection();
-
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    listRef.current?.removeItem(
-      (post) => post.createdAt === timestamp && post.userId === globalThis.myId
-    );
-
-    try {
-      await API.graphql(
-        graphqlOperation(deletePost, {
-          input: { createdAt: timestamp, userId: globalThis.myId },
-        })
-      );
-    } catch {
-      console.log("error in deleting post: ");
-    }
-  };
-
   const reportPost = async (timestamp: string, author: string) => {
     listRef.current?.removeItem(
       (post) => post.createdAt === timestamp && post.userId === author
@@ -313,7 +269,7 @@ export default function FeedScreen({
     scrollRef.current?.scrollToOffset({ offset: 0, animated: true });
   };
 
-  const renderPostItem = ({ item, index }) => {
+  const renderPostItem: APIListRenderItemInfo<Post> = ({ item, index }, operations) => {
     if (item.loading)
       return (
         <ActivityIndicator
@@ -330,16 +286,15 @@ export default function FeedScreen({
     else
       return (
         <PostItem
-          index={index}
+          //index={index}
           item={item}
           likes={item.likes}
           replies={item.replies}
-          deletePostsAsync={deletePostsAsync}
           writtenByYou={item.userId === globalThis.myId}
-          editButtonHandler={updatePostAsync}
           showTimestamp={showTimestamp(item, index)}
           reportPost={reportPost}
           newSection={true}
+          operations={operations}
           isVisible={item.isVisible && isFocused}
         />
       );
