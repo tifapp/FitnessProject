@@ -1,5 +1,5 @@
-import { GraphQLQuery } from "@aws-amplify/api";
-import { API, graphqlOperation } from "aws-amplify";
+import API, { GraphQLQuery } from "@aws-amplify/api";
+import { graphqlOperation } from "aws-amplify";
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import {
   ActivityIndicator,
@@ -78,7 +78,7 @@ const APIList = <T,S>({
         setIsInitiallyLoading(false);
       });
     }
-  });
+  }, []);
 
   const loadMore = () => {
     if (!isLoadingMore && nextToken != null) {

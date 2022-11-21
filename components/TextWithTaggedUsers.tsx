@@ -1,3 +1,4 @@
+import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import {
   Dimensions, Text
@@ -5,13 +6,26 @@ import {
 import LinkableText from "./LinkableText";
 
 interface Props {
-  textInput?: string;
+  textInput?: string | null;
+  taggedUsers: string[];
+  urlPreview: any;
 }
 
 export default function TextWithTaggedUsers({
-  textInput
+  textInput,
+  taggedUsers,
+  urlPreview,
 } : Props) {
   const [textComponents, setTextComponents] = useState<string[]>();
+  const navigation = useNavigation();
+  
+  const goToProfile = (taggedUserId: string) => {
+    if (globalThis.myId === taggedUserId) {
+      navigation.navigate("Profile");
+    } else {
+      navigation.navigate("Lookup", { userId: taggedUserId });
+    }
+  };
   
   const findTaggedUser = (taggedUser: string) => {
     let taggedUserIndex = 0;
@@ -25,7 +39,7 @@ export default function TextWithTaggedUsers({
       }
     }
 
-    goToProfile(item.taggedUsers[taggedUserIndex]);
+    goToProfile(taggedUsers[taggedUserIndex]);
   }
 
   useEffect(() => {
@@ -62,7 +76,7 @@ export default function TextWithTaggedUsers({
         marginLeft: 22,
         maxWidth: Dimensions.get("window").width - 90,
       }}
-      urlPreview={item.urlPreview}
+      urlPreview={urlPreview}
     >
       {textComponents?.map((textInput) => textInput.includes('\u200a') ? <Text onPress = {() => findTaggedUser(textInput)} style={{color: "blue"}}>{textInput}</Text> : <Text>{textInput}</Text>)}
     </LinkableText>

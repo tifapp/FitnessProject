@@ -1,4 +1,4 @@
-import API, { GraphQLResult } from "@aws-amplify/api";
+import API, { GraphQLResult, GraphQLSubscription } from "@aws-amplify/api";
 import APIList from "@components/APIList";
 import FriendListItem from "@components/FriendListItem";
 import { deleteConversation } from "@graphql/mutations";
@@ -116,15 +116,16 @@ export default function ConversationScreen() {
     // Executes when a user receieves a friend request
     // listening for new friend requests
 
-    const receivedConversationSubscription = API.graphql(
+    const receivedConversationSubscription = API.graphql<GraphQLSubscription<{onCreatePostForReceiver: Post}>>(
       graphqlOperation(onCreatePostForReceiver, { receiver: globalThis.myId })
     ).subscribe({
       next: (event) => {
-        const newPost = event.value.data.onCreatePostForReceiver;
+        const newPost = event.value.data?.onCreatePostForReceiver;
         global.addConversationIds(newPost.userId);
         global.showNotificationDot();
         updateConversationList(newPost);
       },
+      error: error => console.warn(error),
     });
 
     const sentConversationSubscription = API.graphql(
@@ -135,6 +136,7 @@ export default function ConversationScreen() {
 
         updateConversationList(newPost);
       },
+      error: error => console.warn(error),
     });
 
     return () => {

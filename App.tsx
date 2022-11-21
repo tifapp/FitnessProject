@@ -1,4 +1,5 @@
 import { headerOptions } from "@components/headerComponents/headerOptions";
+import API, { GraphQLQuery } from "@aws-amplify/api";
 import ConfirmSignIn from "@components/loginComponents/ConfirmSignIn";
 import ConfirmSignUp from "@components/loginComponents/ConfirmSignUp";
 import ForgotPassword from "@components/loginComponents/ForgotPassword";
@@ -30,7 +31,6 @@ import MainStack from "@stacks/MainStack";
 import SettingsStack from "@stacks/SettingsStack";
 import {
   Amplify,
-  API,
   Auth,
   Cache,
   graphqlOperation,
@@ -45,12 +45,14 @@ import {
   ActivityIndicator,
   Alert,
   AppState,
+  AppStateStatus,
   LogBox,
   Platform,
   UIManager,
   useWindowDimensions,
   View
 } from "react-native";
+import { User } from "src/models";
 // Get the aws resources configuration parameters
 import awsconfig from "./src/aws-exports"; // if you are using Amplify CLI
 import { getUser } from "./src/graphql/queries";
@@ -99,7 +101,7 @@ const Drawer = createDrawerNavigator();
 const App = () => {
   //Text.defaultProps = Text.defaultProps || {}
   //Text.defaultProps.style =  { fontFamily: 'Helvetica', fontSize: 15, fontWeight: 'normal' }
-  const appState = useRef(AppState.currentState);
+  const appState = useRef<AppStateStatus>(AppState.currentState);
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
   const [userId, setUserId] = useState<string>("checking..."); //stores the user's id if logged in
@@ -136,12 +138,12 @@ const App = () => {
             "Admins"
           )
         );
-      const user = await API.graphql(
-        graphqlOperation(getUser, { id: query.attributes.sub })
-      );
       setUserId(query.attributes.sub);
       globalThis.myId = query.attributes.sub;
-      if (user.data.getUser == null) {
+      const user = await API.graphql<GraphQLQuery<{getUser: User}>> (
+        graphqlOperation(getUser, { id: query.attributes.sub })
+      );
+      if (user.data?.getUser == null) {
         setIsNewUser(true);
       }
 
@@ -198,7 +200,7 @@ const App = () => {
     };
   }, []);
 
-  const _handleAppStateChange = (nextAppState: string) => {
+  const _handleAppStateChange = (nextAppState: AppStateStatus) => {
     if (
       nextAppState.match(/inactive|background/) &&
       appState.current === "active"
@@ -305,7 +307,7 @@ const App = () => {
           edgeWidth={100}
           initialRouteName="MainTabs"
           drawerContent={(props) => (
-            <CustomSidebarMenu myId={userId} {...props} />
+            <CustomSidebarMenu {...props} />
           )}
           screenOptions={headerOptions}
         >

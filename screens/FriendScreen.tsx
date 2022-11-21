@@ -1,4 +1,4 @@
-import API, { GraphQLQuery } from "@aws-amplify/api";
+import API, { GraphQLQuery, GraphQLSubscription } from "@aws-amplify/api";
 import Accordion from "@components/Accordion";
 import FriendListItem from "@components/FriendListItem";
 import FriendRequestListItem from "@components/FriendRequestListItem";
@@ -14,7 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 import { graphqlOperation } from "aws-amplify";
 import React, { useEffect, useRef } from "react";
 import { LayoutAnimation, SafeAreaView, Text } from "react-native";
-import { Conversation, Friendship } from "src/models";
+import { Conversation, Friendship, Post } from "src/models";
 import APIList, { APIListRefType } from "../components/APIList";
 import {
   batchGetConversations,
@@ -56,10 +56,10 @@ function FriendList() {
       })
     );
 
-    if (convo.data.getConversation != null) {
+    if (convo.data?.getConversation != null) {
       console.log("found old condo");
-      newFriend.lastMessage = convo.data.getConversation.lastMessage;
-      newFriend.lastUser = convo.data.getConversation.lastUser;
+      newFriend.lastMessage = convo.data?.getConversation.lastMessage;
+      newFriend.lastUser = convo.data?.getConversation.lastUser;
     } else {
       console.log("couldnt find condo");
     }
@@ -79,7 +79,7 @@ function FriendList() {
   */
 
   useEffect(() => {
-    const receivedConversationSubscription = API.graphql(
+    const receivedConversationSubscription = API.graphql<GraphQLSubscription<{onCreatePostForReceiver: Post}>>(
       graphqlOperation(onCreatePostForReceiver, {
         receiver: globalThis.myId,
       })
@@ -102,15 +102,16 @@ function FriendList() {
         //foreach users in conversation, if it's not myid and it's in friend list, update friend list, and push it to the top.
         //alternatively for message screen, for each user in message screen, if it's in conversation push it to the top. otherwise just put this conversation at the top of the list.
       },
+      error: error => console.warn(error)
     });
 
-    const friendSubscription = API.graphql(
+    const friendSubscription = API.graphql<GraphQLSubscription<{onAcceptedFriendship: Friendship}>>(
       graphqlOperation(onAcceptedFriendship)
     ).subscribe({
       next: async (event) => {
         console.log("friend subscription fired ");
 
-        const newFriend = event.value.data.onAcceptedFriendship;
+        const newFriend = event.value.data?.onAcceptedFriendship;
         //we can see all friend requests being accepted, so we just have to make sure it's one of ours.
         if (
           newFriend.sender === globalThis.myId ||
@@ -128,7 +129,7 @@ function FriendList() {
           console.log("Message Screen is unopened");
 
           backupConversation =
-            backupConversation.data.getConversationByUsers.items[0];
+            backupConversation.data?.getConversationByUsers.items[0];
           global.checkFriendshipMessage(backupConversation);
         }
 
@@ -146,13 +147,14 @@ function FriendList() {
           global.checkFriendshipConversation(conversation);
         }
       },
+      error: error => console.warn(error)
     });
 
-    const removedFriendSubscription = API.graphql(
+    const removedFriendSubscription = API.graphql<GraphQLSubscription<{onDeleteFriendship: Friendship}>>(
       graphqlOperation(onDeleteFriendship)
     ).subscribe({
       next: (event) => {
-        const deletedFriend = event.value.data.onDeleteFriendship; //check the security on this one. if possible, should only fire for the sender or receiver.
+        const deletedFriend = event.value.data?.onDeleteFriendship; //check the security on this one. if possible, should only fire for the sender or receiver.
         listRef.current.mutateData((currentFriends) => {
           const index = currentFriends.findIndex(
             (item) =>
@@ -168,6 +170,7 @@ function FriendList() {
           return currentFriends;
         });
       },
+      error: error => console.warn(error)
     });
   }, []);
 
@@ -192,12 +195,12 @@ function FriendList() {
       //console.log("looking for conversations: ", conversations);
       //returns an array of like objects or nulls corresponding with the array of conversations
       for (let i = 0; i < items.length; ++i) {
-        if (conversations.data.batchGetConversations[i] != null) {
+        if (conversations.data?.batchGetConversations[i] != null) {
           console.log("found conversation");
           items[i].lastMessage =
-            conversations.data.batchGetConversations[i].lastMessage;
+            conversations.data?.batchGetConversations[i].lastMessage;
           items[i].lastUser =
-            conversations.data.batchGetConversations[i].lastUser; //could also store the index of lastuser from the users array rather than the full string
+            conversations.data?.batchGetConversations[i].lastUser; //could also store the index of lastuser from the users array rather than the full string
         }
       }
       return items;
@@ -325,7 +328,7 @@ export default function FriendScreen() {
 
         console.log(newConversation);
 
-        if (newConversation.data.getConversation != null) {
+        if (newConversation.data?.getConversation != null) {
           await API.graphql(
             graphqlOperation(updateConversation, {
               input: { id: conversationId, Accepted: 1 },
@@ -365,7 +368,7 @@ export default function FriendScreen() {
 
     // Executes when a user receieves a friend request
     // listening for new friend requests
-    const friendRequestSubscription = API.graphql(
+    const friendRequestSubscription = API.graphql<GraphQLSubscription<{onCreateFriendRequestForReceiver: Friendship}>>(
       graphqlOperation(onCreateFriendRequestForReceiver, {
         receiver: globalThis.myId,
       })
@@ -375,7 +378,7 @@ export default function FriendScreen() {
 
         //console.log("is drawer open? ", isDrawerOpen.current);
         const newFriendRequest =
-          event.value.data.onCreateFriendRequestForReceiver;
+          event.value.data?.onCreateFriendRequestForReceiver;
         if (
           newFriendRequest.sender !== globalThis.myId &&
           newFriendRequest.receiver !== globalThis.myId
@@ -419,6 +422,7 @@ export default function FriendScreen() {
           ...currentFriendRequests,
         ]);
       },
+      error: error => console.warn(error)
     });
 
     return () => {

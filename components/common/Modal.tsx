@@ -6,7 +6,12 @@ interface Props {
   ref: React.ForwardedRef<unknown>
 }
 
-export default forwardRef(({ children} : Props , ref) => {
+export type ModalRefType = {
+  showModal: () => void;
+  hideModal: () => void;
+} | null;
+
+export default forwardRef(({children} : Props , ref) => {
   const [visible, setVisible] = useState(false);
 
   useImperativeHandle(ref, () => ({

@@ -1,3 +1,4 @@
+import API, { GraphQLQuery } from "@aws-amplify/api";
 import APIList from "@components/APIList";
 import IconButton from "@components/common/IconButton";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
@@ -24,7 +25,7 @@ import printTime from "@hooks/printTime";
 import { loadCapitals } from "@hooks/stringConversion";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { LookupScreenRouteProps } from "@stacks/MainStack";
-import { API, graphqlOperation } from "aws-amplify";
+import { graphqlOperation } from "aws-amplify";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -35,20 +36,25 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import { User } from "src/models";
 
 const LookupUser = () => {
   const [areMutualFriends, setAreMutualFriends] = useState();
   const [friendStatus, setFriendStatus] = useState("loading"); //can be either "received", "sent", "friends", or "none". don't misspell!
   const [friendsSince, setFriendsSince] = useState("");
+  const [user, setUser] = useState<User>();
   const listRef = useRef();
 
   const navigation = useNavigation();
-  const route = useRoute();
 
   //const [hifiveSent, setHifiveSent] = useState(false); //can be either "received", "sent", or "none". don't misspell!
   //const [hifives, setHifives] = useState(0);
 
   const {params: { userId }} = useRoute<LookupScreenRouteProps>();
+
+  //just get the whole user here via graphql query instead of passing the user as an object every time.
+  //the profileimageandname component as well as search screen can use a smaller version of the query that only picks out the name and image and status
+  //maybe this screen can grab the remaining fields. but would be a bit complicated
 
   let waitForFriend = "";
   let onUpdate = "";
@@ -79,13 +85,9 @@ const LookupUser = () => {
   const checkUsersInfo = async () => {
     try {
       //console("on the lookup screen, id is: ", userId);
-      const u = await API.graphql(graphqlOperation(getUser, { id: userId }));
+      const u = await API.graphql<GraphQLQuery<{getUser: User}>>(graphqlOperation(getUser, { id: userId }));
       //console(u.data.getUser);
-      if (u.data.getUser != null) {
-        ////console("this post is...", item.description, "and the author is...", user.data.getUser);
-        navigation.setParams({ user: u.data.getUser });
-        console.log(u.data.getUser);
-      }
+      setUser(u.data?.getUser);
 
       ////console("success, user is ", user);
     } catch (err) {

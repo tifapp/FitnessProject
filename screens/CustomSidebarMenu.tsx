@@ -1,4 +1,4 @@
-// @ts-nocheck
+import API, { GraphQLSubscription } from "@aws-amplify/api";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import {
   onAcceptedFriendship,
@@ -6,9 +6,10 @@ import {
   onCreatePostForReceiver
 } from "@graphql/subscriptions";
 import { useIsDrawerOpen } from "@react-navigation/drawer";
-import { API, Cache, graphqlOperation } from "aws-amplify";
+import { Cache, graphqlOperation } from "aws-amplify";
 import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaView, Text, TouchableOpacity, View } from "react-native";
+import { Post } from "src/models";
 import playSound from "../hooks/playSound";
 
 //import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,22 +17,19 @@ import playSound from "../hooks/playSound";
 global.localBlockList = [];
 
 export default function CustomSidebarMenu({
-  navigation,
+  navigation, //useNavigation hook does not work in sidebar
   state,
   progress,
-  myId,
 }) {
   const [lastOnlineTime, setLastOnlineTime] = useState(0);
   const [newFriendRequests, setNewFriendRequests] = useState(0); //should persist across sessions (ex. if you receive new friend requests while logged out)
   const [newConversations, setNewConversations] = useState(0); //should persist across sessions (ex. if you receive new friend requests while logged out)
 
-  const isDrawerOpen = useRef();
-  const currentNewFriendRequestCount = useRef();
-  const currentNewConversations = useRef();
+  const isDrawerOpen = useRef<boolean>();
+  const currentNewFriendRequestCount = useRef<number>(newFriendRequests);
+  const currentNewConversations = useRef<number>(newConversations);
 
   isDrawerOpen.current = useIsDrawerOpen();
-  currentNewFriendRequestCount.current = newFriendRequests;
-  currentNewConversations.current = newConversations;
 
   useEffect(() => {
     Cache.getItem("lastOnline", {
@@ -42,36 +40,40 @@ export default function CustomSidebarMenu({
       .then((time) => {
         setLastOnlineTime(time);
       });
-
-    const receivedConversationSubscription = API.graphql(
-      graphqlOperation(onCreatePostForReceiver, { receiver: myId })
-    ).subscribe({
+    
+    const receivedConversationSubscription = API.graphql<GraphQLSubscription<{ onCreatePostForReceiver: Post }>>
+    (graphqlOperation(onCreatePostForReceiver, {
+      receiver: globalThis.myId,
+    })).subscribe({
       next: (event) => {
-        const newPost = event.value.data.onCreatePostForReceiver;
+        //const newPost = event.value.data?.onCreatePostForReceiver;
 
         global.showNotificationDot();
         setNewConversations(currentNewConversations.current + 1);
-        //foreach users in conversation, if it's not myid and it's in friend list, update friend list, and push it to the top.
+        //foreach users in conversation, if it's not globalThis.myId and it's in friend list, update friend list, and push it to the top.
         //alternatively for message screen, for each user in message screen, if it's in conversation push it to the top. otherwise just put this conversation at the top of the list.
       },
+      error: error => console.warn(error)
     });
 
     // Executes when a user receieves a friend request
     // listening for new friend requests
-    const friendRequestSubscription = API.graphql(
-      graphqlOperation(onCreateFriendRequestForReceiver, { receiver: myId })
+    const friendRequestSubscription = API.graphql<GraphQLSubscription<{ onCreateFriendRequestForReceiver: Post }>>(
+      graphqlOperation(onCreateFriendRequestForReceiver, { receiver: globalThis.myId })
     ).subscribe({
       next: (event) => {
-        //increment notificaiton counter
+        global.showNotificationDot();
       },
+      error: error => console.warn(error)
     });
 
-    const friendSubscription = API.graphql(
+    const friendSubscription = API.graphql<GraphQLSubscription<{ onAcceptedFriendship: Post }>>(
       graphqlOperation(onAcceptedFriendship)
     ).subscribe({
       next: async (event) => {
-        //increment notification coutner
+        global.showNotificationDot();
       },
+      error: error => console.warn(error)
     });
 
     /*
@@ -132,7 +134,7 @@ export default function CustomSidebarMenu({
         <ProfileImageAndName
           navigationObject={navigation}
           navigateToProfile={false}
-          userId={myId}
+          userId={globalThis.myId}
           isFullSize={true}
           style={{ marginLeft: 15 }}
           textLayoutStyle={{ alignSelf: "center" }}
@@ -231,7 +233,7 @@ export default function CustomSidebarMenu({
           },
         ]}
         onPress={() => {
-          navigation.navigate("Settings", { myId: myId });
+          navigation.navigate("Settings");
         }}
       >
         <Text
@@ -259,7 +261,7 @@ export default function CustomSidebarMenu({
           },
         ]}
         onPress={() => {
-          navigation.navigate("My Groups", { myId: myId });
+          navigation.navigate("My Groups");
         }}
       >
         <Text

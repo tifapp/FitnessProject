@@ -1,26 +1,16 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
 import APIList, { APIListOperations } from "@components/APIList";
-import PostHeader from "@components/postComponents/PostHeader";
-import PostImage from "@components/PostImage";
 import { deletePost, updatePost } from "@graphql/mutations";
 import { likesByPost } from "@graphql/queries";
-import { useNavigation } from "@react-navigation/native";
 import React, { useRef, useState } from "react";
-import {
-  Alert,
-  Dimensions,
-  FlatList,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
-} from "react-native";
+import { Alert, Dimensions, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Like, Post } from "src/models";
 import IconButton from "./common/IconButton";
-import Modal from "./common/Modal";
+import Modal, { ModalRefType } from "./common/Modal";
 import CommentsModal from "./postComponents/CommentsModal";
 import LikesModal from "./postComponents/LikesModal";
+import PostHeader from "./postComponents/PostHeader";
+import PostImage from "./PostImage";
 import { ProfileImageAndName } from "./ProfileImageAndName";
 import TextWithTaggedUsers from "./TextWithTaggedUsers";
 
@@ -52,14 +42,17 @@ const deletePostAWS = async (createdAt: string) => {
 };
 
 interface Props {
-  item: Post,
+  item: Post & {taggedUsers: string[]; loading: boolean},
+  likes: number,
+  reportPost: (timestamp: string, author: string) => Promise<any>,
+  replyButtonHandler?: () => void,
   writtenByYou: boolean,
   isVisible: boolean,
   shouldSubscribe: boolean,
   operations: APIListOperations<Post>,
 }
 
-export default React.memo(function PostItem({
+const PostItem = ({
   item,
   writtenByYou,
   replyButtonHandler,
@@ -73,29 +66,17 @@ export default React.memo(function PostItem({
   //replies,
   //index,
   operations,
-} : Props) {
+} : Props) => {
   const {removeItem, replaceItem} = operations;
-  const likesModalRef = useRef();
-  const repliesModalRef = useRef();
+  const likesModalRef = useRef<ModalRefType>(null);
+  const repliesModalRef = useRef<ModalRefType>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState("");
-
-  //console.log(item.taggedUsers);
-
-  const navigation = useNavigation();
-
-  const goToProfile = (taggedUserId) => {
-    if (global.id === taggedUserId) {
-      navigation.navigate("Profile");
-    } else {
-      navigation.navigate("Lookup", { userId: taggedUserId });
-    }
-  };
   
   return (
     <View style={styles.secondaryContainerStyle}>
       <View
-        style={[styles.spaceAround, replyButtonHandler ?? styles.nestedReply]}
+        style={[styles.spaceAround, replyButtonHandler ? {} : styles.nestedReply]}
       >
         <PostHeader
           item={item}
@@ -140,7 +121,7 @@ export default React.memo(function PostItem({
               {item.description}
             </TextInput>
           ) : (
-            <TextWithTaggedUsers textInput={item.description}/>
+            <TextWithTaggedUsers textInput={item.description} taggedUsers={item.taggedUsers} urlPreview={item.urlPreview}/>
           )}
 
           <View
@@ -151,7 +132,7 @@ export default React.memo(function PostItem({
                 iconName={"report"}
                 size={20}
                 color={"gray"}
-                onPress={() => reportPost(item.createdAt, item.userId)}
+                onPress={() => {removeItem(), reportPost(item.createdAt, item.userId)}}
               />
             ) : null}
 
@@ -252,7 +233,7 @@ export default React.memo(function PostItem({
           <LikesModal item={item} />
         </Modal>
         <Modal ref={repliesModalRef}>
-          <CommentsModal item={item}/>
+          <CommentsModal item={item} operations={operations}/>
         </Modal>
       </View>
 
@@ -284,7 +265,9 @@ export default React.memo(function PostItem({
       ) : null}
     </View>
   );
-});
+};
+
+export default React.memo(PostItem);
 
 const styles = StyleSheet.create({
   secondaryContainerStyle: {

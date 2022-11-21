@@ -1,18 +1,17 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { ComponentProps } from "react";
-import { Text, TouchableOpacity } from "react-native";
+import { StyleProp, Text, TextStyle, TouchableOpacity, ViewStyle } from "react-native";
 
 interface Props {
   onPress: () => void,
-  iconName: string,
-  color: string,
-  style: Object,
-  label: string,
-  size: number,
-  margin: number,
-  isLabelFirst: boolean,
-  fontSize: number,
-  fontWeight: string,
+  iconName: ComponentProps<typeof MaterialIcons>['name'],
+  color?: string,
+  style?: StyleProp<ViewStyle>,
+  label?: string,
+  size?: number,
+  margin?: number,
+  isLabelFirst?: boolean,
+  textStyle?: StyleProp<TextStyle>,
 }
 
 export default function IconButton({
@@ -24,8 +23,7 @@ export default function IconButton({
   size,
   margin = 6,
   isLabelFirst = false,
-  fontSize = 14,
-  fontWeight = "normal",
+  textStyle,
 } : Props) {
   return (
     <TouchableOpacity
@@ -41,21 +39,21 @@ export default function IconButton({
       {label ? (
         <Text
           style={[
-            // @ts-ignore
             {
-              fontWeight: fontWeight,
+              fontWeight: "normal",
               color: color,
-              fontSize: fontSize,
+              fontSize: 14,
             },
             isLabelFirst
               ? { marginRight: margin ?? 5 }
               : { marginLeft: margin ?? 5 },
+            textStyle
           ]}
         >
           {label}
         </Text>
       ) : null}
-      <MaterialIcons name={iconName as ComponentProps<typeof MaterialIcons>['name']} size={size ?? 17} color={color} />
+      <MaterialIcons name={iconName} size={size ?? 17} color={color} />
     </TouchableOpacity>
   );
 }

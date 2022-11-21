@@ -6,28 +6,66 @@ import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Image,
-  Text,
-  TouchableOpacity,
-  View
+  Image, ImageStyle, StyleProp,
+  Text, TextStyle, TouchableOpacity,
+  View,
+  ViewStyle
 } from "react-native";
 
 // @ts-ignore
 global.savedUsers = {}; // Does this global variable get initialized when the app loads or when this component first gets rendered
 //objects will look like {name: [name], imageURL: [imageURL], isFullSize: [bool]}
 
-export const ProfileImageAndName = React.memo(function ({userId = globalThis.myId, ...props}) {
-  const [userInfo, setUserInfo] = useState(); //an object containing the name and imageurl
+interface Props {
+  userId?: string;
+  isFullSize?: boolean;
+  hideAll?: boolean;
+  hideName?: boolean;
+  vertical?: boolean;
+  spaceAfterName?: boolean;
+  nameComponent: React.ReactNode;
+  subtitleComponent: React.ReactNode;
+  imageOverlay: React.ReactNode;
+  onPress: (imageURL?: string) => void;
+  imageSize?: number;
+  imageStyle?: StyleProp<ImageStyle>;
+  navigationObject: any;
+  margin?: number;
+  style?: StyleProp<ViewStyle>;
+  textLayoutStyle?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
+}
+
+const component = ({
+  userId = globalThis.myId,
+  isFullSize,
+  hideAll,
+  hideName,
+  nameComponent,
+  subtitleComponent,
+  imageOverlay,
+  textLayoutStyle,
+  textStyle,
+  vertical,
+  onPress,
+  imageSize,
+  imageStyle,
+  navigationObject,
+  margin,
+  style,
+  spaceAfterName,
+}: Props) => {
+  const [userInfo, setUserInfo] = useState<{name: string; imageURL: string; isFullSize: boolean; status: keyof typeof StatusColors; isVerified?: boolean}>();
 
   useEffect(() => {
     console.log(
       "are we fetching the full size? ",
       !global.savedUsers[userId] ||
-        (!!props.isFullSize && !global.savedUsers[userId].isFullSize)
+        (!!isFullSize && !global.savedUsers[userId].isFullSize)
     );
     if (
       !global.savedUsers[userId] ||
-      (!!props.isFullSize && !global.savedUsers[userId].isFullSize)
+      (!!isFullSize && !global.savedUsers[userId].isFullSize)
     ) {
       (async () => {
         try {
@@ -36,7 +74,7 @@ export const ProfileImageAndName = React.memo(function ({userId = globalThis.myI
           );
           const profileimageurl = await fetchProfileImageAsync(
             identityId,
-            props.isFullSize
+            isFullSize
           );
 
           Image.getSize(
@@ -44,9 +82,9 @@ export const ProfileImageAndName = React.memo(function ({userId = globalThis.myI
             () => {
               //if (mounted) {
               global.savedUsers[userId] = {
-                name: name,
+                name,
                 imageURL: profileimageurl,
-                isFullSize: props.isFullSize,
+                isFullSize,
                 status: status,
                 isVerified: isVerified,
               };
@@ -58,9 +96,9 @@ export const ProfileImageAndName = React.memo(function ({userId = globalThis.myI
             (err) => {
               //console.log("couldn't find user's profile image");
               global.savedUsers[userId] = {
-                name: name,
+                name,
                 imageURL: "",
-                isFullSize: props.isFullSize,
+                isFullSize,
                 status: status,
                 isVerified: isVerified,
               }; //use DPI to figure out what resolution we should save at
@@ -81,32 +119,31 @@ export const ProfileImageAndName = React.memo(function ({userId = globalThis.myI
     setUserInfo(global.savedUsers[userId]);
   }, [global.savedUsers[userId]]);
 
-  const navigation = props.navigationObject ?? useNavigation();
+  const navigation = navigationObject ?? useNavigation();
 
   const goToProfile = () => {
     if (globalThis.myId === userId) navigation.navigate("Profile");
-    else if (navigation.push)
-      navigation.push("Lookup", { userId: userId });
+    else if (navigation.push) navigation.push("Lookup", { userId: userId });
     else navigation.navigate("Lookup", { userId: userId });
   };
 
-  if (props.hideall) {
+  if (hideAll) {
     return null;
   } else {
     return (
       <TouchableOpacity
         style={[
           {
-            flexDirection: props.vertical ? "column" : "row",
+            flexDirection: vertical ? "column" : "row",
             justifyContent: "flex-start",
             alignItems: "stretch",
           },
-          props.style,
+          style,
         ]}
         onPress={
-          props.onPress
+          onPress
             ? () => {
-                props.onPress(userInfo.imageURL);
+                onPress(userInfo?.imageURL);
               }
             : goToProfile
         }
@@ -116,13 +153,13 @@ export const ProfileImageAndName = React.memo(function ({userId = globalThis.myI
             {
               // onError={addUserInfotoCache}
               resizeMode: "cover",
-              width: props.imageSize ?? 45,
-              height: props.imageSize ?? 45,
-              marginRight: !props.vertical ? props.margin ?? 15 : 0,
-              marginBottom: props.vertical ? props.margin ?? 15 : 0,
+              width: imageSize ?? 45,
+              height: imageSize ?? 45,
+              marginRight: !vertical ? margin ?? 15 : 0,
+              marginBottom: vertical ? margin ?? 15 : 0,
               alignSelf: "flex-start",
             },
-            props.imageStyle,
+            imageStyle,
           ]}
           source={
             userInfo == null || userInfo.imageURL === ""
@@ -130,7 +167,7 @@ export const ProfileImageAndName = React.memo(function ({userId = globalThis.myI
               : { uri: userInfo.imageURL }
           }
         />
-        {props.imageOverlay}
+        {imageOverlay}
         {userInfo == null ? (
           <View
             style={{
@@ -146,25 +183,28 @@ export const ProfileImageAndName = React.memo(function ({userId = globalThis.myI
             <ActivityIndicator color="#26c6a2" />
           </View>
         ) : null}
-        {props.hidename ? null : (
+        {hideName ? null : (
           <View
             style={[
               { justifyContent: "space-between" },
-              props.vertical ? { alignItems: "center" } : {},
-              props.textLayoutStyle,
+              vertical ? { alignItems: "center" } : {},
+              textLayoutStyle,
             ]}
           >
+            {
+              //instead we may consider replacing this whole section with an optional component that takes in the user's name as an argument/prop. the default behavior would be a simple text component.
+            }
             <Text
               onPress={
-                props.onPress
+                onPress
                   ? () => {
-                      props.onPress(userInfo.imageURL);
+                      onPress(userInfo?.imageURL);
                     }
                   : goToProfile
               }
-              style={[props.textStyle, { flexWrap: "wrap" }]}
+              style={[textStyle, { flexWrap: "wrap" }]}
             >
-              {!props.isFullSize && userInfo && userInfo.status ? (
+              {!isFullSize && userInfo && userInfo.status ? (
                 <MaterialIcons
                   name={userInfo.isVerified ? "check-circle" : "circle"}
                   size={10}
@@ -175,18 +215,20 @@ export const ProfileImageAndName = React.memo(function ({userId = globalThis.myI
                   }
                 />
               ) : null}
-              {!props.isFullSize && userInfo && userInfo.status ? " " : null}
+              {!isFullSize && userInfo && userInfo.status ? " " : null}
               {userInfo != null && userInfo.name
                 ? userInfo.isFullSize || userInfo.name.length <= 40
-                  ? userInfo.name + (props.spaceAfterName ? " " : "")
+                  ? userInfo.name + (spaceAfterName ? " " : "")
                   : userInfo.name.substring(0, 40)
                 : "Loading..."}
-              {props.nameComponent}
+              {nameComponent}
             </Text>
-            {props.subtitleComponent}
+            {subtitleComponent}
           </View>
         )}
       </TouchableOpacity>
     );
   }
-});
+}
+
+export const ProfileImageAndName = React.memo(component);

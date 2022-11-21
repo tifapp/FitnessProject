@@ -1,17 +1,20 @@
+import { APIListOperations } from "@components/APIList";
 import PostItem from "@components/PostItem";
 import SHA256 from "@hooks/hash";
 import { useNavigation } from "@react-navigation/native";
 import FeedScreen from "@screens/FeedScreen";
 import React from "react";
 import { View } from "react-native";
+import { Post } from "src/models";
 import ElevatedView from "../common/ElevatedView";
 import IconButton from "../common/IconButton";
 
 interface Props {
-  item: {userId: string, createdAt: string}
+  item: Post;
+  operations: APIListOperations<Post>;
 }
 
-export default function CommentsModal({ item } : Props) {
+export default function CommentsModal({ item, operations } : Props) {
   const navigation = useNavigation();
   return (
     <>
@@ -47,6 +50,7 @@ export default function CommentsModal({ item } : Props) {
       <FeedScreen
         headerComponent={<PostItem
           item={item}
+          operations={operations}
           //deletePostsAsync={deletePostsAsync}
           writtenByYou={item.userId === globalThis.myId}
           //editButtonHandler={updatePostAsync} deleting a post while on the reply screen?
@@ -56,15 +60,9 @@ export default function CommentsModal({ item } : Props) {
           isVisible={false}
           shouldSubscribe={true} />}
         autoFocus={true}
-        navigation={navigation}
         channel={SHA256(item.userId + item.createdAt)} //unique id
         originalParentId={item.createdAt + "#" + item.userId} 
         footerComponent={undefined} 
-        Accepted={undefined} 
-        lastUser={undefined} 
-        sidebar={undefined} 
-        myId={undefined} 
-        id={undefined} 
         isFocused={undefined} 
         style={undefined} 
         postButtonLabel={undefined} 

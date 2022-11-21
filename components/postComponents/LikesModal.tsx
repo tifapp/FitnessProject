@@ -5,7 +5,6 @@ import React from "react";
 import { View } from "react-native";
 
 interface Props {
-  likes: number,
   item: {userId: string, createdAt: string}
 }
 

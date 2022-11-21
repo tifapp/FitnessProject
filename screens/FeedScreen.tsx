@@ -31,9 +31,7 @@ import {
   Alert,
   Animated,
   FlatList,
-  Image,
-  KeyboardAvoidingView, Platform,
-  ScrollView,
+  Image, KeyboardAvoidingView, Platform, ScrollView,
   StyleProp, StyleSheet, Text,
   View,
   ViewStyle
@@ -67,7 +65,7 @@ interface Props {
   style?: StyleProp<ViewStyle>;
   autoFocus?: boolean;
   isChallenge?: boolean;
-  onPostAdded?: () => void;
+  onPostAdded?: (newPost: Post) => void;
 }
 
 export default function FeedScreen({
@@ -121,6 +119,7 @@ export default function FeedScreen({
             post.createdAt === newPost.createdAt
         );
       },
+      error: error => console.warn(error),
     });
 
     const deletePostSubscription = API.graphql<GraphQLSubscription<{onDeletePostFromChannel: Post}>>(
@@ -135,6 +134,7 @@ export default function FeedScreen({
             post.createdAt === deletedPost.createdAt
         );
       },
+      error: error => console.warn(error),
     });
     const updatePostSubscription = API.graphql<GraphQLSubscription<{onUpdatePostFromChannel: Post}>>(
       graphqlOperation(onUpdatePostFromChannel, { channel: channel })
@@ -143,6 +143,7 @@ export default function FeedScreen({
       next: (event) => {
         //console.log("post has been updated");
       },
+      error: error => console.warn(error),
     });
     checkInternetConnection();
     return () => {
@@ -247,10 +248,6 @@ export default function FeedScreen({
   };
 
   const reportPost = async (timestamp: string, author: string) => {
-    listRef.current?.removeItem(
-      (post) => post.createdAt === timestamp && post.userId === author
-    );
-
     try {
       await API.graphql(
         graphqlOperation(createReport, {
@@ -265,9 +262,9 @@ export default function FeedScreen({
     }
   };
 
-  const scrollToTop = () => {
-    scrollRef.current?.scrollToOffset({ offset: 0, animated: true });
-  };
+  // const scrollToTop = () => {
+  //   scrollRef.current?.scrollToOffset({ offset: 0, animated: true });
+  // };
 
   const renderPostItem: APIListRenderItemInfo<Post> = ({ item, index }, operations) => {
     if (item.loading)
@@ -365,7 +362,11 @@ export default function FeedScreen({
             style={{ flex: 1 }}
           >
             <PostInputField
-              onPostAdded={onPostAdded}
+              onPostAdded={(newPost: Post) => {listRef.current?.addItem({...newPost, 
+              userId: globalThis.myId,
+              createdAt: "null",
+              loading: true,
+            }); onPostAdded?.(newPost);}}
               channel={channel}
               originalParentId={originalParentId}
               autoFocus={autoFocus}
@@ -439,13 +440,6 @@ function PostInputField({
       channel: channel,
       parentId: originalParentId ?? undefined,
       taggedUsers,
-    };
-    
-    const localNewPost = {
-      ...newPost,
-      userId: globalThis.myId,
-      createdAt: "null",
-      loading: true,
     };
 
     setTaggedUsers([]);
