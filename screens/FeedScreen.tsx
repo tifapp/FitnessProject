@@ -19,7 +19,7 @@ import NetInfo from "@react-native-community/netinfo";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 // Get the aws resources configuration parameters
 import API, { GraphQLSubscription } from "@aws-amplify/api";
-import { graphqlOperation, Storage } from "aws-amplify";
+import { Cache, graphqlOperation, Storage } from "aws-amplify";
 import { Progress } from "aws-sdk/lib/request";
 import { Video } from "expo-av";
 import * as ImageManipulator from "expo-image-manipulator";
@@ -381,6 +381,7 @@ export default function FeedScreen({
       additionalAmount={7} //change number based on device specs
       processingFunction={getLikedPosts}
       queryOperation={isChallenge ? postsByLikes : postsByChannel}
+      queryOperationName={isChallenge ? "postsByLikes" : "postsByChannel"}
       filter={{ channel: channel, sortDirection: "DESC" }}
       renderItem={renderPostItem}
       keyExtractor={(item) => item.createdAt.toString() + item.userId}
