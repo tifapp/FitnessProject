@@ -1,42 +1,44 @@
 {
-  "compilerOptions": {
-    "jsx": "react-native",
-    "baseUrl": ".",
-    "module": "esnext",
-    "target": "esnext",
-    "lib": [
-      "esnext"
-    ],
-    "checkJs": true,
-    "allowJs": true,
-    "skipLibCheck": true,
-    "noEmit": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "plugins": [],
-    "paths": {
-      "@screens/*": [
-        "./screens/*"
-      ],
-      "@components/*": [
-        "./components/*"
-      ],
-      "@stacks/*": [
-        "./stacks/*"
-      ],
-      "@hooks/*": [
-        "./hooks/*"
-      ],
-      "@assets/*": [
-        "./assets/*"
-      ],
-      "@graphql/*": [
-        "./src/graphql/*"
-      ],
+    "compilerOptions": {
+        "jsx": "react-native",
+        "baseUrl": ".",
+        "module": "esnext",
+        "target": "esnext",
+        "lib": [
+            "esnext"
+        ],
+        "checkJs": true,
+        "allowJs": true,
+        "skipLibCheck": true,
+        "noEmit": true,
+        "noImplicitAny": true,
+        "allowSyntheticDefaultImports": true,
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+        "strictNullChecks": true,
+        "plugins": [],
+        "paths": {
+            "@screens/*": [
+                "./screens/*"
+            ],
+            "@components/*": [
+                "./components/*"
+            ],
+            "@stacks/*": [
+                "./stacks/*"
+            ],
+            "@hooks/*": [
+                "./hooks/*"
+            ],
+            "@assets/*": [
+                "./assets/*"
+            ],
+            "@graphql/*": [
+                "./src/graphql/*"
+            ]
+        }
     },
-  },
   "extends": "expo/tsconfig.base",
   "exclude": [ "node_modules", "amplify/#current-cloud-backend", "dist" ],
 }
