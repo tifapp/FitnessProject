@@ -38,5 +38,5 @@
     },
   },
   "extends": "expo/tsconfig.base",
-  "exclude": [ "node_modules", "amplify/#current-cloud-backend" ],
+  "exclude": [ "node_modules", "amplify/#current-cloud-backend", "dist" ],
 }
