@@ -12,10 +12,7 @@ import {
   ViewStyle
 } from "react-native";
 
-// @ts-ignore
-global.savedUsers = {}; // Does this global variable get initialized when the app loads or when this component first gets rendered
-//objects will look like {name: [name], imageURL: [imageURL], isFullSize: [bool]}
-
+globalThis.savedUsers = {};
 interface Props {
   userId?: string;
   isFullSize?: boolean;
@@ -23,13 +20,13 @@ interface Props {
   hideName?: boolean;
   vertical?: boolean;
   spaceAfterName?: boolean;
-  nameComponent: React.ReactNode;
-  subtitleComponent: React.ReactNode;
-  imageOverlay: React.ReactNode;
-  onPress: (imageURL?: string) => void;
+  nameComponent?: React.ReactNode;
+  subtitleComponent?: React.ReactNode;
+  imageOverlay?: React.ReactNode;
+  onPress?: (imageURL?: string | null) => void;
   imageSize?: number;
   imageStyle?: StyleProp<ImageStyle>;
-  navigationObject: any;
+  navigationObject?: any;
   margin?: number;
   style?: StyleProp<ViewStyle>;
   textLayoutStyle?: StyleProp<ViewStyle>;
@@ -55,21 +52,16 @@ const component = ({
   style,
   spaceAfterName,
 }: Props) => {
-  const [userInfo, setUserInfo] = useState<{name: string; imageURL: string; isFullSize: boolean; status: keyof typeof StatusColors; isVerified?: boolean}>();
+  const [userInfo, setUserInfo] = useState<typeof globalThis.savedUsers[keyof typeof globalThis.savedUsers]>();
 
-  useEffect(() => {
-    console.log(
-      "are we fetching the full size? ",
-      !global.savedUsers[userId] ||
-        (!!isFullSize && !global.savedUsers[userId].isFullSize)
-    );
+  useEffect(() => {    
     if (
-      !global.savedUsers[userId] ||
-      (!!isFullSize && !global.savedUsers[userId].isFullSize)
+      !globalThis.savedUsers?.[userId] ||
+      (!!isFullSize && !globalThis.savedUsers?.[userId]?.isFullSize)
     ) {
       (async () => {
         try {
-          const { name, identityId, status, isVerified } = await fetchUserAsync(
+          const { name, identityId } = await fetchUserAsync(
             userId
           );
           const profileimageurl = await fetchProfileImageAsync(
@@ -81,30 +73,26 @@ const component = ({
             profileimageurl,
             () => {
               //if (mounted) {
-              global.savedUsers[userId] = {
-                name,
+              globalThis.savedUsers[userId] = {
+                ...globalThis.savedUsers[userId],
                 imageURL: profileimageurl,
                 isFullSize,
-                status: status,
-                isVerified: isVerified,
               };
               //console.log("saved profileimageandname to local cache, should update")
               //will this trigger the second use effect or will we have to do this again?
-              setUserInfo(global.savedUsers[userId]);
+              setUserInfo(globalThis.savedUsers[userId]);
               //}
             },
             (err) => {
               //console.log("couldn't find user's profile image");
-              global.savedUsers[userId] = {
-                name,
+              globalThis.savedUsers[userId] = {
+                ...globalThis.savedUsers[userId],
                 imageURL: "",
                 isFullSize,
-                status: status,
-                isVerified: isVerified,
               }; //use DPI to figure out what resolution we should save at
               //console.log("saved profileimageandname to local cache, should update")
               //will this trigger the second use effect or will we have to do this again?
-              setUserInfo(global.savedUsers[userId]);
+              setUserInfo(globalThis.savedUsers[userId]);
             }
           );
         } catch (e) {
@@ -116,8 +104,8 @@ const component = ({
 
   useEffect(() => {
     //console.log("updating profileimageandname")
-    setUserInfo(global.savedUsers[userId]);
-  }, [global.savedUsers[userId]]);
+    setUserInfo(globalThis.savedUsers?.[userId]);
+  }, [globalThis.savedUsers?.[userId]]);
 
   const navigation = navigationObject ?? useNavigation();
 
@@ -211,7 +199,7 @@ const component = ({
                   color={
                     userInfo.isVerified
                       ? "black"
-                      : StatusColors[userInfo.status]
+                      : StatusColors[userInfo.status as keyof typeof StatusColors]
                   }
                 />
               ) : null}

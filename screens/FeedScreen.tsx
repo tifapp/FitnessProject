@@ -401,7 +401,7 @@ function PostInputField({
   const [pickFromGallery, pickFromCamera] = usePhotos(!isChallenge, true);
   const [postInput, setPostInput] = useState<string>("");
   const [text, setText] = useState<string>("");
-  const [imageURL, setImageURL] = useState<string | null>(null);
+  const [imagePartialURL, setImagePartialURL] = useState<string | null>(null);
   const [isVideo, setIsVideo] = useState(null);
   const [postIsLoading, setPostIsLoading] = useState(false);
   const [progress, setProgress] = useState<number>(0);
@@ -429,25 +429,27 @@ function PostInputField({
 
     const imageID = SHA256(Date.now().toString());
     
-    if (imageURL !== null) {
+    let imageURL;
+    let videoExtension;
+    if (imagePartialURL !== null) {
       const re = /(?:\.([^.]+))?$/;
-      const videoExtension = re.exec(imageURL)?.[1];
+      videoExtension = re.exec(imagePartialURL)?.[1];
 
-      newPost.imageURL = `${imageID}.${isVideo ? videoExtension : "jpg"}`;
+      imageURL = `${imageID}.${isVideo ? videoExtension : "jpg"}`;
     }
 
-    const newPost: Partial<Post> = {
+    let newPost: Partial<Post> & {taggedUsers?: string[]} = {
       description: postInput,
       channel: channel,
       parentId: originalParentId ?? undefined,
       taggedUsers,
+      imageURL,
     };
 
     setTaggedUsers([]);
     setPostInput("");
     setText("");
 
-    //LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     //pushLocalPost(localNewPost);
 
     //if (global.updatemessagescreen)
@@ -457,27 +459,24 @@ function PostInputField({
 
     try {
       //first, we must upload the image if any
-      if (imageURL !== null) {
+      if (imagePartialURL) {
         let blob;
         if (!isVideo) {
           const resizedPhoto = await ImageManipulator.manipulateAsync(
-            imageURL,
+            imagePartialURL,
             [{ resize: { width: 500 } }],
             { compress: 1, format: SaveFormat.JPEG }
           );
           const response = await fetch(resizedPhoto.uri);
           blob = await response.blob();
         } else {
-          const response = await fetch(imageURL);
+          const response = await fetch(imagePartialURL);
           blob = await response.blob();
         }
 
-        //scan the uri and check filetype. maybe console log the uri first
-        const re = /(?:\.([^.]+))?$/;
-        const videoExtension = re.exec(imageURL)?.[1];
         setProgress(0.01);
         await Storage.put(
-          `feed/${imageID}.${isVideo ? videoExtension : "jpg"}`,
+          `feed/${imageURL}`,
           blob,
           {
             progressCallback(progress: Progress) {
@@ -489,7 +488,7 @@ function PostInputField({
           }
         ); //make sure people can't overwrite other people's photos, and preferrably not be able to list all the photos in s3 using brute force. may need security on s3
         setProgress(0);
-        setImageURL(null);
+        setImagePartialURL(null);
       }
 
       onPostAdded?.(newPost); //should go before or after api operation?
@@ -504,18 +503,14 @@ function PostInputField({
 
   return (
     <View>
-      {
-        //headerComponent
-      }
-
-      {imageURL !== null ? (
+      {imagePartialURL !== null ? (
         isVideo ? (
           <Video
             style={styles.postVideo} //check if this should be an image or a video?
             useNativeControls
             isLooping
             shouldPlay
-            source={{ uri: imageURL }} //need a way to delete the image too
+            source={{ uri: imagePartialURL }} //need a way to delete the image too
             posterSource={require("../assets/icon.png")}
           />
         ) : (
@@ -526,7 +521,7 @@ function PostInputField({
               height: 450,
               alignSelf: "center",
             }} //check if this should be an image or a video?
-            source={{ uri: imageURL }} //need a way to delete the image too
+            source={{ uri: imagePartialURL }} //need a way to delete the image too
           />
         )
       ) : null}
@@ -589,35 +584,35 @@ function PostInputField({
           <IconButton
             iconName={"insert-photo"}
             size={20}
-            color={imageURL === null || postIsLoading ? "gray" : "blue"}
+            color={imagePartialURL === null || postIsLoading ? "gray" : "blue"}
             style={{ marginRight: 6 }}
-            onPress={() => pickFromGallery(setImageURL, null, setIsVideo)}
+            onPress={() => pickFromGallery(setImagePartialURL, null, setIsVideo)}
           />
           <IconButton
             iconName={"camera-alt"}
             size={20}
             style={{ marginRight: 6 }}
-            color={imageURL === null || postIsLoading ? "gray" : "blue"}
-            onPress={() => pickFromCamera(setImageURL, null, setIsVideo)}
+            color={imagePartialURL === null || postIsLoading ? "gray" : "blue"}
+            onPress={() => pickFromCamera(setImagePartialURL, null, setIsVideo)}
           />
-          {imageURL != null ? (
+          {imagePartialURL != null ? (
             <IconButton
               iconName={"close"}
               size={20}
-              color={imageURL === null || postIsLoading ? "gray" : "blue"}
-              onPress={() => setImageURL(null)}
+              color={imagePartialURL === null || postIsLoading ? "gray" : "blue"}
+              onPress={() => setImagePartialURL(null)}
             />
           ) : null}
         </View>
         <IconButton
           iconName={
-            (postInput === "" && imageURL === null) || postIsLoading
+            (postInput === "" && imagePartialURL === null) || postIsLoading
               ? "add-circle-outline"
               : "add-circle"
           }
           size={15}
           color={
-            (postInput === "" && imageURL === null) || postIsLoading
+            (postInput === "" && imagePartialURL === null) || postIsLoading
               ? "gray"
               : "blue"
           }
@@ -627,7 +622,7 @@ function PostInputField({
               ? () => {
                   Alert.alert("Currently uploading a post");
                 }
-              : postInput === "" && imageURL === null
+              : postInput === "" && imagePartialURL === null
               ? () => {
                   Alert.alert("No text detected in text field");
                 }

@@ -42,7 +42,7 @@ const deletePostAWS = async (createdAt: string) => {
 };
 
 interface Props {
-  item: Post & {taggedUsers: string[]; loading: boolean},
+  item: Post & {taggedUsers: string[]; loading: boolean; likedByYou: boolean},
   likes: number,
   reportPost: (timestamp: string, author: string) => Promise<any>,
   replyButtonHandler?: () => void,
@@ -98,7 +98,7 @@ const PostItem = ({
             alignSelf: "center",
             marginBottom: 15,
           }}
-          imageID={item.imageURL}
+          filename={item.imageURL}
           isVisible={
             isVisible
             // && !areRepliesVisible

@@ -4,6 +4,13 @@ export declare global {
   function showNotificationDot() : void
   function hideNotificationDot() : void
   var localBlockList: Block[]
-  var savedUsers : Record<string, {name: string, imageURL: string, isFullSize: boolean}>
   var addConversationIds: (s : string) => void
+  var currentVideo: string | null | undefined
+  var savedUsers : Record<string, {
+    name: string,
+    imageURL?: string | null,
+    isFullSize?: boolean,
+    status?: string | null,
+    isVerified: boolean,
+  }>;
 }
