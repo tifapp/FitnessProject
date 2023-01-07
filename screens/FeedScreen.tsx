@@ -26,7 +26,6 @@ import { SaveFormat } from "expo-image-manipulator";
 import { getLinkPreview } from "link-preview-js";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   Animated,
   FlatList,
@@ -224,20 +223,20 @@ export default function FeedScreen({
   // };
 
   const renderPostItem: APIListRenderItemInfo<Post> = ({ item, index }, operations) => {
-    if (index === 0 && addedNewPost)
-      return (
-        <ActivityIndicator
-          size="large"
-          color="#000000"
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            flexDirection: "row",
-            padding: 20,
-          }}
-        />
-      );
-    else
+    // if (index === 0 && addedNewPost)
+    //   return (
+    //     <ActivityIndicator
+    //       size="large"
+    //       color="#000000"
+    //       style={{
+    //         flex: 1,
+    //         justifyContent: "center",
+    //         flexDirection: "row",
+    //         padding: 20,
+    //       }}
+    //     />
+    //   );
+    // else
       return (
         <PostItem
           //index={index}
