@@ -42,13 +42,13 @@ const deletePostAWS = async (createdAt: string) => {
 };
 
 interface Props {
-  item: Post & {taggedUsers: string[]; loading: boolean; likedByYou: boolean},
+  item: Post & {taggedUsers?: string[]; likedByYou?: boolean},
   likes: number,
   reportPost: (timestamp: string, author: string) => Promise<any>,
   replyButtonHandler?: () => void,
   writtenByYou: boolean,
-  isVisible: boolean,
-  shouldSubscribe: boolean,
+  isVisible?: boolean,
+  shouldSubscribe?: boolean,
   operations: APIListOperations<Post>,
 }
 
@@ -83,7 +83,6 @@ const PostItem = ({
           writtenByYou={writtenByYou}
           toggleEditing={() => setIsEditing(!isEditing)}
           repliesPressed={() => {
-            console.log("Inside the function");
             repliesModalRef.current?.showModal();
           }}
           reportPost={reportPost}

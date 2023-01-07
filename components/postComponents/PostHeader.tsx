@@ -1,5 +1,7 @@
+import API, { graphqlOperation } from "@aws-amplify/api";
 import LikeButton from "@components/postComponents/LikeButton";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
+import { onDecrementLikes, onDecrementReplies, onIncrementLikes, onIncrementReplies } from "@graphql/subscriptions";
 import printTime from "@hooks/printTime";
 import React, { useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
