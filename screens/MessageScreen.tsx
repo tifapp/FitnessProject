@@ -1,41 +1,31 @@
-// @ts-nocheck
 import AcceptMessageButtons from "@components/AcceptMessageButtons";
-import MessageItem from "@components/MessageItem";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import {
-  createConversation,
-  deleteConversation,
-  updateConversation,
+  createConversation, updateConversation
 } from "@graphql/mutations";
 import {
-  getBlock,
   getConversation,
-  getFriendship,
-  getUser,
+  getFriendship
 } from "@graphql/queries";
-import { onDeleteConversation } from "@graphql/subscriptions";
+import { useNavigation, useRoute } from "@react-navigation/native";
 // Get the aws resources configuration parameters
 import FeedScreen from "@screens/FeedScreen";
 import { API, graphqlOperation } from "aws-amplify";
 import React, { useCallback, useEffect, useState } from "react";
 import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
-//const { width } = Dimensions.get('window');
 
-export default function MessageScreen({ navigation, route }) {
-  //console.log(red);
-  const { userId } = route.params;
-  const { lastUser, id } = route.params;
+export default function MessageScreen() {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { lastUser, conversationId } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [blocked, setBlocked] = useState(false);
 
   const [isFocused, setIsFocused] = useState(false);
 
-  //console.log("Here is the user!");
-  //console.log(userId);
-
   useEffect(() => {
-    const friendlistarray = [route.params?.myId, userId].sort();
+    const friendlistarray = [globalThis.myId, conversationId].sort();
 
     (async () => {
       const convo = await API.graphql(
@@ -46,65 +36,64 @@ export default function MessageScreen({ navigation, route }) {
     })();
 
     const onFocus = navigation.addListener("focus", () => {
-      //console.log("got to settings", global.localBlockList);
       setIsFocused(true);
     });
 
     const onBlur = navigation.addListener("blur", () => {
-      //console.log("got to settings", global.localBlockList);
       setIsFocused(false);
     });
 
     // Return the function to unsubscribe from the event so it gets removed on unmount
-    return onFocus, onBlur;
+    //return onFocus, onBlur;
   }, []);
 
+  //Adding this loading check makes the screen more obtuse/prone to breaking. There should be some global check or subscription that applies to all screens that deletes the user from your local app if they get removed.
   useEffect(() => {
-    navigation.setOptions({ title: global.savedUsers[userId].name });
+    navigation.setOptions({ title: globalThis.savedUsers[conversationId].name });
 
-    (async () => {
-      let user = await API.graphql(
-        graphqlOperation(getUser, {
-          id: userId,
-        })
-      );
-      if (user.data.getUser == null) {
-        await API.graphql(
-          graphqlOperation(deleteConversation, {
-            input: { id: id },
-          })
-        );
+  //   (async () => {
+  //     let user = await API.graphql(
+  //       graphqlOperation(getUser, {
+  //         id: conversationId,
+  //       })
+  //     );
+  //     if (user.data?.getUser == null) {
+  //       await API.graphql(
+  //         graphqlOperation(deleteConversation, {
+  //           input: { id: id },
+  //         })
+  //       );
 
-        navigation.goBack();
-      }
+  //       navigation.goBack();
+  //     }
 
-      let block = await API.graphql(
-        graphqlOperation(getBlock, {
-          userId: userId,
-          blockee: route.params?.myId,
-        })
-      );
-      if (block.data.getBlock != null) {
-        setBlocked(true);
-      }
+  //     let block = await API.graphql(
+  //       graphqlOperation(getBlock, {
+  //         userId: conversationId,
+  //         blockee: globalThis.myId,
+  //       })
+  //     );
+  //     if (block.data?.getBlock != null) {
+  //       setBlocked(true);
+  //     }
 
-      setIsLoading(false);
-    })();
+  //     setIsLoading(false);
+  //   })();
 
-    try {
-      let conversationFromUsers = [route.params?.myId, userId];
-      conversationFromUsers.sort();
+  //   try {
+  //     let conversationFromUsers = [globalThis.myId, conversationId];
+  //     conversationFromUsers.sort();
 
-      API.graphql(
-        graphqlOperation(onDeleteConversation, { users: conversationFromUsers })
-      ).subscribe({
-        next: (event) => {
-          navigation.navigate("Conversations");
-        },
-      });
-    } catch (err) {
-      console.log("Error in the delete conversation subscription", err);
-    }
+  //     API.graphql(
+  //       graphqlOperation(onDeleteConversation, { users: conversationFromUsers })
+  //     ).subscribe({
+  //       next: (event) => {
+  //         navigation.navigate("Conversations");
+  //       },
+  //     });
+  //   } catch (err) {
+  //     console.log("Error in the delete conversation subscription", err);
+  //   }
   }, []);
 
   /*
@@ -147,28 +136,26 @@ export default function MessageScreen({ navigation, route }) {
   */
 
   const onPostAdded = useCallback(async (newPost) => {
-    newPost.receiver = userId;
+    newPost.receiver = conversationId;
 
     if (global.updateFriendsListWithMyNewMessage)
       global.updateFriendsListWithMyNewMessage(newPost);
 
-    const myId = route.params?.myId;
-
     const friend1 = await API.graphql(
-      graphqlOperation(getFriendship, { sender: myId, receiver: userId })
+      graphqlOperation(getFriendship, { sender: globalThis.myId, receiver: conversationId })
     );
     const friend2 = await API.graphql(
-      graphqlOperation(getFriendship, { sender: userId, receiver: myId })
+      graphqlOperation(getFriendship, { sender: conversationId, receiver: globalThis.myId })
     );
 
     let checkConversationExists = await API.graphql(
       graphqlOperation(getConversation, { id: newPost.channel })
     );
-    checkConversationExists = checkConversationExists.data.getConversation;
+    checkConversationExists = checkConversationExists.data?.getConversation;
 
     const friend = friend1 ?? friend2;
 
-    let users = [myId, userId].sort();
+    let users = [globalThis.myId, conversationId].sort();
 
     if (checkConversationExists == null) {
       console.log("convo doesnt exist");
@@ -230,17 +217,15 @@ export default function MessageScreen({ navigation, route }) {
       );
     }
   }, []);
-
-  //console.log(route.params);
-  //console.log(route);
+  
   //have a header with the person's name and profile pic also.
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={0}
       style={{ flex: 1, backgroundColor: "white" }}
     >
-      {!isLoading && !blocked && (
         <FeedScreen
           inverted={true}
           style={{ backgroundColor: "#a9efe0" }}
@@ -250,34 +235,29 @@ export default function MessageScreen({ navigation, route }) {
               <ProfileImageAndName
                 vertical={true}
                 imageStyle={styles.imageStyle}
-                imageLayoutStyle={{ margin: 0 }}
-                userId={userId}
-                navigateToProfile={false}
+                userId={conversationId}
                 isFullSize={true}
-                hidename={true}
+                hideName={true}
               />
-              {lastUser != route.params.myId && lastUser != null && (
+              {lastUser != globalThis.myId && lastUser != null && (
                 <AcceptMessageButtons
                   navigation={navigation}
                   route={route}
                   id={id}
-                  channel={[route.params?.myId, userId].sort().join("")}
-                  receiver={userId}
+                  channel={[globalThis.myId, conversationId].sort().join("")}
+                  receiver={conversationId}
                 />
               )}
             </View>
           }
-          renderItem={MessageItem}
-          navigation={navigation}
-          route={route}
-          receiver={userId}
-          channel={[route.params?.myId, userId].sort().join("")}
-          lastUser={lastUser}
+          //renderItem={MessageItem}
+          //receiver={conversationId}
+          channel={[globalThis.myId, conversationId].sort().join("")}
+          //lastUser={lastUser}
           autoFocus={true}
           isFocused={isFocused}
           onPostAdded={onPostAdded}
         />
-      )}
     </KeyboardAvoidingView>
   );
 }

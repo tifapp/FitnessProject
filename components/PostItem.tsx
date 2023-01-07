@@ -1,10 +1,9 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
-import APIList, { APIListOperations } from "@components/APIList";
+import { APIListOperations } from "@components/APIList";
 import { deletePost, updatePost } from "@graphql/mutations";
-import { likesByPost } from "@graphql/queries";
 import React, { useRef, useState } from "react";
 import { Alert, Dimensions, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { Like, Post } from "src/models";
+import { Post } from "src/models";
 import IconButton from "./common/IconButton";
 import Modal, { ModalRefType } from "./common/Modal";
 import CommentsModal from "./postComponents/CommentsModal";
@@ -157,7 +156,7 @@ const PostItem = ({
           </View>
         </View>
 
-        {item.loading ?? (
+        {/* {item.loading ?? (
           <TouchableOpacity
             style={{
               flexDirection: "row",
@@ -206,7 +205,7 @@ const PostItem = ({
               keyExtractor={(item: Like) => item.userId}
             />
           </TouchableOpacity>
-        )}
+        )} */}
 
         <FlatList
           data={item.taggedUsers}

@@ -1,6 +1,6 @@
+import { API, graphqlOperation } from "@aws-amplify/api";
 import IconButton from "@components/common/IconButton";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { API, graphqlOperation } from "aws-amplify";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import {
@@ -103,7 +103,7 @@ export default function AcceptMessageButtons({
   }, [navigation]);
 
   return (
-    ButtonCheck && (
+    ButtonCheck ? (
       <View
         style={{
           flexDirection: "row",
@@ -138,6 +138,6 @@ export default function AcceptMessageButtons({
           label={"Block"}
           fontSize={18} margin={0} isLabelFirst={false} fontWeight={""}        />
       </View>
-    )
-  );
+    ) : null
+  )
 }

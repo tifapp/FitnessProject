@@ -9,3 +9,5 @@ const StatusColors = {
 };
 
 export default StatusColors;
+
+export type Status = keyof typeof StatusColors;

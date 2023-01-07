@@ -1,10 +1,10 @@
-import StatusColors from "@hooks/statusColors";
+import StatusColors, { Status } from "@hooks/statusColors";
 import { Picker } from "@react-native-picker/picker";
 import React from "react";
 
 interface Props {
-  selectedValue: string,
-  setSelectedValue: (s:string) => void
+  selectedValue: Status,
+  setSelectedValue: (s:Status) => void
 }
 
 const StatusPicker = ({ selectedValue, setSelectedValue }: Props) => {

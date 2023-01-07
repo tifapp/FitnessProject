@@ -1,5 +1,5 @@
 // Get the aws resources configuration parameters
-import API, { GraphQLSubscription } from "@aws-amplify/api";
+import API, { graphqlOperation, GraphQLSubscription } from "@aws-amplify/api";
 import APIList, { APIListRefType } from "@components/APIList";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import { likesByPost } from "@graphql/queries";
@@ -8,7 +8,6 @@ import {
   onDeleteLikeForPost
 } from "@graphql/subscriptions";
 import printTime from "@hooks/printTime";
-import { graphqlOperation } from "aws-amplify";
 import React, { useEffect, useRef } from "react";
 import { SafeAreaView, Text } from "react-native";
 import { Like } from "src/models";
