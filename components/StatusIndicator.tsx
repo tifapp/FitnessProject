@@ -1,13 +1,19 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import StatusColors from "@hooks/statusColors";
+import StatusColors, { Status } from "@hooks/statusColors";
 import React from "react";
 import { Text, View } from "react-native";
+
+interface Props {
+  status: Status;
+  shouldShow?: boolean;
+  isVerified?: boolean;
+}
 
 export default function StatusIndicator({
   status,
   shouldShow,
-  isVerified = null,
-}) {
+  isVerified,
+}: Props) {
   if (status || shouldShow)
     return (
       <View style={{ flexDirection: "row" }}>

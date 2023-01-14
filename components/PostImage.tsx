@@ -2,27 +2,23 @@ import { Storage } from "aws-amplify";
 import { Video } from "expo-av";
 import React, { useEffect, useRef, useState } from "react";
 import { ImageBackground, ImageStyle, StyleProp } from "react-native";
-import { Post } from "src/models";
 
-interface Props extends Pick<Post, "imageURL"> {style: StyleProp<ImageStyle>, isVisible: boolean}
+interface Props {filename?: string | null, style: StyleProp<ImageStyle>, isVisible: boolean}
 
 const re = /(?:\.([^.]+))?$/;
 
-global.currentVideo;
-
-
-export default function PostImage({ style, imageURL /* Change the imageURL to filename 10/17/2022 */, isVisible }: Props) {
+export default function PostImage({ style, filename, isVisible }: Props) {
   const [fullImageURL, setFullImageURL] = useState<string | null>();
   const video = useRef<Video>(null);
 
-  let imageKey = `feed/${imageURL}`;
+  let imageKey = `feed/${filename}`;
   let imageConfig = {
     expires: 86400,
   };
 
   useEffect(() => {
-    //console.log("image id is ", imageURL);
-    if (imageURL) {
+    console.log("image id is ", filename);
+    if (filename) {
       Storage.get(imageKey, imageConfig) //this will incur lots of repeated calls to the backend, idk how else to fix it right now
         .then((imageURL) => {
           setFullImageURL(imageURL as string);
@@ -35,30 +31,29 @@ export default function PostImage({ style, imageURL /* Change the imageURL to fi
   }, []);
 
   useEffect(() => {
-    //console.log("image id is ", imageURL);
     if (video.current) {
-      if (global.currentVideo !== fullImageURL) {
+      if (globalThis.currentVideo !== fullImageURL) {
         video.current.pauseAsync();
       }
     }
-  }, [global.currentVideo]);
+  }, [globalThis.currentVideo]);
 
   useEffect(() => {
     if (video.current) {
       if (isVisible === true) {
         video.current.playAsync();
-        global.currentVideo = fullImageURL;
+        globalThis.currentVideo = fullImageURL;
       } else if (isVisible === false) {
         video.current.pauseAsync();
         if (global.currentVideo === fullImageURL) {
-          global.currentVideo = null;
+          globalThis.currentVideo = null;
         }
       }
     }
   }, [isVisible]);
 
-  if (imageURL) {
-    return re.exec(imageURL)?.[1] === "jpg" ? (
+  if (filename) {
+    return re.exec(filename)?.[1] === "jpg" ? (
       <ImageBackground
         style={style}
         source={

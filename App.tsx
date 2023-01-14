@@ -1,5 +1,5 @@
-import { headerOptions } from "@components/headerComponents/headerOptions";
 import API, { GraphQLQuery } from "@aws-amplify/api";
+import { headerOptions } from "@components/headerComponents/headerOptions";
 import ConfirmSignIn from "@components/loginComponents/ConfirmSignIn";
 import ConfirmSignUp from "@components/loginComponents/ConfirmSignUp";
 import ForgotPassword from "@components/loginComponents/ForgotPassword";
@@ -24,7 +24,6 @@ import CustomSidebarMenu from "@screens/CustomSidebarMenu";
 import FriendScreen from "@screens/FriendScreen";
 import ImageScreen from "@screens/ImageScreen";
 import MessageScreen from "@screens/MessageScreen";
-import MyGroupsScreen from "@screens/MyGroupsScreen";
 import ProfileScreen from "@screens/ProfileScreen";
 import VerificationScreen from "@screens/VerificationScreen";
 import MainStack from "@stacks/MainStack";
@@ -224,7 +223,6 @@ const App = () => {
     }
   }, [userId]);
 
-  ////console("App rerendered, userexists is... ", userId == '');
   const dimensions = useWindowDimensions();
 
   if (userId == "checking...") {
@@ -257,8 +255,6 @@ const App = () => {
             name="Profile"
             component={ProfileScreen}
             initialParams={{
-              newUser: true,
-              myId: userId,
               setUserIdFunction: () => setIsNewUser(false),
             }}
             options={
@@ -314,50 +310,39 @@ const App = () => {
           <Drawer.Screen
             name="Feed"
             component={MainStack}
-            initialParams={{ myId: userId, fromLookup: false }}
+            initialParams={{ fromLookup: false }}
             options={{ headerShown: false }}
           />
           <Drawer.Screen
             name="Profile"
             component={ProfileScreen}
-            initialParams={{ myId: userId }}
           />
           <Drawer.Screen
             name="Verification"
             component={VerificationScreen}
-            initialParams={{ myId: userId }}
-          />
-          <Drawer.Screen
-            name="My Groups"
-            component={MyGroupsScreen}
-            initialParams={{ myId: userId }}
           />
           <Drawer.Screen
             name="Friends"
             component={FriendScreen}
-            initialParams={{ myId: userId }}
           />
           <Drawer.Screen
             name="Conversations"
             component={ConversationScreen}
-            initialParams={{ myId: userId }}
           />
           <Drawer.Screen
             name="Settings"
             component={SettingsStack}
-            initialParams={{ myId: userId }}
           />
           <Drawer.Screen
             name="Image"
             component={ImageScreen}
-            initialParams={{ myId: userId }}
           />
           {conversationIds.map((conversationId) => (
             <Drawer.Screen
               key={conversationId}
               name={conversationId}
               component={MessageScreen}
-              initialParams={{ myId: userId, userId: conversationId }}
+              initialParams={{ conversationId }}
             />
           ))}
         </Drawer.Navigator>

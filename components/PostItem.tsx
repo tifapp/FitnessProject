@@ -1,10 +1,9 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
-import APIList, { APIListOperations } from "@components/APIList";
+import { APIListOperations } from "@components/APIList";
 import { deletePost, updatePost } from "@graphql/mutations";
-import { likesByPost } from "@graphql/queries";
 import React, { useRef, useState } from "react";
 import { Alert, Dimensions, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { Like, Post } from "src/models";
+import { Post } from "src/models";
 import IconButton from "./common/IconButton";
 import Modal, { ModalRefType } from "./common/Modal";
 import CommentsModal from "./postComponents/CommentsModal";
@@ -42,13 +41,13 @@ const deletePostAWS = async (createdAt: string) => {
 };
 
 interface Props {
-  item: Post & {taggedUsers: string[]; loading: boolean},
+  item: Post & {taggedUsers?: string[]; likedByYou?: boolean},
   likes: number,
   reportPost: (timestamp: string, author: string) => Promise<any>,
   replyButtonHandler?: () => void,
   writtenByYou: boolean,
-  isVisible: boolean,
-  shouldSubscribe: boolean,
+  isVisible?: boolean,
+  shouldSubscribe?: boolean,
   operations: APIListOperations<Post>,
 }
 
@@ -83,7 +82,6 @@ const PostItem = ({
           writtenByYou={writtenByYou}
           toggleEditing={() => setIsEditing(!isEditing)}
           repliesPressed={() => {
-            console.log("Inside the function");
             repliesModalRef.current?.showModal();
           }}
           reportPost={reportPost}
@@ -98,7 +96,7 @@ const PostItem = ({
             alignSelf: "center",
             marginBottom: 15,
           }}
-          imageID={item.imageURL}
+          filename={item.imageURL}
           isVisible={
             isVisible
             // && !areRepliesVisible
@@ -158,7 +156,7 @@ const PostItem = ({
           </View>
         </View>
 
-        {item.loading ?? (
+        {/* {item.loading ?? (
           <TouchableOpacity
             style={{
               flexDirection: "row",
@@ -207,7 +205,7 @@ const PostItem = ({
               keyExtractor={(item: Like) => item.userId}
             />
           </TouchableOpacity>
-        )}
+        )} */}
 
         <FlatList
           data={item.taggedUsers}

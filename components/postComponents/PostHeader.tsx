@@ -1,21 +1,16 @@
+import API, { graphqlOperation } from "@aws-amplify/api";
 import LikeButton from "@components/postComponents/LikeButton";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
-import {
-  onDecrementLikes,
-  onDecrementReplies,
-  onIncrementLikes,
-  onIncrementReplies
-} from "@graphql/subscriptions";
+import { onDecrementLikes, onDecrementReplies, onIncrementLikes, onIncrementReplies } from "@graphql/subscriptions";
 import printTime from "@hooks/printTime";
-import { API, graphqlOperation } from "aws-amplify";
 import React, { useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
+import { Post } from "src/models";
 import IconButton from "../common/IconButton";
 
 interface Props {
   likes: number,
-  item: {userId: string, createdAt: string, likes: number, 
-        replies: number, loading: boolean, likedByYou: boolean, info: React.NamedExoticComponent<object>},
+  item: Post & {loading: boolean, likedByYou: boolean},
   writtenByYou: boolean,
   repliesPressed: () => void,
   areRepliesVisible: boolean,
@@ -139,7 +134,6 @@ export default function PostHeader({
       }}
     >
       <ProfileImageAndName
-        info={item.info}
         textStyle={{
           fontWeight: writtenByYou ? "bold" : "normal",
         }}
@@ -158,7 +152,7 @@ export default function PostHeader({
           }}
         >
           <LikeButton
-            likes={likes}
+            likes={likes ?? 0}
             item={item}
             postId={item.createdAt + "#" + item.userId}
             likeDebounceRef={likeDebounce}
@@ -181,10 +175,8 @@ export default function PostHeader({
             label={replies + ""}
             isLabelFirst={true}
             onPress={repliesPressed}
-            fontWeight={"bold"}
-            margin={0}
-            fontSize={0} 
-            style />
+            textStyle={{fontWeight: "bold"}}
+          />
         </View>
       ) : null}
     </View>

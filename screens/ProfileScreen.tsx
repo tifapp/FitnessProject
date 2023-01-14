@@ -1,11 +1,14 @@
+import API, { graphqlOperation, GraphQLQuery } from "@aws-amplify/api";
 import StatusPicker from "@components/basicInfoComponents/StatusPicker";
 import LocationButton from "@components/LocationButton";
 import ProfilePic from "@components/ProfileImagePicker";
 import StatusIndicator from "@components/StatusIndicator";
 import TouchableWithModal from "@components/TouchableWithModal";
 import fetchProfileImageAsync from "@hooks/fetchProfileImage";
+import { Status } from "@hooks/statusColors";
 import { loadCapitals, saveCapitals } from "@hooks/stringConversion";
-import { API, Auth, Cache, graphqlOperation, Storage } from "aws-amplify";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { Auth, Cache, Storage } from "aws-amplify";
 import * as ImageManipulator from "expo-image-manipulator";
 import { SaveFormat } from "expo-image-manipulator";
 import React, { useEffect, useState } from "react";
@@ -20,62 +23,57 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import { User } from "src/models";
 import BasicInfoDetails from "../components/basicInfoComponents/BasicInfoDetails";
 import { createUser, updateUser } from "../src/graphql/mutations";
 import { getUser } from "../src/graphql/queries";
 
-const ProfileScreen = ({ navigation, route }) => {
-  const [loading, setLoading] = useState(true);
-  const [imageChanged, setImageChanged] = useState(false);
-  const [imageURL, setImageURL] = useState("");
-  const [name, setName] = useState("");
-  const [identityId, setIdentityId] = useState();
-  const [age, setAge] = useState(18);
-  const [gender, setGender] = useState("Male");
-  const [status, setStatus] = useState("");
-  const [isVerified, setIsVerified] = useState();
-  const [bioDetails, setBioDetails] = useState("");
-  const [goalsDetails, setGoalsDetails] = useState("");
+const ProfileScreen = () => {
+  const [loading, setLoading] = useState<boolean>(true);
+  const [imageChanged, setImageChanged] = useState<boolean>(false);
+  const [imageURL, setImageURL] = useState<string>("");
+  const [name, setName] = useState<string>("");
+  const [identityId, setIdentityId] = useState<string>(); //for new users, this will be blank
+  const [age, setAge] = useState<number>(18);
+  const [gender, setGender] = useState<string>("Male");
+  const [status, setStatus] = useState<Status>("None");
+  const [isVerified, setIsVerified] = useState<boolean>();
+  const [bioDetails, setBioDetails] = useState<string>("");
+  const [goalsDetails, setGoalsDetails] = useState<string>("");
+
+  const route = useRoute();
+  const navigation = useNavigation();
 
   useEffect(() => {
     (async () => {
-      console.log("user's id is ", route.params?.myId);
-
-      const user = await API.graphql(
-        graphqlOperation(getUser, { id: route.params?.myId })
+      const user = await API.graphql<GraphQLQuery<{getUser: User}>>(
+        graphqlOperation(getUser, { id: globalThis.myId })
       );
-      // @ts-ignore
-      const fields = user.data.getUser;
+      
+      const {identityId, name, status, isVerified, age, gender, bio, goals} = user.data?.getUser ?? {};
 
-      console.log("fetched user result is ", fields);
-
-      if (fields == null) {
-        console.log(
-          "user doesn't exist, they must be making their profile for the first time"
-        );
-      } else {
-        const imageURL = await fetchProfileImageAsync(fields.identityId, true);
+      if (identityId != null) {
+        const imageURL = await fetchProfileImageAsync(identityId, true);
         setImageURL(imageURL);
-        Cache.setItem(fields.identityId, {
+        Cache.setItem(identityId, {
           lastModified: "3000",
           imageURL: imageURL,
         });
-        // @ts-ignore
-        global.savedUsers[route.params?.myId] = {
-          name: loadCapitals(fields.name),
-          imageURL: imageURL,
-          status: fields.status,
-          isVerified: fields.isVerified,
+        global.savedUsers[globalThis.myId] = {
+          name: loadCapitals(name),
+          imageURL,
+          status,
+          isVerified: isVerified ?? false,
         };
 
-        setIdentityId(fields.identityId);
-        setName(loadCapitals(fields.name));
-        setAge(fields.age);
-        setGender(fields.gender);
-        setBioDetails(loadCapitals(fields.bio));
-        setGoalsDetails(loadCapitals(fields.goals));
-        setStatus(fields.status);
-        setIsVerified(fields.isVerified);
+        setIdentityId(identityId);
+        setName(loadCapitals(name));
+        setAge(age ?? 18);
+        setGender(gender ?? "");
+        setBioDetails(loadCapitals(bio));
+        setGoalsDetails(loadCapitals(goals));
+        setStatus(status as Status);
+        setIsVerified(isVerified ?? false);
       }
 
       setLoading(false);
@@ -83,15 +81,13 @@ const ProfileScreen = ({ navigation, route }) => {
   }, []);
 
   useEffect(() => {
-    if (!route.params?.newUser && !loading) {
+    if (identityId && !loading) {
       updateUserAsync({
         age: age,
         gender: gender,
-        bio: saveCapitals(bioDetails),
-        goals: saveCapitals(goalsDetails),
       }); //add a debounce on the textinput, or just when the keyboard is dismissed
     }
-  }, [age, gender, bioDetails, goalsDetails]);
+  }, [age, gender]);
 
   const saveProfilePicture = async () => {
     if (imageURL != "") {
@@ -109,42 +105,39 @@ const ProfileScreen = ({ navigation, route }) => {
         contentType: "image/jpeg",
       });
 
-      console.log("changing cached profile pic");
-      Cache.setItem(identityId, { lastModified: "3000", imageURL: imageURL });
-      // @ts-ignore
-      global.savedUsers[route.params?.myId].imageURL = imageURL;
+      global.savedUsers[globalThis.myId].imageURL = imageURL;
     } else {
       Storage.remove("profileimage.jpg", { level: "protected" })
         .then((result) => console.log("removed profile image!", result))
         .catch((err) => console.log(err));
-      Cache.setItem(identityId, { lastModified: "3000", imageURL: "" });
-      // @ts-ignore
-      global.savedUsers[route.params?.myId].imageURL = "";
+      global.savedUsers[globalThis.myId].imageURL = "";
+    }
+    if (identityId) {
+      Cache.setItem(identityId, { lastModified: "3000", imageURL });
     }
   };
 
-  const updateUserAsync = async (profileInfo, isNewUser) => {
+  const updateUserAsync = async (profileInfo: Partial<User>) => {
     //if user doesn't exist, make one
     try {
-      if (isNewUser) {
+      let userId = identityId;
+      if (!identityId) {
         const { identityId } = await Auth.currentCredentials();
-        profileInfo.identityId = identityId;
+        userId = identityId;
       }
 
       try {
         await API.graphql(
-          graphqlOperation(isNewUser ? createUser : updateUser, {
-            input: profileInfo,
+          graphqlOperation(!identityId ? createUser : updateUser, {
+            input: {identityId: !identityId ? userId : undefined, ...profileInfo},
           })
         );
-        if (isNewUser) Alert.alert("Profile submitted successfully!");
-        //console.log("updated user successfully");
+        if (!identityId) Alert.alert("Profile submitted successfully!");
       } catch (err) {
         Alert.alert("Could not submit profile! Error: ", err.errors[0].message);
-        //console.log("error when updating user: ", err);
       }
 
-      return [profileInfo, route.params?.myId];
+      return [profileInfo, globalThis.myId];
     } catch (err) {
       console.log("error: ", err);
     }
@@ -163,7 +156,6 @@ const ProfileScreen = ({ navigation, route }) => {
           bio: saveCapitals(bioDetails),
           goals: saveCapitals(goalsDetails),
         },
-        true
       ) //add a debounce on the textinput, or just when the keyboard is dismissed
         .then(([user, id]) => {
           route.params?.setUserIdFunction(id);
@@ -230,10 +222,9 @@ const ProfileScreen = ({ navigation, route }) => {
                   value={name}
                   onChangeText={setName}
                   onEndEditing={() => {
-                    if (!route.params?.newUser) {
+                    if (identityId) {
                       updateUserAsync({ name: saveCapitals(name) }); //should be doing savecapitals in the backend
-                      // @ts-ignore
-                      global.savedUsers[route.params?.myId].name = name;
+                      global.savedUsers[globalThis.myId].name = name;
                     }
                   }}
                 ></TextInput>
@@ -259,13 +250,13 @@ const ProfileScreen = ({ navigation, route }) => {
                       }}
                     >
                       <StatusPicker
-                        selectedValue={status}
+                        selectedValue={status ?? ""}
                         setSelectedValue={(val) => {
                           if (val === "Health Professional") {
                             hideModal();
                             navigation.navigate("Verification");
                           } else if (val === "None") {
-                            setStatus(null), updateUserAsync({ status: null });
+                            setStatus("None"), updateUserAsync({ status: null });
                           } else {
                             setStatus(val), updateUserAsync({ status: val });
                           }
@@ -328,7 +319,7 @@ const ProfileScreen = ({ navigation, route }) => {
               onChangeText={setBioDetails}
               style={{ fontSize: 18 }}
               onEndEditing={() => {
-                if (!route.params?.newUser) {
+                if (identityId) {
                   updateUserAsync({ bio: saveCapitals(bioDetails) }); //should be doing savecapitals in the backend
                 }
               }}
@@ -377,15 +368,15 @@ const ProfileScreen = ({ navigation, route }) => {
               onChangeText={setGoalsDetails}
               style={{ fontSize: 18 }}
               onEndEditing={() => {
-                if (!route.params?.newUser) {
+                if (identityId) {
                   updateUserAsync({ goals: saveCapitals(goalsDetails) }); //should be doing savecapitals in the backend
                 }
               }}
             />
           </TouchableWithModal>
 
-          <LocationButton id={route.params?.myId} />
-          {route.params?.newUser ? ( //if name is blank?
+          <LocationButton id={globalThis.myId} />
+          {!identityId ? ( //if name is blank?
             <TouchableOpacity
               style={[styles.buttonStyle, { marginBottom: 25 }]}
               onPress={createNewUser}

@@ -1,9 +1,9 @@
+import API, { graphqlOperation } from "@aws-amplify/api";
 import { Ionicons } from "@expo/vector-icons";
 import { updateUser } from "@graphql/mutations";
 import { getUser } from "@graphql/queries";
 import getLocationAsync from "@hooks/useLocation";
 import CheckBox from "@react-native-community/checkbox"; //when ios is supported, we'll use this
-import { API, graphqlOperation } from "aws-amplify";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator, Platform,

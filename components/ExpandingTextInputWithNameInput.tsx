@@ -8,8 +8,8 @@ interface Props extends TextInputProps {
   setText: React.Dispatch<React.SetStateAction<string>>,
   text: string,
   onDelete: (s : string) => void,
-  taggedUsers: [string] | undefined,
-  setTaggedUsers: React.Dispatch<React.SetStateAction<[string] | undefined>>,
+  taggedUsers: string[] | undefined,
+  setTaggedUsers: React.Dispatch<React.SetStateAction<string[] | undefined>>,
   onChangeText: React.Dispatch<React.SetStateAction<string>>
 }
 
@@ -25,7 +25,6 @@ export default function ExpandingTextInputWithNameInput({
   ...props
 } : Props) {
   const [SignPosition, setSignPosition] = useState<number>(0); // May cause error setting default to 0 10/22/2022 
-  //const [text, setText] = useState("");
   const [newTaggedUserText, setNewTaggedUserText] = useState<string | null>(null); // May cause error 10/22/2022
   const [cursorPosition, setCursorPosition] = useState<[number, number]>([0,0]); // Test for possible issue 10/20/2022
   const [newCursorPosition, setNewCursorPosition] = useState<TextInputProps["selection"]>(undefined);
