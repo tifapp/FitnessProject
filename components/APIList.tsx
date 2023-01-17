@@ -14,8 +14,9 @@ import {
 export type APIListRefType<T> = {
   addItem: (newItem: T, alreadyExists?: (item: T) => boolean) => T[];
   removeItem: (toRemove: number | ((_: T) => boolean)) => T[];
-  replaceItem: (itemMatcher: ((_: T) => boolean), newItem: T) => T[];
+  replaceItem: (itemMatcher: ((_: T) => boolean), newItem: Partial<T>) => T[];
   replaceList: (newList: T[]) => T[];
+  getList: () => Readonly<T[]>;
   refresh: (shouldInvalidateResults?: () => boolean) => void;
 } | null;
 
@@ -133,6 +134,10 @@ const APIList = <T,S>({
     replaceList(newList: T[]): T[] {
       setData(newList);
       return newList;
+    },
+    
+    getList(): Readonly<T[]> {
+      return data;
     },
 
     refresh,

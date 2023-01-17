@@ -14,7 +14,7 @@ import playSound from "../hooks/playSound";
 
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 
-global.localBlockList = [];
+globalThis.localBlockList = [];
 
 export default function CustomSidebarMenu({
   navigation, //useNavigation hook does not work in sidebar
@@ -133,7 +133,6 @@ export default function CustomSidebarMenu({
       >
         <ProfileImageAndName
           navigationObject={navigation}
-          navigateToProfile={false}
           userId={globalThis.myId}
           isFullSize={true}
           style={{ marginLeft: 15 }}

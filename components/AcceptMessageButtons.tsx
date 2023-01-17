@@ -1,8 +1,9 @@
-import { API, graphqlOperation } from "@aws-amplify/api";
+import { API, graphqlOperation, GraphQLQuery } from "@aws-amplify/api";
 import IconButton from "@components/common/IconButton";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
+import { Conversation } from "src/models";
 import {
   createBlock,
   deleteConversation,
@@ -11,17 +12,15 @@ import {
 import { getConversation } from "../src/graphql/queries";
 
 interface Props {
-  id: string,
   channel: string,
   receiver: string
 }
 
 export default function AcceptMessageButtons({
-  id,
   channel,
   receiver
 } : Props) {
-  const [ButtonCheck, setButtonCheck] = useState(false);
+  const [isConversationRequest, setIsConversationRequest] = useState(false);
   const navigation = useNavigation();
   const route = useRoute();
 
@@ -31,46 +30,30 @@ export default function AcceptMessageButtons({
         input: { id: channel, Accepted: 1 },
       })
     );
-    setButtonCheck(true);
+    setIsConversationRequest(false);
   };
 
   const rejectMessageRequest = async () => {
     await API.graphql(
       graphqlOperation(deleteConversation, {
-        input: { id: id },
+        input: { id: channel },
       })
     );
     navigation.navigate("Conversations");
   };
 
-  const checkButton = async () => {
-    let namesArray = [globalThis.myId, receiver];
-    namesArray.sort();
-
-    let temp = namesArray[0] + namesArray[1];
-
-    let newConversations1 = await API.graphql(
-      graphqlOperation(getConversation, { id: temp })
+  const checkIfConversationRequest = async () => {    
+    const conversation = await API.graphql<GraphQLQuery<{getConversation: Conversation}>> (
+      graphqlOperation(getConversation, { id: channel })
     );
 
-    newConversations1 = newConversations1.data.getConversation;
-
-    if (newConversations1 == null) {
-      setButtonCheck(false);
-    } else if (newConversations1.Accepted) {
-      setButtonCheck(true);
-    } else {
-      setButtonCheck(false);
-    }
-
-    //let checkConversationExists = newConversations1.find(item => (item.users[0] === route.params?.myId && item.users[1] === receiver) || (item.users[0] === receiver && item.users[1] === route.params?.myId));
-    //let checkMessageRequestExists = newConversations2.find(item => (item.users[0] === route.params?.myId && item.users[1] === receiver) || (item.users[0] === receiver && item.users[1] === route.params?.myId));
+    setIsConversationRequest(!!(conversation.data?.getConversation?.Accepted));
   };
 
   const blockMessageRequest = async () => {
     await API.graphql(
       graphqlOperation(deleteConversation, {
-        input: { id: id },
+        input: { id: channel },
       })
     );
 
@@ -86,7 +69,7 @@ export default function AcceptMessageButtons({
     globalThis.localBlockList.push({
       createdAt: new Date(Date.now()).toISOString(),
       userId: globalThis.myId,
-      blockee: id,
+      blockee: receiver,
     });
 
     navigation.navigate("Conversations");
@@ -94,8 +77,7 @@ export default function AcceptMessageButtons({
 
   useEffect(() => {
     const onFocus = navigation.addListener("focus", () => {
-      console.log("Inside the Use Effect for check button");
-      checkButton();
+      checkIfConversationRequest();
     });
 
     // Return the function to unsubscribe from the event so it gets removed on unmount
@@ -103,7 +85,7 @@ export default function AcceptMessageButtons({
   }, [navigation]);
 
   return (
-    ButtonCheck ? (
+    isConversationRequest ? (
       <View
         style={{
           flexDirection: "row",
@@ -118,7 +100,8 @@ export default function AcceptMessageButtons({
           onPress={acceptMessageRequest}
           style={{ paddingHorizontal: 12 }}
           label={"Accept"}
-          fontSize={18} margin={0} isLabelFirst={false} fontWeight={""}        />
+          textStyle={{fontSize: 18}}
+          margin={0} isLabelFirst={false}        />
 
         <IconButton
           iconName={"clear"}
@@ -127,7 +110,8 @@ export default function AcceptMessageButtons({
           onPress={rejectMessageRequest}
           style={{ paddingHorizontal: 12 }}
           label={"Reject"}
-          fontSize={18} margin={0} isLabelFirst={false} fontWeight={""}        />
+          textStyle={{fontSize: 18}}
+          margin={0} isLabelFirst={false}       />
 
         <IconButton
           iconName={"block"}
@@ -136,7 +120,8 @@ export default function AcceptMessageButtons({
           onPress={blockMessageRequest}
           style={{ paddingHorizontal: 12 }}
           label={"Block"}
-          fontSize={18} margin={0} isLabelFirst={false} fontWeight={""}        />
+          textStyle={{fontSize: 18}}
+          margin={0} isLabelFirst={false}        />
       </View>
     ) : null
   )
