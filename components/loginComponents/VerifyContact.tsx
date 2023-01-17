@@ -11,21 +11,17 @@
  * and limitations under the License.
  */
 
-import React from 'react';
-import { View, Picker } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { Auth, I18n, Logger } from 'aws-amplify';
+import TEST_ID from 'aws-amplify-react-native/src/AmplifyTestIDs';
+import { AmplifyThemeType } from 'aws-amplify-react-native/src/AmplifyTheme';
 import {
-	AmplifyButton,
-	FormField,
-	LinkCell,
-	Header,
-	ErrorRow,
-	SignedOutMessage,
-	Wrapper,
+	AmplifyButton, ErrorRow, FormField, Header, LinkCell, SignedOutMessage,
+	Wrapper
 } from 'aws-amplify-react-native/src/AmplifyUI';
 import AuthPiece, { IAuthPieceProps, IAuthPieceState } from 'aws-amplify-react-native/src/Auth/AuthPiece';
-import { AmplifyThemeType } from 'aws-amplify-react-native/src/AmplifyTheme';
-import TEST_ID from 'aws-amplify-react-native/src/AmplifyTestIDs';
+import React from 'react';
+import { View } from 'react-native';
 
 const logger = new Logger('VerifyContact');
 

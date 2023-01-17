@@ -47,6 +47,7 @@ import {
   AppStateStatus,
   LogBox,
   Platform,
+  Text,
   UIManager,
   useWindowDimensions,
   View
@@ -106,6 +107,7 @@ const App = () => {
   const [userId, setUserId] = useState<string>("checking..."); //stores the user's id if logged in
   const [isNewUser, setIsNewUser] = useState<boolean>(false); //stores the user's id if logged in
   const [isAdmin, setIsAdmin] = useState<boolean>(false); //seems insecure
+  const [isDeveloper, setIsDeveloper] = useState<boolean>(false);
 
   const [conversationIds, setConversationIds] = useState<string[]>([]);
 
@@ -138,6 +140,11 @@ const App = () => {
           )
         );
       setUserId(query.attributes.sub);
+
+      if (query.signInUserSession.idToken.payload["cognito:groups"].includes("test_users")) {
+        setIsDeveloper(true);
+      }
+
       globalThis.myId = query.attributes.sub;
       const user = await API.graphql<GraphQLQuery<{getUser: User}>> (
         graphqlOperation(getUser, { id: query.attributes.sub })
@@ -284,6 +291,26 @@ const App = () => {
           />
         </Tab.Navigator>
       </NavigationContainer>
+    );
+  } else if (isDeveloper) {
+    return (
+      <View style={{
+        flex:1,
+        justifyContent: "center",
+        alignItems: "center"
+        }}>
+        <Text
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              color: "black",
+              fontWeight: "bold",
+              fontSize: 15
+            }}
+          >
+            SandBox to get started
+        </Text>
+      </View>
     );
   } else {
     return (
