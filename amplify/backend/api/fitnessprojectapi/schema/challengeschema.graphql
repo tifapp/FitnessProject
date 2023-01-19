@@ -2,12 +2,12 @@ type Challenge @model {
   id: ID!
   name: String!
   Description: String!
-  open: Boolean
+  endDate: AWSDateTime!
   winner: ID
 }
 
 input CreateChallengeInput {
   name: String!
   Description: String!
-  open: Boolean
+  endDate: AWSDateTime!
 }
