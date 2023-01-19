@@ -1,9 +1,12 @@
+//components
 import APIList, { APIListRefType, APIListRenderItemInfo } from "@components/APIList";
 import IconButton from "@components/common/IconButton";
 import ExpandingTextInputWithNameInput from "@components/ExpandingTextInputWithNameInput";
 import PostItem from "@components/PostItem";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import SpamButton from "@components/SpamButton";
+
+//graphql
 import {
   createPost,
   createReport
@@ -14,10 +17,14 @@ import {
   onDeletePostFromChannel,
   onUpdatePostFromChannel
 } from "@graphql/subscriptions";
+import { Like, Post } from "src/models";
+
+//hooks
 import SHA256 from "@hooks/hash";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
-// Get the aws resources configuration parameters
+import usePhotos from "@hooks/usePhotos";
+
 import API, { GraphQLQuery, GraphQLSubscription } from "@aws-amplify/api";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { graphqlOperation, Storage } from "aws-amplify";
 import { Progress } from "aws-sdk/lib/request";
 import { Video } from "expo-av";
@@ -34,8 +41,6 @@ import {
   View,
   ViewStyle
 } from "react-native";
-import { Like, Post } from "src/models";
-import usePhotos from "../hooks/usePhotos";
 
 const linkify = require("linkify-it")();
 linkify

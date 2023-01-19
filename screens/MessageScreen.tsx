@@ -1,3 +1,4 @@
+import { API, graphqlOperation, GraphQLQuery } from "@aws-amplify/api";
 import AcceptMessageButtons from "@components/AcceptMessageButtons";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import {
@@ -10,9 +11,9 @@ import {
 import { useNavigation, useRoute } from "@react-navigation/native";
 // Get the aws resources configuration parameters
 import FeedScreen from "@screens/FeedScreen";
-import { API, graphqlOperation } from "aws-amplify";
 import React, { useCallback, useEffect, useState } from "react";
-import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
+import { KeyboardAvoidingView, Platform, View } from "react-native";
+import { Conversation, Friendship } from "src/models";
 
 export default function MessageScreen() {
   const navigation = useNavigation();
@@ -141,65 +142,33 @@ export default function MessageScreen() {
     if (global.updateFriendsListWithMyNewMessage)
       global.updateFriendsListWithMyNewMessage(newPost);
 
-    const friend1 = await API.graphql(
+    const friend1 = await API.graphql<GraphQLQuery<{getFriendship: Friendship}>>(
       graphqlOperation(getFriendship, { sender: globalThis.myId, receiver: conversationId })
     );
-    const friend2 = await API.graphql(
+    const friend2 = await API.graphql<GraphQLQuery<{getFriendship: Friendship}>>(
       graphqlOperation(getFriendship, { sender: conversationId, receiver: globalThis.myId })
     );
 
-    let checkConversationExists = await API.graphql(
+    const friendship = friend1.data?.getFriendship ?? friend2.data?.getFriendship ?? null;
+
+    const conversation = await API.graphql<GraphQLQuery<{getConversation: Conversation}>>(
       graphqlOperation(getConversation, { id: newPost.channel })
     );
-    checkConversationExists = checkConversationExists.data?.getConversation;
-
-    const friend = friend1 ?? friend2;
 
     let users = [globalThis.myId, conversationId].sort();
 
-    if (checkConversationExists == null) {
-      console.log("convo doesnt exist");
-      if (
-        friend1.data.getFriendship == null &&
-        friend2.data.getFriendship == null
-      ) {
-        await API.graphql(
-          graphqlOperation(createConversation, {
-            input: {
-              id: newPost.channel,
-              users: users,
-              lastMessage: newPost.description,
-              Accepted: 0,
-            },
-          })
-        );
-      } else if (
-        friend.data.getFriendship &&
-        friend.data.getFriendship.accepted == null
-      ) {
-        await API.graphql(
-          graphqlOperation(createConversation, {
-            input: {
-              id: newPost.channel,
-              users: users,
-              lastMessage: newPost.description,
-              Accepted: 0,
-            },
-          })
-        );
-      } else {
-        await API.graphql(
-          graphqlOperation(createConversation, {
-            input: {
-              id: newPost.channel,
-              users: users,
-              lastMessage: newPost.description,
-              Accepted: 1,
-            },
-          })
-        );
-      }
-    } else if (myId != checkConversationExists.lastUser) {
+    if (conversation.data?.getConversation == null) {
+      await API.graphql(
+        graphqlOperation(createConversation, {
+          input: {
+            id: newPost.channel,
+            users: users,
+            lastMessage: newPost.description,
+            Accepted: friendship?.accepted ? 1 : 0,
+          },
+        })
+      );
+    } else if (globalThis.myId != conversation.data?.getConversation.lastUser) {
       await API.graphql(
         graphqlOperation(updateConversation, {
           input: {
@@ -217,8 +186,6 @@ export default function MessageScreen() {
       );
     }
   }, []);
-  
-  //have a header with the person's name and profile pic also.
 
   return (
     <KeyboardAvoidingView
@@ -234,16 +201,13 @@ export default function MessageScreen() {
             <View>
               <ProfileImageAndName
                 vertical={true}
-                imageStyle={styles.imageStyle}
+                //imageStyle={styles.imageStyle}
                 userId={conversationId}
                 isFullSize={true}
                 hideName={true}
               />
-              {lastUser != globalThis.myId && lastUser != null && (
+              {lastUser && lastUser != globalThis.myId && (
                 <AcceptMessageButtons
-                  navigation={navigation}
-                  route={route}
-                  id={id}
                   channel={[globalThis.myId, conversationId].sort().join("")}
                   receiver={conversationId}
                 />
@@ -262,11 +226,4 @@ export default function MessageScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  imageStyle: {
-    marginVertical: 15,
-    alignSelf: "center",
-    height: 125,
-    width: 125,
-  },
-});
+

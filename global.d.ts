@@ -3,8 +3,7 @@ export declare global {
   var localBlockList: Block[];
   function showNotificationDot() : void
   function hideNotificationDot() : void
-  var localBlockList: Block[]
-  var addConversationIds: (s : string) => void
+  var addConversationIds: (_ : string) => void
   var currentVideo: string | null | undefined
   var savedUsers : Record<string, {
     name: string,
@@ -13,4 +12,5 @@ export declare global {
     status?: string | null,
     isVerified: boolean,
   }>;
+  var addMyMessageToFriendsList: (_ : Post) => void
 }

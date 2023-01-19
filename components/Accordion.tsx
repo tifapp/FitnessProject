@@ -3,23 +3,22 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Easing,
-  LayoutAnimation, StyleProp, Text,
-  TouchableWithoutFeedback,
+  LayoutAnimation, StyleProp, Text, TextStyle, TouchableWithoutFeedback,
   View,
-  ViewProps, ViewStyle
+  ViewProps
 } from "react-native";
 
 interface Props extends ViewProps {
   initialOpen: boolean,
   headerText: string,
-  headerTextStyle: StyleProp<ViewStyle>,
+  headerTextStyle: StyleProp<TextStyle>,
   maxHeight?: number,
   openTextColor: string,
   iconColor: string,
   iconOpenColor: string,
   empty: boolean,
-  closeFunction: () => void,
-  openFunction: () => void
+  closeFunction?: () => void,
+  openFunction?: () => void
 } 
 
 export default function Accordion({initialOpen, headerText, headerTextStyle, openTextColor, iconColor, maxHeight, iconOpenColor, empty, children, style, openFunction, closeFunction} : Props) {
