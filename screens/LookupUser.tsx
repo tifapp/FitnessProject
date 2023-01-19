@@ -1,5 +1,5 @@
-import API, { GraphQLQuery } from "@aws-amplify/api";
-import APIList from "@components/APIList";
+import API, { GraphQLQuery, GraphQLSubscription } from "@aws-amplify/api";
+import APIList, { APIListRefType } from "@components/APIList";
 import IconButton from "@components/common/IconButton";
 import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import StatusIndicator from "@components/StatusIndicator";
@@ -36,14 +36,16 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import { User } from "src/models";
+import { Friendship, User } from "src/models";
+
+type FriendStatus = "loading" | "received" | "sent" | "friends" | "none" | "blocked" | "blocker" | "sending" | "accepting" | "unsending" | "rejecting" | "deleting";
 
 const LookupUser = () => {
   const [areMutualFriends, setAreMutualFriends] = useState();
-  const [friendStatus, setFriendStatus] = useState("loading"); //can be either "received", "sent", "friends", or "none". don't misspell!
+  const [friendStatus, setFriendStatus] = useState<FriendStatus>("loading"); //can be either "received", "sent", "friends", or "none". don't misspell!
   const [friendsSince, setFriendsSince] = useState("");
   const [user, setUser] = useState<User>();
-  const listRef = useRef();
+  const listRef = useRef<APIListRefType<Friendship>>(null);
 
   const navigation = useNavigation();
 
@@ -220,30 +222,30 @@ const LookupUser = () => {
 
   const waitForFriendUpdateAsync = async () => {
     // Case 1: Sender sends friend request to receiver. Update receiver's side to reject and accept buttons.
-    waitForFriend = API.graphql(
+    waitForFriend = API.graphql<GraphQLSubscription<{onCreateFriendship: Friendship}>>(
       graphqlOperation(createFriendship, {
         sender: userId,
         receiver: globalThis.myId,
       })
     ).subscribe({
       next: (event) => {
-        const newFriendRequest = event.value.data.onCreateFriendship;
-        ////console(newFriendRequest);
-        setFriendStatus("received");
+        const newFriendRequest = event.value.data?.onCreateFriendship;
+        if (newFriendRequest) {
+          setFriendStatus("received");
+        }
       },
     });
 
     // Case 2: Receiver accepts friend request. Update the sender's side to delete button.
-    onUpdate = API.graphql(
+    onUpdate = API.graphql<GraphQLSubscription<{onUpdateFriendship: Friendship}>>(
       graphqlOperation(updateFriendship, {
         sender: globalThis.myId,
         receiver: userId,
       })
     ).subscribe({
       next: (event) => {
-        const newFriend = event.value.data.onUpdateFriendship;
-        ////console(newFriend);
-        if (newFriend.accepted) {
+        const newFriend = event.value.data?.onUpdateFriendship;
+        if (newFriend?.accepted) {
           setFriendStatus("friends");
         }
       },
@@ -251,31 +253,29 @@ const LookupUser = () => {
 
     // Case 3: Receiver rejects friend request. Update the sender's side to send button.
     // Case 4: Friendship is deleted by either sender or receiver. Update the other party's side to send button.
-    onDelete = API.graphql(
+    onDelete = API.graphql<GraphQLSubscription<{onDeleteFriendship: Friendship}>>(
       graphqlOperation(onDeleteFriendship, {
         sender: globalThis.myId,
         receiver: userId,
       })
     ).subscribe({
       next: (event) => {
-        const exFriend = event.value.data.onDeleteFriendship;
-        ////console(exFriend);
-        if (exFriend.sender == userId || exFriend.receiver == userId) {
+        const exFriend = event.value.data?.onDeleteFriendship;
+        if (exFriend?.sender == userId || exFriend?.receiver == userId) {
           setFriendStatus("none");
         }
       },
     });
 
-    onDelete2 = API.graphql(
+    onDelete2 = API.graphql<GraphQLSubscription<{onDeleteFriendship: Friendship}>>(
       graphqlOperation(onDeleteFriendship, {
         sender: userId,
         receiver: globalThis.myId,
       })
     ).subscribe({
       next: (event) => {
-        const exFriend = event.value.data.onDeleteFriendship;
-        ////console(exFriend);
-        if (exFriend.sender == userId || exFriend.receiver == userId) {
+        const exFriend = event.value.data?.onDeleteFriendship;
+        if (exFriend?.sender == userId || exFriend?.receiver == userId) {
           setFriendStatus("none");
         }
       },
@@ -287,7 +287,7 @@ const LookupUser = () => {
 
     try {
       await API.graphql(
-        graphqlOperation(createFriendship, { input: { receiver: user.id } })
+        graphqlOperation(createFriendship, { input: { receiver: user?.id } })
       );
       //console("success");
       setFriendStatus("sent"); //if received, should change to "friends". do a check before this
@@ -304,7 +304,7 @@ const LookupUser = () => {
     try {
       await API.graphql(
         graphqlOperation(updateFriendship, {
-          input: { sender: user.id, accepted: true },
+          input: { sender: user?.id, accepted: true },
         })
       );
       //console("success");
@@ -381,7 +381,7 @@ const LookupUser = () => {
           input: { userId: globalThis.myId, blockee: userId },
         })
       );
-      global.localBlockList = global.localBlockList.filter(
+      globalThis.localBlockList = globalThis.localBlockList.filter(
         (i) => i.blockee !== userId
       );
       //console(global.localBlockList);
@@ -398,7 +398,7 @@ const LookupUser = () => {
       API.graphql(
         graphqlOperation(createBlock, { input: { blockee: userId } })
       );
-      global.localBlockList.push({
+      globalThis.localBlockList.push({
         createdAt: new Date(Date.now()).toISOString(),
         userId: globalThis.myId,
         blockee: userId,
@@ -585,8 +585,6 @@ const LookupUser = () => {
                 }}
                 iconName={"person-add"}
                 size={24}
-                fontWeight={"bold"}
-                fontSize={20}
                 color={"blue"}
                 onPress={sendFriendRequest}
                 label={"Add Friend"}
@@ -614,8 +612,6 @@ const LookupUser = () => {
                 }}
                 iconName={"person-remove"}
                 size={24}
-                fontWeight={"bold"}
-                fontSize={18}
                 color={"red"}
                 onPress={unsendFriendRequest}
                 label={"Unsend Request"}
@@ -645,8 +641,6 @@ const LookupUser = () => {
                   }}
                   iconName={"person-add"}
                   size={24}
-                  fontWeight={"bold"}
-                  fontSize={20}
                   color={"green"}
                   onPress={acceptFriendRequest}
                 />
@@ -662,8 +656,6 @@ const LookupUser = () => {
                   }}
                   iconName={"person-remove"}
                   size={24}
-                  fontWeight={"bold"}
-                  fontSize={20}
                   color={"red"}
                   onPress={rejectFriendRequest}
                 />
@@ -711,22 +703,18 @@ const LookupUser = () => {
                 }}
                 iconName={"message"}
                 size={24}
-                fontSize={20}
                 color={"blue"}
                 onPress={() => {
                   navigation.navigate(userId);
                 }}
-                fontWeight={"bold"}
                 label={"Message"}
               />
             ) : null}
             <IconButton
               iconName={"more-vert"}
               size={24}
-              fontSize={20}
               color={"black"}
               onPress={openOptionsDialog}
-              fontWeight={"bold"}
             />
           </View>
         </View>
@@ -747,6 +735,7 @@ const LookupUser = () => {
           initialAmount={10}
           additionalAmount={20}
           horizontal={true}
+          queryOperationName={"listFriendships"}
           queryOperation={listFriendships}
           processingFunction={collectMutualFriends}
           renderItem={({ item }) => (
@@ -756,7 +745,7 @@ const LookupUser = () => {
               userId={item}
             />
           )}
-          keyExtractor={(item) => item}
+          keyExtractor={(item: string) => item}
         />
       </View>
 
@@ -775,7 +764,6 @@ const LookupUser = () => {
                 flex: 1,
                 justifyContent: "center",
                 flexDirection: "row",
-                justifyContent: "space-around",
                 padding: 10,
               }}
             />

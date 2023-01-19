@@ -1,5 +1,5 @@
 import API, { GraphQLResult, GraphQLSubscription } from "@aws-amplify/api";
-import APIList from "@components/APIList";
+import APIList, { APIListRefType } from "@components/APIList";
 import FriendListItem from "@components/FriendListItem";
 import { deleteConversation } from "@graphql/mutations";
 import {
@@ -13,7 +13,6 @@ import React, { useEffect, useRef } from "react";
 import { SafeAreaView } from "react-native";
 import { Conversation, Post } from "src/models";
 import {
-  getSortedConversations,
   listConversations
 } from "../src/graphql/queries";
 
@@ -21,7 +20,7 @@ const subscriptions = [];
 
 export default function ConversationScreen() {
   const {navigate, push} = useNavigation<StackNavigationProp<any>>();
-  const listRef = useRef<APIList | null>(null);
+  const listRef = useRef<APIListRefType<Conversation>>(null);
 
   const updateConversationList = async (newPost: Post) => {
     /*
@@ -225,27 +224,6 @@ export default function ConversationScreen() {
   });
   */
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const conversation = await API.graphql(
-          graphqlOperation(listConversations)
-        );
-        const conversation1 = await API.graphql(
-          graphqlOperation(getSortedConversations, { dummy: 0, Accepted: 0 })
-        );
-
-        console.log(conversation);
-        console.log("########################");
-        console.log(conversation1);
-
-        console.log("Use Effect for getSortedConversations");
-      } catch (err) {
-        console.log("error: ", err);
-      }
-    })();
-  }, []);
-
   const goToMessages = (id) => {
     if (!push) navigate(id);
     else push(id);
@@ -297,6 +275,7 @@ export default function ConversationScreen() {
         ref={listRef}
         initialAmount={10}
         additionalAmount={20}
+        queryOperationName={"listConversations"}
         queryOperation={listConversations}
         processingFunction={collectConversations}
         renderItem={({ item }) => (

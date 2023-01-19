@@ -31,10 +31,7 @@ const BlockListScreen = () => {
         text: "Yes",
         onPress: () => {
           console.log("about to delete this user: ", blockeeId);
-          globalThis.localBlockList = globalThis.localBlockList.filter(
-            (item) => item.blockee != blockeeId
-          );
-          global.localBlockList = listRef.current?.removeItem((item) => item.blockee === blockeeId) ?? [];
+          globalThis.localBlockList = listRef.current?.removeItem((item) => item.blockee === blockeeId) ?? [];
           API.graphql(
             graphqlOperation(deleteBlock, {
               input: { userId: globalThis.myId, blockee: blockeeId },

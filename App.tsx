@@ -1,18 +1,26 @@
+//aws
 import API, { GraphQLQuery } from "@aws-amplify/api";
-import { headerOptions } from "@components/headerComponents/headerOptions";
-import ConfirmSignIn from "@components/loginComponents/ConfirmSignIn";
-import ConfirmSignUp from "@components/loginComponents/ConfirmSignUp";
-import ForgotPassword from "@components/loginComponents/ForgotPassword";
-import Greetings from "@components/loginComponents/Greetings";
-import RequireNewPassword from "@components/loginComponents/RequireNewPassword";
-import SignIn from "@components/loginComponents/SignIn";
-import SignUp from "@components/loginComponents/SignUp";
-import VerifyContact from "@components/loginComponents/VerifyContact";
-import { Ionicons } from "@expo/vector-icons";
+import {
+  Amplify,
+  Auth,
+  Cache,
+  graphqlOperation,
+  Storage
+} from "aws-amplify";
+import { withAuthenticator } from "aws-amplify-react-native";
+import awsconfig from "./src/aws-exports";
+
+//graphql
 import { updateUser } from "@graphql/mutations.js";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { User } from "src/models";
+import { getUser } from "./src/graphql/queries";
+
+//components
+import { headerOptions } from "@components/headerComponents/headerOptions";
+
+//navigation
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createDrawerNavigator } from "@react-navigation/drawer";
+import { createDrawerNavigator, DrawerNavigationOptions } from "@react-navigation/drawer";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import ChallengeStack from "@screens/adminScreens/ChallengeStack";
@@ -28,14 +36,9 @@ import ProfileScreen from "@screens/ProfileScreen";
 import VerificationScreen from "@screens/VerificationScreen";
 import MainStack from "@stacks/MainStack";
 import SettingsStack from "@stacks/SettingsStack";
-import {
-  Amplify,
-  Auth,
-  Cache,
-  graphqlOperation,
-  Storage
-} from "aws-amplify";
-import { withAuthenticator } from "aws-amplify-react-native";
+
+//react
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
 import * as Notifications from "expo-notifications";
 import { StatusBar } from "expo-status-bar";
@@ -44,17 +47,11 @@ import {
   ActivityIndicator,
   Alert,
   AppState,
-  AppStateStatus,
-  LogBox,
-  Platform,
+  AppStateStatus, Platform,
   UIManager,
   useWindowDimensions,
   View
 } from "react-native";
-import { User } from "src/models";
-// Get the aws resources configuration parameters
-import awsconfig from "./src/aws-exports"; // if you are using Amplify CLI
-import { getUser } from "./src/graphql/queries";
 
 if (
   Platform.OS === "android" &&
@@ -71,16 +68,12 @@ Notifications.setNotificationHandler({
   }),
 });
 
-LogBox.ignoreLogs([
-  "Non-serializable values were found in the navigation state",
-]);
-
 Amplify.configure({
   awsconfig,
   Analytics: {
-    disabled: true,
+    disabled: true, //for some reason this removes the unhandled promise rejection error on startup
   },
-}); //for some reason this removes the unhandled promise rejection error on startup
+});
 Auth.configure(awsconfig);
 API.configure(awsconfig);
 Storage.configure(awsconfig);
@@ -91,7 +84,6 @@ const config = {
 };
 
 Cache.configure(config);
-//Cache.clear(); //will we have to do this for the next build?
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -191,11 +183,11 @@ const App = () => {
   };
 
   useEffect(() => {
-    AppState.addEventListener("change", _handleAppStateChange);
+    const appStateSubscription = AppState.addEventListener("change", _handleAppStateChange);
     checkIfUserSignedUp();
 
     return () => {
-      AppState.removeEventListener("change", _handleAppStateChange);
+      appStateSubscription.remove();
     };
   }, []);
 
@@ -290,10 +282,6 @@ const App = () => {
       <NavigationContainer>
         <StatusBar style="dark" />
         <Drawer.Navigator
-          onNavigationStateChange={() => {
-            //stop playing all videos when navigating somewhere else
-            global.currentVideo = null;
-          }}
           drawerPosition={"right"}
           drawerStyle={{ width: dimensions.width }}
           drawerContentOptions={{
@@ -305,7 +293,7 @@ const App = () => {
           drawerContent={(props) => (
             <CustomSidebarMenu {...props} />
           )}
-          screenOptions={headerOptions}
+          screenOptions={headerOptions as DrawerNavigationOptions}
         >
           <Drawer.Screen
             name="Feed"
@@ -351,16 +339,17 @@ const App = () => {
   }
 };
 
-// You can explore the built-in icon families and icons on the web at:
-// https://icons.expo.fyi/
-function TabBarIcon({ name, color}) {
-  return (
-    <Ionicons size={50} style={{ marginBottom: 0 }} {...{ name, color }} />
-  );
-}
+//sign in
+import ConfirmSignIn from "@components/loginComponents/ConfirmSignIn";
+import ConfirmSignUp from "@components/loginComponents/ConfirmSignUp";
+import ForgotPassword from "@components/loginComponents/ForgotPassword";
+import Greetings from "@components/loginComponents/Greetings";
+import RequireNewPassword from "@components/loginComponents/RequireNewPassword";
+import SignIn from "@components/loginComponents/SignIn";
+import SignUp from "@components/loginComponents/SignUp";
+import VerifyContact from "@components/loginComponents/VerifyContact";
 
 export default withAuthenticator(App, false, [
-  //this is why we cant have splash screen
   <Greetings />,
   <SignIn />,
   <SignUp />,
