@@ -1,6 +1,6 @@
 # FitnessProject
 
-Installing and testing the app ->
+## Installing and testing the app
 
 1. Create an email account and a GitHub account to access the repo
 
@@ -10,26 +10,22 @@ Installing and testing the app ->
 
    1. We recommend using a git client like Sourcetree for convenience ([Install Sourcetree](https://confluence.atlassian.com/get-started-with-sourcetree/install-sourcetree-847359094.html)).
 
-      1. After installing, click the “clone from URL” button and add the repo’s git<https://github.com/tifapp/FitnessProject.git>
+      1. After installing, click the “clone from URL” button and add the repo’s git: <https://github.com/tifapp/FitnessProject.git>
 
    2. If you are instead using the command line, install git and then run this command:
 
-      1. git clone<https://github.com/tifapp/FitnessProject.git>
+      1. git clone: <https://github.com/tifapp/FitnessProject.git>
 
 3. Install Node.js version 16.13.1
 
+   1. <https://nodejs.org/download/release/v16.13.1/>
 
-1. <https://nodejs.org/download/release/v16.13.1/>
-
-   1. For Windows, download node-v16.13.1-win…
-   2. For Mac, download node-v16.13.1-pkg
-
+      1. For Windows, download node-v16.13.1-win…
+      2. For Mac, download node-v16.13.1-pkg
 
 4. Install the Expo CLI in the command line
 
-
-1. npm install expo-cli --global
-
+   1. npm install expo-cli --global
 
 5. Go to the project folder, then install all dependencies through the command line
 
@@ -51,7 +47,7 @@ Installing and testing the app ->
    1. Scan the given QR code or link from the terminal  
 
 
-Development process ->
+## Development process
 
 8. [Code Editor (IDE) - Visual Studio](https://visualstudio.microsoft.com/downloads/)
 
@@ -71,10 +67,16 @@ Development process ->
    }
    }
 
-  
-
-
 9. Create an AWS account and follow the instructions in the link<https://docs.amplify.aws/>
+
+   1. Password requirements:
+      * Minimum length 8 characters
+      * Include a minimum of three of the following mix of character types:
+         * Uppercase
+         * Lowercase
+         * Numbers
+         * Non-alphanumeric characters ( ! @ # $ % ^ & * ( ) _ + - = [ ] {} | ' )
+      * Must not be identical to your IAM username, AWS account name or email address
 
 10. In the project folder use the command "amplify configure" and select the region "us-west-2" for AWS setup.
 
@@ -91,11 +93,11 @@ Login instructions:
   
 
 
-Tif Mobile App ->
+# Tif Mobile App
 
-Convention ->
+## Convention
 
-Branch Management ->
+### Branch Management
 
 - Branch off the development branch for each user story.
 
@@ -107,13 +109,13 @@ Branch Management ->
 
 - Once merged, delete the branch afterward.
 
-Debugging ->
+### Debugging
 
 - Reproduce the error
 - Isolate the error
 - Feel free to reach out to team members through Slack for any issues.
 
-Testing ->
+### Testing
 
 - Use “expo start”/“expo start --tunnel”
 
@@ -124,13 +126,13 @@ Testing ->
   - [cse115bdevelopers@gmail.com](mailto:cse115bdevelopers@gmail.com)
   - cse115bdeveloper
 
-Pull Requests ->
+### Pull Requests
 
 - When you have a feature ready to be merged into the sprint branch, issue a pull request
 - Two other members on the team and one code owner must approve the changes before the merge
 - When a pull request gets made, jenkins will test it for any compile time errors
 
-Extensions (Visual Studio Code) ->
+### Extensions (Visual Studio Code)
 
 - Prettier ESLint
 - Code spell checker
@@ -138,19 +140,19 @@ Extensions (Visual Studio Code) ->
 - GraphQL: Language Feature Support
 - GraphQL: Syntax Highlighting
 
-Sourcetree ->
+### Sourcetree
 
 - Download using the following link<https://www.sourcetreeapp.com/>
 - Tutorial<https://confluence.atlassian.com/get-started-with-sourcetree>
 
-React Native ->
+### React Native
 
 - Documentation:<https://reactnative.dev/>
 
 
 - Tutorial:<https://reactnative.dev/docs/getting-started>
 
-Appendix ->
+### Appendix
 
 <https://www.linode.com/docs/guides/install-and-use-npm-on-linux/>
 
