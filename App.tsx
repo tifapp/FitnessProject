@@ -48,6 +48,7 @@ import {
   LogBox,
   Platform,
   Text,
+  TouchableOpacity,
   UIManager,
   useWindowDimensions,
   View
@@ -129,6 +130,20 @@ const App = () => {
       setConversationIds([...tempConversationsIds]);
     }
   };
+
+  function signOut() {
+    const title = "Are you sure you want to sign out?";
+    const message = "";
+    Alert.alert(title, message, [
+      {
+        text: "Yes",
+        onPress: () => {
+          Auth.signOut();
+        },
+      }, //if submithandler fails user won't know
+      { text: "Cancel", style: "cancel" },
+    ], { cancelable: true });
+  }
 
   const checkIfUserSignedUp = async () => {
     try {
@@ -299,6 +314,16 @@ const App = () => {
         justifyContent: "center",
         alignItems: "center"
         }}>
+        <TouchableOpacity onPress={signOut}>
+          <Text
+            style={{
+              fontSize: 15,
+              margin: 20,
+            }}
+          >
+            Log Out
+          </Text>
+        </TouchableOpacity>
         <Text
             style={{
               alignItems: "center",
