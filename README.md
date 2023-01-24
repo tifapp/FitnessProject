@@ -76,7 +76,7 @@ Development process ->
 
 9. Create an AWS account and follow the instructions in the link<https://docs.amplify.aws/>
 
-10. In the project folder use the command "amplify configure" and select the region "us-west-2" for AWS setup.
+10. In the project folder use the command "amplify init" and select the region "us-west-2" for AWS setup.
 
     1. See Sean for login details
 
