@@ -65,7 +65,7 @@ function MessageItem({
               alignSelf: "center",
               marginBottom: 15,
             }}
-            imageURL={item.imageURL}
+            filename={item.imageURL}
             isVisible={false}
           />
         </TouchableOpacity>
@@ -76,7 +76,7 @@ function MessageItem({
           textStyle={{
             paddingBottom: 15,
           }}
-          urlPreview={urlPreview}
+          //urlPreview={urlPreview}
         >
           {item.description}
         </LinkableText>

@@ -1,22 +1,35 @@
 import { MaterialIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Friendship } from "src/models";
 import IconButton from "./common/IconButton";
 import { ProfileImageAndName } from "./ProfileImageAndName";
 
+interface Props {
+  item: Friendship,
+  removeFriendHandler: (item: any, block?: boolean) => void,
+  deleteConversationFromConvo?: (item: any, friendId: any) => void,
+  friendId: any,
+  lastMessage: any,
+  lastUser: any,
+  Accepted: boolean,
+  sidebar: any,
+}
+
+
 export default function FriendListItem({
   item,
-  navigation,
   removeFriendHandler,
   deleteConversationFromConvo,
   friendId,
-  myId,
   lastMessage,
   lastUser,
   Accepted,
   sidebar,
-  imageURL,
-}) {
+}: Props) {
+  const navigation = useNavigation();
+
   const goToMessages = (id, Accepted, lastUser, sidebar) => {
     if (!navigation.push)
       navigation.navigate(id, {

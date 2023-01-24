@@ -1,10 +1,10 @@
 import RNUrlPreview from "@components/RNUrlPreview";
 import React from "react";
-import { Alert, Linking, Text, View, ViewProps } from "react-native";
+import { Alert, Linking, StyleProp, Text, TextStyle, View, ViewProps } from "react-native";
 import Hyperlink from "react-native-hyperlink";
 
 interface Props extends ViewProps {
-  textStyle: string,
+  textStyle: StyleProp<TextStyle>,
   urlPreview: string
 }
 
