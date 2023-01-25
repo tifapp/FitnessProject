@@ -174,7 +174,7 @@ const component = ({
         {hideName ? null : (
           <View
             style={[
-              { justifyContent: "space-between" },
+              { justifyContent: "center"},
               vertical ? { alignItems: "center" } : {},
               textLayoutStyle,
             ]}

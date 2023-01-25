@@ -12,6 +12,7 @@ import PostHeader from "./postComponents/PostHeader";
 import PostImage from "./PostImage";
 import { ProfileImageAndName } from "./ProfileImageAndName";
 import TextWithTaggedUsers from "./TextWithTaggedUsers";
+import printTime from "@hooks/printTime";
 
 
 const updatePostAWS = async (createdAt: string, editedText: string) => {
@@ -77,6 +78,45 @@ const PostItem = ({
       <View
         style={[styles.spaceAround, replyButtonHandler ? {} : styles.nestedReply]}
       >
+        <View
+          style={{
+            borderColor: "red",
+            borderWidth: 2,
+            flex: 1,
+            flexDirection: 'row'
+          }}
+        >
+          <View
+            style={{
+              borderColor: "yellow",
+              borderWidth: 2,
+              flex: 1,
+              flexDirection: 'row',
+              justifyContent: 'flex-start'
+            }}>
+              <ProfileImageAndName
+                textStyle={{
+                  fontWeight: writtenByYou ? "bold" : "normal",
+                }}
+                style={{
+                  borderColor: "purple",
+                  borderWidth: 2,
+                }}
+                userId={item.userId}
+              />
+          </View>
+          <Text
+            style={{
+              borderColor: "orange",
+              borderWidth: 2,
+              flex: 1,
+              flexDirection: 'row',
+              alignSelf: 'center',
+              textAlign: 'right'
+            }}
+          >distance</Text>
+        </View>
+        {/*
         <PostHeader
           item={item}
           writtenByYou={writtenByYou}
@@ -86,27 +126,31 @@ const PostItem = ({
           }}
           reportPost={reportPost}
           shouldSubscribe={shouldSubscribe}
-        />
-
-        <PostImage
-          style={{
-            resizeMode: "cover",
-            width: Dimensions.get("window").width,
-            height: Dimensions.get("window").width,
-            alignSelf: "center",
-            marginBottom: 15,
-          }}
-          filename={item.imageURL}
-          isVisible={
-            isVisible
-            // && !areRepliesVisible
-          }
-        />
+        />*/}
+        {item.imageURL ? (
+          <PostImage
+            style={{
+              resizeMode: "cover",
+              width: Dimensions.get("window").width,
+              height: Dimensions.get("window").width,
+              alignSelf: "center",
+              marginBottom: 15,
+            }}
+            filename={item.imageURL}
+            isVisible={
+              isVisible
+              // && !areRepliesVisible
+            }
+          />
+          ) : null
+        }
 
         <View
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
+            borderColor: "pink",
+            borderWidth: 2,
             minHeight: writtenByYou ? 70 : 35,
           }}
         >
@@ -132,9 +176,7 @@ const PostItem = ({
                 color={"gray"}
                 onPress={() => {removeItem(), reportPost(item.createdAt, item.userId)}}
               />
-            ) : null}
-
-            {writtenByYou ? (
+            ) : 
               <IconButton
                 style={{ marginBottom: 10 }}
                 iconName={"delete-forever"}
@@ -142,7 +184,9 @@ const PostItem = ({
                 color={"gray"}
                 onPress={() => {removeItem(), deletePostAWS(item.createdAt);}}
               />
-            ) : null}
+          }
+
+
 
             {writtenByYou ? (
               <IconButton
@@ -270,12 +314,18 @@ export default React.memo(PostItem);
 const styles = StyleSheet.create({
   secondaryContainerStyle: {
     backgroundColor: "#a9efe0",
+    borderWidth: 2,
+    borderColor: "blue"
   },
   spaceAround: {
     paddingLeft: 0,
     paddingTop: 0,
     paddingRight: 0,
     paddingBottom: 0,
+    borderWidth: 2,
+    borderColor: "green",
+    flex: 1,
+    flexDirection: 'column'
   },
   check: {
     padding: 25,
