@@ -72,6 +72,7 @@ const PostItem = ({
   const repliesModalRef = useRef<ModalRefType>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState("");
+  const NUM_OF_LINES = 5;
   
   return (
     <View style={styles.secondaryContainerStyle}>
@@ -80,16 +81,12 @@ const PostItem = ({
       >
         <View
           style={{
-            //borderColor: "red",
-            //borderWidth: 2,
             flex: 1,
             flexDirection: 'row'
           }}
         >
           <View
             style={{
-              //borderColor: "yellow",
-             // borderWidth: 2,
               flex: 1,
               flexDirection: 'row',
               justifyContent: 'flex-start'
@@ -98,21 +95,16 @@ const PostItem = ({
                 textStyle={{
                   fontWeight: writtenByYou ? "bold" : "normal",
                 }}
-                style={{
-                  //borderColor: "purple",
-                  //borderWidth: 2,
-                }}
                 userId={item.userId}
               />
           </View>
           <Text
             style={{
-              //borderColor: "orange",
-             // borderWidth: 2,
               flex: 1,
               flexDirection: 'row',
               alignSelf: 'center',
-              textAlign: 'right'
+              textAlign: 'right',
+              paddingRight: 5
             }}
           >distance</Text>
         </View>
@@ -121,9 +113,9 @@ const PostItem = ({
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
-            borderColor: "pink",
-            borderWidth: 2,
-            minHeight: writtenByYou ? 70 : 35,
+            //borderColor: "pink",
+            //borderWidth: 2,
+            paddingBottom: 15
           }}
         >
           
@@ -136,7 +128,7 @@ const PostItem = ({
               {item.description}
             </TextInput>
           ) : (
-            <TextWithTaggedUsers textInput={item.description} taggedUsers={item.taggedUsers} urlPreview={item.urlPreview}/>
+            <Text numberOfLines={NUM_OF_LINES}>{item.description}</Text>
           )}
         </View>
         <View
@@ -144,22 +136,23 @@ const PostItem = ({
             flex: 1,
             flexDirection: "row",
             //justifyContent: "flex-start",
-            borderColor: "red",
-            borderWidth: 2,
+            //borderColor: "red",
+            //borderWidth: 2,
             minHeight: 20,
           }}
         >
           <View
             style={{
-              flex: 0.5,
+              flex: 1,
               flexDirection: "row",
-              justifyContent: "space-between",
-              borderColor: "yellow",
-              borderWidth: 2,
+              justifyContent: "flex-start",
+              //borderColor: "yellow",
+              //borderWidth: 2,
              // minHeight: writtenByYou ? 70 : 35,
             }}
           >
             <IconButton 
+              style={{paddingLeft: 3}}
               iconName={"query-builder"}
               size={20}
               color={"black"}
@@ -169,9 +162,7 @@ const PostItem = ({
             >
                 4hrs</Text>
             <IconButton
-              style={{
-                paddingHorizontal: 5
-              }}
+              style={{paddingHorizontal: 6}}
               iconName={"lens"}
               size={5}
               color={"black"}
@@ -190,9 +181,8 @@ const PostItem = ({
               flex: 1,
               flexDirection: "row",
               justifyContent: "flex-end",
-              borderColor: "purple",
-              borderWidth: 2,
-             // minHeight: writtenByYou ? 70 : 35,
+              //borderColor: "purple",
+              //borderWidth: 2,
             }}
           >
             <Text style={{paddingRight: 3}}>5</Text>
@@ -233,16 +223,16 @@ export default React.memo(PostItem);
 const styles = StyleSheet.create({
   secondaryContainerStyle: {
     backgroundColor: "#a9efe0",
-    borderWidth: 2,
-    borderColor: "blue"
+    //borderWidth: 2,
+    //borderColor: "blue"
   },
   spaceAround: {
     paddingLeft: 0,
     paddingTop: 0,
     paddingRight: 0,
     paddingBottom: 0,
-    borderWidth: 2,
-    borderColor: "green",
+    //borderWidth: 2,
+    //borderColor: "green",
     flex: 1,
     flexDirection: 'column'
   },
