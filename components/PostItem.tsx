@@ -104,32 +104,20 @@ const PostItem = ({
               flexDirection: 'row',
               alignSelf: 'center',
               textAlign: 'right',
-              paddingRight: 5
+              paddingRight: '4%'
             }}
           >distance</Text>
         </View>
 
         <View
           style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            //borderColor: "pink",
-            //borderWidth: 2,
             paddingBottom: 15
           }}
         >
-          
-          {isEditing ? (
-            <TextInput
-              style={[styles.check, { borderColor: "orange" }]}
-              onChangeText={setEditedText}
-              autoFocus={true}
-            >
-              {item.description}
-            </TextInput>
-          ) : (
-            <Text numberOfLines={NUM_OF_LINES}>{item.description}</Text>
-          )}
+          <Text numberOfLines={NUM_OF_LINES} style={{
+            paddingHorizontal: '3%'
+          }}
+          >{item.description}</Text>
         </View>
         <View
           style={{
@@ -138,7 +126,7 @@ const PostItem = ({
             //justifyContent: "flex-start",
             //borderColor: "red",
             //borderWidth: 2,
-            minHeight: 20,
+            //minHeight: 20,
           }}
         >
           <View
@@ -152,29 +140,31 @@ const PostItem = ({
             }}
           >
             <IconButton 
-              style={{paddingLeft: 3}}
+              style={{
+                paddingLeft: '2%',
+                paddingRight: '4%'
+              }}
               iconName={"query-builder"}
-              size={20}
+              size={22}
               color={"black"}
               onPress={() => null}
             />
-            <Text  
-            >
+            <Text style={{textAlignVertical:'center'}}>
                 4hrs</Text>
             <IconButton
-              style={{paddingHorizontal: 6}}
+              style={{paddingHorizontal: '4%'}}
               iconName={"lens"}
-              size={5}
+              size={7}
               color={"black"}
               onPress={() => null}
             />
             <IconButton 
               iconName={"person-outline"}
-              size={20}
+              size={22}
               color={"black"}
               onPress={() => null}
             />
-            <Text>1/10</Text>
+            <Text style={{textAlignVertical:'center'}}>1/10</Text>
           </View>
           <View
             style={{
@@ -185,33 +175,42 @@ const PostItem = ({
               //borderWidth: 2,
             }}
           >
-            <Text style={{paddingRight: 3}}>5</Text>
+            <Text style={{
+                paddingRight: 3,
+                textAlignVertical:'center'
+              }}
+            >5</Text>
             <IconButton
-              style={{paddingLeft: 10}}
+              style={{paddingLeft: '5%'}}
               iconName={"person-add"}
-              size={20}
+              size={22}
               color={"black"}
               onPress={() => null}
             />
-            <Text style={{paddingRight: 3}}>5</Text>
+            <Text style={{
+                paddingRight: 3,
+                textAlignVertical:'center'
+              }}>5</Text>
             <IconButton
-              style={{paddingLeft: 8}}
+              style={{paddingLeft: '3%'}}
               iconName={"messenger"}
-              size={16}
-              color={"black"}
-              onPress={() => null/*repliesModalRef.current?.showModal()*/}
-            />
-            <IconButton
-              iconName={"more-vert"}
-              size={20}
+              size={18}
               color={"black"}
               onPress={() => null}
             />
+            <IconButton
+              style={{paddingLeft: '3%'}}
+              iconName={"more-vert"}
+              size={24}
+              color={"black"}
+              onPress={() => null}
+            />
+            {/* Code for comments modal
             <Modal ref={repliesModalRef}>
               <CommentsModal item={item} operations={operations}/>
             </Modal>
+          */}
           </View>
-
         </View>
       </View>
     </View>
