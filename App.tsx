@@ -47,7 +47,8 @@ import {
   ActivityIndicator,
   Alert,
   AppState,
-  AppStateStatus, Platform,
+  AppStateStatus,
+  Platform,
   UIManager,
   useWindowDimensions,
   View
@@ -98,6 +99,7 @@ const App = () => {
   const [userId, setUserId] = useState<string>("checking..."); //stores the user's id if logged in
   const [isNewUser, setIsNewUser] = useState<boolean>(false); //stores the user's id if logged in
   const [isAdmin, setIsAdmin] = useState<boolean>(false); //seems insecure
+  const [isDeveloper, setIsDeveloper] = useState<boolean>(false);
 
   const [conversationIds, setConversationIds] = useState<string[]>([]);
 
@@ -120,6 +122,20 @@ const App = () => {
     }
   };
 
+  function signOut() {
+    const title = "Are you sure you want to sign out?";
+    const message = "";
+    Alert.alert(title, message, [
+      {
+        text: "Yes",
+        onPress: () => {
+          Auth.signOut();
+        },
+      }, //if submithandler fails user won't know
+      { text: "Cancel", style: "cancel" },
+    ], { cancelable: true });
+  }
+
   const checkIfUserSignedUp = async () => {
     try {
       const query = await Auth.currentAuthenticatedUser();
@@ -130,6 +146,11 @@ const App = () => {
           )
         );
       setUserId(query.attributes.sub);
+
+      if (query.signInUserSession.idToken.payload["cognito:groups"].includes("test_users")) {
+        setIsDeveloper(true);
+      }
+
       globalThis.myId = query.attributes.sub;
       const user = await API.graphql<GraphQLQuery<{getUser: User}>> (
         graphqlOperation(getUser, { id: query.attributes.sub })
@@ -276,6 +297,36 @@ const App = () => {
           />
         </Tab.Navigator>
       </NavigationContainer>
+    );
+  } else if (isDeveloper) {
+    return (
+      <View style={{
+        flex:1,
+        justifyContent: "center",
+        alignItems: "center"
+        }}>
+        <TouchableOpacity onPress={signOut}>
+          <Text
+            style={{
+              fontSize: 15,
+              margin: 20,
+            }}
+          >
+            Log Out
+          </Text>
+        </TouchableOpacity>
+        <Text
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              color: "black",
+              fontWeight: "bold",
+              fontSize: 15
+            }}
+          >
+            SandBox to get started
+        </Text>
+      </View>
     );
   } else {
     return (
