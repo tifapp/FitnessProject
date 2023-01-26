@@ -80,16 +80,16 @@ const PostItem = ({
       >
         <View
           style={{
-            borderColor: "red",
-            borderWidth: 2,
+            //borderColor: "red",
+            //borderWidth: 2,
             flex: 1,
             flexDirection: 'row'
           }}
         >
           <View
             style={{
-              borderColor: "yellow",
-              borderWidth: 2,
+              //borderColor: "yellow",
+             // borderWidth: 2,
               flex: 1,
               flexDirection: 'row',
               justifyContent: 'flex-start'
@@ -99,16 +99,16 @@ const PostItem = ({
                   fontWeight: writtenByYou ? "bold" : "normal",
                 }}
                 style={{
-                  borderColor: "purple",
-                  borderWidth: 2,
+                  //borderColor: "purple",
+                  //borderWidth: 2,
                 }}
                 userId={item.userId}
               />
           </View>
           <Text
             style={{
-              borderColor: "orange",
-              borderWidth: 2,
+              //borderColor: "orange",
+             // borderWidth: 2,
               flex: 1,
               flexDirection: 'row',
               alignSelf: 'center',
@@ -116,34 +116,6 @@ const PostItem = ({
             }}
           >distance</Text>
         </View>
-        {/*
-        <PostHeader
-          item={item}
-          writtenByYou={writtenByYou}
-          toggleEditing={() => setIsEditing(!isEditing)}
-          repliesPressed={() => {
-            repliesModalRef.current?.showModal();
-          }}
-          reportPost={reportPost}
-          shouldSubscribe={shouldSubscribe}
-        />*/}
-        {item.imageURL ? (
-          <PostImage
-            style={{
-              resizeMode: "cover",
-              width: Dimensions.get("window").width,
-              height: Dimensions.get("window").width,
-              alignSelf: "center",
-              marginBottom: 15,
-            }}
-            filename={item.imageURL}
-            isVisible={
-              isVisible
-              // && !areRepliesVisible
-            }
-          />
-          ) : null
-        }
 
         <View
           style={{
@@ -154,6 +126,7 @@ const PostItem = ({
             minHeight: writtenByYou ? 70 : 35,
           }}
         >
+          
           {isEditing ? (
             <TextInput
               style={[styles.check, { borderColor: "orange" }]}
@@ -165,146 +138,92 @@ const PostItem = ({
           ) : (
             <TextWithTaggedUsers textInput={item.description} taggedUsers={item.taggedUsers} urlPreview={item.urlPreview}/>
           )}
-
-          <View
-            style={{ flexDirection: "column", position: "absolute", right: 15 }}
-          >
-            {!writtenByYou ? (
-              <IconButton
-                iconName={"report"}
-                size={20}
-                color={"gray"}
-                onPress={() => {removeItem(), reportPost(item.createdAt, item.userId)}}
-              />
-            ) : 
-              <IconButton
-                style={{ marginBottom: 10 }}
-                iconName={"delete-forever"}
-                size={20}
-                color={"gray"}
-                onPress={() => {removeItem(), deletePostAWS(item.createdAt);}}
-              />
-          }
-
-
-
-            {writtenByYou ? (
-              <IconButton
-                style={{ marginBottom: 15 }}
-                iconName={"edit"}
-                size={20}
-                color={"gray"}
-                onPress={() => setIsEditing(!isEditing)}
-              />
-            ) : null}
-          </View>
         </View>
-
-        {/* {item.loading ?? (
-          <TouchableOpacity
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            //justifyContent: "flex-start",
+            borderColor: "red",
+            borderWidth: 2,
+            minHeight: 20,
+          }}
+        >
+          <View
             style={{
+              flex: 0.5,
               flexDirection: "row",
-              alignItems: "center",
               justifyContent: "space-between",
-              marginTop: 8,
-              marginBottom: 16,
-            }}
-            onPress={() => {
-              likesModalRef.current?.showModal();
+              borderColor: "yellow",
+              borderWidth: 2,
+             // minHeight: writtenByYou ? 70 : 35,
             }}
           >
-            <APIList
-              style={{ margin: 0, padding: 0 }}
-              horizontal={true}
-              queryOperation={likesByPost}
-              queryOperationName={"likesByPost"}
-              filter={{
-                postId: item.createdAt + "#" + item.userId,
-                sortDirection: "DESC",
-              }}
-              initialAmount={1}
-              additionalAmount={0}
-              renderItem={({ item }) => (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <ProfileImageAndName
-                    style={{
-                      alignContent: "flex-start",
-                      alignItems: "center",
-                      alignSelf: "flex-end",
-                      justifyContent: "flex-start",
-                      flexDirection: "row",
-                      marginLeft: 15,
-                      marginRight: 5,
-                    }}
-                    imageSize={20}
-                    userId={item.userId}
-                    onPress={likesModalRef.current?.showModal}
-                  />
-                  <Text>
-                    {likes > 1 ? "and " + (likes - 1) + " others" : ""} liked
-                    this post
-                  </Text>
-                </View>
-              )}
-              keyExtractor={(item: Like) => item.userId}
+            <IconButton 
+              iconName={"query-builder"}
+              size={20}
+              color={"black"}
+              onPress={() => null}
             />
-          </TouchableOpacity>
-        )} */}
-
-        <FlatList
-          data={item.taggedUsers}
-          keyExtractor={(item) => item}
-          renderItem={({ item }) => (
-            <ProfileImageAndName
+            <Text  
+            >
+                4hrs</Text>
+            <IconButton
               style={{
-                alignContent: "flex-start",
-                alignItems: "center",
-                alignSelf: "flex-start",
-                justifyContent: "flex-start",
-                flexDirection: "row",
-                marginLeft: 15,
-                marginRight: 5,
+                paddingHorizontal: 5
               }}
-              imageSize={20}
-              userId={item}
+              iconName={"lens"}
+              size={5}
+              color={"black"}
+              onPress={() => null}
             />
-          )}
-        />
+            <IconButton 
+              iconName={"person-outline"}
+              size={20}
+              color={"black"}
+              onPress={() => null}
+            />
+            <Text>1/10</Text>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              justifyContent: "flex-end",
+              borderColor: "purple",
+              borderWidth: 2,
+             // minHeight: writtenByYou ? 70 : 35,
+            }}
+          >
+            <Text style={{paddingRight: 3}}>5</Text>
+            <IconButton
+              style={{paddingLeft: 10}}
+              iconName={"person-add"}
+              size={20}
+              color={"black"}
+              onPress={() => null}
+            />
+            <Text style={{paddingRight: 3}}>5</Text>
+            <IconButton
+              style={{paddingLeft: 8}}
+              iconName={"messenger"}
+              size={16}
+              color={"black"}
+              onPress={() => null/*repliesModalRef.current?.showModal()*/}
+            />
+            <IconButton
+              iconName={"more-vert"}
+              size={20}
+              color={"black"}
+              onPress={() => null}
+            />
+            <Modal ref={repliesModalRef}>
+              <CommentsModal item={item} operations={operations}/>
+            </Modal>
+          </View>
 
-        <Modal ref={likesModalRef}>
-          <LikesModal item={item} />
-        </Modal>
-        <Modal ref={repliesModalRef}>
-          <CommentsModal item={item} operations={operations}/>
-        </Modal>
+        </View>
       </View>
-
-      {isEditing ? (
-        editedText === "" ? (
-          <TouchableOpacity
-            style={styles.unselectedButtonStyle}
-            onPress={() => {
-              Alert.alert("Post is empty!");
-            }}
-          >
-            <Text style={[styles.buttonTextStyle, { color: "gray" }]}>
-              {"Edit Post"}
-            </Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={styles.buttonStyle}
-            onPress={() => {
-              replaceItem({description: editedText}),
-              updatePostAWS(item.createdAt, editedText),
-              setEditedText(""),
-              setIsEditing(false);
-            }}
-          >
-            <Text style={styles.buttonTextStyle}>{"Edit Post"}</Text>
-          </TouchableOpacity>
-        )
-      ) : null}
     </View>
   );
 };
