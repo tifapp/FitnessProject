@@ -13,6 +13,7 @@ import PostImage from "./PostImage";
 import { ProfileImageAndName } from "./ProfileImageAndName";
 import TextWithTaggedUsers from "./TextWithTaggedUsers";
 import printTime from "@hooks/printTime";
+import { Divider } from "react-native-elements";
 
 
 const updatePostAWS = async (createdAt: string, editedText: string) => {
@@ -82,22 +83,21 @@ const PostItem = ({
         <View
           style={{
             flex: 1,
-            flexDirection: 'row'
+            flexDirection: 'row',
+            paddingBottom: '2%'
           }}
         >
-          <View
+          <ProfileImageAndName
+            textStyle={{
+              fontWeight: writtenByYou ? "bold" : "normal",
+            }}
             style={{
               flex: 1,
               flexDirection: 'row',
-              justifyContent: 'flex-start'
-            }}>
-              <ProfileImageAndName
-                textStyle={{
-                  fontWeight: writtenByYou ? "bold" : "normal",
-                }}
-                userId={item.userId}
-              />
-          </View>
+              alignSelf: 'flex-start'
+            }}
+            userId={item.userId}
+          />
           <Text
             style={{
               flex: 1,
@@ -108,10 +108,16 @@ const PostItem = ({
             }}
           >distance</Text>
         </View>
+        <Divider style={{
+          width: '85%',
+          height: 1,
+          alignSelf: 'center'
+        }}/>
 
         <View
           style={{
-            paddingBottom: 15
+            paddingBottom: 15,
+            paddingTop: '3%'
           }}
         >
           <Text numberOfLines={NUM_OF_LINES} style={{
@@ -123,20 +129,12 @@ const PostItem = ({
           style={{
             flex: 1,
             flexDirection: "row",
-            //justifyContent: "flex-start",
-            //borderColor: "red",
-            //borderWidth: 2,
-            //minHeight: 20,
           }}
         >
           <View
             style={{
               flex: 1,
               flexDirection: "row",
-              justifyContent: "flex-start",
-              //borderColor: "yellow",
-              //borderWidth: 2,
-             // minHeight: writtenByYou ? 70 : 35,
             }}
           >
             <IconButton 
@@ -171,8 +169,6 @@ const PostItem = ({
               flex: 1,
               flexDirection: "row",
               justifyContent: "flex-end",
-              //borderColor: "purple",
-              //borderWidth: 2,
             }}
           >
             <Text style={{
