@@ -15,7 +15,6 @@ import TextWithTaggedUsers from "./TextWithTaggedUsers";
 import printTime from "@hooks/printTime";
 import { Divider } from "react-native-elements";
 import useGenerateRandomColor from "@hooks/generateRandomColor";
-import { int } from "aws-sdk/clients/datapipeline";
 
 
 const updatePostAWS = async (createdAt: string, editedText: string) => {
@@ -53,8 +52,8 @@ interface Props {
   isVisible?: boolean,
   shouldSubscribe?: boolean,
   operations: APIListOperations<Post>,
-  timeUntil: int, // Int just to test UI 
-  maxOccupancy: int,
+  timeUntil: number, // Int just to test UI 
+  maxOccupancy: number,
   hasInvitations: boolean
 }
 
