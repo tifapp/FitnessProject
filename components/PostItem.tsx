@@ -80,63 +80,36 @@ const PostItem = ({
       <View
         style={[styles.spaceAround, replyButtonHandler ? {} : styles.nestedReply]}
       >
+      {/* Header (name, profile pic, event dot, distance) */}
         <View
-          style={{
-            flex: 1,
-            flexDirection: 'row',
-            paddingBottom: '2%'
-          }}
+          style={[styles.flexRow, {paddingBottom: '2%'}]}
         >
           <ProfileImageAndName
             textStyle={{
               fontWeight: writtenByYou ? "bold" : "normal",
             }}
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              alignSelf: 'flex-start'
-            }}
+            style={styles.flexRow}
             userId={item.userId}
           />
-          <Text
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              alignSelf: 'center',
-              textAlign: 'right',
-              paddingRight: '4%'
-            }}
-          >distance</Text>
+          <Text style={styles.distance}>distance</Text>
         </View>
-        <Divider style={{
-          width: '85%',
-          height: 1,
-          alignSelf: 'center'
-        }}/>
 
-        <View
-          style={{
-            paddingBottom: 15,
-            paddingTop: '3%'
-          }}
-        >
-          <Text numberOfLines={NUM_OF_LINES} style={{
-            paddingHorizontal: '3%'
-          }}
-          >{item.description}</Text>
-        </View>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "row",
-          }}
-        >
-          <View
+        <Divider style={styles.divider}/>
+
+        {/* Description */}
+        <View style={styles.description}>
+          <Text numberOfLines={NUM_OF_LINES}
             style={{
-              flex: 1,
-              flexDirection: "row",
+              paddingHorizontal: '3%'
             }}
           >
+            {item.description}
+          </Text>
+        </View>
+
+        {/* Bottom Left Icons (time until event, max occupancy) */}
+        <View style={styles.flexRow}>
+          <View style={styles.flexRow}>
             <IconButton 
               style={{
                 paddingLeft: '2%',
@@ -147,10 +120,9 @@ const PostItem = ({
               color={"black"}
               onPress={() => null}
             />
-            <Text style={{textAlignVertical:'center'}}>
-                4hrs</Text>
+            <Text style={{textAlignVertical:'center'}}>4hrs</Text>
             <IconButton
-              style={{paddingHorizontal: '4%'}}
+              style={styles.paddingDot}
               iconName={"lens"}
               size={7}
               color={"black"}
@@ -164,29 +136,18 @@ const PostItem = ({
             />
             <Text style={{textAlignVertical:'center'}}>1/10</Text>
           </View>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              justifyContent: "flex-end",
-            }}
-          >
-            <Text style={{
-                paddingRight: 3,
-                textAlignVertical:'center'
-              }}
-            >5</Text>
+
+          {/* Bottom Right Icons (invitations, comments, more tab) */}
+          <View style={styles.iconsBottomRight}>
+            <Text style={styles.numbersBottomRight}>5</Text>
             <IconButton
-              style={{paddingLeft: '5%'}}
+              style={{paddingLeft: '6%'}}
               iconName={"person-add"}
               size={22}
               color={"black"}
               onPress={() => null}
             />
-            <Text style={{
-                paddingRight: 3,
-                textAlignVertical:'center'
-              }}>5</Text>
+            <Text style={styles.numbersBottomRight}>5</Text>
             <IconButton
               style={{paddingLeft: '3%'}}
               iconName={"messenger"}
@@ -201,11 +162,6 @@ const PostItem = ({
               color={"black"}
               onPress={() => null}
             />
-            {/* Code for comments modal
-            <Modal ref={repliesModalRef}>
-              <CommentsModal item={item} operations={operations}/>
-            </Modal>
-          */}
           </View>
         </View>
       </View>
@@ -217,9 +173,7 @@ export default React.memo(PostItem);
 
 const styles = StyleSheet.create({
   secondaryContainerStyle: {
-    backgroundColor: "#a9efe0",
-    //borderWidth: 2,
-    //borderColor: "blue"
+    backgroundColor: "#a9efe0"
   },
   spaceAround: {
     paddingLeft: 0,
@@ -231,7 +185,41 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column'
   },
-  check: {
+  flexRow: {
+    flex: 1,
+    flexDirection: 'row'
+  },
+  distance: {
+    flex: 1,
+    flexDirection: 'row',
+    alignSelf: 'center',
+    textAlign: 'right',
+    paddingRight: '4%'
+  },
+  divider: {
+    width: '85%',
+    height: 1,
+    alignSelf: 'center'
+  },
+  description: {
+    paddingBottom: 15,
+    paddingTop: '3%'
+  },
+  iconsBottomRight: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+  },
+  numbersBottomRight: {
+    paddingRight: 3,
+    textAlignVertical:'center'
+  },
+  paddingDot: {
+    paddingRight: '3%',
+    paddingLeft: '2%',
+    paddingTop: '2%'
+  },
+ /* check: {
     padding: 25,
     marginTop: 16,
     borderColor: "#bbb",
@@ -261,7 +249,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginHorizontal: 6,
-  },
+  },*/
   nestedReply: {
     marginBottom: 20,
     backgroundColor: "white",
