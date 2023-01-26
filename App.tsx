@@ -47,8 +47,13 @@ import {
   ActivityIndicator,
   Alert,
   AppState,
+<<<<<<< HEAD
   AppStateStatus, Platform,
   UIManager,
+=======
+  AppStateStatus,
+  Platform, UIManager,
+>>>>>>> 5eac614 (Fixed user sign in flow and missing sandbox imports)
   useWindowDimensions,
   View
 } from "react-native";
@@ -98,7 +103,6 @@ const App = () => {
   const [userId, setUserId] = useState<string>("checking..."); //stores the user's id if logged in
   const [isNewUser, setIsNewUser] = useState<boolean>(false); //stores the user's id if logged in
   const [isAdmin, setIsAdmin] = useState<boolean>(false); //seems insecure
-  const [isDeveloper, setIsDeveloper] = useState<boolean>(false);
 
   const [conversationIds, setConversationIds] = useState<string[]>([]);
 
@@ -121,34 +125,19 @@ const App = () => {
     }
   };
 
-  function signOut() {
-    const title = "Are you sure you want to sign out?";
-    const message = "";
-    Alert.alert(title, message, [
-      {
-        text: "Yes",
-        onPress: () => {
-          Auth.signOut();
-        },
-      }, //if submithandler fails user won't know
-      { text: "Cancel", style: "cancel" },
-    ], { cancelable: true });
-  }
-
   const checkIfUserSignedUp = async () => {
     try {
       const query = await Auth.currentAuthenticatedUser();
-      if (query.signInUserSession.idToken.payload["cognito:groups"])
-        setIsAdmin(
-          query.signInUserSession.idToken.payload["cognito:groups"].includes(
-            "Admins"
-          )
-        );
-      setUserId(query.attributes.sub);
-
-      if (query.signInUserSession.idToken.payload["cognito:groups"].includes("test_users")) {
-        setIsDeveloper(true);
+      const groups = query?.signInUserSession?.idToken?.payload?.["cognito:groups"];
+      if (groups) {
+        if (groups.includes("Admins")) {
+          setIsAdmin(true);
+        }
+        if (groups.includes("test_users")) {
+          setIsDeveloper(true);
+        }
       }
+      setUserId(query.attributes.sub);
 
       globalThis.myId = query.attributes.sub;
       const user = await API.graphql<GraphQLQuery<{getUser: User}>> (
@@ -299,33 +288,21 @@ const App = () => {
     );
   } else if (isDeveloper) {
     return (
-      <View style={{
-        flex:1,
-        justifyContent: "center",
-        alignItems: "center"
-        }}>
-        <TouchableOpacity onPress={signOut}>
-          <Text
-            style={{
-              fontSize: 15,
-              margin: 20,
-            }}
-          >
-            Log Out
-          </Text>
-        </TouchableOpacity>
-        <Text
-            style={{
-              alignItems: "center",
-              justifyContent: "center",
-              color: "black",
-              fontWeight: "bold",
-              fontSize: 15
-            }}
-          >
-            SandBox to get started
-        </Text>
-      </View>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Activities Screen"
+            component={
+              ActivitiesScreen
+            }
+            options={
+              {
+                headerShown: false,
+              }
+            }
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
     );
   } else {
     return (
@@ -398,6 +375,7 @@ import RequireNewPassword from "@components/loginComponents/RequireNewPassword";
 import SignIn from "@components/loginComponents/SignIn";
 import SignUp from "@components/loginComponents/SignUp";
 import VerifyContact from "@components/loginComponents/VerifyContact";
+import ActivitiesScreen from "@screens/ActivitiesScreen";
 
 export default withAuthenticator(App, false, [
   <Greetings />,
