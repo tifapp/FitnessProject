@@ -141,8 +141,8 @@ const component = ({
             {
               // onError={addUserInfotoCache}
               resizeMode: "cover",
-              width: imageSize ?? 45,
-              height: imageSize ?? 45,
+              width: imageSize ?? 25,
+              height: imageSize ?? 25,
               marginRight: !vertical ? margin ?? 15 : 0,
               marginBottom: vertical ? margin ?? 15 : 0,
               alignSelf: "flex-start",
@@ -190,7 +190,8 @@ const component = ({
                     }
                   : goToProfile
               }
-              style={[textStyle, { flexWrap: "wrap" }]}
+              style={[textStyle, { flexWrap: "wrap", fontSize: 15 }]}
+              
             >
               {!isFullSize && userInfo && userInfo.status ? (
                 <MaterialIcons

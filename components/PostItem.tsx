@@ -1,7 +1,7 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
 import { APIListOperations } from "@components/APIList";
 import { deletePost, updatePost } from "@graphql/mutations";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Alert, Dimensions, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Post } from "src/models";
 import IconButton from "./common/IconButton";
@@ -14,6 +14,7 @@ import { ProfileImageAndName } from "./ProfileImageAndName";
 import TextWithTaggedUsers from "./TextWithTaggedUsers";
 import printTime from "@hooks/printTime";
 import { Divider } from "react-native-elements";
+import useGenerateRandomColor from "@hooks/generateRandomColor";
 
 
 const updatePostAWS = async (createdAt: string, editedText: string) => {
@@ -69,12 +70,17 @@ const PostItem = ({
   operations,
 } : Props) => {
   const {removeItem, replaceItem} = operations;
+  const {color, generateColor} = useGenerateRandomColor();
   const likesModalRef = useRef<ModalRefType>(null);
   const repliesModalRef = useRef<ModalRefType>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState("");
   const NUM_OF_LINES = 5;
-  
+
+  useEffect(() => {
+    generateColor();
+  }, []);
+
   return (
     <View style={styles.secondaryContainerStyle}>
       <View
@@ -88,9 +94,16 @@ const PostItem = ({
             textStyle={{
               fontWeight: writtenByYou ? "bold" : "normal",
             }}
-            style={styles.flexRow}
+            style={styles.profile}
             userId={item.userId}
           />
+          <IconButton
+              style={styles.eventDot}
+              iconName={"lens"}
+              size={15}
+              color={color}
+              onPress={() => null}
+            />
           <Text style={styles.distance}>distance</Text>
         </View>
 
@@ -180,8 +193,6 @@ const styles = StyleSheet.create({
     paddingTop: 0,
     paddingRight: 0,
     paddingBottom: 0,
-    //borderWidth: 2,
-    //borderColor: "green",
     flex: 1,
     flexDirection: 'column'
   },
@@ -218,6 +229,13 @@ const styles = StyleSheet.create({
     paddingRight: '3%',
     paddingLeft: '2%',
     paddingTop: '2%'
+  },
+  eventDot: {
+    paddingRight: '2%'
+  },
+  profile: {
+    flexDirection: "row",
+    paddingLeft: "3%"
   },
  /* check: {
     padding: 25,
