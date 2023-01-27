@@ -190,6 +190,7 @@ const component = ({
               //instead we may consider replacing this whole section with an optional component that takes in the user's name as an argument/prop. the default behavior would be a simple text component.
             }
             <Text
+              numberOfLines={1}
               onPress={
                 onPress
                   ? () => {
@@ -215,7 +216,7 @@ const component = ({
               {userInfo != null && userInfo.name
                 ? nameArray[0] +
                   (nameArray[1] != null ? ' ' + nameArray[1][0].toUpperCase() + '.' : '')
-                : "Loading.."}
+                : "Loading..."}
               
               {nameComponent}
             </Text>

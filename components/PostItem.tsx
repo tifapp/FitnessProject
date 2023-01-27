@@ -69,12 +69,13 @@ const PostItem = ({
   //index,
   operations,
 } : Props) => {
-  const {removeItem, replaceItem} = operations;
+  //const {removeItem, replaceItem} = operations;
   const {color, generateColor} = useGenerateRandomColor();
-  const likesModalRef = useRef<ModalRefType>(null);
-  const repliesModalRef = useRef<ModalRefType>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedText, setEditedText] = useState("");
+  //const likesModalRef = useRef<ModalRefType>(null);
+  //const repliesModalRef = useRef<ModalRefType>(null);
+  //const [isEditing, setIsEditing] = useState(false);
+  //const [editedText, setEditedText] = useState("");
+  const [requested, setRequested] = useState(false);
   const NUM_OF_LINES = 5;
 
   useEffect(() => {
@@ -104,7 +105,7 @@ const PostItem = ({
               color={color}
               onPress={() => null}
             />
-          <Text style={styles.distance}>distance</Text>
+          <Text style={styles.distance}>_ mi</Text>
         </View>
 
         <Divider style={styles.divider}/>
@@ -133,7 +134,7 @@ const PostItem = ({
               color={"black"}
               onPress={() => null}
             />
-            <Text style={{textAlignVertical:'center'}}>4hrs</Text>
+            <Text style={{textAlignVertical:'center'}}>_hrs</Text>
             <IconButton
               style={styles.paddingDot}
               iconName={"lens"}
@@ -147,20 +148,26 @@ const PostItem = ({
               color={"black"}
               onPress={() => null}
             />
-            <Text style={{textAlignVertical:'center'}}>1/10</Text>
+            <Text style={{textAlignVertical:'center'}}>_/_</Text>
           </View>
 
           {/* Bottom Right Icons (invitations, comments, more tab) */}
           <View style={styles.iconsBottomRight}>
-            <Text style={styles.numbersBottomRight}>5</Text>
+            <Text 
+              style={[
+                styles.numbersBottomRight,
+                {color: requested ? color : "black"}
+              ]}
+            >_</Text>
             <IconButton
               style={{paddingLeft: '6%'}}
               iconName={"person-add"}
               size={22}
-              color={"black"}
-              onPress={() => null}
+              color={requested ? color : "black"}
+              onPress={() => setRequested(!requested)}
             />
-            <Text style={styles.numbersBottomRight}>5</Text>
+            <Text style={styles.numbersBottomRight}
+            >_</Text>
             <IconButton
               style={{paddingLeft: '3%'}}
               iconName={"messenger"}
