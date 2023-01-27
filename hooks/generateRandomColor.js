@@ -14,7 +14,7 @@ const useGenerateRandomColor = () => {
     const generateColor = () =>{
       const r = randomInt(1, 250);
       const g = randomInt(1, 250);
-      const b = randomInt(50, 250);
+      const b = randomInt(1, 250);
      
      setColor('rgb(' + r.toString() + ', ' + g.toString() + ', ' + b.toString() + ')');
     };

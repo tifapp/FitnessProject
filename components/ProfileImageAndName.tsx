@@ -53,6 +53,7 @@ const component = ({
   spaceAfterName,
 }: Props) => {
   const [userInfo, setUserInfo] = useState<typeof globalThis.savedUsers[keyof typeof globalThis.savedUsers]>();
+  const [nameArray, setNameArray] = useState<string[]>([]);
 
   useEffect(() => {    
     if (
@@ -106,6 +107,12 @@ const component = ({
     //console.log("updating profileimageandname")
     setUserInfo(globalThis.savedUsers?.[userId]);
   }, [globalThis.savedUsers?.[userId]]);
+
+  useEffect(() => {
+    if (userInfo) {
+      setNameArray(userInfo!.name.split(" "));
+    }
+  }, [userInfo]);
 
   const navigation = navigationObject ?? useNavigation();
 
@@ -206,10 +213,10 @@ const component = ({
               ) : null}
               {!isFullSize && userInfo && userInfo.status ? " " : null}
               {userInfo != null && userInfo.name
-                ? userInfo.isFullSize || userInfo.name.length <= 40
-                  ? userInfo.name + (spaceAfterName ? " " : "")
-                  : userInfo.name.substring(0, 40)
-                : "Loading..."}
+                ? nameArray[0] +
+                  (nameArray[1] != null ? ' ' + nameArray[1][0].toUpperCase() + '.' : '')
+                : "Loading.."}
+              
               {nameComponent}
             </Text>
             {subtitleComponent}

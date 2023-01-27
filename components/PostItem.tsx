@@ -205,7 +205,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignSelf: 'center',
     textAlign: 'right',
-    paddingRight: '4%'
+    paddingRight: '4%',
+    paddingTop: '2%'
   },
   divider: {
     width: '85%',
@@ -231,11 +232,13 @@ const styles = StyleSheet.create({
     paddingTop: '2%'
   },
   eventDot: {
-    paddingRight: '2%'
+    paddingRight: '2%',
+    paddingTop: '2%'
   },
   profile: {
     flexDirection: "row",
-    paddingLeft: "3%"
+    paddingLeft: "3%",
+    paddingTop: '2%'
   },
  /* check: {
     padding: 25,
