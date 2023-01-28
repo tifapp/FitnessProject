@@ -80,7 +80,11 @@ const PostItem = ({
   const [hasMaxLimit, setHasMaxLimit] = useState(true); // If post has maximum occupancy
   const [hasInvitation, setHasInvitation] = useState(true); // If post has required invitations
   const [numInvitations, setHasNumInvitations] = useState(1) // Number of requested invitations
+  const [isHours, setIsHours] = useState(true); // If time limit has >= 1 hour left
+  const [currentCapacity, setCurrentCapacity] = useState(5);
+  const maxCapacity = 8;
   const NUM_OF_LINES = 5;
+  const CAPACITY_PERCENTAGE = 0.75;
 
   useEffect(() => {
     generateColor();
@@ -133,10 +137,15 @@ const PostItem = ({
                 <IconButton
                   iconName={"query-builder"}
                   size={22}
-                  color={"black"}
+                  color={isHours ? 'grey' : 'red'}
                   onPress={() => null}
                 />
-                <Text style={styles.numHours}>0hrs</Text>
+                <Text style={[
+                    styles.numHours,
+                    {color: isHours ? 'grey' : 'red'}
+                  ]}>
+                  0{isHours ? 'hrs' : 'min'}
+                </Text>
               </View> : null
             }
             {hasTimeLimit && hasMaxLimit ?
@@ -144,7 +153,7 @@ const PostItem = ({
                 style={styles.paddingDot}
                 iconName={"lens"}
                 size={7}
-                color={"black"}
+                color={"grey"}
                 onPress={() => null}
               /> : null
             }
@@ -153,10 +162,16 @@ const PostItem = ({
                 <IconButton 
                   iconName={"person-outline"}
                   size={22}
-                  color={"black"}
+                  color={(currentCapacity >= Math.floor(maxCapacity*CAPACITY_PERCENTAGE))
+                    ? 'red' : 'grey'}
                   onPress={() => null}
                 />
-                <Text style={{textAlignVertical:'center'}}>0/0</Text>
+                <Text style={[
+                    {textAlignVertical:'center'},
+                    {color: (currentCapacity >= Math.floor(maxCapacity*CAPACITY_PERCENTAGE))
+                      ? 'red' : 'grey'
+                    }
+                  ]}>{currentCapacity}/{maxCapacity}</Text>
               </View> : null
             }
           </View>
@@ -230,7 +245,7 @@ const styles = StyleSheet.create({
     paddingTop: '2%'
   },
   divider: {
-    width: '85%',
+    width: '94%',
     height: 1,
     alignSelf: 'center'
   },
