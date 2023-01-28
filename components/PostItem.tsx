@@ -15,6 +15,7 @@ import TextWithTaggedUsers from "./TextWithTaggedUsers";
 import printTime from "@hooks/printTime";
 import { Divider } from "react-native-elements";
 import useGenerateRandomColor from "@hooks/generateRandomColor";
+import { int } from "aws-sdk/clients/datapipeline";
 
 
 const updatePostAWS = async (createdAt: string, editedText: string) => {
@@ -52,6 +53,9 @@ interface Props {
   isVisible?: boolean,
   shouldSubscribe?: boolean,
   operations: APIListOperations<Post>,
+  timeLimit: int, // Int just to test UI 
+  maxOccupancy: int,
+  hasInvitations: boolean
 }
 
 const PostItem = ({
@@ -68,6 +72,9 @@ const PostItem = ({
   //replies,
   //index,
   operations,
+  timeLimit, // For now I have it as an int to test the UI, probably change it later
+  maxOccupancy,
+  hasInvitations,
 } : Props) => {
   //const {removeItem, replaceItem} = operations;
   const {color, generateColor} = useGenerateRandomColor();
@@ -75,20 +82,27 @@ const PostItem = ({
   //const repliesModalRef = useRef<ModalRefType>(null);
   //const [isEditing, setIsEditing] = useState(false);
   //const [editedText, setEditedText] = useState("");
-  const [requested, setRequested] = useState(false);
-  const [hasTimeLimit, setHasTimeLimit] = useState(true); // If post has time limit
-  const [hasMaxLimit, setHasMaxLimit] = useState(true); // If post has maximum occupancy
-  const [hasInvitation, setHasInvitation] = useState(true); // If post has required invitations
-  const [numInvitations, setHasNumInvitations] = useState(1) // Number of requested invitations
+  const [requested, setRequested] = useState(false); // If user has requested to join
+  const [numInvitations, setNumInvitations] = useState(0) // Number of requested invitations
   const [isHours, setIsHours] = useState(true); // If time limit has >= 1 hour left
   const [currentCapacity, setCurrentCapacity] = useState(5);
-  const maxCapacity = 8;
   const NUM_OF_LINES = 5;
   const CAPACITY_PERCENTAGE = 0.75;
 
   useEffect(() => {
     generateColor();
+
   }, []);
+
+  const handleRequestToJoin = () => {
+    if (requested) {
+      setRequested(false);
+      setNumInvitations(numInvitations-1);
+    } else {
+      setRequested(true);
+      setNumInvitations(numInvitations+1);
+    }
+  };
 
   return (
     <View style={styles.secondaryContainerStyle}>
@@ -130,9 +144,9 @@ const PostItem = ({
         </View>
 
         {/* Bottom Left Icons (time until event, max occupancy) */}
-        <View style={styles.flexRow}>
+        <View style={[styles.flexRow, {paddingBottom: '1%'}]}>
           <View style={[styles.flexRow, {paddingLeft: '2%'}]}>
-            {hasTimeLimit ?
+            {timeLimit != null ?
               <View style={{flexDirection: 'row'}}>
                 <IconButton
                   iconName={"query-builder"}
@@ -143,12 +157,12 @@ const PostItem = ({
                 <Text style={[
                     styles.numHours,
                     {color: isHours ? 'grey' : 'red'}
-                  ]}>
-                  0{isHours ? 'hrs' : 'min'}
+                  ]}
+                >{timeLimit}{isHours ? 'hrs' : 'min'}
                 </Text>
               </View> : null
             }
-            {hasTimeLimit && hasMaxLimit ?
+            {timeLimit && maxOccupancy != null ?
               <IconButton
                 style={styles.paddingDot}
                 iconName={"lens"}
@@ -157,28 +171,28 @@ const PostItem = ({
                 onPress={() => null}
               /> : null
             }
-            {hasMaxLimit ?
+            {maxOccupancy ?
               <View style={styles.maxLimit}>
                 <IconButton 
                   iconName={"person-outline"}
                   size={22}
-                  color={(currentCapacity >= Math.floor(maxCapacity*CAPACITY_PERCENTAGE))
+                  color={(currentCapacity >= Math.floor(maxOccupancy*CAPACITY_PERCENTAGE))
                     ? 'red' : 'grey'}
                   onPress={() => null}
                 />
                 <Text style={[
                     {textAlignVertical:'center'},
-                    {color: (currentCapacity >= Math.floor(maxCapacity*CAPACITY_PERCENTAGE))
+                    {color: (currentCapacity >= Math.floor(maxOccupancy*CAPACITY_PERCENTAGE))
                       ? 'red' : 'grey'
                     }
-                  ]}>{currentCapacity}/{maxCapacity}</Text>
+                  ]}>{currentCapacity}/{maxOccupancy}</Text>
               </View> : null
             }
           </View>
 
           {/* Bottom Right Icons (invitations, comments, more tab) */}
           <View style={styles.iconsBottomRight}>
-            {hasInvitation ?
+            {hasInvitations ?
               <View style={styles.iconsBottomRight
               }>
                 <Text 
@@ -192,7 +206,7 @@ const PostItem = ({
                   iconName={"person-add"}
                   size={22}
                   color={requested ? color : "black"}
-                  onPress={() => setRequested(!requested)}
+                  onPress={handleRequestToJoin}
                 />
               </View> : null
             }

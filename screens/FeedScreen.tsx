@@ -252,6 +252,9 @@ export default function FeedScreen({
           reportPost={reportPost}
           //newSection={true}
           operations={operations}
+          timeLimit={1}
+          maxOccupancy={8}
+          hasInvitations={true}
           //isVisible={item.isVisible && isFocused}
         />
       );
