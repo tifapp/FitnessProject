@@ -76,6 +76,10 @@ const PostItem = ({
   //const [isEditing, setIsEditing] = useState(false);
   //const [editedText, setEditedText] = useState("");
   const [requested, setRequested] = useState(false);
+  const [hasTimeLimit, setHasTimeLimit] = useState(true); // If post has time limit
+  const [hasMaxLimit, setHasMaxLimit] = useState(true); // If post has maximum occupancy
+  const [hasInvitation, setHasInvitation] = useState(true); // If post has required invitations
+  const [numInvitations, setHasNumInvitations] = useState(1) // Number of requested invitations
   const NUM_OF_LINES = 5;
 
   useEffect(() => {
@@ -105,7 +109,7 @@ const PostItem = ({
               color={color}
               onPress={() => null}
             />
-          <Text style={styles.distance}>_ mi</Text>
+          <Text style={styles.distance}>0 mi</Text>
         </View>
 
         <Divider style={styles.divider}/>
@@ -123,51 +127,61 @@ const PostItem = ({
 
         {/* Bottom Left Icons (time until event, max occupancy) */}
         <View style={styles.flexRow}>
-          <View style={styles.flexRow}>
-            <IconButton 
-              style={{
-                paddingLeft: '2%',
-                paddingRight: '4%'
-              }}
-              iconName={"query-builder"}
-              size={22}
-              color={"black"}
-              onPress={() => null}
-            />
-            <Text style={{textAlignVertical:'center'}}>_hrs</Text>
-            <IconButton
-              style={styles.paddingDot}
-              iconName={"lens"}
-              size={7}
-              color={"black"}
-              onPress={() => null}
-            />
-            <IconButton 
-              iconName={"person-outline"}
-              size={22}
-              color={"black"}
-              onPress={() => null}
-            />
-            <Text style={{textAlignVertical:'center'}}>_/_</Text>
+          <View style={[styles.flexRow, {paddingLeft: '2%'}]}>
+            {hasTimeLimit ?
+              <View style={{flexDirection: 'row'}}>
+                <IconButton
+                  iconName={"query-builder"}
+                  size={22}
+                  color={"black"}
+                  onPress={() => null}
+                />
+                <Text style={styles.numHours}>0hrs</Text>
+              </View> : null
+            }
+            {hasTimeLimit && hasMaxLimit ?
+              <IconButton
+                style={styles.paddingDot}
+                iconName={"lens"}
+                size={7}
+                color={"black"}
+                onPress={() => null}
+              /> : null
+            }
+            {hasMaxLimit ?
+              <View style={styles.maxLimit}>
+                <IconButton 
+                  iconName={"person-outline"}
+                  size={22}
+                  color={"black"}
+                  onPress={() => null}
+                />
+                <Text style={{textAlignVertical:'center'}}>0/0</Text>
+              </View> : null
+            }
           </View>
 
           {/* Bottom Right Icons (invitations, comments, more tab) */}
           <View style={styles.iconsBottomRight}>
-            <Text 
-              style={[
-                styles.numbersBottomRight,
-                {color: requested ? color : "black"}
-              ]}
-            >_</Text>
-            <IconButton
-              style={{paddingLeft: '6%'}}
-              iconName={"person-add"}
-              size={22}
-              color={requested ? color : "black"}
-              onPress={() => setRequested(!requested)}
-            />
-            <Text style={styles.numbersBottomRight}
-            >_</Text>
+            {hasInvitation ?
+              <View style={styles.iconsBottomRight
+              }>
+                <Text 
+                  style={[
+                    styles.numbersBottomRight,
+                    {color: requested ? color : "black"}
+                  ]}
+                >{numInvitations > 0 ? numInvitations : null}</Text>
+                <IconButton
+                  style={{paddingLeft: '6%'}}
+                  iconName={"person-add"}
+                  size={22}
+                  color={requested ? color : "black"}
+                  onPress={() => setRequested(!requested)}
+                />
+              </View> : null
+            }
+            <Text style={styles.numbersBottomRight}>0</Text>
             <IconButton
               style={{paddingLeft: '3%'}}
               iconName={"messenger"}
@@ -221,8 +235,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center'
   },
   description: {
-    paddingBottom: 15,
-    paddingTop: '3%'
+    paddingBottom: '3%',
+    paddingTop: '2%'
   },
   iconsBottomRight: {
     flex: 1,
@@ -231,12 +245,12 @@ const styles = StyleSheet.create({
   },
   numbersBottomRight: {
     paddingRight: 3,
-    textAlignVertical:'center'
+    textAlignVertical:'center',
   },
   paddingDot: {
+    paddingTop: '2%',
     paddingRight: '3%',
-    paddingLeft: '2%',
-    paddingTop: '2%'
+    paddingLeft: '1.5%'
   },
   eventDot: {
     paddingRight: '2%',
@@ -246,6 +260,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingLeft: "3%",
     paddingTop: '2%'
+  },
+  maxLimit: {
+    flexDirection: 'row',
+  },
+  numHours: {
+    textAlignVertical:'center',
+    paddingLeft: '1%'
   },
  /* check: {
     padding: 25,
