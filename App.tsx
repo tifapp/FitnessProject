@@ -285,6 +285,63 @@ const App = () => {
   } else if (isDeveloper) {
     return (
       <NavigationContainer>
+        <StatusBar style="dark" />
+        <Drawer.Navigator
+          drawerPosition={"right"}
+          drawerStyle={{ width: dimensions.width }}
+          drawerContentOptions={{
+            itemStyle: { marginVertical: 5 },
+          }}
+          backBehavior="initialRoute"
+          edgeWidth={100}
+          initialRouteName="MainTabs"
+          drawerContent={(props) => (
+            <CustomSidebarMenu {...props} />
+          )}
+          screenOptions={headerOptions as DrawerNavigationOptions}
+        >
+          <Drawer.Screen
+            name="Feed"
+            component={MainStack}
+            initialParams={{ fromLookup: false }}
+            options={{ headerShown: false }}
+          />
+          <Drawer.Screen
+            name="Profile"
+            component={ProfileScreen}
+          />
+          <Drawer.Screen
+            name="Verification"
+            component={VerificationScreen}
+          />
+          <Drawer.Screen
+            name="Friends"
+            component={FriendScreen}
+          />
+          <Drawer.Screen
+            name="Conversations"
+            component={ConversationScreen}
+          />
+          <Drawer.Screen
+            name="Settings"
+            component={SettingsStack}
+          />
+          <Drawer.Screen
+            name="Image"
+            component={ImageScreen}
+          />
+          {conversationIds.map((conversationId) => (
+            <Drawer.Screen
+              key={conversationId}
+              name={conversationId}
+              component={MessageScreen}
+              initialParams={{ conversationId }}
+            />
+          ))}
+        </Drawer.Navigator>
+      </NavigationContainer>
+    );
+     {/* <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen
             name="Activities Screen"
@@ -298,8 +355,8 @@ const App = () => {
             }
           />
         </Stack.Navigator>
-      </NavigationContainer>
-    );
+      </NavigationContainer>*/}
+
   } else {
     return (
       <NavigationContainer>
