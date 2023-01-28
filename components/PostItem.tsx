@@ -236,7 +236,7 @@ export default React.memo(PostItem);
 
 const styles = StyleSheet.create({
   secondaryContainerStyle: {
-    backgroundColor: "#a9efe0"
+    backgroundColor: "#f7f7f7"
   },
   spaceAround: {
     paddingLeft: 0,
