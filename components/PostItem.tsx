@@ -53,7 +53,7 @@ interface Props {
   isVisible?: boolean,
   shouldSubscribe?: boolean,
   operations: APIListOperations<Post>,
-  timeLimit: int, // Int just to test UI 
+  timeUntil: int, // Int just to test UI 
   maxOccupancy: int,
   hasInvitations: boolean
 }
@@ -72,7 +72,7 @@ const PostItem = ({
   //replies,
   //index,
   operations,
-  timeLimit, // For now I have it as an int to test the UI, probably change it later
+  timeUntil, // For now I have it as an int to test the UI, probably change it later
   maxOccupancy,
   hasInvitations,
 } : Props) => {
@@ -146,7 +146,7 @@ const PostItem = ({
         {/* Bottom Left Icons (time until event, max occupancy) */}
         <View style={[styles.flexRow, {paddingBottom: '1%'}]}>
           <View style={[styles.flexRow, {paddingLeft: '2%'}]}>
-            {timeLimit != null ?
+            {timeUntil != null ?
               <View style={{flexDirection: 'row'}}>
                 <IconButton
                   iconName={"query-builder"}
@@ -158,11 +158,11 @@ const PostItem = ({
                     styles.numHours,
                     {color: isHours ? 'grey' : 'red'}
                   ]}
-                >{timeLimit}{isHours ? 'hrs' : 'min'}
+                >{timeUntil}{isHours ? 'hrs' : 'min'}
                 </Text>
               </View> : null
             }
-            {timeLimit && maxOccupancy != null ?
+            {timeUntil && maxOccupancy != null ?
               <IconButton
                 style={styles.paddingDot}
                 iconName={"lens"}
