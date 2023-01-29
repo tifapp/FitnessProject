@@ -1,12 +1,6 @@
 //aws
 import API, { GraphQLQuery } from "@aws-amplify/api";
-import {
-  Amplify,
-  Auth,
-  Cache,
-  graphqlOperation,
-  Storage
-} from "aws-amplify";
+import { Amplify, Auth, Cache, graphqlOperation, Storage } from "aws-amplify";
 import { withAuthenticator } from "aws-amplify-react-native";
 import awsconfig from "./src/aws-exports";
 
@@ -20,7 +14,10 @@ import { headerOptions } from "@components/headerComponents/headerOptions";
 
 //navigation
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createDrawerNavigator, DrawerNavigationOptions } from "@react-navigation/drawer";
+import {
+  createDrawerNavigator,
+  DrawerNavigationOptions,
+} from "@react-navigation/drawer";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import ChallengeStack from "@screens/adminScreens/ChallengeStack";
@@ -48,9 +45,10 @@ import {
   Alert,
   AppState,
   AppStateStatus,
-  Platform, UIManager,
+  Platform,
+  UIManager,
   useWindowDimensions,
-  View
+  View,
 } from "react-native";
 
 if (
@@ -124,7 +122,8 @@ const App = () => {
   const checkIfUserSignedUp = async () => {
     try {
       const query = await Auth.currentAuthenticatedUser();
-      const groups = query?.signInUserSession?.idToken?.payload?.["cognito:groups"];
+      const groups =
+        query?.signInUserSession?.idToken?.payload?.["cognito:groups"];
       if (groups) {
         if (groups.includes("Admins")) {
           setIsAdmin(true);
@@ -136,7 +135,7 @@ const App = () => {
       setUserId(query.attributes.sub);
 
       globalThis.myId = query.attributes.sub;
-      const user = await API.graphql<GraphQLQuery<{getUser: User}>> (
+      const user = await API.graphql<GraphQLQuery<{ getUser: User }>>(
         graphqlOperation(getUser, { id: query.attributes.sub })
       );
       if (user.data?.getUser == null) {
@@ -188,7 +187,10 @@ const App = () => {
   };
 
   useEffect(() => {
-    const appStateSubscription = AppState.addEventListener("change", _handleAppStateChange);
+    const appStateSubscription = AppState.addEventListener(
+      "change",
+      _handleAppStateChange
+    );
     checkIfUserSignedUp();
 
     return () => {
@@ -288,14 +290,10 @@ const App = () => {
         <Stack.Navigator>
           <Stack.Screen
             name="Activities Screen"
-            component={
-              ActivitiesScreen
-            }
-            options={
-              {
-                headerShown: false,
-              }
-            }
+            component={ActivitiesScreen}
+            options={{
+              headerShown: false,
+            }}
           />
         </Stack.Navigator>
       </NavigationContainer>
@@ -313,9 +311,7 @@ const App = () => {
           backBehavior="initialRoute"
           edgeWidth={100}
           initialRouteName="MainTabs"
-          drawerContent={(props) => (
-            <CustomSidebarMenu {...props} />
-          )}
+          drawerContent={(props) => <CustomSidebarMenu {...props} />}
           screenOptions={headerOptions as DrawerNavigationOptions}
         >
           <Drawer.Screen
@@ -324,30 +320,12 @@ const App = () => {
             initialParams={{ fromLookup: false }}
             options={{ headerShown: false }}
           />
-          <Drawer.Screen
-            name="Profile"
-            component={ProfileScreen}
-          />
-          <Drawer.Screen
-            name="Verification"
-            component={VerificationScreen}
-          />
-          <Drawer.Screen
-            name="Friends"
-            component={FriendScreen}
-          />
-          <Drawer.Screen
-            name="Conversations"
-            component={ConversationScreen}
-          />
-          <Drawer.Screen
-            name="Settings"
-            component={SettingsStack}
-          />
-          <Drawer.Screen
-            name="Image"
-            component={ImageScreen}
-          />
+          <Drawer.Screen name="Profile" component={ProfileScreen} />
+          <Drawer.Screen name="Verification" component={VerificationScreen} />
+          <Drawer.Screen name="Friends" component={FriendScreen} />
+          <Drawer.Screen name="Conversations" component={ConversationScreen} />
+          <Drawer.Screen name="Settings" component={SettingsStack} />
+          <Drawer.Screen name="Image" component={ImageScreen} />
           {conversationIds.map((conversationId) => (
             <Drawer.Screen
               key={conversationId}

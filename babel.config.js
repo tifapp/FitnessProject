@@ -13,14 +13,15 @@ module.exports = function (api) {
             "@screens": "./screens",
             "@components": "./components",
             "@stacks": "./stacks",
-            "@hooks":"./hooks",
-            "@assets":"./assets",
-            "@graphql": "./src/graphql"
+            "@hooks": "./hooks",
+            "@assets": "./assets",
+            "@graphql": "./src/graphql",
+            "@lib": "./lib",
           },
           extensions: [".js", ".jsx", ".ts", ".tsx"],
         },
       ],
-	  'react-native-reanimated/plugin'
+      "react-native-reanimated/plugin",
     ],
   };
 };
