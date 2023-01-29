@@ -37,10 +37,12 @@ import {
   Animated,
   FlatList,
   FlatListProps,
-  Image, KeyboardAvoidingView, Platform, StyleProp, StyleSheet, Text,
+  Image, KeyboardAvoidingView, Platform, ScrollView, StyleProp, StyleSheet, Text,
   View,
   ViewStyle
 } from "react-native";
+import PostHeader from "@components/postComponents/PostHeader";
+import NearbyActivities from "@components/headerComponents/NearbyActivities";
 
 const linkify = require("linkify-it")();
 linkify
@@ -309,48 +311,51 @@ export default function FeedScreen({
   ]);
 
   return (
-    <APIList
-      {...rest}
-      ref={listRef}
-      style={[{ flex: 1 }, style]}
-      viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
-      ListRef={scrollRef}
-      ListFooterComponent={footerComponent}
-      ListHeaderComponent={
-        <View style={{}}>
-          <KeyboardAvoidingView
-            enabled={rest.inverted ?? false}
-            behavior={Platform.OS === "ios" ? "position" : "height"}
-            keyboardVerticalOffset={90}
-            style={{ flex: 1 }}
-          >
-            <PostInputField
-              onPostAdded={(newPost: Post) => {
-                setAddedNewPost(true);
-                listRef.current?.addItem({...newPost, 
-              userId: globalThis.myId,
-              createdAt: "null",
-            }); onPostAdded?.(newPost);}}
-              channel={channel}
-              originalParentId={originalParentId}
-              autoFocus={autoFocus}
-              isChallenge={isChallenge}
-              label={postButtonLabel}
-            />
-          </KeyboardAvoidingView>
-          {headerComponent}
-        </View>
-      }
-      initialAmount={7}
-      additionalAmount={7} //change number based on device specs
-      processingFunction={getLikedPosts as any}
-      queryOperation={isChallenge ? postsByLikes : postsByChannel}
-      queryOperationName={isChallenge ? "postsByLikes" : "postsByChannel"}
-      filter={{ channel: channel, sortDirection: "DESC" }}
-      renderItem={renderPostItem}
-      keyExtractor={(item: Post) => item.createdAt.toString() + item.userId}
-      onEndReachedThreshold={0.5}
-    />
+    <>
+      <NearbyActivities />
+      <APIList
+        {...rest}
+        ref={listRef}
+        style={[{ flex: 1 }, style]}
+        viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
+        ListRef={scrollRef}
+        ListFooterComponent={footerComponent}
+        ListHeaderComponent={
+          <View style={{}}>
+            <KeyboardAvoidingView
+              enabled={rest.inverted ?? false}
+              behavior={Platform.OS === "ios" ? "position" : "height"}
+              keyboardVerticalOffset={90}
+              style={{ flex: 1 }}
+            >
+              <PostInputField
+                onPostAdded={(newPost: Post) => {
+                  setAddedNewPost(true);
+                  listRef.current?.addItem({...newPost, 
+                userId: globalThis.myId,
+                createdAt: "null",
+              }); onPostAdded?.(newPost);}}
+                channel={channel}
+                originalParentId={originalParentId}
+                autoFocus={autoFocus}
+                isChallenge={isChallenge}
+                label={postButtonLabel}
+              />
+            </KeyboardAvoidingView>
+            {headerComponent}
+          </View>
+        }
+        initialAmount={7}
+        additionalAmount={7} //change number based on device specs
+        processingFunction={getLikedPosts as any}
+        queryOperation={isChallenge ? postsByLikes : postsByChannel}
+        queryOperationName={isChallenge ? "postsByLikes" : "postsByChannel"}
+        filter={{ channel: channel, sortDirection: "DESC" }}
+        renderItem={renderPostItem}
+        keyExtractor={(item: Post) => item.createdAt.toString() + item.userId}
+        onEndReachedThreshold={0.5}
+      />
+    </>
   );
 }
 
@@ -525,7 +530,6 @@ function PostInputField({
           }
         />
       )}
-
       <FlatList
         data={taggedUsers}
         keyExtractor={(item) => item}
