@@ -1,7 +1,5 @@
-const config = {
+module.exports = {
   verbose: true,
-  preset: "react-native",
-  testEnvironment: "jsdom",
+  preset: "jest-expo",
+  setupFiles: ["<rootDir>/jest/setup.js"],
 };
-
-module.exports = config;

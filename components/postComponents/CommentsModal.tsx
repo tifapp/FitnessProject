@@ -1,7 +1,6 @@
 import { APIListOperations } from "@components/APIList";
 import PostItem from "@components/PostItem";
 import SHA256 from "@hooks/hash";
-import { useNavigation } from "@react-navigation/native";
 import FeedScreen from "@screens/FeedScreen";
 import React from "react";
 import { View } from "react-native";
@@ -14,8 +13,7 @@ interface Props {
   operations: APIListOperations<Post>;
 }
 
-export default function CommentsModal({ item, operations } : Props) {
-  const navigation = useNavigation();
+export default function CommentsModal({ item, operations }: Props) {
   return (
     <>
       <ElevatedView
@@ -48,26 +46,29 @@ export default function CommentsModal({ item, operations } : Props) {
         </View>
       </ElevatedView>
       <FeedScreen
-        headerComponent={<PostItem
-          item={item}
-          operations={operations}
-          //deletePostsAsync={deletePostsAsync}
-          writtenByYou={item.userId === globalThis.myId}
-          //editButtonHandler={updatePostAsync} deleting a post while on the reply screen?
-          //replyButtonHandler={() => {
-          //setAreRepliesVisible(false);
-          //}}
-          isVisible={false}
-          shouldSubscribe={true} />}
+        headerComponent={
+          <PostItem
+            item={item}
+            operations={operations}
+            //deletePostsAsync={deletePostsAsync}
+            writtenByYou={item.userId === globalThis.myId}
+            //editButtonHandler={updatePostAsync} deleting a post while on the reply screen?
+            //replyButtonHandler={() => {
+            //setAreRepliesVisible(false);
+            //}}
+            isVisible={false}
+            shouldSubscribe={true}
+          />
+        }
         autoFocus={true}
         channel={SHA256(item.userId + item.createdAt)} //unique id
-        originalParentId={item.createdAt + "#" + item.userId} 
-        footerComponent={undefined} 
-        isFocused={undefined} 
-        style={undefined} 
-        postButtonLabel={undefined} 
-        renderItem={undefined} 
-        onPostAdded={undefined}      
+        originalParentId={item.createdAt + "#" + item.userId}
+        footerComponent={undefined}
+        isFocused={undefined}
+        style={undefined}
+        postButtonLabel={undefined}
+        renderItem={undefined}
+        onPostAdded={undefined}
       />
     </>
   );

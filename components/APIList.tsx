@@ -224,6 +224,7 @@ const APIList = <T, S>(
     <View style={style}>
       {isInitiallyLoading || (isLoading && !isLoadingMore && !isRefreshing) ? (
         <ActivityIndicator
+          accessibilityHint="Loading..."
           size="large"
           color="#000000"
           style={{
