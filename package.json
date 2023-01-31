@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "@aws-amplify/api": "^4.0.63",
+    "@aws-amplify/notifications": "1.0.12",
+    "@aws-sdk/client-lex-runtime-v2": "3.262.0",
+    "@aws-sdk/client-location": "3.262.0",
     "@expo/ngrok": "^4.1.0",
     "@react-native-async-storage/async-storage": "~1.17.3",
     "@react-native-community/checkbox": "^0.5.5",
@@ -21,6 +24,8 @@
     "@react-navigation/drawer": "^5.12.4",
     "@react-navigation/native": "^5.9.2",
     "@react-navigation/stack": "^5.9.1",
+    "@turf/invariant": "6.5.0",
+    "@turf/boolean-clockwise": "6.5.0",
     "aws-amplify": "^5.0.11",
     "aws-amplify-react-native": "^7.0.2",
     "aws-sdk": "^2.822.0",
