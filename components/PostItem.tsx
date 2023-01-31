@@ -1,6 +1,8 @@
+import API, { graphqlOperation } from "@aws-amplify/api";
 import { APIListOperations } from "@components/APIList";
+import { deletePost, updatePost } from "@graphql/mutations";
 import React, { useState, useEffect } from "react";
-import {  StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { Post } from "src/models";
 import IconButton from "./common/IconButton";
 import { ProfileImageAndName } from "./ProfileImageAndName";
@@ -49,7 +51,6 @@ const PostItem = ({
 
   useEffect(() => {
     generateColor();
-
   }, []);
 
   const handleRequestToJoin = () => {
@@ -151,7 +152,8 @@ const PostItem = ({
           {/* Bottom Right Icons (invitations, comments, more tab) */}
           <View style={styles.iconsBottomRight}>
             {hasInvitations ?
-              <View style={styles.iconsBottomRight}>
+              <View style={styles.iconsBottomRight
+              }>
                 <Text 
                   style={[
                     styles.numbersBottomRight,
@@ -169,7 +171,7 @@ const PostItem = ({
             }
             <Text style={styles.numbersBottomRight}>0</Text>
             <IconButton
-              style={{paddingLeft: '2%'}}
+              style={{paddingLeft: '3%'}}
               iconName={"messenger"}
               size={18}
               color={"black"}
