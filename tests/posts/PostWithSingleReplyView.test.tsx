@@ -1,8 +1,6 @@
 import PostWithSingleReplyView from "@components/postComponents/PostWithSingleReplyView";
 import { screen, fireEvent, render } from "@testing-library/react-native";
 import { UserPost, TestUserPosts } from "../../lib/posts/UserPost";
-import { NavigationContainer } from "@react-navigation/native";
-import { createDrawerNavigator } from "@react-navigation/drawer";
 import { Text } from "react-native";
 
 describe("Post With Single Reply tests", () => {
@@ -14,25 +12,15 @@ describe("Post With Single Reply tests", () => {
   });
 });
 
-const Drawer = createDrawerNavigator();
-
 const renderPostWithReply = (post: UserPost, reply: UserPost) => {
   render(
-    <NavigationContainer>
-      <Drawer.Navigator>
-        <Drawer.Screen name="test">
-          {() => (
-            <PostWithSingleReplyView
-              post={post}
-              reply={reply}
-              fullRepliesView={(post: UserPost) => (
-                <Text testID="fullReplies">{post.description}</Text>
-              )}
-            />
-          )}
-        </Drawer.Screen>
-      </Drawer.Navigator>
-    </NavigationContainer>
+    <PostWithSingleReplyView
+      post={post}
+      reply={reply}
+      fullRepliesView={(post: UserPost) => (
+        <Text testID="fullReplies">{post.description}</Text>
+      )}
+    />
   );
 };
 
