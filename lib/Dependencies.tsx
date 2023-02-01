@@ -51,7 +51,7 @@ export const TransformDependencies = ({
 };
 
 /**
- * Returns the current dependency values in for the given context.
+ * Returns the current dependency values for the given context.
  */
 export const useDependencies = (): DependencyValues => {
   return useContext(DependenciesContext);
