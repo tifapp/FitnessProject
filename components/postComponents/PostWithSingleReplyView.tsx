@@ -1,4 +1,4 @@
-import { UserPost, userPostToPost } from "../lib/posts/UserPost";
+import { UserPost, userPostToPost } from "../../lib/posts/UserPost";
 import { Button } from "react-native";
 import API, { graphqlOperation } from "@aws-amplify/api";
 import { useRef } from "react";
@@ -6,15 +6,12 @@ import Modal, { ModalRefType } from "@components/common/Modal";
 import CommentsModal from "@components/postComponents/CommentsModal";
 import PostItem from "@components/PostItem";
 
-export type PostWithReplyDetailScreenProps = {
+export type PostWithSingleReplyProps = {
   post: UserPost;
   reply: UserPost;
 };
 
-const PostWithReplyDetailScreen = ({
-  post,
-  reply,
-}: PostWithReplyDetailScreenProps) => {
+const PostWithSingleReplyView = ({ post, reply }: PostWithSingleReplyProps) => {
   const repliesModalRef = useRef<ModalRefType>(null);
   return (
     <>
@@ -41,4 +38,4 @@ const PostWithReplyDetailScreen = ({
   );
 };
 
-export default PostWithReplyDetailScreen;
+export default PostWithSingleReplyView;
