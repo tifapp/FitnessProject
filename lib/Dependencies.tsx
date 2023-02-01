@@ -2,6 +2,9 @@ import { createContext, useContext, useMemo, ReactNode } from "react";
 
 const DependenciesContext = createContext<DependencyValues>({});
 
+/**
+ * The interface containing all dependencies in the app.
+ */
 export interface DependencyValues {}
 
 export type DependenciesProviderProps = {
@@ -9,6 +12,9 @@ export type DependenciesProviderProps = {
   children: ReactNode;
 };
 
+/**
+ * Provides a child context access to the specified dependency values.
+ */
 export const DependenciesProvider = ({
   values,
   children,
@@ -23,6 +29,13 @@ export type TransformDependenciesProps = {
   children: ReactNode;
 };
 
+/**
+ * A convenience component to transform the dependencies from
+ * one context to another.
+ *
+ * For this project in particular, this is useful for instantiating
+ * dependencies that require an authenticated user.
+ */
 export const TransformDependencies = ({
   transform,
   children,
@@ -37,6 +50,9 @@ export const TransformDependencies = ({
   );
 };
 
+/**
+ * Returns the current dependency values in for the given context.
+ */
 export const useDependencies = (): DependencyValues => {
   return useContext(DependenciesContext);
 };

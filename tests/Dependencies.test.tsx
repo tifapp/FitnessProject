@@ -11,12 +11,12 @@ interface TestDependencyValues extends DependencyValues {
   testNum: number;
 }
 
-describe("TransformDependencies tests", () => {
+describe("Dependencies tests", () => {
   it("should be able to map dependencies to a child context", () => {
     const wrapper = (children: ReactNode) => {
       // NB: Idk why, but for some reason renderHook passes in the child object with
       // a children key (eg. { children: { child stuff } } instead of { child stuff }
-      // like in normal cases)...
+      // like in normal cases), so we'll get the actual children with a little hack...
       const actualChildren = (children as any).children;
       return (
         <DependenciesProvider values={{ testNum: 1 }}>
