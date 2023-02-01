@@ -4,7 +4,7 @@ import { UserPost, TestUserPosts } from "../../lib/posts/UserPost";
 import { NavigationContainer } from "@react-navigation/native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 
-describe("PostWithSingleReplyView tests", () => {
+describe("Post With Single Reply tests", () => {
   it("can navigate to the full comments thread for a post", async () => {
     renderPostWithReply(TestUserPosts.writtenByYou, TestUserPosts.blob);
     expectCommentsThreadToNotBeLoaded();
