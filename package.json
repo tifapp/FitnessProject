@@ -24,6 +24,7 @@
     "@react-navigation/drawer": "^5.12.4",
     "@react-navigation/native": "^5.9.2",
     "@react-navigation/stack": "^5.9.1",
+    "@sinonjs/commons": "3.0.0",
     "@turf/invariant": "6.5.0",
     "@turf/boolean-clockwise": "6.5.0",
     "aws-amplify": "^5.0.11",
