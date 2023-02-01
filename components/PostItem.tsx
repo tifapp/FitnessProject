@@ -1,48 +1,13 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
 import { APIListOperations } from "@components/APIList";
 import { deletePost, updatePost } from "@graphql/mutations";
-import React, { useRef, useState, useEffect } from "react";
-import { Alert, Dimensions, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import React, { useState, useEffect } from "react";
+import { StyleSheet, Text, View } from "react-native";
 import { Post } from "src/models";
 import IconButton from "./common/IconButton";
-import Modal, { ModalRefType } from "./common/Modal";
-import CommentsModal from "./postComponents/CommentsModal";
-import LikesModal from "./postComponents/LikesModal";
-import PostHeader from "./postComponents/PostHeader";
-import PostImage from "./PostImage";
 import { ProfileImageAndName } from "./ProfileImageAndName";
-import TextWithTaggedUsers from "./TextWithTaggedUsers";
-import printTime from "@hooks/printTime";
 import { Divider } from "react-native-elements";
 import useGenerateRandomColor from "@hooks/generateRandomColor";
-import { int } from "aws-sdk/clients/datapipeline";
-
-
-const updatePostAWS = async (createdAt: string, editedText: string) => {
-  try {
-    await API.graphql(
-      graphqlOperation(updatePost, {
-        input: { createdAt: createdAt, description: editedText },
-      })
-    );
-    console.log("success in updating a post");
-  } catch (err) {
-    console.warn("error in updating post: ", err);
-  }
-};
-
-const deletePostAWS = async (createdAt: string) => {
-  try {
-    await API.graphql(
-      graphqlOperation(deletePost, {
-        input: { createdAt: createdAt, userId: globalThis.myId },
-      })
-    );
-    console.log("success in deleting a post");
-  } catch {
-    console.log("error in deleting post: ");
-  }
-};
 
 interface Props {
   item: Post & {taggedUsers?: string[]; likedByYou?: boolean},
@@ -76,12 +41,7 @@ const PostItem = ({
   maxOccupancy,
   hasInvitations,
 } : Props) => {
-  //const {removeItem, replaceItem} = operations;
   const {color, generateColor} = useGenerateRandomColor();
-  //const likesModalRef = useRef<ModalRefType>(null);
-  //const repliesModalRef = useRef<ModalRefType>(null);
-  //const [isEditing, setIsEditing] = useState(false);
-  //const [editedText, setEditedText] = useState("");
   const [requested, setRequested] = useState(false); // If user has requested to join
   const [numInvitations, setNumInvitations] = useState(0) // Number of requested invitations
   const [isHours, setIsHours] = useState(true); // If time limit has >= 1 hour left
@@ -297,37 +257,6 @@ const styles = StyleSheet.create({
     textAlignVertical:'center',
     paddingLeft: '1%'
   },
- /* check: {
-    padding: 25,
-    marginTop: 16,
-    borderColor: "#bbb",
-    borderWidth: 2,
-    borderStyle: "solid",
-  },
-  unselectedButtonStyle: {
-    borderWidth: 2,
-    borderColor: "gray",
-    alignSelf: "center",
-    backgroundColor: "transparent",
-    padding: 9,
-    borderRadius: 5,
-    marginHorizontal: 10,
-  },
-  buttonTextStyle: {
-    color: "white",
-    alignSelf: "center",
-    fontWeight: "bold",
-    fontSize: 20,
-    marginBottom: 2,
-    marginHorizontal: 6,
-  },
-  buttonStyle: {
-    alignSelf: "center",
-    backgroundColor: "blue",
-    padding: 10,
-    borderRadius: 5,
-    marginHorizontal: 6,
-  },*/
   nestedReply: {
     marginBottom: 20,
     backgroundColor: "white",
