@@ -2,22 +2,21 @@ import SinglePostReplyThreadView from "@components/postComponents/SinglePostRepl
 import { screen, fireEvent, render } from "@testing-library/react-native";
 import { UserPost, TestUserPosts, UserPostID } from "../../lib/posts/UserPost";
 import { View } from "react-native";
-import { UserID } from "../../lib/users/types";
 
 describe("Single Reply Thread tests", () => {
   it("should not have the full replies thread for the parent post open by default", () => {
-    renderSingleReplyThread(TestUserPosts.writtenByYou, TestUserPosts.blob);
-    expectFullRepliesThreadToNotBeLoaded(TestUserPosts.writtenByYou.id);
+    givenSingleReplyThread(TestUserPosts.writtenByYou, TestUserPosts.blob);
+    expectFullRepliesThreadToNotBeOpen(TestUserPosts.writtenByYou.id);
   });
 
   it("can open the full replies thread for the parent post", async () => {
-    renderSingleReplyThread(TestUserPosts.writtenByYou, TestUserPosts.blob);
+    givenSingleReplyThread(TestUserPosts.writtenByYou, TestUserPosts.blob);
     openFullRepliesThread();
-    await expectFullRepliesThreadToBeLoaded(TestUserPosts.writtenByYou.id);
+    await expectFullRepliesThreadToBeOpen(TestUserPosts.writtenByYou.id);
   });
 });
 
-const renderSingleReplyThread = (post: UserPost, reply: UserPost) => {
+const givenSingleReplyThread = (post: UserPost, reply: UserPost) => {
   render(
     <SinglePostReplyThreadView
       post={post}
@@ -34,10 +33,10 @@ const openFullRepliesThread = () => {
   fireEvent.press(screen.getByText("View All"));
 };
 
-const expectFullRepliesThreadToNotBeLoaded = (parentPostId: UserPostID) => {
+const expectFullRepliesThreadToNotBeOpen = (parentPostId: UserPostID) => {
   expect(screen.queryByTestId(parentPostId.rawValue)).toBeNull();
 };
 
-const expectFullRepliesThreadToBeLoaded = async (parentPostId: UserPostID) => {
+const expectFullRepliesThreadToBeOpen = async (parentPostId: UserPostID) => {
   expect(await screen.findByTestId(parentPostId.rawValue)).toBeDefined();
 };
