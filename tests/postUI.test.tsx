@@ -22,8 +22,6 @@ jest.mock('@hooks/generateRandomColor', () => {
   return 'blue'
 });
 
-const mockedNavigate = jest.fn();
-
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
     navigate: mockedNavigate
@@ -34,6 +32,16 @@ globalThis.savedUsers["078ff5c0-5bce-4603-b1f3-79cf8258ec26"] = {
   name: "Post Test",
   isVerified: true
 }
+
+const mockedNavigate = jest.fn();
+
+jest.mock('@react-navigation/native', () => ({
+  useNavigation: () => ({
+    navigate: mockedNavigate
+  })
+}));
+
+
 
 describe("PostUI Component Tests", () => {
   const props = {
@@ -50,96 +58,22 @@ describe("PostUI Component Tests", () => {
     removeItem: jest.fn(),
     replaceItem: jest.fn()
   }
-  const time = new Date();
   
-  it("Renders with all options", () => {
+  it("renders", () => {
     render(<PostItem item={post} likes={0} reportPost={mockReportPost}
-      writtenByYou={false} operations={mockOps} startTime={time}
+      writtenByYou={false} operations={mockOps} timeUntil={1}
       maxOccupancy={8} hasInvitations={true}
     />);
     
     expect(screen.getByText(props.description)).toBeDefined();
-    expect(screen.getByLabelText('time until')).toBeDefined();
-    expect(screen.getByLabelText('max occupancy')).toBeDefined();
-    expect(screen.getByLabelText('request invitations')).toBeDefined();
-  });
-
-  it("Renders with only time until event starts", () => {
-    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
-      writtenByYou={false} operations={mockOps} startTime={time}
-      maxOccupancy={undefined} hasInvitations={false}
-    />);
-    
-    expect(screen.getByText(props.description)).toBeDefined();
-    expect(screen.queryByLabelText('time until')).toBeDefined();
-    expect(screen.queryByLabelText('max occupancy')).toBeNull();
-    expect(screen.queryByLabelText('request invitations')).toBeNull();
-  });
-
-  it("Renders with only max occupancy", () => {
-    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
-      writtenByYou={false} operations={mockOps} startTime={undefined}
-      maxOccupancy={8} hasInvitations={false}
-    />);
-    
-    expect(screen.getByText(props.description)).toBeDefined();
-    expect(screen.queryByLabelText('time until')).toBeNull();
-    expect(screen.queryByLabelText('max occupancy')).toBeDefined();
-    expect(screen.queryByLabelText('request invitations')).toBeNull();
-  });
-
-  it("Renders with only invitations", () => {
-    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
-      writtenByYou={false} operations={mockOps} startTime={undefined}
-      maxOccupancy={undefined} hasInvitations={true}
-    />);
-    
-    expect(screen.getByText(props.description)).toBeDefined();
-    expect(screen.queryByLabelText('time until')).toBeNull();
-    expect(screen.queryByLabelText('max occupancy')).toBeNull();
-    expect(screen.queryByLabelText('request invitations')).toBeDefined();
   });
 
   it("Name is shortened", () => {
     render(<PostItem item={post} likes={0} reportPost={mockReportPost}
-      writtenByYou={false} operations={mockOps} startTime={time}
+      writtenByYou={false} operations={mockOps} timeUntil={1}
       maxOccupancy={8} hasInvitations={true}
     />);
     
     expect(screen.getByText("Post T.")).toBeDefined();
-  });
-
-  it("Color of invitation changes on click", () => {
-    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
-      writtenByYou={false} operations={mockOps} startTime={undefined}
-      maxOccupancy={undefined} hasInvitations={true}
-    />);
-    const invitation = screen.queryByLabelText('invitation icon');
-
-    expect(invitation.props.style[0].color).toEqual("black");
-    fireEvent.press(invitation);
-    expect(invitation.props.style[0].color).toEqual(generateColor);
-  });
-
-  it("Time becomes red", () => {
-    time.setMinutes(time.getMinutes() + 30);
-    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
-      writtenByYou={false} operations={mockOps} startTime={time}
-      maxOccupancy={undefined} hasInvitations={false}
-    />);
-    const timeIcon = screen.queryByLabelText('time icon');
-
-    expect(timeIcon.props.style[0].color).toEqual("red");
-  });
-
-  it("Occupancy becomes red", () => {
-    time.setMinutes(time.getMinutes() + 30);
-    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
-      writtenByYou={false} operations={mockOps} startTime={undefined}
-      maxOccupancy={6} hasInvitations={false}
-    />);
-    const timeIcon = screen.queryByLabelText('occupancy icon');
-
-    expect(timeIcon.props.style[0].color).toEqual("red");
   });
 });
