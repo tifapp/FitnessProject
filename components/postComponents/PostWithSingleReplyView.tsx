@@ -1,8 +1,7 @@
-import { UserPost, userPostToPost } from "../../lib/posts/UserPost";
+import { UserPost } from "../../lib/posts/UserPost";
 import { Button } from "react-native";
 import { useRef } from "react";
 import Modal, { ModalRefType } from "@components/common/Modal";
-import PostItem from "@components/PostItem";
 
 export type PostWithSingleReplyProps = {
   post: UserPost;

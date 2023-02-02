@@ -3,8 +3,10 @@ import { Post } from "src/models";
 import { UserID } from "../users/types";
 
 export class UserPostID extends Tagged<UserPostID, string> {
-  // NB: Atm we don't have an actual post id field, so the work around for
-  // now is to use this constructor.
+  // NB: Atm we don't have an actual post id field, however existing code
+  // simply uses the post creation date and user id. Hopefully, this constructor
+  // can be removed at some point in favor of making this type a simple Tagged
+  // derivative like UserID.
   constructor({
     creationDate,
     userId,
@@ -16,22 +18,30 @@ export class UserPostID extends Tagged<UserPostID, string> {
   }
 }
 
+/**
+ * A type representing a post that comes from a user, which is meant for
+ * viewing in a feed.
+ */
 export type UserPost = {
-  id: UserPostID;
-  likesCount: number;
-  repliesCount: number;
-  createdAt: Date;
-  updatedAt: Date;
-  userId: UserID;
-  username: string;
-  description?: string;
-  parentId?: UserPostID;
-  channel?: string;
-  imageURL?: string;
-  likedByYou: boolean;
-  writtenByYou: boolean;
+  readonly id: UserPostID;
+  readonly likesCount: number;
+  readonly repliesCount: number;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
+  readonly userId: UserID;
+  readonly username: string;
+  readonly description?: string;
+  readonly parentId?: UserPostID;
+  readonly channel?: string;
+  readonly imageURL?: string;
+  readonly likedByYou: boolean;
+  readonly writtenByYou: boolean;
+  readonly taggedUserIds: UserID[];
 };
 
+/**
+ * A simple way to convert a `UserPost` to a legacy `Post` type.
+ */
 export const userPostToPost = (userPost: UserPost): Post => ({
   id: userPost.createdAt.toString() + userPost.userId.rawValue,
   userId: userPost.userId.rawValue,
@@ -45,6 +55,9 @@ export const userPostToPost = (userPost: UserPost): Post => ({
   imageURL: userPost.imageURL,
 });
 
+/**
+ * Some `UserPost` objects for testing and UI previewing purposes.
+ */
 export namespace TestUserPosts {
   const defaultTestPostDate = new Date("2023-01-31T00:00:00+0000");
 
@@ -62,7 +75,8 @@ export namespace TestUserPosts {
     description: "I wrote this amazing post!",
     likedByYou: false,
     writtenByYou: true,
-  } as const;
+    taggedUserIds: [],
+  };
 
   export const blob: UserPost = {
     id: new UserPostID({
@@ -78,5 +92,6 @@ export namespace TestUserPosts {
     description: "I am Blob",
     likedByYou: false,
     writtenByYou: false,
-  } as const;
+    taggedUserIds: [],
+  };
 }

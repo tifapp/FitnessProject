@@ -47,10 +47,22 @@
  * While this is not a foolproof solution to ensure that only a valid post id is passed to `likePost`,
  * at the very least it does make a very strong assertion that we expect a post id in `likePost`.
  */
-export class Tagged<_Tag, RawValue> {
-  rawValue: RawValue;
+export class Tagged<Tag, RawValue> {
+  readonly rawValue: RawValue;
 
   constructor(rawValue: RawValue) {
     this.rawValue = rawValue;
+  }
+
+  /**
+   * Maps the rawValue of this tagged instance, and returns a new tagged instance
+   * with the mapped raw value as the new raw value.
+   *
+   * @param mapper a function to map the raw value to a new value
+   */
+  map<NewValue>(
+    mapper: (rawValue: RawValue) => NewValue
+  ): Tagged<Tag, NewValue> {
+    return new Tagged(mapper(this.rawValue));
   }
 }
