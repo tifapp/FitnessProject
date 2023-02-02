@@ -7,7 +7,7 @@ import { Post } from "src/models";
 import IconButton from "./common/IconButton";
 import { ProfileImageAndName } from "./ProfileImageAndName";
 import { Divider } from "react-native-elements";
-import useGenerateRandomColor from "@hooks/generateRandomColor";
+import generateColor from "@hooks/generateRandomColor";
 
 interface Props {
   item: Post & {taggedUsers?: string[]; likedByYou?: boolean},
@@ -41,16 +41,16 @@ const PostItem = ({
   maxOccupancy,
   hasInvitations,
 } : Props) => {
-  const {color, generateColor} = useGenerateRandomColor();
   const [requested, setRequested] = useState(false); // If user has requested to join
   const [numInvitations, setNumInvitations] = useState(0) // Number of requested invitations
   const [isHours, setIsHours] = useState(true); // If time limit has >= 1 hour left
   const [currentCapacity, setCurrentCapacity] = useState(5);
   const NUM_OF_LINES = 5;
   const CAPACITY_PERCENTAGE = 0.75;
+  const [color, setColor] = useState('black');
 
   useEffect(() => {
-    generateColor();
+    setColor(generateColor);
   }, []);
 
   const handleRequestToJoin = () => {
