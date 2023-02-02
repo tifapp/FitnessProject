@@ -1,19 +1,20 @@
 import { UserPost } from "../../lib/posts/UserPost";
 import { Button } from "react-native";
-import { useRef } from "react";
+import { ReactNode, useRef } from "react";
 import Modal, { ModalRefType } from "@components/common/Modal";
 
-export type PostWithSingleReplyProps = {
+export type SinglePostReplyThreadProps = {
   post: UserPost;
   reply: UserPost;
-  fullRepliesView: (post: UserPost) => JSX.Element;
+  renderItem: (post: UserPost) => ReactNode;
+  renderFullRepliesView: (post: UserPost) => ReactNode;
 };
 
-const PostWithSingleReplyView = ({
+const SinglePostReplyThreadView = ({
   post,
   reply,
-  fullRepliesView,
-}: PostWithSingleReplyProps) => {
+  renderFullRepliesView,
+}: SinglePostReplyThreadProps) => {
   const repliesModalRef = useRef<ModalRefType>(null);
   return (
     <>
@@ -21,9 +22,9 @@ const PostWithSingleReplyView = ({
         title="View All"
         onPress={() => repliesModalRef.current?.showModal()}
       />
-      <Modal ref={repliesModalRef}>{fullRepliesView(post)}</Modal>
+      <Modal ref={repliesModalRef}>{renderFullRepliesView(post)}</Modal>
     </>
   );
 };
 
-export default PostWithSingleReplyView;
+export default SinglePostReplyThreadView;
