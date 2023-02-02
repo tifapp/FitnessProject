@@ -1,13 +1,11 @@
-import API, { graphqlOperation } from "@aws-amplify/api";
 import { APIListOperations } from "@components/APIList";
-import { deletePost, updatePost } from "@graphql/mutations";
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Post } from "src/models";
 import IconButton from "./common/IconButton";
 import { ProfileImageAndName } from "./ProfileImageAndName";
 import { Divider } from "react-native-elements";
-import useGenerateRandomColor from "@hooks/generateRandomColor";
+import generateColor from "@hooks/generateRandomColor";
 
 interface Props {
   item: Post & {taggedUsers?: string[]; likedByYou?: boolean},
@@ -18,8 +16,8 @@ interface Props {
   isVisible?: boolean,
   shouldSubscribe?: boolean,
   operations: APIListOperations<Post>,
-  timeUntil: number, // Int just to test UI 
-  maxOccupancy: number,
+  startTime?: Date, 
+  maxOccupancy?: number,
   hasInvitations: boolean
 }
 
@@ -37,20 +35,40 @@ const PostItem = ({
   //replies,
   //index,
   operations,
-  timeUntil, // For now I have it as an int to test the UI, probably change it later
+  startTime,
   maxOccupancy,
   hasInvitations,
 } : Props) => {
-  const {color, generateColor} = useGenerateRandomColor();
   const [requested, setRequested] = useState(false); // If user has requested to join
   const [numInvitations, setNumInvitations] = useState(0) // Number of requested invitations
   const [isHours, setIsHours] = useState(true); // If time limit has >= 1 hour left
+  const [timeUntil, setTimeUntil] = useState(0);
   const [currentCapacity, setCurrentCapacity] = useState(5);
+  const [color, setColor] = useState('black');
   const NUM_OF_LINES = 5;
   const CAPACITY_PERCENTAGE = 0.75;
 
+  const setTime = () => {
+    if (startTime) {
+      const date = new Date()
+      const diffTime = Math.abs(startTime.getTime() - date.getTime());
+      const diffMin = Math.ceil(diffTime / (1000 * 60));
+      const diffHour = Math.ceil(diffTime / (1000 * 60 * 60));
+
+      if (diffMin < 60) {
+        setIsHours(false);
+        setTimeUntil(diffMin);
+
+      } else {
+        setIsHours(true);
+        setTimeUntil(diffHour);
+      }
+    } 
+  }
+
   useEffect(() => {
-    generateColor();
+    setColor(generateColor);
+    setTime();
   }, []);
 
   const handleRequestToJoin = () => {
@@ -97,6 +115,7 @@ const PostItem = ({
             style={{
               paddingHorizontal: '3%'
             }}
+            accessibilityLabel={'description'}
           >
             {item.description}
           </Text>
@@ -105,13 +124,14 @@ const PostItem = ({
         {/* Bottom Left Icons (time until event, max occupancy) */}
         <View style={[styles.flexRow, {paddingBottom: '1%'}]}>
           <View style={[styles.flexRow, {paddingLeft: '2%'}]}>
-            {timeUntil != null ?
-              <View style={{flexDirection: 'row'}}>
+            {startTime != null ?
+              <View style={{flexDirection: 'row'}} accessibilityLabel={'time until'}>
                 <IconButton
                   iconName={"query-builder"}
                   size={22}
                   color={isHours ? 'grey' : 'red'}
                   onPress={() => null}
+                  accessibilityLabel={'time icon'}
                 />
                 <Text style={[
                     styles.numHours,
@@ -121,7 +141,7 @@ const PostItem = ({
                 </Text>
               </View> : null
             }
-            {timeUntil && maxOccupancy != null ?
+            {startTime && maxOccupancy != null ?
               <IconButton
                 style={styles.paddingDot}
                 iconName={"lens"}
@@ -131,13 +151,14 @@ const PostItem = ({
               /> : null
             }
             {maxOccupancy ?
-              <View style={styles.maxLimit}>
+              <View style={styles.maxLimit} accessibilityLabel={'max occupancy'}>
                 <IconButton 
                   iconName={"person-outline"}
                   size={22}
                   color={(currentCapacity >= Math.floor(maxOccupancy*CAPACITY_PERCENTAGE))
                     ? 'red' : 'grey'}
                   onPress={() => null}
+                  accessibilityLabel={'occupancy icon'}
                 />
                 <Text style={[
                     {textAlignVertical:'center'},
@@ -152,13 +173,13 @@ const PostItem = ({
           {/* Bottom Right Icons (invitations, comments, more tab) */}
           <View style={styles.iconsBottomRight}>
             {hasInvitations ?
-              <View style={styles.iconsBottomRight
-              }>
+              <View style={styles.iconsBottomRight} accessibilityLabel={'request invitations'}>
                 <Text 
                   style={[
                     styles.numbersBottomRight,
                     {color: requested ? color : "black"}
                   ]}
+                  accessibilityLabel={'invitations requested'}
                 >{numInvitations > 0 ? numInvitations : null}</Text>
                 <IconButton
                   style={{paddingLeft: '6%'}}
@@ -166,6 +187,7 @@ const PostItem = ({
                   size={22}
                   color={requested ? color : "black"}
                   onPress={handleRequestToJoin}
+                  accessibilityLabel={'invitation icon'}
                 />
               </View> : null
             }
@@ -176,6 +198,7 @@ const PostItem = ({
               size={18}
               color={"black"}
               onPress={() => null}
+              accessibilityLabel={'comments icon'}
             />
             <IconButton
               style={{paddingLeft: '3%'}}
@@ -183,6 +206,7 @@ const PostItem = ({
               size={24}
               color={"black"}
               onPress={() => null}
+              accessibilityLabel={'more icon'}
             />
           </View>
         </View>

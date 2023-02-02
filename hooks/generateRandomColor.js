@@ -1,7 +1,4 @@
 import {useState} from 'react';
-  
-const useGenerateRandomColor = () => {
-    const [color,setColor] = useState("");
 
     /**
    * @param {number} min
@@ -16,10 +13,7 @@ const useGenerateRandomColor = () => {
       const g = randomInt(1, 250);
       const b = randomInt(1, 250);
      
-     setColor('rgb(' + r.toString() + ', ' + g.toString() + ', ' + b.toString() + ')');
+     return ('rgb(' + r.toString() + ', ' + g.toString() + ', ' + b.toString() + ')');
     };
 
-    return {color,generateColor};
-};
-
-export default useGenerateRandomColor;
+export default generateColor;

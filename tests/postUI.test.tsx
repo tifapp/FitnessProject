@@ -1,74 +1,145 @@
 import { Post } from "../src/models";
 import PostItem from "@components/PostItem";
-import { APIListOperations } from "@components/APIList";
-import { render, screen } from "@testing-library/react-native";
-import { ModelInit } from "@aws-amplify/datastore";
+import { fireEvent, render, screen } from "@testing-library/react-native";
+import generateColor from "@hooks/generateRandomColor";
 
-const createPost = (channel: string, createdAt: string,
-    description: string, imageURL: string, likes: number,
-    parentId: string, receiver: string, replies: number,
-    updatedAt: string, userId: string
-  ) => {
-  const object: ModelInit<Post, {}> = {
-    channel: channel,
-    createdAt: createdAt,
-    description: description,
-    imageURL: imageURL,
-    likes: likes,
-    parentId: parentId,
-    receiver: receiver,
-    replies: replies,
-    updatedAt: updatedAt,
-    userId: userId,
-  };
-  return new Post(object);
-}
-
-const ops: APIListOperations<Post> = {
-  removeItem: function (): void {
-    throw new Error("Function not implemented.");
-  },
-  replaceItem: function (newItem: Partial<Post>): void {
-    throw new Error("Function not implemented.");
+jest.mock('../src/models', () => {
+  return {
+    Post: jest.fn().mockImplementation(() => {
+      return {
+        id: '5',
+        createdAt: "2023-01-23T06:35:53.184Z",
+        updatedAt: "2023-01-29T01:42:01.713Z",
+        userId: "078ff5c0-5bce-4603-b1f3-79cf8258ec26",
+        description: "mockDescription",
+        channel: "general"
+      }
+    })
   }
-};
+});
 
-const reportPost = (timestamp: string, author: string): Promise<any> => {
-  throw new Error("Function not implemented.");
-}
+jest.mock('@hooks/generateRandomColor', () => {
+  return 'blue'
+});
 
-//jest.mock('@hooks/fetchName', () => ({fetchUserAsync: jest.fn()}));
-/*const profile = ProfileImageAndName({
-  userId: "id",
-  isFullSize: false,
-  hideAll: false,
-  hideName: false,
-  vertical: true,
-  spaceAfterName: false
-});*/
+const mockedNavigate = jest.fn();
 
-globalThis.savedUsers["id"] = {
-  name: "User Test",
+jest.mock('@react-navigation/native', () => ({
+  useNavigation: () => ({
+    navigate: mockedNavigate
+  })
+}));
+
+globalThis.savedUsers["078ff5c0-5bce-4603-b1f3-79cf8258ec26"] = {
+  name: "Post Test",
   isVerified: true
 }
 
-const renderPost = (item: Post, likes: number,
-  reportPost: (timestamp: string, author: string) => Promise<any>,
-  writtenByYou: boolean, operations: APIListOperations<Post>,
-  timeUntil: number, maxOccupancy: number, hasInvitations: boolean
-) => {
-  render(<PostItem item={item} likes={likes} reportPost={reportPost}
-    writtenByYou={writtenByYou} operations={operations} timeUntil={timeUntil}
-    maxOccupancy={maxOccupancy} hasInvitations={hasInvitations} />)
-}
-
 describe("PostUI Component Tests", () => {
-  it("renders", () => {
-    const post = createPost("general", "2023-01-23T06:35:53.184Z",
-      "Test", 'null', 0, 'null', 'null', 148, "2023-01-29T01:42:01.713Z",
-      "078ff5c0-5bce-4603-b1f3-79cf8258ec26"
-    );
-    renderPost(post, 148, reportPost, true, ops, 1, 8, true);
-    expect(screen.getByText("Feed")).toBeDefined();
-  })
+  const props = {
+    id: '5',
+    createdAt: "2023-01-23T06:35:53.184Z",
+    updatedAt: "2023-01-29T01:42:01.713Z",
+    userId: "078ff5c0-5bce-4603-b1f3-79cf8258ec26",
+    description: "mockDescription",
+    channel: "general"
+  }
+  const post: Post = new Post(props);
+  const mockReportPost = jest.fn();
+  const mockOps = {
+    removeItem: jest.fn(),
+    replaceItem: jest.fn()
+  }
+  const time = new Date();
+  
+  it("Renders with all options", () => {
+    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
+      writtenByYou={false} operations={mockOps} startTime={time}
+      maxOccupancy={8} hasInvitations={true}
+    />);
+    
+    expect(screen.getByText(props.description)).toBeDefined();
+    expect(screen.getByLabelText('time until')).toBeDefined();
+    expect(screen.getByLabelText('max occupancy')).toBeDefined();
+    expect(screen.getByLabelText('request invitations')).toBeDefined();
+  });
+
+  it("Renders with only time until event starts", () => {
+    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
+      writtenByYou={false} operations={mockOps} startTime={time}
+      maxOccupancy={undefined} hasInvitations={false}
+    />);
+    
+    expect(screen.getByText(props.description)).toBeDefined();
+    expect(screen.queryByLabelText('time until')).toBeDefined();
+    expect(screen.queryByLabelText('max occupancy')).toBeNull();
+    expect(screen.queryByLabelText('request invitations')).toBeNull();
+  });
+
+  it("Renders with only max occupancy", () => {
+    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
+      writtenByYou={false} operations={mockOps} startTime={undefined}
+      maxOccupancy={8} hasInvitations={false}
+    />);
+    
+    expect(screen.getByText(props.description)).toBeDefined();
+    expect(screen.queryByLabelText('time until')).toBeNull();
+    expect(screen.queryByLabelText('max occupancy')).toBeDefined();
+    expect(screen.queryByLabelText('request invitations')).toBeNull();
+  });
+
+  it("Renders with only invitations", () => {
+    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
+      writtenByYou={false} operations={mockOps} startTime={undefined}
+      maxOccupancy={undefined} hasInvitations={true}
+    />);
+    
+    expect(screen.getByText(props.description)).toBeDefined();
+    expect(screen.queryByLabelText('time until')).toBeNull();
+    expect(screen.queryByLabelText('max occupancy')).toBeNull();
+    expect(screen.queryByLabelText('request invitations')).toBeDefined();
+  });
+
+  it("Name is shortened", () => {
+    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
+      writtenByYou={false} operations={mockOps} startTime={time}
+      maxOccupancy={8} hasInvitations={true}
+    />);
+    
+    expect(screen.getByText("Post T.")).toBeDefined();
+  });
+
+  it("Color of invitation changes on click", () => {
+    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
+      writtenByYou={false} operations={mockOps} startTime={undefined}
+      maxOccupancy={undefined} hasInvitations={true}
+    />);
+    const invitation = screen.queryByLabelText('invitation icon');
+
+    expect(invitation.props.style[0].color).toEqual("black");
+    fireEvent.press(invitation);
+    expect(invitation.props.style[0].color).toEqual(generateColor);
+  });
+
+  it("Time becomes red", () => {
+    time.setMinutes(time.getMinutes() + 30);
+    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
+      writtenByYou={false} operations={mockOps} startTime={time}
+      maxOccupancy={undefined} hasInvitations={false}
+    />);
+    const timeIcon = screen.queryByLabelText('time icon');
+
+    expect(timeIcon.props.style[0].color).toEqual("red");
+  });
+
+  it("Occupancy becomes red", () => {
+    time.setMinutes(time.getMinutes() + 30);
+    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
+      writtenByYou={false} operations={mockOps} startTime={undefined}
+      maxOccupancy={6} hasInvitations={false}
+    />);
+    const timeIcon = screen.queryByLabelText('occupancy icon');
+
+    expect(timeIcon.props.style[0].color).toEqual("red");
+  });
 });
