@@ -126,13 +126,26 @@ describe("PostUI Component Tests", () => {
     fireEvent.press(invitation);
     expect(invitation.props.style[0].color).toEqual(generateColor);
   });
-/*
+
   it("Time becomes red", () => {
+    time.setMinutes(time.getMinutes() + 30);
     render(<PostItem item={post} likes={0} reportPost={mockReportPost}
-      writtenByYou={false} operations={mockOps} startTime={1}
-      maxOccupancy={8} hasInvitations={true}
+      writtenByYou={false} operations={mockOps} startTime={time}
+      maxOccupancy={undefined} hasInvitations={false}
     />);
-    
-    expect(screen.getByText("Post T.")).toBeDefined();
-  });*/
+    const timeIcon = screen.queryByLabelText('time icon');
+
+    expect(timeIcon.props.style[0].color).toEqual("red");
+  });
+
+  it("Occupancy becomes red", () => {
+    time.setMinutes(time.getMinutes() + 30);
+    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
+      writtenByYou={false} operations={mockOps} startTime={undefined}
+      maxOccupancy={6} hasInvitations={false}
+    />);
+    const timeIcon = screen.queryByLabelText('occupancy icon');
+
+    expect(timeIcon.props.style[0].color).toEqual("red");
+  });
 });

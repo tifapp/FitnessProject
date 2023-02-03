@@ -228,7 +228,7 @@ export default function FeedScreen({
   // const scrollToTop = () => {
   //   scrollRef.current?.scrollToOffset({ offset: 0, animated: true });
   // };
-  const start = new Date();
+  let start = new Date();
   start.setMinutes(start.getMinutes() + 30);
   const renderPostItem: APIListRenderItemInfo<Post> = ({ item, index }, operations) => {
     // if (index === 0 && addedNewPost)
