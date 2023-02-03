@@ -1,7 +1,6 @@
 import { Post } from "../src/models";
 import PostItem from "@components/PostItem";
 import { fireEvent, render, screen } from "@testing-library/react-native";
-import useGenerateRandomColor from "@hooks/generateRandomColor";
 import generateColor from "@hooks/generateRandomColor";
 
 jest.mock('../src/models', () => {
@@ -23,14 +22,6 @@ jest.mock('@hooks/generateRandomColor', () => {
   return 'blue'
 });
 
-//jest.mock('../foo'); // this happens automatically with automocking
-//const foo = require('../foo');
-
-globalThis.savedUsers["078ff5c0-5bce-4603-b1f3-79cf8258ec26"] = {
-  name: "Post Test",
-  isVerified: true
-}
-
 const mockedNavigate = jest.fn();
 
 jest.mock('@react-navigation/native', () => ({
@@ -39,7 +30,10 @@ jest.mock('@react-navigation/native', () => ({
   })
 }));
 
-
+globalThis.savedUsers["078ff5c0-5bce-4603-b1f3-79cf8258ec26"] = {
+  name: "Post Test",
+  isVerified: true
+}
 
 describe("PostUI Component Tests", () => {
   const props = {
