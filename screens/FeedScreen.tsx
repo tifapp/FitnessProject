@@ -43,6 +43,7 @@ import {
 } from "react-native";
 import PostHeader from "@components/postComponents/PostHeader";
 import NearbyActivities from "@components/headerComponents/NearbyActivities";
+import EventItem from "@components/EventItem";
 
 const linkify = require("linkify-it")();
 linkify
@@ -246,19 +247,12 @@ export default function FeedScreen({
     //   );
     // else
       return (
-        <PostItem
-          //index={index}
+        <EventItem
           item={item}
-          likes={item.likes ?? 0}
           writtenByYou={item.userId === globalThis.myId}
-          //showTimestamp={showTimestamp(item, index)}
-          reportPost={reportPost}
-          //newSection={true}
-          operations={operations}
           startTime={start}
           maxOccupancy={8}
           hasInvitations={true}
-          //isVisible={item.isVisible && isFocused}
         />
       );
     /*return renderItem({
