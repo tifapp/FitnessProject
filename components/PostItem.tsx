@@ -54,16 +54,17 @@ const PostItem = ({
   const setTime = () => {
     if (startTime) {
       const date = new Date()
-      const diff = startTime.getHours() - date.getHours();
+      const diffTime = Math.abs(startTime.getTime() - date.getTime());
+      const diffMin = Math.ceil(diffTime / (1000 * 60));
+      const diffHour = Math.ceil(diffTime / (1000 * 60 * 60));
 
-      if (diff >= 1) {
-        setIsHours(true);
-        setTimeUntil(diff);
+      if (diffMin < 60) {
+        setIsHours(false);
+        setTimeUntil(diffMin);
 
       } else {
-        setIsHours(false);
-        const min = startTime.getMinutes() - date.getMinutes();
-        setTimeUntil(min);
+        setIsHours(true);
+        setTimeUntil(diffHour);
       }
     } 
   }
