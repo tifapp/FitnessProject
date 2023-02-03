@@ -68,8 +68,11 @@ const PostItem = ({
 
   useEffect(() => {
     setColor(generateColor);
-    setTime();
   }, []);
+
+  useEffect(() => {
+    setTime();
+  }, [startTime]);
 
   const handleRequestToJoin = () => {
     if (requested) {
