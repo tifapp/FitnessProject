@@ -229,7 +229,7 @@ export default function FeedScreen({
   //   scrollRef.current?.scrollToOffset({ offset: 0, animated: true });
   // };
   let start = new Date();
-  start.setMinutes(start.getMinutes() + 30);
+  start.setHours(start.getHours() + 2);
   const renderPostItem: APIListRenderItemInfo<Post> = ({ item, index }, operations) => {
     // if (index === 0 && addedNewPost)
     //   return (

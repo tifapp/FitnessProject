@@ -115,6 +115,7 @@ const PostItem = ({
             style={{
               paddingHorizontal: '3%'
             }}
+            accessibilityLabel={'description'}
           >
             {item.description}
           </Text>
