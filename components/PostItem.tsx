@@ -1,4 +1,3 @@
-import API, { graphqlOperation } from "@aws-amplify/api";
 import { APIListOperations } from "@components/APIList";
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
