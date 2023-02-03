@@ -47,13 +47,8 @@ import {
   ActivityIndicator,
   Alert,
   AppState,
-<<<<<<< HEAD
-  AppStateStatus, Platform,
-  UIManager,
-=======
   AppStateStatus,
   Platform, UIManager,
->>>>>>> 5eac614 (Fixed user sign in flow and missing sandbox imports)
   useWindowDimensions,
   View
 } from "react-native";
@@ -103,6 +98,7 @@ const App = () => {
   const [userId, setUserId] = useState<string>("checking..."); //stores the user's id if logged in
   const [isNewUser, setIsNewUser] = useState<boolean>(false); //stores the user's id if logged in
   const [isAdmin, setIsAdmin] = useState<boolean>(false); //seems insecure
+  const [isDeveloper, setIsDeveloper] = useState<boolean>(false);
 
   const [conversationIds, setConversationIds] = useState<string[]>([]);
 

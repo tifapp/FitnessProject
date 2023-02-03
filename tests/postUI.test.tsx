@@ -22,14 +22,6 @@ jest.mock('@hooks/generateRandomColor', () => {
   return 'blue'
 });
 
-//jest.mock('../foo'); // this happens automatically with automocking
-//const foo = require('../foo');
-
-globalThis.savedUsers["078ff5c0-5bce-4603-b1f3-79cf8258ec26"] = {
-  name: "Post Test",
-  isVerified: true
-}
-
 const mockedNavigate = jest.fn();
 
 jest.mock('@react-navigation/native', () => ({
