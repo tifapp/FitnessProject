@@ -5,18 +5,18 @@ import { View } from "react-native";
 
 describe("Single Reply Thread tests", () => {
   it("should not have the full replies thread for the parent post open by default", () => {
-    givenSingleReplyThread(TestUserPosts.writtenByYou, TestUserPosts.blob);
+    makeSingleReplyThread(TestUserPosts.writtenByYou, TestUserPosts.blob);
     expectFullRepliesThreadToNotBeOpen(TestUserPosts.writtenByYou.id);
   });
 
   it("can open the full replies thread for the parent post", async () => {
-    givenSingleReplyThread(TestUserPosts.writtenByYou, TestUserPosts.blob);
+    makeSingleReplyThread(TestUserPosts.writtenByYou, TestUserPosts.blob);
     openFullRepliesThread();
     await expectFullRepliesThreadToBeOpen(TestUserPosts.writtenByYou.id);
   });
 });
 
-const givenSingleReplyThread = (post: UserPost, reply: UserPost) => {
+const makeSingleReplyThread = (post: UserPost, reply: UserPost) => {
   render(
     <SinglePostReplyThreadView
       post={post}

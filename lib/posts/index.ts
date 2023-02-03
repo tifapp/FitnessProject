@@ -1,5 +1,10 @@
 export { groupUserPosts, UserPostMap } from "./UserPostMap";
-export { Posts, PostsProvider, PostsProviderProps, usePosts } from "./Posts";
+export {
+  UserPosts,
+  UserPostsProvider,
+  UserPostsProviderProps,
+  useUserPostsDependency,
+} from "./UserPosts";
 export {
   UserPost,
   UserPostID,

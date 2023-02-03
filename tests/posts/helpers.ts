@@ -1,10 +1,10 @@
 import { unimplemented } from "../helpers/unimplemented";
-import { Posts } from "../../lib/posts/Posts";
+import { UserPosts } from "../../lib/posts/UserPosts";
 
 /**
- * A `Posts` instance which causes a test failure when invoking
+ * A `UserPosts` instance which causes a test failure when invoking
  * any of its functions.
  */
-export const unimplementedPosts: Posts = {
+export const unimplementedUserPosts: UserPosts = {
   postsWithIds: () => unimplemented("postsWithIds"),
 } as const;
