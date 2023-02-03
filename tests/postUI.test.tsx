@@ -1,7 +1,6 @@
 import { Post } from "../src/models";
 import PostItem from "@components/PostItem";
 import { fireEvent, render, screen } from "@testing-library/react-native";
-import useGenerateRandomColor from "@hooks/generateRandomColor";
 import generateColor from "@hooks/generateRandomColor";
 
 jest.mock('../src/models', () => {
@@ -23,14 +22,6 @@ jest.mock('@hooks/generateRandomColor', () => {
   return 'blue'
 });
 
-//jest.mock('../foo'); // this happens automatically with automocking
-//const foo = require('../foo');
-
-globalThis.savedUsers["078ff5c0-5bce-4603-b1f3-79cf8258ec26"] = {
-  name: "Post Test",
-  isVerified: true
-}
-
 const mockedNavigate = jest.fn();
 
 jest.mock('@react-navigation/native', () => ({
@@ -39,7 +30,10 @@ jest.mock('@react-navigation/native', () => ({
   })
 }));
 
-
+globalThis.savedUsers["078ff5c0-5bce-4603-b1f3-79cf8258ec26"] = {
+  name: "Post Test",
+  isVerified: true
+}
 
 describe("PostUI Component Tests", () => {
   const props = {
@@ -126,13 +120,26 @@ describe("PostUI Component Tests", () => {
     fireEvent.press(invitation);
     expect(invitation.props.style[0].color).toEqual(generateColor);
   });
-/*
+
   it("Time becomes red", () => {
+    time.setMinutes(time.getMinutes() + 30);
     render(<PostItem item={post} likes={0} reportPost={mockReportPost}
-      writtenByYou={false} operations={mockOps} startTime={1}
-      maxOccupancy={8} hasInvitations={true}
+      writtenByYou={false} operations={mockOps} startTime={time}
+      maxOccupancy={undefined} hasInvitations={false}
     />);
-    
-    expect(screen.getByText("Post T.")).toBeDefined();
-  });*/
+    const timeIcon = screen.queryByLabelText('time icon');
+
+    expect(timeIcon.props.style[0].color).toEqual("red");
+  });
+
+  it("Occupancy becomes red", () => {
+    time.setMinutes(time.getMinutes() + 30);
+    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
+      writtenByYou={false} operations={mockOps} startTime={undefined}
+      maxOccupancy={6} hasInvitations={false}
+    />);
+    const timeIcon = screen.queryByLabelText('occupancy icon');
+
+    expect(timeIcon.props.style[0].color).toEqual("red");
+  });
 });

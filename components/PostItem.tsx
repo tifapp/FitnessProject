@@ -1,6 +1,4 @@
-import API, { graphqlOperation } from "@aws-amplify/api";
 import { APIListOperations } from "@components/APIList";
-import { deletePost, updatePost } from "@graphql/mutations";
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Post } from "src/models";
@@ -8,7 +6,6 @@ import IconButton from "./common/IconButton";
 import { ProfileImageAndName } from "./ProfileImageAndName";
 import { Divider } from "react-native-elements";
 import generateColor from "@hooks/generateRandomColor";
-import { set } from "react-native-reanimated";
 
 interface Props {
   item: Post & {taggedUsers?: string[]; likedByYou?: boolean},
@@ -118,6 +115,7 @@ const PostItem = ({
             style={{
               paddingHorizontal: '3%'
             }}
+            accessibilityLabel={'description'}
           >
             {item.description}
           </Text>
