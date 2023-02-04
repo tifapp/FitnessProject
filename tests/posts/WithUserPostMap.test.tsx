@@ -1,4 +1,9 @@
-import { render, screen, waitFor } from "@testing-library/react-native";
+import {
+  render,
+  screen,
+  waitFor,
+  fireEvent,
+} from "@testing-library/react-native";
 import WithUserPostMap from "@components/postComponents/WithUserPostMap";
 import { unimplementedUserPosts } from "./helpers";
 import {
@@ -7,10 +12,10 @@ import {
   UserPostID,
   TestUserPosts,
   UserPostsProvider,
-  UserPost,
   UserPostMap,
 } from "../../lib/posts";
-import { Text, View } from "react-native";
+import { Button, Text, View } from "react-native";
+import { neverPromise } from "../helpers/Promise";
 
 let userPosts: UserPosts;
 
@@ -21,20 +26,21 @@ describe("WithUserPostMap tests", () => {
   beforeEach(() => (userPosts = unimplementedUserPosts));
 
   it("should indicate a loading status when posts aren't loaded", () => {
-    userPosts.postsWithIds = async () => await new Promise(() => {});
+    userPosts.postsWithIds = async () => await neverPromise();
     makeUserPostMap(userPostsIds);
     expectLoadingIndication();
   });
 
   it("should indicate an error when posts fail to load", async () => {
+    const errorMessage = "Something went wrong...";
     userPosts.postsWithIds = async () => {
-      throw new Error("Lmao");
+      throw new Error(errorMessage);
     };
     makeUserPostMap(userPostsIds);
-    await expectErrorMessage("Lmao");
+    await expectErrorMessage(errorMessage);
   });
 
-  it("should indicate posts when available", async () => {
+  it("should indicate that posts are available when loaded", async () => {
     userPosts.postsWithIds = async () => groupUserPosts(userPostsModels);
     makeUserPostMap(userPostsIds);
     await expectUserPostWithIdIsPresent(userPostsIds[0]);
