@@ -37,13 +37,10 @@ import {
   Animated,
   FlatList,
   FlatListProps,
-  Image, KeyboardAvoidingView, Platform, ScrollView, StyleProp, StyleSheet, Text,
+  Image, KeyboardAvoidingView, Platform, StyleProp, StyleSheet, Text,
   View,
   ViewStyle
 } from "react-native";
-import PostHeader from "@components/postComponents/PostHeader";
-import NearbyActivities from "@components/headerComponents/NearbyActivities";
-import EventItem from "@components/EventItem";
 
 const linkify = require("linkify-it")();
 linkify
@@ -229,8 +226,7 @@ export default function FeedScreen({
   // const scrollToTop = () => {
   //   scrollRef.current?.scrollToOffset({ offset: 0, animated: true });
   // };
-  let start = new Date();
-  start.setHours(start.getHours() + 2);
+
   const renderPostItem: APIListRenderItemInfo<Post> = ({ item, index }, operations) => {
     // if (index === 0 && addedNewPost)
     //   return (
@@ -247,12 +243,16 @@ export default function FeedScreen({
     //   );
     // else
       return (
-        <EventItem
+        <PostItem
+          //index={index}
           item={item}
+          likes={item.likes ?? 0}
           writtenByYou={item.userId === globalThis.myId}
-          startTime={start}
-          maxOccupancy={8}
-          hasInvitations={true}
+          //showTimestamp={showTimestamp(item, index)}
+          reportPost={reportPost}
+          //newSection={true}
+          operations={operations}
+          //isVisible={item.isVisible && isFocused}
         />
       );
     /*return renderItem({
@@ -306,51 +306,48 @@ export default function FeedScreen({
   ]);
 
   return (
-    <>
-      <NearbyActivities />
-      <APIList
-        {...rest}
-        ref={listRef}
-        style={[{ flex: 1 }, style]}
-        viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
-        ListRef={scrollRef}
-        ListFooterComponent={footerComponent}
-        ListHeaderComponent={
-          <View style={{}}>
-            <KeyboardAvoidingView
-              enabled={rest.inverted ?? false}
-              behavior={Platform.OS === "ios" ? "position" : "height"}
-              keyboardVerticalOffset={90}
-              style={{ flex: 1 }}
-            >
-              <PostInputField
-                onPostAdded={(newPost: Post) => {
-                  setAddedNewPost(true);
-                  listRef.current?.addItem({...newPost, 
-                userId: globalThis.myId,
-                createdAt: "null",
-              }); onPostAdded?.(newPost);}}
-                channel={channel}
-                originalParentId={originalParentId}
-                autoFocus={autoFocus}
-                isChallenge={isChallenge}
-                label={postButtonLabel}
-              />
-            </KeyboardAvoidingView>
-            {headerComponent}
-          </View>
-        }
-        initialAmount={7}
-        additionalAmount={7} //change number based on device specs
-        processingFunction={getLikedPosts as any}
-        queryOperation={isChallenge ? postsByLikes : postsByChannel}
-        queryOperationName={isChallenge ? "postsByLikes" : "postsByChannel"}
-        filter={{ channel: channel, sortDirection: "DESC" }}
-        renderItem={renderPostItem}
-        keyExtractor={(item: Post) => item.createdAt.toString() + item.userId}
-        onEndReachedThreshold={0.5}
-      />
-    </>
+    <APIList
+      {...rest}
+      ref={listRef}
+      style={[{ flex: 1 }, style]}
+      viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
+      ListRef={scrollRef}
+      ListFooterComponent={footerComponent}
+      ListHeaderComponent={
+        <View style={{}}>
+          <KeyboardAvoidingView
+            enabled={rest.inverted ?? false}
+            behavior={Platform.OS === "ios" ? "position" : "height"}
+            keyboardVerticalOffset={90}
+            style={{ flex: 1 }}
+          >
+            <PostInputField
+              onPostAdded={(newPost: Post) => {
+                setAddedNewPost(true);
+                listRef.current?.addItem({...newPost, 
+              userId: globalThis.myId,
+              createdAt: "null",
+            }); onPostAdded?.(newPost);}}
+              channel={channel}
+              originalParentId={originalParentId}
+              autoFocus={autoFocus}
+              isChallenge={isChallenge}
+              label={postButtonLabel}
+            />
+          </KeyboardAvoidingView>
+          {headerComponent}
+        </View>
+      }
+      initialAmount={7}
+      additionalAmount={7} //change number based on device specs
+      processingFunction={getLikedPosts as any}
+      queryOperation={isChallenge ? postsByLikes : postsByChannel}
+      queryOperationName={isChallenge ? "postsByLikes" : "postsByChannel"}
+      filter={{ channel: channel, sortDirection: "DESC" }}
+      renderItem={renderPostItem}
+      keyExtractor={(item: Post) => item.createdAt.toString() + item.userId}
+      onEndReachedThreshold={0.5}
+    />
   );
 }
 
@@ -525,6 +522,7 @@ function PostInputField({
           }
         />
       )}
+
       <FlatList
         data={taggedUsers}
         keyExtractor={(item) => item}

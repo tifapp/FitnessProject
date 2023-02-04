@@ -4,14 +4,14 @@ import { Post } from "src/models";
 import IconButton from "./common/IconButton";
 import { ProfileImageAndName } from "./ProfileImageAndName";
 import { Divider } from "react-native-elements";
-import generateColor from "@hooks/generateRandomColor";
 
 interface Props {
   item: Post,
   writtenByYou: boolean,
   startTime?: Date, 
   maxOccupancy?: number,
-  hasInvitations: boolean
+  hasInvitations: boolean,
+  eventColor: string
 }
 
 const EventItem = ({
@@ -20,6 +20,7 @@ const EventItem = ({
   startTime,
   maxOccupancy,
   hasInvitations,
+  eventColor
 } : Props) => {
   const [requested, setRequested] = useState(false); // If user has requested to join
   const [numInvitations, setNumInvitations] = useState(0) // Number of requested invitations
@@ -29,7 +30,6 @@ const EventItem = ({
   const [distance, setDistance] = useState(0); // Current distance user is from the event
   const NUM_OF_LINES = 5;
   const CAPACITY_PERCENTAGE = 0.75;
-  const color = generateColor();
 
   const setTime = () => {
     if (startTime) {
@@ -83,7 +83,7 @@ const EventItem = ({
               style={styles.eventDot}
               iconName={"lens"}
               size={15}
-              color={color}
+              color={eventColor}
               onPress={() => null}
             />
           <Text style={styles.distance}>{distance} mi</Text>
@@ -159,7 +159,7 @@ const EventItem = ({
                 <Text 
                   style={[
                     styles.numbersBottomRight,
-                    {color: requested ? color : "black"}
+                    {color: requested ? eventColor : "black"}
                   ]}
                   accessibilityLabel={'invitations requested'}
                 >{numInvitations > 0 ? numInvitations : null}</Text>
@@ -167,7 +167,7 @@ const EventItem = ({
                   style={{paddingLeft: '6%'}}
                   iconName={"person-add"}
                   size={22}
-                  color={requested ? color : "black"}
+                  color={requested ? eventColor : "black"}
                   onPress={handleRequestToJoin}
                   accessibilityLabel={'invitation icon'}
                 />
