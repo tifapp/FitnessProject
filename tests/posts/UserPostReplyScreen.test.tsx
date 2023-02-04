@@ -15,6 +15,7 @@ import {
   UserPosts,
   UserPostsProvider,
 } from "../../lib/posts";
+import "../helpers/Matchers";
 import { unimplementedUserPosts } from "./helpers";
 
 let userPosts: UserPosts;
@@ -30,15 +31,15 @@ describe("UserPostReplyScreen tests", () => {
   it("should indicate a loading state when post and reply aren't loaded", () => {
     userPosts.postsWithIds = () => neverPromise();
     renderUserPostReplyScreen({ postId: testPost.id, replyId: testReply.id });
-    expect(loadingIndicator()).not.toBeNull();
+    expect(loadingIndicator()).toBeDisplayed();
   });
 
   it("should display the post and reply when they are loaded", async () => {
     userPosts.postsWithIds = async () => groupUserPosts([testPost, testReply]);
     renderUserPostReplyScreen({ postId: testPost.id, replyId: testReply.id });
     await waitFor(() => {
-      expect(displayedPostWithId(testPost.id)).not.toBeNull();
-      expect(displayedPostWithId(testReply.id)).not.toBeNull();
+      expect(displayedPostWithId(testPost.id)).toBeDisplayed();
+      expect(displayedPostWithId(testReply.id)).toBeDisplayed();
     });
   });
 
@@ -46,22 +47,22 @@ describe("UserPostReplyScreen tests", () => {
     userPosts.postsWithIds = async () => groupUserPosts([testPost]);
     renderUserPostReplyScreen({ postId: testPost.id, replyId: testReply.id });
     await waitFor(() =>
-      expect(displayedPostWithId(testPost.id)).not.toBeNull()
+      expect(displayedPostWithId(testPost.id)).toBeDisplayed()
     );
   });
 
   it("should indicate that the reply is not found when the post loads without it", async () => {
     userPosts.postsWithIds = async () => groupUserPosts([testPost]);
     renderUserPostReplyScreen({ postId: testPost.id, replyId: testReply.id });
-    await waitFor(() => expect(replyNotFoundIndicator()).not.toBeNull());
+    await waitFor(() => expect(replyNotFoundIndicator()).toBeDisplayed());
   });
 
   it("should only display a post not found indicator when the post doesn't exist", async () => {
     userPosts.postsWithIds = async () => groupUserPosts([testReply]);
     renderUserPostReplyScreen({ postId: testPost.id, replyId: testReply.id });
     await waitFor(() => {
-      expect(postNotFoundIndicator()).not.toBeNull();
-      expect(displayedPostWithId(testReply.id)).toBeNull();
+      expect(postNotFoundIndicator()).toBeDisplayed();
+      expect(displayedPostWithId(testReply.id)).not.toBeDisplayed();
     });
   });
 
@@ -79,7 +80,7 @@ describe("UserPostReplyScreen tests", () => {
       throw new Error();
     };
     renderUserPostReplyScreen({ postId: testPost.id, replyId: testReply.id });
-    await waitFor(() => expect(errorMessage()).not.toBeNull());
+    await waitFor(() => expect(errorMessage()).toBeDisplayed());
   });
 
   it("should allow a retry when an error occurs", async () => {
@@ -109,7 +110,7 @@ describe("UserPostReplyScreen tests", () => {
     renderUserPostReplyScreen({ postId: testPost.id, replyId: testReply.id });
     await waitFor(() => {
       retry();
-      expect(errorMessage()).toBeNull();
+      expect(errorMessage()).not.toBeDisplayed();
     });
   });
 
@@ -160,13 +161,13 @@ const postNotFoundIndicator = () => screen.queryByText("Post not found.");
 
 const replyNotFoundIndicator = () => screen.queryByText("Reply not found.");
 
-const dismissScreen = () => fireEvent.press(screen.queryByText("Close"));
+const dismissScreen = () => fireEvent.press(screen.getByText("Close"));
 
 const errorMessage = () => screen.queryByText("Something went wrong...");
 
-const retry = () => fireEvent.press(screen.queryByText("Retry"));
+const retry = () => fireEvent.press(screen.getByText("Retry"));
 
-const openFullReplies = () => fireEvent.press(screen.queryByText("View All"));
+const openFullReplies = () => fireEvent.press(screen.getByText("View All"));
 
 const openExpectFullRepliesForPost = (postId: UserPostID) => {
   openFullReplies();
