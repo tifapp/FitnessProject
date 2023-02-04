@@ -2,7 +2,7 @@ import { Tagged } from "../Tagged";
 import { Post } from "src/models";
 import { UserID } from "../users/types";
 
-export class UserPostID extends Tagged<UserPostID, string> {
+export class UserPostID extends Tagged<UserPost, string> {
   // NB: Atm we don't have an actual post id field, however existing code
   // simply uses the post creation date and user id. Hopefully, this constructor
   // can be removed at some point in favor of making this type a simple Tagged
@@ -18,6 +18,8 @@ export class UserPostID extends Tagged<UserPostID, string> {
   }
 }
 
+export class UserPostChannel extends Tagged<UserPost, string> {}
+
 /**
  * A type representing a post that comes from a user, which is meant for
  * viewing in a feed.
@@ -32,7 +34,7 @@ export type UserPost = {
   readonly username: string;
   readonly description?: string;
   readonly parentId?: UserPostID;
-  readonly channel?: string;
+  readonly channel?: UserPostChannel;
   readonly imageURL?: string;
   readonly likedByYou: boolean;
   readonly writtenByYou: boolean;
@@ -51,7 +53,7 @@ export const userPostToPost = (userPost: UserPost): Post => ({
   updatedAt: userPost.updatedAt.toString(),
   description: userPost.description,
   parentId: userPost.parentId?.rawValue,
-  channel: userPost.channel,
+  channel: userPost.channel?.rawValue,
   imageURL: userPost.imageURL,
 });
 

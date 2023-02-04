@@ -8,6 +8,7 @@ export {
 export {
   UserPost,
   UserPostID,
+  UserPostChannel,
   TestUserPosts,
   userPostToPost,
 } from "./UserPost";
