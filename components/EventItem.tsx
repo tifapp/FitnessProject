@@ -1,4 +1,3 @@
-import { APIListOperations } from "@components/APIList";
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Post } from "src/models";
@@ -27,6 +26,7 @@ const EventItem = ({
   const [isHours, setIsHours] = useState(true); // If time limit has >= 1 hour left
   const [timeUntil, setTimeUntil] = useState(0); // Time (in either hours or minutes) until event starts
   const [currentCapacity, setCurrentCapacity] = useState(5); // How many users have joined event
+  const [distance, setDistance] = useState(0); // Current distance user is from the event
   const NUM_OF_LINES = 5;
   const CAPACITY_PERCENTAGE = 0.75;
   const color = generateColor();
@@ -86,7 +86,7 @@ const EventItem = ({
               color={color}
               onPress={() => null}
             />
-          <Text style={styles.distance}>0 mi</Text>
+          <Text style={styles.distance}>{distance} mi</Text>
         </View>
 
         <Divider style={styles.divider}/>
@@ -272,7 +272,6 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.18,
     shadowRadius: 1.0,
-
     elevation: 1,
   },
 });

@@ -1,8 +1,6 @@
-import MainStack from "@stacks/MainStack";
 import { Auth } from "aws-amplify";
 import React from "react";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
-import FeedScreen from "./FeedScreen";
 
 const ActivitiesScreen = () => {
   function signOut() {
