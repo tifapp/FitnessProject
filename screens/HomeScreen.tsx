@@ -1,8 +1,7 @@
-import { UserPostChannel, UserPostID } from "lib/posts/UserPost";
+import { UserPostID } from "lib/posts/UserPost";
 import { ReactNode, useEffect, useRef } from "react";
 import Modal, { ModalRefType } from "@components/common/Modal";
 import { View } from "react-native";
-import UserPostReplyScreen from "./UserPostReplyScreen";
 
 export type HomeScreenViewReply = {
   postId: UserPostID;
@@ -10,31 +9,29 @@ export type HomeScreenViewReply = {
 };
 
 export type HomeScreenProps = {
-  channel: UserPostChannel;
-  feedView: (channel: UserPostChannel) => ReactNode;
-  replyView?: (viewedReply: HomeScreenViewReply) => ReactNode;
+  feedView: ReactNode;
+  replyView?: (
+    viewedReply: HomeScreenViewReply,
+    onDismissed: () => void
+  ) => ReactNode;
   viewedReply?: HomeScreenViewReply;
 };
 
-const HomeScreen = ({
-  channel,
-  feedView,
-  viewedReply,
-  replyView,
-}: HomeScreenProps) => {
+const HomeScreen = ({ feedView, viewedReply, replyView }: HomeScreenProps) => {
   const modalRef = useRef<ModalRefType>(null);
 
   useEffect(() => {
     if (!viewedReply) return;
     modalRef.current?.showModal();
-    return () => modalRef.current?.hideModal();
   }, [viewedReply]);
 
   return (
     <View>
-      {feedView(channel)}
+      {feedView}
       {viewedReply && replyView && (
-        <Modal ref={modalRef}>{replyView(viewedReply)}</Modal>
+        <Modal ref={modalRef}>
+          {replyView(viewedReply, () => modalRef.current?.hideModal())}
+        </Modal>
       )}
     </View>
   );
