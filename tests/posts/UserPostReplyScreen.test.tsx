@@ -5,7 +5,7 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react-native";
-import { View } from "react-native";
+import { Button, View } from "react-native";
 import { neverPromise } from "../helpers/Promise";
 import {
   groupUserPosts,
@@ -125,6 +125,15 @@ describe("UserPostReplyScreen tests", () => {
     renderUserPostReplyScreen({ postId: testPost.id, replyId: testReply.id });
     await waitFor(() => openExpectFullRepliesForPost(testPost.id));
   });
+
+  it("should be dismissed when the loaded post is deleted", async () => {
+    userPosts.postsWithIds = async () => groupUserPosts([testPost, testReply]);
+    renderUserPostReplyScreen({ postId: testPost.id, replyId: testReply.id });
+    await waitFor(() => {
+      deletePostWithId(testPost.id);
+      expect(wasDismissed).toHaveBeenCalled();
+    });
+  });
 });
 
 const renderUserPostReplyScreen = ({
@@ -137,7 +146,15 @@ const renderUserPostReplyScreen = ({
   render(
     <UserPostsProvider posts={userPosts}>
       <UserPostReplyScreen
-        userPostView={(post: UserPost) => <View testID={post.id.rawValue} />}
+        userPostView={(post: UserPost, onDeleted?: () => void) => (
+          <View testID={post.id.rawValue}>
+            <Button
+              testID={deleteButtonId(post.id)}
+              title="delete"
+              onPress={() => onDeleted?.()}
+            />
+          </View>
+        )}
         fullRepliesView={(post: UserPost) => (
           <View testID={fullRepliesId(post.id)} />
         )}
@@ -168,6 +185,12 @@ const errorMessage = () => screen.queryByText("Something went wrong...");
 const retry = () => fireEvent.press(screen.getByText("Retry"));
 
 const openFullReplies = () => fireEvent.press(screen.getByText("View All"));
+
+const deleteButtonId = (postId: UserPostID) => `delete-${postId.rawValue}`;
+
+const deletePostWithId = (postId: UserPostID) => {
+  fireEvent.press(screen.getByTestId(deleteButtonId(postId)));
+};
 
 const openExpectFullRepliesForPost = (postId: UserPostID) => {
   openFullReplies();

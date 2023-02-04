@@ -13,11 +13,13 @@ export type UserPostReplyScreenProps = {
   postId: UserPostID;
   replyId: UserPostID;
   onDismiss: () => void;
-  userPostView?: (post: UserPost) => ReactNode;
+  userPostView?: (post: UserPost, onDeleted?: () => void) => ReactNode;
   fullRepliesView?: (post: UserPost) => ReactNode;
 };
 
-const renderUserPost = (post: UserPost) => <UserPostView post={post} />;
+const renderUserPost = (post: UserPost, onDeleted?: () => void) => (
+  <UserPostView post={post} onDeleted={() => onDeleted?.()} />
+);
 
 /**
  * A screen to be shown when the user opens the app from a reply notification.
@@ -27,7 +29,7 @@ const UserPostReplyScreen = ({
   replyId,
   onDismiss,
   userPostView = renderUserPost,
-  fullRepliesView = renderUserPost,
+  fullRepliesView = renderUserPost, // TODO: - This should be the comments modal
 }: UserPostReplyScreenProps) => {
   const { post, reply, isError, isLoading, retry } = usePostWithReply(
     postId,
@@ -50,7 +52,7 @@ const UserPostReplyScreen = ({
     <View>
       {post ? (
         <View>
-          {userPostView(post)}
+          {userPostView(post, onDismiss)}
           {reply ? userPostView(reply) : <Text>Reply not found.</Text>}
           <Button
             title="View All"
@@ -83,6 +85,11 @@ const usePostWithReply = (postId: UserPostID, replyId: UserPostID) => {
     [userPosts]
   );
 
+  // NB: postId and replyId are objects that will cause this to run whenever
+  // their addresses change. This is not problematic because this useEffect
+  // doesn't summon a meteor from outer space. Additionally these ids will
+  // likely by held in useState variables from the outside, so this probably
+  // won't even run very often...
   useEffect(() => {
     postIdsRef.current = [postId, replyId];
   }, [postId, replyId]);
