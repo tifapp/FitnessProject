@@ -26,7 +26,7 @@ const EventItem = ({
   const [numInvitations, setNumInvitations] = useState(0) // Number of requested invitations
   const [isHours, setIsHours] = useState(true); // If time limit has >= 1 hour left
   const [timeUntil, setTimeUntil] = useState(0); // Time (in either hours or minutes) until event starts
-  const [currentCapacity, setCurrentCapacity] = useState(5); // How many users have joined event
+  const [currentCapacity, setCurrentCapacity] = useState(1); // How many users have joined event
   const [distance, setDistance] = useState(0); // Current distance user is from the event
   const NUM_OF_LINES = 5;
   const CAPACITY_PERCENTAGE = 0.75;

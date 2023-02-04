@@ -1,7 +1,6 @@
 import { Post } from "../src/models";
-import PostItem from "@components/PostItem";
 import { fireEvent, render, screen } from "@testing-library/react-native";
-import generateColor from "@hooks/generateRandomColor";
+import EventItem from "@components/EventItem";
 
 jest.mock('../src/models', () => {
   return {
@@ -11,18 +10,19 @@ jest.mock('../src/models', () => {
         createdAt: "2023-01-23T06:35:53.184Z",
         updatedAt: "2023-01-29T01:42:01.713Z",
         userId: "078ff5c0-5bce-4603-b1f3-79cf8258ec26",
-        description: "mockDescription",
+        description: "la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la la not shown",
         channel: "general"
       }
     })
   }
 });
 
-jest.mock('@hooks/generateRandomColor', () => {
-  return 'blue'
-});
-
 const mockedNavigate = jest.fn();
+
+const mockGenerateColor: jest.MockedFunction<() => string> =
+  jest.fn().mockImplementation(() => {
+    return 'blue';
+  });
 
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
@@ -53,91 +53,81 @@ describe("PostUI Component Tests", () => {
   const time = new Date();
   
   it("Renders with all options", () => {
-    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
-      writtenByYou={false} operations={mockOps} startTime={time}
-      maxOccupancy={8} hasInvitations={true}
-    />);
+    render(<EventItem item={post} writtenByYou={true} startTime={time}
+      maxOccupancy={8} hasInvitations={true} eventColor={mockGenerateColor()} />)
     
-    expect(screen.getByText(props.description)).toBeDefined();
+    expect(screen.queryByLabelText('description')).toBeDefined();
     expect(screen.getByLabelText('time until')).toBeDefined();
     expect(screen.getByLabelText('max occupancy')).toBeDefined();
     expect(screen.getByLabelText('request invitations')).toBeDefined();
   });
 
   it("Renders with only time until event starts", () => {
-    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
-      writtenByYou={false} operations={mockOps} startTime={time}
-      maxOccupancy={undefined} hasInvitations={false}
-    />);
+    render(<EventItem item={post} writtenByYou={true} startTime={time}
+      maxOccupancy={undefined} hasInvitations={false} eventColor={mockGenerateColor()} />)
     
-    expect(screen.getByText(props.description)).toBeDefined();
+    expect(screen.queryByLabelText('description')).toBeDefined();
     expect(screen.queryByLabelText('time until')).toBeDefined();
     expect(screen.queryByLabelText('max occupancy')).toBeNull();
     expect(screen.queryByLabelText('request invitations')).toBeNull();
   });
 
   it("Renders with only max occupancy", () => {
-    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
-      writtenByYou={false} operations={mockOps} startTime={undefined}
-      maxOccupancy={8} hasInvitations={false}
-    />);
+    render(<EventItem item={post} writtenByYou={true} startTime={undefined}
+      maxOccupancy={8} hasInvitations={false} eventColor={mockGenerateColor()} />)
     
-    expect(screen.getByText(props.description)).toBeDefined();
+    expect(screen.queryByLabelText('description')).toBeDefined();
     expect(screen.queryByLabelText('time until')).toBeNull();
     expect(screen.queryByLabelText('max occupancy')).toBeDefined();
     expect(screen.queryByLabelText('request invitations')).toBeNull();
   });
 
   it("Renders with only invitations", () => {
-    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
-      writtenByYou={false} operations={mockOps} startTime={undefined}
-      maxOccupancy={undefined} hasInvitations={true}
-    />);
+    render(<EventItem item={post} writtenByYou={true} startTime={undefined}
+      maxOccupancy={undefined} hasInvitations={true} eventColor={mockGenerateColor()} />)
     
-    expect(screen.getByText(props.description)).toBeDefined();
+    expect(screen.queryByLabelText('description')).toBeDefined();
     expect(screen.queryByLabelText('time until')).toBeNull();
     expect(screen.queryByLabelText('max occupancy')).toBeNull();
     expect(screen.queryByLabelText('request invitations')).toBeDefined();
   });
 
   it("Name is shortened", () => {
-    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
-      writtenByYou={false} operations={mockOps} startTime={time}
-      maxOccupancy={8} hasInvitations={true}
-    />);
+    render(<EventItem item={post} writtenByYou={true} startTime={time}
+      maxOccupancy={8} hasInvitations={true} eventColor={mockGenerateColor()} />)
     
     expect(screen.getByText("Post T.")).toBeDefined();
   });
 
+  it("Description is truncated", () => {
+    render(<EventItem item={post} writtenByYou={true} startTime={undefined}
+      maxOccupancy={0} hasInvitations={false} eventColor={mockGenerateColor()} />)
+
+      expect(screen.queryByText("not shown")).toBeNull();
+  });
+
   it("Color of invitation changes on click", () => {
-    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
-      writtenByYou={false} operations={mockOps} startTime={undefined}
-      maxOccupancy={undefined} hasInvitations={true}
-    />);
+    render(<EventItem item={post} writtenByYou={true} startTime={undefined}
+      maxOccupancy={undefined} hasInvitations={true} eventColor={mockGenerateColor()} />)
     const invitation = screen.queryByLabelText('invitation icon');
 
     expect(invitation.props.style[0].color).toEqual("black");
     fireEvent.press(invitation);
-    expect(invitation.props.style[0].color).toEqual(generateColor);
+    expect(invitation.props.style[0].color).toEqual(mockGenerateColor());
   });
 
   it("Time becomes red", () => {
     time.setMinutes(time.getMinutes() + 30);
-    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
-      writtenByYou={false} operations={mockOps} startTime={time}
-      maxOccupancy={undefined} hasInvitations={false}
-    />);
+    render(<EventItem item={post} writtenByYou={true} startTime={time}
+      maxOccupancy={undefined} hasInvitations={false} eventColor={mockGenerateColor()} />)
     const timeIcon = screen.queryByLabelText('time icon');
 
     expect(timeIcon.props.style[0].color).toEqual("red");
   });
 
   it("Occupancy becomes red", () => {
-    time.setMinutes(time.getMinutes() + 30);
-    render(<PostItem item={post} likes={0} reportPost={mockReportPost}
-      writtenByYou={false} operations={mockOps} startTime={undefined}
-      maxOccupancy={6} hasInvitations={false}
-    />);
+    render(<EventItem item={post} writtenByYou={true} startTime={undefined}
+      maxOccupancy={1} hasInvitations={false} eventColor={mockGenerateColor()} />)
     const timeIcon = screen.queryByLabelText('occupancy icon');
 
     expect(timeIcon.props.style[0].color).toEqual("red");
