@@ -4,6 +4,7 @@ export {
   UserPostsProvider,
   UserPostsProviderProps,
   useUserPostsDependency,
+  graphQLUserPosts,
 } from "./UserPosts";
 export {
   UserPost,

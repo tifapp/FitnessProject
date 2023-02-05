@@ -8,6 +8,7 @@ import ChallengeScreen from "@screens/ChallengeScreen";
 import CreatingGroups from "@screens/CreatingGroups";
 import FeedScreen from "@screens/FeedScreen";
 import GroupPostsScreen from "@screens/GroupPostsScreen";
+import HomeScreen from "@screens/HomeScreen";
 import ImageScreen from "@screens/ImageScreen";
 import LookupUserScreen from "@screens/LookupUser";
 import SearchScreen from "@screens/SearchScreen";
@@ -73,10 +74,11 @@ export default function MainStack() {
       screenOptions={headerOptions}
     >
       <Stack.Screen name={MainScreenNames.HOME}>
-        {(props) => {
-          console.log(props);
-          return <FeedScreen {...props} channel={"general"} />;
-        }}
+        {(props) => (
+          <HomeScreen
+            feedView={<FeedScreen {...props} channel={"general"} />}
+          />
+        )}
       </Stack.Screen>
       <Stack.Screen
         name={MainScreenNames.LOOKUP}

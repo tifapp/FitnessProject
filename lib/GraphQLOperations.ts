@@ -13,6 +13,8 @@ export interface GraphQLOperations {
    * @param variables variables needed by the query
    */
   execute: <T>(statement: string, variables?: object) => Promise<T>;
+
+  // TODO: - Add a subscribe function
 }
 
 /**
@@ -35,6 +37,11 @@ export class GraphQLOperationsError<T> extends Error {
  */
 export const amplifyGraphQLOperations = (): GraphQLOperations => {
   return {
+    /**
+     * Executes an App Sync graphql request and returns its response data.
+     * If there are any "errors", this function throws a `GraphQLOperationsError`
+     * containing the errors and data from the response.
+     */
     execute: async <T>(statement: string, variables?: object) => {
       const result = (await API.graphql({
         query: statement,

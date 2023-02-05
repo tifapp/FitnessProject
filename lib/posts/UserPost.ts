@@ -2,19 +2,43 @@ import { Tagged } from "../Tagged";
 import { Post } from "src/models";
 import { UserID } from "../users/types";
 
+export type UserPostIDComponents = {
+  creationDate: Date;
+  userId: UserID;
+};
+
 export class UserPostID extends Tagged<UserPost, string> {
+  /**
+   * Attempts to create a `UserPostID` from a raw string.
+   */
+  static fromRawValue(rawValue: string): UserPostID | undefined {
+    const splits = rawValue.split("#");
+    if (splits.length !== 2) return undefined;
+
+    const [dateString, userId] = splits;
+    const date = Date.parse(dateString);
+    if (isNaN(date)) return undefined;
+
+    return new UserPostID({
+      creationDate: new Date(date),
+      userId: new UserID(userId),
+    });
+  }
+
   // NB: Atm we don't have an actual post id field, however existing code
   // simply uses the post creation date and user id. Hopefully, this constructor
   // can be removed at some point in favor of making this type a simple Tagged
   // derivative like UserID.
-  constructor({
-    creationDate,
-    userId,
-  }: {
-    creationDate: Date;
-    userId: UserID;
-  }) {
+  constructor({ creationDate, userId }: UserPostIDComponents) {
     super(`${creationDate.toISOString()}#${userId.rawValue}`);
+  }
+
+  components(): UserPostIDComponents {
+    const splits = this.rawValue.split("#");
+    return {
+      creationDate: new Date(splits[0]),
+      userId: new UserID(splits[1]),
+    };
   }
 }
 
@@ -45,7 +69,7 @@ export type UserPost = {
  * A simple way to convert a `UserPost` to a legacy `Post` type.
  */
 export const userPostToPost = (userPost: UserPost): Post => ({
-  id: userPost.createdAt.toString() + userPost.userId.rawValue,
+  id: userPost.id.rawValue,
   userId: userPost.userId.rawValue,
   likes: userPost.likesCount,
   replies: userPost.repliesCount,

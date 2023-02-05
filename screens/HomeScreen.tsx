@@ -36,14 +36,14 @@ const HomeScreen = ({
   }, [viewedReply]);
 
   return (
-    <View>
+    <>
       {feedView}
       {viewedReply && replyView && (
         <Modal ref={modalRef}>
           {replyView(viewedReply, () => modalRef.current?.hideModal())}
         </Modal>
       )}
-    </View>
+    </>
   );
 };
 

@@ -4,6 +4,10 @@ import { Amplify, Auth, Cache, graphqlOperation, Storage } from "aws-amplify";
 import { withAuthenticator } from "aws-amplify-react-native";
 import awsconfig from "./src/aws-exports";
 
+import { UserID } from "./lib/users";
+import { graphQLUserPosts, UserPosts, UserPostsProvider } from "./lib/posts";
+import { amplifyGraphQLOperations } from "./lib/GraphQLOperations";
+
 //graphql
 import { updateUser } from "@graphql/mutations.js";
 import { User } from "src/models";
@@ -87,6 +91,8 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 
+// TODO: - One day, we may get this under test...
+
 const App = () => {
   //Text.defaultProps = Text.defaultProps || {}
   //Text.defaultProps.style =  { fontFamily: 'Helvetica', fontSize: 15, fontWeight: 'normal' }
@@ -99,6 +105,7 @@ const App = () => {
   const [isDeveloper, setIsDeveloper] = useState<boolean>(false);
 
   const [conversationIds, setConversationIds] = useState<string[]>([]);
+  const [userPosts, setUserPosts] = useState<UserPosts | undefined>();
 
   globalThis.addConversationIds = (id) => {
     //console("(((((((((((((((((((((((((((((((((");
@@ -141,6 +148,13 @@ const App = () => {
       if (user.data?.getUser == null) {
         setIsNewUser(true);
       }
+
+      setUserPosts(
+        graphQLUserPosts(
+          new UserID(globalThis.myId),
+          amplifyGraphQLOperations()
+        )
+      );
 
       //console("success, user is ", user);
     } catch (err) {
@@ -224,7 +238,7 @@ const App = () => {
 
   const dimensions = useWindowDimensions();
 
-  if (userId == "checking...") {
+  if (userId == "checking..." || !userPosts) {
     return (
       <View style={{ flex: 1, backgroundColor: "#a9efe0" }}>
         <ActivityIndicator
@@ -284,58 +298,63 @@ const App = () => {
         </Tab.Navigator>
       </NavigationContainer>
     );
-  } else if (isDeveloper) {
-    return (
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Activities Screen"
-            component={ActivitiesScreen}
-            options={{
-              headerShown: false,
-            }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    );
+    // } else if (isDeveloper) {
+    //   return (
+    //     <NavigationContainer>
+    //       <Stack.Navigator>
+    //         <Stack.Screen
+    //           name="Activities Screen"
+    //           component={ActivitiesScreen}
+    //           options={{
+    //             headerShown: false,
+    //           }}
+    //         />
+    //       </Stack.Navigator>
+    //     </NavigationContainer>
+    //   );
   } else {
     return (
-      <NavigationContainer>
-        <StatusBar style="dark" />
-        <Drawer.Navigator
-          drawerPosition={"right"}
-          drawerStyle={{ width: dimensions.width }}
-          drawerContentOptions={{
-            itemStyle: { marginVertical: 5 },
-          }}
-          backBehavior="initialRoute"
-          edgeWidth={100}
-          initialRouteName="MainTabs"
-          drawerContent={(props) => <CustomSidebarMenu {...props} />}
-          screenOptions={headerOptions as DrawerNavigationOptions}
-        >
-          <Drawer.Screen
-            name="Feed"
-            component={MainStack}
-            initialParams={{ fromLookup: false }}
-            options={{ headerShown: false }}
-          />
-          <Drawer.Screen name="Profile" component={ProfileScreen} />
-          <Drawer.Screen name="Verification" component={VerificationScreen} />
-          <Drawer.Screen name="Friends" component={FriendScreen} />
-          <Drawer.Screen name="Conversations" component={ConversationScreen} />
-          <Drawer.Screen name="Settings" component={SettingsStack} />
-          <Drawer.Screen name="Image" component={ImageScreen} />
-          {conversationIds.map((conversationId) => (
+      <UserPostsProvider posts={userPosts}>
+        <NavigationContainer>
+          <StatusBar style="dark" />
+          <Drawer.Navigator
+            drawerPosition={"right"}
+            drawerStyle={{ width: dimensions.width }}
+            drawerContentOptions={{
+              itemStyle: { marginVertical: 5 },
+            }}
+            backBehavior="initialRoute"
+            edgeWidth={100}
+            initialRouteName="MainTabs"
+            drawerContent={(props) => <CustomSidebarMenu {...props} />}
+            screenOptions={headerOptions as DrawerNavigationOptions}
+          >
             <Drawer.Screen
-              key={conversationId}
-              name={conversationId}
-              component={MessageScreen}
-              initialParams={{ conversationId }}
+              name="Feed"
+              component={MainStack}
+              initialParams={{ fromLookup: false }}
+              options={{ headerShown: false }}
             />
-          ))}
-        </Drawer.Navigator>
-      </NavigationContainer>
+            <Drawer.Screen name="Profile" component={ProfileScreen} />
+            <Drawer.Screen name="Verification" component={VerificationScreen} />
+            <Drawer.Screen name="Friends" component={FriendScreen} />
+            <Drawer.Screen
+              name="Conversations"
+              component={ConversationScreen}
+            />
+            <Drawer.Screen name="Settings" component={SettingsStack} />
+            <Drawer.Screen name="Image" component={ImageScreen} />
+            {conversationIds.map((conversationId) => (
+              <Drawer.Screen
+                key={conversationId}
+                name={conversationId}
+                component={MessageScreen}
+                initialParams={{ conversationId }}
+              />
+            ))}
+          </Drawer.Navigator>
+        </NavigationContainer>
+      </UserPostsProvider>
     );
   }
 };
@@ -350,6 +369,7 @@ import SignIn from "@components/loginComponents/SignIn";
 import SignUp from "@components/loginComponents/SignUp";
 import VerifyContact from "@components/loginComponents/VerifyContact";
 import ActivitiesScreen from "@screens/ActivitiesScreen";
+import { EmptyView } from "@components/common/EmptyView";
 
 export default withAuthenticator(App, false, [
   <Greetings />,
