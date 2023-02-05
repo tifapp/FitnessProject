@@ -2,55 +2,6 @@ import { Tagged } from "../Tagged";
 import { Post } from "src/models";
 import { UserID } from "../users/types";
 
-export type UserPostIDComponents = {
-  creationDate: Date;
-  userId: UserID;
-};
-
-/**
- * A type that encapsulates a post id.
- */
-export class UserPostID {
-  readonly rawValue: string;
-  /**
-   * Attempts to create a `UserPostID` from a raw string.
-   */
-  static fromRawValue(rawValue: string): UserPostID | undefined {
-    const splits = rawValue.split("#");
-    if (splits.length !== 2) return undefined;
-
-    const [dateString, userId] = splits;
-    const date = Date.parse(dateString);
-    if (isNaN(date)) return undefined;
-
-    return new UserPostID({
-      creationDate: new Date(date),
-      userId: new UserID(userId),
-    });
-  }
-
-  // NB: Atm we don't have an actual post id field, however existing code
-  // simply uses the post creation date and user id. Hopefully, this constructor
-  // can be removed at some point in favor of making this type a simple Tagged
-  // derivative like UserID.
-  constructor({ creationDate, userId }: UserPostIDComponents) {
-    this.rawValue = `${creationDate.toISOString()}#${userId.rawValue}`;
-  }
-
-  /**
-   * The components making up this id.
-   */
-  components(): UserPostIDComponents {
-    const splits = this.rawValue.split("#");
-    return {
-      creationDate: new Date(splits[0]),
-      userId: new UserID(splits[1]),
-    };
-  }
-}
-
-export class UserPostChannel extends Tagged<UserPost, string> {}
-
 /**
  * A type representing a post that comes from a user, which is meant for
  * viewing in a feed.
@@ -71,6 +22,51 @@ export type UserPost = {
   readonly writtenByYou: boolean;
   readonly taggedUserIds: UserID[];
 };
+
+/**
+ * The components that make up a legacy `UserPostID`.
+ */
+export type LegacyUserPostIDComponents = {
+  creationDate: Date;
+  userId: UserID;
+};
+
+/**
+ * A type that encapsulates a post id. This type gives ways for it to be constructed from
+ * a set of legacy components (whilst also giving the ability to retrieve said components)
+ * that at present make up what a post id is. At some point, this will likely no longer be
+ * the case, so it is possible to construct this type directly from a raw string.
+ */
+export class UserPostID extends Tagged<UserPost, string> {
+  /**
+   * Constructs a `UserPostID` in legacy format from its raw components.
+   */
+  static fromLegacyComponents({
+    creationDate,
+    userId,
+  }: LegacyUserPostIDComponents): UserPostID {
+    return new UserPostID(`${creationDate.toISOString()}#${userId.rawValue}`);
+  }
+
+  /**
+   * A way to retrieve the components making up a legacy post id.
+   */
+  legacyComponents(): LegacyUserPostIDComponents | undefined {
+    const splits = this.rawValue.split("#");
+    if (splits.length !== 2) return undefined;
+
+    const [dateString, userId] = splits;
+    const date = Date.parse(dateString);
+    if (isNaN(date)) return undefined;
+
+    return {
+      creationDate: new Date(date),
+      userId: new UserID(userId),
+    };
+  }
+}
+
+export class UserPostChannel extends Tagged<UserPost, string> {}
 
 /**
  * A simple way to convert a `UserPost` to a legacy `Post` type.
@@ -95,7 +91,7 @@ export namespace TestUserPosts {
   const defaultTestPostDate = new Date("2023-01-31T00:00:00+0000");
 
   export const writtenByYou: UserPost = {
-    id: new UserPostID({
+    id: UserPostID.fromLegacyComponents({
       creationDate: defaultTestPostDate,
       userId: new UserID("you"),
     }),
@@ -112,7 +108,7 @@ export namespace TestUserPosts {
   };
 
   export const blob: UserPost = {
-    id: new UserPostID({
+    id: UserPostID.fromLegacyComponents({
       creationDate: defaultTestPostDate,
       userId: new UserID("blob"),
     }),

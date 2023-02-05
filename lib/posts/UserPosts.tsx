@@ -55,19 +55,25 @@ export const graphQLUserPosts = (
       if (ids.length === 0) return new UserPostMap();
 
       const rawPosts = await Promise.all<any>(
-        ids.map(async (id) => {
-          const { creationDate, userId } = id.components();
-          return await operations
-            .execute(getPost, {
-              createdAt: creationDate.toISOString(),
-              userId: userId.rawValue,
-            })
-            .then((value: any) => value.getPost);
-        })
+        ids
+          .map((id) => id.legacyComponents())
+          .map(async (idComponents) => {
+            // NB: We force unwrap here because atm all post ids are made up of components.
+            // By the time we change this fact, we'll likely also have made this entire
+            // function doable with a single query entirely, meaning the implementation of
+            // this function will have changed entirely.
+            const { creationDate, userId } = idComponents!!;
+            return await operations
+              .execute(getPost, {
+                createdAt: creationDate.toISOString(),
+                userId: userId.rawValue,
+              })
+              .then((value: any) => value.getPost);
+          })
       );
 
       const userPostIds = rawPosts.map((post) => {
-        return new UserPostID({
+        return UserPostID.fromLegacyComponents({
           creationDate: new Date(post.createdAt),
           userId: new UserID(post.userId),
         });
@@ -99,9 +105,7 @@ export const graphQLUserPosts = (
           userId: new UserID(post.userId),
           username: usernames[idx],
           description: post.description,
-          parentId: post.parentId
-            ? UserPostID.fromRawValue(post.parentId)
-            : undefined,
+          parentId: post.parentId ? new UserPostID(post.parentId) : undefined,
           channel: post.channel ? new UserPostChannel(post.channel) : undefined,
           imageURL: post.imageURL,
           likedByYou: likes[idx] !== null,

@@ -9,29 +9,27 @@ const testRawIdValue = "2023-01-31T00:00:00.000Z#test";
 
 describe("UserPostID tests", () => {
   it("should compose the id from a user id and post creation date", () => {
-    const id = new UserPostID(testComponents);
+    const id = UserPostID.fromLegacyComponents(testComponents);
     expect(id.rawValue).toEqual(testRawIdValue);
   });
 
-  it("should be able to decompose its components", () => {
-    const id = new UserPostID(testComponents);
-    expect(id.components()).toMatchObject(testComponents);
+  it("should be able to decompose its components when it is composed of valid components", () => {
+    const id = UserPostID.fromLegacyComponents(testComponents);
+    expect(id.legacyComponents()).toMatchObject(testComponents);
   });
 
-  test("creating from a correctly formatted raw string returns the proper id", () => {
-    const id = UserPostID.fromRawValue(testRawIdValue);
-    expect(id).toMatchObject(new UserPostID(testComponents));
+  it("should have undefined components when incorrectly formatted raw string", () => {
+    const id = new UserPostID("sdkjhfsuidgf");
+    expect(id.legacyComponents()).toBeUndefined();
   });
 
-  test("creating from an incorrectly formatted raw string returns undefined", () => {
-    expect(UserPostID.fromRawValue("hello world")).not.toBeDefined();
-  });
-
-  test("creating from a string with an invalid date returns undefined", () => {
-    expect(UserPostID.fromRawValue("totallyADate#test")).not.toBeDefined();
+  it("should have undefined components when poorly formatted date", () => {
+    const id = new UserPostID("totallyADate#test");
+    expect(id.legacyComponents()).toBeUndefined();
   });
 
   test("creating from a string with more than 2 # symbols returns undefined", () => {
-    expect(UserPostID.fromRawValue(testRawIdValue + "#lmao"));
+    const id = new UserPostID(testRawIdValue + "#lmao");
+    expect(id.legacyComponents()).toBeUndefined();
   });
 });

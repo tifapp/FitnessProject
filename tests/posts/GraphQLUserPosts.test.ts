@@ -63,7 +63,7 @@ describe("GraphQLUserPosts tests", () => {
 const testUserId = new UserID("test");
 const blob = "Blob|";
 const testStatus = "literally dead";
-const testPostId = new UserPostID({
+const testPostId = UserPostID.fromLegacyComponents({
   creationDate: new Date(0),
   userId: testUserId,
 });

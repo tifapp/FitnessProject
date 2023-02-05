@@ -11,5 +11,6 @@ export {
   UserPostID,
   UserPostChannel,
   TestUserPosts,
+  LegacyUserPostIDComponents,
   userPostToPost,
 } from "./UserPost";
