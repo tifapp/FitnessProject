@@ -7,7 +7,11 @@ export type UserPostIDComponents = {
   userId: UserID;
 };
 
-export class UserPostID extends Tagged<UserPost, string> {
+/**
+ * A type that encapsulates a post id.
+ */
+export class UserPostID {
+  readonly rawValue: string;
   /**
    * Attempts to create a `UserPostID` from a raw string.
    */
@@ -30,9 +34,12 @@ export class UserPostID extends Tagged<UserPost, string> {
   // can be removed at some point in favor of making this type a simple Tagged
   // derivative like UserID.
   constructor({ creationDate, userId }: UserPostIDComponents) {
-    super(`${creationDate.toISOString()}#${userId.rawValue}`);
+    this.rawValue = `${creationDate.toISOString()}#${userId.rawValue}`;
   }
 
+  /**
+   * The components making up this id.
+   */
   components(): UserPostIDComponents {
     const splits = this.rawValue.split("#");
     return {
