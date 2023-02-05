@@ -2,6 +2,7 @@ import { UserPostID } from "lib/posts/UserPost";
 import { ReactNode, useEffect, useRef } from "react";
 import Modal, { ModalRefType } from "@components/common/Modal";
 import { View } from "react-native";
+import UserPostReplyScreen from "./UserPostReplyScreen";
 
 export type HomeScreenViewReply = {
   postId: UserPostID;
@@ -17,7 +18,16 @@ export type HomeScreenProps = {
   viewedReply?: HomeScreenViewReply;
 };
 
-const HomeScreen = ({ feedView, viewedReply, replyView }: HomeScreenProps) => {
+const renderReplyScreen = (
+  viewedReply: HomeScreenViewReply,
+  onDismissed: () => void
+) => <UserPostReplyScreen {...viewedReply} onDismiss={onDismissed} />;
+
+const HomeScreen = ({
+  feedView,
+  viewedReply,
+  replyView = renderReplyScreen,
+}: HomeScreenProps) => {
   const modalRef = useRef<ModalRefType>(null);
 
   useEffect(() => {

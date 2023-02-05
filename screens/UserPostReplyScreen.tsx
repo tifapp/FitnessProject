@@ -1,4 +1,5 @@
 import Modal, { ModalRefType } from "@components/common/Modal";
+import CommentsModal from "@components/postComponents/CommentsModal";
 import UserPostView from "@components/postComponents/UserPostView";
 import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Button, Text, View } from "react-native";
@@ -6,6 +7,7 @@ import {
   UserPost,
   UserPostID,
   UserPostMap,
+  userPostToPost,
   useUserPostsDependency,
 } from "../lib/posts";
 
@@ -21,6 +23,13 @@ const renderUserPost = (post: UserPost, onDeleted?: () => void) => (
   <UserPostView post={post} onDeleted={() => onDeleted?.()} />
 );
 
+const renderCommentsModal = (post: UserPost, onDeleted?: () => void) => (
+  <CommentsModal
+    item={userPostToPost(post)}
+    operations={{ removeItem: () => onDeleted?.(), replaceItem: () => {} }}
+  />
+);
+
 /**
  * A screen to be shown when the user opens the app from a reply notification.
  */
@@ -29,7 +38,7 @@ const UserPostReplyScreen = ({
   replyId,
   onDismiss,
   userPostView = renderUserPost,
-  fullRepliesView = renderUserPost, // TODO: - This should be the comments modal
+  fullRepliesView = renderCommentsModal,
 }: UserPostReplyScreenProps) => {
   const { post, reply, isError, isLoading, retry } = usePostWithReply(
     postId,
@@ -87,9 +96,8 @@ const usePostWithReply = (postId: UserPostID, replyId: UserPostID) => {
 
   // NB: postId and replyId are objects that will cause this to run whenever
   // their addresses change. This is not problematic because this useEffect
-  // doesn't summon a meteor from outer space. Additionally these ids will
-  // likely by held in useState variables from the outside, so this probably
-  // won't even run very often...
+  // doesn't summon a meteor from outer space. Additionally these ids are backed
+  // by an immutable type that will likely be held in some state variable...
   useEffect(() => {
     postIdsRef.current = [postId, replyId];
   }, [postId, replyId]);
@@ -104,6 +112,7 @@ const usePostWithReply = (postId: UserPostID, replyId: UserPostID) => {
     isError,
     retry: () => {
       setIsError(false);
+      setPostMap(undefined);
       loadPostMap();
     },
     isLoading: !postMap,
