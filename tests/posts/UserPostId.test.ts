@@ -24,12 +24,14 @@ describe("UserPostID tests", () => {
   });
 
   test("creating from an incorrectly formatted raw string returns undefined", () => {
-    const id = UserPostID.fromRawValue("hello world");
-    expect(id).not.toBeDefined();
+    expect(UserPostID.fromRawValue("hello world")).not.toBeDefined();
   });
 
-  test("creating from a string with an ivalid date returns undefined", () => {
-    const id = UserPostID.fromRawValue("totallyADate#test");
-    expect(id).not.toBeDefined();
+  test("creating from a string with an invalid date returns undefined", () => {
+    expect(UserPostID.fromRawValue("totallyADate#test")).not.toBeDefined();
+  });
+
+  test("creating from a string with more than 2 # symbols returns undefined", () => {
+    expect(UserPostID.fromRawValue(testRawIdValue + "#lmao"));
   });
 });
