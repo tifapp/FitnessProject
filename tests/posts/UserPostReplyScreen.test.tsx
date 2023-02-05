@@ -184,7 +184,9 @@ const errorMessage = () => screen.queryByText("Something went wrong...");
 
 const retry = () => fireEvent.press(screen.getByText("Retry"));
 
-const openFullReplies = () => fireEvent.press(screen.getByText("View All"));
+const openFullReplies = () => {
+  fireEvent.press(screen.getByText("View All Replies"));
+};
 
 const deleteButtonId = (postId: UserPostID) => `delete-${postId.rawValue}`;
 

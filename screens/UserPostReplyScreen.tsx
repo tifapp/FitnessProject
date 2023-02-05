@@ -1,8 +1,16 @@
 import Modal, { ModalRefType } from "@components/common/Modal";
 import CommentsModal from "@components/postComponents/CommentsModal";
 import UserPostView from "@components/postComponents/UserPostView";
-import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { ActivityIndicator, Button, Text, View } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { MaterialIcons } from "@expo/vector-icons";
 import {
   UserPost,
   UserPostID,
@@ -63,10 +71,27 @@ const UserPostReplyScreen = ({
         <View>
           {userPostView(post, onDismiss)}
           {reply ? userPostView(reply) : <Text>Reply not found.</Text>}
-          <Button
-            title="View All"
+          <TouchableOpacity
             onPress={() => modalRef.current?.showModal()}
-          />
+            style={{
+              display: "flex",
+              padding: 8,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              backgroundColor: "#148df7",
+            }}
+          >
+            <View>
+              <Text style={{ fontWeight: "bold", color: "white" }}>
+                View All Replies
+              </Text>
+              <Text style={{ opacity: 0.75, color: "white" }}>
+                This is a single reply from the post.
+              </Text>
+            </View>
+            <MaterialIcons name="arrow-right" size={32} color="white" />
+          </TouchableOpacity>
           <Modal ref={modalRef}>{fullRepliesView(post)}</Modal>
         </View>
       ) : (
