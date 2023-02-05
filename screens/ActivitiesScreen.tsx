@@ -1,22 +1,8 @@
 import { Auth } from "aws-amplify";
-import React, { useRef } from "react";
-import Modal, { ModalRefType } from "@components/common/Modal";
-import {
-  UserPosts,
-  TestUserPosts,
-  UserPostsProvider,
-  groupUserPosts,
-} from "../lib/posts";
-import { Alert, Button, Text, TouchableOpacity, View } from "react-native";
-import UserPostReplyScreen from "./UserPostReplyScreen";
-
-const userPosts: UserPosts = {
-  postsWithIds: async () =>
-    groupUserPosts([TestUserPosts.writtenByYou, TestUserPosts.blob]),
-};
+import React from "react";
+import { Alert, Text, TouchableOpacity, View } from "react-native";
 
 const ActivitiesScreen = () => {
-  const modalRef = useRef<ModalRefType>(null);
   function signOut() {
     const title = "Are you sure you want to sign out?";
     const message = "";
@@ -54,19 +40,6 @@ const ActivitiesScreen = () => {
           Log Out
         </Text>
       </TouchableOpacity>
-      <Button
-        title="Open Reply screen"
-        onPress={() => modalRef.current?.showModal()}
-      />
-      <Modal ref={modalRef}>
-        <UserPostsProvider posts={userPosts}>
-          <UserPostReplyScreen
-            postId={TestUserPosts.writtenByYou.id}
-            replyId={TestUserPosts.blob.id}
-            onDismiss={() => modalRef.current?.hideModal()}
-          />
-        </UserPostsProvider>
-      </Modal>
     </View>
   );
 };

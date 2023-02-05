@@ -2,13 +2,14 @@ import Modal, { ModalRefType } from "@components/common/Modal";
 import CommentsModal from "@components/postComponents/CommentsModal";
 import UserPostView from "@components/postComponents/UserPostView";
 import React, {
+  ComponentProps,
   ReactNode,
   useCallback,
   useEffect,
   useRef,
   useState,
 } from "react";
-import { ActivityIndicator, Button, Text, View } from "react-native";
+import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { MaterialIcons } from "@expo/vector-icons";
 import {
@@ -56,21 +57,38 @@ const UserPostReplyScreen = ({
 
   if (isError) {
     return (
-      <View>
-        <Text>Something went wrong...</Text>
-        <Button title="Retry" onPress={retry} />
-      </View>
+      <ErrorPrompt
+        errorText="Something went wrong..."
+        actionText="Retry"
+        actionIcon="cached"
+        actionButtonBackgroundColor="#148df7"
+        onActionButtonTapped={retry}
+      />
     );
   }
 
   return isLoading ? (
-    <LoadingIndicator />
+    <ActivityIndicator accessibilityLabel="Loading..." />
   ) : (
     <View>
       {post ? (
-        <View>
+        <ScrollView style={{ height: "100%" }}>
           {userPostView(post, onDismiss)}
-          {reply ? userPostView(reply) : <Text>Reply not found.</Text>}
+          {reply ? (
+            userPostView(reply)
+          ) : (
+            <Text
+              style={{
+                fontWeight: "bold",
+                color: "black",
+                backgroundColor: "white",
+                padding: 8,
+                marginBottom: 16,
+              }}
+            >
+              Reply not found.
+            </Text>
+          )}
           <TouchableOpacity
             onPress={() => modalRef.current?.showModal()}
             style={{
@@ -93,16 +111,64 @@ const UserPostReplyScreen = ({
             <MaterialIcons name="arrow-right" size={32} color="white" />
           </TouchableOpacity>
           <Modal ref={modalRef}>{fullRepliesView(post)}</Modal>
-        </View>
+        </ScrollView>
       ) : (
-        <View>
-          <Text>Post not found.</Text>
-          <Button title="Close" onPress={onDismiss} />
-        </View>
+        <ErrorPrompt
+          errorText="Post not found."
+          actionText="Close"
+          actionIcon="highlight-off"
+          actionButtonBackgroundColor="#e3492d"
+          onActionButtonTapped={onDismiss}
+        />
       )}
     </View>
   );
 };
+
+type ErrorPromptProps = {
+  errorText: string;
+  actionText: string;
+  actionIcon: ComponentProps<typeof MaterialIcons>["name"];
+  actionButtonBackgroundColor: string;
+  onActionButtonTapped: () => void;
+};
+
+const ErrorPrompt = ({
+  errorText,
+  actionText,
+  actionIcon,
+  actionButtonBackgroundColor,
+  onActionButtonTapped,
+}: ErrorPromptProps) => (
+  <View style={{ display: "flex", flexDirection: "column" }}>
+    <Text
+      style={{
+        fontWeight: "bold",
+        color: "black",
+        backgroundColor: "white",
+        padding: 8,
+      }}
+    >
+      {errorText}
+    </Text>
+    <TouchableOpacity onPress={onActionButtonTapped} style={{ marginTop: 16 }}>
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          padding: 8,
+          backgroundColor: actionButtonBackgroundColor,
+        }}
+      >
+        <MaterialIcons name={actionIcon} size={24} color="white" />
+        <Text style={{ fontWeight: "bold", color: "white", marginLeft: 8 }}>
+          {actionText}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  </View>
+);
 
 const usePostWithReply = (postId: UserPostID, replyId: UserPostID) => {
   const userPosts = useUserPostsDependency();
@@ -143,9 +209,5 @@ const usePostWithReply = (postId: UserPostID, replyId: UserPostID) => {
     isLoading: !postMap,
   };
 };
-
-const LoadingIndicator = () => (
-  <ActivityIndicator accessibilityLabel="Loading..." />
-);
 
 export default UserPostReplyScreen;

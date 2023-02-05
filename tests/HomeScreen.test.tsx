@@ -6,6 +6,11 @@ import { Button, View } from "react-native";
 import { EmptyView } from "@components/common/EmptyView";
 
 describe("HomeScreen tests", () => {
+  it("should not display the reply screen if no post and reply id are specified", () => {
+    renderHomeScreen();
+    expect(replyScreen()).not.toBeDisplayed();
+  });
+
   it("should display a reply screen if given a post id and reply id", () => {
     renderHomeScreen({
       postId: TestUserPosts.writtenByYou.id,
