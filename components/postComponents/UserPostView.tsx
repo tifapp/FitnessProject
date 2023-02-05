@@ -6,7 +6,8 @@ export type UserPostViewProps = {
   onDeleted: () => void;
 };
 
-// TODO: - Refactor this to be a more friendly post item
+// TODO: - This is just a temp placeholder component, this will need to be
+// refactored at some point in compliance with the new project structure.
 const UserPostView = ({ post, onDeleted }: UserPostViewProps) => (
   <PostItem
     item={userPostToPost(post)}
