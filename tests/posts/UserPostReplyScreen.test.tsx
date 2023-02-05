@@ -70,7 +70,7 @@ describe("UserPostReplyScreen tests", () => {
     userPosts.postsWithIds = async () => groupUserPosts([]);
     renderUserPostReplyScreen({ postId: testPost.id, replyId: testReply.id });
     await waitFor(() => {
-      dismissScreen();
+      dismiss();
       expect(wasDismissed).toHaveBeenCalled();
     });
   });
@@ -178,7 +178,7 @@ const postNotFoundIndicator = () => screen.queryByText("Post not found.");
 
 const replyNotFoundIndicator = () => screen.queryByText("Reply not found.");
 
-const dismissScreen = () => fireEvent.press(screen.getByText("Close"));
+const dismiss = () => fireEvent.press(screen.getByText("Close"));
 
 const errorMessage = () => screen.queryByText("Something went wrong...");
 
