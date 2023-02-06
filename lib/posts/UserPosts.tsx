@@ -5,7 +5,7 @@ import { UserID } from "../users";
 import { GraphQLOperations } from "../GraphQLOperations";
 import { loadCapitals } from "@hooks/stringConversion";
 import { batchGetLikes, getPost, getUser } from "@graphql/queries";
-import { Like, Post } from "src/models";
+import { Like } from "src/models";
 
 /**
  * An interface representing all the collection of all of the posts in the app.
@@ -51,6 +51,7 @@ export const graphQLUserPosts = (
     // NB: At some point we want to consolidate this into 1 query that returns
     // all of the data in batch. Due to this, some of the more fragile implementation
     // details (eg. caching the user) are not directly covered in unit tests.
+    // At the very least for now, as much of this loading is paralellized.
     postsWithIds: async (ids: UserPostID[]) => {
       if (ids.length === 0) return new UserPostMap();
 

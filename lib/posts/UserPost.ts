@@ -24,7 +24,9 @@ export type UserPost = {
 };
 
 /**
- * The components that make up a legacy `UserPostID`.
+ * The components that make up a legacy formatted `UserPostID`.
+ *
+ * Legacy format is a string of "{creationDate iso formatted}#{user id}"
  */
 export type LegacyUserPostIDComponents = {
   creationDate: Date;
@@ -40,6 +42,8 @@ export type LegacyUserPostIDComponents = {
 export class UserPostID extends Tagged<UserPost, string> {
   /**
    * Constructs a `UserPostID` in legacy format from its raw components.
+   *
+   * Legacy format is a string of "{creationDate iso formatted}#{user id}"
    */
   static fromLegacyComponents({
     creationDate,
@@ -49,7 +53,9 @@ export class UserPostID extends Tagged<UserPost, string> {
   }
 
   /**
-   * A way to retrieve the components making up a legacy post id.
+   * A way to retrieve the components making up a legacy formatted post id.
+   *
+   * Legacy format is a string of "{creationDate iso formatted}#{user id}"
    */
   legacyComponents(): LegacyUserPostIDComponents | undefined {
     const splits = this.rawValue.split("#");
