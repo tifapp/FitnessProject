@@ -1,4 +1,4 @@
-import { GraphQLOperations } from "lib/GraphQLOperations";
+import { GraphQLOperations } from "../../lib/GraphQLOperations";
 import { unimplemented } from "./unimplemented";
 
 /**

@@ -8,7 +8,9 @@ import ChallengeScreen from "@screens/ChallengeScreen";
 import CreatingGroups from "@screens/CreatingGroups";
 import FeedScreen from "@screens/FeedScreen";
 import GroupPostsScreen from "@screens/GroupPostsScreen";
-import HomeScreen from "@screens/HomeScreen";
+import HomeScreen, {
+  homeScreenViewedReplyFromRouteParams,
+} from "@screens/HomeScreen";
 import ImageScreen from "@screens/ImageScreen";
 import LookupUserScreen from "@screens/LookupUser";
 import SearchScreen from "@screens/SearchScreen";
@@ -69,16 +71,19 @@ export type ChallengeFeedScreenRouteProps = StackScreenProps<
 
 export default function MainStack() {
   return (
-    <Stack.Navigator
-      initialRouteName={MainScreenNames.HOME}
-      screenOptions={headerOptions}
-    >
+    <Stack.Navigator screenOptions={headerOptions}>
       <Stack.Screen name={MainScreenNames.HOME}>
-        {(props) => (
-          <HomeScreen
-            feedView={<FeedScreen {...props} channel={"general"} />}
-          />
-        )}
+        {(props) => {
+          console.log(props);
+          return (
+            <HomeScreen
+              viewedReply={homeScreenViewedReplyFromRouteParams(
+                props.route.params
+              )}
+              feedView={<FeedScreen {...props} channel={"general"} />}
+            />
+          );
+        }}
       </Stack.Screen>
       <Stack.Screen
         name={MainScreenNames.LOOKUP}

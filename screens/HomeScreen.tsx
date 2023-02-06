@@ -1,12 +1,26 @@
-import { UserPostID } from "lib/posts/UserPost";
+import { UserPostID } from "../lib/posts";
 import { ReactNode, useEffect, useRef } from "react";
 import Modal, { ModalRefType } from "@components/common/Modal";
-import { View } from "react-native";
 import UserPostReplyScreen from "./UserPostReplyScreen";
 
 export type HomeScreenViewReply = {
   postId: UserPostID;
   replyId: UserPostID;
+};
+
+/**
+ * Parses a `HomeScreenViewReply` from a navigation route.
+ */
+export const homeScreenViewedReplyFromRouteParams = (
+  params: Readonly<object | undefined>
+): HomeScreenViewReply | undefined => {
+  if (!params) return undefined;
+  const { postId, replyId } = params;
+  if (!replyId || !postId) return undefined;
+  return {
+    postId: new UserPostID(postId),
+    replyId: new UserPostID(replyId),
+  };
 };
 
 export type HomeScreenProps = {

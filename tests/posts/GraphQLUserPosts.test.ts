@@ -6,7 +6,7 @@ import {
   unimplementedGraphQLOperations,
 } from "../helpers/GraphQLOperations";
 import { batchGetLikes, getPost, getUser } from "@graphql/queries";
-import { Post } from "src/models";
+import { Post } from "../../src/models";
 
 let operations: GraphQLOperations;
 let userPosts: UserPosts;
