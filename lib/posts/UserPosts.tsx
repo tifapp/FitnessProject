@@ -1,17 +1,17 @@
-import { UserPost, UserPostChannel, UserPostID } from "./UserPost";
-import { groupUserPosts, UserPostMap } from "./UserPostMap";
+import { UserPost } from "./UserPost";
+import { groupUserPosts } from "./helpers";
 import { createContext, ReactNode, useContext } from "react";
-import { UserID } from "../users";
 import { GraphQLOperations } from "../GraphQLOperations";
 import { loadCapitals } from "@hooks/stringConversion";
 import { batchGetLikes, getPost, getUser } from "@graphql/queries";
 import { Like } from "src/models";
+import { componentsFromPostId, postIdFromComponents } from "./PostIDComponents";
 
 /**
  * An interface representing all the collection of all of the posts in the app.
  */
 export interface UserPosts {
-  postsWithIds: (ids: UserPostID[]) => Promise<UserPostMap>;
+  postsWithIds: (ids: string[]) => Promise<Map<string, UserPost>>;
 }
 
 /**
@@ -21,12 +21,12 @@ export interface UserPosts {
  * @param operations the `GraphQLOperations` instance to use
  */
 export const graphQLUserPosts = (
-  userId: UserID,
+  userId: string,
   operations: GraphQLOperations
 ): UserPosts => {
   // NB: Ideally we shouldn't have this, see comment below
-  const fetchUsername = async (userId: UserID): Promise<string> => {
-    const cachedUsername = globalThis.savedUsers?.[userId.rawValue]?.name;
+  const fetchUsername = async (userId: string): Promise<string> => {
+    const cachedUsername = globalThis.savedUsers?.[userId]?.name;
     if (cachedUsername) return cachedUsername;
 
     const user = await operations.execute<{
@@ -35,11 +35,11 @@ export const graphQLUserPosts = (
         status: string;
         isVerified: boolean;
       };
-    }>(getUser, { id: userId.rawValue });
+    }>(getUser, { id: userId });
     const { name, status, isVerified } = user.getUser;
 
     const retName = loadCapitals(name) ?? "Deleted User";
-    globalThis.savedUsers[userId.rawValue] = {
+    globalThis.savedUsers[userId] = {
       name: retName,
       status,
       isVerified: isVerified ?? false,
@@ -52,12 +52,12 @@ export const graphQLUserPosts = (
     // all of the data in batch. Due to this, some of the more fragile implementation
     // details (eg. caching the user) are not directly covered in unit tests.
     // At the very least for now, as much of this loading is paralellized.
-    postsWithIds: async (ids: UserPostID[]) => {
-      if (ids.length === 0) return new UserPostMap();
+    postsWithIds: async (ids: string[]) => {
+      if (ids.length === 0) return new Map();
 
       const rawPosts = await Promise.all<any>(
         ids
-          .map((id) => id.legacyComponents())
+          .map((id) => componentsFromPostId(id))
           .map(async (idComponents) => {
             // NB: We force unwrap here because atm all post ids are made up of components.
             // By the time we change this fact, we'll likely also have made this entire
@@ -67,28 +67,26 @@ export const graphQLUserPosts = (
             return await operations
               .execute(getPost, {
                 createdAt: creationDate.toISOString(),
-                userId: userId.rawValue,
+                userId: userId,
               })
               .then((value: any) => value.getPost);
           })
       );
 
       const userPostIds = rawPosts.map((post) => {
-        return UserPostID.fromLegacyComponents({
+        return postIdFromComponents({
           creationDate: new Date(post.createdAt),
-          userId: new UserID(post.userId),
+          userId: post.userId,
         });
       });
 
       const usernamesPromise = Promise.all<string>(
-        rawPosts.map(
-          async (post) => await fetchUsername(new UserID(post.userId))
-        )
+        rawPosts.map(async (post) => await fetchUsername(post.userId))
       );
 
       const likesPromise = operations
         .execute<{ batchGetLikes: Like[] }>(batchGetLikes, {
-          likes: userPostIds.map((id) => ({ postId: id.rawValue })),
+          likes: userPostIds,
         })
         .then((value) => value.batchGetLikes);
 
@@ -97,22 +95,21 @@ export const graphQLUserPosts = (
         likesPromise,
       ]);
       return groupUserPosts(
-        rawPosts.map<UserPost>((post, idx) => ({
+        rawPosts.map((post, idx) => ({
           id: userPostIds[idx],
           likesCount: post.likes ?? 0,
           repliesCount: post.replies ?? 0,
           createdAt: new Date(post.createdAt),
           updatedAt: new Date(post.updatedAt),
-          userId: new UserID(post.userId),
+          userId: post.userId,
           username: usernames[idx],
           description: post.description,
-          parentId: post.parentId ? new UserPostID(post.parentId) : undefined,
-          channel: post.channel ? new UserPostChannel(post.channel) : undefined,
+          parentId: post.parentId,
+          channel: post.channel,
           imageURL: post.imageURL,
           likedByYou: likes[idx] !== null,
-          writtenByYou: post.userId === userId.rawValue,
-          taggedUserIds:
-            post.taggedUsers?.map((id: string) => new UserID(id)) ?? [],
+          writtenByYou: post.userId === userId,
+          taggedUserIds: post.taggedUsers ?? [],
         }))
       );
     },

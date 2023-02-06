@@ -11,7 +11,6 @@ import {
   groupUserPosts,
   TestUserPosts,
   UserPost,
-  UserPostID,
   UserPosts,
   UserPostsProvider,
 } from "@lib/posts";
@@ -140,14 +139,14 @@ const renderUserPostReplyScreen = ({
   postId,
   replyId,
 }: {
-  postId: UserPostID;
-  replyId: UserPostID;
+  postId: string;
+  replyId: string;
 }) => {
   render(
     <UserPostsProvider posts={userPosts}>
       <UserPostReplyScreen
         userPostView={(post: UserPost, onDeleted?: () => void) => (
-          <View testID={post.id.rawValue}>
+          <View testID={post.id}>
             <Button
               testID={deleteButtonId(post.id)}
               title="delete"
@@ -166,12 +165,12 @@ const renderUserPostReplyScreen = ({
   );
 };
 
-const fullRepliesId = (postId: UserPostID) => postId.rawValue + "-modal";
+const fullRepliesId = (postId: string) => postId + "-modal";
 
 const loadingIndicator = () => screen.queryByLabelText("Loading...");
 
-const displayedPostWithId = (id: UserPostID) => {
-  return screen.queryByTestId(id.rawValue);
+const displayedPostWithId = (id: string) => {
+  return screen.queryByTestId(id);
 };
 
 const postNotFoundIndicator = () => screen.queryByText("Post not found.");
@@ -188,17 +187,17 @@ const openFullReplies = () => {
   fireEvent.press(screen.getByText("View All Replies"));
 };
 
-const deleteButtonId = (postId: UserPostID) => `delete-${postId.rawValue}`;
+const deleteButtonId = (postId: string) => `delete-${postId}`;
 
-const deletePostWithId = (postId: UserPostID) => {
+const deletePostWithId = (postId: string) => {
   fireEvent.press(screen.getByTestId(deleteButtonId(postId)));
 };
 
-const openExpectFullRepliesForPost = (postId: UserPostID) => {
+const openExpectFullRepliesForPost = (postId: string) => {
   openFullReplies();
   expect(fullRepliesForPost(postId)).not.toBeNull();
 };
 
-const fullRepliesForPost = (postId: UserPostID) => {
+const fullRepliesForPost = (postId: string) => {
   return screen.queryByTestId(fullRepliesId(postId));
 };

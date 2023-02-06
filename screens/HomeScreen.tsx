@@ -1,4 +1,3 @@
-import { UserPostID } from "../lib/posts";
 import { ReactNode, useEffect, useRef } from "react";
 import Modal, { ModalRefType } from "@components/common/Modal";
 import UserPostReplyScreen from "./UserPostReplyScreen";
@@ -8,8 +7,8 @@ import UserPostReplyScreen from "./UserPostReplyScreen";
  * from a reply notification.
  */
 export type HomeScreenViewReply = {
-  postId: UserPostID;
-  replyId: UserPostID;
+  postId: string;
+  replyId: string;
 };
 
 /**
@@ -22,8 +21,8 @@ export const homeScreenViewedReplyFromRouteParams = (
   const { postId, replyId } = params as any;
   if (!replyId || !postId) return undefined;
   return {
-    postId: new UserPostID(postId),
-    replyId: new UserPostID(replyId),
+    postId: postId,
+    replyId: replyId,
   };
 };
 

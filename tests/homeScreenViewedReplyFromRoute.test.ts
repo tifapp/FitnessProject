@@ -1,14 +1,13 @@
 import { homeScreenViewedReplyFromRouteParams } from "@screens/HomeScreen";
-import { UserPostID } from "@lib/posts";
 
-const testPostId = new UserPostID("post");
-const testReplyId = new UserPostID("reply");
+const testPostId = "post";
+const testReplyId = "reply";
 
 describe("homeScreenViewedReplyFromRoute tests", () => {
   it("should return a HomeViewedReply when both a post and reply id are set", () => {
     const viewedReply = homeScreenViewedReplyFromRouteParams({
-      postId: testPostId.rawValue,
-      replyId: testReplyId.rawValue,
+      postId: testPostId,
+      replyId: testReplyId,
     });
     expect(viewedReply).toMatchObject({
       postId: testPostId,
@@ -23,14 +22,14 @@ describe("homeScreenViewedReplyFromRoute tests", () => {
 
   it("should return undefined when only post id", () => {
     const viewedReply = homeScreenViewedReplyFromRouteParams({
-      postId: testPostId.rawValue,
+      postId: testPostId,
     });
     expect(viewedReply).toBeUndefined();
   });
 
   it("should return undefined when only reply id", () => {
     const viewedReply = homeScreenViewedReplyFromRouteParams({
-      replyId: testReplyId.rawValue,
+      replyId: testReplyId,
     });
     expect(viewedReply).toBeUndefined();
   });

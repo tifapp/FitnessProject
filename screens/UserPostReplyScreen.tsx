@@ -12,17 +12,11 @@ import React, {
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { MaterialIcons } from "@expo/vector-icons";
-import {
-  UserPost,
-  UserPostID,
-  UserPostMap,
-  userPostToPost,
-  useUserPostsDependency,
-} from "../lib/posts";
+import { UserPost, userPostToPost, useUserPostsDependency } from "../lib/posts";
 
 export type UserPostReplyScreenProps = {
-  postId: UserPostID;
-  replyId: UserPostID;
+  postId: string;
+  replyId: string;
   onDismiss: () => void;
   userPostView?: (post: UserPost, onDeleted?: () => void) => ReactNode;
   fullRepliesView?: (post: UserPost) => ReactNode;
@@ -170,10 +164,10 @@ const ErrorPrompt = ({
   </View>
 );
 
-const usePostWithReply = (postId: UserPostID, replyId: UserPostID) => {
+const usePostWithReply = (postId: string, replyId: string) => {
   const userPosts = useUserPostsDependency();
-  const postIdsRef = useRef<UserPostID[]>([postId, replyId]);
-  const [postMap, setPostMap] = useState<UserPostMap | undefined>();
+  const postIdsRef = useRef<string[]>([postId, replyId]);
+  const [postMap, setPostMap] = useState<Map<string, UserPost> | undefined>();
   const [isError, setIsError] = useState(false);
 
   const loadPostMap = useCallback(

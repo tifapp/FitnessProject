@@ -1,4 +1,4 @@
-export { groupUserPosts, UserPostMap } from "./UserPostMap";
+export { groupUserPosts } from "./helpers";
 export {
   UserPosts,
   UserPostsProvider,
@@ -6,11 +6,4 @@ export {
   useUserPostsDependency,
   graphQLUserPosts,
 } from "./UserPosts";
-export {
-  UserPost,
-  UserPostID,
-  UserPostChannel,
-  TestUserPosts,
-  LegacyUserPostIDComponents,
-  userPostToPost,
-} from "./UserPost";
+export { UserPost, TestUserPosts, userPostToPost } from "./UserPost";

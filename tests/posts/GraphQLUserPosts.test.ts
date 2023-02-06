@@ -1,5 +1,4 @@
-import { UserID } from "@lib/users";
-import { graphQLUserPosts, UserPostID, UserPosts } from "@lib/posts";
+import { graphQLUserPosts, UserPosts } from "@lib/posts";
 import { GraphQLOperations } from "@lib/GraphQLOperations";
 import {
   mockGraphQLResponseForStatement,
@@ -7,6 +6,7 @@ import {
 } from "../helpers/GraphQLOperations";
 import { batchGetLikes, getPost, getUser } from "@graphql/queries";
 import { Post } from "../../src/models";
+import { postIdFromComponents } from "@lib/posts/PostIDComponents";
 
 let operations: GraphQLOperations;
 let userPosts: UserPosts;
@@ -60,17 +60,17 @@ describe("GraphQLUserPosts tests", () => {
   });
 });
 
-const testUserId = new UserID("test");
+const testUserId = "test";
 const blob = "Blob|";
 const testStatus = "literally dead";
-const testPostId = UserPostID.fromLegacyComponents({
+const testPostId = postIdFromComponents({
   creationDate: new Date(0),
   userId: testUserId,
 });
 const testRawPost: Post = {
-  id: testPostId.rawValue,
+  id: testPostId,
   createdAt: new Date(0).toISOString(),
   updatedAt: new Date(0).toISOString(),
-  userId: testUserId.rawValue,
+  userId: testUserId,
   description: "Hello World!",
 } as const;
