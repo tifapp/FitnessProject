@@ -179,10 +179,6 @@ const usePostWithReply = (postId: string, replyId: string) => {
     [userPosts]
   );
 
-  // NB: postId and replyId are objects that will cause this to run whenever
-  // their addresses change. This is not problematic because this useEffect
-  // doesn't summon a meteor from outer space. Additionally these ids are backed
-  // by an immutable type that will likely be held in some state variable...
   useEffect(() => {
     postIdsRef.current = [postId, replyId];
   }, [postId, replyId]);
