@@ -4,7 +4,6 @@ import { Amplify, Auth, Cache, graphqlOperation, Storage } from "aws-amplify";
 import { withAuthenticator } from "aws-amplify-react-native";
 import awsconfig from "./src/aws-exports";
 
-import { UserID } from "./lib/users";
 import { graphQLUserPosts, UserPosts, UserPostsProvider } from "./lib/posts";
 import { amplifyGraphQLOperations } from "./lib/GraphQLOperations";
 
@@ -153,10 +152,7 @@ const App = () => {
       }
 
       setUserPosts(
-        graphQLUserPosts(
-          new UserID(globalThis.myId),
-          amplifyGraphQLOperations()
-        )
+        graphQLUserPosts(globalThis.myId, amplifyGraphQLOperations())
       );
 
       //console("success, user is ", user);
