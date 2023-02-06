@@ -93,6 +93,9 @@ const Drawer = createDrawerNavigator();
 
 // TODO: - One day, we may get this under test...
 
+const userNotifications = expoUserNotifications();
+const linkingConfig = makeLinkingConfig({ userNotifications });
+
 const App = () => {
   //Text.defaultProps = Text.defaultProps || {}
   //Text.defaultProps.style =  { fontFamily: 'Helvetica', fontSize: 15, fontWeight: 'normal' }
@@ -298,24 +301,24 @@ const App = () => {
         </Tab.Navigator>
       </NavigationContainer>
     );
-    // } else if (isDeveloper) {
-    //   return (
-    //     <NavigationContainer>
-    //       <Stack.Navigator>
-    //         <Stack.Screen
-    //           name="Activities Screen"
-    //           component={ActivitiesScreen}
-    //           options={{
-    //             headerShown: false,
-    //           }}
-    //         />
-    //       </Stack.Navigator>
-    //     </NavigationContainer>
-    //   );
+  } else if (isDeveloper) {
+    return (
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Activities Screen"
+            component={ActivitiesScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    );
   } else {
     return (
       <UserPostsProvider posts={userPosts}>
-        <NavigationContainer>
+        <NavigationContainer linking={linkingConfig}>
           <StatusBar style="dark" />
           <Drawer.Navigator
             drawerPosition={"right"}
@@ -369,7 +372,8 @@ import SignIn from "@components/loginComponents/SignIn";
 import SignUp from "@components/loginComponents/SignUp";
 import VerifyContact from "@components/loginComponents/VerifyContact";
 import ActivitiesScreen from "@screens/ActivitiesScreen";
-import { EmptyView } from "@components/common/EmptyView";
+import { expoUserNotifications } from "@lib/UserNotifications";
+import { makeLinkingConfig } from "@lib/linkingConfig";
 
 export default withAuthenticator(App, false, [
   <Greetings />,
