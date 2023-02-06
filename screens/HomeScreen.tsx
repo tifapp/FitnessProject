@@ -3,19 +3,23 @@ import { ReactNode, useEffect, useRef } from "react";
 import Modal, { ModalRefType } from "@components/common/Modal";
 import UserPostReplyScreen from "./UserPostReplyScreen";
 
+/**
+ * A type representing a reply to view when the user opens the app
+ * from a reply notification.
+ */
 export type HomeScreenViewReply = {
   postId: UserPostID;
   replyId: UserPostID;
 };
 
 /**
- * Parses a `HomeScreenViewReply` from a navigation route.
+ * Parses a `HomeScreenViewReply` from navigation route params.
  */
 export const homeScreenViewedReplyFromRouteParams = (
   params: Readonly<object | undefined>
 ): HomeScreenViewReply | undefined => {
   if (!params) return undefined;
-  const { postId, replyId } = params;
+  const { postId, replyId } = params as any;
   if (!replyId || !postId) return undefined;
   return {
     postId: new UserPostID(postId),
@@ -37,6 +41,9 @@ const renderReplyScreen = (
   onDismissed: () => void
 ) => <UserPostReplyScreen {...viewedReply} onDismiss={onDismissed} />;
 
+/**
+ * The main screen when the app opens.
+ */
 const HomeScreen = ({
   feedView,
   viewedReply,
