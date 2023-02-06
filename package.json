@@ -46,6 +46,7 @@
     "react-native-elements": "^2.3.2",
     "react-native-gesture-handler": "~2.2.1",
     "react-native-hyperlink": "0.0.19",
+    "react-native-maps": "0.30.2",
     "react-native-popup-menu": "^0.15.10",
     "react-native-reanimated": "~2.8.0",
     "react-native-screens": "~3.11.1",
