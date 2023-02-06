@@ -1,4 +1,4 @@
-import { TestUserPosts } from "../lib/posts";
+import { TestUserPosts } from "@lib/posts";
 import HomeScreen, { HomeScreenViewReply } from "@screens/HomeScreen";
 import { fireEvent, render, screen } from "@testing-library/react-native";
 import "./helpers/Matchers";

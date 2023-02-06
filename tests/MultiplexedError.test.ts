@@ -1,4 +1,4 @@
-import { MultiplexedError } from "../lib/MultiplexedError";
+import { MultiplexedError } from "@lib/MultiplexedError";
 
 describe("MultiplexedError tests", () => {
   it("separates all error messages from the errors with the given separator", () => {

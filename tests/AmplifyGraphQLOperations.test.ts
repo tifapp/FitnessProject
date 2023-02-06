@@ -1,7 +1,7 @@
 import {
   amplifyGraphQLOperations,
   GraphQLOperationsError,
-} from "../lib/GraphQLOperations";
+} from "@lib/GraphQLOperations";
 import API from "@aws-amplify/api";
 import { GraphQLError } from "graphql";
 import { GraphQLOptions } from "@aws-amplify/api-graphql";

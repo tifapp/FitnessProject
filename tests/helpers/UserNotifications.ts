@@ -1,4 +1,4 @@
-import { UserNotifications } from "../../lib/UserNotifications";
+import { UserNotifications } from "@lib/UserNotifications";
 import { unimplemented } from "./unimplemented";
 
 /**

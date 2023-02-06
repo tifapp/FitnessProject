@@ -1,6 +1,6 @@
-import { UserID } from "../../lib/users";
-import { graphQLUserPosts, UserPostID, UserPosts } from "../../lib/posts";
-import { GraphQLOperations } from "../../lib/GraphQLOperations";
+import { UserID } from "@lib/users";
+import { graphQLUserPosts, UserPostID, UserPosts } from "@lib/posts";
+import { GraphQLOperations } from "@lib/GraphQLOperations";
 import {
   mockGraphQLResponseForStatement,
   unimplementedGraphQLOperations,

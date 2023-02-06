@@ -1,5 +1,5 @@
 import { homeScreenViewedReplyFromRouteParams } from "@screens/HomeScreen";
-import { UserPostID } from "../lib/posts";
+import { UserPostID } from "@lib/posts";
 
 const testPostId = new UserPostID("post");
 const testReplyId = new UserPostID("reply");

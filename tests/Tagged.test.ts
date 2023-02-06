@@ -1,4 +1,4 @@
-import { Tagged } from "../lib/Tagged";
+import { Tagged } from "@lib/Tagged";
 
 type TestType = {};
 

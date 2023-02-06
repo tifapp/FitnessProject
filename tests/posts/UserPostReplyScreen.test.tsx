@@ -14,7 +14,7 @@ import {
   UserPostID,
   UserPosts,
   UserPostsProvider,
-} from "../../lib/posts";
+} from "@lib/posts";
 import "../helpers/Matchers";
 import { unimplementedUserPosts } from "./helpers";
 

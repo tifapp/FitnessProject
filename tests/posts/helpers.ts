@@ -1,5 +1,5 @@
 import { unimplemented } from "../helpers/unimplemented";
-import { UserPosts } from "../../lib/posts/UserPosts";
+import { UserPosts } from "@lib/posts/UserPosts";
 
 /**
  * A `UserPosts` instance which causes a test failure when invoking
