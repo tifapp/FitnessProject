@@ -53,6 +53,7 @@ const component = ({
   spaceAfterName,
 }: Props) => {
   const [userInfo, setUserInfo] = useState<typeof globalThis.savedUsers[keyof typeof globalThis.savedUsers]>();
+  const [nameArray, setNameArray] = useState<string[]>([]);
 
   useEffect(() => {    
     if (
@@ -107,6 +108,12 @@ const component = ({
     setUserInfo(globalThis.savedUsers?.[userId]);
   }, [globalThis.savedUsers?.[userId]]);
 
+  useEffect(() => {
+    if (userInfo) {
+      setNameArray(userInfo!.name.split(" "));
+    }
+  }, [userInfo]);
+
   const navigation = navigationObject ?? useNavigation();
 
   const goToProfile = () => {
@@ -141,8 +148,8 @@ const component = ({
             {
               // onError={addUserInfotoCache}
               resizeMode: "cover",
-              width: imageSize ?? 45,
-              height: imageSize ?? 45,
+              width: imageSize ?? 25,
+              height: imageSize ?? 25,
               marginRight: !vertical ? margin ?? 15 : 0,
               marginBottom: vertical ? margin ?? 15 : 0,
               alignSelf: "flex-start",
@@ -174,7 +181,7 @@ const component = ({
         {hideName ? null : (
           <View
             style={[
-              { justifyContent: "space-between" },
+              { justifyContent: "center"},
               vertical ? { alignItems: "center" } : {},
               textLayoutStyle,
             ]}
@@ -183,6 +190,7 @@ const component = ({
               //instead we may consider replacing this whole section with an optional component that takes in the user's name as an argument/prop. the default behavior would be a simple text component.
             }
             <Text
+              numberOfLines={1}
               onPress={
                 onPress
                   ? () => {
@@ -190,7 +198,8 @@ const component = ({
                     }
                   : goToProfile
               }
-              style={[textStyle, { flexWrap: "wrap" }]}
+              style={[textStyle, { flexWrap: "wrap", fontSize: 15 }]}
+              
             >
               {!isFullSize && userInfo && userInfo.status ? (
                 <MaterialIcons
@@ -205,10 +214,10 @@ const component = ({
               ) : null}
               {!isFullSize && userInfo && userInfo.status ? " " : null}
               {userInfo != null && userInfo.name
-                ? userInfo.isFullSize || userInfo.name.length <= 40
-                  ? userInfo.name + (spaceAfterName ? " " : "")
-                  : userInfo.name.substring(0, 40)
+                ? nameArray[0] +
+                  (nameArray[1] != null ? ' ' + nameArray[1][0].toUpperCase() + '.' : '')
                 : "Loading..."}
+              
               {nameComponent}
             </Text>
             {subtitleComponent}

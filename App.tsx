@@ -47,8 +47,8 @@ import {
   ActivityIndicator,
   Alert,
   AppState,
-  AppStateStatus, Platform,
-  UIManager,
+  AppStateStatus,
+  Platform, UIManager,
   useWindowDimensions,
   View
 } from "react-native";
@@ -98,6 +98,7 @@ const App = () => {
   const [userId, setUserId] = useState<string>("checking..."); //stores the user's id if logged in
   const [isNewUser, setIsNewUser] = useState<boolean>(false); //stores the user's id if logged in
   const [isAdmin, setIsAdmin] = useState<boolean>(false); //seems insecure
+  const [isDeveloper, setIsDeveloper] = useState<boolean>(false);
 
   const [conversationIds, setConversationIds] = useState<string[]>([]);
 
@@ -123,13 +124,17 @@ const App = () => {
   const checkIfUserSignedUp = async () => {
     try {
       const query = await Auth.currentAuthenticatedUser();
-      if (query.signInUserSession.idToken.payload["cognito:groups"])
-        setIsAdmin(
-          query.signInUserSession.idToken.payload["cognito:groups"].includes(
-            "Admins"
-          )
-        );
+      const groups = query?.signInUserSession?.idToken?.payload?.["cognito:groups"];
+      if (groups) {
+        if (groups.includes("Admins")) {
+          setIsAdmin(true);
+        }
+        if (groups.includes("test_users")) {
+          setIsDeveloper(true);
+        }
+      }
       setUserId(query.attributes.sub);
+
       globalThis.myId = query.attributes.sub;
       const user = await API.graphql<GraphQLQuery<{getUser: User}>> (
         graphqlOperation(getUser, { id: query.attributes.sub })
@@ -277,6 +282,24 @@ const App = () => {
         </Tab.Navigator>
       </NavigationContainer>
     );
+  } else if (isDeveloper) {
+    return (
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Activities Screen"
+            component={
+              ActivitiesScreen
+            }
+            options={
+              {
+                headerShown: false,
+              }
+            }
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    );
   } else {
     return (
       <NavigationContainer>
@@ -348,6 +371,7 @@ import RequireNewPassword from "@components/loginComponents/RequireNewPassword";
 import SignIn from "@components/loginComponents/SignIn";
 import SignUp from "@components/loginComponents/SignUp";
 import VerifyContact from "@components/loginComponents/VerifyContact";
+import ActivitiesScreen from "@screens/ActivitiesScreen";
 
 export default withAuthenticator(App, false, [
   <Greetings />,
