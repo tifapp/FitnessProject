@@ -166,3 +166,15 @@ To do:
 - Include details on setting up and using Sourcetree
 - Include visual studio settings and extensions, and tips/helpful shortcuts
 - Include react native documentation links
+
+### Storybook
+
+1. cd .storybook
+
+2. npm install
+
+3. expo start
+
+4. When adding new stories, run "npm run update-stories" so they appear in the app
+
+See examples in .storybook/components
