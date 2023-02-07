@@ -5,7 +5,10 @@ import { withAuthenticator } from "aws-amplify-react-native";
 import awsconfig from "./src/aws-exports";
 
 import { graphQLUserPosts, UserPosts, UserPostsProvider } from "./lib/posts";
-import { amplifyGraphQLOperations } from "./lib/GraphQLOperations";
+import {
+  AmplifyGraphQLOperations,
+  amplifyGraphQLOperations,
+} from "./lib/GraphQLOperations";
 
 //graphql
 import { updateUser } from "@graphql/mutations.js";
@@ -92,7 +95,8 @@ const Drawer = createDrawerNavigator();
 
 // TODO: - One day, we may get this under test...
 
-const userNotifications = expoUserNotifications();
+const graphqlOperations = new AmplifyGraphQLOperations();
+const userNotifications = new ExpoUserNotifications();
 const linkingConfig = makeLinkingConfig({ userNotifications });
 
 const App = () => {
@@ -151,9 +155,7 @@ const App = () => {
         setIsNewUser(true);
       }
 
-      setUserPosts(
-        graphQLUserPosts(globalThis.myId, amplifyGraphQLOperations())
-      );
+      setUserPosts(new GraphQLUserPosts(globalThis.myId, graphqlOperations));
 
       //console("success, user is ", user);
     } catch (err) {
@@ -369,11 +371,13 @@ import SignUp from "@components/loginComponents/SignUp";
 import VerifyContact from "@components/loginComponents/VerifyContact";
 import ActivitiesScreen from "@screens/ActivitiesScreen";
 import {
+  ExpoUserNotifications,
   expoUserNotifications,
   UserNotifications,
 } from "@lib/UserNotifications";
 import { makeLinkingConfig } from "@lib/linkingConfig";
 import { NotificationContent } from "expo-notifications";
+import { GraphQLUserPosts } from "@lib/posts/UserPosts";
 
 export default withAuthenticator(App, false, [
   <Greetings />,

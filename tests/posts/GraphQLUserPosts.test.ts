@@ -1,4 +1,4 @@
-import { graphQLUserPosts, UserPosts } from "@lib/posts";
+import { UserPosts } from "@lib/posts";
 import { GraphQLOperations } from "@lib/GraphQLOperations";
 import {
   mockGraphQLResponseForStatement,
@@ -7,6 +7,7 @@ import {
 import { batchGetLikes, getPost, getUser } from "@graphql/queries";
 import { Post } from "../../src/models";
 import { postIdFromComponents } from "@lib/posts/PostIDComponents";
+import { GraphQLUserPosts } from "@lib/posts/UserPosts";
 
 let operations: GraphQLOperations;
 let userPosts: UserPosts;
@@ -16,7 +17,7 @@ globalThis.savedUsers = {};
 describe("GraphQLUserPosts tests", () => {
   beforeEach(() => {
     operations = unimplementedGraphQLOperations;
-    userPosts = graphQLUserPosts(testUserId, operations);
+    userPosts = new GraphQLUserPosts(testUserId, operations);
   });
 
   test("postsWithIds returns an empty map when no ids given", async () => {

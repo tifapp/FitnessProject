@@ -16,10 +16,10 @@ export interface UserNotifications {
 /**
  * A `UserNotifications` implementation backed by expo.
  */
-export const expoUserNotifications = (): UserNotifications => ({
-  lastNotificationContent: async () => {
+export class ExpoUserNotifications implements UserNotifications {
+  async lastNotificationContent() {
     return await Notifications.getLastNotificationResponseAsync().then(
       (resp) => resp?.notification.request.content
     );
-  },
-});
+  }
+}

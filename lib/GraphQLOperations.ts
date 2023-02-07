@@ -35,26 +35,19 @@ export class GraphQLOperationsError<T> extends Error {
 /**
  * GraphQL operations backed by AWS Amplify.
  */
-export const amplifyGraphQLOperations = (): GraphQLOperations => {
-  return {
-    /**
-     * Executes an App Sync graphql request and returns its response data.
-     * If there are any "errors", this function throws a `GraphQLOperationsError`
-     * containing the errors and data from the response.
-     */
-    execute: async <T>(statement: string, variables?: object) => {
-      const result = (await API.graphql({
-        query: statement,
-        variables: variables,
-      })) as GraphQLResult<T>;
+export class AmplifyGraphQLOperations implements GraphQLOperations {
+  async execute<T>(statement: string, variables?: object): Promise<T> {
+    const result = (await API.graphql({
+      query: statement,
+      variables: variables,
+    })) as GraphQLResult<T>;
 
-      if (result.errors) {
-        throw new GraphQLOperationsError({
-          data: result.data,
-          errors: result.errors,
-        });
-      }
-      return result.data as T;
-    },
-  };
-};
+    if (result.errors) {
+      throw new GraphQLOperationsError({
+        data: result.data,
+        errors: result.errors,
+      });
+    }
+    return result.data as T;
+  }
+}

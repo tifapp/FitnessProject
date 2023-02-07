@@ -1,5 +1,5 @@
 import {
-  amplifyGraphQLOperations,
+  AmplifyGraphQLOperations,
   GraphQLOperationsError,
 } from "@lib/GraphQLOperations";
 import API from "@aws-amplify/api";
@@ -22,7 +22,7 @@ const testVariables = { val: { a: "a", b: "b" } };
 const testReturnData = 1;
 const testAmplifyGraphQLError = new GraphQLError("failed");
 
-const operations = amplifyGraphQLOperations();
+const operations = new AmplifyGraphQLOperations();
 
 describe("AmplifyGraphQLOperations tests", () => {
   test("execute encodes proper request with variables", async () => {
