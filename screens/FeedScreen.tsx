@@ -1,5 +1,8 @@
 //components
-import APIList, { APIListRefType, APIListRenderItemInfo } from "@components/APIList";
+import APIList, {
+  APIListRefType,
+  APIListRenderItemInfo,
+} from "@components/APIList";
 import IconButton from "@components/common/IconButton";
 import ExpandingTextInputWithNameInput from "@components/ExpandingTextInputWithNameInput";
 import PostItem from "@components/PostItem";
@@ -7,15 +10,12 @@ import { ProfileImageAndName } from "@components/ProfileImageAndName";
 import SpamButton from "@components/SpamButton";
 
 //graphql
-import {
-  createPost,
-  createReport
-} from "@graphql/mutations";
+import { createPost, createReport } from "@graphql/mutations";
 import { batchGetLikes, postsByChannel, postsByLikes } from "@graphql/queries";
 import {
   onCreatePostFromChannel,
   onDeletePostFromChannel,
-  onUpdatePostFromChannel
+  onUpdatePostFromChannel,
 } from "@graphql/subscriptions";
 import { Like, Post } from "src/models";
 
@@ -37,9 +37,14 @@ import {
   Animated,
   FlatList,
   FlatListProps,
-  Image, KeyboardAvoidingView, Platform, StyleProp, StyleSheet, Text,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  StyleProp,
+  StyleSheet,
+  Text,
   View,
-  ViewStyle
+  ViewStyle,
 } from "react-native";
 
 const linkify = require("linkify-it")();
@@ -61,7 +66,7 @@ interface Props extends Omit<FlatListProps<any>, "renderItem"> {
   channel: string;
   headerComponent?: React.ReactElement;
   footerComponent?: React.ReactElement;
-  originalParentId?: string
+  originalParentId?: string;
   isFocused?: boolean;
   postButtonLabel?: string;
   renderItem?: (i: Post) => React.ReactNode;
@@ -110,14 +115,15 @@ export default function FeedScreen({
   );
 
   useEffect(() => {
-    const createPostSubscription = API.graphql<GraphQLSubscription<{onCreatePostFromChannel: Post}>>(
+    const createPostSubscription = API.graphql<
+      GraphQLSubscription<{ onCreatePostFromChannel: Post }>
+    >(
       graphqlOperation(onCreatePostFromChannel, { channel: channel })
     ).subscribe({
       next: (event) => {
         const newPost = event.value?.data?.onCreatePostFromChannel;
         if (!newPost) return;
-        if (newPost.userId === globalThis.myId)
-          listRef.current?.removeItem(0);
+        if (newPost.userId === globalThis.myId) listRef.current?.removeItem(0);
         listRef.current?.addItem(
           newPost,
           (post) =>
@@ -125,10 +131,12 @@ export default function FeedScreen({
             post.createdAt === newPost.createdAt
         );
       },
-      error: error => console.warn(error),
+      error: (error) => console.warn(error),
     });
 
-    const deletePostSubscription = API.graphql<GraphQLSubscription<{onDeletePostFromChannel: Post}>>(
+    const deletePostSubscription = API.graphql<
+      GraphQLSubscription<{ onDeletePostFromChannel: Post }>
+    >(
       graphqlOperation(onDeletePostFromChannel, { channel: channel })
     ).subscribe({
       next: (event) => {
@@ -140,16 +148,18 @@ export default function FeedScreen({
             post.createdAt === deletedPost.createdAt
         );
       },
-      error: error => console.warn(error),
+      error: (error) => console.warn(error),
     });
-    const updatePostSubscription = API.graphql<GraphQLSubscription<{onUpdatePostFromChannel: Post}>>(
+    const updatePostSubscription = API.graphql<
+      GraphQLSubscription<{ onUpdatePostFromChannel: Post }>
+    >(
       graphqlOperation(onUpdatePostFromChannel, { channel: channel })
     ).subscribe({
       //nvm we dont have a subscription event for incrementlike
       next: (event) => {
         //console.log("post has been updated");
       },
-      error: error => console.warn(error),
+      error: (error) => console.warn(error),
     });
     return () => {
       createPostSubscription.unsubscribe();
@@ -158,8 +168,13 @@ export default function FeedScreen({
     };
   }, []);
 
-  const getLikedPosts = async (newPosts: (Post & {likedByYou?: boolean; urlPreview: Awaited<ReturnType<typeof getLinkPreview>>})[]) => {
-    let postIds: {postId: string}[] = [];
+  const getLikedPosts = async (
+    newPosts: (Post & {
+      likedByYou?: boolean;
+      urlPreview: Awaited<ReturnType<typeof getLinkPreview>>;
+    })[]
+  ) => {
+    let postIds: { postId: string }[] = [];
 
     newPosts.forEach((item) => {
       postIds.push({ postId: item.createdAt + "#" + item.userId });
@@ -167,13 +182,17 @@ export default function FeedScreen({
 
     try {
       await allSettled([
-        API.graphql<GraphQLQuery<{batchGetLikes: Like[]}>>(graphqlOperation(batchGetLikes, { likes: postIds })).then(
-          (likes) => {
-            for (let i = 0; i < newPosts.length; ++i) {
-              newPosts[i] = {...newPosts[i], likes: newPosts[i].likes ?? 0, likedByYou: likes.data?.batchGetLikes[i] != null};
-            }
+        API.graphql<GraphQLQuery<{ batchGetLikes: Like[] }>>(
+          graphqlOperation(batchGetLikes, { likes: postIds })
+        ).then((likes) => {
+          for (let i = 0; i < newPosts.length; ++i) {
+            newPosts[i] = {
+              ...newPosts[i],
+              likes: newPosts[i].likes ?? 0,
+              likedByYou: likes.data?.batchGetLikes[i] != null,
+            };
           }
-        ),
+        }),
 
         allSettled(
           newPosts.map((post) => {
@@ -227,7 +246,10 @@ export default function FeedScreen({
   //   scrollRef.current?.scrollToOffset({ offset: 0, animated: true });
   // };
 
-  const renderPostItem: APIListRenderItemInfo<Post> = ({ item, index }, operations) => {
+  const renderPostItem: APIListRenderItemInfo<Post> = (
+    { item, index },
+    operations
+  ) => {
     // if (index === 0 && addedNewPost)
     //   return (
     //     <ActivityIndicator
@@ -242,19 +264,19 @@ export default function FeedScreen({
     //     />
     //   );
     // else
-      return (
-        <PostItem
-          //index={index}
-          item={item}
-          likes={item.likes ?? 0}
-          writtenByYou={item.userId === globalThis.myId}
-          //showTimestamp={showTimestamp(item, index)}
-          reportPost={reportPost}
-          //newSection={true}
-          operations={operations}
-          //isVisible={item.isVisible && isFocused}
-        />
-      );
+    return (
+      <PostItem
+        //index={index}
+        item={item}
+        likes={item.likes ?? 0}
+        writtenByYou={item.userId === globalThis.myId}
+        //showTimestamp={showTimestamp(item, index)}
+        reportPost={reportPost}
+        //newSection={true}
+        operations={operations}
+        //isVisible={item.isVisible && isFocused}
+      />
+    );
     /*return renderItem({
         index,
         item,
@@ -324,10 +346,13 @@ export default function FeedScreen({
             <PostInputField
               onPostAdded={(newPost: Post) => {
                 setAddedNewPost(true);
-                listRef.current?.addItem({...newPost, 
-              userId: globalThis.myId,
-              createdAt: "null",
-            }); onPostAdded?.(newPost);}}
+                listRef.current?.addItem({
+                  ...newPost,
+                  userId: globalThis.myId,
+                  createdAt: "null",
+                });
+                onPostAdded?.(newPost);
+              }}
               channel={channel}
               originalParentId={originalParentId}
               autoFocus={autoFocus}
@@ -352,14 +377,16 @@ export default function FeedScreen({
 }
 
 interface PostInputFieldProps {
-  channel: string,
-  label?: string,
-  originalParentId?: string,
-  autoFocus: boolean,
-  isChallenge: boolean,
-  onPostAdded: (_: Partial<Post> & {
-    taggedUsers?: string[] | undefined;
-}) => void,
+  channel: string;
+  label?: string;
+  originalParentId?: string;
+  autoFocus: boolean;
+  isChallenge: boolean;
+  onPostAdded: (
+    _: Partial<Post> & {
+      taggedUsers?: string[] | undefined;
+    }
+  ) => void;
 }
 
 function PostInputField({
@@ -400,7 +427,7 @@ function PostInputField({
     setPostIsLoading(true);
 
     const imageID = SHA256(Date.now().toString());
-    
+
     let imageURL;
     let videoExtension;
     if (imagePartialURL !== null) {
@@ -410,7 +437,7 @@ function PostInputField({
       imageURL = `${imageID}.${isVideo ? videoExtension : "jpg"}`;
     }
 
-    let newPost: Partial<Post> & {taggedUsers?: string[]} = {
+    let newPost: Partial<Post> & { taggedUsers?: string[] } = {
       description: postInput,
       channel: channel,
       parentId: originalParentId ?? undefined,
@@ -447,18 +474,14 @@ function PostInputField({
         }
 
         setProgress(0.01);
-        await Storage.put(
-          `feed/${imageURL}`,
-          blob,
-          {
-            progressCallback(progress: Progress) {
-              setProgress(progress.loaded / progress.total);
-              //console.log(progress); //what is "part"
-            },
-            level: "public",
-            contentType: isVideo ? "video/" + videoExtension : "image/jpeg",
-          }
-        ); //make sure people can't overwrite other people's photos, and preferrably not be able to list all the photos in s3 using brute force. may need security on s3
+        await Storage.put(`feed/${imageURL}`, blob, {
+          progressCallback(progress: Progress) {
+            setProgress(progress.loaded / progress.total);
+            //console.log(progress); //what is "part"
+          },
+          level: "public",
+          contentType: isVideo ? "video/" + videoExtension : "image/jpeg",
+        }); //make sure people can't overwrite other people's photos, and preferrably not be able to list all the photos in s3 using brute force. may need security on s3
         setProgress(0);
         setImagePartialURL(null);
       }
@@ -513,11 +536,13 @@ function PostInputField({
           clearButtonMode="always"
           maxLength={1000}
           onSubmit={(userId) =>
-            taggedUsers && !taggedUsers?.includes(userId) &&
+            taggedUsers &&
+            !taggedUsers?.includes(userId) &&
             setTaggedUsers([...taggedUsers, userId])
           }
           onDelete={(userId) =>
-            taggedUsers && taggedUsers.includes(userId) &&
+            taggedUsers &&
+            taggedUsers.includes(userId) &&
             setTaggedUsers(taggedUsers.filter((user) => user != userId))
           }
         />
@@ -558,7 +583,9 @@ function PostInputField({
             size={20}
             color={imagePartialURL === null || postIsLoading ? "gray" : "blue"}
             style={{ marginRight: 6 }}
-            onPress={() => pickFromGallery(setImagePartialURL, null, setIsVideo)}
+            onPress={() =>
+              pickFromGallery(setImagePartialURL, null, setIsVideo)
+            }
           />
           <IconButton
             iconName={"camera-alt"}
@@ -571,7 +598,9 @@ function PostInputField({
             <IconButton
               iconName={"close"}
               size={20}
-              color={imagePartialURL === null || postIsLoading ? "gray" : "blue"}
+              color={
+                imagePartialURL === null || postIsLoading ? "gray" : "blue"
+              }
               onPress={() => setImagePartialURL(null)}
             />
           ) : null}

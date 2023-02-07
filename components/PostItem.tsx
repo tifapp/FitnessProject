@@ -2,7 +2,16 @@ import API, { graphqlOperation } from "@aws-amplify/api";
 import { APIListOperations } from "@components/APIList";
 import { deletePost, updatePost } from "@graphql/mutations";
 import React, { useRef, useState } from "react";
-import { Alert, Dimensions, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Dimensions,
+  FlatList,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Post } from "src/models";
 import IconButton from "./common/IconButton";
 import Modal, { ModalRefType } from "./common/Modal";
@@ -12,7 +21,6 @@ import PostHeader from "./postComponents/PostHeader";
 import PostImage from "./PostImage";
 import { ProfileImageAndName } from "./ProfileImageAndName";
 import TextWithTaggedUsers from "./TextWithTaggedUsers";
-
 
 const updatePostAWS = async (createdAt: string, editedText: string) => {
   try {
@@ -41,14 +49,14 @@ const deletePostAWS = async (createdAt: string) => {
 };
 
 interface Props {
-  item: Post & {taggedUsers?: string[]; likedByYou?: boolean},
-  likes: number,
-  reportPost: (timestamp: string, author: string) => Promise<any>,
-  replyButtonHandler?: () => void,
-  writtenByYou: boolean,
-  isVisible?: boolean,
-  shouldSubscribe?: boolean,
-  operations: APIListOperations<Post>,
+  item: Post & { taggedUsers?: string[]; likedByYou?: boolean };
+  likes: number;
+  reportPost: (timestamp: string, author: string) => Promise<any>;
+  replyButtonHandler?: () => void;
+  writtenByYou: boolean;
+  isVisible?: boolean;
+  shouldSubscribe?: boolean;
+  operations: APIListOperations<Post>;
 }
 
 const PostItem = ({
@@ -65,17 +73,20 @@ const PostItem = ({
   //replies,
   //index,
   operations,
-} : Props) => {
-  const {removeItem, replaceItem} = operations;
+}: Props) => {
+  const { removeItem, replaceItem } = operations;
   const likesModalRef = useRef<ModalRefType>(null);
   const repliesModalRef = useRef<ModalRefType>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState("");
-  
+
   return (
     <View style={styles.secondaryContainerStyle}>
       <View
-        style={[styles.spaceAround, replyButtonHandler ? {} : styles.nestedReply]}
+        style={[
+          styles.spaceAround,
+          replyButtonHandler ? {} : styles.nestedReply,
+        ]}
       >
         <PostHeader
           item={item}
@@ -119,7 +130,11 @@ const PostItem = ({
               {item.description}
             </TextInput>
           ) : (
-            <TextWithTaggedUsers textInput={item.description} taggedUsers={item.taggedUsers} urlPreview={item.urlPreview}/>
+            <TextWithTaggedUsers
+              textInput={item.description}
+              taggedUsers={item.taggedUsers}
+              urlPreview={item.urlPreview}
+            />
           )}
 
           <View
@@ -130,7 +145,9 @@ const PostItem = ({
                 iconName={"report"}
                 size={20}
                 color={"gray"}
-                onPress={() => {removeItem(), reportPost(item.createdAt, item.userId)}}
+                onPress={() => {
+                  removeItem(), reportPost(item.createdAt, item.userId);
+                }}
               />
             ) : null}
 
@@ -140,7 +157,9 @@ const PostItem = ({
                 iconName={"delete-forever"}
                 size={20}
                 color={"gray"}
-                onPress={() => {removeItem(), deletePostAWS(item.createdAt);}}
+                onPress={() => {
+                  removeItem(), deletePostAWS(item.createdAt);
+                }}
               />
             ) : null}
 
@@ -231,7 +250,7 @@ const PostItem = ({
           <LikesModal item={item} />
         </Modal>
         <Modal ref={repliesModalRef}>
-          <CommentsModal item={item} operations={operations}/>
+          <CommentsModal item={item} operations={operations} />
         </Modal>
       </View>
 
@@ -251,10 +270,10 @@ const PostItem = ({
           <TouchableOpacity
             style={styles.buttonStyle}
             onPress={() => {
-              replaceItem({description: editedText}),
-              updatePostAWS(item.createdAt, editedText),
-              setEditedText(""),
-              setIsEditing(false);
+              replaceItem({ description: editedText }),
+                updatePostAWS(item.createdAt, editedText),
+                setEditedText(""),
+                setIsEditing(false);
             }}
           >
             <Text style={styles.buttonTextStyle}>{"Edit Post"}</Text>
