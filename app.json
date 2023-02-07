@@ -22,6 +22,11 @@
       "favicon": "./assets/favicon.png"
     },
     "android": {
+      "config": {
+        "googleMaps": {
+          "apiKey": "<insert API key here>"
+        }
+      },
       "package": "com.tifapp.FitnessApp",
       "useNextNotificationsApi": true,
       "googleServicesFile": "./google-services.json"

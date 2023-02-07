@@ -40,6 +40,18 @@ const ActivitiesScreen = () => {
           Log Out
         </Text>
       </TouchableOpacity>
+
+      <Text
+        style={{
+          alignItems: "center",
+          justifyContent: "center",
+          color: "black",
+          fontWeight: "bold",
+          fontSize: 15,
+        }}
+      >
+        SandBox to get started
+      </Text>
     </View>
   );
 };

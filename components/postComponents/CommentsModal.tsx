@@ -58,6 +58,13 @@ export default function CommentsModal({ item, operations }: Props) {
             //}}
             isVisible={false}
             shouldSubscribe={true}
+            likes={0}
+            reportPost={function (
+              timestamp: string,
+              author: string
+            ): Promise<any> {
+              throw new Error("Function not implemented.");
+            }}
           />
         }
         autoFocus={true}
@@ -69,6 +76,7 @@ export default function CommentsModal({ item, operations }: Props) {
         postButtonLabel={undefined}
         renderItem={undefined}
         onPostAdded={undefined}
+        data={undefined}
       />
     </>
   );

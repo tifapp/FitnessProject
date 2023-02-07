@@ -27,10 +27,10 @@ export default function PostHeader({
   const [likes, setLikes] = useState(item.likes);
   const [replies, setReplies] = useState(item.replies);
   const likeDebounce = useRef(false);
-  let incrementLikeSubscription,
-    decrementLikeSubscription,
-    incrementReplySubscription,
-    decrementReplySubscription;
+  let incrementLikeSubscription: { unsubscribe: () => void; },
+    decrementLikeSubscription: { unsubscribe: () => void; },
+    incrementReplySubscription: { unsubscribe: () => void; },
+    decrementReplySubscription: { unsubscribe: () => void; };
 
   useEffect(() => {
     if (!item.loading) {
@@ -43,7 +43,7 @@ export default function PostHeader({
           })
         ).subscribe({
           //nvm we dont have a subscription event for incrementlike
-          next: (event) => {
+          next: (event: { value: { data: { onIncrementLikes: { likes: React.SetStateAction<number | null | undefined>; }; }; }; }) => {
             if (likeDebounce.current) {
               likeDebounce.current = false;
             } else {
@@ -51,7 +51,7 @@ export default function PostHeader({
               item.likes = event.value.data.onIncrementLikes.likes;
             }
           },
-          error: (error) => console.warn(error),
+          error: (error: any) => console.warn(error),
         });
         decrementLikeSubscription = API.graphql(
           graphqlOperation(onDecrementLikes, {
@@ -60,7 +60,7 @@ export default function PostHeader({
           })
         ).subscribe({
           //nvm we dont have a subscription event for incrementlike
-          next: (event) => {
+          next: (event: { value: { data: { onDecrementLikes: { likes: React.SetStateAction<number | null | undefined>; }; }; }; }) => {
             if (likeDebounce.current) {
               likeDebounce.current = false;
             } else {
@@ -68,7 +68,7 @@ export default function PostHeader({
               item.likes = event.value.data.onDecrementLikes.likes;
             }
           },
-          error: (error) => console.warn(error),
+          error: (error: any) => console.warn(error),
         });
         incrementReplySubscription = API.graphql(
           graphqlOperation(onIncrementReplies, {
@@ -77,11 +77,11 @@ export default function PostHeader({
           })
         ).subscribe({
           //nvm we dont have a subscription event for incrementlike
-          next: (event) => {
+          next: (event: { value: { data: { onIncrementReplies: { replies: React.SetStateAction<number | null | undefined>; }; }; }; }) => {
             setReplies(event.value.data.onIncrementReplies.replies);
             item.replies = event.value.data.onIncrementReplies.replies;
           },
-          error: (error) => console.warn(error),
+          error: (error: any) => console.warn(error),
         });
         decrementReplySubscription = API.graphql(
           graphqlOperation(onDecrementReplies, {
@@ -90,11 +90,11 @@ export default function PostHeader({
           })
         ).subscribe({
           //nvm we dont have a subscription event for incrementlike
-          next: (event) => {
+          next: (event: { value: { data: { onDecrementReplies: { replies: React.SetStateAction<number | null | undefined>; }; }; }; }) => {
             setReplies(event.value.data.onDecrementReplies.replies);
             item.replies = event.value.data.onDecrementReplies.replies;
           },
-          error: (error) => console.warn(error),
+          error: (error: any) => console.warn(error),
         });
       } else if (shouldSubscribe === false) {
         if (incrementLikeSubscription) incrementLikeSubscription.unsubscribe();
