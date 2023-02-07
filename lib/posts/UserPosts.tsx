@@ -86,7 +86,7 @@ export const graphQLUserPosts = (
 
       const likesPromise = operations
         .execute<{ batchGetLikes: Like[] }>(batchGetLikes, {
-          likes: userPostIds,
+          likes: userPostIds.map((id) => ({ postId: id })),
         })
         .then((value) => value.batchGetLikes);
 

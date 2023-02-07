@@ -297,20 +297,20 @@ const App = () => {
         </Tab.Navigator>
       </NavigationContainer>
     );
-  } else if (isDeveloper) {
-    return (
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Activities Screen"
-            component={ActivitiesScreen}
-            options={{
-              headerShown: false,
-            }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    );
+    // } else if (isDeveloper) {
+    //   return (
+    //     <NavigationContainer>
+    //       <Stack.Navigator>
+    //         <Stack.Screen
+    //           name="Activities Screen"
+    //           component={ActivitiesScreen}
+    //           options={{
+    //             headerShown: false,
+    //           }}
+    //         />
+    //       </Stack.Navigator>
+    //     </NavigationContainer>
+    //   );
   } else {
     return (
       <UserPostsProvider posts={userPosts}>
@@ -368,8 +368,12 @@ import SignIn from "@components/loginComponents/SignIn";
 import SignUp from "@components/loginComponents/SignUp";
 import VerifyContact from "@components/loginComponents/VerifyContact";
 import ActivitiesScreen from "@screens/ActivitiesScreen";
-import { expoUserNotifications } from "@lib/UserNotifications";
+import {
+  expoUserNotifications,
+  UserNotifications,
+} from "@lib/UserNotifications";
 import { makeLinkingConfig } from "@lib/linkingConfig";
+import { NotificationContent } from "expo-notifications";
 
 export default withAuthenticator(App, false, [
   <Greetings />,
