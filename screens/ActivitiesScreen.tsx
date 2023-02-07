@@ -33,6 +33,7 @@ const ActivitiesScreen = () => {
         Log Out
       </Text>
     </TouchableOpacity>
+    
     <Text
         style={{
           alignItems: "center",
@@ -43,7 +44,7 @@ const ActivitiesScreen = () => {
         }}
       >
         SandBox to get started
-    </Text>
+      </Text>
   </View>
   );
 };

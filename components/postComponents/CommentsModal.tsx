@@ -58,17 +58,18 @@ export default function CommentsModal({ item, operations } : Props) {
           //setAreRepliesVisible(false);
           //}}
           isVisible={false}
-          shouldSubscribe={true} />}
+          shouldSubscribe={true} likes={0} reportPost={function (timestamp: string, author: string): Promise<any> {
+            throw new Error("Function not implemented.");
+          } } />}
         autoFocus={true}
         channel={SHA256(item.userId + item.createdAt)} //unique id
-        originalParentId={item.createdAt + "#" + item.userId} 
-        footerComponent={undefined} 
-        isFocused={undefined} 
-        style={undefined} 
-        postButtonLabel={undefined} 
-        renderItem={undefined} 
-        onPostAdded={undefined}      
-      />
+        originalParentId={item.createdAt + "#" + item.userId}
+        footerComponent={undefined}
+        isFocused={undefined}
+        style={undefined}
+        postButtonLabel={undefined}
+        renderItem={undefined}
+        onPostAdded={undefined} data={undefined}      />
     </>
   );
 }
