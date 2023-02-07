@@ -13,9 +13,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "bundleIdentifier": "com.tifapp.FitnessApp"
     },
@@ -25,16 +23,16 @@
     "android": {
       "config": {
         "googleMaps": {
-          "apiKey":  //Fill in as needed, no apiKey normally
+          "apiKey": "<insert API key here>"
         }
       },
       "package": "com.tifapp.FitnessApp",
-	  "useNextNotificationsApi": true,
-	  "googleServicesFile": "./google-services.json"
+      "useNextNotificationsApi": true,
+      "googleServicesFile": "./google-services.json"
     },
-	"splash": {
-		"image": "./assets/splash.png",
-		"backgroundColor": "#26C6A2"
-	}
+    "splash": {
+      "image": "./assets/splash.png",
+      "backgroundColor": "#26C6A2"
+    }
   }
 }
