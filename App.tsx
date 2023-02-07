@@ -4,11 +4,8 @@ import { Amplify, Auth, Cache, graphqlOperation, Storage } from "aws-amplify";
 import { withAuthenticator } from "aws-amplify-react-native";
 import awsconfig from "./src/aws-exports";
 
-import { graphQLUserPosts, UserPosts, UserPostsProvider } from "./lib/posts";
-import {
-  AmplifyGraphQLOperations,
-  amplifyGraphQLOperations,
-} from "./lib/GraphQLOperations";
+import { UserPosts, UserPostsProvider } from "@lib/posts";
+import { AmplifyGraphQLOperations } from "@lib/GraphQLOperations";
 
 //graphql
 import { updateUser } from "@graphql/mutations.js";
@@ -299,20 +296,20 @@ const App = () => {
         </Tab.Navigator>
       </NavigationContainer>
     );
-    // } else if (isDeveloper) {
-    //   return (
-    //     <NavigationContainer>
-    //       <Stack.Navigator>
-    //         <Stack.Screen
-    //           name="Activities Screen"
-    //           component={ActivitiesScreen}
-    //           options={{
-    //             headerShown: false,
-    //           }}
-    //         />
-    //       </Stack.Navigator>
-    //     </NavigationContainer>
-    //   );
+  } else if (isDeveloper) {
+    return (
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Activities Screen"
+            component={ActivitiesScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    );
   } else {
     return (
       <UserPostsProvider posts={userPosts}>
@@ -370,13 +367,8 @@ import SignIn from "@components/loginComponents/SignIn";
 import SignUp from "@components/loginComponents/SignUp";
 import VerifyContact from "@components/loginComponents/VerifyContact";
 import ActivitiesScreen from "@screens/ActivitiesScreen";
-import {
-  ExpoUserNotifications,
-  expoUserNotifications,
-  UserNotifications,
-} from "@lib/UserNotifications";
+import { ExpoUserNotifications } from "@lib/UserNotifications";
 import { makeLinkingConfig } from "@lib/linkingConfig";
-import { NotificationContent } from "expo-notifications";
 import { GraphQLUserPosts } from "@lib/posts/UserPosts";
 
 export default withAuthenticator(App, false, [
