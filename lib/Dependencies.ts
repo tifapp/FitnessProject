@@ -1,6 +1,10 @@
 import crypto from "crypto";
 
-export class DependencyValues {
+export interface ImmutableDependencyValues {
+  get: <T>(key: DependencyKey<T>) => T;
+}
+
+export class DependencyValues implements ImmutableDependencyValues {
   private cachedValues = new Map<string, any>();
 
   get<T>(key: DependencyKey<T>): T {
@@ -11,7 +15,7 @@ export class DependencyValues {
       throw new Error("TODO: - Add Error Message");
     }
 
-    const value = key.createDefaultValue(new ImmutableDependencyValues(this));
+    const value = key.createDefaultValue(this);
     this.cachedValues.set(key.identifier, value);
     return value;
   }
@@ -27,26 +31,27 @@ export class DependencyValues {
   }
 }
 
-class ImmutableDependencyValues {
-  private readonly values: DependencyValues;
-
-  constructor(values: DependencyValues) {
-    this.values = values;
-  }
-
-  get<T>(key: DependencyKey<T>): T {
-    return this.values.get(key);
-  }
-}
-
 type DependencyKey<T> = {
   readonly identifier: string;
   readonly createDefaultValue?: (values: ImmutableDependencyValues) => T;
 };
 
 export const createDependencyKey = <T>(
-  createDefaultValue?: (values: ImmutableDependencyValues) => T
+  createDefaultValue?: ((values: ImmutableDependencyValues) => T) | T
 ): DependencyKey<T> => ({
   identifier: crypto.randomUUID(),
-  createDefaultValue,
+  createDefaultValue: !!createDefaultValue
+    ? _makeDefaultValueCreation(createDefaultValue)
+    : undefined,
 });
+
+const _makeDefaultValueCreation = <T>(
+  create: ((values: ImmutableDependencyValues) => T) | T
+) => {
+  return (values: ImmutableDependencyValues) => {
+    if (create instanceof Function) {
+      return create(values);
+    }
+    return create;
+  };
+};
