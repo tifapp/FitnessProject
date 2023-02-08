@@ -1,26 +1,26 @@
-import API, { GraphQLResult, GraphQLSubscription } from "@aws-amplify/api";
-import APIList, { APIListRefType } from "@components/APIList";
-import FriendListItem from "@components/FriendListItem";
-import { deleteConversation } from "@graphql/mutations";
+import API, { GraphQLResult, GraphQLSubscription } from "@aws-amplify/api"
+import APIList, { APIListRefType } from "@components/APIList"
+import FriendListItem from "@components/FriendListItem"
+import { deleteConversation } from "@graphql/mutations"
 import {
   onCreatePostByUser,
   onCreatePostForReceiver
-} from "@graphql/subscriptions";
-import { useNavigation } from "@react-navigation/native";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { graphqlOperation } from "aws-amplify";
-import React, { useEffect, useRef } from "react";
-import { SafeAreaView } from "react-native";
-import { Conversation, Post } from "src/models";
+} from "@graphql/subscriptions"
+import { useNavigation } from "@react-navigation/native"
+import { StackNavigationProp } from "@react-navigation/stack"
+import { graphqlOperation } from "aws-amplify"
+import React, { useEffect, useRef } from "react"
+import { SafeAreaView } from "react-native"
+import { Conversation, Post } from "src/models"
 import {
   listConversations
-} from "../src/graphql/queries";
+} from "../src/graphql/queries"
 
-const subscriptions = [];
+const subscriptions = []
 
-export default function ConversationScreen() {
-  const {navigate, push} = useNavigation<StackNavigationProp<any>>();
-  const listRef = useRef<APIListRefType<Conversation>>(null);
+export default function ConversationScreen () {
+  const { navigate, push } = useNavigation<StackNavigationProp<any>>()
+  const listRef = useRef<APIListRefType<Conversation>>(null)
 
   const updateConversationList = async (newPost: Post) => {
     /*
@@ -31,7 +31,7 @@ export default function ConversationScreen() {
       tempConversations.unshift(conversation);
 
       setConversations([...tempConversations]);
-    }  
+    }
     */
 
     /*
@@ -50,14 +50,14 @@ export default function ConversationScreen() {
     console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
     */
 
-    //if(newConversationCheck.data.getConversations.items.length != 0){
-    //console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||")
-    //console.log(newConversationCheck.data.getConversations.items);
-    //console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||")
+    // if(newConversationCheck.data.getConversations.items.length != 0){
+    // console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||")
+    // console.log(newConversationCheck.data.getConversations.items);
+    // console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||")
 
-    //console.log(newConversationCheck.data.getConversations.items[0].id)
+    // console.log(newConversationCheck.data.getConversations.items[0].id)
 
-    //newConversationCheck = newConversationCheck.data.getConversations.items[0].id === newPost.channel;
+    // newConversationCheck = newConversationCheck.data.getConversations.items[0].id === newPost.channel;
 
     /*
     console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
@@ -66,29 +66,29 @@ export default function ConversationScreen() {
     console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
     */
 
-    //if(newConversationCheck){
-    //console.log("Conversation already exists");
-    //return;
-    //}
-    //}
+    // if(newConversationCheck){
+    // console.log("Conversation already exists");
+    // return;
+    // }
+    // }
 
-    //console.log("Outside");
+    // console.log("Outside");
 
-    //we may be able to separate this code into a util function that checks the current list of data for a matching item, and if not, makes a call to the backend for a matching item.
+    // we may be able to separate this code into a util function that checks the current list of data for a matching item, and if not, makes a call to the backend for a matching item.
 
     if (true) {
       let newConversation = await API.graphql<GraphQLResult<{getSortedConversations: [Conversation]}>>(
         graphqlOperation(getSortedConversations, {
           dummy: 0,
           Accepted: 1,
-          limit: 1,
+          limit: 1
         })
-      );
+      )
 
       if (newConversation != null) {
-        newConversation = { id: newConversation.data.id };
+        newConversation = { id: newConversation.data.id }
       } else {
-        newConversation = { id: null };
+        newConversation = { id: null }
       }
     }
 
@@ -98,18 +98,18 @@ export default function ConversationScreen() {
         users: [newPost.userId, newPost.receiver],
         lastUser: newPost.userId,
         lastMessage: newPost.description,
-        Accepted: 1,
-      };
+        Accepted: 1
+      }
 
-      //console.log("++++++++++++++++++++++++++++++++");
-      //console.log(conversation);
-      //console.log("++++++++++++++++++++++++++++++++");
+      // console.log("++++++++++++++++++++++++++++++++");
+      // console.log(conversation);
+      // console.log("++++++++++++++++++++++++++++++++");
 
-      listRef.current?.removeItem((item) => newPost.channel === item.id);
-      listRef.current?.addItem(conversation);
+      listRef.current?.removeItem((item) => newPost.channel === item.id)
+      listRef.current?.addItem(conversation)
     } else {
     }
-  };
+  }
 
   useEffect(() => {
     // Executes when a user receieves a friend request
@@ -119,35 +119,35 @@ export default function ConversationScreen() {
       graphqlOperation(onCreatePostForReceiver, { receiver: globalThis.myId })
     ).subscribe({
       next: (event) => {
-        const newPost = event.value.data?.onCreatePostForReceiver;
-        global.addConversationIds(newPost.userId);
-        global.showNotificationDot();
-        updateConversationList(newPost);
+        const newPost = event.value.data?.onCreatePostForReceiver
+        global.addConversationIds(newPost.userId)
+        global.showNotificationDot()
+        updateConversationList(newPost)
       },
-      error: error => console.warn(error),
-    });
+      error: error => console.warn(error)
+    })
 
     const sentConversationSubscription = API.graphql(
       graphqlOperation(onCreatePostByUser, { userId: globalThis.myId })
     ).subscribe({
       next: (event) => {
-        const newPost = event.value.data.onCreatePostByUser;
+        const newPost = event.value.data.onCreatePostByUser
 
-        updateConversationList(newPost);
+        updateConversationList(newPost)
       },
-      error: error => console.warn(error),
-    });
+      error: error => console.warn(error)
+    })
 
     return () => {
-      receivedConversationSubscription.unsubscribe();
-      sentConversationSubscription.unsubscribe();
+      receivedConversationSubscription.unsubscribe()
+      sentConversationSubscription.unsubscribe()
       subscriptions.forEach((element) => {
-        element.unsubscribe();
-      });
-    };
-  }, []);
+        element.unsubscribe()
+      })
+    }
+  }, [])
 
-  //const [button, setButton] = useRef();
+  // const [button, setButton] = useRef();
 
   const deleteConversationFromConvo = async (item, friendID) => {
     /*
@@ -165,15 +165,15 @@ export default function ConversationScreen() {
     listRef.current?.removeItem(
       (conversation) =>
         conversation.users[0] !== friendID || conversation.users[1] !== friendID
-    );
+    )
 
     await API.graphql(
       graphqlOperation(deleteConversation, {
-        input: { id: item.id },
+        input: { id: item.id }
       })
-    );
+    )
 
-    //setButton(false);
+    // setButton(false);
 
     /*
     // delete friend object
@@ -195,7 +195,7 @@ export default function ConversationScreen() {
       //console("error: ", err);
     }
     */
-  };
+  }
 
   /*
   useEffect(() => {
@@ -225,31 +225,31 @@ export default function ConversationScreen() {
   */
 
   const goToMessages = (id) => {
-    if (!push) navigate(id);
-    else push(id);
-  };
+    if (!push) navigate(id)
+    else push(id)
+  }
 
   const collectConversations = (items) => {
-    //what if conversations array shrinks? we should remove from the conversationids array
+    // what if conversations array shrinks? we should remove from the conversationids array
 
-    //console("1. Inside collect Conversations");
-    //console(items);
+    // console("1. Inside collect Conversations");
+    // console(items);
 
     items.forEach((element) => {
-      let userId = null;
+      let userId = null
       if (element.users[0] != globalThis.myId) {
-        userId = element.users[0];
+        userId = element.users[0]
       } else {
-        userId = element.users[1];
+        userId = element.users[1]
       }
-      global.addConversationIds(userId);
-    });
-    return items;
-  };
+      global.addConversationIds(userId)
+    })
+    return items
+  }
 
   /*
     <View style= {[styles.containerStyle, {marginVertical: 5}]}>
-                    
+
                     <ProfileImageAndName
                       imageStyle={[styles.smallImageStyle, { marginHorizontal: 20 }]}
                       userId={ item.users[0] == route.params.myId ? item.users[1] : item.users[0]}
@@ -257,7 +257,7 @@ export default function ConversationScreen() {
                         onPress={() => {
                           //console("message pressed, ");
                           item.isRead = true;
-                          item.users[0] == route.params.myId ? goToMessages(item.users[1]) : goToMessages(item.users[0]) 
+                          item.users[0] == route.params.myId ? goToMessages(item.users[1]) : goToMessages(item.users[0])
                         }}
                         >
                           <Text style = {{marginTop: 10}}>
@@ -265,7 +265,7 @@ export default function ConversationScreen() {
                           </Text>
                         </TouchableOpacity>}
                     />
-                    
+
                   </View>
     */
 
@@ -282,9 +282,9 @@ export default function ConversationScreen() {
           <FriendListItem
             deleteConversationFromConvo={deleteConversationFromConvo}
             imageURL={item.imageURL}
-            //removeFriendHandler={removeFriend}
+            // removeFriendHandler={removeFriend}
             item={item}
-            //friendId={item.sender === myId ? item.receiver : item.sender}
+            // friendId={item.sender === myId ? item.receiver : item.sender}
             friendId={
               item.users[0] == globalThis.myId ? item.users[1] : item.users[0]
             }
@@ -299,5 +299,5 @@ export default function ConversationScreen() {
         keyExtractor={(item: Conversation) => item.id}
       />
     </SafeAreaView>
-  );
+  )
 }

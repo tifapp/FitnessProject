@@ -1,7 +1,7 @@
-import { MaterialIcons } from "@expo/vector-icons";
-import StatusColors, { Status } from "@hooks/statusColors";
-import React from "react";
-import { Text, View } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons"
+import StatusColors, { Status } from "@hooks/statusColors"
+import React from "react"
+import { Text, View } from "react-native"
 
 interface Props {
   status: Status;
@@ -9,12 +9,12 @@ interface Props {
   isVerified?: boolean;
 }
 
-export default function StatusIndicator({
+export default function StatusIndicator ({
   status,
   shouldShow,
-  isVerified,
+  isVerified
 }: Props) {
-  if (status || shouldShow)
+  if (status || shouldShow) {
     return (
       <View style={{ flexDirection: "row" }}>
         <MaterialIcons
@@ -26,10 +26,10 @@ export default function StatusIndicator({
           style={{
             fontSize: 16,
             color: status ? "black" : "gray",
-            marginLeft: 5,
+            marginLeft: 5
           }}
-        >{`${status ? status : "Set your status!"}`}</Text>
+        >{`${status || "Set your status!"}`}</Text>
       </View>
-    );
-  else return null;
+    )
+  } else return null
 }

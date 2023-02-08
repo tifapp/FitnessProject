@@ -1,24 +1,24 @@
-import { useNavigation } from "@react-navigation/native";
-import React from "react";
+import { useNavigation } from "@react-navigation/native"
+import React from "react"
 import {
   Linking,
   StyleSheet,
   Text,
   TouchableOpacity,
   View
-} from "react-native";
+} from "react-native"
 
 const ComplianceScreen = () => {
-  const { navigate } = useNavigation();
+  const { navigate } = useNavigation()
 
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Text
         style={{
           textAlign: "center",
-          //padding: 40,
+          // padding: 40,
           fontWeight: "bold",
-          lineHeight: 30,
+          lineHeight: 30
         }}
       >
         By continuing, you agree to our {"\n"}
@@ -70,10 +70,10 @@ const ComplianceScreen = () => {
         <Text style={styles.buttonTextStyle}>Continue</Text>
       </TouchableOpacity>
     </View>
-  );
-};
+  )
+}
 
-export default ComplianceScreen;
+export default ComplianceScreen
 
 const styles = StyleSheet.create({
   buttonStyle: {
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     backgroundColor: "blue",
     padding: 10,
     borderRadius: 5,
-    marginHorizontal: 6,
+    marginHorizontal: 6
   },
   buttonTextStyle: {
     color: "white",
@@ -89,6 +89,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 20,
     marginBottom: 2,
-    marginHorizontal: 6,
-  },
-});
+    marginHorizontal: 6
+  }
+})

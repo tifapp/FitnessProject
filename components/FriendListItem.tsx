@@ -1,10 +1,10 @@
-import { MaterialIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Friendship } from "src/models";
-import IconButton from "./common/IconButton";
-import { ProfileImageAndName } from "./ProfileImageAndName";
+import { MaterialIcons } from "@expo/vector-icons"
+import { useNavigation } from "@react-navigation/native"
+import React, { useState } from "react"
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { Friendship } from "src/models"
+import IconButton from "./common/IconButton"
+import { ProfileImageAndName } from "./ProfileImageAndName"
 
 interface Props {
   item: Friendship,
@@ -17,8 +17,7 @@ interface Props {
   sidebar: any,
 }
 
-
-export default function FriendListItem({
+export default function FriendListItem ({
   item,
   removeFriendHandler,
   deleteConversationFromConvo,
@@ -26,124 +25,125 @@ export default function FriendListItem({
   lastMessage,
   lastUser,
   Accepted,
-  sidebar,
+  sidebar
 }: Props) {
-  const navigation = useNavigation();
+  const navigation = useNavigation()
 
   const goToMessages = (id, Accepted, lastUser, sidebar) => {
-    if (!navigation.push)
+    if (!navigation.push) {
       navigation.navigate(id, {
-        Accepted: Accepted,
-        lastUser: lastUser,
-        sidebar: sidebar,
-        id: item.id,
-      });
-    else
+        Accepted,
+        lastUser,
+        sidebar,
+        id: item.id
+      })
+    } else {
       navigation.push(id, {
-        Accepted: Accepted,
-        lastUser: lastUser,
-        sidebar: sidebar,
-        id: item.id,
-      });
-  };
+        Accepted,
+        lastUser,
+        sidebar,
+        id: item.id
+      })
+    }
+  }
 
-  const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+  const [isOptionsOpen, setIsOptionsOpen] = useState(false)
 
-  const [isMessageOpen, setIsMessageOpen] = useState(false);
-  const [postVal, setPostVal] = useState("");
+  const [isMessageOpen, setIsMessageOpen] = useState(false)
+  const [postVal, setPostVal] = useState("")
 
   const alertOptions = {
     cancelable: true,
-    onDismiss: () => setIsOptionsOpen(false),
-  };
+    onDismiss: () => setIsOptionsOpen(false)
+  }
 
   const openOptionsDialog = () => {
-    const title = "More Options";
-    const message = "";
+    const title = "More Options"
+    const message = ""
     const options = [
       {
         text: "Block",
         onPress: () => {
           const title =
-            "Are you sure you want to block this friend? This will unfriend them and delete all messages.";
+            "Are you sure you want to block this friend? This will unfriend them and delete all messages."
           const options = [
             {
               text: "Yes",
               onPress: () => {
-                removeFriendHandler(item, true), setIsOptionsOpen(false);
-              },
+                removeFriendHandler(item, true), setIsOptionsOpen(false)
+              }
             },
             {
               text: "Cancel",
               type: "cancel",
               onPress: () => {
-                setIsOptionsOpen(false);
-              },
-            },
-          ];
-          Alert.alert(title, "", options, alertOptions);
-        },
+                setIsOptionsOpen(false)
+              }
+            }
+          ]
+          Alert.alert(title, "", options, alertOptions)
+        }
       },
       deleteConversationFromConvo != undefined
         ? {
             text: "Delete Conversation",
             onPress: () => {
               const title =
-                "Are you sure you want to delete this conversation? This will delete all messages.";
+                "Are you sure you want to delete this conversation? This will delete all messages."
               const options = [
                 {
                   text: "Yes",
                   onPress: () => {
-                    console.log("Test");
+                    console.log("Test")
                     deleteConversationFromConvo(item, friendId),
-                      setIsOptionsOpen(false);
-                  },
+                    setIsOptionsOpen(false)
+                  }
                 },
                 {
                   text: "Cancel",
                   type: "cancel",
                   onPress: () => {
-                    setIsOptionsOpen(false);
-                  },
-                },
-              ];
-              Alert.alert(title, "", options, alertOptions);
-            },
+                    setIsOptionsOpen(false)
+                  }
+                }
+              ]
+              Alert.alert(title, "", options, alertOptions)
+            }
           }
         : {
             text: "Unfriend",
             onPress: () => {
               const title =
-                "Are you sure you want to remove this friend? This will delete all messages.";
+                "Are you sure you want to remove this friend? This will delete all messages."
               const options = [
                 {
                   text: "Yes",
                   onPress: () => {
-                    removeFriendHandler(item), setIsOptionsOpen(false);
-                  },
+                    removeFriendHandler(item), setIsOptionsOpen(false)
+                  }
                 },
                 {
                   text: "Cancel",
                   type: "cancel",
                   onPress: () => {
-                    setIsOptionsOpen(false);
-                  },
-                },
-              ];
-              Alert.alert(title, "", options, alertOptions);
-            },
-          }, //if submithandler fails user won't know
+                    setIsOptionsOpen(false)
+                  }
+                }
+              ]
+              Alert.alert(title, "", options, alertOptions)
+            }
+          }, // if submithandler fails user won't know
       {
         text: "Cancel",
         type: "cancel",
         onPress: () => {
-          setIsOptionsOpen(false);
-        },
-      },
-    ];
-    Alert.alert(title, message, options, alertOptions);
-    setIsOptionsOpen(true);
-  };
+          setIsOptionsOpen(false)
+        }
+      }
+    ]
+    Alert.alert(title, message, options, alertOptions)
+    setIsOptionsOpen(true)
+  }
 
   return (
     <View>
@@ -153,9 +153,9 @@ export default function FriendListItem({
             flex: 1,
             flexDirection: "row",
             alignItems: "flex-start",
-            justifyContent: "flex-start",
+            justifyContent: "flex-start"
           },
-          isOptionsOpen && { backgroundColor: "orange" },
+          isOptionsOpen && { backgroundColor: "orange" }
         ]}
       >
         <IconButton
@@ -172,7 +172,7 @@ export default function FriendListItem({
           textStyle={{
             fontWeight: "bold",
             fontSize: 16,
-            color: Accepted === 0 ? "blue" : "black",
+            color: Accepted === 0 ? "blue" : "black"
           }}
           userId={friendId}
           textLayoutStyle={{ flex: 1, flexGrow: 1 }}
@@ -180,9 +180,9 @@ export default function FriendListItem({
             <TouchableOpacity
               style={styles.subtitleButton}
               onPress={() => {
-                console.log("message pressed, " + isMessageOpen);
-                item.isRead = true;
-                goToMessages(friendId, Accepted, lastUser, sidebar);
+                console.log("message pressed, " + isMessageOpen)
+                item.isRead = true
+                goToMessages(friendId, Accepted, lastUser, sidebar)
               }}
             >
               <Text
@@ -190,17 +190,19 @@ export default function FriendListItem({
                   color: isOptionsOpen
                     ? "black"
                     : item.isRead || lastUser == myId
-                    ? "black"
-                    : "blue",
+                      ? "black"
+                      : "blue",
                   fontSize: 15,
                   fontWeight:
                     item.isRead || lastUser == myId ? "normal" : "bold",
                   fontStyle: lastMessage == null ? "italic" : "normal",
-                  marginRight: 10,
+                  marginRight: 10
                 }}
                 numberOfLines={2}
               >
-                {lastUser == myId ? null : (
+                {lastUser == myId
+                  ? null
+                  : (
                   <MaterialIcons
                     name={item.isRead ? "messenger-outline" : "messenger"}
                     size={15}
@@ -208,15 +210,15 @@ export default function FriendListItem({
                       isOptionsOpen
                         ? "black"
                         : item.isRead || lastUser == myId
-                        ? "black"
-                        : "blue"
+                          ? "black"
+                          : "blue"
                     }
                   />
-                )}
+                    )}
                 {lastUser == myId ? "You: " : item.isRead ? "  " : "  "}
-                {/*(lastMessage == null ? "Message" : imageURL[imageURL.size() - 3] == 'j'
+                {/* (lastMessage == null ? "Message" : imageURL[imageURL.size() - 3] == 'j'
                   && imageURL[imageURL.size() - 2] == 'p' && imageURL[imageURL.size() - 1] == 'g'
-              ? "Image sent" : "Video sent")*/}
+              ? "Image sent" : "Video sent") */}
               </Text>
             </TouchableOpacity>
           }
@@ -226,7 +228,7 @@ export default function FriendListItem({
         style={{ height: 1, backgroundColor: "#efefef", marginHorizontal: 12 }}
       ></View>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -234,6 +236,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     paddingTop: 8,
-    paddingHorizontal: 4,
-  },
-});
+    paddingHorizontal: 4
+  }
+})

@@ -1,7 +1,7 @@
-import { Camera } from "expo-camera";
-import * as ImagePicker from "expo-image-picker";
-import * as MediaLibrary from "expo-media-library";
-import { Alert } from "react-native";
+import { Camera } from "expo-camera"
+import * as ImagePicker from "expo-image-picker"
+import * as MediaLibrary from "expo-media-library"
+import { Alert } from "react-native"
 
 export default (allowPics = true, allowVideo = false) => {
   const imageOptions = {
@@ -12,50 +12,50 @@ export default (allowPics = true, allowVideo = false) => {
       : ImagePicker.MediaTypeOptions.Videos,
     allowsEditing: true,
     aspect: [1, 1],
-    quality: 1,
-  };
+    quality: 1
+  }
 
   const pickFromGallery = async (setImageURL, setImageChanged, setIsVideo) => {
-    const { granted } = await MediaLibrary.requestPermissionsAsync();
+    const { granted } = await MediaLibrary.requestPermissionsAsync()
     if (granted) {
-      let response = await ImagePicker.launchImageLibraryAsync({
+      const response = await ImagePicker.launchImageLibraryAsync({
         ...imageOptions,
-        aspect: [1, 1],
-      });
+        aspect: [1, 1]
+      })
       if (!response.cancelled) {
         // @ts-ignore
-        setImageURL(response.uri);
-        if (setImageChanged) setImageChanged(true);
+        setImageURL(response.uri)
+        if (setImageChanged) setImageChanged(true)
         // @ts-ignore
-        if (setIsVideo) setIsVideo(response.type === "video");
+        if (setIsVideo) setIsVideo(response.type === "video")
       }
 
-      console.log(response);
+      console.log(response)
     } else {
-      Alert.alert("Photos access denied!");
+      Alert.alert("Photos access denied!")
     }
-  };
+  }
 
   const pickFromCamera = async (setImageURL, setImageChanged, setIsVideo) => {
-    const { granted } = await Camera.requestCameraPermissionsAsync();
+    const { granted } = await Camera.requestCameraPermissionsAsync()
     if (granted) {
-      let response = await ImagePicker.launchCameraAsync({
+      const response = await ImagePicker.launchCameraAsync({
         ...imageOptions,
-        aspect: [1, 1],
-      });
+        aspect: [1, 1]
+      })
       if (!response.cancelled) {
         // @ts-ignore
-        setImageURL(response.uri);
-        if (setImageChanged) setImageChanged(true);
+        setImageURL(response.uri)
+        if (setImageChanged) setImageChanged(true)
         // @ts-ignore
-        if (setIsVideo) setIsVideo(response.type === "video");
+        if (setIsVideo) setIsVideo(response.type === "video")
       }
 
-      console.log(response);
+      console.log(response)
     } else {
-      Alert.alert("Camera access denied!");
+      Alert.alert("Camera access denied!")
     }
-  };
+  }
 
-  return [pickFromGallery, pickFromCamera];
-};
+  return [pickFromGallery, pickFromCamera]
+}

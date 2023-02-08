@@ -1,7 +1,7 @@
-import React from "react";
-import { Dimensions, StyleSheet, Text, TextInput, View } from "react-native";
+import React from "react"
+import { Dimensions, StyleSheet, Text, TextInput, View } from "react-native"
 
-const { width } = Dimensions.get("screen");
+const { width } = Dimensions.get("screen")
 
 interface Props {
   setDescription: (s: string) => void,
@@ -9,8 +9,8 @@ interface Props {
   characterCount: number,
 }
 
-export default function GroupDescription({setDescription, descriptionVal, characterCount}: Props) {
-  var totalCharsRemaining = characterCount - descriptionVal.length;
+export default function GroupDescription ({ setDescription, descriptionVal, characterCount }: Props) {
+  const totalCharsRemaining = characterCount - descriptionVal.length
   return (
     <View>
       <View style={styles.boxFormat}>
@@ -26,14 +26,14 @@ export default function GroupDescription({setDescription, descriptionVal, charac
         />
       </View>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
   boxFormat: {
     paddingHorizontal: 8,
     paddingTop: 30,
-    paddingBottom: 15,
+    paddingBottom: 15
   },
   DescriptionBox: {
     marginTop: 16,
@@ -44,6 +44,6 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: "#d3d3d3",
     fontSize: 15,
-    width: width / 1.3,
-  },
-});
+    width: width / 1.3
+  }
+})

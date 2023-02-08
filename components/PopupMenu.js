@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useState } from "react"
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 
-//var styles = require("../styles/stylesheet");
+// var styles = require("../styles/stylesheet");
 
-export default function PopupMenu(props) {
-  const [modalVisible, setModalVisible] = useState(false);
+export default function PopupMenu (props) {
+  const [modalVisible, setModalVisible] = useState(false)
 
   return (
     <View>
@@ -14,7 +14,7 @@ export default function PopupMenu(props) {
         visible={modalVisible}
         onRequestClose={() => {
           // @ts-ignore
-          Alert.alert("Modal has been closed.");
+          Alert.alert("Modal has been closed.")
         }}
       >
         <View style={styles.centeredView}>
@@ -24,7 +24,7 @@ export default function PopupMenu(props) {
             <TouchableOpacity
               style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
               onPress={() => {
-                setModalVisible(!modalVisible);
+                setModalVisible(!modalVisible)
               }}
             >
               <Text style={styles.textStyle}>Hide Modal</Text>
@@ -36,13 +36,13 @@ export default function PopupMenu(props) {
       <TouchableOpacity
         style={props.style}
         onPress={() => {
-          setModalVisible(!modalVisible);
+          setModalVisible(!modalVisible)
         }}
       >
         {props.children}
       </TouchableOpacity>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 22,
+    marginTop: 22
   },
   modalView: {
     margin: 20,
@@ -61,25 +61,25 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 2
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    elevation: 5,
+    elevation: 5
   },
   openButton: {
     backgroundColor: "#F194FF",
     borderRadius: 20,
     padding: 10,
-    elevation: 2,
+    elevation: 2
   },
   textStyle: {
     color: "white",
     fontWeight: "bold",
-    textAlign: "center",
+    textAlign: "center"
   },
   modalText: {
     marginBottom: 15,
-    textAlign: "center",
-  },
-});
+    textAlign: "center"
+  }
+})

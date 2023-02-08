@@ -5,9 +5,9 @@ const StatusColors = {
   "Sports Player": "green",
   Trainee: "blue",
   Trainer: "purple",
-  "Health Professional": "black",
-};
+  "Health Professional": "black"
+}
 
-export default StatusColors;
+export default StatusColors
 
 export type Status = keyof typeof StatusColors;

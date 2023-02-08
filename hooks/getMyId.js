@@ -1,17 +1,17 @@
-import { Auth } from "aws-amplify";
+import { Auth } from "aws-amplify"
 
-async function setMyId() {
-  const query = await Auth.currentUserInfo();
+async function setMyId () {
+  const query = await Auth.currentUserInfo()
   // @ts-ignore
-  global.id = query.attributes.sub;
+  global.id = query.attributes.sub
 }
 
-export default function getMyId() {
+export default function getMyId () {
   // @ts-ignore
   if (global.id == null) {
-    setMyId();
+    setMyId()
   }
 
   // @ts-ignore
-  return global.id;
+  return global.id
 }

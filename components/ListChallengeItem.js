@@ -1,19 +1,19 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons"
+import { useNavigation } from "@react-navigation/native"
+import React from "react"
+import { Text, TouchableOpacity, View } from "react-native"
 
-export default function ListChallengeItem({ item, matchingname }) {
-  const navigation = useNavigation();
+export default function ListChallengeItem ({ item, matchingname }) {
+  const navigation = useNavigation()
 
   const goToGroupPosts = () => {
-    console.log(item);
+    console.log(item)
     navigation.navigate("Challenge", {
       channel: item.id,
       open: item.open,
-      winner: item.winner,
-    });
-  };
+      winner: item.winner
+    })
+  }
 
   return (
     <TouchableOpacity
@@ -28,13 +28,13 @@ export default function ListChallengeItem({ item, matchingname }) {
           shadowColor: "#000",
           shadowOffset: {
             width: 0,
-            height: 1,
+            height: 1
           },
           shadowOpacity: 0.18,
           shadowRadius: 1.0,
 
-          elevation: 1,
-        },
+          elevation: 1
+        }
       ]}
       onPress={goToGroupPosts}
     >
@@ -45,17 +45,17 @@ export default function ListChallengeItem({ item, matchingname }) {
           name="account-group"
           style={{ marginLeft: 20 }}
           color={item.open ? "black" : "#a9efe0"}
-          size={30} //include end date in the challenge description, have an autoclose/winner function as a lambda trigger
+          size={30} // include end date in the challenge description, have an autoclose/winner function as a lambda trigger
         />
         <Text
           style={{
             marginLeft: 20,
-            fontSize: 16,
+            fontSize: 16
           }}
         >
           {item.name}
         </Text>
       </View>
     </TouchableOpacity>
-  );
+  )
 }

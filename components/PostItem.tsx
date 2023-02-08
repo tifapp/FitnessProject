@@ -1,7 +1,7 @@
-import API, { graphqlOperation } from "@aws-amplify/api";
-import { APIListOperations } from "@components/APIList";
-import { deletePost, updatePost } from "@graphql/mutations";
-import React, { useRef, useState } from "react";
+import API, { graphqlOperation } from "@aws-amplify/api"
+import { APIListOperations } from "@components/APIList"
+import { deletePost, updatePost } from "@graphql/mutations"
+import React, { useRef, useState } from "react"
 import {
   Alert,
   Dimensions,
@@ -10,43 +10,43 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
-} from "react-native";
-import { Post } from "src/models";
-import IconButton from "./common/IconButton";
-import Modal, { ModalRefType } from "./common/Modal";
-import CommentsModal from "./postComponents/CommentsModal";
-import LikesModal from "./postComponents/LikesModal";
-import PostHeader from "./postComponents/PostHeader";
-import PostImage from "./PostImage";
-import { ProfileImageAndName } from "./ProfileImageAndName";
-import TextWithTaggedUsers from "./TextWithTaggedUsers";
+  View
+} from "react-native"
+import { Post } from "src/models"
+import IconButton from "./common/IconButton"
+import Modal, { ModalRefType } from "./common/Modal"
+import CommentsModal from "./postComponents/CommentsModal"
+import LikesModal from "./postComponents/LikesModal"
+import PostHeader from "./postComponents/PostHeader"
+import PostImage from "./PostImage"
+import { ProfileImageAndName } from "./ProfileImageAndName"
+import TextWithTaggedUsers from "./TextWithTaggedUsers"
 
 const updatePostAWS = async (createdAt: string, editedText: string) => {
   try {
     await API.graphql(
       graphqlOperation(updatePost, {
-        input: { createdAt: createdAt, description: editedText },
+        input: { createdAt, description: editedText }
       })
-    );
-    console.log("success in updating a post");
+    )
+    console.log("success in updating a post")
   } catch (err) {
-    console.warn("error in updating post: ", err);
+    console.warn("error in updating post: ", err)
   }
-};
+}
 
 const deletePostAWS = async (createdAt: string) => {
   try {
     await API.graphql(
       graphqlOperation(deletePost, {
-        input: { createdAt: createdAt, userId: globalThis.myId },
+        input: { createdAt, userId: globalThis.myId }
       })
-    );
-    console.log("success in deleting a post");
+    )
+    console.log("success in deleting a post")
   } catch {
-    console.log("error in deleting post: ");
+    console.log("error in deleting post: ")
   }
-};
+}
 
 interface Props {
   item: Post & { taggedUsers?: string[]; likedByYou?: boolean };
@@ -63,29 +63,29 @@ const PostItem = ({
   item,
   writtenByYou,
   replyButtonHandler,
-  //receiver,
-  //showTimestamp,
-  //newSection,
+  // receiver,
+  // showTimestamp,
+  // newSection,
   reportPost,
   isVisible,
   shouldSubscribe,
   likes,
-  //replies,
-  //index,
-  operations,
+  // replies,
+  // index,
+  operations
 }: Props) => {
-  const { removeItem, replaceItem } = operations;
-  const likesModalRef = useRef<ModalRefType>(null);
-  const repliesModalRef = useRef<ModalRefType>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedText, setEditedText] = useState("");
+  const { removeItem, replaceItem } = operations
+  const likesModalRef = useRef<ModalRefType>(null)
+  const repliesModalRef = useRef<ModalRefType>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editedText, setEditedText] = useState("")
 
   return (
     <View style={styles.secondaryContainerStyle}>
       <View
         style={[
           styles.spaceAround,
-          replyButtonHandler ? {} : styles.nestedReply,
+          replyButtonHandler ? {} : styles.nestedReply
         ]}
       >
         <PostHeader
@@ -93,7 +93,7 @@ const PostItem = ({
           writtenByYou={writtenByYou}
           toggleEditing={() => setIsEditing(!isEditing)}
           repliesPressed={() => {
-            repliesModalRef.current?.showModal();
+            repliesModalRef.current?.showModal()
           }}
           reportPost={reportPost}
           shouldSubscribe={shouldSubscribe}
@@ -105,7 +105,7 @@ const PostItem = ({
             width: Dimensions.get("window").width,
             height: Dimensions.get("window").width,
             alignSelf: "center",
-            marginBottom: 15,
+            marginBottom: 15
           }}
           filename={item.imageURL}
           isVisible={
@@ -118,10 +118,11 @@ const PostItem = ({
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
-            minHeight: writtenByYou ? 70 : 35,
+            minHeight: writtenByYou ? 70 : 35
           }}
         >
-          {isEditing ? (
+          {isEditing
+            ? (
             <TextInput
               style={[styles.check, { borderColor: "orange" }]}
               onChangeText={setEditedText}
@@ -129,41 +130,47 @@ const PostItem = ({
             >
               {item.description}
             </TextInput>
-          ) : (
+              )
+            : (
             <TextWithTaggedUsers
               textInput={item.description}
               taggedUsers={item.taggedUsers}
               urlPreview={item.urlPreview}
             />
-          )}
+              )}
 
           <View
             style={{ flexDirection: "column", position: "absolute", right: 15 }}
           >
-            {!writtenByYou ? (
+            {!writtenByYou
+              ? (
               <IconButton
                 iconName={"report"}
                 size={20}
                 color={"gray"}
                 onPress={() => {
-                  removeItem(), reportPost(item.createdAt, item.userId);
+                  removeItem(), reportPost(item.createdAt, item.userId)
                 }}
               />
-            ) : null}
+                )
+              : null}
 
-            {writtenByYou ? (
+            {writtenByYou
+              ? (
               <IconButton
                 style={{ marginBottom: 10 }}
                 iconName={"delete-forever"}
                 size={20}
                 color={"gray"}
                 onPress={() => {
-                  removeItem(), deletePostAWS(item.createdAt);
+                  removeItem(), deletePostAWS(item.createdAt)
                 }}
               />
-            ) : null}
+                )
+              : null}
 
-            {writtenByYou ? (
+            {writtenByYou
+              ? (
               <IconButton
                 style={{ marginBottom: 15 }}
                 iconName={"edit"}
@@ -171,7 +178,8 @@ const PostItem = ({
                 color={"gray"}
                 onPress={() => setIsEditing(!isEditing)}
               />
-            ) : null}
+                )
+              : null}
           </View>
         </View>
 
@@ -238,7 +246,7 @@ const PostItem = ({
                 justifyContent: "flex-start",
                 flexDirection: "row",
                 marginLeft: 15,
-                marginRight: 5,
+                marginRight: 5
               }}
               imageSize={20}
               userId={item}
@@ -254,54 +262,58 @@ const PostItem = ({
         </Modal>
       </View>
 
-      {isEditing ? (
-        editedText === "" ? (
+      {isEditing
+        ? (
+            editedText === ""
+              ? (
           <TouchableOpacity
             style={styles.unselectedButtonStyle}
             onPress={() => {
-              Alert.alert("Post is empty!");
+              Alert.alert("Post is empty!")
             }}
           >
             <Text style={[styles.buttonTextStyle, { color: "gray" }]}>
               {"Edit Post"}
             </Text>
           </TouchableOpacity>
-        ) : (
+                )
+              : (
           <TouchableOpacity
             style={styles.buttonStyle}
             onPress={() => {
               replaceItem({ description: editedText }),
-                updatePostAWS(item.createdAt, editedText),
-                setEditedText(""),
-                setIsEditing(false);
+              updatePostAWS(item.createdAt, editedText),
+              setEditedText(""),
+              setIsEditing(false)
             }}
           >
             <Text style={styles.buttonTextStyle}>{"Edit Post"}</Text>
           </TouchableOpacity>
-        )
-      ) : null}
+                )
+          )
+        : null}
     </View>
-  );
-};
+  )
+}
 
-export default React.memo(PostItem);
+export default React.memo(PostItem)
 
 const styles = StyleSheet.create({
   secondaryContainerStyle: {
-    backgroundColor: "#a9efe0",
+    backgroundColor: "#a9efe0"
   },
   spaceAround: {
     paddingLeft: 0,
     paddingTop: 0,
     paddingRight: 0,
-    paddingBottom: 0,
+    paddingBottom: 0
   },
   check: {
     padding: 25,
     marginTop: 16,
     borderColor: "#bbb",
     borderWidth: 2,
-    borderStyle: "solid",
+    borderStyle: "solid"
   },
   unselectedButtonStyle: {
     borderWidth: 2,
@@ -310,7 +322,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     padding: 9,
     borderRadius: 5,
-    marginHorizontal: 10,
+    marginHorizontal: 10
   },
   buttonTextStyle: {
     color: "white",
@@ -318,14 +330,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 20,
     marginBottom: 2,
-    marginHorizontal: 6,
+    marginHorizontal: 6
   },
   buttonStyle: {
     alignSelf: "center",
     backgroundColor: "blue",
     padding: 10,
     borderRadius: 5,
-    marginHorizontal: 6,
+    marginHorizontal: 6
   },
   nestedReply: {
     marginBottom: 20,
@@ -333,11 +345,11 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 1
     },
     shadowOpacity: 0.18,
     shadowRadius: 1.0,
 
-    elevation: 1,
-  },
-});
+    elevation: 1
+  }
+})
