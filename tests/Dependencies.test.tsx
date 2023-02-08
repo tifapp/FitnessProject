@@ -1,39 +1,56 @@
-import {
-  DependenciesProvider,
-  DependencyValues,
-  TransformDependencies,
-  useDependencies,
-} from "../lib/Dependencies";
-import { renderHook } from "@testing-library/react-native";
-import { ReactNode } from "react";
+import { createDependencyKey, DependencyValues } from "@lib/Dependencies";
 
-interface TestDependencyValues extends DependencyValues {
-  testNum: number;
-}
+describe("DependencyValues tests", () => {
+  it("creates a dependency key's default value on first access", () => {
+    const values = new DependencyValues();
+    const key = createDependencyKey(() => 1);
+    expect(values.get(key)).toEqual(1);
+  });
 
-describe("Dependencies tests", () => {
-  it("should be able to map dependencies to a child context", () => {
-    const wrapper = (children: ReactNode) => {
-      // NB: Idk why, but for some reason renderHook passes in the child object with
-      // a children key (eg. { children: { child stuff } } instead of { child stuff }
-      // like in normal cases), so we'll get the actual children with a little hack...
-      const actualChildren = (children as any).children;
-      return (
-        <DependenciesProvider values={{ testNum: 1 }}>
-          <TransformDependencies
-            transform={(deps: TestDependencyValues) => ({
-              ...deps,
-              testNum: deps.testNum + 1,
-            })}
-          >
-            {actualChildren}
-          </TransformDependencies>
-        </DependenciesProvider>
-      );
-    };
+  it("caches the default value for a dependency key on first access", () => {
+    const values = new DependencyValues();
+    const key = createDependencyKey(jest.fn().mockReturnValue(1));
+    values.get(key); // NB: this call should cache the default value from the key
+    const value2 = values.get(key);
 
-    const { result } = renderHook(useDependencies, { wrapper });
-    const mappedTestNum = (result.current as TestDependencyValues).testNum;
-    expect(mappedTestNum).toEqual(2);
+    expect(value2).toEqual(1);
+    expect(key.createDefaultValue).toHaveBeenCalledTimes(1);
+  });
+
+  it("throws when retrieving dependency with no default value creation and no cached value", () => {
+    const values = new DependencyValues();
+    const key = createDependencyKey();
+    expect(() => values.get(key)).toThrow();
+  });
+
+  it("allows a dependency key default value to be initialzed from another dependency", () => {
+    const key1 = createDependencyKey(() => 1);
+    const key2 = createDependencyKey((values) => values.get(key1) + 1);
+    const values = new DependencyValues();
+    expect(values.get(key2)).toEqual(2);
+  });
+
+  it("uses the preset value instead of the key default value", () => {
+    const key = createDependencyKey<number>(() => 2);
+    const values = new DependencyValues();
+    values.set(key, 1);
+    expect(values.get(key)).toEqual(1);
+  });
+
+  it("uses the preset value when a dependency key has not default value creation", () => {
+    const key = createDependencyKey<number>();
+    const values = new DependencyValues();
+    values.set(key, 1);
+    expect(values.get(key)).toEqual(1);
+  });
+
+  it("can create copies of itself", () => {
+    const key = createDependencyKey<number>();
+    const originalValues = new DependencyValues();
+    const newValues = DependencyValues.copyFrom(originalValues);
+    newValues.set(key, 1);
+
+    expect(newValues.get(key)).toEqual(1);
+    expect(() => originalValues.get(key)).toThrow();
   });
 });
