@@ -6,46 +6,53 @@ const ActivitiesScreen = () => {
   function signOut() {
     const title = "Are you sure you want to sign out?";
     const message = "";
-    Alert.alert(title, message, [
-      {
-        text: "Yes",
-        onPress: () => {
-          Auth.signOut();
-        },
-      }, //if submithandler fails user won't know
-      { text: "Cancel", style: "cancel" },
-    ], { cancelable: true });
+    Alert.alert(
+      title,
+      message,
+      [
+        {
+          text: "Yes",
+          onPress: () => {
+            Auth.signOut();
+          },
+        }, //if submithandler fails user won't know
+        { text: "Cancel", style: "cancel" },
+      ],
+      { cancelable: true }
+    );
   }
 
   return (
-  <View style={{
-    flex:1,
-    justifyContent: "center",
-    alignItems: "center"
-    }}>
-    <TouchableOpacity onPress={signOut}>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <TouchableOpacity onPress={signOut}>
+        <Text
+          style={{
+            fontSize: 15,
+            margin: 20,
+          }}
+        >
+          Log Out
+        </Text>
+      </TouchableOpacity>
+
       <Text
-        style={{
-          fontSize: 15,
-          margin: 20,
-        }}
-      >
-        Log Out
-      </Text>
-    </TouchableOpacity>
-    
-    <Text
         style={{
           alignItems: "center",
           justifyContent: "center",
           color: "black",
           fontWeight: "bold",
-          fontSize: 15
+          fontSize: 15,
         }}
       >
         SandBox to get started
       </Text>
-  </View>
+    </View>
   );
 };
 

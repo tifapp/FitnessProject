@@ -1,14 +1,11 @@
 //aws
 import API, { GraphQLQuery } from "@aws-amplify/api";
-import {
-  Amplify,
-  Auth,
-  Cache,
-  graphqlOperation,
-  Storage
-} from "aws-amplify";
+import { Amplify, Auth, Cache, graphqlOperation, Storage } from "aws-amplify";
 import { withAuthenticator } from "aws-amplify-react-native";
 import awsconfig from "./src/aws-exports";
+
+import { UserPosts, UserPostsProvider } from "@lib/posts";
+import { AmplifyGraphQLOperations } from "@lib/GraphQLOperations";
 
 //graphql
 import { updateUser } from "@graphql/mutations.js";
@@ -20,7 +17,10 @@ import { headerOptions } from "@components/headerComponents/headerOptions";
 
 //navigation
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createDrawerNavigator, DrawerNavigationOptions } from "@react-navigation/drawer";
+import {
+  createDrawerNavigator,
+  DrawerNavigationOptions,
+} from "@react-navigation/drawer";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import ChallengeStack from "@screens/adminScreens/ChallengeStack";
@@ -48,9 +48,10 @@ import {
   Alert,
   AppState,
   AppStateStatus,
-  Platform, UIManager,
+  Platform,
+  UIManager,
   useWindowDimensions,
-  View
+  View,
 } from "react-native";
 
 if (
@@ -89,6 +90,12 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 
+// TODO: - One day, we may get this under test...
+
+const graphqlOperations = new AmplifyGraphQLOperations();
+const userNotifications = new ExpoUserNotifications();
+const linkingConfig = makeLinkingConfig({ userNotifications });
+
 const App = () => {
   //Text.defaultProps = Text.defaultProps || {}
   //Text.defaultProps.style =  { fontFamily: 'Helvetica', fontSize: 15, fontWeight: 'normal' }
@@ -101,6 +108,7 @@ const App = () => {
   const [isDeveloper, setIsDeveloper] = useState<boolean>(false);
 
   const [conversationIds, setConversationIds] = useState<string[]>([]);
+  const [userPosts, setUserPosts] = useState<UserPosts | undefined>();
 
   globalThis.addConversationIds = (id) => {
     //console("(((((((((((((((((((((((((((((((((");
@@ -124,7 +132,8 @@ const App = () => {
   const checkIfUserSignedUp = async () => {
     try {
       const query = await Auth.currentAuthenticatedUser();
-      const groups = query?.signInUserSession?.idToken?.payload?.["cognito:groups"];
+      const groups =
+        query?.signInUserSession?.idToken?.payload?.["cognito:groups"];
       if (groups) {
         if (groups.includes("Admins")) {
           setIsAdmin(true);
@@ -136,12 +145,14 @@ const App = () => {
       setUserId(query.attributes.sub);
 
       globalThis.myId = query.attributes.sub;
-      const user = await API.graphql<GraphQLQuery<{getUser: User}>> (
+      const user = await API.graphql<GraphQLQuery<{ getUser: User }>>(
         graphqlOperation(getUser, { id: query.attributes.sub })
       );
       if (user.data?.getUser == null) {
         setIsNewUser(true);
       }
+
+      setUserPosts(new GraphQLUserPosts(globalThis.myId, graphqlOperations));
 
       //console("success, user is ", user);
     } catch (err) {
@@ -188,7 +199,10 @@ const App = () => {
   };
 
   useEffect(() => {
-    const appStateSubscription = AppState.addEventListener("change", _handleAppStateChange);
+    const appStateSubscription = AppState.addEventListener(
+      "change",
+      _handleAppStateChange
+    );
     checkIfUserSignedUp();
 
     return () => {
@@ -222,7 +236,7 @@ const App = () => {
 
   const dimensions = useWindowDimensions();
 
-  if (userId == "checking...") {
+  if (userId == "checking..." || !userPosts) {
     return (
       <View style={{ flex: 1, backgroundColor: "#a9efe0" }}>
         <ActivityIndicator
@@ -288,76 +302,57 @@ const App = () => {
         <Stack.Navigator>
           <Stack.Screen
             name="Activities Screen"
-            component={
-              ActivitiesScreen
-            }
-            options={
-              {
-                headerShown: false,
-              }
-            }
+            component={ActivitiesScreen}
+            options={{
+              headerShown: false,
+            }}
           />
         </Stack.Navigator>
       </NavigationContainer>
     );
   } else {
     return (
-      <NavigationContainer>
-        <StatusBar style="dark" />
-        <Drawer.Navigator
-          drawerPosition={"right"}
-          drawerStyle={{ width: dimensions.width }}
-          drawerContentOptions={{
-            itemStyle: { marginVertical: 5 },
-          }}
-          backBehavior="initialRoute"
-          edgeWidth={100}
-          initialRouteName="MainTabs"
-          drawerContent={(props) => (
-            <CustomSidebarMenu {...props} />
-          )}
-          screenOptions={headerOptions as DrawerNavigationOptions}
-        >
-          <Drawer.Screen
-            name="Feed"
-            component={MainStack}
-            initialParams={{ fromLookup: false }}
-            options={{ headerShown: false }}
-          />
-          <Drawer.Screen
-            name="Profile"
-            component={ProfileScreen}
-          />
-          <Drawer.Screen
-            name="Verification"
-            component={VerificationScreen}
-          />
-          <Drawer.Screen
-            name="Friends"
-            component={FriendScreen}
-          />
-          <Drawer.Screen
-            name="Conversations"
-            component={ConversationScreen}
-          />
-          <Drawer.Screen
-            name="Settings"
-            component={SettingsStack}
-          />
-          <Drawer.Screen
-            name="Image"
-            component={ImageScreen}
-          />
-          {conversationIds.map((conversationId) => (
+      <UserPostsProvider posts={userPosts}>
+        <NavigationContainer linking={linkingConfig}>
+          <StatusBar style="dark" />
+          <Drawer.Navigator
+            drawerPosition={"right"}
+            drawerStyle={{ width: dimensions.width }}
+            drawerContentOptions={{
+              itemStyle: { marginVertical: 5 },
+            }}
+            backBehavior="initialRoute"
+            edgeWidth={100}
+            initialRouteName="MainTabs"
+            drawerContent={(props) => <CustomSidebarMenu {...props} />}
+            screenOptions={headerOptions as DrawerNavigationOptions}
+          >
             <Drawer.Screen
-              key={conversationId}
-              name={conversationId}
-              component={MessageScreen}
-              initialParams={{ conversationId }}
+              name="Feed"
+              component={MainStack}
+              initialParams={{ fromLookup: false }}
+              options={{ headerShown: false }}
             />
-          ))}
-        </Drawer.Navigator>
-      </NavigationContainer>
+            <Drawer.Screen name="Profile" component={ProfileScreen} />
+            <Drawer.Screen name="Verification" component={VerificationScreen} />
+            <Drawer.Screen name="Friends" component={FriendScreen} />
+            <Drawer.Screen
+              name="Conversations"
+              component={ConversationScreen}
+            />
+            <Drawer.Screen name="Settings" component={SettingsStack} />
+            <Drawer.Screen name="Image" component={ImageScreen} />
+            {conversationIds.map((conversationId) => (
+              <Drawer.Screen
+                key={conversationId}
+                name={conversationId}
+                component={MessageScreen}
+                initialParams={{ conversationId }}
+              />
+            ))}
+          </Drawer.Navigator>
+        </NavigationContainer>
+      </UserPostsProvider>
     );
   }
 };
@@ -372,6 +367,9 @@ import SignIn from "@components/loginComponents/SignIn";
 import SignUp from "@components/loginComponents/SignUp";
 import VerifyContact from "@components/loginComponents/VerifyContact";
 import ActivitiesScreen from "@screens/ActivitiesScreen";
+import { ExpoUserNotifications } from "@lib/UserNotifications";
+import { makeLinkingConfig } from "@lib/linkingConfig";
+import { GraphQLUserPosts } from "@lib/posts/UserPosts";
 
 export default withAuthenticator(App, false, [
   <Greetings />,

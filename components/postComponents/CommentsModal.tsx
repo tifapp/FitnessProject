@@ -1,7 +1,6 @@
 import { APIListOperations } from "@components/APIList";
 import PostItem from "@components/PostItem";
 import SHA256 from "@hooks/hash";
-import { useNavigation } from "@react-navigation/native";
 import FeedScreen from "@screens/FeedScreen";
 import React from "react";
 import { View } from "react-native";
@@ -14,8 +13,7 @@ interface Props {
   operations: APIListOperations<Post>;
 }
 
-export default function CommentsModal({ item, operations } : Props) {
-  const navigation = useNavigation();
+export default function CommentsModal({ item, operations }: Props) {
   return (
     <>
       <ElevatedView
@@ -48,19 +46,27 @@ export default function CommentsModal({ item, operations } : Props) {
         </View>
       </ElevatedView>
       <FeedScreen
-        headerComponent={<PostItem
-          item={item}
-          operations={operations}
-          //deletePostsAsync={deletePostsAsync}
-          writtenByYou={item.userId === globalThis.myId}
-          //editButtonHandler={updatePostAsync} deleting a post while on the reply screen?
-          //replyButtonHandler={() => {
-          //setAreRepliesVisible(false);
-          //}}
-          isVisible={false}
-          shouldSubscribe={true} likes={0} reportPost={function (timestamp: string, author: string): Promise<any> {
-            throw new Error("Function not implemented.");
-          } } />}
+        headerComponent={
+          <PostItem
+            item={item}
+            operations={operations}
+            //deletePostsAsync={deletePostsAsync}
+            writtenByYou={item.userId === globalThis.myId}
+            //editButtonHandler={updatePostAsync} deleting a post while on the reply screen?
+            //replyButtonHandler={() => {
+            //setAreRepliesVisible(false);
+            //}}
+            isVisible={false}
+            shouldSubscribe={true}
+            likes={0}
+            reportPost={function (
+              timestamp: string,
+              author: string
+            ): Promise<any> {
+              throw new Error("Function not implemented.");
+            }}
+          />
+        }
         autoFocus={true}
         channel={SHA256(item.userId + item.createdAt)} //unique id
         originalParentId={item.createdAt + "#" + item.userId}
@@ -69,7 +75,9 @@ export default function CommentsModal({ item, operations } : Props) {
         style={undefined}
         postButtonLabel={undefined}
         renderItem={undefined}
-        onPostAdded={undefined} data={undefined}      />
+        onPostAdded={undefined}
+        data={undefined}
+      />
     </>
   );
 }
