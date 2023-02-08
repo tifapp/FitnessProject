@@ -1,13 +1,13 @@
-import { AntDesign, Entypo } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
-import React from "react";
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { AntDesign, Entypo } from "@expo/vector-icons"
+import { Picker } from "@react-native-picker/picker"
+import React from "react"
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 
-export default function PrivacySettings({
+export default function PrivacySettings ({
   setPrivacy,
   privacyVal,
   modalOpen,
-  setModalOpen,
+  setModalOpen
 }) {
   return (
     <View>
@@ -35,7 +35,7 @@ export default function PrivacySettings({
         </TouchableOpacity>
       </View>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -45,10 +45,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     borderBottomWidth: 1,
     paddingTop: 30,
-    paddingBottom: 15,
+    paddingBottom: 15
   },
   privacyformat: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 8
   },
   exitbutton: {
     marginBottom: 10,
@@ -57,6 +57,6 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderBottomWidth: 1,
     paddingTop: 15,
-    paddingBottom: 15,
-  },
-});
+    paddingBottom: 15
+  }
+})

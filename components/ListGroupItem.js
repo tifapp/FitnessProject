@@ -1,18 +1,18 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons"
+import { useNavigation } from "@react-navigation/native"
+import React from "react"
+import { Text, TouchableOpacity, View } from "react-native"
 
-export default function ListGroupItem({ item, matchingname }) {
-  const navigation = useNavigation();
+export default function ListGroupItem ({ item, matchingname }) {
+  const navigation = useNavigation()
 
   const goToGroupPosts = () => {
-    console.log(item);
+    console.log(item)
     navigation.navigate("Group Posts Screen", {
       group: item,
-      channel: item.id,
-    });
-  };
+      channel: item.id
+    })
+  }
 
   if (item.Privacy == "Public") {
     return (
@@ -28,13 +28,13 @@ export default function ListGroupItem({ item, matchingname }) {
             shadowColor: "#000",
             shadowOffset: {
               width: 0,
-              height: 1,
+              height: 1
             },
             shadowOpacity: 0.18,
             shadowRadius: 1.0,
 
-            elevation: 1,
-          },
+            elevation: 1
+          }
         ]}
         onPress={goToGroupPosts}
       >
@@ -50,29 +50,31 @@ export default function ListGroupItem({ item, matchingname }) {
           <Text
             style={{
               marginLeft: 20,
-              fontSize: 16,
+              fontSize: 16
             }}
           >
             {item.name}
           </Text>
         </View>
-        {item.Description.length > 0 ? (
+        {item.Description.length > 0
+          ? (
           <Text
             style={{
               paddingTop: 7,
               paddingBottom: 15,
               marginLeft: 20,
               marginRight: 20,
-              fontSize: 12,
+              fontSize: 12
             }}
             numberOfLines={1}
           >
             "{item.Description}"
           </Text>
-        ) : null}
+            )
+          : null}
       </TouchableOpacity>
-    );
+    )
   } else {
-    return null;
+    return null
   }
 }

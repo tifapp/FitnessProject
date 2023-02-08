@@ -1,4 +1,4 @@
-/*import React, { useState, useRef } from "react";
+/* import React, { useState, useRef } from "react";
 import { View, Text } from "react-native";
 import MapView, { Circle } from "react-native-maps";
 
@@ -18,7 +18,7 @@ const userArea = {
         latitude:
         longitude:
         latitudeDelta:
-        longitudeDelta: 
+        longitudeDelta:
 };
 
 type Camera = {
@@ -38,7 +38,7 @@ Plan: Needs to be fully zoomed out, to some degree
       Want: Can't zoom out anymore, can be zoomed in
         Set a maximum zoom level, set to max zoomed out
         Can only zoom in, and zoom out if already zoomed in
-      At any point of zooming in, can be zoomed out fully with a button that appears 
+      At any point of zooming in, can be zoomed out fully with a button that appears
         In order to make this work, have an "initial zoom level" that's set at some point
         Only allow zooms to be smaller than it, and when they are, make button appear
         Button will set zoom to default level
@@ -50,7 +50,7 @@ Plan: Needs to be fully zoomed out, to some degree
       Getting userLocation would work, but would probably want to have marker for current location? Not sure. showsUserLocation might need to be on
         If follows, then add in stuff where there's a certain "box" of the map that's visible
         Find the maximum of the map, showing visible
-      Refresh map button might be useful. showsMyLocationButton might want to exist to be able 
+      Refresh map button might be useful. showsMyLocationButton might want to exist to be able
         Alternate: onRegionChangeComplete event data to refresh events that are shown when moving
       Cannot implement "limit" to the map, using react-native-maps
         Can however, implement onPanDrag to check if they drag to a certain part that's too far
@@ -58,14 +58,12 @@ Plan: Needs to be fully zoomed out, to some degree
             Refresh map to user location (might seem like error? prolly insert a brief text blurb)
             Refresh map to nearby the border (might be confusing)
 
-
-
 export default MapComponent(){
     return (
     <View>
 
     ------  MAP VIEW GOES DOWN HERE ---------
-        <MapView 
+        <MapView
             ref={mapRef}
             initialRegion={userArea}
             provider="google"
@@ -76,15 +74,13 @@ export default MapComponent(){
         Events are a different kind of type from posts
 
         Create a fake EventFeed elsewhere to supply information regarding events, that I would fetch
-        Allows for testing grabbing the info 
-        grab LatLngs, make them into circles 
+        Allows for testing grabbing the info
+        grab LatLngs, make them into circles
 
         FOR NOW, PUT TEST DATA
-        <Circle center={Lat} 
-
+        <Circle center={Lat}
 
         <MapView />
-
 
     ------  MAP VIEW ENDS FROM HERE ---------
 
@@ -95,80 +91,80 @@ export default MapComponent(){
 
  */
 
-import React from "react";
-import { Dimensions, StyleSheet, View } from "react-native";
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import React from "react"
+import { Dimensions, StyleSheet, View } from "react-native"
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
 
-//Height information: Gets how tall/wide the device in use is
-const deviceHeight= Dimensions.get("window").height
-const deviceWidth= Dimensions.get("window").width
+// Height information: Gets how tall/wide the device in use is
+const deviceHeight = Dimensions.get("window").height
+const deviceWidth = Dimensions.get("window").width
 
-//Placeholder data to figure out how markers work; objects seem to work
-const state = { markers: [
-  {
-    "key": 1,
-    "place": "Place one",
-    "lat": 34.079761,
-    "lng": -118.296802,
-  },
-  {
-    "key": 2,
-    "place": "Place two",
-    "lat": 34.039761,
-    "lng": -118.256802,
-  },
-]
+// Placeholder data to figure out how markers work; objects seem to work
+const state = {
+  markers: [
+    {
+      key: 1,
+      place: "Place one",
+      lat: 34.079761,
+      lng: -118.296802
+    },
+    {
+      key: 2,
+      place: "Place two",
+      lat: 34.039761,
+      lng: -118.256802
+    }
+  ]
 }
 
-//IDK PUT THE LOCATION YOU FETCH FROM THE LOCATION SERVICES HERE? Might be different, could just be placeholder
+// IDK PUT THE LOCATION YOU FETCH FROM THE LOCATION SERVICES HERE? Might be different, could just be placeholder
 const area = {
-    latitude: 34.059761,
-    longitude: -118.276802,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
-};
+  latitude: 34.059761,
+  longitude: -118.276802,
+  latitudeDelta: 0.0922,
+  longitudeDelta: 0.0421
+}
 
-//Function to use map in order to go through objects and use information from them, for marker locations/information
+// Function to use map in order to go through objects and use information from them, for marker locations/information
 const mapMarkerCreations = () => {
-  return state.markers.map((report) => 
-  <Marker 
+  return state.markers.map((report) =>
+  <Marker
   key = {report.key}
   title = {report.place}
-  coordinate = {{ latitude: report.lat, longitude: report.lng}}
+  coordinate = {{ latitude: report.lat, longitude: report.lng }}
   >
   </Marker >)
 }
-  
-//Map view component itself
-function MapComponent () {
 
+// Map view component itself
+function MapComponent () {
   return (
     <View style={styles.container}>
-      <MapView 
+      <MapView
           style={styles.map}
           provider={PROVIDER_GOOGLE}
-          region={area}   
+          region={area}
           rotateEnabled={false}
           scrollEnabled={false}
       >
       {mapMarkerCreations()}
       </MapView>
     </View>
-  );
+  )
 }
 
 //
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
-    height: deviceHeight-360,
+    height: deviceHeight - 360,
     width: deviceWidth,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
+    justifyContent: "flex-start",
+    alignItems: "center"
   },
   map: {
-    ...StyleSheet.absoluteFillObject,
-  },
- });
+    ...StyleSheet.absoluteFillObject
+  }
+})
 
-export default MapComponent;
+export default MapComponent

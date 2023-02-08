@@ -1,10 +1,10 @@
-import Accordion from "@components/Accordion";
-import IconButton from "@components/common/IconButton";
-import { deleteUser } from "@graphql/mutations";
-import { useNavigation } from "@react-navigation/native";
-import PrivacyScreen from "@screens/PrivacyScreen";
-import { API, Auth, graphqlOperation, Storage } from "aws-amplify";
-import React, { useState } from "react";
+import Accordion from "@components/Accordion"
+import IconButton from "@components/common/IconButton"
+import { deleteUser } from "@graphql/mutations"
+import { useNavigation } from "@react-navigation/native"
+import PrivacyScreen from "@screens/PrivacyScreen"
+import { API, Auth, graphqlOperation, Storage } from "aws-amplify"
+import React, { useState } from "react"
 import {
   Alert,
   Modal,
@@ -12,33 +12,33 @@ import {
   TextInput,
   TouchableOpacity,
   View
-} from "react-native";
-import "react-native-gesture-handler";
+} from "react-native"
+import "react-native-gesture-handler"
 
-export default function Settings() {
-  const navigation = useNavigation();
+export default function Settings () {
+  const navigation = useNavigation()
 
   const deleteUserAsync = async () => {
     await API.graphql(
       graphqlOperation(deleteUser, { input: { id: globalThis.myId } })
-    );
+    )
 
     await Storage.remove("profileimage.jpg", { level: "protected" })
       .then((result) => console.log("removed profile image!", result))
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
 
-    const user = await Auth.currentAuthenticatedUser();
+    const user = await Auth.currentAuthenticatedUser()
 
-    await user.deleteUser();  //test this again: 10-17-22
+    await user.deleteUser() // test this again: 10-17-22
 
-    Auth.signOut();
+    Auth.signOut()
 
-    return "successfully deleted";
-  };
+    return "successfully deleted"
+  }
 
-  function deleteAccount() {
-    const title = "Are you sure you want to delete your account?";
-    const message = "";
+  function deleteAccount () {
+    const title = "Are you sure you want to delete your account?"
+    const message = ""
     const options = [
       {
         text: "Yes",
@@ -49,49 +49,49 @@ export default function Settings() {
             [
               {
                 text: "Yes",
-                onPress: deleteUserAsync,
-              }, //if submithandler fails user won't know
-              { text: "Cancel", style: "cancel" },
+                onPress: deleteUserAsync
+              }, // if submithandler fails user won't know
+              { text: "Cancel", style: "cancel" }
             ],
             { cancelable: true }
-          );
-        },
-      }, //if submithandler fails user won't know
-      { text: "Cancel", type: "cancel" },
-    ];
-    Alert.alert(title, message, options, { cancelable: true });
+          )
+        }
+      }, // if submithandler fails user won't know
+      { text: "Cancel", type: "cancel" }
+    ]
+    Alert.alert(title, message, options, { cancelable: true })
   }
 
-  function signOut() {
-    const title = "Are you sure you want to sign out?";
-    const message = "";
+  function signOut () {
+    const title = "Are you sure you want to sign out?"
+    const message = ""
     Alert.alert(title, message, [
       {
         text: "Yes",
         onPress: () => {
-          Auth.signOut();
-        },
-      }, //if submithandler fails user won't know
-      { text: "Cancel", style: "cancel" },
-    ], { cancelable: true });
+          Auth.signOut()
+        }
+      }, // if submithandler fails user won't know
+      { text: "Cancel", style: "cancel" }
+    ], { cancelable: true })
   }
 
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [oldPassword, setOldPassword] = useState<string>("");
-  const [newPassword, setNewPassword] = useState<string>("");
-  const [confirmNewPassword, setConfirmNewPassword] = useState<string>();
+  const [isOpen, setIsOpen] = useState<boolean>(false)
+  const [oldPassword, setOldPassword] = useState<string>("")
+  const [newPassword, setNewPassword] = useState<string>("")
+  const [confirmNewPassword, setConfirmNewPassword] = useState<string>()
 
-  async function changePassword() {
+  async function changePassword () {
     try {
-      const currentUser = await Auth.currentAuthenticatedUser();
+      const currentUser = await Auth.currentAuthenticatedUser()
       if (newPassword != confirmNewPassword) {
-        throw "Passwords don't match";
+        throw "Passwords don't match"
       }
-      await Auth.changePassword(currentUser, oldPassword, newPassword);
-      Alert.alert("Password changed successfully!");
-      setIsOpen(false);
+      await Auth.changePassword(currentUser, oldPassword, newPassword)
+      Alert.alert("Password changed successfully!")
+      setIsOpen(false)
     } catch (e) {
-      Alert.alert(e.message ? e.message : e);
+      Alert.alert(e.message ? e.message : e)
     }
   }
 
@@ -100,25 +100,25 @@ export default function Settings() {
       <PrivacyScreen />
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate("Block List");
+          navigation.navigate("Block List")
         }}
       >
         <Text
           style={{
             fontSize: 18,
-            margin: 20,
+            margin: 20
           }}
         >
           Block List
         </Text>
       </TouchableOpacity>
       <Accordion
-        headerText={"Account Actions"} //would be nice if we had a total friend request count. but then you'd be able to see when people revoke their friend requests.
+        headerText={"Account Actions"} // would be nice if we had a total friend request count. but then you'd be able to see when people revoke their friend requests.
         headerTextStyle={{
           fontSize: 18,
           color: "gray",
           textDecorationLine: "none",
-          marginLeft: 18,
+          marginLeft: 18
         }}
         openTextColor={"black"}
         iconColor={"gray"}
@@ -128,7 +128,7 @@ export default function Settings() {
           <Text
             style={{
               fontSize: 15,
-              margin: 20,
+              margin: 20
             }}
           >
             Log Out
@@ -138,7 +138,7 @@ export default function Settings() {
           <Text
             style={{
               fontSize: 15,
-              margin: 20,
+              margin: 20
             }}
           >
             Change Password
@@ -148,7 +148,7 @@ export default function Settings() {
           <Text
             style={{
               fontSize: 15,
-              margin: 20,
+              margin: 20
             }}
           >
             Delete Account
@@ -161,7 +161,7 @@ export default function Settings() {
         statusBarTranslucent={true}
         visible={isOpen}
         onRequestClose={() => {
-          setIsOpen(false);
+          setIsOpen(false)
         }}
       >
         <TouchableOpacity
@@ -170,7 +170,7 @@ export default function Settings() {
             width: "100%",
             height: "100%",
             position: "absolute",
-            backgroundColor: "#00000033",
+            backgroundColor: "#00000033"
           }}
         ></TouchableOpacity>
         <View
@@ -181,7 +181,7 @@ export default function Settings() {
               height: 1,
               width: "100%",
               alignSelf: "center",
-              backgroundColor: "lightgray",
+              backgroundColor: "lightgray"
             }}
           ></View>
           <View
@@ -190,14 +190,14 @@ export default function Settings() {
               width: 25,
               height: 2,
               alignSelf: "center",
-              backgroundColor: "lightgray",
+              backgroundColor: "lightgray"
             }}
           ></View>
           <Text
             style={{
               fontSize: 15,
               margin: 20,
-              marginBottom: 0,
+              marginBottom: 0
             }}
           >
             Old Password
@@ -213,7 +213,7 @@ export default function Settings() {
             style={{
               fontSize: 15,
               margin: 20,
-              marginBottom: 0,
+              marginBottom: 0
             }}
           >
             New Password (at least eight characters)
@@ -229,7 +229,7 @@ export default function Settings() {
             style={{
               fontSize: 15,
               margin: 20,
-              marginBottom: 0,
+              marginBottom: 0
             }}
           >
             Confirm New Password
@@ -252,5 +252,5 @@ export default function Settings() {
         </View>
       </Modal>
     </View>
-  );
+  )
 }

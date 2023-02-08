@@ -1,17 +1,17 @@
-import LinkableText from "@components/LinkableText";
-import PostImage from "@components/PostImage";
-import printTime from "@hooks/printTime";
-import { useNavigation } from "@react-navigation/native";
-import falsey from "falsey";
-import React from "react";
+import LinkableText from "@components/LinkableText"
+import PostImage from "@components/PostImage"
+import printTime from "@hooks/printTime"
+import { useNavigation } from "@react-navigation/native"
+import falsey from "falsey"
+import React from "react"
 import {
   Dimensions,
   StyleSheet,
   Text,
   TouchableOpacity,
   View
-} from "react-native";
-import { Post } from "src/models";
+} from "react-native"
+import { Post } from "src/models"
 
 interface Props {
   item: Post,
@@ -19,19 +19,19 @@ interface Props {
   receiver: string
 }
 
-function MessageItem({
+function MessageItem ({
   item,
   writtenByYou,
   receiver
 } : Props) {
-  const isReceivedMessage = receiver != null && !writtenByYou;
-  const navigation = useNavigation();
+  const isReceivedMessage = receiver != null && !writtenByYou
+  const navigation = useNavigation()
 
   return (
     <View
       style={[
         styles.secondaryContainerStyle,
-        { backgroundColor: "#fff", marginTop: 21, marginHorizontal: 15 },
+        { backgroundColor: "#fff", marginTop: 21, marginHorizontal: 15 }
       ]}
     >
       <View
@@ -45,12 +45,12 @@ function MessageItem({
           shadowColor: "#000",
           shadowOffset: {
             width: 0,
-            height: 3,
+            height: 3
           },
           shadowOpacity: 0.27,
           shadowRadius: 4.65,
 
-          elevation: 6,
+          elevation: 6
         }}
       >
         <TouchableOpacity
@@ -63,7 +63,7 @@ function MessageItem({
               width: Dimensions.get("window").width / 2,
               height: Dimensions.get("window").width / 2,
               alignSelf: "center",
-              marginBottom: 15,
+              marginBottom: 15
             }}
             filename={item.imageURL}
             isVisible={false}
@@ -71,12 +71,12 @@ function MessageItem({
         </TouchableOpacity>
         <LinkableText
           style={{
-            alignSelf: isReceivedMessage ? "flex-start" : "flex-end",
+            alignSelf: isReceivedMessage ? "flex-start" : "flex-end"
           }}
           textStyle={{
-            paddingBottom: 15,
+            paddingBottom: 15
           }}
-          //urlPreview={urlPreview}
+          // urlPreview={urlPreview}
         >
           {item.description}
         </LinkableText>
@@ -85,19 +85,19 @@ function MessageItem({
         style={{
           color: isReceivedMessage ? "gray" : "#136351",
           textAlign: isReceivedMessage ? "left" : "right",
-          marginTop: 5,
+          marginTop: 5
         }}
       >
         {printTime(item.createdAt)}
       </Text>
     </View>
-  );
+  )
 }
 
-export default React.memo(MessageItem);
+export default React.memo(MessageItem)
 
 const styles = StyleSheet.create({
   secondaryContainerStyle: {
-    backgroundColor: "#fefefe",
-  },
-});
+    backgroundColor: "#fefefe"
+  }
+})
