@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useRef } from "react"
+import React, { ReactNode, useEffect, useRef } from "react"
 import Modal, { ModalRefType } from "@components/common/Modal"
 import UserPostReplyScreen from "./UserPostReplyScreen"
 
