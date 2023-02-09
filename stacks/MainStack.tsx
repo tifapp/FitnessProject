@@ -1,24 +1,24 @@
-import { headerOptions } from "@components/headerComponents/headerOptions";
+import { headerOptions } from "@components/headerComponents/headerOptions"
 import {
   createStackNavigator,
-  StackScreenProps,
-} from "@react-navigation/stack";
-import ChallengeListScreen from "@screens/ChallengeListScreen";
-import ChallengeScreen from "@screens/ChallengeScreen";
-import CreatingGroups from "@screens/CreatingGroups";
-import FeedScreen from "@screens/FeedScreen";
-import GroupPostsScreen from "@screens/GroupPostsScreen";
+  StackScreenProps
+} from "@react-navigation/stack"
+import ChallengeListScreen from "@screens/ChallengeListScreen"
+import ChallengeScreen from "@screens/ChallengeScreen"
+import CreatingGroups from "@screens/CreatingGroups"
+import FeedScreen from "@screens/FeedScreen"
+import GroupPostsScreen from "@screens/GroupPostsScreen"
 import HomeScreen, {
-  homeScreenViewedReplyFromRouteParams,
-} from "@screens/HomeScreen";
-import ImageScreen from "@screens/ImageScreen";
-import LookupUserScreen from "@screens/LookupUser";
-import SearchScreen from "@screens/SearchScreen";
-import React from "react";
-import "react-native-gesture-handler";
-import { Group } from "src/models";
+  homeScreenViewedReplyFromRouteParams
+} from "@screens/HomeScreen"
+import ImageScreen from "@screens/ImageScreen"
+import LookupUserScreen from "@screens/LookupUser"
+import SearchScreen from "@screens/SearchScreen"
+import React from "react"
+import "react-native-gesture-handler"
+import { Group } from "src/models"
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator()
 
 export enum MainScreenNames {
   HOME = "Home",
@@ -69,12 +69,12 @@ export type ChallengeFeedScreenRouteProps = StackScreenProps<
   MainScreenNames.CHALLENGE_FEED
 >["route"];
 
-export default function MainStack() {
+export default function MainStack () {
   return (
     <Stack.Navigator screenOptions={headerOptions}>
       <Stack.Screen name={MainScreenNames.HOME}>
         {(props) => {
-          console.log(props);
+          console.log(props)
           return (
             <HomeScreen
               viewedReply={homeScreenViewedReplyFromRouteParams(
@@ -82,7 +82,7 @@ export default function MainStack() {
               )}
               feedView={<FeedScreen {...props} channel={"general"} />}
             />
-          );
+          )
         }}
       </Stack.Screen>
       <Stack.Screen
@@ -108,5 +108,5 @@ export default function MainStack() {
         component={ChallengeListScreen}
       />
     </Stack.Navigator>
-  );
+  )
 }

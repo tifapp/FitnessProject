@@ -1,6 +1,6 @@
 export declare global {
-  var myId: string;
-  var localBlockList: Block[];
+  var myId: string
+  var localBlockList: Block[]
   function showNotificationDot() : void
   function hideNotificationDot() : void
   var addConversationIds: (_ : string) => void
@@ -11,6 +11,6 @@ export declare global {
     isFullSize?: boolean,
     status?: string | null,
     isVerified: boolean,
-  }>;
+  }>
   var addMyMessageToFriendsList: (_ : Post) => void
 }

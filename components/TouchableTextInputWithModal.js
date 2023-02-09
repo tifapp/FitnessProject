@@ -1,21 +1,21 @@
-import React, { useCallback, useState } from "react";
-import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
+import React, { useCallback, useState } from "react"
+import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native"
 
-//currently this is just used in the profile screen for the bio and goals descriptions
-//later we can make this a generic touchable that causes a transparent modal to appear at the bottom of the screen, and pass in the children from the parent
+// currently this is just used in the profile screen for the bio and goals descriptions
+// later we can make this a generic touchable that causes a transparent modal to appear at the bottom of the screen, and pass in the children from the parent
 
-export default function TouchableTextInputWithModal({
+export default function TouchableTextInputWithModal ({
   modalComponent,
   onEndEditing,
   label,
-  placeholder,
+  placeholder
 }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [textValue, setTextValue] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [textValue, setTextValue] = useState("")
 
   const showModal = useCallback(() => {
-    setIsModalOpen(true);
-  }, []);
+    setIsModalOpen(true)
+  }, [])
 
   return (
     <>
@@ -25,7 +25,7 @@ export default function TouchableTextInputWithModal({
           shadowColor: "#000",
           shadowOffset: {
             width: 0,
-            height: 1,
+            height: 1
           },
           shadowOpacity: 0.18,
           shadowRadius: 1.0,
@@ -34,7 +34,7 @@ export default function TouchableTextInputWithModal({
 
           elevation: 1,
           padding: 15,
-          flex: 0,
+          flex: 0
         }}
       >
         <Text style={{ fontSize: 18, color: "gray", marginBottom: 5 }}>
@@ -64,7 +64,7 @@ export default function TouchableTextInputWithModal({
               justifyContent: "center",
               backgroundColor: "white",
               alignItems: "flex-end",
-              marginTop: "auto",
+              marginTop: "auto"
             }}
           >
             {modalComponent}
@@ -72,5 +72,5 @@ export default function TouchableTextInputWithModal({
         </View>
       </Modal>
     </>
-  );
+  )
 }

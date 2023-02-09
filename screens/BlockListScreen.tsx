@@ -1,65 +1,65 @@
-import APIList, { APIListRefType } from "@components/APIList";
-import { ProfileImageAndName } from "@components/ProfileImageAndName";
-import { deleteBlock } from "@graphql/mutations";
-import { blocksByDate } from "@graphql/queries";
-import printTime from "@hooks/printTime";
-import { useNavigation } from "@react-navigation/native";
-import { API, graphqlOperation } from "aws-amplify";
-import React, { useEffect, useRef, useState } from "react";
+import APIList, { APIListRefType } from "@components/APIList"
+import { ProfileImageAndName } from "@components/ProfileImageAndName"
+import { deleteBlock } from "@graphql/mutations"
+import { blocksByDate } from "@graphql/queries"
+import printTime from "@hooks/printTime"
+import { useNavigation } from "@react-navigation/native"
+import { API, graphqlOperation } from "aws-amplify"
+import React, { useEffect, useRef, useState } from "react"
 import {
   Alert, StyleSheet,
   Text,
   TouchableOpacity,
   View
-} from "react-native";
-import { Block } from "src/models";
+} from "react-native"
+import { Block } from "src/models"
 
 const BlockListScreen = () => {
-  const navigation = useNavigation();
-  const listRef = useRef<APIListRefType<Block> | null>(null);
-  const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+  const navigation = useNavigation()
+  const listRef = useRef<APIListRefType<Block> | null>(null)
+  const [isOptionsOpen, setIsOptionsOpen] = useState(false)
 
   const alertOptions = {
     cancelable: true,
-    onDismiss: () => setIsOptionsOpen(false),
-  };
+    onDismiss: () => setIsOptionsOpen(false)
+  }
 
   const unblock = async (blockeeId: string) => {
-    const title = "Are you sure you want to unblock this friend?";
+    const title = "Are you sure you want to unblock this friend?"
     const options = [
       {
         text: "Yes",
         onPress: () => {
-          console.log("about to delete this user: ", blockeeId);
-          globalThis.localBlockList = listRef.current?.removeItem((item) => item.blockee === blockeeId) ?? [];
+          console.log("about to delete this user: ", blockeeId)
+          globalThis.localBlockList = listRef.current?.removeItem((item) => item.blockee === blockeeId) ?? []
           API.graphql(
             graphqlOperation(deleteBlock, {
-              input: { userId: globalThis.myId, blockee: blockeeId },
+              input: { userId: globalThis.myId, blockee: blockeeId }
             })
-          );
-        },
+          )
+        }
       },
       {
         text: "Cancel",
         type: "cancel",
         onPress: () => {
-          setIsOptionsOpen(false);
-        },
-      },
-    ];
-    Alert.alert(title, "", options, alertOptions);
-  };
+          setIsOptionsOpen(false)
+        }
+      }
+    ]
+    Alert.alert(title, "", options, alertOptions)
+  }
 
   useEffect(() => {
     const onFocus = navigation.addListener("focus", () => {
-      //console.log("got to settings", global.localBlockList);
-      //we just want to save a copy of the data
-      listRef.current?.replaceList([...global.localBlockList]);
-    });
+      // console.log("got to settings", global.localBlockList);
+      // we just want to save a copy of the data
+      listRef.current?.replaceList([...global.localBlockList])
+    })
 
     // Return the function to unsubscribe from the event so it gets removed on unmount
-    return onFocus;
-  }, [navigation]);
+    return onFocus
+  }, [navigation])
 
   return (
     <APIList
@@ -68,14 +68,14 @@ const BlockListScreen = () => {
       queryOperation={blocksByDate}
       queryOperationName={"blocksByDate"}
       ref={listRef}
-      renderItem={({ item }) => ( //needs API list template type
+      renderItem={({ item }) => ( // needs API list template type
         <View
           style={{
             flexDirection: "row",
             alignSelf: "flex-start",
             alignItems: "center",
             marginVertical: 5,
-            justifyContent: "space-evenly",
+            justifyContent: "space-evenly"
           }}
         >
           <ProfileImageAndName
@@ -88,7 +88,7 @@ const BlockListScreen = () => {
                   justifyContent: "flex-end",
                   alignItems: "flex-end",
                   flex: 1,
-                  marginHorizontal: 30,
+                  marginHorizontal: 30
                 }}
               >
                 <Text style={{ marginHorizontal: 16, color: "gray" }}>
@@ -99,8 +99,8 @@ const BlockListScreen = () => {
                   <Text>
                     unblock
                     {
-                      //then ask to verify the unblocking, like with friend requests
-                      //should disappear from the list when confirming, or just fade out? maybe jump to bottom with the option to reblock that person
+                      // then ask to verify the unblocking, like with friend requests
+                      // should disappear from the list when confirming, or just fade out? maybe jump to bottom with the option to reblock that person
                     }
                   </Text>
                 </TouchableOpacity>
@@ -117,20 +117,20 @@ const BlockListScreen = () => {
         justifyContent: "center",
         alignContent: "center",
         alignItems: "center",
-        alignSelf: "center",
+        alignSelf: "center"
       }}
-      keyExtractor={(item: Block) => item.blockee} //needs template type. see how tesla does it
+      keyExtractor={(item: Block) => item.blockee} // needs template type. see how tesla does it
       ListEmptyMessage={"You haven't blocked anyone."}
     />
-  );
-};
+  )
+}
 
-export default BlockListScreen;
+export default BlockListScreen
 
 const styles = StyleSheet.create({
   smallImageStyle: {
     resizeMode: "cover",
     height: 50,
-    width: 50,
-  },
-});
+    width: 50
+  }
+})

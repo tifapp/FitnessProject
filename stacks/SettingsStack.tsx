@@ -1,21 +1,21 @@
-import { createStackNavigator } from "@react-navigation/stack";
-import BlockListScreen from "@screens/BlockListScreen";
-import Settings from "@screens/SettingsScreen";
-import React from "react";
-import "react-native-gesture-handler";
+import { createStackNavigator } from "@react-navigation/stack"
+import BlockListScreen from "@screens/BlockListScreen"
+import Settings from "@screens/SettingsScreen"
+import React from "react"
+import "react-native-gesture-handler"
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator()
 
 export enum SettingsScreenNames {
   SETTINGS = "Settings",
   BLOCKLIST = "Block List",
 }
 
-export default function SettingsStack() {
+export default function SettingsStack () {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerShown: false,
+        headerShown: false
       }}
     >
       <Stack.Screen
@@ -28,5 +28,5 @@ export default function SettingsStack() {
         component={BlockListScreen}
       />
     </Stack.Navigator>
-  );
+  )
 }

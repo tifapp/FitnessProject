@@ -1,9 +1,9 @@
-import API, { GraphQLQuery } from "@aws-amplify/api";
-import ListGroupItem from "@components/ListGroupItem";
-import { listGroups } from "@graphql/queries";
-import { useNavigation } from "@react-navigation/native";
-import { graphqlOperation } from "aws-amplify";
-import React, { useEffect, useState } from "react";
+import API, { GraphQLQuery } from "@aws-amplify/api"
+import ListGroupItem from "@components/ListGroupItem"
+import { listGroups } from "@graphql/queries"
+import { useNavigation } from "@react-navigation/native"
+import { graphqlOperation } from "aws-amplify"
+import React, { useEffect, useState } from "react"
 import {
   FlatList,
   RefreshControl,
@@ -11,20 +11,20 @@ import {
   Text,
   TouchableOpacity,
   View
-} from "react-native";
-import { Group } from "src/models";
+} from "react-native"
+import { Group } from "src/models"
 
-export default function MyGroups() {
-  const {navigate} = useNavigation();
-  const [groups, setGroups] = useState<[Group]>();
-  const [refreshing, setRefreshing] = useState(false);
+export default function MyGroups () {
+  const { navigate } = useNavigation()
+  const [groups, setGroups] = useState<[Group]>()
+  const [refreshing, setRefreshing] = useState(false)
 
   const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-  }, []);
-  //const stateRef = useRef();
-  //const [query, setQuery] = useState("");
-  //console.log(id);
+    setRefreshing(true)
+  }, [])
+  // const stateRef = useRef();
+  // const [query, setQuery] = useState("");
+  // console.log(id);
 
   const showResultsAsync = async () => {
     try {
@@ -32,21 +32,21 @@ export default function MyGroups() {
         graphqlOperation(listGroups, {
           filter: {
             userID: {
-              eq: globalThis.myId,
-            },
-          },
+              eq: globalThis.myId
+            }
+          }
         })
-      );
-      setGroups(namematchresult.data?.listGroups.items);
+      )
+      setGroups(namematchresult.data?.listGroups.items)
     } catch (err) {
-      console.log("error: ", err);
+      console.log("error: ", err)
     }
-    setRefreshing(false);
-  };
+    setRefreshing(false)
+  }
 
   useEffect(() => {
-    showResultsAsync();
-  });
+    showResultsAsync()
+  })
 
   return (
     <View>
@@ -70,7 +70,7 @@ export default function MyGroups() {
         <Text style={styles.buttonTextStyle}>Create Group</Text>
       </TouchableOpacity>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -80,20 +80,20 @@ const styles = StyleSheet.create({
     backgroundColor: "coral",
     borderRadius: 5,
     marginHorizontal: 10,
-    marginTop: 10,
+    marginTop: 10
   },
   title: {
     textAlign: "center",
     color: "#fff",
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: "bold"
   },
   submitButton: {
     marginTop: 20,
     alignSelf: "center",
     backgroundColor: "orange",
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 5
   },
   buttonTextStyle: {
     color: "white",
@@ -101,6 +101,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 20,
     marginBottom: 2,
-    marginHorizontal: 6,
-  },
-});
+    marginHorizontal: 6
+  }
+})

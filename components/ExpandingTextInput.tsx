@@ -1,28 +1,24 @@
-import React from "react";
-import { TextInput, TextInputProps } from "react-native";
+import React from "react"
+import { TextInput, TextInputProps } from "react-native"
 
 interface Props extends TextInputProps {
 
 }
 
 class ExpandingTextInput extends React.Component<Props> {
-  private textInput : TextInput | null;
-  constructor(prop: Props) {
-    super(prop);
+  private textInput : TextInput | null
+  constructor (prop: Props) {
+    super(prop)
     this.state = {
-      height: 0,
-    };
+      height: 0
+    }
   }
 
-
-
-  
-
-  focus() {
-    this.textInput && this.textInput.focus();
+  focus () {
+    this.textInput && this.textInput.focus()
   }
 
-  render() {
+  render () {
     return (
       <TextInput
         {...this.props}
@@ -31,16 +27,16 @@ class ExpandingTextInput extends React.Component<Props> {
         onContentSizeChange={(event) => {
           if (event && event.nativeEvent && event.nativeEvent.contentSize) {
             this.setState({
-              height: event.nativeEvent.contentSize.height,
-            });
+              height: event.nativeEvent.contentSize.height
+            })
           }
           this.props.onContentSizeChange &&
-            this.props.onContentSizeChange(event);
+            this.props.onContentSizeChange(event)
         }}
         style={[this.props.style, { height: Math.max(35, this.state.height) }]}
       />
-    );
+    )
   }
 }
 
-export default ExpandingTextInput; 
+export default ExpandingTextInput
