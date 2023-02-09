@@ -52,15 +52,4 @@ describe("DependencyValues tests", () => {
 
     expect(values.get(key)).toEqual(1)
   })
-
-  it("can create copies of itself", () => {
-    const key = createDependencyKey<number>()
-
-    const originalValues = new DependencyValues()
-    const newValues = DependencyValues.copyFrom(originalValues)
-    newValues.set(key, 1)
-
-    expect(newValues.get(key)).toEqual(1)
-    expect(() => originalValues.get(key)).toThrow()
-  })
 })

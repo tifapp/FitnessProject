@@ -20,7 +20,7 @@ export interface UserPosts {
    *
    * @returns a mapping of post ids to a `UserPost`.
    */
-  postsWithIds: (ids: string[]) => Promise<Map<string, UserPost>>;
+  postsWithIds: (ids: string[]) => Promise<Map<string, UserPost>>
 }
 
 /**
@@ -122,10 +122,10 @@ export class GraphQLUserPosts implements UserPosts {
 
     const user = await this.operations.execute<{
       getUser: {
-        name: string;
-        status: string;
-        isVerified: boolean;
-      };
+        name: string
+        status: string
+        isVerified: boolean
+      }
     }>(getUser, { id: userId })
     const { name, status, isVerified } = user.getUser
 
@@ -139,6 +139,9 @@ export class GraphQLUserPosts implements UserPosts {
   }
 }
 
+/**
+ * A dependency key for a `UserPosts` instance.
+ */
 export const userPostsDependencyKey = createDependencyKey<UserPosts>(
   (values) => {
     return new GraphQLUserPosts(
