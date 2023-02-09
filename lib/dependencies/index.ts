@@ -1,5 +1,3 @@
-export { DependencyKey, createDependencyKey } from "./DependencyKey";
-export {
-  DependencyValues,
-  ImmutableDependencyValues,
-} from "./DependencyValues";
+export * from "./DependencyKey";
+export * from "./DependencyValues";
+export * from "./DependencyHooks";
