@@ -1,4 +1,5 @@
-import { ReactTestInstance } from "react-test-renderer";
+/* eslint-disable no-unused-vars */
+import { ReactTestInstance } from "react-test-renderer"
 
 interface CustomMatchers<R = unknown> {
   /**
@@ -16,16 +17,17 @@ declare global {
 }
 
 expect.extend({
-  toBeDisplayed(value: ReactTestInstance | null) {
+  toBeDisplayed (value: ReactTestInstance | null) {
     // TODO: - Better messages
-    if (!value)
+    if (!value) {
       return {
         pass: false,
-        message: () => "The component was not found on the screen.",
-      };
+        message: () => "The component was not found on the screen."
+      }
+    }
     return {
       pass: true,
-      message: () => "The component was found on the screen.",
-    };
-  },
-});
+      message: () => "The component was found on the screen."
+    }
+  }
+})
