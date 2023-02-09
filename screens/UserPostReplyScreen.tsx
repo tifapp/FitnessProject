@@ -1,20 +1,20 @@
-import Modal, { ModalRefType } from "@components/common/Modal";
-import CommentsModal from "@components/postComponents/CommentsModal";
-import UserPostView from "@components/postComponents/UserPostView";
+import Modal, { ModalRefType } from "@components/common/Modal"
+import CommentsModal from "@components/postComponents/CommentsModal"
+import UserPostView from "@components/postComponents/UserPostView"
 import React, {
   ComponentProps,
   ReactNode,
   useCallback,
   useEffect,
   useRef,
-  useState,
-} from "react";
-import { ActivityIndicator, ScrollView, Text, View } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { MaterialIcons } from "@expo/vector-icons";
-import { UserPost, userPostToPost } from "../lib/posts";
-import { useDependencyValue } from "../lib/dependencies";
-import { userPostsDependencyKey } from "../lib/posts/UserPosts";
+  useState
+} from "react"
+import { ActivityIndicator, ScrollView, Text, View } from "react-native"
+import { TouchableOpacity } from "react-native-gesture-handler"
+import { MaterialIcons } from "@expo/vector-icons"
+import { UserPost, userPostToPost } from "../lib/posts"
+import { useDependencyValue } from "../lib/dependencies"
+import { userPostsDependencyKey } from "../lib/posts/UserPosts"
 
 export type UserPostReplyScreenProps = {
   postId: string;
@@ -26,14 +26,14 @@ export type UserPostReplyScreenProps = {
 
 const renderUserPost = (post: UserPost, onDeleted?: () => void) => (
   <UserPostView post={post} onDeleted={() => onDeleted?.()} />
-);
+)
 
 const renderCommentsModal = (post: UserPost, onDeleted?: () => void) => (
   <CommentsModal
     item={userPostToPost(post)}
     operations={{ removeItem: () => onDeleted?.(), replaceItem: () => {} }}
   />
-);
+)
 
 /**
  * A screen to be shown when the user opens the app from a reply notification.
@@ -43,13 +43,13 @@ const UserPostReplyScreen = ({
   replyId,
   onDismiss,
   userPostView = renderUserPost,
-  fullRepliesView = renderCommentsModal,
+  fullRepliesView = renderCommentsModal
 }: UserPostReplyScreenProps) => {
   const { post, reply, isError, isLoading, retry } = usePostWithReply(
     postId,
     replyId
-  );
-  const modalRef = useRef<ModalRefType>(null);
+  )
+  const modalRef = useRef<ModalRefType>(null)
 
   if (isError) {
     return (
@@ -60,31 +60,36 @@ const UserPostReplyScreen = ({
         actionButtonBackgroundColor="#148df7"
         onActionButtonTapped={retry}
       />
-    );
+    )
   }
 
-  return isLoading ? (
+  return isLoading
+    ? (
     <ActivityIndicator accessibilityLabel="Loading..." />
-  ) : (
+      )
+    : (
     <View>
-      {post ? (
+      {post
+        ? (
         <ScrollView style={{ height: "100%" }}>
           {userPostView(post, onDismiss)}
-          {reply ? (
-            userPostView(reply)
-          ) : (
+          {reply
+            ? (
+                userPostView(reply)
+              )
+            : (
             <Text
               style={{
                 fontWeight: "bold",
                 color: "black",
                 backgroundColor: "white",
                 padding: 8,
-                marginBottom: 16,
+                marginBottom: 16
               }}
             >
               Reply not found.
             </Text>
-          )}
+              )}
           <TouchableOpacity
             onPress={() => modalRef.current?.showModal()}
             style={{
@@ -93,7 +98,7 @@ const UserPostReplyScreen = ({
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "space-between",
-              backgroundColor: "#148df7",
+              backgroundColor: "#148df7"
             }}
           >
             <View>
@@ -108,7 +113,8 @@ const UserPostReplyScreen = ({
           </TouchableOpacity>
           <Modal ref={modalRef}>{fullRepliesView(post)}</Modal>
         </ScrollView>
-      ) : (
+          )
+        : (
         <ErrorPrompt
           errorText="Post not found."
           actionText="Close"
@@ -116,10 +122,10 @@ const UserPostReplyScreen = ({
           actionButtonBackgroundColor="#e3492d"
           onActionButtonTapped={onDismiss}
         />
-      )}
+          )}
     </View>
-  );
-};
+      )
+}
 
 type ErrorPromptProps = {
   errorText: string;
@@ -134,7 +140,7 @@ const ErrorPrompt = ({
   actionText,
   actionIcon,
   actionButtonBackgroundColor,
-  onActionButtonTapped,
+  onActionButtonTapped
 }: ErrorPromptProps) => (
   <View style={{ display: "flex", flexDirection: "column" }}>
     <Text
@@ -142,7 +148,7 @@ const ErrorPrompt = ({
         fontWeight: "bold",
         color: "black",
         backgroundColor: "white",
-        padding: 8,
+        padding: 8
       }}
     >
       {errorText}
@@ -154,7 +160,7 @@ const ErrorPrompt = ({
           flexDirection: "row",
           alignItems: "center",
           padding: 8,
-          backgroundColor: actionButtonBackgroundColor,
+          backgroundColor: actionButtonBackgroundColor
         }}
       >
         <MaterialIcons name={actionIcon} size={24} color="white" />
@@ -164,13 +170,13 @@ const ErrorPrompt = ({
       </View>
     </TouchableOpacity>
   </View>
-);
+)
 
 const usePostWithReply = (postId: string, replyId: string) => {
-  const userPosts = useDependencyValue(userPostsDependencyKey);
-  const postIdsRef = useRef<string[]>([postId, replyId]);
-  const [postMap, setPostMap] = useState<Map<string, UserPost> | undefined>();
-  const [isError, setIsError] = useState(false);
+  const userPosts = useDependencyValue(userPostsDependencyKey)
+  const postIdsRef = useRef<string[]>([postId, replyId])
+  const [postMap, setPostMap] = useState<Map<string, UserPost> | undefined>()
+  const [isError, setIsError] = useState(false)
 
   const loadPostMap = useCallback(
     () =>
@@ -179,27 +185,27 @@ const usePostWithReply = (postId: string, replyId: string) => {
         .then(setPostMap)
         .catch(() => setIsError(true)),
     [userPosts]
-  );
+  )
 
   useEffect(() => {
-    postIdsRef.current = [postId, replyId];
-  }, [postId, replyId]);
+    postIdsRef.current = [postId, replyId]
+  }, [postId, replyId])
 
   useEffect(() => {
-    loadPostMap();
-  }, [loadPostMap]);
+    loadPostMap()
+  }, [loadPostMap])
 
   return {
     post: postMap?.get(postId),
     reply: postMap?.get(replyId),
     isError,
     retry: () => {
-      setIsError(false);
-      setPostMap(undefined);
-      loadPostMap();
+      setIsError(false)
+      setPostMap(undefined)
+      loadPostMap()
     },
-    isLoading: !postMap,
-  };
-};
+    isLoading: !postMap
+  }
+}
 
-export default UserPostReplyScreen;
+export default UserPostReplyScreen

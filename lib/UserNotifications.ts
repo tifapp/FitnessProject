@@ -1,4 +1,4 @@
-import Notifications, { NotificationContent } from "expo-notifications";
+import Notifications, { NotificationContent } from "expo-notifications"
 
 /**
  * An interface to handle notifications.
@@ -17,9 +17,9 @@ export interface UserNotifications {
  * A `UserNotifications` implementation backed by expo.
  */
 export class ExpoUserNotifications implements UserNotifications {
-  async lastNotificationContent() {
+  async lastNotificationContent () {
     return await Notifications.getLastNotificationResponseAsync().then(
       (resp) => resp?.notification.request.content
-    );
+    )
   }
 }

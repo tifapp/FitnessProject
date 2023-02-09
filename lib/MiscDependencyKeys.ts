@@ -1,3 +1,3 @@
-import { createDependencyKey } from "./dependencies";
+import { createDependencyKey } from "./dependencies"
 
-export const userIdDependencyKey = createDependencyKey<string>();
+export const userIdDependencyKey = createDependencyKey<string>()
