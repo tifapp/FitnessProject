@@ -313,17 +313,19 @@ const App = () => {
     )
   } else if (isDeveloper) {
     return (
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Activities Screen"
-            component={ActivitiesScreen}
-            options={{
-              headerShown: false
-            }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <UserPostsProvider posts={userPosts}>
+        <NavigationContainer linking={linkingConfig}>
+          <Stack.Navigator>
+            <Stack.Screen
+              name="Activities Screen"
+              component={ActivitiesScreen}
+              options={{
+                headerShown: false
+              }}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </UserPostsProvider>
     )
   } else {
     return (

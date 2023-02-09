@@ -4,6 +4,7 @@ import { Post } from "src/models"
 import IconButton from "./common/IconButton"
 import { ProfileImageAndName } from "./ProfileImageAndName"
 import { Divider } from "react-native-elements"
+import { UserPost } from "@lib/posts"
 
 interface Props {
   item: Post,
