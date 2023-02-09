@@ -145,9 +145,11 @@ export type SetDependencyValueProps<T> = {
 }
 
 /**
- * Sets the dependency value for a particular key in a child context.
+ * Sets the dependency value for a particular key in a child context. This is most useful
+ * when you need to update the value just for a single dependency, if you need to update
+ * the values for multiple dependencies, use `UpdateDependencyValues` instead.
  *
- * Using this will override the default/pre-existing value of any key.
+ * Using this will override the default/pre-existing value of the specified key.
  *
  * ```tsx
  * const key = createDependencyKey(1);
@@ -187,6 +189,8 @@ export type UpdateDependencyValuesProps = {
  *
  * Use this component when you need to set the values of 2 or more dependencies. If you
  * only need to set the value of 1 dependency, use `SetDependencyValue`.
+ *
+ * Using this will override any of the values for the given dependency keys.
  *
  * ```tsx
  * const key1 = createDependencyKey(1);
