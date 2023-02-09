@@ -1,4 +1,4 @@
-import { createDependencyKey, DependencyValues } from "@lib/Dependencies";
+import { createDependencyKey, DependencyValues } from "../../lib/dependencies";
 
 describe("DependencyValues tests", () => {
   it("creates a dependency key's default value on first access", () => {
