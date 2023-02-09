@@ -1,11 +1,15 @@
-import { UserPost } from "./UserPost"
-import { groupUserPosts } from "./helpers"
-import React, { createContext, ReactNode, useContext } from "react"
-import { GraphQLOperations } from "../GraphQLOperations"
-import { loadCapitals } from "@hooks/stringConversion"
-import { batchGetLikes, getPost, getUser } from "@graphql/queries"
-import { Like, Post } from "src/models"
-import { componentsFromPostId, postIdFromComponents } from "./PostIDComponents"
+import { UserPost } from "./UserPost";
+import { groupUserPosts } from "./helpers";
+import {
+  GraphQLOperations,
+  graphQLOperationsDependencyKey,
+} from "../GraphQLOperations";
+import { loadCapitals } from "@hooks/stringConversion";
+import { batchGetLikes, getPost, getUser } from "@graphql/queries";
+import { Like, Post } from "src/models";
+import { componentsFromPostId, postIdFromComponents } from "./PostIDComponents";
+import { createDependencyKey } from "../dependencies";
+import { userIdDependencyKey } from "../MiscDependencyKeys";
 
 /**
  * An interface representing all the collection of all of the posts in the app.
@@ -26,33 +30,33 @@ export interface UserPosts {
  * @param operations the `GraphQLOperations` instance to use
  */
 export class GraphQLUserPosts implements UserPosts {
-  private userId: string
-  private operations: GraphQLOperations
+  private userId: string;
+  private operations: GraphQLOperations;
 
-  constructor (userId: string, operations: GraphQLOperations) {
-    this.userId = userId
-    this.operations = operations
+  constructor(userId: string, operations: GraphQLOperations) {
+    this.userId = userId;
+    this.operations = operations;
   }
 
-  async postsWithIds (ids: string[]): Promise<Map<string, UserPost>> {
-    if (ids.length === 0) return new Map()
+  async postsWithIds(ids: string[]): Promise<Map<string, UserPost>> {
+    if (ids.length === 0) return new Map();
 
-    const asyncRawPosts = this.fetchRawPosts(ids)
-    const asyncLikes = this.fetchLikes(ids)
-    const [rawPosts, likes] = await Promise.all([asyncRawPosts, asyncLikes])
+    const asyncRawPosts = this.fetchRawPosts(ids);
+    const asyncLikes = this.fetchLikes(ids);
+    const [rawPosts, likes] = await Promise.all([asyncRawPosts, asyncLikes]);
 
     const usernames = await this.fetchUsernames(
       rawPosts.map((post) => post.userId)
-    )
+    );
 
     return groupUserPosts(
       rawPosts.map((post, idx) =>
         this.rawPostToUserPost(post, usernames[idx], likes[idx] !== null)
       )
-    )
+    );
   }
 
-  private rawPostToUserPost (
+  private rawPostToUserPost(
     rawPost: Post & { taggedUsers?: string[] | null },
     username: string,
     isLikedByYou: boolean
@@ -60,7 +64,7 @@ export class GraphQLUserPosts implements UserPosts {
     return {
       id: postIdFromComponents({
         creationDate: new Date(rawPost.createdAt),
-        userId: rawPost.userId
+        userId: rawPost.userId,
       }),
       likesCount: rawPost.likes ?? 0,
       repliesCount: rawPost.replies ?? 0,
@@ -74,11 +78,11 @@ export class GraphQLUserPosts implements UserPosts {
       imageURL: rawPost.imageURL ?? undefined,
       likedByYou: isLikedByYou,
       writtenByYou: rawPost.userId === this.userId,
-      taggedUserIds: rawPost.taggedUsers ?? []
-    }
+      taggedUserIds: rawPost.taggedUsers ?? [],
+    };
   }
 
-  private async fetchRawPosts (
+  private async fetchRawPosts(
     postIds: string[]
   ): Promise<(Post & { taggedUsers?: string[] | null })[]> {
     return await Promise.all(
@@ -87,34 +91,34 @@ export class GraphQLUserPosts implements UserPosts {
         .map(async (idComponents) => {
           // NB: We force unwrap here because atm all post ids are made up of components.
           // By the time we change this fact, we'll likely no longer need this helper regardless.
-          const { creationDate, userId } = idComponents!!
+          const { creationDate, userId } = idComponents!!;
           return await this.operations
             .execute(getPost, {
               createdAt: creationDate.toISOString(),
-              userId
+              userId,
             })
-            .then((value: any) => value.getPost)
+            .then((value: any) => value.getPost);
         })
-    )
+    );
   }
 
-  private async fetchLikes (postIds: string[]): Promise<Like[]> {
+  private async fetchLikes(postIds: string[]): Promise<Like[]> {
     return await this.operations
       .execute<{ batchGetLikes: Like[] }>(batchGetLikes, {
-        likes: postIds.map((id) => ({ postId: id }))
+        likes: postIds.map((id) => ({ postId: id })),
       })
-      .then((value) => value.batchGetLikes)
+      .then((value) => value.batchGetLikes);
   }
 
-  private async fetchUsernames (userIds: string[]): Promise<string[]> {
+  private async fetchUsernames(userIds: string[]): Promise<string[]> {
     return await Promise.all(
       userIds.map(async (id) => await this.fetchUsername(id))
-    )
+    );
   }
 
-  private async fetchUsername (userId: string): Promise<string> {
-    const cachedUsername = globalThis.savedUsers?.[userId]?.name
-    if (cachedUsername) return cachedUsername
+  private async fetchUsername(userId: string): Promise<string> {
+    const cachedUsername = globalThis.savedUsers?.[userId]?.name;
+    if (cachedUsername) return cachedUsername;
 
     const user = await this.operations.execute<{
       getUser: {
@@ -122,39 +126,24 @@ export class GraphQLUserPosts implements UserPosts {
         status: string;
         isVerified: boolean;
       };
-    }>(getUser, { id: userId })
-    const { name, status, isVerified } = user.getUser
+    }>(getUser, { id: userId });
+    const { name, status, isVerified } = user.getUser;
 
-    const retName = loadCapitals(name) ?? "Deleted User"
+    const retName = loadCapitals(name) ?? "Deleted User";
     globalThis.savedUsers[userId] = {
       name: retName,
       status,
-      isVerified: isVerified ?? false
-    }
-    return retName
+      isVerified: isVerified ?? false,
+    };
+    return retName;
   }
 }
 
-// TODO: - We should probably have a generic dependencies system for this...
-
-const PostsContext = createContext<UserPosts | null>(null)
-
-/**
- * Returns an instance of `UserPosts` provided by `UserPostsProvider`.
- */
-export const useUserPostsDependency = () => useContext(PostsContext)!! // NB: Programmer error if not used under a UserPostsProvider
-
-export type UserPostsProviderProps = {
-  posts: UserPosts;
-  children: ReactNode;
-};
-
-/**
- * Provides a `UserPosts` instance to child components.
- */
-export const UserPostsProvider = ({
-  posts,
-  children
-}: UserPostsProviderProps) => (
-  <PostsContext.Provider value={posts}>{children}</PostsContext.Provider>
-)
+export const userPostsDependencyKey = createDependencyKey<UserPosts>(
+  (values) => {
+    return new GraphQLUserPosts(
+      values.get(userIdDependencyKey),
+      values.get(graphQLOperationsDependencyKey)
+    );
+  }
+);

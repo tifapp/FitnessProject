@@ -2,7 +2,6 @@ import React from "react";
 import { View } from "react-native";
 import {
   createDependencyKey,
-  DependencyKey,
   SetDependencyValue,
   UpdateDependencyValues,
   useDependencyValue,
@@ -71,9 +70,9 @@ describe("DependencyHooks tests", () => {
     const key1 = createDependencyKey(testString1);
     const key2 = createDependencyKey(testString2);
 
-    const { result } = renderHook(() =>
-      useDependencyValues<[string, string]>([key1, key2])
-    );
+    const { result } = renderHook(() => {
+      return useDependencyValues<[string, string]>([key1, key2]);
+    });
     const [value1, value2] = result.current;
 
     expect(value1).toEqual(testString1);
