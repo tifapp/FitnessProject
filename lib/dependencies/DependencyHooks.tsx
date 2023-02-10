@@ -232,7 +232,7 @@ const useUpdateCopiedDependencyValues = (
 ) => {
   const currentValues = useDependencyValuesContext()
   return useMemo(() => {
-    const copiedValues = DependencyValues.__copyFrom(currentValues)
+    const copiedValues = DependencyValues.copyFrom(currentValues)
     update(copiedValues)
     return copiedValues
   }, [currentValues, update])

@@ -69,10 +69,10 @@ export class DependencyValues {
    * @returns the generic type specified by `key`'s type
    */
   get<T> (key: DependencyKey<T>) {
-    const cachedValue = this.cachedValues.get(key.__identifier)
+    const cachedValue = this.cachedValues.get(key.identifier)
     if (cachedValue) return cachedValue as T
 
-    if (!key.__createDefaultValue) {
+    if (!key.createDefaultValue) {
       throw new Error(`
       Attempted to create the default value for a dependency key which has no default value.
 
@@ -81,12 +81,12 @@ export class DependencyValues {
         - Call .set on this instance of DependencyValues with the key if possible
         - If in a react component/hook, wrap the current component with SetDependencyValue or UpdateDependencyValues
 
-      Dependency Key identifier: ${key.__identifier}
+      Dependency Key identifier: ${key.identifier}
       `)
     }
 
-    const value = key.__createDefaultValue(new ImmutableDependencyValues(this))
-    this.cachedValues.set(key.__identifier, value)
+    const value = key.createDefaultValue(new ImmutableDependencyValues(this))
+    this.cachedValues.set(key.identifier, value)
     return value
   }
 
@@ -99,10 +99,18 @@ export class DependencyValues {
    * @param value a value of the same type specified by the generic of `key`'s type
    */
   set<T> (key: DependencyKey<T>, value: T) {
-    this.cachedValues.set(key.__identifier, value)
+    this.cachedValues.set(key.identifier, value)
   }
 
-  static __copyFrom (values: DependencyValues): DependencyValues {
+  /**
+   * Copies a `DependencyValues` and returns the copied values.
+   *
+   * Generally, you shouldn't need to use this function directly, as the copying is
+   * handled by `SetDependencyValue` and `UpdateDependencyValues`.
+   *
+   * @param values the `DependencyValues` instance to copy.
+   */
+  static copyFrom (values: DependencyValues) {
     const newValues = new DependencyValues()
     newValues.cachedValues = new Map(values.cachedValues)
     return newValues

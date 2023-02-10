@@ -13,7 +13,7 @@ export interface GraphQLOperations {
    * @param statement a grapql query
    * @param variables variables needed by the query
    */
-  execute: <T>(statement: string, variables?: object) => Promise<T>;
+  execute: <T>(statement: string, variables?: object) => Promise<T>
 
   // TODO: - Add a subscribe function
 }
@@ -53,6 +53,9 @@ export class AmplifyGraphQLOperations implements GraphQLOperations {
   }
 }
 
-const keyOperations = new AmplifyGraphQLOperations()
-export const graphQLOperationsDependencyKey =
-  createDependencyKey<GraphQLOperations>(keyOperations)
+const keyOperations = new AmplifyGraphQLOperations() as GraphQLOperations
+
+/**
+ * A `DependencyKey` for a `GraphQL` operations instance.
+ */
+export const graphQLOperationsDependencyKey = createDependencyKey(keyOperations)

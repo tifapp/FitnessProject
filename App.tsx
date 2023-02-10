@@ -177,8 +177,7 @@ const App = () => {
       playsInSilentModeIOS: true
     })
 
-    const { status: existingStatus } =
-      await Notifications.getPermissionsAsync()
+    const { status: existingStatus } = await Notifications.getPermissionsAsync()
     let finalStatus = existingStatus
     if (existingStatus !== "granted") {
       const { status } = await Notifications.requestPermissionsAsync()
@@ -310,20 +309,20 @@ const App = () => {
         </Tab.Navigator>
       </NavigationContainer>
     )
-  } else if (isDeveloper) {
-    return (
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Activities Screen"
-            component={ActivitiesScreen}
-            options={{
-              headerShown: false
-            }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    )
+    // } else if (isDeveloper) {
+    //   return (
+    //     <NavigationContainer>
+    //       <Stack.Navigator>
+    //         <Stack.Screen
+    //           name="Activities Screen"
+    //           component={ActivitiesScreen}
+    //           options={{
+    //             headerShown: false
+    //           }}
+    //         />
+    //       </Stack.Navigator>
+    //     </NavigationContainer>
+    //   )
   } else {
     return (
       <SetDependencyValue forKey={userIdDependencyKey} value={userId}>

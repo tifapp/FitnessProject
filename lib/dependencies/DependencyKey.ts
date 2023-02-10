@@ -93,9 +93,14 @@ import { uuid } from "@lib/uuid"
  * }
  * ```
  */
-export type DependencyKey<T> = {
-  readonly __identifier: string
-  readonly __createDefaultValue?: (values: ImmutableDependencyValues) => T
+export class DependencyKey<T> {
+  readonly identifier: string
+  readonly createDefaultValue?: (values: ImmutableDependencyValues) => T
+
+  constructor (createDefaultValue?: (values: ImmutableDependencyValues) => T) {
+    this.identifier = uuid()
+    this.createDefaultValue = createDefaultValue
+  }
 }
 
 /**
@@ -119,24 +124,22 @@ export type DependencyKey<T> = {
  * })
  * ```
  *
- * @param createDefaultValue a default value, or a function to create a default value for this key
+ * @param defaultValue a default value, or a function to create a default value for this key
  */
 export const createDependencyKey = <T>(
-  createDefaultValue?: ((values: ImmutableDependencyValues) => T) | T
-): DependencyKey<T> => ({
-    __identifier: uuid(),
-    __createDefaultValue: createDefaultValue
-      ? _makeDefaultValueCreation(createDefaultValue)
-      : undefined
-  })
+  defaultValue?: ((values: ImmutableDependencyValues) => T) | T
+) => {
+  if (!defaultValue) return new DependencyKey<T>()
+  return new DependencyKey<T>(makeDefaultValueCreation(defaultValue))
+}
 
-const _makeDefaultValueCreation = <T>(
-  create: ((values: ImmutableDependencyValues) => T) | T
+const makeDefaultValueCreation = <T>(
+  defaultValue: ((values: ImmutableDependencyValues) => T) | T
 ) => {
   return (values: ImmutableDependencyValues) => {
-    if (create instanceof Function) {
-      return create(values)
+    if (defaultValue instanceof Function) {
+      return defaultValue(values)
     }
-    return create
+    return defaultValue
   }
 }
