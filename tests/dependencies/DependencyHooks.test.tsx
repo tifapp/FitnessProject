@@ -8,7 +8,7 @@ import {
   useDependencyValues
 } from "../../lib/dependencies"
 import "../helpers/Matchers"
-import { render, renderHook, screen } from "@testing-library/react-native"
+import { render, screen } from "@testing-library/react-native"
 
 const testString1 = "Hello World"
 const testString2 = "Goodbye World"

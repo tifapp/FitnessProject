@@ -1,5 +1,5 @@
 import { ImmutableDependencyValues } from "./DependencyValues"
-import crypto from "crypto"
+import { uuid } from "@lib/uuid"
 
 /**
  * A key to that associates itself with a particular type, and is used to retrieve and
@@ -124,7 +124,7 @@ export type DependencyKey<T> = {
 export const createDependencyKey = <T>(
   createDefaultValue?: ((values: ImmutableDependencyValues) => T) | T
 ): DependencyKey<T> => ({
-    __identifier: crypto.randomUUID(),
+    __identifier: uuid(),
     __createDefaultValue: createDefaultValue
       ? _makeDefaultValueCreation(createDefaultValue)
       : undefined
