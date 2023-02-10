@@ -4,7 +4,6 @@ import { Post } from "src/models"
 import IconButton from "./common/IconButton"
 import { ProfileImageAndName } from "./ProfileImageAndName"
 import { Divider } from "react-native-elements"
-import { UserPost } from "@lib/posts"
 
 interface Props {
   item: Post,
@@ -66,7 +65,7 @@ const EventItem = ({
   return (
     <View style={styles.secondaryContainerStyle}>
       <View
-        style={[styles.spaceAround, styles.nestedReply]}
+        style={[styles.nestedReply]}
       >
       {/* Header (name, profile pic, event dot, distance) */}
         <View
@@ -109,7 +108,7 @@ const EventItem = ({
             {startTime != null
               ? <View style={{ flexDirection: "row" }} accessibilityLabel={"time until"}>
                 <IconButton
-                  iconName={"query-builder"}
+                  iconName={"access-time"}
                   size={22}
                   color={isHours ? "grey" : "red"}
                   onPress={() => null}
@@ -210,14 +209,6 @@ const styles = StyleSheet.create({
   secondaryContainerStyle: {
     backgroundColor: "#f7f7f7"
   },
-  spaceAround: {
-    paddingLeft: 0,
-    paddingTop: 0,
-    paddingRight: 0,
-    paddingBottom: 0,
-    flex: 1,
-    flexDirection: "column"
-  },
   flexRow: {
     flex: 1,
     flexDirection: "row"
@@ -270,7 +261,7 @@ const styles = StyleSheet.create({
     paddingLeft: "1%"
   },
   nestedReply: {
-    marginBottom: 20,
+    marginBottom: '4%',
     backgroundColor: "white",
     shadowColor: "#000",
     shadowOffset: {
