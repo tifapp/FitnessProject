@@ -94,14 +94,7 @@ import crypto from "crypto"
  * ```
  */
 export type DependencyKey<T> = {
-  /**
-   * Do not use, this is used internally by the dependencies system.
-   */
   readonly __identifier: string
-
-  /**
-   * Do not use, this is used internally by the dependencies system.
-   */
   readonly __createDefaultValue?: (values: ImmutableDependencyValues) => T
 }
 

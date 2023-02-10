@@ -38,6 +38,34 @@ describe("DependencyHooks tests", () => {
     expect(childId(testString2)).toBeDisplayed()
   })
 
+  test("SetDependencyValue preserves current values in child context", () => {
+    const key1 = createDependencyKey<string>()
+    const key2 = createDependencyKey<string>()
+
+    const ChildComponent = () => {
+      const [d1, d2] = useDependencyValues<[string, string]>([key1, key2])
+      return (
+        <>
+          <View testID={makeChildId(d1)} />
+          <View testID={makeChildId(d2)} />
+        </>
+      )
+    }
+
+    const ParentComponent = () => (
+      <SetDependencyValue forKey={key1} value={testString1}>
+        <SetDependencyValue forKey={key2} value={testString2}>
+          <ChildComponent />
+        </SetDependencyValue>
+      </SetDependencyValue>
+    )
+
+    render(<ParentComponent />)
+
+    expect(childId(testString1)).toBeDisplayed()
+    expect(childId(testString2)).toBeDisplayed()
+  })
+
   test("UpdateDependencyValues creates a new DependencyValues instance for the child context", () => {
     const key = createDependencyKey(testString1)
 
@@ -66,17 +94,36 @@ describe("DependencyHooks tests", () => {
     expect(childId(testString2)).toBeDisplayed()
   })
 
-  test("useDependencyValues returns proper values for keys", () => {
-    const key1 = createDependencyKey(testString1)
-    const key2 = createDependencyKey(testString2)
+  test("UpdateDependencyValues preserves current values in child context", () => {
+    const key1 = createDependencyKey<string>()
+    const key2 = createDependencyKey<string>()
 
-    const { result } = renderHook(() => {
-      return useDependencyValues<[string, string]>([key1, key2])
-    })
-    const [value1, value2] = result.current
+    const ChildComponent = () => {
+      const [d1, d2] = useDependencyValues<[string, string]>([key1, key2])
+      return (
+        <>
+          <View testID={makeChildId(d1)} />
+          <View testID={makeChildId(d2)} />
+        </>
+      )
+    }
 
-    expect(value1).toEqual(testString1)
-    expect(value2).toEqual(testString2)
+    const ParentComponent = () => (
+      <UpdateDependencyValues
+        update={(values) => values.set(key1, testString1)}
+      >
+        <UpdateDependencyValues
+          update={(values) => values.set(key2, testString2)}
+        >
+          <ChildComponent />
+        </UpdateDependencyValues>
+      </UpdateDependencyValues>
+    )
+
+    render(<ParentComponent />)
+
+    expect(childId(testString1)).toBeDisplayed()
+    expect(childId(testString2)).toBeDisplayed()
   })
 })
 

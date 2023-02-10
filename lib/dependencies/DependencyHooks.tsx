@@ -231,10 +231,9 @@ const useUpdateCopiedDependencyValues = (
   update: (values: DependencyValues) => void
 ) => {
   const currentValues = useDependencyValuesContext()
-  const newValues = useMemo(() => {
+  return useMemo(() => {
     const copiedValues = DependencyValues.__copyFrom(currentValues)
     update(copiedValues)
     return copiedValues
   }, [currentValues, update])
-  return newValues
 }

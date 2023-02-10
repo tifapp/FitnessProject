@@ -102,9 +102,6 @@ export class DependencyValues {
     this.cachedValues.set(key.__identifier, value)
   }
 
-  /**
-   * Do not use, this is used internally by the dependencies system.
-   */
   static __copyFrom (values: DependencyValues): DependencyValues {
     const newValues = new DependencyValues()
     newValues.cachedValues = new Map(values.cachedValues)
