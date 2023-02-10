@@ -19,7 +19,7 @@ import { DependencyValues } from "./DependencyValues"
  *
  * However, be careful, if the key does not have a default value, an error will be thrown.
  *
- * ```ts
+ * ```tsx
  * const key = createDependencyKey<number>()
  *
  * const Component = () => {
@@ -31,7 +31,7 @@ import { DependencyValues } from "./DependencyValues"
  *
  * There are 2 ways to make a dependency key without a default value not throw an error:
  *
- * ```ts
+ * ```tsx
  * const key = createDependencyKey<number>()
  *
  * const Component = () => {
