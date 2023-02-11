@@ -1,6 +1,6 @@
 import {
-  AmplifyGraphQLOperations,
-  GraphQLOperationsError
+  AmplifyGraphQLClient,
+  GraphQLClientError
 } from "@lib/GraphQLOperations"
 import API from "@aws-amplify/api"
 import { GraphQLError } from "graphql"
@@ -22,7 +22,7 @@ const testVariables = { val: { a: "a", b: "b" } }
 const testReturnData = 1
 const testAmplifyGraphQLError = new GraphQLError("failed")
 
-const operations = new AmplifyGraphQLOperations()
+const operations = new AmplifyGraphQLClient()
 
 describe("AmplifyGraphQLOperations tests", () => {
   test("execute encodes proper request with variables", async () => {
@@ -63,7 +63,7 @@ describe("AmplifyGraphQLOperations tests", () => {
       fail("this should throw an error")
     } catch (e: unknown) {
       expect(e).toMatchObject(
-        new GraphQLOperationsError({
+        new GraphQLClientError({
           data: testReturnData,
           errors: [testAmplifyGraphQLError]
         })

@@ -4,7 +4,7 @@ import { Amplify, Auth, Cache, graphqlOperation, Storage } from "aws-amplify"
 import { withAuthenticator } from "aws-amplify-react-native"
 import awsconfig from "./src/aws-exports"
 
-import { AmplifyGraphQLOperations } from "@lib/GraphQLOperations"
+import { AmplifyGraphQLClient } from "@lib/GraphQLOperations"
 
 // graphql
 import { updateUser } from "@graphql/mutations.js"
@@ -106,7 +106,7 @@ const Drawer = createDrawerNavigator()
 
 // TODO: - One day, we may get this under test...
 
-const graphqlOperations = new AmplifyGraphQLOperations()
+const graphqlOperations = new AmplifyGraphQLClient()
 const userNotifications = new ExpoUserNotifications()
 const linkingConfig = makeLinkingConfig({ userNotifications })
 

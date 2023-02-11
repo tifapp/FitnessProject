@@ -1,9 +1,6 @@
 import { UserPost } from "./UserPost"
 import { groupUserPosts } from "./helpers"
-import {
-  GraphQLOperations,
-  graphQLOperationsDependencyKey
-} from "../GraphQLOperations"
+import { GraphQLClient, graphQLClientDependencyKey } from "../GraphQLOperations"
 import { loadCapitals } from "@hooks/stringConversion"
 import { batchGetLikes, getPost, getUser } from "@graphql/queries"
 import { Like, Post } from "src/models"
@@ -31,11 +28,11 @@ export interface UserPosts {
  */
 export class GraphQLUserPosts implements UserPosts {
   private userId: string
-  private operations: GraphQLOperations
+  private client: GraphQLClient
 
-  constructor (userId: string, operations: GraphQLOperations) {
+  constructor (userId: string, client: GraphQLClient) {
     this.userId = userId
-    this.operations = operations
+    this.client = client
   }
 
   async postsWithIds (ids: string[]): Promise<Map<string, UserPost>> {
@@ -92,7 +89,7 @@ export class GraphQLUserPosts implements UserPosts {
           // NB: We force unwrap here because atm all post ids are made up of components.
           // By the time we change this fact, we'll likely no longer need this helper regardless.
           const { creationDate, userId } = idComponents!!
-          return await this.operations
+          return await this.client
             .execute(getPost, {
               createdAt: creationDate.toISOString(),
               userId
@@ -103,7 +100,7 @@ export class GraphQLUserPosts implements UserPosts {
   }
 
   private async fetchLikes (postIds: string[]): Promise<Like[]> {
-    return await this.operations
+    return await this.client
       .execute<{ batchGetLikes: Like[] }>(batchGetLikes, {
         likes: postIds.map((id) => ({ postId: id }))
       })
@@ -120,7 +117,7 @@ export class GraphQLUserPosts implements UserPosts {
     const cachedUsername = globalThis.savedUsers?.[userId]?.name
     if (cachedUsername) return cachedUsername
 
-    const user = await this.operations.execute<{
+    const user = await this.client.execute<{
       getUser: {
         name: string
         status: string
@@ -146,7 +143,7 @@ export const userPostsDependencyKey = createDependencyKey<UserPosts>(
   (values) => {
     return new GraphQLUserPosts(
       values.get(userIdDependencyKey),
-      values.get(graphQLOperationsDependencyKey)
+      values.get(graphQLClientDependencyKey)
     )
   }
 )
