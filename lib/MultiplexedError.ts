@@ -3,10 +3,10 @@
  * their error messages by a specified separator.
  */
 export class MultiplexedError<T extends Error> extends Error {
-  readonly errors: T[];
+  readonly errors: T[]
 
-  constructor(errors: T[], messageSeparator: string = "\n") {
-    super(errors.map((e) => e.message).join(messageSeparator));
-    this.errors = errors;
+  constructor (errors: T[], messageSeparator: string = "\n") {
+    super(errors.map((e) => e.message).join(messageSeparator))
+    this.errors = errors
   }
 }
