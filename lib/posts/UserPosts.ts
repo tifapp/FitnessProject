@@ -1,11 +1,12 @@
 import { UserPost } from "./UserPost"
 import { groupUserPosts } from "./helpers"
-import React, { createContext, ReactNode, useContext } from "react"
-import { GraphQLOperations } from "../GraphQLOperations"
+import { GraphQLClient, graphQLClientDependencyKey } from "../GraphQLOperations"
 import { loadCapitals } from "@hooks/stringConversion"
 import { batchGetLikes, getPost, getUser } from "@graphql/queries"
 import { Like, Post } from "src/models"
 import { componentsFromPostId, postIdFromComponents } from "./PostIDComponents"
+import { createDependencyKey } from "../dependencies"
+import { userIdDependencyKey } from "../MiscDependencyKeys"
 
 /**
  * An interface representing all the collection of all of the posts in the app.
@@ -16,7 +17,7 @@ export interface UserPosts {
    *
    * @returns a mapping of post ids to a `UserPost`.
    */
-  postsWithIds: (ids: string[]) => Promise<Map<string, UserPost>>;
+  postsWithIds: (ids: string[]) => Promise<Map<string, UserPost>>
 }
 
 /**
@@ -27,11 +28,11 @@ export interface UserPosts {
  */
 export class GraphQLUserPosts implements UserPosts {
   private userId: string
-  private operations: GraphQLOperations
+  private client: GraphQLClient
 
-  constructor (userId: string, operations: GraphQLOperations) {
+  constructor (userId: string, client: GraphQLClient) {
     this.userId = userId
-    this.operations = operations
+    this.client = client
   }
 
   async postsWithIds (ids: string[]): Promise<Map<string, UserPost>> {
@@ -88,7 +89,7 @@ export class GraphQLUserPosts implements UserPosts {
           // NB: We force unwrap here because atm all post ids are made up of components.
           // By the time we change this fact, we'll likely no longer need this helper regardless.
           const { creationDate, userId } = idComponents!!
-          return await this.operations
+          return await this.client
             .execute(getPost, {
               createdAt: creationDate.toISOString(),
               userId
@@ -99,7 +100,7 @@ export class GraphQLUserPosts implements UserPosts {
   }
 
   private async fetchLikes (postIds: string[]): Promise<Like[]> {
-    return await this.operations
+    return await this.client
       .execute<{ batchGetLikes: Like[] }>(batchGetLikes, {
         likes: postIds.map((id) => ({ postId: id }))
       })
@@ -116,12 +117,12 @@ export class GraphQLUserPosts implements UserPosts {
     const cachedUsername = globalThis.savedUsers?.[userId]?.name
     if (cachedUsername) return cachedUsername
 
-    const user = await this.operations.execute<{
+    const user = await this.client.execute<{
       getUser: {
-        name: string;
-        status: string;
-        isVerified: boolean;
-      };
+        name: string
+        status: string
+        isVerified: boolean
+      }
     }>(getUser, { id: userId })
     const { name, status, isVerified } = user.getUser
 
@@ -135,26 +136,14 @@ export class GraphQLUserPosts implements UserPosts {
   }
 }
 
-// TODO: - We should probably have a generic dependencies system for this...
-
-const PostsContext = createContext<UserPosts | null>(null)
-
 /**
- * Returns an instance of `UserPosts` provided by `UserPostsProvider`.
+ * A dependency key for a `UserPosts` instance.
  */
-export const useUserPostsDependency = () => useContext(PostsContext)!! // NB: Programmer error if not used under a UserPostsProvider
-
-export type UserPostsProviderProps = {
-  posts: UserPosts;
-  children: ReactNode;
-};
-
-/**
- * Provides a `UserPosts` instance to child components.
- */
-export const UserPostsProvider = ({
-  posts,
-  children
-}: UserPostsProviderProps) => (
-  <PostsContext.Provider value={posts}>{children}</PostsContext.Provider>
+export const userPostsDependencyKey = createDependencyKey<UserPosts>(
+  (values) => {
+    return new GraphQLUserPosts(
+      values.get(userIdDependencyKey),
+      values.get(graphQLClientDependencyKey)
+    )
+  }
 )

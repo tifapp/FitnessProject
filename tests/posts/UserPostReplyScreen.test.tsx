@@ -7,15 +7,12 @@ import {
 } from "@testing-library/react-native"
 import { Button, View } from "react-native"
 import { neverPromise } from "../helpers/Promise"
-import {
-  groupUserPosts,
-  TestUserPosts,
-  UserPost,
-  UserPosts,
-  UserPostsProvider
-} from "@lib/posts"
+import { groupUserPosts, TestUserPosts, UserPost, UserPosts } from "@lib/posts"
 import "../helpers/Matchers"
 import { unimplementedUserPosts } from "./helpers"
+import React from "react"
+import { SetDependencyValue } from "../../lib/dependencies"
+import { userPostsDependencyKey } from "../../lib/posts/UserPosts"
 
 let userPosts: UserPosts
 
@@ -143,7 +140,7 @@ const renderUserPostReplyScreen = ({
   replyId: string;
 }) => {
   render(
-    <UserPostsProvider posts={userPosts}>
+    <SetDependencyValue forKey={userPostsDependencyKey} value={userPosts}>
       <UserPostReplyScreen
         userPostView={(post: UserPost, onDeleted?: () => void) => (
           <View testID={post.id}>
@@ -161,7 +158,7 @@ const renderUserPostReplyScreen = ({
         postId={postId}
         replyId={replyId}
       />
-    </UserPostsProvider>
+    </SetDependencyValue>
   )
 }
 

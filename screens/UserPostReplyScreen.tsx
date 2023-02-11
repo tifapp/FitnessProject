@@ -12,7 +12,9 @@ import React, {
 import { ActivityIndicator, ScrollView, Text, View } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { MaterialIcons } from "@expo/vector-icons"
-import { UserPost, userPostToPost, useUserPostsDependency } from "../lib/posts"
+import { UserPost, userPostToPost } from "../lib/posts"
+import { useDependencyValue } from "../lib/dependencies"
+import { userPostsDependencyKey } from "../lib/posts/UserPosts"
 
 export type UserPostReplyScreenProps = {
   postId: string;
@@ -171,7 +173,7 @@ const ErrorPrompt = ({
 )
 
 const usePostWithReply = (postId: string, replyId: string) => {
-  const userPosts = useUserPostsDependency()
+  const userPosts = useDependencyValue(userPostsDependencyKey)
   const postIdsRef = useRef<string[]>([postId, replyId])
   const [postMap, setPostMap] = useState<Map<string, UserPost> | undefined>()
   const [isError, setIsError] = useState(false)

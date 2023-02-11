@@ -6,21 +6,21 @@ import { postIdFromComponents } from "./PostIDComponents"
  * viewing in a feed.
  */
 export type UserPost = {
-  readonly id: string;
-  readonly likesCount: number;
-  readonly repliesCount: number;
-  readonly createdAt: Date;
-  readonly updatedAt: Date;
-  readonly userId: string;
-  readonly username: string;
-  readonly description?: string;
-  readonly parentId?: string;
-  readonly channel?: string;
-  readonly imageURL?: string;
-  readonly likedByYou: boolean;
-  readonly writtenByYou: boolean;
-  readonly taggedUserIds: string[];
-};
+  readonly id: string
+  readonly likesCount: number
+  readonly repliesCount: number
+  readonly createdAt: Date
+  readonly updatedAt: Date
+  readonly userId: string
+  readonly username: string
+  readonly description?: string
+  readonly parentId?: string
+  readonly channel?: string
+  readonly imageURL?: string
+  readonly likedByYou: boolean
+  readonly writtenByYou: boolean
+  readonly taggedUserIds: string[]
+}
 
 /**
  * A simple way to convert a `UserPost` to a legacy `Post` type.
@@ -42,7 +42,7 @@ export const userPostToPost = (userPost: UserPost): Post => ({
  * Some `UserPost` objects for testing and UI previewing purposes.
  */
 export namespace TestUserPosts {
-  const defaultTestPostDate = new Date("2023-01-31T00:00:00+0000")
+  const defaultTestPostDate = new Date("2023-01-31T00:00:00.000Z")
 
   export const writtenByYou: UserPost = {
     id: postIdFromComponents({

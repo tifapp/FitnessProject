@@ -1,5 +1,5 @@
 import { UserPosts } from "@lib/posts"
-import { GraphQLOperations } from "@lib/GraphQLOperations"
+import { GraphQLClient } from "@lib/GraphQLOperations"
 import {
   mockGraphQLResponseForStatement,
   unimplementedGraphQLOperations
@@ -9,7 +9,7 @@ import { Post } from "../../src/models"
 import { postIdFromComponents } from "@lib/posts/PostIDComponents"
 import { GraphQLUserPosts } from "@lib/posts/UserPosts"
 
-let operations: GraphQLOperations
+let operations: GraphQLClient
 let userPosts: UserPosts
 
 globalThis.savedUsers = {}

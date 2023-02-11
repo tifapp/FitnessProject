@@ -4,8 +4,7 @@ import { Amplify, Auth, Cache, graphqlOperation, Storage } from "aws-amplify"
 import { withAuthenticator } from "aws-amplify-react-native"
 import awsconfig from "./src/aws-exports"
 
-import { AmplifyGraphQLOperations } from "@lib/GraphQLOperations"
-import { UserPosts, UserPostsProvider } from "@lib/posts"
+import { AmplifyGraphQLClient } from "@lib/GraphQLOperations"
 
 // graphql
 import { updateUser } from "@graphql/mutations.js"
@@ -64,9 +63,10 @@ import SignIn from "@components/loginComponents/SignIn"
 import SignUp from "@components/loginComponents/SignUp"
 import VerifyContact from "@components/loginComponents/VerifyContact"
 import { makeLinkingConfig } from "@lib/linkingConfig"
-import { GraphQLUserPosts } from "@lib/posts/UserPosts"
 import { ExpoUserNotifications } from "@lib/UserNotifications"
 import ActivitiesScreen from "@screens/ActivitiesScreen"
+import { SetDependencyValue } from "./lib/dependencies"
+import { userIdDependencyKey } from "./lib/MiscDependencyKeys"
 
 if (
   Platform.OS === "android" &&
@@ -106,7 +106,7 @@ const Drawer = createDrawerNavigator()
 
 // TODO: - One day, we may get this under test...
 
-const graphqlOperations = new AmplifyGraphQLOperations()
+const graphqlOperations = new AmplifyGraphQLClient()
 const userNotifications = new ExpoUserNotifications()
 const linkingConfig = makeLinkingConfig({ userNotifications })
 
@@ -122,7 +122,6 @@ const App = () => {
   const [isDeveloper, setIsDeveloper] = useState<boolean>(false)
 
   const [conversationIds, setConversationIds] = useState<string[]>([])
-  const [userPosts, setUserPosts] = useState<UserPosts | undefined>()
 
   globalThis.addConversationIds = (id) => {
     // console("(((((((((((((((((((((((((((((((((");
@@ -166,8 +165,6 @@ const App = () => {
         setIsNewUser(true)
       }
 
-      setUserPosts(new GraphQLUserPosts(globalThis.myId, graphqlOperations))
-
       // console("success, user is ", user);
     } catch (err) {
       console.log("error checking user signed up: ", err)
@@ -180,8 +177,7 @@ const App = () => {
       playsInSilentModeIOS: true
     })
 
-    const { status: existingStatus } =
-      await Notifications.getPermissionsAsync()
+    const { status: existingStatus } = await Notifications.getPermissionsAsync()
     let finalStatus = existingStatus
     if (existingStatus !== "granted") {
       const { status } = await Notifications.requestPermissionsAsync()
@@ -237,7 +233,9 @@ const App = () => {
   }
 
   const setUniqueConversationIds = (items: [string]) => {
-    if (JSON.stringify(conversationIds.sort()) !== JSON.stringify(items.sort())) {
+    if (
+      JSON.stringify(conversationIds.sort()) !== JSON.stringify(items.sort())
+    ) {
       // will work when objects are shuffled, but all items will probably refresh still if there's one extra item added to the list
       setConversationIds(items)
     }
@@ -251,7 +249,7 @@ const App = () => {
 
   const dimensions = useWindowDimensions()
 
-  if (userId == "checking..." || !userPosts) {
+  if (userId == "checking...") {
     return (
       <View style={{ flex: 1, backgroundColor: "#a9efe0" }}>
         <ActivityIndicator
@@ -311,23 +309,23 @@ const App = () => {
         </Tab.Navigator>
       </NavigationContainer>
     )
-  } else if (isDeveloper) {
-    return (
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Activities Screen"
-            component={ActivitiesScreen}
-            options={{
-              headerShown: false
-            }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    )
+    // } else if (isDeveloper) {
+    //   return (
+    //     <NavigationContainer>
+    //       <Stack.Navigator>
+    //         <Stack.Screen
+    //           name="Activities Screen"
+    //           component={ActivitiesScreen}
+    //           options={{
+    //             headerShown: false
+    //           }}
+    //         />
+    //       </Stack.Navigator>
+    //     </NavigationContainer>
+    //   )
   } else {
     return (
-      <UserPostsProvider posts={userPosts}>
+      <SetDependencyValue forKey={userIdDependencyKey} value={userId}>
         <NavigationContainer linking={linkingConfig}>
           <StatusBar style="dark" />
           <Drawer.Navigator
@@ -367,7 +365,7 @@ const App = () => {
             ))}
           </Drawer.Navigator>
         </NavigationContainer>
-      </UserPostsProvider>
+      </SetDependencyValue>
     )
   }
 }
