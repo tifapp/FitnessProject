@@ -1,4 +1,4 @@
-const state = {
+export const state = {
     markers: [
       {
         key: 1,
@@ -12,5 +12,14 @@ const state = {
         lat: 34.039761,
         lng: -118.256802
       }
-    ]
+    ],
+    size: {
+      height: 360,
+      width: 0
+    },
+    movementSettings: {
+      canScroll: true,
+      canZoom: false,
+      canRotate: false,
+    }
   }

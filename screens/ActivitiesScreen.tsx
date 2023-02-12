@@ -1,6 +1,8 @@
-import { Auth } from "aws-amplify"
-import React from "react"
-import { Alert, Text, TouchableOpacity, View } from "react-native"
+import MapComponent from "@components/MapComponent";
+import { state } from "@components/MapTestData";
+import { Auth } from "aws-amplify";
+import React from "react";
+import { Alert, Text, TouchableOpacity, View } from "react-native";
 
 const ActivitiesScreen = () => {
   function signOut () {
@@ -40,7 +42,7 @@ const ActivitiesScreen = () => {
           Log Out
         </Text>
       </TouchableOpacity>
-
+      <MapComponent markers={state.markers} size={state.size} movementSettings={state.movementSettings}/>
       <Text
         style={{
           alignItems: "center",
