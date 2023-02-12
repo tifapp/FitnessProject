@@ -311,7 +311,6 @@ const App = () => {
     )
   } else if (isDeveloper) {
     return (
-      <UserPostsProvider posts={userPosts}>
         <NavigationContainer linking={linkingConfig}>
           <Stack.Navigator>
             <Stack.Screen
@@ -323,7 +322,6 @@ const App = () => {
             />
           </Stack.Navigator>
         </NavigationContainer>
-      </UserPostsProvider>
     )
   } else {
     return (

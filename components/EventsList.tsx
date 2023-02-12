@@ -1,56 +1,41 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { FlatList } from "react-native-gesture-handler"
 import EventItem from "@components/EventItem"
-import generateColor from "@hooks/generateRandomColor"
 import NearbyActivities from "./headerComponents/NearbyActivities"
 import { ListRenderItemInfo } from "react-native"
-import { Post } from "src/models"
+import { Event } from "@lib/events/Event"
 
 const EventsList = () => {
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState<Event[]>([])
 
-  /*const testFunction = async () => {
-    const test = await API.graphql(
-      //graphqlOperation(postsByChannel, {channel: 'general'})
-      graphqlOperation(listPosts)
-      );
-    //console.log(test.data.listPosts.items);
-    /*
-    // @ts-ignore
-    setEvents(test.data.listPosts.items);
-  }*/
-  const date = new Date();
-  const testPost: Post = {
-    id: "a",
-    createdAt: date.toISOString(),
-    updatedAt: date.toISOString(),
-    userId: "213123123123",
-    description: 'blah'
-  } 
+  const date = new Date()
+  const event: Event = {
+    id: "5462426",
+    userId: "3234324",
+    repliesCount: 2,
+    writtenByYou: true,
+    startTime: date,
+    maxOccupancy: 5,
+    hasInvitations: true,
+    color: "magenta",
+    title: "Title for Event"
+  }
 
   useEffect(() => {
-    let test = [];
-    test.push(testPost);
-    setEvents(test);
-  }, []);
+    const test = []
+    test.push(event)
+    setEvents(test)
+  }, [])
 
   return (
-    
-      <FlatList
-        data={events}
-        renderItem={({item}: ListRenderItemInfo<Post>) =>
-          <EventItem
-            item={item}
-            writtenByYou={false}
-            startTime={undefined}
-            maxOccupancy={undefined}
-            hasInvitations={true}
-            eventColor={generateColor()}
-          />
-        }
-        ListHeaderComponent={<NearbyActivities />}
-        stickyHeaderIndices={[0]}
-      />
+    <FlatList
+      data={events}
+      renderItem={({ item }: ListRenderItemInfo<Event>) => (
+        <EventItem event={item} />
+      )}
+      ListHeaderComponent={<NearbyActivities />}
+      stickyHeaderIndices={[0]}
+    />
   )
 }
 
