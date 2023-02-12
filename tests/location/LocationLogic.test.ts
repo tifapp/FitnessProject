@@ -3,7 +3,16 @@ import { milesBetweenLocations, Location } from "@lib/location"
 const testLocationDate = new Date()
 
 describe("Location logic tests", () => {
-  test("milesBetweenLocations", () => {
+  test("milesBetweenLocations returns 0 when same location", () => {
+    const location: Location = {
+      latitude: 45,
+      longitude: 45,
+      date: testLocationDate
+    }
+    expect(milesBetweenLocations(location, location)).toEqual(0)
+  })
+
+  test("milesBetweenLocations returns the distance between 2 different locations in miles", () => {
     const location1: Location = {
       latitude: 45.0,
       longitude: 45.0,
