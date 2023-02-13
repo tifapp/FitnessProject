@@ -84,9 +84,12 @@ const EventItem = ({ event }: Props) => {
         {/* Header (Event Icon, Event Title, Distance) */}
         <View style={[styles.flexRow, styles.eventContainerStyle]}>
           <View style={[styles.spacingTop, { paddingLeft: "3%" }]}>
-            <Icon name="location-pin" color={event.color} />
+            <Icon name="location-pin" style={{ color: event.color }} />
           </View>
-          <Text style={[styles.eventTitle, styles.spacingTop]}>
+          <Text
+            style={[styles.eventTitle, styles.spacingTop]}
+            numberOfLines={1}
+          >
             {event.title}
           </Text>
           <Text style={[styles.distance, styles.spacingTop]}>
@@ -111,7 +114,7 @@ const EventItem = ({ event }: Props) => {
                     <Icon
                       name="access-time"
                       size={20}
-                      color={isHours ? "grey" : "red"}
+                      style={{ color: isHours ? "grey" : "red" }}
                       accessibilityLabel={"time icon"}
                     />
                       )
@@ -153,12 +156,13 @@ const EventItem = ({ event }: Props) => {
                   <Icon
                     name="person-outline"
                     size={24}
-                    color={
-                      currentCapacity >=
-                      Math.floor(event.maxOccupancy * CAPACITY_PERCENTAGE)
-                        ? "red"
-                        : "grey"
-                    }
+                    style={{
+                      color:
+                        currentCapacity >=
+                        Math.floor(event.maxOccupancy * CAPACITY_PERCENTAGE)
+                          ? "red"
+                          : "grey"
+                    }}
                     accessibilityLabel={"occupancy icon"}
                   />
                 </View>
