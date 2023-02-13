@@ -20,8 +20,8 @@ interface Props {
   canZoom: boolean,
   canRotate: boolean,
   };
-
 }
+
 
 // Height information: Gets how tall/wide the device in use is
 const deviceHeight = Dimensions.get("window").height
@@ -45,21 +45,21 @@ function MapComponent ({markers, size, movementSettings}: Props) {
   
   const mapMarkerCreations = () => {
   return markers.map((report) =>
-  <Marker
-  key = {report.key}
-  title = {report.place}
-  coordinate = {{ latitude: report.lat, longitude: report.lng }}
-  onPress={onMarkerClick}
-  >
-  </Marker >)
+    <Marker
+    key = {report.key}
+    title = {report.place}
+    coordinate = {{ latitude: report.lat, longitude: report.lng }}
+    onPress={() => onMarkerClick(report.lat, report.lng)}
+    >
+    </Marker >)
   }
 
-  const onMarkerClick = () => {
+  function onMarkerClick (lat: number, long: number) {
     this.mapRef.animateToRegion({
-      latitude: 34.059761,
-      longitude: -118.276802,
-      latitudeDelta: 0.1,
-      longitudeDelta: 0.1,
+      latitude: lat,
+      longitude: long,
+      latitudeDelta: 0.05,
+      longitudeDelta: 0.05,
     })
   }
 

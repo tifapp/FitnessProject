@@ -42,7 +42,7 @@ export const userPostToPost = (userPost: UserPost): Post => ({
  * Some `UserPost` objects for testing and UI previewing purposes.
  */
 export namespace TestUserPosts {
-  const defaultTestPostDate = new Date("2023-01-31T00:00:00+0000");
+  const defaultTestPostDate = new Date("2023-01-31T00:00:00.000Z");
 
   export const writtenByYou: UserPost = {
     id: postIdFromComponents({
