@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { StyleSheet, Text, View } from "react-native"
-import { Post } from "src/models"
 import { Event } from "@lib/events/Event"
 import IconButton from "./common/IconButton"
-import { ProfileImageAndName } from "./ProfileImageAndName"
 import { Divider, Icon } from "react-native-elements"
 
 interface Props {
@@ -13,11 +11,11 @@ interface Props {
 const EventItem = ({ event }: Props) => {
   const [requested, setRequested] = useState(false) // If user has requested to join
   const [numInvitations, setNumInvitations] = useState(0) // Number of requested invitations
-  const [isHours, setIsHours] = useState(true) // If time limit has >= 1 hour left
-  const [timeUntil, setTimeUntil] = useState(0) // Time (in either hours or minutes) until event starts
+  const [isMin, setIsMin] = useState(false) // If time limit has <> 1 hour left
+  const [isHours, setIsHours] = useState(false) // If time limit has >= 1 hour left
+  const [isDays, setIsDays] = useState(false) // // If time limit has > 24 hours left
+  const [timeUntil, setTimeUntil] = useState(0) // Time (in either days, hours, or minutes) until event starts
   const [currentCapacity, setCurrentCapacity] = useState(1) // How many users have joined event
-  const [distance, setDistance] = useState(0) // Current distance user is from the event
-  const NUM_OF_LINES = 5
   const CAPACITY_PERCENTAGE = 0.75
 
   const setTime = () => {
@@ -25,14 +23,29 @@ const EventItem = ({ event }: Props) => {
       const date = new Date()
       const diffTime = Math.abs(event.startTime.getTime() - date.getTime())
       const diffMin = Math.ceil(diffTime / (1000 * 60))
-      const diffHour = Math.ceil(diffTime / (1000 * 60 * 60))
+      const diffHours = Math.floor(diffMin / 60)
+      const diffDays = Math.floor(diffHours / 24)
 
       if (diffMin < 60) {
+        setIsMin(true)
         setIsHours(false)
+        setIsDays(false)
         setTimeUntil(diffMin)
-      } else {
+      } else if (diffHours < 24) {
+        setIsMin(false)
         setIsHours(true)
-        setTimeUntil(diffHour)
+        setIsDays(false)
+
+        if (diffMin % 60 >= 20 && diffMin % 60 <= 40) {
+          setTimeUntil(diffHours + 0.5)
+        } else {
+          setTimeUntil(diffHours)
+        }
+      } else {
+        setIsMin(false)
+        setIsDays(true)
+        setIsHours(false)
+        setTimeUntil(diffDays)
       }
     }
   }
@@ -51,6 +64,20 @@ const EventItem = ({ event }: Props) => {
     }
   }
 
+  const displayTime = () => {
+    if (isDays) {
+      return `${timeUntil}d`
+    } else if (isHours) {
+      if (timeUntil === 1) {
+        return `${timeUntil}hr`
+      } else {
+        return `${timeUntil}hrs`
+      }
+    } else {
+      return `${timeUntil}min`
+    }
+  }
+
   return (
     <View style={styles.secondaryContainerStyle}>
       <View style={[styles.nestedReply]}>
@@ -63,7 +90,7 @@ const EventItem = ({ event }: Props) => {
             {event.title}
           </Text>
           <Text style={[styles.distance, styles.spacingTop]}>
-            {distance} mi
+            {event.distance} mi
           </Text>
         </View>
 
@@ -79,22 +106,32 @@ const EventItem = ({ event }: Props) => {
                 accessibilityLabel={"time until"}
               >
                 <View style={styles.alignIcon}>
-                  <Icon
-                    name="access-time"
-                    size={20}
-                    color={isHours ? "grey" : "red"}
-                    accessibilityLabel={"time icon"}
-                  />
+                  {isHours || isMin
+                    ? (
+                    <Icon
+                      name="access-time"
+                      size={20}
+                      color={isHours ? "grey" : "red"}
+                      accessibilityLabel={"time icon"}
+                    />
+                      )
+                    : (
+                    <Icon
+                      name="date-range"
+                      size={20}
+                      color={"grey"}
+                      accessibilityLabel={"time icon"}
+                    />
+                      )}
                 </View>
                 <Text
                   style={[
                     styles.numbersBottomLeft,
-                    { color: isHours ? "grey" : "red" },
+                    { color: isHours || isDays ? "grey" : "red" },
                     { paddingHorizontal: "1%" }
                   ]}
                 >
-                  {timeUntil}
-                  {isHours ? "hrs" : "min"}
+                  {displayTime()}
                 </Text>
               </View>
                 )

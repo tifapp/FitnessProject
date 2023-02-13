@@ -9,6 +9,7 @@ const EventsList = () => {
   const [events, setEvents] = useState<Event[]>([])
 
   const date = new Date()
+  date.setHours(date.getHours() + 47)
   const event: Event = {
     id: "5462426",
     userId: "3234324",
@@ -18,7 +19,8 @@ const EventsList = () => {
     maxOccupancy: 5,
     hasInvitations: true,
     color: "magenta",
-    title: "Title for Event"
+    title: "Title for Event",
+    distance: 0.5
   }
 
   useEffect(() => {

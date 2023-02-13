@@ -9,4 +9,5 @@ export type Event = {
   readonly maxOccupancy?: number
   readonly hasInvitations: boolean
   readonly color: string
+  readonly distance: number
 }
