@@ -1,14 +1,15 @@
 /**
- * A type representing a tracked location for any particular user.
+ * A simple latitude and longitude based coordinate.
  */
 export type Location = {
   readonly latitude: number
   readonly longitude: number
-  readonly date: Date
 }
 
 /**
  * Computes the number of miles between 2 locations using the haversine formula.
+ *
+ * For more info on the math: https://en.wikipedia.org/wiki/Haversine_formula
  */
 export const milesBetweenLocations = (
   location1: Location,
@@ -26,13 +27,12 @@ export const milesBetweenLocations = (
   const trigCombo = sin2HalfLatDelta + latCos * sin2HalfLngDelta
 
   const meters = 2 * EARTH_RADIUS_METERS * Math.asin(Math.sqrt(trigCombo))
-  return toMiles(meters)
+  return meters / METERS_PER_MILE
 }
 
 const sin2 = (radians: number) => (1 - Math.cos(2 * radians)) / 2
 
 const EARTH_RADIUS_METERS = 6371e3
-
-const toMiles = (meters: number) => meters / 1609.344
+const METERS_PER_MILE = 1609.344
 
 const toRadians = (degrees: number) => (degrees * Math.PI) / 180
