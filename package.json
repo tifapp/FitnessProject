@@ -17,6 +17,7 @@
     "@aws-sdk/client-lex-runtime-v2": "3.262.0",
     "@aws-sdk/client-location": "3.262.0",
     "@expo/ngrok": "^4.1.0",
+    "@gorhom/bottom-sheet": "^4.4.5",
     "@jest/reporters": "29.4.1",
     "@react-native-async-storage/async-storage": "~1.17.3",
     "@react-native-community/checkbox": "^0.5.5",
@@ -75,8 +76,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
-    "@testing-library/react-native": "^10.1.1",
     "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react-native": "^10.1.1",
     "@types/jest": "^29.2.6",
     "@types/react": "~17.0.21",
     "@types/react-test-renderer": "^18.0.0",

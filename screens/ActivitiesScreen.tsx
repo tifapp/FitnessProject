@@ -1,10 +1,10 @@
-import {Auth} from "aws-amplify"
+import { Auth } from "aws-amplify"
 import React from "react"
 import { Alert, View } from "react-native"
 import EventsList from "@components/EventsList"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 
 const ActivitiesScreen = () => {
-
   function signOut () {
     const title = "Are you sure you want to sign out?"
     const message = ""
@@ -25,9 +25,9 @@ const ActivitiesScreen = () => {
   }
 
   return (
-    <View>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <EventsList />
-    </View>
+    </GestureHandlerRootView>
   )
 }
 

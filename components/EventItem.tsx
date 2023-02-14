@@ -84,7 +84,7 @@ const EventItem = ({ event }: Props) => {
         {/* Header (Event Icon, Event Title, Distance) */}
         <View style={[styles.flexRow, styles.eventContainerStyle]}>
           <View style={[styles.spacingTop, { paddingLeft: "3%" }]}>
-            <Icon name="location-pin" style={{ color: event.color }} />
+            <Icon name="location-pin" color={event.color} />
           </View>
           <Text
             style={[styles.eventTitle, styles.spacingTop]}
@@ -237,7 +237,10 @@ export default React.memo(EventItem)
 
 const styles = StyleSheet.create({
   secondaryContainerStyle: {
-    backgroundColor: "#f7f7f7"
+    backgroundColor: "#f7f7f7",
+    paddingTop: "2%"
+    // paddingVertical: "5%"
+    // borderWidth: 2
   },
   flexRow: {
     flex: 1,
@@ -310,7 +313,6 @@ const styles = StyleSheet.create({
     fontSize: 16
   },
   nestedReply: {
-    marginBottom: "4%",
     backgroundColor: "white",
     shadowColor: "#000",
     shadowOffset: {
