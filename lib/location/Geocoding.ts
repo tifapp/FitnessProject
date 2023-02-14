@@ -1,4 +1,4 @@
-import { AddressComponents } from "./AddressComponents"
+import { Placemark } from "./Placemark"
 import ExpoLocation from "expo-location"
 import { createDependencyKey } from "@lib/dependencies"
 import { Location } from "./Location"
@@ -8,19 +8,19 @@ import { Location } from "./Location"
  */
 export interface Geocoding {
   /**
-   * Reverse geocodes a list of addresses from a given location.
+   * Reverse geocodes a list of placemarks from a given location.
    *
    * On Android, the implementation of this function may require that the
    * user has accepted Location permissions.
    */
-  reverseGeocode: (location: Location) => Promise<AddressComponents[]>
+  reverseGeocode: (location: Location) => Promise<Placemark[]>
 }
 
 const expoReverseGeocode = async (location: Location) => {
   const results = await ExpoLocation.reverseGeocodeAsync({
     ...location
   })
-  return results as AddressComponents[]
+  return results as Placemark[]
 }
 
 /**
