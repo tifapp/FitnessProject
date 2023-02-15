@@ -1,4 +1,4 @@
-import { Placemark, placeMarkToFormattedAddress } from "@lib/location"
+import { Placemark, placemarkToFormattedAddress } from "@lib/location"
 
 describe("Placemark Formatting tests", () => {
   it("formats in US style", () => {
@@ -12,7 +12,7 @@ describe("Placemark Formatting tests", () => {
       isoCountryCode: "US",
       city: "Cupertino"
     }
-    expect(placeMarkToFormattedAddress(components)).toEqual(
+    expect(placemarkToFormattedAddress(components)).toEqual(
       "1234 Cupertino Rd, Cupertino, CA 95104"
     )
   })
@@ -28,7 +28,7 @@ describe("Placemark Formatting tests", () => {
       isoCountryCode: "US",
       city: "Cupertino"
     }
-    expect(placeMarkToFormattedAddress(components)).toEqual(
+    expect(placemarkToFormattedAddress(components)).toEqual(
       "Cupertino, CA 95104"
     )
   })
@@ -44,7 +44,7 @@ describe("Placemark Formatting tests", () => {
       isoCountryCode: "US",
       city: "Cupertino"
     }
-    expect(placeMarkToFormattedAddress(components)).toEqual(
+    expect(placemarkToFormattedAddress(components)).toEqual(
       "1234 Cupertino Rd, Cupertino"
     )
   })
@@ -60,6 +60,6 @@ describe("Placemark Formatting tests", () => {
       isoCountryCode: null,
       city: null
     }
-    expect(placeMarkToFormattedAddress(components)).toBeUndefined()
+    expect(placemarkToFormattedAddress(components)).toBeUndefined()
   })
 })

@@ -1,4 +1,4 @@
-import { GraphQLClient } from "@lib/GraphQLOperations"
+import { GraphQLClient } from "@lib/GraphQLClient"
 import { unimplemented } from "./unimplemented"
 
 /**

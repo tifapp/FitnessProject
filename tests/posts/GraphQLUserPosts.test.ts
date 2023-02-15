@@ -1,5 +1,5 @@
 import { UserPosts } from "@lib/posts"
-import { GraphQLClient } from "@lib/GraphQLOperations"
+import { GraphQLClient } from "@lib/GraphQLClient"
 import {
   mockGraphQLResponseForStatement,
   unimplementedGraphQLOperations

@@ -19,7 +19,7 @@ export type Placemark = {
  *
  * At the moment, this only outputs US style addresses.
  */
-export const placeMarkToFormattedAddress = (placemark: Placemark) => {
+export const placemarkToFormattedAddress = (placemark: Placemark) => {
   // TODO: - At some point this should probably support internationalized styles.
   const streetNumber = placemark.street
     ? placemark.streetNumber ?? undefined

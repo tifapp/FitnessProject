@@ -1,6 +1,6 @@
 import { UserPost } from "./UserPost"
 import { groupUserPosts } from "./helpers"
-import { GraphQLClient, graphQLClientDependencyKey } from "../GraphQLOperations"
+import { GraphQLClient, graphQLClientDependencyKey } from "../GraphQLClient"
 import { loadCapitals } from "@hooks/stringConversion"
 import { batchGetLikes, getPost, getUser } from "@graphql/queries"
 import { Like, Post } from "src/models"
