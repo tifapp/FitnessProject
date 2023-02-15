@@ -1,3 +1,5 @@
+import { degreesToRadians, sin2 } from "@lib/Math"
+
 /**
  * A simple latitude and longitude based coordinate.
  */
@@ -23,23 +25,24 @@ export const milesBetweenLocations = (
   location1: Location,
   location2: Location
 ) => {
-  const lat1Radians = toRadians(location1.latitude)
-  const lat2Radians = toRadians(location2.latitude)
+  const lat1Radians = degreesToRadians(location1.latitude)
+  const lat2Radians = degreesToRadians(location2.latitude)
 
-  const latDeltaRadians = toRadians(location2.latitude - location1.latitude)
-  const lngDeltaRadians = toRadians(location2.longitude - location1.longitude)
+  const latDeltaRadians = degreesToRadians(
+    location2.latitude - location1.latitude
+  )
+  const lngDeltaRadians = degreesToRadians(
+    location2.longitude - location1.longitude
+  )
 
-  const sin2HalfLatDelta = sin2Identity(latDeltaRadians / 2)
+  const sin2HalfLatDelta = sin2(latDeltaRadians / 2)
   const latCos = Math.cos(lat1Radians) * Math.cos(lat2Radians)
-  const sin2HalfLngDelta = sin2Identity(lngDeltaRadians / 2)
+  const sin2HalfLngDelta = sin2(lngDeltaRadians / 2)
   const trigCombo = sin2HalfLatDelta + latCos * sin2HalfLngDelta
 
   const meters = 2 * EARTH_RADIUS_METERS * Math.asin(Math.sqrt(trigCombo))
   return meters / METERS_PER_MILE
 }
-
-const toRadians = (degrees: number) => (degrees * Math.PI) / 180
-const sin2Identity = (radians: number) => (1 - Math.cos(2 * radians)) / 2
 
 const EARTH_RADIUS_METERS = 6371e3
 const METERS_PER_MILE = 1609.344

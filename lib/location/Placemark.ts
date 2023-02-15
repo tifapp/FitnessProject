@@ -38,12 +38,12 @@ export const placemarkToFormattedAddress = (placemark: Placemark) => {
         postcode: postalCode,
         state: placemark.region ?? undefined
       },
-      { abbreviate: true, countryCode }
+      { abbreviate: true, countryCode: US_COUNTRY_CODE }
     )
     .split("\n")
     .filter((str) => str.length > 0)
     .join(", ")
-  return formattedAddress === countryCode ? undefined : formattedAddress
+  return formattedAddress === US_COUNTRY_CODE ? undefined : formattedAddress
 }
 
-const countryCode = "US"
+const US_COUNTRY_CODE = "US"
