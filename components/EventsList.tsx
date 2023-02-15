@@ -12,19 +12,7 @@ const EventsList = () => {
   const sheetRef = useRef<BottomSheet>(null)
 
   // variables
-  const snapPoints = useMemo(() => ["4%", "50%"], [])
-
-  // callbacks
-  /*
-  const handleSheetChange = useCallback((index) => {
-    console.log("handleSheetChange", index)
-  }, [])
-  const handleSnapPress = useCallback((index) => {
-    sheetRef.current?.snapToIndex(index)
-  }, [])
-  const handleClosePress = useCallback(() => {
-    sheetRef.current?.close()
-  }, []) */
+  const snapPoints = useMemo(() => ["4%", "65%"], [])
 
   const date = new Date()
   date.setHours(date.getHours() + 15)
