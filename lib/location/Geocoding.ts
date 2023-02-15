@@ -23,21 +23,25 @@ export interface Geocoding {
   reverseGeocode: (location: Location) => Promise<Placemark[]>
 }
 
-const expoGeocode = async (address: string) => {
-  return (await ExpoLocation.geocodeAsync(address)) as Location[]
-}
+/**
+ * `Geocoding` operations implemented by expo.
+ */
+export class ExpoGeocoding implements Geocoding {
+  async geocode (address: string) {
+    return (await ExpoLocation.geocodeAsync(address)) as Location[]
+  }
 
-const expoReverseGeocode = async (location: Location) => {
-  const results = await ExpoLocation.reverseGeocodeAsync({
-    ...location
-  })
-  return results as Placemark[]
+  async reverseGeocode (location: Location) {
+    const results = await ExpoLocation.reverseGeocodeAsync({
+      ...location
+    })
+    return results as Placemark[]
+  }
 }
 
 /**
  * `DependencyKey` for `Geocoding` operations.
  */
-export const geocodingDependencyKey = createDependencyKey<Geocoding>({
-  geocode: expoGeocode,
-  reverseGeocode: expoReverseGeocode
-})
+export const geocodingDependencyKey = createDependencyKey<Geocoding>(
+  new ExpoGeocoding()
+)

@@ -40,26 +40,29 @@ export interface UserLocation {
   ) => Promise<StopUserLocationTracking>
 }
 
-const expoRequestForegroundPermission = async () => {
-  return (await ExpoLocation.requestForegroundPermissionsAsync()).granted
-}
+/**
+ * `UserLocation` operations implemented by expo.
+ */
+export class ExpoUserLocation implements UserLocation {
+  async requestForegroundPermission () {
+    return (await ExpoLocation.requestForegroundPermissionsAsync()).granted
+  }
 
-const expoLastKnownLocation = async () => {
-  const location = await ExpoLocation.getLastKnownPositionAsync()
-  return location ? toTrackedLocation(location) : null
-}
+  async lastKnownLocation () {
+    const location = await ExpoLocation.getLastKnownPositionAsync()
+    return location ? toTrackedLocation(location) : null
+  }
 
-const expoCurrentLocation = async () => {
-  return toTrackedLocation(await ExpoLocation.getCurrentPositionAsync())
-}
+  async currentLocation () {
+    return toTrackedLocation(await ExpoLocation.getCurrentPositionAsync())
+  }
 
-const expoTrackUserLocation = async (
-  callback: (location: TrackedLocation) => void
-) => {
-  const subscription = await ExpoLocation.watchPositionAsync({}, (location) =>
-    callback(toTrackedLocation(location))
-  )
-  return subscription.remove as StopUserLocationTracking
+  async track (callback: (location: TrackedLocation) => void) {
+    const subscription = await ExpoLocation.watchPositionAsync({}, (location) =>
+      callback(toTrackedLocation(location))
+    )
+    return subscription.remove as StopUserLocationTracking
+  }
 }
 
 const toTrackedLocation = (locationResponse: ExpoLocation.LocationObject) => {
@@ -72,9 +75,6 @@ const toTrackedLocation = (locationResponse: ExpoLocation.LocationObject) => {
 /**
  * `DependencyKey` for `UserLocation` operations.
  */
-export const userLocationDependencyKey = createDependencyKey<UserLocation>({
-  requestForegroundPermission: expoRequestForegroundPermission,
-  lastKnownLocation: expoLastKnownLocation,
-  currentLocation: expoCurrentLocation,
-  track: expoTrackUserLocation
-})
+export const userLocationDependencyKey = createDependencyKey<UserLocation>(
+  new ExpoUserLocation()
+)
