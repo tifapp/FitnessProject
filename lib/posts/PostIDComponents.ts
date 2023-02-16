@@ -15,10 +15,10 @@ export type PostIDComponents = {
  */
 export const postIdFromComponents = ({
   creationDate,
-  userId,
+  userId
 }: PostIDComponents): string => {
-  return `${creationDate.toISOString()}#${userId}`;
-};
+  return `${creationDate.toISOString()}#${userId}`
+}
 
 /**
  * Extracts the components from a post id string if able.
@@ -28,15 +28,15 @@ export const postIdFromComponents = ({
 export const componentsFromPostId = (
   postId: string
 ): PostIDComponents | undefined => {
-  const splits = postId.split("#");
-  if (splits.length !== 2) return undefined;
+  const splits = postId.split("#")
+  if (splits.length !== 2) return undefined
 
-  const [dateString, userId] = splits;
-  const date = Date.parse(dateString);
-  if (isNaN(date)) return undefined;
+  const [dateString, userId] = splits
+  const date = Date.parse(dateString)
+  if (isNaN(date)) return undefined
 
   return {
     creationDate: new Date(date),
-    userId: userId,
-  };
-};
+    userId
+  }
+}
