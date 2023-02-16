@@ -1,20 +1,23 @@
-import React from "react";
-import { Dimensions, StyleSheet, View } from "react-native";
+import React, { useState } from "react";
+import { Button, StyleProp, View, ViewStyle } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 
 interface Props {
+  containStyle?: StyleProp<ViewStyle>;
+  mapStyle?: StyleProp<ViewStyle>;
+  initialRegion: {
+    latitude: number,
+    longitude: number,
+    latitudeDelta: number,
+    longitudeDelta: number,
+  }
   markers: {
   key: number,
   place: string,
   lat: number,
   lng: number,
+  pinColor: string
   }[];
-
-  size: {
-  height: number,
-  width: number,
-  };
-
   movementSettings: {
   canScroll: boolean,
   canZoom: boolean,
@@ -24,24 +27,16 @@ interface Props {
 
 
 // Height information: Gets how tall/wide the device in use is
-const deviceHeight = Dimensions.get("window").height
-const deviceWidth = Dimensions.get("window").width
-
-// Placeholder data to figure out how markers work; objects seem to work
-
-// IDK PUT THE LOCATION YOU FETCH FROM THE LOCATION SERVICES HERE? Might be different, could just be placeholder
-const area = {
-  latitude: 34.059761,
-  longitude: -118.276802,
-  latitudeDelta: 0.0922,
-  longitudeDelta: 0.0421
-}
-
-// Function to use map in order to go through objects and use information from them, for marker locations/information
-
 
 // Map view component itself
-function MapComponent ({markers, size, movementSettings}: Props) {
+function MapComponent ({initialRegion, markers, containStyle, mapStyle, movementSettings}: Props) {
+  const mapRef = React.useRef(null);
+  const [buttonVisible, setButtonVisible] = useState(true);
+  const [currentMarkers, setCurrentMarkers] = useState(markers);
+
+  /*const onLongPress = () => {
+    setCurrentMarkers([...currentMarkers, e.nativeEvent.coordinate]);
+  }*/
   
   const mapMarkerCreations = () => {
   return markers.map((report) =>
@@ -49,13 +44,14 @@ function MapComponent ({markers, size, movementSettings}: Props) {
     key = {report.key}
     title = {report.place}
     coordinate = {{ latitude: report.lat, longitude: report.lng }}
+    pinColor = {report.pinColor}
     onPress={() => onMarkerClick(report.lat, report.lng)}
     >
     </Marker >)
   }
 
   function onMarkerClick (lat: number, long: number) {
-    this.mapRef.animateToRegion({
+    mapRef.current.animateToRegion({
       latitude: lat,
       longitude: long,
       latitudeDelta: 0.05,
@@ -63,35 +59,53 @@ function MapComponent ({markers, size, movementSettings}: Props) {
     })
   }
 
+  function onRecenter () {
+    mapRef.current.animateToRegion({
+      latitude: initialRegion.latitude,
+      longitude: initialRegion.longitude,
+      latitudeDelta: initialRegion.latitudeDelta,
+      longitudeDelta: initialRegion.longitudeDelta,
+    })
+  }
+
   return (
-    <View style={styles.container}>
+    <View style={containStyle}>
       <MapView
-          style={styles.map}
+          style={mapStyle}
           provider={PROVIDER_GOOGLE}
-          region={area}
-          ref={mapRef => {this.mapRef = mapRef}}
+          region={initialRegion}
+          ref={mapRef}
           rotateEnabled={movementSettings.canRotate}
           scrollEnabled={movementSettings.canScroll}
           zoomEnabled={movementSettings.canZoom}
+          customMapStyle={[
+            {
+              "featureType": "poi",
+              "stylers": [{ "visibility": "off" }]
+            },{
+              "featureType": "transit",
+              "stylers": [{ "visibility": "off" }]
+            }
+          ]}
       >
       {mapMarkerCreations()}
       </MapView>
+      <View
+        style={{
+        position: 'absolute',//use absolute position to show button on top of the map
+        top: '70%', //for center align
+        alignSelf: 'flex-end' //for align to right
+        }}
+      >
+      { 
+        buttonVisible == true &&
+        <Button title="Re-Center" onPress={onRecenter}/>
+      }
+      </View>
     </View>
   )
 }
 
 //
-const styles = StyleSheet.create({
-  container: {
-    ...StyleSheet.absoluteFillObject,
-    height: deviceHeight - 360,
-    width: deviceWidth,
-    justifyContent: "flex-start",
-    alignItems: "center"
-  },
-  map: {
-    ...StyleSheet.absoluteFillObject
-  }
-})
 
 export default MapComponent

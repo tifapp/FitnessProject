@@ -1,5 +1,5 @@
 import MapComponent from "@components/MapComponent";
-import { state } from "@components/MapTestData";
+import { mapCompStyle, state } from "@components/MapTestData";
 import { Auth } from "aws-amplify";
 import React from "react";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
@@ -42,7 +42,8 @@ const ActivitiesScreen = () => {
           Log Out
         </Text>
       </TouchableOpacity>
-      <MapComponent markers={state.markers} size={state.size} movementSettings={state.movementSettings}/>
+      <MapComponent containStyle={mapCompStyle.container} mapStyle={mapCompStyle.map} 
+                    initialRegion={state.initialRegion} markers={state.markers} movementSettings={state.movementSettings}/>
       <Text
         style={{
           alignItems: "center",
