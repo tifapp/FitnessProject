@@ -2,22 +2,22 @@ import { UserPosts } from "@lib/posts"
 import { GraphQLClient } from "@lib/GraphQLClient"
 import {
   mockGraphQLResponseForStatement,
-  unimplementedGraphQLOperations
-} from "../helpers/GraphQLOperations"
+  unimplementedGraphQLClient
+} from "../helpers/GraphQLClient"
 import { batchGetLikes, getPost, getUser } from "@graphql/queries"
 import { Post } from "../../src/models"
 import { postIdFromComponents } from "@lib/posts/PostIDComponents"
 import { GraphQLUserPosts } from "@lib/posts/UserPosts"
 
-let operations: GraphQLClient
+let graphql: GraphQLClient
 let userPosts: UserPosts
 
 globalThis.savedUsers = {}
 
 describe("GraphQLUserPosts tests", () => {
   beforeEach(() => {
-    operations = unimplementedGraphQLOperations
-    userPosts = new GraphQLUserPosts(testUserId, operations)
+    graphql = unimplementedGraphQLClient
+    userPosts = new GraphQLUserPosts(testUserId, graphql)
   })
 
   test("postsWithIds returns an empty map when no ids given", async () => {
@@ -30,17 +30,17 @@ describe("GraphQLUserPosts tests", () => {
     mockGraphQLResponseForStatement({
       statement: getUser,
       data: { getUser: { name: blob, isVerfied: true, status: testStatus } },
-      operations
+      client: graphql
     })
     mockGraphQLResponseForStatement({
       statement: batchGetLikes,
       data: { batchGetLikes: [null] },
-      operations
+      client: graphql
     })
     mockGraphQLResponseForStatement({
       statement: getPost,
       data: { getPost: testRawPost },
-      operations
+      client: graphql
     })
 
     const postMap = await userPosts.postsWithIds([testPostId])
