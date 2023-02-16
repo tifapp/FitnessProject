@@ -5,6 +5,54 @@ import { createDependencyKey } from "@lib/dependencies"
 export type StopUserLocationTracking = () => void
 
 /**
+ * An accurracy of where the user's location is when tracking.
+ *
+ * A more precise accuracy may consume more device energy.
+ */
+export enum UserLocationTrackingAccurracy {
+  /**
+   * Accurate to the nearest kilometer.
+   */
+  Low = 1,
+
+  /**
+   * Accurate to within one hundred meters.
+   */
+  Medium = 2,
+
+  /**
+   * Accurate to within ten meters of the desired target.
+   */
+  High = 3,
+
+  /**
+   * The best level of accuracy available.
+   */
+  Precise = 4
+}
+
+/**
+ * Options for tracking the user's location.
+ */
+export type UserLocationTrackingOptions = {
+  /**
+   * The accuracy of the tracked location.
+   *
+   * A more precise accuracy may consume more device energy.
+   *
+   * (Default: UserLocationTrackingAccuracy.Medium)
+   */
+  accuracy?: UserLocationTrackingAccurracy
+
+  /**
+   * The minimum number of meters changed to cause an update to be emitted.
+   *
+   * (Default: Determined by expo)
+   */
+  minUpdateMetersDistance?: number
+}
+
+/**
  * An interface around operations regarding the current user's location.
  */
 export interface UserLocation {
@@ -32,11 +80,13 @@ export interface UserLocation {
   /**
    * Invokes the given callback when the user's location changes.
    *
+   * @param options
    * @param callback a callback that accepts a `TrackedLocation` and runs whenever an update occurs
    * @returns a function to stop tracking
    */
   track: (
-    callback: (location: TrackedLocation) => void
+    callback: (location: TrackedLocation) => void,
+    options?: UserLocationTrackingOptions
   ) => Promise<StopUserLocationTracking>
 }
 
@@ -57,11 +107,35 @@ export class ExpoUserLocation implements UserLocation {
     return toTrackedLocation(await ExpoLocation.getCurrentPositionAsync())
   }
 
-  async track (callback: (location: TrackedLocation) => void) {
-    const subscription = await ExpoLocation.watchPositionAsync({}, (location) =>
-      callback(toTrackedLocation(location))
+  async track (
+    callback: (location: TrackedLocation) => void,
+    options: UserLocationTrackingOptions = defaultTrackingOptions
+  ) {
+    const subscription = await ExpoLocation.watchPositionAsync(
+      {
+        accuracy: toExpoAccurracy(options.accuracy),
+        distanceInterval: options.minUpdateMetersDistance
+      },
+      (location) => callback(toTrackedLocation(location))
     )
     return subscription.remove as StopUserLocationTracking
+  }
+}
+
+const defaultTrackingOptions: UserLocationTrackingOptions = {
+  accuracy: UserLocationTrackingAccurracy.Medium
+}
+
+const toExpoAccurracy = (accuracy?: UserLocationTrackingAccurracy) => {
+  switch (accuracy) {
+    case UserLocationTrackingAccurracy.Low:
+      return ExpoLocation.LocationAccuracy.Low
+    case UserLocationTrackingAccurracy.High:
+      return ExpoLocation.LocationAccuracy.High
+    case UserLocationTrackingAccurracy.Precise:
+      return ExpoLocation.LocationAccuracy.Highest
+    default:
+      return ExpoLocation.LocationAccuracy.Balanced
   }
 }
 
