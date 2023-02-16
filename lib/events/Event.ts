@@ -24,17 +24,26 @@ export namespace TestEventItems {
   const testId = "3283284382584"
   const testDate = new Date()
 
-  export const mockEvent: Event = {
-    id: testId,
-    userId: "3234324",
-    username: "Test Event",
-    title: "Title for Event",
-    repliesCount: 2,
-    writtenByYou: true,
-    startTime: testDate,
-    maxOccupancy: 5,
-    isAcceptingInvitations: true,
-    colorHex: "magenta",
-    distance: 0.5
+  export const mockEvent = (
+    time: Date | undefined,
+    occupancy: number | undefined,
+    hasInvitations: boolean,
+    useHours: boolean
+  ) => {
+    if (useHours) testDate.setHours(testDate.getHours() + 10)
+
+    return {
+      id: testId,
+      userId: "3234324",
+      username: "Test Event",
+      title: "Title for Event",
+      repliesCount: 2,
+      writtenByYou: true,
+      startTime: time,
+      maxOccupancy: occupancy,
+      isAcceptingInvitations: hasInvitations,
+      colorHex: "magenta",
+      distance: 0.5
+    }
   }
 }
