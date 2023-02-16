@@ -1,6 +1,8 @@
 import { Auth } from "aws-amplify"
 import React from "react"
 import { Alert, Text, TouchableOpacity, View } from "react-native"
+import EventsList from "@components/EventsList"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 
 const ActivitiesScreen = () => {
   function signOut () {
@@ -23,13 +25,7 @@ const ActivitiesScreen = () => {
   }
 
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center"
-      }}
-    >
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <TouchableOpacity onPress={signOut}>
         <Text
           style={{
@@ -39,20 +35,20 @@ const ActivitiesScreen = () => {
         >
           Log Out
         </Text>
+        <Text
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            color: "black",
+            fontWeight: "bold",
+            fontSize: 15
+          }}
+        >
+          SandBox to get started
+        </Text>
       </TouchableOpacity>
-
-      <Text
-        style={{
-          alignItems: "center",
-          justifyContent: "center",
-          color: "black",
-          fontWeight: "bold",
-          fontSize: 15
-        }}
-      >
-        SandBox to get started
-      </Text>
-    </View>
+      <EventsList />
+    </GestureHandlerRootView>
   )
 }
 
