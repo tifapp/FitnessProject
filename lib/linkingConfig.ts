@@ -1,6 +1,6 @@
-import { LinkingOptions } from "@react-navigation/native";
-import { Linking } from "react-native";
-import { UserNotifications } from "./UserNotifications";
+import { LinkingOptions } from "@react-navigation/native"
+import { Linking } from "react-native"
+import { UserNotifications } from "./UserNotifications"
 
 /**
  * Creates the app's deep linking configuration.
@@ -11,7 +11,7 @@ import { UserNotifications } from "./UserNotifications";
  */
 export const makeLinkingConfig = ({
   getAppLaunchURL = Linking.getInitialURL,
-  userNotifications,
+  userNotifications
 }: {
   getAppLaunchURL?: () => Promise<string | null>;
   userNotifications: UserNotifications;
@@ -22,17 +22,17 @@ export const makeLinkingConfig = ({
       screens: {
         Feed: {
           screens: {
-            Home: "home",
-          },
-        },
-      },
+            Home: "home"
+          }
+        }
+      }
     },
     getInitialURL: async () => {
       const notificationURL = await userNotifications
         .lastNotificationContent()
-        .then((content) => content?.data.url as string | undefined);
-      if (notificationURL) return notificationURL;
-      return await getAppLaunchURL();
-    },
-  };
-};
+        .then((content) => content?.data.url as string | undefined)
+      if (notificationURL) return notificationURL
+      return await getAppLaunchURL()
+    }
+  }
+}
