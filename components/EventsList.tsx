@@ -1,60 +1,52 @@
-import React, { useEffect, useMemo, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { ListRenderItemInfo, View } from "react-native"
-import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet"
+import BottomSheet, {
+  BottomSheetFlatList,
+  BottomSheetModal,
+  BottomSheetModalProvider
+} from "@gorhom/bottom-sheet"
 import { Event } from "@lib/events/Event"
 import EventItem from "@components/EventItem"
 import NearbyActivities from "./headerComponents/NearbyActivities"
+import { Events, GraphQLEventItems } from "@lib/events/Events"
+
+let eventItems: Events
 
 const EventsList = () => {
-  const [events, setEvents] = useState<Event[]>([])
+  eventItems = new GraphQLEventItems()
+  const ids = Array.from(new Array(10), (_, i) => String(i))
+  const events = eventItems.eventsWithIds(ids)
 
   // hooks
-  const sheetRef = useRef<BottomSheet>(null)
-
-  // variables
-  const snapPoints = useMemo(() => ["4%", "65%"], [])
-
-  const date = new Date()
-  date.setHours(date.getHours() + 15)
+  const sheetRef = useRef<BottomSheetModal>(null)
 
   useEffect(() => {
-    const test = []
-    for (let i = 0; i < 9; i++) {
-      const event: Event = {
-        id: String(i),
-        userId: "3234324",
-        repliesCount: 2,
-        writtenByYou: true,
-        startTime: date,
-        maxOccupancy: 5,
-        hasInvitations: true,
-        color: "magenta",
-        title: "Title for Event",
-        distance: 0.5
-      }
-      test.push(event)
-    }
-    setEvents(test)
+    sheetRef?.current?.present()
   }, [])
 
+  // variables
+  const snapPoints = ["4%", "65%", "100%"]
+
   return (
-    <View style={{ flex: 1 }}>
-      <BottomSheet
-        ref={sheetRef}
-        snapPoints={snapPoints}
-        index={0}
-        handleHeight={15}
-      >
-        <BottomSheetFlatList
-          data={events}
-          renderItem={({ item }: ListRenderItemInfo<Event>) => (
-            <EventItem event={item} />
-          )}
-          ListHeaderComponent={<NearbyActivities />}
-          stickyHeaderIndices={[0]}
-        />
-      </BottomSheet>
-    </View>
+    <BottomSheetModalProvider>
+      <View style={{ flex: 1 }}>
+        <BottomSheetModal
+          ref={sheetRef}
+          snapPoints={snapPoints}
+          index={0}
+          enablePanDownToClose={false}
+        >
+          <BottomSheetFlatList
+            data={events}
+            renderItem={({ item }: ListRenderItemInfo<Event>) => (
+              <EventItem event={item} />
+            )}
+            ListHeaderComponent={<NearbyActivities />}
+            stickyHeaderIndices={[0]}
+          />
+        </BottomSheetModal>
+      </View>
+    </BottomSheetModalProvider>
   )
 }
 

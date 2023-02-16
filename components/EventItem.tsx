@@ -84,7 +84,7 @@ const EventItem = ({ event }: Props) => {
         {/* Header (Event Icon, Event Title, Distance) */}
         <View style={[styles.flexRow, styles.eventContainerStyle]}>
           <View style={[styles.spacingTop, { paddingLeft: "3%" }]}>
-            <Icon name="location-pin" color={event.color} />
+            <Icon name="location-pin" color={event.colorHex} />
           </View>
           <Text
             style={[styles.eventTitle, styles.spacingTop]}
@@ -187,7 +187,7 @@ const EventItem = ({ event }: Props) => {
 
           {/* Bottom Right Icons (invitations, comments, more tab) */}
           <View style={styles.iconsBottomRight}>
-            {event.hasInvitations
+            {event.isAcceptingInvitations
               ? (
               <View
                 style={styles.iconsBottomRight}
@@ -197,7 +197,7 @@ const EventItem = ({ event }: Props) => {
                   style={{ paddingRight: "14%" }}
                   iconName={"person-add"}
                   size={24}
-                  color={requested ? event.color : "black"}
+                  color={requested ? event.colorHex : "black"}
                   onPress={handleRequestToJoin}
                   accessibilityLabel={"invitation icon"}
                   label={`${numInvitations > 0 ? numInvitations : ""}`}

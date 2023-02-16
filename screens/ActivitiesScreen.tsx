@@ -35,19 +35,18 @@ const ActivitiesScreen = () => {
         >
           Log Out
         </Text>
+        <Text
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            color: "black",
+            fontWeight: "bold",
+            fontSize: 15
+          }}
+        >
+          SandBox to get started
+        </Text>
       </TouchableOpacity>
-
-      <Text
-        style={{
-          alignItems: "center",
-          justifyContent: "center",
-          color: "black",
-          fontWeight: "bold",
-          fontSize: 15
-        }}
-      >
-        SandBox to get started
-      </Text>
       <EventsList />
     </GestureHandlerRootView>
   )
