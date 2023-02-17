@@ -309,20 +309,20 @@ const App = () => {
         </Tab.Navigator>
       </NavigationContainer>
     )
-    // } else if (isDeveloper) {
-    //   return (
-    //     <NavigationContainer>
-    //       <Stack.Navigator>
-    //         <Stack.Screen
-    //           name="Activities Screen"
-    //           component={ActivitiesScreen}
-    //           options={{
-    //             headerShown: false
-    //           }}
-    //         />
-    //       </Stack.Navigator>
-    //     </NavigationContainer>
-    //   )
+      } else if (isDeveloper) {
+       return (
+           <NavigationContainer>
+             <Stack.Navigator>
+               <Stack.Screen
+                 name="Activities Screen"
+                 component={ActivitiesScreen}
+                 options={{
+                  headerShown: false
+                 }}
+               />
+             </Stack.Navigator>
+           </NavigationContainer>
+        )
   } else {
     return (
       <SetDependencyValue forKey={userIdDependencyKey} value={userId}>

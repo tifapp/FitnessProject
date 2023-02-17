@@ -25,13 +25,11 @@ interface Props {
   };
 }
 
-
-// Height information: Gets how tall/wide the device in use is
-
 // Map view component itself
 function MapComponent ({initialRegion, markers, containStyle, mapStyle, movementSettings}: Props) {
   const mapRef = React.useRef(null);
   const [buttonVisible, setButtonVisible] = useState(true);
+  const [selectedMarker, setSelectedMarker] = useState<Object>();
   const [currentMarkers, setCurrentMarkers] = useState(markers);
 
   /*const onLongPress = () => {
@@ -45,7 +43,8 @@ function MapComponent ({initialRegion, markers, containStyle, mapStyle, movement
     title = {report.place}
     coordinate = {{ latitude: report.lat, longitude: report.lng }}
     pinColor = {report.pinColor}
-    onPress={() => onMarkerClick(report.lat, report.lng)}
+    onPress={() => {onMarkerClick(report.lat, report.lng); setButtonVisible(true); setSelectedMarker(report)}}
+    icon={require('../assets/icon.png')}
     >
     </Marker >)
   }
@@ -54,9 +53,10 @@ function MapComponent ({initialRegion, markers, containStyle, mapStyle, movement
     mapRef.current.animateToRegion({
       latitude: lat,
       longitude: long,
-      latitudeDelta: 0.05,
-      longitudeDelta: 0.05,
+      latitudeDelta: initialRegion.latitudeDelta - 0.02,
+      longitudeDelta: initialRegion.longitudeDelta - 0.02,
     })
+    
   }
 
   function onRecenter () {
@@ -73,10 +73,12 @@ function MapComponent ({initialRegion, markers, containStyle, mapStyle, movement
       <MapView
           style={mapStyle}
           provider={PROVIDER_GOOGLE}
-          region={initialRegion}
+          initialRegion={initialRegion}
           ref={mapRef}
           rotateEnabled={movementSettings.canRotate}
           scrollEnabled={movementSettings.canScroll}
+          followsUserLocation={true}
+          showsUserLocation={true}
           zoomEnabled={movementSettings.canZoom}
           customMapStyle={[
             {
@@ -99,9 +101,23 @@ function MapComponent ({initialRegion, markers, containStyle, mapStyle, movement
       >
       { 
         buttonVisible == true &&
-        <Button title="Re-Center" onPress={onRecenter}/>
+        <Button title="Re-Center" onPress={() => {onRecenter(); setButtonVisible(false);}}/>
       }
       </View>
+
+      {<View
+        style={{
+        position: 'absolute',//use absolute position to show button on top of the map
+        top: '80%', //for center align
+        alignSelf: 'flex-end' //for align to right
+        }}
+      >
+      {
+        selectedMarker &&
+        <Button title="Deselect" onPress={() => setSelectedMarker(undefined)}/>  
+      }
+      </View>}
+
     </View>
   )
 }
