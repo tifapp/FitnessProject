@@ -1,5 +1,20 @@
 import { Analytics } from "aws-amplify"
+import { createDependencyKey } from "./dependencies"
 
+/**
+ * A function type to record analytic events.
+ */
+export type RecordAnalytics = (
+  eventName: string,
+  data?: Record<string, string | number>
+) => void
+
+/**
+ * Records an event to aws amplify analytics.
+ *
+ * @param eventName the name of the event.
+ * @param data event data, where string values are encoded as attributes and numeric values are encoded as metrics.
+ */
 export const amplifyRecordAnalytics = (
   eventName: string,
   data?: Record<string, string | number>
@@ -28,3 +43,10 @@ const compactMapAnaylticsData = <T extends Record<string, string | number>, V>(
   })
   return Object.fromEntries(map)
 }
+
+/**
+ * A `DependencyKey` for recording analytics.
+ */
+export const analyticsDependencyKey = createDependencyKey<RecordAnalytics>(
+  amplifyRecordAnalytics
+)
