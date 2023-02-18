@@ -1,11 +1,11 @@
-import { GraphQLClient } from "@lib/GraphQLOperations"
+import { GraphQLClient } from "@lib/GraphQLClient"
 import { unimplemented } from "./unimplemented"
 
 /**
- * A `GraphQLOperations` instance that causes a test failure when any
+ * A `GraphQLClient` instance that causes a test failure when any
  * of its methods are invoked.
  */
-export const unimplementedGraphQLOperations: GraphQLClient = {
+export const unimplementedGraphQLClient: GraphQLClient = {
   execute: () => unimplemented("execute")
 } as const
 
@@ -15,14 +15,14 @@ export const unimplementedGraphQLOperations: GraphQLClient = {
 export const mockGraphQLResponseForStatement = <T>({
   statement,
   data,
-  operations
+  client
 }: {
   statement: string
   data: T
-  operations: GraphQLClient
+  client: GraphQLClient
 }) => {
-  const execute = operations.execute.bind({})
-  operations.execute = async (innerStatement, variables) => {
+  const execute = client.execute.bind({})
+  client.execute = async (innerStatement, variables) => {
     if (innerStatement === statement) {
       return data
     }
