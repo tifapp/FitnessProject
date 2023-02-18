@@ -46,6 +46,20 @@ const compactMapAnaylticsData = <T extends Record<string, string | number>, V>(
 
 /**
  * A `DependencyKey` for recording analytics.
+ *
+ * It can be used as such inside react components/hooks:
+ *
+ * ```tsx
+ * const Component = () => {
+ *    const analytics = useDependencyValue(analyticsDependencyKey)
+ *
+ *    const doThing = () => {
+ *        analytics("thingHappened", { attribute: "hello", metric: 5 })
+ *    }
+ *
+ *    return <Button label="Do Thing" onPress={doThing} />
+ * }
+ * ```
  */
 export const analyticsDependencyKey = createDependencyKey<RecordAnalytics>(
   amplifyRecordAnalytics
