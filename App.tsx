@@ -4,7 +4,7 @@ import { Amplify, Auth, Cache, graphqlOperation, Storage } from "aws-amplify"
 import { withAuthenticator } from "aws-amplify-react-native"
 import awsconfig from "./src/aws-exports"
 
-import { AmplifyGraphQLClient } from "@lib/GraphQLOperations"
+import { AmplifyGraphQLClient } from "@lib/GraphQLClient"
 
 // graphql
 import { updateUser } from "@graphql/mutations.js"
@@ -42,6 +42,7 @@ import { Audio } from "expo-av"
 import * as Notifications from "expo-notifications"
 import { StatusBar } from "expo-status-bar"
 import React, { useEffect, useRef, useState } from "react"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 import {
   ActivityIndicator,
   Alert,
@@ -106,7 +107,6 @@ const Drawer = createDrawerNavigator()
 
 // TODO: - One day, we may get this under test...
 
-const graphqlOperations = new AmplifyGraphQLClient()
 const userNotifications = new ExpoUserNotifications()
 const linkingConfig = makeLinkingConfig({ userNotifications })
 
@@ -309,20 +309,21 @@ const App = () => {
         </Tab.Navigator>
       </NavigationContainer>
     )
-      } else if (isDeveloper) {
-       return (
-           <NavigationContainer>
-             <Stack.Navigator>
-               <Stack.Screen
-                 name="Activities Screen"
-                 component={ActivitiesScreen}
-                 options={{
-                  headerShown: false
-                 }}
-               />
-             </Stack.Navigator>
-           </NavigationContainer>
-        )
+
+  } else if (isDeveloper) {
+    return (
+      <NavigationContainer linking={linkingConfig}>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Activities Screen"
+            component={ActivitiesScreen}
+            options={{
+              headerShown: false
+            }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    )
   } else {
     return (
       <SetDependencyValue forKey={userIdDependencyKey} value={userId}>

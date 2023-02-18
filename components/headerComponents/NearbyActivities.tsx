@@ -1,28 +1,33 @@
-import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import React from "react"
+import { StyleSheet, Text, View } from "react-native"
 
-export default function NearbyActivities() {
-
+export default function NearbyActivities () {
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.text}>Nearby Activities</Text>
-      </ScrollView>
+      <View style={styles.activitiesContainer}>
+        <Text style={styles.activitiesText}>Nearby Activities</Text>
+      </View>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
-    height: '8%',
-    flexDirection: 'column'
+    flex: 1,
+    flexDirection: "row",
+    backgroundColor: "white",
+    borderColor: "red",
+    paddingBottom: "3%"
+    // borderWidth: 2
   },
-  scrollContainer: {
-    justifyContent: 'center',
-    flex: 1
+  activitiesContainer: {
+    flex: 1,
+    paddingLeft: "3%"
+    // justifyContent: "space-around"
   },
-  text: {
+  activitiesText: {
     fontSize: 20,
-    paddingLeft: '3%'
+    textAlignVertical: "top",
+    fontWeight: "bold"
   }
-});
+})

@@ -1,7 +1,4 @@
-import {
-  AmplifyGraphQLClient,
-  GraphQLClientError
-} from "@lib/GraphQLOperations"
+import { AmplifyGraphQLClient, GraphQLClientError } from "@lib/GraphQLClient"
 import API from "@aws-amplify/api"
 import { GraphQLError } from "graphql"
 import { GraphQLOptions } from "@aws-amplify/api-graphql"
