@@ -309,6 +309,7 @@ const App = () => {
         </Tab.Navigator>
       </NavigationContainer>
     )
+
   } else if (isDeveloper) {
     return (
       <NavigationContainer linking={linkingConfig}>
