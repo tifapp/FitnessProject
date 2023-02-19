@@ -38,8 +38,8 @@ export const amplifyRecordAnalytics = (
   })
 }
 
-const compactMapAnaylticsData = <T extends Record<string, string | number>, V>(
-  object: T,
+const compactMapAnaylticsData = <V>(
+  object: Record<string, string | number>,
   mapper: (value: string | number) => V | null
 ) => {
   const map = new Map<string, V>()
