@@ -20,7 +20,7 @@ describe("AmplifyAnalytics tests", () => {
     expect(recordedEvent).toMatchObject({ name: testAnalyticEventName })
   })
 
-  it("converts an event with metrics and no attributes to the proper amplify payload", () => {
+  it("converts an event with only numeric data to amplify analytics metrics", () => {
     const eventData = { testMetric: testAnalyticMetric }
     amplifyRecordAnalytics(testAnalyticEventName, eventData)
     expect(recordedEvent).toMatchObject({
@@ -29,7 +29,7 @@ describe("AmplifyAnalytics tests", () => {
     })
   })
 
-  it("converts an event with attributes and no metrics to the proper amplify payload", () => {
+  it("converts an event with only string value data to amplify analytics attributes", () => {
     const eventData = { testAttribute: testAnalyticAttribute }
     amplifyRecordAnalytics(testAnalyticEventName, eventData)
     expect(recordedEvent).toMatchObject({
@@ -38,7 +38,7 @@ describe("AmplifyAnalytics tests", () => {
     })
   })
 
-  it("converts input to amplify analytics event", () => {
+  it("converts event with attribute and metric data to proper amplify analytics event", () => {
     const eventData = {
       testAttribute: testAnalyticAttribute,
       testMetric: testAnalyticMetric

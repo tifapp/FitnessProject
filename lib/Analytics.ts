@@ -12,8 +12,14 @@ export type RecordAnalytics = (
 /**
  * Records an event to aws amplify analytics.
  *
+ * Additional data can optionally be added to events. Amplify records
+ * string value data as attributes, and numeric data as metrics. For more
+ * information, see:
+ *
+ * https://docs.amplify.aws/lib/analytics/record/q/platform/js/
+ *
  * @param eventName the name of the event.
- * @param data event data, where string values are encoded as attributes and numeric values are encoded as metrics.
+ * @param data a record of string keys to string or numeric values.
  */
 export const amplifyRecordAnalytics = (
   eventName: string,
@@ -47,6 +53,14 @@ const compactMapAnaylticsData = <T extends Record<string, string | number>, V>(
 /**
  * A `DependencyKey` for recording analytics.
  *
+ * The default value is a function that records the analytics to AWS Amplify.
+ *
+ * Additional data can be added on to analytics events, the default value
+ * of this key encodes string data as "attributes" and numeric values as
+ * "metrics" in AWS terms. For more information see:
+ *
+ * https://docs.amplify.aws/lib/analytics/record/q/platform/js/
+ *
  * It can be used as such inside react components/hooks:
  *
  * ```tsx
@@ -54,7 +68,9 @@ const compactMapAnaylticsData = <T extends Record<string, string | number>, V>(
  *    const analytics = useDependencyValue(analyticsDependencyKey)
  *
  *    const doThing = () => {
- *        analytics("thingHappened", { attribute: "hello", metric: 5 })
+ *        // The default value will encode "message" as an AWS attribute and
+ *        // "count" as an AWS metric.
+ *        analytics("thingHappened", { message: "hello", count: 5 })
  *    }
  *
  *    return <Button label="Do Thing" onPress={doThing} />
