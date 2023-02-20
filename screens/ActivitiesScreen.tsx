@@ -1,10 +1,12 @@
 import { Auth } from "aws-amplify"
-import React from "react"
+import React, { useState } from "react"
 import { Alert, Text, TouchableOpacity, View } from "react-native"
 import EventsList from "@components/EventsList"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
+import DateTimePicker from "@components/formComponents/DateTimePicker"
 
 const ActivitiesScreen = () => {
+  const [date, setDate] = useState(new Date())
   function signOut () {
     const title = "Are you sure you want to sign out?"
     const message = ""
@@ -47,7 +49,13 @@ const ActivitiesScreen = () => {
           SandBox to get started
         </Text>
       </TouchableOpacity>
-      <EventsList />
+      <DateTimePicker
+        style={{ paddingHorizontal: 24 }}
+        textStyle={{ fontWeight: "bold" }}
+        label="Pick Date"
+        date={date}
+        onDateChanged={setDate}
+      />
     </GestureHandlerRootView>
   )
 }
