@@ -51,7 +51,7 @@ const ActivitiesScreen = () => {
       </TouchableOpacity>
       <DateTimePicker
         style={{ paddingHorizontal: 24 }}
-        textStyle={{ fontWeight: "bold" }}
+        labelStyle={{ fontWeight: "bold" }}
         label="Pick Date"
         date={date}
         onDateChanged={setDate}
