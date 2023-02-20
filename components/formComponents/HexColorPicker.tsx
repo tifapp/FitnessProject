@@ -77,7 +77,7 @@ const HexColorPicker = ({
       {options.map((option, i) => (
         <TouchableOpacity
           style={styles.optionContainer}
-          key={i.toString()}
+          key={option}
           onPress={() => colorTapped(option)}
           accessibilityRole="button"
           accessibilityLabel={createAccessibilityLabel(option)}
