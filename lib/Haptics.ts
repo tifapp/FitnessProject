@@ -8,7 +8,7 @@ export enum HapticEvent {
   /**
    * Useful for when the user changes a selected ui element in a form.
    */
-  Selection,
+  SelectionChanged,
 
   /**
    * Useful for when something positive happens after a user action (eg. Event created).
@@ -52,7 +52,7 @@ export type PlayHaptics = (event: HapticEvent) => Promise<void>
  */
 export const expoPlayHaptics = async (event: HapticEvent) => {
   switch (event) {
-    case HapticEvent.Selection:
+    case HapticEvent.SelectionChanged:
       await ExpoHaptics.selectionAsync()
       break
     case HapticEvent.Success:
@@ -88,5 +88,6 @@ export const expoPlayHaptics = async (event: HapticEvent) => {
  * The default value simply uses [`expo-haptics`](https://docs.expo.dev/versions/latest/sdk/haptics/)
  * which uses `UIFeedbackGenerator` for iOS and `Vibrator` for Android.
  */
-export const hapticsDependencyKey =
-  createDependencyKey<PlayHaptics>(expoPlayHaptics)
+export const hapticsDependencyKey = createDependencyKey<PlayHaptics>(
+  () => expoPlayHaptics
+)

@@ -5,7 +5,7 @@ jest.mock("expo-haptics")
 
 describe("ExpoHaptics tests", () => {
   it("translates a selection event correctly", async () => {
-    await expoPlayHaptics(HapticEvent.Selection)
+    await expoPlayHaptics(HapticEvent.SelectionChanged)
     expect(ExpoHaptics.selectionAsync).toHaveBeenCalled()
   })
 
