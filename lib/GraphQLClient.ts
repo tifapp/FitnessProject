@@ -1,4 +1,4 @@
-import API, { GraphQLResult, graphqlOperation } from "@aws-amplify/api"
+import API, { GraphQLResult } from "@aws-amplify/api"
 import { GraphQLError } from "graphql"
 import { Cancellable } from "./Cancellable"
 import { createDependencyKey } from "./dependencies"
