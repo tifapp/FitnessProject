@@ -78,5 +78,5 @@ const compactMapAnaylticsData = <V>(
  * ```
  */
 export const analyticsDependencyKey = createDependencyKey<RecordAnalytics>(
-  amplifyRecordAnalytics
+  () => amplifyRecordAnalytics
 )
