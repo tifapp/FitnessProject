@@ -74,7 +74,7 @@ const HexColorPicker = ({
 
   return (
     <ScrollView horizontal contentContainerStyle={[styles.container, style]}>
-      {options.map((option, i) => (
+      {options.map((option) => (
         <TouchableOpacity
           style={styles.optionContainer}
           key={option}
