@@ -1,28 +1,28 @@
-import { MaterialIcons } from "@expo/vector-icons";
-import React, { useRef, useState } from "react";
-import { TouchableOpacity } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons"
+import React, { useRef, useState } from "react"
+import { TouchableOpacity } from "react-native"
 
 interface Props {
   func : () => Promise<void>
 }
 
-export default function SpamButton({ func } : Props) {
-  const [spamming, setSpamming] = useState(false);
-  const timeoutFunction = useRef();
+export default function SpamButton ({ func } : Props) {
+  const [spamming, setSpamming] = useState(false)
+  const timeoutFunction = useRef()
 
   const spam = () => {
-    func(), (timeoutFunction.current = setTimeout(spam, 1000));
-  };
+    func(), (timeoutFunction.current = setTimeout(spam, 1000))
+  }
 
   return (
     <TouchableOpacity
       onPress={() => {
         if (spamming) {
-          clearTimeout(timeoutFunction.current);
+          clearTimeout(timeoutFunction.current)
         } else {
-          spam();
+          spam()
         }
-        setSpamming(!spamming);
+        setSpamming(!spamming)
       }}
     >
       <MaterialIcons
@@ -31,5 +31,5 @@ export default function SpamButton({ func } : Props) {
         color="black"
       />
     </TouchableOpacity>
-  );
+  )
 }

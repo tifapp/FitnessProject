@@ -1,24 +1,24 @@
-import React, { useCallback, useState } from "react";
-import { Modal, TouchableOpacity, View } from "react-native";
+import React, { useCallback, useState } from "react"
+import { Modal, TouchableOpacity, View } from "react-native"
 
-//currently this is just used in the profile screen for the bio and goals descriptions
-//later we can make this a generic touchable that causes a transparent modal to appear at the bottom of the screen, and pass in the children from the parent
+// currently this is just used in the profile screen for the bio and goals descriptions
+// later we can make this a generic touchable that causes a transparent modal to appear at the bottom of the screen, and pass in the children from the parent
 
-export default function TouchableWithModal({
+export default function TouchableWithModal ({
   modalComponent,
   style = {},
   children,
-  dontShowModalOnPress = false,
+  dontShowModalOnPress = false
 }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   const showModal = useCallback(() => {
-    setIsModalOpen(true);
-  }, []);
+    setIsModalOpen(true)
+  }, [])
 
   const hideModal = useCallback(() => {
-    setIsModalOpen(false);
-  }, []);
+    setIsModalOpen(false)
+  }, [])
 
   return (
     <>
@@ -41,7 +41,7 @@ export default function TouchableWithModal({
               justifyContent: "center",
               backgroundColor: "white",
               alignItems: "flex-end",
-              marginTop: "auto",
+              marginTop: "auto"
             }}
           >
             {typeof modalComponent === "function"
@@ -51,5 +51,5 @@ export default function TouchableWithModal({
         </View>
       </Modal>
     </>
-  );
+  )
 }

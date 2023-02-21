@@ -1,61 +1,61 @@
-export default function printTime(dateInMilliseconds) {
-  const dateInfo = new Date(dateInMilliseconds);
+export default function printTime (dateInMilliseconds) {
+  const dateInfo = new Date(dateInMilliseconds)
 
-  var hourVal = dateInfo.getHours();
-  var totalTime = dateInfo.getTime();
+  const hourVal = dateInfo.getHours()
+  const totalTime = dateInfo.getTime()
 
-  var currentTotalTime = Date.now();
+  const currentTotalTime = Date.now()
 
-  var timeDifference = currentTotalTime - totalTime;
+  const timeDifference = currentTotalTime - totalTime
 
-  var secondDifference = timeDifference / 1000;
-  var minuteDifference = secondDifference / 60;
-  var hourDifference = minuteDifference / 60;
-  var dayDifference = hourDifference / 24;
-  var monthDifference = dayDifference / 30;
-  var yearDifference = monthDifference / 12;
+  const secondDifference = timeDifference / 1000
+  let minuteDifference = secondDifference / 60
+  let hourDifference = minuteDifference / 60
+  let dayDifference = hourDifference / 24
+  let monthDifference = dayDifference / 30
+  let yearDifference = monthDifference / 12
 
-  let displayTime = "";
+  let displayTime = ""
   if (secondDifference < 60) {
-    displayTime = "Just now";
+    displayTime = "Just now"
   } else if (minuteDifference >= 1 && minuteDifference < 60) {
-    minuteDifference = Math.floor(minuteDifference);
+    minuteDifference = Math.floor(minuteDifference)
     if (minuteDifference == 1) {
-      displayTime = minuteDifference + " min";
+      displayTime = minuteDifference + " min"
     } else {
-      displayTime = minuteDifference + " mins";
+      displayTime = minuteDifference + " mins"
     }
   } else if (hourDifference >= 1 && hourDifference < 24) {
-    hourDifference = Math.floor(hourDifference);
+    hourDifference = Math.floor(hourDifference)
     if (hourDifference == 1) {
-      displayTime = hourDifference + " hr";
+      displayTime = hourDifference + " hr"
     } else {
-      displayTime = hourDifference + " hrs";
+      displayTime = hourDifference + " hrs"
     }
   } else if (dayDifference >= 1 && dayDifference < 31) {
-    dayDifference = Math.floor(dayDifference);
+    dayDifference = Math.floor(dayDifference)
     if (dayDifference == 1) {
-      displayTime = dayDifference + " day";
+      displayTime = dayDifference + " day"
     } else {
-      displayTime = dayDifference + " days";
+      displayTime = dayDifference + " days"
     }
   } else if (monthDifference >= 1 && monthDifference < 12) {
-    monthDifference = Math.floor(monthDifference);
+    monthDifference = Math.floor(monthDifference)
     if (monthDifference == 1) {
-      displayTime = monthDifference + " m";
+      displayTime = monthDifference + " m"
     } else {
-      displayTime = dayDifference + " m";
+      displayTime = dayDifference + " m"
     }
   } else if (yearDifference >= 1) {
-    yearDifference = Math.floor(yearDifference);
+    yearDifference = Math.floor(yearDifference)
     if (yearDifference == 1) {
-      displayTime = yearDifference + " y";
+      displayTime = yearDifference + " y"
     } else {
-      displayTime = yearDifference + " y";
+      displayTime = yearDifference + " y"
     }
   }
 
-  return displayTime;
+  return displayTime
 }
 
 /*
@@ -151,7 +151,6 @@ export default function PostItem({
     }
   }
 
-
   let timeCheck = "AM";
 
   if (hourVal >= 12 && hourVal <= 23) {
@@ -165,7 +164,7 @@ export default function PostItem({
   if (hourVal > 12) {
     hourVal = hourVal - 12;
   }
-  
+
   const navigation = useNavigation();
   const goToProfile = () => {
     navigation.navigate('Lookup',

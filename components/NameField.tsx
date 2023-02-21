@@ -1,14 +1,14 @@
-import React from "react";
-import { Dimensions, StyleSheet, Text, TextInput, View } from "react-native";
+import React from "react"
+import { Dimensions, StyleSheet, Text, TextInput, View } from "react-native"
 
-const { width } = Dimensions.get("screen");
+const { width } = Dimensions.get("screen")
 
 interface Props {
   nameVal: string,
   setName: React.Dispatch<React.SetStateAction<string>>
 }
 
-export default function NameField({ setName, nameVal } : Props) {
+export default function NameField ({ setName, nameVal } : Props) {
   return (
     <View>
       <View style={styles.nameFormat}>
@@ -21,7 +21,7 @@ export default function NameField({ setName, nameVal } : Props) {
         />
       </View>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -32,6 +32,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     paddingTop: 30,
     paddingBottom: 15,
-    width: width / 1.3,
-  },
-});
+    width: width / 1.3
+  }
+})

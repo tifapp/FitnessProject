@@ -1,67 +1,72 @@
-//components
-import APIList, { APIListRefType, APIListRenderItemInfo } from "@components/APIList";
-import IconButton from "@components/common/IconButton";
-import ExpandingTextInputWithNameInput from "@components/ExpandingTextInputWithNameInput";
-import PostItem from "@components/PostItem";
-import { ProfileImageAndName } from "@components/ProfileImageAndName";
-import SpamButton from "@components/SpamButton";
+// components
+import APIList, {
+  APIListRefType,
+  APIListRenderItemInfo
+} from "@components/APIList"
+import IconButton from "@components/common/IconButton"
+import ExpandingTextInputWithNameInput from "@components/ExpandingTextInputWithNameInput"
+import PostItem from "@components/PostItem"
+import { ProfileImageAndName } from "@components/ProfileImageAndName"
+import SpamButton from "@components/SpamButton"
 
-//graphql
-import {
-  createPost,
-  createReport
-} from "@graphql/mutations";
-import { batchGetLikes, postsByChannel, postsByLikes } from "@graphql/queries";
+// graphql
+import { createPost, createReport } from "@graphql/mutations"
+import { batchGetLikes, postsByChannel, postsByLikes } from "@graphql/queries"
 import {
   onCreatePostFromChannel,
   onDeletePostFromChannel,
   onUpdatePostFromChannel
-} from "@graphql/subscriptions";
-import { Like, Post } from "src/models";
+} from "@graphql/subscriptions"
+import { Like, Post } from "src/models"
 
-//hooks
-import SHA256 from "@hooks/hash";
-import usePhotos from "@hooks/usePhotos";
+// hooks
+import SHA256 from "@hooks/hash"
+import usePhotos from "@hooks/usePhotos"
 
-import API, { GraphQLQuery, GraphQLSubscription } from "@aws-amplify/api";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import { graphqlOperation, Storage } from "aws-amplify";
-import { Progress } from "aws-sdk/lib/request";
-import { Video } from "expo-av";
-import * as ImageManipulator from "expo-image-manipulator";
-import { SaveFormat } from "expo-image-manipulator";
-import { getLinkPreview } from "link-preview-js";
-import React, { useEffect, useRef, useState } from "react";
+import API, { GraphQLQuery, GraphQLSubscription } from "@aws-amplify/api"
+import { useFocusEffect, useNavigation } from "@react-navigation/native"
+import { graphqlOperation, Storage } from "aws-amplify"
+import { Progress } from "aws-sdk/lib/request"
+import { Video } from "expo-av"
+import * as ImageManipulator from "expo-image-manipulator"
+import { SaveFormat } from "expo-image-manipulator"
+import { getLinkPreview } from "link-preview-js"
+import React, { useEffect, useRef, useState } from "react"
 import {
   Alert,
   Animated,
   FlatList,
   FlatListProps,
-  Image, KeyboardAvoidingView, Platform, StyleProp, StyleSheet, Text,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  StyleProp,
+  StyleSheet,
+  Text,
   View,
   ViewStyle
-} from "react-native";
+} from "react-native"
 
-const linkify = require("linkify-it")();
+const linkify = require("linkify-it")()
 linkify
   .tlds(require("tlds")) // Reload with full tlds list
-  .tlds("mobi", true); // Add unofficial `.onion` domain
+  .tlds("mobi", true) // Add unofficial `.onion` domain
 
-require("../androidtimerfix");
+require("../androidtimerfix")
 
-var allSettled = require("promise.allsettled");
+const allSettled = require("promise.allsettled")
 
 const viewabilityConfig = {
   minimumViewTime: 150,
   itemVisiblePercentThreshold: 66,
-  waitForInteraction: false,
-};
+  waitForInteraction: false
+}
 
 interface Props extends Omit<FlatListProps<any>, "renderItem"> {
   channel: string;
   headerComponent?: React.ReactElement;
   footerComponent?: React.ReactElement;
-  originalParentId?: string
+  originalParentId?: string;
   isFocused?: boolean;
   postButtonLabel?: string;
   renderItem?: (i: Post) => React.ReactNode;
@@ -71,7 +76,7 @@ interface Props extends Omit<FlatListProps<any>, "renderItem"> {
   onPostAdded?: (newPost: Post) => void;
 }
 
-export default function FeedScreen({
+export default function FeedScreen ({
   channel,
   headerComponent,
   footerComponent,
@@ -85,12 +90,12 @@ export default function FeedScreen({
   onPostAdded,
   ...rest
 }: Props) {
-  const navigation = useNavigation();
+  const navigation = useNavigation()
 
-  const scrollRef = useRef<FlatList>(null); // Used to help with automatic scrolling to top
-  const listRef = useRef<APIListRefType<Post>>(null);
+  const scrollRef = useRef<FlatList>(null) // Used to help with automatic scrolling to top
+  const listRef = useRef<APIListRefType<Post>>(null)
 
-  const [addedNewPost, setAddedNewPost] = useState(false);
+  const [addedNewPost, setAddedNewPost] = useState(false)
 
   useFocusEffect(
     React.useCallback(() => {
@@ -103,110 +108,124 @@ export default function FeedScreen({
               imageSize={30}
               style={{ marginLeft: 15 }}
             />
-          ),
-        });
+          )
+        })
       }
     }, [])
-  );
+  )
 
   useEffect(() => {
-    const createPostSubscription = API.graphql<GraphQLSubscription<{onCreatePostFromChannel: Post}>>(
-      graphqlOperation(onCreatePostFromChannel, { channel: channel })
+    const createPostSubscription = API.graphql<
+      GraphQLSubscription<{ onCreatePostFromChannel: Post }>
+    >(
+      graphqlOperation(onCreatePostFromChannel, { channel })
     ).subscribe({
       next: (event) => {
-        const newPost = event.value?.data?.onCreatePostFromChannel;
-        if (!newPost) return;
-        if (newPost.userId === globalThis.myId)
-          listRef.current?.removeItem(0);
+        const newPost = event.value?.data?.onCreatePostFromChannel
+        if (!newPost) return
+        if (newPost.userId === globalThis.myId) listRef.current?.removeItem(0)
         listRef.current?.addItem(
           newPost,
           (post) =>
             post.userId === newPost.userId &&
             post.createdAt === newPost.createdAt
-        );
+        )
       },
-      error: error => console.warn(error),
-    });
+      error: (error) => console.warn(error)
+    })
 
-    const deletePostSubscription = API.graphql<GraphQLSubscription<{onDeletePostFromChannel: Post}>>(
-      graphqlOperation(onDeletePostFromChannel, { channel: channel })
+    const deletePostSubscription = API.graphql<
+      GraphQLSubscription<{ onDeletePostFromChannel: Post }>
+    >(
+      graphqlOperation(onDeletePostFromChannel, { channel })
     ).subscribe({
       next: (event) => {
-        const deletedPost = event?.value?.data?.onDeletePostFromChannel;
-        if (!deletedPost) return;
+        const deletedPost = event?.value?.data?.onDeletePostFromChannel
+        if (!deletedPost) return
         listRef.current?.removeItem(
           (post) =>
             post.userId === deletedPost.userId &&
             post.createdAt === deletedPost.createdAt
-        );
+        )
       },
-      error: error => console.warn(error),
-    });
-    const updatePostSubscription = API.graphql<GraphQLSubscription<{onUpdatePostFromChannel: Post}>>(
-      graphqlOperation(onUpdatePostFromChannel, { channel: channel })
+      error: (error) => console.warn(error)
+    })
+    const updatePostSubscription = API.graphql<
+      GraphQLSubscription<{ onUpdatePostFromChannel: Post }>
+    >(
+      graphqlOperation(onUpdatePostFromChannel, { channel })
     ).subscribe({
-      //nvm we dont have a subscription event for incrementlike
+      // nvm we dont have a subscription event for incrementlike
       next: (event) => {
-        //console.log("post has been updated");
+        // console.log("post has been updated");
       },
-      error: error => console.warn(error),
-    });
+      error: (error) => console.warn(error)
+    })
     return () => {
-      createPostSubscription.unsubscribe();
-      deletePostSubscription.unsubscribe();
-      updatePostSubscription.unsubscribe();
-    };
-  }, []);
+      createPostSubscription.unsubscribe()
+      deletePostSubscription.unsubscribe()
+      updatePostSubscription.unsubscribe()
+    }
+  }, [])
 
-  const getLikedPosts = async (newPosts: (Post & {likedByYou?: boolean; urlPreview: Awaited<ReturnType<typeof getLinkPreview>>})[]) => {
-    let postIds: {postId: string}[] = [];
+  const getLikedPosts = async (
+    newPosts: (Post & {
+      likedByYou?: boolean;
+      urlPreview: Awaited<ReturnType<typeof getLinkPreview>>;
+    })[]
+  ) => {
+    const postIds: { postId: string }[] = []
 
     newPosts.forEach((item) => {
-      postIds.push({ postId: item.createdAt + "#" + item.userId });
-    });
+      postIds.push({ postId: item.createdAt + "#" + item.userId })
+    })
 
     try {
       await allSettled([
-        API.graphql<GraphQLQuery<{batchGetLikes: Like[]}>>(graphqlOperation(batchGetLikes, { likes: postIds })).then(
-          (likes) => {
-            for (let i = 0; i < newPosts.length; ++i) {
-              newPosts[i] = {...newPosts[i], likes: newPosts[i].likes ?? 0, likedByYou: likes.data?.batchGetLikes[i] != null};
+        API.graphql<GraphQLQuery<{ batchGetLikes: Like[] }>>(
+          graphqlOperation(batchGetLikes, { likes: postIds })
+        ).then((likes) => {
+          for (let i = 0; i < newPosts.length; ++i) {
+            newPosts[i] = {
+              ...newPosts[i],
+              likes: newPosts[i].likes ?? 0,
+              likedByYou: likes.data?.batchGetLikes[i] != null
             }
           }
-        ),
+        }),
 
         allSettled(
           newPosts.map((post) => {
             if (
               linkify.pretest(post.description) &&
               linkify.test(post.description)
-            )
+            ) {
               return getLinkPreview(linkify.match(post.description)[0].url, {
                 headers: {
-                  "user-agent": "googlebot", // fetches with googlebot crawler user agent
-                },
-              });
-            else return Promise.reject();
+                  "user-agent": "googlebot" // fetches with googlebot crawler user agent
+                }
+              })
+            } else return Promise.reject()
           })
         ).then((results: Awaited<ReturnType<typeof getLinkPreview>>[]) => {
           for (let i = 0; i < newPosts.length; ++i) {
-            newPosts[i].urlPreview = results[i];
+            newPosts[i].urlPreview = results[i]
           }
-        }),
-      ]);
+        })
+      ])
 
-      return newPosts;
+      return newPosts
 
-      //we can also check if the item contains a link and load the link preview data through here as well, and insert it into the postitem
-      //link previews should have a fixed height btw, or at least a max height. but then it could vary between 0 and the max height
+      // we can also check if the item contains a link and load the link preview data through here as well, and insert it into the postitem
+      // link previews should have a fixed height btw, or at least a max height. but then it could vary between 0 and the max height
     } catch (err) {
-      console.log("error in detecting likes: ", err);
+      console.log("error in detecting likes: ", err)
     }
-  };
+  }
 
   const showTimestamp = (item: Post, index: number) => {
-    return true;
-  };
+    return true
+  }
 
   const reportPost = async (timestamp: string, author: string) => {
     try {
@@ -214,20 +233,23 @@ export default function FeedScreen({
         graphqlOperation(createReport, {
           input: {
             postId: timestamp + "#" + author,
-            userId: globalThis.myId,
-          },
+            userId: globalThis.myId
+          }
         })
-      );
+      )
     } catch (err) {
-      console.log("error in reporting post: ", err);
+      console.log("error in reporting post: ", err)
     }
-  };
+  }
 
   // const scrollToTop = () => {
   //   scrollRef.current?.scrollToOffset({ offset: 0, animated: true });
   // };
 
-  const renderPostItem: APIListRenderItemInfo<Post> = ({ item, index }, operations) => {
+  const renderPostItem: APIListRenderItemInfo<Post> = (
+    { item, index },
+    operations
+  ) => {
     // if (index === 0 && addedNewPost)
     //   return (
     //     <ActivityIndicator
@@ -242,20 +264,20 @@ export default function FeedScreen({
     //     />
     //   );
     // else
-      return (
-        <PostItem
-          //index={index}
-          item={item}
-          likes={item.likes ?? 0}
-          writtenByYou={item.userId === globalThis.myId}
-          //showTimestamp={showTimestamp(item, index)}
-          reportPost={reportPost}
-          //newSection={true}
-          operations={operations}
-          //isVisible={item.isVisible && isFocused}
-        />
-      );
-    /*return renderItem({
+    return (
+      <PostItem
+        // index={index}
+        item={item}
+        likes={item.likes ?? 0}
+        writtenByYou={item.userId === globalThis.myId}
+        // showTimestamp={showTimestamp(item, index)}
+        reportPost={reportPost}
+        // newSection={true}
+        operations={operations}
+        // isVisible={item.isVisible && isFocused}
+      />
+    )
+    /* return renderItem({
         index,
         item,
         likes: item.likes,
@@ -269,14 +291,14 @@ export default function FeedScreen({
         reportPost,
         newSection: true,
         isVisible: item.isVisible && isFocused,
-      });*/
-  };
+      }); */
+  }
 
   const onViewableItemsChanged = React.useCallback(
     ({ viewableItems, changedItems }) => {
-      if (viewableItems.length <= 0) return;
+      if (viewableItems.length <= 0) return
 
-      let currentIndex = 0;
+      const currentIndex = 0
 
       /*
       listRef.current.filterItems((post) => {
@@ -296,14 +318,14 @@ export default function FeedScreen({
       });
       */
 
-      //in the postitem have a useeffect listening for the subscription flag to turn on and off subscriptions for that post
+      // in the postitem have a useeffect listening for the subscription flag to turn on and off subscriptions for that post
     },
     []
-  );
+  )
 
   const viewabilityConfigCallbackPairs = useRef([
-    { viewabilityConfig, onViewableItemsChanged },
-  ]);
+    { viewabilityConfig, onViewableItemsChanged }
+  ])
 
   return (
     <APIList
@@ -323,11 +345,14 @@ export default function FeedScreen({
           >
             <PostInputField
               onPostAdded={(newPost: Post) => {
-                setAddedNewPost(true);
-                listRef.current?.addItem({...newPost, 
-              userId: globalThis.myId,
-              createdAt: "null",
-            }); onPostAdded?.(newPost);}}
+                setAddedNewPost(true)
+                listRef.current?.addItem({
+                  ...newPost,
+                  userId: globalThis.myId,
+                  createdAt: "null"
+                })
+                onPostAdded?.(newPost)
+              }}
               channel={channel}
               originalParentId={originalParentId}
               autoFocus={autoFocus}
@@ -339,150 +364,148 @@ export default function FeedScreen({
         </View>
       }
       initialAmount={7}
-      additionalAmount={7} //change number based on device specs
+      additionalAmount={7} // change number based on device specs
       processingFunction={getLikedPosts as any}
       queryOperation={isChallenge ? postsByLikes : postsByChannel}
       queryOperationName={isChallenge ? "postsByLikes" : "postsByChannel"}
-      filter={{ channel: channel, sortDirection: "DESC" }}
+      filter={{ channel, sortDirection: "DESC" }}
       renderItem={renderPostItem}
       keyExtractor={(item: Post) => item.createdAt.toString() + item.userId}
       onEndReachedThreshold={0.5}
     />
-  );
+  )
 }
 
 interface PostInputFieldProps {
-  channel: string,
-  label?: string,
-  originalParentId?: string,
-  autoFocus: boolean,
-  isChallenge: boolean,
-  onPostAdded: (_: Partial<Post> & {
-    taggedUsers?: string[] | undefined;
-}) => void,
+  channel: string;
+  label?: string;
+  originalParentId?: string;
+  autoFocus: boolean;
+  isChallenge: boolean;
+  onPostAdded: (
+    _: Partial<Post> & {
+      taggedUsers?: string[] | undefined;
+    }
+  ) => void;
 }
 
-function PostInputField({
+function PostInputField ({
   channel,
   label,
   originalParentId,
   autoFocus = false,
   isChallenge = false,
-  onPostAdded,
+  onPostAdded
 }: PostInputFieldProps) {
-  const [pickFromGallery, pickFromCamera] = usePhotos(!isChallenge, true);
-  const [postInput, setPostInput] = useState<string>("");
-  const [text, setText] = useState<string>("");
-  const [imagePartialURL, setImagePartialURL] = useState<string | null>(null);
-  const [isVideo, setIsVideo] = useState(null);
-  const [postIsLoading, setPostIsLoading] = useState(false);
-  const [progress, setProgress] = useState<number>(0);
+  const [pickFromGallery, pickFromCamera] = usePhotos(!isChallenge, true)
+  const [postInput, setPostInput] = useState<string>("")
+  const [text, setText] = useState<string>("")
+  const [imagePartialURL, setImagePartialURL] = useState<string | null>(null)
+  const [isVideo, setIsVideo] = useState(null)
+  const [postIsLoading, setPostIsLoading] = useState(false)
+  const [progress, setProgress] = useState<number>(0)
 
-  const [taggedUsers, setTaggedUsers] = useState<string[]>();
+  const [taggedUsers, setTaggedUsers] = useState<string[]>()
 
-  let animation = useRef(new Animated.Value(0));
+  const animation = useRef(new Animated.Value(0))
 
   useEffect(() => {
     Animated.timing(animation.current, {
       toValue: progress,
       duration: 200,
-      useNativeDriver: false, // Add This line
-    }).start();
-  }, [progress]);
+      useNativeDriver: false // Add This line
+    }).start()
+  }, [progress])
 
   const width = animation.current.interpolate({
     inputRange: [0, 1],
     outputRange: ["0%", "100%"],
-    extrapolate: "clamp",
-  });
+    extrapolate: "clamp"
+  })
 
   const addPostAsync = async () => {
-    setPostIsLoading(true);
+    setPostIsLoading(true)
 
-    const imageID = SHA256(Date.now().toString());
-    
-    let imageURL;
-    let videoExtension;
+    const imageID = SHA256(Date.now().toString())
+
+    let imageURL
+    let videoExtension
     if (imagePartialURL !== null) {
-      const re = /(?:\.([^.]+))?$/;
-      videoExtension = re.exec(imagePartialURL)?.[1];
+      const re = /(?:\.([^.]+))?$/
+      videoExtension = re.exec(imagePartialURL)?.[1]
 
-      imageURL = `${imageID}.${isVideo ? videoExtension : "jpg"}`;
+      imageURL = `${imageID}.${isVideo ? videoExtension : "jpg"}`
     }
 
-    let newPost: Partial<Post> & {taggedUsers?: string[]} = {
+    const newPost: Partial<Post> & { taggedUsers?: string[] } = {
       description: postInput,
-      channel: channel,
+      channel,
       parentId: originalParentId ?? undefined,
       taggedUsers,
-      imageURL,
-    };
+      imageURL
+    }
 
-    setTaggedUsers([]);
-    setPostInput("");
-    setText("");
+    setTaggedUsers([])
+    setPostInput("")
+    setText("")
 
-    //pushLocalPost(localNewPost);
+    // pushLocalPost(localNewPost);
 
-    //if (global.updatemessagescreen)
-    //global.updateMessageScreen
-    //if global.updateconversationscreen
-    //global.updateConversationScreen
+    // if (global.updatemessagescreen)
+    // global.updateMessageScreen
+    // if global.updateconversationscreen
+    // global.updateConversationScreen
 
     try {
-      //first, we must upload the image if any
+      // first, we must upload the image if any
       if (imagePartialURL) {
-        let blob;
+        let blob
         if (!isVideo) {
           const resizedPhoto = await ImageManipulator.manipulateAsync(
             imagePartialURL,
             [{ resize: { width: 500 } }],
             { compress: 1, format: SaveFormat.JPEG }
-          );
-          const response = await fetch(resizedPhoto.uri);
-          blob = await response.blob();
+          )
+          const response = await fetch(resizedPhoto.uri)
+          blob = await response.blob()
         } else {
-          const response = await fetch(imagePartialURL);
-          blob = await response.blob();
+          const response = await fetch(imagePartialURL)
+          blob = await response.blob()
         }
 
-        setProgress(0.01);
-        await Storage.put(
-          `feed/${imageURL}`,
-          blob,
-          {
-            progressCallback(progress: Progress) {
-              setProgress(progress.loaded / progress.total);
-              //console.log(progress); //what is "part"
-            },
-            level: "public",
-            contentType: isVideo ? "video/" + videoExtension : "image/jpeg",
-          }
-        ); //make sure people can't overwrite other people's photos, and preferrably not be able to list all the photos in s3 using brute force. may need security on s3
-        setProgress(0);
-        setImagePartialURL(null);
+        setProgress(0.01)
+        await Storage.put(`feed/${imageURL}`, blob, {
+          progressCallback (progress: Progress) {
+            setProgress(progress.loaded / progress.total)
+            // console.log(progress); //what is "part"
+          },
+          level: "public",
+          contentType: isVideo ? "video/" + videoExtension : "image/jpeg"
+        }) // make sure people can't overwrite other people's photos, and preferrably not be able to list all the photos in s3 using brute force. may need security on s3
+        setProgress(0)
+        setImagePartialURL(null)
       }
 
-      onPostAdded?.(newPost); //should go before or after api operation?
+      onPostAdded?.(newPost) // should go before or after api operation?
 
-      API.graphql(graphqlOperation(createPost, { input: newPost }));
+      API.graphql(graphqlOperation(createPost, { input: newPost }))
     } catch (err) {
-      console.warn("error in creating post: ", err);
+      console.warn("error in creating post: ", err)
     }
 
-    setPostIsLoading(false);
-  };
+    setPostIsLoading(false)
+  }
 
   return (
     <View>
       {imagePartialURL !== null ? (
         isVideo ? (
           <Video
-            style={styles.postVideo} //check if this should be an image or a video?
+            style={styles.postVideo} // check if this should be an image or a video?
             useNativeControls
             isLooping
             shouldPlay
-            source={{ uri: imagePartialURL }} //need a way to delete the image too
+            source={{ uri: imagePartialURL }} // need a way to delete the image too
             posterSource={require("../assets/icon.png")}
           />
         ) : (
@@ -491,9 +514,9 @@ function PostInputField({
               resizeMode: "cover",
               width: 450,
               height: 450,
-              alignSelf: "center",
-            }} //check if this should be an image or a video?
-            source={{ uri: imagePartialURL }} //need a way to delete the image too
+              alignSelf: "center"
+            }} // check if this should be an image or a video?
+            source={{ uri: imagePartialURL }} // need a way to delete the image too
           />
         )
       ) : null}
@@ -513,11 +536,13 @@ function PostInputField({
           clearButtonMode="always"
           maxLength={1000}
           onSubmit={(userId) =>
-            taggedUsers && !taggedUsers?.includes(userId) &&
+            taggedUsers &&
+            !taggedUsers?.includes(userId) &&
             setTaggedUsers([...taggedUsers, userId])
           }
           onDelete={(userId) =>
-            taggedUsers && taggedUsers.includes(userId) &&
+            taggedUsers &&
+            taggedUsers.includes(userId) &&
             setTaggedUsers(taggedUsers.filter((user) => user != userId))
           }
         />
@@ -535,7 +560,7 @@ function PostInputField({
               justifyContent: "flex-start",
               flexDirection: "row",
               marginLeft: 15,
-              marginRight: 5,
+              marginRight: 5
             }}
             imageSize={20}
             userId={item}
@@ -549,7 +574,7 @@ function PostInputField({
           justifyContent: "space-between",
           marginHorizontal: 15,
           marginTop: 2,
-          marginBottom: 10,
+          marginBottom: 10
         }}
       >
         <View style={{ flexDirection: "row" }}>
@@ -558,7 +583,9 @@ function PostInputField({
             size={20}
             color={imagePartialURL === null || postIsLoading ? "gray" : "blue"}
             style={{ marginRight: 6 }}
-            onPress={() => pickFromGallery(setImagePartialURL, null, setIsVideo)}
+            onPress={() =>
+              pickFromGallery(setImagePartialURL, null, setIsVideo)
+            }
           />
           <IconButton
             iconName={"camera-alt"}
@@ -567,14 +594,18 @@ function PostInputField({
             color={imagePartialURL === null || postIsLoading ? "gray" : "blue"}
             onPress={() => pickFromCamera(setImagePartialURL, null, setIsVideo)}
           />
-          {imagePartialURL != null ? (
+          {imagePartialURL != null
+            ? (
             <IconButton
               iconName={"close"}
               size={20}
-              color={imagePartialURL === null || postIsLoading ? "gray" : "blue"}
+              color={
+                imagePartialURL === null || postIsLoading ? "gray" : "blue"
+              }
               onPress={() => setImagePartialURL(null)}
             />
-          ) : null}
+              )
+            : null}
         </View>
         <IconButton
           iconName={
@@ -592,26 +623,27 @@ function PostInputField({
           onPress={
             postIsLoading
               ? () => {
-                  Alert.alert("Currently uploading a post");
+                  Alert.alert("Currently uploading a post")
                 }
               : postInput === "" && imagePartialURL === null
-              ? () => {
-                  Alert.alert("No text detected in text field");
-                }
-              : addPostAsync
+                ? () => {
+                    Alert.alert("No text detected in text field")
+                  }
+                : addPostAsync
           }
         />
       </View>
 
       <SpamButton func={addPostAsync} />
 
-      {progress > 0 ? (
+      {progress > 0
+        ? (
         <View
           style={{
             height: 30,
             backgroundColor: "white",
             margin: 15,
-            borderRadius: 5,
+            borderRadius: 5
           }}
         >
           <Animated.View
@@ -621,9 +653,9 @@ function PostInputField({
                 left: 0,
                 right: 0,
                 top: 0,
-                bottom: 0,
+                bottom: 0
               },
-              { backgroundColor: "#26c6a2", width },
+              { backgroundColor: "#26c6a2", width }
             ]}
           />
           <Text
@@ -633,34 +665,35 @@ function PostInputField({
               color: "black",
               fontWeight: "bold",
               fontSize: 15,
-              marginTop: 5,
+              marginTop: 5
             }}
           >
             Uploading...
           </Text>
         </View>
-      ) : null}
+          )
+        : null}
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
   textInputStyle: {
     marginHorizontal: 10,
     borderBottomWidth: 2,
-    borderBottomColor: "gray",
+    borderBottomColor: "gray"
   },
   offlineContainer: {
     backgroundColor: "#b52424",
     height: 30,
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "center"
   },
   offlineText: { color: "#fff" },
   postVideo: {
     resizeMode: "cover",
     width: 450,
     height: 450,
-    alignSelf: "center",
-  },
-});
+    alignSelf: "center"
+  }
+})

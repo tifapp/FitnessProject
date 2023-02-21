@@ -12,6 +12,7 @@ interface Props {
   margin?: number,
   isLabelFirst?: boolean,
   textStyle?: StyleProp<TextStyle>,
+  accessibilityLabel?: string
 }
 
 export default function IconButton({
@@ -24,6 +25,7 @@ export default function IconButton({
   margin = 6,
   isLabelFirst = false,
   textStyle,
+  accessibilityLabel
 } : Props) {
   return (
     <TouchableOpacity
@@ -53,7 +55,7 @@ export default function IconButton({
           {label}
         </Text>
       ) : null}
-      <MaterialIcons name={iconName} size={size ?? 17} color={color} />
+      <MaterialIcons name={iconName} size={size ?? 17} color={color} accessibilityLabel={accessibilityLabel} />
     </TouchableOpacity>
   );
 }

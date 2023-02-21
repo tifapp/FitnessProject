@@ -1,38 +1,38 @@
-import { Picker } from "@react-native-picker/picker";
-import { API, graphqlOperation } from "aws-amplify";
-import * as Haptics from "expo-haptics";
-import React, { useEffect, useState } from "react";
-import { Text, View } from "react-native";
-import { updateUser } from "../src/graphql/mutations";
-import { getUser } from "../src/graphql/queries";
+import { Picker } from "@react-native-picker/picker"
+import { API, graphqlOperation } from "aws-amplify"
+import * as Haptics from "expo-haptics"
+import React, { useEffect, useState } from "react"
+import { Text, View } from "react-native"
+import { updateUser } from "../src/graphql/mutations"
+import { getUser } from "../src/graphql/queries"
 
 const PrivacyScreen = () => {
-  const [previousSettings, setPreviousSettings] = useState();
+  const [previousSettings, setPreviousSettings] = useState()
 
   useEffect(() => {
     (async () => {
-      //console.log("your id is ", route.params?.myId)
+      // console.log("your id is ", route.params?.myId)
       const user = await API.graphql(
         graphqlOperation(getUser, { id: global.myId })
-      );
-      console.log(user.data.getUser);
-      setPreviousSettings(user.data.getUser);
-    })();
-  }, []);
+      )
+      console.log(user.data.getUser)
+      setPreviousSettings(user.data.getUser)
+    })()
+  }, [])
 
-  if (!previousSettings) return null;
-  else
+  if (!previousSettings) return null
+  else {
     return (
       <View
         style={{
-          margin: 16,
+          margin: 16
         }}
       >
         <Text
           style={{
             fontSize: 20,
             color: "black",
-            marginBottom: 18,
+            marginBottom: 18
           }}
         >
           Privacy
@@ -42,7 +42,7 @@ const PrivacyScreen = () => {
           apicall={(enabled) =>
             API.graphql(
               graphqlOperation(updateUser, {
-                input: { friendRequestPrivacy: enabled },
+                input: { friendRequestPrivacy: enabled }
               })
             )
           }
@@ -50,7 +50,7 @@ const PrivacyScreen = () => {
           options={[
             { label: "Anybody", value: 0 },
             { label: "Mutual friends", value: 1 },
-            { label: "Nobody", value: 3 },
+            { label: "Nobody", value: 3 }
           ]}
         />
         <APISwitch
@@ -58,7 +58,7 @@ const PrivacyScreen = () => {
           apicall={(enabled) =>
             API.graphql(
               graphqlOperation(updateUser, {
-                input: { messagesPrivacy: enabled },
+                input: { messagesPrivacy: enabled }
               })
             )
           }
@@ -66,28 +66,29 @@ const PrivacyScreen = () => {
           options={[
             { label: "Anybody", value: 0 },
             { label: "Friends and mutuals", value: 1 },
-            { label: "Friends only", value: 2 },
+            { label: "Friends only", value: 2 }
           ]}
         />
       </View>
-    );
-};
+    )
+  }
+}
 
-function APISwitch({ initialState, apicall, label, options }) {
-  const [selectedSetting, setSelectedSetting] = useState(initialState ?? 0); //should fetch from backend
+function APISwitch ({ initialState, apicall, label, options }) {
+  const [selectedSetting, setSelectedSetting] = useState(initialState ?? 0) // should fetch from backend
 
   const toggleAsync = (itemValue, itemIndex) => {
-    //liked ? playSound("unlike") : playSound("like");
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    // liked ? playSound("unlike") : playSound("like");
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
     try {
-      setSelectedSetting(itemValue);
-      apicall(itemValue);
-      console.log(itemValue);
+      setSelectedSetting(itemValue)
+      apicall(itemValue)
+      console.log(itemValue)
     } catch (err) {
-      console.log(err);
-      alert("Could not be submitted!");
+      console.log(err)
+      alert("Could not be submitted!")
     }
-  };
+  }
 
   return (
     <View style={{ marginBottom: 12 }}>
@@ -95,7 +96,7 @@ function APISwitch({ initialState, apicall, label, options }) {
         style={{
           fontSize: 16,
           alignSelf: "center",
-          top: 20,
+          top: 20
         }}
       >
         {label}
@@ -111,7 +112,7 @@ function APISwitch({ initialState, apicall, label, options }) {
         ))}
       </Picker>
     </View>
-  );
+  )
 }
 
-export default PrivacyScreen;
+export default PrivacyScreen

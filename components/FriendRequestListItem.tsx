@@ -1,11 +1,11 @@
-import { MaterialIcons } from "@expo/vector-icons";
-import playSound from "@hooks/playSound";
-import React, { useState } from "react";
-import { Alert, View } from "react-native";
-import { Friendship } from "src/models";
-import { APIListOperations } from "./APIList";
-import IconButton from "./common/IconButton";
-import { ProfileImageAndName } from "./ProfileImageAndName";
+import { MaterialIcons } from "@expo/vector-icons"
+import playSound from "@hooks/playSound"
+import React, { useState } from "react"
+import { Alert, View } from "react-native"
+import { Friendship } from "src/models"
+import { APIListOperations } from "./APIList"
+import IconButton from "./common/IconButton"
+import { ProfileImageAndName } from "./ProfileImageAndName"
 
 interface Props {
   item: Friendship;
@@ -14,63 +14,63 @@ interface Props {
   isNew: boolean;
 }
 
-export default function FriendRequestListItem({
+export default function FriendRequestListItem ({
   item,
   operations,
   confirmResponseHandler,
-  isNew,
+  isNew
 }: Props) {
-  const {replaceItem, removeItem} = operations;
-  const [isSelected, setIsSelected] = useState(false);
+  const { replaceItem, removeItem } = operations
+  const [isSelected, setIsSelected] = useState(false)
 
   const alertOptions = {
     cancelable: true,
-    onDismiss: () => setIsSelected(false),
-  };
+    onDismiss: () => setIsSelected(false)
+  }
 
   const openOptionsDialog = () => {
-    const title = "More Options";
-    const message = "";
+    const title = "More Options"
+    const message = ""
     const options = [
       {
-        text: "Block", //should appear as options, maybe as part of profileimageandname component
+        text: "Block", // should appear as options, maybe as part of profileimageandname component
         onPress: () => {
           const title =
-            "Are you sure you want to block this friend? This will unfriend them and stop them from sending you messages and friend requests.";
+            "Are you sure you want to block this friend? This will unfriend them and stop them from sending you messages and friend requests."
           const options = [
             {
               text: "Yes",
               onPress: () => {
-                removeItem();
-                confirmResponseHandler(item, isNew);
-              },
+                removeItem()
+                confirmResponseHandler(item, isNew)
+              }
             },
             {
               text: "Cancel",
-              type: "cancel",
-            },
-          ];
-          Alert.alert(title, "", options, alertOptions);
-        },
-      }, //if submithandler fails user won't know
+              type: "cancel"
+            }
+          ]
+          Alert.alert(title, "", options, alertOptions)
+        }
+      }, // if submithandler fails user won't know
       {
         text: "Cancel",
         type: "cancel",
         onPress: () => {
-          setIsSelected(false);
-        },
-      },
-    ];
-    Alert.alert(title, message, options, alertOptions);
-    setIsSelected(true);
-  };
+          setIsSelected(false)
+        }
+      }
+    ]
+    Alert.alert(title, message, options, alertOptions)
+    setIsSelected(true)
+  }
 
   return (
     <View style={{}}>
       <View
         style={[
           { flexDirection: "row", alignItems: "flex-start" },
-          isSelected && { backgroundColor: "orange" },
+          isSelected && { backgroundColor: "orange" }
         ]}
       >
         <IconButton
@@ -91,11 +91,12 @@ export default function FriendRequestListItem({
               ? "gray"
               : isNew
                 ? "blue"
-                : "black",
+                : "black"
           }}
           textLayoutStyle={{ flex: 1, flexGrow: 1 }}
           imageOverlay={
-            item.accepted != null ? (
+            item.accepted != null
+              ? (
               <View
                 style={{
                   backgroundColor: item.accepted ? "#00ff0080" : "#ff000080",
@@ -103,7 +104,7 @@ export default function FriendRequestListItem({
                   top: 0,
                   left: 0,
                   height: "100%",
-                  width: "100%",
+                  width: "100%"
                 }}
               >
                 <MaterialIcons
@@ -114,19 +115,20 @@ export default function FriendRequestListItem({
                     position: "absolute",
                     top: 5,
                     left: 5,
-                    alignItems: "center",
+                    alignItems: "center"
                   }}
                 />
               </View>
-            ) : null
+                )
+              : null
           }
           subtitleComponent={
             item.accepted != null ? (
               <View
                 style={{
                   flexDirection: "row",
-                  justifyContent: "flex-start",
-                  //flexShrink: 1
+                  justifyContent: "flex-start"
+                  // flexShrink: 1
                 }}
               >
                 <IconButton
@@ -134,7 +136,7 @@ export default function FriendRequestListItem({
                   iconName={"undo"}
                   size={20}
                   color={"black"}
-                  onPress={() => replaceItem({accepted: null})}
+                  onPress={() => replaceItem({ accepted: null })}
                   label={"Undo"}
                 />
                 <IconButton
@@ -142,9 +144,9 @@ export default function FriendRequestListItem({
                   size={20}
                   color={"blue"}
                   onPress={() => {
-                    removeItem();
-                    confirmResponseHandler(item, isNew);
-                    playSound("complete");
+                    removeItem()
+                    confirmResponseHandler(item, isNew)
+                    playSound("complete")
                   }}
                   label={"Done"}
                 />
@@ -153,8 +155,8 @@ export default function FriendRequestListItem({
               <View
                 style={{
                   flexDirection: "row",
-                  justifyContent: "flex-start",
-                  //flexShrink: 1
+                  justifyContent: "flex-start"
+                  // flexShrink: 1
                 }}
               >
                 <IconButton
@@ -163,8 +165,8 @@ export default function FriendRequestListItem({
                   size={20}
                   color={"red"}
                   onPress={() => {
-                    replaceItem({accepted: false});
-                    playSound("confirm-down");
+                    replaceItem({ accepted: false })
+                    playSound("confirm-down")
                   }}
                   label={"Reject"}
                 />
@@ -173,8 +175,8 @@ export default function FriendRequestListItem({
                   size={20}
                   color={"green"}
                   onPress={() => {
-                    replaceItem({accepted: true});
-                    playSound("confirm-up");
+                    replaceItem({ accepted: true })
+                    playSound("confirm-up")
                   }}
                   label={"Accept"}
                 />
@@ -187,5 +189,5 @@ export default function FriendRequestListItem({
         style={{ height: 1, backgroundColor: "#efefef", marginHorizontal: 12 }}
       ></View>
     </View>
-  );
+  )
 }

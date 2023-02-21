@@ -1,10 +1,10 @@
-import computeDistance from "@hooks/computeDistance";
-import { loadCapitals } from "@hooks/stringConversion";
-import React from "react";
-import { Text, View } from "react-native";
-import { ProfileImageAndName } from "./ProfileImageAndName";
+import computeDistance from "@hooks/computeDistance"
+import { loadCapitals } from "@hooks/stringConversion"
+import React from "react"
+import { Text, View } from "react-native"
+import { ProfileImageAndName } from "./ProfileImageAndName"
 
-export default function UserListItem({ item, matchingname }) {
+export default function UserListItem ({ item, matchingname }) {
   return (
     <ProfileImageAndName
       // @ts-ignore
@@ -22,37 +22,41 @@ export default function UserListItem({ item, matchingname }) {
           shadowColor: "#000",
           shadowOffset: {
             width: 0,
-            height: 1,
+            height: 1
           },
           shadowOpacity: 0.18,
           shadowRadius: 1.0,
 
-          elevation: 1,
-        },
+          elevation: 1
+        }
       ]}
       subtitleComponent={
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           {
             // @ts-ignore
-            global.location != null && item.location != null ? (
+            global.location != null && item.location != null
+              ? (
               <Text>{computeDistance(item.location)}</Text>
-            ) : null
+                )
+              : null
           }
-          {loadCapitals(item.bio).length > 0 ? (
+          {loadCapitals(item.bio).length > 0
+            ? (
             <Text
               style={{
                 paddingTop: 7,
                 fontSize: 12,
-                marginRight: 15,
+                marginRight: 15
               }}
               numberOfLines={1}
             >
               {" "}
               "{loadCapitals(item.bio)}"
             </Text>
-          ) : null}
+              )
+            : null}
         </View>
       }
     />
-  );
+  )
 }
