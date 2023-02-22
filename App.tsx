@@ -84,12 +84,7 @@ Notifications.setNotificationHandler({
   })
 })
 
-Amplify.configure({
-  awsconfig,
-  Analytics: {
-    disabled: true // for some reason this removes the unhandled promise rejection error on startup
-  }
-})
+Amplify.configure(awsconfig)
 Auth.configure(awsconfig)
 API.configure(awsconfig)
 Storage.configure(awsconfig)
