@@ -22,10 +22,10 @@ export const mockGraphQLResponseForStatement = <T>({
   client: GraphQLClient
 }) => {
   const execute = client.execute.bind({})
-  client.execute = async (innerStatement, variables) => {
+  client.execute = (innerStatement, variables) => {
     if (innerStatement === statement) {
-      return data
+      return { value: Promise.resolve(data), onCancel: jest.fn() }
     }
-    return await execute(innerStatement, variables)
+    return execute(innerStatement, variables)
   }
 }

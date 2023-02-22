@@ -1,21 +1,27 @@
-import { MaterialIcons } from "@expo/vector-icons";
-import React, { ComponentProps } from "react";
-import { StyleProp, Text, TextStyle, TouchableOpacity, ViewStyle } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons"
+import React, { ComponentProps } from "react"
+import {
+  StyleProp,
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  ViewStyle
+} from "react-native"
 
 interface Props {
-  onPress: () => void,
-  iconName: ComponentProps<typeof MaterialIcons>['name'],
-  color?: string,
-  style?: StyleProp<ViewStyle>,
-  label?: string,
-  size?: number,
-  margin?: number,
-  isLabelFirst?: boolean,
-  textStyle?: StyleProp<TextStyle>,
+  onPress: () => void
+  iconName: ComponentProps<typeof MaterialIcons>["name"]
+  color?: string
+  style?: StyleProp<ViewStyle>
+  label?: string
+  size?: number
+  margin?: number
+  isLabelFirst?: boolean
+  textStyle?: StyleProp<TextStyle>
   accessibilityLabel?: string
 }
 
-export default function IconButton({
+export default function IconButton ({
   onPress,
   iconName,
   style = {},
@@ -26,25 +32,26 @@ export default function IconButton({
   isLabelFirst = false,
   textStyle,
   accessibilityLabel
-} : Props) {
+}: Props) {
   return (
     <TouchableOpacity
       style={[
         {
           flexDirection: isLabelFirst ? "row" : "row-reverse",
-          alignItems: "center",
+          alignItems: "center"
         },
-        style,
+        style
       ]}
       onPress={onPress}
     >
-      {label ? (
+      {label
+        ? (
         <Text
           style={[
             {
               fontWeight: "normal",
-              color: color,
-              fontSize: 14,
+              color,
+              fontSize: 14
             },
             isLabelFirst
               ? { marginRight: margin ?? 5 }
@@ -54,8 +61,14 @@ export default function IconButton({
         >
           {label}
         </Text>
-      ) : null}
-      <MaterialIcons name={iconName} size={size ?? 17} color={color} accessibilityLabel={accessibilityLabel} />
+          )
+        : null}
+      <MaterialIcons
+        name={iconName}
+        size={size ?? 17}
+        color={color}
+        accessibilityLabel={accessibilityLabel}
+      />
     </TouchableOpacity>
-  );
+  )
 }

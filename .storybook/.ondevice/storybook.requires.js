@@ -14,7 +14,7 @@ global.STORIES = [
     directory: "./components",
     files: "**/*.stories.?(ts|tsx|js|jsx)",
     importPathMatcher:
-      "^\\.[\\\\/](?:components(?:[\\\\/](?!\\.)(?:(?:(?!(?:^|[\\\\/])\\.).)*?)[\\\\/]|[\\\\/]|$)(?!\\.)(?=.)[^\\\\/]*?\\.stories\\.(?:ts|tsx|js|jsx)?)$",
+      "^\\.[\\\\/](?:components(?:\\/(?!\\.)(?:(?:(?!(?:^|\\/)\\.).)*?)\\/|\\/|$)(?!\\.)(?=.)[^/]*?\\.stories\\.(?:ts|tsx|js|jsx)?)$",
   },
 ];
 
@@ -49,8 +49,8 @@ try {
 
 const getStories = () => {
   return {
-    "./componentsButtonButton.stories.tsx": require("../components/Button/Button.stories.tsx"),
-    "./componentsIconButtonIconButton.stories.tsx": require("../components/IconButton/IconButton.stories.tsx"),
+    "./components/Button/Button.stories.tsx": require("../components/Button/Button.stories.tsx"),
+    "./components/IconButton/IconButton.stories.tsx": require("../components/IconButton/IconButton.stories.tsx"),
   };
 };
 

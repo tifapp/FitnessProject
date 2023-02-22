@@ -94,7 +94,7 @@ export class GraphQLUserPosts implements UserPosts {
               createdAt: creationDate.toISOString(),
               userId
             })
-            .then((value: any) => value.getPost)
+            .value.then((value: any) => value.getPost)
         })
     )
   }
@@ -104,7 +104,7 @@ export class GraphQLUserPosts implements UserPosts {
       .execute<{ batchGetLikes: Like[] }>(batchGetLikes, {
         likes: postIds.map((id) => ({ postId: id }))
       })
-      .then((value) => value.batchGetLikes)
+      .value.then((value) => value.batchGetLikes)
   }
 
   private async fetchUsernames (userIds: string[]): Promise<string[]> {
@@ -123,7 +123,7 @@ export class GraphQLUserPosts implements UserPosts {
         status: string
         isVerified: boolean
       }
-    }>(getUser, { id: userId })
+    }>(getUser, { id: userId }).value
     const { name, status, isVerified } = user.getUser
 
     const retName = loadCapitals(name) ?? "Deleted User"

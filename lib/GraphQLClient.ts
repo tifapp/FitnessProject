@@ -1,5 +1,6 @@
 import API, { GraphQLResult } from "@aws-amplify/api"
 import { GraphQLError } from "graphql"
+import { Cancellable } from "./Cancellable"
 import { createDependencyKey } from "./dependencies"
 import { MultiplexedError } from "./MultiplexedError"
 
@@ -13,7 +14,7 @@ export interface GraphQLClient {
    * @param statement a grapql query
    * @param variables variables needed by the query
    */
-  execute: <T>(statement: string, variables?: object) => Promise<T>
+  execute: <T>(statement: string, variables?: object) => Cancellable<T>
 
   // TODO: - Add a subscribe function
 }
@@ -37,19 +38,25 @@ export class GraphQLClientError<T> extends Error {
  * GraphQL operations backed by AWS Amplify.
  */
 export class AmplifyGraphQLClient implements GraphQLClient {
-  async execute<T> (statement: string, variables?: object): Promise<T> {
-    const result = (await API.graphql({
+  execute<T> (statement: string, variables?: object) {
+    const operation = API.graphql({
       query: statement,
       variables
-    })) as GraphQLResult<T>
+    })
 
-    if (result.errors) {
-      throw new GraphQLClientError({
-        data: result.data,
-        errors: result.errors
-      })
+    return {
+      value: (async () => {
+        const result = (await operation) as GraphQLResult<T>
+        if (result.errors) {
+          throw new GraphQLClientError({
+            data: result.data,
+            errors: result.errors
+          })
+        }
+        return result.data as T
+      })(),
+      cancel: () => API.cancel(operation as Promise<GraphQLResult<T>>)
     }
-    return result.data as T
   }
 }
 
