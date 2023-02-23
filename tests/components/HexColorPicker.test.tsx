@@ -58,7 +58,7 @@ const Test = ({ options }: { options: HexColor[] }) => {
 const displayedColorId = (color: HexColor) => `displayed-${color}`
 
 const selectedColorElement = (color: HexColor) => {
-  return screen.queryByLabelText(color)
+  return screen.queryByTestId(displayedColorId(color))
 }
 
 const selectColor = (color: HexColor) => {
