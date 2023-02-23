@@ -10,7 +10,7 @@ import {
 } from "react-native"
 import { MaterialIcons } from "@expo/vector-icons"
 import { TouchableOpacity } from "react-native-gesture-handler"
-import { useDependencyValue } from "@lib/dependencies"
+import { useDependencyValue } from "../../lib/dependencies"
 import { HapticEvent, hapticsDependencyKey } from "@lib/Haptics"
 
 /**
@@ -53,6 +53,11 @@ export type HexColorPickerProps = {
    * "Color {hex color}"
    */
   createAccessibilityLabel?: (color: HexColor) => string
+
+  /**
+   * Renders colors in a grid rather than a horizontal scroll view.
+   */
+  grid?: boolean
 }
 
 /**
@@ -63,6 +68,7 @@ const HexColorPicker = ({
   onChange,
   options,
   style,
+  grid = false,
   createAccessibilityLabel = defaultCreateAccessibilityLabel
 }: HexColorPickerProps) => {
   const playHaptics = useDependencyValue(hapticsDependencyKey)
@@ -73,7 +79,14 @@ const HexColorPicker = ({
   }
 
   return (
-    <ScrollView horizontal contentContainerStyle={[styles.container, style]}>
+    <ScrollView
+      scrollEnabled={!grid}
+      horizontal
+      contentContainerStyle={[
+        grid ? styles.wrappedContainer : styles.container,
+        style
+      ]}
+    >
       {options.map((option) => (
         <TouchableOpacity
           style={styles.optionContainer}
@@ -108,8 +121,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start"
   },
+  wrappedContainer: {
+    display: "flex",
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    flexWrap: "wrap"
+  },
   optionContainer: {
-    marginRight: 12
+    marginRight: 12,
+    marginBottom: 12
   },
   selectionIcon: {
     position: "absolute"
