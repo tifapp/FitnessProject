@@ -21,20 +21,12 @@ describe("EventFormSubmitButton tests", () => {
   })
 
   it("should be disabled when event has an empty title", () => {
-    const event = {
-      ...baseTestEventValues,
-      title: ""
-    }
-    renderSubmitButton(event)
+    renderSubmitButton({ ...baseTestEventValues, title: "" })
     expect(button()).not.toBeEnabled()
   })
 
   it("should be disabled when event has no location", () => {
-    const event = {
-      ...baseTestEventValues,
-      location: undefined
-    }
-    renderSubmitButton(event)
+    renderSubmitButton({ ...baseTestEventValues, location: undefined })
     expect(button()).not.toBeEnabled()
   })
 

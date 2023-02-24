@@ -9,9 +9,22 @@ export type EventFormSubmitButtonProps = {
 }
 
 const EventFormSubmitButton = ({ label }: EventFormSubmitButtonProps) => {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const { formValues, onSubmit } = useEventForm()
+  const { formValues } = useEventForm()
   const updateInput = updateInputFromFormValues(formValues)
+  const submission = updateInput ? useSubmitUpdateInput(updateInput) : undefined
+
+  return (
+    <Button
+      title={label}
+      disabled={!submission || submission.isSubmitting}
+      onPress={() => submission?.submitButtonTapped()}
+    />
+  )
+}
+
+const useSubmitUpdateInput = (updateInput: EventUpdateInput) => {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { onSubmit } = useEventForm()
 
   const submitButtonTapped = async () => {
     setIsSubmitting(true)
@@ -19,13 +32,7 @@ const EventFormSubmitButton = ({ label }: EventFormSubmitButtonProps) => {
     setIsSubmitting(false)
   }
 
-  return (
-    <Button
-      title={label}
-      disabled={!updateInput || isSubmitting}
-      onPress={() => submitButtonTapped()}
-    />
-  )
+  return { isSubmitting, submitButtonTapped }
 }
 
 const updateInputFromFormValues = (values: EventFormValues) => {
