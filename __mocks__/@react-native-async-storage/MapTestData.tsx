@@ -16,28 +16,32 @@ export const state = {
         place: "I'm Tiffer",
         lat: 36.923652,
         lng: -121.726033,
-        pinColor: 'blue'
+        pinColor: 'blue',
+        isSelected: false
       },
       {
         key: 2,
         place: "I'm Tif",
         lat: 36.943652,
         lng: -121.716033,
-        pinColor: 'green'
+        pinColor: 'green',
+        isSelected: false
       },
       {
         key: 3,
         place: "I'm Tiff",
         lat: 36.953652,
         lng: -121.746033,
-        pinColor: 'red'
+        pinColor: 'red',
+        isSelected: false
       },
       {
         key: 4,
         place: "I'm Tiffy",
         lat: 36.933652,
         lng: -121.736033,
-        pinColor: 'purple'
+        pinColor: 'purple',
+        isSelected: false
       }
     ],
 

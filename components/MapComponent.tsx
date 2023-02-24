@@ -1,23 +1,32 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, StyleProp, View, ViewStyle } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 
+//Type for the map markers, in order to separate their logic out
+type mapMarker = {
+  key: number,
+  place: string,
+  lat: number,
+  lng: number,
+  pinColor: string
+  isSelected: boolean
+};
+
 interface Props {
+  //Contain style specifically for style on container for map
+  //Map style specifically for style on map
   containStyle?: StyleProp<ViewStyle>;
   mapStyle?: StyleProp<ViewStyle>;
+
   initialRegion: {
     latitude: number,
     longitude: number,
     latitudeDelta: number,
     longitudeDelta: number,
   }
-  markers: {
-  key: number,
-  place: string,
-  lat: number,
-  lng: number,
-  pinColor: string
-  }[];
+
+  markers: mapMarker[];
+
   movementSettings: {
   canScroll: boolean,
   canZoom: boolean,
@@ -25,28 +34,30 @@ interface Props {
   };
 }
 
+
+
 // Map view component itself
 function MapComponent ({initialRegion, markers, containStyle, mapStyle, movementSettings}: Props) {
+  //Map references
   const mapRef = React.useRef(null);
   const [buttonVisible, setButtonVisible] = useState(true);
-  const [selectedMarker, setSelectedMarker] = useState<Object>();
-  const [currentMarkers, setCurrentMarkers] = useState(markers);
+  const [currentMarkers, setCurrentMarkers] = useState(markers.map((item) => ({ ...item, isSelected: false})));
 
-  /*const onLongPress = () => {
-    setCurrentMarkers([...currentMarkers, e.nativeEvent.coordinate]);
-  }*/
+  useEffect(() => {
+    setCurrentMarkers(markers)
+  }, [markers])
   
   const mapMarkerCreations = () => {
-  return markers.map((report) =>
+  return currentMarkers.map((marker) => {
     <Marker
-    key = {report.key}
-    title = {report.place}
-    coordinate = {{ latitude: report.lat, longitude: report.lng }}
-    pinColor = {report.pinColor}
-    onPress={() => {onMarkerClick(report.lat, report.lng); setButtonVisible(true); setSelectedMarker(report)}}
-    icon={require('../assets/icon.png')}
-    >
-    </Marker >)
+    key = {marker.key}
+    title = {marker.place}
+    coordinate = {{ latitude: marker.lat, longitude: marker.lng }}
+    pinColor = {marker.pinColor}
+    onPress={() => {onMarkerClick(marker.lat, marker.lng); onSelected(marker);}}
+    />
+  }
+    )
   }
 
   function onMarkerClick (lat: number, long: number) {
@@ -66,6 +77,21 @@ function MapComponent ({initialRegion, markers, containStyle, mapStyle, movement
       latitudeDelta: initialRegion.latitudeDelta,
       longitudeDelta: initialRegion.longitudeDelta,
     })
+  }
+
+  //From robinwieruch.de
+  function onSelected (given: mapMarker) {
+    const newMarkers = markers.map((item) => {
+      if (item.key === given.key) {
+        const newItem = {
+          ...item,
+          isSelected: true,
+        };
+        return newItem;
+      }
+      return item;
+    });
+    setCurrentMarkers(newMarkers);
   }
 
   return (
@@ -89,6 +115,10 @@ function MapComponent ({initialRegion, markers, containStyle, mapStyle, movement
               "stylers": [{ "visibility": "off" }]
             }
           ]}
+          onPress={(e) => {
+            if (e.nativeEvent.action != 'marker-press')
+              
+          }}
       >
       {mapMarkerCreations()}
       </MapView>
@@ -100,7 +130,7 @@ function MapComponent ({initialRegion, markers, containStyle, mapStyle, movement
         }}
       >
       { 
-        buttonVisible == true &&
+        !!buttonVisible &&
         <Button title="Re-Center" onPress={() => {onRecenter(); setButtonVisible(false);}}/>
       }
       </View>
@@ -112,10 +142,6 @@ function MapComponent ({initialRegion, markers, containStyle, mapStyle, movement
         alignSelf: 'flex-end' //for align to right
         }}
       >
-      {
-        selectedMarker &&
-        <Button title="Deselect" onPress={() => setSelectedMarker(undefined)}/>  
-      }
       </View>}
 
     </View>
