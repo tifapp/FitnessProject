@@ -1,6 +1,7 @@
 import { EventUpdateInput } from "@lib/events"
 import React, { createContext, ReactNode, useContext } from "react"
 import { EventFormValues } from "./EventFormValues"
+import { FormProvider, useForm, useFormContext } from "react-hook-form"
 
 export type EventFormProps = {
   initialValues: EventFormValues
@@ -8,15 +9,40 @@ export type EventFormProps = {
   children: ReactNode
 }
 
-export type EventFormContext = {
-  formValues: EventFormValues
+export type EventFormContextValues = {
+  formValues: () => EventFormValues
   onSubmit: (update: EventUpdateInput) => Promise<void>
+  isSubmitting: boolean
 }
 
-const FormContext = createContext<EventFormContext | undefined>(undefined)
+const EventFormContext = createContext<EventFormContextValues | undefined>(
+  undefined
+)
+
+type EventFormProviderProps = {
+  onSubmit: (update: EventUpdateInput) => Promise<void>
+  children: ReactNode
+}
+
+const EventFormProvider = ({ onSubmit, children }: EventFormProviderProps) => {
+  const { handleSubmit, formState, watch } = useFormContext<EventFormValues>()
+  return (
+    <EventFormContext.Provider
+      value={{
+        formValues: watch,
+        onSubmit: async (update) => {
+          await handleSubmit(async () => await onSubmit(update))()
+        },
+        isSubmitting: formState.isSubmitting
+      }}
+    >
+      {children}
+    </EventFormContext.Provider>
+  )
+}
 
 export const useEventForm = () => {
-  const formValues = useContext(FormContext)
+  const formValues = useContext(EventFormContext)
   if (!formValues) {
     throw new Error(`
     An event form component attempted to use the current event form values, but none were available.
@@ -28,10 +54,13 @@ export const useEventForm = () => {
 }
 
 const EventForm = ({ initialValues, onSubmit, children }: EventFormProps) => {
+  const formMethods = useForm({
+    defaultValues: initialValues
+  })
   return (
-    <FormContext.Provider value={{ formValues: initialValues, onSubmit }}>
-      {children}
-    </FormContext.Provider>
+    <FormProvider {...formMethods}>
+      <EventFormProvider onSubmit={onSubmit}>{children}</EventFormProvider>
+    </FormProvider>
   )
 }
 

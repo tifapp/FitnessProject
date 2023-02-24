@@ -1,5 +1,5 @@
 import { EventUpdateInput } from "@lib/events"
-import React, { useState } from "react"
+import React from "react"
 import { Button } from "react-native"
 import { useEventForm } from "./EventForm"
 import { EventFormValues } from "./EventFormValues"
@@ -9,30 +9,22 @@ export type EventFormSubmitButtonProps = {
 }
 
 const EventFormSubmitButton = ({ label }: EventFormSubmitButtonProps) => {
-  const { formValues } = useEventForm()
-  const updateInput = updateInputFromFormValues(formValues)
-  const submission = updateInput ? useSubmitUpdateInput(updateInput) : undefined
-
+  const { isSubmitting } = useEventForm()
+  const submitButtonTapped = useSubmit()
   return (
     <Button
       title={label}
-      disabled={!submission || submission.isSubmitting}
-      onPress={() => submission?.submitButtonTapped()}
+      disabled={!submitButtonTapped || isSubmitting}
+      onPress={() => submitButtonTapped?.()}
     />
   )
 }
 
-const useSubmitUpdateInput = (updateInput: EventUpdateInput) => {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const { onSubmit } = useEventForm()
-
-  const submitButtonTapped = async () => {
-    setIsSubmitting(true)
-    await onSubmit(updateInput)
-    setIsSubmitting(false)
-  }
-
-  return { isSubmitting, submitButtonTapped }
+const useSubmit = () => {
+  const { onSubmit, formValues } = useEventForm()
+  const updateInput = updateInputFromFormValues(formValues())
+  if (!updateInput) return undefined
+  return async () => await onSubmit(updateInput)
 }
 
 const updateInputFromFormValues = (values: EventFormValues) => {
