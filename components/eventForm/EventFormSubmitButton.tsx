@@ -1,15 +1,23 @@
 import { EventUpdateInput } from "@lib/events"
 import React from "react"
 import { Button } from "react-native"
-import { useEventForm } from "./EventForm"
+import { useEventFormContext } from "./EventForm"
 import { EventFormValues } from "./EventFormValues"
 
+/**
+ * Props from `EventFormSubmitButton`.
+ */
 export type EventFormSubmitButtonProps = {
   label: string
 }
 
-const EventFormSubmitButton = ({ label }: EventFormSubmitButtonProps) => {
-  const { isSubmitting } = useEventForm()
+/**
+ * Submit button for `EventForm`.
+ */
+export const EventFormSubmitButton = ({
+  label
+}: EventFormSubmitButtonProps) => {
+  const { isSubmitting } = useEventFormContext()
   const submitButtonTapped = useSubmit()
   return (
     <Button
@@ -21,7 +29,7 @@ const EventFormSubmitButton = ({ label }: EventFormSubmitButtonProps) => {
 }
 
 const useSubmit = () => {
-  const { onSubmit, formValues } = useEventForm()
+  const { onSubmit, formValues } = useEventFormContext()
   const updateInput = updateInputFromFormValues(formValues())
   if (!updateInput) return undefined
   return async () => await onSubmit(updateInput)
@@ -40,5 +48,3 @@ const updateInputFromFormValues = (values: EventFormValues) => {
     radiusMeters: values.radiusMeters
   } as EventUpdateInput
 }
-
-export default EventFormSubmitButton

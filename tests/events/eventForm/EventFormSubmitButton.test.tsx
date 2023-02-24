@@ -1,6 +1,8 @@
-import { EventFormValues } from "@components/eventForm"
-import EventForm from "@components/eventForm/EventForm"
-import EventFormSubmitButton from "@components/eventForm/EventFormSubmitButton"
+import {
+  EventForm,
+  EventFormSubmitButton,
+  EventFormValues
+} from "@components/eventForm"
 import {
   fireEvent,
   render,

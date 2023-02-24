@@ -1,6 +1,9 @@
 import { HexColor } from "@lib/Color"
 import { Location } from "@lib/location"
 
+/**
+ * A data type which is used to update event information.
+ */
 export type EventUpdateInput = {
   title: string
   description?: string
