@@ -32,11 +32,7 @@ expect.extend({
       message: () => "The component was found on the screen."
     }
   },
-  toBeEnabled (value: ReactTestInstance | null) {
-    if (!value) {
-      return componentNotFoundResult
-    }
-
+  toBeEnabled (value: ReactTestInstance) {
     if (value.props.disabled === undefined) {
       return {
         pass: false,
