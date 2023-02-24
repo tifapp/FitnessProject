@@ -28,7 +28,7 @@ const useSubmitUpdateInput = (updateInput: EventUpdateInput) => {
 
   const submitButtonTapped = async () => {
     setIsSubmitting(true)
-    await onSubmit(updateInput!!)
+    await onSubmit(updateInput)
     setIsSubmitting(false)
   }
 
