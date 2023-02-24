@@ -31,7 +31,9 @@ const awsmobile = {
     "aws_appsync_region": "us-west-2",
     "aws_appsync_authenticationType": "AMAZON_COGNITO_USER_POOLS",
     "aws_user_files_s3_bucket": "fitnessproject990b7c5f3b1e4687a61074386ec11c28231929-dev",
-    "aws_user_files_s3_bucket_region": "us-west-2"
+    "aws_user_files_s3_bucket_region": "us-west-2",
+    "aws_mobile_analytics_app_id": "ced102bb50484960828f8b5f526ff6c3",
+    "aws_mobile_analytics_app_region": "us-west-2"
 };
 
 

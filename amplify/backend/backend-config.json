@@ -106,6 +106,28 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "eventNotifications": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "GraphQLAPIIdOutput",
+            "GraphQLAPIEndpointOutput"
+          ],
+          "category": "api",
+          "resourceName": "fitnessprojectapi"
+        },
+        {
+          "attributes": [
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "backendResources"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "friendNotifications": {
       "build": true,
       "dependsOn": [
@@ -294,6 +316,22 @@
         {
           "category": "function",
           "resourceName": "deleteUserData"
+        }
+      ]
+    },
+    "AMPLIFY_function_eventNotifications_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "eventNotifications"
+        }
+      ]
+    },
+    "AMPLIFY_function_eventNotifications_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "eventNotifications"
         }
       ]
     },

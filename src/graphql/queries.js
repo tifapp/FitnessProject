@@ -365,6 +365,179 @@ export const conversationsByDate = /* GraphQL */ `
     }
   }
 `;
+export const eventsByUser = /* GraphQL */ `
+  query EventsByUser(
+    $userId: ID
+    $createdAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelEventFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    eventsByUser(
+      userId: $userId
+      createdAt: $createdAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        createdAt
+        updatedAt
+        userId
+        description
+        host
+        parentId
+        radius
+        startDateTime
+        endDateTime
+        name
+        location {
+          latitude
+          longitude
+        }
+        comments
+      }
+      nextToken
+    }
+  }
+`;
+export const eventsByDate = /* GraphQL */ `
+  query EventsByDate(
+    $startDateTime: AWSDateTime
+    $createdAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelEventFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    eventsByDate(
+      startDateTime: $startDateTime
+      createdAt: $createdAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        createdAt
+        updatedAt
+        userId
+        description
+        host
+        parentId
+        radius
+        startDateTime
+        endDateTime
+        name
+        location {
+          latitude
+          longitude
+        }
+        comments
+      }
+      nextToken
+    }
+  }
+`;
+export const eventsByUserId = /* GraphQL */ `
+  query EventsByUserId(
+    $host: String
+    $userId: ModelIDKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelEventFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    eventsByUserId(
+      host: $host
+      userId: $userId
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        createdAt
+        updatedAt
+        userId
+        description
+        host
+        parentId
+        radius
+        startDateTime
+        endDateTime
+        name
+        location {
+          latitude
+          longitude
+        }
+        comments
+      }
+      nextToken
+    }
+  }
+`;
+export const getEvent = /* GraphQL */ `
+  query GetEvent($createdAt: AWSDateTime!, $userId: ID!) {
+    getEvent(createdAt: $createdAt, userId: $userId) {
+      createdAt
+      updatedAt
+      userId
+      description
+      host
+      parentId
+      radius
+      startDateTime
+      endDateTime
+      name
+      location {
+        latitude
+        longitude
+      }
+      comments
+    }
+  }
+`;
+export const listEvents = /* GraphQL */ `
+  query ListEvents(
+    $createdAt: AWSDateTime
+    $userId: ModelIDKeyConditionInput
+    $filter: ModelEventFilterInput
+    $limit: Int
+    $nextToken: String
+    $sortDirection: ModelSortDirection
+  ) {
+    listEvents(
+      createdAt: $createdAt
+      userId: $userId
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
+    ) {
+      items {
+        createdAt
+        updatedAt
+        userId
+        description
+        host
+        parentId
+        radius
+        startDateTime
+        endDateTime
+        name
+        location {
+          latitude
+          longitude
+        }
+        comments
+      }
+      nextToken
+    }
+  }
+`;
 export const getFriendship = /* GraphQL */ `
   query GetFriendship($sender: ID!, $receiver: ID!) {
     getFriendship(sender: $sender, receiver: $receiver) {

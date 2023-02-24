@@ -305,6 +305,78 @@ export const deleteConversation = /* GraphQL */ `
     }
   }
 `;
+export const deleteEvent = /* GraphQL */ `
+  mutation DeleteEvent(
+    $input: DeleteEventInput!
+    $condition: ModelEventConditionInput
+  ) {
+    deleteEvent(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      userId
+      description
+      host
+      parentId
+      radius
+      startDateTime
+      endDateTime
+      name
+      location {
+        latitude
+        longitude
+      }
+      comments
+    }
+  }
+`;
+export const createEvent = /* GraphQL */ `
+  mutation CreateEvent(
+    $input: CreateEventInput!
+    $condition: ModelEventConditionInput
+  ) {
+    createEvent(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      userId
+      description
+      host
+      parentId
+      radius
+      startDateTime
+      endDateTime
+      name
+      location {
+        latitude
+        longitude
+      }
+      comments
+    }
+  }
+`;
+export const updateEvent = /* GraphQL */ `
+  mutation UpdateEvent(
+    $input: UpdateEventInput!
+    $condition: ModelEventConditionInput
+  ) {
+    updateEvent(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      userId
+      description
+      host
+      parentId
+      radius
+      startDateTime
+      endDateTime
+      name
+      location {
+        latitude
+        longitude
+      }
+      comments
+    }
+  }
+`;
 export const createFriendship = /* GraphQL */ `
   mutation CreateFriendship(
     $input: CreateFriendshipInput!
