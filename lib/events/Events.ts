@@ -1,3 +1,17 @@
+import { HexColor } from "@lib/Color"
+import { Location } from "@lib/location"
+
+export type EventUpdateInput = {
+  title: string
+  description?: string
+  location: Location
+  color: HexColor
+  startDate: Date
+  endDate: Date
+  shouldHideAfterStartDate: boolean
+  radiusMeters: number
+}
+
 /**
  * An interface representing all the collection of all of the posts in the app.
  */
