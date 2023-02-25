@@ -1,7 +1,13 @@
 import { EventUpdateInput } from "@lib/events"
 import React, { createContext, ReactNode, useContext } from "react"
-import { EventFormValues } from "./EventFormValues"
-import { FormProvider, useForm, useFormContext } from "react-hook-form"
+import { EventFormValueField, EventFormValues } from "./EventFormValues"
+import {
+  FormProvider,
+  useController,
+  useForm,
+  useFormContext
+} from "react-hook-form"
+import { Location } from "@lib/location"
 
 /**
  * Props for `EventForm`.
@@ -59,6 +65,11 @@ export type EventFormContextValues = {
    * True if the form is currently being submitted.
    */
   isSubmitting: boolean
+
+  /**
+   * True if the user has edited any of form fields.
+   */
+  hasEdited: boolean
 }
 
 /**
@@ -75,6 +86,19 @@ export const useEventFormContext = () => {
     `)
   }
   return context
+}
+
+export const useEventFormField = <
+  T extends string | number | Location | Date | boolean
+>(
+    fieldName: EventFormValueField
+  ) => {
+  const { control } = useFormContext<EventFormValues>()
+  const { field } = useController({ control, name: fieldName })
+  const updateField = (value: T) => {
+    field.onChange(value)
+  }
+  return [field.value as T, updateField] as const
 }
 
 const EventFormContext = createContext<EventFormContextValues | undefined>(
@@ -95,7 +119,8 @@ const EventFormProvider = ({ onSubmit, children }: EventFormProviderProps) => {
         onSubmit: async (update) => {
           await handleSubmit(async () => await onSubmit(update))()
         },
-        isSubmitting: formState.isSubmitting
+        isSubmitting: formState.isSubmitting,
+        hasEdited: formState.isDirty
       }}
     >
       {children}

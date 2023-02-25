@@ -46,7 +46,8 @@ describe("PostUI Component Tests", () => {
 
   it("Color of invitation changes on click", () => {
     const event = TestEventItems.mockEvent(time, 5, true, true)
-    render(<EventItem event={event} />)
+    const { debug } = render(<EventItem event={event} />)
+    console.log(debug())
 
     const invitation = screen.queryByLabelText(invitationIconLabel)
     expect(invitation?.props.style[0].color).toEqual("black")
