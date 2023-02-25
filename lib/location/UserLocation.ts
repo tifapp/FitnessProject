@@ -141,7 +141,7 @@ const toExpoAccurracy = (accuracy?: UserLocationTrackingAccurracy) => {
 
 const toTrackedLocation = (locationResponse: ExpoLocation.LocationObject) => {
   return {
-    location: locationResponse.coords,
+    coordinate: locationResponse.coords,
     trackingDate: new Date(locationResponse.timestamp)
   } as TrackedLocation
 }

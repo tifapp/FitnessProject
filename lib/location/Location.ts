@@ -1,4 +1,9 @@
-import { degreesToRadians, sin2 } from "@lib/Math"
+import {
+  degreesToRadians,
+  EARTH_RADIUS_METERS,
+  METERS_PER_MILE,
+  sin2
+} from "@lib/Math"
 
 /**
  * A simple latitude and longitude based coordinate.
@@ -12,8 +17,8 @@ export type Location = {
  * A location object meant for tracking purposes.
  */
 export type TrackedLocation = {
-  location: Location
-  trackingDate: Date
+  readonly coordinate: Location
+  readonly trackingDate: Date
 }
 
 /**
@@ -44,5 +49,17 @@ export const milesBetweenLocations = (
   return meters / METERS_PER_MILE
 }
 
-const EARTH_RADIUS_METERS = 6371e3
-const METERS_PER_MILE = 1609.344
+/**
+ * Formats a location in the form "{lat}, {lng}" with up to 6
+ * decimal points of precision for either value.
+ */
+export const formatLocation = (location: Location) => {
+  const stringLat = stringifiedLocationCoordinate(location.latitude)
+  const stringLng = stringifiedLocationCoordinate(location.longitude)
+  return `${stringLat}, ${stringLng}`
+}
+
+const stringifiedLocationCoordinate = (num: number) => {
+  const fix = Math.min(num.toString().split(".")[1].length, 6)
+  return num.toFixed(fix).toString()
+}
