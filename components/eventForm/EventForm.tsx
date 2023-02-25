@@ -65,15 +65,16 @@ export type EventFormContextValues = {
  * Returns the current values from a parent `EventForm` component.
  */
 export const useEventFormContext = () => {
-  const formValues = useContext(EventFormContext)
-  if (!formValues) {
+  const context = useContext(EventFormContext)
+  if (!context) {
     throw new Error(`
-    An event form component attempted to use the current event form values, but none were available.
+    An event form component attempted to use the current event form context,
+    but no context was provided.
 
     To fix this, make sure to wrap the event form component with EventForm.
     `)
   }
-  return formValues
+  return context
 }
 
 const EventFormContext = createContext<EventFormContextValues | undefined>(
