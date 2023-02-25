@@ -5,7 +5,8 @@ import {
   FormProvider,
   useController,
   useForm,
-  useFormContext
+  useFormContext,
+  useWatch
 } from "react-hook-form"
 
 /**
@@ -100,10 +101,20 @@ export const useEventFormField = <
   ) => {
   const { control } = useFormContext<EventFormValues>()
   const { field } = useController({ control, name: fieldName })
-  const updateField = (value: V) => {
-    field.onChange(value)
-  }
+  const updateField = (value: V) => field.onChange(value)
   return [field.value as V, updateField] as const
+}
+
+/**
+ * Returns the value of a specified field in the event form.
+ */
+export const useEventFormValue = <
+  T extends keyof EventFormValues,
+  V = EventFormValues[T]
+>(
+    fieldName: T
+  ) => {
+  return useWatch({ name: fieldName }) as V
 }
 
 const EventFormContext = createContext<EventFormContextValues | undefined>(

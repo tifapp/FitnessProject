@@ -23,12 +23,20 @@ describe("Location logic tests", () => {
     expect(milesBetweenLocations(location1, location2)).toBeCloseTo(2570.531)
   })
 
-  test("formatLocation basic", () => {
+  test("formatLocation floats", () => {
     const location = {
       latitude: 43.234,
       longitude: -121.234
     }
     expect(formatLocation(location)).toEqual("43.234, -121.234")
+  })
+
+  test("formatLocation integers", () => {
+    const location = {
+      latitude: 43,
+      longitude: -121
+    }
+    expect(formatLocation(location)).toEqual("43, -121")
   })
 
   test("formatLocation rounds off at 6 decimal places", () => {

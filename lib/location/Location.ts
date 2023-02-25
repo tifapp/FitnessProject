@@ -60,6 +60,6 @@ export const formatLocation = (location: Location) => {
 }
 
 const stringifiedLocationCoordinate = (num: number) => {
-  const fix = Math.min(num.toString().split(".")[1].length, 6)
+  const fix = Math.min(num.toString().split(".")[1]?.length ?? 0, 6)
   return num.toFixed(fix).toString()
 }
