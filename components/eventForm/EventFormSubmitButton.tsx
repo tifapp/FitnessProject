@@ -1,4 +1,4 @@
-import { EventUpdateInput } from "@lib/events"
+import { EditEventInput } from "@lib/events"
 import React from "react"
 import { Button } from "react-native"
 import { useEventFormContext } from "./EventForm"
@@ -30,12 +30,12 @@ export const EventFormSubmitButton = ({
 
 const useSubmit = () => {
   const { onSubmit, formValues } = useEventFormContext()
-  const updateInput = updateInputFromFormValues(formValues())
+  const updateInput = eventEditInputFromFormValues(formValues())
   if (!updateInput) return undefined
   return async () => await onSubmit(updateInput)
 }
 
-const updateInputFromFormValues = (values: EventFormValues) => {
+const eventEditInputFromFormValues = (values: EventFormValues) => {
   if (values.title.length === 0 || !values.location) return undefined
   return {
     title: values.title,
@@ -46,5 +46,5 @@ const updateInputFromFormValues = (values: EventFormValues) => {
     color: values.color,
     shouldHideAfterStartDate: values.shouldHideAfterStartDate,
     radiusMeters: values.radiusMeters
-  } as EventUpdateInput
+  } as EditEventInput
 }

@@ -14,13 +14,3 @@ export type EventFormValues = {
   readonly shouldHideAfterStartDate: boolean
   readonly radiusMeters: number
 }
-
-export type EventFormValueField =
-  | "title"
-  | "description"
-  | "location"
-  | "startDate"
-  | "endDate"
-  | "color"
-  | "shouldHideAfterStartDate"
-  | "radiusMeters"

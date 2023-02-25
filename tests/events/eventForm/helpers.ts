@@ -10,4 +10,4 @@ export const baseTestEventValues: EventFormValues = {
   color: EventColors.Red,
   shouldHideAfterStartDate: false,
   radiusMeters: 0
-} as const
+}

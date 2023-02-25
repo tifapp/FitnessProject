@@ -1,13 +1,12 @@
-import { EventUpdateInput } from "@lib/events"
+import { EditEventInput } from "@lib/events"
 import React, { createContext, ReactNode, useContext } from "react"
-import { EventFormValueField, EventFormValues } from "./EventFormValues"
+import { EventFormValues } from "./EventFormValues"
 import {
   FormProvider,
   useController,
   useForm,
   useFormContext
 } from "react-hook-form"
-import { Location } from "@lib/location"
 
 /**
  * Props for `EventForm`.
@@ -23,7 +22,7 @@ export type EventFormProps = {
    * Handles the submission of the form. This method should not throw
    * any errors and should handle them internally.
    */
-  onSubmit: (update: EventUpdateInput) => Promise<void>
+  onSubmit: (update: EditEventInput) => Promise<void>
 
   children: ReactNode
 }
@@ -59,7 +58,7 @@ export type EventFormContextValues = {
   /**
    * Submits the data of this form context, in the form of an update input.
    */
-  onSubmit: (update: EventUpdateInput) => Promise<void>
+  onSubmit: (update: EditEventInput) => Promise<void>
 
   /**
    * True if the form is currently being submitted.
@@ -88,17 +87,23 @@ export const useEventFormContext = () => {
   return context
 }
 
+/**
+ * Uses the current state of field in the event form. Calling the setter
+ * function that this hook returns only causes a rerender in the components
+ * that need to use the same field, not the entire form.
+ */
 export const useEventFormField = <
-  T extends string | number | Location | Date | boolean
+  T extends keyof EventFormValues,
+  V = EventFormValues[T]
 >(
-    fieldName: EventFormValueField
+    fieldName: T
   ) => {
   const { control } = useFormContext<EventFormValues>()
   const { field } = useController({ control, name: fieldName })
-  const updateField = (value: T) => {
+  const updateField = (value: V) => {
     field.onChange(value)
   }
-  return [field.value as T, updateField] as const
+  return [field.value as V, updateField] as const
 }
 
 const EventFormContext = createContext<EventFormContextValues | undefined>(
@@ -106,7 +111,7 @@ const EventFormContext = createContext<EventFormContextValues | undefined>(
 )
 
 type EventFormProviderProps = {
-  onSubmit: (update: EventUpdateInput) => Promise<void>
+  onSubmit: (update: EditEventInput) => Promise<void>
   children: ReactNode
 }
 

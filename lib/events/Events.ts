@@ -4,7 +4,7 @@ import { Location } from "@lib/location"
 /**
  * A data type which is used to update event information.
  */
-export type EventUpdateInput = {
+export type EditEventInput = {
   title: string
   description?: string
   location: Location

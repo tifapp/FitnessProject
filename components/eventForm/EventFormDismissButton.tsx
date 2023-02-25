@@ -3,10 +3,19 @@ import { Alert, TouchableOpacity } from "react-native"
 import { MaterialIcons } from "@expo/vector-icons"
 import { useEventFormContext } from "./EventForm"
 
+/**
+ * Props for `EventFormDismissButton`.
+ */
 export type EventFormDismissButtonProps = {
   onDismiss: () => void
 }
 
+/**
+ * A dismiss button for `EventForm`.
+ *
+ * If the user has edited any of the form values, this button will display
+ * a confirmation alert before dismissing.
+ */
 export const EventFormDismissButton = ({
   onDismiss
 }: EventFormDismissButtonProps) => {
@@ -23,9 +32,9 @@ export const EventFormDismissButton = ({
     }
   }
 
-  // NB: I have no idea why, but for some reason MaterialIcons doesn't render in
-  // tests, so the IconButton component cannot be used here since it would require
-  // moving the accessibility label (which breaks other tests)...
+  // NB: I have no idea why, but the MaterialIcons component is not rendered in
+  // tests which means we can't use the IconButton component here due to where
+  // it places the accessibility label...
   return (
     <TouchableOpacity onPress={dismissButtonTapped} accessibilityLabel="Cancel">
       <MaterialIcons name="close" size={24} />
