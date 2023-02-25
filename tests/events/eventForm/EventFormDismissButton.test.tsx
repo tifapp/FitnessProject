@@ -56,7 +56,6 @@ const renderDismissButton = (values: EventFormValues) => {
       <EventFormDismissButton onDismiss={dismissAction} />
     </EventForm>
   )
-  console.log(screen.debug())
 }
 
 const editEventTitle = (title: string) => {
