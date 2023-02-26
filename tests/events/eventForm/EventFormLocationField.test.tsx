@@ -3,7 +3,7 @@ import {
   EventFormLocationField,
   EventFormLocationInfo
 } from "@components/eventForm"
-import { Geocoding, geocodingDependencyKey, Location } from "@lib/location"
+import { Geocoding, geocodingDependencyKey } from "@lib/location"
 import { render, screen, waitFor } from "@testing-library/react-native"
 import {
   mockPlacemarksForLocation,
