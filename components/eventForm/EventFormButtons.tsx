@@ -72,10 +72,10 @@ export const EventFormSubmitButton = ({
 }
 
 const useSubmit = () => {
-  const { isSubmitting, onSubmit } = useEventFormContext()
+  const { isSubmitting, onSubmit, hasEdited } = useEventFormContext()
   const formValues = useEventFormValues()
   const updateInput = eventEditInputFromFormValues(formValues)
-  const canSubmit = !!updateInput && !isSubmitting
+  const canSubmit = !!updateInput && !isSubmitting && hasEdited
   if (!canSubmit) return undefined
   return async () => await onSubmit(updateInput)
 }

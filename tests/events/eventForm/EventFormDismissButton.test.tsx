@@ -4,7 +4,7 @@ import {
   EventFormTitleField,
   EventFormValues
 } from "@components/eventForm"
-import { baseTestEventValues } from "./helpers"
+import { baseTestEventValues, editEventFormTitle } from "./helpers"
 import { captureAlerts } from "../../helpers/Alerts"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 
@@ -20,7 +20,7 @@ describe("EventFormDismissButton tests", () => {
 
   it("should present a confirmation alert when dismissing after the event has been edited", () => {
     renderDismissButton(baseTestEventValues)
-    editEventTitle(editedEventTitle)
+    editEventFormTitle(editedEventTitle)
     attemptDismiss()
     expect(dismissAction).not.toHaveBeenCalled()
     expect(alertPresentationSpy).toHaveBeenCalled()
@@ -28,7 +28,7 @@ describe("EventFormDismissButton tests", () => {
 
   it("should allow dismissing the confirmation alert without dismissing the form", async () => {
     renderDismissButton(baseTestEventValues)
-    editEventTitle(editedEventTitle)
+    editEventFormTitle(editedEventTitle)
     attemptDismiss()
     await dismissConfirmationAlert()
     expect(dismissAction).not.toHaveBeenCalled()
@@ -36,7 +36,7 @@ describe("EventFormDismissButton tests", () => {
 
   it("should be able to dismiss the form from the confirmation alert", async () => {
     renderDismissButton(baseTestEventValues)
-    editEventTitle(editedEventTitle)
+    editEventFormTitle(editedEventTitle)
     attemptDismiss()
     await dismissFormFromConfirmationAlert()
     expect(dismissAction).toHaveBeenCalled()
@@ -56,10 +56,6 @@ const renderDismissButton = (values: EventFormValues) => {
       <EventFormDismissButton onDismiss={dismissAction} />
     </EventForm>
   )
-}
-
-const editEventTitle = (title: string) => {
-  fireEvent.changeText(screen.getByPlaceholderText("Title"), title)
 }
 
 const dismissConfirmationAlert = async () => {

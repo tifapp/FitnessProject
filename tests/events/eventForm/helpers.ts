@@ -1,5 +1,6 @@
 import { DateRange } from "@lib/Date"
 import { EventColors } from "@lib/events/EventColors"
+import { fireEvent, screen } from "@testing-library/react-native"
 
 export const baseTestEventValues = {
   title: "Test Event",
@@ -19,3 +20,7 @@ export const baseTestEventValues = {
   shouldHideAfterStartDate: false,
   radiusMeters: 0
 } as const
+
+export const editEventFormTitle = (title: string) => {
+  fireEvent.changeText(screen.getByPlaceholderText("Title"), title)
+}
