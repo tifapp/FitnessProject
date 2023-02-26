@@ -19,24 +19,24 @@ const submitAction = jest.fn()
 describe("EventFormSubmitButton tests", () => {
   it("should be enabled when valid event", () => {
     renderSubmitButton(baseTestEventValues)
-    expect(button()).toBeEnabled()
+    expect(submitButton()).toBeEnabled()
   })
 
   it("should be disabled when event has an empty title", () => {
     renderSubmitButton({ ...baseTestEventValues, title: "" })
-    expect(button()).not.toBeEnabled()
+    expect(submitButton()).not.toBeEnabled()
   })
 
   it("should be disabled when event has no location", () => {
     renderSubmitButton({ ...baseTestEventValues, locationInfo: undefined })
-    expect(button()).not.toBeEnabled()
+    expect(submitButton()).not.toBeEnabled()
   })
 
   it("should be disabled when submitting", async () => {
     submitAction.mockImplementation(neverPromise)
     renderSubmitButton(baseTestEventValues)
     submit()
-    await waitFor(() => expect(button()).not.toBeEnabled())
+    await waitFor(() => expect(submitButton()).not.toBeEnabled())
   })
 
   it("should parse the current event values into an update input on submission", async () => {
@@ -69,7 +69,7 @@ describe("EventFormSubmitButton tests", () => {
     submitAction.mockImplementation(Promise.resolve)
     renderSubmitButton(baseTestEventValues)
     submit()
-    await waitFor(() => expect(button()).toBeEnabled())
+    await waitFor(() => expect(submitButton()).toBeEnabled())
   })
 })
 
@@ -84,9 +84,9 @@ const renderSubmitButton = (values: EventFormValues) => {
 }
 
 const submit = () => {
-  fireEvent.press(button())
+  fireEvent.press(submitButton())
 }
 
-const button = () => {
+const submitButton = () => {
   return screen.getByText(testButtonLabel)
 }
