@@ -86,8 +86,7 @@ const eventEditInputFromFormValues = (values: EventFormValues) => {
     title: values.title,
     description: values.description.length > 0 ? values.description : undefined,
     location: values.locationInfo.coordinates,
-    startDate: values.startDate,
-    endDate: values.endDate,
+    dateRange: values.dateRange,
     color: values.color,
     shouldHideAfterStartDate: values.shouldHideAfterStartDate,
     radiusMeters: values.radiusMeters

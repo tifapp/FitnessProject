@@ -1,3 +1,4 @@
+import { DateRange } from "@lib/Date"
 import { EventColors } from "@lib/events/EventColors"
 
 export const baseTestEventValues = {
@@ -10,8 +11,10 @@ export const baseTestEventValues = {
       address: "1234 Test Dr, TestCity, TestState 12345"
     }
   },
-  startDate: new Date("2023-02-23T00:17:00+0000"),
-  endDate: new Date("2023-02-23T00:19:00+0000"),
+  dateRange: new DateRange(
+    new Date("2023-02-23T00:17:00"),
+    new Date("2023-02-23T00:19:00")
+  ),
   color: EventColors.Red,
   shouldHideAfterStartDate: false,
   radiusMeters: 0

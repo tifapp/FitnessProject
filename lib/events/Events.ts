@@ -1,18 +1,18 @@
 import { HexColor } from "@lib/Color"
+import { DateRange } from "@lib/Date"
 import { Location } from "@lib/location"
 
 /**
  * A data type which is used to update event information.
  */
 export type EditEventInput = {
-  title: string
-  description?: string
-  location: Location
-  color: HexColor
-  startDate: Date
-  endDate: Date
-  shouldHideAfterStartDate: boolean
-  radiusMeters: number
+  readonly title: string
+  readonly description?: string
+  readonly location: Location
+  readonly color: HexColor
+  readonly dateRange: DateRange
+  readonly shouldHideAfterStartDate: boolean
+  readonly radiusMeters: number
 }
 
 /**

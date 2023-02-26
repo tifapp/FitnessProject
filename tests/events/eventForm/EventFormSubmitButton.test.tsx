@@ -48,8 +48,7 @@ describe("EventFormSubmitButton tests", () => {
         description: baseTestEventValues.description,
         location: baseTestEventValues.locationInfo.coordinates,
         color: EventColors.Red,
-        startDate: baseTestEventValues.startDate,
-        endDate: baseTestEventValues.endDate,
+        dateRange: baseTestEventValues.dateRange,
         shouldHideAfterStartDate: false,
         radiusMeters: 0
       })
