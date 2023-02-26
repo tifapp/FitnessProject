@@ -28,8 +28,8 @@ export const MinMaxDate = (args: DateTimePickerProps) => (
   <Picker minimumDate={minDate} maximumDate={maxDate} {...args} />
 )
 
-const startHour = new Date("2023-02-26-01T14:00:00")
-const endHour = new Date("2023-02-26-01T16:00:00")
+const startHour = new Date("2023-02-26T14:00:00")
+const endHour = new Date("2023-02-26T16:00:00")
 
 export const TwoHourPeriod = (args: DateTimePickerProps) => (
   <Picker minimumDate={startHour} maximumDate={endHour} {...args} />

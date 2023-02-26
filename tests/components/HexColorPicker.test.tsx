@@ -13,10 +13,19 @@ import "../helpers/Matchers"
 const testColors: HexColor[] = ["#123456", "#abcdef"]
 
 describe("HexColorPicker tests", () => {
+  beforeEach(() => jest.resetAllMocks())
+
   it("can change the selected color", () => {
     renderHexColorPicker(testColors)
     selectColor(testColors[1])
     expect(selectedColorElement(testColors[1])).toBeDisplayed()
+  })
+
+  it("does not play haptics on android when selection changes", () => {
+    setPlatform("android")
+    renderHexColorPicker(testColors)
+    selectColor(testColors[1])
+    expect(hapticsPlayer).not.toHaveBeenCalled()
   })
 
   it("plays haptics on iOS when the color selection changes", () => {
