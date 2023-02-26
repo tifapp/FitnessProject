@@ -1,8 +1,13 @@
-import { useReverseGeocode } from "@hooks/Geocoding"
+import { useReverseGeocodeQuery } from "@hooks/Geocoding"
 import { placemarkToFormattedAddress } from "@lib/location"
 import React from "react"
 import { Text, TextInput, View } from "react-native"
-import { useEventFormField, useEventFormValue, EventFormLocationInfo, EventFormPlacemarkInfo } from "./EventForm"
+import {
+  useEventFormField,
+  useEventFormValue,
+  EventFormLocationInfo,
+  EventFormPlacemarkInfo
+} from "./EventForm"
 
 /**
  * The title field for an event form.
@@ -31,7 +36,7 @@ const LocationInfoLabel = (locationInfo: EventFormLocationInfo) =>
       )
 
 const GeocodedLocationInfoLabel = (locationInfo: EventFormLocationInfo) => {
-  const { data: placemark, status } = useReverseGeocode(
+  const { data: placemark, status } = useReverseGeocodeQuery(
     locationInfo.coordinates
   )
 

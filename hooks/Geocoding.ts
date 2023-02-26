@@ -5,7 +5,7 @@ import { useQuery } from "react-query"
 /**
  * Geocodes an individual location and returns the best result.
  */
-export const useReverseGeocode = (location: Location) => {
+export const useReverseGeocodeQuery = (location: Location) => {
   const geocoding = useDependencyValue(geocodingDependencyKey)
   return useQuery(
     ["reverseGeocode", location, geocoding.reverseGeocode],
