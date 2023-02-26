@@ -11,8 +11,8 @@ import {
 import RNDateTimePicker, {
   DateTimePickerAndroid as RNDateTimePickerAndroid
 } from "@react-native-community/datetimepicker"
-import IconButton from "@components/common/IconButton"
-import dayjs from "dayjs"
+import IconButton from "../common/IconButton"
+import { dayjs } from "../../lib/dayjs"
 
 /**
  * Default date formatter for `DateTimePicker`.

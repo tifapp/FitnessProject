@@ -1,14 +1,9 @@
 import { Auth } from "aws-amplify"
-import React, { useState } from "react"
-import { Alert, Text, TouchableOpacity, View } from "react-native"
-import EventsList from "@components/EventsList"
+import React from "react"
+import { Alert, Text, TouchableOpacity } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
-import DateTimePicker from "@components/formComponents/DateTimePicker"
-import { EventColors } from "@lib/events/EventColors"
-import HexColorPicker from "@components/formComponents/HexColorPicker"
 
 const ActivitiesScreen = () => {
-  const [color, setColor] = useState(EventColors.Red)
   function signOut () {
     const title = "Are you sure you want to sign out?"
     const message = ""
@@ -51,11 +46,6 @@ const ActivitiesScreen = () => {
           SandBox to get started
         </Text>
       </TouchableOpacity>
-      <HexColorPicker
-        color={color}
-        onChange={setColor}
-        options={EventColors.all}
-      />
     </GestureHandlerRootView>
   )
 }
