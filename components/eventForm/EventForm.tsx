@@ -12,13 +12,13 @@ import {
 } from "react-hook-form"
 
 export type EventFormPlacemarkInfo = {
-  name?: string
-  address?: string
+  readonly name?: string
+  readonly address?: string
 }
 
 export type EventFormLocationInfo = {
-  coordinates: Location
-  placemarkInfo?: EventFormPlacemarkInfo
+  readonly coordinates: Location
+  readonly placemarkInfo?: EventFormPlacemarkInfo
 }
 
 export type EventFormValues = {
