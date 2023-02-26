@@ -34,7 +34,7 @@ export const EventFormDismissButton = ({
 
   // NB: I have no idea why, but the MaterialIcons component is not rendered in
   // tests which means we can't use the IconButton component here due to where
-  // it places the accessibility label...
+  // it places the accessibility label (changing where it does breaks other tests)...
   return (
     <TouchableOpacity onPress={dismissButtonTapped} accessibilityLabel="Cancel">
       <MaterialIcons name="close" size={24} />
