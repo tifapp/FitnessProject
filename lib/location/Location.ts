@@ -48,18 +48,3 @@ export const milesBetweenLocations = (
   const meters = 2 * EARTH_RADIUS_METERS * Math.asin(Math.sqrt(trigCombo))
   return meters / METERS_PER_MILE
 }
-
-/**
- * Formats a location in the form "{lat}, {lng}" with up to 6
- * decimal points of precision for either value.
- */
-export const formatLocation = (location: Location) => {
-  const stringLat = stringifiedLocationCoordinate(location.latitude)
-  const stringLng = stringifiedLocationCoordinate(location.longitude)
-  return `${stringLat}, ${stringLng}`
-}
-
-const stringifiedLocationCoordinate = (num: number) => {
-  const fix = Math.min(num.toString().split(".")[1]?.length ?? 0, 6)
-  return num.toFixed(fix).toString()
-}

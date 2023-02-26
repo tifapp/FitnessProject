@@ -1,77 +1,87 @@
 import {
   EventForm,
   EventFormLocationField,
-  EventFormValues
+  EventFormLocationInfo
 } from "@components/eventForm"
-import {
-  formatLocation,
-  Geocoding,
-  geocodingDependencyKey,
-  Location,
-  Placemark
-} from "@lib/location"
+import { Geocoding, geocodingDependencyKey, Location } from "@lib/location"
 import { render, screen, waitFor } from "@testing-library/react-native"
-import { unimplementedGeocoding } from "../../helpers/Geocoding"
-import { neverPromise } from "../../helpers/Promise"
+import {
+  mockPlacemarksForLocation,
+  unimplementedGeocoding
+} from "../../helpers/Geocoding"
 import { baseTestEventValues } from "./helpers"
 import "../../helpers/Matchers"
 import { SetDependencyValue } from "@lib/dependencies"
 import { TestQueryClientProvider } from "../../helpers/ReactQuery"
-import { baseTestPlacemark } from "../../location/helpers"
+import {
+  baseTestPlacemark,
+  unknownLocationPlacemark
+} from "../../location/helpers"
+
+const testLocation = baseTestEventValues.locationInfo.coordinates
+const testLocationName = baseTestPlacemark.name
+const testLocationAddress = "1234 Cupertino Rd, Cupertino, CA 95104"
 
 describe("EventFormLocationField tests", () => {
-  beforeEach(() => jest.resetAllMocks())
+  beforeEach(() => (geocoding = unimplementedGeocoding()))
 
   it("should not attempt to geocode anything when no location is given", () => {
-    renderLocationField({ ...baseTestEventValues, location: undefined })
+    renderLocationField()
     expect(geocoding.reverseGeocode).not.toHaveBeenCalled()
   })
 
-  it("should display the longitude and latitude while geocoding the location", () => {
-    geocoding.reverseGeocode.mockImplementation(neverPromise)
-    renderLocationField(baseTestEventValues)
-    expect(coordinates(baseTestEventValues.location)).toBeDisplayed()
+  it("should use the predetermined placemark name and address if provided", () => {
+    renderLocationField({
+      coordinates: testLocation,
+      placemarkInfo: { name: testLocationName, address: testLocationAddress }
+    })
+    expect(geocoding.reverseGeocode).not.toHaveBeenCalled()
+    expect(testPlacemarkName()).toBeDisplayed()
+    expect(testPlacemarkAddress()).toBeDisplayed()
   })
 
-  it("should display an error result when geocoding fails", async () => {
+  it("should indicate an error when geocoding fails", async () => {
     geocoding.reverseGeocode.mockRejectedValue(new Error("Geocoding Failed"))
-    renderLocationField(baseTestEventValues)
+    renderLocationField({ coordinates: testLocation })
+    await waitFor(() => expect(errorIndicator()).toBeDisplayed())
+  })
+
+  it("should display the location's placemark's name and address after geocoding the location", async () => {
+    mockPlacemarksForLocation(testLocation, [baseTestPlacemark], geocoding)
+    renderLocationField({ coordinates: testLocation })
     await waitFor(() => {
-      expect(errorText()).toBeDisplayed()
-      expect(coordinates(baseTestEventValues.location)).toBeDisplayed()
+      expect(testPlacemarkName()).toBeDisplayed()
+      expect(testPlacemarkAddress()).toBeDisplayed()
     })
   })
 
-  it("should display the placemark name after geocoding when name placemark has a name", async () => {
-    geocoding.reverseGeocode.mockResolvedValue([baseTestPlacemark])
-    renderLocationField(baseTestEventValues)
-    await waitFor(() => {
-      expect(placemarkName(baseTestPlacemark)).toBeDisplayed()
-    })
-  })
-
-  it("should display an error result when geocoded placemark has no name", async () => {
-    geocoding.reverseGeocode.mockResolvedValue([
-      { ...baseTestPlacemark, name: null }
-    ])
-    renderLocationField(baseTestEventValues)
-    await waitFor(() => {
-      expect(errorText()).toBeDisplayed()
-      expect(coordinates(baseTestEventValues.location)).toBeDisplayed()
-    })
+  it("should indicate that the placemark's address is unknown when it cannot be determined", async () => {
+    mockPlacemarksForLocation(
+      testLocation,
+      [unknownLocationPlacemark],
+      geocoding
+    )
+    renderLocationField({ coordinates: testLocation })
+    await waitFor(() => expect(unknownAddressIndicator()).toBeDisplayed())
   })
 })
 
-const geocoding = unimplementedGeocoding
+let geocoding = unimplementedGeocoding()
 
-const renderLocationField = (values: EventFormValues) => {
+const renderLocationField = (locationInfo?: EventFormLocationInfo) => {
   render(
     <TestQueryClientProvider>
       <SetDependencyValue
         forKey={geocodingDependencyKey}
         value={geocoding as Geocoding}
       >
-        <EventForm initialValues={values} onSubmit={jest.fn()}>
+        <EventForm
+          initialValues={{
+            ...baseTestEventValues,
+            locationInfo
+          }}
+          onSubmit={jest.fn()}
+        >
           <EventFormLocationField />
         </EventForm>
       </SetDependencyValue>
@@ -79,16 +89,18 @@ const renderLocationField = (values: EventFormValues) => {
   )
 }
 
-const errorText = () => {
+const unknownAddressIndicator = () => screen.queryByText("Unknown Address")
+
+const errorIndicator = () => {
   return screen.queryByText(
     "Unable to find address of location, please try again later."
   )
 }
 
-const placemarkName = (placemark: Placemark) => {
-  return screen.queryByText(placemark.name!!)
+const testPlacemarkName = () => {
+  return screen.queryByText(testLocationName)
 }
 
-const coordinates = (location: Location) => {
-  return screen.queryByText(formatLocation(location))
+const testPlacemarkAddress = () => {
+  return screen.queryByText(testLocationAddress)
 }

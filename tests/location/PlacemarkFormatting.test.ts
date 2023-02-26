@@ -1,5 +1,5 @@
 import { placemarkToFormattedAddress } from "@lib/location"
-import { baseTestPlacemark } from "./helpers"
+import { baseTestPlacemark, unknownLocationPlacemark } from "./helpers"
 
 describe("Placemark Formatting tests", () => {
   it("formats in US style", () => {
@@ -20,17 +20,9 @@ describe("Placemark Formatting tests", () => {
     ).toEqual("1234 Cupertino Rd, Cupertino")
   })
 
-  it("returns undefined when no street, city, or region", () => {
-    const placemark = {
-      name: "North Pacific Ocean",
-      country: null,
-      postalCode: null,
-      street: null,
-      streetNumber: null,
-      region: null,
-      isoCountryCode: null,
-      city: null
-    }
-    expect(placemarkToFormattedAddress(placemark)).toBeUndefined()
+  it("returns undefined when little no info in placemark", () => {
+    expect(
+      placemarkToFormattedAddress(unknownLocationPlacemark)
+    ).toBeUndefined()
   })
 })

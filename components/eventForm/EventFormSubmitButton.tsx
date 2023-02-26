@@ -36,11 +36,11 @@ const useSubmit = () => {
 }
 
 const eventEditInputFromFormValues = (values: EventFormValues) => {
-  if (values.title.length === 0 || !values.location) return undefined
+  if (values.title.length === 0 || !values.locationInfo) return undefined
   return {
     title: values.title,
     description: values.description.length > 0 ? values.description : undefined,
-    location: values.location,
+    location: values.locationInfo.coordinates,
     startDate: values.startDate,
     endDate: values.endDate,
     color: values.color,

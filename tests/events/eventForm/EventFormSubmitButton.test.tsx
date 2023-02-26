@@ -28,7 +28,7 @@ describe("EventFormSubmitButton tests", () => {
   })
 
   it("should be disabled when event has no location", () => {
-    renderSubmitButton({ ...baseTestEventValues, location: undefined })
+    renderSubmitButton({ ...baseTestEventValues, locationInfo: undefined })
     expect(button()).not.toBeEnabled()
   })
 
@@ -46,7 +46,7 @@ describe("EventFormSubmitButton tests", () => {
       expect(submitAction).toHaveBeenCalledWith({
         title: baseTestEventValues.title,
         description: baseTestEventValues.description,
-        location: baseTestEventValues.location!!,
+        location: baseTestEventValues.locationInfo.coordinates,
         color: EventColors.Red,
         startDate: baseTestEventValues.startDate,
         endDate: baseTestEventValues.endDate,
