@@ -58,6 +58,9 @@ export class DateRange {
     }
   }
 
+  /**
+   * Sets the start date of this range adjusting the end date accordingly.
+   */
   setStartDate (date: Date) {
     const { seconds } = durationBetweenDates(date, this.endDate)
     if (date > this.endDate) {
@@ -66,6 +69,9 @@ export class DateRange {
     return new DateRange(date, this.endDate)
   }
 
+  /**
+   * Sets the start date of this range adjusting the start date accordingly.
+   */
   setEndDate (date: Date) {
     const { seconds } = durationBetweenDates(date, this.startDate)
 
