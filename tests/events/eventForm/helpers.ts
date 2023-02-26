@@ -21,6 +21,6 @@ export const baseTestEventValues = {
   radiusMeters: 0
 } as const
 
-export const editEventFormTitle = (title: string) => {
+export const editEventTitle = (title: string) => {
   fireEvent.changeText(screen.getByPlaceholderText("Title"), title)
 }

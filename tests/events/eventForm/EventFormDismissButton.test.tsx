@@ -4,7 +4,7 @@ import {
   EventFormTitleField,
   EventFormValues
 } from "@components/eventForm"
-import { baseTestEventValues, editEventFormTitle } from "./helpers"
+import { baseTestEventValues, editEventTitle } from "./helpers"
 import { captureAlerts } from "../../helpers/Alerts"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 
@@ -20,7 +20,7 @@ describe("EventFormDismissButton tests", () => {
 
   it("should present a confirmation alert when dismissing after the event has been edited", () => {
     renderDismissButton(baseTestEventValues)
-    editEventFormTitle(editedEventTitle)
+    editEventTitle(editedEventTitle)
     attemptDismiss()
     expect(dismissAction).not.toHaveBeenCalled()
     expect(alertPresentationSpy).toHaveBeenCalled()
@@ -28,7 +28,7 @@ describe("EventFormDismissButton tests", () => {
 
   it("should allow dismissing the confirmation alert without dismissing the form", async () => {
     renderDismissButton(baseTestEventValues)
-    editEventFormTitle(editedEventTitle)
+    editEventTitle(editedEventTitle)
     attemptDismiss()
     await dismissConfirmationAlert()
     expect(dismissAction).not.toHaveBeenCalled()
@@ -36,7 +36,7 @@ describe("EventFormDismissButton tests", () => {
 
   it("should be able to dismiss the form from the confirmation alert", async () => {
     renderDismissButton(baseTestEventValues)
-    editEventFormTitle(editedEventTitle)
+    editEventTitle(editedEventTitle)
     attemptDismiss()
     await dismissFormFromConfirmationAlert()
     expect(dismissAction).toHaveBeenCalled()

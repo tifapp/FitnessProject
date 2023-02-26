@@ -12,7 +12,7 @@ import {
 } from "@testing-library/react-native"
 import { neverPromise } from "../../helpers/Promise"
 import "../../helpers/Matchers"
-import { baseTestEventValues, editEventFormTitle } from "./helpers"
+import { baseTestEventValues, editEventTitle } from "./helpers"
 import { EventColors } from "@lib/events/EventColors"
 
 const submitAction = jest.fn()
@@ -25,7 +25,7 @@ describe("EventFormSubmitButton tests", () => {
 
   it("should be enabled when valid event", () => {
     renderSubmitButton(baseTestEventValues)
-    editEventFormTitle(editedEventTitle)
+    editEventTitle(editedEventTitle)
     expect(submitButton()).toBeEnabled()
   })
 
@@ -42,14 +42,14 @@ describe("EventFormSubmitButton tests", () => {
   it("should be disabled when submitting", async () => {
     submitAction.mockImplementation(neverPromise)
     renderSubmitButton(baseTestEventValues)
-    editEventFormTitle(editedEventTitle)
+    editEventTitle(editedEventTitle)
     submit()
     await waitFor(() => expect(submitButton()).not.toBeEnabled())
   })
 
   it("should parse the current event values into an update input on submission", async () => {
     renderSubmitButton(baseTestEventValues)
-    editEventFormTitle(editedEventTitle)
+    editEventTitle(editedEventTitle)
     submit()
     await waitFor(() => {
       expect(submitAction).toHaveBeenCalledWith({
@@ -66,7 +66,7 @@ describe("EventFormSubmitButton tests", () => {
 
   it("should make the description undefined when empty in submitted update input", async () => {
     renderSubmitButton({ ...baseTestEventValues, description: "" })
-    editEventFormTitle(editedEventTitle)
+    editEventTitle(editedEventTitle)
     submit()
     await waitFor(() => {
       expect(submitAction).toHaveBeenCalledWith(
@@ -78,7 +78,7 @@ describe("EventFormSubmitButton tests", () => {
   it("should re-enable submissions after submission finishes", async () => {
     submitAction.mockImplementation(Promise.resolve)
     renderSubmitButton(baseTestEventValues)
-    editEventFormTitle(editedEventTitle)
+    editEventTitle(editedEventTitle)
     submit()
     await waitFor(() => expect(submitButton()).toBeEnabled())
   })
