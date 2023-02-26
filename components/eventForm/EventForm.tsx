@@ -1,6 +1,7 @@
+import { HexColor } from "@lib/Color"
 import { EditEventInput } from "@lib/events"
+import { Location } from "@lib/location"
 import React, { createContext, ReactNode, useContext } from "react"
-import { EventFormValues } from "./EventFormValues"
 import {
   FormProvider,
   useController,
@@ -8,6 +9,27 @@ import {
   useFormContext as useReactHookFormContext,
   useWatch
 } from "react-hook-form"
+
+export type EventFormPlacemarkInfo = {
+  name?: string
+  address?: string
+}
+
+export type EventFormLocationInfo = {
+  coordinates: Location
+  placemarkInfo?: EventFormPlacemarkInfo
+}
+
+export type EventFormValues = {
+  readonly title: string
+  readonly description: string
+  readonly locationInfo?: EventFormLocationInfo
+  readonly startDate: Date
+  readonly endDate: Date
+  readonly color: HexColor
+  readonly shouldHideAfterStartDate: boolean
+  readonly radiusMeters: number
+}
 
 /**
  * Props for `EventForm`.

@@ -1,12 +1,16 @@
 import { useReverseGeocode } from "@hooks/Geocoding"
 import { placemarkToFormattedAddress } from "@lib/location"
 import React from "react"
-import { Text, View } from "react-native"
-import { useEventFormValue } from "./EventForm"
-import {
-  EventFormLocationInfo,
-  EventFormPlacemarkInfo
-} from "./EventFormValues"
+import { Text, TextInput, View } from "react-native"
+import { useEventFormField, useEventFormValue, EventFormLocationInfo, EventFormPlacemarkInfo } from "./EventForm"
+
+/**
+ * The title field for an event form.
+ */
+export const EventFormTitleField = () => {
+  const [title, setTitle] = useEventFormField("title")
+  return <TextInput placeholder="Title" value={title} onChangeText={setTitle} />
+}
 
 /**
  * Displays the selected location (if one) in the event form.
