@@ -5,7 +5,7 @@ import {
   FormProvider,
   useController,
   useForm,
-  useFormContext,
+  useFormContext as useReactHookFormContext,
   useWatch
 } from "react-hook-form"
 
@@ -51,12 +51,6 @@ export const EventForm = ({
  */
 export type EventFormContextValues = {
   /**
-   * Retrieves the current form values. A call to this method will rerender the
-   * caller component whenever the form values change.
-   */
-  formValues: () => EventFormValues
-
-  /**
    * Submits the data of this form context, in the form of an update input.
    */
   onSubmit: (update: EditEventInput) => Promise<void>
@@ -99,7 +93,7 @@ export const useEventFormField = <
 >(
     fieldName: T
   ) => {
-  const { control } = useFormContext<EventFormValues>()
+  const { control } = useReactHookFormContext<EventFormValues>()
   const { field } = useController({ control, name: fieldName })
   const updateField = (value: V) => field.onChange(value)
   return [field.value as V, updateField] as const
@@ -117,6 +111,13 @@ export const useEventFormValue = <
   return useWatch({ name: fieldName }) as V
 }
 
+/**
+ * Returns the current event form values.
+ */
+export const useEventFormValues = () => {
+  return useWatch() as EventFormValues
+}
+
 const EventFormContext = createContext<EventFormContextValues | undefined>(
   undefined
 )
@@ -127,11 +128,10 @@ type EventFormProviderProps = {
 }
 
 const EventFormProvider = ({ onSubmit, children }: EventFormProviderProps) => {
-  const { handleSubmit, formState, watch } = useFormContext<EventFormValues>()
+  const { handleSubmit, formState } = useReactHookFormContext<EventFormValues>()
   return (
     <EventFormContext.Provider
       value={{
-        formValues: watch,
         onSubmit: async (update) => {
           await handleSubmit(async () => await onSubmit(update))()
         },
