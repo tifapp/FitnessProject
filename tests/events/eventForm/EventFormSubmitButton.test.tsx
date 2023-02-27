@@ -82,23 +82,34 @@ describe("EventFormSubmitButton tests", () => {
     submit()
     await waitFor(() => expect(submitButton()).toBeEnabled())
   })
+
+  it("should use the current color as the background color", () => {
+    renderSubmitButton({ ...baseTestEventValues, color: EventColors.Turquoise })
+    expect(backgroundColor()).toEqual(EventColors.Turquoise)
+  })
 })
 
 const editedEventTitle = "Updated Event"
 
 const testButtonLabel = "Test Submit"
 
+const testId = "test"
+
 const renderSubmitButton = (values: EventFormValues) => {
   render(
     <EventForm initialValues={values} onSubmit={submitAction}>
       <EventFormTitleField />
-      <EventFormSubmitButton label={testButtonLabel} />
+      <EventFormSubmitButton testID={testId} label={testButtonLabel} />
     </EventForm>
   )
 }
 
 const submit = () => {
   fireEvent.press(submitButton())
+}
+
+const backgroundColor = () => {
+  return screen.getByTestId(testId).props.style.backgroundColor
 }
 
 const submitButton = () => {

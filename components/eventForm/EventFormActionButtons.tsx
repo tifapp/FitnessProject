@@ -1,9 +1,10 @@
 import React from "react"
-import { Alert, Button, TouchableOpacity } from "react-native"
+import { Alert, Button, Text, TouchableOpacity } from "react-native"
 import { MaterialIcons } from "@expo/vector-icons"
 import {
   EventFormValues,
   useEventFormContext,
+  useEventFormValue,
   useEventFormValues
 } from "./EventForm"
 import { EditEventInput } from "@lib/events"
@@ -51,6 +52,7 @@ export const EventFormDismissButton = ({
  * Props from `EventFormSubmitButton`.
  */
 export type EventFormSubmitButtonProps = {
+  testID?: string
   label: string
 }
 
@@ -58,16 +60,20 @@ export type EventFormSubmitButtonProps = {
  * Submit button for `EventForm`.
  */
 export const EventFormSubmitButton = ({
-  label
+  label,
+  testID
 }: EventFormSubmitButtonProps) => {
   const submitButtonTapped = useSubmit()
+  const color = useEventFormValue("color")
   const canSubmit = !!submitButtonTapped
   return (
-    <Button
-      title={label}
-      disabled={!canSubmit}
+    <TouchableOpacity
+      testID={testID}
       onPress={() => submitButtonTapped?.()}
-    />
+      style={{ backgroundColor: color as string }}
+    >
+      <Text disabled={!canSubmit}>{label}</Text>
+    </TouchableOpacity>
   )
 }
 

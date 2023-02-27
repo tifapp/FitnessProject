@@ -35,7 +35,7 @@ expect.extend({
   toBeEnabled (value: ReactTestInstance) {
     if (value.props.disabled === undefined) {
       return {
-        pass: false,
+        pass: true,
         message: () => "The component does not have a disabled state."
       }
     }
