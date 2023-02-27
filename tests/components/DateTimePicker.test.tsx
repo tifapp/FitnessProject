@@ -29,22 +29,20 @@ describe("DateTimePicker tests", () => {
     )
   })
 
-  it("android should not display a formatted date below the mininum date", () => {
-    setPlatform("android")
+  it("should clamp the date to the minimum when date is below minimum", () => {
     renderDateTimePicker({
       initialDate: new Date("2022-01-01"),
       minDate: new Date("2022-01-02")
     })
-    expect(formattedSelectedDate(new Date("2022-01-02"))).toBeDisplayed()
+    expect(selectedDate(new Date("2022-01-02"))).toBeDisplayed()
   })
 
-  it("android should not display a formatted date above the maximum date", () => {
-    setPlatform("android")
+  it("should clamp the date to the maximum when date is above maximum", () => {
     renderDateTimePicker({
       initialDate: new Date("2022-01-02"),
       maxDate: new Date("2022-01-01")
     })
-    expect(formattedSelectedDate(new Date("2022-01-01"))).toBeDisplayed()
+    expect(selectedDate(new Date("2022-01-01"))).toBeDisplayed()
   })
 })
 
@@ -69,7 +67,7 @@ const renderDateTimePicker = (props: TestProps) => {
 const Test = ({ initialDate, minDate, maxDate }: TestProps) => {
   const [date, setDate] = useState(initialDate)
   return (
-    <View testID={date.toString()}>
+    <View testID={date.toISOString()}>
       <DateTimePicker
         label="Test"
         date={date}
@@ -79,6 +77,10 @@ const Test = ({ initialDate, minDate, maxDate }: TestProps) => {
       />
     </View>
   )
+}
+
+const selectedDate = (date: Date) => {
+  return screen.queryByTestId(date.toISOString())
 }
 
 const formattedSelectedDate = (date: Date) => {

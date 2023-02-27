@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import {
   Platform,
   StyleProp,
@@ -76,11 +76,23 @@ export type DateTimePickerProps = {
 
   /**
    * The minimum date for this picker.
+   *
+   * The picker will always ensure that the date is after
+   * the minimum.
+   *
+   * (**Android Note**): On android the picker is not able
+   * to constrain the hour and minute of the selected date.
    */
   minimumDate?: Date
 
   /**
    * The maximum date for this picker.
+   *
+   * The picker will always ensure that the date is before
+   * the maximum.
+   *
+   * (**Android Note**): On android the picker is not able
+   * to constrain the hour and minute of the selected date.
    */
   maximumDate?: Date
 }
@@ -94,6 +106,20 @@ export type DateTimePickerProps = {
  * date and time pickers respectively.
  */
 const DateTimePicker = (props: DateTimePickerProps) => {
+  const { minimumDate, maximumDate, date, onDateChanged } = props
+
+  // TODO: - I don't like this useEffect, but I'm not sure of another way
+  // to ensure that the date is always in range...
+  useEffect(() => {
+    if (minimumDate && date < minimumDate) {
+      onDateChanged(minimumDate)
+    }
+
+    if (maximumDate && date > maximumDate) {
+      onDateChanged(maximumDate)
+    }
+  }, [minimumDate, maximumDate, date, onDateChanged])
+
   return Platform.OS === "ios"
     ? (
     <_DateTimePickerIOS {...props} />
@@ -150,19 +176,13 @@ const _DatePickerAndroid = ({
     })
   }
 
-  const clampedDate = () => {
-    if (minimumDate && date < minimumDate) return minimumDate
-    if (maximumDate && date > maximumDate) return maximumDate
-    return date
-  }
-
   return (
     <View style={[styles.androidContainer, style]}>
       <Text style={[styles.androidTextMargin, textStyle]}>{label}</Text>
       <View style={styles.androidButtonContainer}>
         <IconButton
           style={styles.androidButtonStyle}
-          label={formatDate(clampedDate())}
+          label={formatDate(date)}
           iconName="calendar-today"
           margin={8}
           onPress={() => showDatePicker("date")}
