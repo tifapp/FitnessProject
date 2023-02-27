@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React from "react"
 import { StyleSheet, Text, View } from "react-native"
 import { Event } from "@lib/events/Event"
 import IconButton from "./common/IconButton"
@@ -9,8 +9,8 @@ interface Props {
 }
 
 const EventItem = ({ event }: Props) => {
-  const [requested, setRequested] = useState(false) // If user has requested to join
-  const [numInvitations, setNumInvitations] = useState(0) // Number of requested invitations
+  const numAttendees = 0
+  /*
   const [isMin, setIsMin] = useState(false) // If time limit has <> 1 hour left
   const [isHours, setIsHours] = useState(false) // If time limit has >= 1 hour left
   const [isDays, setIsDays] = useState(false) // // If time limit has > 24 hours left
@@ -54,16 +54,6 @@ const EventItem = ({ event }: Props) => {
     setTime()
   }, [event.startTime])
 
-  const handleRequestToJoin = () => {
-    if (requested) {
-      setRequested(false)
-      setNumInvitations(numInvitations - 1)
-    } else {
-      setRequested(true)
-      setNumInvitations(numInvitations + 1)
-    }
-  }
-
   const displayTime = () => {
     if (isDays) {
       return `${timeUntil}d`
@@ -77,250 +67,114 @@ const EventItem = ({ event }: Props) => {
       return `${timeUntil}min`
     }
   }
-
+*/
   return (
-    <View style={styles.secondaryContainerStyle}>
-      <View style={[styles.nestedReply]}>
-        {/* Header (Event Icon, Event Title, Distance) */}
-        <View style={[styles.flexRow, styles.eventContainerStyle]}>
-          <View style={[styles.spacingTop, { paddingLeft: "3%" }]}>
-            <Icon name="location-pin" color={event.colorHex} />
-          </View>
-          <Text
-            style={[styles.eventTitle, styles.spacingTop]}
-            numberOfLines={1}
-          >
-            {event.title}
-          </Text>
-          <Text style={[styles.distance, styles.spacingTop]}>
-            {event.distance} mi
-          </Text>
+    <View style={[styles.container]}>
+      <View style={styles.topRow}>
+        <Text style={styles.name}>{event.username}</Text>
+
+        <IconButton iconName={"more-horiz"} style={styles.moreButtonStyle} />
+      </View>
+      <View style={styles.middleRow}>
+        <Text style={styles.titleText}>{event.title}</Text>
+        <View style={styles.location}>
+          <Icon name="location-on" color={event.colorHex} />
+          <Text style={styles.infoText}>{event.address}</Text>
         </View>
-
-        <Divider style={styles.divider} />
-
-        {/* Bottom Left Icons (time until event, max occupancy) */}
-        <View style={[styles.flexRow, { paddingVertical: "3%" }]}>
-          <View style={[styles.flexRow, { paddingLeft: "3%" }]}>
-            {event.startTime != null
-              ? (
-              <View
-                style={{ flexDirection: "row" }}
-                accessibilityLabel={"time until"}
-              >
-                <View style={styles.alignIcon}>
-                  {isHours || isMin
-                    ? (
-                    <Icon
-                      name="access-time"
-                      size={20}
-                      style={{ color: isHours ? "grey" : "red" }}
-                      accessibilityLabel={"time icon"}
-                    />
-                      )
-                    : (
-                    <Icon
-                      name="date-range"
-                      size={20}
-                      color={"grey"}
-                      accessibilityLabel={"time icon"}
-                    />
-                      )}
-                </View>
-                <Text
-                  style={[
-                    styles.numbersBottomLeft,
-                    { color: isHours || isDays ? "grey" : "red" },
-                    { paddingHorizontal: "1%" }
-                  ]}
-                >
-                  {displayTime()}
-                </Text>
-              </View>
-                )
-              : null}
-            {event.startTime && event.maxOccupancy != null
-              ? (
-              <View style={styles.eventDot}>
-                <Icon name="lens" size={7} color={"grey"} />
-              </View>
-                )
-              : null}
-            {event.maxOccupancy
-              ? (
-              <View
-                style={styles.maxLimit}
-                accessibilityLabel={"max occupancy"}
-              >
-                <View style={styles.alignIcon}>
-                  <Icon
-                    name="person-outline"
-                    size={24}
-                    style={{
-                      color:
-                        currentCapacity >=
-                        Math.floor(event.maxOccupancy * CAPACITY_PERCENTAGE)
-                          ? "red"
-                          : "grey"
-                    }}
-                    accessibilityLabel={"occupancy icon"}
-                  />
-                </View>
-                <Text
-                  style={[
-                    styles.numbersBottomLeft,
-                    {
-                      color:
-                        currentCapacity >=
-                        Math.floor(event.maxOccupancy * CAPACITY_PERCENTAGE)
-                          ? "red"
-                          : "grey"
-                    }
-                  ]}
-                >
-                  {currentCapacity}/{event.maxOccupancy}
-                </Text>
-              </View>
-                )
-              : null}
-          </View>
-
-          {/* Bottom Right Icons (invitations, comments, more tab) */}
-          <View style={styles.iconsBottomRight}>
-            {event.isAcceptingInvitations
-              ? (
-              <View
-                style={styles.iconsBottomRight}
-                accessibilityLabel={"request invitations"}
-              >
-                <IconButton
-                  style={{ paddingRight: "14%" }}
-                  iconName={"person-add"}
-                  size={24}
-                  color={requested ? event.colorHex : "black"}
-                  onPress={handleRequestToJoin}
-                  accessibilityLabel={"invitation icon"}
-                  label={`${numInvitations > 0 ? numInvitations : ""}`}
-                  isLabelFirst={true}
-                  textStyle={styles.numbersBottomRight}
-                />
-              </View>
-                )
-              : null}
-            <IconButton
-              style={{ paddingRight: "5%" }}
-              iconName={"messenger"}
-              size={18}
-              color={"black"}
-              onPress={() => null}
-              accessibilityLabel={"comments icon"}
-              label={`${event.repliesCount}`}
-              isLabelFirst={true}
-              textStyle={styles.numbersBottomRight}
-            />
-            <IconButton
-              style={{ paddingLeft: "3%" }}
-              iconName={"more-vert"}
-              size={24}
-              color={"black"}
-              onPress={() => null}
-              accessibilityLabel={"more icon"}
-            />
-          </View>
+        <View style={styles.time}>
+          <Icon name="event-available" color={event.colorHex} />
+          <Text style={styles.infoText}>{event.address}</Text>
+        </View>
+        <View style={{ paddingVertical: "4%" }}>
+          <Divider style={{ height: 1 }} />
+        </View>
+        <View style={styles.bottomRow}>
+          <Icon name="people-alt" color={event.colorHex} />
+          <Text
+            style={styles.attendingText}
+          >{`${numAttendees} attending`}</Text>
         </View>
       </View>
     </View>
   )
 }
 
-export default React.memo(EventItem)
-
 const styles = StyleSheet.create({
-  secondaryContainerStyle: {
-    backgroundColor: "#f7f7f7",
-    paddingTop: "2%"
-    // paddingVertical: "5%"
-    // borderWidth: 2
-  },
   flexRow: {
     flex: 1,
     flexDirection: "row"
   },
-  spacingTop: {
-    paddingTop: "2%"
-  },
-  eventContainerStyle: {
-    paddingBottom: "3%",
-    paddingTop: "1%"
-  },
-  eventTitle: {
+  topRow: {
     flex: 1,
     flexDirection: "row",
-    alignSelf: "center",
-    paddingLeft: "1%",
-    fontSize: 18,
-    color: "grey"
+    paddingBottom: "4%"
+    // borderColor: "purple",
+    // borderWidth: 2
   },
-  distance: {
+  middleRow: {
+    flex: 1,
+    flexDirection: "column",
+    paddingBottom: "2%"
+    // borderColor: "blue",
+    // borderWidth: 2
+  },
+  location: {
     flex: 1,
     flexDirection: "row",
-    alignSelf: "center",
-    textAlign: "right",
-    paddingRight: "4%",
-    fontSize: 18,
-    color: "grey"
+    paddingBottom: "2%"
+    // borderColor: "orange",
+    // borderWidth: 2
   },
-  divider: {
-    width: "92%",
-    height: 1,
-    alignSelf: "center"
-  },
-  description: {
-    paddingBottom: "3%",
-    paddingTop: "2%"
-  },
-  iconsBottomRight: {
+  time: {
     flex: 1,
-    flexDirection: "row",
-    justifyContent: "flex-end"
-  },
-  numbersBottomRight: {
-    textAlignVertical: "center",
-    textAlign: "right",
-    fontSize: 16
-  },
-  alignIcon: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingLeft: "2%"
-  },
-  eventDot: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingTop: "1%",
-    paddingHorizontal: "1.5%"
-  },
-  profile: {
-    flexDirection: "row",
-    paddingLeft: "3%",
-    paddingTop: "2%"
-  },
-  maxLimit: {
     flexDirection: "row"
+    // borderColor: "green",
+    // borderWidth: 2
   },
-  numbersBottomLeft: {
+  bottomRow: {
+    flex: 1,
+    flexDirection: "row"
+    // borderColor: "yellow",
+    // borderWidth: 2
+  },
+  infoText: {
     textAlignVertical: "center",
-    fontSize: 16
+    color: "grey"
   },
-  nestedReply: {
+  attendingText: {
+    textAlignVertical: "center",
+    fontWeight: "bold"
+  },
+  titleText: {
+    textAlignVertical: "center",
+    fontWeight: "bold",
+    fontSize: 22,
+    paddingBottom: "1%"
+  },
+  name: {
+    textAlignVertical: "center",
+    fontWeight: "bold",
+    fontSize: 14
+  },
+  moreButtonStyle: {
+    flex: 1,
+    alignItems: "flex-end"
+  },
+  container: {
     backgroundColor: "white",
     shadowColor: "#000",
+    paddingHorizontal: "6%",
+    paddingVertical: "3%",
     shadowOffset: {
       width: 0,
       height: 1
     },
     shadowOpacity: 0.18,
     shadowRadius: 1.0,
-    elevation: 1
+    elevation: 1,
+    borderColor: "red",
+    borderWidth: 2
   }
 })
+
+export default React.memo(EventItem)
