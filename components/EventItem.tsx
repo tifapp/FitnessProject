@@ -70,29 +70,49 @@ const EventItem = ({ event }: Props) => {
 */
   return (
     <View style={[styles.container]}>
-      <View style={styles.topRow}>
+      {/* Profile Image, Name, More button */}
+      <View style={[styles.topRow, styles.flexRow]}>
         <Text style={styles.name}>{event.username}</Text>
 
-        <IconButton iconName={"more-horiz"} style={styles.moreButtonStyle} />
+        <IconButton
+          iconName={"more-horiz"}
+          style={styles.moreButtonStyle}
+          size={26}
+        />
       </View>
+
+      {/* Event Title, Location, Time */}
       <View style={styles.middleRow}>
         <Text style={styles.titleText}>{event.title}</Text>
-        <View style={styles.location}>
+
+        <View style={[styles.location, styles.flexRow]}>
           <Icon name="location-on" color={event.colorHex} />
           <Text style={styles.infoText}>{event.address}</Text>
         </View>
-        <View style={styles.time}>
+
+        <View style={styles.flexRow}>
           <Icon name="event-available" color={event.colorHex} />
           <Text style={styles.infoText}>{event.address}</Text>
         </View>
+
         <View style={{ paddingVertical: "4%" }}>
           <Divider style={{ height: 1 }} />
         </View>
-        <View style={styles.bottomRow}>
-          <Icon name="people-alt" color={event.colorHex} />
-          <Text
-            style={styles.attendingText}
-          >{`${numAttendees} attending`}</Text>
+      </View>
+
+      {/* People Attending, Distance */}
+      <View style={styles.flexRow}>
+        <Icon name="people-alt" color={event.colorHex} />
+        <Text
+          style={[styles.attendingText, styles.attendingNumber]}
+        >{`${numAttendees}`}</Text>
+        <Text style={styles.attendingText}>{" attending"}</Text>
+
+        <View style={styles.distanceContainer}>
+          <View style={[styles.distance, { backgroundColor: event.colorHex }]}>
+            <Icon name="near-me" size={22} color="white" />
+            <Text style={styles.distanceText}>{`${event.distance} mi`}</Text>
+          </View>
         </View>
       </View>
     </View>
@@ -105,45 +125,27 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   topRow: {
-    flex: 1,
-    flexDirection: "row",
     paddingBottom: "4%"
-    // borderColor: "purple",
-    // borderWidth: 2
   },
   middleRow: {
     flex: 1,
-    flexDirection: "column",
-    paddingBottom: "2%"
-    // borderColor: "blue",
-    // borderWidth: 2
+    flexDirection: "column"
   },
   location: {
-    flex: 1,
-    flexDirection: "row",
-    paddingBottom: "2%"
-    // borderColor: "orange",
-    // borderWidth: 2
-  },
-  time: {
-    flex: 1,
-    flexDirection: "row"
-    // borderColor: "green",
-    // borderWidth: 2
-  },
-  bottomRow: {
-    flex: 1,
-    flexDirection: "row"
-    // borderColor: "yellow",
-    // borderWidth: 2
+    paddingBottom: "3%"
   },
   infoText: {
     textAlignVertical: "center",
-    color: "grey"
+    color: "grey",
+    paddingLeft: "2%"
+  },
+  attendingNumber: {
+    fontWeight: "bold",
+    paddingLeft: "3%"
   },
   attendingText: {
     textAlignVertical: "center",
-    fontWeight: "bold"
+    fontSize: 14
   },
   titleText: {
     textAlignVertical: "center",
@@ -154,11 +156,30 @@ const styles = StyleSheet.create({
   name: {
     textAlignVertical: "center",
     fontWeight: "bold",
-    fontSize: 14
+    fontSize: 15
   },
   moreButtonStyle: {
     flex: 1,
     alignItems: "flex-end"
+  },
+  distance: {
+    flexDirection: "row",
+    alignSelf: "center",
+    paddingHorizontal: "2%",
+    paddingVertical: "1%",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "white"
+  },
+  distanceContainer: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "flex-end"
+  },
+  distanceText: {
+    textAlignVertical: "center",
+    color: "white",
+    paddingLeft: "3%"
   },
   container: {
     backgroundColor: "white",
@@ -171,9 +192,8 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.18,
     shadowRadius: 1.0,
-    elevation: 1,
-    borderColor: "red",
-    borderWidth: 2
+    elevation: 1
+    // borderRadius: 28
   }
 })
 

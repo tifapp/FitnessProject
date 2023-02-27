@@ -25,9 +25,9 @@ export class GraphQLEventItems implements Events {
       const event: Event = {
         id: String(ids[i]),
         userId: "3234324",
-        username: "Test Event",
+        username: "Nicolette Antisdel",
         profileImageURL: require("../../assets/icon.png"),
-        title: "Title for Event",
+        title: "Pickup Basketball",
         repliesCount: 2,
         writtenByYou: true,
         startTime: date,
