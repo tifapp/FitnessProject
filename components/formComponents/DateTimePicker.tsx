@@ -190,8 +190,6 @@ const _DatePickerAndroid = ({
         <View style={styles.androidButtonGap} />
         <IconButton
           style={styles.androidButtonStyle}
-          // NB: We don't do any min/max checking for time formatting bc Android
-          // doesn't display such info.
           label={formatTime(date)}
           iconName="access-time"
           margin={8}
