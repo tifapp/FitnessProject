@@ -38,7 +38,22 @@
     "array-bracket-spacing": "error",
     "object-curly-spacing": "error",
     "comma-spacing": "error",
-    "indent": ["error", 2]
+    "indent": ["error", 2],
+    "@typescript-eslint/naming-convention": [
+      "warn",
+      {
+        "selector": [
+          "function",
+          "objectLiteralProperty",
+          "objectLiteralMethod"
+        ],
+        "format": ["PascalCase", "camelCase"]
+      },
+      { "selector": "typeLike", "format": ["PascalCase"] },
+      { "selector": "typeParameter", "format": ["PascalCase"] },
+
+      { "selector": "interface", "format": ["PascalCase"] }
+    ]
   },
   "overrides": [
     {
