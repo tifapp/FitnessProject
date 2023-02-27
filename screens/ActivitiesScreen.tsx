@@ -1,11 +1,10 @@
+import MapComponent from "@components/MapComponent"
+import { mapCompStyle, state } from "@components/MapTestData"
+import { EventColors } from "@lib/events/EventColors"
 import { Auth } from "aws-amplify"
 import React, { useState } from "react"
-import { Alert, Text, TouchableOpacity, View } from "react-native"
-import EventsList from "@components/EventsList"
+import { Alert } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
-import DateTimePicker from "@components/formComponents/DateTimePicker"
-import { EventColors } from "@lib/events/EventColors"
-import HexColorPicker from "@components/formComponents/HexColorPicker"
 
 const ActivitiesScreen = () => {
   const [color, setColor] = useState(EventColors.Red)
@@ -30,31 +29,13 @@ const ActivitiesScreen = () => {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <TouchableOpacity onPress={signOut}>
-        <Text
-          style={{
-            fontSize: 15,
-            margin: 20
-          }}
-        >
-          Log Out
-        </Text>
-        <Text
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            color: "black",
-            fontWeight: "bold",
-            fontSize: 15
-          }}
-        >
-          SandBox to get started
-        </Text>
-      </TouchableOpacity>
-      <HexColorPicker
-        color={color}
-        onChange={setColor}
-        options={EventColors.all}
+      <MapComponent
+        containStyle={mapCompStyle.container}
+        mapStyle={mapCompStyle.map}
+        initialRegion={state.initialRegion}
+        markers={state.markers}
+        extractKey={(event) => event.key}
+        movementSettings={state.movementSettings}
       />
     </GestureHandlerRootView>
   )
