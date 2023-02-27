@@ -3,7 +3,7 @@ import dayjs from "dayjs"
 /**
  * Computes the duration between 2 dates in a variety of units.
  */
-export const durationBetweenDates = (date1: Date, date2: Date) => {
+export const diffDates = (date1: Date, date2: Date) => {
   const d1 = dayjs(date1)
   const d2 = dayjs(date2)
   return {
@@ -61,7 +61,7 @@ export class MinMaxDateRange {
    * Sets the start date of this range adjusting the end date accordingly.
    */
   moveStartDate (date: Date) {
-    const { seconds } = durationBetweenDates(date, this.endDate)
+    const { seconds } = diffDates(date, this.endDate)
     if (date > this.endDate) {
       return new MinMaxDateRange(date, addSecondsToDate(date, seconds))
     }
@@ -72,7 +72,7 @@ export class MinMaxDateRange {
    * Sets the start date of this range adjusting the start date accordingly.
    */
   moveEndDate (date: Date) {
-    const { seconds } = durationBetweenDates(date, this.startDate)
+    const { seconds } = diffDates(date, this.startDate)
     if (date < this.startDate) {
       return new MinMaxDateRange(addSecondsToDate(date, seconds), date)
     }
