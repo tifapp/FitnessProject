@@ -1,8 +1,8 @@
-import { DateRange } from "@lib/Date"
+import { MinMaxDateRange } from "@lib/Date"
 
-describe("DateRange tests", () => {
+describe("MinMaxDateRange tests", () => {
   test("setStartDate basic", () => {
-    const range = new DateRange(
+    const range = new MinMaxDateRange(
       new Date("2023-02-25T00:17:00"),
       new Date("2023-02-25T00:18:00")
     ).setStartDate(new Date(0))
@@ -12,7 +12,7 @@ describe("DateRange tests", () => {
 
   test("setEndDate basic", () => {
     const newEndDate = new Date("3000-01-01T00:00:00")
-    const range = new DateRange(
+    const range = new MinMaxDateRange(
       new Date("2023-02-25T00:17:00"),
       new Date("2023-02-25T00:18:00")
     ).setEndDate(newEndDate)
@@ -21,7 +21,7 @@ describe("DateRange tests", () => {
   })
 
   it("setting start date past end date moves end date past the start date by the previous interval between the dates", () => {
-    const range = new DateRange(
+    const range = new MinMaxDateRange(
       new Date("2023-02-25T00:17:00"),
       new Date("2023-02-25T00:18:00")
     ).setStartDate(new Date("2023-02-25T00:19:00"))
@@ -30,7 +30,7 @@ describe("DateRange tests", () => {
   })
 
   it("setting end date before start date moves start date before the end date by the previous interval between the dates", () => {
-    const range = new DateRange(
+    const range = new MinMaxDateRange(
       new Date("2023-02-25T00:17:00"),
       new Date("2023-02-25T00:18:00")
     ).setEndDate(new Date("2023-02-25T00:16:00"))
@@ -39,7 +39,7 @@ describe("DateRange tests", () => {
   })
 
   it("should correctly adjust when the initial start date is past the initial end date by the current interval between dates", () => {
-    const range = new DateRange(
+    const range = new MinMaxDateRange(
       new Date("2023-02-25T00:20:00"),
       new Date("2023-02-25T00:18:00")
     )

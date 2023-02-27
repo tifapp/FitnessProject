@@ -1,5 +1,5 @@
 import { HexColor } from "@lib/Color"
-import { DateRange } from "@lib/Date"
+import { MinMaxDateRange } from "@lib/Date"
 import { EditEventInput } from "@lib/events"
 import { Location } from "@lib/location"
 import React, { createContext, ReactNode, useContext } from "react"
@@ -25,7 +25,7 @@ export type EventFormValues = {
   readonly title: string
   readonly description: string
   readonly locationInfo?: EventFormLocationInfo
-  readonly dateRange: DateRange
+  readonly dateRange: MinMaxDateRange
   readonly color: HexColor
   readonly shouldHideAfterStartDate: boolean
   readonly radiusMeters: number

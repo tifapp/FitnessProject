@@ -1,4 +1,4 @@
-import { DateRange } from "@lib/Date"
+import { MinMaxDateRange } from "@lib/Date"
 import { EventColors } from "@lib/events/EventColors"
 import { fireEvent, screen } from "@testing-library/react-native"
 
@@ -12,7 +12,7 @@ export const baseTestEventValues = {
       address: "1234 Test Dr, TestCity, TestState 12345"
     }
   },
-  dateRange: new DateRange(
+  dateRange: new MinMaxDateRange(
     new Date("2023-02-23T00:17:00"),
     new Date("2023-02-23T00:19:00")
   ),

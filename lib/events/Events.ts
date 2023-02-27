@@ -1,5 +1,5 @@
 import { HexColor } from "@lib/Color"
-import { DateRange } from "@lib/Date"
+import { MinMaxDateRange } from "@lib/Date"
 import { Location } from "@lib/location"
 
 /**
@@ -10,7 +10,7 @@ export type EditEventInput = {
   readonly description?: string
   readonly location: Location
   readonly color: HexColor
-  readonly dateRange: DateRange
+  readonly dateRange: MinMaxDateRange
   readonly shouldHideAfterStartDate: boolean
   readonly radiusMeters: number
 }

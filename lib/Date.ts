@@ -26,15 +26,14 @@ export const addSecondsToDate = (date: Date, seconds: number) => {
 }
 
 /**
- * A data type to make working with date ranges easier by always keeping the start date
- * before the end date.
+ * A data type to deal with a date range that has a known start and end date.
  *
  * When either the start date is set after the end date or vice versa, the other date
  * is fixed to the correct position using the previous interval between the 2 dates:
  *
  * ```ts
  * // Makes endDate "new Date(3)"" because the previous interval was 1 second
- * const range = new DateRange(new Date(0), new Date(1)).setStartDate(new Date(2))
+ * const range = new MinMaxDateRange(new Date(0), new Date(1)).setStartDate(new Date(2))
  * ```
  *
  * If the intial start date and end date are incompatible with each other, the initial
@@ -42,10 +41,10 @@ export const addSecondsToDate = (date: Date, seconds: number) => {
  *
  * ```ts
  * // Makes endDate "new Date(2)"" because the interval was 1 second
- * const range = new DateRange(new Date(1), new Date(0))
+ * const range = new MinMaxDateRange(new Date(1), new Date(0))
  * ```
  */
-export class DateRange {
+export class MinMaxDateRange {
   readonly startDate: Date
   readonly endDate: Date
 
@@ -64,9 +63,9 @@ export class DateRange {
   setStartDate (date: Date) {
     const { seconds } = durationBetweenDates(date, this.endDate)
     if (date > this.endDate) {
-      return new DateRange(date, addSecondsToDate(date, seconds))
+      return new MinMaxDateRange(date, addSecondsToDate(date, seconds))
     }
-    return new DateRange(date, this.endDate)
+    return new MinMaxDateRange(date, this.endDate)
   }
 
   /**
@@ -76,8 +75,8 @@ export class DateRange {
     const { seconds } = durationBetweenDates(date, this.startDate)
 
     if (date < this.startDate) {
-      return new DateRange(addSecondsToDate(date, seconds), date)
+      return new MinMaxDateRange(addSecondsToDate(date, seconds), date)
     }
-    return new DateRange(this.startDate, date)
+    return new MinMaxDateRange(this.startDate, date)
   }
 }
