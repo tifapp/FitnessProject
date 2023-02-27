@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react"
-import { ListRenderItemInfo, View } from "react-native"
+import { ListRenderItemInfo, StyleSheet, View } from "react-native"
 import BottomSheet, {
   BottomSheetFlatList,
   BottomSheetModal,
@@ -39,7 +39,9 @@ const EventsList = () => {
           <BottomSheetFlatList
             data={events}
             renderItem={({ item }: ListRenderItemInfo<Event>) => (
-              <EventItem event={item} />
+              <View style={styles.secondaryContainerStyle}>
+                <EventItem event={item} />
+              </View>
             )}
             ListHeaderComponent={<NearbyActivities />}
             stickyHeaderIndices={[0]}
@@ -49,5 +51,14 @@ const EventsList = () => {
     </BottomSheetModalProvider>
   )
 }
+
+const styles = StyleSheet.create({
+  secondaryContainerStyle: {
+    backgroundColor: "#f7f7f7",
+    paddingTop: "2%"
+    // paddingVertical: "5%"
+    // borderWidth: 2
+  }
+})
 
 export default EventsList

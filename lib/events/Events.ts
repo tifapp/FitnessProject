@@ -26,6 +26,7 @@ export class GraphQLEventItems implements Events {
         id: String(ids[i]),
         userId: "3234324",
         username: "Test Event",
+        profileImageURL: require("../../assets/icon.png"),
         title: "Title for Event",
         repliesCount: 2,
         writtenByYou: true,
@@ -33,7 +34,8 @@ export class GraphQLEventItems implements Events {
         maxOccupancy: 5,
         isAcceptingInvitations: true,
         colorHex: "magenta",
-        distance: 0.5
+        distance: 0.5,
+        address: "1156 High St, Santa Cruz, CA 95064"
       }
       eventsList.push(event)
     }

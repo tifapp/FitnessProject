@@ -6,6 +6,7 @@ export type Event = {
   readonly id: string
   readonly userId: string
   readonly username: string
+  readonly profileImage: string
   readonly title: string
   readonly repliesCount: number
   readonly description?: string
@@ -15,6 +16,7 @@ export type Event = {
   readonly isAcceptingInvitations: boolean
   readonly colorHex: string
   readonly distance: number
+  readonly address: string
 }
 
 /**
@@ -36,6 +38,7 @@ export namespace TestEventItems {
       id: testId,
       userId: "3234324",
       username: "Test Event",
+      profileImage: require("../../assets/icon.png"),
       title: "Title for Event",
       repliesCount: 2,
       writtenByYou: true,
@@ -43,7 +46,8 @@ export namespace TestEventItems {
       maxOccupancy: occupancy,
       isAcceptingInvitations: hasInvitations,
       colorHex: "magenta",
-      distance: 0.5
+      distance: 0.5,
+      address: "1156 High St, Santa Cruz, CA 95064"
     }
   }
 }
