@@ -7,7 +7,7 @@ import {
   FormProvider,
   useController,
   useForm,
-  useFormContext as useReactHookFormContext,
+  useFormContext,
   useWatch
 } from "react-hook-form"
 
@@ -94,12 +94,7 @@ export type EventFormContextValues = {
 export const useEventFormContext = () => {
   const context = useContext(EventFormContext)
   if (!context) {
-    throw new Error(`
-    An event form component attempted to use the current event form context,
-    but no context was provided.
-
-    To fix this, make sure to wrap the event form component with EventForm.
-    `)
+    throw new Error(noContextProvidedMessage)
   }
   return context
 }
@@ -115,7 +110,7 @@ export const useEventFormField = <
 >(
     fieldName: T
   ) => {
-  const { control } = useReactHookFormContext<EventFormValues>()
+  const { control } = useReactHookFormContext()
   const { field } = useController({ control, name: fieldName })
   const updateField = (value: V) => field.onChange(value)
   return [field.value as V, updateField] as const
@@ -149,8 +144,23 @@ type EventFormProviderProps = {
   children: ReactNode
 }
 
+const useReactHookFormContext = () => {
+  const formContext = useFormContext<EventFormValues>()
+  if (!formContext) {
+    throw new Error(noContextProvidedMessage)
+  }
+  return formContext
+}
+
+const noContextProvidedMessage = `
+An event form component attempted to use the current event form context,
+but no context was provided.
+
+To fix this, make sure to wrap the event form component with EventForm.
+`
+
 const EventFormProvider = ({ onSubmit, children }: EventFormProviderProps) => {
-  const { handleSubmit, formState } = useReactHookFormContext<EventFormValues>()
+  const { handleSubmit, formState } = useReactHookFormContext()
   return (
     <EventFormContext.Provider
       value={{
