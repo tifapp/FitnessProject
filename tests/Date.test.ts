@@ -25,7 +25,7 @@ describe("MinMaxDateRange tests", () => {
       new Date("2023-02-25T00:17:00"),
       new Date("2023-02-25T00:18:00")
     ).moveStartDate(new Date("2023-02-25T00:19:00"))
-    // NB: The previous interval was 1 hour, so we ensure the end date is 1 hour ahead of the start date
+    // NB: The previous interval was 1 minute, so we ensure the end date is 1 minute ahead of the start date
     expect(range.endDate).toEqual(new Date("2023-02-25T00:20:00"))
   })
 
@@ -34,7 +34,7 @@ describe("MinMaxDateRange tests", () => {
       new Date("2023-02-25T00:17:00"),
       new Date("2023-02-25T00:18:00")
     ).moveEndDate(new Date("2023-02-25T00:16:00"))
-    // NB: The previous interval was 1 hour, so we ensure the start date is 1 hour behind of the end date
+    // NB: The previous interval was 1 minute, so we ensure the start date is 1 minute behind of the end date
     expect(range.startDate).toEqual(new Date("2023-02-25T00:15:00"))
   })
 
@@ -43,7 +43,7 @@ describe("MinMaxDateRange tests", () => {
       new Date("2023-02-25T00:20:00"),
       new Date("2023-02-25T00:18:00")
     )
-    // NB: 2 hour interval
+    // NB: 2 minute interval
     expect(range.startDate).toEqual(new Date("2023-02-25T00:20:00"))
     expect(range.endDate).toEqual(new Date("2023-02-25T00:22:00"))
   })
