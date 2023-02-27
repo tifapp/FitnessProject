@@ -73,7 +73,6 @@ export class MinMaxDateRange {
    */
   moveEndDate (date: Date) {
     const { seconds } = durationBetweenDates(date, this.startDate)
-
     if (date < this.startDate) {
       return new MinMaxDateRange(addSecondsToDate(date, seconds), date)
     }
