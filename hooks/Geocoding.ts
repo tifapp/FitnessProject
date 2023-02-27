@@ -3,7 +3,7 @@ import { geocodingDependencyKey, Location } from "@lib/location"
 import { useQuery } from "react-query"
 
 /**
- * Geocodes an individual location and returns the best result.
+ * Reverse geocodes the best placemark for a location.
  */
 export const useReverseGeocodeQuery = (location: Location) => {
   const geocoding = useDependencyValue(geocodingDependencyKey)
