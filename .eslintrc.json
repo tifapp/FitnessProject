@@ -13,7 +13,13 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["react", "react-native", "@typescript-eslint", "jest"],
+  "plugins": [
+    "react",
+    "react-hooks",
+    "react-native",
+    "@typescript-eslint",
+    "jest"
+  ],
   "settings": {
     "react": {
       "version": "detect"
@@ -24,6 +30,8 @@
     "no-unused-vars": "warn",
     "eqeqeq": "warn",
     "react/jsx-key": "warn",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
     "spaced-comment": "warn",
     "space-in-parens": "error",
     "computed-property-spacing": "error",
