@@ -24,7 +24,13 @@
     "no-unused-vars": "warn",
     "eqeqeq": "warn",
     "react/jsx-key": "warn",
-    "spaced-comment": "warn"
+    "spaced-comment": "warn",
+    "space-in-parens": "error",
+    "computed-property-spacing": "error",
+    "array-bracket-spacing": "error",
+    "object-curly-spacing": "error",
+    "comma-spacing": "error",
+    "indent": ["error", 2]
   },
   "overrides": [
     {
