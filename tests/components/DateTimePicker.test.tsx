@@ -1,10 +1,9 @@
 import DateTimePicker, {
-  defaultFormatDate,
-  defaultFormatTime
+  defaultFormatDate
 } from "@components/formComponents/DateTimePicker"
 import { setPlatform } from "../helpers/Platform"
 import "../helpers/Matchers"
-import { render } from "@testing-library/react-native"
+import { render, screen } from "@testing-library/react-native"
 import { useState } from "react"
 import { View } from "react-native"
 
@@ -28,6 +27,24 @@ describe("DateTimePicker tests", () => {
       new Date("2023-02-20 11:34:56"),
       "11:34 AM"
     )
+  })
+
+  it("android should not display a formatted date below the mininum date", () => {
+    setPlatform("android")
+    renderDateTimePicker({
+      initialDate: new Date("2022-01-01"),
+      minDate: new Date("2022-01-02")
+    })
+    expect(formattedSelectedDate(new Date("2022-01-02"))).toBeDisplayed()
+  })
+
+  it("android should not display a formatted date above the maximum date", () => {
+    setPlatform("android")
+    renderDateTimePicker({
+      initialDate: new Date("2022-01-02"),
+      maxDate: new Date("2022-01-01")
+    })
+    expect(formattedSelectedDate(new Date("2022-01-01"))).toBeDisplayed()
   })
 })
 
@@ -62,4 +79,8 @@ const Test = ({ initialDate, minDate, maxDate }: TestProps) => {
       />
     </View>
   )
+}
+
+const formattedSelectedDate = (date: Date) => {
+  return screen.queryByText(defaultFormatDate(date))
 }
