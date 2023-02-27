@@ -2,10 +2,7 @@ import { eventFormFormatDateRange } from "@components/eventForm"
 import { FixedDateRange } from "@lib/Date"
 
 describe("EventFormDateFormatting tests", () => {
-  beforeEach(() => {
-    jest.setSystemTime(new Date(0))
-    jest.useFakeTimers()
-  })
+  beforeEach(() => jest.useFakeTimers())
   afterEach(() => jest.useRealTimers())
 
   test("eventFormFormatDateRange when start date is today, event takes place within the day", () => {
