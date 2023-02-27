@@ -7,6 +7,9 @@ import { useEventFormValue } from "./EventForm"
 
 /**
  * A horizontally scrolling toolbar for an event form.
+ *
+ * Each tab on the toolbar opens a bottom sheet screen
+ * where its respective form values can be edited.
  */
 export const EventFormToolbar = () => {
   const dateRange = useEventFormValue("dateRange")
