@@ -13,6 +13,7 @@ export const EventFormToolbar = () => {
   return <Text>{formatDateRange(dateRange)}</Text>
 }
 
+// TODO: - Should this support multiple locales?
 const formatDateRange = (dateRange: FixedDateRange) => {
   const start = dayjs(dateRange.startDate)
   const end = dayjs(dateRange.endDate)
