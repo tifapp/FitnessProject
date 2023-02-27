@@ -84,9 +84,6 @@ export type DateTimePickerProps = {
    *
    * The picker will always ensure that the date is after
    * the minimum.
-   *
-   * (**Android Note**): On android the picker is not able
-   * to constrain the hour and minute of the selected date.
    */
   minimumDate?: Date
 
@@ -95,9 +92,6 @@ export type DateTimePickerProps = {
    *
    * The picker will always ensure that the date is before
    * the maximum.
-   *
-   * (**Android Note**): On android the picker is not able
-   * to constrain the hour and minute of the selected date.
    */
   maximumDate?: Date
 }

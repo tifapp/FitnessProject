@@ -1,6 +1,4 @@
-import DateTimePicker, {
-  defaultFormatDate
-} from "@components/formComponents/DateTimePicker"
+import DateTimePicker from "@components/formComponents/DateTimePicker"
 import { setPlatform } from "../helpers/Platform"
 import "../helpers/Matchers"
 import { render, screen } from "@testing-library/react-native"
