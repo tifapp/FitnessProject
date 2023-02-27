@@ -26,14 +26,15 @@ export const EventFormLocationField = () => {
   return <LocationInfoLabel {...locationInfo} />
 }
 
-const LocationInfoLabel = (locationInfo: EventFormLocationInfo) =>
-  locationInfo.placemarkInfo
+const LocationInfoLabel = (locationInfo: EventFormLocationInfo) => {
+  return locationInfo.placemarkInfo
     ? (
-    <PlacemarkInfoLabel {...locationInfo.placemarkInfo} />
-      )
+      <PlacemarkInfoLabel {...locationInfo.placemarkInfo} />
+    )
     : (
-    <GeocodedLocationInfoLabel {...locationInfo} />
-      )
+      <GeocodedLocationInfoLabel {...locationInfo} />
+    )
+}
 
 const GeocodedLocationInfoLabel = (locationInfo: EventFormLocationInfo) => {
   const { data: placemark, status } = useReverseGeocodeQuery(
