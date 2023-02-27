@@ -6,7 +6,7 @@ import {
 import { Geocoding, geocodingDependencyKey } from "@lib/location"
 import { render, screen, waitFor } from "@testing-library/react-native"
 import {
-  mockPlacemarksForLocation,
+  mockReverseGeocodedPlacemarks,
   unimplementedGeocoding
 } from "../../helpers/Geocoding"
 import { baseTestEventValues } from "./helpers"
@@ -47,7 +47,7 @@ describe("EventFormLocationField tests", () => {
   })
 
   it("should display the location's placemark's name and address after geocoding the location", async () => {
-    mockPlacemarksForLocation(testLocation, [baseTestPlacemark], geocoding)
+    mockReverseGeocodedPlacemarks(testLocation, [baseTestPlacemark], geocoding)
     renderLocationField({ coordinates: testLocation })
     await waitFor(() => {
       expect(testPlacemarkName()).toBeDisplayed()
@@ -56,7 +56,7 @@ describe("EventFormLocationField tests", () => {
   })
 
   it("should indicate that the placemark's address is unknown when it cannot be determined", async () => {
-    mockPlacemarksForLocation(
+    mockReverseGeocodedPlacemarks(
       testLocation,
       [unknownLocationPlacemark],
       geocoding

@@ -10,7 +10,7 @@ export type UnimplementedGeocoding = ReturnType<typeof unimplementedGeocoding>
 /**
  * Mocks returned placemarks for a `geocoding.reverseGeocode` call.
  */
-export const mockPlacemarksForLocation = (
+export const mockReverseGeocodedPlacemarks = (
   location: Location,
   placemarks: Placemark[],
   geocoding: UnimplementedGeocoding
