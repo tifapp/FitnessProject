@@ -82,7 +82,3 @@ const Test = ({ initialDate, minDate, maxDate }: TestProps) => {
 const selectedDate = (date: Date) => {
   return screen.queryByTestId(date.toISOString())
 }
-
-const formattedSelectedDate = (date: Date) => {
-  return screen.queryByText(defaultFormatDate(date))
-}

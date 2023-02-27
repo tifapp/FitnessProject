@@ -53,14 +53,14 @@ export class MinMaxDateRange {
     this.endDate = endDate
 
     if (startDate > endDate) {
-      this.endDate = this.setStartDate(startDate).endDate
+      this.endDate = this.moveStartDate(startDate).endDate
     }
   }
 
   /**
    * Sets the start date of this range adjusting the end date accordingly.
    */
-  setStartDate (date: Date) {
+  moveStartDate (date: Date) {
     const { seconds } = durationBetweenDates(date, this.endDate)
     if (date > this.endDate) {
       return new MinMaxDateRange(date, addSecondsToDate(date, seconds))
@@ -71,7 +71,7 @@ export class MinMaxDateRange {
   /**
    * Sets the start date of this range adjusting the start date accordingly.
    */
-  setEndDate (date: Date) {
+  moveEndDate (date: Date) {
     const { seconds } = durationBetweenDates(date, this.startDate)
 
     if (date < this.startDate) {

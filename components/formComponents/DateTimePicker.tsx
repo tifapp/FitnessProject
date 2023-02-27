@@ -38,6 +38,11 @@ export const defaultFormatTime = (date: Date) => {
  */
 export type DateTimePickerProps = {
   /**
+   * An ID for using this picker in tests.
+   */
+  testID?: string
+
+  /**
    * The label for the picker.
    */
   label: string
@@ -130,6 +135,7 @@ const DateTimePicker = (props: DateTimePickerProps) => {
 }
 
 const _DateTimePickerIOS = ({
+  testID,
   label,
   date,
   onDateChanged,
@@ -141,6 +147,7 @@ const _DateTimePickerIOS = ({
   <View style={[styles.iOSContainer, style]}>
     <Text style={textStyle}>{label}</Text>
     <RNDateTimePicker
+      testID={testID}
       mode="datetime"
       value={date}
       minimumDate={minimumDate}
@@ -154,6 +161,7 @@ const _DateTimePickerIOS = ({
 )
 
 const _DatePickerAndroid = ({
+  testID,
   label,
   date,
   onDateChanged,
@@ -166,6 +174,7 @@ const _DatePickerAndroid = ({
 }: DateTimePickerProps) => {
   const showDatePicker = (mode: "date" | "time") => {
     RNDateTimePickerAndroid.open({
+      testID,
       value: date,
       onChange: (_, date) => {
         if (date) onDateChanged(date)
