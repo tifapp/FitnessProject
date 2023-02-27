@@ -1,11 +1,19 @@
+import React from "react"
 import { FixedDateRange } from "@lib/Date"
 import { dayjs } from "@lib/dayjs"
 import { Dayjs } from "dayjs"
+import { Text } from "react-native"
+import { useEventFormValue } from "./EventForm"
 
 /**
- * Formats a date range as it appears in the `EventFormToolbar` component.
+ * A horizontally scrolling toolbar for an event form.
  */
-export const eventFormFormatDateRange = (dateRange: FixedDateRange) => {
+export const EventFormToolbar = () => {
+  const dateRange = useEventFormValue("dateRange")
+  return <Text>{formatDateRange(dateRange)}</Text>
+}
+
+const formatDateRange = (dateRange: FixedDateRange) => {
   const start = dayjs(dateRange.startDate)
   const end = dayjs(dateRange.endDate)
 
