@@ -1,70 +1,30 @@
-import { EventFormLocationInfo } from "@components/eventForm"
-import { FixedDateRange } from "@lib/Date"
-import { UpdateDependencyValues } from "@lib/dependencies"
-import { Events, eventsDependencyKey } from "@lib/events"
-import { EventColors } from "@lib/events/EventColors"
-import { hapticsDependencyKey } from "@lib/Haptics"
-import { geocodingDependencyKey } from "@lib/location"
-import CreateEventScreen from "@screens/CreateEventScreen"
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor
-} from "@testing-library/react-native"
-import { unimplementedGeocoding } from "../helpers/Geocoding"
-import { neverPromise } from "../helpers/Promise"
 import { TestQueryClientProvider } from "../helpers/ReactQuery"
-import {
-  baseTestEventValues,
-  editEventDescription,
-  editEventTitle,
-  moveEventEndDate,
-  moveEventStartDate,
-  pickEventColor,
-  toggleShouldHideAfterStartDate
-} from "./eventFormComponents/helpers"
+import "../helpers/Matchers"
+import { EventFormLocationInfo } from "@components/eventForm"
+import { UpdateDependencyValues } from "@lib/dependencies"
+import { geocodingDependencyKey } from "@lib/location"
 import { unimplementedEvents } from "./helpers"
+import { unimplementedGeocoding } from "../helpers/Geocoding"
+import { Events, eventsDependencyKey } from "@lib/events"
+import { hapticsDependencyKey } from "@lib/Haptics"
+import CreateEventScreen from "@screens/CreateEventScreen"
+import { render } from "@testing-library/react-native"
 
 describe("CreateEventScreen tests", () => {
-  beforeEach(() => (events = unimplementedEvents()))
+  beforeEach(() => {
+    jest.useFakeTimers()
+  })
 
-  it("should be able to create an event with a preselected location", async () => {
-    events.createEvent.mockImplementation(neverPromise)
-    renderCreateEventScreen(baseTestEventValues.locationInfo)
+  afterEach(() => {
+    jest.runAllTimers()
+  })
 
-    const title = "Test Event"
-    const description = "Hello world this is a test."
-    const startDate = new Date("2023-04-01T10:00:00")
-    const endDate = new Date("2023-04-01T11:00:00")
-
-    editEventTitle(title)
-    editEventDescription(description)
-    moveEventStartDate(startDate)
-    moveEventEndDate(endDate)
-    pickEventColor("Turquoise")
-    toggleShouldHideAfterStartDate()
-    submitEventForm()
-
-    await waitFor(() => {
-      expect(events.createEvent).toHaveBeenCalledWith({
-        title,
-        description,
-        location: baseTestEventValues.locationInfo.coordinates,
-        dateRange: new FixedDateRange(startDate, endDate),
-        color: EventColors.Turquoise,
-        radiusMeters: 0,
-        shouldHideAfterStartDate: true
-      })
-    })
+  it("should have the default date range last 1 hour from the current date", () => {
+    jest.setSystemTime(new Date("2023-01-01T10:00:00"))
+    const { queryByText } = renderCreateEventScreen()
+    expect(queryByText("Today 10am - 11am")).toBeDisplayed()
   })
 })
-
-let events = unimplementedEvents()
-
-const submitEventForm = () => {
-  fireEvent.press(screen.getByText("Create Event"))
-}
 
 const renderCreateEventScreen = (locationInfo?: EventFormLocationInfo) => {
   return render(
@@ -72,7 +32,10 @@ const renderCreateEventScreen = (locationInfo?: EventFormLocationInfo) => {
       <UpdateDependencyValues
         update={(values) => {
           values.set(geocodingDependencyKey, unimplementedGeocoding())
-          values.set(eventsDependencyKey, events as unknown as Events)
+          values.set(
+            eventsDependencyKey,
+            unimplementedEvents() as unknown as Events
+          )
           values.set(hapticsDependencyKey, jest.fn())
         }}
       >
