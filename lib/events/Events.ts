@@ -24,7 +24,7 @@ export class GraphQLEventItems implements Events {
     const date = new Date()
     const date2 = new Date()
     date.setHours(10, 30)
-    date.setDate(date.getDate() + 2)
+    date.setDate(date.getDate() + 0)
     date2.setHours(16, 30)
     date2.setDate(date2.getDate() + 2)
 

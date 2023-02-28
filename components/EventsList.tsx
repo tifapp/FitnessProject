@@ -13,7 +13,7 @@ import { useDependencyValue } from "@lib/dependencies"
 
 const EventsList = () => {
   const eventItems = useDependencyValue(eventsDependencyKey)
-  const ids = Array.from(new Array(1), (_, i) => String(i))
+  const ids = Array.from(new Array(5), (_, i) => String(i))
   const events = eventItems.eventsWithIds(ids)
 
   // hooks
@@ -53,10 +53,8 @@ const EventsList = () => {
 
 const styles = StyleSheet.create({
   secondaryContainerStyle: {
-    backgroundColor: "#f7f7f7",
-    paddingTop: "2%"
-    // paddingVertical: "5%"
-    // borderWidth: 2
+    backgroundColor: "white",
+    padding: "2%"
   }
 })
 
