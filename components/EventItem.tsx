@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from "react-native"
 import { Event } from "@lib/events/Event"
 import IconButton from "./common/IconButton"
 import { Divider, Icon } from "react-native-elements"
+import { daysBeforeEvent, displayTimeOfEvent } from "@lib/time/Time"
 
 interface Props {
   event: Event
@@ -10,64 +11,7 @@ interface Props {
 
 const EventItem = ({ event }: Props) => {
   const numAttendees = 0
-  /*
-  const [isMin, setIsMin] = useState(false) // If time limit has <> 1 hour left
-  const [isHours, setIsHours] = useState(false) // If time limit has >= 1 hour left
-  const [isDays, setIsDays] = useState(false) // // If time limit has > 24 hours left
-  const [timeUntil, setTimeUntil] = useState(0) // Time (in either days, hours, or minutes) until event starts
-  const [currentCapacity, setCurrentCapacity] = useState(1) // How many users have joined event
-  const CAPACITY_PERCENTAGE = 0.75
 
-  const setTime = () => {
-    if (event.startTime) {
-      const date = new Date()
-      const diffTime = Math.abs(event.startTime.getTime() - date.getTime())
-      const diffMin = Math.ceil(diffTime / (1000 * 60))
-      const diffHours = Math.floor(diffMin / 60)
-      const diffDays = Math.floor(diffHours / 24)
-
-      if (diffMin < 60) {
-        setIsMin(true)
-        setIsHours(false)
-        setIsDays(false)
-        setTimeUntil(diffMin)
-      } else if (diffHours < 24) {
-        setIsMin(false)
-        setIsHours(true)
-        setIsDays(false)
-
-        if (diffMin % 60 >= 20 && diffMin % 60 <= 40) {
-          setTimeUntil(diffHours + 0.5)
-        } else {
-          setTimeUntil(diffHours)
-        }
-      } else {
-        setIsMin(false)
-        setIsDays(true)
-        setIsHours(false)
-        setTimeUntil(diffDays)
-      }
-    }
-  }
-
-  useEffect(() => {
-    setTime()
-  }, [event.startTime])
-
-  const displayTime = () => {
-    if (isDays) {
-      return `${timeUntil}d`
-    } else if (isHours) {
-      if (timeUntil === 1) {
-        return `${timeUntil}hr`
-      } else {
-        return `${timeUntil}hrs`
-      }
-    } else {
-      return `${timeUntil}min`
-    }
-  }
-*/
   return (
     <View style={[styles.container]}>
       {/* Profile Image, Name, More button */}
@@ -92,7 +36,12 @@ const EventItem = ({ event }: Props) => {
 
         <View style={styles.flexRow}>
           <Icon name="event-available" color={event.colorHex} />
-          <Text style={styles.infoText}>{event.address}</Text>
+          <Text style={styles.infoText}>
+            {daysBeforeEvent(event.startTime, new Date())}
+          </Text>
+          <Text style={styles.infoText}>
+            {displayTimeOfEvent(event.startTime, event.endTime)}
+          </Text>
         </View>
 
         <View style={{ paddingVertical: "4%" }}>

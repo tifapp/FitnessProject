@@ -19,7 +19,11 @@ export class GraphQLEventItems implements Events {
     if (ids.length === 0) return []
     const eventsList = []
     const date = new Date()
+    const date2 = new Date()
     date.setHours(date.getHours() + 10)
+    date.setDate(date.getDate() + 2)
+    date2.setHours(date.getHours() + 16)
+    date2.setDate(date2.getDate() + 2)
 
     for (let i = 0; i < ids.length; i++) {
       const event: Event = {
@@ -31,6 +35,7 @@ export class GraphQLEventItems implements Events {
         repliesCount: 2,
         writtenByYou: true,
         startTime: date,
+        endTime: date2,
         maxOccupancy: 5,
         isAcceptingInvitations: true,
         colorHex: "magenta",

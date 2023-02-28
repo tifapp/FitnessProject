@@ -11,7 +11,8 @@ export type Event = {
   readonly repliesCount: number
   readonly description?: string
   readonly writtenByYou: boolean
-  readonly startTime?: Date
+  readonly startTime: Date
+  readonly endTime: Date
   readonly maxOccupancy?: number
   readonly isAcceptingInvitations: boolean
   readonly colorHex: string
@@ -27,7 +28,8 @@ export namespace TestEventItems {
   const testDate = new Date()
 
   export const mockEvent = (
-    time: Date | undefined,
+    startTime: Date,
+    endTime: Date,
     occupancy: number | undefined,
     hasInvitations: boolean,
     useHours: boolean
@@ -42,7 +44,8 @@ export namespace TestEventItems {
       title: "Title for Event",
       repliesCount: 2,
       writtenByYou: true,
-      startTime: time,
+      startTime,
+      endTime,
       maxOccupancy: occupancy,
       isAcceptingInvitations: hasInvitations,
       colorHex: "magenta",
