@@ -13,7 +13,12 @@ interface Props {
 
 const EventItem = ({ event }: Props) => {
   const numAttendees = 1
+  const distance = 0.5
   const lightEventColor = tinycolor(event.colorHex).lighten(15).toString()
+
+  const onPressMore = () => {
+    return null
+  }
 
   return (
     <Shadow
@@ -31,6 +36,7 @@ const EventItem = ({ event }: Props) => {
             iconName={"more-horiz"}
             style={styles.moreButtonStyle}
             size={26}
+            onPress={onPressMore}
           />
         </View>
 
@@ -79,7 +85,7 @@ const EventItem = ({ event }: Props) => {
               ]}
             >
               <Icon name="near-me" size={20} color="white" />
-              <Text style={styles.distanceText}>{`${event.distance} mi`}</Text>
+              <Text style={styles.distanceText}>{`${distance} mi`}</Text>
             </View>
           </Shadow>
         </View>
@@ -147,6 +153,7 @@ const styles = StyleSheet.create({
     textAlignVertical: "center",
     color: "white",
     paddingRight: "3%",
+    paddingLeft: "1%",
     fontWeight: "bold"
   },
   image: {

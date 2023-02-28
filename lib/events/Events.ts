@@ -30,19 +30,16 @@ export class GraphQLEventItems implements Events {
 
     for (let i = 0; i < ids.length; i++) {
       const event: Event = {
-        id: String(ids[i]),
+        id: i,
         userId: "3234324",
         username: "Nicolette Antisdel",
-        profileImageURL: "../../assets/icon.png",
         title: "Pickup Basketball",
         repliesCount: 2,
         writtenByYou: true,
         startTime: date,
         endTime: date2,
-        maxOccupancy: 5,
-        isAcceptingInvitations: true,
         colorHex: "#843efa",
-        distance: 0.5,
+        location: { latitude: 36.991585, longitude: -122.058277 },
         address: "1156 High St, Santa Cruz, CA 95064"
       }
       eventsList.push(event)
