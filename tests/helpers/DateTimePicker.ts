@@ -7,6 +7,9 @@ import { ReactTestInstance } from "react-test-renderer"
  * `DateTimePicker` in a test.
  *
  * The `DateTimePicker` component must have a `testID` prop attached to it.
+ *
+ * (**Important Note**): ATM, if `Platform.OS === "android"` in the current test,
+ * this will not work.
  */
 export const updateDateTimePickerDate = ({
   testID,
@@ -15,6 +18,7 @@ export const updateDateTimePickerDate = ({
   testID: string
   toDate: Date
 }) => {
+  // TODO: - Make this support the android modal picker
   fireEvent(
     pickerWithTestId(testID),
     "onChange",

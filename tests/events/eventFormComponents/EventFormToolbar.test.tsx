@@ -9,11 +9,11 @@ import React from "react"
 import { baseTestEventValues } from "./helpers"
 import "../../helpers/Matchers"
 
-describe("EventFormToolbar tests", () => {
+describe("EventFormToolbarDateFormatting tests", () => {
   beforeEach(() => jest.useFakeTimers())
   afterEach(() => jest.useRealTimers())
 
-  test("eventFormFormatDateRange when start date is today, event takes place within the day", () => {
+  test("when start date is today, event takes place within the day", () => {
     jest.setSystemTime(new Date("2023-02-26T12:00:00"))
     expectFormattedDateRange(
       new FixedDateRange(
@@ -24,7 +24,7 @@ describe("EventFormToolbar tests", () => {
     )
   })
 
-  test("eventFormFormatDateRange when start date is tomorrow, event takes place within the day", () => {
+  test("when start date is tomorrow, event takes place within the day", () => {
     jest.setSystemTime(new Date("2023-02-26T12:00:00"))
     expectFormattedDateRange(
       new FixedDateRange(
@@ -35,7 +35,7 @@ describe("EventFormToolbar tests", () => {
     )
   })
 
-  test("eventFormFormatDateRange event takes place within the day", () => {
+  test("event takes place within the day", () => {
     expectFormattedDateRange(
       new FixedDateRange(
         new Date("2023-02-25T17:00:00"),
@@ -45,7 +45,7 @@ describe("EventFormToolbar tests", () => {
     )
   })
 
-  test("eventFormFormatDateRange event takes place within the day, am times", () => {
+  test("event takes place within the day, am times", () => {
     expectFormattedDateRange(
       new FixedDateRange(
         new Date("2023-02-25T10:00:00"),
@@ -55,7 +55,7 @@ describe("EventFormToolbar tests", () => {
     )
   })
 
-  test("eventFormFormatDateRange event takes place within the day, non-zero minutes", () => {
+  test("event takes place within the day, non-zero minutes", () => {
     expectFormattedDateRange(
       new FixedDateRange(
         new Date("2023-02-25T17:30:00"),
@@ -65,7 +65,7 @@ describe("EventFormToolbar tests", () => {
     )
   })
 
-  test("eventFormFormatDateRange start date is current date, event takes place within the day, non-zero minutes", () => {
+  test("start date is current date, event takes place within the day, non-zero minutes", () => {
     jest.setSystemTime(new Date("2023-02-26T12:00:00"))
     expectFormattedDateRange(
       new FixedDateRange(
@@ -76,7 +76,7 @@ describe("EventFormToolbar tests", () => {
     )
   })
 
-  test("eventFormFormatDateRange start date is current date, ends the next day, non-zero minutes", () => {
+  test("start date is current date, ends the next day, non-zero minutes", () => {
     jest.setSystemTime(new Date("2023-02-26T12:00:00"))
     expectFormattedDateRange(
       new FixedDateRange(
@@ -87,7 +87,7 @@ describe("EventFormToolbar tests", () => {
     )
   })
 
-  test("eventFormFormatDateRange start date is current date, ends the next day", () => {
+  test("start date is current date, ends the next day", () => {
     jest.setSystemTime(new Date("2023-02-26T12:00:00"))
     expectFormattedDateRange(
       new FixedDateRange(
@@ -98,7 +98,7 @@ describe("EventFormToolbar tests", () => {
     )
   })
 
-  test("eventFormFormatDateRange ends the next day, non-zero minutes", () => {
+  test("ends the next day, non-zero minutes", () => {
     expectFormattedDateRange(
       new FixedDateRange(
         new Date("2023-02-24T17:30:00"),
@@ -108,7 +108,7 @@ describe("EventFormToolbar tests", () => {
     )
   })
 
-  test("eventFormFormatDateRange 10 day range, starts today, non-zero minutes, am-pm", () => {
+  test("10 day range, starts today, non-zero minutes, am-pm", () => {
     jest.setSystemTime(new Date("2023-02-24T06:00:00"))
     expectFormattedDateRange(
       new FixedDateRange(
