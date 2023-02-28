@@ -4,8 +4,6 @@ import { Amplify, Auth, Cache, graphqlOperation, Storage } from "aws-amplify"
 import { withAuthenticator } from "aws-amplify-react-native"
 import awsconfig from "./src/aws-exports"
 
-import { AmplifyGraphQLClient } from "@lib/GraphQLClient"
-
 // graphql
 import { updateUser } from "@graphql/mutations.js"
 import { User } from "src/models"
@@ -304,7 +302,6 @@ const App = () => {
         </Tab.Navigator>
       </NavigationContainer>
     )
-
   } else if (isDeveloper) {
     return (
       <NavigationContainer linking={linkingConfig}>
