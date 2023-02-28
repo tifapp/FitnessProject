@@ -1,4 +1,6 @@
+import { Dayjs } from "dayjs"
 import { addSecondsToDate, diffDates } from "./Date"
+import { dayjs } from "./dayjs"
 
 /**
  * A data type to deal with a date range that has a known start and end date.
@@ -61,4 +63,32 @@ export class FixedDateRange {
  */
 export const dateRange = (start: Date, end: Date) => {
   return new FixedDateRange(start, end)
+}
+
+/**
+ * Formats a date range in a UI friendly way.
+ */
+export const formatDateRange = (dateRange: FixedDateRange) => {
+  // TODO: - Should this support multiple locales?
+  const start = dayjs(dateRange.startDate)
+  const end = dayjs(dateRange.endDate)
+
+  const endDateFormat = end.isSame(start, "day")
+    ? formatTime(end)
+    : formatDateTime(end)
+
+  const startDateFormat = start.isToday()
+    ? `Today ${formatTime(start)}`
+    : formatDateTime(start)
+
+  return `${startDateFormat} - ${endDateFormat}`
+}
+
+const formatDateTime = (date: Dayjs) => {
+  const formattedDate = date.isTomorrow() ? "Tomorrow" : date.format("MMM D,")
+  return `${formattedDate} ${formatTime(date)}`
+}
+
+const formatTime = (date: Dayjs) => {
+  return date.format(date.minute() !== 0 ? "h:mma" : "ha")
 }

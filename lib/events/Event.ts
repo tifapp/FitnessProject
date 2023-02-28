@@ -1,3 +1,6 @@
+import { dayjs, FixedDateRange } from "@lib/date"
+import { Dayjs } from "dayjs"
+
 /**
  * A type representing an event hosted by a user, which is meant for
  * viewing in a feed.
