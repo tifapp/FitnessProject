@@ -14,6 +14,7 @@ interface Props {
 const EventItem = ({ event }: Props) => {
   const numAttendees = 1
   const distance = 0.5
+  const shadowColor = "#828282"
   const lightEventColor = tinycolor(event.colorHex).lighten(10).toString()
 
   const onPressMore = () => {
@@ -23,7 +24,7 @@ const EventItem = ({ event }: Props) => {
   return (
     <Shadow
       distance={3}
-      startColor={"#828282"}
+      startColor={shadowColor}
       offset={[-1, 3]}
       style={{ alignSelf: "stretch" }}
     >

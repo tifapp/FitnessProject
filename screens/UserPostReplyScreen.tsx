@@ -17,12 +17,12 @@ import { useDependencyValue } from "../lib/dependencies"
 import { userPostsDependencyKey } from "../lib/posts/UserPosts"
 
 export type UserPostReplyScreenProps = {
-  postId: string;
-  replyId: string;
-  onDismiss: () => void;
-  userPostView?: (post: UserPost, onDeleted?: () => void) => ReactNode;
-  fullRepliesView?: (post: UserPost) => ReactNode;
-};
+  postId: string
+  replyId: string
+  onDismiss: () => void
+  userPostView?: (post: UserPost, onDeleted?: () => void) => ReactNode
+  fullRepliesView?: (post: UserPost) => ReactNode
+}
 
 const renderUserPost = (post: UserPost, onDeleted?: () => void) => (
   <UserPostView post={post} onDeleted={() => onDeleted?.()} />
@@ -65,75 +65,75 @@ const UserPostReplyScreen = ({
 
   return isLoading
     ? (
-    <ActivityIndicator accessibilityLabel="Loading..." />
-      )
+      <ActivityIndicator accessibilityLabel="Loading..." />
+    )
     : (
-    <View>
-      {post
-        ? (
-        <ScrollView style={{ height: "100%" }}>
-          {userPostView(post, onDismiss)}
-          {reply
-            ? (
-                userPostView(reply)
-              )
-            : (
-            <Text
-              style={{
-                fontWeight: "bold",
-                color: "black",
-                backgroundColor: "white",
-                padding: 8,
-                marginBottom: 16
-              }}
-            >
+      <View>
+        {post
+          ? (
+            <ScrollView style={{ height: "100%" }}>
+              {userPostView(post, onDismiss)}
+              {reply
+                ? (
+                  userPostView(reply)
+                )
+                : (
+                  <Text
+                    style={{
+                      fontWeight: "bold",
+                      color: "black",
+                      backgroundColor: "white",
+                      padding: 8,
+                      marginBottom: 16
+                    }}
+                  >
               Reply not found.
-            </Text>
-              )}
-          <TouchableOpacity
-            onPress={() => modalRef.current?.showModal()}
-            style={{
-              display: "flex",
-              padding: 8,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              backgroundColor: "#148df7"
-            }}
-          >
-            <View>
-              <Text style={{ fontWeight: "bold", color: "white" }}>
+                  </Text>
+                )}
+              <TouchableOpacity
+                onPress={() => modalRef.current?.showModal()}
+                style={{
+                  display: "flex",
+                  padding: 8,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  backgroundColor: "#148df7"
+                }}
+              >
+                <View>
+                  <Text style={{ fontWeight: "bold", color: "white" }}>
                 View All Replies
-              </Text>
-              <Text style={{ opacity: 0.75, color: "white" }}>
+                  </Text>
+                  <Text style={{ opacity: 0.75, color: "white" }}>
                 This is a single reply from the post.
-              </Text>
-            </View>
-            <MaterialIcons name="arrow-right" size={32} color="white" />
-          </TouchableOpacity>
-          <Modal ref={modalRef}>{fullRepliesView(post)}</Modal>
-        </ScrollView>
+                  </Text>
+                </View>
+                <MaterialIcons name="arrow-right" size={32} color="white" />
+              </TouchableOpacity>
+              <Modal ref={modalRef}>{fullRepliesView(post)}</Modal>
+            </ScrollView>
           )
-        : (
-        <ErrorPrompt
-          errorText="Post not found."
-          actionText="Close"
-          actionIcon="highlight-off"
-          actionButtonBackgroundColor="#e3492d"
-          onActionButtonTapped={onDismiss}
-        />
+          : (
+            <ErrorPrompt
+              errorText="Post not found."
+              actionText="Close"
+              actionIcon="highlight-off"
+              actionButtonBackgroundColor="#e3492d"
+              onActionButtonTapped={onDismiss}
+            />
           )}
-    </View>
-      )
+      </View>
+    )
 }
 
 type ErrorPromptProps = {
-  errorText: string;
-  actionText: string;
-  actionIcon: ComponentProps<typeof MaterialIcons>["name"];
-  actionButtonBackgroundColor: string;
-  onActionButtonTapped: () => void;
-};
+  errorText: string
+  actionText: string
+  actionIcon: ComponentProps<typeof MaterialIcons>["name"]
+  actionButtonBackgroundColor: string
+  onActionButtonTapped: () => void
+}
 
 const ErrorPrompt = ({
   errorText,

@@ -1,63 +1,65 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from "react-native"
 
 export const state = {
-  //Area where you start the map at
-    initialRegion: 
+  // Area where you start the map at
+  initialRegion: {
+    latitude: 36.933652,
+    longitude: -121.736033,
+    latitudeDelta: 0.0522,
+    longitudeDelta: 0.0221
+  },
+  // Our initial set of markers (events)
+  markers: [
     {
-      latitude: 36.933652,
-      longitude: -121.736033,
-      latitudeDelta: 0.0522,
-      longitudeDelta: 0.0221
-    },
-  //Our initial set of markers (events)
-    markers: [
-      {
-        key: 1,
-        place: "I'm Tiffer",
-        lat: 36.923652,
-        lng: -121.726033,
-        pinColor: 'blue'
-      },
-      {
-        key: 2,
-        place: "I'm Tif",
-        lat: 36.943652,
-        lng: -121.716033,
-        pinColor: 'green'
-      },
-      {
-        key: 3,
-        place: "I'm Tiff",
-        lat: 36.953652,
-        lng: -121.746033,
-        pinColor: 'red'
-      },
-      {
-        key: 4,
-        place: "I'm Tiffy",
-        lat: 36.933652,
-        lng: -121.736033,
-        pinColor: 'purple'
+      key: "1",
+      title: "I'm Tiffer",
+      location: {
+        latitude: 36.923652,
+        longitude: -121.726033
       }
-    ],
-
-    movementSettings: {
-      canScroll: true,
-      canZoom: true,
-      canRotate: false,
-    }
-    
-  }
-  export const mapCompStyle = StyleSheet.create({
-    container: {
-      ...StyleSheet.absoluteFillObject,
-      flex: 1,
-      width: '100%',
-      height: '100%',
-      justifyContent: "flex-end",
-      alignItems: "center"
     },
-    map: {
-      ...StyleSheet.absoluteFillObject
+    {
+      key: "2",
+      title: "I'm Tif",
+      location: {
+        latitude: 36.943652,
+        longitude: -121.716033
+      }
+    },
+    {
+      key: "3",
+      title: "I'm Tiff",
+      location: {
+        latitude: 36.953652,
+        longitude: -121.746033
+      }
+    },
+    {
+      key: "4",
+      title: "I'm Tiffy",
+      location: {
+        latitude: 36.933652,
+        longitude: -121.736033
+      }
     }
-  })
+  ],
+
+  movementSettings: {
+    canScroll: true,
+    canZoom: true,
+    canRotate: false
+  }
+}
+export const mapCompStyle = StyleSheet.create({
+  container: {
+    ...StyleSheet.absoluteFillObject,
+    flex: 1,
+    width: "100%",
+    height: "100%",
+    justifyContent: "flex-end",
+    alignItems: "center"
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject
+  }
+})

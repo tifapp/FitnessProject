@@ -1,7 +1,9 @@
+import MapComponent from "@components/MapComponent"
+import { mapCompStyle, state } from "@components/MapTestData"
 import { Auth } from "aws-amplify"
+import EventsList from "@components/EventsList"
 import React from "react"
 import { Alert, Text, TouchableOpacity } from "react-native"
-import EventsList from "@components/EventsList"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 
 const ActivitiesScreen = () => {
@@ -47,6 +49,14 @@ const ActivitiesScreen = () => {
           SandBox to get started
         </Text>
       </TouchableOpacity>
+      <MapComponent
+        containStyle={mapCompStyle.container}
+        mapStyle={mapCompStyle.map}
+        initialRegion={state.initialRegion}
+        markers={state.markers}
+        extractKey={(event) => event.key}
+        movementSettings={state.movementSettings}
+      />
       <EventsList />
     </GestureHandlerRootView>
   )
