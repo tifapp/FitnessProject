@@ -112,7 +112,14 @@ export const useEventFormField = <
   ) => {
   const { control } = useReactHookFormContext()
   const { field } = useController({ control, name: fieldName })
-  const updateField = (value: V) => field.onChange(value)
+  const updateField = (value: ((_: V) => V) | V) => {
+    if (value instanceof Function) {
+      // TODO: - Is it possible for this to give a stale value?
+      field.onChange(value(field.value as V))
+    } else {
+      field.onChange(value)
+    }
+  }
   return [field.value as V, updateField] as const
 }
 

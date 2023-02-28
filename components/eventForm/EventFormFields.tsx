@@ -18,6 +18,20 @@ export const EventFormTitleField = () => {
 }
 
 /**
+ * The description field for an event form.
+ */
+export const EventFormDescriptionField = () => {
+  const [description, setDescription] = useEventFormField("description")
+  return (
+    <TextInput
+      placeholder="Description"
+      value={description}
+      onChangeText={setDescription}
+    />
+  )
+}
+
+/**
  * Displays the selected location (if one) in the event form.
  */
 export const EventFormLocationField = () => {

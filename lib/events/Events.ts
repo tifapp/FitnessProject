@@ -1,5 +1,6 @@
 import { HexColor } from "@lib/Color"
 import { FixedDateRange } from "@lib/Date"
+import { createDependencyKey } from "@lib/dependencies"
 import { Location } from "@lib/location"
 
 /**
@@ -25,6 +26,11 @@ export interface Events {
    * @returns a list of events (right now just mocks a bunch of events)
    */
   eventsWithIds: (ids: string[]) => Event[]
+
+  /**
+   * Creates a new event.
+   */
+  createEvent: (input: EditEventInput) => Promise<Event>
 }
 
 /**
@@ -57,4 +63,10 @@ export class GraphQLEventItems implements Events {
 
     return eventsList
   }
+
+  async createEvent (input: EditEventInput): Promise<Event> {
+    throw new Error("TODO")
+  }
 }
+
+export const eventsDependencyKey = createDependencyKey<Events>()

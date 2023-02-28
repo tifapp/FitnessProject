@@ -119,16 +119,16 @@ const DateTimePicker = (props: DateTimePickerProps) => {
     }
   }, [minimumDate, maximumDate, date, onDateChanged])
 
-  return Platform.OS === "ios"
+  return Platform.OS === "android"
     ? (
-    <_DateTimePickerIOS {...props} />
-      )
+      <DatePickerAndroid {...props} />
+    )
     : (
-    <_DatePickerAndroid {...props} />
-      )
+      <DateTimePickerIOS {...props} />
+    )
 }
 
-const _DateTimePickerIOS = ({
+const DateTimePickerIOS = ({
   testID,
   label,
   date,
@@ -154,7 +154,7 @@ const _DateTimePickerIOS = ({
   </View>
 )
 
-const _DatePickerAndroid = ({
+const DatePickerAndroid = ({
   testID,
   label,
   date,

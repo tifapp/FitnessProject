@@ -70,7 +70,7 @@ export const EventFormSubmitButton = ({
     <TouchableOpacity
       testID={testID}
       onPress={() => submitButtonTapped?.()}
-      style={{ backgroundColor: color as string }}
+      style={{ backgroundColor: color }}
     >
       <Text disabled={!canSubmit}>{label}</Text>
     </TouchableOpacity>
