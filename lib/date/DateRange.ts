@@ -59,7 +59,7 @@ export class FixedDateRange {
   /**
    * Formats this date range in a UI friendly way.
    */
-  format () {
+  formatted () {
     // TODO: - Should this support multiple locales?
     const start = dayjs(this.startDate)
     const end = dayjs(this.endDate)
