@@ -1,5 +1,5 @@
 import React from "react"
-import { StyleSheet, Text, View } from "react-native"
+import { Image, StyleSheet, Text, View } from "react-native"
 import { Event } from "@lib/events/Event"
 import IconButton from "./common/IconButton"
 import { Divider, Icon } from "react-native-elements"
@@ -10,14 +10,14 @@ interface Props {
 }
 
 const EventItem = ({ event }: Props) => {
-  const numAttendees = 0
+  const numAttendees = 1
 
   return (
     <View style={[styles.container]}>
       {/* Profile Image, Name, More button */}
       <View style={[styles.topRow, styles.flexRow]}>
+        <Image style={styles.image} source={require("../assets/icon.png")} />
         <Text style={styles.name}>{event.username}</Text>
-
         <IconButton
           iconName={"more-horiz"}
           style={styles.moreButtonStyle}
@@ -50,18 +50,21 @@ const EventItem = ({ event }: Props) => {
       </View>
 
       {/* People Attending, Distance */}
-      <View style={styles.flexRow}>
-        <Icon name="people-alt" color={event.colorHex} />
-        <Text
-          style={[styles.attendingText, styles.attendingNumber]}
-        >{`${numAttendees}`}</Text>
-        <Text style={styles.attendingText}>{" attending"}</Text>
-
-        <View style={styles.distanceContainer}>
-          <View style={[styles.distance, { backgroundColor: event.colorHex }]}>
-            <Icon name="near-me" size={22} color="white" />
-            <Text style={styles.distanceText}>{`${event.distance} mi`}</Text>
-          </View>
+      <View style={styles.distanceContainer}>
+        {numAttendees > 0
+          ? (
+            <View style={[styles.flexRow, { alignItems: "center" }]}>
+              <Icon name="people-alt" color={event.colorHex} />
+              <Text
+                style={[styles.attendingText, styles.attendingNumber]}
+              >{`${numAttendees}`}</Text>
+              <Text style={styles.attendingText}>{" attending"}</Text>
+            </View>
+          )
+          : null}
+        <View style={[styles.distance, { backgroundColor: event.colorHex }]}>
+          <Icon name="near-me" size={20} color="white" />
+          <Text style={styles.distanceText}>{`${event.distance} mi`}</Text>
         </View>
       </View>
     </View>
@@ -74,7 +77,8 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   topRow: {
-    paddingBottom: "4%"
+    paddingBottom: "4%",
+    alignItems: "center"
   },
   middleRow: {
     flex: 1,
@@ -90,7 +94,7 @@ const styles = StyleSheet.create({
   },
   attendingNumber: {
     fontWeight: "bold",
-    paddingLeft: "3%"
+    paddingLeft: "5%"
   },
   attendingText: {
     textAlignVertical: "center",
@@ -105,7 +109,8 @@ const styles = StyleSheet.create({
   name: {
     textAlignVertical: "center",
     fontWeight: "bold",
-    fontSize: 15
+    fontSize: 15,
+    paddingLeft: "3%"
   },
   moreButtonStyle: {
     flex: 1,
@@ -116,9 +121,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     paddingHorizontal: "2%",
     paddingVertical: "1%",
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: "white"
+    borderRadius: 16
   },
   distanceContainer: {
     flex: 1,
@@ -128,7 +131,12 @@ const styles = StyleSheet.create({
   distanceText: {
     textAlignVertical: "center",
     color: "white",
-    paddingLeft: "3%"
+    paddingLeft: "2%"
+  },
+  image: {
+    width: 40,
+    height: 40,
+    borderRadius: 24
   },
   container: {
     backgroundColor: "white",

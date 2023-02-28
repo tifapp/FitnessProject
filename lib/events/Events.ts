@@ -1,4 +1,5 @@
 import { createDependencyKey } from "@lib/dependencies"
+import { Image } from "react-native"
 
 /**
  * An interface representing all the collection of all of the posts in the app.
@@ -32,7 +33,7 @@ export class GraphQLEventItems implements Events {
         id: String(ids[i]),
         userId: "3234324",
         username: "Nicolette Antisdel",
-        profileImageURL: require("../../assets/icon.png"),
+        profileImageURL: "../../assets/icon.png",
         title: "Pickup Basketball",
         repliesCount: 2,
         writtenByYou: true,

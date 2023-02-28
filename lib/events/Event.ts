@@ -40,7 +40,7 @@ export namespace TestEventItems {
       id: testId,
       userId: "3234324",
       username: "Test Event",
-      profileImage: require("../../assets/icon.png"),
+      profileImage: "../assets/icon.png",
       title: "Title for Event",
       repliesCount: 2,
       writtenByYou: true,
