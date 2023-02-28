@@ -11,7 +11,8 @@ Amplify Params - DO NOT EDIT */ /* Amplify Params - DO NOT EDIT
 	REGION
 	process.env.STORAGE_MEDIA_BUCKETNAME,
   ""my comment""
-Amplify Params - DO NOT EDIT */ require("isomorphic-fetch");
+Amplify Params - DO NOT EDIT */ 
+require("isomorphic-fetch");
 const gql = require("graphql-tag");
 
 const {

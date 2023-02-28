@@ -4,11 +4,11 @@
       "addmissingownerfields": false,
       "improvepluralization": false,
       "validatetypenamereservedwords": true,
-      "useexperimentalpipelinedtransformer": true,
+      "useexperimentalpipelinedtransformer": false,
       "enableiterativegsiupdates": false,
       "secondarykeyasgsi": false,
       "skipoverridemutationinputtypes": false,
-      "transformerversion": 2,
+      "transformerversion": 1,
       "suppressschemamigrationprompt": true,
       "securityEnhancementNotification": false,
       "showfieldauthnotification": false
@@ -24,7 +24,7 @@
       "useenabledmfas": false
     },
     "codegen": {
-      "useappsyncmodelgenplugin": true,
+      "useappsyncmodelgenplugin": false,
       "usedocsgeneratorplugin": false,
       "usetypesgeneratorplugin": false,
       "cleangeneratedmodelsdirectory": false,

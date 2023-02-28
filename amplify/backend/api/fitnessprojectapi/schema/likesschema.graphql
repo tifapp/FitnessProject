@@ -1,22 +1,11 @@
-type Like @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" }, subscriptions: null)
-@auth(
-  rules: [
-      { allow: owner, ownerField: "userId", operations: [create, read, delete] },
-      { allow: private, provider: iam, operations: [read, delete] },
-  ]
-)
-@key(fields: ["userId", "postId"])
-@key(name: "ByPost", fields: ["postId", "createdAt"], queryField: "likesByPost")
-{
+type Like @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"}, subscriptions: null) @auth(rules: [{allow: owner, ownerField: "userId"}, {allow: private, provider: iam, operations: [read, delete]}, {allow: private, operations: [update]}]) {
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
-  userId: ID!
-  postId: ID!
+  userId: ID! @primaryKey(sortKeyFields: ["postId"])
+  postId: ID! @index(name: "ByPost", queryField: "likesByPost", sortKeyFields: ["createdAt"])
 }
 
-"""
-This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when creating a new like.
-"""
+"""This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when creating a new like."""
 input CreateLikeInput {
   postId: ID!
 }

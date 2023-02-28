@@ -24,153 +24,162 @@ export const onDeleteLikeForPost = /* GraphQL */ `
 export const onCreatePostFromChannel = /* GraphQL */ `
   subscription OnCreatePostFromChannel($channel: ID!) {
     onCreatePostFromChannel(channel: $channel) {
+      likes
+      replies
       createdAt
       updatedAt
       userId
+      postOwner
       description
       channel
       receiver
       parentId
       imageURL
       taggedUsers
-      likes
-      replies
     }
   }
 `;
 export const onCreatePostForReceiver = /* GraphQL */ `
   subscription OnCreatePostForReceiver($receiver: ID!) {
     onCreatePostForReceiver(receiver: $receiver) {
+      likes
+      replies
       createdAt
       updatedAt
       userId
+      postOwner
       description
       channel
       receiver
       parentId
       imageURL
       taggedUsers
-      likes
-      replies
     }
   }
 `;
 export const onCreatePostByUser = /* GraphQL */ `
   subscription OnCreatePostByUser($userId: ID!) {
     onCreatePostByUser(userId: $userId) {
+      likes
+      replies
       createdAt
       updatedAt
       userId
+      postOwner
       description
       channel
       receiver
       parentId
       imageURL
       taggedUsers
-      likes
-      replies
     }
   }
 `;
 export const onUpdatePostFromChannel = /* GraphQL */ `
   subscription OnUpdatePostFromChannel($channel: ID!) {
     onUpdatePostFromChannel(channel: $channel) {
+      likes
+      replies
       createdAt
       updatedAt
       userId
+      postOwner
       description
       channel
       receiver
       parentId
       imageURL
       taggedUsers
-      likes
-      replies
     }
   }
 `;
 export const onDeletePostFromChannel = /* GraphQL */ `
   subscription OnDeletePostFromChannel($channel: ID!) {
     onDeletePostFromChannel(channel: $channel) {
+      likes
+      replies
       createdAt
       updatedAt
       userId
+      postOwner
       description
       channel
       receiver
       parentId
       imageURL
       taggedUsers
-      likes
-      replies
     }
   }
 `;
 export const onIncrementLikes = /* GraphQL */ `
   subscription OnIncrementLikes($createdAt: AWSDateTime!, $userId: ID!) {
     onIncrementLikes(createdAt: $createdAt, userId: $userId) {
+      likes
+      replies
       createdAt
       updatedAt
       userId
+      postOwner
       description
       channel
       receiver
       parentId
       imageURL
       taggedUsers
-      likes
-      replies
     }
   }
 `;
 export const onDecrementLikes = /* GraphQL */ `
   subscription OnDecrementLikes($createdAt: AWSDateTime!, $userId: ID!) {
     onDecrementLikes(createdAt: $createdAt, userId: $userId) {
+      likes
+      replies
       createdAt
       updatedAt
       userId
+      postOwner
       description
       channel
       receiver
       parentId
       imageURL
       taggedUsers
-      likes
-      replies
     }
   }
 `;
 export const onIncrementReplies = /* GraphQL */ `
   subscription OnIncrementReplies($createdAt: AWSDateTime!, $userId: ID!) {
     onIncrementReplies(createdAt: $createdAt, userId: $userId) {
+      likes
+      replies
       createdAt
       updatedAt
       userId
+      postOwner
       description
       channel
       receiver
       parentId
       imageURL
       taggedUsers
-      likes
-      replies
     }
   }
 `;
 export const onDecrementReplies = /* GraphQL */ `
   subscription OnDecrementReplies($createdAt: AWSDateTime!, $userId: ID!) {
     onDecrementReplies(createdAt: $createdAt, userId: $userId) {
+      likes
+      replies
       createdAt
       updatedAt
       userId
+      postOwner
       description
       channel
       receiver
       parentId
       imageURL
       taggedUsers
-      likes
-      replies
     }
   }
 `;
@@ -221,9 +230,50 @@ export const onDeleteFriendship = /* GraphQL */ `
     }
   }
 `;
+export const onCreateBlock = /* GraphQL */ `
+  subscription OnCreateBlock(
+    $filter: ModelSubscriptionBlockFilterInput
+    $userId: String
+  ) {
+    onCreateBlock(filter: $filter, userId: $userId) {
+      createdAt
+      userId
+      blockee
+      updatedAt
+    }
+  }
+`;
+export const onUpdateBlock = /* GraphQL */ `
+  subscription OnUpdateBlock(
+    $filter: ModelSubscriptionBlockFilterInput
+    $userId: String
+  ) {
+    onUpdateBlock(filter: $filter, userId: $userId) {
+      createdAt
+      userId
+      blockee
+      updatedAt
+    }
+  }
+`;
+export const onDeleteBlock = /* GraphQL */ `
+  subscription OnDeleteBlock(
+    $filter: ModelSubscriptionBlockFilterInput
+    $userId: String
+  ) {
+    onDeleteBlock(filter: $filter, userId: $userId) {
+      createdAt
+      userId
+      blockee
+      updatedAt
+    }
+  }
+`;
 export const onCreateChallenge = /* GraphQL */ `
-  subscription OnCreateChallenge {
-    onCreateChallenge {
+  subscription OnCreateChallenge(
+    $filter: ModelSubscriptionChallengeFilterInput
+  ) {
+    onCreateChallenge(filter: $filter) {
       id
       name
       Description
@@ -235,8 +285,10 @@ export const onCreateChallenge = /* GraphQL */ `
   }
 `;
 export const onUpdateChallenge = /* GraphQL */ `
-  subscription OnUpdateChallenge {
-    onUpdateChallenge {
+  subscription OnUpdateChallenge(
+    $filter: ModelSubscriptionChallengeFilterInput
+  ) {
+    onUpdateChallenge(filter: $filter) {
       id
       name
       Description
@@ -248,8 +300,10 @@ export const onUpdateChallenge = /* GraphQL */ `
   }
 `;
 export const onDeleteChallenge = /* GraphQL */ `
-  subscription OnDeleteChallenge {
-    onDeleteChallenge {
+  subscription OnDeleteChallenge(
+    $filter: ModelSubscriptionChallengeFilterInput
+  ) {
+    onDeleteChallenge(filter: $filter) {
       id
       name
       Description
@@ -261,8 +315,8 @@ export const onDeleteChallenge = /* GraphQL */ `
   }
 `;
 export const onCreateGroup = /* GraphQL */ `
-  subscription OnCreateGroup {
-    onCreateGroup {
+  subscription OnCreateGroup($filter: ModelSubscriptionGroupFilterInput) {
+    onCreateGroup(filter: $filter) {
       id
       userID
       name
@@ -277,8 +331,8 @@ export const onCreateGroup = /* GraphQL */ `
   }
 `;
 export const onUpdateGroup = /* GraphQL */ `
-  subscription OnUpdateGroup {
-    onUpdateGroup {
+  subscription OnUpdateGroup($filter: ModelSubscriptionGroupFilterInput) {
+    onUpdateGroup(filter: $filter) {
       id
       userID
       name
@@ -293,8 +347,8 @@ export const onUpdateGroup = /* GraphQL */ `
   }
 `;
 export const onDeleteGroup = /* GraphQL */ `
-  subscription OnDeleteGroup {
-    onDeleteGroup {
+  subscription OnDeleteGroup($filter: ModelSubscriptionGroupFilterInput) {
+    onDeleteGroup(filter: $filter) {
       id
       userID
       name
@@ -308,39 +362,12 @@ export const onDeleteGroup = /* GraphQL */ `
     }
   }
 `;
-export const onCreateBlock = /* GraphQL */ `
-  subscription OnCreateBlock($userId: String) {
-    onCreateBlock(userId: $userId) {
-      createdAt
-      userId
-      blockee
-      updatedAt
-    }
-  }
-`;
-export const onUpdateBlock = /* GraphQL */ `
-  subscription OnUpdateBlock($userId: String) {
-    onUpdateBlock(userId: $userId) {
-      createdAt
-      userId
-      blockee
-      updatedAt
-    }
-  }
-`;
-export const onDeleteBlock = /* GraphQL */ `
-  subscription OnDeleteBlock($userId: String) {
-    onDeleteBlock(userId: $userId) {
-      createdAt
-      userId
-      blockee
-      updatedAt
-    }
-  }
-`;
 export const onCreateUser = /* GraphQL */ `
-  subscription OnCreateUser {
-    onCreateUser {
+  subscription OnCreateUser(
+    $filter: ModelSubscriptionUserFilterInput
+    $id: String
+  ) {
+    onCreateUser(filter: $filter, id: $id) {
       id
       identityId
       name
@@ -356,15 +383,41 @@ export const onCreateUser = /* GraphQL */ `
       deviceToken
       friendRequestPrivacy
       messagesPrivacy
+      isVerified
+      event {
+        comments
+        createdAt
+        updatedAt
+        userId
+        eventOwner
+        description
+        host
+        parentId
+        radius
+        startDateTime
+        endDateTime
+        name
+        location {
+          latitude
+          longitude
+        }
+        users {
+          nextToken
+        }
+      }
       createdAt
       updatedAt
-      isVerified
+      eventUsersId
+      eventUsersUserId
     }
   }
 `;
 export const onUpdateUser = /* GraphQL */ `
-  subscription OnUpdateUser {
-    onUpdateUser {
+  subscription OnUpdateUser(
+    $filter: ModelSubscriptionUserFilterInput
+    $id: String
+  ) {
+    onUpdateUser(filter: $filter, id: $id) {
       id
       identityId
       name
@@ -380,15 +433,41 @@ export const onUpdateUser = /* GraphQL */ `
       deviceToken
       friendRequestPrivacy
       messagesPrivacy
+      isVerified
+      event {
+        comments
+        createdAt
+        updatedAt
+        userId
+        eventOwner
+        description
+        host
+        parentId
+        radius
+        startDateTime
+        endDateTime
+        name
+        location {
+          latitude
+          longitude
+        }
+        users {
+          nextToken
+        }
+      }
       createdAt
       updatedAt
-      isVerified
+      eventUsersId
+      eventUsersUserId
     }
   }
 `;
 export const onDeleteUser = /* GraphQL */ `
-  subscription OnDeleteUser {
-    onDeleteUser {
+  subscription OnDeleteUser(
+    $filter: ModelSubscriptionUserFilterInput
+    $id: String
+  ) {
+    onDeleteUser(filter: $filter, id: $id) {
       id
       identityId
       name
@@ -404,15 +483,41 @@ export const onDeleteUser = /* GraphQL */ `
       deviceToken
       friendRequestPrivacy
       messagesPrivacy
+      isVerified
+      event {
+        comments
+        createdAt
+        updatedAt
+        userId
+        eventOwner
+        description
+        host
+        parentId
+        radius
+        startDateTime
+        endDateTime
+        name
+        location {
+          latitude
+          longitude
+        }
+        users {
+          nextToken
+        }
+      }
       createdAt
       updatedAt
-      isVerified
+      eventUsersId
+      eventUsersUserId
     }
   }
 `;
 export const onCreateVerification = /* GraphQL */ `
-  subscription OnCreateVerification($id: String) {
-    onCreateVerification(id: $id) {
+  subscription OnCreateVerification(
+    $filter: ModelSubscriptionVerificationFilterInput
+    $id: String
+  ) {
+    onCreateVerification(filter: $filter, id: $id) {
       id
       title
       isVerified
@@ -422,8 +527,11 @@ export const onCreateVerification = /* GraphQL */ `
   }
 `;
 export const onUpdateVerification = /* GraphQL */ `
-  subscription OnUpdateVerification($id: String) {
-    onUpdateVerification(id: $id) {
+  subscription OnUpdateVerification(
+    $filter: ModelSubscriptionVerificationFilterInput
+    $id: String
+  ) {
+    onUpdateVerification(filter: $filter, id: $id) {
       id
       title
       isVerified
@@ -433,8 +541,11 @@ export const onUpdateVerification = /* GraphQL */ `
   }
 `;
 export const onDeleteVerification = /* GraphQL */ `
-  subscription OnDeleteVerification($id: String) {
-    onDeleteVerification(id: $id) {
+  subscription OnDeleteVerification(
+    $filter: ModelSubscriptionVerificationFilterInput
+    $id: String
+  ) {
+    onDeleteVerification(filter: $filter, id: $id) {
       id
       title
       isVerified

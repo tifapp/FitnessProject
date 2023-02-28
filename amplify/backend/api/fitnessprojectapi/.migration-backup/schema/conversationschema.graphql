@@ -1,0 +1,75 @@
+"""
+Thankfully we won't need a secondary index key since only the users can see conversations they're a part of. Meaning a "listall" will only list conversations the user is a part of, and no others.
+"""
+type Conversation
+  @model(
+    timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" },
+    subscriptions: null
+  )
+  @auth(
+    rules: [
+      {
+        allow: owner,
+        ownerField: "users",
+        operations: [create, update, read, delete]
+      }
+    ]
+  )
+  @key(
+    name: "ByAcceptedAndDate",
+    fields: ["dummy","Accepted","updatedAt"],
+    queryField: "conversationsByAcceptedAndDate"
+  ) 
+  @key(
+    name: "ByDateAndAccepted",
+    fields: ["dummy","updatedAt","Accepted"],
+    queryField: "conversationsByDateAndAccepted"
+  ) 
+  @key(
+    name: "ByAcceptedThenDate",
+    fields: ["Accepted","updatedAt"],
+    queryField: "conversationsByAcceptedThenDate"
+  ) 
+  @key(
+    name: "ByAccepted",
+    fields: ["dummy","Accepted"],
+    queryField: "conversationsByAccepted"
+  ) 
+  @key(
+    name: "ByDate",
+    fields: ["dummy","updatedAt"],
+    queryField: "conversationsByDate"
+  ) 
+  {
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+  id: ID!
+  users: [ID!]!
+  lastUser: ID!
+  lastMessage: String!
+  dummy: Int
+  Accepted: Int!
+}
+
+"""
+This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when creating a new Conversation.
+"""
+input CreateConversationInput {
+  id: ID!
+  users: [ID!]!
+  lastMessage: String!
+  Accepted: Int!
+}
+
+"""
+This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when updating a Conversation.
+"""
+input UpdateConversationInput {
+  id: ID!
+  lastMessage: String
+  Accepted: Int
+}
+
+input DeleteConversationInput {
+  id: ID!
+}

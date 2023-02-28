@@ -35,7 +35,7 @@
         },
         "postNotifications": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/postNotifications-37466c4c6c2f646c632f-build.zip"
+          "s3Key": "amplify-builds/postNotifications-5a314c6e4c306b6d7967-build.zip"
         },
         "likeNotifications": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
@@ -55,7 +55,7 @@
         },
         "eventNotifications": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/eventNotifications-65785962516f5050317a-build.zip"
+          "s3Key": "amplify-builds/eventNotifications-7a75743435352f5a714a-build.zip"
         }
       },
       "hosting": {
@@ -71,7 +71,19 @@
         "fitnessprojectapi": {}
       },
       "analytics": {
-        "fitnessproject": {}
+        "fitnessproject": {},
+        "Pinpoint": {
+          "Name": "fitnessproject-dev",
+          "Id": "ced102bb50484960828f8b5f526ff6c3",
+          "Region": "us-west-2"
+        }
+      },
+      "notifications": {
+        "Pinpoint": {
+          "Name": "fitnessproject-dev",
+          "Id": "ced102bb50484960828f8b5f526ff6c3",
+          "Region": "us-west-2"
+        }
       }
     }
   }

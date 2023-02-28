@@ -4,17 +4,18 @@
 export const batchDeletePosts = /* GraphQL */ `
   mutation BatchDeletePosts($posts: [DeletePostInput]) {
     batchDeletePosts(posts: $posts) {
+      likes
+      replies
       createdAt
       updatedAt
       userId
+      postOwner
       description
       channel
       receiver
       parentId
       imageURL
       taggedUsers
-      likes
-      replies
     }
   }
 `;
@@ -36,77 +37,143 @@ export const verifyUser = /* GraphQL */ `
       deviceToken
       friendRequestPrivacy
       messagesPrivacy
+      isVerified
+      event {
+        comments
+        createdAt
+        updatedAt
+        userId
+        eventOwner
+        description
+        host
+        parentId
+        radius
+        startDateTime
+        endDateTime
+        name
+        location {
+          latitude
+          longitude
+        }
+        users {
+          nextToken
+        }
+      }
       createdAt
       updatedAt
-      isVerified
+      eventUsersId
+      eventUsersUserId
     }
   }
 `;
 export const incrementLikes = /* GraphQL */ `
   mutation IncrementLikes($input: incrementLikesInput!) {
     incrementLikes(input: $input) {
+      likes
+      replies
       createdAt
       updatedAt
       userId
+      postOwner
       description
       channel
       receiver
       parentId
       imageURL
       taggedUsers
-      likes
-      replies
     }
   }
 `;
 export const decrementLikes = /* GraphQL */ `
   mutation DecrementLikes($input: incrementLikesInput!) {
     decrementLikes(input: $input) {
+      likes
+      replies
       createdAt
       updatedAt
       userId
+      postOwner
       description
       channel
       receiver
       parentId
       imageURL
       taggedUsers
-      likes
-      replies
     }
   }
 `;
 export const incrementReplies = /* GraphQL */ `
   mutation IncrementReplies($input: incrementLikesInput!) {
     incrementReplies(input: $input) {
+      likes
+      replies
       createdAt
       updatedAt
       userId
+      postOwner
       description
       channel
       receiver
       parentId
       imageURL
       taggedUsers
-      likes
-      replies
     }
   }
 `;
 export const decrementReplies = /* GraphQL */ `
   mutation DecrementReplies($input: incrementLikesInput!) {
     decrementReplies(input: $input) {
+      likes
+      replies
       createdAt
       updatedAt
       userId
+      postOwner
       description
       channel
       receiver
       parentId
       imageURL
       taggedUsers
-      likes
-      replies
+    }
+  }
+`;
+export const createBlock = /* GraphQL */ `
+  mutation CreateBlock(
+    $input: CreateBlockInput!
+    $condition: ModelBlockConditionInput
+  ) {
+    createBlock(input: $input, condition: $condition) {
+      createdAt
+      userId
+      blockee
+      updatedAt
+    }
+  }
+`;
+export const updateBlock = /* GraphQL */ `
+  mutation UpdateBlock(
+    $input: UpdateBlockInput!
+    $condition: ModelBlockConditionInput
+  ) {
+    updateBlock(input: $input, condition: $condition) {
+      createdAt
+      userId
+      blockee
+      updatedAt
+    }
+  }
+`;
+export const deleteBlock = /* GraphQL */ `
+  mutation DeleteBlock(
+    $input: DeleteBlockInput!
+    $condition: ModelBlockConditionInput
+  ) {
+    deleteBlock(input: $input, condition: $condition) {
+      createdAt
+      userId
+      blockee
+      updatedAt
     }
   }
 `;
@@ -155,6 +222,237 @@ export const deleteChallenge = /* GraphQL */ `
       winner
       createdAt
       updatedAt
+    }
+  }
+`;
+export const createConversation = /* GraphQL */ `
+  mutation CreateConversation(
+    $input: CreateConversationInput!
+    $condition: ModelConversationConditionInput
+  ) {
+    createConversation(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      id
+      users
+      lastUser
+      lastMessage
+      dummy
+      Accepted
+    }
+  }
+`;
+export const updateConversation = /* GraphQL */ `
+  mutation UpdateConversation(
+    $input: UpdateConversationInput!
+    $condition: ModelConversationConditionInput
+  ) {
+    updateConversation(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      id
+      users
+      lastUser
+      lastMessage
+      dummy
+      Accepted
+    }
+  }
+`;
+export const deleteConversation = /* GraphQL */ `
+  mutation DeleteConversation(
+    $input: DeleteConversationInput!
+    $condition: ModelConversationConditionInput
+  ) {
+    deleteConversation(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      id
+      users
+      lastUser
+      lastMessage
+      dummy
+      Accepted
+    }
+  }
+`;
+export const createEvent = /* GraphQL */ `
+  mutation CreateEvent(
+    $input: CreateEventInput!
+    $condition: ModelEventConditionInput
+  ) {
+    createEvent(input: $input, condition: $condition) {
+      comments
+      createdAt
+      updatedAt
+      userId
+      eventOwner
+      description
+      host
+      parentId
+      radius
+      startDateTime
+      endDateTime
+      name
+      location {
+        latitude
+        longitude
+      }
+      users {
+        items {
+          id
+          identityId
+          name
+          age
+          gender
+          bio
+          goals
+          status
+          deviceToken
+          friendRequestPrivacy
+          messagesPrivacy
+          isVerified
+          createdAt
+          updatedAt
+          eventUsersId
+          eventUsersUserId
+        }
+        nextToken
+      }
+    }
+  }
+`;
+export const updateEvent = /* GraphQL */ `
+  mutation UpdateEvent(
+    $input: UpdateEventInput!
+    $condition: ModelEventConditionInput
+  ) {
+    updateEvent(input: $input, condition: $condition) {
+      comments
+      createdAt
+      updatedAt
+      userId
+      eventOwner
+      description
+      host
+      parentId
+      radius
+      startDateTime
+      endDateTime
+      name
+      location {
+        latitude
+        longitude
+      }
+      users {
+        items {
+          id
+          identityId
+          name
+          age
+          gender
+          bio
+          goals
+          status
+          deviceToken
+          friendRequestPrivacy
+          messagesPrivacy
+          isVerified
+          createdAt
+          updatedAt
+          eventUsersId
+          eventUsersUserId
+        }
+        nextToken
+      }
+    }
+  }
+`;
+export const deleteEvent = /* GraphQL */ `
+  mutation DeleteEvent(
+    $input: DeleteEventInput!
+    $condition: ModelEventConditionInput
+  ) {
+    deleteEvent(input: $input, condition: $condition) {
+      comments
+      createdAt
+      updatedAt
+      userId
+      eventOwner
+      description
+      host
+      parentId
+      radius
+      startDateTime
+      endDateTime
+      name
+      location {
+        latitude
+        longitude
+      }
+      users {
+        items {
+          id
+          identityId
+          name
+          age
+          gender
+          bio
+          goals
+          status
+          deviceToken
+          friendRequestPrivacy
+          messagesPrivacy
+          isVerified
+          createdAt
+          updatedAt
+          eventUsersId
+          eventUsersUserId
+        }
+        nextToken
+      }
+    }
+  }
+`;
+export const createFriendship = /* GraphQL */ `
+  mutation CreateFriendship(
+    $input: CreateFriendshipInput!
+    $condition: ModelFriendshipConditionInput
+  ) {
+    createFriendship(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      sender
+      receiver
+      accepted
+    }
+  }
+`;
+export const updateFriendship = /* GraphQL */ `
+  mutation UpdateFriendship(
+    $input: UpdateFriendshipInput!
+    $condition: ModelFriendshipConditionInput
+  ) {
+    updateFriendship(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      sender
+      receiver
+      accepted
+    }
+  }
+`;
+export const deleteFriendship = /* GraphQL */ `
+  mutation DeleteFriendship(
+    $input: DeleteFriendshipInput!
+    $condition: ModelFriendshipConditionInput
+  ) {
+    deleteFriendship(input: $input, condition: $condition) {
+      createdAt
+      updatedAt
+      sender
+      receiver
+      accepted
     }
   }
 `;
@@ -215,210 +513,6 @@ export const deleteGroup = /* GraphQL */ `
     }
   }
 `;
-export const createBlock = /* GraphQL */ `
-  mutation CreateBlock(
-    $input: CreateBlockInput!
-    $condition: ModelBlockConditionInput
-  ) {
-    createBlock(input: $input, condition: $condition) {
-      createdAt
-      userId
-      blockee
-      updatedAt
-    }
-  }
-`;
-export const updateBlock = /* GraphQL */ `
-  mutation UpdateBlock(
-    $input: UpdateBlockInput!
-    $condition: ModelBlockConditionInput
-  ) {
-    updateBlock(input: $input, condition: $condition) {
-      createdAt
-      userId
-      blockee
-      updatedAt
-    }
-  }
-`;
-export const deleteBlock = /* GraphQL */ `
-  mutation DeleteBlock(
-    $input: DeleteBlockInput!
-    $condition: ModelBlockConditionInput
-  ) {
-    deleteBlock(input: $input, condition: $condition) {
-      createdAt
-      userId
-      blockee
-      updatedAt
-    }
-  }
-`;
-export const createConversation = /* GraphQL */ `
-  mutation CreateConversation(
-    $input: CreateConversationInput!
-    $condition: ModelConversationConditionInput
-  ) {
-    createConversation(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      id
-      users
-      lastUser
-      lastMessage
-      dummy
-      Accepted
-    }
-  }
-`;
-export const updateConversation = /* GraphQL */ `
-  mutation UpdateConversation(
-    $input: UpdateConversationInput!
-    $condition: ModelConversationConditionInput
-  ) {
-    updateConversation(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      id
-      users
-      lastUser
-      lastMessage
-      dummy
-      Accepted
-    }
-  }
-`;
-export const deleteConversation = /* GraphQL */ `
-  mutation DeleteConversation(
-    $input: DeleteConversationInput!
-    $condition: ModelConversationConditionInput
-  ) {
-    deleteConversation(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      id
-      users
-      lastUser
-      lastMessage
-      dummy
-      Accepted
-    }
-  }
-`;
-export const deleteEvent = /* GraphQL */ `
-  mutation DeleteEvent(
-    $input: DeleteEventInput!
-    $condition: ModelEventConditionInput
-  ) {
-    deleteEvent(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      userId
-      description
-      host
-      parentId
-      radius
-      startDateTime
-      endDateTime
-      name
-      location {
-        latitude
-        longitude
-      }
-      comments
-    }
-  }
-`;
-export const createEvent = /* GraphQL */ `
-  mutation CreateEvent(
-    $input: CreateEventInput!
-    $condition: ModelEventConditionInput
-  ) {
-    createEvent(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      userId
-      description
-      host
-      parentId
-      radius
-      startDateTime
-      endDateTime
-      name
-      location {
-        latitude
-        longitude
-      }
-      comments
-    }
-  }
-`;
-export const updateEvent = /* GraphQL */ `
-  mutation UpdateEvent(
-    $input: UpdateEventInput!
-    $condition: ModelEventConditionInput
-  ) {
-    updateEvent(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      userId
-      description
-      host
-      parentId
-      radius
-      startDateTime
-      endDateTime
-      name
-      location {
-        latitude
-        longitude
-      }
-      comments
-    }
-  }
-`;
-export const createFriendship = /* GraphQL */ `
-  mutation CreateFriendship(
-    $input: CreateFriendshipInput!
-    $condition: ModelFriendshipConditionInput
-  ) {
-    createFriendship(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      sender
-      receiver
-      accepted
-    }
-  }
-`;
-export const updateFriendship = /* GraphQL */ `
-  mutation UpdateFriendship(
-    $input: UpdateFriendshipInput!
-    $condition: ModelFriendshipConditionInput
-  ) {
-    updateFriendship(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      sender
-      receiver
-      accepted
-    }
-  }
-`;
-export const deleteFriendship = /* GraphQL */ `
-  mutation DeleteFriendship(
-    $input: DeleteFriendshipInput!
-    $condition: ModelFriendshipConditionInput
-  ) {
-    deleteFriendship(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      sender
-      receiver
-      accepted
-    }
-  }
-`;
 export const createLike = /* GraphQL */ `
   mutation CreateLike(
     $input: CreateLikeInput!
@@ -458,43 +552,24 @@ export const deleteLike = /* GraphQL */ `
     }
   }
 `;
-export const deletePost = /* GraphQL */ `
-  mutation DeletePost(
-    $input: DeletePostInput!
-    $condition: ModelPostConditionInput
-  ) {
-    deletePost(input: $input, condition: $condition) {
-      createdAt
-      updatedAt
-      userId
-      description
-      channel
-      receiver
-      parentId
-      imageURL
-      taggedUsers
-      likes
-      replies
-    }
-  }
-`;
 export const createPost = /* GraphQL */ `
   mutation CreatePost(
     $input: CreatePostInput!
     $condition: ModelPostConditionInput
   ) {
     createPost(input: $input, condition: $condition) {
+      likes
+      replies
       createdAt
       updatedAt
       userId
+      postOwner
       description
       channel
       receiver
       parentId
       imageURL
       taggedUsers
-      likes
-      replies
     }
   }
 `;
@@ -504,17 +579,39 @@ export const updatePost = /* GraphQL */ `
     $condition: ModelPostConditionInput
   ) {
     updatePost(input: $input, condition: $condition) {
+      likes
+      replies
       createdAt
       updatedAt
       userId
+      postOwner
       description
       channel
       receiver
       parentId
       imageURL
       taggedUsers
+    }
+  }
+`;
+export const deletePost = /* GraphQL */ `
+  mutation DeletePost(
+    $input: DeletePostInput!
+    $condition: ModelPostConditionInput
+  ) {
+    deletePost(input: $input, condition: $condition) {
       likes
       replies
+      createdAt
+      updatedAt
+      userId
+      postOwner
+      description
+      channel
+      receiver
+      parentId
+      imageURL
+      taggedUsers
     }
   }
 `;
@@ -581,9 +678,32 @@ export const createUser = /* GraphQL */ `
       deviceToken
       friendRequestPrivacy
       messagesPrivacy
+      isVerified
+      event {
+        comments
+        createdAt
+        updatedAt
+        userId
+        eventOwner
+        description
+        host
+        parentId
+        radius
+        startDateTime
+        endDateTime
+        name
+        location {
+          latitude
+          longitude
+        }
+        users {
+          nextToken
+        }
+      }
       createdAt
       updatedAt
-      isVerified
+      eventUsersId
+      eventUsersUserId
     }
   }
 `;
@@ -608,9 +728,32 @@ export const updateUser = /* GraphQL */ `
       deviceToken
       friendRequestPrivacy
       messagesPrivacy
+      isVerified
+      event {
+        comments
+        createdAt
+        updatedAt
+        userId
+        eventOwner
+        description
+        host
+        parentId
+        radius
+        startDateTime
+        endDateTime
+        name
+        location {
+          latitude
+          longitude
+        }
+        users {
+          nextToken
+        }
+      }
       createdAt
       updatedAt
-      isVerified
+      eventUsersId
+      eventUsersUserId
     }
   }
 `;
@@ -635,9 +778,32 @@ export const deleteUser = /* GraphQL */ `
       deviceToken
       friendRequestPrivacy
       messagesPrivacy
+      isVerified
+      event {
+        comments
+        createdAt
+        updatedAt
+        userId
+        eventOwner
+        description
+        host
+        parentId
+        radius
+        startDateTime
+        endDateTime
+        name
+        location {
+          latitude
+          longitude
+        }
+        users {
+          nextToken
+        }
+      }
       createdAt
       updatedAt
-      isVerified
+      eventUsersId
+      eventUsersUserId
     }
   }
 `;

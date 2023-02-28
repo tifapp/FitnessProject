@@ -2,49 +2,23 @@
 This data type is used on the feed screen, group screen and message screen.
 The "postsByChannel" query is used to find posts belonging to a specific group or directed to a specific user.
 """
-type Post @model(timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" }, subscriptions: null)
-@auth(
-  rules: [
-      { allow: owner, ownerField: "userId" },
-      { allow: owner, ownerField: "receiver", operations: [delete, read] },
-      { allow: private, provider: iam, operations: [create, read, update, delete] },
-      { allow: groups, groups: ["Admins"], operations: [create, read, update, delete] },
-  ]
-)
-@key(fields: ["createdAt", "userId"])
-@key(name: "ByUser", fields: ["userId", "createdAt"], queryField: "postsByUser")
-@key(name: "ByChannel", fields: ["channel", "createdAt"], queryField: "postsByChannel")
-@key(name: "ByLikes", fields: ["channel", "likes"], queryField: "postsByLikes")
-@key(name: "ByUserId", fields: ["channel", "userId"], queryField: "postsByUserId")
-{
-  likes: Int
-    @auth(
-      rules: [
-          { allow: private, operations: [read] },
-          { allow: private, provider: iam, operations: [read, create, update] },
-      ]
-    )
-  replies: Int
-    @auth(
-      rules: [
-          { allow: private, operations: [read] },
-          { allow: private, provider: iam, operations: [read, create, update] },
-      ]
-    )
-  createdAt: AWSDateTime!
+type Post @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"}, subscriptions: null) @auth(rules: [{allow: owner, ownerField: "postOwner"}, {allow: owner, ownerField: "receiver", operations: [delete, read]}, {allow: private, provider: iam, operations: [create, read, update, delete]}, {allow: groups, groups: ["Admins"], operations: [create, read, update, delete]}]) {
+  likes: Int @auth(rules: [{allow: private, operations: [read]}, {allow: private, provider: iam, operations: [read, create, update]}])
+  replies: Int @auth(rules: [{allow: private, operations: [read]}, {allow: private, provider: iam, operations: [read, create, update]}])
+  createdAt: AWSDateTime! @primaryKey(sortKeyFields: ["userId"])
   updatedAt: AWSDateTime!
-  userId: ID!
+  userId: ID! @index(name: "ByUser", queryField: "postsByUser", sortKeyFields: ["createdAt"])
+  postOwner: ID!
   description: String
-  channel: ID
+  channel: ID @index(name: "ByChannel", queryField: "postsByChannel", sortKeyFields: ["createdAt"]) @index(name: "ByLikes", queryField: "postsByLikes", sortKeyFields: ["likes"]) @index(name: "ByUserId", queryField: "postsByUserId", sortKeyFields: ["userId"])
   receiver: ID
   parentId: ID
   imageURL: ID
   taggedUsers: [ID!]
+ 
 }
 
-"""
-This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when creating a new message.
-"""
+"""This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when creating a new message."""
 input CreatePostInput {
   createdAt: AWSDateTime
   description: String
@@ -55,9 +29,7 @@ input CreatePostInput {
   taggedUsers: [ID!]
 }
 
-"""
-This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when updating a message.
-"""
+"""This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when updating a message."""
 input UpdatePostInput {
   createdAt: AWSDateTime!
   description: String
@@ -69,9 +41,7 @@ input incrementLikesInput {
   userId: ID!
 }
 
-"""
-This is used for batch deletion of posts.
-"""
+"""This is used for batch deletion of posts."""
 input DeletePostInput {
   createdAt: AWSDateTime!
   userId: String!

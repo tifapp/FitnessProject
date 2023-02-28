@@ -8,19 +8,23 @@ type Mutation {
 }
 
 type Subscription {
-  onCreateLikeForPost(postId: ID!): Like @aws_subscribe(mutations: ["createLike"])
-  onDeleteLikeForPost(postId: ID!): Like @aws_subscribe(mutations: ["deleteLike"])
-  onCreatePostFromChannel(channel: ID!): Post @aws_subscribe(mutations: ["createPost"])
-  onCreatePostForReceiver(receiver: ID!): Post @aws_subscribe(mutations: ["createPost"])
-  onCreatePostByUser(userId: ID!): Post @aws_subscribe(mutations: ["createPost"])
-  onUpdatePostFromChannel(channel: ID!): Post @aws_subscribe(mutations: ["updatePost"])
-  onDeletePostFromChannel(channel: ID!): Post @aws_subscribe(mutations: ["deletePost"])
-  onIncrementLikes(createdAt: AWSDateTime!, userId: ID!): Post @aws_subscribe(mutations: ["incrementLikes"])
+  onCreateLikeForPost(postId: ID!): Like @aws_subscribe(mutations: ["createLike"]) 
+  onDeleteLikeForPost(postId: ID!): Like @aws_subscribe(mutations: ["deleteLike"]) 
+
+  onCreatePostFromChannel(channel: ID!): Post @aws_subscribe(mutations: ["createPost"]) 
+  onCreatePostForReceiver(receiver: ID!): Post @aws_subscribe(mutations: ["createPost"]) 
+  onCreatePostByUser(userId: ID!): Post @aws_subscribe(mutations: ["createPost"]) 
+  onUpdatePostFromChannel(channel: ID!): Post @aws_subscribe(mutations: ["updatePost"]) 
+  onDeletePostFromChannel(channel: ID!): Post @aws_subscribe(mutations: ["deletePost"]) 
+
+  onIncrementLikes(createdAt: AWSDateTime!, userId: ID!): Post @aws_subscribe(mutations: ["incrementLikes"]) 
   onDecrementLikes(createdAt: AWSDateTime!, userId: ID!): Post @aws_subscribe(mutations: ["decrementLikes"])
-  onIncrementReplies(createdAt: AWSDateTime!, userId: ID!): Post @aws_subscribe(mutations: ["incrementReplies"])
+  onIncrementReplies(createdAt: AWSDateTime!, userId: ID!): Post @aws_subscribe(mutations: ["incrementReplies"]) 
   onDecrementReplies(createdAt: AWSDateTime!, userId: ID!): Post @aws_subscribe(mutations: ["decrementReplies"])
+
   onAcceptedFriendship: Friendship @aws_subscribe(mutations: ["updateFriendship"])
   onCreateFriendRequestForReceiver(receiver: ID!): Friendship @aws_subscribe(mutations: ["createFriendship"])
+
   onDeleteConversation(users: [ID!]!): Conversation @aws_subscribe(mutations: ["deleteConversation"])
   onDeleteFriendship: Friendship @aws_subscribe(mutations: ["deleteFriendship"])
 }

@@ -39,78 +39,6 @@ export const getConversationByUsers = /* GraphQL */ `
     }
   }
 `;
-export const getChallenge = /* GraphQL */ `
-  query GetChallenge($id: ID!) {
-    getChallenge(id: $id) {
-      id
-      name
-      Description
-      endDate
-      winner
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const listChallenges = /* GraphQL */ `
-  query ListChallenges(
-    $filter: ModelChallengeFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listChallenges(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        name
-        Description
-        endDate
-        winner
-        createdAt
-        updatedAt
-      }
-      nextToken
-    }
-  }
-`;
-export const getGroup = /* GraphQL */ `
-  query GetGroup($id: ID!) {
-    getGroup(id: $id) {
-      id
-      userID
-      name
-      Privacy
-      Sport
-      Description
-      characterCount
-      latitude
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const listGroups = /* GraphQL */ `
-  query ListGroups(
-    $filter: ModelGroupFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listGroups(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        userID
-        name
-        Privacy
-        Sport
-        Description
-        characterCount
-        latitude
-        createdAt
-        updatedAt
-      }
-      nextToken
-    }
-  }
-`;
 export const getBlock = /* GraphQL */ `
   query GetBlock($userId: ID!, $blockee: ID!) {
     getBlock(userId: $userId, blockee: $blockee) {
@@ -150,7 +78,7 @@ export const listBlocks = /* GraphQL */ `
 `;
 export const blocksByDate = /* GraphQL */ `
   query BlocksByDate(
-    $userId: ID
+    $userId: ID!
     $createdAt: ModelStringKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelBlockFilterInput
@@ -169,6 +97,39 @@ export const blocksByDate = /* GraphQL */ `
         createdAt
         userId
         blockee
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const getChallenge = /* GraphQL */ `
+  query GetChallenge($id: ID!) {
+    getChallenge(id: $id) {
+      id
+      name
+      Description
+      endDate
+      winner
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listChallenges = /* GraphQL */ `
+  query ListChallenges(
+    $filter: ModelChallengeFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listChallenges(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        name
+        Description
+        endDate
+        winner
+        createdAt
         updatedAt
       }
       nextToken
@@ -212,7 +173,7 @@ export const listConversations = /* GraphQL */ `
 `;
 export const conversationsByAcceptedAndDate = /* GraphQL */ `
   query ConversationsByAcceptedAndDate(
-    $dummy: Int
+    $dummy: Int!
     $acceptedUpdatedAt: ModelConversationByAcceptedAndDateCompositeKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelConversationFilterInput
@@ -243,7 +204,7 @@ export const conversationsByAcceptedAndDate = /* GraphQL */ `
 `;
 export const conversationsByDateAndAccepted = /* GraphQL */ `
   query ConversationsByDateAndAccepted(
-    $dummy: Int
+    $dummy: Int!
     $updatedAtAccepted: ModelConversationByDateAndAcceptedCompositeKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelConversationFilterInput
@@ -272,40 +233,9 @@ export const conversationsByDateAndAccepted = /* GraphQL */ `
     }
   }
 `;
-export const conversationsByAcceptedThenDate = /* GraphQL */ `
-  query ConversationsByAcceptedThenDate(
-    $Accepted: Int
-    $updatedAt: ModelStringKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelConversationFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    conversationsByAcceptedThenDate(
-      Accepted: $Accepted
-      updatedAt: $updatedAt
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        createdAt
-        updatedAt
-        id
-        users
-        lastUser
-        lastMessage
-        dummy
-        Accepted
-      }
-      nextToken
-    }
-  }
-`;
 export const conversationsByAccepted = /* GraphQL */ `
   query ConversationsByAccepted(
-    $dummy: Int
+    $dummy: Int!
     $Accepted: ModelIntKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelConversationFilterInput
@@ -336,7 +266,7 @@ export const conversationsByAccepted = /* GraphQL */ `
 `;
 export const conversationsByDate = /* GraphQL */ `
   query ConversationsByDate(
-    $dummy: Int
+    $dummy: Int!
     $updatedAt: ModelStringKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelConversationFilterInput
@@ -365,18 +295,18 @@ export const conversationsByDate = /* GraphQL */ `
     }
   }
 `;
-export const eventsByUser = /* GraphQL */ `
-  query EventsByUser(
-    $userId: ID
-    $createdAt: ModelStringKeyConditionInput
+export const conversationsByAcceptedThenDate = /* GraphQL */ `
+  query ConversationsByAcceptedThenDate(
+    $Accepted: Int!
+    $updatedAt: ModelStringKeyConditionInput
     $sortDirection: ModelSortDirection
-    $filter: ModelEventFilterInput
+    $filter: ModelConversationFilterInput
     $limit: Int
     $nextToken: String
   ) {
-    eventsByUser(
-      userId: $userId
-      createdAt: $createdAt
+    conversationsByAcceptedThenDate(
+      Accepted: $Accepted
+      updatedAt: $updatedAt
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit
@@ -385,95 +315,12 @@ export const eventsByUser = /* GraphQL */ `
       items {
         createdAt
         updatedAt
-        userId
-        description
-        host
-        parentId
-        radius
-        startDateTime
-        endDateTime
-        name
-        location {
-          latitude
-          longitude
-        }
-        comments
-      }
-      nextToken
-    }
-  }
-`;
-export const eventsByDate = /* GraphQL */ `
-  query EventsByDate(
-    $startDateTime: AWSDateTime
-    $createdAt: ModelStringKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelEventFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    eventsByDate(
-      startDateTime: $startDateTime
-      createdAt: $createdAt
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        createdAt
-        updatedAt
-        userId
-        description
-        host
-        parentId
-        radius
-        startDateTime
-        endDateTime
-        name
-        location {
-          latitude
-          longitude
-        }
-        comments
-      }
-      nextToken
-    }
-  }
-`;
-export const eventsByUserId = /* GraphQL */ `
-  query EventsByUserId(
-    $host: String
-    $userId: ModelIDKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelEventFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    eventsByUserId(
-      host: $host
-      userId: $userId
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        createdAt
-        updatedAt
-        userId
-        description
-        host
-        parentId
-        radius
-        startDateTime
-        endDateTime
-        name
-        location {
-          latitude
-          longitude
-        }
-        comments
+        id
+        users
+        lastUser
+        lastMessage
+        dummy
+        Accepted
       }
       nextToken
     }
@@ -482,9 +329,11 @@ export const eventsByUserId = /* GraphQL */ `
 export const getEvent = /* GraphQL */ `
   query GetEvent($createdAt: AWSDateTime!, $userId: ID!) {
     getEvent(createdAt: $createdAt, userId: $userId) {
+      comments
       createdAt
       updatedAt
       userId
+      eventOwner
       description
       host
       parentId
@@ -496,7 +345,27 @@ export const getEvent = /* GraphQL */ `
         latitude
         longitude
       }
-      comments
+      users {
+        items {
+          id
+          identityId
+          name
+          age
+          gender
+          bio
+          goals
+          status
+          deviceToken
+          friendRequestPrivacy
+          messagesPrivacy
+          isVerified
+          createdAt
+          updatedAt
+          eventUsersId
+          eventUsersUserId
+        }
+        nextToken
+      }
     }
   }
 `;
@@ -518,9 +387,11 @@ export const listEvents = /* GraphQL */ `
       sortDirection: $sortDirection
     ) {
       items {
+        comments
         createdAt
         updatedAt
         userId
+        eventOwner
         description
         host
         parentId
@@ -532,9 +403,194 @@ export const listEvents = /* GraphQL */ `
           latitude
           longitude
         }
-        comments
+        users {
+          nextToken
+        }
       }
       nextToken
+    }
+  }
+`;
+export const eventsByUser = /* GraphQL */ `
+  query EventsByUser(
+    $userId: ID!
+    $createdAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelEventFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    eventsByUser(
+      userId: $userId
+      createdAt: $createdAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        comments
+        createdAt
+        updatedAt
+        userId
+        eventOwner
+        description
+        host
+        parentId
+        radius
+        startDateTime
+        endDateTime
+        name
+        location {
+          latitude
+          longitude
+        }
+        users {
+          nextToken
+        }
+      }
+      nextToken
+    }
+  }
+`;
+export const eventsByUserId = /* GraphQL */ `
+  query EventsByUserId(
+    $host: String!
+    $userId: ModelIDKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelEventFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    eventsByUserId(
+      host: $host
+      userId: $userId
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        comments
+        createdAt
+        updatedAt
+        userId
+        eventOwner
+        description
+        host
+        parentId
+        radius
+        startDateTime
+        endDateTime
+        name
+        location {
+          latitude
+          longitude
+        }
+        users {
+          nextToken
+        }
+      }
+      nextToken
+    }
+  }
+`;
+export const eventsByDate = /* GraphQL */ `
+  query EventsByDate(
+    $startDateTime: AWSDateTime!
+    $createdAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelEventFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    eventsByDate(
+      startDateTime: $startDateTime
+      createdAt: $createdAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        comments
+        createdAt
+        updatedAt
+        userId
+        eventOwner
+        description
+        host
+        parentId
+        radius
+        startDateTime
+        endDateTime
+        name
+        location {
+          latitude
+          longitude
+        }
+        users {
+          nextToken
+        }
+      }
+      nextToken
+    }
+  }
+`;
+export const searchEvents = /* GraphQL */ `
+  query SearchEvents(
+    $filter: SearchableEventFilterInput
+    $sort: [SearchableEventSortInput]
+    $limit: Int
+    $nextToken: String
+    $from: Int
+    $aggregates: [SearchableEventAggregationInput]
+  ) {
+    searchEvents(
+      filter: $filter
+      sort: $sort
+      limit: $limit
+      nextToken: $nextToken
+      from: $from
+      aggregates: $aggregates
+    ) {
+      items {
+        comments
+        createdAt
+        updatedAt
+        userId
+        eventOwner
+        description
+        host
+        parentId
+        radius
+        startDateTime
+        endDateTime
+        name
+        location {
+          latitude
+          longitude
+        }
+        users {
+          nextToken
+        }
+      }
+      nextToken
+      total
+      aggregateItems {
+        name
+        result {
+          ... on SearchableAggregateScalarResult {
+            value
+          }
+          ... on SearchableAggregateBucketResult {
+            buckets {
+              key
+              doc_count
+            }
+          }
+        }
+      }
     }
   }
 `;
@@ -579,7 +635,7 @@ export const listFriendships = /* GraphQL */ `
 `;
 export const friendsByReceiver = /* GraphQL */ `
   query FriendsByReceiver(
-    $receiver: ID
+    $receiver: ID!
     $createdAt: ModelStringKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelFriendshipFilterInput
@@ -600,6 +656,45 @@ export const friendsByReceiver = /* GraphQL */ `
         sender
         receiver
         accepted
+      }
+      nextToken
+    }
+  }
+`;
+export const getGroup = /* GraphQL */ `
+  query GetGroup($id: ID!) {
+    getGroup(id: $id) {
+      id
+      userID
+      name
+      Privacy
+      Sport
+      Description
+      characterCount
+      latitude
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listGroups = /* GraphQL */ `
+  query ListGroups(
+    $filter: ModelGroupFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listGroups(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        userID
+        name
+        Privacy
+        Sport
+        Description
+        characterCount
+        latitude
+        createdAt
+        updatedAt
       }
       nextToken
     }
@@ -644,7 +739,7 @@ export const listLikes = /* GraphQL */ `
 `;
 export const likesByPost = /* GraphQL */ `
   query LikesByPost(
-    $postId: ID
+    $postId: ID!
     $createdAt: ModelStringKeyConditionInput
     $sortDirection: ModelSortDirection
     $filter: ModelLikeFilterInput
@@ -669,156 +764,21 @@ export const likesByPost = /* GraphQL */ `
     }
   }
 `;
-export const postsByUser = /* GraphQL */ `
-  query PostsByUser(
-    $userId: ID
-    $createdAt: ModelStringKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelPostFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    postsByUser(
-      userId: $userId
-      createdAt: $createdAt
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        createdAt
-        updatedAt
-        userId
-        description
-        channel
-        receiver
-        parentId
-        imageURL
-        taggedUsers
-        likes
-        replies
-      }
-      nextToken
-    }
-  }
-`;
-export const postsByChannel = /* GraphQL */ `
-  query PostsByChannel(
-    $channel: ID
-    $createdAt: ModelStringKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelPostFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    postsByChannel(
-      channel: $channel
-      createdAt: $createdAt
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        createdAt
-        updatedAt
-        userId
-        description
-        channel
-        receiver
-        parentId
-        imageURL
-        taggedUsers
-        likes
-        replies
-      }
-      nextToken
-    }
-  }
-`;
-export const postsByLikes = /* GraphQL */ `
-  query PostsByLikes(
-    $channel: ID
-    $likes: ModelIntKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelPostFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    postsByLikes(
-      channel: $channel
-      likes: $likes
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        createdAt
-        updatedAt
-        userId
-        description
-        channel
-        receiver
-        parentId
-        imageURL
-        taggedUsers
-        likes
-        replies
-      }
-      nextToken
-    }
-  }
-`;
-export const postsByUserId = /* GraphQL */ `
-  query PostsByUserId(
-    $channel: ID
-    $userId: ModelIDKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelPostFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    postsByUserId(
-      channel: $channel
-      userId: $userId
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        createdAt
-        updatedAt
-        userId
-        description
-        channel
-        receiver
-        parentId
-        imageURL
-        taggedUsers
-        likes
-        replies
-      }
-      nextToken
-    }
-  }
-`;
 export const getPost = /* GraphQL */ `
   query GetPost($createdAt: AWSDateTime!, $userId: ID!) {
     getPost(createdAt: $createdAt, userId: $userId) {
+      likes
+      replies
       createdAt
       updatedAt
       userId
+      postOwner
       description
       channel
       receiver
       parentId
       imageURL
       taggedUsers
-      likes
-      replies
     }
   }
 `;
@@ -840,17 +800,158 @@ export const listPosts = /* GraphQL */ `
       sortDirection: $sortDirection
     ) {
       items {
+        likes
+        replies
         createdAt
         updatedAt
         userId
+        postOwner
         description
         channel
         receiver
         parentId
         imageURL
         taggedUsers
+      }
+      nextToken
+    }
+  }
+`;
+export const postsByUser = /* GraphQL */ `
+  query PostsByUser(
+    $userId: ID!
+    $createdAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelPostFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    postsByUser(
+      userId: $userId
+      createdAt: $createdAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
         likes
         replies
+        createdAt
+        updatedAt
+        userId
+        postOwner
+        description
+        channel
+        receiver
+        parentId
+        imageURL
+        taggedUsers
+      }
+      nextToken
+    }
+  }
+`;
+export const postsByChannel = /* GraphQL */ `
+  query PostsByChannel(
+    $channel: ID!
+    $createdAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelPostFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    postsByChannel(
+      channel: $channel
+      createdAt: $createdAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        likes
+        replies
+        createdAt
+        updatedAt
+        userId
+        postOwner
+        description
+        channel
+        receiver
+        parentId
+        imageURL
+        taggedUsers
+      }
+      nextToken
+    }
+  }
+`;
+export const postsByLikes = /* GraphQL */ `
+  query PostsByLikes(
+    $channel: ID!
+    $likes: ModelIntKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelPostFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    postsByLikes(
+      channel: $channel
+      likes: $likes
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        likes
+        replies
+        createdAt
+        updatedAt
+        userId
+        postOwner
+        description
+        channel
+        receiver
+        parentId
+        imageURL
+        taggedUsers
+      }
+      nextToken
+    }
+  }
+`;
+export const postsByUserId = /* GraphQL */ `
+  query PostsByUserId(
+    $channel: ID!
+    $userId: ModelIDKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelPostFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    postsByUserId(
+      channel: $channel
+      userId: $userId
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        likes
+        replies
+        createdAt
+        updatedAt
+        userId
+        postOwner
+        description
+        channel
+        receiver
+        parentId
+        imageURL
+        taggedUsers
       }
       nextToken
     }
@@ -913,9 +1014,32 @@ export const getUser = /* GraphQL */ `
       deviceToken
       friendRequestPrivacy
       messagesPrivacy
+      isVerified
+      event {
+        comments
+        createdAt
+        updatedAt
+        userId
+        eventOwner
+        description
+        host
+        parentId
+        radius
+        startDateTime
+        endDateTime
+        name
+        location {
+          latitude
+          longitude
+        }
+        users {
+          nextToken
+        }
+      }
       createdAt
       updatedAt
-      isVerified
+      eventUsersId
+      eventUsersUserId
     }
   }
 `;
@@ -942,9 +1066,25 @@ export const listUsers = /* GraphQL */ `
         deviceToken
         friendRequestPrivacy
         messagesPrivacy
+        isVerified
+        event {
+          comments
+          createdAt
+          updatedAt
+          userId
+          eventOwner
+          description
+          host
+          parentId
+          radius
+          startDateTime
+          endDateTime
+          name
+        }
         createdAt
         updatedAt
-        isVerified
+        eventUsersId
+        eventUsersUserId
       }
       nextToken
     }

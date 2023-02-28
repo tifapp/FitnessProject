@@ -1,0 +1,20 @@
+type Block @model(timestamps: { createdAt: "createdAt" })
+@auth(
+  rules: [
+      { allow: owner, ownerField: "userId", operations: [create, update, read, delete] },
+  ]
+)
+@key(fields: ["userId", "blockee"])
+@key(name: "ByDate", fields: ["userId", "createdAt"], queryField: "blocksByDate")
+{
+  createdAt: AWSDateTime!
+  userId: ID!
+  blockee: ID!
+}
+
+"""
+This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when creating a new read receipt.
+"""
+input CreateBlockInput {
+  blockee: ID!
+}
