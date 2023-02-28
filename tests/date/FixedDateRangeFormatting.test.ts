@@ -1,4 +1,4 @@
-import { dateRange, FixedDateRange, formatDateRange } from "@lib/date"
+import { dateRange, FixedDateRange } from "@lib/date"
 
 describe("FixedDateRangeFormatting tests", () => {
   beforeEach(() => {
