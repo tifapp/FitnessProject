@@ -55,6 +55,34 @@ export class FixedDateRange {
     }
     return new FixedDateRange(this.startDate, date)
   }
+
+  /**
+   * Formats this date range in a UI friendly way.
+   */
+  format () {
+    // TODO: - Should this support multiple locales?
+    const start = dayjs(this.startDate)
+    const end = dayjs(this.endDate)
+
+    const startDateFormat = formatFromBasis(now(), start)
+    const endDateFormat = start.isSame(end, "day")
+      ? formatTime(end)
+      : formatFromBasis(start, end)
+    return `${startDateFormat} - ${endDateFormat}`
+  }
+}
+
+const formatFromBasis = (basis: Dayjs, date: Dayjs) => {
+  const formattedTime = formatTime(date)
+  if (date.isToday()) return `Today ${formattedTime}`
+  if (date.isYesterday()) return `Yesterday ${formattedTime}`
+  if (date.isTomorrow()) return `Tomorrow ${formattedTime}`
+  const yearFormat = !date.isSame(basis, "year") ? " YYYY" : ""
+  return date.format(`MMM D${yearFormat}, `) + formattedTime
+}
+
+const formatTime = (date: Dayjs) => {
+  return date.format(date.minute() !== 0 ? "h:mma" : "ha")
 }
 
 /**

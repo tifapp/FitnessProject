@@ -181,5 +181,5 @@ const expectFormattedDateRange = (
   dateRange: FixedDateRange,
   expected: string
 ) => {
-  expect(formatDateRange(dateRange)).toEqual(expected)
+  expect(dateRange.format()).toEqual(expected)
 }
