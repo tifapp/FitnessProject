@@ -14,6 +14,7 @@ import { neverPromise } from "../../helpers/Promise"
 import "../../helpers/Matchers"
 import { baseTestEventValues, editEventTitle } from "./helpers"
 import { EventColors } from "@lib/events/EventColors"
+import { captureAlerts } from "../../helpers/Alerts"
 
 const submitAction = jest.fn()
 
@@ -87,7 +88,17 @@ describe("EventFormSubmitButton tests", () => {
     renderSubmitButton({ ...baseTestEventValues, color: EventColors.Turquoise })
     expect(backgroundColor()).toEqual(EventColors.Turquoise)
   })
+
+  it("should present an error alert when something goes wrong with the submission", async () => {
+    submitAction.mockRejectedValue(new Error("lmao"))
+    renderSubmitButton(baseTestEventValues)
+    editEventTitle(editedEventTitle)
+    submit()
+    await waitFor(() => expect(alertPresentationSpy).toHaveBeenCalled())
+  })
 })
+
+const { alertPresentationSpy } = captureAlerts()
 
 const editedEventTitle = "Updated Event"
 

@@ -83,7 +83,17 @@ const useSubmit = () => {
   const updateInput = eventEditInputFromFormValues(formValues)
   const canSubmit = !!updateInput && !isSubmitting && hasEdited
   if (!canSubmit) return undefined
-  return async () => await onSubmit(updateInput)
+  return async () => {
+    try {
+      await onSubmit(updateInput)
+    } catch {
+      Alert.alert(
+        "Something went wrong...",
+        "Uh Oh! Something didn't go well... Please check your internet connection and try again later.",
+        [{ text: "Ok" }]
+      )
+    }
+  }
 }
 
 const eventEditInputFromFormValues = (values: EventFormValues) => {
