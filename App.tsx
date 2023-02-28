@@ -66,6 +66,7 @@ import { ExpoUserNotifications } from "@lib/UserNotifications"
 import ActivitiesScreen from "@screens/ActivitiesScreen"
 import { SetDependencyValue } from "./lib/dependencies"
 import { userIdDependencyKey } from "./lib/MiscDependencyKeys"
+import { AppQueryClientProvider } from "@components/AppQueryClientProvider"
 
 if (
   Platform.OS === "android" &&
@@ -363,7 +364,13 @@ const App = () => {
   }
 }
 
-export default withAuthenticator(App, false, [
+const LiveApp = () => (
+  <AppQueryClientProvider>
+    <App />
+  </AppQueryClientProvider>
+)
+
+export default withAuthenticator(LiveApp, false, [
   <Greetings />,
   <SignIn />,
   <SignUp />,
