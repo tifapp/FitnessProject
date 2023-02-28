@@ -23,6 +23,7 @@ export const updateDateTimePickerDate = ({
   )
 }
 
+// See: https://github.com/react-native-datetimepicker/datetimepicker/blob/master/test/userlandTestExamples.test.js
 const pickerWithTestId = (testId: string) => {
   const pickerMap = new Map<string, ReactTestInstance>(
     screen.UNSAFE_getAllByType(RNDateTimePicker).map((picker) => {
