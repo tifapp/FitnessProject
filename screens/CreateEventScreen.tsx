@@ -26,6 +26,9 @@ const initialEventFormValues = {
   radiusMeters: 0
 }
 
+/**
+ * A screen for creating new events.
+ */
 const CreateEventScreen = ({ locationInfo }: CreateEventScreenProps) => {
   const events = useDependencyValue(eventsDependencyKey)
   const createEventMutation = useMutation(async (editInput: EditEventInput) => {
