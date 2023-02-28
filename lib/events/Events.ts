@@ -1,3 +1,5 @@
+import { createDependencyKey } from "@lib/dependencies"
+
 /**
  * An interface representing all the collection of all of the posts in the app.
  */
@@ -20,9 +22,9 @@ export class GraphQLEventItems implements Events {
     const eventsList = []
     const date = new Date()
     const date2 = new Date()
-    date.setHours(date.getHours() + 10)
+    date.setHours(10, 30)
     date.setDate(date.getDate() + 2)
-    date2.setHours(date.getHours() + 16)
+    date2.setHours(16, 30)
     date2.setDate(date2.getDate() + 2)
 
     for (let i = 0; i < ids.length; i++) {
@@ -38,7 +40,7 @@ export class GraphQLEventItems implements Events {
         endTime: date2,
         maxOccupancy: 5,
         isAcceptingInvitations: true,
-        colorHex: "magenta",
+        colorHex: "#843efa",
         distance: 0.5,
         address: "1156 High St, Santa Cruz, CA 95064"
       }
@@ -48,3 +50,10 @@ export class GraphQLEventItems implements Events {
     return eventsList
   }
 }
+
+/**
+ * A dependency key for a `Events` instance.
+ */
+export const eventsDependencyKey = createDependencyKey<Events>(() => {
+  return new GraphQLEventItems()
+})

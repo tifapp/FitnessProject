@@ -8,13 +8,12 @@ import BottomSheet, {
 import { Event } from "@lib/events/Event"
 import EventItem from "@components/EventItem"
 import NearbyActivities from "./headerComponents/NearbyActivities"
-import { Events, GraphQLEventItems } from "@lib/events/Events"
-
-let eventItems: Events
+import { eventsDependencyKey } from "@lib/events/Events"
+import { useDependencyValue } from "@lib/dependencies"
 
 const EventsList = () => {
-  eventItems = new GraphQLEventItems()
-  const ids = Array.from(new Array(10), (_, i) => String(i))
+  const eventItems = useDependencyValue(eventsDependencyKey)
+  const ids = Array.from(new Array(1), (_, i) => String(i))
   const events = eventItems.eventsWithIds(ids)
 
   // hooks
