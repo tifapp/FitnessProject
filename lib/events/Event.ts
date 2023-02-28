@@ -20,22 +20,21 @@ export type Event = {
 }
 
 /**
- * Some `UserPost` objects for testing and UI previewing purposes.
+ * Some `Event` objects for testing and UI previewing purposes.
  */
 export namespace TestEventItems {
   const testId = "3283284382584"
-  const testDate = new Date()
 
-  export const mockEvent = (startTime: Date, endTime: Date) => {
+  export const mockEvent = (start: Date, end: Date): Event => {
     return {
       id: testId,
       userId: "3234324",
-      username: "Test Event",
-      title: "Title for Event",
+      username: "Nicolette Antisdel",
+      title: "Pickup Basketball",
       repliesCount: 2,
       writtenByYou: true,
-      startTime,
-      endTime,
+      startTime: start,
+      endTime: end,
       colorHex: "magenta",
       location: { latitude: 36.991585, longitude: -122.058277 },
       address: "1156 High St, Santa Cruz, CA 95064"

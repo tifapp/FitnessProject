@@ -14,7 +14,7 @@ interface Props {
 const EventItem = ({ event }: Props) => {
   const numAttendees = 1
   const distance = 0.5
-  const lightEventColor = tinycolor(event.colorHex).lighten(15).toString()
+  const lightEventColor = tinycolor(event.colorHex).lighten(10).toString()
 
   const onPressMore = () => {
     return null
@@ -30,7 +30,11 @@ const EventItem = ({ event }: Props) => {
       <View style={[styles.container]}>
         {/* Profile Image, Name, More button */}
         <View style={[styles.topRow, styles.flexRow]}>
-          <Image style={styles.image} source={require("../assets/icon.png")} />
+          <Image
+            style={styles.image}
+            source={require("../assets/icon.png")}
+            accessibilityLabel="profile picture"
+          />
           <Text style={styles.name}>{event.username}</Text>
           <IconButton
             iconName={"more-horiz"}
@@ -51,7 +55,7 @@ const EventItem = ({ event }: Props) => {
 
           <View style={styles.flexRow}>
             <Icon name="event-available" color={event.colorHex} />
-            <Text style={styles.infoText}>
+            <Text style={styles.infoText} accessibilityLabel="day">
               {daysBeforeEvent(event.startTime, new Date())}
             </Text>
             <Text style={styles.infoText}>

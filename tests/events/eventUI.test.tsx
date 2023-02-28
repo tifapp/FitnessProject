@@ -1,80 +1,49 @@
 import { TestEventItems } from "@lib/events/Event"
-import { render } from "@testing-library/react-native"
+import { render, screen } from "@testing-library/react-native"
+import { format } from "date-fns"
 import EventItem from "@components/EventItem"
 import React from "react"
 
-describe("PostUI Component Tests", () => {
-  const time = new Date()
+let startDate: Date
+let endDate: Date
 
-  it("Renders with all options", () => {
-    render(<EventItem event={TestEventItems.mockEvent(time, 5, true, true)} />)
-    /* expect(screen.queryByLabelText(timeComponentLabel)).toBeDefined()
-    expect(screen.queryByLabelText(occupancyComponentLabel)).toBeDefined()
-    expect(screen.queryByLabelText(invitationComponentLabel)).toBeDefined() */
+describe("eventUI Component Tests", () => {
+  beforeAll(() => {
+    startDate = new Date()
+    endDate = new Date()
   })
-})
-/*
-  it("Renders with only time until event starts", () => {
-    render(
-      <EventItem
-        event={TestEventItems.mockEvent(time, undefined, false, true)}
-      />
-    )
-    expect(screen.queryByLabelText(timeComponentLabel)).toBeDefined()
-    expect(screen.queryByLabelText(occupancyComponentLabel)).toBeNull()
-    expect(screen.queryByLabelText(invitationComponentLabel)).toBeNull()
+  it("Renders", () => {
+    render(<EventItem event={TestEventItems.mockEvent(startDate, endDate)} />)
+
+    expect(screen.queryByLabelText(profileLabel)).toBeDefined()
+    expect(screen.getByText("Nicolette Antisdel")).toBeDefined()
+    expect(screen.getByText("Pickup Basketball")).toBeDefined()
+    expect(screen.getByText("1156 High St, Santa Cruz, CA 95064")).toBeDefined()
   })
 
-  it("Renders with only max occupancy", () => {
-    render(
-      <EventItem event={TestEventItems.mockEvent(undefined, 5, false, false)} />
-    )
-    expect(screen.queryByLabelText(timeComponentLabel)).toBeNull()
-    expect(screen.queryByLabelText(occupancyComponentLabel)).toBeDefined()
-    expect(screen.queryByLabelText(invitationComponentLabel)).toBeNull()
+  it("Displays today when Event is same day", () => {
+    render(<EventItem event={TestEventItems.mockEvent(startDate, endDate)} />)
+    expect(screen.getByText("Today,")).toBeDefined()
   })
 
-  it("Renders with only invitations", () => {
-    render(
-      <EventItem
-        event={TestEventItems.mockEvent(undefined, undefined, true, false)}
-      />
-    )
-    expect(screen.queryByLabelText(timeComponentLabel)).toBeNull()
-    expect(screen.queryByLabelText(occupancyComponentLabel)).toBeNull()
-    expect(screen.queryByLabelText(invitationComponentLabel)).toBeDefined()
+  it("Displays Tomorrow when Event is tomorrow", () => {
+    startDate.setDate(startDate.getDate() + 1)
+    render(<EventItem event={TestEventItems.mockEvent(startDate, endDate)} />)
+    expect(screen.getByText("Tomorrow,")).toBeDefined()
   })
 
-  it("Color of invitation changes on click", () => {
-    const event = TestEventItems.mockEvent(time, 5, true, true)
-    render(<EventItem event={event} />)
-
-    const invitation = screen.queryByLabelText(invitationIconLabel)
-    expect(invitation?.props.style[0].color).toEqual("black")
-    fireEvent.press(invitation!!)
-    expect(invitation?.props.style[0].color).toEqual(event.colorHex)
+  it("Displays day of week when Event < 7 Days away", () => {
+    startDate.setDate(startDate.getDate() + 3)
+    render(<EventItem event={TestEventItems.mockEvent(startDate, endDate)} />)
+    expect(screen.getByText(format(startDate, "EEEE,"))).toBeDefined()
   })
 
-  it("Time becomes red", () => {
-    render(<EventItem event={TestEventItems.mockEvent(time, 5, true, false)} />)
-
-    const timeIcon = screen.queryByLabelText(timeIconLabel)
-    expect(timeIcon?.props.style.color).toEqual("red")
-  })
-
-  it("Occupancy becomes red", () => {
-    render(<EventItem event={TestEventItems.mockEvent(time, 1, true, true)} />)
-
-    const occupancyIcon = screen.queryByLabelText(occupancyIconLabel)
-    expect(occupancyIcon?.props.style.color).toEqual("red")
+  it("Displays month, day when Event > 7 days away", () => {
+    startDate.setDate(startDate.getDate() + 9)
+    render(<EventItem event={TestEventItems.mockEvent(startDate, endDate)} />)
+    expect(screen.getByText(format(startDate, "LLL io,"))).toBeDefined()
   })
 })
 
 // Labels
-const timeComponentLabel = "time until"
-const occupancyComponentLabel = "max occupancy"
-const invitationComponentLabel = "request invitations"
-const invitationIconLabel = "invitation icon"
-const timeIconLabel = "time icon"
-const occupancyIconLabel = "occupancy icon"
-*/
+const profileLabel = "profile picture"
