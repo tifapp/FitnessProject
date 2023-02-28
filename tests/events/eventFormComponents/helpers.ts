@@ -22,14 +22,23 @@ export const baseTestEventValues = {
   radiusMeters: 0
 } as const
 
+/**
+ * Simulates editing the event title when an `EventFormTitleField` exists.
+ */
 export const editEventTitle = (title: string) => {
   fireEvent.changeText(screen.getByPlaceholderText("Title"), title)
 }
 
+/**
+ * Simulates editing the event description when an `EventFormDescriptionField` exists.
+ */
 export const editEventDescription = (description: string) => {
   fireEvent.changeText(screen.getByPlaceholderText("Description"), description)
 }
 
+/**
+ * Simulates moving the event start date when an `EventFormToolbar` exists.
+ */
 export const moveEventStartDate = (date: Date) => {
   fireEvent.press(dateToolbarButton())
   updateDateTimePickerDate({
@@ -39,6 +48,9 @@ export const moveEventStartDate = (date: Date) => {
   fireEvent.press(closeToolbarButton())
 }
 
+/**
+ * Simulates moving the event end date when an `EventFormToolbar` exists.
+ */
 export const moveEventEndDate = (date: Date) => {
   fireEvent.press(dateToolbarButton())
   updateDateTimePickerDate({
@@ -48,12 +60,21 @@ export const moveEventEndDate = (date: Date) => {
   fireEvent.press(closeToolbarButton())
 }
 
+/**
+ * Simulates picking the event color when an `EventFormToolbar` exists.
+ *
+ * @param colorName the accessibility name of the color (eg. "Red" for EventColor.Red)
+ */
 export const pickEventColor = (colorName: string) => {
   fireEvent.press(screen.getByLabelText("Pick Color"))
   fireEvent.press(screen.getByLabelText(colorName))
   fireEvent.press(closeToolbarButton())
 }
 
+/**
+ * Simulates toggling the option to hide the event after it starts when
+ * an `EventFormToolbar` exists.
+ */
 export const toggleShouldHideAfterStartDate = () => {
   fireEvent.press(screen.getByLabelText("More Settings"))
   fireEvent(
