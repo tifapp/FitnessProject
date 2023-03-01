@@ -72,14 +72,14 @@ export const EventFormSubmitButton = ({
 }
 
 const useSubmit = () => {
-  const { isSubmitting, onSubmit, hasEdited } = useEventFormContext()
+  const { isSubmitting, submit, hasEdited } = useEventFormContext()
   const formValues = useEventFormValues()
   const updateInput = eventEditInputFromFormValues(formValues)
   const canSubmit = !!updateInput && !isSubmitting && hasEdited
   if (!canSubmit) return undefined
   return async () => {
     try {
-      await onSubmit(updateInput)
+      await submit(updateInput)
     } catch {
       // TODO: - Should we just forward the actual error message here?
       Alert.alert(

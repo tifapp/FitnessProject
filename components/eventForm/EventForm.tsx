@@ -70,7 +70,7 @@ export type EventFormContextValues = {
   /**
    * Submits the data of this form context, in the form of an update input.
    */
-  onSubmit: (update: EditEventInput) => Promise<void>
+  submit: (update: EditEventInput) => Promise<void>
 
   /**
    * True if the form is currently being submitted.
@@ -160,7 +160,7 @@ const EventFormProvider = ({ onSubmit, children }: EventFormProviderProps) => {
   return (
     <EventFormContext.Provider
       value={{
-        onSubmit: async (update) => {
+        submit: async (update) => {
           await handleSubmit(async () => await onSubmit(update))()
         },
         isSubmitting: formState.isSubmitting,

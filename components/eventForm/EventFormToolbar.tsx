@@ -3,7 +3,6 @@ import { Switch, Text, View } from "react-native"
 import { useEventFormField, useEventFormValue } from "./EventForm"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import DateTimePicker from "@components/formComponents/DateTimePicker"
-import { HexColor } from "@lib/Color"
 import HexColorPicker, {
   HexColorPickerOption
 } from "@components/formComponents/HexColorPicker"
