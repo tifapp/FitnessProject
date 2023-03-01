@@ -26,7 +26,7 @@ import {
 } from "./helpers"
 import { unimplementedEvents } from "../helpers"
 
-describe("CreateEventScreen tests", () => {
+describe("EventFormIntegration tests", () => {
   beforeEach(() => (events = unimplementedEvents()))
 
   it("should be able to create an event with a preselected location", async () => {
