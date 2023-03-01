@@ -52,7 +52,6 @@ export const EventFormDismissButton = ({
  * Props from `EventFormSubmitButton`.
  */
 export type EventFormSubmitButtonProps = {
-  testID?: string
   label: string
 }
 
@@ -60,15 +59,13 @@ export type EventFormSubmitButtonProps = {
  * Submit button for `EventForm`.
  */
 export const EventFormSubmitButton = ({
-  label,
-  testID
+  label
 }: EventFormSubmitButtonProps) => {
   const submitButtonTapped = useSubmit()
   const color = useEventFormValue("color")
   const canSubmit = !!submitButtonTapped
   return (
     <TouchableOpacity
-      testID={testID}
       onPress={() => submitButtonTapped?.()}
       style={{ backgroundColor: color }}
     >

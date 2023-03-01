@@ -93,13 +93,11 @@ const editedEventTitle = "Updated Event"
 
 const testButtonLabel = "Test Submit"
 
-const testId = "test"
-
 const renderSubmitButton = (values: EventFormValues) => {
   render(
     <EventForm initialValues={values} onSubmit={submitAction}>
       <EventFormTitleField />
-      <EventFormSubmitButton testID={testId} label={testButtonLabel} />
+      <EventFormSubmitButton label={testButtonLabel} />
     </EventForm>
   )
 }
