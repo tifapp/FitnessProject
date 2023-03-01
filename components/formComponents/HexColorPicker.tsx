@@ -1,17 +1,19 @@
 import React from "react"
 import { HexColor } from "@lib/Color"
 import {
+  Button,
   Platform,
-  ScrollView,
   StyleProp,
   StyleSheet,
+  Text,
   View,
-  ViewStyle
+  ViewStyle,
+  TouchableOpacity,
+  FlatList
 } from "react-native"
 import { MaterialIcons } from "@expo/vector-icons"
-import { TouchableOpacity } from "react-native-gesture-handler"
 import { useDependencyValue } from "../../lib/dependencies"
-import { HapticEvent, hapticsDependencyKey } from "@lib/Haptics"
+import { HapticEvent, hapticsDependencyKey } from "../../lib/Haptics"
 
 /**
  * The default function for creating an accessibility label
@@ -53,11 +55,6 @@ export type HexColorPickerProps = {
    * "Color {hex color}"
    */
   createAccessibilityLabel?: (color: HexColor) => string
-
-  /**
-   * Renders colors in a grid rather than a horizontal scroll view.
-   */
-  grid?: boolean
 }
 
 /**
@@ -68,7 +65,6 @@ const HexColorPicker = ({
   onChange,
   options,
   style,
-  grid = false,
   createAccessibilityLabel = defaultCreateAccessibilityLabel
 }: HexColorPickerProps) => {
   const playHaptics = useDependencyValue(hapticsDependencyKey)
@@ -79,20 +75,12 @@ const HexColorPicker = ({
   }
 
   return (
-    <ScrollView
-      scrollEnabled={!grid}
-      horizontal
-      contentContainerStyle={[
-        grid ? styles.wrappedContainer : styles.container,
-        style
-      ]}
-    >
+    <View style={[styles.wrappedContainer, style]}>
       {options.map((option) => (
         <TouchableOpacity
           style={styles.optionContainer}
           key={option}
           onPress={() => colorTapped(option)}
-          accessibilityRole="button"
           accessibilityLabel={createAccessibilityLabel(option)}
         >
           <View
@@ -111,7 +99,7 @@ const HexColorPicker = ({
           </View>
         </TouchableOpacity>
       ))}
-    </ScrollView>
+    </View>
   )
 }
 
@@ -119,17 +107,17 @@ const styles = StyleSheet.create({
   container: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "flex-start"
+    flex: 1,
+    width: "100%"
   },
   wrappedContainer: {
     display: "flex",
-    flex: 1,
     flexDirection: "row",
     justifyContent: "flex-start",
     flexWrap: "wrap"
   },
   optionContainer: {
-    marginRight: 12,
+    marginHorizontal: 12,
     marginBottom: 12
   },
   selectionIcon: {
