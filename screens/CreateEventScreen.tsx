@@ -7,7 +7,7 @@ import {
   EventFormTitleField,
   EventFormToolbar
 } from "@components/eventForm"
-import { FixedDateRange } from "@lib/Date"
+import { dateRange } from "@lib/Date"
 import { EventColors } from "@lib/events/EventColors"
 import { useDependencyValue } from "@lib/dependencies"
 import { EditEventInput, eventsDependencyKey } from "@lib/events"
@@ -23,7 +23,7 @@ const createInitialFormValues = () => {
   return {
     title: "",
     description: "",
-    dateRange: new FixedDateRange(now, dayjs(now).add(1, "hour").toDate()),
+    dateRange: dateRange(now, dayjs(now).add(1, "hour").toDate()),
     color: EventColors.Red,
     shouldHideAfterStartDate: false,
     radiusMeters: 0
