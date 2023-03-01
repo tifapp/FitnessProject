@@ -1,7 +1,7 @@
 import { FixedDateRange } from "@lib/Date"
 import { EventColors } from "@lib/events/EventColors"
 import { fireEvent, screen } from "@testing-library/react-native"
-import { updateDateTimePickerDate } from "../../helpers/DateTimePicker"
+import { setDateTimePickerDate } from "../../helpers/DateTimePicker"
 
 export const baseTestEventValues = {
   title: "Test Event",
@@ -41,7 +41,7 @@ export const editEventDescription = (description: string) => {
  */
 export const moveEventStartDate = (date: Date) => {
   fireEvent.press(dateToolbarButton())
-  updateDateTimePickerDate({
+  setDateTimePickerDate({
     testID: "eventFormStartDateTimePicker",
     toDate: date
   })
@@ -53,7 +53,7 @@ export const moveEventStartDate = (date: Date) => {
  */
 export const moveEventEndDate = (date: Date) => {
   fireEvent.press(dateToolbarButton())
-  updateDateTimePickerDate({
+  setDateTimePickerDate({
     testID: "eventFormEndDateTimePicker",
     toDate: date
   })

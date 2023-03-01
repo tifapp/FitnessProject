@@ -87,6 +87,7 @@ const useSubmit = () => {
     try {
       await onSubmit(updateInput)
     } catch {
+      // TODO: - Should we just forward the actuall error message here?
       Alert.alert(
         "Something went wrong...",
         "Uh Oh! Something didn't go well... Please check your internet connection and try again later.",

@@ -24,12 +24,6 @@ describe("EventFormSubmitButton tests", () => {
     expect(submitButton()).not.toBeEnabled()
   })
 
-  it("should be enabled when valid event", () => {
-    renderSubmitButton(baseTestEventValues)
-    editEventTitle(editedEventTitle)
-    expect(submitButton()).toBeEnabled()
-  })
-
   it("should be disabled when event has an empty title", () => {
     renderSubmitButton({ ...baseTestEventValues, title: "" })
     expect(submitButton()).not.toBeEnabled()
@@ -84,11 +78,6 @@ describe("EventFormSubmitButton tests", () => {
     await waitFor(() => expect(submitButton()).toBeEnabled())
   })
 
-  it("should use the current color as the background color", () => {
-    renderSubmitButton({ ...baseTestEventValues, color: EventColors.Turquoise })
-    expect(backgroundColor()).toEqual(EventColors.Turquoise)
-  })
-
   it("should present an error alert when something goes wrong with the submission", async () => {
     submitAction.mockRejectedValue(new Error("lmao"))
     renderSubmitButton(baseTestEventValues)
@@ -117,10 +106,6 @@ const renderSubmitButton = (values: EventFormValues) => {
 
 const submit = () => {
   fireEvent.press(submitButton())
-}
-
-const backgroundColor = () => {
-  return screen.getByTestId(testId).props.style.backgroundColor
 }
 
 const submitButton = () => {

@@ -12,9 +12,9 @@ import {
   screen,
   waitFor
 } from "@testing-library/react-native"
-import { unimplementedGeocoding } from "../helpers/Geocoding"
-import { neverPromise } from "../helpers/Promise"
-import { TestQueryClientProvider } from "../helpers/ReactQuery"
+import { unimplementedGeocoding } from "../../helpers/Geocoding"
+import { neverPromise } from "../../helpers/Promise"
+import { TestQueryClientProvider } from "../../helpers/ReactQuery"
 import {
   baseTestEventValues,
   editEventDescription,
@@ -23,8 +23,8 @@ import {
   moveEventStartDate,
   pickEventColor,
   toggleShouldHideAfterStartDate
-} from "./eventFormComponents/helpers"
-import { unimplementedEvents } from "./helpers"
+} from "./helpers"
+import { unimplementedEvents } from "../helpers"
 
 describe("CreateEventScreen tests", () => {
   beforeEach(() => (events = unimplementedEvents()))

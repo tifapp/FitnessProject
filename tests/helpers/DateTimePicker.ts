@@ -11,7 +11,7 @@ import { ReactTestInstance } from "react-test-renderer"
  * (**Important Note**): ATM, if `Platform.OS === "android"` in the current test,
  * this will not work.
  */
-export const updateDateTimePickerDate = ({
+export const setDateTimePickerDate = ({
   testID,
   toDate: date
 }: {
