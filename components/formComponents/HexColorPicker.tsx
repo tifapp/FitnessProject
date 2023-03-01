@@ -101,12 +101,6 @@ const HexColorPicker = ({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    display: "flex",
-    flexDirection: "row",
-    flex: 1,
-    width: "100%"
-  },
   wrappedContainer: {
     display: "flex",
     flexDirection: "row",
@@ -116,9 +110,6 @@ const styles = StyleSheet.create({
   optionContainer: {
     marginHorizontal: 12,
     marginBottom: 12
-  },
-  selectionIcon: {
-    position: "absolute"
   }
 })
 
