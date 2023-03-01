@@ -1,15 +1,10 @@
+import { useReactHookFormContext } from "@hooks/formHooks/useReactHookFormContext"
 import { HexColor } from "@lib/Color"
 import { FixedDateRange } from "@lib/Date"
 import { EditEventInput } from "@lib/events"
 import { Location } from "@lib/location"
 import React, { createContext, ReactNode, useContext } from "react"
-import {
-  FormProvider,
-  useController,
-  useForm,
-  useFormContext,
-  useWatch
-} from "react-hook-form"
+import { FormProvider, useController, useForm, useWatch } from "react-hook-form"
 
 export type EventFormPlacemarkInfo = {
   readonly name?: string
@@ -96,7 +91,9 @@ export const useEventFormContext = () => {
   if (!context) {
     throw new Error(noContextProvidedMessage)
   }
-  return context
+
+  const reactHookFormContext = useReactHookFormContext()
+  return { ...context, ...reactHookFormContext }
 }
 
 /**
@@ -110,7 +107,7 @@ export const useEventFormField = <
 >(
     fieldName: T
   ) => {
-  const { control } = useReactHookFormContext()
+  const { control } = useEventFormContext()
   const { field } = useController({ control, name: fieldName })
   const updateField = (value: ((_: V) => V) | V) => {
     if (value instanceof Function) {
@@ -149,14 +146,6 @@ const EventFormContext = createContext<EventFormContextValues | undefined>(
 type EventFormProviderProps = {
   onSubmit: (update: EditEventInput) => Promise<void>
   children: ReactNode
-}
-
-const useReactHookFormContext = () => {
-  const formContext = useFormContext<EventFormValues>()
-  if (!formContext) {
-    throw new Error(noContextProvidedMessage)
-  }
-  return formContext
 }
 
 const noContextProvidedMessage = `
