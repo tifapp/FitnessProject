@@ -1,15 +1,12 @@
 import React from "react"
 import { HexColor } from "@lib/Color"
 import {
-  Button,
   Platform,
   StyleProp,
   StyleSheet,
-  Text,
   View,
   ViewStyle,
-  TouchableOpacity,
-  FlatList
+  TouchableOpacity
 } from "react-native"
 import { MaterialIcons } from "@expo/vector-icons"
 import { useDependencyValue } from "../../lib/dependencies"
