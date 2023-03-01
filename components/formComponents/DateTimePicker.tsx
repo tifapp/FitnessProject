@@ -12,7 +12,7 @@ import RNDateTimePicker, {
   DateTimePickerAndroid as RNDateTimePickerAndroid
 } from "@react-native-community/datetimepicker"
 import IconButton from "../common/IconButton"
-import { dayjs } from "../../lib/dayjs"
+import { dayjs } from "../../lib/date"
 
 /**
  * Default date formatter for `DateTimePicker`.
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between"
   },
   iOSPickerStyle: {
-    width: 200
+    width: 256
   },
   androidContainer: {
     display: "flex",

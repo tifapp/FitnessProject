@@ -12,7 +12,7 @@ import { EventColors } from "@lib/events/EventColors"
 import { useDependencyValue } from "@lib/dependencies"
 import { EditEventInput, eventsDependencyKey } from "@lib/events"
 import { useMutation } from "react-query"
-import { dayjs } from "@lib/dayjs"
+import { dayjs } from "../lib/date"
 
 export type CreateEventScreenProps = {
   locationInfo?: EventFormLocationInfo

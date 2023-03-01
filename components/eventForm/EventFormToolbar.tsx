@@ -1,7 +1,4 @@
 import React from "react"
-import { FixedDateRange } from "@lib/Date"
-import { dayjs } from "@lib/dayjs"
-import { Dayjs } from "dayjs"
 import { Switch, Text, View } from "react-native"
 import { useEventFormField, useEventFormValue } from "./EventForm"
 import { TouchableOpacity } from "react-native-gesture-handler"
@@ -21,7 +18,7 @@ export const EventFormToolbar = () => {
   return (
     <View>
       <TouchableOpacity accessibilityLabel="Update Dates">
-        <Text>{formatDateRange(dateRange)}</Text>
+        <Text>{dateRange.formatted()}</Text>
       </TouchableOpacity>
       <TouchableOpacity accessibilityLabel="More Settings">
         <View />
@@ -91,29 +88,4 @@ const createEventColorAccessibilityLabel = (color: HexColor) => {
   if (color === EventColors.Red) return "Red"
   if (color === EventColors.Turquoise) return "Turquoise"
   return "Unknown Color"
-}
-
-// TODO: - Should this support multiple locales?
-const formatDateRange = (dateRange: FixedDateRange) => {
-  const start = dayjs(dateRange.startDate)
-  const end = dayjs(dateRange.endDate)
-
-  const endDateFormat = end.isSame(start, "day")
-    ? formatTime(end)
-    : formatDateTime(end)
-
-  const startDateFormat = start.isToday()
-    ? `Today ${formatTime(start)}`
-    : formatDateTime(start)
-
-  return `${startDateFormat} - ${endDateFormat}`
-}
-
-const formatDateTime = (date: Dayjs) => {
-  const formattedDate = date.isTomorrow() ? "Tomorrow" : date.format("MMM D,")
-  return `${formattedDate} ${formatTime(date)}`
-}
-
-const formatTime = (date: Dayjs) => {
-  return date.format(date.minute() !== 0 ? "h:mma" : "ha")
 }

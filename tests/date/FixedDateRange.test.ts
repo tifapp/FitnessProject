@@ -1,8 +1,8 @@
-import { FixedDateRange } from "@lib/Date"
+import { dateRange } from "@lib/date"
 
 describe("FixedDateRange tests", () => {
   test("moveStartDate basic", () => {
-    const range = new FixedDateRange(
+    const range = dateRange(
       new Date("2023-02-25T00:17:00"),
       new Date("2023-02-25T00:18:00")
     ).moveStartDate(new Date(0))
@@ -12,7 +12,7 @@ describe("FixedDateRange tests", () => {
 
   test("moveEndDate basic", () => {
     const newEndDate = new Date("3000-01-01T00:00:00")
-    const range = new FixedDateRange(
+    const range = dateRange(
       new Date("2023-02-25T00:17:00"),
       new Date("2023-02-25T00:18:00")
     ).moveEndDate(newEndDate)
@@ -21,7 +21,7 @@ describe("FixedDateRange tests", () => {
   })
 
   it("moving start date past end date moves end date past the start date by the previous interval between the dates", () => {
-    const range = new FixedDateRange(
+    const range = dateRange(
       new Date("2023-02-25T00:17:00"),
       new Date("2023-02-25T00:18:00")
     ).moveStartDate(new Date("2023-02-25T00:19:00"))
@@ -30,7 +30,7 @@ describe("FixedDateRange tests", () => {
   })
 
   it("moving end date before start date moves start date before the end date by the previous interval between the dates", () => {
-    const range = new FixedDateRange(
+    const range = dateRange(
       new Date("2023-02-25T00:17:00"),
       new Date("2023-02-25T00:18:00")
     ).moveEndDate(new Date("2023-02-25T00:16:00"))
@@ -39,7 +39,7 @@ describe("FixedDateRange tests", () => {
   })
 
   it("should correctly adjust when the initial start date is past the initial end date by the current interval between dates", () => {
-    const range = new FixedDateRange(
+    const range = dateRange(
       new Date("2023-02-25T00:20:00"),
       new Date("2023-02-25T00:18:00")
     )

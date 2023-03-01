@@ -27,7 +27,7 @@ const DateTimePickerMeta: ComponentMeta<typeof DateTimePicker> = {
   title: "DateTimePicker",
   component: Picker,
   args: {
-    label: "Pick Date and Time"
+    label: "Pick Date"
   }
 }
 

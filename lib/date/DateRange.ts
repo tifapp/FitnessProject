@@ -1,29 +1,6 @@
-import { dayjs } from "./dayjs"
-
-/**
- * Computes the difference between 2 dates in a variety of units.
- */
-export const diffDates = (date1: Date, date2: Date) => {
-  const d1 = dayjs(date1)
-  const d2 = dayjs(date2)
-  return {
-    milliseconds: d1.diff(d2, "milliseconds", true),
-    seconds: d1.diff(d2, "seconds", true),
-    minutes: d1.diff(d2, "minutes", true),
-    hours: d1.diff(d2, "hours", true),
-    days: d1.diff(d2, "days", true),
-    weeks: d1.diff(d2, "weeks", true),
-    months: d1.diff(d2, "months", true),
-    years: d1.diff(d2, "years", true)
-  }
-}
-
-/**
- * Adds the designated number of seconds to a date and returns the result.
- */
-export const addSecondsToDate = (date: Date, seconds: number) => {
-  return dayjs(date).add(seconds, "seconds").toDate()
-}
+import { Dayjs } from "dayjs"
+import { addSecondsToDate, diffDates } from "./Date"
+import { dayjs, now } from "./dayjs"
 
 /**
  * A data type to deal with a date range that has a known start and end date.
@@ -78,4 +55,44 @@ export class FixedDateRange {
     }
     return new FixedDateRange(this.startDate, date)
   }
+
+  /**
+   * Formats this date range in a UI friendly way.
+   */
+  formatted () {
+    // TODO: - Should this support multiple locales?
+    const start = dayjs(this.startDate)
+    const end = dayjs(this.endDate)
+
+    const startDateFormat = formatFromBasis(now(), start)
+    const endDateFormat = start.isSame(end, "day")
+      ? formatTime(end)
+      : formatFromBasis(start, end)
+    return `${startDateFormat} - ${endDateFormat}`
+  }
+}
+
+const formatFromBasis = (basis: Dayjs, date: Dayjs) => {
+  const formattedTime = formatTime(date)
+  const current = now()
+  if (date.isToday()) return `Today ${formattedTime}`
+  if (date.isYesterday()) return `Yesterday ${formattedTime}`
+  if (date.isTomorrow()) return `Tomorrow ${formattedTime}`
+  if (date.isBetween(current, current.add(7, "days"), "days")) {
+    return date.format("ddd") + ` ${formattedTime}`
+  }
+  const yearFormat = !date.isSame(basis, "year") ? " YYYY" : ""
+  return date.format(`MMM D${yearFormat}, `) + formattedTime
+}
+
+const formatTime = (date: Dayjs) => {
+  return date.format(date.minute() !== 0 ? "h:mma" : "ha")
+}
+
+/**
+ * Creates a date range object where the start date is always before
+ * the end date.
+ */
+export const dateRange = (start: Date, end: Date) => {
+  return new FixedDateRange(start, end)
 }
