@@ -1,5 +1,5 @@
 import HexColorPicker, {
-  defaultCreateAccessibilityLabel
+  HexColorPickerOption
 } from "@components/formComponents/HexColorPicker"
 import { HexColor } from "@lib/Color"
 import { SetDependencyValue } from "@lib/dependencies"
@@ -10,55 +10,47 @@ import { View } from "react-native"
 import { setPlatform } from "../helpers/Platform"
 import "../helpers/Matchers"
 
-const testColors: HexColor[] = ["#123456", "#abcdef"]
+const testOptions = [
+  { color: "#123456", accessibilityLabel: "#123456" },
+  { color: "#abcdef", accessibilityLabel: "#abcdef" }
+] as HexColorPickerOption[]
 
 describe("HexColorPicker tests", () => {
   beforeEach(() => jest.resetAllMocks())
 
   it("can change the selected color", () => {
-    renderHexColorPicker(testColors)
-    selectColor(testColors[1])
-    expect(selectedColorElement(testColors[1])).toBeDisplayed()
+    renderHexColorPicker(testOptions)
+    selectColor(testOptions[1].color)
+    expect(selectedColorElement(testOptions[1].color)).toBeDisplayed()
   })
 
   it("does not play haptics on android when selection changes", () => {
     setPlatform("android")
-    renderHexColorPicker(testColors)
-    selectColor(testColors[1])
+    renderHexColorPicker(testOptions)
+    selectColor(testOptions[1].color)
     expect(hapticsPlayer).not.toHaveBeenCalled()
   })
 
   it("plays haptics on iOS when the color selection changes", () => {
     setPlatform("ios")
-    renderHexColorPicker(testColors)
-    selectColor(testColors[1])
+    renderHexColorPicker(testOptions)
+    selectColor(testOptions[1].color)
     expect(hapticsPlayer).toHaveBeenCalledWith(HapticEvent.SelectionChanged)
-  })
-
-  test("default accessibility label creator", () => {
-    expect(defaultCreateAccessibilityLabel("#abcdefg")).toEqual(
-      "Color #abcdefg"
-    )
   })
 })
 
-const renderHexColorPicker = (options: HexColor[]) => {
+const renderHexColorPicker = (options: HexColorPickerOption[]) => {
   render(<Test options={options} />)
 }
 
 const hapticsPlayer = jest.fn()
 
-const Test = ({ options }: { options: HexColor[] }) => {
-  const [color, setColor] = useState(options[0])
+const Test = ({ options }: { options: HexColorPickerOption[] }) => {
+  const [color, setColor] = useState(options[0].color)
   return (
     <SetDependencyValue forKey={hapticsDependencyKey} value={hapticsPlayer}>
       <View testID={displayedColorId(color)}>
-        <HexColorPicker
-          color={color}
-          onChange={setColor}
-          options={options}
-          createAccessibilityLabel={(color) => color}
-        />
+        <HexColorPicker color={color} onChange={setColor} options={options} />
       </View>
     </SetDependencyValue>
   )

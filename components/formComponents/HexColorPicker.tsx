@@ -12,12 +12,9 @@ import { MaterialIcons } from "@expo/vector-icons"
 import { useDependencyValue } from "../../lib/dependencies"
 import { HapticEvent, hapticsDependencyKey } from "../../lib/Haptics"
 
-/**
- * The default function for creating an accessibility label
- * for a `HexColorPicker` option.
- */
-export const defaultCreateAccessibilityLabel = (color: HexColor) => {
-  return `Color ${color}`
+export type HexColorPickerOption = {
+  color: HexColor
+  accessibilityLabel: string
 }
 
 /**
@@ -37,21 +34,12 @@ export type HexColorPickerProps = {
   /**
    * The available options in the picker.
    */
-  options: HexColor[]
+  options: HexColorPickerOption[]
 
   /**
    * The container style of the picker.
    */
   style?: StyleProp<ViewStyle>
-
-  /**
-   * A function to create an accessibility label for a color option.
-   *
-   * The default simply returns a string in the following format:
-   *
-   * "Color {hex color}"
-   */
-  createAccessibilityLabel?: (color: HexColor) => string
 }
 
 /**
@@ -61,8 +49,7 @@ const HexColorPicker = ({
   color,
   onChange,
   options,
-  style,
-  createAccessibilityLabel = defaultCreateAccessibilityLabel
+  style
 }: HexColorPickerProps) => {
   const playHaptics = useDependencyValue(hapticsDependencyKey)
 
@@ -76,13 +63,13 @@ const HexColorPicker = ({
       {options.map((option) => (
         <TouchableOpacity
           style={styles.optionContainer}
-          key={option}
-          onPress={() => colorTapped(option)}
-          accessibilityLabel={createAccessibilityLabel(option)}
+          key={option.color}
+          onPress={() => colorTapped(option.color)}
+          accessibilityLabel={option.accessibilityLabel}
         >
           <View
             style={{
-              backgroundColor: option,
+              backgroundColor: option.color,
               borderRadius: 32,
               padding: 12
             }}
@@ -91,7 +78,7 @@ const HexColorPicker = ({
               name="check"
               color="white"
               size={24}
-              style={{ opacity: color === option ? 1 : 0 }}
+              style={{ opacity: color === option.color ? 1 : 0 }}
             />
           </View>
         </TouchableOpacity>

@@ -29,7 +29,7 @@ export const EventFormDismissButton = ({
 
   const dismissButtonTapped = () => {
     if (hasEdited) {
-      Alert.alert("Discard this event?", undefined, [
+      Alert.alert("Discard this draft?", undefined, [
         { text: "Discard", style: "cancel", onPress: onDismiss },
         { text: "Keep Editing" }
       ])
@@ -38,9 +38,6 @@ export const EventFormDismissButton = ({
     }
   }
 
-  // NB: I have no idea why, but the MaterialIcons component is not rendered in
-  // tests which means we can't use the IconButton component here due to where
-  // it places the accessibility label (changing where it does breaks other tests)...
   return (
     <TouchableOpacity onPress={dismissButtonTapped} accessibilityLabel="Cancel">
       <MaterialIcons name="close" size={24} />
@@ -84,10 +81,10 @@ const useSubmit = () => {
     try {
       await onSubmit(updateInput)
     } catch {
-      // TODO: - Should we just forward the actuall error message here?
+      // TODO: - Should we just forward the actual error message here?
       Alert.alert(
         "Something went wrong...",
-        "Uh Oh! Something didn't go well... Please check your internet connection and try again later.",
+        "Please check your internet connection and try again later.",
         [{ text: "Ok" }]
       )
     }

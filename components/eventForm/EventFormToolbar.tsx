@@ -4,7 +4,9 @@ import { useEventFormField, useEventFormValue } from "./EventForm"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import DateTimePicker from "@components/formComponents/DateTimePicker"
 import { HexColor } from "@lib/Color"
-import HexColorPicker from "@components/formComponents/HexColorPicker"
+import HexColorPicker, {
+  HexColorPickerOption
+} from "@components/formComponents/HexColorPicker"
 import { EventColors } from "@lib/events/EventColors"
 
 /**
@@ -78,14 +80,22 @@ const ColorSection = () => {
     <HexColorPicker
       color={color}
       onChange={setColor}
-      options={EventColors.all}
-      createAccessibilityLabel={createEventColorAccessibilityLabel}
+      options={eventColorOptions}
     />
   )
 }
 
-const createEventColorAccessibilityLabel = (color: HexColor) => {
-  if (color === EventColors.Red) return "Red"
-  if (color === EventColors.Turquoise) return "Turquoise"
-  return "Unknown Color"
-}
+const eventColorOptions = [
+  { color: EventColors.Red, accessibilityLabel: "Red" },
+  { color: EventColors.Orange, accessibilityLabel: "Orange" },
+  { color: EventColors.Yellow, accessibilityLabel: "Yellow" },
+  { color: EventColors.BrightPink, accessibilityLabel: "Bright Pink" },
+  { color: EventColors.CherryBlossom, accessibilityLabel: "Cherry Blossom" },
+  { color: EventColors.LightBlue, accessibilityLabel: "Light Blue" },
+  { color: EventColors.LightPurple, accessibilityLabel: "Light Purple" },
+  { color: EventColors.Blue, accessibilityLabel: "Blue" },
+  { color: EventColors.Purple, accessibilityLabel: "Purple" },
+  { color: EventColors.Turquoise, accessibilityLabel: "Turquoise" },
+  { color: EventColors.Green, accessibilityLabel: "Green" },
+  { color: EventColors.Brown, accessibilityLabel: "Brown" }
+] as HexColorPickerOption[]

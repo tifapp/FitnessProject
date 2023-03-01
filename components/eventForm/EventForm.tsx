@@ -1,4 +1,4 @@
-import { useReactHookFormContext } from "@hooks/formHooks/useReactHookFormContext"
+import { useReactHookFormContext } from "@hooks/FormHooks"
 import { HexColor } from "@lib/Color"
 import { FixedDateRange } from "@lib/Date"
 import { EditEventInput } from "@lib/events"
