@@ -74,9 +74,13 @@ export class FixedDateRange {
 
 const formatFromBasis = (basis: Dayjs, date: Dayjs) => {
   const formattedTime = formatTime(date)
+  const current = now()
   if (date.isToday()) return `Today ${formattedTime}`
   if (date.isYesterday()) return `Yesterday ${formattedTime}`
   if (date.isTomorrow()) return `Tomorrow ${formattedTime}`
+  if (date.isBetween(current, current.add(7, "days"), "days")) {
+    return date.format("ddd") + ` ${formattedTime}`
+  }
   const yearFormat = !date.isSame(basis, "year") ? " YYYY" : ""
   return date.format(`MMM D${yearFormat}, `) + formattedTime
 }

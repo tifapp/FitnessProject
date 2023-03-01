@@ -175,6 +175,46 @@ describe("FixedDateRangeFormatting tests", () => {
       "Feb 24 2026, 1pm - Feb 24 2027, 3:05pm"
     )
   })
+
+  test("starts 6 days from today", () => {
+    expectFormattedDateRange(
+      dateRange(
+        new Date("2023-03-04T13:00:00"),
+        new Date("2023-03-04T14:00:00")
+      ),
+      "Sat 1pm - 2pm"
+    )
+  })
+
+  test("starts 2 days from today, ends 5 days from today", () => {
+    expectFormattedDateRange(
+      dateRange(
+        new Date("2023-02-28T13:00:00"),
+        new Date("2023-03-03T14:00:00")
+      ),
+      "Tue 1pm - Fri 2pm"
+    )
+  })
+
+  test("starts 1 week from now at time of day before current time of day, am times", () => {
+    expectFormattedDateRange(
+      dateRange(
+        new Date("2023-03-05T08:00:00"),
+        new Date("2023-03-05T10:00:00")
+      ),
+      "Mar 5, 8am - 10am"
+    )
+  })
+
+  test("ends 1 week from now at time of day before current time of day, am times", () => {
+    expectFormattedDateRange(
+      dateRange(
+        new Date("2023-02-26T08:00:00"),
+        new Date("2023-03-05T10:00:00")
+      ),
+      "Today 8am - Mar 5, 10am"
+    )
+  })
 })
 
 const expectFormattedDateRange = (
