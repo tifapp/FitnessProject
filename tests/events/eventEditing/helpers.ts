@@ -45,7 +45,7 @@ export const moveEventStartDate = (date: Date) => {
     testID: "eventFormStartDateTimePicker",
     toDate: date
   })
-  fireEvent.press(closeToolbarButton())
+  dismissToolbarModal()
 }
 
 /**
@@ -57,7 +57,7 @@ export const moveEventEndDate = (date: Date) => {
     testID: "eventFormEndDateTimePicker",
     toDate: date
   })
-  fireEvent.press(closeToolbarButton())
+  dismissToolbarModal()
 }
 
 /**
@@ -68,7 +68,7 @@ export const moveEventEndDate = (date: Date) => {
 export const pickEventColor = (colorName: string) => {
   fireEvent.press(screen.getByLabelText("Pick Color"))
   fireEvent.press(screen.getByLabelText(colorName))
-  fireEvent.press(closeToolbarButton())
+  dismissToolbarModal()
 }
 
 /**
@@ -82,8 +82,10 @@ export const toggleShouldHideAfterStartDate = () => {
     "valueChange",
     true
   )
-  fireEvent.press(closeToolbarButton())
+  dismissToolbarModal()
 }
 
 const dateToolbarButton = () => screen.getByLabelText("Update Dates")
-const closeToolbarButton = () => screen.getByLabelText("Close")
+const dismissToolbarModal = () => {
+  fireEvent.press(screen.getByLabelText("Close"))
+}
