@@ -1,12 +1,15 @@
-import React from "react"
-import { Switch, Text, View } from "react-native"
+import React, { createContext, ReactNode, useContext, useRef } from "react"
+import { Button, Text, View } from "react-native"
 import { useEventFormField, useEventFormValue } from "./EventForm"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import DateTimePicker from "@components/formComponents/DateTimePicker"
-import HexColorPicker, {
-  HexColorPickerOption
-} from "@components/formComponents/HexColorPicker"
+import { HexColorPickerOption } from "@components/formComponents/HexColorPicker"
 import { EventColors } from "@lib/events/EventColors"
+import {
+  BottomSheetModal,
+  BottomSheetModalProvider,
+  BottomSheetView
+} from "@gorhom/bottom-sheet"
 
 /**
  * A horizontally scrolling toolbar for an event form.
@@ -15,73 +18,67 @@ import { EventColors } from "@lib/events/EventColors"
  * where its respective form values can be edited.
  */
 export const EventFormToolbar = () => {
+  return (
+    <ToolbarProvider>
+      <DateTab />
+    </ToolbarProvider>
+  )
+}
+
+type ToolbarContextValues = {
+  openSection: () => void
+}
+
+const ToolbarContext = createContext<ToolbarContextValues | undefined>(
+  undefined
+)
+
+const useToolbar = () => useContext(ToolbarContext)!!
+
+type ToolbarProviderProps = {
+  children: ReactNode
+}
+
+const bottomSheetSnapPoints = ["50%"]
+
+const ToolbarProvider = ({ children }: ToolbarProviderProps) => {
+  const bottomSheetRef = useRef<BottomSheetModal>(null)
+
+  return (
+    <ToolbarContext.Provider
+      value={{
+        openSection: () => {
+          console.log("Opening section", bottomSheetRef.current)
+          bottomSheetRef.current?.present()
+        }
+      }}
+    >
+      <BottomSheetModalProvider>
+        <BottomSheetModal
+          ref={bottomSheetRef}
+          snapPoints={bottomSheetSnapPoints}
+        >
+          <DateSection />
+        </BottomSheetModal>
+      </BottomSheetModalProvider>
+      {children}
+    </ToolbarContext.Provider>
+  )
+}
+
+const DateTab = () => {
   const dateRange = useEventFormValue("dateRange")
+  const { openSection } = useToolbar()
   return (
-    <View>
-      <TouchableOpacity accessibilityLabel="Update Dates">
-        <Text>{dateRange.formatted()}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity accessibilityLabel="More Settings">
-        <View />
-      </TouchableOpacity>
-      <TouchableOpacity accessibilityLabel="Pick Color">
-        <View />
-      </TouchableOpacity>
-      <ColorSection />
-      <DateRangeSection />
-      <MoreSettingsSection />
-      <TouchableOpacity accessibilityLabel="Close">
-        <View />
-      </TouchableOpacity>
-    </View>
+    // <TouchableOpacity onPress={openSection} accessibilityLabel="Update Dates">
+    //   <Text>{dateRange.formatted()}</Text>
+    // </TouchableOpacity>
+    <Button title={dateRange.formatted()} onPress={openSection} />
   )
 }
 
-const DateRangeSection = () => {
-  const [dateRange, setDateRange] = useEventFormField("dateRange")
-  return (
-    <View>
-      <DateTimePicker
-        testID="eventFormStartDateTimePicker"
-        label="Start Date"
-        date={dateRange.startDate}
-        onDateChanged={(date) =>
-          setDateRange((range) => range.moveStartDate(date))
-        }
-      />
-      <DateTimePicker
-        testID="eventFormEndDateTimePicker"
-        label="End Date"
-        date={dateRange.endDate}
-        onDateChanged={(date) =>
-          setDateRange((range) => range.moveEndDate(date))
-        }
-      />
-    </View>
-  )
-}
-
-const MoreSettingsSection = () => {
-  const [shouldHideAfterStartDate, setShouldHideAfterStartDate] =
-    useEventFormField("shouldHideAfterStartDate")
-  return (
-    <Switch
-      testID="eventFormShouldHideAfterStartDateSwitch"
-      value={shouldHideAfterStartDate}
-      onValueChange={setShouldHideAfterStartDate}
-    />
-  )
-}
-
-const ColorSection = () => {
-  const [color, setColor] = useEventFormField("color")
-  return (
-    <HexColorPicker
-      color={color}
-      onChange={setColor}
-      options={eventColorOptions}
-    />
-  )
+const DateSection = () => {
+  return <Text>Start and End Dates</Text>
 }
 
 const eventColorOptions = [
