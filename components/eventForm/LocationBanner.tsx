@@ -1,5 +1,5 @@
-import { useReverseGeocodeQuery } from "@hooks/Geocoding"
-import { placemarkToFormattedAddress } from "@lib/location"
+import { useReverseGeocodeQuery } from "../../hooks/Geocoding"
+import { placemarkToFormattedAddress } from "../../lib/location"
 import React from "react"
 import { Text, View } from "react-native"
 import {

@@ -1,6 +1,7 @@
 import {
   BottomSheetModal,
-  BottomSheetModalProvider
+  BottomSheetModalProvider,
+  BottomSheetBackdrop
 } from "@gorhom/bottom-sheet"
 import React, {
   createContext,
@@ -46,9 +47,12 @@ export const ToolbarProvider = ({ children }: ToolbarProviderProps) => {
       }}
     >
       <BottomSheetModalProvider>
+        {children}
         <BottomSheetModal
           ref={bottomSheetRef}
+          index={0}
           snapPoints={bottomSheetSnapPoints}
+          backdropComponent={BottomSheetBackdrop}
         >
           {section === "date" && (
             <ToolbarSectionView title="Start and End Dates">
@@ -67,7 +71,6 @@ export const ToolbarProvider = ({ children }: ToolbarProviderProps) => {
           )}
         </BottomSheetModal>
       </BottomSheetModalProvider>
-      {children}
     </ToolbarContext.Provider>
   )
 }

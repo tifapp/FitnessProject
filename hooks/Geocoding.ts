@@ -1,5 +1,5 @@
-import { useDependencyValue } from "@lib/dependencies"
-import { geocodingDependencyKey, Location } from "@lib/location"
+import { useDependencyValue } from "../lib/dependencies"
+import { geocodingDependencyKey, Location } from "../lib/location"
 import { useQuery } from "react-query"
 
 /**

@@ -1,3 +1,6 @@
+import { EventForm, EventFormToolbar } from "@components/eventForm"
+import { dateRange } from "@lib/date"
+import { EventColors } from "@lib/events/EventColors"
 import { Auth } from "aws-amplify"
 import React from "react"
 import { Alert, Text, TouchableOpacity } from "react-native"
@@ -46,6 +49,23 @@ const ActivitiesScreen = () => {
           SandBox to get started
         </Text>
       </TouchableOpacity>
+      <EventForm
+        initialValues={{
+          title: "Test",
+          description: "Hello world this is a test.",
+          color: EventColors.BrightPink,
+          dateRange: dateRange(
+            new Date("2023-03-02T08:00:00"),
+            new Date("2023-03-02T09:00:00")
+          ),
+          radiusMeters: 0,
+          shouldHideAfterStartDate: false
+        }}
+        onDismiss={() => {}}
+        onSubmit={async () => {}}
+      >
+        <EventFormToolbar />
+      </EventForm>
     </GestureHandlerRootView>
   )
 }

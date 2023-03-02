@@ -3,7 +3,7 @@ import {
   EARTH_RADIUS_METERS,
   METERS_PER_MILE,
   sin2
-} from "@lib/Math"
+} from "../Math"
 
 /**
  * A simple latitude and longitude based coordinate.

@@ -1,7 +1,7 @@
 import HexColorPicker, {
   HexColorPickerOption
-} from "@components/formComponents/HexColorPicker"
-import { EventColors } from "@lib/events/EventColors"
+} from "../formComponents/HexColorPicker"
+import { EventColors } from "../../lib/events/EventColors"
 import React from "react"
 import { useEventFormField } from "."
 
