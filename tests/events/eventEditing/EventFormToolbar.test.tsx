@@ -3,42 +3,62 @@ import {
   EventFormToolbar,
   EventFormValues
 } from "@components/eventForm"
-import { dateRange, FixedDateRange } from "@lib/Date"
+import { dateRange } from "@lib/Date"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import { baseTestEventValues } from "./helpers"
 import "../../helpers/Matchers"
+import { EventColors } from "@lib/events/EventColors"
+
+const testDateRange = dateRange(
+  new Date("2023-03-01T08:00:00"),
+  new Date("2023-03-01T10:00:00")
+)
 
 describe("EventFormToolbar tests", () => {
-  beforeEach(() => jest.useFakeTimers())
+  beforeEach(() => {
+    jest.useFakeTimers().setSystemTime(new Date("2023-03-01T00:00:00"))
+  })
   afterEach(() => jest.useRealTimers())
 
   it("should represent the date tab with a formatted date range", () => {
-    jest.setSystemTime(new Date("2023-03-01"))
-    const range = dateRange(
-      new Date("2023-03-01T08:00:00"),
-      new Date("2023-03-01T10:00:00")
-    )
     renderToolbar({
       ...baseTestEventValues,
-      dateRange: range
+      dateRange: testDateRange
     })
-    expect(dateTabLabel(range)).toBeDisplayed()
+    expect(testFormattedDateRange()).toBeDisplayed()
   })
 
   test("opening the date section", () => {
-    jest.setSystemTime(new Date("2023-03-01"))
-    const range = dateRange(
-      new Date("2023-03-01T08:00:00"),
-      new Date("2023-03-01T10:00:00")
-    )
     renderToolbar({
       ...baseTestEventValues,
-      dateRange: range
+      dateRange: testDateRange
     })
 
     expect(dateSectionTitle()).not.toBeDisplayed()
-    openDateSection(range)
+    openDateSection()
     expect(dateSectionTitle()).toBeDisplayed()
+  })
+
+  test("opening the color section", () => {
+    renderToolbar({ ...baseTestEventValues, color: EventColors.Red })
+    expect(colorSectionTitle()).not.toBeDisplayed()
+    openColorSection()
+    expect(colorSectionTitle()).toBeDisplayed()
+  })
+
+  test("opening the advanced section", () => {
+    renderToolbar(baseTestEventValues)
+    expect(advancedSectionTitle()).not.toBeDisplayed()
+    openAdvancedSection()
+    expect(advancedSectionTitle()).toBeDisplayed()
+  })
+
+  test("closing a section", () => {
+    renderToolbar(baseTestEventValues)
+    openAdvancedSection()
+    closeCurrentSection()
+    expect(advancedSectionTitle()).not.toBeDisplayed()
+    expect(closeButton()).not.toBeDisplayed()
   })
 })
 
@@ -50,14 +70,38 @@ const renderToolbar = (values: EventFormValues) => {
   )
 }
 
-const openDateSection = (range: FixedDateRange) => {
-  fireEvent.press(dateTabLabel(range)!!)
+const openDateSection = () => {
+  fireEvent.press(testFormattedDateRange()!!)
+}
+
+const openColorSection = () => {
+  fireEvent.press(screen.getByText("Color"))
+}
+
+const openAdvancedSection = () => {
+  fireEvent.press(screen.getByLabelText("Advanced"))
+}
+
+const colorSectionTitle = () => {
+  return screen.queryByText("Pick Color")
+}
+
+const advancedSectionTitle = () => {
+  return screen.queryByText("Advanced")
 }
 
 const dateSectionTitle = () => {
   return screen.queryByText("Start and End Dates")
 }
 
-const dateTabLabel = (range: FixedDateRange) => {
-  return screen.queryByText(range.formatted())
+const closeCurrentSection = () => {
+  fireEvent.press(closeButton()!!)
+}
+
+const closeButton = () => {
+  return screen.queryByLabelText("Close Section")
+}
+
+const testFormattedDateRange = () => {
+  return screen.queryByText("Today 8am - 10am")
 }

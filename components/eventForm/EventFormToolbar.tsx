@@ -1,14 +1,18 @@
-import React, { createContext, ReactNode, useContext, useRef } from "react"
-import { Button, Text, View } from "react-native"
-import { useEventFormField, useEventFormValue } from "./EventForm"
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useRef,
+  useState
+} from "react"
+import { Button, Text } from "react-native"
+import { useEventFormValue } from "./EventForm"
 import { TouchableOpacity } from "react-native-gesture-handler"
-import DateTimePicker from "@components/formComponents/DateTimePicker"
 import { HexColorPickerOption } from "@components/formComponents/HexColorPicker"
 import { EventColors } from "@lib/events/EventColors"
 import {
   BottomSheetModal,
-  BottomSheetModalProvider,
-  BottomSheetView
+  BottomSheetModalProvider
 } from "@gorhom/bottom-sheet"
 
 /**
@@ -21,48 +25,9 @@ export const EventFormToolbar = () => {
   return (
     <ToolbarProvider>
       <DateTab />
+      <ColorTab />
+      <AdvancedTab />
     </ToolbarProvider>
-  )
-}
-
-type ToolbarContextValues = {
-  openSection: () => void
-}
-
-const ToolbarContext = createContext<ToolbarContextValues | undefined>(
-  undefined
-)
-
-const useToolbar = () => useContext(ToolbarContext)!!
-
-type ToolbarProviderProps = {
-  children: ReactNode
-}
-
-const bottomSheetSnapPoints = ["50%"]
-
-const ToolbarProvider = ({ children }: ToolbarProviderProps) => {
-  const bottomSheetRef = useRef<BottomSheetModal>(null)
-
-  return (
-    <ToolbarContext.Provider
-      value={{
-        openSection: () => {
-          console.log("Opening section", bottomSheetRef.current)
-          bottomSheetRef.current?.present()
-        }
-      }}
-    >
-      <BottomSheetModalProvider>
-        <BottomSheetModal
-          ref={bottomSheetRef}
-          snapPoints={bottomSheetSnapPoints}
-        >
-          <DateSection />
-        </BottomSheetModal>
-      </BottomSheetModalProvider>
-      {children}
-    </ToolbarContext.Provider>
   )
 }
 
@@ -70,15 +35,26 @@ const DateTab = () => {
   const dateRange = useEventFormValue("dateRange")
   const { openSection } = useToolbar()
   return (
-    // <TouchableOpacity onPress={openSection} accessibilityLabel="Update Dates">
-    //   <Text>{dateRange.formatted()}</Text>
-    // </TouchableOpacity>
-    <Button title={dateRange.formatted()} onPress={openSection} />
+    <TouchableOpacity
+      onPress={() => openSection("date")}
+      accessibilityLabel="Update Dates"
+    >
+      <Text>{dateRange.formatted()}</Text>
+    </TouchableOpacity>
   )
 }
 
 const DateSection = () => {
   return <Text>Start and End Dates</Text>
+}
+
+const ColorTab = () => {
+  const { openSection } = useToolbar()
+  return <Button title="Color" onPress={() => openSection("color")} />
+}
+
+const ColorSection = () => {
+  return <Text>Pick Color</Text>
 }
 
 const eventColorOptions = [
@@ -95,3 +71,70 @@ const eventColorOptions = [
   { color: EventColors.Green, accessibilityLabel: "Green" },
   { color: EventColors.Brown, accessibilityLabel: "Brown" }
 ] as HexColorPickerOption[]
+
+const AdvancedTab = () => {
+  const { openSection } = useToolbar()
+  return (
+    <TouchableOpacity
+      accessibilityLabel="Advanced"
+      onPress={() => openSection("advanced")}
+    />
+  )
+}
+
+const AdvancedSection = () => {
+  return <Text>Advanced</Text>
+}
+
+type ToolbarSection = "date" | "color" | "advanced"
+
+type ToolbarContextValues = {
+  openSection: (section: ToolbarSection) => void
+}
+
+const ToolbarContext = createContext<ToolbarContextValues | undefined>(
+  undefined
+)
+
+const useToolbar = () => useContext(ToolbarContext)!!
+
+type ToolbarProviderProps = {
+  children: ReactNode
+}
+
+const bottomSheetSnapPoints = ["50%"]
+
+const ToolbarProvider = ({ children }: ToolbarProviderProps) => {
+  const bottomSheetRef = useRef<BottomSheetModal>(null)
+  const [section, setSection] = useState<ToolbarSection | undefined>()
+
+  return (
+    <ToolbarContext.Provider
+      value={{
+        openSection: (section) => {
+          setSection(section)
+          bottomSheetRef.current?.present()
+        }
+      }}
+    >
+      <BottomSheetModalProvider>
+        <BottomSheetModal
+          ref={bottomSheetRef}
+          snapPoints={bottomSheetSnapPoints}
+        >
+          <TouchableOpacity
+            accessibilityLabel="Close Section"
+            onPress={() => {
+              setSection(undefined)
+              bottomSheetRef.current?.dismiss()
+            }}
+          />
+          {section === "date" && <DateSection />}
+          {section === "color" && <ColorSection />}
+          {section === "advanced" && <AdvancedSection />}
+        </BottomSheetModal>
+      </BottomSheetModalProvider>
+      {children}
+    </ToolbarContext.Provider>
+  )
+}
