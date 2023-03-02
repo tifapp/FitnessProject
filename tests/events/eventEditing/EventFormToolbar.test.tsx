@@ -53,7 +53,7 @@ describe("EventFormToolbar tests", () => {
     expect(advancedSectionTitle()).toBeDisplayed()
   })
 
-  test("closing a section", () => {
+  test("closing the current section", () => {
     renderToolbar(baseTestEventValues)
     openAdvancedSection()
     closeCurrentSection()
