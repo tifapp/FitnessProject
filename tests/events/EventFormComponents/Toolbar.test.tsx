@@ -99,7 +99,7 @@ const openColorSection = () => {
 }
 
 const openAdvancedSection = () => {
-  fireEvent.press(screen.getByLabelText("Advanced"))
+  fireEvent.press(screen.getByLabelText("Advanced Settings"))
 }
 
 const colorSectionTitle = () => {

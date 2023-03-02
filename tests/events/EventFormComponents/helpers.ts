@@ -42,7 +42,7 @@ export const editEventDescription = (description: string) => {
 export const moveEventStartDate = (date: Date) => {
   fireEvent.press(dateToolbarButton())
   setDateTimePickerDate({
-    testID: "eventFormStartDateTimePicker",
+    testID: "eventFormStartDate",
     toDate: date
   })
   dismissToolbarModal()
@@ -54,7 +54,7 @@ export const moveEventStartDate = (date: Date) => {
 export const moveEventEndDate = (date: Date) => {
   fireEvent.press(dateToolbarButton())
   setDateTimePickerDate({
-    testID: "eventFormEndDateTimePicker",
+    testID: "eventFormEndDate",
     toDate: date
   })
   dismissToolbarModal()
@@ -66,7 +66,7 @@ export const moveEventEndDate = (date: Date) => {
  * @param colorName the accessibility name of the color (eg. "Red" for EventColor.Red)
  */
 export const pickEventColor = (colorName: string) => {
-  fireEvent.press(screen.getByLabelText("Pick Color"))
+  fireEvent.press(screen.getByText("Color"))
   fireEvent.press(screen.getByLabelText(colorName))
   dismissToolbarModal()
 }
@@ -75,17 +75,20 @@ export const pickEventColor = (colorName: string) => {
  * Simulates toggling the option to hide the event after it starts when
  * an `EventFormToolbar` exists.
  */
-export const toggleShouldHideAfterStartDate = () => {
-  fireEvent.press(screen.getByLabelText("More Settings"))
-  fireEvent(
-    screen.getByTestId("eventFormShouldHideAfterStartDateSwitch"),
-    "valueChange",
-    true
-  )
+export const toggleShouldHideAfterStartDate = (value: boolean) => {
+  fireEvent.press(screen.getByLabelText("Advanced Settings"))
+  fireEvent(screen.getByRole("togglebutton"), "valueChange", value)
   dismissToolbarModal()
+}
+
+/**
+ * Simulates a user tapping on the dismiss button.
+ */
+export const attemptDismiss = () => {
+  fireEvent.press(screen.getByLabelText("Cancel"))
 }
 
 const dateToolbarButton = () => screen.getByLabelText("Update Dates")
 const dismissToolbarModal = () => {
-  fireEvent.press(screen.getByLabelText("Close"))
+  fireEvent.press(screen.getByLabelText("Close Section"))
 }

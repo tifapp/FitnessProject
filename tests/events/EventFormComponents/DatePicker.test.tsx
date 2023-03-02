@@ -1,6 +1,6 @@
 import {
   EventForm,
-  EventFormDateSection,
+  EventFormDatePicker,
   useEventFormContext
 } from "@components/eventForm"
 import { render, screen } from "@testing-library/react-native"
@@ -10,7 +10,7 @@ import { setDateTimePickerDate } from "../../helpers/DateTimePicker"
 import { baseTestEventFormValues } from "./helpers"
 import "../../helpers/Matchers"
 
-describe("EventFormDateSection tests", () => {
+describe("EventFormDatePicker tests", () => {
   beforeEach(() => {
     jest.useFakeTimers().setSystemTime(new Date("2023-03-01T08:00:00"))
   })
@@ -18,20 +18,20 @@ describe("EventFormDateSection tests", () => {
 
   it("should be able to select a start date", () => {
     const selectedDate = new Date("2023-01-01T00:00:00")
-    renderDateSection()
+    renderDatePicker()
     moveStartDate(selectedDate)
     expect(selectedStartDate(selectedDate)).toBeDisplayed()
   })
 
   it("should be able to select an end date", () => {
     const selectedDate = new Date("2023-01-01T00:00:00")
-    renderDateSection()
+    renderDatePicker()
     moveEndDate(selectedDate)
     expect(selectedEndDate(selectedDate)).toBeDisplayed()
   })
 })
 
-const renderDateSection = () => {
+const renderDatePicker = () => {
   render(
     <EventForm
       initialValues={baseTestEventFormValues}
@@ -39,7 +39,7 @@ const renderDateSection = () => {
       onDismiss={jest.fn()}
     >
       <SelectedDates />
-      <EventFormDateSection />
+      <EventFormDatePicker />
     </EventForm>
   )
 }

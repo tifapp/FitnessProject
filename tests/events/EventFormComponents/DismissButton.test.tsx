@@ -4,9 +4,13 @@ import {
   EventFormTitleField,
   EventFormValues
 } from "@components/eventForm"
-import { baseTestEventFormValues, editEventTitle } from "./helpers"
+import {
+  attemptDismiss,
+  baseTestEventFormValues,
+  editEventTitle
+} from "./helpers"
 import { captureAlerts } from "../../helpers/Alerts"
-import { fireEvent, render, screen } from "@testing-library/react-native"
+import { render } from "@testing-library/react-native"
 
 describe("EventFormDismissButton tests", () => {
   beforeEach(() => jest.resetAllMocks())
@@ -68,8 +72,4 @@ const dismissConfirmationAlert = async () => {
 
 const dismissFormFromConfirmationAlert = async () => {
   await tapAlertButton("Discard")
-}
-
-const attemptDismiss = () => {
-  fireEvent.press(screen.getByLabelText("Cancel"))
 }

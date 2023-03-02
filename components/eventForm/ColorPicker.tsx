@@ -5,7 +5,7 @@ import { EventColors } from "@lib/events/EventColors"
 import React from "react"
 import { useEventFormField } from "."
 
-export const EventFormColorSection = () => {
+export const EventFormColorPicker = () => {
   const [color, setColor] = useEventFormField("color")
   return (
     <HexColorPicker

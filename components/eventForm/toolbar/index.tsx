@@ -42,7 +42,7 @@ const AdvancedTab = () => {
   const { openSection } = useToolbar()
   return (
     <TouchableOpacity
-      accessibilityLabel="Advanced"
+      accessibilityLabel="Advanced Settings"
       onPress={() => openSection("advanced")}
     />
   )

@@ -1,6 +1,6 @@
 import {
   EventForm,
-  EventFormColorSection,
+  EventFormColorPicker,
   useEventFormContext
 } from "@components/eventForm"
 import { HexColor } from "@lib/Color"
@@ -12,7 +12,7 @@ import { View } from "react-native"
 import { baseTestEventFormValues } from "./helpers"
 import "../../helpers/Matchers"
 
-describe("EventFormColorSection tests", () => {
+describe("EventFormColorPicker tests", () => {
   test("selecting every event color", () => {
     renderColorSection()
     testSelectColor("Blue", EventColors.Blue)
@@ -44,7 +44,7 @@ const renderColorSection = () => {
     >
       <SelectedColor />
       <SetDependencyValue forKey={hapticsDependencyKey} value={jest.fn()}>
-        <EventFormColorSection />
+        <EventFormColorPicker />
       </SetDependencyValue>
     </EventForm>
   )

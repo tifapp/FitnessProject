@@ -2,7 +2,7 @@ import React from "react"
 import { Switch } from "react-native"
 import { useEventFormField } from "."
 
-export const EventFormAdvancedSettingsSection = () => {
+export const EventFormAdvancedSettings = () => {
   const [shouldHide, setShouldHide] = useEventFormField(
     "shouldHideAfterStartDate"
   )

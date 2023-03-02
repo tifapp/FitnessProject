@@ -1,6 +1,6 @@
 import {
   EventForm,
-  EventFormAdvancedSettingsSection,
+  EventFormAdvancedSettings,
   useEventFormContext
 } from "@components/eventForm"
 import { fireEvent, render, screen } from "@testing-library/react-native"
@@ -8,21 +8,21 @@ import { View } from "react-native"
 import "../../helpers/Matchers"
 import { baseTestEventFormValues } from "./helpers"
 
-describe("EventFormAdvancedSettingsSection tests", () => {
+describe("EventFormAdvancedSettings tests", () => {
   it("should be able to allow hiding after start date setting", () => {
-    renderAdvancedSettingsSection({ shouldHideAfterStartDate: false })
+    renderAdvancedSettings({ shouldHideAfterStartDate: false })
     toggleHideSetting(true)
     expect(selectedHideSettingValue(true)).toBeDisplayed()
   })
 
   it("should be able to disallow hiding after start date setting", () => {
-    renderAdvancedSettingsSection({ shouldHideAfterStartDate: true })
+    renderAdvancedSettings({ shouldHideAfterStartDate: true })
     toggleHideSetting(false)
     expect(selectedHideSettingValue(false)).toBeDisplayed()
   })
 })
 
-const renderAdvancedSettingsSection = ({
+const renderAdvancedSettings = ({
   shouldHideAfterStartDate
 }: {
   shouldHideAfterStartDate: boolean
@@ -34,7 +34,7 @@ const renderAdvancedSettingsSection = ({
       onDismiss={jest.fn()}
     >
       <SelectedSettings />
-      <EventFormAdvancedSettingsSection />
+      <EventFormAdvancedSettings />
     </EventForm>
   )
 }

@@ -9,6 +9,10 @@ import React, {
   useRef,
   useState
 } from "react"
+import { View } from "react-native"
+import { EventFormAdvancedSettings } from ".."
+import { EventFormColorPicker } from "../ColorPicker"
+import { EventFormDatePicker } from "../DatePicker"
 import { ToolbarSectionView } from "./SectionView"
 
 export type ToolbarSection = "date" | "color" | "advanced"
@@ -47,10 +51,20 @@ export const ToolbarProvider = ({ children }: ToolbarProviderProps) => {
           snapPoints={bottomSheetSnapPoints}
         >
           {section === "date" && (
-            <ToolbarSectionView title="Start and End Dates" />
+            <ToolbarSectionView title="Start and End Dates">
+              <EventFormDatePicker />
+            </ToolbarSectionView>
           )}
-          {section === "color" && <ToolbarSectionView title="Pick Color" />}
-          {section === "advanced" && <ToolbarSectionView title="Advanced" />}
+          {section === "color" && (
+            <ToolbarSectionView title="Pick Color">
+              <EventFormColorPicker />
+            </ToolbarSectionView>
+          )}
+          {section === "advanced" && (
+            <ToolbarSectionView title="Advanced">
+              <EventFormAdvancedSettings />
+            </ToolbarSectionView>
+          )}
         </BottomSheetModal>
       </BottomSheetModalProvider>
       {children}

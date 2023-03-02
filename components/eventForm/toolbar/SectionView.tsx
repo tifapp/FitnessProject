@@ -1,12 +1,16 @@
-import React from "react"
+import React, { ReactNode } from "react"
 import { Text, TouchableOpacity, View } from "react-native"
 import { useToolbar } from "./ToolbarProvider"
 
 export type ToolbarSectionProps = {
   title: string
+  children: ReactNode
 }
 
-export const ToolbarSectionView = ({ title }: ToolbarSectionProps) => {
+export const ToolbarSectionView = ({
+  title,
+  children
+}: ToolbarSectionProps) => {
   const { dismissCurrentSection } = useToolbar()
   return (
     <View>
@@ -15,6 +19,7 @@ export const ToolbarSectionView = ({ title }: ToolbarSectionProps) => {
         onPress={dismissCurrentSection}
       />
       <Text>{title}</Text>
+      {children}
     </View>
   )
 }
