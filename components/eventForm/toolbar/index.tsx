@@ -2,8 +2,6 @@ import React from "react"
 import { Button, Text } from "react-native"
 import { useEventFormContext } from ".."
 import { TouchableOpacity } from "react-native-gesture-handler"
-import { HexColorPickerOption } from "@components/formComponents/HexColorPicker"
-import { EventColors } from "@lib/events/EventColors"
 import { ToolbarProvider, useToolbar } from "./ToolbarProvider"
 
 /**
