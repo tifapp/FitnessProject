@@ -59,7 +59,7 @@ describe("EventFormScreen tests", () => {
   it("should present an error alert when a submission error occurs", async () => {
     submitAction.mockRejectedValue(new Error())
     renderEventFormScreen(baseTestEventFormValues)
-    editEventTitle("Test")
+    editEventDescription("Nice")
     submit()
 
     await waitFor(() => expect(alertPresentationSpy).toHaveBeenCalled())
