@@ -81,6 +81,7 @@ const renderLocationField = (locationInfo?: EventFormLocationInfo) => {
             locationInfo
           }}
           onSubmit={jest.fn()}
+          onDismiss={jest.fn()}
         >
           <EventFormLocationBanner />
         </EventForm>

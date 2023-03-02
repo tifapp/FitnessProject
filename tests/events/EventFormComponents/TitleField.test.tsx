@@ -10,7 +10,7 @@ import { baseTestEventFormValues, editEventTitle } from "./helpers"
 import "../../helpers/Matchers"
 
 describe("EventFormTitleField tests", () => {
-  it("cannot hold a title longer than 75 characters", () => {
+  it("truncates title at 75 characters", () => {
     renderTitleField()
     editEventTitle("a".repeat(76))
     expect(currentTitle("a".repeat(75))).toBeDisplayed()
