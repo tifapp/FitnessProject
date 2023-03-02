@@ -13,25 +13,25 @@ import React, {
 import { EventFormAdvancedSettings } from ".."
 import { EventFormColorPicker } from "../ColorPicker"
 import { EventFormDatePicker } from "../DatePicker"
-import { ToolbarSectionView } from "./SectionView"
+import { _ToolbarSectionView } from "./SectionView"
 
-export type ToolbarSection = "date" | "color" | "advanced"
+export type _ToolbarSection = "date" | "color" | "advanced"
 
-export type ToolbarContextValues = {
-  openSection: (section: ToolbarSection) => void
+export type _ToolbarContextValues = {
+  openSection: (section: _ToolbarSection) => void
   dismissCurrentSection: () => void
 }
 
 // NB: Programmer error if this is ever undefined.
-export const useToolbar = () => useContext(ToolbarContext)!!
+export const _useToolbar = () => useContext(ToolbarContext)!!
 
-export type ToolbarProviderProps = {
+export type _ToolbarProviderProps = {
   children: ReactNode
 }
 
-export const ToolbarProvider = ({ children }: ToolbarProviderProps) => {
+export const _ToolbarProvider = ({ children }: _ToolbarProviderProps) => {
   const bottomSheetRef = useRef<BottomSheetModal>(null)
-  const [section, setSection] = useState<ToolbarSection | undefined>()
+  const [section, setSection] = useState<_ToolbarSection | undefined>()
 
   return (
     <ToolbarContext.Provider
@@ -55,19 +55,19 @@ export const ToolbarProvider = ({ children }: ToolbarProviderProps) => {
           backdropComponent={BottomSheetBackdrop}
         >
           {section === "date" && (
-            <ToolbarSectionView title="Start and End Dates">
+            <_ToolbarSectionView title="Start and End Dates">
               <EventFormDatePicker />
-            </ToolbarSectionView>
+            </_ToolbarSectionView>
           )}
           {section === "color" && (
-            <ToolbarSectionView title="Pick Color">
+            <_ToolbarSectionView title="Pick Color">
               <EventFormColorPicker />
-            </ToolbarSectionView>
+            </_ToolbarSectionView>
           )}
           {section === "advanced" && (
-            <ToolbarSectionView title="Advanced">
+            <_ToolbarSectionView title="Advanced">
               <EventFormAdvancedSettings />
-            </ToolbarSectionView>
+            </_ToolbarSectionView>
           )}
         </BottomSheetModal>
       </BottomSheetModalProvider>
@@ -77,6 +77,6 @@ export const ToolbarProvider = ({ children }: ToolbarProviderProps) => {
 
 const bottomSheetSnapPoints = ["50%"]
 
-const ToolbarContext = createContext<ToolbarContextValues | undefined>(
+const ToolbarContext = createContext<_ToolbarContextValues | undefined>(
   undefined
 )

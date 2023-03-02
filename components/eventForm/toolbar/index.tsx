@@ -9,7 +9,11 @@ import {
   ViewStyle
 } from "react-native"
 import { useEventFormContext } from ".."
-import { ToolbarProvider, ToolbarSection, useToolbar } from "./ToolbarProvider"
+import {
+  _ToolbarProvider,
+  _ToolbarSection,
+  _useToolbar
+} from "./ToolbarProvider"
 import { MaterialIcons } from "@expo/vector-icons"
 
 /**
@@ -20,13 +24,13 @@ import { MaterialIcons } from "@expo/vector-icons"
  */
 export const EventFormToolbar = () => {
   return (
-    <ToolbarProvider>
+    <_ToolbarProvider>
       <ScrollView horizontal contentContainerStyle={styles.scrollView}>
         <DateTab />
         <ColorTab />
         <AdvancedSettingsTab />
       </ScrollView>
-    </ToolbarProvider>
+    </_ToolbarProvider>
   )
 }
 
@@ -78,7 +82,7 @@ const SectionTabIcon = ({ name, style = {} }: SectionTabIconProps) => (
 
 type SectionTabProps = {
   children: ReactNode
-  section: ToolbarSection
+  section: _ToolbarSection
   accessibilityLabel: string
 }
 
@@ -87,7 +91,7 @@ const SectionTab = ({
   section,
   accessibilityLabel
 }: SectionTabProps) => {
-  const { openSection } = useToolbar()
+  const { openSection } = _useToolbar()
   return (
     <TouchableOpacity
       onPress={() => openSection(section)}

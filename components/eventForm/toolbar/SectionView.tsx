@@ -1,17 +1,17 @@
 import React, { ReactNode } from "react"
 import { Text, TouchableOpacity, View } from "react-native"
-import { useToolbar } from "./ToolbarProvider"
+import { _useToolbar } from "./ToolbarProvider"
 
-export type ToolbarSectionProps = {
+export type _ToolbarSectionProps = {
   title: string
   children: ReactNode
 }
 
-export const ToolbarSectionView = ({
+export const _ToolbarSectionView = ({
   title,
   children
-}: ToolbarSectionProps) => {
-  const { dismissCurrentSection } = useToolbar()
+}: _ToolbarSectionProps) => {
+  const { dismissCurrentSection } = _useToolbar()
   return (
     <View>
       <TouchableOpacity
