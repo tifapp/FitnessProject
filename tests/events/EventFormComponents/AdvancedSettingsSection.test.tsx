@@ -31,6 +31,7 @@ const renderAdvancedSettingsSection = ({
     <EventForm
       initialValues={{ ...baseTestEventFormValues, shouldHideAfterStartDate }}
       onSubmit={jest.fn()}
+      onDismiss={jest.fn()}
     >
       <SelectedSettings />
       <EventFormAdvancedSettingsSection />

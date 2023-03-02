@@ -20,6 +20,11 @@ export type EventFormProps = {
    */
   onSubmit: (update: EditEventInput) => Promise<void>
 
+  /**
+   * A handler for the dismissal of this form.
+   */
+  onDismiss: () => void
+
   children: ReactNode
 }
 
@@ -29,6 +34,7 @@ export type EventFormProps = {
 export const EventForm = ({
   initialValues,
   onSubmit,
+  onDismiss,
   children
 }: EventFormProps) => {
   const formMethods = useForm({
@@ -42,6 +48,7 @@ export const EventForm = ({
           submit: async (update) => {
             await handleSubmit(async () => await onSubmit(update))()
           },
+          dismiss: onDismiss,
           hasEdited: formState.isDirty
         }}
       >
@@ -85,6 +92,11 @@ export type EventFormContextValues = {
   submit: (update: EditEventInput) => Promise<void>
 
   /**
+   * Dismisses this form.
+   */
+  dismiss: () => void
+
+  /**
    * True if the form has been editted.
    */
   hasEdited: boolean
@@ -115,10 +127,11 @@ To fix this, make sure to wrap the event form component with EventForm.
 `
 
 export * from "./TextFields"
-export * from "./ActionButtons"
+export * from "./SubmitButton"
 export * from "./toolbar"
 export * from "./LocationBanner"
 export * from "./EventFormValues"
 export * from "./ColorSection"
 export * from "./AdvancedSettingsSection"
 export * from "./DateSection"
+export * from "./DismissButton"

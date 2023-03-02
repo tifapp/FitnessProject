@@ -95,7 +95,11 @@ const testButtonLabel = "Test Submit"
 
 const renderSubmitButton = (values: EventFormValues) => {
   render(
-    <EventForm initialValues={values} onSubmit={submitAction}>
+    <EventForm
+      initialValues={values}
+      onSubmit={submitAction}
+      onDismiss={jest.fn()}
+    >
       <EventFormTitleField />
       <EventFormSubmitButton label={testButtonLabel} />
     </EventForm>

@@ -51,9 +51,13 @@ const dismissAction = jest.fn()
 
 const renderDismissButton = (values: EventFormValues) => {
   render(
-    <EventForm initialValues={values} onSubmit={jest.fn()}>
+    <EventForm
+      initialValues={values}
+      onSubmit={jest.fn()}
+      onDismiss={dismissAction}
+    >
       <EventFormTitleField />
-      <EventFormDismissButton onDismiss={dismissAction} />
+      <EventFormDismissButton />
     </EventForm>
   )
 }

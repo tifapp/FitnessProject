@@ -80,7 +80,11 @@ describe("EventFormToolbar tests", () => {
 
 const renderToolbar = (values: EventFormValues) => {
   render(
-    <EventForm initialValues={values} onSubmit={jest.fn()}>
+    <EventForm
+      initialValues={values}
+      onSubmit={jest.fn()}
+      onDismiss={jest.fn()}
+    >
       <EventFormToolbar />
     </EventForm>
   )

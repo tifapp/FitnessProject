@@ -37,7 +37,11 @@ const testSelectColor = (colorName: string, expected: HexColor) => {
 
 const renderColorSection = () => {
   render(
-    <EventForm initialValues={baseTestEventFormValues} onSubmit={jest.fn()}>
+    <EventForm
+      initialValues={baseTestEventFormValues}
+      onSubmit={jest.fn()}
+      onDismiss={jest.fn()}
+    >
       <SelectedColor />
       <SetDependencyValue forKey={hapticsDependencyKey} value={jest.fn()}>
         <EventFormColorSection />

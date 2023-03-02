@@ -33,7 +33,11 @@ describe("EventFormDateSection tests", () => {
 
 const renderDateSection = () => {
   render(
-    <EventForm initialValues={baseTestEventFormValues} onSubmit={jest.fn()}>
+    <EventForm
+      initialValues={baseTestEventFormValues}
+      onSubmit={jest.fn()}
+      onDismiss={jest.fn()}
+    >
       <SelectedDates />
       <EventFormDateSection />
     </EventForm>
