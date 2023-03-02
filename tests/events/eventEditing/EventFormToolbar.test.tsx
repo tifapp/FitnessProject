@@ -25,7 +25,7 @@ describe("EventFormToolbar tests", () => {
       ...baseTestEventValues,
       dateRange: testDateRange
     })
-    expect(testFormattedDateRange()).toBeDisplayed()
+    expect(formattedTestDateRange()).toBeDisplayed()
   })
 
   test("opening the date section", () => {
@@ -39,11 +39,27 @@ describe("EventFormToolbar tests", () => {
     expect(dateSectionTitle()).toBeDisplayed()
   })
 
+  test("closing the date section", () => {
+    renderToolbar({ ...baseTestEventValues, dateRange: testDateRange })
+    openDateSection()
+    closeCurrentSection()
+    expect(dateSectionTitle()).not.toBeDisplayed()
+    expect(closeButton()).not.toBeDisplayed()
+  })
+
   test("opening the color section", () => {
     renderToolbar({ ...baseTestEventValues, color: EventColors.Red })
     expect(colorSectionTitle()).not.toBeDisplayed()
     openColorSection()
     expect(colorSectionTitle()).toBeDisplayed()
+  })
+
+  test("closing the color section", () => {
+    renderToolbar(baseTestEventValues)
+    openColorSection()
+    closeCurrentSection()
+    expect(colorSectionTitle()).not.toBeDisplayed()
+    expect(closeButton()).not.toBeDisplayed()
   })
 
   test("opening the advanced section", () => {
@@ -53,7 +69,7 @@ describe("EventFormToolbar tests", () => {
     expect(advancedSectionTitle()).toBeDisplayed()
   })
 
-  test("closing the current section", () => {
+  test("closing the advanced section", () => {
     renderToolbar(baseTestEventValues)
     openAdvancedSection()
     closeCurrentSection()
@@ -71,7 +87,7 @@ const renderToolbar = (values: EventFormValues) => {
 }
 
 const openDateSection = () => {
-  fireEvent.press(testFormattedDateRange()!!)
+  fireEvent.press(formattedTestDateRange()!!)
 }
 
 const openColorSection = () => {
@@ -102,6 +118,6 @@ const closeButton = () => {
   return screen.queryByLabelText("Close Section")
 }
 
-const testFormattedDateRange = () => {
+const formattedTestDateRange = () => {
   return screen.queryByText("Today 8am - 10am")
 }
