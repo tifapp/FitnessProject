@@ -5,7 +5,7 @@ import {
 } from "@components/eventForm"
 import { dateRange } from "@lib/Date"
 import { fireEvent, render, screen } from "@testing-library/react-native"
-import { baseTestEventValues } from "./helpers"
+import { baseTestEventFormValues } from "./helpers"
 import "../../helpers/Matchers"
 import { EventColors } from "@lib/events/EventColors"
 
@@ -22,7 +22,7 @@ describe("EventFormToolbar tests", () => {
 
   it("should represent the date tab with a formatted date range", () => {
     renderToolbar({
-      ...baseTestEventValues,
+      ...baseTestEventFormValues,
       dateRange: testDateRange
     })
     expect(formattedTestDateRange()).toBeDisplayed()
@@ -30,7 +30,7 @@ describe("EventFormToolbar tests", () => {
 
   test("opening the date section", () => {
     renderToolbar({
-      ...baseTestEventValues,
+      ...baseTestEventFormValues,
       dateRange: testDateRange
     })
 
@@ -40,7 +40,7 @@ describe("EventFormToolbar tests", () => {
   })
 
   test("closing the date section", () => {
-    renderToolbar({ ...baseTestEventValues, dateRange: testDateRange })
+    renderToolbar({ ...baseTestEventFormValues, dateRange: testDateRange })
     openDateSection()
     closeCurrentSection()
     expect(dateSectionTitle()).not.toBeDisplayed()
@@ -48,14 +48,14 @@ describe("EventFormToolbar tests", () => {
   })
 
   test("opening the color section", () => {
-    renderToolbar({ ...baseTestEventValues, color: EventColors.Red })
+    renderToolbar({ ...baseTestEventFormValues, color: EventColors.Red })
     expect(colorSectionTitle()).not.toBeDisplayed()
     openColorSection()
     expect(colorSectionTitle()).toBeDisplayed()
   })
 
   test("closing the color section", () => {
-    renderToolbar(baseTestEventValues)
+    renderToolbar(baseTestEventFormValues)
     openColorSection()
     closeCurrentSection()
     expect(colorSectionTitle()).not.toBeDisplayed()
@@ -63,14 +63,14 @@ describe("EventFormToolbar tests", () => {
   })
 
   test("opening the advanced section", () => {
-    renderToolbar(baseTestEventValues)
+    renderToolbar(baseTestEventFormValues)
     expect(advancedSectionTitle()).not.toBeDisplayed()
     openAdvancedSection()
     expect(advancedSectionTitle()).toBeDisplayed()
   })
 
   test("closing the advanced section", () => {
-    renderToolbar(baseTestEventValues)
+    renderToolbar(baseTestEventFormValues)
     openAdvancedSection()
     closeCurrentSection()
     expect(advancedSectionTitle()).not.toBeDisplayed()

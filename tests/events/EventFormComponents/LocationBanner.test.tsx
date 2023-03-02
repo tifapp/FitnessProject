@@ -9,7 +9,7 @@ import {
   mockReverseGeocodedPlacemarks,
   unimplementedGeocoding
 } from "../../helpers/Geocoding"
-import { baseTestEventValues } from "./helpers"
+import { baseTestEventFormValues } from "./helpers"
 import "../../helpers/Matchers"
 import { SetDependencyValue } from "@lib/dependencies"
 import { TestQueryClientProvider } from "../../helpers/ReactQuery"
@@ -18,7 +18,7 @@ import {
   unknownLocationPlacemark
 } from "../../location/helpers"
 
-const testLocation = baseTestEventValues.locationInfo.coordinates
+const testLocation = baseTestEventFormValues.locationInfo.coordinates
 const testLocationName = baseTestPlacemark.name
 const testLocationAddress = "1234 Cupertino Rd, Cupertino, CA 95104"
 
@@ -77,7 +77,7 @@ const renderLocationField = (locationInfo?: EventFormLocationInfo) => {
       >
         <EventForm
           initialValues={{
-            ...baseTestEventValues,
+            ...baseTestEventFormValues,
             locationInfo
           }}
           onSubmit={jest.fn()}

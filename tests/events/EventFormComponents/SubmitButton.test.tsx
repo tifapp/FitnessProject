@@ -12,7 +12,7 @@ import {
 } from "@testing-library/react-native"
 import { neverPromise } from "../../helpers/Promise"
 import "../../helpers/Matchers"
-import { baseTestEventValues, editEventTitle } from "./helpers"
+import { baseTestEventFormValues, editEventTitle } from "./helpers"
 import { EventColors } from "@lib/events/EventColors"
 import { captureAlerts } from "../../helpers/Alerts"
 
@@ -20,39 +20,39 @@ const submitAction = jest.fn()
 
 describe("EventFormSubmitButton tests", () => {
   it("should be disbaled when event has not been edited", () => {
-    renderSubmitButton(baseTestEventValues)
+    renderSubmitButton(baseTestEventFormValues)
     expect(submitButton()).not.toBeEnabled()
   })
 
   it("should be disabled when event has an empty title", () => {
-    renderSubmitButton({ ...baseTestEventValues, title: "" })
+    renderSubmitButton({ ...baseTestEventFormValues, title: "" })
     expect(submitButton()).not.toBeEnabled()
   })
 
   it("should be disabled when event has no location", () => {
-    renderSubmitButton({ ...baseTestEventValues, locationInfo: undefined })
+    renderSubmitButton({ ...baseTestEventFormValues, locationInfo: undefined })
     expect(submitButton()).not.toBeEnabled()
   })
 
   it("should be disabled when submitting", async () => {
     submitAction.mockImplementation(neverPromise)
-    renderSubmitButton(baseTestEventValues)
+    renderSubmitButton(baseTestEventFormValues)
     editEventTitle(editedEventTitle)
     submit()
     await waitFor(() => expect(submitButton()).not.toBeEnabled())
   })
 
   it("should parse the current event values into an update input on submission", async () => {
-    renderSubmitButton(baseTestEventValues)
+    renderSubmitButton(baseTestEventFormValues)
     editEventTitle(editedEventTitle)
     submit()
     await waitFor(() => {
       expect(submitAction).toHaveBeenCalledWith({
         title: editedEventTitle,
-        description: baseTestEventValues.description,
-        location: baseTestEventValues.locationInfo.coordinates,
+        description: baseTestEventFormValues.description,
+        location: baseTestEventFormValues.locationInfo.coordinates,
         color: EventColors.Red,
-        dateRange: baseTestEventValues.dateRange,
+        dateRange: baseTestEventFormValues.dateRange,
         shouldHideAfterStartDate: false,
         radiusMeters: 0
       })
@@ -60,7 +60,7 @@ describe("EventFormSubmitButton tests", () => {
   })
 
   it("should make the description undefined when empty in submitted update input", async () => {
-    renderSubmitButton({ ...baseTestEventValues, description: "" })
+    renderSubmitButton({ ...baseTestEventFormValues, description: "" })
     editEventTitle(editedEventTitle)
     submit()
     await waitFor(() => {
@@ -72,7 +72,7 @@ describe("EventFormSubmitButton tests", () => {
 
   it("should re-enable submissions after submission finishes", async () => {
     submitAction.mockImplementation(Promise.resolve)
-    renderSubmitButton(baseTestEventValues)
+    renderSubmitButton(baseTestEventFormValues)
     editEventTitle(editedEventTitle)
     submit()
     await waitFor(() => expect(submitButton()).toBeEnabled())
@@ -80,7 +80,7 @@ describe("EventFormSubmitButton tests", () => {
 
   it("should present an error alert when something goes wrong with the submission", async () => {
     submitAction.mockRejectedValue(new Error("lmao"))
-    renderSubmitButton(baseTestEventValues)
+    renderSubmitButton(baseTestEventFormValues)
     editEventTitle(editedEventTitle)
     submit()
     await waitFor(() => expect(alertPresentationSpy).toHaveBeenCalled())

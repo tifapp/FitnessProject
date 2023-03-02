@@ -9,7 +9,7 @@ import { EventColors } from "@lib/events/EventColors"
 import { hapticsDependencyKey } from "@lib/Haptics"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import { View } from "react-native"
-import { baseTestEventValues } from "./helpers"
+import { baseTestEventFormValues } from "./helpers"
 import "../../helpers/Matchers"
 
 describe("EventFormColorSection tests", () => {
@@ -37,7 +37,7 @@ const testSelectColor = (colorName: string, expected: HexColor) => {
 
 const renderColorSection = () => {
   render(
-    <EventForm initialValues={baseTestEventValues} onSubmit={jest.fn()}>
+    <EventForm initialValues={baseTestEventFormValues} onSubmit={jest.fn()}>
       <SelectedColor />
       <SetDependencyValue forKey={hapticsDependencyKey} value={jest.fn()}>
         <EventFormColorSection />

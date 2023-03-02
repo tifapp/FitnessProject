@@ -4,7 +4,7 @@ import {
   EventFormTitleField,
   EventFormValues
 } from "@components/eventForm"
-import { baseTestEventValues, editEventTitle } from "./helpers"
+import { baseTestEventFormValues, editEventTitle } from "./helpers"
 import { captureAlerts } from "../../helpers/Alerts"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 
@@ -12,14 +12,14 @@ describe("EventFormDismissButton tests", () => {
   beforeEach(() => jest.resetAllMocks())
 
   it("should cleanly dismiss when event has not been edited", () => {
-    renderDismissButton(baseTestEventValues)
+    renderDismissButton(baseTestEventFormValues)
     attemptDismiss()
     expect(dismissAction).toHaveBeenCalled()
     expect(alertPresentationSpy).not.toHaveBeenCalled()
   })
 
   it("should present a confirmation alert when dismissing after the event has been edited", () => {
-    renderDismissButton(baseTestEventValues)
+    renderDismissButton(baseTestEventFormValues)
     editEventTitle(editedEventTitle)
     attemptDismiss()
     expect(dismissAction).not.toHaveBeenCalled()
@@ -27,7 +27,7 @@ describe("EventFormDismissButton tests", () => {
   })
 
   it("should allow dismissing the confirmation alert without dismissing the form", async () => {
-    renderDismissButton(baseTestEventValues)
+    renderDismissButton(baseTestEventFormValues)
     editEventTitle(editedEventTitle)
     attemptDismiss()
     await dismissConfirmationAlert()
@@ -35,7 +35,7 @@ describe("EventFormDismissButton tests", () => {
   })
 
   it("should be able to dismiss the form from the confirmation alert", async () => {
-    renderDismissButton(baseTestEventValues)
+    renderDismissButton(baseTestEventFormValues)
     editEventTitle(editedEventTitle)
     attemptDismiss()
     await dismissFormFromConfirmationAlert()
@@ -45,7 +45,7 @@ describe("EventFormDismissButton tests", () => {
 
 const { alertPresentationSpy, tapAlertButton } = captureAlerts()
 
-const editedEventTitle = baseTestEventValues.title + " Updated"
+const editedEventTitle = baseTestEventFormValues.title + " Updated"
 
 const dismissAction = jest.fn()
 

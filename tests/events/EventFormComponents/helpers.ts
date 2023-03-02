@@ -3,7 +3,7 @@ import { EventColors } from "@lib/events/EventColors"
 import { fireEvent, screen } from "@testing-library/react-native"
 import { setDateTimePickerDate } from "../../helpers/DateTimePicker"
 
-export const baseTestEventValues = {
+export const baseTestEventFormValues = {
   title: "Test Event",
   description: "Hello world this is a test",
   locationInfo: {
