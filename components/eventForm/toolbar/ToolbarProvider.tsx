@@ -9,7 +9,6 @@ import React, {
   useRef,
   useState
 } from "react"
-import { View } from "react-native"
 import { EventFormAdvancedSettings } from ".."
 import { EventFormColorPicker } from "../ColorPicker"
 import { EventFormDatePicker } from "../DatePicker"
@@ -22,6 +21,7 @@ export type ToolbarContextValues = {
   dismissCurrentSection: () => void
 }
 
+// NB: Programmer error if this is ever undefined.
 export const useToolbar = () => useContext(ToolbarContext)!!
 
 export type ToolbarProviderProps = {

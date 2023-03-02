@@ -3,6 +3,9 @@ import React from "react"
 import { View } from "react-native"
 import { useEventFormField } from "."
 
+/**
+ * A date picker for an event form.
+ */
 export const EventFormDatePicker = () => {
   const [dateRange, setDateRange] = useEventFormField("dateRange")
   return (
