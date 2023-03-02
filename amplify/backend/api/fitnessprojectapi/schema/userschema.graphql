@@ -22,7 +22,7 @@ type User @model @auth(rules: [{allow: private, operations: [read]}, {allow: own
   friendRequestPrivacy: Int
   messagesPrivacy: Int
   isVerified: Boolean @auth(rules: [{allow: private, operations: [read]}, {allow: private, provider: iam, operations: [read, create, update, delete]}, {allow: groups, groups: ["Admins"], operations: [read, create, update, delete]}])
-  event: Event @belongsTo
+  ##event: Event @belongsTo
 }
 
 input CreateUserInput {

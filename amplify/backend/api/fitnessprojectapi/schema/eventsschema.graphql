@@ -31,7 +31,7 @@ type Event @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"}, 
   endDateTime: AWSDateTime!
   name: String
   location: LocationEvent
-  users: [User] @hasMany 
+  ##users: [User] @hasMany 
 }
 
 """This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when creating a new message."""

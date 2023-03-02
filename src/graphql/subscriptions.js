@@ -384,31 +384,8 @@ export const onCreateUser = /* GraphQL */ `
       friendRequestPrivacy
       messagesPrivacy
       isVerified
-      event {
-        comments
-        createdAt
-        updatedAt
-        userId
-        eventOwner
-        description
-        host
-        parentId
-        radius
-        startDateTime
-        endDateTime
-        name
-        location {
-          latitude
-          longitude
-        }
-        users {
-          nextToken
-        }
-      }
       createdAt
       updatedAt
-      eventUsersId
-      eventUsersUserId
     }
   }
 `;
@@ -434,31 +411,8 @@ export const onUpdateUser = /* GraphQL */ `
       friendRequestPrivacy
       messagesPrivacy
       isVerified
-      event {
-        comments
-        createdAt
-        updatedAt
-        userId
-        eventOwner
-        description
-        host
-        parentId
-        radius
-        startDateTime
-        endDateTime
-        name
-        location {
-          latitude
-          longitude
-        }
-        users {
-          nextToken
-        }
-      }
       createdAt
       updatedAt
-      eventUsersId
-      eventUsersUserId
     }
   }
 `;
@@ -484,31 +438,8 @@ export const onDeleteUser = /* GraphQL */ `
       friendRequestPrivacy
       messagesPrivacy
       isVerified
-      event {
-        comments
-        createdAt
-        updatedAt
-        userId
-        eventOwner
-        description
-        host
-        parentId
-        radius
-        startDateTime
-        endDateTime
-        name
-        location {
-          latitude
-          longitude
-        }
-        users {
-          nextToken
-        }
-      }
       createdAt
       updatedAt
-      eventUsersId
-      eventUsersUserId
     }
   }
 `;

@@ -345,27 +345,6 @@ export const getEvent = /* GraphQL */ `
         latitude
         longitude
       }
-      users {
-        items {
-          id
-          identityId
-          name
-          age
-          gender
-          bio
-          goals
-          status
-          deviceToken
-          friendRequestPrivacy
-          messagesPrivacy
-          isVerified
-          createdAt
-          updatedAt
-          eventUsersId
-          eventUsersUserId
-        }
-        nextToken
-      }
     }
   }
 `;
@@ -402,9 +381,6 @@ export const listEvents = /* GraphQL */ `
         location {
           latitude
           longitude
-        }
-        users {
-          nextToken
         }
       }
       nextToken
@@ -445,9 +421,6 @@ export const eventsByUser = /* GraphQL */ `
           latitude
           longitude
         }
-        users {
-          nextToken
-        }
       }
       nextToken
     }
@@ -486,9 +459,6 @@ export const eventsByUserId = /* GraphQL */ `
         location {
           latitude
           longitude
-        }
-        users {
-          nextToken
         }
       }
       nextToken
@@ -529,9 +499,6 @@ export const eventsByDate = /* GraphQL */ `
           latitude
           longitude
         }
-        users {
-          nextToken
-        }
       }
       nextToken
     }
@@ -570,9 +537,6 @@ export const searchEvents = /* GraphQL */ `
         location {
           latitude
           longitude
-        }
-        users {
-          nextToken
         }
       }
       nextToken
@@ -1015,31 +979,8 @@ export const getUser = /* GraphQL */ `
       friendRequestPrivacy
       messagesPrivacy
       isVerified
-      event {
-        comments
-        createdAt
-        updatedAt
-        userId
-        eventOwner
-        description
-        host
-        parentId
-        radius
-        startDateTime
-        endDateTime
-        name
-        location {
-          latitude
-          longitude
-        }
-        users {
-          nextToken
-        }
-      }
       createdAt
       updatedAt
-      eventUsersId
-      eventUsersUserId
     }
   }
 `;
@@ -1067,24 +1008,8 @@ export const listUsers = /* GraphQL */ `
         friendRequestPrivacy
         messagesPrivacy
         isVerified
-        event {
-          comments
-          createdAt
-          updatedAt
-          userId
-          eventOwner
-          description
-          host
-          parentId
-          radius
-          startDateTime
-          endDateTime
-          name
-        }
         createdAt
         updatedAt
-        eventUsersId
-        eventUsersUserId
       }
       nextToken
     }
