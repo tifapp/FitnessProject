@@ -1,13 +1,7 @@
 import React from "react"
 import { Alert, Text, TouchableOpacity } from "react-native"
 import { MaterialIcons } from "@expo/vector-icons"
-import {
-  EventFormValues,
-  useEventFormContext,
-  useEventFormValue,
-  useEventFormValues
-} from "./EventForm"
-import { EditEventInput } from "@lib/events"
+import { eventEditInputFromFormValues, useEventFormContext } from "."
 
 /**
  * Props for `EventFormDismissButton`.
@@ -59,7 +53,7 @@ export const EventFormSubmitButton = ({
   label
 }: EventFormSubmitButtonProps) => {
   const submitButtonTapped = useSubmit()
-  const color = useEventFormValue("color")
+  const color = useEventFormContext().watch("color")
   const canSubmit = !!submitButtonTapped
   return (
     <TouchableOpacity
@@ -72,10 +66,10 @@ export const EventFormSubmitButton = ({
 }
 
 const useSubmit = () => {
-  const { isSubmitting, submit, hasEdited } = useEventFormContext()
-  const formValues = useEventFormValues()
-  const updateInput = eventEditInputFromFormValues(formValues)
-  const canSubmit = !!updateInput && !isSubmitting && hasEdited
+  const { formState, submit, watch } = useEventFormContext()
+  const updateInput = eventEditInputFromFormValues(watch())
+  const canSubmit =
+    !!updateInput && !formState.isSubmitting && formState.isDirty
   if (!canSubmit) return undefined
   return async () => {
     try {
@@ -89,17 +83,4 @@ const useSubmit = () => {
       )
     }
   }
-}
-
-const eventEditInputFromFormValues = (values: EventFormValues) => {
-  if (values.title.length === 0 || !values.locationInfo) return undefined
-  return {
-    title: values.title,
-    description: values.description.length > 0 ? values.description : undefined,
-    location: values.locationInfo.coordinates,
-    dateRange: values.dateRange,
-    color: values.color,
-    shouldHideAfterStartDate: values.shouldHideAfterStartDate,
-    radiusMeters: values.radiusMeters
-  } as EditEventInput
 }

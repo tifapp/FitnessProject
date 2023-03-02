@@ -1,6 +1,6 @@
 import {
   EventForm,
-  EventFormLocationField,
+  EventFormLocationBanner,
   EventFormLocationInfo
 } from "@components/eventForm"
 import { Geocoding, geocodingDependencyKey } from "@lib/location"
@@ -22,7 +22,7 @@ const testLocation = baseTestEventValues.locationInfo.coordinates
 const testLocationName = baseTestPlacemark.name
 const testLocationAddress = "1234 Cupertino Rd, Cupertino, CA 95104"
 
-describe("EventFormLocationField tests", () => {
+describe("EventFormLocationBanner tests", () => {
   beforeEach(() => (geocoding = unimplementedGeocoding()))
 
   it("should not attempt to geocode anything when no location is given", () => {
@@ -82,7 +82,7 @@ const renderLocationField = (locationInfo?: EventFormLocationInfo) => {
           }}
           onSubmit={jest.fn()}
         >
-          <EventFormLocationField />
+          <EventFormLocationBanner />
         </EventForm>
       </SetDependencyValue>
     </TestQueryClientProvider>

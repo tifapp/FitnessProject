@@ -1,41 +1,18 @@
 import { useReverseGeocodeQuery } from "@hooks/Geocoding"
 import { placemarkToFormattedAddress } from "@lib/location"
 import React from "react"
-import { Text, TextInput, View } from "react-native"
+import { Text, View } from "react-native"
 import {
-  useEventFormField,
-  useEventFormValue,
   EventFormLocationInfo,
-  EventFormPlacemarkInfo
-} from "./EventForm"
-
-/**
- * The title field for an event form.
- */
-export const EventFormTitleField = () => {
-  const [title, setTitle] = useEventFormField("title")
-  return <TextInput placeholder="Title" value={title} onChangeText={setTitle} />
-}
-
-/**
- * The description field for an event form.
- */
-export const EventFormDescriptionField = () => {
-  const [description, setDescription] = useEventFormField("description")
-  return (
-    <TextInput
-      placeholder="Description"
-      value={description}
-      onChangeText={setDescription}
-    />
-  )
-}
+  EventFormPlacemarkInfo,
+  useEventFormContext
+} from "."
 
 /**
  * Displays the selected location (if one) in the event form.
  */
-export const EventFormLocationField = () => {
-  const locationInfo = useEventFormValue("locationInfo")
+export const EventFormLocationBanner = () => {
+  const locationInfo = useEventFormContext().watch("locationInfo")
   if (!locationInfo) return <></>
   return <LocationInfoLabel {...locationInfo} />
 }

@@ -1,6 +1,6 @@
 import React from "react"
 import { Button, Text } from "react-native"
-import { useEventFormValue } from "../EventForm"
+import { useEventFormContext } from ".."
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { HexColorPickerOption } from "@components/formComponents/HexColorPicker"
 import { EventColors } from "@lib/events/EventColors"
@@ -23,7 +23,7 @@ export const EventFormToolbar = () => {
 }
 
 const DateTab = () => {
-  const dateRange = useEventFormValue("dateRange")
+  const dateRange = useEventFormContext().watch("dateRange")
   const { openSection } = useToolbar()
   return (
     <TouchableOpacity
