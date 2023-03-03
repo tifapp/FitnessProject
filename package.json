@@ -9,8 +9,7 @@
     "eject": "expo eject",
     "test": "jest",
     "prepare": "husky install",
-    "staged-lint": "lint-staged",
-    "postinstall": "patch-package"
+    "staged-lint": "lint-staged"
   },
   "dependencies": {
     "@aws-amplify/api": "^4.0.63",
