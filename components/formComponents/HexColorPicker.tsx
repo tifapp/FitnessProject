@@ -70,9 +70,7 @@ const HexColorPicker = ({
           <View
             style={{
               ...styles.option,
-              backgroundColor: option.color,
-              borderRadius: 32,
-              padding: 12
+              backgroundColor: option.color
             }}
           >
             <MaterialIcons
@@ -103,6 +101,8 @@ const styles = StyleSheet.create({
   option: {
     width: 44,
     height: 44,
+    borderRadius: 32,
+    padding: 12,
     alignSelf: "center",
     display: "flex",
     justifyContent: "center",
