@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react"
-import { ListRenderItemInfo, View } from "react-native"
+import { ListRenderItemInfo, StyleSheet, View } from "react-native"
 import BottomSheet, {
   BottomSheetFlatList,
   BottomSheetModal,
@@ -8,13 +8,12 @@ import BottomSheet, {
 import { Event } from "@lib/events/Event"
 import EventItem from "@components/EventItem"
 import NearbyActivities from "./headerComponents/NearbyActivities"
-import { Events, GraphQLEventItems } from "@lib/events/Events"
-
-let eventItems: Events
+import { eventsDependencyKey } from "@lib/events/Events"
+import { useDependencyValue } from "@lib/dependencies"
 
 const EventsList = () => {
-  eventItems = new GraphQLEventItems()
-  const ids = Array.from(new Array(10), (_, i) => String(i))
+  const eventItems = useDependencyValue(eventsDependencyKey)
+  const ids = Array.from(new Array(5), (_, i) => String(i))
   const events = eventItems.eventsWithIds(ids)
 
   // hooks
@@ -39,7 +38,9 @@ const EventsList = () => {
           <BottomSheetFlatList
             data={events}
             renderItem={({ item }: ListRenderItemInfo<Event>) => (
-              <EventItem event={item} />
+              <View style={styles.secondaryContainerStyle}>
+                <EventItem event={item} />
+              </View>
             )}
             ListHeaderComponent={<NearbyActivities />}
             stickyHeaderIndices={[0]}
@@ -49,5 +50,12 @@ const EventsList = () => {
     </BottomSheetModalProvider>
   )
 }
+
+const styles = StyleSheet.create({
+  secondaryContainerStyle: {
+    backgroundColor: "white",
+    padding: "2%"
+  }
+})
 
 export default EventsList
