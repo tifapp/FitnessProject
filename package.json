@@ -36,7 +36,6 @@
     "aws-amplify": "^5.0.11",
     "aws-amplify-react-native": "^7.0.2",
     "aws-sdk": "^2.822.0",
-    "date-fns": "^2.29.3",
     "dayjs": "^1.11.7",
     "deprecated-react-native-prop-types": "^4.0.0",
     "expo": "^46.0.0",
@@ -86,7 +85,7 @@
   "devDependencies": {
     "@babel/core": "^7.12.9",
     "@testing-library/react-native": "^10.1.1",
-    "@types/jest": "^29.2.6",
+    "@types/jest": "^27.4.1",
     "@types/react": "~17.0.21",
     "@types/react-test-renderer": "^18.0.0",
     "@types/tinycolor2": "^1.4.3",

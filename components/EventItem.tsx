@@ -3,9 +3,9 @@ import { Image, StyleSheet, Text, View } from "react-native"
 import { Event } from "@lib/events/Event"
 import IconButton from "./common/IconButton"
 import { Divider, Icon } from "react-native-elements"
-import { daysBeforeEvent, displayTimeOfEvent } from "@lib/time/Time"
 import { Shadow } from "react-native-shadow-2"
 import tinycolor from "tinycolor2"
+import { placemarkToFormattedAddress } from "@lib/location"
 
 interface Props {
   event: Event
@@ -14,7 +14,7 @@ interface Props {
 const EventItem = ({ event }: Props) => {
   const numAttendees = 1
   const distance = 0.5
-  const shadowColor = "#828282"
+  const shadowColor = "#bdbdbd"
   const lightEventColor = tinycolor(event.colorHex).lighten(10).toString()
 
   const onPressMore = () => {
@@ -23,9 +23,9 @@ const EventItem = ({ event }: Props) => {
 
   return (
     <Shadow
-      distance={3}
+      distance={5}
       startColor={shadowColor}
-      offset={[-1, 3]}
+      offset={[0, 3]}
       style={{ alignSelf: "stretch" }}
     >
       <View style={[styles.container]}>
@@ -51,16 +51,15 @@ const EventItem = ({ event }: Props) => {
 
           <View style={[styles.location, styles.flexRow]}>
             <Icon name="location-on" color={event.colorHex} />
-            <Text style={styles.infoText}>{event.address}</Text>
+            <Text style={styles.infoText}>
+              {placemarkToFormattedAddress(event.address)}
+            </Text>
           </View>
 
           <View style={styles.flexRow}>
             <Icon name="event-available" color={event.colorHex} />
             <Text style={styles.infoText} accessibilityLabel="day">
-              {daysBeforeEvent(event.startTime, new Date())}
-            </Text>
-            <Text style={styles.infoText}>
-              {displayTimeOfEvent(event.startTime, event.endTime)}
+              {event.duration.formatted()}
             </Text>
           </View>
 
@@ -79,7 +78,7 @@ const EventItem = ({ event }: Props) => {
             <Text style={styles.attendingText}>{" attending"}</Text>
           </View>
 
-          <Shadow distance={2} startColor={"black"} offset={[-1, 2]}>
+          <Shadow distance={4} startColor={shadowColor} offset={[0, 1]}>
             <View
               style={[
                 styles.distance,
@@ -174,4 +173,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default React.memo(EventItem)
+export default EventItem
