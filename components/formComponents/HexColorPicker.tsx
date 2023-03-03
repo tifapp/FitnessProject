@@ -69,6 +69,7 @@ const HexColorPicker = ({
         >
           <View
             style={{
+              ...styles.option,
               backgroundColor: option.color,
               borderRadius: 32,
               padding: 12
@@ -95,8 +96,17 @@ const styles = StyleSheet.create({
     flexWrap: "wrap"
   },
   optionContainer: {
-    marginHorizontal: 12,
-    marginBottom: 12
+    width: "20%",
+    marginBottom: 12,
+    display: "flex"
+  },
+  option: {
+    width: 44,
+    height: 44,
+    alignSelf: "center",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center"
   }
 })
 
