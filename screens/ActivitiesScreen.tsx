@@ -53,7 +53,7 @@ const ActivitiesScreen = () => {
         initialValues={{
           title: "Test",
           description: "Hello world this is a test.",
-          color: EventColors.BrightPink,
+          color: EventColors.Red,
           dateRange: dateRange(
             new Date("2023-03-02T08:00:00"),
             new Date("2023-03-02T09:00:00")
