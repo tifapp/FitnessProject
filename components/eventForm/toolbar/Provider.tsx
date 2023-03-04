@@ -53,7 +53,6 @@ export const ToolbarProvider = ({ children }: ToolbarProviderProps) => {
           bottomSheetRef.current?.present()
         },
         dismissCurrentSection: () => {
-          setSection(undefined)
           bottomSheetRef.current?.dismiss()
         }
       }}

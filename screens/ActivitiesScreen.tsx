@@ -5,6 +5,7 @@ import { Auth } from "aws-amplify"
 import React from "react"
 import { Alert, Text, TouchableOpacity } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
+import EventFormScreen from "./EventFormScreen"
 
 const ActivitiesScreen = () => {
   function signOut () {
@@ -49,7 +50,7 @@ const ActivitiesScreen = () => {
           SandBox to get started
         </Text>
       </TouchableOpacity>
-      <EventForm
+      <EventFormScreen
         initialValues={{
           title: "Test",
           description: "Hello world this is a test.",
@@ -61,11 +62,10 @@ const ActivitiesScreen = () => {
           radiusMeters: 0,
           shouldHideAfterStartDate: false
         }}
+        submissionLabel="Save Event"
         onDismiss={() => {}}
         onSubmit={async () => {}}
-      >
-        <EventFormToolbar />
-      </EventForm>
+      />
     </GestureHandlerRootView>
   )
 }
