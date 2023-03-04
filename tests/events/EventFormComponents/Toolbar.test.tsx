@@ -103,7 +103,7 @@ const openAdvancedSection = () => {
 }
 
 const colorSectionTitle = () => {
-  return screen.queryByText("Pick Color")
+  return screen.queryByText("Colors")
 }
 
 const advancedSectionTitle = () => {

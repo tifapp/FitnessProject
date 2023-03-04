@@ -6,10 +6,13 @@ import {
 import React, {
   createContext,
   ReactNode,
+  useCallback,
   useContext,
   useRef,
   useState
 } from "react"
+import { StyleSheet } from "react-native"
+import Animated from "react-native-reanimated"
 import { EventFormAdvancedSettings } from "../AdvancedSettings"
 import { EventFormColorPicker } from "../ColorPicker"
 import { EventFormDatePicker } from "../DatePicker"
@@ -58,7 +61,14 @@ export const ToolbarProvider = ({ children }: ToolbarProviderProps) => {
           ref={bottomSheetRef}
           index={0}
           snapPoints={bottomSheetSnapPoints}
-          backdropComponent={BottomSheetBackdrop}
+          handleStyle={styles.handle}
+          backdropComponent={(props) => (
+            <BottomSheetBackdrop
+              {...props}
+              appearsOnIndex={1}
+              animatedIndex={{ value: 1 }}
+            />
+          )}
         >
           {section === "date" && (
             <EventFormToolbarSection title="Start and End Dates">
@@ -66,7 +76,7 @@ export const ToolbarProvider = ({ children }: ToolbarProviderProps) => {
             </EventFormToolbarSection>
           )}
           {section === "color" && (
-            <EventFormToolbarSection title="Pick Color">
+            <EventFormToolbarSection title="Colors">
               <EventFormColorPicker />
             </EventFormToolbarSection>
           )}
@@ -81,8 +91,14 @@ export const ToolbarProvider = ({ children }: ToolbarProviderProps) => {
   )
 }
 
-const bottomSheetSnapPoints = ["50%"]
+const bottomSheetSnapPoints = ["35%"]
 
 const ToolbarContext = createContext<ToolbarContextValues | undefined>(
   undefined
 )
+
+const styles = StyleSheet.create({
+  handle: {
+    opacity: 0
+  }
+})

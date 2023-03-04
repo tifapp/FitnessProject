@@ -12,27 +12,24 @@ export type EventFormToolbarSectionProps = {
 export const EventFormToolbarSection = ({
   title,
   children
-}: EventFormToolbarSectionProps) => {
-  const { dismissCurrentSection } = useToolbar()
-  return (
-    <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>{title}</Text>
-        <TouchableOpacity
-          accessibilityLabel="Close Section"
-          onPress={dismissCurrentSection}
-        >
-          <MaterialIcons
-            style={styles.closeIcon}
-            name="close"
-            size={24 * useFontScale()}
-          />
-        </TouchableOpacity>
-      </View>
-      {children}
+}: EventFormToolbarSectionProps) => (
+  <View style={styles.container}>
+    <View style={styles.headerContainer}>
+      <Text style={styles.headerText}>{title}</Text>
+      <TouchableOpacity
+        accessibilityLabel="Close Section"
+        onPress={useToolbar().dismissCurrentSection}
+      >
+        <MaterialIcons
+          style={styles.closeIcon}
+          name="close"
+          size={24 * useFontScale()}
+        />
+      </TouchableOpacity>
     </View>
-  )
-}
+    {children}
+  </View>
+)
 
 const styles = StyleSheet.create({
   container: {
