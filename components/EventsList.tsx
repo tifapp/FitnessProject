@@ -15,6 +15,8 @@ const EventsList = () => {
   const eventItems = useDependencyValue(eventsDependencyKey)
   const ids = Array.from(new Array(5), (_, i) => String(i))
   const events = eventItems.eventsWithIds(ids)
+  const MARGIN_HORIZONTAL = 8
+  const MARGIN_VERTICAL = 24
 
   // hooks
   const sheetRef = useRef<BottomSheetModal>(null)
@@ -38,7 +40,12 @@ const EventsList = () => {
           <BottomSheetFlatList
             data={events}
             renderItem={({ item }: ListRenderItemInfo<Event>) => (
-              <View style={styles.secondaryContainerStyle}>
+              <View
+                style={{
+                  marginHorizontal: MARGIN_HORIZONTAL,
+                  marginVertical: MARGIN_VERTICAL
+                }}
+              >
                 <EventItem event={item} />
               </View>
             )}
@@ -50,13 +57,5 @@ const EventsList = () => {
     </BottomSheetModalProvider>
   )
 }
-
-const styles = StyleSheet.create({
-  secondaryContainerStyle: {
-    backgroundColor: "white",
-    paddingHorizontal: "2%",
-    paddingVertical: 24
-  }
-})
 
 export default EventsList

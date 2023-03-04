@@ -2,8 +2,7 @@ import React from "react"
 import { Image, StyleSheet, Text, View } from "react-native"
 import { Event } from "@lib/events/Event"
 import IconButton from "./common/IconButton"
-import { Divider, Icon } from "react-native-elements"
-// import Ionicons from "@expo/vector-icons/Ionicons"
+import { Divider } from "react-native-elements"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { Shadow } from "react-native-shadow-2"
 import tinycolor from "tinycolor2"
@@ -16,20 +15,15 @@ interface Props {
 const EventItem = ({ event }: Props) => {
   const numAttendees = 1
   const distance = 0.5
-  const shadowColor = "#bdbdbd"
-  const lightEventColor = tinycolor(event.colorHex).lighten(25).toString()
+  const shadowColor = "#ebebeb"
+  const lightEventColor = tinycolor(event.colorHex).lighten(30).toString()
 
   const onPressMore = () => {
     return null
   }
 
   return (
-    <Shadow
-      distance={20}
-      startColor={shadowColor}
-      offset={[0, 1]}
-      stretch={true}
-    >
+    <Shadow distance={18} startColor={shadowColor} stretch={true}>
       <View style={[styles.container]}>
         {/* Profile Image, Name, More button */}
         <View style={[styles.topRow, styles.flexRow]}>
@@ -73,7 +67,7 @@ const EventItem = ({ event }: Props) => {
             </Text>
           </View>
 
-          <View style={{ paddingVertical: "4%" }}>
+          <View style={{ marginVertical: 12 }}>
             <Divider style={{ height: 1 }} />
           </View>
         </View>
@@ -121,7 +115,7 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   topRow: {
-    paddingBottom: "4%",
+    paddingBottom: 8,
     alignItems: "center"
   },
   middleRow: {
@@ -129,16 +123,16 @@ const styles = StyleSheet.create({
     flexDirection: "column"
   },
   location: {
-    paddingBottom: "3%"
+    paddingBottom: 8
   },
   infoText: {
     textAlignVertical: "center",
     color: "grey",
-    paddingLeft: "2%"
+    paddingLeft: 8
   },
   attendingNumber: {
     fontWeight: "bold",
-    paddingLeft: "5%"
+    paddingLeft: 8
   },
   attendingText: {
     textAlignVertical: "center",
@@ -148,24 +142,24 @@ const styles = StyleSheet.create({
     textAlignVertical: "center",
     fontWeight: "bold",
     fontSize: 22,
-    paddingBottom: "1%"
+    paddingBottom: 8
   },
   name: {
     textAlignVertical: "center",
     fontWeight: "bold",
     fontSize: 15,
-    paddingLeft: "3%"
+    paddingLeft: 8
   },
   moreButtonStyle: {
     flex: 1,
-    opacity: 0.3,
+    opacity: 0.4,
     alignItems: "flex-end"
   },
   distance: {
     flexDirection: "row",
     alignSelf: "center",
-    paddingVertical: "1%",
-    paddingLeft: "1%",
+    paddingVertical: 2,
+    paddingLeft: 4,
     borderRadius: 14
   },
   distanceContainer: {
@@ -174,8 +168,8 @@ const styles = StyleSheet.create({
   distanceText: {
     textAlignVertical: "center",
     color: "white",
-    paddingRight: "3%",
-    paddingLeft: "1%",
+    paddingRight: 8,
+    paddingLeft: 2,
     fontWeight: "bold"
   },
   image: {
@@ -185,9 +179,8 @@ const styles = StyleSheet.create({
   },
   container: {
     backgroundColor: "white",
-    // marginHorizontal: 6,
-    paddingHorizontal: "6%",
-    paddingVertical: "3%",
+    paddingHorizontal: 18,
+    paddingVertical: 16,
     borderRadius: 20
   }
 })

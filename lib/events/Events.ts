@@ -1,6 +1,5 @@
-import { FixedDateRange } from "@lib/date"
 import { createDependencyKey } from "@lib/dependencies"
-import { Placemark } from "@lib/location"
+import { TestEventItems } from "./Event"
 
 /**
  * An interface representing all the collection of all of the posts in the app.
@@ -24,34 +23,13 @@ export class GraphQLEvents implements Events {
     const eventsList = []
     const date = new Date()
     const date2 = new Date()
-    const address: Placemark = {
-      name: "UCSC Campus",
-      country: "United States of America",
-      postalCode: "95064",
-      street: "High St",
-      streetNumber: "1156",
-      region: "CA",
-      isoCountryCode: "US",
-      city: "Santa Cruz"
-    }
     date.setHours(10, 30)
     date.setDate(date.getDate() + 0)
     date2.setHours(16, 30)
     date2.setDate(date2.getDate() + 2)
 
     for (let i = 0; i < ids.length; i++) {
-      const event: Event = {
-        id: i,
-        userId: "3234324",
-        username: "Nicolette Antisdel",
-        title: "Pickup Basketball",
-        repliesCount: 2,
-        writtenByYou: true,
-        duration: new FixedDateRange(date, date2),
-        colorHex: "#843efa",
-        coordinates: { latitude: 36.991585, longitude: -122.058277 },
-        address
-      }
+      const event: Event = TestEventItems.mockEvent(date, date2, String(i))
       eventsList.push(event)
     }
 
