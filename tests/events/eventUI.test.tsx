@@ -18,8 +18,6 @@ describe("eventUI Component Tests", () => {
         )}
       />
     )
-    const date = screen.getByLabelText("day")
-    console.log(date)
     expect(screen.getByText("Today 5pm - 7pm")).toBeDefined()
   })
 })

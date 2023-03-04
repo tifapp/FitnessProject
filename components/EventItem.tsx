@@ -13,8 +13,8 @@ interface Props {
 }
 
 const EventItem = ({ event }: Props) => {
-  const numAttendees = 1
-  const distance = 0.5
+  const numAttendees = 1 // Eventually will come from event object
+  const distance = 0.5 // Eventually will be calculated from the location given in the event object
   const shadowColor = "#ebebeb"
   const lightEventColor = tinycolor(event.colorHex).lighten(30).toString()
 
