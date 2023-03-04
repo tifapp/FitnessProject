@@ -84,6 +84,22 @@ describe("EventFormScreen tests", () => {
     expect(alertPresentationSpy).toHaveBeenCalled()
   })
 
+  it("should allow dismissing the confirmation alert without dismissing the form", async () => {
+    renderEventFormScreen(baseTestEventFormValues)
+    editEventTitle("Test")
+    attemptDismiss()
+    await dismissConfirmationAlert()
+    expect(dismissAction).not.toHaveBeenCalled()
+  })
+
+  it("should be able to dismiss the form from the confirmation alert", async () => {
+    renderEventFormScreen(baseTestEventFormValues)
+    editEventTitle("Test")
+    attemptDismiss()
+    await dismissFormFromConfirmationAlert()
+    expect(dismissAction).toHaveBeenCalled()
+  })
+
   it("should not be able to submit initial form content", () => {
     renderEventFormScreen(baseTestEventFormValues)
     expect(canSubmit()).toEqual(false)
@@ -130,7 +146,7 @@ describe("EventFormScreen tests", () => {
   })
 })
 
-const { alertPresentationSpy } = captureAlerts()
+const { alertPresentationSpy, tapAlertButton } = captureAlerts()
 
 const testSubmissionLabel = "Test Submit"
 
@@ -165,4 +181,12 @@ const submit = () => {
 
 const canSubmit = () => {
   return !screen.getByText(testSubmissionLabel).props.disabled
+}
+
+const dismissConfirmationAlert = async () => {
+  await tapAlertButton("Keep Editing")
+}
+
+const dismissFormFromConfirmationAlert = async () => {
+  await tapAlertButton("Discard")
 }
