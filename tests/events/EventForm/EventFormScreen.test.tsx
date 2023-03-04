@@ -22,7 +22,7 @@ import {
   moveEventStartDate,
   pickEventColor,
   toggleShouldHideAfterStartDate
-} from "../EventFormComponents/helpers"
+} from "./helpers"
 import { hapticsDependencyKey } from "@lib/Haptics"
 import { neverPromise } from "../../helpers/Promise"
 
@@ -39,21 +39,21 @@ describe("EventFormScreen tests", () => {
     moveEventStartDate(new Date(0))
     moveEventEndDate(new Date(1))
     toggleShouldHideAfterStartDate(false)
-    editEventTitle("Test")
+    editEventTitle(editedTitle)
     editEventDescription("Hello world this is a test!")
     pickEventColor("Blue")
     submit()
 
     await waitFor(() => {
-      expect(submitAction).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: "Test",
-          description: "Hello world this is a test!",
-          dateRange: dateRange(new Date(0), new Date(1)),
-          color: EventColors.Blue,
-          location: testLocation
-        })
-      )
+      expect(submitAction).toHaveBeenCalledWith({
+        title: editedTitle,
+        description: "Hello world this is a test!",
+        dateRange: dateRange(new Date(0), new Date(1)),
+        color: EventColors.Blue,
+        location: testLocation,
+        radiusMeters: 0,
+        shouldHideAfterStartDate: false
+      })
     })
   })
 
@@ -77,7 +77,6 @@ describe("EventFormScreen tests", () => {
     toggleShouldHideAfterStartDate(true)
     editEventDescription("Hello world this is a test!")
     pickEventColor("Green")
-
     attemptDismiss()
 
     expect(dismissAction).not.toHaveBeenCalled()
@@ -86,17 +85,19 @@ describe("EventFormScreen tests", () => {
 
   it("should allow dismissing the confirmation alert without dismissing the form", async () => {
     renderEventFormScreen(baseTestEventFormValues)
-    editEventTitle("Test")
+    editEventTitle(editedTitle)
     attemptDismiss()
     await dismissConfirmationAlert()
+
     expect(dismissAction).not.toHaveBeenCalled()
   })
 
   it("should be able to dismiss the form from the confirmation alert", async () => {
     renderEventFormScreen(baseTestEventFormValues)
-    editEventTitle("Test")
+    editEventTitle(editedTitle)
     attemptDismiss()
     await dismissFormFromConfirmationAlert()
+
     expect(dismissAction).toHaveBeenCalled()
   })
 
@@ -121,14 +122,14 @@ describe("EventFormScreen tests", () => {
   it("should not allow submissions when in process of submitting current form", async () => {
     submitAction.mockImplementation(neverPromise)
     renderEventFormScreen(baseTestEventFormValues)
-    editEventTitle("Test")
+    editEventTitle(editedTitle)
     submit()
     await waitFor(() => expect(canSubmit()).toEqual(false))
   })
 
   it("should make the description undefined when empty in submisssion", async () => {
     renderEventFormScreen({ ...baseTestEventFormValues, description: "" })
-    editEventTitle("Test")
+    editEventTitle(editedTitle)
     submit()
     await waitFor(() => {
       expect(submitAction).toHaveBeenCalledWith(
@@ -140,11 +141,13 @@ describe("EventFormScreen tests", () => {
   it("should re-enable submissions after current submission finishes", async () => {
     submitAction.mockImplementation(Promise.resolve)
     renderEventFormScreen(baseTestEventFormValues)
-    editEventTitle("Test title")
+    editEventTitle(editedTitle)
     submit()
     await waitFor(() => expect(canSubmit()).toEqual(true))
   })
 })
+
+const editedTitle = "Test title"
 
 const { alertPresentationSpy, tapAlertButton } = captureAlerts()
 

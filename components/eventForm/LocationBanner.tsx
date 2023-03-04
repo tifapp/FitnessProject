@@ -33,6 +33,7 @@ const GeocodedLocationInfoLabel = (locationInfo: EventFormLocationInfo) => {
   )
 
   if (status === "error") {
+    // TODO: - Should this just be the message of the error?
     return (
       <Text>Unable to find address of location, please try again later.</Text>
     )
