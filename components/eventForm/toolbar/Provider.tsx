@@ -4,7 +4,7 @@ import {
   BottomSheetBackdrop,
   BottomSheetScrollView
 } from "@gorhom/bottom-sheet"
-import { useFontScale } from "@hooks/useFontScale"
+import { DynamicTypeSizes, useFontScale } from "@lib/FontScale"
 import React, {
   createContext,
   ReactNode,
@@ -14,7 +14,6 @@ import React, {
   useState
 } from "react"
 import { StyleSheet } from "react-native"
-import { ScrollView } from "react-native-gesture-handler"
 import { EventFormAdvancedSettings } from "../AdvancedSettings"
 import { EventFormColorPicker } from "../ColorPicker"
 import { EventFormDatePicker } from "../DatePicker"
@@ -48,6 +47,7 @@ export const ToolbarProvider = ({ children }: ToolbarProviderProps) => {
   return (
     <ToolbarContext.Provider
       value={{
+        // TODO: - Should this allow for pasing in an arbitrary snap point?
         openSection: (section) => {
           setSection(section)
           bottomSheetRef.current?.present()
@@ -95,7 +95,10 @@ export const ToolbarProvider = ({ children }: ToolbarProviderProps) => {
 
 const useSnapPoints = () => {
   const fontScale = useFontScale()
-  return useMemo(() => (fontScale > 1.5 ? ["60%"] : ["35%"]), [fontScale])
+  return useMemo(
+    () => (fontScale > DynamicTypeSizes.xxxLarge ? ["60%"] : ["35%"]),
+    [fontScale]
+  )
 }
 
 const ToolbarContext = createContext<ToolbarContextValues | undefined>(

@@ -11,7 +11,7 @@ import {
 import { useEventFormContext } from "../EventForm"
 import { ToolbarProvider, ToolbarSection, useToolbar } from "./Provider"
 import { MaterialIcons } from "@expo/vector-icons"
-import { useFontScale } from "@hooks/useFontScale"
+import { useFontScale } from "@lib/FontScale"
 
 /**
  * A horizontally scrolling toolbar for an event form.

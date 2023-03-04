@@ -2,7 +2,7 @@ import React, { ReactNode } from "react"
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { useToolbar } from "./Provider"
 import { MaterialIcons } from "@expo/vector-icons"
-import { useFontScale } from "@hooks/useFontScale"
+import { DynamicTypeSizes, useFontScale } from "@lib/FontScale"
 
 export type EventFormToolbarSectionProps = {
   title: string
@@ -15,7 +15,10 @@ export const EventFormToolbarSection = ({
 }: EventFormToolbarSectionProps) => (
   <View style={styles.container}>
     <View style={styles.headerContainer}>
-      <Text maxFontSizeMultiplier={1.5} style={styles.headerText}>
+      <Text
+        maxFontSizeMultiplier={DynamicTypeSizes.xxxLarge}
+        style={styles.headerText}
+      >
         {title}
       </Text>
       <TouchableOpacity
@@ -25,7 +28,9 @@ export const EventFormToolbarSection = ({
         <MaterialIcons
           style={styles.closeIcon}
           name="close"
-          size={24 * useFontScale({ maximumScaleFactor: 1.5 })}
+          size={
+            24 * useFontScale({ maximumScaleFactor: DynamicTypeSizes.xxxLarge })
+          }
         />
       </TouchableOpacity>
     </View>
