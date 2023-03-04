@@ -24,11 +24,8 @@ export const EventFormDismissButton = () => {
   }
 
   return (
-    <MaterialIcons.Button
-      accessibilityLabel="Cancel"
-      onPress={dismissButtonTapped}
-      name="close"
-      size={24}
-    />
+    <TouchableOpacity accessibilityLabel="Cancel" onPress={dismissButtonTapped}>
+      <MaterialIcons name="close" size={24} />
+    </TouchableOpacity>
   )
 }

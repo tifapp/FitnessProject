@@ -13,15 +13,19 @@ import { ToolbarProvider, ToolbarSection, useToolbar } from "./Provider"
 import { MaterialIcons } from "@expo/vector-icons"
 import { useFontScale } from "@lib/FontScale"
 
+export type EventFormToolbarProps = {
+  style?: StyleProp<ViewStyle>
+}
+
 /**
  * A horizontally scrolling toolbar for an event form.
  *
  * Each tab on the toolbar opens a bottom sheet screen
  * where its respective form values can be edited.
  */
-export const EventFormToolbar = () => (
+export const EventFormToolbar = ({ style }: EventFormToolbarProps) => (
   <ToolbarProvider>
-    <ScrollView horizontal contentContainerStyle={styles.scrollView}>
+    <ScrollView horizontal contentContainerStyle={style}>
       <DateTab />
       <ColorTab />
       <AdvancedSettingsTab />
@@ -104,14 +108,9 @@ const SectionTab = ({
 }
 
 const styles = StyleSheet.create({
-  scrollView: {
-    display: "flex",
-    flexDirection: "row",
-    paddingHorizontal: 16
-  },
   outlined: {
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 12,
     borderColor: "#dedede",
     outlineColor: "black",
     outlineStyle: "solid",

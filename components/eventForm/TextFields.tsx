@@ -1,6 +1,6 @@
 import React from "react"
-import { TextInput } from "react-native"
-import { useEventFormField } from "."
+import { StyleSheet, TextInput } from "react-native"
+import { useEventFormField } from "./EventForm"
 
 /**
  * The title field for an event form.
@@ -13,6 +13,8 @@ export const EventFormTitleField = () => {
       maxLength={75}
       value={title}
       onChangeText={setTitle}
+      multiline
+      style={styles.title}
     />
   )
 }
@@ -27,6 +29,18 @@ export const EventFormDescriptionField = () => {
       placeholder="Description"
       value={description}
       onChangeText={setDescription}
+      style={styles.description}
+      multiline
     />
   )
 }
+
+const styles = StyleSheet.create({
+  title: {
+    fontSize: 24,
+    fontWeight: "bold"
+  },
+  description: {
+    fontSize: 16
+  }
+})

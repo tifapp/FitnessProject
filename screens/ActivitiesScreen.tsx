@@ -28,45 +28,22 @@ const ActivitiesScreen = () => {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <TouchableOpacity onPress={signOut}>
-        <Text
-          style={{
-            fontSize: 15,
-            margin: 20
-          }}
-        >
-          Log Out
-        </Text>
-        <Text
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            color: "black",
-            fontWeight: "bold",
-            fontSize: 15
-          }}
-        >
-          SandBox to get started
-        </Text>
-      </TouchableOpacity>
-      <EventFormScreen
-        initialValues={{
-          title: "Test",
-          description: "Hello world this is a test.",
-          color: EventColors.Red,
-          dateRange: dateRange(
-            new Date("2023-03-02T08:00:00"),
-            new Date("2023-03-02T09:00:00")
-          ),
-          radiusMeters: 0,
-          shouldHideAfterStartDate: false
-        }}
-        submissionLabel="Save Event"
-        onDismiss={() => {}}
-        onSubmit={async () => {}}
-      />
-    </GestureHandlerRootView>
+    <EventFormScreen
+      initialValues={{
+        title: "Test",
+        description: "Hello world this is a test.",
+        color: EventColors.Red,
+        dateRange: dateRange(
+          new Date("2023-03-02T08:00:00"),
+          new Date("2023-03-02T09:00:00")
+        ),
+        radiusMeters: 0,
+        shouldHideAfterStartDate: false
+      }}
+      submissionLabel="Save Event"
+      onDismiss={() => {}}
+      onSubmit={async () => {}}
+    />
   )
 }
 

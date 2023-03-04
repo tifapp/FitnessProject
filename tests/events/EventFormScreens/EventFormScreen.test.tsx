@@ -1,6 +1,8 @@
 import { EventFormValues } from "@components/eventForm"
 import { dateRange } from "@lib/Date"
+import { UpdateDependencyValues } from "@lib/dependencies"
 import { EventColors } from "@lib/events/EventColors"
+import { geocodingDependencyKey } from "@lib/location"
 import EventFormScreen from "@screens/EventFormScreen"
 import {
   fireEvent,
@@ -8,6 +10,8 @@ import {
   screen,
   waitFor
 } from "@testing-library/react-native"
+import { unimplementedGeocoding } from "../../helpers/Geocoding"
+import { TestQueryClientProvider } from "../../helpers/ReactQuery"
 import { captureAlerts } from "../../helpers/Alerts"
 import {
   attemptDismiss,
@@ -19,6 +23,8 @@ import {
   pickEventColor,
   toggleShouldHideAfterStartDate
 } from "../EventFormComponents/helpers"
+import { hapticsDependencyKey } from "@lib/Haptics"
+import { neverPromise } from "../../helpers/Promise"
 
 const testLocation = { latitude: 45.0, longitude: -121.0 }
 
@@ -93,12 +99,23 @@ const dismissAction = jest.fn()
 
 const renderEventFormScreen = (values: EventFormValues) => {
   render(
-    <EventFormScreen
-      submissionLabel={testSubmissionLabel}
-      initialValues={values}
-      onSubmit={submitAction}
-      onDismiss={dismissAction}
-    />
+    <TestQueryClientProvider>
+      <UpdateDependencyValues
+        update={(values) => {
+          const geocoding = unimplementedGeocoding()
+          geocoding.reverseGeocode.mockImplementation(neverPromise)
+          values.set(geocodingDependencyKey, geocoding)
+          values.set(hapticsDependencyKey, jest.fn())
+        }}
+      >
+        <EventFormScreen
+          submissionLabel={testSubmissionLabel}
+          initialValues={values}
+          onSubmit={submitAction}
+          onDismiss={dismissAction}
+        />
+      </UpdateDependencyValues>
+    </TestQueryClientProvider>
   )
 }
 
