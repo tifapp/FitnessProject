@@ -1,5 +1,4 @@
 import { EventColor } from "@lib/events/EventColors"
-import { HexColor } from "../../lib/Color"
 import { FixedDateRange } from "../../lib/Date"
 import { EditEventInput } from "../../lib/events"
 import { Location } from "../../lib/location"

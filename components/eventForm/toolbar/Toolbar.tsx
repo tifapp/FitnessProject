@@ -107,8 +107,7 @@ const styles = StyleSheet.create({
   scrollView: {
     display: "flex",
     flexDirection: "row",
-    paddingHorizontal: 16,
-    height: 64
+    paddingHorizontal: 16
   },
   outlined: {
     borderWidth: 1,

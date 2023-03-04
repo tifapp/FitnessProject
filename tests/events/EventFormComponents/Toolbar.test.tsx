@@ -107,7 +107,7 @@ const colorSectionTitle = () => {
 }
 
 const advancedSectionTitle = () => {
-  return screen.queryByText("Advanced")
+  return screen.queryByText("Advanced Settings")
 }
 
 const dateSectionTitle = () => {

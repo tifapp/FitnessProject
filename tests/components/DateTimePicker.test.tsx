@@ -69,7 +69,6 @@ const Test = ({ initialDate }: TestProps) => {
     <View testID={date.toISOString()}>
       <DateTimePicker
         testID={testPickerId}
-        label="Test"
         date={date}
         onDateChanged={setDate}
       />

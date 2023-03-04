@@ -1,18 +1,11 @@
-import React, { ComponentProps, ReactNode } from "react"
-import {
-  Platform,
-  StyleProp,
-  StyleSheet,
-  Text,
-  TextStyle,
-  View,
-  ViewStyle
-} from "react-native"
+import React, { ComponentProps } from "react"
+import { Platform, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import RNDateTimePicker, {
   DateTimePickerAndroid as RNDateTimePickerAndroid
 } from "@react-native-community/datetimepicker"
 import { dayjs } from "../../lib/date"
 import { MaterialIcons } from "@expo/vector-icons"
+import IconButton from "@components/common/IconButton"
 
 /**
  * Default date formatter for `DateTimePicker`.
@@ -43,11 +36,6 @@ export type DateTimePickerProps = {
   testID?: string
 
   /**
-   * The label for the picker.
-   */
-  label: string
-
-  /**
    * The current date displayed by the picker.
    */
   date: Date
@@ -61,11 +49,6 @@ export type DateTimePickerProps = {
    * The outer container style of the picker.
    */
   style?: StyleProp<ViewStyle>
-
-  /**
-   * A `TextStyle` for the picker label.
-   */
-  labelStyle?: StyleProp<TextStyle>
 
   /**
    * (**Android Only**) Formats the pickers date to display
@@ -99,33 +82,26 @@ const DateTimePicker = (props: DateTimePickerProps) =>
 
 const DateTimePickerIOS = ({
   testID,
-  label,
   date,
   onDateChanged,
-  style,
-  labelStyle: textStyle
+  style
 }: DateTimePickerProps) => (
-  <View style={[styles.iOSContainer, style]}>
-    <Text style={textStyle}>{label}</Text>
-    <RNDateTimePicker
-      testID={testID}
-      mode="datetime"
-      value={date}
-      style={styles.iOSPickerStyle}
-      onChange={(_, date) => {
-        if (date) onDateChanged(date)
-      }}
-    />
-  </View>
+  <RNDateTimePicker
+    testID={testID}
+    mode="datetime"
+    value={date}
+    style={style}
+    onChange={(_, date) => {
+      if (date) onDateChanged(date)
+    }}
+  />
 )
 
 const DatePickerAndroid = ({
   testID,
-  label,
   date,
   onDateChanged,
   style,
-  labelStyle: textStyle,
   formatDate = defaultFormatDate,
   formatTime = defaultFormatTime
 }: DateTimePickerProps) => {
@@ -141,62 +117,46 @@ const DatePickerAndroid = ({
   }
 
   return (
-    <View style={[styles.androidContainer, style]}>
-      <Text style={[styles.androidTextMargin, textStyle]}>{label}</Text>
-      <View style={styles.androidButtonContainer}>
-        <AndroidPickerButton
-          testID={testID}
-          iconName="calendar-today"
-          onPress={() => showDatePicker("date")}
-        >
-          {formatDate(date)}
-        </AndroidPickerButton>
-        <View style={styles.androidButtonGap} />
-        <AndroidPickerButton
-          iconName="access-time"
-          onPress={() => showDatePicker("time")}
-        >
-          {formatTime(date)}
-        </AndroidPickerButton>
-      </View>
+    <View style={[styles.androidButtonContainer, style]}>
+      <AndroidPickerButton
+        testID={testID}
+        iconName="calendar-today"
+        onPress={() => showDatePicker("date")}
+        label={formatDate(date)}
+      />
+      <View style={styles.androidButtonGap} />
+      <AndroidPickerButton
+        iconName="access-time"
+        label={formatTime(date)}
+        onPress={() => showDatePicker("time")}
+      />
     </View>
   )
 }
 
 type AndroidPickerButtonProps = {
   testID?: string
-  children: ReactNode
+  label: string
   iconName: ComponentProps<typeof MaterialIcons>["name"]
   onPress: () => void
 }
 
 const AndroidPickerButton = ({
   testID,
-  children,
+  label,
   iconName,
   onPress
 }: AndroidPickerButtonProps) => (
-  <MaterialIcons.Button
-    testID={testID}
-    name={iconName}
+  <IconButton
     style={styles.androidButtonStyle}
-    iconStyle={styles.androidIconStyle}
+    testID={testID}
+    iconName={iconName}
+    label={label}
     onPress={onPress}
-  >
-    {children}
-  </MaterialIcons.Button>
+  />
 )
 
 const styles = StyleSheet.create({
-  iOSContainer: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between"
-  },
-  iOSPickerStyle: {
-    width: 256
-  },
   androidContainer: {
     display: "flex",
     flexDirection: "column",

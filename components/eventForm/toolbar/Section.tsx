@@ -15,7 +15,9 @@ export const EventFormToolbarSection = ({
 }: EventFormToolbarSectionProps) => (
   <View style={styles.container}>
     <View style={styles.headerContainer}>
-      <Text style={styles.headerText}>{title}</Text>
+      <Text maxFontSizeMultiplier={1.5} style={styles.headerText}>
+        {title}
+      </Text>
       <TouchableOpacity
         accessibilityLabel="Close Section"
         onPress={useToolbar().dismissCurrentSection}
@@ -23,7 +25,7 @@ export const EventFormToolbarSection = ({
         <MaterialIcons
           style={styles.closeIcon}
           name="close"
-          size={24 * useFontScale()}
+          size={24 * useFontScale({ maximumScaleFactor: 1.5 })}
         />
       </TouchableOpacity>
     </View>
@@ -39,6 +41,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 24
   },
   headerText: {
@@ -47,5 +50,8 @@ const styles = StyleSheet.create({
   },
   closeIcon: {
     opacity: 0.5
+  },
+  childContainer: {
+    height: "100%"
   }
 })

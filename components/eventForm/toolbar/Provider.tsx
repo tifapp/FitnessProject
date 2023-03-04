@@ -1,18 +1,20 @@
 import {
   BottomSheetModal,
   BottomSheetModalProvider,
-  BottomSheetBackdrop
+  BottomSheetBackdrop,
+  BottomSheetScrollView
 } from "@gorhom/bottom-sheet"
+import { useFontScale } from "@hooks/useFontScale"
 import React, {
   createContext,
   ReactNode,
-  useCallback,
   useContext,
+  useMemo,
   useRef,
   useState
 } from "react"
 import { StyleSheet } from "react-native"
-import Animated from "react-native-reanimated"
+import { ScrollView } from "react-native-gesture-handler"
 import { EventFormAdvancedSettings } from "../AdvancedSettings"
 import { EventFormColorPicker } from "../ColorPicker"
 import { EventFormDatePicker } from "../DatePicker"
@@ -41,6 +43,7 @@ export type ToolbarProviderProps = {
 export const ToolbarProvider = ({ children }: ToolbarProviderProps) => {
   const bottomSheetRef = useRef<BottomSheetModal>(null)
   const [section, setSection] = useState<ToolbarSection | undefined>()
+  const snapPoints = useSnapPoints()
 
   return (
     <ToolbarContext.Provider
@@ -60,7 +63,7 @@ export const ToolbarProvider = ({ children }: ToolbarProviderProps) => {
         <BottomSheetModal
           ref={bottomSheetRef}
           index={0}
-          snapPoints={bottomSheetSnapPoints}
+          snapPoints={snapPoints}
           handleStyle={styles.handle}
           backdropComponent={(props) => (
             <BottomSheetBackdrop
@@ -81,7 +84,7 @@ export const ToolbarProvider = ({ children }: ToolbarProviderProps) => {
             </EventFormToolbarSection>
           )}
           {section === "advanced" && (
-            <EventFormToolbarSection title="Advanced">
+            <EventFormToolbarSection title="Advanced Settings">
               <EventFormAdvancedSettings />
             </EventFormToolbarSection>
           )}
@@ -91,7 +94,10 @@ export const ToolbarProvider = ({ children }: ToolbarProviderProps) => {
   )
 }
 
-const bottomSheetSnapPoints = ["35%"]
+const useSnapPoints = () => {
+  const fontScale = useFontScale()
+  return useMemo(() => (fontScale > 1.5 ? ["60%"] : ["35%"]), [fontScale])
+}
 
 const ToolbarContext = createContext<ToolbarContextValues | undefined>(
   undefined

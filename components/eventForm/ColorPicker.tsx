@@ -14,7 +14,7 @@ export const EventFormColorPicker = () => {
     <HexColorPicker
       color={color}
       options={eventColorOptions}
-      onChange={(value: EventColor) => setColor(value)}
+      onChange={(value) => setColor(value)}
     />
   )
 }
