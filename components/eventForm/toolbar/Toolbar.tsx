@@ -19,17 +19,15 @@ import { useFontScale } from "@hooks/useFontScale"
  * Each tab on the toolbar opens a bottom sheet screen
  * where its respective form values can be edited.
  */
-export const EventFormToolbar = () => {
-  return (
-    <ToolbarProvider>
-      <ScrollView horizontal contentContainerStyle={styles.scrollView}>
-        <DateTab />
-        <ColorTab />
-        <AdvancedSettingsTab />
-      </ScrollView>
-    </ToolbarProvider>
-  )
-}
+export const EventFormToolbar = () => (
+  <ToolbarProvider>
+    <ScrollView horizontal contentContainerStyle={styles.scrollView}>
+      <DateTab />
+      <ColorTab />
+      <AdvancedSettingsTab />
+    </ScrollView>
+  </ToolbarProvider>
+)
 
 const DateTab = () => (
   <SectionTab section="date" accessibilityLabel="Update Dates">
