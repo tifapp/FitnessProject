@@ -31,11 +31,6 @@ const testLocation = { latitude: 45.0, longitude: -121.0 }
 describe("EventFormScreen tests", () => {
   beforeEach(() => jest.resetAllMocks())
 
-  it("should not be able to submit initial form content", () => {
-    renderEventFormScreen(baseTestEventFormValues)
-    expect(canSubmit()).toBeFalsy()
-  })
-
   it("should be able to edit and submit a form with a preselected location", async () => {
     renderEventFormScreen({
       ...baseTestEventFormValues,
@@ -87,6 +82,51 @@ describe("EventFormScreen tests", () => {
 
     expect(dismissAction).not.toHaveBeenCalled()
     expect(alertPresentationSpy).toHaveBeenCalled()
+  })
+
+  it("should not be able to submit initial form content", () => {
+    renderEventFormScreen(baseTestEventFormValues)
+    expect(canSubmit()).toEqual(false)
+  })
+
+  it("cannot submit form with an empty title", () => {
+    renderEventFormScreen({ ...baseTestEventFormValues, title: "" })
+    expect(canSubmit()).toEqual(false)
+  })
+
+  it("cannot submit form with no location", () => {
+    renderEventFormScreen({
+      ...baseTestEventFormValues,
+      locationInfo: undefined
+    })
+    expect(canSubmit()).toEqual(false)
+  })
+
+  it("should not allow submissions when in process of submitting current form", async () => {
+    submitAction.mockImplementation(neverPromise)
+    renderEventFormScreen(baseTestEventFormValues)
+    editEventTitle("Test")
+    submit()
+    await waitFor(() => expect(canSubmit()).toEqual(false))
+  })
+
+  it("should make the description undefined when empty in submisssion", async () => {
+    renderEventFormScreen({ ...baseTestEventFormValues, description: "" })
+    editEventTitle("Test")
+    submit()
+    await waitFor(() => {
+      expect(submitAction).toHaveBeenCalledWith(
+        expect.objectContaining({ description: undefined })
+      )
+    })
+  })
+
+  it("should re-enable submissions after current submission finishes", async () => {
+    submitAction.mockImplementation(Promise.resolve)
+    renderEventFormScreen(baseTestEventFormValues)
+    editEventTitle("Test title")
+    submit()
+    await waitFor(() => expect(canSubmit()).toEqual(true))
   })
 })
 
