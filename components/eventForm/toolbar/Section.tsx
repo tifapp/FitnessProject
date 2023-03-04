@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react"
 import { Text, TouchableOpacity, View } from "react-native"
-import { useToolbar } from "./ToolbarProvider"
+import { useToolbar } from "./Provider"
 
 export type EventFormToolbarSectionProps = {
   title: string

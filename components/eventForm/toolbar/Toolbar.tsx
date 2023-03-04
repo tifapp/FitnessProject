@@ -9,7 +9,7 @@ import {
   StyleSheet
 } from "react-native"
 import { useEventFormContext } from "../EventForm"
-import { ToolbarProvider, ToolbarSection, useToolbar } from "./ToolbarProvider"
+import { ToolbarProvider, ToolbarSection, useToolbar } from "./Provider"
 import { MaterialIcons } from "@expo/vector-icons"
 import { useFontScale } from "@hooks/useFontScale"
 
