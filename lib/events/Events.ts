@@ -2,6 +2,7 @@ import { HexColor } from "@lib/Color"
 import { FixedDateRange } from "@lib/Date"
 import { createDependencyKey } from "@lib/dependencies"
 import { Location } from "@lib/location"
+import { EventColor } from "./EventColors"
 
 /**
  * A data type which is used to update event information.
@@ -10,7 +11,7 @@ export type EditEventInput = {
   readonly title: string
   readonly description?: string
   readonly location: Location
-  readonly color: HexColor
+  readonly color: EventColor
   readonly dateRange: FixedDateRange
   readonly shouldHideAfterStartDate: boolean
   readonly radiusMeters: number

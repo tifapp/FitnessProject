@@ -1,3 +1,4 @@
+import { EventColor } from "@lib/events/EventColors"
 import { HexColor } from "../../lib/Color"
 import { FixedDateRange } from "../../lib/Date"
 import { EditEventInput } from "../../lib/events"
@@ -21,7 +22,7 @@ export type EventFormValues = {
   readonly description: string
   readonly locationInfo?: EventFormLocationInfo
   readonly dateRange: FixedDateRange
-  readonly color: HexColor
+  readonly color: EventColor
   readonly shouldHideAfterStartDate: boolean
   readonly radiusMeters: number
 }

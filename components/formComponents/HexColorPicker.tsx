@@ -12,15 +12,15 @@ import { MaterialIcons } from "@expo/vector-icons"
 import { useDependencyValue } from "../../lib/dependencies"
 import { HapticEvent, hapticsDependencyKey } from "../../lib/Haptics"
 
-export type HexColorPickerOption = {
-  color: HexColor
+export type HexColorPickerOption<T extends HexColor = HexColor> = {
+  color: T
   accessibilityLabel: string
 }
 
 /**
  * Props for a `HexColorPicker`.
  */
-export type HexColorPickerProps = {
+export type HexColorPickerProps<T extends HexColor = HexColor> = {
   /**
    * The current color that is selected in the picker.
    */
@@ -29,12 +29,12 @@ export type HexColorPickerProps = {
   /**
    * Acts upon the color changing in the picker.
    */
-  onChange: (color: HexColor) => void
+  onChange: (color: T) => void
 
   /**
    * The available options in the picker.
    */
-  options: HexColorPickerOption[]
+  options: HexColorPickerOption<T>[]
 
   /**
    * The container style of the picker.
@@ -45,15 +45,15 @@ export type HexColorPickerProps = {
 /**
  * A color picker which uses hex colors.
  */
-const HexColorPicker = ({
+const HexColorPicker = <T extends HexColor = HexColor>({
   color,
   onChange,
   options,
   style
-}: HexColorPickerProps) => {
+}: HexColorPickerProps<T>) => {
   const playHaptics = useDependencyValue(hapticsDependencyKey)
 
-  const colorTapped = (option: HexColor) => {
+  const colorTapped = (option: T) => {
     if (Platform.OS === "ios") playHaptics(HapticEvent.SelectionChanged)
     onChange(option)
   }
