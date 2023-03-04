@@ -1,4 +1,4 @@
-import React from "react"
+import React, { ComponentProps, ReactNode } from "react"
 import {
   Platform,
   StyleProp,
@@ -13,6 +13,7 @@ import RNDateTimePicker, {
 } from "@react-native-community/datetimepicker"
 import IconButton from "../common/IconButton"
 import { dayjs } from "../../lib/date"
+import { MaterialIcons } from "@expo/vector-icons"
 
 /**
  * Default date formatter for `DateTimePicker`.
@@ -144,26 +145,48 @@ const DatePickerAndroid = ({
     <View style={[styles.androidContainer, style]}>
       <Text style={[styles.androidTextMargin, textStyle]}>{label}</Text>
       <View style={styles.androidButtonContainer}>
-        <IconButton
+        <AndroidPickerButton
           testID={testID}
-          style={styles.androidButtonStyle}
-          label={formatDate(date)}
           iconName="calendar-today"
-          margin={8}
           onPress={() => showDatePicker("date")}
-        />
+        >
+          {formatDate(date)}
+        </AndroidPickerButton>
         <View style={styles.androidButtonGap} />
-        <IconButton
-          style={styles.androidButtonStyle}
-          label={formatTime(date)}
+        <AndroidPickerButton
           iconName="access-time"
-          margin={8}
           onPress={() => showDatePicker("time")}
-        />
+        >
+          {formatTime(date)}
+        </AndroidPickerButton>
       </View>
     </View>
   )
 }
+
+type AndroidPickerButtonProps = {
+  testID?: string
+  children: ReactNode
+  iconName: ComponentProps<typeof MaterialIcons>["name"]
+  onPress: () => void
+}
+
+const AndroidPickerButton = ({
+  testID,
+  children,
+  iconName,
+  onPress
+}: AndroidPickerButtonProps) => (
+  <MaterialIcons.Button
+    testID={testID}
+    name={iconName}
+    style={styles.androidButtonStyle}
+    iconStyle={styles.androidIconStyle}
+    onPress={onPress}
+  >
+    {children}
+  </MaterialIcons.Button>
+)
 
 const styles = StyleSheet.create({
   iOSContainer: {
@@ -195,6 +218,9 @@ const styles = StyleSheet.create({
   },
   androidButtonGap: {
     paddingHorizontal: 8
+  },
+  androidIconStyle: {
+    marginRight: 8
   }
 })
 

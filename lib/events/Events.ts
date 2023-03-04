@@ -1,4 +1,3 @@
-import { HexColor } from "@lib/Color"
 import { FixedDateRange } from "@lib/Date"
 import { createDependencyKey } from "@lib/dependencies"
 import { Location } from "@lib/location"
