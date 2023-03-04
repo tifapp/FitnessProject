@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React from "react"
 import {
   Platform,
   StyleProp,
@@ -78,22 +78,6 @@ export type DateTimePickerProps = {
    * hour and minute information.
    */
   formatTime?: (date: Date) => string
-
-  /**
-   * The minimum date for this picker.
-   *
-   * The picker will always ensure that the date is after
-   * the minimum.
-   */
-  minimumDate?: Date
-
-  /**
-   * The maximum date for this picker.
-   *
-   * The picker will always ensure that the date is before
-   * the maximum.
-   */
-  maximumDate?: Date
 }
 
 /**
@@ -104,29 +88,14 @@ export type DateTimePickerProps = {
  * that display a modal are used. The modal then uses Android's native
  * date and time pickers respectively.
  */
-const DateTimePicker = (props: DateTimePickerProps) => {
-  const { minimumDate, maximumDate, date, onDateChanged } = props
-
-  // TODO: - I don't like this useEffect, but I'm not sure of another way
-  // to ensure that the date is always in range...
-  useEffect(() => {
-    if (minimumDate && date < minimumDate) {
-      onDateChanged(minimumDate)
-    }
-
-    if (maximumDate && date > maximumDate) {
-      onDateChanged(maximumDate)
-    }
-  }, [minimumDate, maximumDate, date, onDateChanged])
-
-  return Platform.OS === "android"
+const DateTimePicker = (props: DateTimePickerProps) =>
+  Platform.OS === "android"
     ? (
       <DatePickerAndroid {...props} />
     )
     : (
       <DateTimePickerIOS {...props} />
     )
-}
 
 const DateTimePickerIOS = ({
   testID,
@@ -134,9 +103,7 @@ const DateTimePickerIOS = ({
   date,
   onDateChanged,
   style,
-  labelStyle: textStyle,
-  minimumDate,
-  maximumDate
+  labelStyle: textStyle
 }: DateTimePickerProps) => (
   <View style={[styles.iOSContainer, style]}>
     <Text style={textStyle}>{label}</Text>
@@ -144,8 +111,6 @@ const DateTimePickerIOS = ({
       testID={testID}
       mode="datetime"
       value={date}
-      minimumDate={minimumDate}
-      maximumDate={maximumDate}
       style={styles.iOSPickerStyle}
       onChange={(_, date) => {
         if (date) onDateChanged(date)
@@ -162,9 +127,7 @@ const DatePickerAndroid = ({
   style,
   labelStyle: textStyle,
   formatDate = defaultFormatDate,
-  formatTime = defaultFormatTime,
-  minimumDate,
-  maximumDate
+  formatTime = defaultFormatTime
 }: DateTimePickerProps) => {
   const showDatePicker = (mode: "date" | "time") => {
     RNDateTimePickerAndroid.open({
@@ -173,9 +136,7 @@ const DatePickerAndroid = ({
       onChange: (_, date) => {
         if (date) onDateChanged(date)
       },
-      mode,
-      minimumDate,
-      maximumDate
+      mode
     })
   }
 
@@ -184,6 +145,7 @@ const DatePickerAndroid = ({
       <Text style={[styles.androidTextMargin, textStyle]}>{label}</Text>
       <View style={styles.androidButtonContainer}>
         <IconButton
+          testID={testID}
           style={styles.androidButtonStyle}
           label={formatDate(date)}
           iconName="calendar-today"

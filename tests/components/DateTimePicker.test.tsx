@@ -4,6 +4,7 @@ import "../helpers/Matchers"
 import { render, screen } from "@testing-library/react-native"
 import { useState } from "react"
 import { View } from "react-native"
+import { setDateTimePickerDate } from "../helpers/DateTimePicker"
 
 describe("DateTimePicker tests", () => {
   test("android default date formatter formats date properly", () => {
@@ -27,22 +28,22 @@ describe("DateTimePicker tests", () => {
     )
   })
 
-  it("should clamp the date to the minimum when date is below minimum", () => {
-    renderDateTimePicker({
-      initialDate: new Date("2022-01-01"),
-      minDate: new Date("2022-01-02")
-    })
-    expect(selectedDate(new Date("2022-01-02"))).toBeDisplayed()
+  it("should be able to select a date when platform is iOS", () => {
+    setPlatform("ios")
+    testPickDate(new Date("2023-03-03T08:00:00"))
   })
 
-  it("should clamp the date to the maximum when date is above maximum", () => {
-    renderDateTimePicker({
-      initialDate: new Date("2022-01-02"),
-      maxDate: new Date("2022-01-01")
-    })
-    expect(selectedDate(new Date("2022-01-01"))).toBeDisplayed()
+  it("should be able to select a date when platform is android", () => {
+    setPlatform("android")
+    testPickDate(new Date("2023-03-03T08:00:00"))
   })
 })
+
+const testPickDate = (date: Date) => {
+  renderDateTimePicker({ initialDate: new Date(0) })
+  setPickerDate(date)
+  expect(selectedDate(date)).toBeDisplayed()
+}
 
 const expectDefaultAndroidFormattedDate = (date: Date, formatted: string) => {
   setPlatform("android")
@@ -54,29 +55,30 @@ const expectDefaultAndroidFormattedDate = (date: Date, formatted: string) => {
 
 type TestProps = {
   initialDate: Date
-  minDate?: Date
-  maxDate?: Date
 }
 
 const renderDateTimePicker = (props: TestProps) => {
   return render(<Test {...props} />)
 }
 
-const Test = ({ initialDate, minDate, maxDate }: TestProps) => {
+const testPickerId = "test-datetimepicker"
+
+const Test = ({ initialDate }: TestProps) => {
   const [date, setDate] = useState(initialDate)
   return (
     <View testID={date.toISOString()}>
       <DateTimePicker
+        testID={testPickerId}
         label="Test"
         date={date}
         onDateChanged={setDate}
-        minimumDate={minDate}
-        maximumDate={maxDate}
       />
     </View>
   )
 }
 
-const selectedDate = (date: Date) => {
-  return screen.queryByTestId(date.toISOString())
+const selectedDate = (date: Date) => screen.queryByTestId(date.toISOString())
+
+const setPickerDate = (date: Date) => {
+  setDateTimePickerDate({ toDate: date, testID: testPickerId })
 }
