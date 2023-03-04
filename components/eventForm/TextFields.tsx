@@ -10,16 +10,12 @@ export const EventFormTitleField = () => {
   return (
     <TextInput
       placeholder="Title"
-      maxLength={MAX_TITLE_LENGTH}
+      maxLength={75}
       value={title}
-      onChangeText={(text) => {
-        setTitle(text.substring(0, Math.min(text.length, MAX_TITLE_LENGTH)))
-      }}
+      onChangeText={setTitle}
     />
   )
 }
-
-const MAX_TITLE_LENGTH = 75
 
 /**
  * The description field for an event form.
