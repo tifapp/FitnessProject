@@ -54,7 +54,8 @@ const EventsList = () => {
 const styles = StyleSheet.create({
   secondaryContainerStyle: {
     backgroundColor: "white",
-    padding: "2%"
+    paddingHorizontal: "2%",
+    paddingVertical: 24
   }
 })
 

@@ -2,7 +2,7 @@ import { dateRange, FixedDateRange } from "@lib/date"
 
 describe("FixedDateRangeFormatting tests", () => {
   beforeEach(() => {
-    jest.useFakeTimers("modern").setSystemTime(new Date("2023-02-26T12:00:00"))
+    jest.useFakeTimers().setSystemTime(new Date("2023-02-26T12:00:00"))
   })
   afterEach(() => jest.useRealTimers())
 

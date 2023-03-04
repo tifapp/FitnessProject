@@ -3,6 +3,8 @@ import { Image, StyleSheet, Text, View } from "react-native"
 import { Event } from "@lib/events/Event"
 import IconButton from "./common/IconButton"
 import { Divider, Icon } from "react-native-elements"
+// import Ionicons from "@expo/vector-icons/Ionicons"
+import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { Shadow } from "react-native-shadow-2"
 import tinycolor from "tinycolor2"
 import { placemarkToFormattedAddress } from "@lib/location"
@@ -15,7 +17,7 @@ const EventItem = ({ event }: Props) => {
   const numAttendees = 1
   const distance = 0.5
   const shadowColor = "#bdbdbd"
-  const lightEventColor = tinycolor(event.colorHex).lighten(10).toString()
+  const lightEventColor = tinycolor(event.colorHex).lighten(25).toString()
 
   const onPressMore = () => {
     return null
@@ -23,10 +25,10 @@ const EventItem = ({ event }: Props) => {
 
   return (
     <Shadow
-      distance={5}
+      distance={20}
       startColor={shadowColor}
-      offset={[0, 3]}
-      style={{ alignSelf: "stretch" }}
+      offset={[0, 1]}
+      stretch={true}
     >
       <View style={[styles.container]}>
         {/* Profile Image, Name, More button */}
@@ -50,14 +52,22 @@ const EventItem = ({ event }: Props) => {
           <Text style={styles.titleText}>{event.title}</Text>
 
           <View style={[styles.location, styles.flexRow]}>
-            <Icon name="location-on" color={event.colorHex} />
+            <MaterialCommunityIcons
+              name="map-marker-outline"
+              size={24}
+              color={event.colorHex}
+            />
             <Text style={styles.infoText}>
               {placemarkToFormattedAddress(event.address)}
             </Text>
           </View>
 
           <View style={styles.flexRow}>
-            <Icon name="event-available" color={event.colorHex} />
+            <MaterialCommunityIcons
+              name="calendar-check-outline"
+              size={24}
+              color={event.colorHex}
+            />
             <Text style={styles.infoText} accessibilityLabel="day">
               {event.duration.formatted()}
             </Text>
@@ -71,27 +81,34 @@ const EventItem = ({ event }: Props) => {
         {/* People Attending, Distance */}
         <View style={styles.distanceContainer}>
           <View style={[styles.flexRow, { alignItems: "center" }]}>
-            <Icon name="people-alt" color={event.colorHex} />
+            <MaterialCommunityIcons
+              name="account-multiple-outline"
+              size={24}
+              color={event.colorHex}
+            />
             <Text
               style={[styles.attendingText, styles.attendingNumber]}
             >{`${numAttendees}`}</Text>
             <Text style={styles.attendingText}>{" attending"}</Text>
           </View>
 
-          <Shadow distance={4} startColor={shadowColor} offset={[0, 1]}>
-            <View
-              style={[
-                styles.distance,
-                {
-                  backgroundColor: event.colorHex,
-                  borderColor: lightEventColor
-                }
-              ]}
-            >
-              <Icon name="near-me" size={20} color="white" />
-              <Text style={styles.distanceText}>{`${distance} mi`}</Text>
-            </View>
-          </Shadow>
+          <View
+            style={[
+              styles.distance,
+              {
+                backgroundColor: lightEventColor
+              }
+            ]}
+          >
+            <MaterialCommunityIcons
+              name="navigation-variant-outline"
+              size={22}
+              color={event.colorHex}
+            />
+            <Text
+              style={[styles.distanceText, { color: event.colorHex }]}
+            >{`${distance} mi`}</Text>
+          </View>
         </View>
       </View>
     </Shadow>
@@ -141,14 +158,15 @@ const styles = StyleSheet.create({
   },
   moreButtonStyle: {
     flex: 1,
+    opacity: 0.3,
     alignItems: "flex-end"
   },
   distance: {
     flexDirection: "row",
     alignSelf: "center",
-    paddingVertical: "3%",
-    borderRadius: 14,
-    borderWidth: 3
+    paddingVertical: "1%",
+    paddingLeft: "1%",
+    borderRadius: 14
   },
   distanceContainer: {
     flexDirection: "row"
@@ -167,6 +185,7 @@ const styles = StyleSheet.create({
   },
   container: {
     backgroundColor: "white",
+    // marginHorizontal: 6,
     paddingHorizontal: "6%",
     paddingVertical: "3%",
     borderRadius: 20
