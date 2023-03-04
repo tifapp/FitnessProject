@@ -11,6 +11,7 @@ import {
 import { useEventFormContext } from "../EventForm"
 import { ToolbarProvider, ToolbarSection, useToolbar } from "./ToolbarProvider"
 import { MaterialIcons } from "@expo/vector-icons"
+import { useFontScale } from "@hooks/useFontScale"
 
 /**
  * A horizontally scrolling toolbar for an event form.
@@ -51,6 +52,8 @@ const ColorCicle = () => (
   <View
     style={{
       backgroundColor: useEventFormContext().watch("color"),
+      width: 16 * useFontScale(),
+      height: 16 * useFontScale(),
       ...styles.colorCircle
     }}
   />
@@ -70,7 +73,7 @@ type SectionTabIconProps = {
 const SectionTabIcon = ({ name, style = {} }: SectionTabIconProps) => (
   <MaterialIcons
     name={name}
-    size={16}
+    size={16 * useFontScale()}
     color="black"
     style={[styles.tabIcon, style]}
   />
@@ -137,8 +140,6 @@ const styles = StyleSheet.create({
     marginRight: 8
   },
   colorCircle: {
-    borderRadius: 32,
-    height: 16,
-    width: 16
+    borderRadius: 32
   }
 })
