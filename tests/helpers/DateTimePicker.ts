@@ -25,12 +25,13 @@ const androidSetDateTimePickerDate = ({
   testID,
   toDate: date
 }: SetDateTimePickerDateArgs) => {
-  jest
+  const mock = jest
     .spyOn(DateTimePickerModule.DateTimePickerAndroid, "open")
     .mockImplementation(({ onChange }) => {
       onChange?.(nativeEvent(date), date)
     })
   fireEvent.press(screen.getByTestId(testID))
+  mock.mockRestore()
 }
 
 const iOSSetDateTimePickerDate = ({
