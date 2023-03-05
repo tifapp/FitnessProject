@@ -1,8 +1,18 @@
 import { useReactHookFormContext } from "@hooks/FormHooks"
 import { EditEventInput } from "@lib/events"
-import React, { ReactNode, useContext, createContext } from "react"
+import React, {
+  ReactNode,
+  useContext,
+  createContext,
+  useState,
+  useRef,
+  useEffect
+} from "react"
 import { useForm, FormProvider, useController } from "react-hook-form"
+import { Keyboard } from "react-native"
 import { EventFormValues } from "./EventFormValues"
+
+export type EventFormToolbarSection = "date" | "color" | "advanced"
 
 /**
  * Props for `EventForm`.
@@ -40,7 +50,18 @@ export const EventForm = ({
   const formMethods = useForm({
     defaultValues: initialValues
   })
-  const { handleSubmit, formState } = formMethods
+  const { handleSubmit, formState, setFocus } = formMethods
+  const [currentSection, setCurrentSection] = useState<
+    EventFormToolbarSection | undefined
+  >()
+  const focusedField = useRef<keyof EventFormValues>("title")
+
+  useEffect(() => {
+    if (!currentSection) {
+      setFocus(focusedField.current)
+    }
+  }, [currentSection])
+
   return (
     <FormProvider {...formMethods}>
       <EventFormContext.Provider
@@ -49,7 +70,16 @@ export const EventForm = ({
             await handleSubmit(async () => await onSubmit(update))()
           },
           dismiss: onDismiss,
-          hasEdited: formState.isDirty
+          hasEdited: formState.isDirty,
+          currentSection,
+          openSection: (section) => {
+            Keyboard.dismiss()
+            setCurrentSection(section)
+          },
+          dismissCurrentSection: () => setCurrentSection(undefined),
+          setFocusedField: (name) => {
+            focusedField.current = name
+          }
         }}
       >
         {children}
@@ -79,7 +109,7 @@ export const useEventFormField = <
       field.onChange(value)
     }
   }
-  return [field.value as V, updateField] as const
+  return [field.value as V, updateField, field.ref] as const
 }
 
 /**
@@ -100,6 +130,13 @@ export type EventFormContextValues = {
    * True if the form has been editted.
    */
   hasEdited: boolean
+
+  currentSection?: EventFormToolbarSection
+
+  openSection: (section: EventFormToolbarSection) => void
+  dismissCurrentSection: () => void
+
+  setFocusedField: (name: keyof EventFormValues) => void
 }
 
 /**

@@ -1,15 +1,18 @@
 import React, { ReactNode } from "react"
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import { useToolbar } from "./Provider"
 import { MaterialIcons } from "@expo/vector-icons"
 import { DynamicTypeSizes, useFontScale } from "@lib/FontScale"
+import { useEventFormContext } from "./EventForm"
 
 export type EventFormToolbarSectionProps = {
   title: string
   children: ReactNode
 }
 
-export const EventFormToolbarSection = ({
+/**
+ * A header which displays a dismissable section of the event form.
+ */
+export const EventFormSectionHeader = ({
   title,
   children
 }: EventFormToolbarSectionProps) => (
@@ -23,7 +26,7 @@ export const EventFormToolbarSection = ({
       </Text>
       <TouchableOpacity
         accessibilityLabel="Close Section"
-        onPress={useToolbar().dismissCurrentSection}
+        onPress={useEventFormContext().dismissCurrentSection}
       >
         <MaterialIcons
           style={styles.closeIcon}

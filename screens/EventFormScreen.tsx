@@ -1,14 +1,19 @@
+import { EventFormBottomSheet } from "@components/eventForm/BottomSheet"
 import { EditEventInput } from "@lib/events"
 import { useFontScale } from "@lib/FontScale"
 import React from "react"
-import { SafeAreaView, StyleSheet, View } from "react-native"
+import {
+  KeyboardAvoidingView,
+  SafeAreaView,
+  StyleSheet,
+  View
+} from "react-native"
 import {
   EventForm,
-  EventFormDescriptionField,
   EventFormDismissButton,
   EventFormLocationBanner,
   EventFormSubmitButton,
-  EventFormTitleField,
+  EventFormTextField,
   EventFormToolbar,
   EventFormValues
 } from "../components/eventForm"
@@ -34,11 +39,9 @@ const EventFormScreen = ({
     <SafeAreaView style={styles.container}>
       <Header submissionLabel={submissionLabel} />
       <TextFields />
-      <EventFormLocationBanner />
-      <EventFormToolbar
-        style={{ ...styles.toolbar, height: 44 * useFontScale() }}
-      />
+      <Footer />
     </SafeAreaView>
+    <EventFormBottomSheet />
   </EventForm>
 )
 
@@ -57,10 +60,30 @@ const Header = ({ submissionLabel }: HeaderProps) => (
 
 const TextFields = () => (
   <View style={styles.padding}>
-    <EventFormTitleField />
+    <EventFormTextField
+      placeholder="Title"
+      fieldName="title"
+      multiline
+      maxLength={75}
+      style={styles.title}
+    />
     <View style={styles.textFieldsSpacer} />
-    <EventFormDescriptionField />
+    <EventFormTextField
+      placeholder="Description"
+      fieldName="description"
+      style={styles.description}
+    />
   </View>
+)
+
+const Footer = () => (
+  <KeyboardAvoidingView behavior="padding" style={styles.footer}>
+    <EventFormLocationBanner />
+    <EventFormToolbar
+      scrollStyle={{ height: 44 * useFontScale() }}
+      containerStyle={styles.toolbar}
+    />
+  </KeyboardAvoidingView>
 )
 
 const styles = StyleSheet.create({
@@ -86,6 +109,20 @@ const styles = StyleSheet.create({
   toolbar: {
     minHeight: "100%",
     paddingHorizontal: 16
+  },
+  footer: {
+    flex: 1,
+    position: "absolute",
+    bottom: 16,
+    minHeight: "100%",
+    minWidth: "100%"
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold"
+  },
+  description: {
+    fontSize: 16
   }
 })
 

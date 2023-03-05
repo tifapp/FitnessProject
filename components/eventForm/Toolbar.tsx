@@ -8,13 +8,13 @@ import {
   TouchableOpacity,
   StyleSheet
 } from "react-native"
-import { useEventFormContext } from "../EventForm"
-import { ToolbarProvider, ToolbarSection, useToolbar } from "./Provider"
+import { EventFormToolbarSection, useEventFormContext } from "./EventForm"
 import { MaterialIcons } from "@expo/vector-icons"
 import { useFontScale } from "@lib/FontScale"
 
 export type EventFormToolbarProps = {
-  style?: StyleProp<ViewStyle>
+  scrollStyle?: StyleProp<ViewStyle>
+  containerStyle?: StyleProp<ViewStyle>
 }
 
 /**
@@ -23,14 +23,20 @@ export type EventFormToolbarProps = {
  * Each tab on the toolbar opens a bottom sheet screen
  * where its respective form values can be edited.
  */
-export const EventFormToolbar = ({ style }: EventFormToolbarProps) => (
-  <ToolbarProvider>
-    <ScrollView horizontal contentContainerStyle={style}>
-      <DateTab />
-      <ColorTab />
-      <AdvancedSettingsTab />
-    </ScrollView>
-  </ToolbarProvider>
+export const EventFormToolbar = ({
+  scrollStyle,
+  containerStyle
+}: EventFormToolbarProps) => (
+  <ScrollView
+    horizontal
+    keyboardShouldPersistTaps="always"
+    style={scrollStyle}
+    contentContainerStyle={containerStyle}
+  >
+    <DateTab />
+    <ColorTab />
+    <AdvancedSettingsTab />
+  </ScrollView>
 )
 
 const DateTab = () => (
@@ -83,7 +89,7 @@ const SectionTabIcon = ({ name, style = {} }: SectionTabIconProps) => (
 
 type SectionTabProps = {
   children: ReactNode
-  section: ToolbarSection
+  section: EventFormToolbarSection
   accessibilityLabel: string
 }
 
@@ -92,7 +98,7 @@ const SectionTab = ({
   section,
   accessibilityLabel
 }: SectionTabProps) => {
-  const { openSection } = useToolbar()
+  const { openSection } = useEventFormContext()
   return (
     <TouchableOpacity
       onPress={() => openSection(section)}
@@ -108,6 +114,11 @@ const SectionTab = ({
 }
 
 const styles = StyleSheet.create({
+  container: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-start"
+  },
   outlined: {
     borderWidth: 1,
     borderRadius: 12,
