@@ -1,9 +1,7 @@
-import HexColorPicker, {
-  HexColorPickerOption
-} from "../formComponents/HexColorPicker"
-import { EventColor, EventColors } from "../../lib/events/EventColors"
+import HexColorPicker from "../formComponents/HexColorPicker"
 import React from "react"
-import { useEventFormField } from "."
+import { useEventFormField } from "./EventForm"
+import { eventColorOptions } from "./EventFormValues"
 
 /**
  * A color picker for an event form.
@@ -18,13 +16,3 @@ export const EventFormColorPicker = () => {
     />
   )
 }
-
-const eventColorOptions = [
-  { color: EventColors.Red, accessibilityLabel: "Red" },
-  { color: EventColors.Orange, accessibilityLabel: "Orange" },
-  { color: EventColors.Pink, accessibilityLabel: "Pink" },
-  { color: EventColors.Yellow, accessibilityLabel: "Yellow" },
-  { color: EventColors.Green, accessibilityLabel: "Green" },
-  { color: EventColors.Purple, accessibilityLabel: "Purple" },
-  { color: EventColors.Blue, accessibilityLabel: "Blue" }
-] as HexColorPickerOption<EventColor>[]

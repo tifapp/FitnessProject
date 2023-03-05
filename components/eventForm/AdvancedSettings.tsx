@@ -1,7 +1,7 @@
-import { FormLabel } from "@components/formComponents/FormLabels"
+import { FormLabel } from "../formComponents/FormLabels"
 import React from "react"
 import { StyleSheet, Switch, View } from "react-native"
-import { useEventFormContext, useEventFormField } from "."
+import { useEventFormContext, useEventFormField } from "./EventForm"
 
 /**
  * Advanced settings (hiding after start date, etc.) view for the event form.

@@ -9,6 +9,7 @@ import { Alert, Text, TouchableOpacity } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { QueryClient, QueryClientProvider } from "react-query"
 import EventFormScreen from "./EventFormScreen"
+import { EventFormTestScreen } from "./testScreens/EventFormTestScreen"
 
 const queryClient = new QueryClient()
 
@@ -32,44 +33,7 @@ const ActivitiesScreen = () => {
     )
   }
 
-  return (
-    <QueryClientProvider client={queryClient}>
-      <SetDependencyValue
-        forKey={geocodingDependencyKey}
-        value={
-          {
-            reverseGeocode: async () => {
-              throw new Error()
-            }
-          } as unknown as Geocoding
-        }
-      >
-        <EventFormScreen
-          initialValues={{
-            title: "Test",
-            description: "Hello world this is a test.",
-            color: EventColors.Red,
-            dateRange: dateRange(
-              new Date("2023-03-02T08:00:00"),
-              new Date("2023-03-02T09:00:00")
-            ),
-            radiusMeters: 0,
-            locationInfo: {
-              coordinates: { latitude: 41.234, longitude: -121.123 },
-              placemarkInfo: {
-                name: "Test Location",
-                address: "1234 Test Dr, Test City, CA 12345"
-              }
-            },
-            shouldHideAfterStartDate: false
-          }}
-          submissionLabel="Save Event"
-          onDismiss={() => Alert.alert("Dismissed")}
-          onSubmit={async () => Alert.alert("Submitted")}
-        />
-      </SetDependencyValue>
-    </QueryClientProvider>
-  )
+  return <EventFormTestScreen />
 }
 
 export default ActivitiesScreen

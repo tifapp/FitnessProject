@@ -1,7 +1,7 @@
 import React from "react"
 import { Alert, TouchableOpacity } from "react-native"
 import { MaterialIcons } from "@expo/vector-icons"
-import { useEventFormContext } from "."
+import { useEventFormContext } from "./EventForm"
 
 /**
  * A dismiss button for `EventForm`.

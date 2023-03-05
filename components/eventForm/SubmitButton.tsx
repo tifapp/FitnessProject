@@ -1,7 +1,8 @@
-import { FontScaleFactors } from "@lib/FontScale"
+import { FontScaleFactors } from "../../lib/FontScale"
 import React from "react"
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import { eventEditInputFromFormValues, useEventFormContext } from "."
+import { useEventFormContext } from "./EventForm"
+import { eventEditInputFromFormValues } from "./EventFormValues"
 
 /**
  * Props from `EventFormSubmitButton`.

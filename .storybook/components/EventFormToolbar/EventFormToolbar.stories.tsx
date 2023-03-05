@@ -1,8 +1,12 @@
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import { Alert } from "react-native"
+import React from "react"
+import { Alert, View } from "react-native"
 import {
   EventForm,
+  EventFormDismissButton,
+  EventFormLocationBanner,
   EventFormProps,
+  EventFormSubmitButton,
   EventFormToolbar
 } from "../../../components/eventForm/"
 import { dateRange } from "../../../lib/date"
@@ -23,7 +27,7 @@ const EventFormToolbarMeta: ComponentMeta<typeof EventForm> = {
     initialValues: {
       title: "Test",
       description: "Hello world this is a test.",
-      color: EventColors.BrightPink,
+      color: EventColors.Yellow,
       dateRange: dateRange(
         new Date("2023-03-02T08:00:00"),
         new Date("2023-03-02T09:00:00")

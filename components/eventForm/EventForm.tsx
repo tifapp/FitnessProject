@@ -1,5 +1,5 @@
-import { useReactHookFormContext } from "@hooks/FormHooks"
-import { EditEventInput } from "@lib/events"
+import { useReactHookFormContext } from "../../hooks/FormHooks"
+import { EditEventInput } from "../../lib/events"
 import React, {
   ReactNode,
   useContext,

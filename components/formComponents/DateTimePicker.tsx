@@ -5,7 +5,7 @@ import RNDateTimePicker, {
 } from "@react-native-community/datetimepicker"
 import { dayjs } from "../../lib/date"
 import { MaterialIcons } from "@expo/vector-icons"
-import IconButton from "@components/common/IconButton"
+import IconButton from "../common/IconButton"
 
 /**
  * Default date formatter for `DateTimePicker`.
