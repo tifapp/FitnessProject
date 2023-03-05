@@ -1,4 +1,4 @@
-type Challenge @model @auth(rules: [{allow: private}]) {
+type Challenge @model {
   id: ID!
   name: String!
   Description: String!

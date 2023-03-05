@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "{\"createdOn\":\"Windows\",\"createdBy\":\"Amplify\",\"createdWith\":\"7.5.3\",\"stackType\":\"function-Lambda\",\"metadata\":{}}",
+  "Description": "{\"createdOn\":\"Windows\",\"createdBy\":\"Amplify\",\"createdWith\":\"10.7.3\",\"stackType\":\"function-Lambda\",\"metadata\":{}}",
   "Parameters": {
     "CloudWatchRule": {
       "Type": "String",
@@ -27,10 +27,6 @@
     "functionbackendResourcesArn": {
       "Type": "String",
       "Default": "functionbackendResourcesArn"
-    },
-    "storagemediaBucketName": {
-      "Type": "String",
-      "Default": "storagemediaBucketName"
     }
   },
   "Conditions": {
@@ -63,12 +59,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "postNotifications",
+            "eventNotifications",
             {
               "Fn::Join": [
                 "",
                 [
-                  "postNotifications",
+                  "eventNotifications",
                   "-",
                   {
                     "Ref": "env"
@@ -91,9 +87,6 @@
             },
             "API_FITNESSPROJECTAPI_GRAPHQLAPIENDPOINTOUTPUT": {
               "Ref": "apifitnessprojectapiGraphQLAPIEndpointOutput"
-            },
-            "STORAGE_MEDIA_BUCKETNAME": {
-              "Ref": "storagemediaBucketName"
             }
           }
         },
@@ -109,7 +102,7 @@
             "Ref": "functionbackendResourcesArn"
           }
         ],
-        "Timeout": "25"
+        "Timeout": 25
       }
     },
     "LambdaExecutionRole": {
@@ -118,12 +111,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "fitnessprojectLambdaRole8fcd5380",
+            "fitnessprojectLambdaRole86db69bc",
             {
               "Fn::Join": [
                 "",
                 [
-                  "fitnessprojectLambdaRole8fcd5380",
+                  "fitnessprojectLambdaRole86db69bc",
                   "-",
                   {
                     "Ref": "env"
@@ -261,57 +254,18 @@
                   ]
                 }
               ]
-            },
-            {
-              "Effect": "Allow",
-              "Action": "s3:ListBucket",
-              "Resource": [
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:aws:s3:::",
-                      {
-                        "Ref": "storagemediaBucketName"
-                      }
-                    ]
-                  ]
-                }
-              ]
-            },
-            {
-              "Effect": "Allow",
-              "Action": [
-                "s3:PutObject",
-                "s3:GetObject",
-                "s3:DeleteObject"
-              ],
-              "Resource": [
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:aws:s3:::",
-                      {
-                        "Ref": "storagemediaBucketName"
-                      },
-                      "/*"
-                    ]
-                  ]
-                }
-              ]
             }
           ]
         }
       }
     },
-    "LambdaTriggerPolicyPost": {
+    "LambdaTriggerPolicyEvent": {
       "DependsOn": [
         "LambdaExecutionRole"
       ],
       "Type": "AWS::IAM::Policy",
       "Properties": {
-        "PolicyName": "amplify-lambda-execution-policy-Post",
+        "PolicyName": "amplify-lambda-execution-policy-Event",
         "Roles": [
           {
             "Ref": "LambdaExecutionRole"
@@ -330,7 +284,7 @@
               ],
               "Resource": {
                 "Fn::ImportValue": {
-                  "Fn::Sub": "${apifitnessprojectapiGraphQLAPIIdOutput}:GetAtt:PostTable:StreamArn"
+                  "Fn::Sub": "${apifitnessprojectapiGraphQLAPIIdOutput}:GetAtt:EventTable:StreamArn"
                 }
               }
             }
@@ -338,10 +292,10 @@
         }
       }
     },
-    "LambdaEventSourceMappingPost": {
+    "LambdaEventSourceMappingEvent": {
       "Type": "AWS::Lambda::EventSourceMapping",
       "DependsOn": [
-        "LambdaTriggerPolicyPost",
+        "LambdaTriggerPolicyEvent",
         "LambdaExecutionRole"
       ],
       "Properties": {
@@ -349,7 +303,7 @@
         "Enabled": true,
         "EventSourceArn": {
           "Fn::ImportValue": {
-            "Fn::Sub": "${apifitnessprojectapiGraphQLAPIIdOutput}:GetAtt:PostTable:StreamArn"
+            "Fn::Sub": "${apifitnessprojectapiGraphQLAPIIdOutput}:GetAtt:EventTable:StreamArn"
           }
         },
         "FunctionName": {

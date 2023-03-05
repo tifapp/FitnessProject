@@ -30,7 +30,7 @@ exports.sendNotification = async (deviceToken, message) => {
     to: String(deviceToken),
     sound: "default",
     body: message,
-    data: { status: "ok" },
+    data: { status: "ok"},
   };
   try {
     let tickets = await expo.sendPushNotificationsAsync([pushMessage]);

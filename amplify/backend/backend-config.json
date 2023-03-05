@@ -1,261 +1,519 @@
 {
-  "auth": {
-    "fitnessprojecta8f49cfe": {
-      "service": "Cognito",
+  "analytics": {
+    "fitnessproject": {
       "providerPlugin": "awscloudformation",
-      "dependsOn": [],
-      "customAuth": false
-    },
-    "userPoolGroups": {
-      "service": "Cognito-UserPool-Groups",
-      "providerPlugin": "awscloudformation",
-      "dependsOn": [
-        {
-          "category": "auth",
-          "resourceName": "fitnessprojecta8f49cfe",
-          "attributes": [
-            "UserPoolId",
-            "AppClientIDWeb",
-            "AppClientID",
-            "IdentityPoolId"
-          ]
-        }
-      ]
+      "service": "Pinpoint"
     }
   },
   "api": {
     "fitnessprojectapi": {
-      "service": "AppSync",
-      "providerPlugin": "awscloudformation",
       "output": {
         "authConfig": {
+          "additionalAuthenticationProviders": [
+            {
+              "authenticationType": "AWS_IAM"
+            }
+          ],
           "defaultAuthentication": {
             "authenticationType": "AMAZON_COGNITO_USER_POOLS",
             "userPoolConfig": {
               "userPoolId": "authfitnessprojecta8f49cfe"
             }
-          },
-          "additionalAuthenticationProviders": [
-            {
-              "authenticationType": "AWS_IAM"
-            }
-          ]
+          }
         }
-      }
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "AppSync"
+    }
+  },
+  "auth": {
+    "fitnessprojecta8f49cfe": {
+      "customAuth": false,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito"
+    },
+    "userPoolGroups": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId",
+            "AppClientIDWeb",
+            "AppClientID",
+            "IdentityPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "fitnessprojecta8f49cfe"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito-UserPool-Groups"
     }
   },
   "function": {
     "S3Triggeref91c1ec": {
-      "service": "Lambda",
-      "providerPlugin": "awscloudformation",
       "build": true,
-      "dependsOn": []
-    },
-    "friendNotifications": {
-      "build": true,
+      "dependsOn": [],
       "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": [
-        {
-          "category": "function",
-          "resourceName": "backendResources",
-          "attributes": [
-            "Arn"
-          ]
-        },
-        {
-          "category": "api",
-          "resourceName": "fitnessprojectapi",
-          "attributes": [
-            "GraphQLAPIIdOutput",
-            "GraphQLAPIEndpointOutput"
-          ]
-        }
-      ]
+      "service": "Lambda"
     },
     "backendResources": {
-      "providerPlugin": "awscloudformation",
-      "service": "LambdaLayer",
-      "build": true
-    },
-    "deleteUserData": {
       "build": true,
       "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": [
-        {
-          "category": "api",
-          "resourceName": "fitnessprojectapi",
-          "attributes": [
-            "GraphQLAPIIdOutput",
-            "GraphQLAPIEndpointOutput"
-          ]
-        },
-        {
-          "category": "function",
-          "resourceName": "backendResources",
-          "attributes": [
-            "Arn"
-          ]
-        }
-      ]
-    },
-    "postNotifications": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": [
-        {
-          "category": "api",
-          "resourceName": "fitnessprojectapi",
-          "attributes": [
-            "GraphQLAPIIdOutput",
-            "GraphQLAPIEndpointOutput"
-          ]
-        },
-        {
-          "category": "storage",
-          "resourceName": "media",
-          "attributes": [
-            "BucketName"
-          ]
-        },
-        {
-          "category": "function",
-          "resourceName": "backendResources",
-          "attributes": [
-            "Arn"
-          ]
-        }
-      ]
-    },
-    "likeNotifications": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": [
-        {
-          "category": "api",
-          "resourceName": "fitnessprojectapi",
-          "attributes": [
-            "GraphQLAPIIdOutput",
-            "GraphQLAPIEndpointOutput"
-          ]
-        },
-        {
-          "category": "function",
-          "resourceName": "backendResources",
-          "attributes": [
-            "Arn"
-          ]
-        }
-      ]
+      "service": "LambdaLayer"
     },
     "conversationEvents": {
       "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
       "dependsOn": [
         {
-          "category": "api",
-          "resourceName": "fitnessprojectapi",
           "attributes": [
             "GraphQLAPIIdOutput",
             "GraphQLAPIEndpointOutput"
-          ]
+          ],
+          "category": "api",
+          "resourceName": "fitnessprojectapi"
         },
         {
-          "category": "function",
-          "resourceName": "backendResources",
           "attributes": [
             "Arn"
-          ]
+          ],
+          "category": "function",
+          "resourceName": "backendResources"
         }
-      ]
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
     },
-    "reportNotification": {
+    "deleteUserData": {
       "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
       "dependsOn": [
         {
-          "category": "api",
-          "resourceName": "fitnessprojectapi",
           "attributes": [
             "GraphQLAPIIdOutput",
             "GraphQLAPIEndpointOutput"
-          ]
+          ],
+          "category": "api",
+          "resourceName": "fitnessprojectapi"
         },
         {
-          "category": "function",
-          "resourceName": "backendResources",
           "attributes": [
             "Arn"
-          ]
+          ],
+          "category": "function",
+          "resourceName": "backendResources"
         }
-      ]
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "eventNotifications": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "GraphQLAPIIdOutput",
+            "GraphQLAPIEndpointOutput"
+          ],
+          "category": "api",
+          "resourceName": "fitnessprojectapi"
+        },
+        {
+          "attributes": [
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "backendResources"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "friendNotifications": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "backendResources"
+        },
+        {
+          "attributes": [
+            "GraphQLAPIIdOutput",
+            "GraphQLAPIEndpointOutput"
+          ],
+          "category": "api",
+          "resourceName": "fitnessprojectapi"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "likeNotifications": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "GraphQLAPIIdOutput",
+            "GraphQLAPIEndpointOutput"
+          ],
+          "category": "api",
+          "resourceName": "fitnessprojectapi"
+        },
+        {
+          "attributes": [
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "backendResources"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
     },
     "onChallengeUpdate": {
       "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
       "dependsOn": [
         {
-          "category": "api",
-          "resourceName": "fitnessprojectapi",
           "attributes": [
             "GraphQLAPIIdOutput",
             "GraphQLAPIEndpointOutput"
-          ]
+          ],
+          "category": "api",
+          "resourceName": "fitnessprojectapi"
         },
         {
-          "category": "function",
-          "resourceName": "backendResources",
           "attributes": [
             "Arn"
-          ]
+          ],
+          "category": "function",
+          "resourceName": "backendResources"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "postNotifications": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "GraphQLAPIIdOutput",
+            "GraphQLAPIEndpointOutput"
+          ],
+          "category": "api",
+          "resourceName": "fitnessprojectapi"
+        },
+        {
+          "attributes": [
+            "BucketName"
+          ],
+          "category": "storage",
+          "resourceName": "media"
+        },
+        {
+          "attributes": [
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "backendResources"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "reportNotification": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "GraphQLAPIIdOutput",
+            "GraphQLAPIEndpointOutput"
+          ],
+          "category": "api",
+          "resourceName": "fitnessprojectapi"
+        },
+        {
+          "attributes": [
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "backendResources"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "hosting": {
+    "amplifyhosting": {
+      "providerPlugin": "awscloudformation",
+      "service": "amplifyhosting",
+      "type": "manual"
+    }
+  },
+  "notifications": {
+    "fitnessproject": {
+      "channels": [],
+      "service": "Pinpoint"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_analytics_Pinpoint_Id": {
+      "usedBy": [
+        {
+          "category": "analytics",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_analytics_Pinpoint_Name": {
+      "usedBy": [
+        {
+          "category": "analytics",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_analytics_Pinpoint_Region": {
+      "usedBy": [
+        {
+          "category": "analytics",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_function_S3Triggeref91c1ec_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "S3Triggeref91c1ec"
+        }
+      ]
+    },
+    "AMPLIFY_function_S3Triggeref91c1ec_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "S3Triggeref91c1ec"
+        }
+      ]
+    },
+    "AMPLIFY_function_backendResources_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "backendResources"
+        }
+      ]
+    },
+    "AMPLIFY_function_backendResources_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "backendResources"
+        }
+      ]
+    },
+    "AMPLIFY_function_conversationEvents_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "conversationEvents"
+        }
+      ]
+    },
+    "AMPLIFY_function_conversationEvents_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "conversationEvents"
+        }
+      ]
+    },
+    "AMPLIFY_function_deleteUserData_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteUserData"
+        }
+      ]
+    },
+    "AMPLIFY_function_deleteUserData_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteUserData"
+        }
+      ]
+    },
+    "AMPLIFY_function_eventNotifications_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "eventNotifications"
+        }
+      ]
+    },
+    "AMPLIFY_function_eventNotifications_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "eventNotifications"
+        }
+      ]
+    },
+    "AMPLIFY_function_friendNotifications_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "friendNotifications"
+        }
+      ]
+    },
+    "AMPLIFY_function_friendNotifications_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "friendNotifications"
+        }
+      ]
+    },
+    "AMPLIFY_function_likeNotifications_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "likeNotifications"
+        }
+      ]
+    },
+    "AMPLIFY_function_likeNotifications_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "likeNotifications"
+        }
+      ]
+    },
+    "AMPLIFY_function_onChallengeUpdate_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "onChallengeUpdate"
+        }
+      ]
+    },
+    "AMPLIFY_function_onChallengeUpdate_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "onChallengeUpdate"
+        }
+      ]
+    },
+    "AMPLIFY_function_postNotifications_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "postNotifications"
+        }
+      ]
+    },
+    "AMPLIFY_function_postNotifications_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "postNotifications"
+        }
+      ]
+    },
+    "AMPLIFY_function_reportNotification_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "reportNotification"
+        }
+      ]
+    },
+    "AMPLIFY_function_reportNotification_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "reportNotification"
+        }
+      ]
+    },
+    "AMPLIFY_hosting_amplifyhosting_appId": {
+      "usedBy": [
+        {
+          "category": "hosting",
+          "resourceName": "amplifyhosting"
+        }
+      ]
+    },
+    "AMPLIFY_hosting_amplifyhosting_type": {
+      "usedBy": [
+        {
+          "category": "hosting",
+          "resourceName": "amplifyhosting"
+        }
+      ]
+    },
+    "AMPLIFY_notifications_Pinpoint_Id": {
+      "usedBy": [
+        {
+          "category": "notifications",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_notifications_Pinpoint_Name": {
+      "usedBy": [
+        {
+          "category": "notifications",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_notifications_Pinpoint_Region": {
+      "usedBy": [
+        {
+          "category": "notifications",
+          "resourceName": "Pinpoint"
         }
       ]
     }
   },
   "storage": {
     "media": {
-      "service": "S3",
-      "providerPlugin": "awscloudformation",
       "dependsOn": [
         {
-          "category": "function",
-          "resourceName": "S3Triggeref91c1ec",
           "attributes": [
             "Name",
             "Arn",
             "LambdaExecutionRole"
-          ]
+          ],
+          "category": "function",
+          "resourceName": "S3Triggeref91c1ec"
         },
         {
-          "category": "auth",
-          "resourceName": "fitnessprojecta8f49cfe",
           "attributes": [
             "UserPoolId"
-          ]
+          ],
+          "category": "auth",
+          "resourceName": "fitnessprojecta8f49cfe"
         },
         {
-          "category": "auth",
-          "resourceName": "userPoolGroups",
           "attributes": [
             "AdminsGroupRole"
-          ]
+          ],
+          "category": "auth",
+          "resourceName": "userPoolGroups"
         }
-      ]
-    }
-  },
-  "hosting": {
-    "amplifyhosting": {
-      "service": "amplifyhosting",
+      ],
       "providerPlugin": "awscloudformation",
-      "type": "manual"
+      "service": "S3"
     }
-  },
-  "analytics": {},
-  "notifications": {}
+  }
 }
