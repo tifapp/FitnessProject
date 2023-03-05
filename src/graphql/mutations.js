@@ -38,8 +38,31 @@ export const verifyUser = /* GraphQL */ `
       friendRequestPrivacy
       messagesPrivacy
       isVerified
+      event {
+        comments
+        createdAt
+        updatedAt
+        userId
+        eventOwner
+        description
+        host
+        parentId
+        radius
+        startDateTime
+        endDateTime
+        name
+        location {
+          latitude
+          longitude
+        }
+        users {
+          nextToken
+        }
+      }
       createdAt
       updatedAt
+      eventUsersId
+      eventUsersUserId
     }
   }
 `;
@@ -275,6 +298,27 @@ export const createEvent = /* GraphQL */ `
         latitude
         longitude
       }
+      users {
+        items {
+          id
+          identityId
+          name
+          age
+          gender
+          bio
+          goals
+          status
+          deviceToken
+          friendRequestPrivacy
+          messagesPrivacy
+          isVerified
+          createdAt
+          updatedAt
+          eventUsersId
+          eventUsersUserId
+        }
+        nextToken
+      }
     }
   }
 `;
@@ -300,6 +344,27 @@ export const updateEvent = /* GraphQL */ `
         latitude
         longitude
       }
+      users {
+        items {
+          id
+          identityId
+          name
+          age
+          gender
+          bio
+          goals
+          status
+          deviceToken
+          friendRequestPrivacy
+          messagesPrivacy
+          isVerified
+          createdAt
+          updatedAt
+          eventUsersId
+          eventUsersUserId
+        }
+        nextToken
+      }
     }
   }
 `;
@@ -324,6 +389,27 @@ export const deleteEvent = /* GraphQL */ `
       location {
         latitude
         longitude
+      }
+      users {
+        items {
+          id
+          identityId
+          name
+          age
+          gender
+          bio
+          goals
+          status
+          deviceToken
+          friendRequestPrivacy
+          messagesPrivacy
+          isVerified
+          createdAt
+          updatedAt
+          eventUsersId
+          eventUsersUserId
+        }
+        nextToken
       }
     }
   }
@@ -593,8 +679,31 @@ export const createUser = /* GraphQL */ `
       friendRequestPrivacy
       messagesPrivacy
       isVerified
+      event {
+        comments
+        createdAt
+        updatedAt
+        userId
+        eventOwner
+        description
+        host
+        parentId
+        radius
+        startDateTime
+        endDateTime
+        name
+        location {
+          latitude
+          longitude
+        }
+        users {
+          nextToken
+        }
+      }
       createdAt
       updatedAt
+      eventUsersId
+      eventUsersUserId
     }
   }
 `;
@@ -620,8 +729,31 @@ export const updateUser = /* GraphQL */ `
       friendRequestPrivacy
       messagesPrivacy
       isVerified
+      event {
+        comments
+        createdAt
+        updatedAt
+        userId
+        eventOwner
+        description
+        host
+        parentId
+        radius
+        startDateTime
+        endDateTime
+        name
+        location {
+          latitude
+          longitude
+        }
+        users {
+          nextToken
+        }
+      }
       createdAt
       updatedAt
+      eventUsersId
+      eventUsersUserId
     }
   }
 `;
@@ -647,8 +779,31 @@ export const deleteUser = /* GraphQL */ `
       friendRequestPrivacy
       messagesPrivacy
       isVerified
+      event {
+        comments
+        createdAt
+        updatedAt
+        userId
+        eventOwner
+        description
+        host
+        parentId
+        radius
+        startDateTime
+        endDateTime
+        name
+        location {
+          latitude
+          longitude
+        }
+        users {
+          nextToken
+        }
+      }
       createdAt
       updatedAt
+      eventUsersId
+      eventUsersUserId
     }
   }
 `;

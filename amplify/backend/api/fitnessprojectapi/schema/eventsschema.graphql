@@ -22,16 +22,16 @@ type Event @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"}, 
   createdAt: AWSDateTime! @primaryKey(sortKeyFields: ["userId"])
   updatedAt: AWSDateTime!
   userId: ID! @index(name: "ByUser", queryField: "eventsByUser", sortKeyFields: ["createdAt"])
-  eventOwner: ID!
   description: String
-  host: String @index(name: "ByHost", queryField: "eventsByUserId", sortKeyFields: ["userId"])
+  ##eventOwnerName: String @index(name: "ByHost", queryField: "eventsByUserId", sortKeyFields: ["userId"])
+  eventOwner: User @hasOne
   parentId: ID
   radius: Float
   startDateTime: AWSDateTime! @index(name: "ByDate", queryField: "eventsByDate", sortKeyFields: ["createdAt"])
   endDateTime: AWSDateTime!
   name: String
   location: LocationEvent
-  ##users: [User] @hasMany 
+  users: [User] @hasMany 
 }
 
 """This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when creating a new message."""

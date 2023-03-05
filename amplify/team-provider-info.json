@@ -55,7 +55,7 @@
         },
         "eventNotifications": {
           "deploymentBucketName": "amplify-fitnessproject-dev-231929-deployment",
-          "s3Key": "amplify-builds/eventNotifications-64625868334b32677255-build.zip"
+          "s3Key": "amplify-builds/eventNotifications-58483445627961547251-build.zip"
         }
       },
       "hosting": {

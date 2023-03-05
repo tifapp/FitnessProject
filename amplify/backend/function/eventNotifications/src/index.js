@@ -1,4 +1,3 @@
-
 /* Amplify Params - DO NOT EDIT
 	ENV
 	REGION
@@ -22,6 +21,9 @@ exports.handler = event => {
 };
 */
 
+require("isomorphic-fetch");
+const gql = require("graphql-tag");
+
 const {
   deleteEvent,
 } = require("/opt/mutations");
@@ -36,23 +38,26 @@ const { WellArchitected } = require('aws-sdk');
 exports.handler = async (event, context, callback) => {
   return await Promise.all (
     event.Records.map(async (record) => {
+      console.log(event.Records);
       if(record.eventName == "REMOVE"){
         try {
+          const eventOwner= record.dynamodb.OldImage.userId.S;
+          console.log("event owner is " + eventOwner)
+          console.log("users in event are" + JSON.stringify(record.dynamodb.OldImage.users, null, 4))
           // get name of event owner for push message 
           const OwnerName = await client.query({
-            query: gql(eventOwner),
+            query: gql(getUser),
             variables: {
               id: eventOwner,
             },
           });
 
-          
-
           // hopfully gets list of all users in the post (OldImage == post before)
-          if (record.dynamodb.OldImage.users.L != null) { 
-            for (let i = 0; i < record.dynamodb.OldImage.users.length; i ++){
-              console.log(record.dynamodb.OldImage.users.L[i]);
-
+          if (record.dynamodb.OldImage.users.L != null) {
+            console.log("inside if")
+            console.log(record.dynamodb.OldImage.users.L.length)
+            for (let i = 0; i < record.dynamodb.OldImage.users.L.length; i ++){
+              console.log("user: " + i + record.dynamodb.OldImage.users.L[i]);
               const receiver = record.dynamodb.OldImage.users.L[i].S;
               const receiverName = await client.query({
                 query: gql(getUser),
@@ -61,44 +66,29 @@ exports.handler = async (event, context, callback) => {
                 },
               });
 
-              console.log(receiverName);
+              console.log("Receiver name: " + JSON.stringify(receiverName));
 
+              console.log("Host" + JSON.stringify(record.dynamodb.OldImage.host.S))
               await sendNotification(
-                receiverName.data.getUser.deviceToken, loadCapitals(record.dynamodb.OldImage.Host) + " Has cancelled the event! "
+                receiverName.data.getUser.deviceToken, loadCapitals(record.dynamodb.OldImage.host.S) + " Has cancelled the event! "
               );
             }
-            // deletes the event based on created at date and userId of event
-            client.mutate({
-              mutation: gql(deleteEvent),
-              variables: {
-                input: {
-                  createdAt: record.dynamodb.OldImage.createdAt,
-                  userId: record.dynamodb.OldImage.userId,
-                },
-              },
-            });
-              
             return "Successfully sent messaging notification";
           }
-
-
-
-          
-
         } catch (e) {
           console.warn("Error sending reply: ", e);
           return Error(e);
           }
       } 
     
-      if(record.eventName == "MODIFY"){
+      else if(record.eventName == "MODIFY"){
         try {
             // event location has been changed
             if((record.dynamodb.OldImage.location.latitude != record.dynamodb.NewImage.location.latitude) ||
             (record.dynamodb.OldImage.location.longitude != record.dynamodb.NewImage.location.longitude)){
               // hopfully gets list of all users in the post (OldImage == post before)
               if (record.dynamodb.OldImage.users.L != null) { 
-                for (let i = 0; i < record.dynamodb.OldImage.users.length; i ++){
+                for (let i = 0; i < record.dynamodb.OldImage.users.L.length; i ++){
                   console.log(record.dynamodb.OldImage.users.L[i]);
 
                   const receiver = record.dynamodb.OldImage.users.L[i].S;
@@ -112,7 +102,7 @@ exports.handler = async (event, context, callback) => {
                   console.log(receiverName);
 
                   await sendNotification(
-                    receiverName.data.getUser.deviceToken, loadCapitals(record.dynamodb.NewImage.Host) + " Has changed the event location! "
+                    receiverName.data.getUser.deviceToken, loadCapitals(record.dynamodb.OldImage.host.S) + " Has changed the event location! "
                   );
                 }
               }
@@ -123,7 +113,7 @@ exports.handler = async (event, context, callback) => {
             (record.dynamodb.OldImage.endDateTime != record.dynamodb.NewImage.endDateTime)){
 
               if (record.dynamodb.OldImage.users.L != null) { 
-                for (let i = 0; i < record.dynamodb.OldImage.users.length; i ++){
+                for (let i = 0; i < record.dynamodb.OldImage.users.L.length; i ++){
                   console.log(record.dynamodb.OldImage.users.L[i]);
 
                   const receiver = record.dynamodb.OldImage.users.L[i].S;
@@ -137,7 +127,7 @@ exports.handler = async (event, context, callback) => {
                   console.log(receiverName);
 
                   await sendNotification(
-                    receiverName.data.getUser.deviceToken, loadCapitals(record.dynamodb.NewImage.Host) + " Has changed the event start and end time! "
+                    receiverName.data.getUser.deviceToken, loadCapitals(record.dynamodb.OldImage.host.S) + " Has changed the event start and end time! "
                   );
                 }
               }
@@ -147,7 +137,7 @@ exports.handler = async (event, context, callback) => {
             else if(record.dynamodb.OldImage.startDateTime != record.dynamodb.NewImage.startDateTime){
               
               if (record.dynamodb.OldImage.users.L != null) { 
-                for (let i = 0; i < record.dynamodb.OldImage.users.length; i ++){
+                for (let i = 0; i < record.dynamodb.OldImage.users.L.length; i ++){
                   console.log(record.dynamodb.OldImage.users.L[i]);
 
                   const receiver = record.dynamodb.OldImage.users.L[i].S;
@@ -161,7 +151,7 @@ exports.handler = async (event, context, callback) => {
                   console.log(receiverName);
 
                   await sendNotification(
-                    receiverName.data.getUser.deviceToken, loadCapitals(record.dynamodb.NewImage.Host) + " Has changed the event start time! "
+                    receiverName.data.getUser.deviceToken, loadCapitals(record.dynamodb.OldImage.host.S) + " Has changed the event start time! "
                   );
                 }
               }
@@ -171,7 +161,7 @@ exports.handler = async (event, context, callback) => {
             else if(record.dynamodb.OldImage.endDateTime != record.dynamodb.NewImage.endDateTime){
 
               if (record.dynamodb.OldImage.users.L != null) { 
-                for (let i = 0; i < record.dynamodb.OldImage.users.length; i ++){
+                for (let i = 0; i < record.dynamodb.OldImage.users.L.length; i ++){
                   console.log(record.dynamodb.OldImage.users.L[i]);
 
                   const receiver = record.dynamodb.OldImage.users.L[i].S;
@@ -185,7 +175,7 @@ exports.handler = async (event, context, callback) => {
                   console.log(receiverName);
 
                   await sendNotification(
-                    receiverName.data.getUser.deviceToken, loadCapitals(record.dynamodb.NewImage.Host) + " Has changed the event end time! "
+                    receiverName.data.getUser.deviceToken, loadCapitals(record.dynamodb.OldImage.host.S) + " Has changed the event end time! "
                   );
                 }
               }
@@ -200,4 +190,3 @@ exports.handler = async (event, context, callback) => {
     })
   )
 }
-
