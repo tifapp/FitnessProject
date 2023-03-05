@@ -1,326 +1,176 @@
-import React, { useState, useEffect } from "react"
-import { StyleSheet, Text, View } from "react-native"
+import React from "react"
+import { Image, StyleSheet, Text, View } from "react-native"
 import { Event } from "@lib/events/Event"
 import IconButton from "./common/IconButton"
 import { Divider, Icon } from "react-native-elements"
+import { Shadow } from "react-native-shadow-2"
+import tinycolor from "tinycolor2"
+import { placemarkToFormattedAddress } from "@lib/location"
 
 interface Props {
   event: Event
 }
 
 const EventItem = ({ event }: Props) => {
-  const [requested, setRequested] = useState(false) // If user has requested to join
-  const [numInvitations, setNumInvitations] = useState(0) // Number of requested invitations
-  const [isMin, setIsMin] = useState(false) // If time limit has <> 1 hour left
-  const [isHours, setIsHours] = useState(false) // If time limit has >= 1 hour left
-  const [isDays, setIsDays] = useState(false) // // If time limit has > 24 hours left
-  const [timeUntil, setTimeUntil] = useState(0) // Time (in either days, hours, or minutes) until event starts
-  const [currentCapacity, setCurrentCapacity] = useState(1) // How many users have joined event
-  const CAPACITY_PERCENTAGE = 0.75
+  const numAttendees = 1
+  const distance = 0.5
+  const shadowColor = "#bdbdbd"
+  const lightEventColor = tinycolor(event.colorHex).lighten(10).toString()
 
-  const setTime = () => {
-    if (event.startTime) {
-      const date = new Date()
-      const diffTime = Math.abs(event.startTime.getTime() - date.getTime())
-      const diffMin = Math.ceil(diffTime / (1000 * 60))
-      const diffHours = Math.floor(diffMin / 60)
-      const diffDays = Math.floor(diffHours / 24)
-
-      if (diffMin < 60) {
-        setIsMin(true)
-        setIsHours(false)
-        setIsDays(false)
-        setTimeUntil(diffMin)
-      } else if (diffHours < 24) {
-        setIsMin(false)
-        setIsHours(true)
-        setIsDays(false)
-
-        if (diffMin % 60 >= 20 && diffMin % 60 <= 40) {
-          setTimeUntil(diffHours + 0.5)
-        } else {
-          setTimeUntil(diffHours)
-        }
-      } else {
-        setIsMin(false)
-        setIsDays(true)
-        setIsHours(false)
-        setTimeUntil(diffDays)
-      }
-    }
-  }
-
-  useEffect(() => {
-    setTime()
-  }, [event.startTime])
-
-  const handleRequestToJoin = () => {
-    if (requested) {
-      setRequested(false)
-      setNumInvitations(numInvitations - 1)
-    } else {
-      setRequested(true)
-      setNumInvitations(numInvitations + 1)
-    }
-  }
-
-  const displayTime = () => {
-    if (isDays) {
-      return `${timeUntil}d`
-    } else if (isHours) {
-      if (timeUntil === 1) {
-        return `${timeUntil}hr`
-      } else {
-        return `${timeUntil}hrs`
-      }
-    } else {
-      return `${timeUntil}min`
-    }
+  const onPressMore = () => {
+    return null
   }
 
   return (
-    <View style={styles.secondaryContainerStyle}>
-      <View style={[styles.nestedReply]}>
-        {/* Header (Event Icon, Event Title, Distance) */}
-        <View style={[styles.flexRow, styles.eventContainerStyle]}>
-          <View style={[styles.spacingTop, { paddingLeft: "3%" }]}>
-            <Icon name="location-pin" color={event.colorHex} />
-          </View>
-          <Text
-            style={[styles.eventTitle, styles.spacingTop]}
-            numberOfLines={1}
-          >
-            {event.title}
-          </Text>
-          <Text style={[styles.distance, styles.spacingTop]}>
-            {event.distance} mi
-          </Text>
+    <Shadow
+      distance={5}
+      startColor={shadowColor}
+      offset={[0, 3]}
+      style={{ alignSelf: "stretch" }}
+    >
+      <View style={[styles.container]}>
+        {/* Profile Image, Name, More button */}
+        <View style={[styles.topRow, styles.flexRow]}>
+          <Image
+            style={styles.image}
+            source={require("../assets/icon.png")}
+            accessibilityLabel="profile picture"
+          />
+          <Text style={styles.name}>{event.username}</Text>
+          <IconButton
+            iconName={"more-horiz"}
+            style={styles.moreButtonStyle}
+            size={26}
+            onPress={onPressMore}
+          />
         </View>
 
-        <Divider style={styles.divider} />
+        {/* Event Title, Location, Time */}
+        <View style={styles.middleRow}>
+          <Text style={styles.titleText}>{event.title}</Text>
 
-        {/* Bottom Left Icons (time until event, max occupancy) */}
-        <View style={[styles.flexRow, { paddingVertical: "3%" }]}>
-          <View style={[styles.flexRow, { paddingLeft: "3%" }]}>
-            {event.startTime != null
-              ? (
-              <View
-                style={{ flexDirection: "row" }}
-                accessibilityLabel={"time until"}
-              >
-                <View style={styles.alignIcon}>
-                  {isHours || isMin
-                    ? (
-                    <Icon
-                      name="access-time"
-                      size={20}
-                      style={{ color: isHours ? "grey" : "red" }}
-                      accessibilityLabel={"time icon"}
-                    />
-                      )
-                    : (
-                    <Icon
-                      name="date-range"
-                      size={20}
-                      color={"grey"}
-                      accessibilityLabel={"time icon"}
-                    />
-                      )}
-                </View>
-                <Text
-                  style={[
-                    styles.numbersBottomLeft,
-                    { color: isHours || isDays ? "grey" : "red" },
-                    { paddingHorizontal: "1%" }
-                  ]}
-                >
-                  {displayTime()}
-                </Text>
-              </View>
-                )
-              : null}
-            {event.startTime && event.maxOccupancy != null
-              ? (
-              <View style={styles.eventDot}>
-                <Icon name="lens" size={7} color={"grey"} />
-              </View>
-                )
-              : null}
-            {event.maxOccupancy
-              ? (
-              <View
-                style={styles.maxLimit}
-                accessibilityLabel={"max occupancy"}
-              >
-                <View style={styles.alignIcon}>
-                  <Icon
-                    name="person-outline"
-                    size={24}
-                    style={{
-                      color:
-                        currentCapacity >=
-                        Math.floor(event.maxOccupancy * CAPACITY_PERCENTAGE)
-                          ? "red"
-                          : "grey"
-                    }}
-                    accessibilityLabel={"occupancy icon"}
-                  />
-                </View>
-                <Text
-                  style={[
-                    styles.numbersBottomLeft,
-                    {
-                      color:
-                        currentCapacity >=
-                        Math.floor(event.maxOccupancy * CAPACITY_PERCENTAGE)
-                          ? "red"
-                          : "grey"
-                    }
-                  ]}
-                >
-                  {currentCapacity}/{event.maxOccupancy}
-                </Text>
-              </View>
-                )
-              : null}
+          <View style={[styles.location, styles.flexRow]}>
+            <Icon name="location-on" color={event.colorHex} />
+            <Text style={styles.infoText}>
+              {placemarkToFormattedAddress(event.address)}
+            </Text>
           </View>
 
-          {/* Bottom Right Icons (invitations, comments, more tab) */}
-          <View style={styles.iconsBottomRight}>
-            {event.isAcceptingInvitations
-              ? (
-              <View
-                style={styles.iconsBottomRight}
-                accessibilityLabel={"request invitations"}
-              >
-                <IconButton
-                  style={{ paddingRight: "14%" }}
-                  iconName={"person-add"}
-                  size={24}
-                  color={requested ? event.colorHex : "black"}
-                  onPress={handleRequestToJoin}
-                  accessibilityLabel={"invitation icon"}
-                  label={`${numInvitations > 0 ? numInvitations : ""}`}
-                  isLabelFirst={true}
-                  textStyle={styles.numbersBottomRight}
-                />
-              </View>
-                )
-              : null}
-            <IconButton
-              style={{ paddingRight: "5%" }}
-              iconName={"messenger"}
-              size={18}
-              color={"black"}
-              onPress={() => null}
-              accessibilityLabel={"comments icon"}
-              label={`${event.repliesCount}`}
-              isLabelFirst={true}
-              textStyle={styles.numbersBottomRight}
-            />
-            <IconButton
-              style={{ paddingLeft: "3%" }}
-              iconName={"more-vert"}
-              size={24}
-              color={"black"}
-              onPress={() => null}
-              accessibilityLabel={"more icon"}
-            />
+          <View style={styles.flexRow}>
+            <Icon name="event-available" color={event.colorHex} />
+            <Text style={styles.infoText} accessibilityLabel="day">
+              {event.duration.formatted()}
+            </Text>
           </View>
+
+          <View style={{ paddingVertical: "4%" }}>
+            <Divider style={{ height: 1 }} />
+          </View>
+        </View>
+
+        {/* People Attending, Distance */}
+        <View style={styles.distanceContainer}>
+          <View style={[styles.flexRow, { alignItems: "center" }]}>
+            <Icon name="people-alt" color={event.colorHex} />
+            <Text
+              style={[styles.attendingText, styles.attendingNumber]}
+            >{`${numAttendees}`}</Text>
+            <Text style={styles.attendingText}>{" attending"}</Text>
+          </View>
+
+          <Shadow distance={4} startColor={shadowColor} offset={[0, 1]}>
+            <View
+              style={[
+                styles.distance,
+                {
+                  backgroundColor: event.colorHex,
+                  borderColor: lightEventColor
+                }
+              ]}
+            >
+              <Icon name="near-me" size={20} color="white" />
+              <Text style={styles.distanceText}>{`${distance} mi`}</Text>
+            </View>
+          </Shadow>
         </View>
       </View>
-    </View>
+    </Shadow>
   )
 }
 
-export default React.memo(EventItem)
-
 const styles = StyleSheet.create({
-  secondaryContainerStyle: {
-    backgroundColor: "#f7f7f7",
-    paddingTop: "2%"
-    // paddingVertical: "5%"
-    // borderWidth: 2
-  },
   flexRow: {
     flex: 1,
     flexDirection: "row"
   },
-  spacingTop: {
-    paddingTop: "2%"
+  topRow: {
+    paddingBottom: "4%",
+    alignItems: "center"
   },
-  eventContainerStyle: {
-    paddingBottom: "3%",
-    paddingTop: "1%"
-  },
-  eventTitle: {
+  middleRow: {
     flex: 1,
-    flexDirection: "row",
-    alignSelf: "center",
-    paddingLeft: "1%",
-    fontSize: 18,
-    color: "grey"
+    flexDirection: "column"
   },
-  distance: {
-    flex: 1,
-    flexDirection: "row",
-    alignSelf: "center",
-    textAlign: "right",
-    paddingRight: "4%",
-    fontSize: 18,
-    color: "grey"
+  location: {
+    paddingBottom: "3%"
   },
-  divider: {
-    width: "92%",
-    height: 1,
-    alignSelf: "center"
-  },
-  description: {
-    paddingBottom: "3%",
-    paddingTop: "2%"
-  },
-  iconsBottomRight: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "flex-end"
-  },
-  numbersBottomRight: {
+  infoText: {
     textAlignVertical: "center",
-    textAlign: "right",
-    fontSize: 16
-  },
-  alignIcon: {
-    flexDirection: "row",
-    alignItems: "center",
+    color: "grey",
     paddingLeft: "2%"
   },
-  eventDot: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingTop: "1%",
-    paddingHorizontal: "1.5%"
+  attendingNumber: {
+    fontWeight: "bold",
+    paddingLeft: "5%"
   },
-  profile: {
-    flexDirection: "row",
-    paddingLeft: "3%",
-    paddingTop: "2%"
+  attendingText: {
+    textAlignVertical: "center",
+    fontSize: 14
   },
-  maxLimit: {
+  titleText: {
+    textAlignVertical: "center",
+    fontWeight: "bold",
+    fontSize: 22,
+    paddingBottom: "1%"
+  },
+  name: {
+    textAlignVertical: "center",
+    fontWeight: "bold",
+    fontSize: 15,
+    paddingLeft: "3%"
+  },
+  moreButtonStyle: {
+    flex: 1,
+    alignItems: "flex-end"
+  },
+  distance: {
+    flexDirection: "row",
+    alignSelf: "center",
+    paddingVertical: "3%",
+    borderRadius: 14,
+    borderWidth: 3
+  },
+  distanceContainer: {
     flexDirection: "row"
   },
-  numbersBottomLeft: {
+  distanceText: {
     textAlignVertical: "center",
-    fontSize: 16
+    color: "white",
+    paddingRight: "3%",
+    paddingLeft: "1%",
+    fontWeight: "bold"
   },
-  nestedReply: {
+  image: {
+    width: 40,
+    height: 40,
+    borderRadius: 24
+  },
+  container: {
     backgroundColor: "white",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1
-    },
-    shadowOpacity: 0.18,
-    shadowRadius: 1.0,
-    elevation: 1
+    paddingHorizontal: "6%",
+    paddingVertical: "3%",
+    borderRadius: 20
   }
 })
+
+export default EventItem

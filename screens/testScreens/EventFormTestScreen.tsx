@@ -2,10 +2,10 @@ import { SetDependencyValue } from "@lib/dependencies"
 import EventFormScreen from "@screens/EventFormScreen"
 import { QueryClient, QueryClientProvider } from "react-query"
 import React from "react"
-import { dateRange } from "@lib/Date"
 import { EventColors } from "@lib/events/EventColors"
 import { geocodingDependencyKey, Geocoding } from "@lib/location"
 import { Alert } from "react-native"
+import { dateRange } from "@lib/date"
 
 const queryClient = new QueryClient()
 

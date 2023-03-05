@@ -3,13 +3,12 @@ import { placemarkToFormattedAddress } from "../../lib/location"
 import React from "react"
 import { StyleSheet, View } from "react-native"
 import {
-  EventFormLocationInfo,
-  EventFormPlacemarkInfo,
   useEventFormContext
-} from "."
+} from "./EventForm"
 import { FormLabel, SkeletonFormLabel } from "../formComponents/FormLabels"
 import { MaterialIcons } from "@expo/vector-icons"
 import { FontScaleFactors, useFontScale } from "../../lib/FontScale"
+import { EventFormLocationInfo, EventFormPlacemarkInfo } from "./EventFormValues"
 
 /**
  * Displays the selected location (if one) in the event form.

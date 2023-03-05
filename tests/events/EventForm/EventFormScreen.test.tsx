@@ -26,6 +26,7 @@ import {
 import { hapticsDependencyKey } from "@lib/Haptics"
 import { neverPromise } from "../../helpers/Promise"
 import { NavigationContainer } from "@react-navigation/native"
+import { setPlatform } from "../../helpers/Platform"
 
 const testLocation = { latitude: 45.0, longitude: -121.0 }
 
