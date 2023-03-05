@@ -1,5 +1,5 @@
 export * from "./EventForm"
-export * from "./TextFields"
+export * from "./TextField"
 export * from "./SubmitButton"
 export * from "./LocationBanner"
 export * from "./EventFormValues"

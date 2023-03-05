@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react"
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { MaterialIcons } from "@expo/vector-icons"
-import { DynamicTypeSizes, useFontScale } from "@lib/FontScale"
+import { FontScaleFactors, useFontScale } from "@lib/FontScale"
 import { useEventFormContext } from "./EventForm"
 
 export type EventFormSectionHeaderProps = {
@@ -19,7 +19,7 @@ export const EventFormSectionHeader = ({
   <View style={styles.container}>
     <View style={styles.headerContainer}>
       <Text
-        maxFontSizeMultiplier={DynamicTypeSizes.xxxLarge}
+        maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
         style={styles.headerText}
       >
         {title}
@@ -32,7 +32,7 @@ export const EventFormSectionHeader = ({
           style={styles.closeIcon}
           name="close"
           size={
-            24 * useFontScale({ maximumScaleFactor: DynamicTypeSizes.xxxLarge })
+            24 * useFontScale({ maximumScaleFactor: FontScaleFactors.xxxLarge })
           }
         />
       </TouchableOpacity>

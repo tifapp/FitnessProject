@@ -1,3 +1,4 @@
+import { FontScaleFactors } from "@lib/FontScale"
 import React from "react"
 import { StyleProp, TextInput, TextStyle } from "react-native"
 import { useEventFormContext, useEventFormField } from "./EventForm"
@@ -30,6 +31,7 @@ export const EventFormTextField = ({
 
   return (
     <TextInput
+      maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
       ref={valueRef}
       value={value}
       onChangeText={setValue}

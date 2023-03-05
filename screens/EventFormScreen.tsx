@@ -3,6 +3,8 @@ import { EditEventInput } from "@lib/events"
 import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
 import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native"
+import { Divider } from "react-native-elements"
+import { ScrollView } from "react-native-gesture-handler"
 import {
   EventForm,
   EventFormDismissButton,
@@ -60,12 +62,12 @@ const EventFormScreen = ({
 )
 
 const TextFields = () => (
-  <View style={styles.padding}>
+  <ScrollView contentContainerStyle={styles.padding}>
     <EventFormTextField
       placeholder="Title"
       fieldName="title"
       multiline
-      maxLength={75}
+      maxLength={50}
       style={styles.title}
     />
     <View style={styles.textFieldsSpacer} />
@@ -75,7 +77,7 @@ const TextFields = () => (
       multiline
       style={styles.description}
     />
-  </View>
+  </ScrollView>
 )
 
 const Footer = () => (
@@ -83,7 +85,11 @@ const Footer = () => (
     behavior={Platform.OS === "ios" ? "padding" : "height"}
     style={styles.footer}
   >
-    <EventFormLocationBanner />
+    <Divider />
+    <View style={styles.locationBanner}>
+      <EventFormLocationBanner />
+    </View>
+    <Divider />
     <EventFormToolbar containerStyle={styles.toolbar} />
   </KeyboardAvoidingView>
 )
@@ -127,6 +133,10 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: "white"
+  },
+  locationBanner: {
+    paddingHorizontal: 16,
+    paddingVertical: 8
   }
 })
 

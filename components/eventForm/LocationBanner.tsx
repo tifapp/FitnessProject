@@ -1,33 +1,61 @@
 import { useReverseGeocodeQuery } from "../../hooks/Geocoding"
 import { placemarkToFormattedAddress } from "../../lib/location"
-import React from "react"
-import { Text, View } from "react-native"
+import React, { ReactNode } from "react"
+import { StyleSheet, View } from "react-native"
 import {
   EventFormLocationInfo,
   EventFormPlacemarkInfo,
   useEventFormContext
 } from "."
+import {
+  FormLabel,
+  SkeletonFormLabel
+} from "@components/formComponents/FormLabels"
+import { MaterialIcons } from "@expo/vector-icons"
+import { FontScaleFactors, useFontScale } from "@lib/FontScale"
 
 /**
  * Displays the selected location (if one) in the event form.
  */
 export const EventFormLocationBanner = () => {
   const locationInfo = useEventFormContext().watch("locationInfo")
-  if (!locationInfo) return <></>
-  return <LocationInfoLabel {...locationInfo} />
+  return (
+    <View style={styles.bannerContainer}>
+      {!locationInfo
+        ? (
+          <FormLabel
+            style={styles.label}
+            icon="location-pin"
+            headerText="No Location Selected"
+            captionText="You must select a location to save this event."
+          />
+        )
+        : (
+          <LocationInfoBanner {...locationInfo} />
+        )}
+      <MaterialIcons
+        name="chevron-right"
+        size={
+          24 * useFontScale({ maximumScaleFactor: FontScaleFactors.xxxLarge })
+        }
+        color="black"
+        style={styles.bannerNavigationIcon}
+      />
+    </View>
+  )
 }
 
-const LocationInfoLabel = (locationInfo: EventFormLocationInfo) => {
+const LocationInfoBanner = (locationInfo: EventFormLocationInfo) => {
   return locationInfo.placemarkInfo
     ? (
-      <PlacemarkInfoLabel {...locationInfo.placemarkInfo} />
+      <PlacemarkInfoBanner {...locationInfo.placemarkInfo} />
     )
     : (
-      <GeocodedLocationInfoLabel {...locationInfo} />
+      <GeocodedLocationInfoBanner {...locationInfo} />
     )
 }
 
-const GeocodedLocationInfoLabel = (locationInfo: EventFormLocationInfo) => {
+const GeocodedLocationInfoBanner = (locationInfo: EventFormLocationInfo) => {
   const { data: placemark, status } = useReverseGeocodeQuery(
     locationInfo.coordinates
   )
@@ -35,22 +63,44 @@ const GeocodedLocationInfoLabel = (locationInfo: EventFormLocationInfo) => {
   if (status === "error") {
     // TODO: - Should this just be the message of the error?
     return (
-      <Text>Unable to find address of location, please try again later.</Text>
+      <FormLabel
+        style={styles.label}
+        icon="location-pin"
+        headerText="Unable to find location, please try again later."
+      />
     )
   }
 
   // TODO: - Add shimming loading effect
-  if (!placemark) return <></>
+  if (!placemark) return <SkeletonFormLabel icon="location-pin" />
 
   const address = placemarkToFormattedAddress(placemark)
   return (
-    <PlacemarkInfoLabel name={placemark.name ?? undefined} address={address} />
+    <PlacemarkInfoBanner name={placemark.name ?? undefined} address={address} />
   )
 }
 
-const PlacemarkInfoLabel = ({ name, address }: EventFormPlacemarkInfo) => (
-  <View>
-    {name && <Text>{name}</Text>}
-    <Text>{address ?? "Unknown Address"}</Text>
-  </View>
+const PlacemarkInfoBanner = ({ name, address }: EventFormPlacemarkInfo) => (
+  <FormLabel
+    style={styles.label}
+    icon="location-pin"
+    headerText={name ?? "Unknown Location"}
+    captionText={address ?? "Unknown Address"}
+  />
 )
+
+const styles = StyleSheet.create({
+  label: {
+    maxWidth: "80%"
+  },
+  bannerContainer: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
+  },
+  bannerNavigationIcon: {
+    marginLeft: 8,
+    opacity: 0.5
+  }
+})

@@ -1,3 +1,4 @@
+import { FontScaleFactors } from "@lib/FontScale"
 import React from "react"
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { eventEditInputFromFormValues, useEventFormContext } from "."
@@ -29,7 +30,11 @@ export const EventFormSubmitButton = ({
           shadowColor: color
         }}
       >
-        <Text disabled={!canSubmit} style={styles.button}>
+        <Text
+          maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
+          disabled={!canSubmit}
+          style={styles.button}
+        >
           {label}
         </Text>
       </TouchableOpacity>

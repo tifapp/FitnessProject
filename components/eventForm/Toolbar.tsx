@@ -10,7 +10,7 @@ import {
 } from "react-native"
 import { EventFormSection, useEventFormContext } from "./EventForm"
 import { MaterialIcons } from "@expo/vector-icons"
-import { useFontScale } from "@lib/FontScale"
+import { FontScaleFactors, useFontScale } from "@lib/FontScale"
 
 export type EventFormToolbarProps = {
   containerStyle?: StyleProp<ViewStyle>
@@ -39,7 +39,10 @@ export const EventFormToolbar = ({ containerStyle }: EventFormToolbarProps) => (
 const DateTab = () => (
   <SectionTab section="date" accessibilityLabel="Update Dates">
     <SectionTabIcon name="date-range" style={styles.tabSpacer} />
-    <Text style={styles.tabText}>
+    <Text
+      maxFontSizeMultiplier={FontScaleFactors.accessibility2}
+      style={styles.tabText}
+    >
       {useEventFormContext().watch("dateRange").formatted()}
     </Text>
   </SectionTab>
@@ -48,7 +51,12 @@ const DateTab = () => (
 const ColorTab = () => (
   <SectionTab section="color" accessibilityLabel="Color">
     <SectionTabIcon name="palette" style={styles.tabSpacer} />
-    <Text style={[styles.tabText, styles.tabSpacer]}>Color</Text>
+    <Text
+      maxFontSizeMultiplier={FontScaleFactors.accessibility2}
+      style={[styles.tabText, styles.tabSpacer]}
+    >
+      Color
+    </Text>
     <ColorCicle />
   </SectionTab>
 )
@@ -78,7 +86,7 @@ type SectionTabIconProps = {
 const SectionTabIcon = ({ name, style = {} }: SectionTabIconProps) => (
   <MaterialIcons
     name={name}
-    size={18 * useFontScale()}
+    size={18 * useToolbarFontScale()}
     color="black"
     style={[styles.tabIcon, style]}
   />
@@ -102,12 +110,18 @@ const SectionTab = ({
       accessibilityLabel={accessibilityLabel}
     >
       <View style={styles.outlined}>
-        <View style={{ ...styles.tabChild, height: 40 * useFontScale() }}>
+        <View
+          style={{ ...styles.tabChild, height: 40 * useToolbarFontScale() }}
+        >
           <View style={styles.tabContentContainer}>{children}</View>
         </View>
       </View>
     </TouchableOpacity>
   )
+}
+
+const useToolbarFontScale = () => {
+  return useFontScale({ maximumScaleFactor: FontScaleFactors.accessibility2 })
 }
 
 const styles = StyleSheet.create({

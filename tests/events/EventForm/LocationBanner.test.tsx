@@ -64,7 +64,5 @@ const renderLocationField = (locationInfo?: EventFormLocationInfo) => {
 }
 
 const errorIndicator = () => {
-  return screen.queryByText(
-    "Unable to find address of location, please try again later."
-  )
+  return screen.queryByText("Unable to find location, please try again later.")
 }

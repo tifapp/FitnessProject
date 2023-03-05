@@ -4,7 +4,7 @@ import {
   BottomSheetModalProvider
 } from "@gorhom/bottom-sheet"
 import { useLastDefinedValue } from "@hooks/useLastDefinedValue"
-import { DynamicTypeSizes, useFontScale } from "@lib/FontScale"
+import { FontScaleFactors, useFontScale } from "@lib/FontScale"
 import React, { useEffect, useMemo, useRef } from "react"
 import { StyleSheet } from "react-native"
 import { EventFormAdvancedSettings } from "./AdvancedSettings"
@@ -70,7 +70,7 @@ export const EventFormBottomSheet = () => {
 const useSnapPoints = () => {
   const fontScale = useFontScale()
   return useMemo(
-    () => (fontScale > DynamicTypeSizes.xxxLarge ? ["60%"] : ["35%"]),
+    () => (fontScale > FontScaleFactors.xxxLarge ? ["60%"] : ["35%"]),
     [fontScale]
   )
 }

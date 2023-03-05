@@ -5,7 +5,7 @@ import { useWindowDimensions } from "react-native"
  *
  * See: https://developer.apple.com/documentation/swiftui/dynamictypesize
  */
-export namespace DynamicTypeSizes {
+export namespace FontScaleFactors {
   export const xxxLarge = 1.5
   export const accessibility2 = 2.2
 }
