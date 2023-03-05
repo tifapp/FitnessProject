@@ -4,7 +4,7 @@ import { MaterialIcons } from "@expo/vector-icons"
 import { DynamicTypeSizes, useFontScale } from "@lib/FontScale"
 import { useEventFormContext } from "./EventForm"
 
-export type EventFormToolbarSectionProps = {
+export type EventFormSectionHeaderProps = {
   title: string
   children: ReactNode
 }
@@ -15,7 +15,7 @@ export type EventFormToolbarSectionProps = {
 export const EventFormSectionHeader = ({
   title,
   children
-}: EventFormToolbarSectionProps) => (
+}: EventFormSectionHeaderProps) => (
   <View style={styles.container}>
     <View style={styles.headerContainer}>
       <Text

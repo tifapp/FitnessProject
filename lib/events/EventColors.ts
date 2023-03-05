@@ -8,7 +8,7 @@ export namespace EventColors {
   export const Green = "#72B01D"
   export const Pink = "#F7B2BD"
   export const Orange = "#F4845F"
-  export const Yellow = "#FDE36C"
+  export const Yellow = "#F6BD60"
 
   /**
    * All supported event colors.

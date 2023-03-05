@@ -8,12 +8,11 @@ import {
   TouchableOpacity,
   StyleSheet
 } from "react-native"
-import { EventFormToolbarSection, useEventFormContext } from "./EventForm"
+import { EventFormSection, useEventFormContext } from "./EventForm"
 import { MaterialIcons } from "@expo/vector-icons"
 import { useFontScale } from "@lib/FontScale"
 
 export type EventFormToolbarProps = {
-  scrollStyle?: StyleProp<ViewStyle>
   containerStyle?: StyleProp<ViewStyle>
 }
 
@@ -23,14 +22,12 @@ export type EventFormToolbarProps = {
  * Each tab on the toolbar opens a bottom sheet screen
  * where its respective form values can be edited.
  */
-export const EventFormToolbar = ({
-  scrollStyle,
-  containerStyle
-}: EventFormToolbarProps) => (
+export const EventFormToolbar = ({ containerStyle }: EventFormToolbarProps) => (
   <ScrollView
     horizontal
     keyboardShouldPersistTaps="always"
-    style={scrollStyle}
+    showsHorizontalScrollIndicator={false}
+    style={styles.scroll}
     contentContainerStyle={containerStyle}
   >
     <DateTab />
@@ -81,7 +78,7 @@ type SectionTabIconProps = {
 const SectionTabIcon = ({ name, style = {} }: SectionTabIconProps) => (
   <MaterialIcons
     name={name}
-    size={16 * useFontScale()}
+    size={18 * useFontScale()}
     color="black"
     style={[styles.tabIcon, style]}
   />
@@ -89,7 +86,7 @@ const SectionTabIcon = ({ name, style = {} }: SectionTabIconProps) => (
 
 type SectionTabProps = {
   children: ReactNode
-  section: EventFormToolbarSection
+  section: EventFormSection
   accessibilityLabel: string
 }
 
@@ -105,7 +102,7 @@ const SectionTab = ({
       accessibilityLabel={accessibilityLabel}
     >
       <View style={styles.outlined}>
-        <View style={styles.tabChild}>
+        <View style={{ ...styles.tabChild, height: 40 * useFontScale() }}>
           <View style={styles.tabContentContainer}>{children}</View>
         </View>
       </View>
@@ -114,10 +111,8 @@ const SectionTab = ({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "flex-start"
+  scroll: {
+    minWidth: "100%"
   },
   outlined: {
     borderWidth: 1,
@@ -129,6 +124,9 @@ const styles = StyleSheet.create({
     marginRight: 8
   },
   tabChild: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
     padding: 8
   },
   tabContentContainer: {
@@ -138,7 +136,8 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontWeight: "600",
-    opacity: 0.5
+    opacity: 0.5,
+    fontSize: 16
   },
   tabIcon: {
     opacity: 0.5

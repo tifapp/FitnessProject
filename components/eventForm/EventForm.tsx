@@ -12,7 +12,7 @@ import { useForm, FormProvider, useController } from "react-hook-form"
 import { Keyboard } from "react-native"
 import { EventFormValues } from "./EventFormValues"
 
-export type EventFormToolbarSection = "date" | "color" | "advanced"
+export type EventFormSection = "date" | "color" | "advanced"
 
 /**
  * Props for `EventForm`.
@@ -52,7 +52,7 @@ export const EventForm = ({
   })
   const { handleSubmit, formState, setFocus } = formMethods
   const [currentSection, setCurrentSection] = useState<
-    EventFormToolbarSection | undefined
+    EventFormSection | undefined
   >()
   const focusedField = useRef<keyof EventFormValues>("title")
 
@@ -71,7 +71,7 @@ export const EventForm = ({
           },
           dismiss: onDismiss,
           hasEdited: formState.isDirty,
-          currentSection,
+          currentPresentedSection: currentSection,
           openSection: (section) => {
             Keyboard.dismiss()
             setCurrentSection(section)
@@ -131,11 +131,25 @@ export type EventFormContextValues = {
    */
   hasEdited: boolean
 
-  currentSection?: EventFormToolbarSection
+  /**
+   * The current section being presented in the `EventFormBottomSheet` component.
+   */
+  currentPresentedSection?: EventFormSection
 
-  openSection: (section: EventFormToolbarSection) => void
+  /**
+   * Opens a section to be displayed in the `EventFormBottomSheet` component.
+   */
+  openSection: (section: EventFormSection) => void
+
+  /**
+   * Dismisses the current section and closes the `EventFormBottomSheet`.
+   */
   dismissCurrentSection: () => void
 
+  /**
+   * Sets the current focused field in the form. When the form mounts or when the
+   * bottom sheet disappears, the currently set field will be focused.
+   */
   setFocusedField: (name: keyof EventFormValues) => void
 }
 

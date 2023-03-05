@@ -25,6 +25,7 @@ import {
 } from "./helpers"
 import { hapticsDependencyKey } from "@lib/Haptics"
 import { neverPromise } from "../../helpers/Promise"
+import { NavigationContainer } from "@react-navigation/native"
 
 const testLocation = { latitude: 45.0, longitude: -121.0 }
 
@@ -158,23 +159,25 @@ const dismissAction = jest.fn()
 
 const renderEventFormScreen = (values: EventFormValues) => {
   render(
-    <TestQueryClientProvider>
-      <UpdateDependencyValues
-        update={(values) => {
-          const geocoding = unimplementedGeocoding()
-          geocoding.reverseGeocode.mockImplementation(neverPromise)
-          values.set(geocodingDependencyKey, geocoding)
-          values.set(hapticsDependencyKey, jest.fn())
-        }}
-      >
-        <EventFormScreen
-          submissionLabel={testSubmissionLabel}
-          initialValues={values}
-          onSubmit={submitAction}
-          onDismiss={dismissAction}
-        />
-      </UpdateDependencyValues>
-    </TestQueryClientProvider>
+    <NavigationContainer>
+      <TestQueryClientProvider>
+        <UpdateDependencyValues
+          update={(values) => {
+            const geocoding = unimplementedGeocoding()
+            geocoding.reverseGeocode.mockImplementation(neverPromise)
+            values.set(geocodingDependencyKey, geocoding)
+            values.set(hapticsDependencyKey, jest.fn())
+          }}
+        >
+          <EventFormScreen
+            submissionLabel={testSubmissionLabel}
+            initialValues={values}
+            onSubmit={submitAction}
+            onDismiss={dismissAction}
+          />
+        </UpdateDependencyValues>
+      </TestQueryClientProvider>
+    </NavigationContainer>
   )
 }
 

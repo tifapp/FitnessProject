@@ -18,7 +18,8 @@ import { EventFormSectionHeader } from "./SectionHeader"
  */
 export const EventFormBottomSheet = () => {
   const bottomSheetRef = useRef<BottomSheetModal>(null)
-  const { currentSection, dismissCurrentSection } = useEventFormContext()
+  const { currentPresentedSection: currentSection, dismissCurrentSection } =
+    useEventFormContext()
   const displayedSection = useLastDefinedValue(currentSection)
   const snapPoints = useSnapPoints()
 

@@ -30,6 +30,7 @@ const HideSettingSwitch = () => {
         accessibilityRole="togglebutton"
         value={shouldHide}
         onValueChange={setShouldHide}
+        thumbColor="white"
         trackColor={{ true: useEventFormContext().watch("color") }}
       />
     </View>

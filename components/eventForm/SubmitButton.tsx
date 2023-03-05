@@ -1,5 +1,5 @@
 import React from "react"
-import { Alert, StyleSheet, Text, TouchableOpacity } from "react-native"
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { eventEditInputFromFormValues, useEventFormContext } from "."
 
 /**
@@ -19,26 +19,28 @@ export const EventFormSubmitButton = ({
   const color = useEventFormContext().watch("color")
   const canSubmit = !!submitButtonTapped
   return (
-    <TouchableOpacity
-      onPress={() => submitButtonTapped?.()}
-      style={{
-        ...styles.container,
-        backgroundColor: color,
-        shadowColor: color
-      }}
-    >
-      <Text disabled={!canSubmit} style={styles.button}>
-        {label}
-      </Text>
-    </TouchableOpacity>
+    <View style={{ opacity: canSubmit ? 1 : 0.5 }}>
+      <TouchableOpacity
+        onPress={() => submitButtonTapped?.()}
+        disabled={!canSubmit}
+        style={{
+          ...styles.container,
+          backgroundColor: color,
+          shadowColor: color
+        }}
+      >
+        <Text disabled={!canSubmit} style={styles.button}>
+          {label}
+        </Text>
+      </TouchableOpacity>
+    </View>
   )
 }
 
 const useSubmit = () => {
-  const { formState, submit, watch } = useEventFormContext()
+  const { formState, submit, watch, hasEdited } = useEventFormContext()
   const updateInput = eventEditInputFromFormValues(watch())
-  const canSubmit =
-    !!updateInput && !formState.isSubmitting && formState.isDirty
+  const canSubmit = !!updateInput && !formState.isSubmitting && hasEdited
   if (!canSubmit) return undefined
   return async () => {
     try {
@@ -63,7 +65,6 @@ const styles = StyleSheet.create({
   },
   button: {
     padding: 8,
-    fontSize: 16,
     color: "white",
     fontWeight: "bold"
   }

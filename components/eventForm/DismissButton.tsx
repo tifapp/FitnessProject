@@ -15,7 +15,7 @@ export const EventFormDismissButton = () => {
   const dismissButtonTapped = () => {
     if (hasEdited) {
       Alert.alert("Discard this draft?", undefined, [
-        { text: "Discard", style: "cancel", onPress: dismiss },
+        { text: "Discard", style: "destructive", onPress: dismiss },
         { text: "Keep Editing" }
       ])
     } else {

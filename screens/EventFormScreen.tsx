@@ -1,13 +1,8 @@
 import { EventFormBottomSheet } from "@components/eventForm/BottomSheet"
 import { EditEventInput } from "@lib/events"
-import { useFontScale } from "@lib/FontScale"
+import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
-import {
-  KeyboardAvoidingView,
-  SafeAreaView,
-  StyleSheet,
-  View
-} from "react-native"
+import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native"
 import {
   EventForm,
   EventFormDismissButton,
@@ -17,6 +12,8 @@ import {
   EventFormToolbar,
   EventFormValues
 } from "../components/eventForm"
+
+const Stack = createStackNavigator()
 
 export type EventFormScreenProps = {
   initialValues: EventFormValues
@@ -36,26 +33,30 @@ const EventFormScreen = ({
     onSubmit={onSubmit}
     onDismiss={onDismiss}
   >
-    <SafeAreaView style={styles.container}>
-      <Header submissionLabel={submissionLabel} />
-      <TextFields />
-      <Footer />
-    </SafeAreaView>
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Event"
+        component={TextFields}
+        options={{
+          title: "",
+          headerRight: () => (
+            <View style={styles.padding}>
+              <EventFormSubmitButton label={submissionLabel} />
+            </View>
+          ),
+          headerLeft: () => (
+            <View style={styles.padding}>
+              <EventFormDismissButton />
+            </View>
+          ),
+          headerStyle: styles.header,
+          cardStyle: styles.card
+        }}
+      />
+    </Stack.Navigator>
+    <Footer />
     <EventFormBottomSheet />
   </EventForm>
-)
-
-type HeaderProps = {
-  submissionLabel: string
-}
-
-const Header = ({ submissionLabel }: HeaderProps) => (
-  <View style={styles.padding}>
-    <View style={styles.headerRow}>
-      <EventFormDismissButton />
-      <EventFormSubmitButton label={submissionLabel} />
-    </View>
-  </View>
 )
 
 const TextFields = () => (
@@ -71,29 +72,23 @@ const TextFields = () => (
     <EventFormTextField
       placeholder="Description"
       fieldName="description"
+      multiline
       style={styles.description}
     />
   </View>
 )
 
 const Footer = () => (
-  <KeyboardAvoidingView behavior="padding" style={styles.footer}>
+  <KeyboardAvoidingView
+    behavior={Platform.OS === "ios" ? "padding" : "height"}
+    style={styles.footer}
+  >
     <EventFormLocationBanner />
-    <EventFormToolbar
-      scrollStyle={{ height: 44 * useFontScale() }}
-      containerStyle={styles.toolbar}
-    />
+    <EventFormToolbar containerStyle={styles.toolbar} />
   </KeyboardAvoidingView>
 )
 
 const styles = StyleSheet.create({
-  headerRow: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 16
-  },
   textFieldsContainer: {
     paddingHorizontal: 16
   },
@@ -108,14 +103,16 @@ const styles = StyleSheet.create({
   },
   toolbar: {
     minHeight: "100%",
-    paddingHorizontal: 16
+    paddingHorizontal: 16,
+    paddingVertical: 8
   },
   footer: {
     flex: 1,
     position: "absolute",
-    bottom: 16,
+    bottom: 0,
     minHeight: "100%",
-    minWidth: "100%"
+    minWidth: "100%",
+    backgroundColor: "white"
   },
   title: {
     fontSize: 24,
@@ -123,6 +120,13 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 16
+  },
+  header: {
+    shadowColor: "transparent",
+    elevation: 0
+  },
+  card: {
+    backgroundColor: "white"
   }
 })
 
