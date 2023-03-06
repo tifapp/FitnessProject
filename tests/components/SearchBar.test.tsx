@@ -33,10 +33,12 @@ const Test = () => {
   return (
     <View testID={text}>
       <SearchBar
-        onIconTapped={userAction}
-        icon="10k"
+        icon={{
+          name: "10k",
+          onTapped: userAction,
+          accessibilityLabel: testLabel
+        }}
         placeholder={testPlaceholderText}
-        iconAccessibilityLabel={testLabel}
         text={text}
         onTextChanged={setText}
       />

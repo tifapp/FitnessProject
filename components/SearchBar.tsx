@@ -2,14 +2,17 @@ import React, { ComponentProps } from "react"
 import { MaterialIcons } from "@expo/vector-icons"
 import { StyleProp, TextInput, View, ViewStyle } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
+import { MaterialIconName } from "@lib/MaterialIcon"
 
 export type SearchBarProps = {
   text: string
   onTextChanged: (text: string) => void
-  icon?: ComponentProps<typeof MaterialIcons>["name"]
+  icon?: {
+    name: MaterialIconName
+    onTapped?: () => void
+    accessibilityLabel?: string
+  }
   placeholder?: string
-  onIconTapped?: () => void
-  iconAccessibilityLabel?: string
   style?: StyleProp<ViewStyle>
 }
 
@@ -18,17 +21,15 @@ const SearchBar = ({
   text,
   onTextChanged,
   placeholder,
-  iconAccessibilityLabel,
-  onIconTapped,
   style
 }: SearchBarProps) => (
   <View style={style}>
     {icon && (
       <TouchableOpacity
-        onPress={() => onIconTapped?.()}
-        accessibilityLabel={iconAccessibilityLabel}
+        onPress={() => icon.onTapped?.()}
+        accessibilityLabel={icon.accessibilityLabel}
       >
-        <MaterialIcons name={icon} size={24} />
+        <MaterialIcons name={icon.name} size={24} />
       </TouchableOpacity>
     )}
     <TextInput
