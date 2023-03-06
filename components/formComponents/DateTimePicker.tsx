@@ -1,18 +1,11 @@
-import React from "react"
-import {
-  Platform,
-  StyleProp,
-  StyleSheet,
-  Text,
-  TextStyle,
-  View,
-  ViewStyle
-} from "react-native"
+import React, { ComponentProps } from "react"
+import { Platform, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import RNDateTimePicker, {
   DateTimePickerAndroid as RNDateTimePickerAndroid
 } from "@react-native-community/datetimepicker"
-import IconButton from "@components/common/IconButton"
-import dayjs from "dayjs"
+import { dayjs } from "../../lib/date"
+import { MaterialIcons } from "@expo/vector-icons"
+import IconButton from "../common/IconButton"
 
 /**
  * Default date formatter for `DateTimePicker`.
@@ -38,9 +31,9 @@ export const defaultFormatTime = (date: Date) => {
  */
 export type DateTimePickerProps = {
   /**
-   * The label for the picker.
+   * An ID for using this picker in tests.
    */
-  label: string
+  testID?: string
 
   /**
    * The current date displayed by the picker.
@@ -58,11 +51,6 @@ export type DateTimePickerProps = {
   style?: StyleProp<ViewStyle>
 
   /**
-   * A `TextStyle` for the picker label.
-   */
-  labelStyle?: StyleProp<TextStyle>
-
-  /**
    * (**Android Only**) Formats the pickers date to display
    * month, weekday, and year information.
    */
@@ -73,16 +61,6 @@ export type DateTimePickerProps = {
    * hour and minute information.
    */
   formatTime?: (date: Date) => string
-
-  /**
-   * The minimum date for this picker.
-   */
-  minimumDate?: Date
-
-  /**
-   * The maximum date for this picker.
-   */
-  maximumDate?: Date
 }
 
 /**
@@ -93,97 +71,92 @@ export type DateTimePickerProps = {
  * that display a modal are used. The modal then uses Android's native
  * date and time pickers respectively.
  */
-const DateTimePicker = (props: DateTimePickerProps) => {
-  return Platform.OS === "ios"
+const DateTimePicker = (props: DateTimePickerProps) =>
+  Platform.OS === "android"
     ? (
-    <_DateTimePickerIOS {...props} />
-      )
+      <DatePickerAndroid {...props} />
+    )
     : (
-    <_DatePickerAndroid {...props} />
-      )
-}
+      <DateTimePickerIOS {...props} />
+    )
 
-const _DateTimePickerIOS = ({
-  label,
+const DateTimePickerIOS = ({
+  testID,
   date,
   onDateChanged,
-  style,
-  labelStyle: textStyle,
-  minimumDate,
-  maximumDate
+  style
 }: DateTimePickerProps) => (
-  <View style={[styles.iOSContainer, style]}>
-    <Text style={textStyle}>{label}</Text>
-    <RNDateTimePicker
-      mode="datetime"
-      value={date}
-      minimumDate={minimumDate}
-      maximumDate={maximumDate}
-      style={styles.iOSPickerStyle}
-      onChange={(_, date) => {
-        if (date) onDateChanged(date)
-      }}
-    />
-  </View>
+  <RNDateTimePicker
+    testID={testID}
+    mode="datetime"
+    value={date}
+    style={style}
+    onChange={(_, date) => {
+      if (date) onDateChanged(date)
+    }}
+  />
 )
 
-const _DatePickerAndroid = ({
-  label,
+const DatePickerAndroid = ({
+  testID,
   date,
   onDateChanged,
   style,
-  labelStyle: textStyle,
   formatDate = defaultFormatDate,
-  formatTime = defaultFormatTime,
-  minimumDate,
-  maximumDate
+  formatTime = defaultFormatTime
 }: DateTimePickerProps) => {
   const showDatePicker = (mode: "date" | "time") => {
     RNDateTimePickerAndroid.open({
+      testID,
       value: date,
       onChange: (_, date) => {
         if (date) onDateChanged(date)
       },
-      mode,
-      minimumDate,
-      maximumDate
+      mode
     })
   }
 
   return (
-    <View style={[styles.androidContainer, style]}>
-      <Text style={[styles.androidTextMargin, textStyle]}>{label}</Text>
-      <View style={styles.androidButtonContainer}>
-        <IconButton
-          style={styles.androidButtonStyle}
-          label={formatDate(date)}
-          iconName="calendar-today"
-          margin={8}
-          onPress={() => showDatePicker("date")}
-        />
-        <View style={styles.androidButtonGap} />
-        <IconButton
-          style={styles.androidButtonStyle}
-          label={formatTime(date)}
-          iconName="access-time"
-          margin={8}
-          onPress={() => showDatePicker("time")}
-        />
-      </View>
+    <View style={[styles.androidButtonContainer, style]}>
+      <AndroidPickerButton
+        testID={testID}
+        iconName="calendar-today"
+        onPress={() => showDatePicker("date")}
+        label={formatDate(date)}
+      />
+      <View style={styles.androidButtonGap} />
+      <AndroidPickerButton
+        iconName="access-time"
+        label={formatTime(date)}
+        onPress={() => showDatePicker("time")}
+      />
     </View>
   )
 }
 
+type AndroidPickerButtonProps = {
+  testID?: string
+  label: string
+  iconName: ComponentProps<typeof MaterialIcons>["name"]
+  onPress: () => void
+}
+
+const AndroidPickerButton = ({
+  testID,
+  label,
+  iconName,
+  onPress
+}: AndroidPickerButtonProps) => (
+  <IconButton
+    style={styles.androidButtonStyle}
+    testID={testID}
+    iconName={iconName}
+    label={label}
+    onPress={onPress}
+  />
+)
+
 const styles = StyleSheet.create({
-  iOSContainer: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between"
-  },
-  iOSPickerStyle: {
-    width: 200
-  },
   androidContainer: {
     display: "flex",
     flexDirection: "column",
@@ -204,6 +177,9 @@ const styles = StyleSheet.create({
   },
   androidButtonGap: {
     paddingHorizontal: 8
+  },
+  androidIconStyle: {
+    marginRight: 8
   }
 })
 
