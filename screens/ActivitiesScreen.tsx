@@ -1,10 +1,17 @@
-import MapComponent from "@components/MapComponent"
-import { mapCompStyle, state } from "@components/MapTestData"
+import { EventForm, EventFormToolbar } from "@components/eventForm"
+import { dateRange } from "@lib/date"
+import { SetDependencyValue } from "@lib/dependencies"
+import { EventColors } from "@lib/events/EventColors"
+import { Geocoding, geocodingDependencyKey } from "@lib/location"
 import { Auth } from "aws-amplify"
-import EventsList from "@components/EventsList"
 import React from "react"
 import { Alert, Text, TouchableOpacity } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { QueryClient, QueryClientProvider } from "react-query"
+import EventFormScreen from "./EventFormScreen"
+import { EventFormTestScreen } from "./testScreens/EventFormTestScreen"
+
+const queryClient = new QueryClient()
 
 const ActivitiesScreen = () => {
   function signOut () {
@@ -26,40 +33,7 @@ const ActivitiesScreen = () => {
     )
   }
 
-  return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <TouchableOpacity onPress={signOut}>
-        <Text
-          style={{
-            fontSize: 15,
-            margin: 20
-          }}
-        >
-          Log Out
-        </Text>
-        <Text
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            color: "black",
-            fontWeight: "bold",
-            fontSize: 15
-          }}
-        >
-          SandBox to get started
-        </Text>
-      </TouchableOpacity>
-      <MapComponent
-        containStyle={mapCompStyle.container}
-        mapStyle={mapCompStyle.map}
-        initialRegion={state.initialRegion}
-        markers={state.markers}
-        extractKey={(event) => event.key}
-        movementSettings={state.movementSettings}
-      />
-      <EventsList />
-    </GestureHandlerRootView>
-  )
+  return <EventFormTestScreen />
 }
 
 export default ActivitiesScreen

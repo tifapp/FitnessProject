@@ -5,7 +5,7 @@ import React from "react"
 
 describe("eventUI Component Tests", () => {
   beforeEach(() => {
-    jest.useFakeTimers("modern").setSystemTime(new Date("2023-02-26T12:00:00"))
+    jest.useFakeTimers().setSystemTime(new Date("2023-02-26T12:00:00"))
   })
   afterEach(() => jest.useRealTimers())
 

@@ -1,6 +1,6 @@
 import { Placemark } from "./Placemark"
 import ExpoLocation from "expo-location"
-import { createDependencyKey } from "@lib/dependencies"
+import { createDependencyKey } from "../dependencies"
 import { Location } from "./Location"
 
 /**
