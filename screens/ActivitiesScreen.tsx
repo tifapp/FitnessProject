@@ -1,14 +1,12 @@
 import MapComponent from "@components/MapComponent"
 import { mapCompStyle, state } from "@components/MapTestData"
-import { EventColors } from "@lib/events/EventColors"
-import { Auth } from "aws-amplify"
-import React, { useState } from "react"
-import { Alert } from "react-native"
+import React from "react"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 
 const ActivitiesScreen = () => {
-  const [color, setColor] = useState(EventColors.Red)
-  function signOut () {
+  const circleRadius = 1000
+
+  /* function signOut () {
     const title = "Are you sure you want to sign out?"
     const message = ""
     Alert.alert(
@@ -25,7 +23,7 @@ const ActivitiesScreen = () => {
       ],
       { cancelable: true }
     )
-  }
+  } */
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -33,6 +31,7 @@ const ActivitiesScreen = () => {
         containStyle={mapCompStyle.container}
         mapStyle={mapCompStyle.map}
         initialRegion={state.initialRegion}
+        initialRadius={{ radius: circleRadius }}
         markers={state.markers}
         extractKey={(event) => event.key}
         movementSettings={state.movementSettings}
