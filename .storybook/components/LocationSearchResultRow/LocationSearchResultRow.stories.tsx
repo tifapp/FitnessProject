@@ -1,7 +1,9 @@
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { View, StyleSheet, ScrollView } from "react-native"
-import { LocationSearchResult } from "../../../lib/location/search"
-import { LocationSearchResultRow } from "../../../components/locationSearch"
+import {
+  LocationSearchResultRow,
+  LocationSearchResultRowProps
+} from "../../../components/locationSearch"
 
 const baseSearchResult = {
   name: "Test",
@@ -75,7 +77,7 @@ const Rows = () => (
 )
 
 type RowProps = {
-  result: LocationSearchResult
+  result: LocationSearchResultRowProps["result"]
 }
 
 const Row = ({ result }: RowProps) => (

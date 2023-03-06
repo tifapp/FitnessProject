@@ -1,4 +1,3 @@
-import { LocationSearchResult } from "../../lib/location/search"
 import React, {
   StyleProp,
   StyleSheet,
@@ -11,7 +10,12 @@ import { MaterialIcons } from "@expo/vector-icons"
 import { compactFormatMiles } from "../../lib/DistanceFormatting"
 
 export type LocationSearchResultRowProps = {
-  result: LocationSearchResult
+  result: {
+    name?: string
+    formattedAddress?: string
+    milesAwayFromUser?: number
+    isInSearchHistory: boolean
+  }
   style?: StyleProp<ViewStyle>
 }
 
