@@ -1,6 +1,20 @@
-import { FixedDateRange } from "@lib/date"
+import { FixedDateRange } from "@lib/Date"
 import { createDependencyKey } from "@lib/dependencies"
-import { Placemark } from "@lib/location"
+import { Location, Placemark } from "@lib/location"
+import { EventColor } from "./EventColors"
+
+/**
+ * A data type which is used to update event information.
+ */
+export type EditEventInput = {
+  readonly title: string
+  readonly description?: string
+  readonly location: Location
+  readonly color: EventColor
+  readonly dateRange: FixedDateRange
+  readonly shouldHideAfterStartDate: boolean
+  readonly radiusMeters: number
+}
 
 /**
  * An interface representing all the collection of all of the posts in the app.
@@ -12,6 +26,11 @@ export interface Events {
    * @returns a list of events (right now just mocks a bunch of events)
    */
   eventsWithIds: (ids: string[]) => Event[]
+
+  /**
+   * Creates a new event.
+   */
+  createEvent: (input: EditEventInput) => Promise<Event>
 }
 
 /**
@@ -56,6 +75,10 @@ export class GraphQLEvents implements Events {
     }
 
     return eventsList
+  }
+
+  async createEvent (input: EditEventInput): Promise<Event> {
+    throw new Error("TODO")
   }
 }
 
