@@ -6,6 +6,7 @@ import { Divider, Icon } from "react-native-elements"
 import { Shadow } from "react-native-shadow-2"
 import tinycolor from "tinycolor2"
 import { placemarkToFormattedAddress } from "@lib/location"
+import { compactFormatMiles } from "@lib/DistanceFormatting"
 
 interface Props {
   event: Event
@@ -89,7 +90,9 @@ const EventItem = ({ event }: Props) => {
               ]}
             >
               <Icon name="near-me" size={20} color="white" />
-              <Text style={styles.distanceText}>{`${distance} mi`}</Text>
+              <Text style={styles.distanceText}>
+                {compactFormatMiles(distance)}
+              </Text>
             </View>
           </Shadow>
         </View>
