@@ -7,6 +7,7 @@ import { Shadow } from "react-native-shadow-2"
 import tinycolor from "tinycolor2"
 import { placemarkToFormattedAddress } from "@lib/location"
 import IconButton from "./common/IconButton"
+import { compactFormatMiles } from "@lib/DistanceFormatting"
 
 interface Props {
   event: Event
@@ -20,7 +21,7 @@ const EventItem = ({ event }: Props) => {
 
   return (
     <Shadow
-      distance={16}
+      distance={18}
       offset={[0, 4]}
       startColor={shadowColor}
       stretch={true}
@@ -100,9 +101,9 @@ const EventItem = ({ event }: Props) => {
               size={22}
               color={event.colorHex}
             />
-            <Text
-              style={[styles.distanceText, { color: event.colorHex }]}
-            >{`${distance} mi`}</Text>
+            <Text style={[styles.distanceText, { color: event.colorHex }]}>
+              {compactFormatMiles(distance)}
+            </Text>
           </View>
         </View>
       </View>
