@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react"
-import { ListRenderItemInfo, StyleSheet, View } from "react-native"
-import BottomSheet, {
+import React, { useEffect, useRef } from "react"
+import { ListRenderItemInfo, View } from "react-native"
+import {
   BottomSheetFlatList,
   BottomSheetModal,
   BottomSheetModalProvider
@@ -13,10 +13,11 @@ import { useDependencyValue } from "@lib/dependencies"
 
 const EventsList = () => {
   const eventItems = useDependencyValue(eventsDependencyKey)
-  const ids = Array.from(new Array(5), (_, i) => String(i))
+  const ids = Array.from(new Array(4), (_, i) => String(i))
   const events = eventItems.eventsWithIds(ids)
-  const MARGIN_HORIZONTAL = 8
-  const MARGIN_VERTICAL = 24
+  // const event = TestEventItems.mockEvent(new Date(), new Date(), "4")
+  const MARGIN_HORIZONTAL = 16
+  const MARGIN_VERTICAL = 16
 
   // hooks
   const sheetRef = useRef<BottomSheetModal>(null)
@@ -26,7 +27,7 @@ const EventsList = () => {
   }, [])
 
   // variables
-  const snapPoints = ["4%", "65%", "100%"]
+  const snapPoints = ["3%", "65%", "100%"]
 
   return (
     <BottomSheetModalProvider>

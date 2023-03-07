@@ -48,7 +48,7 @@ export namespace TestEventItems {
       repliesCount: 2,
       writtenByYou: true,
       duration: dateRange(start, end),
-      colorHex: EventColors.Red,
+      colorHex: EventColors.Blue,
       coordinates: { latitude: 36.991585, longitude: -122.058277 },
       address
     }
