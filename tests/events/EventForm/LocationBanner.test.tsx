@@ -13,7 +13,7 @@ import { TestQueryClientProvider } from "../../helpers/ReactQuery"
 import { baseTestPlacemark } from "../../location/helpers"
 
 const testLocation = baseTestEventFormValues.locationInfo.coordinates
-const testLocationName = baseTestPlacemark.name
+const testLocationName = "Test Location"
 const testLocationAddress = "1234 Cupertino Rd, Cupertino, CA 95104"
 
 describe("EventFormLocationBanner tests", () => {
@@ -36,6 +36,17 @@ describe("EventFormLocationBanner tests", () => {
     geocoding.reverseGeocode.mockRejectedValue(new Error("Geocoding Failed"))
     renderLocationField({ coordinates: testLocation })
     await waitFor(() => expect(errorIndicator()).toBeDisplayed())
+  })
+
+  it("should display placemark info when successfully geocoded", async () => {
+    geocoding.reverseGeocode.mockResolvedValue([
+      { ...baseTestPlacemark, name: testLocationName }
+    ])
+    renderLocationField({ coordinates: testLocation })
+    await waitFor(() => {
+      expect(screenTestLocationName()).toBeDisplayed()
+      expect(screenTestLocationAddress()).toBeDisplayed()
+    })
   })
 })
 
@@ -61,6 +72,14 @@ const renderLocationField = (locationInfo?: EventFormLocationInfo) => {
       </SetDependencyValue>
     </TestQueryClientProvider>
   )
+}
+
+const screenTestLocationName = () => {
+  return screen.getByText(testLocationName)
+}
+
+const screenTestLocationAddress = () => {
+  return screen.getByText(testLocationAddress)
 }
 
 const errorIndicator = () => {

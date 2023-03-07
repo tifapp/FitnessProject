@@ -119,8 +119,7 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   icon: {
-    marginRight: 8,
-    opacity: 0.5
+    marginRight: 8
   },
   headerText: {
     fontWeight: "bold",
