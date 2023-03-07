@@ -1,6 +1,7 @@
+import { ImageSource } from "aws-sdk/clients/lookoutvision"
 import { Location } from "lib/location/Location"
 import React, { useState } from "react"
-import { StyleProp, View, ViewStyle } from "react-native"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import MapView, { Circle, Marker, PROVIDER_GOOGLE } from "react-native-maps"
 
 // Type for the map markers, in order to separate their logic out
@@ -10,10 +11,17 @@ export interface MapMarker {
   location: Location
 }
 
+export interface MarkerCustomize {
+  key: string
+  color: string
+  icon?: ImageSource
+  circleFillColor: string
+  circleStrokeColor: string
+  circleStrokeWidth: number
+}
+
 interface Props<T> {
-  // Contain style specifically for style on container for map
   // Map style specifically for style on map
-  containStyle?: StyleProp<ViewStyle>
   mapStyle?: StyleProp<ViewStyle>
 
   initialRegion: {
@@ -28,6 +36,7 @@ interface Props<T> {
   }
 
   markers: MapMarker[]
+  customizers: MarkerCustomize[]
 
   movementSettings: {
     canScroll: boolean
@@ -42,9 +51,9 @@ interface Props<T> {
 export function MapComponent<T extends MapMarker> ({
   initialRegion,
   markers,
+  customizers,
   extractKey,
   initialRadius,
-  containStyle,
   mapStyle,
   movementSettings
 }: Props<T>) {
@@ -70,7 +79,7 @@ export function MapComponent<T extends MapMarker> ({
           latitude: marker.markedMarker.location.latitude,
           longitude: marker.markedMarker.location.longitude
         }}
-        pinColor={"blue"}
+        pinColor={customizationCreation(marker.markedMarker).color}
         onPress={() => {
           onMarkerClick(
             marker.markedMarker.location.latitude,
@@ -92,9 +101,13 @@ export function MapComponent<T extends MapMarker> ({
             longitude: point.markedMarker.location.longitude
           }}
           radius={initialRadius.radius}
-          strokeColor="blue"
-          strokeWidth={2}
-          fillColor="rgba(100, 0, 0, 0.5)"
+          fillColor={customizationCreation(point.markedMarker).circleFillColor}
+          strokeColor={
+            customizationCreation(point.markedMarker).circleStrokeColor
+          }
+          strokeWidth={
+            customizationCreation(point.markedMarker).circleStrokeWidth
+          }
         />
       )
     }
@@ -105,6 +118,21 @@ export function MapComponent<T extends MapMarker> ({
       const createdCircle = checkCircleKey(point)
       return createdCircle
     })
+  }
+
+  //
+  const customizationCreation = (marker: MapMarker) => {
+    const match = customizers.find(({ key }) => key === marker.key)
+    if (match) {
+      return match
+    } else {
+      return {
+        color: "gray",
+        circleFillColor: "rgba(0, 0, 0, 0.5)",
+        circleStrokeColor: "gray",
+        circleStrokeWidth: 1
+      }
+    }
   }
 
   // When clicking on the marker, zoom towards where it is.
@@ -142,14 +170,16 @@ export function MapComponent<T extends MapMarker> ({
   }
 
   return (
-    <View style={containStyle}>
+    <View style={mapStyle}>
       <MapView
-        style={mapStyle}
+        style={fillStyle.map}
         provider={PROVIDER_GOOGLE}
         initialRegion={initialRegion}
         ref={mapRef}
         rotateEnabled={movementSettings.canRotate}
         scrollEnabled={movementSettings.canScroll}
+        loadingEnabled={true}
+        toolbarEnabled={false}
         onLongPress={(e) => {
           onPinPlace(
             e.nativeEvent.coordinate.latitude,
@@ -177,6 +207,10 @@ export function MapComponent<T extends MapMarker> ({
   )
 }
 
-//
+const fillStyle = StyleSheet.create({
+  map: {
+    ...StyleSheet.absoluteFillObject
+  }
+})
 
 export default MapComponent

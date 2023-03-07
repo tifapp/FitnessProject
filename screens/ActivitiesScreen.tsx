@@ -32,11 +32,11 @@ const ActivitiesScreen = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <MapComponent
-        containStyle={mapCompStyle.container}
-        mapStyle={mapCompStyle.map}
+        mapStyle={mapCompStyle.container}
         initialRegion={state.initialRegion}
         initialRadius={{ radius: circleRadius }}
         markers={state.markers}
+        customizers={state.customizers}
         extractKey={(event) => event.key}
         movementSettings={state.movementSettings}
       />

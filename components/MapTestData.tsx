@@ -44,6 +44,37 @@ export const state = {
     }
   ],
 
+  customizers: [
+    {
+      key: "1",
+      color: "green",
+      circleFillColor: "rgba(100, 0, 0, 0.5)",
+      circleStrokeColor: "blue",
+      circleStrokeWidth: 2
+    },
+    {
+      key: "2",
+      color: "yellow",
+      circleFillColor: "rgba(0, 0, 100, 0.5)",
+      circleStrokeColor: "red",
+      circleStrokeWidth: 2
+    },
+    {
+      key: "3",
+      color: "blue",
+      circleFillColor: "rgba(100, 0, 0, 0.5)",
+      circleStrokeColor: "orange",
+      circleStrokeWidth: 2
+    },
+    {
+      key: "4",
+      color: "red",
+      circleFillColor: "rgba(100, 0, 0, 0.5)",
+      circleStrokeColor: "yellow",
+      circleStrokeWidth: 2
+    }
+  ],
+
   movementSettings: {
     canScroll: true,
     canZoom: true,
@@ -58,8 +89,5 @@ export const mapCompStyle = StyleSheet.create({
     height: "100%",
     justifyContent: "flex-end",
     alignItems: "center"
-  },
-  map: {
-    ...StyleSheet.absoluteFillObject
   }
 })
