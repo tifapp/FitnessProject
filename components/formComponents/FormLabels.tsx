@@ -1,4 +1,4 @@
-import React from "react"
+import React, { ReactNode } from "react"
 import { MaterialIcons } from "@expo/vector-icons"
 import { StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native"
 import { SkeletonView } from "../common/Skeleton"
@@ -25,25 +25,22 @@ export const FormLabel = ({
   textColor = "black",
   style
 }: FormLabelProps) => (
-  <View style={[styles.container, style]}>
-    {icon && <LabelIcon icon={icon} color={iconColor} />}
-    <View>
+  <FormLabelContainer icon={icon} iconColor={iconColor} style={style}>
+    <Text
+      maxFontSizeMultiplier={FontScaleFactors.accessibility2}
+      style={{ ...styles.headerText, color: textColor }}
+    >
+      {headerText}
+    </Text>
+    {captionText && (
       <Text
         maxFontSizeMultiplier={FontScaleFactors.accessibility2}
-        style={{ ...styles.headerText, color: textColor }}
+        style={{ ...styles.captionText, color: textColor }}
       >
-        {headerText}
+        {captionText}
       </Text>
-      {captionText && (
-        <Text
-          maxFontSizeMultiplier={FontScaleFactors.accessibility2}
-          style={{ ...styles.captionText, color: textColor }}
-        >
-          {captionText}
-        </Text>
-      )}
-    </View>
-  </View>
+    )}
+  </FormLabelContainer>
 )
 
 export type SkeletonFormLabelProps = {
@@ -64,34 +61,46 @@ export const SkeletonFormLabel = ({
   captionAccessibilityLabel,
   style
 }: SkeletonFormLabelProps) => (
-  <View style={[styles.container, style]}>
-    {icon && <LabelIcon icon={icon} color={iconColor} />}
-    <View>
-      <SkeletonView
-        accessibilityLabel={headerAccessibilityLabel}
-        style={{ ...styles.headerSkeleton, height: useSkeletonHeight() }}
-      />
-      <SkeletonView
-        accessibilityLabel={captionAccessibilityLabel}
-        style={{ ...styles.captionSkeleton, height: useSkeletonHeight() }}
-      />
-    </View>
-  </View>
+  <FormLabelContainer icon={icon} iconColor={iconColor} style={style}>
+    <SkeletonView
+      accessibilityLabel={headerAccessibilityLabel}
+      style={{ ...styles.headerSkeleton, height: useSkeletonHeight() }}
+    />
+    <SkeletonView
+      accessibilityLabel={captionAccessibilityLabel}
+      style={{ ...styles.captionSkeleton, height: useSkeletonHeight() }}
+    />
+  </FormLabelContainer>
 )
 
-type LabelIconProps = {
-  icon: MaterialIconName
-  color: string
+type FormLabelContainerProps = {
+  icon?: MaterialIconName
+  iconColor?: string
+  style?: StyleProp<ViewStyle>
+  children: ReactNode
 }
 
-const LabelIcon = ({ icon, color }: LabelIconProps) => (
-  <MaterialIcons
-    name={icon}
-    size={24 * useLabelFontScale()}
-    color={color}
-    style={styles.icon}
-  />
-)
+const FormLabelContainer = ({
+  icon,
+  iconColor,
+  style,
+  children
+}: FormLabelContainerProps) => {
+  const labelFontScale = useLabelFontScale()
+  return (
+    <View style={[styles.container, style]}>
+      {icon && (
+        <MaterialIcons
+          name={icon}
+          size={24 * labelFontScale}
+          color={iconColor}
+          style={styles.icon}
+        />
+      )}
+      <View>{children}</View>
+    </View>
+  )
+}
 
 const useLabelFontScale = () => {
   return useFontScale({
@@ -119,7 +128,8 @@ const styles = StyleSheet.create({
   },
   captionText: {
     fontSize: 12,
-    opacity: 0.5
+    opacity: 0.5,
+    marginTop: 4
   },
   headerSkeleton: {
     width: 128,
