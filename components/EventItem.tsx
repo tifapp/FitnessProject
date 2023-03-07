@@ -1,12 +1,12 @@
 import React from "react"
 import { Image, StyleSheet, Text, View } from "react-native"
 import { Event } from "@lib/events/Event"
-import IconButton from "./common/IconButton"
 import { Divider } from "react-native-elements"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { Shadow } from "react-native-shadow-2"
 import tinycolor from "tinycolor2"
 import { placemarkToFormattedAddress } from "@lib/location"
+import MoreButton from "./eventItem/MoreButton"
 
 interface Props {
   event: Event
@@ -16,11 +16,7 @@ const EventItem = ({ event }: Props) => {
   const numAttendees = 1 // Eventually will come from event object
   const distance = 0.5 // Eventually will be calculated from the location given in the event object
   const shadowColor = "#ebebeb"
-  const lightEventColor = tinycolor(event.colorHex).lighten(30).toString()
-
-  const onPressMore = () => {
-    return null
-  }
+  const lightEventColor = tinycolor(event.colorHex).lighten(25).toString()
 
   return (
     <Shadow distance={18} startColor={shadowColor} stretch={true}>
@@ -33,12 +29,7 @@ const EventItem = ({ event }: Props) => {
             accessibilityLabel="profile picture"
           />
           <Text style={styles.name}>{event.username}</Text>
-          <IconButton
-            iconName={"more-horiz"}
-            style={styles.moreButtonStyle}
-            size={26}
-            onPress={onPressMore}
-          />
+          <MoreButton />
         </View>
 
         {/* Event Title, Location, Time */}
@@ -67,8 +58,8 @@ const EventItem = ({ event }: Props) => {
             </Text>
           </View>
 
-          <View style={{ marginVertical: 12 }}>
-            <Divider style={{ height: 1 }} />
+          <View style={{ marginVertical: 16 }}>
+            <Divider style={{ height: 1, opacity: 0.4 }} />
           </View>
         </View>
 
@@ -115,7 +106,7 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   topRow: {
-    paddingBottom: 8,
+    paddingBottom: 16,
     alignItems: "center"
   },
   middleRow: {
@@ -149,11 +140,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 15,
     paddingLeft: 8
-  },
-  moreButtonStyle: {
-    flex: 1,
-    opacity: 0.4,
-    alignItems: "flex-end"
   },
   distance: {
     flexDirection: "row",
