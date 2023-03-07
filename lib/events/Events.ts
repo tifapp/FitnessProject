@@ -1,3 +1,21 @@
+import { FixedDateRange } from "@lib/Date"
+import { createDependencyKey } from "@lib/dependencies"
+import { Location, Placemark } from "@lib/location"
+import { EventColor } from "./EventColors"
+
+/**
+ * A data type which is used to update event information.
+ */
+export type EditEventInput = {
+  readonly title: string
+  readonly description?: string
+  readonly location: Location
+  readonly color: EventColor
+  readonly dateRange: FixedDateRange
+  readonly shouldHideAfterStartDate: boolean
+  readonly radiusMeters: number
+}
+
 /**
  * An interface representing all the collection of all of the posts in the app.
  */
@@ -8,36 +26,65 @@ export interface Events {
    * @returns a list of events (right now just mocks a bunch of events)
    */
   eventsWithIds: (ids: string[]) => Event[]
+
+  /**
+   * Creates a new event.
+   */
+  createEvent: (input: EditEventInput) => Promise<Event>
 }
 
 /**
  * Right now doesn't use GraphQL
  *
  */
-export class GraphQLEventItems implements Events {
+export class GraphQLEvents implements Events {
   eventsWithIds (ids: string[]): Event[] {
     if (ids.length === 0) return []
     const eventsList = []
     const date = new Date()
-    date.setHours(date.getHours() + 10)
+    const date2 = new Date()
+    const address: Placemark = {
+      name: "UCSC Campus",
+      country: "United States of America",
+      postalCode: "95064",
+      street: "High St",
+      streetNumber: "1156",
+      region: "CA",
+      isoCountryCode: "US",
+      city: "Santa Cruz"
+    }
+    date.setHours(10, 30)
+    date.setDate(date.getDate() + 0)
+    date2.setHours(16, 30)
+    date2.setDate(date2.getDate() + 2)
 
     for (let i = 0; i < ids.length; i++) {
       const event: Event = {
-        id: String(ids[i]),
+        id: i,
         userId: "3234324",
-        username: "Test Event",
-        title: "Title for Event",
+        username: "Nicolette Antisdel",
+        title: "Pickup Basketball",
         repliesCount: 2,
         writtenByYou: true,
-        startTime: date,
-        maxOccupancy: 5,
-        isAcceptingInvitations: true,
-        colorHex: "magenta",
-        distance: 0.5
+        duration: new FixedDateRange(date, date2),
+        colorHex: "#843efa",
+        coordinates: { latitude: 36.991585, longitude: -122.058277 },
+        address
       }
       eventsList.push(event)
     }
 
     return eventsList
   }
+
+  async createEvent (input: EditEventInput): Promise<Event> {
+    throw new Error("TODO")
+  }
 }
+
+/**
+ * A dependency key for an `Events` instance.
+ */
+export const eventsDependencyKey = createDependencyKey<Events>(
+  new GraphQLEvents()
+)

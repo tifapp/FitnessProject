@@ -1,78 +1,25 @@
 import { TestEventItems } from "@lib/events/Event"
-import { fireEvent, render, screen } from "@testing-library/react-native"
+import { render, screen } from "@testing-library/react-native"
 import EventItem from "@components/EventItem"
 import React from "react"
 
-describe("PostUI Component Tests", () => {
-  const time = new Date()
-
-  it("Renders with all options", () => {
-    render(<EventItem event={TestEventItems.mockEvent(time, 5, true, true)} />)
-    expect(screen.queryByLabelText(timeComponentLabel)).toBeDefined()
-    expect(screen.queryByLabelText(occupancyComponentLabel)).toBeDefined()
-    expect(screen.queryByLabelText(invitationComponentLabel)).toBeDefined()
+describe("eventUI Component Tests", () => {
+  beforeEach(() => {
+    jest.useFakeTimers().setSystemTime(new Date("2023-02-26T12:00:00"))
   })
+  afterEach(() => jest.useRealTimers())
 
-  it("Renders with only time until event starts", () => {
+  it("Displays time in same format as dateRange", () => {
     render(
       <EventItem
-        event={TestEventItems.mockEvent(time, undefined, false, true)}
+        event={TestEventItems.mockEvent(
+          new Date("2023-02-26T17:00:00"),
+          new Date("2023-02-26T19:00:00")
+        )}
       />
     )
-    expect(screen.queryByLabelText(timeComponentLabel)).toBeDefined()
-    expect(screen.queryByLabelText(occupancyComponentLabel)).toBeNull()
-    expect(screen.queryByLabelText(invitationComponentLabel)).toBeNull()
-  })
-
-  it("Renders with only max occupancy", () => {
-    render(
-      <EventItem event={TestEventItems.mockEvent(undefined, 5, false, false)} />
-    )
-    expect(screen.queryByLabelText(timeComponentLabel)).toBeNull()
-    expect(screen.queryByLabelText(occupancyComponentLabel)).toBeDefined()
-    expect(screen.queryByLabelText(invitationComponentLabel)).toBeNull()
-  })
-
-  it("Renders with only invitations", () => {
-    render(
-      <EventItem
-        event={TestEventItems.mockEvent(undefined, undefined, true, false)}
-      />
-    )
-    expect(screen.queryByLabelText(timeComponentLabel)).toBeNull()
-    expect(screen.queryByLabelText(occupancyComponentLabel)).toBeNull()
-    expect(screen.queryByLabelText(invitationComponentLabel)).toBeDefined()
-  })
-
-  it("Color of invitation changes on click", () => {
-    const event = TestEventItems.mockEvent(time, 5, true, true)
-    render(<EventItem event={event} />)
-
-    const invitation = screen.queryByLabelText(invitationIconLabel)
-    expect(invitation?.props.style[0].color).toEqual("black")
-    fireEvent.press(invitation!!)
-    expect(invitation?.props.style[0].color).toEqual(event.colorHex)
-  })
-
-  it("Time becomes red", () => {
-    render(<EventItem event={TestEventItems.mockEvent(time, 5, true, false)} />)
-
-    const timeIcon = screen.queryByLabelText(timeIconLabel)
-    expect(timeIcon?.props.style.color).toEqual("red")
-  })
-
-  it("Occupancy becomes red", () => {
-    render(<EventItem event={TestEventItems.mockEvent(time, 1, true, true)} />)
-
-    const occupancyIcon = screen.queryByLabelText(occupancyIconLabel)
-    expect(occupancyIcon?.props.style.color).toEqual("red")
+    const date = screen.getByLabelText("day")
+    console.log(date)
+    expect(screen.getByText("Today 5pm - 7pm")).toBeDefined()
   })
 })
-
-// Labels
-const timeComponentLabel = "time until"
-const occupancyComponentLabel = "max occupancy"
-const invitationComponentLabel = "request invitations"
-const invitationIconLabel = "invitation icon"
-const timeIconLabel = "time icon"
-const occupancyIconLabel = "occupancy icon"

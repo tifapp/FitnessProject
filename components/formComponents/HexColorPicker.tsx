@@ -2,29 +2,25 @@ import React from "react"
 import { HexColor } from "@lib/Color"
 import {
   Platform,
-  ScrollView,
   StyleProp,
   StyleSheet,
   View,
-  ViewStyle
+  ViewStyle,
+  TouchableOpacity
 } from "react-native"
 import { MaterialIcons } from "@expo/vector-icons"
-import { TouchableOpacity } from "react-native-gesture-handler"
-import { useDependencyValue } from "@lib/dependencies"
-import { HapticEvent, hapticsDependencyKey } from "@lib/Haptics"
+import { useDependencyValue } from "../../lib/dependencies"
+import { HapticEvent, hapticsDependencyKey } from "../../lib/Haptics"
 
-/**
- * The default function for creating an accessibility label
- * for a `HexColorPicker` option.
- */
-export const defaultCreateAccessibilityLabel = (color: HexColor) => {
-  return `Color ${color}`
+export type HexColorPickerOption<T extends HexColor = HexColor> = {
+  color: T
+  accessibilityLabel: string
 }
 
 /**
  * Props for a `HexColorPicker`.
  */
-export type HexColorPickerProps = {
+export type HexColorPickerProps<T extends HexColor = HexColor> = {
   /**
    * The current color that is selected in the picker.
    */
@@ -33,86 +29,84 @@ export type HexColorPickerProps = {
   /**
    * Acts upon the color changing in the picker.
    */
-  onChange: (color: HexColor) => void
+  onChange: (color: T) => void
 
   /**
    * The available options in the picker.
    */
-  options: HexColor[]
+  options: HexColorPickerOption<T>[]
 
   /**
    * The container style of the picker.
    */
   style?: StyleProp<ViewStyle>
-
-  /**
-   * A function to create an accessibility label for a color option.
-   *
-   * The default simply returns a string in the following format:
-   *
-   * "Color {hex color}"
-   */
-  createAccessibilityLabel?: (color: HexColor) => string
 }
 
 /**
  * A color picker which uses hex colors.
  */
-const HexColorPicker = ({
+const HexColorPicker = <T extends HexColor = HexColor>({
   color,
   onChange,
   options,
-  style,
-  createAccessibilityLabel = defaultCreateAccessibilityLabel
-}: HexColorPickerProps) => {
+  style
+}: HexColorPickerProps<T>) => {
   const playHaptics = useDependencyValue(hapticsDependencyKey)
 
-  const colorTapped = (option: HexColor) => {
+  const colorTapped = (option: T) => {
     if (Platform.OS === "ios") playHaptics(HapticEvent.SelectionChanged)
     onChange(option)
   }
 
   return (
-    <ScrollView horizontal contentContainerStyle={[styles.container, style]}>
+    <View style={[styles.wrappedContainer, style]}>
       {options.map((option) => (
         <TouchableOpacity
           style={styles.optionContainer}
-          key={option}
-          onPress={() => colorTapped(option)}
-          accessibilityRole="button"
-          accessibilityLabel={createAccessibilityLabel(option)}
+          key={option.color}
+          onPress={() => colorTapped(option.color)}
+          accessibilityLabel={option.accessibilityLabel}
         >
           <View
             style={{
-              backgroundColor: option,
-              borderRadius: 32,
-              padding: 12
+              ...styles.option,
+              backgroundColor: option.color
             }}
           >
             <MaterialIcons
               name="check"
               color="white"
               size={24}
-              style={{ opacity: color === option ? 1 : 0 }}
+              style={{ opacity: color === option.color ? 1 : 0 }}
             />
           </View>
         </TouchableOpacity>
       ))}
-    </ScrollView>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  wrappedContainer: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "flex-start"
+    justifyContent: "flex-start",
+    flexWrap: "wrap"
   },
   optionContainer: {
-    marginRight: 12
+    width: "20%",
+    marginBottom: 12,
+    display: "flex"
   },
-  selectionIcon: {
-    position: "absolute"
+  option: {
+    width: 44,
+    height: 44,
+    borderRadius: 32,
+    padding: 12,
+    alignSelf: "center",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center"
   }
 })
 

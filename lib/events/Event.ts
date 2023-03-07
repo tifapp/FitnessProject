@@ -1,3 +1,6 @@
+import { dateRange, FixedDateRange } from "@lib/date"
+import { Location, Placemark } from "@lib/location"
+
 /**
  * A type representing an event hosted by a user, which is meant for
  * viewing in a feed.
@@ -10,40 +13,40 @@ export type Event = {
   readonly repliesCount: number
   readonly description?: string
   readonly writtenByYou: boolean
-  readonly startTime?: Date
-  readonly maxOccupancy?: number
-  readonly isAcceptingInvitations: boolean
+  readonly duration: FixedDateRange
   readonly colorHex: string
-  readonly distance: number
+  readonly coordinates: Location
+  readonly address: Placemark
 }
 
 /**
- * Some `UserPost` objects for testing and UI previewing purposes.
+ * Some `Event` objects for testing and UI previewing purposes.
  */
 export namespace TestEventItems {
   const testId = "3283284382584"
-  const testDate = new Date()
+  const address: Placemark = {
+    name: "UCSC Campus",
+    country: "United States of America",
+    postalCode: "95064",
+    street: "High St",
+    streetNumber: "1156",
+    region: "CA",
+    isoCountryCode: "US",
+    city: "Santa Cruz"
+  }
 
-  export const mockEvent = (
-    time: Date | undefined,
-    occupancy: number | undefined,
-    hasInvitations: boolean,
-    useHours: boolean
-  ) => {
-    if (useHours) testDate.setHours(testDate.getHours() + 10)
-
+  export const mockEvent = (start: Date, end: Date): Event => {
     return {
       id: testId,
       userId: "3234324",
-      username: "Test Event",
-      title: "Title for Event",
+      username: "Nicolette Antisdel",
+      title: "Pickup Basketball",
       repliesCount: 2,
       writtenByYou: true,
-      startTime: time,
-      maxOccupancy: occupancy,
-      isAcceptingInvitations: hasInvitations,
+      duration: dateRange(start, end),
       colorHex: "magenta",
-      distance: 0.5
+      coordinates: { latitude: 36.991585, longitude: -122.058277 },
+      address
     }
   }
 }
