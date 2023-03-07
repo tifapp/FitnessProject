@@ -1,6 +1,6 @@
 import { TrackedLocation } from "./Location"
 import ExpoLocation from "expo-location"
-import { createDependencyKey } from "@lib/dependencies"
+import { createDependencyKey } from "../dependencies"
 
 export type StopUserLocationTracking = () => void
 
@@ -128,20 +128,20 @@ const defaultTrackingOptions: UserLocationTrackingOptions = {
 
 const toExpoAccurracy = (accuracy?: UserLocationTrackingAccurracy) => {
   switch (accuracy) {
-    case UserLocationTrackingAccurracy.Low:
-      return ExpoLocation.LocationAccuracy.Low
-    case UserLocationTrackingAccurracy.High:
-      return ExpoLocation.LocationAccuracy.High
-    case UserLocationTrackingAccurracy.Precise:
-      return ExpoLocation.LocationAccuracy.Highest
-    default:
-      return ExpoLocation.LocationAccuracy.Balanced
+  case UserLocationTrackingAccurracy.Low:
+    return ExpoLocation.LocationAccuracy.Low
+  case UserLocationTrackingAccurracy.High:
+    return ExpoLocation.LocationAccuracy.High
+  case UserLocationTrackingAccurracy.Precise:
+    return ExpoLocation.LocationAccuracy.Highest
+  default:
+    return ExpoLocation.LocationAccuracy.Balanced
   }
 }
 
 const toTrackedLocation = (locationResponse: ExpoLocation.LocationObject) => {
   return {
-    location: locationResponse.coords,
+    coordinate: locationResponse.coords,
     trackingDate: new Date(locationResponse.timestamp)
   } as TrackedLocation
 }

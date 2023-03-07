@@ -7,6 +7,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { Shadow } from "react-native-shadow-2"
 import tinycolor from "tinycolor2"
 import { placemarkToFormattedAddress } from "@lib/location"
+import { compactFormatMiles } from "@lib/DistanceFormatting"
 
 interface Props {
   event: Event
@@ -99,9 +100,9 @@ const EventItem = ({ event }: Props) => {
               size={22}
               color={event.colorHex}
             />
-            <Text
-              style={[styles.distanceText, { color: event.colorHex }]}
-            >{`${distance} mi`}</Text>
+            <Text style={[styles.distanceText, { color: event.colorHex }]}>
+              {compactFormatMiles(distance)}
+            </Text>
           </View>
         </View>
       </View>

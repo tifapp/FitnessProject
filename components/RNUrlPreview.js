@@ -25,30 +25,30 @@ export default class RNUrlPreview extends React.PureComponent {
   ) => {
     return imageLink
       ? (
-      <Image
-        style={{
-          height: 81,
-          width: 144,
-          resizeMode: "cover"
-        }}
-        resizeMode="cover"
-        source={{ uri: imageLink }}
-        {...imageProps}
-      />
-        )
+        <Image
+          style={{
+            height: 81,
+            width: 144,
+            resizeMode: "cover"
+          }}
+          resizeMode="cover"
+          source={{ uri: imageLink }}
+          {...imageProps}
+        />
+      )
       : faviconLink
         ? (
-      <Image
-        style={{
-          height: 81,
-          width: 81,
-          resizeMode: "cover"
-        }}
-        resizeMode="cover"
-        source={{ uri: faviconLink }}
-        {...imageProps}
-      />
-          )
+          <Image
+            style={{
+              height: 81,
+              width: 81,
+              resizeMode: "cover"
+            }}
+            resizeMode="cover"
+            source={{ uri: faviconLink }}
+            {...imageProps}
+          />
+        )
         : null
   }
 
