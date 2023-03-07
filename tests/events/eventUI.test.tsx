@@ -3,6 +3,8 @@ import { render, screen } from "@testing-library/react-native"
 import EventItem from "@components/EventItem"
 import React from "react"
 
+jest.mock("react-native-popup-menu")
+
 describe("eventUI Component Tests", () => {
   beforeEach(() => {
     jest.useFakeTimers().setSystemTime(new Date("2023-02-26T12:00:00"))

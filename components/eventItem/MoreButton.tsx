@@ -1,20 +1,50 @@
-import IconButton from "@components/common/IconButton"
-import React, { createContext, useContext } from "react"
+import React from "react"
 import { StyleSheet, View, Alert } from "react-native"
+import { MaterialIcons } from "@expo/vector-icons"
+import {
+  Menu,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger
+} from "react-native-popup-menu"
 
-const MoreButton = () => {
-  const { dismiss } = useMoreButtonContext()
+interface Props {
+  eventHost: boolean
+}
 
-  const alertUser = () => {
+const MoreButton = ({ eventHost }: Props) => {
+  let dismiss: () => void
+
+  const alertDelete = () => {
     Alert.alert("Delete this event?", undefined, [
       { text: "Delete", style: "destructive", onPress: dismiss },
       { text: "Cancel", style: "cancel" }
     ])
   }
 
+  const alertReport = () => {
+    Alert.alert("Report this event?", undefined, [
+      { text: "Report", style: "destructive", onPress: dismiss },
+      { text: "Cancel", style: "cancel" }
+    ])
+  }
+
   return (
     <View style={styles.moreButtonStyle}>
-      <IconButton iconName={"more-horiz"} size={26} onPress={alertUser} />
+      <Menu>
+        <MenuTrigger>
+          <MaterialIcons name="more-horiz" size={24} />
+        </MenuTrigger>
+        <MenuOptions>
+          {eventHost
+            ? (
+              <MenuOption onSelect={alertDelete} text="Delete" />
+            )
+            : (
+              <MenuOption onSelect={alertReport} text="Report" />
+            )}
+        </MenuOptions>
+      </Menu>
     </View>
   )
 }
@@ -26,21 +56,5 @@ const styles = StyleSheet.create({
     alignItems: "flex-end"
   }
 })
-
-export const useMoreButtonContext = () => {
-  const context = useContext(MoreButtonContext)
-  return { ...context }
-}
-
-export type MoreButtonContextValues = {
-  /**
-   * Closes the popup alert
-   */
-  dismiss: () => void
-}
-
-const MoreButtonContext = createContext<MoreButtonContextValues | undefined>(
-  undefined
-)
 
 export default MoreButton

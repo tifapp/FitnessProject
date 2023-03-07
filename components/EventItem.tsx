@@ -29,7 +29,7 @@ const EventItem = ({ event }: Props) => {
             accessibilityLabel="profile picture"
           />
           <Text style={styles.name}>{event.username}</Text>
-          <MoreButton />
+          <MoreButton eventHost={event.writtenByYou} />
         </View>
 
         {/* Event Title, Location, Time */}
