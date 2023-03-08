@@ -18,7 +18,7 @@ export type MaterialIconProps = {
  */
 export const MaterialIcon = ({
   name,
-  size,
+  size = 24,
   style,
   color,
   maximumFontScaleFactor,
@@ -26,10 +26,7 @@ export const MaterialIcon = ({
 }: MaterialIconProps) => (
   <MaterialIcons
     name={name}
-    size={
-      (size ?? 24) *
-      useFontScale({ maximumScaleFactor: maximumFontScaleFactor })
-    }
+    size={size * useFontScale({ maximumScaleFactor: maximumFontScaleFactor })}
     color={color}
     style={style}
     {...props}
