@@ -1,6 +1,5 @@
 import React from "react"
 import { Alert, TouchableOpacity } from "react-native"
-import { MaterialIcons } from "@expo/vector-icons"
 import { useEventFormContext } from "./EventForm"
 import { MaterialIcon } from "@components/common/MaterialIcon"
 import { FontScaleFactors } from "@lib/FontScale"

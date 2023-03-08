@@ -1,7 +1,6 @@
 import React, { ReactNode } from "react"
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import { MaterialIcons } from "@expo/vector-icons"
-import { FontScaleFactors, useFontScale } from "../../lib/FontScale"
+import { FontScaleFactors } from "../../lib/FontScale"
 import { useEventFormContext } from "./EventForm"
 import { MaterialIcon } from "@components/common/MaterialIcon"
 

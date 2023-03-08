@@ -2,11 +2,9 @@ import React, {
   StyleProp,
   StyleSheet,
   Text,
-  useWindowDimensions,
   View,
   ViewStyle
 } from "react-native"
-import { MaterialIcons } from "@expo/vector-icons"
 import { compactFormatMiles } from "../../lib/DistanceFormatting"
 import { MaterialIcon } from "@components/common/MaterialIcon"
 
