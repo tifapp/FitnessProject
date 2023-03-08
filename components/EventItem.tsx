@@ -15,16 +15,23 @@ interface Props {
 const EventItem = ({ event }: Props) => {
   const numAttendees = 1 // Eventually will come from event object
   const distance = 0.5 // Eventually will be calculated from the location given in the event object
-  const shadowColor = "#ebebeb"
+  // const shadowColor = "#ebebeb"
+  const shadowColor = tinycolor(event.colorHex).lighten(25).toString()
   const lightEventColor = tinycolor(event.colorHex).lighten(25).toString()
 
   return (
-    <Shadow distance={18} startColor={shadowColor} stretch={true}>
+    <Shadow
+      distance={16}
+      offset={[-2, 6]}
+      shadowViewProps={{ style: { opacity: 0.6 } }}
+      startColor={shadowColor}
+      stretch={true}
+    >
       <View style={[styles.container]}>
         {/* Profile Image, Name, More button */}
         <View style={[styles.topRow, styles.flexRow]}>
           <Image
-            style={styles.image}
+            style={[styles.image, styles.iconMargin]}
             source={require("../assets/icon.png")}
             accessibilityLabel="profile picture"
           />
@@ -41,6 +48,7 @@ const EventItem = ({ event }: Props) => {
               name="map-marker-outline"
               size={24}
               color={event.colorHex}
+              style={styles.iconMargin}
             />
             <Text style={styles.infoText}>
               {placemarkToFormattedAddress(event.address)}
@@ -52,6 +60,7 @@ const EventItem = ({ event }: Props) => {
               name="calendar-check-outline"
               size={24}
               color={event.colorHex}
+              style={styles.iconMargin}
             />
             <Text style={styles.infoText} accessibilityLabel="day">
               {event.duration.formatted()}
@@ -70,6 +79,7 @@ const EventItem = ({ event }: Props) => {
               name="account-multiple-outline"
               size={24}
               color={event.colorHex}
+              style={styles.iconMargin}
             />
             <Text
               style={[styles.attendingText, styles.attendingNumber]}
@@ -87,8 +97,9 @@ const EventItem = ({ event }: Props) => {
           >
             <MaterialCommunityIcons
               name="navigation-variant-outline"
-              size={22}
+              size={24}
               color={event.colorHex}
+              style={styles.iconMargin}
             />
             <Text
               style={[styles.distanceText, { color: event.colorHex }]}
@@ -118,12 +129,10 @@ const styles = StyleSheet.create({
   },
   infoText: {
     textAlignVertical: "center",
-    color: "grey",
-    paddingLeft: 8
+    color: "grey"
   },
   attendingNumber: {
-    fontWeight: "bold",
-    paddingLeft: 8
+    fontWeight: "bold"
   },
   attendingText: {
     textAlignVertical: "center",
@@ -133,20 +142,19 @@ const styles = StyleSheet.create({
     textAlignVertical: "center",
     fontWeight: "bold",
     fontSize: 22,
-    paddingBottom: 8
+    marginBottom: 8
   },
   name: {
     textAlignVertical: "center",
     fontWeight: "bold",
-    fontSize: 15,
-    paddingLeft: 8
+    fontSize: 15
   },
   distance: {
     flexDirection: "row",
     alignSelf: "center",
     paddingVertical: 2,
     paddingLeft: 4,
-    borderRadius: 14
+    borderRadius: 12
   },
   distanceContainer: {
     flexDirection: "row"
@@ -155,7 +163,6 @@ const styles = StyleSheet.create({
     textAlignVertical: "center",
     color: "white",
     paddingRight: 8,
-    paddingLeft: 2,
     fontWeight: "bold"
   },
   image: {
@@ -168,6 +175,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 16,
     borderRadius: 20
+  },
+  iconMargin: {
+    marginRight: 8
   }
 })
 

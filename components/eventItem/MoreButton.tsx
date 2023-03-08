@@ -35,14 +35,21 @@ const MoreButton = ({ eventHost }: Props) => {
         <MenuTrigger>
           <MaterialIcons name="more-horiz" size={24} />
         </MenuTrigger>
-        <MenuOptions>
+        <MenuOptions customStyles={optionsStyles}>
           {eventHost
             ? (
-              <MenuOption onSelect={alertDelete} text="Delete" />
+              <MenuOption
+                onSelect={alertDelete}
+                text="Delete"
+                customStyles={deleteStyle}
+              />
             )
             : (
               <MenuOption onSelect={alertReport} text="Report" />
             )}
+          {/* <MenuOption onSelect={alertDelete} text="Delete" />
+          <MenuOption onSelect={alertDelete} text="Delete" />
+            <MenuOption onSelect={alertDelete} text="Delete" /> */}
         </MenuOptions>
       </Menu>
     </View>
@@ -54,6 +61,26 @@ const styles = StyleSheet.create({
     flex: 1,
     opacity: 0.4,
     alignItems: "flex-end"
+  }
+})
+
+const optionsStyles = StyleSheet.create({
+  optionsContainer: {
+    width: "30%"
+  },
+  optionText: {
+    // textAlign: "center",
+    textAlignVertical: "center",
+    fontSize: 16
+  }
+})
+
+const deleteStyle = StyleSheet.create({
+  optionText: {
+    // textAlign: "center",
+    textAlignVertical: "center",
+    fontSize: 16,
+    color: "red"
   }
 })
 
