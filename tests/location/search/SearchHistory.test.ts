@@ -1,3 +1,4 @@
+import { AsyncStorageUtils } from "@lib/AsyncStorage"
 import {
   AsyncStorageLocationSearchHistory,
   LocationSearchHistory
@@ -22,10 +23,10 @@ describe("AsyncStorageLocationSearchHistory tests", () => {
     }
     await searchHistory.save({ searchResult, reason: "attended-event" })
 
-    const result = await AsyncStorage.getItem(
+    const result = await AsyncStorageUtils.load(
       "location.search.history.lat+45.12345.lng+-121.12345"
     )
-    expect(JSON.parse(result!!)).toMatchObject({
+    expect(result).toMatchObject({
       ...searchResult,
       history: [{ timestamp: 1678265460, reason: "attended-event" }]
     })
