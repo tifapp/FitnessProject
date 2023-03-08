@@ -3,7 +3,7 @@ import { MaterialIcons } from "@expo/vector-icons"
 import { StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native"
 import { SkeletonView } from "../common/Skeleton"
 import { FontScaleFactors, useFontScale } from "../../lib/FontScale"
-import { MaterialIconName } from "../../lib/MaterialIcon"
+import { MaterialIconName } from "../common/MaterialIcon"
 
 export type FormLabelProps = {
   icon?: MaterialIconName
