@@ -12,7 +12,7 @@ const testSearchResult = {
 } as const
 
 const testSearchResultKey =
-  "location.search.history.lat+45.12345.lng+-121.12345"
+  "@location_search_history_lat+45.12345_lng+-121.12345"
 
 let searchHistory: LocationSearchHistory
 describe("AsyncStorageLocationSearchHistory tests", () => {

@@ -50,5 +50,5 @@ implements LocationSearchHistory {
 }
 
 const searchHistoryKey = (coordinates: Location) => {
-  return `location.search.history.lat+${coordinates.latitude}.lng+${coordinates.longitude}`
+  return `@location_search_history_lat+${coordinates.latitude}_lng+${coordinates.longitude}`
 }
