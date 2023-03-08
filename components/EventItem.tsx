@@ -16,7 +16,7 @@ const EventItem = ({ event }: Props) => {
   const numAttendees = 1
   const distance = 0.5
   const shadowColor = "#bdbdbd"
-  const lightEventColor = tinycolor(event.colorHex).lighten(10).toString()
+  const lightEventColor = tinycolor(event.color).lighten(10).toString()
 
   const onPressMore = () => {
     return null
@@ -51,16 +51,16 @@ const EventItem = ({ event }: Props) => {
           <Text style={styles.titleText}>{event.title}</Text>
 
           <View style={[styles.location, styles.flexRow]}>
-            <Icon name="location-on" color={event.colorHex} />
+            <Icon name="location-on" color={event.color} />
             <Text style={styles.infoText}>
               {placemarkToFormattedAddress(event.address)}
             </Text>
           </View>
 
           <View style={styles.flexRow}>
-            <Icon name="event-available" color={event.colorHex} />
+            <Icon name="event-available" color={event.color} />
             <Text style={styles.infoText} accessibilityLabel="day">
-              {event.duration.formatted()}
+              {event.dateRange.formatted()}
             </Text>
           </View>
 
@@ -72,7 +72,7 @@ const EventItem = ({ event }: Props) => {
         {/* People Attending, Distance */}
         <View style={styles.distanceContainer}>
           <View style={[styles.flexRow, { alignItems: "center" }]}>
-            <Icon name="people-alt" color={event.colorHex} />
+            <Icon name="people-alt" color={event.color} />
             <Text
               style={[styles.attendingText, styles.attendingNumber]}
             >{`${numAttendees}`}</Text>
@@ -84,7 +84,7 @@ const EventItem = ({ event }: Props) => {
               style={[
                 styles.distance,
                 {
-                  backgroundColor: event.colorHex,
+                  backgroundColor: event.color,
                   borderColor: lightEventColor
                 }
               ]}
