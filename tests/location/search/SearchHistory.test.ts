@@ -58,4 +58,26 @@ describe("AsyncStorageLocationSearchHistory tests", () => {
       ]
     })
   })
+
+  it("should be able to query for a single history item", async () => {
+    jest.setSystemTime(new Date("2023-03-08T00:51:00"))
+    await searchHistory.save({
+      searchResult: testSearchResult,
+      reason: "searched-location"
+    })
+    const historyItem = await searchHistory.itemForLocation(
+      testSearchResult.coordinates
+    )
+    expect(historyItem).toMatchObject({
+      ...testSearchResult,
+      history: [{ timestamp: 1678265460, reason: "searched-location" }]
+    })
+  })
+
+  it("should return undefined for a query on a non-existent history item", async () => {
+    const historyItem = await searchHistory.itemForLocation(
+      testSearchResult.coordinates
+    )
+    expect(historyItem).toBeUndefined()
+  })
 })
