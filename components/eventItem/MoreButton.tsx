@@ -1,5 +1,5 @@
 import React from "react"
-import { StyleSheet, View, Alert } from "react-native"
+import { StyleSheet, View, Alert, Text } from "react-native"
 import { MaterialIcons } from "@expo/vector-icons"
 import {
   Menu,
@@ -32,20 +32,21 @@ const MoreButton = ({ eventHost }: Props) => {
   return (
     <View style={styles.moreButtonStyle}>
       <Menu>
-        <MenuTrigger>
+        <MenuTrigger testID="more options">
           <MaterialIcons name="more-horiz" size={24} />
         </MenuTrigger>
         <MenuOptions customStyles={optionsStyles}>
+          {/* Need to use Text in order for tests to find the element */}
           {eventHost
             ? (
-              <MenuOption
-                onSelect={alertDelete}
-                text="Delete"
-                customStyles={deleteStyle}
-              />
+              <MenuOption onSelect={alertDelete} customStyles={deleteStyle}>
+                <Text>Delete</Text>
+              </MenuOption>
             )
             : (
-              <MenuOption onSelect={alertReport} text="Report" />
+              <MenuOption onSelect={alertReport}>
+                <Text>Report</Text>
+              </MenuOption>
             )}
           {/* <MenuOption onSelect={alertDelete} text="Delete" />
           <MenuOption onSelect={alertDelete} text="Delete" />
