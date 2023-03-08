@@ -10,6 +10,8 @@ const testObject = {
 }
 
 describe("AsyncStorageUtils tests", () => {
+  beforeEach(async () => await AsyncStorage.clear())
+
   test("saving object for key", async () => {
     await AsyncStorageUtils.save(testKey, testObject)
     const result = await AsyncStorage.getItem(testKey)

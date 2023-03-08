@@ -14,6 +14,10 @@ export type LocationSearchHistorySaveOptions = {
   reason: LocationSearchHistorySaveReason
 }
 
+export type LocationSearchHistoryRecord = {
+  history: [{ timestamp: number; reason: LocationSearchHistorySaveReason }]
+} & LocationSearchResult
+
 export interface LocationSearchHistory {
   save: (options: LocationSearchHistorySaveOptions) => Promise<void>
 }
@@ -21,14 +25,19 @@ export interface LocationSearchHistory {
 export class AsyncStorageLocationSearchHistory
 implements LocationSearchHistory {
   async save (options: LocationSearchHistorySaveOptions) {
+    const key = searchHistoryKey(options.searchResult.coordinates)
+    const prevHistory =
+      await AsyncStorageUtils.load<LocationSearchHistoryRecord>(key).then(
+        (res) => res?.history ?? []
+      )
     const result = {
       ...options.searchResult,
-      history: [{ timestamp: now().unix(), reason: options.reason }]
+      history: [
+        ...prevHistory,
+        { timestamp: now().unix(), reason: options.reason }
+      ]
     }
-    await AsyncStorageUtils.save(
-      searchHistoryKey(options.searchResult.coordinates),
-      result
-    )
+    await AsyncStorageUtils.save(key, result)
   }
 }
 
