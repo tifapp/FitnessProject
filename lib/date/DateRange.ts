@@ -65,7 +65,7 @@ export class FixedDateRange {
     const end = dayjs(this.endDate)
 
     const startDateFormat = formatFromBasis(now(), start)
-    if (start.isSame(end)) return startDateFormat
+    if (start.isSame(end, "minute")) return startDateFormat
 
     const endDateFormat = start.isSame(end, "day")
       ? formatTime(end)

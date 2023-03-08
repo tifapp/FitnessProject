@@ -216,37 +216,37 @@ describe("FixedDateRangeFormatting tests", () => {
     )
   })
 
-  test("start and end date are the exact same, today", () => {
+  test("start and end date are in same minute, today", () => {
     expectFormattedDateRange(
       dateRange(
-        new Date("2023-02-26T08:00:00"),
-        new Date("2023-02-26T08:00:00")
+        new Date("2023-02-26T08:00:32"),
+        new Date("2023-02-26T08:00:48")
       ),
       "Today 8am"
     )
   })
 
-  test("start and end date are the exact same, yesterday", () => {
+  test("start and end date are in same minute, yesterday", () => {
     expectFormattedDateRange(
       dateRange(
-        new Date("2023-02-25T08:00:00"),
-        new Date("2023-02-25T08:00:00")
+        new Date("2023-02-25T08:00:06"),
+        new Date("2023-02-25T08:00:42")
       ),
       "Yesterday 8am"
     )
   })
 
-  test("start and end date are the exact same, tomorrow", () => {
+  test("start and end date are in same minute, tomorrow", () => {
     expectFormattedDateRange(
       dateRange(
-        new Date("2023-02-27T08:00:00"),
-        new Date("2023-02-27T08:00:00")
+        new Date("2023-02-27T08:00:11"),
+        new Date("2023-02-27T08:00:22")
       ),
       "Tomorrow 8am"
     )
   })
 
-  test("start and end date are the exact same, 2 days from now", () => {
+  test("start and end date are in same minute, 2 days from now", () => {
     expectFormattedDateRange(
       dateRange(
         new Date("2023-02-28T08:00:00"),
@@ -256,21 +256,21 @@ describe("FixedDateRangeFormatting tests", () => {
     )
   })
 
-  test("start and end date are the exact same, 1 month from now", () => {
+  test("start and end date are in same minute, 1 month from now", () => {
     expectFormattedDateRange(
       dateRange(
-        new Date("2023-03-26T08:00:00"),
-        new Date("2023-03-26T08:00:00")
+        new Date("2023-03-26T08:00:55"),
+        new Date("2023-03-26T08:00:58")
       ),
       "Mar 26, 8am"
     )
   })
 
-  test("start and end date are the exact same, 1 year from now", () => {
+  test("start and end date arein same minute, 1 year from now", () => {
     expectFormattedDateRange(
       dateRange(
-        new Date("2024-02-26T08:00:00"),
-        new Date("2024-02-26T08:00:00")
+        new Date("2024-02-26T08:00:30"),
+        new Date("2024-02-26T08:00:50")
       ),
       "Feb 26 2024, 8am"
     )
