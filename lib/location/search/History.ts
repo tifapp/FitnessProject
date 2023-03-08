@@ -1,3 +1,4 @@
+import { AsyncStorageUtils } from "@lib/AsyncStorage"
 import { now } from "@lib/date"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { Location } from "../Location"
@@ -24,9 +25,9 @@ implements LocationSearchHistory {
       ...options.searchResult,
       history: [{ timestamp: now().unix(), reason: options.reason }]
     }
-    await AsyncStorage.setItem(
+    await AsyncStorageUtils.save(
       searchHistoryKey(options.searchResult.coordinates),
-      JSON.stringify(result)
+      result
     )
   }
 }
