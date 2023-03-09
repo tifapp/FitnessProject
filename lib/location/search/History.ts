@@ -171,7 +171,7 @@ implements LocationSearchHistory {
 
   private async historyItemsForKeys (keys: string[]) {
     return await AsyncStorage.multiGet(keys).then((results) => {
-      return ArrayUtils.filterOptionals(results.map(([_, value]) => value)).map(
+      return ArrayUtils.removeOptionals(results.map(([_, value]) => value)).map(
         (value) => JSON.parse(value) as LocationSearchHistoryItem
       )
     })

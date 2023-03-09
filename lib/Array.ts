@@ -5,9 +5,9 @@ export type NonEmptyArray<T> = [T, ...T[]]
 
 export namespace ArrayUtils {
   /**
-   * A typesafe way for filtering all null/undefined values from an array.
+   * A typesafe way for removing all null/undefined values from an array.
    */
-  export const filterOptionals = <T>(arr: (T | null | undefined)[]) => {
+  export const removeOptionals = <T>(arr: (T | null | undefined)[]) => {
     return arr.reduce((acc, curr) => (curr ? [...acc, curr] : acc), [] as T[])
   }
 
