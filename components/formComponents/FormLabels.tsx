@@ -1,9 +1,8 @@
 import React from "react"
-import { MaterialIcons } from "@expo/vector-icons"
 import { StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native"
 import { SkeletonView } from "../common/Skeleton"
 import { FontScaleFactors, useFontScale } from "../../lib/FontScale"
-import { MaterialIconName } from "../../lib/MaterialIcon"
+import { MaterialIcon, MaterialIconName } from "../common/Icons"
 
 export type FormLabelProps = {
   icon?: MaterialIconName
@@ -85,9 +84,9 @@ type LabelIconProps = {
 }
 
 const LabelIcon = ({ icon, color }: LabelIconProps) => (
-  <MaterialIcons
+  <MaterialIcon
     name={icon}
-    size={24 * useLabelFontScale()}
+    maximumFontScaleFactor={FontScaleFactors.xxxLarge}
     color={color}
     style={styles.icon}
   />

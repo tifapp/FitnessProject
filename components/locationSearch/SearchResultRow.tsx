@@ -2,12 +2,11 @@ import React, {
   StyleProp,
   StyleSheet,
   Text,
-  useWindowDimensions,
   View,
   ViewStyle
 } from "react-native"
-import { MaterialIcons } from "@expo/vector-icons"
 import { compactFormatMiles } from "../../lib/DistanceFormatting"
+import { MaterialIcon } from "@components/common/Icons"
 
 export type LocationSearchResultRowProps = {
   result: {
@@ -27,9 +26,8 @@ export const LocationSearchResultRow = ({
   style
 }: LocationSearchResultRowProps) => (
   <View style={[styles.container, style]}>
-    <MaterialIcons
+    <MaterialIcon
       name={result.isInSearchHistory ? "location-history" : "location-on"}
-      size={24 * useWindowDimensions().fontScale}
       color="black"
       style={styles.iconContainer}
     />
