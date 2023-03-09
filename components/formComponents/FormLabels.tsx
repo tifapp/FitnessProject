@@ -2,7 +2,7 @@ import React from "react"
 import { StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native"
 import { SkeletonView } from "../common/Skeleton"
 import { FontScaleFactors, useFontScale } from "../../lib/FontScale"
-import { MaterialIcon, MaterialIconName } from "../common/MaterialIcon"
+import { MaterialIcon, MaterialIconName } from "../common/Icons"
 
 export type FormLabelProps = {
   icon?: MaterialIconName

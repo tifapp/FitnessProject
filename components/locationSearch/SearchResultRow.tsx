@@ -6,7 +6,7 @@ import React, {
   ViewStyle
 } from "react-native"
 import { compactFormatMiles } from "../../lib/DistanceFormatting"
-import { MaterialIcon } from "@components/common/MaterialIcon"
+import { MaterialIcon } from "@components/common/Icons"
 
 export type LocationSearchResultRowProps = {
   result: {

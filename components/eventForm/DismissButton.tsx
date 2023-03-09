@@ -1,7 +1,7 @@
 import React from "react"
 import { Alert, TouchableOpacity } from "react-native"
 import { useEventFormContext } from "./EventForm"
-import { MaterialIcon } from "@components/common/MaterialIcon"
+import { MaterialIcon } from "@components/common/Icons"
 import { FontScaleFactors } from "@lib/FontScale"
 
 /**

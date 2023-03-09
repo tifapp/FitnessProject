@@ -9,7 +9,7 @@ import {
   EventFormLocationInfo,
   EventFormPlacemarkInfo
 } from "./EventFormValues"
-import { MaterialIcon } from "@components/common/MaterialIcon"
+import { MaterialIcon } from "@components/common/Icons"
 
 /**
  * Displays the selected location (if one) in the event form.
