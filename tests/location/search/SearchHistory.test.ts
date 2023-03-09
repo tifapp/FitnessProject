@@ -143,6 +143,12 @@ describe("AsyncStorageLocationSearchHistory tests", () => {
       }
     ])
   })
+
+  it("should ignore non-location search history keys in AsyncStorage when querying all items", async () => {
+    await AsyncStorageUtils.save("test", 1)
+    await saveFakeSearchResults(10)
+    expect(await searchHistory.loadItems()).not.toContain(1)
+  })
 })
 
 const saveFakeSearchResults = async (amount: number) => {
