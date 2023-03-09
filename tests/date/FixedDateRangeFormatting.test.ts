@@ -2,7 +2,7 @@ import { dateRange, FixedDateRange } from "@lib/date"
 
 describe("FixedDateRangeFormatting tests", () => {
   beforeEach(() => {
-    jest.useFakeTimers("modern").setSystemTime(new Date("2023-02-26T12:00:00"))
+    jest.useFakeTimers().setSystemTime(new Date("2023-02-26T12:00:00"))
   })
   afterEach(() => jest.useRealTimers())
 
@@ -213,6 +213,66 @@ describe("FixedDateRangeFormatting tests", () => {
         new Date("2023-03-05T10:00:00")
       ),
       "Today 8am - Mar 5, 10am"
+    )
+  })
+
+  test("start and end date are in same minute, today", () => {
+    expectFormattedDateRange(
+      dateRange(
+        new Date("2023-02-26T08:00:32"),
+        new Date("2023-02-26T08:00:48")
+      ),
+      "Today 8am"
+    )
+  })
+
+  test("start and end date are in same minute, yesterday", () => {
+    expectFormattedDateRange(
+      dateRange(
+        new Date("2023-02-25T08:00:06"),
+        new Date("2023-02-25T08:00:42")
+      ),
+      "Yesterday 8am"
+    )
+  })
+
+  test("start and end date are in same minute, tomorrow", () => {
+    expectFormattedDateRange(
+      dateRange(
+        new Date("2023-02-27T08:00:11"),
+        new Date("2023-02-27T08:00:22")
+      ),
+      "Tomorrow 8am"
+    )
+  })
+
+  test("start and end date are in same minute, 2 days from now", () => {
+    expectFormattedDateRange(
+      dateRange(
+        new Date("2023-02-28T08:00:00"),
+        new Date("2023-02-28T08:00:00")
+      ),
+      "Tue 8am"
+    )
+  })
+
+  test("start and end date are in same minute, 1 month from now", () => {
+    expectFormattedDateRange(
+      dateRange(
+        new Date("2023-03-26T08:00:55"),
+        new Date("2023-03-26T08:00:58")
+      ),
+      "Mar 26, 8am"
+    )
+  })
+
+  test("start and end date arein same minute, 1 year from now", () => {
+    expectFormattedDateRange(
+      dateRange(
+        new Date("2024-02-26T08:00:30"),
+        new Date("2024-02-26T08:00:50")
+      ),
+      "Feb 26 2024, 8am"
     )
   })
 })
