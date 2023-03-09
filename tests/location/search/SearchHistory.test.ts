@@ -1,4 +1,5 @@
 import { AsyncStorageUtils } from "@lib/AsyncStorage"
+import { LocationSearchResult } from "@lib/location/search"
 import {
   AsyncStorageLocationSearchHistory,
   LocationSearchHistory
@@ -15,6 +16,7 @@ const testSearchResultKey =
   "@location_search_history_lat+45.12345_lng+-121.12345"
 
 let searchHistory: LocationSearchHistory
+
 describe("AsyncStorageLocationSearchHistory tests", () => {
   beforeEach(async () => {
     jest.useFakeTimers({ doNotFake: ["nextTick", "setImmediate"] })
@@ -26,10 +28,7 @@ describe("AsyncStorageLocationSearchHistory tests", () => {
 
   it("should save a newly created result in async storage", async () => {
     jest.setSystemTime(new Date("2023-03-08T00:51:00"))
-    await searchHistory.save({
-      searchResult: testSearchResult,
-      reason: "attended-event"
-    })
+    await searchHistory.save(testSearchResult, { reason: "attended-event" })
 
     const result = await AsyncStorageUtils.load(testSearchResultKey)
     expect(result).toMatchObject({
@@ -40,15 +39,11 @@ describe("AsyncStorageLocationSearchHistory tests", () => {
 
   it("should append to the history when saved more than once", async () => {
     jest.setSystemTime(new Date("2023-03-08T00:51:00"))
-    await searchHistory.save({
-      searchResult: testSearchResult,
-      reason: "attended-event"
-    })
+    await searchHistory.save(testSearchResult, { reason: "attended-event" })
+
     jest.setSystemTime(new Date("2023-03-09T00:51:00"))
-    await searchHistory.save({
-      searchResult: testSearchResult,
-      reason: "hosted-event"
-    })
+    await searchHistory.save(testSearchResult, { reason: "hosted-event" })
+
     const result = await AsyncStorageUtils.load(testSearchResultKey)
     expect(result).toMatchObject(
       expect.objectContaining({
@@ -61,26 +56,20 @@ describe("AsyncStorageLocationSearchHistory tests", () => {
   })
 
   it("should update place info when saved", async () => {
-    jest.setSystemTime(new Date("2023-03-08T00:51:00"))
-    await searchHistory.save({
-      searchResult: testSearchResult,
-      reason: "attended-event"
-    })
-    jest.setSystemTime(new Date("2023-03-09T00:51:00"))
-    await searchHistory.save({
-      searchResult: { ...testSearchResult, name: "Hello" },
-      reason: "hosted-event"
-    })
+    await searchHistory.save(testSearchResult, { reason: "attended-event" })
+    await searchHistory.save(
+      { ...testSearchResult, name: "Hello" },
+      {
+        reason: "hosted-event"
+      }
+    )
     const result = await AsyncStorageUtils.load(testSearchResultKey)
     expect(result).toMatchObject(expect.objectContaining({ name: "Hello" }))
   })
 
   it("should be able to query specific history items in batch", async () => {
     jest.setSystemTime(new Date("2023-03-08T00:51:00"))
-    await searchHistory.save({
-      searchResult: testSearchResult,
-      reason: "searched-location"
-    })
+    await searchHistory.save(testSearchResult, { reason: "searched-location" })
 
     const otherSearchResult = {
       ...testSearchResult,
@@ -88,10 +77,7 @@ describe("AsyncStorageLocationSearchHistory tests", () => {
       coordinates: { latitude: 43.1, longitude: -121.34 }
     }
     jest.setSystemTime(new Date("2023-03-09T00:51:00"))
-    await searchHistory.save({
-      searchResult: otherSearchResult,
-      reason: "hosted-event"
-    })
+    await searchHistory.save(otherSearchResult, { reason: "hosted-event" })
 
     const itemMap = await searchHistory.itemsForLocations([
       testSearchResult.coordinates,
