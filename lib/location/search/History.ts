@@ -40,12 +40,12 @@ export class LocationSearchHistoryItemMap {
 }
 
 export interface LocationSearchHistory {
-  load: (
+  loadItems: (
     options?: LocationSearchHistoryLoadOptions
   ) => Promise<LocationSearchHistoryItem[]>
-  save: (
+  saveSearchResult: (
     searchResult: LocationSearchResult,
-    options: LocationSearchHistorySaveOptions
+    options?: LocationSearchHistorySaveOptions
   ) => Promise<void>
   itemsForLocations: (
     locations: Location[]
@@ -54,7 +54,7 @@ export interface LocationSearchHistory {
 
 export class AsyncStorageLocationSearchHistory
 implements LocationSearchHistory {
-  async load (options?: LocationSearchHistoryLoadOptions) {
+  async loadItems (options?: LocationSearchHistoryLoadOptions) {
     const items = await this.historyItemsForKeys(await this.allKeys()).then(
       (items) =>
         items.sort((item1, item2) => {
@@ -87,9 +87,9 @@ implements LocationSearchHistory {
     })
   }
 
-  async save (
+  async saveSearchResult (
     searchResult: LocationSearchResult,
-    options: LocationSearchHistorySaveOptions
+    options?: LocationSearchHistorySaveOptions
   ) {
     const historyItem = await this.itemsForLocations([
       searchResult.coordinates
@@ -98,7 +98,10 @@ implements LocationSearchHistory {
       ...searchResult,
       history: [
         ...(historyItem?.history ?? []),
-        { timestamp: now().unix(), reason: options.reason }
+        {
+          timestamp: now().unix(),
+          reason: options?.reason ?? "searched-location"
+        }
       ]
     })
   }
