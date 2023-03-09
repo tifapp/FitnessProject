@@ -1,9 +1,7 @@
 import { AsyncStorageUtils } from "@lib/AsyncStorage"
-import { LocationSearchResult } from "@lib/location/search"
 import {
   AsyncStorageLocationSearchHistory,
-  LocationSearchHistory,
-  LocationSearchHistorySaveReason
+  LocationSearchHistory
 } from "@lib/location/search/History"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
@@ -52,13 +50,29 @@ describe("AsyncStorageLocationSearchHistory tests", () => {
       reason: "hosted-event"
     })
     const result = await AsyncStorageUtils.load(testSearchResultKey)
-    expect(result).toMatchObject({
-      ...testSearchResult,
-      history: [
-        { timestamp: 1678265460, reason: "attended-event" },
-        { timestamp: 1678351860, reason: "hosted-event" }
-      ]
+    expect(result).toMatchObject(
+      expect.objectContaining({
+        history: [
+          { timestamp: 1678265460, reason: "attended-event" },
+          { timestamp: 1678351860, reason: "hosted-event" }
+        ]
+      })
+    )
+  })
+
+  it("should update place info when saved", async () => {
+    jest.setSystemTime(new Date("2023-03-08T00:51:00"))
+    await searchHistory.save({
+      searchResult: testSearchResult,
+      reason: "attended-event"
     })
+    jest.setSystemTime(new Date("2023-03-09T00:51:00"))
+    await searchHistory.save({
+      searchResult: { ...testSearchResult, name: "Hello" },
+      reason: "hosted-event"
+    })
+    const result = await AsyncStorageUtils.load(testSearchResultKey)
+    expect(result).toMatchObject(expect.objectContaining({ name: "Hello" }))
   })
 
   it("should be able to query specific history items in batch", async () => {
