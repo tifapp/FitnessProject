@@ -14,8 +14,8 @@ export type Event = {
   readonly repliesCount: number
   readonly description?: string
   readonly writtenByYou: boolean
-  readonly duration: FixedDateRange
-  readonly colorHex: string
+  readonly dateRange: FixedDateRange
+  readonly color: EventColors
   readonly coordinates: Location
   readonly address: Placemark
 }
@@ -47,8 +47,8 @@ export namespace TestEventItems {
       title: "Pickup Basketball",
       repliesCount: 2,
       writtenByYou: true,
-      duration: dateRange(start, end),
-      colorHex: EventColors.Blue,
+      dateRange: dateRange(start, end),
+      color: EventColors.Red,
       coordinates: { latitude: 36.991585, longitude: -122.058277 },
       address
     }

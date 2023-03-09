@@ -53,6 +53,7 @@ const EventItem = ({ event }: Props) => {
               size={24}
               color={event.colorHex}
             />
+
             <Text style={styles.infoText}>
               {placemarkToFormattedAddress(event.address)}
             </Text>
@@ -65,7 +66,7 @@ const EventItem = ({ event }: Props) => {
               color={event.colorHex}
             />
             <Text style={styles.infoText} accessibilityLabel="day">
-              {event.duration.formatted()}
+              {event.dateRange.formatted()}
             </Text>
           </View>
 
@@ -87,7 +88,6 @@ const EventItem = ({ event }: Props) => {
             >{`${numAttendees}`}</Text>
             <Text style={styles.attendingText}>{" attending"}</Text>
           </View>
-
           <View
             style={[
               styles.distance,
