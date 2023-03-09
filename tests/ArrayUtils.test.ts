@@ -1,9 +1,9 @@
 import { ArrayUtils } from "@lib/Array"
 
 describe("ArrayUtils tests", () => {
-  test("takeNonNulls", () => {
+  test("filterOptionals", () => {
     const arr = [1, null, undefined, 2]
-    expect(ArrayUtils.takeNonNulls(arr)).toEqual([1, 2])
+    expect(ArrayUtils.filterOptionals(arr)).toEqual([1, 2])
   })
 
   test("lastElementNonEmpty", () => {
