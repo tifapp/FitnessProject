@@ -19,6 +19,7 @@ interface Props {
   isLabelFirst?: boolean
   textStyle?: StyleProp<TextStyle>
   accessibilityLabel?: string
+  testID?: string
 }
 
 export default function IconButton ({
@@ -31,10 +32,12 @@ export default function IconButton ({
   margin = 6,
   isLabelFirst = false,
   textStyle,
-  accessibilityLabel
+  accessibilityLabel,
+  testID
 }: Props) {
   return (
     <TouchableOpacity
+      testID={testID}
       style={[
         {
           flexDirection: isLabelFirst ? "row" : "row-reverse",
@@ -46,22 +49,22 @@ export default function IconButton ({
     >
       {label
         ? (
-        <Text
-          style={[
-            {
-              fontWeight: "normal",
-              color,
-              fontSize: 14
-            },
-            isLabelFirst
-              ? { marginRight: margin ?? 5 }
-              : { marginLeft: margin ?? 5 },
-            textStyle
-          ]}
-        >
-          {label}
-        </Text>
-          )
+          <Text
+            style={[
+              {
+                fontWeight: "normal",
+                color,
+                fontSize: 14
+              },
+              isLabelFirst
+                ? { marginRight: margin ?? 5 }
+                : { marginLeft: margin ?? 5 },
+              textStyle
+            ]}
+          >
+            {label}
+          </Text>
+        )
         : null}
       <MaterialIcons
         name={iconName}

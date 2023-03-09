@@ -1,10 +1,11 @@
-import MapComponent from "@components/MapComponent"
-import { mapCompStyle, state } from "@components/MapTestData"
 import { EventColors } from "@lib/events/EventColors"
 import { Auth } from "aws-amplify"
 import React, { useState } from "react"
-import { Alert, Button } from "react-native"
-import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { Alert } from "react-native"
+import { QueryClient } from "react-query"
+import { EventFormTestScreen } from "./testScreens/EventFormTestScreen"
+
+const queryClient = new QueryClient()
 
 const ActivitiesScreen = () => {
   const [color, setColor] = useState(EventColors.Red)
@@ -30,24 +31,7 @@ const ActivitiesScreen = () => {
     )
   }
 
-  return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <MapComponent
-        mapStyle={mapCompStyle.container}
-        initialRegion={state.initialRegion}
-        initialRadius={{ radius: circleRadius }}
-        currentSelectedMarker={selectedMarker}
-        markers={state.markers}
-        customizers={state.customizers}
-        movementSettings={state.movementSettings}
-      />
-      <Button title={"Filler"} />
-      <Button title={"Select 1"} onPress={() => setSelectedMarker("1")} />
-      <Button title={"Select 2"} onPress={() => setSelectedMarker("2")} />
-      <Button title={"Select 3"} onPress={() => setSelectedMarker("3")} />
-      <Button title={"Select 4"} onPress={() => setSelectedMarker("4")} />
-    </GestureHandlerRootView>
-  )
+  return <EventFormTestScreen />
 }
 
 export default ActivitiesScreen
