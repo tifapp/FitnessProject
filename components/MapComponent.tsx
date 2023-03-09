@@ -1,6 +1,7 @@
+import { degreesToRadians } from "@lib/Math"
 import { ImageSource } from "aws-sdk/clients/lookoutvision"
 import { Location } from "lib/location/Location"
-import React, { useState } from "react"
+import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import MapView, { Circle, Marker, PROVIDER_GOOGLE } from "react-native-maps"
 
@@ -38,13 +39,43 @@ interface Props<T> {
   markers: MapMarker[]
   customizers: MarkerCustomize[]
 
+  currentSelectedMarker: String | undefined
+
   movementSettings: {
     canScroll: boolean
     canZoom: boolean
     canRotate: boolean
   }
+}
 
-  extractKey: (event: any) => string
+// When clicking on the marker, zoom towards where it is.
+// Using stackOverflow formula
+// stackoverflow.com/questions/5206018/fit-mapview-to-circle-bounds
+function circleCoordinateGeneration (lat: number, long: number, radius: number) {
+  const earthRadius = 6378.1 // km
+  const circleLatitude0 = lat + degreesToRadians(-radius / earthRadius)
+  const circleLatitude1 = lat + degreesToRadians(radius / earthRadius)
+  const circleLongitude0 =
+    long + degreesToRadians(-radius / earthRadius) / degreesToRadians(lat)
+  const circleLongitude1 =
+    long + degreesToRadians(radius / earthRadius) / degreesToRadians(lat)
+  const bottomCoord = {
+    latitude: circleLatitude0,
+    longitude: long
+  }
+  const leftCoord = {
+    latitude: lat,
+    longitude: circleLongitude0
+  }
+  const rightCoord = {
+    latitude: circleLatitude1,
+    longitude: long
+  }
+  const topCoord = {
+    latitude: lat,
+    longitude: circleLongitude1
+  }
+  return [bottomCoord, leftCoord, rightCoord, topCoord]
 }
 
 // Map view component itself
@@ -52,48 +83,55 @@ export function MapComponent<T extends MapMarker> ({
   initialRegion,
   markers,
   customizers,
-  extractKey,
+  currentSelectedMarker,
   initialRadius,
   mapStyle,
   movementSettings
 }: Props<T>) {
   // Map references
   const mapRef = React.useRef<MapView | null>(null)
-  const [selectedMarker, setSelectedMarker] = useState<String | undefined>()
-
   const markerData = markers.map((markedMarker) => {
-    const key = extractKey(markedMarker)
     return {
       markedMarker,
-      isSelected: key === selectedMarker
+      isSelected: markedMarker.key === currentSelectedMarker
     }
   })
 
-  // Return the markers so that they appear on the map
+  // Return the markers/circles so that they appear on the map
   const mapMarkerCreations = () => {
-    return markerData.map((marker) => (
-      <Marker
-        key={marker.markedMarker.key}
-        title={marker.markedMarker.title}
-        coordinate={{
-          latitude: marker.markedMarker.location.latitude,
-          longitude: marker.markedMarker.location.longitude
-        }}
-        pinColor={customizationCreation(marker.markedMarker).color}
-        onPress={() => {
-          onMarkerClick(
-            marker.markedMarker.location.latitude,
-            marker.markedMarker.location.longitude
-          )
-          onSelected(marker.markedMarker)
-        }}
-      />
-    ))
+    return markerData.map((marker) => {
+      const createdCircle = checkCircleKey(marker)
+      return (
+        <>
+          <Marker
+            key={marker.markedMarker.key}
+            title={marker.markedMarker.title}
+            coordinate={{
+              latitude: marker.markedMarker.location.latitude,
+              longitude: marker.markedMarker.location.longitude
+            }}
+            pinColor={customizationCreation(marker.markedMarker).color}
+            onPress={() => {
+              if (marker.isSelected) {
+                centerMapOnMarker(
+                  marker.markedMarker.location.latitude,
+                  marker.markedMarker.location.longitude,
+                  initialRadius.radius
+                )
+              }
+            }}
+          />
+          {createdCircle}
+        </>
+      )
+    })
   }
 
   // Check to see if the circle is for the right selected marker.
   const checkCircleKey = (point) => {
-    if (point.markedMarker.key === selectedMarker) {
+    if (point.markedMarker.key === currentSelectedMarker) {
+      const { circleFillColor, circleStrokeColor, circleStrokeWidth } =
+        customizationCreation(point.markedMarker)
       return (
         <Circle
           center={{
@@ -101,23 +139,12 @@ export function MapComponent<T extends MapMarker> ({
             longitude: point.markedMarker.location.longitude
           }}
           radius={initialRadius.radius}
-          fillColor={customizationCreation(point.markedMarker).circleFillColor}
-          strokeColor={
-            customizationCreation(point.markedMarker).circleStrokeColor
-          }
-          strokeWidth={
-            customizationCreation(point.markedMarker).circleStrokeWidth
-          }
+          fillColor={circleFillColor}
+          strokeColor={circleStrokeColor}
+          strokeWidth={circleStrokeWidth}
         />
       )
-    }
-  }
-
-  const circleCreations = () => {
-    return markerData.map((point) => {
-      const createdCircle = checkCircleKey(point)
-      return createdCircle
-    })
+    } else return undefined
   }
 
   //
@@ -135,30 +162,12 @@ export function MapComponent<T extends MapMarker> ({
     }
   }
 
-  // When clicking on the marker, zoom towards where it is.
-  function onMarkerClick (lat: number, long: number) {
-    const circleLatDelta = initialRadius.radius / 111000
-    const circleLngDelta = Math.abs(
-      initialRadius.radius / (111000 * Math.cos((lat * Math.PI) / 180))
-    )
-    const northEastCoord = {
-      latitude: lat + circleLatDelta,
-      longitude: long + circleLngDelta
-    }
-    const southWestCoord = {
-      latitude: lat - circleLatDelta,
-      longitude: long - circleLngDelta
-    }
-    const bounds = [northEastCoord, southWestCoord]
+  const centerMapOnMarker = (lat: number, lng: number, radius: number) => {
+    const bounds = circleCoordinateGeneration(lat, lng, radius)
     mapRef.current.fitToCoordinates(bounds, {
-      edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+      edgePadding: { top: 100, right: 100, bottom: 400, left: 100 },
       animated: true
     })
-  }
-
-  // Set the key of the marker that is selected.
-  function onSelected (givenMapMarker: MapMarker) {
-    setSelectedMarker(givenMapMarker.key)
   }
 
   // Function to give the location of a long press, ideally for a pin place.
@@ -201,7 +210,6 @@ export function MapComponent<T extends MapMarker> ({
         ]}
       >
         {mapMarkerCreations()}
-        {circleCreations()}
       </MapView>
     </View>
   )
