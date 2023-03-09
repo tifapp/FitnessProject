@@ -1,30 +1,74 @@
 import { ArrayUtils, NonEmptyArray } from "@lib/Array"
 import { AsyncStorageUtils } from "@lib/AsyncStorage"
 import { now } from "@lib/date"
+import { createDependencyKey } from "@lib/dependencies"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { Location } from "../Location"
-import { LocationSearchResult } from "./SearchResult"
+import { LocationSearchResult } from "./Client"
 
+/**
+ * Reason for saving an item in the search history.
+ *
+ * This is mainly meant for use cases in which some status indicator can
+ * be shown on top of a history item, indicating some context to the
+ * user about the result (eg. `"You recently hosted 3 events here"`).
+ *
+ * ### Available Options
+ * - `"attended-event"`
+ *    - Use this when the user joins an event
+ * - `"hosted-event"`
+ *    - Use this when the user creates an event
+ * - `"searched-location"` (default option)
+ *    - Use this when the user selects a location from the location search screen
+ */
 export type LocationSearchHistorySaveReason =
   | "attended-event"
   | "hosted-event"
   | "searched-location"
 
+/**
+ * Configurable options when saving a {@link LocationSearchResult}
+ */
 export type LocationSearchHistorySaveOptions = {
-  reason: LocationSearchHistorySaveReason
+  /**
+   * The reason for saving this result, which can be used to indicate
+   * useful context behind history items to the user (eg. `"You recently hosted 3 events here"`).
+   *
+   * Defaults to `"searched-location"`
+   */
+  reason?: LocationSearchHistorySaveReason
 }
 
-export type LocationSearchHistoryItem = {
-  history: NonEmptyArray<{
-    timestamp: number
-    reason: LocationSearchHistorySaveReason
-  }>
-} & LocationSearchResult
+/**
+ * An item stored in the user's location search history.
+ *
+ * A history item contains its base search result, as well as everytime
+ * and all the reasons that the result was saved in history.
+ */
+export type LocationSearchHistoryItem = Readonly<{
+  history: NonEmptyArray<
+    Readonly<{
+      timestamp: number
+      reason: LocationSearchHistorySaveReason
+    }>
+  >
+}> &
+  LocationSearchResult
 
+/**
+ * Some options for loading results from a `LocationSearchHistory`
+ * instance.
+ */
 export type LocationSearchHistoryLoadOptions = {
+  /**
+   * Upper limits the number of results to this amount.
+   */
   limit?: number
 }
 
+/**
+ * A mapping of `LocationSearchHistoryItem`s to their respective location coordinates.
+ */
 export class LocationSearchHistoryItemMap {
   private readonly map: Map<string, LocationSearchHistoryItem>
 
@@ -34,24 +78,51 @@ export class LocationSearchHistoryItemMap {
     )
   }
 
+  /**
+   * Retrieves the item that has the given coordinates, or returns undefined
+   * if not available.
+   */
   item (location: Location) {
     return this.map.get(searchHistoryKey(location))
   }
 }
 
+/**
+ * An interface for accessing the user's location search history.
+ */
 export interface LocationSearchHistory {
+  /**
+   * Loads all history items sorted by the most recently saved item timestamp
+   * in descending order.
+   *
+   * @param options see {@link LocationSearchHistoryLoadOptions}
+   */
   loadItems: (
     options?: LocationSearchHistoryLoadOptions
   ) => Promise<LocationSearchHistoryItem[]>
+
+  /**
+   * Saves a given search result and appends to its existing history array, or creates
+   * it if this is a new search result.
+   */
   saveSearchResult: (
     searchResult: LocationSearchResult,
     options?: LocationSearchHistorySaveOptions
   ) => Promise<void>
+
+  /**
+   * Retrieves the history items for a given array of locations.
+   *
+   * @returns a mapping of location coordinates to the respective items
+   */
   itemsForLocations: (
     locations: Location[]
   ) => Promise<LocationSearchHistoryItemMap>
 }
 
+/**
+ * A {@link LocationSearchHistory} instance backed by a {@link AsyncStorage}.
+ */
 export class AsyncStorageLocationSearchHistory
 implements LocationSearchHistory {
   async loadItems (options?: LocationSearchHistoryLoadOptions) {
@@ -66,25 +137,11 @@ implements LocationSearchHistory {
     return options?.limit ? items.splice(0, options.limit) : items
   }
 
-  private async allKeys () {
-    return await AsyncStorage.getAllKeys().then((keys) =>
-      keys.filter(isSearchHistoryKey)
-    )
-  }
-
   async itemsForLocations (locations: Location[]) {
     const keys = locations.map((coordinates) => searchHistoryKey(coordinates))
     return await this.historyItemsForKeys(keys).then(
       (items) => new LocationSearchHistoryItemMap(items)
     )
-  }
-
-  private async historyItemsForKeys (keys: string[]) {
-    return await AsyncStorage.multiGet(keys).then((results) => {
-      return ArrayUtils.takeNonNulls(results.map(([_, value]) => value)).map(
-        (value) => JSON.parse(value) as LocationSearchHistoryItem
-      )
-    })
   }
 
   async saveSearchResult (
@@ -105,7 +162,29 @@ implements LocationSearchHistory {
       ]
     })
   }
+
+  private async allKeys () {
+    return await AsyncStorage.getAllKeys().then((keys) =>
+      keys.filter(isSearchHistoryKey)
+    )
+  }
+
+  private async historyItemsForKeys (keys: string[]) {
+    return await AsyncStorage.multiGet(keys).then((results) => {
+      return ArrayUtils.takeNonNulls(results.map(([_, value]) => value)).map(
+        (value) => JSON.parse(value) as LocationSearchHistoryItem
+      )
+    })
+  }
 }
+
+/**
+ * A `DependencyKey` for a {@link LocationSearchHistory} instance.
+ */
+export const locationSearchHistoryDependencyKey =
+  createDependencyKey<LocationSearchHistory>(
+    new AsyncStorageLocationSearchHistory()
+  )
 
 const isSearchHistoryKey = (key: string) => {
   return key.match(
