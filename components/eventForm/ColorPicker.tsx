@@ -1,7 +1,9 @@
-import HexColorPicker from "../formComponents/HexColorPicker"
+import HexColorPicker, {
+  HexColorPickerOption
+} from "../formComponents/HexColorPicker"
 import React from "react"
 import { useEventFormField } from "./EventForm"
-import { eventColorOptions } from "./EventFormValues"
+import { EventColors } from "@lib/events/EventColors"
 
 /**
  * A color picker for an event form.
@@ -11,8 +13,15 @@ export const EventFormColorPicker = () => {
   return (
     <HexColorPicker
       color={color}
-      options={eventColorOptions}
+      options={eventColorPickerOptions}
       onChange={(value) => setColor(value)}
     />
   )
 }
+
+export const eventColorPickerOptions = Object.entries(EventColors).map(
+  ([name, color]) => ({
+    accessibilityLabel: name,
+    color
+  })
+) as HexColorPickerOption<EventColors>[]
