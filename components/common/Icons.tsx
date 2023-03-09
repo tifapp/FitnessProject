@@ -6,8 +6,8 @@ import { StyleProp, ViewProps, ViewStyle } from "react-native"
 /**
  * A base type for icon props.
  */
-export type IconProps<T extends string> = {
-  name: T
+export type IconProps<IconName extends string> = {
+  name: IconName
   size?: number
   maximumFontScaleFactor?: number
   style?: StyleProp<ViewStyle>
