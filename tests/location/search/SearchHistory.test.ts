@@ -37,8 +37,8 @@ describe("AsyncStorageLocationSearchHistory tests", () => {
       reason: "attended-event"
     })
 
-    const result = await AsyncStorageUtils.load(testSearchResultKey)
-    expect(result).toMatchObject({
+    const saved = await AsyncStorageUtils.load(testSearchResultKey)
+    expect(saved).toMatchObject({
       ...testSearchResult,
       history: [{ timestamp: 1678265460, reason: "attended-event" }]
     })
@@ -55,8 +55,8 @@ describe("AsyncStorageLocationSearchHistory tests", () => {
       reason: "hosted-event"
     })
 
-    const result = await AsyncStorageUtils.load(testSearchResultKey)
-    expect(result).toMatchObject(
+    const saved = await AsyncStorageUtils.load(testSearchResultKey)
+    expect(saved).toMatchObject(
       expect.objectContaining({
         history: [
           { timestamp: 1, reason: "attended-event" },
@@ -105,8 +105,12 @@ describe("AsyncStorageLocationSearchHistory tests", () => {
 
   it("allows querying for the entire history with a limit", async () => {
     await saveFakeSearchResults(100)
-    const items = await searchHistory.loadItems({ limit: 45 })
-    expect(items).toHaveLength(45)
+    expect(await searchHistory.loadItems({ limit: 45 })).toHaveLength(45)
+  })
+
+  it("allows querying for the entire history with a limit greater than the amount of stored history items", async () => {
+    await saveFakeSearchResults(10)
+    expect(await searchHistory.loadItems({ limit: 45 })).toHaveLength(10)
   })
 
   it("allows querying for the entire history ordered by the most recent save date", async () => {
@@ -125,8 +129,7 @@ describe("AsyncStorageLocationSearchHistory tests", () => {
       reason: "attended-event"
     })
 
-    const items = await searchHistory.loadItems()
-    expect(items).toMatchObject([
+    expect(await searchHistory.loadItems()).toMatchObject([
       {
         ...testSearchResult,
         history: [
