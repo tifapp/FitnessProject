@@ -101,4 +101,54 @@ describe("AsyncStorageLocationSearchHistory tests", () => {
     ])
     expect(itemMap.item(testSearchResult.coordinates)).toBeUndefined()
   })
+
+  it("allows querying for the entire history with a limit", async () => {
+    await saveFakeSearchResults(100)
+    const items = await searchHistory.load({ limit: 45 })
+    expect(items).toHaveLength(45)
+  })
+
+  it("allows querying for the entire history ordered by the most recent save date", async () => {
+    jest.setSystemTime(1000)
+    await searchHistory.save(testSearchResult, { reason: "searched-location" })
+
+    jest.setSystemTime(2000)
+    await searchHistory.save(testSearchResult2, { reason: "hosted-event" })
+
+    jest.setSystemTime(3000)
+    await searchHistory.save(testSearchResult, { reason: "attended-event" })
+
+    const items = await searchHistory.load()
+    expect(items).toMatchObject([
+      {
+        ...testSearchResult,
+        history: [
+          { timestamp: 1, reason: "searched-location" },
+          { timestamp: 3, reason: "attended-event" }
+        ]
+      },
+      {
+        ...testSearchResult2,
+        history: [{ timestamp: 2, reason: "hosted-event" }]
+      }
+    ])
+  })
 })
+
+const saveFakeSearchResults = async (amount: number) => {
+  await Promise.all(
+    [...Array(amount).keys()].map(async (i) => {
+      await searchHistory.save(
+        {
+          name: `Test ${i}`,
+          formattedAddress: `${i} Test Dr, Test City, Test State ${i}`,
+          coordinates: {
+            latitude: 42 + i * 0.0001,
+            longitude: -121 + i * 0.0001
+          }
+        },
+        { reason: "attended-event" }
+      )
+    })
+  )
+}
