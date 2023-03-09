@@ -15,15 +15,14 @@ interface Props {
 const EventItem = ({ event }: Props) => {
   const numAttendees = 1 // Eventually will come from event object
   const distance = 0.5 // Eventually will be calculated from the location given in the event object
-  // const shadowColor = "#ebebeb"
   const shadowColor = tinycolor(event.colorHex).lighten(25).toString()
   const lightEventColor = tinycolor(event.colorHex).lighten(25).toString()
 
   return (
     <Shadow
       distance={16}
-      offset={[-2, 6]}
-      shadowViewProps={{ style: { opacity: 0.6 } }}
+      offset={[-2, 4]}
+      shadowViewProps={{ style: { opacity: 0.25 } }}
       startColor={shadowColor}
       stretch={true}
     >
@@ -174,7 +173,10 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     paddingHorizontal: 18,
     paddingVertical: 16,
-    borderRadius: 20
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(145, 145, 145, 0.1)"
+    // opacity: 0.2
   },
   iconMargin: {
     marginRight: 8

@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { StyleSheet, View, Alert, Text } from "react-native"
 import { MaterialIcons } from "@expo/vector-icons"
 import {
@@ -12,10 +12,13 @@ interface Props {
   eventHost: boolean
 }
 
+// Uses Popup menu. In order to test clicking on a Menu Option, the onPress option must be passed to the child since there is an issue with testID not being available on Menu Option */
 const MoreButton = ({ eventHost }: Props) => {
+  const [isOpen, setOpen] = useState(false)
   let dismiss: () => void
 
   const alertDelete = () => {
+    setOpen(false)
     Alert.alert("Delete this event?", undefined, [
       { text: "Delete", style: "destructive", onPress: dismiss },
       { text: "Cancel", style: "cancel" }
@@ -23,6 +26,7 @@ const MoreButton = ({ eventHost }: Props) => {
   }
 
   const alertReport = () => {
+    setOpen(false)
     Alert.alert("Report this event?", undefined, [
       { text: "Report", style: "destructive", onPress: dismiss },
       { text: "Cancel", style: "cancel" }
@@ -31,21 +35,28 @@ const MoreButton = ({ eventHost }: Props) => {
 
   return (
     <View style={styles.moreButtonStyle}>
-      <Menu>
-        <MenuTrigger testID="more options">
+      <Menu opened={isOpen}>
+        <MenuTrigger
+          testID="more options"
+          onPress={() => {
+            setOpen(true)
+          }}
+        >
           <MaterialIcons name="more-horiz" size={24} />
         </MenuTrigger>
         <MenuOptions customStyles={optionsStyles}>
           {/* Need to use Text in order for tests to find the element */}
           {eventHost
             ? (
-              <MenuOption onSelect={alertDelete} customStyles={deleteStyle}>
-                <Text>Delete</Text>
+              <MenuOption>
+                <Text style={styles.deleteStyle} onPress={alertDelete}>
+                Delete
+                </Text>
               </MenuOption>
             )
             : (
-              <MenuOption onSelect={alertReport}>
-                <Text>Report</Text>
+              <MenuOption>
+                <Text onPress={alertReport}>Report</Text>
               </MenuOption>
             )}
           {/* <MenuOption onSelect={alertDelete} text="Delete" />
@@ -62,6 +73,11 @@ const styles = StyleSheet.create({
     flex: 1,
     opacity: 0.4,
     alignItems: "flex-end"
+  },
+  deleteStyle: {
+    textAlignVertical: "center",
+    fontSize: 16,
+    color: "red"
   }
 })
 
@@ -73,15 +89,6 @@ const optionsStyles = StyleSheet.create({
     // textAlign: "center",
     textAlignVertical: "center",
     fontSize: 16
-  }
-})
-
-const deleteStyle = StyleSheet.create({
-  optionText: {
-    // textAlign: "center",
-    textAlignVertical: "center",
-    fontSize: 16,
-    color: "red"
   }
 })
 

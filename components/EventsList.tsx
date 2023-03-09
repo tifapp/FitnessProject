@@ -15,7 +15,6 @@ const EventsList = () => {
   const eventItems = useDependencyValue(eventsDependencyKey)
   const ids = Array.from(new Array(4), (_, i) => String(i))
   const events = eventItems.eventsWithIds(ids)
-  // const event = TestEventItems.mockEvent(new Date(), new Date(), "4")
   const MARGIN_HORIZONTAL = 16
   const MARGIN_VERTICAL = 16
 
