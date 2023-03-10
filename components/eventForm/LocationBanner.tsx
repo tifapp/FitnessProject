@@ -2,13 +2,14 @@ import { useReverseGeocodeQuery } from "../../hooks/Geocoding"
 import { placemarkToFormattedAddress } from "../../lib/location"
 import React from "react"
 import { StyleSheet, View } from "react-native"
-import {
-  useEventFormContext
-} from "./EventForm"
+import { useEventFormContext } from "./EventForm"
 import { FormLabel, SkeletonFormLabel } from "../formComponents/FormLabels"
 import { MaterialIcons } from "@expo/vector-icons"
 import { FontScaleFactors, useFontScale } from "../../lib/FontScale"
-import { EventFormLocationInfo, EventFormPlacemarkInfo } from "./EventFormValues"
+import {
+  EventFormLocationInfo,
+  EventFormPlacemarkInfo
+} from "./EventFormValues"
 
 /**
  * Displays the selected location (if one) in the event form.
@@ -71,9 +72,7 @@ const GeocodedLocationInfoBanner = (locationInfo: EventFormLocationInfo) => {
   if (!placemark) return <SkeletonFormLabel icon="location-pin" />
 
   const address = placemarkToFormattedAddress(placemark)
-  return (
-    <PlacemarkInfoBanner name={placemark.name ?? undefined} address={address} />
-  )
+  return <PlacemarkInfoBanner name={placemark.name} address={address} />
 }
 
 const PlacemarkInfoBanner = ({ name, address }: EventFormPlacemarkInfo) => (

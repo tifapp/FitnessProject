@@ -2,6 +2,7 @@ import { Placemark } from "./Placemark"
 import ExpoLocation from "expo-location"
 import { createDependencyKey } from "../dependencies"
 import { Location } from "./Location"
+import { nullsToUndefined } from "@lib/NullsToUndefined"
 
 /**
  * An interface for geocoding operations.
@@ -32,10 +33,11 @@ export class ExpoGeocoding implements Geocoding {
   }
 
   async reverseGeocode (location: Location) {
-    const results = await ExpoLocation.reverseGeocodeAsync({
-      ...location
-    })
-    return results as Placemark[]
+    return nullsToUndefined(
+      await ExpoLocation.reverseGeocodeAsync({
+        ...location
+      })
+    ) as Placemark[]
   }
 }
 
