@@ -19,6 +19,7 @@ import {
   MenuTrigger
 } from "react-native-popup-menu"
 import { placemarkToFormattedAddress } from "@lib/location"
+import { TouchableOpacity } from "react-native-gesture-handler"
 
 interface Props {
   event: Event
@@ -84,10 +85,19 @@ const EventItem = ({ event }: Props) => {
               <Menu
                 opened={isMenuOpen}
                 onBackdropPress={() => setMenuOpen(false)}
+                // style={{ borderWidth: 2, padding: 4 }}
               >
                 <MenuTrigger
                   testID="more options"
                   onPress={() => setMenuOpen(true)}
+                  customStyles={{
+                    TriggerTouchableComponent: TouchableOpacity
+                  }}
+                  // Increase area where menu is triggered
+                  style={{
+                    paddingLeft: 16,
+                    paddingVertical: 6
+                  }}
                 >
                   <MaterialIcons name="more-horiz" size={24} />
                 </MenuTrigger>
