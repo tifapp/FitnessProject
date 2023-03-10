@@ -4,7 +4,7 @@ import { EventColors } from "../../../lib/events/EventColors"
 import HexColorPicker, {
   HexColorPickerProps
 } from "../../../components/formComponents/HexColorPicker"
-import { eventColorOptions } from "../../../components/eventForm"
+import { eventColorPickerOptions } from "../../../components/eventForm"
 
 const Picker = (props: HexColorPickerProps) => {
   const [color, setColor] = useState(EventColors.Red)
@@ -15,7 +15,7 @@ const HexColorPickerMeta: ComponentMeta<typeof HexColorPicker> = {
   title: "HexColorPicker",
   component: Picker,
   args: {
-    options: eventColorOptions,
+    options: eventColorPickerOptions,
     style: {
       display: "flex",
       justifyContent: "center",
