@@ -2,12 +2,11 @@ import React from "react"
 import { Image, StyleSheet, Text, View } from "react-native"
 import { Event } from "@lib/events/Event"
 import { Divider } from "react-native-elements"
-import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { Shadow } from "react-native-shadow-2"
 import tinycolor from "tinycolor2"
 import { placemarkToFormattedAddress } from "@lib/location"
-import IconButton from "./common/IconButton"
 import { compactFormatMiles } from "@lib/DistanceFormatting"
+import { MaterialCommunityIcon, MaterialIcon } from "./common/Icons"
 
 interface Props {
   event: Event
@@ -17,7 +16,7 @@ const EventItem = ({ event }: Props) => {
   const numAttendees = 1 // Eventually will come from event object
   const distance = 0.5 // Eventually will be calculated from the location given in the event object
   const shadowColor = "#ebebeb"
-  const lightEventColor = tinycolor(event.colorHex).lighten(25).toString()
+  const lightEventColor = tinycolor(event.color).lighten(25).toString()
 
   return (
     <Shadow
@@ -35,12 +34,9 @@ const EventItem = ({ event }: Props) => {
             accessibilityLabel="profile picture"
           />
           <Text style={styles.name}>{event.username}</Text>
-          <IconButton
-            iconName="more-horiz"
-            size={26}
-            style={styles.moreButtonStyle}
-            onPress={() => null}
-          />
+          <View style={[styles.flexRow, { justifyContent: "flex-end" }]}>
+            <MaterialIcon name="more-horiz" style={styles.moreButtonStyle} />
+          </View>
         </View>
 
         {/* Event Title, Location, Time */}
@@ -48,22 +44,19 @@ const EventItem = ({ event }: Props) => {
           <Text style={styles.titleText}>{event.title}</Text>
 
           <View style={[styles.location, styles.flexRow]}>
-            <MaterialCommunityIcons
+            <MaterialCommunityIcon
               name="map-marker-outline"
-              size={24}
-              color={event.colorHex}
+              color={event.color}
             />
-
             <Text style={styles.infoText}>
               {placemarkToFormattedAddress(event.address)}
             </Text>
           </View>
 
           <View style={styles.flexRow}>
-            <MaterialCommunityIcons
+            <MaterialCommunityIcon
               name="calendar-check-outline"
-              size={24}
-              color={event.colorHex}
+              color={event.color}
             />
             <Text style={styles.infoText} accessibilityLabel="day">
               {event.dateRange.formatted()}
@@ -78,10 +71,9 @@ const EventItem = ({ event }: Props) => {
         {/* People Attending, Distance */}
         <View style={styles.distanceContainer}>
           <View style={[styles.flexRow, { alignItems: "center" }]}>
-            <MaterialCommunityIcons
+            <MaterialCommunityIcon
               name="account-multiple-outline"
-              size={24}
-              color={event.colorHex}
+              color={event.color}
             />
             <Text
               style={[styles.attendingText, styles.attendingNumber]}
@@ -96,12 +88,11 @@ const EventItem = ({ event }: Props) => {
               }
             ]}
           >
-            <MaterialCommunityIcons
+            <MaterialCommunityIcon
               name="navigation-variant-outline"
-              size={22}
-              color={event.colorHex}
+              color={event.color}
             />
-            <Text style={[styles.distanceText, { color: event.colorHex }]}>
+            <Text style={[styles.distanceText, { color: event.color }]}>
               {compactFormatMiles(distance)}
             </Text>
           </View>
@@ -181,9 +172,7 @@ const styles = StyleSheet.create({
     borderRadius: 20
   },
   moreButtonStyle: {
-    flex: 1,
-    opacity: 0.4,
-    alignItems: "flex-end"
+    opacity: 0.4
   }
 })
 
