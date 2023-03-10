@@ -1,18 +1,7 @@
-// import { EventForm, EventFormToolbar } from "@components/eventForm"
+import React, { createContext, useContext, useState } from "react"
 import EventsList from "@components/EventsList"
-// import { dateRange } from "@lib/date"
-// import { SetDependencyValue } from "@lib/dependencies"
-// import { EventColors } from "@lib/events/EventColors"
-// import { Geocoding, geocodingDependencyKey } from "@lib/location"
-// import { Auth } from "aws-amplify"
-import React from "react"
-// import { Alert } from "react-native"
-// import { GestureHandlerRootView } from "react-native-gesture-handler"
-// import { QueryClient, QueryClientProvider } from "react-query"
-// import EventFormScreen from "./EventFormScreen"
-// import { EventFormTestScreen } from "./testScreens/EventFormTestScreen"
-
-// const queryClient = new QueryClient()
+import { View } from "react-native"
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 
 const ActivitiesScreen = () => {
   /* function signOut () {

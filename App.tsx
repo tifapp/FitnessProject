@@ -48,6 +48,7 @@ import {
   AppState,
   AppStateStatus,
   Platform,
+  StyleSheet,
   UIManager,
   useWindowDimensions,
   View
@@ -367,7 +368,7 @@ const App = () => {
 
 const LiveApp = () => (
   <AppQueryClientProvider>
-    <MenuProvider>
+    <MenuProvider customStyles={menuProviderStyles}>
       <App />
     </MenuProvider>
   </AppQueryClientProvider>
@@ -383,3 +384,14 @@ export default withAuthenticator(LiveApp, false, [
   <ForgotPassword />,
   <RequireNewPassword />
 ])
+
+const styles = StyleSheet.create({
+  backdrop: {
+    backgroundColor: "black",
+    opacity: 0.5
+  }
+})
+
+const menuProviderStyles = {
+  backdrop: styles.backdrop
+}

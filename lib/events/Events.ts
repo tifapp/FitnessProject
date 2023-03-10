@@ -50,7 +50,12 @@ export class GraphQLEvents implements Events {
     date2.setDate(date2.getDate() + 2)
 
     for (let i = 0; i < ids.length; i++) {
-      const event: Event = TestEventItems.mockEvent(date, date2, String(i))
+      const event: Event = TestEventItems.mockEvent(
+        date,
+        date2,
+        true,
+        String(i)
+      )
       eventsList.push(event)
     }
 

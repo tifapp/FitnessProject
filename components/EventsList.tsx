@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react"
-import { ListRenderItemInfo, View } from "react-native"
+import { ListRenderItemInfo, StyleSheet, Text, View } from "react-native"
 import {
   BottomSheetFlatList,
   BottomSheetModal,
@@ -7,7 +7,6 @@ import {
 } from "@gorhom/bottom-sheet"
 import { Event } from "@lib/events/Event"
 import EventItem from "@components/EventItem"
-import NearbyActivities from "./headerComponents/NearbyActivities"
 import { eventsDependencyKey } from "@lib/events/Events"
 import { useDependencyValue } from "@lib/dependencies"
 
@@ -30,7 +29,11 @@ const EventsList = () => {
 
   return (
     <BottomSheetModalProvider>
-      <View style={{ flex: 1 }}>
+      <View
+        style={{
+          flex: 1
+        }}
+      >
         <BottomSheetModal
           ref={sheetRef}
           snapPoints={snapPoints}
@@ -49,7 +52,9 @@ const EventsList = () => {
                 <EventItem event={item} />
               </View>
             )}
-            ListHeaderComponent={<NearbyActivities />}
+            ListHeaderComponent={
+              <Text style={styles.activitiesText}>Nearby Activities</Text>
+            }
             stickyHeaderIndices={[0]}
           />
         </BottomSheetModal>
@@ -57,5 +62,14 @@ const EventsList = () => {
     </BottomSheetModalProvider>
   )
 }
+
+const styles = StyleSheet.create({
+  activitiesText: {
+    fontSize: 20,
+    marginLeft: 16,
+    textAlignVertical: "top",
+    fontWeight: "bold"
+  }
+})
 
 export default EventsList

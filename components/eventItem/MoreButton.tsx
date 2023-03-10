@@ -14,11 +14,11 @@ interface Props {
 
 // Uses Popup menu. In order to test clicking on a Menu Option, the onPress option must be passed to the child since there is an issue with testID not being available on Menu Option */
 const MoreButton = ({ eventHost }: Props) => {
-  const [isOpen, setOpen] = useState(false)
+  // const [isOpen, setOpen] = useState(false)
   let dismiss: () => void
 
   const alertDelete = () => {
-    setOpen(false)
+    // setOpen(false)
     Alert.alert("Delete this event?", undefined, [
       { text: "Delete", style: "destructive", onPress: dismiss },
       { text: "Cancel", style: "cancel" }
@@ -26,7 +26,7 @@ const MoreButton = ({ eventHost }: Props) => {
   }
 
   const alertReport = () => {
-    setOpen(false)
+    // setOpen(false)
     Alert.alert("Report this event?", undefined, [
       { text: "Report", style: "destructive", onPress: dismiss },
       { text: "Cancel", style: "cancel" }
@@ -35,27 +35,29 @@ const MoreButton = ({ eventHost }: Props) => {
 
   return (
     <View style={styles.moreButtonStyle}>
-      <Menu opened={isOpen}>
+      <Menu>
         <MenuTrigger
           testID="more options"
-          onPress={() => {
+          /* onPress={() => {
             setOpen(true)
-          }}
+          }} */
         >
           <MaterialIcons name="more-horiz" size={24} />
         </MenuTrigger>
         <MenuOptions customStyles={optionsStyles}>
-          {/* Need to use Text in order for tests to find the element */}
+          {/* Need to use Text in order for tests to find the element
+           Also need to add the onSelect functions to child in order to test functionality
+          */}
           {eventHost
             ? (
-              <MenuOption>
+              <MenuOption onSelect={alertDelete}>
                 <Text style={styles.deleteStyle} onPress={alertDelete}>
                 Delete
                 </Text>
               </MenuOption>
             )
             : (
-              <MenuOption>
+              <MenuOption onSelect={alertReport}>
                 <Text onPress={alertReport}>Report</Text>
               </MenuOption>
             )}
