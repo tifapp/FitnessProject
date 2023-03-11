@@ -6,7 +6,7 @@ import {
   BottomSheetModalProvider
 } from "@gorhom/bottom-sheet"
 import { Event } from "@lib/events/Event"
-import EventItem from "@components/EventItem"
+import EventItem from "@components/eventCard/EventItem"
 import { eventsDependencyKey } from "@lib/events/Events"
 import { useDependencyValue } from "@lib/dependencies"
 

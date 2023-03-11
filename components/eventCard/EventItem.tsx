@@ -20,7 +20,7 @@ import {
 import { placemarkToFormattedAddress } from "@lib/location"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { compactFormatMiles } from "@lib/DistanceFormatting"
-import { MaterialCommunityIcon, MaterialIcon } from "./common/Icons"
+import { MaterialCommunityIcon, MaterialIcon } from "../common/Icons"
 
 interface Props {
   event: Event
@@ -75,7 +75,7 @@ const EventItem = ({ event }: Props) => {
         <View style={[styles.topRow, styles.flexRow]}>
           <Image
             style={[styles.image, styles.iconMargin]}
-            source={require("../assets/icon.png")}
+            source={require("../../assets/icon.png")}
             accessibilityLabel="profile picture"
           />
           <Text style={styles.name}>{event.username}</Text>

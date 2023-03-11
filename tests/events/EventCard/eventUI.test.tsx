@@ -1,6 +1,6 @@
 import { TestEventItems } from "@lib/events/Event"
 import { fireEvent, render, screen } from "@testing-library/react-native"
-import EventItem from "@components/EventItem"
+import EventItem from "@components/eventCard/EventItem"
 import React from "react"
 import { captureAlerts } from "../../helpers/Alerts"
 import { MenuProvider } from "react-native-popup-menu"
