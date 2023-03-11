@@ -1,7 +1,5 @@
-import React, { createContext, useContext, useState } from "react"
+import React from "react"
 import EventsList from "@components/EventsList"
-import { View } from "react-native"
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 
 const ActivitiesScreen = () => {
   /* function signOut () {

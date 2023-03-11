@@ -1,7 +1,8 @@
 import React from "react"
 import { Alert, TouchableOpacity } from "react-native"
-import { MaterialIcons } from "@expo/vector-icons"
 import { useEventFormContext } from "./EventForm"
+import { MaterialIcon } from "@components/common/Icons"
+import { FontScaleFactors } from "@lib/FontScale"
 
 /**
  * A dismiss button for `EventForm`.
@@ -25,7 +26,10 @@ export const EventFormDismissButton = () => {
 
   return (
     <TouchableOpacity accessibilityLabel="Cancel" onPress={dismissButtonTapped}>
-      <MaterialIcons name="close" size={24} />
+      <MaterialIcon
+        name="close"
+        maximumFontScaleFactor={FontScaleFactors.xxxLarge}
+      />
     </TouchableOpacity>
   )
 }

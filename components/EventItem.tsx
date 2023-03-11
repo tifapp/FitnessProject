@@ -9,7 +9,6 @@ import {
 } from "react-native"
 import { Event } from "@lib/events/Event"
 import { Divider } from "react-native-elements"
-import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons"
 import { Shadow } from "react-native-shadow-2"
 import tinycolor from "tinycolor2"
 import {
@@ -20,6 +19,8 @@ import {
 } from "react-native-popup-menu"
 import { placemarkToFormattedAddress } from "@lib/location"
 import { TouchableOpacity } from "react-native-gesture-handler"
+import { compactFormatMiles } from "@lib/DistanceFormatting"
+import { MaterialCommunityIcon, MaterialIcon } from "./common/Icons"
 
 interface Props {
   event: Event
@@ -29,7 +30,7 @@ const EventItem = ({ event }: Props) => {
   const [isMenuOpen, setMenuOpen] = useState(false)
   const numAttendees = 1 // Eventually will come from event object
   const distance = 0.5 // Eventually will be calculated from the location given in the event object
-  const lightEventColor = tinycolor(event.colorHex).lighten(25).toString()
+  const lightEventColor = tinycolor(event.color).lighten(25).toString()
   let dismiss: () => void
 
   const alertDelete = () => {
@@ -69,140 +70,131 @@ const EventItem = ({ event }: Props) => {
       startColor={lightEventColor}
       stretch={true}
     >
-      <TouchableWithoutFeedback onPress={onPressEvent}>
-        <View style={styles.container}>
-          {/* Profile Image, Name, More button */}
-          <View style={[styles.topRow, styles.flexRow]}>
-            <Image
-              style={[styles.image, styles.iconMargin]}
-              source={require("../assets/icon.png")}
-              accessibilityLabel="profile picture"
-            />
-            <Text style={styles.name}>{event.username}</Text>
+      <View style={styles.container}>
+        {/* Profile Image, Name, More button */}
+        <View style={[styles.topRow, styles.flexRow]}>
+          <Image
+            style={[styles.image, styles.iconMargin]}
+            source={require("../assets/icon.png")}
+            accessibilityLabel="profile picture"
+          />
+          <Text style={styles.name}>{event.username}</Text>
 
-            {/* Dropdown menu when more button is pressed */}
-            <View style={styles.moreButtonStyle}>
-              <Menu
-                opened={isMenuOpen}
-                onBackdropPress={() => setMenuOpen(false)}
-                // style={{ borderWidth: 2, padding: 4 }}
+          {/* Dropdown menu when more button is pressed */}
+          <View style={styles.moreButtonStyle}>
+            <Menu
+              opened={isMenuOpen}
+              onBackdropPress={() => setMenuOpen(false)}
+            >
+              <MenuTrigger
+                testID="more options"
+                onPress={() => setMenuOpen(true)}
+                customStyles={{
+                  TriggerTouchableComponent: TouchableOpacity
+                }}
+                // Increase area where menu is triggered
+                style={{
+                  paddingLeft: 16,
+                  paddingVertical: 6
+                }}
               >
-                <MenuTrigger
-                  testID="more options"
-                  onPress={() => setMenuOpen(true)}
-                  customStyles={{
-                    TriggerTouchableComponent: TouchableOpacity
-                  }}
-                  // Increase area where menu is triggered
-                  style={{
-                    paddingLeft: 16,
-                    paddingVertical: 6
-                  }}
-                >
-                  <MaterialIcons name="more-horiz" size={24} />
-                </MenuTrigger>
-                {/* Need to use Text in order for tests to find the element
+                <MaterialIcon name="more-horiz" />
+              </MenuTrigger>
+              {/* Need to use Text in order for tests to find the element
                 Also need to move the onSelect functions to child in order to test functionality
                 */}
-                {event.writtenByYou
-                  ? (
-                    <MenuOptions customStyles={menuOptionsStyles}>
-                      <MenuOption>
-                        <Text style={{ color: "red" }} onPress={alertDelete}>
-                        Delete
-                        </Text>
-                      </MenuOption>
-                      <MenuOption>
-                        <Text onPress={editForm}>Edit</Text>
-                      </MenuOption>
-                    </MenuOptions>
-                  )
-                  : (
-                    <MenuOptions
-                      customStyles={{
-                        optionsContainer: {
-                          width: "30%"
-                        }
-                      }}
-                    >
-                      <MenuOption>
-                        <Text onPress={alertReport}>Report</Text>
-                      </MenuOption>
-                    </MenuOptions>
-                  )}
-              </Menu>
-            </View>
-          </View>
-
-          {/* Event Title, Location, Time */}
-          <View style={styles.middleRow}>
-            <Text style={styles.titleText}>{event.title}</Text>
-
-            <View style={[styles.location, styles.flexRow]}>
-              <MaterialCommunityIcons
-                name="map-marker-outline"
-                size={24}
-                color={event.colorHex}
-                style={styles.iconMargin}
-              />
-              <Text style={styles.infoText}>
-                {placemarkToFormattedAddress(event.address)}
-              </Text>
-            </View>
-
-            <View style={styles.flexRow}>
-              <MaterialCommunityIcons
-                name="calendar-check-outline"
-                size={24}
-                color={event.colorHex}
-                style={styles.iconMargin}
-              />
-              <Text style={styles.infoText} accessibilityLabel="day">
-                {event.duration.formatted()}
-              </Text>
-            </View>
-
-            <View style={{ marginVertical: 16 }}>
-              <Divider style={{ height: 1, opacity: 0.4 }} />
-            </View>
-          </View>
-
-          {/* People Attending, Distance */}
-          <View style={styles.distanceContainer}>
-            <View style={[styles.flexRow, { alignItems: "center" }]}>
-              <MaterialCommunityIcons
-                name="account-multiple-outline"
-                size={24}
-                color={event.colorHex}
-                style={styles.iconMargin}
-              />
-              <Text
-                style={[styles.attendingText, styles.attendingNumber]}
-              >{`${numAttendees}`}</Text>
-              <Text style={styles.attendingText}>{" attending"}</Text>
-            </View>
-
-            <View
-              style={[
-                styles.distance,
-                {
-                  backgroundColor: lightEventColor
-                }
-              ]}
-            >
-              <MaterialCommunityIcons
-                name="navigation-variant-outline"
-                size={24}
-                color={event.colorHex}
-                style={styles.iconMargin}
-              />
-              <Text
-                style={[styles.distanceText, { color: event.colorHex }]}
-              >{`${distance} mi`}</Text>
-            </View>
+              {event.writtenByYou
+                ? (
+                  <MenuOptions customStyles={menuOptionsStyles}>
+                    <MenuOption>
+                      <Text style={{ color: "red" }} onPress={alertDelete}>
+                      Delete
+                      </Text>
+                    </MenuOption>
+                    <MenuOption>
+                      <Text onPress={editForm}>Edit</Text>
+                    </MenuOption>
+                  </MenuOptions>
+                )
+                : (
+                  <MenuOptions
+                    customStyles={{
+                      optionsContainer: {
+                        width: "30%"
+                      }
+                    }}
+                  >
+                    <MenuOption>
+                      <Text onPress={alertReport}>Report</Text>
+                    </MenuOption>
+                  </MenuOptions>
+                )}
+            </Menu>
           </View>
         </View>
-      </TouchableWithoutFeedback>
+
+        {/* Event Title, Location, Time */}
+        <View style={styles.middleRow}>
+          <Text style={styles.titleText}>{event.title}</Text>
+
+          <View style={[styles.location, styles.flexRow]}>
+            <MaterialCommunityIcon
+              name="map-marker-outline"
+              color={event.color}
+              style={styles.iconMargin}
+            />
+            <Text style={styles.infoText}>
+              {placemarkToFormattedAddress(event.address)}
+            </Text>
+          </View>
+          <View style={styles.flexRow}>
+            <MaterialCommunityIcon
+              name="calendar-check-outline"
+              color={event.color}
+              style={styles.iconMargin}
+            />
+            <Text style={styles.infoText} accessibilityLabel="day">
+              {event.dateRange.formatted()}
+            </Text>
+          </View>
+        </View>
+
+        <View style={{ marginVertical: 16 }}>
+          <Divider style={{ height: 1, opacity: 0.4 }} />
+        </View>
+
+        {/* People Attending, Distance */}
+        <View style={styles.distanceContainer}>
+          <View style={[styles.flexRow, { alignItems: "center" }]}>
+            <MaterialCommunityIcon
+              name="account-multiple-outline"
+              color={event.color}
+              style={styles.iconMargin}
+            />
+            <Text
+              style={[styles.attendingText, styles.attendingNumber]}
+            >{`${numAttendees}`}</Text>
+            <Text style={styles.attendingText}>{" attending"}</Text>
+          </View>
+          <View
+            style={[
+              styles.distance,
+              {
+                backgroundColor: lightEventColor
+              }
+            ]}
+          >
+            <MaterialCommunityIcon
+              name="navigation-variant-outline"
+              color={event.color}
+              style={styles.iconMargin}
+            />
+            <Text style={[styles.distanceText, { color: event.color }]}>
+              {compactFormatMiles(distance)}
+            </Text>
+          </View>
+        </View>
+      </View>
     </Shadow>
   )
 }
@@ -243,7 +235,8 @@ const styles = StyleSheet.create({
   name: {
     textAlignVertical: "center",
     fontWeight: "bold",
-    fontSize: 15
+    fontSize: 15,
+    paddingLeft: 8
   },
   distance: {
     flexDirection: "row",
