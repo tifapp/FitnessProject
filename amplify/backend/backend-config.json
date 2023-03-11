@@ -106,6 +106,28 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "eventNotifications": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "GraphQLAPIIdOutput",
+            "GraphQLAPIEndpointOutput"
+          ],
+          "category": "api",
+          "resourceName": "fitnessprojectapi"
+        },
+        {
+          "attributes": [
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "backendResources"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "friendNotifications": {
       "build": true,
       "dependsOn": [
@@ -224,6 +246,25 @@
       "service": "Lambda"
     }
   },
+  "geo": {
+    "placeindexd936f235": {
+      "accessType": "AuthorizedUsers",
+      "dataProvider": "Here",
+      "dataSourceIntendedUse": "Storage",
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "fitnessprojecta8f49cfe"
+        }
+      ],
+      "isDefault": true,
+      "providerPlugin": "awscloudformation",
+      "service": "PlaceIndex"
+    }
+  },
   "hosting": {
     "amplifyhosting": {
       "providerPlugin": "awscloudformation",
@@ -231,8 +272,37 @@
       "type": "manual"
     }
   },
-  "notifications": {},
+  "notifications": {
+    "fitnessproject": {
+      "channels": [],
+      "service": "Pinpoint"
+    }
+  },
   "parameters": {
+    "AMPLIFY_analytics_Pinpoint_Id": {
+      "usedBy": [
+        {
+          "category": "analytics",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_analytics_Pinpoint_Name": {
+      "usedBy": [
+        {
+          "category": "analytics",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_analytics_Pinpoint_Region": {
+      "usedBy": [
+        {
+          "category": "analytics",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
     "AMPLIFY_function_S3Triggeref91c1ec_deploymentBucketName": {
       "usedBy": [
         {
@@ -294,6 +364,22 @@
         {
           "category": "function",
           "resourceName": "deleteUserData"
+        }
+      ]
+    },
+    "AMPLIFY_function_eventNotifications_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "eventNotifications"
+        }
+      ]
+    },
+    "AMPLIFY_function_eventNotifications_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "eventNotifications"
         }
       ]
     },
@@ -390,6 +476,30 @@
         {
           "category": "hosting",
           "resourceName": "amplifyhosting"
+        }
+      ]
+    },
+    "AMPLIFY_notifications_Pinpoint_Id": {
+      "usedBy": [
+        {
+          "category": "notifications",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_notifications_Pinpoint_Name": {
+      "usedBy": [
+        {
+          "category": "notifications",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_notifications_Pinpoint_Region": {
+      "usedBy": [
+        {
+          "category": "notifications",
+          "resourceName": "Pinpoint"
         }
       ]
     }

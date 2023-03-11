@@ -4,11 +4,11 @@
       "addmissingownerfields": false,
       "improvepluralization": false,
       "validatetypenamereservedwords": true,
-      "useexperimentalpipelinedtransformer": false,
+      "useexperimentalpipelinedtransformer": true,
       "enableiterativegsiupdates": false,
       "secondarykeyasgsi": false,
       "skipoverridemutationinputtypes": false,
-      "transformerversion": 1,
+      "transformerversion": 2,
       "suppressschemamigrationprompt": true,
       "securityEnhancementNotification": false,
       "showfieldauthnotification": false

@@ -1,11 +1,11 @@
 {
     "appName": "fitnessproject",
-    "roleName": "pinpointLambdaRole8489e416",
-    "cloudformationPolicyName": "cloudformationPolicy8489e416",
-    "cloudWatchPolicyName": "cloudWatchPolicy8489e416",
-    "pinpointPolicyName": "pinpointPolicy8489e416",
-    "authPolicyName": "pinpoint_amplify_8489e416",
-    "unauthPolicyName": "pinpoint_amplify_8489e416",
+    "roleName": "pinpointLambdaRolee574cf55",
+    "cloudformationPolicyName": "cloudformationPolicye574cf55",
+    "cloudWatchPolicyName": "cloudWatchPolicye574cf55",
+    "pinpointPolicyName": "pinpointPolicye574cf55",
+    "authPolicyName": "pinpoint_amplify_e574cf55",
+    "unauthPolicyName": "pinpoint_amplify_e574cf55",
     "authRoleName": {
         "Ref": "AuthRoleName"
     },

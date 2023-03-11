@@ -51,6 +51,13 @@ export type AmplifyDependentResourcesAttributes = {
       "Name": "string",
       "Region": "string"
     },
+    "eventNotifications": {
+      "Arn": "string",
+      "LambdaExecutionRole": "string",
+      "LambdaExecutionRoleArn": "string",
+      "Name": "string",
+      "Region": "string"
+    },
     "friendNotifications": {
       "Arn": "string",
       "LambdaExecutionRole": "string",
@@ -83,6 +90,13 @@ export type AmplifyDependentResourcesAttributes = {
       "Arn": "string",
       "LambdaExecutionRole": "string",
       "LambdaExecutionRoleArn": "string",
+      "Name": "string",
+      "Region": "string"
+    }
+  },
+  "geo": {
+    "placeindexd936f235": {
+      "Arn": "string",
       "Name": "string",
       "Region": "string"
     }
