@@ -149,7 +149,23 @@ describe("AsyncStorageLocationSearchHistory tests", () => {
     await saveFakeSearchResults(10)
     expect(await searchHistory.loadItems()).not.toContain(1)
   })
+
+  it("should ignore search results that are corrupted when querying all items", async () => {
+    await AsyncStorage.setItem(testSearchResultKey, corruptedJSONString)
+    expect(await searchHistory.loadItems()).toHaveLength(0)
+  })
+
+  it("should ignore search results that are corrupted when querying specific items", async () => {
+    await AsyncStorage.setItem(testSearchResultKey, corruptedJSONString)
+    const itemMap = await searchHistory.itemsForLocations([
+      testSearchResult.coordinates
+    ])
+    expect(itemMap.item(testSearchResult.coordinates)).toBeUndefined()
+  })
 })
+
+const corruptedJSONString =
+  "{ \"data\": \"L33T H4CK3R has corrupted this data and the JSON is invalid! Please send 4,000,000 bitcoin the resove this issue!\""
 
 const saveFakeSearchResults = async (amount: number) => {
   await Promise.all(
