@@ -24,7 +24,7 @@
       "useenabledmfas": false
     },
     "codegen": {
-      "useappsyncmodelgenplugin": true,
+      "useappsyncmodelgenplugin": false,
       "usedocsgeneratorplugin": false,
       "usetypesgeneratorplugin": false,
       "cleangeneratedmodelsdirectory": false,

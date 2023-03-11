@@ -1,3 +1,4 @@
+
 /* Amplify Params - DO NOT EDIT
 	ENV
 	REGION
@@ -69,6 +70,7 @@ exports.handler = async (event, context, callback) => {
               console.log("Receiver name: " + JSON.stringify(receiverName));
 
               console.log("Host" + JSON.stringify(record.dynamodb.OldImage.host.S))
+
               await sendNotification(
                 receiverName.data.getUser.deviceToken, loadCapitals(record.dynamodb.OldImage.host.S) + " Has cancelled the event! "
               );
@@ -88,7 +90,7 @@ exports.handler = async (event, context, callback) => {
             (record.dynamodb.OldImage.location.longitude != record.dynamodb.NewImage.location.longitude)){
               // hopfully gets list of all users in the post (OldImage == post before)
               if (record.dynamodb.OldImage.users.L != null) { 
-                for (let i = 0; i < record.dynamodb.OldImage.users.L.length; i ++){
+                for (let i = 0; i < record.dynamodb.OldImage.users.length; i ++){
                   console.log(record.dynamodb.OldImage.users.L[i]);
 
                   const receiver = record.dynamodb.OldImage.users.L[i].S;
@@ -100,9 +102,10 @@ exports.handler = async (event, context, callback) => {
                 });
 
                   console.log(receiverName);
-
+                   
+                  let url = "tifapp://event?id=" + record.dynamodb.NewImage.eventId.S; 
                   await sendNotification(
-                    receiverName.data.getUser.deviceToken, loadCapitals(record.dynamodb.OldImage.host.S) + " Has changed the event location! "
+                    receiverName.data.getUser.deviceToken, loadCapitals(record.dynamodb.NewImage.Host) + " Has changed the event location! ", {url}
                   );
                 }
               }
@@ -113,7 +116,7 @@ exports.handler = async (event, context, callback) => {
             (record.dynamodb.OldImage.endDateTime != record.dynamodb.NewImage.endDateTime)){
 
               if (record.dynamodb.OldImage.users.L != null) { 
-                for (let i = 0; i < record.dynamodb.OldImage.users.L.length; i ++){
+                for (let i = 0; i < record.dynamodb.OldImage.users.length; i ++){
                   console.log(record.dynamodb.OldImage.users.L[i]);
 
                   const receiver = record.dynamodb.OldImage.users.L[i].S;
@@ -125,9 +128,10 @@ exports.handler = async (event, context, callback) => {
                   });
 
                   console.log(receiverName);
-
+                  
+                  let url = "tifapp://event?id=" + record.dynamodb.NewImage.eventId.S; 
                   await sendNotification(
-                    receiverName.data.getUser.deviceToken, loadCapitals(record.dynamodb.OldImage.host.S) + " Has changed the event start and end time! "
+                    receiverName.data.getUser.deviceToken, loadCapitals(record.dynamodb.NewImage.Host) + " Has changed the event start and end time! ", {url}
                   );
                 }
               }
@@ -137,7 +141,7 @@ exports.handler = async (event, context, callback) => {
             else if(record.dynamodb.OldImage.startDateTime != record.dynamodb.NewImage.startDateTime){
               
               if (record.dynamodb.OldImage.users.L != null) { 
-                for (let i = 0; i < record.dynamodb.OldImage.users.L.length; i ++){
+                for (let i = 0; i < record.dynamodb.OldImage.users.length; i ++){
                   console.log(record.dynamodb.OldImage.users.L[i]);
 
                   const receiver = record.dynamodb.OldImage.users.L[i].S;
@@ -149,9 +153,10 @@ exports.handler = async (event, context, callback) => {
                   });
 
                   console.log(receiverName);
-
+                  
+                  let url = "tifapp://event?id=" + record.dynamodb.NewImage.eventId.S; 
                   await sendNotification(
-                    receiverName.data.getUser.deviceToken, loadCapitals(record.dynamodb.OldImage.host.S) + " Has changed the event start time! "
+                    receiverName.data.getUser.deviceToken, loadCapitals(record.dynamodb.NewImage.Host) + " Has changed the event start time! ", {url}
                   );
                 }
               }
@@ -161,7 +166,7 @@ exports.handler = async (event, context, callback) => {
             else if(record.dynamodb.OldImage.endDateTime != record.dynamodb.NewImage.endDateTime){
 
               if (record.dynamodb.OldImage.users.L != null) { 
-                for (let i = 0; i < record.dynamodb.OldImage.users.L.length; i ++){
+                for (let i = 0; i < record.dynamodb.OldImage.users.length; i ++){
                   console.log(record.dynamodb.OldImage.users.L[i]);
 
                   const receiver = record.dynamodb.OldImage.users.L[i].S;
@@ -173,9 +178,10 @@ exports.handler = async (event, context, callback) => {
                   });
 
                   console.log(receiverName);
-
+                  
+                  let url = "tifapp://event?id=" + record.dynamodb.NewImage.eventId.S; 
                   await sendNotification(
-                    receiverName.data.getUser.deviceToken, loadCapitals(record.dynamodb.OldImage.host.S) + " Has changed the event end time! "
+                    receiverName.data.getUser.deviceToken, loadCapitals(record.dynamodb.NewImage.Host) + " Has changed the event end time! ", {url}
                   );
                 }
               }

@@ -22,7 +22,7 @@ const { Expo } = require("expo-server-sdk");
 // Create a new Expo SDK client
 let expo = new Expo();
 
-exports.sendNotification = async (deviceToken, message) => {
+exports.sendNotification = async (deviceToken, message, data) => {
   if (deviceToken == null || deviceToken == "") return;
 
   ////console.log("creating notification");
@@ -30,7 +30,8 @@ exports.sendNotification = async (deviceToken, message) => {
     to: String(deviceToken),
     sound: "default",
     body: message,
-    data: { status: "ok"},
+    data: { status: "ok",
+            ...data },
   };
   try {
     let tickets = await expo.sendPushNotificationsAsync([pushMessage]);

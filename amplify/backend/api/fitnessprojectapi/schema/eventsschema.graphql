@@ -8,33 +8,104 @@ input LocationEventInput {
   longitude: Float
 }
 
-input groups {
+input gps {
   latitude: Float
   longitude: Float
 }
+
+input GPSInput {
+  lon: Float!
+  lat: Float!
+}
+
+input GPSQueryInput {
+  gps: GPSInput!
+  radius: Float!
+}
+
+input FindEventsInput {
+  byGPS: GPSQueryInput
+  byPlaceID: String
+  limit: Int
+  nextToken: String
+  from: Int
+}
+
+type SearchableEventsConnection @aws_iam @aws_cognito_user_pools {
+  items: [Event]
+  nextToken: String
+  total: Int
+}
+ 
 
 """
 This data type is used on the feed screen, group screen and message screen.
 The "postsByChannel" query is used to find posts belonging to a specific group or directed to a specific user.
 """
-type Event @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"}, subscriptions: null) @searchable @auth(rules: [{allow: owner, ownerField: "eventOwner"}, {allow: private, provider: iam, operations: [create, read, update, delete]}, {allow: groups, groups: ["Admins"], operations: [create, read, update, delete]}]) {
-  comments: Int @auth(rules: [{allow: private, operations: [read]}, {allow: private, provider: iam, operations: [read, create, update]}])
+type Event
+  @model(
+    timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" }
+    subscriptions: null
+  )
+  @searchable
+  @auth(
+    rules: [
+      { allow: owner, ownerField: "eventOwner" }
+      {
+        allow: private
+        provider: iam
+        operations: [create, read, update, delete]
+      }
+      {
+        allow: groups
+        groups: ["Admins"]
+        operations: [create, read, update, delete]
+      }
+    ]
+  ) {
+  comments: Int
+    @auth(
+      rules: [
+        { allow: private, operations: [read] }
+        { allow: private, provider: iam, operations: [read, create, update] }
+      ]
+    )
+  evenId: ID! 
   createdAt: AWSDateTime! @primaryKey(sortKeyFields: ["userId"])
   updatedAt: AWSDateTime!
-  userId: ID! @index(name: "ByUser", queryField: "eventsByUser", sortKeyFields: ["createdAt"])
+  userId: ID!
+    @index(
+      name: "ByUser"
+      queryField: "eventsByUser"
+      sortKeyFields: ["createdAt"]
+    )
+  eventOwner: ID!
+  owner: User @hasOne(fields: ["eventOwner"])
   description: String
-  ##eventOwnerName: String @index(name: "ByHost", queryField: "eventsByUserId", sortKeyFields: ["userId"])
-  eventOwner: User @hasOne
+  host: String
+    @index(
+      name: "ByHost"
+      queryField: "eventsByUserId"
+      sortKeyFields: ["userId"]
+    )
   parentId: ID
   radius: Float
-  startDateTime: AWSDateTime! @index(name: "ByDate", queryField: "eventsByDate", sortKeyFields: ["createdAt"])
+  startDateTime: AWSDateTime!
+    @index(
+      name: "ByDate"
+      queryField: "eventsByDate"
+      sortKeyFields: ["createdAt"]
+    )
   endDateTime: AWSDateTime!
   name: String
   location: LocationEvent
-  users: [User] @hasMany 
+  userIds: [ID!]!
+  users: [User] @hasMany
 }
 
-"""This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when creating a new message."""
+"""
+This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when creating a new message.
+"""
 input CreateEventInput {
   description: String
   parentId: ID
@@ -45,14 +116,18 @@ input CreateEventInput {
   location: LocationEventInput
 }
 
-"""This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when updating a message."""
+"""
+This allows us to fill in the missing fields in the backend rather than letting the user do it. Applies when updating a message.
+"""
 input UpdateEventInput {
   description: String
   radius: Float
   name: String
 }
 
-"""This is used for batch deletion of posts."""
+"""
+This is used for batch deletion of posts.
+"""
 input DeleteEventInput {
   createdAt: AWSDateTime!
   userId: String!

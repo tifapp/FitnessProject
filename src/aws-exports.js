@@ -3,6 +3,11 @@
 
 const awsmobile = {
     "aws_project_region": "us-west-2",
+    "aws_mobile_analytics_app_id": "ced102bb50484960828f8b5f526ff6c3",
+    "aws_mobile_analytics_app_region": "us-west-2",
+    "aws_appsync_graphqlEndpoint": "https://dngqwkczhjdexneem43my5unje.appsync-api.us-west-2.amazonaws.com/graphql",
+    "aws_appsync_region": "us-west-2",
+    "aws_appsync_authenticationType": "AMAZON_COGNITO_USER_POOLS",
     "aws_cognito_identity_pool_id": "us-west-2:a3a3d523-73de-4352-8055-1e3ecf98fad0",
     "aws_cognito_region": "us-west-2",
     "aws_user_pools_id": "us-west-2_kfUHcSZXb",
@@ -27,13 +32,8 @@ const awsmobile = {
     "aws_cognito_verification_mechanisms": [
         "EMAIL"
     ],
-    "aws_appsync_graphqlEndpoint": "https://dngqwkczhjdexneem43my5unje.appsync-api.us-west-2.amazonaws.com/graphql",
-    "aws_appsync_region": "us-west-2",
-    "aws_appsync_authenticationType": "AMAZON_COGNITO_USER_POOLS",
     "aws_user_files_s3_bucket": "fitnessproject990b7c5f3b1e4687a61074386ec11c28231929-dev",
-    "aws_user_files_s3_bucket_region": "us-west-2",
-    "aws_mobile_analytics_app_id": "ced102bb50484960828f8b5f526ff6c3",
-    "aws_mobile_analytics_app_region": "us-west-2"
+    "aws_user_files_s3_bucket_region": "us-west-2"
 };
 
 
