@@ -25,7 +25,7 @@ const EventsList = () => {
   }, [])
 
   // variables
-  const snapPoints = ["3%", "65%", "100%"]
+  const snapPoints = ["8%", "75%"]
 
   return (
     <BottomSheetModalProvider>
@@ -53,7 +53,9 @@ const EventsList = () => {
               </View>
             )}
             ListHeaderComponent={
-              <Text style={styles.activitiesText}>Nearby Activities</Text>
+              <View style={styles.activitiesContainer}>
+                <Text style={styles.activitiesText}>Nearby Activities</Text>
+              </View>
             }
             stickyHeaderIndices={[0]}
           />
@@ -64,6 +66,12 @@ const EventsList = () => {
 }
 
 const styles = StyleSheet.create({
+  activitiesContainer: {
+    flex: 1,
+    flexDirection: "row",
+    backgroundColor: "white",
+    paddingBottom: 8
+  },
   activitiesText: {
     fontSize: 20,
     marginLeft: 16,
