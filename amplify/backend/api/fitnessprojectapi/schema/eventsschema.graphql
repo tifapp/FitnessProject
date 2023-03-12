@@ -23,7 +23,7 @@ input GPSQueryInput {
   radius: Float!
 }
 
-input FindeventsInput {
+input FindEventsInput {
   byGPS: GPSQueryInput
   byPlaceID: String
   limit: Int
@@ -31,11 +31,12 @@ input FindeventsInput {
   from: Int
 }
 
-type SearchableeventsConnection @aws_iam @aws_cognito_user_pools {
+type SearchableEventsConnection @aws_iam @aws_cognito_user_pools {
   items: [Event]
   nextToken: String
   total: Int
 }
+ 
 
 """
 This data type is used on the feed screen, group screen and message screen.

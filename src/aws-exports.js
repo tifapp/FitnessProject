@@ -39,9 +39,9 @@ const awsmobile = {
             "region": "us-west-2",
             "search_indices": {
                 "items": [
-                    "placeindexd936f235-dev"
+                    "placeindexa53d0303-dev"
                 ],
-                "default": "placeindexd936f235-dev"
+                "default": "placeindexa53d0303-dev"
             }
         }
     }

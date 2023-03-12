@@ -29,4 +29,5 @@ type Query {
   batchGetLikes(likes: [CreateLikeInput]): [Like]
   batchGetConversations(ids: [DeleteConversationInput]): [Conversation]
   getConversationByUsers(users: [ID!]!): Conversation
+  findEvents(input: FindEventsInput!): SearchableEventsConnection @aws_iam @aws_cognito_user_pools
 }

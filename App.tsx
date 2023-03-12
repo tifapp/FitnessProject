@@ -1,6 +1,13 @@
 // aws
 import API, { GraphQLQuery } from "@aws-amplify/api"
-import { Amplify, Auth, Cache, graphqlOperation, Storage } from "aws-amplify"
+import {
+  Amplify,
+  Auth,
+  Cache,
+  Geo,
+  graphqlOperation,
+  Storage
+} from "aws-amplify"
 import { withAuthenticator } from "aws-amplify-react-native"
 import awsconfig from "./src/aws-exports"
 
@@ -87,6 +94,7 @@ Amplify.configure(awsconfig)
 Auth.configure(awsconfig)
 API.configure(awsconfig)
 Storage.configure(awsconfig)
+Geo.configure(awsconfig)
 
 const config = {
   storage: AsyncStorage,

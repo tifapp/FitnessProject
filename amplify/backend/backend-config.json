@@ -247,10 +247,10 @@
     }
   },
   "geo": {
-    "placeindexd936f235": {
-      "accessType": "AuthorizedUsers",
-      "dataProvider": "Here",
-      "dataSourceIntendedUse": "Storage",
+    "placeindexa53d0303": {
+      "accessType": "AuthorizedAndGuestUsers",
+      "dataProvider": "HERE",
+      "dataSourceIntendedUse": "SingleUse",
       "dependsOn": [
         {
           "attributes": [
@@ -258,6 +258,13 @@
           ],
           "category": "auth",
           "resourceName": "fitnessprojecta8f49cfe"
+        },
+        {
+          "attributes": [
+            "AdminsGroupRole"
+          ],
+          "category": "auth",
+          "resourceName": "userPoolGroups"
         }
       ],
       "isDefault": true,

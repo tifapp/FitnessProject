@@ -3,7 +3,6 @@ import {
   LocationSearchClient
 } from "@lib/location/search"
 import { Geo } from "aws-amplify"
-import { Place } from "aws-sdk/clients/location"
 
 jest.mock("aws-amplify")
 const amplifyTextSearchSpy = jest.spyOn(Geo, "searchByText")
@@ -17,7 +16,7 @@ describe("AmplifyLocationSearchClient tests", () => {
     amplifyTextSearchSpy.mockReset()
   })
 
-  it("creates a proper request to amplify geo with custom options", async () => {
+  test("textSearch creates a proper request to amplify geo with custom options", async () => {
     amplifyTextSearchSpy.mockResolvedValue([])
     await client.textSearch(testTextQuery, {
       biasLocation: { latitude: 42, longitude: -121 },
@@ -30,7 +29,7 @@ describe("AmplifyLocationSearchClient tests", () => {
     })
   })
 
-  it("creates a proper request to amplify geo with no custom options", async () => {
+  test("textSearch creates a proper request to amplify geo with no custom options", async () => {
     amplifyTextSearchSpy.mockResolvedValue([])
     await client.textSearch(testTextQuery)
     expect(amplifyTextSearchSpy).toHaveBeenCalledWith(testTextQuery, {
@@ -38,18 +37,14 @@ describe("AmplifyLocationSearchClient tests", () => {
     })
   })
 
-  it("handlesa normal amplify geo text search response properly", async () => {
+  test("textSearch handles an amplify geo text search response properly", async () => {
     amplifyTextSearchSpy.mockResolvedValue([
       {
-        geometry: {
-          point: [-122.36738, 47.61609]
-        },
+        geometry: { point: [-122.36738, 47.61609] },
         label: "Amazon Go, 2131 7th Ave, Seattle, WA, 98121, USA"
       },
       {
-        geometry: {
-          point: [-112.10668, 46.31909]
-        },
+        geometry: { point: [-112.10668, 46.31909] },
         label: "Amazon, Jefferson City, MT, United States"
       }
     ])
@@ -65,5 +60,15 @@ describe("AmplifyLocationSearchClient tests", () => {
         coordinates: { latitude: 46.31909, longitude: -112.10668 }
       }
     ])
+  })
+
+  test("textSearch filters amplify geo results with unknown geometry", async () => {
+    amplifyTextSearchSpy.mockResolvedValue([
+      {
+        geometry: undefined,
+        label: "Amazon Go, 2131 7th Ave, Seattle, WA, 98121, USA"
+      }
+    ])
+    expect(await client.textSearch(testTextQuery)).toEqual([])
   })
 })
