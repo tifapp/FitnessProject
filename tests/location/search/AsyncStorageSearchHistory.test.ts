@@ -150,13 +150,34 @@ describe("AsyncStorageLocationSearchHistory tests", () => {
     expect(await searchHistory.loadItems()).not.toContain(1)
   })
 
-  it("should ignore search results that are corrupted when querying all items", async () => {
+  it("should ignore search results that are invalid json strings when querying all items", async () => {
     await AsyncStorage.setItem(testSearchResultKey, corruptedJSONString)
     expect(await searchHistory.loadItems()).toHaveLength(0)
   })
 
-  it("should ignore search results that are corrupted when querying specific items", async () => {
+  it("should ignore invalid formatted search results when querying all items", async () => {
+    await AsyncStorageUtils.save(testSearchResultKey, {
+      name: 5,
+      formattedAddress: true,
+      history: []
+    })
+    expect(await searchHistory.loadItems()).toHaveLength(0)
+  })
+
+  it("should ignore search results that are invalid json strings when querying specific items", async () => {
     await AsyncStorage.setItem(testSearchResultKey, corruptedJSONString)
+    const itemMap = await searchHistory.itemsForLocations([
+      testSearchResult.coordinates
+    ])
+    expect(itemMap.item(testSearchResult.coordinates)).toBeUndefined()
+  })
+
+  it("should ignore invalid formatted search results when querying specific items", async () => {
+    await AsyncStorageUtils.save(testSearchResultKey, {
+      name: true,
+      formattedAddress: false,
+      history: "Hello world"
+    })
     const itemMap = await searchHistory.itemsForLocations([
       testSearchResult.coordinates
     ])

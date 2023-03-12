@@ -1,10 +1,20 @@
-import { ArrayUtils, NonEmptyArray } from "@lib/Array"
+import { ArrayUtils, NonEmptyArraySchema } from "@lib/Array"
 import { AsyncStorageUtils } from "@lib/AsyncStorage"
 import { now } from "@lib/date"
 import { createDependencyKey } from "@lib/dependencies"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { Location } from "../Location"
-import { LocationSearchResult } from "./Result"
+import { LocationSearchResult, LocationSearchResultSchema } from "./Result"
+import { z } from "zod"
+
+/**
+ * A zod schema for {@link LocationSearchHistorySaveReason}.
+ */
+export const LocationSearchHistorySaveReasonSchema = z.enum([
+  "attended-event",
+  "hosted-event",
+  "searched-location"
+])
 
 /**
  * Reason for saving an item in the search history.
@@ -21,13 +31,12 @@ import { LocationSearchResult } from "./Result"
  * - `"searched-location"` (default option)
  *    - Use this when the user selects a location from the location search screen
  */
-export type LocationSearchHistorySaveReason =
-  | "attended-event"
-  | "hosted-event"
-  | "searched-location"
+export type LocationSearchHistorySaveReason = z.infer<
+  typeof LocationSearchHistorySaveReasonSchema
+>
 
 /**
- * Configurable options when saving a {@link LocationSearchResult}
+ * Configurable options when saving a {@link LocationSearchResult}.
  */
 export type LocationSearchHistorySaveOptions = {
   /**
@@ -40,20 +49,39 @@ export type LocationSearchHistorySaveOptions = {
 }
 
 /**
+ * A zod schema for the {@link LocationSearchHistoryItemRecord}.
+ */
+export const LocationSearchHistoryItemRecordSchema = z.object({
+  timestamp: z.number(),
+  reason: LocationSearchHistorySaveReasonSchema
+})
+
+/**
+ * A recorded history record in a {@link LocationSearchHistoryItem}.
+ */
+export type LocationSearchHistoryItemRecord = Readonly<
+  z.infer<typeof LocationSearchHistoryItemRecordSchema>
+>
+
+/**
+ * A zod schema for a {@link LocationSearchHistoryItem}.
+ */
+export const LocationSearchHistoryItemSchema =
+  LocationSearchResultSchema.extend({
+    history: NonEmptyArraySchema<LocationSearchHistoryItemRecord>(
+      LocationSearchHistoryItemRecordSchema
+    )
+  })
+
+/**
  * An item stored in the user's location search history.
  *
  * A history item contains its base search result, as well as everytime
  * and all the reasons that the result was saved in history.
  */
-export type LocationSearchHistoryItem = Readonly<{
-  history: NonEmptyArray<
-    Readonly<{
-      timestamp: number
-      reason: LocationSearchHistorySaveReason
-    }>
-  >
-}> &
-  LocationSearchResult
+export type LocationSearchHistoryItem = Readonly<
+  z.infer<typeof LocationSearchHistoryItemSchema>
+>
 
 /**
  * Some options for loading results from a `LocationSearchHistory`
@@ -171,15 +199,9 @@ implements LocationSearchHistory {
 
   private async historyItemsForKeys (keys: string[]) {
     return await AsyncStorage.multiGet(keys).then((results) => {
-      const items = results.map(([_, value]) => {
-        try {
-          if (!value) return undefined
-          return JSON.parse(value) as LocationSearchHistoryItem
-        } catch {
-          return undefined
-        }
-      })
-      return ArrayUtils.removeOptionals(items)
+      return ArrayUtils.removeOptionals(
+        results.map(([_, value]) => parseStoredHistoryItem(value))
+      )
     })
   }
 }
@@ -200,4 +222,13 @@ const isSearchHistoryKey = (key: string) => {
 
 const searchHistoryKey = (coordinates: Location) => {
   return `@location_search_history_lat+${coordinates.latitude}_lng+${coordinates.longitude}`
+}
+
+const parseStoredHistoryItem = (historyItemString: string | null) => {
+  try {
+    if (!historyItemString) return undefined
+    return LocationSearchHistoryItemSchema.parse(JSON.parse(historyItemString))
+  } catch {
+    return undefined
+  }
 }
