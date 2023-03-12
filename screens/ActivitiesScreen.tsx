@@ -1,19 +1,17 @@
-import { EventForm, EventFormToolbar } from "@components/eventForm"
-import { dateRange } from "@lib/date"
-import { SetDependencyValue } from "@lib/dependencies"
 import { EventColors } from "@lib/events/EventColors"
-import { Geocoding, geocodingDependencyKey } from "@lib/location"
 import { Auth } from "aws-amplify"
-import React from "react"
-import { Alert, Text, TouchableOpacity } from "react-native"
-import { GestureHandlerRootView } from "react-native-gesture-handler"
-import { QueryClient, QueryClientProvider } from "react-query"
-import EventFormScreen from "./EventFormScreen"
+import React, { useState } from "react"
+import { Alert } from "react-native"
+import { QueryClient } from "react-query"
 import { EventFormTestScreen } from "./testScreens/EventFormTestScreen"
 
 const queryClient = new QueryClient()
 
 const ActivitiesScreen = () => {
+  const [color, setColor] = useState(EventColors.Red)
+  const [circleRadius, setCircleRadius] = useState(100)
+  const [selectedMarker, setSelectedMarker] = useState<String | undefined>("1")
+
   function signOut () {
     const title = "Are you sure you want to sign out?"
     const message = ""
