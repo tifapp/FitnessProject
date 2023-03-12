@@ -4,7 +4,7 @@ import { now } from "@lib/date"
 import { createDependencyKey } from "@lib/dependencies"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { Location } from "../Location"
-import { LocationSearchResult } from "./Client"
+import { LocationSearchResult } from "./Result"
 
 /**
  * Reason for saving an item in the search history.

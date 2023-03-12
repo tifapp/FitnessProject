@@ -3,15 +3,8 @@ import { Geo } from "aws-amplify"
 import { Location } from "../Location"
 import "react-native-get-random-values"
 import "react-native-url-polyfill/auto"
-
-/**
- * A result returned from a {@link LocationSearchClient}.
- */
-export type LocationSearchResult = Readonly<{
-  name?: string
-  formattedAddress?: string
-  coordinates: Location
-}>
+import { AmplifyLocationSearchUtils } from "./AmplifyUtils"
+import { LocationSearchResult } from "./Result"
 
 export type LocationTextSearchOptions = {
   biasLocation?: Location
@@ -35,16 +28,7 @@ export class AmplifyLocationSearchClient implements LocationSearchClient {
       maxResults: options?.limit
     }).then((results) =>
       ArrayUtils.removeOptionals(
-        results.map((result) => {
-          if (!result.geometry?.point) return undefined
-          const [longitude, latitude] = result.geometry.point
-          const addressMatches = result.label?.match(/(.+?), (.*)/)
-          return {
-            name: addressMatches?.[1],
-            formattedAddress: addressMatches?.[2],
-            coordinates: { latitude, longitude }
-          }
-        })
+        results.map(AmplifyLocationSearchUtils.placeToSearchResult)
       )
     )
   }
