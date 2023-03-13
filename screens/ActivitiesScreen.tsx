@@ -1,7 +1,12 @@
-import React from "react"
 import EventsList from "@components/EventsList"
+import MapComponent from "@components/MapComponent"
+import { mapCompStyle, state } from "@components/MapTestData"
+import React, { useState } from "react"
 
 const ActivitiesScreen = () => {
+  const [circleRadius, setCircleRadius] = useState(100)
+  const [selectedMarker, setSelectedMarker] = useState<String | undefined>("1")
+
   /* function signOut () {
     const title = "Are you sure you want to sign out?"
     const message = ""
@@ -21,7 +26,20 @@ const ActivitiesScreen = () => {
     )
   } */
 
-  return <EventsList />
+  return (
+    <>
+      <MapComponent
+        mapStyle={mapCompStyle.container}
+        initialRegion={state.initialRegion}
+        initialRadius={{ radius: circleRadius }}
+        currentSelectedMarker={selectedMarker}
+        markers={state.markers}
+        customizers={state.customizers}
+        movementSettings={state.movementSettings}
+      />
+      <EventsList />
+    </>
+  )
 }
 
 export default ActivitiesScreen
