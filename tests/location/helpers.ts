@@ -10,12 +10,5 @@ export const baseTestPlacemark = {
 } as const
 
 export const unknownLocationPlacemark = {
-  name: "North Pacific Ocean",
-  country: null,
-  postalCode: null,
-  street: null,
-  streetNumber: null,
-  region: null,
-  isoCountryCode: null,
-  city: null
+  name: "North Pacific Ocean"
 } as const

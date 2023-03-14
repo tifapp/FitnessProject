@@ -10,13 +10,13 @@ describe("Placemark Formatting tests", () => {
 
   it("omits street number when missing street name", () => {
     expect(
-      placemarkToFormattedAddress({ ...baseTestPlacemark, street: null })
+      placemarkToFormattedAddress({ ...baseTestPlacemark, street: undefined })
     ).toEqual("Cupertino, CA 95104")
   })
 
   it("omits postal code when missing state", () => {
     expect(
-      placemarkToFormattedAddress({ ...baseTestPlacemark, region: null })
+      placemarkToFormattedAddress({ ...baseTestPlacemark, region: undefined })
     ).toEqual("1234 Cupertino Rd, Cupertino")
   })
 
