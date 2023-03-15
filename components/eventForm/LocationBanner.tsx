@@ -70,9 +70,7 @@ const GeocodedLocationInfoBanner = (locationInfo: EventFormLocationInfo) => {
   if (!placemark) return <SkeletonFormLabel icon="location-pin" />
 
   const address = placemarkToFormattedAddress(placemark)
-  return (
-    <PlacemarkInfoBanner name={placemark.name ?? undefined} address={address} />
-  )
+  return <PlacemarkInfoBanner name={placemark.name} address={address} />
 }
 
 const PlacemarkInfoBanner = ({ name, address }: EventFormPlacemarkInfo) => (

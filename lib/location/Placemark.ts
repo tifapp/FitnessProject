@@ -3,16 +3,18 @@ import addressFormatter from "@fragaria/address-formatter"
 /**
  * A type representing the components of an address.
  */
-export type Placemark = {
-  readonly name: string | null
-  readonly country: string | null
-  readonly postalCode: string | null
-  readonly street: string | null
-  readonly streetNumber: string | null
-  readonly region: string | null
-  readonly isoCountryCode: string | null
-  readonly city: string | null
-}
+export type Placemark = Partial<
+  Readonly<{
+    name: string
+    country: string
+    postalCode: string
+    street: string
+    streetNumber: string
+    region: string
+    isoCountryCode: string
+    city: string
+  }>
+>
 
 /**
  * Formats a `Placemark` instance into a readable address if able.
@@ -21,22 +23,18 @@ export type Placemark = {
  */
 export const placemarkToFormattedAddress = (placemark: Placemark) => {
   // TODO: - At some point this should probably support internationalized styles.
-  const streetNumber = placemark.street
-    ? placemark.streetNumber ?? undefined
-    : undefined
+  const streetNumber = placemark.street ? placemark.streetNumber : undefined
 
-  const postalCode = placemark.region
-    ? placemark.postalCode ?? undefined
-    : undefined
+  const postalCode = placemark.region ? placemark.postalCode : undefined
   const formattedAddress = addressFormatter
     .format(
       {
-        street: placemark.street ?? undefined,
+        street: placemark.street,
         streetNumber,
-        city: placemark.city ?? undefined,
-        region: placemark.region ?? undefined,
+        city: placemark.city,
+        region: placemark.region,
         postcode: postalCode,
-        state: placemark.region ?? undefined
+        state: placemark.region
       },
       { abbreviate: true, countryCode: US_COUNTRY_CODE }
     )
