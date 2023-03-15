@@ -24,7 +24,7 @@
     "android": {
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyBj2MLRDtyqHZg-kPHmMokprMITNHH2r_0"
+          "apiKey": "<insert API key here>"
         }
       },
       "package": "com.tifapp.FitnessApp",
