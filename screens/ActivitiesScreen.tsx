@@ -1,5 +1,5 @@
 import EventsList from "@components/EventsList"
-import MapComponent from "@components/MapComponent"
+import Map from "@components/Map"
 import { mapCompStyle, state } from "@components/MapTestData"
 import { Auth } from "aws-amplify"
 import React, { useState } from "react"
@@ -31,10 +31,9 @@ const ActivitiesScreen = () => {
 
   return (
     <>
-      <MapComponent
+      <Map
         mapStyle={mapCompStyle.container}
         initialRegion={state.initialRegion}
-        initialRadius={{ radius: circleRadius }}
         renderMarker={(item) => <Text> Lesgoo </Text>}
         renderCircle={(item) => (
           <Circle
@@ -48,9 +47,7 @@ const ActivitiesScreen = () => {
             strokeWidth={1}
           />
         )}
-        currentSelectedMarker={selectedMarker}
         markers={state.markers}
-        movementSettings={state.movementSettings}
       />
       <EventsList />
     </>

@@ -7,11 +7,10 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
 // Type for the map markers, in order to separate their logic out
 export interface MapMarker {
   key: string
-  title: string
   location: Location
 }
 
-interface Props<T> {
+interface Props<T extends MapMarker> {
   // Map style specifically for style on map
   mapStyle?: StyleProp<ViewStyle>
 
@@ -22,25 +21,17 @@ interface Props<T> {
     longitudeDelta: number
   }
 
-  initialRadius: {
-    radius: number
-  }
+  markers: T[]
 
-  markers: MapMarker[]
+  canScroll?: boolean
+  canZoom?: boolean
+  canRotate?: boolean
 
-  currentSelectedMarker: String | undefined
+  renderMarker: (marker: T) => React.ReactNode
 
-  movementSettings: {
-    canScroll: boolean
-    canZoom: boolean
-    canRotate: boolean
-  }
+  renderCircle?: (marker: T) => React.ReactNode
 
-  renderMarker: (marker: MapMarker) => React.ReactNode
-
-  renderCircle?: (marker: MapMarker) => React.ReactNode
-
-  onMarkerSelected?: (marker: MapMarker) => void
+  onMarkerSelected?: (marker: T) => void
 }
 
 // When clicking on the marker, zoom towards where it is.
@@ -74,16 +65,16 @@ function circleCoordinateGeneration (lat: number, long: number, radius: number) 
 }
 
 // Map view component itself
-export function MapComponent<T extends MapMarker> ({
+export function Map<T extends MapMarker> ({
   initialRegion,
   markers,
-  currentSelectedMarker,
   renderMarker,
   renderCircle,
   onMarkerSelected,
-  initialRadius,
   mapStyle,
-  movementSettings
+  canScroll = true,
+  canRotate = true,
+  canZoom = true
 }: Props<T>) {
   // Map references
   const mapRef = React.useRef<MapView | null>(null)
@@ -95,7 +86,6 @@ export function MapComponent<T extends MapMarker> ({
         <>
           <Marker
             key={marker.key}
-            title={marker.title}
             coordinate={{
               latitude: marker.location.latitude,
               longitude: marker.location.longitude
@@ -125,8 +115,8 @@ export function MapComponent<T extends MapMarker> ({
         provider={PROVIDER_GOOGLE}
         initialRegion={initialRegion}
         ref={mapRef}
-        rotateEnabled={movementSettings.canRotate}
-        scrollEnabled={movementSettings.canScroll}
+        rotateEnabled={canRotate}
+        scrollEnabled={canScroll}
         loadingEnabled={true}
         toolbarEnabled={false}
         onLongPress={(e) => {
@@ -137,7 +127,7 @@ export function MapComponent<T extends MapMarker> ({
         }}
         followsUserLocation={true}
         showsUserLocation={true}
-        zoomEnabled={movementSettings.canZoom}
+        zoomEnabled={canZoom}
         customMapStyle={[
           {
             featureType: "poi",
@@ -161,4 +151,4 @@ const fillStyle = StyleSheet.create({
   }
 })
 
-export default MapComponent
+export default Map
