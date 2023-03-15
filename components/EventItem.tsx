@@ -1,6 +1,6 @@
 import React from "react"
 import { Image, StyleSheet, Text, View } from "react-native"
-import { Event } from "@lib/events/Event"
+import { HostedEvent } from "@lib/events/Event"
 import IconButton from "./common/IconButton"
 import { Divider, Icon } from "react-native-elements"
 import { Shadow } from "react-native-shadow-2"
@@ -9,14 +9,14 @@ import { placemarkToFormattedAddress } from "@lib/location"
 import { compactFormatMiles } from "@lib/DistanceFormatting"
 
 interface Props {
-  event: Event
+  event: HostedEvent
 }
 
 const EventItem = ({ event }: Props) => {
   const numAttendees = 1
   const distance = 0.5
   const shadowColor = "#bdbdbd"
-  const lightEventColor = tinycolor(event.color).lighten(10).toString()
+  const lightEventColor = tinycolor(event.details.color).lighten(10).toString()
 
   const onPressMore = () => {
     return null
@@ -37,7 +37,9 @@ const EventItem = ({ event }: Props) => {
             source={require("../assets/icon.png")}
             accessibilityLabel="profile picture"
           />
-          <Text style={styles.name}>{event.hostname}</Text>
+          <Text
+            style={styles.name}
+          >{`${event.host.firstName} ${event.host.lastName}`}</Text>
           <IconButton
             iconName={"more-horiz"}
             style={styles.moreButtonStyle}
@@ -48,21 +50,21 @@ const EventItem = ({ event }: Props) => {
 
         {/* Event Title, Location, Time */}
         <View style={styles.middleRow}>
-          <Text style={styles.titleText}>{event.title}</Text>
+          <Text style={styles.titleText}>{event.details.title}</Text>
 
           <View style={[styles.location, styles.flexRow]}>
-            <Icon name="location-on" color={event.color} />
+            <Icon name="location-on" color={event.details.color} />
             <Text style={styles.infoText}>
-              {event.placemark
-                ? placemarkToFormattedAddress(event.placemark)
+              {event.details.placemark
+                ? placemarkToFormattedAddress(event.details.placemark)
                 : "Unknown Address"}
             </Text>
           </View>
 
           <View style={styles.flexRow}>
-            <Icon name="event-available" color={event.color} />
+            <Icon name="event-available" color={event.details.color} />
             <Text style={styles.infoText} accessibilityLabel="day">
-              {event.dateRange.formatted()}
+              {event.details.dateRange.formatted()}
             </Text>
           </View>
 
@@ -74,7 +76,7 @@ const EventItem = ({ event }: Props) => {
         {/* People Attending, Distance */}
         <View style={styles.distanceContainer}>
           <View style={[styles.flexRow, { alignItems: "center" }]}>
-            <Icon name="people-alt" color={event.color} />
+            <Icon name="people-alt" color={event.details.color} />
             <Text
               style={[styles.attendingText, styles.attendingNumber]}
             >{`${numAttendees}`}</Text>
@@ -86,7 +88,7 @@ const EventItem = ({ event }: Props) => {
               style={[
                 styles.distance,
                 {
-                  backgroundColor: event.color,
+                  backgroundColor: event.details.color,
                   borderColor: lightEventColor
                 }
               ]}

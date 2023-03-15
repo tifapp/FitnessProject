@@ -71,7 +71,7 @@ describe("EventFormScreen tests", () => {
   })
 
   it("forwards created event from submission", async () => {
-    const event = TestEventItems.mockEvent(new Date(1000), new Date(2000))
+    const event = TestEventItems.mockHostedEvent(new Date(1000), new Date(2000))
     events.saveEvent.mockResolvedValue(event)
 
     renderEventFormScreen(baseTestEventFormValues)

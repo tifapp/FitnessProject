@@ -2,7 +2,7 @@ import { FontScaleFactors } from "../../lib/FontScale"
 import React from "react"
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { useEventFormContext } from "./EventForm"
-import { EventFormValuesSchema } from "./EventFormValues"
+import { eventFormValuesToSaveInput } from "./EventFormValues"
 
 /**
  * Props from `EventFormSubmitButton`.
@@ -44,9 +44,9 @@ export const EventFormSubmitButton = ({
 }
 
 const useSubmit = () => {
-  const { formState, submit, reset } = useEventFormContext()
+  const { formState, submit, reset, watch } = useEventFormContext()
   const { isDirty, isSubmitting } = formState
-  const isValid = useIsValidForm()
+  const isValid = !!eventFormValuesToSaveInput(watch())
   const canSubmit = isValid && !isSubmitting && isDirty
   if (!canSubmit) return undefined
   return async () => {
@@ -61,17 +61,6 @@ const useSubmit = () => {
         [{ text: "Ok" }]
       )
     }
-  }
-}
-
-// TODO: - Remove this hack
-const useIsValidForm = () => {
-  const { watch } = useEventFormContext()
-  try {
-    EventFormValuesSchema.parse(watch())
-    return true
-  } catch {
-    return false
   }
 }
 

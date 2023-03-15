@@ -12,7 +12,7 @@ describe("eventUI Component Tests", () => {
   it("Displays time in same format as dateRange", () => {
     render(
       <EventItem
-        event={TestEventItems.mockEvent(
+        event={TestEventItems.mockHostedEvent(
           new Date("2023-02-26T17:00:00"),
           new Date("2023-02-26T19:00:00")
         )}

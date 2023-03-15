@@ -1,5 +1,5 @@
 import { useReactHookFormContext } from "../../hooks/FormHooks"
-import { eventsDependencyKey, Event } from "../../lib/events"
+import { eventsDependencyKey, HostedEvent } from "../../lib/events"
 import React, {
   ReactNode,
   useContext,
@@ -10,9 +10,8 @@ import React, {
 } from "react"
 import { useForm, FormProvider, useController } from "react-hook-form"
 import { Keyboard } from "react-native"
-import { EventFormValues, EventFormValuesSchema } from "./EventFormValues"
+import { EventFormValues, eventFormValuesToSaveInput } from "./EventFormValues"
 import { useDependencyValue } from "@lib/dependencies"
-import { zodResolver } from "@hookform/resolvers/zod"
 
 export type EventFormSection = "date" | "color" | "advanced"
 
@@ -30,7 +29,7 @@ export type EventFormProps = {
    * Handles the submission of the form. This method should not throw
    * any errors and should handle them internally.
    */
-  onSubmit: (event: Event) => void
+  onSubmit: (event: HostedEvent) => void
 
   /**
    * A handler for the dismissal of this form.
@@ -50,10 +49,7 @@ export const EventForm = ({
   children
 }: EventFormProps) => {
   const events = useDependencyValue(eventsDependencyKey)
-  const formMethods = useForm({
-    defaultValues: initialValues,
-    resolver: zodResolver(EventFormValuesSchema)
-  })
+  const formMethods = useForm({ defaultValues: initialValues })
   const { handleSubmit, setFocus } = formMethods
   const [currentSection, setCurrentSection] = useState<
     EventFormSection | undefined
@@ -72,20 +68,9 @@ export const EventForm = ({
         value={{
           submit: async () => {
             await handleSubmit(async (formValues) => {
-              const event = await events.saveEvent({
-                title: formValues.title,
-                description:
-                  formValues.description.length > 0
-                    ? formValues.description
-                    : undefined,
-                // NB: This force unwrap is fine, because we verify that it cannot be
-                // optional by parsing with zod first.
-                location: formValues.locationInfo!!.coordinates,
-                dateRange: formValues.dateRange,
-                color: formValues.color,
-                shouldHideAfterStartDate: formValues.shouldHideAfterStartDate,
-                radiusMeters: formValues.radiusMeters
-              })
+              const saveInput = eventFormValuesToSaveInput(formValues)
+              if (!saveInput) return
+              const event = await events.saveEvent(saveInput)
               onSubmit(event)
             })()
           },

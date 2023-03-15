@@ -1,41 +1,46 @@
-import { EventColorsSchema } from "../../lib/events/EventColors"
-import { FixedDateRangeSchema } from "../../lib/date"
-import { LocationSchema } from "../../lib/location"
-import { z } from "zod"
-import { ZodUtils } from "@lib/Zod"
+import { EventColors } from "../../lib/events/EventColors"
+import { FixedDateRange } from "../../lib/date"
+import { Location } from "../../lib/location"
+import { SaveEventInput, SaveEventInputSchema } from "@lib/events"
 
-export const EventFormPlacemarkInfoSchema = z.object({
-  name: z.string().optional(),
-  address: z.string().optional()
-})
+export type EventFormPlacemarkInfo = Readonly<{
+  name?: string
+  address?: string
+}>
 
-export type EventFormPlacemarkInfo = ZodUtils.ReadonlyInferred<
-  typeof EventFormPlacemarkInfoSchema
->
-
-export const EventFormLocationInfoSchema = z.object({
-  coordinates: LocationSchema,
-  placemarkInfo: EventFormPlacemarkInfoSchema.optional()
-})
-
-export type EventFormLocationInfo = ZodUtils.ReadonlyInferred<
-  typeof EventFormLocationInfoSchema
->
-
-export const EventFormValuesSchema = z.object({
-  id: z.string().optional(),
-  title: z.string().max(75).min(1),
-  description: z.string().max(500),
-  locationInfo: EventFormLocationInfoSchema.optional(),
-  dateRange: FixedDateRangeSchema,
-  color: EventColorsSchema,
-  shouldHideAfterStartDate: z.boolean(),
-  radiusMeters: z.number().nonnegative()
-})
+export type EventFormLocationInfo = Readonly<{
+  coordinates: Location
+  placemarkInfo?: EventFormPlacemarkInfo
+}>
 
 /**
  * Values held by an `EventForm`.
  */
-export type EventFormValues = ZodUtils.ReadonlyInferred<
-  typeof EventFormValuesSchema
->
+export type EventFormValues = Readonly<{
+  id?: string
+  title: string
+  description: string
+  locationInfo?: EventFormLocationInfo
+  dateRange: FixedDateRange
+  color: EventColors
+  shouldHideAfterStartDate: boolean
+  radiusMeters: number
+}>
+
+/**
+ * Converts {@link EventFormValues} to a {@link SaveEventInput} type if possible.
+ */
+export const eventFormValuesToSaveInput = (values: EventFormValues) => {
+  const parsed = SaveEventInputSchema.passthrough().safeParse({
+    id: values.id,
+    title: values.title,
+    dateRange: values.dateRange,
+    color: values.color,
+    shouldHideAfterStartDate: values.shouldHideAfterStartDate,
+    radiusMeters: values.radiusMeters,
+    description:
+      values.description.length === 0 ? undefined : values.description,
+    location: values.locationInfo?.coordinates
+  })
+  return parsed.success ? parsed.data : undefined
+}
