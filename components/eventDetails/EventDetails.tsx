@@ -184,6 +184,7 @@ const styles = StyleSheet.create({
     marginBottom: 8
   },
   details: {
+    textAlignVertical: "center",
     fontWeight: "bold",
     fontSize: 15
   },
