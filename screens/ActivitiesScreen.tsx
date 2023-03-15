@@ -1,13 +1,15 @@
 import EventsList from "@components/EventsList"
 import MapComponent from "@components/MapComponent"
 import { mapCompStyle, state } from "@components/MapTestData"
+import { Auth } from "aws-amplify"
 import React, { useState } from "react"
+import { Alert } from "react-native"
 
 const ActivitiesScreen = () => {
   const [circleRadius, setCircleRadius] = useState(100)
   const [selectedMarker, setSelectedMarker] = useState<String | undefined>("1")
 
-  /* function signOut () {
+  function signOut () {
     const title = "Are you sure you want to sign out?"
     const message = ""
     Alert.alert(
@@ -24,7 +26,7 @@ const ActivitiesScreen = () => {
       ],
       { cancelable: true }
     )
-  } */
+  }
 
   return (
     <>
