@@ -1,2 +1,2 @@
 export * from "./History"
-export * from "./Client"
+export * from "./Result"

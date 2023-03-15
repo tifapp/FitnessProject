@@ -26,7 +26,7 @@ describe("eventUI Component Tests", () => {
       </MenuProvider>
     )
 
-    fireEvent.press(screen.getByTestId(moreButtonLabel))
+    openDropdown()
     expect(screen.queryByText("Delete")).toBeDefined()
     expect(screen.queryByText("Report")).toBeNull()
   })
@@ -38,7 +38,7 @@ describe("eventUI Component Tests", () => {
       </MenuProvider>
     )
 
-    fireEvent.press(screen.getByTestId(moreButtonLabel))
+    openDropdown()
     expect(screen.queryByText("Report")).toBeDefined()
     expect(screen.queryByText("Delete")).toBeNull()
   })
@@ -49,23 +49,23 @@ describe("eventUI Component Tests", () => {
         <MenuDropdown isEventHost={true} />
       </MenuProvider>
     )
-    fireEvent.press(screen.getByTestId(moreButtonLabel))
-    fireEvent.press(screen.getByText("Delete"))
+    openDropdown()
+    selectDelete()
 
     expect(alertPresentationSpy).toHaveBeenCalled()
   })
 
   //* * Right now event isn't removed */
-  it("Clicking delete on alert closes alert and removes event", () => {
+  it("Clicking delete on alert closes alert and removes event", async () => {
     render(
       <MenuProvider>
         <MenuDropdown isEventHost={true} />
       </MenuProvider>
     )
-    fireEvent.press(screen.getByTestId(moreButtonLabel))
-    fireEvent.press(screen.getByText("Delete"))
+    openDropdown()
+    selectDelete()
+    await dismissConfirmDelete()
 
-    dismissConfirmDelete()
     expect(screen.queryByText("Delete this event?")).toBeNull()
   })
 
@@ -75,23 +75,23 @@ describe("eventUI Component Tests", () => {
         <MenuDropdown isEventHost={false} />
       </MenuProvider>
     )
-    fireEvent.press(screen.getByTestId(moreButtonLabel))
-    fireEvent.press(screen.getByText("Report"))
+    openDropdown()
+    selectReport()
 
     expect(alertPresentationSpy).toHaveBeenCalled()
   })
 
   //* * Right now reporting isn't implemented */
-  it("Clicking report on alert closes alert and reports", () => {
+  it("Clicking report on alert closes alert and reports", async () => {
     render(
       <MenuProvider>
         <MenuDropdown isEventHost={false} />
       </MenuProvider>
     )
-    fireEvent.press(screen.getByTestId(moreButtonLabel))
-    fireEvent.press(screen.getByText("Report"))
+    openDropdown()
+    selectReport()
+    await dismissConfirmReport()
 
-    dismissConfirmReport()
     expect(screen.queryByText("Report this event?")).toBeNull()
   })
 })
@@ -102,10 +102,22 @@ const moreButtonLabel = "more options"
 // Alert helpers
 const { alertPresentationSpy, tapAlertButton } = captureAlerts()
 
-const dismissConfirmDelete = () => {
-  tapAlertButton("Delete")
+const dismissConfirmDelete = async () => {
+  await tapAlertButton("Delete")
 }
 
-const dismissConfirmReport = () => {
-  tapAlertButton("Report")
+const dismissConfirmReport = async () => {
+  await tapAlertButton("Report")
+}
+
+const openDropdown = () => {
+  fireEvent.press(screen.getByTestId(moreButtonLabel))
+}
+
+const selectDelete = () => {
+  fireEvent.press(screen.getByText("Delete"))
+}
+
+const selectReport = () => {
+  fireEvent.press(screen.getByText("Report"))
 }

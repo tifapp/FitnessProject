@@ -40,9 +40,21 @@ const ActivitiesScreen = () => {
         mapStyle={mapCompStyle.container}
         initialRegion={state.initialRegion}
         initialRadius={{ radius: circleRadius }}
+        renderMarker={(item) => <Text> Lesgoo </Text>}
+        renderCircle={(item) => (
+          <Circle
+            radius={1000}
+            center={{
+              latitude: item.location.latitude,
+              longitude: item.location.longitude
+            }}
+            fillColor={"rgba(0, 0, 0, 0.5)"}
+            strokeColor={"gray"}
+            strokeWidth={1}
+          />
+        )}
         currentSelectedMarker={selectedMarker}
         markers={state.markers}
-        customizers={state.customizers}
         movementSettings={state.movementSettings}
       />
       <EventsList />
