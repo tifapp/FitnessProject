@@ -1,5 +1,5 @@
-import React, { useRef } from "react"
-import { Image, StyleSheet, Text, View } from "react-native"
+import React, { useEffect, useRef } from "react"
+import { Image, Modal, StyleSheet, Text, View } from "react-native"
 import { Event } from "@lib/events/Event"
 import { Divider } from "react-native-elements"
 import { Shadow } from "react-native-shadow-2"
@@ -10,6 +10,7 @@ import { MaterialCommunityIcon } from "../common/Icons"
 import MenuDropdown from "./MenuDropdown"
 import { BottomSheetModal } from "@gorhom/bottom-sheet"
 import { TouchableWithoutFeedback } from "react-native-gesture-handler"
+import EventDetails from "@components/eventDetails/EventDetails"
 
 interface Props {
   event: Event
