@@ -1,7 +1,7 @@
 import { EventColors } from "../../lib/events/EventColors"
 import { FixedDateRange } from "../../lib/date"
 import { Location } from "../../lib/location"
-import { SaveEventInput, SaveEventInputSchema } from "@lib/events"
+import { SaveEventInputSchema } from "@lib/events"
 
 export type EventFormPlacemarkInfo = Readonly<{
   name?: string

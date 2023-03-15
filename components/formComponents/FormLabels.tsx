@@ -118,7 +118,8 @@ const styles = StyleSheet.create({
   },
   captionText: {
     fontSize: 12,
-    opacity: 0.5
+    opacity: 0.5,
+    marginTop: 4
   },
   headerSkeleton: {
     width: 128,
