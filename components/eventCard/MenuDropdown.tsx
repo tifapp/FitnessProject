@@ -50,11 +50,6 @@ const MenuDropdown = ({ isEventHost }: Props) => {
         customStyles={{
           TriggerTouchableComponent: TouchableOpacity
         }}
-        // Increase area where menu is triggered
-        style={{
-          paddingLeft: 16,
-          paddingVertical: 6
-        }}
       >
         <MaterialIcon name="more-horiz" />
       </MenuTrigger>

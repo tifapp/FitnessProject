@@ -1,16 +1,19 @@
+import React, { useState } from "react"
 import EventsList from "@components/EventsList"
 import MapComponent from "@components/MapComponent"
 import { mapCompStyle, state } from "@components/MapTestData"
-import { Auth } from "aws-amplify"
-import React, { useState } from "react"
-import { Alert, Text } from "react-native"
-import { Circle } from "react-native-maps"
+import EventDetails from "@components/eventDetails/EventDetails"
+import { TestEventItems } from "@lib/events"
 
 const ActivitiesScreen = () => {
   const [circleRadius, setCircleRadius] = useState(100)
   const [selectedMarker, setSelectedMarker] = useState<String | undefined>("1")
-
-  function signOut () {
+  const startTime = new Date()
+  const endTime = new Date()
+  endTime.setDate(endTime.getDate() + 2)
+  endTime.setHours(endTime.getHours() + 2)
+  const event = TestEventItems.mockEvent(startTime, endTime, true, "3")
+  /* function signOut () {
     const title = "Are you sure you want to sign out?"
     const message = ""
     Alert.alert(
@@ -27,9 +30,11 @@ const ActivitiesScreen = () => {
       ],
       { cancelable: true }
     )
-  }
+  } */
 
-  return (
+  return <EventDetails event={event} numAttendees={3} />
+}
+/*
     <>
       <MapComponent
         mapStyle={mapCompStyle.container}
@@ -53,8 +58,5 @@ const ActivitiesScreen = () => {
         movementSettings={state.movementSettings}
       />
       <EventsList />
-    </>
-  )
-}
-
+</> */
 export default ActivitiesScreen

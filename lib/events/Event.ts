@@ -17,6 +17,7 @@ export type Event = {
   readonly color: EventColors
   readonly coordinates: Location
   readonly address: Placemark
+  readonly isAttending: boolean
 }
 
 /**
@@ -49,11 +50,13 @@ export namespace TestEventItems {
       userId: "3234324",
       username: "Nicolette Antisdel",
       title: "Pickup Basketball",
+      description: "This is a test description",
       writtenByYou: eventHost,
       dateRange: dateRange(start, end),
       color: EventColors.Red,
       coordinates: { latitude: 36.991585, longitude: -122.058277 },
-      address
+      address,
+      isAttending: true
     }
   }
 }

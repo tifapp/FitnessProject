@@ -1,5 +1,5 @@
-import React from "react"
-import { Image, StyleSheet, Text, View } from "react-native"
+import React, { useEffect, useRef } from "react"
+import { Image, Modal, StyleSheet, Text, View } from "react-native"
 import { Event } from "@lib/events/Event"
 import { Divider } from "react-native-elements"
 import { Shadow } from "react-native-shadow-2"
@@ -8,6 +8,9 @@ import { placemarkToFormattedAddress } from "@lib/location"
 import { compactFormatMiles } from "@lib/DistanceFormatting"
 import { MaterialCommunityIcon } from "../common/Icons"
 import MenuDropdown from "./MenuDropdown"
+import { BottomSheetModal } from "@gorhom/bottom-sheet"
+import { TouchableWithoutFeedback } from "react-native-gesture-handler"
+import EventDetails from "@components/eventDetails/EventDetails"
 
 interface Props {
   event: Event
@@ -20,7 +23,7 @@ const EventItem = ({ event }: Props) => {
 
   // Show event details screen
   const onPressEvent = () => {
-    console.log("test")
+    // console.log("test")
   }
 
   return (
@@ -31,84 +34,86 @@ const EventItem = ({ event }: Props) => {
       startColor={lightEventColor}
       stretch={true}
     >
-      <View style={styles.container}>
-        {/* Profile Image, Name, More button */}
-        <View style={[styles.topRow, styles.flexRow]}>
-          <Image
-            style={[styles.image, styles.iconMargin]}
-            source={require("../../assets/icon.png")}
-            accessibilityLabel="profile picture"
-          />
-          <Text style={styles.name}>{event.username}</Text>
+      <TouchableWithoutFeedback onPress={onPressEvent}>
+        <View style={styles.container}>
+          {/* Profile Image, Name, More button */}
+          <View style={[styles.topRow, styles.flexRow]}>
+            <Image
+              style={[styles.image, styles.iconMargin]}
+              source={require("../../assets/icon.png")}
+              accessibilityLabel="profile picture"
+            />
+            <Text style={styles.name}>{event.username}</Text>
 
-          {/* Dropdown menu when more button is pressed */}
-          <View style={styles.moreButtonStyle}>
-            <MenuDropdown isEventHost={event.writtenByYou} />
+            {/* Dropdown menu when more button is pressed */}
+            <View style={styles.moreButtonStyle}>
+              <MenuDropdown isEventHost={event.writtenByYou} />
+            </View>
+          </View>
+
+          {/* Event Title, Location, Time */}
+          <View style={styles.middleRow}>
+            <Text style={styles.titleText}>{event.title}</Text>
+
+            <View style={[styles.location, styles.flexRow]}>
+              <MaterialCommunityIcon
+                name="map-marker-outline"
+                color={event.color}
+                style={styles.iconMargin}
+              />
+              <Text style={styles.infoText}>
+                {placemarkToFormattedAddress(event.address)}
+              </Text>
+            </View>
+            <View style={styles.flexRow}>
+              <MaterialCommunityIcon
+                name="calendar-check-outline"
+                color={event.color}
+                style={styles.iconMargin}
+              />
+              <Text style={styles.infoText} accessibilityLabel="day">
+                {event.dateRange.formatted()}
+              </Text>
+            </View>
+          </View>
+
+          <View style={{ marginVertical: 16 }}>
+            <Divider style={{ height: 1, opacity: 0.4 }} />
+          </View>
+
+          {/* People Attending, Distance */}
+          <View style={styles.distanceContainer}>
+            <View style={[styles.flexRow, { alignItems: "center" }]}>
+              <MaterialCommunityIcon
+                name="account-multiple-outline"
+                color={event.color}
+                style={styles.iconMargin}
+              />
+              <Text
+                style={[styles.attendingText, styles.attendingNumber]}
+              >{`${numAttendees}`}</Text>
+              <Text style={styles.attendingText}>{" attending"}</Text>
+            </View>
+            <View
+              style={[
+                styles.distance,
+                {
+                  backgroundColor: lightEventColor
+                }
+              ]}
+            >
+              <MaterialCommunityIcon
+                name="navigation-variant-outline"
+                color={event.color}
+                style={styles.iconMargin}
+              />
+              <Text style={[styles.distanceText, { color: event.color }]}>
+                {compactFormatMiles(distance)}
+              </Text>
+            </View>
           </View>
         </View>
-
-        {/* Event Title, Location, Time */}
-        <View style={styles.middleRow}>
-          <Text style={styles.titleText}>{event.title}</Text>
-
-          <View style={[styles.location, styles.flexRow]}>
-            <MaterialCommunityIcon
-              name="map-marker-outline"
-              color={event.color}
-              style={styles.iconMargin}
-            />
-            <Text style={styles.infoText}>
-              {placemarkToFormattedAddress(event.address)}
-            </Text>
-          </View>
-          <View style={styles.flexRow}>
-            <MaterialCommunityIcon
-              name="calendar-check-outline"
-              color={event.color}
-              style={styles.iconMargin}
-            />
-            <Text style={styles.infoText} accessibilityLabel="day">
-              {event.dateRange.formatted()}
-            </Text>
-          </View>
-        </View>
-
-        <View style={{ marginVertical: 16 }}>
-          <Divider style={{ height: 1, opacity: 0.4 }} />
-        </View>
-
-        {/* People Attending, Distance */}
-        <View style={styles.distanceContainer}>
-          <View style={[styles.flexRow, { alignItems: "center" }]}>
-            <MaterialCommunityIcon
-              name="account-multiple-outline"
-              color={event.color}
-              style={styles.iconMargin}
-            />
-            <Text
-              style={[styles.attendingText, styles.attendingNumber]}
-            >{`${numAttendees}`}</Text>
-            <Text style={styles.attendingText}>{" attending"}</Text>
-          </View>
-          <View
-            style={[
-              styles.distance,
-              {
-                backgroundColor: lightEventColor
-              }
-            ]}
-          >
-            <MaterialCommunityIcon
-              name="navigation-variant-outline"
-              color={event.color}
-              style={styles.iconMargin}
-            />
-            <Text style={[styles.distanceText, { color: event.color }]}>
-              {compactFormatMiles(distance)}
-            </Text>
-          </View>
-        </View>
-      </View>
+      </TouchableWithoutFeedback>
     </Shadow>
   )
 }
