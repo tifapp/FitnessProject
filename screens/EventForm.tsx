@@ -24,6 +24,9 @@ export type EventFormScreenProps = {
   onDismiss: () => void
 }
 
+/**
+ * A screen for the user to create and update events.
+ */
 export const EventFormScreen = ({
   initialValues,
   onSubmit,

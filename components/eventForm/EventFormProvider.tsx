@@ -217,6 +217,9 @@ export const useEventFormPresentedSection = () => {
   }
 }
 
+/**
+ * Returns a value from the current set of event form values denoted by the key.
+ */
 export const useEventFormValue = <T extends keyof EventFormValues>(key: T) => {
   return useWatch({ name: key }) as EventFormValues[T]
 }
