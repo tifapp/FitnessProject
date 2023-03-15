@@ -1,14 +1,11 @@
-import { EventColors } from "@lib/events/EventColors"
+import EventsList from "@components/EventsList"
+import MapComponent from "@components/MapComponent"
+import { mapCompStyle, state } from "@components/MapTestData"
 import { Auth } from "aws-amplify"
 import React, { useState } from "react"
 import { Alert } from "react-native"
-import { QueryClient } from "react-query"
-import { EventFormTestScreen } from "./testScreens/EventFormTestScreen"
-
-const queryClient = new QueryClient()
 
 const ActivitiesScreen = () => {
-  const [color, setColor] = useState(EventColors.Red)
   const [circleRadius, setCircleRadius] = useState(100)
   const [selectedMarker, setSelectedMarker] = useState<String | undefined>("1")
 
@@ -31,7 +28,20 @@ const ActivitiesScreen = () => {
     )
   }
 
-  return <EventFormTestScreen />
+  return (
+    <>
+      <MapComponent
+        mapStyle={mapCompStyle.container}
+        initialRegion={state.initialRegion}
+        initialRadius={{ radius: circleRadius }}
+        currentSelectedMarker={selectedMarker}
+        markers={state.markers}
+        customizers={state.customizers}
+        movementSettings={state.movementSettings}
+      />
+      <EventsList />
+    </>
+  )
 }
 
 export default ActivitiesScreen

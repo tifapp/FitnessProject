@@ -1,49 +1,50 @@
 import React from "react"
 import { Image, StyleSheet, Text, View } from "react-native"
 import { Event } from "@lib/events/Event"
-import IconButton from "./common/IconButton"
-import { Divider, Icon } from "react-native-elements"
+import { Divider } from "react-native-elements"
 import { Shadow } from "react-native-shadow-2"
 import tinycolor from "tinycolor2"
 import { placemarkToFormattedAddress } from "@lib/location"
 import { compactFormatMiles } from "@lib/DistanceFormatting"
+import { MaterialCommunityIcon } from "../common/Icons"
+import MenuDropdown from "./MenuDropdown"
 
 interface Props {
   event: Event
 }
 
 const EventItem = ({ event }: Props) => {
-  const numAttendees = 1
-  const distance = 0.5
-  const shadowColor = "#bdbdbd"
-  const lightEventColor = tinycolor(event.color).lighten(10).toString()
+  const numAttendees = 1 // Eventually will come from event object
+  const distance = 0.5 // Eventually will be calculated from the location given in the event object
+  const lightEventColor = tinycolor(event.color).lighten(25).toString()
 
-  const onPressMore = () => {
-    return null
+  // Show event details screen
+  const onPressEvent = () => {
+    console.log("test")
   }
 
   return (
     <Shadow
-      distance={5}
-      startColor={shadowColor}
-      offset={[0, 3]}
-      style={{ alignSelf: "stretch" }}
+      distance={16}
+      offset={[-2, 4]}
+      shadowViewProps={{ style: { opacity: 0.25 } }}
+      startColor={lightEventColor}
+      stretch={true}
     >
-      <View style={[styles.container]}>
+      <View style={styles.container}>
         {/* Profile Image, Name, More button */}
         <View style={[styles.topRow, styles.flexRow]}>
           <Image
-            style={styles.image}
-            source={require("../assets/icon.png")}
+            style={[styles.image, styles.iconMargin]}
+            source={require("../../assets/icon.png")}
             accessibilityLabel="profile picture"
           />
           <Text style={styles.name}>{event.username}</Text>
-          <IconButton
-            iconName={"more-horiz"}
-            style={styles.moreButtonStyle}
-            size={26}
-            onPress={onPressMore}
-          />
+
+          {/* Dropdown menu when more button is pressed */}
+          <View style={styles.moreButtonStyle}>
+            <MenuDropdown isEventHost={event.writtenByYou} />
+          </View>
         </View>
 
         {/* Event Title, Location, Time */}
@@ -51,50 +52,61 @@ const EventItem = ({ event }: Props) => {
           <Text style={styles.titleText}>{event.title}</Text>
 
           <View style={[styles.location, styles.flexRow]}>
-            <Icon name="location-on" color={event.color} />
+            <MaterialCommunityIcon
+              name="map-marker-outline"
+              color={event.color}
+              style={styles.iconMargin}
+            />
             <Text style={styles.infoText}>
               {placemarkToFormattedAddress(event.address)}
             </Text>
           </View>
-
           <View style={styles.flexRow}>
-            <Icon name="event-available" color={event.color} />
+            <MaterialCommunityIcon
+              name="calendar-check-outline"
+              color={event.color}
+              style={styles.iconMargin}
+            />
             <Text style={styles.infoText} accessibilityLabel="day">
               {event.dateRange.formatted()}
             </Text>
           </View>
+        </View>
 
-          <View style={{ paddingVertical: "4%" }}>
-            <Divider style={{ height: 1 }} />
-          </View>
+        <View style={{ marginVertical: 16 }}>
+          <Divider style={{ height: 1, opacity: 0.4 }} />
         </View>
 
         {/* People Attending, Distance */}
         <View style={styles.distanceContainer}>
           <View style={[styles.flexRow, { alignItems: "center" }]}>
-            <Icon name="people-alt" color={event.color} />
+            <MaterialCommunityIcon
+              name="account-multiple-outline"
+              color={event.color}
+              style={styles.iconMargin}
+            />
             <Text
               style={[styles.attendingText, styles.attendingNumber]}
             >{`${numAttendees}`}</Text>
             <Text style={styles.attendingText}>{" attending"}</Text>
           </View>
-
-          <Shadow distance={4} startColor={shadowColor} offset={[0, 1]}>
-            <View
-              style={[
-                styles.distance,
-                {
-                  backgroundColor: event.color,
-                  borderColor: lightEventColor
-                }
-              ]}
-            >
-              <Icon name="near-me" size={20} color="white" />
-              <Text style={styles.distanceText}>
-                {compactFormatMiles(distance)}
-              </Text>
-            </View>
-          </Shadow>
+          <View
+            style={[
+              styles.distance,
+              {
+                backgroundColor: lightEventColor
+              }
+            ]}
+          >
+            <MaterialCommunityIcon
+              name="navigation-variant-outline"
+              color={event.color}
+              style={styles.iconMargin}
+            />
+            <Text style={[styles.distanceText, { color: event.color }]}>
+              {compactFormatMiles(distance)}
+            </Text>
+          </View>
         </View>
       </View>
     </Shadow>
@@ -107,7 +119,7 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   topRow: {
-    paddingBottom: "4%",
+    paddingBottom: 16,
     alignItems: "center"
   },
   middleRow: {
@@ -115,16 +127,14 @@ const styles = StyleSheet.create({
     flexDirection: "column"
   },
   location: {
-    paddingBottom: "3%"
+    paddingBottom: 8
   },
   infoText: {
     textAlignVertical: "center",
-    color: "grey",
-    paddingLeft: "2%"
+    color: "grey"
   },
   attendingNumber: {
-    fontWeight: "bold",
-    paddingLeft: "5%"
+    fontWeight: "bold"
   },
   attendingText: {
     textAlignVertical: "center",
@@ -134,24 +144,20 @@ const styles = StyleSheet.create({
     textAlignVertical: "center",
     fontWeight: "bold",
     fontSize: 22,
-    paddingBottom: "1%"
+    marginBottom: 8
   },
   name: {
     textAlignVertical: "center",
     fontWeight: "bold",
     fontSize: 15,
-    paddingLeft: "3%"
-  },
-  moreButtonStyle: {
-    flex: 1,
-    alignItems: "flex-end"
+    paddingLeft: 8
   },
   distance: {
     flexDirection: "row",
     alignSelf: "center",
-    paddingVertical: "3%",
-    borderRadius: 14,
-    borderWidth: 3
+    paddingVertical: 2,
+    paddingLeft: 4,
+    borderRadius: 12
   },
   distanceContainer: {
     flexDirection: "row"
@@ -159,8 +165,7 @@ const styles = StyleSheet.create({
   distanceText: {
     textAlignVertical: "center",
     color: "white",
-    paddingRight: "3%",
-    paddingLeft: "1%",
+    paddingRight: 8,
     fontWeight: "bold"
   },
   image: {
@@ -170,9 +175,19 @@ const styles = StyleSheet.create({
   },
   container: {
     backgroundColor: "white",
-    paddingHorizontal: "6%",
-    paddingVertical: "3%",
-    borderRadius: 20
+    paddingHorizontal: 18,
+    paddingVertical: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(145, 145, 145, 0.1)"
+  },
+  iconMargin: {
+    marginRight: 8
+  },
+  moreButtonStyle: {
+    flex: 1,
+    opacity: 0.4,
+    alignItems: "flex-end"
   }
 })
 

@@ -11,7 +11,6 @@ export type Event = {
   readonly userId: string
   readonly username: string
   readonly title: string
-  readonly repliesCount: number
   readonly description?: string
   readonly writtenByYou: boolean
   readonly dateRange: FixedDateRange
@@ -36,14 +35,21 @@ export namespace TestEventItems {
     city: "Santa Cruz"
   }
 
-  export const mockEvent = (start: Date, end: Date): Event => {
+  export const mockEvent = (
+    start: Date,
+    end: Date,
+    eventHost: boolean,
+    id?: string
+  ): Event => {
+    let givenID: string
+    if (id) givenID = id
+    else givenID = testId
     return {
-      id: testId,
+      id: givenID,
       userId: "3234324",
       username: "Nicolette Antisdel",
       title: "Pickup Basketball",
-      repliesCount: 2,
-      writtenByYou: true,
+      writtenByYou: eventHost,
       dateRange: dateRange(start, end),
       color: EventColors.Red,
       coordinates: { latitude: 36.991585, longitude: -122.058277 },
