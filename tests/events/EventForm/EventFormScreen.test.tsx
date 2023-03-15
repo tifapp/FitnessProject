@@ -3,7 +3,7 @@ import { dateRange } from "@lib/Date"
 import { UpdateDependencyValues } from "@lib/dependencies"
 import { EventColors } from "@lib/events/EventColors"
 import { geocodingDependencyKey } from "@lib/location"
-import EventFormScreen from "@screens/EventFormScreen"
+import { EventFormScreen } from "@screens/EventForm"
 import {
   fireEvent,
   render,
@@ -26,7 +26,8 @@ import {
 import { hapticsDependencyKey } from "@lib/Haptics"
 import { neverPromise } from "../../helpers/Promise"
 import { NavigationContainer } from "@react-navigation/native"
-import { setPlatform } from "../../helpers/Platform"
+import { unimplementedEvents } from "../helpers"
+import { Events, eventsDependencyKey } from "@lib/events"
 
 const testLocation = { latitude: 45.0, longitude: -121.0 }
 
@@ -34,6 +35,7 @@ describe("EventFormScreen tests", () => {
   beforeEach(() => jest.resetAllMocks())
 
   it("should be able to edit and submit a form with a preselected location", async () => {
+    events.saveEvent.mockImplementation(neverPromise)
     renderEventFormScreen({
       ...baseTestEventFormValues,
       locationInfo: { coordinates: testLocation }
@@ -47,7 +49,7 @@ describe("EventFormScreen tests", () => {
     submit()
 
     await waitFor(() => {
-      expect(submitAction).toHaveBeenCalledWith({
+      expect(events.saveEvent).toHaveBeenCalledWith({
         title: editedTitle,
         description: "Hello world this is a test!",
         dateRange: dateRange(new Date(0), new Date(1)),
@@ -60,7 +62,7 @@ describe("EventFormScreen tests", () => {
   })
 
   it("should present an error alert when a submission error occurs", async () => {
-    submitAction.mockRejectedValue(new Error())
+    events.saveEvent.mockRejectedValue(new Error())
     renderEventFormScreen(baseTestEventFormValues)
     editEventDescription("Nice")
     submit()
@@ -122,7 +124,7 @@ describe("EventFormScreen tests", () => {
   })
 
   it("should not allow submissions when in process of submitting current form", async () => {
-    submitAction.mockImplementation(neverPromise)
+    events.saveEvent.mockImplementation(neverPromise)
     renderEventFormScreen(baseTestEventFormValues)
     editEventTitle(editedTitle)
     submit()
@@ -134,20 +136,22 @@ describe("EventFormScreen tests", () => {
     editEventTitle(editedTitle)
     submit()
     await waitFor(() => {
-      expect(submitAction).toHaveBeenCalledWith(
+      expect(events.saveEvent).toHaveBeenCalledWith(
         expect.objectContaining({ description: undefined })
       )
     })
   })
 
   it("should re-enable submissions after current submission finishes", async () => {
-    submitAction.mockImplementation(Promise.resolve)
+    events.saveEvent.mockImplementation(Promise.resolve)
     renderEventFormScreen(baseTestEventFormValues)
     editEventTitle(editedTitle)
     submit()
     await waitFor(() => expect(canSubmit()).toEqual(true))
   })
 })
+
+const events = unimplementedEvents()
 
 const editedTitle = "Test title"
 
@@ -164,10 +168,9 @@ const renderEventFormScreen = (values: EventFormValues) => {
       <TestQueryClientProvider>
         <UpdateDependencyValues
           update={(values) => {
-            const geocoding = unimplementedGeocoding()
-            geocoding.reverseGeocode.mockImplementation(neverPromise)
-            values.set(geocodingDependencyKey, geocoding)
+            values.set(geocodingDependencyKey, unimplementedGeocoding())
             values.set(hapticsDependencyKey, jest.fn())
+            values.set(eventsDependencyKey, events as unknown as Events)
           }}
         >
           <EventFormScreen

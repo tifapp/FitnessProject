@@ -1,5 +1,5 @@
 import { useReactHookFormContext } from "../../hooks/FormHooks"
-import { EditEventInput } from "../../lib/events"
+import { EditEventInput, eventsDependencyKey } from "../../lib/events"
 import React, {
   ReactNode,
   useContext,
@@ -11,6 +11,7 @@ import React, {
 import { useForm, FormProvider, useController } from "react-hook-form"
 import { Keyboard } from "react-native"
 import { EventFormValues } from "./EventFormValues"
+import { useDependencyValue } from "@lib/dependencies"
 
 export type EventFormSection = "date" | "color" | "advanced"
 
@@ -47,6 +48,7 @@ export const EventForm = ({
   onDismiss,
   children
 }: EventFormProps) => {
+  const events = useDependencyValue(eventsDependencyKey)
   const formMethods = useForm({
     defaultValues: initialValues
   })
@@ -60,14 +62,14 @@ export const EventForm = ({
     if (!currentSection) {
       setFocus(focusedField.current)
     }
-  }, [currentSection])
+  }, [currentSection, setFocus])
 
   return (
     <FormProvider {...formMethods}>
       <EventFormContext.Provider
         value={{
           submit: async (update) => {
-            await handleSubmit(async () => await onSubmit(update))()
+            await handleSubmit(async () => await events.saveEvent(update))()
           },
           dismiss: onDismiss,
           hasEdited: formState.isDirty,

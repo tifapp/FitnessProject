@@ -8,16 +8,16 @@ import { EventColors } from "./EventColors"
  */
 export type Event = {
   readonly id: string
-  readonly userId: string
-  readonly username: string
+  readonly hostId: string
+  readonly hostname: string
   readonly title: string
-  readonly repliesCount: number
   readonly description?: string
-  readonly writtenByYou: boolean
+  readonly isHostedByYou: boolean
   readonly dateRange: FixedDateRange
   readonly color: EventColors
   readonly coordinates: Location
-  readonly address: Placemark
+  readonly placemark?: Placemark
+  readonly shouldHideAfterStartDate: boolean
 }
 
 /**
@@ -39,15 +39,15 @@ export namespace TestEventItems {
   export const mockEvent = (start: Date, end: Date): Event => {
     return {
       id: testId,
-      userId: "3234324",
-      username: "Nicolette Antisdel",
+      hostId: "3234324",
+      hostname: "Nicolette Antisdel",
       title: "Pickup Basketball",
-      repliesCount: 2,
-      writtenByYou: true,
+      isHostedByYou: true,
       dateRange: dateRange(start, end),
       color: EventColors.Red,
       coordinates: { latitude: 36.991585, longitude: -122.058277 },
-      address
+      placemark: address,
+      shouldHideAfterStartDate: true
     }
   }
 }

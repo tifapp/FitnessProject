@@ -37,7 +37,7 @@ const EventItem = ({ event }: Props) => {
             source={require("../assets/icon.png")}
             accessibilityLabel="profile picture"
           />
-          <Text style={styles.name}>{event.username}</Text>
+          <Text style={styles.name}>{event.hostname}</Text>
           <IconButton
             iconName={"more-horiz"}
             style={styles.moreButtonStyle}
@@ -53,7 +53,9 @@ const EventItem = ({ event }: Props) => {
           <View style={[styles.location, styles.flexRow]}>
             <Icon name="location-on" color={event.color} />
             <Text style={styles.infoText}>
-              {placemarkToFormattedAddress(event.address)}
+              {event.placemark
+                ? placemarkToFormattedAddress(event.placemark)
+                : "Unknown Address"}
             </Text>
           </View>
 

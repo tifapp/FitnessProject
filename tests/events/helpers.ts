@@ -1,3 +1,6 @@
+/**
+ * An `Events` instance which contains mock methods.
+ */
 export const unimplementedEvents = () => ({
-  createEvent: jest.fn()
+  saveEvent: jest.fn()
 })

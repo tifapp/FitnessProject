@@ -28,9 +28,10 @@ export interface Events {
   eventsWithIds: (ids: string[]) => Event[]
 
   /**
-   * Creates a new event.
+   * Creates an event if no `id` is present in the {@link SaveEventInput} param,
+   * otherwise updates the event with the id.
    */
-  createEvent: (input: EditEventInput) => Promise<Event>
+  saveEvent: (input: EditEventInput) => Promise<Event>
 }
 
 /**
@@ -77,7 +78,7 @@ export class GraphQLEvents implements Events {
     return eventsList
   }
 
-  async createEvent (input: EditEventInput): Promise<Event> {
+  async saveEvent (input: EditEventInput): Promise<Event> {
     throw new Error("TODO")
   }
 }

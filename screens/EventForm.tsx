@@ -24,7 +24,7 @@ export type EventFormScreenProps = {
   onDismiss: () => void
 }
 
-const EventFormScreen = ({
+export const EventFormScreen = ({
   initialValues,
   onSubmit,
   submissionLabel,
@@ -139,5 +139,3 @@ const styles = StyleSheet.create({
     paddingVertical: 8
   }
 })
-
-export default EventFormScreen
