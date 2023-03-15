@@ -1,24 +1,14 @@
 import { degreesToRadians } from "@lib/Math"
-import { ImageSource } from "aws-sdk/clients/lookoutvision"
 import { Location } from "lib/location/Location"
 import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import MapView, { Circle, Marker, PROVIDER_GOOGLE } from "react-native-maps"
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
 
 // Type for the map markers, in order to separate their logic out
 export interface MapMarker {
   key: string
   title: string
   location: Location
-}
-
-export interface MarkerCustomize {
-  key: string
-  color: string
-  icon?: ImageSource
-  circleFillColor: string
-  circleStrokeColor: string
-  circleStrokeWidth: number
 }
 
 interface Props<T> {
@@ -37,7 +27,6 @@ interface Props<T> {
   }
 
   markers: MapMarker[]
-  customizers: MarkerCustomize[]
 
   currentSelectedMarker: String | undefined
 
@@ -46,6 +35,12 @@ interface Props<T> {
     canZoom: boolean
     canRotate: boolean
   }
+
+  renderMarker: (marker: MapMarker) => React.ReactNode
+
+  renderCircle?: (marker: MapMarker) => React.ReactNode
+
+  onMarkerSelected?: (marker: MapMarker) => void
 }
 
 // When clicking on the marker, zoom towards where it is.
@@ -82,91 +77,36 @@ function circleCoordinateGeneration (lat: number, long: number, radius: number) 
 export function MapComponent<T extends MapMarker> ({
   initialRegion,
   markers,
-  customizers,
   currentSelectedMarker,
+  renderMarker,
+  renderCircle,
+  onMarkerSelected,
   initialRadius,
   mapStyle,
   movementSettings
 }: Props<T>) {
   // Map references
   const mapRef = React.useRef<MapView | null>(null)
-  const markerData = markers.map((markedMarker) => {
-    return {
-      markedMarker,
-      isSelected: markedMarker.key === currentSelectedMarker
-    }
-  })
 
   // Return the markers/circles so that they appear on the map
   const mapMarkerCreations = () => {
-    return markerData.map((marker) => {
-      const createdCircle = checkCircleKey(marker)
+    return markers.map((marker) => {
       return (
         <>
           <Marker
-            key={marker.markedMarker.key}
-            title={marker.markedMarker.title}
+            key={marker.key}
+            title={marker.title}
             coordinate={{
-              latitude: marker.markedMarker.location.latitude,
-              longitude: marker.markedMarker.location.longitude
+              latitude: marker.location.latitude,
+              longitude: marker.location.longitude
             }}
-            pinColor={customizationCreation(marker.markedMarker).color}
-            onPress={() => {
-              if (marker.isSelected) {
-                centerMapOnMarker(
-                  marker.markedMarker.location.latitude,
-                  marker.markedMarker.location.longitude,
-                  initialRadius.radius
-                )
-              }
-            }}
-          />
-          {createdCircle}
+            onPress={() => onMarkerSelected?.(marker)}
+          >
+            {renderMarker(marker)}
+          </Marker>
+          {renderCircle && renderCircle(marker)}
         </>
       )
-    })
-  }
-
-  // Check to see if the circle is for the right selected marker.
-  const checkCircleKey = (point) => {
-    if (point.markedMarker.key === currentSelectedMarker) {
-      const { circleFillColor, circleStrokeColor, circleStrokeWidth } =
-        customizationCreation(point.markedMarker)
-      return (
-        <Circle
-          center={{
-            latitude: point.markedMarker.location.latitude,
-            longitude: point.markedMarker.location.longitude
-          }}
-          radius={initialRadius.radius}
-          fillColor={circleFillColor}
-          strokeColor={circleStrokeColor}
-          strokeWidth={circleStrokeWidth}
-        />
-      )
-    } else return undefined
-  }
-
-  //
-  const customizationCreation = (marker: MapMarker) => {
-    const match = customizers.find(({ key }) => key === marker.key)
-    if (match) {
-      return match
-    } else {
-      return {
-        color: "gray",
-        circleFillColor: "rgba(0, 0, 0, 0.5)",
-        circleStrokeColor: "gray",
-        circleStrokeWidth: 1
-      }
-    }
-  }
-
-  const centerMapOnMarker = (lat: number, lng: number, radius: number) => {
-    const bounds = circleCoordinateGeneration(lat, lng, radius)
-    mapRef.current.fitToCoordinates(bounds, {
-      edgePadding: { top: 100, right: 100, bottom: 400, left: 100 },
-      animated: true
     })
   }
 

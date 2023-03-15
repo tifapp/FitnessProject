@@ -14,5 +14,5 @@
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "file",
   "files.autoSave": "onFocusChange",
-  "cSpell.words": ["Placemark", "tinycolor", "UCSC"]
+  "cSpell.words": ["Ionicons", "Placemark", "tinycolor", "UCSC"]
 }

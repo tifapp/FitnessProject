@@ -1,7 +1,9 @@
 import { TestEventItems } from "@lib/events/Event"
 import { render, screen } from "@testing-library/react-native"
-import EventItem from "@components/EventItem"
+import EventItem from "@components/eventCard/EventItem"
 import React from "react"
+
+jest.mock("react-native-popup-menu")
 
 describe("eventUI Component Tests", () => {
   beforeEach(() => {
@@ -18,8 +20,6 @@ describe("eventUI Component Tests", () => {
         )}
       />
     )
-    const date = screen.getByLabelText("day")
-    console.log(date)
     expect(screen.getByText("Today 5pm - 7pm")).toBeDefined()
   })
 })

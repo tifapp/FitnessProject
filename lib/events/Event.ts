@@ -22,8 +22,7 @@ export type Event = Readonly<{
  */
 export type EventUser = Readonly<{
   id: string
-  firstName: string
-  lastName: string
+  username: string
 }>
 
 /**
@@ -55,8 +54,7 @@ export namespace TestEventItems {
     return {
       host: {
         id: "test-host",
-        firstName: "Matthew",
-        lastName: "Hayes"
+        username: "Matthew Hayes"
       },
       details: {
         id: testId,
