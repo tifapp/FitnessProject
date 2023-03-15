@@ -67,7 +67,7 @@ function circleCoordinateGeneration (lat: number, long: number, radius: number) 
 }
 
 // Map view component itself
-export function Map<T extends MapMarker> ({
+export const Map = <T extends MapMarker>({
   initialRegion,
   markers,
   renderMarker,
@@ -78,38 +78,12 @@ export function Map<T extends MapMarker> ({
   canRotate = true,
   canZoom = true,
   onLongPress
-}: Props<T>) {
-  // Map references
-  const mapRef = React.useRef<MapView | null>(null)
-
-  // Return the markers/circles so that they appear on the map
-  const mapMarkerCreations = () => {
-    return markers.map((marker) => {
-      return (
-        <>
-          <Marker
-            key={marker.key}
-            coordinate={{
-              latitude: marker.location.latitude,
-              longitude: marker.location.longitude
-            }}
-            onPress={() => onMarkerSelected?.(marker)}
-          >
-            {renderMarker(marker)}
-          </Marker>
-          {renderCircle && renderCircle(marker)}
-        </>
-      )
-    })
-  }
-
-  return (
+}: Props<T>) => (
     <View style={mapStyle}>
       <MapView
         style={fillStyle.map}
         provider={PROVIDER_GOOGLE}
         initialRegion={initialRegion}
-        ref={mapRef}
         rotateEnabled={canRotate}
         scrollEnabled={canScroll}
         loadingEnabled={true}
@@ -129,11 +103,24 @@ export function Map<T extends MapMarker> ({
           }
         ]}
       >
-        {mapMarkerCreations()}
+        {markers.map((marker) => (
+          <>
+            <Marker
+              key={marker.key}
+              coordinate={{
+                latitude: marker.location.latitude,
+                longitude: marker.location.longitude
+              }}
+              onPress={() => onMarkerSelected?.(marker)}
+            >
+              {renderMarker(marker)}
+            </Marker>
+            {renderCircle && renderCircle(marker)}
+          </>
+        ))}
       </MapView>
     </View>
   )
-}
 
 const fillStyle = StyleSheet.create({
   map: {
