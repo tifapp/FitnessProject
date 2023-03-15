@@ -36,7 +36,7 @@ const renderMap = (markers: TestMapMarker[]) => {
         latitudeDelta: 0.2,
         longitudeDelta: 0.2
       }}
-      renderMarker={(marker) => <View testID={marker.name} />}
+      renderMarker={(marker: TestMapMarker) => <View testID={marker.name} />}
       onMarkerSelected={selectionEvent}
     />
   )

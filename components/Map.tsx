@@ -1,16 +1,42 @@
 import { degreesToRadians } from "@lib/Math"
 import { Location } from "lib/location/Location"
-import React from "react"
+import React, {
+  forwardRef,
+  MutableRefObject,
+  useImperativeHandle,
+  useRef
+} from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
 
-// Type for the map markers, in order to separate their logic out
+/**
+ * A type that can be rendered by a {@link Map}.
+ */
 export interface MapMarker {
   key: string
   location: Location
 }
 
-interface Props<T extends MapMarker> {
+export type MapBounds = {
+  left: Location
+  right: Location
+  bottom: Location
+  top: Location
+}
+
+export type MapFitToBoundsOptions = { animated: boolean }
+
+export type MapRefMethods = {
+  /**
+   * Fits the map on set of bounds.
+   *
+   * @param bounds See {@link MapBounds}.
+   * @param options See {@link MapFitToBoundsOptions}.
+   */
+  fitToBounds: (bounds: MapBounds, options?: MapFitToBoundsOptions) => void
+}
+
+export type MapProps<T extends MapMarker> = {
   // Map style specifically for style on map
   mapStyle?: StyleProp<ViewStyle>
 
@@ -67,20 +93,36 @@ function circleCoordinateGeneration (lat: number, long: number, radius: number) 
 }
 
 // Map view component itself
-export const Map = <T extends MapMarker>({
-  initialRegion,
-  markers,
-  renderMarker,
-  renderCircle,
-  onMarkerSelected,
-  mapStyle,
-  canScroll = true,
-  canRotate = true,
-  canZoom = true,
-  onLongPress
-}: Props<T>) => (
+export const Map = forwardRef(function ReffedMap<T extends MapMarker> (
+  {
+    initialRegion,
+    markers,
+    renderMarker,
+    renderCircle,
+    onMarkerSelected,
+    mapStyle,
+    canScroll = true,
+    canRotate = true,
+    canZoom = true,
+    onLongPress
+  }: MapProps<T>,
+  ref: MutableRefObject<MapRefMethods>
+) {
+  const mapRef = useRef<MapView | null>(null)
+
+  useImperativeHandle(ref, () => ({
+    fitToBounds: (bounds, options) => {
+      mapRef.current?.fitToCoordinates(
+        [bounds.bottom, bounds.left, bounds.right, bounds.top],
+        options
+      )
+    }
+  }))
+
+  return (
     <View style={mapStyle}>
       <MapView
+        ref={mapRef}
         style={fillStyle.map}
         provider={PROVIDER_GOOGLE}
         initialRegion={initialRegion}
@@ -121,6 +163,7 @@ export const Map = <T extends MapMarker>({
       </MapView>
     </View>
   )
+})
 
 const fillStyle = StyleSheet.create({
   map: {
