@@ -31,7 +31,8 @@ export type EventUser = Readonly<{
 export type HostedEvent = Readonly<{
   host: EventUser
   details: Event
-  isHostedByYou: boolean
+  isHostedByUser: boolean
+  isUserAttending: boolean
 }>
 
 /**
@@ -66,7 +67,8 @@ export namespace TestEventItems {
         attendeeCount: 0,
         shouldHideAfterStartDate: true
       },
-      isHostedByYou: true
+      isHostedByUser: true,
+      isUserAttending: true
     }
   }
 }

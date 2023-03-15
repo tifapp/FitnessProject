@@ -20,7 +20,7 @@ const EventItem = ({ event }: Props) => {
 
   // Show event details screen
   const onPressEvent = () => {
-    console.log("test")
+    // console.log("test")
   }
 
   return (
@@ -43,7 +43,7 @@ const EventItem = ({ event }: Props) => {
 
           {/* Dropdown menu when more button is pressed */}
           <View style={styles.moreButtonStyle}>
-            <MenuDropdown isEventHost={event.isHostedByYou} />
+            <MenuDropdown isEventHost={event.isHostedByUser} />
           </View>
         </View>
 

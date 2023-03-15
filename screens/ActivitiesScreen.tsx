@@ -1,16 +1,19 @@
-import EventsList from "@components/EventsList"
-import MapComponent from "@components/MapComponent"
-import { mapCompStyle, state } from "@components/MapTestData"
-import { Auth } from "aws-amplify"
 import React, { useState } from "react"
-import { Alert, Text } from "react-native"
-import { Circle } from "react-native-maps"
+import EventsList from "@components/EventsList"
+import Map from "@components/Map"
+import { mapCompStyle, state } from "@components/MapTestData"
+import EventDetails from "@components/eventDetails/EventDetails"
+import { TestEventItems } from "@lib/events"
 
 const ActivitiesScreen = () => {
   const [circleRadius, setCircleRadius] = useState(100)
   const [selectedMarker, setSelectedMarker] = useState<String | undefined>("1")
-
-  function signOut () {
+  const startTime = new Date()
+  const endTime = new Date()
+  endTime.setDate(endTime.getDate() + 2)
+  endTime.setHours(endTime.getHours() + 2)
+  const event = TestEventItems.mockHostedEvent(startTime, endTime)
+  /* function signOut () {
     const title = "Are you sure you want to sign out?"
     const message = ""
     Alert.alert(
@@ -27,14 +30,15 @@ const ActivitiesScreen = () => {
       ],
       { cancelable: true }
     )
-  }
+  } */
 
-  return (
+  return <EventDetails event={event} />
+}
+/*
     <>
-      <MapComponent
-        mapStyle={mapCompStyle.container}
+      <Map
+        style={{ width: "100%", height: "100%" }}
         initialRegion={state.initialRegion}
-        initialRadius={{ radius: circleRadius }}
         renderMarker={(item) => <Text> Lesgoo </Text>}
         renderCircle={(item) => (
           <Circle
@@ -48,13 +52,8 @@ const ActivitiesScreen = () => {
             strokeWidth={1}
           />
         )}
-        currentSelectedMarker={selectedMarker}
         markers={state.markers}
-        movementSettings={state.movementSettings}
       />
       <EventsList />
-    </>
-  )
-}
-
+</> */
 export default ActivitiesScreen
