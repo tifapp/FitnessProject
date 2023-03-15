@@ -32,7 +32,7 @@ const ActivitiesScreen = () => {
   return (
     <>
       <Map
-        mapStyle={mapCompStyle.container}
+        style={mapCompStyle.container}
         initialRegion={state.initialRegion}
         renderMarker={(item) => <Text> Lesgoo </Text>}
         renderCircle={(item) => (

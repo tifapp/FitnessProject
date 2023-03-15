@@ -1,4 +1,3 @@
-import { degreesToRadians } from "@lib/Math"
 import { Location } from "lib/location/Location"
 import React, {
   forwardRef,
@@ -37,9 +36,11 @@ export type MapRefMethods = {
 }
 
 export type MapProps<T extends MapMarker> = {
-  // Map style specifically for style on map
-  mapStyle?: StyleProp<ViewStyle>
+  style?: StyleProp<ViewStyle>
 
+  /**
+   * The initial region to center the map on.
+   */
   initialRegion: {
     latitude: number
     longitude: number
@@ -47,52 +48,52 @@ export type MapProps<T extends MapMarker> = {
     longitudeDelta: number
   }
 
+  /**
+   * A list of map markers to render.
+   */
   markers: T[]
 
+  /**
+   * Enables scrolling if true (default: true)
+   */
   canScroll?: boolean
+
+  /**
+   * Enables zooming if true (default: true)
+   */
   canZoom?: boolean
+
+  /**
+   * Enables rotating if true (default: true)
+   */
   canRotate?: boolean
 
+  /**
+   * Renders a singular map marker that was passed in through `markers`.
+   */
   renderMarker: (marker: T) => React.ReactNode
 
+  /**
+   * Renders a circle for a singular map marker that was passed in through `markers`.
+   */
   renderCircle?: (marker: T) => React.ReactNode
 
+  /**
+   * Handles the selection of a marker.
+   *
+   * @param marker a singular map marker that was passed in through `markers`.
+   */
   onMarkerSelected?: (marker: T) => void
 
+  /**
+   * Forwards the coordinates of where a user long pressed on the map.
+   */
   onLongPress?: (coordinates: Location) => void
 }
 
-// When clicking on the marker, zoom towards where it is.
-// Using stackOverflow formula
-// stackoverflow.com/questions/5206018/fit-mapview-to-circle-bounds
-function circleCoordinateGeneration (lat: number, long: number, radius: number) {
-  const earthRadius = 6378.1 // km
-  const circleLatitude0 = lat + degreesToRadians(-radius / earthRadius)
-  const circleLatitude1 = lat + degreesToRadians(radius / earthRadius)
-  const circleLongitude0 =
-    long + degreesToRadians(-radius / earthRadius) / degreesToRadians(lat)
-  const circleLongitude1 =
-    long + degreesToRadians(radius / earthRadius) / degreesToRadians(lat)
-  const bottomCoord = {
-    latitude: circleLatitude0,
-    longitude: long
-  }
-  const leftCoord = {
-    latitude: lat,
-    longitude: circleLongitude0
-  }
-  const rightCoord = {
-    latitude: circleLatitude1,
-    longitude: long
-  }
-  const topCoord = {
-    latitude: lat,
-    longitude: circleLongitude1
-  }
-  return [bottomCoord, leftCoord, rightCoord, topCoord]
-}
-
-// Map view component itself
+/**
+ * A view for rendering a google map.
+ */
 export const Map = forwardRef(function ReffedMap<T extends MapMarker> (
   {
     initialRegion,
@@ -100,7 +101,7 @@ export const Map = forwardRef(function ReffedMap<T extends MapMarker> (
     renderMarker,
     renderCircle,
     onMarkerSelected,
-    mapStyle,
+    style,
     canScroll = true,
     canRotate = true,
     canZoom = true,
@@ -120,7 +121,7 @@ export const Map = forwardRef(function ReffedMap<T extends MapMarker> (
   }))
 
   return (
-    <View style={mapStyle}>
+    <View style={style}>
       <MapView
         ref={mapRef}
         style={fillStyle.map}
