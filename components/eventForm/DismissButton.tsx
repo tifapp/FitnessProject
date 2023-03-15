@@ -11,9 +11,10 @@ import { FontScaleFactors } from "@lib/FontScale"
  * a confirmation alert before dismissing.
  */
 export const EventFormDismissButton = () => {
-  const { formState, dismiss } = useEventFormContext()
-
-  const { isDirty } = formState
+  const {
+    formState: { isDirty },
+    dismiss
+  } = useEventFormContext()
 
   const dismissButtonTapped = () => {
     if (isDirty) {

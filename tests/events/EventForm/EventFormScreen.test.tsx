@@ -27,7 +27,7 @@ import { hapticsDependencyKey } from "@lib/Haptics"
 import { neverPromise } from "../../helpers/Promise"
 import { NavigationContainer } from "@react-navigation/native"
 import { unimplementedEvents } from "../helpers"
-import { Events, eventsDependencyKey } from "@lib/events"
+import { Events, eventsDependencyKey, TestEventItems } from "@lib/events"
 
 const testLocation = { latitude: 45.0, longitude: -121.0 }
 
@@ -68,6 +68,17 @@ describe("EventFormScreen tests", () => {
     submit()
 
     await waitFor(() => expect(alertPresentationSpy).toHaveBeenCalled())
+  })
+
+  it("forwards created event from submission", async () => {
+    const event = TestEventItems.mockEvent(new Date(1000), new Date(2000))
+    events.saveEvent.mockResolvedValue(event)
+
+    renderEventFormScreen(baseTestEventFormValues)
+    editEventDescription("Nice")
+    submit()
+
+    await waitFor(() => expect(submitAction).toHaveBeenCalledWith(event))
   })
 
   it("should be submitable after an error occurs", async () => {

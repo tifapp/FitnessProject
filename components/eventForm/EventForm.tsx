@@ -1,5 +1,5 @@
 import { useReactHookFormContext } from "../../hooks/FormHooks"
-import { SaveEventInput, eventsDependencyKey } from "../../lib/events"
+import { eventsDependencyKey, Event } from "../../lib/events"
 import React, {
   ReactNode,
   useContext,
@@ -30,7 +30,7 @@ export type EventFormProps = {
    * Handles the submission of the form. This method should not throw
    * any errors and should handle them internally.
    */
-  onSubmit: (update: SaveEventInput) => Promise<void>
+  onSubmit: (event: Event) => Promise<void>
 
   /**
    * A handler for the dismissal of this form.
@@ -72,7 +72,7 @@ export const EventForm = ({
         value={{
           submit: async () => {
             await handleSubmit(async (formValues) => {
-              await events.saveEvent({
+              const event = await events.saveEvent({
                 title: formValues.title,
                 description:
                   formValues.description.length > 0
@@ -86,6 +86,7 @@ export const EventForm = ({
                 shouldHideAfterStartDate: formValues.shouldHideAfterStartDate,
                 radiusMeters: formValues.radiusMeters
               })
+              onSubmit(event)
             })()
           },
           dismiss: onDismiss,
