@@ -30,7 +30,7 @@ export type EventFormProps = {
    * Handles the submission of the form. This method should not throw
    * any errors and should handle them internally.
    */
-  onSubmit: (event: Event) => Promise<void>
+  onSubmit: (event: Event) => void
 
   /**
    * A handler for the dismissal of this form.

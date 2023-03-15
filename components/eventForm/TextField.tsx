@@ -3,15 +3,10 @@ import React from "react"
 import { StyleProp, TextInput, TextStyle } from "react-native"
 import { useEventFormContext, useEventFormField } from "./EventForm"
 import { EventFormValues } from "./EventFormValues"
+import { KeysWithValueType } from "@lib/GenericTypes"
 
 export type EventFormTextFieldProps = {
-  fieldName: NonNullable<
-    {
-      [I in keyof EventFormValues]: EventFormValues[I] extends string
-        ? I
-        : never
-    }[keyof EventFormValues]
-  >
+  fieldName: KeysWithValueType<EventFormValues, string>
   placeholder: string
   multiline?: boolean
   maxLength?: number
