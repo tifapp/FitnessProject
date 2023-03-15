@@ -121,55 +121,47 @@ export const Map = forwardRef(function ReffedMap<T extends MapMarker> (
   }))
 
   return (
-    <View style={style}>
-      <MapView
-        ref={mapRef}
-        style={fillStyle.map}
-        provider={PROVIDER_GOOGLE}
-        initialRegion={initialRegion}
-        rotateEnabled={canRotate}
-        scrollEnabled={canScroll}
-        loadingEnabled={true}
-        toolbarEnabled={false}
-        onLongPress={(e) => onLongPress?.(e.nativeEvent.coordinate)}
-        followsUserLocation={true}
-        showsUserLocation={true}
-        zoomEnabled={canZoom}
-        customMapStyle={[
-          {
-            featureType: "poi",
-            stylers: [{ visibility: "off" }]
-          },
-          {
-            featureType: "transit",
-            stylers: [{ visibility: "off" }]
-          }
-        ]}
-      >
-        {markers.map((marker) => (
-          <>
-            <Marker
-              key={marker.key}
-              coordinate={{
-                latitude: marker.location.latitude,
-                longitude: marker.location.longitude
-              }}
-              onPress={() => onMarkerSelected?.(marker)}
-            >
-              {renderMarker(marker)}
-            </Marker>
-            {renderCircle && renderCircle(marker)}
-          </>
-        ))}
-      </MapView>
-    </View>
+    <MapView
+      ref={mapRef}
+      style={style}
+      provider={PROVIDER_GOOGLE}
+      initialRegion={initialRegion}
+      rotateEnabled={canRotate}
+      scrollEnabled={canScroll}
+      loadingEnabled={true}
+      toolbarEnabled={false}
+      onLongPress={(e) => onLongPress?.(e.nativeEvent.coordinate)}
+      followsUserLocation={true}
+      showsUserLocation={true}
+      zoomEnabled={canZoom}
+      customMapStyle={[
+        {
+          featureType: "poi",
+          stylers: [{ visibility: "off" }]
+        },
+        {
+          featureType: "transit",
+          stylers: [{ visibility: "off" }]
+        }
+      ]}
+    >
+      {markers.map((marker) => (
+        <>
+          <Marker
+            key={marker.key}
+            coordinate={{
+              latitude: marker.location.latitude,
+              longitude: marker.location.longitude
+            }}
+            onPress={() => onMarkerSelected?.(marker)}
+          >
+            {renderMarker(marker)}
+          </Marker>
+          {renderCircle && renderCircle(marker)}
+        </>
+      ))}
+    </MapView>
   )
-})
-
-const fillStyle = StyleSheet.create({
-  map: {
-    ...StyleSheet.absoluteFillObject
-  }
 })
 
 export default Map
