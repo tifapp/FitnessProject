@@ -1,7 +1,8 @@
+import MapComponent from "@components/MapComponent"
 import { EventColors } from "@lib/events/EventColors"
 import { Auth } from "aws-amplify"
 import React, { useState } from "react"
-import { Alert } from "react-native"
+import { Alert, View } from "react-native"
 import { QueryClient } from "react-query"
 import { EventFormTestScreen } from "./testScreens/EventFormTestScreen"
 

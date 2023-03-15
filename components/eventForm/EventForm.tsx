@@ -1,5 +1,5 @@
 import { useReactHookFormContext } from "../../hooks/FormHooks"
-import { EditEventInput, eventsDependencyKey } from "../../lib/events"
+import { SaveEventInput, eventsDependencyKey } from "../../lib/events"
 import React, {
   ReactNode,
   useContext,
@@ -10,8 +10,9 @@ import React, {
 } from "react"
 import { useForm, FormProvider, useController } from "react-hook-form"
 import { Keyboard } from "react-native"
-import { EventFormValues } from "./EventFormValues"
+import { EventFormValues, EventFormValuesSchema } from "./EventFormValues"
 import { useDependencyValue } from "@lib/dependencies"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 export type EventFormSection = "date" | "color" | "advanced"
 
@@ -29,7 +30,7 @@ export type EventFormProps = {
    * Handles the submission of the form. This method should not throw
    * any errors and should handle them internally.
    */
-  onSubmit: (update: EditEventInput) => Promise<void>
+  onSubmit: (update: SaveEventInput) => Promise<void>
 
   /**
    * A handler for the dismissal of this form.
@@ -50,9 +51,10 @@ export const EventForm = ({
 }: EventFormProps) => {
   const events = useDependencyValue(eventsDependencyKey)
   const formMethods = useForm({
-    defaultValues: initialValues
+    defaultValues: initialValues,
+    resolver: zodResolver(EventFormValuesSchema)
   })
-  const { handleSubmit, formState, setFocus } = formMethods
+  const { handleSubmit, setFocus } = formMethods
   const [currentSection, setCurrentSection] = useState<
     EventFormSection | undefined
   >()
@@ -68,11 +70,25 @@ export const EventForm = ({
     <FormProvider {...formMethods}>
       <EventFormContext.Provider
         value={{
-          submit: async (update) => {
-            await handleSubmit(async () => await events.saveEvent(update))()
+          submit: async () => {
+            await handleSubmit(async (formValues) => {
+              await events.saveEvent({
+                title: formValues.title,
+                description:
+                  formValues.description.length > 0
+                    ? formValues.description
+                    : undefined,
+                // NB: This force unwrap is fine, because we verify that it cannot be
+                // optional by parsing with zod first.
+                location: formValues.locationInfo!!.coordinates,
+                dateRange: formValues.dateRange,
+                color: formValues.color,
+                shouldHideAfterStartDate: formValues.shouldHideAfterStartDate,
+                radiusMeters: formValues.radiusMeters
+              })
+            })()
           },
           dismiss: onDismiss,
-          hasEdited: formState.isDirty,
           currentPresentedSection: currentSection,
           openSection: (section) => {
             Keyboard.dismiss()
@@ -121,17 +137,12 @@ export type EventFormContextValues = {
   /**
    * Submits the data of this form context, in the form of an update input.
    */
-  submit: (update: EditEventInput) => Promise<void>
+  submit: () => Promise<void>
 
   /**
    * Dismisses this form.
    */
   dismiss: () => void
-
-  /**
-   * True if the form has been editted.
-   */
-  hasEdited: boolean
 
   /**
    * The current section being presented in the `EventFormBottomSheet` component.

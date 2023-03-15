@@ -11,10 +11,12 @@ import { FontScaleFactors } from "@lib/FontScale"
  * a confirmation alert before dismissing.
  */
 export const EventFormDismissButton = () => {
-  const { hasEdited, dismiss } = useEventFormContext()
+  const { formState, dismiss } = useEventFormContext()
+
+  const { isDirty } = formState
 
   const dismissButtonTapped = () => {
-    if (hasEdited) {
+    if (isDirty) {
       Alert.alert("Discard this draft?", undefined, [
         { text: "Discard", style: "destructive", onPress: dismiss },
         { text: "Keep Editing" }

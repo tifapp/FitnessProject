@@ -70,6 +70,17 @@ describe("EventFormScreen tests", () => {
     await waitFor(() => expect(alertPresentationSpy).toHaveBeenCalled())
   })
 
+  it("should be submitable after an error occurs", async () => {
+    events.saveEvent.mockRejectedValue(new Error())
+    renderEventFormScreen(baseTestEventFormValues)
+    editEventDescription("Nice")
+    submit()
+
+    await waitFor(() => expect(alertPresentationSpy).toHaveBeenCalled())
+    await dismissErrorAlert()
+    expect(canSubmit()).toEqual(true)
+  })
+
   it("should be able to be dismissed", () => {
     renderEventFormScreen(baseTestEventFormValues)
     attemptDismiss()
@@ -199,4 +210,8 @@ const dismissConfirmationAlert = async () => {
 
 const dismissFormFromConfirmationAlert = async () => {
   await tapAlertButton("Discard")
+}
+
+const dismissErrorAlert = async () => {
+  await tapAlertButton("Ok")
 }

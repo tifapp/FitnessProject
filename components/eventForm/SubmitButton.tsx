@@ -2,7 +2,7 @@ import { FontScaleFactors } from "../../lib/FontScale"
 import React from "react"
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { useEventFormContext } from "./EventForm"
-import { eventEditInputFromFormValues } from "./EventFormValues"
+import { EventFormValuesSchema } from "./EventFormValues"
 
 /**
  * Props from `EventFormSubmitButton`.
@@ -44,14 +44,16 @@ export const EventFormSubmitButton = ({
 }
 
 const useSubmit = () => {
-  const { formState, submit, watch, hasEdited } = useEventFormContext()
-  const updateInput = eventEditInputFromFormValues(watch())
-  const canSubmit = !!updateInput && !formState.isSubmitting && hasEdited
+  const { formState, submit, reset } = useEventFormContext()
+  const { isDirty, isSubmitting } = formState
+  const isValid = useIsValidForm()
+  const canSubmit = isValid && !isSubmitting && isDirty
   if (!canSubmit) return undefined
   return async () => {
     try {
-      await submit(updateInput)
+      await submit()
     } catch {
+      reset(undefined, { keepValues: true, keepDirty: true })
       // TODO: - Should we just forward the actual error message from the thrown error here?
       Alert.alert(
         "Something went wrong...",
@@ -59,6 +61,17 @@ const useSubmit = () => {
         [{ text: "Ok" }]
       )
     }
+  }
+}
+
+// TODO: - Remove this hack
+const useIsValidForm = () => {
+  const { watch } = useEventFormContext()
+  try {
+    EventFormValuesSchema.parse(watch())
+    return true
+  } catch {
+    return false
   }
 }
 

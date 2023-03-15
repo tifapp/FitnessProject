@@ -1,5 +1,5 @@
 import { SetDependencyValue } from "@lib/dependencies"
-import EventFormScreen from "@screens/EventForm"
+import { EventFormScreen } from "@screens/EventForm"
 import { QueryClient, QueryClientProvider } from "react-query"
 import React from "react"
 import { EventColors } from "@lib/events/EventColors"

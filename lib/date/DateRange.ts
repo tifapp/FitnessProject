@@ -1,6 +1,17 @@
 import { Dayjs } from "dayjs"
+import { z } from "zod"
 import { addSecondsToDate, diffDates } from "./Date"
 import { dayjs, now } from "./dayjs"
+
+/**
+ * A zod schema for {@link FixedDateRange}.
+ */
+export const FixedDateRangeSchema = z
+  .object({
+    startDate: z.date(),
+    endDate: z.date()
+  })
+  .transform(({ startDate, endDate }) => new FixedDateRange(startDate, endDate))
 
 /**
  * A data type to deal with a date range that has a known start and end date.

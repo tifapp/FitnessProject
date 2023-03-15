@@ -1,43 +1,41 @@
-import { EventColors } from "../../lib/events/EventColors"
-import { FixedDateRange } from "../../lib/Date"
-import { EditEventInput } from "../../lib/events"
-import { Location } from "../../lib/location"
+import { EventColorsSchema } from "../../lib/events/EventColors"
+import { FixedDateRangeSchema } from "../../lib/date"
+import { LocationSchema } from "../../lib/location"
+import { z } from "zod"
+import { ZodUtils } from "@lib/Zod"
 
-export type EventFormPlacemarkInfo = {
-  readonly name?: string
-  readonly address?: string
-}
+export const EventFormPlacemarkInfoSchema = z.object({
+  name: z.string().optional(),
+  address: z.string().optional()
+})
 
-export type EventFormLocationInfo = {
-  readonly coordinates: Location
-  readonly placemarkInfo?: EventFormPlacemarkInfo
-}
+export type EventFormPlacemarkInfo = ZodUtils.ReadonlyInferred<
+  typeof EventFormPlacemarkInfoSchema
+>
+
+export const EventFormLocationInfoSchema = z.object({
+  coordinates: LocationSchema,
+  placemarkInfo: EventFormPlacemarkInfoSchema.optional()
+})
+
+export type EventFormLocationInfo = ZodUtils.ReadonlyInferred<
+  typeof EventFormLocationInfoSchema
+>
+
+export const EventFormValuesSchema = z.object({
+  id: z.string().optional(),
+  title: z.string().max(75).min(1),
+  description: z.string().max(500),
+  locationInfo: EventFormLocationInfoSchema.optional(),
+  dateRange: FixedDateRangeSchema,
+  color: EventColorsSchema,
+  shouldHideAfterStartDate: z.boolean(),
+  radiusMeters: z.number().nonnegative()
+})
 
 /**
  * Values held by an `EventForm`.
  */
-export type EventFormValues = {
-  readonly title: string
-  readonly description: string
-  readonly locationInfo?: EventFormLocationInfo
-  readonly dateRange: FixedDateRange
-  readonly color: EventColors
-  readonly shouldHideAfterStartDate: boolean
-  readonly radiusMeters: number
-}
-
-/**
- * Converts valid `EventFormValues` into an `EditEventInput` type.
- */
-export const eventEditInputFromFormValues = (values: EventFormValues) => {
-  if (values.title.length === 0 || !values.locationInfo) return undefined
-  return {
-    title: values.title,
-    description: values.description.length > 0 ? values.description : undefined,
-    location: values.locationInfo.coordinates,
-    dateRange: values.dateRange,
-    color: values.color,
-    shouldHideAfterStartDate: values.shouldHideAfterStartDate,
-    radiusMeters: values.radiusMeters
-  } as EditEventInput
-}
+export type EventFormValues = ZodUtils.ReadonlyInferred<
+  typeof EventFormValuesSchema
+>

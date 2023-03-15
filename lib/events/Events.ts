@@ -1,4 +1,4 @@
-import { FixedDateRange } from "@lib/Date"
+import { FixedDateRange } from "@lib/date"
 import { createDependencyKey } from "@lib/dependencies"
 import { Location, Placemark } from "@lib/location"
 import { EventColors } from "./EventColors"
@@ -6,7 +6,8 @@ import { EventColors } from "./EventColors"
 /**
  * A data type which is used to update event information.
  */
-export type EditEventInput = {
+export type SaveEventInput = {
+  readonly id?: string
   readonly title: string
   readonly description?: string
   readonly location: Location
@@ -31,7 +32,7 @@ export interface Events {
    * Creates an event if no `id` is present in the {@link SaveEventInput} param,
    * otherwise updates the event with the id.
    */
-  saveEvent: (input: EditEventInput) => Promise<Event>
+  saveEvent: (input: SaveEventInput) => Promise<Event>
 }
 
 /**
@@ -78,7 +79,7 @@ export class GraphQLEvents implements Events {
     return eventsList
   }
 
-  async saveEvent (input: EditEventInput): Promise<Event> {
+  async saveEvent (input: SaveEventInput): Promise<Event> {
     throw new Error("TODO")
   }
 }
