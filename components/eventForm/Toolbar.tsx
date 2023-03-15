@@ -8,7 +8,11 @@ import {
   TouchableOpacity,
   StyleSheet
 } from "react-native"
-import { EventFormSection, useEventFormContext } from "./EventForm"
+import {
+  EventFormSection,
+  useEventFormPresentedSection,
+  useEventFormValue
+} from "./EventFormProvider"
 import { MaterialIcons } from "@expo/vector-icons"
 import { FontScaleFactors, useFontScale } from "../../lib/FontScale"
 
@@ -43,7 +47,7 @@ const DateTab = () => (
       maxFontSizeMultiplier={FontScaleFactors.accessibility2}
       style={styles.tabText}
     >
-      {useEventFormContext().watch("dateRange").formatted()}
+      {useEventFormValue("dateRange").formatted()}
     </Text>
   </SectionTab>
 )
@@ -64,7 +68,7 @@ const ColorTab = () => (
 const ColorCicle = () => (
   <View
     style={{
-      backgroundColor: useEventFormContext().watch("color"),
+      backgroundColor: useEventFormValue("color"),
       width: 16 * useFontScale(),
       height: 16 * useFontScale(),
       ...styles.colorCircle
@@ -83,7 +87,7 @@ type SectionTabIconProps = {
   style?: StyleProp<ViewStyle>
 }
 
-const SectionTabIcon = ({ name, style = {} }: SectionTabIconProps) => (
+const SectionTabIcon = ({ name, style }: SectionTabIconProps) => (
   <MaterialIcons
     name={name}
     size={18 * useToolbarFontScale()}
@@ -103,10 +107,10 @@ const SectionTab = ({
   section,
   accessibilityLabel
 }: SectionTabProps) => {
-  const { openSection } = useEventFormContext()
+  const { presentSection } = useEventFormPresentedSection()
   return (
     <TouchableOpacity
-      onPress={() => openSection(section)}
+      onPress={() => presentSection(section)}
       accessibilityLabel={accessibilityLabel}
     >
       <View style={styles.outlined}>

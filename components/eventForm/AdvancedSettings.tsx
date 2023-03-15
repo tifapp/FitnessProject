@@ -1,7 +1,7 @@
 import { FormLabel } from "../formComponents/FormLabels"
 import React from "react"
 import { StyleSheet, Switch, View } from "react-native"
-import { useEventFormContext, useEventFormField } from "./EventForm"
+import { useEventFormField, useEventFormValue } from "./EventFormProvider"
 
 /**
  * Advanced settings (hiding after start date, etc.) view for the event form.
@@ -23,7 +23,7 @@ export const EventFormAdvancedSettings = () => {
         value={shouldHide}
         onValueChange={setShouldHide}
         thumbColor="white"
-        trackColor={{ true: useEventFormContext().watch("color") }}
+        trackColor={{ true: useEventFormValue("color") }}
       />
     </View>
   )

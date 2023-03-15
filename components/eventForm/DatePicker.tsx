@@ -1,7 +1,7 @@
 import DateTimePicker from "../formComponents/DateTimePicker"
 import React from "react"
 import { StyleSheet, Text, View } from "react-native"
-import { useEventFormField } from "./EventForm"
+import { useEventFormField } from "./EventFormProvider"
 
 /**
  * A date picker for an event form.

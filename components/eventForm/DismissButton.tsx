@@ -1,6 +1,6 @@
 import React from "react"
-import { Alert, TouchableOpacity } from "react-native"
-import { useEventFormContext } from "./EventForm"
+import { TouchableOpacity } from "react-native"
+import { useEventFormDismiss } from "./EventFormProvider"
 import { MaterialIcon } from "@components/common/Icons"
 import { FontScaleFactors } from "@lib/FontScale"
 
@@ -10,29 +10,11 @@ import { FontScaleFactors } from "@lib/FontScale"
  * If the user has edited any of the form values, this button will display
  * a confirmation alert before dismissing.
  */
-export const EventFormDismissButton = () => {
-  const {
-    formState: { isDirty },
-    dismiss
-  } = useEventFormContext()
-
-  const dismissButtonTapped = () => {
-    if (isDirty) {
-      Alert.alert("Discard this draft?", undefined, [
-        { text: "Discard", style: "destructive", onPress: dismiss },
-        { text: "Keep Editing" }
-      ])
-    } else {
-      dismiss()
-    }
-  }
-
-  return (
-    <TouchableOpacity accessibilityLabel="Cancel" onPress={dismissButtonTapped}>
-      <MaterialIcon
-        name="close"
-        maximumFontScaleFactor={FontScaleFactors.xxxLarge}
-      />
-    </TouchableOpacity>
-  )
-}
+export const EventFormDismissButton = () => (
+  <TouchableOpacity accessibilityLabel="Cancel" onPress={useEventFormDismiss()}>
+    <MaterialIcon
+      name="close"
+      maximumFontScaleFactor={FontScaleFactors.xxxLarge}
+    />
+  </TouchableOpacity>
+)

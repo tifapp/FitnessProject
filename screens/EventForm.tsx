@@ -6,7 +6,7 @@ import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native"
 import { Divider } from "react-native-elements"
 import { ScrollView } from "react-native-gesture-handler"
 import {
-  EventForm,
+  EventFormProvider,
   EventFormDismissButton,
   EventFormLocationBanner,
   EventFormSubmitButton,
@@ -30,7 +30,7 @@ export const EventFormScreen = ({
   submissionLabel,
   onDismiss
 }: EventFormScreenProps) => (
-  <EventForm
+  <EventFormProvider
     initialValues={initialValues}
     onSubmit={onSubmit}
     onDismiss={onDismiss}
@@ -58,7 +58,7 @@ export const EventFormScreen = ({
     </Stack.Navigator>
     <Footer />
     <EventFormBottomSheet />
-  </EventForm>
+  </EventFormProvider>
 )
 
 const TextFields = () => (

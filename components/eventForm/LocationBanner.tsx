@@ -2,20 +2,20 @@ import { useReverseGeocodeQuery } from "../../hooks/Geocoding"
 import { placemarkToFormattedAddress } from "../../lib/location"
 import React from "react"
 import { StyleSheet, View } from "react-native"
-import { useEventFormContext } from "./EventForm"
-import { FormLabel, SkeletonFormLabel } from "../formComponents/FormLabels"
-import { FontScaleFactors } from "../../lib/FontScale"
 import {
   EventFormLocationInfo,
-  EventFormPlacemarkInfo
-} from "./EventFormValues"
+  EventFormPlacemarkInfo,
+  useEventFormValue
+} from "./EventFormProvider"
+import { FormLabel, SkeletonFormLabel } from "../formComponents/FormLabels"
+import { FontScaleFactors } from "../../lib/FontScale"
 import { MaterialIcon } from "@components/common/Icons"
 
 /**
  * Displays the selected location (if one) in the event form.
  */
 export const EventFormLocationBanner = () => {
-  const locationInfo = useEventFormContext().watch("locationInfo")
+  const locationInfo = useEventFormValue("locationInfo")
   return (
     <View style={styles.bannerContainer}>
       {!locationInfo

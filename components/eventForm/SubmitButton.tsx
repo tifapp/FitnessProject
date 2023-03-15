@@ -1,8 +1,7 @@
 import { FontScaleFactors } from "../../lib/FontScale"
 import React from "react"
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import { useEventFormContext } from "./EventForm"
-import { eventFormValuesToSaveInput } from "./EventFormValues"
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { useEventFormSubmit, useEventFormValue } from "./EventFormProvider"
 
 /**
  * Props from `EventFormSubmitButton`.
@@ -17,14 +16,15 @@ export type EventFormSubmitButtonProps = {
 export const EventFormSubmitButton = ({
   label
 }: EventFormSubmitButtonProps) => {
-  const submitButtonTapped = useSubmit()
-  const color = useEventFormContext().watch("color")
-  const canSubmit = !!submitButtonTapped
+  const submission = useEventFormSubmit()
+  const color = useEventFormValue("color")
   return (
-    <View style={{ opacity: canSubmit ? 1 : 0.5 }}>
+    <View style={{ opacity: submission.canSubmit ? 1 : 0.5 }}>
       <TouchableOpacity
-        onPress={() => submitButtonTapped?.()}
-        disabled={!canSubmit}
+        onPress={() => {
+          if (submission.canSubmit) submission.submit()
+        }}
+        disabled={!submission.canSubmit}
         style={{
           ...styles.container,
           backgroundColor: color,
@@ -33,7 +33,7 @@ export const EventFormSubmitButton = ({
       >
         <Text
           maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
-          disabled={!canSubmit}
+          disabled={!submission.canSubmit}
           style={styles.button}
         >
           {label}
@@ -41,27 +41,6 @@ export const EventFormSubmitButton = ({
       </TouchableOpacity>
     </View>
   )
-}
-
-const useSubmit = () => {
-  const { formState, submit, reset, watch } = useEventFormContext()
-  const { isDirty, isSubmitting } = formState
-  const isValid = !!eventFormValuesToSaveInput(watch())
-  const canSubmit = isValid && !isSubmitting && isDirty
-  if (!canSubmit) return undefined
-  return async () => {
-    try {
-      await submit()
-    } catch {
-      reset(undefined, { keepValues: true, keepDirty: true })
-      // TODO: - Should we just forward the actual error message from the thrown error here?
-      Alert.alert(
-        "Something went wrong...",
-        "Please check your internet connection and try again later.",
-        [{ text: "Ok" }]
-      )
-    }
-  }
 }
 
 const styles = StyleSheet.create({

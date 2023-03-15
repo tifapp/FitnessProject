@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react"
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { FontScaleFactors } from "../../lib/FontScale"
-import { useEventFormContext } from "./EventForm"
+import { useEventFormPresentedSection } from "./EventFormProvider"
 import { MaterialIcon } from "@components/common/Icons"
 
 export type EventFormSectionHeaderProps = {
@@ -26,7 +26,7 @@ export const EventFormSectionHeader = ({
       </Text>
       <TouchableOpacity
         accessibilityLabel="Close Section"
-        onPress={useEventFormContext().dismissCurrentSection}
+        onPress={useEventFormPresentedSection().dismissPresentedSection}
       >
         <MaterialIcon
           style={styles.closeIcon}

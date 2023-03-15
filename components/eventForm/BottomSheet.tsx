@@ -1,67 +1,66 @@
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
-  BottomSheetModalProvider
+  BottomSheetModalProvider,
+  BottomSheetView
 } from "@gorhom/bottom-sheet"
 import { useLastDefinedValue } from "../../hooks/useLastDefinedValue"
 import { FontScaleFactors, useFontScale } from "../../lib/FontScale"
 import React, { useEffect, useMemo, useRef } from "react"
-import { StyleSheet } from "react-native"
+import { StyleSheet, Keyboard } from "react-native"
 import { EventFormAdvancedSettings } from "./AdvancedSettings"
 import { EventFormColorPicker } from "./ColorPicker"
 import { EventFormDatePicker } from "./DatePicker"
-import { useEventFormContext } from "./EventForm"
 import { EventFormSectionHeader } from "./SectionHeader"
+import { useEventFormPresentedSection } from "./EventFormProvider"
 
 /**
  * A bottom sheet which displays the current section in an `EventForm`.
  */
 export const EventFormBottomSheet = () => {
   const bottomSheetRef = useRef<BottomSheetModal>(null)
-  const { currentPresentedSection: currentSection, dismissCurrentSection } =
-    useEventFormContext()
-  const displayedSection = useLastDefinedValue(currentSection)
+  const { presentedSection, dismissPresentedSection } =
+    useEventFormPresentedSection()
+  const displayedSection = useLastDefinedValue(presentedSection)
   const snapPoints = useSnapPoints()
 
   useEffect(() => {
-    if (currentSection) {
+    if (presentedSection) {
+      Keyboard.dismiss()
       bottomSheetRef.current?.present()
     } else {
       bottomSheetRef.current?.dismiss()
     }
-  }, [currentSection])
+  }, [presentedSection])
 
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
         ref={bottomSheetRef}
-        index={0}
         snapPoints={snapPoints}
+        onDismiss={dismissPresentedSection}
         handleStyle={styles.handle}
-        onDismiss={dismissCurrentSection}
         backdropComponent={(props) => (
-          <BottomSheetBackdrop
-            {...props}
-            appearsOnIndex={1}
-            animatedIndex={{ value: 1 }}
-          />
+          <BottomSheetBackdrop {...props} animatedIndex={{ value: 1 }} />
         )}
       >
-        {displayedSection === "date" && (
-          <EventFormSectionHeader title="Start and End Dates">
-            <EventFormDatePicker />
-          </EventFormSectionHeader>
-        )}
-        {displayedSection === "color" && (
-          <EventFormSectionHeader title="Colors">
-            <EventFormColorPicker />
-          </EventFormSectionHeader>
-        )}
-        {displayedSection === "advanced" && (
-          <EventFormSectionHeader title="Advanced Settings">
-            <EventFormAdvancedSettings />
-          </EventFormSectionHeader>
-        )}
+        <BottomSheetView>
+          {displayedSection === "date" && (
+            <EventFormSectionHeader title="Start and End Dates">
+              <EventFormDatePicker />
+            </EventFormSectionHeader>
+          )}
+          {displayedSection === "color" && (
+            <EventFormSectionHeader title="Colors">
+              <EventFormColorPicker />
+            </EventFormSectionHeader>
+          )}
+          {displayedSection === "advanced" && (
+            <EventFormSectionHeader title="Advanced Settings">
+              <EventFormAdvancedSettings />
+            </EventFormSectionHeader>
+          )}
+        </BottomSheetView>
       </BottomSheetModal>
     </BottomSheetModalProvider>
   )

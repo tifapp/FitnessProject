@@ -1,12 +1,14 @@
 import { FontScaleFactors } from "../../lib/FontScale"
 import React from "react"
 import { StyleProp, TextInput, TextStyle } from "react-native"
-import { useEventFormContext, useEventFormField } from "./EventForm"
-import { EventFormValues } from "./EventFormValues"
-import { KeysWithValueType } from "@lib/GenericTypes"
+import {
+  EventFormTextFieldKey,
+  useEventFormField,
+  useSetEventFormActiveTextField
+} from "./EventFormProvider"
 
 export type EventFormTextFieldProps = {
-  fieldName: KeysWithValueType<EventFormValues, string>
+  fieldName: EventFormTextFieldKey
   placeholder: string
   multiline?: boolean
   maxLength?: number
@@ -22,15 +24,14 @@ export const EventFormTextField = ({
   ...props
 }: EventFormTextFieldProps) => {
   const [value, setValue, valueRef] = useEventFormField(fieldName)
-  const { setFocusedField } = useEventFormContext()
-
+  const setActiveTextField = useSetEventFormActiveTextField()
   return (
     <TextInput
       maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
       ref={valueRef}
       value={value}
       onChangeText={setValue}
-      onFocus={() => setFocusedField(fieldName)}
+      onFocus={() => setActiveTextField(fieldName)}
       {...props}
     />
   )

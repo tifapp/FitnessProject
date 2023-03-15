@@ -1,5 +1,5 @@
 import {
-  EventForm,
+  EventFormProvider,
   EventFormLocationBanner,
   EventFormLocationInfo
 } from "@components/eventForm"
@@ -48,7 +48,7 @@ const renderLocationField = (locationInfo?: EventFormLocationInfo) => {
         forKey={geocodingDependencyKey}
         value={geocoding as Geocoding}
       >
-        <EventForm
+        <EventFormProvider
           initialValues={{
             ...baseTestEventFormValues,
             locationInfo
@@ -57,7 +57,7 @@ const renderLocationField = (locationInfo?: EventFormLocationInfo) => {
           onDismiss={jest.fn()}
         >
           <EventFormLocationBanner />
-        </EventForm>
+        </EventFormProvider>
       </SetDependencyValue>
     </TestQueryClientProvider>
   )
