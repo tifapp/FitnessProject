@@ -32,6 +32,8 @@ interface Props<T extends MapMarker> {
   renderCircle?: (marker: T) => React.ReactNode
 
   onMarkerSelected?: (marker: T) => void
+
+  onLongPress?: (coordinates: Location) => void
 }
 
 // When clicking on the marker, zoom towards where it is.
@@ -74,7 +76,8 @@ export function Map<T extends MapMarker> ({
   mapStyle,
   canScroll = true,
   canRotate = true,
-  canZoom = true
+  canZoom = true,
+  onLongPress
 }: Props<T>) {
   // Map references
   const mapRef = React.useRef<MapView | null>(null)
@@ -100,14 +103,6 @@ export function Map<T extends MapMarker> ({
     })
   }
 
-  // Function to give the location of a long press, ideally for a pin place.
-  function onPinPlace (lat: number, lng: number): Location {
-    return {
-      latitude: lat,
-      longitude: lng
-    }
-  }
-
   return (
     <View style={mapStyle}>
       <MapView
@@ -119,12 +114,7 @@ export function Map<T extends MapMarker> ({
         scrollEnabled={canScroll}
         loadingEnabled={true}
         toolbarEnabled={false}
-        onLongPress={(e) => {
-          onPinPlace(
-            e.nativeEvent.coordinate.latitude,
-            e.nativeEvent.coordinate.longitude
-          )
-        }}
+        onLongPress={(e) => onLongPress?.(e.nativeEvent.coordinate)}
         followsUserLocation={true}
         showsUserLocation={true}
         zoomEnabled={canZoom}
