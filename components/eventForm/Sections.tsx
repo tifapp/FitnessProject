@@ -1,7 +1,32 @@
-import DateTimePicker from "../formComponents/DateTimePicker"
-import React from "react"
-import { StyleSheet, Text, View } from "react-native"
+import DateTimePicker from "@components/formComponents/DateTimePicker"
+import HexColorPicker, {
+  HexColorPickerOption
+} from "@components/formComponents/HexColorPicker"
+import { EventColors } from "@lib/events/EventColors"
+import { View, Text, StyleSheet } from "react-native"
 import { useEventFormField } from "./EventFormProvider"
+import React from "react"
+
+/**
+ * A color picker for an event form.
+ */
+export const EventFormColorPicker = () => {
+  const [color, setColor] = useEventFormField("color")
+  return (
+    <HexColorPicker
+      color={color}
+      options={eventColorPickerOptions}
+      onChange={(value) => setColor(value)}
+    />
+  )
+}
+
+export const eventColorPickerOptions = Object.entries(EventColors).map(
+  ([name, color]) => ({
+    accessibilityLabel: name,
+    color
+  })
+) as HexColorPickerOption<EventColors>[]
 
 /**
  * A date picker for an event form.
@@ -19,7 +44,7 @@ export const EventFormDatePicker = () => {
           setDateRange((range) => range.moveStartDate(date))
         }}
       />
-      <View style={styles.spacer} />
+      <View style={styles.datePickerSpacer} />
       <LabeledDatePicker
         testID="eventFormEndDate"
         label="End Date"
@@ -45,32 +70,32 @@ const LabeledDatePicker = ({
   date,
   onDateChanged
 }: LabeledDatePickerProps) => (
-  <View style={styles.pickerContainer}>
-    <Text maxFontSizeMultiplier={1.5} style={styles.label}>
+  <View style={styles.datePickerContainer}>
+    <Text maxFontSizeMultiplier={1.5} style={styles.datePickerLabel}>
       {label}
     </Text>
     <DateTimePicker
       testID={testID}
       date={date}
-      style={styles.picker}
+      style={styles.datePicker}
       onDateChanged={onDateChanged}
     />
   </View>
 )
 
 const styles = StyleSheet.create({
-  label: {
+  datePickerLabel: {
     fontSize: 16,
     fontWeight: "bold"
   },
-  picker: {
+  datePicker: {
     width: 256,
     height: 44
   },
-  spacer: {
+  datePickerSpacer: {
     marginBottom: 12
   },
-  pickerContainer: {
+  datePickerContainer: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",

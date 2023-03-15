@@ -9,10 +9,9 @@ import { FontScaleFactors, useFontScale } from "../../lib/FontScale"
 import React, { useEffect, useMemo, useRef } from "react"
 import { StyleSheet, Keyboard } from "react-native"
 import { EventFormAdvancedSettings } from "./AdvancedSettings"
-import { EventFormColorPicker } from "./ColorPicker"
-import { EventFormDatePicker } from "./DatePicker"
 import { EventFormSectionHeader } from "./SectionHeader"
 import { useEventFormPresentedSection } from "./EventFormProvider"
+import { EventFormColorPicker, EventFormDatePicker } from "./Sections"
 
 /**
  * A bottom sheet which displays the current section in an `EventForm`.

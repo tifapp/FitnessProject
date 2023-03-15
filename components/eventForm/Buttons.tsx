@@ -1,7 +1,27 @@
-import { FontScaleFactors } from "../../lib/FontScale"
-import React from "react"
+import { MaterialIcon } from "@components/common/Icons"
+import { FontScaleFactors } from "@lib/FontScale"
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import { useEventFormSubmit, useEventFormValue } from "./EventFormProvider"
+import {
+  useEventFormDismiss,
+  useEventFormSubmit,
+  useEventFormValue
+} from "./EventFormProvider"
+import React from "react"
+
+/**
+ * A dismiss button for `EventForm`.
+ *
+ * If the user has edited any of the form values, this button will display
+ * a confirmation alert before dismissing.
+ */
+export const EventFormDismissButton = () => (
+  <TouchableOpacity accessibilityLabel="Cancel" onPress={useEventFormDismiss()}>
+    <MaterialIcon
+      name="close"
+      maximumFontScaleFactor={FontScaleFactors.xxxLarge}
+    />
+  </TouchableOpacity>
+)
 
 /**
  * Props from `EventFormSubmitButton`.
@@ -26,7 +46,7 @@ export const EventFormSubmitButton = ({
         }}
         disabled={!submission.canSubmit}
         style={{
-          ...styles.container,
+          ...styles.submitButtonContainer,
           backgroundColor: color,
           shadowColor: color
         }}
@@ -34,7 +54,7 @@ export const EventFormSubmitButton = ({
         <Text
           maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
           disabled={!submission.canSubmit}
-          style={styles.button}
+          style={styles.submitButton}
         >
           {label}
         </Text>
@@ -44,13 +64,13 @@ export const EventFormSubmitButton = ({
 }
 
 const styles = StyleSheet.create({
-  container: {
+  submitButtonContainer: {
     borderRadius: 12,
     shadowOpacity: 0.35,
     shadowRadius: 16,
     shadowOffset: { width: 0, height: 4 }
   },
-  button: {
+  submitButton: {
     padding: 8,
     color: "white",
     fontWeight: "bold"
