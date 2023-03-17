@@ -3,10 +3,29 @@ import React, {
   forwardRef,
   MutableRefObject,
   useImperativeHandle,
+  useMemo,
   useRef
 } from "react"
-import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
+import { StyleProp, ViewStyle } from "react-native"
+import MapView, { Circle, Marker, PROVIDER_GOOGLE } from "react-native-maps"
+
+/**
+ * Props to display a circle on the map. If `show` is set to true, then
+ * a circle will be displayed on the map with the given options.
+ *
+ * See the `circleForMarker` prop on {@link Map}.
+ */
+export type MapCircleProps =
+  | { show: false }
+  | {
+      show: true
+      options: {
+        strokeColor?: string
+        fillColor?: string
+        strokeWidth?: number
+        radiusMeters: number
+      }
+    }
 
 /**
  * A type that can be rendered by a {@link Map}.
@@ -74,9 +93,10 @@ export type MapProps<T extends MapMarker> = {
   renderMarker: (marker: T) => React.ReactNode
 
   /**
-   * Renders a circle for a singular map marker that was passed in through `markers`.
+   * Returns a {@link MapCircleProps} for a given marker. If `show` is set to
+   * true, the map displays a circle underneath the marker with the given options.
    */
-  renderCircle?: (marker: T) => React.ReactNode
+  circleForMarker?: (marker: T) => MapCircleProps
 
   /**
    * Handles the selection of a marker.
@@ -99,7 +119,7 @@ export const Map = forwardRef(function ReffedMap<T extends MapMarker> (
     initialRegion,
     markers,
     renderMarker,
-    renderCircle,
+    circleForMarker,
     onMarkerSelected,
     style,
     canScroll = true,
@@ -119,6 +139,15 @@ export const Map = forwardRef(function ReffedMap<T extends MapMarker> (
       )
     }
   }))
+
+  const markersWithCircles = useMemo(
+    () =>
+      markers.map((marker) => ({
+        marker,
+        circleProps: circleForMarker?.(marker) ?? { show: false }
+      })),
+    [markers, circleForMarker]
+  )
 
   return (
     <MapView
@@ -145,7 +174,7 @@ export const Map = forwardRef(function ReffedMap<T extends MapMarker> (
         }
       ]}
     >
-      {markers.map((marker) => (
+      {markersWithCircles.map(({ marker, circleProps }) => (
         <>
           <Marker
             key={marker.key}
@@ -157,7 +186,19 @@ export const Map = forwardRef(function ReffedMap<T extends MapMarker> (
           >
             {renderMarker(marker)}
           </Marker>
-          {renderCircle && renderCircle(marker)}
+          {circleProps.show && (
+            <Circle
+              testID={`mapCircle-${marker.key}`}
+              radius={circleProps.options.radiusMeters}
+              center={{
+                latitude: marker.location.latitude,
+                longitude: marker.location.longitude
+              }}
+              fillColor={circleProps.options.fillColor}
+              strokeColor={circleProps.options.strokeColor}
+              strokeWidth={circleProps.options.strokeWidth}
+            />
+          )}
         </>
       ))}
     </MapView>
