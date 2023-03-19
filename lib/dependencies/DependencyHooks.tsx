@@ -123,7 +123,7 @@ export const useDependencyValue = <T, >(key: DependencyKey<T>) => {
  * }
  * ```
  *
- * @param keys the `DependencyKey`s to use to retrieve their values in the dependencies system.
+ * @param keys the {@link DependencyKey}'s to use to retrieve their values in the dependencies system.
  * @returns a tuple type of all the dependencies returned.
  */
 export const useDependencyValues = <
@@ -147,7 +147,7 @@ export type SetDependencyValueProps<T> = {
 /**
  * Sets the dependency value for a particular key in a child context. This is most useful
  * when you need to update the value just for a single dependency, if you need to update
- * the values for multiple dependencies, use `UpdateDependencyValues` instead.
+ * the values for multiple dependencies, use {@link UpdateDependencyValues} instead.
  *
  * Using this will override the default/pre-existing value of the specified key.
  *
@@ -188,7 +188,7 @@ export type UpdateDependencyValuesProps = {
  * Updates an instance of `DependencyValues` specifically for the child context to use.
  *
  * Use this component when you need to set the values of 2 or more dependencies. If you
- * only need to set the value of 1 dependency, use `SetDependencyValue`.
+ * only need to set the value of 1 dependency, use {@link SetDependencyValue}.
  *
  * Using this will override any of the values for the given dependency keys.
  *

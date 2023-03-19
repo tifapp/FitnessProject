@@ -1,11 +1,11 @@
-import { ImmutableDependencyValues } from "./DependencyValues"
+import { ReadonlyDependencyValues } from "./DependencyValues"
 import { uuid } from "@lib/uuid"
 
 /**
  * A key to that associates itself with a particular type, and is used to retrieve and
  * modify its associated type in the dependencies system.
  *
- * This object should not be created directly, but rather with the `createDependencyKey`
+ * This object should not be created directly, but rather with the {@link createDependencyKey}
  * function like such.
  *
  * ```ts
@@ -95,9 +95,9 @@ import { uuid } from "@lib/uuid"
  */
 export class DependencyKey<T> {
   readonly identifier: string
-  readonly createDefaultValue?: (values: ImmutableDependencyValues) => T
+  readonly createDefaultValue?: (values: ReadonlyDependencyValues) => T
 
-  constructor (createDefaultValue?: (values: ImmutableDependencyValues) => T) {
+  constructor (createDefaultValue?: (values: ReadonlyDependencyValues) => T) {
     this.identifier = uuid()
     this.createDefaultValue = createDefaultValue
   }
@@ -127,16 +127,16 @@ export class DependencyKey<T> {
  * @param defaultValue a default value, or a function to create a default value for this key
  */
 export const createDependencyKey = <T>(
-  defaultValue?: ((values: ImmutableDependencyValues) => T) | T
+  defaultValue?: ((values: ReadonlyDependencyValues) => T) | T
 ) => {
   if (!defaultValue) return new DependencyKey<T>()
   return new DependencyKey<T>(makeDefaultValueCreation(defaultValue))
 }
 
 const makeDefaultValueCreation = <T>(
-  defaultValue: ((values: ImmutableDependencyValues) => T) | T
+  defaultValue: ((values: ReadonlyDependencyValues) => T) | T
 ) => {
-  return (values: ImmutableDependencyValues) => {
+  return (values: ReadonlyDependencyValues) => {
     if (defaultValue instanceof Function) {
       return defaultValue(values)
     }
