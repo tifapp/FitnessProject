@@ -1,7 +1,7 @@
 import { MaterialCommunityIcon } from "@components/common/Icons"
 import MenuDropdown from "@components/eventCard/MenuDropdown"
 import { placemarkToFormattedAddress } from "@lib/location"
-import { Event } from "@lib/events"
+import { Event, isAttendingEvent, isHostingEvent } from "@lib/events"
 import React from "react"
 import { Image, Pressable, StyleSheet, Text, View } from "react-native"
 
@@ -20,7 +20,7 @@ const EventDetails = ({ event }: Props) => {
             <View style={styles.topRowButtons}>
               <View style={styles.topRowButtonStyle}>
                 <MenuDropdown
-                  isEventHost={event.userAttendeeStatus === "hosting"}
+                  isEventHost={isHostingEvent(event.userAttendeeStatus)}
                 />
               </View>
               <MaterialCommunityIcon
@@ -95,7 +95,7 @@ const EventDetails = ({ event }: Props) => {
           <Text style={styles.sectionTitle}>About</Text>
           <Text>{event.description}</Text>
         </View>
-        {event.userAttendeeStatus !== "attending"
+        {!isAttendingEvent(event.userAttendeeStatus)
           ? (
             <View style={styles.buttonContainer}>
               <Pressable

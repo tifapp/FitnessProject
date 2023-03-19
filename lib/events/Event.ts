@@ -1,7 +1,6 @@
 import { dateRange, FixedDateRange } from "@lib/date"
 import { LocationCoordinate2D, Placemark } from "@lib/location"
 import { uuid } from "@lib/uuid"
-import { EventColors } from "./EventColors"
 
 /**
  * A type for determining whether or not the user is a host,
@@ -11,6 +10,34 @@ export type EventCurrentUserAttendeeStatus =
   | "hosting"
   | "attending"
   | "not-participating"
+
+/**
+ * Returns true if the status indicates that the user is hosting the event.
+ */
+export const isHostingEvent = (
+  attendeeStatus: EventCurrentUserAttendeeStatus
+) => attendeeStatus === "hosting"
+
+/**
+ * Returns true if the status indicates that the user is either hosting or
+ * attending the event.
+ */
+export const isAttendingEvent = (
+  attendeeStatus: EventCurrentUserAttendeeStatus
+) => attendeeStatus !== "not-participating"
+
+/**
+ * A type for the color value for an event.
+ */
+export enum EventColors {
+  Red = "#EF6351",
+  Purple = "#CB9CF2",
+  Blue = "#88BDEA",
+  Green = "#72B01D",
+  Pink = "#F7B2BD",
+  Orange = "#F4845F",
+  Yellow = "#F6BD60"
+}
 
 /**
  * A user who is attending an event.

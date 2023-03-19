@@ -1,6 +1,6 @@
 import React from "react"
 import { Image, StyleSheet, Text, View } from "react-native"
-import { Event } from "@lib/events/Event"
+import { Event, isHostingEvent } from "@lib/events/Event"
 import { Divider } from "react-native-elements"
 import { Shadow } from "react-native-shadow-2"
 import tinycolor from "tinycolor2"
@@ -34,7 +34,7 @@ export const EventCard = ({ event }: EventCardProps) => {
           <Text style={styles.name}>{event.host.username}</Text>
           <View style={styles.moreButtonStyle}>
             <MenuDropdown
-              isEventHost={event.userAttendeeStatus === "hosting"}
+              isEventHost={isHostingEvent(event.userAttendeeStatus)}
             />
           </View>
         </View>

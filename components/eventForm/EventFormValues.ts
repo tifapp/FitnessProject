@@ -1,6 +1,5 @@
-import { EventColors } from "../../lib/events/EventColors"
+import { EventColors, EditEventInput } from "../../lib/events"
 import { FixedDateRange } from "../../lib/Date"
-import { EditEventInput } from "../../lib/events"
 import { LocationCoordinate2D } from "../../lib/location"
 
 export type EventFormPlacemarkInfo = {

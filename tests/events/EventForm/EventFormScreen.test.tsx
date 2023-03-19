@@ -1,7 +1,7 @@
 import { EventFormValues } from "@components/eventForm"
 import { dateRange } from "@lib/Date"
 import { UpdateDependencyValues } from "@lib/dependencies"
-import { EventColors } from "@lib/events/EventColors"
+import { EventColors } from "@lib/events"
 import { geocodingDependencyKey } from "@lib/location"
 import EventFormScreen from "@screens/EventFormScreen"
 import {
@@ -26,7 +26,6 @@ import {
 import { hapticsDependencyKey } from "@lib/Haptics"
 import { neverPromise } from "../../helpers/Promise"
 import { NavigationContainer } from "@react-navigation/native"
-import { setPlatform } from "../../helpers/Platform"
 
 const testLocation = { latitude: 45.0, longitude: -121.0 }
 
