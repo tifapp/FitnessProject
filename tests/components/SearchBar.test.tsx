@@ -1,43 +1,42 @@
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import React, { useState } from "react"
 import { View } from "react-native"
-import SearchBar from "@components/SearchBar"
+import { SearchBar } from "@components/SearchBar"
 import "../helpers/Matchers"
 
 describe("SearchBar tests", () => {
   beforeEach(() => jest.resetAllMocks())
-
-  it("allows a user action when icon tapped", () => {
-    renderSearchBar()
-    tapIcon()
-    expect(userAction).toHaveBeenCalled()
-  })
 
   test("basic searching", () => {
     renderSearchBar()
     enterText("Hello world")
     expect(searchedText("Hello world")).toBeDisplayed()
   })
+
+  it("should be able to clear search text when characters entered", () => {
+    renderSearchBar()
+    enterText("Hello world")
+    clearText()
+    expect(searchedText("")).toBeDisplayed()
+  })
+
+  it("should not be able to clear search text when no characters entered", () => {
+    renderSearchBar()
+    expect(canClearText()).toEqual(false)
+  })
 })
 
 const renderSearchBar = () => {
-  render(<Test />)
+  render(<SearchBarTest />)
 }
 
-const userAction = jest.fn()
-const testLabel = "Test"
 const testPlaceholderText = "Search Test"
 
-const Test = () => {
+const SearchBarTest = () => {
   const [text, setText] = useState("")
   return (
     <View testID={text}>
       <SearchBar
-        icon={{
-          name: "10k",
-          onTapped: userAction,
-          accessibilityLabel: testLabel
-        }}
         placeholder={testPlaceholderText}
         text={text}
         onTextChanged={setText}
@@ -46,9 +45,15 @@ const Test = () => {
   )
 }
 
-const tapIcon = () => {
-  fireEvent.press(screen.getByLabelText(testLabel))
+const canClearText = () => {
+  return clearButton() !== null
 }
+
+const clearText = () => {
+  fireEvent.press(clearButton()!!)
+}
+
+const clearButton = () => screen.queryByLabelText("Clear all search text")
 
 const searchedText = (text: string) => {
   return screen.queryByTestId(text)
