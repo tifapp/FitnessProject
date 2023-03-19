@@ -1,5 +1,7 @@
-import { getStorybookUI } from "@storybook/react-native";
-import "./storybook.requires";
+import { getStorybookUI } from "@storybook/react-native"
+import "./storybook.requires"
 
-const StorybookUIRoot = getStorybookUI({});
-export default StorybookUIRoot;
+const StorybookUIRoot = getStorybookUI({
+  shouldDisableKeyboardAvoidingView: true
+})
+export default StorybookUIRoot

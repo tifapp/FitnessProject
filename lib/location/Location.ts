@@ -4,14 +4,20 @@ import {
   METERS_PER_MILE,
   sin2
 } from "../Math"
+import { z } from "zod"
+
+/**
+ * A zod schema for {@link Location}.
+ */
+export const LocationSchema = z.object({
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180)
+})
 
 /**
  * A simple latitude and longitude based coordinate.
  */
-export type Location = {
-  readonly latitude: number
-  readonly longitude: number
-}
+export type Location = Readonly<z.infer<typeof LocationSchema>>
 
 /**
  * A location object meant for tracking purposes.

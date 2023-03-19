@@ -58,8 +58,5 @@ export const mapCompStyle = StyleSheet.create({
     height: "100%",
     justifyContent: "flex-end",
     alignItems: "center"
-  },
-  map: {
-    ...StyleSheet.absoluteFillObject
   }
 })

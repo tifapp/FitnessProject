@@ -1,20 +1,21 @@
-import React, { useEffect, useRef, useState } from "react"
-import { ListRenderItemInfo, StyleSheet, View } from "react-native"
-import BottomSheet, {
+import React, { useEffect, useRef } from "react"
+import { ListRenderItemInfo, StyleSheet, Text, View } from "react-native"
+import {
   BottomSheetFlatList,
   BottomSheetModal,
   BottomSheetModalProvider
 } from "@gorhom/bottom-sheet"
 import { Event } from "@lib/events/Event"
-import EventItem from "@components/EventItem"
-import NearbyActivities from "./headerComponents/NearbyActivities"
+import EventItem from "@components/eventCard/EventItem"
 import { eventsDependencyKey } from "@lib/events/Events"
 import { useDependencyValue } from "@lib/dependencies"
 
 const EventsList = () => {
   const eventItems = useDependencyValue(eventsDependencyKey)
-  const ids = Array.from(new Array(5), (_, i) => String(i))
+  const ids = Array.from(new Array(4), (_, i) => String(i))
   const events = eventItems.eventsWithIds(ids)
+  const MARGIN_HORIZONTAL = 16
+  const MARGIN_VERTICAL = 16
 
   // hooks
   const sheetRef = useRef<BottomSheetModal>(null)
@@ -24,11 +25,15 @@ const EventsList = () => {
   }, [])
 
   // variables
-  const snapPoints = ["4%", "65%", "100%"]
+  const snapPoints = ["8%", "55%"]
 
   return (
     <BottomSheetModalProvider>
-      <View style={{ flex: 1 }}>
+      <View
+        style={{
+          flex: 1
+        }}
+      >
         <BottomSheetModal
           ref={sheetRef}
           snapPoints={snapPoints}
@@ -38,11 +43,20 @@ const EventsList = () => {
           <BottomSheetFlatList
             data={events}
             renderItem={({ item }: ListRenderItemInfo<Event>) => (
-              <View style={styles.secondaryContainerStyle}>
+              <View
+                style={{
+                  marginHorizontal: MARGIN_HORIZONTAL,
+                  marginVertical: MARGIN_VERTICAL
+                }}
+              >
                 <EventItem event={item} />
               </View>
             )}
-            ListHeaderComponent={<NearbyActivities />}
+            ListHeaderComponent={
+              <View style={styles.activitiesContainer}>
+                <Text style={styles.activitiesText}>Nearby Activities</Text>
+              </View>
+            }
             stickyHeaderIndices={[0]}
           />
         </BottomSheetModal>
@@ -52,9 +66,17 @@ const EventsList = () => {
 }
 
 const styles = StyleSheet.create({
-  secondaryContainerStyle: {
+  activitiesContainer: {
+    flex: 1,
+    flexDirection: "row",
     backgroundColor: "white",
-    padding: "2%"
+    paddingBottom: 8
+  },
+  activitiesText: {
+    fontSize: 20,
+    marginLeft: 16,
+    textAlignVertical: "top",
+    fontWeight: "bold"
   }
 })
 

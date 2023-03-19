@@ -1,3 +1,9 @@
+// @ts-nocheck
+/* eslint-disable comma-dangle */
+/* eslint-disable semi */
+const path = require("path");
+const rootPath = __dirname;
+
 module.exports = function (api) {
   api.cache(true);
   return {
@@ -10,13 +16,13 @@ module.exports = function (api) {
         "module-resolver",
         {
           alias: {
-            "@screens": "./screens",
-            "@components": "./components",
-            "@stacks": "./stacks",
-            "@hooks": "./hooks",
-            "@assets": "./assets",
-            "@graphql": "./src/graphql",
-            "@lib": "./lib",
+            "@screens": path.join(rootPath, "screens"),
+            "@components": path.join(rootPath, "components"),
+            "@stacks": path.join(rootPath, "stacks"),
+            "@hooks": path.join(rootPath, "hooks"),
+            "@assets": path.join(rootPath, "assets"),
+            "@graphql": path.join(rootPath, "src/graphql"),
+            "@lib": path.join(rootPath, "lib"),
           },
           extensions: [".js", ".jsx", ".ts", ".tsx"],
         },

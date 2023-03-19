@@ -2,6 +2,7 @@
 import API, { GraphQLQuery } from "@aws-amplify/api"
 import { Amplify, Auth, Cache, graphqlOperation, Storage } from "aws-amplify"
 import { withAuthenticator } from "aws-amplify-react-native"
+import { MenuProvider } from "react-native-popup-menu"
 import awsconfig from "./src/aws-exports"
 
 // graphql
@@ -47,6 +48,7 @@ import {
   AppState,
   AppStateStatus,
   Platform,
+  StyleSheet,
   UIManager,
   useWindowDimensions,
   View
@@ -366,7 +368,9 @@ const App = () => {
 
 const LiveApp = () => (
   <AppQueryClientProvider>
-    <App />
+    <MenuProvider customStyles={menuProviderStyles}>
+      <App />
+    </MenuProvider>
   </AppQueryClientProvider>
 )
 
@@ -380,3 +384,14 @@ export default withAuthenticator(LiveApp, false, [
   <ForgotPassword />,
   <RequireNewPassword />
 ])
+
+const styles = StyleSheet.create({
+  backdrop: {
+    backgroundColor: "black",
+    opacity: 0.5
+  }
+})
+
+const menuProviderStyles = {
+  backdrop: styles.backdrop
+}
