@@ -1,7 +1,7 @@
 import { createDependencyKey } from "@lib/dependencies"
 import { TestEventItems } from "./Event"
 import { FixedDateRange } from "@lib/Date"
-import { Location, Placemark } from "@lib/location"
+import { LocationCoordinate2D, Placemark } from "@lib/location"
 import { EventColors } from "./EventColors"
 
 /**
@@ -10,7 +10,7 @@ import { EventColors } from "./EventColors"
 export type EditEventInput = {
   readonly title: string
   readonly description?: string
-  readonly location: Location
+  readonly location: LocationCoordinate2D
   readonly color: EventColors
   readonly dateRange: FixedDateRange
   readonly shouldHideAfterStartDate: boolean

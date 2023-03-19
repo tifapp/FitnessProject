@@ -6,9 +6,9 @@ import {
   BottomSheetModalProvider
 } from "@gorhom/bottom-sheet"
 import { Event } from "@lib/events/Event"
-import EventItem from "@components/eventCard/EventItem"
 import { eventsDependencyKey } from "@lib/events/Events"
 import { useDependencyValue } from "@lib/dependencies"
+import { EventCard } from "./eventCard/EventCard"
 
 const EventsList = () => {
   const eventItems = useDependencyValue(eventsDependencyKey)
@@ -49,7 +49,7 @@ const EventsList = () => {
                   marginVertical: MARGIN_VERTICAL
                 }}
               >
-                <EventItem event={item} />
+                <EventCard event={item} />
               </View>
             )}
             ListHeaderComponent={
