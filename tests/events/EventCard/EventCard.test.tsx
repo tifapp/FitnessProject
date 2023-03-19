@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react-native"
 import { EventCard } from "@components/eventCard/EventCard"
 import React from "react"
-import { EventMocks, Event } from "@lib/events"
+import { EventMocks, CurrentUserEvent } from "@lib/events"
 import "../../helpers/Matchers"
 
 jest.mock("react-native-popup-menu")
@@ -18,6 +18,6 @@ describe("EventCard tests", () => {
   })
 })
 
-const renderEventCard = (event: Event) => {
+const renderEventCard = (event: CurrentUserEvent) => {
   return render(<EventCard event={event} />)
 }

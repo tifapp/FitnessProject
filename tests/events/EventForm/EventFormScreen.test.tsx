@@ -51,7 +51,7 @@ describe("EventFormScreen tests", () => {
         description: "Hello world this is a test!",
         dateRange: dateRange(new Date(0), new Date(1)),
         color: EventColors.Blue,
-        location: testLocation,
+        coordinates: testLocation,
         radiusMeters: 0,
         shouldHideAfterStartDate: false
       })

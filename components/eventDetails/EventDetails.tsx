@@ -1,15 +1,15 @@
 import { MaterialCommunityIcon } from "@components/common/Icons"
 import MenuDropdown from "@components/eventCard/MenuDropdown"
 import { placemarkToFormattedAddress } from "@lib/location"
-import { Event, isAttendingEvent, isHostingEvent } from "@lib/events"
+import { CurrentUserEvent, isAttendingEvent, isHostingEvent } from "@lib/events"
 import React from "react"
 import { Image, Pressable, StyleSheet, Text, View } from "react-native"
 
-interface Props {
-  event: Event
+export type EventDetailsProps = {
+  event: CurrentUserEvent
 }
 
-const EventDetails = ({ event }: Props) => {
+const EventDetails = ({ event }: EventDetailsProps) => {
   const hexAlpha = "33"
   return (
     <View style={styles.container}>

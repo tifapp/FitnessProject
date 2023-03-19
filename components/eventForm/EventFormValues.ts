@@ -1,4 +1,4 @@
-import { EventColors, EditEventInput } from "../../lib/events"
+import { EventColors, SaveEventRequest } from "../../lib/events"
 import { FixedDateRange } from "../../lib/Date"
 import { LocationCoordinate2D } from "../../lib/location"
 
@@ -33,10 +33,10 @@ export const eventEditInputFromFormValues = (values: EventFormValues) => {
   return {
     title: values.title,
     description: values.description.length > 0 ? values.description : undefined,
-    location: values.locationInfo.coordinates,
+    coordinates: values.locationInfo.coordinates,
     dateRange: values.dateRange,
     color: values.color,
     shouldHideAfterStartDate: values.shouldHideAfterStartDate,
     radiusMeters: values.radiusMeters
-  } as EditEventInput
+  } as SaveEventRequest
 }

@@ -1,6 +1,6 @@
 import React from "react"
 import { Image, StyleSheet, Text, View } from "react-native"
-import { Event, isHostingEvent } from "@lib/events/Event"
+import { CurrentUserEvent, isHostingEvent } from "@lib/events/Event"
 import { Divider } from "react-native-elements"
 import { Shadow } from "react-native-shadow-2"
 import tinycolor from "tinycolor2"
@@ -10,7 +10,7 @@ import { MaterialCommunityIcon } from "../common/Icons"
 import MenuDropdown from "./MenuDropdown"
 
 export type EventCardProps = {
-  event: Event
+  event: CurrentUserEvent
 }
 
 export const EventCard = ({ event }: EventCardProps) => {
