@@ -74,10 +74,10 @@ export type Event = Readonly<{
 }>
 
 /**
- * A type for determining whether or not the user is a host,
+ * A type for determining whether or not a user is a host,
  * attendee, or a non-participant of an event.
  */
-export type EventCurrentUserAttendeeStatus =
+export type EventUserAttendeeStatus =
   | "hosting"
   | "attending"
   | "not-participating"
@@ -85,25 +85,25 @@ export type EventCurrentUserAttendeeStatus =
 /**
  * Returns true if the status indicates that the user is hosting the event.
  */
-export const isHostingEvent = (
-  attendeeStatus: EventCurrentUserAttendeeStatus
-) => attendeeStatus === "hosting"
+export const isHostingEvent = (attendeeStatus: EventUserAttendeeStatus) => {
+  return attendeeStatus === "hosting"
+}
 
 /**
  * Returns true if the status indicates that the user is either hosting or
  * attending the event.
  */
-export const isAttendingEvent = (
-  attendeeStatus: EventCurrentUserAttendeeStatus
-) => attendeeStatus !== "not-participating"
+export const isAttendingEvent = (attendeeStatus: EventUserAttendeeStatus) => {
+  return attendeeStatus !== "not-participating"
+}
 
 /**
- * An event type that adds additional data on the current user's
+ * An event type that adds additional data on a specific user's
  * perspective of the event.
  */
 export type CurrentUserEvent = Event &
   Readonly<{
-    userAttendeeStatus: EventCurrentUserAttendeeStatus
+    userAttendeeStatus: EventUserAttendeeStatus
     userMilesFromEvent: number
   }>
 
