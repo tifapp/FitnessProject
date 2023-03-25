@@ -65,12 +65,29 @@ export class DependencyValues {
    *
    * Subsequent accesses to this method return a cached value for the same key.
    *
-   * @param key a `DependencyKey` instance.
+   * @param key a {@link DependencyKey} instance.
    * @returns the generic type specified by `key`'s type
    */
   get<T> (key: DependencyKey<T>) {
     const cachedValue = this.cachedValues.get(key.identifier)
     if (cachedValue) return cachedValue as T
+
+    if (process.env.JEST_WORKER_ID !== "undefined") {
+      throw new Error(`
+      Attempted to access the default value of a dependency key in a test context.
+
+      This error is thrown because by not explicitly setting a value for this dependency 
+      key you may be accidentally firing off AWS requests or doing other costly things that
+      shouldn't happen in unit tests.
+
+      To fix this, make sure you wrap the component/hook you're testing with either:
+      - SetDepencencyValue
+      - UpdateDependencyValues
+      
+      Dependency Key identifier: ${key.identifier}
+      Jest Worker ID: ${process.env.JEST_WORKER_ID}
+      `)
+    }
 
     if (!key.createDefaultValue) {
       throw new Error(`
@@ -85,7 +102,7 @@ export class DependencyValues {
       `)
     }
 
-    const value = key.createDefaultValue(new ImmutableDependencyValues(this))
+    const value = key.createDefaultValue(this)
     this.cachedValues.set(key.identifier, value)
     return value
   }
@@ -95,7 +112,7 @@ export class DependencyValues {
    * using the same key will use the value set by this method instead of the
    * key's default or previous value.
    *
-   * @param key a `DependencyKey` instance.
+   * @param key a {@link DependencyKey} instance.
    * @param value a value of the same type specified by the generic of `key`'s type
    */
   set<T> (key: DependencyKey<T>, value: T) {
@@ -103,10 +120,10 @@ export class DependencyValues {
   }
 
   /**
-   * Copies a `DependencyValues` and returns the copied values.
+   * Copies a {@link DependencyValues} and returns the copied values.
    *
    * Generally, you shouldn't need to use this function directly, as the copying is
-   * handled by `SetDependencyValue` and `UpdateDependencyValues`.
+   * handled by {@link SetDependencyValue} and {@link UpdateDependencyValues}.
    *
    * @param values the `DependencyValues` instance to copy.
    */
@@ -118,7 +135,7 @@ export class DependencyValues {
 }
 
 /**
- * An immutable store of `DependencyValues`.
+ * An immutable store of {@link DependencyValues}.
  *
  * When creating a dependency that relies on another dependency, `createDependencyKey`
  * passes this interface to the function passed in as its parameter. This allows you to
@@ -135,15 +152,9 @@ export class DependencyValues {
  * ```
  *
  * This type solely exists to make it possible to create dependencies from other dependencies
- * without modifying the underlying `DependencyValues`.
+ * without modifying the underlying {@link DependencyValues}.
  */
-export class ImmutableDependencyValues {
-  private readonly values: DependencyValues
-
-  constructor (values: DependencyValues) {
-    this.values = values
-  }
-
+export interface ReadonlyDependencyValues {
   /**
    * Retrieves the value for the specified dependency key, or attempts to create
    * its default value if there is no previously set value. If no value can be
@@ -151,10 +162,8 @@ export class ImmutableDependencyValues {
    *
    * Subsequent accesses to this method return a cached value for the same key.
    *
-   * @param key a `DependencyKey` instance.
+   * @param key a {@link DependencyKey} instance.
    * @returns the generic type specified by `key`'s type
    */
-  get<T> (key: DependencyKey<T>) {
-    return this.values.get(key)
-  }
+  get<T>(key: DependencyKey<T>): T
 }

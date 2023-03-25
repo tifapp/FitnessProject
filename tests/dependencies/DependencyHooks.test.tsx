@@ -9,121 +9,128 @@ import {
 } from "../../lib/dependencies"
 import "../helpers/Matchers"
 import { render, screen } from "@testing-library/react-native"
+import { _negateDependencyKeyDefaultValueTestContext } from "./helpers"
 
 const testString1 = "Hello World"
 const testString2 = "Goodbye World"
 
 describe("DependencyHooks tests", () => {
-  test("SetDependencyValue creates a new DependencyValues instance for the child context", () => {
-    const key = createDependencyKey(testString1)
+  _negateDependencyKeyDefaultValueTestContext()
 
-    const ChildComponent = () => {
-      const dependency = useDependencyValue(key)
-      return <View testID={makeChildId(dependency)} />
-    }
+  describe("SetDependencyValue tests", () => {
+    it("creates a new DependencyValues instance for the child context", () => {
+      const key = createDependencyKey(testString1)
 
-    const ParentComponent = () => {
-      const dependency = useDependencyValue(key)
-      return (
-        <SetDependencyValue forKey={key} value={testString2}>
-          <ChildComponent />
-          <View testID={makeParentId(dependency)} />
+      const ChildComponent = () => {
+        const dependency = useDependencyValue(key)
+        return <View testID={makeChildId(dependency)} />
+      }
+
+      const ParentComponent = () => {
+        const dependency = useDependencyValue(key)
+        return (
+          <SetDependencyValue forKey={key} value={testString2}>
+            <ChildComponent />
+            <View testID={makeParentId(dependency)} />
+          </SetDependencyValue>
+        )
+      }
+
+      render(<ParentComponent />)
+
+      expect(parentId(testString1)).toBeDisplayed()
+      expect(childId(testString2)).toBeDisplayed()
+    })
+
+    it("preserves current values in child context", () => {
+      const key1 = createDependencyKey<string>()
+      const key2 = createDependencyKey<string>()
+
+      const ChildComponent = () => {
+        const [d1, d2] = useDependencyValues<[string, string]>([key1, key2])
+        return (
+          <>
+            <View testID={makeChildId(d1)} />
+            <View testID={makeChildId(d2)} />
+          </>
+        )
+      }
+
+      const ParentComponent = () => (
+        <SetDependencyValue forKey={key1} value={testString1}>
+          <SetDependencyValue forKey={key2} value={testString2}>
+            <ChildComponent />
+          </SetDependencyValue>
         </SetDependencyValue>
       )
-    }
 
-    render(<ParentComponent />)
+      render(<ParentComponent />)
 
-    expect(parentId(testString1)).toBeDisplayed()
-    expect(childId(testString2)).toBeDisplayed()
+      expect(childId(testString1)).toBeDisplayed()
+      expect(childId(testString2)).toBeDisplayed()
+    })
   })
 
-  test("SetDependencyValue preserves current values in child context", () => {
-    const key1 = createDependencyKey<string>()
-    const key2 = createDependencyKey<string>()
+  describe("UpdateDependencyValues tests", () => {
+    it("creates a new DependencyValues instance for the child context", () => {
+      const key = createDependencyKey(testString1)
 
-    const ChildComponent = () => {
-      const [d1, d2] = useDependencyValues<[string, string]>([key1, key2])
-      return (
-        <>
-          <View testID={makeChildId(d1)} />
-          <View testID={makeChildId(d2)} />
-        </>
-      )
-    }
+      const ChildComponent = () => {
+        const dependency = useDependencyValue(key)
+        return <View testID={makeChildId(dependency)} />
+      }
 
-    const ParentComponent = () => (
-      <SetDependencyValue forKey={key1} value={testString1}>
-        <SetDependencyValue forKey={key2} value={testString2}>
-          <ChildComponent />
-        </SetDependencyValue>
-      </SetDependencyValue>
-    )
+      const ParentComponent = () => {
+        const dependency = useDependencyValue(key)
+        return (
+          <UpdateDependencyValues
+            update={(values) => {
+              values.set(key, testString2)
+            }}
+          >
+            <ChildComponent />
+            <View testID={makeParentId(dependency)} />
+          </UpdateDependencyValues>
+        )
+      }
 
-    render(<ParentComponent />)
+      render(<ParentComponent />)
 
-    expect(childId(testString1)).toBeDisplayed()
-    expect(childId(testString2)).toBeDisplayed()
-  })
+      expect(parentId(testString1)).toBeDisplayed()
+      expect(childId(testString2)).toBeDisplayed()
+    })
 
-  test("UpdateDependencyValues creates a new DependencyValues instance for the child context", () => {
-    const key = createDependencyKey(testString1)
+    it("preserves current values in child context", () => {
+      const key1 = createDependencyKey<string>()
+      const key2 = createDependencyKey<string>()
 
-    const ChildComponent = () => {
-      const dependency = useDependencyValue(key)
-      return <View testID={makeChildId(dependency)} />
-    }
+      const ChildComponent = () => {
+        const [d1, d2] = useDependencyValues<[string, string]>([key1, key2])
+        return (
+          <>
+            <View testID={makeChildId(d1)} />
+            <View testID={makeChildId(d2)} />
+          </>
+        )
+      }
 
-    const ParentComponent = () => {
-      const dependency = useDependencyValue(key)
-      return (
+      const ParentComponent = () => (
         <UpdateDependencyValues
-          update={(values) => {
-            values.set(key, testString2)
-          }}
+          update={(values) => values.set(key1, testString1)}
         >
-          <ChildComponent />
-          <View testID={makeParentId(dependency)} />
+          <UpdateDependencyValues
+            update={(values) => values.set(key2, testString2)}
+          >
+            <ChildComponent />
+          </UpdateDependencyValues>
         </UpdateDependencyValues>
       )
-    }
 
-    render(<ParentComponent />)
+      render(<ParentComponent />)
 
-    expect(parentId(testString1)).toBeDisplayed()
-    expect(childId(testString2)).toBeDisplayed()
-  })
-
-  test("UpdateDependencyValues preserves current values in child context", () => {
-    const key1 = createDependencyKey<string>()
-    const key2 = createDependencyKey<string>()
-
-    const ChildComponent = () => {
-      const [d1, d2] = useDependencyValues<[string, string]>([key1, key2])
-      return (
-        <>
-          <View testID={makeChildId(d1)} />
-          <View testID={makeChildId(d2)} />
-        </>
-      )
-    }
-
-    const ParentComponent = () => (
-      <UpdateDependencyValues
-        update={(values) => values.set(key1, testString1)}
-      >
-        <UpdateDependencyValues
-          update={(values) => values.set(key2, testString2)}
-        >
-          <ChildComponent />
-        </UpdateDependencyValues>
-      </UpdateDependencyValues>
-    )
-
-    render(<ParentComponent />)
-
-    expect(childId(testString1)).toBeDisplayed()
-    expect(childId(testString2)).toBeDisplayed()
+      expect(childId(testString1)).toBeDisplayed()
+      expect(childId(testString2)).toBeDisplayed()
+    })
   })
 })
 
