@@ -1,6 +1,14 @@
 import { TrackedLocation } from "./Location"
-import ExpoLocation from "expo-location"
-import { createDependencyKey } from "../dependencies"
+import {
+  watchPositionAsync,
+  requestForegroundPermissionsAsync,
+  getLastKnownPositionAsync,
+  getCurrentPositionAsync,
+  LocationObject,
+  LocationAccuracy
+} from "expo-location"
+import { createDependencyKey, useDependencyValue } from "../dependencies"
+import { useEffect, useRef, useState } from "react"
 
 export type StopUserLocationTracking = () => void
 
@@ -95,23 +103,23 @@ export interface UserLocation {
  */
 export class ExpoUserLocation implements UserLocation {
   async requestForegroundPermission () {
-    return (await ExpoLocation.requestForegroundPermissionsAsync()).granted
+    return (await requestForegroundPermissionsAsync()).granted
   }
 
   async lastKnownLocation () {
-    const location = await ExpoLocation.getLastKnownPositionAsync()
+    const location = await getLastKnownPositionAsync()
     return location ? toTrackedLocation(location) : null
   }
 
   async currentLocation () {
-    return toTrackedLocation(await ExpoLocation.getCurrentPositionAsync())
+    return toTrackedLocation(await getCurrentPositionAsync())
   }
 
   async track (
     callback: (location: TrackedLocation) => void,
     options: UserLocationTrackingOptions = defaultTrackingOptions
   ) {
-    const subscription = await ExpoLocation.watchPositionAsync(
+    const subscription = await watchPositionAsync(
       {
         accuracy: toExpoAccurracy(options.accuracy),
         distanceInterval: options.minUpdateMetersDistance
@@ -129,21 +137,47 @@ const defaultTrackingOptions: UserLocationTrackingOptions = {
 const toExpoAccurracy = (accuracy?: UserLocationTrackingAccurracy) => {
   switch (accuracy) {
   case UserLocationTrackingAccurracy.Low:
-    return ExpoLocation.LocationAccuracy.Low
+    return LocationAccuracy.Low
   case UserLocationTrackingAccurracy.High:
-    return ExpoLocation.LocationAccuracy.High
+    return LocationAccuracy.High
   case UserLocationTrackingAccurracy.Precise:
-    return ExpoLocation.LocationAccuracy.Highest
+    return LocationAccuracy.Highest
   default:
-    return ExpoLocation.LocationAccuracy.Balanced
+    return LocationAccuracy.Balanced
   }
 }
 
-const toTrackedLocation = (locationResponse: ExpoLocation.LocationObject) => {
+const toTrackedLocation = (locationResponse: LocationObject) => {
   return {
     coordinate: locationResponse.coords,
     trackingDate: new Date(locationResponse.timestamp)
   } as TrackedLocation
+}
+
+/**
+ * A hook to observe the user's current location.
+ *
+ * This hook uses the {@link userLocationDependencyKey} to perform
+ * the tracking.
+ *
+ * @param options see {@link UserLocationTrackingOptions}
+ * @returns
+ */
+export const useUserLocation = (options?: UserLocationTrackingOptions) => {
+  const trackLocation = useDependencyValue(userLocationDependencyKey).track
+  const [location, setLocation] = useState<TrackedLocation | undefined>()
+  const optionsRef = useRef(options)
+  optionsRef.current = options
+
+  useEffect(() => {
+    let unsub: () => void
+    trackLocation(setLocation, optionsRef.current).then(
+      (unsubscribe) => (unsub = unsubscribe)
+    )
+    return () => unsub?.()
+  }, [trackLocation])
+
+  return location
 }
 
 /**
