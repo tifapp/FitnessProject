@@ -44,4 +44,13 @@ export const placemarkToFormattedAddress = (placemark: Placemark) => {
   return formattedAddress === US_COUNTRY_CODE ? undefined : formattedAddress
 }
 
+/**
+ * Formats a `Placemark` instance into a short address (name, city, region/state)
+ *
+ * At the moment, this only outputs US style addresses.
+ */
+export const placemarkToAbbreviatedAddress = (placemark: Placemark) => {
+  return `${placemark.name}, ${placemark.city}, ${placemark.region}`
+}
+
 const US_COUNTRY_CODE = "US"

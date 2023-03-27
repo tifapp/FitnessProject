@@ -88,7 +88,6 @@
     "react-navigation": "^4.4.4",
     "react-query": "^3.39.3",
     "regenerator-runtime": "^0.13.11",
-    "tinycolor2": "^1.6.0",
     "tlds": "^1.221.1",
     "type-detect": "4.0.8",
     "uuid": "^9.0.0",

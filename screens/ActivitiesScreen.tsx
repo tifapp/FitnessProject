@@ -1,7 +1,12 @@
+import EventsList from "@components/EventsList"
 import React from "react"
 
 const ActivitiesScreen = () => {
-  return <></>
+  return (
+    <>
+      <EventsList />
+    </>
+  )
 }
 
 export default ActivitiesScreen

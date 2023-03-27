@@ -5,11 +5,15 @@ import {
   BottomSheetModal,
   BottomSheetModalProvider
 } from "@gorhom/bottom-sheet"
-import { CurrentUserEvent } from "@lib/events/Event"
+import { CurrentUserEvent, EventMocks } from "@lib/events/Event"
 import { EventCard } from "./eventCard/EventCard"
 
 const EventsList = () => {
-  const events: CurrentUserEvent[] = []
+  const events: CurrentUserEvent[] = [
+    EventMocks.Multiday,
+    EventMocks.NoPlacemarkInfo,
+    EventMocks.PickupBasketball
+  ]
   const MARGIN_HORIZONTAL = 16
   const MARGIN_VERTICAL = 16
 

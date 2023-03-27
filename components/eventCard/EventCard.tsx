@@ -1,12 +1,13 @@
 import React from "react"
 import { Image, StyleSheet, Text, View } from "react-native"
 import { CurrentUserEvent, isHostingEvent } from "@lib/events/Event"
-import { Divider } from "react-native-elements"
 import { Shadow } from "react-native-shadow-2"
-import tinycolor from "tinycolor2"
-import { placemarkToFormattedAddress } from "@lib/location"
-import { compactFormatMiles } from "@lib/DistanceFormatting"
+import {
+  placemarkToAbbreviatedAddress,
+  placemarkToFormattedAddress
+} from "@lib/location"
 import { MaterialCommunityIcon } from "../common/Icons"
+import { Ionicons } from "@expo/vector-icons"
 import MenuDropdown from "./MenuDropdown"
 
 export type EventCardProps = {
@@ -14,7 +15,9 @@ export type EventCardProps = {
 }
 
 export const EventCard = ({ event }: EventCardProps) => {
-  const lightEventColor = tinycolor(event.color).lighten(25).toString()
+  const hexAlpha = "4D"
+  const lightEventColor = event.color + hexAlpha
+  const shadowColor = "grey"
 
   return (
     <Shadow
@@ -41,6 +44,23 @@ export const EventCard = ({ event }: EventCardProps) => {
         <View style={styles.middleRow}>
           <Text style={styles.titleText}>{event.title}</Text>
 
+          <View style={styles.flexRow}>
+            <MaterialCommunityIcon
+              name="calendar-check-outline"
+              color={event.color}
+              style={styles.iconMargin}
+            />
+            <Text style={styles.infoText} accessibilityLabel="day">
+              {event.dateRange.formattedStartDate()}
+            </Text>
+            <View style={styles.dotIcon}>
+              <Ionicons name="md-ellipse" size={5} color="grey" />
+            </View>
+            <Text style={styles.infoText} accessibilityLabel="time">
+              {event.dateRange.formattedStartTime()}
+            </Text>
+          </View>
+
           <View style={[styles.location, styles.flexRow]}>
             <MaterialCommunityIcon
               name="map-marker-outline"
@@ -49,21 +69,12 @@ export const EventCard = ({ event }: EventCardProps) => {
             />
             <Text style={styles.infoText}>
               {event.placemark
-                ? placemarkToFormattedAddress(event.placemark)
+                ? placemarkToAbbreviatedAddress(event.placemark)
                 : "Unknown Address"}
             </Text>
           </View>
-          <View style={styles.flexRow}>
-            <MaterialCommunityIcon
-              name="calendar-check-outline"
-              color={event.color}
-              style={styles.iconMargin}
-            />
-            <Text style={styles.infoText} accessibilityLabel="day">
-              {event.dateRange.formatted()}
-            </Text>
-          </View>
         </View>
+        {/*
         <View style={{ marginVertical: 16 }}>
           <Divider style={{ height: 1, opacity: 0.4 }} />
         </View>
@@ -96,7 +107,7 @@ export const EventCard = ({ event }: EventCardProps) => {
               {compactFormatMiles(event.userMilesFromEvent)}
             </Text>
           </View>
-        </View>
+          </View> */}
       </View>
     </Shadow>
   )
@@ -158,8 +169,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold"
   },
   image: {
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
     borderRadius: 24
   },
   container: {
@@ -177,5 +188,10 @@ const styles = StyleSheet.create({
     flex: 1,
     opacity: 0.4,
     alignItems: "flex-end"
+  },
+  dotIcon: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: 8
   }
 })

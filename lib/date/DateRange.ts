@@ -83,26 +83,22 @@ export class FixedDateRange {
   }
 
   formattedTime () {
-    const start = dayjs(this.startDate)
     const end = dayjs(this.endDate)
-    const startDateFormat = formatTime(start)
+    const startDateFormat = this.formattedStartDate()
     const endDateFormat = formatTime(end)
 
     return `${startDateFormat} - ${endDateFormat}`
   }
-}
 
-const formatFromBasis = (basis: Dayjs, date: Dayjs) => {
-  const formattedTime = formatTime(date)
-  const current = now()
-  if (date.isToday()) return `Today ${formattedTime}`
-  if (date.isYesterday()) return `Yesterday ${formattedTime}`
-  if (date.isTomorrow()) return `Tomorrow ${formattedTime}`
-  if (date.isBetween(current, current.add(7, "days"), "days")) {
-    return date.format("ddd") + ` ${formattedTime}`
+  formattedStartTime () {
+    const start = dayjs(this.startDate)
+    return formatTime(start)
   }
-  const yearFormat = !date.isSame(basis, "year") ? " YYYY" : ""
-  return date.format(`MMM D${yearFormat}, `) + formattedTime
+
+  formattedStartDate () {
+    const start = dayjs(this.startDate)
+    return formatDate(now(), start)
+  }
 }
 
 const formatDate = (basis: Dayjs, date: Dayjs) => {
@@ -114,11 +110,20 @@ const formatDate = (basis: Dayjs, date: Dayjs) => {
     return date.format("ddd")
   }
   const yearFormat = !date.isSame(basis, "year") ? " YYYY" : ""
-  return date.format(`MMM D${yearFormat}`)
+  return date.format(`ddd, MMM D${yearFormat}`)
+}
+
+const formatFromBasis = (basis: Dayjs, date: Dayjs) => {
+  const formattedTime = formatTime(date)
+
+  if (!date.isSame(basis, "year")) {
+    return `${formatDate(basis, date)}, ` + formattedTime
+  }
+  return `${formatDate(basis, date)} ` + formattedTime
 }
 
 const formatTime = (date: Dayjs) => {
-  return date.format(date.minute() !== 0 ? "h:mma" : "ha")
+  return date.format("h:mm A")
 }
 /**
  * Creates a date range object where the start date is always before
