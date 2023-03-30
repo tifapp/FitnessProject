@@ -1,15 +1,16 @@
-import React, { useState } from "react"
-import EventsList from "@components/EventsList"
-import Map from "@components/Map"
-import { mapCompStyle, state } from "@components/MapTestData"
 import EventDetails from "@components/eventDetails/EventDetails"
+import EventsList from "@components/EventsList"
+import EventsMap, { MapRefMethods } from "@components/EventsMap"
+import { state } from "@components/MapTestData"
 import { TestEventItems } from "@lib/events"
+import React, { useRef, useState } from "react"
+import { Button } from "react-native"
 
 const ActivitiesScreen = () => {
-  const [circleRadius, setCircleRadius] = useState(100)
   const [selectedMarker, setSelectedMarker] = useState<String | undefined>("1")
   const startTime = new Date()
   const endTime = new Date()
+  const appRef = useRef<MapRefMethods | null>(null)
   endTime.setDate(endTime.getDate() + 2)
   endTime.setHours(endTime.getHours() + 2)
   const event = TestEventItems.mockEvent(startTime, endTime, true, "3")
@@ -31,29 +32,24 @@ const ActivitiesScreen = () => {
       { cancelable: true }
     )
   } */
+  const recenterThing = () => {
+    appRef.current?.recenterToLocation(state.initialRegion)
+  }
 
-  return <EventDetails event={event} numAttendees={3} />
-}
-/*
+  return (
     <>
-      <Map
+      <Button title={"Recenter"} onPress={recenterThing} />
+      <Button title={"Recenter"} onPress={recenterThing} />
+      <EventsMap
+        ref={appRef}
         style={{ width: "100%", height: "100%" }}
         initialRegion={state.initialRegion}
-        renderMarker={(item) => <Text> Lesgoo </Text>}
-        renderCircle={(item) => (
-          <Circle
-            radius={1000}
-            center={{
-              latitude: item.location.latitude,
-              longitude: item.location.longitude
-            }}
-            fillColor={"rgba(0, 0, 0, 0.5)"}
-            strokeColor={"gray"}
-            strokeWidth={1}
-          />
-        )}
         markers={state.markers}
       />
       <EventsList />
-</> */
+      <EventDetails event={event} numAttendees={3} />
+    </>
+  )
+}
+
 export default ActivitiesScreen
