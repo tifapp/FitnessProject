@@ -1,4 +1,4 @@
-import { Location } from "lib/location/Location"
+import { LocationCoordinate2D } from "lib/location/Location"
 import React, {
   forwardRef,
   MutableRefObject,
@@ -13,14 +13,14 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
  */
 export interface MapMarker {
   key: string
-  location: Location
+  location: LocationCoordinate2D
 }
 
 export type MapBounds = {
-  left: Location
-  right: Location
-  bottom: Location
-  top: Location
+  left: LocationCoordinate2D
+  right: LocationCoordinate2D
+  bottom: LocationCoordinate2D
+  top: LocationCoordinate2D
 }
 
 export type MapFitToBoundsOptions = { animated: boolean }
@@ -88,7 +88,7 @@ export type MapProps<T extends MapMarker> = {
   /**
    * Forwards the coordinates of where a user long pressed on the map.
    */
-  onLongPress?: (coordinates: Location) => void
+  onLongPress?: (coordinates: LocationCoordinate2D) => void
 }
 
 /**

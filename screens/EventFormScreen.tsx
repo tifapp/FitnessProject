@@ -1,5 +1,5 @@
 import { EventFormBottomSheet } from "@components/eventForm/BottomSheet"
-import { EditEventInput } from "@lib/events"
+import { SaveEventRequest } from "@lib/events"
 import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
 import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native"
@@ -20,7 +20,7 @@ const Stack = createStackNavigator()
 export type EventFormScreenProps = {
   initialValues: EventFormValues
   submissionLabel: string
-  onSubmit: (editInput: EditEventInput) => Promise<void>
+  onSubmit: (editInput: SaveEventRequest) => Promise<void>
   onDismiss: () => void
 }
 

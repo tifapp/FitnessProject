@@ -1,4 +1,4 @@
-import { Location, LocationSchema } from "../Location"
+import { LocationCoordinate2D, LocationCoordinates2DSchema } from "../Location"
 import { z } from "zod"
 
 /**
@@ -8,7 +8,7 @@ export const LocationSearchResultSchema = z.object({
   name: z.string().optional(),
   // TODO: - Address schema?
   formattedAddress: z.string().optional(),
-  coordinates: LocationSchema
+  coordinates: LocationCoordinates2DSchema
 })
 
 /**

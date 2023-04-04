@@ -1,7 +1,7 @@
 import { Placemark } from "./Placemark"
 import ExpoLocation from "expo-location"
 import { createDependencyKey } from "../dependencies"
-import { Location } from "./Location"
+import { LocationCoordinate2D } from "./Location"
 import { nullsToUndefined } from "@lib/NullsToUndefined"
 
 /**
@@ -13,7 +13,7 @@ export interface Geocoding {
    *
    * @param address a string that is a formatted address (eg. `"1234 Cupertino Rd, Cupertino, CA 95104"`)
    */
-  geocode: (address: string) => Promise<Location[]>
+  geocode: (address: string) => Promise<LocationCoordinate2D[]>
 
   /**
    * Reverse geocodes a list of placemarks from a given location.
@@ -21,7 +21,7 @@ export interface Geocoding {
    * On Android, the implementation of this function may require that the
    * user has accepted Location permissions.
    */
-  reverseGeocode: (location: Location) => Promise<Placemark[]>
+  reverseGeocode: (location: LocationCoordinate2D) => Promise<Placemark[]>
 }
 
 /**
@@ -29,10 +29,10 @@ export interface Geocoding {
  */
 export class ExpoGeocoding implements Geocoding {
   async geocode (address: string) {
-    return (await ExpoLocation.geocodeAsync(address)) as Location[]
+    return (await ExpoLocation.geocodeAsync(address)) as LocationCoordinate2D[]
   }
 
-  async reverseGeocode (location: Location) {
+  async reverseGeocode (location: LocationCoordinate2D) {
     return nullsToUndefined(
       await ExpoLocation.reverseGeocodeAsync({
         ...location
