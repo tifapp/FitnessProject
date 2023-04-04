@@ -5,15 +5,11 @@ import {
   BottomSheetModal,
   BottomSheetModalProvider
 } from "@gorhom/bottom-sheet"
-import { Event } from "@lib/events/Event"
-import EventItem from "@components/eventCard/EventItem"
-import { eventsDependencyKey } from "@lib/events/Events"
-import { useDependencyValue } from "@lib/dependencies"
+import { CurrentUserEvent } from "@lib/events/Event"
+import { EventCard } from "./eventCard/EventCard"
 
 const EventsList = () => {
-  const eventItems = useDependencyValue(eventsDependencyKey)
-  const ids = Array.from(new Array(4), (_, i) => String(i))
-  const events = eventItems.eventsWithIds(ids)
+  const events: CurrentUserEvent[] = []
   const MARGIN_HORIZONTAL = 16
   const MARGIN_VERTICAL = 16
 
@@ -42,14 +38,14 @@ const EventsList = () => {
         >
           <BottomSheetFlatList
             data={events}
-            renderItem={({ item }: ListRenderItemInfo<Event>) => (
+            renderItem={({ item }: ListRenderItemInfo<CurrentUserEvent>) => (
               <View
                 style={{
                   marginHorizontal: MARGIN_HORIZONTAL,
                   marginVertical: MARGIN_VERTICAL
                 }}
               >
-                <EventItem event={item} />
+                <EventCard event={item} />
               </View>
             )}
             ListHeaderComponent={

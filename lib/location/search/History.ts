@@ -3,7 +3,7 @@ import { AsyncStorageUtils } from "@lib/AsyncStorage"
 import { now } from "@lib/date"
 import { createDependencyKey } from "@lib/dependencies"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { Location } from "../Location"
+import { LocationCoordinate2D } from "../Location"
 import { LocationSearchResult, LocationSearchResultSchema } from "./Result"
 import { z } from "zod"
 
@@ -110,7 +110,7 @@ export class LocationSearchHistoryItemMap {
    * Retrieves the item that has the given coordinates, or returns undefined
    * if not available.
    */
-  item (location: Location) {
+  item (location: LocationCoordinate2D) {
     return this.map.get(searchHistoryKey(location))
   }
 }
@@ -144,7 +144,7 @@ export interface LocationSearchHistory {
    * @returns a mapping of location coordinates to the respective items
    */
   itemsForLocations: (
-    locations: Location[]
+    locations: LocationCoordinate2D[]
   ) => Promise<LocationSearchHistoryItemMap>
 }
 
@@ -165,7 +165,7 @@ implements LocationSearchHistory {
     return options?.limit ? items.splice(0, options.limit) : items
   }
 
-  async itemsForLocations (locations: Location[]) {
+  async itemsForLocations (locations: LocationCoordinate2D[]) {
     const keys = locations.map((coordinates) => searchHistoryKey(coordinates))
     return await this.historyItemsForKeys(keys).then(
       (items) => new LocationSearchHistoryItemMap(items)
@@ -220,7 +220,7 @@ const isSearchHistoryKey = (key: string) => {
   )
 }
 
-const searchHistoryKey = (coordinates: Location) => {
+const searchHistoryKey = (coordinates: LocationCoordinate2D) => {
   return `@location_search_history_lat+${coordinates.latitude}_lng+${coordinates.longitude}`
 }
 

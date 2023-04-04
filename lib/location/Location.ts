@@ -7,9 +7,9 @@ import {
 import { z } from "zod"
 
 /**
- * A zod schema for {@link Location}.
+ * A zod schema for {@link LocationCoordinate2D}.
  */
-export const LocationSchema = z.object({
+export const LocationCoordinates2DSchema = z.object({
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180)
 })
@@ -17,13 +17,15 @@ export const LocationSchema = z.object({
 /**
  * A simple latitude and longitude based coordinate.
  */
-export type Location = Readonly<z.infer<typeof LocationSchema>>
+export type LocationCoordinate2D = Readonly<
+  z.infer<typeof LocationCoordinates2DSchema>
+>
 
 /**
  * A location object meant for tracking purposes.
  */
 export type TrackedLocation = {
-  readonly coordinate: Location
+  readonly coordinate: LocationCoordinate2D
   readonly trackingDate: Date
 }
 
@@ -33,8 +35,8 @@ export type TrackedLocation = {
  * For more info on the math: https://en.wikipedia.org/wiki/Haversine_formula
  */
 export const milesBetweenLocations = (
-  location1: Location,
-  location2: Location
+  location1: LocationCoordinate2D,
+  location2: LocationCoordinate2D
 ) => {
   const lat1Radians = degreesToRadians(location1.latitude)
   const lat2Radians = degreesToRadians(location2.latitude)

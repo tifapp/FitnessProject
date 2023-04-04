@@ -1,28 +1,27 @@
 import { MaterialCommunityIcon } from "@components/common/Icons"
 import MenuDropdown from "@components/eventCard/MenuDropdown"
-import { Event } from "@lib/events"
 import { placemarkToFormattedAddress } from "@lib/location"
+import { CurrentUserEvent, isAttendingEvent, isHostingEvent } from "@lib/events"
 import React from "react"
 import { Image, Pressable, StyleSheet, Text, View } from "react-native"
 
-interface Props {
-  event: Event
-  numAttendees: number
+export type EventDetailsProps = {
+  event: CurrentUserEvent
 }
 
-const EventDetails = ({ event, numAttendees }: Props) => {
+const EventDetails = ({ event }: EventDetailsProps) => {
   const hexAlpha = "33"
   return (
     <View style={styles.container}>
       <View style={[styles.viewSpacing, { flex: 1 }]}>
-        {/* Event Title, profile image, name */}
         <View style={styles.viewSpacing}>
           <View style={styles.flexRow}>
             <Text style={styles.titleText}>{event.title}</Text>
-
             <View style={styles.topRowButtons}>
               <View style={styles.topRowButtonStyle}>
-                <MenuDropdown isEventHost={event.writtenByYou} />
+                <MenuDropdown
+                  isEventHost={isHostingEvent(event.userAttendeeStatus)}
+                />
               </View>
               <MaterialCommunityIcon
                 name="close"
@@ -30,21 +29,17 @@ const EventDetails = ({ event, numAttendees }: Props) => {
               />
             </View>
           </View>
-
           <View style={styles.flexRow}>
             <Image
               style={[styles.image, styles.iconMargin]}
               source={require("../../assets/icon.png")}
               accessibilityLabel="profile picture"
             />
-            <Text style={styles.name}>{event.username}</Text>
+            <Text style={styles.name}>{event.host.username}</Text>
           </View>
         </View>
-
-        {/* Details: attendees, date, location */}
         <View style={[styles.viewSpacing]}>
           <Text style={styles.sectionTitle}>Details</Text>
-
           <View style={[styles.flexRow, styles.sectionSpacing]}>
             <MaterialCommunityIcon
               name="account-multiple-outline"
@@ -55,9 +50,10 @@ const EventDetails = ({ event, numAttendees }: Props) => {
                 { backgroundColor: event.color + hexAlpha }
               ]}
             />
-            <Text style={styles.details}>{`${numAttendees} Attending`}</Text>
+            <Text
+              style={styles.details}
+            >{`${event.attendeeCount} Attending`}</Text>
           </View>
-
           <View style={[styles.flexRow, styles.sectionSpacing]}>
             <MaterialCommunityIcon
               name="calendar-check-outline"
@@ -75,7 +71,6 @@ const EventDetails = ({ event, numAttendees }: Props) => {
               <Text>{event.dateRange.formattedTime()}</Text>
             </View>
           </View>
-
           <View style={[styles.flexRow, styles.sectionSpacing]}>
             <MaterialCommunityIcon
               name="map-marker-outline"
@@ -87,19 +82,20 @@ const EventDetails = ({ event, numAttendees }: Props) => {
               ]}
             />
             <View>
-              <Text style={styles.details}>{event.address.name}</Text>
-              <Text>{placemarkToFormattedAddress(event.address)}</Text>
+              <Text style={styles.details}>{event.title}</Text>
+              <Text>
+                {event.placemark
+                  ? placemarkToFormattedAddress(event.placemark)
+                  : "Unknown Address"}
+              </Text>
             </View>
           </View>
         </View>
-
-        {/* Description */}
         <View style={styles.viewSpacing}>
           <Text style={styles.sectionTitle}>About</Text>
           <Text>{event.description}</Text>
         </View>
-
-        {event.isAttending
+        {!isAttendingEvent(event.userAttendeeStatus)
           ? (
             <View style={styles.buttonContainer}>
               <Pressable
