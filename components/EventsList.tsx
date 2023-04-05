@@ -14,7 +14,7 @@ const EventsList = () => {
     EventMocks.NoPlacemarkInfo,
     EventMocks.PickupBasketball
   ]
-  const MARGIN_HORIZONTAL = 16
+  const MARGIN_HORIZONTAL = 24
   const MARGIN_VERTICAL = 16
 
   // hooks
@@ -54,7 +54,7 @@ const EventsList = () => {
             )}
             ListHeaderComponent={
               <View style={styles.activitiesContainer}>
-                <Text style={styles.activitiesText}>Nearby Activities</Text>
+                <Text style={styles.activitiesText}>Events in the Area</Text>
               </View>
             }
             stickyHeaderIndices={[0]}
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8
   },
   activitiesText: {
-    fontSize: 20,
+    fontSize: 18,
     marginLeft: 16,
     textAlignVertical: "top",
     fontWeight: "bold"

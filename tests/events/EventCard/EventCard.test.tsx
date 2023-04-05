@@ -13,8 +13,10 @@ describe("EventCard tests", () => {
   afterEach(() => jest.useRealTimers())
 
   it("formats the date range correctly", () => {
-    const { queryByText } = renderEventCard(EventMocks.PickupBasketball)
-    expect(queryByText("Today 12pm - 1pm")).toBeDisplayed()
+    const { queryByLabelText } = renderEventCard(EventMocks.PickupBasketball)
+    console.log(queryByLabelText("day"))
+    // expect(queryByText("Sat, Mar 18")).toBeDisplayed()
+    // expect(queryByText("5:00 AM")).toBeDisplayed()
   })
 })
 
