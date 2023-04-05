@@ -21,7 +21,7 @@ export type UserLocationTrackingAccurracy = "low-accurracy" | "precise-accurracy
 export type UserLocationTrackingError = "no-permissions" | "services-disabled" | "location-unavailable"
 
 /**
- * An update published by to a (@link TrackUserLocation} callback.
+ * An update published to a (@link TrackUserLocation} callback.
  */
 export type UserLocationTrackingUpdate =
   { status: "error", error: UserLocationTrackingError }
