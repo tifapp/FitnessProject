@@ -1,13 +1,11 @@
 import { SetDependencyValue } from "@lib/dependencies"
 import {
   TrackedLocation,
-  UserLocation,
-  userLocationDependencyKey,
-  useUserLocation
+  UserLocationDependencyKeys,
+  UserLocationTrackingUpdate
 } from "@lib/location"
+import { useUserLocation } from "@hooks/UserLocationHooks"
 import { act, renderHook } from "@testing-library/react-native"
-import { neverPromise, promiseComponents } from "../helpers/Promise"
-import { unimplementedUserLocation } from "./helpers"
 
 const testTrackedLocation: TrackedLocation = {
   coordinate: {
@@ -18,44 +16,27 @@ const testTrackedLocation: TrackedLocation = {
 }
 
 describe("useUserLocation tests", () => {
-  beforeEach(() => (userLocation = unimplementedUserLocation()))
+  beforeEach(() => jest.resetAllMocks())
 
-  it("is tracks the user's location", () => {
-    let sendLocationUpdate: (location: TrackedLocation) => void
-    userLocation.track.mockImplementation((callback) => {
-      sendLocationUpdate = callback
-      return Promise.resolve()
-    })
-    const { result } = renderUserLocation()
-    expect(result.current).toBeUndefined()
+  test("processes simple location updates", () => {
+    let sendLocationUpdate: (update: UserLocationTrackingUpdate) => void
+    trackUserLocation.mockImplementation((_, callback) => (sendLocationUpdate = callback))
+    const { result } = renderUseUserLocation()
+    expect(result.current).toMatchObject({ status: "undetermined" })
 
-    act(() => sendLocationUpdate(testTrackedLocation))
-    expect(result.current).toMatchObject(testTrackedLocation)
-  })
-
-  it("unsubs when unmounted", async () => {
-    const unsubAction = jest.fn()
-    const { resolver, promise } = promiseComponents<undefined>()
-    userLocation.track.mockImplementation(() => {
-      resolver(undefined)
-      return Promise.resolve(unsubAction)
-    })
-
-    const { unmount } = renderUserLocation()
-    await promise
-
-    unmount()
-    expect(unsubAction).toHaveBeenCalled()
+    const update = { status: "success", location: testTrackedLocation }
+    act(() => sendLocationUpdate(update as UserLocationTrackingUpdate))
+    expect(result.current).toMatchObject(update)
   })
 })
 
-let userLocation = unimplementedUserLocation()
+const trackUserLocation = jest.fn()
 
-const renderUserLocation = () => {
+const renderUseUserLocation = () => {
   const wrapper = ({ children }: any) => (
     <SetDependencyValue
-      forKey={userLocationDependencyKey}
-      value={userLocation as unknown as UserLocation}
+      forKey={UserLocationDependencyKeys.track}
+      value={trackUserLocation}
     >
       {children}
     </SetDependencyValue>
