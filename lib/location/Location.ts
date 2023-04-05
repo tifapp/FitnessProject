@@ -24,10 +24,10 @@ export type LocationCoordinate2D = Readonly<
 /**
  * A location object meant for tracking purposes.
  */
-export type TrackedLocation = {
-  readonly coordinate: LocationCoordinate2D
-  readonly trackingDate: Date
-}
+export type TrackedLocation = Readonly<{
+  coordinate: LocationCoordinate2D
+  trackingDate: Date
+}>
 
 /**
  * Computes the number of miles between 2 locations using the haversine formula.

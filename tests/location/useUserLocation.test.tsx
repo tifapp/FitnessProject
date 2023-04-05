@@ -24,7 +24,7 @@ describe("useUserLocation tests", () => {
     let sendLocationUpdate: (location: TrackedLocation) => void
     userLocation.track.mockImplementation((callback) => {
       sendLocationUpdate = callback
-      return neverPromise()
+      return Promise.resolve()
     })
     const { result } = renderUserLocation()
     expect(result.current).toBeUndefined()
