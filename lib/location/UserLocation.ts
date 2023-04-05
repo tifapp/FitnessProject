@@ -1,4 +1,11 @@
 import { TrackedLocation } from "./Location"
+import {
+  watchPositionAsync,
+  LocationOptions,
+  LocationCallback,
+  LocationSubscription,
+  LocationAccuracy
+} from "expo-location"
 import { createDependencyKey } from "../dependencies"
 
 // Android -> E_LOCATION_UNAUTHORIZED
@@ -18,6 +25,12 @@ export type UserLocationTrackingAccurracy =
   | "approximate-low"
   | "approximate-medium"
   | "precise"
+
+const accurracyToExpoAccurracy = (accurracy: UserLocationTrackingAccurracy) => {
+  if (accurracy === "approximate-low") return LocationAccuracy.Low
+  if (accurracy === "approximate-medium") return LocationAccuracy.Balanced
+  return LocationAccuracy.Highest
+}
 
 /**
  * An error that can occur when tracking a user's location.
@@ -49,8 +62,18 @@ export type TrackUserLocation = (
   callback: (update: UserLocationTrackingUpdate) => void
 ) => StopUserLocationTracking
 
+export const expoTrackUserLocation = (
+  accurracy: UserLocationTrackingAccurracy,
+  track: (
+    options: LocationOptions,
+    callback: LocationCallback
+  ) => Promise<LocationSubscription> = watchPositionAsync
+) => {
+  track({ accuracy: accurracyToExpoAccurracy(accurracy) })
+}
+
 /**
- * Dependency Keys relating to operations around the user's location.
+   Dependency Keys relating to operations around the user's location.
  */
 export namespace UserLocationDependencyKeys {
   /**
