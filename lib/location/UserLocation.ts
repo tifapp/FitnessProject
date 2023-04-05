@@ -10,23 +10,30 @@ import { createDependencyKey } from "../dependencies"
  *
  * A higher accurracy may consume more device resources.
  *
- * `low-accurracy`: Accurrate within 1km.
- * `precise-accurracy`: The most precise accurracy possible.
+ * `approximate-low`: Accurrate within 1km.
+ * `approximate-medium`: Accurate within 100m.
+ * `precise`: The most precise accurracy possible.
  */
-export type UserLocationTrackingAccurracy = "low-accurracy" | "precise-accurracy"
+export type UserLocationTrackingAccurracy =
+  | "approximate-low"
+  | "approximate-medium"
+  | "precise"
 
 /**
  * An error that can occur when tracking a user's location.
  */
-export type UserLocationTrackingError = "no-permissions" | "services-disabled" | "location-unavailable"
+export type UserLocationTrackingError =
+  | "no-permissions"
+  | "services-disabled"
+  | "location-unavailable"
 
 /**
  * An update published to a (@link TrackUserLocation} callback.
  */
 export type UserLocationTrackingUpdate =
-  { status: "error", error: UserLocationTrackingError }
+  | { status: "error"; error: UserLocationTrackingError }
   | { status: "undetermined" }
-  | { status: "success", location: TrackedLocation }
+  | { status: "success"; location: TrackedLocation }
 
 export type StopUserLocationTracking = () => void
 
@@ -49,5 +56,7 @@ export namespace UserLocationDependencyKeys {
   /**
    * A dependency key to track the user's location.
    */
-  export const track = createDependencyKey<TrackUserLocation>(() => () => { /* TODO */ })
+  export const track = createDependencyKey<TrackUserLocation>(() => () => {
+    /* TODO */
+  })
 }

@@ -1,13 +1,6 @@
-import React, { useEffect } from "react"
-import { LocationObject, watchPositionAsync } from "expo-location"
+import React from "react"
 
 const ActivitiesScreen = () => {
-  useEffect(() => {
-    watchPositionAsync(
-      {},
-      (location: LocationObject) => console.log(location)
-    ).catch((err: any) => console.error(err.code))
-  }, [])
   return <></>
 }
 

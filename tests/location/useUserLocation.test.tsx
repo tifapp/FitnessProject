@@ -20,7 +20,9 @@ describe("useUserLocation tests", () => {
 
   test("processes simple location updates", () => {
     let sendLocationUpdate: (update: UserLocationTrackingUpdate) => void
-    trackUserLocation.mockImplementation((_, callback) => (sendLocationUpdate = callback))
+    trackUserLocation.mockImplementation(
+      (_, callback) => (sendLocationUpdate = callback)
+    )
     const { result } = renderUseUserLocation()
     expect(result.current).toMatchObject({ status: "undetermined" })
 

@@ -11,10 +11,10 @@ import { useEffect, useState } from "react"
  * `UserLocationDependencyKeys.track` dependency.
  *
  * @param accurracy The accurracy at which to track the user's location.
- * Defaults to `low-accurracy`.
+ * Defaults to `approximate-low`.
  */
 export const useUserLocation = (
-  accurracy: UserLocationTrackingAccurracy = "low-accurracy"
+  accurracy: UserLocationTrackingAccurracy = "approximate-low"
 ) => {
   const trackLocation = useDependencyValue(UserLocationDependencyKeys.track)
   const [location, setLocation] = useState<UserLocationTrackingUpdate>({
