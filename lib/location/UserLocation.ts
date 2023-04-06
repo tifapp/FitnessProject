@@ -41,7 +41,7 @@ export type UserLocationTrackingError =
  * An update published to a (@link TrackUserLocation} callback.
  */
 export type UserLocationTrackingUpdate =
-  | { status: "error"; error: UserLocationTrackingError }
+  | { status: "error" }
   | { status: "undetermined" }
   | { status: "success"; location: TrackedLocation }
 
@@ -76,6 +76,7 @@ export const expoTrackUserLocation = (
       })
     }
   )
+  subscription.catch(() => onUpdate({ status: "error" }))
   return async () => (await subscription).remove()
 }
 
@@ -94,7 +95,7 @@ export namespace UserLocationDependencyKeys {
   /**
    * A dependency key to track the user's location.
    */
-  export const track = createDependencyKey<TrackUserLocation>(() => () => {
-    /* TODO */
-  })
+  export const track = createDependencyKey<TrackUserLocation>(
+    () => expoTrackUserLocation
+  )
 }

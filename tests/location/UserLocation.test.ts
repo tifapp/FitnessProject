@@ -1,5 +1,9 @@
 import { LocationAccuracy } from "expo-location"
-import { expoTrackUserLocation, UserLocationTrackingAccurracy } from "@lib/location"
+import {
+  expoTrackUserLocation,
+  UserLocationTrackingAccurracy
+} from "@lib/location"
+import { promiseComponents } from "../helpers/Promise"
 
 const testAccuracy = "precise"
 
@@ -23,7 +27,10 @@ describe("UserLocation tests", () => {
     test("translates expo location update into TrackedLocation", () => {
       const callback = jest.fn()
       const track = jest.fn().mockImplementation((_, trackFn) => {
-        trackFn({ coords: { latitude: 32.1234, longitude: -121.1234 }, timestamp: 1000 })
+        trackFn({
+          coords: { latitude: 32.1234, longitude: -121.1234 },
+          timestamp: 1000
+        })
         return Promise.resolve()
       })
       expoTrackUserLocation(testAccuracy, callback, track)
@@ -34,6 +41,19 @@ describe("UserLocation tests", () => {
           trackingDate: new Date(1)
         }
       })
+    })
+
+    it("sends an error update when expo tracker fails", async () => {
+      const callback = jest.fn()
+      const { resolver, promise } = promiseComponents<void>()
+      const track = jest.fn().mockImplementation(() => {
+        resolver()
+        return Promise.reject(new Error())
+      })
+
+      expoTrackUserLocation(testAccuracy, callback, track)
+      await promise
+      expect(callback).toHaveBeenCalledWith({ status: "error" })
     })
 
     const expectAccuracyConversion = (
