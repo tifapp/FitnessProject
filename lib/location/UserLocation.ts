@@ -4,13 +4,10 @@ import {
   LocationOptions,
   LocationCallback,
   LocationSubscription,
-  LocationAccuracy
+  LocationAccuracy,
+  LocationObject
 } from "expo-location"
 import { createDependencyKey } from "../dependencies"
-
-// Android -> E_LOCATION_UNAUTHORIZED
-// iOS (Perms Denied) -> E_NO_PERMISSIONS
-// iOS (Services Disabled) -> E_LOCATION_SERVICES_DISABLED
 
 /**
  * An accurracy to track the user's location.
@@ -64,20 +61,34 @@ export type TrackUserLocation = (
 
 export const expoTrackUserLocation = (
   accurracy: UserLocationTrackingAccurracy,
+  onUpdate: (update: UserLocationTrackingUpdate) => void,
   track: (
     options: LocationOptions,
     callback: LocationCallback
   ) => Promise<LocationSubscription> = watchPositionAsync
 ) => {
-  const subPromise = track(
+  const subscription = track(
     { accuracy: accurracyToExpoAccurracy(accurracy) },
-    () => { }
+    (locationObject) => {
+      onUpdate({
+        status: "success",
+        location: expoLocationToTrackedLocation(locationObject)
+      })
+    }
   )
-  return async () => (await subPromise).remove()
+  return async () => (await subscription).remove()
 }
 
+const expoLocationToTrackedLocation = (location: LocationObject) => ({
+  coordinate: {
+    latitude: location.coords.latitude,
+    longitude: location.coords.longitude
+  },
+  trackingDate: new Date(location.timestamp / 1000)
+})
+
 /**
-   Dependency Keys relating to operations around the user's location.
+ * Dependency Keys relating to operations around the user's location.
  */
 export namespace UserLocationDependencyKeys {
   /**

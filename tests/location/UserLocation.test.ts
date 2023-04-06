@@ -15,9 +15,25 @@ describe("UserLocation tests", () => {
       const unsubFromExpo = jest.fn()
       const track = jest.fn().mockResolvedValue({ remove: unsubFromExpo })
 
-      const unsub = expoTrackUserLocation(testAccuracy, track)
+      const unsub = expoTrackUserLocation(testAccuracy, jest.fn(), track)
       await unsub()
       expect(unsubFromExpo).toHaveBeenCalled()
+    })
+
+    test("translates expo location update into TrackedLocation", () => {
+      const callback = jest.fn()
+      const track = jest.fn().mockImplementation((_, trackFn) => {
+        trackFn({ coords: { latitude: 32.1234, longitude: -121.1234 }, timestamp: 1000 })
+        return Promise.resolve()
+      })
+      expoTrackUserLocation(testAccuracy, callback, track)
+      expect(callback).toHaveBeenCalledWith({
+        status: "success",
+        location: {
+          coordinate: { latitude: 32.1234, longitude: -121.1234 },
+          trackingDate: new Date(1)
+        }
+      })
     })
 
     const expectAccuracyConversion = (
@@ -25,10 +41,10 @@ describe("UserLocation tests", () => {
       expoAccuracy: LocationAccuracy
     ) => {
       const track = jest.fn().mockResolvedValue(jest.fn())
-      expoTrackUserLocation(accuracy, track)
+      expoTrackUserLocation(accuracy, jest.fn(), track)
       expect(track).toHaveBeenCalledWith(
         expect.objectContaining({ accuracy: expoAccuracy }),
-        expect.anything()
+        expect.any(Function)
       )
     }
   })
