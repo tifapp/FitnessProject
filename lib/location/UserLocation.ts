@@ -69,7 +69,11 @@ export const expoTrackUserLocation = (
     callback: LocationCallback
   ) => Promise<LocationSubscription> = watchPositionAsync
 ) => {
-  track({ accuracy: accurracyToExpoAccurracy(accurracy) })
+  const subPromise = track(
+    { accuracy: accurracyToExpoAccurracy(accurracy) },
+    () => { }
+  )
+  return async () => (await subPromise).remove()
 }
 
 /**
