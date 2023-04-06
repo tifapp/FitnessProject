@@ -4,7 +4,7 @@ import {
   UserLocationDependencyKeys,
   UserLocationTrackingUpdate
 } from "@lib/location"
-import { useUserLocation } from "@hooks/UserLocationHooks"
+import { useUserLocation } from "@hooks/UserLocation"
 import { act, renderHook } from "@testing-library/react-native"
 
 describe("UserLocationHooks tests", () => {
