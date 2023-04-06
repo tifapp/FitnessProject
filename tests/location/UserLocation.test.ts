@@ -33,6 +33,7 @@ describe("UserLocation tests", () => {
         })
         return Promise.resolve()
       })
+
       expoTrackUserLocation(testAccuracy, callback, track)
       expect(callback).toHaveBeenCalledWith({
         status: "success",

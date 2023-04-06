@@ -7,6 +7,11 @@ import { useDependencyValue } from "@lib/dependencies"
 import { useEffect, useState } from "react"
 
 /**
+ * A type for tracking the current user's location in the UI.
+ */
+export type UserLocationStatus = UserLocationTrackingUpdate | { status: "undetermined" }
+
+/**
  * A hook to observe the user's current location using the
  * `UserLocationDependencyKeys.track` dependency.
  *
@@ -17,7 +22,7 @@ export const useUserLocation = (
   accurracy: UserLocationTrackingAccurracy = "approximate-low"
 ) => {
   const trackLocation = useDependencyValue(UserLocationDependencyKeys.track)
-  const [location, setLocation] = useState<UserLocationTrackingUpdate>({
+  const [location, setLocation] = useState<UserLocationStatus>({
     status: "undetermined"
   })
 

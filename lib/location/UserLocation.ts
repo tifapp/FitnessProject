@@ -30,19 +30,10 @@ const accurracyToExpoAccurracy = (accurracy: UserLocationTrackingAccurracy) => {
 }
 
 /**
- * An error that can occur when tracking a user's location.
- */
-export type UserLocationTrackingError =
-  | "no-permissions"
-  | "services-disabled"
-  | "location-unavailable"
-
-/**
  * An update published to a (@link TrackUserLocation} callback.
  */
 export type UserLocationTrackingUpdate =
   | { status: "error" }
-  | { status: "undetermined" }
   | { status: "success"; location: TrackedLocation }
 
 export type StopUserLocationTracking = () => void
@@ -59,6 +50,9 @@ export type TrackUserLocation = (
   callback: (update: UserLocationTrackingUpdate) => void
 ) => StopUserLocationTracking
 
+/**
+ * Tracks the user's location using expo.
+ */
 export const expoTrackUserLocation = (
   accurracy: UserLocationTrackingAccurracy,
   onUpdate: (update: UserLocationTrackingUpdate) => void,
