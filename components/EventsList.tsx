@@ -21,7 +21,7 @@ const EventsList = () => {
   }, [])
 
   // variables
-  const snapPoints = ["8%", "55%"]
+  const snapPoints = ["18%", "55%", "90%"]
 
   return (
     <BottomSheetModalProvider>
