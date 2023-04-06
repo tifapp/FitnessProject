@@ -47,11 +47,15 @@ export type StopUserLocationTracking = () => void
  */
 export type TrackUserLocation = (
   accuracy: UserLocationTrackingAccurracy,
-  callback: (update: UserLocationTrackingUpdate) => void
+  onUpdate: (update: UserLocationTrackingUpdate) => void
 ) => StopUserLocationTracking
 
 /**
  * Tracks the user's location using expo.
+ *
+ * @param accurracy The accurracy of which to track the user's location.
+ * @param callback Handles an {@link UserLocationTrackingUpdate}.
+ * @returns A function to stop tracking the user's location.
  */
 export const expoTrackUserLocation = (
   accurracy: UserLocationTrackingAccurracy,
@@ -71,7 +75,7 @@ export const expoTrackUserLocation = (
     }
   )
   subscription.catch(() => onUpdate({ status: "error" }))
-  return async () => (await subscription).remove()
+  return () => subscription.then(sub => sub.remove())
 }
 
 const expoLocationToTrackedLocation = (location: LocationObject) => ({

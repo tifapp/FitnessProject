@@ -3,7 +3,6 @@ import {
   expoTrackUserLocation,
   UserLocationTrackingAccurracy
 } from "@lib/location"
-import { promiseComponents } from "../helpers/Promise"
 
 const testAccuracy = "precise"
 
@@ -13,15 +12,6 @@ describe("UserLocation tests", () => {
       expectAccuracyConversion("approximate-low", LocationAccuracy.Low)
       expectAccuracyConversion("approximate-medium", LocationAccuracy.Balanced)
       expectAccuracyConversion("precise", LocationAccuracy.Highest)
-    })
-
-    it("should unsubscribe from expo tracking when return callback invoked", async () => {
-      const unsubFromExpo = jest.fn()
-      const track = jest.fn().mockResolvedValue({ remove: unsubFromExpo })
-
-      const unsub = expoTrackUserLocation(testAccuracy, jest.fn(), track)
-      await unsub()
-      expect(unsubFromExpo).toHaveBeenCalled()
     })
 
     test("translates expo location update into TrackedLocation", () => {
@@ -46,15 +36,42 @@ describe("UserLocation tests", () => {
 
     it("sends an error update when expo tracker fails", async () => {
       const callback = jest.fn()
-      const { resolver, promise } = promiseComponents<void>()
-      const track = jest.fn().mockImplementation(() => {
-        resolver()
-        return Promise.reject(new Error())
+      const track = jest.fn()
+
+      // NB: Expo makes their API asynchronous, however since we're in
+      // a syncronous context we use a promise to ensure that our callback
+      // actually consumes the error event before the test ends.
+      const errorPromise = new Promise<void>((resolve) => {
+        track.mockImplementation(() => {
+          resolve()
+          return Promise.reject(new Error())
+        })
       })
 
       expoTrackUserLocation(testAccuracy, callback, track)
-      await promise
+      await errorPromise
       expect(callback).toHaveBeenCalledWith({ status: "error" })
+    })
+
+    it("unsubscribes from expo tracking when unsub invoked", async () => {
+      const track = jest.fn()
+      const unsubFromExpo = jest.fn()
+
+      // NB: The unsub function is in a "fire-and-forget" style, which means
+      // we can't tell when it will actually unsubscribe from expo (since
+      // expo's tracker returns a promise). This promise ensures that we give
+      // a chance for the tracker to resolve before asserting.
+      const trackPromise = new Promise<void>((resolve) => {
+        track.mockImplementation(() => {
+          resolve()
+          return Promise.resolve({ remove: unsubFromExpo })
+        })
+      })
+
+      const unsub = expoTrackUserLocation(testAccuracy, jest.fn(), track)
+      unsub()
+      await trackPromise
+      expect(unsubFromExpo).toHaveBeenCalled()
     })
 
     const expectAccuracyConversion = (
