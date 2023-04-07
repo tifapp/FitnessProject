@@ -7,24 +7,23 @@ import { useDependencyValue } from "@lib/dependencies"
 import { useEffect, useState } from "react"
 
 /**
- * A type for tracking the current user's location in the UI.
- */
-export type UserLocationStatus = UserLocationTrackingUpdate | { status: "undetermined" }
-
-/**
  * A hook to observe the user's current location using the
  * `UserLocationDependencyKeys.track` dependency.
+ *
+ * **Notice**:
+ * This hook will always return an error update if the user previously
+ * denied location permissions but then allowed them in settings.
+ * To fix this, ensure you re-request the location permissions before calling
+ * this hook.
  *
  * @param accurracy The accurracy at which to track the user's location.
  * Defaults to `approximate-low`.
  */
-export const useUserLocation = (
+export const useTrackUserLocation = (
   accurracy: UserLocationTrackingAccurracy = "approximate-low"
 ) => {
   const trackLocation = useDependencyValue(UserLocationDependencyKeys.track)
-  const [location, setLocation] = useState<UserLocationStatus>({
-    status: "undetermined"
-  })
+  const [location, setLocation] = useState<UserLocationTrackingUpdate | undefined>()
 
   useEffect(
     () => trackLocation(accurracy, setLocation),

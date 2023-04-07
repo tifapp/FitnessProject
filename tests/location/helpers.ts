@@ -12,7 +12,3 @@ export const baseTestPlacemark = {
 export const unknownLocationPlacemark = {
   name: "North Pacific Ocean"
 } as const
-
-export const unimplementedUserLocation = () => ({
-  track: jest.fn()
-})

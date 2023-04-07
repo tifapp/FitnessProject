@@ -4,7 +4,7 @@ import {
   UserLocationDependencyKeys,
   UserLocationTrackingUpdate
 } from "@lib/location"
-import { useUserLocation } from "@hooks/UserLocation"
+import { useTrackUserLocation } from "@hooks/UserLocation"
 import { act, renderHook } from "@testing-library/react-native"
 
 describe("UserLocationHooks tests", () => {
@@ -30,7 +30,7 @@ describe("UserLocationHooks tests", () => {
           {children}
         </SetDependencyValue>
       )
-      return renderHook(useUserLocation, { wrapper })
+      return renderHook(useTrackUserLocation, { wrapper })
     }
 
     test("processes simple location updates", () => {
@@ -39,7 +39,7 @@ describe("UserLocationHooks tests", () => {
         (_, callback) => (sendLocationUpdate = callback)
       )
       const { result } = renderUseUserLocation()
-      expect(result.current).toMatchObject({ status: "undetermined" })
+      expect(result.current).toBeUndefined()
 
       const update = {
         status: "success",
