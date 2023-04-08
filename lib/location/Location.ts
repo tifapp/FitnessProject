@@ -24,8 +24,8 @@ export type LocationCoordinate2D = Readonly<
 /**
  * A location object meant for tracking purposes.
  */
-export type TrackedLocation = Readonly<{
-  coordinate: LocationCoordinate2D
+export type TrackedLocationCoordinates = Readonly<{
+  coordinates: LocationCoordinate2D
   trackingDate: Date
 }>
 

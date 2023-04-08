@@ -28,7 +28,7 @@ describe("UserLocation tests", () => {
       expect(callback).toHaveBeenCalledWith({
         status: "success",
         location: {
-          coordinate: { latitude: 32.1234, longitude: -121.1234 },
+          coordinates: { latitude: 32.1234, longitude: -121.1234 },
           trackingDate: new Date(1)
         }
       })

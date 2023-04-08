@@ -1,4 +1,4 @@
-import { TrackedLocation } from "./Location"
+import { TrackedLocationCoordinates } from "./Location"
 import {
   watchPositionAsync,
   LocationOptions,
@@ -23,18 +23,12 @@ export type UserLocationTrackingAccurracy =
   | "approximate-medium"
   | "precise"
 
-const accurracyToExpoAccurracy = (accurracy: UserLocationTrackingAccurracy) => {
-  if (accurracy === "approximate-low") return LocationAccuracy.Low
-  if (accurracy === "approximate-medium") return LocationAccuracy.Balanced
-  return LocationAccuracy.Highest
-}
-
 /**
  * An update published to a (@link TrackUserLocation} callback.
  */
 export type UserLocationTrackingUpdate =
   | { status: "error" }
-  | { status: "success"; location: TrackedLocation }
+  | { status: "success"; location: TrackedLocationCoordinates }
 
 export type StopUserLocationTracking = () => void
 
@@ -78,8 +72,14 @@ export const expoTrackUserLocation = (
   return () => subscription.then(sub => sub.remove())
 }
 
+const accurracyToExpoAccurracy = (accurracy: UserLocationTrackingAccurracy) => {
+  if (accurracy === "approximate-low") return LocationAccuracy.Low
+  if (accurracy === "approximate-medium") return LocationAccuracy.Balanced
+  return LocationAccuracy.Highest
+}
+
 const expoLocationToTrackedLocation = (location: LocationObject) => ({
-  coordinate: {
+  coordinates: {
     latitude: location.coords.latitude,
     longitude: location.coords.longitude
   },
