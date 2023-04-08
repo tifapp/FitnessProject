@@ -3,29 +3,35 @@ import {
   EventFormLocationBanner,
   EventFormLocationInfo
 } from "@components/eventForm"
+import { SetDependencyValue } from "@lib/dependencies"
 import { Geocoding, geocodingDependencyKey } from "@lib/location"
 import { render, screen, waitFor } from "@testing-library/react-native"
+import { QueryClient } from "react-query"
 import { unimplementedGeocoding } from "../../helpers/Geocoding"
-import { baseTestEventFormValues } from "./helpers"
 import "../../helpers/Matchers"
-import { SetDependencyValue } from "@lib/dependencies"
-import { TestQueryClientProvider } from "../../helpers/ReactQuery"
+import {
+  createTestQueryClient,
+  TestQueryClientProvider
+} from "../../helpers/ReactQuery"
 import { baseTestPlacemark } from "../../location/helpers"
+import { baseTestEventFormValues } from "./helpers"
 
 const testLocation = baseTestEventFormValues.locationInfo.coordinates
 const testLocationName = baseTestPlacemark.name
 const testLocationAddress = "1234 Cupertino Rd, Cupertino, CA 95104"
 
+const queryClient = createTestQueryClient()
+
 describe("EventFormLocationBanner tests", () => {
   beforeEach(() => (geocoding = unimplementedGeocoding()))
 
   it("should not attempt to geocode when no location is given", () => {
-    renderLocationField()
+    renderLocationField(queryClient)
     expect(geocoding.reverseGeocode).not.toHaveBeenCalled()
   })
 
   it("should not attempt to geocode when initial placemark info given", () => {
-    renderLocationField({
+    renderLocationField(queryClient, {
       coordinates: testLocation,
       placemarkInfo: { name: testLocationName, address: testLocationAddress }
     })
@@ -34,16 +40,26 @@ describe("EventFormLocationBanner tests", () => {
 
   it("should indicate an error when failing to geocode the given coordinates", async () => {
     geocoding.reverseGeocode.mockRejectedValue(new Error("Geocoding Failed"))
-    renderLocationField({ coordinates: testLocation })
+    renderLocationField(queryClient, {
+      coordinates: { latitude: 45.123456, longitude: 45.123456 }
+    })
     await waitFor(() => expect(errorIndicator()).toBeDisplayed())
+  })
+
+  afterAll(() => {
+    queryClient.removeQueries()
+    queryClient.clear()
   })
 })
 
 let geocoding = unimplementedGeocoding()
 
-const renderLocationField = (locationInfo?: EventFormLocationInfo) => {
+const renderLocationField = (
+  queryClient: QueryClient,
+  locationInfo?: EventFormLocationInfo
+) => {
   render(
-    <TestQueryClientProvider>
+    <TestQueryClientProvider client={queryClient}>
       <SetDependencyValue
         forKey={geocodingDependencyKey}
         value={geocoding as Geocoding}

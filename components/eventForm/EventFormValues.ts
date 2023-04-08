@@ -1,6 +1,6 @@
-import { EventColors, SaveEventRequest } from "../../lib/events"
-import { FixedDateRange } from "../../lib/Date"
-import { LocationCoordinate2D } from "../../lib/location"
+import { FixedDateRange } from "@lib/date"
+import { EventColors, SaveEventRequest } from "@lib/events"
+import { LocationCoordinate2D } from "@lib/location"
 
 export type EventFormPlacemarkInfo = {
   readonly name?: string
