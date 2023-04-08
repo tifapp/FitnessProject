@@ -26,7 +26,7 @@ const EventsList = () => {
 
   useEffect(() => {
     sheetRef?.current?.present()
-  }, [])
+  }, [fontsLoaded])
 
   if (!fontsLoaded) {
     return null
