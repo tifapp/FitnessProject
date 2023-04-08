@@ -1,10 +1,8 @@
 import EventsList from "@components/EventsList"
-import Map, { MapMarker } from "@components/Map"
+import Map from "@components/Map"
 import EventTabBar from "@components/tabBarComponents/EventTabBar"
 import React from "react"
-import { mapCompStyle, state } from "@components/MapTestData"
-import { Text } from "react-native"
-import { Circle } from "react-native-maps"
+import { state } from "@components/MapTestData"
 
 const ActivitiesScreen = () => {
   return (
