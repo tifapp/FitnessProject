@@ -1,6 +1,6 @@
 import { SetDependencyValue } from "@lib/dependencies"
 import {
-  TrackedLocation,
+  LocationCoordinatesMocks,
   UserLocationDependencyKeys,
   UserLocationTrackingUpdate
 } from "@lib/location"
@@ -11,11 +11,8 @@ describe("UserLocationHooks tests", () => {
   describe("useUserLocation tests", () => {
     beforeEach(() => jest.resetAllMocks())
 
-    const testTrackedLocation: TrackedLocation = {
-      coordinate: {
-        latitude: 69.69696969,
-        longitude: -69.696969
-      },
+    const testLocation = {
+      coordinates: LocationCoordinatesMocks.NYC,
       trackingDate: new Date()
     }
 
@@ -41,10 +38,7 @@ describe("UserLocationHooks tests", () => {
       const { result } = renderUseUserLocation()
       expect(result.current).toBeUndefined()
 
-      const update = {
-        status: "success",
-        location: testTrackedLocation
-      } as const
+      const update = { status: "success", location: testLocation } as const
       act(() => sendLocationUpdate(update))
       expect(result.current).toMatchObject(update)
     })

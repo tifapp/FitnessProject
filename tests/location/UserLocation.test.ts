@@ -1,6 +1,7 @@
 import { LocationAccuracy } from "expo-location"
 import {
   expoTrackUserLocation,
+  LocationCoordinatesMocks,
   UserLocationTrackingAccurracy
 } from "@lib/location"
 
@@ -18,7 +19,7 @@ describe("UserLocation tests", () => {
       const callback = jest.fn()
       const track = jest.fn().mockImplementation((_, trackFn) => {
         trackFn({
-          coords: { latitude: 32.1234, longitude: -121.1234 },
+          coords: LocationCoordinatesMocks.Paris,
           timestamp: 1000
         })
         return Promise.resolve()
@@ -28,7 +29,7 @@ describe("UserLocation tests", () => {
       expect(callback).toHaveBeenCalledWith({
         status: "success",
         location: {
-          coordinates: { latitude: 32.1234, longitude: -121.1234 },
+          coordinates: LocationCoordinatesMocks.Paris,
           trackingDate: new Date(1)
         }
       })
