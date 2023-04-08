@@ -1,6 +1,9 @@
 import { createDependencyKey, DependencyValues } from "../../lib/dependencies"
+import { _negateDependencyKeyDefaultValueTestContext } from "./helpers"
 
 describe("DependencyValues tests", () => {
+  _negateDependencyKeyDefaultValueTestContext()
+
   it("creates a dependency key's default value on first access", () => {
     const key = createDependencyKey(1)
 
