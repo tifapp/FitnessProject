@@ -4,7 +4,7 @@ import {
   BottomSheetModalProvider
 } from "@gorhom/bottom-sheet"
 import { useLastDefinedValue } from "../../hooks/useLastDefinedValue"
-import { FontScaleFactors, useFontScale } from "../../lib/FontScale"
+import { FontScaleFactors, useFontScale } from "../../hooks/Fonts"
 import React, { useEffect, useMemo, useRef } from "react"
 import { StyleSheet } from "react-native"
 import { EventFormAdvancedSettings } from "./AdvancedSettings"

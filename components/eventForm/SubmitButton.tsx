@@ -1,4 +1,4 @@
-import { FontScaleFactors } from "../../lib/FontScale"
+import { FontScaleFactors } from "../../hooks/Fonts"
 import React from "react"
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { useEventFormContext } from "./EventForm"
