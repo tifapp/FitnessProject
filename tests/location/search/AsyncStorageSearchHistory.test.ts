@@ -32,7 +32,7 @@ describe("AsyncStorageLocationSearchHistory tests", () => {
   afterEach(() => jest.useRealTimers())
 
   it("should save a newly created result in async storage with history based on the current date", async () => {
-    jest.setSystemTime(new Date("2023-03-08T00:51:00"))
+    jest.setSystemTime(new Date("2023-03-08T00:51:00Z"))
     await searchHistory.saveSearchResult(testSearchResult, {
       reason: "attended-event"
     })
@@ -40,17 +40,17 @@ describe("AsyncStorageLocationSearchHistory tests", () => {
     const saved = await AsyncStorageUtils.load(testSearchResultKey)
     expect(saved).toMatchObject({
       ...testSearchResult,
-      history: [{ timestamp: 1678265460, reason: "attended-event" }]
+      history: [{ timestamp: 1678236660, reason: "attended-event" }]
     })
   })
 
   it("should append to the history when saved more than once", async () => {
-    jest.setSystemTime(1000)
+    jest.setSystemTime(new Date("2023-03-04T00:51:00Z"))
     await searchHistory.saveSearchResult(testSearchResult, {
       reason: "attended-event"
     })
 
-    jest.setSystemTime(2000)
+    jest.setSystemTime(new Date("2023-03-05T00:51:00Z"))
     await searchHistory.saveSearchResult(testSearchResult, {
       reason: "hosted-event"
     })
@@ -59,8 +59,8 @@ describe("AsyncStorageLocationSearchHistory tests", () => {
     expect(saved).toMatchObject(
       expect.objectContaining({
         history: [
-          { timestamp: 1, reason: "attended-event" },
-          { timestamp: 2, reason: "hosted-event" }
+          { timestamp: 1677891060, reason: "attended-event" },
+          { timestamp: 1677977460, reason: "hosted-event" }
         ]
       })
     )
