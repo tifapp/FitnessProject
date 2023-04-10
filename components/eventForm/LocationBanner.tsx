@@ -4,7 +4,7 @@ import React from "react"
 import { StyleSheet, View } from "react-native"
 import { useEventFormContext } from "./EventForm"
 import { FormLabel, SkeletonFormLabel } from "../formComponents/FormLabels"
-import { FontScaleFactors } from "../../lib/FontScale"
+import { FontScaleFactors } from "../../hooks/Fonts"
 import {
   EventFormLocationInfo,
   EventFormPlacemarkInfo

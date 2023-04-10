@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react"
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import { FontScaleFactors } from "../../lib/FontScale"
+import { FontScaleFactors } from "../../hooks/Fonts"
 import { useEventFormContext } from "./EventForm"
 import { MaterialIcon } from "@components/common/Icons"
 
