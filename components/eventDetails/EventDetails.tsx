@@ -132,7 +132,7 @@ const EventDetails = ({ event, numAttendees }: Props) => {
       </View>
       <DetailsMap
         ref={appRef}
-        style={{ width: "100%", height: "50%" }}
+        style={{ width: "100%", height: "30%" }}
         initialRegion={{
           latitude: event.coordinates.latitude,
           longitude: event.coordinates.longitude,
