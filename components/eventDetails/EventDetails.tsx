@@ -2,8 +2,9 @@ import { MaterialCommunityIcon } from "@components/common/Icons"
 import MenuDropdown from "@components/eventCard/MenuDropdown"
 import { Event } from "@lib/events"
 import { placemarkToFormattedAddress } from "@lib/location"
-import React from "react"
+import React, { useRef } from "react"
 import { Image, Pressable, StyleSheet, Text, View } from "react-native"
+import DetailsMap, { MapRefMethods } from "./DetailsMap"
 
 interface Props {
   event: Event
@@ -12,6 +13,7 @@ interface Props {
 
 const EventDetails = ({ event, numAttendees }: Props) => {
   const hexAlpha = "33"
+  const appRef = useRef<MapRefMethods | null>(null)
   return (
     <View style={styles.container}>
       <View style={[styles.viewSpacing, { flex: 1 }]}>
@@ -128,6 +130,17 @@ const EventDetails = ({ event, numAttendees }: Props) => {
             </View>
           )}
       </View>
+      <DetailsMap
+        ref={appRef}
+        style={{ width: "100%", height: "50%" }}
+        initialRegion={{
+          latitude: event.coordinates.latitude,
+          longitude: event.coordinates.longitude,
+          latitudeDelta: 0.1,
+          longitudeDelta: 0.1
+        }}
+        marker={{ key: event.id, location: event.coordinates }}
+      />
     </View>
   )
 }
