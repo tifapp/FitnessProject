@@ -5,6 +5,7 @@ import {
   sin2
 } from "../Math"
 import { z } from "zod"
+import { PlacemarkSchema } from "./Placemark"
 
 /**
  * A zod schema for {@link LocationCoordinate2D}.
@@ -50,6 +51,19 @@ export namespace LocationCoordinatesMocks {
     longitude: 2.3522
   } as const
 }
+
+/**
+ * A zod schema for {@link Location}.
+ */
+export const LocationSchema = z.object({
+  coordinates: LocationCoordinates2DSchema,
+  placemark: PlacemarkSchema
+})
+
+/**
+ * A type that maps a lat-lng coordinate to its respective placemark.
+ */
+export type Location = Readonly<z.infer<typeof LocationSchema>>
 
 /**
  * A location object meant for tracking purposes.
