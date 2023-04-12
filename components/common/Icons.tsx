@@ -1,5 +1,5 @@
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons"
-import { useFontScale } from "@lib/FontScale"
+import { useFontScale } from "@hooks/Fonts"
 import React, { ComponentProps } from "react"
 import { StyleProp, ViewProps, ViewStyle } from "react-native"
 

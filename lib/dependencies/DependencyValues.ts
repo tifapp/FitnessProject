@@ -72,7 +72,10 @@ export class DependencyValues {
     const cachedValue = this.cachedValues.get(key.identifier)
     if (cachedValue) return cachedValue as T
 
-    if (process.env.JEST_WORKER_ID !== "undefined") {
+    if (
+      process.env.JEST_WORKER_ID !== "undefined" &&
+      process.env.JEST_WORKER_ID !== undefined
+    ) {
       throw new Error(`
       Attempted to access the default value of a dependency key in a test context.
 

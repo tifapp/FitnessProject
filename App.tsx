@@ -41,7 +41,6 @@ import { Audio } from "expo-av"
 import * as Notifications from "expo-notifications"
 import { StatusBar } from "expo-status-bar"
 import React, { useEffect, useRef, useState } from "react"
-import { GestureHandlerRootView } from "react-native-gesture-handler"
 import {
   ActivityIndicator,
   Alert,
@@ -69,6 +68,7 @@ import ActivitiesScreen from "@screens/ActivitiesScreen"
 import { SetDependencyValue } from "./lib/dependencies"
 import { userIdDependencyKey } from "./lib/MiscDependencyKeys"
 import { AppQueryClientProvider } from "@components/AppQueryClientProvider"
+import { useAppFonts } from "@hooks/Fonts"
 
 if (
   Platform.OS === "android" &&
@@ -116,7 +116,7 @@ const App = () => {
   const [isNewUser, setIsNewUser] = useState<boolean>(false) // stores the user's id if logged in
   const [isAdmin, setIsAdmin] = useState<boolean>(false) // seems insecure
   const [isDeveloper, setIsDeveloper] = useState<boolean>(false)
-
+  const [areFontsLoaded] = useAppFonts()
   const [conversationIds, setConversationIds] = useState<string[]>([])
 
   globalThis.addConversationIds = (id) => {
@@ -245,6 +245,8 @@ const App = () => {
 
   const dimensions = useWindowDimensions()
 
+  // TODO: Replace this with the splash screen?
+  if (!areFontsLoaded) return null
   if (userId == "checking...") {
     return (
       <View style={{ flex: 1, backgroundColor: "#a9efe0" }}>

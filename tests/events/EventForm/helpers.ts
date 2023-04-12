@@ -1,4 +1,4 @@
-import { FixedDateRange } from "@lib/Date"
+import { FixedDateRange } from "@lib/date"
 import { EventColors } from "@lib/events"
 import { fireEvent, screen } from "@testing-library/react-native"
 import { setDateTimePickerDate } from "../../helpers/DateTimePicker"

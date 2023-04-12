@@ -5,7 +5,6 @@ import {
   BottomSheetModal,
   BottomSheetModalProvider
 } from "@gorhom/bottom-sheet"
-import { useFonts } from "expo-font"
 import { CurrentUserEvent, EventMocks } from "@lib/events/Event"
 import { EventCard } from "./eventCard/EventCard"
 
@@ -20,20 +19,13 @@ const EventsList = () => {
 
   // hooks
   const sheetRef = useRef<BottomSheetModal>(null)
-  const [fontsLoaded] = useFonts({
-    "Open-Sans-Bold": require("../assets/fonts/OpenSans-Bold.ttf")
-  })
 
   useEffect(() => {
     sheetRef?.current?.present()
-  }, [fontsLoaded])
-
-  if (!fontsLoaded) {
-    return null
-  }
+  }, [])
 
   // variables
-  const snapPoints = ["8%", "55%", "90%"]
+  const snapPoints = ["17%", "55%", "90%"]
 
   return (
     <BottomSheetModalProvider>
@@ -84,7 +76,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginLeft: 16,
     textAlignVertical: "top",
-    fontFamily: "Open-Sans-Bold"
+    fontFamily: "OpenSansBold"
   }
 })
 

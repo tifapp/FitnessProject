@@ -3,7 +3,6 @@ import { Image, StyleSheet, Text, View } from "react-native"
 import { CurrentUserEvent, isHostingEvent } from "@lib/events/Event"
 import { placemarkToAbbreviatedAddress } from "@lib/location"
 import { Ionicons } from "@expo/vector-icons"
-import { useFonts } from "expo-font"
 import MenuDropdown from "./MenuDropdown"
 
 export type EventCardProps = {
@@ -14,17 +13,8 @@ export const EventCard = ({ event }: EventCardProps) => {
   const hexAlpha = "4D"
   const lightEventColor = event.color + hexAlpha
 
-  const [fontsLoaded] = useFonts({
-    "Open-Sans": require("../../assets/fonts/OpenSans-Regular.ttf"),
-    "Open-Sans-Bold": require("../../assets/fonts/OpenSans-Bold.ttf")
-  })
-
-  if (!fontsLoaded) {
-    return null
-  }
-
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor: "#0000000D"}]}>
       <View style={[styles.topRow, styles.flexRow]}>
         <Image
           style={[styles.image, styles.iconMargin]}
@@ -115,22 +105,22 @@ const styles = StyleSheet.create({
   infoText: {
     textAlignVertical: "center",
     fontSize: 14,
-    fontFamily: "Open-Sans",
+    fontFamily: "OpenSans",
     color: "grey"
   },
   titleText: {
     textAlignVertical: "center",
-    fontFamily: "Open-Sans-Bold",
+    fontFamily: "OpenSansBold",
     fontSize: 16
   },
   name: {
     textAlignVertical: "center",
-    fontFamily: "Open-Sans-Bold",
+    fontFamily: "OpenSansBold",
     fontSize: 14,
     paddingLeft: 8
   },
   description: {
-    fontFamily: "Open-Sans",
+    fontFamily: "OpenSans",
     fontSize: 13
   },
   image: {
@@ -139,7 +129,6 @@ const styles = StyleSheet.create({
     borderRadius: 24
   },
   container: {
-    backgroundColor: "#f5f5f5",
     paddingHorizontal: 18,
     paddingVertical: 16,
     borderRadius: 20,
