@@ -50,6 +50,11 @@ export const placemarkToFormattedAddress = (placemark: Placemark) => {
  * At the moment, this only outputs US style addresses.
  */
 export const placemarkToAbbreviatedAddress = (placemark: Placemark) => {
+  if (placemark.city === undefined || placemark.region === undefined) {
+    return "Unknown Location"
+  } else if (placemark.name === undefined) {
+    return `${placemark.city}, ${placemark.region}`
+  }
   return `${placemark.name}, ${placemark.city}, ${placemark.region}`
 }
 

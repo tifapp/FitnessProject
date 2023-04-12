@@ -16,6 +16,7 @@ const EventsList = () => {
   ]
   const MARGIN_HORIZONTAL = 24
   const MARGIN_VERTICAL = 16
+  const BOTTOM_OFFSET = 80
 
   // hooks
   const sheetRef = useRef<BottomSheetModal>(null)
@@ -25,7 +26,7 @@ const EventsList = () => {
   }, [])
 
   // variables
-  const snapPoints = ["17%", "55%", "90%"]
+  const snapPoints = ["8%", "55%", "90%"]
 
   return (
     <BottomSheetModalProvider>
@@ -39,6 +40,7 @@ const EventsList = () => {
           snapPoints={snapPoints}
           index={0}
           enablePanDownToClose={false}
+          bottomInset={BOTTOM_OFFSET}
         >
           <BottomSheetFlatList
             data={events}
