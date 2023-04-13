@@ -19,8 +19,8 @@ export const BodyText = (props: TextProps) => (
 /**
  * A text component for smaller and more subtle details.
  */
-export const Subtitle = (props: TextProps) => (
-  <Text {...props} style={[props.style, styles.subtitle]} />
+export const Caption = (props: TextProps) => (
+  <Text {...props} style={[props.style, styles.caption]} />
 )
 
 /**
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     fontFamily: "OpenSans",
     fontSize: 16
   },
-  subtitle: {
+  caption: {
     fontFamily: "OpenSans",
     fontSize: 12,
     opacity: 0.35
