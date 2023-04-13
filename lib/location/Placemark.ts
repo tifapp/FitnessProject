@@ -1,20 +1,24 @@
 import addressFormatter from "@fragaria/address-formatter"
+import { z } from "zod"
+
+/**
+ * A zod schema for {@link Placemark}.
+ */
+export const PlacemarkSchema = z.object({
+  name: z.string(),
+  country: z.string(),
+  postalCode: z.string(),
+  street: z.string(),
+  streetNumber: z.string(),
+  region: z.string(),
+  isoCountryCode: z.string(),
+  city: z.string()
+}).partial()
 
 /**
  * A type representing the components of an address.
  */
-export type Placemark = Partial<
-  Readonly<{
-    name: string
-    country: string
-    postalCode: string
-    street: string
-    streetNumber: string
-    region: string
-    isoCountryCode: string
-    city: string
-  }>
->
+export type Placemark = Readonly<z.infer<typeof PlacemarkSchema>>
 
 /**
  * Formats a `Placemark` instance into a readable address if able.
