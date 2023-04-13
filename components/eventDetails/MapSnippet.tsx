@@ -6,30 +6,12 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
 /**
  * A type that can be rendered by a {@link EventsMap}.
  */
-export interface MapMarker {
+export interface EventMarker {
   key: string
   location: Location
 }
 
-export type MapBounds = {
-  left: Location
-  right: Location
-  bottom: Location
-  top: Location
-}
-
-export type MapFitToBoundsOptions = { animated: boolean }
-
-export type MapRefMethods = {
-  /**
-   * Recenter the map to wherever the given location is.
-   *
-   */
-
-  recenterToLocation: (givenLocation: Location) => void
-}
-
-export type MapProps<T extends MapMarker> = {
+export type MapProps<T extends EventMarker> = {
   style?: StyleProp<ViewStyle>
 
   /**
@@ -66,51 +48,22 @@ export type MapProps<T extends MapMarker> = {
    * Renders a replacement for a singular map marker that was passed in through `markers`.
    */
   renderMarker?: (marker: T) => React.ReactNode
-
-  /**
-   * Handles the selection of a marker.
-   *
-   * @param marker a singular map marker that was passed in through `markers`.
-   */
-  onMarkerSelected?: (marker: T) => void
-
-  /**
-   * Forwards the coordinates of where a user long pressed on the map.
-   */
-  onLongPress?: (coordinates: Location) => void
 }
 
-export const DetailsMap = forwardRef(function ReffedMap<T extends MapMarker> (
+export const MapSnippet = function Map<T extends EventMarker> (
   {
     initialRegion,
     marker,
     renderMarker,
-    onMarkerSelected,
     style,
     canScroll = false,
     canRotate = false,
     canZoom = false,
-    onLongPress
-  }: MapProps<T>,
-  ref: MutableRefObject<MapRefMethods>
+  }: MapProps<T>
 ) {
-  const mapRef = useRef<MapView | null>(null)
-
-  /**
-   * Recenter on to the given marker.
-   */
-  function reCenter () {
-    mapRef.current?.animateToRegion({
-      latitude: marker.location.latitude,
-      longitude: marker.location.longitude,
-      latitudeDelta: 0.1,
-      longitudeDelta: 0.1
-    })
-  }
 
   return (
     <MapView
-      ref={mapRef}
       style={style}
       provider={PROVIDER_GOOGLE}
       initialRegion={initialRegion}
@@ -118,10 +71,6 @@ export const DetailsMap = forwardRef(function ReffedMap<T extends MapMarker> (
       scrollEnabled={canScroll}
       loadingEnabled={true}
       toolbarEnabled={false}
-      onMapReady={() => reCenter}
-      onLongPress={(e) => onLongPress?.(e.nativeEvent.coordinate)}
-      followsUserLocation={true}
-      showsUserLocation={true}
       zoomEnabled={canZoom}
       customMapStyle={[
         {
@@ -142,7 +91,6 @@ export const DetailsMap = forwardRef(function ReffedMap<T extends MapMarker> (
               latitude: marker.location.latitude,
               longitude: marker.location.longitude
             }}
-            onPress={() => onMarkerSelected?.(marker)}
           >
             {renderMarker && renderMarker(marker)}
           </Marker>
@@ -150,6 +98,6 @@ export const DetailsMap = forwardRef(function ReffedMap<T extends MapMarker> (
       }
     </MapView>
   )
-})
+}
 
-export default DetailsMap
+export default MapSnippet;
