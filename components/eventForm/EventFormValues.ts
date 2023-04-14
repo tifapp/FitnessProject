@@ -1,7 +1,6 @@
-import { EventColors } from "../../lib/events/EventColors"
-import { FixedDateRange } from "../../lib/Date"
-import { EditEventInput } from "../../lib/events"
-import { Location } from "../../lib/location"
+import { FixedDateRange } from "@lib/date"
+import { EventColors, SaveEventRequest } from "@lib/events"
+import { LocationCoordinate2D } from "@lib/location"
 
 export type EventFormPlacemarkInfo = {
   readonly name?: string
@@ -9,7 +8,7 @@ export type EventFormPlacemarkInfo = {
 }
 
 export type EventFormLocationInfo = {
-  readonly coordinates: Location
+  readonly coordinates: LocationCoordinate2D
   readonly placemarkInfo?: EventFormPlacemarkInfo
 }
 
@@ -34,10 +33,10 @@ export const eventEditInputFromFormValues = (values: EventFormValues) => {
   return {
     title: values.title,
     description: values.description.length > 0 ? values.description : undefined,
-    location: values.locationInfo.coordinates,
+    coordinates: values.locationInfo.coordinates,
     dateRange: values.dateRange,
     color: values.color,
     shouldHideAfterStartDate: values.shouldHideAfterStartDate,
     radiusMeters: values.radiusMeters
-  } as EditEventInput
+  } as SaveEventRequest
 }

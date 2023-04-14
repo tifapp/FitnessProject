@@ -10,7 +10,7 @@ import {
 } from "react-native"
 import { EventFormSection, useEventFormContext } from "./EventForm"
 import { MaterialIcons } from "@expo/vector-icons"
-import { FontScaleFactors, useFontScale } from "../../lib/FontScale"
+import { FontScaleFactors, useFontScale } from "../../hooks/Fonts"
 
 export type EventFormToolbarProps = {
   containerStyle?: StyleProp<ViewStyle>

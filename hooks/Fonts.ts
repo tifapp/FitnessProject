@@ -1,4 +1,22 @@
 import { useWindowDimensions } from "react-native"
+import {
+  useFonts,
+  OpenSans_700Bold as OpenSansBold,
+  OpenSans_400Regular as OpenSans,
+  OpenSans_600SemiBold as OpenSansSemiBold
+} from "@expo-google-fonts/open-sans"
+
+/**
+ * Loads all fonts for the app. (Currently just open sans variants).
+ *
+ * This hook should only need to be called once at the root of the
+ * application. Subsequent calls will produce error results.
+ */
+export const useAppFonts = () => useFonts({
+  OpenSansSemiBold,
+  OpenSans,
+  OpenSansBold
+})
 
 /**
  * Common font scale factor cutoffs somewhat based on iOS's dynamic type sizes.

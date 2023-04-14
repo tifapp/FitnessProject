@@ -1,0 +1,49 @@
+name: Auto label PRs with review count
+on:
+  pull_request_review:
+    types: [submitted]
+  pull_request:
+    types: [opened, synchronize]
+jobs:
+  auto-label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if PR has reviews
+        id: check_reviews
+        uses: octokit/request-action@v2.x
+        with:
+          route: GET /repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Count reviews
+        id: count_reviews
+        if: steps.check_reviews.outputs.data != ''
+        run: echo "review_count=$(echo "${{ steps.check_reviews.outputs.data }}" | jq -r '. | length')" >> $GITHUB_ENV
+      - name: Add "merge conflict" label
+        if: steps.check-conflicts.outputs.data.mergeable == false
+        uses: actions/github-script@v4.1.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const payload = {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              labels: ['merge conflict']
+            };
+            await github.issues.addLabels(payload);
+      - name: Label PR with review count
+        if: steps.check_reviews.outputs.data != ''
+        uses: actions/github-script@v4.1.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const reviewCount = process.env.review_count;
+            const labelName = `reviews (${reviewCount})`;
+            const payload = {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              labels: [labelName]
+            };
+            await github.issues.addLabels(payload);

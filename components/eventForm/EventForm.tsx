@@ -1,5 +1,5 @@
 import { useReactHookFormContext } from "../../hooks/FormHooks"
-import { EditEventInput } from "../../lib/events"
+import { SaveEventRequest } from "../../lib/events"
 import React, {
   ReactNode,
   useContext,
@@ -28,7 +28,7 @@ export type EventFormProps = {
    * Handles the submission of the form. This method should not throw
    * any errors and should handle them internally.
    */
-  onSubmit: (update: EditEventInput) => Promise<void>
+  onSubmit: (update: SaveEventRequest) => Promise<void>
 
   /**
    * A handler for the dismissal of this form.
@@ -119,7 +119,7 @@ export type EventFormContextValues = {
   /**
    * Submits the data of this form context, in the form of an update input.
    */
-  submit: (update: EditEventInput) => Promise<void>
+  submit: (update: SaveEventRequest) => Promise<void>
 
   /**
    * Dismisses this form.
