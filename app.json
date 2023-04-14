@@ -34,6 +34,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "backgroundColor": "#26C6A2"
-    }
+    },
+    "assets": ["./assets/fonts/"]
   }
 }
