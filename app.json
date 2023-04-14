@@ -28,7 +28,7 @@
     "android": {
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyBO7rcJvIrgvekbFs5z2NHgcafBkvsjcfc"
+          "apiKey": "insert API key"
         }
       },
       "permissions": ["ACCESS_BACKGROUND_LOCATION"],
