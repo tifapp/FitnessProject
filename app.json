@@ -16,7 +16,11 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "bundleIdentifier": "com.tifapp.FitnessApp"
+      "bundleIdentifier": "com.tifapp.FitnessApp",
+      "infoPlist": {
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "REASON_FOR_REQUEST",
+        "UIBackgroundModes": ["location", "fetch"]
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -24,16 +28,13 @@
     "android": {
       "config": {
         "googleMaps": {
-          "apiKey": "<insert API key here>"
+          "apiKey": "AIzaSyBO7rcJvIrgvekbFs5z2NHgcafBkvsjcfc"
         }
       },
+      "permissions": ["ACCESS_BACKGROUND_LOCATION"],
       "package": "com.tifapp.FitnessApp",
       "useNextNotificationsApi": true,
       "googleServicesFile": "./google-services.json"
-    },
-    "splash": {
-      "image": "./assets/splash.png",
-      "backgroundColor": "#26C6A2"
     }
   }
 }

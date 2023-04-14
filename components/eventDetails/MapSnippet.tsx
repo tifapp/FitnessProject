@@ -1,5 +1,5 @@
-import { Location } from "lib/location/Location"
-import React, { forwardRef, MutableRefObject, useRef } from "react"
+import { LocationCoordinate2D } from "lib/location/Location"
+import React from "react"
 import { StyleProp, ViewStyle } from "react-native"
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
 
@@ -8,7 +8,7 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
  */
 export interface EventMarker {
   key: string
-  location: Location
+  location: LocationCoordinate2D
 }
 
 export type MapProps<T extends EventMarker> = {
@@ -50,18 +50,15 @@ export type MapProps<T extends EventMarker> = {
   renderMarker?: (marker: T) => React.ReactNode
 }
 
-export const MapSnippet = function Map<T extends EventMarker> (
-  {
-    initialRegion,
-    marker,
-    renderMarker,
-    style,
-    canScroll = false,
-    canRotate = false,
-    canZoom = false,
-  }: MapProps<T>
-) {
-
+export const MapSnippet = function Map<T extends EventMarker> ({
+  initialRegion,
+  marker,
+  renderMarker,
+  style,
+  canScroll = false,
+  canRotate = false,
+  canZoom = false
+}: MapProps<T>) {
   return (
     <MapView
       style={style}
@@ -100,4 +97,4 @@ export const MapSnippet = function Map<T extends EventMarker> (
   )
 }
 
-export default MapSnippet;
+export default MapSnippet

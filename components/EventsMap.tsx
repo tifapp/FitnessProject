@@ -31,7 +31,7 @@ export type MapRefMethods = {
    *
    */
 
-  recenterToLocation: (givenLocation: Location) => void
+  recenterToLocation: (givenLocation: LocationCoordinate2D) => void
 }
 
 export type MapProps<T extends MapMarker> = {

@@ -1,9 +1,9 @@
+import EventsList from "@components/EventsList"
 import EventsMap, { MapRefMethods } from "@components/EventsMap"
 import { state } from "@components/MapTestData"
+import EventTabBar from "@components/tabBarComponents/EventTabBar"
 import React, { useRef } from "react"
 import { Button } from "react-native"
-import EventsList from "@components/EventsList"
-import EventTabBar from "@components/tabBarComponents/EventTabBar"
 
 const ActivitiesScreen = () => {
   const appRef = useRef<MapRefMethods | null>(null)

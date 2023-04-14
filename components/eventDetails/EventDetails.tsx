@@ -1,7 +1,7 @@
 import { MaterialCommunityIcon } from "@components/common/Icons"
 import MenuDropdown from "@components/eventCard/MenuDropdown"
-import { placemarkToFormattedAddress } from "@lib/location"
 import { CurrentUserEvent, isAttendingEvent, isHostingEvent } from "@lib/events"
+import { placemarkToFormattedAddress } from "@lib/location"
 import React from "react"
 import { Image, Pressable, StyleSheet, Text, View } from "react-native"
 import MapSnippet from "./MapSnippet"
