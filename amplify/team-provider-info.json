@@ -64,5 +64,12 @@
         "media": {}
       }
     }
+  },
+  "mockapi": {
+    "categories": {
+      "auth": {
+        "fitnessprojecta8f49cfe": {}
+      }
+    }
   }
 }
