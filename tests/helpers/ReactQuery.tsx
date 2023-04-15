@@ -1,4 +1,4 @@
-import React, { ReactNode, useMemo } from "react"
+import React, { ReactNode, useEffect, useMemo } from "react"
 import { QueryClient, QueryClientProvider } from "react-query"
 
 /**
@@ -67,12 +67,15 @@ export const TestQueryClientProvider = ({
   // on each other.
   // See: https://react-query-v3.tanstack.com/guides/testing#our-first-test
   const queryClient = useMemo(() => {
-    if (client) {
-      client.resetQueries()
-      return client
-    }
+    if (client) return client
     return createTestQueryClient()
   }, [client])
+
+  useEffect(() => {
+    queryClient.resetQueries()
+    return () => queryClient.clear()
+  }, [queryClient])
+
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )

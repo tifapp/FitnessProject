@@ -1,3 +1,5 @@
+import { UserLocationTrackingUpdate } from "@lib/location"
+
 export const baseTestPlacemark = {
   name: "Apple Infinite Loop",
   country: "United States of America",

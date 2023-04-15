@@ -1,3 +1,4 @@
+import { faker } from "@faker-js/faker"
 import addressFormatter from "@fragaria/address-formatter"
 import { z } from "zod"
 
@@ -19,6 +20,20 @@ export const PlacemarkSchema = z.object({
  * A type representing the components of an address.
  */
 export type Placemark = Readonly<z.infer<typeof PlacemarkSchema>>
+
+/**
+ * Generates a mock placemark for testing and UI purposes.
+ */
+export const mockPlacemark = () => ({
+  name: faker.address.streetName(),
+  country: faker.address.country(),
+  postalCode: faker.address.zipCode(),
+  street: faker.address.street(),
+  streetNumber: faker.address.buildingNumber(),
+  region: faker.address.stateAbbr(),
+  isoCountryCode: faker.address.countryCode(),
+  city: faker.address.city()
+})
 
 /**
  * Formats a `Placemark` instance into a readable address if able.

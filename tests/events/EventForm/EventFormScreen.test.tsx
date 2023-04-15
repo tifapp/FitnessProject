@@ -3,7 +3,7 @@ import { dateRange } from "@lib/date"
 import { UpdateDependencyValues } from "@lib/dependencies"
 import { EventColors } from "@lib/events"
 import { hapticsDependencyKey } from "@lib/Haptics"
-import { geocodingDependencyKey } from "@lib/location"
+import { GeocodingDependencyKeys } from "@lib/location"
 import { NavigationContainer } from "@react-navigation/native"
 import EventFormScreen from "@screens/EventFormScreen"
 import {
@@ -183,9 +183,7 @@ const renderEventFormScreen = (
       <TestQueryClientProvider client={queryClient}>
         <UpdateDependencyValues
           update={(values) => {
-            const geocoding = unimplementedGeocoding()
-            geocoding.reverseGeocode.mockImplementation(neverPromise)
-            values.set(geocodingDependencyKey, geocoding)
+            values.set(GeocodingDependencyKeys.reverseGeocode, neverPromise)
             values.set(hapticsDependencyKey, jest.fn())
           }}
         >

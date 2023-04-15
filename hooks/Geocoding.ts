@@ -1,14 +1,28 @@
 import { useDependencyValue } from "../lib/dependencies"
-import { geocodingDependencyKey, LocationCoordinate2D } from "../lib/location"
+import { GeocodingDependencyKeys, LocationCoordinate2D } from "../lib/location"
 import { useQuery } from "react-query"
 
+export type UseReverseGeocodeQueryOptions = {
+  isEnabled?: boolean
+}
+
 /**
- * Reverse geocodes the best placemark for a location.
+ * Reverse geocodes the most accurrate location for the given coordinates.
  */
-export const useReverseGeocodeQuery = (location: LocationCoordinate2D) => {
-  const geocoding = useDependencyValue(geocodingDependencyKey)
+export const useReverseGeocodeQuery = (
+  coordinates: LocationCoordinate2D,
+  options?: UseReverseGeocodeQueryOptions
+) => {
+  const reverseGeocode = useDependencyValue(GeocodingDependencyKeys.reverseGeocode)
   return useQuery(
-    ["reverseGeocode", location, geocoding.reverseGeocode],
-    async () => await geocoding.reverseGeocode(location).then((res) => res[0])
+    ["reverseGeocode", coordinates, reverseGeocode],
+    async () => await reverseGeocode(coordinates),
+    // NB: Geocoded data rarely ever changes, so we can
+    // get away with infinite cache time.
+    {
+      cacheTime: Infinity,
+      staleTime: Infinity,
+      enabled: options?.isEnabled ?? true
+    }
   )
 }
