@@ -1,8 +1,40 @@
 import React from "react"
 import { LocationCoordinate2D, Location } from "@lib/location"
-import { TouchableHighlight } from "react-native"
+import {
+  TouchableHighlight,
+  TouchableOpacity,
+  View
+} from "react-native"
 import { useReverseGeocodeQuery } from "@hooks/Geocoding"
 import { Headline } from "@components/Text"
+import { SearchBar } from "@components/SearchBar"
+import { atom, useAtom } from "jotai"
+
+const searchTextAtom = atom("")
+
+export type HeaderLocationSearchBarProps = {
+  onBackTapped: () => void
+}
+
+export const HeaderLocationSearchBar = ({
+  onBackTapped
+}: HeaderLocationSearchBarProps) => {
+  const [searchText, setSearchText] = useAtom(searchTextAtom)
+  return (
+    <SearchBar
+      leftAddon={
+        <TouchableOpacity
+          onPress={() => onBackTapped()}
+          accessibilityLabel="Go back"
+        >
+          <View />
+        </TouchableOpacity>
+      }
+      text={searchText}
+      onTextChanged={setSearchText}
+    />
+  )
+}
 
 export type LocationSearchUserCoordinatesOptionProps = {
   onSelected: (selection: Location) => void

@@ -8,7 +8,8 @@ import {
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
 import React from "react"
 import {
-  LocationSearchUserCoordinatesOption
+  LocationSearchUserCoordinatesOption,
+  HeaderLocationSearchBar
 } from "@screens/LocationSearch"
 import { SetDependencyValue } from "@lib/dependencies"
 import "../../helpers/Matchers"
@@ -16,6 +17,26 @@ import { TestQueryClientProvider } from "../../helpers/ReactQuery"
 
 describe("LocationSearchUI tests", () => {
   beforeEach(() => jest.resetAllMocks())
+
+  describe("SearchBar tests", () => {
+    it("allows for backwards navigation", () => {
+      renderSearchBar()
+      navigateBack()
+      expect(backwardsNavigationAction).toHaveBeenCalled()
+    })
+
+    const backwardsNavigationAction = jest.fn()
+
+    const renderSearchBar = () => {
+      return render(
+        <HeaderLocationSearchBar onBackTapped={backwardsNavigationAction} />
+      )
+    }
+
+    const navigateBack = () => {
+      fireEvent.press(screen.getByLabelText("Go back"))
+    }
+  })
 
   describe("CurrentUserCoordinatesOption tests", () => {
     it("reverse geocodes the user's location when selected", async () => {
