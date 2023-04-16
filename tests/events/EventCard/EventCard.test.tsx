@@ -8,16 +8,17 @@ jest.mock("react-native-popup-menu")
 
 describe("EventCard tests", () => {
   beforeEach(() => {
-    jest.useFakeTimers().setSystemTime(new Date("2023-03-18T12:00:00"))
+    jest.useFakeTimers().setSystemTime(new Date("2023-03-07T12:00:00"))
   })
   afterEach(() => jest.useRealTimers())
 
   it("formats the date range correctly", () => {
     const { queryByText } = renderEventCard(EventMocks.PickupBasketball)
-    expect(queryByText("Today 12pm - 1pm")).toBeDisplayed()
+    expect(queryByText("Sat, Mar 18")).toBeDisplayed()
   })
 })
 
 const renderEventCard = (event: CurrentUserEvent) => {
   return render(<EventCard event={event} />)
 }
+

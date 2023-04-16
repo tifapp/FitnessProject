@@ -41,7 +41,6 @@ import { Audio } from "expo-av"
 import * as Notifications from "expo-notifications"
 import { StatusBar } from "expo-status-bar"
 import React, { useEffect, useRef, useState } from "react"
-import { GestureHandlerRootView } from "react-native-gesture-handler"
 import {
   ActivityIndicator,
   Alert,
