@@ -1,10 +1,28 @@
 import {
   UserLocationTrackingUpdate,
   UserLocationTrackingAccurracy,
-  UserLocationDependencyKeys
+  expoTrackUserLocation,
+  TrackUserLocation,
+  QueryUserCoordinates
 } from "@lib/location/UserLocation"
-import { useDependencyValue } from "@lib/dependencies"
+import { createDependencyKey, useDependencyValue } from "@lib/dependencies"
 import { useEffect, useState } from "react"
+import { useQuery } from "react-query"
+
+/**
+ * Dependency Keys relating to operations around the user's location.
+ */
+export namespace UserLocationDependencyKeys {
+  /**
+   * A dependency key to track the user's location.
+   */
+  export const track = createDependencyKey<TrackUserLocation>(
+    () => expoTrackUserLocation
+  )
+
+  // TODO: - Live Value
+  export const currentCoordinates = createDependencyKey<QueryUserCoordinates>()
+}
 
 /**
  * A hook to observe the user's current location using the
@@ -23,7 +41,9 @@ export const useTrackUserLocation = (
   accurracy: UserLocationTrackingAccurracy = "approximate-low"
 ) => {
   const trackLocation = useDependencyValue(UserLocationDependencyKeys.track)
-  const [location, setLocation] = useState<UserLocationTrackingUpdate | undefined>()
+  const [location, setLocation] = useState<
+    UserLocationTrackingUpdate | undefined
+  >()
 
   useEffect(
     () => trackLocation(accurracy, setLocation),
@@ -31,4 +51,16 @@ export const useTrackUserLocation = (
   )
 
   return location
+}
+
+export const useUserCoordinatesQuery = (
+  accurracy: UserLocationTrackingAccurracy = "approximate-low"
+) => {
+  const query = useDependencyValue(
+    UserLocationDependencyKeys.currentCoordinates
+  )
+  return useQuery(
+    ["user-coordinates", accurracy],
+    async () => await query(accurracy)
+  )
 }

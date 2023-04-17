@@ -19,6 +19,7 @@ import { createDependencyKey, useDependencyValue } from "@lib/dependencies"
 import { useQuery } from "react-query"
 import { atomWithDebounce } from "@lib/Jotai"
 import { randomBool } from "@lib/Random"
+import { useUserCoordinatesQuery } from "@hooks/UserLocation"
 
 export type LocationSearchAnnotation = "attended-recently" | "hosted-recently"
 
@@ -211,5 +212,28 @@ const useLocationSearchOptionsQuery = (center?: LocationCoordinate2D) => {
   return useQuery(
     ["search-locations", query, center],
     async () => await loadOptions(query, center)
+  )
+}
+
+export type LocationSearchFromUserLocationProps = {
+  renderUserLocationOption: (
+    props: LocationSearchUserCoordinatesOptionProps
+  ) => ReactNode
+  onLocationSelected: (selection: Location) => void
+}
+
+export const LocationSearchFromUserLocation = ({
+  renderUserLocationOption,
+  onLocationSelected
+}: LocationSearchFromUserLocationProps) => {
+  const { data } = useUserCoordinatesQuery("precise")
+  if (!data) return null
+  return (
+    <>
+      {renderUserLocationOption({
+        coordinates: data.coordinates,
+        onSelected: onLocationSelected
+      })}
+    </>
   )
 }

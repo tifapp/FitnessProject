@@ -3,7 +3,8 @@ import {
   LocationCoordinate2D,
   GeocodingDependencyKeys,
   mockLocation,
-  mockLocationCoordinate2D
+  mockLocationCoordinate2D,
+  mockTrackedLocationCoordinate
 } from "@lib/location"
 import {
   fireEvent,
@@ -18,13 +19,15 @@ import {
   LocationSearchOptionView,
   LocationSearchDependencyKeys,
   LocationSearchOptionsFlatList,
-  mockLocationSearchOption
+  mockLocationSearchOption,
+  LocationSearchFromUserLocation
 } from "@screens/LocationSearch"
 import { SetDependencyValue } from "@lib/dependencies"
 import "../../helpers/Matchers"
 import { TestQueryClientProvider } from "../../helpers/ReactQuery"
 import { neverPromise } from "../../helpers/Promise"
 import { View } from "react-native"
+import { UserLocationDependencyKeys } from "@hooks/UserLocation"
 
 describe("LocationSearchUI tests", () => {
   beforeEach(() => jest.resetAllMocks())
@@ -284,6 +287,41 @@ describe("LocationSearchUI tests", () => {
                     distanceMiles
                   )}
                 />
+              )}
+            />
+          </SetDependencyValue>
+        </TestQueryClientProvider>
+      )
+    }
+  })
+
+  describe("FromUserLocation tests", () => {
+    it("displays the option to use the user's location when able", async () => {
+      const userCoordinates = mockTrackedLocationCoordinate()
+      queryCurrentCoordinates.mockResolvedValue(userCoordinates)
+      renderFromUserLocation()
+      await waitFor(() => expect(userLocationOption()).toBeDisplayed())
+    })
+
+    const queryCurrentCoordinates = jest.fn()
+
+    const userLocationOptionTestId = "user-location-option"
+
+    const userLocationOption = () => {
+      return screen.queryByTestId(userLocationOptionTestId)
+    }
+
+    const renderFromUserLocation = () => {
+      return render(
+        <TestQueryClientProvider>
+          <SetDependencyValue
+            forKey={UserLocationDependencyKeys.currentCoordinates}
+            value={queryCurrentCoordinates}
+          >
+            <LocationSearchFromUserLocation
+              onLocationSelected={jest.fn()}
+              renderUserLocationOption={() => (
+                <View testID={userLocationOptionTestId} />
               )}
             />
           </SetDependencyValue>
