@@ -21,31 +21,68 @@ import { atomWithDebounce } from "@lib/Jotai"
 import { randomBool } from "@lib/Random"
 import { useUserCoordinatesQuery } from "@hooks/UserLocation"
 
+/**
+ * An annotation that appears above a location search result in the UI.
+ */
 export type LocationSearchAnnotation = "attended-recently" | "hosted-recently"
 
+/**
+ * Creates a random {@link LocationSearchAnnotation}.
+ */
 export const mockLocationSearchAnnotation = (): LocationSearchAnnotation => {
   return randomBool() ? "hosted-recently" : "hosted-recently"
 }
 
+/**
+ * An option that is displayed by the location search.
+ */
 export type LocationSearchOption = {
+  /**
+   * The actual location presented by this option.
+   */
   location: Location
+
+  /**
+   * An annotation that appears above this option.
+   */
   annotation?: LocationSearchAnnotation
+
+  /**
+   * True if the option is a saved location in the user's
+   * recent locations.
+   */
   isRecentLocation: boolean
 }
 
+/**
+ * Mocks a {@link LocationSearchOption}.
+ */
 export const mockLocationSearchOption = (): LocationSearchOption => ({
   location: mockLocation(),
   annotation: mockLocationSearchAnnotation(),
   isRecentLocation: randomBool()
 })
 
+/**
+ * Saves a search selection made by the user in the location search process.
+ */
 export type SaveLocationSearchSelection = (selection: Location) => void
 
+/**
+ * Loads a set of {@link LocationSearchOption}s for the user to pick from based
+ * on a query string and a center bias.
+ *
+ * If the query string is empty, a list of the user's recent locations will be
+ * loaded.
+ */
 export type LoadLocationSearchOptions = (
   query: string,
   center?: LocationCoordinate2D
 ) => Promise<LocationSearchOption[]>
 
+/**
+ * Some dependency keys used by the location search UI.
+ */
 export namespace LocationSearchDependencyKeys {
   // TODO: - Live Value
   export const saveSelection =
@@ -63,6 +100,9 @@ export type LocationSearchOptionProps = {
   onSelected: (location: Location) => void
 }
 
+/**
+ * Displays a {@link LocationSearchOption} with a specified distance.
+ */
 export const LocationSearchOptionView = ({
   option,
   distanceMiles,
@@ -81,15 +121,18 @@ export const LocationSearchOptionView = ({
   )
 }
 
-export type HeaderLocationSearchBarProps = {
+export type LocationSearchBarProps = {
   onBackTapped: () => void
   placeholder: string
 }
 
-export const LocationSearchHeaderSearchBar = ({
+/**
+ * A search bar that edits the current location search query.
+ */
+export const LocationSearchBar = ({
   onBackTapped,
   placeholder
-}: HeaderLocationSearchBarProps) => {
+}: LocationSearchBarProps) => {
   const [searchText, setSearchText] = useAtom(searchTextAtom)
   return (
     <SearchBar
@@ -105,44 +148,22 @@ export const LocationSearchHeaderSearchBar = ({
   )
 }
 
-export type LocationSearchUserCoordinatesOptionProps = {
-  onSelected: (selection: Location) => void
-  coordinates: LocationCoordinate2D
-}
-
-export const LocationSearchUserCoordinatesOption = ({
-  onSelected,
-  coordinates
-}: LocationSearchUserCoordinatesOptionProps) => {
-  const { refetch } = useReverseGeocodeQuery(coordinates, { isEnabled: false })
-
-  const optionTapped = async () => {
-    const reverseGeocodedLocation = await refetch()
-    if (reverseGeocodedLocation.status !== "success") {
-      onSelected({ coordinates, placemark: {} })
-    } else {
-      onSelected(reverseGeocodedLocation.data)
-    }
-  }
-
-  return (
-    <TouchableHighlight onPress={() => optionTapped()}>
-      <Headline>Use current location</Headline>
-    </TouchableHighlight>
-  )
-}
-
-export type LocationSearchOptionsFlatListProps = {
+export type LocationSearchOptionsListProps = {
   center?: LocationCoordinate2D
-  renderOption: (props: LocationSearchOptionProps) => ReactNode
+  header?: ReactNode
+  renderOption?: (props: LocationSearchOptionProps) => ReactNode
   onLocationSelected: (location: Location) => void
 }
 
-export const LocationSearchOptionsFlatList = ({
+/**
+ * Renders the current list of options that the user can pick from the
+ * location search ui.
+ */
+export const LocationSearchOptionsListView = ({
   center,
-  renderOption,
+  renderOption = LocationSearchOptionView,
   onLocationSelected
-}: LocationSearchOptionsFlatListProps) => {
+}: LocationSearchOptionsListProps) => {
   const { status, data } = useLocationSearchOptionsQuery(center)
   return (
     <FlatList
@@ -215,17 +236,57 @@ const useLocationSearchOptionsQuery = (center?: LocationCoordinate2D) => {
   )
 }
 
-export type LocationSearchFromUserLocationProps = {
-  renderUserLocationOption: (
-    props: LocationSearchUserCoordinatesOptionProps
+export type LocationSearchUserLocationOptionProps = {
+  onSelected: (selection: Location) => void
+  coordinates: LocationCoordinate2D
+}
+
+/**
+ * Displays a selectable option that represents the user's current
+ * location in the location search ui.
+ *
+ * When this is selected, the user's location is reverse geocoded which may
+ * introduce a slight delay.
+ */
+export const LocationSearchUserLocationOptionView = ({
+  onSelected,
+  coordinates
+}: LocationSearchUserLocationOptionProps) => {
+  const { refetch } = useReverseGeocodeQuery(coordinates, { isEnabled: false })
+
+  const optionTapped = async () => {
+    const reverseGeocodedLocation = await refetch()
+    if (reverseGeocodedLocation.status !== "success") {
+      onSelected({ coordinates, placemark: {} })
+    } else {
+      onSelected(reverseGeocodedLocation.data)
+    }
+  }
+
+  return (
+    <TouchableHighlight onPress={() => optionTapped()}>
+      <Headline>Use current location</Headline>
+    </TouchableHighlight>
+  )
+}
+
+export type LocationSearchPickerProps = {
+  renderUserLocationOption?: (
+    props: LocationSearchUserLocationOptionProps
   ) => ReactNode
+  renderOptionsList?: (props: LocationSearchOptionsListProps) => ReactNode
   onLocationSelected: (selection: Location) => void
 }
 
-export const LocationSearchFromUserLocation = ({
-  renderUserLocationOption,
+/**
+ * Renders the location search UI involved with picking a location from
+ * a list of options.
+ */
+export const LocationSearchPicker = ({
+  renderUserLocationOption = LocationSearchUserLocationOptionView,
+  renderOptionsList = LocationSearchOptionsListView,
   onLocationSelected
-}: LocationSearchFromUserLocationProps) => {
+}: LocationSearchPickerProps) => {
   const { data } = useUserCoordinatesQuery("precise")
   if (!data) return null
   return (

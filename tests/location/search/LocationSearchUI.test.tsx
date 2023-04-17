@@ -14,13 +14,13 @@ import {
 } from "@testing-library/react-native"
 import React from "react"
 import {
-  LocationSearchUserCoordinatesOption,
-  LocationSearchHeaderSearchBar,
+  LocationSearchUserLocationOptionView,
+  LocationSearchBar,
   LocationSearchOptionView,
   LocationSearchDependencyKeys,
-  LocationSearchOptionsFlatList,
+  LocationSearchOptionsListView,
   mockLocationSearchOption,
-  LocationSearchFromUserLocation
+  LocationSearchPicker
 } from "@screens/LocationSearch"
 import { SetDependencyValue } from "@lib/dependencies"
 import "../../helpers/Matchers"
@@ -43,7 +43,7 @@ describe("LocationSearchUI tests", () => {
 
     const renderSearchBar = () => {
       return render(
-        <LocationSearchHeaderSearchBar
+        <LocationSearchBar
           placeholder="Test"
           onBackTapped={backwardsNavigationAction}
         />
@@ -97,7 +97,7 @@ describe("LocationSearchUI tests", () => {
             forKey={GeocodingDependencyKeys.reverseGeocode}
             value={reverseGeocode}
           >
-            <LocationSearchUserCoordinatesOption
+            <LocationSearchUserLocationOptionView
               onSelected={(selection) => (selectedLocation = selection)}
               coordinates={coordinates}
             />
@@ -142,7 +142,7 @@ describe("LocationSearchUI tests", () => {
     }
   })
 
-  describe("OptionsFlatList tests", () => {
+  describe("OptionsList tests", () => {
     beforeEach(() => {
       jest.useFakeTimers({ doNotFake: ["nextTick", "setImmediate"] })
     })
@@ -150,20 +150,20 @@ describe("LocationSearchUI tests", () => {
 
     it("should indicate an error when loading options fails", async () => {
       loadLocationOptions.mockRejectedValue(new Error())
-      renderOptionsFlatList()
+      renderOptionsList()
       await waitFor(() => expect(errorIndicator()).toBeDisplayed())
     })
 
     it("should indicate that there are no recents when no options available with empty search", async () => {
       loadLocationOptions.mockResolvedValue([])
-      renderOptionsFlatList()
+      renderOptionsList()
       await waitFor(() => expect(noRecentsIndicator()).toBeDisplayed())
     })
 
     it("should debounce when search text changes", async () => {
       const center = mockLocationCoordinate2D()
       loadLocationOptions.mockImplementation(neverPromise)
-      renderOptionsFlatList(center)
+      renderOptionsList(center)
 
       let searchText = "Hello World!"
       enterSearchText(searchText)
@@ -192,7 +192,7 @@ describe("LocationSearchUI tests", () => {
 
     it("should indicate that no results were found when no options available with non-empty search", async () => {
       loadLocationOptions.mockResolvedValue([])
-      renderOptionsFlatList()
+      renderOptionsList()
 
       const searchText = "Chuck E. Cheese"
       enterSearchText(searchText)
@@ -203,7 +203,7 @@ describe("LocationSearchUI tests", () => {
 
     it("displays a loading indicator when searched results have not yet loaded", async () => {
       loadLocationOptions.mockImplementation(neverPromise)
-      renderOptionsFlatList()
+      renderOptionsList()
       await waitFor(() => expect(loadingIndicator()).toBeDisplayed())
     })
 
@@ -219,7 +219,7 @@ describe("LocationSearchUI tests", () => {
           }
         }
       ])
-      renderOptionsFlatList(center)
+      renderOptionsList(center)
       await waitFor(() => {
         expect(
           distanceForLocationName(
@@ -266,18 +266,18 @@ describe("LocationSearchUI tests", () => {
       fireEvent.changeText(screen.getByPlaceholderText(placeholder), text)
     }
 
-    const renderOptionsFlatList = (center?: LocationCoordinate2D) => {
+    const renderOptionsList = (center?: LocationCoordinate2D) => {
       return render(
         <TestQueryClientProvider>
           <SetDependencyValue
             forKey={LocationSearchDependencyKeys.loadOptions}
             value={loadLocationOptions}
           >
-            <LocationSearchHeaderSearchBar
+            <LocationSearchBar
               onBackTapped={jest.fn()}
               placeholder={placeholder}
             />
-            <LocationSearchOptionsFlatList
+            <LocationSearchOptionsListView
               center={center}
               onLocationSelected={jest.fn()}
               renderOption={({ option, distanceMiles }) => (
@@ -295,11 +295,11 @@ describe("LocationSearchUI tests", () => {
     }
   })
 
-  describe("FromUserLocation tests", () => {
+  describe("Picker tests", () => {
     it("displays the option to use the user's location when able", async () => {
       const userCoordinates = mockTrackedLocationCoordinate()
       queryCurrentCoordinates.mockResolvedValue(userCoordinates)
-      renderFromUserLocation()
+      renderPicker()
       await waitFor(() => expect(userLocationOption()).toBeDisplayed())
     })
 
@@ -311,15 +311,16 @@ describe("LocationSearchUI tests", () => {
       return screen.queryByTestId(userLocationOptionTestId)
     }
 
-    const renderFromUserLocation = () => {
+    const renderPicker = () => {
       return render(
         <TestQueryClientProvider>
           <SetDependencyValue
             forKey={UserLocationDependencyKeys.currentCoordinates}
             value={queryCurrentCoordinates}
           >
-            <LocationSearchFromUserLocation
+            <LocationSearchPicker
               onLocationSelected={jest.fn()}
+              renderOptionsList={() => <></>}
               renderUserLocationOption={() => (
                 <View testID={userLocationOptionTestId} />
               )}
