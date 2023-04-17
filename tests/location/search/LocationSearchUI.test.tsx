@@ -1,7 +1,6 @@
 import {
   Location,
   LocationCoordinate2D,
-  GeocodingDependencyKeys,
   mockLocation,
   mockLocationCoordinate2D,
   mockTrackedLocationCoordinate
@@ -28,6 +27,7 @@ import { TestQueryClientProvider } from "../../helpers/ReactQuery"
 import { neverPromise } from "../../helpers/Promise"
 import { View } from "react-native"
 import { UserLocationDependencyKeys } from "@hooks/UserLocation"
+import { GeocodingDependencyKeys } from "@hooks/Geocoding"
 
 describe("LocationSearchUI tests", () => {
   beforeEach(() => jest.resetAllMocks())

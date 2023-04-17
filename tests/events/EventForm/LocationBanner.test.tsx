@@ -4,7 +4,6 @@ import {
   EventFormLocationInfo
 } from "@components/eventForm"
 import { SetDependencyValue } from "@lib/dependencies"
-import { GeocodingDependencyKeys } from "@lib/location"
 import { render, screen, waitFor } from "@testing-library/react-native"
 import "../../helpers/Matchers"
 import {
@@ -13,6 +12,7 @@ import {
 } from "../../helpers/ReactQuery"
 import { baseTestPlacemark } from "../../location/helpers"
 import { baseTestEventFormValues } from "./helpers"
+import { GeocodingDependencyKeys } from "@hooks/Geocoding"
 
 const testLocation = baseTestEventFormValues.locationInfo.coordinates
 const testLocationName = baseTestPlacemark.name
@@ -46,9 +46,7 @@ describe("EventFormLocationBanner tests", () => {
 const reverseGeocode = jest.fn()
 const queryClient = createTestQueryClient()
 
-const renderLocationField = (
-  locationInfo?: EventFormLocationInfo
-) => {
+const renderLocationField = (locationInfo?: EventFormLocationInfo) => {
   render(
     <TestQueryClientProvider client={queryClient}>
       <SetDependencyValue

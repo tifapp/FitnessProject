@@ -3,7 +3,6 @@ import { dateRange } from "@lib/date"
 import { UpdateDependencyValues } from "@lib/dependencies"
 import { EventColors } from "@lib/events"
 import { hapticsDependencyKey } from "@lib/Haptics"
-import { GeocodingDependencyKeys } from "@lib/location"
 import { NavigationContainer } from "@react-navigation/native"
 import EventFormScreen from "@screens/EventFormScreen"
 import {
@@ -14,7 +13,6 @@ import {
 } from "@testing-library/react-native"
 import { QueryClient } from "react-query"
 import { captureAlerts } from "../../helpers/Alerts"
-import { unimplementedGeocoding } from "../../helpers/Geocoding"
 import { neverPromise } from "../../helpers/Promise"
 import {
   createTestQueryClient,
@@ -30,6 +28,7 @@ import {
   pickEventColor,
   toggleShouldHideAfterStartDate
 } from "./helpers"
+import { GeocodingDependencyKeys } from "@hooks/Geocoding"
 
 const testLocation = { latitude: 45.0, longitude: -121.0 }
 
