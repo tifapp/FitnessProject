@@ -3,12 +3,23 @@ import MenuDropdown from "@components/eventCard/MenuDropdown"
 import { CurrentUserEvent, isAttendingEvent, isHostingEvent } from "@lib/events"
 import { placemarkToFormattedAddress } from "@lib/location"
 import React from "react"
-import { Image, Pressable, StyleSheet, Text, View } from "react-native"
+import {
+  Image,
+  ImageBackground,
+  Pressable,
+  StyleSheet,
+  Text,
+  View
+} from "react-native"
 import MapSnippet from "./MapSnippet"
+
+import { Icon } from "react-native-elements"
 
 export type EventDetailsProps = {
   event: CurrentUserEvent
 }
+
+const MARKER_SIZE = 100
 
 const EventDetails = ({ event }: EventDetailsProps) => {
   const hexAlpha = "33"
@@ -133,6 +144,57 @@ const EventDetails = ({ event }: EventDetailsProps) => {
           latitudeDelta: 0.1,
           longitudeDelta: 0.1
         }}
+        renderMarker={(item) => (
+          <>
+            {/* Solid white background for the image */}
+            <ImageBackground
+              source={require("../assets/Solid_white.svg.png")}
+              style={{
+                flex: 1,
+                width: MARKER_SIZE,
+                height: MARKER_SIZE,
+                borderRadius: MARKER_SIZE / 2,
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden"
+              }}
+            />
+            {/* The profile image itself */}
+            <ImageBackground
+              source={require("../assets/icon.png")}
+              style={{
+                marginTop: "2.5%",
+                position: "absolute",
+                width: MARKER_SIZE - 5,
+                height: MARKER_SIZE - 5,
+                borderRadius: MARKER_SIZE - 5 / 2,
+                alignSelf: "center",
+                overflow: "hidden"
+              }}
+            />
+            {/* Ideally, badge showing current number of attendees */}
+            <View
+              style={{
+                paddingVertical: 15,
+                paddingHorizontal: 10,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center"
+              }}
+            >
+              <Icon name="people" type="ionicon" color="white" />
+              <Text
+                style={{
+                  backgroundColor: event.color,
+                  fontSize: 16,
+                  color: "white"
+                }}
+              >
+                {event.attendeeCount}
+              </Text>
+            </View>
+          </>
+        )}
         marker={{ key: event.id, location: event.coordinates }}
       />
     </View>

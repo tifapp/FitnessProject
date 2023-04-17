@@ -103,14 +103,15 @@ export const EventsMap = forwardRef(function ReffedMap<T extends MapMarker> (
   ref: MutableRefObject<MapRefMethods>
 ) {
   const mapRef = useRef<MapView | null>(null)
+  const latlngDelta = 0.03
 
   useImperativeHandle(ref, () => ({
     recenterToLocation: (givenLocation) => {
       mapRef.current?.animateToRegion({
         latitude: givenLocation.latitude,
         longitude: givenLocation.longitude,
-        latitudeDelta: 0.1,
-        longitudeDelta: 0.1
+        latitudeDelta: latlngDelta,
+        longitudeDelta: latlngDelta
       })
     }
   }))
@@ -127,6 +128,7 @@ export const EventsMap = forwardRef(function ReffedMap<T extends MapMarker> (
       toolbarEnabled={false}
       onLongPress={(e) => onLongPress?.(e.nativeEvent.coordinate)}
       followsUserLocation={true}
+      moveOnMarkerPress={false}
       showsUserLocation={true}
       zoomEnabled={canZoom}
       customMapStyle={[
