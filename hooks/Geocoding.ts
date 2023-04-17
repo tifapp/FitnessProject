@@ -25,7 +25,7 @@ export const useReverseGeocodeQuery = (
     GeocodingDependencyKeys.reverseGeocode
   )
   return useQuery(
-    ["reverseGeocode", coordinates, reverseGeocode],
+    ["reverseGeocode", coordinates],
     async () => await reverseGeocode(coordinates),
     // NB: Geocoded data rarely ever changes, so we can
     // get away with infinite cache time.
