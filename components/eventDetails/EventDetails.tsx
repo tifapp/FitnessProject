@@ -11,9 +11,9 @@ import {
   Text,
   View
 } from "react-native"
-import MapSnippet from "./MapSnippet"
 
 import { Icon } from "react-native-elements"
+import EventMapSnippet from "./EventMapSnippet"
 
 export type EventDetailsProps = {
   event: CurrentUserEvent
@@ -136,7 +136,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
             </View>
           )}
       </View>
-      <MapSnippet
+      <EventMapSnippet
         style={{ width: "100%", height: "30%" }}
         initialRegion={{
           latitude: event.coordinates.latitude,

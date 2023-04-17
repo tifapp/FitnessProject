@@ -30,45 +30,27 @@ export type MapProps<T extends EventMarker> = {
   marker: T
 
   /**
-   * Enables scrolling if true (default: true)
-   */
-  canScroll?: boolean
-
-  /**
-   * Enables zooming if true (default: true)
-   */
-  canZoom?: boolean
-
-  /**
-   * Enables rotating if true (default: true)
-   */
-  canRotate?: boolean
-
-  /**
    * Renders a replacement for a singular map marker that was passed in through `markers`.
    */
   renderMarker?: (marker: T) => React.ReactNode
 }
 
-export const MapSnippet = function Map<T extends EventMarker> ({
+export const EventMapSnippet = function Map<T extends EventMarker> ({
   initialRegion,
   marker,
   renderMarker,
-  style,
-  canScroll = false,
-  canRotate = false,
-  canZoom = false
+  style
 }: MapProps<T>) {
   return (
     <MapView
       style={style}
       provider={PROVIDER_GOOGLE}
       initialRegion={initialRegion}
-      rotateEnabled={canRotate}
-      scrollEnabled={canScroll}
+      rotateEnabled={false}
+      scrollEnabled={false}
       loadingEnabled={true}
       toolbarEnabled={false}
-      zoomEnabled={canZoom}
+      zoomEnabled={false}
       customMapStyle={[
         {
           featureType: "poi",
@@ -89,7 +71,7 @@ export const MapSnippet = function Map<T extends EventMarker> ({
               longitude: marker.location.longitude
             }}
           >
-            {renderMarker && renderMarker(marker)}
+            {renderMarker?.(marker)}
           </Marker>
         </>
       }
@@ -97,4 +79,4 @@ export const MapSnippet = function Map<T extends EventMarker> ({
   )
 }
 
-export default MapSnippet
+export default EventMapSnippet

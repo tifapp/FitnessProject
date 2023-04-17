@@ -152,7 +152,7 @@ export const EventsMap = forwardRef(function ReffedMap<T extends MapMarker> (
             }}
             onPress={() => onMarkerSelected?.(marker)}
           >
-            {renderMarker && renderMarker(marker)}
+            {renderMarker?.(marker)}
           </Marker>
         </>
       ))}
