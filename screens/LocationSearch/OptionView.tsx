@@ -1,6 +1,7 @@
 import React from "react"
 import { Location, placemarkToFormattedAddress } from "@lib/location"
 import {
+  LocationSearchAnnotation,
   LocationSearchDependencyKeys,
   LocationSearchOption
 } from "./OptionData"
@@ -46,11 +47,7 @@ export const LocationSearchOptionView = ({
         <View style={styles.contentContainer}>
           <View style={styles.textContainer}>
             {option.annotation && (
-              <Caption style={styles.annotationText}>
-                {option.annotation === "attended-recently"
-                  ? "You attended an event here recently."
-                  : "You hosted an event here recently."}
-              </Caption>
+              <AnnotationView annotation={option.annotation} />
             )}
             <Headline style={styles.nameText}>
               {option.location.placemark.name ?? "Unknown Location"}
@@ -67,6 +64,21 @@ export const LocationSearchOptionView = ({
     </TouchableOpacity>
   )
 }
+
+type AnnotationProps = {
+  annotation: LocationSearchAnnotation
+}
+
+const AnnotationView = ({ annotation }: AnnotationProps) => (
+  <View style={styles.annotation}>
+    <Ionicon name="people" size={12} style={styles.annotationIcon} />
+    <Caption style={styles.annotationText}>
+      {annotation === "attended-recently"
+        ? "You attended an event here recently."
+        : "You hosted an event here recently."}
+    </Caption>
+  </View>
+)
 
 const styles = StyleSheet.create({
   container: {
@@ -101,5 +113,15 @@ const styles = StyleSheet.create({
   },
   distanceText: {
     marginLeft: 8
+  },
+  annotation: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%"
+  },
+  annotationIcon: {
+    opacity: 0.35,
+    paddingRight: 4
   }
 })
