@@ -1,12 +1,14 @@
 import React from "react"
-import { useAtom } from "jotai"
-import { TouchableOpacity, View } from "react-native"
+import { useAtomValue, useSetAtom } from "jotai"
 import { SearchBar } from "@components/SearchBar"
-import { searchTextAtom } from "./state"
+import { searchTextAtoms } from "./state"
+import { IoniconTouchableOpacity } from "@components/common/Icons"
+import { StyleProp, ViewStyle } from "react-native"
 
 export type LocationSearchBarProps = {
   onBackTapped: () => void
   placeholder: string
+  style?: StyleProp<ViewStyle>
 }
 
 /**
@@ -14,19 +16,24 @@ export type LocationSearchBarProps = {
  */
 export const LocationSearchBar = ({
   onBackTapped,
-  placeholder
+  placeholder,
+  style
 }: LocationSearchBarProps) => {
-  const [searchText, setSearchText] = useAtom(searchTextAtom)
+  const text = useAtomValue(searchTextAtoms.currentValueAtom)
+  const setText = useSetAtom(searchTextAtoms.debouncedValueAtom)
   return (
     <SearchBar
+      style={style}
       placeholder={placeholder}
       leftAddon={
-        <TouchableOpacity onPress={onBackTapped} accessibilityLabel="Go back">
-          <View />
-        </TouchableOpacity>
+        <IoniconTouchableOpacity
+          icon={{ name: "chevron-back-outline" }}
+          onPress={onBackTapped}
+          accessibilityLabel="Go back"
+        />
       }
-      text={searchText}
-      onTextChanged={setSearchText}
+      text={text}
+      onTextChanged={setText}
     />
   )
 }

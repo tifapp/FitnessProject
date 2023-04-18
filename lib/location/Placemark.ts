@@ -5,16 +5,18 @@ import { z } from "zod"
 /**
  * A zod schema for {@link Placemark}.
  */
-export const PlacemarkSchema = z.object({
-  name: z.string(),
-  country: z.string(),
-  postalCode: z.string(),
-  street: z.string(),
-  streetNumber: z.string(),
-  region: z.string(),
-  isoCountryCode: z.string(),
-  city: z.string()
-}).partial()
+export const PlacemarkSchema = z
+  .object({
+    name: z.string(),
+    country: z.string(),
+    postalCode: z.string(),
+    street: z.string(),
+    streetNumber: z.string(),
+    region: z.string(),
+    isoCountryCode: z.string(),
+    city: z.string()
+  })
+  .partial()
 
 /**
  * A type representing the components of an address.
@@ -25,7 +27,7 @@ export type Placemark = Readonly<z.infer<typeof PlacemarkSchema>>
  * Generates a mock placemark for testing and UI purposes.
  */
 export const mockPlacemark = () => ({
-  name: faker.address.streetName(),
+  name: faker.address.street(),
   country: faker.address.country(),
   postalCode: faker.address.zipCode(),
   street: faker.address.street(),

@@ -9,6 +9,7 @@ import {
   LocationSearchUserLocationOptionProps,
   LocationSearchUserLocationOptionView
 } from "./UserLocationOptionView"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 
 export type LocationSearchPickerProps = {
   renderUserLocationOption?: (
@@ -16,6 +17,7 @@ export type LocationSearchPickerProps = {
   ) => ReactNode
   renderOptionsList?: (props: LocationSearchOptionsListProps) => ReactNode
   onLocationSelected: (selection: Location) => void
+  style?: StyleProp<ViewStyle>
 }
 
 /**
@@ -25,16 +27,33 @@ export type LocationSearchPickerProps = {
 export const LocationSearchPicker = ({
   renderUserLocationOption = LocationSearchUserLocationOptionView,
   renderOptionsList = LocationSearchOptionsListView,
-  onLocationSelected
+  onLocationSelected,
+  style
 }: LocationSearchPickerProps) => {
   const { data } = useUserCoordinatesQuery("precise")
-  if (!data) return null
   return (
-    <>
-      {renderUserLocationOption({
-        coordinates: data.coordinates,
-        onSelected: onLocationSelected
-      })}
-    </>
+    <View style={style}>
+      <LocationSearchOptionsListView
+        center={data?.coordinates}
+        header={
+          <>
+            {data?.coordinates && (
+              <LocationSearchUserLocationOptionView
+                coordinates={data.coordinates}
+                onSelected={onLocationSelected}
+                style={styles.header}
+              />
+            )}
+          </>
+        }
+        onLocationSelected={onLocationSelected}
+      />
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+  header: {
+    marginBottom: 24
+  }
+})

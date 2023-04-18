@@ -2,11 +2,19 @@ import React from "react"
 import { Headline } from "@components/Text"
 import { useReverseGeocodeQuery } from "@hooks/Geocoding"
 import { LocationCoordinate2D, Location } from "@lib/location"
-import { TouchableHighlight } from "react-native"
+import {
+  StyleProp,
+  StyleSheet,
+  TouchableOpacity,
+  ViewStyle
+} from "react-native"
+import { Ionicon } from "@components/common/Icons"
+import Animated, { FadeInUp } from "react-native-reanimated"
 
 export type LocationSearchUserLocationOptionProps = {
   onSelected: (selection: Location) => void
   coordinates: LocationCoordinate2D
+  style?: StyleProp<ViewStyle>
 }
 
 /**
@@ -18,7 +26,8 @@ export type LocationSearchUserLocationOptionProps = {
  */
 export const LocationSearchUserLocationOptionView = ({
   onSelected,
-  coordinates
+  coordinates,
+  style
 }: LocationSearchUserLocationOptionProps) => {
   const { refetch } = useReverseGeocodeQuery(coordinates, { isEnabled: false })
 
@@ -32,8 +41,21 @@ export const LocationSearchUserLocationOptionView = ({
   }
 
   return (
-    <TouchableHighlight onPress={() => optionTapped()}>
-      <Headline>Use current location</Headline>
-    </TouchableHighlight>
+    <TouchableOpacity style={style} onPress={() => optionTapped()}>
+      <Animated.View entering={FadeInUp} style={styles.container}>
+        <Ionicon name="navigate" style={styles.icon} />
+        <Headline>Use current location</Headline>
+      </Animated.View>
+    </TouchableOpacity>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    display: "flex",
+    flexDirection: "row"
+  },
+  icon: {
+    marginRight: 8
+  }
+})

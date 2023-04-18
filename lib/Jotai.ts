@@ -1,20 +1,67 @@
-import { atom } from "jotai"
+import { SetStateAction, atom } from "jotai"
 
 /**
- * Creates an atom that delays it's write operation by the specified number of milliseconds.
- * This is most useful for atoms that are used on search screens.
+ * Creates an atom that debounces whenever it's set.
  *
- * @param value The initial value.
- * @param millis The number of milliseconds to delay when setting.
+ * Copied from: {@link https://jotai.org/docs/recipes/atom-creators}
  */
-export const atomWithDebounce = <T>(value: T, millis: number) => {
-  const baseAtom = atom(value)
-  let timeoutHandle: ReturnType<typeof setTimeout>
-  return atom(
-    (get) => get(baseAtom),
-    (_, set, update: T) => {
-      clearTimeout(timeoutHandle)
-      timeoutHandle = setTimeout(() => set(baseAtom, update), millis)
+export const debounceAtoms = <T>(
+  initialValue: T,
+  delayMilliseconds = 500,
+  shouldDebounceOnReset = false
+) => {
+  const prevTimeoutAtom = atom<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  )
+
+  const _currentValueAtom = atom(initialValue)
+  const isDebouncingAtom = atom(false)
+
+  const debouncedValueAtom = atom(
+    initialValue,
+    (get, set, update: SetStateAction<T>) => {
+      clearTimeout(get(prevTimeoutAtom))
+
+      const prevValue = get(_currentValueAtom)
+      const nextValue =
+        typeof update === "function"
+          ? (update as (prev: T) => T)(prevValue)
+          : update
+
+      const onDebounceStart = () => {
+        set(_currentValueAtom, nextValue)
+        set(isDebouncingAtom, true)
+      }
+
+      const onDebounceEnd = () => {
+        set(debouncedValueAtom, nextValue)
+        set(isDebouncingAtom, false)
+      }
+
+      onDebounceStart()
+
+      if (!shouldDebounceOnReset && nextValue === initialValue) {
+        onDebounceEnd()
+        return
+      }
+
+      const nextTimeoutId = setTimeout(() => {
+        onDebounceEnd()
+      }, delayMilliseconds)
+
+      set(prevTimeoutAtom, nextTimeoutId)
     }
   )
+
+  const clearTimeoutAtom = atom(null, (get, set, _arg) => {
+    clearTimeout(get(prevTimeoutAtom))
+    set(isDebouncingAtom, false)
+  })
+
+  return {
+    currentValueAtom: atom((get) => get(_currentValueAtom)),
+    isDebouncingAtom,
+    clearTimeoutAtom,
+    debouncedValueAtom
+  }
 }

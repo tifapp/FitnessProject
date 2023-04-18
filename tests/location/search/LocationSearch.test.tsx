@@ -21,11 +21,10 @@ import {
   mockLocationSearchOption,
   LocationSearchPicker
 } from "@screens/LocationSearch"
-import { SetDependencyValue } from "@lib/dependencies"
+import { SetDependencyValue, UpdateDependencyValues } from "@lib/dependencies"
 import "../../helpers/Matchers"
 import { TestQueryClientProvider } from "../../helpers/ReactQuery"
 import { neverPromise } from "../../helpers/Promise"
-import { View } from "react-native"
 import { UserLocationDependencyKeys } from "@hooks/UserLocation"
 import { GeocodingDependencyKeys } from "@hooks/Geocoding"
 
@@ -56,7 +55,7 @@ describe("LocationSearch tests", () => {
       }
     })
 
-    describe("CurrentUserCoordinatesOption tests", () => {
+    describe("UserLocationOptionView tests", () => {
       it("reverse geocodes the user's location when selected", async () => {
         const reverseGeocodedLocation = mockLocation()
         reverseGeocode.mockResolvedValue(reverseGeocodedLocation)
@@ -172,7 +171,7 @@ describe("LocationSearch tests", () => {
           expect(loadLocationOptions).toHaveBeenCalledWith("", center)
         })
 
-        jest.advanceTimersByTime(50)
+        jest.advanceTimersByTime(100)
         await waitFor(() => {
           expect(loadLocationOptions).not.toHaveBeenCalledWith(
             searchText,
@@ -183,7 +182,7 @@ describe("LocationSearch tests", () => {
         searchText = "The user changed the text while typing or something..."
         enterSearchText(searchText)
 
-        jest.advanceTimersByTime(50)
+        jest.advanceTimersByTime(100)
         await waitFor(() => {
           expect(loadLocationOptions).not.toHaveBeenCalledWith(
             searchText,
@@ -191,7 +190,7 @@ describe("LocationSearch tests", () => {
           )
         })
 
-        jest.advanceTimersByTime(50)
+        jest.advanceTimersByTime(100)
         await waitFor(() => {
           expect(loadLocationOptions).toHaveBeenCalledWith(searchText, center)
         })
@@ -214,7 +213,7 @@ describe("LocationSearch tests", () => {
         await waitFor(() => expect(loadingIndicator()).toBeDisplayed())
       })
 
-      it("should display the center's distance from each result in miles if able", async () => {
+      it("should display the result with the center's distance from the result in miles", async () => {
         const center = { latitude: 41.1234, longitude: -121.1234 }
         const mockOption = mockLocationSearchOption()
         loadLocationOptions.mockResolvedValue([
@@ -226,14 +225,12 @@ describe("LocationSearch tests", () => {
             }
           }
         ])
-        renderOptionsList(center)
+        const { queryByText } = renderOptionsList(center)
         await waitFor(() => {
           expect(
-            distanceForLocationName(
-              mockOption.location.placemark.name!,
-              5909.319265423842
-            )
+            locationWithName(mockOption.location.placemark.name!)
           ).toBeDisplayed()
+          expect(queryByText("5909.3 mi")).toBeDisplayed()
         })
       })
 
@@ -257,12 +254,8 @@ describe("LocationSearch tests", () => {
         return screen.queryByTestId("loading-location-options")
       }
 
-      const distanceForLocationName = (name: string, distanceMiles: number) => {
-        return screen.queryByTestId(locationOptionTestId(name, distanceMiles))
-      }
-
-      const locationOptionTestId = (name: string, distanceMiles?: number) => {
-        return `${name}-${distanceMiles}`
+      const locationWithName = (name: string) => {
+        return screen.queryByText(name)
       }
 
       const loadLocationOptions = jest.fn()
@@ -276,9 +269,17 @@ describe("LocationSearch tests", () => {
       const renderOptionsList = (center?: LocationCoordinate2D) => {
         return render(
           <TestQueryClientProvider>
-            <SetDependencyValue
-              forKey={LocationSearchDependencyKeys.loadOptions}
-              value={loadLocationOptions}
+            <UpdateDependencyValues
+              update={(values) => {
+                values.set(
+                  LocationSearchDependencyKeys.loadOptions,
+                  loadLocationOptions
+                )
+                values.set(
+                  LocationSearchDependencyKeys.saveSelection,
+                  jest.fn()
+                )
+              }}
             >
               <LocationSearchBar
                 onBackTapped={jest.fn()}
@@ -287,16 +288,8 @@ describe("LocationSearch tests", () => {
               <LocationSearchOptionsListView
                 center={center}
                 onLocationSelected={jest.fn()}
-                renderOption={({ option, distanceMiles }) => (
-                  <View
-                    testID={locationOptionTestId(
-                      option.location.placemark.name!,
-                      distanceMiles
-                    )}
-                  />
-                )}
               />
-            </SetDependencyValue>
+            </UpdateDependencyValues>
           </TestQueryClientProvider>
         )
       }
@@ -312,27 +305,32 @@ describe("LocationSearch tests", () => {
 
       const queryCurrentCoordinates = jest.fn()
 
-      const userLocationOptionTestId = "user-location-option"
-
       const userLocationOption = () => {
-        return screen.queryByTestId(userLocationOptionTestId)
+        return screen.queryByText("Use current location")
       }
 
       const renderPicker = () => {
         return render(
           <TestQueryClientProvider>
-            <SetDependencyValue
-              forKey={UserLocationDependencyKeys.currentCoordinates}
-              value={queryCurrentCoordinates}
+            <UpdateDependencyValues
+              update={(values) => {
+                values.set(
+                  UserLocationDependencyKeys.currentCoordinates,
+                  queryCurrentCoordinates
+                )
+                values.set(
+                  LocationSearchDependencyKeys.loadOptions,
+                  neverPromise
+                )
+                values.set(
+                  LocationSearchDependencyKeys.saveSelection,
+                  jest.fn()
+                )
+                values.set(GeocodingDependencyKeys.reverseGeocode, jest.fn())
+              }}
             >
-              <LocationSearchPicker
-                onLocationSelected={jest.fn()}
-                renderOptionsList={() => <></>}
-                renderUserLocationOption={() => (
-                  <View testID={userLocationOptionTestId} />
-                )}
-              />
-            </SetDependencyValue>
+              <LocationSearchPicker onLocationSelected={jest.fn()} />
+            </UpdateDependencyValues>
           </TestQueryClientProvider>
         )
       }

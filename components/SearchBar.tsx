@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet
 } from "react-native"
-import { MaterialCommunityIcon } from "./common/Icons"
+import { IoniconTouchableOpacity, MaterialCommunityIcon } from "./common/Icons"
 
 export type SearchBarProps = {
   text: string
@@ -40,18 +40,14 @@ export const SearchBar = ({
           />
         </View>
         {text.length > 0 && (
-          <TouchableOpacity
+          <IoniconTouchableOpacity
+            icon={{
+              name: "close"
+            }}
+            style={styles.clearIconContainer}
             onPress={() => onTextChanged("")}
             accessibilityLabel="Clear all search text"
-            style={styles.clearIconContainer}
-            hitSlop={{ top: 12, left: 12, bottom: 12, right: 12 }}
-          >
-            <MaterialCommunityIcon
-              style={styles.clearIcon}
-              name="close"
-              size={21}
-            />
-          </TouchableOpacity>
+          />
         )}
       </View>
     </View>
@@ -63,7 +59,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderWidth: 1,
     borderRadius: 12,
-    borderColor: "rgba(0, 0, 0, 0.05)"
+    borderColor: "rgba(0, 0, 0, 0.10)"
   },
   container: {
     display: "flex",
@@ -82,12 +78,12 @@ const styles = StyleSheet.create({
     marginRight: 8
   },
   textInput: {
-    fontSize: 21
+    fontSize: 16,
+    fontFamily: "OpenSans",
+    width: "100%"
   },
   clearIconContainer: {
-    marginLeft: 16,
-    backgroundColor: "rgba(0, 0, 0, 0.05)",
-    borderRadius: 12
+    marginLeft: 8
   },
   clearIcon: {
     color: "black",

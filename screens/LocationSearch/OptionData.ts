@@ -11,7 +11,7 @@ export type LocationSearchAnnotation = "attended-recently" | "hosted-recently"
  * Creates a random {@link LocationSearchAnnotation}.
  */
 export const mockLocationSearchAnnotation = (): LocationSearchAnnotation => {
-  return randomBool() ? "hosted-recently" : "hosted-recently"
+  return randomBool() ? "attended-recently" : "hosted-recently"
 }
 
 /**
@@ -40,7 +40,7 @@ export type LocationSearchOption = {
  */
 export const mockLocationSearchOption = (): LocationSearchOption => ({
   location: mockLocation(),
-  annotation: mockLocationSearchAnnotation(),
+  annotation: randomBool(0.8) ? mockLocationSearchAnnotation() : undefined,
   isRecentLocation: randomBool()
 })
 
