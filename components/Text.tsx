@@ -6,21 +6,21 @@ import { StyleSheet, Text, TextProps } from "react-native"
  * some UI element.
  */
 export const Title = (props: TextProps) => (
-  <Text {...props} style={[props.style, styles.title]} />
+  <Text {...props} style={[styles.title, props.style]} />
 )
 
 /**
  * A text component for standard text that the user sees.
  */
 export const BodyText = (props: TextProps) => (
-  <Text {...props} style={[props.style, styles.body]} />
+  <Text {...props} style={[styles.body, props.style]} />
 )
 
 /**
  * A text component for smaller and more subtle details.
  */
 export const Caption = (props: TextProps) => (
-  <Text {...props} style={[props.style, styles.caption]} />
+  <Text {...props} style={[styles.caption, props.style]} />
 )
 
 /**
@@ -29,7 +29,7 @@ export const Caption = (props: TextProps) => (
  * group.
  */
 export const Headline = (props: TextProps) => (
-  <Text {...props} style={[props.style, styles.headline]} />
+  <Text {...props} style={[styles.headline, props.style]} />
 )
 
 const styles = StyleSheet.create({

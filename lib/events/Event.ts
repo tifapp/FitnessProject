@@ -21,6 +21,7 @@ export enum EventColors {
 export type EventAttendee = Readonly<{
   id: string
   username: string
+  handle: string
 }>
 
 /**
@@ -29,17 +30,20 @@ export type EventAttendee = Readonly<{
 export namespace EventAttendeeMocks {
   export const Blob = {
     id: uuid(),
-    username: "Blob"
+    username: "Blob",
+    handle: "@Blob"
   } as EventAttendee
 
   export const BlobJr = {
     id: uuid(),
-    username: "Blob Jr."
+    username: "Blob Jr.",
+    handle: "@SmallBlob"
   } as EventAttendee
 
   export const BlobSr = {
     id: uuid(),
-    username: "Blob Sr."
+    username: "Blob Sr.",
+    handle: "@TheOriginalBlob"
   } as EventAttendee
 
   // NB: Unfortunately, we can't reuse Harrison's legendary
@@ -133,7 +137,8 @@ export namespace EventMocks {
     },
     shouldHideAfterStartDate: false,
     userAttendeeStatus: "attending",
-    userMilesFromEvent: 12.7892
+    userMilesFromEvent: 12.7892,
+    attendeeCount: 3
   } as CurrentUserEvent
 
   export const Multiday = {

@@ -99,6 +99,12 @@ export class FixedDateRange {
     const start = dayjs(this.startDate)
     return formatDate(now(), start)
   }
+
+  endSameDay () {
+    const start = dayjs(this.startDate)
+    const end = dayjs(this.endDate)
+    return start.isSame(end, "day")
+  }
 }
 
 const formatDate = (basis: Dayjs, date: Dayjs) => {
