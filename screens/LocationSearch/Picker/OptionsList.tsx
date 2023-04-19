@@ -7,84 +7,78 @@ import {
   Location
 } from "@lib/location"
 import { useAtomValue } from "jotai"
-import { StyleSheet, View } from "react-native"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { useQuery } from "react-query"
 import {
-  LocationSearchDependencyKeys,
+  LocationSearchPickerDependencyKeys,
   LocationSearchOption
-} from "./OptionData"
-import {
-  LocationSearchOptionProps,
-  LocationSearchOptionView
-} from "./OptionView"
-import { searchTextAtoms } from "./state"
+} from "./DataLoading"
+import { LocationSearchOptionView } from "./OptionView"
+import { searchTextAtoms } from "../state"
 import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view"
 import { SkeletonView } from "@components/common/Skeleton"
 import { Divider } from "react-native-elements"
-import { WithScreenEdgePadding } from "@components/Spacing"
 
 export type LocationSearchOptionsListProps = {
   center?: LocationCoordinate2D
   header?: ReactNode
-  renderOption?: (props: LocationSearchOptionProps) => ReactNode
   onLocationSelected: (location: Location) => void
-}
-
-const extractKey = (option: LocationSearchOption) => {
-  return `${option.location.coordinates.latitude}, ${option.location.coordinates.longitude}`
+  style?: StyleProp<ViewStyle>
 }
 
 /**
  * Renders the current list of options that the user can pick from the
  * location search ui.
  */
-export const LocationSearchOptionsListView = ({
+export const LocationSearchPickerOptionsListView = ({
   center,
   header,
-  renderOption = LocationSearchOptionView,
+  style,
   onLocationSelected
 }: LocationSearchOptionsListProps) => {
   const { status, data } = useLocationSearchOptionsQuery(center)
-  const searchText = useAtomValue(searchTextAtoms.debouncedValueAtom)
-  const headerText = searchText.length === 0 ? "Recents" : "Results"
   return (
     <KeyboardAwareFlatList
-      style={styles.optionsList}
-      keyExtractor={(item) => extractKey(item)}
+      style={[styles.optionsList, style]}
+      keyExtractor={(item) => extractKeyFromOption(item)}
       ItemSeparatorComponent={() => <Divider style={styles.divider} />}
       ListHeaderComponent={
-        <WithScreenEdgePadding>
+        <View style={styles.horizontalPadding}>
           <View>{header}</View>
-          <CaptionTitle style={styles.headerText}>{headerText}</CaptionTitle>
-        </WithScreenEdgePadding>
+          <OptionsListHeaderTitle style={styles.headerTitle} />
+        </View>
       }
       renderItem={({ item }) => (
-        <WithScreenEdgePadding>
-          <LocationSearchOptionView
-            option={item}
-            distanceMiles={
-              center
-                ? milesBetweenLocations(center, item.location.coordinates)
-                : undefined
-            }
-            onSelected={onLocationSelected}
-          />
-        </WithScreenEdgePadding>
+        <LocationSearchOptionView
+          option={item}
+          distanceMiles={
+            center
+              ? milesBetweenLocations(center, item.location.coordinates)
+              : undefined
+          }
+          onSelected={onLocationSelected}
+          style={styles.horizontalPadding}
+        />
       )}
       data={data ?? []}
       ListEmptyComponent={
-        <WithScreenEdgePadding>
-          <EmptyOptionsView reason={emptyReasonFromQueryStatus(status)} />
-        </WithScreenEdgePadding>
+        <EmptyOptionsView
+          reason={emptyReasonFromQueryStatus(status)}
+          style={styles.horizontalPadding}
+        />
       }
     />
   )
 }
 
+const extractKeyFromOption = (option: LocationSearchOption) => {
+  return `${option.location.coordinates.latitude}, ${option.location.coordinates.longitude}`
+}
+
 const useLocationSearchOptionsQuery = (center?: LocationCoordinate2D) => {
   const query = useAtomValue(searchTextAtoms.debouncedValueAtom)
   const loadOptions = useDependencyValue(
-    LocationSearchDependencyKeys.loadOptions
+    LocationSearchPickerDependencyKeys.loadOptions
   )
   return useQuery(
     ["search-locations", query, center],
@@ -92,26 +86,39 @@ const useLocationSearchOptionsQuery = (center?: LocationCoordinate2D) => {
   )
 }
 
+type OptionsListHeaderTitleProps = {
+  style?: StyleProp<ViewStyle>
+}
+
+const OptionsListHeaderTitle = ({ style }: OptionsListHeaderTitleProps) => {
+  const debouncedSearchText = useAtomValue(searchTextAtoms.debouncedValueAtom)
+  const headerText = debouncedSearchText.length === 0 ? "Recents" : "Results"
+  return <CaptionTitle style={style}>{headerText}</CaptionTitle>
+}
+
+type EmptyOptionsReason = "no-results" | "error" | "loading"
+
 type EmptyOptionsProps = {
-  reason: "no-results" | "error" | "loading"
+  reason: EmptyOptionsReason
+  style?: StyleProp<ViewStyle>
 }
 
 const emptyReasonFromQueryStatus = (
   status: "idle" | "success" | "loading" | "error"
-) => {
+): EmptyOptionsReason => {
   if (status === "success" || status === "idle") return "no-results"
   if (status === "loading") return "loading"
   return "error"
 }
 
-const EmptyOptionsView = ({ reason }: EmptyOptionsProps) => {
+const EmptyOptionsView = ({ reason, style }: EmptyOptionsProps) => {
   const searchText = useAtomValue(searchTextAtoms.currentValueAtom)
   const noResultsText =
     searchText.length === 0
       ? "No recent locations. Locations of events that you host and attend will appear here."
       : `Sorry, no results found for "${searchText}".`
   return (
-    <>
+    <View style={style}>
       {reason === "error" && (
         <Caption>
           Something went wrong, please check your internet connection and try
@@ -120,7 +127,7 @@ const EmptyOptionsView = ({ reason }: EmptyOptionsProps) => {
       )}
       {reason === "loading" && <LoadingOptionsView />}
       {reason === "no-results" && <Caption>{noResultsText}</Caption>}
-    </>
+    </View>
   )
 }
 
@@ -153,7 +160,7 @@ const styles = StyleSheet.create({
   divider: {
     marginVertical: 16
   },
-  headerText: {
+  headerTitle: {
     opacity: 0.35,
     marginBottom: 16
   },
@@ -180,7 +187,7 @@ const styles = StyleSheet.create({
     height: 12,
     borderRadius: 12
   },
-  option: {
+  horizontalPadding: {
     paddingHorizontal: 16
   }
 })

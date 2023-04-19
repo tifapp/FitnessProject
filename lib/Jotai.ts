@@ -1,11 +1,11 @@
 import { SetStateAction, atom } from "jotai"
 
 /**
- * Creates an atom that debounces whenever it's set.
+ * Creates a group of atoms that allow for debouncing operations.
  *
  * Copied from: {@link https://jotai.org/docs/recipes/atom-creators}
  */
-export const debounceAtoms = <T>(
+export const debounceAtomGroup = <T>(
   initialValue: T,
   delayMilliseconds = 500,
   shouldDebounceOnReset = false

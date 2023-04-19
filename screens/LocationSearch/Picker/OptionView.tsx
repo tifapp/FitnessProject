@@ -2,9 +2,9 @@ import React from "react"
 import { Location, placemarkToFormattedAddress } from "@lib/location"
 import {
   LocationSearchAnnotation,
-  LocationSearchDependencyKeys,
+  LocationSearchPickerDependencyKeys,
   LocationSearchOption
-} from "./OptionData"
+} from "./DataLoading"
 import { Caption, Headline } from "@components/Text"
 import { useDependencyValue } from "@lib/dependencies"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
@@ -29,7 +29,9 @@ export const LocationSearchOptionView = ({
   onSelected,
   style
 }: LocationSearchOptionProps) => {
-  const save = useDependencyValue(LocationSearchDependencyKeys.saveSelection)
+  const save = useDependencyValue(
+    LocationSearchPickerDependencyKeys.saveSelection
+  )
   const formattedAddress = placemarkToFormattedAddress(
     option.location.placemark
   )

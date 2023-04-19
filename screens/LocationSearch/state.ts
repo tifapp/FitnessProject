@@ -1,3 +1,3 @@
-import { debounceAtoms } from "@lib/Jotai"
+import { debounceAtomGroup } from "@lib/Jotai"
 
-export const searchTextAtoms = debounceAtoms("", 200)
+export const searchTextAtoms = debounceAtomGroup("", 200)

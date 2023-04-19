@@ -5,16 +5,15 @@ import React from "react"
 import { state } from "@components/MapTestData"
 import {
   LocationSearchBar,
-  LocationSearchDependencyKeys,
+  LocationSearchPickerDependencyKeys,
   LocationSearchOption,
   LocationSearchPicker,
   mockLocationSearchOption
 } from "./LocationSearch"
-import { SafeAreaView, View } from "react-native"
+import { SafeAreaView } from "react-native"
 import { UpdateDependencyValues } from "@lib/dependencies"
 import { UserLocationDependencyKeys } from "@hooks/UserLocation"
-import { GeocodingDependencyKeys } from "@hooks/Geocoding"
-import { mockLocation, mockTrackedLocationCoordinate } from "@lib/location"
+import { mockTrackedLocationCoordinate } from "@lib/location"
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -45,12 +44,8 @@ const ActivitiesScreen = () => {
                 return mockTrackedLocationCoordinate()
               }
             )
-            values.set(GeocodingDependencyKeys.reverseGeocode, async () => {
-              await sleep(3000)
-              return mockLocation()
-            })
             values.set(
-              LocationSearchDependencyKeys.loadOptions,
+              LocationSearchPickerDependencyKeys.loadOptions,
               async (query) => {
                 await sleep(3000)
                 return Promise.resolve(
@@ -60,7 +55,10 @@ const ActivitiesScreen = () => {
                 )
               }
             )
-            values.set(LocationSearchDependencyKeys.saveSelection, () => {})
+            values.set(
+              LocationSearchPickerDependencyKeys.saveSelection,
+              async () => {}
+            )
           }}
         >
           <LocationSearchBar
@@ -69,6 +67,9 @@ const ActivitiesScreen = () => {
             onBackTapped={() => console.log("Exited")}
           />
           <LocationSearchPicker
+            onUserCoordinatesSelected={() =>
+              console.log("User location selected")
+            }
             onLocationSelected={(selection) =>
               console.log("Selected Location", selection)
             }

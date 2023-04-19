@@ -10,17 +10,10 @@ export namespace GeocodingDependencyKeys {
   export const reverseGeocode = createDependencyKey<ReverseGeocodeLocation>()
 }
 
-export type UseReverseGeocodeQueryOptions = {
-  isEnabled?: boolean
-}
-
 /**
  * Reverse geocodes the most accurrate location for the given coordinates.
  */
-export const useReverseGeocodeQuery = (
-  coordinates: LocationCoordinate2D,
-  options?: UseReverseGeocodeQueryOptions
-) => {
+export const useReverseGeocodeQuery = (coordinates: LocationCoordinate2D) => {
   const reverseGeocode = useDependencyValue(
     GeocodingDependencyKeys.reverseGeocode
   )
@@ -29,10 +22,6 @@ export const useReverseGeocodeQuery = (
     async () => await reverseGeocode(coordinates),
     // NB: Geocoded data rarely ever changes, so we can
     // get away with infinite cache time.
-    {
-      cacheTime: Infinity,
-      staleTime: Infinity,
-      enabled: options?.isEnabled ?? true
-    }
+    { cacheTime: Infinity, staleTime: Infinity }
   )
 }

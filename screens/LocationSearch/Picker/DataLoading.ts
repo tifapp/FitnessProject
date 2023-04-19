@@ -45,9 +45,11 @@ export const mockLocationSearchOption = (): LocationSearchOption => ({
 })
 
 /**
- * Saves a search selection made by the user in the location search process.
+ * Saves a search selection made by the user in the location search picker.
  */
-export type SaveLocationSearchSelection = (selection: Location) => void
+export type SaveLocationSearchPickerSelection = (
+  selection: Location
+) => Promise<void>
 
 /**
  * Loads a set of {@link LocationSearchOption}s for the user to pick from based
@@ -56,7 +58,7 @@ export type SaveLocationSearchSelection = (selection: Location) => void
  * If the query string is empty, a list of the user's recent locations will be
  * loaded.
  */
-export type LoadLocationSearchOptions = (
+export type LoadLocationSearchPickerOptions = (
   query: string,
   center?: LocationCoordinate2D
 ) => Promise<LocationSearchOption[]>
@@ -64,11 +66,12 @@ export type LoadLocationSearchOptions = (
 /**
  * Some dependency keys used by the location search UI.
  */
-export namespace LocationSearchDependencyKeys {
+export namespace LocationSearchPickerDependencyKeys {
   // TODO: - Live Value
   export const saveSelection =
-    createDependencyKey<SaveLocationSearchSelection>()
+    createDependencyKey<SaveLocationSearchPickerSelection>()
 
   // TODO: - Live Value
-  export const loadOptions = createDependencyKey<LoadLocationSearchOptions>()
+  export const loadOptions =
+    createDependencyKey<LoadLocationSearchPickerOptions>()
 }

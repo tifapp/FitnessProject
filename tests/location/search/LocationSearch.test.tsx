@@ -1,9 +1,6 @@
 import {
   Location,
-  LocationCoordinate2D,
-  milesBetweenLocations,
-  mockLocation,
-  mockLocationCoordinate2D,
+  TrackedLocationCoordinates,
   mockTrackedLocationCoordinate
 } from "@lib/location"
 import {
@@ -14,21 +11,16 @@ import {
 } from "@testing-library/react-native"
 import React from "react"
 import {
-  LocationSearchUserLocationOptionView,
   LocationSearchBar,
-  LocationSearchOptionView,
-  LocationSearchDependencyKeys,
-  LocationSearchOptionsListView,
+  LocationSearchPickerDependencyKeys,
   mockLocationSearchOption,
   LocationSearchPicker
 } from "@screens/LocationSearch"
-import { SetDependencyValue, UpdateDependencyValues } from "@lib/dependencies"
+import { UpdateDependencyValues } from "@lib/dependencies"
 import "../../helpers/Matchers"
 import { TestQueryClientProvider } from "../../helpers/ReactQuery"
 import { neverPromise } from "../../helpers/Promise"
 import { UserLocationDependencyKeys } from "@hooks/UserLocation"
-import { GeocodingDependencyKeys } from "@hooks/Geocoding"
-import { compactFormatMiles } from "@lib/DistanceFormatting"
 
 describe("LocationSearch tests", () => {
   describe("LocationSearchUI tests", () => {
@@ -57,94 +49,7 @@ describe("LocationSearch tests", () => {
       }
     })
 
-    describe("UserLocationOptionView tests", () => {
-      it("reverse geocodes the user's location when selected", async () => {
-        const reverseGeocodedLocation = mockLocation()
-        reverseGeocode.mockResolvedValue(reverseGeocodedLocation)
-
-        const coordinates = mockLocationCoordinate2D()
-        renderOption(coordinates)
-        performSelection()
-        await waitFor(() => {
-          expect(reverseGeocode).toHaveBeenCalledWith(coordinates)
-          expect(selectedLocation).toMatchObject(reverseGeocodedLocation)
-        })
-      })
-
-      it("gives back initial coordinates when failing to reverse geocode selection", async () => {
-        reverseGeocode.mockRejectedValue(new Error())
-
-        const coordinates = mockLocationCoordinate2D()
-        renderOption(coordinates)
-        performSelection()
-        await waitFor(() => {
-          expect(selectedLocation).toMatchObject({
-            coordinates,
-            placemark: {}
-          })
-        })
-      })
-
-      const performSelection = () => {
-        fireEvent.press(screen.getByText("Use current location"))
-      }
-
-      const reverseGeocode = jest.fn()
-      let selectedLocation: Location
-
-      const renderOption = (coordinates: LocationCoordinate2D) => {
-        return render(
-          <TestQueryClientProvider>
-            <SetDependencyValue
-              forKey={GeocodingDependencyKeys.reverseGeocode}
-              value={reverseGeocode}
-            >
-              <LocationSearchUserLocationOptionView
-                onSelected={(selection) => (selectedLocation = selection)}
-                coordinates={coordinates}
-              />
-            </SetDependencyValue>
-          </TestQueryClientProvider>
-        )
-      }
-    })
-
-    describe("LocationOption tests", () => {
-      it("should save the selected option", async () => {
-        const location = mockLocation()
-        renderOption(location)
-        selectLocation(location.placemark.name)
-        expect(selectedLocation).toMatchObject(location)
-        expect(saveSelection).toHaveBeenCalledWith(location)
-      })
-
-      const selectLocation = (name: string) => {
-        fireEvent.press(screen.getByText(name))
-      }
-
-      const saveSelection = jest.fn()
-
-      let selectedLocation: Location
-      const renderOption = (location: Location) => {
-        return render(
-          <SetDependencyValue
-            forKey={LocationSearchDependencyKeys.saveSelection}
-            value={saveSelection}
-          >
-            <LocationSearchOptionView
-              onSelected={(selection) => (selectedLocation = selection)}
-              distanceMiles={0}
-              option={{
-                location,
-                isRecentLocation: false
-              }}
-            />
-          </SetDependencyValue>
-        )
-      }
-    })
-
-    describe("OptionsList tests", () => {
+    describe("Picker tests", () => {
       beforeEach(() => {
         jest.useFakeTimers({ doNotFake: ["nextTick", "setImmediate"] })
       })
@@ -152,32 +57,30 @@ describe("LocationSearch tests", () => {
 
       it("should indicate an error when loading options fails", async () => {
         loadLocationOptions.mockRejectedValue(new Error())
-        renderOptionsList()
+        renderPicker()
         await waitFor(() => expect(errorIndicator()).toBeDisplayed())
       })
 
       it("should indicate that there are no recents when no options available with empty search", async () => {
         loadLocationOptions.mockResolvedValue([])
-        renderOptionsList()
+        renderPicker()
         await waitFor(() => expect(noRecentsIndicator()).toBeDisplayed())
       })
 
       it("should debounce when search text changes", async () => {
-        const center = mockLocationCoordinate2D()
+        const trackedUserCoordinates = mockTrackedLocationCoordinate()
+        queryUserCoordinates.mockResolvedValue(trackedUserCoordinates)
         loadLocationOptions.mockImplementation(neverPromise)
-        renderOptionsList(center)
+        renderPicker()
 
         let searchText = "Hello World!"
         enterSearchText(searchText)
-        await waitFor(() => {
-          expect(loadLocationOptions).toHaveBeenCalledWith("", center)
-        })
 
         jest.advanceTimersByTime(100)
         await waitFor(() => {
           expect(loadLocationOptions).not.toHaveBeenCalledWith(
             searchText,
-            center
+            trackedUserCoordinates.coordinates
           )
         })
 
@@ -188,19 +91,22 @@ describe("LocationSearch tests", () => {
         await waitFor(() => {
           expect(loadLocationOptions).not.toHaveBeenCalledWith(
             searchText,
-            center
+            trackedUserCoordinates.coordinates
           )
         })
 
         jest.advanceTimersByTime(100)
         await waitFor(() => {
-          expect(loadLocationOptions).toHaveBeenCalledWith(searchText, center)
+          expect(loadLocationOptions).toHaveBeenCalledWith(
+            searchText,
+            trackedUserCoordinates.coordinates
+          )
         })
       })
 
       it("should indicate that no results were found when no options available with non-empty search", async () => {
         loadLocationOptions.mockResolvedValue([])
-        renderOptionsList()
+        renderPicker()
 
         const searchText = "Chuck E. Cheese"
         enterSearchText(searchText)
@@ -211,51 +117,53 @@ describe("LocationSearch tests", () => {
 
       it("displays a loading indicator when searched results have not yet loaded", async () => {
         loadLocationOptions.mockImplementation(neverPromise)
-        renderOptionsList()
+        renderPicker()
         await waitFor(() => expect(loadingIndicator()).toBeDisplayed())
       })
 
-      it("should display the result with the center's distance from the result in miles", async () => {
-        const center = { latitude: 41.1234, longitude: -121.1234 }
-        const mockOption = mockLocationSearchOption()
-        loadLocationOptions.mockResolvedValue([
-          {
-            ...mockOption,
-            location: {
-              ...mockOption.location,
-              coordinates: { latitude: 36.5678, longitude: 0.1234 }
-            }
-          }
-        ])
-        const { queryByText } = renderOptionsList(center)
+      it("can select the user's coordinates when user coordinates available", async () => {
+        const trackedUserCoordinates = mockTrackedLocationCoordinate()
+        queryUserCoordinates.mockResolvedValue(trackedUserCoordinates)
+
+        renderPicker()
+        await selectUserLocation()
         await waitFor(() => {
-          expect(
-            locationWithName(mockOption.location.placemark.name!)
-          ).toBeDisplayed()
-          expect(queryByText("5909.3 mi")).toBeDisplayed()
+          expect(selectedUserCoordinates).toMatchObject(trackedUserCoordinates)
         })
       })
 
-      it("should display the result with the center's distance from the result in feet when small distance", async () => {
-        const center = { latitude: 41.1234, longitude: -121.1234 }
-        const mockOption = mockLocationSearchOption()
-        loadLocationOptions.mockResolvedValue([
-          {
-            ...mockOption,
-            location: {
-              ...mockOption.location,
-              coordinates: { latitude: 41.12345, longitude: -121.12345 }
-            }
-          }
-        ])
-        const { queryByText } = renderOptionsList(center)
-        await waitFor(() => {
-          expect(
-            locationWithName(mockOption.location.placemark.name!)
-          ).toBeDisplayed()
-          expect(queryByText("23 ft")).toBeDisplayed()
+      test("when option is selected, it is also saved somewhere", async () => {
+        const locationOptions = [
+          mockLocationSearchOption(),
+          mockLocationSearchOption(),
+          mockLocationSearchOption()
+        ]
+        loadLocationOptions.mockResolvedValue(locationOptions)
+        renderPicker()
+
+        locationOptions.forEach(async (option) => {
+          await selectLocationWithName(option.location.placemark.name!)
+          await waitFor(() => {
+            expect(selectedLocation).toMatchObject(option.location)
+            expect(saveSelection).toHaveBeenCalledWith(option.location)
+          })
         })
       })
+
+      const loadLocationOptions = jest.fn().mockImplementation(neverPromise)
+      const queryUserCoordinates = jest.fn().mockImplementation(neverPromise)
+      const saveSelection = jest.fn()
+
+      let selectedUserCoordinates: TrackedLocationCoordinates
+      let selectedLocation: Location
+
+      const selectUserLocation = async () => {
+        return fireEvent.press(await screen.findByText("Use current location"))
+      }
+
+      const selectLocationWithName = async (name: string) => {
+        return fireEvent.press(await screen.findByText(name))
+      }
 
       const errorIndicator = () => {
         return screen.queryByText(
@@ -277,59 +185,13 @@ describe("LocationSearch tests", () => {
         return screen.queryByTestId("loading-location-options")
       }
 
-      const locationWithName = (name: string) => {
-        return screen.queryByText(name)
-      }
-
-      const loadLocationOptions = jest.fn()
-
-      const placeholder = "Test Search"
+      const searchBarPlaceholder = "Test Search"
 
       const enterSearchText = (text: string) => {
-        fireEvent.changeText(screen.getByPlaceholderText(placeholder), text)
-      }
-
-      const renderOptionsList = (center?: LocationCoordinate2D) => {
-        return render(
-          <TestQueryClientProvider>
-            <UpdateDependencyValues
-              update={(values) => {
-                values.set(
-                  LocationSearchDependencyKeys.loadOptions,
-                  loadLocationOptions
-                )
-                values.set(
-                  LocationSearchDependencyKeys.saveSelection,
-                  jest.fn()
-                )
-              }}
-            >
-              <LocationSearchBar
-                onBackTapped={jest.fn()}
-                placeholder={placeholder}
-              />
-              <LocationSearchOptionsListView
-                center={center}
-                onLocationSelected={jest.fn()}
-              />
-            </UpdateDependencyValues>
-          </TestQueryClientProvider>
+        fireEvent.changeText(
+          screen.getByPlaceholderText(searchBarPlaceholder),
+          text
         )
-      }
-    })
-
-    describe("Picker tests", () => {
-      it("displays the option to use the user's location when able", async () => {
-        const userCoordinates = mockTrackedLocationCoordinate()
-        queryCurrentCoordinates.mockResolvedValue(userCoordinates)
-        renderPicker()
-        await waitFor(() => expect(userLocationOption()).toBeDisplayed())
-      })
-
-      const queryCurrentCoordinates = jest.fn()
-
-      const userLocationOption = () => {
-        return screen.queryByText("Use current location")
       }
 
       const renderPicker = () => {
@@ -339,20 +201,28 @@ describe("LocationSearch tests", () => {
               update={(values) => {
                 values.set(
                   UserLocationDependencyKeys.currentCoordinates,
-                  queryCurrentCoordinates
+                  queryUserCoordinates
                 )
                 values.set(
-                  LocationSearchDependencyKeys.loadOptions,
-                  neverPromise
+                  LocationSearchPickerDependencyKeys.loadOptions,
+                  loadLocationOptions
                 )
                 values.set(
-                  LocationSearchDependencyKeys.saveSelection,
-                  jest.fn()
+                  LocationSearchPickerDependencyKeys.saveSelection,
+                  saveSelection
                 )
-                values.set(GeocodingDependencyKeys.reverseGeocode, jest.fn())
               }}
             >
-              <LocationSearchPicker onLocationSelected={jest.fn()} />
+              <LocationSearchBar
+                onBackTapped={jest.fn()}
+                placeholder={searchBarPlaceholder}
+              />
+              <LocationSearchPicker
+                onUserCoordinatesSelected={(coordinates) => {
+                  selectedUserCoordinates = coordinates
+                }}
+                onLocationSelected={(location) => (selectedLocation = location)}
+              />
             </UpdateDependencyValues>
           </TestQueryClientProvider>
         )
