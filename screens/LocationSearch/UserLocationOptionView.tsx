@@ -9,7 +9,7 @@ import {
   ViewStyle
 } from "react-native"
 import { Ionicon } from "@components/common/Icons"
-import Animated, { FadeInUp } from "react-native-reanimated"
+import Animated, { FadeIn } from "react-native-reanimated"
 
 export type LocationSearchUserLocationOptionProps = {
   onSelected: (selection: Location) => void
@@ -42,7 +42,7 @@ export const LocationSearchUserLocationOptionView = ({
 
   return (
     <TouchableOpacity style={style} onPress={() => optionTapped()}>
-      <Animated.View entering={FadeInUp} style={styles.container}>
+      <Animated.View entering={FadeIn} style={styles.container}>
         <Ionicon name="navigate" style={styles.icon} />
         <Headline>Use current location</Headline>
       </Animated.View>

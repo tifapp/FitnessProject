@@ -52,7 +52,7 @@ const ActivitiesScreen = () => {
             values.set(
               LocationSearchDependencyKeys.loadOptions,
               async (query) => {
-                // return await new Promise(() => {})
+                await sleep(3000)
                 return Promise.resolve(
                   locations.filter((loc) =>
                     loc.location.placemark.name?.includes(query)
