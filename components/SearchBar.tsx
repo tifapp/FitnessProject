@@ -1,13 +1,6 @@
 import React, { ReactNode } from "react"
-import {
-  StyleProp,
-  TextInput,
-  View,
-  ViewStyle,
-  TouchableOpacity,
-  StyleSheet
-} from "react-native"
-import { IoniconTouchableOpacity, MaterialCommunityIcon } from "./common/Icons"
+import { StyleProp, TextInput, View, ViewStyle, StyleSheet } from "react-native"
+import { TouchableIonicon } from "./common/Icons"
 
 export type SearchBarProps = {
   text: string
@@ -40,7 +33,7 @@ export const SearchBar = ({
           />
         </View>
         {text.length > 0 && (
-          <IoniconTouchableOpacity
+          <TouchableIonicon
             icon={{
               name: "close"
             }}

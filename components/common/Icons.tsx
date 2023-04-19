@@ -72,6 +72,9 @@ export const MaterialCommunityIcon = ({
 
 export type IoniconName = ComponentProps<typeof Ionicons>["name"]
 
+/**
+ * An icon component for Ionicons.
+ */
 export const Ionicon = ({
   name,
   size = 24,
@@ -93,10 +96,10 @@ export type IoniconButtonProps = {
   icon: IconProps<IoniconName>
 } & TouchableOpacityProps
 
-export const IoniconTouchableOpacity = ({
-  icon,
-  ...props
-}: IoniconButtonProps) => (
+/**
+ * An ionicon with no background that behaves like {@link TouchableOpacity}.
+ */
+export const TouchableIonicon = ({ icon, ...props }: IoniconButtonProps) => (
   <TouchableOpacity
     {...props}
     hitSlop={{ left: 16, right: 16, top: 16, bottom: 16 }}

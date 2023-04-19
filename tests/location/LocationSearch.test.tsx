@@ -17,9 +17,9 @@ import {
   LocationSearchPicker
 } from "@screens/LocationSearch"
 import { UpdateDependencyValues } from "@lib/dependencies"
-import "../../helpers/Matchers"
-import { TestQueryClientProvider } from "../../helpers/ReactQuery"
-import { neverPromise } from "../../helpers/Promise"
+import "../helpers/Matchers"
+import { TestQueryClientProvider } from "../helpers/ReactQuery"
+import { neverPromise } from "../helpers/Promise"
 import { UserLocationDependencyKeys } from "@hooks/UserLocation"
 
 describe("LocationSearch tests", () => {

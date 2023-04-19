@@ -2,7 +2,7 @@ import React from "react"
 import { useAtomValue, useSetAtom } from "jotai"
 import { SearchBar } from "@components/SearchBar"
 import { searchTextAtoms } from "./state"
-import { IoniconTouchableOpacity } from "@components/common/Icons"
+import { TouchableIonicon } from "@components/common/Icons"
 import { StyleProp, ViewStyle } from "react-native"
 
 export type LocationSearchBarProps = {
@@ -26,7 +26,7 @@ export const LocationSearchBar = ({
       style={style}
       placeholder={placeholder}
       leftAddon={
-        <IoniconTouchableOpacity
+        <TouchableIonicon
           icon={{ name: "chevron-back-outline" }}
           onPress={onBackTapped}
           accessibilityLabel="Go back"
