@@ -18,11 +18,19 @@ import {
 } from "@screens/LocationSearch"
 import { UpdateDependencyValues } from "@lib/dependencies"
 import "../helpers/Matchers"
-import { TestQueryClientProvider } from "../helpers/ReactQuery"
+import {
+  TestQueryClientProvider,
+  cleanupQueryClientAfterAll,
+  createTestQueryClient
+} from "../helpers/ReactQuery"
 import { neverPromise } from "../helpers/Promise"
 import { UserLocationDependencyKeys } from "@hooks/UserLocation"
 
+const queryClient = createTestQueryClient()
+
 describe("LocationSearch tests", () => {
+  cleanupQueryClientAfterAll(queryClient)
+
   describe("LocationSearchUI tests", () => {
     beforeEach(() => jest.resetAllMocks())
 
@@ -196,7 +204,7 @@ describe("LocationSearch tests", () => {
 
       const renderPicker = () => {
         return render(
-          <TestQueryClientProvider>
+          <TestQueryClientProvider client={queryClient}>
             <UpdateDependencyValues
               update={(values) => {
                 values.set(

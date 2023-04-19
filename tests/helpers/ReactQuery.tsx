@@ -41,19 +41,21 @@ export const createTestQueryClient = () => {
 }
 
 /**
+ * An after all hook to clear a query client.
+ */
+export const cleanupQueryClientAfterAll = (client: QueryClient) => {
+  afterAll(() => {
+    client.resetQueries()
+    client.clear()
+  })
+}
+
+/**
  * Props for `TestQueryClientProvider`.
  */
 export type TestQueryClientProviderProps = {
   children: ReactNode
-
-  /**
-   * Use this if you need to pass in a custom query client.
-   * (Eg. if you need to test some retry behavior)
-   *
-   * Any custom query client will automatically be reset when
-   * `TestQueryClientProvider` mounts.
-   */
-  client?: QueryClient
+  client: QueryClient
 }
 
 /**
@@ -63,20 +65,10 @@ export const TestQueryClientProvider = ({
   children,
   client
 }: TestQueryClientProviderProps) => {
-  // NB: Ensure each test has a fresh query client so that tests don't depend
-  // on each other.
-  // See: https://react-query-v3.tanstack.com/guides/testing#our-first-test
-  const queryClient = useMemo(() => {
-    if (client) return client
-    return createTestQueryClient()
+  useEffect(() => {
+    client.resetQueries()
+    return () => client.clear()
   }, [client])
 
-  useEffect(() => {
-    queryClient.resetQueries()
-    return () => queryClient.clear()
-  }, [queryClient])
-
-  return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  )
+  return <QueryClientProvider client={client}>{children}</QueryClientProvider>
 }
