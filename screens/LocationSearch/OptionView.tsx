@@ -9,8 +9,9 @@ import { Caption, Headline } from "@components/Text"
 import { useDependencyValue } from "@lib/dependencies"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { Ionicon } from "@components/common/Icons"
-import { compactFormatMiles } from "@lib/DistanceFormatting"
+import { compactFormatFeet, compactFormatMiles } from "@lib/DistanceFormatting"
 import { TouchableOpacity } from "react-native-gesture-handler"
+import { FEET_PER_MILE } from "@lib/Math"
 
 export type LocationSearchOptionProps = {
   option: LocationSearchOption
@@ -54,15 +55,20 @@ export const LocationSearchOptionView = ({
             </Headline>
             <Caption>{formattedAddress ?? "Unknown Address"}</Caption>
           </View>
-          {distanceMiles && distanceMiles > 0.1 && (
+          {distanceMiles && (
             <Headline style={styles.distanceText}>
-              {compactFormatMiles(distanceMiles)}
+              {compactFormatLocationOptionDistance(distanceMiles)}
             </Headline>
           )}
         </View>
       </View>
     </TouchableOpacity>
   )
+}
+
+const compactFormatLocationOptionDistance = (miles: number) => {
+  if (miles < 0.1) return compactFormatFeet(miles * FEET_PER_MILE)
+  return compactFormatMiles(miles)
 }
 
 type AnnotationProps = {

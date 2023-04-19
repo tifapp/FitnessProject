@@ -1,6 +1,7 @@
 import {
   Location,
   LocationCoordinate2D,
+  milesBetweenLocations,
   mockLocation,
   mockLocationCoordinate2D,
   mockTrackedLocationCoordinate
@@ -27,6 +28,7 @@ import { TestQueryClientProvider } from "../../helpers/ReactQuery"
 import { neverPromise } from "../../helpers/Promise"
 import { UserLocationDependencyKeys } from "@hooks/UserLocation"
 import { GeocodingDependencyKeys } from "@hooks/Geocoding"
+import { compactFormatMiles } from "@lib/DistanceFormatting"
 
 describe("LocationSearch tests", () => {
   describe("LocationSearchUI tests", () => {
@@ -231,6 +233,27 @@ describe("LocationSearch tests", () => {
             locationWithName(mockOption.location.placemark.name!)
           ).toBeDisplayed()
           expect(queryByText("5909.3 mi")).toBeDisplayed()
+        })
+      })
+
+      it("should display the result with the center's distance from the result in feet when small distance", async () => {
+        const center = { latitude: 41.1234, longitude: -121.1234 }
+        const mockOption = mockLocationSearchOption()
+        loadLocationOptions.mockResolvedValue([
+          {
+            ...mockOption,
+            location: {
+              ...mockOption.location,
+              coordinates: { latitude: 41.12345, longitude: -121.12345 }
+            }
+          }
+        ])
+        const { queryByText } = renderOptionsList(center)
+        await waitFor(() => {
+          expect(
+            locationWithName(mockOption.location.placemark.name!)
+          ).toBeDisplayed()
+          expect(queryByText("23 ft")).toBeDisplayed()
         })
       })
 
