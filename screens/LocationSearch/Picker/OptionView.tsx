@@ -32,9 +32,6 @@ export const LocationSearchOptionView = ({
   const save = useDependencyValue(
     LocationSearchPickerDependencyKeys.saveSelection
   )
-  const formattedAddress = placemarkToFormattedAddress(
-    option.location.placemark
-  )
   return (
     <TouchableOpacity
       onPress={() => {
@@ -47,24 +44,36 @@ export const LocationSearchOptionView = ({
           name={option.isRecentLocation ? "time" : "location"}
           style={styles.iconContainer}
         />
-        <View style={styles.contentContainer}>
-          <View style={styles.textContainer}>
-            {option.annotation && (
-              <AnnotationView annotation={option.annotation} />
-            )}
-            <Headline style={styles.nameText}>
-              {option.location.placemark.name ?? "Unknown Location"}
-            </Headline>
-            <Caption>{formattedAddress ?? "Unknown Address"}</Caption>
-          </View>
-          {distanceMiles && (
-            <Headline style={styles.distanceText}>
-              {compactFormatLocationOptionDistance(distanceMiles)}
-            </Headline>
-          )}
-        </View>
+        <OptionLabel option={option} distanceMiles={distanceMiles} />
       </View>
     </TouchableOpacity>
+  )
+}
+
+type OptionLabelProps = {
+  option: LocationSearchOption
+  distanceMiles?: number
+}
+
+const OptionLabel = ({ option, distanceMiles }: OptionLabelProps) => {
+  const formattedAddress = placemarkToFormattedAddress(
+    option.location.placemark
+  )
+  return (
+    <View style={styles.contentContainer}>
+      <View style={styles.textContainer}>
+        {option.annotation && <AnnotationView annotation={option.annotation} />}
+        <Headline style={styles.nameText}>
+          {option.location.placemark.name ?? "Unknown Location"}
+        </Headline>
+        <Caption>{formattedAddress ?? "Unknown Address"}</Caption>
+      </View>
+      {distanceMiles && (
+        <Headline style={styles.distanceText}>
+          {compactFormatLocationOptionDistance(distanceMiles)}
+        </Headline>
+      )}
+    </View>
   )
 }
 

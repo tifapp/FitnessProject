@@ -18,6 +18,7 @@ import { searchTextAtoms } from "../state"
 import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view"
 import { SkeletonView } from "@components/common/Skeleton"
 import { Divider } from "react-native-elements"
+import { useFontScale } from "@hooks/Fonts"
 
 export type LocationSearchOptionsListProps = {
   center?: LocationCoordinate2D
@@ -40,8 +41,8 @@ export const LocationSearchPickerOptionsListView = ({
   return (
     <KeyboardAwareFlatList
       style={[styles.optionsList, style]}
-      keyExtractor={(item) => extractKeyFromOption(item)}
-      ItemSeparatorComponent={() => <Divider style={styles.divider} />}
+      keyExtractor={extractKeyFromOption}
+      ItemSeparatorComponent={() => <OptionsListSeparator />}
       ListHeaderComponent={
         <View style={styles.horizontalPadding}>
           <View>{header}</View>
@@ -70,6 +71,12 @@ export const LocationSearchPickerOptionsListView = ({
     />
   )
 }
+
+const OptionsListSeparator = () => (
+  <View style={styles.separator}>
+    <Divider style={{ ...styles.divider, marginLeft: 48 * useFontScale() }} />
+  </View>
+)
 
 const extractKeyFromOption = (option: LocationSearchOption) => {
   return `${option.location.coordinates.latitude}, ${option.location.coordinates.longitude}`
@@ -157,8 +164,15 @@ const styles = StyleSheet.create({
   optionsList: {
     height: "100%"
   },
+  separator: {
+    marginVertical: 16,
+    display: "flex",
+    flexDirection: "row",
+    width: "100%"
+  },
   divider: {
-    marginVertical: 16
+    marginLeft: 32,
+    width: "100%"
   },
   headerTitle: {
     opacity: 0.35,
