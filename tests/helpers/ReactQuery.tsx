@@ -41,13 +41,11 @@ export const createTestQueryClient = () => {
 }
 
 /**
- * An after all hook to clear a query client.
+ * Use this inside of an `afterAll` to make sure CI doesn't break.
  */
-export const cleanupQueryClientAfterAll = (client: QueryClient) => {
-  afterAll(() => {
-    client.resetQueries()
-    client.clear()
-  })
+export const cleanupTestQueryClient = (client: QueryClient) => {
+  client.resetQueries()
+  client.clear()
 }
 
 /**
@@ -66,8 +64,7 @@ export const TestQueryClientProvider = ({
   client
 }: TestQueryClientProviderProps) => {
   useEffect(() => {
-    client.resetQueries()
-    return () => client.clear()
+    cleanupTestQueryClient(client)
   }, [client])
 
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>

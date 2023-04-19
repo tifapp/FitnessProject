@@ -20,7 +20,7 @@ import { UpdateDependencyValues } from "@lib/dependencies"
 import "../helpers/Matchers"
 import {
   TestQueryClientProvider,
-  cleanupQueryClientAfterAll,
+  cleanupTestQueryClient,
   createTestQueryClient
 } from "../helpers/ReactQuery"
 import { neverPromise } from "../helpers/Promise"
@@ -29,8 +29,6 @@ import { UserLocationDependencyKeys } from "@hooks/UserLocation"
 const queryClient = createTestQueryClient()
 
 describe("LocationSearch tests", () => {
-  cleanupQueryClientAfterAll(queryClient)
-
   describe("LocationSearchUI tests", () => {
     beforeEach(() => jest.resetAllMocks())
 
@@ -157,6 +155,8 @@ describe("LocationSearch tests", () => {
           })
         })
       })
+
+      afterAll(() => cleanupTestQueryClient(queryClient))
 
       const loadLocationOptions = jest.fn().mockImplementation(neverPromise)
       const queryUserCoordinates = jest.fn().mockImplementation(neverPromise)

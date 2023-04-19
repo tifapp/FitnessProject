@@ -15,7 +15,7 @@ import { QueryClient } from "react-query"
 import { captureAlerts } from "../../helpers/Alerts"
 import { neverPromise } from "../../helpers/Promise"
 import {
-  cleanupQueryClientAfterAll,
+  cleanupTestQueryClient,
   createTestQueryClient,
   TestQueryClientProvider
 } from "../../helpers/ReactQuery"
@@ -37,7 +37,6 @@ const queryClient = createTestQueryClient()
 
 describe("EventFormScreen tests", () => {
   beforeEach(() => jest.resetAllMocks())
-  cleanupQueryClientAfterAll(queryClient)
 
   it("should be able to edit and submit a form with a preselected location", async () => {
     renderEventFormScreen(queryClient, {
@@ -159,6 +158,8 @@ describe("EventFormScreen tests", () => {
     submit()
     await waitFor(() => expect(canSubmit()).toEqual(true))
   })
+
+  afterAll(() => cleanupTestQueryClient(queryClient))
 })
 
 const editedTitle = "Test title"

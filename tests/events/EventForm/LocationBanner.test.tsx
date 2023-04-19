@@ -7,7 +7,7 @@ import { SetDependencyValue } from "@lib/dependencies"
 import { render, screen, waitFor } from "@testing-library/react-native"
 import "../../helpers/Matchers"
 import {
-  cleanupQueryClientAfterAll,
+  cleanupTestQueryClient,
   createTestQueryClient,
   TestQueryClientProvider
 } from "../../helpers/ReactQuery"
@@ -23,7 +23,6 @@ const queryClient = createTestQueryClient()
 
 describe("EventFormLocationBanner tests", () => {
   beforeEach(() => jest.resetAllMocks())
-  cleanupQueryClientAfterAll(queryClient)
 
   it("should not attempt to geocode when no location is given", () => {
     renderLocationField()
@@ -45,6 +44,8 @@ describe("EventFormLocationBanner tests", () => {
     })
     await waitFor(() => expect(errorIndicator()).toBeDisplayed())
   })
+
+  afterAll(() => cleanupTestQueryClient(queryClient))
 })
 
 const reverseGeocode = jest.fn()
