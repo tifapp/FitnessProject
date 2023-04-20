@@ -12,9 +12,11 @@ import {
 import React from "react"
 import {
   LocationSearchBar,
-  LocationSearchPickerDependencyKeys,
-  mockLocationSearchOption,
-  LocationSearchPicker
+  LocationSearchDependencyKeys,
+  mockLocationSearchResult,
+  LocationSearchPicker,
+  LocationSearchResult,
+  LocationSearchResultView
 } from "@screens/LocationSearch"
 import { UpdateDependencyValues } from "@lib/dependencies"
 import "../helpers/Matchers"
@@ -52,6 +54,30 @@ describe("LocationSearch tests", () => {
 
       const navigateBack = () => {
         fireEvent.press(screen.getByLabelText("Go back"))
+      }
+    })
+
+    describe("OptionView tests", () => {
+      it("should display the distance from the option in miles", () => {
+        const { queryByText } = renderOption(mockLocationSearchResult(), 12.3)
+        expect(queryByText("12.3 mi")).toBeDisplayed()
+      })
+
+      it("should display the distance from the option in feet when small distance", () => {
+        const { queryByText } = renderOption(mockLocationSearchResult(), 0.03)
+        expect(queryByText("158 ft")).toBeDisplayed()
+      })
+
+      const renderOption = (
+        option: LocationSearchResult,
+        distanceMiles: number
+      ) => {
+        return render(
+          <LocationSearchResultView
+            option={option}
+            distanceMiles={distanceMiles}
+          />
+        )
       }
     })
 
@@ -140,9 +166,9 @@ describe("LocationSearch tests", () => {
 
       test("when option is selected, it is also saved somewhere", async () => {
         const locationOptions = [
-          mockLocationSearchOption(),
-          mockLocationSearchOption(),
-          mockLocationSearchOption()
+          mockLocationSearchResult(),
+          mockLocationSearchResult(),
+          mockLocationSearchResult()
         ]
         loadLocationOptions.mockResolvedValue(locationOptions)
         renderPicker()
@@ -212,11 +238,11 @@ describe("LocationSearch tests", () => {
                   queryUserCoordinates
                 )
                 values.set(
-                  LocationSearchPickerDependencyKeys.loadOptions,
+                  LocationSearchDependencyKeys.searchForResults,
                   loadLocationOptions
                 )
                 values.set(
-                  LocationSearchPickerDependencyKeys.saveSelection,
+                  LocationSearchDependencyKeys.savePickerSelection,
                   saveSelection
                 )
               }}

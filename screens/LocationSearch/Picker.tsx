@@ -1,7 +1,7 @@
 import React from "react"
 import { Location, TrackedLocationCoordinates } from "@lib/location"
 import { useUserCoordinatesQuery } from "@hooks/UserLocation"
-import { LocationSearchPickerOptionsListView } from "./OptionsList"
+import { LocationSearchResultsListView } from "./SearchResultsList"
 import {
   StyleProp,
   StyleSheet,
@@ -12,6 +12,9 @@ import {
 import Animated, { FadeIn } from "react-native-reanimated"
 import { Ionicon } from "@components/common/Icons"
 import { Headline } from "@components/Text"
+import { useDependencyValue } from "@lib/dependencies"
+import { LocationSearchDependencyKeys } from "./Data"
+import { LocationSearchResultView } from "./SearchResultView"
 
 export type LocationSearchPickerProps = {
   onUserCoordinatesSelected: (coordinates: TrackedLocationCoordinates) => void
@@ -29,45 +32,46 @@ export const LocationSearchPicker = ({
   style
 }: LocationSearchPickerProps) => {
   const { data } = useUserCoordinatesQuery("approximate-low")
+  const saveSelection = useDependencyValue(
+    LocationSearchDependencyKeys.savePickerSelection
+  )
   return (
     <View style={style}>
-      <LocationSearchPickerOptionsListView
+      <LocationSearchResultsListView
         center={data?.coordinates}
         header={
           <>
             {!!data && (
-              <UserCoordinatesOptionView
-                coordinates={data}
-                onSelected={onUserCoordinatesSelected}
-                style={styles.header}
-              />
+              <TouchableOpacity
+                style={style}
+                onPress={() => onUserCoordinatesSelected(data)}
+              >
+                <Animated.View
+                  entering={FadeIn}
+                  style={styles.userCoordinatesOption}
+                >
+                  <Ionicon name="navigate" style={styles.userCoordinatesIcon} />
+                  <Headline>Use current location</Headline>
+                </Animated.View>
+              </TouchableOpacity>
             )}
           </>
         }
-        onLocationSelected={onLocationSelected}
+        renderSearchResult={(option, milesFromCenter) => (
+          <TouchableOpacity
+            onPress={() => {
+              onLocationSelected(option.location)
+              saveSelection(option.location)
+            }}
+          >
+            <LocationSearchResultView
+              option={option}
+              distanceMiles={milesFromCenter}
+            />
+          </TouchableOpacity>
+        )}
       />
     </View>
-  )
-}
-
-type UserCoordinatesOptionProps = {
-  onSelected: (coordinates: TrackedLocationCoordinates) => void
-  coordinates: TrackedLocationCoordinates
-  style?: StyleProp<ViewStyle>
-}
-
-const UserCoordinatesOptionView = ({
-  onSelected,
-  coordinates,
-  style
-}: UserCoordinatesOptionProps) => {
-  return (
-    <TouchableOpacity style={style} onPress={() => onSelected(coordinates)}>
-      <Animated.View entering={FadeIn} style={styles.userCoordinatesOption}>
-        <Ionicon name="navigate" style={styles.userCoordinatesIcon} />
-        <Headline>Use current location</Headline>
-      </Animated.View>
-    </TouchableOpacity>
   )
 }
 

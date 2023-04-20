@@ -1,29 +1,24 @@
-import React, { ReactNode } from "react"
+import React, { ReactElement } from "react"
 import { Caption, CaptionTitle } from "@components/Text"
 import { useDependencyValue } from "@lib/dependencies"
-import {
-  LocationCoordinate2D,
-  milesBetweenLocations,
-  Location
-} from "@lib/location"
+import { LocationCoordinate2D, milesBetweenLocations } from "@lib/location"
 import { useAtomValue } from "jotai"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { useQuery } from "react-query"
-import {
-  LocationSearchPickerDependencyKeys,
-  LocationSearchOption
-} from "./DataLoading"
-import { LocationSearchOptionView } from "./OptionView"
-import { searchTextAtoms } from "../state"
+import { LocationSearchDependencyKeys, LocationSearchResult } from "./Data"
+import { searchTextAtoms } from "./state"
 import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view"
 import { SkeletonView } from "@components/common/Skeleton"
 import { Divider } from "react-native-elements"
 import { useFontScale } from "@hooks/Fonts"
 
-export type LocationSearchOptionsListProps = {
+export type LocationSearchResultsListProps = {
   center?: LocationCoordinate2D
-  header?: ReactNode
-  onLocationSelected: (location: Location) => void
+  header?: ReactElement
+  renderSearchResult: (
+    result: LocationSearchResult,
+    milesFromCenter?: number
+  ) => ReactElement
   style?: StyleProp<ViewStyle>
 }
 
@@ -31,18 +26,23 @@ export type LocationSearchOptionsListProps = {
  * Renders the current list of options that the user can pick from the
  * location search ui.
  */
-export const LocationSearchPickerOptionsListView = ({
+export const LocationSearchResultsListView = ({
   center,
   header,
   style,
-  onLocationSelected
-}: LocationSearchOptionsListProps) => {
+  renderSearchResult
+}: LocationSearchResultsListProps) => {
   const { status, data } = useLocationSearchOptionsQuery(center)
+  const fontScale = useFontScale()
   return (
     <KeyboardAwareFlatList
       style={[styles.optionsList, style]}
       keyExtractor={extractKeyFromOption}
-      ItemSeparatorComponent={() => <OptionsListSeparator />}
+      ItemSeparatorComponent={() => (
+        <View style={styles.separator}>
+          <Divider style={{ ...styles.divider, marginLeft: 48 * fontScale }} />
+        </View>
+      )}
       ListHeaderComponent={
         <View style={styles.horizontalPadding}>
           <View>{header}</View>
@@ -50,16 +50,14 @@ export const LocationSearchPickerOptionsListView = ({
         </View>
       }
       renderItem={({ item }) => (
-        <LocationSearchOptionView
-          option={item}
-          distanceMiles={
+        <View style={styles.horizontalPadding}>
+          {renderSearchResult(
+            item,
             center
               ? milesBetweenLocations(center, item.location.coordinates)
               : undefined
-          }
-          onSelected={onLocationSelected}
-          style={styles.horizontalPadding}
-        />
+          )}
+        </View>
       )}
       data={data ?? []}
       ListEmptyComponent={
@@ -72,20 +70,14 @@ export const LocationSearchPickerOptionsListView = ({
   )
 }
 
-const OptionsListSeparator = () => (
-  <View style={styles.separator}>
-    <Divider style={{ ...styles.divider, marginLeft: 48 * useFontScale() }} />
-  </View>
-)
-
-const extractKeyFromOption = (option: LocationSearchOption) => {
+const extractKeyFromOption = (option: LocationSearchResult) => {
   return `${option.location.coordinates.latitude}, ${option.location.coordinates.longitude}`
 }
 
 const useLocationSearchOptionsQuery = (center?: LocationCoordinate2D) => {
   const query = useAtomValue(searchTextAtoms.debouncedValueAtom)
   const loadOptions = useDependencyValue(
-    LocationSearchPickerDependencyKeys.loadOptions
+    LocationSearchDependencyKeys.searchForResults
   )
   return useQuery(
     ["search-locations", query, center],

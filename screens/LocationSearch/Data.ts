@@ -5,19 +5,22 @@ import { mockLocation, LocationCoordinate2D, Location } from "@lib/location"
 /**
  * An annotation that appears above a location search result in the UI.
  */
-export type LocationSearchAnnotation = "attended-recently" | "hosted-recently"
+export type LocationSearchResultAnnotation =
+  | "attended-recently"
+  | "hosted-recently"
 
 /**
- * Creates a random {@link LocationSearchAnnotation}.
+ * Creates a random {@link LocationSearchResultAnnotation}.
  */
-export const mockLocationSearchAnnotation = (): LocationSearchAnnotation => {
-  return randomBool() ? "attended-recently" : "hosted-recently"
-}
+export const mockLocationSearchAnnotation =
+  (): LocationSearchResultAnnotation => {
+    return randomBool() ? "attended-recently" : "hosted-recently"
+  }
 
 /**
  * An option that is displayed by the location search.
  */
-export type LocationSearchOption = {
+export type LocationSearchResult = {
   /**
    * The actual location presented by this option.
    */
@@ -26,7 +29,7 @@ export type LocationSearchOption = {
   /**
    * An annotation that appears above this option.
    */
-  annotation?: LocationSearchAnnotation
+  annotation?: LocationSearchResultAnnotation
 
   /**
    * True if the option is a saved location in the user's
@@ -36,9 +39,9 @@ export type LocationSearchOption = {
 }
 
 /**
- * Mocks a {@link LocationSearchOption}.
+ * Mocks a {@link LocationSearchResult}.
  */
-export const mockLocationSearchOption = (): LocationSearchOption => ({
+export const mockLocationSearchResult = (): LocationSearchResult => ({
   location: mockLocation(),
   annotation: randomBool(0.8) ? mockLocationSearchAnnotation() : undefined,
   isRecentLocation: randomBool()
@@ -52,26 +55,26 @@ export type SaveLocationSearchPickerSelection = (
 ) => Promise<void>
 
 /**
- * Loads a set of {@link LocationSearchOption}s for the user to pick from based
+ * Loads a set of {@link LocationSearchResult}s for the user to pick from based
  * on a query string and a center bias.
  *
  * If the query string is empty, a list of the user's recent locations will be
  * loaded.
  */
-export type LoadLocationSearchPickerOptions = (
+export type LoadLocationSearchResults = (
   query: string,
   center?: LocationCoordinate2D
-) => Promise<LocationSearchOption[]>
+) => Promise<LocationSearchResult[]>
 
 /**
  * Some dependency keys used by the location search UI.
  */
-export namespace LocationSearchPickerDependencyKeys {
+export namespace LocationSearchDependencyKeys {
   // TODO: - Live Value
-  export const saveSelection =
+  export const savePickerSelection =
     createDependencyKey<SaveLocationSearchPickerSelection>()
 
   // TODO: - Live Value
-  export const loadOptions =
-    createDependencyKey<LoadLocationSearchPickerOptions>()
+  export const searchForResults =
+    createDependencyKey<LoadLocationSearchResults>()
 }
