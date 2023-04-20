@@ -111,7 +111,7 @@ const emptyReasonFromQueryStatus = (
 }
 
 const EmptyOptionsView = ({ reason, style }: EmptyOptionsProps) => {
-  const searchText = useAtomValue(searchTextAtoms.currentValueAtom)
+  const searchText = useAtomValue(searchTextAtoms.debouncedValueAtom)
   const noResultsText =
     searchText.length === 0
       ? "No recent locations. Locations of events that you host and attend will appear here."
