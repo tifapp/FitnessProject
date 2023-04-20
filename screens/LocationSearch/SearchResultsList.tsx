@@ -23,8 +23,10 @@ export type LocationSearchResultsListProps = {
 }
 
 /**
- * Renders the current list of options that the user can pick from the
- * location search ui.
+ * Renders a list of location search results.
+ *
+ * This component uses the search text that can be edited by {@link LocationSearchBar}.
+ * When the search text is empty, the user's recent locations will be loaded.
  */
 export const LocationSearchResultsListView = ({
   center,
@@ -32,11 +34,11 @@ export const LocationSearchResultsListView = ({
   style,
   renderSearchResult
 }: LocationSearchResultsListProps) => {
-  const { status, data } = useLocationSearchOptionsQuery(center)
+  const { status, data } = useLocationSearchResultsQuery(center)
   const fontScale = useFontScale()
   return (
     <KeyboardAwareFlatList
-      style={[styles.optionsList, style]}
+      style={style}
       keyExtractor={extractKeyFromOption}
       ItemSeparatorComponent={() => (
         <View style={styles.separator}>
@@ -46,7 +48,9 @@ export const LocationSearchResultsListView = ({
       ListHeaderComponent={
         <View style={styles.horizontalPadding}>
           <View>{header}</View>
-          <OptionsListHeaderTitle style={styles.headerTitle} />
+          <CaptionTitle style={style}>
+            {useDebouncedSearchText().length === 0 ? "Recents" : "Results"}
+          </CaptionTitle>
         </View>
       }
       renderItem={({ item }) => (
@@ -61,7 +65,7 @@ export const LocationSearchResultsListView = ({
       )}
       data={data ?? []}
       ListEmptyComponent={
-        <EmptyOptionsView
+        <EmptyResultsView
           reason={emptyReasonFromQueryStatus(status)}
           style={styles.horizontalPadding}
         />
@@ -71,11 +75,11 @@ export const LocationSearchResultsListView = ({
 }
 
 const extractKeyFromOption = (option: LocationSearchResult) => {
-  return `${option.location.coordinates.latitude}, ${option.location.coordinates.longitude}`
+  return `${option.location.coordinates.latitude}|${option.location.coordinates.longitude}`
 }
 
-const useLocationSearchOptionsQuery = (center?: LocationCoordinate2D) => {
-  const query = useAtomValue(searchTextAtoms.debouncedValueAtom)
+const useLocationSearchResultsQuery = (center?: LocationCoordinate2D) => {
+  const query = useDebouncedSearchText()
   const loadOptions = useDependencyValue(
     LocationSearchDependencyKeys.searchForResults
   )
@@ -85,33 +89,23 @@ const useLocationSearchOptionsQuery = (center?: LocationCoordinate2D) => {
   )
 }
 
-type OptionsListHeaderTitleProps = {
-  style?: StyleProp<ViewStyle>
-}
+type EmptyResultsReason = "no-results" | "error" | "loading"
 
-const OptionsListHeaderTitle = ({ style }: OptionsListHeaderTitleProps) => {
-  const debouncedSearchText = useAtomValue(searchTextAtoms.debouncedValueAtom)
-  const headerText = debouncedSearchText.length === 0 ? "Recents" : "Results"
-  return <CaptionTitle style={style}>{headerText}</CaptionTitle>
-}
-
-type EmptyOptionsReason = "no-results" | "error" | "loading"
-
-type EmptyOptionsProps = {
-  reason: EmptyOptionsReason
+type EmptyResultsProps = {
+  reason: EmptyResultsReason
   style?: StyleProp<ViewStyle>
 }
 
 const emptyReasonFromQueryStatus = (
   status: "idle" | "success" | "loading" | "error"
-): EmptyOptionsReason => {
+): EmptyResultsReason => {
   if (status === "success" || status === "idle") return "no-results"
   if (status === "loading") return "loading"
   return "error"
 }
 
-const EmptyOptionsView = ({ reason, style }: EmptyOptionsProps) => {
-  const searchText = useAtomValue(searchTextAtoms.debouncedValueAtom)
+const EmptyResultsView = ({ reason, style }: EmptyResultsProps) => {
+  const searchText = useDebouncedSearchText()
   const noResultsText =
     searchText.length === 0
       ? "No recent locations. Locations of events that you host and attend will appear here."
@@ -124,23 +118,21 @@ const EmptyOptionsView = ({ reason, style }: EmptyOptionsProps) => {
           again later.
         </Caption>
       )}
-      {reason === "loading" && <LoadingOptionsView />}
+      {reason === "loading" && (
+        <View testID="loading-location-options">
+          <SkeletonOption />
+          <SkeletonOption />
+          <SkeletonOption />
+          <SkeletonOption />
+          <SkeletonOption />
+          <SkeletonOption />
+          <SkeletonOption />
+        </View>
+      )}
       {reason === "no-results" && <Caption>{noResultsText}</Caption>}
     </View>
   )
 }
-
-const LoadingOptionsView = () => (
-  <View testID="loading-location-options">
-    <SkeletonOption />
-    <SkeletonOption />
-    <SkeletonOption />
-    <SkeletonOption />
-    <SkeletonOption />
-    <SkeletonOption />
-    <SkeletonOption />
-  </View>
-)
 
 const SkeletonOption = () => (
   <View style={styles.skeletonContainer}>
@@ -152,10 +144,11 @@ const SkeletonOption = () => (
   </View>
 )
 
+const useDebouncedSearchText = () => {
+  return useAtomValue(searchTextAtoms.debouncedValueAtom)
+}
+
 const styles = StyleSheet.create({
-  optionsList: {
-    height: "100%"
-  },
   separator: {
     marginVertical: 16,
     display: "flex",
@@ -166,7 +159,7 @@ const styles = StyleSheet.create({
     marginLeft: 32,
     width: "100%"
   },
-  headerTitle: {
+  searchResultsTitle: {
     opacity: 0.35,
     marginBottom: 16
   },

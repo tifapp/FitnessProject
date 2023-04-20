@@ -12,10 +12,10 @@ export type LocationSearchResultAnnotation =
 /**
  * Creates a random {@link LocationSearchResultAnnotation}.
  */
-export const mockLocationSearchAnnotation =
-  (): LocationSearchResultAnnotation => {
-    return randomBool() ? "attended-recently" : "hosted-recently"
-  }
+export const mockLocationSearchAnnotation = () => {
+  const annotation = randomBool() ? "attended-recently" : "hosted-recently"
+  return annotation as LocationSearchResultAnnotation
+}
 
 /**
  * An option that is displayed by the location search.
@@ -41,11 +41,16 @@ export type LocationSearchResult = {
 /**
  * Mocks a {@link LocationSearchResult}.
  */
-export const mockLocationSearchResult = (): LocationSearchResult => ({
-  location: mockLocation(),
-  annotation: randomBool(0.8) ? mockLocationSearchAnnotation() : undefined,
-  isRecentLocation: randomBool()
-})
+export const mockLocationSearchResult = (
+  coordinates?: LocationCoordinate2D
+) => {
+  const isRecent = randomBool(0.8)
+  return {
+    location: mockLocation(coordinates),
+    annotation: isRecent ? mockLocationSearchAnnotation() : undefined,
+    isRecentLocation: isRecent
+  } as LocationSearchResult
+}
 
 /**
  * Saves a search selection made by the user in the location search picker.

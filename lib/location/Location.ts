@@ -42,7 +42,7 @@ export namespace LocationCoordinatesMocks {
 
   export const NYC = {
     latitude: 40.7128,
-    longitude: 74.0060
+    longitude: 74.006
   } as const
 
   export const SanFrancisco = {
@@ -77,8 +77,8 @@ export type Location = Readonly<z.infer<typeof LocationSchema>>
 /**
  * Creates a mock location for testing and UI purposes.
  */
-export const mockLocation = () => ({
-  coordinates: mockLocationCoordinate2D(),
+export const mockLocation = (coordinates?: LocationCoordinate2D) => ({
+  coordinates: coordinates ?? mockLocationCoordinate2D(),
   placemark: mockPlacemark()
 })
 

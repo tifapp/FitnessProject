@@ -6,7 +6,6 @@ import {
   StyleProp,
   StyleSheet,
   TouchableOpacity,
-  View,
   ViewStyle
 } from "react-native"
 import Animated, { FadeIn } from "react-native-reanimated"
@@ -25,6 +24,12 @@ export type LocationSearchPickerProps = {
 /**
  * Renders the location search UI involved with picking a location from
  * a list of options.
+ *
+ * This component uses the search text that can be edited by {@link LocationSearchBar}.
+ * When the search text is empty, the user's recent locations will be loaded.
+ *
+ * When an option that is not the user's coordinates is selected, it gets saved to the
+ * user's recent locations.
  */
 export const LocationSearchPicker = ({
   onUserCoordinatesSelected,
@@ -36,42 +41,41 @@ export const LocationSearchPicker = ({
     LocationSearchDependencyKeys.savePickerSelection
   )
   return (
-    <View style={style}>
-      <LocationSearchResultsListView
-        center={data?.coordinates}
-        header={
-          <>
-            {!!data && (
-              <TouchableOpacity
-                style={style}
-                onPress={() => onUserCoordinatesSelected(data)}
+    <LocationSearchResultsListView
+      style={style}
+      center={data?.coordinates}
+      header={
+        <>
+          {!!data && (
+            <TouchableOpacity
+              style={style}
+              onPress={() => onUserCoordinatesSelected(data)}
+            >
+              <Animated.View
+                entering={FadeIn}
+                style={styles.userCoordinatesOption}
               >
-                <Animated.View
-                  entering={FadeIn}
-                  style={styles.userCoordinatesOption}
-                >
-                  <Ionicon name="navigate" style={styles.userCoordinatesIcon} />
-                  <Headline>Use current location</Headline>
-                </Animated.View>
-              </TouchableOpacity>
-            )}
-          </>
-        }
-        renderSearchResult={(option, milesFromCenter) => (
-          <TouchableOpacity
-            onPress={() => {
-              onLocationSelected(option.location)
-              saveSelection(option.location)
-            }}
-          >
-            <LocationSearchResultView
-              option={option}
-              distanceMiles={milesFromCenter}
-            />
-          </TouchableOpacity>
-        )}
-      />
-    </View>
+                <Ionicon name="navigate" style={styles.userCoordinatesIcon} />
+                <Headline>Use current location</Headline>
+              </Animated.View>
+            </TouchableOpacity>
+          )}
+        </>
+      }
+      renderSearchResult={(option, milesFromCenter) => (
+        <TouchableOpacity
+          onPress={() => {
+            onLocationSelected(option.location)
+            saveSelection(option.location)
+          }}
+        >
+          <LocationSearchResultView
+            option={option}
+            distanceMiles={milesFromCenter}
+          />
+        </TouchableOpacity>
+      )}
+    />
   )
 }
 
