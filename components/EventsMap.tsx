@@ -5,11 +5,11 @@ import React, {
   useImperativeHandle,
   useRef
 } from "react"
-import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { StyleProp, ViewStyle } from "react-native"
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
 
 /**
- * A type that can be rendered by a {@link Map}.
+ * A type that can be rendered by a {@link EventsMap}.
  */
 export interface MapMarker {
   key: string
@@ -27,12 +27,11 @@ export type MapFitToBoundsOptions = { animated: boolean }
 
 export type MapRefMethods = {
   /**
-   * Fits the map on set of bounds.
+   * Recenter the map to wherever the given location is.
    *
-   * @param bounds See {@link MapBounds}.
-   * @param options See {@link MapFitToBoundsOptions}.
    */
-  fitToBounds: (bounds: MapBounds, options?: MapFitToBoundsOptions) => void
+
+  recenterToLocation: (givenLocation: LocationCoordinate2D) => void
 }
 
 export type MapProps<T extends MapMarker> = {
@@ -69,14 +68,9 @@ export type MapProps<T extends MapMarker> = {
   canRotate?: boolean
 
   /**
-   * Renders a singular map marker that was passed in through `markers`.
+   * Renders a replacement for a singular map marker that was passed in through `markers`.
    */
-  renderMarker: (marker: T) => React.ReactNode
-
-  /**
-   * Renders a circle for a singular map marker that was passed in through `markers`.
-   */
-  renderCircle?: (marker: T) => React.ReactNode
+  renderMarker?: (marker: T) => React.ReactNode
 
   /**
    * Handles the selection of a marker.
@@ -94,12 +88,11 @@ export type MapProps<T extends MapMarker> = {
 /**
  * A view for rendering a google map.
  */
-export const Map = forwardRef(function ReffedMap<T extends MapMarker> (
+export const EventsMap = forwardRef(function ReffedMap<T extends MapMarker> (
   {
     initialRegion,
     markers,
     renderMarker,
-    renderCircle,
     onMarkerSelected,
     style,
     canScroll = true,
@@ -110,13 +103,16 @@ export const Map = forwardRef(function ReffedMap<T extends MapMarker> (
   ref: MutableRefObject<MapRefMethods>
 ) {
   const mapRef = useRef<MapView | null>(null)
+  const latlngDelta = 0.03
 
   useImperativeHandle(ref, () => ({
-    fitToBounds: (bounds, options) => {
-      mapRef.current?.fitToCoordinates(
-        [bounds.bottom, bounds.left, bounds.right, bounds.top],
-        options
-      )
+    recenterToLocation: (givenLocation) => {
+      mapRef.current?.animateToRegion({
+        latitude: givenLocation.latitude,
+        longitude: givenLocation.longitude,
+        latitudeDelta: latlngDelta,
+        longitudeDelta: latlngDelta
+      })
     }
   }))
 
@@ -132,6 +128,7 @@ export const Map = forwardRef(function ReffedMap<T extends MapMarker> (
       toolbarEnabled={false}
       onLongPress={(e) => onLongPress?.(e.nativeEvent.coordinate)}
       followsUserLocation={true}
+      moveOnMarkerPress={false}
       showsUserLocation={true}
       zoomEnabled={canZoom}
       customMapStyle={[
@@ -155,13 +152,12 @@ export const Map = forwardRef(function ReffedMap<T extends MapMarker> (
             }}
             onPress={() => onMarkerSelected?.(marker)}
           >
-            {renderMarker(marker)}
+            {renderMarker?.(marker)}
           </Marker>
-          {renderCircle && renderCircle(marker)}
         </>
       ))}
     </MapView>
   )
 })
 
-export default Map
+export default EventsMap

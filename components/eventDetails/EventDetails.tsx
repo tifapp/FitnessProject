@@ -4,15 +4,18 @@ import { placemarkToAbbreviatedAddress, placemarkToFormattedAddress } from "@lib
 import { CurrentUserEvent, isAttendingEvent, isHostingEvent } from "@lib/events"
 import React from "react"
 import { Ionicons } from "@expo/vector-icons"
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native"
+import { Image, ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from "react-native"
 import { BodyText, Caption, Headline, Title } from "@components/Text"
 import dayjs from "dayjs"
 import ExpandableText from "@components/common/ExpandableText"
-import { Divider } from "react-native-elements"
+import { Divider, Icon } from "react-native-elements"
+import EventMapSnippet from "./EventMapSnippet"
 
 export type EventDetailsProps = {
   event: CurrentUserEvent
 }
+
+const MARKER_SIZE = 100
 
 const EventDetails = ({ event }: EventDetailsProps) => {
   const hexAlpha = "26"
@@ -147,6 +150,54 @@ const EventDetails = ({ event }: EventDetailsProps) => {
           <ExpandableText props={{style: {color: event.color, marginTop: 10}}} text={event.description} linesToDisplay={3} />
         </View>
       }
+      <EventMapSnippet
+        style={{ width: "100%", height: "30%" }}
+        initialRegion={{
+          latitude: event.coordinates.latitude,
+          longitude: event.coordinates.longitude,
+          latitudeDelta: 0.1,
+          longitudeDelta: 0.1
+        }}
+        renderMarker={(item) => (
+          <>
+            {/* The profile image itself */}
+            <ImageBackground
+              source={require("../assets/icon.png")}
+              style={{
+                marginTop: "2.5%",
+                position: "absolute",
+                width: MARKER_SIZE - 5,
+                height: MARKER_SIZE - 5,
+                borderRadius: MARKER_SIZE - 5 / 2,
+                alignSelf: "center",
+                overflow: "hidden"
+              }}
+            />
+            {/* Ideally, badge showing current number of attendees */}
+            <View
+              style={{
+                paddingVertical: 15,
+                paddingHorizontal: 10,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center"
+              }}
+            >
+              <Icon name="people" type="ionicon" color="white" />
+              <Text
+                style={{
+                  backgroundColor: event.color,
+                  fontSize: 16,
+                  color: "white"
+                }}
+              >
+                {event.attendeeCount}
+              </Text>
+            </View>
+          </>
+        )}
+        marker={{ key: event.id, location: event.coordinates }}
+      />
     </ScrollView>
   )
 }
