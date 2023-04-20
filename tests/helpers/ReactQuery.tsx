@@ -34,7 +34,9 @@ export const createTestQueryClient = () => {
         // NB: Turn retries off so that we don't get unexepcted calls to queries in tests.
         // See: https://react-query-v3.tanstack.com/guides/testing#turn-off-retries
         retry: false,
-        retryDelay: 0
+        retryDelay: 0,
+        // NB: This prevents CI from hanging endlessly.
+        cacheTime: 0
       }
     }
   })
@@ -53,7 +55,7 @@ export const cleanupTestQueryClient = (client: QueryClient) => {
  */
 export type TestQueryClientProviderProps = {
   children: ReactNode
-  client: QueryClient
+  client?: QueryClient
 }
 
 /**
@@ -63,9 +65,16 @@ export const TestQueryClientProvider = ({
   children,
   client
 }: TestQueryClientProviderProps) => {
-  useEffect(() => {
-    cleanupTestQueryClient(client)
+  const queryClient = useMemo(() => {
+    if (client) return client
+    return createTestQueryClient()
   }, [client])
 
-  return <QueryClientProvider client={client}>{children}</QueryClientProvider>
+  useEffect(() => {
+    cleanupTestQueryClient(queryClient)
+  }, [queryClient])
+
+  return (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  )
 }

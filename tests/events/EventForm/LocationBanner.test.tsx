@@ -6,11 +6,7 @@ import {
 import { SetDependencyValue } from "@lib/dependencies"
 import { render, screen, waitFor } from "@testing-library/react-native"
 import "../../helpers/Matchers"
-import {
-  cleanupTestQueryClient,
-  createTestQueryClient,
-  TestQueryClientProvider
-} from "../../helpers/ReactQuery"
+import { TestQueryClientProvider } from "../../helpers/ReactQuery"
 import { baseTestPlacemark } from "../../location/helpers"
 import { baseTestEventFormValues } from "./helpers"
 import { GeocodingDependencyKeys } from "@hooks/Geocoding"
@@ -18,8 +14,6 @@ import { GeocodingDependencyKeys } from "@hooks/Geocoding"
 const testLocation = baseTestEventFormValues.locationInfo.coordinates
 const testLocationName = baseTestPlacemark.name
 const testLocationAddress = "1234 Cupertino Rd, Cupertino, CA 95104"
-
-const queryClient = createTestQueryClient()
 
 describe("EventFormLocationBanner tests", () => {
   beforeEach(() => jest.resetAllMocks())
@@ -44,15 +38,13 @@ describe("EventFormLocationBanner tests", () => {
     })
     await waitFor(() => expect(errorIndicator()).toBeDisplayed())
   })
-
-  afterAll(() => cleanupTestQueryClient(queryClient))
 })
 
 const reverseGeocode = jest.fn()
 
 const renderLocationField = (locationInfo?: EventFormLocationInfo) => {
   render(
-    <TestQueryClientProvider client={queryClient}>
+    <TestQueryClientProvider>
       <SetDependencyValue
         forKey={GeocodingDependencyKeys.reverseGeocode}
         value={reverseGeocode}

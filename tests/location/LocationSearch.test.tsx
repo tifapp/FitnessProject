@@ -172,10 +172,6 @@ describe("LocationSearch tests", () => {
         })
       })
 
-      const queryClient = createTestQueryClient()
-
-      afterAll(() => cleanupTestQueryClient(queryClient))
-
       const searchForLocations = jest.fn().mockImplementation(neverPromise)
 
       const errorIndicator = () => {
@@ -220,7 +216,7 @@ describe("LocationSearch tests", () => {
 
       const renderResultsList = (center?: LocationCoordinate2D) => {
         return render(
-          <TestQueryClientProvider client={queryClient}>
+          <TestQueryClientProvider>
             <SetDependencyValue
               forKey={LocationSearchDependencyKeys.searchForResults}
               value={searchForLocations}
@@ -266,10 +262,6 @@ describe("LocationSearch tests", () => {
         expect(saveSelection).toHaveBeenCalledWith(searchResult.location)
       })
 
-      const queryClient = createTestQueryClient()
-
-      afterAll(() => cleanupTestQueryClient(queryClient))
-
       const searchForLocations = jest.fn().mockImplementation(neverPromise)
       const queryUserCoordinates = jest.fn().mockImplementation(neverPromise)
       const saveSelection = jest.fn()
@@ -287,7 +279,7 @@ describe("LocationSearch tests", () => {
 
       const renderPicker = () => {
         return render(
-          <TestQueryClientProvider client={queryClient}>
+          <TestQueryClientProvider>
             <UpdateDependencyValues
               update={(values) => {
                 values.set(
