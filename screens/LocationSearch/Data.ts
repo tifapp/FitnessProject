@@ -18,7 +18,7 @@ export const mockLocationSearchAnnotation = () => {
 }
 
 /**
- * An option that is displayed by the location search.
+ * An result that is displayed by the location search.
  */
 export type LocationSearchResult = {
   /**

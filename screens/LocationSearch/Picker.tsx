@@ -70,7 +70,7 @@ export const LocationSearchPicker = ({
           }}
         >
           <LocationSearchResultView
-            option={option}
+            result={option}
             distanceMiles={milesFromCenter}
           />
         </TouchableOpacity>

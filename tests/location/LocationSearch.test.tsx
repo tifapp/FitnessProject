@@ -24,11 +24,7 @@ import {
 } from "@screens/LocationSearch"
 import { SetDependencyValue, UpdateDependencyValues } from "@lib/dependencies"
 import "../helpers/Matchers"
-import {
-  TestQueryClientProvider,
-  cleanupTestQueryClient,
-  createTestQueryClient
-} from "../helpers/ReactQuery"
+import { TestQueryClientProvider } from "../helpers/ReactQuery"
 import { neverPromise } from "../helpers/Promise"
 import { UserLocationDependencyKeys } from "@hooks/UserLocation"
 import { View } from "react-native"
@@ -62,22 +58,28 @@ describe("LocationSearch tests", () => {
 
     describe("SearchResultView tests", () => {
       it("should display the distance from the option in miles", () => {
-        const { queryByText } = renderOption(mockLocationSearchResult(), 12.3)
+        const { queryByText } = renderSearchResult(
+          mockLocationSearchResult(),
+          12.3
+        )
         expect(queryByText("12.3 mi")).toBeDisplayed()
       })
 
       it("should display the distance from the option in feet when small distance", () => {
-        const { queryByText } = renderOption(mockLocationSearchResult(), 0.03)
+        const { queryByText } = renderSearchResult(
+          mockLocationSearchResult(),
+          0.03
+        )
         expect(queryByText("158 ft")).toBeDisplayed()
       })
 
-      const renderOption = (
-        option: LocationSearchResult,
+      const renderSearchResult = (
+        result: LocationSearchResult,
         distanceMiles: number
       ) => {
         return render(
           <LocationSearchResultView
-            option={option}
+            result={result}
             distanceMiles={distanceMiles}
           />
         )

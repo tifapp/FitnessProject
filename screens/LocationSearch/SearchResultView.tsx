@@ -8,7 +8,7 @@ import { compactFormatFeet, compactFormatMiles } from "@lib/DistanceFormatting"
 import { FEET_PER_MILE } from "@lib/Math"
 
 export type LocationSearchResultProps = {
-  option: LocationSearchResult
+  result: LocationSearchResult
   distanceMiles?: number
   style?: StyleProp<ViewStyle>
 }
@@ -17,39 +17,39 @@ export type LocationSearchResultProps = {
  * Renders a single search result for location searching.
  */
 export const LocationSearchResultView = ({
-  option,
+  result,
   distanceMiles,
   style
 }: LocationSearchResultProps) => {
   const formattedAddress = placemarkToFormattedAddress(
-    option.location.placemark
+    result.location.placemark
   )
   return (
     <View style={[style, styles.container]}>
       <Ionicon
-        name={option.isRecentLocation ? "time" : "location"}
+        name={result.isRecentLocation ? "time" : "location"}
         style={styles.iconContainer}
       />
       <View style={styles.contentContainer}>
         <View style={styles.textContainer}>
-          {option.annotation && (
+          {result.annotation && (
             <View style={styles.annotation}>
               <Ionicon name="people" size={12} style={styles.annotationIcon} />
               <Caption style={styles.annotationText}>
-                {option.annotation === "attended-recently"
+                {result.annotation === "attended-recently"
                   ? "You attended an event here recently."
                   : "You hosted an event here recently."}
               </Caption>
             </View>
           )}
           <Headline style={styles.nameText}>
-            {option.location.placemark.name ?? "Unknown Location"}
+            {result.location.placemark.name ?? "Unknown Location"}
           </Headline>
           <Caption>{formattedAddress ?? "Unknown Address"}</Caption>
         </View>
         {distanceMiles && (
           <Headline style={styles.distanceText}>
-            {compactFormatLocationOptionDistance(distanceMiles)}
+            {compactFormatSearchResultDistance(distanceMiles)}
           </Headline>
         )}
       </View>
@@ -57,7 +57,7 @@ export const LocationSearchResultView = ({
   )
 }
 
-const compactFormatLocationOptionDistance = (miles: number) => {
+const compactFormatSearchResultDistance = (miles: number) => {
   if (miles < 0.1) return compactFormatFeet(miles * FEET_PER_MILE)
   return compactFormatMiles(miles)
 }

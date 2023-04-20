@@ -80,12 +80,12 @@ const extractKeyFromOption = (option: LocationSearchResult) => {
 
 const useLocationSearchResultsQuery = (center?: LocationCoordinate2D) => {
   const query = useDebouncedSearchText()
-  const loadOptions = useDependencyValue(
+  const search = useDependencyValue(
     LocationSearchDependencyKeys.searchForResults
   )
   return useQuery(
     ["search-locations", query, center],
-    async () => await loadOptions(query, center)
+    async () => await search(query, center)
   )
 }
 
@@ -120,13 +120,13 @@ const EmptyResultsView = ({ reason, style }: EmptyResultsProps) => {
       )}
       {reason === "loading" && (
         <View testID="loading-location-options">
-          <SkeletonOption />
-          <SkeletonOption />
-          <SkeletonOption />
-          <SkeletonOption />
-          <SkeletonOption />
-          <SkeletonOption />
-          <SkeletonOption />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
         </View>
       )}
       {reason === "no-results" && <Caption>{noResultsText}</Caption>}
@@ -134,7 +134,7 @@ const EmptyResultsView = ({ reason, style }: EmptyResultsProps) => {
   )
 }
 
-const SkeletonOption = () => (
+const SkeletonResult = () => (
   <View style={styles.skeletonContainer}>
     <SkeletonView style={styles.skeletonIcon} />
     <View>
