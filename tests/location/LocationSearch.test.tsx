@@ -33,8 +33,6 @@ import { neverPromise } from "../helpers/Promise"
 import { UserLocationDependencyKeys } from "@hooks/UserLocation"
 import { View } from "react-native"
 
-const queryClient = createTestQueryClient()
-
 describe("LocationSearch tests", () => {
   describe("LocationSearchUI tests", () => {
     beforeEach(() => jest.resetAllMocks())
@@ -174,6 +172,8 @@ describe("LocationSearch tests", () => {
         })
       })
 
+      const queryClient = createTestQueryClient()
+
       afterAll(() => cleanupTestQueryClient(queryClient))
 
       const searchForLocations = jest.fn().mockImplementation(neverPromise)
@@ -265,6 +265,8 @@ describe("LocationSearch tests", () => {
         expect(selectedLocation).toMatchObject(searchResult.location)
         expect(saveSelection).toHaveBeenCalledWith(searchResult.location)
       })
+
+      const queryClient = createTestQueryClient()
 
       afterAll(() => cleanupTestQueryClient(queryClient))
 
