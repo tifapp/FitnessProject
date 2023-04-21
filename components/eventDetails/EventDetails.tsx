@@ -15,7 +15,7 @@ export type EventDetailsProps = {
   event: CurrentUserEvent
 }
 
-const MARKER_SIZE = 100
+const MARKER_SIZE = 30
 
 const EventDetails = ({ event }: EventDetailsProps) => {
   const hexAlpha = "26"
@@ -25,7 +25,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
   const endTimeFormat = dayjs(eventDuration.endDate).format("h A")
   const isFriend = false
   return (
-    <ScrollView style={[styles.container, styles.spacing]}>
+    <ScrollView style={[styles.container, styles.spacing]} contentContainerStyle={{ flex: 1 }}>
      <Title>{event.title}</Title>
      <View style={[styles.flexRow, {marginVertical: 16}]}>
         <Image 
@@ -150,54 +150,32 @@ const EventDetails = ({ event }: EventDetailsProps) => {
           <ExpandableText props={{style: {color: event.color, marginTop: 10}}} text={event.description} linesToDisplay={3} />
         </View>
       }
-      <EventMapSnippet
-        style={{ width: "100%", height: "30%" }}
-        initialRegion={{
-          latitude: event.coordinates.latitude,
-          longitude: event.coordinates.longitude,
-          latitudeDelta: 0.1,
-          longitudeDelta: 0.1
-        }}
-        renderMarker={(item) => (
-          <>
-            {/* The profile image itself */}
-            <ImageBackground
-              source={require("../assets/icon.png")}
-              style={{
-                marginTop: "2.5%",
-                position: "absolute",
-                width: MARKER_SIZE - 5,
-                height: MARKER_SIZE - 5,
-                borderRadius: MARKER_SIZE - 5 / 2,
-                alignSelf: "center",
-                overflow: "hidden"
-              }}
-            />
-            {/* Ideally, badge showing current number of attendees */}
-            <View
-              style={{
-                paddingVertical: 15,
-                paddingHorizontal: 10,
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center"
-              }}
-            >
-              <Icon name="people" type="ionicon" color="white" />
-              <Text
+
+      <View style={{marginTop: 16}}>
+        <Headline style={{marginBottom: 8}}>Location</Headline>
+        <EventMapSnippet
+          style={{ width: "100%", height: "50%" }}
+          initialRegion={{
+            latitude: event.coordinates.latitude,
+            longitude: event.coordinates.longitude,
+            latitudeDelta: 0.91,
+            longitudeDelta: 0.91
+          }}
+          renderMarker={() => (
+              <ImageBackground
+                source={require("../../assets/icon.png")}
                 style={{
-                  backgroundColor: event.color,
-                  fontSize: 16,
-                  color: "white"
+                  width: MARKER_SIZE,
+                  height: MARKER_SIZE,
+                  borderRadius: 16,
+                  overflow: "hidden",
+                  borderWidth: 1
                 }}
-              >
-                {event.attendeeCount}
-              </Text>
-            </View>
-          </>
-        )}
-        marker={{ key: event.id, location: event.coordinates }}
-      />
+              />
+          )}
+          marker={{ key: event.id, location: event.coordinates }}
+        />
+      </View>
     </ScrollView>
   )
 }
@@ -206,7 +184,6 @@ export default EventDetails
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     paddingVertical: 24,
     backgroundColor: "white"
   },
