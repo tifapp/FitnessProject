@@ -5,7 +5,8 @@ import {
   sin2
 } from "../Math"
 import { z } from "zod"
-import { PlacemarkSchema } from "./Placemark"
+import { mockPlacemark, PlacemarkSchema } from "./Placemark"
+import { faker } from "@faker-js/faker"
 
 /**
  * A zod schema for {@link LocationCoordinate2D}.
@@ -23,6 +24,14 @@ export type LocationCoordinate2D = Readonly<
 >
 
 /**
+ * Generates a mock coordinate for testing and UI purposes.
+ */
+export const mockLocationCoordinate2D = () => ({
+  latitude: parseFloat(faker.address.latitude()),
+  longitude: parseFloat(faker.address.longitude())
+})
+
+/**
  * Some mock Location coordinates suitable for testing.
  */
 export namespace LocationCoordinatesMocks {
@@ -33,7 +42,7 @@ export namespace LocationCoordinatesMocks {
 
   export const NYC = {
     latitude: 40.7128,
-    longitude: 74.0060
+    longitude: 74.006
   } as const
 
   export const SanFrancisco = {
@@ -66,12 +75,29 @@ export const LocationSchema = z.object({
 export type Location = Readonly<z.infer<typeof LocationSchema>>
 
 /**
+ * Creates a mock location for testing and UI purposes.
+ */
+export const mockLocation = (coordinates?: LocationCoordinate2D) => ({
+  coordinates: coordinates ?? mockLocationCoordinate2D(),
+  placemark: mockPlacemark()
+})
+
+/**
  * A location object meant for tracking purposes.
  */
 export type TrackedLocationCoordinates = Readonly<{
   coordinates: LocationCoordinate2D
   trackingDate: Date
 }>
+
+/**
+ * Generates a mocked Tracked location coordinate for testing and ui
+ * purposes.
+ */
+export const mockTrackedLocationCoordinate = (date?: Date) => ({
+  coordinates: mockLocationCoordinate2D(),
+  trackingDate: date ?? faker.date.soon()
+})
 
 /**
  * Computes the number of miles between 2 locations using the haversine formula.
