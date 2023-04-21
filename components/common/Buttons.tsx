@@ -1,51 +1,47 @@
 import React from "react"
-import { ButtonProps, Pressable, StyleSheet } from "react-native"
-import { Headline } from "@components/Text"
+import {StyleSheet, TouchableOpacity, TouchableOpacityProps } from "react-native"
 
-const darkColor = "#26282A"
 const hexAlpha = "26" // 15% Opacity
 
-export const DarkButton = (props: ButtonProps) => {
+export namespace CustomButtonStyles {
+  export const darkColor = "#26282A"
+}
+
+export const CustomButton = (props: TouchableOpacityProps) => {
   return (
-    <Pressable
-      onPress={props.onPress}
-      style={[styles.container, {backgroundColor: darkColor}]}>
-      <Headline style={styles.darkStyleText}>{props.title}</Headline>
-    </Pressable>
+    <TouchableOpacity
+      {...props}
+      style={[props.style, styles.container, {backgroundColor: CustomButtonStyles.darkColor}]}>
+      {props.children}
+    </TouchableOpacity>
   )
 }
 
-export const LightButton = (props: ButtonProps) => {
+export const CustomOutlinedButton = (props: TouchableOpacityProps) => {
   return (
-    <Pressable
-      onPress={props.onPress}
+    <TouchableOpacity
+      {...props}
       style={[
+        props.style,
         styles.container,
         styles.lightStyle,
-        {borderColor: darkColor + hexAlpha}
+        {borderColor: CustomButtonStyles.darkColor + hexAlpha}
       ]}>
-      <Headline style={styles.lightStyleText}>{props.title}</Headline>
-    </Pressable>
+      {props.children}
+    </TouchableOpacity>
   )
 }
 
 const styles = StyleSheet.create ({
   container: {
     height: 48,
-    width: "90%",
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 12
   },
-  darkStyleText: {
-    color: "white"
-  },
   lightStyle: {
     backgroundColor: "white",
     borderWidth: 1
-  },
-  lightStyleText: {
-    color: "black"
   }
 })
