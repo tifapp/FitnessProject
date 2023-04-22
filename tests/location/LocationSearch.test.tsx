@@ -28,6 +28,7 @@ import { TestQueryClientProvider } from "../helpers/ReactQuery"
 import { neverPromise } from "../helpers/Promise"
 import { UserLocationDependencyKeys } from "@hooks/UserLocation"
 import { View } from "react-native"
+import { fakeTimers } from "../helpers/Timers"
 
 describe("LocationSearch tests", () => {
   describe("LocationSearchUI tests", () => {
@@ -87,10 +88,7 @@ describe("LocationSearch tests", () => {
     })
 
     describe("SearchResultsList tests", () => {
-      beforeEach(() => {
-        jest.useFakeTimers({ doNotFake: ["nextTick", "setImmediate"] })
-      })
-      afterEach(() => jest.useRealTimers())
+      fakeTimers()
 
       it("should indicate an error when loading options fails", async () => {
         searchForLocations.mockRejectedValue(new Error())

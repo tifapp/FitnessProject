@@ -1,7 +1,11 @@
 import React, { ReactElement } from "react"
 import { Caption, CaptionTitle } from "@components/Text"
 import { useDependencyValue } from "@lib/dependencies"
-import { LocationCoordinate2D, milesBetweenLocations } from "@lib/location"
+import {
+  LocationCoordinate2D,
+  hashLocationCoordinate,
+  milesBetweenLocations
+} from "@lib/location"
 import { useAtomValue } from "jotai"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { useQuery } from "react-query"
@@ -75,7 +79,7 @@ export const LocationSearchResultsListView = ({
 }
 
 const extractKeyFromOption = (option: LocationSearchResult) => {
-  return `${option.location.coordinates.latitude}|${option.location.coordinates.longitude}`
+  return hashLocationCoordinate(option.location.coordinates)
 }
 
 const useLocationSearchResultsQuery = (center?: LocationCoordinate2D) => {
