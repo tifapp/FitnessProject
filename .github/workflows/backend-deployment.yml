@@ -1,0 +1,70 @@
+name: Backend Deployment
+run-name: Backend Deployment
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - "api_schemas/**"
+    branches:
+      - master
+      - development
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "14.17.0"
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+      - name: Install npm
+        run: npm install -g npm@8.3.2
+      - name: Install dependencies
+        run: npm ci
+      - name: Configure AWS CLI
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws configure set default.region ${{ secrets.AWS_REGION }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+      - name: Convert Zod schemas to JSON Validation schemas
+        run: node deploy_scripts/convert-zod-to-json-schema.ts
+      - name: Upload JSON schemas to API Gateway (Dev Stage)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: ./deploy_scripts/upload-json-schemas-to-apigateway.sh
+      - name: Get OpenAPI schema from API Gateway (Dev Stage)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws apigateway get-export \
+            --rest-api-id <your_api_gateway_id> \
+            --stage-name dev \
+            --export-type swagger \
+            --accepts application/json \
+            openapi-schema.json
+      - name: Add OpenAPI schema and TypeScript client to the PR
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add openapi-schema.json generated-client/
+          git commit -m "Add OpenAPI schema and generated TypeScript client" || echo "No changes to commit"
+          git push origin ${{ github.head_ref }}
+      - name: Run tests
+        run: npm run test:ci

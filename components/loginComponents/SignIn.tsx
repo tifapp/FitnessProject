@@ -11,95 +11,114 @@
  * and limitations under the License.
  */
 
-import React from "react";
-import { View } from "react-native";
-import { Auth, I18n, Logger } from "aws-amplify";
-import AuthPiece, {
-  IAuthPieceProps,
-  IAuthPieceState,
-} from "aws-amplify-react-native/src/Auth/AuthPiece";
+import {
+  AuthenticationDetails,
+  CognitoUser,
+  CognitoUserPool
+} from "amazon-cognito-identity-js"
+import { I18n, Logger } from "aws-amplify"
+import { AmplifyThemeType } from "aws-amplify-react-native/src/AmplifyTheme"
 import {
   AmplifyButton,
-  FormField,
-  LinkCell,
-  Header,
   ErrorRow,
+  FormField,
+  Header,
+  LinkCell,
   SignedOutMessage,
-  Wrapper,
-} from "aws-amplify-react-native/src/AmplifyUI";
-import { AmplifyThemeType } from "aws-amplify-react-native/src/AmplifyTheme";
-import TEST_ID from "aws-amplify-react-native/src/AmplifyTestIDs";
+  Wrapper
+} from "aws-amplify-react-native/src/AmplifyUI"
+import AuthPiece, {
+  IAuthPieceProps,
+  IAuthPieceState
+} from "aws-amplify-react-native/src/Auth/AuthPiece"
+import { CognitoIdentityCredentials } from "aws-sdk"
+import React from "react"
+import { View } from "react-native"
 
-const logger = new Logger("SignIn");
+const logger = new Logger("SignIn")
 
 interface ISignInProps extends IAuthPieceProps {}
 
 interface ISignInState extends IAuthPieceState {
-  password?: string;
+  password?: string
 }
 
 export default class SignIn extends AuthPiece<ISignInProps, ISignInState> {
-  constructor(props: ISignInProps) {
-    super(props);
+  constructor (props: ISignInProps) {
+    super(props)
 
-    this._validAuthStates = ["signIn", "signedOut", "signedUp"];
+    this._validAuthStates = ["signIn", "signedOut", "signedUp"]
     this.state = {
       username: null,
       password: null,
-      error: null,
-    };
+      error: null
+    }
 
-    this.checkContact = this.checkContact.bind(this);
-    this.signIn = this.signIn.bind(this);
+    this.checkContact = this.checkContact.bind(this)
+    this.signIn = this.signIn.bind(this)
   }
 
-  signIn() {
-    const username = this.getUsernameFromInput() || "";
-    const { password } = this.state;
-    logger.debug("Sign In for " + username);
-    return Auth.signIn(
-      username
-        .trim()
-        .toLowerCase()
-        .replace(function (c) {
-          return c === /[\p{L}\p{M}\p{S}\p{N}\p{P}]+/ ? c : "";
+  signIn () {
+    const username = this.getUsernameFromInput() || ""
+    const { password } = this.state
+
+    const userPool = new CognitoUserPool({
+      UserPoolId: "YOUR_COGNITO_USER_POOL_ID",
+      ClientId: "YOUR_COGNITO_APP_CLIENT_ID"
+    })
+
+    const cognitoUser = new CognitoUser({
+      Username: username.trim().toLowerCase().replace(/\s/g, ""),
+      Pool: userPool
+    })
+
+    const authenticationDetails = new AuthenticationDetails({
+      Username: username.trim().toLowerCase().replace(/\s/g, ""),
+      Password: password
+    })
+
+    cognitoUser.authenticateUser(authenticationDetails, {
+      onSuccess: (result) => {
+        // Update authDetails with the new session
+        global.authDetails.isLoggedIn = true
+        global.authDetails.jwtToken = result.getIdToken().getJwtToken()
+        global.authDetails.awsCredentials = new CognitoIdentityCredentials({
+          IdentityPoolId: "YOUR_COGNITO_IDENTITY_POOL_ID",
+          Logins: {
+            [`cognito-idp.${"YOUR_AWS_REGION"}.amazonaws.com/${"YOUR_COGNITO_USER_POOL_ID"}`]:
+              result.getIdToken().getJwtToken()
+          }
         })
-        .replace(/\s/g, ""),
-      password
-    )
-      .then((user) => {
-        logger.debug(user);
-        const requireMFA = user.Session !== null;
-        if (user.challengeName === "SMS_MFA") {
-          this.changeState("confirmSignIn", user);
-        } else if (user.challengeName === "NEW_PASSWORD_REQUIRED") {
-          logger.debug("require new password", user.challengeParam);
-          this.changeState("requireNewPassword", user);
+        global.authDetails.cognitoUser = cognitoUser
+
+        // ... rest of the code (check MFA, handle NEW_PASSWORD_REQUIRED, etc.)
+        // Use 'result.getAccessToken().getJwtToken()' if you need the access token
+
+        // Check MFA and other challenges
+        if (cognitoUser.challengeName === "SMS_MFA") {
+          this.changeState("confirmSignIn", cognitoUser)
+        } else if (cognitoUser.challengeName === "NEW_PASSWORD_REQUIRED") {
+          this.changeState("requireNewPassword", cognitoUser)
         } else {
-          this.checkContact(user);
+          this.checkContact(cognitoUser)
         }
-      })
-      .catch((err) => {
+      },
+      onFailure: (err) => {
         if (err.code === "PasswordResetRequiredException") {
-          logger.debug("the user requires a new password");
-          this.changeState("forgotPassword", username);
+          this.changeState("forgotPassword", username)
         } else {
-          this.error(err);
+          this.error(err)
         }
-      });
+      }
+    })
   }
 
-  showComponent(theme: AmplifyThemeType) {
+  showComponent (theme: AmplifyThemeType) {
     return (
       <Wrapper>
         <View style={theme.section}>
           <View>
-            <Header
-              theme={theme}
-              testID={TEST_ID.AUTH.SIGN_IN_TO_YOUR_ACCOUNT_TEXT}
-            >
-              {I18n.get("Sign in to your account")}
-            </Header>
+            <Header theme={theme}>{I18n.get("Sign in to your account")}</Header>
             <View style={theme.sectionBody}>
               {this.renderUsernameField(theme)}
               <FormField
@@ -109,7 +128,6 @@ export default class SignIn extends AuthPiece<ISignInProps, ISignInState> {
                 placeholder={I18n.get("Enter your password")}
                 secureTextEntry={true}
                 required={true}
-                testID={TEST_ID.AUTH.PASSWORD_INPUT}
               />
               <AmplifyButton
                 text={I18n.get("Sign In").toUpperCase()}
@@ -118,21 +136,18 @@ export default class SignIn extends AuthPiece<ISignInProps, ISignInState> {
                 disabled={
                   !!(!this.getUsernameFromInput() && this.state.password)
                 }
-                testID={TEST_ID.AUTH.SIGN_IN_BUTTON}
               />
             </View>
             <View style={theme.sectionFooter}>
               <LinkCell
                 theme={theme}
                 onPress={() => this.changeState("forgotPassword")}
-                testID={TEST_ID.AUTH.FORGOT_PASSWORD_BUTTON}
               >
                 {I18n.get("Forgot Password")}
               </LinkCell>
               <LinkCell
                 theme={theme}
                 onPress={() => this.changeState("signUp")}
-                testID={TEST_ID.AUTH.SIGN_UP_BUTTON}
               >
                 {I18n.get("Sign Up")}
               </LinkCell>
@@ -142,6 +157,6 @@ export default class SignIn extends AuthPiece<ISignInProps, ISignInState> {
           <SignedOutMessage {...this.props} />
         </View>
       </Wrapper>
-    );
+    )
   }
 }

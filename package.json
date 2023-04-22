@@ -47,10 +47,12 @@
     "@sinonjs/commons": "3.0.0",
     "@turf/boolean-clockwise": "6.5.0",
     "@turf/invariant": "6.5.0",
+    "amazon-cognito-identity-js": "^6.2.0",
     "aws-amplify": "^5.0.11",
     "aws-amplify-react-native": "^7.0.2",
     "aws-sdk": "^2.822.0",
     "dayjs": "^1.11.7",
+    "dotenv": "^16.0.3",
     "expo": "^46.0.0",
     "expo-av": "~12.0.4",
     "expo-blur": "^12.2.2",
@@ -72,6 +74,7 @@
     "jotai": "^2.0.3",
     "link-preview-js": "^2.1.6",
     "linkify-it": "^3.0.2",
+    "openapi-types": "^12.1.0",
     "promise.allsettled": "^1.0.4",
     "react": "18.0.0",
     "react-dom": "18.0.0",
@@ -97,7 +100,8 @@
     "tlds": "^1.221.1",
     "type-detect": "4.0.8",
     "uuid": "^9.0.0",
-    "zod": "^3.20.6"
+    "zod": "^3.20.6",
+    "zod-to-json-schema": "^3.20.4"
   },
   "devDependencies": {
     "@aws-amplify/cli": "^10.8.1",
