@@ -1,8 +1,8 @@
 import { mockLocation } from "@lib/location"
-import { asyncStorageSaveLocation } from "@lib/location/LocationStorage"
+import { asyncStorageSaveLocation } from "@lib/location/LocationLocalStorage"
 import { fakeTimers } from "../helpers/Timers"
 
-describe("LocationStorage tests", () => {
+describe("LocationLocalStorage tests", () => {
   describe("AsyncStorageSaveLocation tests", () => {
     fakeTimers()
 
