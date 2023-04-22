@@ -11,85 +11,85 @@
  * and limitations under the License.
  */
 
-import React from "react";
-import { View } from "react-native";
-import { Auth, I18n, Logger } from "aws-amplify";
-import AuthPiece, {
-  IAuthPieceProps,
-  IAuthPieceState,
-} from "aws-amplify-react-native/src/Auth/AuthPiece";
+import { Auth, I18n, Logger } from "aws-amplify"
+import TEST_ID from "aws-amplify-react-native/src/AmplifyTestIDs"
+import { AmplifyThemeType } from "aws-amplify-react-native/src/AmplifyTheme"
 import {
   AmplifyButton,
-  FormField,
-  LinkCell,
-  Header,
   ErrorRow,
+  FormField,
+  Header,
+  LinkCell,
   SignedOutMessage,
-  Wrapper,
-} from "aws-amplify-react-native/src/AmplifyUI";
-import { AmplifyThemeType } from "aws-amplify-react-native/src/AmplifyTheme";
-import TEST_ID from "aws-amplify-react-native/src/AmplifyTestIDs";
+  Wrapper
+} from "aws-amplify-react-native/src/AmplifyUI"
+import AuthPiece, {
+  IAuthPieceProps,
+  IAuthPieceState
+} from "aws-amplify-react-native/src/Auth/AuthPiece"
+import React from "react"
+import { View } from "react-native"
 
-const logger = new Logger("SignIn");
+const logger = new Logger("SignIn")
 
 interface ISignInProps extends IAuthPieceProps {}
 
 interface ISignInState extends IAuthPieceState {
-  password?: string;
+  password?: string
 }
 
 export default class SignIn extends AuthPiece<ISignInProps, ISignInState> {
-  constructor(props: ISignInProps) {
-    super(props);
+  constructor (props: ISignInProps) {
+    super(props)
 
-    this._validAuthStates = ["signIn", "signedOut", "signedUp"];
+    this._validAuthStates = ["signIn", "signedOut", "signedUp"]
     this.state = {
       username: null,
       password: null,
-      error: null,
-    };
+      error: null
+    }
 
-    this.checkContact = this.checkContact.bind(this);
-    this.signIn = this.signIn.bind(this);
+    this.checkContact = this.checkContact.bind(this)
+    this.signIn = this.signIn.bind(this)
   }
 
-  signIn() {
-    const username = this.getUsernameFromInput() || "";
-    const { password } = this.state;
-    logger.debug("Sign In for " + username);
+  signIn () {
+    const username = this.getUsernameFromInput() || ""
+    const { password } = this.state
+    logger.debug("Sign In for " + username)
     return Auth.signIn(
       username
         .trim()
         .toLowerCase()
         .replace(function (c) {
-          return c === /[\p{L}\p{M}\p{S}\p{N}\p{P}]+/ ? c : "";
+          return c === /[\p{L}\p{M}\p{S}\p{N}\p{P}]+/ ? c : ""
         })
         .replace(/\s/g, ""),
       password
     )
       .then((user) => {
-        logger.debug(user);
-        const requireMFA = user.Session !== null;
+        logger.debug(user)
+        const requireMFA = user.Session !== null
         if (user.challengeName === "SMS_MFA") {
-          this.changeState("confirmSignIn", user);
+          this.changeState("confirmSignIn", user)
         } else if (user.challengeName === "NEW_PASSWORD_REQUIRED") {
-          logger.debug("require new password", user.challengeParam);
-          this.changeState("requireNewPassword", user);
+          logger.debug("require new password", user.challengeParam)
+          this.changeState("requireNewPassword", user)
         } else {
-          this.checkContact(user);
+          this.checkContact(user)
         }
       })
       .catch((err) => {
         if (err.code === "PasswordResetRequiredException") {
-          logger.debug("the user requires a new password");
-          this.changeState("forgotPassword", username);
+          logger.debug("the user requires a new password")
+          this.changeState("forgotPassword", username)
         } else {
-          this.error(err);
+          this.error(err)
         }
-      });
+      })
   }
 
-  showComponent(theme: AmplifyThemeType) {
+  showComponent (theme: AmplifyThemeType) {
     return (
       <Wrapper>
         <View style={theme.section}>
@@ -142,6 +142,6 @@ export default class SignIn extends AuthPiece<ISignInProps, ISignInState> {
           <SignedOutMessage {...this.props} />
         </View>
       </Wrapper>
-    );
+    )
   }
 }
