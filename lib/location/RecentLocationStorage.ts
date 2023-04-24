@@ -101,7 +101,6 @@ export const asyncStorageSaveRecentLocation = async (
       key,
       JSON.stringify({
         location,
-        timestamp: now().unix(),
         annotation
       })
     ]
