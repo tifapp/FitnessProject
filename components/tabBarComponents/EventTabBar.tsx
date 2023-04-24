@@ -1,7 +1,7 @@
-import React from "react"
-import { StyleSheet, TouchableOpacity, View } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { BlurView } from "expo-blur"
+import React from "react"
+import { StyleSheet, TouchableOpacity, View } from "react-native"
 
 export const EventTabBar = () => {
   const darkIconColor = "#1c1c1c"
@@ -16,8 +16,8 @@ export const EventTabBar = () => {
         <TouchableOpacity style={styles.icon}>
           <Ionicons name="chatbox" size={iconSize} color={"grey"} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.icon}>
-          <Ionicons name="add-circle" size={60} color={darkIconColor} />
+        <TouchableOpacity style={styles.plusIcon}>
+          <Ionicons name="add-outline" color="white" size={30} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.icon}>
           <Ionicons name="notifications" size={iconSize} color={"grey"} />
@@ -51,6 +51,16 @@ const styles = StyleSheet.create({
   icon: {
     alignItems: "center",
     justifyContent: "center"
+  },
+  plusIcon: {
+    alignItems: "center",
+    justifyContent: "center",
+    width: 50,
+    height: 50,
+    top: "4%",
+    left: "4%",
+    borderRadius: 15,
+    backgroundColor: "black"
   }
 })
 

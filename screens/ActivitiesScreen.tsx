@@ -1,18 +1,31 @@
 import EventsList from "@components/EventsList"
 import EventsMap, { MapRefMethods } from "@components/EventsMap"
 import { state } from "@components/MapTestData"
+import { Ionicon } from "@components/common/Icons"
 import EventTabBar from "@components/tabBarComponents/EventTabBar"
+import { CurrentUserEvent, EventMocks } from "@lib/events"
 import React, { useRef } from "react"
-import { ImageBackground, Text, TouchableOpacity, View } from "react-native"
+import {
+  ImageBackground,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native"
 import { Icon } from "react-native-elements"
 
-const MARKER_SIZE = 80
+const MARKER_SIZE = 60
 
 const ActivitiesScreen = () => {
   const appRef = useRef<MapRefMethods | null>(null)
   const recenterThing = () => {
     appRef.current?.recenterToLocation(state.initialRegion)
   }
+  const events: CurrentUserEvent[] = [
+    EventMocks.Multiday,
+    EventMocks.NoPlacemarkInfo,
+    EventMocks.PickupBasketball
+  ]
   return (
     <>
       <EventsMap
@@ -21,97 +34,94 @@ const ActivitiesScreen = () => {
         initialRegion={state.initialRegion}
         renderMarker={(item) => (
           <>
-            {/* Solid white background for the image */}
-            <ImageBackground
-              source={require("../assets/Solid_white.svg.png")}
-              style={{
-                flex: 1,
-                width: MARKER_SIZE,
-                height: MARKER_SIZE,
-                borderRadius: MARKER_SIZE / 2,
-                alignItems: "center",
-                justifyContent: "center",
-                overflow: "hidden"
-              }}
-            />
-            {/* The profile image itself */}
-            <ImageBackground
-              source={require("../assets/icon.png")}
-              style={{
-                marginTop: "3%",
-                position: "absolute",
-                width: MARKER_SIZE - 5,
-                height: MARKER_SIZE - 5,
-                borderRadius: MARKER_SIZE - 5 / 2,
-                alignSelf: "center",
-                overflow: "hidden"
-              }}
-            />
-            {/* Ideally, badge showing current number of attendees */}
             <View
-              style={{
-                marginLeft: "30%",
-                paddingHorizontal: 3,
-                backgroundColor: "red",
-                position: "absolute",
-                borderRadius: 10,
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center"
-              }}
+              style={[
+                styles.badgeDisplay,
+                { backgroundColor: events.find((x) => x.id === item.id).color }
+              ]}
             >
-              <Icon name="people" type="ionicon" color="white" />
-              <Text
-                style={{
-                  paddingHorizontal: 4,
-                  fontWeight: "bold",
-                  fontSize: 16,
-                  color: "white"
-                }}
-              >
-                {/* Ideally, add the event amount of attendees here */}
-                {5}
+              <Ionicon name="people" color="white" size={10} />
+              <Text style={styles.badgeText}>
+                {events.find((x) => x.id === item.id).attendeeCount}
               </Text>
+            </View>
+
+            <View style={styles.whiteBackground}>
+              <ImageBackground
+                source={require("../assets/icon.png")}
+                style={styles.imageBackground}
+              />
             </View>
           </>
         )}
-        markers={state.markers}
+        markers={events}
       />
-      <TouchableOpacity
-        onPress={recenterThing}
-        style={{
-          alignItems: "center",
-          justifyContent: "center",
-          width: 60,
-          height: 60,
-          position: "absolute",
-          bottom: "20%",
-          right: "80%",
-          borderRadius: 15,
-          backgroundColor: "black"
-        }}
-      >
+
+      <TouchableOpacity onPress={recenterThing} style={styles.recenterButton}>
         <Icon name="locate-outline" type="ionicon" color="white" size={30} />
       </TouchableOpacity>
-      <TouchableOpacity
-        style={{
-          alignItems: "center",
-          justifyContent: "center",
-          width: 60,
-          height: 60,
-          position: "absolute",
-          bottom: "20%",
-          right: "4%",
-          borderRadius: 15,
-          backgroundColor: "black"
-        }}
-      >
-        <Icon name="add-outline" type="ionicon" color="white" size={30} />
-      </TouchableOpacity>
+
       <EventsList />
       <EventTabBar />
     </>
   )
 }
+
+const styles = StyleSheet.create({
+  whiteBackground: {
+    zIndex: 1,
+    flex: 1,
+    width: MARKER_SIZE,
+    height: MARKER_SIZE,
+    backgroundColor: "white",
+    borderRadius: MARKER_SIZE / 2,
+    alignItems: "center",
+    overflow: "hidden"
+  },
+  imageBackground: {
+    flex: 1,
+    marginTop: "4%",
+    position: "absolute",
+    width: MARKER_SIZE - 5,
+    height: MARKER_SIZE - 5,
+    borderRadius: MARKER_SIZE - 5 / 2,
+    alignSelf: "center",
+    overflow: "hidden"
+  },
+  badgeDisplay: {
+    zIndex: 2,
+    flex: 1,
+    marginLeft: 20,
+    paddingVertical: 3,
+    paddingHorizontal: 5,
+    backgroundColor: "red",
+    position: "absolute",
+    borderRadius: 7,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    overflow: "scroll"
+  },
+  badgeText: {
+    alignSelf: "stretch",
+    textAlign: "center",
+    paddingHorizontal: 3,
+    fontWeight: "bold",
+    fontSize: 10,
+    color: "white",
+    fontFamily: "OpenSansBold"
+  },
+  recenterButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    width: 60,
+    height: 60,
+    position: "absolute",
+    bottom: "20%",
+    right: "80%",
+    borderRadius: 15,
+    backgroundColor: "black"
+  }
+})
 
 export default ActivitiesScreen

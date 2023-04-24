@@ -12,8 +12,8 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
  * A type that can be rendered by a {@link EventsMap}.
  */
 export interface MapMarker {
-  key: string
-  location: LocationCoordinate2D
+  id: string
+  coordinates: LocationCoordinate2D
 }
 
 export type MapBounds = {
@@ -145,10 +145,10 @@ export const EventsMap = forwardRef(function ReffedMap<T extends MapMarker> (
       {markers.map((marker) => (
         <>
           <Marker
-            key={marker.key}
+            key={marker.id}
             coordinate={{
-              latitude: marker.location.latitude,
-              longitude: marker.location.longitude
+              latitude: marker.coordinates.latitude,
+              longitude: marker.coordinates.longitude
             }}
             onPress={() => onMarkerSelected?.(marker)}
           >
