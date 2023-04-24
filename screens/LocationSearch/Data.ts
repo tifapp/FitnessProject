@@ -1,6 +1,11 @@
 import { randomBool } from "@lib/Random"
 import { createDependencyKey } from "@lib/dependencies"
-import { mockLocation, LocationCoordinate2D, Location } from "@lib/location"
+import {
+  mockLocation,
+  LocationCoordinate2D,
+  Location,
+  asyncStorageSaveRecentLocation
+} from "@lib/location"
 
 /**
  * An annotation that appears above a location search result in the UI.
@@ -75,9 +80,10 @@ export type LoadLocationSearchResults = (
  * Some dependency keys used by the location search UI.
  */
 export namespace LocationSearchDependencyKeys {
-  // TODO: - Live Value
   export const savePickerSelection =
-    createDependencyKey<SaveLocationSearchPickerSelection>()
+    createDependencyKey<SaveLocationSearchPickerSelection>(
+      () => asyncStorageSaveRecentLocation
+    )
 
   // TODO: - Live Value
   export const searchForResults =
