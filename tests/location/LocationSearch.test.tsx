@@ -1,8 +1,10 @@
 import {
   Location,
   LocationCoordinate2D,
+  LocationSearchResult,
   TrackedLocationCoordinates,
   mockLocationCoordinate2D,
+  mockLocationSearchResult,
   mockTrackedLocationCoordinate
 } from "@lib/location"
 import {
@@ -16,9 +18,7 @@ import React from "react"
 import {
   LocationSearchBar,
   LocationSearchDependencyKeys,
-  mockLocationSearchResult,
   LocationSearchPicker,
-  LocationSearchResult,
   LocationSearchResultView,
   LocationSearchResultsListView
 } from "@screens/LocationSearch"

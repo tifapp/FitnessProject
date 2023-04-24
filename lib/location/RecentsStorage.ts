@@ -7,7 +7,6 @@ import {
 } from "./Location"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { ArrayUtils } from "@lib/Array"
-import { now } from "@lib/date"
 import { AsyncStorageUtils } from "@lib/AsyncStorage"
 
 /**
@@ -15,8 +14,7 @@ import { AsyncStorageUtils } from "@lib/AsyncStorage"
  */
 export const RecentLocationAnnotationSchema = z.enum([
   "attended-event",
-  "hosted-event",
-  "searched-location"
+  "hosted-event"
 ])
 
 /**
@@ -31,8 +29,6 @@ export const RecentLocationAnnotationSchema = z.enum([
  *    - Use this when the user joins an event
  * - `"hosted-event"`
  *    - Use this when the user creates an event
- * - `"searched-location"` (default option)
- *    - Use this when the user selects a location from the location search screen
  */
 export type RecentLocationAnnotation = z.infer<
   typeof RecentLocationAnnotationSchema
@@ -80,11 +76,20 @@ const recentLocationsWithKeys = async (keys: string[]) => {
 }
 
 /**
+ * A function type for saving a location that the user has recently
+ * interacted with.
+ */
+export type SaveRecentLocation = (
+  selection: Location,
+  annotation?: RecentLocationAnnotation
+) => Promise<void>
+
+/**
  * Saves a location to async storage with the given reason.
  */
 export const asyncStorageSaveRecentLocation = async (
   location: Location,
-  annotation: RecentLocationAnnotation = "searched-location"
+  annotation?: RecentLocationAnnotation
 ) => {
   const key = recentLocationAsyncStorageKey(location.coordinates)
   const keylist = await loadRecentLocationsKeylist().then((keylist) =>

@@ -3,13 +3,14 @@ import { Caption, CaptionTitle } from "@components/Text"
 import { useDependencyValue } from "@lib/dependencies"
 import {
   LocationCoordinate2D,
+  LocationSearchResult,
   hashLocationCoordinate,
   milesBetweenLocations
 } from "@lib/location"
 import { useAtomValue } from "jotai"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { useQuery } from "react-query"
-import { LocationSearchDependencyKeys, LocationSearchResult } from "./Data"
+import { LocationSearchDependencyKeys } from "./Data"
 import { searchTextAtoms } from "./state"
 import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view"
 import { SkeletonView } from "@components/common/Skeleton"
