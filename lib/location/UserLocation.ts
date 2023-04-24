@@ -5,7 +5,8 @@ import {
   LocationCallback,
   LocationSubscription,
   LocationAccuracy,
-  LocationObject
+  LocationObject,
+  getCurrentPositionAsync
 } from "expo-location"
 
 /**
@@ -28,6 +29,20 @@ export type UserLocationTrackingAccurracy =
 export type QueryUserCoordinates = (
   accurracy: UserLocationTrackingAccurracy
 ) => Promise<TrackedLocationCoordinates>
+
+/**
+ * Queries the current user's coordinates using expo.
+ */
+export const expoQueryUserCoordinates = async (
+  accurracy: UserLocationTrackingAccurracy,
+  getCurrentPosition: (
+    options: LocationOptions
+  ) => Promise<LocationObject> = getCurrentPositionAsync
+) => {
+  return expoLocationToTrackedLocation(
+    await getCurrentPosition({ accuracy: accurracyToExpoAccurracy(accurracy) })
+  )
+}
 
 /**
  * An update published to a (@link TrackUserLocation} callback.
@@ -89,5 +104,5 @@ const expoLocationToTrackedLocation = (location: LocationObject) => ({
     latitude: location.coords.latitude,
     longitude: location.coords.longitude
   },
-  trackingDate: new Date(location.timestamp / 1000)
+  trackingDate: new Date(location.timestamp)
 })
