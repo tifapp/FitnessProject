@@ -1,18 +1,39 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import { ZodSchema } from "zod"
 
 export namespace AsyncStorageUtils {
   /**
-   * A helper to save an object in `AsyncStorage` via `JSON.stringify`.
+   * Loads multiple items from AsyncStorage and attempts to parse them
+   * with the given zod schema assuming it is parseable with `JSON.parse`.
+   * @returns a tuple array with each entry containing its key and parsed value (or undefined)
    */
-  export const save = async <T>(key: string, value: T) => {
-    await AsyncStorage.setItem(key, JSON.stringify(value))
+  export const multiParseItems = async <ParsedType>(
+    schema: ZodSchema<ParsedType>,
+    keys: string[]
+  ) => {
+    return await AsyncStorage.multiGet(keys).then((results) =>
+      results.map(([key, json]) => {
+        try {
+          if (!json) return [key, undefined] as const
+          return [key, schema.parse(JSON.parse(json))] as const
+        } catch {
+          return [key, undefined] as const
+        }
+      })
+    )
   }
 
   /**
-   * A helper to load an object from `AsyncStorage` via `JSON.parse`.
+   * Loads an item from AsyncStorage against a zod schema assuming it is
+   * parseable with `JSON.parse`.
    */
-  export const load = async <T>(key: string) => {
-    const value = await AsyncStorage.getItem(key)
-    return value ? (JSON.parse(value) as T) : null
+  export const parseItem = async <ParsedType>(
+    schema: ZodSchema<ParsedType>,
+    key: string
+  ) => {
+    return await multiParseItems(schema, [key]).then((results) => {
+      const [, value] = results[0]
+      return value
+    })
   }
 }
