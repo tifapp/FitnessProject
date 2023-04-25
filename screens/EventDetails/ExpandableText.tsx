@@ -13,11 +13,11 @@ const ExpandableText = ({
   text,
   linesToDisplay
 }: ExpandableTextProps) => {
-  const startingHeight = 70
   const [expander, setExpander] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const [lineNumber, setLineNumber] = useState(linesToDisplay)
-  const [lineHeight, setLineHeight] = useState(20)
+  const [lineHeight, setLineHeight] = useState(22)
+  const startingHeight = lineHeight * linesToDisplay
   const [fullHeight, setFullHeight] = useState(startingHeight)
   const animatedHeight = useRef(new Animated.Value(startingHeight)).current
 
@@ -38,11 +38,11 @@ const ExpandableText = ({
       animatedHeight.setValue(lineHeight * lineNumber)
       setExpander(false)
     }
-  }, [animatedHeight, text])
+  }, [animatedHeight, text, lineNumber])
 
   const onLayout = (e: { nativeEvent: { layout: { height: any } } }) => {
     let { height } = e.nativeEvent.layout
-    height = Math.floor(height) + 40
+    height = Math.floor(height) + lineHeight * (lineNumber - linesToDisplay)
 
     if (height > startingHeight) {
       setFullHeight(height)
@@ -50,13 +50,10 @@ const ExpandableText = ({
     }
   }
 
-  const onTextLayout = useCallback(
-    (e: { nativeEvent: { lines: string | any[] } }) => {
-      setLineNumber(e.nativeEvent.lines.length)
-      setLineHeight(e.nativeEvent.lines[0].height)
-    },
-    [text]
-  )
+  const onTextLayout = (e: { nativeEvent: { lines: string | any[] } }) => {
+    setLineNumber(e.nativeEvent.lines.length)
+    setLineHeight(e.nativeEvent.lines[0].height)
+  }
 
   return (
     <View>

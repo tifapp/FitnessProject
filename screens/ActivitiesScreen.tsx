@@ -1,7 +1,7 @@
 import EventsList from "@components/EventsList"
 import EventsMap, { MapRefMethods } from "@components/EventsMap"
 import { state } from "@components/MapTestData"
-import EventDetails from "@components/eventDetails/EventDetails"
+import EventDetails from "@screens/EventDetails/EventDetails"
 import { EventMocks } from "@lib/events"
 import EventTabBar from "@components/tabBarComponents/EventTabBar"
 import React, { useRef } from "react"
