@@ -73,7 +73,7 @@ export class FixedDateRange {
     return `${startDateFormat} - ${endDateFormat}`
   }
 
-  formattedDate () {
+  formattedDateRange () {
     const start = dayjs(this.startDate)
     const end = dayjs(this.endDate)
     const startDateFormat = formatDate(now(), start)
@@ -82,9 +82,13 @@ export class FixedDateRange {
     return `${startDateFormat} - ${endDateFormat}`
   }
 
+  formattedDate (basis: Dayjs, date: Dayjs) {
+    return formatDate(basis, date)
+  }
+
   formattedTime () {
     const end = dayjs(this.endDate)
-    const startDateFormat = this.formattedStartDate()
+    const startDateFormat = this.formattedDate(now(), dayjs(this.startDate))
     const endDateFormat = formatTime(end)
 
     return `${startDateFormat} - ${endDateFormat}`
@@ -93,11 +97,6 @@ export class FixedDateRange {
   formattedStartTime () {
     const start = dayjs(this.startDate)
     return start.format("h:mm A")
-  }
-
-  formattedStartDate () {
-    const start = dayjs(this.startDate)
-    return formatDate(now(), start)
   }
 
   endSameDay () {

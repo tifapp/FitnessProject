@@ -1,10 +1,6 @@
-import { BodyText, Headline } from "@components/Text";
-import React, { useCallback, useEffect, useState } from "react";
-import {
-  Animated,
-  TextProps,
-  View,
-} from "react-native";
+import { BodyText, Headline } from "@components/Text"
+import React, { useCallback, useEffect, useRef, useState } from "react"
+import { Animated, Easing, TextProps, View } from "react-native"
 
 export type ExpandableTextProps = {
   props: TextProps
@@ -12,71 +8,75 @@ export type ExpandableTextProps = {
   linesToDisplay: number
 }
 
-const ExpandableText = ({props, text, linesToDisplay}: ExpandableTextProps) => {
-  const [lineHeight] = useState(new Animated.Value(linesToDisplay));
-  const [readMore, setReadMore] = useState(false)
+const ExpandableText = ({
+  props,
+  text,
+  linesToDisplay
+}: ExpandableTextProps) => {
+  const startingHeight = 70
+  const [expander, setExpander] = useState(false)
   const [expanded, setExpanded] = useState(false)
-/*
+  const [lineNumber, setLineNumber] = useState(linesToDisplay)
+  const [lineHeight, setLineHeight] = useState(20)
+  const [fullHeight, setFullHeight] = useState(startingHeight)
+  const animatedHeight = useRef(new Animated.Value(startingHeight)).current
+
+  const toggleExpansion = () => {
+    setExpanded(!expanded)
+  }
+
   useEffect(() => {
-    Animated.timing(height, {
-      toValue: !expanded ? 200 : 0,
-      duration: 150,
+    Animated.spring(animatedHeight, {
+      friction: 100,
+      toValue: expanded ? fullHeight : startingHeight,
       useNativeDriver: false
-    }).start();
-  }, [expanded, height]);*/
+    }).start()
+  }, [expanded])
 
-  const expandText = () => {
-    Animated.timing(lineHeight, {
-      toValue: 0,
-      duration: 3000,
-      useNativeDriver: true,
-    }).start
-  }
-
-  const reduceText = () => {
-    Animated.timing(lineHeight, {
-      toValue: linesToDisplay,
-      duration: 3000,
-      useNativeDriver: true,
-    }).start
-  }
-
-  const onTextLayout = useCallback((e: { nativeEvent: { lines: string | any[]; }; }) =>{
-    setReadMore(e.nativeEvent.lines.length > linesToDisplay); //to check the text is more than 4 lines or not
-    // console.log(e.nativeEvent);
-},[]);
-
-  const toggleNumberOfLines = () => { //To toggle the show text or hide it
-    if (expanded) {
-      reduceText()
-    } else {
-      expandText()
+  useEffect(() => {
+    if (lineNumber < linesToDisplay) {
+      animatedHeight.setValue(lineHeight * lineNumber)
+      setExpander(false)
     }
-    setExpanded(!expanded);
+  }, [animatedHeight, text])
+
+  const onLayout = (e: { nativeEvent: { layout: { height: any } } }) => {
+    let { height } = e.nativeEvent.layout
+    height = Math.floor(height) + 40
+
+    if (height > startingHeight) {
+      setFullHeight(height)
+      setExpander(true)
+    }
   }
 
-  
-
-  // console.log('rerendered');
+  const onTextLayout = useCallback(
+    (e: { nativeEvent: { lines: string | any[] } }) => {
+      setLineNumber(e.nativeEvent.lines.length)
+      setLineHeight(e.nativeEvent.lines[0].height)
+    },
+    [text]
+  )
 
   return (
-    <Animated.View
-      //style={{ height, backgroundColor: "orange" }}
-    >
-      <BodyText 
-        numberOfLines={expanded ? 0 : linesToDisplay}
-        onTextLayout={onTextLayout}>
-          {text}
-      </BodyText>
-      {
-        readMore ? <Headline
-            {...props}
-            style={props?.style}
-            onPress={toggleNumberOfLines}>
-            {expanded ? 'Read Less' : 'Read More'}
-          </Headline> : null
-      }
-    </Animated.View>
+    <View>
+      <Animated.View style={{ height: animatedHeight }}>
+        <View onLayout={onLayout}>
+          <BodyText
+            numberOfLines={expanded ? 0 : linesToDisplay}
+            ellipsizeMode="tail"
+            onTextLayout={onTextLayout}
+          >
+            {text}
+          </BodyText>
+        </View>
+      </Animated.View>
+      {expander && (
+        <Headline {...props} style={props?.style} onPress={toggleExpansion}>
+          {expanded ? "Read Less" : "Read More"}
+        </Headline>
+      )}
+    </View>
   )
 }
 

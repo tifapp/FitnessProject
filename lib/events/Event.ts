@@ -146,6 +146,7 @@ export namespace EventMocks {
     id: uuid(),
     title: "Multiday Event",
     description: "This event runs for more than one day.",
+    attendeeCount: 2,
     dateRange: dateRange(
       new Date("2023-03-18T12:00:00"),
       new Date("2023-03-21T12:00:00")
@@ -170,6 +171,7 @@ export namespace EventMocks {
     host: EventAttendeeMocks.Blob,
     id: uuid(),
     title: "No Placemark Info",
+    attendeeCount: 5,
     description:
       "The placemark info should then be geocoded from the coordinates if it is not available." +
       "(ie. Our AWS backend still needs to geocode it) The result in this case should be somewhere in New York.",

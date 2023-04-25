@@ -33,13 +33,19 @@ export type MapProps<T extends EventMarker> = {
    * Renders a replacement for a singular map marker that was passed in through `markers`.
    */
   renderMarker?: (marker: T) => React.ReactNode
+
+  /**
+   * Sets the minimum/default zoom level for the map
+   */
+  minZoomLevel?: number
 }
 
 export const EventMapSnippet = function Map<T extends EventMarker> ({
   initialRegion,
   marker,
   renderMarker,
-  style
+  style,
+  minZoomLevel
 }: MapProps<T>) {
   return (
     <MapView
@@ -51,6 +57,7 @@ export const EventMapSnippet = function Map<T extends EventMarker> ({
       loadingEnabled={true}
       toolbarEnabled={false}
       zoomEnabled={false}
+      minZoomLevel={minZoomLevel}
       customMapStyle={[
         {
           featureType: "poi",
@@ -62,19 +69,15 @@ export const EventMapSnippet = function Map<T extends EventMarker> ({
         }
       ]}
     >
-      {
-        <>
-          <Marker
-            key={marker.key}
-            coordinate={{
-              latitude: marker.location.latitude,
-              longitude: marker.location.longitude
-            }}
-          >
-            {renderMarker?.(marker)}
-          </Marker>
-        </>
-      }
+      <Marker
+        key={marker.key}
+        coordinate={{
+          latitude: marker.location.latitude,
+          longitude: marker.location.longitude
+        }}
+      >
+        {renderMarker?.(marker)}
+      </Marker>
     </MapView>
   )
 }
