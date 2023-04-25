@@ -1,8 +1,14 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { StyleSheet, View } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
+import { getApps, GetAppResult, showLocation } from "react-native-map-link"
 import { Headline, Caption } from "@components/Text"
-import { LocationCoordinate2D, Placemark } from "@lib/location"
+import {
+  LocationCoordinate2D,
+  Placemark,
+  placemarkToAbbreviatedAddress,
+  placemarkToFormattedAddress
+} from "@lib/location"
 
 interface LocationSectionProps {
   color: string
@@ -15,6 +21,37 @@ const LocationSection = ({
   placemark,
   coordinates
 }: LocationSectionProps) => {
+  // const [availableApps, setAvailableApps] = useState<GetAppResult[]>([])
+  /*
+  const getAvailableApps = async () => {
+    const result = await getApps({
+      latitude: coordinates.latitude,
+      longitude: coordinates.longitude
+    })
+    console.log(result)
+    setAvailableApps(result)
+  } */
+
+  const openMap = () => {
+    /* const provider = availableApps.filter((app) => {
+      return app.name === "Google Maps" || "Apple Maps"
+    }) */
+    const name =
+      placemark && placemark.street
+        ? placemarkToFormattedAddress(placemark)
+        : ""
+
+    showLocation({
+      latitude: coordinates.latitude,
+      longitude: coordinates.longitude,
+      title: name
+    })
+  }
+  /*
+  useEffect(() => {
+    getAvailableApps()
+  }, []) */
+
   return (
     <View style={[styles.flexRow, styles.paddingIconSection]}>
       <View style={{ justifyContent: "center" }}>
@@ -40,12 +77,10 @@ const LocationSection = ({
               </View>
             </View>
             <View style={styles.flexRow}>
-              <Caption
-                style={[{ color, marginRight: 16 }, styles.captionLinks]}
-              >
+              <Caption style={[{ color, marginRight: 16 }, styles.captionLinks]}>
               Copy Address
               </Caption>
-              <Caption style={[{ color }, styles.captionLinks]}>
+              <Caption style={[{ color }, styles.captionLinks]} onPress={openMap}>
               Directions
               </Caption>
             </View>
@@ -60,12 +95,10 @@ const LocationSection = ({
               </View>
             </View>
             <View style={styles.flexRow}>
-              <Caption
-                style={[{ color, marginRight: 16 }, styles.captionLinks]}
-              >
+              <Caption style={[{ color, marginRight: 16 }, styles.captionLinks]}>
               Copy Coordinates
               </Caption>
-              <Caption style={[{ color }, styles.captionLinks]}>
+              <Caption style={[{ color }, styles.captionLinks]} onPress={openMap}>
               Directions
               </Caption>
             </View>

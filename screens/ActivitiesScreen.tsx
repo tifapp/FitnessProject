@@ -1,12 +1,12 @@
 import EventsList from "@components/EventsList"
 import EventsMap, { MapRefMethods } from "@components/EventsMap"
 import { state } from "@components/MapTestData"
-import EventDetails from "@screens/EventDetails/EventDetails"
 import { EventMocks } from "@lib/events"
 import EventTabBar from "@components/tabBarComponents/EventTabBar"
 import React, { useRef } from "react"
 import { ImageBackground, Text, TouchableOpacity, View } from "react-native"
 import { Icon } from "react-native-elements"
+import EventDetails from "./EventDetails/EventDetails"
 
 const MARKER_SIZE = 80
 
@@ -17,7 +17,7 @@ const ActivitiesScreen = () => {
   }
   return (
     <>
-      <EventDetails event={EventMocks.PickupBasketball} />
+      <EventDetails event={EventMocks.NoPlacemarkInfo} />
     </>
   )
 }

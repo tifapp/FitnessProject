@@ -19,7 +19,28 @@
       "bundleIdentifier": "com.tifapp.FitnessApp",
       "infoPlist": {
         "NSLocationAlwaysAndWhenInUseUsageDescription": "REASON_FOR_REQUEST",
-        "UIBackgroundModes": ["location", "fetch"]
+        "UIBackgroundModes": ["location", "fetch"],
+        "LSApplicationQueriesSchemes": [
+          "comgooglemaps",
+          "citymapper",
+          "uber",
+          "lyft",
+          "transit",
+          "truckmap",
+          "waze",
+          "yandexnavi",
+          "moovit",
+          "yandextaxi",
+          "yandexmaps",
+          "kakaomap",
+          "szn-mapy",
+          "mapsme",
+          "osmandmaps",
+          "gett",
+          "nmap",
+          "dgis",
+          "lftgpas"
+        ]
       }
     },
     "web": {
