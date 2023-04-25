@@ -1,10 +1,11 @@
 import EventsList from "@components/EventsList"
 import EventsMap, { MapRefMethods } from "@components/EventsMap"
-import { state } from "@components/MapTestData"
 import { Ionicon } from "@components/common/Icons"
 import EventTabBar from "@components/tabBarComponents/EventTabBar"
+import { requestLocationPermissions } from "@hooks/UserLocation"
 import { CurrentUserEvent, EventMocks } from "@lib/events"
-import React, { useRef } from "react"
+import { LocationObject, getCurrentPositionAsync } from "expo-location"
+import React, { useEffect, useRef, useState } from "react"
 import {
   ImageBackground,
   StyleSheet,
@@ -18,44 +19,75 @@ const MARKER_SIZE = 60
 
 const ActivitiesScreen = () => {
   const appRef = useRef<MapRefMethods | null>(null)
+  const [location, setLocation] = useState<LocationObject | null>(null)
+
   const recenterThing = () => {
-    appRef.current?.recenterToLocation(state.initialRegion)
+    appRef.current?.recenterToLocation({
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude
+    })
   }
   const events: CurrentUserEvent[] = [
     EventMocks.Multiday,
     EventMocks.NoPlacemarkInfo,
     EventMocks.PickupBasketball
   ]
+
+  useEffect(() => {
+    ;(async () => {
+      const status = await requestLocationPermissions()
+      if (status == false) {
+        return
+      }
+
+      const locationToGive = await getCurrentPositionAsync({})
+      setLocation(locationToGive)
+    })()
+  }, [])
+
   return (
     <>
-      <EventsMap
-        ref={appRef}
-        style={{ width: "100%", height: "100%" }}
-        initialRegion={state.initialRegion}
-        renderMarker={(item) => (
-          <>
-            <View
-              style={[
-                styles.badgeDisplay,
-                { backgroundColor: events.find((x) => x.id === item.id).color }
-              ]}
-            >
-              <Ionicon name="people" color="white" size={10} />
-              <Text style={styles.badgeText}>
-                {events.find((x) => x.id === item.id).attendeeCount}
-              </Text>
-            </View>
+      {location
+        ? (
+          <EventsMap
+            ref={appRef}
+            style={{ width: "100%", height: "100%" }}
+            initialRegion={{
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+              latitudeDelta: 0.5,
+              longitudeDelta: 0.5
+            }}
+            renderMarker={(item) => (
+              <>
+                <View
+                  style={[
+                    styles.badgeDisplay,
+                    {
+                      backgroundColor: events.find((x) => x.id === item.id).color
+                    }
+                  ]}
+                >
+                  <Ionicon name="people" color="white" size={10} />
+                  <Text style={styles.badgeText}>
+                    {events.find((x) => x.id === item.id).attendeeCount}
+                  </Text>
+                </View>
 
-            <View style={styles.whiteBackground}>
-              <ImageBackground
-                source={require("../assets/icon.png")}
-                style={styles.imageBackground}
-              />
-            </View>
-          </>
+                <View style={styles.whiteBackground}>
+                  <ImageBackground
+                    source={require("../assets/Windows_10_Default_Profile_Picture.svg.png")}
+                    style={styles.imageBackground}
+                  />
+                </View>
+              </>
+            )}
+            markers={events}
+          />
+        )
+        : (
+          <Text>{"Gathering location..."}</Text>
         )}
-        markers={events}
-      />
 
       <TouchableOpacity onPress={recenterThing} style={styles.recenterButton}>
         <Icon name="locate-outline" type="ionicon" color="white" size={30} />

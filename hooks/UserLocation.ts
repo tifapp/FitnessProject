@@ -1,11 +1,12 @@
-import {
-  UserLocationTrackingUpdate,
-  UserLocationTrackingAccurracy,
-  expoTrackUserLocation,
-  TrackUserLocation,
-  QueryUserCoordinates
-} from "@lib/location/UserLocation"
 import { createDependencyKey, useDependencyValue } from "@lib/dependencies"
+import {
+  QueryUserCoordinates,
+  TrackUserLocation,
+  UserLocationTrackingAccurracy,
+  UserLocationTrackingUpdate,
+  expoTrackUserLocation
+} from "@lib/location/UserLocation"
+import { requestForegroundPermissionsAsync } from "expo-location"
 import { useEffect, useState } from "react"
 import { useQuery } from "react-query"
 
@@ -53,6 +54,20 @@ export const useTrackUserLocation = (
   )
 
   return location
+}
+
+/**
+ * Request the permissions of the user.
+ *
+ * @returns A boolean indicating  whether or not it worked.
+ *
+ */
+
+export const requestLocationPermissions = async () => {
+  const { status } = await requestForegroundPermissionsAsync()
+  if (status == "granted") {
+    return true
+  } else return false
 }
 
 /**

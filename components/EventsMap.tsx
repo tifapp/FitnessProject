@@ -130,6 +130,7 @@ export const EventsMap = forwardRef(function ReffedMap<T extends MapMarker> (
       followsUserLocation={true}
       moveOnMarkerPress={false}
       showsUserLocation={true}
+      showsMyLocationButton={false}
       zoomEnabled={canZoom}
       customMapStyle={[
         {
