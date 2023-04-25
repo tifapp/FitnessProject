@@ -7,7 +7,7 @@ export namespace AsyncStorageUtils {
    * with the given zod schema assuming it is parseable with `JSON.parse`.
    * @returns a tuple array with each entry containing its key and parsed value (or undefined)
    */
-  export const multiParseItems = async <ParsedType>(
+  export const parseJSONItems = async <ParsedType>(
     schema: ZodSchema<ParsedType>,
     keys: string[]
   ) => {
@@ -27,11 +27,11 @@ export namespace AsyncStorageUtils {
    * Loads an item from AsyncStorage against a zod schema assuming it is
    * parseable with `JSON.parse`.
    */
-  export const parseItem = async <ParsedType>(
+  export const parseJSONItem = async <ParsedType>(
     schema: ZodSchema<ParsedType>,
     key: string
   ) => {
-    return await multiParseItems(schema, [key]).then((results) => {
+    return await parseJSONItems(schema, [key]).then((results) => {
       const [, value] = results[0]
       return value
     })

@@ -67,7 +67,7 @@ export const asyncStorageLoadSpecificRecentLocations = async (
 }
 
 const recentLocationsWithKeys = async (keys: string[]) => {
-  return await AsyncStorageUtils.multiParseItems(
+  return await AsyncStorageUtils.parseJSONItems(
     RecentLocationSchema,
     keys
   ).then((results) => {
@@ -117,7 +117,7 @@ const RECENT_LOCATIONS_KEYLIST_KEY = "@recent_locations_keys"
 const RecentLocationsKeylistSchema = z.array(z.string())
 
 const loadRecentLocationsKeylist = async () => {
-  return await AsyncStorageUtils.parseItem(
+  return await AsyncStorageUtils.parseJSONItem(
     RecentLocationsKeylistSchema,
     RECENT_LOCATIONS_KEYLIST_KEY
   ).then((result) => result ?? [])

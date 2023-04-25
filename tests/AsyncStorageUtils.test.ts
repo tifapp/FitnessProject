@@ -5,27 +5,21 @@ import { z } from "zod"
 describe("AsyncStorageUtils tests", () => {
   beforeEach(async () => await AsyncStorage.clear())
 
-  describe("MultiParseItems tests", () => {
-    it("should resort to the default value when item is invalid json", async () => {
+  describe("ParseJSONItems tests", () => {
+    it("should resort to undefined when item is invalid json", async () => {
       await AsyncStorage.setItem("test", "uiefuiefgui")
-      const items = await AsyncStorageUtils.multiParseItems(z.string(), [
-        "test"
-      ])
+      const items = await AsyncStorageUtils.parseJSONItems(z.string(), ["test"])
       expect(items).toEqual([["test", undefined]])
     })
 
-    it("should resort to the default value when item does not parse with schema", async () => {
+    it("should resort to undefined when item does not parse with schema", async () => {
       await AsyncStorage.setItem("test", "uiefuiefgui")
-      const items = await AsyncStorageUtils.multiParseItems(z.number(), [
-        "test"
-      ])
+      const items = await AsyncStorageUtils.parseJSONItems(z.number(), ["test"])
       expect(items).toEqual([["test", undefined]])
     })
 
-    it("should resort to the default value when item does not exist", async () => {
-      const items = await AsyncStorageUtils.multiParseItems(z.number(), [
-        "test"
-      ])
+    it("should resort to undefined when item does not exist", async () => {
+      const items = await AsyncStorageUtils.parseJSONItems(z.number(), ["test"])
       expect(items).toEqual([["test", undefined]])
     })
 
@@ -34,7 +28,7 @@ describe("AsyncStorageUtils tests", () => {
         ["a", "1"],
         ["b", "2"]
       ])
-      const items = await AsyncStorageUtils.multiParseItems(z.number(), [
+      const items = await AsyncStorageUtils.parseJSONItems(z.number(), [
         "a",
         "b"
       ])
