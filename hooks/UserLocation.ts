@@ -3,8 +3,9 @@ import {
   UserLocationTrackingAccurracy,
   expoTrackUserLocation,
   TrackUserLocation,
-  QueryUserCoordinates
-} from "@lib/location/UserLocation"
+  QueryUserCoordinates,
+  expoQueryUserCoordinates
+} from "@lib/location"
 import { createDependencyKey, useDependencyValue } from "@lib/dependencies"
 import { useEffect, useState } from "react"
 import { useQuery } from "react-query"
@@ -23,8 +24,9 @@ export namespace UserLocationDependencyKeys {
   /**
    * A dependency key to load the user's current coordinates a single time.
    */
-  // TODO: - Live Value
-  export const currentCoordinates = createDependencyKey<QueryUserCoordinates>()
+  export const currentCoordinates = createDependencyKey<QueryUserCoordinates>(
+    () => expoQueryUserCoordinates
+  )
 }
 
 /**
