@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react"
-import { StyleSheet, View } from "react-native"
+import { StyleSheet, Text, View } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { getApps, GetAppResult, showLocation } from "react-native-map-link"
+import * as Clipboard from "expo-clipboard"
+import Toast from "react-native-root-toast"
 import { Headline, Caption } from "@components/Text"
 import {
   LocationCoordinate2D,
@@ -47,6 +49,25 @@ const LocationSection = ({
       title: name
     })
   }
+
+  const copyToClipboard = async () => {
+    if (placemark) {
+      await Clipboard.setStringAsync(placemarkToFormattedAddress(placemark)!)
+    } else {
+      await Clipboard.setStringAsync(
+        `${coordinates.latitude}, ${coordinates.longitude}`
+      )
+    }
+
+    Toast.show("Copied to Clipboard", {
+      duration: Toast.durations.SHORT,
+      position: Toast.positions.BOTTOM,
+      shadow: true,
+      animation: true,
+      hideOnPress: true,
+      delay: 0
+    })
+  }
   /*
   useEffect(() => {
     getAvailableApps()
@@ -77,7 +98,10 @@ const LocationSection = ({
               </View>
             </View>
             <View style={styles.flexRow}>
-              <Caption style={[{ color, marginRight: 16 }, styles.captionLinks]}>
+              <Caption
+                style={[{ color, marginRight: 16 }, styles.captionLinks]}
+                onPress={copyToClipboard}
+              >
               Copy Address
               </Caption>
               <Caption style={[{ color }, styles.captionLinks]} onPress={openMap}>
@@ -95,7 +119,10 @@ const LocationSection = ({
               </View>
             </View>
             <View style={styles.flexRow}>
-              <Caption style={[{ color, marginRight: 16 }, styles.captionLinks]}>
+              <Caption
+                style={[{ color, marginRight: 16 }, styles.captionLinks]}
+                onPress={copyToClipboard}
+              >
               Copy Coordinates
               </Caption>
               <Caption style={[{ color }, styles.captionLinks]} onPress={openMap}>

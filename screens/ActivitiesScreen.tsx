@@ -17,7 +17,7 @@ const ActivitiesScreen = () => {
   }
   return (
     <>
-      <EventDetails event={EventMocks.NoPlacemarkInfo} />
+      <EventDetails event={EventMocks.PickupBasketball} />
     </>
   )
 }

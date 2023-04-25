@@ -3,6 +3,7 @@ import API, { GraphQLQuery } from "@aws-amplify/api"
 import { Amplify, Auth, Cache, graphqlOperation, Storage } from "aws-amplify"
 import { withAuthenticator } from "aws-amplify-react-native"
 import { MenuProvider } from "react-native-popup-menu"
+import { RootSiblingParent } from "react-native-root-siblings"
 import awsconfig from "./src/aws-exports"
 
 // graphql
@@ -371,7 +372,9 @@ const App = () => {
 const LiveApp = () => (
   <AppQueryClientProvider>
     <MenuProvider customStyles={menuProviderStyles}>
-      <App />
+      <RootSiblingParent>
+        <App />
+      </RootSiblingParent>
     </MenuProvider>
   </AppQueryClientProvider>
 )
