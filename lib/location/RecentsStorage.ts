@@ -39,7 +39,7 @@ export type RecentLocationAnnotation = z.infer<
  */
 export const RecentLocationSchema = z.object({
   location: LocationSchema,
-  annotation: RecentLocationAnnotationSchema
+  annotation: RecentLocationAnnotationSchema.optional()
 })
 
 /**

@@ -6,16 +6,19 @@ import {
 } from "@lib/location"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
+const TEST_COORDINATES = { latitude: 41.1234, longitude: -121.1234 }
+const TEST_COORDINATES_STORAGE_KEY = "@location_9r3cgy29h"
+
 describe("RecentLocationStorage tests", () => {
   beforeEach(async () => await AsyncStorage.clear())
 
   describe("AsyncStorageSaveRecentLocation tests", () => {
     it("should save the location in async storage", async () => {
-      const location = mockLocation({ latitude: 41.1234, longitude: -121.1234 })
+      const location = mockLocation(TEST_COORDINATES)
 
       await asyncStorageSaveRecentLocation(location, "attended-event")
       const savedLocation = JSON.parse(
-        (await AsyncStorage.getItem("@location_9r3cgy29h"))!
+        (await AsyncStorage.getItem(TEST_COORDINATES_STORAGE_KEY))!
       )
       expect(savedLocation).toMatchObject({
         location,
@@ -50,17 +53,15 @@ describe("RecentLocationStorage tests", () => {
     })
 
     it("filters invalidly persisted locations", async () => {
-      await AsyncStorage.setItem("@location_9r3cgy29h", "sdkjcudsb")
+      await AsyncStorage.setItem(TEST_COORDINATES_STORAGE_KEY, "sdkjcudsb")
       expect(
-        await asyncStorageLoadSpecificRecentLocations([
-          { latitude: 41.1234, longitude: -121.1234 }
-        ])
+        await asyncStorageLoadSpecificRecentLocations([TEST_COORDINATES])
       ).toHaveLength(0)
     })
   })
 
   describe("AsyncStorageLoadRecentLocations tests", () => {
-    it("should load recent locations ordered by most recent", async () => {
+    it("should load recent locations ordered by most recently saved", async () => {
       const location1 = mockLocation()
       const location2 = mockLocation()
       const location3 = mockLocation()
@@ -68,16 +69,17 @@ describe("RecentLocationStorage tests", () => {
       await asyncStorageSaveRecentLocation(location1)
       await asyncStorageSaveRecentLocation(location2, "hosted-event")
       await asyncStorageSaveRecentLocation(location3, "attended-event")
+      await asyncStorageSaveRecentLocation(location1)
 
       const results = await asyncStorageLoadRecentLocations(2)
       expect(results).toEqual([
         {
-          location: location3,
-          annotation: "attended-event"
+          location: location1,
+          annotation: undefined
         },
         {
-          location: location2,
-          annotation: "hosted-event"
+          location: location3,
+          annotation: "attended-event"
         }
       ])
     })
@@ -88,10 +90,8 @@ describe("RecentLocationStorage tests", () => {
 
     it("filters invalidly persisted locations", async () => {
       // NB: Ensure this location appears in the keylist.
-      await asyncStorageSaveRecentLocation(
-        mockLocation({ latitude: 41.1234, longitude: -121.1234 })
-      )
-      await AsyncStorage.setItem("@location_9r3cgy29h", "sdkjcudsb")
+      await asyncStorageSaveRecentLocation(mockLocation(TEST_COORDINATES))
+      await AsyncStorage.setItem(TEST_COORDINATES_STORAGE_KEY, "sdkjcudsb")
       expect(await asyncStorageLoadRecentLocations(10)).toHaveLength(0)
     })
   })
