@@ -41,6 +41,9 @@ const EventsList = () => {
           index={0}
           enablePanDownToClose={false}
           bottomInset={BOTTOM_OFFSET}
+          onChange={(e) => {
+            console.log(e)
+          }}
         >
           <BottomSheetFlatList
             data={events}

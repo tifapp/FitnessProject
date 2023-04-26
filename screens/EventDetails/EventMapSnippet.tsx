@@ -58,6 +58,7 @@ export const EventMapSnippet = function Map<T extends EventMarker> ({
       toolbarEnabled={false}
       zoomEnabled={false}
       minZoomLevel={minZoomLevel}
+      pointerEvents="none"
       customMapStyle={[
         {
           featureType: "poi",

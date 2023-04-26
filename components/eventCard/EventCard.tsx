@@ -14,7 +14,7 @@ export const EventCard = ({ event }: EventCardProps) => {
   const lightEventColor = event.color + hexAlpha
 
   return (
-    <View style={[styles.container, {backgroundColor: "#0000000D"}]}>
+    <View style={[styles.container, { backgroundColor: "#0000000D" }]}>
       <View style={[styles.topRow, styles.flexRow]}>
         <Image
           style={[styles.image, styles.iconMargin]}
@@ -54,7 +54,7 @@ export const EventCard = ({ event }: EventCardProps) => {
             />
           </View>
           <Text style={styles.infoText} accessibilityLabel="day">
-            {event.dateRange.formattedStartDate()}
+            {"event.dateRange.formattedStartDate()"}
           </Text>
           <View style={styles.dotIcon}>
             <Ionicons name="md-ellipse" size={5} color="grey" />

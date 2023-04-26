@@ -1,7 +1,14 @@
 import { CurrentUserEvent } from "@lib/events"
 import React from "react"
 import { Ionicons } from "@expo/vector-icons"
-import { Image, ScrollView, StyleSheet, View } from "react-native"
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native"
 import { Caption, Headline, Title } from "@components/Text"
 import ExpandableText from "@screens/EventDetails/ExpandableText"
 import { Divider } from "react-native-elements"
@@ -23,7 +30,8 @@ const EventDetails = ({ event }: EventDetailsProps) => {
   return (
     <ScrollView
       style={[styles.container, styles.spacing]}
-      contentContainerStyle={{ flex: 1 }}
+      contentContainerStyle={{ flexGrow: 1 }}
+      nestedScrollEnabled={true}
     >
       <Title>{event.title}</Title>
       <View style={[styles.flexRow, { marginVertical: 16 }]}>
@@ -85,33 +93,34 @@ const EventDetails = ({ event }: EventDetailsProps) => {
           />
         </View>
       )}
+      <Headline style={{ marginTop: 16, marginBottom: 8 }}>Location</Headline>
+      <EventMapSnippet
+        style={{ width: "100%", height: 160, marginBottom: 16 }}
+        minZoomLevel={12}
+        initialRegion={{
+          latitude: event.coordinates.latitude,
+          longitude: event.coordinates.longitude,
+          latitudeDelta: 0.1,
+          longitudeDelta: 0.1
+        }}
+        renderMarker={() => (
+          <Image
+            source={require("../../assets/icon.png")}
+            style={{
+              width: MARKER_SIZE,
+              height: MARKER_SIZE,
+              borderWidth: 1,
+              borderColor: "white",
+              borderRadius: 20
+            }}
+          />
+        )}
+        marker={{ key: event.id, location: event.coordinates }}
+      />
 
-      <View style={{ marginTop: 16 }}>
-        <Headline style={{ marginBottom: 8 }}>Location</Headline>
-        <EventMapSnippet
-          style={{ width: "100%", height: "50%" }}
-          minZoomLevel={12}
-          initialRegion={{
-            latitude: event.coordinates.latitude,
-            longitude: event.coordinates.longitude,
-            latitudeDelta: 0.1,
-            longitudeDelta: 0.1
-          }}
-          renderMarker={() => (
-            <Image
-              source={require("../../assets/icon.png")}
-              style={{
-                width: MARKER_SIZE,
-                height: MARKER_SIZE,
-                borderWidth: 1,
-                borderColor: "white",
-                borderRadius: 20
-              }}
-            />
-          )}
-          marker={{ key: event.id, location: event.coordinates }}
-        />
-      </View>
+      <Text>{event.description}</Text>
+      <Text>{event.description}</Text>
+      <Text>{event.description}</Text>
     </ScrollView>
   )
 }
@@ -120,7 +129,7 @@ export default EventDetails
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 24,
+    marginTop: 24,
     backgroundColor: "white"
   },
   flexRow: {
@@ -145,5 +154,10 @@ const styles = StyleSheet.create({
     width: "80%",
     height: 1,
     alignSelf: "flex-end"
+  },
+  bottomTab: {
+    // position: "absolute",
+    backgroundColor: "yellow",
+    bottom: 0
   }
 })
