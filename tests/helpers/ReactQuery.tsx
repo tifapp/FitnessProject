@@ -1,4 +1,4 @@
-import React, { ReactNode, useMemo } from "react"
+import React, { ReactNode, useEffect, useMemo } from "react"
 import { QueryClient, QueryClientProvider } from "react-query"
 
 /**
@@ -34,10 +34,20 @@ export const createTestQueryClient = () => {
         // NB: Turn retries off so that we don't get unexepcted calls to queries in tests.
         // See: https://react-query-v3.tanstack.com/guides/testing#turn-off-retries
         retry: false,
-        retryDelay: 0
+        retryDelay: 0,
+        // NB: This prevents CI from hanging endlessly.
+        cacheTime: 0
       }
     }
   })
+}
+
+/**
+ * Use this inside of an `afterAll` to make sure CI doesn't break.
+ */
+export const cleanupTestQueryClient = (client: QueryClient) => {
+  client.resetQueries()
+  client.clear()
 }
 
 /**
@@ -45,14 +55,6 @@ export const createTestQueryClient = () => {
  */
 export type TestQueryClientProviderProps = {
   children: ReactNode
-
-  /**
-   * Use this if you need to pass in a custom query client.
-   * (Eg. if you need to test some retry behavior)
-   *
-   * Any custom query client will automatically be reset when
-   * `TestQueryClientProvider` mounts.
-   */
   client?: QueryClient
 }
 
@@ -63,16 +65,15 @@ export const TestQueryClientProvider = ({
   children,
   client
 }: TestQueryClientProviderProps) => {
-  // NB: Ensure each test has a fresh query client so that tests don't depend
-  // on each other.
-  // See: https://react-query-v3.tanstack.com/guides/testing#our-first-test
   const queryClient = useMemo(() => {
-    if (client) {
-      client.resetQueries()
-      return client
-    }
+    if (client) return client
     return createTestQueryClient()
   }, [client])
+
+  useEffect(() => {
+    cleanupTestQueryClient(queryClient)
+  }, [queryClient])
+
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )

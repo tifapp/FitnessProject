@@ -1,7 +1,9 @@
-import { LocationAccuracy } from "expo-location"
+import { LocationAccuracy, LocationOptions } from "expo-location"
 import {
+  expoQueryUserCoordinates,
   expoTrackUserLocation,
   LocationCoordinatesMocks,
+  mockLocationCoordinate2D,
   UserLocationTrackingAccurracy
 } from "@lib/location"
 import { waitFor } from "@testing-library/react-native"
@@ -9,10 +11,42 @@ import { waitFor } from "@testing-library/react-native"
 const testAccuracy = "precise"
 
 describe("UserLocation tests", () => {
+  describe("ExpoQueryUserCoordinates tests", () => {
+    it("translates a response from expo properly", async () => {
+      const coordinates = mockLocationCoordinate2D()
+      const getCurrentPosition = jest
+        .fn()
+        .mockImplementation((options: LocationOptions) => {
+          if (options.accuracy === LocationAccuracy.Highest) {
+            return Promise.resolve({
+              coords: coordinates,
+              timestamp: 1000
+            })
+          }
+          return Promise.reject(new Error())
+        })
+
+      const response = await expoQueryUserCoordinates(
+        "precise",
+        getCurrentPosition
+      )
+      expect(response).toMatchObject({
+        coordinates,
+        trackingDate: new Date(1000)
+      })
+    })
+  })
+
   describe("ExpoUserLocationTracking tests", () => {
     test("translates accurracy to proper expo accurracy when making tracking request", () => {
-      expectMakesExpoRequestWithAccurracy("approximate-low", LocationAccuracy.Low)
-      expectMakesExpoRequestWithAccurracy("approximate-medium", LocationAccuracy.Balanced)
+      expectMakesExpoRequestWithAccurracy(
+        "approximate-low",
+        LocationAccuracy.Low
+      )
+      expectMakesExpoRequestWithAccurracy(
+        "approximate-medium",
+        LocationAccuracy.Balanced
+      )
       expectMakesExpoRequestWithAccurracy("precise", LocationAccuracy.Highest)
     })
 
@@ -43,7 +77,7 @@ describe("UserLocation tests", () => {
         status: "success",
         location: {
           coordinates: LocationCoordinatesMocks.Paris,
-          trackingDate: new Date(1)
+          trackingDate: new Date(1000)
         }
       })
     })

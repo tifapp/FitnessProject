@@ -23,6 +23,10 @@ export const Caption = (props: TextProps) => (
   <Text {...props} style={[styles.caption, props.style]} />
 )
 
+export const CaptionTitle = (props: TextProps) => (
+  <Text {...props} style={[props.style, styles.captionTitle]} />
+)
+
 /**
  * A text component with the same font size as {@link BodyText}
  * that allows for more emphasis on a particular UI element
@@ -45,6 +49,10 @@ const styles = StyleSheet.create({
     fontFamily: "OpenSans",
     fontSize: 12,
     opacity: 0.35
+  },
+  captionTitle: {
+    fontSize: 12,
+    fontFamily: "OpenSansBold"
   },
   headline: {
     fontFamily: "OpenSansBold",

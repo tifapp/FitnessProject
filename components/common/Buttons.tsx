@@ -1,51 +1,60 @@
-import React from "react"
-import { ButtonProps, Pressable, StyleSheet } from "react-native"
 import { Headline } from "@components/Text"
+import { ButtonStyles } from "@lib/ButtonStyle"
+import React from "react"
+import {
+  StyleSheet,
+  TouchableOpacity,
+  TouchableOpacityProps
+} from "react-native"
 
-const darkColor = "#26282A"
-const hexAlpha = "26" // 15% Opacity
+interface ButtonProps {
+  title: string
+  buttonProps: TouchableOpacityProps
+}
 
-export const DarkButton = (props: ButtonProps) => {
+export const PrimaryButton = ({ title, buttonProps }: ButtonProps) => {
   return (
-    <Pressable
-      onPress={props.onPress}
-      style={[styles.container, {backgroundColor: darkColor}]}>
-      <Headline style={styles.darkStyleText}>{props.title}</Headline>
-    </Pressable>
+    <TouchableOpacity
+      {...buttonProps}
+      style={[
+        buttonProps.style,
+        styles.container,
+        { backgroundColor: ButtonStyles.darkColor }
+      ]}
+    >
+      <Headline style={{ color: "white" }}>{title}</Headline>
+      {buttonProps.children}
+    </TouchableOpacity>
   )
 }
 
-export const LightButton = (props: ButtonProps) => {
+export const OutlinedButton = ({ title, buttonProps }: ButtonProps) => {
   return (
-    <Pressable
-      onPress={props.onPress}
+    <TouchableOpacity
+      {...buttonProps}
       style={[
+        buttonProps.style,
         styles.container,
         styles.lightStyle,
-        {borderColor: darkColor + hexAlpha}
-      ]}>
-      <Headline style={styles.lightStyleText}>{props.title}</Headline>
-    </Pressable>
+        { borderColor: ButtonStyles.darkColor + ButtonStyles.opacity }
+      ]}
+    >
+      <Headline style={{ color: ButtonStyles.darkColor }}>{title}</Headline>
+      {buttonProps.children}
+    </TouchableOpacity>
   )
 }
 
-const styles = StyleSheet.create ({
+const styles = StyleSheet.create({
   container: {
     height: 48,
-    width: "90%",
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 12
   },
-  darkStyleText: {
-    color: "white"
-  },
   lightStyle: {
     backgroundColor: "white",
     borderWidth: 1
-  },
-  lightStyleText: {
-    color: "black"
   }
 })

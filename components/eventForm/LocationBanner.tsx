@@ -1,5 +1,5 @@
 import { useReverseGeocodeQuery } from "../../hooks/Geocoding"
-import { placemarkToFormattedAddress } from "../../lib/location"
+import { LocationCoordinate2D, placemarkToFormattedAddress } from "../../lib/location"
 import React from "react"
 import { StyleSheet, View } from "react-native"
 import { useEventFormContext } from "./EventForm"
@@ -10,6 +10,7 @@ import {
   EventFormPlacemarkInfo
 } from "./EventFormValues"
 import { MaterialIcon } from "@components/common/Icons"
+import { useQuery } from "react-query"
 
 /**
  * Displays the selected location (if one) in the event form.
@@ -51,9 +52,7 @@ const LocationInfoBanner = (locationInfo: EventFormLocationInfo) => {
 }
 
 const GeocodedLocationInfoBanner = (locationInfo: EventFormLocationInfo) => {
-  const { data: placemark, status } = useReverseGeocodeQuery(
-    locationInfo.coordinates
-  )
+  const { data, status } = useReverseGeocodeQuery(locationInfo.coordinates)
 
   if (status === "error") {
     // TODO: - Should this just be the message of the error?
@@ -67,10 +66,10 @@ const GeocodedLocationInfoBanner = (locationInfo: EventFormLocationInfo) => {
   }
 
   // TODO: - Add shimming loading effect
-  if (!placemark) return <SkeletonFormLabel icon="location-pin" />
+  if (!data?.placemark) return <SkeletonFormLabel icon="location-pin" />
 
-  const address = placemarkToFormattedAddress(placemark)
-  return <PlacemarkInfoBanner name={placemark.name} address={address} />
+  const address = placemarkToFormattedAddress(data.placemark)
+  return <PlacemarkInfoBanner name={data.placemark.name} address={address} />
 }
 
 const PlacemarkInfoBanner = ({ name, address }: EventFormPlacemarkInfo) => (

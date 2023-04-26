@@ -5,9 +5,9 @@ import {
   LocationCallback,
   LocationSubscription,
   LocationAccuracy,
-  LocationObject
+  LocationObject,
+  getCurrentPositionAsync
 } from "expo-location"
-import { createDependencyKey } from "../dependencies"
 
 /**
  * An accurracy to track the user's location.
@@ -22,6 +22,27 @@ export type UserLocationTrackingAccurracy =
   | "approximate-low"
   | "approximate-medium"
   | "precise"
+
+/**
+ * A function type to query the current user's coordinates.
+ */
+export type QueryUserCoordinates = (
+  accurracy: UserLocationTrackingAccurracy
+) => Promise<TrackedLocationCoordinates>
+
+/**
+ * Queries the current user's coordinates using expo.
+ */
+export const expoQueryUserCoordinates = async (
+  accurracy: UserLocationTrackingAccurracy,
+  getCurrentPosition: (
+    options: LocationOptions
+  ) => Promise<LocationObject> = getCurrentPositionAsync
+) => {
+  return expoLocationToTrackedLocation(
+    await getCurrentPosition({ accuracy: accurracyToExpoAccurracy(accurracy) })
+  )
+}
 
 /**
  * An update published to a (@link TrackUserLocation} callback.
@@ -69,7 +90,7 @@ export const expoTrackUserLocation = (
     }
   )
   subscription.catch(() => onUpdate({ status: "error" }))
-  return () => subscription.then(sub => sub.remove())
+  return () => subscription.then((sub) => sub.remove())
 }
 
 const accurracyToExpoAccurracy = (accurracy: UserLocationTrackingAccurracy) => {
@@ -83,17 +104,5 @@ const expoLocationToTrackedLocation = (location: LocationObject) => ({
     latitude: location.coords.latitude,
     longitude: location.coords.longitude
   },
-  trackingDate: new Date(location.timestamp / 1000)
+  trackingDate: new Date(location.timestamp)
 })
-
-/**
- * Dependency Keys relating to operations around the user's location.
- */
-export namespace UserLocationDependencyKeys {
-  /**
-   * A dependency key to track the user's location.
-   */
-  export const track = createDependencyKey<TrackUserLocation>(
-    () => expoTrackUserLocation
-  )
-}
