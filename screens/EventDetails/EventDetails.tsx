@@ -91,29 +91,36 @@ const EventDetails = ({ event }: EventDetailsProps) => {
         )}
         <View style={{ marginTop: 16, marginBottom: BOTTOM_TAB_HEIGHT + 24 }}>
           <Headline style={{ marginBottom: 8 }}>Location</Headline>
-          <EventMapSnippet
-            style={{ width: "100%", height: 160 }}
-            minZoomLevel={12}
-            initialRegion={{
-              latitude: event.coordinates.latitude,
-              longitude: event.coordinates.longitude,
-              latitudeDelta: 0.1,
-              longitudeDelta: 0.1
+          <View
+            style={{
+              borderRadius: 12,
+              overflow: "hidden"
             }}
-            renderMarker={() => (
-              <Image
-                source={require("../../assets/icon.png")}
-                style={{
-                  width: MARKER_SIZE,
-                  height: MARKER_SIZE,
-                  borderWidth: 1,
-                  borderColor: "white",
-                  borderRadius: 20
-                }}
-              />
-            )}
-            marker={{ key: event.id, location: event.coordinates }}
-          />
+          >
+            <EventMapSnippet
+              style={{ width: "100%", height: 160 }}
+              minZoomLevel={12}
+              initialRegion={{
+                latitude: event.coordinates.latitude,
+                longitude: event.coordinates.longitude,
+                latitudeDelta: 0.1,
+                longitudeDelta: 0.1
+              }}
+              renderMarker={() => (
+                <Image
+                  source={require("../../assets/icon.png")}
+                  style={{
+                    width: MARKER_SIZE,
+                    height: MARKER_SIZE,
+                    borderWidth: 1,
+                    borderColor: "white",
+                    borderRadius: 20
+                  }}
+                />
+              )}
+              marker={{ key: event.id, location: event.coordinates }}
+            />
+          </View>
         </View>
       </ScrollView>
       <View style={styles.bottomTab}>
