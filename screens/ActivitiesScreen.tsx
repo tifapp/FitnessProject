@@ -47,47 +47,41 @@ const ActivitiesScreen = () => {
 
   return (
     <>
-      {location
-        ? (
-          <EventsMap
-            ref={appRef}
-            style={{ width: "100%", height: "100%" }}
-            initialRegion={{
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-              latitudeDelta: 0.5,
-              longitudeDelta: 0.5
-            }}
-            renderMarker={(item) => (
-              <>
-                <View
-                  style={[
-                    styles.badgeDisplay,
-                    {
-                      backgroundColor: events.find((x) => x.id === item.id).color
-                    }
-                  ]}
-                >
-                  <Ionicon name="people" color="white" size={10} />
-                  <Text style={styles.badgeText}>
-                    {events.find((x) => x.id === item.id).attendeeCount}
-                  </Text>
-                </View>
+      <EventsMap
+        ref={appRef}
+        style={{ width: "100%", height: "100%" }}
+        initialRegion={{
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.5,
+          longitudeDelta: 0.5
+        }}
+        renderMarker={(item) => (
+          <>
+            <View
+              style={[
+                styles.badgeDisplay,
+                {
+                  backgroundColor: events.find((x) => x.id === item.id).color
+                }
+              ]}
+            >
+              <Ionicon name="people" color="white" size={10} />
+              <Text style={styles.badgeText}>
+                {events.find((x) => x.id === item.id).attendeeCount}
+              </Text>
+            </View>
 
-                <View style={styles.whiteBackground}>
-                  <ImageBackground
-                    source={require("../assets/Windows_10_Default_Profile_Picture.svg.png")}
-                    style={styles.imageBackground}
-                  />
-                </View>
-              </>
-            )}
-            markers={events}
-          />
-        )
-        : (
-          <Text>{"Gathering location..."}</Text>
+            <View style={styles.whiteBackground}>
+              <ImageBackground
+                source={require("../assets/Windows_10_Default_Profile_Picture.svg.png")}
+                style={styles.imageBackground}
+              />
+            </View>
+          </>
         )}
+        markers={events}
+      />
 
       <TouchableOpacity onPress={recenterThing} style={styles.recenterButton}>
         <Icon name="locate-outline" type="ionicon" color="white" size={30} />
@@ -150,7 +144,7 @@ const styles = StyleSheet.create({
     height: 60,
     position: "absolute",
     bottom: "20%",
-    right: "80%",
+    right: "50%",
     borderRadius: 15,
     backgroundColor: "black"
   }
