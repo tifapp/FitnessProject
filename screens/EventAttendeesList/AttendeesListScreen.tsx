@@ -1,9 +1,8 @@
-import { AttendeeEntry } from "@components/attendeesList/attendeeEntry"
+import { AttendeeEntry } from "@screens/EventAttendeesList/attendeeEntry"
 import IconButton from "@components/common/IconButton"
 import { EventAttendee } from "@lib/events"
 import React from "react"
 import { FlatList, View } from "react-native"
-import { Divider } from "react-native-elements"
 
 const someData: EventAttendee[] = [
   {
