@@ -1,7 +1,7 @@
 import { CurrentUserEvent, isAttendingEvent } from "@lib/events"
 import React from "react"
 import { Ionicons } from "@expo/vector-icons"
-import { Image, ScrollView, StyleSheet, View } from "react-native"
+import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
 import { Caption, Headline, Title } from "@components/Text"
 import ExpandableText from "@screens/EventDetails/ExpandableText"
 import { Divider } from "react-native-elements"
@@ -11,7 +11,8 @@ import LocationSection from "./LocationSection"
 import AttendeeSection from "./AttendeeSection"
 import ChatSection from "./ChatSection"
 import { OutlinedButton, PrimaryButton } from "@components/common/Buttons"
-import { CalendarEvent } from "@lib/calendar/Calendar"
+import { CalendarEvent } from "@lib/Calendar"
+import { EventMapDetails, openMap} from "@lib/ExternalMap"
 
 export type EventDetailsProps = {
   event: CurrentUserEvent
@@ -28,6 +29,16 @@ const EventDetails = ({ event }: EventDetailsProps) => {
     description: event.description!,
     coordinates: event.coordinates,
     title: event.title
+  }
+  const mapDetails: EventMapDetails = {
+    coordinates: event.coordinates,
+    placemark: event.placemark
+  }
+
+  //console.log(userLocation)
+
+  const openMapWithoutDirections = () => {
+    openMap(mapDetails)
   }
 
   return (
@@ -99,11 +110,12 @@ const EventDetails = ({ event }: EventDetailsProps) => {
         )}
         <View style={{ marginTop: 16, marginBottom: BOTTOM_TAB_HEIGHT + 24 }}>
           <Headline style={{ marginBottom: 8 }}>Location</Headline>
-          <View
+          <TouchableOpacity
             style={{
               borderRadius: 12,
               overflow: "hidden"
             }}
+            onPress={openMapWithoutDirections}
           >
             <EventMapSnippet
               style={{ width: "100%", height: 160 }}
@@ -128,7 +140,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
               )}
               marker={{ key: event.id, location: event.coordinates }}
             />
-          </View>
+          </TouchableOpacity>
         </View>
       </ScrollView>
       <View style={styles.bottomTab}>

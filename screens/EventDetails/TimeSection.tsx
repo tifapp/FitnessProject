@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity, View } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { Headline, Caption } from "@components/Text"
 import { dayjs, now } from "@lib/date"
-import { CalendarEvent, addToCalendar, getCalendar } from "@lib/calendar/Calendar"
+import { CalendarEvent, addToCalendar, getCalendar } from "@lib/Calendar"
 import * as Calendar from 'expo-calendar';
 
 interface TimeSectionProps {
