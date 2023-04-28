@@ -2,10 +2,13 @@ import EventsList from "@components/EventsList"
 import EventsMap, { MapRefMethods } from "@components/EventsMap"
 import { Ionicon } from "@components/common/Icons"
 import EventTabBar from "@components/tabBarComponents/EventTabBar"
-import { requestLocationPermissions } from "@hooks/UserLocation"
+import { useTrackUserLocation } from "@hooks/UserLocation"
 import { CurrentUserEvent, EventMocks } from "@lib/events"
-import { LocationObject, getCurrentPositionAsync } from "expo-location"
-import React, { useEffect, useRef, useState } from "react"
+import {
+  UserLocationTrackingUpdate,
+  requestLocationPermissions
+} from "@lib/location/UserLocation"
+import React, { useEffect, useRef } from "react"
 import {
   ImageBackground,
   StyleSheet,
@@ -19,13 +22,16 @@ const MARKER_SIZE = 60
 
 const ActivitiesScreen = () => {
   const appRef = useRef<MapRefMethods | null>(null)
-  const [location, setLocation] = useState<LocationObject | null>(null)
+  let doesWork = false
+  const givenUserLocation = useTrackUserLocation()
 
   const recenterThing = () => {
-    appRef.current?.recenterToLocation({
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude
-    })
+    if (givenUserLocation?.status === "success") {
+      appRef.current?.recenterToLocation({
+        latitude: givenUserLocation?.location.coordinates.latitude,
+        longitude: givenUserLocation?.location.coordinates.longitude
+      })
+    }
   }
   const events: CurrentUserEvent[] = [
     EventMocks.Multiday,
@@ -36,26 +42,40 @@ const ActivitiesScreen = () => {
   useEffect(() => {
     ;(async () => {
       const status = await requestLocationPermissions()
-      if (status == false) {
-        return
+      if (status === false) {
+      } else {
+        doesWork = true
       }
-
-      const locationToGive = await getCurrentPositionAsync({})
-      setLocation(locationToGive)
     })()
   }, [])
 
+  function checkUserLocation (
+    userLocationParam: UserLocationTrackingUpdate | undefined
+  ) {
+    if (userLocationParam?.status === "success") {
+      return {
+        latitude: userLocationParam.location.coordinates.latitude,
+        longitude: userLocationParam.location.coordinates.longitude,
+        latitudeDelta: 0.5,
+        longitudeDelta: 0.5
+      }
+    } else {
+      return {
+        latitude: 30.0,
+        longitude: 30.0,
+        latitudeDelta: 0.5,
+        longitudeDelta: 0.5
+      }
+    }
+  }
+
+  console.log(givenUserLocation)
   return (
     <>
       <EventsMap
         ref={appRef}
         style={{ width: "100%", height: "100%" }}
-        initialRegion={{
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          latitudeDelta: 0.5,
-          longitudeDelta: 0.5
-        }}
+        initialRegion={checkUserLocation(givenUserLocation)}
         renderMarker={(item) => (
           <>
             <View
@@ -144,7 +164,7 @@ const styles = StyleSheet.create({
     height: 60,
     position: "absolute",
     bottom: "20%",
-    right: "50%",
+    right: "5%",
     borderRadius: 15,
     backgroundColor: "black"
   }
