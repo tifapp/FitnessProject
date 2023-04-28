@@ -1,22 +1,48 @@
 import React from "react"
-import { StyleSheet, View } from "react-native"
+import { StyleSheet, TouchableOpacity, View } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { Headline, Caption } from "@components/Text"
-import { FixedDateRange, dayjs, now } from "@lib/date"
+import { dayjs, now } from "@lib/date"
+import { CalendarEvent, addToCalendar, getCalendar } from "@lib/calendar/Calendar"
+import * as Calendar from 'expo-calendar';
 
 interface TimeSectionProps {
   color: string
-  duration: FixedDateRange
+  event: CalendarEvent
 }
 
-const TimeSection = ({ color, duration }: TimeSectionProps) => {
-  const startDateFormat = duration.formattedDate(
+const TimeSection = ({ color, event }: TimeSectionProps) => {
+  const [status, requestPermission] = Calendar.useCalendarPermissions();
+  const startDateFormat = event.duration.formattedDate(
     now(),
-    dayjs(duration.startDate)
+    dayjs(event.duration.startDate)
   )
-  const endDateFormat = duration.formattedDate(now(), dayjs(duration.endDate))
-  const startTimeFormat = dayjs(duration.startDate).format("h A")
-  const endTimeFormat = dayjs(duration.endDate).format("h A")
+  const endDateFormat = event.duration.formattedDate(now(), dayjs(event.duration.endDate))
+  const startTimeFormat = dayjs(event.duration.startDate).format("h A")
+  const endTimeFormat = dayjs(event.duration.endDate).format("h A")
+  const hitSlopInset = {
+    top: 10,
+    bottom: 10,
+    right: 10,
+    left: 10
+  }
+
+  const addEventToCalendar = async () => {
+    let calendar: Calendar.Calendar
+
+    if (status?.granted) {
+      calendar = await getCalendar()
+      await addToCalendar(calendar.id, event)
+
+    } else {
+      await requestPermission().then(async (status) => {
+        if (status?.granted) {
+          calendar = await getCalendar()
+          await addToCalendar(calendar.id, event)
+        }
+      })
+    }
+  }
 
   return (
     <View style={[styles.flexRow, styles.paddingIconSection]}>
@@ -29,7 +55,7 @@ const TimeSection = ({ color, duration }: TimeSectionProps) => {
         />
       </View>
       <View style={styles.spacing}>
-        {duration.endSameDay()
+        {event.duration.endSameDay()
           ? (
             <View style={{ marginBottom: 4 }}>
               <Headline>{`${startDateFormat}`}</Headline>
@@ -42,9 +68,11 @@ const TimeSection = ({ color, duration }: TimeSectionProps) => {
               <Caption>{`to ${endDateFormat}, ${endTimeFormat}`}</Caption>
             </View>
           )}
-        <Caption style={[{ color }, styles.captionLinks]}>
-          Add to Calendar
-        </Caption>
+        <TouchableOpacity onPress={addEventToCalendar} hitSlop={hitSlopInset}>
+          <Caption style={[{ color }, styles.captionLinks]}>
+            Add to Calendar
+          </Caption>
+        </TouchableOpacity>
       </View>
     </View>
   )

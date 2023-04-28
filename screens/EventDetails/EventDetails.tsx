@@ -11,6 +11,7 @@ import LocationSection from "./LocationSection"
 import AttendeeSection from "./AttendeeSection"
 import ChatSection from "./ChatSection"
 import { OutlinedButton, PrimaryButton } from "@components/common/Buttons"
+import { CalendarEvent } from "@lib/calendar/Calendar"
 
 export type EventDetailsProps = {
   event: CurrentUserEvent
@@ -21,6 +22,13 @@ const BOTTOM_TAB_HEIGHT = 80
 
 const EventDetails = ({ event }: EventDetailsProps) => {
   const isFriend = false
+  const calenderEvent: CalendarEvent = {
+    duration: event.dateRange,
+    id: event.id,
+    description: event.description!,
+    coordinates: event.coordinates,
+    title: event.title
+  }
 
   return (
     <View>
@@ -54,7 +62,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
         </View>
 
         <View style={styles.iconSection}>
-          <TimeSection color={event.color} duration={event.dateRange} />
+          <TimeSection color={event.color} event={calenderEvent} />
 
           <Divider style={styles.divider} />
 

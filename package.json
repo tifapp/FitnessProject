@@ -84,8 +84,8 @@
     "react-native-gesture-handler": "~2.5.0",
     "react-native-get-random-values": "~1.8.0",
     "react-native-hyperlink": "0.0.19",
-    "react-native-map-link": "^2.11.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
+    "react-native-map-link": "^2.11.0",
     "react-native-maps": "0.31.1",
     "react-native-popup-menu": "^0.15.13",
     "react-native-reanimated": "~2.9.1",
@@ -100,7 +100,8 @@
     "tlds": "^1.221.1",
     "type-detect": "4.0.8",
     "uuid": "^9.0.0",
-    "zod": "^3.20.6"
+    "zod": "^3.20.6",
+    "expo-calendar": "~10.3.0"
   },
   "devDependencies": {
     "@aws-amplify/cli": "^10.8.1",
