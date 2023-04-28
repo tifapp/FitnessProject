@@ -33,6 +33,23 @@ export namespace UserLocationDependencyKeys {
  * A hook to observe the user's current location using the
  * `UserLocationDependencyKeys.track` dependency.
  *
+ * ```tsx
+ * const Component = () => {
+ *  const userLocation = useTrackUserLocation("precise")
+ *  if (!userLocation) return <Text>Location is loading</Text>
+ *
+ *  return (
+ *    <>
+ *      {userLocation.status === "success" ? (
+ *        <Text>Location is {displayLocationText(userLocation.location)}</Text>
+ *      ) : (
+ *        <Text>Error loading location</Text>
+ *      )}
+ *    </>
+ *  )
+ * }
+ * ```
+ *
  * **Notice**:
  * This hook will always return an error update if the user previously
  * denied location permissions but then allowed them in settings.
