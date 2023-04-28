@@ -1,10 +1,12 @@
 import { SetDependencyValue } from "@lib/dependencies"
 import {
   LocationCoordinatesMocks,
-  UserLocationDependencyKeys,
   UserLocationTrackingUpdate
 } from "@lib/location"
-import { useTrackUserLocation } from "@hooks/UserLocation"
+import {
+  useTrackUserLocation,
+  UserLocationDependencyKeys
+} from "@hooks/UserLocation"
 import { act, renderHook } from "@testing-library/react-native"
 
 describe("UserLocationHooks tests", () => {

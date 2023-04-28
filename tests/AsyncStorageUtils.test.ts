@@ -1,25 +1,41 @@
 import { AsyncStorageUtils } from "@lib/AsyncStorage"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-
-const testKey = "test_key"
-const testObject = {
-  hello: "world",
-  num: 1,
-  bool: true,
-  nested: { hello: "world" }
-}
+import { z } from "zod"
 
 describe("AsyncStorageUtils tests", () => {
   beforeEach(async () => await AsyncStorage.clear())
 
-  test("saving object for key", async () => {
-    await AsyncStorageUtils.save(testKey, testObject)
-    const result = await AsyncStorage.getItem(testKey)
-    expect(JSON.parse(result!!)).toMatchObject(testObject)
-  })
+  describe("ParseJSONItems tests", () => {
+    it("should resort to undefined when item is invalid json", async () => {
+      await AsyncStorage.setItem("test", "uiefuiefgui")
+      const items = await AsyncStorageUtils.parseJSONItems(z.string(), ["test"])
+      expect(items).toEqual([["test", undefined]])
+    })
 
-  test("getting object for key", async () => {
-    await AsyncStorage.setItem(testKey, JSON.stringify(testObject))
-    expect(await AsyncStorageUtils.load(testKey)).toEqual(testObject)
+    it("should resort to undefined when item does not parse with schema", async () => {
+      await AsyncStorage.setItem("test", "uiefuiefgui")
+      const items = await AsyncStorageUtils.parseJSONItems(z.number(), ["test"])
+      expect(items).toEqual([["test", undefined]])
+    })
+
+    it("should resort to undefined when item does not exist", async () => {
+      const items = await AsyncStorageUtils.parseJSONItems(z.number(), ["test"])
+      expect(items).toEqual([["test", undefined]])
+    })
+
+    it("should parse items against the given schema", async () => {
+      await AsyncStorage.multiSet([
+        ["a", "1"],
+        ["b", "2"]
+      ])
+      const items = await AsyncStorageUtils.parseJSONItems(z.number(), [
+        "a",
+        "b"
+      ])
+      expect(items).toEqual([
+        ["a", 1],
+        ["b", 2]
+      ])
+    })
   })
 })
