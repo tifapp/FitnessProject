@@ -1,12 +1,8 @@
 import React from "react"
 import { Image, StyleSheet, Text, View } from "react-native"
 import { CurrentUserEvent, isHostingEvent } from "@lib/events/Event"
-import { Divider } from "react-native-elements"
-import { Shadow } from "react-native-shadow-2"
-import tinycolor from "tinycolor2"
-import { placemarkToFormattedAddress } from "@lib/location"
-import { compactFormatMiles } from "@lib/DistanceFormatting"
-import { MaterialCommunityIcon } from "../common/Icons"
+import { placemarkToAbbreviatedAddress } from "@lib/location"
+import { Ionicons } from "@expo/vector-icons"
 import MenuDropdown from "./MenuDropdown"
 
 export type EventCardProps = {
@@ -14,91 +10,79 @@ export type EventCardProps = {
 }
 
 export const EventCard = ({ event }: EventCardProps) => {
-  const lightEventColor = tinycolor(event.color).lighten(25).toString()
+  const hexAlpha = "4D"
+  const lightEventColor = event.color + hexAlpha
 
   return (
-    <Shadow
-      distance={16}
-      offset={[-2, 4]}
-      shadowViewProps={{ style: { opacity: 0.25 } }}
-      startColor={lightEventColor}
-      stretch={true}
-    >
-      <View style={styles.container}>
-        <View style={[styles.topRow, styles.flexRow]}>
-          <Image
-            style={[styles.image, styles.iconMargin]}
-            source={require("../../assets/icon.png")}
-            accessibilityLabel="profile picture"
-          />
+    <View style={[styles.container, {backgroundColor: "#0000000D"}]}>
+      <View style={[styles.topRow, styles.flexRow]}>
+        <Image
+          style={[styles.image, styles.iconMargin]}
+          source={require("../../assets/icon.png")}
+          accessibilityLabel="profile picture"
+        />
+        <View>
           <Text style={styles.name}>{event.host.username}</Text>
-          <View style={styles.moreButtonStyle}>
-            <MenuDropdown
-              isEventHost={isHostingEvent(event.userAttendeeStatus)}
-            />
-          </View>
         </View>
-        <View style={styles.middleRow}>
-          <Text style={styles.titleText}>{event.title}</Text>
-
-          <View style={[styles.location, styles.flexRow]}>
-            <MaterialCommunityIcon
-              name="map-marker-outline"
-              color={event.color}
-              style={styles.iconMargin}
-            />
-            <Text style={styles.infoText}>
-              {event.placemark
-                ? placemarkToFormattedAddress(event.placemark)
-                : "Unknown Address"}
-            </Text>
-          </View>
-          <View style={styles.flexRow}>
-            <MaterialCommunityIcon
-              name="calendar-check-outline"
-              color={event.color}
-              style={styles.iconMargin}
-            />
-            <Text style={styles.infoText} accessibilityLabel="day">
-              {event.dateRange.formatted()}
-            </Text>
-          </View>
-        </View>
-        <View style={{ marginVertical: 16 }}>
-          <Divider style={{ height: 1, opacity: 0.4 }} />
-        </View>
-        <View style={styles.distanceContainer}>
-          <View style={[styles.flexRow, { alignItems: "center" }]}>
-            <MaterialCommunityIcon
-              name="account-multiple-outline"
-              color={event.color}
-              style={styles.iconMargin}
-            />
-            <Text
-              style={[styles.attendingText, styles.attendingNumber]}
-            >{`${event.attendeeCount}`}</Text>
-            <Text style={styles.attendingText}>{" attending"}</Text>
-          </View>
-          <View
-            style={[
-              styles.distance,
-              {
-                backgroundColor: lightEventColor
-              }
-            ]}
-          >
-            <MaterialCommunityIcon
-              name="navigation-variant-outline"
-              color={event.color}
-              style={styles.iconMargin}
-            />
-            <Text style={[styles.distanceText, { color: event.color }]}>
-              {compactFormatMiles(event.userMilesFromEvent)}
-            </Text>
-          </View>
+        <View style={styles.moreButtonStyle}>
+          <MenuDropdown
+            isEventHost={isHostingEvent(event.userAttendeeStatus)}
+          />
         </View>
       </View>
-    </Shadow>
+      <View style={styles.middleRow}>
+        <Text style={[styles.titleText, styles.bottomSpacing]}>
+          {event.title}
+        </Text>
+
+        <Text
+          style={[styles.bottomSpacing, styles.description]}
+          numberOfLines={3}
+        >
+          {event.description}
+        </Text>
+
+        <View style={[styles.flexRow, styles.bottomSpacing]}>
+          <View
+            style={[styles.iconContainer, { backgroundColor: lightEventColor }]}
+          >
+            <Ionicons
+              name="calendar-outline"
+              size={24}
+              color={event.color}
+              style={styles.icon}
+            />
+          </View>
+          <Text style={styles.infoText} accessibilityLabel="day">
+            {event.dateRange.formattedStartDate()}
+          </Text>
+          <View style={styles.dotIcon}>
+            <Ionicons name="md-ellipse" size={5} color="grey" />
+          </View>
+          <Text style={styles.infoText} accessibilityLabel="time">
+            {event.dateRange.formattedStartTime()}
+          </Text>
+        </View>
+
+        <View style={[styles.flexRow]}>
+          <View
+            style={[styles.iconContainer, { backgroundColor: lightEventColor }]}
+          >
+            <Ionicons
+              name="location-outline"
+              color={event.color}
+              size={24}
+              style={styles.icon}
+            />
+          </View>
+          <Text style={styles.infoText}>
+            {event.placemark
+              ? placemarkToAbbreviatedAddress(event.placemark)
+              : "Unknown Address"}
+          </Text>
+        </View>
+      </View>
+    </View>
   )
 }
 
@@ -108,62 +92,43 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   topRow: {
-    paddingBottom: 16,
+    paddingBottom: 12,
     alignItems: "center"
   },
   middleRow: {
     flex: 1,
     flexDirection: "column"
   },
-  location: {
-    paddingBottom: 8
+  bottomSpacing: {
+    marginBottom: 8
   },
   infoText: {
     textAlignVertical: "center",
+    fontSize: 14,
+    fontFamily: "OpenSans",
     color: "grey"
-  },
-  attendingNumber: {
-    fontWeight: "bold"
-  },
-  attendingText: {
-    textAlignVertical: "center",
-    fontSize: 14
   },
   titleText: {
     textAlignVertical: "center",
-    fontWeight: "bold",
-    fontSize: 22,
-    marginBottom: 8
+    fontFamily: "OpenSansBold",
+    fontSize: 16
   },
   name: {
     textAlignVertical: "center",
-    fontWeight: "bold",
-    fontSize: 15,
+    fontFamily: "OpenSansBold",
+    fontSize: 14,
     paddingLeft: 8
   },
-  distance: {
-    flexDirection: "row",
-    alignSelf: "center",
-    paddingVertical: 2,
-    paddingLeft: 4,
-    borderRadius: 12
-  },
-  distanceContainer: {
-    flexDirection: "row"
-  },
-  distanceText: {
-    textAlignVertical: "center",
-    color: "white",
-    paddingRight: 8,
-    fontWeight: "bold"
+  description: {
+    fontFamily: "OpenSans",
+    fontSize: 13
   },
   image: {
-    width: 40,
-    height: 40,
+    width: 32,
+    height: 32,
     borderRadius: 24
   },
   container: {
-    backgroundColor: "white",
     paddingHorizontal: 18,
     paddingVertical: 16,
     borderRadius: 20,
@@ -177,5 +142,17 @@ const styles = StyleSheet.create({
     flex: 1,
     opacity: 0.4,
     alignItems: "flex-end"
+  },
+  dotIcon: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: 8
+  },
+  iconContainer: {
+    borderRadius: 14,
+    marginRight: 16
+  },
+  icon: {
+    margin: 2
   }
 })

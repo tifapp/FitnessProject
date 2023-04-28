@@ -1,7 +1,17 @@
-import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons"
-import { useFontScale } from "@lib/FontScale"
+import {
+  MaterialIcons,
+  MaterialCommunityIcons,
+  Ionicons
+} from "@expo/vector-icons"
+import { useFontScale } from "@hooks/Fonts"
 import React, { ComponentProps } from "react"
-import { StyleProp, ViewProps, ViewStyle } from "react-native"
+import {
+  StyleProp,
+  TouchableOpacityProps,
+  ViewProps,
+  ViewStyle,
+  TouchableOpacity
+} from "react-native"
 
 /**
  * A base type for icon props.
@@ -58,4 +68,42 @@ export const MaterialCommunityIcon = ({
     style={style}
     {...props}
   />
+)
+
+export type IoniconName = ComponentProps<typeof Ionicons>["name"]
+
+/**
+ * An icon component for Ionicons.
+ */
+export const Ionicon = ({
+  name,
+  size = 24,
+  style,
+  color,
+  maximumFontScaleFactor,
+  ...props
+}: IconProps<IoniconName>) => (
+  <Ionicons
+    name={name}
+    size={size * useFontScale({ maximumScaleFactor: maximumFontScaleFactor })}
+    color={color}
+    style={style}
+    {...props}
+  />
+)
+
+export type IoniconButtonProps = {
+  icon: IconProps<IoniconName>
+} & TouchableOpacityProps
+
+/**
+ * An ionicon with no background that behaves like {@link TouchableOpacity}.
+ */
+export const TouchableIonicon = ({ icon, ...props }: IoniconButtonProps) => (
+  <TouchableOpacity
+    {...props}
+    hitSlop={{ left: 16, right: 16, top: 16, bottom: 16 }}
+  >
+    <Ionicon {...icon} />
+  </TouchableOpacity>
 )

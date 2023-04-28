@@ -3,7 +3,6 @@ import { dateRange } from "@lib/date"
 import { UpdateDependencyValues } from "@lib/dependencies"
 import { EventColors } from "@lib/events"
 import { hapticsDependencyKey } from "@lib/Haptics"
-import { geocodingDependencyKey } from "@lib/location"
 import { NavigationContainer } from "@react-navigation/native"
 import EventFormScreen from "@screens/EventFormScreen"
 import {
@@ -14,9 +13,9 @@ import {
 } from "@testing-library/react-native"
 import { QueryClient } from "react-query"
 import { captureAlerts } from "../../helpers/Alerts"
-import { unimplementedGeocoding } from "../../helpers/Geocoding"
 import { neverPromise } from "../../helpers/Promise"
 import {
+  cleanupTestQueryClient,
   createTestQueryClient,
   TestQueryClientProvider
 } from "../../helpers/ReactQuery"
@@ -30,6 +29,7 @@ import {
   pickEventColor,
   toggleShouldHideAfterStartDate
 } from "./helpers"
+import { GeocodingDependencyKeys } from "@hooks/Geocoding"
 
 const testLocation = { latitude: 45.0, longitude: -121.0 }
 
@@ -159,10 +159,7 @@ describe("EventFormScreen tests", () => {
     await waitFor(() => expect(canSubmit()).toEqual(true))
   })
 
-  afterAll(() => {
-    queryClient.removeQueries()
-    queryClient.clear()
-  })
+  afterAll(() => cleanupTestQueryClient(queryClient))
 })
 
 const editedTitle = "Test title"
@@ -183,9 +180,7 @@ const renderEventFormScreen = (
       <TestQueryClientProvider client={queryClient}>
         <UpdateDependencyValues
           update={(values) => {
-            const geocoding = unimplementedGeocoding()
-            geocoding.reverseGeocode.mockImplementation(neverPromise)
-            values.set(geocodingDependencyKey, geocoding)
+            values.set(GeocodingDependencyKeys.reverseGeocode, neverPromise)
             values.set(hapticsDependencyKey, jest.fn())
           }}
         >

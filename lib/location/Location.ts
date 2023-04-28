@@ -5,6 +5,9 @@ import {
   sin2
 } from "../Math"
 import { z } from "zod"
+import { mockPlacemark, PlacemarkSchema } from "./Placemark"
+import { faker } from "@faker-js/faker"
+import geohash from "ngeohash"
 
 /**
  * A zod schema for {@link LocationCoordinate2D}.
@@ -22,12 +25,80 @@ export type LocationCoordinate2D = Readonly<
 >
 
 /**
+ * Generates a mock coordinate for testing and UI purposes.
+ */
+export const mockLocationCoordinate2D = () => ({
+  latitude: parseFloat(faker.address.latitude()),
+  longitude: parseFloat(faker.address.longitude())
+})
+
+/**
+ * Some mock Location coordinates suitable for testing.
+ */
+export namespace LocationCoordinatesMocks {
+  export const SantaCruz = {
+    latitude: 36.9741,
+    longitude: 122.0308
+  } as const
+
+  export const NYC = {
+    latitude: 40.7128,
+    longitude: 74.006
+  } as const
+
+  export const SanFrancisco = {
+    latitude: 37.7749,
+    longitude: 122.4194
+  } as const
+
+  export const London = {
+    latitude: 51.5072,
+    longitude: 0.1276
+  } as const
+
+  export const Paris = {
+    latitude: 48.8566,
+    longitude: 2.3522
+  } as const
+}
+
+/**
+ * A zod schema for {@link Location}.
+ */
+export const LocationSchema = z.object({
+  coordinates: LocationCoordinates2DSchema,
+  placemark: PlacemarkSchema
+})
+
+/**
+ * A type that maps a lat-lng coordinate to its respective placemark.
+ */
+export type Location = Readonly<z.infer<typeof LocationSchema>>
+
+/**
+ * Creates a mock location for testing and UI purposes.
+ */
+export const mockLocation = (coordinates?: LocationCoordinate2D) => ({
+  coordinates: coordinates ?? mockLocationCoordinate2D(),
+  placemark: mockPlacemark()
+})
+
+/**
  * A location object meant for tracking purposes.
  */
-export type TrackedLocation = {
-  readonly coordinate: LocationCoordinate2D
-  readonly trackingDate: Date
-}
+export type TrackedLocationCoordinates = Readonly<{
+  coordinates: LocationCoordinate2D
+  trackingDate: Date
+}>
+
+/**
+ * Generates a mocked Tracked location coordinate for testing and ui
+ * purposes.
+ */
+export const mockTrackedLocationCoordinate = (date?: Date) => ({
+  coordinates: mockLocationCoordinate2D(),
+  trackingDate: date ?? faker.date.soon()
+})
 
 /**
  * Computes the number of miles between 2 locations using the haversine formula.
@@ -55,4 +126,11 @@ export const milesBetweenLocations = (
 
   const meters = 2 * EARTH_RADIUS_METERS * Math.asin(Math.sqrt(trigCombo))
   return meters / METERS_PER_MILE
+}
+
+/**
+ * Produces a geohash of a location coordinate.
+ */
+export const hashLocationCoordinate = (coordinate: LocationCoordinate2D) => {
+  return geohash.encode(coordinate.latitude, coordinate.longitude)
 }

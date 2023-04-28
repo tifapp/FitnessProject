@@ -5,13 +5,18 @@ import {
   BottomSheetModal,
   BottomSheetModalProvider
 } from "@gorhom/bottom-sheet"
-import { CurrentUserEvent } from "@lib/events/Event"
+import { CurrentUserEvent, EventMocks } from "@lib/events/Event"
 import { EventCard } from "./eventCard/EventCard"
 
 const EventsList = () => {
-  const events: CurrentUserEvent[] = []
-  const MARGIN_HORIZONTAL = 16
+  const events: CurrentUserEvent[] = [
+    EventMocks.Multiday,
+    EventMocks.NoPlacemarkInfo,
+    EventMocks.PickupBasketball
+  ]
+  const MARGIN_HORIZONTAL = 24
   const MARGIN_VERTICAL = 16
+  const BOTTOM_OFFSET = 80
 
   // hooks
   const sheetRef = useRef<BottomSheetModal>(null)
@@ -21,7 +26,7 @@ const EventsList = () => {
   }, [])
 
   // variables
-  const snapPoints = ["8%", "55%"]
+  const snapPoints = ["8%", "55%", "90%"]
 
   return (
     <BottomSheetModalProvider>
@@ -35,6 +40,7 @@ const EventsList = () => {
           snapPoints={snapPoints}
           index={0}
           enablePanDownToClose={false}
+          bottomInset={BOTTOM_OFFSET}
         >
           <BottomSheetFlatList
             data={events}
@@ -50,7 +56,7 @@ const EventsList = () => {
             )}
             ListHeaderComponent={
               <View style={styles.activitiesContainer}>
-                <Text style={styles.activitiesText}>Nearby Activities</Text>
+                <Text style={styles.activitiesText}>Events in the Area</Text>
               </View>
             }
             stickyHeaderIndices={[0]}
@@ -69,10 +75,10 @@ const styles = StyleSheet.create({
     paddingBottom: 8
   },
   activitiesText: {
-    fontSize: 20,
+    fontSize: 18,
     marginLeft: 16,
     textAlignVertical: "top",
-    fontWeight: "bold"
+    fontFamily: "OpenSansBold"
   }
 })
 
