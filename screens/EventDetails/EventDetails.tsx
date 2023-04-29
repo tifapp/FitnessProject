@@ -54,7 +54,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
         contentContainerStyle={{ flexGrow: 1 }}
         nestedScrollEnabled={true}
       >
-        <Title>{event.title}</Title>
+        <Title style={styles.textColor}>{event.title}</Title>
         <View style={[styles.flexRow, { marginVertical: 16 }]}>
           <Image
             style={[styles.image]}
@@ -62,19 +62,34 @@ const EventDetails = ({ event }: EventDetailsProps) => {
           />
           <View style={{ flex: 1 }}>
             <View style={styles.flexRow}>
-              <Headline>{event.host.username}</Headline>
-              {!requestSent && (
-                <View style={[styles.flexRow, { alignItems: "center" }]}>
-                  <Ionicons
-                    style={{ marginHorizontal: 4 }}
-                    size={6}
-                    name="ellipse"
-                  />
-                  <Headline onPress={sendFriendRequest} style={{ color: event.color }}>Add Friend</Headline>
-                </View>
-              )}
+              <Headline style={styles.textColor}>{event.host.username}</Headline>
+              {!isFriend && 
+                !requestSent ? (
+                  <View style={[styles.flexRow, { alignItems: "center" }]}>
+                    <Ionicons
+                      style={{ marginHorizontal: 8 }}
+                      size={6}
+                      color={ButtonStyles.colorOpacity35}
+                      name="ellipse"
+                    />
+                    <Headline onPress={sendFriendRequest} style={{ color: event.color }}>Add Friend</Headline>
+                  </View>
+                )
+                : (
+                  <View style={[styles.flexRow, { alignItems: "center" }]}>
+                    <Ionicons
+                      style={{ marginHorizontal: 8 }}
+                      color={ButtonStyles.colorOpacity35}
+                      size={6}
+                      name="ellipse"
+                    />
+                    <Headline onPress={sendFriendRequest} style={{ color: ButtonStyles.colorOpacity35 }}>Request Sent</Headline>
+                  </View>
+                )
+              }
+              
             </View>
-            <Caption>{event.host.handle}</Caption>
+            <Caption style={styles.textColor}>{event.host.handle}</Caption>
           </View>
         </View>
 
@@ -107,7 +122,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
 
         {event.description && (
           <View style={{ marginTop: 16 }}>
-            <Headline style={{ marginBottom: 4 }}>About</Headline>
+            <Headline style={[styles.textColor, {marginBottom: 4 }]}>About</Headline>
             <ExpandableText
               props={{ style: { color: event.color, marginTop: 5 } }}
               text={event.description}
@@ -116,7 +131,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
           </View>
         )}
         <View style={{ marginTop: 16, marginBottom: BOTTOM_TAB_HEIGHT + 24 }}>
-          <Headline style={{ marginBottom: 8 }}>Location</Headline>
+          <Headline style={[styles.textColor, { marginBottom: 8 }]}>Location</Headline>
           <TouchableOpacity
             style={{
               borderRadius: 12,
@@ -207,7 +222,7 @@ const styles = StyleSheet.create({
     borderRadius: 20
   },
   iconSection: {
-    backgroundColor: "#0000000D",
+    backgroundColor: "#F4F4F6",
     borderRadius: 8,
     paddingVertical: 16
   },
@@ -215,7 +230,8 @@ const styles = StyleSheet.create({
     marginVertical: 16,
     width: "80%",
     height: 1,
-    alignSelf: "flex-end"
+    alignSelf: "flex-end",
+    color: "#0000001A"
   },
   bottomTab: {
     flexDirection: "row",
@@ -235,5 +251,8 @@ const styles = StyleSheet.create({
     width: '90%',
     backgroundColor: ButtonStyles.darkColor,
     alignItems: "flex-start"
+  },
+  textColor: {
+    color: ButtonStyles.darkColor
   }
 })

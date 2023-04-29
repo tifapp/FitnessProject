@@ -1,6 +1,7 @@
 import { BodyText, Headline } from "@components/Text"
+import { ButtonStyles } from "@lib/ButtonStyle"
 import React, {useEffect, useRef, useState } from "react"
-import { Animated, TextProps, View } from "react-native"
+import { Animated, Button, TextProps, View } from "react-native"
 
 export type ExpandableTextProps = {
   props: TextProps
@@ -65,6 +66,7 @@ const ExpandableText = ({
             numberOfLines={expanded ? 0 : linesToDisplay}
             ellipsizeMode="tail"
             onTextLayout={onTextLayout}
+            style={{color: ButtonStyles.darkColor}}
           >
             {text}
           </BodyText>

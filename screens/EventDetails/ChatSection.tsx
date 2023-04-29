@@ -1,8 +1,9 @@
 import React from "react"
 import { StyleSheet, TouchableOpacity, View } from "react-native"
-import { Ionicons } from "@expo/vector-icons"
 import { Headline, Caption } from "@components/Text"
 import { EventUserAttendeeStatus, isAttendingEvent } from "@lib/events"
+import { ButtonStyles } from "@lib/ButtonStyle"
+import { Ionicon } from "@components/common/Icons"
 
 interface ChatSectionProps {
   color: string
@@ -13,15 +14,14 @@ const ChatSection = ({ color, userAttendeeStatus }: ChatSectionProps) => {
   return (
     <TouchableOpacity style={[styles.flexRow, styles.paddingIconSection]}>
       <View style={{ justifyContent: "center" }}>
-        <Ionicons
+        <Ionicon
           style={[styles.iconStyling, { backgroundColor: color }]}
           name="chatbox-ellipses"
           color={"white"}
-          size={24}
         />
       </View>
       <View style={styles.spacing}>
-        <Headline>Event Chat</Headline>
+        <Headline style={styles.textColor}>Event Chat</Headline>
         {isAttendingEvent(userAttendeeStatus)
           ? (
             <Caption>View the chat</Caption>
@@ -31,10 +31,10 @@ const ChatSection = ({ color, userAttendeeStatus }: ChatSectionProps) => {
           )}
       </View>
       <View style={[styles.flexRow, { flex: 1, justifyContent: "flex-end" }]}>
-        <Ionicons
+        <Ionicon
           name="chevron-forward"
-          size={20}
-          style={{ alignSelf: "center", opacity: 0.3 }}
+          style={{ alignSelf: "center"}}
+          color={ButtonStyles.colorOpacity35}
         />
       </View>
     </TouchableOpacity>
@@ -56,5 +56,8 @@ const styles = StyleSheet.create({
   },
   spacing: {
     paddingHorizontal: 16
+  },
+  textColor: {
+    color: ButtonStyles.darkColor
   }
 })

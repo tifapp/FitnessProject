@@ -36,7 +36,7 @@ export const OutlinedButton = ({ title, buttonProps }: ButtonProps) => {
         buttonProps.style,
         styles.container,
         styles.lightStyle,
-        { borderColor: ButtonStyles.darkColor + ButtonStyles.opacity }
+        { borderColor: ButtonStyles.colorOpacity15 }
       ]}
     >
       <Headline style={{ color: ButtonStyles.darkColor }}>{title}</Headline>

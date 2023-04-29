@@ -1,7 +1,8 @@
 import React from "react"
 import { StyleSheet, TouchableOpacity, View } from "react-native"
-import { Ionicons } from "@expo/vector-icons"
 import { Headline, Caption } from "@components/Text"
+import { ButtonStyles } from "@lib/ButtonStyle"
+import { Ionicon } from "@components/common/Icons"
 
 interface AttendeeSectionProps {
   color: string
@@ -12,22 +13,21 @@ const AttendeeSection = ({ color, attendeeCount }: AttendeeSectionProps) => {
   return (
     <TouchableOpacity style={[styles.flexRow, styles.paddingIconSection]}>
       <View style={{ justifyContent: "center" }}>
-        <Ionicons
+        <Ionicon 
           style={[styles.iconStyling, { backgroundColor: color }]}
           name="people"
           color={"white"}
-          size={24}
         />
       </View>
       <View style={styles.spacing}>
-        <Headline>{`${attendeeCount} Attending`}</Headline>
+        <Headline style={styles.textColor}>{`${attendeeCount} Attending`}</Headline>
         <Caption>View all attendees</Caption>
       </View>
       <View style={[styles.flexRow, { flex: 1, justifyContent: "flex-end" }]}>
-        <Ionicons
+        <Ionicon
           name="chevron-forward"
-          size={20}
-          style={{ alignSelf: "center", opacity: 0.3 }}
+          style={{ alignSelf: "center"}}
+          color={ButtonStyles.colorOpacity35}
         />
       </View>
     </TouchableOpacity>
@@ -49,5 +49,8 @@ const styles = StyleSheet.create({
   },
   spacing: {
     paddingHorizontal: 16
+  },
+  textColor: {
+    color: ButtonStyles.darkColor
   }
 })

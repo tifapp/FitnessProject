@@ -1,8 +1,7 @@
 import React from "react"
 import { StyleSheet, TouchableOpacity, View } from "react-native"
-import { Ionicons } from "@expo/vector-icons"
 import * as Clipboard from "expo-clipboard"
-import { Headline, Caption } from "@components/Text"
+import { Headline, Caption, CaptionTitle } from "@components/Text"
 import {
   LocationCoordinate2D,
   Placemark,
@@ -10,7 +9,8 @@ import {
 } from "@lib/location"
 import { useTrackUserLocation } from "@hooks/UserLocation"
 import { EventMapDetails, withDirections } from "@lib/ExternalMap"
-import { showToast } from "@lib/ButtonStyle"
+import { ButtonStyles, showToast } from "@lib/ButtonStyle"
+import { Ionicon } from "@components/common/Icons"
 
 interface LocationSectionProps {
   color: string
@@ -57,18 +57,17 @@ const LocationSection = ({
   return (
     <View style={[styles.flexRow, styles.paddingIconSection]}>
       <View style={{ justifyContent: "center" }}>
-        <Ionicons
+        <Ionicon 
           style={[styles.iconStyling, { backgroundColor: color }]}
           name="location"
           color={"white"}
-          size={24}
         />
       </View>
       {placemark
         ? (
           <View style={styles.spacing}>
             <View style={{ marginBottom: 4 }}>
-              <Headline>{placemark.name}</Headline>
+              <Headline style={styles.textColor}>{placemark.name}</Headline>
               <View style={styles.flexRow}>
                 {placemark.streetNumber && (
                   <Caption>{`${placemark.streetNumber} `}</Caption>
@@ -80,17 +79,17 @@ const LocationSection = ({
             </View>
             <View style={styles.flexRow}>
               <TouchableOpacity onPress={copyToClipboard} hitSlop={hitSlopInset}>
-                <Caption
+                <CaptionTitle
                   style={[{ color, marginRight: 16 }, styles.captionLinks]}
                   
                 >
                 Copy Address
-                </Caption>
+                </CaptionTitle>
               </TouchableOpacity>
               <TouchableOpacity onPress={openMapWithDirections} hitSlop={hitSlopInset}>
-                <Caption style={[{ color }, styles.captionLinks]}>
+                <CaptionTitle style={[{ color }, styles.captionLinks]}>
                 Directions
-                </Caption>
+                </CaptionTitle>
               </TouchableOpacity>
             </View>
           </View>
@@ -105,16 +104,16 @@ const LocationSection = ({
             </View>
             <View style={styles.flexRow}>
               <TouchableOpacity onPress={copyToClipboard} hitSlop={hitSlopInset}>
-                <Caption
+                <CaptionTitle
                   style={[{ color, marginRight: 16 }, styles.captionLinks]}
                 >
                 Copy Coordinates
-                </Caption>
+                </CaptionTitle>
               </TouchableOpacity>
               <TouchableOpacity onPress={openMapWithDirections} hitSlop={hitSlopInset}>
-                <Caption style={[{ color }, styles.captionLinks]}>
+                <CaptionTitle style={[{ color }, styles.captionLinks]}>
                 Directions
-                </Caption>
+                </CaptionTitle>
               </TouchableOpacity>
             </View>
           </View>
@@ -142,5 +141,8 @@ const styles = StyleSheet.create({
   captionLinks: {
     opacity: 1,
     fontWeight: "bold"
+  },
+  textColor: {
+    color: ButtonStyles.darkColor
   }
 })

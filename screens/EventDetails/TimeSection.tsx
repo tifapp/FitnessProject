@@ -1,11 +1,11 @@
 import React, { useState } from "react"
 import { StyleSheet, TouchableOpacity, View } from "react-native"
-import { Ionicons } from "@expo/vector-icons"
-import { Headline, Caption } from "@components/Text"
+import * as Calendar from 'expo-calendar';
+import { Headline, Caption, CaptionTitle } from "@components/Text"
 import { dayjs, now } from "@lib/date"
 import { CalendarEvent, addToCalendar, getCalendar } from "@lib/Calendar"
-import * as Calendar from 'expo-calendar';
-import { showToast } from "@lib/ButtonStyle"
+import { ButtonStyles, showToast } from "@lib/ButtonStyle"
+import { Ionicon } from "@components/common/Icons"
 
 interface TimeSectionProps {
   color: string
@@ -51,18 +51,17 @@ const TimeSection = ({ color, event }: TimeSectionProps) => {
   return (
     <View style={[styles.flexRow, styles.paddingIconSection]}>
       <View style={{ justifyContent: "center" }}>
-        <Ionicons
+        <Ionicon 
           style={[styles.iconStyling, { backgroundColor: color }]}
           name="calendar"
           color={"white"}
-          size={24}
         />
       </View>
       <View style={styles.spacing}>
         {event.duration.endSameDay()
           ? (
             <View style={{ marginBottom: 4 }}>
-              <Headline>{`${startDateFormat}`}</Headline>
+              <Headline style={styles.textColor}>{`${startDateFormat}`}</Headline>
               <Caption>{`from ${startTimeFormat} - ${endTimeFormat}`}</Caption>
             </View>
           )
@@ -74,9 +73,9 @@ const TimeSection = ({ color, event }: TimeSectionProps) => {
           )}
         {!addedEvent && (
           <TouchableOpacity onPress={addEventToCalendar} hitSlop={hitSlopInset}>
-            <Caption style={[{ color }, styles.captionLinks]}>
+            <CaptionTitle style={[{ color }, styles.captionLinks]}>
               Add to Calendar
-            </Caption>
+            </CaptionTitle>
           </TouchableOpacity>
         )}
       </View>
@@ -103,5 +102,8 @@ const styles = StyleSheet.create({
   captionLinks: {
     opacity: 1,
     fontWeight: "bold"
+  },
+  textColor: {
+    color: ButtonStyles.darkColor
   }
 })

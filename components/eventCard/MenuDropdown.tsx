@@ -8,6 +8,8 @@ import {
 } from "react-native-popup-menu"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { Ionicons } from "@expo/vector-icons"
+import { Ionicon } from "@components/common/Icons"
+import { ButtonStyles } from "@lib/ButtonStyle"
 
 interface Props {
   isEventHost: boolean
@@ -51,7 +53,7 @@ const MenuDropdown = ({ isEventHost }: Props) => {
           TriggerTouchableComponent: TouchableOpacity
         }}
       >
-        <Ionicons size={24} name="ellipsis-horizontal" />
+        <Ionicon color={ButtonStyles.darkColor} name="ellipsis-horizontal"/>
       </MenuTrigger>
       {/* Need to use Text in order for tests to find the element
                 Also need to move the onSelect functions to child in order to test functionality
