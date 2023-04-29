@@ -55,6 +55,10 @@
       { "selector": "interface", "format": ["PascalCase"] }
     ]
   },
+  "globals": {
+    "RequestInfo": "readonly",
+    "RequestInit": "readonly"
+  },
   "overrides": [
     {
       "files": ["*.test.js", "*.test.ts", "*.test.tsx"],
