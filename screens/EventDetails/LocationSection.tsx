@@ -2,7 +2,6 @@ import React from "react"
 import { StyleSheet, TouchableOpacity, View } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import * as Clipboard from "expo-clipboard"
-import Toast from "react-native-root-toast"
 import { Headline, Caption } from "@components/Text"
 import {
   LocationCoordinate2D,
@@ -11,17 +10,20 @@ import {
 } from "@lib/location"
 import { useTrackUserLocation } from "@hooks/UserLocation"
 import { EventMapDetails, withDirections } from "@lib/ExternalMap"
+import { showToast } from "@lib/ButtonStyle"
 
 interface LocationSectionProps {
   color: string
   placemark?: Placemark
-  coordinates: LocationCoordinate2D
+  coordinates: LocationCoordinate2D,
+  bottomTabHeight: number
 }
 
 const LocationSection = ({
   color,
   placemark,
-  coordinates
+  coordinates,
+  bottomTabHeight
 }: LocationSectionProps) => {
   const userLocation = useTrackUserLocation("precise")
   
@@ -49,15 +51,7 @@ const LocationSection = ({
         `${coordinates.latitude}, ${coordinates.longitude}`
       )
     }
-
-    Toast.show("Copied to Clipboard", {
-      duration: Toast.durations.SHORT,
-      position: Toast.positions.BOTTOM,
-      shadow: true,
-      animation: true,
-      hideOnPress: true,
-      delay: 0
-    })
+    showToast("Copied to Clipboard", bottomTabHeight)
   }
 
   return (

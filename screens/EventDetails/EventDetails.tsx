@@ -2,7 +2,7 @@ import { CurrentUserEvent, isAttendingEvent } from "@lib/events"
 import React, { useState } from "react"
 import { Ionicons } from "@expo/vector-icons"
 import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
-import { Caption, Headline, Title } from "@components/Text"
+import { BodyText, Caption, Headline, Title } from "@components/Text"
 import ExpandableText from "@screens/EventDetails/ExpandableText"
 import { Divider } from "react-native-elements"
 import EventMapSnippet from "./EventMapSnippet"
@@ -13,6 +13,8 @@ import ChatSection from "./ChatSection"
 import { OutlinedButton, PrimaryButton } from "@components/common/Buttons"
 import { CalendarEvent } from "@lib/Calendar"
 import { EventMapDetails, openMap} from "@lib/ExternalMap"
+import Toast from "react-native-root-toast"
+import { ButtonStyles } from "@lib/ButtonStyle"
 
 export type EventDetailsProps = {
   event: CurrentUserEvent
@@ -29,14 +31,17 @@ const EventDetails = ({ event }: EventDetailsProps) => {
     id: event.id,
     description: event.description!,
     coordinates: event.coordinates,
-    title: event.title
+    title: event.title,
+    bottomTabHeight: BOTTOM_TAB_HEIGHT
   }
   const mapDetails: EventMapDetails = {
     coordinates: event.coordinates,
     placemark: event.placemark
   }
 
-  //console.log(userLocation)
+  const sendFriendRequest = () => {
+    setRequestSent(true)
+  }
 
   const openMapWithoutDirections = () => {
     openMap(mapDetails)
@@ -58,14 +63,14 @@ const EventDetails = ({ event }: EventDetailsProps) => {
           <View style={{ flex: 1 }}>
             <View style={styles.flexRow}>
               <Headline>{event.host.username}</Headline>
-              {!isFriend && (
+              {!requestSent && (
                 <View style={[styles.flexRow, { alignItems: "center" }]}>
                   <Ionicons
                     style={{ marginHorizontal: 4 }}
                     size={6}
                     name="ellipse"
                   />
-                  <Headline style={{ color: event.color }}>Add Friend</Headline>
+                  <Headline onPress={sendFriendRequest} style={{ color: event.color }}>Add Friend</Headline>
                 </View>
               )}
             </View>
@@ -82,6 +87,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
             color={event.color}
             coordinates={event.coordinates}
             placemark={event.placemark}
+            bottomTabHeight={BOTTOM_TAB_HEIGHT}
           />
 
           <Divider style={styles.divider} />
@@ -159,6 +165,24 @@ const EventDetails = ({ event }: EventDetailsProps) => {
             />
           )}
       </View>
+      <Toast
+        visible={requestSent}
+        opacity={1}
+        position={Toast.positions.BOTTOM - BOTTOM_TAB_HEIGHT}
+        shadow={false}
+        animation={true}
+        hideOnPress={true}
+        containerStyle={styles.toastStyle}
+      >
+        <View style={styles.flexRow}>
+          <View style={{marginRight: 16}}>
+            <Ionicons style={{color: "white"}} name="close" size={24}/>
+          </View>
+          <BodyText style={{color: "white", textAlignVertical: "center"}}>
+            {"Friend request sent"}
+          </BodyText>
+        </View>
+      </Toast>
     </View>
   )
 }
@@ -205,6 +229,11 @@ const styles = StyleSheet.create({
   buttonStyle: {
     flex: 1,
     marginHorizontal: 16
-    // marginBottom: 8
+  },
+  toastStyle: {
+    borderRadius: 12,
+    width: '90%',
+    backgroundColor: ButtonStyles.darkColor,
+    alignItems: "flex-start"
   }
 })

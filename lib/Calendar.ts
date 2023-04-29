@@ -2,7 +2,7 @@ import { FixedDateRange } from '@lib/date';
 import { LocationCoordinate2D, Placemark, placemarkToFormattedAddress } from '@lib/location';
 import * as Calendar from 'expo-calendar';
 import { Platform } from 'react-native';
-import Toast from 'react-native-root-toast';
+import { showToast } from './ButtonStyle';
 
 export type CalendarEvent = {
   duration: FixedDateRange,
@@ -10,7 +10,8 @@ export type CalendarEvent = {
   description: string,
   placemark?: Placemark,
   coordinates: LocationCoordinate2D,
-  title: string
+  title: string,
+  bottomTabHeight: number
 }
 
 const getPrimaryCalendar = (calendars: Calendar.Calendar[]) => {
@@ -48,44 +49,12 @@ export const addToCalendar = async (calendarId: string, event: CalendarEvent, se
   }
   
   await Calendar.createEventAsync(calendarId, calendarEvent)
-    .then((eventId) => {
+    .then(() => {
       setAddSuccessful(true)
-
-      Toast.show("Event added to Calendar", {
-        duration: Toast.durations.SHORT,
-        position: Toast.positions.BOTTOM,
-        shadow: true,
-        animation: true,
-        hideOnPress: true,
-        delay: 100
-      })
-  }).catch((error) => {
-    addNotSuccessful(error)
-  })
-/*
-  if (eventId) {
-    setAddSuccessful(true)
-
-    Toast.show("Event added to Calendar", {
-      duration: Toast.durations.SHORT,
-      position: Toast.positions.BOTTOM,
-      shadow: true,
-      animation: true,
-      hideOnPress: true,
-      delay: 100
+      showToast("Event added to Calendar", event.bottomTabHeight)
+      
+    }).catch(() => {
+      setAddSuccessful(false)
+      showToast("Unable to add Event", event.bottomTabHeight)
     })
-  } else {
-    addNotSuccessful()
-  }*/
-}
-
-export const addNotSuccessful = (errorMessage: string) => {
-  Toast.show(errorMessage, {
-    duration: Toast.durations.SHORT,
-    position: Toast.positions.BOTTOM,
-    shadow: true,
-    animation: true,
-    hideOnPress: true,
-    delay: 100
-  })
 }

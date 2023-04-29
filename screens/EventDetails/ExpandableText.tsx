@@ -1,12 +1,14 @@
 import { BodyText, Headline } from "@components/Text"
-import React, { useCallback, useEffect, useRef, useState } from "react"
-import { Animated, Easing, TextProps, View } from "react-native"
+import React, {useEffect, useRef, useState } from "react"
+import { Animated, TextProps, View } from "react-native"
 
 export type ExpandableTextProps = {
   props: TextProps
   text: string
   linesToDisplay: number
 }
+
+const TEXT_HEIGHT = 22
 
 const ExpandableText = ({
   props,
@@ -16,7 +18,7 @@ const ExpandableText = ({
   const [expander, setExpander] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const [lineNumber, setLineNumber] = useState(linesToDisplay)
-  const [lineHeight, setLineHeight] = useState(22)
+  const [lineHeight, setLineHeight] = useState(TEXT_HEIGHT)
   const startingHeight = lineHeight * linesToDisplay
   const [fullHeight, setFullHeight] = useState(startingHeight)
   const animatedHeight = useRef(new Animated.Value(startingHeight)).current
@@ -38,7 +40,7 @@ const ExpandableText = ({
       animatedHeight.setValue(lineHeight * lineNumber)
       setExpander(false)
     }
-  }, [animatedHeight, text, lineNumber])
+  }, [lineNumber])
 
   const onLayout = (e: { nativeEvent: { layout: { height: any } } }) => {
     let { height } = e.nativeEvent.layout

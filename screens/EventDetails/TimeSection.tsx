@@ -3,8 +3,9 @@ import { StyleSheet, TouchableOpacity, View } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { Headline, Caption } from "@components/Text"
 import { dayjs, now } from "@lib/date"
-import { CalendarEvent, addNotSuccessful, addToCalendar, getCalendar } from "@lib/Calendar"
+import { CalendarEvent, addToCalendar, getCalendar } from "@lib/Calendar"
 import * as Calendar from 'expo-calendar';
+import { showToast } from "@lib/ButtonStyle"
 
 interface TimeSectionProps {
   color: string
@@ -42,7 +43,7 @@ const TimeSection = ({ color, event }: TimeSectionProps) => {
           await addToCalendar(calendar.id, event, setAddedEvent)
         }
       }).catch((error) => {
-        addNotSuccessful(error)
+       showToast("Unable to add Event without Permissions", event.bottomTabHeight)
       })
     }
   }
