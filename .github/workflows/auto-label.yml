@@ -1,26 +1,22 @@
-name: Auto label PRs with review count
+name: Auto label PRs with review count and merge conflicts
 on:
   pull_request_review:
     types: [submitted]
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, converted_to_draft, synchronize, ready_for_review]
 jobs:
-  auto-label:
+  handle_merge_conflict_label:
     runs-on: ubuntu-latest
     steps:
-      - name: Check if PR has reviews
-        id: check_reviews
+      - name: Get PR properties
+        id: check_conflicts
         uses: octokit/request-action@v2.x
         with:
-          route: GET /repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews
+          route: GET /repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Count reviews
-        id: count_reviews
-        if: steps.check_reviews.outputs.data != ''
-        run: echo "review_count=$(echo "${{ steps.check_reviews.outputs.data }}" | jq -r '. | length')" >> $GITHUB_ENV
       - name: Add "merge conflict" label
-        if: steps.check-conflicts.outputs.data.mergeable == false
+        if: steps.check_conflicts.outputs.data.mergeable_state == 'dirty'
         uses: actions/github-script@v4.1.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -32,18 +28,54 @@ jobs:
               labels: ['merge conflict']
             };
             await github.issues.addLabels(payload);
-      - name: Label PR with review count
-        if: steps.check_reviews.outputs.data != ''
+
+  handle_review_count_label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if PR has reviews
+        id: check_reviews
+        uses: octokit/request-action@v2.x
+        with:
+          route: GET /repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update review count label
         uses: actions/github-script@v4.1.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const reviewCount = process.env.review_count;
-            const labelName = `reviews (${reviewCount})`;
-            const payload = {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.payload.pull_request.number,
-              labels: [labelName]
-            };
-            await github.issues.addLabels(payload);
+            const issue_number = context.payload.pull_request.number;
+
+            async function updateReviewCountLabel(labelName) {
+              const { data: currentLabels } = await github.issues.listLabelsOnIssue({ owner: context.repo.owner, repo: context.repo.repo, issue_number });
+              const reviewLabelPattern = /^reviews \(\d+\)$/;
+              const reviewLabels = currentLabels.filter(label => reviewLabelPattern.test(label.name));
+
+              for (const label of reviewLabels) {
+                await github.issues.removeLabel({ owner: context.repo.owner, repo: context.repo.repo, issue_number, name: label.name });
+              }
+
+              if (labelName) {
+                await github.issues.addLabels({ owner: context.repo.owner, repo: context.repo.repo, issue_number, labels: [labelName] });
+              }
+            }
+
+            const reviewData = process.env.REVIEW_DATA;
+            const uniqueReviewers = reviewData ? new Set(JSON.parse(reviewData).map(review => review.user.id)) : new Set();
+            const uniqueReviewerCount = uniqueReviewers.size;
+            const labelName = `reviews (${uniqueReviewerCount})`;
+
+            if (context.eventName === 'pull_request') {
+              if (context.payload.action === 'opened' || context.payload.action === 'ready_for_review') {
+                await updateReviewCountLabel(labelName);
+              } else if (context.payload.action === 'converted_to_draft') {
+                await updateReviewCountLabel(null);
+              } else if (context.payload.action === 'synchronize') {
+                await updateReviewCountLabel('reviews (0)');
+              }
+            } else if (context.eventName === 'pull_request_review') {
+              await updateReviewCountLabel(labelName);
+            }
+        env:
+          REVIEW_DATA: ${{ steps.check_reviews.outputs.data }}

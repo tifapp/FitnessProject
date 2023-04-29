@@ -7,6 +7,7 @@ import {
 import { z } from "zod"
 import { mockPlacemark, PlacemarkSchema } from "./Placemark"
 import { faker } from "@faker-js/faker"
+import geohash from "ngeohash"
 
 /**
  * A zod schema for {@link LocationCoordinate2D}.
@@ -125,4 +126,11 @@ export const milesBetweenLocations = (
 
   const meters = 2 * EARTH_RADIUS_METERS * Math.asin(Math.sqrt(trigCombo))
   return meters / METERS_PER_MILE
+}
+
+/**
+ * Produces a geohash of a location coordinate.
+ */
+export const hashLocationCoordinate = (coordinate: LocationCoordinate2D) => {
+  return geohash.encode(coordinate.latitude, coordinate.longitude)
 }
