@@ -24,7 +24,28 @@ const config = {
     bundleIdentifier: "com.tifapp.FitnessApp",
     infoPlist: {
       NSLocationAlwaysAndWhenInUseUsageDescription: "REASON_FOR_REQUEST",
-      UIBackgroundModes: ["location", "fetch"]
+      UIBackgroundModes: ["location", "fetch"],
+      LSApplicationQueriesSchemes: [
+        "comgooglemaps",
+        "citymapper",
+        "uber",
+        "lyft",
+        "transit",
+        "truckmap",
+        "waze",
+        "yandexnavi",
+        "moovit",
+        "yandextaxi",
+        "yandexmaps",
+        "kakaomap",
+        "szn-mapy",
+        "mapsme",
+        "osmandmaps",
+        "gett",
+        "nmap",
+        "dgis",
+        "lftgpas"
+      ]
     }
   },
   web: {
@@ -36,7 +57,11 @@ const config = {
         apiKey: MAPS_API
       }
     },
-    permissions: ["ACCESS_BACKGROUND_LOCATION"],
+    permissions: [
+      "ACCESS_BACKGROUND_LOCATION",
+      "READ_CALENDAR",
+      "WRITE_CALENDAR"
+    ],
     package: "com.tifapp.FitnessApp",
     useNextNotificationsApi: true,
     googleServicesFile: "./google-services.json"

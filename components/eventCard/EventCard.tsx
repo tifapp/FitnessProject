@@ -4,6 +4,10 @@ import { CurrentUserEvent, isHostingEvent } from "@lib/events/Event"
 import { placemarkToAbbreviatedAddress } from "@lib/location"
 import { Ionicons } from "@expo/vector-icons"
 import MenuDropdown from "./MenuDropdown"
+import { dayjs, now } from "@lib/date"
+import { Ionicon } from "@components/common/Icons"
+import { Headline } from "@components/Text"
+import { ButtonStyles } from "@lib/ButtonStyle"
 
 export type EventCardProps = {
   event: CurrentUserEvent
@@ -12,9 +16,10 @@ export type EventCardProps = {
 export const EventCard = ({ event }: EventCardProps) => {
   const hexAlpha = "4D"
   const lightEventColor = event.color + hexAlpha
+  const formattedStartDate = event.dateRange.formattedDate(now(), dayjs(event.dateRange.startDate))
 
   return (
-    <View style={[styles.container, {backgroundColor: "#0000000D"}]}>
+    <View style={[styles.container, { backgroundColor: "#F4F4F6" }]}>
       <View style={[styles.topRow, styles.flexRow]}>
         <Image
           style={[styles.image, styles.iconMargin]}
@@ -22,7 +27,9 @@ export const EventCard = ({ event }: EventCardProps) => {
           accessibilityLabel="profile picture"
         />
         <View>
-          <Text style={styles.name}>{event.host.username}</Text>
+          <Text style={[styles.text14px, {fontFamily: "OpenSansBold"}]}>
+            {event.host.username}
+          </Text>
         </View>
         <View style={styles.moreButtonStyle}>
           <MenuDropdown
@@ -31,12 +38,12 @@ export const EventCard = ({ event }: EventCardProps) => {
         </View>
       </View>
       <View style={styles.middleRow}>
-        <Text style={[styles.titleText, styles.bottomSpacing]}>
+        <Headline style={[styles.textColor, styles.bottomSpacing]}>
           {event.title}
-        </Text>
+        </Headline>
 
         <Text
-          style={[styles.bottomSpacing, styles.description]}
+          style={[styles.bottomSpacing, styles.text14px]}
           numberOfLines={3}
         >
           {event.description}
@@ -46,15 +53,14 @@ export const EventCard = ({ event }: EventCardProps) => {
           <View
             style={[styles.iconContainer, { backgroundColor: lightEventColor }]}
           >
-            <Ionicons
+            <Ionicon
               name="calendar-outline"
-              size={24}
               color={event.color}
               style={styles.icon}
             />
           </View>
           <Text style={styles.infoText} accessibilityLabel="day">
-            {event.dateRange.formattedStartDate()}
+            {formattedStartDate}
           </Text>
           <View style={styles.dotIcon}>
             <Ionicons name="md-ellipse" size={5} color="grey" />
@@ -68,10 +74,9 @@ export const EventCard = ({ event }: EventCardProps) => {
           <View
             style={[styles.iconContainer, { backgroundColor: lightEventColor }]}
           >
-            <Ionicons
+            <Ionicon
               name="location-outline"
               color={event.color}
-              size={24}
               style={styles.icon}
             />
           </View>
@@ -106,12 +111,7 @@ const styles = StyleSheet.create({
     textAlignVertical: "center",
     fontSize: 14,
     fontFamily: "OpenSans",
-    color: "grey"
-  },
-  titleText: {
-    textAlignVertical: "center",
-    fontFamily: "OpenSansBold",
-    fontSize: 16
+    color: ButtonStyles.colorOpacity50
   },
   name: {
     textAlignVertical: "center",
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     borderColor: "rgba(145, 145, 145, 0.1)"
   },
   iconMargin: {
-    marginRight: 8
+    marginRight: 16
   },
   moreButtonStyle: {
     flex: 1,
@@ -149,10 +149,19 @@ const styles = StyleSheet.create({
     marginHorizontal: 8
   },
   iconContainer: {
-    borderRadius: 14,
-    marginRight: 16
+    justifyContent: "center",
+    borderRadius: 12,
+    marginRight: 8
   },
   icon: {
-    margin: 2
+    padding: 4
+  },
+  textColor: {
+    color: ButtonStyles.darkColor
+  },
+  text14px: {
+    fontSize: 14,
+    fontFamily: "OpenSans",
+    color: ButtonStyles.darkColor
   }
 })
