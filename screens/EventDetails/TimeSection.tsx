@@ -1,9 +1,9 @@
-import React from "react"
+import React, { useState } from "react"
 import { StyleSheet, TouchableOpacity, View } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { Headline, Caption } from "@components/Text"
 import { dayjs, now } from "@lib/date"
-import { CalendarEvent, addToCalendar, getCalendar } from "@lib/Calendar"
+import { CalendarEvent, addNotSuccessful, addToCalendar, getCalendar } from "@lib/Calendar"
 import * as Calendar from 'expo-calendar';
 
 interface TimeSectionProps {
@@ -13,6 +13,7 @@ interface TimeSectionProps {
 
 const TimeSection = ({ color, event }: TimeSectionProps) => {
   const [status, requestPermission] = Calendar.useCalendarPermissions();
+  const [addedEvent, setAddedEvent] = useState(false)
   const startDateFormat = event.duration.formattedDate(
     now(),
     dayjs(event.duration.startDate)
@@ -32,14 +33,16 @@ const TimeSection = ({ color, event }: TimeSectionProps) => {
 
     if (status?.granted) {
       calendar = await getCalendar()
-      await addToCalendar(calendar.id, event)
+      await addToCalendar(calendar.id, event, setAddedEvent)
 
     } else {
       await requestPermission().then(async (status) => {
         if (status?.granted) {
           calendar = await getCalendar()
-          await addToCalendar(calendar.id, event)
+          await addToCalendar(calendar.id, event, setAddedEvent)
         }
+      }).catch((error) => {
+        addNotSuccessful(error)
       })
     }
   }
@@ -68,11 +71,13 @@ const TimeSection = ({ color, event }: TimeSectionProps) => {
               <Caption>{`to ${endDateFormat}, ${endTimeFormat}`}</Caption>
             </View>
           )}
-        <TouchableOpacity onPress={addEventToCalendar} hitSlop={hitSlopInset}>
-          <Caption style={[{ color }, styles.captionLinks]}>
-            Add to Calendar
-          </Caption>
-        </TouchableOpacity>
+        {!addedEvent && (
+          <TouchableOpacity onPress={addEventToCalendar} hitSlop={hitSlopInset}>
+            <Caption style={[{ color }, styles.captionLinks]}>
+              Add to Calendar
+            </Caption>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   )

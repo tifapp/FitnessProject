@@ -14,14 +14,12 @@ export type CalendarEvent = {
 }
 
 const getPrimaryCalendar = (calendars: Calendar.Calendar[]) => {
-  //console.log(calendars)
   let primary = calendars.filter(cal => cal.isPrimary)
 
-  //console.log(primary)
   if (primary.length === 0) {
     primary = calendars.filter(cal => cal.accessLevel === Calendar.CalendarAccessLevel.OWNER)
   }
-  //console.log(primary)
+
   return primary[0]
 }
 
@@ -35,9 +33,9 @@ export const getCalendar = async (): Promise<Calendar.Calendar> => {
   return primaryCalendar
 }
 
-export const addToCalendar = async (calendarId: string, event: CalendarEvent) => {
+export const addToCalendar = async (calendarId: string, event: CalendarEvent, setAddSuccessful: React.Dispatch<React.SetStateAction<boolean>>) => {
 	const location = event.placemark ? placemarkToFormattedAddress(event.placemark)! : `${event.coordinates.latitude}, ${event.coordinates.longitude}`
-  const description = event.description ? event.description : ''
+  const description = event.description ? event.description : 'No description was provided'
 
   const calendarEvent: Partial<Calendar.Event> = {
     id: event.id,
@@ -46,12 +44,28 @@ export const addToCalendar = async (calendarId: string, event: CalendarEvent) =>
     endDate: event.duration.endDate,
     location: location,
     notes: description,
-    title: event.title
+    title: `${event.title} - tiF Event`
   }
   
-  const eventId = await Calendar.createEventAsync(calendarId, calendarEvent)
+  await Calendar.createEventAsync(calendarId, calendarEvent)
+    .then((eventId) => {
+      setAddSuccessful(true)
 
+      Toast.show("Event added to Calendar", {
+        duration: Toast.durations.SHORT,
+        position: Toast.positions.BOTTOM,
+        shadow: true,
+        animation: true,
+        hideOnPress: true,
+        delay: 100
+      })
+  }).catch((error) => {
+    addNotSuccessful(error)
+  })
+/*
   if (eventId) {
+    setAddSuccessful(true)
+
     Toast.show("Event added to Calendar", {
       duration: Toast.durations.SHORT,
       position: Toast.positions.BOTTOM,
@@ -60,9 +74,18 @@ export const addToCalendar = async (calendarId: string, event: CalendarEvent) =>
       hideOnPress: true,
       delay: 100
     })
-  }
-  /*
-  if (Platform.OS === "android") {
-    Calendar.openEventInCalendar(eventId)
+  } else {
+    addNotSuccessful()
   }*/
+}
+
+export const addNotSuccessful = (errorMessage: string) => {
+  Toast.show(errorMessage, {
+    duration: Toast.durations.SHORT,
+    position: Toast.positions.BOTTOM,
+    shadow: true,
+    animation: true,
+    hideOnPress: true,
+    delay: 100
+  })
 }

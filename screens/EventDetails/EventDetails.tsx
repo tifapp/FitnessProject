@@ -1,5 +1,5 @@
 import { CurrentUserEvent, isAttendingEvent } from "@lib/events"
-import React from "react"
+import React, { useState } from "react"
 import { Ionicons } from "@expo/vector-icons"
 import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
 import { Caption, Headline, Title } from "@components/Text"
@@ -23,6 +23,7 @@ const BOTTOM_TAB_HEIGHT = 80
 
 const EventDetails = ({ event }: EventDetailsProps) => {
   const isFriend = false
+  const [requestSent, setRequestSent] = useState(isFriend)
   const calenderEvent: CalendarEvent = {
     duration: event.dateRange,
     id: event.id,

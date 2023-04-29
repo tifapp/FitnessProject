@@ -1,6 +1,11 @@
 import { showLocation } from "react-native-map-link"
 import * as Location from "expo-location"
-import { LocationCoordinate2D, Placemark, UserLocationTrackingUpdate, placemarkToFormattedAddress } from "./location"
+import {
+  LocationCoordinate2D,
+  Placemark,
+  UserLocationTrackingUpdate,
+  placemarkToFormattedAddress
+} from "./location"
 
 
 export type EventMapDetails = {
@@ -25,7 +30,8 @@ export const openMap = (details: EventMapDetails) => {
   showLocation(mapOptions(details))
 }
 
-export const withDirections = async (userLocation: UserLocationTrackingUpdate | undefined, details: EventMapDetails) => {
+export const withDirections = 
+  async (userLocation: UserLocationTrackingUpdate | undefined, details: EventMapDetails) => {
   const options = mapOptions(details)
   const userCoordinates =
     userLocation && userLocation.status === "success"
