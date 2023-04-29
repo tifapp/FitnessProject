@@ -17,6 +17,8 @@ import {
   View
 } from "react-native"
 import { Icon } from "react-native-elements"
+import EventDetails from "./EventDetails/EventDetails"
+import { EventMocks } from "@lib/events"
 
 const MARKER_SIZE = 60
 
@@ -109,7 +111,6 @@ const ActivitiesScreen = () => {
 
       <EventsList />
       <EventTabBar />
-    </>
   )
 }
 

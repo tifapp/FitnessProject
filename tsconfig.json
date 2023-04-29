@@ -19,6 +19,7 @@
     "paths": {
       "@screens/*": ["./screens/*"],
       "@components/*": ["./components/*"],
+      "@api-client/*": ["./api-client/*"],
       "@stacks/*": ["./stacks/*"],
       "@hooks/*": ["./hooks/*"],
       "@assets/*": ["./assets/*"],

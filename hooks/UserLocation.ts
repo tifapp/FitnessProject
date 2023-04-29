@@ -6,6 +6,10 @@ import {
   UserLocationTrackingUpdate,
   expoTrackUserLocation
 } from "@lib/location/UserLocation"
+  QueryUserCoordinates,
+  expoQueryUserCoordinates
+} from "@lib/location"
+import { createDependencyKey, useDependencyValue } from "@lib/dependencies"
 import { useEffect, useState } from "react"
 import { useQuery } from "react-query"
 
@@ -23,13 +27,31 @@ export namespace UserLocationDependencyKeys {
   /**
    * A dependency key to load the user's current coordinates a single time.
    */
-  // TODO: - Live Value
-  export const currentCoordinates = createDependencyKey<QueryUserCoordinates>()
+  export const currentCoordinates = createDependencyKey<QueryUserCoordinates>(
+    () => expoQueryUserCoordinates
+  )
 }
 
 /**
  * A hook to observe the user's current location using the
  * `UserLocationDependencyKeys.track` dependency.
+ *
+ * ```tsx
+ * const Component = () => {
+ *  const userLocation = useTrackUserLocation("precise")
+ *  if (!userLocation) return <Text>Location is loading</Text>
+ *
+ *  return (
+ *    <>
+ *      {userLocation.status === "success" ? (
+ *        <Text>Location is {displayLocationText(userLocation.location)}</Text>
+ *      ) : (
+ *        <Text>Error loading location</Text>
+ *      )}
+ *    </>
+ *  )
+ * }
+ * ```
  *
  * **Notice**:
  * This hook will always return an error update if the user previously

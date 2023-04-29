@@ -3,8 +3,10 @@ import { SetDependencyValue, UpdateDependencyValues } from "@lib/dependencies"
 import {
   Location,
   LocationCoordinate2D,
+  LocationSearchResult,
   TrackedLocationCoordinates,
   mockLocationCoordinate2D,
+  mockLocationSearchResult,
   mockTrackedLocationCoordinate
 } from "@lib/location"
 import {
@@ -25,9 +27,20 @@ import {
 } from "@testing-library/react-native"
 import React from "react"
 import { View } from "react-native"
+import {
+  LocationSearchBar,
+  LocationSearchDependencyKeys,
+  LocationSearchPicker,
+  LocationSearchResultView,
+  LocationSearchResultsListView
+} from "@screens/LocationSearch"
+import { SetDependencyValue, UpdateDependencyValues } from "@lib/dependencies"
 import "../helpers/Matchers"
 import { neverPromise } from "../helpers/Promise"
 import { TestQueryClientProvider } from "../helpers/ReactQuery"
+import { UserLocationDependencyKeys } from "@hooks/UserLocation"
+import { View } from "react-native"
+import { fakeTimers } from "../helpers/Timers"
 
 describe("LocationSearch tests", () => {
   describe("LocationSearchUI tests", () => {
@@ -87,10 +100,7 @@ describe("LocationSearch tests", () => {
     })
 
     describe("SearchResultsList tests", () => {
-      beforeEach(() => {
-        jest.useFakeTimers({ doNotFake: ["nextTick", "setImmediate"] })
-      })
-      afterEach(() => jest.useRealTimers())
+      fakeTimers()
 
       it("should indicate an error when loading options fails", async () => {
         searchForLocations.mockRejectedValue(new Error())

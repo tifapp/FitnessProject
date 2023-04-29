@@ -17,6 +17,7 @@ module.exports = function (api) {
         {
           alias: {
             "@screens": path.join(rootPath, "screens"),
+            "@api-client": path.join(rootPath, "api-client"),
             "@components": path.join(rootPath, "components"),
             "@stacks": path.join(rootPath, "stacks"),
             "@hooks": path.join(rootPath, "hooks"),

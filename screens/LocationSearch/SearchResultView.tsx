@@ -1,6 +1,8 @@
 import React from "react"
-import { placemarkToFormattedAddress } from "@lib/location"
-import { LocationSearchResult } from "./Data"
+import {
+  LocationSearchResult,
+  placemarkToFormattedAddress
+} from "@lib/location"
 import { Caption, Headline } from "@components/Text"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { Ionicon } from "@components/common/Icons"
@@ -36,7 +38,7 @@ export const LocationSearchResultView = ({
             <View style={styles.annotation}>
               <Ionicon name="people" size={12} style={styles.annotationIcon} />
               <Caption style={styles.annotationText}>
-                {result.annotation === "attended-recently"
+                {result.annotation === "attended-event"
                   ? "You attended an event here recently."
                   : "You hosted an event here recently."}
               </Caption>
