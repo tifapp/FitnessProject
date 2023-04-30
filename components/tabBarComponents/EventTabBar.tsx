@@ -1,7 +1,8 @@
-import { Ionicons } from "@expo/vector-icons"
+import { TouchableIonicon } from "@components/common/Icons"
+import { ButtonStyles } from "@lib/ButtonStyle"
 import { BlurView } from "expo-blur"
 import React from "react"
-import { StyleSheet, TouchableOpacity, View } from "react-native"
+import { StyleSheet, View } from "react-native"
 
 export const EventTabBar = () => {
   const darkIconColor = "#1c1c1c"
@@ -10,21 +11,26 @@ export const EventTabBar = () => {
   return (
     <BlurView intensity={100} tint="light" style={styles.blur}>
       <View style={styles.container}>
-        <TouchableOpacity style={styles.icon}>
-          <Ionicons name="location" size={iconSize} color={darkIconColor} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.icon}>
-          <Ionicons name="chatbox" size={iconSize} color={"grey"} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.plusIcon}>
-          <Ionicons name="add-outline" color="white" size={30} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.icon}>
-          <Ionicons name="notifications" size={iconSize} color={"grey"} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.icon}>
-          <Ionicons name="person" size={iconSize} color={"grey"} />
-        </TouchableOpacity>
+        <TouchableIonicon
+          style={styles.icon}
+          icon={{ name: "location", color: ButtonStyles.darkColor }}
+        />
+        <TouchableIonicon
+          style={styles.icon}
+          icon={{ name: "chatbox", color: ButtonStyles.darkColor }}
+        />
+        <TouchableIonicon
+          style={styles.plusIcon}
+          icon={{ name: "add-outline", color: "white" }}
+        />
+        <TouchableIonicon
+          style={styles.icon}
+          icon={{ name: "notifications", color: "grey" }}
+        />
+        <TouchableIonicon
+          style={styles.icon}
+          icon={{ name: "person", color: "grey" }}
+        />
       </View>
     </BlurView>
   )
@@ -55,10 +61,10 @@ const styles = StyleSheet.create({
   plusIcon: {
     alignItems: "center",
     justifyContent: "center",
+    top: "4%",
     width: 50,
     height: 50,
-    top: "4%",
-    left: "4%",
+    padding: 4,
     borderRadius: 15,
     backgroundColor: "black"
   }

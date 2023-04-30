@@ -4,11 +4,9 @@ import {
   LocationObject,
   LocationOptions,
   LocationSubscription,
+  getCurrentPositionAsync,
   requestForegroundPermissionsAsync,
   watchPositionAsync
-  LocationAccuracy,
-  LocationObject,
-  getCurrentPositionAsync
 } from "expo-location"
 import { TrackedLocationCoordinates } from "./Location"
 
@@ -105,9 +103,7 @@ export const expoTrackUserLocation = (
 
 export const requestLocationPermissions = async () => {
   const { status } = await requestForegroundPermissionsAsync()
-  if (status === "granted") {
-    return true
-  } else return false
+  return status === "granted"
 }
 
 const accurracyToExpoAccurracy = (accurracy: UserLocationTrackingAccurracy) => {

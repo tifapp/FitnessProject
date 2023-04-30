@@ -138,8 +138,7 @@ export namespace EventMocks {
     shouldHideAfterStartDate: false,
     attendeeCount: 10,
     userAttendeeStatus: "attending",
-    userMilesFromEvent: 12.7892,
-    attendeeCount: 3
+    userMilesFromEvent: 12.7892
   } as CurrentUserEvent
 
   export const Multiday = {
@@ -187,7 +186,6 @@ export namespace EventMocks {
       longitude: -73.969717
     },
     shouldHideAfterStartDate: false,
-    attendeeCount: 5,
     userAttendeeStatus: "attending",
     userMilesFromEvent: 12.7892
   } as CurrentUserEvent
