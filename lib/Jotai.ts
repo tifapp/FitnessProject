@@ -65,3 +65,10 @@ export const debounceAtomGroup = <T>(
     debouncedValueAtom
   }
 }
+
+/**
+ *  Atoms for friend state.
+ */
+
+export const friendAtom = atom(false)
+export const requestAtom = atom(false)

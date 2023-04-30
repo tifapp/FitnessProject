@@ -13,7 +13,7 @@ export type EventMapDetails = {
   placemark?: Placemark
 }
 
-const mapOptions = (details: EventMapDetails) => {
+const externalMapOptions = (details: EventMapDetails) => {
   const name =
     details.placemark && details.placemark.street
       ? placemarkToFormattedAddress(details.placemark)
@@ -26,13 +26,13 @@ const mapOptions = (details: EventMapDetails) => {
   }
 }
 
-export const openMap = (details: EventMapDetails) => {
-  showLocation(mapOptions(details))
+export const openExternalMap = (details: EventMapDetails) => {
+  showLocation(externalMapOptions(details))
 }
 
-export const withDirections = 
+export const externalMapWithDirections = 
   async (userLocation: UserLocationTrackingUpdate | undefined, details: EventMapDetails) => {
-  const options = mapOptions(details)
+  const options = externalMapOptions(details)
   const userCoordinates =
     userLocation && userLocation.status === "success"
       ? userLocation.location.coordinates
@@ -50,6 +50,6 @@ export const withDirections =
       directionsMode: "car"
     })
   } else {
-    openMap(details)
+    openExternalMap(details)
   }
 }

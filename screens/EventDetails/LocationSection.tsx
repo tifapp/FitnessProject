@@ -8,7 +8,7 @@ import {
   placemarkToFormattedAddress
 } from "@lib/location"
 import { useTrackUserLocation } from "@hooks/UserLocation"
-import { EventMapDetails, withDirections } from "@lib/ExternalMap"
+import { EventMapDetails, externalMapWithDirections } from "@lib/ExternalMap"
 import { ButtonStyles, showToast } from "@lib/ButtonStyle"
 import { Ionicon } from "@components/common/Icons"
 
@@ -40,7 +40,7 @@ const LocationSection = ({
   }
 
   const openMapWithDirections = async () => {
-    await withDirections(userLocation, mapDetails)
+    await externalMapWithDirections(userLocation, mapDetails)
   }
 
   const copyToClipboard = async () => {
@@ -67,7 +67,7 @@ const LocationSection = ({
         ? (
           <View style={styles.spacing}>
             <View style={{ marginBottom: 4 }}>
-              <Headline style={styles.textColor}>{placemark.name}</Headline>
+              <Headline>{placemark.name}</Headline>
               <View style={styles.flexRow}>
                 {placemark.streetNumber && (
                   <Caption>{`${placemark.streetNumber} `}</Caption>
@@ -141,8 +141,5 @@ const styles = StyleSheet.create({
   captionLinks: {
     opacity: 1,
     fontWeight: "bold"
-  },
-  textColor: {
-    color: ButtonStyles.darkColor
   }
 })

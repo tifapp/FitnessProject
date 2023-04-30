@@ -61,7 +61,7 @@ const TimeSection = ({ color, event }: TimeSectionProps) => {
         {event.duration.endSameDay()
           ? (
             <View style={{ marginBottom: 4 }}>
-              <Headline style={styles.textColor}>{`${startDateFormat}`}</Headline>
+              <Headline>{`${startDateFormat}`}</Headline>
               <Caption>{`from ${startTimeFormat} - ${endTimeFormat}`}</Caption>
             </View>
           )
@@ -102,8 +102,5 @@ const styles = StyleSheet.create({
   captionLinks: {
     opacity: 1,
     fontWeight: "bold"
-  },
-  textColor: {
-    color: ButtonStyles.darkColor
   }
 })
