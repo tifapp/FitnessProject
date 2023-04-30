@@ -11,14 +11,14 @@ import React, { useEffect, useRef } from "react"
 import { StyleSheet, TouchableOpacity } from "react-native"
 import { Icon } from "react-native-elements"
 
-const latlngDelta = 0.5
+const LATLNGDELTA = 0.5
 
 const ActivitiesScreen = () => {
   const appRef = useRef<MapRefMethods | null>(null)
   let doesWork = false
   const givenUserLocation = useTrackUserLocation()
 
-  const recenterThing = () => {
+  const recenterToUserLocation = () => {
     if (givenUserLocation?.status === "success") {
       appRef.current?.recenterToLocation({
         latitude: givenUserLocation.location.coordinates.latitude,
@@ -49,15 +49,15 @@ const ActivitiesScreen = () => {
       return {
         latitude: userLocationParam.location.coordinates.latitude,
         longitude: userLocationParam.location.coordinates.longitude,
-        latitudeDelta: latlngDelta,
-        longitudeDelta: latlngDelta
+        latitudeDelta: LATLNGDELTA,
+        longitudeDelta: LATLNGDELTA
       }
     } else {
       return {
         latitude: 37.7749,
         longitude: -122.4194,
-        latitudeDelta: latlngDelta,
-        longitudeDelta: latlngDelta
+        latitudeDelta: LATLNGDELTA,
+        longitudeDelta: LATLNGDELTA
       }
     }
   }
@@ -77,7 +77,10 @@ const ActivitiesScreen = () => {
         }))}
       />
 
-      <TouchableOpacity onPress={recenterThing} style={styles.recenterButton}>
+      <TouchableOpacity
+        onPress={recenterToUserLocation}
+        style={styles.recenterButton}
+      >
         <Icon name="locate-outline" type="ionicon" color="white" size={30} />
       </TouchableOpacity>
 
