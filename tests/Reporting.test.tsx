@@ -7,6 +7,8 @@ import {
 } from "@testing-library/react-native"
 import React from "react"
 import { captureAlerts } from "./helpers/Alerts"
+import { neverPromise } from "./helpers/Promise"
+import { REPORTING_REASONS } from "@lib/Reporting"
 
 describe("Reporting tests", () => {
   beforeEach(() => jest.resetAllMocks())
@@ -39,6 +41,20 @@ describe("Reporting tests", () => {
       })
     })
 
+    it("disallows selecting other submissions when in process of current submission", async () => {
+      submitReportWithReason.mockImplementation(neverPromise)
+      renderForm()
+      selectReason("Other")
+      expect(canSelectAnyReason()).toEqual(false)
+    })
+
+    it("reallows submitting when current submission errors", async () => {
+      submitReportWithReason.mockRejectedValue(new Error())
+      renderForm()
+      selectReason("Hate speech")
+      await waitFor(() => expect(canSelectAnyReason()).toEqual(true))
+    })
+
     const { alertPresentationSpy, tapAlertButton } = captureAlerts()
 
     const retrySubmission = async () => {
@@ -49,6 +65,12 @@ describe("Reporting tests", () => {
 
     const selectReason = (reason: string) => {
       fireEvent.press(screen.getByText(reason))
+    }
+
+    const canSelectAnyReason = () => {
+      return REPORTING_REASONS.every((reason) => {
+        return !screen.getByTestId(reason).props.accessibilityState.disabled
+      })
     }
 
     const renderForm = () => {
