@@ -33,14 +33,17 @@ export const ReportFormView = ({
   style,
   onSubmitWithReason
 }: ReportFormProps) => {
-  const resonLabelTapped = async (reason: ReportingReason) => {
+  const reasonLabelTapped = async (reason: ReportingReason) => {
     try {
       await onSubmitWithReason(reason)
     } catch {
       Alert.alert(
         "Uh Oh",
         "Sorry, something went wrong when submitting your report. Please try again.",
-        [{ text: "Ok" }]
+        [
+          { text: "Try Again", onPress: () => reasonLabelTapped(reason) },
+          { text: "Ok" }
+        ]
       )
     }
   }
@@ -50,7 +53,7 @@ export const ReportFormView = ({
       {REPORTING_REASON_LABELS.map(({ reason, label }) => (
         <TouchableHighlight
           key={reason}
-          onPress={() => resonLabelTapped(reason)}
+          onPress={() => reasonLabelTapped(reason)}
           style={style}
         >
           <BodyText>{label}</BodyText>
