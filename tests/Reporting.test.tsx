@@ -6,6 +6,7 @@ import {
   waitFor
 } from "@testing-library/react-native"
 import React from "react"
+import { captureAlerts } from "./helpers/Alerts"
 
 describe("Reporting tests", () => {
   describe("ReportFormView tests", () => {
@@ -15,6 +16,14 @@ describe("Reporting tests", () => {
       await waitFor(() => {
         expect(submitReportWithReason).toHaveBeenCalledWith("harassment")
       })
+    })
+
+    it("displays an error alert when submission fails", async () => {
+      const { alertPresentationSpy } = captureAlerts()
+      submitReportWithReason.mockRejectedValue(new Error())
+      renderForm()
+      selectReason("Violence")
+      await waitFor(() => expect(alertPresentationSpy).toHaveBeenCalled())
     })
 
     const submitReportWithReason = jest.fn()
