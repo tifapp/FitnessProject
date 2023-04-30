@@ -1,0 +1,10 @@
+export type ReportingReason =
+  | "spam"
+  | "harassment"
+  | "hate-speech"
+  | "violence"
+  | "scam"
+  | "self-harm"
+  | "misinformation"
+  | "illegally-sold-goods"
+  | "other"
