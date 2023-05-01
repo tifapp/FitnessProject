@@ -47,7 +47,23 @@ describe("Reporting tests", () => {
         submitReportAction.mockImplementation(neverPromise)
         renderForm()
         submitReportReason("Other")
-        expect(canSubmitAnyReportReason()).toEqual(false)
+        await waitFor(() => expect(canSubmitAnyReportReason()).toEqual(false))
+      })
+
+      it("disallows submitting when current submission success", async () => {
+        const waitForSubmission = new Promise<void>((resolve) => {
+          submitReportAction.mockImplementation(() => {
+            resolve()
+            return Promise.resolve()
+          })
+        })
+        renderForm()
+        submitReportReason("Violence")
+
+        // NB: Wait for the submission to finish before checking this. This prevents a bug
+        // where the user can somehow tap another selection when doing a navigation animation.
+        await waitForSubmission
+        await waitFor(() => expect(canSubmitAnyReportReason()).toEqual(false))
       })
 
       it("reallows submitting when current submission errors", async () => {
