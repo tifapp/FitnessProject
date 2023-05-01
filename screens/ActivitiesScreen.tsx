@@ -7,7 +7,7 @@ const MARKER_SIZE = 80
 const ActivitiesScreen = () => {
   return (
     <>
-      <EventDetails event={EventMocks.NoPlacemarkInfo}/>
+      <EventDetails event={EventMocks.NoPlacemarkInfo} />
     </>
   )
 }

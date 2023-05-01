@@ -1,5 +1,5 @@
 import { BodyText } from "@components/Text"
-import { ReportingReason } from "@lib/Reporting"
+import { ReportableContentType, ReportingReason } from "@lib/Reporting"
 import React, { useState } from "react"
 import {
   Alert,
@@ -25,13 +25,14 @@ const REPORTING_REASON_LABELS = [
 ] as { reason: ReportingReason; label: string }[]
 
 export type ReportFormProps = {
-  onSubmitWithReason: (reason: ReportingReason) => Promise<void>
+  contentType: ReportableContentType
+  onSubmitted: (reason: ReportingReason) => Promise<void>
   style?: StyleProp<ViewStyle>
 }
 
 export const ReportFormView = ({
   style,
-  onSubmitWithReason
+  onSubmitted: onSubmitWithReason
 }: ReportFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
 

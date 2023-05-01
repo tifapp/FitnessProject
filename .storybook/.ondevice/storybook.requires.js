@@ -50,6 +50,7 @@ try {
 const getStories = () => {
   return {
     "./components/Button/Button.stories.tsx": require("../components/Button/Button.stories.tsx"),
+    "./components/ContentReporting/ContentReporting.stories.tsx": require("../components/ContentReporting/ContentReporting.stories.tsx"),
     "./components/DateTimePicker/DateTimePicker.stories.tsx": require("../components/DateTimePicker/DateTimePicker.stories.tsx"),
     "./components/EventForm/EventForm.stories.tsx": require("../components/EventForm/EventForm.stories.tsx"),
     "./components/EventFormToolbar/EventFormToolbar.stories.tsx": require("../components/EventFormToolbar/EventFormToolbar.stories.tsx"),

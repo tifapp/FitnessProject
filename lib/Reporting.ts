@@ -11,3 +11,13 @@ export const REPORTING_REASONS = [
 ] as const
 
 export type ReportingReason = (typeof REPORTING_REASONS)[number]
+
+export type ReportableContentType = "event" | "user"
+
+export const reportContent = async (
+  contentId: string,
+  contentType: ReportableContentType,
+  reason: ReportingReason
+) => {
+  // TODO: - Backend endpoint for reporting events and users.
+}

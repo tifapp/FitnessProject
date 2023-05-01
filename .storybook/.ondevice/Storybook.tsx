@@ -7,6 +7,10 @@ import { FlatList } from "react-native-gesture-handler"
 import MyButtonMeta, {
   Basic as MyButtonBasic
 } from "../components/Button/Button.stories"
+import ContentReportingMeta, {
+  Default as DefaultReportingFlow
+} from "../components/ContentReporting/ContentReporting.stories"
+import { useAppFonts } from "../../hooks/Fonts"
 
 // Create an array of stories
 const stories = [
@@ -14,12 +18,20 @@ const stories = [
     name: MyButtonMeta.title,
     component: MyButtonBasic,
     args: MyButtonMeta.args as MyButtonProps
+  },
+  {
+    name: ContentReportingMeta.title,
+    component: DefaultReportingFlow,
+    args: ContentReportingMeta.args
   }
   // Add more stories here...
 ]
 
 const CustomStorybookUI = () => {
+  const [isFontsLoaded] = useAppFonts()
   const [selectedStory, setSelectedStory] = useState(-1)
+
+  if (!isFontsLoaded) return null
 
   // Render the selected story
   if (selectedStory !== -1) {
