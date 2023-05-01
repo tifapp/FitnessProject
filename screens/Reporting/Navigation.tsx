@@ -1,5 +1,5 @@
 import React from "react"
-import { StackNavigatorType } from "@lib/NavTypes"
+import { ChevronBackButton, StackNavigatorType } from "@components/Navigation"
 import {
   ReportingReason,
   ReportableContentType,
@@ -41,12 +41,14 @@ export const createContentReportingStackScreens = <
         name="reportSuccess"
         component={ReportSuccessScreen}
         options={({ route }: ReportSuccessScreenProps) => ({
+          headerLeft: () => <ChevronBackButton />,
           title: `Report ${titleFromContentType(route.params.contentType)}`
         })}
       />
       <stack.Screen
         name="reportContent"
         options={({ route }: ReportingScreenStackProps) => ({
+          headerLeft: () => <ChevronBackButton />,
           title: `Report ${titleFromContentType(route.params.contentType)}`
         })}
       >

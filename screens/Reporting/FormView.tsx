@@ -3,14 +3,7 @@ import { Ionicon } from "@components/common/Icons"
 import { TouchableOpacity } from "@gorhom/bottom-sheet"
 import { ReportableContentType, ReportingReason } from "@lib/Reporting"
 import React, { useState } from "react"
-import {
-  Alert,
-  StyleProp,
-  StyleSheet,
-  TouchableHighlight,
-  View,
-  ViewStyle
-} from "react-native"
+import { Alert, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { Divider } from "react-native-elements"
 import { ScrollView } from "react-native-gesture-handler"
 
@@ -65,7 +58,7 @@ export const ReportFormView = ({
   }
 
   return (
-    <ScrollView contentContainerStyle={style}>
+    <ScrollView contentContainerStyle={[style, styles.container]}>
       <View style={styles.headerSection}>
         <Headline>Why are you reporting this {contentType}?</Headline>
         <BodyText style={styles.headerDesctiption}>
@@ -104,30 +97,36 @@ const ReasonOptionView = ({
   style
 }: ReasonOptionProps) => {
   const [isSelected, setIsSelected] = useState(false)
+
+  const reasonTapped = async () => {
+    try {
+      setIsSelected(true)
+      await onSelected(label.reason)
+    } finally {
+      setIsSelected(false)
+    }
+  }
+
   return (
     <TouchableOpacity
       activeOpacity={0.35}
       testID={label.reason}
       disabled={disabled}
-      onPress={async () => {
-        try {
-          setIsSelected(true)
-          await onSelected(label.reason)
-        } finally {
-          setIsSelected(false)
-        }
-      }}
-      style={[style, { opacity: !isSelected ? 1 : 0.35 }]}
+      onPress={() => reasonTapped()}
+      style={style}
     >
-      <View style={styles.reasonRow}>
+      <View style={[styles.reasonRow, { opacity: !isSelected ? 1 : 0.35 }]}>
         <BodyText>{label.text}</BodyText>
-        <Ionicon name="chevron-forward" />
+        <Ionicon name="chevron-forward" style={styles.reasonIcon} />
       </View>
     </TouchableOpacity>
   )
 }
 
 const styles = StyleSheet.create({
+  container: {
+    paddingBottom: 48
+  },
   headerSection: {
     paddingHorizontal: 16,
     marginBottom: 24
@@ -143,7 +142,9 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 16
+    padding: 16
+  },
+  reasonIcon: {
+    opacity: 0.35
   }
 })

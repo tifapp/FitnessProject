@@ -8,6 +8,7 @@ import {
   createContentReportingStackScreens
 } from "../../../screens/Reporting"
 import { NavigationContainer } from "@react-navigation/native"
+import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 
 type ParamsList = { test: undefined } & ReportingScreensParamsList
 
@@ -36,7 +37,7 @@ const Screen = ({ navigation }: StackScreenProps<ParamsList, "test">) => (
 
 const TestScreen = () => (
   <NavigationContainer>
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
       <Stack.Screen name="test" component={Screen} />
       {reportingScreens}
     </Stack.Navigator>
