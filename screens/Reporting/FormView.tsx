@@ -7,6 +7,65 @@ import { Alert, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { Divider } from "react-native-elements"
 import { ScrollView } from "react-native-gesture-handler"
 
+export type ReportFormProps = {
+  contentType: ReportableContentType
+  onSubmitted: (reason: ReportingReason) => Promise<void>
+  style?: StyleProp<ViewStyle>
+}
+
+/**
+ * A form that allows the use to select a reason for why a particular piece
+ * of content is to be reported.
+ */
+export const ReportFormView = ({
+  style,
+  contentType,
+  onSubmitted: onSubmitWithReason
+}: ReportFormProps) => {
+  const [allowSubmissions, setAllowSubmissions] = useState(true)
+
+  const submitReport = async (reason: ReportingReason) => {
+    try {
+      setAllowSubmissions(false)
+      await onSubmitWithReason(reason)
+    } catch {
+      Alert.alert(
+        "Oh No!",
+        "Sorry, something went wrong when submitting your report. Please try again.",
+        [
+          { text: "Try Again", onPress: () => submitReport(reason) },
+          { text: "Ok", onPress: () => setAllowSubmissions(true) }
+        ]
+      )
+    }
+  }
+
+  return (
+    <ScrollView contentContainerStyle={[style, styles.container]}>
+      <View style={styles.headerSection}>
+        <Headline>Why are you reporting this {contentType}?</Headline>
+        <BodyText style={styles.headerDesctiption}>
+          Your report is anonymous and not shared with others. If this is a
+          critical emergency, call the appropriate authorities immediately -
+          don’t wait.
+        </BodyText>
+      </View>
+      <Divider />
+      {REPORTING_REASON_LABELS.map((label) => (
+        <View key={label.reason}>
+          <ReasonOptionView
+            disabled={!allowSubmissions}
+            label={label}
+            style={styles.reasonButton}
+            onSelected={submitReport}
+          />
+          <Divider />
+        </View>
+      ))}
+    </ScrollView>
+  )
+}
+
 type ReportingReasonLabel = {
   reason: ReportingReason
   text: string
@@ -26,62 +85,6 @@ const REPORTING_REASON_LABELS = [
   },
   { reason: "other", text: "Other" }
 ] as ReportingReasonLabel[]
-
-export type ReportFormProps = {
-  contentType: ReportableContentType
-  onSubmitted: (reason: ReportingReason) => Promise<void>
-  style?: StyleProp<ViewStyle>
-}
-
-export const ReportFormView = ({
-  style,
-  contentType,
-  onSubmitted: onSubmitWithReason
-}: ReportFormProps) => {
-  const [allowSubmissions, setAllowSubmissions] = useState(false)
-
-  const submitReport = async (reason: ReportingReason) => {
-    try {
-      setAllowSubmissions(true)
-      await onSubmitWithReason(reason)
-    } catch {
-      Alert.alert(
-        "Uh Oh",
-        "Sorry, something went wrong when submitting your report. Please try again.",
-        [
-          { text: "Try Again", onPress: () => submitReport(reason) },
-          { text: "Ok" }
-        ]
-      )
-      setAllowSubmissions(false)
-    }
-  }
-
-  return (
-    <ScrollView contentContainerStyle={[style, styles.container]}>
-      <View style={styles.headerSection}>
-        <Headline>Why are you reporting this {contentType}?</Headline>
-        <BodyText style={styles.headerDesctiption}>
-          Your report is anonymous and not shared with others. If this is a
-          critical emergency, call the appropriate authorities immediately -
-          don’t wait.
-        </BodyText>
-      </View>
-      <Divider />
-      {REPORTING_REASON_LABELS.map((label) => (
-        <View key={label.reason}>
-          <ReasonOptionView
-            disabled={allowSubmissions}
-            label={label}
-            style={styles.reasonButton}
-            onSelected={submitReport}
-          />
-          <Divider />
-        </View>
-      ))}
-    </ScrollView>
-  )
-}
 
 type ReasonOptionProps = {
   label: ReportingReasonLabel

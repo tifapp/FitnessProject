@@ -63,13 +63,25 @@ describe("Reporting tests", () => {
         // NB: Wait for the submission to finish before checking this. This prevents a bug
         // where the user can somehow tap another selection when doing a navigation animation.
         await waitForSubmission
-        await waitFor(() => expect(canSubmitAnyReportReason()).toEqual(false))
+        expect(canSubmitAnyReportReason()).toEqual(false)
       })
 
       it("reallows submitting when current submission errors", async () => {
-        submitReportAction.mockRejectedValue(new Error())
+        const waitForSubmission = new Promise<void>((resolve) => {
+          submitReportAction.mockImplementation(() => {
+            resolve()
+            return Promise.reject(new Error())
+          })
+        })
         renderForm()
         submitReportReason("Hate speech")
+
+        // NB: Make it so that the user explicitly has to dismiss the error alert before re-allowing
+        // submissions. This ensures that they cannot somehow submit 2 reasons at once.
+        await waitForSubmission
+        expect(canSubmitAnyReportReason()).toEqual(false)
+
+        await dismissErrorAlert()
         await waitFor(() => expect(canSubmitAnyReportReason()).toEqual(true))
       })
 
@@ -77,6 +89,10 @@ describe("Reporting tests", () => {
 
       const retrySubmission = async () => {
         await tapAlertButton("Try Again")
+      }
+
+      const dismissErrorAlert = async () => {
+        await tapAlertButton("Ok")
       }
 
       const submitReportAction = jest.fn()

@@ -15,6 +15,9 @@ export type ReportSuccessProps = {
   style?: StyleProp<ViewStyle>
 }
 
+/**
+ * A view to indicate that a piece of content was successfully reported.
+ */
 export const ReportSuccessView = ({
   onDoneTapped,
   style

@@ -17,9 +17,7 @@ const Stack = createStackNavigator<ParamsList>()
 const reportingScreens = createContentReportingStackScreens<ParamsList>(
   Stack,
   () => {
-    return new Promise((resolve) => {
-      setTimeout(resolve, 3000)
-    })
+    throw new Error()
   }
 )
 
