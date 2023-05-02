@@ -1,6 +1,5 @@
 import EventsList from "@components/EventsList"
 import EventsMap, { MapRefMethods } from "@components/EventsMap"
-import IconButton from "@components/common/IconButton"
 import { Ionicon } from "@components/common/Icons"
 import EventTabBar from "@components/tabBarComponents/EventTabBar"
 import { useTrackUserLocation } from "@hooks/UserLocation"
@@ -66,8 +65,8 @@ const ActivitiesScreen = ({
       }
     } else {
       return {
-        latitude: 30.0,
-        longitude: 30.0,
+        latitude: 37.773972,
+        longitude: -122.431297,
         latitudeDelta: 0.5,
         longitudeDelta: 0.5
       }
@@ -75,7 +74,7 @@ const ActivitiesScreen = ({
   }
 
   // console.log(givenUserLocation)
-  console.log(events[0])
+
   return (
     <>
       <EventsMap
@@ -100,7 +99,7 @@ const ActivitiesScreen = ({
 
             <View style={styles.whiteBackground}>
               <ImageBackground
-                source={require("../assets/Windows_10_Default_Profile_Picture.svg.png")}
+                source={require("../assets/icon.png")}
                 style={styles.imageBackground}
               />
             </View>
@@ -112,17 +111,6 @@ const ActivitiesScreen = ({
       <TouchableOpacity onPress={recenterThing} style={styles.recenterButton}>
         <Icon name="locate-outline" type="ionicon" color="white" size={30} />
       </TouchableOpacity>
-
-      <IconButton
-        iconName="height"
-        style={styles.recenterButton}
-        color="white"
-        size={50}
-        onPress={() => {
-          console.log("It got to the nav"),
-          navFunction("Event Details", { event: events[0] })
-        }}
-      />
 
       <EventsList />
       <EventTabBar />

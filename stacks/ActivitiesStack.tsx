@@ -1,9 +1,10 @@
-import EventDetails, {
-  EventDetailsProps
-} from "@components/eventDetails/EventDetails"
+import EventsList from "@components/EventsList"
 import { headerOptions } from "@components/headerComponents/headerOptions"
+import { CurrentUserEvent, EventMocks } from "@lib/events"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { ActivitiesScreenNavWrapper } from "@screens/ActivitiesScreenNavWrapper"
+import { EventDetailsProps } from "@screens/EventDetails/EventDetails"
+import { EventDetailsScreenNavWrapper } from "@screens/EventDetailsScreenNavWrapper"
 import { EventFormScreenProps } from "@screens/EventFormScreen"
 import { EventFormScreenNavWrapper } from "@screens/EventFormScreenNavWrapper"
 import {
@@ -18,8 +19,15 @@ export enum ActivitiesScreenNames {
   EVENT_DETAILS = "Event Details",
   MAP = "Map",
   LOCATION_SEARCH = "Location Search",
-  CHAT_ROOM = "Chat Room"
+  CHAT_ROOM = "Chat Room",
+  EVENT_LIST = "Event List"
 }
+
+const events: CurrentUserEvent[] = [
+  EventMocks.Multiday,
+  EventMocks.NoPlacemarkInfo,
+  EventMocks.PickupBasketball
+]
 
 export type ActivitiesStackParamList = {
   [ActivitiesScreenNames.EVENT_FORM]: EventFormScreenProps
@@ -27,6 +35,7 @@ export type ActivitiesStackParamList = {
   [ActivitiesScreenNames.MAP]: undefined
   [ActivitiesScreenNames.LOCATION_SEARCH]: LocationSearchPickerProps
   [ActivitiesScreenNames.CHAT_ROOM]: undefined
+  [ActivitiesScreenNames.EVENT_LIST]: undefined
 }
 
 export type EventFormScreenRouteProps = StackScreenProps<
@@ -41,6 +50,10 @@ export type ActivitiesScreenRouteProps = StackScreenProps<
   ActivitiesStackParamList,
   ActivitiesScreenNames.MAP
 >["route"]
+export type EventListRouteProps = StackScreenProps<
+  ActivitiesStackParamList,
+  ActivitiesScreenNames.EVENT_LIST
+>["route"]
 
 /* export type LocationSearchScreenRouteProps = StackScreenProps<
   ActivitiesStackParamList,
@@ -52,7 +65,6 @@ export type ActivitiesScreenRouteProps = StackScreenProps<
 >["route"] */
 
 export default function ActivitiesStack () {
-  console.log("Cool")
   return (
     <Stack.Navigator screenOptions={headerOptions}>
       <Stack.Screen
@@ -65,7 +77,12 @@ export default function ActivitiesStack () {
       />
       <Stack.Screen
         name={ActivitiesScreenNames.EVENT_DETAILS}
-        component={EventDetails}
+        component={EventDetailsScreenNavWrapper}
+        initialParams={events[2]}
+      />
+      <Stack.Screen
+        name={ActivitiesScreenNames.EVENT_LIST}
+        component={EventsList}
       />
       <Stack.Screen
         name={ActivitiesScreenNames.LOCATION_SEARCH}

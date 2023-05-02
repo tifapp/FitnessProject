@@ -1,18 +1,18 @@
-import BackButton from "@components/headerComponents/BackButton";
-import DrawerButton from "@components/headerComponents/DrawerButton";
-import { StackNavigationOptions } from "@react-navigation/stack";
-import React from "react";
-import { Platform } from "react-native";
+import BackButton from "@components/headerComponents/BackButton"
+import { StackNavigationOptions } from "@react-navigation/stack"
+import React from "react"
 
 export const headerOptions: StackNavigationOptions = {
   headerLeft: () => <BackButton />,
-  headerRight: () => <DrawerButton />,
-  headerStyle: { backgroundColor: "#a9efe0" },
+  headerShown: false
+  // headerRight: () => <DrawerButton />,
+  /* headerStyle: { backgroundColor: "#a9efe0" },
   headerTintColor: "#000",
   headerTitleStyle: {
     fontWeight: Platform.OS === "android" ? "normal" : "bold",
-    fontSize: 20,
+    fontSize: 20
   },
   headerTitleAlign: "center",
-  headerShown: true,
-};
+
+  detachPreviousScreen: true */
+}
