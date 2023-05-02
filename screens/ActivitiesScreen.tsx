@@ -18,7 +18,7 @@ import {
 } from "react-native"
 import { Icon } from "react-native-elements"
 
-const MARKER_SIZE = 80
+const MARKER_SIZE = 60
 
 const ActivitiesScreen = ({
   navFunction
