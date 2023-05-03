@@ -2,14 +2,14 @@ import { Ionicon } from "@components/common/Icons"
 import React from "react"
 import { ImageBackground, StyleSheet, Text, View } from "react-native"
 
-const MARKER_SIZE = 60
+const MARKER_SIZE = 44
 
 export type EventMarkerProps = {
   color: string
   attendeeCount: number
 }
 
-export const EventMarker = ({ color, attendeeCount }: EventMarkerProps) => {
+export const EventMarkerView = ({ color, attendeeCount }: EventMarkerProps) => {
   return (
     <>
       <View
