@@ -1,3 +1,5 @@
+import { UserLocationDependencyKeys } from "@hooks/UserLocation"
+import { SetDependencyValue, UpdateDependencyValues } from "@lib/dependencies"
 import {
   Location,
   LocationCoordinate2D,
@@ -8,6 +10,13 @@ import {
   mockTrackedLocationCoordinate
 } from "@lib/location"
 import {
+  LocationSearchBar,
+  LocationSearchDependencyKeys,
+  LocationSearchPicker,
+  LocationSearchResultView,
+  LocationSearchResultsListView
+} from "@screens/LocationSearch"
+import {
   act,
   fireEvent,
   render,
@@ -15,18 +24,9 @@ import {
   waitFor
 } from "@testing-library/react-native"
 import React from "react"
-import {
-  LocationSearchBar,
-  LocationSearchDependencyKeys,
-  LocationSearchPicker,
-  LocationSearchResultView,
-  LocationSearchResultsListView
-} from "@screens/LocationSearch"
-import { SetDependencyValue, UpdateDependencyValues } from "@lib/dependencies"
 import "../helpers/Matchers"
-import { TestQueryClientProvider } from "../helpers/ReactQuery"
 import { neverPromise } from "../helpers/Promise"
-import { UserLocationDependencyKeys } from "@hooks/UserLocation"
+import { TestQueryClientProvider } from "../helpers/ReactQuery"
 import { View } from "react-native"
 import { fakeTimers } from "../helpers/Timers"
 
