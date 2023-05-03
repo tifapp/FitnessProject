@@ -1,12 +1,12 @@
-import {
-  UserLocationTrackingUpdate,
-  UserLocationTrackingAccurracy,
-  expoTrackUserLocation,
-  TrackUserLocation,
-  QueryUserCoordinates,
-  expoQueryUserCoordinates
-} from "@lib/location"
 import { createDependencyKey, useDependencyValue } from "@lib/dependencies"
+import {
+  QueryUserCoordinates,
+  TrackUserLocation,
+  UserLocationTrackingAccurracy,
+  UserLocationTrackingUpdate,
+  expoQueryUserCoordinates,
+  expoTrackUserLocation
+} from "@lib/location/UserLocation"
 import { useEffect, useState } from "react"
 import { useQuery } from "react-query"
 
