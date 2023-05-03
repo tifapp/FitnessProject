@@ -1,6 +1,5 @@
 import { CurrentUserEvent, isAttendingEvent } from "@lib/events"
-import React, { useState } from "react"
-import { Ionicons } from "@expo/vector-icons"
+import React from "react"
 import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
 import { Caption, Headline, Title } from "@components/Text"
 import ExpandableText from "@screens/EventDetails/ExpandableText"
@@ -13,20 +12,19 @@ import ChatSection from "./ChatSection"
 import { OutlinedButton, PrimaryButton } from "@components/common/Buttons"
 import { CalendarEvent } from "@lib/Calendar"
 import { EventMapDetails, openExternalMap} from "@lib/ExternalMap"
-import { ButtonStyles } from "@lib/ButtonStyle"
-import FriendRequestToast from "@components/FriendRequestToast"
-import AddFriendText from "@components/AddFriendText"
+import FriendRequestToast from "@components/friendComponents/FriendRequestToast"
+import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
 
 export type EventDetailsProps = {
   event: CurrentUserEvent
 }
 
 const MARKER_SIZE = 44
+const PROFILE_IMAGE_SIZE = 40
 const BOTTOM_TAB_HEIGHT = 80
+const MARGIN_SPACING = 16
 
 const EventDetails = ({ event }: EventDetailsProps) => {
-  const isFriend = false
-  const [requestSent, setRequestSent] = useState(isFriend)
   const calenderEvent: CalendarEvent = {
     duration: event.dateRange,
     id: event.id,
@@ -38,10 +36,6 @@ const EventDetails = ({ event }: EventDetailsProps) => {
   const mapDetails: EventMapDetails = {
     coordinates: event.coordinates,
     placemark: event.placemark
-  }
-
-  const sendFriendRequest = () => {
-    setRequestSent(true)
   }
 
   const openMapWithoutDirections = () => {
@@ -56,26 +50,19 @@ const EventDetails = ({ event }: EventDetailsProps) => {
         nestedScrollEnabled={true}
       >
         <Title>{event.title}</Title>
-        <View style={[styles.flexRow, { marginVertical: 16 }]}>
-          <Image
-            style={[styles.image]}
-            source={require("../../assets/icon.png")}
-          />
-          <View style={{ flex: 1 }}>
-            <View style={styles.flexRow}>
-              <Headline>{event.host.username}</Headline>
-              <AddFriendText eventColor={event.color} />
-              
-            </View>
-            <Caption>{event.host.handle}</Caption>
-          </View>
-        </View>
+        <ProfileImageAndName
+          displayFriend={true}
+          username={event.host.username}
+          userHandle={event.host.handle}
+          eventColor={event.color}
+          style={[styles.flexRow, {marginVertical: 24}]}
+          imageStyle={styles.profileImage}
+        />
 
         <View style={styles.iconSection}>
           <TimeSection color={event.color} event={calenderEvent} />
 
           <Divider style={styles.divider} />
-
           <LocationSection
             color={event.color}
             coordinates={event.coordinates}
@@ -84,14 +71,12 @@ const EventDetails = ({ event }: EventDetailsProps) => {
           />
 
           <Divider style={styles.divider} />
-
           <AttendeeSection
             color={event.color}
             attendeeCount={event.attendeeCount}
           />
 
           <Divider style={styles.divider} />
-
           <ChatSection
             color={event.color}
             userAttendeeStatus={event.userAttendeeStatus}
@@ -108,6 +93,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
             />
           </View>
         )}
+
         <View style={{ marginTop: 16, marginBottom: BOTTOM_TAB_HEIGHT + 24 }}>
           <Headline style={{ marginBottom: 8 }}>Location</Headline>
           <TouchableOpacity
@@ -174,18 +160,18 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   spacing: {
-    paddingHorizontal: 16
+    paddingHorizontal: MARGIN_SPACING
   },
   image: {
     width: 40,
     height: 40,
-    marginRight: 16,
+    marginRight: MARGIN_SPACING,
     borderRadius: 20
   },
   iconSection: {
     backgroundColor: "#F4F4F6",
     borderRadius: 8,
-    paddingVertical: 16
+    paddingVertical: MARGIN_SPACING
   },
   divider: {
     marginVertical: 16,
@@ -205,6 +191,12 @@ const styles = StyleSheet.create({
   },
   buttonStyle: {
     flex: 1,
-    marginHorizontal: 16
+    marginHorizontal: MARGIN_SPACING
+  },
+  profileImage: {
+    width: PROFILE_IMAGE_SIZE,
+    height: PROFILE_IMAGE_SIZE,
+    marginRight: MARGIN_SPACING,
+    borderRadius: 20
   }
 })

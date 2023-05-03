@@ -1,5 +1,5 @@
 import { Headline } from "@components/Text"
-import { ButtonStyles } from "@lib/ButtonStyle"
+import { ButtonStyles } from "@lib/AppColorStyle"
 import React from "react"
 import {
   StyleSheet,

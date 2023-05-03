@@ -1,6 +1,6 @@
 import Toast from "react-native-root-toast"
 
-export namespace ButtonStyles {
+export namespace AppStyles {
   export const darkColor = "#26282A"
   export const colorOpacity15 = "#26282A26" // 15% Opacity
   export const colorOpacity50 = "#26282A80" // 50% Opacity
@@ -17,7 +17,7 @@ export const showToast = (message: string, bottomOffset: number) => {
     delay: 100,
     textStyle: {fontSize: 16, fontFamily: "OpenSans"},
     textColor: "white",
-    backgroundColor: ButtonStyles.darkColor,
+    backgroundColor: AppStyles.darkColor,
     opacity: 1,
     containerStyle: {borderRadius: 12}
   })

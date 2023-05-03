@@ -1,9 +1,9 @@
 import React from "react"
 import { View } from "react-native"
-import { Headline } from "./Text"
+import { Headline } from "../Text"
 import { Ionicons } from "@expo/vector-icons"
-import { Ionicon } from "./common/Icons"
-import { ButtonStyles } from "@lib/ButtonStyle"
+import { Ionicon } from "../common/Icons"
+import { AppStyles } from "@lib/AppColorStyle"
 import { useAtom, useAtomValue } from "jotai"
 import { friendAtom, requestAtom } from "@lib/Jotai"
 
@@ -22,7 +22,7 @@ const AddFriendText = ({eventColor}: AddFriendProps) => {
             <Ionicon
               style={{ marginHorizontal: 8 }}
               size={6}
-              color={ButtonStyles.colorOpacity35}
+              color={AppStyles.colorOpacity35}
               name="ellipse"
             />
             <Headline
@@ -36,7 +36,7 @@ const AddFriendText = ({eventColor}: AddFriendProps) => {
           <View style={[{flexDirection: "row", alignItems: "center" }]}>
             <Ionicons
               style={{ marginHorizontal: 8 }}
-              color={ButtonStyles.colorOpacity35}
+              color={AppStyles.colorOpacity35}
               size={6}
               name="ellipse"
             />

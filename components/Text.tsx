@@ -1,4 +1,4 @@
-import { ButtonStyles } from "@lib/ButtonStyle"
+import { AppStyles } from "@lib/AppColorStyle"
 import React from "react"
 import { StyleSheet, Text, TextProps } from "react-native"
 
@@ -60,6 +60,6 @@ const styles = StyleSheet.create({
     fontSize: 16
   },
   color: {
-    color: ButtonStyles.darkColor
+    color: AppStyles.darkColor
   }
 })

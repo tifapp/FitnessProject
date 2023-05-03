@@ -6,30 +6,32 @@ import { Ionicons } from "@expo/vector-icons"
 import MenuDropdown from "./MenuDropdown"
 import { dayjs, now } from "@lib/date"
 import { Ionicon } from "@components/common/Icons"
-import { Headline } from "@components/Text"
-import { ButtonStyles } from "@lib/ButtonStyle"
+import { BodyText, Caption, CaptionTitle, Headline } from "@components/Text"
+import { AppStyles } from "@lib/AppColorStyle"
+import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
 
 export type EventCardProps = {
   event: CurrentUserEvent
 }
 
+const IMAGE_SIZE = 32
+
 export const EventCard = ({ event }: EventCardProps) => {
-  const hexAlpha = "4D"
-  const lightEventColor = event.color + hexAlpha
+  const lightEventColor = event.color + "4D"
   const formattedStartDate = event.dateRange.formattedDate(now(), dayjs(event.dateRange.startDate))
 
   return (
     <View style={[styles.container, { backgroundColor: "#F4F4F6" }]}>
       <View style={[styles.topRow, styles.flexRow]}>
-        <Image
-          style={[styles.image, styles.iconMargin]}
-          source={require("../../assets/icon.png")}
-          accessibilityLabel="profile picture"
-        />
         <View>
-          <Text style={[styles.text14px, {fontFamily: "OpenSansBold"}]}>
-            {event.host.username}
-          </Text>
+          <ProfileImageAndName
+            displayFriend={false}
+            username={event.host.username}
+            userHandle={event.host.handle}
+            eventColor={event.color}
+            imageStyle={[styles.image, styles.iconMargin]}
+          />
+
         </View>
         <View style={styles.moreButtonStyle}>
           <MenuDropdown
@@ -38,16 +40,16 @@ export const EventCard = ({ event }: EventCardProps) => {
         </View>
       </View>
       <View style={styles.middleRow}>
-        <Headline style={[styles.textColor, styles.bottomSpacing]}>
+        <Headline style={styles.bottomSpacing}>
           {event.title}
         </Headline>
 
-        <Text
-          style={[styles.bottomSpacing, styles.text14px]}
+        <BodyText
+          style={styles.bottomSpacing}
           numberOfLines={3}
         >
           {event.description}
-        </Text>
+        </BodyText>
 
         <View style={[styles.flexRow, styles.bottomSpacing]}>
           <View
@@ -59,15 +61,15 @@ export const EventCard = ({ event }: EventCardProps) => {
               style={styles.icon}
             />
           </View>
-          <Text style={styles.infoText} accessibilityLabel="day">
+          <Caption style={styles.infoText} accessibilityLabel="day">
             {formattedStartDate}
-          </Text>
+          </Caption>
           <View style={styles.dotIcon}>
-            <Ionicons name="md-ellipse" size={5} color="grey" />
+            <Ionicons name="md-ellipse" size={4} color={AppStyles.colorOpacity50} />
           </View>
-          <Text style={styles.infoText} accessibilityLabel="time">
+          <Caption style={styles.infoText} accessibilityLabel="time">
             {event.dateRange.formattedStartTime()}
-          </Text>
+          </Caption>
         </View>
 
         <View style={[styles.flexRow]}>
@@ -80,11 +82,11 @@ export const EventCard = ({ event }: EventCardProps) => {
               style={styles.icon}
             />
           </View>
-          <Text style={styles.infoText}>
+          <Caption style={styles.infoText}>
             {event.placemark
               ? placemarkToAbbreviatedAddress(event.placemark)
               : "Unknown Address"}
-          </Text>
+          </Caption>
         </View>
       </View>
     </View>
@@ -108,10 +110,7 @@ const styles = StyleSheet.create({
     marginBottom: 8
   },
   infoText: {
-    textAlignVertical: "center",
-    fontSize: 14,
-    fontFamily: "OpenSans",
-    color: ButtonStyles.colorOpacity50
+    textAlignVertical: "center"
   },
   name: {
     textAlignVertical: "center",
@@ -124,8 +123,8 @@ const styles = StyleSheet.create({
     fontSize: 13
   },
   image: {
-    width: 32,
-    height: 32,
+    width: IMAGE_SIZE,
+    height: IMAGE_SIZE,
     borderRadius: 24
   },
   container: {
@@ -156,12 +155,8 @@ const styles = StyleSheet.create({
   icon: {
     padding: 4
   },
-  textColor: {
-    color: ButtonStyles.darkColor
-  },
   text14px: {
     fontSize: 14,
     fontFamily: "OpenSans",
-    color: ButtonStyles.darkColor
   }
 })

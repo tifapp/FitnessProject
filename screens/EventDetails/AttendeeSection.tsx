@@ -1,7 +1,7 @@
 import React from "react"
 import { StyleSheet, TouchableOpacity, View } from "react-native"
 import { Headline, Caption } from "@components/Text"
-import { ButtonStyles } from "@lib/ButtonStyle"
+import { ButtonStyles } from "@lib/AppColorStyle"
 import { Ionicon } from "@components/common/Icons"
 
 interface AttendeeSectionProps {

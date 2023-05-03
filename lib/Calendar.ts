@@ -2,7 +2,7 @@ import { FixedDateRange } from '@lib/date';
 import { LocationCoordinate2D, Placemark, placemarkToFormattedAddress } from '@lib/location';
 import * as Calendar from 'expo-calendar';
 import { Platform } from 'react-native';
-import { showToast } from './ButtonStyle';
+import { showToast } from './AppColorStyle';
 
 export type CalendarEvent = {
   duration: FixedDateRange,
