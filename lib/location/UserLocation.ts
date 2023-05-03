@@ -31,11 +31,6 @@ export type QueryUserCoordinates = (
   accurracy: UserLocationTrackingAccurracy
 ) => Promise<TrackedLocationCoordinates>
 
-export const requestLocationPermissions = async () => {
-  const { status } = await requestForegroundPermissionsAsync()
-  return status === "granted"
-}
-
 /**
  * Queries the current user's coordinates using expo.
  */

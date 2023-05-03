@@ -47,7 +47,8 @@ const styles = StyleSheet.create({
   },
   imageBackground: {
     flex: 1,
-    marginTop: "4%",
+    marginTop: "6%",
+    marginRight: "1%",
     position: "absolute",
     width: MARKER_SIZE - 5,
     height: MARKER_SIZE - 5,
@@ -58,7 +59,7 @@ const styles = StyleSheet.create({
   badgeDisplay: {
     zIndex: 2,
     flex: 1,
-    marginLeft: 20,
+    marginLeft: 15,
     paddingVertical: 3,
     paddingHorizontal: 5,
     backgroundColor: "red",
@@ -74,7 +75,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     paddingHorizontal: 3,
     fontWeight: "bold",
-    fontSize: 10,
+    fontSize: 8,
     color: "white",
     fontFamily: "OpenSansBold"
   }

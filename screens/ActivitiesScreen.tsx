@@ -8,12 +8,11 @@ import {
   requestLocationPermissions
 } from "@lib/location/UserLocation"
 import React, { useEffect, useRef } from "react"
-import {
-  StyleSheet, TouchableOpacity, TouchableOpacity
-} from "react-native"
+import { StyleSheet, TouchableOpacity } from "react-native"
 import { Icon } from "react-native-elements"
 
 const MARKER_SIZE = 44
+const LATLNGDELTA = 0.5
 
 const ActivitiesScreen = ({
   navFunction
@@ -68,10 +67,7 @@ const ActivitiesScreen = ({
       }
     }
   }
-}
 
-const LATLNGDELTA = 0.5
-  
   return (
     <>
       <EventsMap
