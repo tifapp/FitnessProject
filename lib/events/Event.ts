@@ -136,9 +136,9 @@ export namespace EventMocks {
       postalCode: "95064"
     },
     shouldHideAfterStartDate: false,
+    attendeeCount: 10,
     userAttendeeStatus: "attending",
-    userMilesFromEvent: 12.7892,
-    attendeeCount: 3
+    userMilesFromEvent: 12.7892
   } as CurrentUserEvent
 
   export const Multiday = {
@@ -163,6 +163,7 @@ export namespace EventMocks {
       postalCode: "G3 8JU"
     },
     shouldHideAfterStartDate: false,
+    attendeeCount: 3,
     userAttendeeStatus: "attending",
     userMilesFromEvent: 12.7892
   } as CurrentUserEvent

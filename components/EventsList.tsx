@@ -8,6 +8,7 @@ import { useNavigation } from "@react-navigation/native"
 import React, { useEffect, useRef } from "react"
 import { ListRenderItemInfo, StyleSheet, Text, View } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
+import { Title } from "./Text"
 import { EventCard } from "./eventCard/EventCard"
 
 const EventsList = () => {
@@ -68,7 +69,7 @@ const EventsList = () => {
             )}
             ListHeaderComponent={
               <View style={styles.activitiesContainer}>
-                <Text style={styles.activitiesText}>Events in the Area</Text>
+                <Title style={styles.activitiesText}>Nearby Events</Title>
               </View>
             }
             stickyHeaderIndices={[0]}

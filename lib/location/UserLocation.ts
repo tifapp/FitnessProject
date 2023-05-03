@@ -99,6 +99,18 @@ export const expoTrackUserLocation = (
   return () => subscription.then((sub) => sub.remove())
 }
 
+/**
+ * Request the permissions of the user.
+ *
+ * @returns A boolean indicating  whether or not it worked.
+ *
+ */
+
+export const requestLocationPermissions = async () => {
+  const { status } = await requestForegroundPermissionsAsync()
+  return status === "granted"
+}
+
 const accurracyToExpoAccurracy = (accurracy: UserLocationTrackingAccurracy) => {
   if (accurracy === "approximate-low") return LocationAccuracy.Low
   if (accurracy === "approximate-medium") return LocationAccuracy.Balanced

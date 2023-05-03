@@ -1,6 +1,5 @@
 import EventsList from "@components/EventsList"
-import EventsMap, { MapRefMethods } from "@components/EventsMap"
-import { Ionicon } from "@components/common/Icons"
+import EventsMap, { MapRefMethods } from "@components/eventMap/EventsMap"
 import EventTabBar from "@components/tabBarComponents/EventTabBar"
 import { useTrackUserLocation } from "@hooks/UserLocation"
 import { CurrentUserEvent, EventMocks } from "@lib/events"
@@ -10,15 +9,11 @@ import {
 } from "@lib/location/UserLocation"
 import React, { useEffect, useRef } from "react"
 import {
-  ImageBackground,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+  StyleSheet, TouchableOpacity, TouchableOpacity
 } from "react-native"
 import { Icon } from "react-native-elements"
 
-const MARKER_SIZE = 60
+const MARKER_SIZE = 44
 
 const ActivitiesScreen = ({
   navFunction
@@ -29,14 +24,15 @@ const ActivitiesScreen = ({
   let doesWork = false
   const givenUserLocation = useTrackUserLocation()
 
-  const recenterThing = () => {
+  const recenterToUserLocation = () => {
     if (givenUserLocation?.status === "success") {
       appRef.current?.recenterToLocation({
-        latitude: givenUserLocation?.location.coordinates.latitude,
-        longitude: givenUserLocation?.location.coordinates.longitude
+        latitude: givenUserLocation.location.coordinates.latitude,
+        longitude: givenUserLocation.location.coordinates.longitude
       })
     }
   }
+
   const events: CurrentUserEvent[] = [
     EventMocks.Multiday,
     EventMocks.NoPlacemarkInfo,
@@ -60,55 +56,41 @@ const ActivitiesScreen = ({
       return {
         latitude: userLocationParam.location.coordinates.latitude,
         longitude: userLocationParam.location.coordinates.longitude,
-        latitudeDelta: 0.5,
-        longitudeDelta: 0.5
+        latitudeDelta: LATLNGDELTA,
+        longitudeDelta: LATLNGDELTA
       }
     } else {
       return {
-        latitude: 37.773972,
-        longitude: -122.431297,
-        latitudeDelta: 0.5,
-        longitudeDelta: 0.5
+        latitude: 37.7749,
+        longitude: -122.4194,
+        latitudeDelta: LATLNGDELTA,
+        longitudeDelta: LATLNGDELTA
       }
     }
   }
+}
 
-  // console.log(givenUserLocation)
-
+const LATLNGDELTA = 0.5
+  
   return (
     <>
       <EventsMap
         ref={appRef}
         style={{ width: "100%", height: "100%" }}
         initialRegion={checkUserLocation(givenUserLocation)}
-        renderMarker={(item) => (
-          <>
-            <View
-              style={[
-                styles.badgeDisplay,
-                {
-                  backgroundColor: events.find((x) => x.id === item.id).color
-                }
-              ]}
-            >
-              <Ionicon name="people" color="white" size={10} />
-              <Text style={styles.badgeText}>
-                {events.find((x) => x.id === item.id).attendeeCount}
-              </Text>
-            </View>
-
-            <View style={styles.whiteBackground}>
-              <ImageBackground
-                source={require("../assets/icon.png")}
-                style={styles.imageBackground}
-              />
-            </View>
-          </>
-        )}
-        markers={events}
+        markers={events.map((event: CurrentUserEvent) => ({
+          id: event.id,
+          coordinates: event.coordinates,
+          attendeeCount: event.attendeeCount,
+          color: event.color,
+          hostID: event.host.id
+        }))}
       />
 
-      <TouchableOpacity onPress={recenterThing} style={styles.recenterButton}>
+      <TouchableOpacity
+        onPress={recenterToUserLocation}
+        style={styles.recenterButton}
+      >
         <Icon name="locate-outline" type="ionicon" color="white" size={30} />
       </TouchableOpacity>
 
@@ -119,49 +101,6 @@ const ActivitiesScreen = ({
 }
 
 const styles = StyleSheet.create({
-  whiteBackground: {
-    zIndex: 1,
-    flex: 1,
-    width: MARKER_SIZE,
-    height: MARKER_SIZE,
-    backgroundColor: "white",
-    borderRadius: MARKER_SIZE / 2,
-    alignItems: "center",
-    overflow: "hidden"
-  },
-  imageBackground: {
-    flex: 1,
-    marginTop: "4%",
-    position: "absolute",
-    width: MARKER_SIZE - 5,
-    height: MARKER_SIZE - 5,
-    borderRadius: MARKER_SIZE - 5 / 2,
-    alignSelf: "center",
-    overflow: "hidden"
-  },
-  badgeDisplay: {
-    zIndex: 2,
-    flex: 1,
-    marginLeft: 20,
-    paddingVertical: 3,
-    paddingHorizontal: 5,
-    backgroundColor: "red",
-    position: "absolute",
-    borderRadius: 7,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    overflow: "scroll"
-  },
-  badgeText: {
-    alignSelf: "stretch",
-    textAlign: "center",
-    paddingHorizontal: 3,
-    fontWeight: "bold",
-    fontSize: 10,
-    color: "white",
-    fontFamily: "OpenSansBold"
-  },
   recenterButton: {
     alignItems: "center",
     justifyContent: "center",
@@ -174,5 +113,4 @@ const styles = StyleSheet.create({
     backgroundColor: "black"
   }
 })
-
 export default ActivitiesScreen
