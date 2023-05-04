@@ -1,0 +1,8 @@
+type Establishment @model @searchable {
+  gps: GPS  
+}
+
+type GPS {
+  lon: Float
+  lat:  Float
+}
