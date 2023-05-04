@@ -1,11 +1,12 @@
-import React, { useEffect, useRef } from "react"
-import { ListRenderItemInfo, StyleSheet, Text, View } from "react-native"
 import {
   BottomSheetFlatList,
   BottomSheetModal,
   BottomSheetModalProvider
 } from "@gorhom/bottom-sheet"
 import { CurrentUserEvent, EventMocks } from "@lib/events/Event"
+import React, { useEffect, useRef } from "react"
+import { ListRenderItemInfo, StyleSheet, View } from "react-native"
+import { Title } from "./Text"
 import { EventCard } from "./eventCard/EventCard"
 
 const EventsList = () => {
@@ -56,7 +57,7 @@ const EventsList = () => {
             )}
             ListHeaderComponent={
               <View style={styles.activitiesContainer}>
-                <Text style={styles.activitiesText}>Events in the Area</Text>
+                <Title style={styles.activitiesText}>Nearby Events</Title>
               </View>
             }
             stickyHeaderIndices={[0]}

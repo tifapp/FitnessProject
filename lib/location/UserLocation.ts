@@ -1,13 +1,14 @@
-import { TrackedLocationCoordinates } from "./Location"
 import {
-  watchPositionAsync,
-  LocationOptions,
-  LocationCallback,
-  LocationSubscription,
   LocationAccuracy,
+  LocationCallback,
   LocationObject,
-  getCurrentPositionAsync
+  LocationOptions,
+  LocationSubscription,
+  getCurrentPositionAsync,
+  requestForegroundPermissionsAsync,
+  watchPositionAsync
 } from "expo-location"
+import { TrackedLocationCoordinates } from "./Location"
 
 /**
  * An accurracy to track the user's location.
@@ -91,6 +92,18 @@ export const expoTrackUserLocation = (
   )
   subscription.catch(() => onUpdate({ status: "error" }))
   return () => subscription.then((sub) => sub.remove())
+}
+
+/**
+ * Request the permissions of the user.
+ *
+ * @returns A boolean indicating  whether or not it worked.
+ *
+ */
+
+export const requestLocationPermissions = async () => {
+  const { status } = await requestForegroundPermissionsAsync()
+  return status === "granted"
 }
 
 const accurracyToExpoAccurracy = (accurracy: UserLocationTrackingAccurracy) => {
