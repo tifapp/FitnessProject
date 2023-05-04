@@ -9,7 +9,7 @@ import {
 } from "@lib/location"
 import { useTrackUserLocation } from "@hooks/UserLocation"
 import { EventMapDetails, externalMapWithDirections } from "@lib/ExternalMap"
-import { ButtonStyles, showToast } from "@lib/AppColorStyle"
+import { showToast } from "@lib/AppColorStyle"
 import { Ionicon } from "@components/common/Icons"
 
 interface LocationSectionProps {

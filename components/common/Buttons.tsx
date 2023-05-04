@@ -1,46 +1,48 @@
 import { Headline } from "@components/Text"
-import { ButtonStyles } from "@lib/AppColorStyle"
+import { AppStyles } from "@lib/AppColorStyle"
 import React from "react"
 import {
+  StyleProp,
   StyleSheet,
   TouchableOpacity,
-  TouchableOpacityProps
+  TouchableOpacityProps,
+  ViewStyle
 } from "react-native"
 
-interface ButtonProps {
+type ButtonProps = {
   title: string
-  buttonProps: TouchableOpacityProps
-}
+  style?: StyleProp<ViewStyle>
+} & TouchableOpacityProps
 
-export const PrimaryButton = ({ title, buttonProps }: ButtonProps) => {
+export const PrimaryButton = ({title, style, ...props}: ButtonProps) => {
   return (
     <TouchableOpacity
-      {...buttonProps}
       style={[
-        buttonProps.style,
+        style,
         styles.container,
-        { backgroundColor: ButtonStyles.darkColor }
+        { backgroundColor: AppStyles.darkColor }
       ]}
+      {...props}
     >
       <Headline style={{ color: "white" }}>{title}</Headline>
-      {buttonProps.children}
+      {props.children}
     </TouchableOpacity>
   )
 }
 
-export const OutlinedButton = ({ title, buttonProps }: ButtonProps) => {
+export const OutlinedButton = ({title, style, ...props}: ButtonProps) => {
   return (
     <TouchableOpacity
-      {...buttonProps}
       style={[
-        buttonProps.style,
+        style,
         styles.container,
         styles.lightStyle,
-        { borderColor: ButtonStyles.colorOpacity15 }
+        { borderColor: AppStyles.colorOpacity15 }
       ]}
+      {...props}
     >
-      <Headline style={{ color: ButtonStyles.darkColor }}>{title}</Headline>
-      {buttonProps.children}
+      <Headline style={{ color: AppStyles.darkColor }}>{title}</Headline>
+      {props.children}
     </TouchableOpacity>
   )
 }

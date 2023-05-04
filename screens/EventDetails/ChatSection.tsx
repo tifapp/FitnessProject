@@ -2,7 +2,7 @@ import React from "react"
 import { StyleSheet, TouchableOpacity, View } from "react-native"
 import { Headline, Caption } from "@components/Text"
 import { EventUserAttendeeStatus, isAttendingEvent } from "@lib/events"
-import { ButtonStyles } from "@lib/AppColorStyle"
+import { AppStyles } from "@lib/AppColorStyle"
 import { Ionicon } from "@components/common/Icons"
 
 interface ChatSectionProps {
@@ -21,7 +21,7 @@ const ChatSection = ({ color, userAttendeeStatus }: ChatSectionProps) => {
         />
       </View>
       <View style={styles.spacing}>
-        <Headline style={styles.textColor}>Event Chat</Headline>
+        <Headline>Event Chat</Headline>
         {isAttendingEvent(userAttendeeStatus)
           ? (
             <Caption>View the chat</Caption>
@@ -34,7 +34,7 @@ const ChatSection = ({ color, userAttendeeStatus }: ChatSectionProps) => {
         <Ionicon
           name="chevron-forward"
           style={{ alignSelf: "center"}}
-          color={ButtonStyles.colorOpacity35}
+          color={AppStyles.colorOpacity35}
         />
       </View>
     </TouchableOpacity>
@@ -56,8 +56,5 @@ const styles = StyleSheet.create({
   },
   spacing: {
     paddingHorizontal: 16
-  },
-  textColor: {
-    color: ButtonStyles.darkColor
   }
 })

@@ -1,7 +1,7 @@
 import React from "react"
 import { StyleSheet, TouchableOpacity, View } from "react-native"
 import { Headline, Caption } from "@components/Text"
-import { ButtonStyles } from "@lib/AppColorStyle"
+import { AppStyles } from "@lib/AppColorStyle"
 import { Ionicon } from "@components/common/Icons"
 
 interface AttendeeSectionProps {
@@ -20,14 +20,14 @@ const AttendeeSection = ({ color, attendeeCount }: AttendeeSectionProps) => {
         />
       </View>
       <View style={styles.spacing}>
-        <Headline style={styles.textColor}>{`${attendeeCount} Attending`}</Headline>
+        <Headline>{`${attendeeCount} Attending`}</Headline>
         <Caption>View all attendees</Caption>
       </View>
       <View style={[styles.flexRow, { flex: 1, justifyContent: "flex-end" }]}>
         <Ionicon
           name="chevron-forward"
           style={{ alignSelf: "center"}}
-          color={ButtonStyles.colorOpacity35}
+          color={AppStyles.colorOpacity35}
         />
       </View>
     </TouchableOpacity>
@@ -49,8 +49,5 @@ const styles = StyleSheet.create({
   },
   spacing: {
     paddingHorizontal: 16
-  },
-  textColor: {
-    color: ButtonStyles.darkColor
   }
 })

@@ -4,7 +4,7 @@ import * as Calendar from 'expo-calendar';
 import { Headline, Caption, CaptionTitle } from "@components/Text"
 import { dayjs, now } from "@lib/date"
 import { CalendarEvent, addToCalendar, getCalendar } from "@lib/Calendar"
-import { ButtonStyles, showToast } from "@lib/AppColorStyle"
+import { showToast } from "@lib/AppColorStyle"
 import { Ionicon } from "@components/common/Icons"
 
 interface TimeSectionProps {

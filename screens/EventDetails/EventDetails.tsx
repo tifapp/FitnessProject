@@ -9,11 +9,11 @@ import TimeSection from "./TimeSection"
 import LocationSection from "./LocationSection"
 import AttendeeSection from "./AttendeeSection"
 import ChatSection from "./ChatSection"
-import { OutlinedButton, PrimaryButton } from "@components/common/Buttons"
 import { CalendarEvent } from "@lib/Calendar"
 import { EventMapDetails, openExternalMap} from "@lib/ExternalMap"
 import FriendRequestToast from "@components/friendComponents/FriendRequestToast"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
+import LeaveJoinButton from "@components/bottomTabComponents/LeaveJoinButton"
 
 export type EventDetailsProps = {
   event: CurrentUserEvent
@@ -114,7 +114,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
               }}
               renderMarker={() => (
                 <Image
-                  source={require("../../assets/icon.png")}
+                  source={require("@assets/icon.png")}
                   style={{
                     width: MARKER_SIZE,
                     height: MARKER_SIZE,
@@ -129,21 +129,10 @@ const EventDetails = ({ event }: EventDetailsProps) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      <View style={styles.bottomTab}>
-        {isAttendingEvent(event.userAttendeeStatus)
-          ? (
-            <OutlinedButton
-              title={"Leave Event"}
-              buttonProps={{ style: styles.buttonStyle }}
-            />
-          )
-          : (
-            <PrimaryButton
-              title={"Join Now"}
-              buttonProps={{ style: styles.buttonStyle }}
-            />
-          )}
-      </View>
+      <LeaveJoinButton
+        attendeeStatus={event.userAttendeeStatus}
+        style={styles.bottomTabButton}
+      />
       <FriendRequestToast bottomOffset={BOTTOM_TAB_HEIGHT} />
     </View>
   )
@@ -162,12 +151,6 @@ const styles = StyleSheet.create({
   spacing: {
     paddingHorizontal: MARGIN_SPACING
   },
-  image: {
-    width: 40,
-    height: 40,
-    marginRight: MARGIN_SPACING,
-    borderRadius: 20
-  },
   iconSection: {
     backgroundColor: "#F4F4F6",
     borderRadius: 8,
@@ -180,17 +163,8 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
     color: "#0000001A"
   },
-  bottomTab: {
-    flexDirection: "row",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
+  bottomTabButton: {
     height: BOTTOM_TAB_HEIGHT,
-    backgroundColor: "white"
-  },
-  buttonStyle: {
-    flex: 1,
     marginHorizontal: MARGIN_SPACING
   },
   profileImage: {
