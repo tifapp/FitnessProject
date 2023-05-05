@@ -16,7 +16,7 @@ import LocationSection from "./LocationSection"
 import AttendeeSection from "./AttendeeSection"
 import ChatSection from "./ChatSection"
 import { CalendarEvent } from "@lib/Calendar"
-import { EventMapDetails, openExternalMap } from "@lib/ExternalMap"
+import { NativeEventMapDetails, openInMaps } from "@lib/NativeMap"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
 import LeaveJoinButton from "@components/bottomTabComponents/LeaveJoinButton"
 
@@ -38,13 +38,13 @@ const EventDetails = ({ event }: EventDetailsProps) => {
     title: event.title,
     bottomTabHeight: BOTTOM_TAB_HEIGHT
   }
-  const mapDetails: EventMapDetails = {
+  const mapDetails: NativeEventMapDetails = {
     coordinates: event.coordinates,
     placemark: event.placemark
   }
 
   const openMapWithoutDirections = () => {
-    openExternalMap(mapDetails)
+    openInMaps(mapDetails)
   }
 
   return (

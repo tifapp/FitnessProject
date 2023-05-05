@@ -7,13 +7,12 @@ import {
   placemarkToFormattedAddress
 } from "./location"
 
-
-export type EventMapDetails = {
-  coordinates: LocationCoordinate2D,
+export type NativeEventMapDetails = {
+  coordinates: LocationCoordinate2D
   placemark?: Placemark
 }
 
-const externalMapOptions = (details: EventMapDetails) => {
+const nativeMapOptions = (details: NativeEventMapDetails) => {
   const name =
     details.placemark && details.placemark.street
       ? placemarkToFormattedAddress(details.placemark)
@@ -26,13 +25,15 @@ const externalMapOptions = (details: EventMapDetails) => {
   }
 }
 
-export const openExternalMap = (details: EventMapDetails) => {
-  showLocation(externalMapOptions(details))
+export const openInMaps = (details: NativeEventMapDetails) => {
+  showLocation(nativeMapOptions(details))
 }
 
-export const externalMapWithDirections = 
-  async (userLocation: UserLocationTrackingUpdate | undefined, details: EventMapDetails) => {
-  const options = externalMapOptions(details)
+export const openMapDirections = async (
+  userLocation: UserLocationTrackingUpdate | undefined,
+  details: NativeEventMapDetails
+) => {
+  const options = nativeMapOptions(details)
   const userCoordinates =
     userLocation && userLocation.status === "success"
       ? userLocation.location.coordinates
@@ -50,6 +51,6 @@ export const externalMapWithDirections =
       directionsMode: "car"
     })
   } else {
-    openExternalMap(details)
+    openInMaps(details)
   }
 }
