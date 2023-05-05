@@ -1,12 +1,14 @@
-import Map, { MapMarker } from "@components/eventMap/EventsMap"
+import { EventMarker, EventsMap } from "@components/eventMap/EventsMap"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import React from "react"
-import { View } from "react-native"
 
 const testMapMarker = {
-  key: "test",
-  location: { latitude: 41.1234, longitude: -121.1234 },
-  name: "Test Marker"
+  id: "test",
+  coordinates: { latitude: 41.1234, longitude: -121.1234 },
+  attendeeCount: 19,
+  color: "red",
+  hostID: "bruh",
+  name: "Test1"
 }
 
 describe("Map tests", () => {
@@ -23,20 +25,27 @@ const selectMarker = (markerName: string) => {
   fireEvent.press(screen.getByTestId(markerName))
 }
 
-interface TestMapMarker extends MapMarker {
+interface TestMapMarker extends EventMarker {
   name: string
 }
 
 const renderMap = (markers: TestMapMarker[]) => {
   return render(
-    <Map
-      markers={markers}
+    <EventsMap
+      markers={[
+        {
+          id: testMapMarker.id,
+          coordinates: testMapMarker.coordinates,
+          attendeeCount: 19,
+          color: "red",
+          hostID: "bruh"
+        }
+      ]}
       initialRegion={{
-        ...testMapMarker.location,
+        ...testMapMarker.coordinates,
         latitudeDelta: 0.2,
         longitudeDelta: 0.2
       }}
-      renderMarker={(marker: TestMapMarker) => <View testID={marker.name} />}
       onMarkerSelected={selectionEvent}
     />
   )
