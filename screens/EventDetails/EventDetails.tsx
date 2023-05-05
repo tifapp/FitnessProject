@@ -18,7 +18,7 @@ import ChatSection from "./ChatSection"
 import { CalendarEvent } from "@lib/Calendar"
 import { NativeEventMapDetails, openInMaps } from "@lib/NativeMap"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
-import LeaveJoinButton from "@components/bottomTabComponents/LeaveJoinButton"
+import AttendanceButton from "@components/bottomTabComponents/AttendanceButton"
 
 export type EventDetailsProps = {
   event: CurrentUserEvent
@@ -136,7 +136,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      <LeaveJoinButton
+      <AttendanceButton
         attendeeStatus={event.userAttendeeStatus}
         style={styles.bottomTabButton}
       />
