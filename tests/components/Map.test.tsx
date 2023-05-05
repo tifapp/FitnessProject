@@ -16,7 +16,7 @@ const testEvents: TestMapMarker[] = [
 describe("Map tests", () => {
   it("forwards marker selection events", () => {
     renderMap(testEvents)
-    selectMarker(testEvents[0].name)
+    selectMarker(testEvents[0].id)
     expect(selectionEvent).toHaveBeenCalledWith(testEvents)
   })
 })
