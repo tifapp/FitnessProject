@@ -15,10 +15,15 @@ export const showToast = (message: string, bottomOffset: number) => {
     animation: true,
     hideOnPress: true,
     delay: 100,
-    textStyle: {fontSize: 16, fontFamily: "OpenSans"},
+    textStyle: {
+      fontSize: 16,
+      fontFamily: "OpenSans",
+      textAlignVertical: "center",
+      textAlign: "center"
+    },
     textColor: "white",
     backgroundColor: AppStyles.darkColor,
     opacity: 1,
-    containerStyle: {borderRadius: 12}
+    containerStyle: { borderRadius: 12 }
   })
 }

@@ -12,12 +12,8 @@ interface AttendeeSectionProps {
 const AttendeeSection = ({ color, attendeeCount }: AttendeeSectionProps) => {
   return (
     <TouchableOpacity style={[styles.flexRow, styles.paddingIconSection]}>
-      <View style={{ justifyContent: "center" }}>
-        <Ionicon 
-          style={[styles.iconStyling, { backgroundColor: color }]}
-          name="people"
-          color={"white"}
-        />
+      <View style={[styles.iconStyling, { backgroundColor: color }]}>
+        <Ionicon name="people" color={"white"} />
       </View>
       <View style={styles.spacing}>
         <Headline>{`${attendeeCount} Attending`}</Headline>
@@ -26,7 +22,7 @@ const AttendeeSection = ({ color, attendeeCount }: AttendeeSectionProps) => {
       <View style={[styles.flexRow, { flex: 1, justifyContent: "flex-end" }]}>
         <Ionicon
           name="chevron-forward"
-          style={{ alignSelf: "center"}}
+          style={{ alignSelf: "center" }}
           color={AppStyles.colorOpacity35}
         />
       </View>
@@ -41,11 +37,13 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   paddingIconSection: {
-    paddingHorizontal: 16
+    paddingHorizontal: 16,
+    alignItems: "center"
   },
   iconStyling: {
     padding: 6,
-    borderRadius: 12
+    borderRadius: 12,
+    justifyContent: "center"
   },
   spacing: {
     paddingHorizontal: 16

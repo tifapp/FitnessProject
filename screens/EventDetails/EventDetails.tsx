@@ -1,6 +1,12 @@
 import { CurrentUserEvent, isAttendingEvent } from "@lib/events"
 import React from "react"
-import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View
+} from "react-native"
 import { Caption, Headline, Title } from "@components/Text"
 import ExpandableText from "@screens/EventDetails/ExpandableText"
 import { Divider } from "react-native-elements"
@@ -10,7 +16,7 @@ import LocationSection from "./LocationSection"
 import AttendeeSection from "./AttendeeSection"
 import ChatSection from "./ChatSection"
 import { CalendarEvent } from "@lib/Calendar"
-import { EventMapDetails, openExternalMap} from "@lib/ExternalMap"
+import { EventMapDetails, openExternalMap } from "@lib/ExternalMap"
 import FriendRequestToast from "@components/friendComponents/FriendRequestToast"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
 import LeaveJoinButton from "@components/bottomTabComponents/LeaveJoinButton"
@@ -43,7 +49,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
   }
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <ScrollView
         style={[styles.container, styles.spacing]}
         contentContainerStyle={{ flexGrow: 1 }}
@@ -55,7 +61,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
           username={event.host.username}
           userHandle={event.host.handle}
           eventColor={event.color}
-          style={[styles.flexRow, {marginVertical: 24}]}
+          style={[styles.flexRow, { marginVertical: 24 }]}
           imageStyle={styles.profileImage}
         />
 
@@ -85,7 +91,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
 
         {event.description && (
           <View style={{ marginTop: 16 }}>
-            <Headline style={{marginBottom: 4 }}>About</Headline>
+            <Headline style={{ marginBottom: 4 }}>About</Headline>
             <ExpandableText
               props={{ style: { color: event.color, marginTop: 5 } }}
               text={event.description}

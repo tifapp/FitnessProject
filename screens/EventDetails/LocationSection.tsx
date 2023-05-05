@@ -15,7 +15,7 @@ import { Ionicon } from "@components/common/Icons"
 interface LocationSectionProps {
   color: string
   placemark?: Placemark
-  coordinates: LocationCoordinate2D,
+  coordinates: LocationCoordinate2D
   bottomTabHeight: number
 }
 
@@ -26,10 +26,10 @@ const LocationSection = ({
   bottomTabHeight
 }: LocationSectionProps) => {
   const userLocation = useTrackUserLocation("precise")
-  
+
   const mapDetails: EventMapDetails = {
-    coordinates: coordinates,
-    placemark: placemark
+    coordinates,
+    placemark
   }
 
   const hitSlopInset = {
@@ -56,12 +56,8 @@ const LocationSection = ({
 
   return (
     <View style={[styles.flexRow, styles.paddingIconSection]}>
-      <View style={{ justifyContent: "center" }}>
-        <Ionicon 
-          style={[styles.iconStyling, { backgroundColor: color }]}
-          name="location"
-          color={"white"}
-        />
+      <View style={[styles.iconStyling, { backgroundColor: color }]}>
+        <Ionicon name="location" color={"white"} />
       </View>
       {placemark
         ? (
@@ -81,12 +77,14 @@ const LocationSection = ({
               <TouchableOpacity onPress={copyToClipboard} hitSlop={hitSlopInset}>
                 <CaptionTitle
                   style={[{ color, marginRight: 16 }, styles.captionLinks]}
-                  
                 >
                 Copy Address
                 </CaptionTitle>
               </TouchableOpacity>
-              <TouchableOpacity onPress={openMapWithDirections} hitSlop={hitSlopInset}>
+              <TouchableOpacity
+                onPress={openMapWithDirections}
+                hitSlop={hitSlopInset}
+              >
                 <CaptionTitle style={[{ color }, styles.captionLinks]}>
                 Directions
                 </CaptionTitle>
@@ -110,7 +108,10 @@ const LocationSection = ({
                 Copy Coordinates
                 </CaptionTitle>
               </TouchableOpacity>
-              <TouchableOpacity onPress={openMapWithDirections} hitSlop={hitSlopInset}>
+              <TouchableOpacity
+                onPress={openMapWithDirections}
+                hitSlop={hitSlopInset}
+              >
                 <CaptionTitle style={[{ color }, styles.captionLinks]}>
                 Directions
                 </CaptionTitle>
@@ -129,11 +130,13 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   paddingIconSection: {
-    paddingHorizontal: 16
+    paddingHorizontal: 16,
+    alignItems: "center"
   },
   iconStyling: {
     padding: 6,
-    borderRadius: 12
+    borderRadius: 12,
+    justifyContent: "center"
   },
   spacing: {
     paddingHorizontal: 16

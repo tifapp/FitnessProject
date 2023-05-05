@@ -7,18 +7,17 @@ import { BodyText } from "../Text"
 import { useAtomValue } from "jotai"
 import { useState } from "react"
 
-
 interface FriendRequestToastProps {
   bottomOffset: number
 }
 
-const FriendRequestToast = ({bottomOffset}: FriendRequestToastProps) => {
+const FriendRequestToast = ({ bottomOffset }: FriendRequestToastProps) => {
   const requestSent = useAtomValue(requestAtom)
   const [showedToast] = useState(requestSent)
 
   return (
     <>
-      {!showedToast &&
+      {!showedToast && (
         <Toast
           visible={requestSent}
           opacity={1}
@@ -28,16 +27,16 @@ const FriendRequestToast = ({bottomOffset}: FriendRequestToastProps) => {
           hideOnPress={true}
           containerStyle={styles.toastStyle}
         >
-          <View style={{flexDirection: "row"}}>
-            <View style={{marginRight: 16}}>
-              <Ionicon color="white" name="close"/>
+          <View style={styles.containerStyle}>
+            <View style={styles.iconStyle}>
+              <Ionicon color="white" name="close" />
             </View>
-            <BodyText style={{color: "white", textAlignVertical: "center"}}>
+            <BodyText style={styles.textStyle}>
               {"Friend request sent"}
             </BodyText>
           </View>
         </Toast>
-      }
+      )}
     </>
   )
 }
@@ -45,9 +44,23 @@ const FriendRequestToast = ({bottomOffset}: FriendRequestToastProps) => {
 const styles = StyleSheet.create({
   toastStyle: {
     borderRadius: 12,
-    width: '90%',
+    flex: 1,
+    width: "90%",
     backgroundColor: AppStyles.darkColor,
     alignItems: "flex-start"
+  },
+  textStyle: {
+    color: "white",
+    textAlignVertical: "center",
+    paddingTop: 4
+  },
+  iconStyle: {
+    marginRight: 16,
+    paddingTop: 4
+  },
+  containerStyle: {
+    flexDirection: "row",
+    alignItems: "center"
   }
 })
 
