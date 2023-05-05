@@ -11,7 +11,6 @@ import {
 } from "@lib/location/UserLocation"
 import React, { useEffect, useRef } from "react"
 import { StyleSheet } from "react-native"
-import EventDetails from "./EventDetails/EventDetails"
 
 const LATLNGDELTA = 0.5
 
@@ -61,7 +60,27 @@ const ActivitiesScreen = () => {
 
   return (
     <>
-      <EventDetails event={EventMocks.NoPlacemarkInfo} />
+      <EventsMap
+        ref={appRef}
+        style={{ width: "100%", height: "100%" }}
+        initialRegion={checkUserLocation(givenUserLocation)}
+        markers={events.map((event: CurrentUserEvent) => ({
+          id: event.id,
+          coordinates: event.coordinates,
+          attendeeCount: event.attendeeCount,
+          color: event.color,
+          hostID: event.host.id
+        }))}
+      />
+
+      <TouchableIonicon
+        style={styles.recenterButton}
+        icon={{ name: "locate-outline", color: "white" }}
+        onPress={recenterToUserLocation}
+      />
+
+      <EventsList />
+      <EventTabBar />
     </>
   )
 }

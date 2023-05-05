@@ -1,10 +1,10 @@
 import { showLocation } from "react-native-map-link"
-import * as Location from "expo-location"
 import {
   LocationCoordinate2D,
   Placemark,
   UserLocationTrackingUpdate,
-  placemarkToFormattedAddress
+  placemarkToFormattedAddress,
+  requestLocationPermissions
 } from "./location"
 
 export type NativeEventMapDetails = {
@@ -34,13 +34,17 @@ export const openMapDirections = async (
   details: NativeEventMapDetails
 ) => {
   const options = nativeMapOptions(details)
-  const userCoordinates =
+  let userCoordinates =
     userLocation && userLocation.status === "success"
       ? userLocation.location.coordinates
       : undefined
 
   if (!userCoordinates) {
-    await Location.requestForegroundPermissionsAsync()
+    await requestLocationPermissions()
+    userCoordinates =
+      userLocation && userLocation.status === "success"
+        ? userLocation.location.coordinates
+        : undefined
   }
 
   if (userCoordinates) {
