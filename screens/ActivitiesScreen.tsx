@@ -20,7 +20,6 @@ const ActivitiesScreen = ({
   navFunction: (s: string, e: { event: CurrentUserEvent }) => void
 }) => {
   const appRef = useRef<MapRefMethods | null>(null)
-  let doesWork = false
   const givenUserLocation = useTrackUserLocation()
 
   const recenterToUserLocation = () => {
@@ -41,10 +40,6 @@ const ActivitiesScreen = ({
   useEffect(() => {
     ;(async () => {
       const status = await requestLocationPermissions()
-      if (status === false) {
-      } else {
-        doesWork = true
-      }
     })()
   }, [])
 

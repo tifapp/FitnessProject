@@ -13,10 +13,8 @@ import {
   LocationSearchBar,
   LocationSearchDependencyKeys,
   LocationSearchPicker,
-  LocationSearchResult,
   LocationSearchResultView,
-  LocationSearchResultsListView,
-  mockLocationSearchResult
+  LocationSearchResultsListView
 } from "@screens/LocationSearch"
 import {
   act,
@@ -26,19 +24,9 @@ import {
   waitFor
 } from "@testing-library/react-native"
 import React from "react"
-import { View } from "react-native"
-import {
-  LocationSearchBar,
-  LocationSearchDependencyKeys,
-  LocationSearchPicker,
-  LocationSearchResultView,
-  LocationSearchResultsListView
-} from "@screens/LocationSearch"
-import { SetDependencyValue, UpdateDependencyValues } from "@lib/dependencies"
 import "../helpers/Matchers"
 import { neverPromise } from "../helpers/Promise"
 import { TestQueryClientProvider } from "../helpers/ReactQuery"
-import { UserLocationDependencyKeys } from "@hooks/UserLocation"
 import { View } from "react-native"
 import { fakeTimers } from "../helpers/Timers"
 
