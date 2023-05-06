@@ -61,6 +61,27 @@ const ActivitiesScreen = () => {
 
   return (
     <>
+      {/* <EventsMap
+        ref={appRef}
+        style={{ width: "100%", height: "100%" }}
+        initialRegion={checkUserLocation(givenUserLocation)}
+        markers={events.map((event: CurrentUserEvent) => ({
+          id: event.id,
+          coordinates: event.coordinates,
+          attendeeCount: event.attendeeCount,
+          color: event.color,
+          hostID: event.host.id
+        }))}
+      />
+
+      <TouchableIonicon
+        style={styles.recenterButton}
+        icon={{ name: "locate-outline", color: "white" }}
+        onPress={recenterToUserLocation}
+      />
+
+      <EventsList />
+      <EventTabBar /> */}
       <EventDetails event={EventMocks.NoPlacemarkInfo} />
     </>
   )

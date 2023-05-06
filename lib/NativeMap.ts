@@ -1,19 +1,18 @@
 import { showLocation } from "react-native-map-link"
-import * as Location from "expo-location"
 import {
   LocationCoordinate2D,
   Placemark,
   UserLocationTrackingUpdate,
-  placemarkToFormattedAddress
+  placemarkToFormattedAddress,
+  requestLocationPermissions
 } from "./location"
 
-
-export type EventMapDetails = {
-  coordinates: LocationCoordinate2D,
+export type NativeEventMapDetails = {
+  coordinates: LocationCoordinate2D
   placemark?: Placemark
 }
 
-const externalMapOptions = (details: EventMapDetails) => {
+const nativeMapOptions = (details: NativeEventMapDetails) => {
   const name =
     details.placemark && details.placemark.street
       ? placemarkToFormattedAddress(details.placemark)
@@ -26,20 +25,26 @@ const externalMapOptions = (details: EventMapDetails) => {
   }
 }
 
-export const openExternalMap = (details: EventMapDetails) => {
-  showLocation(externalMapOptions(details))
+export const openInMaps = (details: NativeEventMapDetails) => {
+  showLocation(nativeMapOptions(details))
 }
 
-export const externalMapWithDirections = 
-  async (userLocation: UserLocationTrackingUpdate | undefined, details: EventMapDetails) => {
-  const options = externalMapOptions(details)
-  const userCoordinates =
+export const openMapDirections = async (
+  userLocation: UserLocationTrackingUpdate | undefined,
+  details: NativeEventMapDetails
+) => {
+  const options = nativeMapOptions(details)
+  let userCoordinates =
     userLocation && userLocation.status === "success"
       ? userLocation.location.coordinates
       : undefined
 
   if (!userCoordinates) {
-    await Location.requestForegroundPermissionsAsync()
+    await requestLocationPermissions()
+    userCoordinates =
+      userLocation && userLocation.status === "success"
+        ? userLocation.location.coordinates
+        : undefined
   }
 
   if (userCoordinates) {
@@ -50,6 +55,6 @@ export const externalMapWithDirections =
       directionsMode: "car"
     })
   } else {
-    openExternalMap(details)
+    openInMaps(details)
   }
 }

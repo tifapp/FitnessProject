@@ -18,7 +18,10 @@ const IMAGE_SIZE = 32
 
 export const EventCard = ({ event }: EventCardProps) => {
   const lightEventColor = event.color + "4D"
-  const formattedStartDate = event.dateRange.formattedDate(now(), dayjs(event.dateRange.startDate))
+  const formattedStartDate = event.dateRange.formattedDate(
+    now(),
+    dayjs(event.dateRange.startDate)
+  )
 
   return (
     <View style={[styles.container, { backgroundColor: "#F4F4F6" }]}>
@@ -26,12 +29,12 @@ export const EventCard = ({ event }: EventCardProps) => {
         <View>
           <ProfileImageAndName
             displayFriend={false}
+            displayHandle={true}
             username={event.host.username}
             userHandle={event.host.handle}
             eventColor={event.color}
             imageStyle={[styles.image, styles.iconMargin]}
           />
-
         </View>
         <View style={styles.moreButtonStyle}>
           <MenuDropdown
@@ -40,14 +43,9 @@ export const EventCard = ({ event }: EventCardProps) => {
         </View>
       </View>
       <View style={styles.middleRow}>
-        <Headline style={styles.bottomSpacing}>
-          {event.title}
-        </Headline>
+        <Headline style={styles.bottomSpacing}>{event.title}</Headline>
 
-        <BodyText
-          style={styles.bottomSpacing}
-          numberOfLines={3}
-        >
+        <BodyText style={styles.bottomSpacing} numberOfLines={3}>
           {event.description}
         </BodyText>
 
@@ -65,7 +63,11 @@ export const EventCard = ({ event }: EventCardProps) => {
             {formattedStartDate}
           </Caption>
           <View style={styles.dotIcon}>
-            <Ionicons name="md-ellipse" size={4} color={AppStyles.colorOpacity50} />
+            <Ionicons
+              name="md-ellipse"
+              size={4}
+              color={AppStyles.colorOpacity50}
+            />
           </View>
           <Caption style={styles.infoText} accessibilityLabel="time">
             {event.dateRange.formattedStartTime()}
@@ -157,6 +159,6 @@ const styles = StyleSheet.create({
   },
   text14px: {
     fontSize: 14,
-    fontFamily: "OpenSans",
+    fontFamily: "OpenSans"
   }
 })

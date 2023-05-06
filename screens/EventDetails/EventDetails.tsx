@@ -1,4 +1,4 @@
-import { CurrentUserEvent, isAttendingEvent } from "@lib/events"
+import { CurrentUserEvent } from "@lib/events"
 import React from "react"
 import {
   Image,
@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native"
-import { Caption, Headline, Title } from "@components/Text"
+import { Headline, Title } from "@components/Text"
 import ExpandableText from "@screens/EventDetails/ExpandableText"
 import { Divider } from "react-native-elements"
 import EventMapSnippet from "./EventMapSnippet"
@@ -16,10 +16,9 @@ import LocationSection from "./LocationSection"
 import AttendeeSection from "./AttendeeSection"
 import ChatSection from "./ChatSection"
 import { CalendarEvent } from "@lib/Calendar"
-import { EventMapDetails, openExternalMap } from "@lib/ExternalMap"
-import FriendRequestToast from "@components/friendComponents/FriendRequestToast"
+import { NativeEventMapDetails, openInMaps } from "@lib/NativeMap"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
-import LeaveJoinButton from "@components/bottomTabComponents/LeaveJoinButton"
+import AttendanceButton from "@components/bottomTabComponents/AttendanceButton"
 
 export type EventDetailsProps = {
   event: CurrentUserEvent
@@ -39,13 +38,13 @@ const EventDetails = ({ event }: EventDetailsProps) => {
     title: event.title,
     bottomTabHeight: BOTTOM_TAB_HEIGHT
   }
-  const mapDetails: EventMapDetails = {
+  const mapDetails: NativeEventMapDetails = {
     coordinates: event.coordinates,
     placemark: event.placemark
   }
 
   const openMapWithoutDirections = () => {
-    openExternalMap(mapDetails)
+    openInMaps(mapDetails)
   }
 
   return (
@@ -58,31 +57,27 @@ const EventDetails = ({ event }: EventDetailsProps) => {
         <Title>{event.title}</Title>
         <ProfileImageAndName
           displayFriend={true}
+          displayHandle={true}
           username={event.host.username}
           userHandle={event.host.handle}
           eventColor={event.color}
           style={[styles.flexRow, { marginVertical: 24 }]}
           imageStyle={styles.profileImage}
+          toastOffset={BOTTOM_TAB_HEIGHT}
         />
 
         <View style={styles.iconSection}>
           <TimeSection color={event.color} event={calenderEvent} />
-
-          <Divider style={styles.divider} />
           <LocationSection
             color={event.color}
             coordinates={event.coordinates}
             placemark={event.placemark}
             bottomTabHeight={BOTTOM_TAB_HEIGHT}
           />
-
-          <Divider style={styles.divider} />
           <AttendeeSection
             color={event.color}
             attendeeCount={event.attendeeCount}
           />
-
-          <Divider style={styles.divider} />
           <ChatSection
             color={event.color}
             userAttendeeStatus={event.userAttendeeStatus}
@@ -135,11 +130,10 @@ const EventDetails = ({ event }: EventDetailsProps) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      <LeaveJoinButton
+      <AttendanceButton
         attendeeStatus={event.userAttendeeStatus}
         style={styles.bottomTabButton}
       />
-      <FriendRequestToast bottomOffset={BOTTOM_TAB_HEIGHT} />
     </View>
   )
 }
@@ -164,7 +158,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     marginVertical: 16,
-    width: "80%",
+    // width: "80%",
     height: 1,
     alignSelf: "flex-end",
     color: "#0000001A"

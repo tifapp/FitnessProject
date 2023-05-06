@@ -9,21 +9,18 @@ interface LeaveJoinButtonProps {
   style?: StyleProp<ViewStyle>
 }
 
-const LeaveJoinButton = ({attendeeStatus, style}: LeaveJoinButtonProps) => {
+const AttendanceButton = ({ attendeeStatus, style }: LeaveJoinButtonProps) => {
   return (
     <View style={[style, styles.bottomTab]}>
       {isAttendingEvent(attendeeStatus)
         ? (
           <OutlinedButton
-            title={"Leave Event"}
+            title={attendeeStatus == "hosting" ? "Delete Event" : "Leave Event"}
             style={styles.buttonStyle}
           />
         )
         : (
-          <PrimaryButton
-            title={"Join Now"}
-            style={styles.buttonStyle}
-          />
+          <PrimaryButton title={"Join Now"} style={styles.buttonStyle} />
         )}
     </View>
   )
@@ -41,7 +38,7 @@ const styles = StyleSheet.create({
   },
   buttonStyle: {
     flex: 1
-  },
+  }
 })
 
-export default LeaveJoinButton
+export default AttendanceButton
