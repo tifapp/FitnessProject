@@ -32,7 +32,6 @@ export const EventCard = ({ event }: EventCardProps) => {
             displayHandle={true}
             username={event.host.username}
             userHandle={event.host.handle}
-            eventColor={event.color}
             imageStyle={[styles.image, styles.iconMargin]}
           />
         </View>

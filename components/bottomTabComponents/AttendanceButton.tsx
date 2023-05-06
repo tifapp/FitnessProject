@@ -15,7 +15,7 @@ const AttendanceButton = ({ attendeeStatus, style }: LeaveJoinButtonProps) => {
       {isAttendingEvent(attendeeStatus)
         ? (
           <OutlinedButton
-            title={attendeeStatus == "hosting" ? "Delete Event" : "Leave Event"}
+            title={attendeeStatus === "hosting" ? "Delete Event" : "Leave Event"}
             style={styles.buttonStyle}
           />
         )

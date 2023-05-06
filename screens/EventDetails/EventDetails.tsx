@@ -64,6 +64,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
           style={[styles.flexRow, { marginVertical: 24 }]}
           imageStyle={styles.profileImage}
           toastOffset={BOTTOM_TAB_HEIGHT}
+          userFriendStatus="not-friends"
         />
 
         <View style={styles.iconSection}>

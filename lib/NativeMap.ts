@@ -34,17 +34,13 @@ export const openMapDirections = async (
   details: NativeEventMapDetails
 ) => {
   const options = nativeMapOptions(details)
-  let userCoordinates =
+  const userCoordinates =
     userLocation && userLocation.status === "success"
       ? userLocation.location.coordinates
       : undefined
 
   if (!userCoordinates) {
     await requestLocationPermissions()
-    userCoordinates =
-      userLocation && userLocation.status === "success"
-        ? userLocation.location.coordinates
-        : undefined
   }
 
   if (userCoordinates) {
