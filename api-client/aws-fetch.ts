@@ -9,38 +9,22 @@ export interface AuthDetails {
   cognitoUser: CognitoUser | null
 }
 
-globalThis.cognitoAuth = {}
-
 // fetch + aws auth headers
 export const fetchWithAuth = async (
   url: string,
   options: RequestInit = {}
 ): Promise<any> => {
-  if (!globalThis.cognitoAuth.isLoggedIn) {
-    console.error("User not authenticated")
-    throw new Error("User not authenticated")
-  }
-
   try {
-    if (!globalThis.cognitoAuth) {
-      const session = await Auth.currentSession()
-      const token = session.getAccessToken()
-      globalThis.cognitoAuth.jwtToken = token
-    }
+    const session = await Auth.currentSession()
+    const jwtToken = session.getIdToken().getJwtToken()
 
     options.headers = {
       ...options.headers,
       "Content-Type": "application/json",
-      Authorization: `Bearer ${globalThis.cognitoAuth.jwtToken}`
+      Authorization: `Bearer ${jwtToken}`
     }
 
-    const response = await fetch(url, options)
-
-    if (!response.ok) {
-      throw new Error("Network response was not ok")
-    }
-
-    return await response.json()
+    return await fetch(url, options)
   } catch (error) {
     console.error("Error fetching data:", error)
     throw error
