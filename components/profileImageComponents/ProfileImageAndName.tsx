@@ -87,13 +87,11 @@ const ProfileImageAndName = ({
                         hideOnPress={true}
                         containerStyle={styles.toastStyle}
                       >
-                        <View style={{ flexDirection: "row" }}>
-                          <View style={{ marginRight: 16 }}>
+                        <View style={styles.containerStyle}>
+                          <View style={styles.iconStyle}>
                             <Ionicon color="white" name="close" />
                           </View>
-                          <BodyText
-                            style={{ color: "white", textAlignVertical: "center" }}
-                          >
+                          <BodyText style={styles.textStyle}>
                             {"Friend request sent"}
                           </BodyText>
                         </View>
@@ -127,9 +125,23 @@ const ProfileImageAndName = ({
 const styles = StyleSheet.create({
   toastStyle: {
     borderRadius: 12,
+    flex: 1,
     width: "90%",
     backgroundColor: AppStyles.darkColor,
     alignItems: "flex-start"
+  },
+  textStyle: {
+    color: "white",
+    textAlignVertical: "center",
+    paddingTop: 4
+  },
+  iconStyle: {
+    marginRight: 16,
+    paddingTop: 4
+  },
+  containerStyle: {
+    flexDirection: "row",
+    alignItems: "center"
   }
 })
 

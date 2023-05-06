@@ -156,13 +156,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: MARGIN_SPACING
   },
-  divider: {
-    marginVertical: 16,
-    // width: "80%",
-    height: 1,
-    alignSelf: "flex-end",
-    color: "#0000001A"
-  },
   bottomTabButton: {
     height: BOTTOM_TAB_HEIGHT,
     marginHorizontal: MARGIN_SPACING
