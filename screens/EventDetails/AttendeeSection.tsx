@@ -11,14 +11,15 @@ interface AttendeeSectionProps {
 }
 
 const AttendeeSection = ({ color, attendeeCount }: AttendeeSectionProps) => {
-  const [dividerWidth, setDividerWidth] = useState(0)
+  const [textWidth, setTextWidth] = useState(0)
+  const [chevronWidth, setChevronWidth] = useState(0)
 
   const onLayoutView = (e: { nativeEvent: { layout: { width: any } } }) => {
-    setDividerWidth(e.nativeEvent.layout.width + dividerWidth)
+    setTextWidth(e.nativeEvent.layout.width)
   }
 
   const onLayoutChevron = (e: { nativeEvent: { layout: { width: any } } }) => {
-    setDividerWidth(e.nativeEvent.layout.width + dividerWidth)
+    setChevronWidth(e.nativeEvent.layout.width)
   }
 
   return (
@@ -42,7 +43,9 @@ const AttendeeSection = ({ color, attendeeCount }: AttendeeSectionProps) => {
           />
         </View>
       </TouchableOpacity>
-      <Divider style={[styles.divider, { width: dividerWidth }]} />
+      <Divider
+        style={[styles.divider, { width: textWidth + chevronWidth + 16 }]}
+      />
     </View>
   )
 }
@@ -59,11 +62,11 @@ const styles = StyleSheet.create({
   },
   iconStyling: {
     padding: 6,
+    marginRight: 16,
     borderRadius: 12,
     justifyContent: "center"
   },
   spacing: {
-    paddingHorizontal: 16,
     flex: 1
   },
   divider: {

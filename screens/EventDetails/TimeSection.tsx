@@ -16,7 +16,7 @@ interface TimeSectionProps {
 const TimeSection = ({ color, event }: TimeSectionProps) => {
   const [status, requestPermission] = Calendar.useCalendarPermissions()
   const [addedEvent, setAddedEvent] = useState(false)
-  const [dividerWidth, setDividerWidth] = useState("100%")
+  const [dividerWidth, setDividerWidth] = useState(0)
   const startDateFormat = event.duration.formattedDate(
     now(),
     dayjs(event.duration.startDate)
@@ -48,7 +48,7 @@ const TimeSection = ({ color, event }: TimeSectionProps) => {
             await addToCalendar(calendar.id, event, setAddedEvent)
           }
         })
-        .catch((error) => {
+        .catch(() => {
           showToast(
             "Unable to add Event without Permissions",
             event.bottomTabHeight
@@ -93,7 +93,7 @@ const TimeSection = ({ color, event }: TimeSectionProps) => {
           )}
         </View>
       </View>
-      <Divider style={[styles.divider, { width: dividerWidth }]} />
+      <Divider style={[styles.divider, { width: dividerWidth + 16 }]} />
     </View>
   )
 }
@@ -105,16 +105,16 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   paddingIconSection: {
-    paddingHorizontal: 16,
+    marginHorizontal: 16,
     alignItems: "center"
   },
   iconStyling: {
     padding: 6,
+    marginRight: 16,
     borderRadius: 12,
     justifyContent: "center"
   },
   spacing: {
-    paddingHorizontal: 16,
     flex: 1
   },
   captionLinks: {

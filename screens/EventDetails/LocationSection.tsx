@@ -27,7 +27,7 @@ const LocationSection = ({
   bottomTabHeight
 }: LocationSectionProps) => {
   const userLocation = useTrackUserLocation("precise")
-  const [dividerWidth, setDividerWidth] = useState("100%")
+  const [dividerWidth, setDividerWidth] = useState(0)
 
   const mapDetails: NativeEventMapDetails = {
     coordinates,
@@ -135,7 +135,7 @@ const LocationSection = ({
             </View>
           )}
       </View>
-      <Divider style={[styles.divider, { width: dividerWidth }]} />
+      <Divider style={[styles.divider, { width: dividerWidth + 16 }]} />
     </View>
   )
 }
@@ -152,11 +152,11 @@ const styles = StyleSheet.create({
   },
   iconStyling: {
     padding: 6,
+    marginRight: 16,
     borderRadius: 12,
     justifyContent: "center"
   },
   spacing: {
-    paddingHorizontal: 16,
     flex: 1
   },
   captionLinks: {

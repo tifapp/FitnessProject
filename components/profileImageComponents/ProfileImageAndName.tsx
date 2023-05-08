@@ -1,5 +1,6 @@
 import {
   ImageStyle,
+  Platform,
   StyleProp,
   StyleSheet,
   View,
@@ -133,11 +134,11 @@ const styles = StyleSheet.create({
   textStyle: {
     color: "white",
     textAlignVertical: "center",
-    paddingTop: 4
+    paddingTop: Platform.OS === "ios" ? 4 : 0
   },
   iconStyle: {
     marginRight: 16,
-    paddingTop: 4
+    paddingTop: Platform.OS === "ios" ? 4 : 0
   },
   containerStyle: {
     flexDirection: "row",

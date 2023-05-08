@@ -174,7 +174,9 @@ export namespace EventMocks {
     attendeeCount: 5,
     description:
       "The placemark info should then be geocoded from the coordinates if it is not available." +
-      "(ie. Our AWS backend still needs to geocode it) The result in this case should be somewhere in New York.",
+      "(ie. Our AWS backend still needs to geocode it) The result in this case should be somewhere in New York." +
+      "The placemark info should then be geocoded from the coordinates if it is not available." +
+      "The placemark info should then be geocoded from the coordinates if it is not available.",
     dateRange: dateRange(
       new Date("2023-03-18T12:00:00"),
       new Date("2023-03-18T15:00:00")
