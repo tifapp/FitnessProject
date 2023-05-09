@@ -1,4 +1,3 @@
-import { CurrentUserEvent } from "@lib/events"
 import React from "react"
 import {
   Image,
@@ -7,19 +6,18 @@ import {
   TouchableOpacity,
   View
 } from "react-native"
+import { CurrentUserEvent } from "@lib/events"
 import { Headline, Title } from "@components/Text"
 import ExpandableText from "@screens/EventDetails/ExpandableText"
-import { Divider } from "react-native-elements"
-import EventMapSnippet from "./EventMapSnippet"
-import TimeSection from "./TimeSection"
-import LocationSection from "./LocationSection"
 import AttendeeSection from "./AttendeeSection"
 import ChatSection from "./ChatSection"
 import { CalendarEvent } from "@lib/Calendar"
 import { NativeEventMapDetails, openInMaps } from "@lib/NativeMap"
-import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
 import AttendanceButton from "@components/bottomTabComponents/AttendanceButton"
 import ProfileImageAndNameWithFriend from "@components/profileImageComponents/ProfileImageAndNameWithFriend"
+import EventMapSnippet from "./EventMapSnippet"
+import LocationSection from "./LocationSection"
+import TimeSection from "./TimeSection"
 
 export type EventDetailsProps = {
   event: CurrentUserEvent
@@ -142,7 +140,7 @@ export default EventDetails
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 24,
+    marginTop: 0,
     backgroundColor: "white"
   },
   flexRow: {

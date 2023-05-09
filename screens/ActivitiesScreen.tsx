@@ -12,9 +12,14 @@ import {
 import React, { useEffect, useRef } from "react"
 import { StyleSheet } from "react-native"
 
+const MARKER_SIZE = 44
 const LATLNGDELTA = 0.5
 
-const ActivitiesScreen = () => {
+const ActivitiesScreen = ({
+  navFunction
+}: {
+  navFunction: (s: string, e: { event: CurrentUserEvent }) => void
+}) => {
   const appRef = useRef<MapRefMethods | null>(null)
   const givenUserLocation = useTrackUserLocation()
 
@@ -26,6 +31,7 @@ const ActivitiesScreen = () => {
       })
     }
   }
+
   const events: CurrentUserEvent[] = [
     EventMocks.Multiday,
     EventMocks.NoPlacemarkInfo,
