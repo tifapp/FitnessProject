@@ -1,20 +1,26 @@
-import { CurrentUserEvent, isAttendingEvent } from "@lib/events"
-import React, { useState } from "react"
-import { Ionicons } from "@expo/vector-icons"
-import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
 import { BodyText, Caption, Headline, Title } from "@components/Text"
+import { OutlinedButton, PrimaryButton } from "@components/common/Buttons"
+import { Ionicons } from "@expo/vector-icons"
+import { ButtonStyles } from "@lib/ButtonStyle"
+import { CalendarEvent } from "@lib/Calendar"
+import { EventMapDetails, openMap } from "@lib/ExternalMap"
+import { CurrentUserEvent, isAttendingEvent } from "@lib/events"
 import ExpandableText from "@screens/EventDetails/ExpandableText"
+import React, { useState } from "react"
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View
+} from "react-native"
 import { Divider } from "react-native-elements"
-import EventMapSnippet from "./EventMapSnippet"
-import TimeSection from "./TimeSection"
-import LocationSection from "./LocationSection"
+import Toast from "react-native-root-toast"
 import AttendeeSection from "./AttendeeSection"
 import ChatSection from "./ChatSection"
-import { OutlinedButton, PrimaryButton } from "@components/common/Buttons"
-import { CalendarEvent } from "@lib/Calendar"
-import { EventMapDetails, openMap} from "@lib/ExternalMap"
-import Toast from "react-native-root-toast"
-import { ButtonStyles } from "@lib/ButtonStyle"
+import EventMapSnippet from "./EventMapSnippet"
+import LocationSection from "./LocationSection"
+import TimeSection from "./TimeSection"
 
 export type EventDetailsProps = {
   event: CurrentUserEvent
@@ -54,7 +60,9 @@ const EventDetails = ({ event }: EventDetailsProps) => {
         contentContainerStyle={{ flexGrow: 1 }}
         nestedScrollEnabled={true}
       >
-        <Title style={styles.textColor}>{event.title}</Title>
+        <Title style={[styles.textColor, { marginTop: 36 }]}>
+          {event.title}
+        </Title>
         <View style={[styles.flexRow, { marginVertical: 16 }]}>
           <Image
             style={[styles.image]}
@@ -62,9 +70,11 @@ const EventDetails = ({ event }: EventDetailsProps) => {
           />
           <View style={{ flex: 1 }}>
             <View style={styles.flexRow}>
-              <Headline style={styles.textColor}>{event.host.username}</Headline>
-              {!isFriend && 
-                !requestSent ? (
+              <Headline style={styles.textColor}>
+                {event.host.username}
+              </Headline>
+              {!isFriend && !requestSent
+                ? (
                   <View style={[styles.flexRow, { alignItems: "center" }]}>
                     <Ionicons
                       style={{ marginHorizontal: 8 }}
@@ -72,7 +82,12 @@ const EventDetails = ({ event }: EventDetailsProps) => {
                       color={ButtonStyles.colorOpacity35}
                       name="ellipse"
                     />
-                    <Headline onPress={sendFriendRequest} style={{ color: event.color }}>Add Friend</Headline>
+                    <Headline
+                      onPress={sendFriendRequest}
+                      style={{ color: event.color }}
+                    >
+                    Add Friend
+                    </Headline>
                   </View>
                 )
                 : (
@@ -83,11 +98,14 @@ const EventDetails = ({ event }: EventDetailsProps) => {
                       size={6}
                       name="ellipse"
                     />
-                    <Headline onPress={sendFriendRequest} style={{ color: ButtonStyles.colorOpacity35 }}>Request Sent</Headline>
+                    <Headline
+                      onPress={sendFriendRequest}
+                      style={{ color: ButtonStyles.colorOpacity35 }}
+                    >
+                    Request Sent
+                    </Headline>
                   </View>
-                )
-              }
-              
+                )}
             </View>
             <Caption style={styles.textColor}>{event.host.handle}</Caption>
           </View>
@@ -122,7 +140,9 @@ const EventDetails = ({ event }: EventDetailsProps) => {
 
         {event.description && (
           <View style={{ marginTop: 16 }}>
-            <Headline style={[styles.textColor, {marginBottom: 4 }]}>About</Headline>
+            <Headline style={[styles.textColor, { marginBottom: 4 }]}>
+              About
+            </Headline>
             <ExpandableText
               props={{ style: { color: event.color, marginTop: 5 } }}
               text={event.description}
@@ -131,7 +151,9 @@ const EventDetails = ({ event }: EventDetailsProps) => {
           </View>
         )}
         <View style={{ marginTop: 16, marginBottom: BOTTOM_TAB_HEIGHT + 24 }}>
-          <Headline style={[styles.textColor, { marginBottom: 8 }]}>Location</Headline>
+          <Headline style={[styles.textColor, { marginBottom: 8 }]}>
+            Location
+          </Headline>
           <TouchableOpacity
             style={{
               borderRadius: 12,
@@ -190,10 +212,10 @@ const EventDetails = ({ event }: EventDetailsProps) => {
         containerStyle={styles.toastStyle}
       >
         <View style={styles.flexRow}>
-          <View style={{marginRight: 16}}>
-            <Ionicons style={{color: "white"}} name="close" size={24}/>
+          <View style={{ marginRight: 16 }}>
+            <Ionicons style={{ color: "white" }} name="close" size={24} />
           </View>
-          <BodyText style={{color: "white", textAlignVertical: "center"}}>
+          <BodyText style={{ color: "white", textAlignVertical: "center" }}>
             {"Friend request sent"}
           </BodyText>
         </View>
@@ -206,7 +228,7 @@ export default EventDetails
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 24,
+    marginTop: 0,
     backgroundColor: "white"
   },
   flexRow: {
@@ -248,7 +270,7 @@ const styles = StyleSheet.create({
   },
   toastStyle: {
     borderRadius: 12,
-    width: '90%',
+    width: "90%",
     backgroundColor: ButtonStyles.darkColor,
     alignItems: "flex-start"
   },
