@@ -13,12 +13,8 @@ interface ChatSectionProps {
 const ChatSection = ({ color, userAttendeeStatus }: ChatSectionProps) => {
   return (
     <TouchableOpacity style={[styles.flexRow, styles.paddingIconSection]}>
-      <View style={{ justifyContent: "center" }}>
-        <Ionicon
-          style={[styles.iconStyling, { backgroundColor: color }]}
-          name="chatbox-ellipses"
-          color={"white"}
-        />
+      <View style={[styles.iconStyling, { backgroundColor: color }]}>
+        <Ionicon name="chatbox-ellipses" color={"white"} />
       </View>
       <View style={styles.spacing}>
         <Headline>Event Chat</Headline>
@@ -33,7 +29,7 @@ const ChatSection = ({ color, userAttendeeStatus }: ChatSectionProps) => {
       <View style={[styles.flexRow, { flex: 1, justifyContent: "flex-end" }]}>
         <Ionicon
           name="chevron-forward"
-          style={{ alignSelf: "center"}}
+          style={{ alignSelf: "center" }}
           color={AppStyles.colorOpacity35}
         />
       </View>
@@ -48,11 +44,13 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   paddingIconSection: {
-    paddingHorizontal: 16
+    paddingHorizontal: 16,
+    alignItems: "center"
   },
   iconStyling: {
     padding: 6,
-    borderRadius: 12
+    borderRadius: 12,
+    justifyContent: "center"
   },
   spacing: {
     paddingHorizontal: 16

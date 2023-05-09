@@ -94,7 +94,7 @@ export const EventCard = ({ event }: EventCardProps) => {
 
 const styles = StyleSheet.create({
   flexRow: {
-    flex: 1,
+    // flex: 1,
     flexDirection: "row"
   },
   topRow: {
@@ -110,7 +110,8 @@ const styles = StyleSheet.create({
   },
   infoText: {
     textAlignVertical: "center",
-    textAlign: "center"
+    textAlign: "center",
+    alignSelf: "center"
   },
   name: {
     textAlignVertical: "center",

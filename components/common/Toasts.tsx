@@ -1,6 +1,6 @@
 import Toast from "react-native-root-toast"
 import { AppStyles } from "../../lib/AppColorStyle"
-import { StyleSheet, View } from "react-native"
+import { Platform, StyleSheet, View } from "react-native"
 import { Ionicon } from "./Icons"
 import { BodyText } from "@components/Text"
 import { UserFriendStatus } from "@components/profileImageComponents/ProfileImageAndNameWithFriend"
@@ -47,11 +47,11 @@ export const FriendToast = ({
           containerStyle={styles.toastStyle}
           onHide={() => setRequestSent(true)}
         >
-          <View style={{ flexDirection: "row" }}>
-            <View style={{ marginRight: 16 }}>
+          <View style={styles.containerStyle}>
+            <View style={styles.iconStyle}>
               <Ionicon color="white" name="close" />
             </View>
-            <BodyText style={{ color: "white", textAlignVertical: "center" }}>
+            <BodyText style={styles.textStyle}>
               {"Friend request sent"}
             </BodyText>
           </View>
@@ -64,8 +64,22 @@ export const FriendToast = ({
 const styles = StyleSheet.create({
   toastStyle: {
     borderRadius: 12,
+    flex: 1,
     width: "90%",
     backgroundColor: AppStyles.darkColor,
     alignItems: "flex-start"
+  },
+  textStyle: {
+    color: "white",
+    textAlignVertical: "center",
+    paddingTop: Platform.OS === "ios" ? 4 : 0
+  },
+  iconStyle: {
+    marginRight: 16,
+    paddingTop: Platform.OS === "ios" ? 4 : 0
+  },
+  containerStyle: {
+    flexDirection: "row",
+    alignItems: "center"
   }
 })

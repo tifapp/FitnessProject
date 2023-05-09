@@ -68,22 +68,16 @@ const EventDetails = ({ event }: EventDetailsProps) => {
 
         <View style={styles.iconSection}>
           <TimeSection color={event.color} event={calenderEvent} />
-
-          <Divider style={styles.divider} />
           <LocationSection
             color={event.color}
             coordinates={event.coordinates}
             placemark={event.placemark}
             bottomTabHeight={BOTTOM_TAB_HEIGHT}
           />
-
-          <Divider style={styles.divider} />
           <AttendeeSection
             color={event.color}
             attendeeCount={event.attendeeCount}
           />
-
-          <Divider style={styles.divider} />
           <ChatSection
             color={event.color}
             userAttendeeStatus={event.userAttendeeStatus}
@@ -161,13 +155,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#F4F4F6",
     borderRadius: 8,
     paddingVertical: MARGIN_SPACING
-  },
-  divider: {
-    marginVertical: 16,
-    width: "80%",
-    height: 1,
-    alignSelf: "flex-end",
-    color: "#0000001A"
   },
   bottomTabButton: {
     height: BOTTOM_TAB_HEIGHT,

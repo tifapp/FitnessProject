@@ -5,6 +5,7 @@ import { Headline, Caption, CaptionTitle } from "@components/Text"
 import { dayjs, now } from "@lib/date"
 import { CalendarEvent, addToCalendar, getCalendar } from "@lib/Calendar"
 import { Ionicon } from "@components/common/Icons"
+import { Divider } from "react-native-elements"
 import { showToast } from "@components/common/Toasts"
 
 interface TimeSectionProps {
@@ -15,6 +16,7 @@ interface TimeSectionProps {
 const TimeSection = ({ color, event }: TimeSectionProps) => {
   const [status, requestPermission] = Calendar.useCalendarPermissions()
   const [addedEvent, setAddedEvent] = useState(false)
+  const [dividerWidth, setDividerWidth] = useState(0)
   const startDateFormat = event.duration.formattedDate(
     now(),
     dayjs(event.duration.startDate)
@@ -55,37 +57,43 @@ const TimeSection = ({ color, event }: TimeSectionProps) => {
     }
   }
 
+  const onLayout = (e: { nativeEvent: { layout: { width: any } } }) => {
+    setDividerWidth(e.nativeEvent.layout.width)
+  }
+
   return (
-    <View style={[styles.flexRow, styles.paddingIconSection]}>
-      <View style={{ justifyContent: "center" }}>
-        <Ionicon
-          style={[styles.iconStyling, { backgroundColor: color }]}
-          name="calendar"
-          color={"white"}
-        />
-      </View>
-      <View style={styles.spacing}>
-        {event.duration.endSameDay()
-          ? (
-            <View style={{ marginBottom: 4 }}>
-              <Headline>{`${startDateFormat}`}</Headline>
-              <Caption>{`from ${startTimeFormat} - ${endTimeFormat}`}</Caption>
-            </View>
-          )
-          : (
-            <View style={{ marginBottom: 4 }}>
-              <Headline>{`From ${startDateFormat}, ${startTimeFormat}`}</Headline>
-              <Caption>{`to ${endDateFormat}, ${endTimeFormat}`}</Caption>
-            </View>
+    <View>
+      <View style={[styles.flexRow, styles.paddingIconSection]}>
+        <View style={[styles.iconStyling, { backgroundColor: color }]}>
+          <Ionicon name="calendar" color={"white"} />
+        </View>
+        <View style={styles.spacing} onLayout={onLayout}>
+          {event.duration.endSameDay()
+            ? (
+              <View style={{ marginBottom: 4 }}>
+                <Headline>{`${startDateFormat}`}</Headline>
+                <Caption>{`from ${startTimeFormat} - ${endTimeFormat}`}</Caption>
+              </View>
+            )
+            : (
+              <View style={{ marginBottom: 4 }}>
+                <Headline>{`From ${startDateFormat}, ${startTimeFormat}`}</Headline>
+                <Caption>{`to ${endDateFormat}, ${endTimeFormat}`}</Caption>
+              </View>
+            )}
+          {!addedEvent && (
+            <TouchableOpacity
+              onPress={addEventToCalendar}
+              hitSlop={hitSlopInset}
+            >
+              <CaptionTitle style={[{ color }, styles.captionLinks]}>
+                Add to Calendar
+              </CaptionTitle>
+            </TouchableOpacity>
           )}
-        {!addedEvent && (
-          <TouchableOpacity onPress={addEventToCalendar} hitSlop={hitSlopInset}>
-            <CaptionTitle style={[{ color }, styles.captionLinks]}>
-              Add to Calendar
-            </CaptionTitle>
-          </TouchableOpacity>
-        )}
+        </View>
       </View>
+      <Divider style={[styles.divider, { width: dividerWidth + 16 }]} />
     </View>
   )
 }
@@ -97,17 +105,26 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   paddingIconSection: {
-    paddingHorizontal: 16
+    marginHorizontal: 16,
+    alignItems: "center"
   },
   iconStyling: {
     padding: 6,
-    borderRadius: 12
+    marginRight: 16,
+    borderRadius: 12,
+    justifyContent: "center"
   },
   spacing: {
-    paddingHorizontal: 16
+    flex: 1
   },
   captionLinks: {
     opacity: 1,
     fontWeight: "bold"
+  },
+  divider: {
+    marginVertical: 16,
+    height: 1,
+    alignSelf: "flex-end",
+    color: "#0000001A"
   }
 })

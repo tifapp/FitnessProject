@@ -1,5 +1,5 @@
 import { BodyText, Headline } from "@components/Text"
-import React, {useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { Animated, TextProps, View } from "react-native"
 
 export type ExpandableTextProps = {
@@ -18,10 +18,10 @@ const ExpandableText = ({
   const [expander, setExpander] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const [lineNumber, setLineNumber] = useState(linesToDisplay)
-  const [lineHeight, setLineHeight] = useState(TEXT_HEIGHT)
-  const startingHeight = lineHeight * linesToDisplay
-  const [fullHeight, setFullHeight] = useState(startingHeight)
-  const animatedHeight = useRef(new Animated.Value(startingHeight)).current
+  const startingHeight = TEXT_HEIGHT * linesToDisplay
+  const [fullHeight, setFullHeight] = useState(500)
+  const [numLinesDetermined, setNumLinesDetermined] = useState(false)
+  const animatedHeight = useRef(new Animated.Value(500)).current
 
   const toggleExpansion = () => {
     setExpanded(!expanded)
@@ -35,40 +35,41 @@ const ExpandableText = ({
     }).start()
   }, [expanded])
 
+  // Lower the height of the view if lines of text is less than the number to render
   useEffect(() => {
     if (lineNumber < linesToDisplay) {
-      animatedHeight.setValue(lineHeight * lineNumber)
+      animatedHeight.setValue(TEXT_HEIGHT * lineNumber)
       setExpander(false)
     }
   }, [lineNumber])
 
-  const onLayout = (e: { nativeEvent: { layout: { height: any } } }) => {
-    let { height } = e.nativeEvent.layout
-    height = Math.floor(height) + lineHeight * (lineNumber - linesToDisplay)
+  // Get number of lines text renders to and calculate full height
+  const onTextLayout = (e: { nativeEvent: { lines: string | any[] } }) => {
+    if (!numLinesDetermined) {
+      const totalHeight = TEXT_HEIGHT * e.nativeEvent.lines.length
+      setNumLinesDetermined(true)
+      setLineNumber(e.nativeEvent.lines.length)
 
-    if (height > startingHeight) {
-      setFullHeight(height)
-      setExpander(true)
+      if (totalHeight > startingHeight) {
+        setFullHeight(totalHeight + 5)
+        setExpander(true)
+      }
     }
   }
 
-  const onTextLayout = (e: { nativeEvent: { lines: string | any[] } }) => {
-    setLineNumber(e.nativeEvent.lines.length)
-    setLineHeight(e.nativeEvent.lines[0].height)
-  }
-
+  // Initially set numberOfLines to undefined since ios uses it as line.length otherwise
   return (
     <View>
       <Animated.View style={{ height: animatedHeight }}>
-        <View onLayout={onLayout}>
-          <BodyText
-            numberOfLines={expanded ? 0 : linesToDisplay}
-            ellipsizeMode="tail"
-            onTextLayout={onTextLayout}
-          >
-            {text}
-          </BodyText>
-        </View>
+        <BodyText
+          numberOfLines={
+            !numLinesDetermined ? undefined : expanded ? 0 : linesToDisplay
+          }
+          ellipsizeMode="tail"
+          onTextLayout={onTextLayout}
+        >
+          {text}
+        </BodyText>
       </Animated.View>
       {expander && (
         <Headline {...props} style={props?.style} onPress={toggleExpansion}>
