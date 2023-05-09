@@ -5,10 +5,12 @@ interface ProfileImageProps {
   style?: StyleProp<ImageStyle>
 }
 
-const ProfileImage = ({imageURL, style}: ProfileImageProps) => {
+const ProfileImage = ({ imageURL, style }: ProfileImageProps) => {
   const defaultImage = require("@assets/icon.png")
 
-  return <Image source={defaultImage} style={style}/>
+  return (
+    <Image source={defaultImage} style={[{ alignSelf: "center" }, style]} />
+  )
 }
 
 export default ProfileImage

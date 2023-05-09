@@ -9,8 +9,8 @@ import {
 } from "@lib/location"
 import { useTrackUserLocation } from "@hooks/UserLocation"
 import { NativeEventMapDetails, openMapDirections } from "@lib/NativeMap"
-import { showToast } from "@lib/AppColorStyle"
 import { Ionicon } from "@components/common/Icons"
+import { showToast } from "@components/common/Toasts"
 
 interface LocationSectionProps {
   color: string

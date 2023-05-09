@@ -28,8 +28,6 @@ export const EventCard = ({ event }: EventCardProps) => {
       <View style={[styles.topRow, styles.flexRow]}>
         <View>
           <ProfileImageAndName
-            displayFriend={false}
-            displayHandle={true}
             username={event.host.username}
             userHandle={event.host.handle}
             imageStyle={[styles.image, styles.iconMargin]}
@@ -111,7 +109,8 @@ const styles = StyleSheet.create({
     marginBottom: 8
   },
   infoText: {
-    textAlignVertical: "center"
+    textAlignVertical: "center",
+    textAlign: "center"
   },
   name: {
     textAlignVertical: "center",
@@ -150,6 +149,7 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     justifyContent: "center",
+    alignContent: "center",
     borderRadius: 12,
     marginRight: 8
   },

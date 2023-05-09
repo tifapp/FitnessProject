@@ -1,11 +1,11 @@
 import React, { useState } from "react"
 import { StyleSheet, TouchableOpacity, View } from "react-native"
-import * as Calendar from 'expo-calendar';
+import * as Calendar from "expo-calendar"
 import { Headline, Caption, CaptionTitle } from "@components/Text"
 import { dayjs, now } from "@lib/date"
 import { CalendarEvent, addToCalendar, getCalendar } from "@lib/Calendar"
-import { showToast } from "@lib/AppColorStyle"
 import { Ionicon } from "@components/common/Icons"
+import { showToast } from "@components/common/Toasts"
 
 interface TimeSectionProps {
   color: string
@@ -13,13 +13,16 @@ interface TimeSectionProps {
 }
 
 const TimeSection = ({ color, event }: TimeSectionProps) => {
-  const [status, requestPermission] = Calendar.useCalendarPermissions();
+  const [status, requestPermission] = Calendar.useCalendarPermissions()
   const [addedEvent, setAddedEvent] = useState(false)
   const startDateFormat = event.duration.formattedDate(
     now(),
     dayjs(event.duration.startDate)
   )
-  const endDateFormat = event.duration.formattedDate(now(), dayjs(event.duration.endDate))
+  const endDateFormat = event.duration.formattedDate(
+    now(),
+    dayjs(event.duration.endDate)
+  )
   const startTimeFormat = dayjs(event.duration.startDate).format("h A")
   const endTimeFormat = dayjs(event.duration.endDate).format("h A")
   const hitSlopInset = {
@@ -35,23 +38,27 @@ const TimeSection = ({ color, event }: TimeSectionProps) => {
     if (status?.granted) {
       calendar = await getCalendar()
       await addToCalendar(calendar.id, event, setAddedEvent)
-
     } else {
-      await requestPermission().then(async (status) => {
-        if (status?.granted) {
-          calendar = await getCalendar()
-          await addToCalendar(calendar.id, event, setAddedEvent)
-        }
-      }).catch((error) => {
-       showToast("Unable to add Event without Permissions", event.bottomTabHeight)
-      })
+      await requestPermission()
+        .then(async (status) => {
+          if (status?.granted) {
+            calendar = await getCalendar()
+            await addToCalendar(calendar.id, event, setAddedEvent)
+          }
+        })
+        .catch(() => {
+          showToast(
+            "Unable to add Event without Permissions",
+            event.bottomTabHeight
+          )
+        })
     }
   }
 
   return (
     <View style={[styles.flexRow, styles.paddingIconSection]}>
       <View style={{ justifyContent: "center" }}>
-        <Ionicon 
+        <Ionicon
           style={[styles.iconStyling, { backgroundColor: color }]}
           name="calendar"
           color={"white"}

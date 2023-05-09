@@ -19,6 +19,7 @@ import { CalendarEvent } from "@lib/Calendar"
 import { NativeEventMapDetails, openInMaps } from "@lib/NativeMap"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
 import AttendanceButton from "@components/bottomTabComponents/AttendanceButton"
+import ProfileImageAndNameWithFriend from "@components/profileImageComponents/ProfileImageAndNameWithFriend"
 
 export type EventDetailsProps = {
   event: CurrentUserEvent
@@ -55,9 +56,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
         nestedScrollEnabled={true}
       >
         <Title>{event.title}</Title>
-        <ProfileImageAndName
-          displayFriend={true}
-          displayHandle={true}
+        <ProfileImageAndNameWithFriend
           username={event.host.username}
           userHandle={event.host.handle}
           eventColor={event.color}
