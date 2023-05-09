@@ -15,6 +15,8 @@ import EventDetails from "./EventDetails/EventDetails"
 
 const LATLNGDELTA = 0.5
 
+const MARKER_SIZE = 80
+
 const ActivitiesScreen = () => {
   const appRef = useRef<MapRefMethods | null>(null)
   const givenUserLocation = useTrackUserLocation()
