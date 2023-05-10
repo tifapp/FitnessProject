@@ -13,11 +13,11 @@ const StoryText = () => {
     >
       <ContentText
         style={{ width: "100%" }}
-        onHandleTapped={console.log}
+        onUserHandleTapped={console.log}
         text={text}
       />
       <TextInput multiline style={{ width: "100%" }} onChangeText={setText}>
-        <ContentText onHandleTapped={console.log} text={text} />
+        <ContentText onUserHandleTapped={console.log} text={text} />
       </TextInput>
     </View>
   )

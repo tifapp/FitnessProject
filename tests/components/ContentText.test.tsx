@@ -27,7 +27,7 @@ describe("ContentText tests", () => {
   it("allows for opening a profile based on its handle", () => {
     const handle = "@why_people"
     renderLinkedText(
-      `This is a handle ${handle} that brings youb to a profile.`
+      `This is a handle\n${handle}\nthat brings you to a profile.`
     )
     tapText(handle)
     expect(handleTappedAction).toHaveBeenCalledWith(handle)
@@ -45,6 +45,12 @@ describe("ContentText tests", () => {
     expectRegularText(invalidHandle)
   })
 
+  test("the character before a handle must be whitespace for it to be valid", () => {
+    const text = "...@why_people"
+    renderLinkedText(text)
+    expectRegularText(text)
+  })
+
   const handleTappedAction = jest.fn()
   const urlTappedAction = jest.fn()
 
@@ -60,7 +66,7 @@ describe("ContentText tests", () => {
     return render(
       <ContentText
         text={url}
-        onHandleTapped={handleTappedAction}
+        onUserHandleTapped={handleTappedAction}
         onURLTapped={urlTappedAction}
       />
     )
