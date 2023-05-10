@@ -11,9 +11,9 @@ import ContentReportingMeta, {
   Default as DefaultReportingFlow
 } from "../components/ContentReporting/ContentReporting.stories"
 import { useAppFonts } from "../../hooks/Fonts"
-import LinkedTextMeta, {
-  Basic as LinkedTextBasic
-} from "../components/LinkedText/LinkedText.stories"
+import ContentTextMeta, {
+  Basic as ContentTextBasic
+} from "../components/ContentText/ContextText.stories"
 
 // Create an array of stories
 const stories = [
@@ -28,9 +28,9 @@ const stories = [
     args: ContentReportingMeta.args
   },
   {
-    name: LinkedTextMeta.title,
-    component: LinkedTextBasic,
-    args: LinkedTextMeta.args
+    name: ContentTextMeta.title,
+    component: ContentTextBasic,
+    args: ContentTextMeta.args
   }
   // Add more stories here...
 ]

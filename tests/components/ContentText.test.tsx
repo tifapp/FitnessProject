@@ -1,7 +1,7 @@
-import { LinkedText } from "@components/LinkedText"
+import { ContentText } from "@components/ContentText"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 
-describe("LinkedText tests", () => {
+describe("ContentText tests", () => {
   beforeEach(() => jest.resetAllMocks())
 
   it("renders text without urls or profile handles normally", () => {
@@ -47,6 +47,6 @@ describe("LinkedText tests", () => {
   }
 
   const renderLinkedText = (url: string) => {
-    return render(<LinkedText text={url} onURLTapped={urlTappedAction} />)
+    return render(<ContentText text={url} onURLTapped={urlTappedAction} />)
   }
 })

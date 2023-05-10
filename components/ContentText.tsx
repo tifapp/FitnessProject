@@ -6,16 +6,16 @@ import linkifyIt, { Match } from "linkify-it"
 
 const linkify = linkifyIt()
 
-export type LinkedTextProps = {
+export type ContentTextProps = {
   text: string
   onURLTapped?: (url: string) => void
 } & TextProps
 
-export const LinkedText = ({
+export const ContentText = ({
   text,
   onURLTapped = openURL,
   ...props
-}: LinkedTextProps) => {
+}: ContentTextProps) => {
   const textBlocks = useMemo(
     () => renderLinkTextBlocks(text, onURLTapped),
     [text, onURLTapped]
