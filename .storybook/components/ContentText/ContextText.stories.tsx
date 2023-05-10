@@ -11,9 +11,13 @@ const StoryText = () => {
     <View
       style={{ height: "100%", justifyContent: "center", alignItems: "center" }}
     >
-      <ContentText style={{ width: "100%" }} text={text} />
+      <ContentText
+        style={{ width: "100%" }}
+        onHandleTapped={console.log}
+        text={text}
+      />
       <TextInput multiline style={{ width: "100%" }} onChangeText={setText}>
-        <ContentText text={text} />
+        <ContentText onHandleTapped={console.log} text={text} />
       </TextInput>
     </View>
   )

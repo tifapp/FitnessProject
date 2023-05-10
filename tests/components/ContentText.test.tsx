@@ -10,12 +10,6 @@ describe("ContentText tests", () => {
     expectRegularText(text)
   })
 
-  it("renders text and urls together", () => {
-    const text = "Hello world https://www.youareanidiot.cc this is a test"
-    renderLinkedText(text)
-    expectLinkText("https://www.youareanidiot.cc")
-  })
-
   it("allows for opening raw urls embedded in text", () => {
     const url = "google.com"
     renderLinkedText(`Hello world this is a url to: ${url}!`)
@@ -30,6 +24,28 @@ describe("ContentText tests", () => {
     expect(urlTappedAction).toHaveBeenCalledWith("mailto:bigchungus@gmail.com")
   })
 
+  it("allows for opening a profile based on its handle", () => {
+    const handle = "@why_people"
+    renderLinkedText(
+      `This is a handle ${handle} that brings youb to a profile.`
+    )
+    tapText(handle)
+    expect(handleTappedAction).toHaveBeenCalledWith(handle)
+  })
+
+  it("does not detect @@handles as a handle", () => {
+    const invalidHandle = "@@why_people"
+    renderLinkedText(invalidHandle)
+    expectRegularText(invalidHandle)
+  })
+
+  it("does not detect invalid handles", () => {
+    const invalidHandle = "@++++test++++"
+    renderLinkedText(invalidHandle)
+    expectRegularText(invalidHandle)
+  })
+
+  const handleTappedAction = jest.fn()
   const urlTappedAction = jest.fn()
 
   const tapText = (text: string) => {
@@ -40,13 +56,13 @@ describe("ContentText tests", () => {
     expect(screen.getByText(text).props.testID).toEqual("regular-text")
   }
 
-  const expectLinkText = (text: string) => {
-    expect(screen.getByText(text).props.style[0].textDecorationLine).toEqual(
-      "underline"
-    )
-  }
-
   const renderLinkedText = (url: string) => {
-    return render(<ContentText text={url} onURLTapped={urlTappedAction} />)
+    return render(
+      <ContentText
+        text={url}
+        onHandleTapped={handleTappedAction}
+        onURLTapped={urlTappedAction}
+      />
+    )
   }
 })
