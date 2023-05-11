@@ -1,15 +1,16 @@
 import EventsList from "@components/EventsList"
+import EventTabBar from "@components/bottomTabComponents/EventTabBar"
+import { TouchableIonicon } from "@components/common/Icons"
 import EventsMap, { MapRefMethods } from "@components/eventMap/EventsMap"
-import EventTabBar from "@components/tabBarComponents/EventTabBar"
 import { useTrackUserLocation } from "@hooks/UserLocation"
+import { AppStyles } from "@lib/AppColorStyle"
 import { CurrentUserEvent, EventMocks } from "@lib/events"
 import {
   UserLocationTrackingUpdate,
   requestLocationPermissions
 } from "@lib/location/UserLocation"
 import React, { useEffect, useRef } from "react"
-import { StyleSheet, TouchableOpacity } from "react-native"
-import { Icon } from "react-native-elements"
+import { StyleSheet } from "react-native"
 
 const MARKER_SIZE = 44
 const LATLNGDELTA = 0.5
@@ -78,12 +79,11 @@ const ActivitiesScreen = ({
         }))}
       />
 
-      <TouchableOpacity
-        onPress={recenterToUserLocation}
+      <TouchableIonicon
         style={styles.recenterButton}
-      >
-        <Icon name="locate-outline" type="ionicon" color="white" size={30} />
-      </TouchableOpacity>
+        icon={{ name: "locate-outline", color: "white" }}
+        onPress={recenterToUserLocation}
+      />
 
       <EventsList />
       <EventTabBar />
@@ -95,13 +95,13 @@ const styles = StyleSheet.create({
   recenterButton: {
     alignItems: "center",
     justifyContent: "center",
-    width: 60,
-    height: 60,
+    width: 48,
+    height: 48,
     position: "absolute",
     bottom: "20%",
     right: "5%",
-    borderRadius: 15,
-    backgroundColor: "black"
+    borderRadius: 12,
+    backgroundColor: AppStyles.darkColor
   }
 })
 export default ActivitiesScreen

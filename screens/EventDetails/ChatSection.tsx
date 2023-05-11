@@ -2,7 +2,7 @@ import React from "react"
 import { StyleSheet, TouchableOpacity, View } from "react-native"
 import { Headline, Caption } from "@components/Text"
 import { EventUserAttendeeStatus, isAttendingEvent } from "@lib/events"
-import { ButtonStyles } from "@lib/ButtonStyle"
+import { AppStyles } from "@lib/AppColorStyle"
 import { Ionicon } from "@components/common/Icons"
 
 interface ChatSectionProps {
@@ -13,15 +13,11 @@ interface ChatSectionProps {
 const ChatSection = ({ color, userAttendeeStatus }: ChatSectionProps) => {
   return (
     <TouchableOpacity style={[styles.flexRow, styles.paddingIconSection]}>
-      <View style={{ justifyContent: "center" }}>
-        <Ionicon
-          style={[styles.iconStyling, { backgroundColor: color }]}
-          name="chatbox-ellipses"
-          color={"white"}
-        />
+      <View style={[styles.iconStyling, { backgroundColor: color }]}>
+        <Ionicon name="chatbox-ellipses" color={"white"} />
       </View>
       <View style={styles.spacing}>
-        <Headline style={styles.textColor}>Event Chat</Headline>
+        <Headline>Event Chat</Headline>
         {isAttendingEvent(userAttendeeStatus)
           ? (
             <Caption>View the chat</Caption>
@@ -33,8 +29,8 @@ const ChatSection = ({ color, userAttendeeStatus }: ChatSectionProps) => {
       <View style={[styles.flexRow, { flex: 1, justifyContent: "flex-end" }]}>
         <Ionicon
           name="chevron-forward"
-          style={{ alignSelf: "center"}}
-          color={ButtonStyles.colorOpacity35}
+          style={{ alignSelf: "center" }}
+          color={AppStyles.colorOpacity35}
         />
       </View>
     </TouchableOpacity>
@@ -48,16 +44,15 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   paddingIconSection: {
-    paddingHorizontal: 16
+    paddingHorizontal: 16,
+    alignItems: "center"
   },
   iconStyling: {
     padding: 6,
-    borderRadius: 12
+    borderRadius: 12,
+    justifyContent: "center"
   },
   spacing: {
     paddingHorizontal: 16
-  },
-  textColor: {
-    color: ButtonStyles.darkColor
   }
 })
