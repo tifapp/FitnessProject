@@ -1,3 +1,4 @@
+import { AppStyles } from "@lib/AppColorStyle"
 import React from "react"
 import { StyleSheet, Text, TextProps } from "react-native"
 
@@ -57,5 +58,8 @@ const styles = StyleSheet.create({
   headline: {
     fontFamily: "OpenSansBold",
     fontSize: 16
+  },
+  color: {
+    color: AppStyles.darkColor
   }
 })

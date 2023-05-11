@@ -55,6 +55,7 @@ import {
 } from "react-native"
 
 // sign in
+import { AppQueryClientProvider } from "@components/AppQueryClientProvider"
 import ConfirmSignIn from "@components/loginComponents/ConfirmSignIn"
 import ConfirmSignUp from "@components/loginComponents/ConfirmSignUp"
 import ForgotPassword from "@components/loginComponents/ForgotPassword"
@@ -63,13 +64,12 @@ import RequireNewPassword from "@components/loginComponents/RequireNewPassword"
 import SignIn from "@components/loginComponents/SignIn"
 import SignUp from "@components/loginComponents/SignUp"
 import VerifyContact from "@components/loginComponents/VerifyContact"
+import { useAppFonts } from "@hooks/Fonts"
 import { makeLinkingConfig } from "@lib/linkingConfig"
 import { ExpoUserNotifications } from "@lib/UserNotifications"
-import ActivitiesScreen from "@screens/ActivitiesScreen"
+import ActivitiesStack from "@stacks/ActivitiesStack"
 import { SetDependencyValue } from "./lib/dependencies"
 import { userIdDependencyKey } from "./lib/MiscDependencyKeys"
-import { AppQueryClientProvider } from "@components/AppQueryClientProvider"
-import { useAppFonts } from "@hooks/Fonts"
 
 if (
   Platform.OS === "android" &&
@@ -314,7 +314,7 @@ const App = () => {
         <Stack.Navigator>
           <Stack.Screen
             name="Activities Screen"
-            component={ActivitiesScreen}
+            component={ActivitiesStack}
             options={{
               headerShown: false
             }}

@@ -1,19 +1,18 @@
 import { showLocation } from "react-native-map-link"
-import * as Location from "expo-location"
 import {
   LocationCoordinate2D,
   Placemark,
   UserLocationTrackingUpdate,
-  placemarkToFormattedAddress
+  placemarkToFormattedAddress,
+  requestLocationPermissions
 } from "./location"
 
-
-export type EventMapDetails = {
-  coordinates: LocationCoordinate2D,
+export type NativeEventMapDetails = {
+  coordinates: LocationCoordinate2D
   placemark?: Placemark
 }
 
-const mapOptions = (details: EventMapDetails) => {
+const nativeMapOptions = (details: NativeEventMapDetails) => {
   const name =
     details.placemark && details.placemark.street
       ? placemarkToFormattedAddress(details.placemark)
@@ -26,20 +25,22 @@ const mapOptions = (details: EventMapDetails) => {
   }
 }
 
-export const openMap = (details: EventMapDetails) => {
-  showLocation(mapOptions(details))
+export const openInMaps = (details: NativeEventMapDetails) => {
+  showLocation(nativeMapOptions(details))
 }
 
-export const withDirections = 
-  async (userLocation: UserLocationTrackingUpdate | undefined, details: EventMapDetails) => {
-  const options = mapOptions(details)
+export const openMapDirections = async (
+  userLocation: UserLocationTrackingUpdate | undefined,
+  details: NativeEventMapDetails
+) => {
+  const options = nativeMapOptions(details)
   const userCoordinates =
     userLocation && userLocation.status === "success"
       ? userLocation.location.coordinates
       : undefined
 
   if (!userCoordinates) {
-    await Location.requestForegroundPermissionsAsync()
+    await requestLocationPermissions()
   }
 
   if (userCoordinates) {
@@ -50,6 +51,6 @@ export const withDirections =
       directionsMode: "car"
     })
   } else {
-    openMap(details)
+    openInMaps(details)
   }
 }

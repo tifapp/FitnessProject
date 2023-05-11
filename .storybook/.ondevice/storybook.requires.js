@@ -56,6 +56,7 @@ const getStories = () => {
     "./components/EventFormToolbar/EventFormToolbar.stories.tsx": require("../components/EventFormToolbar/EventFormToolbar.stories.tsx"),
     "./components/HexColorPicker/HexColorPicker.stories.tsx": require("../components/HexColorPicker/HexColorPicker.stories.tsx"),
     "./components/IconButton/IconButton.stories.tsx": require("../components/IconButton/IconButton.stories.tsx"),
+    "./components/LinkedText/LinkedText.stories.tsx": require("../components/LinkedText/LinkedText.stories.tsx"),
     "./components/LocationSearchResultRow/LocationSearchResultRow.stories.tsx": require("../components/LocationSearchResultRow/LocationSearchResultRow.stories.tsx"),
     "./components/SearchBar/SearchBar.stories.tsx": require("../components/SearchBar/SearchBar.stories.tsx"),
   };

@@ -1,16 +1,19 @@
-import { Caption, CaptionTitle, Headline } from "@components/Text"
-import { Ionicon } from "@components/common/Icons"
-import { useTrackUserLocation } from "@hooks/UserLocation"
-import { ButtonStyles, showToast } from "@lib/ButtonStyle"
-import { EventMapDetails, withDirections } from "@lib/ExternalMap"
+
+import React, { useState } from "react"
+import { StyleSheet, TouchableOpacity, View } from "react-native"
+import * as Clipboard from "expo-clipboard"
+import { Headline, Caption, CaptionTitle } from "@components/Text"
 import {
   LocationCoordinate2D,
   Placemark,
   placemarkToFormattedAddress
 } from "@lib/location"
-import * as Clipboard from "expo-clipboard"
-import React from "react"
-import { StyleSheet, TouchableOpacity, View } from "react-native"
+import { useTrackUserLocation } from "@hooks/UserLocation"
+import { NativeEventMapDetails, openMapDirections } from "@lib/NativeMap"
+import { Ionicon } from "@components/common/Icons"
+import { showToast } from "@components/common/Toasts"
+import { Divider } from "react-native-elements"
+
 
 interface LocationSectionProps {
   color: string
@@ -26,8 +29,9 @@ const LocationSection = ({
   bottomTabHeight
 }: LocationSectionProps) => {
   const userLocation = useTrackUserLocation("precise")
+  const [dividerWidth, setDividerWidth] = useState(0)
 
-  const mapDetails: EventMapDetails = {
+  const mapDetails: NativeEventMapDetails = {
     coordinates,
     placemark
   }
@@ -40,7 +44,7 @@ const LocationSection = ({
   }
 
   const openMapWithDirections = async () => {
-    await withDirections(userLocation, mapDetails)
+    await openMapDirections(userLocation, mapDetails)
   }
 
   const copyToClipboard = async () => {
@@ -54,75 +58,86 @@ const LocationSection = ({
     showToast("Copied to Clipboard", bottomTabHeight)
   }
 
+  const onLayout = (e: { nativeEvent: { layout: { width: any } } }) => {
+    setDividerWidth(e.nativeEvent.layout.width)
+  }
+
   return (
-    <View style={[styles.flexRow, styles.paddingIconSection]}>
-      <View style={{ justifyContent: "center" }}>
-        <Ionicon
-          style={[styles.iconStyling, { backgroundColor: color }]}
-          name="location"
-          color={"white"}
-        />
+    <View>
+      <View style={[styles.flexRow, styles.paddingIconSection]}>
+        <View style={[styles.iconStyling, { backgroundColor: color }]}>
+          <Ionicon name="location" color={"white"} />
+        </View>
+        {placemark
+          ? (
+            <View style={styles.spacing} onLayout={onLayout}>
+              <View style={{ marginBottom: 4 }}>
+                <Headline>{placemark.name}</Headline>
+                <View style={styles.flexRow}>
+                  {placemark.streetNumber && (
+                    <Caption>{`${placemark.streetNumber} `}</Caption>
+                  )}
+                  {placemark.street && (
+                    <Caption>{`${placemark.street}, `}</Caption>
+                  )}
+                  {placemark.city && <Caption>{`${placemark.city}, `}</Caption>}
+                  {placemark.region && <Caption>{`${placemark.region}`}</Caption>}
+                </View>
+              </View>
+              <View style={styles.flexRow}>
+                <TouchableOpacity
+                  onPress={copyToClipboard}
+                  hitSlop={hitSlopInset}
+                >
+                  <CaptionTitle
+                    style={[{ color, marginRight: 16 }, styles.captionLinks]}
+                  >
+                  Copy Address
+                  </CaptionTitle>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={openMapWithDirections}
+                  hitSlop={hitSlopInset}
+                >
+                  <CaptionTitle style={[{ color }, styles.captionLinks]}>
+                  Directions
+                  </CaptionTitle>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )
+          : (
+            <View style={styles.spacing} onLayout={onLayout}>
+              <View style={{ marginBottom: 4 }}>
+                <Headline>{`${coordinates.latitude}, ${coordinates.longitude}`}</Headline>
+                <View style={styles.flexRow}>
+                  <Caption>Unknown Address</Caption>
+                </View>
+              </View>
+              <View style={styles.flexRow}>
+                <TouchableOpacity
+                  onPress={copyToClipboard}
+                  hitSlop={hitSlopInset}
+                >
+                  <CaptionTitle
+                    style={[{ color, marginRight: 16 }, styles.captionLinks]}
+                  >
+                  Copy Coordinates
+                  </CaptionTitle>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={openMapWithDirections}
+                  hitSlop={hitSlopInset}
+                >
+                  <CaptionTitle style={[{ color }, styles.captionLinks]}>
+                  Directions
+                  </CaptionTitle>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
       </View>
-      {placemark
-        ? (
-          <View style={styles.spacing}>
-            <View style={{ marginBottom: 4 }}>
-              <Headline style={styles.textColor}>{placemark.name}</Headline>
-              <View style={styles.flexRow}>
-                {placemark.streetNumber && (
-                  <Caption>{`${placemark.streetNumber} `}</Caption>
-                )}
-                {placemark.street && <Caption>{`${placemark.street}, `}</Caption>}
-                {placemark.city && <Caption>{`${placemark.city}, `}</Caption>}
-                {placemark.region && <Caption>{`${placemark.region}`}</Caption>}
-              </View>
-            </View>
-            <View style={styles.flexRow}>
-              <TouchableOpacity onPress={copyToClipboard} hitSlop={hitSlopInset}>
-                <CaptionTitle
-                  style={[{ color, marginRight: 16 }, styles.captionLinks]}
-                >
-                Copy Address
-                </CaptionTitle>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={openMapWithDirections}
-                hitSlop={hitSlopInset}
-              >
-                <CaptionTitle style={[{ color }, styles.captionLinks]}>
-                Directions
-                </CaptionTitle>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )
-        : (
-          <View style={styles.spacing}>
-            <View style={{ marginBottom: 4 }}>
-              <Headline>{`${coordinates.latitude}, ${coordinates.longitude}`}</Headline>
-              <View style={styles.flexRow}>
-                <Caption>Unknown Address</Caption>
-              </View>
-            </View>
-            <View style={styles.flexRow}>
-              <TouchableOpacity onPress={copyToClipboard} hitSlop={hitSlopInset}>
-                <CaptionTitle
-                  style={[{ color, marginRight: 16 }, styles.captionLinks]}
-                >
-                Copy Coordinates
-                </CaptionTitle>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={openMapWithDirections}
-                hitSlop={hitSlopInset}
-              >
-                <CaptionTitle style={[{ color }, styles.captionLinks]}>
-                Directions
-                </CaptionTitle>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
+      <Divider style={[styles.divider, { width: dividerWidth + 16 }]} />
     </View>
   )
 }
@@ -134,20 +149,26 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   paddingIconSection: {
-    paddingHorizontal: 16
+    paddingHorizontal: 16,
+    alignItems: "center"
   },
   iconStyling: {
     padding: 6,
-    borderRadius: 12
+    marginRight: 16,
+    borderRadius: 12,
+    justifyContent: "center"
   },
   spacing: {
-    paddingHorizontal: 16
+    flex: 1
   },
   captionLinks: {
     opacity: 1,
     fontWeight: "bold"
   },
-  textColor: {
-    color: ButtonStyles.darkColor
+  divider: {
+    marginVertical: 16,
+    height: 1,
+    alignSelf: "flex-end",
+    color: "#0000001A"
   }
 })

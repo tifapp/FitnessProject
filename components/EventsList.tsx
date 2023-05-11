@@ -4,12 +4,15 @@ import {
   BottomSheetModalProvider
 } from "@gorhom/bottom-sheet"
 import { CurrentUserEvent, EventMocks } from "@lib/events/Event"
+import { useNavigation } from "@react-navigation/native"
 import React, { useEffect, useRef } from "react"
-import { ListRenderItemInfo, StyleSheet, View } from "react-native"
+import { ListRenderItemInfo, StyleSheet, Text, View } from "react-native"
+import { TouchableOpacity } from "react-native-gesture-handler"
 import { Title } from "./Text"
 import { EventCard } from "./eventCard/EventCard"
 
 const EventsList = () => {
+  const navigation = useNavigation()
   const events: CurrentUserEvent[] = [
     EventMocks.Multiday,
     EventMocks.NoPlacemarkInfo,
@@ -49,14 +52,20 @@ const EventsList = () => {
           <BottomSheetFlatList
             data={events}
             renderItem={({ item }: ListRenderItemInfo<CurrentUserEvent>) => (
-              <View
-                style={{
-                  marginHorizontal: MARGIN_HORIZONTAL,
-                  marginVertical: MARGIN_VERTICAL
-                }}
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("Event Details", { event: item })
+                }
               >
-                <EventCard event={item} />
-              </View>
+                <View
+                  style={{
+                    marginHorizontal: MARGIN_HORIZONTAL,
+                    marginVertical: MARGIN_VERTICAL
+                  }}
+                >
+                  <EventCard event={item} />
+                </View>
+              </TouchableOpacity>
             )}
             ListHeaderComponent={
               <View style={styles.activitiesContainer}>
