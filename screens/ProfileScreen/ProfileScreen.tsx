@@ -1,5 +1,9 @@
 import { BodyText, Caption, Headline, Title } from "@components/Text"
+import { OutlinedButton, PrimaryButton } from "@components/common/Buttons"
+import ExpandableText from "@components/common/ExpandableText"
 import { EventCard } from "@components/eventCard/EventCard"
+import ProfileImage from "@components/profileImageComponents/ProfileImage"
+import { useUserCoordinatesQuery } from "@hooks/UserLocation"
 import { User } from "@lib/User"
 import { Image, ScrollView, StyleSheet, View } from "react-native"
 
@@ -15,17 +19,43 @@ const ProfileScreen = ({ user }: ProfileScreenProps) => {
       contentContainerStyle={{ flexGrow: 1 }}
     >
       <View style={{ alignItems: "center", marginTop: 16 }}>
-        <Image
+        <ProfileImage
           style={styles.profileImage}
-          source={require("@assets/Windows_10_Default_Profile_Picture.svg.png")}
+          imageURL={user.profileImageURL}
         />
         <Title style={{ marginBottom: 8 }}>{user.username}</Title>
         <Caption>{user.handle}</Caption>
       </View>
 
+      {user.friendStatus !== "current-user" && (
+        <View
+          style={{
+            flexDirection: "row",
+            marginTop: 20
+          }}
+        >
+          {user.friendStatus === "not-friends" && (
+            <PrimaryButton style={{ flex: 1 }} title="Add Friend" />
+          )}
+          {user.friendStatus !== "blocked" && (
+            <OutlinedButton
+              style={{
+                flex: 1,
+                marginLeft: user.friendStatus === "not-friends" ? 16 : 0
+              }}
+              title="Message"
+            />
+          )}
+        </View>
+      )}
+
       <View style={{ marginVertical: 24 }}>
         <Headline style={{ marginBottom: 16 }}>About</Headline>
-        <BodyText>{user.biography}</BodyText>
+        <ExpandableText
+          text={user.biography}
+          linesToDisplay={3}
+          style={{ color: colorText }}
+        />
       </View>
 
       <View style={{ flexDirection: "row", marginBottom: 16 }}>

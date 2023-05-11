@@ -5,12 +5,7 @@ import React, { useState } from "react"
 import { Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FriendToast } from "@components/common/Toasts"
-
-export type UserFriendStatus =
-  | "not-friends"
-  | "friend-request-pending"
-  | "friends"
-  | "blocked"
+import { UserFriendStatus } from "@lib/User"
 
 interface ImageAndNameProps {
   username: string

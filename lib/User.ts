@@ -1,6 +1,12 @@
 import { CurrentUserEvent, EventMocks } from "./events"
 import { uuid } from "./uuid"
 
+export type UserFriendStatus =
+  | "not-friends"
+  | "friend-request-pending"
+  | "friends"
+  | "blocked"
+
 export type User = {
   id: string
   username: string
@@ -8,6 +14,7 @@ export type User = {
   biography: string
   profileImageURL: string
   events: CurrentUserEvent[]
+  friendStatus: UserFriendStatus | "current-user"
 }
 
 /**
@@ -21,12 +28,15 @@ export namespace UserMocks {
     biography:
       "The placemark info should then be geocoded from the coordinates if it is not available." +
       "The placemark info should then be geocoded from the coordinates if it is not available." +
+      "The placemark info should then be geocoded from the coordinates if it is not available." +
+      "The placemark info should then be geocoded from the coordinates if it is not available." +
       "The placemark info should then be geocoded from the coordinates if it is not available.",
     profileImageURL: "",
     events: [
       EventMocks.NoPlacemarkInfo,
       EventMocks.Multiday,
       EventMocks.PickupBasketball
-    ]
+    ],
+    friendStatus: "not-friends"
   } as User
 }

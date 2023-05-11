@@ -8,7 +8,7 @@ import {
 } from "react-native"
 import { CurrentUserEvent } from "@lib/events"
 import { Headline, Title } from "@components/Text"
-import ExpandableText from "@screens/EventDetails/ExpandableText"
+import ExpandableText from "@components/common/ExpandableText"
 import AttendeeSection from "./AttendeeSection"
 import ChatSection from "./ChatSection"
 import { CalendarEvent } from "@lib/Calendar"
@@ -86,7 +86,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
           <View style={{ marginTop: 16 }}>
             <Headline style={{ marginBottom: 4 }}>About</Headline>
             <ExpandableText
-              props={{ style: { color: event.color, marginTop: 5 } }}
+              style={{ color: event.color, marginTop: 5 }}
               text={event.description}
               linesToDisplay={3}
             />
