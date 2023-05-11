@@ -1,21 +1,21 @@
-import React from "react"
-import { StyleSheet, TouchableOpacity, View } from "react-native"
-import * as Clipboard from "expo-clipboard"
-import { Headline, Caption, CaptionTitle } from "@components/Text"
+import { Caption, CaptionTitle, Headline } from "@components/Text"
+import { Ionicon } from "@components/common/Icons"
+import { useTrackUserLocation } from "@hooks/UserLocation"
+import { ButtonStyles, showToast } from "@lib/ButtonStyle"
+import { EventMapDetails, withDirections } from "@lib/ExternalMap"
 import {
   LocationCoordinate2D,
   Placemark,
   placemarkToFormattedAddress
 } from "@lib/location"
-import { useTrackUserLocation } from "@hooks/UserLocation"
-import { EventMapDetails, withDirections } from "@lib/ExternalMap"
-import { ButtonStyles, showToast } from "@lib/ButtonStyle"
-import { Ionicon } from "@components/common/Icons"
+import * as Clipboard from "expo-clipboard"
+import React from "react"
+import { StyleSheet, TouchableOpacity, View } from "react-native"
 
 interface LocationSectionProps {
   color: string
   placemark?: Placemark
-  coordinates: LocationCoordinate2D,
+  coordinates: LocationCoordinate2D
   bottomTabHeight: number
 }
 
@@ -26,10 +26,10 @@ const LocationSection = ({
   bottomTabHeight
 }: LocationSectionProps) => {
   const userLocation = useTrackUserLocation("precise")
-  
+
   const mapDetails: EventMapDetails = {
-    coordinates: coordinates,
-    placemark: placemark
+    coordinates,
+    placemark
   }
 
   const hitSlopInset = {
@@ -57,7 +57,7 @@ const LocationSection = ({
   return (
     <View style={[styles.flexRow, styles.paddingIconSection]}>
       <View style={{ justifyContent: "center" }}>
-        <Ionicon 
+        <Ionicon
           style={[styles.iconStyling, { backgroundColor: color }]}
           name="location"
           color={"white"}
@@ -81,12 +81,14 @@ const LocationSection = ({
               <TouchableOpacity onPress={copyToClipboard} hitSlop={hitSlopInset}>
                 <CaptionTitle
                   style={[{ color, marginRight: 16 }, styles.captionLinks]}
-                  
                 >
                 Copy Address
                 </CaptionTitle>
               </TouchableOpacity>
-              <TouchableOpacity onPress={openMapWithDirections} hitSlop={hitSlopInset}>
+              <TouchableOpacity
+                onPress={openMapWithDirections}
+                hitSlop={hitSlopInset}
+              >
                 <CaptionTitle style={[{ color }, styles.captionLinks]}>
                 Directions
                 </CaptionTitle>
@@ -110,7 +112,10 @@ const LocationSection = ({
                 Copy Coordinates
                 </CaptionTitle>
               </TouchableOpacity>
-              <TouchableOpacity onPress={openMapWithDirections} hitSlop={hitSlopInset}>
+              <TouchableOpacity
+                onPress={openMapWithDirections}
+                hitSlop={hitSlopInset}
+              >
                 <CaptionTitle style={[{ color }, styles.captionLinks]}>
                 Directions
                 </CaptionTitle>
