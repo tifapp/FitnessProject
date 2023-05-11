@@ -10,6 +10,8 @@ import {
 import React, { useEffect, useRef } from "react"
 import { StyleSheet, TouchableOpacity } from "react-native"
 import { Icon } from "react-native-elements"
+import ProfileScreen from "./ProfileScreen/ProfileScreen"
+import { UserMocks } from "@lib/User"
 
 const MARKER_SIZE = 44
 const LATLNGDELTA = 0.5
@@ -65,7 +67,7 @@ const ActivitiesScreen = ({
 
   return (
     <>
-      <EventsMap
+      {/* <EventsMap
         ref={appRef}
         style={{ width: "100%", height: "100%" }}
         initialRegion={checkUserLocation(givenUserLocation)}
@@ -86,7 +88,8 @@ const ActivitiesScreen = ({
       </TouchableOpacity>
 
       <EventsList />
-      <EventTabBar />
+      <EventTabBar /> */}
+      <ProfileScreen user={UserMocks.Blob} />
     </>
   )
 }
