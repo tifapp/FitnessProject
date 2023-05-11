@@ -11,6 +11,9 @@ import ContentReportingMeta, {
   Default as DefaultReportingFlow
 } from "../components/ContentReporting/ContentReporting.stories"
 import { useAppFonts } from "../../hooks/Fonts"
+import ContentTextMeta, {
+  Basic as ContentTextBasic
+} from "../components/ContentText/ContextText.stories"
 
 // Create an array of stories
 const stories = [
@@ -23,6 +26,11 @@ const stories = [
     name: ContentReportingMeta.title,
     component: DefaultReportingFlow,
     args: ContentReportingMeta.args
+  },
+  {
+    name: ContentTextMeta.title,
+    component: ContentTextBasic,
+    args: ContentTextMeta.args
   }
   // Add more stories here...
 ]

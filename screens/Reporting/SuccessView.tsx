@@ -33,7 +33,8 @@ export const ReportSuccessView = ({
     <View style={styles.doneButtonContainer}>
       <PrimaryButton
         title="Done"
-        buttonProps={{ onPress: onDoneTapped, style: styles.doneButton }}
+        onPress={onDoneTapped}
+        style={styles.doneButton}
       />
     </View>
   </SafeAreaView>
