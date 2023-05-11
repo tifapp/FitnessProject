@@ -34,8 +34,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
     id: event.id,
     description: event.description!,
     coordinates: event.coordinates,
-    title: event.title,
-    bottomTabHeight: BOTTOM_TAB_HEIGHT
+    title: event.title
   }
   const mapDetails: NativeEventMapDetails = {
     coordinates: event.coordinates,
@@ -60,7 +59,6 @@ const EventDetails = ({ event }: EventDetailsProps) => {
           eventColor={event.color}
           style={[styles.flexRow, { marginVertical: 24 }]}
           imageStyle={styles.profileImage}
-          toastOffset={BOTTOM_TAB_HEIGHT}
           userFriendStatus="not-friends"
         />
 
@@ -70,7 +68,6 @@ const EventDetails = ({ event }: EventDetailsProps) => {
             color={event.color}
             coordinates={event.coordinates}
             placemark={event.placemark}
-            bottomTabHeight={BOTTOM_TAB_HEIGHT}
           />
           <AttendeeSection
             color={event.color}

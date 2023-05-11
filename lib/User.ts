@@ -14,7 +14,7 @@ export type User = {
   biography: string
   profileImageURL: string
   events: CurrentUserEvent[]
-  friendStatus: UserFriendStatus | "current-user"
+  userStatus: UserFriendStatus | "current-user"
 }
 
 /**
@@ -37,6 +37,6 @@ export namespace UserMocks {
       EventMocks.Multiday,
       EventMocks.PickupBasketball
     ],
-    friendStatus: "not-friends"
+    userStatus: "not-friends"
   } as User
 }

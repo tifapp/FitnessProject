@@ -1,18 +1,28 @@
 import { BodyText, Caption, Headline, Title } from "@components/Text"
 import { OutlinedButton, PrimaryButton } from "@components/common/Buttons"
 import ExpandableText from "@components/common/ExpandableText"
+import { ToastWithIcon } from "@components/common/Toasts"
 import { EventCard } from "@components/eventCard/EventCard"
 import ProfileImage from "@components/profileImageComponents/ProfileImage"
-import { useUserCoordinatesQuery } from "@hooks/UserLocation"
 import { User } from "@lib/User"
-import { Image, ScrollView, StyleSheet, View } from "react-native"
+import { SetStateAction, useState } from "react"
+import { ScrollView, StyleSheet, View } from "react-native"
 
 interface ProfileScreenProps {
   user: User
 }
 
 const ProfileScreen = ({ user }: ProfileScreenProps) => {
+  const [userStatus, setUserStatus] = useState(user.userStatus)
+  const [requestSent, setRequestSent] = useState(
+    !!(userStatus === "friend-request-pending" || userStatus === "friends")
+  )
   const colorText = "#4285F4"
+
+  const setStatus = () => {
+    setUserStatus("friend-request-pending")
+  }
+
   return (
     <ScrollView
       style={{ marginHorizontal: 16 }}
@@ -27,25 +37,35 @@ const ProfileScreen = ({ user }: ProfileScreenProps) => {
         <Caption>{user.handle}</Caption>
       </View>
 
-      {user.friendStatus !== "current-user" && (
+      {userStatus !== "current-user" && (
         <View
           style={{
             flexDirection: "row",
             marginTop: 20
           }}
         >
-          {user.friendStatus === "not-friends" && (
-            <PrimaryButton style={{ flex: 1 }} title="Add Friend" />
+          {userStatus === "not-friends" && (
+            <PrimaryButton
+              style={{ flex: 1 }}
+              title="Add Friend"
+              onPress={setStatus}
+            />
           )}
-          {user.friendStatus !== "blocked" && (
+          {userStatus !== "blocked" && (
             <OutlinedButton
               style={{
                 flex: 1,
-                marginLeft: user.friendStatus === "not-friends" ? 16 : 0
+                marginLeft: userStatus === "not-friends" ? 16 : 0
               }}
               title="Message"
             />
           )}
+          <ToastWithIcon
+            requestSent={requestSent}
+            setRequestSent={setRequestSent}
+            isVisible={userStatus === "friend-request-pending"}
+            text="Friend request sent."
+          />
         </View>
       )}
 
