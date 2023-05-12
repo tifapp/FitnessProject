@@ -1,13 +1,13 @@
-import { BodyText, Caption, Headline, Title } from "@components/Text"
+import { Caption, Headline, Title } from "@components/Text"
 import { OutlinedButton, PrimaryButton } from "@components/common/Buttons"
 import ExpandableText from "@components/common/ExpandableText"
 import { ToastWithIcon } from "@components/common/Toasts"
-import { EventCard } from "@components/eventCard/EventCard"
 import ProfileImage from "@components/profileImageComponents/ProfileImage"
 import { User } from "@lib/User"
-import { SetStateAction, useState } from "react"
-import { ScrollView, StyleSheet, View } from "react-native"
+import { useState } from "react"
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
 import EventPager from "./EventPager"
+import AllEventsModal from "./AllEventsModal"
 
 interface ProfileScreenProps {
   user: User
@@ -17,6 +17,7 @@ const NUM_EVENTS_SHOWN = 20
 
 const ProfileScreen = ({ user }: ProfileScreenProps) => {
   const [userStatus, setUserStatus] = useState(user.userStatus)
+  const [modalVisible, setModalVisible] = useState(false)
   const [requestSent, setRequestSent] = useState(
     !!(userStatus === "friend-request-pending" || userStatus === "friends")
   )
@@ -27,8 +28,17 @@ const ProfileScreen = ({ user }: ProfileScreenProps) => {
     setUserStatus("friend-request-pending")
   }
 
+  const openModal = () => {
+    setModalVisible(true)
+  }
+
   return (
-    <View style={{ marginHorizontal: 16 }}>
+    <View style={styles.container}>
+      <AllEventsModal
+        visible={modalVisible}
+        setVisible={setModalVisible}
+        events={user.events}
+      />
       <ScrollView>
         <View style={{ alignItems: "center", marginTop: 16 }}>
           <ProfileImage
@@ -90,7 +100,9 @@ const ProfileScreen = ({ user }: ProfileScreenProps) => {
                 justifyContent: "flex-end"
               }}
             >
-              <Headline style={{ color: colorText }}>View All</Headline>
+              <TouchableOpacity onPress={openModal}>
+                <Headline style={{ color: colorText }}>View All</Headline>
+              </TouchableOpacity>
             </View>
           )}
         </View>
@@ -117,8 +129,9 @@ const ProfileScreen = ({ user }: ProfileScreenProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    marginHorizontal: 16
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    backgroundColor: "white"
   },
   profileImage: {
     width: 80,

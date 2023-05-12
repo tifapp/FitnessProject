@@ -31,15 +31,16 @@ const EventPager = ({ events, style }: EventPagerProps) => {
 const styles = StyleSheet.create({
   pageContainer: {
     flex: 1,
-    maxHeight: 270
+    maxHeight: 290
   },
   page: {
     justifyContent: "flex-start",
     alignItems: "flex-start"
   },
   container: {
-    height: 270,
-    flex: 1
+    height: 290,
+    flex: 1,
+    paddingBottom: 24
   }
 })
 
