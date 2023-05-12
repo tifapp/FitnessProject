@@ -1,5 +1,12 @@
 import React, { useState } from "react"
-import { Alert, StyleSheet, Text } from "react-native"
+import {
+  Alert,
+  StyleProp,
+  StyleSheet,
+  Text,
+  View,
+  ViewStyle
+} from "react-native"
 import {
   Menu,
   MenuOptions,
@@ -12,9 +19,10 @@ import { AppStyles } from "@lib/AppColorStyle"
 
 interface Props {
   isEventHost: boolean
+  style?: StyleProp<ViewStyle>
 }
 
-const MenuDropdown = ({ isEventHost }: Props) => {
+const MenuDropdown = ({ isEventHost, style }: Props) => {
   const [isMenuOpen, setMenuOpen] = useState(false)
   let dismiss: () => void
 
@@ -44,46 +52,48 @@ const MenuDropdown = ({ isEventHost }: Props) => {
   }
 
   return (
-    <Menu opened={isMenuOpen} onBackdropPress={() => setMenuOpen(false)}>
-      <MenuTrigger
-        testID="more options"
-        onPress={() => setMenuOpen(true)}
-        customStyles={{
-          TriggerTouchableComponent: TouchableOpacity
-        }}
-      >
-        <Ionicon color={AppStyles.darkColor} name="ellipsis-horizontal"/>
-      </MenuTrigger>
-      {/* Need to use Text in order for tests to find the element
+    <View style={style}>
+      <Menu opened={isMenuOpen} onBackdropPress={() => setMenuOpen(false)}>
+        <MenuTrigger
+          testID="more options"
+          onPress={() => setMenuOpen(true)}
+          customStyles={{
+            TriggerTouchableComponent: TouchableOpacity
+          }}
+        >
+          <Ionicon color={AppStyles.darkColor} name="ellipsis-horizontal" />
+        </MenuTrigger>
+        {/* Need to use Text in order for tests to find the element
                 Also need to move the onSelect functions to child in order to test functionality
                 */}
-      {isEventHost
-        ? (
-          <MenuOptions customStyles={menuOptionsStyles}>
-            <MenuOption>
-              <Text style={{ color: "red" }} onPress={alertDelete}>
-              Delete
-              </Text>
-            </MenuOption>
-            <MenuOption>
-              <Text onPress={editForm}>Edit</Text>
-            </MenuOption>
-          </MenuOptions>
-        )
-        : (
-          <MenuOptions
-            customStyles={{
-              optionsContainer: {
-                width: "30%"
-              }
-            }}
-          >
-            <MenuOption>
-              <Text onPress={alertReport}>Report</Text>
-            </MenuOption>
-          </MenuOptions>
-        )}
-    </Menu>
+        {isEventHost
+          ? (
+            <MenuOptions customStyles={menuOptionsStyles}>
+              <MenuOption>
+                <Text style={{ color: "red" }} onPress={alertDelete}>
+                Delete
+                </Text>
+              </MenuOption>
+              <MenuOption>
+                <Text onPress={editForm}>Edit</Text>
+              </MenuOption>
+            </MenuOptions>
+          )
+          : (
+            <MenuOptions
+              customStyles={{
+                optionsContainer: {
+                  width: "30%"
+                }
+              }}
+            >
+              <MenuOption>
+                <Text onPress={alertReport}>Report</Text>
+              </MenuOption>
+            </MenuOptions>
+          )}
+      </Menu>
+    </View>
   )
 }
 
