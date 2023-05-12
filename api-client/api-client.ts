@@ -1,6 +1,7 @@
 import { z, ZodType } from "zod"
 import {
   ApiClient,
+  ApiError,
   GenericApiClient,
   GenericApiSchema,
   Method
@@ -15,7 +16,7 @@ const endpointFunction = async <K extends keyof ApiClient, M extends Method>(
   payload?: any,
   queryParams?: any,
   pathParams?: any
-): Promise<ReturnType<ApiClient[K][M]>> => {
+): Promise<ReturnType<ApiClient[K][M]> | ApiError> => {
   const parsedUrl = pathParams
     ? Object.keys(pathParams).reduce(
       (accumulatedUrl, param) =>
@@ -32,17 +33,22 @@ const endpointFunction = async <K extends keyof ApiClient, M extends Method>(
     body: JSON.stringify(payload)
   }
 
-  const response = await fetchApi(
-    `${baseUrl}${parsedUrl}?${new URLSearchParams(queryParams)}`,
-    requestOptions
-  )
+  try {
+    const response = await fetchApi(
+      `${baseUrl}${parsedUrl}?${new URLSearchParams(queryParams)}`,
+      requestOptions
+    )
 
-  if (!response.ok) {
-    throw new Error(`Request failed with status ${response.status}`)
+    if (!response.ok) {
+      const errorData = await response.json()
+      return { status: response.status, message: errorData.body }
+    }
+
+    const data = await response.json()
+    return responseType.parse(data.body ?? null)
+  } catch (error) {
+    return { status: "Network Error", message: error }
   }
-
-  const data = await response.json()
-  return responseType.parse(data)
 }
 
 export const createApiClient = <S extends GenericApiSchema<any>>(
