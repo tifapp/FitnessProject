@@ -1,6 +1,7 @@
 import { Caption, Headline, Title } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
-import { ButtonStyles } from "@lib/ButtonStyle"
+import { AppStyles } from "@lib/AppColorStyle"
+import { useNavigation } from "@react-navigation/native"
 import { bool } from "aws-sdk/clients/signer"
 import React, { useState } from "react"
 import { ScrollView, StyleSheet, Switch, View } from "react-native"
@@ -9,6 +10,7 @@ import { Divider } from "react-native-elements"
 export const SettingsScreen = () => {
   // List of attendees
 
+  const navigation = useNavigation()
   /**
    * Creates a switch for a given setting, and uses states to keep track of its current on-off status.
    *
@@ -113,7 +115,7 @@ export const SettingsScreen = () => {
           <Ionicon
             name="chevron-forward"
             style={{ alignSelf: "center" }}
-            color={ButtonStyles.colorOpacity35}
+            color={AppStyles.colorOpacity35}
           />
         </View>
       </View>
@@ -166,7 +168,7 @@ export const SettingsScreen = () => {
           <Ionicon
             name="chevron-forward"
             style={{ alignSelf: "center" }}
-            color={ButtonStyles.colorOpacity35}
+            color={AppStyles.colorOpacity35}
           />
         </View>
       </View>
@@ -473,7 +475,7 @@ export const SettingsScreen = () => {
           <Ionicon
             name="chevron-forward"
             style={{ alignSelf: "center" }}
-            color={ButtonStyles.colorOpacity35}
+            color={AppStyles.colorOpacity35}
           />
         </View>
       </View>
@@ -646,6 +648,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold"
   },
   textColor: {
-    color: ButtonStyles.darkColor
+    color: AppStyles.darkColor
   }
 })

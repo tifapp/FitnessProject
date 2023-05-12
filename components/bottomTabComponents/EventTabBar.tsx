@@ -1,14 +1,14 @@
 import { TouchableIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
+import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { StyleSheet, View } from "react-native"
 
 export const EventTabBar = () => {
+  const navigation = useNavigation()
   return (
     <View style={styles.container}>
-      <TouchableIonicon
-        icon={{ name: "map", color: AppStyles.darkColor }}
-      />
+      <TouchableIonicon icon={{ name: "map", color: AppStyles.darkColor }} />
       <TouchableIonicon
         icon={{ name: "chatbox", color: AppStyles.colorOpacity35 }}
       />
@@ -21,6 +21,7 @@ export const EventTabBar = () => {
       />
       <TouchableIonicon
         icon={{ name: "person", color: AppStyles.colorOpacity35 }}
+        onPress={() => navigation.navigate("Profile Screen")}
       />
     </View>
   )

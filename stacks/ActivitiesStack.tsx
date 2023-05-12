@@ -1,4 +1,5 @@
 import EventsList from "@components/EventsList"
+import EventTabBar from "@components/bottomTabComponents/EventTabBar"
 import { headerOptions } from "@components/headerComponents/headerOptions"
 import { CurrentUserEvent, EventMocks } from "@lib/events"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
@@ -11,6 +12,8 @@ import {
   LocationSearchPicker,
   LocationSearchPickerProps
 } from "@screens/LocationSearch"
+import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
+import { TestProfileScreen } from "@screens/TestProfileScreen"
 
 const Stack = createStackNavigator()
 
@@ -20,7 +23,10 @@ export enum ActivitiesScreenNames {
   MAP = "Map",
   LOCATION_SEARCH = "Location Search",
   CHAT_ROOM = "Chat Room",
-  EVENT_LIST = "Event List"
+  EVENT_LIST = "Event List",
+  EVENT_TAB_BAR = "Event Tab Bar",
+  PROFILE_SCREEN = "Profile Screen",
+  SETTINGS_SCREEN = "Settings Screen"
 }
 
 const events: CurrentUserEvent[] = [
@@ -36,6 +42,8 @@ export type ActivitiesStackParamList = {
   [ActivitiesScreenNames.LOCATION_SEARCH]: LocationSearchPickerProps
   [ActivitiesScreenNames.CHAT_ROOM]: undefined
   [ActivitiesScreenNames.EVENT_LIST]: undefined
+  [ActivitiesScreenNames.PROFILE_SCREEN]: undefined
+  [ActivitiesScreenNames.SETTINGS_SCREEN]: undefined
 }
 
 export type EventFormScreenRouteProps = StackScreenProps<
@@ -87,6 +95,18 @@ export default function ActivitiesStack () {
       <Stack.Screen
         name={ActivitiesScreenNames.LOCATION_SEARCH}
         component={LocationSearchPicker}
+      />
+      <Stack.Screen
+        name={ActivitiesScreenNames.PROFILE_SCREEN}
+        component={TestProfileScreen}
+      />
+      <Stack.Screen
+        name={ActivitiesScreenNames.SETTINGS_SCREEN}
+        component={SettingsScreen}
+      />
+      <Stack.Screen
+        name={ActivitiesScreenNames.EVENT_TAB_BAR}
+        component={EventTabBar}
       />
     </Stack.Navigator>
   )
