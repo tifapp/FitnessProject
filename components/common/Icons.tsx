@@ -7,10 +7,11 @@ import { useFontScale } from "@hooks/Fonts"
 import React, { ComponentProps } from "react"
 import {
   StyleProp,
-  TouchableOpacityProps,
+  TouchableHighlightProps,
   ViewProps,
   ViewStyle,
-  TouchableOpacity
+  TouchableOpacity,
+  TouchableHighlight
 } from "react-native"
 
 /**
@@ -94,16 +95,16 @@ export const Ionicon = ({
 
 export type IoniconButtonProps = {
   icon: IconProps<IoniconName>
-} & TouchableOpacityProps
+} & TouchableHighlightProps
 
 /**
  * An ionicon with no background that behaves like {@link TouchableOpacity}.
  */
 export const TouchableIonicon = ({ icon, ...props }: IoniconButtonProps) => (
-  <TouchableOpacity
+  <TouchableHighlight
     {...props}
     hitSlop={{ left: 16, right: 16, top: 16, bottom: 16 }}
   >
     <Ionicon {...icon} />
-  </TouchableOpacity>
+  </TouchableHighlight>
 )

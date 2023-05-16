@@ -1,5 +1,5 @@
 import EventsList from "@components/EventsList"
-import EventTabBar from "@components/bottomTabComponents/EventTabBar"
+import EventTabBar from "@components/bottomTabComponents/BottomNavTabBar"
 import { headerOptions } from "@components/headerComponents/headerOptions"
 import { CurrentUserEvent, EventMocks } from "@lib/events"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"

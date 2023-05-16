@@ -4,24 +4,32 @@ import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { StyleSheet, View } from "react-native"
 
-export const EventTabBar = () => {
+export const BottomNavTabBar = () => {
   const navigation = useNavigation()
   return (
     <View style={styles.container}>
       <TouchableIonicon icon={{ name: "map", color: AppStyles.darkColor }} />
       <TouchableIonicon
         icon={{ name: "chatbox", color: AppStyles.colorOpacity35 }}
+        activeOpacity={0.5}
+        underlayColor={AppStyles.colorOpacity15}
       />
       <TouchableIonicon
         style={styles.plusIcon}
         icon={{ name: "add-outline", color: "white" }}
+        activeOpacity={0.5}
+        underlayColor={AppStyles.colorOpacity15}
       />
       <TouchableIonicon
         icon={{ name: "notifications", color: AppStyles.colorOpacity35 }}
+        activeOpacity={0.5}
+        underlayColor={AppStyles.colorOpacity15}
       />
       <TouchableIonicon
         icon={{ name: "person", color: AppStyles.colorOpacity35 }}
+        activeOpacity={0.5}
         onPress={() => navigation.navigate("Profile Screen")}
+        underlayColor={AppStyles.colorOpacity15}
       />
     </View>
   )
@@ -50,4 +58,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default EventTabBar
+export default BottomNavTabBar

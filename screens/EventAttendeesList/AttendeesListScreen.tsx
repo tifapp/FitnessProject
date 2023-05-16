@@ -1,4 +1,5 @@
-import IconButton from "@components/common/IconButton"
+import { Title } from "@components/Text"
+import MenuDropdown from "@components/eventCard/MenuDropdown"
 import { EventAttendee } from "@lib/events"
 import { AttendeeEntry } from "@screens/EventAttendeesList/attendeeEntry"
 import React from "react"
@@ -14,39 +15,90 @@ const someData: EventAttendee[] = [
     id: "2",
     username: "Also cool",
     handle: "Cool"
+  },
+  {
+    id: "3",
+    username: "Also coolest",
+    handle: "Cool"
+  },
+  {
+    id: "4",
+    username: "Also coolest",
+    handle: "Cool"
+  },
+  {
+    id: "5",
+    username: "Also coolest",
+    handle: "Cool"
+  },
+  {
+    id: "6",
+    username: "Also coolest",
+    handle: "Cool"
+  },
+  {
+    id: "7",
+    username: "Also coolest",
+    handle: "Cool"
+  },
+  {
+    id: "8",
+    username: "Also coolest",
+    handle: "Cool"
+  },
+  {
+    id: "9",
+    username: "Also coolest",
+    handle: "Cool"
+  },
+  {
+    id: "10",
+    username: "Also coolest",
+    handle: "Cool"
+  },
+  {
+    id: "11",
+    username: "Also coolest",
+    handle: "Cool"
   }
 ]
-
-function goBack () {
-  // Presumably use navigate back to the previous screen you were on
-}
-
-// Take in a eventAttendee[] as a prop
 
 export const AttendeesListScreen = () => {
   // List of attendees
 
-  // Button that would let you go back, goes on the top left
-  // Could also use setOptions in navigation itself, for headerLeft
   const FlatSeparator = () => {
     return (
       <View
         style={{
           height: 1,
-          width: "100%",
-          backgroundColor: "#000"
+          width: "100%"
         }}
       />
     )
   }
 
   return (
-    <View>
-      <IconButton iconName="height" onPress={goBack} />
+    <View style={{ marginTop: 24, marginHorizontal: 16 }}>
+      <Title style={{ marginTop: 8 }}>Attendees List</Title>
       <FlatList
         ItemSeparatorComponent={FlatSeparator}
         data={someData}
-        renderItem={({ item }) => <AttendeeEntry attendee={item} />}
+        renderItem={({ item }) => (
+          <>
+            <View style={{ flex: 1, flexDirection: "row", marginTop: 8 }}>
+              <AttendeeEntry attendee={item} />
+              <MenuDropdown
+                isEventHost={false}
+                style={{
+                  flex: 1,
+                  flexDirection: "row",
+                  alignSelf: "center",
+                  justifyContent: "flex-end"
+                }}
+              />
+            </View>
+          </>
+        )}
       />
     </View>
   )

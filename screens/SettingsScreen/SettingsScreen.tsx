@@ -2,10 +2,14 @@ import { Caption, Headline, Title } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useNavigation } from "@react-navigation/native"
-import { bool } from "aws-sdk/clients/signer"
 import React, { useState } from "react"
 import { ScrollView, StyleSheet, Switch, View } from "react-native"
 import { Divider } from "react-native-elements"
+
+export type SwitchComponentProps = {
+  value: boolean
+  onValueChange: (value: boolean) => void
+}
 
 export const SettingsScreen = () => {
   // List of attendees
@@ -17,17 +21,15 @@ export const SettingsScreen = () => {
    * @param setting: A given setting you want to keep track of.
    * @returns A pre-built Switch component for this specific setting.
    */
-  const SwitchComponent = (setting: any) => {
-    const [switchState, setSwitchState] = useState(setting.state)
+
+  const SwitchComponent = ({ value, onValueChange }: SwitchComponentProps) => {
     return (
       <Switch
-        trackColor={{ false: "#767577", true: "#81b0ff" }}
-        thumbColor={eventScreenNotifEnabled ? "#f5dd4b" : "#f4f3f4"}
+        trackColor={{ false: "#767577", true: "#f5dd4b" }}
+        thumbColor={value ? "#ffffff" : "#f4f3f4"}
         ios_backgroundColor="#3e3e3e"
-        value={switchState}
-        onValueChange={() =>
-          setSwitchState((previousState: bool) => !previousState)
-        }
+        value={value}
+        onValueChange={onValueChange}
       />
     )
   }
@@ -176,6 +178,8 @@ export const SettingsScreen = () => {
   }
 
   const EventNotificationSection = () => {
+    const [eventScreenNotifEnabled, seteventScreenNotifEnabled] =
+      useState<boolean>(true)
     return (
       <View>
         <View
@@ -229,7 +233,14 @@ export const SettingsScreen = () => {
                 }
               ]}
             >
-              <SwitchComponent setting={eventScreenNotifEnabled} />
+              <SwitchComponent
+                value={eventScreenNotifEnabled}
+                onValueChange={() =>
+                  seteventScreenNotifEnabled(
+                    (previousState: boolean) => !previousState
+                  )
+                }
+              />
             </View>
           </View>
         </View>
@@ -238,6 +249,8 @@ export const SettingsScreen = () => {
   }
 
   const MentionNotificationSection = () => {
+    const [mentionNotifEnabled, setMentionNotifEnabled] =
+      useState<boolean>(true)
     return (
       <View>
         <View
@@ -293,7 +306,14 @@ export const SettingsScreen = () => {
                 }
               ]}
             >
-              <SwitchComponent setting={mentionNotifEnabled} />
+              <SwitchComponent
+                value={mentionNotifEnabled}
+                onValueChange={() =>
+                  setMentionNotifEnabled(
+                    (previousState: boolean) => !previousState
+                  )
+                }
+              />
             </View>
           </View>
         </View>
@@ -302,6 +322,8 @@ export const SettingsScreen = () => {
   }
 
   const ChatMsgNotificationSection = () => {
+    const [chatMsgNotifEnabled, setChatMsgNotifEnabled] =
+      useState<boolean>(true)
     return (
       <View>
         <View
@@ -356,7 +378,14 @@ export const SettingsScreen = () => {
                 }
               ]}
             >
-              <SwitchComponent setting={chatMsgNotifEnabled} />
+              <SwitchComponent
+                value={chatMsgNotifEnabled}
+                onValueChange={() =>
+                  setChatMsgNotifEnabled(
+                    (previousState: boolean) => !previousState
+                  )
+                }
+              />
             </View>
           </View>
         </View>
@@ -365,6 +394,8 @@ export const SettingsScreen = () => {
   }
 
   const FriendReqNotificationSection = () => {
+    const [friendReqNotifEnabled, setFriendReqNotifEnabled] =
+      useState<boolean>(true)
     return (
       <View>
         <View
@@ -421,7 +452,14 @@ export const SettingsScreen = () => {
                 }
               ]}
             >
-              <SwitchComponent setting={friendReqNotifEnabled} />
+              <SwitchComponent
+                value={friendReqNotifEnabled}
+                onValueChange={() =>
+                  setFriendReqNotifEnabled(
+                    (previousState: boolean) => !previousState
+                  )
+                }
+              />
             </View>
           </View>
         </View>
@@ -532,11 +570,6 @@ export const SettingsScreen = () => {
     )
   }
 
-  const eventScreenNotifEnabled = { state: true }
-  const mentionNotifEnabled = { state: true }
-  const chatMsgNotifEnabled = { state: true }
-  const friendReqNotifEnabled = { state: true }
-
   // Button that would let you go back, goes on the top left
   // Could also use setOptions in navigation itself, for headerLeft
 
@@ -608,6 +641,17 @@ export const SettingsScreen = () => {
         <Divider style={[styles.divider, { width: "95%" }]} />
 
         <DeleteAccountSection />
+      </View>
+
+      <View
+        style={{
+          flex: 1,
+          alignSelf: "center",
+          paddingTop: 8,
+          paddingBottom: 2
+        }}
+      >
+        <Caption>{}</Caption>
       </View>
     </ScrollView>
   )

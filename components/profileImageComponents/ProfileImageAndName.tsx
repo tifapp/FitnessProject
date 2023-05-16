@@ -1,7 +1,7 @@
+import React from "react"
 import { ImageStyle, StyleProp, View, ViewStyle } from "react-native"
 import { Caption, Headline } from "../Text"
 import ProfileImage from "./ProfileImage"
-import React from "react"
 
 interface ImageAndNameProps {
   username: string
@@ -18,9 +18,12 @@ const ProfileImageAndName = ({
 }: ImageAndNameProps) => {
   return (
     <View style={[{ flexDirection: "row" }, style]}>
-      <ProfileImage imageURL="@assets/icon.png" style={imageStyle} />
-      <View>
-        <Headline>{username}</Headline>
+      <ProfileImage
+        imageURL="@assets/Windows_10_Default_Profile_Picture.svg.png"
+        style={imageStyle}
+      />
+      <View style={{ marginLeft: 16 }}>
+        <Headline style={{ marginBottom: 4 }}>{username}</Headline>
         <Caption>{userHandle}</Caption>
       </View>
     </View>
