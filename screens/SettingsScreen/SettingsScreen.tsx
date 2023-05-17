@@ -1,8 +1,9 @@
 import { Caption, Headline, Title } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
-import { useNavigation } from "@react-navigation/native"
-import React, { useState } from "react"
+import { useAtom } from "jotai"
+import { atomWithStorage } from "jotai/utils"
+import React from "react"
 import { ScrollView, StyleSheet, Switch, View } from "react-native"
 import { Divider } from "react-native-elements"
 
@@ -11,568 +12,551 @@ export type SwitchComponentProps = {
   onValueChange: (value: boolean) => void
 }
 
+const eventScreenNotifEnabledAtom = atomWithStorage(
+  "eventScreenNotifEnabled",
+  true
+)
+
+const mentionNotifEnabledAtom = atomWithStorage("mentionNotifEnabled", true)
+
+const chatMsgNotifEnabledAtom = atomWithStorage("chatMsgNotifEnabled", true)
+
+const friendReqNotifEnabledAtom = atomWithStorage("friendReqNotifEnabled", true)
+
+const SwitchComponent = ({ value, onValueChange }: SwitchComponentProps) => {
+  return (
+    <Switch
+      trackColor={{ false: "#767577", true: AppStyles.darkColor }}
+      thumbColor={value ? "#ffffff" : "#f4f3f4"}
+      ios_backgroundColor="#3e3e3e"
+      value={value}
+      onValueChange={onValueChange}
+    />
+  )
+}
+
+const EmailSection = () => {
+  return (
+    <View
+      style={[
+        styles.flexRow,
+        styles.paddingIconSection,
+        {
+          alignItems: "flex-start",
+          justifyContent: "flex-start"
+        }
+      ]}
+    >
+      <View
+        style={[styles.spacing, { paddingVertical: 0, paddingHorizontal: 10 }]}
+      >
+        <View style={{ justifyContent: "center" }}>
+          <Ionicon style={[styles.iconStyling]} name="mail" color={"black"} />
+        </View>
+      </View>
+
+      <View style={[styles.spacing, { paddingHorizontal: 2 }]}>
+        <View style={{ marginBottom: 0 }}>
+          <Headline
+            style={[
+              styles.textColor,
+              { textAlignVertical: "center", textAlign: "left" }
+            ]}
+          >
+            {"Email"}
+          </Headline>
+        </View>
+        <View style={styles.flexRow}>
+          <Caption>{"-insert email here-"}</Caption>
+        </View>
+      </View>
+    </View>
+  )
+}
+
+const ChangePasswdSection = () => {
+  return (
+    <View
+      style={[
+        styles.flexRow,
+        styles.paddingIconSection,
+        { alignItems: "center", justifyContent: "center" }
+      ]}
+    >
+      <View style={[styles.spacing, { paddingHorizontal: 10 }]}>
+        <View style={{ justifyContent: "center" }}>
+          <Ionicon style={[styles.iconStyling]} name="shield" color={"black"} />
+        </View>
+      </View>
+
+      <View style={[styles.spacing, { paddingHorizontal: 2 }]}>
+        <View style={{ marginBottom: 4 }}>
+          <Headline
+            style={[
+              styles.textColor,
+              { textAlignVertical: "center", textAlign: "center" }
+            ]}
+          >
+            {"Change Password"}
+          </Headline>
+        </View>
+      </View>
+
+      <View
+        style={[
+          styles.flexRow,
+          { flex: 1, marginRight: 8, justifyContent: "flex-end" }
+        ]}
+      >
+        <Ionicon
+          name="chevron-forward"
+          style={{ alignSelf: "center" }}
+          color={AppStyles.colorOpacity35}
+        />
+      </View>
+    </View>
+  )
+}
+
+const BlockedUserSection = () => {
+  return (
+    <View
+      style={[
+        styles.flexRow,
+        styles.paddingIconSection,
+        { alignItems: "center", justifyContent: "center" }
+      ]}
+    >
+      <View
+        style={[styles.spacing, { paddingVertical: 0, paddingHorizontal: 10 }]}
+      >
+        <View style={{ justifyContent: "center" }}>
+          <Ionicon
+            style={[styles.iconStyling]}
+            name="person-remove"
+            color={"black"}
+          />
+        </View>
+      </View>
+
+      <View style={[styles.spacing, { paddingHorizontal: 2 }]}>
+        <View style={{ marginBottom: 0 }}>
+          <Headline
+            style={[
+              styles.textColor,
+              { textAlignVertical: "center", textAlign: "left" }
+            ]}
+          >
+            {"Blocked Users"}
+          </Headline>
+        </View>
+      </View>
+
+      <View
+        style={[
+          styles.flexRow,
+          { flex: 1, marginRight: 8, justifyContent: "flex-end" }
+        ]}
+      >
+        <Ionicon
+          name="chevron-forward"
+          style={{ alignSelf: "center" }}
+          color={AppStyles.colorOpacity35}
+        />
+      </View>
+    </View>
+  )
+}
+
+const EventNotificationSection = () => {
+  const [eventScreenNotifEnabled, setEventScreenNotifEnabled] = useAtom(
+    eventScreenNotifEnabledAtom
+  )
+  return (
+    <View>
+      <View
+        style={[
+          styles.flexRow,
+          styles.paddingIconSection,
+          { alignItems: "center", justifyContent: "flex-start" }
+        ]}
+      >
+        <View
+          style={[
+            styles.spacing,
+            { paddingVertical: 0, paddingHorizontal: 12 }
+          ]}
+        >
+          <View style={{ justifyContent: "center" }}>
+            <Ionicon style={[styles.iconStyling]} name="map" color={"black"} />
+          </View>
+        </View>
+
+        <View style={[styles.spacing, { paddingHorizontal: 2 }]}>
+          <View style={{ marginBottom: 0 }}>
+            <Headline
+              style={[
+                styles.textColor,
+                { textAlignVertical: "center", textAlign: "left" }
+              ]}
+            >
+              {"Events"}
+            </Headline>
+          </View>
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            <Caption style={{ width: "80%" }}>
+              {"Enable notifications when an event is about to start."}
+            </Caption>
+          </View>
+          <View
+            style={[
+              styles.flexRow,
+              {
+                flex: 1,
+                position: "absolute",
+                width: "20%",
+                marginTop: "1%",
+                alignSelf: "flex-end",
+                justifyContent: "flex-end"
+              }
+            ]}
+          >
+            <SwitchComponent
+              value={eventScreenNotifEnabled}
+              onValueChange={() =>
+                setEventScreenNotifEnabled(
+                  (previousState: boolean) => !previousState
+                )
+              }
+            />
+          </View>
+        </View>
+      </View>
+    </View>
+  )
+}
+
+const MentionNotificationSection = () => {
+  const [mentionNotifEnabled, setMentionNotifEnabled] = useAtom(
+    mentionNotifEnabledAtom
+  )
+  return (
+    <View>
+      <View
+        style={[
+          styles.flexRow,
+          styles.paddingIconSection,
+          { alignItems: "center", justifyContent: "flex-start" }
+        ]}
+      >
+        <View
+          style={[
+            styles.spacing,
+            { paddingVertical: 0, paddingHorizontal: 12 }
+          ]}
+        >
+          <View style={{ justifyContent: "center" }}>
+            <Ionicon
+              style={[styles.iconStyling]}
+              name="at-circle"
+              color={"black"}
+            />
+          </View>
+        </View>
+
+        <View style={[styles.spacing, { paddingHorizontal: 2 }]}>
+          <View style={{ marginBottom: 0 }}>
+            <Headline
+              style={[
+                styles.textColor,
+                { textAlignVertical: "center", textAlign: "left" }
+              ]}
+            >
+              {"Mentions"}
+            </Headline>
+          </View>
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            <Caption style={{ width: "80%" }}>
+              {
+                "Enable notifications when others @ your name in events and chats."
+              }
+            </Caption>
+          </View>
+          <View
+            style={[
+              styles.flexRow,
+              {
+                flex: 1,
+                position: "absolute",
+                width: "20%",
+                marginTop: "1%",
+                alignSelf: "flex-end",
+                justifyContent: "flex-end"
+              }
+            ]}
+          >
+            <SwitchComponent
+              value={mentionNotifEnabled}
+              onValueChange={() =>
+                setMentionNotifEnabled(
+                  (previousState: boolean) => !previousState
+                )
+              }
+            />
+          </View>
+        </View>
+      </View>
+    </View>
+  )
+}
+
+const ChatMsgNotificationSection = () => {
+  const [chatMsgNotifEnabled, setChatMsgNotifEnabled] = useAtom(
+    chatMsgNotifEnabledAtom
+  )
+  return (
+    <View>
+      <View
+        style={[
+          styles.flexRow,
+          styles.paddingIconSection,
+          { alignItems: "center", justifyContent: "flex-start" }
+        ]}
+      >
+        <View
+          style={[
+            styles.spacing,
+            { paddingVertical: 0, paddingHorizontal: 12 }
+          ]}
+        >
+          <View style={{ justifyContent: "center" }}>
+            <Ionicon
+              style={[styles.iconStyling]}
+              name="chatbox"
+              color={"black"}
+            />
+          </View>
+        </View>
+
+        <View style={[styles.spacing, { paddingHorizontal: 2 }]}>
+          <View style={{ marginBottom: 0 }}>
+            <Headline
+              style={[
+                styles.textColor,
+                { textAlignVertical: "center", textAlign: "left" }
+              ]}
+            >
+              {"Chat Messages"}
+            </Headline>
+          </View>
+
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            <Caption style={{ width: "80%" }}>
+              {"Enable notifications for all chat messages."}
+            </Caption>
+          </View>
+          <View
+            style={[
+              styles.flexRow,
+              {
+                flex: 1,
+                position: "absolute",
+                width: "20%",
+                marginTop: "1%",
+                alignSelf: "flex-end",
+                justifyContent: "flex-end"
+              }
+            ]}
+          >
+            <SwitchComponent
+              value={chatMsgNotifEnabled}
+              onValueChange={() =>
+                setChatMsgNotifEnabled(
+                  (previousState: boolean) => !previousState
+                )
+              }
+            />
+          </View>
+        </View>
+      </View>
+    </View>
+  )
+}
+
+const FriendReqNotificationSection = () => {
+  const [friendReqNotifEnabled, setFriendReqNotifEnabled] = useAtom(
+    friendReqNotifEnabledAtom
+  )
+  return (
+    <View>
+      <View
+        style={[
+          styles.flexRow,
+          styles.paddingIconSection,
+          { alignItems: "center", justifyContent: "flex-start" }
+        ]}
+      >
+        <View
+          style={[
+            styles.spacing,
+            { paddingVertical: 0, paddingHorizontal: 12 }
+          ]}
+        >
+          <View style={{ justifyContent: "center" }}>
+            <Ionicon
+              style={[styles.iconStyling]}
+              name="people"
+              color={"black"}
+            />
+          </View>
+        </View>
+
+        <View style={[styles.spacing, { paddingHorizontal: 2 }]}>
+          <View style={{ marginBottom: 0 }}>
+            <Headline
+              style={[
+                styles.textColor,
+                { textAlignVertical: "center", textAlign: "left" }
+              ]}
+            >
+              {"Friend Requests"}
+            </Headline>
+          </View>
+
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            <Caption style={{ width: "80%" }}>
+              {"Enable notifications for pending and accepted friend requests."}
+            </Caption>
+          </View>
+          <View
+            style={[
+              styles.flexRow,
+              {
+                flex: 1,
+                position: "absolute",
+                width: "20%",
+                marginTop: "1%",
+                alignSelf: "flex-end",
+                justifyContent: "flex-end"
+              }
+            ]}
+          >
+            <SwitchComponent
+              value={friendReqNotifEnabled}
+              onValueChange={() =>
+                setFriendReqNotifEnabled(
+                  (previousState: boolean) => !previousState
+                )
+              }
+            />
+          </View>
+        </View>
+      </View>
+    </View>
+  )
+}
+
+const MoreInfoSection = () => {
+  return (
+    <View
+      style={[
+        styles.flexRow,
+        styles.paddingIconSection,
+        { alignItems: "center", justifyContent: "center" }
+      ]}
+    >
+      <View
+        style={[styles.spacing, { paddingVertical: 0, paddingHorizontal: 10 }]}
+      >
+        <View style={{ justifyContent: "center" }}>
+          <Ionicon
+            style={[styles.iconStyling]}
+            name="information-circle"
+            color={"black"}
+          />
+        </View>
+      </View>
+
+      <View style={[styles.spacing, { paddingHorizontal: 2 }]}>
+        <View style={{ marginBottom: 0 }}>
+          <Headline
+            style={[
+              styles.textColor,
+              { textAlignVertical: "center", textAlign: "left" }
+            ]}
+          >
+            {"Privacy Policy"}
+          </Headline>
+        </View>
+      </View>
+
+      <View
+        style={[
+          styles.flexRow,
+          { flex: 1, marginRight: 8, justifyContent: "flex-end" }
+        ]}
+      >
+        <Ionicon
+          name="chevron-forward"
+          style={{ alignSelf: "center" }}
+          color={AppStyles.colorOpacity35}
+        />
+      </View>
+    </View>
+  )
+}
+
+const LogoutSection = () => {
+  return (
+    <View
+      style={[
+        styles.flexRow,
+        styles.paddingIconSection,
+        { alignItems: "flex-start", justifyContent: "flex-start" }
+      ]}
+    >
+      <View style={[styles.spacing, { paddingHorizontal: "4%" }]}>
+        <View style={{ marginBottom: 0 }}>
+          <Headline
+            style={[
+              styles.textColor,
+              { color: "red", textAlignVertical: "center", textAlign: "left" }
+            ]}
+          >
+            {"Logout"}
+          </Headline>
+        </View>
+      </View>
+    </View>
+  )
+}
+
+const DeleteAccountSection = () => {
+  return (
+    <View
+      style={[
+        styles.flexRow,
+        styles.paddingIconSection,
+        { alignItems: "flex-start", justifyContent: "flex-start" }
+      ]}
+    >
+      <View style={[styles.spacing, { paddingHorizontal: "4%" }]}>
+        <View style={{ marginBottom: 0 }}>
+          <Headline
+            style={[
+              styles.textColor,
+              { color: "red", textAlignVertical: "center", textAlign: "left" }
+            ]}
+          >
+            {"Delete Account"}
+          </Headline>
+        </View>
+      </View>
+    </View>
+  )
+}
+
 export const SettingsScreen = () => {
-  // List of attendees
-
-  const navigation = useNavigation()
-  /**
-   * Creates a switch for a given setting, and uses states to keep track of its current on-off status.
-   *
-   * @param setting: A given setting you want to keep track of.
-   * @returns A pre-built Switch component for this specific setting.
-   */
-
-  const SwitchComponent = ({ value, onValueChange }: SwitchComponentProps) => {
-    return (
-      <Switch
-        trackColor={{ false: "#767577", true: "#f5dd4b" }}
-        thumbColor={value ? "#ffffff" : "#f4f3f4"}
-        ios_backgroundColor="#3e3e3e"
-        value={value}
-        onValueChange={onValueChange}
-      />
-    )
-  }
-
-  const EmailSection = () => {
-    return (
-      <View
-        style={[
-          styles.flexRow,
-          styles.paddingIconSection,
-          {
-            alignItems: "flex-start",
-            justifyContent: "flex-start"
-          }
-        ]}
-      >
-        <View
-          style={[
-            styles.spacing,
-            { paddingVertical: 0, paddingHorizontal: 10 }
-          ]}
-        >
-          <View style={{ justifyContent: "center" }}>
-            <Ionicon style={[styles.iconStyling]} name="mail" color={"black"} />
-          </View>
-        </View>
-
-        <View style={[styles.spacing, { paddingHorizontal: 2 }]}>
-          <View style={{ marginBottom: 0 }}>
-            <Headline
-              style={[
-                styles.textColor,
-                { textAlignVertical: "center", textAlign: "left" }
-              ]}
-            >
-              {"Email"}
-            </Headline>
-          </View>
-          <View style={styles.flexRow}>
-            <Caption>{"-insert email here-"}</Caption>
-          </View>
-        </View>
-      </View>
-    )
-  }
-
-  const ChangePasswdSection = () => {
-    return (
-      <View
-        style={[
-          styles.flexRow,
-          styles.paddingIconSection,
-          { alignItems: "center", justifyContent: "center" }
-        ]}
-      >
-        <View style={[styles.spacing, { paddingHorizontal: 10 }]}>
-          <View style={{ justifyContent: "center" }}>
-            <Ionicon
-              style={[styles.iconStyling]}
-              name="shield"
-              color={"black"}
-            />
-          </View>
-        </View>
-
-        <View style={[styles.spacing, { paddingHorizontal: 2 }]}>
-          <View style={{ marginBottom: 4 }}>
-            <Headline
-              style={[
-                styles.textColor,
-                { textAlignVertical: "center", textAlign: "center" }
-              ]}
-            >
-              {"Change Password"}
-            </Headline>
-          </View>
-        </View>
-
-        <View
-          style={[
-            styles.flexRow,
-            { flex: 1, marginRight: 8, justifyContent: "flex-end" }
-          ]}
-        >
-          <Ionicon
-            name="chevron-forward"
-            style={{ alignSelf: "center" }}
-            color={AppStyles.colorOpacity35}
-          />
-        </View>
-      </View>
-    )
-  }
-
-  const BlockedUserSection = () => {
-    return (
-      <View
-        style={[
-          styles.flexRow,
-          styles.paddingIconSection,
-          { alignItems: "center", justifyContent: "center" }
-        ]}
-      >
-        <View
-          style={[
-            styles.spacing,
-            { paddingVertical: 0, paddingHorizontal: 10 }
-          ]}
-        >
-          <View style={{ justifyContent: "center" }}>
-            <Ionicon
-              style={[styles.iconStyling]}
-              name="person-remove"
-              color={"black"}
-            />
-          </View>
-        </View>
-
-        <View style={[styles.spacing, { paddingHorizontal: 2 }]}>
-          <View style={{ marginBottom: 0 }}>
-            <Headline
-              style={[
-                styles.textColor,
-                { textAlignVertical: "center", textAlign: "left" }
-              ]}
-            >
-              {"Blocked Users"}
-            </Headline>
-          </View>
-        </View>
-
-        <View
-          style={[
-            styles.flexRow,
-            { flex: 1, marginRight: 8, justifyContent: "flex-end" }
-          ]}
-        >
-          <Ionicon
-            name="chevron-forward"
-            style={{ alignSelf: "center" }}
-            color={AppStyles.colorOpacity35}
-          />
-        </View>
-      </View>
-    )
-  }
-
-  const EventNotificationSection = () => {
-    const [eventScreenNotifEnabled, seteventScreenNotifEnabled] =
-      useState<boolean>(true)
-    return (
-      <View>
-        <View
-          style={[
-            styles.flexRow,
-            styles.paddingIconSection,
-            { alignItems: "center", justifyContent: "flex-start" }
-          ]}
-        >
-          <View
-            style={[
-              styles.spacing,
-              { paddingVertical: 0, paddingHorizontal: 12 }
-            ]}
-          >
-            <View style={{ justifyContent: "center" }}>
-              <Ionicon
-                style={[styles.iconStyling]}
-                name="map"
-                color={"black"}
-              />
-            </View>
-          </View>
-
-          <View style={[styles.spacing, { paddingHorizontal: 2 }]}>
-            <View style={{ marginBottom: 0 }}>
-              <Headline
-                style={[
-                  styles.textColor,
-                  { textAlignVertical: "center", textAlign: "left" }
-                ]}
-              >
-                {"Events"}
-              </Headline>
-            </View>
-            <View style={{ flex: 1, flexDirection: "row" }}>
-              <Caption style={{ width: "80%" }}>
-                {"Enable notifications when an event is about to start."}
-              </Caption>
-            </View>
-            <View
-              style={[
-                styles.flexRow,
-                {
-                  flex: 1,
-                  position: "absolute",
-                  width: "20%",
-                  marginTop: "1%",
-                  alignSelf: "flex-end",
-                  justifyContent: "flex-end"
-                }
-              ]}
-            >
-              <SwitchComponent
-                value={eventScreenNotifEnabled}
-                onValueChange={() =>
-                  seteventScreenNotifEnabled(
-                    (previousState: boolean) => !previousState
-                  )
-                }
-              />
-            </View>
-          </View>
-        </View>
-      </View>
-    )
-  }
-
-  const MentionNotificationSection = () => {
-    const [mentionNotifEnabled, setMentionNotifEnabled] =
-      useState<boolean>(true)
-    return (
-      <View>
-        <View
-          style={[
-            styles.flexRow,
-            styles.paddingIconSection,
-            { alignItems: "center", justifyContent: "flex-start" }
-          ]}
-        >
-          <View
-            style={[
-              styles.spacing,
-              { paddingVertical: 0, paddingHorizontal: 12 }
-            ]}
-          >
-            <View style={{ justifyContent: "center" }}>
-              <Ionicon
-                style={[styles.iconStyling]}
-                name="at-circle"
-                color={"black"}
-              />
-            </View>
-          </View>
-
-          <View style={[styles.spacing, { paddingHorizontal: 2 }]}>
-            <View style={{ marginBottom: 0 }}>
-              <Headline
-                style={[
-                  styles.textColor,
-                  { textAlignVertical: "center", textAlign: "left" }
-                ]}
-              >
-                {"Mentions"}
-              </Headline>
-            </View>
-            <View style={{ flex: 1, flexDirection: "row" }}>
-              <Caption style={{ width: "80%" }}>
-                {
-                  "Enable notifications when others @ your name in events and chats."
-                }
-              </Caption>
-            </View>
-            <View
-              style={[
-                styles.flexRow,
-                {
-                  flex: 1,
-                  position: "absolute",
-                  width: "20%",
-                  marginTop: "1%",
-                  alignSelf: "flex-end",
-                  justifyContent: "flex-end"
-                }
-              ]}
-            >
-              <SwitchComponent
-                value={mentionNotifEnabled}
-                onValueChange={() =>
-                  setMentionNotifEnabled(
-                    (previousState: boolean) => !previousState
-                  )
-                }
-              />
-            </View>
-          </View>
-        </View>
-      </View>
-    )
-  }
-
-  const ChatMsgNotificationSection = () => {
-    const [chatMsgNotifEnabled, setChatMsgNotifEnabled] =
-      useState<boolean>(true)
-    return (
-      <View>
-        <View
-          style={[
-            styles.flexRow,
-            styles.paddingIconSection,
-            { alignItems: "center", justifyContent: "flex-start" }
-          ]}
-        >
-          <View
-            style={[
-              styles.spacing,
-              { paddingVertical: 0, paddingHorizontal: 12 }
-            ]}
-          >
-            <View style={{ justifyContent: "center" }}>
-              <Ionicon
-                style={[styles.iconStyling]}
-                name="chatbox"
-                color={"black"}
-              />
-            </View>
-          </View>
-
-          <View style={[styles.spacing, { paddingHorizontal: 2 }]}>
-            <View style={{ marginBottom: 0 }}>
-              <Headline
-                style={[
-                  styles.textColor,
-                  { textAlignVertical: "center", textAlign: "left" }
-                ]}
-              >
-                {"Chat Messages"}
-              </Headline>
-            </View>
-
-            <View style={{ flex: 1, flexDirection: "row" }}>
-              <Caption style={{ width: "80%" }}>
-                {"Enable notifications for all chat messages."}
-              </Caption>
-            </View>
-            <View
-              style={[
-                styles.flexRow,
-                {
-                  flex: 1,
-                  position: "absolute",
-                  width: "20%",
-                  marginTop: "1%",
-                  alignSelf: "flex-end",
-                  justifyContent: "flex-end"
-                }
-              ]}
-            >
-              <SwitchComponent
-                value={chatMsgNotifEnabled}
-                onValueChange={() =>
-                  setChatMsgNotifEnabled(
-                    (previousState: boolean) => !previousState
-                  )
-                }
-              />
-            </View>
-          </View>
-        </View>
-      </View>
-    )
-  }
-
-  const FriendReqNotificationSection = () => {
-    const [friendReqNotifEnabled, setFriendReqNotifEnabled] =
-      useState<boolean>(true)
-    return (
-      <View>
-        <View
-          style={[
-            styles.flexRow,
-            styles.paddingIconSection,
-            { alignItems: "center", justifyContent: "flex-start" }
-          ]}
-        >
-          <View
-            style={[
-              styles.spacing,
-              { paddingVertical: 0, paddingHorizontal: 12 }
-            ]}
-          >
-            <View style={{ justifyContent: "center" }}>
-              <Ionicon
-                style={[styles.iconStyling]}
-                name="people"
-                color={"black"}
-              />
-            </View>
-          </View>
-
-          <View style={[styles.spacing, { paddingHorizontal: 2 }]}>
-            <View style={{ marginBottom: 0 }}>
-              <Headline
-                style={[
-                  styles.textColor,
-                  { textAlignVertical: "center", textAlign: "left" }
-                ]}
-              >
-                {"Friend Requests"}
-              </Headline>
-            </View>
-
-            <View style={{ flex: 1, flexDirection: "row" }}>
-              <Caption style={{ width: "80%" }}>
-                {
-                  "Enable notifications for pending and accepted friend requests."
-                }
-              </Caption>
-            </View>
-            <View
-              style={[
-                styles.flexRow,
-                {
-                  flex: 1,
-                  position: "absolute",
-                  width: "20%",
-                  marginTop: "1%",
-                  alignSelf: "flex-end",
-                  justifyContent: "flex-end"
-                }
-              ]}
-            >
-              <SwitchComponent
-                value={friendReqNotifEnabled}
-                onValueChange={() =>
-                  setFriendReqNotifEnabled(
-                    (previousState: boolean) => !previousState
-                  )
-                }
-              />
-            </View>
-          </View>
-        </View>
-      </View>
-    )
-  }
-
-  const MoreInfoSection = () => {
-    return (
-      <View
-        style={[
-          styles.flexRow,
-          styles.paddingIconSection,
-          { alignItems: "center", justifyContent: "center" }
-        ]}
-      >
-        <View
-          style={[
-            styles.spacing,
-            { paddingVertical: 0, paddingHorizontal: 10 }
-          ]}
-        >
-          <View style={{ justifyContent: "center" }}>
-            <Ionicon
-              style={[styles.iconStyling]}
-              name="information-circle"
-              color={"black"}
-            />
-          </View>
-        </View>
-
-        <View style={[styles.spacing, { paddingHorizontal: 2 }]}>
-          <View style={{ marginBottom: 0 }}>
-            <Headline
-              style={[
-                styles.textColor,
-                { textAlignVertical: "center", textAlign: "left" }
-              ]}
-            >
-              {"Privacy Policy"}
-            </Headline>
-          </View>
-        </View>
-
-        <View
-          style={[
-            styles.flexRow,
-            { flex: 1, marginRight: 8, justifyContent: "flex-end" }
-          ]}
-        >
-          <Ionicon
-            name="chevron-forward"
-            style={{ alignSelf: "center" }}
-            color={AppStyles.colorOpacity35}
-          />
-        </View>
-      </View>
-    )
-  }
-
-  const LogoutSection = () => {
-    return (
-      <View
-        style={[
-          styles.flexRow,
-          styles.paddingIconSection,
-          { alignItems: "flex-start", justifyContent: "flex-start" }
-        ]}
-      >
-        <View style={[styles.spacing, { paddingHorizontal: "4%" }]}>
-          <View style={{ marginBottom: 0 }}>
-            <Headline
-              style={[
-                styles.textColor,
-                { color: "red", textAlignVertical: "center", textAlign: "left" }
-              ]}
-            >
-              {"Logout"}
-            </Headline>
-          </View>
-        </View>
-      </View>
-    )
-  }
-
-  const DeleteAccountSection = () => {
-    return (
-      <View
-        style={[
-          styles.flexRow,
-          styles.paddingIconSection,
-          { alignItems: "flex-start", justifyContent: "flex-start" }
-        ]}
-      >
-        <View style={[styles.spacing, { paddingHorizontal: "4%" }]}>
-          <View style={{ marginBottom: 0 }}>
-            <Headline
-              style={[
-                styles.textColor,
-                { color: "red", textAlignVertical: "center", textAlign: "left" }
-              ]}
-            >
-              {"Delete Account"}
-            </Headline>
-          </View>
-        </View>
-      </View>
-    )
-  }
-
-  // Button that would let you go back, goes on the top left
-  // Could also use setOptions in navigation itself, for headerLeft
-
   return (
     <ScrollView
       style={[styles.container, styles.spacing, { paddingVertical: 8 }]}
