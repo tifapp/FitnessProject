@@ -172,6 +172,7 @@ const EventNotificationSection = () => {
   const [eventScreenNotifEnabled, setEventScreenNotifEnabled] = useAtom(
     eventScreenNotifEnabledAtom
   )
+
   return (
     <View>
       <View

@@ -1,5 +1,5 @@
 import EventsList from "@components/EventsList"
-import EventTabBar from "@components/bottomTabComponents/BottomNavTabBar"
+import { BottomNavTabBar } from "@components/bottomTabComponents/BottomNavTabBar"
 import { headerOptions } from "@components/headerComponents/headerOptions"
 import { CurrentUserEvent, EventMocks } from "@lib/events"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
@@ -24,7 +24,7 @@ export enum ActivitiesScreenNames {
   LOCATION_SEARCH = "Location Search",
   CHAT_ROOM = "Chat Room",
   EVENT_LIST = "Event List",
-  EVENT_TAB_BAR = "Event Tab Bar",
+  BOTTOM_NAV_TAB_BAR = "Bottom Nav Tab Tab Bar",
   PROFILE_SCREEN = "Profile Screen",
   SETTINGS_SCREEN = "Settings Screen"
 }
@@ -41,7 +41,7 @@ export type ActivitiesStackParamList = {
   [ActivitiesScreenNames.MAP]: undefined
   [ActivitiesScreenNames.LOCATION_SEARCH]: LocationSearchPickerProps
   [ActivitiesScreenNames.CHAT_ROOM]: undefined
-  [ActivitiesScreenNames.EVENT_LIST]: undefined
+  [ActivitiesScreenNames.BOTTOM_NAV_TAB_BAR: undefined
   [ActivitiesScreenNames.PROFILE_SCREEN]: undefined
   [ActivitiesScreenNames.SETTINGS_SCREEN]: undefined
 }
@@ -60,7 +60,7 @@ export type ActivitiesScreenRouteProps = StackScreenProps<
 >["route"]
 export type EventListRouteProps = StackScreenProps<
   ActivitiesStackParamList,
-  ActivitiesScreenNames.EVENT_LIST
+  ActivitiesScreenNames.BOTTOM_NAV_TAB_BAR
 >["route"]
 
 /* export type LocationSearchScreenRouteProps = StackScreenProps<
@@ -105,8 +105,8 @@ export default function ActivitiesStack () {
         component={SettingsScreen}
       />
       <Stack.Screen
-        name={ActivitiesScreenNames.EVENT_TAB_BAR}
-        component={EventTabBar}
+        name={ActivitiesScreenNames.BOTTOM_NAV_TAB_BAR}
+        component={BottomNavTabBar}
       />
     </Stack.Navigator>
   )
