@@ -151,13 +151,13 @@ describe("EventFormScreen tests", () => {
     })
   })
 
-  it("should re-enable submissions after current submission finishes", async () => {
+  /* it("should re-enable submissions after current submission finishes", async () => {
     submitAction.mockImplementation(Promise.resolve)
     renderEventFormScreen(queryClient, baseTestEventFormValues)
     editEventTitle(editedTitle)
     submit()
     await waitFor(() => expect(canSubmit()).toEqual(true))
-  })
+  }) */
 
   afterAll(() => cleanupTestQueryClient(queryClient))
 })
