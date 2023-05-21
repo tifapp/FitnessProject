@@ -11,7 +11,7 @@ import {
   requestForegroundPermissionsAsync
 } from "expo-location"
 
-const exploreQueryUserLocation = async () => {
+const exploreEventsQueryUserLocation = async () => {
   return await expoQueryUserCoordinates("approximate-low")
 }
 
@@ -19,9 +19,9 @@ const exploreQueryUserLocation = async () => {
  * Fetches the user location on the explore screen by first requesting
  * for foreground location permissions.
  */
-export const exploreFetchUserLocation = async (
+export const exploreEventsFetchUserLocation = async (
   requestPermission: () => Promise<LocationPermissionResponse> = requestForegroundPermissionsAsync,
-  fetchLocation: () => Promise<TrackedLocationCoordinates> = exploreQueryUserLocation
+  fetchLocation: () => Promise<TrackedLocationCoordinates> = exploreEventsQueryUserLocation
 ) => {
   const didGrantLocationPermissions = await requestPermission().then(
     (res) => res.granted
@@ -34,7 +34,7 @@ export const exploreFetchUserLocation = async (
   return { status: "success", location: await fetchLocation() }
 }
 
-export type ExlporeEnvironment = {
+export type ExlporeEventsEnvironment = {
   fetchEvents: (
     center: LocationCoordinate2D,
     radiusMeters: number
@@ -42,10 +42,10 @@ export type ExlporeEnvironment = {
   fetchUserLocation: () => Promise<LocationCoordinate2D>
 }
 
-export const useExplore = () => {}
+export const useExploreEvents = () => {}
 
-export type ExploreProps = {
+export type ExploreEventsProps = {
   style?: StyleProp<ViewStyle>
 }
 
-export const ExploreView = ({ style }: ExploreProps) => <></>
+export const ExploreEventsView = ({ style }: ExploreEventsProps) => <></>
