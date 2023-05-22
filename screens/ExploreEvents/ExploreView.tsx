@@ -4,22 +4,21 @@ import {
   TrackedLocationCoordinates,
   expoQueryUserCoordinates
 } from "@lib/location"
-import React, { useEffect, useState } from "react"
+import React, { useEffect } from "react"
 import { StyleProp, ViewStyle } from "react-native"
 import {
   LocationPermissionResponse,
   requestForegroundPermissionsAsync
 } from "expo-location"
 import { useQuery } from "react-query"
+import { milesToMeters } from "@lib/Math"
 
 const exploreEventsQueryUserLocation = async () => {
   return await expoQueryUserCoordinates("approximate-low")
 }
 
 export type ExploreEventsUserLocation =
-  | {
-      status: "permission-denied"
-    }
+  | { status: "permission-denied"; location: undefined }
   | { status: "success"; location: TrackedLocationCoordinates }
 
 /**
@@ -35,7 +34,7 @@ export const exploreEventsFetchUserLocation = async (
   )
 
   if (!didGrantLocationPermissions) {
-    return { status: "permission-denied" }
+    return { status: "permission-denied", location: undefined }
   }
 
   return { status: "success", location: await fetchLocation() }
@@ -48,7 +47,7 @@ export type ExploreEventsError =
 
 export type ExploreEventsData =
   | { status: "error"; type: ExploreEventsError }
-  | { status: "success" }
+  | { status: "success"; events: CurrentUserEvent[] }
   | { status: "loading" }
 
 export type UseExploreEventsResult = {
@@ -57,10 +56,7 @@ export type UseExploreEventsResult = {
 
 export type UseExploreEventsProps = {
   center?: LocationCoordinate2D
-  fetchEvents?: (
-    center: LocationCoordinate2D,
-    radiusMeters: number
-  ) => Promise<CurrentUserEvent[]>
+  fetchEvents?: (center: LocationCoordinate2D) => Promise<CurrentUserEvent[]>
   fetchUserLocation?: () => Promise<ExploreEventsUserLocation>
   onUserLocationPermissionDenied: () => void
 }
@@ -71,38 +67,57 @@ export const useExploreEvents = ({
   fetchUserLocation = exploreEventsFetchUserLocation,
   onUserLocationPermissionDenied
 }: UseExploreEventsProps): UseExploreEventsResult => {
-  const { isError } = useExploreEventsData({
+  const data = useExploreEventsData({
     center,
     fetchEvents,
     fetchUserLocation,
     onUserLocationPermissionDenied
   })
-  return {
-    data: isError
-      ? { status: "error", type: "user-location" }
-      : { status: "loading" }
-  }
+  return { data }
 }
 
 type UseExploreEventsDataProps = {
   center?: LocationCoordinate2D
-  fetchEvents: (
-    center: LocationCoordinate2D,
-    radiusMeters: number
-  ) => Promise<CurrentUserEvent[]>
+  fetchEvents: (center: LocationCoordinate2D) => Promise<CurrentUserEvent[]>
   fetchUserLocation: () => Promise<ExploreEventsUserLocation>
   onUserLocationPermissionDenied: () => void
 }
 
 const useExploreEventsData = ({
   center,
+  fetchEvents,
   fetchUserLocation,
   onUserLocationPermissionDenied
-}: UseExploreEventsDataProps) => {
-  return useExploreEventsUserLocation(
-    fetchUserLocation,
-    onUserLocationPermissionDenied,
-    !center
+}: UseExploreEventsDataProps): ExploreEventsData => {
+  const { data: userLocation, isError: isLocationError } =
+    useExploreEventsUserLocation(
+      fetchUserLocation,
+      onUserLocationPermissionDenied,
+      !center
+    )
+
+  const { data: events, isError: isEventsError } = useEventsQuery(
+    center ?? userLocation?.location?.coordinates,
+    fetchEvents
+  )
+
+  if (isLocationError) return { status: "error", type: "user-location" }
+  if (isEventsError) return { status: "error", type: "events-loading" }
+  if (!events) return { status: "loading" }
+  return events.length === 0
+    ? { status: "error", type: "no-results" }
+    : { status: "success", events }
+}
+
+const useEventsQuery = (
+  center: LocationCoordinate2D | undefined,
+  fetchEvents: (center: LocationCoordinate2D) => Promise<CurrentUserEvent[]>
+) => {
+  return useQuery(
+    ["explore-events", center],
+    // NB: We must have a center for this query to be enabled, so the force unwrap is safe
+    async () => await fetchEvents(center!),
+    { enabled: !!center }
   )
 }
 

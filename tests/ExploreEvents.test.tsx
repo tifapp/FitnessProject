@@ -9,6 +9,7 @@ import {
 } from "@screens/ExploreEvents"
 import { renderHook, waitFor } from "@testing-library/react-native"
 import { TestQueryClientProvider } from "./helpers/ReactQuery"
+import { EventMocks } from "@lib/events"
 
 describe("ExploreEvents tests", () => {
   beforeEach(() => jest.resetAllMocks())
@@ -68,7 +69,61 @@ describe("ExploreEvents tests", () => {
     it("does not fetch user location when initial center given", async () => {
       const center = mockLocationCoordinate2D()
       renderUseExploreEvents(center)
-      expect(fetchUserLocation).not.toHaveBeenCalled()
+      await waitFor(() => expect(fetchUserLocation).not.toHaveBeenCalled())
+    })
+
+    it("fetches events with the initial given center", async () => {
+      const center = mockLocationCoordinate2D()
+      fetchEvents.mockResolvedValue([EventMocks.PickupBasketball])
+      const { result } = renderUseExploreEvents(center)
+
+      expect(result.current.data).toMatchObject({ status: "loading" })
+      await waitFor(() => expect(fetchEvents).toHaveBeenCalledWith(center))
+      expect(result.current.data).toMatchObject({
+        status: "success",
+        events: [EventMocks.PickupBasketball]
+      })
+    })
+
+    it("fetches events with user location as center when no initial center given", async () => {
+      const location = mockTrackedLocationCoordinate()
+      fetchUserLocation.mockResolvedValue({ status: "success", location })
+      fetchEvents.mockResolvedValue([EventMocks.PickupBasketball])
+      const { result } = renderUseExploreEvents()
+
+      expect(result.current.data).toMatchObject({ status: "loading" })
+      await waitFor(() => expect(fetchUserLocation).toHaveBeenCalled())
+      expect(fetchEvents).toHaveBeenCalledWith(location.coordinates)
+      expect(result.current.data).toMatchObject({
+        status: "success",
+        events: [EventMocks.PickupBasketball]
+      })
+    })
+
+    it("presents a no-results error when empty events array fetched", async () => {
+      fetchEvents.mockResolvedValue([])
+      const { result } = renderUseExploreEvents(mockLocationCoordinate2D())
+
+      expect(result.current.data).toMatchObject({ status: "loading" })
+      await waitFor(() => expect(fetchEvents).toHaveBeenCalled())
+      expect(result.current.data).toMatchObject({
+        status: "error",
+        type: "no-results"
+      })
+    })
+
+    it("presents an events-loading error when event loading fails", async () => {
+      fetchEvents.mockRejectedValue(
+        new Error("Our backend was destroyed by a meteor")
+      )
+      const { result } = renderUseExploreEvents(mockLocationCoordinate2D())
+
+      expect(result.current.data).toMatchObject({ status: "loading" })
+      await waitFor(() => expect(fetchEvents).toHaveBeenCalled())
+      expect(result.current.data).toMatchObject({
+        status: "error",
+        type: "events-loading"
+      })
     })
 
     const onUserLocationPermissionDenied = jest.fn()
