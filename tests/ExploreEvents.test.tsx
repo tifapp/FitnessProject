@@ -1,14 +1,14 @@
 import {
   LocationCoordinate2D,
+  mockLocationCoordinate2D,
   mockTrackedLocationCoordinate
 } from "@lib/location"
 import {
   exploreEventsFetchUserLocation,
   useExploreEvents
 } from "@screens/ExploreEvents"
-import { act, render, renderHook, waitFor } from "@testing-library/react-native"
+import { renderHook, waitFor } from "@testing-library/react-native"
 import { TestQueryClientProvider } from "./helpers/ReactQuery"
-import { neverPromise } from "./helpers/Promise"
 
 describe("ExploreEvents tests", () => {
   beforeEach(() => jest.resetAllMocks())
@@ -65,7 +65,14 @@ describe("ExploreEvents tests", () => {
       })
     })
 
+    it("does not fetch user location when initial center given", async () => {
+      const center = mockLocationCoordinate2D()
+      renderUseExploreEvents(center)
+      expect(fetchUserLocation).not.toHaveBeenCalled()
+    })
+
     const onUserLocationPermissionDenied = jest.fn()
+    const fetchEvents = jest.fn()
     const fetchUserLocation = jest.fn()
 
     const renderUseExploreEvents = (center?: LocationCoordinate2D) => {
@@ -73,6 +80,7 @@ describe("ExploreEvents tests", () => {
         () => {
           return useExploreEvents({
             center,
+            fetchEvents,
             fetchUserLocation,
             onUserLocationPermissionDenied
           })

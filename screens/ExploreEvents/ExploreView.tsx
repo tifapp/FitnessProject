@@ -60,21 +60,23 @@ export type UseExploreEventsProps = {
   fetchEvents?: (
     center: LocationCoordinate2D,
     radiusMeters: number
-  ) => Promise<CurrentUserEvent>
+  ) => Promise<CurrentUserEvent[]>
   fetchUserLocation?: () => Promise<ExploreEventsUserLocation>
   onUserLocationPermissionDenied: () => void
 }
 
 export const useExploreEvents = ({
+  center,
+  fetchEvents = async () => [] as CurrentUserEvent[],
   fetchUserLocation = exploreEventsFetchUserLocation,
   onUserLocationPermissionDenied
 }: UseExploreEventsProps): UseExploreEventsResult => {
-  const { data, isError } = useExploreEventsUserLocation(fetchUserLocation)
-  useEffect(() => {
-    if (data?.status === "permission-denied") {
-      onUserLocationPermissionDenied()
-    }
-  }, [data?.status, onUserLocationPermissionDenied])
+  const { isError } = useExploreEventsData({
+    center,
+    fetchEvents,
+    fetchUserLocation,
+    onUserLocationPermissionDenied
+  })
   return {
     data: isError
       ? { status: "error", type: "user-location" }
@@ -82,10 +84,45 @@ export const useExploreEvents = ({
   }
 }
 
+type UseExploreEventsDataProps = {
+  center?: LocationCoordinate2D
+  fetchEvents: (
+    center: LocationCoordinate2D,
+    radiusMeters: number
+  ) => Promise<CurrentUserEvent[]>
+  fetchUserLocation: () => Promise<ExploreEventsUserLocation>
+  onUserLocationPermissionDenied: () => void
+}
+
+const useExploreEventsData = ({
+  center,
+  fetchUserLocation,
+  onUserLocationPermissionDenied
+}: UseExploreEventsDataProps) => {
+  return useExploreEventsUserLocation(
+    fetchUserLocation,
+    onUserLocationPermissionDenied,
+    !center
+  )
+}
+
 const useExploreEventsUserLocation = (
-  fetchLocation: () => Promise<ExploreEventsUserLocation>
+  fetchLocation: () => Promise<ExploreEventsUserLocation>,
+  onPermissionDenied: () => void,
+  isEnabled: boolean
 ) => {
-  return useQuery(["explore-events-user-location"], fetchLocation)
+  const query = useQuery(
+    ["explore-events-user-location"],
+    async () => await fetchLocation(),
+    { enabled: isEnabled }
+  )
+  const { data } = query
+  useEffect(() => {
+    if (data?.status === "permission-denied") {
+      onPermissionDenied()
+    }
+  }, [data?.status, onPermissionDenied])
+  return query
 }
 
 export type ExploreEventsProps = {

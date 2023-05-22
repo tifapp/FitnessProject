@@ -2,6 +2,7 @@ import {
   degreesToRadians,
   EARTH_RADIUS_METERS,
   METERS_PER_MILE,
+  metersToMiles,
   sin2
 } from "../Math"
 import { z } from "zod"
@@ -124,8 +125,9 @@ export const milesBetweenLocations = (
   const sin2HalfLngDelta = sin2(lngDeltaRadians / 2)
   const trigCombo = sin2HalfLatDelta + latCos * sin2HalfLngDelta
 
-  const meters = 2 * EARTH_RADIUS_METERS * Math.asin(Math.sqrt(trigCombo))
-  return meters / METERS_PER_MILE
+  return metersToMiles(
+    2 * EARTH_RADIUS_METERS * Math.asin(Math.sqrt(trigCombo))
+  )
 }
 
 /**
