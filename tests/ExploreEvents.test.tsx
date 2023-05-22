@@ -8,6 +8,7 @@ import {
 } from "@screens/ExploreEvents"
 import { act, render, renderHook, waitFor } from "@testing-library/react-native"
 import { TestQueryClientProvider } from "./helpers/ReactQuery"
+import { neverPromise } from "./helpers/Promise"
 
 describe("ExploreEvents tests", () => {
   beforeEach(() => jest.resetAllMocks())
@@ -56,8 +57,9 @@ describe("ExploreEvents tests", () => {
       fetchUserLocation.mockRejectedValue(new Error("The user died"))
       const { result } = renderUseExploreEvents()
 
+      expect(result.current.data).toMatchObject({ status: "loading" })
       await waitFor(() => expect(fetchUserLocation).toHaveBeenCalled())
-      expect(result.current.data).toEqual({
+      expect(result.current.data).toMatchObject({
         status: "error",
         type: "user-location"
       })

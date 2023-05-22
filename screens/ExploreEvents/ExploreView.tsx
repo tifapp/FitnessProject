@@ -49,6 +49,7 @@ export type ExploreEventsError =
 export type ExploreEventsData =
   | { status: "error"; type: ExploreEventsError }
   | { status: "success" }
+  | { status: "loading" }
 
 export type UseExploreEventsResult = {
   data: ExploreEventsData
@@ -77,7 +78,7 @@ export const useExploreEvents = ({
   return {
     data: isError
       ? { status: "error", type: "user-location" }
-      : { status: "success" }
+      : { status: "loading" }
   }
 }
 
