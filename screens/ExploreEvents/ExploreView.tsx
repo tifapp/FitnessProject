@@ -41,7 +41,21 @@ export const exploreEventsFetchUserLocation = async (
   return { status: "success", location: await fetchLocation() }
 }
 
-export type ExploreEventsEnvironment = {
+export type ExploreEventsError =
+  | "user-location"
+  | "events-loading"
+  | "no-results"
+
+export type ExploreEventsData =
+  | { status: "error"; type: ExploreEventsError }
+  | { status: "success" }
+
+export type UseExploreEventsResult = {
+  data: ExploreEventsData
+}
+
+export type UseExploreEventsProps = {
+  center?: LocationCoordinate2D
   fetchEvents?: (
     center: LocationCoordinate2D,
     radiusMeters: number
@@ -53,13 +67,18 @@ export type ExploreEventsEnvironment = {
 export const useExploreEvents = ({
   fetchUserLocation = exploreEventsFetchUserLocation,
   onUserLocationPermissionDenied
-}: ExploreEventsEnvironment) => {
-  const { data } = useExploreEventsUserLocation(fetchUserLocation)
+}: UseExploreEventsProps): UseExploreEventsResult => {
+  const { data, isError } = useExploreEventsUserLocation(fetchUserLocation)
   useEffect(() => {
     if (data?.status === "permission-denied") {
       onUserLocationPermissionDenied()
     }
   }, [data?.status, onUserLocationPermissionDenied])
+  return {
+    data: isError
+      ? { status: "error", type: "user-location" }
+      : { status: "success" }
+  }
 }
 
 const useExploreEventsUserLocation = (

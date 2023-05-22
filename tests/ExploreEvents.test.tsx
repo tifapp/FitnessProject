@@ -1,4 +1,7 @@
-import { mockTrackedLocationCoordinate } from "@lib/location"
+import {
+  LocationCoordinate2D,
+  mockTrackedLocationCoordinate
+} from "@lib/location"
 import {
   exploreEventsFetchUserLocation,
   useExploreEvents
@@ -44,18 +47,30 @@ describe("ExploreEvents tests", () => {
       fetchUserLocation.mockResolvedValue({ status: "success", location })
       renderUseExploreEvents()
 
-      await waitFor(() =>
+      await waitFor(() => {
         expect(onUserLocationPermissionDenied).not.toHaveBeenCalled()
-      )
+      })
+    })
+
+    it("presents a user location error when location fetch fails and no preset center", async () => {
+      fetchUserLocation.mockRejectedValue(new Error("The user died"))
+      const { result } = renderUseExploreEvents()
+
+      await waitFor(() => expect(fetchUserLocation).toHaveBeenCalled())
+      expect(result.current.data).toEqual({
+        status: "error",
+        type: "user-location"
+      })
     })
 
     const onUserLocationPermissionDenied = jest.fn()
     const fetchUserLocation = jest.fn()
 
-    const renderUseExploreEvents = () => {
+    const renderUseExploreEvents = (center?: LocationCoordinate2D) => {
       return renderHook(
         () => {
           return useExploreEvents({
+            center,
             fetchUserLocation,
             onUserLocationPermissionDenied
           })
