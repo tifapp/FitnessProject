@@ -1,7 +1,14 @@
 import { mockTrackedLocationCoordinate } from "@lib/location"
-import { exploreEventsFetchUserLocation } from "@screens/ExploreEvents"
+import {
+  exploreEventsFetchUserLocation,
+  useExploreEvents
+} from "@screens/ExploreEvents"
+import { act, render, renderHook, waitFor } from "@testing-library/react-native"
+import { TestQueryClientProvider } from "./helpers/ReactQuery"
 
 describe("ExploreEvents tests", () => {
+  beforeEach(() => jest.resetAllMocks())
+
   describe("exploreEventsFetchUserLocation tests", () => {
     it("returns a permissions denied status when location permission request is denied", async () => {
       expect(
@@ -23,5 +30,42 @@ describe("ExploreEvents tests", () => {
     })
   })
 
-  describe("useExploreEvents tests", () => {})
+  describe("useExploreEvents tests", () => {
+    it("presents the location search when user location permissions denied", async () => {
+      fetchUserLocation.mockResolvedValue({ status: "permission-denied" })
+      renderUseExploreEvents()
+
+      await waitFor(() => expect(fetchUserLocation).toHaveBeenCalled())
+      expect(onUserLocationPermissionDenied).toHaveBeenCalled()
+    })
+
+    it("does not present location search when user location fetch successful", async () => {
+      const location = mockTrackedLocationCoordinate()
+      fetchUserLocation.mockResolvedValue({ status: "success", location })
+      renderUseExploreEvents()
+
+      await waitFor(() =>
+        expect(onUserLocationPermissionDenied).not.toHaveBeenCalled()
+      )
+    })
+
+    const onUserLocationPermissionDenied = jest.fn()
+    const fetchUserLocation = jest.fn()
+
+    const renderUseExploreEvents = () => {
+      return renderHook(
+        () => {
+          return useExploreEvents({
+            fetchUserLocation,
+            onUserLocationPermissionDenied
+          })
+        },
+        {
+          wrapper: ({ children }) => (
+            <TestQueryClientProvider>{children}</TestQueryClientProvider>
+          )
+        }
+      )
+    }
+  })
 })
