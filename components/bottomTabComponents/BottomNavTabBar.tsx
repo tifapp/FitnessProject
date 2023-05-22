@@ -1,36 +1,69 @@
 import { TouchableIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
-import { useNavigation } from "@react-navigation/native"
+import {
+  BottomTabBarOptions,
+  BottomTabBarProps
+} from "@react-navigation/bottom-tabs"
 import React from "react"
 import { StyleSheet, View } from "react-native"
 
-export const BottomNavTabBar = () => {
-  const navigation = useNavigation()
+function getIconName (routeName: string) {
+  if (routeName === "Map") return "map"
+  else if (routeName === "Chat Room") return "chatbox"
+  else if (routeName === "Event Details") return "add-outline"
+  else if (routeName === "Notifications") return "notifications"
+  else return "person"
+}
+
+export const BottomNavTabBar = ({
+  state,
+  descriptors,
+  navigation
+}: BottomTabBarProps<BottomTabBarOptions>) => {
   return (
     <View style={styles.container}>
-      <TouchableIonicon icon={{ name: "map", color: AppStyles.darkColor }} />
-      <TouchableIonicon
-        icon={{ name: "chatbox", color: AppStyles.colorOpacity35 }}
-        activeOpacity={0.5}
-        underlayColor={AppStyles.colorOpacity15}
-      />
-      <TouchableIonicon
-        style={styles.plusIcon}
-        icon={{ name: "add-outline", color: "white" }}
-        activeOpacity={0.5}
-        underlayColor={AppStyles.colorOpacity15}
-      />
-      <TouchableIonicon
-        icon={{ name: "notifications", color: AppStyles.colorOpacity35 }}
-        activeOpacity={0.5}
-        underlayColor={AppStyles.colorOpacity15}
-      />
-      <TouchableIonicon
-        icon={{ name: "person", color: AppStyles.colorOpacity35 }}
-        activeOpacity={0.5}
-        onPress={() => navigation.navigate("Profile Screen")}
-        underlayColor={AppStyles.colorOpacity15}
-      />
+      {state.routes.map((route, index) => {
+        const { options } = descriptors[route.key]
+        const label =
+          options.tabBarLabel !== undefined
+            ? options.tabBarLabel
+            : options.title !== undefined
+              ? options.title
+              : route.name
+
+        const isFocused = state.index === index
+
+        const onPress = () => {
+          const event = navigation.emit({
+            type: "tabPress",
+            target: route.key,
+            canPreventDefault: true
+          })
+
+          if (!isFocused && !event.defaultPrevented) {
+            // The `merge: true` option makes sure that the params inside the tab screen are preserved
+            navigation.navigate(route.name)
+          }
+        }
+        return (
+          <TouchableIonicon
+            icon={{
+              name: getIconName(route.name),
+              color: isFocused
+                ? "#673ab7"
+                : getIconName(route.name) === "add-outline"
+                  ? "#ffffff"
+                  : "#222"
+            }}
+            style={
+              getIconName(route.name) === "add-outline" ? styles.plusIcon : null
+            }
+            activeOpacity={0.5}
+            onPress={onPress}
+            underlayColor={AppStyles.colorOpacity15}
+          />
+        )
+      })}
     </View>
   )
 }
@@ -59,3 +92,12 @@ const styles = StyleSheet.create({
 })
 
 export default BottomNavTabBar
+
+/**
+ * <TouchableIonicon
+        icon={{ name: "person", color: AppStyles.colorOpacity35 }}
+        activeOpacity={0.5}
+        onPress={() => navigation.navigate("Profile Screen")}
+        underlayColor={AppStyles.colorOpacity15}
+      />
+ */

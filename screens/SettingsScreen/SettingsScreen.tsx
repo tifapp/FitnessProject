@@ -23,6 +23,8 @@ const chatMsgNotifEnabledAtom = atomWithStorage("chatMsgNotifEnabled", true)
 
 const friendReqNotifEnabledAtom = atomWithStorage("friendReqNotifEnabled", true)
 
+const analyticsEnabledAtom = atomWithStorage("analyticsEnabled", true)
+
 const SwitchComponent = ({ value, onValueChange }: SwitchComponentProps) => {
   return (
     <Switch
@@ -457,6 +459,70 @@ const FriendReqNotificationSection = () => {
   )
 }
 
+const AnalyticsSection = () => {
+  const [analyticsEnabled, setAnalyticsEnabled] = useAtom(analyticsEnabledAtom)
+  return (
+    <View>
+      <View
+        style={[
+          styles.flexRow,
+          styles.paddingIconSection,
+          { alignItems: "center", justifyContent: "flex-start" }
+        ]}
+      >
+        <View
+          style={[
+            styles.spacing,
+            { paddingVertical: 0, paddingHorizontal: 12 }
+          ]}
+        >
+          <View style={{ justifyContent: "center" }}>
+            <Ionicon
+              style={[styles.iconStyling]}
+              name="people"
+              color={"black"}
+            />
+          </View>
+        </View>
+
+        <View style={[styles.spacing, { paddingHorizontal: 2 }]}>
+          <View style={{ marginBottom: 0 }}>
+            <Headline
+              style={[
+                styles.textColor,
+                { textAlignVertical: "center", textAlign: "left" }
+              ]}
+            >
+              {"Analytics"}
+            </Headline>
+          </View>
+
+          <View
+            style={[
+              styles.flexRow,
+              {
+                flex: 1,
+                height: "90%",
+                width: "350%",
+                position: "absolute",
+                alignItems: "flex-end",
+                justifyContent: "flex-end"
+              }
+            ]}
+          >
+            <SwitchComponent
+              value={analyticsEnabled}
+              onValueChange={() =>
+                setAnalyticsEnabled((previousState: boolean) => !previousState)
+              }
+            />
+          </View>
+        </View>
+      </View>
+    </View>
+  )
+}
+
 const MoreInfoSection = () => {
   return (
     <View
@@ -607,6 +673,13 @@ export const SettingsScreen = () => {
       </Headline>
       <View style={styles.iconSection}>
         <MoreInfoSection />
+      </View>
+
+      <Headline style={[styles.textColor, { paddingTop: 8, paddingBottom: 2 }]}>
+        {"Other Settings"}
+      </Headline>
+      <View style={styles.iconSection}>
+        <AnalyticsSection />
       </View>
 
       <View
