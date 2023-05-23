@@ -1,18 +1,19 @@
+import { Headline, Title } from "@components/Text"
 import { TouchableIonicon } from "@components/common/Icons"
 import { EventCard } from "@components/eventCard/EventCard"
 import { AppStyles } from "@lib/AppColorStyle"
 import { CurrentUserEvent } from "@lib/events"
-import { useNavigation } from "@react-navigation/native"
 import { SetStateAction } from "react"
 import {
   FlatList,
   ListRenderItemInfo,
   Modal,
   StyleSheet,
-  TouchableOpacity
+  View
 } from "react-native"
 
 interface Props {
+  username: string
   visible: boolean
   setVisible: React.Dispatch<SetStateAction<boolean>>
   events: CurrentUserEvent[]
@@ -21,9 +22,7 @@ interface Props {
 const MARGIN_HORIZONTAL = 16
 const MARGIN_VERTICAL = 16
 
-const AllEventsModal = ({ visible, setVisible, events }: Props) => {
-  const navigation = useNavigation()
-
+const AllEventsModal = ({username, visible, setVisible, events }: Props) => {
   return (
     <Modal style={styles.container} visible={visible} animationType="slide">
       <TouchableIonicon
@@ -33,19 +32,15 @@ const AllEventsModal = ({ visible, setVisible, events }: Props) => {
           setVisible(false)
         }}
       />
+      <View style={styles.eventSpacing}>
+      <Title>{`${username}'s Events`}</Title>
       <FlatList
         data={events}
         renderItem={({ item }: ListRenderItemInfo<CurrentUserEvent>) => (
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("Event Details", { event: item })
-            }
-            style={styles.eventSpacing}
-          >
-            <EventCard event={item} />
-          </TouchableOpacity>
+          <EventCard event={item} style={{marginVertical: 16}}/>
         )}
       />
+      </View>
     </Modal>
   )
 }

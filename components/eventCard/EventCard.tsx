@@ -141,7 +141,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 20,
     borderWidth: 1,
-    // width: "100%",
     borderColor: "rgba(145, 145, 145, 0.1)",
     backgroundColor: "#F4F4F6"
   },

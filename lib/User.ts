@@ -21,10 +21,10 @@ export type User = {
  * Some mock {@link User} objects.
  */
 export namespace UserMocks {
-  export const Blob = {
+  export const Holly = {
     id: uuid(),
-    username: "Blob",
-    handle: "@Blob",
+    username: "Holly Host",
+    handle: "@Holly",
     biography:
       "The placemark info should then be geocoded from the coordinates if it is not available." +
       "The placemark info should then be geocoded from the coordinates if it is not available." +

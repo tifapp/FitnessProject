@@ -69,7 +69,7 @@ const ActivitiesScreen = ({
 
   return (
     <>
-      {/* <EventsMap
+      <EventsMap
         ref={appRef}
         style={{ width: "100%", height: "100%" }}
         initialRegion={checkUserLocation(givenUserLocation)}
@@ -89,8 +89,7 @@ const ActivitiesScreen = ({
       />
 
       <EventsList />
-      <EventTabBar /> */}
-      <ProfileScreen user={UserMocks.Blob} />
+      <EventTabBar />
     </>
   )
 }
