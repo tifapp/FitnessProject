@@ -134,10 +134,6 @@ export default function ActivitiesStack () {
         component={AttendeesListScreen}
       />
       <Stack.Screen
-        name={ActivitiesScreenNames.NOTIFICATIONS}
-        component={TestNotifScreen}
-      />
-      <Stack.Screen
         name={ActivitiesScreenNames.CHAT_ROOM}
         component={TestChatRoomScreen}
       />

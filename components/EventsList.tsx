@@ -6,7 +6,7 @@ import {
 import { CurrentUserEvent, EventMocks } from "@lib/events/Event"
 import { useNavigation } from "@react-navigation/native"
 import React, { useEffect, useRef } from "react"
-import { ListRenderItemInfo, StyleSheet, Text, View } from "react-native"
+import { ListRenderItemInfo, StyleSheet, View } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { Title } from "./Text"
 import { EventCard } from "./eventCard/EventCard"
@@ -30,7 +30,7 @@ const EventsList = () => {
   }, [])
 
   // variables
-  const snapPoints = ["8%", "55%", "90%"]
+  const snapPoints = ["8%", "55%", "95%"]
 
   return (
     <BottomSheetModalProvider>

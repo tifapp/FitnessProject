@@ -10,7 +10,7 @@ import React, { useRef } from "react"
 import { StyleProp, View, ViewStyle } from "react-native"
 
 // import ActionSheet
-import ActionSheet from "react-native-actionsheet"
+import ActionSheet from "@alessiocancian/react-native-actionsheet"
 
 interface Props {
   style?: StyleProp<ViewStyle>
