@@ -24,7 +24,8 @@
       "@hooks/*": ["./hooks/*"],
       "@assets/*": ["./assets/*"],
       "@graphql/*": ["./src/graphql/*"],
-      "@lib/*": ["./lib/*"]
+      "@lib/*": ["./lib/*"],
+      "env": ["./.env"]
     }
   },
   "extends": "expo/tsconfig.base",
