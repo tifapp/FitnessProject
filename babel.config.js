@@ -9,6 +9,7 @@ module.exports = function (api) {
   return {
     presets: ["babel-preset-expo"],
     plugins: [
+      ["module:react-native-dotenv", { moduleName: "env", path: ".env" }],
       ["@babel/plugin-transform-flow-strip-types"],
       ["@babel/plugin-proposal-decorators", { legacy: true }],
       ["@babel/plugin-proposal-class-properties", { loose: true }],

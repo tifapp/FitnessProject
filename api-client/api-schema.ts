@@ -7,11 +7,7 @@ const payloadSchema = z.object({
   id: z.number()
 })
 
-const responseSchema = z.object({
-  id: z.number(),
-  username: z.string(),
-  password: z.string()
-})
+const responseSchema = z.any()
 
 const typecheckApiSchema = <T extends Endpoint>(
   schema: T
@@ -20,9 +16,8 @@ const typecheckApiSchema = <T extends Endpoint>(
 }
 
 export const ApiSchema = typecheckApiSchema({
-  "/user": {
+  "/lambdaSQLRoute/user": {
     GET: {
-      payloadType: payloadSchema,
       responseType: responseSchema
     }
   }
