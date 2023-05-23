@@ -626,7 +626,11 @@ const DeleteAccountSection = () => {
 export const SettingsScreen = () => {
   return (
     <ScrollView
-      style={[styles.container, styles.spacing, { paddingVertical: 8 }]}
+      style={[
+        styles.container,
+        styles.spacing,
+        { flex: 1, paddingVertical: 8 }
+      ]}
       contentContainerStyle={{ flexGrow: 1 }}
       nestedScrollEnabled={true}
     >

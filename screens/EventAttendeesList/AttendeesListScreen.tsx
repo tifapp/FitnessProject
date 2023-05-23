@@ -1,5 +1,5 @@
 import { Title } from "@components/Text"
-import MenuDropdown from "@components/eventCard/MenuDropdown"
+import ConfirmationDialogue from "@components/profileImageComponents/ConfirmationDialogue"
 import { EventAttendee } from "@lib/events"
 import { AttendeeEntry } from "@screens/EventAttendeesList/attendeeEntry"
 import React from "react"
@@ -78,7 +78,7 @@ export const AttendeesListScreen = () => {
   }
 
   return (
-    <View style={{ marginTop: 24, marginHorizontal: 16 }}>
+    <View style={{ flex: 1, marginTop: 24, marginHorizontal: 16 }}>
       <Title style={{ marginTop: 8 }}>Attendees List</Title>
       <FlatList
         ItemSeparatorComponent={FlatSeparator}
@@ -87,8 +87,7 @@ export const AttendeesListScreen = () => {
           <>
             <View style={{ flex: 1, flexDirection: "row", marginTop: 8 }}>
               <AttendeeEntry attendee={item} />
-              <MenuDropdown
-                isEventHost={false}
+              <ConfirmationDialogue
                 style={{
                   flex: 1,
                   flexDirection: "row",

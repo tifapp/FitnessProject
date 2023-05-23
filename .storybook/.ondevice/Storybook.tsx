@@ -5,6 +5,9 @@ import { Text, TouchableOpacity, View } from "react-native"
 import { MyButtonProps } from ".storybook/components/Button/Button"
 import { FlatList } from "react-native-gesture-handler"
 import { useAppFonts } from "../../hooks/Fonts"
+import AttendeesListMeta, {
+  Basic as AttendeesListScreenBasic
+} from "../components/AttendeesList/AttendeesList.stories"
 import MyButtonMeta, {
   Basic as MyButtonBasic
 } from "../components/Button/Button.stories"
@@ -39,6 +42,11 @@ const stories = [
     name: SettingsMeta.title,
     component: SettingsScreenBasic,
     args: ContentTextMeta.args
+  },
+  {
+    name: AttendeesListMeta.title,
+    component: AttendeesListScreenBasic,
+    args: AttendeesListMeta.args
   }
   // Add more stories here...
 ]
