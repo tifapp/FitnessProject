@@ -12,7 +12,7 @@ import { AppStyles } from "@lib/AppColorStyle"
 import { EventCard } from "@components/eventCard/EventCard"
 import { CurrentUserEvent } from "@lib/events"
 
-interface ProfileScreenProps {
+export interface ProfileScreenProps {
   user: User
 }
 
