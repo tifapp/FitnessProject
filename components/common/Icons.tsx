@@ -1,16 +1,16 @@
 import {
-  MaterialIcons,
+  Ionicons,
   MaterialCommunityIcons,
-  Ionicons
+  MaterialIcons
 } from "@expo/vector-icons"
 import { useFontScale } from "@hooks/Fonts"
 import React, { ComponentProps } from "react"
 import {
   StyleProp,
-  TouchableOpacityProps,
+  TouchableHighlightProps,
+  TouchableOpacity,
   ViewProps,
-  ViewStyle,
-  TouchableOpacity
+  ViewStyle
 } from "react-native"
 
 /**
@@ -94,7 +94,7 @@ export const Ionicon = ({
 
 export type IoniconButtonProps = {
   icon: IconProps<IoniconName>
-} & TouchableOpacityProps
+} & TouchableHighlightProps
 
 /**
  * An ionicon with no background that behaves like {@link TouchableOpacity}.

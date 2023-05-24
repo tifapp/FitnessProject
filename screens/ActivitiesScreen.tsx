@@ -1,5 +1,4 @@
 import EventsList from "@components/EventsList"
-import EventTabBar from "@components/bottomTabComponents/EventTabBar"
 import { TouchableIonicon } from "@components/common/Icons"
 import EventsMap, { MapRefMethods } from "@components/eventMap/EventsMap"
 import { useTrackUserLocation } from "@hooks/UserLocation"
@@ -89,7 +88,6 @@ const ActivitiesScreen = ({
       />
 
       <EventsList />
-      <EventTabBar />
     </>
   )
 }

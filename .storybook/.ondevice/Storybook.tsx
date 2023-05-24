@@ -4,16 +4,22 @@ import { Text, TouchableOpacity, View } from "react-native"
 // Import your stories
 import { MyButtonProps } from ".storybook/components/Button/Button"
 import { FlatList } from "react-native-gesture-handler"
+import { useAppFonts } from "../../hooks/Fonts"
+import AttendeesListMeta, {
+  Basic as AttendeesListScreenBasic
+} from "../components/AttendeesList/AttendeesList.stories"
 import MyButtonMeta, {
   Basic as MyButtonBasic
 } from "../components/Button/Button.stories"
 import ContentReportingMeta, {
   Default as DefaultReportingFlow
 } from "../components/ContentReporting/ContentReporting.stories"
-import { useAppFonts } from "../../hooks/Fonts"
 import ContentTextMeta, {
   Basic as ContentTextBasic
 } from "../components/ContentText/ContextText.stories"
+import SettingsMeta, {
+  Basic as SettingsScreenBasic
+} from "../components/SettingsScreen/SettingsScreen.stories"
 
 // Create an array of stories
 const stories = [
@@ -31,6 +37,16 @@ const stories = [
     name: ContentTextMeta.title,
     component: ContentTextBasic,
     args: ContentTextMeta.args
+  },
+  {
+    name: SettingsMeta.title,
+    component: SettingsScreenBasic,
+    args: ContentTextMeta.args
+  },
+  {
+    name: AttendeesListMeta.title,
+    component: AttendeesListScreenBasic,
+    args: AttendeesListMeta.args
   }
   // Add more stories here...
 ]
