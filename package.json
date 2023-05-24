@@ -25,6 +25,7 @@
     }
   },
   "dependencies": {
+    "@alessiocancian/react-native-actionsheet": "^3.2.0",
     "@aws-amplify/api": "^4.0.63",
     "@aws-amplify/notifications": "1.0.12",
     "@aws-sdk/client-lex-runtime-v2": "3.262.0",

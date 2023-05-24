@@ -14,7 +14,7 @@ global.STORIES = [
     directory: "./components",
     files: "**/*.stories.?(ts|tsx|js|jsx)",
     importPathMatcher:
-      "^\\.[\\\\/](?:components(?:\\/(?!\\.)(?:(?:(?!(?:^|\\/)\\.).)*?)\\/|\\/|$)(?!\\.)(?=.)[^/]*?\\.stories\\.(?:ts|tsx|js|jsx)?)$",
+      "^\\.[\\\\/](?:components(?:[\\\\/](?!\\.)(?:(?:(?!(?:^|[\\\\/])\\.).)*?)[\\\\/]|[\\\\/]|$)(?!\\.)(?=.)[^\\\\/]*?\\.stories\\.(?:ts|tsx|js|jsx)?)$",
   },
 ];
 
@@ -49,16 +49,18 @@ try {
 
 const getStories = () => {
   return {
-    "./components/Button/Button.stories.tsx": require("../components/Button/Button.stories.tsx"),
-    "./components/ContentReporting/ContentReporting.stories.tsx": require("../components/ContentReporting/ContentReporting.stories.tsx"),
-    "./components/DateTimePicker/DateTimePicker.stories.tsx": require("../components/DateTimePicker/DateTimePicker.stories.tsx"),
-    "./components/EventForm/EventForm.stories.tsx": require("../components/EventForm/EventForm.stories.tsx"),
-    "./components/EventFormToolbar/EventFormToolbar.stories.tsx": require("../components/EventFormToolbar/EventFormToolbar.stories.tsx"),
-    "./components/HexColorPicker/HexColorPicker.stories.tsx": require("../components/HexColorPicker/HexColorPicker.stories.tsx"),
-    "./components/IconButton/IconButton.stories.tsx": require("../components/IconButton/IconButton.stories.tsx"),
-    "./components/LinkedText/LinkedText.stories.tsx": require("../components/LinkedText/LinkedText.stories.tsx"),
-    "./components/LocationSearchResultRow/LocationSearchResultRow.stories.tsx": require("../components/LocationSearchResultRow/LocationSearchResultRow.stories.tsx"),
-    "./components/SearchBar/SearchBar.stories.tsx": require("../components/SearchBar/SearchBar.stories.tsx"),
+    "./componentsAttendeesListAttendeesList.stories.tsx": require("../components/AttendeesList/AttendeesList.stories.tsx"),
+    "./componentsButtonButton.stories.tsx": require("../components/Button/Button.stories.tsx"),
+    "./componentsContentReportingContentReporting.stories.tsx": require("../components/ContentReporting/ContentReporting.stories.tsx"),
+    "./componentsContentTextContextText.stories.tsx": require("../components/ContentText/ContextText.stories.tsx"),
+    "./componentsDateTimePickerDateTimePicker.stories.tsx": require("../components/DateTimePicker/DateTimePicker.stories.tsx"),
+    "./componentsEventFormEventForm.stories.tsx": require("../components/EventForm/EventForm.stories.tsx"),
+    "./componentsEventFormToolbarEventFormToolbar.stories.tsx": require("../components/EventFormToolbar/EventFormToolbar.stories.tsx"),
+    "./componentsHexColorPickerHexColorPicker.stories.tsx": require("../components/HexColorPicker/HexColorPicker.stories.tsx"),
+    "./componentsIconButtonIconButton.stories.tsx": require("../components/IconButton/IconButton.stories.tsx"),
+    "./componentsLocationSearchResultRowLocationSearchResultRow.stories.tsx": require("../components/LocationSearchResultRow/LocationSearchResultRow.stories.tsx"),
+    "./componentsSearchBarSearchBar.stories.tsx": require("../components/SearchBar/SearchBar.stories.tsx"),
+    "./componentsSettingsScreenSettingsScreen.stories.tsx": require("../components/SettingsScreen/SettingsScreen.stories.tsx"),
   };
 };
 

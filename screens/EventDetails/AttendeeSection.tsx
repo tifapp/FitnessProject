@@ -1,8 +1,9 @@
+import { Caption, Headline } from "@components/Text"
+import { Ionicon } from "@components/common/Icons"
+import { AppStyles } from "@lib/AppColorStyle"
+import { useNavigation } from "@react-navigation/native"
 import React, { useState } from "react"
 import { StyleSheet, TouchableOpacity, View } from "react-native"
-import { Headline, Caption } from "@components/Text"
-import { AppStyles } from "@lib/AppColorStyle"
-import { Ionicon } from "@components/common/Icons"
 import { Divider } from "react-native-elements"
 
 interface AttendeeSectionProps {
@@ -11,6 +12,7 @@ interface AttendeeSectionProps {
 }
 
 const AttendeeSection = ({ color, attendeeCount }: AttendeeSectionProps) => {
+  const navigation = useNavigation()
   const [textWidth, setTextWidth] = useState(0)
   const [chevronWidth, setChevronWidth] = useState(0)
 
@@ -24,7 +26,12 @@ const AttendeeSection = ({ color, attendeeCount }: AttendeeSectionProps) => {
 
   return (
     <View>
-      <TouchableOpacity style={[styles.flexRow, styles.paddingIconSection]}>
+      <TouchableOpacity
+        style={[styles.flexRow, styles.paddingIconSection]}
+        onPress={() => {
+          navigation.navigate("Attendees List")
+        }}
+      >
         <View style={[styles.iconStyling, { backgroundColor: color }]}>
           <Ionicon name="people" color={"white"} />
         </View>
