@@ -1,3 +1,4 @@
+
 import React, { useState } from "react"
 import { StyleSheet, TouchableOpacity, View } from "react-native"
 import * as Clipboard from "expo-clipboard"
@@ -12,6 +13,7 @@ import { NativeEventMapDetails, openMapDirections } from "@lib/NativeMap"
 import { Ionicon } from "@components/common/Icons"
 import { showToast } from "@components/common/Toasts"
 import { Divider } from "react-native-elements"
+
 
 interface LocationSectionProps {
   color: string

@@ -1,3 +1,10 @@
+import { Headline, Title } from "@components/Text"
+import AttendanceButton from "@components/bottomTabComponents/AttendanceButton"
+import ProfileImageAndNameWithFriend from "@components/profileImageComponents/ProfileImageAndNameWithFriend"
+import { CalendarEvent } from "@lib/Calendar"
+import { NativeEventMapDetails, openInMaps } from "@lib/NativeMap"
+import { CurrentUserEvent } from "@lib/events"
+import ExpandableText from "@screens/EventDetails/ExpandableText"
 import React from "react"
 import {
   Image,
@@ -6,15 +13,8 @@ import {
   TouchableOpacity,
   View
 } from "react-native"
-import { CurrentUserEvent } from "@lib/events"
-import { Headline, Title } from "@components/Text"
-import ExpandableText from "@screens/EventDetails/ExpandableText"
 import AttendeeSection from "./AttendeeSection"
 import ChatSection from "./ChatSection"
-import { CalendarEvent } from "@lib/Calendar"
-import { NativeEventMapDetails, openInMaps } from "@lib/NativeMap"
-import AttendanceButton from "@components/bottomTabComponents/AttendanceButton"
-import ProfileImageAndNameWithFriend from "@components/profileImageComponents/ProfileImageAndNameWithFriend"
 import EventMapSnippet from "./EventMapSnippet"
 import LocationSection from "./LocationSection"
 import TimeSection from "./TimeSection"
@@ -63,7 +63,6 @@ const EventDetails = ({ event }: EventDetailsProps) => {
           toastOffset={BOTTOM_TAB_HEIGHT}
           userFriendStatus="not-friends"
         />
-
         <View style={styles.iconSection}>
           <TimeSection color={event.color} event={calenderEvent} />
           <LocationSection
