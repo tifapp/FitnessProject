@@ -1,67 +1,39 @@
 import { Title } from "@components/Text"
 import ConfirmationDialogue from "@components/profileImageComponents/ConfirmationDialogue"
 import { EventAttendee } from "@lib/events"
+import { uuid } from "@lib/uuid"
 import { AttendeeEntry } from "@screens/EventAttendeesList/attendeeEntry"
 import React from "react"
 import { FlatList, View } from "react-native"
 
-const someData: EventAttendee[] = [
-  {
-    id: "1",
-    username: "Cool",
-    handle: "Cool"
-  },
-  {
-    id: "2",
-    username: "Also cool",
-    handle: "Cool"
-  },
-  {
-    id: "3",
-    username: "Also coolest",
-    handle: "Cool"
-  },
-  {
-    id: "4",
-    username: "Also coolest",
-    handle: "Cool"
-  },
-  {
-    id: "5",
-    username: "Also coolest",
-    handle: "Cool"
-  },
-  {
-    id: "6",
-    username: "Also coolest",
-    handle: "Cool"
-  },
-  {
-    id: "7",
-    username: "Also coolest",
-    handle: "Cool"
-  },
-  {
-    id: "8",
-    username: "Also coolest",
-    handle: "Cool"
-  },
-  {
-    id: "9",
-    username: "Also coolest",
-    handle: "Cool"
-  },
-  {
-    id: "10",
-    username: "Also coolest",
-    handle: "Cool"
-  },
-  {
-    id: "11",
-    username: "Also coolest",
-    handle: "Cool"
-  }
+const namesAndHandles = [
+  { name: "Sophia Wilson", handle: "sophisophia" },
+  { name: "Benjamin Clark", handle: "benjamincred" },
+  { name: "Ava Thompson", handle: "avantgardeava" },
+  { name: "Elijah Rodriguez", handle: "electricelijah" },
+  { name: "Mia Anderson", handle: "mysticalmia" },
+  { name: "James Martinez", handle: "jovialjames" },
+  { name: "Isabella Scott", handle: "bellaenchant" },
+  { name: "William Cooper", handle: "wittywilliam" },
+  { name: "Charlotte Taylor", handle: "charismaticchar" },
+  { name: "Ethan Adams", handle: "energeticethan" },
+  { name: "Amelia Mitchell", handle: "amiableamelia" },
+  { name: "Oliver Wright", handle: "outspokenoliver" },
+  { name: "Harper Turner", handle: "harmaciousharp" },
+  { name: "Elijah Walker", handle: "etherealelijah" },
+  { name: "Evelyn Green", handle: "evergreenevelyn" },
+  { name: "Henry Hill", handle: "happyhenry" },
+  { name: "Elizabeth Phillips", handle: "luminouslizzy" },
+  { name: "Michael Campbell", handle: "musicalmichael" },
+  { name: "Sofía Bailey", handle: "sparklingsofía" },
+  { name: "Alexander Reed", handle: "artisticalex" }
 ]
+
+const someData: EventAttendee[] = namesAndHandles.map(({ name, handle }) => ({
+  id: uuid(),
+  username: name,
+  handle: "@" + handle
+}))
 
 export const AttendeesListScreen = () => {
   // List of attendees
