@@ -1,5 +1,6 @@
 import { dateRange, FixedDateRange } from "@lib/date"
 import { LocationCoordinate2D, Placemark } from "@lib/location"
+import { UserToProfileRelationStatus } from "@lib/users"
 import { uuid } from "@lib/uuid"
 
 /**
@@ -18,11 +19,13 @@ export enum EventColors {
 /**
  * A user who is attending an event.
  */
-export type EventAttendee = Readonly<{
+export type EventAttendee = {
   id: string
   username: string
   handle: string
-}>
+  profileImageURL?: string
+  relationStatus: UserToProfileRelationStatus
+}
 
 /**
  * Some mock {@link EventAttendee} objects.
@@ -64,18 +67,18 @@ export namespace EventAttendeeMocks {
 /**
  * A type representing events that are attended and hosted by users.
  */
-export type Event = Readonly<{
+export type Event = {
   host: EventAttendee
   id: string
   title: string
-  description?: string
+  description: string
   dateRange: FixedDateRange
   color: EventColors
   coordinates: LocationCoordinate2D
   placemark?: Placemark
   shouldHideAfterStartDate: boolean
   attendeeCount: number
-}>
+}
 
 /**
  * A type for determining whether or not a user is a host,
@@ -105,11 +108,9 @@ export const isAttendingEvent = (attendeeStatus: EventUserAttendeeStatus) => {
  * An event type that adds additional data on a specific user's
  * perspective of the event.
  */
-export type CurrentUserEvent = Event &
-  Readonly<{
-    userAttendeeStatus: EventUserAttendeeStatus
-    userMilesFromEvent: number
-  }>
+export type CurrentUserEvent = Event & {
+  userAttendeeStatus: EventUserAttendeeStatus
+}
 
 /**
  * Some mock {@link CurrentUserEvent} objects.

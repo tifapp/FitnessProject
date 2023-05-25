@@ -5,18 +5,13 @@ import React, { useState } from "react"
 import { Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FriendToast } from "@components/common/Toasts"
-
-export type UserFriendStatus =
-  | "not-friends"
-  | "friend-request-pending"
-  | "friends"
-  | "blocked"
+import { UserToProfileRelationStatus } from "@lib/users"
 
 interface ImageAndNameProps {
   username: string
   userHandle: string
   eventColor: string
-  userFriendStatus: UserFriendStatus | undefined
+  userFriendStatus: UserToProfileRelationStatus | undefined
   toastOffset: number
   style?: StyleProp<ViewStyle>
   imageStyle?: StyleProp<ImageStyle>
@@ -36,7 +31,9 @@ const ProfileImageAndNameWithFriend = ({
     !!(friendStatus === "friend-request-pending" || friendStatus === "friends")
   )
 
-  const renderFriendStatus = (status: UserFriendStatus | undefined) => {
+  const renderFriendStatus = (
+    status: UserToProfileRelationStatus | undefined
+  ) => {
     switch (status) {
     case "not-friends":
       return "Add Friend"

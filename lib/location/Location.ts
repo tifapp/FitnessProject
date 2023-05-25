@@ -1,7 +1,6 @@
 import {
   degreesToRadians,
   EARTH_RADIUS_METERS,
-  METERS_PER_MILE,
   metersToMiles,
   sin2
 } from "../Math"
