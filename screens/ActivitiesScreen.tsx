@@ -9,7 +9,10 @@ import {
   requestLocationPermissions
 } from "@lib/location/UserLocation"
 import React, { useEffect, useRef } from "react"
-import { StyleSheet } from "react-native"
+import { StyleSheet, TouchableOpacity } from "react-native"
+import { Icon } from "react-native-elements"
+import ProfileScreen from "./ProfileScreen/ProfileScreen"
+import { UserMocks } from "@lib/User"
 
 const MARKER_SIZE = 44
 const LATLNGDELTA = 0.5

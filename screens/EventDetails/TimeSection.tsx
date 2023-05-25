@@ -49,10 +49,7 @@ const TimeSection = ({ color, event }: TimeSectionProps) => {
           }
         })
         .catch(() => {
-          showToast(
-            "Unable to add Event without Permissions",
-            event.bottomTabHeight
-          )
+          showToast("Unable to add Event without Permissions")
         })
     }
   }
