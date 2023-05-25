@@ -3,12 +3,14 @@ import { AppStyles } from "../../lib/AppColorStyle"
 import { Platform, StyleSheet, View } from "react-native"
 import { Ionicon } from "./Icons"
 import { BodyText } from "@components/Text"
-import { UserFriendStatus } from "@components/profileImageComponents/ProfileImageAndNameWithFriend"
+import { UserFriendStatus } from "@lib/User"
 
-export const showToast = (message: string, bottomOffset: number) => {
+const BOTTOM_TAB_HEIGHT = 80
+
+export const showToast = (message: string) => {
   Toast.show(message, {
     duration: Toast.durations.SHORT,
-    position: Toast.positions.BOTTOM - bottomOffset,
+    position: Toast.positions.BOTTOM - BOTTOM_TAB_HEIGHT,
     shadow: false,
     animation: true,
     hideOnPress: true,
@@ -24,23 +26,23 @@ export const showToast = (message: string, bottomOffset: number) => {
 interface ToastProps {
   requestSent: boolean
   setRequestSent: React.Dispatch<React.SetStateAction<boolean>>
-  friendStatus: UserFriendStatus
-  offset: number
+  isVisible: boolean
+  text: string
 }
 
-export const FriendToast = ({
+export const ToastWithIcon = ({
   requestSent,
   setRequestSent,
-  friendStatus,
-  offset
+  isVisible,
+  text
 }: ToastProps) => {
   return (
     <>
       {!requestSent && (
         <Toast
-          visible={friendStatus === "friend-request-pending"}
+          visible={isVisible}
           opacity={1}
-          position={Toast.positions.BOTTOM - offset}
+          position={Toast.positions.BOTTOM - BOTTOM_TAB_HEIGHT}
           shadow={false}
           animation={true}
           hideOnPress={true}
@@ -51,9 +53,7 @@ export const FriendToast = ({
             <View style={styles.iconStyle}>
               <Ionicon color="white" name="close" />
             </View>
-            <BodyText style={styles.textStyle}>
-              {"Friend request sent"}
-            </BodyText>
+            <BodyText style={styles.textStyle}>{text}</BodyText>
           </View>
         </Toast>
       )}

@@ -4,6 +4,7 @@ import React from "react"
 import {
   StyleProp,
   StyleSheet,
+  TextStyle,
   TouchableOpacity,
   TouchableOpacityProps,
   ViewStyle
@@ -12,36 +13,37 @@ import {
 type ButtonProps = {
   title: string
   style?: StyleProp<ViewStyle>
+  textStyle?: StyleProp<TextStyle>
 } & TouchableOpacityProps
 
-export const PrimaryButton = ({title, style, ...props}: ButtonProps) => {
+export const PrimaryButton = ({title, style, textStyle, ...props}: ButtonProps) => {
   return (
     <TouchableOpacity
       style={[
-        style,
         styles.container,
-        { backgroundColor: AppStyles.darkColor }
+        { backgroundColor: AppStyles.darkColor },
+        style
       ]}
       {...props}
     >
-      <Headline style={{ color: "white" }}>{title}</Headline>
+      <Headline style={[{ color: "white" }, textStyle]}>{title}</Headline>
       {props.children}
     </TouchableOpacity>
   )
 }
 
-export const OutlinedButton = ({title, style, ...props}: ButtonProps) => {
+export const OutlinedButton = ({title, style, textStyle, ...props}: ButtonProps) => {
   return (
     <TouchableOpacity
       style={[
-        style,
         styles.container,
         styles.lightStyle,
-        { borderColor: AppStyles.colorOpacity15 }
+        { borderColor: AppStyles.colorOpacity15 },
+        style
       ]}
       {...props}
     >
-      <Headline style={{ color: AppStyles.darkColor }}>{title}</Headline>
+      <Headline style={[{ color: AppStyles.darkColor }, textStyle]}>{title}</Headline>
       {props.children}
     </TouchableOpacity>
   )
