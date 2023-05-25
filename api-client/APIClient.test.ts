@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { createApiClient } from "./api-client"
+import { ApiError, createApiClient } from "./api-client"
 import { GenericApiClient } from "./api-endpoint-types"
 
 const ApiSchema = {
@@ -21,19 +21,16 @@ const ApiSchema = {
 type ApiClient = GenericApiClient<typeof ApiSchema>
 
 describe("createApiClient", () => {
-  beforeEach(() => {
-    global.fetch = jest.fn()
-  })
-
-  afterEach(() => {
-    jest.restoreAllMocks()
-  })
-
   it("calls the GET API with the correct method, endpoint, headers, and path params", async () => {
+    const mockFetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ body: { user: "user1" } })
+    })
+
     const apiClient: ApiClient = createApiClient(
       ApiSchema,
       "https://example.com",
-      global.fetch
+      mockFetch
     )
 
     await apiClient["/users/{userId}"].GET({
@@ -41,7 +38,7 @@ describe("createApiClient", () => {
       queryParams: { includePosts: 1 }
     })
 
-    expect(global.fetch).toHaveBeenCalledWith(
+    expect(mockFetch).toHaveBeenCalledWith(
       "https://example.com/users/1?includePosts=1",
       {
         headers: { "Content-Type": "application/json" },
@@ -51,17 +48,22 @@ describe("createApiClient", () => {
   })
 
   it("calls the POST API with the correct method, endpoint, headers, and payload", async () => {
+    const mockFetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({})
+    })
+
     const apiClient: ApiClient = createApiClient(
       ApiSchema,
       "https://example.com",
-      global.fetch
+      mockFetch
     )
 
     await apiClient["/posts"].POST({
       payload: { title: "Test title", content: "Test content" }
     })
 
-    expect(global.fetch).toHaveBeenCalledWith("https://example.com/posts?", {
+    expect(mockFetch).toHaveBeenCalledWith("https://example.com/posts?", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -127,7 +129,7 @@ describe("createApiClient", () => {
         payload: { title: "Test title", content: "Test content" }
       })
     } catch (error) {
-      expect(error).toEqual({ status: 500, message: "Internal Server Error" })
+      expect(error).toEqual(new ApiError(500, "Internal Server Error"))
     }
   })
 
@@ -148,10 +150,7 @@ describe("createApiClient", () => {
         queryParams: { includePosts: 1 }
       })
     } catch (error) {
-      expect(error).toEqual({
-        status: "Network error",
-        message: "Failed to connect"
-      })
+      expect(error).toEqual(new Error("Failed to connect"))
     }
   })
 })
