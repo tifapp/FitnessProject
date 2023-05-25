@@ -50,17 +50,15 @@ export const BottomNavTabBar = ({
             icon={{
               name: getIconName(route.name),
               color: isFocused
-                ? "#673ab7"
+                ? "#222"
                 : getIconName(route.name) === "add-outline"
                   ? "#ffffff"
-                  : "#222"
+                  : AppStyles.colorOpacity35
             }}
             style={
               getIconName(route.name) === "add-outline" ? styles.plusIcon : null
             }
-            activeOpacity={0.5}
             onPress={onPress}
-            underlayColor={AppStyles.colorOpacity15}
           />
         )
       })}
