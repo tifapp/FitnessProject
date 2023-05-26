@@ -88,7 +88,7 @@ export type EventListRouteProps = StackScreenProps<
 export type ProfileScreenRouteProps = StackScreenProps<
   ActivitiesStackParamList,
   ActivitiesScreenNames.PROFILE_SCREEN
->["route"]
+>
 
 /* export type LocationSearchScreenRouteProps = StackScreenProps<
   ActivitiesStackParamList,
@@ -126,7 +126,6 @@ export default function ActivitiesStack () {
       <Stack.Screen
         name={ActivitiesScreenNames.PROFILE_SCREEN}
         component={ProfileScreenNavWrapper}
-        initialParams={{user: UserMocks.Mia}}
       />
       <Stack.Screen
         name={ActivitiesScreenNames.SETTINGS_SCREEN}
@@ -163,7 +162,7 @@ export function TabNavigation () {
       <Tab.Screen
         name="Profile"
         component={ProfileScreenNavWrapper}
-        initialParams={{user: UserMocks.Mia}}
+        //initialParams={{user: UserMocks.Mia}}
       />
     </Tab.Navigator>
   )

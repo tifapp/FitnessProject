@@ -37,6 +37,6 @@ export namespace UserMocks {
       EventMocks.Multiday,
       EventMocks.PickupBasketball
     ],
-    userStatus: "not-friends"
+    userStatus: "current-user"
   } as User
 }
