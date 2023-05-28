@@ -4,7 +4,6 @@ import ProfileImageAndNameWithFriend from "@components/profileImageComponents/Pr
 import { CalendarEvent } from "@lib/Calendar"
 import { NativeEventMapDetails, openInMaps } from "@lib/NativeMap"
 import { CurrentUserEvent } from "@lib/events"
-import ExpandableText from "@screens/EventDetails/ExpandableText"
 import React from "react"
 import {
   Image,
@@ -18,6 +17,7 @@ import ChatSection from "./ChatSection"
 import EventMapSnippet from "./EventMapSnippet"
 import LocationSection from "./LocationSection"
 import TimeSection from "./TimeSection"
+import ExpandableText from "@components/common/ExpandableText"
 
 export type EventDetailsProps = {
   event: CurrentUserEvent
@@ -34,8 +34,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
     id: event.id,
     description: event.description!,
     coordinates: event.coordinates,
-    title: event.title,
-    bottomTabHeight: BOTTOM_TAB_HEIGHT
+    title: event.title
   }
   const mapDetails: NativeEventMapDetails = {
     coordinates: event.coordinates,
@@ -60,7 +59,6 @@ const EventDetails = ({ event }: EventDetailsProps) => {
           eventColor={event.color}
           style={[styles.flexRow, { marginVertical: 24 }]}
           imageStyle={styles.profileImage}
-          toastOffset={BOTTOM_TAB_HEIGHT}
           userFriendStatus="not-friends"
         />
         <View style={styles.iconSection}>
@@ -69,7 +67,6 @@ const EventDetails = ({ event }: EventDetailsProps) => {
             color={event.color}
             coordinates={event.coordinates}
             placemark={event.placemark}
-            bottomTabHeight={BOTTOM_TAB_HEIGHT}
           />
           <AttendeeSection
             color={event.color}
@@ -85,7 +82,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
           <View style={{ marginTop: 16 }}>
             <Headline style={{ marginBottom: 4 }}>About</Headline>
             <ExpandableText
-              props={{ style: { color: event.color, marginTop: 5 } }}
+              style={{ color: event.color, marginTop: 5 }}
               text={event.description}
               linesToDisplay={3}
             />

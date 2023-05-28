@@ -49,10 +49,10 @@ export const BottomNavTabBar = ({
           <TouchableIonicon
             icon={{
               name: getIconName(route.name),
-              color: isFocused
-                ? "#222"
-                : getIconName(route.name) === "add-outline"
-                  ? "#ffffff"
+              color: getIconName(route.name) === "add-outline"
+                ? "white"
+                : isFocused
+                  ? AppStyles.darkColor
                   : AppStyles.colorOpacity35
             }}
             style={

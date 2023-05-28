@@ -16,9 +16,11 @@ const typecheckApiSchema = <T extends Endpoint>(
 }
 
 export const ApiSchema = typecheckApiSchema({
-  "/lambdaSQLRoute/user": {
+  "/user": {
     GET: {
-      responseType: responseSchema
+      payloadType: responseSchema,
+      responseType: responseSchema,
+      errorType: { 500: responseSchema }
     }
   }
 })
