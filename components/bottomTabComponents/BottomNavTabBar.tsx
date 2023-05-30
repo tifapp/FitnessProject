@@ -4,7 +4,9 @@ import {
   BottomTabBarOptions,
   BottomTabBarProps
 } from "@react-navigation/bottom-tabs"
-import React from "react"
+import { PartialState, Route, RouteProp, getFocusedRouteNameFromRoute } from "@react-navigation/native"
+import { ActivitiesScreenNames } from "@stacks/ActivitiesStack"
+import React, { useEffect, useState } from "react"
 import { StyleSheet, View } from "react-native"
 
 function getIconName (routeName: string) {
@@ -20,8 +22,12 @@ export const BottomNavTabBar = ({
   descriptors,
   navigation
 }: BottomTabBarProps<BottomTabBarOptions>) => {
+  const focusedOptions = descriptors[state.routes[state.index].key].options;
+  const isVisible = focusedOptions?.tabBarVisible === true
+    || focusedOptions?.tabBarVisible === undefined ? true : false
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {display: isVisible ? "flex" : "none"}]} >
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key]
         const label =

@@ -1,4 +1,4 @@
-import { useNavigation, useRoute } from "@react-navigation/native"
+import { getFocusedRouteNameFromRoute, useNavigation, useRoute } from "@react-navigation/native"
 import { StackNavigationProp, createStackNavigator } from "@react-navigation/stack"
 import { ActivitiesScreenNames, ActivitiesStackParamList, ProfileScreenRouteProps } from "@stacks/ActivitiesStack"
 import ProfileScreen from "./ProfileScreen"
@@ -9,10 +9,11 @@ import MenuDropdown from "@components/eventCard/MenuDropdown";
 import { StyleSheet, View } from "react-native";
 import EditProfileScreen from "./EditProfileScreen";
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen";
+import { useLayoutEffect, useState } from "react";
 
 const ProfileStack = createStackNavigator<ActivitiesStackParamList>();
 
-export const ProfileScreenNavWrapper = () => {
+export const ProfileScreenStack = () => {
   const user = UserMocks.Mia
 
   const renderHeaderRight =

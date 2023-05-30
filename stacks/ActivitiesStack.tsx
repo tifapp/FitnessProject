@@ -16,7 +16,7 @@ import {
   LocationSearchPickerProps
 } from "@screens/LocationSearch"
 import { ProfileScreenProps } from "@screens/ProfileScreen/ProfileScreen"
-import { ProfileScreenNavWrapper } from "@screens/ProfileScreen/ProfileScreenNavWrapper"
+import { ProfileScreenStack } from "@screens/ProfileScreen/ProfileScreenStack"
 import {
   ReportingScreensParamsList,
   createContentReportingStackScreens
@@ -24,6 +24,7 @@ import {
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { TestChatRoomScreen } from "@screens/testScreens/TestChatRoomScreen"
 import { TestNotifScreen } from "@screens/testScreens/TestNotifScreen"
+import { PartialState, Route, RouteProp, getFocusedRouteNameFromRoute } from "@react-navigation/native"
 
 const Stack = createStackNavigator<ActivitiesStackParamList>()
 const Tab = createBottomTabNavigator()
@@ -126,10 +127,6 @@ export default function ActivitiesStack () {
         component={LocationSearchPicker}
       />
       <Stack.Screen
-        name={ActivitiesScreenNames.PROFILE_SCREEN}
-        component={ProfileScreenNavWrapper}
-      />
-      <Stack.Screen
         name={ActivitiesScreenNames.SETTINGS_SCREEN}
         component={SettingsScreen}
       />
@@ -150,9 +147,22 @@ export default function ActivitiesStack () {
   )
 }
 
+const getTabBarVisibility = (route: any) => {
+  const routeName = getFocusedRouteNameFromRoute(route)!
+  const tabHiddenRoutes = [
+    ActivitiesScreenNames.EDIT_PROFILE.valueOf(),
+    ActivitiesScreenNames.SETTINGS_SCREEN.valueOf()
+  ]
+  if (tabHiddenRoutes.includes(routeName)) {
+    return false
+  }
+  return true
+}
+
 export function TabNavigation () {
   return (
-    <Tab.Navigator tabBar={(props) => <BottomNavTabBar {...props} />}
+    <Tab.Navigator
+      tabBar={(props) => <BottomNavTabBar {...props} />}
     >
       <Tab.Screen name="Map" component={ActivitiesStack} />
       <Tab.Screen name="Chat Room" component={TestChatRoomScreen} />
@@ -164,7 +174,11 @@ export function TabNavigation () {
       <Tab.Screen name="Notifications" component={TestNotifScreen} />
       <Tab.Screen
         name="Profile"
-        component={ProfileScreenNavWrapper}
+        component={ProfileScreenStack}
+        options={({route}) => ({
+            tabBarVisible: getTabBarVisibility(route)
+          })
+        }
       />
     </Tab.Navigator>
   )

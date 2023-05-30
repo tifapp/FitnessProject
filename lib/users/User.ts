@@ -46,8 +46,8 @@ export namespace UserMocks {
     id: uuid(),
     username: "Mia Anderson",
     handle: "MysticalMia",
-    biography:
-      "Simple biography",
+    biography: 
+    "When I'm not on the field or court, you can find me cheering for my favorite teams and athletes from the sidelines.",
     profileImageURL: "",
     events: [
       EventMocks.NoPlacemarkInfo,
