@@ -16,7 +16,7 @@ import {
   LocationSearchPickerProps
 } from "@screens/LocationSearch"
 import { ProfileScreenProps } from "@screens/ProfileScreen/ProfileScreen"
-import { ProfileScreenStack } from "@screens/ProfileScreen/ProfileScreenStack"
+import { ProfileScreensParamsList, createProfileStackScreens } from "@screens/ProfileScreen/Navigation/ProfileScreensNavigation"
 import {
   ReportingScreensParamsList,
   createContentReportingStackScreens
@@ -65,12 +65,15 @@ export type ActivitiesStackParamList = {
   [ActivitiesScreenNames.SETTINGS_SCREEN]: undefined
   [ActivitiesScreenNames.CHAT_ROOM]: undefined
   [ActivitiesScreenNames.EDIT_PROFILE]: undefined
-} & ReportingScreensParamsList
+} & ReportingScreensParamsList & ProfileScreensParamsList
 
 const reportingScreens =
   createContentReportingStackScreens<ActivitiesStackParamList>(Stack, () => {
     throw new Error()
   })
+
+const profileScreens =
+  createProfileStackScreens<ActivitiesStackParamList>(Stack)
 
 export type EventFormScreenRouteProps = StackScreenProps<
   ActivitiesStackParamList,
@@ -116,7 +119,7 @@ export default function ActivitiesStack () {
       <Stack.Screen
         name={ActivitiesScreenNames.EVENT_DETAILS}
         component={EventDetailsScreenNavWrapper}
-        initialParams={{ event: events[2] }}
+        //initialParams={{ event: events[2] }}
       />
       <Stack.Screen
         name={ActivitiesScreenNames.EVENT_LIST}
@@ -125,10 +128,6 @@ export default function ActivitiesStack () {
       <Stack.Screen
         name={ActivitiesScreenNames.LOCATION_SEARCH}
         component={LocationSearchPicker}
-      />
-      <Stack.Screen
-        name={ActivitiesScreenNames.SETTINGS_SCREEN}
-        component={SettingsScreen}
       />
       <Stack.Screen
         name={ActivitiesScreenNames.BOTTOM_NAV_TAB_BAR}
@@ -143,6 +142,7 @@ export default function ActivitiesStack () {
         component={TestChatRoomScreen}
       />
       {reportingScreens}
+      {profileScreens}
     </Stack.Navigator>
   )
 }
@@ -159,6 +159,8 @@ const getTabBarVisibility = (route: any) => {
   return true
 }
 
+const ProfileStack = createStackNavigator<ActivitiesStackParamList>()
+
 export function TabNavigation () {
   return (
     <Tab.Navigator
@@ -174,12 +176,17 @@ export function TabNavigation () {
       <Tab.Screen name="Notifications" component={TestNotifScreen} />
       <Tab.Screen
         name="Profile"
-        component={ProfileScreenStack}
         options={({route}) => ({
             tabBarVisible: getTabBarVisibility(route)
           })
         }
-      />
+      >
+        {() => 
+          <ProfileStack.Navigator>
+            {profileScreens}
+          </ProfileStack.Navigator>
+        }
+        </Tab.Screen>
     </Tab.Navigator>
   )
 }

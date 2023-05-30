@@ -1,5 +1,5 @@
 import { StyleProp, StyleSheet, TextInput, TextInputProps, View, ViewStyle } from "react-native"
-import { Ionicon, IoniconName } from "../../components/common/Icons"
+import { Ionicon, IoniconName } from "../../../components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { BodyText } from "@components/Text"
 

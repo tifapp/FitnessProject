@@ -1,5 +1,5 @@
 import { Title } from "@components/Text"
-import ConfirmationDialogue from "@components/profileImageComponents/ConfirmationDialogue"
+import ConfirmationDialogue from "@components/common/ConfirmationDialogue"
 import { EventAttendee } from "@lib/events"
 import { AttendeeEntry } from "@screens/EventAttendeesList/attendeeEntry"
 import React from "react"
