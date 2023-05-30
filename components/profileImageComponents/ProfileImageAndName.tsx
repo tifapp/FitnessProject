@@ -24,7 +24,7 @@ const ProfileImageAndName = ({
       />
       <View style={{ marginLeft: 16 }}>
         <Headline style={{ marginBottom: 4 }}>{username}</Headline>
-        <Caption>{userHandle}</Caption>
+        <Caption>{`@${userHandle}`}</Caption>
       </View>
     </View>
   )

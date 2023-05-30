@@ -3,16 +3,12 @@ import { OutlinedButton, PrimaryButton } from "@components/common/Buttons"
 import ExpandableText from "@components/common/ExpandableText"
 import { ToastWithIcon } from "@components/common/Toasts"
 import ProfileImage from "@components/profileImageComponents/ProfileImage"
-import { User } from "@lib/User"
-import { useEffect, useState } from "react"
-import { FlatList, ListRenderItemInfo, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
+import { User } from "@lib/users/User"
+import { useState } from "react"
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
 import EventPager from "./EventCarousel"
 import AllEventsModal from "./AllEventsModal"
 import { AppStyles } from "@lib/AppColorStyle"
-import { EventCard } from "@components/eventCard/EventCard"
-import { CurrentUserEvent } from "@lib/events"
-import { useNavigation } from "@react-navigation/native"
-import { ChevronBackButton } from "@components/Navigation"
 
 export interface ProfileScreenProps {
   user: User
@@ -28,7 +24,6 @@ const ProfileScreen = ({ user }: ProfileScreenProps) => {
   )
   const colorText = "#4285F4"
   const firstEvents = user.events.slice(0, NUM_EVENTS_SHOWN)
-  //const navigation = useNavigation()
 
   const setStatus = () => {
     setUserStatus("friend-request-pending")
@@ -37,12 +32,6 @@ const ProfileScreen = ({ user }: ProfileScreenProps) => {
   const openModal = () => {
     setModalVisible(true)
   }
-
-  /*useEffect(() => {
-    navigation.setOptions({
-       headerLeft: () => {user.userStatus === "current-user" && <ChevronBackButton />}
-    })
-  }, [navigation])*/
 
   return (
     <View style={styles.container}>
@@ -59,7 +48,7 @@ const ProfileScreen = ({ user }: ProfileScreenProps) => {
             imageURL={user.profileImageURL}
           />
           <Title style={styles.title}>{user.username}</Title>
-          <Caption>{user.handle}</Caption>
+          <Caption>{`@${user.handle}`}</Caption>
         </View>
 
         {userStatus !== "current-user" && (

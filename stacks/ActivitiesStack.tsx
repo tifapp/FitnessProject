@@ -1,7 +1,7 @@
 import EventsList from "@components/EventsList"
 import { BottomNavTabBar } from "@components/bottomTabComponents/BottomNavTabBar"
 import { headerOptions } from "@components/headerComponents/headerOptions"
-import { UserMocks } from "@lib/User"
+import { UserMocks } from "@lib/users/User"
 import { CurrentUserEvent, EventMocks } from "@lib/events"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
@@ -40,7 +40,8 @@ export enum ActivitiesScreenNames {
   SETTINGS_SCREEN = "Settings Screen",
   ATTENDEES_LIST = "Attendees List",
   NOTIFICATIONS = "Notifications",
-  REPORTING_SCREENS = "Reporting Screens"
+  REPORTING_SCREENS = "Reporting Screens",
+  EDIT_PROFILE = "Edit Profile Screen"
 }
 
 const events: CurrentUserEvent[] = [
@@ -62,6 +63,7 @@ export type ActivitiesStackParamList = {
   [ActivitiesScreenNames.NOTIFICATIONS]: undefined
   [ActivitiesScreenNames.SETTINGS_SCREEN]: undefined
   [ActivitiesScreenNames.CHAT_ROOM]: undefined
+  [ActivitiesScreenNames.EDIT_PROFILE]: undefined
 } & ReportingScreensParamsList
 
 const reportingScreens =
@@ -150,7 +152,8 @@ export default function ActivitiesStack () {
 
 export function TabNavigation () {
   return (
-    <Tab.Navigator tabBar={(props) => <BottomNavTabBar {...props} />}>
+    <Tab.Navigator tabBar={(props) => <BottomNavTabBar {...props} />}
+    >
       <Tab.Screen name="Map" component={ActivitiesStack} />
       <Tab.Screen name="Chat Room" component={TestChatRoomScreen} />
       <Tab.Screen
@@ -162,7 +165,6 @@ export function TabNavigation () {
       <Tab.Screen
         name="Profile"
         component={ProfileScreenNavWrapper}
-        //initialParams={{user: UserMocks.Mia}}
       />
     </Tab.Navigator>
   )

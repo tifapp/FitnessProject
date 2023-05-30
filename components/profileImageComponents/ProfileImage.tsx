@@ -1,4 +1,4 @@
-import { Image, ImageStyle, StyleProp } from "react-native"
+import { ImageBackground, ImageStyle, StyleProp } from "react-native"
 
 interface ProfileImageProps {
   imageURL: string
@@ -9,7 +9,7 @@ const ProfileImage = ({ imageURL, style }: ProfileImageProps) => {
   const defaultImage = require("@assets/Windows_10_Default_Profile_Picture.svg.png")
 
   return (
-    <Image source={defaultImage} style={[{ alignSelf: "center" }, style]} />
+    <ImageBackground source={defaultImage} style={[{ alignSelf: "center" }, style]} />
   )
 }
 
