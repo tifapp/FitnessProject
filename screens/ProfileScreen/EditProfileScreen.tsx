@@ -1,5 +1,5 @@
 import ProfileImage from "@components/profileImageComponents/ProfileImage"
-import { ScrollView, StyleSheet, TouchableOpacity } from "react-native"
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TouchableOpacity } from "react-native"
 import { View } from "react-native"
 import { ProfileScreenProps } from "./ProfileScreen"
 import { Ionicon } from "@components/common/Icons"
@@ -10,6 +10,7 @@ import TextInputWithIcon from "@screens/ProfileScreen/TextInputWithIcon"
 import { SetStateAction, useState } from "react"
 import ContentTextInput from "./ContentTextInput"
 import BottomTabButton from "@components/bottomTabComponents/BottomTabButton"
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 
 type InputTypes = "display" | "bio" | "handle"
 
@@ -51,43 +52,45 @@ const EditProfileScreen = ({user}: ProfileScreenProps) => {
   }
 
   return (
-    <View style={styles.container}>
-      <ScrollView style={{marginHorizontal: 16}}>
-        <View style={[styles.spacing, styles.imageSection]}>
-          <TouchableOpacity>
-            <Ionicon name="create" color="white" size={16} style={styles.badge}/>     
-            <ProfileImage
-              style={styles.profileImage}
-              imageURL={user.profileImageURL}
+    <View style={styles.container}>  
+      <KeyboardAwareScrollView>
+        <View style={styles.spacing}>
+          <View style={[styles.spacing, styles.imageSection]}>
+            <TouchableOpacity>
+              <Ionicon name="create" color="white" size={16} style={styles.badge}/>     
+              <ProfileImage
+                style={styles.profileImage}
+                imageURL={user.profileImageURL}
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.inputSpacing}>
+            <BodyText style={styles.textInput}>Display Name</BodyText>
+            <TextInputWithIcon
+              iconName={"pencil-sharp"}
+              text={displayName}
+              onChangeText={(text) => onChangeText(text, "display")}
             />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.inputSpacing}>
-          <BodyText style={styles.textInput}>Display Name</BodyText>
-          <TextInputWithIcon
-            iconName={"pencil-sharp"}
-            text={displayName}
-            onChangeText={(text) => onChangeText(text, "display")}
-          />
-        </View>
+          </View>
 
-        <View style={styles.inputSpacing}>
-          <BodyText style={styles.textInput}>Handle</BodyText>
-          <TextInputWithIcon
-            iconName={"at"}
-            text={handle}
-            onChangeText={(text) => onChangeText(text, "handle")}
-          />
-        </View>
+          <View style={styles.inputSpacing}>
+            <BodyText style={styles.textInput}>Handle</BodyText>
+            <TextInputWithIcon
+              iconName={"at"}
+              text={handle}
+              onChangeText={(text) => onChangeText(text, "handle")}
+            />
+          </View>
 
-        <View style={styles.inputSpacing}>
-          <BodyText style={styles.textInput}>Bio</BodyText>
-          <ContentTextInput
-            text={bio}
-            onChangeText={(text) => onChangeText(text, "bio")}
-          />
+          <View style={styles.inputSpacing}>
+            <BodyText style={styles.textInput}>Bio</BodyText>
+            <ContentTextInput
+              text={bio}
+              onChangeText={(text) => onChangeText(text, "bio")}
+            />
+          </View>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
       <BottomTabButton
         title="Save Changes"
         onPress={() => console.log("s")}

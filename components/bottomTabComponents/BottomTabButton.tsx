@@ -27,7 +27,6 @@ const BottomTabButton = ({title, onPress, disabled, style }: ButtonTabProps) => 
 const styles = StyleSheet.create({
   bottomTab: {
     flexDirection: "row",
-    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
