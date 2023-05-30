@@ -1,41 +1,18 @@
 import { Title } from "@components/Text"
 import ConfirmationDialogue from "@components/profileImageComponents/ConfirmationDialogue"
-import { EventAttendee } from "@lib/events"
-import { uuid } from "@lib/uuid"
+import { delayData } from "@lib/DelayData"
 import { AttendeeEntry } from "@screens/EventAttendeesList/attendeeEntry"
 import React from "react"
 import { FlatList, View } from "react-native"
-
-const namesAndHandles = [
-  { name: "Sophia Wilson", handle: "sophisophia" },
-  { name: "Benjamin Clark", handle: "benjamincred" },
-  { name: "Ava Thompson", handle: "avantgardeava" },
-  { name: "Elijah Rodriguez", handle: "electricelijah" },
-  { name: "Mia Anderson", handle: "mysticalmia" },
-  { name: "James Martinez", handle: "jovialjames" },
-  { name: "Isabella Scott", handle: "bellaenchant" },
-  { name: "William Cooper", handle: "wittywilliam" },
-  { name: "Charlotte Taylor", handle: "charismaticchar" },
-  { name: "Ethan Adams", handle: "energeticethan" },
-  { name: "Amelia Mitchell", handle: "amiableamelia" },
-  { name: "Oliver Wright", handle: "outspokenoliver" },
-  { name: "Harper Turner", handle: "harmaciousharp" },
-  { name: "Elijah Walker", handle: "etherealelijah" },
-  { name: "Evelyn Green", handle: "evergreenevelyn" },
-  { name: "Henry Hill", handle: "happyhenry" },
-  { name: "Elizabeth Phillips", handle: "luminouslizzy" },
-  { name: "Michael Campbell", handle: "musicalmichael" },
-  { name: "Sofía Bailey", handle: "sparklingsofía" },
-  { name: "Alexander Reed", handle: "artisticalex" }
-]
-
-const someData: EventAttendee[] = namesAndHandles.map(({ name, handle }) => ({
-  id: uuid(),
-  username: name,
-  handle: "@" + handle
-}))
+import { useQuery } from "react-query"
+import { AttendeeListMocks } from "./AttendeesMocks"
 
 export const AttendeesListScreen = () => {
+  const someQuery = useQuery(["/event/:eventId/attendee", "GET"], () =>
+    delayData(AttendeeListMocks.List1)
+  )
+
+  const someData = someQuery.data ?? []
   // List of attendees
 
   const FlatSeparator = () => {
