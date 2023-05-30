@@ -1,5 +1,5 @@
 import ProfileImage from "@components/profileImageComponents/ProfileImage"
-import { ScrollView, StyleSheet } from "react-native"
+import { ScrollView, StyleSheet, TouchableOpacity } from "react-native"
 import { View } from "react-native"
 import { ProfileScreenProps } from "./ProfileScreen"
 import { Ionicon } from "@components/common/Icons"
@@ -9,30 +9,65 @@ import { ContentText } from "@components/ContentText"
 import TextInputWithIcon from "@screens/ProfileScreen/TextInputWithIcon"
 import { SetStateAction, useState } from "react"
 import ContentTextInput from "./ContentTextInput"
+import BottomTabButton from "@components/bottomTabComponents/BottomTabButton"
+
+type InputTypes = "display" | "bio" | "handle"
 
 const EditProfileScreen = ({user}: ProfileScreenProps) => {
   const [displayName, setDisplayName] = useState(user.username)
   const [handle, setHandle] = useState(user.handle)
   const [bio, setBio] = useState(user.biography)
+  const [hasChanged, setHasChanged] = useState(false)
+
+  const onChangeText = (text: string, input: InputTypes) => {
+    switch (input) {
+      case "display":
+        setDisplayName(text)
+        if (text === user.username && bio === user.biography && handle === user.handle) {
+          setHasChanged(false)
+        } else {
+          setHasChanged(true)
+        }
+        break
+
+      case "bio":
+        setBio(text)
+        if (displayName === user.username && text === user.biography && handle === user.handle) {
+          setHasChanged(false)
+        } else {
+          setHasChanged(true)
+        }
+        break
+
+      case "handle":
+        setHandle(text)
+        if (displayName === user.username && bio === user.biography && text === user.handle) {
+          setHasChanged(false)
+        } else {
+          setHasChanged(true)
+        }
+    }
+
+  }
 
   return (
     <View style={styles.container}>
       <ScrollView style={{marginHorizontal: 16}}>
         <View style={[styles.spacing, styles.imageSection]}>
-          <View>
+          <TouchableOpacity>
             <Ionicon name="create" color="white" size={16} style={styles.badge}/>     
             <ProfileImage
               style={styles.profileImage}
               imageURL={user.profileImageURL}
             />
-          </View>
+          </TouchableOpacity>
         </View>
         <View style={styles.inputSpacing}>
           <BodyText style={styles.textInput}>Display Name</BodyText>
           <TextInputWithIcon
             iconName={"pencil-sharp"}
             text={displayName}
-            setText={setDisplayName}
+            onChangeText={(text) => onChangeText(text, "display")}
           />
         </View>
 
@@ -41,15 +76,23 @@ const EditProfileScreen = ({user}: ProfileScreenProps) => {
           <TextInputWithIcon
             iconName={"at"}
             text={handle}
-            setText={setHandle}
+            onChangeText={(text) => onChangeText(text, "handle")}
           />
         </View>
 
         <View style={styles.inputSpacing}>
           <BodyText style={styles.textInput}>Bio</BodyText>
-          <ContentTextInput text={bio} setText={setBio} />
+          <ContentTextInput
+            text={bio}
+            onChangeText={(text) => onChangeText(text, "bio")}
+          />
         </View>
       </ScrollView>
+      <BottomTabButton
+        title="Save Changes"
+        onPress={() => console.log("s")}
+        disabled={!hasChanged}
+      />
     </View>
   )
 }

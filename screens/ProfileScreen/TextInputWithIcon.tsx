@@ -1,23 +1,22 @@
-import { StyleProp, StyleSheet, TextInput, View, ViewStyle } from "react-native"
+import { StyleProp, StyleSheet, TextInput, TextInputProps, View, ViewStyle } from "react-native"
 import { Ionicon, IoniconName } from "../../components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { BodyText } from "@components/Text"
 
-interface Props {
+type Props = {
   iconName: IoniconName
   text: string
-  setText: React.Dispatch<React.SetStateAction<string>>
   style?: StyleProp<ViewStyle>
-}
+} & TextInputProps
 
-const TextInputWithIcon = ({iconName, text, setText, style}: Props) => {
+const TextInputWithIcon = ({iconName, text, style, ...props}: Props) => {
 
   return (
     <View style={[styles.container, style]}>
       <Ionicon name={iconName} style={styles.icon}/>
       <TextInput
         style={styles.input}
-        onChangeText={setText}
+        {...props}
       >
         <BodyText>{text}</BodyText>
       </TextInput>

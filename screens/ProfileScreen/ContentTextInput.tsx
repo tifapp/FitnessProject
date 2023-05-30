@@ -1,22 +1,21 @@
 import { ContentText } from "@components/ContentText"
 import { AppStyles } from "@lib/AppColorStyle"
-import { StyleSheet } from "react-native"
+import { StyleSheet, TextInputProps } from "react-native"
 import { StyleProp, TextInput, View, ViewStyle } from "react-native"
 
-interface Props {
+type Props = {
   text: string
-  setText: React.Dispatch<React.SetStateAction<string>>
   style?: StyleProp<ViewStyle>
-}
+} & TextInputProps
 
-const ContentTextInput = ({text, setText, style}: Props) => {
+const ContentTextInput = ({text, style, ...props}: Props) => {
 
   return (
     <View style={[styles.container, style]}>
       <TextInput
         style={styles.input}
         multiline
-        onChangeText={setText}
+        {...props}
       >
         <ContentText text={text} onUserHandleTapped={(handle) => console.log(handle)} />
       </TextInput>
