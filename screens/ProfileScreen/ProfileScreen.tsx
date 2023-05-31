@@ -1,5 +1,5 @@
 import { Caption, Headline, Title } from "@components/Text"
-import { OutlinedButton, PrimaryButton } from "@components/common/Buttons"
+import { DisabledButton, OutlinedButton, PrimaryButton } from "@components/common/Buttons"
 import ExpandableText from "@components/common/ExpandableText"
 import { ToastWithIcon } from "@components/common/Toasts"
 import ProfileImage from "@components/profileImageComponents/ProfileImage"
@@ -7,8 +7,8 @@ import { User } from "@lib/users/User"
 import { useState } from "react"
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
 import EventPager from "./EventCarousel"
-import AllEventsModal from "./AllEventsModal"
 import { AppStyles } from "@lib/AppColorStyle"
+import EventHistoryModal from "./EventHistoryModal"
 
 export type ProfileScreenProps = {
   user: User
@@ -22,12 +22,7 @@ const ProfileScreen = ({ user }: ProfileScreenProps) => {
   const [requestSent, setRequestSent] = useState(
     !!(userStatus === "friend-request-pending" || userStatus === "friends")
   )
-  const colorText = "#4285F4"
-  const firstEvents = user.events.slice(0, NUM_EVENTS_SHOWN)
-
-  const setStatus = () => {
-    setUserStatus("friend-request-pending")
-  }
+  const recentEvents = user.events.slice(0, NUM_EVENTS_SHOWN)
 
   const openModal = () => {
     setModalVisible(true)
@@ -35,7 +30,7 @@ const ProfileScreen = ({ user }: ProfileScreenProps) => {
 
   return (
     <View style={styles.container}>
-      <AllEventsModal
+      <EventHistoryModal
         username={user.username}
         visible={modalVisible}
         setVisible={setModalVisible}
@@ -57,23 +52,17 @@ const ProfileScreen = ({ user }: ProfileScreenProps) => {
               <PrimaryButton
                 style={{ flex: 1 }}
                 title="Add Friend"
-                onPress={setStatus}
+                onPress={() => setUserStatus("friend-request-pending")}
               />
             )}
             {userStatus === "friend-request-pending" && (
-              <OutlinedButton
-                style={styles.disabledButton}
-                textStyle={styles.textButton}
+              <DisabledButton
                 title="Request Pending"
-                disabled
               />
             )}
             {userStatus === "friends" && (
-              <OutlinedButton
-                style={styles.disabledButton}
-                textStyle={styles.textButton}
+              <DisabledButton
                 title="Friends"
-                disabled
               />
             )}
             {userStatus !== "blocked" && (
@@ -96,7 +85,7 @@ const ProfileScreen = ({ user }: ProfileScreenProps) => {
           <ExpandableText
             text={user.biography}
             linesToDisplay={3}
-            style={{ color: colorText }}
+            style={{ color: AppStyles.highlightedText }}
           />
         </View>
 
@@ -111,14 +100,14 @@ const ProfileScreen = ({ user }: ProfileScreenProps) => {
               }}
             >
               <TouchableOpacity onPress={openModal}>
-                <Headline style={{ color: colorText }}>View All</Headline>
+                <Headline style={{ color: AppStyles.highlightedText }}>View All</Headline>
               </TouchableOpacity>
             </View>
           )}
         </View>
         {user.events.length !== 0
           ? (
-            <EventPager events={firstEvents} />
+            <EventPager events={recentEvents} />
           )
           : (
             <View
@@ -148,14 +137,6 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     marginBottom: 24
-  },
-  disabledButton: {
-    flex: 1,
-    backgroundColor: AppStyles.darkColor + "0D",
-    borderWidth: 0
-  },
-  textButton: {
-    color: AppStyles.colorOpacity50
   },
   spacing: {
     paddingHorizontal: 16
