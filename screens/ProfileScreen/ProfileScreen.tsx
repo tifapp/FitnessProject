@@ -10,7 +10,7 @@ import EventPager from "./EventCarousel"
 import AllEventsModal from "./AllEventsModal"
 import { AppStyles } from "@lib/AppColorStyle"
 
-export interface ProfileScreenProps {
+export type ProfileScreenProps = {
   user: User
 }
 

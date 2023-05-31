@@ -6,10 +6,11 @@ import { Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { BodyText } from "@components/Text"
 import TextInputWithIcon from "@screens/ProfileScreen/EditProfileScreen/TextInputWithIcon"
-import {  useState } from "react"
+import { useState } from "react"
 import ContentTextInput from "./ContentTextInput"
 import BottomTabButton from "@components/bottomTabComponents/BottomTabButton"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
+import { useEditProfileContext } from "../Navigation/EditProfileScreenNavWrapper"
 
 type InputTypes = "display" | "bio" | "handle"
 
@@ -17,37 +18,37 @@ const EditProfileScreen = ({user}: ProfileScreenProps) => {
   const [displayName, setDisplayName] = useState(user.username)
   const [handle, setHandle] = useState(user.handle)
   const [bio, setBio] = useState(user.biography)
-  const [hasChanged, setHasChanged] = useState(false)
+  const {hasEdited, setHasEdited} = useEditProfileContext()
 
   const onChangeText = (text: string, input: InputTypes) => {
     switch (input) {
       case "display":
         setDisplayName(text)
         if (text === user.username && bio === user.biography && handle === user.handle) {
-          setHasChanged(false)
+          setHasEdited(false)
         } else {
-          setHasChanged(true)
+          setHasEdited(true)
         }
         break
 
       case "bio":
         setBio(text)
         if (displayName === user.username && text === user.biography && handle === user.handle) {
-          setHasChanged(false)
+          setHasEdited(false)
         } else {
-          setHasChanged(true)
+          setHasEdited(true)
         }
         break
 
       case "handle":
         setHandle(text)
         if (displayName === user.username && bio === user.biography && text === user.handle) {
-          setHasChanged(false)
+          setHasEdited(false)
         } else {
-          setHasChanged(true)
+          setHasEdited(true)
         }
+        break
     }
-
   }
 
   return (
@@ -93,7 +94,7 @@ const EditProfileScreen = ({user}: ProfileScreenProps) => {
       <BottomTabButton
         title="Save Changes"
         onPress={() => console.log("s")}
-        disabled={!hasChanged}
+        disabled={!hasEdited}
       />
     </View>
   )
