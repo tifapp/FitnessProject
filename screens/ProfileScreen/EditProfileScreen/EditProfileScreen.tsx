@@ -18,6 +18,7 @@ const EditProfileScreen = ({user}: ProfileScreenProps) => {
   const [displayName, setDisplayName] = useState(user.username)
   const [handle, setHandle] = useState(user.handle)
   const [bio, setBio] = useState(user.biography)
+  const [hasError, setHasError] = useState(false)
   const {hasEdited, setHasEdited} = useEditProfileContext()
 
   const onChangeText = (text: string, input: InputTypes) => {
@@ -79,6 +80,8 @@ const EditProfileScreen = ({user}: ProfileScreenProps) => {
               iconName={"at"}
               text={handle}
               onChangeText={(text) => onChangeText(text, "handle")}
+              hasError={hasError}
+              errorMessage="That handle is already taken."
             />
           </View>
 
@@ -93,7 +96,7 @@ const EditProfileScreen = ({user}: ProfileScreenProps) => {
       </KeyboardAwareScrollView>
       <BottomTabButton
         title="Save Changes"
-        onPress={() => console.log("s")}
+        onPress={() => console.log("saved")}
         disabled={!hasEdited}
       />
     </View>

@@ -1,25 +1,38 @@
 import { StyleProp, StyleSheet, TextInput, TextInputProps, View, ViewStyle } from "react-native"
 import { Ionicon, IoniconName } from "../../../components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
-import { BodyText } from "@components/Text"
+import { BodyText, Caption } from "@components/Text"
 
 type Props = {
   iconName: IoniconName
   text: string
+  hasError?: boolean
+  errorMessage?: string
   style?: StyleProp<ViewStyle>
 } & TextInputProps
 
-const TextInputWithIcon = ({iconName, text, style, ...props}: Props) => {
+const TextInputWithIcon = ({iconName, text, hasError, errorMessage, style, ...props}: Props) => {
 
   return (
-    <View style={[styles.container, style]}>
-      <Ionicon name={iconName} style={styles.icon}/>
-      <TextInput
-        style={styles.input}
-        {...props}
-      >
-        <BodyText>{text}</BodyText>
-      </TextInput>
+    <View>
+      <View style={[
+        styles.container,
+        {borderColor: hasError ? AppStyles.errorColor : AppStyles.colorOpacity15},
+        style
+      ]}>
+        <Ionicon
+          name={iconName}
+          style={[styles.icon]}
+          color={hasError ? AppStyles.errorColor : AppStyles.darkColor}
+        />
+        <TextInput
+          style={styles.input}
+          {...props}
+        >
+          <BodyText>{text}</BodyText>
+        </TextInput>
+      </View>
+      {hasError && <Caption style={styles.errorText}>{errorMessage}</Caption>}
     </View>
   )
 }
@@ -29,7 +42,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: "center",
     borderWidth: 1,
-    borderColor: AppStyles.colorOpacity15,
     borderRadius: 12,
     padding: 8,
 
@@ -39,6 +51,12 @@ const styles = StyleSheet.create({
   },
   icon: {
     paddingRight: 8
+  },
+  errorText: {
+    color: AppStyles.errorColor,
+    opacity: 1,
+    paddingLeft: 16,
+    paddingTop: 8
   }
 })
 

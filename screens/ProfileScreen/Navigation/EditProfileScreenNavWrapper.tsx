@@ -15,7 +15,7 @@ export const EditProfileScreenNavWrapper = () => {
 
   let dismiss: () => void
 
-  const warnUser = useCallback(() => {
+  const warnUser = () => {
     if (hasEdited) {
       Alert.alert("Discard Edits?", "Changes you have made will not be saved.",[
         { text: "Discard", style: "destructive", onPress: navigation.goBack},
@@ -24,7 +24,7 @@ export const EditProfileScreenNavWrapper = () => {
     } else {
       navigation.goBack()
     }
-  }, [hasEdited])
+  }
 
   useEffect (() => {
     navigation.setOptions({
@@ -37,7 +37,7 @@ export const EditProfileScreenNavWrapper = () => {
           onPress={warnUser}
         />
     })
-  }, [navigation, hasEdited])
+  }, [hasEdited])
 
   return (
     <EditProfileContext.Provider value={{hasEdited, setHasEdited}}>
