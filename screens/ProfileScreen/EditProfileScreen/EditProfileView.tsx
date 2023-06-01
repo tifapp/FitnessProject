@@ -1,64 +1,85 @@
 import ProfileImage from "@components/profileImageComponents/ProfileImage"
-import { StyleSheet, TouchableOpacity } from "react-native"
-import { View } from "react-native"
-import { ProfileScreenProps } from "../ProfileScreen"
+import { StyleSheet, TouchableOpacity, View } from "react-native"
 import { Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { BodyText } from "@components/Text"
 import TextInputWithIcon from "@screens/ProfileScreen/EditProfileScreen/TextInputWithIcon"
-import { useState } from "react"
 import ContentTextInput from "./ContentTextInput"
 import BottomTabButton from "@components/bottomTabComponents/BottomTabButton"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
-import { useEditProfileContext } from "../Navigation/EditProfileScreenNavWrapper"
+import { User } from "@lib/users/User"
+import { useAtom } from "jotai"
+import { hasEditedProfileAtom } from "../state"
+import React, { useState } from "react"
 
 type InputTypes = "display" | "bio" | "handle"
 
-const EditProfileScreen = ({user}: ProfileScreenProps) => {
+type EditProfileViewProps = {
+  user: User
+}
+
+const EditProfileView = ({ user }: EditProfileViewProps) => {
   const [displayName, setDisplayName] = useState(user.username)
   const [handle, setHandle] = useState(user.handle)
   const [bio, setBio] = useState(user.biography)
   const [hasError, setHasError] = useState(false)
-  const {hasEdited, setHasEdited} = useEditProfileContext()
+  const [hasEdited, setHasEdited] = useAtom(hasEditedProfileAtom)
 
   const onChangeText = (text: string, input: InputTypes) => {
     switch (input) {
-      case "display":
-        setDisplayName(text)
-        if (text === user.username && bio === user.biography && handle === user.handle) {
-          setHasEdited(false)
-        } else {
-          setHasEdited(true)
-        }
-        break
+    case "display":
+      setDisplayName(text)
+      if (
+        text === user.username &&
+          bio === user.biography &&
+          handle === user.handle
+      ) {
+        setHasEdited(false)
+      } else {
+        setHasEdited(true)
+      }
+      break
 
-      case "bio":
-        setBio(text)
-        if (displayName === user.username && text === user.biography && handle === user.handle) {
-          setHasEdited(false)
-        } else {
-          setHasEdited(true)
-        }
-        break
+    case "bio":
+      setBio(text)
+      if (
+        displayName === user.username &&
+          text === user.biography &&
+          handle === user.handle
+      ) {
+        setHasEdited(false)
+      } else {
+        setHasEdited(true)
+      }
+      break
 
-      case "handle":
-        setHandle(text)
-        if (displayName === user.username && bio === user.biography && text === user.handle) {
-          setHasEdited(false)
-        } else {
-          setHasEdited(true)
-        }
-        break
+    case "handle":
+      setHandle(text)
+      if (
+        displayName === user.username &&
+          bio === user.biography &&
+          text === user.handle
+      ) {
+        setHasEdited(false)
+      } else {
+        setHasEdited(true)
+      }
+      break
     }
   }
 
   return (
-    <View style={styles.container}>  
+    <View style={styles.container}>
       <KeyboardAwareScrollView>
         <View style={styles.spacing}>
           <View style={[styles.spacing, styles.imageSection]}>
             <TouchableOpacity>
-              <Ionicon name="create" color="white" size={16} style={styles.badge}/>     
+              <Ionicon
+                name="create"
+                color="white"
+                size={16}
+                style={styles.badge}
+              />
               <ProfileImage
                 style={styles.profileImage}
                 imageURL={user.profileImageURL}
@@ -122,9 +143,9 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     marginRight: 4
   },
-  badge:{
-    position:'absolute',
-    zIndex:1,
+  badge: {
+    position: "absolute",
+    zIndex: 1,
     textAlign: "center",
     textAlignVertical: "center",
     bottom: 0,
@@ -133,9 +154,9 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingRight: 6,
     backgroundColor: AppStyles.darkColor,
-    borderRadius:16,
+    borderRadius: 16,
     borderWidth: 2,
-    borderColor: "white",
+    borderColor: "white"
   },
   textInput: {
     color: AppStyles.colorOpacity50,
@@ -145,4 +166,4 @@ const styles = StyleSheet.create({
     marginBottom: 32
   }
 })
-export default EditProfileScreen
+export default EditProfileView

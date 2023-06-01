@@ -11,7 +11,7 @@ import {
 import React, { useEffect, useRef } from "react"
 import { StyleSheet, TouchableOpacity } from "react-native"
 import { Icon } from "react-native-elements"
-import ProfileScreen from "./ProfileScreen/ProfileScreen"
+import ProfileScreen from "./ProfileScreen/ProfileView"
 import { UserMocks } from "@lib/users/User"
 
 const MARKER_SIZE = 44

@@ -15,8 +15,7 @@ import {
   LocationSearchPicker,
   LocationSearchPickerProps
 } from "@screens/LocationSearch"
-import { ProfileScreenProps } from "@screens/ProfileScreen/ProfileScreen"
-import { ProfileScreensParamsList, createProfileStackScreens } from "@screens/ProfileScreen/Navigation/ProfileScreensNavigation"
+import { ProfileScreenProps, ProfileScreensParamsList, ProfileStack, createProfileStackScreens } from "@screens/ProfileScreen/Navigation/ProfileScreensNavigation"
 import {
   ReportingScreensParamsList,
   createContentReportingStackScreens
@@ -42,7 +41,8 @@ export enum ActivitiesScreenNames {
   ATTENDEES_LIST = "Attendees List",
   NOTIFICATIONS = "Notifications",
   REPORTING_SCREENS = "Reporting Screens",
-  EDIT_PROFILE = "Edit Profile Screen"
+  EDIT_PROFILE = "Edit Profile Screen",
+  CURRENT_USER_PROFILE = "Current User Profile"
 }
 
 const events: CurrentUserEvent[] = [
@@ -61,6 +61,7 @@ export type ActivitiesStackParamList = {
   [ActivitiesScreenNames.CHAT_ROOM]: undefined
   [ActivitiesScreenNames.BOTTOM_NAV_TAB_BAR]: undefined
   [ActivitiesScreenNames.PROFILE_SCREEN]: ProfileScreenProps
+  [ActivitiesScreenNames.CURRENT_USER_PROFILE]: ProfileScreenProps
   [ActivitiesScreenNames.NOTIFICATIONS]: undefined
   [ActivitiesScreenNames.SETTINGS_SCREEN]: undefined
   [ActivitiesScreenNames.CHAT_ROOM]: undefined
@@ -159,8 +160,6 @@ const getTabBarVisibility = (route: any) => {
   return true
 }
 
-const ProfileStack = createStackNavigator<ActivitiesStackParamList>()
-
 export function TabNavigation () {
   return (
     <Tab.Navigator
@@ -176,17 +175,12 @@ export function TabNavigation () {
       <Tab.Screen name="Notifications" component={TestNotifScreen} />
       <Tab.Screen
         name="Profile"
+        component={ProfileStack}
         options={({route}) => ({
             tabBarVisible: getTabBarVisibility(route)
           })
         }
-      >
-        {() => 
-          <ProfileStack.Navigator>
-            {profileScreens}
-          </ProfileStack.Navigator>
-        }
-        </Tab.Screen>
+      />
     </Tab.Navigator>
   )
 }
