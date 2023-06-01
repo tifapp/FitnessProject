@@ -1,10 +1,7 @@
 import { ZodType } from "zod"
 import { ApiSchema } from "./api-schema"
 
-export type ApiError = {
-  status: number | "Network Error"
-  message: string
-}
+export type ApiErrorType = { [Status in number]: ZodType<any> }
 
 export type Method = "GET" | "PUT" | "POST" | "PATCH" | "DELETE"
 
@@ -15,6 +12,7 @@ export type Endpoint = {
       queryParamsType?: ZodType<any>
       pathParamsType?: ZodType<any>
       responseType: ZodType<any>
+      errorType?: ApiErrorType
     }
   }
 }

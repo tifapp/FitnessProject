@@ -1,19 +1,25 @@
 import { BodyText, Headline } from "@components/Text"
 import React, { useEffect, useRef, useState } from "react"
-import { Animated, TextProps, View } from "react-native"
+import {
+  Animated,
+  StyleProp,
+  TextProps,
+  TouchableOpacity,
+  View,
+  ViewStyle
+} from "react-native"
 
 export type ExpandableTextProps = {
-  props: TextProps
   text: string
   linesToDisplay: number
-}
+} & TextProps
 
 const TEXT_HEIGHT = 22
 
 const ExpandableText = ({
-  props,
   text,
-  linesToDisplay
+  linesToDisplay,
+  ...props
 }: ExpandableTextProps) => {
   const [expander, setExpander] = useState(false)
   const [expanded, setExpanded] = useState(false)
@@ -72,9 +78,14 @@ const ExpandableText = ({
         </BodyText>
       </Animated.View>
       {expander && (
-        <Headline {...props} style={props?.style} onPress={toggleExpansion}>
-          {expanded ? "Read Less" : "Read More"}
-        </Headline>
+        <TouchableOpacity
+          style={{ alignSelf: "flex-start" }}
+          onPress={toggleExpansion}
+        >
+          <Headline {...props} style={[{ marginTop: 8 }, props.style]}>
+            {expanded ? "Read Less" : "Read More"}
+          </Headline>
+        </TouchableOpacity>
       )}
     </View>
   )

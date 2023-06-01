@@ -1,6 +1,7 @@
 import EventsList from "@components/EventsList"
 import { BottomNavTabBar } from "@components/bottomTabComponents/BottomNavTabBar"
 import { headerOptions } from "@components/headerComponents/headerOptions"
+import { UserMocks } from "@lib/User"
 import { CurrentUserEvent, EventMocks } from "@lib/events"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
@@ -14,12 +15,13 @@ import {
   LocationSearchPicker,
   LocationSearchPickerProps
 } from "@screens/LocationSearch"
+import { ProfileScreenProps } from "@screens/ProfileScreen/ProfileScreen"
+import { ProfileScreenNavWrapper } from "@screens/ProfileScreen/ProfileScreenNavWrapper"
 import {
   ReportingScreensParamsList,
   createContentReportingStackScreens
 } from "@screens/Reporting"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
-import { TestProfileScreen } from "@screens/TestProfileScreen"
 import { TestChatRoomScreen } from "@screens/testScreens/TestChatRoomScreen"
 import { TestNotifScreen } from "@screens/testScreens/TestNotifScreen"
 
@@ -56,7 +58,7 @@ export type ActivitiesStackParamList = {
   [ActivitiesScreenNames.LOCATION_SEARCH]: LocationSearchPickerProps
   [ActivitiesScreenNames.CHAT_ROOM]: undefined
   [ActivitiesScreenNames.BOTTOM_NAV_TAB_BAR]: undefined
-  [ActivitiesScreenNames.PROFILE_SCREEN]: undefined
+  [ActivitiesScreenNames.PROFILE_SCREEN]: ProfileScreenProps
   [ActivitiesScreenNames.NOTIFICATIONS]: undefined
   [ActivitiesScreenNames.SETTINGS_SCREEN]: undefined
   [ActivitiesScreenNames.CHAT_ROOM]: undefined
@@ -82,6 +84,10 @@ export type ActivitiesScreenRouteProps = StackScreenProps<
 export type EventListRouteProps = StackScreenProps<
   ActivitiesStackParamList,
   ActivitiesScreenNames.BOTTOM_NAV_TAB_BAR
+>["route"]
+export type ProfileScreenRouteProps = StackScreenProps<
+  ActivitiesStackParamList,
+  ActivitiesScreenNames.PROFILE_SCREEN
 >["route"]
 
 /* export type LocationSearchScreenRouteProps = StackScreenProps<
@@ -119,7 +125,8 @@ export default function ActivitiesStack () {
       />
       <Stack.Screen
         name={ActivitiesScreenNames.PROFILE_SCREEN}
-        component={TestProfileScreen}
+        component={ProfileScreenNavWrapper}
+        initialParams={{user: UserMocks.Mia}}
       />
       <Stack.Screen
         name={ActivitiesScreenNames.SETTINGS_SCREEN}
@@ -153,7 +160,11 @@ export function TabNavigation () {
         initialParams={{ event: events[2] }}
       />
       <Tab.Screen name="Notifications" component={TestNotifScreen} />
-      <Tab.Screen name="Profile" component={TestProfileScreen} />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreenNavWrapper}
+        initialParams={{user: UserMocks.Mia}}
+      />
     </Tab.Navigator>
   )
 }
