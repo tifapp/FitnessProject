@@ -14,11 +14,14 @@ import { EditProfileDismissButton } from "./EditProfileDismissButton"
 import EditProfileView from "../EditProfileScreen/EditProfileView"
 import { EventMocks } from "@lib/events"
 import { useHydrateAtoms } from "jotai/utils"
+import { View } from "react-native"
+import { TouchableIonicon } from "@components/common/Icons"
 
 export type ProfileScreensParamsList = {
   ProfileScreen: ProfileScreenViewProps
   EditProfileScreen: undefined
   SettingsScreen: undefined
+  CurrentUserProfileScreen: undefined
 }
 
 export type ProfileScreenRouteProps = StackScreenProps<
@@ -50,6 +53,25 @@ export const createProfileStackScreens = <T extends ProfileScreensParamsList>(
           )
         })}
         component={ProfileScreen}
+      />
+      <ProfileStack.Screen
+        name={"CurrentUserProfileScreen"}
+        options={({ navigation }) => ({
+          title: "",
+          headerRight: () => (
+            <View style={{ flexDirection: "row" }}>
+              <TouchableIonicon
+                icon={{ name: "create", style: { paddingRight: 18 } }}
+                onPress={() => navigation.navigate("EditProfileScreen")}
+              />
+              <TouchableIonicon
+                icon={{ name: "settings", style: { paddingRight: 18 } }}
+                onPress={() => navigation.navigate("SettingsScreen")}
+              />
+            </View>
+          )
+        })}
+        component={CurrentUserProfileScreen}
       />
       <ProfileStack.Screen
         name={"EditProfileScreen"}
@@ -90,7 +112,7 @@ const ProfileScreen = ({ route }: ProfileScreenProps) => {
   console.log(route)
   // get user
   const user = UserMocks.Mia
-  user.relationStatus = "current-user"
+  // user.relationStatus = "current-user"
   // get user's events
   const events = [
     EventMocks.Multiday,
@@ -99,6 +121,21 @@ const ProfileScreen = ({ route }: ProfileScreenProps) => {
   ]
   // update Atom
   useHydrateAtoms([[userAtom, user]])
+
+  return <ProfileScreenView user={user} events={events} />
+}
+
+const CurrentUserProfileScreen = () => {
+  // get current user
+  const user = UserMocks.Mia
+  user.relationStatus = "current-user"
+
+  // get user's events
+  const events = [
+    EventMocks.Multiday,
+    EventMocks.NoPlacemarkInfo,
+    EventMocks.PickupBasketball
+  ]
 
   return <ProfileScreenView user={user} events={events} />
 }
@@ -118,7 +155,7 @@ export const ProfileStack = () => {
     createProfileStackScreens<ActivitiesStackParamList>(ProfileStack)
 
   return (
-    <ProfileStack.Navigator initialRouteName={"ProfileScreen"}>
+    <ProfileStack.Navigator initialRouteName={"CurrentUserProfileScreen"}>
       {profileScreens}
     </ProfileStack.Navigator>
   )
