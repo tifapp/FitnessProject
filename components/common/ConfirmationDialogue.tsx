@@ -22,7 +22,7 @@ const ConfirmationDialogue = ({ style }: Props) => {
 
   const showActionSheet = () => {
     // To show the Bottom ActionSheet
-    actionSheet.current!.show()
+    actionSheet.current?.show()
   }
 
   return (

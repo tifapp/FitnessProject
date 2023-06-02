@@ -3,10 +3,7 @@ import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import ProfileScreenView, { ProfileScreenViewProps } from "../ProfileView"
 import { StackNavigatorType } from "@components/Navigation"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
-import {
-  ActivitiesScreenNames,
-  ActivitiesStackParamList
-} from "@stacks/ActivitiesStack"
+import { ActivitiesStackParamList } from "@stacks/ActivitiesStack"
 import { useAtomValue } from "jotai"
 import { userAtom } from "../state"
 import { UserMocks } from "@lib/users/User"
@@ -19,19 +16,19 @@ import { EventMocks } from "@lib/events"
 import { useHydrateAtoms } from "jotai/utils"
 
 export type ProfileScreensParamsList = {
-  "Profile Screen": ProfileScreenViewProps
-  "Edit Profile Screen": undefined
-  "Settings Screen": undefined
+  ProfileScreen: ProfileScreenViewProps
+  EditProfileScreen: undefined
+  SettingsScreen: undefined
 }
 
 export type ProfileScreenRouteProps = StackScreenProps<
   ProfileScreensParamsList,
-  "Profile Screen"
+  "ProfileScreen"
 >["route"]
 
 export type ProfileScreenProps = {
   userID: string
-} & StackScreenProps<ProfileScreensParamsList, "Profile Screen">
+} & StackScreenProps<ProfileScreensParamsList, "ProfileScreen">
 
 export const createProfileStackScreens = <T extends ProfileScreensParamsList>(
   ProfileStack: StackNavigatorType<T>
@@ -39,25 +36,23 @@ export const createProfileStackScreens = <T extends ProfileScreensParamsList>(
   return (
     <>
       <ProfileStack.Screen
-        name={ActivitiesScreenNames.PROFILE_SCREEN}
+        name={"ProfileScreen"}
         options={({ navigation }) => ({
           title: "",
           headerLeft: () => <HeaderLeftProfile />,
           headerRight: () => (
             <HeaderRightProfile
               onPressEditProfile={() =>
-                navigation.navigate(ActivitiesScreenNames.EDIT_PROFILE)
+                navigation.navigate("EditProfileScreen")
               }
-              onPressSettings={() =>
-                navigation.navigate(ActivitiesScreenNames.SETTINGS_SCREEN)
-              }
+              onPressSettings={() => navigation.navigate("SettingsScreen")}
             />
           )
         })}
         component={ProfileScreen}
       />
       <ProfileStack.Screen
-        name={ActivitiesScreenNames.EDIT_PROFILE}
+        name={"EditProfileScreen"}
         component={EditProfileScreen}
         options={({ navigation }) => ({
           headerTitle: () => (
@@ -71,10 +66,7 @@ export const createProfileStackScreens = <T extends ProfileScreensParamsList>(
           )
         })}
       />
-      <ProfileStack.Screen
-        name={ActivitiesScreenNames.SETTINGS_SCREEN}
-        component={SettingsScreen}
-      />
+      <ProfileStack.Screen name={"SettingsScreen"} component={SettingsScreen} />
     </>
   )
 }
@@ -116,9 +108,7 @@ export const ProfileStack = () => {
     createProfileStackScreens<ActivitiesStackParamList>(ProfileStack)
 
   return (
-    <ProfileStack.Navigator
-      initialRouteName={ActivitiesScreenNames.PROFILE_SCREEN}
-    >
+    <ProfileStack.Navigator initialRouteName={"ProfileScreen"}>
       {profileScreens}
     </ProfileStack.Navigator>
   )

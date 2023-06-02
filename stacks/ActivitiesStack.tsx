@@ -1,7 +1,7 @@
+import React from "react"
 import EventsList from "@components/EventsList"
 import { BottomNavTabBar } from "@components/bottomTabComponents/BottomNavTabBar"
 import { headerOptions } from "@components/headerComponents/headerOptions"
-import { UserMocks } from "@lib/users/User"
 import { CurrentUserEvent, EventMocks } from "@lib/events"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
@@ -15,18 +15,19 @@ import {
   LocationSearchPicker,
   LocationSearchPickerProps
 } from "@screens/LocationSearch"
-import { ProfileScreenProps, ProfileScreensParamsList, ProfileStack, createProfileStackScreens } from "@screens/ProfileScreen/Navigation/ProfileScreensNavigation"
+import {
+  ProfileScreenProps,
+  ProfileScreensParamsList,
+  ProfileStack,
+  createProfileStackScreens
+} from "@screens/ProfileScreen/Navigation/ProfileScreensNavigation"
 import {
   ReportingScreensParamsList,
   createContentReportingStackScreens
 } from "@screens/Reporting"
-import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { TestChatRoomScreen } from "@screens/testScreens/TestChatRoomScreen"
 import { TestNotifScreen } from "@screens/testScreens/TestNotifScreen"
-import { PartialState, Route, RouteProp, getFocusedRouteNameFromRoute } from "@react-navigation/native"
-
-const Stack = createStackNavigator<ActivitiesStackParamList>()
-const Tab = createBottomTabNavigator()
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native"
 
 export enum ActivitiesScreenNames {
   EVENT_FORM = "Event Form",
@@ -66,7 +67,11 @@ export type ActivitiesStackParamList = {
   [ActivitiesScreenNames.SETTINGS_SCREEN]: undefined
   [ActivitiesScreenNames.CHAT_ROOM]: undefined
   [ActivitiesScreenNames.EDIT_PROFILE]: undefined
-} & ReportingScreensParamsList & ProfileScreensParamsList
+} & ReportingScreensParamsList &
+  ProfileScreensParamsList
+
+const Stack = createStackNavigator<ActivitiesStackParamList>()
+const Tab = createBottomTabNavigator()
 
 const reportingScreens =
   createContentReportingStackScreens<ActivitiesStackParamList>(Stack, () => {
@@ -120,7 +125,7 @@ export default function ActivitiesStack () {
       <Stack.Screen
         name={ActivitiesScreenNames.EVENT_DETAILS}
         component={EventDetailsScreenNavWrapper}
-        //initialParams={{ event: events[2] }}
+        // initialParams={{ event: events[2] }}
       />
       <Stack.Screen
         name={ActivitiesScreenNames.EVENT_LIST}
@@ -150,10 +155,7 @@ export default function ActivitiesStack () {
 
 const getTabBarVisibility = (route: any) => {
   const routeName = getFocusedRouteNameFromRoute(route)!
-  const tabHiddenRoutes = [
-    ActivitiesScreenNames.EDIT_PROFILE.valueOf(),
-    ActivitiesScreenNames.SETTINGS_SCREEN.valueOf()
-  ]
+  const tabHiddenRoutes = ["EditProfileScreen", "SettingsScreen"]
   if (tabHiddenRoutes.includes(routeName)) {
     return false
   }
@@ -162,9 +164,7 @@ const getTabBarVisibility = (route: any) => {
 
 export function TabNavigation () {
   return (
-    <Tab.Navigator
-      tabBar={(props) => <BottomNavTabBar {...props} />}
-    >
+    <Tab.Navigator tabBar={(props) => <BottomNavTabBar {...props} />}>
       <Tab.Screen name="Map" component={ActivitiesStack} />
       <Tab.Screen name="Chat Room" component={TestChatRoomScreen} />
       <Tab.Screen
@@ -176,10 +176,9 @@ export function TabNavigation () {
       <Tab.Screen
         name="Profile"
         component={ProfileStack}
-        options={({route}) => ({
-            tabBarVisible: getTabBarVisibility(route)
-          })
-        }
+        options={({ route }) => ({
+          tabBarVisible: getTabBarVisibility(route)
+        })}
       />
     </Tab.Navigator>
   )
