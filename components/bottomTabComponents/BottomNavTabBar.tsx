@@ -1,70 +1,62 @@
-import { TouchableIonicon } from "@components/common/Icons";
-import { AppStyles } from "@lib/AppColorStyle";
+import { TouchableIonicon } from "@components/common/Icons"
+import { AppStyles } from "@lib/AppColorStyle"
 import {
   BottomTabBarOptions,
-  BottomTabBarProps,
-} from "@react-navigation/bottom-tabs";
-import {
-  PartialState,
-  Route,
-  RouteProp,
-  getFocusedRouteNameFromRoute,
-} from "@react-navigation/native";
-import { ActivitiesScreenNames } from "@stacks/ActivitiesStack";
-import React, { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+  BottomTabBarProps
+} from "@react-navigation/bottom-tabs"
+import React from "react"
+import { StyleSheet, View } from "react-native"
 
-function getIconName(routeName: string) {
-  if (routeName === "Map") return "map";
-  else if (routeName === "Chat Room") return "chatbox";
-  else if (routeName === "Event Details") return "add-outline";
-  else if (routeName === "Notifications") return "notifications";
-  else return "person";
+function getIconName (routeName: string) {
+  if (routeName === "Map") return "map"
+  else if (routeName === "Chat Room") return "chatbox"
+  else if (routeName === "Event Details") return "add-outline"
+  else if (routeName === "Notifications") return "notifications"
+  else return "person"
 }
 
 export const BottomNavTabBar = ({
   state,
   descriptors,
-  navigation,
+  navigation
 }: BottomTabBarProps<BottomTabBarOptions>) => {
-  const focusedOptions = descriptors[state.routes[state.index].key].options;
-  const isVisible =
+  const focusedOptions = descriptors[state.routes[state.index].key].options
+  const isVisible = !!(
     focusedOptions?.tabBarVisible === true ||
     focusedOptions?.tabBarVisible === undefined
-      ? true
-      : false;
+  )
 
   return (
     <View style={[styles.container, { display: isVisible ? "flex" : "none" }]}>
       {state.routes.map((route, index) => {
-        const { options } = descriptors[route.key];
+        const { options } = descriptors[route.key]
         const label =
           options.tabBarLabel !== undefined
             ? options.tabBarLabel
             : options.title !== undefined
-            ? options.title
-            : route.name;
+              ? options.title
+              : route.name
 
-        const isFocused = state.index === index;
+        const isFocused = state.index === index
 
         const onPress = () => {
-          console.log(route.name);
+          console.log(route.name)
           const event = navigation.emit({
             type: "tabPress",
             target: route.key,
-            canPreventDefault: true,
-          });
+            canPreventDefault: true
+          })
 
           if (!isFocused && !event.defaultPrevented) {
             // The `merge: true` option makes sure that the params inside the tab screen are preserved
             if (route.name === "Profile") {
-              console.log("test");
-              navigation.navigate("Profile", { userID: "3432432" });
+              console.log("test")
+              navigation.navigate("Profile", { userID: "3432432" })
             } else {
-              navigation.navigate(route.name);
+              navigation.navigate(route.name)
             }
           }
-        };
+        }
         return (
           <TouchableIonicon
             icon={{
@@ -73,8 +65,8 @@ export const BottomNavTabBar = ({
                 getIconName(route.name) === "add-outline"
                   ? "white"
                   : isFocused
-                  ? AppStyles.darkColor
-                  : AppStyles.colorOpacity35,
+                    ? AppStyles.darkColor
+                    : AppStyles.colorOpacity35
             }}
             style={
               getIconName(route.name) === "add-outline" ? styles.plusIcon : null
@@ -83,11 +75,11 @@ export const BottomNavTabBar = ({
             onPress={onPress}
             underlayColor={AppStyles.colorOpacity15}
           />
-        );
+        )
       })}
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -99,7 +91,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 80,
-    backgroundColor: "white",
+    backgroundColor: "white"
   },
   plusIcon: {
     alignItems: "center",
@@ -108,11 +100,11 @@ const styles = StyleSheet.create({
     height: 48,
     padding: 4,
     borderRadius: 12,
-    backgroundColor: AppStyles.darkColor,
-  },
-});
+    backgroundColor: AppStyles.darkColor
+  }
+})
 
-export default BottomNavTabBar;
+export default BottomNavTabBar
 
 /**
  * <TouchableIonicon

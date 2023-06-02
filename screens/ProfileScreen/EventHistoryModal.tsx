@@ -1,16 +1,10 @@
-import { Headline, Title } from "@components/Text"
+import React, { SetStateAction } from "react"
+import { Title } from "@components/Text"
 import { TouchableIonicon } from "@components/common/Icons"
 import { EventCard } from "@components/eventCard/EventCard"
 import { AppStyles } from "@lib/AppColorStyle"
 import { CurrentUserEvent } from "@lib/events"
-import { SetStateAction } from "react"
-import {
-  FlatList,
-  ListRenderItemInfo,
-  Modal,
-  StyleSheet,
-  View
-} from "react-native"
+import { FlatList, ListRenderItemInfo, Modal, StyleSheet } from "react-native"
 
 interface Props {
   username: string
@@ -22,7 +16,12 @@ interface Props {
 const MARGIN_HORIZONTAL = 16
 const MARGIN_VERTICAL = 16
 
-const EventHistoryModal = ({username, visible, setVisible, events }: Props) => {
+const EventHistoryModal = ({
+  username,
+  visible,
+  setVisible,
+  events
+}: Props) => {
   return (
     <Modal style={styles.container} visible={visible} animationType="slide">
       <TouchableIonicon
@@ -36,7 +35,7 @@ const EventHistoryModal = ({username, visible, setVisible, events }: Props) => {
       <FlatList
         data={events}
         renderItem={({ item }: ListRenderItemInfo<CurrentUserEvent>) => (
-          <EventCard event={item} style={styles.eventSpacing}/>
+          <EventCard event={item} style={styles.eventSpacing} />
         )}
       />
     </Modal>
