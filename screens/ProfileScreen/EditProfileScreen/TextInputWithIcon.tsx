@@ -1,4 +1,12 @@
-import { StyleProp, StyleSheet, TextInput, TextInputProps, View, ViewStyle } from "react-native"
+import React from "react"
+import {
+  StyleProp,
+  StyleSheet,
+  TextInput,
+  TextInputProps,
+  View,
+  ViewStyle
+} from "react-native"
 import { Ionicon, IoniconName } from "../../../components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { BodyText, Caption } from "@components/Text"
@@ -6,45 +14,53 @@ import { BodyText, Caption } from "@components/Text"
 type Props = {
   iconName: IoniconName
   text: string
-  hasError?: boolean
   errorMessage?: string
   style?: StyleProp<ViewStyle>
 } & TextInputProps
 
-const TextInputWithIcon = ({iconName, text, hasError, errorMessage, style, ...props}: Props) => {
-
+const TextInputWithIcon = ({
+  iconName,
+  text,
+  errorMessage,
+  style,
+  ...props
+}: Props) => {
   return (
     <View>
-      <View style={[
-        styles.container,
-        {borderColor: hasError ? AppStyles.errorColor : AppStyles.colorOpacity15},
-        style
-      ]}>
+      <View
+        style={[
+          styles.container,
+          {
+            borderColor: errorMessage
+              ? AppStyles.errorColor
+              : AppStyles.colorOpacity15
+          },
+          style
+        ]}
+      >
         <Ionicon
           name={iconName}
           style={[styles.icon]}
-          color={hasError ? AppStyles.errorColor : AppStyles.darkColor}
+          color={errorMessage ? AppStyles.errorColor : AppStyles.darkColor}
         />
-        <TextInput
-          style={styles.input}
-          {...props}
-        >
+        <TextInput style={styles.input} {...props}>
           <BodyText>{text}</BodyText>
         </TextInput>
       </View>
-      {hasError && <Caption style={styles.errorText}>{errorMessage}</Caption>}
+      {errorMessage && (
+        <Caption style={styles.errorText}>{errorMessage}</Caption>
+      )}
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
+    flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
     borderRadius: 12,
-    padding: 8,
-
+    padding: 8
   },
   input: {
     flex: 1

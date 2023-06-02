@@ -19,21 +19,17 @@ type EditProfileViewProps = {
 }
 
 const EditProfileView = ({ user }: EditProfileViewProps) => {
-  const [displayName, setDisplayName] = useState(user.username)
+  const [displayName, setDisplayName] = useState(user.name)
   const [handle, setHandle] = useState(user.handle)
-  const [bio, setBio] = useState(user.biography)
-  const [hasError, setHasError] = useState(false)
+  const [bio, setBio] = useState(user.bio)
+  const [handleErrorMessage, setHandleErrorMessage] = useState(undefined)
   const [hasEdited, setHasEdited] = useAtom(hasEditedProfileAtom)
 
   const onChangeText = (text: string, input: InputTypes) => {
     switch (input) {
     case "display":
       setDisplayName(text)
-      if (
-        text === user.username &&
-          bio === user.biography &&
-          handle === user.handle
-      ) {
+      if (text === user.name && bio === user.bio && handle === user.handle) {
         setHasEdited(false)
       } else {
         setHasEdited(true)
@@ -43,8 +39,8 @@ const EditProfileView = ({ user }: EditProfileViewProps) => {
     case "bio":
       setBio(text)
       if (
-        displayName === user.username &&
-          text === user.biography &&
+        displayName === user.name &&
+          text === user.bio &&
           handle === user.handle
       ) {
         setHasEdited(false)
@@ -56,8 +52,8 @@ const EditProfileView = ({ user }: EditProfileViewProps) => {
     case "handle":
       setHandle(text)
       if (
-        displayName === user.username &&
-          bio === user.biography &&
+        displayName === user.name &&
+          bio === user.bio &&
           text === user.handle
       ) {
         setHasEdited(false)
@@ -101,8 +97,7 @@ const EditProfileView = ({ user }: EditProfileViewProps) => {
               iconName={"at"}
               text={handle}
               onChangeText={(text) => onChangeText(text, "handle")}
-              hasError={hasError}
-              errorMessage="That handle is already taken."
+              errorMessage={handleErrorMessage}
             />
           </View>
 

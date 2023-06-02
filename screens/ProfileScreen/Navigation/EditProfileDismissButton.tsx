@@ -1,18 +1,18 @@
-import { TouchableIonicon } from "@components/common/Icons";
-import { AppStyles } from "@lib/AppColorStyle";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { useAtomValue } from "jotai";
-import { Alert, StyleSheet } from "react-native";
-import { hasEditedProfileAtom } from "../state";
+import React from "react"
+import { TouchableIonicon } from "@components/common/Icons"
+import { AppStyles } from "@lib/AppColorStyle"
+import { useAtomValue } from "jotai"
+import { Alert, StyleSheet } from "react-native"
+import { hasEditedProfileAtom } from "../state"
 
 type EditProfileDismissButtonProps = {
-  onDismiss: () => void;
-};
+  onDismiss: () => void
+}
 
 export const EditProfileDismissButton = ({
-  onDismiss,
+  onDismiss
 }: EditProfileDismissButtonProps) => {
-  const hasEdited = useAtomValue(hasEditedProfileAtom);
+  const hasEdited = useAtomValue(hasEditedProfileAtom)
 
   const backButtonTapped = () => {
     if (hasEdited) {
@@ -21,13 +21,13 @@ export const EditProfileDismissButton = ({
         "Changes to your profile will not be saved.",
         [
           { text: "Discard", style: "destructive", onPress: onDismiss },
-          { text: "Keep Editing" },
+          { text: "Keep Editing" }
         ]
-      );
+      )
     } else {
-      onDismiss();
+      onDismiss()
     }
-  };
+  }
 
   return (
     <TouchableIonicon
@@ -35,11 +35,11 @@ export const EditProfileDismissButton = ({
       style={styles.leftSpacing}
       onPress={backButtonTapped}
     />
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   leftSpacing: {
-    paddingLeft: 16,
-  },
-});
+    paddingLeft: 16
+  }
+})

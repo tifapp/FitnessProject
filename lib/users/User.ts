@@ -30,12 +30,11 @@ export type UserFriendStatus =
 
 export type User = {
   id: string
-  username: string
+  name: string
   handle: string
-  biography: string
+  bio: string
   profileImageURL: string
-  events: CurrentUserEvent[]
-  userStatus: UserFriendStatus | "current-user"
+  relationStatus: UserFriendStatus | "current-user"
 }
 
 /**
@@ -44,16 +43,10 @@ export type User = {
 export namespace UserMocks {
   export const Mia = {
     id: uuid(),
-    username: "Mia Anderson",
+    name: "Mia Anderson",
     handle: "MysticalMia",
-    biography: 
-    "When I'm not on the field or court, you can find me cheering for my favorite teams and athletes from the sidelines.",
+    bio: "When I'm not on the field or court, you can find me cheering for my favorite teams and athletes from the sidelines.",
     profileImageURL: "",
-    events: [
-      EventMocks.NoPlacemarkInfo,
-      EventMocks.Multiday,
-      EventMocks.PickupBasketball
-    ],
-    userStatus: "not-friends"
+    relationStatus: "not-friends"
   } as User
 }
