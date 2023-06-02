@@ -1,4 +1,4 @@
-import { Caption, Headline, Title } from "@components/Text"
+import { Caption, Headline } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useAtom } from "jotai"
@@ -626,15 +626,10 @@ const DeleteAccountSection = () => {
 export const SettingsScreen = () => {
   return (
     <ScrollView
-      style={[
-        styles.container,
-        styles.spacing,
-        { flex: 1, paddingVertical: 8 }
-      ]}
+      style={[styles.container, styles.spacing, { flex: 1 }]}
       contentContainerStyle={{ flexGrow: 1 }}
       nestedScrollEnabled={true}
     >
-      <Title style={styles.textColor}>{"Settings"}</Title>
       <Headline style={[styles.textColor, { paddingTop: 8, paddingBottom: 2 }]}>
         {"Your Account"}
       </Headline>
@@ -725,7 +720,6 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   container: {
-    marginTop: 24,
     backgroundColor: "white"
   },
   paddingIconSection: {

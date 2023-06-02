@@ -1,7 +1,7 @@
 import React from "react"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import ProfileScreenView, { ProfileScreenViewProps } from "../ProfileView"
-import { StackNavigatorType } from "@components/Navigation"
+import { ChevronBackButton, StackNavigatorType } from "@components/Navigation"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ActivitiesStackParamList } from "@stacks/ActivitiesStack"
 import { useAtomValue } from "jotai"
@@ -66,7 +66,17 @@ export const createProfileStackScreens = <T extends ProfileScreensParamsList>(
           )
         })}
       />
-      <ProfileStack.Screen name={"SettingsScreen"} component={SettingsScreen} />
+      <ProfileStack.Screen
+        name={"SettingsScreen"}
+        component={SettingsScreen}
+        options={{
+          headerTitle: () => (
+            <Headline style={{ color: AppStyles.darkColor }}>Settings</Headline>
+          ),
+          headerTitleAlign: "center",
+          headerLeft: () => <ChevronBackButton />
+        }}
+      />
     </>
   )
 }
