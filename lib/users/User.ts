@@ -44,7 +44,7 @@ export namespace UserMocks {
   export const Mia = {
     id: uuid(),
     name: "Mia Anderson",
-    handle: "MysticalMia",
+    handle: "@MysticalMia",
     bio: "When I'm not on the field or court, you can find me cheering for my favorite teams and athletes from the sidelines.",
     profileImageURL: "",
     relationStatus: "not-friends"

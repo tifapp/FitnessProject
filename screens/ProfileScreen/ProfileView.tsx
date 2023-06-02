@@ -49,7 +49,7 @@ const ProfileView = ({ user, events }: ProfileScreenViewProps) => {
             imageURL={user.profileImageURL}
           />
           <Title style={styles.title}>{user.name}</Title>
-          <Caption>{`@${user.handle}`}</Caption>
+          <Caption>{user.handle}</Caption>
         </View>
 
         {userStatus !== "current-user" && (

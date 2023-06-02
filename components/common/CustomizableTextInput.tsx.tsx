@@ -7,20 +7,18 @@ import {
   View,
   ViewStyle
 } from "react-native"
-import { Ionicon, IoniconName } from "../../../components/common/Icons"
+import { Ionicon, IoniconName } from "./Icons"
 import { AppStyles } from "@lib/AppColorStyle"
-import { BodyText, Caption } from "@components/Text"
+import { Caption } from "@components/Text"
 
 type Props = {
-  iconName: IoniconName
-  text: string
+  iconName?: IoniconName
   errorMessage?: string
   style?: StyleProp<ViewStyle>
 } & TextInputProps
 
-const TextInputWithIcon = ({
+const CustomizableTextInput = ({
   iconName,
-  text,
   errorMessage,
   style,
   ...props
@@ -38,13 +36,15 @@ const TextInputWithIcon = ({
           style
         ]}
       >
-        <Ionicon
-          name={iconName}
-          style={[styles.icon]}
-          color={errorMessage ? AppStyles.errorColor : AppStyles.darkColor}
-        />
+        {iconName && (
+          <Ionicon
+            name={iconName}
+            style={[styles.icon]}
+            color={errorMessage ? AppStyles.errorColor : AppStyles.darkColor}
+          />
+        )}
         <TextInput style={styles.input} {...props}>
-          <BodyText>{text}</BodyText>
+          {props.children}
         </TextInput>
       </View>
       {errorMessage && (
@@ -76,4 +76,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default TextInputWithIcon
+export default CustomizableTextInput

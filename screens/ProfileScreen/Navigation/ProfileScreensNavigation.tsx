@@ -7,7 +7,7 @@ import {
   ActivitiesScreenNames,
   ActivitiesStackParamList
 } from "@stacks/ActivitiesStack"
-import { useAtomValue, useSetAtom } from "jotai"
+import { useAtomValue } from "jotai"
 import { userAtom } from "../state"
 import { UserMocks } from "@lib/users/User"
 import { HeaderLeftProfile, HeaderRightProfile } from "./ProfileHeaders"
@@ -16,6 +16,7 @@ import { AppStyles } from "@lib/AppColorStyle"
 import { EditProfileDismissButton } from "./EditProfileDismissButton"
 import EditProfileView from "../EditProfileScreen/EditProfileView"
 import { EventMocks } from "@lib/events"
+import { useHydrateAtoms } from "jotai/utils"
 
 export type ProfileScreensParamsList = {
   "Profile Screen": ProfileScreenViewProps
@@ -85,7 +86,6 @@ export const createProfileStackScreens = <T extends ProfileScreensParamsList>(
  */
 const ProfileScreen = ({ route }: ProfileScreenProps) => {
   console.log(route)
-  const setUser = useSetAtom(userAtom)
   // get user
   const user = UserMocks.Mia
   user.relationStatus = "current-user"
@@ -96,7 +96,7 @@ const ProfileScreen = ({ route }: ProfileScreenProps) => {
     EventMocks.PickupBasketball
   ]
   // update Atom
-  setUser(user)
+  useHydrateAtoms([[userAtom, user]])
 
   return <ProfileScreenView user={user} events={events} />
 }

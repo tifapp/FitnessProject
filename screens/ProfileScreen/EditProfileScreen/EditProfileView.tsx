@@ -3,14 +3,14 @@ import { StyleSheet, TouchableOpacity, View } from "react-native"
 import { Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { BodyText } from "@components/Text"
-import TextInputWithIcon from "@screens/ProfileScreen/EditProfileScreen/TextInputWithIcon"
-import ContentTextInput from "./ContentTextInput"
 import BottomTabButton from "@components/bottomTabComponents/BottomTabButton"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import { User } from "@lib/users/User"
 import { useAtom } from "jotai"
 import { hasEditedProfileAtom } from "../state"
 import React, { useState } from "react"
+import CustomizableTextInput from "@components/common/CustomizableTextInput.tsx"
+import { ContentText } from "@components/ContentText"
 
 type InputTypes = "display" | "bio" | "handle"
 
@@ -20,9 +20,11 @@ type EditProfileViewProps = {
 
 const EditProfileView = ({ user }: EditProfileViewProps) => {
   const [displayName, setDisplayName] = useState(user.name)
-  const [handle, setHandle] = useState(user.handle)
+  const [handle, setHandle] = useState(user.handle.substring(1))
   const [bio, setBio] = useState(user.bio)
-  const [handleErrorMessage, setHandleErrorMessage] = useState(undefined)
+  const [handleErrorMessage, setHandleErrorMessage] = useState<
+    string | undefined
+  >(undefined)
   const [hasEdited, setHasEdited] = useAtom(hasEditedProfileAtom)
 
   const onChangeText = (text: string, input: InputTypes) => {
@@ -51,6 +53,9 @@ const EditProfileView = ({ user }: EditProfileViewProps) => {
 
     case "handle":
       setHandle(text)
+      if (handleErrorMessage) {
+        setHandleErrorMessage(undefined)
+      }
       if (
         displayName === user.name &&
           bio === user.bio &&
@@ -62,6 +67,11 @@ const EditProfileView = ({ user }: EditProfileViewProps) => {
       }
       break
     }
+  }
+
+  const onSaveChanges = () => {
+    // Check if handle is already taken/save to backend
+    setHandleErrorMessage("That handle is already taken.")
   }
 
   return (
@@ -84,35 +94,42 @@ const EditProfileView = ({ user }: EditProfileViewProps) => {
           </View>
           <View style={styles.inputSpacing}>
             <BodyText style={styles.textInput}>Display Name</BodyText>
-            <TextInputWithIcon
+            <CustomizableTextInput
               iconName={"pencil-sharp"}
-              text={displayName}
               onChangeText={(text) => onChangeText(text, "display")}
-            />
+            >
+              <BodyText>{displayName}</BodyText>
+            </CustomizableTextInput>
           </View>
 
           <View style={styles.inputSpacing}>
             <BodyText style={styles.textInput}>Handle</BodyText>
-            <TextInputWithIcon
+            <CustomizableTextInput
               iconName={"at"}
-              text={handle}
               onChangeText={(text) => onChangeText(text, "handle")}
               errorMessage={handleErrorMessage}
-            />
+            >
+              <BodyText>{handle}</BodyText>
+            </CustomizableTextInput>
           </View>
 
           <View style={styles.inputSpacing}>
             <BodyText style={styles.textInput}>Bio</BodyText>
-            <ContentTextInput
-              text={bio}
+            <CustomizableTextInput
               onChangeText={(text) => onChangeText(text, "bio")}
-            />
+              multiline
+            >
+              <ContentText
+                text={bio}
+                onUserHandleTapped={() => console.log(handle)}
+              />
+            </CustomizableTextInput>
           </View>
         </View>
       </KeyboardAwareScrollView>
       <BottomTabButton
         title="Save Changes"
-        onPress={() => console.log("saved")}
+        onPress={onSaveChanges}
         disabled={!hasEdited}
       />
     </View>
