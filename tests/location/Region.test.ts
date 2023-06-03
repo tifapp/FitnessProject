@@ -1,5 +1,6 @@
 import {
   containsRegion,
+  containsRegionRect,
   minRegionRadius,
   mockLocationCoordinate2D,
   regionRect
@@ -21,19 +22,33 @@ describe("Region tests", () => {
     })
   })
 
-  describe("regionRect tests", () => {
-    test("basics", () => {
-      const region = {
-        latitude: 90,
-        longitude: -90,
-        latitudeDelta: 0.3,
-        longitudeDelta: 0.2
-      }
-      expect(regionRect(region)).toMatchObject({
-        topLeft: { latitude: 90.15, longitude: -90.1 },
-        topRight: { latitude: 90.15, longitude: -89.9 },
-        bottomLeft: { latitude: 89.85, longitude: -90.1 },
-        bottomRight: { latitude: 89.85, longitude: -89.9 }
+  describe("RegionRect tests", () => {
+    describe("RegionToRect tests", () => {
+      test("basics", () => {
+        const region = {
+          latitude: 90,
+          longitude: -90,
+          latitudeDelta: 0.3,
+          longitudeDelta: 0.2
+        }
+        expect(regionRect(region)).toMatchObject({
+          topLeft: { latitude: 90.15, longitude: -90.1 },
+          topRight: { latitude: 90.15, longitude: -89.9 },
+          bottomLeft: { latitude: 89.85, longitude: -90.1 },
+          bottomRight: { latitude: 89.85, longitude: -89.9 }
+        })
+      })
+    })
+
+    describe("Intersection tests", () => {
+      test("same region rect intersects", () => {
+        const rect = regionRect({
+          latitude: 90,
+          longitude: -90,
+          latitudeDelta: 0.3,
+          longitudeDelta: 0.2
+        })
+        expect(containsRegionRect(rect, rect)).toEqual(true)
       })
     })
   })

@@ -50,3 +50,7 @@ export const regionRect = (region: Region): RegionRect => ({
     longitude: region.longitude + region.longitudeDelta / 2
   }
 })
+
+export const containsRegionRect = (rect1: RegionRect, rect2: RegionRect) => {
+  return true
+}
