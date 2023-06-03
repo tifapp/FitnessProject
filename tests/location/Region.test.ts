@@ -204,5 +204,35 @@ describe("Region tests", () => {
 
       expect(containsRegion(r1, r2)).toEqual(false)
     })
+
+    it("should return true when region rects contains each other", () => {
+      const r1 = {
+        latitude: 90,
+        longitude: -90,
+        latitudeDelta: 0.3,
+        longitudeDelta: 0.2
+      }
+      // expect(regionRect(region)).toMatchObject({
+      //   northLatitude: 90.15,
+      //   southLatitude: 89.85,
+      //   westLongitude: -90.1,
+      //   eastLongitude: -89.9
+      // })
+
+      const r2 = {
+        latitude: 89.8,
+        longitude: -90.8,
+        latitudeDelta: 0.5,
+        longitudeDelta: 1.4
+      }
+      // expect(regionRect(region)).toMatchObject({
+      //   northLatitude: 90.05,
+      //   southLatitude: -90.1,
+      //   westLongitude: -90.1,
+      //   eastLongitude: -89.9
+      // })
+
+      expect(containsRegion(r1, r2)).toEqual(true)
+    })
   })
 })

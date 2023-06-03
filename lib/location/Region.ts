@@ -23,8 +23,11 @@ export const minRegionRadius = (region: Region) => {
   return Math.min(region.latitudeDelta, region.longitudeDelta) / 2
 }
 
+/**
+ * Returns true if any points in a region are contained within another region.
+ */
 export const containsRegion = (region: Region, other: Region) => {
-  return false
+  return containsRegionRect(regionRect(region), regionRect(other))
 }
 
 /**
