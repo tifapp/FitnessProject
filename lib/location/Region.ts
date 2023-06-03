@@ -1,4 +1,7 @@
-import { LocationCoordinate2D } from "./Location"
+import {
+  LocationCoordinate2D,
+  earthCircumfrenceMetersAtLatitude
+} from "./Location"
 
 /**
  * A type representing the area around a given lat-lng coordinate.
@@ -22,6 +25,18 @@ export type RegionRect = {
 export const minRegionRadius = (region: Region) => {
   return Math.min(region.latitudeDelta, region.longitudeDelta) / 2
 }
+
+export const regionLongitudeDeltaToMeters = (region: Region) => {
+  return (
+    (0.86737863 *
+      (2 * Math.PI * earthCircumfrenceMetersAtLatitude(region.latitude))) /
+    360
+  )
+}
+
+// export const longitudeDeltaToMeters = (delta: number) => {
+//   return (longitude delta) * (circumference of the Earth at the given latitude) / 360
+// }
 
 /**
  * Returns true if any points in a region are contained within another region.

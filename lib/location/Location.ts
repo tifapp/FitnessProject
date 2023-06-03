@@ -135,3 +135,7 @@ export const milesBetweenLocations = (
 export const hashLocationCoordinate = (coordinate: LocationCoordinate2D) => {
   return geohash.encode(coordinate.latitude, coordinate.longitude)
 }
+
+export const earthCircumfrenceMetersAtLatitude = (latitude: number) => {
+  return 2 * Math.PI * EARTH_RADIUS_METERS * Math.cos(latitude)
+}

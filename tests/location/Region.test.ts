@@ -3,10 +3,23 @@ import {
   containsRegionRect,
   minRegionRadius,
   mockLocationCoordinate2D,
+  regionLongitudeDeltaToMeters,
   regionRect
 } from "@lib/location"
 
 describe("Region tests", () => {
+  describe("LatLngDeltaToMeters tests", () => {
+    test("longitude delta to meters", () => {
+      const region = {
+        latitude: 92.7863,
+        longitude: -90,
+        latitudeDelta: 0.3,
+        longitudeDelta: 0.2
+      }
+      expect(regionLongitudeDeltaToMeters(region)).toBeCloseTo(66114.211)
+    })
+  })
+
   describe("minRegionRadius tests", () => {
     it("uses half the minimum of the lat and lng delta as the min radius", () => {
       const region = {
@@ -212,26 +225,12 @@ describe("Region tests", () => {
         latitudeDelta: 0.3,
         longitudeDelta: 0.2
       }
-      // expect(regionRect(region)).toMatchObject({
-      //   northLatitude: 90.15,
-      //   southLatitude: 89.85,
-      //   westLongitude: -90.1,
-      //   eastLongitude: -89.9
-      // })
-
       const r2 = {
         latitude: 89.8,
         longitude: -90.8,
         latitudeDelta: 0.5,
         longitudeDelta: 1.4
       }
-      // expect(regionRect(region)).toMatchObject({
-      //   northLatitude: 90.05,
-      //   southLatitude: -90.1,
-      //   westLongitude: -90.1,
-      //   eastLongitude: -89.9
-      // })
-
       expect(containsRegion(r1, r2)).toEqual(true)
     })
   })
