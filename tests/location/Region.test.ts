@@ -1,7 +1,8 @@
 import {
   containsRegion,
   minRegionRadius,
-  mockLocationCoordinate2D
+  mockLocationCoordinate2D,
+  regionRect
 } from "@lib/location"
 
 describe("Region tests", () => {
@@ -17,6 +18,23 @@ describe("Region tests", () => {
       region.latitudeDelta = 0.5
       region.longitudeDelta = 0.3
       expect(minRegionRadius(region)).toEqual(0.15)
+    })
+  })
+
+  describe("regionRect tests", () => {
+    test("basics", () => {
+      const region = {
+        latitude: 90,
+        longitude: -90,
+        latitudeDelta: 0.3,
+        longitudeDelta: 0.2
+      }
+      expect(regionRect(region)).toMatchObject({
+        topLeft: { latitude: 90.15, longitude: -90.1 },
+        topRight: { latitude: 90.15, longitude: -89.9 },
+        bottomLeft: { latitude: 89.85, longitude: -90.1 },
+        bottomRight: { latitude: 89.85, longitude: -89.9 }
+      })
     })
   })
 
