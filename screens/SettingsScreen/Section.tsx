@@ -20,9 +20,7 @@ export const Section = ({
   title
 }: SectionProps) => {
   return (
-    <View
-      style={[styles.paddingIconSection, style, { alignSelf: "flex-start" }]}
-    >
+    <View style={[styles.paddingIconSection, style]}>
       <View style={styles.spacing}>
         <View style={{ alignItems: "center", justifyContent: "center" }}>
           <Ionicon
@@ -33,39 +31,37 @@ export const Section = ({
         </View>
       </View>
 
-      <View style={{ justifyContent: "center" }}>
+      <View style={{ flex: 1 }}>
         <Headline
           style={[
             styles.textColor,
-            { textAlignVertical: "center", textAlign: "left" }
+            {
+              textAlignVertical: "center",
+              textAlign: "left"
+            }
           ]}
         >
           {title}
         </Headline>
 
-        {caption
-          ? (
-            <View style={{ flex: 1, flexDirection: "row", maxWidth: "80%" }}>
-              <Caption style={[styles.textColor, { textAlign: "left" }]}>
-                {caption}
-              </Caption>
-            </View>
-          )
-          : null}
+        {caption && (
+          <View style={{ marginTop: 4 }}>
+            <Caption>{caption}</Caption>
+          </View>
+        )}
       </View>
 
-      {addOn
-        ? (
-          <View
-            style={[
-              styles.flexRow,
-              { alignItems: "center", justifyContent: "flex-end" }
-            ]}
-          >
-            {addOn}
-          </View>
-        )
-        : null}
+      {addOn && (
+        <View
+          style={{
+            marginRight: 8,
+            alignItems: "flex-end",
+            justifyContent: "flex-end"
+          }}
+        >
+          {addOn}
+        </View>
+      )}
     </View>
   )
 }
@@ -80,8 +76,10 @@ const styles = StyleSheet.create({
     backgroundColor: "white"
   },
   paddingIconSection: {
+    display: "flex",
     paddingVertical: 8,
-    alignItems: "center"
+    alignItems: "center",
+    width: "100%"
   },
   iconSection: {
     backgroundColor: "#F4F4F6",
