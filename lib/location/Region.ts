@@ -52,5 +52,8 @@ export const regionRect = (region: Region): RegionRect => ({
 })
 
 export const containsRegionRect = (rect1: RegionRect, rect2: RegionRect) => {
-  return true
+  return (
+    rect1.bottomLeft.latitude <= rect2.topLeft.latitude &&
+    rect1.bottomLeft.latitude >= rect2.bottomLeft.latitude
+  )
 }
