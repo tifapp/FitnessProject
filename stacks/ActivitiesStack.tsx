@@ -18,7 +18,6 @@ import {
   createContentReportingStackScreens
 } from "@screens/Reporting"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
-import { TestChatRoomScreen } from "@screens/testScreens/TestChatRoomScreen"
 import { TestEventFormScreen } from "@screens/testScreens/TestEventFormScreen"
 import { TestNotifScreen } from "@screens/testScreens/TestNotifScreen"
 
@@ -117,8 +116,12 @@ export default function ActivitiesStack () {
 export function TabNavigation () {
   return (
     <Tab.Navigator tabBar={(props) => <BottomNavTabBar {...props} />}>
-      <Tab.Screen name="Map" component={ActivitiesStack} />
-      <Tab.Screen name="Chat Room" component={TestChatRoomScreen} />
+      <Tab.Screen
+        name="Map"
+        component={ActivitiesStack}
+        options={{ tabBarVisible: false }}
+      />
+      <Tab.Screen name="Chat Room" component={SettingsScreen} />
       <Tab.Screen name="Event Form" component={TestEventFormScreen} />
       <Tab.Screen name="Notifications" component={TestNotifScreen} />
       <Tab.Screen

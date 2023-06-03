@@ -1,4 +1,3 @@
-import { Title } from "@components/Text"
 import ConfirmationDialogue from "@components/profileImageComponents/ConfirmationDialogue"
 import { delayData } from "@lib/DelayData"
 import { AttendeeEntry } from "@screens/EventAttendeesList/attendeeEntry"
@@ -19,7 +18,7 @@ export const AttendeesListScreen = () => {
     return (
       <View
         style={{
-          height: 1,
+          height: 2,
           width: "100%"
         }}
       />
@@ -28,7 +27,6 @@ export const AttendeesListScreen = () => {
 
   return (
     <View style={{ flex: 1, marginTop: 24, marginHorizontal: 16 }}>
-      <Title style={{ marginTop: 8 }}>Attendees List</Title>
       <FlatList
         ItemSeparatorComponent={FlatSeparator}
         data={someData}
