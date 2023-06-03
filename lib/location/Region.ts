@@ -15,3 +15,7 @@ export type Region = LocationCoordinate2D & {
 export const minRegionRadius = (region: Region) => {
   return Math.min(region.latitudeDelta, region.longitudeDelta) / 2
 }
+
+export const containsRegion = (region: Region, other: Region) => {
+  return false
+}
