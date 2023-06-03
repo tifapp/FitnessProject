@@ -9,10 +9,10 @@ export type Region = LocationCoordinate2D & {
 }
 
 export type RegionRect = {
-  topLeft: LocationCoordinate2D
-  topRight: LocationCoordinate2D
-  bottomLeft: LocationCoordinate2D
-  bottomRight: LocationCoordinate2D
+  northLatitude: number
+  southLatitude: number
+  westLongitude: number
+  eastLongitude: number
 }
 
 /**
@@ -33,27 +33,59 @@ export const containsRegion = (region: Region, other: Region) => {
  * @returns see {@link RegionRect}
  */
 export const regionRect = (region: Region): RegionRect => ({
-  topLeft: {
-    latitude: region.latitude + region.latitudeDelta / 2,
-    longitude: region.longitude - region.longitudeDelta / 2
-  },
-  topRight: {
-    latitude: region.latitude + region.latitudeDelta / 2,
-    longitude: region.longitude + region.longitudeDelta / 2
-  },
-  bottomLeft: {
-    latitude: region.latitude - region.latitudeDelta / 2,
-    longitude: region.longitude - region.longitudeDelta / 2
-  },
-  bottomRight: {
-    latitude: region.latitude - region.latitudeDelta / 2,
-    longitude: region.longitude + region.longitudeDelta / 2
-  }
+  northLatitude: region.latitude + region.latitudeDelta / 2,
+  southLatitude: region.latitude - region.latitudeDelta / 2,
+  eastLongitude: region.longitude + region.longitudeDelta / 2,
+  westLongitude: region.longitude - region.longitudeDelta / 2
 })
 
+/**
+ * Returns true if any of the points in `rect1` are contained in `rect2`.
+ */
 export const containsRegionRect = (rect1: RegionRect, rect2: RegionRect) => {
+  const isTopLeftIntersection =
+    isTopIntersection(rect1, rect2) && isLeftIntersection(rect1, rect2)
+
+  const isTopRightIntersection =
+    isTopIntersection(rect1, rect2) && isRightIntersection(rect1, rect2)
+
+  const isBottomRightIntersection =
+    isBottomIntersection(rect1, rect2) && isRightIntersection(rect1, rect2)
+
+  const isBottomLeftIntersection =
+    isBottomIntersection(rect1, rect2) && isLeftIntersection(rect1, rect2)
   return (
-    rect1.bottomLeft.latitude <= rect2.topLeft.latitude &&
-    rect1.bottomLeft.latitude >= rect2.bottomLeft.latitude
+    isTopLeftIntersection ||
+    isTopRightIntersection ||
+    isBottomLeftIntersection ||
+    isBottomRightIntersection
+  )
+}
+
+const isTopIntersection = (rect1: RegionRect, rect2: RegionRect) => {
+  return (
+    rect1.southLatitude >= rect2.southLatitude &&
+    rect1.southLatitude <= rect2.northLatitude
+  )
+}
+
+const isBottomIntersection = (rect1: RegionRect, rect2: RegionRect) => {
+  return (
+    rect1.northLatitude >= rect2.southLatitude &&
+    rect1.northLatitude <= rect2.northLatitude
+  )
+}
+
+const isLeftIntersection = (rect1: RegionRect, rect2: RegionRect) => {
+  return (
+    rect1.eastLongitude >= rect2.westLongitude &&
+    rect1.eastLongitude <= rect2.eastLongitude
+  )
+}
+
+const isRightIntersection = (rect1: RegionRect, rect2: RegionRect) => {
+  return (
+    rect1.westLongitude >= rect2.westLongitude &&
+    rect1.westLongitude <= rect2.eastLongitude
   )
 }

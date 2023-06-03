@@ -32,10 +32,10 @@ describe("Region tests", () => {
           longitudeDelta: 0.2
         }
         expect(regionRect(region)).toMatchObject({
-          topLeft: { latitude: 90.15, longitude: -90.1 },
-          topRight: { latitude: 90.15, longitude: -89.9 },
-          bottomLeft: { latitude: 89.85, longitude: -90.1 },
-          bottomRight: { latitude: 89.85, longitude: -89.9 }
+          northLatitude: 90.15,
+          southLatitude: 89.85,
+          westLongitude: -90.1,
+          eastLongitude: -89.9
         })
       })
     })
@@ -43,10 +43,10 @@ describe("Region tests", () => {
     describe("Intersection tests", () => {
       test("same region rect intersects", () => {
         const rect = {
-          topLeft: { latitude: 90.15, longitude: -90.1 },
-          topRight: { latitude: 90.15, longitude: -89.9 },
-          bottomLeft: { latitude: 89.85, longitude: -90.1 },
-          bottomRight: { latitude: 89.85, longitude: -89.9 }
+          northLatitude: 90.15,
+          southLatitude: 89.85,
+          westLongitude: -90.1,
+          eastLongitude: -89.9
         }
         expect(containsRegionRect(rect, rect)).toEqual(true)
       })
@@ -55,19 +55,133 @@ describe("Region tests", () => {
         expect(
           containsRegionRect(
             {
-              topLeft: { latitude: 90.15, longitude: -11.1 },
-              topRight: { latitude: 90.15, longitude: -13.9 },
-              bottomLeft: { latitude: 89.85, longitude: -11.1 },
-              bottomRight: { latitude: 89.85, longitude: -13.9 }
+              northLatitude: 90.15,
+              southLatitude: 89.85,
+              westLongitude: -13.9,
+              eastLongitude: -11.9
             },
             {
-              topLeft: { latitude: 12.15, longitude: -90.1 },
-              topRight: { latitude: 13.15, longitude: -89.9 },
-              bottomLeft: { latitude: 12.85, longitude: -90.1 },
-              bottomRight: { latitude: 13.85, longitude: -89.9 }
+              northLatitude: 11.15,
+              southLatitude: 13.85,
+              westLongitude: -90.9,
+              eastLongitude: -92.9
             }
           )
         ).toEqual(false)
+      })
+
+      test("top partial intersection does not contain rect", () => {
+        expect(
+          containsRegionRect(
+            {
+              northLatitude: 90.15,
+              southLatitude: 89.85,
+              westLongitude: -13.1,
+              eastLongitude: -12.9
+            },
+            {
+              northLatitude: 91.1,
+              southLatitude: 90.1,
+              westLongitude: -15.003,
+              eastLongitude: -14.003
+            }
+          )
+        ).toEqual(false)
+      })
+
+      test("bottom partial intersection does not contain rect", () => {
+        expect(
+          containsRegionRect(
+            {
+              northLatitude: 90.15,
+              southLatitude: 89.85,
+              westLongitude: -13.1,
+              eastLongitude: -12.9
+            },
+            {
+              northLatitude: 93.1,
+              southLatitude: 92.1,
+              westLongitude: -14.003,
+              eastLongitude: -13.003
+            }
+          )
+        ).toEqual(false)
+      })
+
+      test("top left intersection", () => {
+        expect(
+          containsRegionRect(
+            {
+              northLatitude: 90.15,
+              southLatitude: 89.85,
+              westLongitude: -13.1,
+              eastLongitude: -12.9
+            },
+            {
+              northLatitude: 91.1,
+              southLatitude: 90.1,
+              westLongitude: -14.003,
+              eastLongitude: -13.003
+            }
+          )
+        ).toEqual(true)
+      })
+
+      test("top right intersection", () => {
+        expect(
+          containsRegionRect(
+            {
+              northLatitude: 90.15,
+              southLatitude: 89.85,
+              westLongitude: -13.1,
+              eastLongitude: -12.9
+            },
+            {
+              northLatitude: 91.1,
+              southLatitude: 90.1,
+              westLongitude: -13.003,
+              eastLongitude: -12.003
+            }
+          )
+        ).toEqual(true)
+      })
+
+      test("bottom left intersection", () => {
+        expect(
+          containsRegionRect(
+            {
+              northLatitude: 90.15,
+              southLatitude: 89.85,
+              westLongitude: -13.1,
+              eastLongitude: -12.9
+            },
+            {
+              northLatitude: 89.9,
+              southLatitude: 88.9,
+              westLongitude: -14.003,
+              eastLongitude: -13.003
+            }
+          )
+        ).toEqual(true)
+      })
+
+      test("bottom right intersection", () => {
+        expect(
+          containsRegionRect(
+            {
+              northLatitude: 90.15,
+              southLatitude: 89.85,
+              westLongitude: -13.1,
+              eastLongitude: -12.9
+            },
+            {
+              northLatitude: 89.9,
+              southLatitude: 88.9,
+              westLongitude: -13.003,
+              eastLongitude: -12.003
+            }
+          )
+        ).toEqual(true)
       })
     })
   })
