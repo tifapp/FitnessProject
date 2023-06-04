@@ -9,7 +9,7 @@ export type Region = LocationCoordinate2D & {
 }
 
 export const isSignificantlyDifferentRegions = (r1: Region, r2: Region) => {
-  return false
+  return !containsRegion(r1, r2)
 }
 
 /**

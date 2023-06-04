@@ -241,5 +241,24 @@ describe("Region tests", () => {
       }
       expect(isSignificantlyDifferentRegions(region, region)).toEqual(false)
     })
+
+    it("returns true when regions are not contained within each other", () => {
+      expect(
+        isSignificantlyDifferentRegions(
+          {
+            latitude: 0.0,
+            longitude: 0.0,
+            latitudeDelta: 0.3,
+            longitudeDelta: 0.2
+          },
+          {
+            latitude: 90,
+            longitude: -90,
+            latitudeDelta: 0.3,
+            longitudeDelta: 0.2
+          }
+        )
+      ).toEqual(true)
+    })
   })
 })
