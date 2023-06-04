@@ -1,37 +1,32 @@
 import {
   containsRegion,
   containsRegionRect,
-  minRegionRadius,
-  mockLocationCoordinate2D,
-  regionLongitudeDeltaToMeters,
+  minRegionMeterRadius,
   regionRect
 } from "@lib/location"
 
 describe("Region tests", () => {
-  describe("LatLngDeltaToMeters tests", () => {
-    test("longitude delta to meters", () => {
-      const region = {
-        latitude: 92.7863,
-        longitude: -90,
-        latitudeDelta: 0.3,
-        longitudeDelta: 0.2
-      }
-      expect(regionLongitudeDeltaToMeters(region)).toBeCloseTo(66114.211)
+  describe("minRegionMeterRadius tests", () => {
+    it("uses the latitude delta meter length when latitude delta less then longitude delta", () => {
+      expect(
+        minRegionMeterRadius({
+          latitude: 88.1,
+          longitude: 44.1,
+          latitudeDelta: 0.2,
+          longitudeDelta: 0.3
+        })
+      ).toBeCloseTo(11119.49)
     })
-  })
 
-  describe("minRegionRadius tests", () => {
-    it("uses half the minimum of the lat and lng delta as the min radius", () => {
-      const region = {
-        ...mockLocationCoordinate2D(),
-        latitudeDelta: 0.2,
-        longitudeDelta: 0.3
-      }
-      expect(minRegionRadius(region)).toEqual(0.1)
-
-      region.latitudeDelta = 0.5
-      region.longitudeDelta = 0.3
-      expect(minRegionRadius(region)).toEqual(0.15)
+    it("uses the longitude delta meter length when longitude delta less then latitude delta", () => {
+      expect(
+        minRegionMeterRadius({
+          latitude: 88.1,
+          longitude: 44.1,
+          latitudeDelta: 0.8,
+          longitudeDelta: 0.7
+        })
+      ).toBeCloseTo(1290.338)
     })
   })
 

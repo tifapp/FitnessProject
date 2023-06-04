@@ -101,11 +101,11 @@ export const mockTrackedLocationCoordinate = (date?: Date) => ({
 })
 
 /**
- * Computes the number of miles between 2 locations using the haversine formula.
+ * Computes the number of meters between 2 locations using the haversine formula.
  *
  * For more info on the math: https://en.wikipedia.org/wiki/Haversine_formula
  */
-export const milesBetweenLocations = (
+export const metersBetweenLocations = (
   location1: LocationCoordinate2D,
   location2: LocationCoordinate2D
 ) => {
@@ -119,14 +119,25 @@ export const milesBetweenLocations = (
     location2.longitude - location1.longitude
   )
 
-  const sin2HalfLatDelta = sin2(latDeltaRadians / 2)
+  const latDelta = sin2(latDeltaRadians / 2)
   const latCos = Math.cos(lat1Radians) * Math.cos(lat2Radians)
-  const sin2HalfLngDelta = sin2(lngDeltaRadians / 2)
-  const trigCombo = sin2HalfLatDelta + latCos * sin2HalfLngDelta
+  const lngDelta = sin2(lngDeltaRadians / 2)
 
-  return metersToMiles(
-    2 * EARTH_RADIUS_METERS * Math.asin(Math.sqrt(trigCombo))
+  return (
+    2 * EARTH_RADIUS_METERS * Math.asin(Math.sqrt(latDelta + latCos * lngDelta))
   )
+}
+
+/**
+ * Computes the number of miles between 2 locations using the haversine formula.
+ *
+ * For more info on the math: https://en.wikipedia.org/wiki/Haversine_formula
+ */
+export const milesBetweenLocations = (
+  location1: LocationCoordinate2D,
+  location2: LocationCoordinate2D
+) => {
+  return metersToMiles(metersBetweenLocations(location1, location2))
 }
 
 /**
@@ -134,8 +145,4 @@ export const milesBetweenLocations = (
  */
 export const hashLocationCoordinate = (coordinate: LocationCoordinate2D) => {
   return geohash.encode(coordinate.latitude, coordinate.longitude)
-}
-
-export const earthCircumfrenceMetersAtLatitude = (latitude: number) => {
-  return 2 * Math.PI * EARTH_RADIUS_METERS * Math.cos(latitude)
 }

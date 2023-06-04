@@ -1,7 +1,4 @@
-import {
-  LocationCoordinate2D,
-  earthCircumfrenceMetersAtLatitude
-} from "./Location"
+import { LocationCoordinate2D, metersBetweenLocations } from "./Location"
 
 /**
  * A type representing the area around a given lat-lng coordinate.
@@ -11,6 +8,9 @@ export type Region = LocationCoordinate2D & {
   longitudeDelta: number
 }
 
+/**
+ * The area of a region of latlng coordinates enclosed in a rectangle.
+ */
 export type RegionRect = {
   northLatitude: number
   southLatitude: number
@@ -19,24 +19,18 @@ export type RegionRect = {
 }
 
 /**
- * Takes the minimum radius of the latitude and longitude delta of a region.
- * The minimum radius is defined as the half the minimum of the latitude and longitude deltas.
+ * Computes the minimum radius in meters of a region.
+ *
+ * The minimum radius is computed based on the minimum of the latitude and longitude delta.
  */
-export const minRegionRadius = (region: Region) => {
-  return Math.min(region.latitudeDelta, region.longitudeDelta) / 2
+export const minRegionMeterRadius = (region: Region) => {
+  const isMinLatitude = region.latitudeDelta < region.longitudeDelta
+  return metersBetweenLocations(region, {
+    latitude: region.latitude + (isMinLatitude ? region.latitudeDelta / 2 : 0),
+    longitude:
+      region.longitude + (!isMinLatitude ? region.longitudeDelta / 2 : 0)
+  })
 }
-
-export const regionLongitudeDeltaToMeters = (region: Region) => {
-  return (
-    (0.86737863 *
-      (2 * Math.PI * earthCircumfrenceMetersAtLatitude(region.latitude))) /
-    360
-  )
-}
-
-// export const longitudeDeltaToMeters = (delta: number) => {
-//   return (longitude delta) * (circumference of the Earth at the given latitude) / 360
-// }
 
 /**
  * Returns true if any points in a region are contained within another region.
