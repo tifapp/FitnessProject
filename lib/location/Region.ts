@@ -1,3 +1,4 @@
+import { milesToMeters } from "@lib/Math"
 import { LocationCoordinate2D, metersBetweenLocations } from "./Location"
 
 /**
@@ -8,8 +9,37 @@ export type Region = LocationCoordinate2D & {
   longitudeDelta: number
 }
 
-export const isSignificantlyDifferentRegions = (r1: Region, r2: Region) => {
-  return !containsRegion(r1, r2)
+/**
+ * Returns true if 2 regions are either not contained within each other,
+ * or have a minimum radius difference above the given threshold (in meters).
+ *
+ * The minimum radius of a region is computed based on the minimum of
+ * its latitude and longitude delta.
+ *
+ * @param r1 see {@link Region}
+ * @param r2 see {@link Region}
+ * @param radiusMetersDifferenceThreshold the minimum radius difference threshold if the regions are contained within each other
+ */
+export const isSignificantlyDifferentRegions = (
+  r1: Region,
+  r2: Region,
+  radiusMetersDifferenceThreshold: number = milesToMeters(5)
+) => {
+  const isAboveRadiusDiffThreshold = isMinRadiusDifferenceAboveThreshold(
+    r1,
+    r2,
+    radiusMetersDifferenceThreshold
+  )
+  return !containsRegion(r1, r2) || isAboveRadiusDiffThreshold
+}
+
+const isMinRadiusDifferenceAboveThreshold = (
+  r1: Region,
+  r2: Region,
+  thresholdMeters: number
+) => {
+  const radiusDiff = minRegionMeterRadius(r1) - minRegionMeterRadius(r2)
+  return Math.abs(radiusDiff) > thresholdMeters
 }
 
 /**

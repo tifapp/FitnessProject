@@ -234,8 +234,8 @@ describe("Region tests", () => {
   describe("isSignificantlyDifferentRegion tests", () => {
     it("returns false when same regions", () => {
       const region = {
-        latitude: 90,
-        longitude: -90,
+        latitude: 88.18372789,
+        longitude: -44.1312789,
         latitudeDelta: 0.3,
         longitudeDelta: 0.2
       }
@@ -252,13 +252,53 @@ describe("Region tests", () => {
             longitudeDelta: 0.2
           },
           {
-            latitude: 90,
-            longitude: -90,
+            latitude: 88.18372789,
+            longitude: -44.1312789,
             latitudeDelta: 0.3,
             longitudeDelta: 0.2
           }
         )
       ).toEqual(true)
+    })
+
+    it("returns true when regions are contained within each other and min radius distance greater then threshold", () => {
+      expect(
+        isSignificantlyDifferentRegions(
+          {
+            latitude: 88.18372789,
+            longitude: -44.1312789,
+            latitudeDelta: 0.0000003,
+            longitudeDelta: 0.0000002
+          },
+          {
+            latitude: 88.18372789,
+            longitude: -44.1312789,
+            latitudeDelta: 0.88881837,
+            longitudeDelta: 0.7188872
+          },
+          1000
+        )
+      ).toEqual(true)
+    })
+
+    it("returns false when regions are contained within each other and min radius distance lower then threshold", () => {
+      expect(
+        isSignificantlyDifferentRegions(
+          {
+            latitude: 88.18372789,
+            longitude: -44.1312789,
+            latitudeDelta: 0.29999,
+            longitudeDelta: 0.19999
+          },
+          {
+            latitude: 88.18372789,
+            longitude: -44.1312789,
+            latitudeDelta: 0.39877297,
+            longitudeDelta: 0.2901902
+          },
+          1000
+        )
+      ).toEqual(false)
     })
   })
 })
