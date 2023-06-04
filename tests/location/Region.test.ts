@@ -1,6 +1,7 @@
 import {
   containsRegion,
   containsRegionRect,
+  isSignificantlyDifferentRegions,
   minRegionMeterRadius,
   regionRect
 } from "@lib/location"
@@ -227,6 +228,18 @@ describe("Region tests", () => {
         longitudeDelta: 1.4
       }
       expect(containsRegion(r1, r2)).toEqual(true)
+    })
+  })
+
+  describe("isSignificantlyDifferentRegion tests", () => {
+    it("returns false when same regions", () => {
+      const region = {
+        latitude: 90,
+        longitude: -90,
+        latitudeDelta: 0.3,
+        longitudeDelta: 0.2
+      }
+      expect(isSignificantlyDifferentRegions(region, region)).toEqual(false)
     })
   })
 })

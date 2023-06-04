@@ -8,14 +8,8 @@ export type Region = LocationCoordinate2D & {
   longitudeDelta: number
 }
 
-/**
- * The area of a region of latlng coordinates enclosed in a rectangle.
- */
-export type RegionRect = {
-  northLatitude: number
-  southLatitude: number
-  westLongitude: number
-  eastLongitude: number
+export const isSignificantlyDifferentRegions = (r1: Region, r2: Region) => {
+  return false
 }
 
 /**
@@ -37,6 +31,16 @@ export const minRegionMeterRadius = (region: Region) => {
  */
 export const containsRegion = (region: Region, other: Region) => {
   return containsRegionRect(regionRect(region), regionRect(other))
+}
+
+/**
+ * The area of a region of latlng coordinates enclosed in a rectangle.
+ */
+export type RegionRect = {
+  northLatitude: number
+  southLatitude: number
+  westLongitude: number
+  eastLongitude: number
 }
 
 /**
