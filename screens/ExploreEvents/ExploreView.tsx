@@ -1,3 +1,4 @@
+import { Headline } from "@components/Text"
 import { CurrentUserEvent } from "@lib/events"
 import { LocationCoordinate2D } from "@lib/location"
 import React, { useState } from "react"
@@ -23,4 +24,6 @@ export type ExploreEventsProps = {
   style?: StyleProp<ViewStyle>
 }
 
-export const ExploreEventsView = ({ style }: ExploreEventsProps) => <></>
+export const ExploreEventsView = ({ style }: ExploreEventsProps) => (
+  <Headline>TODO: Build the screen</Headline>
+)
