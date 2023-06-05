@@ -14,7 +14,7 @@ export const useExploreEvents = (
   { fetchEvents }: ExploreEventsEnvironment
 ) => {
   const events = useQuery(["explore-events", initialCenter], async () => {
-    await fetchEvents({
+    return await fetchEvents({
       ...initialCenter!,
       latitudeDelta: 0,
       longitudeDelta: 0

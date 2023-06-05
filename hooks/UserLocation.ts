@@ -28,10 +28,6 @@ export namespace UserLocationDependencyKeys {
   export const currentCoordinates = createDependencyKey<QueryUserCoordinates>(
     () => expoQueryUserCoordinates
   )
-
-  export const permissionStatus = createDependencyKey<PermissionStatus>(
-    PermissionStatus.UNDETERMINED
-  )
 }
 
 /**
@@ -101,8 +97,4 @@ export const useUserCoordinatesQuery = (
     ["user-coordinates", accurracy],
     async () => await query(accurracy)
   )
-}
-
-export const useUserLocationPermissionStatus = () => {
-  return useDependencyValue(UserLocationDependencyKeys.permissionStatus)
 }
