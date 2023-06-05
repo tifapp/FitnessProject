@@ -1,8 +1,9 @@
+import { SkeletonView } from "@components/common/Skeleton"
 import ConfirmationDialogue from "@components/profileImageComponents/ConfirmationDialogue"
 import { delayData } from "@lib/DelayData"
 import { AttendeeEntry } from "@screens/EventAttendeesList/attendeeEntry"
 import React from "react"
-import { FlatList, View } from "react-native"
+import { FlatList, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { useQuery } from "react-query"
 import { AttendeeListMocks } from "./AttendeesMocks"
 
@@ -13,6 +14,43 @@ export const AttendeesListScreen = () => {
 
   const someData = someQuery.data ?? []
   // List of attendees
+
+  type NoAttendeesProps = {
+    style?: StyleProp<ViewStyle>
+  }
+
+  const NoAttendeesView = ({ style }: NoAttendeesProps) => {
+    return (
+      <View style={style}>
+        <View testID="loading-attendees">
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+        </View>
+      </View>
+    )
+  }
+
+  const SkeletonResult = () => (
+    <View style={styles.skeletonContainer}>
+      <SkeletonView style={styles.skeletonIcon} />
+      <View>
+        <SkeletonView style={styles.skeletionHeadline} />
+        <SkeletonView style={styles.skeletonCaption} />
+      </View>
+    </View>
+  )
 
   const FlatSeparator = () => {
     return (
@@ -26,13 +64,13 @@ export const AttendeesListScreen = () => {
   }
 
   return (
-    <View style={{ flex: 1, marginTop: 24, marginHorizontal: 16 }}>
+    <View style={styles.listContainer}>
       <FlatList
         ItemSeparatorComponent={FlatSeparator}
         data={someData}
         renderItem={({ item }) => (
           <>
-            <View style={{ flex: 1, flexDirection: "row", marginTop: 8 }}>
+            <View style={styles.entryContainer}>
               <AttendeeEntry attendee={item} />
               <ConfirmationDialogue
                 style={{
@@ -45,7 +83,41 @@ export const AttendeesListScreen = () => {
             </View>
           </>
         )}
+        ListEmptyComponent={
+          <NoAttendeesView style={styles.horizontalPadding} />
+        }
       />
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  listContainer: { flex: 1, marginTop: 24, marginHorizontal: 16 },
+  entryContainer: { flex: 1, flexDirection: "row", marginTop: 8 },
+  skeletonContainer: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 16
+  },
+  skeletonIcon: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    marginRight: 8
+  },
+  skeletionHeadline: {
+    width: 128,
+    height: 16,
+    marginBottom: 4,
+    borderRadius: 12
+  },
+  skeletonCaption: {
+    width: 256,
+    height: 12,
+    borderRadius: 12
+  },
+  horizontalPadding: {
+    paddingHorizontal: 16
+  }
+})
