@@ -1,22 +1,27 @@
 import { Headline } from "@components/Text"
 import { CurrentUserEvent } from "@lib/events"
-import { LocationCoordinate2D } from "@lib/location"
+import { LocationCoordinate2D, Region } from "@lib/location"
 import React, { useState } from "react"
 import { StyleProp, ViewStyle } from "react-native"
 import { useQuery } from "react-query"
 
+export type ExploreEventsEnvironment = {
+  fetchEvents: (region: Region) => Promise<CurrentUserEvent[]>
+}
+
 export const useExploreEvents = (
-  fetchEvents: (center: LocationCoordinate2D) => Promise<CurrentUserEvent[]>
+  initialCenter: LocationCoordinate2D | undefined,
+  { fetchEvents }: ExploreEventsEnvironment
 ) => {
-  const [center, setCenter] = useState<LocationCoordinate2D | undefined>()
-  const events = useQuery(
-    ["explore-events", center],
-    async () => await fetchEvents(center!),
-    { enabled: !!center }
-  )
+  const events = useQuery(["explore-events", initialCenter], async () => {
+    await fetchEvents({
+      ...initialCenter!,
+      latitudeDelta: 0,
+      longitudeDelta: 0
+    })
+  })
   return {
-    events,
-    regionUpdated: setCenter
+    events
   }
 }
 

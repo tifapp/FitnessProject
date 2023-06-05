@@ -7,6 +7,7 @@ import {
   expoQueryUserCoordinates,
   expoTrackUserLocation
 } from "@lib/location/UserLocation"
+import { PermissionStatus } from "expo-location"
 import { useEffect, useState } from "react"
 import { useQuery } from "react-query"
 
@@ -26,6 +27,10 @@ export namespace UserLocationDependencyKeys {
    */
   export const currentCoordinates = createDependencyKey<QueryUserCoordinates>(
     () => expoQueryUserCoordinates
+  )
+
+  export const permissionStatus = createDependencyKey<PermissionStatus>(
+    PermissionStatus.UNDETERMINED
   )
 }
 
@@ -96,4 +101,8 @@ export const useUserCoordinatesQuery = (
     ["user-coordinates", accurracy],
     async () => await query(accurracy)
   )
+}
+
+export const useUserLocationPermissionStatus = () => {
+  return useDependencyValue(UserLocationDependencyKeys.permissionStatus)
 }
