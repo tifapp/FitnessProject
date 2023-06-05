@@ -7,7 +7,7 @@ import { useFontScale } from "@hooks/Fonts"
 import React, { ComponentProps } from "react"
 import {
   StyleProp,
-  TouchableHighlightProps,
+  TouchableOpacityProps,
   TouchableOpacity,
   ViewProps,
   ViewStyle
@@ -94,7 +94,7 @@ export const Ionicon = ({
 
 export type IoniconButtonProps = {
   icon: IconProps<IoniconName>
-} & TouchableHighlightProps
+} & TouchableOpacityProps
 
 /**
  * An ionicon with no background that behaves like {@link TouchableOpacity}.

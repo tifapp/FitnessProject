@@ -1,15 +1,11 @@
-import EventsList from "@components/EventsList"
 import { BottomNavTabBar } from "@components/bottomTabComponents/BottomNavTabBar"
 import { headerOptions } from "@components/headerComponents/headerOptions"
 import { UserMocks } from "@lib/User"
-import { CurrentUserEvent, EventMocks } from "@lib/events"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { ActivitiesScreenNavWrapper } from "@screens/ActivitiesScreenNavWrapper"
-import { AttendeesListScreen } from "@screens/EventAttendeesList/AttendeesListScreen"
 import { EventDetailsProps } from "@screens/EventDetails/EventDetails"
-import { EventDetailsScreenNavWrapper } from "@screens/EventDetailsScreenNavWrapper"
-import { EventFormScreenProps } from "@screens/EventFormScreen"
+import { createEventDetailsStackScreens } from "@screens/EventDetails/EventScreensNavigation"
 import { EventFormScreenNavWrapper } from "@screens/EventFormScreenNavWrapper"
 import {
   LocationSearchPicker,
@@ -22,7 +18,7 @@ import {
   createContentReportingStackScreens
 } from "@screens/Reporting"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
-import { TestChatRoomScreen } from "@screens/testScreens/TestChatRoomScreen"
+import { TestEventFormScreen } from "@screens/testScreens/TestEventFormScreen"
 import { TestNotifScreen } from "@screens/testScreens/TestNotifScreen"
 
 const Stack = createStackNavigator<ActivitiesStackParamList>()
@@ -43,14 +39,9 @@ export enum ActivitiesScreenNames {
   REPORTING_SCREENS = "Reporting Screens"
 }
 
-const events: CurrentUserEvent[] = [
-  EventMocks.Multiday,
-  EventMocks.NoPlacemarkInfo,
-  EventMocks.PickupBasketball
-]
-
 export type ActivitiesStackParamList = {
-  [ActivitiesScreenNames.EVENT_FORM]: EventFormScreenProps
+  "Events Stack": undefined
+  [ActivitiesScreenNames.EVENT_FORM]: undefined
   [ActivitiesScreenNames.EVENT_DETAILS]: EventDetailsProps
   [ActivitiesScreenNames.MAP]: undefined
   [ActivitiesScreenNames.EVENT_LIST]: undefined
@@ -68,6 +59,9 @@ const reportingScreens =
   createContentReportingStackScreens<ActivitiesStackParamList>(Stack, () => {
     throw new Error()
   })
+
+const eventDetailsScreens =
+  createEventDetailsStackScreens<ActivitiesStackParamList>(Stack)
 
 export type EventFormScreenRouteProps = StackScreenProps<
   ActivitiesStackParamList,
@@ -90,15 +84,6 @@ export type ProfileScreenRouteProps = StackScreenProps<
   ActivitiesScreenNames.PROFILE_SCREEN
 >["route"]
 
-/* export type LocationSearchScreenRouteProps = StackScreenProps<
-  ActivitiesStackParamList,
-  ActivitiesScreenNames.LOCATION_SEARCH
->["route"] */
-/* export type GroupFeedScreenRouteProps = StackScreenProps<
-  ActivitiesStackParamList,
-  ActivitiesScreenNames.CHAT_ROOM
->["route"] */
-
 export default function ActivitiesStack () {
   return (
     <Stack.Navigator screenOptions={headerOptions}>
@@ -111,22 +96,8 @@ export default function ActivitiesStack () {
         component={EventFormScreenNavWrapper}
       />
       <Stack.Screen
-        name={ActivitiesScreenNames.EVENT_DETAILS}
-        component={EventDetailsScreenNavWrapper}
-        initialParams={{ event: events[2] }}
-      />
-      <Stack.Screen
-        name={ActivitiesScreenNames.EVENT_LIST}
-        component={EventsList}
-      />
-      <Stack.Screen
         name={ActivitiesScreenNames.LOCATION_SEARCH}
         component={LocationSearchPicker}
-      />
-      <Stack.Screen
-        name={ActivitiesScreenNames.PROFILE_SCREEN}
-        component={ProfileScreenNavWrapper}
-        initialParams={{user: UserMocks.Mia}}
       />
       <Stack.Screen
         name={ActivitiesScreenNames.SETTINGS_SCREEN}
@@ -136,14 +107,7 @@ export default function ActivitiesStack () {
         name={ActivitiesScreenNames.BOTTOM_NAV_TAB_BAR}
         component={BottomNavTabBar}
       />
-      <Stack.Screen
-        name={ActivitiesScreenNames.ATTENDEES_LIST}
-        component={AttendeesListScreen}
-      />
-      <Stack.Screen
-        name={ActivitiesScreenNames.CHAT_ROOM}
-        component={TestChatRoomScreen}
-      />
+      {eventDetailsScreens}
       {reportingScreens}
     </Stack.Navigator>
   )
@@ -152,21 +116,19 @@ export default function ActivitiesStack () {
 export function TabNavigation () {
   return (
     <Tab.Navigator tabBar={(props) => <BottomNavTabBar {...props} />}>
-      <Tab.Screen name="Map" component={ActivitiesStack} />
-      <Tab.Screen name="Chat Room" component={TestChatRoomScreen} />
       <Tab.Screen
-        name={ActivitiesScreenNames.EVENT_DETAILS}
-        component={EventDetailsScreenNavWrapper}
-        initialParams={{ event: events[2] }}
+        name="Map"
+        component={ActivitiesStack}
+        options={{ tabBarVisible: false }}
       />
+      <Tab.Screen name="Chat Room" component={SettingsScreen} />
+      <Tab.Screen name="Event Form" component={TestEventFormScreen} />
       <Tab.Screen name="Notifications" component={TestNotifScreen} />
       <Tab.Screen
         name="Profile"
         component={ProfileScreenNavWrapper}
-        initialParams={{user: UserMocks.Mia}}
+        initialParams={{ user: UserMocks.Mia }}
       />
     </Tab.Navigator>
   )
 }
-
-// BottomTabBarProps<BottomTabBarOptions>

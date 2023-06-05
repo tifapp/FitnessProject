@@ -3,16 +3,15 @@ import { TouchableIonicon } from "@components/common/Icons"
 import EventsMap, { MapRefMethods } from "@components/eventMap/EventsMap"
 import { useTrackUserLocation } from "@hooks/UserLocation"
 import { AppStyles } from "@lib/AppColorStyle"
+import { delayData } from "@lib/DelayData"
 import { CurrentUserEvent, EventMocks } from "@lib/events"
 import {
   UserLocationTrackingUpdate,
   requestLocationPermissions
 } from "@lib/location/UserLocation"
 import React, { useEffect, useRef } from "react"
-import { StyleSheet, TouchableOpacity } from "react-native"
-import { Icon } from "react-native-elements"
-import ProfileScreen from "./ProfileScreen/ProfileScreen"
-import { UserMocks } from "@lib/User"
+import { StyleSheet } from "react-native"
+import { useQuery } from "react-query"
 
 const MARKER_SIZE = 44
 const LATLNGDELTA = 0.5
@@ -34,11 +33,15 @@ const ActivitiesScreen = ({
     }
   }
 
-  const events: CurrentUserEvent[] = [
-    EventMocks.Multiday,
-    EventMocks.NoPlacemarkInfo,
-    EventMocks.PickupBasketball
-  ]
+  const eventsQuery = useQuery(["/event", "GET"], () =>
+    delayData([
+      EventMocks.Multiday,
+      EventMocks.NoPlacemarkInfo,
+      EventMocks.PickupBasketball
+    ])
+  )
+
+  const events = eventsQuery.data ?? []
 
   useEffect(() => {
     ;(async () => {

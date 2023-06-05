@@ -26,7 +26,7 @@ export const EventMarkerView = ({ color, attendeeCount }: EventMarkerProps) => {
 
       <View style={styles.whiteBackground}>
         <ImageBackground
-          source={require("../../assets/Windows_10_Default_Profile_Picture.svg.png")}
+          source={require("../../assets/default_profile.png")}
           style={styles.imageBackground}
         />
       </View>
