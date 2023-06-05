@@ -18,10 +18,7 @@ const ProfileImageAndName = ({
 }: ImageAndNameProps) => {
   return (
     <View style={[{ flexDirection: "row" }, style]}>
-      <ProfileImage
-        imageURL="@assets/Windows_10_Default_Profile_Picture.svg.png"
-        style={imageStyle}
-      />
+      <ProfileImage imageURL="@assets/default_profile.png" style={imageStyle} />
       <View style={{ marginLeft: 16 }}>
         <Headline style={{ marginBottom: 4 }}>{username}</Headline>
         <Caption>{userHandle}</Caption>
