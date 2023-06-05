@@ -17,6 +17,16 @@ describe("ExploreEvents tests", () => {
     beforeEach(() => jest.useFakeTimers())
     afterEach(() => jest.useRealTimers())
 
+    it("should use the initial provided region when fetching for first time", async () => {
+      const coordinates = mockLocationCoordinate2D()
+      renderUseExploreEvents(coordinates)
+      await waitFor(() => {
+        expect(fetchEvents).toHaveBeenCalledWith(
+          expect.objectContaining(coordinates)
+        )
+      })
+    })
+
     it("should use the user's location as the default center when no initial center is provided", async () => {
       const trackedCoordinates = mockTrackedLocationCoordinate()
       queryUserCoordinates.mockResolvedValue(trackedCoordinates)
