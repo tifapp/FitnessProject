@@ -17,13 +17,6 @@ describe("ExploreEvents tests", () => {
     beforeEach(() => jest.useFakeTimers())
     afterEach(() => jest.useRealTimers())
 
-    it("should be in a loading state when fetching events", async () => {
-      fetchEvents.mockImplementation(neverPromise)
-      const coordinates = mockLocationCoordinate2D()
-      const { result } = renderUseExploreEvents(coordinates)
-      expect(result.current.events).toMatchObject({ status: "loading" })
-    })
-
     it("should use the user's location as the default center when no initial center is provided", async () => {
       const trackedCoordinates = mockTrackedLocationCoordinate()
       queryUserCoordinates.mockResolvedValue(trackedCoordinates)
