@@ -1,5 +1,13 @@
 import React from "react"
-import { Image, StyleSheet, Text, View } from "react-native"
+import {
+  Image,
+  StyleProp,
+  StyleSheet,
+  Text,
+  View,
+  ViewProps,
+  ViewStyle
+} from "react-native"
 import { CurrentUserEvent, isHostingEvent } from "@lib/events/Event"
 import { placemarkToAbbreviatedAddress } from "@lib/location"
 import { Ionicons } from "@expo/vector-icons"
@@ -12,11 +20,12 @@ import ProfileImageAndName from "@components/profileImageComponents/ProfileImage
 
 export type EventCardProps = {
   event: CurrentUserEvent
-}
+  style?: StyleProp<ViewStyle>
+} & ViewProps
 
 const IMAGE_SIZE = 32
 
-export const EventCard = ({ event }: EventCardProps) => {
+export const EventCard = ({ event, style }: EventCardProps) => {
   const lightEventColor = event.color + "4D"
   const formattedStartDate = event.dateRange.formattedDate(
     now(),
@@ -24,15 +33,14 @@ export const EventCard = ({ event }: EventCardProps) => {
   )
 
   return (
-    <View style={[styles.container, { backgroundColor: "#F4F4F6" }]}>
+    <View style={[styles.container, style]}>
       <View style={[styles.topRow, styles.flexRow]}>
-        <View>
-          <ProfileImageAndName
-            username={event.host.username}
-            userHandle={event.host.handle}
-            imageStyle={[styles.image, styles.iconMargin]}
-          />
-        </View>
+        <ProfileImageAndName
+          username={event.host.username}
+          userHandle={event.host.handle}
+          imageStyle={[styles.image, styles.iconMargin]}
+        />
+
         <View style={styles.moreButtonStyle}>
           <MenuDropdown
             isEventHost={isHostingEvent(event.userAttendeeStatus)}
@@ -133,7 +141,8 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "rgba(145, 145, 145, 0.1)"
+    borderColor: "rgba(145, 145, 145, 0.1)",
+    backgroundColor: "#F4F4F6"
   },
   iconMargin: {
     marginRight: 16

@@ -1,9 +1,9 @@
 import EventsList from "@components/EventsList"
-import EventTabBar from "@components/bottomTabComponents/EventTabBar"
 import { TouchableIonicon } from "@components/common/Icons"
 import EventsMap, { MapRefMethods } from "@components/eventMap/EventsMap"
 import { useTrackUserLocation } from "@hooks/UserLocation"
 import { AppStyles } from "@lib/AppColorStyle"
+import { delayData } from "@lib/DelayData"
 import { CurrentUserEvent, EventMocks } from "@lib/events"
 import {
   UserLocationTrackingUpdate,
@@ -11,6 +11,7 @@ import {
 } from "@lib/location/UserLocation"
 import React, { useEffect, useRef } from "react"
 import { StyleSheet } from "react-native"
+import { useQuery } from "react-query"
 
 const MARKER_SIZE = 44
 const LATLNGDELTA = 0.5
@@ -32,11 +33,15 @@ const ActivitiesScreen = ({
     }
   }
 
-  const events: CurrentUserEvent[] = [
-    EventMocks.Multiday,
-    EventMocks.NoPlacemarkInfo,
-    EventMocks.PickupBasketball
-  ]
+  const eventsQuery = useQuery(["/event", "GET"], () =>
+    delayData([
+      EventMocks.Multiday,
+      EventMocks.NoPlacemarkInfo,
+      EventMocks.PickupBasketball
+    ])
+  )
+
+  const events = eventsQuery.data ?? []
 
   useEffect(() => {
     ;(async () => {
@@ -86,7 +91,6 @@ const ActivitiesScreen = ({
       />
 
       <EventsList />
-      <EventTabBar />
     </>
   )
 }

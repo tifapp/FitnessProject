@@ -1,16 +1,16 @@
 import {
-  MaterialIcons,
+  Ionicons,
   MaterialCommunityIcons,
-  Ionicons
+  MaterialIcons
 } from "@expo/vector-icons"
 import { useFontScale } from "@hooks/Fonts"
 import React, { ComponentProps } from "react"
 import {
   StyleProp,
   TouchableOpacityProps,
+  TouchableOpacity,
   ViewProps,
-  ViewStyle,
-  TouchableOpacity
+  ViewStyle
 } from "react-native"
 
 /**

@@ -15,7 +15,6 @@ export type CalendarEvent = {
   placemark?: Placemark
   coordinates: LocationCoordinate2D
   title: string
-  bottomTabHeight: number
 }
 
 const getPrimaryCalendar = (calendars: Calendar.Calendar[]) => {
@@ -65,10 +64,10 @@ export const addToCalendar = async (
   await Calendar.createEventAsync(calendarId, calendarEvent)
     .then(() => {
       setAddSuccessful(true)
-      showToast("Event added to Calendar", event.bottomTabHeight)
+      showToast("Event added to Calendar")
     })
     .catch(() => {
       setAddSuccessful(false)
-      showToast("Unable to add Event", event.bottomTabHeight)
+      showToast("Unable to add Event")
     })
 }

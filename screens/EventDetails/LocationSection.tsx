@@ -1,3 +1,4 @@
+
 import React, { useState } from "react"
 import { StyleSheet, TouchableOpacity, View } from "react-native"
 import * as Clipboard from "expo-clipboard"
@@ -13,18 +14,17 @@ import { Ionicon } from "@components/common/Icons"
 import { showToast } from "@components/common/Toasts"
 import { Divider } from "react-native-elements"
 
+
 interface LocationSectionProps {
   color: string
   placemark?: Placemark
   coordinates: LocationCoordinate2D
-  bottomTabHeight: number
 }
 
 const LocationSection = ({
   color,
   placemark,
-  coordinates,
-  bottomTabHeight
+  coordinates
 }: LocationSectionProps) => {
   const userLocation = useTrackUserLocation("precise")
   const [dividerWidth, setDividerWidth] = useState(0)
@@ -53,7 +53,7 @@ const LocationSection = ({
         `${coordinates.latitude}, ${coordinates.longitude}`
       )
     }
-    showToast("Copied to Clipboard", bottomTabHeight)
+    showToast("Copied to Clipboard")
   }
 
   const onLayout = (e: { nativeEvent: { layout: { width: any } } }) => {

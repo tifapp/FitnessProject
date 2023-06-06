@@ -1,9 +1,10 @@
+import { Caption, Headline } from "@components/Text"
+import { Ionicon } from "@components/common/Icons"
+import { AppStyles } from "@lib/AppColorStyle"
+import { EventUserAttendeeStatus, isAttendingEvent } from "@lib/events"
+import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { StyleSheet, TouchableOpacity, View } from "react-native"
-import { Headline, Caption } from "@components/Text"
-import { EventUserAttendeeStatus, isAttendingEvent } from "@lib/events"
-import { AppStyles } from "@lib/AppColorStyle"
-import { Ionicon } from "@components/common/Icons"
 
 interface ChatSectionProps {
   color: string
@@ -11,8 +12,14 @@ interface ChatSectionProps {
 }
 
 const ChatSection = ({ color, userAttendeeStatus }: ChatSectionProps) => {
+  const navigation = useNavigation()
   return (
-    <TouchableOpacity style={[styles.flexRow, styles.paddingIconSection]}>
+    <TouchableOpacity
+      style={[styles.flexRow, styles.paddingIconSection]}
+      onPress={() => {
+        navigation.navigate("Chat Room")
+      }}
+    >
       <View style={[styles.iconStyling, { backgroundColor: color }]}>
         <Ionicon name="chatbox-ellipses" color={"white"} />
       </View>

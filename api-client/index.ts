@@ -1,9 +1,9 @@
+import { API_URL } from "env"
 import { createApiClient } from "./api-client"
 import { ApiClient } from "./api-endpoint-types"
 import { ApiSchema } from "./api-schema"
 import { fetchWithAuth } from "./aws-fetch"
 
-const { API_URL } = process.env
 
 /**
  * apiClient is an instance of the generated API client based on the provided ApiSchema

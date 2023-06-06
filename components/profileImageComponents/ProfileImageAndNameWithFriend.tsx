@@ -4,20 +4,14 @@ import ProfileImage from "./ProfileImage"
 import React, { useState } from "react"
 import { Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
-import { FriendToast } from "@components/common/Toasts"
-
-export type UserFriendStatus =
-  | "not-friends"
-  | "friend-request-pending"
-  | "friends"
-  | "blocked"
+import { ToastWithIcon } from "@components/common/Toasts"
+import { UserFriendStatus } from "@lib/User"
 
 interface ImageAndNameProps {
   username: string
   userHandle: string
   eventColor: string
   userFriendStatus: UserFriendStatus | undefined
-  toastOffset: number
   style?: StyleProp<ViewStyle>
   imageStyle?: StyleProp<ImageStyle>
 }
@@ -27,7 +21,6 @@ const ProfileImageAndNameWithFriend = ({
   userHandle,
   eventColor,
   userFriendStatus,
-  toastOffset,
   style,
   imageStyle
 }: ImageAndNameProps) => {
@@ -83,11 +76,11 @@ const ProfileImageAndNameWithFriend = ({
               >
                 {renderFriendStatus(friendStatus)}
               </Headline>
-              <FriendToast
+              <ToastWithIcon
                 requestSent={requestSent}
                 setRequestSent={setRequestSent}
-                friendStatus={friendStatus}
-                offset={toastOffset}
+                isVisible={friendStatus === "friend-request-pending"}
+                text="Friend request sent."
               />
             </View>
           )}

@@ -1,6 +1,8 @@
 import { ZodType } from "zod"
 import { ApiSchema } from "./api-schema"
 
+export type ApiErrorType = { [Status in number]: ZodType<any> }
+
 export type Method = "GET" | "PUT" | "POST" | "PATCH" | "DELETE"
 
 export type Endpoint = {
@@ -10,6 +12,7 @@ export type Endpoint = {
       queryParamsType?: ZodType<any>
       pathParamsType?: ZodType<any>
       responseType: ZodType<any>
+      errorType?: ApiErrorType
     }
   }
 }

@@ -1,3 +1,5 @@
+import { Ionicon } from "@components/common/Icons"
+import { AppStyles } from "@lib/AppColorStyle"
 import React, { useState } from "react"
 import {
   Alert,
@@ -7,15 +9,13 @@ import {
   View,
   ViewStyle
 } from "react-native"
+import { TouchableOpacity } from "react-native-gesture-handler"
 import {
   Menu,
-  MenuOptions,
   MenuOption,
+  MenuOptions,
   MenuTrigger
 } from "react-native-popup-menu"
-import { TouchableOpacity } from "react-native-gesture-handler"
-import { Ionicon } from "@components/common/Icons"
-import { AppStyles } from "@lib/AppColorStyle"
 
 interface Props {
   isEventHost: boolean
@@ -33,7 +33,6 @@ const MenuDropdown = ({ isEventHost, style }: Props) => {
       { text: "Cancel", style: "cancel", onPress: dismiss }
     ])
   }
-
   // Will probably need to use a modal instead to have user select/type in reason for report
   const alertReport = () => {
     dismissMenu()
@@ -42,11 +41,9 @@ const MenuDropdown = ({ isEventHost, style }: Props) => {
       { text: "Cancel", style: "cancel" }
     ])
   }
-
   const dismissMenu = () => {
     setMenuOpen(false)
   }
-
   const editForm = () => {
     console.log("call event form")
   }

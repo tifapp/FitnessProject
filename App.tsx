@@ -67,7 +67,7 @@ import VerifyContact from "@components/loginComponents/VerifyContact"
 import { useAppFonts } from "@hooks/Fonts"
 import { makeLinkingConfig } from "@lib/linkingConfig"
 import { ExpoUserNotifications } from "@lib/UserNotifications"
-import ActivitiesStack from "@stacks/ActivitiesStack"
+import ActivitiesStack, { TabNavigation } from "@stacks/ActivitiesStack"
 import { SetDependencyValue } from "./lib/dependencies"
 import { userIdDependencyKey } from "./lib/MiscDependencyKeys"
 
@@ -314,7 +314,7 @@ const App = () => {
         <Stack.Navigator>
           <Stack.Screen
             name="Activities Screen"
-            component={ActivitiesStack}
+            component={TabNavigation}
             options={{
               headerShown: false
             }}

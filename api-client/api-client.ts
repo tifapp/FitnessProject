@@ -6,6 +6,17 @@ import {
   Method
 } from "./api-endpoint-types"
 
+export class ApiError extends Error {
+  status: number
+  error: any
+
+  constructor (status: number, error: any) {
+    super({ status, error }.toString())
+    this.status = status
+    this.error = error
+  }
+}
+
 const endpointFunction = async <K extends keyof ApiClient, M extends Method>(
   baseUrl: string,
   fetchApi: typeof fetch,
@@ -38,11 +49,12 @@ const endpointFunction = async <K extends keyof ApiClient, M extends Method>(
   )
 
   if (!response.ok) {
-    throw new Error(`Request failed with status ${response.status}`)
+    const error = await response.json()
+    throw new ApiError(response.status, error)
   }
 
   const data = await response.json()
-  return responseType.parse(data)
+  return responseType.parse(data.body ?? null)
 }
 
 export const createApiClient = <S extends GenericApiSchema<any>>(
