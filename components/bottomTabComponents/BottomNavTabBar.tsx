@@ -10,7 +10,7 @@ import { StyleSheet, View } from "react-native"
 function getIconName (routeName: string) {
   if (routeName === "Map") return "map"
   else if (routeName === "Chat Room") return "chatbox"
-  else if (routeName === "Event Details") return "add-outline"
+  else if (routeName === "Event Form") return "add-outline"
   else if (routeName === "Notifications") return "notifications"
   else return "person"
 }
@@ -71,9 +71,7 @@ export const BottomNavTabBar = ({
             style={
               getIconName(route.name) === "add-outline" ? styles.plusIcon : null
             }
-            activeOpacity={0.5}
             onPress={onPress}
-            underlayColor={AppStyles.colorOpacity15}
           />
         )
       })}
@@ -105,12 +103,3 @@ const styles = StyleSheet.create({
 })
 
 export default BottomNavTabBar
-
-/**
- * <TouchableIonicon
-        icon={{ name: "person", color: AppStyles.colorOpacity35 }}
-        activeOpacity={0.5}
-        onPress={() => navigation.navigate("Profile Screen")}
-        underlayColor={AppStyles.colorOpacity15}
-      />
- */

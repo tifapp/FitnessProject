@@ -119,8 +119,6 @@ const ProfileScreen = ({ route }: ProfileScreenProps) => {
     EventMocks.NoPlacemarkInfo,
     EventMocks.PickupBasketball
   ]
-  // update Atom
-  useHydrateAtoms([[userAtom, user]])
 
   return <ProfileScreenView user={user} events={events} />
 }
@@ -136,6 +134,8 @@ const CurrentUserProfileScreen = () => {
     EventMocks.NoPlacemarkInfo,
     EventMocks.PickupBasketball
   ]
+  // update Atom
+  useHydrateAtoms([[userAtom, user]])
 
   return <ProfileScreenView user={user} events={events} />
 }
