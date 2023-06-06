@@ -1,5 +1,4 @@
 import React from "react"
-import EventsList from "@components/EventsList"
 import { BottomNavTabBar } from "@components/bottomTabComponents/BottomNavTabBar"
 import { headerOptions } from "@components/headerComponents/headerOptions"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
