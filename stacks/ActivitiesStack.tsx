@@ -1,3 +1,4 @@
+import React from "react"
 import { BottomNavTabBar } from "@components/bottomTabComponents/BottomNavTabBar"
 import { headerOptions } from "@components/headerComponents/headerOptions"
 import { UserMocks } from "@lib/User"
@@ -20,9 +21,7 @@ import {
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { TestEventFormScreen } from "@screens/testScreens/TestEventFormScreen"
 import { TestNotifScreen } from "@screens/testScreens/TestNotifScreen"
-
-const Stack = createStackNavigator<ActivitiesStackParamList>()
-const Tab = createBottomTabNavigator()
+import BlockedUsersListView from "@screens/BlockedUsersList/BlockedUsersListView"
 
 export enum ActivitiesScreenNames {
   EVENT_FORM = "Event Form",
@@ -54,6 +53,9 @@ export type ActivitiesStackParamList = {
   [ActivitiesScreenNames.SETTINGS_SCREEN]: undefined
   [ActivitiesScreenNames.CHAT_ROOM]: undefined
 } & ReportingScreensParamsList
+
+const Stack = createStackNavigator<ActivitiesStackParamList>()
+const Tab = createBottomTabNavigator()
 
 const reportingScreens =
   createContentReportingStackScreens<ActivitiesStackParamList>(Stack, () => {
@@ -123,7 +125,7 @@ export function TabNavigation () {
       />
       <Tab.Screen name="Chat Room" component={SettingsScreen} />
       <Tab.Screen name="Event Form" component={TestEventFormScreen} />
-      <Tab.Screen name="Notifications" component={TestNotifScreen} />
+      <Tab.Screen name="Notifications" component={BlockedUsersListView} />
       <Tab.Screen
         name="Profile"
         component={ProfileScreenNavWrapper}

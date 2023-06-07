@@ -50,6 +50,7 @@ try {
 const getStories = () => {
   return {
     "./componentsAttendeesListAttendeesList.stories.tsx": require("../components/AttendeesList/AttendeesList.stories.tsx"),
+    "./componentsBlockedUsersListBlockedUsersList.stories.tsx": require("../components/BlockedUsersList/BlockedUsersList.stories.tsx"),
     "./componentsButtonButton.stories.tsx": require("../components/Button/Button.stories.tsx"),
     "./componentsContentReportingContentReporting.stories.tsx": require("../components/ContentReporting/ContentReporting.stories.tsx"),
     "./componentsContentTextContextText.stories.tsx": require("../components/ContentText/ContextText.stories.tsx"),

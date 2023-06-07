@@ -1,10 +1,12 @@
-import { BodyText, Title } from "@components/Text"
+import React from "react"
+import { BodyText, Subtitle } from "@components/Text"
 import MenuDropdown from "@components/eventCard/MenuDropdown"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FlatList, ListRenderItemInfo, StyleSheet, View } from "react-native"
+import ConfirmationDialogue from "@components/profileImageComponents/ConfirmationDialogue"
 
-const BlockedUsersList = () => {
+const BlockedUsersListView = () => {
   type TempUser = {
     username: string
     handle: string
@@ -30,7 +32,7 @@ const BlockedUsersList = () => {
 
   return (
     <View style={{ marginTop: 24, marginHorizontal: 16 }}>
-      <Title style={{ marginBottom: 8 }}>Blocked Users</Title>
+      <Subtitle style={{ marginBottom: 8 }}>Blocked Users</Subtitle>
       <BodyText style={{ color: AppStyles.colorOpacity50, marginBottom: 24 }}>
         Users you have blocked cannot join your events or view your profile, but
         you can still view their profile.
@@ -46,8 +48,7 @@ const BlockedUsersList = () => {
               imageURL={item.url}
               imageStyle={styles.image}
             />
-            <MenuDropdown
-              isEventHost={false}
+            <ConfirmationDialogue
               style={{
                 flex: 1,
                 flexDirection: "row",
@@ -74,4 +75,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default BlockedUsersList
+export default BlockedUsersListView

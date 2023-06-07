@@ -11,6 +11,14 @@ export const Title = (props: TextProps) => (
 )
 
 /**
+ * A text component that represents a smaller version of
+ * a title
+ */
+export const Subtitle = (props: TextProps) => (
+  <Text {...props} style={[props.style, styles.subtitle]} />
+)
+
+/**
  * A text component for standard text that the user sees.
  */
 export const BodyText = (props: TextProps) => (
@@ -41,6 +49,10 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "OpenSansBold",
     fontSize: 24
+  },
+  subtitle: {
+    fontFamily: "OpenSansBold",
+    fontSize: 20
   },
   body: {
     fontFamily: "OpenSans",

@@ -20,6 +20,10 @@ import ContentTextMeta, {
 import SettingsMeta, {
   Basic as SettingsScreenBasic
 } from "../components/SettingsScreen/SettingsScreen.stories"
+import BlockedUsersListMeta, {
+  Basic as BlockedUsersListViewBasic
+} from ".storybook/components/BlockedUsersList/BlockedUsersList.stories"
+import BlockedUsersListView from "@screens/BlockedUsersList/BlockedUsersListView"
 
 // Create an array of stories
 const stories = [
@@ -47,6 +51,11 @@ const stories = [
     name: AttendeesListMeta.title,
     component: AttendeesListScreenBasic,
     args: AttendeesListMeta.args
+  },
+  {
+    name: BlockedUsersListMeta.title,
+    component: BlockedUsersListViewBasic,
+    args: BlockedUsersListMeta.args
   }
   // Add more stories here...
 ]
