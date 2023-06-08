@@ -17,6 +17,7 @@ import { Ionicon } from "@components/common/Icons"
 import { BodyText, Caption, CaptionTitle, Headline } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
+import ConfirmationDialogue from "@components/common/ConfirmationDialogue"
 
 export type EventCardProps = {
   event: CurrentUserEvent
@@ -38,15 +39,11 @@ export const EventCard = ({ event, style }: EventCardProps) => {
         <ProfileImageAndName
           username={event.host.username}
           userHandle={event.host.handle}
-          imageStyle={[styles.image, styles.iconMargin]}
+          imageStyle={styles.image}
         />
-
-        <View style={styles.moreButtonStyle}>
-          <MenuDropdown
-            isEventHost={isHostingEvent(event.userAttendeeStatus)}
-          />
-        </View>
+        <ConfirmationDialogue style={styles.moreButtonStyle}/>
       </View>
+
       <View style={styles.middleRow}>
         <Headline style={styles.bottomSpacing}>{event.title}</Headline>
 
@@ -141,11 +138,8 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "rgba(145, 145, 145, 0.1)",
-    backgroundColor: "#F4F4F6"
-  },
-  iconMargin: {
-    marginRight: 16
+    borderColor: AppStyles.eventCardBorder,
+    backgroundColor: AppStyles.eventCardColor
   },
   moreButtonStyle: {
     flex: 1,

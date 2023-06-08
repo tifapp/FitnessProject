@@ -5,7 +5,7 @@ import React, { useState } from "react"
 import { Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { ToastWithIcon } from "@components/common/Toasts"
-import { UserFriendStatus } from "@lib/User"
+import { UserFriendStatus } from "@lib/users/User"
 
 interface ImageAndNameProps {
   username: string
@@ -85,7 +85,7 @@ const ProfileImageAndNameWithFriend = ({
             </View>
           )}
         </View>
-        <Caption>{userHandle}</Caption>
+        <Caption>{`@${userHandle}`}</Caption>
       </View>
     </View>
   )

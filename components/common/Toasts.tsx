@@ -3,7 +3,7 @@ import { AppStyles } from "../../lib/AppColorStyle"
 import { Platform, StyleSheet, View } from "react-native"
 import { Ionicon } from "./Icons"
 import { BodyText } from "@components/Text"
-import { UserFriendStatus } from "@lib/User"
+import { UserFriendStatus } from "@lib/users/User"
 
 const BOTTOM_TAB_HEIGHT = 80
 

@@ -13,7 +13,6 @@ import React, { useEffect, useRef } from "react"
 import { StyleSheet } from "react-native"
 import { useQuery } from "react-query"
 
-const MARKER_SIZE = 44
 const LATLNGDELTA = 0.5
 
 const ActivitiesScreen = ({

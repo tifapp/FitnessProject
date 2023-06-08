@@ -21,7 +21,7 @@ const ProfileImageAndName = ({
       <ProfileImage imageURL="@assets/default_profile.png" style={imageStyle} />
       <View style={{ marginLeft: 16 }}>
         <Headline style={{ marginBottom: 4 }}>{username}</Headline>
-        <Caption>{userHandle}</Caption>
+        <Caption>{`@${userHandle}`}</Caption>
       </View>
     </View>
   )
