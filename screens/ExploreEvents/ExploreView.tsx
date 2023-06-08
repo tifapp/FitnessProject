@@ -19,16 +19,14 @@ const createDefaultMapRegion = (coordinates: LocationCoordinate2D) => ({
 })
 
 export const useExploreEvents = (
-  initialCenter: LocationCoordinate2D | undefined,
+  initialCenter: LocationCoordinate2D,
   { fetchEvents, isSignificantlyDifferentRegions }: ExploreEventsEnvironment
 ) => {
-  const [region, setRegion] = useState(
-    initialCenter ? createDefaultMapRegion(initialCenter) : undefined
-  )
+  const [region, setRegion] = useState(createDefaultMapRegion(initialCenter))
   return {
     events: useExploreEventsQuery(region, fetchEvents),
     regionUpdated: (newRegion: Region) => {
-      if (isSignificantlyDifferentRegions(region!, newRegion)) {
+      if (isSignificantlyDifferentRegions(region, newRegion)) {
         setTimeout(() => setRegion(newRegion), 300)
       }
     }
@@ -36,19 +34,11 @@ export const useExploreEvents = (
 }
 
 const useExploreEventsQuery = (
-  center: Region | undefined,
+  center: Region,
   fetchEvents: (region: Region) => Promise<CurrentUserEvent[]>
 ) => {
-  const queryUserCoordinates = useDependencyValue(
-    UserLocationDependencyKeys.currentCoordinates
-  )
   return useQuery(["explore-events", center], async () => {
-    const fetchCenter =
-      center ??
-      createDefaultMapRegion(
-        (await queryUserCoordinates("approximate-low")).coordinates
-      )
-    return await fetchEvents(fetchCenter)
+    return await fetchEvents(center)
   })
 }
 
