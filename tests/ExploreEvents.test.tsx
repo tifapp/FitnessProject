@@ -31,7 +31,7 @@ describe("ExploreEvents tests", () => {
       const { result } = renderUseExploreEvents(mockLocationCoordinate2D())
 
       const region = mockRegion()
-      act(() => result.current.regionUpdated(region))
+      act(() => result.current.updateRegion(region))
 
       await waitFor(() => {
         expect(fetchEvents).not.toHaveBeenCalledWith(region)
@@ -48,7 +48,7 @@ describe("ExploreEvents tests", () => {
       const { result } = renderUseExploreEvents(mockLocationCoordinate2D())
 
       const region = mockRegion()
-      act(() => result.current.regionUpdated(region))
+      act(() => result.current.updateRegion(region))
 
       await waitFor(() => {
         expect(fetchEvents).not.toHaveBeenCalledWith(region)

@@ -1,6 +1,4 @@
 import { Headline } from "@components/Text"
-import { UserLocationDependencyKeys } from "@hooks/UserLocation"
-import { useDependencyValue } from "@lib/dependencies"
 import { CurrentUserEvent } from "@lib/events"
 import { LocationCoordinate2D, Region } from "@lib/location"
 import React, { useState } from "react"
@@ -24,22 +22,15 @@ export const useExploreEvents = (
 ) => {
   const [region, setRegion] = useState(createDefaultMapRegion(initialCenter))
   return {
-    events: useExploreEventsQuery(region, fetchEvents),
-    regionUpdated: (newRegion: Region) => {
+    events: useQuery(["explore-events", region], async () => {
+      return await fetchEvents(region)
+    }),
+    updateRegion: (newRegion: Region) => {
       if (isSignificantlyDifferentRegions(region, newRegion)) {
         setTimeout(() => setRegion(newRegion), 300)
       }
     }
   }
-}
-
-const useExploreEventsQuery = (
-  center: Region,
-  fetchEvents: (region: Region) => Promise<CurrentUserEvent[]>
-) => {
-  return useQuery(["explore-events", center], async () => {
-    return await fetchEvents(center)
-  })
 }
 
 export type ExploreEventsProps = {
