@@ -7,6 +7,7 @@ import { useExploreEvents } from "@screens/ExploreEvents"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { TestQueryClientProvider } from "./helpers/ReactQuery"
 import { neverPromise } from "./helpers/Promise"
+import { emptyCancellable } from "@lib/Cancellable"
 
 describe("ExploreEvents tests", () => {
   beforeEach(() => jest.resetAllMocks())
@@ -16,6 +17,7 @@ describe("ExploreEvents tests", () => {
     afterEach(() => jest.useRealTimers())
 
     it("should use the initial provided region when fetching for first time", async () => {
+      fetchEvents.mockReturnValue(emptyCancellable(neverPromise()))
       const coordinates = mockLocationCoordinate2D()
       renderUseExploreEvents(coordinates)
       await waitFor(() => {
@@ -26,7 +28,7 @@ describe("ExploreEvents tests", () => {
     })
 
     it("should not refetch events at new region when new region is not significantly different from current region", async () => {
-      fetchEvents.mockImplementation(neverPromise)
+      fetchEvents.mockReturnValue(emptyCancellable(neverPromise()))
       isSignificantlyDifferentRegions.mockReturnValue(false)
       const { result } = renderUseExploreEvents(mockLocationCoordinate2D())
 
@@ -43,7 +45,7 @@ describe("ExploreEvents tests", () => {
     })
 
     it("should refetch events at updated region after debounce period", async () => {
-      fetchEvents.mockImplementation(neverPromise)
+      fetchEvents.mockReturnValue(emptyCancellable(neverPromise()))
       isSignificantlyDifferentRegions.mockReturnValue(true)
       const { result } = renderUseExploreEvents(mockLocationCoordinate2D())
 
@@ -57,6 +59,19 @@ describe("ExploreEvents tests", () => {
       await waitFor(() => {
         expect(fetchEvents).toHaveBeenCalledWith(region)
       })
+    })
+
+    it("should cancel the existing fetch immediatedly when significant region change", async () => {
+      const cancel = jest.fn()
+      fetchEvents.mockReturnValue({ promise: neverPromise(), cancel })
+      isSignificantlyDifferentRegions.mockReturnValue(true)
+
+      const { result } = renderUseExploreEvents(mockLocationCoordinate2D())
+
+      const region = mockRegion()
+      act(() => result.current.updateRegion(region))
+
+      await waitFor(() => expect(cancel).toHaveBeenCalled())
     })
 
     const advanceThroughRegionUpdateDebounce = () => {
