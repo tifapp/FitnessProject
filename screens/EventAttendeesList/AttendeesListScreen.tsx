@@ -109,12 +109,12 @@ const styles = StyleSheet.create({
   skeletionHeadline: {
     width: 128,
     height: 16,
-    marginBottom: 4,
+    marginBottom: 8,
     borderRadius: 12
   },
   skeletonCaption: {
-    width: 256,
-    height: 12,
+    width: 64,
+    height: 8,
     borderRadius: 12
   },
   horizontalPadding: {

@@ -1,7 +1,7 @@
-import React from "react"
 import { BottomNavTabBar } from "@components/bottomTabComponents/BottomNavTabBar"
 import { headerOptions } from "@components/headerComponents/headerOptions"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { ActivitiesScreenNavWrapper } from "@screens/ActivitiesScreenNavWrapper"
 import { EventDetailsProps } from "@screens/EventDetails/EventDetails"
@@ -24,7 +24,7 @@ import {
 import { TestChatRoomScreen } from "@screens/testScreens/TestChatRoomScreen"
 import { TestEventFormScreen } from "@screens/testScreens/TestEventFormScreen"
 import { TestNotifScreen } from "@screens/testScreens/TestNotifScreen"
-import { getFocusedRouteNameFromRoute } from "@react-navigation/native"
+import React from "react"
 
 export enum ActivitiesScreenNames {
   EVENT_FORM = "Event Form",
