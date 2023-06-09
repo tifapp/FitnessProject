@@ -72,30 +72,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginTop: 20
   },
-  iconSection: {
-    backgroundColor: "#F4F4F6",
-    borderRadius: 8,
-    paddingVertical: 4,
-    marginBottom: 24
-  },
-  iconStyling: {
-    padding: 6
-  },
-  divider: {
-    marginVertical: 8,
-    width: "80%",
-    height: 1,
-    alignSelf: "flex-end",
-    color: "#0000001A"
-  },
   spacing: {
     paddingHorizontal: 16
-  },
-  captionLinks: {
-    opacity: 1,
-    fontWeight: "bold"
-  },
-  textColor: {
-    color: AppStyles.darkColor
   }
 })
