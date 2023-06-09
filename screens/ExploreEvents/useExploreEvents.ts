@@ -5,17 +5,23 @@ import { useState } from "react"
 import { useQuery, useQueryClient } from "react-query"
 import { createDefaultMapRegion } from "./utils"
 
+export type ExploreEventsInitialCenter =
+  | { type: "user-location" }
+  | { type: "preset"; coordinates: LocationCoordinate2D }
+
 export type UseExploreEventsEnvironment = {
   fetchEvents: (region: Region) => Cancellable<CurrentUserEvent[]>
   isSignificantlyDifferentRegions: (r1: Region, r2: Region) => boolean
 }
 
 export const useExploreEvents = (
-  initialCenter: LocationCoordinate2D | undefined,
+  initialCenter: ExploreEventsInitialCenter,
   { fetchEvents, isSignificantlyDifferentRegions }: UseExploreEventsEnvironment
 ) => {
   const [region, setRegion] = useState(
-    initialCenter ? createDefaultMapRegion(initialCenter) : undefined
+    initialCenter.type === "preset"
+      ? createDefaultMapRegion(initialCenter.coordinates)
+      : undefined
   )
   const { events, cancel } = useExploreEventsQuery(region, fetchEvents)
   return {
