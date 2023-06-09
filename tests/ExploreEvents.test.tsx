@@ -16,6 +16,11 @@ describe("ExploreEvents tests", () => {
     beforeEach(() => jest.useFakeTimers())
     afterEach(() => jest.useRealTimers())
 
+    it("should be idle when no initial center provided", async () => {
+      renderUseExploreEvents()
+      await waitFor(() => expect(fetchEvents).not.toHaveBeenCalled())
+    })
+
     it("should use the initial provided region when fetching for first time", async () => {
       fetchEvents.mockReturnValue(emptyCancellable(neverPromise()))
       const coordinates = mockLocationCoordinate2D()
@@ -61,6 +66,18 @@ describe("ExploreEvents tests", () => {
       })
     })
 
+    it("should fetch with no debounce when region updates when current region is non-existent", async () => {
+      fetchEvents.mockReturnValue(emptyCancellable(neverPromise()))
+      const { result } = renderUseExploreEvents()
+
+      const region = mockRegion()
+      act(() => result.current.updateRegion(region))
+
+      await waitFor(() => {
+        expect(fetchEvents).toHaveBeenCalledWith(region)
+      })
+    })
+
     it("should cancel the existing fetch immediatedly when significant region change", async () => {
       const cancel = jest.fn()
       fetchEvents.mockReturnValue({ promise: neverPromise(), cancel })
@@ -81,7 +98,7 @@ describe("ExploreEvents tests", () => {
     const isSignificantlyDifferentRegions = jest.fn()
     const fetchEvents = jest.fn()
 
-    const renderUseExploreEvents = (center: LocationCoordinate2D) => {
+    const renderUseExploreEvents = (center?: LocationCoordinate2D) => {
       return renderHook(
         () =>
           useExploreEvents(center, {

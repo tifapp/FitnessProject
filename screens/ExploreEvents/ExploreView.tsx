@@ -18,23 +18,45 @@ const createDefaultMapRegion = (coordinates: LocationCoordinate2D) => ({
 })
 
 export const useExploreEvents = (
-  initialCenter: LocationCoordinate2D,
+  initialCenter: LocationCoordinate2D | undefined,
   { fetchEvents, isSignificantlyDifferentRegions }: ExploreEventsEnvironment
 ) => {
-  const [region, setRegion] = useState(createDefaultMapRegion(initialCenter))
-  const queryClient = useQueryClient()
+  const [region, setRegion] = useState(
+    initialCenter ? createDefaultMapRegion(initialCenter) : undefined
+  )
+  const { events, cancel } = useExploreEventsQuery(region, fetchEvents)
   return {
-    events: useQuery(["explore-events", region], async ({ signal }) => {
-      // NB: The signal is only undefined if the platform does not support the AbortController
-      // api, but react-native added support in 0.60, so the force unwrap should be fine.
-      return await cancelOnAborted(fetchEvents(region), signal!).value
-    }),
+    region,
+    events,
     updateRegion: (newRegion: Region) => {
-      if (isSignificantlyDifferentRegions(region, newRegion)) {
-        queryClient.cancelQueries({ queryKey: ["explore-events", region] })
+      if (!region) {
+        setRegion(newRegion)
+      } else if (isSignificantlyDifferentRegions(region!, newRegion)) {
+        cancel()
         setTimeout(() => setRegion(newRegion), 300)
       }
     }
+  }
+}
+
+const useExploreEventsQuery = (
+  region: Region | undefined,
+  fetchEvents: (region: Region) => Cancellable<CurrentUserEvent[]>
+) => {
+  const events = useQuery(
+    ["explore-events", region],
+    async ({ signal }) => {
+      // NB: The signal is only undefined if the platform does not support the AbortController
+      // api, but react-native added support in 0.60, so the force unwrap should be fine.
+      return await cancelOnAborted(fetchEvents(region!), signal!).value
+    },
+    { enabled: !!region }
+  )
+  const queryClient = useQueryClient()
+  return {
+    events,
+    cancel: () =>
+      queryClient.cancelQueries({ queryKey: ["explore-events", region] })
   }
 }
 
