@@ -1,23 +1,25 @@
-import React from "react"
-import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
-import ProfileScreenView, { ProfileScreenViewProps } from "../ProfileView"
 import { ChevronBackButton, StackNavigatorType } from "@components/Navigation"
+import { Headline } from "@components/Text"
+import { TouchableIonicon } from "@components/common/Icons"
+import { AppStyles } from "@lib/AppColorStyle"
+import { EventMocks } from "@lib/events"
+import { UserMocks } from "@lib/users/User"
+import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
+import { ChangePasswordScreen } from "@screens/changePassword/ChangePasswordScreen"
 import { ActivitiesStackParamList } from "@stacks/ActivitiesStack"
 import { useAtomValue } from "jotai"
-import { userAtom } from "../state"
-import { UserMocks } from "@lib/users/User"
-import { HeaderLeftProfile, HeaderRightProfile } from "./ProfileHeaders"
-import { Headline } from "@components/Text"
-import { AppStyles } from "@lib/AppColorStyle"
-import { EditProfileDismissButton } from "./EditProfileDismissButton"
-import EditProfileView from "../EditProfileScreen/EditProfileView"
-import { EventMocks } from "@lib/events"
 import { useHydrateAtoms } from "jotai/utils"
+import React from "react"
 import { View } from "react-native"
-import { TouchableIonicon } from "@components/common/Icons"
+import EditProfileView from "../EditProfileScreen/EditProfileView"
+import ProfileScreenView, { ProfileScreenViewProps } from "../ProfileView"
+import { userAtom } from "../state"
+import { EditProfileDismissButton } from "./EditProfileDismissButton"
+import { HeaderLeftProfile, HeaderRightProfile } from "./ProfileHeaders"
 
 export type ProfileScreensParamsList = {
+  ChangePasswordScreen: undefined
   ProfileScreen: ProfileScreenViewProps
   EditProfileScreen: undefined
   SettingsScreen: undefined
@@ -94,6 +96,19 @@ export const createProfileStackScreens = <T extends ProfileScreensParamsList>(
         options={{
           headerTitle: () => (
             <Headline style={{ color: AppStyles.darkColor }}>Settings</Headline>
+          ),
+          headerTitleAlign: "center",
+          headerLeft: () => <ChevronBackButton />
+        }}
+      />
+      <ProfileStack.Screen
+        name={"ChangePasswordScreen"}
+        component={ChangePasswordScreen}
+        options={{
+          headerTitle: () => (
+            <Headline style={{ color: AppStyles.darkColor }}>
+              Change Password
+            </Headline>
           ),
           headerTitleAlign: "center",
           headerLeft: () => <ChevronBackButton />

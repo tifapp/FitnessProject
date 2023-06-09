@@ -1,4 +1,5 @@
 import { FontScaleFactors } from "@hooks/Fonts"
+import { AppStyles } from "@lib/AppColorStyle"
 import { StyleProp, StyleSheet, TextInput, View, ViewStyle } from "react-native"
 
 export type textFieldProps = {
@@ -14,9 +15,17 @@ export const TextField = ({ style, ...props }: textFieldProps) => {
     <View style={styles.containerStyle}>
       <TextInput
         maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
-        placeholder="Current Password"
+        placeholderTextColor={AppStyles.colorOpacity35}
+        placeholder={props.placeholder}
         secureTextEntry={true}
-        style={style}
+        style={[
+          style,
+          {
+            paddingLeft: 8,
+            fontFamily: "OpenSans",
+            fontSize: 16
+          }
+        ]}
         value={props.value}
         onChangeText={props.onChangeText}
       />
@@ -26,9 +35,14 @@ export const TextField = ({ style, ...props }: textFieldProps) => {
 
 const styles = StyleSheet.create({
   containerStyle: {
-    height: 40,
     flex: 1,
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: AppStyles.colorOpacity15,
+    borderRadius: 8,
+    borderWidth: 1,
+    maxHeight: 50,
+    marginBottom: 20
   }
 })

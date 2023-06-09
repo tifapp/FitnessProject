@@ -11,6 +11,9 @@ import AttendeesListMeta, {
 import MyButtonMeta, {
   Basic as MyButtonBasic
 } from "../components/Button/Button.stories"
+import ChangePasswordScreenMeta, {
+  Basic as ChangePasswordScreenBasic
+} from "../components/ChangePassword/ChangePasswordScreen.stories"
 import ContentReportingMeta, {
   Default as DefaultReportingFlow
 } from "../components/ContentReporting/ContentReporting.stories"
@@ -47,6 +50,11 @@ const stories = [
     name: AttendeesListMeta.title,
     component: AttendeesListScreenBasic,
     args: AttendeesListMeta.args
+  },
+  {
+    name: ChangePasswordScreenMeta.title,
+    component: ChangePasswordScreenBasic,
+    args: ChangePasswordScreenMeta.args
   }
   // Add more stories here...
 ]

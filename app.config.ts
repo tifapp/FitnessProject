@@ -63,6 +63,7 @@ const config = {
       "WRITE_CALENDAR"
     ],
     package: "com.tifapp.FitnessApp",
+    softwareKeyboardLayoutMode: "pan",
     useNextNotificationsApi: true,
     googleServicesFile: "./google-services.json"
   }
