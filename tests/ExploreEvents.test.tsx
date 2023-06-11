@@ -12,7 +12,8 @@ import { TestQueryClientProvider } from "./helpers/ReactQuery"
 import { UpdateDependencyValues } from "@lib/dependencies"
 import { UserLocationDependencyKeys } from "@hooks/UserLocation"
 import { SAN_FRANCISCO_DEFAULT_REGION } from "@screens/ExploreEvents/models"
-import { endlessCancellable } from "./helpers/Cancellable"
+import { emptyCancellable, endlessCancellable } from "./helpers/Cancellable"
+import { EventMocks } from "@lib/events"
 
 describe("ExploreEvents tests", () => {
   beforeEach(() => jest.resetAllMocks())
@@ -154,6 +155,29 @@ describe("ExploreEvents tests", () => {
 
       await waitFor(() => expect(cancellable.cancel).toHaveBeenCalled())
     })
+
+    it("should indicate a successful result when events loaded for the given region", async () => {
+      fetchEvents.mockReturnValue(
+        emptyCancellable(Promise.resolve(TEST_EVENTS))
+      )
+      const coordinates = mockLocationCoordinate2D()
+
+      const { result } = renderUseExploreEvents({
+        center: "preset",
+        coordinates
+      })
+
+      await waitFor(() => expect(fetchEvents).toHaveBeenCalled())
+      await waitFor(() => {
+        expect(result.current.events).toMatchObject({
+          status: "success",
+          region: expect.objectContaining(coordinates),
+          data: TEST_EVENTS
+        })
+      })
+    })
+
+    const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
 
     const waitForUserRegionToLoad = async () => {
       await waitFor(() => {

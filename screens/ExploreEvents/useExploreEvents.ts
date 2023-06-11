@@ -24,8 +24,7 @@ export const useExploreEvents = (
   const { region, panToRegion } = useExploreEventsRegion(initialCenter)
   const { events, cancel } = useExploreEventsQuery(region, fetchEvents)
   return {
-    region,
-    events,
+    events: { ...events, region },
     updateRegion: (newRegion: Region) => {
       if (!region) {
         panToRegion(newRegion)
