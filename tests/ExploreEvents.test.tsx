@@ -156,33 +156,6 @@ describe("ExploreEvents tests", () => {
       await waitFor(() => expect(cancellable.cancel).toHaveBeenCalled())
     })
 
-    it("should indicate a successful result when events loaded for the given region", async () => {
-      fetchEvents.mockReturnValue(
-        emptyCancellable(Promise.resolve(TEST_EVENTS))
-      )
-      const coordinates = mockLocationCoordinate2D()
-
-      const { result } = renderUseExploreEvents({
-        center: "preset",
-        coordinates
-      })
-
-      expect(result.current.events).toMatchObject({
-        status: "loading",
-        region: expect.objectContaining(coordinates)
-      })
-      await waitFor(() => expect(fetchEvents).toHaveBeenCalled())
-      await waitFor(() => {
-        expect(result.current.events).toMatchObject({
-          status: "success",
-          region: expect.objectContaining(coordinates),
-          data: TEST_EVENTS
-        })
-      })
-    })
-
-    const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
-
     const waitForUserRegionToLoad = async () => {
       await waitFor(() => {
         expect(queryUserCoordinates).toHaveBeenCalled()

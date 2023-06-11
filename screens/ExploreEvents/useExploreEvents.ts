@@ -13,13 +13,20 @@ import { useDependencyValue } from "@lib/dependencies"
 import { Region } from "@lib/location"
 
 export type UseExploreEventsEnvironment = {
+  region?: Region
   fetchEvents: (region: Region) => Cancellable<CurrentUserEvent[]>
   isSignificantlyDifferentRegions: (r1: Region, r2: Region) => boolean
 }
 
 export type ExploreEventsDataResult =
-  | { status: "loading"; region: Region }
-  | { status: "success"; region: Region; data: CurrentUserEvent[] }
+  | { status: "loading" }
+  | { status: "success"; data: CurrentUserEvent[] }
+  | { status: "error"; retry: () => void; error: unknown }
+
+export type UseExploreEventsResult = {
+  events: ExploreEventsDataResult
+  updateRegion: (newRegion: Region) => void
+}
 
 export const useExploreEvents = (
   initialCenter: ExploreEventsInitialCenter,
@@ -28,7 +35,8 @@ export const useExploreEvents = (
   const { region, panToRegion } = useExploreEventsRegion(initialCenter)
   const { events, cancel } = useExploreEventsQuery(region, fetchEvents)
   return {
-    events: { ...events, region },
+    region,
+    events,
     updateRegion: (newRegion: Region) => {
       if (!region) {
         panToRegion(newRegion)
