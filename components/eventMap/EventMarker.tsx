@@ -1,6 +1,7 @@
+import { CaptionTitle } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
 import React from "react"
-import { ImageBackground, StyleSheet, Text, View } from "react-native"
+import { ImageBackground, StyleSheet, View } from "react-native"
 
 const MARKER_SIZE = 44
 
@@ -11,72 +12,83 @@ export type EventMarkerProps = {
 
 export const EventMarkerView = ({ color, attendeeCount }: EventMarkerProps) => {
   return (
-    <>
-      <View
-        style={[
-          styles.badgeDisplay,
-          {
-            backgroundColor: color
-          }
-        ]}
-      >
-        <Ionicon name="people" color="white" size={10} />
-        <Text style={styles.badgeText}>{attendeeCount}</Text>
-      </View>
+    <View style={styles.frame}>
+      <View style={styles.container}>
+        <View style={styles.markerContainer}>
+          <View style={[{ backgroundColor: color }, styles.badgeContainer]}>
+            <Ionicon
+              style={styles.badgeIcon}
+              name="people"
+              color="white"
+              size={12}
+            />
+            <CaptionTitle style={styles.badgeText}>
+              {attendeeCount}
+            </CaptionTitle>
+          </View>
 
-      <View style={styles.whiteBackground}>
-        <ImageBackground
-          source={require("../../assets/Windows_10_Default_Profile_Picture.svg.png")}
-          style={styles.imageBackground}
-        />
+          <View style={styles.whiteBackground}>
+            <ImageBackground
+              source={require("../../assets/Windows_10_Default_Profile_Picture.svg.png")}
+              style={styles.imageBackground}
+            />
+          </View>
+        </View>
       </View>
-    </>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
+  frame: {
+    width: 96,
+    height: 64
+  },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  markerContainer: {
+    justifyContent: "center",
+    alignItems: "center"
+  },
   whiteBackground: {
     zIndex: 1,
-    flex: 1,
     width: MARKER_SIZE,
     height: MARKER_SIZE,
     backgroundColor: "white",
-    borderRadius: MARKER_SIZE / 2,
+    borderRadius: 128,
+    justifySelf: "flex-end",
     alignItems: "center",
+    justifyContent: "center",
     overflow: "hidden"
   },
   imageBackground: {
-    flex: 1,
-    marginTop: "6%",
-    marginRight: "1%",
-    position: "absolute",
-    width: MARKER_SIZE - 5,
-    height: MARKER_SIZE - 5,
-    borderRadius: MARKER_SIZE - 5 / 2,
-    alignSelf: "center",
+    width: MARKER_SIZE - 2,
+    height: MARKER_SIZE - 2,
+    borderRadius: 128,
     overflow: "hidden"
   },
-  badgeDisplay: {
+  badgeContainer: {
     zIndex: 2,
     flex: 1,
-    marginLeft: 15,
-    paddingVertical: 3,
-    paddingHorizontal: 5,
-    backgroundColor: "red",
+    top: -8,
+    right: -MARKER_SIZE / 2,
+    padding: 4,
     position: "absolute",
-    borderRadius: 7,
+    borderRadius: 8,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     overflow: "scroll"
   },
+  badgeIcon: {
+    marginLeft: 4
+  },
   badgeText: {
-    alignSelf: "stretch",
-    textAlign: "center",
-    paddingHorizontal: 3,
-    fontWeight: "bold",
-    fontSize: 8,
-    color: "white",
-    fontFamily: "OpenSansBold"
+    marginLeft: 4,
+    marginRight: 4,
+    color: "white"
   }
 })
