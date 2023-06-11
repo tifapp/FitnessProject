@@ -167,6 +167,10 @@ describe("ExploreEvents tests", () => {
         coordinates
       })
 
+      expect(result.current.events).toMatchObject({
+        status: "loading",
+        region: expect.objectContaining(coordinates)
+      })
       await waitFor(() => expect(fetchEvents).toHaveBeenCalled())
       await waitFor(() => {
         expect(result.current.events).toMatchObject({

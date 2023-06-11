@@ -17,6 +17,10 @@ export type UseExploreEventsEnvironment = {
   isSignificantlyDifferentRegions: (r1: Region, r2: Region) => boolean
 }
 
+export type ExploreEventsDataResult =
+  | { status: "loading"; region: Region }
+  | { status: "success"; region: Region; data: CurrentUserEvent[] }
+
 export const useExploreEvents = (
   initialCenter: ExploreEventsInitialCenter,
   { fetchEvents, isSignificantlyDifferentRegions }: UseExploreEventsEnvironment
