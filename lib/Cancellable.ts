@@ -7,17 +7,6 @@ export type Cancellable<T> = {
 }
 
 /**
- * Creates a {@link Cancellable} that has an empty `cancel` function. This is primarily
- * useful for tests and previews, where nothing actually needs to truly be cancelled.
- *
- * @param promise a promise to wrap in a cancellable.
- */
-export const emptyCancellable = <T>(promise: Promise<T>) => ({
-  value: promise,
-  cancel: () => {}
-})
-
-/**
  * Runs the `cancel` fucntion of a given {@link Cancellable} when
  * an {@link AbortSignal} is aborted.
  *
