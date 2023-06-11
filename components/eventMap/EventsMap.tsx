@@ -7,7 +7,7 @@ import React, {
 } from "react"
 import { StyleProp, ViewStyle } from "react-native"
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
-import { EventMarkerView } from "./EventMarker"
+import { ExploreEventsMarkerView } from "../../screens/ExploreEvents/MapMarker"
 
 /**
  * A type that will contain the information of a marker's appearance, and be rendered by the map.
@@ -152,7 +152,7 @@ export const EventsMap = forwardRef(function ReffedMap (
             onPress={() => onMarkerSelected?.(marker)}
           >
             {
-              <EventMarkerView
+              <ExploreEventsMarkerView
                 color={marker.color}
                 attendeeCount={marker.attendeeCount}
               />

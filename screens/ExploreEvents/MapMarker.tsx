@@ -5,12 +5,15 @@ import { ImageBackground, StyleSheet, View } from "react-native"
 
 const MARKER_SIZE = 44
 
-export type EventMarkerProps = {
+export type ExploreEventsMarkerProps = {
   color: string
   attendeeCount: number
 }
 
-export const EventMarkerView = ({ color, attendeeCount }: EventMarkerProps) => {
+export const ExploreEventsMarkerView = ({
+  color,
+  attendeeCount
+}: ExploreEventsMarkerProps) => {
   return (
     <View style={styles.frame}>
       <View style={styles.container}>

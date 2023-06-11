@@ -1,4 +1,4 @@
-import { EventMarkerView } from "@components/eventMap/EventMarker"
+import { ExploreEventsMarkerView } from "@screens/ExploreEvents/MapMarker"
 import { CurrentUserEvent } from "@lib/events"
 import { LocationCoordinate2D, Region } from "@lib/location"
 import React, { useRef } from "react"
@@ -49,19 +49,19 @@ export const ExploreEventsMap = ({
         }
       ]}
     >
-      {events.map((marker) => (
+      {events.map((event) => (
         <Marker
-          key={marker.id}
+          key={event.id}
           coordinate={{
-            latitude: marker.coordinates.latitude,
-            longitude: marker.coordinates.longitude
+            latitude: event.coordinates.latitude,
+            longitude: event.coordinates.longitude
           }}
-          onPress={() => onEventSelected(marker)}
+          onPress={() => onEventSelected(event)}
         >
           {
-            <EventMarkerView
-              color={marker.color}
-              attendeeCount={marker.attendeeCount}
+            <ExploreEventsMarkerView
+              color={event.color}
+              attendeeCount={event.attendeeCount}
             />
           }
         </Marker>

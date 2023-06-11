@@ -7,10 +7,7 @@ import {
   isSignificantlyDifferentRegions
 } from "@lib/location"
 import { CurrentUserEvent } from "@lib/events"
-import {
-  ExploreEventsInitialCenter,
-  SAN_FRANCISCO_DEFAULT_REGION
-} from "./models"
+import { ExploreEventsInitialCenter } from "./models"
 import { useExploreEvents } from "./useExploreEvents"
 import { Cancellable } from "@lib/Cancellable"
 import { ExploreEventsMap } from "./Map"
