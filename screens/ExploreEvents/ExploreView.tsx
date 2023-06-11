@@ -1,6 +1,5 @@
 import React from "react"
-import { Headline } from "@components/Text"
-import { StyleProp, ViewStyle } from "react-native"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import {
   LocationCoordinate2D,
   Region,
@@ -32,18 +31,37 @@ export const ExploreEventsView = ({
     isSignificantlyDifferentRegions
   })
 
-  if (!region) {
-    return <Headline>Loading...</Headline>
-  }
-
   return (
-    <ExploreEventsMap
-      initialRegion={region}
-      onLongPress={onMapLongPress}
-      onRegionChanged={updateRegion}
-      onEventSelected={onEventTapped}
-      events={events.data ?? []}
-      style={style}
-    />
+    <View style={style}>
+      {region
+        ? (
+          <ExploreEventsMap
+            initialRegion={region}
+            onLongPress={onMapLongPress}
+            onRegionChanged={updateRegion}
+            onEventSelected={onEventTapped}
+            events={events.data ?? []}
+            style={styles.map}
+          />
+        )
+        : (
+          <View
+            accessibilityLabel="Loading a map where you can explore nearby events in any area"
+            style={styles.mapPlaceholder}
+          />
+        )}
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+  mapPlaceholder: {
+    width: "100%",
+    height: "100%",
+    backgroundColor: "#a3bff4"
+  },
+  map: {
+    width: "100%",
+    height: "100%"
+  }
+})

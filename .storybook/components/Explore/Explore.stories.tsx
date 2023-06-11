@@ -21,16 +21,12 @@ export const Basic: ExploreEventsStory = () => (
     <SetDependencyValue
       forKey={UserLocationDependencyKeys.currentCoordinates}
       value={async () => {
-        return {
-          coordinates: LocationCoordinatesMocks.NYC,
-          trackingDate: new Date()
-        }
+        throw new Error()
       }}
     >
       <ExploreEventsView
         initialCenter={{
-          center: "preset",
-          coordinates: LocationCoordinatesMocks.SanFrancisco
+          center: "user-location"
         }}
         fetchEvents={() => ({
           value: Promise.resolve([
