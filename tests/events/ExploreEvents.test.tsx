@@ -8,11 +8,14 @@ import {
   useExploreEvents
 } from "@screens/ExploreEvents"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
-import { TestQueryClientProvider } from "./helpers/ReactQuery"
+import {
+  TestQueryClientProvider,
+  createTestQueryClient
+} from "../helpers/ReactQuery"
 import { UpdateDependencyValues } from "@lib/dependencies"
 import { UserLocationDependencyKeys } from "@hooks/UserLocation"
 import { SAN_FRANCISCO_DEFAULT_REGION } from "@screens/ExploreEvents/models"
-import { emptyCancellable, endlessCancellable } from "./helpers/Cancellable"
+import { nonCancellable, endlessCancellable } from "../helpers/Cancellable"
 import { EventMocks } from "@lib/events"
 
 describe("ExploreEvents tests", () => {
@@ -156,6 +159,24 @@ describe("ExploreEvents tests", () => {
       await waitFor(() => expect(cancellable.cancel).toHaveBeenCalled())
     })
 
+    it("should seed the query cache with an entry for each individual loaded event", async () => {
+      const events = [EventMocks.Multiday, EventMocks.PickupBasketball]
+      fetchEvents.mockReturnValue(nonCancellable(Promise.resolve(events)))
+
+      renderUseExploreEvents({
+        center: "preset",
+        coordinates: mockLocationCoordinate2D()
+      })
+
+      await waitFor(() => expect(fetchEvents).toHaveBeenCalled())
+      expect(queryClient.getQueryData(["event", events[0].id])).toMatchObject(
+        events[0]
+      )
+      expect(queryClient.getQueryData(["event", events[1].id])).toMatchObject(
+        events[1]
+      )
+    })
+
     const waitForUserRegionToLoad = async () => {
       await waitFor(() => {
         expect(queryUserCoordinates).toHaveBeenCalled()
@@ -165,6 +186,8 @@ describe("ExploreEvents tests", () => {
     const advanceThroughRegionUpdateDebounce = () => {
       act(() => jest.advanceTimersByTime(300))
     }
+
+    const queryClient = createTestQueryClient()
 
     const requestForegroundPermissions = jest.fn()
     const queryUserCoordinates = jest.fn()
@@ -180,7 +203,7 @@ describe("ExploreEvents tests", () => {
           }),
         {
           wrapper: ({ children }) => (
-            <TestQueryClientProvider>
+            <TestQueryClientProvider client={queryClient}>
               <UpdateDependencyValues
                 update={(values) => {
                   values.set(

@@ -4,7 +4,7 @@
  *
  * @param promise a promise to wrap in a cancellable.
  */
-export const emptyCancellable = <T>(promise: Promise<T>) => ({
+export const nonCancellable = <T>(promise: Promise<T>) => ({
   value: promise,
   cancel: jest.fn()
 })
