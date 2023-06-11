@@ -77,23 +77,23 @@ const useExploreEventsQuery = (
   fetchEvents: (region: Region) => Cancellable<CurrentUserEvent[]>
 ) => {
   const queryClient = useQueryClient()
-  const events = useQuery(
-    ["explore-events", region],
-    async ({ signal }) => {
-      // NB: The signal is only undefined if the platform does not support the AbortController
-      // api, but react-native added support in 0.60, so the force unwrap should be fine.
-      const events = await cancelOnAborted(fetchEvents(region!), signal!).value
-
-      events.forEach((event) => {
-        queryClient.setQueryData(["event", event.id], event)
-      })
-
-      return events
-    },
-    { enabled: !!region }
-  )
   return {
-    events,
+    events: useQuery(
+      ["explore-events", region],
+      async ({ signal }) => {
+        // NB: The signal is only undefined if the platform does not support the AbortController
+        // api, but react-native added support in 0.60, so the force unwrap should be fine.
+        const events = await cancelOnAborted(fetchEvents(region!), signal!)
+          .value
+
+        events.forEach((event) => {
+          queryClient.setQueryData(["event", event.id], event)
+        })
+
+        return events
+      },
+      { enabled: !!region }
+    ),
     cancel: () => {
       queryClient.cancelQueries({ queryKey: ["explore-events", region] })
     }
