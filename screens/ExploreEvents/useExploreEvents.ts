@@ -1,13 +1,16 @@
 import { Cancellable, cancelOnAborted } from "@lib/Cancellable"
 import { CurrentUserEvent } from "@lib/events"
-import { LocationCoordinate2D, Region } from "@lib/location"
 import { useState } from "react"
 import { useQuery, useQueryClient } from "react-query"
-import { createDefaultMapRegion } from "./utils"
-
-export type ExploreEventsInitialCenter =
-  | { type: "user-location" }
-  | { type: "preset"; coordinates: LocationCoordinate2D }
+import {
+  ExploreEventsInitialCenter,
+  SAN_FRANCISCO_DEFAULT_REGION,
+  createDefaultMapRegion,
+  initialCenterToRegion
+} from "./models"
+import { UserLocationDependencyKeys } from "@hooks/UserLocation"
+import { useDependencyValue } from "@lib/dependencies"
+import { Region } from "@lib/location"
 
 export type UseExploreEventsEnvironment = {
   fetchEvents: (region: Region) => Cancellable<CurrentUserEvent[]>
@@ -18,24 +21,54 @@ export const useExploreEvents = (
   initialCenter: ExploreEventsInitialCenter,
   { fetchEvents, isSignificantlyDifferentRegions }: UseExploreEventsEnvironment
 ) => {
-  const [region, setRegion] = useState(
-    initialCenter.type === "preset"
-      ? createDefaultMapRegion(initialCenter.coordinates)
-      : undefined
-  )
+  const { region, panToRegion } = useExploreEventsRegion(initialCenter)
   const { events, cancel } = useExploreEventsQuery(region, fetchEvents)
   return {
     region,
     events,
     updateRegion: (newRegion: Region) => {
       if (!region) {
-        setRegion(newRegion)
-      } else if (isSignificantlyDifferentRegions(region!, newRegion)) {
+        panToRegion(newRegion)
+      } else if (isSignificantlyDifferentRegions(region, newRegion)) {
         cancel()
-        setTimeout(() => setRegion(newRegion), 300)
+        setTimeout(() => panToRegion(newRegion), 300)
       }
     }
   }
+}
+
+const useExploreEventsRegion = (initialCenter: ExploreEventsInitialCenter) => {
+  const [pannedRegion, setPannedRegion] = useState(
+    initialCenterToRegion(initialCenter)
+  )
+  const userRegion = useUserRegionQuery({ isEnabled: !pannedRegion })
+  const region = userRegion.isLoading
+    ? undefined
+    : pannedRegion ?? userRegion.data ?? SAN_FRANCISCO_DEFAULT_REGION
+  return { region, panToRegion: setPannedRegion }
+}
+
+type UseUserRegionQueryProps = {
+  isEnabled: boolean
+}
+
+const useUserRegionQuery = ({ isEnabled }: UseUserRegionQueryProps) => {
+  const queryUserCoordinates = useDependencyValue(
+    UserLocationDependencyKeys.currentCoordinates
+  )
+  const requestPermission = useDependencyValue(
+    UserLocationDependencyKeys.requestForegroundPermissions
+  )
+  return useQuery(
+    ["explore-events-user-region"],
+    async () => {
+      const isGranted = await requestPermission()
+      if (!isGranted) throw new Error("Foreground location permission denied.")
+      const trackedCoordinate = await queryUserCoordinates("approximate-medium")
+      return createDefaultMapRegion(trackedCoordinate.coordinates)
+    },
+    { enabled: isEnabled }
+  )
 }
 
 const useExploreEventsQuery = (
