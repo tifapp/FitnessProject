@@ -2,8 +2,8 @@ import { LocationCoordinate2D } from "@lib/location"
 
 export const createDefaultMapRegion = (coordinates: LocationCoordinate2D) => ({
   ...coordinates,
-  latitudeDelta: 0.3,
-  longitudeDelta: 0.3
+  latitudeDelta: 0.1,
+  longitudeDelta: 0.1
 })
 
 export const SAN_FRANCISCO_DEFAULT_REGION = createDefaultMapRegion({

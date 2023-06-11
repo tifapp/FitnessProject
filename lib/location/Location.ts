@@ -38,17 +38,17 @@ export const mockLocationCoordinate2D = () => ({
 export namespace LocationCoordinatesMocks {
   export const SantaCruz = {
     latitude: 36.9741,
-    longitude: 122.0308
+    longitude: -122.0308
   } as const
 
   export const NYC = {
     latitude: 40.7128,
-    longitude: 74.006
+    longitude: -74.006
   } as const
 
   export const SanFrancisco = {
     latitude: 37.7749,
-    longitude: 122.4194
+    longitude: -122.4194
   } as const
 
   export const London = {
