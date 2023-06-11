@@ -63,8 +63,12 @@ const config = {
       "WRITE_CALENDAR"
     ],
     package: "com.tifapp.FitnessApp",
-    useNextNotificationsApi: true,
     googleServicesFile: "./google-services.json"
+  },
+  extra: {
+    eas: {
+      projectId: "5ff7c49e-1bf6-40a7-87fc-7782dad31255"
+    }
   }
 }
 
