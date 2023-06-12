@@ -6,6 +6,8 @@ import React from "react"
 import { SetDependencyValue } from "@lib/dependencies"
 import { UserLocationDependencyKeys } from "@hooks/UserLocation"
 import { LocationCoordinatesMocks } from "@lib/location"
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
+import { MenuProvider } from "react-native-popup-menu"
 
 const ExploreEventsMeta: ComponentMeta<typeof ExploreEventsView> = {
   title: "Explore Events Screen",
@@ -17,29 +19,34 @@ export default ExploreEventsMeta
 type ExploreEventsStory = ComponentStory<typeof ExploreEventsView>
 
 export const Basic: ExploreEventsStory = () => (
-  <AppQueryClientProvider>
-    <SetDependencyValue
-      forKey={UserLocationDependencyKeys.currentCoordinates}
-      value={async () => {
-        throw new Error()
-      }}
-    >
-      <ExploreEventsView
-        initialCenter={{
-          center: "user-location"
-        }}
-        fetchEvents={() => ({
-          value: Promise.resolve([
-            EventMocks.Multiday,
-            EventMocks.NoPlacemarkInfo,
-            EventMocks.PickupBasketball
-          ]),
-          cancel: () => {}
-        })}
-        onMapLongPress={console.log}
-        onEventTapped={console.log}
-        style={{ width: "100%", height: "100%" }}
-      />
-    </SetDependencyValue>
-  </AppQueryClientProvider>
+  <MenuProvider>
+    <BottomSheetModalProvider>
+      <AppQueryClientProvider>
+        <SetDependencyValue
+          forKey={UserLocationDependencyKeys.currentCoordinates}
+          value={async () => {
+            throw new Error()
+          }}
+        >
+          <ExploreEventsView
+            initialCenter={{
+              center: "preset",
+              coordinates: LocationCoordinatesMocks.SanFrancisco
+            }}
+            fetchEvents={() => ({
+              value: Promise.resolve([
+                EventMocks.Multiday,
+                EventMocks.NoPlacemarkInfo,
+                EventMocks.PickupBasketball
+              ]),
+              cancel: () => {}
+            })}
+            onMapLongPress={console.log}
+            onEventTapped={console.log}
+            style={{ width: "100%", height: "100%" }}
+          />
+        </SetDependencyValue>
+      </AppQueryClientProvider>
+    </BottomSheetModalProvider>
+  </MenuProvider>
 )

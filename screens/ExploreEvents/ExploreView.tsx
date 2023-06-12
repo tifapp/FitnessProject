@@ -10,6 +10,10 @@ import { ExploreEventsInitialCenter } from "./models"
 import { useExploreEvents } from "./useExploreEvents"
 import { Cancellable } from "@lib/Cancellable"
 import { ExploreEventsMap } from "./Map"
+import { useLastDefinedValue } from "@hooks/useLastDefinedValue"
+import { ExploreEventsBottomSheet } from "./BottomSheet"
+import { Title } from "@components/Text"
+import { SkeletonEventCard } from "@components/eventCard/SkeletonEventCard"
 
 export type ExploreEventsProps = {
   initialCenter: ExploreEventsInitialCenter
@@ -31,6 +35,10 @@ export const ExploreEventsView = ({
     isSignificantlyDifferentRegions
   })
 
+  // NB: - Ensure the current events are still on the map when the
+  // user pans to a new region
+  const mapEventsData = useLastDefinedValue(events.data)
+
   return (
     <View style={style}>
       {region
@@ -40,16 +48,34 @@ export const ExploreEventsView = ({
             onLongPress={onMapLongPress}
             onRegionChanged={updateRegion}
             onEventSelected={onEventTapped}
-            events={events.data ?? []}
+            events={mapEventsData ?? []}
             style={styles.map}
           />
         )
         : (
           <Water />
         )}
+      <ExploreEventsBottomSheet
+        onEventSelected={onEventTapped}
+        events={events.data ?? []}
+        HeaderComponent={
+          <Title style={styles.sheetHeaderText}>
+            {!events.isLoading ? "Nearby Events" : "Finding Nearby Events..."}
+          </Title>
+        }
+        EmptyEventsComponent={<>{events.isLoading && <LoadingIndicator />}</>}
+      />
     </View>
   )
 }
+
+const LoadingIndicator = () => (
+  <View style={styles.horizontalSpacing}>
+    <SkeletonEventCard style={styles.skeletonCardSpacing} />
+    <SkeletonEventCard style={styles.skeletonCardSpacing} />
+    <SkeletonEventCard style={styles.skeletonCardSpacing} />
+  </View>
+)
 
 const Water = () => (
   <View
@@ -59,6 +85,12 @@ const Water = () => (
 )
 
 const styles = StyleSheet.create({
+  sheetHeaderText: {
+    flex: 1,
+    backgroundColor: "white",
+    paddingHorizontal: 24,
+    paddingBottom: 8
+  },
   water: {
     width: "100%",
     height: "100%",
@@ -67,5 +99,11 @@ const styles = StyleSheet.create({
   map: {
     width: "100%",
     height: "100%"
+  },
+  horizontalSpacing: {
+    paddingHorizontal: 24
+  },
+  skeletonCardSpacing: {
+    paddingVertical: 12
   }
 })
