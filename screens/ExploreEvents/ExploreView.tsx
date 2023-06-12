@@ -15,6 +15,7 @@ import { ExploreEventsBottomSheet } from "./BottomSheet"
 import { BodyText, Headline, Title } from "@components/Text"
 import { SkeletonEventCard } from "@components/eventCard/SkeletonEventCard"
 import { Ionicon } from "@components/common/Icons"
+import { PrimaryButton } from "@components/common/Buttons"
 
 export type ExploreEventsProps = {
   initialCenter: ExploreEventsInitialCenter
@@ -66,8 +67,8 @@ export const ExploreEventsView = ({
         }
         EmptyEventsComponent={
           <View style={styles.emptyEventsContainer}>
-            {events.isLoading && <LoadingIndicator />}
-            {events.isError && <Headline>Lol</Headline>}
+            {events.isLoading && <LoadingView />}
+            {events.isError && <ErrorView onRetried={events.refetch} />}
             {events.isSuccess && events.data.length === 0 && <NoResultsView />}
           </View>
         }
@@ -76,16 +77,34 @@ export const ExploreEventsView = ({
   )
 }
 
+type ErrorProps = {
+  onRetried: () => void
+}
+
+const ErrorView = ({ onRetried }: ErrorProps) => (
+  <View style={styles.emptyEventsContentContainer}>
+    <Ionicon name="flame" size={48} style={styles.emptyEventsIcon} />
+    <BodyText style={styles.emptyEventsText}>
+      An error occurred, please try again.
+    </BodyText>
+    <PrimaryButton
+      style={styles.tryAgainButton}
+      title="Try Again"
+      onPress={onRetried}
+    />
+  </View>
+)
+
 const NoResultsView = () => (
-  <View style={styles.noResultsContainer}>
-    <Ionicon name="map" size={48} style={styles.noResultsIcon} />
-    <BodyText style={styles.noResultsText}>
+  <View style={styles.emptyEventsContentContainer}>
+    <Ionicon name="map" size={48} style={styles.emptyEventsIcon} />
+    <BodyText style={styles.emptyEventsText}>
       No events were found in this area. Try moving to a different location.
     </BodyText>
   </View>
 )
 
-const LoadingIndicator = () => (
+const LoadingView = () => (
   <>
     <SkeletonEventCard style={styles.skeletonCardSpacing} />
     <SkeletonEventCard style={styles.skeletonCardSpacing} />
@@ -117,23 +136,26 @@ const styles = StyleSheet.create({
     height: "100%"
   },
   emptyEventsContainer: {
-    paddingHorizontal: 24,
-    flex: 1
+    paddingHorizontal: 24
   },
   skeletonCardSpacing: {
     paddingVertical: 12
   },
-  noResultsContainer: {
+  emptyEventsContentContainer: {
     width: "100%",
     marginTop: 24,
     alignItems: "center",
     justifyContent: "center"
   },
-  noResultsIcon: {
+  emptyEventsIcon: {
     opacity: 0.5
   },
-  noResultsText: {
-    marginTop: 16,
+  emptyEventsText: {
+    marginTop: 8,
     textAlign: "center"
+  },
+  tryAgainButton: {
+    marginTop: 24,
+    width: "100%"
   }
 })
