@@ -5,7 +5,7 @@ import {
   BottomTabBarProps
 } from "@react-navigation/bottom-tabs"
 import React from "react"
-import { StyleSheet, View } from "react-native"
+import { SafeAreaView, StyleSheet, View } from "react-native"
 
 function getIconName (routeName: string) {
   if (routeName === "Map") return "map"
@@ -27,16 +27,10 @@ export const BottomNavTabBar = ({
   )
 
   return (
-    <View style={[styles.container, { display: isVisible ? "flex" : "none" }]}>
+    <SafeAreaView
+      style={[styles.container, { display: isVisible ? "flex" : "none" }]}
+    >
       {state.routes.map((route, index) => {
-        const { options } = descriptors[route.key]
-        const label =
-          options.tabBarLabel !== undefined
-            ? options.tabBarLabel
-            : options.title !== undefined
-              ? options.title
-              : route.name
-
         const isFocused = state.index === index
 
         const onPress = () => {
@@ -59,6 +53,7 @@ export const BottomNavTabBar = ({
         }
         return (
           <TouchableIonicon
+            key={route.name}
             icon={{
               name: getIconName(route.name),
               color:
@@ -75,7 +70,7 @@ export const BottomNavTabBar = ({
           />
         )
       })}
-    </View>
+    </SafeAreaView>
   )
 }
 
@@ -88,7 +83,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 80,
+    height: 100,
     backgroundColor: "white"
   },
   plusIcon: {

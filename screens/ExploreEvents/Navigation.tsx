@@ -7,18 +7,23 @@ import { ExploreEventsView } from "./ExploreView"
 import { StackScreenProps } from "@react-navigation/stack"
 import { createInitialCenter } from "./models"
 import { StyleSheet } from "react-native"
+import { EventScreensParamsList } from "@screens/EventDetails/EventScreensNavigation"
 
 export type ExploreEventsScreensParamsList = {
   exploreEvents: { searchText: string; center?: LocationCoordinate2D }
   exploreEventsLocationSearch: undefined
-}
+  exploreEventsForm: { coordinates: LocationCoordinate2D }
+} & EventScreensParamsList
 
 type ExploreEventsProps = StackScreenProps<
   ExploreEventsScreensParamsList,
   "exploreEvents"
 >
 
-export const createExploreEventsScreensStack = <
+/**
+ * Creates the event exploration screens given a Stack Navigator.
+ */
+export const createExploreEventsScreens = <
   ParamsList extends ExploreEventsScreensParamsList
 >(
     stack: StackNavigatorType<ParamsList>,
@@ -44,12 +49,13 @@ type ExploreEventsScreenProps = {
 
 const ExploreEventsScreen = ({
   route,
+  navigation,
   fetchEvents
 }: ExploreEventsScreenProps) => (
   <ExploreEventsView
     searchText={route.params.searchText}
     fetchEvents={fetchEvents}
-    onEventTapped={console.log}
+    onEventTapped={(event) => navigation.navigate("Event Details", { event })}
     onMapLongPress={console.log}
     onSearchTapped={() => console.log("Search")}
     initialCenter={createInitialCenter(route.params.center)}

@@ -18,6 +18,9 @@ export type UseExploreEventsEnvironment = {
   isSignificantlyDifferentRegions: (r1: Region, r2: Region) => boolean
 }
 
+/**
+ * A hook to provide the data and current region for the event exploration view.
+ */
 export const useExploreEvents = (
   initialCenter: ExploreEventsInitialCenter,
   { fetchEvents, isSignificantlyDifferentRegions }: UseExploreEventsEnvironment

@@ -35,6 +35,9 @@ export type ExploreEventsProps = {
   style?: StyleProp<ViewStyle>
 }
 
+/**
+ * A view which allows users to interactively explore events in any given area.
+ */
 export const ExploreEventsView = ({
   searchText,
   initialCenter,

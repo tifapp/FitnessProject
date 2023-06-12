@@ -2,13 +2,7 @@ import { CaptionTitle } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
 import ProfileImage from "@components/profileImageComponents/ProfileImage"
 import React from "react"
-import {
-  ImageBackground,
-  StyleProp,
-  StyleSheet,
-  View,
-  ViewStyle
-} from "react-native"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 
 const MARKER_SIZE = 44
 

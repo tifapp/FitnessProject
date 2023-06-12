@@ -23,9 +23,12 @@ export type ExploreEventsBottomSheetProps = {
   style?: StyleProp<ViewStyle>
 }
 
-const SNAP_POINTS = ["20%", "45%", "85%"]
+const SNAP_POINTS = ["25%", "50%", "85%"]
 const STICKY_HEADER_INDICIES = [0]
 
+/**
+ * The bottom sheet that displays events in the explore events view.
+ */
 export const ExploreEventsBottomSheet = ({
   events,
   onEventSelected,

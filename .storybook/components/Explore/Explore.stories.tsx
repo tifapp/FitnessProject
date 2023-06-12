@@ -2,7 +2,7 @@ import { EventMocks } from "@lib/events"
 import {
   ExploreEventsScreensParamsList,
   ExploreEventsView,
-  createExploreEventsScreensStack
+  createExploreEventsScreens
 } from "@screens/ExploreEvents"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { AppQueryClientProvider } from "@components/AppQueryClientProvider"
@@ -26,7 +26,7 @@ export default ExploreEventsMeta
 type ExploreEventsStory = ComponentStory<typeof ExploreEventsView>
 
 const Stack = createStackNavigator<ExploreEventsScreensParamsList>()
-const screens = createExploreEventsScreensStack(Stack, () => ({
+const screens = createExploreEventsScreens(Stack, () => ({
   value: Promise.resolve([
     EventMocks.Multiday,
     EventMocks.NoPlacemarkInfo,

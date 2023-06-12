@@ -12,6 +12,7 @@ interface ImageAndNameProps {
   userHandle: string
   eventColor: string
   userFriendStatus: UserToProfileRelationStatus | undefined
+  imageURL?: string
   toastOffset: number
   style?: StyleProp<ViewStyle>
   imageStyle?: StyleProp<ImageStyle>
@@ -23,6 +24,7 @@ const ProfileImageAndNameWithFriend = ({
   eventColor,
   userFriendStatus,
   style,
+  imageURL,
   imageStyle
 }: ImageAndNameProps) => {
   const [friendStatus, setFriendStatus] = useState(userFriendStatus)
@@ -56,7 +58,7 @@ const ProfileImageAndNameWithFriend = ({
 
   return (
     <View style={[{ flexDirection: "row" }, style]}>
-      <ProfileImage imageURL="@assets/icon.png" style={imageStyle} />
+      <ProfileImage imageURL={imageURL} style={imageStyle} />
       <View>
         <View style={{ flexDirection: "row" }}>
           <Headline>{username}</Headline>
