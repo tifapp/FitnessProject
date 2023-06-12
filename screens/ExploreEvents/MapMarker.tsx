@@ -1,21 +1,29 @@
 import { CaptionTitle } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
 import React from "react"
-import { ImageBackground, StyleSheet, View } from "react-native"
+import {
+  ImageBackground,
+  StyleProp,
+  StyleSheet,
+  View,
+  ViewStyle
+} from "react-native"
 
 const MARKER_SIZE = 44
 
 export type ExploreEventsMarkerProps = {
   color: string
   attendeeCount: number
+  style?: StyleProp<ViewStyle>
 }
 
 export const ExploreEventsMarkerView = ({
   color,
-  attendeeCount
+  attendeeCount,
+  style
 }: ExploreEventsMarkerProps) => {
   return (
-    <View style={styles.frame}>
+    <View style={[style, styles.frame]}>
       <View style={styles.container}>
         <View style={styles.markerContainer}>
           <View style={[{ backgroundColor: color }, styles.badgeContainer]}>

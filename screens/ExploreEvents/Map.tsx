@@ -1,7 +1,7 @@
 import { ExploreEventsMarkerView } from "@screens/ExploreEvents/MapMarker"
 import { CurrentUserEvent } from "@lib/events"
 import { LocationCoordinate2D, Region } from "@lib/location"
-import React, { useRef } from "react"
+import React from "react"
 import { StyleProp, ViewStyle } from "react-native"
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
 
@@ -21,51 +21,41 @@ export const ExploreEventsMap = ({
   onEventSelected,
   onLongPress,
   style
-}: ExploreEventsMapProps) => {
-  const mapRef = useRef<MapView | null>(null)
-
-  return (
-    <MapView
-      ref={mapRef}
-      style={style}
-      provider={PROVIDER_GOOGLE}
-      initialRegion={initialRegion}
-      loadingEnabled={true}
-      toolbarEnabled={false}
-      onLongPress={(e) => onLongPress(e.nativeEvent.coordinate)}
-      followsUserLocation={true}
-      moveOnMarkerPress={false}
-      showsUserLocation={true}
-      onRegionChangeComplete={(region) => onRegionChanged(region)}
-      showsMyLocationButton={false}
-      customMapStyle={[
-        {
-          featureType: "poi",
-          stylers: [{ visibility: "off" }]
-        },
-        {
-          featureType: "transit",
-          stylers: [{ visibility: "off" }]
-        }
-      ]}
-    >
-      {events.map((event) => (
-        <Marker
-          key={event.id}
-          coordinate={{
-            latitude: event.coordinates.latitude,
-            longitude: event.coordinates.longitude
-          }}
-          onPress={() => onEventSelected(event)}
-        >
-          {
-            <ExploreEventsMarkerView
-              color={event.color}
-              attendeeCount={event.attendeeCount}
-            />
-          }
-        </Marker>
-      ))}
-    </MapView>
-  )
-}
+}: ExploreEventsMapProps) => (
+  <MapView
+    style={style}
+    provider={PROVIDER_GOOGLE}
+    initialRegion={initialRegion}
+    loadingEnabled={true}
+    toolbarEnabled={false}
+    onLongPress={(e) => onLongPress(e.nativeEvent.coordinate)}
+    followsUserLocation={true}
+    moveOnMarkerPress={false}
+    showsUserLocation={true}
+    onRegionChangeComplete={(region) => onRegionChanged(region)}
+    showsMyLocationButton={false}
+    customMapStyle={[
+      {
+        featureType: "poi",
+        stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "transit",
+        stylers: [{ visibility: "off" }]
+      }
+    ]}
+  >
+    {events.map((event) => (
+      <Marker
+        key={event.id}
+        coordinate={event.coordinates}
+        onPress={() => onEventSelected(event)}
+      >
+        <ExploreEventsMarkerView
+          color={event.color}
+          attendeeCount={event.attendeeCount}
+        />
+      </Marker>
+    ))}
+  </MapView>
+)

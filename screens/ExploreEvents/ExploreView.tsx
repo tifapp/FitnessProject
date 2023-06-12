@@ -45,17 +45,21 @@ export const ExploreEventsView = ({
           />
         )
         : (
-          <View
-            accessibilityLabel="Loading a map where you can explore nearby events in any area"
-            style={styles.mapPlaceholder}
-          />
+          <Water />
         )}
     </View>
   )
 }
 
+const Water = () => (
+  <View
+    accessibilityLabel="Loading a map where you can explore nearby events in any area"
+    style={styles.water}
+  />
+)
+
 const styles = StyleSheet.create({
-  mapPlaceholder: {
+  water: {
     width: "100%",
     height: "100%",
     backgroundColor: "#a3bff4"
