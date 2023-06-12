@@ -1,15 +1,11 @@
 import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import {
-  CurrentUserEvent,
-  EventColors,
-  isHostingEvent
-} from "@lib/events/Event"
+import { CurrentUserEvent, EventColors } from "@lib/events/Event"
 import { placemarkToAbbreviatedAddress } from "@lib/location"
-import MenuDropdown from "./MenuDropdown"
 import { dayjs, now } from "@lib/date"
 import { Ionicon, IoniconName } from "@components/common/Icons"
 import { BodyText, Caption, Headline } from "@components/Text"
+import ConfirmationDialogue from "@components/common/ConfirmationDialogue"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
 
 export type EventCardProps = {
@@ -30,13 +26,9 @@ export const EventCard = ({ event, style }: EventCardProps) => {
           username={event.host.username}
           userHandle={event.host.handle}
         />
-
-        <View style={styles.moreButtonStyle}>
-          <MenuDropdown
-            isEventHost={isHostingEvent(event.userAttendeeStatus)}
-          />
-        </View>
+        <ConfirmationDialogue style={styles.moreButtonStyle} />
       </View>
+
       <View style={styles.middleRow}>
         <Headline>{event.title}</Headline>
 

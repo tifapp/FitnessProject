@@ -13,10 +13,9 @@ import {
 type ButtonProps = {
   title: string
   style?: StyleProp<ViewStyle>
-  textStyle?: StyleProp<TextStyle>
 } & TouchableOpacityProps
 
-export const PrimaryButton = ({title, style, textStyle, ...props}: ButtonProps) => {
+export const PrimaryButton = ({title, style, ...props}: ButtonProps) => {
   return (
     <TouchableOpacity
       style={[
@@ -26,13 +25,13 @@ export const PrimaryButton = ({title, style, textStyle, ...props}: ButtonProps) 
       ]}
       {...props}
     >
-      <Headline style={[{ color: "white" }, textStyle]}>{title}</Headline>
+      <Headline style={{color: "white" }}>{title}</Headline>
       {props.children}
     </TouchableOpacity>
   )
 }
 
-export const OutlinedButton = ({title, style, textStyle, ...props}: ButtonProps) => {
+export const OutlinedButton = ({title, style, ...props}: ButtonProps) => {
   return (
     <TouchableOpacity
       style={[
@@ -43,7 +42,24 @@ export const OutlinedButton = ({title, style, textStyle, ...props}: ButtonProps)
       ]}
       {...props}
     >
-      <Headline style={[{ color: AppStyles.darkColor }, textStyle]}>{title}</Headline>
+      <Headline style={{ color: AppStyles.darkColor }}>{title}</Headline>
+      {props.children}
+    </TouchableOpacity>
+  )
+}
+
+export const DisabledButton = ({title, style, ...props}: ButtonProps) => {
+  return (
+    <TouchableOpacity
+      style={[
+        styles.container,
+        styles.disabledStyle,
+        style
+      ]}
+      {...props}
+      disabled
+    >
+      <Headline style={{ color: AppStyles.colorOpacity50 }}>{title}</Headline>
       {props.children}
     </TouchableOpacity>
   )
@@ -60,5 +76,10 @@ const styles = StyleSheet.create({
   lightStyle: {
     backgroundColor: "white",
     borderWidth: 1
-  }
+  },
+  disabledStyle: {
+    flex: 1,
+    backgroundColor: AppStyles.darkColor + "0D",
+    borderWidth: 0
+  },
 })

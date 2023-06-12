@@ -4,8 +4,6 @@ import React from "react"
 import { EventMocks, CurrentUserEvent } from "@lib/events"
 import "../../helpers/Matchers"
 
-jest.mock("react-native-popup-menu")
-
 describe("EventCard tests", () => {
   beforeEach(() => {
     jest.useFakeTimers().setSystemTime(new Date("2023-03-07T12:00:00"))

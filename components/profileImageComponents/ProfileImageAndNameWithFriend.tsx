@@ -88,7 +88,7 @@ const ProfileImageAndNameWithFriend = ({
             </View>
           )}
         </View>
-        <Caption>{userHandle}</Caption>
+        <Caption>{`@${userHandle}`}</Caption>
       </View>
     </View>
   )

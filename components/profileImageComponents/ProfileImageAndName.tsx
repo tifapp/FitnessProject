@@ -28,7 +28,7 @@ const ProfileImageAndName = ({
     />
     <View style={styles.textContainer}>
       <Headline style={styles.handle}>{username}</Headline>
-      <Caption>{userHandle}</Caption>
+      <Caption>@{userHandle}</Caption>
     </View>
   </View>
 )

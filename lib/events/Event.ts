@@ -34,19 +34,19 @@ export namespace EventAttendeeMocks {
   export const Blob = {
     id: uuid(),
     username: "Blob",
-    handle: "@Blob"
+    handle: "Blob"
   } as EventAttendee
 
   export const BlobJr = {
     id: uuid(),
     username: "Blob Jr.",
-    handle: "@SmallBlob"
+    handle: "SmallBlob"
   } as EventAttendee
 
   export const BlobSr = {
     id: uuid(),
     username: "Blob Sr.",
-    handle: "@TheOriginalBlob"
+    handle: "TheOriginalBlob"
   } as EventAttendee
 
   // NB: Unfortunately, we can't reuse Harrison's legendary
