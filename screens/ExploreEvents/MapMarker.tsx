@@ -1,5 +1,6 @@
 import { CaptionTitle } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
+import ProfileImage from "@components/profileImageComponents/ProfileImage"
 import React from "react"
 import {
   ImageBackground,
@@ -14,12 +15,14 @@ const MARKER_SIZE = 44
 export type ExploreEventsMarkerProps = {
   color: string
   attendeeCount: number
+  imageURL?: string
   style?: StyleProp<ViewStyle>
 }
 
 export const ExploreEventsMarkerView = ({
   color,
   attendeeCount,
+  imageURL,
   style
 }: ExploreEventsMarkerProps) => {
   return (
@@ -39,10 +42,7 @@ export const ExploreEventsMarkerView = ({
           </View>
 
           <View style={styles.whiteBackground}>
-            <ImageBackground
-              source={require("../../assets/Windows_10_Default_Profile_Picture.svg.png")}
-              style={styles.imageBackground}
-            />
+            <ProfileImage imageURL={imageURL} style={styles.imageBackground} />
           </View>
         </View>
       </View>

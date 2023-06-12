@@ -53,6 +53,7 @@ export const ExploreEventsMap = ({
       >
         <ExploreEventsMarkerView
           color={event.color}
+          imageURL={event.host.profileImageURL}
           attendeeCount={event.attendeeCount}
         />
       </Marker>

@@ -25,6 +25,7 @@ export const EventCard = ({ event, style }: EventCardProps) => {
         <ProfileImageAndName
           username={event.host.username}
           userHandle={event.host.handle}
+          imageURL={event.host.profileImageURL}
         />
         <ConfirmationDialogue style={styles.moreButtonStyle} />
       </View>

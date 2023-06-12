@@ -31,10 +31,12 @@ export type EventAttendee = {
  * Some mock {@link EventAttendee} objects.
  */
 export namespace EventAttendeeMocks {
-  export const Blob = {
+  export const Alivs = {
     id: uuid(),
-    username: "Blob",
-    handle: "Blob"
+    username: "Alvis",
+    handle: "alvis",
+    profileImageURL:
+      "https://www.escapistmagazine.com/wp-content/uploads/2023/05/xc3-future-redeemed-alvis.jpg?resize=1200%2C673"
   } as EventAttendee
 
   export const BlobJr = {
@@ -117,7 +119,7 @@ export type CurrentUserEvent = Event & {
  */
 export namespace EventMocks {
   export const PickupBasketball = {
-    host: EventAttendeeMocks.Blob,
+    host: EventAttendeeMocks.Alivs,
     id: uuid(),
     title: "Pickup Basketball",
     description: "I'm better than Lebron James.",
@@ -143,7 +145,7 @@ export namespace EventMocks {
   } as CurrentUserEvent
 
   export const Multiday = {
-    host: EventAttendeeMocks.Blob,
+    host: EventAttendeeMocks.Alivs,
     id: uuid(),
     title: "Multiday Event",
     description: "This event runs for more than one day.",
@@ -169,7 +171,7 @@ export namespace EventMocks {
   } as CurrentUserEvent
 
   export const NoPlacemarkInfo = {
-    host: EventAttendeeMocks.Blob,
+    host: EventAttendeeMocks.Alivs,
     id: uuid(),
     title: "No Placemark Info",
     attendeeCount: 5,

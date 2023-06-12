@@ -12,6 +12,7 @@ import ProfileImage from "./ProfileImage"
 interface ImageAndNameProps {
   username: string
   userHandle: string
+  imageURL?: string
   style?: StyleProp<ViewStyle>
   imageStyle?: StyleProp<ImageStyle>
 }
@@ -19,13 +20,11 @@ interface ImageAndNameProps {
 const ProfileImageAndName = ({
   username,
   userHandle,
+  imageURL,
   style
 }: ImageAndNameProps) => (
   <View style={[style, styles.container]}>
-    <ProfileImage
-      imageURL="@assets/Windows_10_Default_Profile_Picture.svg.png"
-      style={styles.image}
-    />
+    <ProfileImage imageURL={imageURL} style={styles.image} />
     <View style={styles.textContainer}>
       <Headline style={styles.handle}>{username}</Headline>
       <Caption>@{userHandle}</Caption>
