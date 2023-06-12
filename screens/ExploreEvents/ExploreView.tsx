@@ -1,5 +1,12 @@
 import React from "react"
-import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import {
+  Pressable,
+  SafeAreaView,
+  StyleProp,
+  StyleSheet,
+  View,
+  ViewStyle
+} from "react-native"
 import {
   LocationCoordinate2D,
   Region,
@@ -12,24 +19,29 @@ import { Cancellable } from "@lib/Cancellable"
 import { ExploreEventsMap } from "./Map"
 import { useLastDefinedValue } from "@hooks/useLastDefinedValue"
 import { ExploreEventsBottomSheet } from "./BottomSheet"
-import { BodyText, Headline, Title } from "@components/Text"
+import { BodyText, Title } from "@components/Text"
 import { SkeletonEventCard } from "@components/eventCard/SkeletonEventCard"
 import { Ionicon } from "@components/common/Icons"
 import { PrimaryButton } from "@components/common/Buttons"
+import { ExploreEventsSearchBar } from "./SearchBar"
 
 export type ExploreEventsProps = {
+  searchText?: string
   initialCenter: ExploreEventsInitialCenter
   onMapLongPress: (coordinate: LocationCoordinate2D) => void
   onEventTapped: (event: CurrentUserEvent) => void
+  onSearchTapped: () => void
   fetchEvents: (region: Region) => Cancellable<CurrentUserEvent[]>
   style?: StyleProp<ViewStyle>
 }
 
 export const ExploreEventsView = ({
+  searchText,
   initialCenter,
   fetchEvents,
   onMapLongPress,
   onEventTapped,
+  onSearchTapped,
   style
 }: ExploreEventsProps) => {
   const { region, events, updateRegion } = useExploreEvents(initialCenter, {
@@ -41,8 +53,9 @@ export const ExploreEventsView = ({
   // user pans to a new region
   const mapEventsData = useLastDefinedValue(events.data)
 
+  const isLoadingEvents = events.isLoading || events.isIdle
   return (
-    <View style={style}>
+    <View style={[style, styles.container]}>
       {region
         ? (
           <ExploreEventsMap
@@ -57,17 +70,22 @@ export const ExploreEventsView = ({
         : (
           <Water />
         )}
+      <SafeAreaView style={styles.searchBarContainer}>
+        <Pressable onPress={onSearchTapped} style={styles.searchBar}>
+          <ExploreEventsSearchBar text={searchText} />
+        </Pressable>
+      </SafeAreaView>
       <ExploreEventsBottomSheet
         onEventSelected={onEventTapped}
         events={events.data ?? []}
         HeaderComponent={
           <Title style={styles.sheetHeaderText}>
-            {!events.isLoading ? "Nearby Events" : "Finding Nearby Events..."}
+            {!isLoadingEvents ? "Nearby Events" : "Finding Nearby Events..."}
           </Title>
         }
         EmptyEventsComponent={
           <View style={styles.emptyEventsContainer}>
-            {events.isLoading && <LoadingView />}
+            {isLoadingEvents && <LoadingView />}
             {events.isError && <ErrorView onRetried={events.refetch} />}
             {events.isSuccess && events.data.length === 0 && <NoResultsView />}
           </View>
@@ -120,10 +138,13 @@ const Water = () => (
 )
 
 const styles = StyleSheet.create({
+  container: {
+    position: "relative"
+  },
   sheetHeaderText: {
     flex: 1,
     backgroundColor: "white",
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     paddingBottom: 8
   },
   water: {
@@ -136,7 +157,7 @@ const styles = StyleSheet.create({
     height: "100%"
   },
   emptyEventsContainer: {
-    paddingHorizontal: 24
+    paddingHorizontal: 16
   },
   skeletonCardSpacing: {
     paddingVertical: 12
@@ -153,6 +174,13 @@ const styles = StyleSheet.create({
   emptyEventsText: {
     marginTop: 8,
     textAlign: "center"
+  },
+  searchBarContainer: {
+    position: "absolute",
+    width: "100%"
+  },
+  searchBar: {
+    paddingHorizontal: 16
   },
   tryAgainButton: {
     marginTop: 24,

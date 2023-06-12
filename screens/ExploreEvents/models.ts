@@ -13,10 +13,17 @@ export const SAN_FRANCISCO_DEFAULT_REGION = createDefaultMapRegion({
 
 export type ExploreEventsInitialCenter =
   | { center: "user-location" }
-  | { center: "preset"; coordinates: LocationCoordinate2D }
+  | { center: "preset"; coordinate: LocationCoordinate2D }
+
+export const createInitialCenter = (
+  coordinate?: LocationCoordinate2D
+): ExploreEventsInitialCenter => {
+  if (coordinate) return { center: "preset", coordinate }
+  return { center: "user-location" }
+}
 
 export const initialCenterToRegion = (center: ExploreEventsInitialCenter) => {
   return center.center === "preset"
-    ? createDefaultMapRegion(center.coordinates)
+    ? createDefaultMapRegion(center.coordinate)
     : undefined
 }

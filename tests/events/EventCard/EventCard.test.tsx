@@ -14,11 +14,10 @@ describe("EventCard tests", () => {
 
   it("formats the date range correctly", () => {
     const { queryByText } = renderEventCard(EventMocks.PickupBasketball)
-    expect(queryByText("Sat, Mar 18")).toBeDisplayed()
+    expect(queryByText("Sat, Mar 18 • 12:00 PM")).toBeDisplayed()
   })
 })
 
 const renderEventCard = (event: CurrentUserEvent) => {
   return render(<EventCard event={event} />)
 }
-

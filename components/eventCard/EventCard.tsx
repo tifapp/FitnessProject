@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignContent: "center",
     borderRadius: 12,
-    marginRight: 8
+    marginRight: 16
   },
   icon: {
     padding: 4

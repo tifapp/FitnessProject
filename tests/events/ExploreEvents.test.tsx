@@ -14,12 +14,33 @@ import {
 } from "../helpers/ReactQuery"
 import { UpdateDependencyValues } from "@lib/dependencies"
 import { UserLocationDependencyKeys } from "@hooks/UserLocation"
-import { SAN_FRANCISCO_DEFAULT_REGION } from "@screens/ExploreEvents/models"
+import {
+  SAN_FRANCISCO_DEFAULT_REGION,
+  createInitialCenter
+} from "@screens/ExploreEvents/models"
 import { nonCancellable, endlessCancellable } from "../helpers/Cancellable"
 import { EventMocks } from "@lib/events"
 
 describe("ExploreEvents tests", () => {
   beforeEach(() => jest.resetAllMocks())
+
+  describe("ExploreEventsInitialCenter tests", () => {
+    describe("CoordinateToInitialCenter tests", () => {
+      it("should be user-location when undefined", () => {
+        expect(createInitialCenter(undefined)).toMatchObject({
+          center: "user-location"
+        })
+      })
+
+      it("should be preset when coordinates passed", () => {
+        const coordinate = mockLocationCoordinate2D()
+        expect(createInitialCenter(coordinate)).toMatchObject({
+          center: "preset",
+          coordinate
+        })
+      })
+    })
+  })
 
   describe("useExploreEvents tests", () => {
     beforeEach(() => jest.useFakeTimers())
@@ -28,7 +49,7 @@ describe("ExploreEvents tests", () => {
     it("should use the initial provided region when fetching for first time", async () => {
       fetchEvents.mockReturnValue(endlessCancellable())
       const coordinates = mockLocationCoordinate2D()
-      renderUseExploreEvents({ center: "preset", coordinates })
+      renderUseExploreEvents({ center: "preset", coordinate: coordinates })
 
       await waitFor(() => {
         expect(fetchEvents).toHaveBeenCalledWith(
@@ -41,7 +62,7 @@ describe("ExploreEvents tests", () => {
       fetchEvents.mockReturnValue(endlessCancellable())
 
       const coordinates = mockLocationCoordinate2D()
-      renderUseExploreEvents({ center: "preset", coordinates })
+      renderUseExploreEvents({ center: "preset", coordinate: coordinates })
 
       await waitFor(() => {
         expect(requestForegroundPermissions).not.toHaveBeenCalled()
@@ -96,7 +117,7 @@ describe("ExploreEvents tests", () => {
       isSignificantlyDifferentRegions.mockReturnValue(false)
       const { result } = renderUseExploreEvents({
         center: "preset",
-        coordinates: mockLocationCoordinate2D()
+        coordinate: mockLocationCoordinate2D()
       })
 
       const updatedRegion = mockRegion()
@@ -116,7 +137,7 @@ describe("ExploreEvents tests", () => {
       isSignificantlyDifferentRegions.mockReturnValue(true)
       const { result } = renderUseExploreEvents({
         center: "preset",
-        coordinates: mockLocationCoordinate2D()
+        coordinate: mockLocationCoordinate2D()
       })
 
       const updatedRegion = mockRegion()
@@ -150,7 +171,7 @@ describe("ExploreEvents tests", () => {
 
       const { result } = renderUseExploreEvents({
         center: "preset",
-        coordinates: mockLocationCoordinate2D()
+        coordinate: mockLocationCoordinate2D()
       })
 
       const region = mockRegion()
@@ -165,7 +186,7 @@ describe("ExploreEvents tests", () => {
 
       renderUseExploreEvents({
         center: "preset",
-        coordinates: mockLocationCoordinate2D()
+        coordinate: mockLocationCoordinate2D()
       })
 
       await waitFor(() => expect(fetchEvents).toHaveBeenCalled())
