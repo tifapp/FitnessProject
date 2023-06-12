@@ -34,11 +34,12 @@ export const Basic: ExploreEventsStory = () => (
               coordinates: LocationCoordinatesMocks.SanFrancisco
             }}
             fetchEvents={() => ({
-              value: Promise.resolve([
-                EventMocks.Multiday,
-                EventMocks.NoPlacemarkInfo,
-                EventMocks.PickupBasketball
-              ]),
+              // value: Promise.resolve([
+              //   EventMocks.Multiday,
+              //   EventMocks.NoPlacemarkInfo,
+              //   EventMocks.PickupBasketball
+              // ]),
+              value: Promise.resolve([]),
               cancel: () => {}
             })}
             onMapLongPress={console.log}

@@ -12,8 +12,9 @@ import { Cancellable } from "@lib/Cancellable"
 import { ExploreEventsMap } from "./Map"
 import { useLastDefinedValue } from "@hooks/useLastDefinedValue"
 import { ExploreEventsBottomSheet } from "./BottomSheet"
-import { Title } from "@components/Text"
+import { BodyText, Headline, Title } from "@components/Text"
 import { SkeletonEventCard } from "@components/eventCard/SkeletonEventCard"
+import { Ionicon } from "@components/common/Icons"
 
 export type ExploreEventsProps = {
   initialCenter: ExploreEventsInitialCenter
@@ -63,18 +64,33 @@ export const ExploreEventsView = ({
             {!events.isLoading ? "Nearby Events" : "Finding Nearby Events..."}
           </Title>
         }
-        EmptyEventsComponent={<>{events.isLoading && <LoadingIndicator />}</>}
+        EmptyEventsComponent={
+          <View style={styles.emptyEventsContainer}>
+            {events.isLoading && <LoadingIndicator />}
+            {events.isError && <Headline>Lol</Headline>}
+            {events.isSuccess && events.data.length === 0 && <NoResultsView />}
+          </View>
+        }
       />
     </View>
   )
 }
 
-const LoadingIndicator = () => (
-  <View style={styles.horizontalSpacing}>
-    <SkeletonEventCard style={styles.skeletonCardSpacing} />
-    <SkeletonEventCard style={styles.skeletonCardSpacing} />
-    <SkeletonEventCard style={styles.skeletonCardSpacing} />
+const NoResultsView = () => (
+  <View style={styles.noResultsContainer}>
+    <Ionicon name="map" size={48} style={styles.noResultsIcon} />
+    <BodyText style={styles.noResultsText}>
+      No events were found in this area. Try moving to a different location.
+    </BodyText>
   </View>
+)
+
+const LoadingIndicator = () => (
+  <>
+    <SkeletonEventCard style={styles.skeletonCardSpacing} />
+    <SkeletonEventCard style={styles.skeletonCardSpacing} />
+    <SkeletonEventCard style={styles.skeletonCardSpacing} />
+  </>
 )
 
 const Water = () => (
@@ -100,10 +116,24 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%"
   },
-  horizontalSpacing: {
-    paddingHorizontal: 24
+  emptyEventsContainer: {
+    paddingHorizontal: 24,
+    flex: 1
   },
   skeletonCardSpacing: {
     paddingVertical: 12
+  },
+  noResultsContainer: {
+    width: "100%",
+    marginTop: 24,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  noResultsIcon: {
+    opacity: 0.5
+  },
+  noResultsText: {
+    marginTop: 16,
+    textAlign: "center"
   }
 })
