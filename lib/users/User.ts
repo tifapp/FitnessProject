@@ -1,3 +1,6 @@
+import { CurrentUserEvent, EventMocks } from "../events"
+import { uuid } from "../uuid"
+
 const IS_VALID_USER_HANDLE_REGEX = /^@[A-Za-z0-9_]{1,15}$/
 
 /**
@@ -17,4 +20,33 @@ const IS_VALID_USER_HANDLE_REGEX = /^@[A-Za-z0-9_]{1,15}$/
  */
 export const isValidUserHandle = (handle: string) => {
   return IS_VALID_USER_HANDLE_REGEX.test(handle)
+}
+
+export type UserFriendStatus =
+  | "not-friends"
+  | "friend-request-pending"
+  | "friends"
+  | "blocked"
+
+export type User = {
+  id: string
+  name: string
+  handle: string
+  bio: string
+  profileImageURL: string
+  relationStatus: UserFriendStatus | "current-user"
+}
+
+/**
+ * Some mock {@link User} objects.
+ */
+export namespace UserMocks {
+  export const Mia = {
+    id: uuid(),
+    name: "Mia Anderson",
+    handle: "@MysticalMia",
+    bio: "When I'm not on the field or court, you can find me cheering for my favorite teams and athletes from the sidelines.",
+    profileImageURL: "",
+    relationStatus: "not-friends"
+  } as User
 }

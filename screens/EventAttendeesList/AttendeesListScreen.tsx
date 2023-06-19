@@ -1,5 +1,5 @@
 import { SkeletonView } from "@components/common/Skeleton"
-import ConfirmationDialogue from "@components/profileImageComponents/ConfirmationDialogue"
+import ConfirmationDialogue from "@components/common/ConfirmationDialogue"
 import { delayData } from "@lib/DelayData"
 import { AttendeeEntry } from "@screens/EventAttendeesList/attendeeEntry"
 import React from "react"

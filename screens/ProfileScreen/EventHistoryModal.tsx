@@ -1,16 +1,10 @@
-import { Headline, Title } from "@components/Text"
+import React, { SetStateAction } from "react"
+import { Title } from "@components/Text"
 import { TouchableIonicon } from "@components/common/Icons"
 import { EventCard } from "@components/eventCard/EventCard"
 import { AppStyles } from "@lib/AppColorStyle"
 import { CurrentUserEvent } from "@lib/events"
-import { SetStateAction } from "react"
-import {
-  FlatList,
-  ListRenderItemInfo,
-  Modal,
-  StyleSheet,
-  View
-} from "react-native"
+import { FlatList, ListRenderItemInfo, Modal, StyleSheet } from "react-native"
 
 interface Props {
   username: string
@@ -22,7 +16,12 @@ interface Props {
 const MARGIN_HORIZONTAL = 16
 const MARGIN_VERTICAL = 16
 
-const AllEventsModal = ({username, visible, setVisible, events }: Props) => {
+const EventHistoryModal = ({
+  username,
+  visible,
+  setVisible,
+  events
+}: Props) => {
   return (
     <Modal style={styles.container} visible={visible} animationType="slide">
       <TouchableIonicon
@@ -32,15 +31,13 @@ const AllEventsModal = ({username, visible, setVisible, events }: Props) => {
           setVisible(false)
         }}
       />
-      <View style={styles.eventSpacing}>
-      <Title>{`${username}'s Events`}</Title>
+      <Title style={styles.eventSpacing}>{`${username}'s\nEvents`}</Title>
       <FlatList
         data={events}
         renderItem={({ item }: ListRenderItemInfo<CurrentUserEvent>) => (
-          <EventCard event={item} style={{marginVertical: 16}}/>
+          <EventCard event={item} style={styles.eventSpacing} />
         )}
       />
-      </View>
     </Modal>
   )
 }
@@ -58,9 +55,8 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
     backgroundColor: AppStyles.colorOpacity35,
     borderRadius: 20,
-    marginRight: 16,
-    marginVertical: 8
+    marginRight: 16
   }
 })
 
-export default AllEventsModal
+export default EventHistoryModal

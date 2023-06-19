@@ -29,7 +29,7 @@ export const BodyText = (props: TextProps) => (
  * A text component for smaller and more subtle details.
  */
 export const Caption = (props: TextProps) => (
-  <Text {...props} style={[props.style, styles.caption]} />
+  <Text {...props} style={[styles.caption, props.style]} />
 )
 
 export const CaptionTitle = (props: TextProps) => (

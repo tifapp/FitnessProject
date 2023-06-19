@@ -1,12 +1,14 @@
+import React from "react"
 import EventsList from "@components/EventsList"
 import { StackNavigatorType } from "@components/Navigation"
-import { UserMocks } from "@lib/User"
 import { EventMocks } from "@lib/events"
 import { StackScreenProps } from "@react-navigation/stack"
 import { AttendeesListScreen } from "@screens/EventAttendeesList/AttendeesListScreen"
 import { EventDetailsScreenNavWrapper } from "@screens/EventDetailsScreenNavWrapper"
-import { ProfileScreenProps } from "@screens/ProfileScreen/ProfileScreen"
-import { ProfileScreenNavWrapper } from "@screens/ProfileScreen/ProfileScreenNavWrapper"
+import {
+  ProfileScreenProps,
+  ProfileStack
+} from "@screens/ProfileScreen/Navigation/ProfileScreensNavigation"
 import { TestChatRoomScreen } from "@screens/testScreens/TestChatRoomScreen"
 import { EventDetailsProps } from "./EventDetails"
 
@@ -41,11 +43,7 @@ export const createEventDetailsStackScreens = <
         component={EventDetailsScreenNavWrapper}
         initialParams={{ event: EventMocks.PickupBasketball }}
       />
-      <stack.Screen
-        name={"Profile Screen"}
-        component={ProfileScreenNavWrapper}
-        initialParams={{ user: UserMocks.Mia }}
-      />
+      <stack.Screen name={"Profile Screen"} component={ProfileStack} />
       <stack.Screen name={"Attendees List"} component={AttendeesListScreen} />
       <stack.Screen name={"Chat Room"} component={TestChatRoomScreen} />
     </>

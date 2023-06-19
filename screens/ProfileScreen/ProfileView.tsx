@@ -1,35 +1,34 @@
+import React, { useState } from "react"
 import { Caption, Headline, Title } from "@components/Text"
-import { OutlinedButton, PrimaryButton } from "@components/common/Buttons"
+import {
+  DisabledButton,
+  OutlinedButton,
+  PrimaryButton
+} from "@components/common/Buttons"
 import ExpandableText from "@components/common/ExpandableText"
 import { ToastWithIcon } from "@components/common/Toasts"
 import ProfileImage from "@components/profileImageComponents/ProfileImage"
-import { User } from "@lib/User"
-import { useState } from "react"
-import { FlatList, ListRenderItemInfo, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
+import { User } from "@lib/users/User"
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
 import EventPager from "./EventCarousel"
-import AllEventsModal from "./AllEventsModal"
 import { AppStyles } from "@lib/AppColorStyle"
-import { EventCard } from "@components/eventCard/EventCard"
+import EventHistoryModal from "./EventHistoryModal"
 import { CurrentUserEvent } from "@lib/events"
 
-export interface ProfileScreenProps {
+export type ProfileScreenViewProps = {
   user: User
+  events: CurrentUserEvent[]
 }
 
 const NUM_EVENTS_SHOWN = 20
 
-const ProfileScreen = ({ user }: ProfileScreenProps) => {
-  const [userStatus, setUserStatus] = useState(user.userStatus)
+const ProfileView = ({ user, events }: ProfileScreenViewProps) => {
+  const [userStatus, setUserStatus] = useState(user.relationStatus)
   const [modalVisible, setModalVisible] = useState(false)
   const [requestSent, setRequestSent] = useState(
     !!(userStatus === "friend-request-pending" || userStatus === "friends")
   )
-  const colorText = "#4285F4"
-  const firstEvents = user.events.slice(0, NUM_EVENTS_SHOWN)
-
-  const setStatus = () => {
-    setUserStatus("friend-request-pending")
-  }
+  const recentEvents = events.slice(0, NUM_EVENTS_SHOWN)
 
   const openModal = () => {
     setModalVisible(true)
@@ -37,11 +36,11 @@ const ProfileScreen = ({ user }: ProfileScreenProps) => {
 
   return (
     <View style={styles.container}>
-      <AllEventsModal
-        username={user.username}
+      <EventHistoryModal
+        username={user.name}
         visible={modalVisible}
         setVisible={setModalVisible}
-        events={user.events}
+        events={events}
       />
       <ScrollView>
         <View style={[styles.spacing, styles.imageSection]}>
@@ -49,7 +48,7 @@ const ProfileScreen = ({ user }: ProfileScreenProps) => {
             style={styles.profileImage}
             imageURL={user.profileImageURL}
           />
-          <Title style={styles.title}>{user.username}</Title>
+          <Title style={styles.title}>{user.name}</Title>
           <Caption>{user.handle}</Caption>
         </View>
 
@@ -59,30 +58,15 @@ const ProfileScreen = ({ user }: ProfileScreenProps) => {
               <PrimaryButton
                 style={{ flex: 1 }}
                 title="Add Friend"
-                onPress={setStatus}
+                onPress={() => setUserStatus("friend-request-pending")}
               />
             )}
             {userStatus === "friend-request-pending" && (
-              <OutlinedButton
-                style={styles.disabledButton}
-                textStyle={styles.textButton}
-                title="Request Pending"
-                disabled
-              />
+              <DisabledButton title="Request Pending" />
             )}
-            {userStatus === "friends" && (
-              <OutlinedButton
-                style={styles.disabledButton}
-                textStyle={styles.textButton}
-                title="Friends"
-                disabled
-              />
-            )}
+            {userStatus === "friends" && <DisabledButton title="Friends" />}
             {userStatus !== "blocked" && (
-              <OutlinedButton
-                style={styles.messageButton}
-                title="Message"
-              />
+              <OutlinedButton style={styles.messageButton} title="Message" />
             )}
             <ToastWithIcon
               requestSent={requestSent}
@@ -96,15 +80,15 @@ const ProfileScreen = ({ user }: ProfileScreenProps) => {
         <View style={[styles.spacing, { marginVertical: 24 }]}>
           <Headline style={{ marginBottom: 16 }}>About</Headline>
           <ExpandableText
-            text={user.biography}
+            text={user.bio}
             linesToDisplay={3}
-            style={{ color: colorText }}
+            style={{ color: AppStyles.highlightedText }}
           />
         </View>
 
-        <View style={[styles.spacing, { flexDirection: "row"}]}>
+        <View style={[styles.spacing, { flexDirection: "row" }]}>
           <Headline>Events</Headline>
-          {user.events.length > 1 && (
+          {events.length > 1 && (
             <View
               style={{
                 flex: 1,
@@ -113,29 +97,31 @@ const ProfileScreen = ({ user }: ProfileScreenProps) => {
               }}
             >
               <TouchableOpacity onPress={openModal}>
-                <Headline style={{ color: colorText }}>View All</Headline>
+                <Headline style={{ color: AppStyles.highlightedText }}>
+                  View All
+                </Headline>
               </TouchableOpacity>
             </View>
           )}
         </View>
-        {user.events.length !== 0
+        {events.length !== 0
           ? (
-            <EventPager events={firstEvents} />
+            <EventPager events={recentEvents} />
           )
           : (
             <View
               style={[
                 styles.spacing,
                 {
-                flex: 1,
-                alignItems: "center",
-                justifyContent: "center"
-              }]}
+                  flex: 1,
+                  alignItems: "center",
+                  justifyContent: "center"
+                }
+              ]}
             >
-              <Caption>Sorry, this user hasn't attended any events</Caption>
+              <Caption>{"Sorry, this user hasn't attended any events"}</Caption>
             </View>
-          )
-        }
+          )}
       </ScrollView>
     </View>
   )
@@ -144,21 +130,12 @@ const ProfileScreen = ({ user }: ProfileScreenProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 16,
     backgroundColor: "white"
   },
   profileImage: {
     width: 80,
     height: 80,
     marginBottom: 24
-  },
-  disabledButton: {
-    flex: 1,
-    backgroundColor: AppStyles.darkColor + "0D",
-    borderWidth: 0
-  },
-  textButton: {
-    color: AppStyles.colorOpacity50
   },
   spacing: {
     paddingHorizontal: 16
@@ -180,4 +157,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default ProfileScreen
+export default ProfileView
