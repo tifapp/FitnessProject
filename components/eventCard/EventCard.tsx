@@ -33,6 +33,10 @@ export const EventCard = ({ event, style }: EventCardProps) => {
     dayjs(event.dateRange.startDate)
   )
 
+  const options = isHostingEvent(event.userAttendeeStatus)
+    ? ["Delete", "Edit"]
+    : ["Report"]
+
   return (
     <View style={[styles.container, style]}>
       <View style={[styles.topRow, styles.flexRow]}>
@@ -40,8 +44,12 @@ export const EventCard = ({ event, style }: EventCardProps) => {
           username={event.host.username}
           userHandle={event.host.handle}
           imageStyle={styles.image}
+          imageURL="image"
         />
-        <ConfirmationDialogue style={styles.moreButtonStyle}/>
+        <ConfirmationDialogue
+          options={options}
+          style={styles.moreButtonStyle}
+        />
       </View>
 
       <View style={styles.middleRow}>

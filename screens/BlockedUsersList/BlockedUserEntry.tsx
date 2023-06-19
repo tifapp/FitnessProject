@@ -18,6 +18,10 @@ const BlockedUserEntry = ({ attendee }: BlockedUserProps) => {
         imageStyle={styles.image}
       />
       <ConfirmationDialogue
+        options={[
+          `Unblock ${attendee.username}`,
+          `Report ${attendee.username}`
+        ]}
         style={{
           flex: 1,
           flexDirection: "row",

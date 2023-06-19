@@ -13,12 +13,13 @@ import { StyleProp, View, ViewStyle } from "react-native"
 import ActionSheet from "@alessiocancian/react-native-actionsheet"
 
 interface Props {
+  options: string[]
   style?: StyleProp<ViewStyle>
 }
 
-const ConfirmationDialogue = ({ style }: Props) => {
+const ConfirmationDialogue = ({ options, style }: Props) => {
   const actionSheet = useRef<ActionSheet>(null)
-  const optionArray = ["Block User", "Report User", "Cancel"]
+  const optionsArray = options.concat("Cancel")
 
   const showActionSheet = () => {
     // To show the Bottom ActionSheet
@@ -36,8 +37,7 @@ const ConfirmationDialogue = ({ style }: Props) => {
       />
       <ActionSheet
         ref={actionSheet}
-        title={"Options"}
-        options={optionArray}
+        options={optionsArray}
         cancelButtonIndex={2}
         destructiveButtonIndex={1}
         onPress={(index) => {
