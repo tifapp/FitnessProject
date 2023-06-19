@@ -24,7 +24,6 @@ import {
 import { TestChatRoomScreen } from "@screens/testScreens/TestChatRoomScreen"
 import { TestEventFormScreen } from "@screens/testScreens/TestEventFormScreen"
 import { TestNotifScreen } from "@screens/testScreens/TestNotifScreen"
-import BlockedUsersListView from "@screens/BlockedUsersList/BlockedUsersListView"
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native"
 
 export enum ActivitiesScreenNames {
@@ -124,9 +123,9 @@ export default function ActivitiesStack () {
 }
 
 const getTabBarVisibility = (route: any) => {
-  const routeName = getFocusedRouteNameFromRoute(route)!
+  const routeName = getFocusedRouteNameFromRoute(route) ?? undefined
   const tabHiddenRoutes = ["EditProfileScreen", "SettingsScreen"]
-  if (tabHiddenRoutes.includes(routeName)) {
+  if (routeName && tabHiddenRoutes.includes(routeName)) {
     return false
   }
   return true
@@ -138,7 +137,7 @@ export function TabNavigation () {
       <Tab.Screen name="Map" component={ActivitiesStack} />
       <Tab.Screen name="Chat Room" component={TestChatRoomScreen} />
       <Tab.Screen name="Event Form" component={TestEventFormScreen} />
-      <Tab.Screen name="Notifications" component={BlockedUsersListView} />
+      <Tab.Screen name="Notifications" component={TestNotifScreen} />
       <Tab.Screen
         name="Profile"
         component={ProfileStack}

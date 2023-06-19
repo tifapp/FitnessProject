@@ -52,7 +52,7 @@ const BlockedUsersListView = () => {
   }
 
   const SkeletonResult = () => (
-    <View style={styles.skeletonContainer}>
+    <View style={[styles.skeletonContainer, styles.container]}>
       <SkeletonView style={[styles.image, styles.skeletonIcon]} />
       <View>
         <SkeletonView style={styles.skeletonHeadline} />
@@ -62,7 +62,7 @@ const BlockedUsersListView = () => {
   )
 
   return (
-    <View style={{ marginTop: 24 }}>
+    <View style={styles.container}>
       <Subtitle style={[styles.title, styles.horizontalPadding]}>
         Blocked Users
       </Subtitle>
@@ -87,6 +87,9 @@ const BlockedUsersListView = () => {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "white"
+  },
   title: {
     marginBottom: 8
   },

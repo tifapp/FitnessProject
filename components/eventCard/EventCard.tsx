@@ -1,20 +1,11 @@
 import React from "react"
-import {
-  Image,
-  StyleProp,
-  StyleSheet,
-  Text,
-  View,
-  ViewProps,
-  ViewStyle
-} from "react-native"
+import { StyleProp, StyleSheet, View, ViewProps, ViewStyle } from "react-native"
 import { CurrentUserEvent, isHostingEvent } from "@lib/events/Event"
 import { placemarkToAbbreviatedAddress } from "@lib/location"
 import { Ionicons } from "@expo/vector-icons"
-import MenuDropdown from "./MenuDropdown"
 import { dayjs, now } from "@lib/date"
 import { Ionicon } from "@components/common/Icons"
-import { BodyText, Caption, CaptionTitle, Headline } from "@components/Text"
+import { BodyText, Caption, Headline } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
 import ConfirmationDialogue from "@components/common/ConfirmationDialogue"

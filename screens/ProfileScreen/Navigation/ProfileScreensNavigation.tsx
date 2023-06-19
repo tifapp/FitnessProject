@@ -1,8 +1,7 @@
 import React from "react"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import ProfileScreenView, { ProfileScreenViewProps } from "../ProfileView"
-import { ChevronBackButton, StackNavigatorType } from "@components/Navigation"
-import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
+import { StackNavigatorType } from "@components/Navigation"
 import { ActivitiesStackParamList } from "@stacks/ActivitiesStack"
 import { useAtomValue } from "jotai"
 import { userAtom } from "../state"
@@ -16,11 +15,13 @@ import { EventMocks } from "@lib/events"
 import { useHydrateAtoms } from "jotai/utils"
 import { View } from "react-native"
 import { TouchableIonicon } from "@components/common/Icons"
+import SettingsStack from "@stacks/SettingsStack"
+import { SettingsScreenProps } from "@screens/SettingsScreen/SettingsScreenView"
 
 export type ProfileScreensParamsList = {
   ProfileScreen: ProfileScreenViewProps
   EditProfileScreen: undefined
-  SettingsScreen: undefined
+  SettingsScreen: SettingsScreenProps
   CurrentUserProfileScreen: undefined
 }
 
@@ -90,14 +91,8 @@ export const createProfileStackScreens = <T extends ProfileScreensParamsList>(
       />
       <ProfileStack.Screen
         name={"SettingsScreen"}
-        component={SettingsScreen}
-        options={{
-          headerTitle: () => (
-            <Headline style={{ color: AppStyles.darkColor }}>Settings</Headline>
-          ),
-          headerTitleAlign: "center",
-          headerLeft: () => <ChevronBackButton />
-        }}
+        component={SettingsStack}
+        options={{ headerShown: false }}
       />
     </>
   )
@@ -109,7 +104,7 @@ export const createProfileStackScreens = <T extends ProfileScreensParamsList>(
  * @returns Profile Screen Component
  */
 const ProfileScreen = ({ route }: ProfileScreenProps) => {
-  console.log(route)
+  // console.log(route)
   // get user
   const user = UserMocks.Mia
   // user.relationStatus = "current-user"

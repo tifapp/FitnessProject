@@ -79,13 +79,12 @@ const ChangePasswdSection = () => {
   )
 }
 
-const BlockedUserSection = () => {
+interface BlockedUserProps {
+  navigate: () => void
+}
+const BlockedUserSection = ({ navigate }: BlockedUserProps) => {
   return (
-    <TouchableOpacity
-      onPress={() => {
-        console.log("Yes")
-      }}
-    >
+    <TouchableOpacity onPress={navigate}>
       <Section
         icon={"person-remove"}
         style={styles.flexRow}
@@ -308,7 +307,13 @@ const DeleteAccountSection = () => {
   )
 }
 
-export const SettingsScreen = () => {
+export type SettingsScreenProps = {
+  navigateToBlocked: () => void
+}
+
+export const SettingsScreenView = ({
+  navigateToBlocked
+}: SettingsScreenProps) => {
   return (
     <ScrollView
       style={[styles.container, styles.spacing, { flex: 1 }]}
@@ -330,7 +335,7 @@ export const SettingsScreen = () => {
         {"Users"}
       </Headline>
       <View style={styles.iconSection}>
-        <BlockedUserSection />
+        <BlockedUserSection navigate={navigateToBlocked} />
       </View>
 
       <Headline style={[styles.textColor, { paddingBottom: 8 }]}>

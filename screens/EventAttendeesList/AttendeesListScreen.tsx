@@ -79,6 +79,7 @@ export const AttendeesListScreen = () => {
                   alignSelf: "center",
                   justifyContent: "flex-end"
                 }}
+                options={["Report"]}
               />
             </View>
           </>

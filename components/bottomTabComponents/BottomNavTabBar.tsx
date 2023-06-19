@@ -40,7 +40,6 @@ export const BottomNavTabBar = ({
         const isFocused = state.index === index
 
         const onPress = () => {
-          console.log(route.name)
           const event = navigation.emit({
             type: "tabPress",
             target: route.key,
@@ -50,7 +49,6 @@ export const BottomNavTabBar = ({
           if (!isFocused && !event.defaultPrevented) {
             // The `merge: true` option makes sure that the params inside the tab screen are preserved
             if (route.name === "Profile") {
-              console.log("test")
               navigation.navigate("Profile", { userID: "3432432" })
             } else {
               navigation.navigate(route.name)
