@@ -1,69 +1,99 @@
 import React from "react"
 import { BodyText, Subtitle } from "@components/Text"
-import MenuDropdown from "@components/eventCard/MenuDropdown"
-import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
 import { AppStyles } from "@lib/AppColorStyle"
-import { FlatList, ListRenderItemInfo, StyleSheet, View } from "react-native"
-import ConfirmationDialogue from "@components/profileImageComponents/ConfirmationDialogue"
+import {
+  FlatList,
+  ListRenderItemInfo,
+  StyleProp,
+  StyleSheet,
+  View,
+  ViewStyle
+} from "react-native"
+import { useQuery } from "react-query"
+import { SkeletonView } from "@components/common/Skeleton"
+import { delayData } from "@lib/DelayData"
+import { AttendeeListMocks } from "@screens/EventAttendeesList/AttendeesMocks"
+import { EventAttendee } from "@lib/events"
+import BlockedUserEntry from "./BlockedUserEntry"
 
 const BlockedUsersListView = () => {
-  type TempUser = {
-    username: string
-    handle: string
-    url: string
+  const getUsers = useQuery(["/event/:eventId/attendee", "GET"], () =>
+    delayData(AttendeeListMocks.List1)
+  )
+
+  const blockedUsers = getUsers.data ?? []
+  // List of attendees
+
+  type LoadingUsersProps = {
+    style?: StyleProp<ViewStyle>
   }
-  const users: TempUser[] = [
-    {
-      username: "sfdf",
-      handle: "@sdfs",
-      url: "dsfsdsdg"
-    },
-    {
-      username: "sfdf",
-      handle: "@sdfs",
-      url: "dsfsdsdg"
-    },
-    {
-      username: "sfdf",
-      handle: "@sdfs",
-      url: "dsfsdsdg"
-    }
-  ]
+
+  const LoadingUsersView = ({ style }: LoadingUsersProps) => {
+    return (
+      <View style={style}>
+        <View testID="loading-blocked-users">
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+          <SkeletonResult />
+        </View>
+      </View>
+    )
+  }
+
+  const SkeletonResult = () => (
+    <View style={styles.skeletonContainer}>
+      <SkeletonView style={[styles.image, styles.skeletonIcon]} />
+      <View>
+        <SkeletonView style={styles.skeletonHeadline} />
+        <SkeletonView style={styles.skeletonCaption} />
+      </View>
+    </View>
+  )
 
   return (
-    <View style={{ marginTop: 24, marginHorizontal: 16 }}>
-      <Subtitle style={{ marginBottom: 8 }}>Blocked Users</Subtitle>
-      <BodyText style={{ color: AppStyles.colorOpacity50, marginBottom: 24 }}>
+    <View style={{ marginTop: 24 }}>
+      <Subtitle style={[styles.title, styles.horizontalPadding]}>
+        Blocked Users
+      </Subtitle>
+      <BodyText style={[styles.body, styles.horizontalPadding]}>
         Users you have blocked cannot join your events or view your profile, but
         you can still view their profile.
       </BodyText>
 
       <FlatList
-        data={users}
-        renderItem={({ item }: ListRenderItemInfo<TempUser>) => (
-          <View style={styles.listContainer}>
-            <ProfileImageAndName
-              username={item.username}
-              userHandle={item.handle}
-              imageURL={item.url}
-              imageStyle={styles.image}
-            />
-            <ConfirmationDialogue
-              style={{
-                flex: 1,
-                flexDirection: "row",
-                alignSelf: "center",
-                justifyContent: "flex-end"
-              }}
-            />
-          </View>
+        data={blockedUsers}
+        renderItem={({ item }: ListRenderItemInfo<EventAttendee>) => (
+          <BlockedUserEntry attendee={item} />
         )}
-      ></FlatList>
+        ListEmptyComponent={
+          <LoadingUsersView
+            style={[styles.listContainer, styles.horizontalPadding]}
+          />
+        }
+      />
     </View>
   )
 }
 
 const styles = StyleSheet.create({
+  title: {
+    marginBottom: 8
+  },
+  body: {
+    color: AppStyles.colorOpacity50,
+    marginBottom: 24
+  },
   image: {
     width: 40,
     height: 40,
@@ -72,6 +102,29 @@ const styles = StyleSheet.create({
   listContainer: {
     marginBottom: 16,
     flexDirection: "row"
+  },
+  skeletonContainer: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 16
+  },
+  horizontalPadding: {
+    marginHorizontal: 16
+  },
+  skeletonIcon: {
+    marginRight: 16
+  },
+  skeletonHeadline: {
+    width: 256,
+    height: 16,
+    marginBottom: 4,
+    borderRadius: 12
+  },
+  skeletonCaption: {
+    width: 128,
+    height: 12,
+    borderRadius: 12
   }
 })
 
