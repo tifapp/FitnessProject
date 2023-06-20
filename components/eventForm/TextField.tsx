@@ -1,6 +1,7 @@
-import { FontScaleFactors } from "../../hooks/Fonts"
+import CustomizableTextInput from "@components/common/CustomizableTextInput.tsx"
 import React from "react"
-import { StyleProp, TextInput, TextStyle } from "react-native"
+import { StyleProp, TextStyle } from "react-native"
+import { FontScaleFactors } from "../../hooks/Fonts"
 import { useEventFormContext, useEventFormField } from "./EventForm"
 import { EventFormValues } from "./EventFormValues"
 
@@ -26,13 +27,11 @@ export const EventFormTextField = ({
   fieldName,
   ...props
 }: EventFormTextFieldProps) => {
-  const [value, setValue, valueRef] = useEventFormField(fieldName)
+  const [value, setValue] = useEventFormField(fieldName)
   const { setFocusedField } = useEventFormContext()
-
   return (
-    <TextInput
+    <CustomizableTextInput
       maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
-      ref={valueRef}
       value={value}
       onChangeText={setValue}
       onFocus={() => setFocusedField(fieldName)}
