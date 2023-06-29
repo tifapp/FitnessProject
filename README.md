@@ -1,6 +1,6 @@
 # FitnessProject
 
-Installing and testing the app ->
+## Installing and testing the app
 
 1. Create an email account and a GitHub account to access the repo
 
@@ -51,9 +51,9 @@ Installing and testing the app ->
    1. Scan the given QR code or link from the terminal  
 
 
-Development process ->
+## Development process
 
-8. [Code Editor (IDE) - Visual Studio](https://visualstudio.microsoft.com/downloads/)
+1. [Code Editor (IDE) - Visual Studio](https://visualstudio.microsoft.com/downloads/)
 
    1. Settings
    {
@@ -74,13 +74,13 @@ Development process ->
   
 
 
-9. Create an AWS account and follow the instructions in the link<https://docs.amplify.aws/>
+2. Create an AWS account and follow the instructions in the link<https://docs.amplify.aws/>
 
-10. In the project folder use the command "amplify configure" and select the region "us-west-2" for AWS setup.
+3. In the project folder use the command "amplify configure" and select the region "us-west-2" for AWS setup.
 
     1. See Sean for login details
 
-Trello:[Fitness Project (fitnessproject19) | Trello](https://trello.com/w/fitnessproject19)
+Trello: [Fitness Project (fitnessproject19) | Trello](https://trello.com/w/fitnessproject19)
 
 Login instructions:  
   
@@ -88,14 +88,11 @@ Login instructions:
 
 <https://docs.aws.amazon.com/IAM/latest/UserGuide/console.html#user-sign-in-page>
 
-  
+## tiF Mobile App
 
+## Convention
 
-Tif Mobile App ->
-
-Convention ->
-
-Branch Management ->
+## Branch Management
 
 - Branch off the development branch for each user story.
 
@@ -107,13 +104,13 @@ Branch Management ->
 
 - Once merged, delete the branch afterward.
 
-Debugging ->
+## Debugging
 
 - Reproduce the error
 - Isolate the error
 - Feel free to reach out to team members through Slack for any issues.
 
-Testing ->
+## Testing
 
 - Use “expo start”/“expo start --tunnel”
 
@@ -124,13 +121,13 @@ Testing ->
   - [cse115bdevelopers@gmail.com](mailto:cse115bdevelopers@gmail.com)
   - cse115bdeveloper
 
-Pull Requests ->
+## Pull Request Policy
 
 - When you have a feature ready to be merged into the sprint branch, issue a pull request
 - Two other members on the team and one code owner must approve the changes before the merge
 - When a pull request gets made, jenkins will test it for any compile time errors
 
-Extensions (Visual Studio Code) ->
+## Extensions (Visual Studio Code)
 
 - Prettier ESLint
 - Code spell checker
@@ -138,19 +135,19 @@ Extensions (Visual Studio Code) ->
 - GraphQL: Language Feature Support
 - GraphQL: Syntax Highlighting
 
-Sourcetree ->
+### Sourcetree
 
-- Download using the following link<https://www.sourcetreeapp.com/>
-- Tutorial<https://confluence.atlassian.com/get-started-with-sourcetree>
+- Download using the following link: <https://www.sourcetreeapp.com/>
+- Tutorial: <https://confluence.atlassian.com/get-started-with-sourcetree>
 
-React Native ->
+### React Native
 
 - Documentation:<https://reactnative.dev/>
 
 
 - Tutorial:<https://reactnative.dev/docs/getting-started>
 
-Appendix ->
+### Appendix
 
 <https://www.linode.com/docs/guides/install-and-use-npm-on-linux/>
 
@@ -160,7 +157,7 @@ Appendix ->
 
 <https://reactnative.dev/docs/getting-started>
 
-To do:
+## To do
 
 - Include AWS setup
 - Include details on setting up and using Sourcetree
