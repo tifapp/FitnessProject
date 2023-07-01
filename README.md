@@ -1,6 +1,6 @@
 # FitnessProject
 
-## Installing and testing the app
+## Installation
 
 1. Create an email account and a GitHub account to access the repo
 
@@ -14,7 +14,7 @@
 
    2. If you are instead using the command line, install git and then run this command:
 
-      1. git clone<https://github.com/tifapp/FitnessProject.git>
+      1. git clone <https://github.com/tifapp/FitnessProject.git>
 
 3. Install Node.js version 16.13.1
 
@@ -35,8 +35,10 @@
 
    1. cd FitnessProject
    2. npm install
+  
+## Testing the App
 
-6. Run the metro server on your machine through the command line
+1. Run the metro server on your machine through the command line
 
    1. expo start
 
@@ -46,7 +48,7 @@
 
       1. Opens a tunnel link that’s accessible to anyone from the internet
 
-7. Download the Expo Go App on your device to test the application locally
+2. Download the Expo Go App on your device to test the application locally
 
    1. Scan the given QR code or link from the terminal  
 
@@ -74,9 +76,9 @@
   
 
 
-2. Create an AWS account and follow the instructions in the link<https://docs.amplify.aws/>
+2. Create an AWS account and follow the instructions in the link: <https://docs.amplify.aws/>
 
-3. In the project folder use the command "amplify configure" and select the region "us-west-2" for AWS setup.
+3. In the project folder, use the command "amplify configure" and select the region "us-west-2" for AWS setup.
 
     1. See Sean for login details
 
