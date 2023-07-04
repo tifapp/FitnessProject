@@ -1,11 +1,51 @@
 import { BodyText, Headline } from "@components/Text"
 import { PrimaryButton } from "@components/common/Buttons"
 import { AppStyles } from "@lib/AppColorStyle"
-import React from "react"
+import { Auth } from "aws-amplify"
+import React, { useState } from "react"
 import { StyleSheet, View } from "react-native"
 import { TextField } from "./TextField"
 
-export const ChangePasswordScreen = () => {
+type ChangePasswordProps = {
+  onPasswordChangeSubmitted?: (
+    oldPass: string,
+    newPass: string
+  ) => Promise<boolean>
+}
+
+const changePassword = async (oldPass: string, newPass: string) => {
+  return await Auth.currentAuthenticatedUser()
+    .then((user) => {
+      return Auth.changePassword(user, oldPass, newPass)
+    })
+    .then((data) => true)
+    .catch((err) => false)
+}
+
+type FormSubmission =
+  | { status: "valid"; submit: () => void }
+  | { status: "invalid"; errors: string[] }
+
+const beginChangePassword = () => {}
+
+export const ChangePasswordScreen = ({
+  onPasswordChangeSubmitted = changePassword
+}: ChangePasswordProps) => {
+  const [currentPassword, setCurrentPassword] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [reEnteredPassword, setReEnteredPassword] = useState("")
+  const [isValidForm, setIsValidForm] = useState(false)
+
+  const tapChangePassword = () => {
+    /*
+      Check for conditions on password go here:
+      Incorrect states:
+    */
+    const submit = () => {
+      changePassword(currentPassword, newPassword)
+    }
+  }
+
   return (
     <View
       style={[
@@ -27,18 +67,21 @@ export const ChangePasswordScreen = () => {
         placeholder="Current Password"
         title={"Current Password"}
         style={{ flex: 1 }}
+        onChangeText={(onChangeText) => setCurrentPassword(onChangeText)}
       />
 
       <TextField
         placeholder="New Password"
         title={"New Password"}
         style={{ flex: 1 }}
+        onChangeText={(onChangeText) => setNewPassword(onChangeText)}
       />
 
       <TextField
         placeholder="Re-enter New Password"
         title={"Re-Enter Password"}
         style={{ flex: 1 }}
+        onChangeText={(onChangeText) => setReEnteredPassword(onChangeText)}
       />
 
       <Headline style={{ color: "blue" }}> Forgot your password? </Headline>
@@ -47,7 +90,7 @@ export const ChangePasswordScreen = () => {
         <PrimaryButton
           style={{ flex: 1 }}
           title="Add Friend"
-          onPress={() => console.log("Lesgo")}
+          onPress={() => tapChangePassword}
         />
       </View>
     </View>
