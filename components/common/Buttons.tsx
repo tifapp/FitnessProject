@@ -4,7 +4,6 @@ import React from "react"
 import {
   StyleProp,
   StyleSheet,
-  TextStyle,
   TouchableOpacity,
   TouchableOpacityProps,
   ViewStyle
@@ -15,23 +14,23 @@ type ButtonProps = {
   style?: StyleProp<ViewStyle>
 } & TouchableOpacityProps
 
-export const PrimaryButton = ({title, style, ...props}: ButtonProps) => {
+export const PrimaryButton = ({ title, style, ...props }: ButtonProps) => {
   return (
     <TouchableOpacity
       style={[
-        styles.container,
         { backgroundColor: AppStyles.darkColor },
+        styles.container,
         style
       ]}
       {...props}
     >
-      <Headline style={{color: "white" }}>{title}</Headline>
+      <Headline style={{ color: "white" }}>{title}</Headline>
       {props.children}
     </TouchableOpacity>
   )
 }
 
-export const OutlinedButton = ({title, style, ...props}: ButtonProps) => {
+export const OutlinedButton = ({ title, style, ...props }: ButtonProps) => {
   return (
     <TouchableOpacity
       style={[
@@ -48,14 +47,10 @@ export const OutlinedButton = ({title, style, ...props}: ButtonProps) => {
   )
 }
 
-export const DisabledButton = ({title, style, ...props}: ButtonProps) => {
+export const DisabledButton = ({ title, style, ...props }: ButtonProps) => {
   return (
     <TouchableOpacity
-      style={[
-        styles.container,
-        styles.disabledStyle,
-        style
-      ]}
+      style={[styles.container, styles.disabledStyle, style]}
       {...props}
       disabled
     >
@@ -81,5 +76,5 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: AppStyles.darkColor + "0D",
     borderWidth: 0
-  },
+  }
 })

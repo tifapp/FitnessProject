@@ -5,6 +5,7 @@ import { Auth } from "aws-amplify"
 import React, { useState } from "react"
 import { StyleSheet, View } from "react-native"
 import { TextField } from "./TextField"
+import { validationProcedure } from "@hooks/ValidationMethods"
 
 type ChangePasswordProps = {
   onPasswordChangeSubmitted?: (
@@ -43,6 +44,18 @@ export const ChangePasswordScreen = ({
     */
     const submit = () => {
       changePassword(currentPassword, newPassword)
+    }
+    const validatePassword = (password: string) => {
+      const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[0-9]).{8,}$/
+      return passwordRegex.test(password)
+    }
+    if (!validationProcedure(validatePassword, newPassword)) {
+      // Return error given by validationProcedure, I think
+      return false
+    } else {
+      // Allow the next thing to happen
+      submit()
+      return true
     }
   }
 
@@ -88,7 +101,12 @@ export const ChangePasswordScreen = ({
 
       <View style={[styles.spacing, styles.buttons, { marginTop: "65%" }]}>
         <PrimaryButton
-          style={{ flex: 1 }}
+          style={{
+            flex: 1,
+            backgroundColor: isValidForm
+              ? AppStyles.darkColor
+              : AppStyles.colorOpacity35
+          }}
           title="Add Friend"
           onPress={() => tapChangePassword}
         />
