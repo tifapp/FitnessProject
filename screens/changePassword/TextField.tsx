@@ -1,5 +1,3 @@
-import CustomizableTextInput from "@components/common/CustomizableTextInput.tsx"
-import { FontScaleFactors } from "@hooks/Fonts"
 import { AppStyles } from "@lib/AppColorStyle"
 import { StyleProp, StyleSheet, TextInput, View, ViewStyle } from "react-native"
 
@@ -14,12 +12,16 @@ export type textFieldProps = {
 export const TextField = ({ style, ...props }: textFieldProps) => {
   return (
     <View style={styles.containerStyle}>
-      <CustomizableTextInput
-        maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
+      <TextInput
+        style={{
+          flex: 1,
+          fontFamily: "OpenSans",
+          padding: 5,
+          textAlign: "left"
+        }}
         placeholderTextColor={AppStyles.colorOpacity35}
         placeholder={props.placeholder}
         secureTextEntry={true}
-        value={props.value}
         onChangeText={props.onChangeText}
       />
     </View>
