@@ -20,6 +20,7 @@ import {
 } from "@screens/ExploreEvents/models"
 import { nonCancellable, endlessCancellable } from "../helpers/Cancellable"
 import { EventMocks } from "@lib/events"
+import { fakeTimers } from "../helpers/Timers"
 
 describe("ExploreEvents tests", () => {
   beforeEach(() => jest.resetAllMocks())
@@ -43,8 +44,7 @@ describe("ExploreEvents tests", () => {
   })
 
   describe("useExploreEvents tests", () => {
-    beforeEach(() => jest.useFakeTimers())
-    afterEach(() => jest.useRealTimers())
+    fakeTimers()
 
     it("should use the initial provided region when fetching for first time", async () => {
       fetchEvents.mockReturnValue(endlessCancellable())
@@ -166,6 +166,7 @@ describe("ExploreEvents tests", () => {
     })
 
     it("should cancel the existing fetch immediatedly when significant region change", async () => {
+      queryClient.setDefaultOptions({ queries: { cacheTime: Infinity } })
       const cancellable = endlessCancellable()
       fetchEvents.mockReturnValue(cancellable)
       isSignificantlyDifferentRegions.mockReturnValue(true)
@@ -182,6 +183,7 @@ describe("ExploreEvents tests", () => {
     })
 
     it("should seed the query cache with an entry for each individual loaded event", async () => {
+      queryClient.setDefaultOptions({ queries: { cacheTime: Infinity } })
       const events = [EventMocks.Multiday, EventMocks.PickupBasketball]
       fetchEvents.mockReturnValue(nonCancellable(Promise.resolve(events)))
 
