@@ -29,7 +29,9 @@ export const useExploreEvents = (
   { fetchEvents, isSignificantlyDifferentRegions }: UseExploreEventsEnvironment
 ) => {
   const { region, panToRegion } = useExploreEventsRegion(initialCenter)
-  const { events, cancel } = useExploreEventsQuery(region, fetchEvents)
+  const { events, cancel } = useExploreEventsQuery(region!, fetchEvents, {
+    enabled: !!region
+  })
   return {
     region,
     events,
@@ -48,7 +50,7 @@ const useExploreEventsRegion = (initialCenter: ExploreEventsInitialCenter) => {
   const [pannedRegion, setPannedRegion] = useState(
     initialCenterToRegion(initialCenter)
   )
-  const userRegion = useUserRegionQuery({ enabled: !pannedRegion })
+  const userRegion = useUserRegion({ enabled: !pannedRegion })
   const region =
     userRegion.status === "loading"
       ? undefined
@@ -60,7 +62,7 @@ type UserRegionResult =
   | { status: "loading" }
   | { status: "loaded"; data?: Region }
 
-const useUserRegionQuery = (
+const useUserRegion = (
   options?: QueryHookOptions<boolean>
 ): UserRegionResult => {
   const permissionQuery = useRequestForegroundLocationPermissions(options)
@@ -79,8 +81,9 @@ const useUserRegionQuery = (
 }
 
 const useExploreEventsQuery = (
-  region: Region | undefined,
-  fetchEvents: (region: Region) => Cancellable<CurrentUserEvent[]>
+  region: Region,
+  fetchEvents: (region: Region) => Cancellable<CurrentUserEvent[]>,
+  options?: QueryHookOptions<CurrentUserEvent[]>
 ) => {
   const queryClient = useQueryClient()
   return {
@@ -89,8 +92,7 @@ const useExploreEventsQuery = (
       async ({ signal }) => {
         // NB: The signal is only undefined if the platform does not support the AbortController
         // api, but react-native added support in 0.60, so the force unwrap should be fine.
-        const events = await cancelOnAborted(fetchEvents(region!), signal!)
-          .value
+        const events = await cancelOnAborted(fetchEvents(region), signal!).value
 
         events.forEach((event) => {
           queryClient.setQueryData(["event", event.id], event)
@@ -98,7 +100,7 @@ const useExploreEventsQuery = (
 
         return events
       },
-      { enabled: !!region }
+      options
     ),
     cancel: () => {
       queryClient.cancelQueries({ queryKey: ["explore-events", region] })
