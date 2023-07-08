@@ -105,7 +105,7 @@ export const ChangePasswordScreen = ({
             }}
             title="Add Friend"
             onPress={() => {
-              console.log(newPassword), tapChangePassword()
+              tapChangePassword()
             }}
           />
         </View>
