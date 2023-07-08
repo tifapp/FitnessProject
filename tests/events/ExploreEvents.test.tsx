@@ -77,6 +77,7 @@ describe("ExploreEvents tests", () => {
 
       renderUseExploreEvents({ center: "user-location" })
 
+      await waitForLocationPermissionRequest()
       await waitForUserRegionToLoad()
       await waitFor(() => {
         expect(fetchEvents).toHaveBeenCalledWith(
@@ -91,9 +92,8 @@ describe("ExploreEvents tests", () => {
 
       renderUseExploreEvents({ center: "user-location" })
 
-      await waitFor(() => {
-        expect(requestForegroundPermissions).toHaveBeenCalled()
-      })
+      await waitForLocationPermissionRequest()
+      await waitForUserRegionToLoad()
       await waitFor(() => {
         expect(fetchEvents).toHaveBeenCalledWith(SAN_FRANCISCO_DEFAULT_REGION)
       })
@@ -106,6 +106,7 @@ describe("ExploreEvents tests", () => {
 
       renderUseExploreEvents({ center: "user-location" })
 
+      await waitForLocationPermissionRequest()
       await waitForUserRegionToLoad()
       await waitFor(() => {
         expect(fetchEvents).toHaveBeenCalledWith(SAN_FRANCISCO_DEFAULT_REGION)
@@ -197,6 +198,12 @@ describe("ExploreEvents tests", () => {
         events[1]
       )
     })
+
+    const waitForLocationPermissionRequest = async () => {
+      await waitFor(() => {
+        expect(requestForegroundPermissions).toHaveBeenCalled()
+      })
+    }
 
     const waitForUserRegionToLoad = async () => {
       await waitFor(() => {

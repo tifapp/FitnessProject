@@ -8,9 +8,12 @@ import {
   createDefaultMapRegion,
   initialCenterToRegion
 } from "./models"
-import { UserLocationDependencyKeys } from "@hooks/UserLocation"
-import { useDependencyValue } from "@lib/dependencies"
+import {
+  useRequestForegroundLocationPermissions,
+  useUserCoordinatesQuery
+} from "@hooks/UserLocation"
 import { Region } from "@lib/location"
+import { QueryHookOptions } from "@lib/ReactQuery"
 
 export type UseExploreEventsEnvironment = {
   region?: Region
@@ -45,34 +48,34 @@ const useExploreEventsRegion = (initialCenter: ExploreEventsInitialCenter) => {
   const [pannedRegion, setPannedRegion] = useState(
     initialCenterToRegion(initialCenter)
   )
-  const userRegion = useUserRegionQuery({ isEnabled: !pannedRegion })
-  const region = userRegion.isLoading
-    ? undefined
-    : pannedRegion ?? userRegion.data ?? SAN_FRANCISCO_DEFAULT_REGION
+  const userRegion = useUserRegionQuery({ enabled: !pannedRegion })
+  const region =
+    userRegion.status === "loading"
+      ? undefined
+      : pannedRegion ?? userRegion.data ?? SAN_FRANCISCO_DEFAULT_REGION
   return { region, panToRegion: setPannedRegion }
 }
 
-type UseUserRegionQueryProps = {
-  isEnabled: boolean
-}
+type UserRegionResult =
+  | { status: "loading" }
+  | { status: "loaded"; data?: Region }
 
-const useUserRegionQuery = ({ isEnabled }: UseUserRegionQueryProps) => {
-  const queryUserCoordinates = useDependencyValue(
-    UserLocationDependencyKeys.currentCoordinates
-  )
-  const requestPermission = useDependencyValue(
-    UserLocationDependencyKeys.requestForegroundPermissions
-  )
-  return useQuery(
-    ["explore-events-user-region"],
-    async () => {
-      const isGranted = await requestPermission()
-      if (!isGranted) throw new Error("Foreground location permission denied.")
-      const trackedCoordinate = await queryUserCoordinates("approximate-medium")
-      return createDefaultMapRegion(trackedCoordinate.coordinates)
-    },
-    { enabled: isEnabled }
-  )
+const useUserRegionQuery = (
+  options?: QueryHookOptions<boolean>
+): UserRegionResult => {
+  const permissionQuery = useRequestForegroundLocationPermissions(options)
+  const locationQuery = useUserCoordinatesQuery("approximate-medium", {
+    enabled: permissionQuery.data !== undefined
+  })
+  if (permissionQuery.isLoading || locationQuery.isLoading) {
+    return { status: "loading" }
+  }
+  return {
+    status: "loaded",
+    data: !locationQuery.data
+      ? undefined
+      : createDefaultMapRegion(locationQuery.data.coordinates)
+  }
 }
 
 const useExploreEventsQuery = (

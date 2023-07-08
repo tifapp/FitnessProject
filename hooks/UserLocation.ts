@@ -1,4 +1,6 @@
+import { QueryHookOptions } from "@lib/ReactQuery"
 import { createDependencyKey, useDependencyValue } from "@lib/dependencies"
+import { TrackedLocationCoordinates } from "@lib/location"
 import {
   QueryUserCoordinates,
   TrackUserLocation,
@@ -29,6 +31,9 @@ export namespace UserLocationDependencyKeys {
     () => expoQueryUserCoordinates
   )
 
+  /**
+   * A dependency key for requesting location foreground permissions.
+   */
   export const requestForegroundPermissions = createDependencyKey(
     () => requestLocationPermissions
   )
@@ -92,13 +97,32 @@ export const useTrackUserLocation = (
  * @param accurracy See {@link UserLocationTrackingAccurracy}, defaults to `approximate-low`.
  */
 export const useUserCoordinatesQuery = (
-  accurracy: UserLocationTrackingAccurracy = "approximate-low"
+  accurracy: UserLocationTrackingAccurracy = "approximate-low",
+  options?: QueryHookOptions<TrackedLocationCoordinates>
 ) => {
   const query = useDependencyValue(
     UserLocationDependencyKeys.currentCoordinates
   )
   return useQuery(
     ["user-coordinates", accurracy],
-    async () => await query(accurracy)
+    async () => await query(accurracy),
+    options
+  )
+}
+
+/**
+ * Requests permission for location foreground permissions and returns a `true`
+ * result if the permissions were granted.
+ */
+export const useRequestForegroundLocationPermissions = (
+  options?: QueryHookOptions<boolean>
+) => {
+  const request = useDependencyValue(
+    UserLocationDependencyKeys.requestForegroundPermissions
+  )
+  return useQuery(
+    ["request-location-foreground-permissions"],
+    async () => await request(),
+    options
   )
 }
