@@ -1,11 +1,15 @@
 import { BodyText, Headline } from "@components/Text"
 import { PrimaryButton } from "@components/common/Buttons"
-import { validationProcedure } from "@hooks/validationMethods"
+import { validatePassword } from "@hooks/validatePassword"
 import { AppStyles } from "@lib/AppColorStyle"
 import { Auth } from "aws-amplify"
 import React, { useState } from "react"
 import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native"
+import { TouchableOpacity } from "react-native-gesture-handler"
 import { TextField } from "./TextField"
+
+const isValidForm: boolean = false
+const oldAccountPassword: string = "Icarus43$"
 
 type ChangePasswordProps = {
   onPasswordChangeSubmitted?: (
@@ -30,42 +34,36 @@ type FormSubmission =
 export const ChangePasswordScreen = ({
   onPasswordChangeSubmitted = changePassword
 }: ChangePasswordProps) => {
-  const [currentPassword, setCurrentPassword] = useState("")
-  const [newPassword, setNewPassword] = useState("")
-  const [reEnteredPassword, setReEnteredPassword] = useState("")
-  const [isValidForm, setIsValidForm] = useState(false)
+  const [currentPassword, setCurrentPassword] = useState<string>("")
+  const [newPassword, setNewPassword] = useState<string>("")
+  const [reEnteredPassword, setReEnteredPassword] = useState<string>("")
 
+  const validateForm = () => {
+    const passwordRegex: RegExp =
+      /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[0-9]).{8,}$/
+    const formValid: boolean =
+      oldAccountPassword === currentPassword &&
+      validatePassword(newPassword, passwordRegex) &&
+      reEnteredPassword === newPassword
+    console.log("Got it as: ", formValid)
+    return formValid
+  }
+
+  // Function activated on button tap
   const tapChangePassword = () => {
     const submit = () => {
-      changePassword(currentPassword, newPassword)
+      onPasswordChangeSubmitted(currentPassword, newPassword)
     }
-    const validatePassword = (password: string) => {
-      const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[0-9]).{8,}$/
-      return passwordRegex.test(password)
-    }
-    if (!validationProcedure(validatePassword, newPassword)) {
-      // Return error given by validationProcedure
-      setIsValidForm(false)
-    } else {
-      // Allow the next thing to happen
-      submit()
-      setIsValidForm(true)
-    }
-    return isValidForm
+    const submission: FormSubmission = isValidForm
+      ? { status: "valid", submit }
+      : { status: "invalid", errors: [] }
+    return { currentPassword, submission }
   }
 
   return (
-    <SafeAreaView
-      style={[
-        styles.flexColumn,
-        styles.paddingIconSection,
-        { backgroundColor: "white" }
-      ]}
-    >
+    <SafeAreaView style={[styles.flexColumn, styles.paddingIconSection]}>
       <ScrollView>
-        <BodyText
-          style={{ color: AppStyles.colorOpacity35, paddingBottom: 20 }}
-        >
+        <BodyText style={styles.bodyText}>
           Your new password should at least be 8 characters and contain at least
           1 letter, 1 number, and 1 special character.
         </BodyText>
@@ -73,14 +71,17 @@ export const ChangePasswordScreen = ({
         <TextField
           placeholder="Current Password"
           title={"Current Password"}
-          style={{ flex: 1 }}
-          onChangeText={(text) => setCurrentPassword(text)}
+          style={styles.textField}
+          value={currentPassword}
+          onChangeText={(text) => {
+            setCurrentPassword(text)
+          }}
         />
 
         <TextField
           placeholder="New Password"
           title={"New Password"}
-          style={{ flex: 1 }}
+          style={styles.textField}
           value={newPassword}
           onChangeText={(text) => setNewPassword(text)}
         />
@@ -88,24 +89,21 @@ export const ChangePasswordScreen = ({
         <TextField
           placeholder="Re-enter New Password"
           title={"Re-Enter Password"}
-          style={{ flex: 1 }}
+          style={styles.textField}
           value={reEnteredPassword}
           onChangeText={(text) => setReEnteredPassword(text)}
         />
 
-        <Headline style={{ color: "blue" }}> Forgot your password? </Headline>
+        <TouchableOpacity>
+          <Headline style={{ color: "blue" }}> Forgot your password? </Headline>
+        </TouchableOpacity>
 
-        <View style={[styles.buttons, { marginTop: "65%" }]}>
+        <View style={styles.buttonContainer}>
           <PrimaryButton
-            style={{
-              flex: 1,
-              backgroundColor: isValidForm
-                ? AppStyles.darkColor
-                : AppStyles.colorOpacity35
-            }}
-            title="Add Friend"
+            style={styles.button}
+            title="Change Password"
             onPress={() => {
-              tapChangePassword()
+              validateForm()
             }}
           />
         </View>
@@ -126,10 +124,24 @@ const styles = StyleSheet.create({
     backgroundColor: "white"
   },
   paddingIconSection: {
-    paddingVertical: 8
+    paddingVertical: 8,
+    backgroundColor: "white"
   },
-  buttons: {
+  buttonContainer: {
     flexDirection: "row",
-    marginTop: 20
+    marginTop: "65%"
+  },
+  button: {
+    flex: 1,
+    backgroundColor: isValidForm
+      ? AppStyles.darkColor
+      : AppStyles.colorOpacity35
+  },
+  bodyText: {
+    color: AppStyles.colorOpacity35,
+    paddingBottom: 20
+  },
+  textField: {
+    flex: 1
   }
 })
