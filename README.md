@@ -20,7 +20,8 @@ In order to install the project, you must first:
 
    #### Command Line
 
-   If you are instead using the command line, install git and then run this command: git clone <https://github.com/tifapp/FitnessProject.gi
+   If you are instead using the command line, install git and then run this command:
+   git clone <https://github.com/tifapp/FitnessProject.git>
 
 3. Install Node.js version 16.13.1: <https://nodejs.org/download/release/v16.13.1/>
 
