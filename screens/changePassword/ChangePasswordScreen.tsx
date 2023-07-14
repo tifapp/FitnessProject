@@ -1,14 +1,15 @@
 import { BodyText, Headline } from "@components/Text"
 import { PrimaryButton } from "@components/common/Buttons"
+import { TouchableIonicon } from "@components/common/Icons"
 import { validatePassword } from "@hooks/validatePassword"
 import { AppStyles } from "@lib/AppColorStyle"
 import { Auth } from "aws-amplify"
 import React, { useState } from "react"
-import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native"
+import { Alert, SafeAreaView, ScrollView, StyleSheet, View } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { TextField } from "./TextField"
 
-const isValidForm: boolean = false
+const isValidForm: boolean = true
 const oldAccountPassword: string = "Icarus43$"
 
 type ChangePasswordProps = {
@@ -38,12 +39,18 @@ export const ChangePasswordScreen = ({
   const [newPassword, setNewPassword] = useState<string>("")
   const [reEnteredPassword, setReEnteredPassword] = useState<string>("")
 
+  const [currentPasswordHidden, setCurrentPasswordHidden] =
+    useState<boolean>(true)
+  const [newPasswordHidden, setNewPasswordHidden] = useState<boolean>(true)
+  const [reEnteredPasswordHidden, setReEnteredPasswordHidden] =
+    useState<boolean>(true)
+
   const validateForm = () => {
     const passwordRegex: RegExp =
       /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[0-9]).{8,}$/
     const formValid: boolean =
       oldAccountPassword === currentPassword &&
-      validatePassword(newPassword, passwordRegex) &&
+      validatePassword(newPassword) &&
       reEnteredPassword === newPassword
     console.log("Got it as: ", formValid)
     return formValid
@@ -64,35 +71,92 @@ export const ChangePasswordScreen = ({
     <SafeAreaView style={[styles.flexColumn, styles.paddingIconSection]}>
       <ScrollView>
         <BodyText style={styles.bodyText}>
-          Your new password should at least be 8 characters and contain at least
-          1 letter, 1 number, and 1 special character.
+          Your new password must at least be 8 characters and contain at least 1
+          letter, 1 number, and 1 special character.
         </BodyText>
 
-        <TextField
-          placeholder="Current Password"
-          title={"Current Password"}
-          style={styles.textField}
-          value={currentPassword}
-          onChangeText={(text) => {
-            setCurrentPassword(text)
-          }}
-        />
+        <View>
+          <TextField
+            placeholder="Current Password"
+            style={styles.textField}
+            value={currentPassword}
+            secureTextEntry={currentPasswordHidden}
+            onChangeText={(text) => {
+              setCurrentPassword(text)
+            }}
+            onBlur={() =>
+              currentPassword !== oldAccountPassword
+                ? Alert.alert(
+                  "No Match",
+                  "The entered current password does not match that of the old account's password. Please try again."
+                )
+                : Alert.alert("Correct match", "The password is correct")
+            }
+          />
+          {currentPassword && (
+            <TouchableIonicon
+              style={{
+                position: "absolute",
+                top: 10,
+                right: 10
+              }}
+              icon={{ name: "lock-closed" }}
+              onPress={() => setCurrentPasswordHidden(!currentPasswordHidden)}
+            />
+          )}
+        </View>
 
-        <TextField
-          placeholder="New Password"
-          title={"New Password"}
-          style={styles.textField}
-          value={newPassword}
-          onChangeText={(text) => setNewPassword(text)}
-        />
+        <View>
+          <TextField
+            placeholder="New Password"
+            style={styles.textField}
+            value={newPassword}
+            secureTextEntry={newPasswordHidden}
+            onChangeText={(text) => setNewPassword(text)}
+          />
+          {newPassword && (
+            <TouchableIonicon
+              style={{
+                position: "absolute",
+                top: 10,
+                right: 10
+              }}
+              icon={{ name: "lock-closed" }}
+              onPress={() => setNewPasswordHidden(!newPasswordHidden)}
+            />
+          )}
+        </View>
 
-        <TextField
-          placeholder="Re-enter New Password"
-          title={"Re-Enter Password"}
-          style={styles.textField}
-          value={reEnteredPassword}
-          onChangeText={(text) => setReEnteredPassword(text)}
-        />
+        <View>
+          <TextField
+            placeholder="Re-enter New Password"
+            style={styles.textField}
+            value={reEnteredPassword}
+            secureTextEntry={reEnteredPasswordHidden}
+            onChangeText={(text) => setReEnteredPassword(text)}
+            onBlur={() =>
+              reEnteredPassword !== newPassword
+                ? Alert.alert(
+                  "No Match",
+                  "The re-entered password does not match that of the new password. Please try again."
+                )
+                : Alert.alert("Correct match", "The password matches.")
+            }
+          />
+          {reEnteredPassword && (
+            <TouchableIonicon
+              style={{
+                position: "absolute",
+                top: 10,
+                right: 10
+              }}
+              icon={{ name: "lock-closed" }}
+              onPress={() =>
+                setReEnteredPasswordHidden(!reEnteredPasswordHidden)
+              }
+            />
+          )}
+        </View>
 
         <TouchableOpacity>
           <Headline style={{ color: "blue" }}> Forgot your password? </Headline>
@@ -142,6 +206,9 @@ const styles = StyleSheet.create({
     paddingBottom: 20
   },
   textField: {
-    flex: 1
+    flex: 1,
+    fontFamily: "OpenSans",
+    padding: 10,
+    textAlign: "left"
   }
 })

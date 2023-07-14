@@ -1,28 +1,27 @@
 import { AppStyles } from "@lib/AppColorStyle"
-import { StyleProp, StyleSheet, TextInput, View, ViewStyle } from "react-native"
+import {
+  StyleProp,
+  StyleSheet,
+  TextInput,
+  TextInputProps,
+  View,
+  ViewStyle
+} from "react-native"
 
 export type textFieldProps = {
   style?: StyleProp<ViewStyle>
-  value?: string | undefined
-  onChangeText?: ((text: string) => void) | undefined
-  title: string
-  placeholder: string
-}
+} & TextInputProps
 
 export const TextField = ({ style, ...props }: textFieldProps) => {
   return (
     <View style={styles.containerStyle}>
       <TextInput
-        style={{
-          flex: 1,
-          fontFamily: "OpenSans",
-          padding: 5,
-          textAlign: "left"
-        }}
+        style={style}
         placeholderTextColor={AppStyles.colorOpacity35}
         placeholder={props.placeholder}
-        secureTextEntry={true}
+        secureTextEntry={props.secureTextEntry}
         onChangeText={props.onChangeText}
+        onBlur={props.onBlur}
       />
     </View>
   )
