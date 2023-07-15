@@ -52,7 +52,7 @@ To use the app, you must first run the metro server on your machine through the 
 
     - Note: You must be on the same wifi network, in order to make proper usage of the server.
 
-#### Publicly Accessible Proces
+#### Publicly Accessible Process
 
 2.  expo start –tunnel
 
@@ -124,13 +124,13 @@ If you are a developer for the app, please keep track of tasks on our Trello: [F
 
 - Once merged, delete the branch afterward.
 
+## Appendix
+
 ### React Native
 
 - Documentation:<https://reactnative.dev/>
 
 - Tutorial:<https://reactnative.dev/docs/getting-started>
-
-### Appendix
 
 <https://www.linode.com/docs/guides/install-and-use-npm-on-linux/>
 
