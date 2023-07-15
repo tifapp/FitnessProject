@@ -128,17 +128,19 @@ If you are a developer for the app, please keep track of tasks on our Trello: [F
 
 ### React Native
 
-- Documentation:<https://reactnative.dev/>
+- Documentation: <https://reactnative.dev/>
 
-- Tutorial:<https://reactnative.dev/docs/getting-started>
+- Tutorial: <https://reactnative.dev/docs/getting-started>
 
-<https://www.linode.com/docs/guides/install-and-use-npm-on-linux/>
+- Development Environment Help: [Setting up the development environment · React Native](https://reactnative.dev/docs/environment-setup)
 
-<https://docs.expo.dev/workflow/expo-cli/>
+- Getting Started with React Native <https://reactnative.dev/docs/getting-started>
 
-[Setting up the development environment · React Native](https://reactnative.dev/docs/environment-setup)
+### Other Links
 
-<https://reactnative.dev/docs/getting-started>
+- Steps on utilizing NPM on the Linux command line: <https://www.linode.com/docs/guides/install-and-use-npm-on-linux/>
+
+- Expo CLI: <https://docs.expo.dev/workflow/expo-cli/>
 
 ### Storybook
 
