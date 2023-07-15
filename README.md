@@ -60,15 +60,9 @@ To use the app, you must first run the metro server on your machine through the 
 
 Second, download the Expo Go App on the Play Store/App Store, to test the application locally.
 
-1.  To use the app, you must scan the given QR code or link from the terminal using the Expo Go app.
+- To use the app, you must scan the given QR code or link from the terminal using the Expo Go app.
 
-## Manually Testing the App
-
-- Use “expo start”/“expo start --tunnel”
-
-- Scan the QR code on your testing device or open the tunnel URL by clicking on the link
-
-- Create a new user, or use the test account to enter sandbox mode
+- Afterwards, create a new user, or use the test account to enter sandbox mode
 
   - [cse115bdevelopers@gmail.com](mailto:cse115bdevelopers@gmail.com)
   - cse115bdeveloper
