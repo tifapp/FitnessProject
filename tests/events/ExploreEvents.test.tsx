@@ -46,6 +46,7 @@ describe("ExploreEvents tests", () => {
   describe("useExploreEvents tests", () => {
     fakeTimers()
     beforeEach(() => jest.resetAllMocks())
+    beforeEach(() => queryClient.clear())
 
     test("exploring events successfully at user location", async () => {
       const userCoordinate = mockTrackedLocationCoordinate()
