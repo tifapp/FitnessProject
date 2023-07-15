@@ -1,7 +1,7 @@
 import { BodyText, Headline } from "@components/Text"
 import { PrimaryButton } from "@components/common/Buttons"
 import { TouchableIonicon } from "@components/common/Icons"
-import { validatePassword } from "@hooks/validatePassword"
+import { validateNewPassword } from "@hooks/validatePassword"
 import { AppStyles } from "@lib/AppColorStyle"
 import { Auth } from "aws-amplify"
 import React, { useState } from "react"
@@ -9,7 +9,7 @@ import { Alert, SafeAreaView, ScrollView, StyleSheet, View } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { TextField } from "./TextField"
 
-const isValidForm: boolean = true
+let isValidForm = false
 const oldAccountPassword: string = "Icarus43$"
 
 type ChangePasswordProps = {
@@ -46,13 +46,11 @@ export const ChangePasswordScreen = ({
     useState<boolean>(true)
 
   const validateForm = () => {
-    const passwordRegex: RegExp =
-      /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[0-9]).{8,}$/
     const formValid: boolean =
       oldAccountPassword === currentPassword &&
-      validatePassword(newPassword) &&
+      validateNewPassword(newPassword) &&
       reEnteredPassword === newPassword
-    console.log("Got it as: ", formValid)
+    isValidForm = formValid
     return formValid
   }
 
@@ -84,14 +82,14 @@ export const ChangePasswordScreen = ({
             onChangeText={(text) => {
               setCurrentPassword(text)
             }}
-            onBlur={() =>
-              currentPassword !== oldAccountPassword
-                ? Alert.alert(
+            onBlur={() => {
+              if (currentPassword !== oldAccountPassword) {
+                Alert.alert(
                   "No Match",
                   "The entered current password does not match that of the old account's password. Please try again."
                 )
-                : Alert.alert("Correct match", "The password is correct")
-            }
+              }
+            }}
           />
           {currentPassword && (
             <TouchableIonicon
@@ -113,6 +111,15 @@ export const ChangePasswordScreen = ({
             value={newPassword}
             secureTextEntry={newPasswordHidden}
             onChangeText={(text) => setNewPassword(text)}
+            onBlur={() => {
+              const currentFormValid = validateNewPassword(newPassword)
+              if (!currentFormValid) {
+                Alert.alert(
+                  "Invalid Password",
+                  "The new password does not follow the rules given. Please try again."
+                )
+              }
+            }}
           />
           {newPassword && (
             <TouchableIonicon
@@ -134,14 +141,15 @@ export const ChangePasswordScreen = ({
             value={reEnteredPassword}
             secureTextEntry={reEnteredPasswordHidden}
             onChangeText={(text) => setReEnteredPassword(text)}
-            onBlur={() =>
-              reEnteredPassword !== newPassword
-                ? Alert.alert(
+            onBlur={() => {
+              if (reEnteredPassword !== newPassword) {
+                Alert.alert(
                   "No Match",
                   "The re-entered password does not match that of the new password. Please try again."
                 )
-                : Alert.alert("Correct match", "The password matches.")
-            }
+              }
+              validateForm()
+            }}
           />
           {reEnteredPassword && (
             <TouchableIonicon
@@ -164,7 +172,7 @@ export const ChangePasswordScreen = ({
 
         <View style={styles.buttonContainer}>
           <PrimaryButton
-            style={styles.button}
+            style={isValidForm ? styles.activeButton : styles.inactiveButton}
             title="Change Password"
             onPress={() => {
               validateForm()
@@ -195,11 +203,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginTop: "65%"
   },
-  button: {
+  activeButton: {
     flex: 1,
-    backgroundColor: isValidForm
-      ? AppStyles.darkColor
-      : AppStyles.colorOpacity35
+    backgroundColor: AppStyles.darkColor
+  },
+  inactiveButton: {
+    flex: 1,
+    backgroundColor: AppStyles.colorOpacity35
   },
   bodyText: {
     color: AppStyles.colorOpacity35,

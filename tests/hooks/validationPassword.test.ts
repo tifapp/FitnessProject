@@ -1,4 +1,4 @@
-import { validatePassword } from "@hooks/validatePassword"
+import { validateNewPassword } from "@hooks/validatePassword"
 
 describe("validation tests", () => {
   it("should result in a success, after validation. Given: old matches current, validate new pass WORKS, reEntered correct", () => {
@@ -10,7 +10,7 @@ describe("validation tests", () => {
     const validateForm = () => {
       const formValid: boolean =
         oldAccountPassword === currentAccountPassword &&
-        validatePassword(newAccountPassword) &&
+        validateNewPassword(newAccountPassword) &&
         reEnteredPassword === newAccountPassword
       return formValid
     }
