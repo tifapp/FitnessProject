@@ -10,7 +10,7 @@
 
 In order to install the project, you must first:
 
-1. Create an email account and a GitHub account to access the repo: <https://github.com/signup>
+1. Create an email account and a [GitHub](https://github.com/signup) account to access the repo:
 
 2. Clone the remote repository to your local machine using a git client or through the command line.
 
@@ -24,7 +24,7 @@ In order to install the project, you must first:
 
    git clone <https://github.com/tifapp/FitnessProject.git>
 
-3. Install Node.js version 16.13.1: <https://nodejs.org/download/release/v16.13.1/>
+3. Install [Node.js](https://nodejs.org/download/release/v16.13.1/) version 16.13.1:
 
    #### Windows
 
@@ -62,18 +62,32 @@ Second, download the Expo Go App on the Play Store/App Store, to test the applic
 
 1.  To use the app, you must scan the given QR code or link from the terminal using the Expo Go app.
 
-## Testing the App
+## Manually Testing the App
+
+- Use “expo start”/“expo start --tunnel”
+
+- Scan the QR code on your testing device or open the tunnel URL by clicking on the link
+
+- Create a new user, or use the test account to enter sandbox mode
+
+  - [cse115bdevelopers@gmail.com](mailto:cse115bdevelopers@gmail.com)
+  - cse115bdeveloper
+
+## Running Automated Testing
 
 We utilize automated testing in a good portion of our work. In order to run tests that have been created, you must:
 
-1.
+## Convention
 
 ## Development process
 
-1. [Code Editor (IDE) - Visual Studio](https://visualstudio.microsoft.com/downloads/)
+To develop for the app, you must utilize a code editor of your own choosing. Recommendations are given below, for the usage of [Visual Studio Code](https://visualstudio.microsoft.com/downloads/).
 
-   1. Settings
-      {
+### Recommended Settings for VSCode
+
+Settings here are to be added onto your workspace's settings.json.
+
+      ```{
       "diffEditor.renderSideBySide":false,
       "\[javascript]": {
       "editor.defaultFormatter":"esbenp.prettier-vscode",
@@ -86,60 +100,11 @@ We utilize automated testing in a good portion of our work. In order to run test
       "\[json]": {
       "editor.defaultFormatter":"esbenp.prettier-vscode"
       }
-      }
+      }```
 
-2. Create an AWS account and follow the instructions in the link: <https://docs.amplify.aws/>
+If you are a developer for the app, please keep track of tasks on our Trello: [Fitness Project (fitnessproject19) | Trello](https://trello.com/w/fitnessproject19)
 
-3. In the project folder, use the command "amplify configure" and select the region "us-west-2" for AWS setup.
-
-   1. See Sean for login details
-
-Trello: [Fitness Project (fitnessproject19) | Trello](https://trello.com/w/fitnessproject19)
-
-Login instructions:
-
-<https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_sign-in.html>
-
-<https://docs.aws.amazon.com/IAM/latest/UserGuide/console.html#user-sign-in-page>
-
-## Convention
-
-## Branch Management
-
-- Branch off the development branch for each user story.
-
-- When you are ready to merge your feature branch to the sprint branch, create a pull request and have it reviewed by two other team members and one code owner (Sean or Surya).
-
-  - Recommended to checkout the branch and test the changes locally before approval
-
-- Before the pull request, do a git rebase squash.
-
-- Once merged, delete the branch afterward.
-
-## Debugging
-
-- Reproduce the error
-- Isolate the error
-- Feel free to reach out to team members through Slack for any issues.
-
-## Testing
-
-- Use “expo start”/“expo start --tunnel”
-
-- Scan the QR code on your testing device or open the tunnel URL by clicking on the link
-
-- Create a new user, or use the test account to enter sandbox mode
-
-  - [cse115bdevelopers@gmail.com](mailto:cse115bdevelopers@gmail.com)
-  - cse115bdeveloper
-
-## Pull Request Policy
-
-- When you have a feature ready to be merged into the sprint branch, issue a pull request
-- Two other members on the team and one code owner must approve the changes before the merge
-- When a pull request gets made, jenkins will test it for any compile time errors
-
-## Extensions (Visual Studio Code)
+### Recommended Extensions for VSCode
 
 - Prettier ESLint
 - Code spell checker
@@ -147,10 +112,17 @@ Login instructions:
 - GraphQL: Language Feature Support
 - GraphQL: Syntax Highlighting
 
-### Sourcetree
+## Branch Management / Pull Request Policy
 
-- Download using the following link: <https://www.sourcetreeapp.com/>
-- Tutorial: <https://confluence.atlassian.com/get-started-with-sourcetree>
+- Branch off the development branch for each task you are performing.
+
+- When you are ready to merge your feature branch to the sprint branch, create a pull request and have it reviewed by one other team member.
+
+  - Recommended to checkout the branch and test the changes locally before approval
+
+- Before the pull request, do a git rebase squash.
+
+- Once merged, delete the branch afterward.
 
 ### React Native
 
@@ -167,13 +139,6 @@ Login instructions:
 [Setting up the development environment · React Native](https://reactnative.dev/docs/environment-setup)
 
 <https://reactnative.dev/docs/getting-started>
-
-## To do
-
-- Include AWS setup
-- Include details on setting up and using Sourcetree
-- Include visual studio settings and extensions, and tips/helpful shortcuts
-- Include react native documentation links
 
 ### Storybook
 
