@@ -1,3 +1,5 @@
+import "abortcontroller-polyfill/dist/polyfill-patch-fetch"
+
 /**
  * A type that holds a promise with a function to cancel the same promise.
  */
@@ -16,8 +18,8 @@ export type Cancellable<T> = {
  */
 export const cancelOnAborted = <T>(
   cancellable: Cancellable<T>,
-  signal: AbortSignal
+  signal?: AbortSignal
 ) => {
-  signal.addEventListener("abort", () => cancellable.cancel())
+  signal?.addEventListener("abort", () => cancellable.cancel())
   return cancellable
 }
