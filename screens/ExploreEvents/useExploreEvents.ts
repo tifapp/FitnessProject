@@ -1,8 +1,9 @@
 import { Cancellable, cancelOnAborted } from "@lib/Cancellable"
 import { CurrentUserEvent } from "@lib/events"
 import { useState } from "react"
-import { useQuery, useQueryClient } from "react-query"
+import { UseQueryResult, useQuery, useQueryClient } from "react-query"
 import {
+  ExploreEventsData,
   ExploreEventsInitialCenter,
   SAN_FRANCISCO_DEFAULT_REGION,
   createDefaultMapRegion,
@@ -34,7 +35,7 @@ export const useExploreEvents = (
   })
   return {
     region,
-    events,
+    data: eventsQueryToExploreEventsData(events),
     updateRegion: (newRegion: Region) => {
       if (!region) {
         panToRegion(newRegion)
@@ -44,6 +45,21 @@ export const useExploreEvents = (
       }
     }
   }
+}
+
+const eventsQueryToExploreEventsData = (
+  query: UseQueryResult<CurrentUserEvent[], unknown>
+): ExploreEventsData => {
+  if (query.isIdle || query.isLoading) {
+    return { status: "loading" }
+  }
+  if (query.status === "success" && query.data.length === 0) {
+    return { status: "no-results", events: [] }
+  }
+  if (query.isError) {
+    return { status: "error", retry: query.refetch }
+  }
+  return { status: "success", events: query.data }
 }
 
 const useExploreEventsRegion = (initialCenter: ExploreEventsInitialCenter) => {

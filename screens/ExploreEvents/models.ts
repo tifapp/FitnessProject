@@ -1,3 +1,4 @@
+import { CurrentUserEvent } from "@lib/events"
 import { LocationCoordinate2D } from "@lib/location"
 
 /**
@@ -46,3 +47,12 @@ export const initialCenterToRegion = (center: ExploreEventsInitialCenter) => {
     ? createDefaultMapRegion(center.coordinate)
     : undefined
 }
+
+/**
+ * Data representation of events explored in a given area.
+ */
+export type ExploreEventsData =
+  | { status: "loading"; events?: CurrentUserEvent[]; retry?: () => void }
+  | { status: "error"; events?: CurrentUserEvent[]; retry: () => void }
+  | { status: "no-results"; events: []; retry?: () => void }
+  | { status: "success"; events: CurrentUserEvent[]; retry?: undefined }

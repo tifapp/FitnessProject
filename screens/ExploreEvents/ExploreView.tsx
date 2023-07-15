@@ -47,16 +47,15 @@ export const ExploreEventsView = ({
   onSearchTapped,
   style
 }: ExploreEventsProps) => {
-  const { region, events, updateRegion } = useExploreEvents(initialCenter, {
+  const { region, data, updateRegion } = useExploreEvents(initialCenter, {
     fetchEvents,
     isSignificantlyDifferentRegions
   })
 
   // NB: - Ensure the current events are still on the map when the
   // user pans to a new region
-  const mapEventsData = useLastDefinedValue(events.data)
+  const mapEventsData = useLastDefinedValue(data.events)
 
-  const isLoadingEvents = events.isLoading || events.isIdle
   return (
     <View style={[style, styles.container]}>
       {region
@@ -80,17 +79,19 @@ export const ExploreEventsView = ({
       </SafeAreaView>
       <ExploreEventsBottomSheet
         onEventSelected={onEventTapped}
-        events={events.data ?? []}
+        events={data.events ?? []}
         HeaderComponent={
           <Title style={styles.sheetHeaderText}>
-            {!isLoadingEvents ? "Nearby Events" : "Finding Nearby Events..."}
+            {data.status !== "loading"
+              ? "Nearby Events"
+              : "Finding Nearby Events..."}
           </Title>
         }
         EmptyEventsComponent={
           <View style={styles.emptyEventsContainer}>
-            {isLoadingEvents && <LoadingView />}
-            {events.isError && <ErrorView onRetried={events.refetch} />}
-            {events.isSuccess && events.data.length === 0 && <NoResultsView />}
+            {data.status === "loading" && <LoadingView />}
+            {data.status === "error" && <ErrorView onRetried={data.retry} />}
+            {data.status === "no-results" && <NoResultsView />}
           </View>
         }
       />

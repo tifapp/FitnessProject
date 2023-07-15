@@ -5,7 +5,9 @@ import {
 } from "@lib/location"
 import {
   ExploreEventsInitialCenter,
-  useExploreEvents
+  useExploreEvents,
+  SAN_FRANCISCO_DEFAULT_REGION,
+  createInitialCenter
 } from "@screens/ExploreEvents"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import {
@@ -14,13 +16,11 @@ import {
 } from "../helpers/ReactQuery"
 import { UpdateDependencyValues } from "@lib/dependencies"
 import { UserLocationDependencyKeys } from "@hooks/UserLocation"
-import {
-  SAN_FRANCISCO_DEFAULT_REGION,
-  createInitialCenter
-} from "@screens/ExploreEvents/models"
 import { nonCancellable, endlessCancellable } from "../helpers/Cancellable"
 import { EventMocks } from "@lib/events"
 import { fakeTimers } from "../helpers/Timers"
+
+const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
 
 describe("ExploreEvents tests", () => {
   beforeEach(() => jest.resetAllMocks())
@@ -45,6 +45,70 @@ describe("ExploreEvents tests", () => {
 
   describe("useExploreEvents tests", () => {
     fakeTimers()
+    beforeEach(() => jest.resetAllMocks())
+
+    test("exploring events successfully at user location", async () => {
+      const userCoordinate = mockTrackedLocationCoordinate()
+
+      requestForegroundPermissions.mockResolvedValue(true)
+      queryUserCoordinates.mockReturnValue(userCoordinate)
+      fetchEvents.mockReturnValue(nonCancellable(Promise.resolve(TEST_EVENTS)))
+
+      const { result } = renderUseExploreEvents({ center: "user-location" })
+
+      await waitFor(() => {
+        expect(result.current.data.status).toEqual("loading")
+      })
+      await waitForLocationPermissionRequest()
+      await waitForUserRegionToLoad()
+      await waitFor(() => {
+        expect(result.current.data.events).toEqual(TEST_EVENTS)
+        expect(result.current.data.status).toEqual("success")
+      })
+    })
+
+    test("retrying after unsuccessfully exploring events", async () => {
+      fetchEvents.mockReturnValue(nonCancellable(Promise.reject(new Error())))
+
+      const coordinate = mockLocationCoordinate2D()
+      const { result } = renderUseExploreEvents({
+        center: "preset",
+        coordinate
+      })
+
+      await waitFor(() => {
+        expect(result.current.data.status).toEqual("loading")
+      })
+
+      await waitFor(() => {
+        expect(result.current.data.status).toEqual("error")
+      })
+
+      act(() => result.current.data.retry?.())
+
+      await waitFor(() => {
+        expect(result.current.data.status).toEqual("loading")
+      })
+
+      await waitFor(() => {
+        expect(result.current.data.status).toEqual("error")
+      })
+    })
+
+    it("should be in a no-results state when no events for region", async () => {
+      fetchEvents.mockReturnValue(nonCancellable(Promise.resolve([])))
+      const coordinate = mockLocationCoordinate2D()
+      const { result } = renderUseExploreEvents({
+        center: "preset",
+        coordinate
+      })
+      await waitFor(() => {
+        expect(result.current.data.status).toEqual("loading")
+      })
+      await waitFor(() => {
+        expect(result.current.data.status).toEqual("no-results")
+      })
+    })
 
     it("should use the initial provided region when fetching for first time", async () => {
       fetchEvents.mockReturnValue(endlessCancellable())
@@ -187,14 +251,12 @@ describe("ExploreEvents tests", () => {
       const events = [EventMocks.Multiday, EventMocks.PickupBasketball]
       fetchEvents.mockReturnValue(nonCancellable(Promise.resolve(events)))
 
-      const { result } = renderUseExploreEvents({
+      renderUseExploreEvents({
         center: "preset",
         coordinate: mockLocationCoordinate2D()
       })
 
       await waitFor(() => expect(fetchEvents).toHaveBeenCalled())
-      await waitFor(() => expect(result.current.events.data).toBeUndefined())
-      await waitFor(() => expect(result.current.events.data).toEqual(events))
       expect(queryClient.getQueryData(["event", events[0].id])).toMatchObject(
         events[0]
       )
