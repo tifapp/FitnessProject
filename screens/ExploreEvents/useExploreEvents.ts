@@ -106,9 +106,6 @@ const useExploreEventsQuery = (
     events: useQuery(
       ["explore-events", region],
       async ({ signal }) => {
-        // NB: The signal is only undefined if the platform does not support the AbortController
-        // api, but react-native added support in 0.60, so the force unwrap should be fine.
-        console.log("ABORT SIGNAL", signal)
         const events = await cancelOnAborted(fetchEvents(region), signal).value
 
         events.forEach((event) => {
