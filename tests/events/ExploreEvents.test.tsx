@@ -193,6 +193,7 @@ describe("ExploreEvents tests", () => {
       })
 
       await waitFor(() => expect(fetchEvents).toHaveBeenCalled())
+      await waitFor(() => expect(result.current.events.data).toBeUndefined())
       await waitFor(() => expect(result.current.events.data).toEqual(events))
       expect(queryClient.getQueryData(["event", events[0].id])).toMatchObject(
         events[0]
