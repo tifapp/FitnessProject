@@ -1,3 +1,8 @@
+if (process.env.TEST_RUNNER_CI) {
+  global.fetch = require("node-fetch")
+}
+
+// eslint-disable-next-line import/first
 import "abortcontroller-polyfill/dist/polyfill-patch-fetch"
 
 /**

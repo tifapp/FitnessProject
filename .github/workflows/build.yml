@@ -1,5 +1,9 @@
 name: Project Setup
 run-name: Setup Project
+
+env:
+  TEST_RUNNER_CI: 1
+
 on:
   pull_request:
     types: [opened, synchronize]
