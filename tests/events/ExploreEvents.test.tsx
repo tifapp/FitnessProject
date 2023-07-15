@@ -63,6 +63,7 @@ describe("ExploreEvents tests", () => {
       await waitForLocationPermissionRequest()
       await waitForUserRegionToLoad()
       await waitFor(() => {
+        console.log(result.current)
         expect(result.current.data.events).toEqual(TEST_EVENTS)
         expect(result.current.data.status).toEqual("success")
       })
@@ -107,6 +108,7 @@ describe("ExploreEvents tests", () => {
         expect(result.current.data.status).toEqual("loading")
       })
       await waitFor(() => {
+        console.log(result.current)
         expect(result.current.data.status).toEqual("no-results")
       })
     })
