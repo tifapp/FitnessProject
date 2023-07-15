@@ -1,10 +1,3 @@
-if (process.env.TEST_RUNNER_CI) {
-  global.fetch = require("node-fetch")
-}
-
-// eslint-disable-next-line import/first
-import "abortcontroller-polyfill/dist/polyfill-patch-fetch"
-
 /**
  * A type that holds a promise with a function to cancel the same promise.
  */
