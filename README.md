@@ -22,7 +22,7 @@ In order to install the project, you must first:
 
    If you are instead using the command line, install git and then run this command:
 
-   git clone <https://github.com/tifapp/FitnessProject.git>
+   `git clone https://github.com/tifapp/FitnessProject.git`
 
 3. Install [Node.js](https://nodejs.org/download/release/v16.13.1/) version 16.13.1:
 
@@ -34,9 +34,9 @@ In order to install the project, you must first:
 
    Look for the package labeled "node-v16.13.1-pkg", and download.
 
-4. Install the Expo CLI in the command line, using this command: npm install expo-cli --global
+4. Install the Expo CLI in the command line, using this command: `npm install expo-cli --global`
 
-5. Go to the FitnessProject folder (cd FitnessProject), then install all dependencies through the command line (npm install).
+5. Go to the FitnessProject folder (`cd FitnessProject`), then install all dependencies through the command line (`npm install`).
 
 ## Usage
 
@@ -52,7 +52,7 @@ To use the app, you must first run the metro server on your machine through the 
 
     - Note: You must be on the same wifi network, in order to make proper usage of the server.
 
-#### Publicly Accessible Process
+#### Publicly Accessible Proces
 
 2.  expo start –tunnel
 
@@ -60,9 +60,15 @@ To use the app, you must first run the metro server on your machine through the 
 
 Second, download the Expo Go App on the Play Store/App Store, to test the application locally.
 
-- To use the app, you must scan the given QR code or link from the terminal using the Expo Go app.
+1.  To use the app, you must scan the given QR code or link from the terminal using the Expo Go app.
 
-- Afterwards, create a new user, or use the test account to enter sandbox mode
+## Manually Testing the App
+
+- Use “`expo start`”/“`expo start --tunnel`”
+
+- Scan the QR code on your testing device or open the tunnel URL by clicking on the link
+
+- Create a new user, or use the test account to enter sandbox mode
 
   - [cse115bdevelopers@gmail.com](mailto:cse115bdevelopers@gmail.com)
   - cse115bdeveloper
@@ -81,20 +87,30 @@ To develop for the app, you must utilize a code editor of your own choosing. Rec
 
 Settings here are to be added onto your workspace's settings.json.
 
+      ```
       {
-      "diffEditor.renderSideBySide":false,
-      "\[javascript]": {
-      "editor.defaultFormatter":"esbenp.prettier-vscode",
-      "editor.formatOnSave":true,
-      "editor.formatOnPaste":true,
-      "editor.autoIndent":"full",
-      },
-      "editor.codeActionsOnSave": {"source.fixAll":true,"source.fixAll.eslint":true,"source.organizeImports":true,"source.addMissingImports":true,},
-      "javascript.updateImportsOnFileMove.enabled":"always",
-      "\[json]": {
-      "editor.defaultFormatter":"esbenp.prettier-vscode"
+      	"diffEditor.renderSideBySide":false,
+      	"\[javascript]":
+      	{
+      		"editor.defaultFormatter":"esbenp.prettier-vscode",
+      		"editor.formatOnSave":true,
+      		"editor.formatOnPaste":true,
+      		"editor.autoIndent":"full",
+      	},
+      	"editor.codeActionsOnSave":
+      	{
+      		"source.fixAll":true,
+      		"source.fixAll.eslint":true,
+      		"source.organizeImports":true,
+      		"source.addMissingImports":true,
+      	},
+      		"javascript.updateImportsOnFileMove.enabled":"always",
+      		"\[json]":
+      		{
+      			"editor.defaultFormatter":"esbenp.prettier-vscode"
+      		}
       }
-      }
+      ```
 
 If you are a developer for the app, please keep track of tasks on our Trello: [Fitness Project (fitnessproject19) | Trello](https://trello.com/w/fitnessproject19)
 
@@ -118,23 +134,21 @@ If you are a developer for the app, please keep track of tasks on our Trello: [F
 
 - Once merged, delete the branch afterward.
 
-## Appendix
-
 ### React Native
 
-- Documentation: <https://reactnative.dev/>
+- Documentation:<https://reactnative.dev/>
 
-- Tutorial: <https://reactnative.dev/docs/getting-started>
+- Tutorial:<https://reactnative.dev/docs/getting-started>
 
-- Development Environment Help: [Setting up the development environment · React Native](https://reactnative.dev/docs/environment-setup)
+### Appendix
 
-- Getting Started with React Native <https://reactnative.dev/docs/getting-started>
+<https://www.linode.com/docs/guides/install-and-use-npm-on-linux/>
 
-### Other Links
+<https://docs.expo.dev/workflow/expo-cli/>
 
-- Steps on utilizing NPM on the Linux command line: <https://www.linode.com/docs/guides/install-and-use-npm-on-linux/>
+[Setting up the development environment · React Native](https://reactnative.dev/docs/environment-setup)
 
-- Expo CLI: <https://docs.expo.dev/workflow/expo-cli/>
+<https://reactnative.dev/docs/getting-started>
 
 ### Storybook
 
