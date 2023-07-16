@@ -103,11 +103,11 @@ Settings here are to be added onto your workspace's settings.json.
       		"source.organizeImports":true,
       		"source.addMissingImports":true,
       	},
-      		"javascript.updateImportsOnFileMove.enabled":"always",
-      		"\[json]":
-      		{
-      			"editor.defaultFormatter":"esbenp.prettier-vscode"
-      		}
+      	"javascript.updateImportsOnFileMove.enabled":"always",
+      	"\[json]":
+      	{
+      		"editor.defaultFormatter":"esbenp.prettier-vscode"
+      	}
       }
 
 If you are a developer for the app, please keep track of tasks on our Trello: [Fitness Project (fitnessproject19) | Trello](https://trello.com/w/fitnessproject19)
