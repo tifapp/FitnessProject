@@ -48,15 +48,15 @@ To use the app, you must first run the metro server on your machine through the 
 
 #### Local Process
 
-1.  expo start
+1.  `expo start`
 
     - Note: You must be on the same wifi network, in order to make proper usage of the server.
 
 #### Publicly Accessible Proces
 
-2.  expo start –tunnel
+2. `expo start –tunnel`
 
-    - Note: This opens a tunnel link that is accessible to anyone from the internet.
+   - Note: This opens a tunnel link that is accessible to anyone from the internet.
 
 Second, download the Expo Go App on the Play Store/App Store, to test the application locally.
 
@@ -134,9 +134,9 @@ If you are a developer for the app, please keep track of tasks on our Trello: [F
 
 ### React Native
 
-- Documentation:<https://reactnative.dev/>
+- Documentation: <https://reactnative.dev/>
 
-- Tutorial:<https://reactnative.dev/docs/getting-started>
+- Tutorial: <https://reactnative.dev/docs/getting-started>
 
 ### Appendix
 
@@ -150,12 +150,12 @@ If you are a developer for the app, please keep track of tasks on our Trello: [F
 
 ### Storybook
 
-1. cd .storybook
+1. `cd .storybook`
 
-2. npm install
+2. `npm install`
 
-3. expo start
+3. `expo start`
 
-4. When adding new stories, run "npm run update-stories" so they appear in the app
+4. When adding new stories, run "`npm run update-stories`" so they appear in the app
 
 See examples in .storybook/components
