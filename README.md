@@ -87,7 +87,7 @@ To develop for the app, you must utilize a code editor of your own choosing. Rec
 
 Settings here are to be added onto your workspace's settings.json.
 
-      ```
+      `
       {
       	"diffEditor.renderSideBySide":false,
       	"\[javascript]":
@@ -110,7 +110,7 @@ Settings here are to be added onto your workspace's settings.json.
       			"editor.defaultFormatter":"esbenp.prettier-vscode"
       		}
       }
-      ```
+      `
 
 If you are a developer for the app, please keep track of tasks on our Trello: [Fitness Project (fitnessproject19) | Trello](https://trello.com/w/fitnessproject19)
 
