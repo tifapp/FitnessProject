@@ -42,14 +42,10 @@ export type PasswordErrorReason =
   | "too-short"
 
 export const validateNewPassword = (password: string) => {
-  if (
+  const isValidPassword =
     passwordRegexCapital.test(password) &&
     passwordRegexSpecialChar.test(password) &&
     passwordRegexNumber.test(password) &&
-    passwordRegexMinimumLength.test(password)
-  ) {
-    return true
-  } else {
-    return false
-  }
+    password.length >= 8
+  return isValidPassword
 }
