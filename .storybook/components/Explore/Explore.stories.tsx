@@ -15,6 +15,7 @@ import { createStackNavigator } from "@react-navigation/stack"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { NavigationContainer } from "@react-navigation/native"
 import { LocationSearchDependencyKeys } from "@screens/LocationSearch"
+import { SafeAreaProvider } from "react-native-safe-area-context"
 
 const ExploreEventsMeta: ComponentMeta<typeof ExploreEventsView> = {
   title: "Explore Events Screen",
@@ -48,11 +49,13 @@ export const Basic: ExploreEventsStory = () => (
           )
         }}
       >
-        <NavigationContainer onStateChange={console.log}>
-          <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
-            {screens}
-          </Stack.Navigator>
-        </NavigationContainer>
+        <SafeAreaProvider>
+          <NavigationContainer onStateChange={console.log}>
+            <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
+              {screens}
+            </Stack.Navigator>
+          </NavigationContainer>
+        </SafeAreaProvider>
       </UpdateDependencyValues>
     </AppQueryClientProvider>
   </MenuProvider>

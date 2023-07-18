@@ -1,12 +1,6 @@
 import React from "react"
-import {
-  Pressable,
-  SafeAreaView,
-  StyleProp,
-  StyleSheet,
-  View,
-  ViewStyle
-} from "react-native"
+import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import {
   LocationCoordinate2D,
   Region,
@@ -51,6 +45,7 @@ export const ExploreEventsView = ({
     fetchEvents,
     isSignificantlyDifferentRegions
   })
+  const insets = useSafeAreaInsets()
 
   // NB: - Ensure the current events are still on the map when the
   // user pans to a new region
@@ -72,11 +67,11 @@ export const ExploreEventsView = ({
         : (
           <Water />
         )}
-      <SafeAreaView style={styles.searchBarContainer}>
+      <View style={[{ paddingTop: insets.top + 4 }, styles.searchBarContainer]}>
         <Pressable onPress={onSearchTapped} style={styles.searchBar}>
           <ExploreEventsSearchBar text={searchText} />
         </Pressable>
-      </SafeAreaView>
+      </View>
       <ExploreEventsBottomSheet
         onEventSelected={onEventTapped}
         events={data.events ?? []}

@@ -5,7 +5,8 @@ import {
   BottomTabBarProps
 } from "@react-navigation/bottom-tabs"
 import React from "react"
-import { SafeAreaView, StyleSheet, View } from "react-native"
+import { Platform, SafeAreaView, StyleSheet, View } from "react-native"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 function getIconName (routeName: string) {
   if (routeName === "Map") return "map"
@@ -25,10 +26,14 @@ export const BottomNavTabBar = ({
     focusedOptions?.tabBarVisible === true ||
     focusedOptions?.tabBarVisible === undefined
   )
+  const insets = useSafeAreaInsets()
 
   return (
-    <SafeAreaView
-      style={[styles.container, { display: isVisible ? "flex" : "none" }]}
+    <View
+      style={[
+        styles.container,
+        { display: isVisible ? "flex" : "none", paddingBottom: insets.bottom }
+      ]}
     >
       {state.routes.map((route, index) => {
         const isFocused = state.index === index
@@ -70,7 +75,7 @@ export const BottomNavTabBar = ({
           />
         )
       })}
-    </SafeAreaView>
+    </View>
   )
 }
 
@@ -83,7 +88,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 100,
+    height: Platform.OS === "android" ? 80 : 49,
     backgroundColor: "white"
   },
   plusIcon: {
