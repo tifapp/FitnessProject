@@ -23,6 +23,15 @@ import ContentTextMeta, {
 import SettingsMeta, {
   Basic as SettingsScreenBasic
 } from "../components/SettingsScreen/SettingsScreen.stories"
+import ExploreEventsMeta, {
+  Basic as ExploreEventsBasic
+} from "../components/Explore/Explore.stories"
+import TextFieldMeta, {
+  Basic as TextFieldBasic
+} from "../components/TextField/TextField.stories"
+import SearchBarMeta, {
+  Default as SearchBarBasic
+} from "../components/SearchBar/SearchBar.stories"
 
 // Create an array of stories
 const stories = [
@@ -52,9 +61,25 @@ const stories = [
     args: AttendeesListMeta.args
   },
   {
+
     name: ChangePasswordScreenMeta.title,
     component: ChangePasswordScreenBasic,
     args: ChangePasswordScreenMeta.args
+  },
+  {
+    name: ExploreEventsMeta.title,
+    component: ExploreEventsBasic,
+    args: ExploreEventsMeta.args
+  },
+  {
+    name: TextFieldMeta.title,
+    component: TextFieldBasic,
+    args: TextFieldMeta.args
+  },
+  {
+    name: SearchBarMeta.title,
+    component: SearchBarBasic,
+    args: SearchBarMeta.args
   }
   // Add more stories here...
 ]

@@ -1,16 +1,27 @@
-import { ImageBackground, ImageStyle, StyleProp } from "react-native"
+import React from "react"
+import { Image, ImageStyle, StyleProp, StyleSheet } from "react-native"
 
 interface ProfileImageProps {
-  imageURL: string
+  imageURL?: string
   style?: StyleProp<ImageStyle>
 }
 
-const ProfileImage = ({ imageURL, style }: ProfileImageProps) => {
-  const defaultImage = require("@assets/default_profile.png")
+const fallbackImage = require("../../assets/default_profile.png")
 
+const ProfileImage = ({ imageURL, style }: ProfileImageProps) => {
   return (
-    <ImageBackground source={defaultImage} style={[{ alignSelf: "center" }, style]} />
+    <Image
+      defaultSource={fallbackImage}
+      source={{ uri: imageURL }}
+      style={[style, styles.image]}
+    />
   )
 }
+
+const styles = StyleSheet.create({
+  image: {
+    borderRadius: 128
+  }
+})
 
 export default ProfileImage

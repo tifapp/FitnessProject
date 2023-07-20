@@ -4,6 +4,15 @@ import { uuid } from "../uuid"
 const IS_VALID_USER_HANDLE_REGEX = /^@[A-Za-z0-9_]{1,15}$/
 
 /**
+ * A type representing the relationship status between 2 users.
+ */
+export type UserToProfileRelationStatus =
+  | "not-friends"
+  | "friend-request-pending"
+  | "friends"
+  | "blocked"
+
+/**
  * Returns true if the given string is a valid user handle.
  *
  * A valid user handle is similar to a twitter handle.

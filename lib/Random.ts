@@ -6,3 +6,7 @@
 export const randomBool = (falseChance: number = 0.5) => {
   return Math.random() > falseChance
 }
+
+export const randomFloatInRange = (lower: number, upper: number) => {
+  return lower + Math.random() * (upper - lower)
+}
