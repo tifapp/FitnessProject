@@ -7,7 +7,7 @@ const PreviewSearchBar = () => {
   const [text, setText] = useState("")
   return (
     <SearchBar
-      style={{ paddingHorizontal: 16, paddingVertical: 8 }}
+      style={{ paddingHorizontal: 16, paddingVertical: 48 }}
       leftAddon={<MaterialIcon name="search" />}
       placeholder={"Search Something..."}
       text={text}

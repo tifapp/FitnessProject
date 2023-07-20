@@ -9,12 +9,13 @@ import {
 import { TextInput } from "react-native-gesture-handler"
 import { Caption } from "./Text"
 import { AppStyles } from "@lib/AppColorStyle"
+import { TouchableIonicon } from "./common/Icons"
 
 export type TextFieldProps = {
-  leftAddon?: ReactNode
-  rightAddon?: ReactNode
+  leftAddon?: JSX.Element
+  rightAddon?: JSX.Element
   error?: ReactNode
-  containerStyle?: StyleProp<ViewStyle>
+  style?: StyleProp<ViewStyle>
 } & Omit<TextInputProps, "style" | "placeholderStyle">
 
 /**
@@ -24,12 +25,12 @@ export const TextField = ({
   leftAddon,
   rightAddon,
   error,
-  containerStyle,
+  style,
   ...props
 }: TextFieldProps) => {
   const borderColor = error ? AppStyles.errorColor : "rgba(0, 0, 0, 0.10)"
   return (
-    <View style={containerStyle}>
+    <View style={style}>
       <View style={[styles.card, { borderColor }]}>
         <View style={styles.container}>
           <View style={styles.leftAddon}>{leftAddon}</View>
@@ -53,6 +54,33 @@ export const TextField = ({
     </View>
   )
 }
+
+export type PasswordTextFieldProps = {
+  onShowPasswordContentsChanged: (shouldShowPassword: boolean) => void
+  isShowingPasswordContents: boolean
+} & Omit<TextFieldProps, "rightAddon" | "secureTextEntry">
+
+/**
+ * A text field component for password inputs.
+ */
+export const PasswordTextField = ({
+  onShowPasswordContentsChanged,
+  isShowingPasswordContents,
+  ...props
+}: PasswordTextFieldProps) => (
+  <TextField
+    secureTextEntry={!isShowingPasswordContents}
+    rightAddon={
+      <TouchableIonicon
+        icon={{ name: isShowingPasswordContents ? "eye" : "lock-closed" }}
+        onPress={() =>
+          onShowPasswordContentsChanged(!isShowingPasswordContents)
+        }
+      />
+    }
+    {...props}
+  />
+)
 
 const styles = StyleSheet.create({
   card: {

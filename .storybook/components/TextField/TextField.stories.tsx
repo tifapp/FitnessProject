@@ -1,7 +1,7 @@
 import React, { useState } from "react"
-import { TextField } from "@components/TextFields"
+import { PasswordTextField, TextField } from "@components/TextFields"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import { View } from "react-native"
+import { KeyboardAvoidingView, View } from "react-native"
 import { ContentText } from "@components/ContentText"
 import { Ionicon } from "@components/common/Icons"
 
@@ -15,7 +15,8 @@ export default TextFieldMeta
 type TextFieldStory = ComponentStory<typeof TextField>
 
 export const Basic: TextFieldStory = () => (
-  <View
+  <KeyboardAvoidingView
+    behavior="padding"
     style={{
       display: "flex",
       alignItems: "center",
@@ -27,17 +28,14 @@ export const Basic: TextFieldStory = () => (
     <LeftAddon />
     <ErrorString />
     <ErrorView />
-  </View>
+    <Password />
+  </KeyboardAvoidingView>
 )
 
 const Standard = () => {
   const [text, setText] = useState("")
   return (
-    <TextField
-      value={text}
-      onChangeText={setText}
-      containerStyle={{ padding: 16 }}
-    />
+    <TextField value={text} onChangeText={setText} style={{ padding: 16 }} />
   )
 }
 
@@ -47,7 +45,7 @@ const LeftAddon = () => {
     <TextField
       leftAddon={<Ionicon name="close-circle" />}
       placeholder="Enter Text"
-      containerStyle={{ padding: 16 }}
+      style={{ padding: 16 }}
       value={text}
       onChangeText={setText}
     />
@@ -61,7 +59,7 @@ const ErrorString = () => {
       value={text}
       placeholder="Enter Text"
       onChangeText={setText}
-      containerStyle={{ padding: 16 }}
+      style={{ padding: 16 }}
       error="This is an error..."
     />
   )
@@ -74,8 +72,23 @@ const ErrorView = () => {
       value={text}
       placeholder="Enter Text"
       onChangeText={setText}
-      containerStyle={{ padding: 16 }}
+      style={{ padding: 16 }}
       error={<ContentText text="@die" onUserHandleTapped={() => {}} />}
+    />
+  )
+}
+
+const Password = () => {
+  const [text, setText] = useState("")
+  const [isShowingPassword, setIsShowingPassword] = useState(false)
+  return (
+    <PasswordTextField
+      value={text}
+      placeholder="Enter Text"
+      onChangeText={setText}
+      isShowingPasswordContents={isShowingPassword}
+      onShowPasswordContentsChanged={setIsShowingPassword}
+      style={{ padding: 16 }}
     />
   )
 }

@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react"
+import React from "react"
 import { StyleProp, ViewStyle, StyleSheet } from "react-native"
 import { TouchableIonicon } from "./common/Icons"
 import { TextField } from "./TextFields"
@@ -6,7 +6,7 @@ import { TextField } from "./TextFields"
 export type SearchBarProps = {
   text: string
   onTextChanged: (text: string) => void
-  leftAddon?: ReactNode
+  leftAddon?: JSX.Element
   placeholder?: string
   style?: StyleProp<ViewStyle>
 }
@@ -22,7 +22,7 @@ export const SearchBar = ({
   style
 }: SearchBarProps) => (
   <TextField
-    containerStyle={style}
+    style={style}
     value={text}
     onChangeText={onTextChanged}
     leftAddon={leftAddon}
