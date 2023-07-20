@@ -73,8 +73,11 @@ export const PasswordTextField = ({
     rightAddon={
       <TouchableIonicon
         icon={{ name: isShowingPasswordContents ? "eye" : "lock-closed" }}
-        onPress={() =>
+        onPress={() => {
           onShowPasswordContentsChanged(!isShowingPasswordContents)
+        }}
+        accessibilityLabel={
+          isShowingPasswordContents ? "Hide password" : "Show password"
         }
       />
     }
