@@ -1,15 +1,9 @@
 import React from "react"
 import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
-import {
-  LocationCoordinate2D,
-  Region,
-  isSignificantlyDifferentRegions
-} from "@lib/location"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { LocationCoordinate2D, Region } from "@lib/location"
 import { CurrentUserEvent } from "@lib/events"
-import { ExploreEventsInitialCenter } from "./models"
-import { useExploreEvents } from "./useExploreEvents"
-import { Cancellable } from "@lib/Cancellable"
+import { ExploreEventsData } from "./models"
 import { ExploreEventsMap } from "./Map"
 import { useLastDefinedValue } from "@hooks/useLastDefinedValue"
 import { ExploreEventsBottomSheet } from "./BottomSheet"
@@ -21,11 +15,12 @@ import { ExploreEventsSearchBar } from "./SearchBar"
 
 export type ExploreEventsProps = {
   searchText?: string
-  initialCenter: ExploreEventsInitialCenter
+  region?: Region
+  data: ExploreEventsData
+  onRegionUpdated: (region: Region) => void
   onMapLongPress: (coordinate: LocationCoordinate2D) => void
   onEventTapped: (event: CurrentUserEvent) => void
   onSearchTapped: () => void
-  fetchEvents: (region: Region) => Cancellable<CurrentUserEvent[]>
   style?: StyleProp<ViewStyle>
 }
 
@@ -34,17 +29,14 @@ export type ExploreEventsProps = {
  */
 export const ExploreEventsView = ({
   searchText,
-  initialCenter,
-  fetchEvents,
+  region,
+  data,
+  onRegionUpdated,
   onMapLongPress,
   onEventTapped,
   onSearchTapped,
   style
 }: ExploreEventsProps) => {
-  const { region, data, updateRegion } = useExploreEvents(initialCenter, {
-    fetchEvents,
-    isSignificantlyDifferentRegions
-  })
   const insets = useSafeAreaInsets()
 
   // NB: - Ensure the current events are still on the map when the
@@ -58,7 +50,7 @@ export const ExploreEventsView = ({
           <ExploreEventsMap
             initialRegion={region}
             onLongPress={onMapLongPress}
-            onRegionChanged={updateRegion}
+            onRegionChanged={onRegionUpdated}
             onEventSelected={onEventTapped}
             events={mapEventsData ?? []}
             style={styles.map}

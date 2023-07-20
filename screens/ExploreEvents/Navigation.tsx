@@ -2,12 +2,17 @@ import React from "react"
 import { StackNavigatorType } from "@components/Navigation"
 import { Cancellable } from "@lib/Cancellable"
 import { CurrentUserEvent } from "@lib/events"
-import { LocationCoordinate2D, Region } from "@lib/location"
+import {
+  LocationCoordinate2D,
+  Region,
+  isSignificantlyDifferentRegions
+} from "@lib/location"
 import { ExploreEventsView } from "./ExploreView"
 import { StackScreenProps } from "@react-navigation/stack"
 import { createInitialCenter } from "./models"
 import { StyleSheet } from "react-native"
 import { EventScreensParamsList } from "@screens/EventDetails/EventScreensNavigation"
+import { useExploreEvents } from "./useExploreEvents"
 
 export type ExploreEventsScreensParamsList = {
   exploreEvents: { searchText: string; center?: LocationCoordinate2D }
@@ -51,17 +56,27 @@ const ExploreEventsScreen = ({
   route,
   navigation,
   fetchEvents
-}: ExploreEventsScreenProps) => (
-  <ExploreEventsView
-    searchText={route.params.searchText}
-    fetchEvents={fetchEvents}
-    onEventTapped={(event) => navigation.navigate("Event Details", { event })}
-    onMapLongPress={console.log}
-    onSearchTapped={() => console.log("Search")}
-    initialCenter={createInitialCenter(route.params.center)}
-    style={styles.exploreEvents}
-  />
-)
+}: ExploreEventsScreenProps) => {
+  const { region, data, updateRegion } = useExploreEvents(
+    createInitialCenter(route.params.center),
+    {
+      fetchEvents,
+      isSignificantlyDifferentRegions
+    }
+  )
+  return (
+    <ExploreEventsView
+      region={region}
+      data={data}
+      onRegionUpdated={updateRegion}
+      searchText={route.params.searchText}
+      onEventTapped={(event) => navigation.navigate("Event Details", { event })}
+      onMapLongPress={console.log}
+      onSearchTapped={() => console.log("Search")}
+      style={styles.exploreEvents}
+    />
+  )
+}
 
 const styles = StyleSheet.create({
   exploreEvents: {
