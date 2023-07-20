@@ -1,6 +1,7 @@
 import React, { ReactNode } from "react"
-import { StyleProp, TextInput, View, ViewStyle, StyleSheet } from "react-native"
+import { StyleProp, ViewStyle, StyleSheet } from "react-native"
 import { TouchableIonicon } from "./common/Icons"
+import { TextField } from "./TextFields"
 
 export type SearchBarProps = {
   text: string
@@ -20,18 +21,14 @@ export const SearchBar = ({
   placeholder,
   style
 }: SearchBarProps) => (
-  <View style={style}>
-    <View style={styles.card}>
-      <View style={styles.container}>
-        <View style={styles.leftAddon}>{leftAddon}</View>
-        <View style={styles.leftContainer}>
-          <TextInput
-            placeholder={placeholder}
-            value={text}
-            onChangeText={onTextChanged}
-            style={styles.textInput}
-          />
-        </View>
+  <TextField
+    containerStyle={style}
+    value={text}
+    onChangeText={onTextChanged}
+    leftAddon={leftAddon}
+    placeholder={placeholder}
+    rightAddon={
+      <>
         {text.length > 0 && (
           <TouchableIonicon
             icon={{
@@ -42,45 +39,13 @@ export const SearchBar = ({
             accessibilityLabel="Clear all search text"
           />
         )}
-      </View>
-    </View>
-  </View>
+      </>
+    }
+  />
 )
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: "white",
-    borderWidth: 1,
-    borderRadius: 12,
-    borderColor: "rgba(0, 0, 0, 0.10)"
-  },
-  container: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    width: "100%",
-    padding: 8
-  },
-  leftContainer: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1
-  },
-  leftAddon: {
-    marginRight: 8
-  },
-  textInput: {
-    fontSize: 16,
-    fontFamily: "OpenSans",
-    width: "100%"
-  },
   clearIconContainer: {
     marginLeft: 8
-  },
-  clearIcon: {
-    color: "black",
-    padding: 4,
-    opacity: 0.35
   }
 })
