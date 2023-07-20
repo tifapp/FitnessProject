@@ -23,6 +23,12 @@ import SettingsMeta, {
 import ExploreEventsMeta, {
   Basic as ExploreEventsBasic
 } from "../components/Explore/Explore.stories"
+import TextFieldMeta, {
+  Basic as TextFieldBasic
+} from "../components/TextField/TextField.stories"
+import SearchBarMeta, {
+  Default as SearchBarBasic
+} from "../components/SearchBar/SearchBar.stories"
 
 // Create an array of stories
 const stories = [
@@ -55,6 +61,16 @@ const stories = [
     name: ExploreEventsMeta.title,
     component: ExploreEventsBasic,
     args: ExploreEventsMeta.args
+  },
+  {
+    name: TextFieldMeta.title,
+    component: TextFieldBasic,
+    args: TextFieldMeta.args
+  },
+  {
+    name: SearchBarMeta.title,
+    component: SearchBarBasic,
+    args: SearchBarMeta.args
   }
   // Add more stories here...
 ]
