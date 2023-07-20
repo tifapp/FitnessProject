@@ -1,6 +1,6 @@
 import React from "react"
 import EventsList from "@components/EventsList"
-import { StackNavigatorType } from "@components/Navigation"
+import { ChevronBackButton, StackNavigatorType } from "@components/Navigation"
 import { EventMocks } from "@lib/events"
 import { StackScreenProps } from "@react-navigation/stack"
 import { AttendeesListScreen } from "@screens/EventAttendeesList/AttendeesListScreen"
@@ -40,6 +40,10 @@ export const createEventDetailsStackScreens = <
       <stack.Screen name={"Event List"} component={EventsList} />
       <stack.Screen
         name={"Event Details"}
+        options={{
+          headerTitle: "",
+          headerLeft: ChevronBackButton
+        }}
         component={EventDetailsScreenNavWrapper}
         initialParams={{ event: EventMocks.PickupBasketball }}
       />

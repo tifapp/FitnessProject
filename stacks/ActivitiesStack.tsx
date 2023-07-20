@@ -1,9 +1,7 @@
 import React from "react"
 import { BottomNavTabBar } from "@components/bottomTabComponents/BottomNavTabBar"
-import { headerOptions } from "@components/headerComponents/headerOptions"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
-import { ActivitiesScreenNavWrapper } from "@screens/ActivitiesScreenNavWrapper"
 import { EventDetailsProps } from "@screens/EventDetails/EventDetails"
 import { createEventDetailsStackScreens } from "@screens/EventDetails/EventScreensNavigation"
 import { EventFormScreenNavWrapper } from "@screens/EventFormScreenNavWrapper"
@@ -25,6 +23,12 @@ import { TestChatRoomScreen } from "@screens/testScreens/TestChatRoomScreen"
 import { TestEventFormScreen } from "@screens/testScreens/TestEventFormScreen"
 import { TestNotifScreen } from "@screens/testScreens/TestNotifScreen"
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native"
+import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
+import {
+  ExploreEventsScreensParamsList,
+  createExploreEventsScreens
+} from "@screens/ExploreEvents"
+import { EventMocks } from "@lib/events"
 
 export enum ActivitiesScreenNames {
   EVENT_FORM = "Event Form",
@@ -47,7 +51,6 @@ export type ActivitiesStackParamList = {
   "Events Stack": undefined
   [ActivitiesScreenNames.EVENT_FORM]: undefined
   [ActivitiesScreenNames.EVENT_DETAILS]: EventDetailsProps
-  [ActivitiesScreenNames.MAP]: undefined
   [ActivitiesScreenNames.EVENT_LIST]: undefined
   [ActivitiesScreenNames.ATTENDEES_LIST]: undefined
   [ActivitiesScreenNames.LOCATION_SEARCH]: LocationSearchPickerProps
@@ -60,7 +63,8 @@ export type ActivitiesStackParamList = {
   [ActivitiesScreenNames.CHAT_ROOM]: undefined
   [ActivitiesScreenNames.EDIT_PROFILE]: undefined
 } & ReportingScreensParamsList &
-  ProfileScreensParamsList
+  ProfileScreensParamsList &
+  ExploreEventsScreensParamsList
 
 const Stack = createStackNavigator<ActivitiesStackParamList>()
 const Tab = createBottomTabNavigator()
@@ -75,6 +79,11 @@ const profileScreens =
 const eventDetailsScreens =
   createEventDetailsStackScreens<ActivitiesStackParamList>(Stack)
 
+const exploreEventsScreens = createExploreEventsScreens(Stack, () => ({
+  value: Promise.resolve([EventMocks.PickupBasketball]),
+  cancel: () => {}
+}))
+
 export type EventFormScreenRouteProps = StackScreenProps<
   ActivitiesStackParamList,
   ActivitiesScreenNames.EVENT_FORM
@@ -82,10 +91,6 @@ export type EventFormScreenRouteProps = StackScreenProps<
 export type EventDetailsScreenRouteProps = StackScreenProps<
   ActivitiesStackParamList,
   ActivitiesScreenNames.EVENT_DETAILS
->["route"]
-export type ActivitiesScreenRouteProps = StackScreenProps<
-  ActivitiesStackParamList,
-  ActivitiesScreenNames.MAP
 >["route"]
 export type EventListRouteProps = StackScreenProps<
   ActivitiesStackParamList,
@@ -98,11 +103,8 @@ export type ProfileScreenRouteProps = StackScreenProps<
 
 export default function ActivitiesStack () {
   return (
-    <Stack.Navigator screenOptions={headerOptions}>
-      <Stack.Screen
-        name={ActivitiesScreenNames.MAP}
-        component={ActivitiesScreenNavWrapper}
-      />
+    <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
+      {exploreEventsScreens}
       <Stack.Screen
         name={ActivitiesScreenNames.EVENT_FORM}
         component={EventFormScreenNavWrapper}

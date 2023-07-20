@@ -5,13 +5,15 @@ import React, { useState } from "react"
 import { Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { ToastWithIcon } from "@components/common/Toasts"
-import { UserFriendStatus } from "@lib/users/User"
+import { UserToProfileRelationStatus } from "@lib/users"
 
 interface ImageAndNameProps {
   username: string
   userHandle: string
   eventColor: string
-  userFriendStatus: UserFriendStatus | undefined
+  userFriendStatus: UserToProfileRelationStatus | undefined
+  imageURL?: string
+  toastOffset: number
   style?: StyleProp<ViewStyle>
   imageStyle?: StyleProp<ImageStyle>
 }
@@ -22,6 +24,7 @@ const ProfileImageAndNameWithFriend = ({
   eventColor,
   userFriendStatus,
   style,
+  imageURL,
   imageStyle
 }: ImageAndNameProps) => {
   const [friendStatus, setFriendStatus] = useState(userFriendStatus)
@@ -29,7 +32,9 @@ const ProfileImageAndNameWithFriend = ({
     !!(friendStatus === "friend-request-pending" || friendStatus === "friends")
   )
 
-  const renderFriendStatus = (status: UserFriendStatus | undefined) => {
+  const renderFriendStatus = (
+    status: UserToProfileRelationStatus | undefined
+  ) => {
     switch (status) {
     case "not-friends":
       return "Add Friend"
@@ -53,7 +58,7 @@ const ProfileImageAndNameWithFriend = ({
 
   return (
     <View style={[{ flexDirection: "row" }, style]}>
-      <ProfileImage imageURL="@assets/icon.png" style={imageStyle} />
+      <ProfileImage imageURL={imageURL} style={imageStyle} />
       <View>
         <View style={{ flexDirection: "row" }}>
           <Headline>{username}</Headline>

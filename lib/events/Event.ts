@@ -1,5 +1,6 @@
 import { dateRange, FixedDateRange } from "@lib/date"
 import { LocationCoordinate2D, Placemark } from "@lib/location"
+import { UserToProfileRelationStatus } from "@lib/users"
 import { uuid } from "@lib/uuid"
 
 /**
@@ -18,20 +19,24 @@ export enum EventColors {
 /**
  * A user who is attending an event.
  */
-export type EventAttendee = Readonly<{
+export type EventAttendee = {
   id: string
   username: string
   handle: string
-}>
+  profileImageURL?: string
+  relationStatus: UserToProfileRelationStatus
+}
 
 /**
  * Some mock {@link EventAttendee} objects.
  */
 export namespace EventAttendeeMocks {
-  export const Blob = {
+  export const Alivs = {
     id: uuid(),
-    username: "Blob",
-    handle: "Blob"
+    username: "Alvis",
+    handle: "alvis",
+    profileImageURL:
+      "https://www.escapistmagazine.com/wp-content/uploads/2023/05/xc3-future-redeemed-alvis.jpg?resize=1200%2C673"
   } as EventAttendee
 
   export const BlobJr = {
@@ -64,18 +69,18 @@ export namespace EventAttendeeMocks {
 /**
  * A type representing events that are attended and hosted by users.
  */
-export type Event = Readonly<{
+export type Event = {
   host: EventAttendee
   id: string
   title: string
-  description?: string
+  description: string
   dateRange: FixedDateRange
   color: EventColors
   coordinates: LocationCoordinate2D
   placemark?: Placemark
   shouldHideAfterStartDate: boolean
   attendeeCount: number
-}>
+}
 
 /**
  * A type for determining whether or not a user is a host,
@@ -105,18 +110,16 @@ export const isAttendingEvent = (attendeeStatus: EventUserAttendeeStatus) => {
  * An event type that adds additional data on a specific user's
  * perspective of the event.
  */
-export type CurrentUserEvent = Event &
-  Readonly<{
-    userAttendeeStatus: EventUserAttendeeStatus
-    userMilesFromEvent: number
-  }>
+export type CurrentUserEvent = Event & {
+  userAttendeeStatus: EventUserAttendeeStatus
+}
 
 /**
  * Some mock {@link CurrentUserEvent} objects.
  */
 export namespace EventMocks {
   export const PickupBasketball = {
-    host: EventAttendeeMocks.Blob,
+    host: EventAttendeeMocks.Alivs,
     id: uuid(),
     title: "Pickup Basketball",
     description: "I'm better than Lebron James.",
@@ -142,7 +145,7 @@ export namespace EventMocks {
   } as CurrentUserEvent
 
   export const Multiday = {
-    host: EventAttendeeMocks.Blob,
+    host: EventAttendeeMocks.Alivs,
     id: uuid(),
     title: "Multiday Event",
     description: "This event runs for more than one day.",
@@ -168,7 +171,7 @@ export namespace EventMocks {
   } as CurrentUserEvent
 
   export const NoPlacemarkInfo = {
-    host: EventAttendeeMocks.Blob,
+    host: EventAttendeeMocks.Alivs,
     id: uuid(),
     title: "No Placemark Info",
     attendeeCount: 5,

@@ -70,6 +70,7 @@ import { ExpoUserNotifications } from "@lib/UserNotifications"
 import ActivitiesStack, { TabNavigation } from "@stacks/ActivitiesStack"
 import { SetDependencyValue } from "./lib/dependencies"
 import { userIdDependencyKey } from "./lib/MiscDependencyKeys"
+import { SafeAreaProvider } from "react-native-safe-area-context"
 
 if (
   Platform.OS === "android" &&
@@ -310,17 +311,19 @@ const App = () => {
     )
   } else if (isDeveloper) {
     return (
-      <NavigationContainer linking={linkingConfig}>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Activities Screen"
-            component={TabNavigation}
-            options={{
-              headerShown: false
-            }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <SafeAreaProvider>
+        <NavigationContainer linking={linkingConfig}>
+          <Stack.Navigator>
+            <Stack.Screen
+              name="Activities Screen"
+              component={TabNavigation}
+              options={{
+                headerShown: false
+              }}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </SafeAreaProvider>
     )
   } else {
     return (

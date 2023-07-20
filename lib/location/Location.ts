@@ -1,7 +1,7 @@
 import {
   degreesToRadians,
   EARTH_RADIUS_METERS,
-  METERS_PER_MILE,
+  metersToMiles,
   sin2
 } from "../Math"
 import { z } from "zod"
@@ -38,17 +38,17 @@ export const mockLocationCoordinate2D = () => ({
 export namespace LocationCoordinatesMocks {
   export const SantaCruz = {
     latitude: 36.9741,
-    longitude: 122.0308
+    longitude: -122.0308
   } as const
 
   export const NYC = {
     latitude: 40.7128,
-    longitude: 74.006
+    longitude: -74.006
   } as const
 
   export const SanFrancisco = {
     latitude: 37.7749,
-    longitude: 122.4194
+    longitude: -122.4194
   } as const
 
   export const London = {
@@ -101,11 +101,11 @@ export const mockTrackedLocationCoordinate = (date?: Date) => ({
 })
 
 /**
- * Computes the number of miles between 2 locations using the haversine formula.
+ * Computes the number of meters between 2 locations using the haversine formula.
  *
  * For more info on the math: https://en.wikipedia.org/wiki/Haversine_formula
  */
-export const milesBetweenLocations = (
+export const metersBetweenLocations = (
   location1: LocationCoordinate2D,
   location2: LocationCoordinate2D
 ) => {
@@ -119,13 +119,25 @@ export const milesBetweenLocations = (
     location2.longitude - location1.longitude
   )
 
-  const sin2HalfLatDelta = sin2(latDeltaRadians / 2)
+  const latDelta = sin2(latDeltaRadians / 2)
   const latCos = Math.cos(lat1Radians) * Math.cos(lat2Radians)
-  const sin2HalfLngDelta = sin2(lngDeltaRadians / 2)
-  const trigCombo = sin2HalfLatDelta + latCos * sin2HalfLngDelta
+  const lngDelta = sin2(lngDeltaRadians / 2)
 
-  const meters = 2 * EARTH_RADIUS_METERS * Math.asin(Math.sqrt(trigCombo))
-  return meters / METERS_PER_MILE
+  return (
+    2 * EARTH_RADIUS_METERS * Math.asin(Math.sqrt(latDelta + latCos * lngDelta))
+  )
+}
+
+/**
+ * Computes the number of miles between 2 locations using the haversine formula.
+ *
+ * For more info on the math: https://en.wikipedia.org/wiki/Haversine_formula
+ */
+export const milesBetweenLocations = (
+  location1: LocationCoordinate2D,
+  location2: LocationCoordinate2D
+) => {
+  return metersToMiles(metersBetweenLocations(location1, location2))
 }
 
 /**

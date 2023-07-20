@@ -20,6 +20,9 @@ import ContentTextMeta, {
 import SettingsMeta, {
   Basic as SettingsScreenBasic
 } from "../components/SettingsScreen/SettingsScreen.stories"
+import ExploreEventsMeta, {
+  Basic as ExploreEventsBasic
+} from "../components/Explore/Explore.stories"
 
 // Create an array of stories
 const stories = [
@@ -47,6 +50,11 @@ const stories = [
     name: AttendeesListMeta.title,
     component: AttendeesListScreenBasic,
     args: AttendeesListMeta.args
+  },
+  {
+    name: ExploreEventsMeta.title,
+    component: ExploreEventsBasic,
+    args: ExploreEventsMeta.args
   }
   // Add more stories here...
 ]

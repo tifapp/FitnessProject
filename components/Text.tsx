@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
   caption: {
     fontFamily: "OpenSans",
     fontSize: 12,
-    opacity: 0.35
+    opacity: 0.5
   },
   captionTitle: {
     fontSize: 12,
