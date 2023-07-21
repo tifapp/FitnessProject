@@ -12,8 +12,8 @@ const isValidForm = false
 
 type ChangePasswordProps = {
   onPasswordChangeSubmitted?: (
-    oldPass: string,
-    newPass: string
+    uncheckedOldPass: string,
+    newPass: Password
   ) => Promise<boolean>
 }
 
@@ -21,17 +21,23 @@ type ChangePasswordSubmission =
   | { status: "valid"; submit: () => void }
   | {
       status: "invalid"
-      error: ChangePasswordErrorReason | PasswordErrorReason
+      error: ChangePasswordErrorReason
     }
 
 type ChangePasswordErrorReason =
   | "current-matches-new"
   | "reenter-does-not-match-new"
+  | "weak-new-password"
 
-export const changePassword = async (oldPass: string, newPass: string) => {
+type ChangePasswordSubmissionResult = "valid" | "invalid" | "incorrect-password"
+
+export const changePassword = async (
+  uncheckedOldPass: string,
+  newPass: Password
+) => {
   return await Auth.currentAuthenticatedUser()
     .then((user) => {
-      return Auth.changePassword(user, oldPass, newPass)
+      return Auth.changePassword(user, uncheckedOldPass, newPass.rawValue)
     })
     .then((data) => true)
     .catch((err) => false)
@@ -43,16 +49,6 @@ export const useChangePassword = ({
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [reEnteredPassword, setReEnteredPassword] = useState("")
-
-  const tapChangePassword = () => {
-    const submit = () => {
-      onPasswordChangeSubmitted(currentPassword, newPassword)
-    }
-    const submission: FormSubmission = isValidForm
-      ? { status: "valid", submit }
-      : { status: "invalid", errors: [] }
-    return { currentPassword, submission }
-  }
 
   const doThing = () => {
     console.log("Did a thing")
@@ -66,7 +62,7 @@ export const useChangePassword = ({
     } else {
       const passwordResult = Password.validate(newPassword)
       if (passwordResult.status === "invalid") {
-        return { status: "invalid", error: passwordResult.errorReason }
+        return { status: "invalid", error: "weak-new-password" }
       } else {
         return { status: "valid", submit: doThing }
       }

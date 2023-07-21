@@ -1,14 +1,12 @@
-import {
-  changePassword,
-  useChangePassword
-} from "@screens/changePassword/ChangePasswordScreen"
+import { useChangePassword } from "@screens/changePassword/ChangePasswordScreen"
 import { act, renderHook } from "@testing-library/react-native"
 
 describe("ChangePassword tests", () => {
   describe("UseChangePassword tests", () => {
+    const passwordChange = jest.fn()
     const renderChangePassword = () => {
       return renderHook(() =>
-        useChangePassword({ onPasswordChangeSubmitted: changePassword })
+        useChangePassword({ onPasswordChangeSubmitted: passwordChange })
       )
     }
     it("should give an invalid state, if the current password matches the new password", () => {
@@ -48,21 +46,7 @@ describe("ChangePassword tests", () => {
 
       expect(result.current.validationState).toMatchObject({
         status: "invalid",
-        error: "too-short"
-      })
-    })
-    it("should give an invalid state, if the new password is not strong enough: no-capitals", () => {
-      const newPassword = "asct$32f"
-
-      const { result } = renderChangePassword()
-
-      act(() => result.current.setCurrentPassword("ReturnToAll32@"))
-      act(() => result.current.setNewPassword(newPassword))
-      act(() => result.current.setReEnteredPassword(newPassword))
-
-      expect(result.current.validationState).toMatchObject({
-        status: "invalid",
-        error: "no-capitals"
+        error: "weak-new-password"
       })
     })
     it("should give a valid state, if all conditions are met", () => {
@@ -72,7 +56,10 @@ describe("ChangePassword tests", () => {
       act(() => result.current.setNewPassword("OblivionAwaits43#"))
       act(() => result.current.setReEnteredPassword("OblivionAwaits43#"))
 
-      expect(result.current.validationState).toHaveProperty("status", "valid")
+      expect(result.current.validationState).toMatchObject({
+        status: "valid",
+        submit: expect.any(Function)
+      })
     })
   })
 })
