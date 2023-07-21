@@ -2,11 +2,12 @@ import { BodyText, Headline } from "@components/Text"
 import { PasswordTextField } from "@components/TextFields"
 import { PrimaryButton } from "@components/common/Buttons"
 import { AppStyles } from "@lib/AppColorStyle"
-import { Password, PasswordErrorReason } from "@lib/Password"
+import { Password } from "@lib/Password"
 import { Auth } from "aws-amplify"
 import React, { useState } from "react"
 import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
+import { useMutation } from "react-query"
 
 const isValidForm = false
 
@@ -21,7 +22,8 @@ type ChangePasswordSubmission =
   | { status: "valid"; submit: () => void }
   | {
       status: "invalid"
-      error: ChangePasswordErrorReason
+      submit?: undefined
+      error?: ChangePasswordErrorReason
     }
 
 type ChangePasswordErrorReason =
@@ -50,9 +52,15 @@ export const useChangePassword = ({
   const [newPassword, setNewPassword] = useState("")
   const [reEnteredPassword, setReEnteredPassword] = useState("")
 
-  const doThing = () => {
-    console.log("Did a thing")
-  }
+  const passwordResult = Password.validate(newPassword)
+
+  const mutation = useMutation(async () => {
+    if (passwordResult) {
+      await onPasswordChangeSubmitted(currentPassword, passwordResult)
+    }
+  })
+
+  console.log(mutation.isLoading)
 
   const errorReason = () => {
     if (currentPassword === newPassword) {
@@ -60,11 +68,12 @@ export const useChangePassword = ({
     } else if (reEnteredPassword !== newPassword) {
       return { status: "invalid", error: "reenter-does-not-match-new" }
     } else {
-      const passwordResult = Password.validate(newPassword)
-      if (passwordResult.status === "invalid") {
+      if (!passwordResult) {
         return { status: "invalid", error: "weak-new-password" }
+      } else if (mutation.isLoading) {
+        return { status: "invalid" }
       } else {
-        return { status: "valid", submit: doThing }
+        return { status: "valid", submit: mutation.mutate }
       }
     }
   }
@@ -76,7 +85,7 @@ export const useChangePassword = ({
     setNewPassword,
     reEnteredPassword,
     setReEnteredPassword,
-    validationState: errorReason()
+    submission: errorReason()
   }
 }
 
@@ -93,7 +102,7 @@ export const ChangePasswordScreen = () => {
     setNewPassword,
     reEnteredPassword,
     setReEnteredPassword,
-    validationState
+    submission
   } = useChangePassword({ onPasswordChangeSubmitted: changePassword })
 
   const [isCurrentPwdShowing, setIsCurrentPwdShowing] = useState(false)

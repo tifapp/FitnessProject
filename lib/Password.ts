@@ -15,17 +15,16 @@ export class Password {
   }
 
   // Returns an object with the status of the validation, and either a reason for its failure, or the password if it is valid.
-  static validate (rawValue: string): PasswordValidationResult {
-    if (!passwordRegexCapital.test(rawValue)) {
-      return { status: "invalid", errorReason: "no-capitals" }
-    } else if (!passwordRegexSpecialChar.test(rawValue)) {
-      return { status: "invalid", errorReason: "no-special-chars" }
-    } else if (!passwordRegexNumber.test(rawValue)) {
-      return { status: "invalid", errorReason: "no-numbers" }
-    } else if (rawValue.length < 8) {
-      return { status: "invalid", errorReason: "too-short" }
+  static validate (rawValue: string) {
+    if (
+      !passwordRegexCapital.test(rawValue) ||
+      !passwordRegexSpecialChar.test(rawValue) ||
+      !passwordRegexNumber.test(rawValue) ||
+      rawValue.length < 8
+    ) {
+      return undefined
     } else {
-      return { status: "valid", password: new Password(rawValue) }
+      return new Password(rawValue)
     }
   }
 }
