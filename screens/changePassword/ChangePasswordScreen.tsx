@@ -1,15 +1,14 @@
 import { BodyText, Headline } from "@components/Text"
+import { PasswordTextField } from "@components/TextFields"
 import { PrimaryButton } from "@components/common/Buttons"
 import { AppStyles } from "@lib/AppColorStyle"
-import { validateNewPassword } from "@lib/Password"
+import { Password, PasswordErrorReason } from "@lib/Password"
 import { Auth } from "aws-amplify"
 import React, { useState } from "react"
 import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
-import { PasswordField } from "./PasswordField"
 
-let isValidForm = false
-const oldAccountPassword: string = "Icarus43$"
+const isValidForm = false
 
 type ChangePasswordProps = {
   onPasswordChangeSubmitted?: (
@@ -18,7 +17,18 @@ type ChangePasswordProps = {
   ) => Promise<boolean>
 }
 
-const changePassword = async (oldPass: string, newPass: string) => {
+type ChangePasswordSubmission =
+  | { status: "valid"; submit: () => void }
+  | {
+      status: "invalid"
+      error: ChangePasswordErrorReason | PasswordErrorReason
+    }
+
+type ChangePasswordErrorReason =
+  | "current-matches-new"
+  | "reenter-does-not-match-new"
+
+export const changePassword = async (oldPass: string, newPass: string) => {
   return await Auth.currentAuthenticatedUser()
     .then((user) => {
       return Auth.changePassword(user, oldPass, newPass)
@@ -27,33 +37,13 @@ const changePassword = async (oldPass: string, newPass: string) => {
     .catch((err) => false)
 }
 
-type FormSubmission =
-  | { status: "valid"; submit: () => void }
-  | { status: "invalid"; errors: string[] }
-
-export const ChangePasswordScreen = ({
+export const useChangePassword = ({
   onPasswordChangeSubmitted = changePassword
 }: ChangePasswordProps) => {
-  const [currentPassword, setCurrentPassword] = useState<string>("")
-  const [newPassword, setNewPassword] = useState<string>("")
-  const [reEnteredPassword, setReEnteredPassword] = useState<string>("")
+  const [currentPassword, setCurrentPassword] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [reEnteredPassword, setReEnteredPassword] = useState("")
 
-  const [currentPasswordHidden, setCurrentPasswordHidden] =
-    useState<boolean>(true)
-  const [newPasswordHidden, setNewPasswordHidden] = useState<boolean>(true)
-  const [reEnteredPasswordHidden, setReEnteredPasswordHidden] =
-    useState<boolean>(true)
-
-  const validateForm = () => {
-    const formValid: boolean =
-      oldAccountPassword === currentPassword &&
-      validateNewPassword(newPassword) &&
-      reEnteredPassword === newPassword
-    isValidForm = formValid
-    return formValid
-  }
-
-  // Function activated on button tap
   const tapChangePassword = () => {
     const submit = () => {
       onPasswordChangeSubmitted(currentPassword, newPassword)
@@ -64,6 +54,56 @@ export const ChangePasswordScreen = ({
     return { currentPassword, submission }
   }
 
+  const doThing = () => {
+    console.log("Did a thing")
+  }
+
+  const errorReason = () => {
+    if (currentPassword === newPassword) {
+      return { status: "invalid", error: "current-matches-new" }
+    } else if (reEnteredPassword !== newPassword) {
+      return { status: "invalid", error: "reenter-does-not-match-new" }
+    } else {
+      const passwordResult = Password.validate(newPassword)
+      if (passwordResult.status === "invalid") {
+        return { status: "invalid", error: passwordResult.errorReason }
+      } else {
+        return { status: "valid", submit: doThing }
+      }
+    }
+  }
+
+  return {
+    currentPassword,
+    setCurrentPassword,
+    newPassword,
+    setNewPassword,
+    reEnteredPassword,
+    setReEnteredPassword,
+    validationState: errorReason()
+  }
+}
+
+type FormSubmission =
+  | { status: "valid"; submit: () => void }
+  | { status: "invalid"; errors: string[] }
+
+export const ChangePasswordScreen = () => {
+  // Function activated on button tap
+  const {
+    currentPassword,
+    setCurrentPassword,
+    newPassword,
+    setNewPassword,
+    reEnteredPassword,
+    setReEnteredPassword,
+    validationState
+  } = useChangePassword({ onPasswordChangeSubmitted: changePassword })
+
+  const [isCurrentPwdShowing, setIsCurrentPwdShowing] = useState(false)
+  const [isNewPwdShowing, setIsNewPwdShowing] = useState(false)
+  const [isReEnteredPwdShowing, setIsReEnteredPwdShowing] = useState(false)
+
   return (
     <SafeAreaView style={[styles.flexColumn, styles.paddingIconSection]}>
       <ScrollView>
@@ -72,13 +112,28 @@ export const ChangePasswordScreen = ({
           letter, 1 number, and 1 special character.
         </BodyText>
 
-        <PasswordField title={"Current Password"} style={styles.textField} />
-
-        <PasswordField title={"New Password"} style={styles.textField} />
-
-        <PasswordField
-          title={"Re-enter New Password"}
+        <PasswordTextField
           style={styles.textField}
+          value={currentPassword}
+          onChangeText={(text) => setCurrentPassword(text)}
+          onShowPasswordContentsChanged={setIsCurrentPwdShowing}
+          isShowingPasswordContents={isCurrentPwdShowing}
+        />
+
+        <PasswordTextField
+          style={styles.textField}
+          value={newPassword}
+          onChangeText={(text) => setNewPassword(text)}
+          onShowPasswordContentsChanged={setIsNewPwdShowing}
+          isShowingPasswordContents={isNewPwdShowing}
+        />
+
+        <PasswordTextField
+          style={styles.textField}
+          value={reEnteredPassword}
+          onChangeText={(text) => setReEnteredPassword(text)}
+          onShowPasswordContentsChanged={setIsReEnteredPwdShowing}
+          isShowingPasswordContents={isReEnteredPwdShowing}
         />
 
         <TouchableOpacity>
@@ -91,7 +146,7 @@ export const ChangePasswordScreen = ({
             style={isValidForm ? styles.activeButton : styles.inactiveButton}
             title="Change Password"
             onPress={() => {
-              validateForm()
+              useChangePassword
             }}
           />
         </View>

@@ -8,11 +8,11 @@ import {
   ViewStyle
 } from "react-native"
 
-export type textFieldProps = {
+export type TextFieldProps = {
   style?: StyleProp<ViewStyle>
 } & TextInputProps
 
-export const TextField = ({ style, ...props }: textFieldProps) => {
+export const TextField = ({ style, ...props }: TextFieldProps) => {
   return (
     <View style={styles.containerStyle}>
       <TextInput

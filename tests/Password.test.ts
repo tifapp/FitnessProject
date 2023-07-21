@@ -1,22 +1,6 @@
 import { Password, validateNewPassword } from "@lib/Password"
 
 describe("Password tests", () => {
-  it("should result in a success, after validation. Given: old matches current, validate new pass WORKS, reEntered correct", () => {
-    const oldAccountPassword: string = "Acting34$"
-    const currentAccountPassword: string = "Acting34$"
-    const newAccountPassword: string = "$hide34All"
-    const reEnteredPassword: string = "$hide34All"
-
-    const validateForm = () => {
-      const formValid: boolean =
-        oldAccountPassword === currentAccountPassword &&
-        validateNewPassword(newAccountPassword) &&
-        reEnteredPassword === newAccountPassword
-      return formValid
-    }
-    expect(validateForm()).toEqual(true)
-  })
-
   it("should fail with a no-capitals error reason, when the text doesn't have any capitals", () => {
     const givenPassword = "ilovepie"
     expect(Password.validate(givenPassword)).toMatchObject({

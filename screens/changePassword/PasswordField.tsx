@@ -4,14 +4,18 @@ import { AppStyles } from "@lib/AppColorStyle"
 import { Password, PasswordErrorReason } from "@lib/Password"
 import { useState } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { TextField } from "./TextField"
+import { TextField, TextFieldProps } from "./TextField"
 
-export type passwordFieldProps = {
+export type PasswordFieldProps = {
   title: string
   style?: StyleProp<ViewStyle>
-}
+} & TextFieldProps
 
-export const PasswordField = ({ title, style }: passwordFieldProps) => {
+export const PasswordField = ({
+  title,
+  style,
+  ...props
+}: PasswordFieldProps) => {
   const [passwordHidden, setPasswordHidden] = useState<boolean>(true)
   const [currentText, setCurrentText] = useState<string>("")
   const [currentError, setCurrentError] =
@@ -36,9 +40,9 @@ export const PasswordField = ({ title, style }: passwordFieldProps) => {
       <TextField
         placeholder={title}
         style={[styles.textField, style]}
-        value={currentText}
+        value={props.value}
         secureTextEntry={passwordHidden}
-        onChangeText={(text) => setCurrentText(text)}
+        onChangeText={props.onChangeText}
         onBlur={() => {
           const passwordResult = Password.validate(currentText)
           if (passwordResult.status === "invalid") {
