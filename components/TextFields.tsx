@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react"
+import React, { ReactNode, useState } from "react"
 import {
   TextInputProps,
   StyleSheet,
@@ -55,35 +55,34 @@ export const TextField = ({
   )
 }
 
-export type PasswordTextFieldProps = {
-  onShowPasswordContentsChanged: (shouldShowPassword: boolean) => void
-  isShowingPasswordContents: boolean
-} & Omit<TextFieldProps, "rightAddon" | "secureTextEntry">
+export type PasswordTextFieldProps = Omit<
+  TextFieldProps,
+  "rightAddon" | "secureTextEntry"
+>
 
 /**
  * A text field component for password inputs.
  */
-export const PasswordTextField = ({
-  onShowPasswordContentsChanged,
-  isShowingPasswordContents,
-  ...props
-}: PasswordTextFieldProps) => (
-  <TextField
-    secureTextEntry={!isShowingPasswordContents}
-    rightAddon={
-      <TouchableIonicon
-        icon={{ name: isShowingPasswordContents ? "eye" : "lock-closed" }}
-        onPress={() => {
-          onShowPasswordContentsChanged(!isShowingPasswordContents)
-        }}
-        accessibilityLabel={
-          isShowingPasswordContents ? "Hide password" : "Show password"
-        }
-      />
-    }
-    {...props}
-  />
-)
+export const PasswordTextField = ({ ...props }: PasswordTextFieldProps) => {
+  const [isShowingPassword, setIsShowingPassword] = useState(false)
+  return (
+    <TextField
+      secureTextEntry={!isShowingPassword}
+      rightAddon={
+        <TouchableIonicon
+          icon={{ name: isShowingPassword ? "eye" : "lock-closed" }}
+          onPress={() => {
+            setIsShowingPassword((isShowing) => !isShowing)
+          }}
+          accessibilityLabel={
+            isShowingPassword ? "Hide password" : "Show password"
+          }
+        />
+      }
+      {...props}
+    />
+  )
+}
 
 const styles = StyleSheet.create({
   card: {
