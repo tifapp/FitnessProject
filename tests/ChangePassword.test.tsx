@@ -1,11 +1,16 @@
 import { Password } from "@lib/Password"
 import { useChangePassword } from "@screens/changePassword/ChangePasswordScreen"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
+import { captureAlerts } from "./helpers/Alerts"
 import { TestQueryClientProvider } from "./helpers/ReactQuery"
 
 describe("ChangePassword tests", () => {
   describe("UseChangePassword tests", () => {
     const passwordChange = jest.fn()
+    const { tapAlertButton, alertPresentationSpy } = captureAlerts()
+    const retry = async () => {
+      await tapAlertButton("Try Again")
+    }
     const renderChangePassword = () => {
       return renderHook(
         () => useChangePassword({ onPasswordChangeSubmitted: passwordChange }),
@@ -96,6 +101,29 @@ describe("ChangePassword tests", () => {
           "incorrect-current-password"
         )
         expect(result.current.submission.status).toEqual("invalid")
+      })
+    })
+    it("should be able to retry when it gets an error", async () => {
+      passwordChange.mockRejectedValue(new Error())
+
+      const { result } = renderChangePassword()
+
+      act(() => result.current.setCurrentPassword("ReturnToAll32@"))
+      act(() => result.current.setNewPassword("OblivionAwaits43#"))
+      act(() => result.current.setReEnteredPassword("OblivionAwaits43#"))
+
+      expect(result.current.submission.status).toEqual("valid")
+
+      act(() => result.current.submission.submit?.())
+      await waitFor(() => {
+        expect(result.current.submission.status).toEqual("submitting")
+      })
+      await waitFor(() => {
+        expect(alertPresentationSpy).toHaveBeenCalled()
+      })
+      await act(async () => await retry())
+      await waitFor(() => {
+        expect(alertPresentationSpy).toHaveBeenCalledTimes(2)
       })
     })
   })

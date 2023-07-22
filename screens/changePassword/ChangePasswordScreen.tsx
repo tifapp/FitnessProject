@@ -5,7 +5,7 @@ import { AppStyles } from "@lib/AppColorStyle"
 import { Password } from "@lib/Password"
 import { Auth } from "aws-amplify"
 import React, { useState } from "react"
-import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native"
+import { Alert, SafeAreaView, ScrollView, StyleSheet, View } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { useMutation } from "react-query"
 
@@ -56,31 +56,45 @@ export const useChangePassword = ({
 
   const passwordResult = Password.validate(newPassword)
 
-  const mutation = useMutation(async () => {
-    if (passwordResult) {
-      return await onPasswordChangeSubmitted(currentPassword, passwordResult)
+  const mutation = useMutation(
+    async () => {
+      if (passwordResult) {
+        return await onPasswordChangeSubmitted(currentPassword, passwordResult)
+      }
+    },
+    {
+      onError: () => {
+        Alert.alert(
+          "Whoops",
+          "Sorry, something went wrong when trying to change your password. Please try again.",
+          [
+            { text: "Try Again", onPress: () => mutation.mutate() },
+            { text: "Ok" }
+          ]
+        )
+      }
     }
-  })
+  )
 
-  console.log(mutation.data)
+  console.log(mutation.isLoading)
 
   const errorReason = () => {
     if (currentPassword === newPassword) {
       return { status: "invalid", error: "current-matches-new" }
     } else if (reEnteredPassword !== newPassword) {
       return { status: "invalid", error: "reenter-does-not-match-new" }
+    } else if (!passwordResult) {
+      return { status: "invalid", error: "weak-new-password" }
+    } else if (mutation.isLoading) {
+      return { status: "submitting" }
+    } else if (mutation.data === "incorrect-password") {
+      return { status: "invalid", error: "incorrect-current-password" }
     } else {
-      if (!passwordResult) {
-        return { status: "invalid", error: "weak-new-password" }
-      } else if (mutation.isLoading) {
-        return { status: "submitting" }
-      } else if (mutation.data === "incorrect-password") {
-        return { status: "invalid", error: "incorrect-current-password" }
-      } else {
-        return { status: "valid", submit: mutation.mutate }
-      }
+      return { status: "valid", submit: mutation.mutate }
     }
   }
+
+  // console.log(errorReason())
 
   return {
     currentPassword,
