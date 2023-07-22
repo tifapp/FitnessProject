@@ -12,10 +12,10 @@ import { useMutation } from "react-query"
 const isValidForm = false
 
 type ChangePasswordProps = {
-  onPasswordChangeSubmitted?: (
+  onPasswordChangeSubmitted: (
     uncheckedOldPass: string,
     newPass: Password
-  ) => Promise<boolean>
+  ) => Promise<ChangePasswordSubmissionResult>
 }
 
 type ChangePasswordSubmission =
@@ -23,13 +23,15 @@ type ChangePasswordSubmission =
   | {
       status: "invalid"
       submit?: undefined
-      error?: ChangePasswordErrorReason
+      error: ChangePasswordErrorReason
     }
+  | { status: "submitting" }
 
 type ChangePasswordErrorReason =
   | "current-matches-new"
   | "reenter-does-not-match-new"
   | "weak-new-password"
+  | "incorrect-current-password"
 
 type ChangePasswordSubmissionResult = "valid" | "invalid" | "incorrect-password"
 
@@ -46,7 +48,7 @@ export const changePassword = async (
 }
 
 export const useChangePassword = ({
-  onPasswordChangeSubmitted = changePassword
+  onPasswordChangeSubmitted
 }: ChangePasswordProps) => {
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
@@ -56,11 +58,11 @@ export const useChangePassword = ({
 
   const mutation = useMutation(async () => {
     if (passwordResult) {
-      await onPasswordChangeSubmitted(currentPassword, passwordResult)
+      return await onPasswordChangeSubmitted(currentPassword, passwordResult)
     }
   })
 
-  console.log(mutation.isLoading)
+  console.log(mutation.data)
 
   const errorReason = () => {
     if (currentPassword === newPassword) {
@@ -71,7 +73,9 @@ export const useChangePassword = ({
       if (!passwordResult) {
         return { status: "invalid", error: "weak-new-password" }
       } else if (mutation.isLoading) {
-        return { status: "invalid" }
+        return { status: "submitting" }
+      } else if (mutation.data === "incorrect-password") {
+        return { status: "invalid", error: "incorrect-current-password" }
       } else {
         return { status: "valid", submit: mutation.mutate }
       }

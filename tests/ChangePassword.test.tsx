@@ -69,13 +69,34 @@ describe("ChangePassword tests", () => {
 
       act(() => result.current.submission.submit?.())
       await waitFor(() => {
-        expect(result.current.submission.error).toBeUndefined()
-        expect(result.current.submission.status).toEqual("invalid")
+        expect(result.current.submission.status).toEqual("submitting")
       })
       expect(passwordChange).toHaveBeenCalledWith(
         "ReturnToAll32@",
         Password.validate("OblivionAwaits43#")
       )
+    })
+    it("should have a failed submission flow", async () => {
+      passwordChange.mockResolvedValue("incorrect-password")
+
+      const { result } = renderChangePassword()
+
+      act(() => result.current.setCurrentPassword("ReturnToAll32@"))
+      act(() => result.current.setNewPassword("OblivionAwaits43#"))
+      act(() => result.current.setReEnteredPassword("OblivionAwaits43#"))
+
+      expect(result.current.submission.status).toEqual("valid")
+
+      act(() => result.current.submission.submit?.())
+      await waitFor(() => {
+        expect(result.current.submission.status).toEqual("submitting")
+      })
+      await waitFor(() => {
+        expect(result.current.submission.error).toEqual(
+          "incorrect-current-password"
+        )
+        expect(result.current.submission.status).toEqual("invalid")
+      })
     })
   })
 })
