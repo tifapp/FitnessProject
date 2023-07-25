@@ -1,15 +1,15 @@
 import { Password } from "@lib/Password"
-import {
-  changePassword,
-  useChangePassword
-} from "@screens/changePassword/ChangePasswordScreen"
+import { useChangePassword } from "@screens/changePassword/ChangePasswordScreen"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { captureAlerts } from "./helpers/Alerts"
 import { TestQueryClientProvider } from "./helpers/ReactQuery"
 
 describe("ChangePassword tests", () => {
+  beforeEach(() => jest.resetAllMocks())
+
   describe("UseChangePassword tests", () => {
-    const passwordChange = jest.fn()
+    const changePassword = jest.fn()
+    const onSuccess = jest.fn()
     const { tapAlertButton, alertPresentationSpy } = captureAlerts()
     const retry = async () => {
       await tapAlertButton("Try Again")
@@ -19,7 +19,7 @@ describe("ChangePassword tests", () => {
         () =>
           useChangePassword({
             onSubmitted: changePassword,
-            onSuccess: () => console.log("Success")
+            onSuccess
           }),
         {
           wrapper: ({ children }) => (
@@ -28,6 +28,7 @@ describe("ChangePassword tests", () => {
         }
       )
     }
+
     it("should give an invalid state, if the current password matches the new password", () => {
       const currentPassword = "FiddleSticks32@"
 
@@ -41,9 +42,9 @@ describe("ChangePassword tests", () => {
         error: "current-matches-new"
       })
     })
+
     it("should give an invalid state, if the re-entered password does not match the new password", () => {
       const reEnteredPassword = "WaterBottle2%"
-
       const { result } = renderChangePassword()
 
       act(() => result.current.updateField("newPassword", reEnteredPassword))
@@ -54,9 +55,9 @@ describe("ChangePassword tests", () => {
         error: "reenter-does-not-match-new"
       })
     })
+
     it("should give an invalid state, if the new password is not strong enough: too short", () => {
       const newPassword = "Wat2%"
-
       const { result } = renderChangePassword()
 
       act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
@@ -68,8 +69,19 @@ describe("ChangePassword tests", () => {
         error: "weak-new-password"
       })
     })
+
     it("should have a successful submission flow", async () => {
-      passwordChange.mockResolvedValue("valid")
+      changePassword.mockImplementation(
+        async (uncheckedOldPass: string, newPass: Password) => {
+          if (
+            uncheckedOldPass === "ReturnToAll32@" &&
+            newPass.rawValue === "OblivionAwaits43#"
+          ) {
+            return "valid"
+          }
+          return "invalid"
+        }
+      )
 
       const { result } = renderChangePassword()
 
@@ -86,13 +98,13 @@ describe("ChangePassword tests", () => {
         expect(result.current.submission.status).toEqual("submitting")
       })
       // This test doesn't seem to work; onSubmitted not working right/onSuccess overwriting
-      expect(passwordChange).toHaveBeenCalledWith(
-        "ReturnToAll32@",
-        Password.validate("OblivionAwaits43#")
-      )
+      await waitFor(() => {
+        expect(onSuccess).toHaveBeenCalled()
+      })
     })
+
     it("should have a failed submission flow", async () => {
-      passwordChange.mockResolvedValue("incorrect-password")
+      changePassword.mockResolvedValue("incorrect-password")
 
       const { result } = renderChangePassword()
 
@@ -115,8 +127,11 @@ describe("ChangePassword tests", () => {
         expect(result.current.submission.status).toEqual("invalid")
       })
     })
+
     it("should be able to retry when it gets an error", async () => {
-      passwordChange.mockRejectedValue(new Error())
+      changePassword
+        .mockRejectedValueOnce(new Error())
+        .mockResolvedValueOnce("valid")
 
       const { result } = renderChangePassword()
 
@@ -137,7 +152,7 @@ describe("ChangePassword tests", () => {
       })
       await act(async () => await retry())
       await waitFor(() => {
-        expect(alertPresentationSpy).toHaveBeenCalledTimes(2)
+        expect(onSuccess).toHaveBeenCalled()
       })
     })
   })

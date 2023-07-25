@@ -82,8 +82,6 @@ export const useChangePassword = ({
     }
   )
 
-  console.log(mutation.isLoading)
-
   const errorReason = () => {
     if (fields.currentPassword === fields.newPassword) {
       return { status: "invalid", error: "current-matches-new" }
