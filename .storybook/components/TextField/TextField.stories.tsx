@@ -80,14 +80,11 @@ const ErrorView = () => {
 
 const Password = () => {
   const [text, setText] = useState("")
-  const [isShowingPassword, setIsShowingPassword] = useState(false)
   return (
     <PasswordTextField
       value={text}
       placeholder="Enter Text"
       onChangeText={setText}
-      isShowingPasswordContents={isShowingPassword}
-      onShowPasswordContentsChanged={setIsShowingPassword}
       style={{ padding: 16 }}
     />
   )
