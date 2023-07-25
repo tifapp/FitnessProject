@@ -52,22 +52,18 @@ export const useChangePassword = ({
   onSubmitted,
   onSuccess
 }: ChangePasswordProps) => {
-  const [currentPassword, setCurrentPassword] = useState("")
-  const [newPassword, setNewPassword] = useState("")
-  const [reEnteredPassword, setReEnteredPassword] = useState("")
-
   const [fields, setFields] = useState({
     currentPassword: "",
     newPassword: "",
     reEnteredPassword: ""
   })
 
-  const passwordResult = Password.validate(newPassword)
+  const passwordResult = Password.validate(fields.newPassword)
 
   const mutation = useMutation(
     async () => {
       if (passwordResult) {
-        return await onSubmitted(currentPassword, passwordResult)
+        return await onSubmitted(fields.currentPassword, passwordResult)
       }
     },
 
@@ -89,9 +85,9 @@ export const useChangePassword = ({
   console.log(mutation.isLoading)
 
   const errorReason = () => {
-    if (currentPassword === newPassword) {
+    if (fields.currentPassword === fields.newPassword) {
       return { status: "invalid", error: "current-matches-new" }
-    } else if (reEnteredPassword !== newPassword) {
+    } else if (fields.reEnteredPassword !== fields.newPassword) {
       return { status: "invalid", error: "reenter-does-not-match-new" }
     } else if (!passwordResult) {
       return { status: "invalid", error: "weak-new-password" }

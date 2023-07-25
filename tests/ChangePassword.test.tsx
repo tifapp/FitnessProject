@@ -85,6 +85,7 @@ describe("ChangePassword tests", () => {
       await waitFor(() => {
         expect(result.current.submission.status).toEqual("submitting")
       })
+      // This test doesn't seem to work; onSubmitted not working right/onSuccess overwriting
       expect(passwordChange).toHaveBeenCalledWith(
         "ReturnToAll32@",
         Password.validate("OblivionAwaits43#")
