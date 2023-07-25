@@ -1,5 +1,8 @@
 import { Password } from "@lib/Password"
-import { useChangePassword } from "@screens/changePassword/ChangePasswordScreen"
+import {
+  changePassword,
+  useChangePassword
+} from "@screens/changePassword/ChangePasswordScreen"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { captureAlerts } from "./helpers/Alerts"
 import { TestQueryClientProvider } from "./helpers/ReactQuery"
@@ -13,7 +16,11 @@ describe("ChangePassword tests", () => {
     }
     const renderChangePassword = () => {
       return renderHook(
-        () => useChangePassword({ onPasswordChangeSubmitted: passwordChange }),
+        () =>
+          useChangePassword({
+            onSubmitted: changePassword,
+            onSuccess: () => console.log("Success")
+          }),
         {
           wrapper: ({ children }) => (
             <TestQueryClientProvider>{children}</TestQueryClientProvider>
@@ -26,8 +33,8 @@ describe("ChangePassword tests", () => {
 
       const { result } = renderChangePassword()
 
-      act(() => result.current.setCurrentPassword(currentPassword))
-      act(() => result.current.setNewPassword(currentPassword))
+      act(() => result.current.updateField("currentPassword", currentPassword))
+      act(() => result.current.updateField("newPassword", currentPassword))
 
       expect(result.current.submission).toMatchObject({
         status: "invalid",
@@ -39,8 +46,8 @@ describe("ChangePassword tests", () => {
 
       const { result } = renderChangePassword()
 
-      act(() => result.current.setNewPassword(reEnteredPassword))
-      act(() => result.current.setReEnteredPassword("K"))
+      act(() => result.current.updateField("newPassword", reEnteredPassword))
+      act(() => result.current.updateField("reEnteredPassword", "K"))
 
       expect(result.current.submission).toMatchObject({
         status: "invalid",
@@ -52,9 +59,9 @@ describe("ChangePassword tests", () => {
 
       const { result } = renderChangePassword()
 
-      act(() => result.current.setCurrentPassword("ReturnToAll32@"))
-      act(() => result.current.setNewPassword(newPassword))
-      act(() => result.current.setReEnteredPassword(newPassword))
+      act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
+      act(() => result.current.updateField("newPassword", newPassword))
+      act(() => result.current.updateField("reEnteredPassword", newPassword))
 
       expect(result.current.submission).toMatchObject({
         status: "invalid",
@@ -66,9 +73,11 @@ describe("ChangePassword tests", () => {
 
       const { result } = renderChangePassword()
 
-      act(() => result.current.setCurrentPassword("ReturnToAll32@"))
-      act(() => result.current.setNewPassword("OblivionAwaits43#"))
-      act(() => result.current.setReEnteredPassword("OblivionAwaits43#"))
+      act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
+      act(() => result.current.updateField("newPassword", "OblivionAwaits43#"))
+      act(() =>
+        result.current.updateField("reEnteredPassword", "OblivionAwaits43#")
+      )
 
       expect(result.current.submission.status).toEqual("valid")
 
@@ -86,9 +95,11 @@ describe("ChangePassword tests", () => {
 
       const { result } = renderChangePassword()
 
-      act(() => result.current.setCurrentPassword("ReturnToAll32@"))
-      act(() => result.current.setNewPassword("OblivionAwaits43#"))
-      act(() => result.current.setReEnteredPassword("OblivionAwaits43#"))
+      act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
+      act(() => result.current.updateField("newPassword", "OblivionAwaits43#"))
+      act(() =>
+        result.current.updateField("reEnteredPassword", "OblivionAwaits43#")
+      )
 
       expect(result.current.submission.status).toEqual("valid")
 
@@ -108,9 +119,11 @@ describe("ChangePassword tests", () => {
 
       const { result } = renderChangePassword()
 
-      act(() => result.current.setCurrentPassword("ReturnToAll32@"))
-      act(() => result.current.setNewPassword("OblivionAwaits43#"))
-      act(() => result.current.setReEnteredPassword("OblivionAwaits43#"))
+      act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
+      act(() => result.current.updateField("newPassword", "OblivionAwaits43#"))
+      act(() =>
+        result.current.updateField("reEnteredPassword", "OblivionAwaits43#")
+      )
 
       expect(result.current.submission.status).toEqual("valid")
 

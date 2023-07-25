@@ -12,10 +12,11 @@ import { useMutation } from "react-query"
 const isValidForm = false
 
 type ChangePasswordProps = {
-  onPasswordChangeSubmitted: (
+  onSubmitted: (
     uncheckedOldPass: string,
     newPass: Password
-  ) => Promise<ChangePasswordSubmissionResult>
+  ) => Promise<ChangePasswordResult>
+  onSuccess: () => void
 }
 
 type ChangePasswordSubmission =
@@ -33,7 +34,7 @@ type ChangePasswordErrorReason =
   | "weak-new-password"
   | "incorrect-current-password"
 
-type ChangePasswordSubmissionResult = "valid" | "invalid" | "incorrect-password"
+export type ChangePasswordResult = "valid" | "invalid" | "incorrect-password"
 
 export const changePassword = async (
   uncheckedOldPass: string,
@@ -43,26 +44,35 @@ export const changePassword = async (
     .then((user) => {
       return Auth.changePassword(user, uncheckedOldPass, newPass.rawValue)
     })
-    .then((data) => true)
-    .catch((err) => false)
+    .then<ChangePasswordResult>((data) => "valid")
+    .catch<ChangePasswordResult>((err) => "invalid")
 }
 
 export const useChangePassword = ({
-  onPasswordChangeSubmitted
+  onSubmitted,
+  onSuccess
 }: ChangePasswordProps) => {
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [reEnteredPassword, setReEnteredPassword] = useState("")
+
+  const [fields, setFields] = useState({
+    currentPassword: "",
+    newPassword: "",
+    reEnteredPassword: ""
+  })
 
   const passwordResult = Password.validate(newPassword)
 
   const mutation = useMutation(
     async () => {
       if (passwordResult) {
-        return await onPasswordChangeSubmitted(currentPassword, passwordResult)
+        return await onSubmitted(currentPassword, passwordResult)
       }
     },
+
     {
+      onSuccess,
       onError: () => {
         Alert.alert(
           "Whoops",
@@ -94,15 +104,11 @@ export const useChangePassword = ({
     }
   }
 
-  // console.log(errorReason())
-
   return {
-    currentPassword,
-    setCurrentPassword,
-    newPassword,
-    setNewPassword,
-    reEnteredPassword,
-    setReEnteredPassword,
+    ...fields,
+    updateField: (key: keyof typeof fields, value: string) => {
+      setFields((fields) => ({ ...fields, [key]: value }))
+    },
     submission: errorReason()
   }
 }
@@ -115,17 +121,14 @@ export const ChangePasswordScreen = () => {
   // Function activated on button tap
   const {
     currentPassword,
-    setCurrentPassword,
     newPassword,
-    setNewPassword,
     reEnteredPassword,
-    setReEnteredPassword,
+    updateField,
     submission
-  } = useChangePassword({ onPasswordChangeSubmitted: changePassword })
-
-  const [isCurrentPwdShowing, setIsCurrentPwdShowing] = useState(false)
-  const [isNewPwdShowing, setIsNewPwdShowing] = useState(false)
-  const [isReEnteredPwdShowing, setIsReEnteredPwdShowing] = useState(false)
+  } = useChangePassword({
+    onSubmitted: changePassword,
+    onSuccess: () => console.log("Success")
+  })
 
   return (
     <SafeAreaView style={[styles.flexColumn, styles.paddingIconSection]}>
@@ -138,25 +141,19 @@ export const ChangePasswordScreen = () => {
         <PasswordTextField
           style={styles.textField}
           value={currentPassword}
-          onChangeText={(text) => setCurrentPassword(text)}
-          onShowPasswordContentsChanged={setIsCurrentPwdShowing}
-          isShowingPasswordContents={isCurrentPwdShowing}
+          onChangeText={(text) => updateField("currentPassword", text)}
         />
 
         <PasswordTextField
           style={styles.textField}
           value={newPassword}
-          onChangeText={(text) => setNewPassword(text)}
-          onShowPasswordContentsChanged={setIsNewPwdShowing}
-          isShowingPasswordContents={isNewPwdShowing}
+          onChangeText={(text) => updateField("newPassword", text)}
         />
 
         <PasswordTextField
           style={styles.textField}
           value={reEnteredPassword}
-          onChangeText={(text) => setReEnteredPassword(text)}
-          onShowPasswordContentsChanged={setIsReEnteredPwdShowing}
-          isShowingPasswordContents={isReEnteredPwdShowing}
+          onChangeText={(text) => updateField("reEnteredPassword", text)}
         />
 
         <TouchableOpacity>
