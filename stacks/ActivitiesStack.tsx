@@ -1,6 +1,6 @@
-import React from "react"
 import { BottomNavTabBar } from "@components/bottomTabComponents/BottomNavTabBar"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { EventDetailsProps } from "@screens/EventDetails/EventDetails"
 import { createEventDetailsStackScreens } from "@screens/EventDetails/EventScreensNavigation"
@@ -22,7 +22,7 @@ import {
 import { TestChatRoomScreen } from "@screens/testScreens/TestChatRoomScreen"
 import { TestEventFormScreen } from "@screens/testScreens/TestEventFormScreen"
 import { TestNotifScreen } from "@screens/testScreens/TestNotifScreen"
-import { getFocusedRouteNameFromRoute } from "@react-navigation/native"
+import React from "react"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import {
   ExploreEventsScreensParamsList,
@@ -44,7 +44,8 @@ export enum ActivitiesScreenNames {
   NOTIFICATIONS = "Notifications",
   REPORTING_SCREENS = "Reporting Screens",
   EDIT_PROFILE = "Edit Profile Screen",
-  CURRENT_USER_PROFILE = "Current User Profile"
+  CURRENT_USER_PROFILE = "Current User Profile",
+  CHANGE_PASSWORD = "Change Password"
 }
 
 export type ActivitiesStackParamList = {
@@ -62,6 +63,7 @@ export type ActivitiesStackParamList = {
   [ActivitiesScreenNames.SETTINGS_SCREEN]: undefined
   [ActivitiesScreenNames.CHAT_ROOM]: undefined
   [ActivitiesScreenNames.EDIT_PROFILE]: undefined
+  [ActivitiesScreenNames.CHANGE_PASSWORD]: undefined
 } & ReportingScreensParamsList &
   ProfileScreensParamsList &
   ExploreEventsScreensParamsList
@@ -117,6 +119,7 @@ export default function ActivitiesStack () {
         name={ActivitiesScreenNames.BOTTOM_NAV_TAB_BAR}
         component={BottomNavTabBar}
       />
+
       {eventDetailsScreens}
       {reportingScreens}
       {profileScreens}
@@ -126,7 +129,11 @@ export default function ActivitiesStack () {
 
 const getTabBarVisibility = (route: any) => {
   const routeName = getFocusedRouteNameFromRoute(route)!
-  const tabHiddenRoutes = ["EditProfileScreen", "SettingsScreen"]
+  const tabHiddenRoutes = [
+    "EditProfileScreen",
+    "SettingsScreen",
+    "ChangePasswordScreen"
+  ]
   if (tabHiddenRoutes.includes(routeName)) {
     return false
   }

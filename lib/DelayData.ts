@@ -7,7 +7,7 @@
  * @returns `value`
  */
 export const delayData = async <T>(value: T, millis: number = 10_000) => {
-  return await new Promise((resolve) => {
+  return await new Promise<T>((resolve) => {
     setTimeout(() => resolve(value), millis)
   })
 }
