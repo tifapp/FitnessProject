@@ -30,7 +30,7 @@ export type ChangePasswordSubmission =
   | {
       status: "invalid"
       submit?: undefined
-      error: ChangePasswordErrorReason
+      error?: ChangePasswordErrorReason
     }
   | { status: "submitting"; submit?: undefined; error?: undefined }
 
@@ -94,8 +94,14 @@ export const useChangePasswordForm = ({
     }
   )
 
-  const errorReason = (): ChangePasswordSubmission => {
-    if (fields.currentPassword === fields.newPassword) {
+  const getSubmission = (): ChangePasswordSubmission => {
+    if (
+      fields.currentPassword === "" &&
+      fields.newPassword === "" &&
+      fields.reEnteredPassword === ""
+    ) {
+      return { status: "invalid" }
+    } else if (fields.currentPassword === fields.newPassword) {
       return { status: "invalid", error: "current-matches-new" }
     } else if (fields.reEnteredPassword !== fields.newPassword) {
       return { status: "invalid", error: "reenter-does-not-match-new" }
@@ -115,7 +121,7 @@ export const useChangePasswordForm = ({
     updateField: (key: keyof ChangePasswordFormFields, value: string) => {
       setFields((fields) => ({ ...fields, [key]: value }))
     },
-    submission: errorReason()
+    submission: getSubmission()
   }
 }
 
