@@ -1,5 +1,4 @@
 import React from "react"
-import EventsList from "@components/EventsList"
 import { ChevronBackButton, StackNavigatorType } from "@components/Navigation"
 import { EventMocks } from "@lib/events"
 import { StackScreenProps } from "@react-navigation/stack"
@@ -37,7 +36,6 @@ export const createEventDetailsStackScreens = <
   ) => {
   return (
     <>
-      <stack.Screen name={"Event List"} component={EventsList} />
       <stack.Screen
         name={"Event Details"}
         options={{
