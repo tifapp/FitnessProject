@@ -2,11 +2,16 @@ import { ChevronBackButton, StackNavigatorType } from "@components/Navigation"
 import { Headline } from "@components/Text"
 import { TouchableIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
+import { delayData } from "@lib/DelayData"
 import { EventMocks } from "@lib/events"
 import { UserMocks } from "@lib/users/User"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
-import { ChangePasswordScreen } from "@screens/changePassword/ChangePasswordScreen"
+import {
+  ChangePasswordFormView,
+  ChangePasswordResult,
+  useChangePasswordForm
+} from "@screens/changePassword/ChangePasswordForm"
 import { ActivitiesStackParamList } from "@stacks/ActivitiesStack"
 import { useAtomValue } from "jotai"
 import { useHydrateAtoms } from "jotai/utils"
@@ -34,6 +39,11 @@ export type ProfileScreenRouteProps = StackScreenProps<
 export type ProfileScreenProps = {
   userID: string
 } & StackScreenProps<ProfileScreensParamsList, "ProfileScreen">
+
+export type ChangePasswordScreenProps = StackScreenProps<
+  ProfileScreensParamsList,
+  "ChangePasswordScreen"
+>
 
 export const createProfileStackScreens = <T extends ProfileScreensParamsList>(
   ProfileStack: StackNavigatorType<T>
@@ -136,6 +146,14 @@ const ProfileScreen = ({ route }: ProfileScreenProps) => {
   ]
 
   return <ProfileScreenView user={user} events={events} />
+}
+
+const ChangePasswordScreen = ({ navigation }: ChangePasswordScreenProps) => {
+  const changePassword = useChangePasswordForm({
+    onSubmitted: async () => await delayData<ChangePasswordResult>("valid"),
+    onSuccess: () => navigation.goBack()
+  })
+  return <ChangePasswordFormView {...changePassword} />
 }
 
 const CurrentUserProfileScreen = () => {

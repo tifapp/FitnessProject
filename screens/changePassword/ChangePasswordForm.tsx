@@ -5,13 +5,19 @@ import { AppStyles } from "@lib/AppColorStyle"
 import { Password } from "@lib/Password"
 import { Auth } from "aws-amplify"
 import React, { useState } from "react"
-import { Alert, SafeAreaView, ScrollView, StyleSheet, View } from "react-native"
+import {
+  Alert,
+  SafeAreaView,
+  ScrollView,
+  StyleProp,
+  StyleSheet,
+  View,
+  ViewStyle
+} from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { useMutation } from "react-query"
 
-const isValidForm = false
-
-type ChangePasswordProps = {
+export type UseChangePasswordFormEnvironment = {
   onSubmitted: (
     uncheckedOldPass: string,
     newPass: Password
@@ -19,16 +25,16 @@ type ChangePasswordProps = {
   onSuccess: () => void
 }
 
-type ChangePasswordSubmission =
-  | { status: "valid"; submit: () => void }
+export type ChangePasswordSubmission =
+  | { status: "valid"; submit: () => void; error?: undefined }
   | {
       status: "invalid"
       submit?: undefined
       error: ChangePasswordErrorReason
     }
-  | { status: "submitting" }
+  | { status: "submitting"; submit?: undefined; error?: undefined }
 
-type ChangePasswordErrorReason =
+export type ChangePasswordErrorReason =
   | "current-matches-new"
   | "reenter-does-not-match-new"
   | "weak-new-password"
@@ -48,10 +54,16 @@ export const changePassword = async (
     .catch<ChangePasswordResult>((err) => "invalid")
 }
 
-export const useChangePassword = ({
+export type ChangePasswordFormFields = {
+  currentPassword: string
+  newPassword: string
+  reEnteredPassword: string
+}
+
+export const useChangePasswordForm = ({
   onSubmitted,
   onSuccess
-}: ChangePasswordProps) => {
+}: UseChangePasswordFormEnvironment) => {
   const [fields, setFields] = useState({
     currentPassword: "",
     newPassword: "",
@@ -82,7 +94,7 @@ export const useChangePassword = ({
     }
   )
 
-  const errorReason = () => {
+  const errorReason = (): ChangePasswordSubmission => {
     if (fields.currentPassword === fields.newPassword) {
       return { status: "invalid", error: "current-matches-new" }
     } else if (fields.reEnteredPassword !== fields.newPassword) {
@@ -99,30 +111,30 @@ export const useChangePassword = ({
   }
 
   return {
-    ...fields,
-    updateField: (key: keyof typeof fields, value: string) => {
+    fields,
+    updateField: (key: keyof ChangePasswordFormFields, value: string) => {
       setFields((fields) => ({ ...fields, [key]: value }))
     },
     submission: errorReason()
   }
 }
 
-type FormSubmission =
-  | { status: "valid"; submit: () => void }
-  | { status: "invalid"; errors: string[] }
+export type ChangePasswordFormProps = {
+  style?: StyleProp<ViewStyle>
+  fields: ChangePasswordFormFields
+  updateField: (key: keyof ChangePasswordFormFields, value: string) => void
+  submission: ChangePasswordSubmission
+}
 
-export const ChangePasswordScreen = () => {
+export const ChangePasswordFormView = ({
+  style,
+  fields,
+  updateField,
+  submission
+}: ChangePasswordFormProps) => {
+  const isSubmittable =
+    submission.status === "invalid" || submission.status === "submitting"
   // Function activated on button tap
-  const {
-    currentPassword,
-    newPassword,
-    reEnteredPassword,
-    updateField,
-    submission
-  } = useChangePassword({
-    onSubmitted: changePassword,
-    onSuccess: () => console.log("Success")
-  })
 
   return (
     <SafeAreaView style={[styles.flexColumn, styles.paddingIconSection]}>
@@ -134,34 +146,54 @@ export const ChangePasswordScreen = () => {
 
         <PasswordTextField
           style={styles.textField}
-          value={currentPassword}
+          value={fields.currentPassword}
+          placeholder="Current Password"
+          error={
+            submission.error === "incorrect-current-password"
+              ? "Your old password was entered incorrectly. Please enter it again."
+              : undefined
+          }
           onChangeText={(text) => updateField("currentPassword", text)}
         />
 
         <PasswordTextField
           style={styles.textField}
-          value={newPassword}
+          value={fields.newPassword}
+          placeholder="New Password"
+          error={
+            submission.error === "weak-new-password"
+              ? "Your password should be at least 8 characters, and contain at least 1 capital letter, number, and special character."
+              : submission.error === "current-matches-new"
+                ? "Your new password must be different from your old password."
+                : undefined
+          }
           onChangeText={(text) => updateField("newPassword", text)}
         />
 
         <PasswordTextField
           style={styles.textField}
-          value={reEnteredPassword}
+          value={fields.reEnteredPassword}
+          placeholder="Re-Enter New Password"
+          error={
+            submission.error === "reenter-does-not-match-new"
+              ? "Your new password does not match, please enter it here again."
+              : undefined
+          }
           onChangeText={(text) => updateField("reEnteredPassword", text)}
         />
 
         <TouchableOpacity>
-          <Headline style={{ color: "blue" }}> Forgot your password? </Headline>
+          <Headline style={{ color: AppStyles.highlightedText }}>
+            Forgot your password?
+          </Headline>
         </TouchableOpacity>
 
         <View style={styles.buttonContainer}>
           <PrimaryButton
-            disabled={!isValidForm}
-            style={isValidForm ? styles.activeButton : styles.inactiveButton}
+            disabled={!isSubmittable}
+            style={isSubmittable ? styles.inactiveButton : styles.activeButton}
             title="Change Password"
-            onPress={() => {
-              useChangePassword
-            }}
+            onPress={() => submission.submit?.()}
           />
         </View>
       </ScrollView>
@@ -194,6 +226,7 @@ const styles = StyleSheet.create({
   },
   inactiveButton: {
     flex: 1,
+    opacity: 0.5,
     backgroundColor: AppStyles.colorOpacity35
   },
   bodyText: {

@@ -1,6 +1,13 @@
+import { PrimaryButton } from "@components/common/Buttons"
 import { Password } from "@lib/Password"
-import { useChangePassword } from "@screens/changePassword/ChangePasswordScreen"
-import { act, renderHook, waitFor } from "@testing-library/react-native"
+import { useChangePasswordForm } from "@screens/changePassword/ChangePasswordForm"
+import {
+  act,
+  render,
+  renderHook,
+  screen,
+  waitFor
+} from "@testing-library/react-native"
 import { captureAlerts } from "./helpers/Alerts"
 import { TestQueryClientProvider } from "./helpers/ReactQuery"
 
@@ -17,7 +24,7 @@ describe("ChangePassword tests", () => {
     const renderChangePassword = () => {
       return renderHook(
         () =>
-          useChangePassword({
+          useChangePasswordForm({
             onSubmitted: changePassword,
             onSuccess
           }),
@@ -97,7 +104,6 @@ describe("ChangePassword tests", () => {
       await waitFor(() => {
         expect(result.current.submission.status).toEqual("submitting")
       })
-      // This test doesn't seem to work; onSubmitted not working right/onSuccess overwriting
       await waitFor(() => {
         expect(onSuccess).toHaveBeenCalled()
       })
@@ -121,10 +127,10 @@ describe("ChangePassword tests", () => {
         expect(result.current.submission.status).toEqual("submitting")
       })
       await waitFor(() => {
+        expect(result.current.submission.status).toEqual("invalid")
         expect(result.current.submission.error).toEqual(
           "incorrect-current-password"
         )
-        expect(result.current.submission.status).toEqual("invalid")
       })
     })
 
@@ -151,6 +157,38 @@ describe("ChangePassword tests", () => {
         expect(alertPresentationSpy).toHaveBeenCalled()
       })
       await act(async () => await retry())
+      await waitFor(() => {
+        expect(onSuccess).toHaveBeenCalled()
+      })
+    })
+
+    it("should disable the button when the status changes", async () => {
+      changePassword.mockImplementation(
+        async (uncheckedOldPass: string, newPass: Password) => {
+          if (
+            uncheckedOldPass === "ReturnToAll32@" &&
+            newPass.rawValue === "OblivionAwaits43#"
+          ) {
+            return "valid"
+          }
+          return "invalid"
+        }
+      )
+
+      const { result } = renderChangePassword()
+
+      act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
+      act(() => result.current.updateField("newPassword", "OblivionAwaits43#"))
+      act(() =>
+        result.current.updateField("reEnteredPassword", "OblivionAwaits43#")
+      )
+
+      expect(result.current.submission.status).toEqual("valid")
+
+      act(() => result.current.submission.submit?.())
+      await waitFor(() => {
+        expect(result.current.submission.status).toEqual("submitting")
+      })
       await waitFor(() => {
         expect(onSuccess).toHaveBeenCalled()
       })
