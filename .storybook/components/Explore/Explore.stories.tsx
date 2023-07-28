@@ -5,7 +5,7 @@ import {
   createExploreEventsScreens
 } from "@screens/ExploreEvents"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import { AppQueryClientProvider } from "@components/AppQueryClientProvider"
+import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import React from "react"
 import { UpdateDependencyValues } from "@lib/dependencies"
 import { UserLocationDependencyKeys } from "@hooks/UserLocation"
@@ -38,7 +38,7 @@ const screens = createExploreEventsScreens(Stack, () => ({
 
 export const Basic: ExploreEventsStory = () => (
   <MenuProvider>
-    <AppQueryClientProvider>
+    <TiFQueryClientProvider>
       <UpdateDependencyValues
         update={(values) => {
           values.set(UserLocationDependencyKeys.currentCoordinates, () =>
@@ -57,6 +57,6 @@ export const Basic: ExploreEventsStory = () => (
           </NavigationContainer>
         </SafeAreaProvider>
       </UpdateDependencyValues>
-    </AppQueryClientProvider>
+    </TiFQueryClientProvider>
   </MenuProvider>
 )

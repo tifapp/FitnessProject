@@ -2,18 +2,11 @@ import React, { useState } from "react"
 import { Text, TouchableOpacity, View } from "react-native"
 
 // Import your stories
-import { MyButtonProps } from ".storybook/components/Button/Button"
 import { FlatList } from "react-native-gesture-handler"
 import { useAppFonts } from "../../hooks/Fonts"
 import AttendeesListMeta, {
   Basic as AttendeesListScreenBasic
 } from "../components/AttendeesList/AttendeesList.stories"
-import MyButtonMeta, {
-  Basic as MyButtonBasic
-} from "../components/Button/Button.stories"
-import ChangePasswordScreenMeta, {
-  Basic as ChangePasswordScreenBasic
-} from "../components/ChangePassword/ChangePasswordScreen.stories"
 import ContentReportingMeta, {
   Default as DefaultReportingFlow
 } from "../components/ContentReporting/ContentReporting.stories"
@@ -36,11 +29,6 @@ import SearchBarMeta, {
 // Create an array of stories
 const stories = [
   {
-    name: MyButtonMeta.title,
-    component: MyButtonBasic,
-    args: MyButtonMeta.args as MyButtonProps
-  },
-  {
     name: ContentReportingMeta.title,
     component: DefaultReportingFlow,
     args: ContentReportingMeta.args
@@ -59,12 +47,6 @@ const stories = [
     name: AttendeesListMeta.title,
     component: AttendeesListScreenBasic,
     args: AttendeesListMeta.args
-  },
-  {
-
-    name: ChangePasswordScreenMeta.title,
-    component: ChangePasswordScreenBasic,
-    args: ChangePasswordScreenMeta.args
   },
   {
     name: ExploreEventsMeta.title,

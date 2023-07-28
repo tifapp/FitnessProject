@@ -1,3 +1,4 @@
+import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { AttendeesListScreen } from "@screens/EventAttendeesList/AttendeesListScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 
@@ -9,4 +10,8 @@ export default AttendeesListMeta
 
 type AttendeesListStory = ComponentStory<typeof AttendeesListScreen>
 
-export const Basic: AttendeesListStory = () => <AttendeesListScreen />
+export const Basic: AttendeesListStory = () => (
+  <TiFQueryClientProvider>
+    <AttendeesListScreen />
+  </TiFQueryClientProvider>
+)
