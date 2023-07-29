@@ -1,6 +1,6 @@
 import { z } from "zod"
 import {
-  Location,
+  TiFLocation,
   LocationCoordinate2D,
   LocationSchema,
   hashLocationCoordinate
@@ -80,7 +80,7 @@ const recentLocationsWithKeys = async (keys: string[]) => {
  * interacted with.
  */
 export type SaveRecentLocation = (
-  selection: Location,
+  selection: TiFLocation,
   annotation?: RecentLocationAnnotation
 ) => Promise<void>
 
@@ -88,7 +88,7 @@ export type SaveRecentLocation = (
  * Saves a location to async storage with the given reason.
  */
 export const asyncStorageSaveRecentLocation = async (
-  location: Location,
+  location: TiFLocation,
   annotation?: RecentLocationAnnotation
 ) => {
   const key = recentLocationAsyncStorageKey(location.coordinates)

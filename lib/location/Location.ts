@@ -63,7 +63,7 @@ export namespace LocationCoordinatesMocks {
 }
 
 /**
- * A zod schema for {@link Location}.
+ * A zod schema for {@link TiFLocation}.
  */
 export const LocationSchema = z.object({
   coordinates: LocationCoordinates2DSchema,
@@ -73,7 +73,7 @@ export const LocationSchema = z.object({
 /**
  * A type that maps a lat-lng coordinate to its respective placemark.
  */
-export type Location = Readonly<z.infer<typeof LocationSchema>>
+export type TiFLocation = Readonly<z.infer<typeof LocationSchema>>
 
 /**
  * Creates a mock location for testing and UI purposes.

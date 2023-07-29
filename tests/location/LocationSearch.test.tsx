@@ -1,7 +1,7 @@
 import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
 import { SetDependencyValue, UpdateDependencyValues } from "@lib/dependencies"
 import {
-  Location,
+  TiFLocation,
   LocationCoordinate2D,
   LocationSearchResult,
   mockExpoLocationObject,
@@ -267,7 +267,7 @@ describe("LocationSearch tests", () => {
       const saveSelection = jest.fn()
 
       let selectedUserLocationObject: LocationObject
-      let selectedLocation: Location
+      let selectedLocation: TiFLocation
 
       const selectUserLocation = async () => {
         return fireEvent.press(await screen.findByText("Use current location"))

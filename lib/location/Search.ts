@@ -1,5 +1,5 @@
 import { randomBool } from "@lib/Random"
-import { Location, LocationCoordinate2D, mockLocation } from "./Location"
+import { TiFLocation, LocationCoordinate2D, mockLocation } from "./Location"
 import { RecentLocationAnnotation } from "./RecentsStorage"
 
 /**
@@ -17,7 +17,7 @@ export type LocationSearchResult = {
   /**
    * The actual location presented by this option.
    */
-  location: Location
+  location: TiFLocation
 
   /**
    * An annotation that appears above this option.

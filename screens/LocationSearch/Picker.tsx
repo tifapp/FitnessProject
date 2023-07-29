@@ -1,5 +1,5 @@
 import React from "react"
-import { Location } from "@lib/location"
+import { TiFLocation } from "@lib/location"
 import { useUserCoordinatesQuery } from "@hooks/UserLocation"
 import { LocationSearchResultsListView } from "./SearchResultsList"
 import {
@@ -18,7 +18,7 @@ import { LocationAccuracy, LocationObject } from "expo-location"
 
 export type LocationSearchPickerProps = {
   onUserLocationSelected: (location: LocationObject) => void
-  onLocationSelected: (selection: Location) => void
+  onLocationSelected: (selection: TiFLocation) => void
   style?: StyleProp<ViewStyle>
 }
 
