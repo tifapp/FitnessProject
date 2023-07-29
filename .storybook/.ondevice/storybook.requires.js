@@ -50,16 +50,10 @@ try {
 const getStories = () => {
   return {
     "./components/AttendeesList/AttendeesList.stories.tsx": require("../components/AttendeesList/AttendeesList.stories.tsx"),
-    "./components/Button/Button.stories.tsx": require("../components/Button/Button.stories.tsx"),
+    "./components/ChangePassword/ChangePasswordScreen.stories.tsx": require("../components/ChangePassword/ChangePasswordScreen.stories.tsx"),
     "./components/ContentReporting/ContentReporting.stories.tsx": require("../components/ContentReporting/ContentReporting.stories.tsx"),
     "./components/ContentText/ContextText.stories.tsx": require("../components/ContentText/ContextText.stories.tsx"),
-    "./components/DateTimePicker/DateTimePicker.stories.tsx": require("../components/DateTimePicker/DateTimePicker.stories.tsx"),
-    "./components/EventForm/EventForm.stories.tsx": require("../components/EventForm/EventForm.stories.tsx"),
-    "./components/EventFormToolbar/EventFormToolbar.stories.tsx": require("../components/EventFormToolbar/EventFormToolbar.stories.tsx"),
     "./components/Explore/Explore.stories.tsx": require("../components/Explore/Explore.stories.tsx"),
-    "./components/HexColorPicker/HexColorPicker.stories.tsx": require("../components/HexColorPicker/HexColorPicker.stories.tsx"),
-    "./components/IconButton/IconButton.stories.tsx": require("../components/IconButton/IconButton.stories.tsx"),
-    "./components/LocationSearchResultRow/LocationSearchResultRow.stories.tsx": require("../components/LocationSearchResultRow/LocationSearchResultRow.stories.tsx"),
     "./components/SearchBar/SearchBar.stories.tsx": require("../components/SearchBar/SearchBar.stories.tsx"),
     "./components/SettingsScreen/SettingsScreen.stories.tsx": require("../components/SettingsScreen/SettingsScreen.stories.tsx"),
     "./components/TextField/TextField.stories.tsx": require("../components/TextField/TextField.stories.tsx"),
