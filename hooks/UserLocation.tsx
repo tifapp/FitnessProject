@@ -1,6 +1,12 @@
+import React, {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState
+} from "react"
 import { QueryHookOptions } from "@lib/ReactQuery"
 import { createDependencyKey, useDependencyValue } from "@lib/dependencies"
-import { TrackedLocationCoordinates } from "@lib/location"
 import {
   QueryUserCoordinates,
   TrackUserLocation,
@@ -10,7 +16,11 @@ import {
   expoTrackUserLocation,
   requestLocationPermissions
 } from "@lib/location/UserLocation"
-import { useEffect, useState } from "react"
+import {
+  LocationObject,
+  LocationOptions,
+  PermissionResponse
+} from "expo-location"
 import { useQuery } from "react-query"
 
 /**
@@ -97,15 +107,13 @@ export const useTrackUserLocation = (
  * @param accurracy See {@link UserLocationTrackingAccurracy}, defaults to `approximate-low`.
  */
 export const useUserCoordinatesQuery = (
-  accurracy: UserLocationTrackingAccurracy = "approximate-low",
-  options?: QueryHookOptions<TrackedLocationCoordinates>
+  locationOptions: LocationOptions,
+  options?: QueryHookOptions<LocationObject>
 ) => {
-  const query = useDependencyValue(
-    UserLocationDependencyKeys.currentCoordinates
-  )
+  const { getCurrentLocation } = useUserLocationFunctions()
   return useQuery(
-    ["user-coordinates", accurracy],
-    async () => await query(accurracy),
+    ["user-coordinates", locationOptions],
+    async () => await getCurrentLocation(locationOptions),
     options
   )
 }
@@ -115,14 +123,43 @@ export const useUserCoordinatesQuery = (
  * result if the permissions were granted.
  */
 export const useRequestForegroundLocationPermissions = (
-  options?: QueryHookOptions<boolean>
+  options?: QueryHookOptions<PermissionResponse>
 ) => {
-  const request = useDependencyValue(
-    UserLocationDependencyKeys.requestForegroundPermissions
-  )
+  const { requestForegroundPermissions } = useUserLocationFunctions()
   return useQuery(
     ["request-location-foreground-permissions"],
-    async () => await request(),
+    async () => await requestForegroundPermissions(),
     options
   )
 }
+
+export type UserLocationFunctions = {
+  getCurrentLocation: (options: LocationOptions) => Promise<LocationObject>
+  requestForegroundPermissions: () => Promise<PermissionResponse>
+}
+
+const UserLocationFunctionsContext = createContext<
+  UserLocationFunctions | undefined
+>(undefined)
+
+/**
+ * The current functions that handle user location based operations.
+ */
+export const useUserLocationFunctions = () =>
+  useContext(UserLocationFunctionsContext)!
+
+export type UserLocationFunctionsProviderProps = UserLocationFunctions & {
+  children: ReactNode
+}
+
+/**
+ * Provides a context of functions that operate on the user's current location.
+ */
+export const UserLocationFunctionsProvider = ({
+  children,
+  ...props
+}: UserLocationFunctionsProviderProps) => (
+  <UserLocationFunctionsContext.Provider value={props}>
+    {children}
+  </UserLocationFunctionsContext.Provider>
+)

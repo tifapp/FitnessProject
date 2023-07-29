@@ -15,6 +15,7 @@ import {
 } from "@hooks/UserLocation"
 import { Region } from "@lib/location"
 import { QueryHookOptions } from "@lib/ReactQuery"
+import { LocationAccuracy, PermissionResponse } from "expo-location"
 
 export type UseExploreEventsEnvironment = {
   region?: Region
@@ -79,20 +80,27 @@ type UserRegionResult =
   | { status: "loaded"; data?: Region }
 
 const useUserRegion = (
-  options?: QueryHookOptions<boolean>
+  options?: QueryHookOptions<PermissionResponse>
 ): UserRegionResult => {
   const permissionQuery = useRequestForegroundLocationPermissions(options)
-  const locationQuery = useUserCoordinatesQuery("approximate-medium", {
-    enabled: permissionQuery.data !== undefined
-  })
+  const locationQuery = useUserCoordinatesQuery(
+    { accuracy: LocationAccuracy.Balanced },
+    {
+      enabled: permissionQuery.data !== undefined
+    }
+  )
   if (permissionQuery.isLoading || locationQuery.isLoading) {
     return { status: "loading" }
   }
+  const coords = locationQuery.data ? locationQuery.data?.coords : undefined
   return {
     status: "loaded",
-    data: !locationQuery.data
+    data: !coords
       ? undefined
-      : createDefaultMapRegion(locationQuery.data.coordinates)
+      : createDefaultMapRegion({
+        latitude: coords.latitude,
+        longitude: coords.longitude
+      })
   }
 }
 

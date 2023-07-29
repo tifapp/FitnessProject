@@ -1,5 +1,5 @@
 import React from "react"
-import { Location, TrackedLocationCoordinates } from "@lib/location"
+import { Location } from "@lib/location"
 import { useUserCoordinatesQuery } from "@hooks/UserLocation"
 import { LocationSearchResultsListView } from "./SearchResultsList"
 import {
@@ -14,9 +14,10 @@ import { Headline } from "@components/Text"
 import { useDependencyValue } from "@lib/dependencies"
 import { LocationSearchDependencyKeys } from "./Data"
 import { LocationSearchResultView } from "./SearchResultView"
+import { LocationAccuracy, LocationObject } from "expo-location"
 
 export type LocationSearchPickerProps = {
-  onUserCoordinatesSelected: (coordinates: TrackedLocationCoordinates) => void
+  onUserLocationSelected: (location: LocationObject) => void
   onLocationSelected: (selection: Location) => void
   style?: StyleProp<ViewStyle>
 }
@@ -32,24 +33,24 @@ export type LocationSearchPickerProps = {
  * user's recent locations.
  */
 export const LocationSearchPicker = ({
-  onUserCoordinatesSelected,
+  onUserLocationSelected,
   onLocationSelected,
   style
 }: LocationSearchPickerProps) => {
-  const { data } = useUserCoordinatesQuery("approximate-low")
+  const { data } = useUserCoordinatesQuery({ accuracy: LocationAccuracy.Low })
   const saveSelection = useDependencyValue(
     LocationSearchDependencyKeys.savePickerSelection
   )
   return (
     <LocationSearchResultsListView
       style={style}
-      center={data?.coordinates}
+      center={data?.coords}
       header={
         <>
           {!!data && (
             <TouchableOpacity
               style={style}
-              onPress={() => onUserCoordinatesSelected(data)}
+              onPress={() => onUserLocationSelected(data)}
             >
               <Animated.View
                 entering={FadeIn}
