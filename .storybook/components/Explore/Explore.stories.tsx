@@ -8,10 +8,7 @@ import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import React from "react"
 import { UpdateDependencyValues } from "@lib/dependencies"
-import {
-  UserLocationDependencyKeys,
-  UserLocationFunctionsProvider
-} from "@hooks/UserLocation"
+import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
 import { mockLocationSearchResult } from "@lib/location"
 import { MenuProvider } from "react-native-popup-menu"
 import { createStackNavigator } from "@react-navigation/stack"

@@ -1,7 +1,6 @@
 export * from "./Location"
 export * from "./Placemark"
 export * from "./Geocoding"
-export * from "./UserLocation"
 export * from "./RecentsStorage"
 export * from "./Search"
 export * from "./Region"
