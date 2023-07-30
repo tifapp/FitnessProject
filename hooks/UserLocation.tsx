@@ -8,16 +8,13 @@ import {
 import { useQuery } from "react-query"
 
 /**
- * Loads the current user's coordinates using the
- * `UserLocationDependencyKeys.currentCoordinates` dependency key.
+ * A query hook to load the user's current location from expo.
  *
  * **Notice**:
  * This hook will always return an error status if the user previously
  * denied location permissions but then allowed them in settings.
  * To fix this, ensure you re-request the location permissions before calling
  * this hook.
- *
- * @param accurracy See {@link UserLocationTrackingAccurracy}, defaults to `approximate-low`.
  */
 export const useUserCoordinatesQuery = (
   locationOptions: LocationOptions,
@@ -32,8 +29,7 @@ export const useUserCoordinatesQuery = (
 }
 
 /**
- * Requests permission for location foreground permissions and returns a `true`
- * result if the permissions were granted.
+ * A query hook to Request permission for location foreground permissions.
  */
 export const useRequestForegroundLocationPermissions = (
   options?: QueryHookOptions<PermissionResponse>

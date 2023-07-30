@@ -2,7 +2,7 @@ import { z } from "zod"
 import {
   TiFLocation,
   LocationCoordinate2D,
-  LocationSchema,
+  TiFLocationSchema,
   hashLocationCoordinate
 } from "./Location"
 import AsyncStorage from "@react-native-async-storage/async-storage"
@@ -38,7 +38,7 @@ export type RecentLocationAnnotation = z.infer<
  * A zod schema for {@link RecentLocation}.
  */
 export const RecentLocationSchema = z.object({
-  location: LocationSchema,
+  location: TiFLocationSchema,
   annotation: RecentLocationAnnotationSchema.optional()
 })
 

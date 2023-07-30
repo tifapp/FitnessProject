@@ -1,5 +1,5 @@
 import {
-  mockLocation,
+  mockTiFLocation,
   asyncStorageLoadRecentLocations,
   asyncStorageLoadSpecificRecentLocations,
   asyncStorageSaveRecentLocation
@@ -14,7 +14,7 @@ describe("RecentLocationStorage tests", () => {
 
   describe("AsyncStorageSaveRecentLocation tests", () => {
     it("should save the location in async storage", async () => {
-      const location = mockLocation(TEST_COORDINATES)
+      const location = mockTiFLocation(TEST_COORDINATES)
 
       await asyncStorageSaveRecentLocation(location, "attended-event")
       const savedLocation = JSON.parse(
@@ -29,9 +29,9 @@ describe("RecentLocationStorage tests", () => {
 
   describe("AsyncStorageLoadSpecificRecentLocations tests", () => {
     it("should be able to retrieve multiple saved locations", async () => {
-      const location1 = mockLocation()
-      const location2 = mockLocation()
-      const location3 = mockLocation()
+      const location1 = mockTiFLocation()
+      const location2 = mockTiFLocation()
+      const location3 = mockTiFLocation()
       await asyncStorageSaveRecentLocation(location1, "attended-event")
       await asyncStorageSaveRecentLocation(location2, "hosted-event")
 
@@ -62,9 +62,9 @@ describe("RecentLocationStorage tests", () => {
 
   describe("AsyncStorageLoadRecentLocations tests", () => {
     it("should load recent locations ordered by most recently saved", async () => {
-      const location1 = mockLocation()
-      const location2 = mockLocation()
-      const location3 = mockLocation()
+      const location1 = mockTiFLocation()
+      const location2 = mockTiFLocation()
+      const location3 = mockTiFLocation()
 
       await asyncStorageSaveRecentLocation(location1)
       await asyncStorageSaveRecentLocation(location2, "hosted-event")
@@ -90,7 +90,7 @@ describe("RecentLocationStorage tests", () => {
 
     it("filters invalidly persisted locations", async () => {
       // NB: Ensure this location appears in the keylist.
-      await asyncStorageSaveRecentLocation(mockLocation(TEST_COORDINATES))
+      await asyncStorageSaveRecentLocation(mockTiFLocation(TEST_COORDINATES))
       await AsyncStorage.setItem(TEST_COORDINATES_STORAGE_KEY, "sdkjcudsb")
       expect(await asyncStorageLoadRecentLocations(10)).toHaveLength(0)
     })
