@@ -1,4 +1,3 @@
-
 import React, { useState } from "react"
 import { StyleSheet, TouchableOpacity, View } from "react-native"
 import * as Clipboard from "expo-clipboard"
@@ -8,12 +7,10 @@ import {
   Placemark,
   placemarkToFormattedAddress
 } from "@lib/location"
-import { useTrackUserLocation } from "@hooks/UserLocation"
-import { NativeEventMapDetails, openMapDirections } from "@lib/NativeMap"
+import { OpenInMapsOptions, openInMapWithDirections } from "@lib/OpenInMaps"
 import { Ionicon } from "@components/common/Icons"
 import { showToast } from "@components/common/Toasts"
 import { Divider } from "react-native-elements"
-
 
 interface LocationSectionProps {
   color: string
@@ -26,10 +23,9 @@ const LocationSection = ({
   placemark,
   coordinates
 }: LocationSectionProps) => {
-  const userLocation = useTrackUserLocation("precise")
   const [dividerWidth, setDividerWidth] = useState(0)
 
-  const mapDetails: NativeEventMapDetails = {
+  const mapDetails: OpenInMapsOptions = {
     coordinates,
     placemark
   }
@@ -42,7 +38,7 @@ const LocationSection = ({
   }
 
   const openMapWithDirections = async () => {
-    await openMapDirections(userLocation, mapDetails)
+    await openInMapWithDirections(mapDetails)
   }
 
   const copyToClipboard = async () => {
