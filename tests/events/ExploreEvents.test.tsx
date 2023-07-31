@@ -1,21 +1,21 @@
 import {
+  mockExpoLocationObject,
   mockLocationCoordinate2D,
-  mockRegion,
-  mockTrackedLocationCoordinate
+  mockRegion
 } from "@lib/location"
 import {
   ExploreEventsInitialCenter,
   useExploreEvents,
   SAN_FRANCISCO_DEFAULT_REGION,
-  createInitialCenter
+  createInitialCenter,
+  createDefaultMapRegion
 } from "@screens/ExploreEvents"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import {
   TestQueryClientProvider,
   createTestQueryClient
 } from "../helpers/ReactQuery"
-import { UpdateDependencyValues } from "@lib/dependencies"
-import { UserLocationDependencyKeys } from "@hooks/UserLocation"
+import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
 import { nonCancellable, endlessCancellable } from "../helpers/Cancellable"
 import { EventMocks } from "@lib/events"
 import { fakeTimers } from "../helpers/Timers"
@@ -49,10 +49,10 @@ describe("ExploreEvents tests", () => {
     beforeEach(() => queryClient.clear())
 
     test("exploring events successfully at user location", async () => {
-      const userCoordinate = mockTrackedLocationCoordinate()
+      const userLocation = mockExpoLocationObject()
 
-      requestForegroundPermissions.mockResolvedValue(true)
-      queryUserCoordinates.mockReturnValue(userCoordinate)
+      requestForegroundPermissions.mockResolvedValue({ granted: true })
+      queryUserCoordinates.mockReturnValue(userLocation)
       fetchEvents.mockReturnValue(nonCancellable(Promise.resolve(TEST_EVENTS)))
 
       const { result } = renderUseExploreEvents({ center: "user-location" })
@@ -62,6 +62,14 @@ describe("ExploreEvents tests", () => {
       })
       await waitForLocationPermissionRequest()
       await waitForUserRegionToLoad()
+      await waitFor(() => {
+        expect(fetchEvents).toHaveBeenCalledWith(
+          createDefaultMapRegion({
+            latitude: userLocation.coords.latitude,
+            longitude: userLocation.coords.longitude
+          })
+        )
+      })
       await waitFor(() => {
         expect(result.current.data.events).toEqual(TEST_EVENTS)
         expect(result.current.data.status).toEqual("success")
@@ -134,26 +142,9 @@ describe("ExploreEvents tests", () => {
       })
     })
 
-    it("should be able to fetch events based on the user's location if user accepted location foreground permissions", async () => {
-      fetchEvents.mockReturnValue(endlessCancellable())
-      requestForegroundPermissions.mockResolvedValue(true)
-      const userLocation = mockTrackedLocationCoordinate()
-      queryUserCoordinates.mockResolvedValue(userLocation)
-
-      renderUseExploreEvents({ center: "user-location" })
-
-      await waitForLocationPermissionRequest()
-      await waitForUserRegionToLoad()
-      await waitFor(() => {
-        expect(fetchEvents).toHaveBeenCalledWith(
-          expect.objectContaining(userLocation.coordinates)
-        )
-      })
-    })
-
     it("should use sanfrancisco as the default region when user denies foreground location permissions", async () => {
       fetchEvents.mockReturnValue(endlessCancellable())
-      requestForegroundPermissions.mockResolvedValue(false)
+      requestForegroundPermissions.mockResolvedValue({ granted: false })
 
       renderUseExploreEvents({ center: "user-location" })
 
@@ -166,7 +157,7 @@ describe("ExploreEvents tests", () => {
 
     it("should use sanfrancisco as the default region when user location fetch errors", async () => {
       fetchEvents.mockReturnValue(endlessCancellable())
-      requestForegroundPermissions.mockResolvedValue(true)
+      requestForegroundPermissions.mockResolvedValue({ granted: true })
       queryUserCoordinates.mockRejectedValue(new Error())
 
       renderUseExploreEvents({ center: "user-location" })
@@ -299,20 +290,12 @@ describe("ExploreEvents tests", () => {
         {
           wrapper: ({ children }) => (
             <TestQueryClientProvider client={queryClient}>
-              <UpdateDependencyValues
-                update={(values) => {
-                  values.set(
-                    UserLocationDependencyKeys.currentCoordinates,
-                    queryUserCoordinates
-                  )
-                  values.set(
-                    UserLocationDependencyKeys.requestForegroundPermissions,
-                    requestForegroundPermissions
-                  )
-                }}
+              <UserLocationFunctionsProvider
+                getCurrentLocation={queryUserCoordinates}
+                requestForegroundPermissions={requestForegroundPermissions}
               >
                 {children}
-              </UpdateDependencyValues>
+              </UserLocationFunctionsProvider>
             </TestQueryClientProvider>
           )
         }

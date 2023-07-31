@@ -27,7 +27,7 @@ export type LocationCoordinate2D = Readonly<
 /**
  * Generates a mock coordinate for testing and UI purposes.
  */
-export const mockLocationCoordinate2D = () => ({
+export const mockLocationCoordinate2D = (): LocationCoordinate2D => ({
   latitude: parseFloat(faker.address.latitude()),
   longitude: parseFloat(faker.address.longitude())
 })
@@ -63,9 +63,9 @@ export namespace LocationCoordinatesMocks {
 }
 
 /**
- * A zod schema for {@link Location}.
+ * A zod schema for {@link TiFLocation}.
  */
-export const LocationSchema = z.object({
+export const TiFLocationSchema = z.object({
   coordinates: LocationCoordinates2DSchema,
   placemark: PlacemarkSchema
 })
@@ -73,31 +73,16 @@ export const LocationSchema = z.object({
 /**
  * A type that maps a lat-lng coordinate to its respective placemark.
  */
-export type Location = Readonly<z.infer<typeof LocationSchema>>
+export type TiFLocation = Readonly<z.infer<typeof TiFLocationSchema>>
 
 /**
  * Creates a mock location for testing and UI purposes.
  */
-export const mockLocation = (coordinates?: LocationCoordinate2D) => ({
+export const mockTiFLocation = (
+  coordinates?: LocationCoordinate2D
+): TiFLocation => ({
   coordinates: coordinates ?? mockLocationCoordinate2D(),
   placemark: mockPlacemark()
-})
-
-/**
- * A location object meant for tracking purposes.
- */
-export type TrackedLocationCoordinates = Readonly<{
-  coordinates: LocationCoordinate2D
-  trackingDate: Date
-}>
-
-/**
- * Generates a mocked Tracked location coordinate for testing and ui
- * purposes.
- */
-export const mockTrackedLocationCoordinate = (date?: Date) => ({
-  coordinates: mockLocationCoordinate2D(),
-  trackingDate: date ?? faker.date.soon()
 })
 
 /**

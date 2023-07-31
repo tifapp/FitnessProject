@@ -1,13 +1,12 @@
-import { UserLocationDependencyKeys } from "@hooks/UserLocation"
+import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
 import { SetDependencyValue, UpdateDependencyValues } from "@lib/dependencies"
 import {
-  Location,
+  TiFLocation,
   LocationCoordinate2D,
   LocationSearchResult,
-  TrackedLocationCoordinates,
+  mockExpoLocationObject,
   mockLocationCoordinate2D,
-  mockLocationSearchResult,
-  mockTrackedLocationCoordinate
+  mockLocationSearchResult
 } from "@lib/location"
 import {
   LocationSearchBar,
@@ -29,6 +28,7 @@ import { neverPromise } from "../helpers/Promise"
 import { TestQueryClientProvider } from "../helpers/ReactQuery"
 import { View } from "react-native"
 import { fakeTimers } from "../helpers/Timers"
+import { LocationObject } from "expo-location"
 
 describe("LocationSearch tests", () => {
   describe("LocationSearchUI tests", () => {
@@ -244,12 +244,12 @@ describe("LocationSearch tests", () => {
 
     describe("Picker tests", () => {
       it("can select the user's coordinates when user coordinates available", async () => {
-        const trackedUserCoordinates = mockTrackedLocationCoordinate()
-        queryUserCoordinates.mockResolvedValue(trackedUserCoordinates)
+        const userLocation = mockExpoLocationObject()
+        queryUserCoordinates.mockResolvedValue(userLocation)
         renderPicker()
 
         await selectUserLocation()
-        expect(selectedUserCoordinates).toMatchObject(trackedUserCoordinates)
+        expect(selectedUserLocationObject).toMatchObject(userLocation)
       })
 
       test("when option is selected, it is also saved somewhere", async () => {
@@ -266,8 +266,8 @@ describe("LocationSearch tests", () => {
       const queryUserCoordinates = jest.fn().mockImplementation(neverPromise)
       const saveSelection = jest.fn()
 
-      let selectedUserCoordinates: TrackedLocationCoordinates
-      let selectedLocation: Location
+      let selectedUserLocationObject: LocationObject
+      let selectedLocation: TiFLocation
 
       const selectUserLocation = async () => {
         return fireEvent.press(await screen.findByText("Use current location"))
@@ -283,10 +283,6 @@ describe("LocationSearch tests", () => {
             <UpdateDependencyValues
               update={(values) => {
                 values.set(
-                  UserLocationDependencyKeys.currentCoordinates,
-                  queryUserCoordinates
-                )
-                values.set(
                   LocationSearchDependencyKeys.searchForResults,
                   searchForLocations
                 )
@@ -296,12 +292,19 @@ describe("LocationSearch tests", () => {
                 )
               }}
             >
-              <LocationSearchPicker
-                onUserCoordinatesSelected={(coordinates) => {
-                  selectedUserCoordinates = coordinates
-                }}
-                onLocationSelected={(location) => (selectedLocation = location)}
-              />
+              <UserLocationFunctionsProvider
+                getCurrentLocation={queryUserCoordinates}
+                requestForegroundPermissions={jest.fn()}
+              >
+                <LocationSearchPicker
+                  onUserLocationSelected={(coordinates) => {
+                    selectedUserLocationObject = coordinates
+                  }}
+                  onLocationSelected={(location) =>
+                    (selectedLocation = location)
+                  }
+                />
+              </UserLocationFunctionsProvider>
             </UpdateDependencyValues>
           </TestQueryClientProvider>
         )

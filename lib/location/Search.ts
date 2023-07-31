@@ -1,5 +1,5 @@
 import { randomBool } from "@lib/Random"
-import { Location, LocationCoordinate2D, mockLocation } from "./Location"
+import { TiFLocation, LocationCoordinate2D, mockTiFLocation } from "./Location"
 import { RecentLocationAnnotation } from "./RecentsStorage"
 
 /**
@@ -17,7 +17,7 @@ export type LocationSearchResult = {
   /**
    * The actual location presented by this option.
    */
-  location: Location
+  location: TiFLocation
 
   /**
    * An annotation that appears above this option.
@@ -39,7 +39,7 @@ export const mockLocationSearchResult = (
 ) => {
   const isRecent = randomBool(0.8)
   return {
-    location: mockLocation(coordinates),
+    location: mockTiFLocation(coordinates),
     annotation: isRecent ? mockLocationSearchAnnotation() : undefined,
     isRecentLocation: isRecent
   } as LocationSearchResult

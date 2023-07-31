@@ -7,6 +7,11 @@ import { useAppFonts } from "@hooks/Fonts"
 import { TabNavigation } from "@stacks/ActivitiesStack"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { TiFMenuProvider } from "@components/TiFMenuProvider"
+import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
+import {
+  getCurrentPositionAsync,
+  requestForegroundPermissionsAsync
+} from "expo-location"
 
 const Stack = createStackNavigator()
 
@@ -35,13 +40,18 @@ const App = () => {
   const [isFontsLoaded] = useAppFonts()
   return (
     <TiFQueryClientProvider>
-      <SafeAreaProvider>
-        <TiFMenuProvider>
-          <RootSiblingParent>
-            <AppView isFontsLoaded={isFontsLoaded} />
-          </RootSiblingParent>
-        </TiFMenuProvider>
-      </SafeAreaProvider>
+      <UserLocationFunctionsProvider
+        getCurrentLocation={getCurrentPositionAsync}
+        requestForegroundPermissions={requestForegroundPermissionsAsync}
+      >
+        <SafeAreaProvider>
+          <TiFMenuProvider>
+            <RootSiblingParent>
+              <AppView isFontsLoaded={isFontsLoaded} />
+            </RootSiblingParent>
+          </TiFMenuProvider>
+        </SafeAreaProvider>
+      </UserLocationFunctionsProvider>
     </TiFQueryClientProvider>
   )
 }
