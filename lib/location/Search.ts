@@ -55,7 +55,7 @@ export type LocationsSearchSourceType = "user-recents" | "remote-search"
  * A rich query type that carries user-entered text for searching locations.
  */
 export class LocationsSearchQuery {
-  readonly rawValue: string
+  private readonly rawValue: string
 
   constructor (rawValue: string) {
     this.rawValue = rawValue
@@ -67,6 +67,10 @@ export class LocationsSearchQuery {
    */
   get sourceType (): LocationsSearchSourceType {
     return this.rawValue.length === 0 ? "user-recents" : "remote-search"
+  }
+
+  toString () {
+    return this.rawValue
   }
 }
 

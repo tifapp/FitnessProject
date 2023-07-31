@@ -118,7 +118,7 @@ const EmptyResultsView = ({ reason, style }: EmptyResultsProps) => {
   const noResultsText =
     query.sourceType === "user-recents"
       ? "No recent locations. Locations of events that you host and attend will appear here."
-      : `Sorry, no results found for "${query.rawValue}".`
+      : `Sorry, no results found for "${query}".`
   return (
     <View style={style}>
       {reason === "error" && (
