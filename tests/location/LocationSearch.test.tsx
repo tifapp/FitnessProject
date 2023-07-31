@@ -33,9 +33,9 @@ import { LocationObject } from "expo-location"
 
 describe("LocationSearch tests", () => {
   describe("LocationsSearchQuery tests", () => {
-    test("query type", () => {
-      expect(new LocationsSearchQuery("").queryType).toEqual("user-recents")
-      expect(new LocationsSearchQuery("New York").queryType).toEqual(
+    test("sourceType", () => {
+      expect(new LocationsSearchQuery("").sourceType).toEqual("user-recents")
+      expect(new LocationsSearchQuery("New York").sourceType).toEqual(
         "remote-search"
       )
     })
@@ -123,7 +123,7 @@ describe("LocationSearch tests", () => {
         jest.advanceTimersByTime(100)
         await waitFor(() => {
           expect(searchForLocations).not.toHaveBeenCalledWith(
-            searchText,
+            new LocationsSearchQuery(searchText),
             center
           )
         })
@@ -132,10 +132,16 @@ describe("LocationSearch tests", () => {
         enterSearchText(searchText)
 
         act(() => jest.advanceTimersByTime(100))
-        expect(searchForLocations).not.toHaveBeenCalledWith(searchText, center)
+        expect(searchForLocations).not.toHaveBeenCalledWith(
+          new LocationsSearchQuery(searchText),
+          center
+        )
 
         act(() => jest.advanceTimersByTime(100))
-        expect(searchForLocations).toHaveBeenCalledWith(searchText, center)
+        expect(searchForLocations).toHaveBeenCalledWith(
+          new LocationsSearchQuery(searchText),
+          center
+        )
       })
 
       it("should indicate that no results were found when no options available with non-empty search", async () => {

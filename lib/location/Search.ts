@@ -49,7 +49,7 @@ export const mockLocationSearchResult = (
  * A type that denotes whether searching for locations should utilize the user's
  * recent locations, or a remote service.
  */
-export type LocationsSearchQueryType = "user-recents" | "remote-search"
+export type LocationsSearchSourceType = "user-recents" | "remote-search"
 
 /**
  * A rich query type that carries user-entered text for searching locations.
@@ -62,9 +62,10 @@ export class LocationsSearchQuery {
   }
 
   /**
-   * The type of this query. An empty string means loading from the user's recent locations.
+   * The data source type of this query. An empty string means loading from
+   * the user's recent locations.
    */
-  get queryType (): LocationsSearchQueryType {
+  get sourceType (): LocationsSearchSourceType {
     return this.rawValue.length === 0 ? "user-recents" : "remote-search"
   }
 }
@@ -77,6 +78,6 @@ export class LocationsSearchQuery {
  * loaded.
  */
 export type LoadLocationSearchResults = (
-  query: string,
+  query: LocationsSearchQuery,
   center?: LocationCoordinate2D
 ) => Promise<LocationSearchResult[]>

@@ -4,6 +4,7 @@ import { useDependencyValue } from "@lib/dependencies"
 import {
   LocationCoordinate2D,
   LocationSearchResult,
+  LocationsSearchQuery,
   hashLocationCoordinate,
   milesBetweenLocations
 } from "@lib/location"
@@ -11,7 +12,7 @@ import { useAtomValue } from "jotai"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { useQuery } from "react-query"
 import { LocationSearchDependencyKeys } from "./Data"
-import { searchTextAtoms } from "./state"
+import { searchTextAtoms, useLocationsSearchQueryObject } from "./state"
 import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view"
 import { SkeletonView } from "@components/common/Skeleton"
 import { Divider } from "react-native-elements"
@@ -39,7 +40,8 @@ export const LocationSearchResultsListView = ({
   style,
   renderSearchResult
 }: LocationSearchResultsListProps) => {
-  const { status, data } = useLocationSearchResultsQuery(center)
+  const query = useLocationsSearchQueryObject()
+  const { status, data } = useLocationSearchResultsQuery(query, center)
   const fontScale = useFontScale()
   return (
     <KeyboardAwareFlatList
@@ -54,7 +56,7 @@ export const LocationSearchResultsListView = ({
         <View style={styles.horizontalPadding}>
           <View>{header}</View>
           <CaptionTitle style={style}>
-            {useDebouncedSearchText().length === 0 ? "Recents" : "Results"}
+            {query.sourceType === "user-recents" ? "Recents" : "Results"}
           </CaptionTitle>
         </View>
       }
@@ -83,8 +85,10 @@ const extractKeyFromOption = (option: LocationSearchResult) => {
   return hashLocationCoordinate(option.location.coordinates)
 }
 
-const useLocationSearchResultsQuery = (center?: LocationCoordinate2D) => {
-  const query = useDebouncedSearchText()
+const useLocationSearchResultsQuery = (
+  query: LocationsSearchQuery,
+  center?: LocationCoordinate2D
+) => {
   const search = useDependencyValue(
     LocationSearchDependencyKeys.searchForResults
   )
@@ -110,11 +114,11 @@ const emptyReasonFromQueryStatus = (
 }
 
 const EmptyResultsView = ({ reason, style }: EmptyResultsProps) => {
-  const searchText = useDebouncedSearchText()
+  const query = useLocationsSearchQueryObject()
   const noResultsText =
-    searchText.length === 0
+    query.sourceType === "user-recents"
       ? "No recent locations. Locations of events that you host and attend will appear here."
-      : `Sorry, no results found for "${searchText}".`
+      : `Sorry, no results found for "${query.rawValue}".`
   return (
     <View style={style}>
       {reason === "error" && (
@@ -148,10 +152,6 @@ const SkeletonResult = () => (
     </View>
   </View>
 )
-
-const useDebouncedSearchText = () => {
-  return useAtomValue(searchTextAtoms.debouncedValueAtom)
-}
 
 const styles = StyleSheet.create({
   separator: {
