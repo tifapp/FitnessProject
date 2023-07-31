@@ -3,7 +3,7 @@ import AttendanceButton from "@components/bottomTabComponents/AttendanceButton"
 import ExpandableText from "@components/common/ExpandableText"
 import ProfileImageAndNameWithFriend from "@components/profileImageComponents/ProfileImageAndNameWithFriend"
 import { CalendarEvent } from "@lib/Calendar"
-import { OpenInMapsOptions, openInMaps } from "@lib/OpenInMaps"
+import { OpenInMapsRequest, openInMaps } from "@lib/OpenInMaps"
 import { CurrentUserEvent } from "@lib/events"
 import React from "react"
 import {
@@ -36,7 +36,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
     coordinates: event.coordinates,
     title: event.title
   }
-  const mapDetails: OpenInMapsOptions = {
+  const mapDetails: OpenInMapsRequest = {
     coordinates: event.coordinates,
     placemark: event.placemark
   }

@@ -7,7 +7,7 @@ import {
   Placemark,
   placemarkToFormattedAddress
 } from "@lib/location"
-import { OpenInMapsOptions, openInMapWithDirections } from "@lib/OpenInMaps"
+import { OpenInMapsRequest, openInMapWithDirections } from "@lib/OpenInMaps"
 import { Ionicon } from "@components/common/Icons"
 import { showToast } from "@components/common/Toasts"
 import { Divider } from "react-native-elements"
@@ -25,7 +25,7 @@ const LocationSection = ({
 }: LocationSectionProps) => {
   const [dividerWidth, setDividerWidth] = useState(0)
 
-  const mapDetails: OpenInMapsOptions = {
+  const mapDetails: OpenInMapsRequest = {
     coordinates,
     placemark
   }
@@ -37,8 +37,8 @@ const LocationSection = ({
     left: 10
   }
 
-  const openMapWithDirections = async () => {
-    await openInMapWithDirections(mapDetails)
+  const openMapWithDirections = () => {
+    openInMapWithDirections(mapDetails)
   }
 
   const copyToClipboard = async () => {
