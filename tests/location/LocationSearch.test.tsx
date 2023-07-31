@@ -6,7 +6,8 @@ import {
   LocationSearchResult,
   mockExpoLocationObject,
   mockLocationCoordinate2D,
-  mockLocationSearchResult
+  mockLocationSearchResult,
+  LocationsSearchQuery
 } from "@lib/location"
 import {
   LocationSearchBar,
@@ -31,6 +32,15 @@ import { fakeTimers } from "../helpers/Timers"
 import { LocationObject } from "expo-location"
 
 describe("LocationSearch tests", () => {
+  describe("LocationsSearchQuery tests", () => {
+    test("query type", () => {
+      expect(new LocationsSearchQuery("").queryType).toEqual("user-recents")
+      expect(new LocationsSearchQuery("New York").queryType).toEqual(
+        "remote-search"
+      )
+    })
+  })
+
   describe("LocationSearchUI tests", () => {
     beforeEach(() => jest.resetAllMocks())
 
