@@ -29,7 +29,7 @@ import {
   pickEventColor,
   toggleShouldHideAfterStartDate
 } from "./helpers"
-import { GeocodingDependencyKeys } from "@hooks/Geocoding"
+import { GeocodingFunctionsProvider } from "@hooks/Geocoding"
 
 const testLocation = { latitude: 45.0, longitude: -121.0 }
 
@@ -180,16 +180,17 @@ const renderEventFormScreen = (
       <TestQueryClientProvider client={queryClient}>
         <UpdateDependencyValues
           update={(values) => {
-            values.set(GeocodingDependencyKeys.reverseGeocode, neverPromise)
             values.set(hapticsDependencyKey, jest.fn())
           }}
         >
-          <EventFormScreen
-            submissionLabel={testSubmissionLabel}
-            initialValues={values}
-            onSubmit={submitAction}
-            onDismiss={dismissAction}
-          />
+          <GeocodingFunctionsProvider reverseGeocode={neverPromise}>
+            <EventFormScreen
+              submissionLabel={testSubmissionLabel}
+              initialValues={values}
+              onSubmit={submitAction}
+              onDismiss={dismissAction}
+            />
+          </GeocodingFunctionsProvider>
         </UpdateDependencyValues>
       </TestQueryClientProvider>
     </NavigationContainer>
