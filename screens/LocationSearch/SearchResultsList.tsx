@@ -22,7 +22,7 @@ export type LocationSearchResultsListProps = {
   query: LocationsSearchQuery
   center?: LocationCoordinate2D
   searchResults: LocationSearchResultsData
-  Header: () => JSX.Element
+  Header: JSX.Element
   SearchResultView?: (props: LocationSearchResultProps) => ReactElement
   style?: StyleProp<ViewStyle>
 }
@@ -53,7 +53,7 @@ export const LocationSearchResultsListView = ({
       )}
       ListHeaderComponent={
         <View style={styles.horizontalPadding}>
-          <Header />
+          {Header}
           <CaptionTitle style={styles.searchResultsTitle}>
             {query.sourceType === "user-recents" ? "Recents" : "Results"}
           </CaptionTitle>

@@ -123,7 +123,7 @@ export const LocationSearchPicker = ({
     query={query}
     searchResults={searchResults}
     center={userLocation?.coords}
-    Header={() => (
+    Header={
       <>
         {userLocation && (
           <TouchableOpacity
@@ -140,7 +140,7 @@ export const LocationSearchPicker = ({
           </TouchableOpacity>
         )}
       </>
-    )}
+    }
     SearchResultView={(props: LocationSearchResultProps) => (
       <TouchableOpacity
         onPress={() => {
