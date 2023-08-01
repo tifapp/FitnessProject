@@ -54,7 +54,7 @@ export const LocationSearchResultsListView = ({
       ListHeaderComponent={
         <View style={styles.horizontalPadding}>
           <Header />
-          <CaptionTitle style={style}>
+          <CaptionTitle style={styles.searchResultsTitle}>
             {query.sourceType === "user-recents" ? "Recents" : "Results"}
           </CaptionTitle>
         </View>
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   },
   searchResultsTitle: {
     opacity: 0.35,
-    marginBottom: 16
+    marginVertical: 16
   },
   skeletonContainer: {
     display: "flex",
