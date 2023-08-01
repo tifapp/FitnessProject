@@ -9,7 +9,7 @@ import "../../helpers/Matchers"
 import { TestQueryClientProvider } from "../../helpers/ReactQuery"
 import { baseTestPlacemark } from "../../location/helpers"
 import { baseTestEventFormValues } from "./helpers"
-import { GeocodingDependencyKeys } from "@hooks/Geocoding"
+import { GeocodingFunctionsProvider } from "@hooks/Geocoding"
 
 const testLocation = baseTestEventFormValues.locationInfo.coordinates
 const testLocationName = baseTestPlacemark.name
@@ -45,10 +45,7 @@ const reverseGeocode = jest.fn()
 const renderLocationField = (locationInfo?: EventFormLocationInfo) => {
   render(
     <TestQueryClientProvider>
-      <SetDependencyValue
-        forKey={GeocodingDependencyKeys.reverseGeocode}
-        value={reverseGeocode}
-      >
+      <GeocodingFunctionsProvider reverseGeocode={reverseGeocode}>
         <EventForm
           initialValues={{
             ...baseTestEventFormValues,
@@ -59,7 +56,7 @@ const renderLocationField = (locationInfo?: EventFormLocationInfo) => {
         >
           <EventFormLocationBanner />
         </EventForm>
-      </SetDependencyValue>
+      </GeocodingFunctionsProvider>
     </TestQueryClientProvider>
   )
 }
