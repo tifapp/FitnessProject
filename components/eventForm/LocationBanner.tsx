@@ -1,5 +1,5 @@
 import { useReverseGeocodeQuery } from "../../hooks/Geocoding"
-import { LocationCoordinate2D, placemarkToFormattedAddress } from "../../lib/location"
+import { placemarkToFormattedAddress } from "../../lib/location"
 import React from "react"
 import { StyleSheet, View } from "react-native"
 import { useEventFormContext } from "./EventForm"
@@ -10,7 +10,6 @@ import {
   EventFormPlacemarkInfo
 } from "./EventFormValues"
 import { MaterialIcon } from "@components/common/Icons"
-import { useQuery } from "react-query"
 
 /**
  * Displays the selected location (if one) in the event form.
