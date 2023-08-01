@@ -27,6 +27,8 @@
   "dependencies": {
     "@alessiocancian/react-native-actionsheet": "^3.2.0",
     "@aws-amplify/api": "^4.0.63",
+    "@aws-amplify/core": "^5.4.0",
+    "@aws-amplify/geo": "^2.0.34",
     "@aws-amplify/notifications": "1.0.12",
     "@aws-sdk/client-lex-runtime-v2": "3.262.0",
     "@aws-sdk/client-location": "3.262.0",
