@@ -78,15 +78,3 @@ export class LocationsSearchQuery {
     return this.rawValue
   }
 }
-
-/**
- * Loads a set of {@link LocationSearchResult}s for the user to pick from based
- * on a query string and a center bias.
- *
- * If the query string is empty, a list of the user's recent locations will be
- * loaded.
- */
-export type LoadLocationSearchResults = (
-  query: LocationsSearchQuery,
-  center?: LocationCoordinate2D
-) => Promise<LocationSearchResult[]>

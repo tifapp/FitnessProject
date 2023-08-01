@@ -1,6 +1,5 @@
 import React, { ReactElement } from "react"
 import { Caption, CaptionTitle } from "@components/Text"
-import { useDependencyValue } from "@lib/dependencies"
 import {
   LocationCoordinate2D,
   LocationSearchResult,
@@ -9,9 +8,6 @@ import {
   milesBetweenLocations
 } from "@lib/location"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { useQuery } from "react-query"
-import { LocationSearchDependencyKeys } from "./Data"
-import { useLocationsSearchQueryObject } from "./state"
 import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view"
 import { SkeletonView } from "@components/common/Skeleton"
 import { Divider } from "react-native-elements"
@@ -20,10 +16,13 @@ import {
   LocationSearchResultProps,
   LocationSearchResultView
 } from "./SearchResultView"
+import { LocationSearchResultsData } from "./models"
 
 export type LocationSearchResultsListProps = {
+  query: LocationsSearchQuery
   center?: LocationCoordinate2D
-  header?: ReactElement
+  searchResults: LocationSearchResultsData
+  Header: () => JSX.Element
   SearchResultView?: (props: LocationSearchResultProps) => ReactElement
   style?: StyleProp<ViewStyle>
 }
@@ -35,13 +34,13 @@ export type LocationSearchResultsListProps = {
  * When the search text is empty, the user's recent locations will be loaded.
  */
 export const LocationSearchResultsListView = ({
+  query,
   center,
-  header,
+  searchResults,
   style,
+  Header,
   SearchResultView = LocationSearchResultView
 }: LocationSearchResultsListProps) => {
-  const query = useLocationsSearchQueryObject()
-  const { status, data } = useLocationSearchResultsQuery(query, center)
   const fontScale = useFontScale()
   return (
     <KeyboardAwareFlatList
@@ -54,7 +53,7 @@ export const LocationSearchResultsListView = ({
       )}
       ListHeaderComponent={
         <View style={styles.horizontalPadding}>
-          <View>{header}</View>
+          <Header />
           <CaptionTitle style={style}>
             {query.sourceType === "user-recents" ? "Recents" : "Results"}
           </CaptionTitle>
@@ -71,10 +70,11 @@ export const LocationSearchResultsListView = ({
           style={styles.horizontalPadding}
         />
       )}
-      data={data ?? []}
+      data={searchResults.data ?? []}
       ListEmptyComponent={
         <EmptyResultsView
-          reason={emptyReasonFromQueryStatus(status)}
+          query={query}
+          reason={searchResults.status}
           style={styles.horizontalPadding}
         />
       }
@@ -86,36 +86,13 @@ const extractKeyFromOption = (option: LocationSearchResult) => {
   return hashLocationCoordinate(option.location.coordinates)
 }
 
-const useLocationSearchResultsQuery = (
-  query: LocationsSearchQuery,
-  center?: LocationCoordinate2D
-) => {
-  const search = useDependencyValue(
-    LocationSearchDependencyKeys.searchForResults
-  )
-  return useQuery(
-    ["search-locations", query, center],
-    async () => await search(query, center)
-  )
-}
-
-type EmptyResultsReason = "no-results" | "error" | "loading"
-
 type EmptyResultsProps = {
-  reason: EmptyResultsReason
+  query: LocationsSearchQuery
+  reason: LocationSearchResultsData["status"]
   style?: StyleProp<ViewStyle>
 }
 
-const emptyReasonFromQueryStatus = (
-  status: "idle" | "success" | "loading" | "error"
-): EmptyResultsReason => {
-  if (status === "success" || status === "idle") return "no-results"
-  if (status === "loading") return "loading"
-  return "error"
-}
-
-const EmptyResultsView = ({ reason, style }: EmptyResultsProps) => {
-  const query = useLocationsSearchQueryObject()
+const EmptyResultsView = ({ query, reason, style }: EmptyResultsProps) => {
   const noResultsText =
     query.sourceType === "user-recents"
       ? "No recent locations. Locations of events that you host and attend will appear here."

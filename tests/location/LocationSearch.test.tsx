@@ -1,5 +1,4 @@
 import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
-import { UpdateDependencyValues } from "@lib/dependencies"
 import {
   TiFLocation,
   LocationSearchResult,
@@ -9,9 +8,10 @@ import {
 } from "@lib/location"
 import {
   LocationSearchBar,
-  LocationSearchDependencyKeys,
   LocationSearchPicker,
-  LocationSearchResultView
+  LocationSearchResultProps,
+  LocationSearchResultView,
+  useLocationSearchPicker
 } from "@screens/LocationSearch"
 import {
   act,
@@ -29,6 +29,8 @@ import { fakeTimers } from "../helpers/Timers"
 import { LocationObject } from "expo-location"
 
 describe("LocationSearch tests", () => {
+  beforeEach(() => jest.resetAllMocks())
+
   describe("LocationsSearchQuery tests", () => {
     test("sourceType", () => {
       expect(LocationsSearchQuery.empty.sourceType).toEqual("user-recents")
@@ -120,6 +122,7 @@ describe("LocationSearch tests", () => {
       it("can select the user's coordinates when user coordinates available", async () => {
         const userLocation = mockExpoLocationObject()
         queryUserCoordinates.mockResolvedValue(userLocation)
+        searchForLocations.mockImplementation(neverPromise)
         renderPicker()
 
         await selectUserLocation()
@@ -133,7 +136,7 @@ describe("LocationSearch tests", () => {
 
         await selectLocationWithName(searchResult.location.placemark.name!)
         expect(selectedLocation).toMatchObject(searchResult.location)
-        expect(saveSelection).toHaveBeenCalledWith(searchResult.location)
+        expect(savedLocation).toMatchObject(searchResult.location)
       })
 
       it("should indicate an error when loading options fails", async () => {
@@ -229,12 +232,12 @@ describe("LocationSearch tests", () => {
         })
       })
 
-      const searchForLocations = jest.fn().mockImplementation(neverPromise)
-      const queryUserCoordinates = jest.fn().mockImplementation(neverPromise)
-      const saveSelection = jest.fn()
+      const searchForLocations = jest.fn()
+      const queryUserCoordinates = jest.fn()
 
       let selectedUserLocationObject: LocationObject
       let selectedLocation: TiFLocation
+      let savedLocation: TiFLocation
 
       const waitForCurrentLocationOptionToLoad = async () => {
         expect(await userLocationOptionLabel()).toBeDisplayed()
@@ -296,49 +299,45 @@ describe("LocationSearch tests", () => {
         return `${name} | ${Math.trunc(distance ?? 0.0)}`
       }
 
+      const TestView = () => {
+        const picker = useLocationSearchPicker({
+          loadSearchResults: searchForLocations
+        })
+        return (
+          <LocationSearchPicker
+            {...picker}
+            savePickedLocation={(location) => (savedLocation = location)}
+            onUserLocationSelected={(coordinates) => {
+              selectedUserLocationObject = coordinates
+            }}
+            onLocationSelected={(location) => (selectedLocation = location)}
+            SearchResultView={(props: LocationSearchResultProps) => (
+              <View
+                testID={searchResultTestId(
+                  props.result.location.placemark.name!,
+                  props.distanceMiles
+                )}
+              >
+                <LocationSearchResultView {...props} />
+              </View>
+            )}
+          />
+        )
+      }
+
       const renderPicker = () => {
         return render(
           <TestQueryClientProvider>
-            <UpdateDependencyValues
-              update={(values) => {
-                values.set(
-                  LocationSearchDependencyKeys.searchForResults,
-                  searchForLocations
-                )
-                values.set(
-                  LocationSearchDependencyKeys.savePickerSelection,
-                  saveSelection
-                )
-              }}
+            <UserLocationFunctionsProvider
+              getCurrentLocation={queryUserCoordinates}
+              requestForegroundPermissions={jest.fn()}
             >
-              <UserLocationFunctionsProvider
-                getCurrentLocation={queryUserCoordinates}
-                requestForegroundPermissions={jest.fn()}
-              >
-                <LocationSearchBar
-                  onBackTapped={jest.fn()}
-                  placeholder={searchBarPlaceholder}
-                />
-                <LocationSearchPicker
-                  onUserLocationSelected={(coordinates) => {
-                    selectedUserLocationObject = coordinates
-                  }}
-                  onLocationSelected={(location) =>
-                    (selectedLocation = location)
-                  }
-                  SearchResultView={(props) => (
-                    <View
-                      testID={searchResultTestId(
-                        props.result.location.placemark.name!,
-                        props.distanceMiles
-                      )}
-                    >
-                      <LocationSearchResultView {...props} />
-                    </View>
-                  )}
-                />
-              </UserLocationFunctionsProvider>
-            </UpdateDependencyValues>
+              <LocationSearchBar
+                onBackTapped={jest.fn()}
+                placeholder={searchBarPlaceholder}
+              />
+              <TestView />
+            </UserLocationFunctionsProvider>
           </TestQueryClientProvider>
         )
       }
