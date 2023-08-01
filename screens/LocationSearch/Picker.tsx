@@ -13,12 +13,16 @@ import { Ionicon } from "@components/common/Icons"
 import { Headline } from "@components/Text"
 import { useDependencyValue } from "@lib/dependencies"
 import { LocationSearchDependencyKeys } from "./Data"
-import { LocationSearchResultView } from "./SearchResultView"
+import {
+  LocationSearchResultProps,
+  LocationSearchResultView
+} from "./SearchResultView"
 import { LocationAccuracy, LocationObject } from "expo-location"
 
 export type LocationSearchPickerProps = {
   onUserLocationSelected: (location: LocationObject) => void
   onLocationSelected: (selection: TiFLocation) => void
+  SearchResultView?: (props: LocationSearchResultProps) => JSX.Element
   style?: StyleProp<ViewStyle>
 }
 
@@ -35,6 +39,7 @@ export type LocationSearchPickerProps = {
 export const LocationSearchPicker = ({
   onUserLocationSelected,
   onLocationSelected,
+  SearchResultView = LocationSearchResultView,
   style
 }: LocationSearchPickerProps) => {
   const { data } = useUserCoordinatesQuery({ accuracy: LocationAccuracy.Low })
@@ -63,17 +68,14 @@ export const LocationSearchPicker = ({
           )}
         </>
       }
-      renderSearchResult={(option, milesFromCenter) => (
+      SearchResultView={(props: LocationSearchResultProps) => (
         <TouchableOpacity
           onPress={() => {
-            onLocationSelected(option.location)
-            saveSelection(option.location)
+            onLocationSelected(props.result.location)
+            saveSelection(props.result.location)
           }}
         >
-          <LocationSearchResultView
-            result={option}
-            distanceMiles={milesFromCenter}
-          />
+          {<SearchResultView {...props} />}
         </TouchableOpacity>
       )}
     />

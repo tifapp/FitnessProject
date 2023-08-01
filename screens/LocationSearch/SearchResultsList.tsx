@@ -8,23 +8,23 @@ import {
   hashLocationCoordinate,
   milesBetweenLocations
 } from "@lib/location"
-import { useAtomValue } from "jotai"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { useQuery } from "react-query"
 import { LocationSearchDependencyKeys } from "./Data"
-import { searchTextAtoms, useLocationsSearchQueryObject } from "./state"
+import { useLocationsSearchQueryObject } from "./state"
 import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view"
 import { SkeletonView } from "@components/common/Skeleton"
 import { Divider } from "react-native-elements"
 import { useFontScale } from "@hooks/Fonts"
+import {
+  LocationSearchResultProps,
+  LocationSearchResultView
+} from "./SearchResultView"
 
 export type LocationSearchResultsListProps = {
   center?: LocationCoordinate2D
   header?: ReactElement
-  renderSearchResult: (
-    result: LocationSearchResult,
-    milesFromCenter?: number
-  ) => ReactElement
+  SearchResultView?: (props: LocationSearchResultProps) => ReactElement
   style?: StyleProp<ViewStyle>
 }
 
@@ -38,7 +38,7 @@ export const LocationSearchResultsListView = ({
   center,
   header,
   style,
-  renderSearchResult
+  SearchResultView = LocationSearchResultView
 }: LocationSearchResultsListProps) => {
   const query = useLocationsSearchQueryObject()
   const { status, data } = useLocationSearchResultsQuery(query, center)
@@ -61,14 +61,15 @@ export const LocationSearchResultsListView = ({
         </View>
       }
       renderItem={({ item }) => (
-        <View style={styles.horizontalPadding}>
-          {renderSearchResult(
-            item,
+        <SearchResultView
+          result={item}
+          distanceMiles={
             center
               ? milesBetweenLocations(center, item.location.coordinates)
               : undefined
-          )}
-        </View>
+          }
+          style={styles.horizontalPadding}
+        />
       )}
       data={data ?? []}
       ListEmptyComponent={

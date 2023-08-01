@@ -55,6 +55,11 @@ export type LocationsSearchSourceType = "user-recents" | "remote-search"
  * A rich query type that carries user-entered text for searching locations.
  */
 export class LocationsSearchQuery {
+  /**
+   * A {@link LocationsSearchQuery} that is initialized with an empty string.
+   */
+  static empty = new LocationsSearchQuery("")
+
   private readonly rawValue: string
 
   constructor (rawValue: string) {
