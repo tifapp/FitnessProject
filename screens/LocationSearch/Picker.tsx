@@ -14,7 +14,6 @@ import {
   ViewStyle
 } from "react-native"
 import Animated, { FadeIn } from "react-native-reanimated"
-import { Ionicon } from "@components/common/Icons"
 import { Headline } from "@components/Text"
 import {
   LocationSearchResultProps,
@@ -24,6 +23,8 @@ import { LocationAccuracy, LocationObject } from "expo-location"
 import { useLocationsSearchQueryObject } from "./state"
 import { UseQueryResult, useQuery } from "react-query"
 import { LocationSearchResultsData } from "./models"
+import { LocationSearchIconView } from "./Icon"
+import { AppStyles } from "@lib/AppColorStyle"
 
 export type UseLocationSearchPickerEnvironment = {
   loadSearchResults: (
@@ -96,6 +97,7 @@ export type LocationSearchPickerProps = {
   onLocationSelected: (selection: TiFLocation) => void
   SearchResultView?: (props: LocationSearchResultProps) => JSX.Element
   style?: StyleProp<ViewStyle>
+  contentContainerStyle?: StyleProp<ViewStyle>
 }
 
 /**
@@ -116,10 +118,12 @@ export const LocationSearchPicker = ({
   onUserLocationSelected,
   onLocationSelected,
   SearchResultView = LocationSearchResultView,
-  style
+  style,
+  contentContainerStyle
 }: LocationSearchPickerProps) => (
   <LocationSearchResultsListView
     style={style}
+    contentContainerStyle={contentContainerStyle}
     query={query}
     searchResults={searchResults}
     center={userLocation?.coords}
@@ -127,14 +131,18 @@ export const LocationSearchPicker = ({
       <>
         {userLocation && (
           <TouchableOpacity
-            style={style}
             onPress={() => onUserLocationSelected(userLocation)}
           >
             <Animated.View
               entering={FadeIn}
               style={styles.userCoordinatesOption}
             >
-              <Ionicon name="navigate" style={styles.userCoordinatesIcon} />
+              <LocationSearchIconView
+                backgroundColor={AppStyles.linkColor}
+                name="navigate"
+                accessible={false}
+                style={styles.userCoordinatesIcon}
+              />
               <Headline>Use current location</Headline>
             </Animated.View>
           </TouchableOpacity>
@@ -160,7 +168,8 @@ const styles = StyleSheet.create({
   },
   userCoordinatesOption: {
     display: "flex",
-    flexDirection: "row"
+    flexDirection: "row",
+    alignItems: "center"
   },
   userCoordinatesIcon: {
     marginRight: 8

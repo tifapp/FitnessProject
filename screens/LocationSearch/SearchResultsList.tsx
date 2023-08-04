@@ -25,6 +25,7 @@ export type LocationSearchResultsListProps = {
   Header: JSX.Element
   SearchResultView?: (props: LocationSearchResultProps) => ReactElement
   style?: StyleProp<ViewStyle>
+  contentContainerStyle?: StyleProp<ViewStyle>
 }
 
 /**
@@ -38,6 +39,7 @@ export const LocationSearchResultsListView = ({
   center,
   searchResults,
   style,
+  contentContainerStyle,
   Header,
   SearchResultView = LocationSearchResultView
 }: LocationSearchResultsListProps) => {
@@ -45,7 +47,8 @@ export const LocationSearchResultsListView = ({
   return (
     <KeyboardAwareFlatList
       style={style}
-      keyExtractor={extractKeyFromOption}
+      contentContainerStyle={contentContainerStyle}
+      keyExtractor={keyExtractor}
       ItemSeparatorComponent={() => (
         <View style={styles.separator}>
           <Divider style={{ ...styles.divider, marginLeft: 48 * fontScale }} />
@@ -82,8 +85,8 @@ export const LocationSearchResultsListView = ({
   )
 }
 
-const extractKeyFromOption = (option: LocationSearchResult) => {
-  return hashLocationCoordinate(option.location.coordinates)
+const keyExtractor = (result: LocationSearchResult) => {
+  return hashLocationCoordinate(result.location.coordinates)
 }
 
 type EmptyResultsProps = {

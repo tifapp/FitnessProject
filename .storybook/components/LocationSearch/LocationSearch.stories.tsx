@@ -1,8 +1,9 @@
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
+import { ArrayUtils } from "@lib/Array"
 import { delayData } from "@lib/DelayData"
-import { mockLocationSearchResult } from "@lib/location"
+import { LocationSearchResult, mockLocationSearchResult } from "@lib/location"
 import { NavigationContainer, useNavigation } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import {
@@ -36,21 +37,15 @@ export const Basic: LocationSearchStory = () => (
       requestForegroundPermissions={requestForegroundPermissionsAsync}
     >
       <NavigationContainer>
-        <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
+        <Stack.Navigator
+          screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
+          headerMode="screen"
+        >
           <Stack.Screen name="settings" component={TestScreen} />
           <Stack.Screen
             name="search"
             options={{
-              header: ({ navigation }) => {
-                const insets = useSafeAreaInsets()
-                return (
-                  <LocationSearchBar
-                    placeholder="Search for locations..."
-                    onBackTapped={navigation.goBack}
-                    style={{ marginTop: insets.top, marginHorizontal: 16 }}
-                  />
-                )
-              }
+              header: () => <LocationSearchHeader />
             }}
             component={LocationSearchScreen}
           />
@@ -60,15 +55,23 @@ export const Basic: LocationSearchStory = () => (
   </TiFQueryClientProvider>
 )
 
+const LocationSearchHeader = () => {
+  const insets = useSafeAreaInsets()
+  const navigation = useNavigation()
+  return (
+    <LocationSearchBar
+      placeholder="Search for locations..."
+      onBackTapped={navigation.goBack}
+      style={{ marginTop: insets.top, marginHorizontal: 16 }}
+    />
+  )
+}
+
 const LocationSearchScreen = () => {
   const picker = useLocationSearchPicker({
     loadSearchResults: async () => {
       return await delayData(
-        [
-          mockLocationSearchResult(),
-          mockLocationSearchResult(),
-          mockLocationSearchResult()
-        ],
+        ArrayUtils.repeatElements(15, () => mockLocationSearchResult()),
         3000
       )
     }
@@ -79,7 +82,7 @@ const LocationSearchScreen = () => {
       savePickedLocation={(location) => console.log("Saved", location)}
       onUserLocationSelected={console.log}
       onLocationSelected={console.log}
-      style={{ marginTop: 16 }}
+      contentContainerStyle={{ paddingVertical: 16 }}
     />
   )
 }
