@@ -21,11 +21,12 @@ export class TestFilesystem implements Filesystem {
   private constructor () {}
 
   async appendString (filepath: string, data: string) {
-    const dirname = path.dirname(TEST_DIRECTORY + filepath)
+    const testFilepath = TEST_DIRECTORY + filepath
+    const dirname = path.dirname(testFilepath)
     if (!fs.existsSync(dirname)) {
       fs.mkdirSync(dirname, { recursive: true })
     }
-    fs.appendFileSync(TEST_DIRECTORY + filepath, data)
+    fs.appendFileSync(testFilepath, data)
   }
 
   /**
@@ -37,6 +38,10 @@ export class TestFilesystem implements Filesystem {
     } catch {
       return undefined
     }
+  }
+
+  async listDirectory (directoryPath: string) {
+    return fs.readdirSync(TEST_DIRECTORY + directoryPath)
   }
 
   private setup () {

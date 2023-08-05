@@ -1,4 +1,6 @@
+import { ArrayUtils } from "./Array"
 import { Filesystem } from "./Filesystem"
+import { diffDates } from "./date"
 
 export type LogLevel = "debug" | "info" | "error"
 
@@ -9,13 +11,19 @@ export type LogHandler = (
   metadata?: object
 ) => Promise<void>
 
-let logHandlers = [] as LogHandler[]
+const consoleLogHandler = (): LogHandler => {
+  return async (label, level, message, metadata) => {
+    console[level](formatLogMessage(label, level, message, metadata))
+  }
+}
+
+let logHandlers = [consoleLogHandler()] as LogHandler[]
 
 export const createLogFunction = (label: string) => {
-  return (level: LogLevel, message: string, metadata?: object) => {
-    for (const handler of logHandlers) {
-      handler(label, level, message, metadata)
-    }
+  return async (level: LogLevel, message: string, metadata?: object) => {
+    await Promise.allSettled(
+      logHandlers.map((handler) => handler(label, level, message, metadata))
+    )
   }
 }
 
@@ -24,29 +32,89 @@ export const addLogHandler = (handler: LogHandler) => {
 }
 
 export const resetLogHandlers = () => {
-  logHandlers = []
+  logHandlers = [consoleLogHandler()]
 }
 
 export const rotatingLogFileHandler = (
   directoryPath: string,
   fs: Filesystem
 ): LogHandler => {
-  const currentDate = new Date()
-  const logFilename = logFileNameForDate(directoryPath, currentDate)
-
+  let writingLogFilename: LogFilename
   return async (label, level, message, metadata) => {
     if (level === "debug") return
-    const currentDate = new Date()
-    const stringifiedMetadata = JSON.stringify(metadata)
+
+    const logFilename =
+      writingLogFilename ??
+      (await LogFilename.currentInDirectory(directoryPath, fs))
+    writingLogFilename = logFilename
     await fs.appendString(
-      logFilename,
-      `${currentDate.toISOString()} [${label}] (${level.toUpperCase()}) ${message}${
-        stringifiedMetadata ? " " + stringifiedMetadata : ""
-      }\n`
+      logFilename.pathInDirectory(directoryPath),
+      formatLogMessage(label, level, message, metadata)
     )
   }
 }
 
-const logFileNameForDate = (directoryPath: string, date: Date) => {
-  return `${directoryPath}/${date.toISOString()}.log`
+class LogFilename {
+  private readonly date: Date
+
+  private constructor (rawValue: Date) {
+    this.date = rawValue
+  }
+
+  pathInDirectory (directoryPath: string): string {
+    return `${directoryPath}/${this.date.toISOString()}.log`
+  }
+
+  static async currentInDirectory (path: string, fs: Filesystem) {
+    const currentLogFiles = await LogFilename.namesFromDirectory(path, fs)
+    const currentDateLogfile = LogFilename.fromCurrentDate()
+
+    if (currentLogFiles.length === 0) return currentDateLogfile
+    if (diffDates(currentDateLogfile.date, currentLogFiles[0].date).weeks > 2) {
+      return currentDateLogfile
+    }
+    return currentLogFiles[0]
+  }
+
+  private static async namesFromDirectory (
+    directoryPath: string,
+    fs: Filesystem
+  ): Promise<LogFilename[]> {
+    return await fs
+      .listDirectory(directoryPath)
+      .then((contents) =>
+        ArrayUtils.compactMap(contents, (content) => {
+          return LogFilename.fromPathString(content)
+        })
+      )
+      .catch(() => [])
+  }
+
+  private static fromCurrentDate () {
+    return new LogFilename(new Date())
+  }
+
+  private static fromPathString (pathString: string) {
+    const pathSplits = pathString.split("/")
+    const filenameSplits = pathSplits[pathSplits.length - 1].split(".")
+    const fileDateString = `${filenameSplits[0]}.${filenameSplits[1]}`
+    const parsedDate = new Date(fileDateString)
+    if (!Number.isNaN(parsedDate.valueOf())) {
+      return new LogFilename(parsedDate)
+    }
+    return undefined
+  }
+}
+
+const formatLogMessage = (
+  label: string,
+  level: LogLevel,
+  message: string,
+  metadata?: object
+) => {
+  const currentDate = new Date()
+  const stringifiedMetadata = JSON.stringify(metadata)
+  return `${currentDate.toISOString()} [${label}] (${level.toUpperCase()}) ${message}${
+    stringifiedMetadata ? " " + stringifiedMetadata : ""
+  }\n`
 }
