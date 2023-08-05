@@ -28,14 +28,14 @@ import VerifyContact from "@components/loginComponents/VerifyContact"
 import awsconfig from "./src/aws-exports"
 Geo.configure(awsconfig)
 Auth.configure(awsconfig)
-Geo.searchByText("Amazon Go Store")
-  .then((res) => console.log(JSON.stringify(res)))
-  .finally(() => {
-    ;(async () => {
-      const a = await Auth.currentUserCredentials()
-      console.log(a)
-    })()
-  })
+// Geo.searchByText("Amazon Go Store")
+//   .then((res) => console.log(JSON.stringify(res)))
+//   .finally(() => {
+//     ;(async () => {
+//       const a = await Auth.currentUserCredentials()
+//       console.log(a)
+//     })()
+//   })
 
 const Stack = createStackNavigator()
 
