@@ -169,11 +169,15 @@ export const sentryBreadcrumbLogHandler = (
 ): LogHandler => {
   return async (label, level, message, metadata) => {
     if (level === "debug") return
-    handleBreadcrumb({ message, level, ...getSentryMetadata(label, metadata) })
+    handleBreadcrumb({
+      message,
+      level,
+      ...getSentryBreadcrumbMetadata(label, metadata)
+    })
   }
 }
 
-const getSentryMetadata = (label: string, metadata?: object) => {
+const getSentryBreadcrumbMetadata = (label: string, metadata?: object) => {
   if (!metadata) return { category: undefined, data: { label } }
   const sentryData = { label, ...metadata }
   const category =
@@ -185,6 +189,23 @@ const getSentryMetadata = (label: string, metadata?: object) => {
     delete sentryData.category
   }
   return { category, data: sentryData }
+}
+
+/**
+ * A `LogHandler` which captures errors to sentry.
+ *
+ * The error must be assigned to the `error` field and must be an instance of subclass of {@link Error}.
+ */
+export const sentryErrorCapturingLogHandler = (
+  captureError: (error: Error) => void = SentryNative.captureException
+): LogHandler => {
+  // NB: We don't need to care about the label of message since those are handled by the breadcrumb handler
+  return async (_, level, __, metadata) => {
+    if (level !== "error" || !metadata) return
+    if ("error" in metadata && metadata.error instanceof Error) {
+      captureError(metadata.error)
+    }
+  }
 }
 
 const formatLogMessage = (

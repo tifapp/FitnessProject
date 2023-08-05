@@ -3,7 +3,8 @@ import {
   createLogFunction,
   resetLogHandlers,
   rotatingLogFileHandler,
-  sentryBreadcrumbLogHandler
+  sentryBreadcrumbLogHandler,
+  sentryErrorCapturingLogHandler
 } from "@lib/Logging"
 import { TestFilesystem } from "./helpers/Filesystem"
 import { fakeTimers } from "./helpers/Timers"
@@ -208,6 +209,48 @@ describe("Logging tests", () => {
         category: "Test Category",
         data: { key: "value", label }
       })
+    })
+  })
+
+  describe("SentryErrorLogHandler tests", () => {
+    const log = createLogFunction("sentry.error.test")
+
+    it("should ignore INFO and DEBUG logs", async () => {
+      const captureError = jest.fn()
+      addLogHandler(sentryErrorCapturingLogHandler(captureError))
+
+      await log("debug", "hello", { error: new Error() })
+      await log("info", "hello", { error: new Error() })
+
+      expect(captureError).not.toHaveBeenCalled()
+    })
+
+    it("should ignore logs with no error field in metadata", async () => {
+      const captureError = jest.fn()
+      addLogHandler(sentryErrorCapturingLogHandler(captureError))
+
+      await log("error", "hello", { key: "value" })
+
+      expect(captureError).not.toHaveBeenCalled()
+    })
+
+    it("should ignore logs with error field that's not of type Error in metadata", async () => {
+      const captureError = jest.fn()
+      addLogHandler(sentryErrorCapturingLogHandler(captureError))
+
+      await log("error", "hello", { error: "value" })
+
+      expect(captureError).not.toHaveBeenCalled()
+    })
+
+    it("should log the error in metadata", async () => {
+      const captureError = jest.fn()
+      addLogHandler(sentryErrorCapturingLogHandler(captureError))
+
+      const error = new Error("Some error")
+      await log("error", "hello", { error })
+
+      expect(captureError).toHaveBeenCalledWith(error)
     })
   })
 })
