@@ -2,7 +2,8 @@ import {
   addLogHandler,
   createLogFunction,
   resetLogHandlers,
-  rotatingLogFileHandler
+  rotatingLogFileHandler,
+  sentryBreadcrumbLogHandler
 } from "@lib/Logging"
 import { TestFilesystem } from "./helpers/Filesystem"
 import { fakeTimers } from "./helpers/Timers"
@@ -150,6 +151,20 @@ describe("Logging tests", () => {
       expect(file5Logs).toEqual(
         "2023-03-12T00:00:00.000Z [rotating.test] (INFO) Test message 6\n"
       )
+    })
+  })
+
+  describe("SentryBreadcrumbsLogHandler tests", () => {
+    const log = createLogFunction("sentry.breadcrumbs.test")
+
+    it("should ignore DEBUG and ERROR logs", async () => {
+      const handleBreadcrumb = jest.fn()
+      addLogHandler(sentryBreadcrumbLogHandler(handleBreadcrumb))
+
+      await log("debug", "iodjkhfcids")
+      await log("error", "djnsikd")
+
+      expect(handleBreadcrumb).not.toHaveBeenCalled()
     })
   })
 })

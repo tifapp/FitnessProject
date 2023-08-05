@@ -1,6 +1,7 @@
 import { ArrayUtils } from "./Array"
 import { Filesystem } from "./Filesystem"
 import { diffDates } from "./date"
+import { Native as SentryNative } from "sentry-expo"
 
 /**
  * A level to be used when logging.
@@ -156,6 +157,14 @@ class LogFilename {
     }
     return undefined
   }
+}
+
+export const sentryBreadcrumbLogHandler = (
+  handleBreadcrumb: (
+    breadcrumb: SentryNative.Breadcrumb
+  ) => void = SentryNative.addBreadcrumb
+): LogHandler => {
+  return async (label, level, message, metadata) => {}
 }
 
 const formatLogMessage = (
