@@ -1,5 +1,10 @@
 import React from "react"
-import { TiFLocation } from "@lib/location"
+import {
+  LocationCoordinate2D,
+  LocationSearchResult,
+  LocationsSearchQuery,
+  TiFLocation
+} from "@lib/location"
 import { useUserCoordinatesQuery } from "@hooks/UserLocation"
 import { LocationSearchResultsListView } from "./SearchResultsList"
 import {
@@ -9,17 +14,90 @@ import {
   ViewStyle
 } from "react-native"
 import Animated, { FadeIn } from "react-native-reanimated"
-import { Ionicon } from "@components/common/Icons"
 import { Headline } from "@components/Text"
-import { useDependencyValue } from "@lib/dependencies"
-import { LocationSearchDependencyKeys } from "./Data"
-import { LocationSearchResultView } from "./SearchResultView"
+import {
+  LocationSearchResultProps,
+  LocationSearchResultView
+} from "./SearchResultView"
 import { LocationAccuracy, LocationObject } from "expo-location"
+import { useLocationsSearchQueryObject } from "./state"
+import { UseQueryResult, useQuery } from "react-query"
+import { LocationSearchResultsData } from "./models"
+import { LocationSearchIconView } from "./Icon"
+import { AppStyles } from "@lib/AppColorStyle"
+
+export type UseLocationSearchPickerEnvironment = {
+  loadSearchResults: (
+    query: LocationsSearchQuery,
+    center?: LocationCoordinate2D
+  ) => Promise<LocationSearchResult[]>
+}
+
+/**
+ * A hook to provide data to the location search picker.
+ */
+export const useLocationSearchPicker = ({
+  loadSearchResults
+}: UseLocationSearchPickerEnvironment) => {
+  const query = useLocationsSearchQueryObject()
+  const userLocation = useLocationSearchCenter()
+  const queryResult = useLocationSearchResultsQuery(
+    query,
+    userLocation?.coords,
+    loadSearchResults
+  )
+  return {
+    userLocation,
+    query,
+    searchResults: queryResultToDataResult(queryResult)
+  }
+}
+
+const queryResultToDataResult = ({
+  status,
+  data
+}: UseQueryResult<
+  LocationSearchResult[],
+  unknown
+>): LocationSearchResultsData => {
+  if (status === "success" && data.length === 0) {
+    return { status: "no-results", data: [] }
+  } else if (status === "success") {
+    return { status, data }
+  } else if (status === "loading" || status === "idle") {
+    return { status: "loading", data: undefined }
+  }
+  return { status: "error", data: undefined }
+}
+
+const useLocationSearchResultsQuery = (
+  query: LocationsSearchQuery,
+  center: LocationCoordinate2D | undefined,
+  loadSearchResults: (
+    query: LocationsSearchQuery,
+    center?: LocationCoordinate2D
+  ) => Promise<LocationSearchResult[]>
+) => {
+  return useQuery(
+    ["search-locations", query, center],
+    async () => await loadSearchResults(query, center)
+  )
+}
+
+const useLocationSearchCenter = () => {
+  return useUserCoordinatesQuery({ accuracy: LocationAccuracy.Low }).data
+}
 
 export type LocationSearchPickerProps = {
+  query: LocationsSearchQuery
+  userLocation?: LocationObject
+  searchResults: LocationSearchResultsData
+  savePickedLocation: (result: TiFLocation) => void
   onUserLocationSelected: (location: LocationObject) => void
   onLocationSelected: (selection: TiFLocation) => void
+  SearchResultView?: (props: LocationSearchResultProps) => JSX.Element
   style?: StyleProp<ViewStyle>
+  contentContainerStyle?: StyleProp<ViewStyle>
 }
 
 /**
@@ -33,52 +111,56 @@ export type LocationSearchPickerProps = {
  * user's recent locations.
  */
 export const LocationSearchPicker = ({
+  query,
+  searchResults,
+  userLocation,
+  savePickedLocation,
   onUserLocationSelected,
   onLocationSelected,
-  style
-}: LocationSearchPickerProps) => {
-  const { data } = useUserCoordinatesQuery({ accuracy: LocationAccuracy.Low })
-  const saveSelection = useDependencyValue(
-    LocationSearchDependencyKeys.savePickerSelection
-  )
-  return (
-    <LocationSearchResultsListView
-      style={style}
-      center={data?.coords}
-      header={
-        <>
-          {!!data && (
-            <TouchableOpacity
-              style={style}
-              onPress={() => onUserLocationSelected(data)}
+  SearchResultView = LocationSearchResultView,
+  style,
+  contentContainerStyle
+}: LocationSearchPickerProps) => (
+  <LocationSearchResultsListView
+    style={style}
+    contentContainerStyle={contentContainerStyle}
+    query={query}
+    searchResults={searchResults}
+    center={userLocation?.coords}
+    Header={
+      <>
+        {userLocation && (
+          <TouchableOpacity
+            onPress={() => onUserLocationSelected(userLocation)}
+          >
+            <Animated.View
+              entering={FadeIn}
+              style={styles.userCoordinatesOption}
             >
-              <Animated.View
-                entering={FadeIn}
-                style={styles.userCoordinatesOption}
-              >
-                <Ionicon name="navigate" style={styles.userCoordinatesIcon} />
-                <Headline>Use current location</Headline>
-              </Animated.View>
-            </TouchableOpacity>
-          )}
-        </>
-      }
-      renderSearchResult={(option, milesFromCenter) => (
-        <TouchableOpacity
-          onPress={() => {
-            onLocationSelected(option.location)
-            saveSelection(option.location)
-          }}
-        >
-          <LocationSearchResultView
-            result={option}
-            distanceMiles={milesFromCenter}
-          />
-        </TouchableOpacity>
-      )}
-    />
-  )
-}
+              <LocationSearchIconView
+                backgroundColor={AppStyles.linkColor}
+                name="navigate"
+                accessible={false}
+                style={styles.userCoordinatesIcon}
+              />
+              <Headline>Use current location</Headline>
+            </Animated.View>
+          </TouchableOpacity>
+        )}
+      </>
+    }
+    SearchResultView={(props: LocationSearchResultProps) => (
+      <TouchableOpacity
+        onPress={() => {
+          onLocationSelected(props.result.location)
+          savePickedLocation(props.result.location)
+        }}
+      >
+        {<SearchResultView {...props} />}
+      </TouchableOpacity>
+    )}
+  />
+)
 
 const styles = StyleSheet.create({
   header: {
@@ -86,7 +168,8 @@ const styles = StyleSheet.create({
   },
   userCoordinatesOption: {
     display: "flex",
-    flexDirection: "row"
+    flexDirection: "row",
+    alignItems: "center"
   },
   userCoordinatesIcon: {
     marginRight: 8

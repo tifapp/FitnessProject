@@ -52,33 +52,33 @@ export type PlayHaptics = (event: HapticEvent) => Promise<void>
  */
 export const expoPlayHaptics = async (event: HapticEvent) => {
   switch (event) {
-    case HapticEvent.SelectionChanged:
-      await ExpoHaptics.selectionAsync()
-      break
-    case HapticEvent.Success:
-      await ExpoHaptics.notificationAsync(
-        ExpoHaptics.NotificationFeedbackType.Success
-      )
-      break
-    case HapticEvent.Warning:
-      await ExpoHaptics.notificationAsync(
-        ExpoHaptics.NotificationFeedbackType.Warning
-      )
-      break
-    case HapticEvent.Error:
-      await ExpoHaptics.notificationAsync(
-        ExpoHaptics.NotificationFeedbackType.Error
-      )
-      break
-    case HapticEvent.LightTap:
-      await ExpoHaptics.impactAsync(ExpoHaptics.ImpactFeedbackStyle.Light)
-      break
-    case HapticEvent.MediumTap:
-      await ExpoHaptics.impactAsync(ExpoHaptics.ImpactFeedbackStyle.Medium)
-      break
-    case HapticEvent.HeavyTap:
-      await ExpoHaptics.impactAsync(ExpoHaptics.ImpactFeedbackStyle.Heavy)
-      break
+  case HapticEvent.SelectionChanged:
+    await ExpoHaptics.selectionAsync()
+    break
+  case HapticEvent.Success:
+    await ExpoHaptics.notificationAsync(
+      ExpoHaptics.NotificationFeedbackType.Success
+    )
+    break
+  case HapticEvent.Warning:
+    await ExpoHaptics.notificationAsync(
+      ExpoHaptics.NotificationFeedbackType.Warning
+    )
+    break
+  case HapticEvent.Error:
+    await ExpoHaptics.notificationAsync(
+      ExpoHaptics.NotificationFeedbackType.Error
+    )
+    break
+  case HapticEvent.LightTap:
+    await ExpoHaptics.impactAsync(ExpoHaptics.ImpactFeedbackStyle.Light)
+    break
+  case HapticEvent.MediumTap:
+    await ExpoHaptics.impactAsync(ExpoHaptics.ImpactFeedbackStyle.Medium)
+    break
+  case HapticEvent.HeavyTap:
+    await ExpoHaptics.impactAsync(ExpoHaptics.ImpactFeedbackStyle.Heavy)
+    break
   }
 }
 

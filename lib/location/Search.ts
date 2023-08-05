@@ -46,13 +46,35 @@ export const mockLocationSearchResult = (
 }
 
 /**
- * Loads a set of {@link LocationSearchResult}s for the user to pick from based
- * on a query string and a center bias.
- *
- * If the query string is empty, a list of the user's recent locations will be
- * loaded.
+ * A type that denotes whether searching for locations should utilize the user's
+ * recent locations, or a remote service.
  */
-export type LoadLocationSearchResults = (
-  query: string,
-  center?: LocationCoordinate2D
-) => Promise<LocationSearchResult[]>
+export type LocationsSearchSourceType = "user-recents" | "remote-search"
+
+/**
+ * A rich query type that carries user-entered text for searching locations.
+ */
+export class LocationsSearchQuery {
+  /**
+   * A {@link LocationsSearchQuery} that is initialized with an empty string.
+   */
+  static empty = new LocationsSearchQuery("")
+
+  private readonly rawValue: string
+
+  constructor (rawValue: string) {
+    this.rawValue = rawValue
+  }
+
+  /**
+   * The data source type of this query. An empty string means loading from
+   * the user's recent locations.
+   */
+  get sourceType (): LocationsSearchSourceType {
+    return this.rawValue.length === 0 ? "user-recents" : "remote-search"
+  }
+
+  toString () {
+    return this.rawValue
+  }
+}
