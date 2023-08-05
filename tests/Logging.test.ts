@@ -158,12 +158,11 @@ describe("Logging tests", () => {
     const label = "sentry.breadcrumbs.test"
     const log = createLogFunction(label)
 
-    it("should ignore DEBUG and ERROR logs", async () => {
+    it("should ignore DEBUG logs", async () => {
       const handleBreadcrumb = jest.fn()
       addLogHandler(sentryBreadcrumbLogHandler(handleBreadcrumb))
 
       await log("debug", "iodjkhfcids")
-      await log("error", "djnsikd")
 
       expect(handleBreadcrumb).not.toHaveBeenCalled()
     })
@@ -198,13 +197,13 @@ describe("Logging tests", () => {
       const handleBreadcrumb = jest.fn()
       addLogHandler(sentryBreadcrumbLogHandler(handleBreadcrumb))
 
-      await log("info", "Test message", {
+      await log("error", "Test message", {
         key: "value",
         category: "Test Category"
       })
 
       expect(handleBreadcrumb).toHaveBeenCalledWith({
-        level: "info",
+        level: "error",
         message: "Test message",
         category: "Test Category",
         data: { key: "value", label }

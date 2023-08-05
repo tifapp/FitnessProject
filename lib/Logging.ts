@@ -168,7 +168,7 @@ export const sentryBreadcrumbLogHandler = (
   ) => void = SentryNative.addBreadcrumb
 ): LogHandler => {
   return async (label, level, message, metadata) => {
-    if (level !== "info") return
+    if (level === "debug") return
     handleBreadcrumb({ message, level, ...getSentryMetadata(label, metadata) })
   }
 }
