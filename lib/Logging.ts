@@ -35,6 +35,7 @@ export const rotatingLogFileHandler = (
   const logFilename = logFileNameForDate(directoryPath, currentDate)
 
   return async (label, level, message, metadata) => {
+    if (level === "debug") return
     const currentDate = new Date()
     const stringifiedMetadata = JSON.stringify(metadata)
     await fs.appendString(

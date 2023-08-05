@@ -32,7 +32,11 @@ export class TestFilesystem implements Filesystem {
    * Reads the contents of a given file at the path.
    */
   readString (filepath: string) {
-    return fs.readFileSync(TEST_DIRECTORY + filepath, "utf-8")
+    try {
+      return fs.readFileSync(TEST_DIRECTORY + filepath, "utf-8")
+    } catch {
+      return undefined
+    }
   }
 
   private setup () {
