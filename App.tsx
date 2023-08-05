@@ -13,6 +13,8 @@ import React from "react"
 import { RootSiblingParent } from "react-native-root-siblings"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 
+import { withAuthenticator } from "aws-amplify-react-native"
+
 import { Geo } from "@aws-amplify/geo"
 import { Auth } from "aws-amplify"
 import awsconfig from "./src/aws-exports"
