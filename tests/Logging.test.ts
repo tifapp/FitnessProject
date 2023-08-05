@@ -17,17 +17,20 @@ describe("Logging tests", () => {
       return `${TEST_DIRECTORY}/${name}`
     }
 
+    const resetLogFileHandlerToDate = (date: Date) => {
+      resetLogHandlers()
+      addLogHandler(rotatingLogFileHandler(TEST_DIRECTORY, fs))
+      jest.setSystemTime(date)
+    }
+
     const fs = TestFilesystem.create()
     const log = createLogFunction("rotating.test")
 
     test("basic log", async () => {
-      jest.setSystemTime(new Date("2022-11-24T00:00:03.000Z"))
-
-      addLogHandler(rotatingLogFileHandler(TEST_DIRECTORY, fs))
-
+      resetLogFileHandlerToDate(new Date("2022-11-24T00:00:03.000Z"))
       await log("info", "Test message", { a: 1, b: "hello" })
 
-      jest.setSystemTime(new Date("2022-11-24T00:00:05.000Z"))
+      resetLogFileHandlerToDate(new Date("2022-11-24T00:00:05.000Z"))
       await log("error", "Test message", { a: 2, b: "world", c: { d: true } })
 
       const logData = fs.readString(logFileName("2022-11-24T00:00:03.000Z.log"))
@@ -39,17 +42,10 @@ describe("Logging tests", () => {
     })
 
     it("should write to the same logfile if the difference between the last log < 2 weeks", async () => {
-      jest.setSystemTime(new Date("2022-11-24T00:00:03.000Z"))
-
-      addLogHandler(rotatingLogFileHandler(TEST_DIRECTORY, fs))
-
+      resetLogFileHandlerToDate(new Date("2022-11-24T00:00:03.000Z"))
       await log("info", "Test message", { a: 1, b: "hello" })
 
-      resetLogHandlers()
-
-      addLogHandler(rotatingLogFileHandler(TEST_DIRECTORY, fs))
-
-      jest.setSystemTime(new Date("2022-11-26T00:00:05.000Z"))
+      resetLogFileHandlerToDate(new Date("2022-11-26T00:00:05.000Z"))
       await log("error", "Test message", { a: 2, b: "world", c: { d: true } })
 
       const logData = fs.readString(logFileName("2022-11-24T00:00:03.000Z.log"))
@@ -61,8 +57,7 @@ describe("Logging tests", () => {
     })
 
     it("should not write DEBUG level logs to log file", async () => {
-      jest.setSystemTime(new Date("2022-11-24T00:00:03.000Z"))
-      addLogHandler(rotatingLogFileHandler(TEST_DIRECTORY, fs))
+      resetLogFileHandlerToDate(new Date("2022-11-24T00:00:03.000Z"))
       await log("debug", "Test message")
 
       expect(
@@ -71,17 +66,10 @@ describe("Logging tests", () => {
     })
 
     it("should create another log file when writing to a log 2 weeks later", async () => {
-      jest.setSystemTime(new Date("2022-11-24T00:00:03.000Z"))
-      addLogHandler(rotatingLogFileHandler(TEST_DIRECTORY, fs))
-
+      resetLogFileHandlerToDate(new Date("2022-11-24T00:00:03.000Z"))
       await log("info", "Test message 1")
 
-      // NB: User takes a 2 week vacation
-      resetLogHandlers()
-
-      addLogHandler(rotatingLogFileHandler(TEST_DIRECTORY, fs))
-
-      jest.setSystemTime(new Date("2022-12-09T00:00:03.000Z"))
+      resetLogFileHandlerToDate(new Date("2022-12-09T00:00:03.000Z"))
       await log("info", "Test message 2")
 
       const directoryContents = await fs.listDirectory(TEST_DIRECTORY)
@@ -101,6 +89,66 @@ describe("Logging tests", () => {
       )
       expect(file2Logs).toEqual(
         "2022-12-09T00:00:03.000Z [rotating.test] (INFO) Test message 2\n"
+      )
+    })
+
+    it("should purge the oldest log file when more than 5 log files", async () => {
+      resetLogFileHandlerToDate(new Date("2023-01-01T00:00:00.000Z"))
+      await log("info", "Test message 1")
+
+      resetLogFileHandlerToDate(new Date("2023-01-15T00:00:00.000Z"))
+      await log("info", "Test message 2")
+
+      resetLogFileHandlerToDate(new Date("2023-01-29T00:00:00.000Z"))
+      await log("info", "Test message 3")
+
+      resetLogFileHandlerToDate(new Date("2023-02-12T00:00:00.000Z"))
+      await log("info", "Test message 4")
+
+      resetLogFileHandlerToDate(new Date("2023-02-26T00:00:00.000Z"))
+      await log("info", "Test message 5")
+
+      resetLogFileHandlerToDate(new Date("2023-03-12T00:00:00.000Z"))
+      await log("info", "Test message 6")
+
+      const directoryContents = await fs.listDirectory(TEST_DIRECTORY)
+      expect(directoryContents).toEqual([
+        "2023-01-15T00:00:00.000Z.log",
+        "2023-01-29T00:00:00.000Z.log",
+        "2023-02-12T00:00:00.000Z.log",
+        "2023-02-26T00:00:00.000Z.log",
+        "2023-03-12T00:00:00.000Z.log"
+      ])
+
+      const file1Logs = fs.readString(
+        logFileName("2023-01-15T00:00:00.000Z.log")
+      )
+      const file2Logs = fs.readString(
+        logFileName("2023-01-29T00:00:00.000Z.log")
+      )
+      const file3Logs = fs.readString(
+        logFileName("2023-02-12T00:00:00.000Z.log")
+      )
+      const file4Logs = fs.readString(
+        logFileName("2023-02-26T00:00:00.000Z.log")
+      )
+      const file5Logs = fs.readString(
+        logFileName("2023-03-12T00:00:00.000Z.log")
+      )
+      expect(file1Logs).toEqual(
+        "2023-01-15T00:00:00.000Z [rotating.test] (INFO) Test message 2\n"
+      )
+      expect(file2Logs).toEqual(
+        "2023-01-29T00:00:00.000Z [rotating.test] (INFO) Test message 3\n"
+      )
+      expect(file3Logs).toEqual(
+        "2023-02-12T00:00:00.000Z [rotating.test] (INFO) Test message 4\n"
+      )
+      expect(file4Logs).toEqual(
+        "2023-02-26T00:00:00.000Z [rotating.test] (INFO) Test message 5\n"
+      )
+      expect(file5Logs).toEqual(
+        "2023-03-12T00:00:00.000Z [rotating.test] (INFO) Test message 6\n"
       )
     })
   })

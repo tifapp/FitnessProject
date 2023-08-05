@@ -2,8 +2,18 @@ import { ArrayUtils } from "./Array"
 import { Filesystem } from "./Filesystem"
 import { diffDates } from "./date"
 
+/**
+ * A level to be used when logging.
+ *
+ * `debug` = important stuff that doesn't matter in prod
+ * `info` = general log message
+ * `error` = for when an error occurs
+ */
 export type LogLevel = "debug" | "info" | "error"
 
+/**
+ * A type that handles log messages and sends them somewhere.
+ */
 export type LogHandler = (
   label: string,
   level: LogLevel,
@@ -17,8 +27,26 @@ const consoleLogHandler = (): LogHandler => {
   }
 }
 
-let logHandlers = [consoleLogHandler()] as LogHandler[]
+let logHandlers = [consoleLogHandler()]
 
+/**
+ * Creates a function to log with a given label.
+ *
+ * Use this instead of `console.log` to log to many different sources at once.
+ *
+ * ```ts
+ * const log = createLogFunction("example")
+ * addLogHandler(rotatingLogFileHandler(...))
+ *
+ * // Logs to both the console and filesystem.
+ * log("info", "Message", { key: "value" })
+ * ```
+ *
+ * By default, calling `log` will output formatted logs to the console, use `addLogHandler` to log to more sources.
+ *
+ * @param label the label which identifies this logger, use this in different modules of the app to identify specific components.
+ * @returns a function which handles logging.
+ */
 export const createLogFunction = (label: string) => {
   return async (level: LogLevel, message: string, metadata?: object) => {
     await Promise.allSettled(
@@ -27,14 +55,26 @@ export const createLogFunction = (label: string) => {
   }
 }
 
+/**
+ * Adds a log handler that can handle and receive log messages via calls from the function created by `createLogFunction`.
+ */
 export const addLogHandler = (handler: LogHandler) => {
   logHandlers.push(handler)
 }
 
+/**
+ * Removes all active log handlers, preserving only the console logger.
+ */
 export const resetLogHandlers = () => {
   logHandlers = [consoleLogHandler()]
 }
 
+/**
+ * A `LogHandler` which logs to a rotating log file system.
+ *
+ * @param directoryPath the base logs directory.
+ * @param fs the {@link Filesystem} interface to use.
+ */
 export const rotatingLogFileHandler = (
   directoryPath: string,
   fs: Filesystem
@@ -45,7 +85,7 @@ export const rotatingLogFileHandler = (
 
     const logFilename =
       writingLogFilename ??
-      (await LogFilename.currentInDirectory(directoryPath, fs))
+      (await LogFilename.getCurrentWritable(directoryPath, fs))
     writingLogFilename = logFilename
     await fs.appendString(
       logFilename.pathInDirectory(directoryPath),
@@ -65,15 +105,27 @@ class LogFilename {
     return `${directoryPath}/${this.date.toISOString()}.log`
   }
 
-  static async currentInDirectory (path: string, fs: Filesystem) {
-    const currentLogFiles = await LogFilename.namesFromDirectory(path, fs)
-    const currentDateLogfile = LogFilename.fromCurrentDate()
+  static async getCurrentWritable (path: string, fs: Filesystem) {
+    const persistedNames = await LogFilename.namesFromDirectory(path, fs)
+    const currentDateName = LogFilename.fromCurrentDate()
+    if (persistedNames.length === 0) return currentDateName
 
-    if (currentLogFiles.length === 0) return currentDateLogfile
-    if (diffDates(currentDateLogfile.date, currentLogFiles[0].date).weeks > 2) {
-      return currentDateLogfile
+    const weeksDiff = diffDates(
+      currentDateName.date,
+      persistedNames[0].date
+    ).weeks
+
+    if (weeksDiff < 2) {
+      return persistedNames[0]
     }
-    return currentLogFiles[0]
+
+    if (persistedNames.length >= 5) {
+      const deletePath =
+        persistedNames[persistedNames.length - 1].pathInDirectory(path)
+      await fs.deleteFile(deletePath)
+    }
+
+    return currentDateName
   }
 
   private static async namesFromDirectory (
@@ -85,7 +137,7 @@ class LogFilename {
       .then((contents) =>
         ArrayUtils.compactMap(contents, (content) => {
           return LogFilename.fromPathString(content)
-        })
+        }).sort((name1, name2) => name2.date.getTime() - name1.date.getTime())
       )
       .catch(() => [])
   }

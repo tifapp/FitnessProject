@@ -44,6 +44,10 @@ export class TestFilesystem implements Filesystem {
     return fs.readdirSync(TEST_DIRECTORY + directoryPath)
   }
 
+  async deleteFile (path: string) {
+    fs.rmSync(TEST_DIRECTORY + path)
+  }
+
   private setup () {
     fs.mkdirSync(TEST_DIRECTORY)
   }

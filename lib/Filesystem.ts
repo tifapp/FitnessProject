@@ -7,5 +7,13 @@ export interface Filesystem {
    */
   appendString(path: string, data: string): Promise<void>
 
+  /**
+   * Lists the contents of the given directory.
+   */
   listDirectory(path: string): Promise<string[]>
+
+  /**
+   * Deletes the file at the given path.
+   */
+  deleteFile(path: string): Promise<void>
 }
