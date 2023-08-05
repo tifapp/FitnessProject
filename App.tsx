@@ -15,7 +15,6 @@ import { SafeAreaProvider } from "react-native-safe-area-context"
 
 import { withAuthenticator } from "aws-amplify-react-native"
 
-import { Auth } from "@aws-amplify/auth"
 import { Geo } from "@aws-amplify/geo"
 import ConfirmSignIn from "@components/loginComponents/ConfirmSignIn"
 import ConfirmSignUp from "@components/loginComponents/ConfirmSignUp"
@@ -25,17 +24,10 @@ import RequireNewPassword from "@components/loginComponents/RequireNewPassword"
 import SignIn from "@components/loginComponents/SignIn"
 import SignUp from "@components/loginComponents/SignUp"
 import VerifyContact from "@components/loginComponents/VerifyContact"
+import { Auth } from "aws-amplify"
 import awsconfig from "./src/aws-exports"
 Geo.configure(awsconfig)
 Auth.configure(awsconfig)
-// Geo.searchByText("Amazon Go Store")
-//   .then((res) => console.log(JSON.stringify(res)))
-//   .finally(() => {
-//     ;(async () => {
-//       const a = await Auth.currentUserCredentials()
-//       console.log(a)
-//     })()
-//   })
 
 const Stack = createStackNavigator()
 
@@ -61,6 +53,14 @@ const AppView = ({ isFontsLoaded }: AppProps) => {
 }
 
 const App = () => {
+  Geo.searchByText("Amazon Go Store")
+    .then((res) => console.log(JSON.stringify(res)))
+    .finally(() => {
+      ;(async () => {
+        const a = await Auth.currentUserCredentials()
+        console.log(a)
+      })()
+    })
   const [isFontsLoaded] = useAppFonts()
   return (
     <TiFQueryClientProvider>

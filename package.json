@@ -53,6 +53,7 @@
     "@turf/boolean-clockwise": "6.5.0",
     "@turf/invariant": "6.5.0",
     "amazon-cognito-identity-js": "^6.2.0",
+    "aws-amplify": "^5.3.6",
     "aws-amplify-react-native": "^7.0.2",
     "aws-sdk": "^2.822.0",
     "babel-jest": "^29.5.0",

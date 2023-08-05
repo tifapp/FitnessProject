@@ -49,12 +49,6 @@ const awsmobile = {
                 "default": "placeIndex7c0b71bf-dev"
             }
         }
-    },
-    "Analytics": {
-        "AWSPinpoint": {
-            "appId": "ced102bb50484960828f8b5f526ff6c3",
-            "region": "us-west-2"
-        }
     }
 };
 
