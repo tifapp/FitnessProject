@@ -70,4 +70,15 @@ const App = () => {
   )
 }
 
-export default App
+// export default App
+
+export default withAuthenticator(App, false, [
+  <Greetings />,
+  <SignIn />,
+  <SignUp />,
+  <ConfirmSignIn />,
+  <ConfirmSignUp />,
+  <VerifyContact />,
+  <ForgotPassword />,
+  <RequireNewPassword />
+])
