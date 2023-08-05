@@ -159,12 +159,32 @@ class LogFilename {
   }
 }
 
+/**
+ * A log handler which tracks info logs as sentry breadcrumbs.
+ */
 export const sentryBreadcrumbLogHandler = (
   handleBreadcrumb: (
     breadcrumb: SentryNative.Breadcrumb
   ) => void = SentryNative.addBreadcrumb
 ): LogHandler => {
-  return async (label, level, message, metadata) => {}
+  return async (label, level, message, metadata) => {
+    if (level !== "info") return
+    handleBreadcrumb({ message, level, ...getSentryMetadata(label, metadata) })
+  }
+}
+
+const getSentryMetadata = (label: string, metadata?: object) => {
+  if (!metadata) return { category: undefined, data: { label } }
+  const sentryData = { label, ...metadata }
+  const category =
+    "category" in sentryData && typeof sentryData.category === "string"
+      ? sentryData.category
+      : undefined
+
+  if ("category" in sentryData && typeof sentryData.category === "string") {
+    delete sentryData.category
+  }
+  return { category, data: sentryData }
 }
 
 const formatLogMessage = (

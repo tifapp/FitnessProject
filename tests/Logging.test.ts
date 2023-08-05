@@ -155,7 +155,8 @@ describe("Logging tests", () => {
   })
 
   describe("SentryBreadcrumbsLogHandler tests", () => {
-    const log = createLogFunction("sentry.breadcrumbs.test")
+    const label = "sentry.breadcrumbs.test"
+    const log = createLogFunction(label)
 
     it("should ignore DEBUG and ERROR logs", async () => {
       const handleBreadcrumb = jest.fn()
@@ -165,6 +166,49 @@ describe("Logging tests", () => {
       await log("error", "djnsikd")
 
       expect(handleBreadcrumb).not.toHaveBeenCalled()
+    })
+
+    test("logging with no metadata", async () => {
+      const handleBreadcrumb = jest.fn()
+      addLogHandler(sentryBreadcrumbLogHandler(handleBreadcrumb))
+
+      await log("info", "Test message")
+
+      expect(handleBreadcrumb).toHaveBeenCalledWith({
+        level: "info",
+        message: "Test message",
+        data: { label }
+      })
+    })
+
+    test("logging with no category metadata", async () => {
+      const handleBreadcrumb = jest.fn()
+      addLogHandler(sentryBreadcrumbLogHandler(handleBreadcrumb))
+
+      await log("info", "Test message", { key: "value" })
+
+      expect(handleBreadcrumb).toHaveBeenCalledWith({
+        level: "info",
+        message: "Test message",
+        data: { key: "value", label }
+      })
+    })
+
+    test("logging with category metadata", async () => {
+      const handleBreadcrumb = jest.fn()
+      addLogHandler(sentryBreadcrumbLogHandler(handleBreadcrumb))
+
+      await log("info", "Test message", {
+        key: "value",
+        category: "Test Category"
+      })
+
+      expect(handleBreadcrumb).toHaveBeenCalledWith({
+        level: "info",
+        message: "Test message",
+        category: "Test Category",
+        data: { key: "value", label }
+      })
     })
   })
 })
