@@ -12,14 +12,20 @@ import {
   getCurrentPositionAsync,
   requestForegroundPermissionsAsync
 } from "expo-location"
-import * as Sentry from "sentry-expo"
-import { setupSentry } from "@lib/Sentry"
-import { addTiFLogHandlers, createLogFunction } from "@lib/Logging"
+import { Native as SentryNative } from "sentry-expo"
+import { enableSentry } from "@lib/Sentry"
+import {
+  addLogHandler,
+  createLogFunction,
+  sentryBreadcrumbLogHandler,
+  sentryErrorCapturingLogHandler
+} from "@lib/Logging"
 
-setupSentry()
+enableSentry()
 
 const log = createLogFunction("app.root")
-addTiFLogHandlers()
+addLogHandler(sentryBreadcrumbLogHandler())
+addLogHandler(sentryErrorCapturingLogHandler())
 
 log("info", "App launched", { date: new Date() })
 
@@ -66,4 +72,4 @@ const App = () => {
   )
 }
 
-export default Sentry.Native.wrap(App)
+export default SentryNative.wrap(App)

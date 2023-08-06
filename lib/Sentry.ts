@@ -3,14 +3,18 @@ import * as Sentry from "sentry-expo"
 
 /**
  * Sets up sentry with the default app config.
- *
- * @param isEnabled whether or not the user has enabled crash reporting.
  */
-export const setupSentry = (isEnabled: boolean = true) => {
+export const enableSentry = () => {
   Sentry.init({
     dsn: SENTRY_DSN,
-    enabled: isEnabled,
     enableInExpoDevelopment: true,
     tracesSampleRate: 1
   })
+}
+
+/**
+ * Disables sentry on an app-wide level.
+ */
+export const disableSentry = () => {
+  Sentry.init({ enabled: false })
 }

@@ -7,10 +7,14 @@ import { Native as SentryNative } from "sentry-expo"
  * A level to be used when logging.
  *
  * `debug` = important stuff that doesn't matter in prod
+ *
  * `info` = general log message
+ *
+ * `warn` = a forewarning that a giant alien spider will trample this lostbe- I mean world
+ *
  * `error` = for when an error occurs
  */
-export type LogLevel = "debug" | "info" | "error"
+export type LogLevel = "debug" | "info" | "warn" | "error"
 
 /**
  * A type that handles log messages and sends them somewhere.
@@ -22,13 +26,16 @@ export type LogHandler = (
   metadata?: object
 ) => void
 
-const consoleLogHandler = (): LogHandler => {
-  return async (label, level, message, metadata) => {
-    console[level](formatLogMessage(label, level, message, metadata))
-  }
+const consoleLogHandler: LogHandler = async (
+  label,
+  level,
+  message,
+  metadata
+) => {
+  console[level](formatLogMessage(label, level, message, metadata))
 }
 
-let logHandlers = [consoleLogHandler()]
+let logHandlers = [consoleLogHandler]
 
 /**
  * Creates a function to log with a given label.
@@ -67,12 +74,7 @@ export const addLogHandler = (handler: LogHandler) => {
  * Removes all active log handlers, preserving only the console logger.
  */
 export const resetLogHandlers = () => {
-  logHandlers = [consoleLogHandler()]
-}
-
-export const addTiFLogHandlers = () => {
-  addLogHandler(sentryBreadcrumbLogHandler())
-  addLogHandler(sentryErrorCapturingLogHandler())
+  logHandlers = [consoleLogHandler]
 }
 
 /**
@@ -247,16 +249,10 @@ export const sentryBreadcrumbLogHandler = (
     if (level === "debug") return
     handleBreadcrumb({
       message,
-      level: logLevelToSentrySeverity(level),
+      level: level === "warn" ? "warning" : level,
       ...getSentryBreadcrumbMetadata(label, metadata)
     })
   }
-}
-
-const logLevelToSentrySeverity = (level: LogLevel) => {
-  if (level === "info") return SentryNative.Severity.Info
-  if (level === "error") return SentryNative.Severity.Error
-  return SentryNative.Severity.Debug
 }
 
 const getSentryBreadcrumbMetadata = (label: string, metadata?: object) => {
@@ -309,5 +305,6 @@ export const formatLogMessage = (
 const emojiForLogLevel = (level: LogLevel) => {
   if (level === "debug") return "🟢"
   if (level === "info") return "🔵"
+  if (level === "warn") return "🟡"
   return "🔴"
 }
