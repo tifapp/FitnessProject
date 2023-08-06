@@ -106,20 +106,50 @@ class LogFilename {
 }
 
 /**
+ * A configuration for {@link RotatingFileLogs}.
+ */
+export type RotatingFileLogsConfig = {
+  /**
+   * The directory to store log files in.
+   */
+  directoryPath: string
+
+  /**
+   * The maximum number of files to keep in rotation.
+   */
+  maxFiles: number
+
+  /**
+   * The interval on which to create a new log file.
+   */
+  rotatingIntervalMillis: number
+
+  /**
+   * A function to format a log message.
+   */
+  format: (
+    label: string,
+    level: LogLevel,
+    message: string,
+    metadata?: object
+  ) => string
+}
+
+/**
  * A class that writes log messages to a rotating log file system which it internally manages.
  *
  * The {@link LogHandler} on this class only queues log messages such that they can be written in
  * batch. To actually write them, call {@link flush}.
  */
-export class RotatingFilesystemLogs {
-  private readonly directoryPath: string
+export class RotatingFileLogs {
+  private readonly config: RotatingFileLogsConfig
   private readonly fs: Filesystem
   private openLogFilename?: LogFilename
   private currentDateLogFilename = LogFilename.fromCurrentDate()
   private queuedLogs = [] as string[]
 
-  constructor (directoryPath: string, fs: Filesystem) {
-    this.directoryPath = directoryPath
+  constructor (config: RotatingFileLogsConfig, fs: Filesystem) {
+    this.config = config
     this.fs = fs
   }
 
@@ -143,7 +173,7 @@ export class RotatingFilesystemLogs {
     metadata?: object
   ) {
     if (level === "debug") return
-    this.queuedLogs.push(formatLogMessage(label, level, message, metadata))
+    this.queuedLogs.push(this.config.format(label, level, message, metadata))
   }
 
   /**
@@ -153,8 +183,9 @@ export class RotatingFilesystemLogs {
    */
   async flush () {
     if (this.queuedLogs.length === 0) return
+    const logFilename = await this.loadOpenLogFilename()
     await this.fs.appendString(
-      (await this.loadOpenLogFilename()).pathInDirectory(this.directoryPath),
+      logFilename.pathInDirectory(this.config.directoryPath),
       this.queuedLogs.join("")
     )
     this.queuedLogs = []
@@ -169,20 +200,20 @@ export class RotatingFilesystemLogs {
       return this.currentDateLogFilename
     }
 
-    const { weeks } = diffDates(
+    const { milliseconds } = diffDates(
       this.currentDateLogFilename.date,
       persistedNames[0].date
     )
 
-    if (weeks < 2) {
+    if (milliseconds < this.config.rotatingIntervalMillis) {
       this.openLogFilename = persistedNames[0]
       return persistedNames[0]
     }
 
-    if (persistedNames.length >= 5) {
+    if (persistedNames.length >= this.config.maxFiles) {
       const deletePath = persistedNames[
         persistedNames.length - 1
-      ].pathInDirectory(this.directoryPath)
+      ].pathInDirectory(this.config.directoryPath)
       await this.fs.deleteFile(deletePath)
     }
 
@@ -192,7 +223,9 @@ export class RotatingFilesystemLogs {
 
   private async loadPersistedLogFilenames () {
     try {
-      const paths = await this.fs.listDirectoryContents(this.directoryPath)
+      const paths = await this.fs.listDirectoryContents(
+        this.config.directoryPath
+      )
       return ArrayUtils.compactMap(paths, LogFilename.fromPathString).sort(
         (name1, name2) => name2.date.getTime() - name1.date.getTime()
       )
@@ -257,7 +290,10 @@ export const sentryErrorCapturingLogHandler = (
   }
 }
 
-const formatLogMessage = (
+/**
+ * The default formatter for a log message.
+ */
+export const formatLogMessage = (
   label: string,
   level: LogLevel,
   message: string,

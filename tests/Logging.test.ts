@@ -1,7 +1,9 @@
 import {
-  RotatingFilesystemLogs,
+  RotatingFileLogsConfig,
+  RotatingFileLogs,
   addLogHandler,
   createLogFunction,
+  formatLogMessage,
   resetLogHandlers,
   sentryBreadcrumbLogHandler,
   sentryErrorCapturingLogHandler
@@ -23,24 +25,37 @@ describe("Logging tests", () => {
     const fs = TestFilesystem.create()
     const log = createLogFunction("rotating.filesystem.test")
 
-    const setupRotatingFilesystemLogsWithDate = (date: Date) => {
+    const TWO_WEEKS_MILLIS = 1000 * 60 * 60 * 24 * 14
+
+    const TEST_LOG_FILES_CONFIG = {
+      directoryPath: TEST_DIRECTORY,
+      maxFiles: 5,
+      rotatingIntervalMillis: TWO_WEEKS_MILLIS,
+      format: formatLogMessage
+    }
+
+    const setupRotatingFileLogsWithDate = (
+      date: Date,
+      config: RotatingFileLogsConfig = TEST_LOG_FILES_CONFIG
+    ) => {
       jest.setSystemTime(date)
-      const fsLogs = new RotatingFilesystemLogs(TEST_DIRECTORY, fs)
+      const fsLogs = new RotatingFileLogs(config, fs)
       addLogHandler(fsLogs.logHandler)
       return fsLogs
     }
 
-    const resetToNewRotatingLogFilesystemWithDate = async (
-      fsLogs: RotatingFilesystemLogs,
-      date: Date
+    const resetToNewRotatingFileLogsWithDate = async (
+      fsLogs: RotatingFileLogs,
+      date: Date,
+      config: RotatingFileLogsConfig = TEST_LOG_FILES_CONFIG
     ) => {
       await fsLogs.flush()
       resetLogHandlers()
-      return setupRotatingFilesystemLogsWithDate(date)
+      return setupRotatingFileLogsWithDate(date, config)
     }
 
     it("should batch write logs when flushing", async () => {
-      const fsLogs = setupRotatingFilesystemLogsWithDate(
+      const fsLogs = setupRotatingFileLogsWithDate(
         new Date("2022-11-24T00:00:03.000Z")
       )
       log("info", "Test message", { a: 1, b: "hello" })
@@ -77,12 +92,12 @@ describe("Logging tests", () => {
     })
 
     it("should write to the same logfile if the difference between the last log < 2 weeks", async () => {
-      let fsLogs = setupRotatingFilesystemLogsWithDate(
+      let fsLogs = setupRotatingFileLogsWithDate(
         new Date("2022-11-24T00:00:03.000Z")
       )
       log("info", "Test message", { a: 1, b: "hello" })
 
-      fsLogs = await resetToNewRotatingLogFilesystemWithDate(
+      fsLogs = await resetToNewRotatingFileLogsWithDate(
         fsLogs,
         new Date("2022-11-26T00:00:05.000Z")
       )
@@ -101,7 +116,7 @@ describe("Logging tests", () => {
     })
 
     it("should not write DEBUG level logs to log file", async () => {
-      const fsLogs = setupRotatingFilesystemLogsWithDate(
+      const fsLogs = setupRotatingFileLogsWithDate(
         new Date("2022-11-24T00:00:03.000Z")
       )
 
@@ -116,13 +131,13 @@ describe("Logging tests", () => {
 
     it("should ignore random filenames when logging to new file", async () => {
       await fs.appendString(`${TEST_DIRECTORY}/hello.txt`, "Hello")
-      let fsLogs = setupRotatingFilesystemLogsWithDate(
+      let fsLogs = setupRotatingFileLogsWithDate(
         new Date("2022-11-24T00:00:03.000Z")
       )
 
       log("info", "test")
 
-      fsLogs = await resetToNewRotatingLogFilesystemWithDate(
+      fsLogs = await resetToNewRotatingFileLogsWithDate(
         fsLogs,
         new Date("2022-11-24T00:12:52.000Z")
       )
@@ -141,12 +156,12 @@ describe("Logging tests", () => {
     })
 
     it("should create another log file when writing to a log 2 weeks later", async () => {
-      let fsLogs = setupRotatingFilesystemLogsWithDate(
+      let fsLogs = setupRotatingFileLogsWithDate(
         new Date("2022-11-24T00:00:03.000Z")
       )
       log("info", "Test message 1")
 
-      fsLogs = await resetToNewRotatingLogFilesystemWithDate(
+      fsLogs = await resetToNewRotatingFileLogsWithDate(
         fsLogs,
         new Date("2022-12-09T00:00:03.000Z")
       )
@@ -174,51 +189,34 @@ describe("Logging tests", () => {
       )
     })
 
-    it("should purge the oldest log file when more than 5 log files", async () => {
-      let fsLogs = setupRotatingFilesystemLogsWithDate(
-        new Date("2023-01-01T00:00:00.000Z")
+    it("should purge the oldest log file when more than 2 log files", async () => {
+      const config = { ...TEST_LOG_FILES_CONFIG, maxFiles: 2 }
+      let fsLogs = setupRotatingFileLogsWithDate(
+        new Date("2023-01-01T00:00:00.000Z"),
+        config
       )
       log("info", "Test message 1")
 
-      fsLogs = await resetToNewRotatingLogFilesystemWithDate(
+      fsLogs = await resetToNewRotatingFileLogsWithDate(
         fsLogs,
-        new Date("2023-01-15T00:00:00.000Z")
+        new Date("2023-01-15T00:00:00.000Z"),
+        config
       )
       log("info", "Test message 2")
 
-      fsLogs = await resetToNewRotatingLogFilesystemWithDate(
+      fsLogs = await resetToNewRotatingFileLogsWithDate(
         fsLogs,
-        new Date("2023-01-29T00:00:00.000Z")
+        new Date("2023-01-29T00:00:00.000Z"),
+        config
       )
       log("info", "Test message 3")
-
-      fsLogs = await resetToNewRotatingLogFilesystemWithDate(
-        fsLogs,
-        new Date("2023-02-12T00:00:00.000Z")
-      )
-      log("info", "Test message 4")
-
-      fsLogs = await resetToNewRotatingLogFilesystemWithDate(
-        fsLogs,
-        new Date("2023-02-26T00:00:00.000Z")
-      )
-      log("info", "Test message 5")
-
-      fsLogs = await resetToNewRotatingLogFilesystemWithDate(
-        fsLogs,
-        new Date("2023-03-12T00:00:00.000Z")
-      )
-      log("info", "Test message 6")
 
       await fsLogs.flush()
 
       const directoryContents = await fs.listDirectoryContents(TEST_DIRECTORY)
       expect(directoryContents).toEqual([
         "2023-01-15T00:00:00.000Z.log",
-        "2023-01-29T00:00:00.000Z.log",
-        "2023-02-12T00:00:00.000Z.log",
-        "2023-02-26T00:00:00.000Z.log",
-        "2023-03-12T00:00:00.000Z.log"
+        "2023-01-29T00:00:00.000Z.log"
       ])
 
       const file1Logs = fs.readString(
@@ -227,29 +225,11 @@ describe("Logging tests", () => {
       const file2Logs = fs.readString(
         testLogFileName("2023-01-29T00:00:00.000Z.log")
       )
-      const file3Logs = fs.readString(
-        testLogFileName("2023-02-12T00:00:00.000Z.log")
-      )
-      const file4Logs = fs.readString(
-        testLogFileName("2023-02-26T00:00:00.000Z.log")
-      )
-      const file5Logs = fs.readString(
-        testLogFileName("2023-03-12T00:00:00.000Z.log")
-      )
       expect(file1Logs).toEqual(
         "2023-01-15T00:00:00.000Z [rotating.filesystem.test] (INFO 🔵) Test message 2\n"
       )
       expect(file2Logs).toEqual(
         "2023-01-29T00:00:00.000Z [rotating.filesystem.test] (INFO 🔵) Test message 3\n"
-      )
-      expect(file3Logs).toEqual(
-        "2023-02-12T00:00:00.000Z [rotating.filesystem.test] (INFO 🔵) Test message 4\n"
-      )
-      expect(file4Logs).toEqual(
-        "2023-02-26T00:00:00.000Z [rotating.filesystem.test] (INFO 🔵) Test message 5\n"
-      )
-      expect(file5Logs).toEqual(
-        "2023-03-12T00:00:00.000Z [rotating.filesystem.test] (INFO 🔵) Test message 6\n"
       )
     })
   })
