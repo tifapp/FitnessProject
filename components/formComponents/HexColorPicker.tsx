@@ -1,16 +1,14 @@
-import React from "react"
+import { MaterialIcons } from "@expo/vector-icons"
 import { HexColor } from "@lib/Color"
+import React from "react"
 import {
-  Platform,
   StyleProp,
   StyleSheet,
+  TouchableOpacity,
   View,
-  ViewStyle,
-  TouchableOpacity
+  ViewStyle
 } from "react-native"
-import { MaterialIcons } from "@expo/vector-icons"
-import { useDependencyValue } from "../../lib/dependencies"
-import { HapticEvent, hapticsDependencyKey } from "../../lib/Haptics"
+import { useHapticsFunctions } from "../../lib/Haptics"
 
 export type HexColorPickerOption<T extends HexColor = HexColor> = {
   color: T
@@ -51,10 +49,11 @@ const HexColorPicker = <T extends HexColor = HexColor>({
   options,
   style
 }: HexColorPickerProps<T>) => {
-  const playHaptics = useDependencyValue(hapticsDependencyKey)
+  const hapticsContext = useHapticsFunctions()
 
   const colorTapped = (option: T) => {
-    if (Platform.OS === "ios") playHaptics(HapticEvent.SelectionChanged)
+    hapticsContext.play("light tap")
+    hapticsContext.mute()
     onChange(option)
   }
 

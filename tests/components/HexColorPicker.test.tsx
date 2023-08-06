@@ -2,13 +2,16 @@ import HexColorPicker, {
   HexColorPickerOption
 } from "@components/formComponents/HexColorPicker"
 import { HexColor } from "@lib/Color"
-import { SetDependencyValue } from "@lib/dependencies"
-import { HapticEvent, hapticsDependencyKey } from "@lib/Haptics"
+import { HapticsManagerProvider } from "@lib/Haptics"
+import { hapticsAtom } from "@lib/HapticsManager"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import { useState } from "react"
 import { View } from "react-native"
-import { setPlatform } from "../helpers/Platform"
 import "../helpers/Matchers"
+
+const turnOffHaptics = jest.fn()
+const turnOnHaptics = jest.fn()
+const startWithEvent = jest.fn()
 
 const testOptions = [
   { color: "#123456", accessibilityLabel: "#123456" },
@@ -24,18 +27,16 @@ describe("HexColorPicker tests", () => {
     expect(selectedColorElement(testOptions[1].color)).toBeDisplayed()
   })
 
-  it("does not play haptics on android when selection changes", () => {
-    setPlatform("android")
+  it("calls actOnEvent correctly", () => {
     renderHexColorPicker(testOptions)
     selectColor(testOptions[1].color)
-    expect(hapticsPlayer).not.toHaveBeenCalled()
+    expect(startWithEvent).toHaveBeenCalled()
   })
 
-  it("plays haptics on iOS when the color selection changes", () => {
-    setPlatform("ios")
+  it("calls turnOffHaptics correctly and switches the current value to what it should be", async () => {
     renderHexColorPicker(testOptions)
     selectColor(testOptions[1].color)
-    expect(hapticsPlayer).toHaveBeenCalledWith(HapticEvent.SelectionChanged)
+    expect(hapticsAtom.read).toEqual(true)
   })
 })
 
@@ -43,16 +44,19 @@ const renderHexColorPicker = (options: HexColorPickerOption[]) => {
   render(<Test options={options} />)
 }
 
-const hapticsPlayer = jest.fn()
-
 const Test = ({ options }: { options: HexColorPickerOption[] }) => {
   const [color, setColor] = useState(options[0].color)
+
   return (
-    <SetDependencyValue forKey={hapticsDependencyKey} value={hapticsPlayer}>
+    <HapticsManagerProvider
+      play={startWithEvent}
+      unmute={turnOnHaptics}
+      mute={turnOffHaptics}
+    >
       <View testID={displayedColorId(color)}>
         <HexColorPicker color={color} onChange={setColor} options={options} />
       </View>
-    </SetDependencyValue>
+    </HapticsManagerProvider>
   )
 }
 

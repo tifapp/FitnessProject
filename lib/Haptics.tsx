@@ -1,11 +1,14 @@
 import * as ExpoHaptics from "expo-haptics"
 import { ReactNode, createContext, useContext } from "react"
+import { HapticsManager } from "./HapticsManager"
 
 /**
  * A haptic event to be played to the user.
  */
 export interface HapticsFunctions {
-  actOnEvent: (hapticTrigger: HapticEvent) => void
+  play: (hapticTrigger: HapticEvent) => Promise<void>
+  mute: () => void
+  unmute: () => void
 }
 
 /**
@@ -20,26 +23,24 @@ export type HapticEvent =
   | "warning"
   | "error"
 
-const HapticsFunctionsContext = createContext<HapticsFunctions | undefined>(
+const HapticsManagerContext = createContext<HapticsManager | undefined>(
   undefined
 )
 
-export const useHapticsFunctions = () => useContext(HapticsFunctionsContext)!
+export const useHapticsFunctions = () => useContext(HapticsManagerContext)!
 
-export type HapticsProviderProps = HapticsFunctions & {
+export type HapticsProviderProps = HapticsManager & {
   children: ReactNode
 }
 
-export const HapticsFunctionsProvider = ({
+export const HapticsManagerProvider = ({
   children,
   ...props
 }: HapticsProviderProps) => (
-  <HapticsFunctionsContext.Provider value={props}>
+  <HapticsManagerContext.Provider value={props}>
     {children}
-  </HapticsFunctionsContext.Provider>
+  </HapticsManagerContext.Provider>
 )
-
-export type PlayHaptics = (event: HapticEvent) => Promise<void>
 
 /**
  * Haptics Player implemented by Expo.
