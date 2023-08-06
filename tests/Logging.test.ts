@@ -8,6 +8,7 @@ import {
 } from "@lib/Logging"
 import { TestFilesystem } from "./helpers/Filesystem"
 import { fakeTimers } from "./helpers/Timers"
+import { Native as SentryNative } from "sentry-expo"
 
 describe("Logging tests", () => {
   fakeTimers()
@@ -273,7 +274,7 @@ describe("Logging tests", () => {
       log("info", "Test message")
 
       expect(handleBreadcrumb).toHaveBeenCalledWith({
-        level: "info",
+        level: SentryNative.Severity.Info,
         message: "Test message",
         data: { label }
       })
@@ -286,7 +287,7 @@ describe("Logging tests", () => {
       log("info", "Test message", { key: "value" })
 
       expect(handleBreadcrumb).toHaveBeenCalledWith({
-        level: "info",
+        level: SentryNative.Severity.Info,
         message: "Test message",
         data: { key: "value", label }
       })
@@ -302,7 +303,7 @@ describe("Logging tests", () => {
       })
 
       expect(handleBreadcrumb).toHaveBeenCalledWith({
-        level: "error",
+        level: SentryNative.Severity.Error,
         message: "Test message",
         category: "Test Category",
         data: { key: "value", label }

@@ -12,6 +12,16 @@ import {
   getCurrentPositionAsync,
   requestForegroundPermissionsAsync
 } from "expo-location"
+import * as Sentry from "sentry-expo"
+import { setupSentry } from "@lib/Sentry"
+import { addTiFLogHandlers, createLogFunction } from "@lib/Logging"
+
+setupSentry()
+
+const log = createLogFunction("app.root")
+addTiFLogHandlers()
+
+log("info", "App launched", { date: new Date() })
 
 const Stack = createStackNavigator()
 
@@ -56,4 +66,4 @@ const App = () => {
   )
 }
 
-export default App
+export default Sentry.Native.wrap(App)

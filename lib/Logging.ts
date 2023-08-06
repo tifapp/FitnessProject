@@ -70,6 +70,11 @@ export const resetLogHandlers = () => {
   logHandlers = [consoleLogHandler()]
 }
 
+export const addTiFLogHandlers = () => {
+  addLogHandler(sentryBreadcrumbLogHandler())
+  addLogHandler(sentryErrorCapturingLogHandler())
+}
+
 /**
  * A type for representing a valid name from a log file.
  */
@@ -209,10 +214,16 @@ export const sentryBreadcrumbLogHandler = (
     if (level === "debug") return
     handleBreadcrumb({
       message,
-      level,
+      level: logLevelToSentrySeverity(level),
       ...getSentryBreadcrumbMetadata(label, metadata)
     })
   }
+}
+
+const logLevelToSentrySeverity = (level: LogLevel) => {
+  if (level === "info") return SentryNative.Severity.Info
+  if (level === "error") return SentryNative.Severity.Error
+  return SentryNative.Severity.Debug
 }
 
 const getSentryBreadcrumbMetadata = (label: string, metadata?: object) => {
