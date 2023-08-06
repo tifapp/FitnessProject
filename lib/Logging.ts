@@ -20,7 +20,7 @@ export type LogHandler = (
   level: LogLevel,
   message: string,
   metadata?: object
-) => Promise<void>
+) => void
 
 const consoleLogHandler = (): LogHandler => {
   return async (label, level, message, metadata) => {
@@ -49,10 +49,10 @@ let logHandlers = [consoleLogHandler()]
  * @returns a function which handles logging.
  */
 export const createLogFunction = (label: string) => {
-  return async (level: LogLevel, message: string, metadata?: object) => {
-    await Promise.allSettled(
-      logHandlers.map((handler) => handler(label, level, message, metadata))
-    )
+  return (level: LogLevel, message: string, metadata?: object) => {
+    for (const handler of logHandlers) {
+      handler(label, level, message, metadata)
+    }
   }
 }
 
@@ -71,32 +71,10 @@ export const resetLogHandlers = () => {
 }
 
 /**
- * A `LogHandler` which logs to a rotating log file system.
- *
- * @param directoryPath the base logs directory.
- * @param fs the {@link Filesystem} interface to use.
+ * A type for representing a valid name from a log file.
  */
-export const rotatingLogFileHandler = (
-  directoryPath: string,
-  fs: Filesystem
-): LogHandler => {
-  let writingLogFilename: LogFilename
-  return async (label, level, message, metadata) => {
-    if (level === "debug") return
-
-    const logFilename =
-      writingLogFilename ??
-      (await LogFilename.getCurrentWritable(directoryPath, fs))
-    writingLogFilename = logFilename
-    await fs.appendString(
-      logFilename.pathInDirectory(directoryPath),
-      formatLogMessage(label, level, message, metadata)
-    )
-  }
-}
-
 class LogFilename {
-  private readonly date: Date
+  readonly date: Date
 
   private constructor (rawValue: Date) {
     this.date = rawValue
@@ -106,48 +84,11 @@ class LogFilename {
     return `${directoryPath}/${this.date.toISOString()}.log`
   }
 
-  static async getCurrentWritable (path: string, fs: Filesystem) {
-    const persistedNames = await LogFilename.namesFromDirectory(path, fs)
-    const currentDateName = LogFilename.fromCurrentDate()
-    if (persistedNames.length === 0) return currentDateName
-
-    const weeksDiff = diffDates(
-      currentDateName.date,
-      persistedNames[0].date
-    ).weeks
-
-    if (weeksDiff < 2) {
-      return persistedNames[0]
-    }
-
-    if (persistedNames.length >= 5) {
-      const deletePath =
-        persistedNames[persistedNames.length - 1].pathInDirectory(path)
-      await fs.deleteFile(deletePath)
-    }
-
-    return currentDateName
-  }
-
-  private static async namesFromDirectory (
-    directoryPath: string,
-    fs: Filesystem
-  ): Promise<LogFilename[]> {
-    return await fs
-      .listDirectory(directoryPath)
-      .then((contents) =>
-        ArrayUtils.compactMap(contents, (content) => {
-          return LogFilename.fromPathString(content)
-        }).sort((name1, name2) => name2.date.getTime() - name1.date.getTime())
-      )
-      .catch(() => [])
-  }
-
-  private static fromCurrentDate () {
+  static fromCurrentDate () {
     return new LogFilename(new Date())
   }
 
-  private static fromPathString (pathString: string) {
+  static fromPathString (pathString: string) {
     const pathSplits = pathString.split("/")
     const filenameSplits = pathSplits[pathSplits.length - 1].split(".")
     const fileDateString = `${filenameSplits[0]}.${filenameSplits[1]}`
@@ -156,6 +97,103 @@ class LogFilename {
       return new LogFilename(parsedDate)
     }
     return undefined
+  }
+}
+
+/**
+ * A class that writes log messages to a rotating log file system which it internally manages.
+ *
+ * The {@link LogHandler} on this class only queues log messages such that they can be written in
+ * batch. To actually write them, call {@link flush}.
+ */
+export class RotatingFilesystemLogs {
+  private readonly directoryPath: string
+  private readonly fs: Filesystem
+  private openLogFilename?: LogFilename
+  private currentDateLogFilename = LogFilename.fromCurrentDate()
+  private queuedLogs = [] as string[]
+
+  constructor (directoryPath: string, fs: Filesystem) {
+    this.directoryPath = directoryPath
+    this.fs = fs
+  }
+
+  /**
+   * A log handler which queues log messages but doesn't write them to disk.
+   *
+   * In order to write the logs to disk, call {@link flush}.
+   */
+  get logHandler (): LogHandler {
+    // NB: We can't just return handleLog directly because then calling addLogHandler will
+    // cause the "this" keyword to refer to the global "this", thus causing chaos...
+    return async (label, level, message, metadata) => {
+      await this.handleLog(label, level, message, metadata)
+    }
+  }
+
+  private async handleLog (
+    label: string,
+    level: LogLevel,
+    message: string,
+    metadata?: object
+  ) {
+    if (level === "debug") return
+    this.queuedLogs.push(formatLogMessage(label, level, message, metadata))
+  }
+
+  /**
+   * Flushes all queued log messages to disk by joining them together.
+   *
+   * Log messages are queued via interacting with {@link logHandler}.
+   */
+  async flush () {
+    if (this.queuedLogs.length === 0) return
+    await this.fs.appendString(
+      (await this.loadOpenLogFilename()).pathInDirectory(this.directoryPath),
+      this.queuedLogs.join("")
+    )
+    this.queuedLogs = []
+  }
+
+  private async loadOpenLogFilename () {
+    if (this.openLogFilename) return this.openLogFilename
+
+    const persistedNames = await this.loadPersistedLogFilenames()
+    if (persistedNames.length === 0) {
+      this.openLogFilename = this.currentDateLogFilename
+      return this.currentDateLogFilename
+    }
+
+    const { weeks } = diffDates(
+      this.currentDateLogFilename.date,
+      persistedNames[0].date
+    )
+
+    if (weeks < 2) {
+      this.openLogFilename = persistedNames[0]
+      return persistedNames[0]
+    }
+
+    if (persistedNames.length >= 5) {
+      const deletePath = persistedNames[
+        persistedNames.length - 1
+      ].pathInDirectory(this.directoryPath)
+      await this.fs.deleteFile(deletePath)
+    }
+
+    this.openLogFilename = this.currentDateLogFilename
+    return this.currentDateLogFilename
+  }
+
+  private async loadPersistedLogFilenames () {
+    try {
+      const paths = await this.fs.listDirectoryContents(this.directoryPath)
+      return ArrayUtils.compactMap(paths, LogFilename.fromPathString).sort(
+        (name1, name2) => name2.date.getTime() - name1.date.getTime()
+      )
+    } catch {
+      return []
+    }
   }
 }
 
@@ -215,8 +253,14 @@ const formatLogMessage = (
   metadata?: object
 ) => {
   const currentDate = new Date()
+  const levelEmoji = emojiForLogLevel(level)
   const stringifiedMetadata = JSON.stringify(metadata)
-  return `${currentDate.toISOString()} [${label}] (${level.toUpperCase()}) ${message}${
-    stringifiedMetadata ? " " + stringifiedMetadata : ""
-  }\n`
+  const metadataStr = stringifiedMetadata ? ` ${stringifiedMetadata}` : ""
+  return `${currentDate.toISOString()} [${label}] (${level.toUpperCase()} ${levelEmoji}) ${message}${metadataStr}\n`
+}
+
+const emojiForLogLevel = (level: LogLevel) => {
+  if (level === "debug") return "🟢"
+  if (level === "info") return "🔵"
+  return "🔴"
 }

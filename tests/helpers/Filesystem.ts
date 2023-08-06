@@ -40,7 +40,7 @@ export class TestFilesystem implements Filesystem {
     }
   }
 
-  async listDirectory (directoryPath: string) {
+  async listDirectoryContents (directoryPath: string) {
     return fs.readdirSync(TEST_DIRECTORY + directoryPath)
   }
 

@@ -6,17 +6,18 @@ export namespace ArrayUtils {
     return arr.reduce((acc, curr) => (curr ? [...acc, curr] : acc), [])
   }
 
+  /**
+   * Maps an array using a transform function, but removes any `null` or
+   * `undefined` values from the array.
+   */
   export const compactMap = <A, B>(
     arr: A[],
-    mapper: (a: A) => B | undefined | null
+    mapper: (a: A, index: number) => B | undefined | null
   ) => {
-    const arrMapped = [] as NonNullable<B>[]
-    for (const a of arr) {
-      const value = mapper(a)
-      if (value) {
-        arrMapped.push(value)
-      }
-    }
-    return arrMapped
+    return arr.reduce((acc, curr, index) => {
+      const mapped = mapper(curr, index)
+      if (mapped) acc.push(mapped)
+      return acc
+    }, [] as NonNullable<B>[])
   }
 }
