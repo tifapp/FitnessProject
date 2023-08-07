@@ -26,12 +26,7 @@ export type LogHandler = (
   metadata?: object
 ) => void
 
-const consoleLogHandler: LogHandler = async (
-  label,
-  level,
-  message,
-  metadata
-) => {
+const consoleLogHandler: LogHandler = (label, level, message, metadata) => {
   console[level](formatLogMessage(label, level, message, metadata))
 }
 
@@ -165,12 +160,12 @@ export class RotatingFileLogs {
   get logHandler (): LogHandler {
     // NB: We can't just return handleLog directly because then calling addLogHandler will
     // cause the "this" keyword to refer to the global "this", thus causing chaos...
-    return async (label, level, message, metadata) => {
-      await this.handleLog(label, level, message, metadata)
+    return (label, level, message, metadata) => {
+      this.handleLog(label, level, message, metadata)
     }
   }
 
-  private async handleLog (
+  private handleLog (
     label: string,
     level: LogLevel,
     message: string,
@@ -249,7 +244,7 @@ export const sentryBreadcrumbLogHandler = (
     breadcrumb: SentryNative.Breadcrumb
   ) => void = SentryNative.addBreadcrumb
 ): LogHandler => {
-  return async (label, level, message, metadata) => {
+  return (label, level, message, metadata) => {
     if (level === "debug") return
     handleBreadcrumb({
       message,
@@ -282,7 +277,7 @@ export const sentryErrorCapturingLogHandler = (
   captureError: (error: Error) => void = SentryNative.captureException
 ): LogHandler => {
   // NB: We don't need to care about the label of message since those are handled by the breadcrumb handler
-  return async (_, level, __, metadata) => {
+  return (_, level, __, metadata) => {
     if (level !== "error" || !metadata) return
     if ("error" in metadata && metadata.error instanceof Error) {
       captureError(metadata.error)

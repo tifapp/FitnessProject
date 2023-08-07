@@ -237,7 +237,7 @@ describe("Logging tests", () => {
     const label = "sentry.breadcrumbs.test"
     const log = createLogFunction(label)
 
-    it("should ignore DEBUG logs", async () => {
+    it("should ignore DEBUG logs", () => {
       const handleBreadcrumb = jest.fn()
       addLogHandler(sentryBreadcrumbLogHandler(handleBreadcrumb))
 
@@ -246,7 +246,7 @@ describe("Logging tests", () => {
       expect(handleBreadcrumb).not.toHaveBeenCalled()
     })
 
-    test("logging with no metadata", async () => {
+    test("logging with no metadata", () => {
       const handleBreadcrumb = jest.fn()
       addLogHandler(sentryBreadcrumbLogHandler(handleBreadcrumb))
 
@@ -259,7 +259,7 @@ describe("Logging tests", () => {
       })
     })
 
-    test("logging with no category metadata", async () => {
+    test("logging with no category metadata", () => {
       const handleBreadcrumb = jest.fn()
       addLogHandler(sentryBreadcrumbLogHandler(handleBreadcrumb))
 
@@ -272,7 +272,7 @@ describe("Logging tests", () => {
       })
     })
 
-    test("logging with category metadata", async () => {
+    test("logging with category metadata", () => {
       const handleBreadcrumb = jest.fn()
       addLogHandler(sentryBreadcrumbLogHandler(handleBreadcrumb))
 
@@ -293,7 +293,7 @@ describe("Logging tests", () => {
   describe("SentryErrorLogHandler tests", () => {
     const log = createLogFunction("sentry.error.test")
 
-    it("should ignore INFO and DEBUG logs", async () => {
+    it("should ignore INFO and DEBUG logs", () => {
       const captureError = jest.fn()
       addLogHandler(sentryErrorCapturingLogHandler(captureError))
 
@@ -303,7 +303,7 @@ describe("Logging tests", () => {
       expect(captureError).not.toHaveBeenCalled()
     })
 
-    it("should ignore logs with no error field in metadata", async () => {
+    it("should ignore logs with no error field in metadata", () => {
       const captureError = jest.fn()
       addLogHandler(sentryErrorCapturingLogHandler(captureError))
 
@@ -312,7 +312,7 @@ describe("Logging tests", () => {
       expect(captureError).not.toHaveBeenCalled()
     })
 
-    it("should ignore logs with error field that's not of type Error in metadata", async () => {
+    it("should ignore logs with error field that's not of type Error in metadata", () => {
       const captureError = jest.fn()
       addLogHandler(sentryErrorCapturingLogHandler(captureError))
 
@@ -321,11 +321,22 @@ describe("Logging tests", () => {
       expect(captureError).not.toHaveBeenCalled()
     })
 
-    it("should log the error in metadata", async () => {
+    it("should log the error in metadata", () => {
       const captureError = jest.fn()
       addLogHandler(sentryErrorCapturingLogHandler(captureError))
 
       const error = new Error("Some error")
+      log("error", "hello", { error })
+
+      expect(captureError).toHaveBeenCalledWith(error)
+    })
+
+    it("should log a custom error subclass in metadata", () => {
+      class TestError extends Error {}
+      const captureError = jest.fn()
+      addLogHandler(sentryErrorCapturingLogHandler(captureError))
+
+      const error = new TestError("Some error")
       log("error", "hello", { error })
 
       expect(captureError).toHaveBeenCalledWith(error)
