@@ -159,6 +159,8 @@ export class RotatingFileLogs {
    * A log handler which queues log messages but doesn't write them to disk.
    *
    * In order to write the logs to disk, call {@link flush}.
+   *
+   * This log handler ignores `"debug"` level logs.
    */
   get logHandler (): LogHandler {
     // NB: We can't just return handleLog directly because then calling addLogHandler will
@@ -239,6 +241,8 @@ export class RotatingFileLogs {
 
 /**
  * A log handler which tracks info logs as sentry breadcrumbs.
+ *
+ * This log handler ignores `"debug"` level logs.
  */
 export const sentryBreadcrumbLogHandler = (
   handleBreadcrumb: (
@@ -270,7 +274,7 @@ const getSentryBreadcrumbMetadata = (label: string, metadata?: object) => {
 }
 
 /**
- * A `LogHandler` which captures errors to sentry.
+ * A `LogHandler` which captures errors to sentry when a log level of `"error"` is used.
  *
  * The error must be assigned to the `error` field and must be an instance of subclass of {@link Error}.
  */
