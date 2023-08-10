@@ -1,0 +1,40 @@
+name: Storybook Setup
+run-name: Setup Storybook
+
+env:
+  TEST_RUNNER_CI: 1
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - master
+      - development
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.16.0"
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+      - name: Install npm
+        run: npm install -g npm@8.3.2
+      - name: Install dependencies
+        run: cd .storybook | npm ci
+      - name: Lint
+        run: cd .storybook | npm run staged-lint
+      - name: Bundle project
+        run: cd .storybook | npx expo export
