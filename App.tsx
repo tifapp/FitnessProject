@@ -12,6 +12,22 @@ import {
   getCurrentPositionAsync,
   requestForegroundPermissionsAsync
 } from "expo-location"
+import { Native as SentryNative } from "sentry-expo"
+import { enableSentry } from "@lib/Sentry"
+import {
+  addLogHandler,
+  createLogFunction,
+  sentryBreadcrumbLogHandler,
+  sentryErrorCapturingLogHandler
+} from "@lib/Logging"
+
+enableSentry()
+
+const log = createLogFunction("app.root")
+addLogHandler(sentryBreadcrumbLogHandler())
+addLogHandler(sentryErrorCapturingLogHandler())
+
+log("info", "App launched", { date: new Date() })
 
 const Stack = createStackNavigator()
 
@@ -56,4 +72,4 @@ const App = () => {
   )
 }
 
-export default App
+export default SentryNative.wrap(App)
