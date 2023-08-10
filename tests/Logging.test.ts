@@ -18,7 +18,7 @@ describe("Logging tests", () => {
   describe("RotatingFilesystemLogs tests", () => {
     const TEST_DIRECTORY = "test"
     const testLogFileName = (name: string) => {
-      return `${TEST_DIRECTORY}/${name}`
+      return `${TEST_DIRECTORY}/${name}.log`
     }
 
     const fs = TestFilesystem.create()
@@ -62,14 +62,12 @@ describe("Logging tests", () => {
       jest.setSystemTime(new Date("2022-11-24T00:00:05.000Z"))
       log("error", "Test message", { a: 2, b: "world", c: { d: true } })
 
-      let logData = fs.readString(
-        testLogFileName("2022-11-24T00:00:03.000Z.log")
-      )
+      let logData = fs.readString(testLogFileName("2022-11-24T00:00:03.000Z"))
       expect(logData).toBeUndefined()
 
       await fsLogs.flush()
 
-      logData = fs.readString(testLogFileName("2022-11-24T00:00:03.000Z.log"))
+      logData = fs.readString(testLogFileName("2022-11-24T00:00:03.000Z"))
       expect(logData).toEqual(
         `2022-11-24T00:00:03.000Z [rotating.filesystem.test] (INFO 🔵) Test message {"a":1,"b":"hello"}
 2022-11-24T00:00:05.000Z [rotating.filesystem.test] (ERROR 🔴) Test message {"a":2,"b":"world","c":{"d":true}}
@@ -81,7 +79,7 @@ describe("Logging tests", () => {
 
       await fsLogs.flush()
 
-      logData = fs.readString(testLogFileName("2022-11-24T00:00:03.000Z.log"))
+      logData = fs.readString(testLogFileName("2022-11-24T00:00:03.000Z"))
       expect(logData).toEqual(
         `2022-11-24T00:00:03.000Z [rotating.filesystem.test] (INFO 🔵) Test message {"a":1,"b":"hello"}
 2022-11-24T00:00:05.000Z [rotating.filesystem.test] (ERROR 🔴) Test message {"a":2,"b":"world","c":{"d":true}}
@@ -104,9 +102,7 @@ describe("Logging tests", () => {
 
       await fsLogs.flush()
 
-      const logData = fs.readString(
-        testLogFileName("2022-11-24T00:00:03.000Z.log")
-      )
+      const logData = fs.readString(testLogFileName("2022-11-24T00:00:03.000Z"))
       expect(logData).toEqual(
         `2022-11-24T00:00:03.000Z [rotating.filesystem.test] (INFO 🔵) Test message {"a":1,"b":"hello"}
 2022-11-26T00:00:05.000Z [rotating.filesystem.test] (ERROR 🔴) Test message {"a":2,"b":"world","c":{"d":true}}
@@ -124,7 +120,7 @@ describe("Logging tests", () => {
       await fsLogs.flush()
 
       expect(
-        fs.readString(testLogFileName("2022-11-24T00:00:03.000Z.log"))
+        fs.readString(testLogFileName("2022-11-24T00:00:03.000Z"))
       ).toBeUndefined()
     })
 
@@ -144,9 +140,7 @@ describe("Logging tests", () => {
 
       await fsLogs.flush()
 
-      const logData = fs.readString(
-        testLogFileName("2022-11-24T00:00:03.000Z.log")
-      )
+      const logData = fs.readString(testLogFileName("2022-11-24T00:00:03.000Z"))
       expect(logData).toEqual(
         `2022-11-24T00:00:03.000Z [rotating.filesystem.test] (INFO 🔵) test
 2022-11-24T00:12:52.000Z [rotating.filesystem.test] (INFO 🔵) test 2
@@ -175,10 +169,10 @@ describe("Logging tests", () => {
       ])
 
       const file1Logs = fs.readString(
-        testLogFileName("2022-11-24T00:00:03.000Z.log")
+        testLogFileName("2022-11-24T00:00:03.000Z")
       )
       const file2Logs = fs.readString(
-        testLogFileName("2022-12-09T00:00:03.000Z.log")
+        testLogFileName("2022-12-09T00:00:03.000Z")
       )
       expect(file1Logs).toEqual(
         "2022-11-24T00:00:03.000Z [rotating.filesystem.test] (INFO 🔵) Test message 1\n"
@@ -219,10 +213,10 @@ describe("Logging tests", () => {
       ])
 
       const file1Logs = fs.readString(
-        testLogFileName("2023-01-15T00:00:00.000Z.log")
+        testLogFileName("2023-01-15T00:00:00.000Z")
       )
       const file2Logs = fs.readString(
-        testLogFileName("2023-01-29T00:00:00.000Z.log")
+        testLogFileName("2023-01-29T00:00:00.000Z")
       )
       expect(file1Logs).toEqual(
         "2023-01-15T00:00:00.000Z [rotating.filesystem.test] (INFO 🔵) Test message 2\n"
@@ -230,6 +224,24 @@ describe("Logging tests", () => {
       expect(file2Logs).toEqual(
         "2023-01-29T00:00:00.000Z [rotating.filesystem.test] (INFO 🔵) Test message 3\n"
       )
+    })
+
+    it("should trim the number of log files to the maximum when logging to a the current file", async () => {
+      const config = { ...TEST_LOG_FILES_CONFIG, maxFiles: 1 }
+      const fsLogs = setupRotatingFileLogsWithDate(
+        new Date("2023-01-29T00:04:23.000Z"),
+        config
+      )
+      await fs.appendString(testLogFileName("2023-01-01T00:00:00.000Z"), "logs")
+      await fs.appendString(testLogFileName("2023-01-15T00:00:00.000Z"), "logs")
+      await fs.appendString(testLogFileName("2023-01-29T00:00:00.000Z"), "logs")
+
+      log("info", "wsjkadhbibhas")
+
+      await fsLogs.flush()
+
+      const directoryContents = await fs.listDirectoryContents(TEST_DIRECTORY)
+      expect(directoryContents).toEqual(["2023-01-29T00:00:00.000Z.log"])
     })
   })
 

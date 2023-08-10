@@ -82,7 +82,7 @@ class LogFilename {
     this.date = rawValue
   }
 
-  pathInDirectory (directoryPath: string): string {
+  pathInDirectory (directoryPath: string) {
     return `${directoryPath}/${this.date.toISOString()}.log`
   }
 
@@ -193,7 +193,9 @@ export class RotatingFileLogs {
   private async loadOpenLogFilename () {
     if (this.openLogFilename) return this.openLogFilename
 
-    const persistedNames = await this.loadPersistedLogFilenames()
+    const persistedNames = (await this.loadPersistedLogFilenames()).sort(
+      (name1, name2) => name2.date.getTime() - name1.date.getTime()
+    )
     if (persistedNames.length === 0) {
       this.openLogFilename = this.currentDateLogFilename
       return this.currentDateLogFilename
@@ -204,16 +206,16 @@ export class RotatingFileLogs {
       persistedNames[0].date
     )
 
+    const logsToPurge = persistedNames.slice(this.config.maxFiles - 1)
+    for (const logFilename of logsToPurge) {
+      await this.fs.deleteFile(
+        logFilename.pathInDirectory(this.config.directoryPath)
+      )
+    }
+
     if (milliseconds < this.config.rotatingIntervalMillis) {
       this.openLogFilename = persistedNames[0]
       return persistedNames[0]
-    }
-
-    if (persistedNames.length >= this.config.maxFiles) {
-      const deletePath = persistedNames[
-        persistedNames.length - 1
-      ].pathInDirectory(this.config.directoryPath)
-      await this.fs.deleteFile(deletePath)
     }
 
     this.openLogFilename = this.currentDateLogFilename
@@ -225,9 +227,7 @@ export class RotatingFileLogs {
       const paths = await this.fs.listDirectoryContents(
         this.config.directoryPath
       )
-      return ArrayUtils.compactMap(paths, LogFilename.fromPathString).sort(
-        (name1, name2) => name2.date.getTime() - name1.date.getTime()
-      )
+      return ArrayUtils.compactMap(paths, LogFilename.fromPathString)
     } catch {
       return []
     }
