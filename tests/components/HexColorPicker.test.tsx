@@ -2,8 +2,11 @@ import HexColorPicker, {
   HexColorPickerOption
 } from "@components/formComponents/HexColorPicker"
 import { HexColor } from "@lib/Color"
-import { HapticsManagerProvider } from "@lib/Haptics"
-import { hapticsAtom } from "@lib/HapticsManager"
+import {
+  ExpoHapticsImplementation,
+  ExpoHapticsImplementationProvider
+} from "@lib/Haptics"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import { useState } from "react"
 import { View } from "react-native"
@@ -27,16 +30,10 @@ describe("HexColorPicker tests", () => {
     expect(selectedColorElement(testOptions[1].color)).toBeDisplayed()
   })
 
-  it("calls actOnEvent correctly", () => {
+  it("checks the current haptics value", async () => {
     renderHexColorPicker(testOptions)
     selectColor(testOptions[1].color)
-    expect(startWithEvent).toHaveBeenCalled()
-  })
-
-  it("calls turnOffHaptics correctly and switches the current value to what it should be", async () => {
-    renderHexColorPicker(testOptions)
-    selectColor(testOptions[1].color)
-    expect(hapticsAtom.read).toEqual(true)
+    expect(AsyncStorage.getItem("haptics on/off")).toEqual(true)
   })
 })
 
@@ -48,15 +45,13 @@ const Test = ({ options }: { options: HexColorPickerOption[] }) => {
   const [color, setColor] = useState(options[0].color)
 
   return (
-    <HapticsManagerProvider
-      play={startWithEvent}
-      unmute={turnOnHaptics}
-      mute={turnOffHaptics}
+    <ExpoHapticsImplementationProvider
+      haptics={new ExpoHapticsImplementation()}
     >
       <View testID={displayedColorId(color)}>
         <HexColorPicker color={color} onChange={setColor} options={options} />
       </View>
-    </HapticsManagerProvider>
+    </ExpoHapticsImplementationProvider>
   )
 }
 

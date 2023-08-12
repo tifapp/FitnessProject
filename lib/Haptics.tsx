@@ -1,52 +1,77 @@
+import AsyncStorage from "@react-native-async-storage/async-storage"
 import * as ExpoHaptics from "expo-haptics"
+import { atomWithStorage } from "jotai/utils"
 import { ReactNode, createContext, useContext } from "react"
-import { HapticsManager } from "./HapticsManager"
 
 /**
  * A haptic event to be played to the user.
  */
+
+export const hapticsEnabledIndicator = atomWithStorage("haptics on/off", true)
+
+export class ExpoHapticsImplementation implements HapticsFunctions {
+  async play (hapticsTrigger: HapticEvent) {
+    const areHapticsOn = await AsyncStorage.getItem("haptics on/off")
+    if (areHapticsOn) {
+      expoPlayHaptics(hapticsTrigger)
+    }
+  }
+
+  async mute () {
+    await AsyncStorage.setItem("haptics on/off", "false")
+  }
+
+  async unmute () {
+    await AsyncStorage.setItem("haptics on/off", "true")
+  }
+}
+
 export interface HapticsFunctions {
-  play: (hapticTrigger: HapticEvent) => Promise<void>
-  mute: () => void
-  unmute: () => void
+  play(hapticsTrigger: HapticEvent): Promise<void>
+  mute(): Promise<void>
+  unmute(): Promise<void>
 }
 
 /**
  * A function type to indicate haptic feedback being played to the user.
  */
 export type HapticEvent =
-  | "light tap"
-  | "medium tap"
-  | "heavy tap"
-  | "selection"
-  | "success"
-  | "warning"
-  | "error"
+  | { hapticsInteraction: "light tap" }
+  | { hapticsInteraction: "selection" }
+  | { hapticsInteraction: "success" }
+  | { hapticsInteraction: "warning" }
+  | { hapticsInteraction: "error" }
 
-const HapticsManagerContext = createContext<HapticsManager | undefined>(
-  undefined
-)
+const ExpoHapticsImplementationContext = createContext<
+  ExpoHapticsImplementation | undefined
+>(undefined)
 
-export const useHapticsFunctions = () => useContext(HapticsManagerContext)!
+export const useHapticsFunctions = () =>
+  useContext(ExpoHapticsImplementationContext)!
 
-export type HapticsProviderProps = HapticsManager & {
+export type HapticsProviderProps = {
   children: ReactNode
+  haptics: ExpoHapticsImplementation
 }
-
-export const HapticsManagerProvider = ({
+/**
+ * Provider for ExpoHapticsImplementation.
+ *
+ */
+export const ExpoHapticsImplementationProvider = ({
   children,
+  haptics,
   ...props
 }: HapticsProviderProps) => (
-  <HapticsManagerContext.Provider value={props}>
+  <ExpoHapticsImplementationContext.Provider value={haptics}>
     {children}
-  </HapticsManagerContext.Provider>
+  </ExpoHapticsImplementationContext.Provider>
 )
 
 /**
  * Haptics Player implemented by Expo.
  */
 export const expoPlayHaptics = async (event: HapticEvent) => {
-  switch (event) {
+  switch (event.hapticsInteraction) {
   case "selection":
     await ExpoHaptics.selectionAsync()
     break
@@ -67,12 +92,6 @@ export const expoPlayHaptics = async (event: HapticEvent) => {
     break
   case "light tap":
     await ExpoHaptics.impactAsync(ExpoHaptics.ImpactFeedbackStyle.Light)
-    break
-  case "medium tap":
-    await ExpoHaptics.impactAsync(ExpoHaptics.ImpactFeedbackStyle.Medium)
-    break
-  case "heavy tap":
-    await ExpoHaptics.impactAsync(ExpoHaptics.ImpactFeedbackStyle.Heavy)
     break
   }
 }

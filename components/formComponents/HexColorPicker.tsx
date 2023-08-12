@@ -52,8 +52,7 @@ const HexColorPicker = <T extends HexColor = HexColor>({
   const hapticsContext = useHapticsFunctions()
 
   const colorTapped = (option: T) => {
-    hapticsContext.play("light tap")
-    hapticsContext.mute()
+    hapticsContext.play({ hapticsInteraction: "light tap" })
     onChange(option)
   }
 
