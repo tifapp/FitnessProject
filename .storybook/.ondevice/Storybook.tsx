@@ -25,6 +25,9 @@ import TextFieldMeta, {
 import SearchBarMeta, {
   Default as SearchBarBasic
 } from "../components/SearchBar/SearchBar.stories"
+import LocationSearchMeta, {
+  Basic as LocationSearchBasic
+} from "../components/LocationSearch/LocationSearch.stories"
 
 // Create an array of stories
 const stories = [
@@ -62,6 +65,11 @@ const stories = [
     name: SearchBarMeta.title,
     component: SearchBarBasic,
     args: SearchBarMeta.args
+  },
+  {
+    name: LocationSearchMeta.title,
+    component: LocationSearchBasic,
+    args: LocationSearchMeta.args
   }
   // Add more stories here...
 ]

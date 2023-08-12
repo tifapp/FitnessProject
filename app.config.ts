@@ -19,6 +19,7 @@ const config = {
   updates: {
     fallbackToCacheTimeout: 0
   },
+  plugins: ["sentry-expo"],
   assetBundlePatterns: ["**/*"],
   ios: {
     bundleIdentifier: "com.tifapp.FitnessApp",
