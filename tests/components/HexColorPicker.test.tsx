@@ -2,14 +2,12 @@ import HexColorPicker, {
   HexColorPickerOption
 } from "@components/formComponents/HexColorPicker"
 import { HexColor } from "@lib/Color"
-import {
-  ExpoHapticsImplementation,
-  ExpoHapticsImplementationProvider
-} from "@lib/Haptics"
+import { ExpoHapticsImplementation, HapticsProvider } from "@lib/Haptics"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import { useState } from "react"
 import { View } from "react-native"
+import { TestHaptics } from "../helpers/Haptics"
 import "../helpers/Matchers"
 
 const testOptions = [
@@ -18,7 +16,11 @@ const testOptions = [
 ] as HexColorPickerOption[]
 
 describe("HexColorPicker tests", () => {
-  beforeEach(() => jest.resetAllMocks())
+  let haptics = new TestHaptics()
+  beforeEach(() => {
+    haptics = new TestHaptics()
+    jest.resetAllMocks()
+  })
 
   it("can change the selected color", () => {
     renderHexColorPicker(testOptions)
@@ -26,37 +28,35 @@ describe("HexColorPicker tests", () => {
     expect(selectedColorElement(testOptions[1].color)).toBeDisplayed()
   })
 
-  it("checks the current haptics value", async () => {
+  it("plays haptics when selecting the colour", async () => {
     renderHexColorPicker(testOptions)
     selectColor(testOptions[1].color)
-    expect(AsyncStorage.getItem("haptics on/off")).toEqual(true)
+    expect(haptics.playedEvents).toEqual([{ name: "selection" }])
   })
+
+  const renderHexColorPicker = (options: HexColorPickerOption[]) => {
+    render(<Test options={options} />)
+  }
+
+  const Test = ({ options }: { options: HexColorPickerOption[] }) => {
+    const [color, setColor] = useState(options[0].color)
+
+    return (
+      <HapticsProvider haptics={haptics}>
+        <View testID={displayedColorId(color)}>
+          <HexColorPicker color={color} onChange={setColor} options={options} />
+        </View>
+      </HapticsProvider>
+    )
+  }
+
+  const displayedColorId = (color: HexColor) => `displayed-${color}`
+
+  const selectedColorElement = (color: HexColor) => {
+    return screen.queryByTestId(displayedColorId(color))
+  }
+
+  const selectColor = (color: HexColor) => {
+    fireEvent.press(screen.getByLabelText(color))
+  }
 })
-
-const renderHexColorPicker = (options: HexColorPickerOption[]) => {
-  render(<Test options={options} />)
-}
-
-const Test = ({ options }: { options: HexColorPickerOption[] }) => {
-  const [color, setColor] = useState(options[0].color)
-
-  return (
-    <ExpoHapticsImplementationProvider
-      haptics={new ExpoHapticsImplementation()}
-    >
-      <View testID={displayedColorId(color)}>
-        <HexColorPicker color={color} onChange={setColor} options={options} />
-      </View>
-    </ExpoHapticsImplementationProvider>
-  )
-}
-
-const displayedColorId = (color: HexColor) => `displayed-${color}`
-
-const selectedColorElement = (color: HexColor) => {
-  return screen.queryByTestId(displayedColorId(color))
-}
-
-const selectColor = (color: HexColor) => {
-  fireEvent.press(screen.getByLabelText(color))
-}

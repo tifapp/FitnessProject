@@ -8,7 +8,7 @@ import {
   View,
   ViewStyle
 } from "react-native"
-import { useHapticsFunctions } from "../../lib/Haptics"
+import { useHaptics } from "../../lib/Haptics"
 
 export type HexColorPickerOption<T extends HexColor = HexColor> = {
   color: T
@@ -49,10 +49,10 @@ const HexColorPicker = <T extends HexColor = HexColor>({
   options,
   style
 }: HexColorPickerProps<T>) => {
-  const hapticsContext = useHapticsFunctions()
+  const haptics = useHaptics()
 
   const colorTapped = (option: T) => {
-    hapticsContext.play({ hapticsInteraction: "light tap" })
+    haptics.play({ name: "selection" })
     onChange(option)
   }
 
