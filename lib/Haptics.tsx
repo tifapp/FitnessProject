@@ -3,13 +3,9 @@ import * as ExpoHaptics from "expo-haptics"
 import { atomWithStorage } from "jotai/utils"
 import { ReactNode, createContext, useContext } from "react"
 
-/**
- * A haptic event to be played to the user.
- */
-
-export const isHapticsMutedAtom = atomWithStorage("@haptics_is_muted", false)
-
 export const IS_HAPTICS_MUTED_KEY = "@haptics_is_muted"
+
+export const isHapticsMutedAtom = atomWithStorage(IS_HAPTICS_MUTED_KEY, false)
 
 export class PersistentHaptics implements Haptics {
   private readonly playEvent: (event: HapticEvent) => Promise<void>
