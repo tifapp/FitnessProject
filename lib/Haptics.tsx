@@ -9,25 +9,35 @@ import { ReactNode, createContext, useContext } from "react"
 
 export const isHapticsMutedAtom = atomWithStorage("@haptics_is_muted", false)
 
-export class ExpoHapticsImplementation implements Haptics {
-  async play (hapticsTrigger: HapticEvent) {
-    const areHapticsOn = await AsyncStorage.getItem("@haptics_is_muted")
-    if (areHapticsOn) {
-      expoPlayHaptics(hapticsTrigger)
+export const IS_HAPTICS_MUTED_KEY = "@haptics_is_muted"
+
+export class PersistentHaptics implements Haptics {
+  private readonly playEvent: (event: HapticEvent) => Promise<void>
+
+  constructor (
+    playEvent: (event: HapticEvent) => Promise<void> = expoPlayHaptics
+  ) {
+    this.playEvent = playEvent
+  }
+
+  async play (event: HapticEvent) {
+    const isMuted = await AsyncStorage.getItem(IS_HAPTICS_MUTED_KEY)
+    if (!isMuted) {
+      await this.playEvent(event)
     }
   }
 
   mute () {
-    AsyncStorage.setItem("@haptics_is_muted", "false")
+    AsyncStorage.setItem(IS_HAPTICS_MUTED_KEY, "true")
   }
 
   unmute () {
-    AsyncStorage.setItem("@haptics_is_muted", "true")
+    AsyncStorage.removeItem(IS_HAPTICS_MUTED_KEY)
   }
 }
 
 export interface Haptics {
-  play(hapticsTrigger: HapticEvent): Promise<void>
+  play(event: HapticEvent): Promise<void>
   mute(): void
   unmute(): void
 }
