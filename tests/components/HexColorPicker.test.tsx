@@ -12,10 +12,6 @@ import { useState } from "react"
 import { View } from "react-native"
 import "../helpers/Matchers"
 
-const turnOffHaptics = jest.fn()
-const turnOnHaptics = jest.fn()
-const startWithEvent = jest.fn()
-
 const testOptions = [
   { color: "#123456", accessibilityLabel: "#123456" },
   { color: "#abcdef", accessibilityLabel: "#abcdef" }
