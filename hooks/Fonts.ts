@@ -12,11 +12,12 @@ import {
  * This hook should only need to be called once at the root of the
  * application. Subsequent calls will produce error results.
  */
-export const useAppFonts = () => useFonts({
-  OpenSansSemiBold,
-  OpenSans,
-  OpenSansBold
-})
+export const useAppFonts = () =>
+  useFonts({
+    OpenSansSemiBold,
+    OpenSans,
+    OpenSansBold
+  })
 
 /**
  * Common font scale factor cutoffs somewhat based on iOS's dynamic type sizes.

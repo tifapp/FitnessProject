@@ -59,7 +59,8 @@
     "RequestInfo": "readonly",
     "RequestInit": "readonly",
     "JSX": "readonly",
-    "NodeJS": "readonly"
+    "NodeJS": "readonly",
+    "__DEV__": "readonly"
   },
   "overrides": [
     {
