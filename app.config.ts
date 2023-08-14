@@ -70,7 +70,6 @@ const config = {
       "WRITE_CALENDAR"
     ],
     package: "com.tifapp.FitnessApp",
-    useNextNotificationsApi: true,
     googleServicesFile: "./google-services.json"
   }
 }
