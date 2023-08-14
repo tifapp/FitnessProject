@@ -10,7 +10,8 @@
     "test": "jest",
     "test:ci": "jest --ci --detectOpenHandles",
     "prepare": "husky install",
-    "staged-lint": "lint-staged"
+    "staged-lint": "lint-staged",
+    "dev": "expo start --dev-client"
   },
   "engines": {
     "npm": ">=8.3.0"
