@@ -2,8 +2,7 @@ import HexColorPicker, {
   HexColorPickerOption
 } from "@components/formComponents/HexColorPicker"
 import { HexColor } from "@lib/Color"
-import { ExpoHapticsImplementation, HapticsProvider } from "@lib/Haptics"
-import AsyncStorage from "@react-native-async-storage/async-storage"
+import { HapticsProvider } from "@lib/Haptics"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import { useState } from "react"
 import { View } from "react-native"
