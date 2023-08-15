@@ -20,6 +20,7 @@ import {
   sentryBreadcrumbLogHandler,
   sentryErrorCapturingLogHandler
 } from "@lib/Logging"
+import "expo-dev-client"
 
 enableSentry()
 
