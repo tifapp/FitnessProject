@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React from "react"
 import { RootSiblingParent } from "react-native-root-siblings"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
