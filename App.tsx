@@ -2,6 +2,7 @@ import { TiFMenuProvider } from "@components/TiFMenuProvider"
 import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { useAppFonts } from "@hooks/Fonts"
 import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
+import { HapticsProvider, PersistentHaptics } from "@lib/Haptics"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { TabNavigation } from "@stacks/ActivitiesStack"
@@ -68,22 +69,26 @@ const AppView = ({ isFontsLoaded }: AppProps) => {
   )
 }
 
+const haptics = new PersistentHaptics()
+
 const App = () => {
   const [isFontsLoaded] = useAppFonts()
   return (
     <TiFQueryClientProvider>
-      <UserLocationFunctionsProvider
-        getCurrentLocation={getCurrentPositionAsync}
-        requestForegroundPermissions={requestForegroundPermissionsAsync}
-      >
-        <SafeAreaProvider>
-          <TiFMenuProvider>
-            <RootSiblingParent>
-              <AppView isFontsLoaded={isFontsLoaded} />
-            </RootSiblingParent>
-          </TiFMenuProvider>
-        </SafeAreaProvider>
-      </UserLocationFunctionsProvider>
+      <HapticsProvider haptics={haptics}>
+        <UserLocationFunctionsProvider
+          getCurrentLocation={getCurrentPositionAsync}
+          requestForegroundPermissions={requestForegroundPermissionsAsync}
+        >
+          <SafeAreaProvider>
+            <TiFMenuProvider>
+              <RootSiblingParent>
+                <AppView isFontsLoaded={isFontsLoaded} />
+              </RootSiblingParent>
+            </TiFMenuProvider>
+          </SafeAreaProvider>
+        </UserLocationFunctionsProvider>
+      </HapticsProvider>
     </TiFQueryClientProvider>
   )
 }
