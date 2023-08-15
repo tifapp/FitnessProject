@@ -13,24 +13,31 @@ export const isHapticsMutedAtom = atomWithStorage(IS_HAPTICS_MUTED_KEY, false)
 export type HapticEvent = { name: "selection" }
 
 /**
- * Interface that provides structures for functions for:
- *
- * - How to play haptics
- * - How to mute/unmute the activation of haptics
+ * An interface for playing and configuring haptics.
  */
 export interface Haptics {
+  /**
+   * Plays haptic feedback for the given {@link HapticEvent}.
+   */
   play(event: HapticEvent): Promise<void>
+
+  /**
+   * Mutes haptics if unmuted.
+   */
   mute(): void
+
+  /**
+   * Unmutes haptics if muted.
+   */
   unmute(): void
 }
 
+/**
+ * A {@link Haptics} implementation that persists the mute state to {@link AsyncStorage}.
+ */
 export class PersistentHaptics implements Haptics {
   private readonly playEvent: (event: HapticEvent) => Promise<void>
 
-  /**
-   * Assigns the function callback that occurs when a HapticEvent is given.
-   * @param playEvent
-   */
   constructor (
     playEvent: (event: HapticEvent) => Promise<void> = expoPlayHaptics
   ) {
@@ -49,16 +56,10 @@ export class PersistentHaptics implements Haptics {
     }
   }
 
-  /**
-   * Sets the haptics muted key to "true", enabling haptics for use.
-   */
   mute () {
     AsyncStorage.setItem(IS_HAPTICS_MUTED_KEY, "true")
   }
 
-  /**
-   * Removes the haptics muted key, disabling haptics for use.
-   */
   unmute () {
     AsyncStorage.removeItem(IS_HAPTICS_MUTED_KEY)
   }
@@ -66,6 +67,9 @@ export class PersistentHaptics implements Haptics {
 
 const HapticsContext = createContext<Haptics | undefined>(undefined)
 
+/**
+ * The current {@link Haptics} implementation provided by {@link HapticsProvider}.
+ */
 export const useHaptics = () => useContext(HapticsContext)!
 
 export type HapticsProviderProps = {
@@ -74,7 +78,7 @@ export type HapticsProviderProps = {
 }
 
 /**
- * Provider for {@link Haptics}
+ * Provider for {@link Haptics}.
  */
 export const HapticsProvider = ({
   children,
