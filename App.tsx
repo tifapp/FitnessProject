@@ -1,19 +1,30 @@
-import React from "react"
-import { RootSiblingParent } from "react-native-root-siblings"
-import { NavigationContainer } from "@react-navigation/native"
-import { createStackNavigator } from "@react-navigation/stack"
+import { TiFMenuProvider } from "@components/TiFMenuProvider"
 import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { useAppFonts } from "@hooks/Fonts"
-import { TabNavigation } from "@stacks/ActivitiesStack"
-import { SafeAreaProvider } from "react-native-safe-area-context"
-import { TiFMenuProvider } from "@components/TiFMenuProvider"
 import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
+import { HapticsProvider, PersistentHaptics } from "@lib/Haptics"
+import { NavigationContainer } from "@react-navigation/native"
+import { createStackNavigator } from "@react-navigation/stack"
+import { TabNavigation } from "@stacks/ActivitiesStack"
 import {
   getCurrentPositionAsync,
   requestForegroundPermissionsAsync
 } from "expo-location"
-import { Native as SentryNative } from "sentry-expo"
-import { enableSentry } from "@lib/Sentry"
+import React from "react"
+import { RootSiblingParent } from "react-native-root-siblings"
+import { SafeAreaProvider } from "react-native-safe-area-context"
+
+import { withAuthenticator } from "aws-amplify-react-native"
+
+import { Geo } from "@aws-amplify/geo"
+import ConfirmSignIn from "@components/loginComponents/ConfirmSignIn"
+import ConfirmSignUp from "@components/loginComponents/ConfirmSignUp"
+import ForgotPassword from "@components/loginComponents/ForgotPassword"
+import Greetings from "@components/loginComponents/Greetings"
+import RequireNewPassword from "@components/loginComponents/RequireNewPassword"
+import SignIn from "@components/loginComponents/SignIn"
+import SignUp from "@components/loginComponents/SignUp"
+import VerifyContact from "@components/loginComponents/VerifyContact"
 import {
   addLogHandler,
   createLogFunction,
@@ -21,6 +32,12 @@ import {
   sentryErrorCapturingLogHandler
 } from "@lib/Logging"
 import "expo-dev-client"
+import { enableSentry } from "@lib/Sentry"
+import { Auth } from "aws-amplify"
+import { Native as SentryNative } from "sentry-expo"
+import awsconfig from "./src/aws-exports"
+Geo.configure(awsconfig)
+Auth.configure(awsconfig)
 
 enableSentry()
 
@@ -53,24 +70,39 @@ const AppView = ({ isFontsLoaded }: AppProps) => {
   )
 }
 
+const haptics = new PersistentHaptics()
+
 const App = () => {
   const [isFontsLoaded] = useAppFonts()
   return (
     <TiFQueryClientProvider>
-      <UserLocationFunctionsProvider
-        getCurrentLocation={getCurrentPositionAsync}
-        requestForegroundPermissions={requestForegroundPermissionsAsync}
-      >
-        <SafeAreaProvider>
-          <TiFMenuProvider>
-            <RootSiblingParent>
-              <AppView isFontsLoaded={isFontsLoaded} />
-            </RootSiblingParent>
-          </TiFMenuProvider>
-        </SafeAreaProvider>
-      </UserLocationFunctionsProvider>
+      <HapticsProvider haptics={haptics}>
+        <UserLocationFunctionsProvider
+          getCurrentLocation={getCurrentPositionAsync}
+          requestForegroundPermissions={requestForegroundPermissionsAsync}
+        >
+          <SafeAreaProvider>
+            <TiFMenuProvider>
+              <RootSiblingParent>
+                <AppView isFontsLoaded={isFontsLoaded} />
+              </RootSiblingParent>
+            </TiFMenuProvider>
+          </SafeAreaProvider>
+        </UserLocationFunctionsProvider>
+      </HapticsProvider>
     </TiFQueryClientProvider>
   )
 }
 
-export default SentryNative.wrap(App)
+export default SentryNative.wrap(
+  withAuthenticator(App, false, [
+    <Greetings />,
+    <SignIn />,
+    <SignUp />,
+    <ConfirmSignIn />,
+    <ConfirmSignUp />,
+    <VerifyContact />,
+    <ForgotPassword />,
+    <RequireNewPassword />
+  ])
+)
