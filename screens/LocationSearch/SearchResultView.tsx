@@ -8,6 +8,8 @@ import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { Ionicon } from "@components/common/Icons"
 import { compactFormatFeet, compactFormatMiles } from "@lib/DistanceFormatting"
 import { FEET_PER_MILE } from "@lib/Math"
+import { LocationSearchIconView } from "./Icon"
+import { AppStyles } from "@lib/AppColorStyle"
 
 export type LocationSearchResultProps = {
   result: LocationSearchResult
@@ -28,7 +30,15 @@ export const LocationSearchResultView = ({
   )
   return (
     <View style={[style, styles.container]}>
-      <Ionicon
+      <LocationSearchIconView
+        backgroundColor={
+          result.isRecentLocation
+            ? AppStyles.colorOpacity35
+            : AppStyles.darkColor
+        }
+        accessibilityLabel={
+          result.isRecentLocation ? "Recent Search" : "Search Result"
+        }
         name={result.isRecentLocation ? "time" : "location"}
         style={styles.iconContainer}
       />
@@ -72,7 +82,6 @@ const styles = StyleSheet.create({
     width: "100%"
   },
   iconContainer: {
-    display: "flex",
     marginRight: 8
   },
   annotationText: {

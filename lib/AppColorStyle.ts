@@ -7,4 +7,5 @@ export namespace AppStyles {
   export const highlightedText = "#4285F4"
   export const eventCardColor = "#F4F4F6"
   export const eventCardBorder = "rgba(145, 145, 145, 0.2)"
+  export const linkColor = "#4287f5"
 }

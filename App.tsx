@@ -14,6 +14,38 @@ import React from "react"
 import { RootSiblingParent } from "react-native-root-siblings"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 
+import { withAuthenticator } from "aws-amplify-react-native"
+
+import { Geo } from "@aws-amplify/geo"
+import ConfirmSignIn from "@components/loginComponents/ConfirmSignIn"
+import ConfirmSignUp from "@components/loginComponents/ConfirmSignUp"
+import ForgotPassword from "@components/loginComponents/ForgotPassword"
+import Greetings from "@components/loginComponents/Greetings"
+import RequireNewPassword from "@components/loginComponents/RequireNewPassword"
+import SignIn from "@components/loginComponents/SignIn"
+import SignUp from "@components/loginComponents/SignUp"
+import VerifyContact from "@components/loginComponents/VerifyContact"
+import {
+  addLogHandler,
+  createLogFunction,
+  sentryBreadcrumbLogHandler,
+  sentryErrorCapturingLogHandler
+} from "@lib/Logging"
+import { enableSentry } from "@lib/Sentry"
+import { Auth } from "aws-amplify"
+import { Native as SentryNative } from "sentry-expo"
+import awsconfig from "./src/aws-exports"
+Geo.configure(awsconfig)
+Auth.configure(awsconfig)
+
+enableSentry()
+
+const log = createLogFunction("app.root")
+addLogHandler(sentryBreadcrumbLogHandler())
+addLogHandler(sentryErrorCapturingLogHandler())
+
+log("info", "App launched", { date: new Date() })
+
 const Stack = createStackNavigator()
 
 export type AppProps = {
@@ -61,4 +93,15 @@ const App = () => {
   )
 }
 
-export default App
+export default SentryNative.wrap(
+  withAuthenticator(App, false, [
+    <Greetings />,
+    <SignIn />,
+    <SignUp />,
+    <ConfirmSignIn />,
+    <ConfirmSignUp />,
+    <VerifyContact />,
+    <ForgotPassword />,
+    <RequireNewPassword />
+  ])
+)

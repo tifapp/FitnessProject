@@ -76,15 +76,6 @@ const recentLocationsWithKeys = async (keys: string[]) => {
 }
 
 /**
- * A function type for saving a location that the user has recently
- * interacted with.
- */
-export type SaveRecentLocation = (
-  selection: TiFLocation,
-  annotation?: RecentLocationAnnotation
-) => Promise<void>
-
-/**
  * Saves a location to async storage with the given reason.
  */
 export const asyncStorageSaveRecentLocation = async (
