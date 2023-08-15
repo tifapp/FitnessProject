@@ -21,6 +21,7 @@ import {
   sentryErrorCapturingLogHandler
 } from "@lib/Logging"
 import "expo-dev-client"
+import { AnalyticsProvider, MixpanelAnalytics } from "@lib/Analytics"
 
 enableSentry()
 
@@ -61,13 +62,15 @@ const App = () => {
         getCurrentLocation={getCurrentPositionAsync}
         requestForegroundPermissions={requestForegroundPermissionsAsync}
       >
-        <SafeAreaProvider>
-          <TiFMenuProvider>
-            <RootSiblingParent>
-              <AppView isFontsLoaded={isFontsLoaded} />
-            </RootSiblingParent>
-          </TiFMenuProvider>
-        </SafeAreaProvider>
+        <AnalyticsProvider analytics={MixpanelAnalytics.shared}>
+          <SafeAreaProvider>
+            <TiFMenuProvider>
+              <RootSiblingParent>
+                <AppView isFontsLoaded={isFontsLoaded} />
+              </RootSiblingParent>
+            </TiFMenuProvider>
+          </SafeAreaProvider>
+        </AnalyticsProvider>
       </UserLocationFunctionsProvider>
     </TiFQueryClientProvider>
   )
