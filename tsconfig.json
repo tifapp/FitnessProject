@@ -25,6 +25,7 @@
       "@assets/*": ["./assets/*"],
       "@graphql/*": ["./src/graphql/*"],
       "@lib/*": ["./lib/*"],
+      "@native/*": ["./native/*"],
       "env": ["./.env"]
     }
   },

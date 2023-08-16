@@ -2,23 +2,27 @@ import { HapticEvent, Haptics } from "@lib/Haptics"
 
 export class TestHaptics implements Haptics {
   private _playedEvents = [] as HapticEvent[]
-  private isMuted = false
+  private _isMuted = false
 
   get playedEvents () {
     return this._playedEvents
   }
 
+  get isMuted () {
+    return this._isMuted
+  }
+
   async play (event: HapticEvent) {
-    if (!this.isMuted) {
+    if (!this._isMuted) {
       this._playedEvents.push(event)
     }
   }
 
   mute () {
-    this.isMuted = true
+    this._isMuted = true
   }
 
   unmute () {
-    this.isMuted = false
+    this._isMuted = false
   }
 }

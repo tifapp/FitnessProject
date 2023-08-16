@@ -2,7 +2,11 @@ import { TiFMenuProvider } from "@components/TiFMenuProvider"
 import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { useAppFonts } from "@hooks/Fonts"
 import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
-import { HapticsProvider, PersistentHaptics } from "@lib/Haptics"
+import {
+  HapticsProvider,
+  IS_HAPTICS_SUPPORTED_ON_DEVICE,
+  TiFHaptics
+} from "@lib/Haptics"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { TabNavigation } from "@stacks/ActivitiesStack"
@@ -37,6 +41,7 @@ import { enableSentry } from "@lib/Sentry"
 import { Auth } from "aws-amplify"
 import { Native as SentryNative } from "sentry-expo"
 import awsconfig from "./src/aws-exports"
+
 Geo.configure(awsconfig)
 Auth.configure(awsconfig)
 
@@ -79,7 +84,10 @@ const App = () => {
         getCurrentLocation={getCurrentPositionAsync}
         requestForegroundPermissions={requestForegroundPermissionsAsync}
       >
-        <HapticsProvider haptics={PersistentHaptics.shared}>
+        <HapticsProvider
+          isSupportedOnDevice={IS_HAPTICS_SUPPORTED_ON_DEVICE}
+          haptics={TiFHaptics}
+        >
           <AnalyticsProvider analytics={MixpanelAnalytics.shared}>
             <SafeAreaProvider>
               <TiFMenuProvider>

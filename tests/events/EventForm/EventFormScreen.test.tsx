@@ -178,7 +178,10 @@ const renderEventFormScreen = (
   render(
     <NavigationContainer>
       <TestQueryClientProvider client={queryClient}>
-        <HapticsProvider haptics={new TestHaptics()}>
+        <HapticsProvider
+          isSupportedOnDevice={false}
+          haptics={new TestHaptics()}
+        >
           <GeocodingFunctionsProvider reverseGeocode={neverPromise}>
             <EventFormScreen
               submissionLabel={testSubmissionLabel}
