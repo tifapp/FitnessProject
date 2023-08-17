@@ -13,6 +13,17 @@ export const isHapticsMutedAtom = atomWithStorage(IS_HAPTICS_MUTED_KEY, false)
 export type HapticEvent = { name: "selection" }
 
 /**
+ * Haptics Player implemented by Expo.
+ */
+export const expoPlayHaptics = async (event: HapticEvent) => {
+  switch (event.name) {
+  case "selection":
+    await ExpoHaptics.selectionAsync()
+    break
+  }
+}
+
+/**
  * An interface for playing and configuring haptics.
  */
 export interface Haptics {
@@ -36,11 +47,11 @@ export interface Haptics {
  * A {@link Haptics} implementation that persists the mute state to {@link AsyncStorage}.
  */
 export class PersistentHaptics implements Haptics {
+  static shared = new PersistentHaptics(expoPlayHaptics)
+
   private readonly playEvent: (event: HapticEvent) => Promise<void>
 
-  constructor (
-    playEvent: (event: HapticEvent) => Promise<void> = expoPlayHaptics
-  ) {
+  constructor (playEvent: (event: HapticEvent) => Promise<void>) {
     this.playEvent = playEvent
   }
 
@@ -86,14 +97,3 @@ export const HapticsProvider = ({
 }: HapticsProviderProps) => (
   <HapticsContext.Provider value={haptics}>{children}</HapticsContext.Provider>
 )
-
-/**
- * Haptics Player implemented by Expo.
- */
-export const expoPlayHaptics = async (event: HapticEvent) => {
-  switch (event.name) {
-  case "selection":
-    await ExpoHaptics.selectionAsync()
-    break
-  }
-}

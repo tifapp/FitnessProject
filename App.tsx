@@ -32,6 +32,7 @@ import {
   sentryErrorCapturingLogHandler
 } from "@lib/Logging"
 import "expo-dev-client"
+import { AnalyticsProvider, MixpanelAnalytics } from "@lib/Analytics"
 import { enableSentry } from "@lib/Sentry"
 import { Auth } from "aws-amplify"
 import { Native as SentryNative } from "sentry-expo"
@@ -70,26 +71,26 @@ const AppView = ({ isFontsLoaded }: AppProps) => {
   )
 }
 
-const haptics = new PersistentHaptics()
-
 const App = () => {
   const [isFontsLoaded] = useAppFonts()
   return (
     <TiFQueryClientProvider>
-      <HapticsProvider haptics={haptics}>
-        <UserLocationFunctionsProvider
-          getCurrentLocation={getCurrentPositionAsync}
-          requestForegroundPermissions={requestForegroundPermissionsAsync}
-        >
-          <SafeAreaProvider>
-            <TiFMenuProvider>
-              <RootSiblingParent>
-                <AppView isFontsLoaded={isFontsLoaded} />
-              </RootSiblingParent>
-            </TiFMenuProvider>
-          </SafeAreaProvider>
-        </UserLocationFunctionsProvider>
-      </HapticsProvider>
+      <UserLocationFunctionsProvider
+        getCurrentLocation={getCurrentPositionAsync}
+        requestForegroundPermissions={requestForegroundPermissionsAsync}
+      >
+        <HapticsProvider haptics={PersistentHaptics.shared}>
+          <AnalyticsProvider analytics={MixpanelAnalytics.shared}>
+            <SafeAreaProvider>
+              <TiFMenuProvider>
+                <RootSiblingParent>
+                  <AppView isFontsLoaded={isFontsLoaded} />
+                </RootSiblingParent>
+              </TiFMenuProvider>
+            </SafeAreaProvider>
+          </AnalyticsProvider>
+        </HapticsProvider>
+      </UserLocationFunctionsProvider>
     </TiFQueryClientProvider>
   )
 }
