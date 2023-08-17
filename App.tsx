@@ -41,7 +41,6 @@ import { enableSentry } from "@lib/Sentry"
 import { Auth } from "aws-amplify"
 import { Native as SentryNative } from "sentry-expo"
 import awsconfig from "./src/aws-exports"
-import { Button, View } from "react-native"
 
 Geo.configure(awsconfig)
 Auth.configure(awsconfig)

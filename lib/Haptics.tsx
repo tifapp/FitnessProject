@@ -1,12 +1,15 @@
-import AsyncStorage from "@react-native-async-storage/async-storage"
-import { atomWithStorage } from "jotai/utils"
-import React, { ReactNode, createContext, useContext } from "react"
+import React, { ReactNode, createContext, useContext, useEffect } from "react"
 import { TiFNativeHaptics, TiFNativeHapticEvent } from "@modules/tif-haptics"
 import { createLogFunction } from "./Logging"
+import { useAtom } from "jotai"
+import { atomWithAsyncStorage } from "./Jotai"
 
 export const IS_HAPTICS_MUTED_KEY = "@haptics_is_muted"
 
-export const isHapticsMutedAtom = atomWithStorage(IS_HAPTICS_MUTED_KEY, false)
+export const isHapticsMutedAtom = atomWithAsyncStorage(
+  IS_HAPTICS_MUTED_KEY,
+  false
+)
 
 export const IS_HAPTICS_SUPPORTED_ON_DEVICE =
   !!TiFNativeHaptics.IS_HAPTICS_SUPPORTED
@@ -41,41 +44,13 @@ export interface Haptics {
   unmute(): void
 }
 
-/**
- * A {@link Haptics} implementation that persists the mute state to {@link AsyncStorage}.
- */
-export class PersistentHaptics<Base extends Haptics> implements Haptics {
-  private readonly base: Base
-
-  constructor (base: Base) {
-    this.base = base
-  }
-
-  async play (event: HapticEvent) {
-    const isMuted = await AsyncStorage.getItem(IS_HAPTICS_MUTED_KEY)
-    if (!isMuted) {
-      await this.base.play(event)
-    }
-  }
-
-  mute () {
-    AsyncStorage.setItem(IS_HAPTICS_MUTED_KEY, "true")
-    this.base.mute()
-  }
-
-  unmute () {
-    AsyncStorage.removeItem(IS_HAPTICS_MUTED_KEY)
-    this.base.unmute()
-  }
-}
-
 const log = createLogFunction("tif.haptics")
 
 /**
  * The default {@link Haptics} implementation which persists the mute state in async storage,
  * and uses CoreHaptics on iOS and Vibrator on Android.
  */
-export const TiFHaptics = new PersistentHaptics({
+export const TiFHaptics = {
   ...TiFNativeHaptics,
   play: async (event: HapticEvent) => {
     try {
@@ -86,7 +61,7 @@ export const TiFHaptics = new PersistentHaptics({
       })
     }
   }
-}) as Haptics
+} as Haptics
 
 export type HapticsContextValues = Haptics & { isSupportedOnDevice: boolean }
 
@@ -97,7 +72,25 @@ const HapticsContext = createContext<HapticsContextValues | undefined>(
 /**
  * The current {@link Haptics} implementation provided by {@link HapticsProvider}.
  */
-export const useHaptics = () => useContext(HapticsContext)!
+export const useHaptics = () => {
+  const [isMuted, setIsMuted] = useAtom(isHapticsMutedAtom)
+  const hapticsContext = useContext(HapticsContext)!
+
+  useEffect(() => {
+    if (isMuted) {
+      hapticsContext.mute()
+    } else {
+      hapticsContext.unmute()
+    }
+  }, [isMuted, hapticsContext])
+
+  return {
+    ...hapticsContext,
+    isMuted,
+    mute: () => setIsMuted(true),
+    unmute: () => setIsMuted(false)
+  }
+}
 
 export type HapticsProviderProps = {
   haptics: Haptics

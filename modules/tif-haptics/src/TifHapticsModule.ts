@@ -11,7 +11,12 @@ const resolveNativeModule = <Module = any>(name: string) => {
   try {
     return requireNativeModule<Module>(name)
   } catch (error) {
-    log("error", `Native module ${name} failed to load.`, { error })
+    // NB: - Yes node... I know it doesn't load in tests...
+    if (process.env.JEST_WORKER_ID) return {}
+    log("error", `Native module ${name} failed to load.`, {
+      error,
+      message: error.message
+    })
     return {}
   }
 }
