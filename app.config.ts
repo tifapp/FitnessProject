@@ -2,7 +2,7 @@ import * as dotenv from "dotenv"
 
 dotenv.config()
 
-const { MAPS_API } = process.env
+const { MAPS_API, EXPO_PROJECT_ID, EXPO_PROJECT_OWNER } = process.env
 
 const config = {
   name: "FitnessApp",
@@ -18,6 +18,12 @@ const config = {
   },
   updates: {
     fallbackToCacheTimeout: 0
+  },
+  owner: EXPO_PROJECT_OWNER,
+  extra: {
+    eas: {
+      projectId: EXPO_PROJECT_ID
+    }
   },
   plugins: ["sentry-expo"],
   assetBundlePatterns: ["**/*"],
@@ -64,7 +70,6 @@ const config = {
       "WRITE_CALENDAR"
     ],
     package: "com.tifapp.FitnessApp",
-    useNextNotificationsApi: true,
     googleServicesFile: "./google-services.json"
   }
 }
