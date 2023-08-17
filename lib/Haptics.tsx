@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { atomWithStorage } from "jotai/utils"
 import React, { ReactNode, createContext, useContext } from "react"
-import { TiFNativeHaptics, TiFNativeHapticEvent } from "@native/tif-haptics"
+import { TiFNativeHaptics, TiFNativeHapticEvent } from "@modules/tif-haptics"
 import { createLogFunction } from "./Logging"
 
 export const IS_HAPTICS_MUTED_KEY = "@haptics_is_muted"
@@ -16,7 +16,7 @@ export const IS_HAPTICS_SUPPORTED_ON_DEVICE =
  */
 export type HapticEvent = { name: "selection" }
 
-export const toNativeHapticEvent = (_: HapticEvent) => {
+const toNativeHapticEvent = (_: HapticEvent) => {
   // TODO: - Add more events
   return TiFNativeHapticEvent.Selection
 }
@@ -39,26 +39,6 @@ export interface Haptics {
    * Unmutes haptics if muted.
    */
   unmute(): void
-}
-
-class NativeHaptics implements Haptics {
-  private readonly log = createLogFunction("native.haptics")
-
-  async play (event: HapticEvent) {
-    try {
-      await TiFNativeHaptics.play(toNativeHapticEvent(event))
-    } catch (error) {
-      this.log("warn", "An error occurred when playing haptics", { error })
-    }
-  }
-
-  mute () {
-    TiFNativeHaptics.mute()
-  }
-
-  unmute () {
-    TiFNativeHaptics.unmute()
-  }
 }
 
 /**
@@ -89,11 +69,24 @@ export class PersistentHaptics<Base extends Haptics> implements Haptics {
   }
 }
 
+const log = createLogFunction("tif.haptics")
+
 /**
  * The default {@link Haptics} implementation which persists the mute state in async storage,
  * and uses CoreHaptics on iOS and Vibrator on Android.
  */
-export const TiFHaptics = new PersistentHaptics(new NativeHaptics()) as Haptics
+export const TiFHaptics = new PersistentHaptics({
+  ...TiFNativeHaptics,
+  play: async (event: HapticEvent) => {
+    try {
+      await TiFNativeHaptics.play(toNativeHapticEvent(event))
+    } catch (error) {
+      log("warn", "An error occurred when playing haptics", {
+        error: error.message
+      })
+    }
+  }
+}) as Haptics
 
 export type HapticsContextValues = Haptics & { isSupportedOnDevice: boolean }
 

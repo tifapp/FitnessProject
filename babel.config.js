@@ -25,7 +25,7 @@ module.exports = function (api) {
             "@assets": path.join(rootPath, "assets"),
             "@graphql": path.join(rootPath, "src/graphql"),
             "@lib": path.join(rootPath, "lib"),
-            "@native": path.join(rootPath, "native")
+            "@modules": path.join(rootPath, "modules")
           },
           extensions: [".js", ".jsx", ".ts", ".tsx"]
         }
