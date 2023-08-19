@@ -30,6 +30,6 @@ export class SecureStorage implements StorageManagement<string | null> {
   }
 
   clear () {
-    console.log("Cool")
+    console.log("Data cleared.")
   }
 }
