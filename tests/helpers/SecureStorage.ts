@@ -8,10 +8,6 @@ export class TestSecureStorage implements StorageManagement<string | null> {
   // set item with the key
   private _currentStorage = new Map()
 
-  get currentStorage () {
-    return this._currentStorage
-  }
-
   // set item with the key
   async setItem (key: string, value: string) {
     this._currentStorage.set(key, value)
