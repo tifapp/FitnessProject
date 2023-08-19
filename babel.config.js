@@ -1,11 +1,11 @@
 // @ts-nocheck
 /* eslint-disable comma-dangle */
 /* eslint-disable semi */
-const path = require("path");
-const rootPath = __dirname;
+const path = require("path")
+const rootPath = __dirname
 
 module.exports = function (api) {
-  api.cache(true);
+  api.cache(true)
   return {
     presets: ["babel-preset-expo"],
     plugins: [
@@ -25,11 +25,12 @@ module.exports = function (api) {
             "@assets": path.join(rootPath, "assets"),
             "@graphql": path.join(rootPath, "src/graphql"),
             "@lib": path.join(rootPath, "lib"),
+            "@auth": path.join(rootPath, "auth")
           },
-          extensions: [".js", ".jsx", ".ts", ".tsx"],
-        },
+          extensions: [".js", ".jsx", ".ts", ".tsx"]
+        }
       ],
-      "react-native-reanimated/plugin",
-    ],
-  };
-};
+      "react-native-reanimated/plugin"
+    ]
+  }
+}
