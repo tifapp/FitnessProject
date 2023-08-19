@@ -1,26 +1,27 @@
-import AsyncStorage from "@react-native-async-storage/async-storage"
-import * as ExpoHaptics from "expo-haptics"
-import { atomWithStorage } from "jotai/utils"
-import React, { ReactNode, createContext, useContext } from "react"
+import React, { ReactNode, createContext, useContext, useEffect } from "react"
+import { TiFNativeHaptics, TiFNativeHapticEvent } from "@modules/tif-haptics"
+import { createLogFunction } from "./Logging"
+import { useAtom } from "jotai"
+import { atomWithAsyncStorage } from "./Jotai"
 
 export const IS_HAPTICS_MUTED_KEY = "@haptics_is_muted"
 
-export const isHapticsMutedAtom = atomWithStorage(IS_HAPTICS_MUTED_KEY, false)
+export const isHapticsMutedAtom = atomWithAsyncStorage(
+  IS_HAPTICS_MUTED_KEY,
+  false
+)
+
+export const IS_HAPTICS_SUPPORTED_ON_DEVICE =
+  !!TiFNativeHaptics.IS_HAPTICS_SUPPORTED
 
 /**
  * A function type to indicate haptic feedback being played to the user.
  */
 export type HapticEvent = { name: "selection" }
 
-/**
- * Haptics Player implemented by Expo.
- */
-export const expoPlayHaptics = async (event: HapticEvent) => {
-  switch (event.name) {
-  case "selection":
-    await ExpoHaptics.selectionAsync()
-    break
-  }
+const toNativeHapticEvent = (_: HapticEvent) => {
+  // TODO: - Add more events
+  return TiFNativeHapticEvent.Selection
 }
 
 /**
@@ -43,49 +44,58 @@ export interface Haptics {
   unmute(): void
 }
 
+const log = createLogFunction("tif.haptics")
+
 /**
- * A {@link Haptics} implementation that persists the mute state to {@link AsyncStorage}.
+ * The default {@link Haptics} implementation which persists the mute state in async storage,
+ * and uses CoreHaptics on iOS and Vibrator on Android.
  */
-export class PersistentHaptics implements Haptics {
-  static shared = new PersistentHaptics(expoPlayHaptics)
-
-  private readonly playEvent: (event: HapticEvent) => Promise<void>
-
-  constructor (playEvent: (event: HapticEvent) => Promise<void>) {
-    this.playEvent = playEvent
-  }
-
-  /**
-   * Function that uses the class's current playEvent function callback.
-   * Checks whether or not haptics are muted before trying.
-   * @param event - the callback's parameter.
-   */
-  async play (event: HapticEvent) {
-    const isMuted = await AsyncStorage.getItem(IS_HAPTICS_MUTED_KEY)
-    if (!isMuted) {
-      await this.playEvent(event)
+export const TiFHaptics = {
+  ...TiFNativeHaptics,
+  play: async (event: HapticEvent) => {
+    try {
+      await TiFNativeHaptics.play(toNativeHapticEvent(event))
+    } catch (error) {
+      log("warn", "An error occurred when playing haptics", {
+        error: error.message
+      })
     }
   }
+} as Haptics
 
-  mute () {
-    AsyncStorage.setItem(IS_HAPTICS_MUTED_KEY, "true")
-  }
+export type HapticsContextValues = Haptics & { isSupportedOnDevice: boolean }
 
-  unmute () {
-    AsyncStorage.removeItem(IS_HAPTICS_MUTED_KEY)
-  }
-}
-
-const HapticsContext = createContext<Haptics | undefined>(undefined)
+const HapticsContext = createContext<HapticsContextValues | undefined>(
+  undefined
+)
 
 /**
  * The current {@link Haptics} implementation provided by {@link HapticsProvider}.
  */
-export const useHaptics = () => useContext(HapticsContext)!
+export const useHaptics = () => {
+  const [isMuted, setIsMuted] = useAtom(isHapticsMutedAtom)
+  const hapticsContext = useContext(HapticsContext)!
+
+  useEffect(() => {
+    if (isMuted) {
+      hapticsContext.mute()
+    } else {
+      hapticsContext.unmute()
+    }
+  }, [isMuted, hapticsContext])
+
+  return {
+    ...hapticsContext,
+    isMuted,
+    mute: () => setIsMuted(true),
+    unmute: () => setIsMuted(false)
+  }
+}
 
 export type HapticsProviderProps = {
-  children: ReactNode
   haptics: Haptics
+  isSupportedOnDevice: boolean
+  children: ReactNode
 }
 
 /**
@@ -93,7 +103,17 @@ export type HapticsProviderProps = {
  */
 export const HapticsProvider = ({
   children,
-  haptics
+  haptics,
+  isSupportedOnDevice
 }: HapticsProviderProps) => (
-  <HapticsContext.Provider value={haptics}>{children}</HapticsContext.Provider>
+  <HapticsContext.Provider
+    value={{
+      play: async (event) => await haptics.play(event),
+      mute: () => haptics.mute(),
+      unmute: () => haptics.unmute(),
+      isSupportedOnDevice
+    }}
+  >
+    {children}
+  </HapticsContext.Provider>
 )
