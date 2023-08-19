@@ -21,7 +21,7 @@ describe("SecureStorage tests", () => {
     expect(result).toBeNull()
     testStorage.removeItem(TEST_STORAGE_KEY)
   })
-  test("if the secure storage can place multiple keys/values successfully, clear, and the information does get removed", async () => {
+  test("if the secure storage can place multiple keys/values successfully, and successfully clear all data", async () => {
     const testStorage = new TestSecureStorage()
 
     await testStorage.setItem(TEST_STORAGE_KEY + "0", "Test Value")
