@@ -58,7 +58,9 @@
   "globals": {
     "RequestInfo": "readonly",
     "RequestInit": "readonly",
-    "JSX": "readonly"
+    "JSX": "readonly",
+    "NodeJS": "readonly",
+    "__DEV__": "readonly"
   },
   "overrides": [
     {

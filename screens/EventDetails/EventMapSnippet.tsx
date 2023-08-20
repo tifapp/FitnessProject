@@ -1,7 +1,7 @@
 import { LocationCoordinate2D } from "lib/location/Location"
 import React from "react"
 import { StyleProp, ViewStyle } from "react-native"
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
+import MapView, { Marker } from "react-native-maps"
 
 /**
  * A type that can be rendered by a {@link EventsMap}.
@@ -50,7 +50,6 @@ export const EventMapSnippet = function Map<T extends EventMarker> ({
   return (
     <MapView
       style={style}
-      provider={PROVIDER_GOOGLE}
       initialRegion={initialRegion}
       rotateEnabled={false}
       scrollEnabled={false}

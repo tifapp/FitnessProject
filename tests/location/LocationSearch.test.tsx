@@ -1,19 +1,17 @@
 import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
-import { SetDependencyValue, UpdateDependencyValues } from "@lib/dependencies"
 import {
   TiFLocation,
-  LocationCoordinate2D,
   LocationSearchResult,
   mockExpoLocationObject,
-  mockLocationCoordinate2D,
-  mockLocationSearchResult
+  mockLocationSearchResult,
+  LocationsSearchQuery
 } from "@lib/location"
 import {
   LocationSearchBar,
-  LocationSearchDependencyKeys,
   LocationSearchPicker,
+  LocationSearchResultProps,
   LocationSearchResultView,
-  LocationSearchResultsListView
+  useLocationSearchPicker
 } from "@screens/LocationSearch"
 import {
   act,
@@ -31,6 +29,17 @@ import { fakeTimers } from "../helpers/Timers"
 import { LocationObject } from "expo-location"
 
 describe("LocationSearch tests", () => {
+  beforeEach(() => jest.resetAllMocks())
+
+  describe("LocationsSearchQuery tests", () => {
+    test("sourceType", () => {
+      expect(LocationsSearchQuery.empty.sourceType).toEqual("user-recents")
+      expect(new LocationsSearchQuery("New York").sourceType).toEqual(
+        "remote-search"
+      )
+    })
+  })
+
   describe("LocationSearchUI tests", () => {
     beforeEach(() => jest.resetAllMocks())
 
@@ -87,25 +96,64 @@ describe("LocationSearch tests", () => {
       }
     })
 
-    describe("SearchResultsList tests", () => {
+    describe("Picker tests", () => {
       fakeTimers()
+
+      test("loading results at the user's location", async () => {
+        const userLocation = mockExpoLocationObject()
+        queryUserCoordinates.mockResolvedValue(userLocation)
+
+        const searchResult = mockLocationSearchResult()
+        searchForLocations.mockResolvedValue([searchResult])
+
+        renderPicker()
+
+        await waitForCurrentLocationOptionToLoad()
+
+        expect(
+          await locationWithName(searchResult.location.placemark.name!)
+        ).toBeDisplayed()
+        expect(searchForLocations).toHaveBeenCalledWith(
+          LocationsSearchQuery.empty,
+          userLocation.coords
+        )
+      })
+
+      it("can select the user's coordinates when user coordinates available", async () => {
+        const userLocation = mockExpoLocationObject()
+        queryUserCoordinates.mockResolvedValue(userLocation)
+        searchForLocations.mockImplementation(neverPromise)
+        renderPicker()
+
+        await selectUserLocation()
+        expect(selectedUserLocationObject).toMatchObject(userLocation)
+      })
+
+      test("when option is selected, it is also saved somewhere", async () => {
+        const searchResult = mockLocationSearchResult()
+        searchForLocations.mockResolvedValue([searchResult])
+        renderPicker()
+
+        await selectLocationWithName(searchResult.location.placemark.name!)
+        expect(selectedLocation).toMatchObject(searchResult.location)
+        expect(savedLocation).toMatchObject(searchResult.location)
+      })
 
       it("should indicate an error when loading options fails", async () => {
         searchForLocations.mockRejectedValue(new Error())
-        renderResultsList()
+        renderPicker()
         await waitFor(() => expect(errorIndicator()).toBeDisplayed())
       })
 
       it("should indicate that there are no recents when no options available with empty search", async () => {
         searchForLocations.mockResolvedValue([])
-        renderResultsList()
+        renderPicker()
         await waitFor(() => expect(noRecentsIndicator()).toBeDisplayed())
       })
 
       it("should debounce when search text changes", async () => {
-        const center = mockLocationCoordinate2D()
         searchForLocations.mockImplementation(neverPromise)
-        renderResultsList(center)
+        renderPicker()
 
         let searchText = "Hello World!"
         enterSearchText(searchText)
@@ -113,8 +161,8 @@ describe("LocationSearch tests", () => {
         jest.advanceTimersByTime(100)
         await waitFor(() => {
           expect(searchForLocations).not.toHaveBeenCalledWith(
-            searchText,
-            center
+            new LocationsSearchQuery(searchText),
+            undefined
           )
         })
 
@@ -122,15 +170,21 @@ describe("LocationSearch tests", () => {
         enterSearchText(searchText)
 
         act(() => jest.advanceTimersByTime(100))
-        expect(searchForLocations).not.toHaveBeenCalledWith(searchText, center)
+        expect(searchForLocations).not.toHaveBeenCalledWith(
+          new LocationsSearchQuery(searchText),
+          undefined
+        )
 
         act(() => jest.advanceTimersByTime(100))
-        expect(searchForLocations).toHaveBeenCalledWith(searchText, center)
+        expect(searchForLocations).toHaveBeenCalledWith(
+          new LocationsSearchQuery(searchText),
+          undefined
+        )
       })
 
       it("should indicate that no results were found when no options available with non-empty search", async () => {
         searchForLocations.mockResolvedValue([])
-        renderResultsList()
+        renderPicker()
 
         const searchText = "Chuck E. Cheese"
         enterSearchText(searchText)
@@ -141,19 +195,25 @@ describe("LocationSearch tests", () => {
 
       it("displays a loading indicator when searched results have not yet loaded", async () => {
         searchForLocations.mockImplementation(neverPromise)
-        renderResultsList()
+        renderPicker()
         await waitFor(() => expect(loadingIndicator()).toBeDisplayed())
       })
 
       it("displays the searched locations with their distance from the center", async () => {
-        const center = { latitude: 45.0, longitude: 45.0 }
+        const userLocation = mockExpoLocationObject({
+          latitude: 45.0,
+          longitude: 45.0
+        })
         const searchResult1 = mockLocationSearchResult({
           latitude: 53.0,
           longitude: -12.0
         })
-        const searchResult2 = mockLocationSearchResult(center)
+        const searchResult2 = mockLocationSearchResult(userLocation.coords)
         searchForLocations.mockResolvedValue([searchResult1, searchResult2])
-        renderResultsList(center)
+        queryUserCoordinates.mockResolvedValue(userLocation)
+        renderPicker()
+
+        await waitForCurrentLocationOptionToLoad()
 
         await waitFor(() => {
           expect(
@@ -172,7 +232,32 @@ describe("LocationSearch tests", () => {
         })
       })
 
-      const searchForLocations = jest.fn().mockImplementation(neverPromise)
+      const searchForLocations = jest.fn()
+      const queryUserCoordinates = jest.fn()
+
+      let selectedUserLocationObject: LocationObject
+      let selectedLocation: TiFLocation
+      let savedLocation: TiFLocation
+
+      const waitForCurrentLocationOptionToLoad = async () => {
+        expect(await userLocationOptionLabel()).toBeDisplayed()
+      }
+
+      const selectUserLocation = async () => {
+        return fireEvent.press(await userLocationOptionLabel())
+      }
+
+      const userLocationOptionLabel = async () => {
+        return await screen.findByText("Use current location")
+      }
+
+      const selectLocationWithName = async (name: string) => {
+        return fireEvent.press(await locationWithName(name))
+      }
+
+      const locationWithName = async (name: string) => {
+        return await screen.findByText(name)
+      }
 
       const errorIndicator = () => {
         return screen.queryByText(
@@ -214,98 +299,45 @@ describe("LocationSearch tests", () => {
         return `${name} | ${Math.trunc(distance ?? 0.0)}`
       }
 
-      const renderResultsList = (center?: LocationCoordinate2D) => {
-        return render(
-          <TestQueryClientProvider>
-            <SetDependencyValue
-              forKey={LocationSearchDependencyKeys.searchForResults}
-              value={searchForLocations}
-            >
-              <LocationSearchBar
-                onBackTapped={jest.fn()}
-                placeholder={searchBarPlaceholder}
-              />
-              <LocationSearchResultsListView
-                center={center}
-                renderSearchResult={(result, distance) => (
-                  <View
-                    testID={searchResultTestId(
-                      result.location.placemark.name!,
-                      distance
-                    )}
-                  />
+      const TestView = () => {
+        const picker = useLocationSearchPicker({
+          loadSearchResults: searchForLocations
+        })
+        return (
+          <LocationSearchPicker
+            {...picker}
+            savePickedLocation={(location) => (savedLocation = location)}
+            onUserLocationSelected={(coordinates) => {
+              selectedUserLocationObject = coordinates
+            }}
+            onLocationSelected={(location) => (selectedLocation = location)}
+            SearchResultView={(props: LocationSearchResultProps) => (
+              <View
+                testID={searchResultTestId(
+                  props.result.location.placemark.name!,
+                  props.distanceMiles
                 )}
-              />
-            </SetDependencyValue>
-          </TestQueryClientProvider>
+              >
+                <LocationSearchResultView {...props} />
+              </View>
+            )}
+          />
         )
-      }
-    })
-
-    describe("Picker tests", () => {
-      it("can select the user's coordinates when user coordinates available", async () => {
-        const userLocation = mockExpoLocationObject()
-        queryUserCoordinates.mockResolvedValue(userLocation)
-        renderPicker()
-
-        await selectUserLocation()
-        expect(selectedUserLocationObject).toMatchObject(userLocation)
-      })
-
-      test("when option is selected, it is also saved somewhere", async () => {
-        const searchResult = mockLocationSearchResult()
-        searchForLocations.mockResolvedValue([searchResult])
-        renderPicker()
-
-        await selectLocationWithName(searchResult.location.placemark.name!)
-        expect(selectedLocation).toMatchObject(searchResult.location)
-        expect(saveSelection).toHaveBeenCalledWith(searchResult.location)
-      })
-
-      const searchForLocations = jest.fn().mockImplementation(neverPromise)
-      const queryUserCoordinates = jest.fn().mockImplementation(neverPromise)
-      const saveSelection = jest.fn()
-
-      let selectedUserLocationObject: LocationObject
-      let selectedLocation: TiFLocation
-
-      const selectUserLocation = async () => {
-        return fireEvent.press(await screen.findByText("Use current location"))
-      }
-
-      const selectLocationWithName = async (name: string) => {
-        return fireEvent.press(await screen.findByText(name))
       }
 
       const renderPicker = () => {
         return render(
           <TestQueryClientProvider>
-            <UpdateDependencyValues
-              update={(values) => {
-                values.set(
-                  LocationSearchDependencyKeys.searchForResults,
-                  searchForLocations
-                )
-                values.set(
-                  LocationSearchDependencyKeys.savePickerSelection,
-                  saveSelection
-                )
-              }}
+            <UserLocationFunctionsProvider
+              getCurrentLocation={queryUserCoordinates}
+              requestForegroundPermissions={jest.fn()}
             >
-              <UserLocationFunctionsProvider
-                getCurrentLocation={queryUserCoordinates}
-                requestForegroundPermissions={jest.fn()}
-              >
-                <LocationSearchPicker
-                  onUserLocationSelected={(coordinates) => {
-                    selectedUserLocationObject = coordinates
-                  }}
-                  onLocationSelected={(location) =>
-                    (selectedLocation = location)
-                  }
-                />
-              </UserLocationFunctionsProvider>
-            </UpdateDependencyValues>
+              <LocationSearchBar
+                onBackTapped={jest.fn()}
+                placeholder={searchBarPlaceholder}
+              />
+              <TestView />
+            </UserLocationFunctionsProvider>
           </TestQueryClientProvider>
         )
       }

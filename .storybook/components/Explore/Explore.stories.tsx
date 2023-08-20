@@ -7,14 +7,11 @@ import {
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import React from "react"
-import { UpdateDependencyValues } from "@lib/dependencies"
 import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
-import { mockLocationSearchResult } from "@lib/location"
 import { MenuProvider } from "react-native-popup-menu"
 import { createStackNavigator } from "@react-navigation/stack"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { NavigationContainer } from "@react-navigation/native"
-import { LocationSearchDependencyKeys } from "@screens/LocationSearch"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import {
   getCurrentPositionAsync,
@@ -43,28 +40,18 @@ const screens = createExploreEventsScreens(Stack, () => ({
 export const Basic: ExploreEventsStory = () => (
   <MenuProvider>
     <TiFQueryClientProvider>
-      <UpdateDependencyValues
-        update={(values) => {
-          values.set(LocationSearchDependencyKeys.searchForResults, () =>
-            Promise.resolve([mockLocationSearchResult()])
-          )
-        }}
+      <UserLocationFunctionsProvider
+        getCurrentLocation={getCurrentPositionAsync}
+        requestForegroundPermissions={requestForegroundPermissionsAsync}
       >
-        <UserLocationFunctionsProvider
-          getCurrentLocation={getCurrentPositionAsync}
-          requestForegroundPermissions={requestForegroundPermissionsAsync}
-        >
-          <SafeAreaProvider>
-            <NavigationContainer onStateChange={console.log}>
-              <Stack.Navigator
-                screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
-              >
-                {screens}
-              </Stack.Navigator>
-            </NavigationContainer>
-          </SafeAreaProvider>
-        </UserLocationFunctionsProvider>
-      </UpdateDependencyValues>
+        <SafeAreaProvider>
+          <NavigationContainer onStateChange={console.log}>
+            <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
+              {screens}
+            </Stack.Navigator>
+          </NavigationContainer>
+        </SafeAreaProvider>
+      </UserLocationFunctionsProvider>
     </TiFQueryClientProvider>
   </MenuProvider>
 )

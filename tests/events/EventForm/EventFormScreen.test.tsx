@@ -1,8 +1,8 @@
 import { EventFormValues } from "@components/eventForm"
+import { GeocodingFunctionsProvider } from "@hooks/Geocoding"
+import { HapticsProvider } from "@lib/Haptics"
 import { dateRange } from "@lib/date"
-import { UpdateDependencyValues } from "@lib/dependencies"
 import { EventColors } from "@lib/events"
-import { hapticsDependencyKey } from "@lib/Haptics"
 import { NavigationContainer } from "@react-navigation/native"
 import EventFormScreen from "@screens/EventFormScreen"
 import {
@@ -13,11 +13,12 @@ import {
 } from "@testing-library/react-native"
 import { QueryClient } from "react-query"
 import { captureAlerts } from "../../helpers/Alerts"
+import { TestHaptics } from "../../helpers/Haptics"
 import { neverPromise } from "../../helpers/Promise"
 import {
+  TestQueryClientProvider,
   cleanupTestQueryClient,
-  createTestQueryClient,
-  TestQueryClientProvider
+  createTestQueryClient
 } from "../../helpers/ReactQuery"
 import {
   attemptDismiss,
@@ -29,7 +30,6 @@ import {
   pickEventColor,
   toggleShouldHideAfterStartDate
 } from "./helpers"
-import { GeocodingFunctionsProvider } from "@hooks/Geocoding"
 
 const testLocation = { latitude: 45.0, longitude: -121.0 }
 
@@ -178,10 +178,9 @@ const renderEventFormScreen = (
   render(
     <NavigationContainer>
       <TestQueryClientProvider client={queryClient}>
-        <UpdateDependencyValues
-          update={(values) => {
-            values.set(hapticsDependencyKey, jest.fn())
-          }}
+        <HapticsProvider
+          isSupportedOnDevice={false}
+          haptics={new TestHaptics()}
         >
           <GeocodingFunctionsProvider reverseGeocode={neverPromise}>
             <EventFormScreen
@@ -191,7 +190,7 @@ const renderEventFormScreen = (
               onDismiss={dismissAction}
             />
           </GeocodingFunctionsProvider>
-        </UpdateDependencyValues>
+        </HapticsProvider>
       </TestQueryClientProvider>
     </NavigationContainer>
   )

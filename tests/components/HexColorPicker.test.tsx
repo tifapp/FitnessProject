@@ -2,12 +2,11 @@ import HexColorPicker, {
   HexColorPickerOption
 } from "@components/formComponents/HexColorPicker"
 import { HexColor } from "@lib/Color"
-import { SetDependencyValue } from "@lib/dependencies"
-import { HapticEvent, hapticsDependencyKey } from "@lib/Haptics"
+import { HapticsProvider } from "@lib/Haptics"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import { useState } from "react"
 import { View } from "react-native"
-import { setPlatform } from "../helpers/Platform"
+import { TestHaptics } from "../helpers/Haptics"
 import "../helpers/Matchers"
 
 const testOptions = [
@@ -16,7 +15,11 @@ const testOptions = [
 ] as HexColorPickerOption[]
 
 describe("HexColorPicker tests", () => {
-  beforeEach(() => jest.resetAllMocks())
+  let haptics = new TestHaptics()
+  beforeEach(() => {
+    haptics = new TestHaptics()
+    jest.resetAllMocks()
+  })
 
   it("can change the selected color", () => {
     renderHexColorPicker(testOptions)
@@ -24,44 +27,35 @@ describe("HexColorPicker tests", () => {
     expect(selectedColorElement(testOptions[1].color)).toBeDisplayed()
   })
 
-  it("does not play haptics on android when selection changes", () => {
-    setPlatform("android")
+  it("plays haptics when selecting the colour", async () => {
     renderHexColorPicker(testOptions)
     selectColor(testOptions[1].color)
-    expect(hapticsPlayer).not.toHaveBeenCalled()
+    expect(haptics.playedEvents).toEqual([{ name: "selection" }])
   })
 
-  it("plays haptics on iOS when the color selection changes", () => {
-    setPlatform("ios")
-    renderHexColorPicker(testOptions)
-    selectColor(testOptions[1].color)
-    expect(hapticsPlayer).toHaveBeenCalledWith(HapticEvent.SelectionChanged)
-  })
+  const renderHexColorPicker = (options: HexColorPickerOption[]) => {
+    render(<Test options={options} />)
+  }
+
+  const Test = ({ options }: { options: HexColorPickerOption[] }) => {
+    const [color, setColor] = useState(options[0].color)
+
+    return (
+      <HapticsProvider isSupportedOnDevice={true} haptics={haptics}>
+        <View testID={displayedColorId(color)}>
+          <HexColorPicker color={color} onChange={setColor} options={options} />
+        </View>
+      </HapticsProvider>
+    )
+  }
+
+  const displayedColorId = (color: HexColor) => `displayed-${color}`
+
+  const selectedColorElement = (color: HexColor) => {
+    return screen.queryByTestId(displayedColorId(color))
+  }
+
+  const selectColor = (color: HexColor) => {
+    fireEvent.press(screen.getByLabelText(color))
+  }
 })
-
-const renderHexColorPicker = (options: HexColorPickerOption[]) => {
-  render(<Test options={options} />)
-}
-
-const hapticsPlayer = jest.fn()
-
-const Test = ({ options }: { options: HexColorPickerOption[] }) => {
-  const [color, setColor] = useState(options[0].color)
-  return (
-    <SetDependencyValue forKey={hapticsDependencyKey} value={hapticsPlayer}>
-      <View testID={displayedColorId(color)}>
-        <HexColorPicker color={color} onChange={setColor} options={options} />
-      </View>
-    </SetDependencyValue>
-  )
-}
-
-const displayedColorId = (color: HexColor) => `displayed-${color}`
-
-const selectedColorElement = (color: HexColor) => {
-  return screen.queryByTestId(displayedColorId(color))
-}
-
-const selectColor = (color: HexColor) => {
-  fireEvent.press(screen.getByLabelText(color))
-}
