@@ -79,6 +79,8 @@ We utilize automated testing in a good portion of our work. In order to run test
 
 ## Convention
 
+The standards that we have for our code are located on our [style guide](STYLEGUIDE.md).
+
 ## Development process
 
 To develop for the app, you must utilize a code editor of your own choosing. Recommendations are given below, for the usage of [Visual Studio Code](https://visualstudio.microsoft.com/downloads/).
