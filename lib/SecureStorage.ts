@@ -1,7 +1,7 @@
 import { Amplify } from "aws-amplify"
 import { deleteItemAsync, setItemAsync } from "expo-secure-store"
 
-const MEMORY_KEY_PREFIX = "@MyStorage:"
+const MEMORY_KEY_PREFIX = "@SecureStorage:"
 let dataMemory: any = {}
 
 export class SecureStorage {

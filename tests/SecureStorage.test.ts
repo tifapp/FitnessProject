@@ -1,6 +1,6 @@
 import { TestSecureStorage } from "./helpers/SecureStorage"
 
-const TEST_STORAGE_KEY: string = "TestStorageKey"
+const TEST_STORAGE_KEY: string = "@TestStorageKey:"
 
 /**
  * Have to mock this instead of attempting to utilise the functionality directly
