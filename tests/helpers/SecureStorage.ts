@@ -1,10 +1,8 @@
-import { StorageManagement } from "@lib/SecureStorage"
-
 /**
  * Mock implementation of SecureStorage for testing purposes.
  * Utilises a Map to emulate storage behaviour.
  */
-export class TestSecureStorage implements StorageManagement<string | null> {
+export class TestSecureStorage {
   // set item with the key
   private _currentStorage = new Map()
 
@@ -16,12 +14,7 @@ export class TestSecureStorage implements StorageManagement<string | null> {
   // get item with the key
   async getItem (key: string) {
     const result = this._currentStorage.get(key)
-    console.log(result)
-    if (result) {
-      return result
-    } else {
-      return null
-    }
+    return result
   }
 
   // remove item with the key

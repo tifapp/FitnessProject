@@ -1,35 +1,36 @@
-import { deleteItemAsync, getItemAsync, setItemAsync } from "expo-secure-store"
+import { Amplify } from "aws-amplify"
+import { deleteItemAsync, setItemAsync } from "expo-secure-store"
 
-export interface StorageManagement<T> {
-  setItem(key: string, value: T): Promise<void>
-  getItem(key: string): Promise<T>
-  removeItem(key: string): Promise<void>
-  clear(): void
-}
+const MEMORY_KEY_PREFIX = "@MyStorage:"
+let dataMemory: any = {}
 
-export class SecureStorage implements StorageManagement<string | null> {
+export class SecureStorage {
   // set item with the key
-  async setItem (key: string, value: string) {
-    await setItemAsync(key, value)
+  static setItem (key: string, value: string) {
+    setItemAsync(MEMORY_KEY_PREFIX + key, value)
+    dataMemory[key] = value
+    return dataMemory[key]
   }
 
   // get item with the key
-  async getItem (key: string) {
-    const result = await getItemAsync(key)
-    console.log(result)
-    if (result) {
-      return result
-    } else {
-      return null
-    }
+  static getItem (key: string) {
+    return Object.prototype.hasOwnProperty.call(dataMemory, key)
+      ? dataMemory[key]
+      : undefined
   }
 
   // remove item with the key
-  async removeItem (key: string) {
-    await deleteItemAsync(key)
+  static removeItem (key: string) {
+    deleteItemAsync(key)
+    return delete dataMemory[key]
   }
 
-  clear () {
-    console.log("Data cleared.")
+  static clear () {
+    dataMemory = {}
+    return dataMemory
   }
 }
+
+Amplify.configure({
+  storage: SecureStorage
+})
