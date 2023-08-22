@@ -4,26 +4,26 @@
  */
 export class TestSecureStorage {
   // set item with the key
-  private _currentStorage = new Map()
+  static _currentStorage = new Map()
 
   // set item with the key
-  async setItem (key: string, value: string) {
+  static setItem (key: string, value: string) {
     this._currentStorage.set(key, value)
   }
 
   // get item with the key
-  async getItem (key: string) {
+  static getItem (key: string) {
     const result = this._currentStorage.get(key)
     return result
   }
 
   // remove item with the key
-  async removeItem (key: string) {
+  static removeItem (key: string) {
     this._currentStorage.delete(key)
   }
 
   // clear items
-  clear () {
+  static clear () {
     this._currentStorage = new Map()
   }
 }
