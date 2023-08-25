@@ -1,36 +1,65 @@
 import { Amplify } from "aws-amplify"
-import { deleteItemAsync, setItemAsync } from "expo-secure-store"
+import * as ExpoSecureStore from "expo-secure-store"
 
-const MEMORY_KEY_PREFIX = "@SecureStorage:"
-let dataMemory: any = {}
+export type SecureStorage = typeof ExpoSecureStore
 
-export class SecureStorage {
+export const SECURE_STORAGE_KEY_PREFIX = "@SecureStorage:"
+
+export class AmplifySecureStorage<Store extends SecureStorage> {
+  private syncPromise?: Promise<void>
+  private store: Store
+  private keyList: string[]
+  private cache = new Map<string, string>()
+
+  constructor (store: Store) {
+    this.store = store
+  }
+
   // set item with the key
-  static setItem (key: string, value: string) {
-    setItemAsync(MEMORY_KEY_PREFIX + key, value)
-    dataMemory[key] = value
-    return dataMemory[key]
+  setItem (key: string, value: string) {
+    if (!this.keyList.find((k) => k === key)) {
+      this.keyList.push(key)
+    }
+    this.cache.set(SECURE_STORAGE_KEY_PREFIX + key, value)
+    this.store.setItemAsync(SECURE_STORAGE_KEY_PREFIX + key, value)
   }
 
   // get item with the key
-  static getItem (key: string) {
-    return Object.prototype.hasOwnProperty.call(dataMemory, key)
-      ? dataMemory[key]
-      : undefined
+  getItem (key: string) {
+    const result = this.cache.get(SECURE_STORAGE_KEY_PREFIX + key)
+    return result
   }
 
   // remove item with the key
-  static removeItem (key: string) {
-    deleteItemAsync(key)
-    return delete dataMemory[key]
+  removeItem (key: string) {
+    this.keyList = this.keyList.filter((k) => k === key)
+    this.cache.delete(SECURE_STORAGE_KEY_PREFIX + key)
+    this.store.deleteItemAsync(key)
   }
 
-  static clear () {
-    dataMemory = {}
-    return dataMemory
+  async clear () {
+    await Promise.allSettled(
+      this.keyList.map(async (k) => {
+        await this.store.deleteItemAsync(k)
+      })
+    )
+  }
+
+  async sync () {
+    if (this.syncPromise) {
+      return await this.syncPromise
+    }
+    return await Promise.allSettled(
+      this.keyList.map(async (k) => {
+        const storageValue = await this.store.getItemAsync(k)
+        if (storageValue) {
+          this.cache.set(k, storageValue)
+        }
+      })
+    )
   }
 }
 
 Amplify.configure({
-  storage: SecureStorage
+  storage: AmplifySecureStorage
 })
