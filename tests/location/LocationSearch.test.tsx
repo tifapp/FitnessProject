@@ -113,7 +113,7 @@ describe("LocationSearch tests", () => {
         await waitForCurrentLocationOptionToLoad()
 
         expect(
-          await locationWithName(searchResult.location.placemark.name!)
+          await waitForLocationWithName(searchResult.location.placemark.name!)
         ).toBeDisplayed()
         expect(searchForLocations).toHaveBeenCalledWith(
           LocationsSearchQuery.empty,
@@ -137,7 +137,9 @@ describe("LocationSearch tests", () => {
         queryUserCoordinates.mockRejectedValueOnce(new Error())
         renderPicker()
 
-        await selectLocationWithName(searchResult.location.placemark.name!)
+        await waitToSelectLocationWithName(
+          searchResult.location.placemark.name!
+        )
         expect(selectedLocation).toMatchObject(searchResult.location)
         expect(savedLocation).toMatchObject(searchResult.location)
       })
@@ -158,7 +160,10 @@ describe("LocationSearch tests", () => {
 
       it("should debounce when search text changes", async () => {
         queryUserCoordinates.mockRejectedValueOnce(new Error())
-        searchForLocations.mockImplementation(neverPromise)
+        const result = mockLocationSearchResult()
+        searchForLocations
+          .mockResolvedValueOnce([])
+          .mockResolvedValueOnce([result])
         renderPicker()
 
         let searchText = "Hello World!"
@@ -186,6 +191,9 @@ describe("LocationSearch tests", () => {
           new LocationsSearchQuery(searchText),
           undefined
         )
+        expect(
+          await waitForLocationWithName(result.location.placemark.name!)
+        ).toBeDisplayed()
       })
 
       it("should indicate that no results were found when no options available with non-empty search", async () => {
@@ -261,11 +269,11 @@ describe("LocationSearch tests", () => {
         return await screen.findByText("Use current location")
       }
 
-      const selectLocationWithName = async (name: string) => {
-        return fireEvent.press(await locationWithName(name))
+      const waitToSelectLocationWithName = async (name: string) => {
+        return fireEvent.press(await waitForLocationWithName(name))
       }
 
-      const locationWithName = async (name: string) => {
+      const waitForLocationWithName = async (name: string) => {
         return await screen.findByText(name)
       }
 
