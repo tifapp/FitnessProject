@@ -1,5 +1,6 @@
 import { ReportFormView } from "@screens/Reporting"
 import {
+  act,
   fireEvent,
   render,
   screen,
@@ -62,7 +63,7 @@ describe("Reporting tests", () => {
 
         // NB: Wait for the submission to finish before checking this. This prevents a bug
         // where the user can somehow tap another selection when doing a navigation animation.
-        await waitForSubmission
+        await act(async () => await waitForSubmission)
         expect(canSubmitAnyReportReason()).toEqual(false)
       })
 
@@ -78,7 +79,7 @@ describe("Reporting tests", () => {
 
         // NB: Make it so that the user explicitly has to dismiss the error alert before re-allowing
         // submissions. This ensures that they cannot somehow submit 2 reasons at once.
-        await waitForSubmission
+        await act(async () => await waitForSubmission)
         expect(canSubmitAnyReportReason()).toEqual(false)
 
         await dismissErrorAlert()

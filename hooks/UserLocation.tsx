@@ -5,7 +5,7 @@ import {
   LocationOptions,
   PermissionResponse
 } from "expo-location"
-import { useQuery } from "react-query"
+import { useQuery } from "@tanstack/react-query"
 
 /**
  * A query hook to load the user's current location from expo.

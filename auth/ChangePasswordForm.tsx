@@ -14,7 +14,7 @@ import {
   ViewStyle
 } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
-import { useMutation } from "react-query"
+import { useMutation } from "@tanstack/react-query"
 
 export type ChangePasswordResult = "valid" | "invalid" | "incorrect-password"
 
@@ -65,7 +65,6 @@ export const useChangePasswordForm = ({
         return await onSubmitted(fields.currentPassword, passwordResult)
       }
     },
-
     {
       onSuccess,
       onError: () => {

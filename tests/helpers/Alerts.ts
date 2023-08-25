@@ -1,4 +1,5 @@
 /* global jest */
+import { act } from "@testing-library/react-native"
 import { Alert, AlertButton } from "react-native"
 
 /**
@@ -39,7 +40,7 @@ export const captureAlerts = () => {
       }
 
       if (targetButton.onPress) {
-        await targetButton.onPress()
+        await act(async () => await targetButton.onPress())
       }
 
       dismissedCalls = [...dismissedCalls, mostRecentCall]
