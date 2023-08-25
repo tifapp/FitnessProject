@@ -101,17 +101,19 @@ describe("LocationSearch tests", () => {
 
       test("loading results at the user's location", async () => {
         const userLocation = mockExpoLocationObject()
-        queryUserCoordinates.mockResolvedValue(userLocation)
+        queryUserCoordinates.mockResolvedValueOnce(userLocation)
 
         const searchResult = mockLocationSearchResult()
-        searchForLocations.mockResolvedValue([searchResult])
+        searchForLocations
+          .mockResolvedValueOnce([])
+          .mockResolvedValueOnce([searchResult])
 
         renderPicker()
 
         await waitForCurrentLocationOptionToLoad()
 
         expect(
-          await locationWithName(searchResult.location.placemark.name!)
+          await waitForLocationWithName(searchResult.location.placemark.name!)
         ).toBeDisplayed()
         expect(searchForLocations).toHaveBeenCalledWith(
           LocationsSearchQuery.empty,
@@ -121,7 +123,7 @@ describe("LocationSearch tests", () => {
 
       it("can select the user's coordinates when user coordinates available", async () => {
         const userLocation = mockExpoLocationObject()
-        queryUserCoordinates.mockResolvedValue(userLocation)
+        queryUserCoordinates.mockResolvedValueOnce(userLocation)
         searchForLocations.mockImplementation(neverPromise)
         renderPicker()
 
@@ -131,28 +133,37 @@ describe("LocationSearch tests", () => {
 
       test("when option is selected, it is also saved somewhere", async () => {
         const searchResult = mockLocationSearchResult()
-        searchForLocations.mockResolvedValue([searchResult])
+        searchForLocations.mockResolvedValueOnce([searchResult])
+        queryUserCoordinates.mockRejectedValueOnce(new Error())
         renderPicker()
 
-        await selectLocationWithName(searchResult.location.placemark.name!)
+        await waitToSelectLocationWithName(
+          searchResult.location.placemark.name!
+        )
         expect(selectedLocation).toMatchObject(searchResult.location)
         expect(savedLocation).toMatchObject(searchResult.location)
       })
 
       it("should indicate an error when loading options fails", async () => {
-        searchForLocations.mockRejectedValue(new Error())
+        queryUserCoordinates.mockRejectedValueOnce(new Error())
+        searchForLocations.mockRejectedValueOnce(new Error())
         renderPicker()
         await waitFor(() => expect(errorIndicator()).toBeDisplayed())
       })
 
       it("should indicate that there are no recents when no options available with empty search", async () => {
-        searchForLocations.mockResolvedValue([])
+        queryUserCoordinates.mockRejectedValueOnce(new Error())
+        searchForLocations.mockResolvedValueOnce([])
         renderPicker()
         await waitFor(() => expect(noRecentsIndicator()).toBeDisplayed())
       })
 
       it("should debounce when search text changes", async () => {
-        searchForLocations.mockImplementation(neverPromise)
+        queryUserCoordinates.mockRejectedValueOnce(new Error())
+        const result = mockLocationSearchResult()
+        searchForLocations
+          .mockResolvedValueOnce([])
+          .mockResolvedValueOnce([result])
         renderPicker()
 
         let searchText = "Hello World!"
@@ -180,10 +191,16 @@ describe("LocationSearch tests", () => {
           new LocationsSearchQuery(searchText),
           undefined
         )
+        expect(
+          await waitForLocationWithName(result.location.placemark.name!)
+        ).toBeDisplayed()
       })
 
       it("should indicate that no results were found when no options available with non-empty search", async () => {
-        searchForLocations.mockResolvedValue([])
+        queryUserCoordinates.mockRejectedValueOnce(new Error())
+        searchForLocations
+          .mockResolvedValueOnce([mockLocationSearchResult()])
+          .mockResolvedValueOnce([])
         renderPicker()
 
         const searchText = "Chuck E. Cheese"
@@ -194,6 +211,7 @@ describe("LocationSearch tests", () => {
       })
 
       it("displays a loading indicator when searched results have not yet loaded", async () => {
+        queryUserCoordinates.mockRejectedValueOnce(new Error())
         searchForLocations.mockImplementation(neverPromise)
         renderPicker()
         await waitFor(() => expect(loadingIndicator()).toBeDisplayed())
@@ -251,11 +269,11 @@ describe("LocationSearch tests", () => {
         return await screen.findByText("Use current location")
       }
 
-      const selectLocationWithName = async (name: string) => {
-        return fireEvent.press(await locationWithName(name))
+      const waitToSelectLocationWithName = async (name: string) => {
+        return fireEvent.press(await waitForLocationWithName(name))
       }
 
-      const locationWithName = async (name: string) => {
+      const waitForLocationWithName = async (name: string) => {
         return await screen.findByText(name)
       }
 

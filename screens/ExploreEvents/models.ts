@@ -52,7 +52,7 @@ export const initialCenterToRegion = (center: ExploreEventsInitialCenter) => {
  * Data representation of events explored in a given area.
  */
 export type ExploreEventsData =
-  | { status: "loading"; events?: CurrentUserEvent[]; retry?: () => void }
+  | { status: "loading"; events?: CurrentUserEvent[] }
   | { status: "error"; events?: CurrentUserEvent[]; retry: () => void }
-  | { status: "no-results"; events: []; retry?: () => void }
-  | { status: "success"; events: CurrentUserEvent[]; retry?: undefined }
+  | { status: "no-results"; events: [] }
+  | { status: "success"; events: CurrentUserEvent[] }

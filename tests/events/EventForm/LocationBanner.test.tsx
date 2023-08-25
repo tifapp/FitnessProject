@@ -3,7 +3,6 @@ import {
   EventFormLocationBanner,
   EventFormLocationInfo
 } from "@components/eventForm"
-import { SetDependencyValue } from "@lib/dependencies"
 import { render, screen, waitFor } from "@testing-library/react-native"
 import "../../helpers/Matchers"
 import { TestQueryClientProvider } from "../../helpers/ReactQuery"

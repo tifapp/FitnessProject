@@ -16,15 +16,6 @@
   "engines": {
     "npm": ">=8.3.0"
   },
-  "overrides": {
-    "@react-native-picker/picker": {
-      "react": "18"
-    },
-    "@testing-library/react-native": {
-      "react": "18",
-      "react-test-renderer": "18.0.0"
-    }
-  },
   "dependencies": {
     "@alessiocancian/react-native-actionsheet": "^3.2.0",
     "@aws-amplify/api": "^4.0.63",
@@ -52,6 +43,7 @@
     "@react-navigation/stack": "^5.9.1",
     "@sentry/react-native": "4.15.2",
     "@sinonjs/commons": "3.0.0",
+    "@tanstack/react-query": "^4.33.0",
     "@turf/boolean-clockwise": "6.5.0",
     "@turf/invariant": "6.5.0",
     "amazon-cognito-identity-js": "^6.2.0",
@@ -121,7 +113,6 @@
     "react-native-svg": "13.4.0",
     "react-native-web": "~0.18.11",
     "react-navigation": "^4.4.4",
-    "react-query": "^3.39.3",
     "regenerator-runtime": "^0.13.11",
     "sentry-expo": "^6.2.0",
     "tlds": "^1.221.1",
@@ -133,7 +124,7 @@
     "@aws-amplify/cli": "^10.8.1",
     "@babel/core": "^7.20.0",
     "@faker-js/faker": "^7.6.0",
-    "@testing-library/react-native": "^10.1.1",
+    "@testing-library/react-native": "12.2",
     "@types/jest": "^29.4.0",
     "@types/linkify-it": "^3.0.2",
     "@types/ngeohash": "^0.6.4",
@@ -160,7 +151,7 @@
     "jest-expo": "^48.0.0",
     "lint-staged": "^13.1.1",
     "prettier": "^2.8.8",
-    "react-test-renderer": "^18.0.0",
+    "react-test-renderer": "18.2",
     "typescript": "^4.9.5"
   },
   "private": true

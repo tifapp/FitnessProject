@@ -3,7 +3,6 @@ import { GeocodingFunctionsProvider } from "@hooks/Geocoding"
 import { HapticsProvider } from "@lib/Haptics"
 import { dateRange } from "@lib/date"
 import { EventColors } from "@lib/events"
-import { NavigationContainer } from "@react-navigation/native"
 import EventFormScreen from "@screens/EventFormScreen"
 import {
   fireEvent,
@@ -11,13 +10,12 @@ import {
   screen,
   waitFor
 } from "@testing-library/react-native"
-import { QueryClient } from "react-query"
+import { QueryClient } from "@tanstack/react-query"
 import { captureAlerts } from "../../helpers/Alerts"
 import { TestHaptics } from "../../helpers/Haptics"
 import { neverPromise } from "../../helpers/Promise"
 import {
   TestQueryClientProvider,
-  cleanupTestQueryClient,
   createTestQueryClient
 } from "../../helpers/ReactQuery"
 import {
@@ -36,7 +34,10 @@ const testLocation = { latitude: 45.0, longitude: -121.0 }
 const queryClient = createTestQueryClient()
 
 describe("EventFormScreen tests", () => {
-  beforeEach(() => jest.resetAllMocks())
+  beforeEach(() => {
+    jest.resetAllMocks()
+    queryClient.clear()
+  })
 
   it("should be able to edit and submit a form with a preselected location", async () => {
     renderEventFormScreen(queryClient, {
@@ -158,8 +159,6 @@ describe("EventFormScreen tests", () => {
     submit()
     await waitFor(() => expect(canSubmit()).toEqual(true))
   }) */
-
-  afterAll(() => cleanupTestQueryClient(queryClient))
 })
 
 const editedTitle = "Test title"
@@ -176,23 +175,18 @@ const renderEventFormScreen = (
   values: EventFormValues
 ) => {
   render(
-    <NavigationContainer>
-      <TestQueryClientProvider client={queryClient}>
-        <HapticsProvider
-          isSupportedOnDevice={false}
-          haptics={new TestHaptics()}
-        >
-          <GeocodingFunctionsProvider reverseGeocode={neverPromise}>
-            <EventFormScreen
-              submissionLabel={testSubmissionLabel}
-              initialValues={values}
-              onSubmit={submitAction}
-              onDismiss={dismissAction}
-            />
-          </GeocodingFunctionsProvider>
-        </HapticsProvider>
-      </TestQueryClientProvider>
-    </NavigationContainer>
+    <TestQueryClientProvider client={queryClient}>
+      <HapticsProvider isSupportedOnDevice={false} haptics={new TestHaptics()}>
+        <GeocodingFunctionsProvider reverseGeocode={neverPromise}>
+          <EventFormScreen
+            submissionLabel={testSubmissionLabel}
+            initialValues={values}
+            onSubmit={submitAction}
+            onDismiss={dismissAction}
+          />
+        </GeocodingFunctionsProvider>
+      </HapticsProvider>
+    </TestQueryClientProvider>
   )
 }
 
