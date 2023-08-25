@@ -41,7 +41,6 @@ import { enableSentry } from "@lib/Sentry"
 import { Auth } from "aws-amplify"
 import { Native as SentryNative } from "sentry-expo"
 import awsconfig from "./src/aws-exports"
-import { mockExpoLocationObject } from "@lib/location"
 
 Geo.configure(awsconfig)
 Auth.configure(awsconfig)
@@ -104,15 +103,15 @@ const App = () => {
   )
 }
 
-export default SentryNative.wrap(App)
-//   withAuthenticator(App, false, [
-//     <Greetings />,
-//     <SignIn />,
-//     <SignUp />,
-//     <ConfirmSignIn />,
-//     <ConfirmSignUp />,
-//     <VerifyContact />,
-//     <ForgotPassword />,
-//     <RequireNewPassword />
-//   ])
-// )
+export default SentryNative.wrap(
+  withAuthenticator(App, false, [
+    <Greetings />,
+    <SignIn />,
+    <SignUp />,
+    <ConfirmSignIn />,
+    <ConfirmSignUp />,
+    <VerifyContact />,
+    <ForgotPassword />,
+    <RequireNewPassword />
+  ])
+)
