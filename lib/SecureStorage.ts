@@ -38,7 +38,7 @@ export class AmplifySecureStorage<Store extends SecureStorage> {
   }
 
   async clear () {
-    await Promise.allSettled(
+    return await Promise.allSettled(
       this.keyList.map(async (k) => {
         await this.store.deleteItemAsync(k)
       })
