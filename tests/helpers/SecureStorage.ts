@@ -26,6 +26,6 @@ export class TestSecureStorage<Store extends SecureStorage> {
 
   // clear items
   clear () {
-    this.TestAmplifyStore.delete(SECURE_STORAGE_KEY_PREFIX + key)
+    this.TestAmplifyStore = new Map()
   }
 }
