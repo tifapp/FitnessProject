@@ -1,4 +1,4 @@
-import { Password } from "@lib/Password"
+import { Password } from "@auth/Password"
 
 describe("Password tests", () => {
   it("should fail with a no-capitals error reason, when the text doesn't have any capitals", () => {

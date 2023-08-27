@@ -41,7 +41,7 @@ describe("HexColorPicker tests", () => {
     const [color, setColor] = useState(options[0].color)
 
     return (
-      <HapticsProvider haptics={haptics}>
+      <HapticsProvider isSupportedOnDevice={true} haptics={haptics}>
         <View testID={displayedColorId(color)}>
           <HexColorPicker color={color} onChange={setColor} options={options} />
         </View>

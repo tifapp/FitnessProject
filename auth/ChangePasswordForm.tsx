@@ -2,8 +2,7 @@ import { BodyText, Headline } from "@components/Text"
 import { PasswordTextField } from "@components/TextFields"
 import { PrimaryButton } from "@components/common/Buttons"
 import { AppStyles } from "@lib/AppColorStyle"
-import { Password } from "@lib/Password"
-import { Auth } from "aws-amplify"
+import { Password } from "@auth/Password"
 import React, { useState } from "react"
 import {
   Alert,
@@ -15,7 +14,15 @@ import {
   ViewStyle
 } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
-import { useMutation } from "react-query"
+import { useMutation } from "@tanstack/react-query"
+
+export type ChangePasswordResult = "valid" | "invalid" | "incorrect-password"
+
+export type ChangePasswordErrorReason =
+  | "current-matches-new"
+  | "reenter-does-not-match-new"
+  | "weak-new-password"
+  | "incorrect-current-password"
 
 export type UseChangePasswordFormEnvironment = {
   onSubmitted: (
@@ -33,26 +40,6 @@ export type ChangePasswordSubmission =
       error?: ChangePasswordErrorReason
     }
   | { status: "submitting"; submit?: undefined; error?: undefined }
-
-export type ChangePasswordErrorReason =
-  | "current-matches-new"
-  | "reenter-does-not-match-new"
-  | "weak-new-password"
-  | "incorrect-current-password"
-
-export type ChangePasswordResult = "valid" | "invalid" | "incorrect-password"
-
-export const changePassword = async (
-  uncheckedOldPass: string,
-  newPass: Password
-) => {
-  return await Auth.currentAuthenticatedUser()
-    .then((user) => {
-      return Auth.changePassword(user, uncheckedOldPass, newPass.rawValue)
-    })
-    .then<ChangePasswordResult>((data) => "valid")
-    .catch<ChangePasswordResult>((err) => "invalid")
-}
 
 export type ChangePasswordFormFields = {
   currentPassword: string
@@ -78,7 +65,6 @@ export const useChangePasswordForm = ({
         return await onSubmitted(fields.currentPassword, passwordResult)
       }
     },
-
     {
       onSuccess,
       onError: () => {

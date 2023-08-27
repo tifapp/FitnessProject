@@ -1,19 +1,34 @@
-import { Password } from "@lib/Password"
-import { useChangePasswordForm } from "@screens/changePassword/ChangePasswordForm"
+import { Password } from "@auth/Password"
+import { useChangePasswordForm } from "@auth/ChangePasswordForm"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
-import { captureAlerts } from "./helpers/Alerts"
-import { TestQueryClientProvider } from "./helpers/ReactQuery"
+import { captureAlerts } from "../tests/helpers/Alerts"
+import {
+  TestQueryClientProvider,
+  createTestQueryClient
+} from "../tests/helpers/ReactQuery"
+import { neverPromise } from "../tests/helpers/Promise"
 
 describe("ChangePassword tests", () => {
   beforeEach(() => jest.resetAllMocks())
 
   describe("UseChangePassword tests", () => {
+    const queryClient = createTestQueryClient()
+    beforeEach(() => queryClient.clear())
+
+    afterAll(() => {
+      queryClient.resetQueries()
+      queryClient.clear()
+    })
+
     const changePassword = jest.fn()
     const onSuccess = jest.fn()
+
     const { tapAlertButton, alertPresentationSpy } = captureAlerts()
+
     const retry = async () => {
       await tapAlertButton("Try Again")
     }
+
     const renderChangePassword = () => {
       return renderHook(
         () =>
@@ -23,7 +38,9 @@ describe("ChangePassword tests", () => {
           }),
         {
           wrapper: ({ children }) => (
-            <TestQueryClientProvider>{children}</TestQueryClientProvider>
+            <TestQueryClientProvider client={queryClient}>
+              {children}
+            </TestQueryClientProvider>
           )
         }
       )
@@ -70,16 +87,35 @@ describe("ChangePassword tests", () => {
       })
     })
 
+    it("should have a submitting status while in process in submitting", async () => {
+      changePassword.mockImplementation(neverPromise)
+      const { result } = renderChangePassword()
+
+      act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
+      act(() => result.current.updateField("newPassword", "OblivionAwaits43#"))
+      act(() => {
+        result.current.updateField("reEnteredPassword", "OblivionAwaits43#")
+      })
+
+      expect(result.current.submission.status).toEqual("valid")
+
+      act(() => result.current.submission.submit?.())
+
+      await waitFor(() => {
+        expect(result.current.submission.status).toEqual("submitting")
+      })
+    })
+
     it("should have a successful submission flow", async () => {
       changePassword.mockImplementation(
-        async (uncheckedOldPass: string, newPass: Password) => {
+        (uncheckedOldPass: string, newPass: Password) => {
           if (
             uncheckedOldPass === "ReturnToAll32@" &&
             newPass.rawValue === "OblivionAwaits43#"
           ) {
-            return "valid"
+            return Promise.resolve("valid")
           }
-          return "invalid"
+          return Promise.resolve("invalid")
         }
       )
 
@@ -87,19 +123,15 @@ describe("ChangePassword tests", () => {
 
       act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
       act(() => result.current.updateField("newPassword", "OblivionAwaits43#"))
-      act(() =>
+      act(() => {
         result.current.updateField("reEnteredPassword", "OblivionAwaits43#")
-      )
+      })
 
       expect(result.current.submission.status).toEqual("valid")
 
       act(() => result.current.submission.submit?.())
-      await waitFor(() => {
-        expect(result.current.submission.status).toEqual("submitting")
-      })
-      await waitFor(() => {
-        expect(onSuccess).toHaveBeenCalled()
-      })
+
+      await waitFor(() => expect(onSuccess).toHaveBeenCalled())
     })
 
     it("should have a failed submission flow", async () => {
@@ -116,15 +148,13 @@ describe("ChangePassword tests", () => {
       expect(result.current.submission.status).toEqual("valid")
 
       act(() => result.current.submission.submit?.())
-      await waitFor(() => {
-        expect(result.current.submission.status).toEqual("submitting")
-      })
+
       await waitFor(() => {
         expect(result.current.submission.status).toEqual("invalid")
-        expect(result.current.submission.error).toEqual(
-          "incorrect-current-password"
-        )
       })
+      expect(result.current.submission.error).toEqual(
+        "incorrect-current-password"
+      )
     })
 
     it("should be able to retry when it gets an error", async () => {
@@ -143,16 +173,14 @@ describe("ChangePassword tests", () => {
       expect(result.current.submission.status).toEqual("valid")
 
       act(() => result.current.submission.submit?.())
-      await waitFor(() => {
-        expect(result.current.submission.status).toEqual("submitting")
-      })
+
       await waitFor(() => {
         expect(alertPresentationSpy).toHaveBeenCalled()
       })
+
       await act(async () => await retry())
-      await waitFor(() => {
-        expect(onSuccess).toHaveBeenCalled()
-      })
+
+      await waitFor(() => expect(onSuccess).toHaveBeenCalled())
     })
 
     it("should not produce error messages when no input is initially given", () => {

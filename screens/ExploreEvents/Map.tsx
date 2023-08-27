@@ -3,7 +3,7 @@ import { CurrentUserEvent } from "@lib/events"
 import { LocationCoordinate2D, Region } from "@lib/location"
 import React from "react"
 import { StyleProp, ViewStyle } from "react-native"
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
+import MapView, { Marker } from "react-native-maps"
 
 export type ExploreEventsMapProps = {
   initialRegion: Region
@@ -24,7 +24,6 @@ export const ExploreEventsMap = ({
 }: ExploreEventsMapProps) => (
   <MapView
     style={style}
-    provider={PROVIDER_GOOGLE}
     initialRegion={initialRegion}
     loadingEnabled={true}
     toolbarEnabled={false}

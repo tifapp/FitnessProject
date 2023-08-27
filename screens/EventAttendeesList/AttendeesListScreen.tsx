@@ -4,7 +4,7 @@ import { delayData } from "@lib/DelayData"
 import { AttendeeEntry } from "@screens/EventAttendeesList/attendeeEntry"
 import React from "react"
 import { FlatList, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { useQuery } from "react-query"
+import { useQuery } from "@tanstack/react-query"
 import { AttendeeListMocks } from "./AttendeesMocks"
 
 export const AttendeesListScreen = () => {

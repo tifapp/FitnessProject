@@ -1,6 +1,6 @@
 import { ApiSchema } from "@api-client/api-schema"
 import { apiClient } from "@api-client/index"
-import { UseQueryOptions, UseQueryResult, useQuery } from "react-query"
+import { UseQueryOptions, UseQueryResult, useQuery } from "@tanstack/react-query"
 
 type ApiPath = keyof typeof ApiSchema
 type ApiMethod<P extends ApiPath> = keyof (typeof ApiSchema)[P]
