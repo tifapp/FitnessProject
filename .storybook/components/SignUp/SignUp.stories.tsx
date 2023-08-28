@@ -7,6 +7,7 @@ import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { CreateAccountView } from "@auth/sign-up"
+import { SafeAreaProvider } from "react-native-safe-area-context"
 
 const SignUpMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Sign Up"
@@ -19,13 +20,15 @@ type SignUpStory = ComponentStory<typeof SettingsScreen>
 const Stack = createStackNavigator()
 
 export const Basic: SignUpStory = () => (
-  <NavigationContainer>
-    <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
-      <Stack.Screen
-        name="Sign Up"
-        options={{ headerLeft: () => <XMarkBackButton /> }}
-        component={CreateAccountView}
-      />
-    </Stack.Navigator>
-  </NavigationContainer>
+  <SafeAreaProvider>
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
+        <Stack.Screen
+          name="signUp"
+          options={{ headerLeft: () => <XMarkBackButton />, title: "" }}
+          component={CreateAccountView}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  </SafeAreaProvider>
 )
