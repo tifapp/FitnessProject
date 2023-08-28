@@ -15,7 +15,7 @@ export type CreateAccountProps = {
 }
 
 export const CreateAccountView = ({ style }: CreateAccountProps) => {
-  const textFieldHeight = 48 * useFontScale()
+  const textFieldHeight = 32 * useFontScale()
   return (
     <KeyboardAwareScrollView style={style}>
       <View style={styles.illustration} />
@@ -36,16 +36,16 @@ export const CreateAccountView = ({ style }: CreateAccountProps) => {
           style={styles.textField}
         />
 
-        <PrimaryButton
-          title="Create Account"
-          style={styles.createAccountButton}
-        />
         <Caption style={styles.disclaimerText}>
-          By signing up, you agree to the{" "}
+          <Caption>By signing up, you agree to the </Caption>
           <Caption style={styles.termsAndConditions}>
             terms and conditions.
           </Caption>
         </Caption>
+        <PrimaryButton
+          title="Create Account"
+          style={styles.createAccountButton}
+        />
       </View>
     </KeyboardAwareScrollView>
   )
@@ -68,12 +68,13 @@ const styles = StyleSheet.create({
   },
   createAccountButton: {
     width: "100%",
-    marginTop: 32,
-    paddingHorizontal: 16
+    paddingHorizontal: 16,
+    marginTop: 8
   },
   disclaimerText: {
     textAlign: "center",
-    marginTop: 8
+    opacity: 1,
+    marginTop: 32
   },
   termsAndConditions: {
     color: AppStyles.linkColor,
@@ -98,18 +99,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     height: 48,
     width: "100%"
-  },
-  signInWithGoogleButton: {
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: AppStyles.eventCardBorder,
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    height: 48,
-    marginTop: 16
   },
   signUpWithGoogleText: {
     marginLeft: 16
