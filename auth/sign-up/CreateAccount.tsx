@@ -1,29 +1,40 @@
-import { Caption, Headline } from "@components/Text"
-import { PasswordTextField, TextField } from "@components/TextFields"
+import { Caption } from "@components/Text"
+import {
+  FilledPasswordTextField,
+  FilledTextField
+} from "@components/TextFields"
 import { PrimaryButton } from "@components/common/Buttons"
-import { Ionicon } from "@components/common/Icons"
+import { useFontScale } from "@hooks/Fonts"
 import { AppStyles } from "@lib/AppColorStyle"
 import React from "react"
 import { StyleProp, View, ViewStyle, StyleSheet } from "react-native"
-import { Divider } from "react-native-elements"
-import { TouchableOpacity } from "react-native-gesture-handler"
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 
 export type CreateAccountProps = {
   style?: StyleProp<ViewStyle>
 }
 
 export const CreateAccountView = ({ style }: CreateAccountProps) => {
+  const textFieldHeight = 48 * useFontScale()
   return (
-    <View style={style}>
+    <KeyboardAwareScrollView style={style}>
       <View style={styles.illustration} />
 
       <View style={styles.fieldsContainer}>
-        <TextField placeholder="Name" />
-        <TextField
+        <FilledTextField
+          placeholder="Name"
+          textStyle={{ height: textFieldHeight }}
+        />
+        <FilledTextField
           placeholder="Phone number or Email"
+          textStyle={{ height: textFieldHeight }}
           style={styles.textField}
         />
-        <PasswordTextField placeholder="Password" style={styles.textField} />
+        <FilledPasswordTextField
+          placeholder="Password"
+          textStyle={{ height: textFieldHeight }}
+          style={styles.textField}
+        />
 
         <PrimaryButton
           title="Create Account"
@@ -35,27 +46,15 @@ export const CreateAccountView = ({ style }: CreateAccountProps) => {
             terms and conditions.
           </Caption>
         </Caption>
-
-        <View style={styles.dividerContainer}>
-          <Divider style={styles.divider} />
-          <Caption style={styles.dividerText}>Or</Caption>
-          <Divider style={styles.divider} />
-        </View>
-        <View style={styles.signInWithAppleButton} />
-        <SignInWithGoogleButton />
       </View>
-    </View>
+    </KeyboardAwareScrollView>
   )
 }
 
-const SignInWithGoogleButton = () => (
-  <TouchableOpacity style={styles.signInWithGoogleButton}>
-    <Ionicon name="logo-google" />
-    <Headline style={styles.signUpWithGoogleText}>Sign up with Google</Headline>
-  </TouchableOpacity>
-)
-
 const styles = StyleSheet.create({
+  textFieldHeight: {
+    height: 48
+  },
   fieldsContainer: {
     padding: 16
   },

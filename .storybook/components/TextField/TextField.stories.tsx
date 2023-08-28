@@ -1,5 +1,9 @@
 import React, { useState } from "react"
-import { PasswordTextField, TextField } from "@components/TextFields"
+import {
+  FilledTextField,
+  PasswordTextField,
+  TextField
+} from "@components/TextFields"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { KeyboardAvoidingView, View } from "react-native"
 import { ContentText } from "@components/ContentText"
@@ -29,6 +33,7 @@ export const Basic: TextFieldStory = () => (
     <ErrorString />
     <ErrorView />
     <Password />
+    <Filled />
   </KeyboardAvoidingView>
 )
 
@@ -86,6 +91,19 @@ const Password = () => {
       placeholder="Enter Text"
       onChangeText={setText}
       style={{ padding: 16 }}
+    />
+  )
+}
+
+const Filled = () => {
+  const [text, setText] = useState("")
+  return (
+    <FilledTextField
+      value={text}
+      placeholder="Enter Text"
+      onChangeText={setText}
+      style={{ padding: 16 }}
+      error="This is an error"
     />
   )
 }

@@ -9,7 +9,7 @@ import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { CreateAccountView } from "@auth/sign-up"
 
 const SignUpMeta: ComponentMeta<typeof SettingsScreen> = {
-  title: "Location Search Screen"
+  title: "Sign Up"
 }
 
 export default SignUpMeta
