@@ -2,7 +2,8 @@ import { act, renderHook, waitFor } from "@testing-library/react-native"
 import {
   TestQueryClientProvider,
   createTestQueryClient
-} from "tests/helpers/ReactQuery"
+} from "../tests/helpers/ReactQuery"
+import { useForgotPasswordForm } from "./ForgotPasswordForm"
 describe("Forgot Password Form tests", () => {
   describe("Verify Email logic tests", () => {
     const queryClient = createTestQueryClient()
@@ -36,18 +37,19 @@ describe("Forgot Password Form tests", () => {
       const emailAddress = "FiddleSticks32@ka"
       const { result } = renderForgotPassword()
 
-      act(() => result.current.updateField("email", emailAddress))
+      act(() => result.current.updateField(emailAddress))
 
       expect(result.current.submission).toMatchObject({
         status: "invalid",
         error: "invalid-email"
       })
     })
+
     it("can correctly use its logic to proceed onto the next screen after a successful verification", async () => {
       const emailAddress = "FiddleSticks32@kale.org"
       const { result } = renderForgotPassword()
 
-      act(() => result.current.updateField("email", emailAddress))
+      act(() => result.current.updateField(emailAddress))
 
       expect(result.current.submission.status).toEqual("valid")
 
