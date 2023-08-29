@@ -1,34 +1,47 @@
-import { BodyText, Caption, Title } from "@components/Text"
-import {
-  FilledPasswordTextField,
-  FilledTextField
-} from "@components/TextFields"
+import { Title, BodyText } from "@components/Text"
+import { FilledTextField } from "@components/TextFields"
 import { PrimaryButton } from "@components/common/Buttons"
-import { CircularIonicon } from "@components/common/Icons"
+import { CircularIonicon, Ionicon } from "@components/common/Icons"
 import { useFontScale } from "@hooks/Fonts"
 import { useKeyboardState } from "@hooks/Keyboard"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useHeaderHeight } from "@react-navigation/stack"
 import React, { useState } from "react"
 import {
+  KeyboardAvoidingView,
+  Platform,
   StyleProp,
   View,
   ViewStyle,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform
+  StyleSheet
 } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
-export type CreateAccountFormProps = {
+export type InvalidUserHandleReason = "already-taken" | "bad-format"
+
+const errorTextForInvalidHandleReason = (
+  invalidHandleReason: InvalidUserHandleReason
+) => {
+  if (invalidHandleReason === "already-taken") {
+    return "This username is already taken."
+  }
+  return "Your username can only contain letters, numbers, and underscores."
+}
+
+export type CreateAccountUserHandleFormProps = {
+  currentHandleText: string
+  onCurrentHandleTextChanged: (handleText: string) => void
+  invalidHandleReason?: InvalidUserHandleReason
   style?: StyleProp<ViewStyle>
 }
 
-/**
- * The form the user uses to enter their initial information to create an account.
- */
-export const CreateAccountFormView = ({ style }: CreateAccountFormProps) => {
+export const CreateAccountUserHandleFormView = ({
+  currentHandleText,
+  onCurrentHandleTextChanged,
+  invalidHandleReason,
+  style
+}: CreateAccountUserHandleFormProps) => {
   const [footerHeight, setFooterHeight] = useState(0)
   const textFieldHeight = 32 * useFontScale()
   const { isPresented: isKeyboardPresented } = useKeyboardState()
@@ -42,48 +55,33 @@ export const CreateAccountFormView = ({ style }: CreateAccountFormProps) => {
         keyboardDismissMode="interactive"
         contentContainerStyle={styles.fieldsContainer}
       >
-        <Title>Create your Account!</Title>
+        <Title>Pick your Username</Title>
         <BodyText style={styles.bodyText}>
-          Welcome to tiF! Begin your fitness journey by creating an account.
+          We have created a username for you, but you can customize it if you
+          don&apos;t like it. It&apos;s also possible to change it later if you
+          want to.
         </BodyText>
 
         <FilledTextField
           leftAddon={
+            <Ionicon name="at-outline" color={AppStyles.colorOpacity50} />
+          }
+          rightAddon={
             <CircularIonicon
-              backgroundColor={AppStyles.linkColor}
-              name="person"
-              color={AppStyles.colorOpacity50}
+              backgroundColor={!invalidHandleReason ? "#14B329" : "#FB3640"}
+              name={!invalidHandleReason ? "checkmark" : "close"}
             />
           }
-          placeholder="Name"
-          textStyle={{ height: textFieldHeight }}
-        />
-        <FilledTextField
-          placeholder="Phone number or Email"
-          leftAddon={
-            <CircularIonicon
-              backgroundColor="#14B329"
-              name="phone-portrait"
-              color={AppStyles.colorOpacity50}
-            />
+          error={
+            invalidHandleReason
+              ? errorTextForInvalidHandleReason(invalidHandleReason)
+              : undefined
           }
-          keyboardType="phone-pad"
-          autoCapitalize="none"
-          autoCorrect={false}
+          placeholder="Enter a username"
+          keyboardType="twitter"
+          value={currentHandleText}
+          onChangeText={onCurrentHandleTextChanged}
           textStyle={{ height: textFieldHeight }}
-          style={styles.textField}
-        />
-        <FilledPasswordTextField
-          placeholder="Password"
-          leftAddon={
-            <CircularIonicon
-              backgroundColor="#FB3640"
-              name="lock-closed"
-              color={AppStyles.colorOpacity50}
-            />
-          }
-          textStyle={{ height: textFieldHeight }}
-          style={styles.textField}
         />
         <View style={{ height: footerHeight }} />
       </KeyboardAwareScrollView>
@@ -100,16 +98,7 @@ export const CreateAccountFormView = ({ style }: CreateAccountFormProps) => {
           ]}
           onLayout={(e) => setFooterHeight(e.nativeEvent.layout.height)}
         >
-          <Caption style={styles.disclaimerText}>
-            <Caption>By signing up, you agree to the </Caption>
-            <Caption style={styles.legalLinkText}>terms and conditions</Caption>
-            <Caption> and </Caption>
-            <Caption style={styles.legalLinkText}>privacy policy</Caption>.
-          </Caption>
-          <PrimaryButton
-            title="Create Account"
-            style={styles.createAccountButton}
-          />
+          <PrimaryButton title="Next" style={styles.nextButton} />
         </View>
       </KeyboardAvoidingView>
     </View>
@@ -154,7 +143,7 @@ const styles = StyleSheet.create({
   textField: {
     marginTop: 16
   },
-  createAccountButton: {
+  nextButton: {
     width: "100%",
     paddingHorizontal: 16,
     marginTop: 8
