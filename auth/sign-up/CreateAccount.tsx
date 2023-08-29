@@ -67,6 +67,9 @@ export const CreateAccountFormView = ({ style }: CreateAccountFormProps) => {
               color={AppStyles.colorOpacity50}
             />
           }
+          keyboardType="phone-pad"
+          autoCapitalize="none"
+          autoCorrect={false}
           textStyle={{ height: textFieldHeight }}
           style={styles.textField}
         />
