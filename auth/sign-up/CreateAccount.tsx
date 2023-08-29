@@ -42,7 +42,7 @@ export const CreateAccountFormView = ({ style }: CreateAccountFormProps) => {
         keyboardDismissMode="interactive"
         contentContainerStyle={styles.fieldsContainer}
       >
-        <Title>Create your Account!</Title>
+        <Title>Create your Account</Title>
         <BodyText style={styles.bodyText}>
           Welcome to tiF! Begin your fitness journey by creating an account.
         </BodyText>
@@ -101,13 +101,13 @@ export const CreateAccountFormView = ({ style }: CreateAccountFormProps) => {
           onLayout={(e) => setFooterHeight(e.nativeEvent.layout.height)}
         >
           <Caption style={styles.disclaimerText}>
-            <Caption>By signing up, you agree to the </Caption>
+            <Caption>By creating an account, you agree to the </Caption>
             <Caption style={styles.legalLinkText}>terms and conditions</Caption>
             <Caption> and </Caption>
             <Caption style={styles.legalLinkText}>privacy policy</Caption>.
           </Caption>
           <PrimaryButton
-            title="Create Account"
+            title="I'm ready!"
             style={styles.createAccountButton}
           />
         </View>

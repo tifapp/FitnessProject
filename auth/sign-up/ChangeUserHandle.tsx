@@ -64,11 +64,15 @@ export const CreateAccountUserHandleFormView = ({
 
         <FilledTextField
           leftAddon={
-            <Ionicon name="at-outline" color={AppStyles.colorOpacity50} />
+            <CircularIonicon
+              backgroundColor={AppStyles.darkColor}
+              name="at-outline"
+              color={AppStyles.colorOpacity50}
+            />
           }
           rightAddon={
-            <CircularIonicon
-              backgroundColor={!invalidHandleReason ? "#14B329" : "#FB3640"}
+            <Ionicon
+              color={!invalidHandleReason ? "#14B329" : "#FB3640"}
               name={!invalidHandleReason ? "checkmark" : "close"}
             />
           }
@@ -98,7 +102,7 @@ export const CreateAccountUserHandleFormView = ({
           ]}
           onLayout={(e) => setFooterHeight(e.nativeEvent.layout.height)}
         >
-          <PrimaryButton title="Next" style={styles.nextButton} />
+          <PrimaryButton title="I like this name!" style={styles.nextButton} />
         </View>
       </KeyboardAvoidingView>
     </View>

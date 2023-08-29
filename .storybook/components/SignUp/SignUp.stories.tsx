@@ -9,7 +9,8 @@ import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import {
   CreateAccountUserHandleFormView,
-  CreateAccountFormView
+  CreateAccountFormView,
+  VerifyCodeView
 } from "@auth/sign-up"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { Button, View } from "react-native"
@@ -40,6 +41,11 @@ export const Basic: SignUpStory = () => (
           options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
           component={HandleScreen}
         />
+        <Stack.Screen
+          name="verifyCode"
+          options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
+          component={VerifyCodeView}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   </SafeAreaProvider>
@@ -67,6 +73,10 @@ const TestScreen = () => {
       <Button
         title="Change Handle Form"
         onPress={() => navigation.navigate("changeHandle")}
+      />
+      <Button
+        title="Verify Code Form"
+        onPress={() => navigation.navigate("verifyCode")}
       />
     </View>
   )
