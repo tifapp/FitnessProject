@@ -10,7 +10,8 @@ import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import {
   CreateAccountUserHandleFormView,
   CreateAccountFormView,
-  VerifyCodeView
+  VerifyCodeView,
+  WelcomeView
 } from "@auth/sign-up"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { Button, View } from "react-native"
@@ -46,6 +47,11 @@ export const Basic: SignUpStory = () => (
           options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
           component={VerifyCodeView}
         />
+        <Stack.Screen
+          name="welcome"
+          options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
+          component={WelcomeView}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   </SafeAreaProvider>
@@ -57,7 +63,7 @@ const HandleScreen = () => {
     <CreateAccountUserHandleFormView
       currentHandleText={handle}
       onCurrentHandleTextChanged={setHandle}
-      invalidHandleReason="bad-format"
+      // invalidHandleReason="bad-format"
     />
   )
 }
@@ -78,6 +84,7 @@ const TestScreen = () => {
         title="Verify Code Form"
         onPress={() => navigation.navigate("verifyCode")}
       />
+      <Button title="Welcome" onPress={() => navigation.navigate("welcome")} />
     </View>
   )
 }

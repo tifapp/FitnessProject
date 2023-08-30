@@ -45,7 +45,7 @@ export const VerifyCodeView = ({ style }: VerifyCodeProps) => {
         <FilledTextField
           leftAddon={
             <CircularIonicon
-              backgroundColor="#A882DD"
+              backgroundColor="#FB5607"
               name="barcode-outline"
               color={AppStyles.colorOpacity50}
             />
@@ -76,7 +76,7 @@ export const VerifyCodeView = ({ style }: VerifyCodeProps) => {
             </BodyText>
             <BodyText style={styles.resendLinkText}>Resend it.</BodyText>
           </BodyText>
-          <PrimaryButton title="I'm not evil..." style={styles.nextButton} />
+          <PrimaryButton title="Verify me!" style={styles.nextButton} />
         </View>
       </KeyboardAvoidingView>
     </View>

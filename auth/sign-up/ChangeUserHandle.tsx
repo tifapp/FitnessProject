@@ -65,7 +65,7 @@ export const CreateAccountUserHandleFormView = ({
         <FilledTextField
           leftAddon={
             <CircularIonicon
-              backgroundColor={AppStyles.darkColor}
+              backgroundColor="#A882DD"
               name="at-outline"
               color={AppStyles.colorOpacity50}
             />
