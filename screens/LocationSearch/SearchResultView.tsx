@@ -5,10 +5,9 @@ import {
 } from "@lib/location"
 import { Caption, Headline } from "@components/Text"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { Ionicon } from "@components/common/Icons"
+import { CircularIonicon, Ionicon } from "@components/common/Icons"
 import { compactFormatFeet, compactFormatMiles } from "@lib/DistanceFormatting"
 import { FEET_PER_MILE } from "@lib/Math"
-import { LocationSearchIconView } from "./Icon"
 import { AppStyles } from "@lib/AppColorStyle"
 
 export type LocationSearchResultProps = {
@@ -30,7 +29,7 @@ export const LocationSearchResultView = ({
   )
   return (
     <View style={[style, styles.container]}>
-      <LocationSearchIconView
+      <CircularIonicon
         backgroundColor={
           result.isRecentLocation
             ? AppStyles.colorOpacity35
