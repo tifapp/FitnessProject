@@ -23,8 +23,8 @@ import { LocationAccuracy, LocationObject } from "expo-location"
 import { useLocationsSearchQueryObject } from "./state"
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
 import { LocationSearchResultsData } from "./models"
-import { LocationSearchIconView } from "./Icon"
 import { AppStyles } from "@lib/AppColorStyle"
+import { CircularIonicon } from "@components/common/Icons"
 
 export type UseLocationSearchPickerEnvironment = {
   loadSearchResults: (
@@ -137,7 +137,7 @@ export const LocationSearchPicker = ({
               entering={FadeIn}
               style={styles.userCoordinatesOption}
             >
-              <LocationSearchIconView
+              <CircularIonicon
                 backgroundColor={AppStyles.linkColor}
                 name="navigate"
                 accessible={false}
