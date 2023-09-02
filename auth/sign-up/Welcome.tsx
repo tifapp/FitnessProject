@@ -4,14 +4,16 @@ import { CircularIonicon, IoniconName } from "@components/common/Icons"
 import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 
-export type WelcomeProps = {
+export type CreateAccountEndingProps = {
   style?: StyleProp<ViewStyle>
 }
 
 /**
  * The view that shows to the user at the end of the sign-up flow.
  */
-export const CreateAccountEndingView = ({ style }: WelcomeProps) => {
+export const CreateAccountEndingView = ({
+  style
+}: CreateAccountEndingProps) => {
   return (
     <AuthSectionView
       title="Welcome to tiF!"

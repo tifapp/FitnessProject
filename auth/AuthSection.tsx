@@ -38,7 +38,6 @@ export const AuthSectionView = ({
   style
 }: AuthSectionProps) => {
   const [footerHeight, setFooterHeight] = useState(0)
-  const { isPresented: isKeyboardPresented } = useKeyboardState()
   const insets = useSafeAreaInsets()
   return (
     <View style={[style, styles.container]}>
@@ -57,13 +56,17 @@ export const AuthSectionView = ({
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={[styles.footer]}
-        contentContainerStyle={{ paddingBottom: useSafeAreaInsets().bottom }}
+        contentContainerStyle={{ paddingBottom: insets.bottom }}
         keyboardVerticalOffset={useHeaderHeight()}
       >
         <View
           style={[
             styles.footerContainer,
-            { paddingBottom: !isKeyboardPresented ? insets.bottom + 16 : 16 }
+            {
+              paddingBottom: !useKeyboardState().isPresented
+                ? insets.bottom + 16
+                : 16
+            }
           ]}
           onLayout={(e) => setFooterHeight(e.nativeEvent.layout.height)}
         >

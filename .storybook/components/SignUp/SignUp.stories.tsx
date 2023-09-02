@@ -9,7 +9,7 @@ import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import {
   CreateAccountUserHandleFormView,
-  CreateAccountFormView,
+  CreateAccountCredentialsFormView,
   CreateAccountVerifyCodeView,
   CreateAccountEndingView
 } from "@auth/sign-up"
@@ -35,7 +35,7 @@ export const Basic: SignUpStory = () => (
         <Stack.Screen
           name="signUp"
           options={{ headerLeft: () => <XMarkBackButton />, title: "" }}
-          component={CreateAccountFormView}
+          component={CreateAccountCredentialsFormView}
         />
         <Stack.Screen
           name="changeHandle"
