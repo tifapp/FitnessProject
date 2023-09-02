@@ -5,7 +5,7 @@ import { UseQueryOptions } from "@tanstack/react-query"
 /**
  * A helper type for creating custom hooks that wrap `useQuery`.
  */
-export type QueryHookOptions<Data> = Omit<
-  UseQueryOptions<Data, unknown, Data, string[]>,
+export type QueryHookOptions<Data, Error = unknown> = Omit<
+  UseQueryOptions<Data, Error, Data, string[]>,
   "queryKey" | "queryFn"
 >
