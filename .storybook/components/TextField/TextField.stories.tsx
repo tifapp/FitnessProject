@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import {
-  FilledTextField,
+  ShadedTextField,
   PasswordTextField,
   TextField
 } from "@components/TextFields"
@@ -98,7 +98,7 @@ const Password = () => {
 const Filled = () => {
   const [text, setText] = useState("")
   return (
-    <FilledTextField
+    <ShadedTextField
       value={text}
       placeholder="Enter Text"
       onChangeText={setText}

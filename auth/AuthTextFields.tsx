@@ -1,7 +1,7 @@
 import React from "react"
 import {
-  FilledPasswordTextField,
-  FilledTextField,
+  ShadedPasswordTextField,
+  ShadedTextField,
   PasswordTextFieldProps,
   TextFieldProps
 } from "@components/TextFields"
@@ -18,7 +18,7 @@ export type AuthFilledTextFieldProps = {
 /**
  * A filled text field matching the style of the auth screens.
  */
-export const AuthFilledTextField = ({
+export const AuthShadedTextField = ({
   iconName,
   iconBackgroundColor,
   style,
@@ -26,7 +26,7 @@ export const AuthFilledTextField = ({
 }: AuthFilledTextFieldProps) => {
   const textFieldHeight = 32 * useFontScale()
   return (
-    <FilledTextField
+    <ShadedTextField
       leftAddon={
         <CircularIonicon
           backgroundColor={iconBackgroundColor}
@@ -49,7 +49,7 @@ export type AuthFilledPasswordTextFieldProps = {
 /**
  * A filled password text field matching the style of the auth screens.
  */
-export const AuthFilledPasswordTextField = ({
+export const AuthShadedPasswordTextField = ({
   iconName,
   iconBackgroundColor,
   style,
@@ -57,7 +57,7 @@ export const AuthFilledPasswordTextField = ({
 }: AuthFilledPasswordTextFieldProps) => {
   const textFieldHeight = 32 * useFontScale()
   return (
-    <FilledPasswordTextField
+    <ShadedPasswordTextField
       leftAddon={
         <CircularIonicon
           backgroundColor={iconBackgroundColor}

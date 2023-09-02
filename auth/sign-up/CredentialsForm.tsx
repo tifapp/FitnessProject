@@ -1,7 +1,7 @@
 import { AuthSectionView } from "@auth/AuthSection"
 import {
-  AuthFilledPasswordTextField,
-  AuthFilledTextField
+  AuthShadedPasswordTextField,
+  AuthShadedTextField
 } from "@auth/AuthTextFields"
 import { Caption } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
@@ -32,12 +32,12 @@ export const CreateAccountCredentialsFormView = ({
     }
     style={style}
   >
-    <AuthFilledTextField
+    <AuthShadedTextField
       iconName="person"
       iconBackgroundColor={AppStyles.linkColor}
       placeholder="Name"
     />
-    <AuthFilledTextField
+    <AuthShadedTextField
       iconName="phone-portrait"
       iconBackgroundColor="#14B329"
       placeholder="Phone number or Email"
@@ -46,7 +46,7 @@ export const CreateAccountCredentialsFormView = ({
       autoCorrect={false}
       style={styles.textField}
     />
-    <AuthFilledPasswordTextField
+    <AuthShadedPasswordTextField
       iconName="lock-closed"
       iconBackgroundColor="#FB3640"
       placeholder="Password"

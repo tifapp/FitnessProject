@@ -1,5 +1,5 @@
 import { AuthSectionView } from "@auth/AuthSection"
-import { AuthFilledTextField } from "@auth/AuthTextFields"
+import { AuthShadedTextField } from "@auth/AuthTextFields"
 import { BodyText } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import React from "react"
@@ -29,7 +29,7 @@ export const CreateAccountVerifyCodeView = ({
     callToActionTitle="Verify me!"
     style={style}
   >
-    <AuthFilledTextField
+    <AuthShadedTextField
       iconName="barcode-outline"
       iconBackgroundColor="#FB5607"
       placeholder="Enter the code sent to *****-61"

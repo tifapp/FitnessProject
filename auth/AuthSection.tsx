@@ -102,7 +102,8 @@ const styles = StyleSheet.create({
   },
   footerContainer: {
     flex: 1,
-    padding: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
     width: "100%"
   },
   fieldsContainer: {

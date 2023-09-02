@@ -1,5 +1,5 @@
 import { AuthSectionView } from "@auth/AuthSection"
-import { AuthFilledTextField } from "@auth/AuthTextFields"
+import { AuthShadedTextField } from "@auth/AuthTextFields"
 import { Ionicon } from "@components/common/Icons"
 import React from "react"
 import { StyleProp, ViewStyle } from "react-native"
@@ -39,7 +39,7 @@ export const CreateAccountUserHandleFormView = ({
     callToActionTitle="I like this name!"
     style={style}
   >
-    <AuthFilledTextField
+    <AuthShadedTextField
       iconName="at-outline"
       iconBackgroundColor="#A882DD"
       rightAddon={
