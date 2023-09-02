@@ -1,43 +1,45 @@
-import { BodyText, Title } from "@components/Text"
-import { PrimaryButton } from "@components/common/Buttons"
-import { Ionicon, IoniconName } from "@components/common/Icons"
+import { AuthSectionView } from "@auth/AuthSection"
+import { BodyText, Subtitle } from "@components/Text"
+import { CircularIonicon, IoniconName } from "@components/common/Icons"
 import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { ScrollView } from "react-native-gesture-handler"
 
 export type WelcomeProps = {
   style?: StyleProp<ViewStyle>
 }
 
-export const WelcomeView = ({ style }: WelcomeProps) => {
+/**
+ * The view that shows to the user at the end of the sign-up flow.
+ */
+export const CreateAccountEndingView = ({ style }: WelcomeProps) => {
   return (
-    <View style={[styles.container, style]}>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContainer}
-      >
-        <Title>Welcome to tiF!</Title>
-        <View style={styles.illustration} />
-        <FeatureLabel
-          iconName="notifications"
-          title="Enable Notifications"
-          description="Be notified about events, friend requests, messages, and more when notifications are turned on!"
-        />
-        <FeatureLabel
-          iconName="notifications"
-          title="Join Events"
-          description="Forge everlasting bonds and embark on limitless ventures by working out with others in your area!"
-        />
-      </ScrollView>
-      <View style={styles.footer}>
-        <PrimaryButton title="Awesome!" style={styles.nextButton} />
-      </View>
-    </View>
+    <AuthSectionView
+      title="Welcome to tiF!"
+      description="Way to get started on your fitness journey! See below for what to do with your new account!"
+      callToActionTitle="Awesome!"
+      style={style}
+    >
+      <View style={styles.illustration} />
+      <FeatureLabel
+        iconName="people"
+        iconColor="#F76F8E"
+        title="Join Events"
+        description="Forge everlasting bonds and embark on limitless ventures by working out with others in your area!"
+      />
+      <FeatureLabel
+        iconName="notifications"
+        iconColor="#E9D758"
+        title="Enable Notifications"
+        description="Be notified about events, friend requests, messages, and more when notifications are turned on!"
+        style={styles.notificationsLabel}
+      />
+    </AuthSectionView>
   )
 }
 
 type FeatureLabelProps = {
   iconName: IoniconName
+  iconColor: string
   title: string
   description: string
   style?: StyleProp<ViewStyle>
@@ -45,57 +47,40 @@ type FeatureLabelProps = {
 
 const FeatureLabel = ({
   iconName,
+  iconColor,
   title,
   description,
   style
 }: FeatureLabelProps) => (
   <View style={[styles.featureLabelContainer, style]}>
-    <Ionicon name={iconName} style={styles.featureLabelIcon} />
+    <CircularIonicon
+      backgroundColor={iconColor}
+      name={iconName}
+      style={styles.featureLabelIcon}
+    />
     <View style={styles.featureLabelTextContainer}>
-      <Title>{title}</Title>
+      <Subtitle>{title}</Subtitle>
       <BodyText style={styles.featureLabelBodyText}>{description}</BodyText>
     </View>
   </View>
 )
 
 const styles = StyleSheet.create({
-  container: {
-    position: "relative",
-    flex: 1
-  },
-  footer: {
-    position: "absolute",
-    width: "100%",
-    flex: 1,
-    backgroundColor: "white",
-    bottom: 0,
-    padding: 16
-  },
-  bodyText: {
-    opacity: 0.5,
-    marginBottom: 24
-  },
-  scrollView: {
-    flex: 1
-  },
-  scrollContainer: {
-    padding: 16
-  },
-  nextButton: {
-    width: "100%",
-    paddingHorizontal: 16,
-    marginTop: 8
-  },
   illustration: {
     height: 200,
-    backgroundColor: "red"
+    backgroundColor: "red",
+    marginBottom: 24
+  },
+  notificationsLabel: {
+    marginTop: 16
   },
   featureLabelContainer: {
     display: "flex",
     flexDirection: "row"
   },
   featureLabelIcon: {
-    marginRight: 8
+    marginRight: 8,
+    maxHeight: 32
   },
   featureLabelTextContainer: {
     flex: 1
