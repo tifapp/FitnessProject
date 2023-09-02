@@ -5,7 +5,7 @@ import {
 } from "@lib/location"
 import { Caption, Headline } from "@components/Text"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { CircularIonicon, Ionicon } from "@components/common/Icons"
+import { Ionicon, CircularIonicon } from "@components/common/Icons"
 import { compactFormatFeet, compactFormatMiles } from "@lib/DistanceFormatting"
 import { FEET_PER_MILE } from "@lib/Math"
 import { AppStyles } from "@lib/AppColorStyle"

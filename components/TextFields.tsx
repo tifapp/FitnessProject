@@ -61,7 +61,7 @@ export const TextField = ({
 /**
  * A text field with a filled background.
  */
-export const FilledTextField = ({
+export const ShadedTextField = ({
   leftAddon,
   rightAddon,
   error,
@@ -125,12 +125,12 @@ export const PasswordTextField = ({ ...props }: PasswordTextFieldProps) => {
 /**
  * A password text field which is filled with a solic background
  */
-export const FilledPasswordTextField = ({
+export const ShadedPasswordTextField = ({
   ...props
 }: PasswordTextFieldProps) => {
   const [isShowingPassword, setIsShowingPassword] = useState(false)
   return (
-    <FilledTextField
+    <ShadedTextField
       secureTextEntry={!isShowingPassword}
       rightAddon={
         <TouchableIonicon

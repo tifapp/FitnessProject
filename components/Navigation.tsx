@@ -48,6 +48,19 @@ export const ChevronBackButton = ({
   )
 }
 
+export const XMarkBackButton = ({
+  style = styles.backButtonPadding
+}: BackButtonProps) => {
+  const navigation = useNavigation()
+  return (
+    <TouchableIonicon
+      icon={{ name: "close" }}
+      onPress={() => navigation.goBack()}
+      style={style}
+    />
+  )
+}
+
 const styles = StyleSheet.create({
   backButtonPadding: {
     paddingLeft: 16

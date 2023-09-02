@@ -28,6 +28,9 @@ import SearchBarMeta, {
 import LocationSearchMeta, {
   Basic as LocationSearchBasic
 } from "../components/LocationSearch/LocationSearch.stories"
+import SignUpMeta, {
+  Basic as SignUpBasic
+} from "../components/SignUp/SignUp.stories"
 
 // Create an array of stories
 const stories = [
@@ -70,6 +73,11 @@ const stories = [
     name: LocationSearchMeta.title,
     component: LocationSearchBasic,
     args: LocationSearchMeta.args
+  },
+  {
+    name: SignUpMeta.title,
+    component: SignUpBasic,
+    args: SignUpMeta.args
   }
   // Add more stories here...
 ]
