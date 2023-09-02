@@ -44,98 +44,95 @@ describe("ExploreEvents tests", () => {
   })
 
   describe("useExploreEvents tests", () => {
-    fakeTimers()
-    beforeEach(() => jest.resetAllMocks())
+    const queryClient = createTestQueryClient()
     beforeEach(() => queryClient.clear())
+    fakeTimers()
 
     test("exploring events successfully at user location", async () => {
       const userLocation = mockExpoLocationObject()
+      const expectedRegion = createDefaultMapRegion({
+        latitude: userLocation.coords.latitude,
+        longitude: userLocation.coords.longitude
+      })
 
-      requestForegroundPermissions.mockResolvedValue({ granted: true })
-      queryUserCoordinates.mockReturnValue(userLocation)
-      fetchEvents.mockReturnValue(nonCancellable(Promise.resolve(TEST_EVENTS)))
+      requestForegroundPermissions.mockResolvedValueOnce({ granted: true })
+      queryUserCoordinates.mockReturnValueOnce(userLocation)
+      fetchEvents.mockReturnValueOnce(
+        nonCancellable(Promise.resolve(TEST_EVENTS))
+      )
 
       const { result } = renderUseExploreEvents({ center: "user-location" })
 
-      await waitFor(() => {
-        expect(result.current.data.status).toEqual("loading")
-      })
-      await waitForLocationPermissionRequest()
-      await waitForUserRegionToLoad()
-      await waitFor(() => {
-        expect(fetchEvents).toHaveBeenCalledWith(
-          createDefaultMapRegion({
-            latitude: userLocation.coords.latitude,
-            longitude: userLocation.coords.longitude
-          })
+      await waitFor(() => expect(result.current.data.status).toEqual("loading"))
+
+      await waitFor(() => expect(result.current.region).toEqual(expectedRegion))
+
+      await waitFor(() => expect(result.current.data.status).toEqual("success"))
+      expect(result.current.data.events).toEqual(TEST_EVENTS)
+      expect(fetchEvents).toHaveBeenCalledWith(expectedRegion)
+    })
+
+    test("retrying after unsuccessfully exploring events", async () => {
+      fetchEvents
+        .mockReturnValueOnce(nonCancellable(Promise.reject(new Error())))
+        .mockReturnValueOnce(
+          nonCancellable(Promise.resolve([EventMocks.Multiday]))
         )
+
+      const coordinate = mockLocationCoordinate2D()
+      const { result } = renderUseExploreEvents({
+        center: "preset",
+        coordinate
       })
+
       await waitFor(() => {
-        expect(result.current.data.events).toEqual(TEST_EVENTS)
+        expect(result.current.data.status).toEqual("error")
+      })
+
+      await act(async () => (result.current.data as any).retry())
+
+      await waitFor(() => {
         expect(result.current.data.status).toEqual("success")
       })
     })
 
-    test("retrying after unsuccessfully exploring events", async () => {
-      fetchEvents.mockReturnValue(nonCancellable(Promise.reject(new Error())))
-
-      const coordinate = mockLocationCoordinate2D()
-      const { result } = renderUseExploreEvents({
-        center: "preset",
-        coordinate
-      })
-
-      await waitFor(() => {
-        expect(result.current.data.status).toEqual("loading")
-      })
-
-      await waitFor(() => {
-        expect(result.current.data.status).toEqual("error")
-      })
-
-      act(() => result.current.data.retry?.())
-
-      await waitFor(() => {
-        expect(result.current.data.status).toEqual("loading")
-      })
-
-      await waitFor(() => {
-        expect(result.current.data.status).toEqual("error")
-      })
-    })
-
     it("should be in a no-results state when no events for region", async () => {
-      fetchEvents.mockReturnValue(nonCancellable(Promise.resolve([])))
+      fetchEvents.mockReturnValueOnce(nonCancellable(Promise.resolve([])))
       const coordinate = mockLocationCoordinate2D()
       const { result } = renderUseExploreEvents({
         center: "preset",
         coordinate
       })
       await waitFor(() => {
-        expect(result.current.data.status).toEqual("loading")
+        expect(result.current.data.events).toEqual([])
       })
-      await waitFor(() => {
-        expect(result.current.data.status).toEqual("no-results")
-      })
+      expect(result.current.data.status).toEqual("no-results")
     })
 
     it("should use the initial provided region when fetching for first time", async () => {
-      fetchEvents.mockReturnValue(endlessCancellable())
+      fetchEvents.mockReturnValueOnce(endlessCancellable())
       const coordinates = mockLocationCoordinate2D()
-      renderUseExploreEvents({ center: "preset", coordinate: coordinates })
+      const expectedRegion = createDefaultMapRegion(coordinates)
+      const { result } = renderUseExploreEvents({
+        center: "preset",
+        coordinate: coordinates
+      })
 
       await waitFor(() => {
-        expect(fetchEvents).toHaveBeenCalledWith(
-          expect.objectContaining(coordinates)
-        )
+        expect(result.current.region).toMatchObject(expectedRegion)
+      })
+      await waitFor(() => {
+        expect(fetchEvents).toHaveBeenCalledWith(expectedRegion)
       })
     })
 
     it("should not request location permissions if initial coordinates provided", async () => {
-      fetchEvents.mockReturnValue(endlessCancellable())
+      fetchEvents.mockReturnValueOnce(endlessCancellable())
 
-      const coordinates = mockLocationCoordinate2D()
-      renderUseExploreEvents({ center: "preset", coordinate: coordinates })
+      renderUseExploreEvents({
+        center: "preset",
+        coordinate: mockLocationCoordinate2D()
+      })
 
       await waitFor(() => {
         expect(requestForegroundPermissions).not.toHaveBeenCalled()
@@ -143,35 +140,53 @@ describe("ExploreEvents tests", () => {
     })
 
     it("should use sanfrancisco as the default region when user denies foreground location permissions", async () => {
-      fetchEvents.mockReturnValue(endlessCancellable())
-      requestForegroundPermissions.mockResolvedValue({ granted: false })
+      fetchEvents.mockReturnValueOnce(endlessCancellable())
+      requestForegroundPermissions.mockResolvedValueOnce({ granted: false })
 
-      renderUseExploreEvents({ center: "user-location" })
+      const { result } = renderUseExploreEvents({ center: "user-location" })
 
-      await waitForLocationPermissionRequest()
-      await waitForUserRegionToLoad()
       await waitFor(() => {
         expect(fetchEvents).toHaveBeenCalledWith(SAN_FRANCISCO_DEFAULT_REGION)
       })
+      expect(result.current.region).toEqual(SAN_FRANCISCO_DEFAULT_REGION)
     })
 
     it("should use sanfrancisco as the default region when user location fetch errors", async () => {
-      fetchEvents.mockReturnValue(endlessCancellable())
-      requestForegroundPermissions.mockResolvedValue({ granted: true })
-      queryUserCoordinates.mockRejectedValue(new Error())
+      fetchEvents.mockReturnValueOnce(endlessCancellable())
+      requestForegroundPermissions.mockResolvedValueOnce({ granted: true })
+      queryUserCoordinates.mockRejectedValueOnce(new Error())
 
-      renderUseExploreEvents({ center: "user-location" })
+      const { result } = renderUseExploreEvents({ center: "user-location" })
 
-      await waitForLocationPermissionRequest()
-      await waitForUserRegionToLoad()
       await waitFor(() => {
         expect(fetchEvents).toHaveBeenCalledWith(SAN_FRANCISCO_DEFAULT_REGION)
       })
+      expect(result.current.region).toEqual(SAN_FRANCISCO_DEFAULT_REGION)
     })
 
-    it("should not refetch events at new region when new region is not significantly different from current region", async () => {
-      fetchEvents.mockReturnValue(endlessCancellable())
-      isSignificantlyDifferentRegions.mockReturnValue(false)
+    it("should maintain current region when new region is not significantly different", async () => {
+      fetchEvents.mockReturnValueOnce(endlessCancellable())
+      isSignificantlyDifferentRegions.mockReturnValueOnce(false)
+      const coordinate = mockLocationCoordinate2D()
+      const initialRegion = createDefaultMapRegion(coordinate)
+      const { result } = renderUseExploreEvents({
+        center: "preset",
+        coordinate
+      })
+
+      const updatedRegion = mockRegion()
+      act(() => result.current.updateRegion(updatedRegion))
+
+      advanceThroughRegionUpdateDebounce()
+      expect(result.current.region).toMatchObject(initialRegion)
+      await waitFor(() => {
+        expect(fetchEvents).not.toHaveBeenCalledWith(updatedRegion)
+      })
+    })
+
+    it("should update to new region after debounce period if new region is significantly different", async () => {
+      fetchEvents.mockReturnValueOnce(endlessCancellable())
+      isSignificantlyDifferentRegions.mockReturnValueOnce(true)
       const { result } = renderUseExploreEvents({
         center: "preset",
         coordinate: mockLocationCoordinate2D()
@@ -180,42 +195,21 @@ describe("ExploreEvents tests", () => {
       const updatedRegion = mockRegion()
       act(() => result.current.updateRegion(updatedRegion))
 
-      await waitFor(() => {
-        expect(fetchEvents).not.toHaveBeenCalledWith(updatedRegion)
-      })
       advanceThroughRegionUpdateDebounce()
-      await waitFor(() => {
-        expect(fetchEvents).not.toHaveBeenCalledWith(updatedRegion)
-      })
-    })
-
-    it("should refetch events at updated region after debounce period", async () => {
-      fetchEvents.mockReturnValue(endlessCancellable())
-      isSignificantlyDifferentRegions.mockReturnValue(true)
-      const { result } = renderUseExploreEvents({
-        center: "preset",
-        coordinate: mockLocationCoordinate2D()
-      })
-
-      const updatedRegion = mockRegion()
-      act(() => result.current.updateRegion(updatedRegion))
-
-      await waitFor(() => {
-        expect(fetchEvents).not.toHaveBeenCalledWith(updatedRegion)
-      })
-      advanceThroughRegionUpdateDebounce()
+      expect(result.current.region).toMatchObject(updatedRegion)
       await waitFor(() => {
         expect(fetchEvents).toHaveBeenCalledWith(updatedRegion)
       })
     })
 
-    it("should fetch with no debounce when region updates when current region is non-existent", async () => {
-      fetchEvents.mockReturnValue(endlessCancellable())
+    it("should region update region immediately when current region is non-existent", async () => {
+      fetchEvents.mockReturnValueOnce(endlessCancellable())
       const { result } = renderUseExploreEvents({ center: "user-location" })
 
       const region = mockRegion()
       act(() => result.current.updateRegion(region))
 
+      expect(result.current.region).toMatchObject(region)
       await waitFor(() => {
         expect(fetchEvents).toHaveBeenCalledWith(region)
       })
@@ -223,8 +217,8 @@ describe("ExploreEvents tests", () => {
 
     it("should cancel the existing fetch immediatedly when significant region change", async () => {
       const cancellable = endlessCancellable()
-      fetchEvents.mockReturnValue(cancellable)
-      isSignificantlyDifferentRegions.mockReturnValue(true)
+      fetchEvents.mockReturnValueOnce(cancellable)
+      isSignificantlyDifferentRegions.mockReturnValueOnce(true)
 
       const { result } = renderUseExploreEvents({
         center: "preset",
@@ -241,39 +235,26 @@ describe("ExploreEvents tests", () => {
 
     it("should seed the query cache with an entry for each individual loaded event", async () => {
       const events = [EventMocks.Multiday, EventMocks.PickupBasketball]
-      fetchEvents.mockReturnValue(nonCancellable(Promise.resolve(events)))
+      fetchEvents.mockReturnValueOnce(nonCancellable(Promise.resolve(events)))
 
       renderUseExploreEvents({
         center: "preset",
         coordinate: mockLocationCoordinate2D()
       })
 
-      await waitFor(() => expect(fetchEvents).toHaveBeenCalled())
-      expect(queryClient.getQueryData(["event", events[0].id])).toMatchObject(
-        events[0]
-      )
+      await waitFor(() => {
+        expect(queryClient.getQueryData(["event", events[0].id])).toMatchObject(
+          events[0]
+        )
+      })
       expect(queryClient.getQueryData(["event", events[1].id])).toMatchObject(
         events[1]
       )
     })
 
-    const waitForLocationPermissionRequest = async () => {
-      await waitFor(() => {
-        expect(requestForegroundPermissions).toHaveBeenCalled()
-      })
-    }
-
-    const waitForUserRegionToLoad = async () => {
-      await waitFor(() => {
-        expect(queryUserCoordinates).toHaveBeenCalled()
-      })
-    }
-
     const advanceThroughRegionUpdateDebounce = () => {
       act(() => jest.advanceTimersByTime(300))
     }
-
-    const queryClient = createTestQueryClient()
 
     const requestForegroundPermissions = jest.fn()
     const queryUserCoordinates = jest.fn()

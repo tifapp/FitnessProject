@@ -13,6 +13,16 @@ describe("Haptics tests", () => {
   describe("useHaptics tests", () => {
     beforeEach(async () => await AsyncStorage.clear())
 
+    it("should mute and unmute its state", () => {
+      const { result } = renderUseHaptics(new TestHaptics())
+
+      act(() => result.current.mute())
+      expect(result.current.isMuted).toEqual(true)
+
+      act(() => result.current.unmute())
+      expect(result.current.isMuted).toEqual(false)
+    })
+
     it("should persist mute state in AsyncStorage", async () => {
       const { result } = renderUseHaptics(new TestHaptics())
 
@@ -70,10 +80,10 @@ describe("Haptics tests", () => {
       testHaptics.unmute()
       await AsyncStorage.setItem(IS_HAPTICS_MUTED_KEY, "true")
 
-      renderUseHaptics(testHaptics)
+      const { result } = renderUseHaptics(testHaptics)
 
-      await waitFor(() => expect(testHaptics.isMuted).toEqual(false))
-      expect(testHaptics.isMuted).toEqual(true)
+      await waitFor(() => expect(testHaptics.isMuted).toEqual(true))
+      expect(result.current.isMuted).toEqual(true)
     })
 
     it("should unmute when rendered if persisted value indicates unmute", async () => {
@@ -81,9 +91,10 @@ describe("Haptics tests", () => {
       testHaptics.mute()
       await AsyncStorage.setItem(IS_HAPTICS_MUTED_KEY, "false")
 
-      renderUseHaptics(testHaptics)
+      const { result } = renderUseHaptics(testHaptics)
 
       await waitFor(() => expect(testHaptics.isMuted).toEqual(false))
+      expect(result.current.isMuted).toEqual(false)
     })
 
     const renderUseHaptics = (haptics: Haptics) => {

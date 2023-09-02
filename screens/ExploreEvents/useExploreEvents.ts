@@ -1,7 +1,7 @@
 import { Cancellable, cancelOnAborted } from "@lib/Cancellable"
 import { CurrentUserEvent } from "@lib/events"
 import { useState } from "react"
-import { UseQueryResult, useQuery, useQueryClient } from "react-query"
+import { UseQueryResult, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   ExploreEventsData,
   ExploreEventsInitialCenter,
@@ -18,7 +18,6 @@ import { QueryHookOptions } from "@lib/ReactQuery"
 import { LocationAccuracy, PermissionResponse } from "expo-location"
 
 export type UseExploreEventsEnvironment = {
-  region?: Region
   fetchEvents: (region: Region) => Cancellable<CurrentUserEvent[]>
   isSignificantlyDifferentRegions: (r1: Region, r2: Region) => boolean
 }
@@ -51,13 +50,11 @@ export const useExploreEvents = (
 const eventsQueryToExploreEventsData = (
   query: UseQueryResult<CurrentUserEvent[], unknown>
 ): ExploreEventsData => {
-  if (query.isIdle || query.isLoading) {
+  if (query.isLoading) {
     return { status: "loading" }
-  }
-  if (query.status === "success" && query.data.length === 0) {
+  } else if (query.isSuccess && query.data.length === 0) {
     return { status: "no-results", events: [] }
-  }
-  if (query.isError) {
+  } else if (query.isError) {
     return { status: "error", retry: query.refetch }
   }
   return { status: "success", events: query.data }
@@ -68,19 +65,17 @@ const useExploreEventsRegion = (initialCenter: ExploreEventsInitialCenter) => {
     initialCenterToRegion(initialCenter)
   )
   const userRegion = useUserRegion({ enabled: !pannedRegion })
-  const region =
-    userRegion.status === "loading"
-      ? undefined
-      : pannedRegion ?? userRegion.data ?? SAN_FRANCISCO_DEFAULT_REGION
-  return { region, panToRegion: setPannedRegion }
+  const exploreRegion =
+    userRegion === "loading"
+      ? pannedRegion
+      : pannedRegion ?? userRegion ?? SAN_FRANCISCO_DEFAULT_REGION
+  return { region: exploreRegion, panToRegion: setPannedRegion }
 }
 
-type UserRegionResult =
-  | { status: "loading" }
-  | { status: "loaded"; data?: Region }
+type UserRegionResult = "loading" | (Region | undefined)
 
 const useUserRegion = (
-  options?: QueryHookOptions<PermissionResponse>
+  options: QueryHookOptions<PermissionResponse>
 ): UserRegionResult => {
   const permissionQuery = useRequestForegroundLocationPermissions(options)
   const locationQuery = useUserCoordinatesQuery(
@@ -89,30 +84,28 @@ const useUserRegion = (
       enabled: permissionQuery.data !== undefined
     }
   )
-  if (permissionQuery.isLoading || locationQuery.isLoading) {
-    return { status: "loading" }
+  if (permissionQuery.isFetching || locationQuery.isFetching) {
+    return "loading"
   }
   const coords = locationQuery.data ? locationQuery.data?.coords : undefined
-  return {
-    status: "loaded",
-    data: !coords
-      ? undefined
-      : createDefaultMapRegion({
-        latitude: coords.latitude,
-        longitude: coords.longitude
-      })
-  }
+  return !coords
+    ? undefined
+    : createDefaultMapRegion({
+      latitude: coords.latitude,
+      longitude: coords.longitude
+    })
 }
 
 const useExploreEventsQuery = (
   region: Region,
   fetchEvents: (region: Region) => Cancellable<CurrentUserEvent[]>,
-  options?: QueryHookOptions<CurrentUserEvent[]>
+  options: QueryHookOptions<CurrentUserEvent[]>
 ) => {
   const queryClient = useQueryClient()
+  const queryKey = ["explore-events", region]
   return {
     events: useQuery(
-      ["explore-events", region],
+      queryKey,
       async ({ signal }) => {
         const events = await cancelOnAborted(fetchEvents(region), signal).value
 
@@ -125,7 +118,7 @@ const useExploreEventsQuery = (
       options
     ),
     cancel: () => {
-      queryClient.cancelQueries({ queryKey: ["explore-events", region] })
+      queryClient.cancelQueries({ queryKey })
     }
   }
 }

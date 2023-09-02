@@ -1,6 +1,5 @@
 import { EventFormBottomSheet } from "@components/eventForm/BottomSheet"
 import { SaveEventRequest } from "@lib/events"
-import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
 import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native"
 import { Divider } from "react-native-elements"
@@ -14,8 +13,6 @@ import {
   EventFormToolbar,
   EventFormValues
 } from "../components/eventForm"
-
-const Stack = createStackNavigator()
 
 export type EventFormScreenProps = {
   initialValues: EventFormValues
@@ -35,27 +32,13 @@ const EventFormScreen = ({
     onSubmit={onSubmit}
     onDismiss={onDismiss}
   >
-    <Stack.Navigator>
-      <Stack.Screen
-        name="Event"
-        component={TextFields}
-        options={{
-          title: "",
-          headerRight: () => (
-            <View style={styles.padding}>
-              <EventFormSubmitButton label={submissionLabel} />
-            </View>
-          ),
-          headerLeft: () => (
-            <View style={styles.padding}>
-              <EventFormDismissButton />
-            </View>
-          ),
-          headerStyle: styles.header,
-          cardStyle: styles.card
-        }}
-      />
-    </Stack.Navigator>
+    <View style={styles.padding}>
+      <EventFormSubmitButton label={submissionLabel} />
+    </View>
+    <View style={styles.padding}>
+      <EventFormDismissButton />
+    </View>
+    <TextFields />
     <Footer />
     <EventFormBottomSheet />
   </EventForm>

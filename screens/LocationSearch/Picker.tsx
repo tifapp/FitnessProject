@@ -21,10 +21,10 @@ import {
 } from "./SearchResultView"
 import { LocationAccuracy, LocationObject } from "expo-location"
 import { useLocationsSearchQueryObject } from "./state"
-import { UseQueryResult, useQuery } from "react-query"
+import { UseQueryResult, useQuery } from "@tanstack/react-query"
 import { LocationSearchResultsData } from "./models"
-import { CircularIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
+import { CircularIonicon } from "@components/common/Icons"
 
 export type UseLocationSearchPickerEnvironment = {
   loadSearchResults: (
@@ -64,7 +64,7 @@ const queryResultToDataResult = ({
     return { status: "no-results", data: [] }
   } else if (status === "success") {
     return { status, data }
-  } else if (status === "loading" || status === "idle") {
+  } else if (status === "loading") {
     return { status: "loading", data: undefined }
   }
   return { status: "error", data: undefined }

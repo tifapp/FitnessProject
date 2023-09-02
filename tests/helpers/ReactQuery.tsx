@@ -1,5 +1,5 @@
-import React, { ReactNode, useEffect, useMemo } from "react"
-import { QueryClient, QueryClientProvider } from "react-query"
+import React, { ReactNode, useMemo } from "react"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
 /**
  * Creates a `QueryClient` suitable for testing.
@@ -36,18 +36,19 @@ export const createTestQueryClient = () => {
         retry: false,
         retryDelay: 0,
         // NB: This prevents CI from hanging endlessly.
-        cacheTime: 0
+        cacheTime: Infinity
+      },
+      mutations: {
+        cacheTime: Infinity,
+        retry: false
       }
+    },
+    logger: {
+      log: console.log,
+      warn: console.warn,
+      error: process.env.NODE_ENV === "test" ? () => {} : console.error
     }
   })
-}
-
-/**
- * Use this inside of an `afterAll` to make sure CI doesn't break.
- */
-export const cleanupTestQueryClient = (client: QueryClient) => {
-  client.resetQueries()
-  client.clear()
 }
 
 /**
@@ -69,10 +70,6 @@ export const TestQueryClientProvider = ({
     if (client) return client
     return createTestQueryClient()
   }, [client])
-
-  useEffect(() => {
-    cleanupTestQueryClient(queryClient)
-  }, [queryClient])
 
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
