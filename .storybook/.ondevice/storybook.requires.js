@@ -14,7 +14,7 @@ global.STORIES = [
     directory: "./components",
     files: "**/*.stories.?(ts|tsx|js|jsx)",
     importPathMatcher:
-      "^\\.[\\\\/](?:components(?:\\/(?!\\.)(?:(?:(?!(?:^|\\/)\\.).)*?)\\/|\\/|$)(?!\\.)(?=.)[^/]*?\\.stories\\.(?:ts|tsx|js|jsx)?)$",
+      "^\\.[\\\\/](?:components(?:[\\\\/](?!\\.)(?:(?:(?!(?:^|[\\\\/])\\.).)*?)[\\\\/]|[\\\\/]|$)(?!\\.)(?=.)[^\\\\/]*?\\.stories\\.(?:ts|tsx|js|jsx)?)$",
   },
 ];
 
@@ -49,15 +49,16 @@ try {
 
 const getStories = () => {
   return {
-    "./components/AttendeesList/AttendeesList.stories.tsx": require("../components/AttendeesList/AttendeesList.stories.tsx"),
-    "./components/ContentReporting/ContentReporting.stories.tsx": require("../components/ContentReporting/ContentReporting.stories.tsx"),
-    "./components/ContentText/ContextText.stories.tsx": require("../components/ContentText/ContextText.stories.tsx"),
-    "./components/Explore/Explore.stories.tsx": require("../components/Explore/Explore.stories.tsx"),
-    "./components/LocationSearch/LocationSearch.stories.tsx": require("../components/LocationSearch/LocationSearch.stories.tsx"),
-    "./components/SearchBar/SearchBar.stories.tsx": require("../components/SearchBar/SearchBar.stories.tsx"),
-    "./components/SettingsScreen/SettingsScreen.stories.tsx": require("../components/SettingsScreen/SettingsScreen.stories.tsx"),
-    "./components/SignUp/SignUp.stories.tsx": require("../components/SignUp/SignUp.stories.tsx"),
-    "./components/TextField/TextField.stories.tsx": require("../components/TextField/TextField.stories.tsx"),
+    "./componentsAttendeesListAttendeesList.stories.tsx": require("../components/AttendeesList/AttendeesList.stories.tsx"),
+    "./componentsContentReportingContentReporting.stories.tsx": require("../components/ContentReporting/ContentReporting.stories.tsx"),
+    "./componentsContentTextContextText.stories.tsx": require("../components/ContentText/ContextText.stories.tsx"),
+    "./componentsExploreExplore.stories.tsx": require("../components/Explore/Explore.stories.tsx"),
+    "./componentsForgotPasswordForgotPasswordForm.stories.tsx": require("../components/ForgotPassword/ForgotPasswordForm.stories.tsx"),
+    "./componentsLocationSearchLocationSearch.stories.tsx": require("../components/LocationSearch/LocationSearch.stories.tsx"),
+    "./componentsSearchBarSearchBar.stories.tsx": require("../components/SearchBar/SearchBar.stories.tsx"),
+    "./componentsSettingsScreenSettingsScreen.stories.tsx": require("../components/SettingsScreen/SettingsScreen.stories.tsx"),
+    "./componentsSignUpSignUp.stories.tsx": require("../components/SignUp/SignUp.stories.tsx"),
+    "./componentsTextFieldTextField.stories.tsx": require("../components/TextField/TextField.stories.tsx"),
   };
 };
 

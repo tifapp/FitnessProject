@@ -3,7 +3,7 @@ import { TextField } from "@components/TextFields"
 import { PrimaryButton } from "@components/common/Buttons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useMutation } from "@tanstack/react-query"
-import { Auth } from "aws-amplify"
+// import { Auth } from "aws-amplify"
 import { useState } from "react"
 import {
   Alert,
@@ -15,15 +15,15 @@ import {
   ViewStyle
 } from "react-native"
 
-// To initiate the process of verifying the attribute like 'phone_number' or 'email'
-async function verifyCurrentUserAttribute (attr: string) {
-  try {
-    await Auth.verifyCurrentUserAttribute(attr)
-    console.log("a verification code is sent")
-  } catch (err) {
-    console.log("failed with error", err)
-  }
-}
+// Send confirmation code to user's email
+// async function forgotPassword (username: string) {
+//   try {
+//     const data = await Auth.forgotPassword(username)
+//     console.log(data)
+//   } catch (err) {
+//     console.log(err)
+//   }
+// }
 
 export type ForgotPasswordResult = "valid" | "invalid" | "invalid-email"
 
@@ -47,12 +47,12 @@ export const useForgotPasswordForm = ({
   onSubmitted,
   onSuccess
 }: UseForgotPasswordFormEnvironment) => {
-  const [emailField, setEmailField] = useState("")
+  const [email, setEmail] = useState("")
 
   const mutation = useMutation(
     async () => {
-      if (emailField) {
-        return await onSubmitted(emailField)
+      if (email) {
+        return await onSubmitted(email)
       }
     },
     {
@@ -71,7 +71,7 @@ export const useForgotPasswordForm = ({
   )
 
   const getSubmission = (): ForgotPasswordSubmission => {
-    if (emailField === "") {
+    if (email === "") {
       return { status: "invalid" }
     } else if (mutation.isLoading) {
       return { status: "submitting" }
@@ -83,9 +83,9 @@ export const useForgotPasswordForm = ({
   }
 
   return {
-    emailField,
+    email,
     updateField: (value: string) => {
-      setEmailField(value)
+      setEmail(value)
     },
     submission: getSubmission()
   }
@@ -112,8 +112,8 @@ export const ForgotPasswordFormView = ({
     <SafeAreaView style={[styles.flexColumn, styles.paddingIconSection]}>
       <ScrollView>
         <BodyText style={styles.bodyText}>
-          Your new password must at least be 8 characters and contain at least 1
-          letter, 1 number, and 1 special character.
+          Please enter in your valid email. A verification code will be sent to
+          the email, that will be used to reset your password.
         </BodyText>
 
         <TextField

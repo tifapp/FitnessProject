@@ -13,24 +13,27 @@ import ContentReportingMeta, {
 import ContentTextMeta, {
   Basic as ContentTextBasic
 } from "../components/ContentText/ContextText.stories"
-import SettingsMeta, {
-  Basic as SettingsScreenBasic
-} from "../components/SettingsScreen/SettingsScreen.stories"
 import ExploreEventsMeta, {
   Basic as ExploreEventsBasic
 } from "../components/Explore/Explore.stories"
-import TextFieldMeta, {
-  Basic as TextFieldBasic
-} from "../components/TextField/TextField.stories"
-import SearchBarMeta, {
-  Default as SearchBarBasic
-} from "../components/SearchBar/SearchBar.stories"
+import ForgotPasswordMeta, {
+  Basic as ForgotPasswordBasic
+} from "../components/ForgotPassword/ForgotPasswordForm.stories"
 import LocationSearchMeta, {
   Basic as LocationSearchBasic
 } from "../components/LocationSearch/LocationSearch.stories"
+import SearchBarMeta, {
+  Default as SearchBarBasic
+} from "../components/SearchBar/SearchBar.stories"
+import SettingsMeta, {
+  Basic as SettingsScreenBasic
+} from "../components/SettingsScreen/SettingsScreen.stories"
 import SignUpMeta, {
   Basic as SignUpBasic
 } from "../components/SignUp/SignUp.stories"
+import TextFieldMeta, {
+  Basic as TextFieldBasic
+} from "../components/TextField/TextField.stories"
 
 // Create an array of stories
 const stories = [
@@ -73,6 +76,11 @@ const stories = [
     name: LocationSearchMeta.title,
     component: LocationSearchBasic,
     args: LocationSearchMeta.args
+  },
+  {
+    name: ForgotPasswordMeta.title,
+    component: ForgotPasswordBasic,
+    args: ForgotPasswordMeta.args
   },
   {
     name: SignUpMeta.title,
