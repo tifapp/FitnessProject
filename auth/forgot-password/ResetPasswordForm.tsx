@@ -1,12 +1,10 @@
+import { AuthShadedPasswordTextField } from "@auth/AuthTextFields"
 import { Password } from "@auth/Password"
-import { BodyText, Headline } from "@components/Text"
-import { PasswordTextField } from "@components/TextFields"
+import { BodyText, Title } from "@components/Text"
 import { PrimaryButton } from "@components/common/Buttons"
 import { AppStyles } from "@lib/AppColorStyle"
-import { useMutation } from "@tanstack/react-query"
 import React, { useState } from "react"
 import {
-  Alert,
   SafeAreaView,
   ScrollView,
   StyleProp,
@@ -14,7 +12,6 @@ import {
   View,
   ViewStyle
 } from "react-native"
-import { TouchableOpacity } from "react-native-gesture-handler"
 
 export type ResetPasswordResult = "valid" | "invalid"
 
@@ -52,26 +49,40 @@ export const useResetPasswordForm = ({
 
   const passwordResult = Password.validate(fields.newPassword)
 
-  const mutation = useMutation(
-    async () => {
-      if (passwordResult) {
-        return await onSubmitted(passwordResult)
-      }
-    },
-    {
-      onSuccess,
-      onError: () => {
-        Alert.alert(
-          "Whoops",
-          "Sorry, something went wrong when trying to change your password. Please try again.",
-          [
-            { text: "Try Again", onPress: () => mutation.mutate() },
-            { text: "Ok" }
-          ]
-        )
-      }
-    }
-  )
+  //   const mutation = useMutation(
+  //     async () => {
+  //       if (passwordResult) {
+  //         return await onSubmitted(passwordResult)
+  //       }
+  //     },
+  //     {
+  //       onSuccess,
+  //       onError: () => {
+  //         Alert.alert(
+  //           "Whoops",
+  //           "Sorry, something went wrong when trying to change your password. Please try again.",
+  //           [
+  //             { text: "Try Again", onPress: () => mutation.mutate() },
+  //             { text: "Ok" }
+  //           ]
+  //         )
+  //       }
+  //     }
+  //   )
+
+  //   const getSubmission = (): ResetPasswordSubmission => {
+  //     if (fields.newPassword === "" && fields.reEnteredPassword === "") {
+  //       return { status: "invalid" }
+  //     } else if (fields.reEnteredPassword !== fields.newPassword) {
+  //       return { status: "invalid", error: "reenter-does-not-match-new" }
+  //     } else if (!passwordResult) {
+  //       return { status: "invalid", error: "weak-new-password" }
+  //     } else if (mutation.isLoading) {
+  //       return { status: "submitting" }
+  //     } else {
+  //       return { status: "valid", submit: mutation.mutate }
+  //     }
+  //   }
 
   const getSubmission = (): ResetPasswordSubmission => {
     if (fields.newPassword === "" && fields.reEnteredPassword === "") {
@@ -80,13 +91,13 @@ export const useResetPasswordForm = ({
       return { status: "invalid", error: "reenter-does-not-match-new" }
     } else if (!passwordResult) {
       return { status: "invalid", error: "weak-new-password" }
-    } else if (mutation.isLoading) {
-      return { status: "submitting" }
     } else {
-      return { status: "valid", submit: mutation.mutate }
+      return {
+        status: "valid",
+        submit: () => console.log("Reset Password Submitted")
+      }
     }
   }
-
   return {
     fields,
     updateField: (key: keyof ResetPasswordFormFields, value: string) => {
@@ -116,12 +127,15 @@ export const ResetPasswordFormView = ({
   return (
     <SafeAreaView style={[styles.flexColumn, styles.paddingIconSection]}>
       <ScrollView>
+        <Title>Reset Password</Title>
         <BodyText style={styles.bodyText}>
           Your new password must at least be 8 characters and contain at least 1
           letter, 1 number, and 1 special character.
         </BodyText>
 
-        <PasswordTextField
+        <AuthShadedPasswordTextField
+          iconName="lock-closed"
+          iconBackgroundColor="#FB3640"
           style={styles.textField}
           value={fields.newPassword}
           placeholder="New Password"
@@ -133,10 +147,12 @@ export const ResetPasswordFormView = ({
           onChangeText={(text) => updateField("newPassword", text)}
         />
 
-        <PasswordTextField
+        <AuthShadedPasswordTextField
+          iconName="lock-closed"
+          iconBackgroundColor="#FB3640"
           style={styles.textField}
           value={fields.reEnteredPassword}
-          placeholder="Re-Enter New Password"
+          placeholder="Re-enter New Password"
           error={
             submission.error === "reenter-does-not-match-new"
               ? "Your new password does not match, please enter it here again."
@@ -145,15 +161,9 @@ export const ResetPasswordFormView = ({
           onChangeText={(text) => updateField("reEnteredPassword", text)}
         />
 
-        <TouchableOpacity>
-          <Headline style={{ color: AppStyles.highlightedText }}>
-            Forgot your password?
-          </Headline>
-        </TouchableOpacity>
-
         <View style={styles.buttonContainer}>
           <PrimaryButton
-            disabled={!isSubmittable}
+            disabled={isSubmittable}
             style={isSubmittable ? styles.inactiveButton : styles.activeButton}
             title="Change Password"
             onPress={() => submission.submit?.()}
@@ -173,15 +183,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15
   },
   container: {
-    backgroundColor: "white"
+    backgroundColor: "white",
+    flex: 1
   },
   paddingIconSection: {
     paddingVertical: 8,
     backgroundColor: "white"
   },
   buttonContainer: {
+    flex: 1,
     flexDirection: "row",
-    marginTop: "65%"
+    marginTop: "90%"
   },
   activeButton: {
     flex: 1,
@@ -194,12 +206,10 @@ const styles = StyleSheet.create({
   },
   bodyText: {
     color: AppStyles.colorOpacity35,
-    paddingBottom: 20
+    paddingBottom: 16
   },
   textField: {
     flex: 1,
-    fontFamily: "OpenSans",
-    padding: 10,
-    textAlign: "left"
+    marginTop: 16
   }
 })

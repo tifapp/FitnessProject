@@ -1,12 +1,10 @@
-import { BodyText } from "@components/Text"
-import { TextField } from "@components/TextFields"
+import { AuthShadedTextField } from "@auth/AuthTextFields"
+import { BodyText, Title } from "@components/Text"
 import { PrimaryButton } from "@components/common/Buttons"
 import { AppStyles } from "@lib/AppColorStyle"
-import { useMutation } from "@tanstack/react-query"
 // import { Auth } from "aws-amplify"
 import { useState } from "react"
 import {
-  Alert,
   SafeAreaView,
   ScrollView,
   StyleProp,
@@ -49,36 +47,50 @@ export const useForgotPasswordForm = ({
 }: UseForgotPasswordFormEnvironment) => {
   const [email, setEmail] = useState("")
 
-  const mutation = useMutation(
-    async () => {
-      if (email) {
-        return await onSubmitted(email)
-      }
-    },
-    {
-      onSuccess,
-      onError: () => {
-        Alert.alert(
-          "Whoops",
-          "Sorry, something went wrong when trying to validate your email. Please try again.",
-          [
-            { text: "Try Again", onPress: () => mutation.mutate() },
-            { text: "Ok" }
-          ]
-        )
-      }
-    }
-  )
+  // const mutation = useMutation(
+  //   async () => {
+  //     if (email) {
+  //       return await onSubmitted(email)
+  //     }
+  //   },
+  //   {
+  //     onSuccess,
+  //     onError: () => {
+  //       Alert.alert(
+  //         "Whoops",
+  //         "Sorry, something went wrong when trying to validate your email. Please try again.",
+  //         [
+  //           { text: "Try Again", onPress: () => mutation.mutate() },
+  //           { text: "Ok" }
+  //         ]
+  //       )
+  //     }
+  //   }
+  // )
+
+  // const getSubmission = (): ForgotPasswordSubmission => {
+  //   if (email === "") {
+  //     return { status: "invalid" }
+  //   } else if (mutation.isLoading) {
+  //     return { status: "submitting" }
+  //   } else if (mutation.data === "invalid-email") {
+  //     return { status: "invalid", error: "invalid-email" }
+  //   } else {
+  //     return {
+  //       status: "valid",
+  //       submit: () => console.log("Forgot Password Submitted")
+  //     }
+  //   }
+  // }
 
   const getSubmission = (): ForgotPasswordSubmission => {
     if (email === "") {
       return { status: "invalid" }
-    } else if (mutation.isLoading) {
-      return { status: "submitting" }
-    } else if (mutation.data === "invalid-email") {
-      return { status: "invalid", error: "invalid-email" }
     } else {
-      return { status: "valid", submit: mutation.mutate }
+      return {
+        status: "valid",
+        submit: () => console.log("Forgot Password Submitted")
+      }
     }
   }
 
@@ -111,12 +123,17 @@ export const ForgotPasswordFormView = ({
   return (
     <SafeAreaView style={[styles.flexColumn, styles.paddingIconSection]}>
       <ScrollView>
+        <Title>Forgot Your Password?</Title>
         <BodyText style={styles.bodyText}>
           Please enter in your valid email. A verification code will be sent to
           the email, that will be used to reset your password.
         </BodyText>
 
-        <TextField
+        <AuthShadedTextField
+          iconName="mail"
+          iconBackgroundColor="#14B329"
+          autoCapitalize="none"
+          autoCorrect={false}
           style={styles.textField}
           value={email}
           placeholder="Email Address"
@@ -130,7 +147,7 @@ export const ForgotPasswordFormView = ({
 
         <View style={styles.buttonContainer}>
           <PrimaryButton
-            disabled={!isSubmittable}
+            disabled={isSubmittable}
             style={isSubmittable ? styles.inactiveButton : styles.activeButton}
             title="Reset Password"
             onPress={() => submission.submit?.()}
@@ -157,8 +174,9 @@ const styles = StyleSheet.create({
     backgroundColor: "white"
   },
   buttonContainer: {
+    flex: 1,
     flexDirection: "row",
-    marginTop: "65%"
+    marginTop: "110%"
   },
   activeButton: {
     flex: 1,
@@ -175,8 +193,8 @@ const styles = StyleSheet.create({
   },
   textField: {
     flex: 1,
+    marginTop: 16,
     fontFamily: "OpenSans",
-    padding: 10,
     textAlign: "left"
   }
 })
