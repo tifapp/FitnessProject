@@ -1,17 +1,9 @@
+import { AuthSectionView } from "@auth/AuthSection"
 import { AuthShadedPasswordTextField } from "@auth/AuthTextFields"
 import { Password } from "@auth/Password"
-import { BodyText, Title } from "@components/Text"
-import { PrimaryButton } from "@components/common/Buttons"
 import { AppStyles } from "@lib/AppColorStyle"
 import React, { useState } from "react"
-import {
-  SafeAreaView,
-  ScrollView,
-  StyleProp,
-  StyleSheet,
-  View,
-  ViewStyle
-} from "react-native"
+import { StyleProp, StyleSheet, ViewStyle } from "react-native"
 
 export type ResetPasswordResult = "valid" | "invalid"
 
@@ -125,70 +117,52 @@ export const ResetPasswordFormView = ({
   // Function activated on button tap
 
   return (
-    <SafeAreaView style={[styles.flexColumn, styles.paddingIconSection]}>
-      <ScrollView>
-        <Title>Reset Password</Title>
-        <BodyText style={styles.bodyText}>
-          Your new password must at least be 8 characters and contain at least 1
-          letter, 1 number, and 1 special character.
-        </BodyText>
+    <AuthSectionView
+      title={"Reset Password"}
+      description={
+        "Your new password must at least be 8 characters and contain at least 1 letter, 1 number, and 1 special character."
+      }
+      callToActionTitle={"Change Password"}
+      style={[styles.flexColumn]}
+    >
+      <AuthShadedPasswordTextField
+        iconName="lock-closed"
+        iconBackgroundColor="#FB3640"
+        style={styles.textField}
+        value={fields.newPassword}
+        placeholder="New Password"
+        error={
+          submission.error === "weak-new-password"
+            ? "Your password should be at least 8 characters, and contain at least 1 capital letter, number, and special character."
+            : undefined
+        }
+        onChangeText={(text) => updateField("newPassword", text)}
+      />
 
-        <AuthShadedPasswordTextField
-          iconName="lock-closed"
-          iconBackgroundColor="#FB3640"
-          style={styles.textField}
-          value={fields.newPassword}
-          placeholder="New Password"
-          error={
-            submission.error === "weak-new-password"
-              ? "Your password should be at least 8 characters, and contain at least 1 capital letter, number, and special character."
-              : undefined
-          }
-          onChangeText={(text) => updateField("newPassword", text)}
-        />
-
-        <AuthShadedPasswordTextField
-          iconName="lock-closed"
-          iconBackgroundColor="#FB3640"
-          style={styles.textField}
-          value={fields.reEnteredPassword}
-          placeholder="Re-enter New Password"
-          error={
-            submission.error === "reenter-does-not-match-new"
-              ? "Your new password does not match, please enter it here again."
-              : undefined
-          }
-          onChangeText={(text) => updateField("reEnteredPassword", text)}
-        />
-
-        <View style={styles.buttonContainer}>
-          <PrimaryButton
-            disabled={isSubmittable}
-            style={isSubmittable ? styles.inactiveButton : styles.activeButton}
-            title="Change Password"
-            onPress={() => submission.submit?.()}
-          />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+      <AuthShadedPasswordTextField
+        iconName="lock-closed"
+        iconBackgroundColor="#FB3640"
+        style={styles.textField}
+        value={fields.reEnteredPassword}
+        placeholder="Re-enter New Password"
+        error={
+          submission.error === "reenter-does-not-match-new"
+            ? "Your new password does not match, please enter it here again."
+            : undefined
+        }
+        onChangeText={(text) => updateField("reEnteredPassword", text)}
+      />
+    </AuthSectionView>
   )
 }
 
 const styles = StyleSheet.create({
   flexColumn: {
-    flex: 1,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 15
+    flex: 1
   },
   container: {
     backgroundColor: "white",
     flex: 1
-  },
-  paddingIconSection: {
-    paddingVertical: 8,
-    backgroundColor: "white"
   },
   buttonContainer: {
     flex: 1,

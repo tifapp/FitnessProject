@@ -1,17 +1,9 @@
+import { AuthSectionView } from "@auth/AuthSection"
 import { AuthShadedTextField } from "@auth/AuthTextFields"
-import { BodyText, Title } from "@components/Text"
-import { PrimaryButton } from "@components/common/Buttons"
 import { AppStyles } from "@lib/AppColorStyle"
 // import { Auth } from "aws-amplify"
 import { useState } from "react"
-import {
-  SafeAreaView,
-  ScrollView,
-  StyleProp,
-  StyleSheet,
-  View,
-  ViewStyle
-} from "react-native"
+import { StyleProp, StyleSheet, ViewStyle } from "react-native"
 
 // Send confirmation code to user's email
 // async function forgotPassword (username: string) {
@@ -121,56 +113,38 @@ export const ForgotPasswordFormView = ({
   // Function activated on button tap
 
   return (
-    <SafeAreaView style={[styles.flexColumn, styles.paddingIconSection]}>
-      <ScrollView>
-        <Title>Forgot Your Password?</Title>
-        <BodyText style={styles.bodyText}>
-          Please enter in your valid email. A verification code will be sent to
-          the email, that will be used to reset your password.
-        </BodyText>
-
-        <AuthShadedTextField
-          iconName="mail"
-          iconBackgroundColor="#14B329"
-          autoCapitalize="none"
-          autoCorrect={false}
-          style={styles.textField}
-          value={email}
-          placeholder="Email Address"
-          error={
-            submission.error === "invalid-email"
-              ? "Your email is invalid. Please enter a valid email address."
-              : undefined
-          }
-          onChangeText={(text) => updateField(text)}
-        />
-
-        <View style={styles.buttonContainer}>
-          <PrimaryButton
-            disabled={isSubmittable}
-            style={isSubmittable ? styles.inactiveButton : styles.activeButton}
-            title="Reset Password"
-            onPress={() => submission.submit?.()}
-          />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <AuthSectionView
+      title={"Forgot Your Password?"}
+      description={
+        "Please enter in your valid email. A verification code will be sent to the email, that will be used to reset your password."
+      }
+      callToActionTitle={"Reset Password"}
+      style={[styles.flexColumn]}
+    >
+      <AuthShadedTextField
+        iconName="mail"
+        iconBackgroundColor="#14B329"
+        autoCapitalize="none"
+        autoCorrect={false}
+        style={styles.textField}
+        value={email}
+        placeholder="Email Address"
+        error={
+          submission.error === "invalid-email"
+            ? "Your email is invalid. Please enter a valid email address."
+            : undefined
+        }
+        onChangeText={(text) => updateField(text)}
+      />
+    </AuthSectionView>
   )
 }
 
 const styles = StyleSheet.create({
   flexColumn: {
-    flex: 1,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 15
+    flex: 1
   },
   container: {
-    backgroundColor: "white"
-  },
-  paddingIconSection: {
-    paddingVertical: 8,
     backgroundColor: "white"
   },
   buttonContainer: {
