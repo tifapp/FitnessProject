@@ -15,7 +15,7 @@ const errorTextForInvalidHandleReason = (
   return "Your username can only contain letters, numbers, and underscores."
 }
 
-export type CreateAccountUserHandleFormProps = {
+export type SignUpChangeUserHandleFormProps = {
   currentHandleText: string
   onCurrentHandleTextChanged: (handleText: string) => void
   invalidHandleReason?: InvalidUserHandleReason
@@ -27,12 +27,12 @@ export type CreateAccountUserHandleFormProps = {
  *
  * This gives them the chance to differ their handle from the one we generated.
  */
-export const CreateAccountUserHandleFormView = ({
+export const SignUpChangeUserHandleFormView = ({
   currentHandleText,
   onCurrentHandleTextChanged,
   invalidHandleReason,
   style
-}: CreateAccountUserHandleFormProps) => (
+}: SignUpChangeUserHandleFormProps) => (
   <AuthSectionView
     title="Pick your Username"
     description="We have created a username for you, but you can customize it if you don't like it. It's also possible to change it later if you want to."

@@ -8,10 +8,10 @@ import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import {
-  CreateAccountUserHandleFormView,
-  CreateAccountCredentialsFormView,
-  CreateAccountVerifyCodeView,
-  CreateAccountEndingView
+  SignUpChangeUserHandleFormView,
+  SignUpCredentialsFormView,
+  SignUpVerifyCodeView,
+  SignUpEndingView
 } from "@auth/sign-up"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { Button, View } from "react-native"
@@ -45,12 +45,12 @@ export const Basic: SignUpStory = () => (
         <Stack.Screen
           name="verifyCode"
           options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
-          component={CreateAccountVerifyCodeView}
+          component={SignUpVerifyCodeView}
         />
         <Stack.Screen
           name="welcome"
           options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
-          component={CreateAccountEndingView}
+          component={SignUpEndingView}
         />
       </Stack.Navigator>
     </NavigationContainer>
@@ -58,7 +58,7 @@ export const Basic: SignUpStory = () => (
 )
 
 const CredentialsScreen = () => (
-  <CreateAccountCredentialsFormView
+  <SignUpCredentialsFormView
     onPrivacyPolicyTapped={() => console.log("privacy policy tapped")}
     onTermsAndConditionsTapped={() => {
       console.log("terms and conditions tapped")
@@ -69,7 +69,7 @@ const CredentialsScreen = () => (
 const HandleScreen = () => {
   const [handle, setHandle] = useState("pinaculousprincess69")
   return (
-    <CreateAccountUserHandleFormView
+    <SignUpChangeUserHandleFormView
       currentHandleText={handle}
       onCurrentHandleTextChanged={setHandle}
       invalidHandleReason="bad-format"

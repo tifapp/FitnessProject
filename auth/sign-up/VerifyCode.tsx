@@ -5,16 +5,14 @@ import { AppStyles } from "@lib/AppColorStyle"
 import React from "react"
 import { StyleProp, ViewStyle, StyleSheet } from "react-native"
 
-export type CreateAccountVerifyCodeProps = {
+export type SignUpVerifyCodeProps = {
   style?: StyleProp<ViewStyle>
 }
 
 /**
  * A view for the user to verify their account with a 2FA code during sign up.
  */
-export const CreateAccountVerifyCodeView = ({
-  style
-}: CreateAccountVerifyCodeProps) => (
+export const SignUpVerifyCodeView = ({ style }: SignUpVerifyCodeProps) => (
   <AuthSectionView
     title="Verify your Account"
     description="We have sent a verification code to *****-61. Please enter it in the field below."

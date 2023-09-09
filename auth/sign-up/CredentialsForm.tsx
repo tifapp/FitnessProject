@@ -8,7 +8,7 @@ import { AppStyles } from "@lib/AppColorStyle"
 import React from "react"
 import { StyleProp, ViewStyle, StyleSheet } from "react-native"
 
-export type CreateAccountCredentialsFormProps = {
+export type SignUpCredentialsFormProps = {
   onTermsAndConditionsTapped: () => void
   onPrivacyPolicyTapped: () => void
   style?: StyleProp<ViewStyle>
@@ -17,11 +17,11 @@ export type CreateAccountCredentialsFormProps = {
 /**
  * The form the user uses to enter their initial information to create an account.
  */
-export const CreateAccountCredentialsFormView = ({
+export const SignUpCredentialsFormView = ({
   onPrivacyPolicyTapped,
   onTermsAndConditionsTapped,
   style
-}: CreateAccountCredentialsFormProps) => (
+}: SignUpCredentialsFormProps) => (
   <AuthSectionView
     title="Create your Account"
     description="Welcome to tiF! Begin your fitness journey by creating an account."
