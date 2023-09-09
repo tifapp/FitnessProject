@@ -1,10 +1,9 @@
 import { AuthSectionView } from "@auth/AuthSection"
 import { AuthShadedTextField } from "@auth/AuthTextFields"
 import { Ionicon } from "@components/common/Icons"
+import { InvalidUserHandleReason } from "@lib/users"
 import React from "react"
 import { StyleProp, ViewStyle } from "react-native"
-
-export type InvalidUserHandleReason = "already-taken" | "bad-format"
 
 const errorTextForInvalidHandleReason = (
   invalidHandleReason: InvalidUserHandleReason
@@ -14,6 +13,8 @@ const errorTextForInvalidHandleReason = (
   }
   return "Your username can only contain letters, numbers, and underscores."
 }
+
+export const useSignUpChangeUserHandle = (initialHandle: string) => {}
 
 export type SignUpChangeUserHandleFormProps = {
   currentHandleText: string
