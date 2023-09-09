@@ -9,6 +9,8 @@ import React from "react"
 import { StyleProp, ViewStyle, StyleSheet } from "react-native"
 
 export type CreateAccountCredentialsFormProps = {
+  onTermsAndConditionsTapped: () => void
+  onPrivacyPolicyTapped: () => void
   style?: StyleProp<ViewStyle>
 }
 
@@ -16,20 +18,14 @@ export type CreateAccountCredentialsFormProps = {
  * The form the user uses to enter their initial information to create an account.
  */
 export const CreateAccountCredentialsFormView = ({
+  onPrivacyPolicyTapped,
+  onTermsAndConditionsTapped,
   style
 }: CreateAccountCredentialsFormProps) => (
   <AuthSectionView
     title="Create your Account"
     description="Welcome to tiF! Begin your fitness journey by creating an account."
     callToActionTitle="I'm ready!"
-    footer={
-      <Caption style={styles.disclaimerText}>
-        <Caption>By creating an account, you agree to the </Caption>
-        <Caption style={styles.legalLinkText}>terms and conditions</Caption>
-        <Caption> and </Caption>
-        <Caption style={styles.legalLinkText}>privacy policy</Caption>.
-      </Caption>
-    }
     style={style}
   >
     <AuthShadedTextField
@@ -52,6 +48,20 @@ export const CreateAccountCredentialsFormView = ({
       placeholder="Password"
       style={styles.textField}
     />
+    <Caption style={styles.disclaimerText}>
+      <Caption>By creating an account, you agree to the </Caption>
+      <Caption
+        onPress={onTermsAndConditionsTapped}
+        style={styles.legalLinkText}
+      >
+        terms and conditions
+      </Caption>
+      <Caption> and </Caption>
+      <Caption onPress={onPrivacyPolicyTapped} style={styles.legalLinkText}>
+        privacy policy
+      </Caption>
+      .
+    </Caption>
   </AuthSectionView>
 )
 
@@ -61,7 +71,8 @@ const styles = StyleSheet.create({
   },
   disclaimerText: {
     textAlign: "center",
-    opacity: 1
+    opacity: 1,
+    marginTop: 16
   },
   disclaimerTextBlock: {
     opacity: 0.5

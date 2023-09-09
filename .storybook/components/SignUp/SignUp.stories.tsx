@@ -35,7 +35,7 @@ export const Basic: SignUpStory = () => (
         <Stack.Screen
           name="signUp"
           options={{ headerLeft: () => <XMarkBackButton />, title: "" }}
-          component={CreateAccountCredentialsFormView}
+          component={CredentialsScreen}
         />
         <Stack.Screen
           name="changeHandle"
@@ -55,6 +55,15 @@ export const Basic: SignUpStory = () => (
       </Stack.Navigator>
     </NavigationContainer>
   </SafeAreaProvider>
+)
+
+const CredentialsScreen = () => (
+  <CreateAccountCredentialsFormView
+    onPrivacyPolicyTapped={() => console.log("privacy policy tapped")}
+    onTermsAndConditionsTapped={() => {
+      console.log("terms and conditions tapped")
+    }}
+  />
 )
 
 const HandleScreen = () => {
