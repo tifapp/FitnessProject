@@ -11,11 +11,15 @@ import {
   SignUpChangeUserHandleFormView,
   SignUpCredentialsFormView,
   SignUpVerifyCodeView,
-  SignUpEndingView
+  SignUpEndingView,
+  useSignUpChangeUserHandle
 } from "@auth/sign-up"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { Button, View } from "react-native"
 import { useState } from "react"
+import { UserHandle } from "@lib/users"
+import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
+import { delayData, sleep } from "@lib/DelayData"
 
 const SignUpMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Sign Up"
@@ -28,33 +32,35 @@ type SignUpStory = ComponentStory<typeof SettingsScreen>
 const Stack = createStackNavigator()
 
 export const Basic: SignUpStory = () => (
-  <SafeAreaProvider>
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
-        <Stack.Screen name="test" component={TestScreen} />
-        <Stack.Screen
-          name="signUp"
-          options={{ headerLeft: () => <XMarkBackButton />, title: "" }}
-          component={CredentialsScreen}
-        />
-        <Stack.Screen
-          name="changeHandle"
-          options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
-          component={HandleScreen}
-        />
-        <Stack.Screen
-          name="verifyCode"
-          options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
-          component={SignUpVerifyCodeView}
-        />
-        <Stack.Screen
-          name="welcome"
-          options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
-          component={SignUpEndingView}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
-  </SafeAreaProvider>
+  <TiFQueryClientProvider>
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
+          <Stack.Screen name="test" component={TestScreen} />
+          <Stack.Screen
+            name="signUp"
+            options={{ headerLeft: () => <XMarkBackButton />, title: "" }}
+            component={CredentialsScreen}
+          />
+          <Stack.Screen
+            name="changeHandle"
+            options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
+            component={HandleScreen}
+          />
+          <Stack.Screen
+            name="verifyCode"
+            options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
+            component={SignUpVerifyCodeView}
+          />
+          <Stack.Screen
+            name="welcome"
+            options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
+            component={SignUpEndingView}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </SafeAreaProvider>
+  </TiFQueryClientProvider>
 )
 
 const CredentialsScreen = () => (
@@ -67,12 +73,24 @@ const CredentialsScreen = () => (
 )
 
 const HandleScreen = () => {
-  const [handle, setHandle] = useState("pinaculousprincess69")
+  const methods = useSignUpChangeUserHandle(
+    UserHandle.parse("elonmusk").handle!,
+    200,
+    {
+      changeUserHandle: async () => {
+        await sleep(3000)
+        throw new Error("Lmao")
+      },
+      checkIfUserHandleTaken: async () => {
+        return await delayData(false, 3000)
+      },
+      onSuccess: () => console.log("Succeeded")
+    }
+  )
   return (
     <SignUpChangeUserHandleFormView
-      currentHandleText={handle}
-      onCurrentHandleTextChanged={setHandle}
-      invalidHandleReason="bad-format"
+      {...methods}
+      onHandleTextChanged={methods.handleTextChanged}
     />
   )
 }

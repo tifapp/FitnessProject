@@ -1,5 +1,5 @@
 import linkifyIt from "linkify-it"
-import { isValidUserHandle } from "./users/User"
+import { isValidUserHandle } from "./users"
 import { StringUtils } from "./String"
 
 /**

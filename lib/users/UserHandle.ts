@@ -1,8 +1,20 @@
 /**
+ * An reason that a user handle's raw text was unable to be parsed.
+ */
+export type UnparseableUserHandleReason = "bad-format" | "empty" | "too-long"
+
+export type ParseUserHandleResult =
+  // eslint-disable-next-line no-use-before-define
+  | { handle: UserHandle; error: undefined }
+  | { handle: undefined; error: UnparseableUserHandleReason }
+
+/**
  * A union type representing the reason that a user handle could be invalid,
  * namely if it's already taken or is in an improper format.
  */
-export type InvalidUserHandleReason = "already-taken" | "bad-format"
+export type InvalidUserHandleReason =
+  | "already-taken"
+  | UnparseableUserHandleReason
 
 const USER_HANDLE_REGEX = /^@[A-Za-z0-9_]{1,15}$/
 const UNPREFIXED_USER_HANDLE_REGEX = /^[A-Za-z0-9_]{1,15}$/
@@ -55,9 +67,15 @@ export class UserHandle {
    * @param rawValue the raw user handle string to validate
    * @returns an {@link UserHandle} instance if successful.
    */
-  static validate (rawValue: string) {
-    return UNPREFIXED_USER_HANDLE_REGEX.test(rawValue)
-      ? new UserHandle(rawValue)
-      : undefined
+  static parse (rawValue: string): ParseUserHandleResult {
+    if (rawValue.length === 0) {
+      return { handle: undefined, error: "empty" }
+    } else if (rawValue.length > 15) {
+      return { handle: undefined, error: "too-long" }
+    } else if (!UNPREFIXED_USER_HANDLE_REGEX.test(rawValue)) {
+      return { handle: undefined, error: "bad-format" }
+    } else {
+      return { handle: new UserHandle(rawValue), error: undefined }
+    }
   }
 }
