@@ -3,24 +3,23 @@ import { AuthShadedTextField } from "@auth/AuthTextFields"
 import { Email } from "@auth/Email"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useMutation } from "@tanstack/react-query"
-import { Auth } from "aws-amplify"
 import { useState } from "react"
 import { Alert, StyleProp, StyleSheet, ViewStyle } from "react-native"
 
 // Send confirmation code to user's email
-async function forgotPassword (username: string) {
-  try {
-    const data = await Auth.forgotPassword(username)
-    console.log(data)
-  } catch (err) {
-    console.log(err)
-  }
-}
+// async function forgotPassword (username: string) {
+//   try {
+//     const data = await Auth.forgotPassword(username)
+//     console.log(data)
+//   } catch (err) {
+//     console.log(err)
+//   }
+// }
 
 export type ForgotPasswordResult = "valid" | "invalid" | "invalid-email"
 
 export type UseForgotPasswordFormEnvironment = {
-  onSubmitted: (email: Email) => Promise<ForgotPasswordResult>
+  onSubmitted: (emailResult: Email) => Promise<ForgotPasswordResult>
   onSuccess: () => void
 }
 
@@ -79,17 +78,6 @@ export const useForgotPasswordForm = ({
     }
   }
 
-  // const getSubmission = (): ForgotPasswordSubmission => {
-  //   if (email === "") {
-  //     return { status: "invalid" }
-  //   } else {
-  //     return {
-  //       status: "valid",
-  //       submit: () => console.log("Forgot Password Submitted")
-  //     }
-  //   }
-  // }
-
   return {
     email,
     updateField: (value: string) => {
@@ -101,7 +89,7 @@ export const useForgotPasswordForm = ({
 
 export type ForgotPasswordFormProps = {
   style?: StyleProp<ViewStyle>
-  email: Email
+  email: string
   updateField: (value: string) => void
   submission: ForgotPasswordSubmission
 }
@@ -131,7 +119,7 @@ export const ForgotPasswordFormView = ({
         autoCapitalize="none"
         autoCorrect={false}
         style={styles.textField}
-        value={email.rawValue}
+        value={email}
         placeholder="Email Address"
         error={
           submission.error === "invalid-email"

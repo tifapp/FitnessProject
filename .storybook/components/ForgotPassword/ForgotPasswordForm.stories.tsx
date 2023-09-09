@@ -52,6 +52,10 @@ const ResetPasswordScreen = ({ navigation }: ResetPasswordScreenProps) => {
   return <ResetPasswordFormView {...resetPassword} />
 }
 
+const VerifyCodeScreen = ({ navigation }: ResetPasswordScreenProps) => {
+  return <CreateAccountVerifyCodeView phoneNumber={"432-3321"} />
+}
+
 export const Basic: ForgotPasswordStory = () => (
   <SafeAreaProvider>
     <NavigationContainer>
@@ -65,7 +69,7 @@ export const Basic: ForgotPasswordStory = () => (
         <Stack.Screen
           name="verifyCode"
           options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
-          component={CreateAccountVerifyCodeView}
+          component={VerifyCodeScreen}
         />
         <Stack.Screen
           name="resetPassword"

@@ -3,21 +3,23 @@ import { AuthShadedTextField } from "@auth/AuthTextFields"
 import { BodyText } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import React from "react"
-import { StyleProp, ViewStyle, StyleSheet } from "react-native"
+import { StyleProp, StyleSheet, ViewStyle } from "react-native"
 
 export type CreateAccountVerifyCodeProps = {
   style?: StyleProp<ViewStyle>
+  phoneNumber: string
 }
 
 /**
  * A view for the user to verify their account with a 2FA code during sign up.
  */
 export const CreateAccountVerifyCodeView = ({
-  style
+  style,
+  phoneNumber
 }: CreateAccountVerifyCodeProps) => (
   <AuthSectionView
     title="Verify your Account"
-    description="We have sent a verification code to *****-61. Please enter it in the field below."
+    description={`We have sent a verification code to ${phoneNumber}. Please enter it in the field below.`}
     footer={
       <BodyText style={styles.resendTextContainer}>
         <BodyText style={styles.resendText}>
@@ -32,7 +34,7 @@ export const CreateAccountVerifyCodeView = ({
     <AuthShadedTextField
       iconName="barcode-outline"
       iconBackgroundColor="#FB5607"
-      placeholder="Enter the code sent to *****-61"
+      placeholder={`Enter the code sent to ${phoneNumber}`}
       textContentType="oneTimeCode"
       keyboardType="number-pad"
     />

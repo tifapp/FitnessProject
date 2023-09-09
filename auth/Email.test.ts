@@ -1,7 +1,7 @@
 import { Email } from "@auth/Email"
 
 describe("Password tests", () => {
-  it("should fail with a no-capitals error reason, when the text doesn't have any capitals", () => {
+  it("should not succeed, when it does not have a @ inside of the string", () => {
     const givenEmail = "i.com"
     expect(Email.validate(givenEmail)).toBeUndefined()
   })
