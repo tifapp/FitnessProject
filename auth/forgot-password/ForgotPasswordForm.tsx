@@ -1,24 +1,26 @@
 import { AuthSectionView } from "@auth/AuthSection"
 import { AuthShadedTextField } from "@auth/AuthTextFields"
+import { Email } from "@auth/Email"
 import { AppStyles } from "@lib/AppColorStyle"
-// import { Auth } from "aws-amplify"
+import { useMutation } from "@tanstack/react-query"
+import { Auth } from "aws-amplify"
 import { useState } from "react"
-import { StyleProp, StyleSheet, ViewStyle } from "react-native"
+import { Alert, StyleProp, StyleSheet, ViewStyle } from "react-native"
 
 // Send confirmation code to user's email
-// async function forgotPassword (username: string) {
-//   try {
-//     const data = await Auth.forgotPassword(username)
-//     console.log(data)
-//   } catch (err) {
-//     console.log(err)
-//   }
-// }
+async function forgotPassword (username: string) {
+  try {
+    const data = await Auth.forgotPassword(username)
+    console.log(data)
+  } catch (err) {
+    console.log(err)
+  }
+}
 
 export type ForgotPasswordResult = "valid" | "invalid" | "invalid-email"
 
 export type UseForgotPasswordFormEnvironment = {
-  onSubmitted: (email: string) => Promise<ForgotPasswordResult>
+  onSubmitted: (email: Email) => Promise<ForgotPasswordResult>
   onSuccess: () => void
 }
 
@@ -39,45 +41,36 @@ export const useForgotPasswordForm = ({
 }: UseForgotPasswordFormEnvironment) => {
   const [email, setEmail] = useState("")
 
-  // const mutation = useMutation(
-  //   async () => {
-  //     if (email) {
-  //       return await onSubmitted(email)
-  //     }
-  //   },
-  //   {
-  //     onSuccess,
-  //     onError: () => {
-  //       Alert.alert(
-  //         "Whoops",
-  //         "Sorry, something went wrong when trying to validate your email. Please try again.",
-  //         [
-  //           { text: "Try Again", onPress: () => mutation.mutate() },
-  //           { text: "Ok" }
-  //         ]
-  //       )
-  //     }
-  //   }
-  // )
+  const emailResult = Email.validate(email)
 
-  // const getSubmission = (): ForgotPasswordSubmission => {
-  //   if (email === "") {
-  //     return { status: "invalid" }
-  //   } else if (mutation.isLoading) {
-  //     return { status: "submitting" }
-  //   } else if (mutation.data === "invalid-email") {
-  //     return { status: "invalid", error: "invalid-email" }
-  //   } else {
-  //     return {
-  //       status: "valid",
-  //       submit: () => console.log("Forgot Password Submitted")
-  //     }
-  //   }
-  // }
+  const mutation = useMutation(
+    async () => {
+      if (emailResult) {
+        return await onSubmitted(emailResult)
+      }
+    },
+    {
+      onSuccess,
+      onError: () => {
+        Alert.alert(
+          "Whoops",
+          "Sorry, something went wrong when trying to validate your email. Please try again.",
+          [
+            { text: "Try Again", onPress: () => mutation.mutate() },
+            { text: "Ok" }
+          ]
+        )
+      }
+    }
+  )
 
   const getSubmission = (): ForgotPasswordSubmission => {
     if (email === "") {
       return { status: "invalid" }
+    } else if (mutation.isLoading) {
+      return { status: "submitting" }
+    } else if (mutation.data === "invalid-email") {
+      return { status: "invalid", error: "invalid-email" }
     } else {
       return {
         status: "valid",
@@ -85,6 +78,17 @@ export const useForgotPasswordForm = ({
       }
     }
   }
+
+  // const getSubmission = (): ForgotPasswordSubmission => {
+  //   if (email === "") {
+  //     return { status: "invalid" }
+  //   } else {
+  //     return {
+  //       status: "valid",
+  //       submit: () => console.log("Forgot Password Submitted")
+  //     }
+  //   }
+  // }
 
   return {
     email,
@@ -97,7 +101,7 @@ export const useForgotPasswordForm = ({
 
 export type ForgotPasswordFormProps = {
   style?: StyleProp<ViewStyle>
-  email: string
+  email: Email
   updateField: (value: string) => void
   submission: ForgotPasswordSubmission
 }
@@ -127,7 +131,7 @@ export const ForgotPasswordFormView = ({
         autoCapitalize="none"
         autoCorrect={false}
         style={styles.textField}
-        value={email}
+        value={email.rawValue}
         placeholder="Email Address"
         error={
           submission.error === "invalid-email"

@@ -2,8 +2,9 @@ import { AuthSectionView } from "@auth/AuthSection"
 import { AuthShadedPasswordTextField } from "@auth/AuthTextFields"
 import { Password } from "@auth/Password"
 import { AppStyles } from "@lib/AppColorStyle"
+import { useMutation } from "@tanstack/react-query"
 import React, { useState } from "react"
-import { StyleProp, StyleSheet, ViewStyle } from "react-native"
+import { Alert, StyleProp, StyleSheet, ViewStyle } from "react-native"
 
 export type ResetPasswordResult = "valid" | "invalid"
 
@@ -41,40 +42,26 @@ export const useResetPasswordForm = ({
 
   const passwordResult = Password.validate(fields.newPassword)
 
-  //   const mutation = useMutation(
-  //     async () => {
-  //       if (passwordResult) {
-  //         return await onSubmitted(passwordResult)
-  //       }
-  //     },
-  //     {
-  //       onSuccess,
-  //       onError: () => {
-  //         Alert.alert(
-  //           "Whoops",
-  //           "Sorry, something went wrong when trying to change your password. Please try again.",
-  //           [
-  //             { text: "Try Again", onPress: () => mutation.mutate() },
-  //             { text: "Ok" }
-  //           ]
-  //         )
-  //       }
-  //     }
-  //   )
-
-  //   const getSubmission = (): ResetPasswordSubmission => {
-  //     if (fields.newPassword === "" && fields.reEnteredPassword === "") {
-  //       return { status: "invalid" }
-  //     } else if (fields.reEnteredPassword !== fields.newPassword) {
-  //       return { status: "invalid", error: "reenter-does-not-match-new" }
-  //     } else if (!passwordResult) {
-  //       return { status: "invalid", error: "weak-new-password" }
-  //     } else if (mutation.isLoading) {
-  //       return { status: "submitting" }
-  //     } else {
-  //       return { status: "valid", submit: mutation.mutate }
-  //     }
-  //   }
+  const mutation = useMutation(
+    async () => {
+      if (passwordResult) {
+        return await onSubmitted(passwordResult)
+      }
+    },
+    {
+      onSuccess,
+      onError: () => {
+        Alert.alert(
+          "Whoops",
+          "Sorry, something went wrong when trying to change your password. Please try again.",
+          [
+            { text: "Try Again", onPress: () => mutation.mutate() },
+            { text: "Ok" }
+          ]
+        )
+      }
+    }
+  )
 
   const getSubmission = (): ResetPasswordSubmission => {
     if (fields.newPassword === "" && fields.reEnteredPassword === "") {
@@ -83,13 +70,13 @@ export const useResetPasswordForm = ({
       return { status: "invalid", error: "reenter-does-not-match-new" }
     } else if (!passwordResult) {
       return { status: "invalid", error: "weak-new-password" }
+    } else if (mutation.isLoading) {
+      return { status: "submitting" }
     } else {
-      return {
-        status: "valid",
-        submit: () => console.log("Reset Password Submitted")
-      }
+      return { status: "valid", submit: mutation.mutate }
     }
   }
+
   return {
     fields,
     updateField: (key: keyof ResetPasswordFormFields, value: string) => {
