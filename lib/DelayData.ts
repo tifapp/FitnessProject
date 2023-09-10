@@ -4,6 +4,7 @@
  *
  * @param value the value to return.
  * @param millis the number of milliseconds to sleep.
+ * @param abortSignal an {@link AbortSignal} that can be used to cancel the sleep.
  * @returns `value`
  */
 export const delayData = async <T>(
@@ -26,6 +27,12 @@ export const delayData = async <T>(
   })
 }
 
+/**
+ * Sleeps for the specified amount of milliseconds.
+ *
+ * @param millis the number of milliseconds to sleep.
+ * @param abortSignal an {@link AbortSignal} that can be used to cancel the sleep.
+ */
 export const sleep = async (millis: number, abortSignal?: AbortSignal) => {
   await delayData(undefined, millis, abortSignal)
 }

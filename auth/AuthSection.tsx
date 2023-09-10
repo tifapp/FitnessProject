@@ -20,7 +20,7 @@ export type AuthSectionProps = {
   children: ReactNode
   footer?: JSX.Element
   callToActionTitle: string
-  isDisabled?: boolean
+  isCallToActionDisabled?: boolean
   onCallToActionTapped?: () => void
   style?: StyleProp<ViewStyle>
 }
@@ -38,7 +38,7 @@ export const AuthSectionView = ({
   footer,
   callToActionTitle,
   onCallToActionTapped,
-  isDisabled,
+  isCallToActionDisabled,
   style
 }: AuthSectionProps) => {
   const [footerHeight, setFooterHeight] = useState(0)
@@ -79,10 +79,10 @@ export const AuthSectionView = ({
             title={callToActionTitle}
             style={[
               styles.callToActionButton,
-              { opacity: isDisabled ? 0.5 : 1 }
+              { opacity: isCallToActionDisabled ? 0.5 : 1 }
             ]}
             onPress={onCallToActionTapped}
-            disabled={isDisabled}
+            disabled={isCallToActionDisabled}
           />
         </View>
       </KeyboardAvoidingView>

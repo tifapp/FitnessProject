@@ -5,18 +5,23 @@ import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 
 export type SignUpEndingProps = {
+  onCallToActionTapped: () => void
   style?: StyleProp<ViewStyle>
 }
 
 /**
  * The view that shows to the user at the end of the sign-up flow.
  */
-export const SignUpEndingView = ({ style }: SignUpEndingProps) => {
+export const SignUpEndingView = ({
+  onCallToActionTapped,
+  style
+}: SignUpEndingProps) => {
   return (
     <AuthSectionView
       title="Welcome to tiF!"
       description="Way to get started on your fitness journey! See below for what to do with your new account!"
       callToActionTitle="Awesome!"
+      onCallToActionTapped={onCallToActionTapped}
       style={style}
     >
       <View style={styles.illustration} />

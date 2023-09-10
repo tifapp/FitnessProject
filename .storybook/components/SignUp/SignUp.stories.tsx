@@ -16,7 +16,6 @@ import {
 } from "@auth/sign-up"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { Button, View } from "react-native"
-import { useState } from "react"
 import { UserHandle } from "@lib/users"
 import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { delayData, sleep } from "@lib/DelayData"
@@ -55,7 +54,7 @@ export const Basic: SignUpStory = () => (
           <Stack.Screen
             name="welcome"
             options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
-            component={SignUpEndingView}
+            component={EndingScreen}
           />
         </Stack.Navigator>
       </NavigationContainer>
@@ -94,6 +93,10 @@ const HandleScreen = () => {
     />
   )
 }
+
+const EndingScreen = () => (
+  <SignUpEndingView onCallToActionTapped={() => console.log("Done")} />
+)
 
 const TestScreen = () => {
   const navigation = useNavigation()
