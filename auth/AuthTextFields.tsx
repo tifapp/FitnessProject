@@ -9,7 +9,7 @@ import { CircularIonicon, IoniconName } from "@components/common/Icons"
 import { StyleProp, ViewStyle } from "react-native"
 import { useFontScale } from "@hooks/Fonts"
 
-export type AuthFilledTextFieldProps = {
+export type AuthShadedTextFieldProps = {
   iconName: IoniconName
   iconBackgroundColor: string
   style?: StyleProp<ViewStyle>
@@ -23,7 +23,7 @@ export const AuthShadedTextField = ({
   iconBackgroundColor,
   style,
   ...props
-}: AuthFilledTextFieldProps) => {
+}: AuthShadedTextFieldProps) => {
   const textFieldHeight = 32 * useFontScale()
   return (
     <ShadedTextField
@@ -40,7 +40,7 @@ export const AuthShadedTextField = ({
   )
 }
 
-export type AuthFilledPasswordTextFieldProps = {
+export type AuthShadedPasswordTextFieldProps = {
   iconName: IoniconName
   iconBackgroundColor: string
   style?: StyleProp<ViewStyle>
@@ -54,7 +54,7 @@ export const AuthShadedPasswordTextField = ({
   iconBackgroundColor,
   style,
   ...props
-}: AuthFilledPasswordTextFieldProps) => {
+}: AuthShadedPasswordTextFieldProps) => {
   const textFieldHeight = 32 * useFontScale()
   return (
     <ShadedPasswordTextField

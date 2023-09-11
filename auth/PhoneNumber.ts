@@ -17,7 +17,7 @@ export class USPhoneNumber {
    * centric screens (eg. verification code, settings).
    */
   get formattedForPrivacy () {
-    return `+1 (***) ***-${this.rawValue.substring(6)}`
+    return `(***) ***-${this.rawValue.substring(6)}`
   }
 
   toString () {

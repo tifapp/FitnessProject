@@ -22,7 +22,7 @@ describe("PhoneNumber tests", () => {
 
     test("privacy formatted", () => {
       const phoneNumber = USPhoneNumber.parse("9258881234")!
-      expect(phoneNumber.formattedForPrivacy).toEqual("+1 (***) ***-1234")
+      expect(phoneNumber.formattedForPrivacy).toEqual("(***) ***-1234")
     })
   })
 })
