@@ -15,4 +15,8 @@ export namespace StringUtils {
   export const isWhitespaceCharacter = (str: string, index: number) => {
     return /\s/.test(str[index])
   }
+
+  // export const findIndexBeforeSubstring = (str: string, substr: string) => {
+
+  // }
 }

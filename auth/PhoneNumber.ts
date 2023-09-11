@@ -16,7 +16,7 @@ export class USPhoneNumber {
    * Formats this phone number in a way such that it can be used on privacy
    * centric screens (eg. verification code, settings).
    */
-  get formattedForPrivacy (): string {
+  get formattedForPrivacy () {
     return `+1 (***) ***-${this.rawValue.substring(6)}`
   }
 
@@ -30,7 +30,7 @@ export class USPhoneNumber {
    *
    * A valid phone number string is precisely an exact 10 character, numerical string.
    */
-  static parse (rawValue: string): USPhoneNumber | undefined {
+  static parse (rawValue: string) {
     return USPhoneNumber.REGEX.test(rawValue)
       ? new USPhoneNumber(rawValue)
       : undefined
