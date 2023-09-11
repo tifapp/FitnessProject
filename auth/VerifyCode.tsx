@@ -64,7 +64,10 @@ export const useAuthVerificationCodeForm = ({
       checkCodeMutation.reset()
       setCode(code)
     },
-    resendCodeStatus: resendCodeMutation.status,
+    resendCodeStatus:
+      resendCodeMutation.isError || resendCodeMutation.isSuccess
+        ? resendCodeMutation.status
+        : undefined,
     onCodeResent: resendCodeMutation.mutate,
     get submission (): AuthVerificationCodeFormSubmission {
       if (hasSubmittedInvalidCode) {
