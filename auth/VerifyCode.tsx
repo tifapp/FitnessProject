@@ -3,7 +3,7 @@ import { AuthShadedTextField } from "@auth/AuthTextFields"
 import { BodyText } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useMutation } from "@tanstack/react-query"
-import React, { useState } from "react"
+import React, { useRef, useState } from "react"
 import { StyleProp, ViewStyle, StyleSheet, Alert, View } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { TextToastView } from "@components/common/Toasts"
@@ -37,16 +37,18 @@ export const useAuthVerificationCodeForm = ({
   onSuccess
 }: UseAuthVerificationCodeFormEnvironment) => {
   const [code, setCode] = useState("")
+  const attemptedCodesRef = useRef<string[]>([])
   const resendCodeMutation = useMutation(resendCode)
   const checkCodeMutation = useMutation(checkCode, {
-    onSuccess: (isValidCode: boolean) => {
+    onSuccess: (isValidCode: boolean, code: string) => {
       if (isValidCode) {
         onSuccess()
       } else {
         Alert.alert(
           "Invalid Code",
-          "The code you have entered is invalid, please try again."
+          `${code} is an invalid code, please try again.`
         )
+        attemptedCodesRef.current.push(code)
       }
     },
     onError: () => {
@@ -56,20 +58,17 @@ export const useAuthVerificationCodeForm = ({
       )
     }
   })
-  const hasSubmittedInvalidCode = checkCodeMutation.data === false
+  const isInvalidCode = !!attemptedCodesRef.current.find((c) => code === c)
   return {
     code,
-    onCodeChanged: (code: string) => {
-      checkCodeMutation.reset()
-      setCode(code)
-    },
+    onCodeChanged: setCode,
     resendCodeStatus:
       resendCodeMutation.isError || resendCodeMutation.isSuccess
         ? resendCodeMutation.status
         : undefined,
     onCodeResent: resendCodeMutation.mutate,
     get submission (): AuthVerificationCodeFormSubmission {
-      if (hasSubmittedInvalidCode) {
+      if (isInvalidCode) {
         return { status: "invalid", reason: "invalid-code" }
       } else if (checkCodeMutation.isLoading) {
         return { status: "submitting" }

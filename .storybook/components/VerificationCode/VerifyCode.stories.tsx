@@ -56,7 +56,7 @@ export const Basic: VerifyCodeStory = () => (
 const EmailScreen = () => {
   const email = EmailAddress.parse("peacock69@gmail.com")!
   const form = useAuthVerificationCodeForm({
-    checkCode: async () => await delayData(true, 1500),
+    checkCode: async () => await delayData(false, 7000),
     resendCode: async () => await delayData(undefined, 1000),
     onSuccess: () => console.log("success")
   })

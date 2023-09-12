@@ -8,7 +8,7 @@ import { captureAlerts } from "../tests/helpers/Alerts"
 describe("VerifyCode tests", () => {
   beforeEach(() => jest.resetAllMocks())
 
-  describe("useVerificationCodeForm tests", () => {
+  describe("useAuthVerificationCodeForm tests", () => {
     it("should be in an invalid state when code is less than 6 digits", () => {
       const { result } = renderUseAuthVerificationCodeForm()
 
@@ -86,6 +86,67 @@ describe("VerifyCode tests", () => {
       act(() => (result.current.submission as any).submit())
 
       await waitFor(() => expect(onSuccess).toHaveBeenCalled())
+    })
+
+    test("submit invalid code, change code while submitting, retype invalid code after submission, stays invalid for retyped code", async () => {
+      let resolveCheckCode: (value: boolean) => void
+      checkCode.mockReturnValueOnce(
+        new Promise<boolean>((resolve) => {
+          resolveCheckCode = resolve
+        })
+      )
+      const invalidCode = "123456"
+      const codeToChangeToWhileSubmitting = "789012"
+
+      const { result } = renderUseAuthVerificationCodeForm()
+
+      act(() => result.current.onCodeChanged(invalidCode))
+      act(() => (result.current.submission as any).submit())
+
+      act(() => result.current.onCodeChanged(codeToChangeToWhileSubmitting))
+      act(() => resolveCheckCode(false))
+
+      await waitFor(() => {
+        expect(result.current.submission.status).toEqual("submittable")
+      })
+
+      act(() => result.current.onCodeChanged(invalidCode))
+      expect(result.current.submission).toMatchObject({
+        status: "invalid",
+        reason: "invalid-code"
+      })
+    })
+
+    test("previous invalid codes are always invalid", async () => {
+      checkCode.mockResolvedValue(false)
+      const invalidCode = "123456"
+      const invalidCode2 = "789012"
+
+      const { result } = renderUseAuthVerificationCodeForm()
+
+      act(() => result.current.onCodeChanged(invalidCode))
+      act(() => (result.current.submission as any).submit())
+      await waitFor(() => {
+        expect(result.current.submission.status).toEqual("invalid")
+      })
+
+      act(() => result.current.onCodeChanged(invalidCode2))
+      act(() => (result.current.submission as any).submit())
+      await waitFor(() => {
+        expect(result.current.submission.status).toEqual("invalid")
+      })
+
+      act(() => result.current.onCodeChanged(invalidCode))
+      expect(result.current.submission).toMatchObject({
+        status: "invalid",
+        reason: "invalid-code"
+      })
+
+      act(() => result.current.onCodeChanged(invalidCode2))
+      expect(result.current.submission).toMatchObject({
+        status: "invalid",
+        reason: "invalid-code"
+      })
     })
 
     test("error submission flow", async () => {
