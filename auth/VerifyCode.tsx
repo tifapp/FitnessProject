@@ -1,4 +1,4 @@
-import { AuthSectionView } from "@auth/AuthSection"
+import { AuthFormView, BaseAuthFormSubmission } from "@auth/AuthSection"
 import { AuthShadedTextField } from "@auth/AuthTextFields"
 import { BodyText } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
@@ -11,8 +11,8 @@ import { TextToastView } from "@components/common/Toasts"
 export type AuthResendVerificationCodeStatus = "success" | "error"
 
 export type AuthVerificationCodeFormInvalidReason =
-  | "too-short"
-  | "too-long"
+  | "code-too-short"
+  | "code-too-long"
   | "invalid-code"
 
 export type AuthVerificationCodeFormSubmission =
@@ -20,8 +20,7 @@ export type AuthVerificationCodeFormSubmission =
       status: "invalid"
       reason: AuthVerificationCodeFormInvalidReason
     }
-  | { status: "submitting" }
-  | { status: "submitable"; submit: () => void }
+  | BaseAuthFormSubmission
 
 export type UseAuthVerificationCodeFormEnvironment = {
   resendCode: () => Promise<void>
@@ -76,13 +75,13 @@ export const useAuthVerificationCodeForm = ({
         return { status: "submitting" }
       } else if (code.length === 6) {
         return {
-          status: "submitable",
+          status: "submittable",
           submit: () => checkCodeMutation.mutate(code)
         }
       } else {
         return {
           status: "invalid",
-          reason: code.length < 6 ? "too-short" : "too-long"
+          reason: code.length < 6 ? "code-too-short" : "code-too-long"
         }
       }
     }
@@ -113,7 +112,7 @@ export const AuthVerificationCodeFormView = ({
   style
 }: AuthVerificationCodeProps) => (
   <>
-    <AuthSectionView
+    <AuthFormView
       title="Verify your Account"
       description={`We have sent a 6-digit verification code to ${codeReceiverName}. Please enter it in the field below.`}
       footer={
@@ -126,13 +125,8 @@ export const AuthVerificationCodeFormView = ({
           </TouchableOpacity>
         </View>
       }
-      callToActionTitle="Verify me!"
-      isCallToActionDisabled={submission.status !== "submitable"}
-      onCallToActionTapped={() => {
-        if (submission.status === "submitable") {
-          submission.submit()
-        }
-      }}
+      submissionTitle="Verify me!"
+      submission={submission}
       style={style}
     >
       <AuthShadedTextField
@@ -150,7 +144,7 @@ export const AuthVerificationCodeFormView = ({
         onChangeText={onCodeChanged}
         autoFocus
       />
-    </AuthSectionView>
+    </AuthFormView>
     <TextToastView
       isVisible={resendCodeStatus === "success"}
       text={`We have resent the code to ${codeReceiverName}.`}
@@ -167,7 +161,7 @@ const errorMessageForInvalidSubmissionReason = (
 ) => {
   if (reason === "invalid-code") {
     return "The code you have entered is invalid, please try again."
-  } else if (reason === "too-long") {
+  } else if (reason === "code-too-long") {
     return "The code should only 6-digits."
   } else {
     return undefined

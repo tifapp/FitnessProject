@@ -16,7 +16,7 @@ describe("VerifyCode tests", () => {
 
       expect(result.current.submission).toMatchObject({
         status: "invalid",
-        reason: "too-short"
+        reason: "code-too-short"
       })
     })
 
@@ -27,7 +27,7 @@ describe("VerifyCode tests", () => {
 
       expect(result.current.submission).toMatchObject({
         status: "invalid",
-        reason: "too-long"
+        reason: "code-too-long"
       })
     })
 
