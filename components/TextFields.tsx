@@ -146,6 +146,9 @@ export const ShadedPasswordTextField = ({
           }
         />
       }
+      autoCorrect={false}
+      autoCapitalize="none"
+      autoComplete="password"
       {...props}
     />
   )
