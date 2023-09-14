@@ -14,6 +14,46 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
+/**
+ * A base type that all Auth Forms should union with.
+ */
+export type BaseAuthFormSubmission =
+  | { status: "submittable"; submit: () => void }
+  | { status: "submitting" }
+
+export type AuthFormProps<Submission extends { status: string }> = {
+  title: string
+  description: string
+  children: ReactNode
+  footer?: JSX.Element
+  submissionTitle: string
+  submission: Submission | BaseAuthFormSubmission
+  style?: StyleProp<ViewStyle>
+}
+
+/**
+ * A base view for creating an auth screen that acts as a form.
+ *
+ * It automatically includes a title, description, a call to action at the bottom with an optional
+ * footer above it, and handles weird scrolling behaviors.
+ */
+export const AuthFormView = <Submission extends { status: string }>({
+  submission,
+  submissionTitle,
+  ...props
+}: AuthFormProps<Submission>) => (
+    <AuthSectionView
+      callToActionTitle={submissionTitle}
+      isCallToActionDisabled={submission.status !== "submittable"}
+      onCallToActionTapped={() => {
+        if (submission.status === "submittable") {
+          ;(submission as { submit: () => void }).submit()
+        }
+      }}
+      {...props}
+    />
+  )
+
 export type AuthSectionProps = {
   title: string
   description: string
@@ -37,8 +77,8 @@ export const AuthSectionView = ({
   children,
   footer,
   callToActionTitle,
-  onCallToActionTapped,
   isCallToActionDisabled,
+  onCallToActionTapped,
   style
 }: AuthSectionProps) => {
   const [footerHeight, setFooterHeight] = useState(0)
@@ -81,8 +121,8 @@ export const AuthSectionView = ({
               styles.callToActionButton,
               { opacity: isCallToActionDisabled ? 0.5 : 1 }
             ]}
-            onPress={onCallToActionTapped}
             disabled={isCallToActionDisabled}
+            onPressIn={onCallToActionTapped}
           />
         </View>
       </KeyboardAvoidingView>

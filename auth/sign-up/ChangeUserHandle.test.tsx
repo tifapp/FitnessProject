@@ -1,5 +1,5 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
-import { useSignUpChangeUserHandle } from "./ChangeUserHandle"
+import { useSignUpChangeUserHandleForm } from "./ChangeUserHandle"
 import { UserHandle } from "@lib/users"
 import { act } from "react-test-renderer"
 import { fakeTimers } from "../../tests/helpers/Timers"
@@ -107,7 +107,7 @@ describe("SignUpChangeUserHandle tests", () => {
       const parsedHandle = UserHandle.parse(initialHandle).handle!
       return renderHook(
         () => {
-          return useSignUpChangeUserHandle(parsedHandle, debounceMs, {
+          return useSignUpChangeUserHandleForm(parsedHandle, debounceMs, {
             checkIfUserHandleTaken,
             changeUserHandle,
             onSuccess

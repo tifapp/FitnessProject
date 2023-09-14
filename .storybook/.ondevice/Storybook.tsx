@@ -31,6 +31,9 @@ import LocationSearchMeta, {
 import SignUpMeta, {
   Basic as SignUpBasic
 } from "../components/SignUp/SignUp.stories"
+import VerifcationCodeMeta, {
+  Basic as VerifcationCodeBasic
+} from "../components/VerificationCode/VerifyCode.stories"
 
 // Create an array of stories
 const stories = [
@@ -78,6 +81,11 @@ const stories = [
     name: SignUpMeta.title,
     component: SignUpBasic,
     args: SignUpMeta.args
+  },
+  {
+    name: VerifcationCodeMeta.title,
+    component: VerifcationCodeBasic,
+    args: VerifcationCodeMeta.args
   }
   // Add more stories here...
 ]

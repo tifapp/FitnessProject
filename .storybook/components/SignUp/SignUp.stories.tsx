@@ -10,9 +10,8 @@ import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import {
   SignUpChangeUserHandleFormView,
   SignUpCredentialsFormView,
-  SignUpVerifyCodeView,
   SignUpEndingView,
-  useSignUpChangeUserHandle
+  useSignUpChangeUserHandleForm
 } from "@auth/sign-up"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { Button, View } from "react-native"
@@ -31,48 +30,32 @@ type SignUpStory = ComponentStory<typeof SettingsScreen>
 const Stack = createStackNavigator()
 
 export const Basic: SignUpStory = () => (
-  <TiFQueryClientProvider>
-    <SafeAreaProvider>
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
-          <Stack.Screen name="test" component={TestScreen} />
-          <Stack.Screen
-            name="signUp"
-            options={{ headerLeft: () => <XMarkBackButton />, title: "" }}
-            component={CredentialsScreen}
-          />
-          <Stack.Screen
-            name="changeHandle"
-            options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
-            component={HandleScreen}
-          />
-          <Stack.Screen
-            name="verifyCode"
-            options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
-            component={SignUpVerifyCodeView}
-          />
-          <Stack.Screen
-            name="welcome"
-            options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
-            component={EndingScreen}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </SafeAreaProvider>
-  </TiFQueryClientProvider>
-)
-
-const CredentialsScreen = () => (
-  <SignUpCredentialsFormView
-    onPrivacyPolicyTapped={() => console.log("privacy policy tapped")}
-    onTermsAndConditionsTapped={() => {
-      console.log("terms and conditions tapped")
-    }}
-  />
+  <SafeAreaProvider>
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
+        <Stack.Screen name="test" component={TestScreen} />
+        <Stack.Screen
+          name="signUp"
+          options={{ headerLeft: () => <XMarkBackButton />, title: "" }}
+          component={SignUpCredentialsFormView}
+        />
+        <Stack.Screen
+          name="changeHandle"
+          options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
+          component={HandleScreen}
+        />
+        <Stack.Screen
+          name="welcome"
+          options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
+          component={EndingScreen}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  </SafeAreaProvider>
 )
 
 const HandleScreen = () => {
-  const methods = useSignUpChangeUserHandle(
+  const methods = useSignUpChangeUserHandleForm(
     UserHandle.parse("elonmusk").handle!,
     200,
     {
@@ -109,10 +92,6 @@ const TestScreen = () => {
       <Button
         title="Change Handle Form"
         onPress={() => navigation.navigate("changeHandle")}
-      />
-      <Button
-        title="Verify Code Form"
-        onPress={() => navigation.navigate("verifyCode")}
       />
       <Button title="Welcome" onPress={() => navigation.navigate("welcome")} />
     </View>

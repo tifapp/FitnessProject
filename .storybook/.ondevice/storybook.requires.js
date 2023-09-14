@@ -58,6 +58,7 @@ const getStories = () => {
     "./components/SettingsScreen/SettingsScreen.stories.tsx": require("../components/SettingsScreen/SettingsScreen.stories.tsx"),
     "./components/SignUp/SignUp.stories.tsx": require("../components/SignUp/SignUp.stories.tsx"),
     "./components/TextField/TextField.stories.tsx": require("../components/TextField/TextField.stories.tsx"),
+    "./components/VerificationCode/VerifyCode.stories.tsx": require("../components/VerificationCode/VerifyCode.stories.tsx"),
   };
 };
 
