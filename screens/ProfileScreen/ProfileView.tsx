@@ -6,7 +6,7 @@ import {
   PrimaryButton
 } from "@components/common/Buttons"
 import ExpandableText from "@components/common/ExpandableText"
-import { ToastWithIcon } from "@components/common/Toasts"
+import { TextToastView } from "@components/common/Toasts"
 import ProfileImage from "@components/profileImageComponents/ProfileImage"
 import { User } from "@lib/users/User"
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
@@ -68,7 +68,7 @@ const ProfileView = ({ user, events }: ProfileScreenViewProps) => {
             {userStatus !== "blocked" && (
               <OutlinedButton style={styles.messageButton} title="Message" />
             )}
-            <ToastWithIcon
+            <TextToastView
               requestSent={requestSent}
               setRequestSent={setRequestSent}
               isVisible={userStatus === "friend-request-pending"}

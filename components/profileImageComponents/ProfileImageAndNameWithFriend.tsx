@@ -4,7 +4,7 @@ import ProfileImage from "./ProfileImage"
 import React, { useState } from "react"
 import { Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
-import { ToastWithIcon } from "@components/common/Toasts"
+import { TextToastView } from "@components/common/Toasts"
 import { UserToProfileRelationStatus } from "@lib/users"
 
 interface ImageAndNameProps {
@@ -81,7 +81,7 @@ const ProfileImageAndNameWithFriend = ({
               >
                 {renderFriendStatus(friendStatus)}
               </Headline>
-              <ToastWithIcon
+              <TextToastView
                 requestSent={requestSent}
                 setRequestSent={setRequestSent}
                 isVisible={friendStatus === "friend-request-pending"}
