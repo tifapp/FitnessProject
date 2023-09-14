@@ -1,13 +1,10 @@
-import { Email } from "@auth/Email"
+import { EmailAddress } from "./Email"
 
-describe("Password tests", () => {
-  it("should not succeed, when it does not have a @ inside of the string", () => {
-    const givenEmail = "i.com"
-    expect(Email.validate(givenEmail)).toBeUndefined()
-  })
-
-  it("should succeed, when it has a @ inside of the string", () => {
-    const givenEmail = "waterBottle@walak.com"
-    expect(Email.validate(givenEmail)?.rawValue).toEqual(givenEmail)
+describe("Email tests", () => {
+  describe("EmailAddress tests", () => {
+    test("formattedForPrivacy", () => {
+      const email = EmailAddress.parse("peacock69@gmail.com")!
+      expect(email.formattedForPrivacy).toEqual("p***9@gmail.com")
+    })
   })
 })

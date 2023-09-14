@@ -34,6 +34,10 @@ import SignUpMeta, {
 import TextFieldMeta, {
   Basic as TextFieldBasic
 } from "../components/TextField/TextField.stories"
+import VerifcationCodeMeta, {
+  Basic as VerifcationCodeBasic
+} from "../components/VerificationCode/VerifyCode.stories"
+import { name } from "dayjs"
 
 // Create an array of stories
 const stories = [
@@ -86,6 +90,11 @@ const stories = [
     name: SignUpMeta.title,
     component: SignUpBasic,
     args: SignUpMeta.args
+  },
+  {
+    name: VerifcationCodeMeta.title,
+    component: VerifcationCodeBasic,
+    args: VerifcationCodeMeta.args
   }
   // Add more stories here...
 ]
