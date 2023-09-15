@@ -12,7 +12,6 @@ export type ChangePasswordResult = "valid" | "invalid" | "incorrect-password"
 
 export type ChangePasswordErrorReason =
   | "current-matches-new"
-  | "reenter-does-not-match-new"
   | "weak-new-password"
   | "incorrect-current-password"
 
@@ -34,7 +33,6 @@ export type ChangePasswordSubmission =
 export type ChangePasswordFormFields = {
   currentPassword: string
   newPassword: string
-  reEnteredPassword: string
 }
 
 export const useChangePasswordForm = ({
@@ -43,8 +41,7 @@ export const useChangePasswordForm = ({
 }: UseChangePasswordFormEnvironment) => {
   const [fields, setFields] = useState({
     currentPassword: "",
-    newPassword: "",
-    reEnteredPassword: ""
+    newPassword: ""
   })
 
   const passwordResult = Password.validate(fields.newPassword)
@@ -74,16 +71,10 @@ export const useChangePasswordForm = ({
       setFields((fields) => ({ ...fields, [key]: value }))
     },
     get submission (): ChangePasswordSubmission {
-      if (
-        fields.currentPassword === "" &&
-        fields.newPassword === "" &&
-        fields.reEnteredPassword === ""
-      ) {
+      if (fields.currentPassword === "" && fields.newPassword === "") {
         return { status: "invalid" }
       } else if (fields.currentPassword === fields.newPassword) {
         return { status: "invalid", error: "current-matches-new" }
-      } else if (fields.reEnteredPassword !== fields.newPassword) {
-        return { status: "invalid", error: "reenter-does-not-match-new" }
       } else if (!passwordResult) {
         return { status: "invalid", error: "weak-new-password" }
       } else if (mutation.isLoading) {
@@ -124,7 +115,7 @@ export const ChangePasswordFormView = ({
   >
     <AuthShadedPasswordTextField
       iconName="lock-closed"
-      iconBackgroundColor="#FB3640"
+      iconBackgroundColor={AppStyles.linkColor}
       value={fields.currentPassword}
       placeholder="Current Password"
       error={
@@ -138,8 +129,8 @@ export const ChangePasswordFormView = ({
     />
 
     <AuthShadedPasswordTextField
-      iconName="lock-closed"
-      iconBackgroundColor="#FB3640"
+      iconName="md-key"
+      iconBackgroundColor="#14B329"
       value={fields.newPassword}
       placeholder="New Password"
       error={
@@ -148,21 +139,6 @@ export const ChangePasswordFormView = ({
           : undefined
       }
       onChangeText={(text) => updateField("newPassword", text)}
-      style={styles.textField}
-    />
-
-    <AuthShadedPasswordTextField
-      iconName="lock-closed"
-      iconBackgroundColor="#FB3640"
-      value={fields.reEnteredPassword}
-      placeholder="Re-Enter New Password"
-      error={
-        submission.status === "invalid" &&
-        submission.error === "reenter-does-not-match-new"
-          ? "Your new password does not match, please enter it here again."
-          : undefined
-      }
-      onChangeText={(text) => updateField("reEnteredPassword", text)}
       style={styles.textField}
     />
 

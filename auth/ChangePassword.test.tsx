@@ -60,26 +60,12 @@ describe("ChangePassword tests", () => {
       })
     })
 
-    it("should give an invalid state, if the re-entered password does not match the new password", () => {
-      const reEnteredPassword = "WaterBottle2%"
-      const { result } = renderChangePassword()
-
-      act(() => result.current.updateField("newPassword", reEnteredPassword))
-      act(() => result.current.updateField("reEnteredPassword", "K"))
-
-      expect(result.current.submission).toMatchObject({
-        status: "invalid",
-        error: "reenter-does-not-match-new"
-      })
-    })
-
     it("should give an invalid state, if the new password is not strong enough: too short", () => {
       const newPassword = "Wat2%"
       const { result } = renderChangePassword()
 
       act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
       act(() => result.current.updateField("newPassword", newPassword))
-      act(() => result.current.updateField("reEnteredPassword", newPassword))
 
       expect(result.current.submission).toMatchObject({
         status: "invalid",
@@ -93,9 +79,6 @@ describe("ChangePassword tests", () => {
 
       act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
       act(() => result.current.updateField("newPassword", "OblivionAwaits43#"))
-      act(() => {
-        result.current.updateField("reEnteredPassword", "OblivionAwaits43#")
-      })
 
       act(() => (result.current.submission as any).submit())
 
@@ -121,9 +104,6 @@ describe("ChangePassword tests", () => {
 
       act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
       act(() => result.current.updateField("newPassword", "OblivionAwaits43#"))
-      act(() => {
-        result.current.updateField("reEnteredPassword", "OblivionAwaits43#")
-      })
 
       act(() => (result.current.submission as any).submit())
 
@@ -137,9 +117,6 @@ describe("ChangePassword tests", () => {
 
       act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
       act(() => result.current.updateField("newPassword", "OblivionAwaits43#"))
-      act(() =>
-        result.current.updateField("reEnteredPassword", "OblivionAwaits43#")
-      )
 
       act(() => (result.current.submission as any).submit())
 
@@ -160,9 +137,6 @@ describe("ChangePassword tests", () => {
 
       act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
       act(() => result.current.updateField("newPassword", "OblivionAwaits43#"))
-      act(() =>
-        result.current.updateField("reEnteredPassword", "OblivionAwaits43#")
-      )
 
       act(() => (result.current.submission as any).submit())
 
