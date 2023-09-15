@@ -26,7 +26,7 @@ export type UseChangePasswordFormEnvironment = {
 export type ChangePasswordSubmission =
   | {
       status: "invalid"
-      error?: ChangePasswordErrorReason
+      error: ChangePasswordErrorReason | undefined
     }
   | BaseAuthFormSubmission
 
@@ -80,8 +80,8 @@ export const useChangePasswordForm = ({
       setFields((fields) => ({ ...fields, [key]: value }))
     },
     get submission (): ChangePasswordSubmission {
-      if (fields.currentPassword === "" && fields.newPassword === "") {
-        return { status: "invalid" }
+      if (fields.newPassword === "") {
+        return { status: "invalid", error: undefined }
       } else if (fields.currentPassword === fields.newPassword) {
         return { status: "invalid", error: "current-matches-new" }
       } else if (!passwordResult) {

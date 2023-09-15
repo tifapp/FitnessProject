@@ -110,7 +110,7 @@ describe("ChangePassword tests", () => {
       await waitFor(() => expect(onSuccess).toHaveBeenCalled())
     })
 
-    test("incorrec current password submission flow, presents alert", async () => {
+    test("incorrect current password submission flow, presents alert", async () => {
       changePassword.mockResolvedValue("incorrect-password")
 
       const { result } = renderChangePassword()
@@ -145,16 +145,24 @@ describe("ChangePassword tests", () => {
         expect(alertPresentationSpy).toHaveBeenCalled()
       })
 
-      await act(async () => await retry())
+      retry()
 
       await waitFor(() => expect(onSuccess).toHaveBeenCalled())
     })
 
-    it("should not produce error messages when no input is initially given", () => {
+    it("should not produce error messages when no new password is empty", () => {
       const { result } = renderChangePassword()
 
       expect(result.current.submission).toMatchObject({
-        status: "invalid"
+        status: "invalid",
+        error: undefined
+      })
+
+      act(() => result.current.updateField("currentPassword", "abc123"))
+
+      expect(result.current.submission).toMatchObject({
+        status: "invalid",
+        error: undefined
       })
     })
   })
