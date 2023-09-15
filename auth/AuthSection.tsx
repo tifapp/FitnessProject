@@ -88,7 +88,6 @@ export const AuthSectionView = ({
       <KeyboardAwareScrollView
         style={styles.scrollView}
         keyboardShouldPersistTaps="always"
-        automaticallyAdjustKeyboardInsets={true}
         keyboardDismissMode="interactive"
         contentContainerStyle={styles.fieldsContainer}
       >

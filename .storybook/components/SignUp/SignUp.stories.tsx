@@ -9,6 +9,7 @@ import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import {
   SignUpChangeUserHandleFormView,
+  SignUpCredentialsFormFocusField,
   SignUpCredentialsFormView,
   SignUpEndingView,
   useSignUpChangeUserHandleForm
@@ -18,6 +19,7 @@ import { Button, View } from "react-native"
 import { UserHandle } from "@lib/users"
 import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { delayData, sleep } from "@lib/DelayData"
+import { useState } from "react"
 
 const SignUpMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Sign Up"
@@ -30,29 +32,45 @@ type SignUpStory = ComponentStory<typeof SettingsScreen>
 const Stack = createStackNavigator()
 
 export const Basic: SignUpStory = () => (
-  <SafeAreaProvider>
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
-        <Stack.Screen name="test" component={TestScreen} />
-        <Stack.Screen
-          name="signUp"
-          options={{ headerLeft: () => <XMarkBackButton />, title: "" }}
-          component={SignUpCredentialsFormView}
-        />
-        <Stack.Screen
-          name="changeHandle"
-          options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
-          component={HandleScreen}
-        />
-        <Stack.Screen
-          name="welcome"
-          options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
-          component={EndingScreen}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
-  </SafeAreaProvider>
+  <TiFQueryClientProvider>
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
+          <Stack.Screen name="test" component={TestScreen} />
+          <Stack.Screen
+            name="signUp"
+            options={{ headerLeft: () => <XMarkBackButton />, title: "" }}
+            component={CredentialsScreen}
+          />
+          <Stack.Screen
+            name="changeHandle"
+            options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
+            component={HandleScreen}
+          />
+          <Stack.Screen
+            name="welcome"
+            options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
+            component={EndingScreen}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </SafeAreaProvider>
+  </TiFQueryClientProvider>
 )
+
+const CredentialsScreen = () => {
+  const [focus, setFocus] =
+    useState<SignUpCredentialsFormFocusField | undefined>(undefined)
+  console.log(focus)
+  return (
+    <SignUpCredentialsFormView
+      focusField={focus}
+      onFocusFieldChanged={setFocus}
+      onTermsAndConditionsTapped={() => console.log("terms and conditions")}
+      onPrivacyPolicyTapped={() => console.log("privacy policy")}
+    />
+  )
+}
 
 const HandleScreen = () => {
   const methods = useSignUpChangeUserHandleForm(

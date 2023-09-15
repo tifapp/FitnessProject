@@ -8,9 +8,16 @@ import { AppStyles } from "@lib/AppColorStyle"
 import React from "react"
 import { StyleProp, ViewStyle, StyleSheet } from "react-native"
 
+export type SignUpCredentialsFormFocusField =
+  | "name"
+  | "email-phone"
+  | "password"
+
 export type SignUpCredentialsFormProps = {
   onTermsAndConditionsTapped: () => void
   onPrivacyPolicyTapped: () => void
+  focusField?: SignUpCredentialsFormFocusField
+  onFocusFieldChanged: (focus?: SignUpCredentialsFormFocusField) => void
   style?: StyleProp<ViewStyle>
 }
 
@@ -20,6 +27,8 @@ export type SignUpCredentialsFormProps = {
 export const SignUpCredentialsFormView = ({
   onPrivacyPolicyTapped,
   onTermsAndConditionsTapped,
+  focusField,
+  onFocusFieldChanged,
   style
 }: SignUpCredentialsFormProps) => (
   <AuthSectionView
@@ -31,6 +40,16 @@ export const SignUpCredentialsFormView = ({
     <AuthShadedTextField
       iconName="person"
       iconBackgroundColor={AppStyles.linkColor}
+      isFocused={focusField === "name"}
+      returnKeyType="next"
+      autoFocus
+      onBlur={() => {
+        if (focusField === "name") {
+          onFocusFieldChanged(undefined)
+        }
+      }}
+      onFocus={() => onFocusFieldChanged("name")}
+      onSubmitEditing={() => onFocusFieldChanged("email-phone")}
       placeholder="Name"
     />
     <AuthShadedTextField
@@ -40,12 +59,28 @@ export const SignUpCredentialsFormView = ({
       keyboardType="phone-pad"
       autoCapitalize="none"
       autoCorrect={false}
+      isFocused={focusField === "email-phone"}
+      returnKeyType="next"
+      onBlur={() => {
+        if (focusField === "email-phone") {
+          onFocusFieldChanged(undefined)
+        }
+      }}
+      onFocus={() => onFocusFieldChanged("email-phone")}
+      onSubmitEditing={() => onFocusFieldChanged("password")}
       style={styles.textField}
     />
     <AuthShadedPasswordTextField
       iconName="lock-closed"
       iconBackgroundColor="#FB3640"
       placeholder="Password"
+      isFocused={focusField === "password"}
+      onBlur={() => {
+        if (focusField === "password") {
+          onFocusFieldChanged(undefined)
+        }
+      }}
+      onFocus={() => onFocusFieldChanged("password")}
       style={styles.textField}
     />
     <Caption style={styles.disclaimerText}>

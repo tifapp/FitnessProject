@@ -31,6 +31,7 @@ export const AuthShadedTextField = ({
         <CircularIonicon
           backgroundColor={iconBackgroundColor}
           name={iconName}
+          accessibilityElementsHidden
         />
       }
       {...props}
@@ -62,6 +63,7 @@ export const AuthShadedPasswordTextField = ({
         <CircularIonicon
           backgroundColor={iconBackgroundColor}
           name={iconName}
+          accessibilityElementsHidden
         />
       }
       {...props}
