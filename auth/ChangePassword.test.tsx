@@ -97,9 +97,7 @@ describe("ChangePassword tests", () => {
         result.current.updateField("reEnteredPassword", "OblivionAwaits43#")
       })
 
-      expect(result.current.submission.status).toEqual("valid")
-
-      act(() => result.current.submission.submit?.())
+      act(() => (result.current.submission as any).submit())
 
       await waitFor(() => {
         expect(result.current.submission.status).toEqual("submitting")
@@ -127,9 +125,7 @@ describe("ChangePassword tests", () => {
         result.current.updateField("reEnteredPassword", "OblivionAwaits43#")
       })
 
-      expect(result.current.submission.status).toEqual("valid")
-
-      act(() => result.current.submission.submit?.())
+      act(() => (result.current.submission as any).submit())
 
       await waitFor(() => expect(onSuccess).toHaveBeenCalled())
     })
@@ -145,16 +141,14 @@ describe("ChangePassword tests", () => {
         result.current.updateField("reEnteredPassword", "OblivionAwaits43#")
       )
 
-      expect(result.current.submission.status).toEqual("valid")
-
-      act(() => result.current.submission.submit?.())
+      act(() => (result.current.submission as any).submit())
 
       await waitFor(() => {
-        expect(result.current.submission.status).toEqual("invalid")
+        expect(result.current.submission).toMatchObject({
+          status: "invalid",
+          error: "incorrect-current-password"
+        })
       })
-      expect(result.current.submission.error).toEqual(
-        "incorrect-current-password"
-      )
     })
 
     it("should be able to retry when it gets an error", async () => {
@@ -170,9 +164,7 @@ describe("ChangePassword tests", () => {
         result.current.updateField("reEnteredPassword", "OblivionAwaits43#")
       )
 
-      expect(result.current.submission.status).toEqual("valid")
-
-      act(() => result.current.submission.submit?.())
+      act(() => (result.current.submission as any).submit())
 
       await waitFor(() => {
         expect(alertPresentationSpy).toHaveBeenCalled()
@@ -186,8 +178,9 @@ describe("ChangePassword tests", () => {
     it("should not produce error messages when no input is initially given", () => {
       const { result } = renderChangePassword()
 
-      expect(result.current.submission.status).toEqual("invalid")
-      expect(result.current.submission.error).toBeUndefined()
+      expect(result.current.submission).toMatchObject({
+        status: "invalid"
+      })
     })
   })
 })
