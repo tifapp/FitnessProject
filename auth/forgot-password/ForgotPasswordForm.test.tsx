@@ -34,7 +34,7 @@ describe("Forgot Password Form tests", () => {
       )
     }
     it("can verify an email and send back an error for invalid emails", () => {
-      const emailAddress = "FiddleSticks32@ka"
+      const emailAddress = "FiddleSticks32ka"
       const { result } = renderForgotPassword()
 
       act(() => result.current.updateField(emailAddress))

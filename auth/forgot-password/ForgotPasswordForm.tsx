@@ -68,12 +68,12 @@ export const useForgotPasswordForm = ({
       return { status: "invalid" }
     } else if (mutation.isLoading) {
       return { status: "submitting" }
-    } else if (mutation.data === "invalid-email") {
+    } else if (!emailResult) {
       return { status: "invalid", error: "invalid-email" }
     } else {
       return {
         status: "valid",
-        submit: () => console.log("Forgot Password Submitted")
+        submit: mutation.mutate
       }
     }
   }
