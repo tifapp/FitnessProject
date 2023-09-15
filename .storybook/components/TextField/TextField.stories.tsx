@@ -5,7 +5,7 @@ import {
   TextField
 } from "@components/TextFields"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import { KeyboardAvoidingView, View } from "react-native"
+import { Button, KeyboardAvoidingView, View } from "react-native"
 import { ContentText } from "@components/ContentText"
 import { Ionicon } from "@components/common/Icons"
 
@@ -85,13 +85,18 @@ const ErrorView = () => {
 
 const Password = () => {
   const [text, setText] = useState("")
+  const [isFocused, setIsFocused] = useState(false)
   return (
-    <PasswordTextField
-      value={text}
-      placeholder="Enter Text"
-      onChangeText={setText}
-      style={{ padding: 16 }}
-    />
+    <View style={{ width: "100%" }}>
+      <PasswordTextField
+        isFocused={isFocused}
+        value={text}
+        placeholder="Enter Text"
+        onChangeText={setText}
+        style={{ padding: 16 }}
+      />
+      <Button title="Toggle Focus" onPress={() => setIsFocused((f) => !f)} />
+    </View>
   )
 }
 
