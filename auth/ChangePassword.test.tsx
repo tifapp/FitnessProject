@@ -110,7 +110,7 @@ describe("ChangePassword tests", () => {
       await waitFor(() => expect(onSuccess).toHaveBeenCalled())
     })
 
-    it("should have a failed submission flow", async () => {
+    test("incorrec current password submission flow, presents alert", async () => {
       changePassword.mockResolvedValue("incorrect-password")
 
       const { result } = renderChangePassword()
@@ -126,6 +126,7 @@ describe("ChangePassword tests", () => {
           error: "incorrect-current-password"
         })
       })
+      expect(alertPresentationSpy).toHaveBeenCalled()
     })
 
     it("should be able to retry when it gets an error", async () => {

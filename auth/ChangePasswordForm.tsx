@@ -8,7 +8,7 @@ import { useMutation } from "@tanstack/react-query"
 import { AuthFormView, BaseAuthFormSubmission } from "./AuthSection"
 import { AuthShadedPasswordTextField } from "./AuthTextFields"
 
-export type ChangePasswordResult = "valid" | "invalid" | "incorrect-password"
+export type ChangePasswordResult = "valid" | "incorrect-password"
 
 export type ChangePasswordErrorReason =
   | "current-matches-new"
@@ -51,8 +51,17 @@ export const useChangePasswordForm = ({
       return await onSubmitted(fields.currentPassword, password)
     },
     {
-      onSuccess,
-      onError: (_, password: Password) => {
+      onSuccess (result) {
+        if (result === "valid") {
+          onSuccess()
+        } else {
+          Alert.alert(
+            "Incorrect Password",
+            "You entered your current password incorrectly, please try again."
+          )
+        }
+      },
+      onError: (_, password) => {
         Alert.alert(
           "Whoops",
           "Sorry, something went wrong when trying to change your password. Please try again.",
