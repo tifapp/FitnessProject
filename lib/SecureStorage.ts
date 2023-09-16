@@ -1,5 +1,6 @@
 import { Amplify } from "aws-amplify"
 import * as ExpoSecureStore from "expo-secure-store"
+import { AsyncStorage } from "react-native"
 
 export type SecureStorage = typeof ExpoSecureStore
 
@@ -15,7 +16,6 @@ export class AmplifySecureStorage<Store extends SecureStorage> {
     this.store = store
   }
 
-  // set item with the key
   setItem (key: string, value: string) {
     if (!this.keyList.find((k) => k === key)) {
       this.keyList.push(key)
@@ -24,13 +24,10 @@ export class AmplifySecureStorage<Store extends SecureStorage> {
     this.store.setItemAsync(SECURE_STORAGE_KEY_PREFIX + key, value)
   }
 
-  // get item with the key
   getItem (key: string) {
-    const result = this.cache.get(SECURE_STORAGE_KEY_PREFIX + key)
-    return result
+    return this.cache.get(SECURE_STORAGE_KEY_PREFIX + key)
   }
 
-  // remove item with the key
   removeItem (key: string) {
     this.keyList = this.keyList.filter((k) => k === key)
     this.cache.delete(SECURE_STORAGE_KEY_PREFIX + key)
@@ -38,11 +35,13 @@ export class AmplifySecureStorage<Store extends SecureStorage> {
   }
 
   async clear () {
-    return await Promise.allSettled(
+    const fullPromise = await Promise.allSettled(
       this.keyList.map(async (k) => {
         await this.store.deleteItemAsync(SECURE_STORAGE_KEY_PREFIX + k)
       })
     )
+    this.keyList = []
+    return fullPromise
   }
 
   async sync () {
@@ -61,6 +60,8 @@ export class AmplifySecureStorage<Store extends SecureStorage> {
     )
   }
 }
+
+const keyList = AmplifySecureStorage.JSON.parse
 
 Amplify.configure({
   storage: AmplifySecureStorage

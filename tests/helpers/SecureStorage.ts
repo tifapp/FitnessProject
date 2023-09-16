@@ -1,7 +1,6 @@
 import { SECURE_STORAGE_KEY_PREFIX, SecureStorage } from "@lib/SecureStorage"
 
 export class TestSecureStorage<Store extends SecureStorage> {
-  // set item with the key
   private TestAmplifyStore = new Map<string, string>()
   private store: Store
 
@@ -13,13 +12,10 @@ export class TestSecureStorage<Store extends SecureStorage> {
     this.TestAmplifyStore.set(SECURE_STORAGE_KEY_PREFIX + key, value)
   }
 
-  // get item with the key
   getItem (key: string) {
-    const result = this.TestAmplifyStore.get(SECURE_STORAGE_KEY_PREFIX + key)
-    return result
+    return this.TestAmplifyStore.get(SECURE_STORAGE_KEY_PREFIX + key)
   }
 
-  // remove item with the key
   removeItem (key: string) {
     this.TestAmplifyStore.delete(SECURE_STORAGE_KEY_PREFIX + key)
   }
