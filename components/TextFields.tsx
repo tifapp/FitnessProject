@@ -21,7 +21,6 @@ export type TextFieldProps = {
   leftAddon?: JSX.Element
   rightAddon?: JSX.Element
   error?: ReactNode
-  isFocused?: boolean
   textStyle?: StyleProp<TextStyle>
   style?: StyleProp<ViewStyle>
 } & Omit<TextInputProps, "style" | "placeholderStyle">
@@ -82,7 +81,7 @@ const TextFieldErrorView = ({ error }: { error: ReactNode }) => (
 )
 
 const InternalTextField = forwardRef(function TextField (
-  { leftAddon, rightAddon, textStyle, isFocused, ...props }: TextFieldProps,
+  { leftAddon, rightAddon, textStyle, ...props }: TextFieldProps,
   ref: TextFieldRef
 ) {
   return (
