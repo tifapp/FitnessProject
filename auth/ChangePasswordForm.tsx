@@ -1,12 +1,13 @@
 import { Headline } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import { Password } from "@auth/Password"
-import React, { useState } from "react"
-import { Alert, StyleProp, StyleSheet, ViewStyle } from "react-native"
+import React, { useRef, useState } from "react"
+import { Alert, Platform, StyleProp, StyleSheet, ViewStyle } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { useMutation } from "@tanstack/react-query"
 import { AuthFormView, BaseAuthFormSubmission } from "./AuthSection"
 import { AuthShadedPasswordTextField } from "./AuthTextFields"
+import { TextFieldRefValue } from "@components/TextFields"
 
 export type ChangePasswordResult = "valid" | "incorrect-password"
 
@@ -114,50 +115,64 @@ export const ChangePasswordFormView = ({
   updateField,
   submission,
   onForgotPasswordTapped
-}: ChangePasswordFormProps) => (
-  <AuthFormView
-    title="Change Password"
-    description="Your new password must at least be 8 characters and contain at least 1 letter, 1 number, and 1 special character."
-    submissionTitle="Change Password"
-    submission={submission}
-    style={style}
-  >
-    <AuthShadedPasswordTextField
-      iconName="lock-closed"
-      iconBackgroundColor={AppStyles.linkColor}
-      value={fields.currentPassword}
-      placeholder="Current Password"
-      error={
-        submission.status === "invalid" &&
-        submission.error === "incorrect-current-password"
-          ? "Your old password was entered incorrectly. Please enter it again."
-          : undefined
-      }
-      onChangeText={(text) => updateField("currentPassword", text)}
-      style={styles.textField}
-    />
+}: ChangePasswordFormProps) => {
+  const newPasswordRef = useRef<TextFieldRefValue>(null)
+  return (
+    <AuthFormView
+      title="Change Password"
+      description="Your new password must at least be 8 characters and contain at least 1 letter, 1 number, and 1 special character."
+      submissionTitle="Change Password"
+      submission={submission}
+      style={style}
+    >
+      <AuthShadedPasswordTextField
+        iconName="lock-closed"
+        iconBackgroundColor={AppStyles.linkColor}
+        value={fields.currentPassword}
+        autoFocus
+        placeholder="Current Password"
+        returnKeyType={Platform.OS === "android" ? "next" : undefined}
+        blurOnSubmit={false}
+        onSubmitEditing={() => {
+          // NB: Keep this Android exclusive for now as iOS has issues with this
+          // when the focus also has secureTextEntry (ie. A PasswordTextField).
+          if (Platform.OS === "android") {
+            newPasswordRef.current?.focus()
+          }
+        }}
+        error={
+          submission.status === "invalid" &&
+          submission.error === "incorrect-current-password"
+            ? "Your old password was entered incorrectly. Please enter it again."
+            : undefined
+        }
+        onChangeText={(text) => updateField("currentPassword", text)}
+        style={styles.textField}
+      />
 
-    <AuthShadedPasswordTextField
-      iconName="md-key"
-      iconBackgroundColor="#14B329"
-      value={fields.newPassword}
-      placeholder="New Password"
-      error={
-        submission.status === "invalid"
-          ? newPasswordErrorMessage(submission.error)
-          : undefined
-      }
-      onChangeText={(text) => updateField("newPassword", text)}
-      style={styles.textField}
-    />
-
-    <TouchableOpacity onPress={onForgotPasswordTapped}>
-      <Headline style={{ color: AppStyles.highlightedText }}>
-        Forgot your password?
-      </Headline>
-    </TouchableOpacity>
-  </AuthFormView>
-)
+      <AuthShadedPasswordTextField
+        iconName="md-key"
+        iconBackgroundColor="#14B329"
+        value={fields.newPassword}
+        placeholder="New Password"
+        returnKeyType="done"
+        ref={newPasswordRef}
+        error={
+          submission.status === "invalid"
+            ? newPasswordErrorMessage(submission.error)
+            : undefined
+        }
+        onChangeText={(text) => updateField("newPassword", text)}
+        style={styles.textField}
+      />
+      <TouchableOpacity onPress={onForgotPasswordTapped}>
+        <Headline style={{ color: AppStyles.highlightedText }}>
+          Forgot your password?
+        </Headline>
+      </TouchableOpacity>
+    </AuthFormView>
+  )
+}
 
 const newPasswordErrorMessage = (error?: ChangePasswordErrorReason) => {
   if (error === "current-matches-new") {
