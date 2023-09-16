@@ -122,7 +122,7 @@ export const createTiFAPIFetch = (
       })
       const json = await resp.json()
       return {
-        status: resp.status as any,
+        status: resp.status as StatusCodeMap[keyof StatusCodeMap],
         data: await responseSchemas[`status${resp.status}`].parseAsync(json)
       }
     } catch (error) {
