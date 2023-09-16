@@ -150,7 +150,7 @@ const ProfileScreen = ({ route }: ProfileScreenProps) => {
 
 const ChangePasswordScreen = ({ navigation }: ChangePasswordScreenProps) => {
   const changePassword = useChangePasswordForm({
-    onSubmitted: async () => await delayData<ChangePasswordResult>("valid"),
+    changePassword: async () => await delayData<ChangePasswordResult>("valid"),
     onSuccess: () => navigation.goBack()
   })
   return <ChangePasswordFormView {...changePassword} />

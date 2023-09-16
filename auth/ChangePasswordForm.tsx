@@ -12,13 +12,16 @@ import Animated, { Layout } from "react-native-reanimated"
 
 export type ChangePasswordResult = "valid" | "incorrect-password"
 
-export type ChangePasswordErrorReason =
+export type ChangePasswordCurrentPasswordError =
+  | "incorrect-current-password"
+  | "empty"
+export type ChangePasswordNewPasswordError =
   | "current-matches-new"
   | "weak-new-password"
-  | "incorrect-current-password"
+  | "empty"
 
 export type UseChangePasswordFormEnvironment = {
-  onSubmitted: (
+  changePassword: (
     uncheckedOldPass: string,
     newPass: Password
   ) => Promise<ChangePasswordResult>
@@ -28,7 +31,8 @@ export type UseChangePasswordFormEnvironment = {
 export type ChangePasswordSubmission =
   | {
       status: "invalid"
-      error: ChangePasswordErrorReason | undefined
+      currentPasswordError: ChangePasswordCurrentPasswordError | undefined
+      newPasswordError: ChangePasswordNewPasswordError | undefined
     }
   | BaseAuthFormSubmission
 
@@ -37,8 +41,13 @@ export type ChangePasswordFormFields = {
   newPassword: string
 }
 
+type ChangePasswordMutationArgs = {
+  uncheckedCurrentPassword: string
+  newPassword: Password
+}
+
 export const useChangePasswordForm = ({
-  onSubmitted,
+  changePassword,
   onSuccess
 }: UseChangePasswordFormEnvironment) => {
   const [fields, setFields] = useState({
@@ -46,29 +55,38 @@ export const useChangePasswordForm = ({
     newPassword: ""
   })
 
-  const passwordResult = Password.validate(fields.newPassword)
+  const attemptedCurrentPasswords = useRef<string[]>([])
+  const validatedNewPassword = Password.validate(fields.newPassword)
 
-  const mutation = useMutation(
-    async (password: Password) => {
-      return await onSubmitted(fields.currentPassword, password)
+  const changePasswordMutation = useMutation(
+    async (args: ChangePasswordMutationArgs) => {
+      return await changePassword(
+        args.uncheckedCurrentPassword,
+        args.newPassword
+      )
     },
     {
-      onSuccess (result) {
+      onSuccess (result, args) {
         if (result === "valid") {
           onSuccess()
         } else {
+          attemptedCurrentPasswords.current.push(args.uncheckedCurrentPassword)
           Alert.alert(
             "Incorrect Password",
-            "You entered your current password incorrectly, please try again."
+            "You entered your current password incorrectly, please try again.",
+            [{ text: "Ok" }]
           )
         }
       },
-      onError: (_, password) => {
+      onError: (_, args) => {
         Alert.alert(
           "Whoops",
           "Sorry, something went wrong when trying to change your password. Please try again.",
           [
-            { text: "Try Again", onPress: () => mutation.mutate(password) },
+            {
+              text: "Try Again",
+              onPress: () => changePasswordMutation.mutate(args)
+            },
             { text: "Ok" }
           ]
         )
@@ -82,30 +100,86 @@ export const useChangePasswordForm = ({
       setFields((fields) => ({ ...fields, [key]: value }))
     },
     get submission (): ChangePasswordSubmission {
-      if (fields.newPassword === "") {
-        return { status: "invalid", error: undefined }
-      } else if (fields.currentPassword === fields.newPassword) {
-        return { status: "invalid", error: "current-matches-new" }
-      } else if (!passwordResult) {
-        return { status: "invalid", error: "weak-new-password" }
-      } else if (mutation.isLoading) {
+      if (changePasswordMutation.isLoading) {
         return { status: "submitting" }
-      } else if (mutation.data === "incorrect-password") {
-        return { status: "invalid", error: "incorrect-current-password" }
-      } else {
+      }
+
+      const currentPasswordError = checkForCurrentPasswordError(
+        fields.currentPassword,
+        attemptedCurrentPasswords.current
+      )
+
+      const newPasswordError = checkForNewPasswordError(
+        fields.newPassword,
+        fields.currentPassword
+      )
+
+      if (newPasswordError) {
+        return { status: "invalid", newPasswordError, currentPasswordError }
+      }
+
+      if (!validatedNewPassword) {
         return {
-          status: "submittable",
-          submit: () => mutation.mutate(passwordResult)
+          status: "invalid",
+          currentPasswordError,
+          newPasswordError: "weak-new-password"
+        }
+      }
+
+      if (currentPasswordError) {
+        return {
+          status: "invalid",
+          newPasswordError: undefined,
+          currentPasswordError
+        }
+      }
+
+      return {
+        status: "submittable",
+        submit: () => {
+          changePasswordMutation.mutate({
+            uncheckedCurrentPassword: fields.currentPassword,
+            newPassword: validatedNewPassword
+          })
         }
       }
     }
   }
 }
 
+const checkForNewPasswordError = (
+  newPassword: string,
+  currentPassword: string
+): ChangePasswordNewPasswordError | undefined => {
+  if (newPassword === "") {
+    return "empty"
+  } else if (newPassword === currentPassword) {
+    return "current-matches-new"
+  } else {
+    return undefined
+  }
+}
+
+const checkForCurrentPasswordError = (
+  currentPassword: string,
+  attemptedPasswords: string[]
+): ChangePasswordCurrentPasswordError | undefined => {
+  const isCurrentPasswordIncorrect = attemptedPasswords.find(
+    (p) => p === currentPassword
+  )
+  if (isCurrentPasswordIncorrect) {
+    return "incorrect-current-password"
+  } else if (currentPassword === "") {
+    return "empty"
+  } else {
+    return undefined
+  }
+}
+
 export type ChangePasswordFormProps = {
   style?: StyleProp<ViewStyle>
   fields: ChangePasswordFormFields
-  updateField: (key: keyof ChangePasswordFormFields, value: string) => void
+  onFieldUpdated: (key: keyof ChangePasswordFormFields, value: string) => void
   submission: ChangePasswordSubmission
   onForgotPasswordTapped: () => void
 }
@@ -113,7 +187,7 @@ export type ChangePasswordFormProps = {
 export const ChangePasswordFormView = ({
   style,
   fields,
-  updateField,
+  onFieldUpdated,
   submission,
   onForgotPasswordTapped
 }: ChangePasswordFormProps) => {
@@ -143,11 +217,11 @@ export const ChangePasswordFormView = ({
         }}
         error={
           submission.status === "invalid" &&
-          submission.error === "incorrect-current-password"
+          submission.currentPasswordError === "incorrect-current-password"
             ? "Your old password was entered incorrectly. Please enter it again."
             : undefined
         }
-        onChangeText={(text) => updateField("currentPassword", text)}
+        onChangeText={(text) => onFieldUpdated("currentPassword", text)}
         style={styles.textField}
       />
 
@@ -161,10 +235,10 @@ export const ChangePasswordFormView = ({
           ref={newPasswordRef}
           error={
             submission.status === "invalid"
-              ? newPasswordErrorMessage(submission.error)
+              ? newPasswordErrorMessage(submission.newPasswordError)
               : undefined
           }
-          onChangeText={(text) => updateField("newPassword", text)}
+          onChangeText={(text) => onFieldUpdated("newPassword", text)}
           style={styles.textField}
         />
       </Animated.View>
@@ -179,7 +253,7 @@ export const ChangePasswordFormView = ({
   )
 }
 
-const newPasswordErrorMessage = (error?: ChangePasswordErrorReason) => {
+const newPasswordErrorMessage = (error?: ChangePasswordNewPasswordError) => {
   if (error === "current-matches-new") {
     return "Your new password must be different from your old password."
   } else if (error === "weak-new-password") {
