@@ -1,31 +1,27 @@
-import { BodyText, Headline } from "@components/Text"
-import { PasswordTextField } from "@components/TextFields"
-import { PrimaryButton } from "@components/common/Buttons"
+import { Headline } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import { Password } from "@auth/Password"
-import React, { useState } from "react"
-import {
-  Alert,
-  SafeAreaView,
-  ScrollView,
-  StyleProp,
-  StyleSheet,
-  View,
-  ViewStyle
-} from "react-native"
+import React, { useRef, useState } from "react"
+import { Alert, Platform, StyleProp, StyleSheet, ViewStyle } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { useMutation } from "@tanstack/react-query"
+import { AuthFormView, BaseAuthFormSubmission } from "./AuthSection"
+import { AuthShadedPasswordTextField } from "./AuthTextFields"
+import { TextFieldRefValue } from "@components/TextFields"
+import Animated, { Layout } from "react-native-reanimated"
 
-export type ChangePasswordResult = "valid" | "invalid" | "incorrect-password"
+export type ChangePasswordResult = "valid" | "incorrect-password"
 
-export type ChangePasswordErrorReason =
-  | "current-matches-new"
-  | "reenter-does-not-match-new"
-  | "weak-new-password"
+export type ChangePasswordCurrentPasswordError =
   | "incorrect-current-password"
+  | "empty"
+export type ChangePasswordNewPasswordError =
+  | "current-matches-new"
+  | "weak-new-password"
+  | "empty"
 
 export type UseChangePasswordFormEnvironment = {
-  onSubmitted: (
+  changePassword: (
     uncheckedOldPass: string,
     newPass: Password
   ) => Promise<ChangePasswordResult>
@@ -33,46 +29,64 @@ export type UseChangePasswordFormEnvironment = {
 }
 
 export type ChangePasswordSubmission =
-  | { status: "valid"; submit: () => void; error?: undefined }
   | {
       status: "invalid"
-      submit?: undefined
-      error?: ChangePasswordErrorReason
+      currentPasswordError: ChangePasswordCurrentPasswordError | undefined
+      newPasswordError: ChangePasswordNewPasswordError | undefined
     }
-  | { status: "submitting"; submit?: undefined; error?: undefined }
+  | BaseAuthFormSubmission
 
 export type ChangePasswordFormFields = {
   currentPassword: string
   newPassword: string
-  reEnteredPassword: string
+}
+
+type ChangePasswordMutationArgs = {
+  uncheckedCurrentPassword: string
+  newPassword: Password
 }
 
 export const useChangePasswordForm = ({
-  onSubmitted,
+  changePassword,
   onSuccess
 }: UseChangePasswordFormEnvironment) => {
   const [fields, setFields] = useState({
     currentPassword: "",
-    newPassword: "",
-    reEnteredPassword: ""
+    newPassword: ""
   })
 
-  const passwordResult = Password.validate(fields.newPassword)
+  const attemptedCurrentPasswords = useRef<string[]>([])
+  const validatedNewPassword = Password.validate(fields.newPassword)
 
-  const mutation = useMutation(
-    async () => {
-      if (passwordResult) {
-        return await onSubmitted(fields.currentPassword, passwordResult)
-      }
+  const changePasswordMutation = useMutation(
+    async (args: ChangePasswordMutationArgs) => {
+      return await changePassword(
+        args.uncheckedCurrentPassword,
+        args.newPassword
+      )
     },
     {
-      onSuccess,
-      onError: () => {
+      onSuccess (result, args) {
+        if (result === "valid") {
+          onSuccess()
+        } else {
+          attemptedCurrentPasswords.current.push(args.uncheckedCurrentPassword)
+          Alert.alert(
+            "Incorrect Password",
+            "You entered your current password incorrectly, please try again.",
+            [{ text: "Ok" }]
+          )
+        }
+      },
+      onError: (_, args) => {
         Alert.alert(
           "Whoops",
           "Sorry, something went wrong when trying to change your password. Please try again.",
           [
-            { text: "Try Again", onPress: () => mutation.mutate() },
+            {
+              text: "Try Again",
+              onPress: () => changePasswordMutation.mutate(args)
+            },
             { text: "Ok" }
           ]
         )
@@ -80,117 +94,173 @@ export const useChangePasswordForm = ({
     }
   )
 
-  const getSubmission = (): ChangePasswordSubmission => {
-    if (
-      fields.currentPassword === "" &&
-      fields.newPassword === "" &&
-      fields.reEnteredPassword === ""
-    ) {
-      return { status: "invalid" }
-    } else if (fields.currentPassword === fields.newPassword) {
-      return { status: "invalid", error: "current-matches-new" }
-    } else if (fields.reEnteredPassword !== fields.newPassword) {
-      return { status: "invalid", error: "reenter-does-not-match-new" }
-    } else if (!passwordResult) {
-      return { status: "invalid", error: "weak-new-password" }
-    } else if (mutation.isLoading) {
-      return { status: "submitting" }
-    } else if (mutation.data === "incorrect-password") {
-      return { status: "invalid", error: "incorrect-current-password" }
-    } else {
-      return { status: "valid", submit: mutation.mutate }
-    }
-  }
-
   return {
     fields,
     updateField: (key: keyof ChangePasswordFormFields, value: string) => {
       setFields((fields) => ({ ...fields, [key]: value }))
     },
-    submission: getSubmission()
+    get submission (): ChangePasswordSubmission {
+      if (changePasswordMutation.isLoading) {
+        return { status: "submitting" }
+      }
+
+      const currentPasswordError = checkForCurrentPasswordError(
+        fields.currentPassword,
+        attemptedCurrentPasswords.current
+      )
+
+      const newPasswordError = checkForNewPasswordError(
+        fields.newPassword,
+        fields.currentPassword
+      )
+
+      if (newPasswordError) {
+        return { status: "invalid", newPasswordError, currentPasswordError }
+      }
+
+      if (!validatedNewPassword) {
+        return {
+          status: "invalid",
+          currentPasswordError,
+          newPasswordError: "weak-new-password"
+        }
+      }
+
+      if (currentPasswordError) {
+        return {
+          status: "invalid",
+          newPasswordError: undefined,
+          currentPasswordError
+        }
+      }
+
+      return {
+        status: "submittable",
+        submit: () => {
+          changePasswordMutation.mutate({
+            uncheckedCurrentPassword: fields.currentPassword,
+            newPassword: validatedNewPassword
+          })
+        }
+      }
+    }
+  }
+}
+
+const checkForNewPasswordError = (
+  newPassword: string,
+  currentPassword: string
+): ChangePasswordNewPasswordError | undefined => {
+  if (newPassword === "") {
+    return "empty"
+  } else if (newPassword === currentPassword) {
+    return "current-matches-new"
+  } else {
+    return undefined
+  }
+}
+
+const checkForCurrentPasswordError = (
+  currentPassword: string,
+  attemptedPasswords: string[]
+): ChangePasswordCurrentPasswordError | undefined => {
+  const isCurrentPasswordIncorrect = attemptedPasswords.find(
+    (p) => p === currentPassword
+  )
+  if (isCurrentPasswordIncorrect) {
+    return "incorrect-current-password"
+  } else if (currentPassword === "") {
+    return "empty"
+  } else {
+    return undefined
   }
 }
 
 export type ChangePasswordFormProps = {
   style?: StyleProp<ViewStyle>
   fields: ChangePasswordFormFields
-  updateField: (key: keyof ChangePasswordFormFields, value: string) => void
+  onFieldUpdated: (key: keyof ChangePasswordFormFields, value: string) => void
   submission: ChangePasswordSubmission
+  onForgotPasswordTapped: () => void
 }
 
 export const ChangePasswordFormView = ({
   style,
   fields,
-  updateField,
-  submission
+  onFieldUpdated,
+  submission,
+  onForgotPasswordTapped
 }: ChangePasswordFormProps) => {
-  const isSubmittable =
-    submission.status === "invalid" || submission.status === "submitting"
-  // Function activated on button tap
-
+  const newPasswordRef = useRef<TextFieldRefValue>(null)
   return (
-    <SafeAreaView style={[styles.flexColumn, styles.paddingIconSection]}>
-      <ScrollView>
-        <BodyText style={styles.bodyText}>
-          Your new password must at least be 8 characters and contain at least 1
-          letter, 1 number, and 1 special character.
-        </BodyText>
-
-        <PasswordTextField
-          style={styles.textField}
-          value={fields.currentPassword}
-          placeholder="Current Password"
-          error={
-            submission.error === "incorrect-current-password"
-              ? "Your old password was entered incorrectly. Please enter it again."
-              : undefined
+    <AuthFormView
+      title="Change Password"
+      description="Your new password must at least be 8 characters and contain at least 1 letter, 1 number, and 1 special character."
+      submissionTitle="Change Password"
+      submission={submission}
+      style={style}
+    >
+      <AuthShadedPasswordTextField
+        iconName="lock-closed"
+        iconBackgroundColor={AppStyles.linkColor}
+        value={fields.currentPassword}
+        autoFocus
+        placeholder="Current Password"
+        returnKeyType={Platform.OS === "android" ? "next" : undefined}
+        blurOnSubmit={false}
+        onSubmitEditing={() => {
+          // NB: Keep this Android exclusive for now as iOS has issues with this
+          // when the focus also has secureTextEntry (ie. A PasswordTextField).
+          if (Platform.OS === "android") {
+            newPasswordRef.current?.focus()
           }
-          onChangeText={(text) => updateField("currentPassword", text)}
-        />
+        }}
+        error={
+          submission.status === "invalid" &&
+          submission.currentPasswordError === "incorrect-current-password"
+            ? "Your old password was entered incorrectly. Please enter it again."
+            : undefined
+        }
+        onChangeText={(text) => onFieldUpdated("currentPassword", text)}
+        style={styles.textField}
+      />
 
-        <PasswordTextField
-          style={styles.textField}
+      <Animated.View layout={Layout.springify()}>
+        <AuthShadedPasswordTextField
+          iconName="md-key"
+          iconBackgroundColor="#14B329"
           value={fields.newPassword}
           placeholder="New Password"
+          returnKeyType="done"
+          ref={newPasswordRef}
           error={
-            submission.error === "weak-new-password"
-              ? "Your password should be at least 8 characters, and contain at least 1 capital letter, number, and special character."
-              : submission.error === "current-matches-new"
-                ? "Your new password must be different from your old password."
-                : undefined
-          }
-          onChangeText={(text) => updateField("newPassword", text)}
-        />
-
-        <PasswordTextField
-          style={styles.textField}
-          value={fields.reEnteredPassword}
-          placeholder="Re-Enter New Password"
-          error={
-            submission.error === "reenter-does-not-match-new"
-              ? "Your new password does not match, please enter it here again."
+            submission.status === "invalid"
+              ? newPasswordErrorMessage(submission.newPasswordError)
               : undefined
           }
-          onChangeText={(text) => updateField("reEnteredPassword", text)}
+          onChangeText={(text) => onFieldUpdated("newPassword", text)}
+          style={styles.textField}
         />
-
-        <TouchableOpacity>
+      </Animated.View>
+      <Animated.View layout={Layout.springify()}>
+        <TouchableOpacity onPress={onForgotPasswordTapped}>
           <Headline style={{ color: AppStyles.highlightedText }}>
             Forgot your password?
           </Headline>
         </TouchableOpacity>
-
-        <View style={styles.buttonContainer}>
-          <PrimaryButton
-            disabled={!isSubmittable}
-            style={isSubmittable ? styles.inactiveButton : styles.activeButton}
-            title="Change Password"
-            onPress={() => submission.submit?.()}
-          />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+      </Animated.View>
+    </AuthFormView>
   )
+}
+
+const newPasswordErrorMessage = (error?: ChangePasswordNewPasswordError) => {
+  if (error === "current-matches-new") {
+    return "Your new password must be different from your old password."
+  } else if (error === "weak-new-password") {
+    return "Your password should be at least 8 characters, and contain at least 1 capital letter, number, and special character."
+  } else {
+    return undefined
+  }
 }
 
 const styles = StyleSheet.create({
@@ -226,9 +296,6 @@ const styles = StyleSheet.create({
     paddingBottom: 20
   },
   textField: {
-    flex: 1,
-    fontFamily: "OpenSans",
-    padding: 10,
-    textAlign: "left"
+    marginBottom: 16
   }
 })
