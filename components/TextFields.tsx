@@ -11,6 +11,7 @@ import { TextInput } from "react-native-gesture-handler"
 import { Caption } from "./Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import { TouchableIonicon } from "./common/Icons"
+import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated"
 
 export type TextFieldRefValue = TextInput | null
 
@@ -42,7 +43,7 @@ export const TextField = forwardRef(function TextField (
           {...props}
         />
       </View>
-      <TextFieldErrorView error={error} />
+      {error && <TextFieldErrorView error={error} />}
     </View>
   )
 })
@@ -63,13 +64,13 @@ export const ShadedTextField = forwardRef(function TextField (
           {...props}
         />
       </View>
-      <TextFieldErrorView error={error} />
+      {error && <TextFieldErrorView error={error} />}
     </View>
   )
 })
 
-const TextFieldErrorView = ({ error }: { error?: ReactNode }) => (
-  <>
+const TextFieldErrorView = ({ error }: { error: ReactNode }) => (
+  <Animated.View entering={FadeInUp} exiting={FadeOutUp}>
     {typeof error === "string" || typeof error === "number"
       ? (
         <Caption style={styles.errorText}>{error}</Caption>
@@ -77,7 +78,7 @@ const TextFieldErrorView = ({ error }: { error?: ReactNode }) => (
       : (
         error
       )}
-  </>
+  </Animated.View>
 )
 
 const InternalTextField = forwardRef(function TextField (
@@ -162,7 +163,6 @@ const InternalPasswordTextField = forwardRef(function TextField (
           }
         />
       }
-      // value={isShowingPassword ? value : "•".repeat(value?.length ?? 0)}
       autoCorrect={false}
       autoCapitalize="none"
       autoComplete="password"

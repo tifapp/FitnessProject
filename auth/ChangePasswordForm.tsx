@@ -8,6 +8,7 @@ import { useMutation } from "@tanstack/react-query"
 import { AuthFormView, BaseAuthFormSubmission } from "./AuthSection"
 import { AuthShadedPasswordTextField } from "./AuthTextFields"
 import { TextFieldRefValue } from "@components/TextFields"
+import Animated, { Layout } from "react-native-reanimated"
 
 export type ChangePasswordResult = "valid" | "incorrect-password"
 
@@ -150,26 +151,30 @@ export const ChangePasswordFormView = ({
         style={styles.textField}
       />
 
-      <AuthShadedPasswordTextField
-        iconName="md-key"
-        iconBackgroundColor="#14B329"
-        value={fields.newPassword}
-        placeholder="New Password"
-        returnKeyType="done"
-        ref={newPasswordRef}
-        error={
-          submission.status === "invalid"
-            ? newPasswordErrorMessage(submission.error)
-            : undefined
-        }
-        onChangeText={(text) => updateField("newPassword", text)}
-        style={styles.textField}
-      />
-      <TouchableOpacity onPress={onForgotPasswordTapped}>
-        <Headline style={{ color: AppStyles.highlightedText }}>
-          Forgot your password?
-        </Headline>
-      </TouchableOpacity>
+      <Animated.View layout={Layout.springify()}>
+        <AuthShadedPasswordTextField
+          iconName="md-key"
+          iconBackgroundColor="#14B329"
+          value={fields.newPassword}
+          placeholder="New Password"
+          returnKeyType="done"
+          ref={newPasswordRef}
+          error={
+            submission.status === "invalid"
+              ? newPasswordErrorMessage(submission.error)
+              : undefined
+          }
+          onChangeText={(text) => updateField("newPassword", text)}
+          style={styles.textField}
+        />
+      </Animated.View>
+      <Animated.View layout={Layout.springify()}>
+        <TouchableOpacity onPress={onForgotPasswordTapped}>
+          <Headline style={{ color: AppStyles.highlightedText }}>
+            Forgot your password?
+          </Headline>
+        </TouchableOpacity>
+      </Animated.View>
     </AuthFormView>
   )
 }
