@@ -42,22 +42,14 @@ type StatusCodeMap = {
   status500: 500
 }
 
-type TiFAPIResponseObject<
-  Status extends number,
-  Schema extends AnyZodObject
-> = {
-  status: Status
-  data: z.infer<Schema>
-}
-
 /**
  * A union type mapping a status code to the infered type of a ZodSchema.
  */
 export type TiFAPIResponse<Schemas extends TiFAPIResponseSchemas> = {
-  [key in keyof StatusCodeMap]: TiFAPIResponseObject<
-    StatusCodeMap[key],
-    Schemas[key]
-  >
+  [key in keyof StatusCodeMap]: {
+    status: StatusCodeMap[key]
+    data: z.infer<Schemas[key]>
+  }
 }[keyof StatusCodeMap]
 
 const log = createLogFunction("tif.api.client")
@@ -67,28 +59,28 @@ const log = createLogFunction("tif.api.client")
  *
  * ```ts
  * const apiFetch = createTiFAPIFetch(
-      TEST_BASE_URL,
-      () => TEST_JWT
-    )
-
-    const ResponseSchema = {
-      status400: z.object({ b: z.string() }),
-      status200: z.object({ a: z.number() })
-    }
-
-    const resp = await apiFetch(
-      {
-        method: "POST",
-        endpoint: "/test",
-        query: { hello: "world", a: 1 },
-        body: { a: 1, b: "hello" }
-      },
-      ResponseSchema
-    )
-
-    if (resp.status === 200) {
-      console.log(resp.data.a) // a is inferred to be a number.
-    }
+ *   TEST_BASE_URL,
+ *   () => TEST_JWT
+ * )
+ *
+ * const ResponseSchema = {
+ *   status400: z.object({ b: z.string() }),
+ *   status200: z.object({ a: z.number() })
+ * }
+ *
+ * const resp = await apiFetch(
+ *   {
+ *     method: "POST",
+ *     endpoint: "/test",
+ *     query: { hello: "world", a: 1 },
+ *     body: { a: 1, b: "hello" }
+ *   },
+ *   ResponseSchema
+ * )
+ *
+ * if (resp.status === 200) {
+ *   console.log(resp.data.a) // a is inferred to be a number.
+ * }
  * ```
  *
  * @param baseUrl the base url of the backend to use.
@@ -120,10 +112,22 @@ export const createTiFAPIFetch = (
         body:
           request.method === "GET" ? undefined : JSON.stringify(request.body)
       })
-      const json = await resp.json()
+      const json = await loadResponseBody(resp)
+
+      if (!(`status${resp.status}` in responseSchemas)) {
+        throw new Error(
+          `TiF API responded with an unexpected status code ${
+            resp.status
+          } and body ${JSON.stringify(json)}`
+        )
+      }
       return {
         status: resp.status as StatusCodeMap[keyof StatusCodeMap],
-        data: await responseSchemas[`status${resp.status}`].parseAsync(json)
+        data: await parseResponseBody(
+          json,
+          resp.status,
+          responseSchemas[`status${resp.status}`]
+        )
       }
     } catch (error) {
       log("error", "Failed to make tif API request.", {
@@ -132,6 +136,32 @@ export const createTiFAPIFetch = (
       })
       throw error
     }
+  }
+}
+
+const parseResponseBody = async (
+  json: unknown,
+  status: number,
+  responseSchema: AnyZodObject
+) => {
+  try {
+    return await responseSchema.parseAsync(json)
+  } catch {
+    throw new Error(
+      `TiF API responded with an invalid JSON body ${JSON.stringify(
+        json
+      )} and status ${status}.`
+    )
+  }
+}
+
+const loadResponseBody = async (resp: Response) => {
+  try {
+    return await resp.json()
+  } catch {
+    throw new Error(
+      `TiF API responded with non-JSON body and status ${resp.status}.`
+    )
   }
 }
 

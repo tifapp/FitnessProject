@@ -40,6 +40,15 @@ const server = setupServer(
     } catch {
       return res(ctx.status(200), ctx.json({ a: 1 }))
     }
+  }),
+  rest.get("http://localhost:8080/test3", async (_, res, ctx) => {
+    return res(ctx.status(500), ctx.json({ b: "bad" }))
+  }),
+  rest.get("http://localhost:8080/test4", async (_, res, ctx) => {
+    return res(ctx.status(200), ctx.text("LMAO"))
+  }),
+  rest.get("http://localhost:8080/test5", async (_, res, ctx) => {
+    return res(ctx.status(200), ctx.json({ b: "bad" }))
   })
 )
 
@@ -86,5 +95,51 @@ describe("createAPIFetch tests", () => {
       status: 200,
       data: { a: 1 }
     })
+  })
+
+  test("api client fetch, response code not in schema", async () => {
+    expect(
+      apiFetch(
+        {
+          method: "GET",
+          endpoint: "/test3"
+        },
+        TestResponseSchema
+      )
+    ).rejects.toEqual(
+      new Error(
+        "TiF API responded with an unexpected status code 500 and body {\"b\":\"bad\"}"
+      )
+    )
+  })
+
+  test("api client fetch, json not returned from API", async () => {
+    expect(
+      apiFetch(
+        {
+          method: "GET",
+          endpoint: "/test4"
+        },
+        TestResponseSchema
+      )
+    ).rejects.toEqual(
+      new Error("TiF API responded with non-JSON body and status 200.")
+    )
+  })
+
+  test("api client fetch, invalid json returned from API", async () => {
+    expect(
+      apiFetch(
+        {
+          method: "GET",
+          endpoint: "/test5"
+        },
+        TestResponseSchema
+      )
+    ).rejects.toEqual(
+      new Error(
+        "TiF API responded with an invalid JSON body {\"b\":\"bad\"} and status 200."
+      )
+    )
   })
 })
