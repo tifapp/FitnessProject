@@ -3,15 +3,22 @@ import { createLogFunction } from "@lib/Logging"
 import { ToStringable } from "@lib/String"
 import { AnyZodObject, z } from "zod"
 
+export type TiFHTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE"
+
+type BaseTiFAPIRequest<Method extends TiFHTTPMethod> = {
+  method: Method
+  endpoint: `/${string}`
+  query?: { [key: string]: ToStringable }
+}
+
 /**
  * A type defining an API request to the backend.
  */
-export type TiFAPIRequest = {
-  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE"
-  endpoint: `/${string}`
-  query: { [key: string]: ToStringable }
-  body: { [key: string]: JSONSerializableValue }
-}
+export type TiFAPIRequest<Method extends TiFHTTPMethod> = Method extends "GET"
+  ? BaseTiFAPIRequest<Method>
+  : BaseTiFAPIRequest<Method> & {
+      body?: { [key: string]: JSONSerializableValue }
+    }
 
 type TiFAPIStatusCodeKey = `status${number}`
 
@@ -92,13 +99,16 @@ export const createTiFAPIFetch = (
   baseUrl: URL,
   loadAuthBearerToken: () => Promise<string | undefined>
 ) => {
-  return async <Schemas extends TiFAPIResponseSchemas>(
-    request: TiFAPIRequest,
+  return async <
+    Method extends TiFHTTPMethod,
+    Schemas extends TiFAPIResponseSchemas
+  >(
+    request: TiFAPIRequest<Method>,
     responseSchemas: Schemas
   ): Promise<TiFAPIResponse<Schemas>> => {
     try {
       const token = await loadAuthBearerToken()
-      const searchParams = queryToSearchParams(request.query)
+      const searchParams = queryToSearchParams(request.query ?? {})
       const url = `${baseUrl}${request.endpoint.slice(1)}?${searchParams}`
       const resp = await fetch(url, {
         method: request.method,
@@ -107,7 +117,8 @@ export const createTiFAPIFetch = (
           // eslint-disable-next-line @typescript-eslint/naming-convention
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(request.body)
+        body:
+          request.method === "GET" ? undefined : JSON.stringify(request.body)
       })
       const json = await resp.json()
       return {
