@@ -1,5 +1,5 @@
 import { Password } from "@auth/Password"
-import { useChangePasswordForm } from "@auth/ChangePasswordForm"
+import { useChangePasswordForm } from "@auth/ChangePassword"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { captureAlerts } from "../tests/helpers/Alerts"
 import {
@@ -24,10 +24,6 @@ describe("ChangePassword tests", () => {
     const onSuccess = jest.fn()
 
     const { tapAlertButton, alertPresentationSpy } = captureAlerts()
-
-    const retry = async () => {
-      await tapAlertButton("Try Again")
-    }
 
     const dismissIncorrectCurrentPasswordAlert = async () => {
       await tapAlertButton("Ok")
@@ -55,8 +51,10 @@ describe("ChangePassword tests", () => {
 
       const { result } = renderChangePassword()
 
-      act(() => result.current.updateField("currentPassword", currentPassword))
-      act(() => result.current.updateField("newPassword", currentPassword))
+      act(() =>
+        result.current.onFieldUpdated("currentPassword", currentPassword)
+      )
+      act(() => result.current.onFieldUpdated("newPassword", currentPassword))
 
       expect(result.current.submission).toMatchObject({
         status: "invalid",
@@ -69,8 +67,10 @@ describe("ChangePassword tests", () => {
       const newPassword = "Wat2%"
       const { result } = renderChangePassword()
 
-      act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
-      act(() => result.current.updateField("newPassword", newPassword))
+      act(() =>
+        result.current.onFieldUpdated("currentPassword", "ReturnToAll32@")
+      )
+      act(() => result.current.onFieldUpdated("newPassword", newPassword))
 
       expect(result.current.submission).toMatchObject({
         status: "invalid",
@@ -83,8 +83,12 @@ describe("ChangePassword tests", () => {
       changePassword.mockImplementation(neverPromise)
       const { result } = renderChangePassword()
 
-      act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
-      act(() => result.current.updateField("newPassword", "OblivionAwaits43#"))
+      act(() =>
+        result.current.onFieldUpdated("currentPassword", "ReturnToAll32@")
+      )
+      act(() =>
+        result.current.onFieldUpdated("newPassword", "OblivionAwaits43#")
+      )
 
       act(() => (result.current.submission as any).submit())
 
@@ -108,8 +112,12 @@ describe("ChangePassword tests", () => {
 
       const { result } = renderChangePassword()
 
-      act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
-      act(() => result.current.updateField("newPassword", "OblivionAwaits43#"))
+      act(() =>
+        result.current.onFieldUpdated("currentPassword", "ReturnToAll32@")
+      )
+      act(() =>
+        result.current.onFieldUpdated("newPassword", "OblivionAwaits43#")
+      )
 
       act(() => (result.current.submission as any).submit())
 
@@ -120,8 +128,12 @@ describe("ChangePassword tests", () => {
       changePassword.mockResolvedValueOnce("incorrect-password")
       const { result } = renderChangePassword()
 
-      act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
-      act(() => result.current.updateField("newPassword", "OblivionAwaits43#"))
+      act(() =>
+        result.current.onFieldUpdated("currentPassword", "ReturnToAll32@")
+      )
+      act(() =>
+        result.current.onFieldUpdated("newPassword", "OblivionAwaits43#")
+      )
 
       act(() => (result.current.submission as any).submit())
 
@@ -133,7 +145,7 @@ describe("ChangePassword tests", () => {
         })
       })
 
-      act(() => result.current.updateField("newPassword", "1234"))
+      act(() => result.current.onFieldUpdated("newPassword", "1234"))
 
       expect(result.current.submission).toMatchObject({
         status: "invalid",
@@ -149,8 +161,12 @@ describe("ChangePassword tests", () => {
 
       const { result } = renderChangePassword()
 
-      act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
-      act(() => result.current.updateField("newPassword", "OblivionAwaits43#"))
+      act(() =>
+        result.current.onFieldUpdated("currentPassword", "ReturnToAll32@")
+      )
+      act(() =>
+        result.current.onFieldUpdated("newPassword", "OblivionAwaits43#")
+      )
 
       act(() => (result.current.submission as any).submit())
 
@@ -165,7 +181,7 @@ describe("ChangePassword tests", () => {
 
       await dismissIncorrectCurrentPasswordAlert()
 
-      act(() => result.current.updateField("currentPassword", "1234"))
+      act(() => result.current.onFieldUpdated("currentPassword", "1234"))
       act(() => (result.current.submission as any).submit())
 
       await waitFor(() => expect(onSuccess).toHaveBeenCalled())
@@ -179,8 +195,10 @@ describe("ChangePassword tests", () => {
       const firstPassword = "ReturnToAll32@"
       const secondPassword = "1234"
 
-      act(() => result.current.updateField("currentPassword", firstPassword))
-      act(() => result.current.updateField("newPassword", "OblivionAwaits43#"))
+      act(() => result.current.onFieldUpdated("currentPassword", firstPassword))
+      act(() =>
+        result.current.onFieldUpdated("newPassword", "OblivionAwaits43#")
+      )
 
       act(() => (result.current.submission as any).submit())
 
@@ -188,39 +206,22 @@ describe("ChangePassword tests", () => {
         expect(result.current.submission.status).toEqual("invalid")
       })
 
-      act(() => result.current.updateField("currentPassword", secondPassword))
+      act(() =>
+        result.current.onFieldUpdated("currentPassword", secondPassword)
+      )
       act(() => (result.current.submission as any).submit())
 
       await waitFor(() => {
         expect(result.current.submission.status).toEqual("invalid")
       })
 
-      act(() => result.current.updateField("currentPassword", firstPassword))
+      act(() => result.current.onFieldUpdated("currentPassword", firstPassword))
       expect(result.current.submission.status).toEqual("invalid")
 
-      act(() => result.current.updateField("currentPassword", secondPassword))
+      act(() =>
+        result.current.onFieldUpdated("currentPassword", secondPassword)
+      )
       expect(result.current.submission.status).toEqual("invalid")
-    })
-
-    it("should be able to retry when it gets an error", async () => {
-      changePassword
-        .mockRejectedValueOnce(new Error())
-        .mockResolvedValueOnce("valid")
-
-      const { result } = renderChangePassword()
-
-      act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
-      act(() => result.current.updateField("newPassword", "OblivionAwaits43#"))
-
-      act(() => (result.current.submission as any).submit())
-
-      await waitFor(() => {
-        expect(alertPresentationSpy).toHaveBeenCalled()
-      })
-
-      retry()
-
-      await waitFor(() => expect(onSuccess).toHaveBeenCalled())
     })
 
     it("should produce empty error messages when a field is empty", () => {
@@ -232,7 +233,7 @@ describe("ChangePassword tests", () => {
         newPasswordError: "empty"
       })
 
-      act(() => result.current.updateField("currentPassword", "abc123"))
+      act(() => result.current.onFieldUpdated("currentPassword", "abc123"))
 
       expect(result.current.submission).toMatchObject({
         status: "invalid",

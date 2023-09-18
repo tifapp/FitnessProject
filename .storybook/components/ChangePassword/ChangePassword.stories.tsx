@@ -45,7 +45,7 @@ export const Basic: ChangePasswordStory = () => (
 
 const ChangePasswordScreen = () => {
   const form = useChangePasswordForm({
-    onSubmitted: async () => await delayData("incorrect-password", 1500),
+    changePassword: async () => await delayData("incorrect-password", 1500),
     onSuccess: () => console.log("Success")
   })
   return (

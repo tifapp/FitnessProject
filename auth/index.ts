@@ -1,4 +1,4 @@
-export * from "./ChangePasswordForm"
+export * from "./ChangePassword"
 export * from "./Password"
 export * from "./VerifyCode"
 export * from "./Email"
