@@ -34,6 +34,9 @@ import SignUpMeta, {
 import VerifcationCodeMeta, {
   Basic as VerifcationCodeBasic
 } from "../components/VerificationCode/VerifyCode.stories"
+import ChangePasswordMeta, {
+  Basic as ChangePasswordBasic
+} from "../components/ChangePassword/ChangePassword.stories"
 
 // Create an array of stories
 const stories = [
@@ -86,6 +89,11 @@ const stories = [
     name: VerifcationCodeMeta.title,
     component: VerifcationCodeBasic,
     args: VerifcationCodeMeta.args
+  },
+  {
+    name: ChangePasswordMeta.title,
+    component: ChangePasswordBasic,
+    args: ChangePasswordMeta.args
   }
   // Add more stories here...
 ]

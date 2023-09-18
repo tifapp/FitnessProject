@@ -1,9 +1,10 @@
-import React from "react"
+import React, { forwardRef } from "react"
 import {
   ShadedPasswordTextField,
   ShadedTextField,
   PasswordTextFieldProps,
-  TextFieldProps
+  TextFieldProps,
+  TextFieldRef
 } from "@components/TextFields"
 import { CircularIonicon, IoniconName } from "@components/common/Icons"
 import { StyleProp, ViewStyle } from "react-native"
@@ -18,15 +19,14 @@ export type AuthShadedTextFieldProps = {
 /**
  * A filled text field matching the style of the auth screens.
  */
-export const AuthShadedTextField = ({
-  iconName,
-  iconBackgroundColor,
-  style,
-  ...props
-}: AuthShadedTextFieldProps) => {
+export const AuthShadedTextField = forwardRef(function TextField (
+  { iconName, iconBackgroundColor, style, ...props }: AuthShadedTextFieldProps,
+  ref: TextFieldRef
+) {
   const textFieldHeight = 32 * useFontScale()
   return (
     <ShadedTextField
+      ref={ref}
       leftAddon={
         <CircularIonicon
           backgroundColor={iconBackgroundColor}
@@ -39,7 +39,7 @@ export const AuthShadedTextField = ({
       textStyle={{ height: textFieldHeight }}
     />
   )
-}
+})
 
 export type AuthShadedPasswordTextFieldProps = {
   iconName: IoniconName
@@ -50,15 +50,19 @@ export type AuthShadedPasswordTextFieldProps = {
 /**
  * A filled password text field matching the style of the auth screens.
  */
-export const AuthShadedPasswordTextField = ({
-  iconName,
-  iconBackgroundColor,
-  style,
-  ...props
-}: AuthShadedPasswordTextFieldProps) => {
+export const AuthShadedPasswordTextField = forwardRef(function TextField (
+  {
+    iconName,
+    iconBackgroundColor,
+    style,
+    ...props
+  }: AuthShadedPasswordTextFieldProps,
+  ref: TextFieldRef
+) {
   const textFieldHeight = 32 * useFontScale()
   return (
     <ShadedPasswordTextField
+      ref={ref}
       leftAddon={
         <CircularIonicon
           backgroundColor={iconBackgroundColor}
@@ -71,4 +75,4 @@ export const AuthShadedPasswordTextField = ({
       textStyle={{ height: textFieldHeight }}
     />
   )
-}
+})
