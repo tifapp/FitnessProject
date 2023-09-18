@@ -90,7 +90,7 @@ const HandleScreen = () => {
   return (
     <SignUpChangeUserHandleFormView
       {...methods}
-      onHandleTextChanged={methods.handleTextChanged}
+      onHandleTextChanged={methods.onHandleTextChanged}
     />
   )
 }

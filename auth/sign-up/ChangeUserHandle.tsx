@@ -1,19 +1,13 @@
-import { AuthFormView, BaseAuthFormSubmission } from "@auth/AuthSection"
+import { AuthFormView } from "@auth/AuthSection"
 import { AuthShadedTextField } from "@auth/AuthTextFields"
 import { Ionicon } from "@components/common/Icons"
+import { useFormSubmission } from "@hooks/FormHooks"
 import { sleep } from "@lib/DelayData"
 import { QueryHookOptions } from "@lib/ReactQuery"
 import { UserHandleError, UserHandle } from "@lib/users"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import React, { useState } from "react"
 import { ActivityIndicator, Alert, StyleProp, ViewStyle } from "react-native"
-
-export type SignUpChangeUserHandleSubmission =
-  | {
-      status: "invalid"
-      reason: UserHandleError
-    }
-  | BaseAuthFormSubmission
 
 export type UseSignUpChangeUserHandleFormEnvironment = {
   checkIfUserHandleTaken: (
@@ -58,34 +52,34 @@ export const useSignUpChangeUserHandleForm = (
     }
   )
 
-  const changeHandleMutation = useMutation(changeUserHandle, {
-    onSuccess,
-    onError: () => {
-      Alert.alert("Oh No!", "Something went wrong, please try again.")
-    }
-  })
-
   return {
     handleText,
-    handleTextChanged: (handleText: string) => {
+    onHandleTextChanged: (handleText: string) => {
       handleTakenCheck.cancel()
       setHandleText(handleText)
     },
     isPerformingUserHandleTakenCheck: handleTakenCheck.query.isFetching,
-    get submission (): SignUpChangeUserHandleSubmission {
-      if (changeHandleMutation.isLoading) {
-        return { status: "submitting" }
-      } else if (!parsedHandle) {
-        return { status: "invalid", reason: parseHandleError }
-      } else if (handleTakenCheck.query.data) {
-        return { status: "invalid", reason: "already-taken" }
-      } else {
-        return {
-          status: "submittable",
-          submit: () => changeHandleMutation.mutate(parsedHandle)
+    submission: useFormSubmission(
+      changeUserHandle,
+      () => {
+        if (!parsedHandle) {
+          return { status: "invalid", reason: parseHandleError } as const
+        } else if (handleTakenCheck.query.data) {
+          return { status: "invalid", reason: "already-taken" } as const
+        } else {
+          return {
+            status: "submittable",
+            submissionValues: parsedHandle
+          }
+        }
+      },
+      {
+        onSuccess,
+        onError: () => {
+          Alert.alert("Oh No!", "Something went wrong, please try again.")
         }
       }
-    }
+    )
   }
 }
 
@@ -109,12 +103,8 @@ const useCheckIfHandleTakenQuery = (
 }
 
 export type SignUpChangeUserHandleFormProps = {
-  isPerformingUserHandleTakenCheck: boolean
-  submission: SignUpChangeUserHandleSubmission
-  handleText: string
-  onHandleTextChanged: (handleText: string) => void
   style?: StyleProp<ViewStyle>
-}
+} & ReturnType<typeof useSignUpChangeUserHandleForm>
 
 /**
  * A view which allows the user optionally edit their user handle during sign up.

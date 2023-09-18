@@ -18,14 +18,14 @@ describe("SignUpChangeUserHandle tests", () => {
 
       const { result } = renderUseSignUpChangeUserHandle("elon_musk", 300)
 
-      act(() => result.current.handleTextChanged("musk_elon"))
+      act(() => result.current.onHandleTextChanged("musk_elon"))
       expect(result.current.handleText).toEqual("musk_elon")
       expect(result.current.isPerformingUserHandleTakenCheck).toEqual(true)
 
       act(() => jest.advanceTimersByTime(150))
       expect(result.current.submission.status).toEqual("submittable")
 
-      act(() => result.current.handleTextChanged("melon_husk"))
+      act(() => result.current.onHandleTextChanged("melon_husk"))
       expect(result.current.handleText).toEqual("melon_husk")
 
       act(() => jest.advanceTimersByTime(150))
@@ -53,7 +53,7 @@ describe("SignUpChangeUserHandle tests", () => {
     it("should be in an invalid state when invalid user handle text is entered", () => {
       const { result } = renderUseSignUpChangeUserHandle("bichell_dickle", 200)
 
-      act(() => result.current.handleTextChanged("bitchell_di:"))
+      act(() => result.current.onHandleTextChanged("bitchell_di:"))
       expect(result.current.submission).toMatchObject({
         status: "invalid",
         reason: "bad-format"
@@ -81,7 +81,7 @@ describe("SignUpChangeUserHandle tests", () => {
       checkIfUserHandleTaken.mockResolvedValueOnce(false)
       const { result } = renderUseSignUpChangeUserHandle("bichell_dickle", 200)
 
-      act(() => result.current.handleTextChanged(handleTextToSubmit))
+      act(() => result.current.onHandleTextChanged(handleTextToSubmit))
       act(() => (result.current.submission as any).submit())
       await waitFor(() => expect(onSuccess).toHaveBeenCalled())
     })
