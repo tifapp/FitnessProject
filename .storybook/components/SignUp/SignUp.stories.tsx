@@ -59,13 +59,8 @@ export const Basic: SignUpStory = () => (
 )
 
 const CredentialsScreen = () => {
-  const [focus, setFocus] =
-    useState<SignUpCredentialsFormFocusField | undefined>(undefined)
-  console.log(focus)
   return (
     <SignUpCredentialsFormView
-      focusField={focus}
-      onFocusFieldChanged={setFocus}
       onTermsAndConditionsTapped={() => console.log("terms and conditions")}
       onPrivacyPolicyTapped={() => console.log("privacy policy")}
     />
