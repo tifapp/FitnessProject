@@ -1,6 +1,4 @@
-import { Amplify } from "aws-amplify"
 import * as ExpoSecureStore from "expo-secure-store"
-import { AsyncStorage } from "react-native"
 
 export type SecureStorage = typeof ExpoSecureStore
 
@@ -14,6 +12,7 @@ export class AmplifySecureStorage<Store extends SecureStorage> {
 
   constructor (store: Store) {
     this.store = store
+    this.keyList = []
   }
 
   setItem (key: string, value: string) {
@@ -61,8 +60,6 @@ export class AmplifySecureStorage<Store extends SecureStorage> {
   }
 }
 
-const keyList = AmplifySecureStorage.JSON.parse
-
-Amplify.configure({
-  storage: AmplifySecureStorage
-})
+// Amplify.configure({
+//   storage: AmplifySecureStorage
+// })
