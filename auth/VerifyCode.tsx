@@ -1,4 +1,4 @@
-import { AuthFormView, BaseAuthFormSubmission } from "@auth/AuthSection"
+import { AuthFormView } from "@auth/AuthSection"
 import { AuthShadedTextField } from "@auth/AuthTextFields"
 import { BodyText } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
@@ -7,20 +7,9 @@ import React, { useRef, useState } from "react"
 import { StyleProp, ViewStyle, StyleSheet, Alert, View } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { TextToastView } from "@components/common/Toasts"
+import { useFormSubmission } from "@hooks/FormHooks"
 
 export type AuthResendVerificationCodeStatus = "success" | "error"
-
-export type AuthVerificationCodeFormInvalidReason =
-  | "code-too-short"
-  | "code-too-long"
-  | "invalid-code"
-
-export type AuthVerificationCodeFormSubmission =
-  | {
-      status: "invalid"
-      reason: AuthVerificationCodeFormInvalidReason
-    }
-  | BaseAuthFormSubmission
 
 export type UseAuthVerificationCodeFormEnvironment = {
   resendCode: () => Promise<void>
@@ -39,25 +28,6 @@ export const useAuthVerificationCodeForm = ({
   const [code, setCode] = useState("")
   const attemptedCodesRef = useRef<string[]>([])
   const resendCodeMutation = useMutation(resendCode)
-  const checkCodeMutation = useMutation(checkCode, {
-    onSuccess: (isValidCode: boolean, code: string) => {
-      if (isValidCode) {
-        onSuccess()
-      } else {
-        Alert.alert(
-          "Invalid Code",
-          `${code} is an invalid code, please try again.`
-        )
-        attemptedCodesRef.current.push(code)
-      }
-    },
-    onError: () => {
-      Alert.alert(
-        "Whoops!",
-        "Something went wrong trying to submit your code. Please try again."
-      )
-    }
-  })
   const isInvalidCode = !!attemptedCodesRef.current.find((c) => code === c)
   return {
     code,
@@ -66,36 +36,52 @@ export const useAuthVerificationCodeForm = ({
       resendCodeMutation.isError || resendCodeMutation.isSuccess
         ? resendCodeMutation.status
         : undefined,
-    onCodeResent: resendCodeMutation.mutate,
-    get submission (): AuthVerificationCodeFormSubmission {
-      if (isInvalidCode) {
-        return { status: "invalid", reason: "invalid-code" }
-      } else if (checkCodeMutation.isLoading) {
-        return { status: "submitting" }
-      } else if (code.length === 6) {
+    onCodeResent: () => resendCodeMutation.mutate(),
+    submission: useFormSubmission(
+      checkCode,
+      () => {
+        if (isInvalidCode) {
+          return { status: "invalid", reason: "invalid-code" } as const
+        }
+        if (code.length !== 6) {
+          return {
+            status: "invalid",
+            reason: code.length < 6 ? "code-too-short" : "code-too-long"
+          } as const
+        }
         return {
           status: "submittable",
-          submit: () => checkCodeMutation.mutate(code)
+          submissionValues: code
         }
-      } else {
-        return {
-          status: "invalid",
-          reason: code.length < 6 ? "code-too-short" : "code-too-long"
+      },
+      {
+        onSuccess: (isValidCode: boolean, code: string) => {
+          if (isValidCode) {
+            onSuccess()
+          } else {
+            Alert.alert(
+              "Invalid Code",
+              `${code} is an invalid code, please try again.`
+            )
+            attemptedCodesRef.current.push(code)
+          }
+        },
+        onError: () => {
+          Alert.alert(
+            "Whoops!",
+            "Something went wrong trying to submit your code. Please try again."
+          )
         }
       }
-    }
+    )
   }
 }
 
 export type AuthVerificationCodeProps = {
   code: string
-  onCodeChanged: (code: string) => void
-  submission: AuthVerificationCodeFormSubmission
-  resendCodeStatus?: AuthResendVerificationCodeStatus
-  onCodeResent: () => void
   codeReceiverName: string
   style?: StyleProp<ViewStyle>
-}
+} & ReturnType<typeof useAuthVerificationCodeForm>
 
 /**
  * A view for the user to verify their account with a 2FA code during auth flows
@@ -156,7 +142,7 @@ export const AuthVerificationCodeFormView = ({
 )
 
 const errorMessageForInvalidSubmissionReason = (
-  reason: AuthVerificationCodeFormInvalidReason
+  reason: "code-too-short" | "code-too-long" | "invalid-code"
 ) => {
   if (reason === "invalid-code") {
     return "The code you have entered is invalid, please try again."

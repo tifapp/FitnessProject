@@ -21,7 +21,7 @@ export type BaseAuthFormSubmission =
   | { status: "submittable"; submit: () => void }
   | { status: "submitting" }
 
-export type AuthFormProps<Submission extends { status: string }> = {
+export type AuthFormProps<Submission extends { status: "invalid" }> = {
   title: string
   description: string
   children: ReactNode
@@ -37,7 +37,7 @@ export type AuthFormProps<Submission extends { status: string }> = {
  * It automatically includes a title, description, a call to action at the bottom with an optional
  * footer above it, and handles weird scrolling behaviors.
  */
-export const AuthFormView = <Submission extends { status: string }>({
+export const AuthFormView = <Submission extends { status: "invalid" }>({
   submission,
   submissionTitle,
   ...props
@@ -47,7 +47,7 @@ export const AuthFormView = <Submission extends { status: string }>({
       isCallToActionDisabled={submission.status !== "submittable"}
       onCallToActionTapped={() => {
         if (submission.status === "submittable") {
-          ;(submission as { submit: () => void }).submit()
+          submission.submit()
         }
       }}
       {...props}
