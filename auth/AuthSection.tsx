@@ -1,6 +1,7 @@
 import { Title, BodyText } from "@components/Text"
 import { PrimaryButton } from "@components/common/Buttons"
 import { useKeyboardState } from "@hooks/Keyboard"
+import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { useHeaderHeight } from "@react-navigation/stack"
 import React, { ReactNode, useState } from "react"
 import {
@@ -12,6 +13,7 @@ import {
   StyleSheet
 } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
+import Animated from "react-native-reanimated"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 /**
@@ -114,15 +116,17 @@ export const AuthSectionView = ({
           onLayout={(e) => setFooterHeight(e.nativeEvent.layout.height)}
         >
           {footer}
-          <PrimaryButton
-            title={callToActionTitle}
-            style={[
-              styles.callToActionButton,
-              { opacity: isCallToActionDisabled ? 0.5 : 1 }
-            ]}
-            disabled={isCallToActionDisabled}
-            onPressIn={onCallToActionTapped}
-          />
+          <Animated.View layout={TiFDefaultLayoutTransition}>
+            <PrimaryButton
+              title={callToActionTitle}
+              style={[
+                styles.callToActionButton,
+                { opacity: isCallToActionDisabled ? 0.5 : 1 }
+              ]}
+              disabled={isCallToActionDisabled}
+              onPressIn={onCallToActionTapped}
+            />
+          </Animated.View>
         </View>
       </KeyboardAvoidingView>
     </View>

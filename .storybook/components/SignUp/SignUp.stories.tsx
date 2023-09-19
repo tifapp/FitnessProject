@@ -9,10 +9,10 @@ import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import {
   SignUpChangeUserHandleFormView,
-  SignUpCredentialsFormFocusField,
   SignUpCredentialsFormView,
   SignUpEndingView,
-  useSignUpChangeUserHandleForm
+  useSignUpChangeUserHandleForm,
+  useSignUpCredentialsForm
 } from "@auth/sign-up"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { Button, View } from "react-native"
@@ -59,8 +59,16 @@ export const Basic: SignUpStory = () => (
 )
 
 const CredentialsScreen = () => {
+  const form = useSignUpCredentialsForm({
+    createAccount: async () => {
+      await sleep(2000)
+      throw new Error("Died")
+    },
+    onSuccess: () => console.log("Success")
+  })
   return (
     <SignUpCredentialsFormView
+      {...form}
       onTermsAndConditionsTapped={() => console.log("terms and conditions")}
       onPrivacyPolicyTapped={() => console.log("privacy policy")}
     />

@@ -4,6 +4,12 @@ import { EmailAddress } from "./Email"
 
 export type EmailPhoneTextType = "email" | "phone"
 
+export const toggleEmailPhoneTextType = (
+  textType: EmailPhoneTextType
+): EmailPhoneTextType => {
+  return textType === "email" ? "phone" : "email"
+}
+
 /**
  * A hook that enabled seemless text editing for text fields that require
  * either email or phone number input.
