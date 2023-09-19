@@ -21,11 +21,11 @@ describe("useEmailPhoneTextState tests", () => {
     expect(result.current.text).toEqual("john@gmail.com")
     expect(result.current.parsedValue).toBeInstanceOf(EmailAddress)
 
-    act(() => result.current.switchActiveTextTypeTo("phone"))
+    act(() => result.current.toggleActiveTextType())
     expect(result.current.text).toEqual("1234567890")
     expect(result.current.parsedValue).toBeInstanceOf(USPhoneNumber)
 
-    act(() => result.current.switchActiveTextTypeTo("email"))
+    act(() => result.current.toggleActiveTextType())
     expect(result.current.text).toEqual("john@gmail.com")
     expect(result.current.parsedValue).toBeInstanceOf(EmailAddress)
   })

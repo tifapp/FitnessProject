@@ -4,6 +4,14 @@ import { EmailAddress } from "./Email"
 
 export type EmailPhoneTextType = "email" | "phone"
 
+const toggleTextType = (textType: EmailPhoneTextType): EmailPhoneTextType => {
+  return textType === "email" ? "phone" : "email"
+}
+
+const textTypeParser = (textType: EmailPhoneTextType) => {
+  return textType === "email" ? EmailAddress : USPhoneNumber
+}
+
 /**
  * A hook that enabled seemless text editing for text fields that require
  * either email or phone number input.
@@ -11,24 +19,17 @@ export type EmailPhoneTextType = "email" | "phone"
  * @param initialTextType Used to choose whether the email text or phone text is active first.
  */
 export const useEmailPhoneTextState = (initialTextType: EmailPhoneTextType) => {
-  const [emailText, setEmailText] = useState("")
-  const [phoneNumberText, setPhoneNumberText] = useState("")
-  const [activeTextType, switchActiveTextTypeTo] =
-    useState<EmailPhoneTextType>(initialTextType)
+  const [text, setText] = useState({ email: "", phone: "" })
+  const [activeTextType, setTextType] = useState(initialTextType)
+  const activeText = text[activeTextType]
   return {
-    text: activeTextType === "email" ? emailText : phoneNumberText,
+    text: activeText,
     onTextChanged: (text: string) => {
-      if (activeTextType === "phone") {
-        setPhoneNumberText(text)
-      } else {
-        setEmailText(text)
-      }
+      setText((t) => ({ ...t, [activeTextType]: text }))
     },
     activeTextType,
-    switchActiveTextTypeTo,
-    parsedValue:
-      activeTextType === "phone"
-        ? USPhoneNumber.parse(phoneNumberText)
-        : EmailAddress.parse(emailText)
+    switchActiveTextTypeTo: setTextType,
+    toggleActiveTextType: () => setTextType(toggleTextType),
+    parsedValue: textTypeParser(activeTextType).parse(activeText)
   }
 }
