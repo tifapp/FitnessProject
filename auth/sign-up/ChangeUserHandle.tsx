@@ -119,7 +119,7 @@ export const SignUpChangeUserHandleFormView = ({
   style
 }: SignUpChangeUserHandleFormProps) => (
   <AuthFormView
-    title="Pick your Username"
+    title="1"
     description="We have created a username for you, but you can customize it if you don't like it. It's also possible to change it later if you want to."
     submissionTitle="I like this name!"
     submission={submission}

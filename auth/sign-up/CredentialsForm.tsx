@@ -30,7 +30,7 @@ export type UseSignUpCredentialsFormEnvironment = {
     emailOrPhoneNumber: EmailAddress | USPhoneNumber,
     uncheckedPassword: string
   ) => Promise<void>
-  onSuccess: () => void
+  onSuccess: (emailOrPhoneNumber: EmailAddress | USPhoneNumber) => void
 }
 
 /**
@@ -103,7 +103,7 @@ export const useSignUpCredentialsForm = ({
         } as const
       },
       {
-        onSuccess,
+        onSuccess: (_, args) => onSuccess(args.emailOrPhoneNumber),
         onError: () => {
           Alert.alert(
             "Whoops!",
