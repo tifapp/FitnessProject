@@ -1,4 +1,4 @@
-import { SECURE_STORAGE_KEY_PREFIX, SecureStorage } from "@lib/SecureStorage"
+import { SecureStorage } from "@lib/SecureStorage"
 import * as ExpoSecureStore from "expo-secure-store"
 
 export class TestSecureStorage implements SecureStorage {
@@ -63,7 +63,7 @@ export class TestSecureStorage implements SecureStorage {
     value: string,
     options?: ExpoSecureStore.SecureStoreOptions | undefined
   ) {
-    this.TestAmplifyStore.set(SECURE_STORAGE_KEY_PREFIX + key, value)
+    this.TestAmplifyStore.set(key, value)
   }
 
   async getItemAsync (key: string) {
@@ -75,7 +75,7 @@ export class TestSecureStorage implements SecureStorage {
   }
 
   async deleteItemAsync (key: string) {
-    this.TestAmplifyStore.delete(SECURE_STORAGE_KEY_PREFIX + key)
+    this.TestAmplifyStore.delete(key)
   }
 
   async isAvailableAsync () {

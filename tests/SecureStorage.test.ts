@@ -21,14 +21,22 @@ describe("SecureStorage tests", () => {
 
     expect(TestStorage2.getItem(TEST_STORAGE_KEY + "2")).toBeUndefined()
 
-    TestStorage2.sync()
+    await TestStorage2.sync()
+
     expect(TestStorage2.getItem(TEST_STORAGE_KEY + "2")).toEqual("Test Value 2")
   })
-  // test("if the secure storage can clear all data, and when trying to access it, no data can be found", async () => {
-  //   TestSecureStorage.setItem(TEST_STORAGE_KEY, "Test Value")
-  //   TestSecureStorage.removeItem(TEST_STORAGE_KEY)
-  //   const result = TestSecureStorage.getItem(TEST_STORAGE_KEY)
-  //   expect(result).toBeUndefined()
-  //   TestSecureStorage.removeItem(TEST_STORAGE_KEY)
-  // })
+  test("if the secure storage can clear all data, and when trying to access it, no data can be found", async () => {
+    const sharedStorage = new TestSecureStorage()
+    const TestStorage1 = new AmplifySecureStorage(sharedStorage)
+
+    TestStorage1.setItem(TEST_STORAGE_KEY, "Test Value")
+    TestStorage1.setItem(TEST_STORAGE_KEY + "2", "Test Value 2")
+    expect(TestStorage1.getItem(TEST_STORAGE_KEY)).toEqual("Test Value")
+
+    await TestStorage1.clear()
+
+    expect(TestStorage1.getItem(TEST_STORAGE_KEY)).toBeUndefined()
+
+    expect(TestStorage1.getItem(TEST_STORAGE_KEY + "2")).toBeUndefined()
+  })
 })
