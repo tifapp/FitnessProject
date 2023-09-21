@@ -1,10 +1,13 @@
-import * as ExpoSecureStore from "expo-secure-store"
-
-export type SecureStorage = typeof ExpoSecureStore
+export interface SecureStore {
+  getItemAsync(key: string): Promise<string | null>
+  deleteItemAsync(key: string): Promise<void>
+  setItemAsync(key: string, value: string): Promise<void>
+}
 
 export const SECURE_STORAGE_KEY_PREFIX = "@SecureStorage:"
+export const KEYLIST_PREFIX = "KeyList"
 
-export class AmplifySecureStorage<Store extends SecureStorage> {
+export class AmplifySecureStorage<Store extends SecureStore> {
   private syncPromise?: Promise<void>
   private store: Store
   private keyList: string[]
@@ -20,7 +23,7 @@ export class AmplifySecureStorage<Store extends SecureStorage> {
       this.keyList.push(key)
     }
     this.cache.set(SECURE_STORAGE_KEY_PREFIX + key, value)
-    this.store.setItemAsync("KeyList", JSON.stringify(this.keyList))
+    this.store.setItemAsync(KEYLIST_PREFIX, JSON.stringify(this.keyList))
     this.store.setItemAsync(SECURE_STORAGE_KEY_PREFIX + key, value)
   }
 
@@ -30,7 +33,7 @@ export class AmplifySecureStorage<Store extends SecureStorage> {
 
   removeItem (key: string) {
     this.keyList = this.keyList.filter((k) => k !== key)
-    this.store.setItemAsync("KeyList", JSON.stringify(this.keyList))
+    this.store.setItemAsync(KEYLIST_PREFIX, JSON.stringify(this.keyList))
     this.cache.delete(SECURE_STORAGE_KEY_PREFIX + key)
     this.store.deleteItemAsync(SECURE_STORAGE_KEY_PREFIX + key)
   }
@@ -50,7 +53,7 @@ export class AmplifySecureStorage<Store extends SecureStorage> {
     if (this.syncPromise) {
       return await this.syncPromise
     }
-    const result = await this.store.getItemAsync("KeyList")
+    const result = await this.store.getItemAsync(KEYLIST_PREFIX)
     if (result) {
       this.keyList = JSON.parse(result)
     }
@@ -66,7 +69,3 @@ export class AmplifySecureStorage<Store extends SecureStorage> {
     )
   }
 }
-
-// Amplify.configure({
-//   storage: AmplifySecureStorage
-// })

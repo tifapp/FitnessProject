@@ -1,7 +1,7 @@
-import { SecureStorage } from "@lib/SecureStorage"
+import { SecureStore } from "@lib/SecureStorage"
 import * as ExpoSecureStore from "expo-secure-store"
 
-export class TestSecureStorage implements SecureStorage {
+export class TestSecureStorage implements SecureStore {
   private TestAmplifyStore = new Map<string, string>()
 
   // @needsAudit
@@ -67,11 +67,7 @@ export class TestSecureStorage implements SecureStorage {
   }
 
   async getItemAsync (key: string) {
-    let result = this.TestAmplifyStore.get(key) || null
-    if (!result) {
-      result = null
-    }
-    return result
+    return this.TestAmplifyStore.get(key) ?? null
   }
 
   async deleteItemAsync (key: string) {
