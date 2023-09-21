@@ -14,9 +14,21 @@ describe("PhoneNumber tests", () => {
       expect(USPhoneNumber.parse("123456789012345")).toBeUndefined()
     })
 
-    it("should only allow parse phone numbers with exactly 10 digits", () => {
-      expect(USPhoneNumber.parse("1234567890")?.toString()).toEqual(
-        "1234567890"
+    it("should parse phone numbers with exactly 10 digits", () => {
+      expect(USPhoneNumber.parse("1234567890")?.e164Formatted).toEqual(
+        "+11234567890"
+      )
+    })
+
+    it("should allow phone numbers in the format (***) ***-****", () => {
+      expect(USPhoneNumber.parse("(123) 456-7890")?.e164Formatted).toEqual(
+        "+11234567890"
+      )
+    })
+
+    it("should parse e.164 formatted phone numbers", () => {
+      expect(USPhoneNumber.parse("+11234567890")?.e164Formatted).toEqual(
+        "+11234567890"
       )
     })
 

@@ -10,14 +10,17 @@ export class USPhoneNumber {
     this.rawValue = rawValue
   }
 
-  private static REGEX = /^\d{10}$/
-
   /**
-   * Formats this phone number in a way such that it can be used on privacy
-   * centric screens (eg. verification code, settings).
+   * Pretty formats this phone number with only the last 4 digits shown.
+   *
+   * `1234567890 -> (***) ***-7890`
    */
   get formattedForPrivacy () {
     return `(***) ***-${this.rawValue.substring(6)}`
+  }
+
+  get e164Formatted () {
+    return `+1${this.rawValue}`
   }
 
   toString () {
@@ -28,11 +31,23 @@ export class USPhoneNumber {
    * Attempts to parse an {@link USPhoneNumber} from a raw string and returns undefined
    * if it fails to parse the string.
    *
-   * A valid phone number string is precisely an exact 10 character, numerical string.
+   * Ex.
+   *
+   * `1234567890 ✅`
+   *
+   * `+11234567890 ✅`
+   *
+   * `(123) 456-7890 ✅`
    */
   static parse (rawValue: string) {
-    return USPhoneNumber.REGEX.test(rawValue)
-      ? new USPhoneNumber(rawValue)
-      : undefined
+    if (/^(\+1)?\d{10}$/.test(rawValue)) {
+      return new USPhoneNumber(
+        rawValue.startsWith("+1") ? rawValue.slice(2) : rawValue
+      )
+    } else if (/^\(\d{3}\) \d{3}-\d{4}$/.test(rawValue)) {
+      return new USPhoneNumber(rawValue.replaceAll(/\D/g, ""))
+    } else {
+      return undefined
+    }
   }
 }
