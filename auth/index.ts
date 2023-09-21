@@ -1,5 +1,4 @@
-export * from "./ChangePasswordForm"
-export * from "./Email"
+export * from "./ChangePassword"
 export * from "./Password"
 export * from "./VerifyCode"
 export * from "./Email"

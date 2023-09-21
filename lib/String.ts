@@ -16,3 +16,10 @@ export namespace StringUtils {
     return /\s/.test(str[index])
   }
 }
+
+/**
+ * An interface reprsenting types that have a callable `toString` method.
+ */
+export interface ToStringable {
+  toString(): string
+}

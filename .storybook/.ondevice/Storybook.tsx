@@ -7,6 +7,9 @@ import { useAppFonts } from "../../hooks/Fonts"
 import AttendeesListMeta, {
   Basic as AttendeesListScreenBasic
 } from "../components/AttendeesList/AttendeesList.stories"
+import ChangePasswordMeta, {
+  Basic as ChangePasswordBasic
+} from "../components/ChangePassword/ChangePassword.stories"
 import ContentReportingMeta, {
   Default as DefaultReportingFlow
 } from "../components/ContentReporting/ContentReporting.stories"
@@ -37,7 +40,6 @@ import TextFieldMeta, {
 import VerifcationCodeMeta, {
   Basic as VerifcationCodeBasic
 } from "../components/VerificationCode/VerifyCode.stories"
-import { name } from "dayjs"
 
 // Create an array of stories
 const stories = [
@@ -95,6 +97,11 @@ const stories = [
     name: VerifcationCodeMeta.title,
     component: VerifcationCodeBasic,
     args: VerifcationCodeMeta.args
+  },
+  {
+    name: ChangePasswordMeta.title,
+    component: ChangePasswordBasic,
+    args: ChangePasswordMeta.args
   }
   // Add more stories here...
 ]
