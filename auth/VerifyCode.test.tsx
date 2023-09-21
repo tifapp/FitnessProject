@@ -168,7 +168,12 @@ describe("VerifyCode tests", () => {
 
     const renderUseAuthVerificationCodeForm = () => {
       return renderHook(
-        () => useAuthVerificationCodeForm({ resendCode, checkCode, onSuccess }),
+        () =>
+          useAuthVerificationCodeForm({
+            resendCode,
+            submitCode: checkCode,
+            onSuccess
+          }),
         {
           wrapper: ({ children }: any) => (
             <TestQueryClientProvider>{children}</TestQueryClientProvider>
