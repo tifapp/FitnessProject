@@ -29,14 +29,14 @@ export class AmplifySecureStorage<Store extends SecureStorage> {
   }
 
   removeItem (key: string) {
-    this.keyList = this.keyList.filter((k) => k === key)
+    this.keyList = this.keyList.filter((k) => k !== key)
     this.store.setItemAsync("KeyList", JSON.stringify(this.keyList))
     this.cache.delete(SECURE_STORAGE_KEY_PREFIX + key)
     this.store.deleteItemAsync(SECURE_STORAGE_KEY_PREFIX + key)
   }
 
   async clear () {
-    const fullPromise = await Promise.all(
+    const fullPromise = await Promise.allSettled(
       this.keyList.map(async (k) => {
         await this.store.deleteItemAsync(SECURE_STORAGE_KEY_PREFIX + k)
       })
@@ -54,16 +54,13 @@ export class AmplifySecureStorage<Store extends SecureStorage> {
     if (result) {
       this.keyList = JSON.parse(result)
     }
-    return await Promise.all(
+    return await Promise.allSettled(
       this.keyList.map(async (k) => {
         const storageValue = await this.store.getItemAsync(
           SECURE_STORAGE_KEY_PREFIX + k
         )
         if (storageValue) {
-          console.log("Storage Value: " + storageValue)
           this.cache.set(SECURE_STORAGE_KEY_PREFIX + k, storageValue)
-        } else {
-          console.log("Storage Value for key " + k + "is null.")
         }
       })
     )
