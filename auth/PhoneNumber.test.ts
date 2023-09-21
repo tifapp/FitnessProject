@@ -1,4 +1,7 @@
-import { USPhoneNumber } from "./PhoneNumber"
+import {
+  USPhoneNumber,
+  prettyFormatIncrementalE164PhoneNumber
+} from "./PhoneNumber"
 
 describe("PhoneNumber tests", () => {
   describe("USPhoneNumber tests", () => {
@@ -35,6 +38,37 @@ describe("PhoneNumber tests", () => {
     test("privacy formatted", () => {
       const phoneNumber = USPhoneNumber.parse("9258881234")!
       expect(phoneNumber.formattedForPrivacy).toEqual("(***) ***-1234")
+    })
+  })
+
+  describe("IncrementalPhoneNumberFormatting test", () => {
+    test("incremental phone number formatting", () => {
+      expect(prettyFormatIncrementalE164PhoneNumber("")).toEqual("")
+      expect(prettyFormatIncrementalE164PhoneNumber("1")).toEqual("1")
+      expect(prettyFormatIncrementalE164PhoneNumber("12")).toEqual("12")
+      expect(prettyFormatIncrementalE164PhoneNumber("123")).toEqual("123")
+      expect(prettyFormatIncrementalE164PhoneNumber("1234")).toEqual("(123) 4")
+      expect(prettyFormatIncrementalE164PhoneNumber("12345")).toEqual(
+        "(123) 45"
+      )
+      expect(prettyFormatIncrementalE164PhoneNumber("123456")).toEqual(
+        "(123) 456"
+      )
+      expect(prettyFormatIncrementalE164PhoneNumber("1234567")).toEqual(
+        "(123) 456-7"
+      )
+      expect(prettyFormatIncrementalE164PhoneNumber("12345678")).toEqual(
+        "(123) 456-78"
+      )
+      expect(prettyFormatIncrementalE164PhoneNumber("123456789")).toEqual(
+        "(123) 456-789"
+      )
+      expect(prettyFormatIncrementalE164PhoneNumber("1234567890")).toEqual(
+        "(123) 456-7890"
+      )
+      expect(prettyFormatIncrementalE164PhoneNumber("12345678901")).toEqual(
+        "(123) 456-78901"
+      )
     })
   })
 })

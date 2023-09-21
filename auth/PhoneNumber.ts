@@ -1,3 +1,5 @@
+import { StringUtils } from "@lib/String"
+
 /**
  * A data class representing a US Phone Number.
  *
@@ -9,6 +11,9 @@ export class USPhoneNumber {
   private constructor (rawValue: string) {
     this.rawValue = rawValue
   }
+
+  private static E164_REGEX = /^(\+1)?\d{10}$/
+  private static PRETTY_FORMAT_REGEX = /^\(\d{3}\) \d{3}-\d{4}$/
 
   /**
    * Pretty formats this phone number with only the last 4 digits shown.
@@ -40,14 +45,38 @@ export class USPhoneNumber {
    * `(123) 456-7890 ✅`
    */
   static parse (rawValue: string) {
-    if (/^(\+1)?\d{10}$/.test(rawValue)) {
+    if (USPhoneNumber.E164_REGEX.test(rawValue)) {
       return new USPhoneNumber(
         rawValue.startsWith("+1") ? rawValue.slice(2) : rawValue
       )
-    } else if (/^\(\d{3}\) \d{3}-\d{4}$/.test(rawValue)) {
-      return new USPhoneNumber(rawValue.replaceAll(/\D/g, ""))
+    } else if (USPhoneNumber.PRETTY_FORMAT_REGEX.test(rawValue)) {
+      return new USPhoneNumber(StringUtils.extractNumbers(rawValue))
     } else {
       return undefined
     }
+  }
+}
+
+/**
+ * Formates an incremental E164 phone number string as a pretty formatted phone number.
+ *
+ * Ex.
+ *
+ * `"1234" -> "(123) 4"`
+ *
+ * `"1234567" -> "(123) 456-7"`
+ */
+export const prettyFormatIncrementalE164PhoneNumber = (
+  digitString: `${number}` | ""
+) => {
+  if (digitString.length < 4) {
+    return digitString
+  } else if (digitString.length < 7) {
+    return `(${digitString.substring(0, 3)}) ${digitString.slice(3)}`
+  } else {
+    return `(${digitString.substring(0, 3)}) ${digitString.substring(
+      3,
+      6
+    )}-${digitString.slice(6)}`
   }
 }
