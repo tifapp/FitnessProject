@@ -1,3 +1,5 @@
+import { MutationHookOptions } from "@lib/ReactQuery"
+import { UseMutationResult, useMutation } from "@tanstack/react-query"
 import { FieldValues, useFormContext } from "react-hook-form"
 
 /**
@@ -14,4 +16,59 @@ export const useReactHookFormContext = <T extends FieldValues>() => {
     `)
   }
   return formContext
+}
+
+export type FormVaidationResult<
+  Result extends { status: "invalid" },
+  SubmissionArgs
+> = Result | { status: "submittable"; submissionValues: SubmissionArgs }
+
+export type FormSubmissionMutation<Result, Args> = UseMutationResult<
+  Result,
+  unknown,
+  Args,
+  unknown
+>
+
+/**
+ * A hook that manages a form submission. Use this hook when you need to create a form hook, as this
+ * hook only allows the form to be submitted if the form is valid. It also provides intel on when the
+ * form is being submitted.
+ *
+ * @param submit A function to submit the form.
+ * @param validate A function that validates the form.
+ * @param options See the docs of {@link useMutation}.
+ * @returns An object that allows the form to be submitted when it's valid.
+ */
+export const useFormSubmission = <
+  SubmissionArgs,
+  SubmissionResult,
+  InvalidValidationResult extends { status: "invalid" }
+>(
+    submit: (args: SubmissionArgs) => Promise<SubmissionResult>,
+    validate: (
+    submissionMutation: FormSubmissionMutation<SubmissionResult, SubmissionArgs>
+  ) => FormVaidationResult<InvalidValidationResult, SubmissionArgs>,
+    options?: MutationHookOptions<SubmissionResult, SubmissionArgs>
+  ) => {
+  const submissionMutation = useMutation(submit, options)
+  const validationResult = validate(submissionMutation)
+
+  if (validationResult.status === "invalid") {
+    return validationResult
+  }
+
+  if (submissionMutation.isLoading) {
+    return {
+      status: "submitting",
+      submissionValues: validationResult.submissionValues
+    } as const
+  }
+
+  return {
+    ...validationResult,
+    submit: () => {
+      submissionMutation.mutate(validationResult.submissionValues)
+    }
+  } as const
 }
