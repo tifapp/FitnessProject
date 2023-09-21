@@ -11,7 +11,7 @@ import {
   ChangePasswordFormView,
   ChangePasswordResult,
   useChangePasswordForm
-} from "@auth/ChangePasswordForm"
+} from "@auth/ChangePassword"
 import { ActivitiesStackParamList } from "@stacks/ActivitiesStack"
 import { useAtomValue } from "jotai"
 import { useHydrateAtoms } from "jotai/utils"
