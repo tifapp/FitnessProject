@@ -22,6 +22,7 @@ export const PrimaryButton = ({ title, style, ...props }: ButtonProps) => {
         styles.container,
         style
       ]}
+      activeOpacity={0.8}
       {...props}
     >
       <Headline style={{ color: "white" }}>{title}</Headline>

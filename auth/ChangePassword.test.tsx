@@ -29,11 +29,15 @@ describe("ChangePassword tests", () => {
       await tapAlertButton("Try Again")
     }
 
+    const dismissIncorrectCurrentPasswordAlert = async () => {
+      await tapAlertButton("Ok")
+    }
+
     const renderChangePassword = () => {
       return renderHook(
         () =>
           useChangePasswordForm({
-            onSubmitted: changePassword,
+            changePassword,
             onSuccess
           }),
         {
@@ -56,20 +60,8 @@ describe("ChangePassword tests", () => {
 
       expect(result.current.submission).toMatchObject({
         status: "invalid",
-        error: "current-matches-new"
-      })
-    })
-
-    it("should give an invalid state, if the re-entered password does not match the new password", () => {
-      const reEnteredPassword = "WaterBottle2%"
-      const { result } = renderChangePassword()
-
-      act(() => result.current.updateField("newPassword", reEnteredPassword))
-      act(() => result.current.updateField("reEnteredPassword", "K"))
-
-      expect(result.current.submission).toMatchObject({
-        status: "invalid",
-        error: "reenter-does-not-match-new"
+        newPasswordError: "current-matches-new",
+        currentPasswordError: undefined
       })
     })
 
@@ -79,11 +71,11 @@ describe("ChangePassword tests", () => {
 
       act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
       act(() => result.current.updateField("newPassword", newPassword))
-      act(() => result.current.updateField("reEnteredPassword", newPassword))
 
       expect(result.current.submission).toMatchObject({
         status: "invalid",
-        error: "weak-new-password"
+        newPasswordError: "weak-new-password",
+        currentPasswordError: undefined
       })
     })
 
@@ -93,13 +85,8 @@ describe("ChangePassword tests", () => {
 
       act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
       act(() => result.current.updateField("newPassword", "OblivionAwaits43#"))
-      act(() => {
-        result.current.updateField("reEnteredPassword", "OblivionAwaits43#")
-      })
 
-      expect(result.current.submission.status).toEqual("valid")
-
-      act(() => result.current.submission.submit?.())
+      act(() => (result.current.submission as any).submit())
 
       await waitFor(() => {
         expect(result.current.submission.status).toEqual("submitting")
@@ -123,38 +110,96 @@ describe("ChangePassword tests", () => {
 
       act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
       act(() => result.current.updateField("newPassword", "OblivionAwaits43#"))
-      act(() => {
-        result.current.updateField("reEnteredPassword", "OblivionAwaits43#")
-      })
 
-      expect(result.current.submission.status).toEqual("valid")
-
-      act(() => result.current.submission.submit?.())
+      act(() => (result.current.submission as any).submit())
 
       await waitFor(() => expect(onSuccess).toHaveBeenCalled())
     })
 
-    it("should have a failed submission flow", async () => {
-      changePassword.mockResolvedValue("incorrect-password")
+    test("incorrect current password and weak new password at the same time", async () => {
+      changePassword.mockResolvedValueOnce("incorrect-password")
+      const { result } = renderChangePassword()
+
+      act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
+      act(() => result.current.updateField("newPassword", "OblivionAwaits43#"))
+
+      act(() => (result.current.submission as any).submit())
+
+      await waitFor(() => {
+        expect(result.current.submission).toMatchObject({
+          status: "invalid",
+          currentPasswordError: "incorrect-current-password",
+          newPasswordError: undefined
+        })
+      })
+
+      act(() => result.current.updateField("newPassword", "1234"))
+
+      expect(result.current.submission).toMatchObject({
+        status: "invalid",
+        currentPasswordError: "incorrect-current-password",
+        newPasswordError: "weak-new-password"
+      })
+    })
+
+    test("submit incorrect current password, then resubmit with correct one", async () => {
+      changePassword
+        .mockResolvedValueOnce("incorrect-password")
+        .mockResolvedValueOnce("valid")
 
       const { result } = renderChangePassword()
 
       act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
       act(() => result.current.updateField("newPassword", "OblivionAwaits43#"))
-      act(() =>
-        result.current.updateField("reEnteredPassword", "OblivionAwaits43#")
-      )
 
-      expect(result.current.submission.status).toEqual("valid")
+      act(() => (result.current.submission as any).submit())
 
-      act(() => result.current.submission.submit?.())
+      await waitFor(() => {
+        expect(result.current.submission).toMatchObject({
+          status: "invalid",
+          currentPasswordError: "incorrect-current-password",
+          newPasswordError: undefined
+        })
+      })
+      expect(alertPresentationSpy).toHaveBeenCalled()
+
+      await dismissIncorrectCurrentPasswordAlert()
+
+      act(() => result.current.updateField("currentPassword", "1234"))
+      act(() => (result.current.submission as any).submit())
+
+      await waitFor(() => expect(onSuccess).toHaveBeenCalled())
+    })
+
+    it("remembers every incorrect current password when typed in the current password field", async () => {
+      changePassword.mockResolvedValue("incorrect-password")
+
+      const { result } = renderChangePassword()
+
+      const firstPassword = "ReturnToAll32@"
+      const secondPassword = "1234"
+
+      act(() => result.current.updateField("currentPassword", firstPassword))
+      act(() => result.current.updateField("newPassword", "OblivionAwaits43#"))
+
+      act(() => (result.current.submission as any).submit())
 
       await waitFor(() => {
         expect(result.current.submission.status).toEqual("invalid")
       })
-      expect(result.current.submission.error).toEqual(
-        "incorrect-current-password"
-      )
+
+      act(() => result.current.updateField("currentPassword", secondPassword))
+      act(() => (result.current.submission as any).submit())
+
+      await waitFor(() => {
+        expect(result.current.submission.status).toEqual("invalid")
+      })
+
+      act(() => result.current.updateField("currentPassword", firstPassword))
+      expect(result.current.submission.status).toEqual("invalid")
+
+      act(() => result.current.updateField("currentPassword", secondPassword))
+      expect(result.current.submission.status).toEqual("invalid")
     })
 
     it("should be able to retry when it gets an error", async () => {
@@ -166,28 +211,34 @@ describe("ChangePassword tests", () => {
 
       act(() => result.current.updateField("currentPassword", "ReturnToAll32@"))
       act(() => result.current.updateField("newPassword", "OblivionAwaits43#"))
-      act(() =>
-        result.current.updateField("reEnteredPassword", "OblivionAwaits43#")
-      )
 
-      expect(result.current.submission.status).toEqual("valid")
-
-      act(() => result.current.submission.submit?.())
+      act(() => (result.current.submission as any).submit())
 
       await waitFor(() => {
         expect(alertPresentationSpy).toHaveBeenCalled()
       })
 
-      await act(async () => await retry())
+      retry()
 
       await waitFor(() => expect(onSuccess).toHaveBeenCalled())
     })
 
-    it("should not produce error messages when no input is initially given", () => {
+    it("should produce empty error messages when a field is empty", () => {
       const { result } = renderChangePassword()
 
-      expect(result.current.submission.status).toEqual("invalid")
-      expect(result.current.submission.error).toBeUndefined()
+      expect(result.current.submission).toMatchObject({
+        status: "invalid",
+        currentPasswordError: "empty",
+        newPasswordError: "empty"
+      })
+
+      act(() => result.current.updateField("currentPassword", "abc123"))
+
+      expect(result.current.submission).toMatchObject({
+        status: "invalid",
+        currentPasswordError: undefined,
+        newPasswordError: "empty"
+      })
     })
   })
 })

@@ -1,7 +1,11 @@
 import React, { useState } from "react"
-import { PasswordTextField, TextField } from "@components/TextFields"
+import {
+  ShadedTextField,
+  PasswordTextField,
+  TextField
+} from "@components/TextFields"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import { KeyboardAvoidingView, View } from "react-native"
+import { Button, KeyboardAvoidingView, View } from "react-native"
 import { ContentText } from "@components/ContentText"
 import { Ionicon } from "@components/common/Icons"
 
@@ -29,6 +33,7 @@ export const Basic: TextFieldStory = () => (
     <ErrorString />
     <ErrorView />
     <Password />
+    <Filled />
   </KeyboardAvoidingView>
 )
 
@@ -80,12 +85,30 @@ const ErrorView = () => {
 
 const Password = () => {
   const [text, setText] = useState("")
+  const [isFocused, setIsFocused] = useState(false)
   return (
-    <PasswordTextField
+    <View style={{ width: "100%" }}>
+      <PasswordTextField
+        isFocused={isFocused}
+        value={text}
+        placeholder="Enter Text"
+        onChangeText={setText}
+        style={{ padding: 16 }}
+      />
+      <Button title="Toggle Focus" onPress={() => setIsFocused((f) => !f)} />
+    </View>
+  )
+}
+
+const Filled = () => {
+  const [text, setText] = useState("")
+  return (
+    <ShadedTextField
       value={text}
       placeholder="Enter Text"
       onChangeText={setText}
       style={{ padding: 16 }}
+      error="This is an error"
     />
   )
 }

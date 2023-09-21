@@ -7,10 +7,13 @@ import { useFontScale } from "@hooks/Fonts"
 import React, { ComponentProps } from "react"
 import {
   StyleProp,
+  StyleSheet,
   TouchableOpacityProps,
   TouchableOpacity,
   ViewProps,
-  ViewStyle
+  ViewStyle,
+  Platform,
+  View
 } from "react-native"
 
 /**
@@ -107,3 +110,43 @@ export const TouchableIonicon = ({ icon, ...props }: IoniconButtonProps) => (
     <Ionicon {...icon} />
   </TouchableOpacity>
 )
+
+export type CircularIoniconProps = {
+  backgroundColor: string
+  name: IoniconName
+  style?: StyleProp<ViewStyle>
+} & IconProps<IoniconName>
+
+/**
+ * An ionicon with a circular colored background.
+ */
+export const CircularIonicon = ({
+  backgroundColor,
+  name,
+  style,
+  ...props
+}: CircularIoniconProps) => {
+  const borderStyle = { backgroundColor, borderRadius: 32 }
+  // NB: iOS needs to put the border in a container view in order to get the border radius, but this
+  // breaks android which we apply the border style directly to the icon on android...
+  return (
+    <View style={[style, Platform.OS === "ios" ? borderStyle : undefined]}>
+      <Ionicon
+        {...props}
+        name={name}
+        size={16}
+        style={[
+          styles.iconStyle,
+          Platform.OS === "android" ? borderStyle : undefined
+        ]}
+      />
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  iconStyle: {
+    color: "white",
+    padding: 8
+  }
+})
