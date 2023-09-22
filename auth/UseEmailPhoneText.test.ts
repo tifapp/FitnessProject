@@ -1,8 +1,5 @@
 import { renderHook } from "@testing-library/react-native"
-import {
-  EmailPhoneTextType,
-  useEmailPhoneTextState
-} from "./UseEmailPhoneTextState"
+import { EmailPhoneTextType, useEmailPhoneTextState } from "./UseEmailPhoneText"
 import { act } from "react-test-renderer"
 import { USPhoneNumber } from "./PhoneNumber"
 import { EmailAddress } from "./Email"
@@ -15,17 +12,17 @@ describe("useEmailPhoneTextState tests", () => {
     expect(result.current.text).toEqual("(123) 456-7890")
     expect(result.current.parsedValue).toBeInstanceOf(USPhoneNumber)
 
-    act(() => result.current.switchActiveTextTypeTo("email"))
+    act(() => result.current.onActiveTextTypeChanged("email"))
 
     act(() => result.current.onTextChanged("john@gmail.com"))
     expect(result.current.text).toEqual("john@gmail.com")
     expect(result.current.parsedValue).toBeInstanceOf(EmailAddress)
 
-    act(() => result.current.toggleActiveTextType())
+    act(() => result.current.onActiveTextTypeToggled())
     expect(result.current.text).toEqual("(123) 456-7890")
     expect(result.current.parsedValue).toBeInstanceOf(USPhoneNumber)
 
-    act(() => result.current.toggleActiveTextType())
+    act(() => result.current.onActiveTextTypeToggled())
     expect(result.current.text).toEqual("john@gmail.com")
     expect(result.current.parsedValue).toBeInstanceOf(EmailAddress)
   })

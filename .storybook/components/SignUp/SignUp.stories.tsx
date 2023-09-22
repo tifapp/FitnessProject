@@ -12,9 +12,13 @@ import {
   CreateAccountCredentialsFormView,
   CreateAccountEndingView
 } from "@auth/sign-up"
+import { useEmailPhoneTextState } from "@auth/UseEmailPhoneText"
+import { AuthShadedEmailPhoneTextFieldView } from "@auth/AuthTextFields"
 import { SafeAreaProvider } from "react-native-safe-area-context"
-import { Button, View } from "react-native"
+import { Button } from "react-native"
 import { useState } from "react"
+import { ScrollView } from "react-native-gesture-handler"
+import { AppStyles } from "@lib/AppColorStyle"
 
 const SignUpMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Sign Up"
@@ -64,8 +68,10 @@ const HandleScreen = () => {
 
 const TestScreen = () => {
   const navigation = useNavigation()
+  const { text, activeTextType, onTextChanged, onActiveTextTypeChanged } =
+    useEmailPhoneTextState("phone")
   return (
-    <View>
+    <ScrollView>
       <Button
         title="Create Account Form"
         onPress={() => navigation.navigate("signUp")}
@@ -75,6 +81,14 @@ const TestScreen = () => {
         onPress={() => navigation.navigate("changeHandle")}
       />
       <Button title="Welcome" onPress={() => navigation.navigate("welcome")} />
-    </View>
+      <AuthShadedEmailPhoneTextFieldView
+        iconBackgroundColor={AppStyles.darkColor}
+        value={text}
+        activeTextType={activeTextType}
+        onChangeText={onTextChanged}
+        onActiveTextTypeChanged={onActiveTextTypeChanged}
+        style={{ marginTop: 48, paddingHorizontal: 16 }}
+      />
+    </ScrollView>
   )
 }

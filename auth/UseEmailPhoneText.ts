@@ -37,8 +37,8 @@ export const useEmailPhoneTextState = (initialTextType: EmailPhoneTextType) => {
       setText((t) => ({ ...t, [activeTextType]: text }))
     },
     activeTextType,
-    switchActiveTextTypeTo: setTextType,
-    toggleActiveTextType: () => setTextType(toggleTextType),
+    onActiveTextTypeChanged: setTextType,
+    onActiveTextTypeToggled: () => setTextType(toggleTextType),
     parsedValue: textTypeParser(activeTextType).parse(activeText)
   }
 }
