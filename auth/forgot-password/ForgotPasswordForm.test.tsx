@@ -1,4 +1,5 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native"
+import { captureAlerts } from "../../tests/helpers/Alerts"
 import {
   TestQueryClientProvider,
   createTestQueryClient
@@ -14,14 +15,14 @@ describe("Forgot Password Form tests", () => {
       queryClient.clear()
     })
 
-    const confirmedEmail = jest.fn()
+    const emailOrPhone = jest.fn()
     const onSuccess = jest.fn()
 
     const renderForgotPassword = () => {
       return renderHook(
         () =>
           useForgotPasswordForm({
-            onSubmitted: confirmedEmail,
+            initiateForgotPassword: emailOrPhone,
             onSuccess
           }),
         {
@@ -33,11 +34,17 @@ describe("Forgot Password Form tests", () => {
         }
       )
     }
+
+    const { tapAlertButton, alertPresentationSpy } = captureAlerts()
+
     it("can verify an email and send back an error for invalid emails", () => {
       const emailAddress = "FiddleSticks32ka"
       const { result } = renderForgotPassword()
 
-      act(() => result.current.updateField(emailAddress))
+      act(() =>
+        result.current.forgotPasswordText.onActiveTextTypeChanged("email")
+      )
+      act(() => result.current.forgotPasswordText.onTextChanged(emailAddress))
 
       expect(result.current.submission).toMatchObject({
         status: "invalid",
@@ -45,17 +52,54 @@ describe("Forgot Password Form tests", () => {
       })
     })
 
+    it("can verify a phone number and send back an error for invalid phone numbers", () => {
+      const phoneNumber = "833412412"
+      const { result } = renderForgotPassword()
+
+      act(() =>
+        result.current.forgotPasswordText.onActiveTextTypeChanged("phone")
+      )
+      act(() => result.current.forgotPasswordText.onTextChanged(phoneNumber))
+
+      expect(result.current.submission).toMatchObject({
+        status: "invalid",
+        error: "invalid-phone-number"
+      })
+    })
+
     it("can correctly use its logic to proceed onto the next screen after a successful verification", async () => {
       const emailAddress = "FiddleSticks32@kale.org"
       const { result } = renderForgotPassword()
 
-      act(() => result.current.updateField(emailAddress))
+      act(() =>
+        result.current.forgotPasswordText.onActiveTextTypeChanged("email")
+      )
+      act(() => result.current.forgotPasswordText.onTextChanged(emailAddress))
 
-      expect(result.current.submission.status).toEqual("valid")
+      expect(result.current.submission.status).toEqual("submittable")
 
-      act(() => result.current.submission.submit?.())
+      act(() => (result.current.submission as any).submit())
 
       await waitFor(() => expect(onSuccess).toHaveBeenCalled())
+    })
+
+    it("can properly display an alert on an error", async () => {
+      emailOrPhone.mockRejectedValue(new Error())
+      const emailAddress = "FiddleSticks32@kale.org"
+      const { result } = renderForgotPassword()
+
+      act(() =>
+        result.current.forgotPasswordText.onActiveTextTypeChanged("email")
+      )
+      act(() => result.current.forgotPasswordText.onTextChanged(emailAddress))
+
+      expect(result.current.submission.status).toEqual("submittable")
+
+      act(() => (result.current.submission as any).submit())
+
+      await waitFor(() => {
+        expect(alertPresentationSpy).toHaveBeenCalled()
+      })
     })
   })
 })
