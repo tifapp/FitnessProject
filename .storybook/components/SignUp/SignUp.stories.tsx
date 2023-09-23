@@ -68,7 +68,7 @@ const HandleScreen = () => {
 
 const TestScreen = () => {
   const navigation = useNavigation()
-  const { text, activeTextType, onTextChanged, onActiveTextTypeChanged } =
+  const { text, activeTextType, onTextChanged, onActiveTextTypeToggled } =
     useEmailPhoneTextState("phone")
   return (
     <ScrollView>
@@ -86,7 +86,7 @@ const TestScreen = () => {
         value={text}
         activeTextType={activeTextType}
         onChangeText={onTextChanged}
-        onActiveTextTypeChanged={onActiveTextTypeChanged}
+        onActiveTextTypeToggled={onActiveTextTypeToggled}
         style={{ marginTop: 48, paddingHorizontal: 16 }}
       />
     </ScrollView>
