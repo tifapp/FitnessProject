@@ -1,29 +1,40 @@
 import { AuthSectionView } from "@auth/AuthSection"
 import { AuthShadedTextField } from "@auth/AuthTextFields"
-import { Email } from "@auth/Email"
+import { EmailAddress } from "@auth/Email"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useMutation } from "@tanstack/react-query"
 import { useState } from "react"
 import { Alert, StyleProp, StyleSheet, ViewStyle } from "react-native"
+import { USPhoneNumber } from ".."
 
-// Send confirmation code to user's email
-// async function forgotPassword (username: string) {
-//   try {
-//     const data = await Auth.forgotPassword(username)
-//     console.log(data)
-//   } catch (err) {
-//     console.log(err)
-//   }
-// }
-
+/**
+ * A type to determine what result ForgotPassword should give on submission.
+ */
 export type ForgotPasswordResult = "valid" | "invalid" | "invalid-email"
 
+/**
+ * A type to help show what current format {@link useForgotPasswordForm} is using for text fields: An {@link EmailAddress}, or a {@link USPhoneNumber}.
+ */
+
+export type ForgotPasswordTextFormat = EmailAddress | USPhoneNumber
+
+/**
+ * A type to help show what props need to be given in order to utilize {@link useForgotPasswordForm}.
+ */
 export type UseForgotPasswordFormEnvironment = {
-  onSubmitted: (emailResult: Email) => Promise<ForgotPasswordResult>
+  onSubmitted: (emailResult: EmailAddress) => Promise<ForgotPasswordResult>
+  textFormat: ForgotPasswordTextFormat
   onSuccess: () => void
 }
 
-export type ForgotPasswordErrorReason = "invalid-email"
+/**
+ * A type to help show what errors {@link ForgotPasswordSubmission} is allowed to give on an invalid submission.
+ */
+
+export type ForgotPasswordErrorReason =
+  | "invalid-phone-number"
+  | "invalid-email"
+  | "undefined"
 
 export type ForgotPasswordSubmission =
   | { status: "valid"; submit: () => void; error?: undefined }
@@ -36,11 +47,12 @@ export type ForgotPasswordSubmission =
 
 export const useForgotPasswordForm = ({
   onSubmitted,
+  textFormat,
   onSuccess
 }: UseForgotPasswordFormEnvironment) => {
-  const [email, setEmail] = useState("")
+  const [currentText, setCurrentText] = useState("")
 
-  const emailResult = Email.validate(email)
+  const emailResult = EmailAddress.parse(currentText)
 
   const mutation = useMutation(
     async () => {
@@ -53,7 +65,7 @@ export const useForgotPasswordForm = ({
       onError: () => {
         Alert.alert(
           "Whoops",
-          "Sorry, something went wrong when trying to validate your email. Please try again.",
+          "Sorry, something went wrong when trying to parse your email. Please try again.",
           [
             { text: "Try Again", onPress: () => mutation.mutate() },
             { text: "Ok" }
@@ -64,7 +76,7 @@ export const useForgotPasswordForm = ({
   )
 
   const getSubmission = (): ForgotPasswordSubmission => {
-    if (email === "") {
+    if (currentText === "") {
       return { status: "invalid" }
     } else if (mutation.isLoading) {
       return { status: "submitting" }
@@ -79,9 +91,9 @@ export const useForgotPasswordForm = ({
   }
 
   return {
-    email,
+    currentText,
     updateField: (value: string) => {
-      setEmail(value)
+      setCurrentText(value)
     },
     submission: getSubmission()
   }
@@ -90,6 +102,7 @@ export const useForgotPasswordForm = ({
 export type ForgotPasswordFormProps = {
   style?: StyleProp<ViewStyle>
   email: string
+  currentTextFormat: ForgotPasswordTextFormat
   updateField: (value: string) => void
   submission: ForgotPasswordSubmission
 }
@@ -97,6 +110,7 @@ export type ForgotPasswordFormProps = {
 export const ForgotPasswordFormView = ({
   style,
   email,
+  currentTextFormat,
   updateField,
   submission
 }: ForgotPasswordFormProps) => {

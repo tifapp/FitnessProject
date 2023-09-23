@@ -17,7 +17,7 @@ const textTypeParser = (textType: EmailPhoneTextType) => {
 }
 
 /**
- * A hook that enabled seemless text editing for text fields that require
+ * A hook that enabled seamless text editing for text fields that require
  * either email or phone number input.
  *
  * @param initialTextType Used to choose whether the email text or phone text is active first.
