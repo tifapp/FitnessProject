@@ -15,6 +15,13 @@ export namespace StringUtils {
   export const isWhitespaceCharacter = (str: string, index: number) => {
     return /\s/.test(str[index])
   }
+
+  /**
+   * Extracts a numerical string of all the numbers in this string.
+   */
+  export const extractNumbers = (str: string) => {
+    return str.replaceAll(/\D/g, "") as `${number}` | ""
+  }
 }
 
 /**
