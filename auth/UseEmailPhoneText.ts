@@ -1,6 +1,10 @@
 import { useState } from "react"
-import { USPhoneNumber } from "./PhoneNumber"
+import {
+  USPhoneNumber,
+  prettyFormatIncrementalE164PhoneNumber
+} from "./PhoneNumber"
 import { EmailAddress } from "./Email"
+import { StringUtils } from "@lib/String"
 
 export type EmailPhoneTextType = "email" | "phone"
 
@@ -23,13 +27,18 @@ export const useEmailPhoneTextState = (initialTextType: EmailPhoneTextType) => {
   const [activeTextType, setTextType] = useState(initialTextType)
   const activeText = text[activeTextType]
   return {
-    text: activeText,
+    text:
+      activeTextType === "email"
+        ? activeText
+        : prettyFormatIncrementalE164PhoneNumber(
+          StringUtils.extractNumbers(activeText)
+        ),
     onTextChanged: (text: string) => {
       setText((t) => ({ ...t, [activeTextType]: text }))
     },
     activeTextType,
-    switchActiveTextTypeTo: setTextType,
-    toggleActiveTextType: () => setTextType(toggleTextType),
+    onActiveTextTypeChanged: setTextType,
+    onActiveTextTypeToggled: () => setTextType(toggleTextType),
     parsedValue: textTypeParser(activeTextType).parse(activeText)
   }
 }
