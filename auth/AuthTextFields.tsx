@@ -6,15 +6,12 @@ import {
   TextFieldProps,
   TextFieldRef
 } from "@components/TextFields"
-import {
-  CircularIonicon,
-  IoniconName,
-  TouchableIonicon
-} from "@components/common/Icons"
-import { StyleProp, View, ViewStyle, StyleSheet } from "react-native"
+import { CircularIonicon, Ionicon, IoniconName } from "@components/common/Icons"
+import { StyleProp, ViewStyle, StyleSheet } from "react-native"
 import { useFontScale } from "@hooks/Fonts"
 import { AppStyles } from "@lib/AppColorStyle"
 import { EmailPhoneTextType } from "./UseEmailPhoneText"
+import { TouchableOpacity } from "react-native-gesture-handler"
 
 export type AuthShadedTextFieldProps = {
   iconName: IoniconName
@@ -83,7 +80,7 @@ export const AuthShadedPasswordTextField = forwardRef(function TextField (
 
 export type AuthEmailPhoneTextFieldProps = {
   activeTextType: EmailPhoneTextType
-  onActiveTextTypeChanged: (textType: EmailPhoneTextType) => void
+  onActiveTextTypeToggled: () => void
 } & Omit<AuthShadedTextFieldProps, "rightAddon" | "keyboardType" | "iconName">
 
 /**
@@ -92,7 +89,7 @@ export type AuthEmailPhoneTextFieldProps = {
 export const AuthShadedEmailPhoneTextFieldView = forwardRef(function TextField (
   {
     activeTextType,
-    onActiveTextTypeChanged,
+    onActiveTextTypeToggled,
     ...props
   }: AuthEmailPhoneTextFieldProps,
   ref: TextFieldRef
@@ -101,57 +98,27 @@ export const AuthShadedEmailPhoneTextFieldView = forwardRef(function TextField (
     <AuthShadedTextField
       {...props}
       ref={ref}
-      iconName={activeTextType === "email" ? "mail" : "phone-portrait"}
+      iconName={activeTextType === "email" ? "mail" : "call"}
       keyboardType={activeTextType === "phone" ? "number-pad" : "email-address"}
       rightAddon={
-        <View style={styles.toggleButtonsContainer}>
-          <TouchableIonicon
-            icon={{
-              name: "phone-portrait",
-              color:
-                activeTextType === "phone"
-                  ? AppStyles.darkColor
-                  : AppStyles.colorOpacity35
-            }}
-            onPress={() => onActiveTextTypeChanged("phone")}
-            style={styles.toggleButtonSpacing}
+        <TouchableOpacity
+          style={styles.emailPhoneToggleButtonContainer}
+          onPress={onActiveTextTypeToggled}
+        >
+          <Ionicon name="refresh" color={AppStyles.colorOpacity35} />
+          <Ionicon
+            name={activeTextType === "phone" ? "mail" : "call"}
+            color={AppStyles.colorOpacity35}
           />
-
-          <TouchableIonicon
-            icon={{
-              name: "mail",
-              color:
-                activeTextType === "email"
-                  ? AppStyles.darkColor
-                  : AppStyles.colorOpacity35
-            }}
-            onPress={() => onActiveTextTypeChanged("email")}
-          />
-        </View>
+        </TouchableOpacity>
       }
     />
   )
 })
 
 const styles = StyleSheet.create({
-  toggleContainer: {
-    position: "relative"
-  },
-  toggleButtonsContainer: {
+  emailPhoneToggleButtonContainer: {
     display: "flex",
     flexDirection: "row"
-  },
-  toggleButtonSpacing: {
-    marginRight: 8
-  },
-  toggleSelectionIndicator: {
-    width: 32,
-    height: 32,
-    borderRadius: 12,
-    backgroundColor: AppStyles.darkColor
-  },
-  toggleSelectionContainer: {
-    position: "absolute",
-    left: 0
   }
 })
