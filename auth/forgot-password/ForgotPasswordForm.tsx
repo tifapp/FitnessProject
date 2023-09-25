@@ -85,7 +85,7 @@ export const ForgotPasswordFormView = ({
         value={forgotPasswordText.text}
         activeTextType={forgotPasswordText.activeTextType}
         onChangeText={forgotPasswordText.onTextChanged}
-        onActiveTextTypeChanged={forgotPasswordText.onActiveTextTypeChanged}
+        onActiveTextTypeToggled={forgotPasswordText.onActiveTextTypeToggled}
         style={styles.emailPhoneTextField}
       />
     </AuthFormView>
