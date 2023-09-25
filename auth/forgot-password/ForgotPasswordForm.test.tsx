@@ -35,7 +35,7 @@ describe("Forgot Password Form tests", () => {
       )
     }
 
-    const { tapAlertButton, alertPresentationSpy } = captureAlerts()
+    const { alertPresentationSpy } = captureAlerts()
 
     it("can verify an email and send back an error for invalid emails", () => {
       const emailAddress = "FiddleSticks32ka"
