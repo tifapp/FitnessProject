@@ -1,17 +1,17 @@
-import React, { forwardRef } from "react"
 import {
+  PasswordTextFieldProps,
   ShadedPasswordTextField,
   ShadedTextField,
-  PasswordTextFieldProps,
   TextFieldProps,
   TextFieldRef
 } from "@components/TextFields"
 import { CircularIonicon, Ionicon, IoniconName } from "@components/common/Icons"
-import { StyleProp, ViewStyle, StyleSheet } from "react-native"
 import { useFontScale } from "@hooks/Fonts"
 import { AppStyles } from "@lib/AppColorStyle"
-import { EmailPhoneTextType } from "./UseEmailPhoneText"
+import React, { forwardRef } from "react"
+import { StyleProp, StyleSheet, ViewStyle } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
+import { EmailPhoneTextType } from "./UseEmailPhoneText"
 
 export type AuthShadedTextFieldProps = {
   iconName: IoniconName
@@ -81,7 +81,10 @@ export const AuthShadedPasswordTextField = forwardRef(function TextField (
 export type AuthEmailPhoneTextFieldProps = {
   activeTextType: EmailPhoneTextType
   onActiveTextTypeToggled: () => void
-} & Omit<AuthShadedTextFieldProps, "rightAddon" | "keyboardType" | "iconName">
+} & Omit<
+  AuthShadedTextFieldProps,
+  "rightAddon" | "keyboardType" | "iconName" | "placeholder"
+>
 
 /**
  * An auth text field that accepts both email addresses and phone numbers as input.
@@ -98,6 +101,7 @@ export const AuthShadedEmailPhoneTextFieldView = forwardRef(function TextField (
     <AuthShadedTextField
       {...props}
       ref={ref}
+      placeholder="Enter Phone # / Email"
       iconName={activeTextType === "email" ? "mail" : "call"}
       keyboardType={activeTextType === "phone" ? "number-pad" : "email-address"}
       rightAddon={
