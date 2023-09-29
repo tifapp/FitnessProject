@@ -1,23 +1,7 @@
-import {
-  ChangePasswordFormView,
-  ChangePasswordResult,
-  useChangePasswordForm
-} from "@auth/ChangePasswordForm"
-import {
-  ForgotPasswordFormView,
-  ForgotPasswordResult,
-  useForgotPasswordForm
-} from "@auth/forgot-password/ForgotPasswordForm"
-import {
-  ResetPasswordFormView,
-  ResetPasswordResult,
-  useResetPasswordForm
-} from "@auth/forgot-password/ResetPasswordForm"
 import { ChevronBackButton, StackNavigatorType } from "@components/Navigation"
 import { Headline } from "@components/Text"
 import { TouchableIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
-import { delayData } from "@lib/DelayData"
 import { EventMocks } from "@lib/events"
 import { UserMocks } from "@lib/users/User"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
@@ -39,8 +23,6 @@ export type ProfileScreensParamsList = {
   EditProfileScreen: undefined
   SettingsScreen: undefined
   CurrentUserProfileScreen: undefined
-  ForgotPasswordScreen: undefined
-  ResetPasswordScreen: undefined
 }
 
 export type ProfileScreenRouteProps = StackScreenProps<
@@ -51,21 +33,6 @@ export type ProfileScreenRouteProps = StackScreenProps<
 export type ProfileScreenProps = {
   userID: string
 } & StackScreenProps<ProfileScreensParamsList, "ProfileScreen">
-
-export type ChangePasswordScreenProps = StackScreenProps<
-  ProfileScreensParamsList,
-  "ChangePasswordScreen"
->
-
-export type ForgotPasswordScreenProps = StackScreenProps<
-  ProfileScreensParamsList,
-  "ForgotPasswordScreen"
->
-
-export type ResetPasswordScreenProps = StackScreenProps<
-  ProfileScreensParamsList,
-  "ResetPasswordScreen"
->
 
 export const createProfileStackScreens = <T extends ProfileScreensParamsList>(
   ProfileStack: StackNavigatorType<T>
@@ -133,47 +100,6 @@ export const createProfileStackScreens = <T extends ProfileScreensParamsList>(
           headerLeft: () => <ChevronBackButton />
         }}
       />
-      <ProfileStack.Screen
-        name={"ChangePasswordScreen"}
-        component={ChangePasswordScreen}
-        options={{
-          headerTitle: () => (
-            <Headline style={{ color: AppStyles.darkColor }}>
-              Change Password
-            </Headline>
-          ),
-          headerTitleAlign: "center",
-          headerLeft: () => <ChevronBackButton />
-        }}
-      />
-
-      <ProfileStack.Screen
-        name={"ForgotPasswordScreen"}
-        component={ForgotPasswordScreen}
-        options={{
-          headerTitle: () => (
-            <Headline style={{ color: AppStyles.darkColor }}>
-              Forgot Password
-            </Headline>
-          ),
-          headerTitleAlign: "center",
-          headerLeft: () => <ChevronBackButton />
-        }}
-      />
-
-      <ProfileStack.Screen
-        name={"ResetPasswordScreen"}
-        component={ResetPasswordScreen}
-        options={{
-          headerTitle: () => (
-            <Headline style={{ color: AppStyles.darkColor }}>
-              Reset Password
-            </Headline>
-          ),
-          headerTitleAlign: "center",
-          headerLeft: () => <ChevronBackButton />
-        }}
-      />
     </>
   )
 }
@@ -196,30 +122,6 @@ const ProfileScreen = ({ route }: ProfileScreenProps) => {
   ]
 
   return <ProfileScreenView user={user} events={events} />
-}
-
-const ChangePasswordScreen = ({ navigation }: ChangePasswordScreenProps) => {
-  const changePassword = useChangePasswordForm({
-    changePassword: async () => await delayData<ChangePasswordResult>("valid"),
-    onSuccess: () => navigation.goBack()
-  })
-  return <ChangePasswordFormView {...changePassword} />
-}
-
-const ForgotPasswordScreen = ({ navigation }: ForgotPasswordScreenProps) => {
-  const forgotPassword = useForgotPasswordForm({
-    onSubmitted: async () => await delayData<ForgotPasswordResult>("valid"),
-    onSuccess: () => navigation.goBack()
-  })
-  return <ForgotPasswordFormView {...forgotPassword} />
-}
-
-const ResetPasswordScreen = ({ navigation }: ResetPasswordScreenProps) => {
-  const resetPassword = useResetPasswordForm({
-    onSubmitted: async () => await delayData<ResetPasswordResult>("valid"),
-    onSuccess: () => navigation.goBack()
-  })
-  return <ResetPasswordFormView {...resetPassword} />
 }
 
 const CurrentUserProfileScreen = () => {

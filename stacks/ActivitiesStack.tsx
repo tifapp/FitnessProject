@@ -1,10 +1,16 @@
+import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { BottomNavTabBar } from "@components/bottomTabComponents/BottomNavTabBar"
+import { EventMocks } from "@lib/events"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { EventDetailsProps } from "@screens/EventDetails/EventDetails"
 import { createEventDetailsStackScreens } from "@screens/EventDetails/EventScreensNavigation"
 import { EventFormScreenNavWrapper } from "@screens/EventFormScreenNavWrapper"
+import {
+  ExploreEventsScreensParamsList,
+  createExploreEventsScreens
+} from "@screens/ExploreEvents"
 import {
   LocationSearchPicker,
   LocationSearchPickerProps
@@ -15,6 +21,7 @@ import {
   ProfileStack,
   createProfileStackScreens
 } from "@screens/ProfileScreen/Navigation/ProfileScreensNavigation"
+import { SignInScreensParamsList } from "@screens/ProfileScreen/Navigation/SignInScreensNavigation"
 import {
   ReportingScreensParamsList,
   createContentReportingStackScreens
@@ -23,12 +30,6 @@ import { TestChatRoomScreen } from "@screens/testScreens/TestChatRoomScreen"
 import { TestEventFormScreen } from "@screens/testScreens/TestEventFormScreen"
 import { TestNotifScreen } from "@screens/testScreens/TestNotifScreen"
 import React from "react"
-import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
-import {
-  ExploreEventsScreensParamsList,
-  createExploreEventsScreens
-} from "@screens/ExploreEvents"
-import { EventMocks } from "@lib/events"
 
 export enum ActivitiesScreenNames {
   EVENT_FORM = "Event Form",
@@ -66,6 +67,7 @@ export type ActivitiesStackParamList = {
   [ActivitiesScreenNames.CHANGE_PASSWORD]: undefined
 } & ReportingScreensParamsList &
   ProfileScreensParamsList &
+  SignInScreensParamsList &
   ExploreEventsScreensParamsList
 
 const Stack = createStackNavigator<ActivitiesStackParamList>()
