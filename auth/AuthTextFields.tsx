@@ -104,6 +104,7 @@ export const AuthShadedEmailPhoneTextFieldView = forwardRef(function TextField (
         <TouchableOpacity
           style={styles.emailPhoneToggleButtonContainer}
           onPress={onActiveTextTypeToggled}
+          hitSlop={32}
         >
           <Ionicon name="refresh" color={AppStyles.colorOpacity35} />
           <Ionicon
