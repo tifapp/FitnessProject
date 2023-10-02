@@ -19,7 +19,12 @@ import {
 } from "@components/Navigation"
 import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { delayData } from "@lib/DelayData"
-import { NavigationContainer, useNavigation } from "@react-navigation/native"
+import {
+  NavigationContainer,
+  NavigationProp,
+  ParamListBase,
+  useNavigation
+} from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import {
   ForgotPasswordScreenProps,
@@ -105,7 +110,7 @@ export const Basic: ForgotPasswordStory = () => (
 )
 
 const TestScreen = () => {
-  const navigation = useNavigation()
+  const navigation: NavigationProp<ParamListBase> = useNavigation()
   return (
     <View>
       <Button

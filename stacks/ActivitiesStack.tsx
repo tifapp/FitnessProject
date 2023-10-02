@@ -107,25 +107,29 @@ export type ProfileScreenRouteProps = StackScreenProps<
 
 export default function ActivitiesStack () {
   return (
-    <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
-      {exploreEventsScreens}
-      <Stack.Screen
-        name={ActivitiesScreenNames.EVENT_FORM}
-        component={EventFormScreenNavWrapper}
-      />
-      <Stack.Screen
-        name={ActivitiesScreenNames.LOCATION_SEARCH}
-        component={LocationSearchPicker}
-      />
-      <Stack.Screen
-        name={ActivitiesScreenNames.BOTTOM_NAV_TAB_BAR}
-        component={BottomNavTabBar}
-      />
-
-      {eventDetailsScreens}
-      {reportingScreens}
-      {profileScreens}
-    </Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
+      children={
+        <>
+          <Stack.Screen
+            name={ActivitiesScreenNames.EVENT_FORM}
+            component={EventFormScreenNavWrapper}
+          />
+          <Stack.Screen
+            name={ActivitiesScreenNames.LOCATION_SEARCH}
+            component={LocationSearchPicker}
+          />
+          <Stack.Screen
+            name={ActivitiesScreenNames.BOTTOM_NAV_TAB_BAR}
+            component={BottomNavTabBar}
+          />
+          {exploreEventsScreens}
+          {eventDetailsScreens}
+          {reportingScreens}
+          {profileScreens}
+        </>
+      }
+    ></Stack.Navigator>
   )
 }
 
@@ -144,18 +148,23 @@ const getTabBarVisibility = (route: any) => {
 
 export function TabNavigation () {
   return (
-    <Tab.Navigator tabBar={(props) => <BottomNavTabBar {...props} />}>
-      <Tab.Screen name="Map" component={ActivitiesStack} />
-      <Tab.Screen name="Chat Room" component={TestChatRoomScreen} />
-      <Tab.Screen name="Event Form" component={TestEventFormScreen} />
-      <Tab.Screen name="Notifications" component={TestNotifScreen} />
-      <Tab.Screen
-        name="Profile"
-        component={ProfileStack}
-        options={({ route }) => ({
-          tabBarVisible: getTabBarVisibility(route)
-        })}
-      />
-    </Tab.Navigator>
+    <Tab.Navigator
+      tabBar={(props) => <BottomNavTabBar {...props} />}
+      children={
+        <>
+          <Tab.Screen name="Map" component={ActivitiesStack} />
+          <Tab.Screen name="Chat Room" component={TestChatRoomScreen} />
+          <Tab.Screen name="Event Form" component={TestEventFormScreen} />
+          <Tab.Screen name="Notifications" component={TestNotifScreen} />
+          <Tab.Screen
+            name="Profile"
+            component={ProfileStack}
+            options={({ route }) => ({
+              tabBarVisible: getTabBarVisibility(route)
+            })}
+          />
+        </>
+      }
+    ></Tab.Navigator>
   )
 }

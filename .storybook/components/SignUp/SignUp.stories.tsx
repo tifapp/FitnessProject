@@ -1,24 +1,29 @@
+import { AuthShadedEmailPhoneTextFieldView } from "@auth/AuthTextFields"
+import { useEmailPhoneTextState } from "@auth/UseEmailPhoneText"
+import {
+  CreateAccountCredentialsFormView,
+  CreateAccountEndingView,
+  CreateAccountUserHandleFormView
+} from "@auth/sign-up"
 import {
   BASE_HEADER_SCREEN_OPTIONS,
   ChevronBackButton,
   XMarkBackButton
 } from "@components/Navigation"
-import { NavigationContainer, useNavigation } from "@react-navigation/native"
+import { AppStyles } from "@lib/AppColorStyle"
+import {
+  NavigationContainer,
+  NavigationProp,
+  ParamListBase,
+  useNavigation
+} from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import {
-  CreateAccountUserHandleFormView,
-  CreateAccountCredentialsFormView,
-  CreateAccountEndingView
-} from "@auth/sign-up"
-import { useEmailPhoneTextState } from "@auth/UseEmailPhoneText"
-import { AuthShadedEmailPhoneTextFieldView } from "@auth/AuthTextFields"
-import { SafeAreaProvider } from "react-native-safe-area-context"
-import { Button } from "react-native"
 import { useState } from "react"
+import { Button } from "react-native"
 import { ScrollView } from "react-native-gesture-handler"
-import { AppStyles } from "@lib/AppColorStyle"
+import { SafeAreaProvider } from "react-native-safe-area-context"
 
 const SignUpMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Sign Up"
@@ -67,7 +72,7 @@ const HandleScreen = () => {
 }
 
 const TestScreen = () => {
-  const navigation = useNavigation()
+  const navigation: NavigationProp<ParamListBase> = useNavigation()
   const { text, activeTextType, onTextChanged, onActiveTextTypeToggled } =
     useEmailPhoneTextState("phone")
   return (

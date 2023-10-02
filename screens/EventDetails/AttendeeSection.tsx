@@ -1,7 +1,11 @@
 import { Caption, Headline } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
-import { useNavigation } from "@react-navigation/native"
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation
+} from "@react-navigation/native"
 import React, { useState } from "react"
 import { StyleSheet, TouchableOpacity, View } from "react-native"
 import { Divider } from "react-native-elements"
@@ -12,7 +16,7 @@ interface AttendeeSectionProps {
 }
 
 const AttendeeSection = ({ color, attendeeCount }: AttendeeSectionProps) => {
-  const navigation = useNavigation()
+  const navigation: NavigationProp<ParamListBase> = useNavigation()
   const [textWidth, setTextWidth] = useState(0)
   const [chevronWidth, setChevronWidth] = useState(0)
 
