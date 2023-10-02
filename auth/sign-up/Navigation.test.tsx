@@ -41,7 +41,7 @@ describe("SignUpNavigation tests", () => {
 
     submitCredentials()
 
-    await waitFor(() => expect(verififyCodeForm()).toBeDisplayed())
+    await waitFor(() => expect(verifyCodeForm()).toBeDisplayed())
 
     enterVerificationCode("123456")
     submitVerificationCode()
@@ -105,7 +105,7 @@ describe("SignUpNavigation tests", () => {
     fireEvent.press(screen.getByText("I'm ready!"))
   }
 
-  const verififyCodeForm = () => screen.queryByText("Verify your Account")
+  const verifyCodeForm = () => screen.queryByText("Verify your Account")
 
   const enterVerificationCode = (code: string) => {
     fireEvent.changeText(
