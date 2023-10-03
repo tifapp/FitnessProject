@@ -6,6 +6,8 @@ export namespace StringUtils {
     return str[0].toUpperCase() + str.slice(1)
   }
 
+  const WHITESPACE_REGEX = /\s/
+
   /**
    * Returns true if the the given character in a string is whitespace.
    *
@@ -13,14 +15,16 @@ export namespace StringUtils {
    * @param index the index of the character to check.
    */
   export const isWhitespaceCharacter = (str: string, index: number) => {
-    return /\s/.test(str[index])
+    return WHITESPACE_REGEX.test(str[index])
   }
+
+  const NON_DIGIT_REGEX = /\D/g
 
   /**
    * Extracts a numerical string of all the numbers in this string.
    */
   export const extractNumbers = (str: string) => {
-    return str.replaceAll(/\D/g, "") as `${number}` | ""
+    return str.replace(NON_DIGIT_REGEX, "") as `${number}` | ""
   }
 }
 
