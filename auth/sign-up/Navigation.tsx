@@ -58,6 +58,9 @@ export type SignUpParamsList = {
 
 const SignUpModalStack = createStackNavigator<SignUpModalParamsList>()
 
+/**
+ * Creates the sign up screens on a Stack Navigator.
+ */
 export const createSignUpScreens = <Params extends SignUpParamsList>(
   stack: StackNavigatorType<Params>,
   env: SignUpEnvironment
