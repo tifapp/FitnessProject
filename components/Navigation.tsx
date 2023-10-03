@@ -46,6 +46,7 @@ export const ChevronBackButton = ({
   return (
     <TouchableIonicon
       icon={{ name: "chevron-back" }}
+      accessibilityLabel="Go Back"
       onPress={() => navigation.goBack()}
       style={style}
     />
@@ -59,6 +60,7 @@ export const XMarkBackButton = ({
   return (
     <TouchableIonicon
       icon={{ name: "close" }}
+      accessibilityLabel="Go Back"
       onPress={() => navigation.goBack()}
       style={style}
     />

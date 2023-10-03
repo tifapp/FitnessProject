@@ -34,6 +34,7 @@ export const AuthShadedTextField = forwardRef(function TextField (
         <CircularIonicon
           backgroundColor={iconBackgroundColor}
           name={iconName}
+          accessibilityElementsHidden
         />
       }
       {...props}
@@ -69,6 +70,7 @@ export const AuthShadedPasswordTextField = forwardRef(function TextField (
         <CircularIonicon
           backgroundColor={iconBackgroundColor}
           name={iconName}
+          accessibilityElementsHidden
         />
       }
       {...props}
@@ -108,6 +110,7 @@ export const AuthShadedEmailPhoneTextFieldView = forwardRef(function TextField (
         <TouchableOpacity
           style={styles.emailPhoneToggleButtonContainer}
           onPress={onActiveTextTypeToggled}
+          hitSlop={32}
         >
           <Ionicon name="refresh" color={AppStyles.colorOpacity35} />
           <Ionicon
