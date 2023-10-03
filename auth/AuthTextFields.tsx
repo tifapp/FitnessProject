@@ -6,9 +6,12 @@ import {
   TextFieldProps,
   TextFieldRef
 } from "@components/TextFields"
-import { CircularIonicon, IoniconName } from "@components/common/Icons"
-import { StyleProp, ViewStyle } from "react-native"
+import { CircularIonicon, Ionicon, IoniconName } from "@components/common/Icons"
+import { StyleProp, ViewStyle, StyleSheet } from "react-native"
 import { useFontScale } from "@hooks/Fonts"
+import { AppStyles } from "@lib/AppColorStyle"
+import { EmailPhoneTextType } from "./UseEmailPhoneText"
+import { TouchableOpacity } from "react-native-gesture-handler"
 
 export type AuthShadedTextFieldProps = {
   iconName: IoniconName
@@ -75,4 +78,49 @@ export const AuthShadedPasswordTextField = forwardRef(function TextField (
       textStyle={{ height: textFieldHeight }}
     />
   )
+})
+
+export type AuthEmailPhoneTextFieldProps = {
+  activeTextType: EmailPhoneTextType
+  onActiveTextTypeToggled: () => void
+} & Omit<AuthShadedTextFieldProps, "rightAddon" | "keyboardType" | "iconName">
+
+/**
+ * An auth text field that accepts both email addresses and phone numbers as input.
+ */
+export const AuthShadedEmailPhoneTextFieldView = forwardRef(function TextField (
+  {
+    activeTextType,
+    onActiveTextTypeToggled,
+    ...props
+  }: AuthEmailPhoneTextFieldProps,
+  ref: TextFieldRef
+) {
+  return (
+    <AuthShadedTextField
+      {...props}
+      ref={ref}
+      iconName={activeTextType === "email" ? "mail" : "call"}
+      keyboardType={activeTextType === "phone" ? "number-pad" : "email-address"}
+      rightAddon={
+        <TouchableOpacity
+          style={styles.emailPhoneToggleButtonContainer}
+          onPress={onActiveTextTypeToggled}
+        >
+          <Ionicon name="refresh" color={AppStyles.colorOpacity35} />
+          <Ionicon
+            name={activeTextType === "phone" ? "mail" : "call"}
+            color={AppStyles.colorOpacity35}
+          />
+        </TouchableOpacity>
+      }
+    />
+  )
+})
+
+const styles = StyleSheet.create({
+  emailPhoneToggleButtonContainer: {
+    display: "flex",
+    flexDirection: "row"
+  }
 })

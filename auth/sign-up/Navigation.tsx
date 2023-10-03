@@ -1,5 +1,6 @@
 import React, { memo, useRef } from "react"
 import {
+  BASE_HEADER_SCREEN_OPTIONS,
   ChevronBackButton,
   StackNavigatorType,
   XMarkBackButton
@@ -11,7 +12,7 @@ import {
   useAuthVerificationCodeForm
 } from ".."
 import { UserHandle } from "@lib/users"
-import { StackScreenProps } from "@react-navigation/stack"
+import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import {
   SignUpCredentialsFormView,
   useSignUpCredentialsForm
@@ -21,6 +22,7 @@ import {
   useSignUpChangeUserHandleForm
 } from "./ChangeUserHandle"
 import { SignUpEndingView } from "./Ending"
+import { NavigatorScreenParams } from "@react-navigation/native"
 
 export type SignUpEnvironment = {
   createAccount: (
@@ -39,84 +41,101 @@ export type SignUpEnvironment = {
   ) => Promise<{ userHandle: UserHandle }>
 }
 
-export type SignUpParamsList = {
-  signUpCredentialsForm: {}
+type SignUpModalParamsList = {
+  signUpCredentialsForm: undefined
   signUpVerifyCodeForm: {
     emailOrPhoneNumber: EmailAddress | USPhoneNumber
   }
   signUpChangeUserHandleForm: {
     initialHandle: UserHandle
   }
-  signUpEnding: {}
+  signUpEnding: undefined
 }
 
-type CredentialsFormStackScreenProps = StackScreenProps<
-  SignUpParamsList,
-  "signUpCredentialsForm"
->
+export type SignUpParamsList = {
+  signUp: NavigatorScreenParams<SignUpModalParamsList>
+}
 
-type VerifyCodeFormStackScreenPrrops = StackScreenProps<
-  SignUpParamsList,
-  "signUpVerifyCodeForm"
->
-
-type ChangeUserHandleFormStackScreenProps = StackScreenProps<
-  SignUpParamsList,
-  "signUpChangeUserHandleForm"
->
+const SignUpModalStack = createStackNavigator<SignUpModalParamsList>()
 
 export const createSignUpScreens = <Params extends SignUpParamsList>(
   stack: StackNavigatorType<Params>,
-  {
-    createAccount,
-    finishRegisteringAccount,
-    changeUserHandle,
-    checkIfUserHandleTaken
-  }: SignUpEnvironment
+  env: SignUpEnvironment
 ) => {
   return (
-    <>
-      <stack.Screen
+    <stack.Screen
+      name="signUp"
+      options={() => ({ headerShown: false, presentation: "modal" })}
+    >
+      {(props: any) => <SignUpModalScreen {...props} {...env} />}
+    </stack.Screen>
+  )
+}
+
+type SignUpModalScreenProps = StackScreenProps<SignUpParamsList, "signUp"> &
+  SignUpEnvironment
+
+const SignUpModalScreen = memo(function Screen ({
+  createAccount,
+  finishRegisteringAccount,
+  changeUserHandle,
+  checkIfUserHandleTaken
+}: SignUpModalScreenProps) {
+  return (
+    <SignUpModalStack.Navigator
+      screenOptions={BASE_HEADER_SCREEN_OPTIONS}
+      initialRouteName="signUpCredentialsForm"
+    >
+      <SignUpModalStack.Screen
         name="signUpCredentialsForm"
-        options={() => ({ headerLeft: XMarkBackButton, title: "" })}
+        options={() => ({
+          headerLeft: XMarkBackButton,
+          title: ""
+        })}
       >
-        {(props: CredentialsFormStackScreenProps) => (
+        {(props) => (
           <CredentialsFormScreen {...props} createAccount={createAccount} />
         )}
-      </stack.Screen>
-      <stack.Screen
+      </SignUpModalStack.Screen>
+      <SignUpModalStack.Screen
         name="signUpVerifyCodeForm"
-        options={() => ({ headerLeft: ChevronBackButton, title: "" })}
+        options={() => ({
+          headerLeft: XMarkBackButton,
+          title: ""
+        })}
       >
-        {(props: VerifyCodeFormStackScreenPrrops) => (
+        {(props) => (
           <VerifyCodeFormScreen
             {...props}
             finishRegisteringAccount={finishRegisteringAccount}
           />
         )}
-      </stack.Screen>
-      <stack.Screen
+      </SignUpModalStack.Screen>
+      <SignUpModalStack.Screen
         name="signUpChangeUserHandleForm"
-        options={() => ({ headerLeft: ChevronBackButton, title: "" })}
+        options={() => ({ headerLeft: XMarkBackButton, title: "" })}
       >
-        {(props: ChangeUserHandleFormStackScreenProps) => (
+        {(props) => (
           <ChangeUserHandleFormScreen
             {...props}
             changeUserHandle={changeUserHandle}
             checkIfUserHandleTaken={checkIfUserHandleTaken}
           />
         )}
-      </stack.Screen>
-      <stack.Screen
+      </SignUpModalStack.Screen>
+      <SignUpModalStack.Screen
         name="signUpEnding"
         options={() => ({ headerLeft: ChevronBackButton, title: "" })}
         component={EndingScreen}
       />
-    </>
+    </SignUpModalStack.Navigator>
   )
-}
+})
 
-type CredentialsScreenProps = CredentialsFormStackScreenProps & {
+type CredentialsScreenProps = StackScreenProps<
+  SignUpModalParamsList,
+  "signUpCredentialsForm"
+> & {
   createAccount: (
     name: string,
     emailOrPhoneNumber: EmailAddress | USPhoneNumber,
@@ -131,8 +150,7 @@ const CredentialsFormScreen = memo(function Screen ({
   const form = useSignUpCredentialsForm({
     createAccount,
     onSuccess: (emailOrPhoneNumber) => {
-      console.log("Navigating")
-      navigation.navigate("signUpVerifyCodeForm", { emailOrPhoneNumber })
+      navigation.replace("signUpVerifyCodeForm", { emailOrPhoneNumber })
     }
   })
   return (
@@ -144,7 +162,10 @@ const CredentialsFormScreen = memo(function Screen ({
   )
 })
 
-type VerifyCodeFormScreenProps = VerifyCodeFormStackScreenPrrops & {
+type VerifyCodeFormScreenProps = StackScreenProps<
+  SignUpModalParamsList,
+  "signUpVerifyCodeForm"
+> & {
   finishRegisteringAccount: (
     emailOrPhoneNumber: EmailAddress | USPhoneNumber,
     verificationCode: string
@@ -156,11 +177,10 @@ const VerifyCodeFormScreen = memo(function Screen ({
   route,
   finishRegisteringAccount
 }: VerifyCodeFormScreenProps) {
-  console.log("Verify Code Screen")
   const generatedUserHandleRef = useRef<UserHandle | undefined>()
   const form = useAuthVerificationCodeForm({
     resendCode: async () => {},
-    checkCode: async (code: string) => {
+    submitCode: async (code: string) => {
       generatedUserHandleRef.current = await finishRegisteringAccount(
         route.params.emailOrPhoneNumber,
         code
@@ -169,7 +189,7 @@ const VerifyCodeFormScreen = memo(function Screen ({
     },
     onSuccess: () => {
       if (generatedUserHandleRef.current) {
-        navigation.navigate("signUpChangeUserHandleForm", {
+        navigation.replace("signUpChangeUserHandleForm", {
           initialHandle: generatedUserHandleRef.current
         })
       }
@@ -183,7 +203,10 @@ const VerifyCodeFormScreen = memo(function Screen ({
   )
 })
 
-type ChangeUserHandleFormScreenProps = ChangeUserHandleFormStackScreenProps & {
+type ChangeUserHandleFormScreenProps = StackScreenProps<
+  SignUpModalParamsList,
+  "signUpChangeUserHandleForm"
+> & {
   checkIfUserHandleTaken: (
     handle: UserHandle,
     signal?: AbortSignal
@@ -200,13 +223,15 @@ const ChangeUserHandleFormScreen = memo(function Screen ({
   const form = useSignUpChangeUserHandleForm(route.params.initialHandle, 300, {
     checkIfUserHandleTaken,
     changeUserHandle,
-    onSuccess: () => navigation.navigate("signUpEnding", {})
+    onSuccess: () => navigation.navigate("signUpEnding")
   })
   return <SignUpChangeUserHandleFormView {...form} />
 })
 
 const EndingScreen = ({
   navigation
-}: StackScreenProps<SignUpParamsList, "signUpEnding">) => (
-  <SignUpEndingView onCallToActionTapped={navigation.popToTop} />
+}: StackScreenProps<SignUpModalParamsList, "signUpEnding">) => (
+  <SignUpEndingView
+    onCallToActionTapped={() => navigation.getParent()?.goBack()}
+  />
 )

@@ -36,7 +36,7 @@ describe("SignUpCredentialsForm tests", () => {
     it("should have an invalid email message when invalid email entered", () => {
       const { result } = renderUseSignUpCredentialsForm()
 
-      act(() => result.current.toggleEmailPhoneTextType())
+      act(() => result.current.onEmailPhoneTextTypeToggled())
       act(() => {
         result.current.onFieldUpdated(
           "emailPhoneNumberText",

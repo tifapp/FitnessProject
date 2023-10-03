@@ -1,12 +1,10 @@
 import { AuthFormView } from "@auth/AuthSection"
 import {
+  AuthShadedEmailPhoneTextFieldView,
   AuthShadedPasswordTextField,
   AuthShadedTextField
 } from "@auth/AuthTextFields"
-import {
-  toggleEmailPhoneTextType,
-  useEmailPhoneTextState
-} from "@auth/UseEmailPhoneTextState"
+import { useEmailPhoneTextState } from "@auth/UseEmailPhoneText"
 import { BodyText, Caption } from "@components/Text"
 import { TextFieldRefValue } from "@components/TextFields"
 import { useFormSubmission } from "@hooks/FormHooks"
@@ -61,14 +59,14 @@ export const useSignUpCredentialsForm = ({
       }
     },
     emailPhoneTextType: emailPhoneText.activeTextType,
-    toggleEmailPhoneTextType: () => {
-      emailPhoneText.switchActiveTextTypeTo(toggleEmailPhoneTextType)
+    onEmailPhoneTextTypeToggled: () => {
+      emailPhoneText.onActiveTextTypeToggled()
     },
     submission: useFormSubmission(
       async (args) => {
         await createAccount(
           args.name,
-          args.emailOrPhoneNumber!,
+          args.emailOrPhoneNumber,
           args.passwordText
         )
       },
@@ -128,7 +126,7 @@ export const SignUpCredentialsFormView = ({
   fields,
   onFieldUpdated,
   emailPhoneTextType,
-  toggleEmailPhoneTextType,
+  onEmailPhoneTextTypeToggled,
   submission,
   onPrivacyPolicyTapped,
   onTermsAndConditionsTapped,
@@ -150,7 +148,7 @@ export const SignUpCredentialsFormView = ({
               entering={SlideInLeft.duration(300)}
               exiting={SlideOutLeft.duration(300)}
             >
-              <TouchableOpacity onPress={toggleEmailPhoneTextType}>
+              <TouchableOpacity onPress={onEmailPhoneTextTypeToggled}>
                 <BodyText style={styles.emailPhoneToggle}>
                   {emailPhoneTextType === "email"
                     ? "Use phone number instead."
@@ -174,15 +172,11 @@ export const SignUpCredentialsFormView = ({
         onSubmitEditing={() => emailPhoneRef.current?.focus()}
         placeholder="Name"
       />
-      <AuthShadedTextField
-        iconName={emailPhoneTextType === "phone" ? "phone-portrait" : "mail"}
+      <AuthShadedEmailPhoneTextFieldView
+        activeTextType={emailPhoneTextType}
+        onActiveTextTypeToggled={onEmailPhoneTextTypeToggled}
         iconBackgroundColor="#14B329"
         placeholder="Phone number or Email"
-        keyboardType={
-          emailPhoneTextType === "phone" ? "phone-pad" : "email-address"
-        }
-        autoCapitalize="none"
-        autoCorrect={false}
         blurOnSubmit={false}
         value={fields.emailPhoneText}
         onChangeText={(text) => onFieldUpdated("emailPhoneNumberText", text)}

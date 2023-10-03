@@ -1,47 +1,53 @@
-import { createStackNavigator } from "@react-navigation/stack"
+import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { SignUpParamsList, createSignUpScreens } from "./Navigation"
-import { View } from "react-native"
+import { Button, View } from "react-native"
 import {
+  act,
   fireEvent,
   render,
   screen,
   waitFor
 } from "@testing-library/react-native"
-import { NavigationContainer } from "@react-navigation/native"
+import { NavigationContainer, useFocusEffect } from "@react-navigation/native"
 import "../../tests/helpers/Matchers"
 import { UserHandle } from "@lib/users"
 import { fakeTimers } from "../../tests/helpers/Timers"
 import { USPhoneNumber } from ".."
 import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
+import { useCallback, useState } from "react"
 
 type TestSignUpParamsList = {
-  testEnding: undefined
+  test: undefined
 } & SignUpParamsList
 
 describe("SignUpNavigation tests", () => {
+  afterEach(() => act(() => jest.runAllTimers()))
   fakeTimers()
   beforeEach(() => jest.resetAllMocks())
 
   test("a full valid sign-up flow", async () => {
     createAccount.mockReturnValueOnce(Promise.resolve())
 
-    const generatedUserHandle = UserHandle.parse("bitchelldickle12").handle!
-    finishRegisteringAccount.mockResolvedValue({
+    const generatedUserHandle = UserHandle.parse("bitchelldic12").handle!
+    finishRegisteringAccount.mockResolvedValueOnce({
       userHandle: generatedUserHandle
     })
 
     checkIfUserHandleTaken.mockResolvedValue(false)
-    changeUserHandle.mockReturnValue(Promise.resolve())
+    changeUserHandle.mockReturnValueOnce(Promise.resolve())
 
     renderSignUpFlow()
 
+    startSignUpTest()
+
     enterName("Bitchell Dickle")
     enterPhoneNumberText("1234567890")
-    enterPassword("1234")
+    enterPassword("Abc123{}op")
 
     submitCredentials()
 
     await waitFor(() => expect(verifyCodeForm()).toBeDisplayed())
+    expect(credentialsForm()).not.toBeDisplayed()
 
     enterVerificationCode("123456")
     submitVerificationCode()
@@ -51,12 +57,40 @@ describe("SignUpNavigation tests", () => {
       USPhoneNumber.parse("1234567890")!,
       "123456"
     )
+    expect(verifyCodeForm()).not.toBeDisplayed()
 
     replaceUserHandleText(generatedUserHandle.rawValue, "bitchelldickle")
     submitNewUserHandle()
 
     await waitFor(() => expect(endingView()).toBeDisplayed())
-    movePastEnding()
+    endSignUpTest()
+
+    expect(isAtEnd()).toEqual(true)
+  })
+
+  test("get to end of sign-up flow, go back to change username again, finish sign-up flow", async () => {
+    const generatedUserHandle = UserHandle.parse("bitchelldic12").handle!
+
+    checkIfUserHandleTaken.mockResolvedValue(false)
+    changeUserHandle.mockReturnValue(Promise.resolve())
+
+    renderSignUpFlow()
+
+    startSignUpTestAtUserHandleStage(generatedUserHandle)
+
+    replaceUserHandleText(generatedUserHandle.rawValue, "bitchelldickle")
+    submitNewUserHandle()
+
+    await waitFor(() => expect(endingView()).toBeDisplayed())
+    goBack()
+    expect(endingView()).not.toBeDisplayed()
+
+    replaceUserHandleText("bitchelldickle", "bic")
+    submitNewUserHandle()
+
+    await waitFor(() => expect(endingView()).toBeDisplayed())
+
+    endSignUpTest()
 
     expect(isAtEnd()).toEqual(true)
   })
@@ -75,15 +109,19 @@ describe("SignUpNavigation tests", () => {
       changeUserHandle
     })
     return render(
-      <NavigationContainer>
-        <TestQueryClientProvider>
-          <Stack.Navigator initialRouteName="signUpCredentialsForm">
+      <TestQueryClientProvider>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="test">
             {signUpScreens}
-            <Stack.Screen name="testEnding" component={TestEndingScreen} />
+            <Stack.Screen name="test" component={TestScreen} />
           </Stack.Navigator>
-        </TestQueryClientProvider>
-      </NavigationContainer>
+        </NavigationContainer>
+      </TestQueryClientProvider>
     )
+  }
+
+  const credentialsForm = () => {
+    return screen.queryByText("Create your Account")
   }
 
   const enterName = (name: string) => {
@@ -102,7 +140,7 @@ describe("SignUpNavigation tests", () => {
   }
 
   const submitCredentials = () => {
-    fireEvent.press(screen.getByText("I'm ready!"))
+    fireEvent.press(screen.getByLabelText("I'm ready!"))
   }
 
   const verifyCodeForm = () => screen.queryByText("Verify your Account")
@@ -115,31 +153,73 @@ describe("SignUpNavigation tests", () => {
   }
 
   const submitVerificationCode = () => {
-    fireEvent.press(screen.getByText("Verify Me!"))
+    fireEvent.press(screen.getByLabelText("Verify me!"))
   }
 
-  const changeUserHandleForm = () => screen.queryByText("Pick your Username")
+  const changeUserHandleForm = () => screen.queryByText("Choose your Username")
 
   const replaceUserHandleText = (
     originalHandleText: string,
     newHandletext: string
   ) => {
-    fireEvent.changeText(screen.getByText(originalHandleText), newHandletext)
+    fireEvent.changeText(screen.getByTestId(originalHandleText), newHandletext)
   }
 
   const submitNewUserHandle = () => {
-    fireEvent.press(screen.getByText("I like this name!"))
+    const button = screen.getByLabelText("I like this name!")
+    act(() => button.props.onClick())
   }
 
-  const endingView = () => screen.queryByText("Welcome to TiF!")
+  const endingView = () => screen.queryByText("Welcome to tiF!")
 
-  const movePastEnding = () => {
+  const endSignUpTest = () => {
     fireEvent.press(screen.getByText("Awesome!"))
+  }
+
+  const startSignUpTest = () => {
+    fireEvent.press(screen.getByText("Begin Sign-up Test"))
+  }
+
+  let initialHandle: UserHandle | undefined
+  const startSignUpTestAtUserHandleStage = (handle: UserHandle) => {
+    initialHandle = handle
+    fireEvent.press(screen.getByText("Begin Sign-up Test at Handle Stage"))
   }
 
   const IS_AT_END_TEST_ID = "test-sign-up-flow-end"
 
   const isAtEnd = () => !!screen.queryByTestId(IS_AT_END_TEST_ID)
 
-  const TestEndingScreen = () => <View testID={IS_AT_END_TEST_ID} />
+  const goBack = () => {
+    fireEvent.press(screen.getByLabelText("Go Back"))
+  }
+
+  const TestScreen = ({
+    navigation
+  }: StackScreenProps<TestSignUpParamsList, "test">) => {
+    const [focusCount, setFocusCount] = useState(0)
+    useFocusEffect(
+      useCallback(() => setFocusCount((focusCount) => focusCount + 1), [])
+    )
+    return (
+      <>
+        <Button
+          title="Begin Sign-up Test"
+          onPress={() =>
+            navigation.navigate("signUp", { screen: "signUpCredentialsForm" })
+          }
+        />
+        <Button
+          title="Begin Sign-up Test at Handle Stage"
+          onPress={() =>
+            navigation.navigate("signUp", {
+              screen: "signUpChangeUserHandleForm",
+              params: { initialHandle: initialHandle! }
+            })
+          }
+        />
+        {focusCount > 1 && <View testID={IS_AT_END_TEST_ID} />}
+      </>
+    )
+  }
 })

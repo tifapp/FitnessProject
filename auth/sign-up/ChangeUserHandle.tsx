@@ -119,13 +119,14 @@ export const SignUpChangeUserHandleFormView = ({
   style
 }: SignUpChangeUserHandleFormProps) => (
   <AuthFormView
-    title="1"
+    title="Choose your Username"
     description="We have created a username for you, but you can customize it if you don't like it. It's also possible to change it later if you want to."
     submissionTitle="I like this name!"
     submission={submission}
     style={style}
   >
     <AuthShadedTextField
+      testID={handleText}
       iconName="at-outline"
       iconBackgroundColor="#A882DD"
       rightAddon={

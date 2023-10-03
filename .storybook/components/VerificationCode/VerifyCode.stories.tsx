@@ -56,7 +56,7 @@ export const Basic: VerifyCodeStory = () => (
 const EmailScreen = () => {
   const email = EmailAddress.parse("peacock69@gmail.com")!
   const form = useAuthVerificationCodeForm({
-    checkCode: async () => await delayData(false, 7000),
+    submitCode: async () => await delayData(false, 7000),
     resendCode: async () => await delayData(undefined, 1000),
     onSuccess: () => console.log("success")
   })
@@ -72,7 +72,7 @@ const EmailScreen = () => {
 const PhoneNumberScreen = () => {
   const phoneNumber = USPhoneNumber.parse("1234567890")!
   const form = useAuthVerificationCodeForm({
-    checkCode: async () => await delayData(false, 1500),
+    submitCode: async () => await delayData(false, 1500),
     resendCode: async () => {
       throw new Error("Lol")
     },

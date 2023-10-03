@@ -13,7 +13,7 @@ export type AuthResendVerificationCodeStatus = "success" | "error"
 
 export type UseAuthVerificationCodeFormEnvironment = {
   resendCode: () => Promise<void>
-  checkCode: (code: string) => Promise<boolean>
+  submitCode: (code: string) => Promise<boolean>
   onSuccess: () => void
 }
 
@@ -22,7 +22,7 @@ export type UseAuthVerificationCodeFormEnvironment = {
  */
 export const useAuthVerificationCodeForm = ({
   resendCode,
-  checkCode,
+  submitCode,
   onSuccess
 }: UseAuthVerificationCodeFormEnvironment) => {
   const [code, setCode] = useState("")
@@ -38,7 +38,7 @@ export const useAuthVerificationCodeForm = ({
         : undefined,
     onCodeResent: () => resendCodeMutation.mutate(),
     submission: useFormSubmission(
-      checkCode,
+      submitCode,
       () => {
         if (isInvalidCode) {
           return { status: "invalid", reason: "invalid-code" } as const

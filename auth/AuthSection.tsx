@@ -2,7 +2,7 @@ import { Title, BodyText } from "@components/Text"
 import { PrimaryButton } from "@components/common/Buttons"
 import { useKeyboardState } from "@hooks/Keyboard"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
-import { useHeaderHeight } from "@react-navigation/stack"
+import { useHeaderHeight } from "@react-navigation/elements"
 import React, { ReactNode, useState } from "react"
 import {
   KeyboardAvoidingView,
@@ -124,7 +124,8 @@ export const AuthSectionView = ({
                 { opacity: isCallToActionDisabled ? 0.5 : 1 }
               ]}
               disabled={isCallToActionDisabled}
-              onPressIn={onCallToActionTapped}
+              onPress={onCallToActionTapped}
+              accessibilityLabel={callToActionTitle}
             />
           </Animated.View>
         </View>

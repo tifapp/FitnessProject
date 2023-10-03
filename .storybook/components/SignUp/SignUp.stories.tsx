@@ -4,22 +4,19 @@ import {
   XMarkBackButton
 } from "@components/Navigation"
 import { NavigationContainer, useNavigation } from "@react-navigation/native"
-import { createStackNavigator } from "@react-navigation/stack"
+import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import {
-  SignUpChangeUserHandleFormView,
-  SignUpCredentialsFormView,
-  SignUpEndingView,
-  useSignUpChangeUserHandleForm,
-  useSignUpCredentialsForm
-} from "@auth/sign-up"
+import { createSignUpScreens, SignUpParamsList } from "@auth/sign-up"
+import { useEmailPhoneTextState } from "@auth/UseEmailPhoneText"
+import { AuthShadedEmailPhoneTextFieldView } from "@auth/AuthTextFields"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { Button, View } from "react-native"
 import { UserHandle } from "@lib/users"
 import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { delayData, sleep } from "@lib/DelayData"
-import { useState } from "react"
+import { ScrollView } from "react-native-gesture-handler"
+import { AppStyles } from "@lib/AppColorStyle"
 
 const SignUpMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Sign Up"
@@ -29,7 +26,18 @@ export default SignUpMeta
 
 type SignUpStory = ComponentStory<typeof SettingsScreen>
 
-const Stack = createStackNavigator()
+type ParamsList = SignUpParamsList & { test: {} }
+
+const Stack = createStackNavigator<ParamsList>()
+
+const screens = createSignUpScreens(Stack, {
+  createAccount: async () => {},
+  finishRegisteringAccount: async () => {
+    return { userHandle: UserHandle.parse("elonmusk").handle! }
+  },
+  changeUserHandle: async () => {},
+  checkIfUserHandleTaken: async () => false
+})
 
 export const Basic: SignUpStory = () => (
   <TiFQueryClientProvider>
@@ -37,84 +45,32 @@ export const Basic: SignUpStory = () => (
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
           <Stack.Screen name="test" component={TestScreen} />
-          <Stack.Screen
-            name="signUp"
-            options={{ headerLeft: () => <XMarkBackButton />, title: "" }}
-            component={CredentialsScreen}
-          />
-          <Stack.Screen
-            name="changeHandle"
-            options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
-            component={HandleScreen}
-          />
-          <Stack.Screen
-            name="welcome"
-            options={{ headerLeft: () => <ChevronBackButton />, title: "" }}
-            component={EndingScreen}
-          />
+          {screens}
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
   </TiFQueryClientProvider>
 )
 
-const CredentialsScreen = () => {
-  const form = useSignUpCredentialsForm({
-    createAccount: async () => {
-      await sleep(2000)
-      throw new Error("Died")
-    },
-    onSuccess: () => console.log("Success")
-  })
+const TestScreen = ({ navigation }: StackScreenProps<ParamsList, "test">) => {
+  const { text, activeTextType, onTextChanged, onActiveTextTypeToggled } =
+    useEmailPhoneTextState("phone")
   return (
-    <SignUpCredentialsFormView
-      {...form}
-      onTermsAndConditionsTapped={() => console.log("terms and conditions")}
-      onPrivacyPolicyTapped={() => console.log("privacy policy")}
-    />
-  )
-}
-
-const HandleScreen = () => {
-  const methods = useSignUpChangeUserHandleForm(
-    UserHandle.parse("elonmusk").handle!,
-    200,
-    {
-      changeUserHandle: async () => {
-        await sleep(3000)
-        throw new Error("Lmao")
-      },
-      checkIfUserHandleTaken: async () => {
-        return await delayData(false, 3000)
-      },
-      onSuccess: () => console.log("Succeeded")
-    }
-  )
-  return (
-    <SignUpChangeUserHandleFormView
-      {...methods}
-      onHandleTextChanged={methods.onHandleTextChanged}
-    />
-  )
-}
-
-const EndingScreen = () => (
-  <SignUpEndingView onCallToActionTapped={() => console.log("Done")} />
-)
-
-const TestScreen = () => {
-  const navigation = useNavigation()
-  return (
-    <View>
+    <ScrollView>
       <Button
-        title="Create Account Form"
-        onPress={() => navigation.navigate("signUp")}
+        title="Do sign up flow"
+        onPress={() => {
+          navigation.navigate("signUp", { screen: "signUpCredentialsForm" })
+        }}
       />
-      <Button
-        title="Change Handle Form"
-        onPress={() => navigation.navigate("changeHandle")}
+      <AuthShadedEmailPhoneTextFieldView
+        iconBackgroundColor={AppStyles.darkColor}
+        value={text}
+        activeTextType={activeTextType}
+        onChangeText={onTextChanged}
+        onActiveTextTypeToggled={onActiveTextTypeToggled}
+        style={{ marginTop: 48, paddingHorizontal: 16 }}
       />
-      <Button title="Welcome" onPress={() => navigation.navigate("welcome")} />
-    </View>
+    </ScrollView>
   )
 }
