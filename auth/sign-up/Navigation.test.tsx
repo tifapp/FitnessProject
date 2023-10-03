@@ -20,6 +20,8 @@ type TestSignUpParamsList = {
   test: undefined
 } & SignUpParamsList
 
+const TEST_GENERATED_USER_HANDLE = UserHandle.parse("bitchelldic12").handle!
+
 describe("SignUpNavigation tests", () => {
   afterEach(() => act(() => jest.runAllTimers()))
   fakeTimers()
@@ -27,11 +29,7 @@ describe("SignUpNavigation tests", () => {
 
   test("a full valid sign-up flow", async () => {
     createAccount.mockReturnValueOnce(Promise.resolve())
-
-    const generatedUserHandle = UserHandle.parse("bitchelldic12").handle!
-    finishRegisteringAccount.mockResolvedValueOnce({
-      userHandle: generatedUserHandle
-    })
+    finishRegisteringAccount.mockResolvedValueOnce(TEST_GENERATED_USER_HANDLE)
 
     checkIfUserHandleTaken.mockResolvedValue(false)
     changeUserHandle.mockReturnValueOnce(Promise.resolve())
@@ -59,7 +57,7 @@ describe("SignUpNavigation tests", () => {
     )
     expect(verifyCodeForm()).not.toBeDisplayed()
 
-    replaceUserHandleText(generatedUserHandle.rawValue, "bitchelldickle")
+    replaceUserHandleText(TEST_GENERATED_USER_HANDLE.rawValue, "bitchelldickle")
     submitNewUserHandle()
 
     await waitFor(() => expect(endingView()).toBeDisplayed())
@@ -69,16 +67,14 @@ describe("SignUpNavigation tests", () => {
   })
 
   test("get to end of sign-up flow, go back to change username again, finish sign-up flow", async () => {
-    const generatedUserHandle = UserHandle.parse("bitchelldic12").handle!
-
     checkIfUserHandleTaken.mockResolvedValue(false)
     changeUserHandle.mockReturnValue(Promise.resolve())
 
     renderSignUpFlow()
 
-    startSignUpTestAtUserHandleStage(generatedUserHandle)
+    startSignUpTestAtUserHandleStage(TEST_GENERATED_USER_HANDLE)
 
-    replaceUserHandleText(generatedUserHandle.rawValue, "bitchelldickle")
+    replaceUserHandleText(TEST_GENERATED_USER_HANDLE.rawValue, "bitchelldickle")
     submitNewUserHandle()
 
     await waitFor(() => expect(endingView()).toBeDisplayed())
@@ -167,6 +163,8 @@ describe("SignUpNavigation tests", () => {
 
   const submitNewUserHandle = () => {
     const button = screen.getByLabelText("I like this name!")
+    // NB: For some reason, using fireEvent will sometimes just hang and not press the button, even though
+    // it knows it's there so instead we'll just have to invoke the press manually...
     act(() => button.props.onClick())
   }
 

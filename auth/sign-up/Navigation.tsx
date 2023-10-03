@@ -38,7 +38,7 @@ export type SignUpEnvironment = {
   finishRegisteringAccount: (
     emailOrPhoneNumber: EmailAddress | USPhoneNumber,
     verificationCode: string
-  ) => Promise<{ userHandle: UserHandle }>
+  ) => Promise<"invalid-verification-code" | UserHandle>
 }
 
 type SignUpModalParamsList = {
@@ -169,7 +169,7 @@ type VerifyCodeFormScreenProps = StackScreenProps<
   finishRegisteringAccount: (
     emailOrPhoneNumber: EmailAddress | USPhoneNumber,
     verificationCode: string
-  ) => Promise<{ userHandle: UserHandle }>
+  ) => Promise<"invalid-verification-code" | UserHandle>
 }
 
 const VerifyCodeFormScreen = memo(function Screen ({
@@ -181,10 +181,14 @@ const VerifyCodeFormScreen = memo(function Screen ({
   const form = useAuthVerificationCodeForm({
     resendCode: async () => {},
     submitCode: async (code: string) => {
-      generatedUserHandleRef.current = await finishRegisteringAccount(
+      const result = await finishRegisteringAccount(
         route.params.emailOrPhoneNumber,
         code
-      ).then((res) => res.userHandle)
+      )
+      if (result === "invalid-verification-code") {
+        return false
+      }
+      generatedUserHandleRef.current = result
       return true
     },
     onSuccess: () => {
