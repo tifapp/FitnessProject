@@ -54,7 +54,7 @@ describe("VerifyCode tests", () => {
     })
 
     it("should be in a submitting state when in process of submitting code", async () => {
-      checkCode.mockImplementationOnce(neverPromise)
+      submitCode.mockImplementationOnce(neverPromise)
 
       const { result } = renderUseAuthVerificationCodeForm()
 
@@ -67,7 +67,7 @@ describe("VerifyCode tests", () => {
     })
 
     test("submit invalid code, then resubmit valid code", async () => {
-      checkCode.mockResolvedValueOnce(false).mockResolvedValueOnce(true)
+      submitCode.mockResolvedValueOnce(false).mockResolvedValueOnce(true)
 
       const { result } = renderUseAuthVerificationCodeForm()
 
@@ -90,7 +90,7 @@ describe("VerifyCode tests", () => {
 
     test("submit invalid code, change code while submitting, retype invalid code after submission, stays invalid for retyped code", async () => {
       let resolveCheckCode: (value: boolean) => void
-      checkCode.mockReturnValueOnce(
+      submitCode.mockReturnValueOnce(
         new Promise<boolean>((resolve) => {
           resolveCheckCode = resolve
         })
@@ -118,7 +118,7 @@ describe("VerifyCode tests", () => {
     })
 
     test("previous invalid codes are always invalid", async () => {
-      checkCode.mockResolvedValue(false)
+      submitCode.mockResolvedValue(false)
       const invalidCode = "123456"
       const invalidCode2 = "789012"
 
@@ -150,7 +150,7 @@ describe("VerifyCode tests", () => {
     })
 
     test("error submission flow", async () => {
-      checkCode.mockRejectedValueOnce(new Error("Someone lied, people died"))
+      submitCode.mockRejectedValueOnce(new Error("Someone lied, people died"))
 
       const { result } = renderUseAuthVerificationCodeForm()
 
@@ -163,7 +163,7 @@ describe("VerifyCode tests", () => {
     const { alertPresentationSpy } = captureAlerts()
 
     const onSuccess = jest.fn()
-    const checkCode = jest.fn()
+    const submitCode = jest.fn()
     const resendCode = jest.fn()
 
     const renderUseAuthVerificationCodeForm = () => {
@@ -171,7 +171,7 @@ describe("VerifyCode tests", () => {
         () =>
           useAuthVerificationCodeForm({
             resendCode,
-            submitCode: checkCode,
+            submitCode,
             onSuccess
           }),
         {
