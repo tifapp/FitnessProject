@@ -16,56 +16,19 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import Animated from "react-native-reanimated"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
-/**
- * A base type that all Auth Forms should union with.
- */
-export type BaseAuthFormSubmission =
-  | { status: "submittable"; submit: () => void }
-  | { status: "submitting" }
-
-export type AuthFormProps<Submission extends { status: "invalid" }> = {
-  title: string
-  description: string
-  children: ReactNode
-  footer?: JSX.Element
-  submissionTitle: string
-  submission: Submission | BaseAuthFormSubmission
-  style?: StyleProp<ViewStyle>
-}
-
-/**
- * A base view for creating an auth screen that acts as a form.
- *
- * It automatically includes a title, description, a call to action at the bottom with an optional
- * footer above it, and handles weird scrolling behaviors.
- */
-export const AuthFormView = <Submission extends { status: "invalid" }>({
-  submission,
-  submissionTitle,
-  ...props
-}: AuthFormProps<Submission>) => (
-    <AuthSectionView
-      callToActionTitle={submissionTitle}
-      isCallToActionDisabled={submission.status !== "submittable"}
-      onCallToActionTapped={() => {
-        if (submission.status === "submittable") {
-          submission.submit()
-        }
-      }}
-      {...props}
-    />
-  )
-
 export type AuthSectionProps = {
   title: string
   description: string
   children: ReactNode
   footer?: JSX.Element
+  iOSInModal?: boolean
   callToActionTitle: string
   isCallToActionDisabled?: boolean
   onCallToActionTapped?: () => void
   style?: StyleProp<ViewStyle>
 }
+
+const IOS_MODAL_BOTTOM_OFFSET = 64
 
 /**
  * A view that serves as a basis for making an auth screen.
@@ -81,10 +44,13 @@ export const AuthSectionView = ({
   callToActionTitle,
   isCallToActionDisabled,
   onCallToActionTapped,
+  iOSInModal,
   style
 }: AuthSectionProps) => {
   const [footerHeight, setFooterHeight] = useState(0)
   const insets = useSafeAreaInsets()
+  const modalPaddingOffset =
+    Platform.OS === "ios" && iOSInModal ? IOS_MODAL_BOTTOM_OFFSET : 0
   return (
     <View style={[style, styles.container]}>
       <KeyboardAwareScrollView
@@ -102,7 +68,7 @@ export const AuthSectionView = ({
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={[styles.footer]}
         contentContainerStyle={{ paddingBottom: insets.bottom }}
-        keyboardVerticalOffset={useHeaderHeight()}
+        keyboardVerticalOffset={useHeaderHeight() + modalPaddingOffset}
       >
         <View
           style={[
@@ -133,6 +99,44 @@ export const AuthSectionView = ({
     </View>
   )
 }
+
+/**
+ * A base type that all Auth Forms should union with.
+ */
+export type BaseAuthFormSubmission =
+  | { status: "submittable"; submit: () => void }
+  | { status: "submitting" }
+
+export type AuthFormProps<Submission extends { status: "invalid" }> = {
+  submissionTitle: string
+  submission: Submission | BaseAuthFormSubmission
+} & Omit<
+  AuthSectionProps,
+  "callToActionTitle" | "isCallToActionDisabled" | "onCallToActionTapped"
+>
+
+/**
+ * A base view for creating an auth screen that acts as a form.
+ *
+ * It automatically includes a title, description, a call to action at the bottom with an optional
+ * footer above it, and handles weird scrolling behaviors.
+ */
+export const AuthFormView = <Submission extends { status: "invalid" }>({
+  submission,
+  submissionTitle,
+  ...props
+}: AuthFormProps<Submission>) => (
+    <AuthSectionView
+      callToActionTitle={submissionTitle}
+      isCallToActionDisabled={submission.status !== "submittable"}
+      onCallToActionTapped={() => {
+        if (submission.status === "submittable") {
+          submission.submit()
+        }
+      }}
+      {...props}
+    />
+  )
 
 const styles = StyleSheet.create({
   container: {

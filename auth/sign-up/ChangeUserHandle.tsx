@@ -122,6 +122,7 @@ export const SignUpChangeUserHandleFormView = ({
     title="Choose your Username"
     description="We have created a username for you, but you can customize it if you don't like it. It's also possible to change it later if you want to."
     submissionTitle="I like this name!"
+    iOSInModal
     submission={submission}
     style={style}
   >

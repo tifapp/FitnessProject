@@ -202,6 +202,7 @@ const VerifyCodeFormScreen = memo(function Screen ({
   return (
     <AuthVerificationCodeFormView
       {...form}
+      iOSInModal
       codeReceiverName={route.params.emailOrPhoneNumber.formattedForPrivacy}
     />
   )

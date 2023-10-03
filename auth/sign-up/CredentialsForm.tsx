@@ -140,6 +140,7 @@ export const SignUpCredentialsFormView = ({
       title="Create your Account"
       description="Welcome to tiF! Begin your fitness journey by creating an account."
       submissionTitle="I'm ready!"
+      iOSInModal
       submission={submission}
       footer={
         <Animated.View layout={TiFDefaultLayoutTransition}>

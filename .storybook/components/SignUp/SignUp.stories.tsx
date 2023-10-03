@@ -1,9 +1,5 @@
-import {
-  BASE_HEADER_SCREEN_OPTIONS,
-  ChevronBackButton,
-  XMarkBackButton
-} from "@components/Navigation"
-import { NavigationContainer, useNavigation } from "@react-navigation/native"
+import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
+import { NavigationContainer } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
@@ -11,10 +7,9 @@ import { createSignUpScreens, SignUpParamsList } from "@auth/sign-up"
 import { useEmailPhoneTextState } from "@auth/UseEmailPhoneText"
 import { AuthShadedEmailPhoneTextFieldView } from "@auth/AuthTextFields"
 import { SafeAreaProvider } from "react-native-safe-area-context"
-import { Button, View } from "react-native"
+import { Button } from "react-native"
 import { UserHandle } from "@lib/users"
 import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
-import { delayData, sleep } from "@lib/DelayData"
 import { ScrollView } from "react-native-gesture-handler"
 import { AppStyles } from "@lib/AppColorStyle"
 
@@ -33,7 +28,7 @@ const Stack = createStackNavigator<ParamsList>()
 const screens = createSignUpScreens(Stack, {
   createAccount: async () => {},
   finishRegisteringAccount: async () => {
-    return { userHandle: UserHandle.parse("elonmusk").handle! }
+    return UserHandle.parse("elonmusk").handle!
   },
   changeUserHandle: async () => {},
   checkIfUserHandleTaken: async () => false
