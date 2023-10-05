@@ -38,13 +38,12 @@ import {
 import "expo-dev-client"
 import { AnalyticsProvider, MixpanelAnalytics } from "@lib/Analytics"
 import { enableSentry } from "@lib/Sentry"
-import { Auth } from "aws-amplify"
 import { Native as SentryNative } from "sentry-expo"
 import awsconfig from "./src/aws-exports"
+import { setupCognito } from "./auth"
 
 Geo.configure(awsconfig)
-Auth.configure(awsconfig)
-
+setupCognito()
 enableSentry()
 
 const log = createLogFunction("app.root")

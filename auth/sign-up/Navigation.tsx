@@ -5,12 +5,7 @@ import {
   StackNavigatorType,
   XMarkBackButton
 } from "@components/Navigation"
-import {
-  AuthVerificationCodeFormView,
-  EmailAddress,
-  USPhoneNumber,
-  useAuthVerificationCodeForm
-} from ".."
+import { EmailAddress, USPhoneNumber } from ".."
 import { UserHandle } from "@lib/users"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import {
@@ -23,6 +18,10 @@ import {
 } from "./ChangeUserHandle"
 import { SignUpEndingView } from "./Ending"
 import { NavigatorScreenParams } from "@react-navigation/native"
+import {
+  useAuthVerificationCodeForm,
+  AuthVerificationCodeFormView
+} from "@auth/VerifyCode"
 
 export type SignUpEnvironment = {
   createAccount: (

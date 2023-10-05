@@ -1,5 +1,5 @@
-import { AmplifySecureStorage } from "@lib/SecureStorage"
-import { TestSecureStorage } from "./helpers/SecureStorage"
+import { AmplifySecureStorage } from "@auth/SecureStorage"
+import { TestSecureStorage } from "../tests/helpers/SecureStorage"
 
 const TEST_STORAGE_KEY: string = "@TestStorageKey: "
 
@@ -12,17 +12,17 @@ describe("SecureStorage tests", () => {
     const TestStorage1 = new AmplifySecureStorage(sharedStorage)
     const TestStorage2 = new AmplifySecureStorage(sharedStorage)
 
-    //Test set + get
+    // Test set + get
     TestStorage1.setItem(TEST_STORAGE_KEY + "1", "Test Value")
     TestStorage1.setItem(TEST_STORAGE_KEY + "2", "Test Value 2")
     TestStorage1.setItem(TEST_STORAGE_KEY + "3", "Test Value 3")
     expect(TestStorage1.getItem(TEST_STORAGE_KEY + "1")).toEqual("Test Value")
 
-    //Test remove
+    // Test remove
     TestStorage1.removeItem(TEST_STORAGE_KEY + "1")
     expect(TestStorage1.getItem(TEST_STORAGE_KEY + "1")).toBeUndefined()
 
-    //Test sync
+    // Test sync
     expect(TestStorage2.getItem(TEST_STORAGE_KEY + "2")).toBeUndefined()
     await TestStorage2.sync()
     expect(TestStorage2.getItem(TEST_STORAGE_KEY + "2")).toEqual("Test Value 2")

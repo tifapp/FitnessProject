@@ -1,21 +1,28 @@
+import "@lib/Promise"
+
+/**
+ * An interface for expo secure storage functions.
+ */
 export interface SecureStore {
   getItemAsync(key: string): Promise<string | null>
   deleteItemAsync(key: string): Promise<void>
   setItemAsync(key: string, value: string): Promise<void>
 }
 
-export const SECURE_STORAGE_KEY_PREFIX = "@SecureStorage:"
-export const KEYLIST_PREFIX = "KeyList"
+const SECURE_STORAGE_KEY_PREFIX = "secureStorage"
+const KEYLIST_PREFIX = "secureStorageKeyList"
 
+/**
+ * Secure storage for AWS Cognito Auth.
+ */
 export class AmplifySecureStorage<Store extends SecureStore> {
   private syncPromise?: Promise<void>
   private store: Store
-  private keyList: string[]
+  private keyList = [] as string[]
   private cache = new Map<string, string>()
 
   constructor (store: Store) {
     this.store = store
-    this.keyList = []
   }
 
   setItem (key: string, value: string) {
@@ -57,7 +64,7 @@ export class AmplifySecureStorage<Store extends SecureStore> {
     if (result) {
       this.keyList = JSON.parse(result)
     }
-    return await Promise.allSettled(
+    await Promise.allSettled(
       this.keyList.map(async (k) => {
         const storageValue = await this.store.getItemAsync(
           SECURE_STORAGE_KEY_PREFIX + k

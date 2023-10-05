@@ -12,6 +12,9 @@ import { UserHandle } from "@lib/users"
 import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { ScrollView } from "react-native-gesture-handler"
 import { AppStyles } from "@lib/AppColorStyle"
+import { setupCognito } from "@auth"
+
+setupCognito()
 
 const SignUpMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Sign Up"
@@ -27,6 +30,7 @@ const Stack = createStackNavigator<ParamsList>()
 
 const screens = createSignUpScreens(Stack, {
   createAccount: async () => {},
+  resendCode: async () => {},
   finishRegisteringAccount: async () => {
     return UserHandle.parse("elonmusk").handle!
   },

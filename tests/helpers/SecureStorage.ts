@@ -1,4 +1,4 @@
-import { SecureStore } from "@lib/SecureStorage"
+import { SecureStore } from "@auth/SecureStorage"
 import * as ExpoSecureStore from "expo-secure-store"
 
 export class TestSecureStorage implements SecureStore {

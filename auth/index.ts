@@ -1,5 +1,5 @@
 export * from "./ChangePassword"
 export * from "./Password"
-export * from "./VerifyCode"
 export * from "./Email"
 export * from "./PhoneNumber"
+export * from "./CognitoSetup"
