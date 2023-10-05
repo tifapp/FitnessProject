@@ -35,6 +35,7 @@ export type SignUpEnvironment = {
     signal?: AbortSignal
   ) => Promise<boolean>
   changeUserHandle: (handle: UserHandle) => Promise<void>
+  resendCode: () => Promise<void>
   finishRegisteringAccount: (
     emailOrPhoneNumber: EmailAddress | USPhoneNumber,
     verificationCode: string
@@ -81,6 +82,7 @@ type SignUpModalScreenProps = StackScreenProps<SignUpParamsList, "signUp"> &
 const SignUpModalScreen = memo(function Screen ({
   createAccount,
   finishRegisteringAccount,
+  resendCode,
   changeUserHandle,
   checkIfUserHandleTaken
 }: SignUpModalScreenProps) {
@@ -110,6 +112,7 @@ const SignUpModalScreen = memo(function Screen ({
         {(props) => (
           <VerifyCodeFormScreen
             {...props}
+            resendCode={resendCode}
             finishRegisteringAccount={finishRegisteringAccount}
           />
         )}
@@ -173,16 +176,18 @@ type VerifyCodeFormScreenProps = StackScreenProps<
     emailOrPhoneNumber: EmailAddress | USPhoneNumber,
     verificationCode: string
   ) => Promise<"invalid-verification-code" | UserHandle>
+  resendCode: () => Promise<void>
 }
 
 const VerifyCodeFormScreen = memo(function Screen ({
   navigation,
   route,
-  finishRegisteringAccount
+  finishRegisteringAccount,
+  resendCode
 }: VerifyCodeFormScreenProps) {
   const generatedUserHandleRef = useRef<UserHandle | undefined>()
   const form = useAuthVerificationCodeForm({
-    resendCode: async () => {},
+    resendCode,
     submitCode: async (code: string) => {
       const result = await finishRegisteringAccount(
         route.params.emailOrPhoneNumber,

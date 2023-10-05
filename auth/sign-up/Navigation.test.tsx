@@ -101,6 +101,7 @@ describe("SignUpNavigation tests", () => {
     const signUpScreens = createSignUpScreens(Stack, {
       createAccount,
       finishRegisteringAccount,
+      resendCode: jest.fn(),
       checkIfUserHandleTaken,
       changeUserHandle
     })
