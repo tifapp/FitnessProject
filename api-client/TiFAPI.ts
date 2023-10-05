@@ -1,4 +1,12 @@
+import { TiFAPIFetch } from "./client"
+
 /**
- * A namespace containing functions that make api calls to the backend.
+ * A high-level client for the TiF API.
  */
-export namespace TiFAPI {}
+export class TiFAPI {
+  private readonly apiFetch: TiFAPIFetch
+
+  constructor (apiFetch: TiFAPIFetch) {
+    this.apiFetch = apiFetch
+  }
+}

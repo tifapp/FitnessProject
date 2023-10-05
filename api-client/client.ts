@@ -139,6 +139,11 @@ export const createTiFAPIFetch = (
   }
 }
 
+/**
+ * A type defining a function that can perform fetches to the TiFAPi.
+ */
+export type TiFAPIFetch = ReturnType<typeof createTiFAPIFetch>
+
 const parseResponseBody = async (
   json: unknown,
   status: number,

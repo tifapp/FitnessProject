@@ -34,7 +34,9 @@ export type SignUpEnvironment = {
     signal?: AbortSignal
   ) => Promise<boolean>
   changeUserHandle: (handle: UserHandle) => Promise<void>
-  resendCode: () => Promise<void>
+  resendCode: (
+    emailOrPhoneNumber: EmailAddress | USPhoneNumber
+  ) => Promise<void>
   finishRegisteringAccount: (
     emailOrPhoneNumber: EmailAddress | USPhoneNumber,
     verificationCode: string
@@ -140,13 +142,8 @@ const SignUpModalScreen = memo(function Screen ({
 type CredentialsScreenProps = StackScreenProps<
   SignUpModalParamsList,
   "signUpCredentialsForm"
-> & {
-  createAccount: (
-    name: string,
-    emailOrPhoneNumber: EmailAddress | USPhoneNumber,
-    uncheckedPassword: string
-  ) => Promise<void>
-}
+> &
+  Pick<SignUpEnvironment, "createAccount">
 
 const CredentialsFormScreen = memo(function Screen ({
   navigation,
@@ -170,13 +167,8 @@ const CredentialsFormScreen = memo(function Screen ({
 type VerifyCodeFormScreenProps = StackScreenProps<
   SignUpModalParamsList,
   "signUpVerifyCodeForm"
-> & {
-  finishRegisteringAccount: (
-    emailOrPhoneNumber: EmailAddress | USPhoneNumber,
-    verificationCode: string
-  ) => Promise<"invalid-verification-code" | UserHandle>
-  resendCode: () => Promise<void>
-}
+> &
+  Pick<SignUpEnvironment, "finishRegisteringAccount" | "resendCode">
 
 const VerifyCodeFormScreen = memo(function Screen ({
   navigation,
@@ -186,7 +178,7 @@ const VerifyCodeFormScreen = memo(function Screen ({
 }: VerifyCodeFormScreenProps) {
   const generatedUserHandleRef = useRef<UserHandle | undefined>()
   const form = useAuthVerificationCodeForm({
-    resendCode,
+    resendCode: async () => await resendCode(route.params.emailOrPhoneNumber),
     submitCode: async (code: string) => {
       const result = await finishRegisteringAccount(
         route.params.emailOrPhoneNumber,
@@ -218,13 +210,8 @@ const VerifyCodeFormScreen = memo(function Screen ({
 type ChangeUserHandleFormScreenProps = StackScreenProps<
   SignUpModalParamsList,
   "signUpChangeUserHandleForm"
-> & {
-  checkIfUserHandleTaken: (
-    handle: UserHandle,
-    signal?: AbortSignal
-  ) => Promise<boolean>
-  changeUserHandle: (handle: UserHandle) => Promise<void>
-}
+> &
+  Pick<SignUpEnvironment, "checkIfUserHandleTaken" | "changeUserHandle">
 
 const ChangeUserHandleFormScreen = memo(function Screen ({
   navigation,
