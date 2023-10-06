@@ -68,7 +68,12 @@ export type TiFAPIResponse<Schemas extends TiFAPIResponseSchemas> = {
 const log = createLogFunction("tif.api.client")
 
 /**
- * Creates a fetch function to fetch from the backend.
+ * Creates a low-level fetch function to fetch from the TiF API.
+ *
+ * This lower level fetch handles automatic session tracking and
+ * response parsing. The {@link TiFAPI} class provides a set of
+ * high-level wrapper functions that utilize this low level
+ * fetch function.
  *
  * ```ts
  * const apiFetch = createTiFAPIFetch(

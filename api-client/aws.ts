@@ -2,7 +2,11 @@ import { Auth } from "@aws-amplify/auth"
 import { TiFAPIFetch, createTiFAPIFetch } from "./client"
 
 const awsAmplifyLoadBearerToken = async () => {
-  return (await Auth.currentSession()).getIdToken().getJwtToken()
+  try {
+    return (await Auth.currentSession()).getIdToken().getJwtToken()
+  } catch {
+    return undefined
+  }
 }
 
 /**

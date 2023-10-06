@@ -22,26 +22,7 @@ import {
   useAuthVerificationCodeForm,
   AuthVerificationCodeFormView
 } from "@auth/VerifyCode"
-
-export type SignUpEnvironment = {
-  createAccount: (
-    name: string,
-    emailOrPhoneNumber: EmailAddress | USPhoneNumber,
-    uncheckedPassword: string
-  ) => Promise<void>
-  checkIfUserHandleTaken: (
-    handle: UserHandle,
-    signal?: AbortSignal
-  ) => Promise<boolean>
-  changeUserHandle: (handle: UserHandle) => Promise<void>
-  resendCode: (
-    emailOrPhoneNumber: EmailAddress | USPhoneNumber
-  ) => Promise<void>
-  finishRegisteringAccount: (
-    emailOrPhoneNumber: EmailAddress | USPhoneNumber,
-    verificationCode: string
-  ) => Promise<"invalid-verification-code" | UserHandle>
-}
+import { SignUpEnvironment } from "./Environment"
 
 type SignUpModalParamsList = {
   signUpCredentialsForm: undefined
@@ -83,7 +64,7 @@ type SignUpModalScreenProps = StackScreenProps<SignUpParamsList, "signUp"> &
 const SignUpModalScreen = memo(function Screen ({
   createAccount,
   finishRegisteringAccount,
-  resendCode,
+  resendVerificationCode,
   changeUserHandle,
   checkIfUserHandleTaken
 }: SignUpModalScreenProps) {
@@ -113,7 +94,7 @@ const SignUpModalScreen = memo(function Screen ({
         {(props) => (
           <VerifyCodeFormScreen
             {...props}
-            resendCode={resendCode}
+            resendVerificationCode={resendVerificationCode}
             finishRegisteringAccount={finishRegisteringAccount}
           />
         )}
@@ -168,17 +149,18 @@ type VerifyCodeFormScreenProps = StackScreenProps<
   SignUpModalParamsList,
   "signUpVerifyCodeForm"
 > &
-  Pick<SignUpEnvironment, "finishRegisteringAccount" | "resendCode">
+  Pick<SignUpEnvironment, "finishRegisteringAccount" | "resendVerificationCode">
 
 const VerifyCodeFormScreen = memo(function Screen ({
   navigation,
   route,
   finishRegisteringAccount,
-  resendCode
+  resendVerificationCode
 }: VerifyCodeFormScreenProps) {
   const generatedUserHandleRef = useRef<UserHandle | undefined>()
   const form = useAuthVerificationCodeForm({
-    resendCode: async () => await resendCode(route.params.emailOrPhoneNumber),
+    resendCode: async () =>
+      await resendVerificationCode(route.params.emailOrPhoneNumber),
     submitCode: async (code: string) => {
       const result = await finishRegisteringAccount(
         route.params.emailOrPhoneNumber,

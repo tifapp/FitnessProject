@@ -3,18 +3,21 @@ import { NavigationContainer } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import { createSignUpScreens, SignUpParamsList } from "@auth/sign-up"
+import {
+  createSignUpEnvironment,
+  createSignUpScreens,
+  SignUpParamsList
+} from "@auth/sign-up"
 import { useEmailPhoneTextState } from "@auth/UseEmailPhoneText"
 import { AuthShadedEmailPhoneTextFieldView } from "@auth/AuthTextFields"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { Button } from "react-native"
-import { UserHandle } from "@lib/users"
 import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { ScrollView } from "react-native-gesture-handler"
 import { AppStyles } from "@lib/AppColorStyle"
-import { setupCognito } from "@auth"
-
-setupCognito()
+import { TiFAPI } from "@api-client/TiFAPI"
+import { createAWSTiFAPIFetch } from "@api-client"
+import { Auth } from "@aws-amplify/auth"
 
 const SignUpMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Sign Up"
@@ -28,15 +31,16 @@ type ParamsList = SignUpParamsList & { test: {} }
 
 const Stack = createStackNavigator<ParamsList>()
 
-const screens = createSignUpScreens(Stack, {
-  createAccount: async () => {},
-  resendCode: async () => {},
-  finishRegisteringAccount: async () => {
-    return UserHandle.parse("elonmusk").handle!
-  },
-  changeUserHandle: async () => {},
-  checkIfUserHandleTaken: async () => false
-})
+const tiFAPI = new TiFAPI(
+  createAWSTiFAPIFetch(
+    new URL("https://623qsegfb9.execute-api.us-west-2.amazonaws.com/prod")
+  )
+)
+
+const screens = createSignUpScreens(
+  Stack,
+  createSignUpEnvironment(Auth, tiFAPI)
+)
 
 export const Basic: SignUpStory = () => (
   <TiFQueryClientProvider>
