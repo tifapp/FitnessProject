@@ -1,4 +1,4 @@
-import { Title, BodyText } from "@components/Text"
+import { BodyText, Title } from "@components/Text"
 import { PrimaryButton } from "@components/common/Buttons"
 import { useKeyboardState } from "@hooks/Keyboard"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
@@ -8,9 +8,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleProp,
+  StyleSheet,
   View,
-  ViewStyle,
-  StyleSheet
+  ViewStyle
 } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import Animated from "react-native-reanimated"

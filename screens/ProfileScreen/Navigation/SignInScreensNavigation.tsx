@@ -92,7 +92,7 @@ const ChangePasswordScreen = ({ navigation }: ChangePasswordScreenProps) => {
   )
 }
 
-export const ForgotPasswordScreen = ({ navigation }) => {
+const ForgotPasswordScreen = ({ navigation }) => {
   const forgotPassword = useForgotPasswordForm({
     initiateForgotPassword: async () =>
       await delayData<void>(console.log("Test Forgot Password Screen")),
@@ -101,7 +101,7 @@ export const ForgotPasswordScreen = ({ navigation }) => {
   return <ForgotPasswordFormView {...forgotPassword} />
 }
 
-export const VerifyCodeScreen = ({ navigation }) => {
+const VerifyCodeScreen = ({ navigation }) => {
   const email = EmailAddress.parse("peacock69@gmail.com")!
   const form = useAuthVerificationCodeForm({
     submitCode: async () => await delayData(false, 7000),
@@ -117,7 +117,7 @@ export const VerifyCodeScreen = ({ navigation }) => {
   )
 }
 
-export const ResetPasswordScreen = ({ navigation }) => {
+const ResetPasswordScreen = ({ navigation }: ResetPasswordScreenProps) => {
   const resetPassword = useResetPasswordForm({
     initiateResetPassword: async () =>
       await delayData<ResetPasswordResult>("valid"),
