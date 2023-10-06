@@ -109,7 +109,8 @@ export const createTiFAPIFetch = (
     Schemas extends TiFAPIResponseSchemas
   >(
     request: TiFAPIRequest<Method>,
-    responseSchemas: Schemas
+    responseSchemas: Schemas,
+    signal?: AbortSignal
   ): Promise<TiFAPIResponse<Schemas>> => {
     try {
       const token = await loadAuthBearerToken()
@@ -123,7 +124,8 @@ export const createTiFAPIFetch = (
           "Content-Type": "application/json"
         },
         body:
-          request.method === "GET" ? undefined : JSON.stringify(request.body)
+          request.method === "GET" ? undefined : JSON.stringify(request.body),
+        signal
       })
 
       const json = await loadResponseBody(resp)

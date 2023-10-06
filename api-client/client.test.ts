@@ -3,6 +3,7 @@ import { createTiFAPIFetch } from "./client"
 import { rest } from "msw"
 import fetch, { Request, Response } from "node-fetch"
 import { setupServer } from "msw/node"
+import { neverPromise } from "../tests/helpers/Promise"
 
 globalThis.fetch = fetch as any
 globalThis.Request = Request as any
@@ -52,6 +53,10 @@ const server = setupServer(
   }),
   rest.get("http://localhost:8080/test6", async (_, res, ctx) => {
     return res(ctx.status(204))
+  }),
+  rest.get("http://localhost:8080/test7", async (_, res, ctx) => {
+    await neverPromise()
+    return res(ctx.status(500))
   })
 )
 
@@ -172,5 +177,21 @@ describe("CreateAPIFetch tests", () => {
     )
 
     expect(resp.data).toMatchObject({})
+  })
+
+  test("cancellation", async () => {
+    const controller = new AbortController()
+    const respPromise = apiFetch(
+      {
+        method: "GET",
+        endpoint: "/test7"
+      },
+      TestResponseSchema,
+      controller.signal
+    )
+
+    controller.abort()
+
+    expect(respPromise).rejects.toBeInstanceOf(Error)
   })
 })
