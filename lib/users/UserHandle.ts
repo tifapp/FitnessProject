@@ -59,6 +59,10 @@ export class UserHandle {
     return this.rawValue
   }
 
+  isEqualTo (other: UserHandle) {
+    return this.rawValue === other.rawValue
+  }
+
   /**
    * A zod schema that converts a string to an {@link UserHandle}.
    */

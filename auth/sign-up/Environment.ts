@@ -67,7 +67,7 @@ export const createSignUpEnvironment = (
   checkIfUserHandleTaken: async (handle: UserHandle, signal?: AbortSignal) => {
     return await tifAPI
       .autocompleteUsers(handle.rawValue, 1, signal)
-      .then((resp) => resp.data.users[0]?.handle.rawValue === handle.rawValue)
+      .then((resp) => resp.data.users[0]?.handle.isEqualTo(handle))
   },
   /**
    * Changes the user's handle.
