@@ -20,16 +20,6 @@ export type TiFAPIRequest<Method extends TiFHTTPMethod> = Method extends "GET"
       body?: { [key: string]: JSONSerializableValue }
     }
 
-type TiFAPIStatusCodeKey = `status${number}`
-
-/**
- * A type mapping a zod schema to an http status code. The keys of the object
- * must be in the form `statusXXX`.
- */
-export type TiFAPIResponseSchemas = {
-  [key: TiFAPIStatusCodeKey]: AnyZodObject
-}
-
 type StatusCodeMap = {
   status200: 200
   status201: 201
@@ -43,13 +33,36 @@ type StatusCodeMap = {
 }
 
 /**
+ * A type mapping a zod schema to an http status code. The keys of the object
+ * must be in the form `statusXXX`.
+ */
+export type TiFAPIResponseSchemas = Partial<{
+  [key in keyof StatusCodeMap]: key extends "status204"
+    ? "no-content"
+    : AnyZodObject
+}>
+
+const EmptyObjectSchema = z.object({})
+
+type SchemaFor<
+  Key extends keyof StatusCodeMap,
+  Schemas extends TiFAPIResponseSchemas
+> = Key extends "status204"
+  ? Schemas[Key] extends "no-content"
+    ? typeof EmptyObjectSchema
+    : undefined
+  : Schemas[Key]
+
+/**
  * A union type mapping a status code to the infered type of a ZodSchema.
  */
 export type TiFAPIResponse<Schemas extends TiFAPIResponseSchemas> = {
-  [key in keyof StatusCodeMap]: {
-    status: StatusCodeMap[key]
-    data: z.infer<Schemas[key]>
-  }
+  [key in keyof StatusCodeMap]: SchemaFor<key, Schemas> extends AnyZodObject
+    ? {
+        status: StatusCodeMap[key]
+        data: z.infer<SchemaFor<key, Schemas>>
+      }
+    : never
 }[keyof StatusCodeMap]
 
 const log = createLogFunction("tif.api.client")
@@ -112,23 +125,31 @@ export const createTiFAPIFetch = (
         body:
           request.method === "GET" ? undefined : JSON.stringify(request.body)
       })
+
       const json = await loadResponseBody(resp)
 
-      if (!(`status${resp.status}` in responseSchemas)) {
+      const statusKey = `status${resp.status}` as keyof StatusCodeMap
+
+      if (!(statusKey in responseSchemas)) {
         throw new Error(
           `TiF API responded with an unexpected status code ${
             resp.status
           } and body ${JSON.stringify(json)}`
         )
       }
+
+      if (resp.status === 204) {
+        return { status: 204, data: {} } as TiFAPIResponse<Schemas>
+      }
+
       return {
-        status: resp.status as StatusCodeMap[keyof StatusCodeMap],
+        status: resp.status,
         data: await parseResponseBody(
           json,
           resp.status,
-          responseSchemas[`status${resp.status}`]
+          responseSchemas[statusKey] as AnyZodObject
         )
-      }
+      } as TiFAPIResponse<Schemas>
     } catch (error) {
       log("error", "Failed to make tif API request.", {
         error,
@@ -164,9 +185,12 @@ const loadResponseBody = async (resp: Response) => {
   try {
     return await resp.json()
   } catch {
-    throw new Error(
-      `TiF API responded with non-JSON body and status ${resp.status}.`
-    )
+    if (resp.status !== 204) {
+      throw new Error(
+        `TiF API responded with non-JSON body and status ${resp.status}.`
+      )
+    }
+    return ""
   }
 }
 

@@ -49,6 +49,9 @@ const server = setupServer(
   }),
   rest.get("http://localhost:8080/test5", async (_, res, ctx) => {
     return res(ctx.status(200), ctx.json({ b: "bad" }))
+  }),
+  rest.get("http://localhost:8080/test6", async (_, res, ctx) => {
+    return res(ctx.status(204))
   })
 )
 
@@ -64,7 +67,7 @@ const TestResponseSchema = {
 
 server.listen()
 
-describe("createAPIFetch tests", () => {
+describe("CreateAPIFetch tests", () => {
   test("api client fetch", async () => {
     const resp = await apiFetch(
       {
@@ -141,5 +144,33 @@ describe("createAPIFetch tests", () => {
         "TiF API responded with an invalid JSON body {\"b\":\"bad\"} and status 200."
       )
     )
+  })
+
+  test("api client fetch, empty body on 204, response schema doesn't list a 204 response", async () => {
+    expect(
+      apiFetch(
+        {
+          method: "GET",
+          endpoint: "/test6"
+        },
+        TestResponseSchema
+      )
+    ).rejects.toEqual(
+      new Error(
+        "TiF API responded with an unexpected status code 204 and body \"\""
+      )
+    )
+  })
+
+  test("api client fetch, empty body on 204, response schema lists a 204 response", async () => {
+    const resp = await apiFetch(
+      {
+        method: "GET",
+        endpoint: "/test6"
+      },
+      { ...TestResponseSchema, status204: "no-content" }
+    )
+
+    expect(resp.data).toMatchObject({})
   })
 })
