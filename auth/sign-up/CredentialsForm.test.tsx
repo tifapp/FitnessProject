@@ -69,7 +69,7 @@ describe("SignUpCredentialsForm tests", () => {
     })
 
     test("successful submission flow", async () => {
-      createAccount.mockReturnValueOnce(Promise.resolve())
+      createAccount.mockResolvedValueOnce("success")
 
       const { result } = renderUseSignUpCredentialsForm()
 
@@ -114,6 +114,23 @@ describe("SignUpCredentialsForm tests", () => {
         emailPhoneReason: "empty",
         passwordReason: "too-short"
       })
+
+      await waitFor(() => expect(alertPresentationSpy).toHaveBeenCalled())
+    })
+
+    it("should display an error alert when account creation not success", async () => {
+      createAccount.mockResolvedValueOnce("email-already-exists")
+
+      const { result } = renderUseSignUpCredentialsForm()
+
+      act(() => result.current.onFieldUpdated("name", "Bitchell Dickle"))
+      act(() => {
+        result.current.onFieldUpdated("emailPhoneNumberText", "1234567890")
+      })
+      act(() => {
+        result.current.onFieldUpdated("passwordText", "SuperSecretPassword69")
+      })
+      act(() => (result.current.submission as any).submit())
 
       await waitFor(() => expect(alertPresentationSpy).toHaveBeenCalled())
     })

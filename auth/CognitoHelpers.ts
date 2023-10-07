@@ -18,13 +18,22 @@ export const setupCognito = () => {
 export const COGNITO_CODE_MISMATCH_EXCEPTION_ERROR_CODE =
   "CodeMismatchException"
 
+export const COGNITO_USERNAME_EXISTS_ERROR_CODE = "UsernameExistsException"
+
+export type CognitoErrorCode =
+  | "CodeMismatchException"
+  | "UsernameExistsException"
+
 /**
  * Returns true if the given error object is an instance of {@link Error} and has a property
- * `code` that matches Cognito's error code for an invalid verification code.
+ * `code` that matches the given Cognito error code.
  */
-export const isCognitoCodeMismatchError = (error: unknown) => {
+export const isCognitoErrorWithCode = (
+  error: unknown,
+  code: CognitoErrorCode
+) => {
   if (error instanceof Error && "code" in error) {
-    return error.code === COGNITO_CODE_MISMATCH_EXCEPTION_ERROR_CODE
+    return error.code === code
   }
   return false
 }

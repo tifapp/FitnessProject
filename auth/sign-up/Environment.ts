@@ -4,8 +4,13 @@ import { TiFAPI } from "@api-client/TiFAPI"
 import { UserHandle } from "@lib/users"
 import {
   cognitoFormatEmailOrPhoneNumber,
-  isCognitoCodeMismatchError
+  isCognitoErrorWithCode
 } from "@auth/CognitoHelpers"
+
+export type CreateAccountResult =
+  | "success"
+  | "phone-number-already-exists"
+  | "email-already-exists"
 
 /**
  * Creates the functions needed for the sign-up flow.
@@ -30,25 +35,33 @@ export const createSignUpEnvironment = (
     name: string,
     emailOrPhoneNumber: EmailAddress | USPhoneNumber,
     password: Password
-  ) => {
-    await cognito.signUp({
-      username: cognitoFormatEmailOrPhoneNumber(emailOrPhoneNumber),
-      password: password.rawValue,
-      attributes:
-        // NB: If we have a phone number, then cognito throws an error if we have the email key and vice versa.
-        emailOrPhoneNumber instanceof USPhoneNumber
-          ? {
-            name,
-            phoneNumber: cognitoFormatEmailOrPhoneNumber(emailOrPhoneNumber)
-          }
-          : {
-            name,
-            email: cognitoFormatEmailOrPhoneNumber(emailOrPhoneNumber)
-          },
-      autoSignIn: {
-        enabled: true
-      }
-    })
+  ): Promise<CreateAccountResult> => {
+    try {
+      await cognito.signUp({
+        username: cognitoFormatEmailOrPhoneNumber(emailOrPhoneNumber),
+        password: password.rawValue,
+        attributes:
+          // NB: If we have a phone number, then cognito throws an error if we have the email key and vice versa.
+          emailOrPhoneNumber instanceof USPhoneNumber
+            ? {
+              name,
+              phoneNumber: cognitoFormatEmailOrPhoneNumber(emailOrPhoneNumber)
+            }
+            : {
+              name,
+              email: cognitoFormatEmailOrPhoneNumber(emailOrPhoneNumber)
+            },
+        autoSignIn: {
+          enabled: true
+        }
+      })
+      return "success"
+    } catch (err) {
+      if (!isCognitoErrorWithCode(err, "UsernameExistsException")) throw err
+      return emailOrPhoneNumber instanceof USPhoneNumber
+        ? "phone-number-already-exists"
+        : "email-already-exists"
+    }
   },
   /**
    * Resends a sign-up verification code.
@@ -104,7 +117,7 @@ export const createSignUpEnvironment = (
         .createCurrentUserProfile()
         .then((resp) => resp.data.handle)
     } catch (error) {
-      if (isCognitoCodeMismatchError(error)) {
+      if (isCognitoErrorWithCode(error, "CodeMismatchException")) {
         return "invalid-verification-code" as const
       }
       throw error

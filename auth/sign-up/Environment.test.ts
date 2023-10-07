@@ -5,10 +5,19 @@ import { createTiFAPIFetch } from "@api-client/client"
 import { rest } from "msw"
 import { UserHandle } from "@lib/users"
 import { uuid } from "@lib/uuid"
-import { COGNITO_CODE_MISMATCH_EXCEPTION_ERROR_CODE } from "@auth/CognitoHelpers"
+import { CognitoErrorCode } from "@auth/CognitoHelpers"
 import { mswServer } from "../../tests/helpers/msw"
 
 describe("SignUpEnvironment tests", () => {
+  class CognitoError extends Error {
+    code: CognitoErrorCode
+
+    constructor (code: CognitoErrorCode) {
+      super()
+      this.code = code
+    }
+  }
+
   const cognito = {
     signUp: jest.fn(),
     resendSignUp: jest.fn(),
@@ -27,7 +36,7 @@ describe("SignUpEnvironment tests", () => {
 
   describe("CreateAccount tests", () => {
     test("create account with email", async () => {
-      await env.createAccount(
+      const result = await env.createAccount(
         "Bitchell Dickle",
         EmailAddress.parse("peacock69@gmail.com")!,
         Password.validate("12345678")!
@@ -43,10 +52,11 @@ describe("SignUpEnvironment tests", () => {
           enabled: true
         }
       })
+      expect(result).toEqual("success")
     })
 
     test("create account with phone number", async () => {
-      await env.createAccount(
+      const result = await env.createAccount(
         "Bitchell Dickle",
         USPhoneNumber.parse("1234567890")!,
         Password.validate("12345678")!
@@ -62,6 +72,31 @@ describe("SignUpEnvironment tests", () => {
           enabled: true
         }
       })
+      expect(result).toEqual("success")
+    })
+
+    test("create account with already existing email", async () => {
+      cognito.signUp.mockRejectedValueOnce(
+        new CognitoError("UsernameExistsException")
+      )
+      const result = await env.createAccount(
+        "Bitchell Dickle",
+        EmailAddress.parse("peacock69@gmail.com")!,
+        Password.validate("12345678")!
+      )
+      expect(result).toEqual("email-already-exists")
+    })
+
+    test("create account with already existing phone number", async () => {
+      cognito.signUp.mockRejectedValueOnce(
+        new CognitoError("UsernameExistsException")
+      )
+      const result = await env.createAccount(
+        "Bitchell Dickle",
+        USPhoneNumber.parse("1234567890")!,
+        Password.validate("12345678")!
+      )
+      expect(result).toEqual("phone-number-already-exists")
     })
   })
 
@@ -160,12 +195,10 @@ describe("SignUpEnvironment tests", () => {
   })
 
   describe("FinishRegisteringAccount tests", () => {
-    class CodeError extends Error {
-      code = COGNITO_CODE_MISMATCH_EXCEPTION_ERROR_CODE
-    }
-
     it("should return \"invalid-verification-code\" when cognito throws CodeMismatchException", async () => {
-      cognito.confirmSignUpWithAutoSignIn.mockRejectedValueOnce(new CodeError())
+      cognito.confirmSignUpWithAutoSignIn.mockRejectedValueOnce(
+        new CognitoError("CodeMismatchException")
+      )
       const result = await env.finishRegisteringAccount(
         USPhoneNumber.parse("1234567890")!,
         "123456"

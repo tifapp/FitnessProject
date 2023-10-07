@@ -18,6 +18,7 @@ import { EmailAddress, Password, USPhoneNumber } from ".."
 import { TouchableOpacity } from "react-native-gesture-handler"
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
+import { CreateAccountResult } from "./Environment"
 
 export type SignUpCredentialsFormFields = {
   name: string
@@ -30,7 +31,7 @@ export type UseSignUpCredentialsFormEnvironment = {
     name: string,
     emailOrPhoneNumber: EmailAddress | USPhoneNumber,
     password: Password
-  ) => Promise<void>
+  ) => Promise<CreateAccountResult>
   onSuccess: (emailOrPhoneNumber: EmailAddress | USPhoneNumber) => void
 }
 
@@ -68,7 +69,11 @@ export const useSignUpCredentialsForm = ({
     },
     submission: useFormSubmission(
       async (args) => {
-        await createAccount(args.name, args.emailOrPhoneNumber, args.password)
+        return await createAccount(
+          args.name,
+          args.emailOrPhoneNumber,
+          args.password
+        )
       },
       () => {
         const nameReason = checkForNameError(baseFields.name)
@@ -102,7 +107,20 @@ export const useSignUpCredentialsForm = ({
         }
       },
       {
-        onSuccess: (_, args) => onSuccess(args.emailOrPhoneNumber),
+        onSuccess: (result, args) => {
+          if (result === "success") {
+            onSuccess(args.emailOrPhoneNumber)
+          } else {
+            Alert.alert(
+              result === "email-already-exists"
+                ? "Email already exists"
+                : "Phone number already exists",
+              result === "email-already-exists"
+                ? "This email is being used for another account."
+                : "This phone number is being used for another account."
+            )
+          }
+        },
         onError: () => {
           Alert.alert(
             "Whoops!",
