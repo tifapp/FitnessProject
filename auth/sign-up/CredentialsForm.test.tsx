@@ -10,13 +10,16 @@ describe("SignUpCredentialsForm tests", () => {
       const { result } = renderUseSignUpCredentialsForm()
       expect(result.current.submission).toMatchObject({
         status: "invalid",
-        reason: "one-or-more-fields-empty"
+        nameReason: "empty",
+        emailPhoneReason: "empty",
+        passwordReason: "empty"
       })
 
       act(() => result.current.onFieldUpdated("name", "Bitchell Dickle"))
       expect(result.current.submission).toMatchObject({
         status: "invalid",
-        reason: "one-or-more-fields-empty"
+        emailPhoneReason: "empty",
+        passwordReason: "empty"
       })
 
       act(() => {
@@ -24,7 +27,7 @@ describe("SignUpCredentialsForm tests", () => {
       })
       expect(result.current.submission).toMatchObject({
         status: "invalid",
-        reason: "one-or-more-fields-empty"
+        passwordReason: "empty"
       })
 
       act(() => {
@@ -46,7 +49,9 @@ describe("SignUpCredentialsForm tests", () => {
 
       expect(result.current.submission).toMatchObject({
         status: "invalid",
-        reason: "invalid-email"
+        nameReason: "empty",
+        emailPhoneReason: "invalid-email",
+        passwordReason: "empty"
       })
     })
 
@@ -57,7 +62,9 @@ describe("SignUpCredentialsForm tests", () => {
 
       expect(result.current.submission).toMatchObject({
         status: "invalid",
-        reason: "invalid-phone-number"
+        nameReason: "empty",
+        emailPhoneReason: "invalid-phone-number",
+        passwordReason: "empty"
       })
     })
 
@@ -78,7 +85,7 @@ describe("SignUpCredentialsForm tests", () => {
       await waitFor(() => expect(onSuccess).toHaveBeenCalled())
     })
 
-    it("shoulde display an alert when submission fails", async () => {
+    it("should display an alert when submission fails", async () => {
       createAccount.mockRejectedValueOnce(new Error())
 
       const { result } = renderUseSignUpCredentialsForm()
@@ -91,6 +98,22 @@ describe("SignUpCredentialsForm tests", () => {
         result.current.onFieldUpdated("passwordText", "SuperSecretPassword69")
       })
       act(() => (result.current.submission as any).submit())
+
+      await waitFor(() => expect(alertPresentationSpy).toHaveBeenCalled())
+    })
+
+    it("should display an error for passwords under 8 characters", async () => {
+      createAccount.mockRejectedValueOnce(new Error())
+
+      const { result } = renderUseSignUpCredentialsForm()
+
+      act(() => result.current.onFieldUpdated("passwordText", "1234567"))
+      expect(result.current.submission).toMatchObject({
+        status: "invalid",
+        nameReason: "empty",
+        emailPhoneReason: "empty",
+        passwordReason: "too-short"
+      })
 
       await waitFor(() => expect(alertPresentationSpy).toHaveBeenCalled())
     })

@@ -1,5 +1,5 @@
 import { Auth } from "@aws-amplify/auth"
-import { EmailAddress, USPhoneNumber } from ".."
+import { EmailAddress, Password, USPhoneNumber } from ".."
 import { TiFAPI } from "@api-client/TiFAPI"
 import { UserHandle } from "@lib/users"
 import {
@@ -29,11 +29,11 @@ export const createSignUpEnvironment = (
   createAccount: async (
     name: string,
     emailOrPhoneNumber: EmailAddress | USPhoneNumber,
-    uncheckedPassword: string
+    password: Password
   ) => {
     await cognito.signUp({
       username: cognitoFormatEmailOrPhoneNumber(emailOrPhoneNumber),
-      password: uncheckedPassword,
+      password: password.rawValue,
       attributes:
         // NB: If we have a phone number, then cognito throws an error if we have the email key and vice versa.
         emailOrPhoneNumber instanceof USPhoneNumber

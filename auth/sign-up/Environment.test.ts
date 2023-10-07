@@ -1,4 +1,4 @@
-import { EmailAddress, USPhoneNumber } from ".."
+import { EmailAddress, Password, USPhoneNumber } from ".."
 import { createSignUpEnvironment } from "./Environment"
 import { TiFAPI } from "@api-client/TiFAPI"
 import { createTiFAPIFetch } from "@api-client/client"
@@ -30,11 +30,11 @@ describe("SignUpEnvironment tests", () => {
       await env.createAccount(
         "Bitchell Dickle",
         EmailAddress.parse("peacock69@gmail.com")!,
-        "1234"
+        Password.validate("12345678")!
       )
       expect(cognito.signUp).toHaveBeenCalledWith({
         username: "peacock69@gmail.com",
-        password: "1234",
+        password: "12345678",
         attributes: {
           email: "peacock69@gmail.com",
           name: "Bitchell Dickle"
@@ -49,11 +49,11 @@ describe("SignUpEnvironment tests", () => {
       await env.createAccount(
         "Bitchell Dickle",
         USPhoneNumber.parse("1234567890")!,
-        "1234"
+        Password.validate("12345678")!
       )
       expect(cognito.signUp).toHaveBeenCalledWith({
         username: "+11234567890",
-        password: "1234",
+        password: "12345678",
         attributes: {
           phoneNumber: "+11234567890",
           name: "Bitchell Dickle"
