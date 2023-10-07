@@ -96,7 +96,7 @@ describe("SignUpNavigation tests", () => {
 
     replaceUserHandleText(TEST_GENERATED_USER_HANDLE.rawValue, newHandleText)
     mswServer.use(
-      rest.patch("https://localhost:8080/user", async (req, res, ctx) => {
+      rest.patch("https://localhost:8080/user/self", async (req, res, ctx) => {
         const body = await req.json()
         if (body.handle !== newHandleText) {
           return res(ctx.status(500))
@@ -114,7 +114,7 @@ describe("SignUpNavigation tests", () => {
 
   test("get to end of sign-up flow, go back to change username again, finish sign-up flow", async () => {
     mswServer.use(
-      rest.patch("https://localhost:8080/user", async (_, res, ctx) => {
+      rest.patch("https://localhost:8080/user/self", async (_, res, ctx) => {
         return res(ctx.status(204))
       })
     )

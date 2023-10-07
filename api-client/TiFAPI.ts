@@ -46,7 +46,7 @@ export class TiFAPI {
     return await this.apiFetch(
       {
         method: "PATCH",
-        endpoint: "/user",
+        endpoint: "/user/self",
         body: request
       },
       {

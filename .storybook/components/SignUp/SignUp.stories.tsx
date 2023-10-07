@@ -34,7 +34,7 @@ const Stack = createStackNavigator<ParamsList>()
 
 const tiFAPI = new TiFAPI(
   createAWSTiFAPIFetch(
-    new URL("https://623qsegfb9.execute-api.us-west-2.amazonaws.com/prod")
+    new URL("https://623qsegfb9.execute-api.us-west-2.amazonaws.com/prod/")
   )
 )
 
