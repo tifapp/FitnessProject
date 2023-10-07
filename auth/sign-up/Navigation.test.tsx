@@ -20,6 +20,7 @@ import { createSignUpEnvironment } from "./Environment"
 import { rest } from "msw"
 import { uuid } from "@lib/uuid"
 import { mswServer } from "../../tests/helpers/msw"
+import { captureAlerts } from "../../tests/helpers/Alerts"
 
 type TestSignUpParamsList = {
   test: undefined
@@ -134,6 +135,19 @@ describe("SignUpNavigation tests", () => {
     expect(isAtEnd()).toEqual(true)
   })
 
+  test("leave sign-up flow warning alert flow", async () => {
+    renderSignUpFlow()
+
+    startSignUpTest()
+
+    attemptToExit()
+    expect(alertPresentationSpy).toHaveBeenCalled()
+
+    await confirmExit()
+
+    expect(isAtEnd()).toEqual(true)
+  })
+
   const renderSignUpFlow = () => {
     const Stack = createStackNavigator<TestSignUpParamsList>()
     const signUpScreens = createSignUpScreens(Stack, env)
@@ -147,6 +161,16 @@ describe("SignUpNavigation tests", () => {
         </NavigationContainer>
       </TestQueryClientProvider>
     )
+  }
+
+  const { alertPresentationSpy, tapAlertButton } = captureAlerts()
+
+  const attemptToExit = () => {
+    fireEvent.press(screen.getByLabelText("Go Back"))
+  }
+
+  const confirmExit = async () => {
+    await tapAlertButton("Cancel Sign Up")
   }
 
   const credentialsForm = () => {

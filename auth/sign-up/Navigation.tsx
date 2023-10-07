@@ -17,12 +17,14 @@ import {
   useSignUpChangeUserHandleForm
 } from "./ChangeUserHandle"
 import { SignUpEndingView } from "./Ending"
-import { NavigatorScreenParams } from "@react-navigation/native"
+import { NavigatorScreenParams, useNavigation } from "@react-navigation/native"
 import {
   useAuthVerificationCodeForm,
   AuthVerificationCodeFormView
 } from "@auth/VerifyCode"
 import { SignUpEnvironment } from "./Environment"
+import { TouchableIonicon } from "@components/common/Icons"
+import { Alert, StyleSheet } from "react-native"
 
 type SignUpModalParamsList = {
   signUpCredentialsForm: undefined
@@ -53,7 +55,9 @@ export const createSignUpScreens = <Params extends SignUpParamsList>(
       name="signUp"
       options={() => ({ headerShown: false, presentation: "modal" })}
     >
-      {(props: any) => <SignUpModalScreen {...props} {...env} />}
+      {(props: StackScreenProps<SignUpParamsList, "signUp">) => (
+        <SignUpModalScreen {...props} {...env} />
+      )}
     </stack.Screen>
   )
 }
@@ -76,7 +80,7 @@ const SignUpModalScreen = memo(function Screen ({
       <SignUpModalStack.Screen
         name="signUpCredentialsForm"
         options={() => ({
-          headerLeft: XMarkBackButton,
+          headerLeft: SignUpExitButton,
           title: ""
         })}
       >
@@ -216,3 +220,34 @@ const EndingScreen = ({
     onCallToActionTapped={() => navigation.getParent()?.goBack()}
   />
 )
+
+const SignUpExitButton = () => {
+  const navigation = useNavigation()
+  return (
+    <TouchableIonicon
+      icon={{ name: "close" }}
+      accessibilityLabel="Go Back"
+      onPress={() => {
+        Alert.alert(
+          "Cancel Sign Up?",
+          "Are you sure you want to cancel your sign-up?",
+          [
+            {
+              text: "Cancel Sign Up",
+              style: "destructive",
+              onPress: () => navigation.getParent()?.goBack()
+            },
+            { text: "Dismiss" }
+          ]
+        )
+      }}
+      style={styles.exitButtonPadding}
+    />
+  )
+}
+
+const styles = StyleSheet.create({
+  exitButtonPadding: {
+    paddingLeft: 16
+  }
+})
