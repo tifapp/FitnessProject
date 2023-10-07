@@ -1,6 +1,6 @@
+import { UserHandle } from "@lib/users"
+import { NavigationContainer, useFocusEffect } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
-import { SignUpParamsList, createSignUpScreens } from "./Navigation"
-import { Button, View } from "react-native"
 import {
   act,
   fireEvent,
@@ -8,13 +8,13 @@ import {
   screen,
   waitFor
 } from "@testing-library/react-native"
-import { NavigationContainer, useFocusEffect } from "@react-navigation/native"
-import "../../tests/helpers/Matchers"
-import { UserHandle } from "@lib/users"
-import { fakeTimers } from "../../tests/helpers/Timers"
-import { USPhoneNumber } from ".."
-import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
 import { useCallback, useState } from "react"
+import { Button, View } from "react-native"
+import { USPhoneNumber } from ".."
+import "../../tests/helpers/Matchers"
+import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
+import { fakeTimers } from "../../tests/helpers/Timers"
+import { SignUpParamsList, createSignUpScreens } from "./Navigation"
 
 type TestSignUpParamsList = {
   test: undefined

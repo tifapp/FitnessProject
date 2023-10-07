@@ -14,7 +14,7 @@ export type UseForgotPasswordFormEnvironment = {
   initiateForgotPassword: (
     emailOrPhoneNumber: EmailAddress | USPhoneNumber
   ) => Promise<void>
-  onSuccess: () => void
+  onSuccess: (emailOrPhoneNumber: EmailAddress | USPhoneNumber) => void
 }
 
 export const useForgotPasswordForm = ({
@@ -22,12 +22,11 @@ export const useForgotPasswordForm = ({
   onSuccess
 }: UseForgotPasswordFormEnvironment) => {
   const forgotPasswordText = useEmailPhoneTextState("phone")
-
   return {
     forgotPasswordText,
     submission: useFormSubmission(
       async (args) => {
-        return await initiateForgotPassword(args.emailOrPhoneNumber)
+        await initiateForgotPassword(args.emailOrPhoneNumber)
       },
       () => {
         if (forgotPasswordText.parsedValue) {
@@ -48,7 +47,7 @@ export const useForgotPasswordForm = ({
         }
       },
       {
-        onSuccess,
+        onSuccess: (_, args) => onSuccess(args.emailOrPhoneNumber),
         onError: () => {
           Alert.alert(
             "Whoops",

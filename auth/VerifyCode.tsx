@@ -1,13 +1,13 @@
 import { AuthFormView } from "@auth/AuthSection"
 import { AuthShadedTextField } from "@auth/AuthTextFields"
 import { BodyText } from "@components/Text"
+import { TextToastView } from "@components/common/Toasts"
+import { useFormSubmission } from "@hooks/FormHooks"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useMutation } from "@tanstack/react-query"
 import React, { useRef, useState } from "react"
-import { StyleProp, ViewStyle, StyleSheet, Alert, View } from "react-native"
+import { Alert, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
-import { TextToastView } from "@components/common/Toasts"
-import { useFormSubmission } from "@hooks/FormHooks"
 
 export type AuthResendVerificationCodeStatus = "success" | "error"
 
