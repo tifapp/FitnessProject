@@ -17,7 +17,7 @@ import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { ScrollView } from "react-native-gesture-handler"
 import { AppStyles } from "@lib/AppColorStyle"
 import { TiFAPI } from "@api-client/TiFAPI"
-import { createAWSTiFAPIFetch } from "@api-client"
+import { createAWSTiFAPIFetch } from "@api-client/aws"
 import { Auth } from "@aws-amplify/auth"
 
 const SignUpMeta: ComponentMeta<typeof SettingsScreen> = {

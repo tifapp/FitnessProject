@@ -3,9 +3,12 @@ import { useSignUpCredentialsForm } from "./CredentialsForm"
 import { act } from "react-test-renderer"
 import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
 import { captureAlerts } from "../../tests/helpers/Alerts"
+import { fakeTimers } from "../../tests/helpers/Timers"
 
 describe("SignUpCredentialsForm tests", () => {
   describe("useSignUpCredentialsForm tests", () => {
+    fakeTimers()
+
     it("should not be sumbittable when any field is empty", () => {
       const { result } = renderUseSignUpCredentialsForm()
       expect(result.current.submission).toMatchObject({

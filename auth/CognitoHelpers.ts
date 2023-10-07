@@ -15,11 +15,9 @@ export const setupCognito = () => {
   })
 }
 
-export const COGNITO_CODE_MISMATCH_EXCEPTION_ERROR_CODE =
-  "CodeMismatchException"
-
-export const COGNITO_USERNAME_EXISTS_ERROR_CODE = "UsernameExistsException"
-
+/**
+ * An error code thrown by cognito.
+ */
 export type CognitoErrorCode =
   | "CodeMismatchException"
   | "UsernameExistsException"
