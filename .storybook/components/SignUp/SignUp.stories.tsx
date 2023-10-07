@@ -6,7 +6,8 @@ import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import {
   createSignUpEnvironment,
   createSignUpScreens,
-  SignUpParamsList
+  SignUpParamsList,
+  cognitoConfirmSignUpWithAutoSignIn
 } from "@auth/sign-up"
 import { useEmailPhoneTextState } from "@auth/UseEmailPhoneText"
 import { AuthShadedEmailPhoneTextFieldView } from "@auth/AuthTextFields"
@@ -39,7 +40,16 @@ const tiFAPI = new TiFAPI(
 
 const screens = createSignUpScreens(
   Stack,
-  createSignUpEnvironment(Auth, tiFAPI)
+  createSignUpEnvironment(
+    {
+      signUp: async (request) => await Auth.signUp(request),
+      resendSignUp: async (username: string) => {
+        await Auth.resendSignUp(username)
+      },
+      confirmSignUpWithAutoSignIn: cognitoConfirmSignUpWithAutoSignIn
+    },
+    tiFAPI
+  )
 )
 
 export const Basic: SignUpStory = () => (

@@ -11,7 +11,12 @@ import {
  * Creates the functions needed for the sign-up flow.
  */
 export const createSignUpEnvironment = (
-  cognito: Pick<typeof Auth, "signUp" | "resendSignUp" | "confirmSignUp">,
+  cognito: Pick<typeof Auth, "signUp" | "resendSignUp"> & {
+    confirmSignUpWithAutoSignIn: (
+      username: string,
+      code: string
+    ) => Promise<any>
+  },
   tifAPI: TiFAPI
 ) => ({
   /**
@@ -91,7 +96,7 @@ export const createSignUpEnvironment = (
     verificationCode: string
   ) => {
     try {
-      await cognito.confirmSignUp(
+      await cognito.confirmSignUpWithAutoSignIn(
         cognitoFormatEmailOrPhoneNumber(emailOrPhoneNumber),
         verificationCode
       )

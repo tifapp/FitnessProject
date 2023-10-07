@@ -32,7 +32,7 @@ describe("SignUpNavigation tests", () => {
   const cognito = {
     signUp: jest.fn(),
     resendSignUp: jest.fn(),
-    confirmSignUp: jest.fn()
+    confirmSignUpWithAutoSignIn: jest.fn()
   }
   const env = createSignUpEnvironment(
     cognito,
@@ -80,11 +80,16 @@ describe("SignUpNavigation tests", () => {
     expect(credentialsForm()).not.toBeDisplayed()
 
     enterVerificationCode("123456")
-    cognito.confirmSignUp.mockReturnValue(Promise.resolve("SUCCESS"))
+    cognito.confirmSignUpWithAutoSignIn.mockReturnValue(
+      Promise.resolve("SUCCESS")
+    )
     submitVerificationCode()
 
     await waitFor(() => expect(changeUserHandleForm()).toBeDisplayed())
-    expect(cognito.confirmSignUp).toHaveBeenCalledWith("+11234567890", "123456")
+    expect(cognito.confirmSignUpWithAutoSignIn).toHaveBeenCalledWith(
+      "+11234567890",
+      "123456"
+    )
     expect(verifyCodeForm()).not.toBeDisplayed()
 
     const newHandleText = "bitchelldickle"

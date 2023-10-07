@@ -12,7 +12,7 @@ describe("SignUpEnvironment tests", () => {
   const cognito = {
     signUp: jest.fn(),
     resendSignUp: jest.fn(),
-    confirmSignUp: jest.fn()
+    confirmSignUpWithAutoSignIn: jest.fn()
   }
   const env = createSignUpEnvironment(
     cognito,
@@ -165,7 +165,7 @@ describe("SignUpEnvironment tests", () => {
     }
 
     it("should return \"invalid-verification-code\" when cognito throws CodeMismatchException", async () => {
-      cognito.confirmSignUp.mockRejectedValueOnce(new CodeError())
+      cognito.confirmSignUpWithAutoSignIn.mockRejectedValueOnce(new CodeError())
       const result = await env.finishRegisteringAccount(
         USPhoneNumber.parse("1234567890")!,
         "123456"
@@ -174,7 +174,7 @@ describe("SignUpEnvironment tests", () => {
     })
 
     it("should forward error when cognito throws a non-CodeMismatchException", async () => {
-      cognito.confirmSignUp.mockRejectedValueOnce(new Error())
+      cognito.confirmSignUpWithAutoSignIn.mockRejectedValueOnce(new Error())
       const resultPromise = env.finishRegisteringAccount(
         USPhoneNumber.parse("1234567890")!,
         "123456"
@@ -184,7 +184,7 @@ describe("SignUpEnvironment tests", () => {
 
     it("should return user handle from API when verification code is valid", async () => {
       const handle = UserHandle.parse("test").handle!
-      cognito.confirmSignUp.mockResolvedValueOnce("SUCCESS")
+      cognito.confirmSignUpWithAutoSignIn.mockResolvedValueOnce("SUCCESS")
       mswServer.use(
         rest.post("https://localhost:8080/user", async (_, res, ctx) => {
           return res(
