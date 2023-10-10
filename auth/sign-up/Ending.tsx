@@ -1,4 +1,4 @@
-import { AuthSectionView } from "@auth/AuthSection"
+import { AuthLayoutView } from "@auth/AuthSection"
 import { BodyText, Subtitle } from "@components/Text"
 import { CircularIonicon, IoniconName } from "@components/common/Icons"
 import React from "react"
@@ -16,7 +16,7 @@ export const SignUpEndingView = ({
   onCallToActionTapped,
   style
 }: SignUpEndingProps) => (
-  <AuthSectionView
+  <AuthLayoutView
     title="Welcome to tiF!"
     description="Way to get started on your fitness journey! See below for what to do with your new account!"
     callToActionTitle="Awesome!"
@@ -38,7 +38,7 @@ export const SignUpEndingView = ({
       description="Be notified about events, friend requests, messages, and more when notifications are turned on!"
       style={styles.notificationsLabel}
     />
-  </AuthSectionView>
+  </AuthLayoutView>
 )
 
 type FeatureLabelProps = {

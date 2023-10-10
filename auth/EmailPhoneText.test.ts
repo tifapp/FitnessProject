@@ -1,5 +1,5 @@
 import { renderHook } from "@testing-library/react-native"
-import { EmailPhoneTextType, useEmailPhoneTextState } from "./UseEmailPhoneText"
+import { EmailPhoneTextType, useEmailPhoneTextState } from "./EmailPhoneText"
 import { act } from "react-test-renderer"
 import { USPhoneNumber } from "./PhoneNumber"
 import { EmailAddress } from "./Email"

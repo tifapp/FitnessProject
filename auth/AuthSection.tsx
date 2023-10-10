@@ -2,7 +2,6 @@ import { Title, BodyText } from "@components/Text"
 import { PrimaryButton } from "@components/common/Buttons"
 import { useKeyboardState } from "@hooks/Keyboard"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
-import { useHeaderHeight } from "@react-navigation/elements"
 import React, { ReactNode, useState } from "react"
 import {
   KeyboardAvoidingView,
@@ -10,7 +9,8 @@ import {
   StyleProp,
   View,
   ViewStyle,
-  StyleSheet
+  StyleSheet,
+  useWindowDimensions
 } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import Animated from "react-native-reanimated"
@@ -21,14 +21,11 @@ export type AuthSectionProps = {
   description: string
   children: ReactNode
   footer?: JSX.Element
-  iOSInModal?: boolean
   callToActionTitle: string
   isCallToActionDisabled?: boolean
   onCallToActionTapped?: () => void
   style?: StyleProp<ViewStyle>
 }
-
-const IOS_MODAL_BOTTOM_OFFSET = 64
 
 /**
  * A view that serves as a basis for making an auth screen.
@@ -36,7 +33,7 @@ const IOS_MODAL_BOTTOM_OFFSET = 64
  * It automatically includes a title, description, a call to action at the bottom with an optional
  * footer above it, and handles weird scrolling behaviors.
  */
-export const AuthSectionView = ({
+export const AuthLayoutView = ({
   title,
   description,
   children,
@@ -44,15 +41,17 @@ export const AuthSectionView = ({
   callToActionTitle,
   isCallToActionDisabled,
   onCallToActionTapped,
-  iOSInModal,
   style
 }: AuthSectionProps) => {
   const [footerHeight, setFooterHeight] = useState(0)
+  const [viewHeight, setViewHeight] = useState(0)
+  const { height: windowHeight } = useWindowDimensions()
   const insets = useSafeAreaInsets()
-  const modalPaddingOffset =
-    Platform.OS === "ios" && iOSInModal ? IOS_MODAL_BOTTOM_OFFSET : 0
   return (
-    <View style={[style, styles.container]}>
+    <View
+      style={[style, styles.container]}
+      onLayout={(e) => setViewHeight(e.nativeEvent.layout.height)}
+    >
       <KeyboardAwareScrollView
         style={styles.scrollView}
         keyboardShouldPersistTaps="always"
@@ -68,7 +67,7 @@ export const AuthSectionView = ({
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={[styles.footer]}
         contentContainerStyle={{ paddingBottom: insets.bottom }}
-        keyboardVerticalOffset={useHeaderHeight() + modalPaddingOffset}
+        keyboardVerticalOffset={windowHeight - viewHeight}
       >
         <View
           style={[
@@ -126,7 +125,7 @@ export const AuthFormView = <Submission extends { status: "invalid" }>({
   submissionTitle,
   ...props
 }: AuthFormProps<Submission>) => (
-    <AuthSectionView
+    <AuthLayoutView
       callToActionTitle={submissionTitle}
       isCallToActionDisabled={submission.status !== "submittable"}
       onCallToActionTapped={() => {

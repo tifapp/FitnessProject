@@ -9,13 +9,10 @@ import {
   SignUpParamsList,
   cognitoConfirmSignUpWithAutoSignIn
 } from "@auth/sign-up"
-import { useEmailPhoneTextState } from "@auth/UseEmailPhoneText"
-import { AuthShadedEmailPhoneTextFieldView } from "@auth/AuthTextFields"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { Button } from "react-native"
 import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { ScrollView } from "react-native-gesture-handler"
-import { AppStyles } from "@lib/AppColorStyle"
 import { TiFAPI } from "@api-client/TiFAPI"
 import { createAWSTiFAPIFetch } from "@api-client/aws"
 import { Auth } from "@aws-amplify/auth"
@@ -65,25 +62,13 @@ export const Basic: SignUpStory = () => (
   </TiFQueryClientProvider>
 )
 
-const TestScreen = ({ navigation }: StackScreenProps<ParamsList, "test">) => {
-  const { text, activeTextType, onTextChanged, onActiveTextTypeToggled } =
-    useEmailPhoneTextState("phone")
-  return (
-    <ScrollView>
-      <Button
-        title="Do sign up flow"
-        onPress={() => {
-          navigation.navigate("signUp", { screen: "signUpCredentialsForm" })
-        }}
-      />
-      <AuthShadedEmailPhoneTextFieldView
-        iconBackgroundColor={AppStyles.darkColor}
-        value={text}
-        activeTextType={activeTextType}
-        onChangeText={onTextChanged}
-        onActiveTextTypeToggled={onActiveTextTypeToggled}
-        style={{ marginTop: 48, paddingHorizontal: 16 }}
-      />
-    </ScrollView>
-  )
-}
+const TestScreen = ({ navigation }: StackScreenProps<ParamsList, "test">) => (
+  <ScrollView>
+    <Button
+      title="Do sign up flow"
+      onPress={() => {
+        navigation.navigate("signUp", { screen: "signUpCredentialsForm" })
+      }}
+    />
+  </ScrollView>
+)

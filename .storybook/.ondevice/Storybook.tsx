@@ -31,6 +31,9 @@ import LocationSearchMeta, {
 import SignUpMeta, {
   Basic as SignUpBasic
 } from "../components/SignUp/SignUp.stories"
+import SignInMeta, {
+  Basic as SignInBasic
+} from "../components/SignIn/SignIn.stories"
 import VerifcationCodeMeta, {
   Basic as VerifcationCodeBasic
 } from "../components/VerificationCode/VerifyCode.stories"
@@ -38,9 +41,8 @@ import ChangePasswordMeta, {
   Basic as ChangePasswordBasic
 } from "../components/ChangePassword/ChangePassword.stories"
 import { setupCognito } from "@auth/CognitoHelpers"
-import * as ExpoSecureStore from "expo-secure-store"
 
-setupCognito(ExpoSecureStore)
+setupCognito()
 
 // Create an array of stories
 const stories = [
@@ -88,6 +90,11 @@ const stories = [
     name: SignUpMeta.title,
     component: SignUpBasic,
     args: SignUpMeta.args
+  },
+  {
+    name: SignInMeta.title,
+    component: SignInBasic,
+    args: SignInMeta.args
   },
   {
     name: VerifcationCodeMeta.title,

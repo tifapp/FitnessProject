@@ -10,7 +10,7 @@ import { CircularIonicon, Ionicon, IoniconName } from "@components/common/Icons"
 import { StyleProp, ViewStyle, StyleSheet } from "react-native"
 import { useFontScale } from "@hooks/Fonts"
 import { AppStyles } from "@lib/AppColorStyle"
-import { EmailPhoneTextType } from "./UseEmailPhoneText"
+import { EmailPhoneTextErrorReason, EmailPhoneTextType } from "./EmailPhoneText"
 import { TouchableOpacity } from "react-native-gesture-handler"
 
 export type AuthShadedTextFieldProps = {
@@ -83,7 +83,16 @@ export const AuthShadedPasswordTextField = forwardRef(function TextField (
 export type AuthEmailPhoneTextFieldProps = {
   activeTextType: EmailPhoneTextType
   onActiveTextTypeToggled: () => void
-} & Omit<AuthShadedTextFieldProps, "rightAddon" | "keyboardType" | "iconName">
+  errorReason?: EmailPhoneTextErrorReason
+} & Omit<
+  AuthShadedTextFieldProps,
+  | "rightAddon"
+  | "keyboardType"
+  | "iconName"
+  | "iconBackgroundColor"
+  | "placeholder"
+  | "error"
+>
 
 /**
  * An auth text field that accepts both email addresses and phone numbers as input.
@@ -92,6 +101,7 @@ export const AuthShadedEmailPhoneTextFieldView = forwardRef(function TextField (
   {
     activeTextType,
     onActiveTextTypeToggled,
+    errorReason,
     ...props
   }: AuthEmailPhoneTextFieldProps,
   ref: TextFieldRef
@@ -101,7 +111,10 @@ export const AuthShadedEmailPhoneTextFieldView = forwardRef(function TextField (
       {...props}
       ref={ref}
       iconName={activeTextType === "email" ? "mail" : "call"}
+      iconBackgroundColor="#14B329"
       keyboardType={activeTextType === "phone" ? "number-pad" : "email-address"}
+      placeholder="Phone number or Email"
+      error={errorReason && emailPhoneTextStateErrorMessage(errorReason)}
       rightAddon={
         <TouchableOpacity
           style={styles.emailPhoneToggleButtonContainer}
@@ -118,6 +131,18 @@ export const AuthShadedEmailPhoneTextFieldView = forwardRef(function TextField (
     />
   )
 })
+
+const emailPhoneTextStateErrorMessage = (
+  errorReason: EmailPhoneTextErrorReason
+) => {
+  if (errorReason === "invalid-email") {
+    return "Please enter a valid email."
+  } else if (errorReason === "invalid-phone-number") {
+    return "Please enter a valid phone number."
+  } else {
+    return undefined
+  }
+}
 
 const styles = StyleSheet.create({
   emailPhoneToggleButtonContainer: {
