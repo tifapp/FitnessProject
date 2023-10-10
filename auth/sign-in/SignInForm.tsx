@@ -6,11 +6,11 @@ import {
   TouchableOpacity,
   Alert
 } from "react-native"
-import { AuthFormView } from "./AuthSection"
+import { AuthFormView } from "../AuthSection"
 import {
   AuthShadedEmailPhoneTextFieldView,
   AuthShadedPasswordTextField
-} from "./AuthTextFields"
+} from "../AuthTextFields"
 import { Headline } from "@components/Text"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import Animated from "react-native-reanimated"
@@ -19,10 +19,10 @@ import { TextFieldRefValue } from "@components/TextFields"
 import {
   EmailPhoneTextToggleFooterView,
   useEmailPhoneTextState
-} from "./EmailPhoneText"
+} from "../EmailPhoneText"
 import { useFormSubmission } from "@hooks/FormHooks"
-import { USPhoneNumber } from "./PhoneNumber"
-import { EmailAddress } from "./Email"
+import { USPhoneNumber } from "../PhoneNumber"
+import { EmailAddress } from "../Email"
 
 export type SignInResult =
   | "success"

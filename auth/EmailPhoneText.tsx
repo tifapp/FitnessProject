@@ -66,18 +66,6 @@ export const useEmailPhoneTextState = (initialTextType: EmailPhoneTextType) => {
   }
 }
 
-export const emailPhoneTextStateErrorMessage = (
-  errorReason: EmailPhoneTextErrorReason
-) => {
-  if (errorReason === "invalid-email") {
-    return "Please enter a valid email."
-  } else if (errorReason === "invalid-phone-number") {
-    return "Please enter a valid phone number."
-  } else {
-    return undefined
-  }
-}
-
 export type EmailPhoneTextToggleFooterProps = {
   isVisible: boolean
   textType: EmailPhoneTextType

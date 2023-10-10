@@ -1,10 +1,10 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
-import { TestQueryClientProvider } from "../tests/helpers/ReactQuery"
-import { useSignInForm } from "./SignIn"
+import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
+import { useSignInForm } from "./SignInForm"
 import { act } from "react-test-renderer"
-import { captureAlerts } from "../tests/helpers/Alerts"
+import { captureAlerts } from "../../tests/helpers/Alerts"
 
-describe("SignIn tests", () => {
+describe("SignInForm tests", () => {
   describe("UseSignInForm tests", () => {
     test("invalid form states", () => {
       const { result } = renderUseSignInForm()

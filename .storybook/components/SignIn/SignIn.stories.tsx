@@ -2,7 +2,7 @@ import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
-import { SignInFormView, useSignInForm } from "@auth/SignIn"
+import { SignInFormView, useSignInForm } from "@auth/sign-in"
 import { createStackNavigator } from "@react-navigation/stack"
 import { NavigationContainer } from "@react-navigation/native"
 import {
