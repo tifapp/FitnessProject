@@ -4,6 +4,7 @@ import {
   createForgotPasswordScreens
 } from "@auth/forgot-password/ForgotPasswordNavigation"
 import { ResetPasswordResult } from "@auth/forgot-password/ResetPasswordForm"
+import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { delayData } from "@lib/DelayData"
 import { NavigationContainer } from "@react-navigation/native"
@@ -28,7 +29,7 @@ const signUpScreens = createForgotPasswordScreens(Stack, {
   initiateResetPassword: async () =>
     await delayData<ResetPasswordResult>("valid", 500),
   finishVerifyingAccount: async () => {
-    return Password.validate("elon@Smusk")!
+    return "elon@Smusk"
   }
 })
 
@@ -36,7 +37,10 @@ export const Basic: ForgotPasswordStory = () => (
   <TiFQueryClientProvider>
     <SafeAreaProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="forgotPassword">
+        <Stack.Navigator
+          initialRouteName="forgotPassword"
+          screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
+        >
           {signUpScreens}
         </Stack.Navigator>
       </NavigationContainer>

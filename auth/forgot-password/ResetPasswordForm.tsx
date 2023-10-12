@@ -13,13 +13,16 @@ import { ChangePasswordNewPasswordError, Password } from ".."
 export type UseResetPasswordFormEnvironment = {
   initiateResetPassword: (newPass: Password) => Promise<ResetPasswordResult>
   onSuccess: () => void
+  onError: () => void
+  code?: string
 }
 
 export type ResetPasswordResult = "valid" | "invalid-password"
 
 export const useResetPasswordForm = ({
   initiateResetPassword,
-  onSuccess
+  onSuccess,
+  onError
 }: UseResetPasswordFormEnvironment) => {
   const [newPasswordField, setNewPasswordField] = useState("")
   const validatedNewPassword = Password.validate(newPasswordField)
@@ -28,7 +31,7 @@ export const useResetPasswordForm = ({
     newPasswordField,
     submission: useFormSubmission(
       async (args) => {
-        return await initiateResetPassword(args.newPassword)
+        return await initiateResetPassword(args.newPass)
       },
       () => {
         const newPasswordError = checkForNewPasswordError(
@@ -40,7 +43,7 @@ export const useResetPasswordForm = ({
           return {
             status: "submittable",
             submissionValues: {
-              newPassword: validatedNewPassword
+              newPass: validatedNewPassword
             }
           }
         }
@@ -48,13 +51,7 @@ export const useResetPasswordForm = ({
       },
       {
         onSuccess,
-        onError: () => {
-          Alert.alert(
-            "Whoops",
-            "Sorry, something went wrong when trying to reset your password. Please try again.",
-            [{ text: "Ok" }]
-          )
-        }
+        onError
       }
     ),
     onTextChanged: (text: string) => setNewPasswordField(text)
@@ -83,12 +80,14 @@ const newPasswordErrorMessage = (error?: ChangePasswordNewPasswordError) => {
 }
 
 export type ResetPasswordFormProps = {
+  code: string
   style?: StyleProp<ViewStyle>
 } & ReturnType<typeof useResetPasswordForm>
 
 export const ResetPasswordFormView = ({
   style,
   submission,
+  code,
   newPasswordField,
   onTextChanged
 }: ResetPasswordFormProps) => {

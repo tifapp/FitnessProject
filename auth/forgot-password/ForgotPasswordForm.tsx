@@ -2,9 +2,20 @@ import { AuthFormView } from "@auth/AuthSection"
 import { AuthShadedEmailPhoneTextFieldView } from "@auth/AuthTextFields"
 import { EmailAddress } from "@auth/Email"
 import { useEmailPhoneTextState } from "@auth/UseEmailPhoneText"
+import { BodyText } from "@components/Text"
+import { TextFieldRefValue } from "@components/TextFields"
 import { useFormSubmission } from "@hooks/FormHooks"
 import { AppStyles } from "@lib/AppColorStyle"
-import { Alert, StyleProp, StyleSheet, ViewStyle } from "react-native"
+import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
+import { useRef, useState } from "react"
+import {
+  Alert,
+  StyleProp,
+  StyleSheet,
+  TouchableOpacity,
+  ViewStyle
+} from "react-native"
+import Animated, { SlideInLeft, SlideOutLeft } from "react-native-reanimated"
 import { USPhoneNumber } from ".."
 
 /**
@@ -69,6 +80,8 @@ export const ForgotPasswordFormView = ({
   submission,
   forgotPasswordText
 }: ForgotPasswordFormProps) => {
+  const emailPhoneRef = useRef<TextFieldRefValue>(null)
+  const [isFocusingEmailPhone, setIsFocusingEmailPhone] = useState(false)
   return (
     <AuthFormView
       title={"Forgot Your Password?"}
@@ -78,14 +91,38 @@ export const ForgotPasswordFormView = ({
       submissionTitle={"Reset Password"}
       submission={submission}
       style={style}
+      footer={
+        <Animated.View layout={TiFDefaultLayoutTransition}>
+          {isFocusingEmailPhone && (
+            <Animated.View
+              entering={SlideInLeft.duration(300)}
+              exiting={SlideOutLeft.duration(300)}
+            >
+              <TouchableOpacity
+                onPress={forgotPasswordText.onActiveTextTypeToggled}
+              >
+                <BodyText style={styles.emailPhoneToggle}>
+                  {forgotPasswordText.activeTextType === "email"
+                    ? "Use phone number instead."
+                    : "Use email instead."}
+                </BodyText>
+              </TouchableOpacity>
+            </Animated.View>
+          )}
+        </Animated.View>
+      }
     >
       <AuthShadedEmailPhoneTextFieldView
         iconBackgroundColor={AppStyles.darkColor}
         value={forgotPasswordText.text}
         activeTextType={forgotPasswordText.activeTextType}
         onChangeText={forgotPasswordText.onTextChanged}
+        blurOnSubmit={false}
         onActiveTextTypeToggled={forgotPasswordText.onActiveTextTypeToggled}
         style={styles.emailPhoneTextField}
+        ref={emailPhoneRef}
+        onFocus={() => setIsFocusingEmailPhone(true)}
+        onBlur={() => setIsFocusingEmailPhone(false)}
       />
     </AuthFormView>
   )
@@ -121,5 +158,9 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontFamily: "OpenSans",
     textAlign: "left"
+  },
+  emailPhoneToggle: {
+    color: AppStyles.linkColor,
+    paddingBottom: 8
   }
 })

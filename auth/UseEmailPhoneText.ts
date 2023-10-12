@@ -1,10 +1,10 @@
+import { StringUtils } from "@lib/String"
 import { useState } from "react"
+import { EmailAddress } from "./Email"
 import {
   USPhoneNumber,
   prettyFormatIncrementalE164PhoneNumber
 } from "./PhoneNumber"
-import { EmailAddress } from "./Email"
-import { StringUtils } from "@lib/String"
 
 export type EmailPhoneTextType = "email" | "phone"
 

@@ -1,8 +1,8 @@
 import { Password } from "@auth/Password"
 import { USPhoneNumber } from "@auth/PhoneNumber"
 import { delayData } from "@lib/DelayData"
-import { NavigationContainer } from "@react-navigation/native"
-import { createStackNavigator } from "@react-navigation/stack"
+import { NavigationContainer, useFocusEffect } from "@react-navigation/native"
+import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import {
   act,
   fireEvent,
@@ -10,6 +10,9 @@ import {
   screen,
   waitFor
 } from "@testing-library/react-native"
+import { useCallback, useState } from "react"
+import { View } from "react-native"
+import { Button } from "react-native-elements"
 import "../../tests/helpers/Matchers"
 import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
 import { fakeTimers } from "../../tests/helpers/Timers"
@@ -43,7 +46,7 @@ describe("Forgot Password Navigation tests", () => {
     })
 
     finishVerifyingAccount.mockImplementation(async () => {
-      return Password.validate("elon@Smusk")!
+      return "123456"
     })
 
     renderForgotPasswordNavigation()
@@ -58,7 +61,7 @@ describe("Forgot Password Navigation tests", () => {
     expect(credentialsForm()).not.toBeDisplayed()
   })
 
-  it("starts with forgot password, has a success, goes to verify code screen, then gets to reset password", async () => {
+  it("has a full navigation flow: forgot -> verify -> reset -> verify", async () => {
     // Test screen to get into actual flow
     const testPhoneNumber = "8882332121"
     initiateForgotPassword.mockImplementation(
@@ -71,7 +74,7 @@ describe("Forgot Password Navigation tests", () => {
     })
 
     finishVerifyingAccount.mockImplementation(async () => {
-      return Password.validate("elon@Smusk")!
+      return "123456"
     })
 
     renderForgotPasswordNavigation()
@@ -96,6 +99,13 @@ describe("Forgot Password Navigation tests", () => {
       "123456"
     )
     expect(verifyCodeForm()).not.toBeDisplayed()
+
+    enterNewPassword("elon@musK3")
+
+    submitNewPassword()
+
+    await waitFor(() => expect(verifyCodeForm()).toBeDisplayed())
+    expect(resetPasswordForm()).not.toBeDisplayed()
   })
 })
 
@@ -113,13 +123,20 @@ const renderForgotPasswordNavigation = () => {
   return render(
     <TestQueryClientProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="forgotPassword">
+        <Stack.Navigator
+          initialRouteName="forgotPassword"
+          screenOptions={{ headerShown: false }}
+        >
           {signUpScreens}
         </Stack.Navigator>
       </NavigationContainer>
     </TestQueryClientProvider>
   )
 }
+
+const IS_AT_END_TEST_ID = "test-sign-up-flow-end"
+
+const isAtEnd = () => !!screen.queryByTestId(IS_AT_END_TEST_ID)
 
 const credentialsForm = () => screen.queryByText("Forgot Your Password?")
 
@@ -156,21 +173,30 @@ const submitVerificationCode = () => {
 
 const resetPasswordForm = () => screen.queryByText("Reset Password")
 
-// const TestScreen = ({
-//   navigation
-// }: StackScreenProps<TestForgotPasswordParamsList, "test">) => {
-//   const [focusCount, setFocusCount] = useState(0)
-//   useFocusEffect(
-//     useCallback(() => setFocusCount((focusCount) => focusCount + 1), [])
-//   )
-//   return (
-//     <>
-//       <Button
-//         title="Begin Sign-up Test"
-//         onPress={() => navigation.navigate({ key: "forgotPassword" })}
-//       />
+const enterNewPassword = (newPass: string) => {
+  fireEvent.changeText(screen.getByPlaceholderText("New Password"), newPass)
+}
 
-//       {focusCount > 1 && <View testID={IS_AT_END_TEST_ID} />}
-//     </>
-//   )
-// }
+const submitNewPassword = () => {
+  const button = screen.getByLabelText("Change Password")
+  act(() => button.props.onClick())
+}
+
+const TestScreen = ({
+  navigation
+}: StackScreenProps<TestForgotPasswordParamsList, "test">) => {
+  const [focusCount, setFocusCount] = useState(0)
+  useFocusEffect(
+    useCallback(() => setFocusCount((focusCount) => focusCount + 1), [])
+  )
+  return (
+    <>
+      <Button
+        title="Begin Sign-up Test"
+        onPress={() => navigation.navigate({ key: "forgotPassword" })}
+      />
+
+      {focusCount > 1 && <View testID={IS_AT_END_TEST_ID} />}
+    </>
+  )
+}

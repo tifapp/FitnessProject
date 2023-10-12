@@ -2,6 +2,7 @@ import { StackNavigatorType } from "@components/Navigation"
 import {} from "@lib/users"
 import { StackScreenProps } from "@react-navigation/stack"
 import { useRef } from "react"
+import { Alert } from "react-native"
 import {
   AuthVerificationCodeFormView,
   EmailAddress,
@@ -27,15 +28,16 @@ export type ForgotPasswordEnvironment = {
   finishVerifyingAccount: (
     emailOrPhoneNumber: EmailAddress | USPhoneNumber,
     verificationCode: string
-  ) => Promise<"invalid-verification-code" | Password>
+  ) => Promise<"invalid-verification-code" | string>
 }
 
 export type ForgotPasswordParamsList = {
   forgotPassword: { emailOrPhoneNumber: EmailAddress | USPhoneNumber }
   verifyCode: {
     emailOrPhoneNumber: EmailAddress | USPhoneNumber
+    code?: string
   }
-  resetPassword: { newPass: Password }
+  resetPassword: { code: string }
 }
 
 type ForgotPasswordScreenProps = StackScreenProps<
@@ -54,7 +56,7 @@ type VerifyCodeScreenProps = StackScreenProps<
   finishVerifyingAccount: (
     emailOrPhoneNumber: EmailAddress | USPhoneNumber,
     verificationCode: string
-  ) => Promise<"invalid-verification-code" | Password>
+  ) => Promise<"invalid-verification-code" | string>
 }
 
 type ResetPasswordScreenProps = StackScreenProps<
@@ -120,7 +122,7 @@ const VerifyCodeScreen = ({
   route,
   finishVerifyingAccount
 }: VerifyCodeScreenProps) => {
-  const generatedRef = useRef<Password | undefined>()
+  const generatedRef = useRef<string | undefined>()
   const form = useAuthVerificationCodeForm({
     resendCode: async () => {},
     submitCode: async (code: string) => {
@@ -135,7 +137,11 @@ const VerifyCodeScreen = ({
       return true
     },
     onSuccess: () => {
-      navigation.navigate("resetPassword" as never)
+      if (generatedRef.current) {
+        navigation.navigate("resetPassword", {
+          code: generatedRef.current
+        })
+      }
     }
   })
   return (
@@ -154,7 +160,15 @@ const ResetPasswordScreen = ({
 }: ResetPasswordScreenProps) => {
   const resetPassword = useResetPasswordForm({
     initiateResetPassword,
-    onSuccess: () => navigation.goBack()
+    onSuccess: () => navigation.goBack(),
+    onError: () => {
+      Alert.alert(
+        "Whoops",
+        "Sorry, something went wrong when trying to reset your password. Please try again.",
+        [{ text: "Ok" }]
+      ),
+      navigation.goBack()
+    }
   })
-  return <ResetPasswordFormView {...resetPassword} />
+  return <ResetPasswordFormView {...resetPassword} code={route.params.code} />
 }
