@@ -23,6 +23,21 @@ export type CognitoErrorCode =
   | "UsernameExistsException"
 
 /**
+ * An {@link Error} subclass that mimicks a Cognito error for testing purposes.
+ *
+ * This is useful because cognito just adds a `code` field to {@link Error} directly,
+ * which is invalid typescript.
+ */
+export class TestCognitoError extends Error {
+  code: CognitoErrorCode
+
+  constructor (code: CognitoErrorCode) {
+    super()
+    this.code = code
+  }
+}
+
+/**
  * Returns true if the given error object is an instance of {@link Error} and has a property
  * `code` that matches the given Cognito error code.
  */
