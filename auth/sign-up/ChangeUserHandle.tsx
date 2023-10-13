@@ -6,7 +6,7 @@ import { sleep } from "@lib/DelayData"
 import { QueryHookOptions } from "@lib/ReactQuery"
 import { UserHandleError, UserHandle } from "@lib/users"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import React, { useState } from "react"
+import React, { useRef, useState } from "react"
 import { ActivityIndicator, Alert, StyleProp, ViewStyle } from "react-native"
 
 export type UseSignUpChangeUserHandleFormEnvironment = {
@@ -35,6 +35,7 @@ export const useSignUpChangeUserHandleForm = (
   }: UseSignUpChangeUserHandleFormEnvironment
 ) => {
   const [handleText, setHandleText] = useState(initialHandle.rawValue)
+  const userCurrentHandle = useRef(initialHandle)
   const { handle: parsedHandle, error: parseHandleError } =
     UserHandle.parse(handleText)
 
@@ -46,7 +47,7 @@ export const useSignUpChangeUserHandleForm = (
     },
     {
       enabled:
-        !!parsedHandle && parsedHandle.rawValue !== initialHandle.rawValue,
+        !!parsedHandle && !parsedHandle.isEqualTo(userCurrentHandle.current),
       cacheTime: Infinity,
       staleTime: Infinity
     }
@@ -60,7 +61,11 @@ export const useSignUpChangeUserHandleForm = (
     },
     isPerformingUserHandleTakenCheck: handleTakenCheck.query.isFetching,
     submission: useFormSubmission(
-      changeUserHandle,
+      async (handle: UserHandle) => {
+        if (handle.isEqualTo(userCurrentHandle.current)) return
+        await changeUserHandle(handle)
+        userCurrentHandle.current = handle
+      },
       () => {
         if (!parsedHandle) {
           return { status: "invalid", reason: parseHandleError } as const

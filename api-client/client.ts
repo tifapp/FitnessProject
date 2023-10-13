@@ -68,7 +68,12 @@ export type TiFAPIResponse<Schemas extends TiFAPIResponseSchemas> = {
 const log = createLogFunction("tif.api.client")
 
 /**
- * Creates a fetch function to fetch from the backend.
+ * Creates a low-level fetch function to fetch from the TiF API.
+ *
+ * This lower level fetch handles automatic session tracking and
+ * response parsing. The {@link TiFAPI} class provides a set of
+ * high-level wrapper functions that utilize this low level
+ * fetch function.
  *
  * ```ts
  * const apiFetch = createTiFAPIFetch(
@@ -109,7 +114,8 @@ export const createTiFAPIFetch = (
     Schemas extends TiFAPIResponseSchemas
   >(
     request: TiFAPIRequest<Method>,
-    responseSchemas: Schemas
+    responseSchemas: Schemas,
+    signal?: AbortSignal
   ): Promise<TiFAPIResponse<Schemas>> => {
     try {
       const token = await loadAuthBearerToken()
@@ -123,7 +129,8 @@ export const createTiFAPIFetch = (
           "Content-Type": "application/json"
         },
         body:
-          request.method === "GET" ? undefined : JSON.stringify(request.body)
+          request.method === "GET" ? undefined : JSON.stringify(request.body),
+        signal
       })
 
       const json = await loadResponseBody(resp)
@@ -159,6 +166,11 @@ export const createTiFAPIFetch = (
     }
   }
 }
+
+/**
+ * A type defining a function that can perform fetches to the TiFAPi.
+ */
+export type TiFAPIFetch = ReturnType<typeof createTiFAPIFetch>
 
 const parseResponseBody = async (
   json: unknown,

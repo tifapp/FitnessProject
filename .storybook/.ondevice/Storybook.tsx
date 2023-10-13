@@ -37,6 +37,10 @@ import VerifcationCodeMeta, {
 import ChangePasswordMeta, {
   Basic as ChangePasswordBasic
 } from "../components/ChangePassword/ChangePassword.stories"
+import { setupCognito } from "@auth/CognitoHelpers"
+import * as ExpoSecureStore from "expo-secure-store"
+
+setupCognito(ExpoSecureStore)
 
 // Create an array of stories
 const stories = [

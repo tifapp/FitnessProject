@@ -4,17 +4,21 @@ import {
   AuthShadedPasswordTextField,
   AuthShadedTextField
 } from "@auth/AuthTextFields"
-import { useEmailPhoneTextState } from "@auth/UseEmailPhoneText"
+import {
+  EmailPhoneTextType,
+  useEmailPhoneTextState
+} from "@auth/UseEmailPhoneText"
 import { BodyText, Caption } from "@components/Text"
 import { TextFieldRefValue } from "@components/TextFields"
 import { useFormSubmission } from "@hooks/FormHooks"
 import { AppStyles } from "@lib/AppColorStyle"
 import React, { useRef, useState } from "react"
 import { StyleProp, ViewStyle, StyleSheet, Alert } from "react-native"
-import { EmailAddress, USPhoneNumber } from ".."
+import { EmailAddress, Password, USPhoneNumber } from ".."
 import { TouchableOpacity } from "react-native-gesture-handler"
-import Animated, { SlideInLeft, SlideOutLeft } from "react-native-reanimated"
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
+import { CreateAccountResult } from "./Environment"
 
 export type SignUpCredentialsFormFields = {
   name: string
@@ -26,8 +30,8 @@ export type UseSignUpCredentialsFormEnvironment = {
   createAccount: (
     name: string,
     emailOrPhoneNumber: EmailAddress | USPhoneNumber,
-    uncheckedPassword: string
-  ) => Promise<void>
+    password: Password
+  ) => Promise<CreateAccountResult>
   onSuccess: (emailOrPhoneNumber: EmailAddress | USPhoneNumber) => void
 }
 
@@ -43,6 +47,7 @@ export const useSignUpCredentialsForm = ({
     name: "",
     passwordText: ""
   })
+  const validatedPassword = Password.validate(baseFields.passwordText)
   return {
     fields: {
       ...baseFields,
@@ -64,44 +69,58 @@ export const useSignUpCredentialsForm = ({
     },
     submission: useFormSubmission(
       async (args) => {
-        await createAccount(
+        return await createAccount(
           args.name,
           args.emailOrPhoneNumber,
-          args.passwordText
+          args.password
         )
       },
       () => {
-        const isEmailPhoneTextEmpty = emailPhoneText.text === ""
-        const isEmpty =
-          baseFields.name === "" ||
-          baseFields.passwordText === "" ||
-          isEmailPhoneTextEmpty
+        const nameReason = checkForNameError(baseFields.name)
+        const emailPhoneReason = checkForEmailPhoneError(
+          emailPhoneText.text,
+          emailPhoneText.activeTextType,
+          emailPhoneText.parsedValue
+        )
+        const passwordReason = checkForPasswordError(
+          baseFields.passwordText,
+          validatedPassword
+        )
+        const isError = !!nameReason || !!emailPhoneReason || !!passwordReason
 
-        if (emailPhoneText.parsedValue && !isEmpty) {
+        if (emailPhoneText.parsedValue && validatedPassword && !isError) {
           return {
             status: "submittable",
             submissionValues: {
-              ...baseFields,
+              name: baseFields.name,
+              password: validatedPassword,
               emailOrPhoneNumber: emailPhoneText.parsedValue
             }
           }
         }
-        if (!emailPhoneText.parsedValue && !isEmailPhoneTextEmpty) {
-          return {
-            status: "invalid",
-            reason:
-              emailPhoneText.activeTextType === "email"
-                ? "invalid-email"
-                : "invalid-phone-number"
-          } as const
-        }
+
         return {
           status: "invalid",
-          reason: "one-or-more-fields-empty"
-        } as const
+          nameReason,
+          emailPhoneReason,
+          passwordReason
+        }
       },
       {
-        onSuccess: (_, args) => onSuccess(args.emailOrPhoneNumber),
+        onSuccess: (result, args) => {
+          if (result === "success") {
+            onSuccess(args.emailOrPhoneNumber)
+          } else {
+            Alert.alert(
+              result === "email-already-exists"
+                ? "Email already exists"
+                : "Phone number already exists",
+              result === "email-already-exists"
+                ? "This email is being used for another account."
+                : "This phone number is being used for another account."
+            )
+          }
+        },
         onError: () => {
           Alert.alert(
             "Whoops!",
@@ -111,6 +130,32 @@ export const useSignUpCredentialsForm = ({
       }
     )
   }
+}
+
+const checkForNameError = (name: string) => {
+  return name.length === 0 ? ("empty" as const) : undefined
+}
+
+const checkForEmailPhoneError = (
+  text: string,
+  activeTextType: EmailPhoneTextType,
+  emailOrPhoneNumber: EmailAddress | USPhoneNumber | undefined
+) => {
+  if (text.length === 0) return "empty" as const
+  if (!emailOrPhoneNumber) {
+    return activeTextType === "email"
+      ? ("invalid-email" as const)
+      : ("invalid-phone-number" as const)
+  }
+  return undefined
+}
+
+const checkForPasswordError = (
+  passwordText: string,
+  validatedPassword: Password | undefined
+) => {
+  if (passwordText.length === 0) return "empty" as const
+  return !validatedPassword ? ("too-short" as const) : undefined
 }
 
 export type SignUpCredentialsFormProps = {
@@ -146,8 +191,8 @@ export const SignUpCredentialsFormView = ({
         <Animated.View layout={TiFDefaultLayoutTransition}>
           {isFocusingEmailPhone && (
             <Animated.View
-              entering={SlideInLeft.duration(300)}
-              exiting={SlideOutLeft.duration(300)}
+              entering={FadeIn.duration(300)}
+              exiting={FadeOut.duration(300)}
             >
               <TouchableOpacity onPress={onEmailPhoneTextTypeToggled}>
                 <BodyText style={styles.emailPhoneToggle}>
@@ -183,11 +228,12 @@ export const SignUpCredentialsFormView = ({
         onChangeText={(text) => onFieldUpdated("emailPhoneNumberText", text)}
         error={
           submission.status === "invalid"
-            ? emailPhoneErrorText(submission.reason)
+            ? emailPhoneErrorText(submission.emailPhoneReason)
             : undefined
         }
         returnKeyType="next"
         ref={emailPhoneRef}
+        // NB: This state is needed to hide the footer button.
         onFocus={() => setIsFocusingEmailPhone(true)}
         onBlur={() => setIsFocusingEmailPhone(false)}
         onSubmitEditing={() => {
@@ -203,8 +249,16 @@ export const SignUpCredentialsFormView = ({
           placeholder="Password"
           onChangeText={(text) => onFieldUpdated("passwordText", text)}
           ref={passwordRef}
+          error={
+            submission.status === "invalid" &&
+            submission.passwordReason === "too-short"
+              ? "Your password must be at least 8 characters"
+              : undefined
+          }
           style={styles.textField}
         />
+      </Animated.View>
+      <Animated.View layout={TiFDefaultLayoutTransition}>
         <Caption style={styles.disclaimerText}>
           <Caption>By creating an account, you agree to the </Caption>
           <Caption
@@ -225,7 +279,7 @@ export const SignUpCredentialsFormView = ({
 }
 
 const emailPhoneErrorText = (
-  error: "one-or-more-fields-empty" | "invalid-email" | "invalid-phone-number"
+  error: "invalid-email" | "invalid-phone-number" | "empty" | undefined
 ) => {
   if (error === "invalid-email") {
     return "Please enter a valid email."

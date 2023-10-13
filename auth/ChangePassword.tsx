@@ -7,19 +7,11 @@ import { TouchableOpacity } from "react-native-gesture-handler"
 import { AuthFormView } from "./AuthSection"
 import { AuthShadedPasswordTextField } from "./AuthTextFields"
 import { TextFieldRefValue } from "@components/TextFields"
-import Animated, { Layout } from "react-native-reanimated"
+import Animated from "react-native-reanimated"
 import { useFormSubmission } from "@hooks/FormHooks"
+import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 
 export type ChangePasswordResult = "valid" | "incorrect-password"
-
-export type ChangePasswordCurrentPasswordError =
-  | "incorrect-current-password"
-  | "empty"
-
-export type ChangePasswordNewPasswordError =
-  | "current-matches-new"
-  | "weak-new-password"
-  | "empty"
 
 export type UseChangePasswordFormEnvironment = {
   changePassword: (
@@ -116,13 +108,13 @@ const checkForNewPasswordError = (
   newPassword: string,
   currentPassword: string,
   validatedNewPassword?: Password
-): ChangePasswordNewPasswordError | undefined => {
+) => {
   if (newPassword === "") {
-    return "empty"
+    return "empty" as const
   } else if (newPassword === currentPassword) {
-    return "current-matches-new"
+    return "current-matches-new" as const
   } else if (!validatedNewPassword) {
-    return "weak-new-password"
+    return "too-short" as const
   } else {
     return undefined
   }
@@ -131,14 +123,14 @@ const checkForNewPasswordError = (
 const checkForCurrentPasswordError = (
   currentPassword: string,
   attemptedPasswords: string[]
-): ChangePasswordCurrentPasswordError | undefined => {
+) => {
   const isCurrentPasswordIncorrect = attemptedPasswords.find(
     (p) => p === currentPassword
   )
   if (isCurrentPasswordIncorrect) {
-    return "incorrect-current-password"
+    return "incorrect-current-password" as const
   } else if (currentPassword === "") {
-    return "empty"
+    return "empty" as const
   } else {
     return undefined
   }
@@ -160,7 +152,7 @@ export const ChangePasswordFormView = ({
   return (
     <AuthFormView
       title="Change Password"
-      description="Your new password must at least be 8 characters and contain at least 1 letter, 1 number, and 1 special character."
+      description="First, enter your current password, then choose your new password. Your new password must at least be 8 characters."
       submissionTitle="Change Password"
       submission={submission}
       style={style}
@@ -190,7 +182,7 @@ export const ChangePasswordFormView = ({
         style={styles.textField}
       />
 
-      <Animated.View layout={Layout.springify()}>
+      <Animated.View layout={TiFDefaultLayoutTransition}>
         <AuthShadedPasswordTextField
           iconName="md-key"
           iconBackgroundColor="#14B329"
@@ -207,7 +199,7 @@ export const ChangePasswordFormView = ({
           style={styles.textField}
         />
       </Animated.View>
-      <Animated.View layout={Layout.springify()}>
+      <Animated.View layout={TiFDefaultLayoutTransition}>
         <TouchableOpacity onPress={onForgotPasswordTapped}>
           <Headline style={{ color: AppStyles.highlightedText }}>
             Forgot your password?
@@ -218,11 +210,13 @@ export const ChangePasswordFormView = ({
   )
 }
 
-const newPasswordErrorMessage = (error?: ChangePasswordNewPasswordError) => {
+const newPasswordErrorMessage = (
+  error?: "current-matches-new" | "too-short" | "empty"
+) => {
   if (error === "current-matches-new") {
     return "Your new password must be different from your old password."
-  } else if (error === "weak-new-password") {
-    return "Your password should be at least 8 characters, and contain at least 1 capital letter, number, and special character."
+  } else if (error === "too-short") {
+    return "Your password should be at least 8 characters."
   } else {
     return undefined
   }

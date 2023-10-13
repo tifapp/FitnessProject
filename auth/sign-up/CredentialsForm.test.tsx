@@ -3,20 +3,26 @@ import { useSignUpCredentialsForm } from "./CredentialsForm"
 import { act } from "react-test-renderer"
 import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
 import { captureAlerts } from "../../tests/helpers/Alerts"
+import { fakeTimers } from "../../tests/helpers/Timers"
 
 describe("SignUpCredentialsForm tests", () => {
   describe("useSignUpCredentialsForm tests", () => {
+    fakeTimers()
+
     it("should not be sumbittable when any field is empty", () => {
       const { result } = renderUseSignUpCredentialsForm()
       expect(result.current.submission).toMatchObject({
         status: "invalid",
-        reason: "one-or-more-fields-empty"
+        nameReason: "empty",
+        emailPhoneReason: "empty",
+        passwordReason: "empty"
       })
 
       act(() => result.current.onFieldUpdated("name", "Bitchell Dickle"))
       expect(result.current.submission).toMatchObject({
         status: "invalid",
-        reason: "one-or-more-fields-empty"
+        emailPhoneReason: "empty",
+        passwordReason: "empty"
       })
 
       act(() => {
@@ -24,7 +30,7 @@ describe("SignUpCredentialsForm tests", () => {
       })
       expect(result.current.submission).toMatchObject({
         status: "invalid",
-        reason: "one-or-more-fields-empty"
+        passwordReason: "empty"
       })
 
       act(() => {
@@ -46,7 +52,9 @@ describe("SignUpCredentialsForm tests", () => {
 
       expect(result.current.submission).toMatchObject({
         status: "invalid",
-        reason: "invalid-email"
+        nameReason: "empty",
+        emailPhoneReason: "invalid-email",
+        passwordReason: "empty"
       })
     })
 
@@ -57,12 +65,14 @@ describe("SignUpCredentialsForm tests", () => {
 
       expect(result.current.submission).toMatchObject({
         status: "invalid",
-        reason: "invalid-phone-number"
+        nameReason: "empty",
+        emailPhoneReason: "invalid-phone-number",
+        passwordReason: "empty"
       })
     })
 
     test("successful submission flow", async () => {
-      createAccount.mockReturnValueOnce(Promise.resolve())
+      createAccount.mockResolvedValueOnce("success")
 
       const { result } = renderUseSignUpCredentialsForm()
 
@@ -78,8 +88,41 @@ describe("SignUpCredentialsForm tests", () => {
       await waitFor(() => expect(onSuccess).toHaveBeenCalled())
     })
 
-    it("shoulde display an alert when submission fails", async () => {
+    it("should display an alert when submission fails", async () => {
       createAccount.mockRejectedValueOnce(new Error())
+
+      const { result } = renderUseSignUpCredentialsForm()
+
+      act(() => result.current.onFieldUpdated("name", "Bitchell Dickle"))
+      act(() => {
+        result.current.onFieldUpdated("emailPhoneNumberText", "1234567890")
+      })
+      act(() => {
+        result.current.onFieldUpdated("passwordText", "SuperSecretPassword69")
+      })
+      act(() => (result.current.submission as any).submit())
+
+      await waitFor(() => expect(alertPresentationSpy).toHaveBeenCalled())
+    })
+
+    it("should display an error for passwords under 8 characters", async () => {
+      createAccount.mockRejectedValueOnce(new Error())
+
+      const { result } = renderUseSignUpCredentialsForm()
+
+      act(() => result.current.onFieldUpdated("passwordText", "1234567"))
+      expect(result.current.submission).toMatchObject({
+        status: "invalid",
+        nameReason: "empty",
+        emailPhoneReason: "empty",
+        passwordReason: "too-short"
+      })
+
+      await waitFor(() => expect(alertPresentationSpy).toHaveBeenCalled())
+    })
+
+    it("should display an error alert when account creation not success", async () => {
+      createAccount.mockResolvedValueOnce("email-already-exists")
 
       const { result } = renderUseSignUpCredentialsForm()
 

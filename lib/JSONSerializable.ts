@@ -9,3 +9,4 @@ export type JSONSerializableValue =
   | JSONSerializableValue[]
   | null
   | Date
+  | { toJSON: () => JSONSerializableValue }

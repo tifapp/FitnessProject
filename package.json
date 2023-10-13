@@ -18,11 +18,9 @@
   },
   "dependencies": {
     "@alessiocancian/react-native-actionsheet": "^3.2.0",
-    "@aws-amplify/api": "^4.0.63",
     "@aws-amplify/auth": "^5.6.0",
     "@aws-amplify/core": "^5.8.0",
-    "@aws-amplify/geo": "^2.3.0",
-    "@aws-amplify/notifications": "1.0.12",
+    "@aws-amplify/geo": "^2.3.5",
     "@aws-sdk/client-lex-runtime-v2": "3.262.0",
     "@aws-sdk/client-location": "3.262.0",
     "@expo-google-fonts/open-sans": "^0.2.3",

@@ -5,12 +5,7 @@ import {
   StackNavigatorType,
   XMarkBackButton
 } from "@components/Navigation"
-import {
-  AuthVerificationCodeFormView,
-  EmailAddress,
-  USPhoneNumber,
-  useAuthVerificationCodeForm
-} from ".."
+import { EmailAddress, USPhoneNumber } from ".."
 import { UserHandle } from "@lib/users"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import {
@@ -22,26 +17,16 @@ import {
   useSignUpChangeUserHandleForm
 } from "./ChangeUserHandle"
 import { SignUpEndingView } from "./Ending"
-import { NavigatorScreenParams } from "@react-navigation/native"
+import { NavigatorScreenParams, useNavigation } from "@react-navigation/native"
+import {
+  useAuthVerificationCodeForm,
+  AuthVerificationCodeFormView
+} from "@auth/VerifyCode"
+import { SignUpEnvironment } from "./Environment"
+import { TouchableIonicon } from "@components/common/Icons"
+import { Alert, StyleSheet } from "react-native"
 
-export type SignUpEnvironment = {
-  createAccount: (
-    name: string,
-    emailOrPhoneNumber: EmailAddress | USPhoneNumber,
-    uncheckedPassword: string
-  ) => Promise<void>
-  checkIfUserHandleTaken: (
-    handle: UserHandle,
-    signal?: AbortSignal
-  ) => Promise<boolean>
-  changeUserHandle: (handle: UserHandle) => Promise<void>
-  finishRegisteringAccount: (
-    emailOrPhoneNumber: EmailAddress | USPhoneNumber,
-    verificationCode: string
-  ) => Promise<"invalid-verification-code" | UserHandle>
-}
-
-type SignUpModalParamsList = {
+export type SignUpModalParamsList = {
   signUpCredentialsForm: undefined
   signUpVerifyCodeForm: {
     emailOrPhoneNumber: EmailAddress | USPhoneNumber
@@ -70,7 +55,9 @@ export const createSignUpScreens = <Params extends SignUpParamsList>(
       name="signUp"
       options={() => ({ headerShown: false, presentation: "modal" })}
     >
-      {(props: any) => <SignUpModalScreen {...props} {...env} />}
+      {(props: StackScreenProps<SignUpParamsList, "signUp">) => (
+        <SignUpModalScreen {...props} {...env} />
+      )}
     </stack.Screen>
   )
 }
@@ -81,6 +68,7 @@ type SignUpModalScreenProps = StackScreenProps<SignUpParamsList, "signUp"> &
 const SignUpModalScreen = memo(function Screen ({
   createAccount,
   finishRegisteringAccount,
+  resendVerificationCode,
   changeUserHandle,
   checkIfUserHandleTaken
 }: SignUpModalScreenProps) {
@@ -92,7 +80,7 @@ const SignUpModalScreen = memo(function Screen ({
       <SignUpModalStack.Screen
         name="signUpCredentialsForm"
         options={() => ({
-          headerLeft: XMarkBackButton,
+          headerLeft: SignUpExitButton,
           title: ""
         })}
       >
@@ -110,6 +98,7 @@ const SignUpModalScreen = memo(function Screen ({
         {(props) => (
           <VerifyCodeFormScreen
             {...props}
+            resendVerificationCode={resendVerificationCode}
             finishRegisteringAccount={finishRegisteringAccount}
           />
         )}
@@ -138,13 +127,8 @@ const SignUpModalScreen = memo(function Screen ({
 type CredentialsScreenProps = StackScreenProps<
   SignUpModalParamsList,
   "signUpCredentialsForm"
-> & {
-  createAccount: (
-    name: string,
-    emailOrPhoneNumber: EmailAddress | USPhoneNumber,
-    uncheckedPassword: string
-  ) => Promise<void>
-}
+> &
+  Pick<SignUpEnvironment, "createAccount">
 
 const CredentialsFormScreen = memo(function Screen ({
   navigation,
@@ -168,21 +152,19 @@ const CredentialsFormScreen = memo(function Screen ({
 type VerifyCodeFormScreenProps = StackScreenProps<
   SignUpModalParamsList,
   "signUpVerifyCodeForm"
-> & {
-  finishRegisteringAccount: (
-    emailOrPhoneNumber: EmailAddress | USPhoneNumber,
-    verificationCode: string
-  ) => Promise<"invalid-verification-code" | UserHandle>
-}
+> &
+  Pick<SignUpEnvironment, "finishRegisteringAccount" | "resendVerificationCode">
 
 const VerifyCodeFormScreen = memo(function Screen ({
   navigation,
   route,
-  finishRegisteringAccount
+  finishRegisteringAccount,
+  resendVerificationCode
 }: VerifyCodeFormScreenProps) {
   const generatedUserHandleRef = useRef<UserHandle | undefined>()
   const form = useAuthVerificationCodeForm({
-    resendCode: async () => {},
+    resendCode: async () =>
+      await resendVerificationCode(route.params.emailOrPhoneNumber),
     submitCode: async (code: string) => {
       const result = await finishRegisteringAccount(
         route.params.emailOrPhoneNumber,
@@ -214,13 +196,8 @@ const VerifyCodeFormScreen = memo(function Screen ({
 type ChangeUserHandleFormScreenProps = StackScreenProps<
   SignUpModalParamsList,
   "signUpChangeUserHandleForm"
-> & {
-  checkIfUserHandleTaken: (
-    handle: UserHandle,
-    signal?: AbortSignal
-  ) => Promise<boolean>
-  changeUserHandle: (handle: UserHandle) => Promise<void>
-}
+> &
+  Pick<SignUpEnvironment, "checkIfUserHandleTaken" | "changeUserHandle">
 
 const ChangeUserHandleFormScreen = memo(function Screen ({
   navigation,
@@ -243,3 +220,34 @@ const EndingScreen = ({
     onCallToActionTapped={() => navigation.getParent()?.goBack()}
   />
 )
+
+const SignUpExitButton = () => {
+  const navigation = useNavigation()
+  return (
+    <TouchableIonicon
+      icon={{ name: "close" }}
+      accessibilityLabel="Go Back"
+      onPress={() => {
+        Alert.alert(
+          "Cancel Sign Up?",
+          "Are you sure you want to cancel your sign-up?",
+          [
+            {
+              text: "Cancel Sign Up",
+              style: "destructive",
+              onPress: () => navigation.getParent()?.goBack()
+            },
+            { text: "Dismiss" }
+          ]
+        )
+      }}
+      style={styles.exitButtonPadding}
+    />
+  )
+}
+
+const styles = StyleSheet.create({
+  exitButtonPadding: {
+    paddingLeft: 16
+  }
+})

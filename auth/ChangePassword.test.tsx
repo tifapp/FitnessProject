@@ -2,24 +2,13 @@ import { Password } from "@auth/Password"
 import { useChangePasswordForm } from "@auth/ChangePassword"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { captureAlerts } from "../tests/helpers/Alerts"
-import {
-  TestQueryClientProvider,
-  createTestQueryClient
-} from "../tests/helpers/ReactQuery"
+import { TestQueryClientProvider } from "../tests/helpers/ReactQuery"
 import { neverPromise } from "../tests/helpers/Promise"
 
 describe("ChangePassword tests", () => {
   beforeEach(() => jest.resetAllMocks())
 
   describe("UseChangePassword tests", () => {
-    const queryClient = createTestQueryClient()
-    beforeEach(() => queryClient.clear())
-
-    afterAll(() => {
-      queryClient.resetQueries()
-      queryClient.clear()
-    })
-
     const changePassword = jest.fn()
     const onSuccess = jest.fn()
 
@@ -38,9 +27,7 @@ describe("ChangePassword tests", () => {
           }),
         {
           wrapper: ({ children }) => (
-            <TestQueryClientProvider client={queryClient}>
-              {children}
-            </TestQueryClientProvider>
+            <TestQueryClientProvider>{children}</TestQueryClientProvider>
           )
         }
       )
@@ -74,7 +61,7 @@ describe("ChangePassword tests", () => {
 
       expect(result.current.submission).toMatchObject({
         status: "invalid",
-        newPasswordError: "weak-new-password",
+        newPasswordError: "too-short",
         currentPasswordError: undefined
       })
     })
@@ -150,7 +137,7 @@ describe("ChangePassword tests", () => {
       expect(result.current.submission).toMatchObject({
         status: "invalid",
         currentPasswordError: "incorrect-current-password",
-        newPasswordError: "weak-new-password"
+        newPasswordError: "too-short"
       })
     })
 

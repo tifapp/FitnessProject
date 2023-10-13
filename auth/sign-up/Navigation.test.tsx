@@ -12,9 +12,15 @@ import { NavigationContainer, useFocusEffect } from "@react-navigation/native"
 import "../../tests/helpers/Matchers"
 import { UserHandle } from "@lib/users"
 import { fakeTimers } from "../../tests/helpers/Timers"
-import { USPhoneNumber } from ".."
 import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
 import { useCallback, useState } from "react"
+import { TiFAPI } from "@api-client/TiFAPI"
+import { createTiFAPIFetch } from "@api-client/client"
+import { createSignUpEnvironment } from "./Environment"
+import { rest } from "msw"
+import { uuid } from "@lib/uuid"
+import { mswServer } from "../../tests/helpers/msw"
+import { captureAlerts } from "../../tests/helpers/Alerts"
 
 type TestSignUpParamsList = {
   test: undefined
@@ -23,17 +29,42 @@ type TestSignUpParamsList = {
 const TEST_GENERATED_USER_HANDLE = UserHandle.parse("bitchelldic12").handle!
 
 describe("SignUpNavigation tests", () => {
+  const cognito = {
+    signUp: jest.fn(),
+    resendSignUp: jest.fn(),
+    confirmSignUpWithAutoSignIn: jest.fn()
+  }
+  const env = createSignUpEnvironment(
+    cognito,
+    new TiFAPI(
+      createTiFAPIFetch(
+        new URL("https://localhost:8080"),
+        async () => "I am a jwt"
+      )
+    )
+  )
+
   afterEach(() => act(() => jest.runAllTimers()))
   fakeTimers()
-  beforeEach(() => jest.resetAllMocks())
+  beforeEach(() => {
+    jest.resetAllMocks()
+    mswServer.use(
+      rest.post("https://localhost:8080/user", async (_, res, ctx) => {
+        return res(
+          ctx.status(201),
+          ctx.json({ id: uuid(), handle: TEST_GENERATED_USER_HANDLE.rawValue })
+        )
+      }),
+      rest.get(
+        "https://localhost:8080/user/autocomplete",
+        async (_, res, ctx) => {
+          return res(ctx.status(200), ctx.json({ users: [] }))
+        }
+      )
+    )
+  })
 
   test("a full valid sign-up flow", async () => {
-    createAccount.mockReturnValueOnce(Promise.resolve())
-    finishRegisteringAccount.mockResolvedValueOnce(TEST_GENERATED_USER_HANDLE)
-
-    checkIfUserHandleTaken.mockResolvedValue(false)
-    changeUserHandle.mockReturnValueOnce(Promise.resolve())
-
     renderSignUpFlow()
 
     startSignUpTest()
@@ -42,22 +73,37 @@ describe("SignUpNavigation tests", () => {
     enterPhoneNumberText("1234567890")
     enterPassword("Abc123{}op")
 
+    cognito.signUp.mockReturnValue(Promise.resolve({}))
     submitCredentials()
 
     await waitFor(() => expect(verifyCodeForm()).toBeDisplayed())
     expect(credentialsForm()).not.toBeDisplayed()
 
     enterVerificationCode("123456")
+    cognito.confirmSignUpWithAutoSignIn.mockReturnValue(
+      Promise.resolve("SUCCESS")
+    )
     submitVerificationCode()
 
     await waitFor(() => expect(changeUserHandleForm()).toBeDisplayed())
-    expect(finishRegisteringAccount).toHaveBeenCalledWith(
-      USPhoneNumber.parse("1234567890")!,
+    expect(cognito.confirmSignUpWithAutoSignIn).toHaveBeenCalledWith(
+      "+11234567890",
       "123456"
     )
     expect(verifyCodeForm()).not.toBeDisplayed()
 
-    replaceUserHandleText(TEST_GENERATED_USER_HANDLE.rawValue, "bitchelldickle")
+    const newHandleText = "bitchelldickle"
+
+    replaceUserHandleText(TEST_GENERATED_USER_HANDLE.rawValue, newHandleText)
+    mswServer.use(
+      rest.patch("https://localhost:8080/user/self", async (req, res, ctx) => {
+        const body = await req.json()
+        if (body.handle !== newHandleText) {
+          return res(ctx.status(500))
+        }
+        return res(ctx.status(204))
+      })
+    )
     submitNewUserHandle()
 
     await waitFor(() => expect(endingView()).toBeDisplayed())
@@ -67,8 +113,11 @@ describe("SignUpNavigation tests", () => {
   })
 
   test("get to end of sign-up flow, go back to change username again, finish sign-up flow", async () => {
-    checkIfUserHandleTaken.mockResolvedValue(false)
-    changeUserHandle.mockReturnValue(Promise.resolve())
+    mswServer.use(
+      rest.patch("https://localhost:8080/user/self", async (_, res, ctx) => {
+        return res(ctx.status(204))
+      })
+    )
 
     renderSignUpFlow()
 
@@ -91,19 +140,22 @@ describe("SignUpNavigation tests", () => {
     expect(isAtEnd()).toEqual(true)
   })
 
-  const createAccount = jest.fn()
-  const finishRegisteringAccount = jest.fn()
-  const changeUserHandle = jest.fn()
-  const checkIfUserHandleTaken = jest.fn()
+  test("leave sign-up flow warning alert flow", async () => {
+    renderSignUpFlow()
+
+    startSignUpTest()
+
+    attemptToExit()
+    expect(alertPresentationSpy).toHaveBeenCalled()
+
+    await confirmExit()
+
+    expect(isAtEnd()).toEqual(true)
+  })
 
   const renderSignUpFlow = () => {
     const Stack = createStackNavigator<TestSignUpParamsList>()
-    const signUpScreens = createSignUpScreens(Stack, {
-      createAccount,
-      finishRegisteringAccount,
-      checkIfUserHandleTaken,
-      changeUserHandle
-    })
+    const signUpScreens = createSignUpScreens(Stack, env)
     return render(
       <TestQueryClientProvider>
         <NavigationContainer>
@@ -114,6 +166,16 @@ describe("SignUpNavigation tests", () => {
         </NavigationContainer>
       </TestQueryClientProvider>
     )
+  }
+
+  const { alertPresentationSpy, tapAlertButton } = captureAlerts()
+
+  const attemptToExit = () => {
+    fireEvent.press(screen.getByLabelText("Go Back"))
+  }
+
+  const confirmExit = async () => {
+    await tapAlertButton("Cancel Sign Up")
   }
 
   const credentialsForm = () => {
