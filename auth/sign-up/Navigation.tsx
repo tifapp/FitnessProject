@@ -26,7 +26,7 @@ import { SignUpEnvironment } from "./Environment"
 import { TouchableIonicon } from "@components/common/Icons"
 import { Alert, StyleSheet } from "react-native"
 
-type SignUpModalParamsList = {
+export type SignUpModalParamsList = {
   signUpCredentialsForm: undefined
   signUpVerifyCodeForm: {
     emailOrPhoneNumber: EmailAddress | USPhoneNumber

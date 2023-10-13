@@ -5,19 +5,10 @@ import { createTiFAPIFetch } from "@api-client/client"
 import { rest } from "msw"
 import { UserHandle } from "@lib/users"
 import { uuid } from "@lib/uuid"
-import { CognitoErrorCode } from "@auth/CognitoHelpers"
+import { TestCognitoError } from "@auth/CognitoHelpers"
 import { mswServer } from "../../tests/helpers/msw"
 
 describe("SignUpEnvironment tests", () => {
-  class CognitoError extends Error {
-    code: CognitoErrorCode
-
-    constructor (code: CognitoErrorCode) {
-      super()
-      this.code = code
-    }
-  }
-
   const cognito = {
     signUp: jest.fn(),
     resendSignUp: jest.fn(),
@@ -77,7 +68,7 @@ describe("SignUpEnvironment tests", () => {
 
     test("create account with already existing email", async () => {
       cognito.signUp.mockRejectedValueOnce(
-        new CognitoError("UsernameExistsException")
+        new TestCognitoError("UsernameExistsException")
       )
       const result = await env.createAccount(
         "Bitchell Dickle",
@@ -89,7 +80,7 @@ describe("SignUpEnvironment tests", () => {
 
     test("create account with already existing phone number", async () => {
       cognito.signUp.mockRejectedValueOnce(
-        new CognitoError("UsernameExistsException")
+        new TestCognitoError("UsernameExistsException")
       )
       const result = await env.createAccount(
         "Bitchell Dickle",
@@ -197,7 +188,7 @@ describe("SignUpEnvironment tests", () => {
   describe("FinishRegisteringAccount tests", () => {
     it("should return \"invalid-verification-code\" when cognito throws CodeMismatchException", async () => {
       cognito.confirmSignUpWithAutoSignIn.mockRejectedValueOnce(
-        new CognitoError("CodeMismatchException")
+        new TestCognitoError("CodeMismatchException")
       )
       const result = await env.finishRegisteringAccount(
         USPhoneNumber.parse("1234567890")!,
