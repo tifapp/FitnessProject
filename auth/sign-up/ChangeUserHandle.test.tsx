@@ -64,6 +64,7 @@ describe("SignUpChangeUserHandle tests", () => {
       changeUserHandle.mockImplementationOnce(neverPromise)
       const { result } = renderUseSignUpChangeUserHandle("bichell_dickle", 200)
 
+      act(() => result.current.onHandleTextChanged("abc"))
       act(() => (result.current.submission as any).submit())
       await waitFor(() => {
         expect(result.current.submission.status).toEqual("submitting")
@@ -90,8 +91,34 @@ describe("SignUpChangeUserHandle tests", () => {
       changeUserHandle.mockRejectedValueOnce(new Error())
       const { result } = renderUseSignUpChangeUserHandle("bichell_dickle", 200)
 
+      act(() => result.current.onHandleTextChanged("abc"))
       act(() => (result.current.submission as any).submit())
       await waitFor(() => expect(alertPresentationSpy).toHaveBeenCalled())
+    })
+
+    it("should not fully submit new handle when new handle is the same as initial handle", async () => {
+      changeUserHandle.mockRejectedValueOnce(new Error())
+      const { result } = renderUseSignUpChangeUserHandle("bichell_dickle", 200)
+
+      act(() => (result.current.submission as any).submit())
+      await waitFor(() => expect(onSuccess).toHaveBeenCalled())
+      expect(changeUserHandle).not.toHaveBeenCalled()
+    })
+
+    it("should not fully submit new handle is the same as the previous submission handle", async () => {
+      changeUserHandle
+        .mockReturnValueOnce(Promise.resolve())
+        .mockRejectedValueOnce(new Error())
+      const { result } = renderUseSignUpChangeUserHandle("bichell_dickle", 200)
+
+      act(() => result.current.onHandleTextChanged("abc"))
+
+      act(() => (result.current.submission as any).submit())
+      await waitFor(() => expect(onSuccess).toHaveBeenCalled())
+
+      act(() => (result.current.submission as any).submit())
+      await waitFor(() => expect(onSuccess).toHaveBeenCalled())
+      expect(changeUserHandle).toHaveBeenCalledTimes(1)
     })
 
     const { alertPresentationSpy } = captureAlerts()

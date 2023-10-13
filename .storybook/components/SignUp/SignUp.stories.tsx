@@ -1,10 +1,17 @@
+import { TiFAPI } from "@api-client/TiFAPI"
+import { createAWSTiFAPIFetch } from "@api-client/aws"
 import { AuthShadedEmailPhoneTextFieldView } from "@auth/AuthTextFields"
 import { useEmailPhoneTextState } from "@auth/UseEmailPhoneText"
-import { SignUpParamsList, createSignUpScreens } from "@auth/sign-up"
+import {
+  SignUpParamsList,
+  cognitoConfirmSignUpWithAutoSignIn,
+  createSignUpEnvironment,
+  createSignUpScreens
+} from "@auth/sign-up"
+import { Auth } from "@aws-amplify/auth"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { AppStyles } from "@lib/AppColorStyle"
-import { UserHandle } from "@lib/users"
 import { NavigationContainer } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
@@ -25,14 +32,25 @@ type ParamsList = SignUpParamsList & { test: {} }
 
 const Stack = createStackNavigator<ParamsList>()
 
-const screens = createSignUpScreens(Stack, {
-  createAccount: async () => {},
-  finishRegisteringAccount: async () => {
-    return UserHandle.parse("elonmusk").handle!
-  },
-  changeUserHandle: async () => {},
-  checkIfUserHandleTaken: async () => false
-})
+const tiFAPI = new TiFAPI(
+  createAWSTiFAPIFetch(
+    new URL("https://623qsegfb9.execute-api.us-west-2.amazonaws.com/prod/")
+  )
+)
+
+const screens = createSignUpScreens(
+  Stack,
+  createSignUpEnvironment(
+    {
+      signUp: async (request) => await Auth.signUp(request),
+      resendSignUp: async (username: string) => {
+        await Auth.resendSignUp(username)
+      },
+      confirmSignUpWithAutoSignIn: cognitoConfirmSignUpWithAutoSignIn
+    },
+    tiFAPI
+  )
+)
 
 export const Basic: SignUpStory = () => (
   <TiFQueryClientProvider>

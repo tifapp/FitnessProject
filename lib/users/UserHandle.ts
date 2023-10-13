@@ -1,3 +1,5 @@
+import { ZodUtils } from "@lib/Zod"
+
 /**
  * An reason that a user handle's raw text was unable to be parsed.
  */
@@ -52,6 +54,21 @@ export class UserHandle {
   toString () {
     return `@${this.rawValue}`
   }
+
+  toJSON () {
+    return this.rawValue
+  }
+
+  isEqualTo (other: UserHandle) {
+    return this.rawValue === other.rawValue
+  }
+
+  /**
+   * A zod schema that converts a string to an {@link UserHandle}.
+   */
+  static schema = ZodUtils.createOptionalParseableSchema({
+    parse: (rawValue: string) => UserHandle.parse(rawValue).handle
+  })
 
   /**
    * Validates a raw user handle string and returns an instance of this
