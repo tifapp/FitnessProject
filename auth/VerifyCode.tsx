@@ -81,7 +81,6 @@ export type AuthVerificationCodeProps = {
   code: string
   codeReceiverName: string
   style?: StyleProp<ViewStyle>
-  iOSInModal?: boolean
 } & ReturnType<typeof useAuthVerificationCodeForm>
 
 /**
@@ -95,7 +94,6 @@ export const AuthVerificationCodeFormView = ({
   resendCodeStatus,
   onCodeResent,
   codeReceiverName,
-  iOSInModal,
   style
 }: AuthVerificationCodeProps) => (
   <>
@@ -112,7 +110,6 @@ export const AuthVerificationCodeFormView = ({
           </TouchableOpacity>
         </View>
       }
-      iOSInModal={iOSInModal}
       submissionTitle="Verify me!"
       submission={submission}
       style={style}

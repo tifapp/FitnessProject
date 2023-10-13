@@ -20,7 +20,6 @@ export const SignUpEndingView = ({
     title="Welcome to tiF!"
     description="Way to get started on your fitness journey! See below for what to do with your new account!"
     callToActionTitle="Awesome!"
-    iOSInModal
     onCallToActionTapped={onCallToActionTapped}
     style={style}
   >

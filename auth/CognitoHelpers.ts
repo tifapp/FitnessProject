@@ -21,6 +21,9 @@ export const setupCognito = () => {
 export type CognitoErrorCode =
   | "CodeMismatchException"
   | "UsernameExistsException"
+  | "NotAuthorizedException"
+  | "UserNotFoundException"
+  | "UserNotConfirmedException"
 
 /**
  * Returns true if the given error object is an instance of {@link Error} and has a property
