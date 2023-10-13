@@ -3,9 +3,9 @@ import { AuthShadedPasswordTextField } from "@auth/AuthTextFields"
 import { useFormSubmission } from "@hooks/FormHooks"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useState } from "react"
-import { Alert, StyleProp, StyleSheet, ViewStyle } from "react-native"
+import { StyleProp, StyleSheet, ViewStyle } from "react-native"
 import Animated, { Layout } from "react-native-reanimated"
-import { ChangePasswordNewPasswordError, Password } from ".."
+import { Password } from ".."
 
 /**
  * A type to help show what props need to be given in order to utilize {@link useForgotPasswordForm}.
@@ -61,17 +61,17 @@ export const useResetPasswordForm = ({
 const checkForNewPasswordError = (
   newPassword: string,
   validatedNewPassword?: Password
-): ChangePasswordNewPasswordError | undefined => {
+) => {
   if (newPassword === "") {
-    return "empty"
+    return "empty" as const
   } else if (!validatedNewPassword) {
-    return "weak-new-password"
+    return "weak-new-password" as const
   } else {
     return undefined
   }
 }
 
-const newPasswordErrorMessage = (error?: ChangePasswordNewPasswordError) => {
+const newPasswordErrorMessage = (error?: "weak-new-password" | "empty") => {
   if (error === "weak-new-password") {
     return "Your password should be at least 8 characters, and contain at least 1 capital letter, number, and special character."
   } else {
