@@ -113,7 +113,7 @@ export const SignInFormView = ({
     <AuthFormView
       title="Sign In"
       description="Welcome back! Fill in the fields below and return to your fitness journey!"
-      submissionTitle="I am back!"
+      submissionTitle="I'm back!"
       submission={submission}
       footer={
         <EmailPhoneTextToggleFooterView
