@@ -1,0 +1,33 @@
+name: EAS Build
+
+on:
+  pull_request_review:
+    types:
+      - submitted
+
+jobs:
+  build:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-latest
+
+    env:
+      EXPO_PROJECT_ID: ${{ secrets.EXPO_PROJECT_ID }}
+      EXPO_PROJECT_OWNER: ${{ secrets.EXPO_USERNAME }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      - name: Install Expo CLI
+        run: npm install -g expo-cli
+
+      - name: Expo Login
+        run: echo ${{ secrets.EXPO_PASSWORD }} | expo login -u ${{ secrets.EXPO_USERNAME }} --non-interactive
+
+      - name: EAS Build
+        run: eas build --platform all
