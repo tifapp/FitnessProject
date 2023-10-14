@@ -6,14 +6,23 @@ import {
 } from "@testing-library/react-native"
 import { CognitoSignInAuthenticator } from "./Authenticator"
 import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
-import { NavigationContainer, useFocusEffect } from "@react-navigation/native"
+import {
+  NavigationContainer,
+  NavigatorScreenParams,
+  useFocusEffect
+} from "@react-navigation/native"
 import { SignInParamsList, createSignInScreens } from "./Navigation"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { useState, useCallback } from "react"
 import { Button, View } from "react-native"
 import { USPhoneNumber } from ".."
+import "../../tests/helpers/Matchers"
+import { TestCognitoError } from "@auth/CognitoHelpers"
 
-type TestParamsList = { test: undefined } & SignInParamsList
+type TestParamsList = {
+  test: undefined
+  signIn: NavigatorScreenParams<SignInParamsList>
+}
 
 describe("SignInNavigation tests", () => {
   const TEST_PASSWORD = "12345678"
@@ -23,6 +32,8 @@ describe("SignInNavigation tests", () => {
     confirmSignIn: jest.fn()
   }
   const authenticator = new CognitoSignInAuthenticator(cognito)
+
+  beforeEach(() => jest.useFakeTimers())
 
   test("sign in with correct credentials", async () => {
     renderSignInScreens()
@@ -35,6 +46,42 @@ describe("SignInNavigation tests", () => {
     submitSignInCredentials()
 
     await waitFor(() => expect(isAtEnd()).toEqual(true))
+  })
+
+  test("sign in, requires sign in verification flow for SMS MFA", async () => {
+    renderSignInScreens()
+    beginSignInTest()
+
+    enterPhoneNumberText(USPhoneNumber.mock.toString())
+    enterPasswordText(TEST_PASSWORD)
+
+    cognito.signIn.mockResolvedValueOnce({ challengeName: "SMS_MFA" })
+    submitSignInCredentials()
+
+    await waitFor(() => expect(signInVerificationCodeForm()).toBeDisplayed())
+    enterVerificationCode("123456")
+
+    cognito.confirmSignIn.mockResolvedValue({})
+
+    submitVerificationCode()
+    await waitFor(() => expect(isAtEnd()).toEqual(true))
+  })
+
+  it("should switch over to the sign up flow when sign up verification required", async () => {
+    renderSignInScreens()
+    beginSignInTest()
+
+    enterPhoneNumberText(USPhoneNumber.mock.toString())
+    enterPasswordText(TEST_PASSWORD)
+
+    cognito.signIn.mockRejectedValueOnce(
+      new TestCognitoError("UserNotConfirmedException")
+    )
+    submitSignInCredentials()
+
+    await waitFor(() => {
+      expect(signUpVerifyCodeForm(USPhoneNumber.mock)).toBeDisplayed()
+    })
   })
 
   const enterPhoneNumberText = (text: string) => {
@@ -52,15 +99,47 @@ describe("SignInNavigation tests", () => {
     fireEvent.press(screen.getByText("I'm back!"))
   }
 
+  const signInVerificationCodeForm = () => {
+    return screen.queryByText("Verify your Account")
+  }
+  const submitVerificationCode = () => {
+    fireEvent.press(screen.getByLabelText("Verify me!"))
+  }
+
+  const enterVerificationCode = (code: string) => {
+    fireEvent.changeText(
+      screen.getByPlaceholderText("Enter the 6-digit code"),
+      code
+    )
+  }
+
+  const signUpVerifyCodeForm = (phoneNumber: USPhoneNumber) => {
+    return screen.queryByTestId(`sign-up-verify-${phoneNumber}`)
+  }
+
   const renderSignInScreens = () => {
     const Stack = createStackNavigator<TestParamsList>()
-    const signInScreens = createSignInScreens(Stack, authenticator)
+    const ModalStack = createStackNavigator<SignInParamsList>()
+    const signInScreens = createSignInScreens(ModalStack, authenticator)
     return render(
       <TestQueryClientProvider>
         <NavigationContainer>
           <Stack.Navigator initialRouteName="test">
-            {signInScreens}
             <Stack.Screen name="test" component={TestScreen} />
+            <Stack.Screen name="signIn">
+              {() => (
+                <ModalStack.Navigator initialRouteName="signInForm">
+                  {signInScreens}
+                  <ModalStack.Screen name="signUpVerifyCodeForm">
+                    {(props) => (
+                      <View
+                        testID={`sign-up-verify-${props.route.params.emailOrPhoneNumber}`}
+                      />
+                    )}
+                  </ModalStack.Screen>
+                </ModalStack.Navigator>
+              )}
+            </Stack.Screen>
           </Stack.Navigator>
         </NavigationContainer>
       </TestQueryClientProvider>

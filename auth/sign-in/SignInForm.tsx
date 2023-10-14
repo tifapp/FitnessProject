@@ -30,7 +30,10 @@ export type UseSignInFormEnvironment = {
     emailOrPhoneNumber: EmailAddress | USPhoneNumber,
     uncheckedPassword: string
   ) => Promise<SignInResult>
-  onSuccess: (result: Omit<SignInResult, "incorrect-credentials">) => void
+  onSuccess: (
+    result: Omit<SignInResult, "incorrect-credentials">,
+    emailOrPhoneNumber: EmailAddress | USPhoneNumber
+  ) => void
 }
 
 /**
@@ -67,14 +70,14 @@ export const useSignInForm = ({
         return { status: "invalid", passwordReason, emailPhoneReason }
       },
       {
-        onSuccess: (result) => {
+        onSuccess: (result, args) => {
           if (result === "incorrect-credentials") {
             Alert.alert(
               "Incorrect Credentials",
               "Your email, phone number, or password entered was incorrectly entered."
             )
           } else {
-            onSuccess(result)
+            onSuccess(result, args.emailOrPhoneNumber)
           }
         },
         onError: () => {

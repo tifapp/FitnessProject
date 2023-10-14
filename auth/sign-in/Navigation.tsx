@@ -1,64 +1,88 @@
-import {
-  BASE_HEADER_SCREEN_OPTIONS,
-  StackNavigatorType,
-  XMarkBackButton
-} from "@components/Navigation"
+import { StackNavigatorType, XMarkBackButton } from "@components/Navigation"
 import { SignInAuthenticator } from "./Authenticator"
-import { NavigatorScreenParams } from "@react-navigation/native"
-import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
+import { StackScreenProps } from "@react-navigation/stack"
 import React, { memo } from "react"
 import { SignInFormView, useSignInForm } from "./SignInForm"
-
-export type SignInModalParamsList = {
-  signInForm: undefined
-}
+import { EmailAddress, USPhoneNumber } from ".."
+import {
+  AuthVerificationCodeFormView,
+  useAuthVerificationCodeForm
+} from "@auth/VerifyCode"
+import { SignUpParamsList } from "@auth/sign-up"
 
 export type SignInParamsList = {
-  signIn: NavigatorScreenParams<SignInModalParamsList>
-}
+  signInForm: undefined
+  signInVerifyCode: {
+    emailOrPhoneNumber: EmailAddress | USPhoneNumber
+  }
+} & SignUpParamsList
 
 export const createSignInScreens = <Params extends SignInParamsList>(
   stack: StackNavigatorType<Params>,
   authenticator: SignInAuthenticator
 ) => (
-    <stack.Screen
-      name="signIn"
-      options={{ presentation: "modal", headerShown: false }}
-    >
-      {(props: StackScreenProps<SignInParamsList, "signIn">) => (
-        <SignInModalScreen {...props} authenticator={authenticator} />
-      )}
-    </stack.Screen>
-  )
-
-const SignInModalStack = createStackNavigator<SignInModalParamsList>()
-
-type SignInModalScreenProps = StackScreenProps<SignInParamsList, "signIn"> & {
-  authenticator: SignInAuthenticator
-}
-
-const SignInModalScreen = memo(function Screen ({
-  authenticator
-}: SignInModalScreenProps) {
-  return (
-    <SignInModalStack.Navigator
-      screenOptions={BASE_HEADER_SCREEN_OPTIONS}
-      initialRouteName="signInForm"
-    >
-      <SignInModalStack.Screen
+    <>
+      <stack.Screen
         name="signInForm"
         options={{ headerLeft: XMarkBackButton, title: "" }}
       >
-        {(props) => (
+        {(props: any) => (
           <SignInFormScreen {...props} authenticator={authenticator} />
         )}
-      </SignInModalStack.Screen>
-    </SignInModalStack.Navigator>
+      </stack.Screen>
+      <stack.Screen
+        name="signInVerifyCode"
+        options={{ headerLeft: XMarkBackButton, title: "" }}
+      >
+        {(props: any) => (
+          <SignInVerificationCodeScreen
+            {...props}
+            authenticator={authenticator}
+          />
+        )}
+      </stack.Screen>
+    </>
   )
-})
+
+// const SignInModalStack = createStackNavigator<SignInModalParamsList>()
+
+// type SignInModalScreenProps = StackScreenProps<SignInParamsList, "signIn"> & {
+//   authenticator: SignInAuthenticator
+// }
+
+// const SignInModalScreen = memo(function Screen ({
+//   authenticator
+// }: SignInModalScreenProps) {
+//   return (
+//     <SignInModalStack.Navigator
+//       screenOptions={BASE_HEADER_SCREEN_OPTIONS}
+//       initialRouteName="signInForm"
+//     >
+//       <SignInModalStack.Screen
+//         name="signInForm"
+//         options={{ headerLeft: XMarkBackButton, title: "" }}
+//       >
+//         {(props) => (
+//           <SignInFormScreen {...props} authenticator={authenticator} />
+//         )}
+//       </SignInModalStack.Screen>
+//       <SignInModalStack.Screen
+//         name="signInVerifyCode"
+//         options={{ headerLeft: XMarkBackButton, title: "" }}
+//       >
+//         {(props) => (
+//           <SignInVerificationCodeScreen
+//             {...props}
+//             authenticator={authenticator}
+//           />
+//         )}
+//       </SignInModalStack.Screen>
+//     </SignInModalStack.Navigator>
+//   )
+// })
 
 type SignInFormScreenProps = StackScreenProps<
-  SignInModalParamsList,
+  SignInParamsList,
   "signInForm"
 > & {
   authenticator: SignInAuthenticator
@@ -72,7 +96,43 @@ const SignInFormScreen = memo(function Screen ({
     signIn: async (emailOrPhoneNumber, uncheckedPassword) => {
       return await authenticator.signIn(emailOrPhoneNumber, uncheckedPassword)
     },
-    onSuccess: () => navigation.getParent()?.goBack()
+    onSuccess: (result, emailOrPhoneNumber) => {
+      if (result === "success") {
+        navigation.getParent()?.goBack()
+      } else if (result === "sign-up-verification-required") {
+        navigation.replace("signUpVerifyCodeForm", { emailOrPhoneNumber })
+      } else {
+        navigation.navigate("signInVerifyCode", { emailOrPhoneNumber })
+      }
+    }
   })
   return <SignInFormView {...form} onForgotPasswordTapped={() => {}} />
+})
+
+type SignInVerificationCodeScreenProps = StackScreenProps<
+  SignInParamsList,
+  "signInVerifyCode"
+> & {
+  authenticator: SignInAuthenticator
+}
+
+const SignInVerificationCodeScreen = memo(function Screen ({
+  navigation,
+  route,
+  authenticator
+}: SignInVerificationCodeScreenProps) {
+  const form = useAuthVerificationCodeForm({
+    resendCode: async () => await authenticator.resendSignInVerificationCode(),
+    submitCode: async (code) => {
+      const result = await authenticator.verifySignIn(code)
+      return result === "success"
+    },
+    onSuccess: () => navigation.getParent()?.goBack()
+  })
+  return (
+    <AuthVerificationCodeFormView
+      {...form}
+      codeReceiverName={route.params.emailOrPhoneNumber.formattedForPrivacy}
+    />
+  )
 })

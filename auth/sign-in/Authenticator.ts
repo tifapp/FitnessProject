@@ -2,7 +2,7 @@ import {
   cognitoFormatEmailOrPhoneNumber,
   isCognitoErrorWithCode
 } from "@auth/CognitoHelpers"
-import { Auth } from "aws-amplify"
+import { Auth } from "@aws-amplify/auth"
 import { EmailAddress, USPhoneNumber } from ".."
 import { CognitoUser } from "amazon-cognito-identity-js"
 

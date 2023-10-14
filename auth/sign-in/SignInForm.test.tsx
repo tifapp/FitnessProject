@@ -3,6 +3,7 @@ import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
 import { useSignInForm } from "./SignInForm"
 import { act } from "react-test-renderer"
 import { captureAlerts } from "../../tests/helpers/Alerts"
+import { USPhoneNumber } from ".."
 
 describe("SignInForm tests", () => {
   beforeEach(() => jest.resetAllMocks())
@@ -48,7 +49,12 @@ describe("SignInForm tests", () => {
       act(() => result.current.onEmailPhoneTextChanged("(111) 111-1111"))
       act(() => (result.current.submission as any).submit())
 
-      await waitFor(() => expect(onSuccess).toHaveBeenCalledWith("success"))
+      await waitFor(() =>
+        expect(onSuccess).toHaveBeenCalledWith(
+          "success",
+          USPhoneNumber.parse("(111) 111-1111")
+        )
+      )
     })
 
     test("incorrect credentials submission flow, displays alert", async () => {
