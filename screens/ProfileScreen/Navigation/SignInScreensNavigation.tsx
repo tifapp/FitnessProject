@@ -119,7 +119,7 @@ const VerifyCodeScreen = ({ navigation }) => {
 
 const ResetPasswordScreen = ({ navigation }: ResetPasswordScreenProps) => {
   const resetPassword = useResetPasswordForm({
-    initiateResetPassword: async () =>
+    submitResettedPassword: async () =>
       await delayData<ResetPasswordResult>("valid"),
     onSuccess: () => navigation.goBack()
   })

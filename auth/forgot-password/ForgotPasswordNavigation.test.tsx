@@ -1,6 +1,4 @@
 import { Password } from "@auth/Password"
-import { USPhoneNumber } from "@auth/PhoneNumber"
-import { delayData } from "@lib/DelayData"
 import { NavigationContainer, useFocusEffect } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import {
@@ -13,6 +11,7 @@ import {
 import { useCallback, useState } from "react"
 import { View } from "react-native"
 import { Button } from "react-native-elements"
+import { USPhoneNumber } from ".."
 import "../../tests/helpers/Matchers"
 import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
 import { fakeTimers } from "../../tests/helpers/Timers"
@@ -20,7 +19,6 @@ import {
   ForgotPasswordParamsList,
   createForgotPasswordScreens
 } from "./ForgotPasswordNavigation"
-import { ResetPasswordResult } from "./ResetPasswordForm"
 
 const TEST_GENERATED_PASSWORD = Password.validate("Fergus#12")!
 
@@ -33,55 +31,19 @@ describe("Forgot Password Navigation tests", () => {
   fakeTimers()
   beforeEach(() => jest.resetAllMocks())
 
-  it("starts with forgot password, has a success, goes to verify code screen", async () => {
+  test("valid navigation flow", async () => {
     // Test screen to get into actual flow
     const testPhoneNumber = "8882332121"
-    initiateForgotPassword.mockImplementation(
-      async () =>
-        await delayData<void>(console.log("Test Forgot Password Screen"), 500)
-    )
+    initiateForgotPassword.mockReturnValueOnce(Promise.resolve())
 
-    initiateResetPassword.mockImplementation(async () => {
-      await delayData<ResetPasswordResult>("valid", 500)
-    })
-
-    finishVerifyingAccount.mockImplementation(async () => {
-      return "123456"
-    })
+    submitResettedPassword.mockResolvedValueOnce("valid")
 
     renderForgotPasswordNavigation()
 
-    enterPhoneNumberText(testPhoneNumber)
-
-    expect(checkPhoneNumberText(testPhoneNumber)).not.toBeNull()
-
-    submitCredentials()
-
-    await waitFor(() => expect(verifyCodeForm()).toBeDisplayed())
-    expect(credentialsForm()).not.toBeDisplayed()
-  })
-
-  it("has a full navigation flow: forgot -> verify -> reset -> verify", async () => {
-    // Test screen to get into actual flow
-    const testPhoneNumber = "8882332121"
-    initiateForgotPassword.mockImplementation(
-      async () =>
-        await delayData<void>(console.log("Test Forgot Password Screen"), 500)
-    )
-
-    initiateResetPassword.mockImplementation(async () => {
-      await delayData<ResetPasswordResult>("valid", 500)
-    })
-
-    finishVerifyingAccount.mockImplementation(async () => {
-      return "123456"
-    })
-
-    renderForgotPasswordNavigation()
+    beginForgotPasswordTest()
 
     enterPhoneNumberText(testPhoneNumber)
-
-    expect(checkPhoneNumberText(testPhoneNumber)).not.toBeNull()
+    expect(checkText(testPhoneNumber)).not.toBeNull()
 
     submitCredentials()
 
@@ -89,15 +51,47 @@ describe("Forgot Password Navigation tests", () => {
     expect(credentialsForm()).not.toBeDisplayed()
 
     enterVerificationCode("123456")
-    expect(checkPhoneNumberText("123456")).not.toBeNull()
+    expect(checkText("123456")).not.toBeNull()
 
     submitVerificationCode()
 
     await waitFor(() => expect(resetPasswordForm()).toBeDisplayed())
-    expect(finishVerifyingAccount).toHaveBeenCalledWith(
-      USPhoneNumber.parse(testPhoneNumber)!,
-      "123456"
-    )
+    expect(verifyCodeForm()).not.toBeDisplayed()
+
+    enterNewPassword("elon@musK3")
+    submitNewPassword()
+
+    await waitFor(() => expect(isAtEnd()).toEqual(true))
+  })
+
+  it("has a full navigation flow: forgot -> verify -> reset -> verify", async () => {
+    // Test screen to get into actual flow
+    const testPhoneNumber = "8882332121"
+    initiateForgotPassword.mockReturnValueOnce(Promise.resolve())
+
+    submitResettedPassword
+      .mockResolvedValueOnce("invalid-verification-code")
+      .mockResolvedValueOnce("valid")
+
+    renderForgotPasswordNavigation()
+
+    beginForgotPasswordTest()
+
+    enterPhoneNumberText(testPhoneNumber)
+
+    expect(checkText(testPhoneNumber)).not.toBeNull()
+
+    submitCredentials()
+
+    await waitFor(() => expect(verifyCodeForm()).toBeDisplayed())
+    expect(credentialsForm()).not.toBeDisplayed()
+
+    enterVerificationCode("123456")
+    expect(checkText("123456")).not.toBeNull()
+
+    submitVerificationCode()
+
+    await waitFor(() => expect(resetPasswordForm()).toBeDisplayed())
     expect(verifyCodeForm()).not.toBeDisplayed()
 
     enterNewPassword("elon@musK3")
@@ -106,27 +100,44 @@ describe("Forgot Password Navigation tests", () => {
 
     await waitFor(() => expect(verifyCodeForm()).toBeDisplayed())
     expect(resetPasswordForm()).not.toBeDisplayed()
+
+    enterVerificationCode("543423")
+    expect(checkText("543423")).not.toBeNull()
+
+    submitVerificationCode()
+
+    await waitFor(() => expect(resetPasswordForm()).toBeDisplayed())
+    expect(verifyCodeForm()).not.toBeDisplayed()
+
+    submitNewPassword()
+
+    await waitFor(() =>
+      expect(submitResettedPassword).toHaveBeenCalledWith(
+        USPhoneNumber.parse(testPhoneNumber),
+        "543423",
+        Password.validate("elon@musK3")
+      )
+    )
   })
 })
 
 const initiateForgotPassword = jest.fn()
-const initiateResetPassword = jest.fn()
-const finishVerifyingAccount = jest.fn()
+const submitResettedPassword = jest.fn()
 
 const renderForgotPasswordNavigation = () => {
   const Stack = createStackNavigator<TestForgotPasswordParamsList>()
   const signUpScreens = createForgotPasswordScreens(Stack, {
     initiateForgotPassword,
-    initiateResetPassword,
-    finishVerifyingAccount
+    submitResettedPassword
   })
   return render(
     <TestQueryClientProvider>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="forgotPassword"
+          initialRouteName="test"
           screenOptions={{ headerShown: false }}
         >
+          <Stack.Screen name="test" component={TestScreen} />
           {signUpScreens}
         </Stack.Navigator>
       </NavigationContainer>
@@ -138,6 +149,9 @@ const IS_AT_END_TEST_ID = "test-sign-up-flow-end"
 
 const isAtEnd = () => !!screen.queryByTestId(IS_AT_END_TEST_ID)
 
+const beginForgotPasswordTest = () =>
+  fireEvent.press(screen.getByText("Begin Forgot Password Test"))
+
 const credentialsForm = () => screen.queryByText("Forgot Your Password?")
 
 const enterPhoneNumberText = (text: string) => {
@@ -147,7 +161,7 @@ const enterPhoneNumberText = (text: string) => {
   )
 }
 
-const checkPhoneNumberText = (text: string) => {
+const checkText = (text: string) => {
   screen.queryByText(text)
 }
 
@@ -192,8 +206,8 @@ const TestScreen = ({
   return (
     <>
       <Button
-        title="Begin Sign-up Test"
-        onPress={() => navigation.navigate({ key: "forgotPassword" })}
+        title="Begin Forgot Password Test"
+        onPress={() => navigation.navigate("forgotPassword")}
       />
 
       {focusCount > 1 && <View testID={IS_AT_END_TEST_ID} />}

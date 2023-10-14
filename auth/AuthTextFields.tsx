@@ -83,10 +83,7 @@ export const AuthShadedPasswordTextField = forwardRef(function TextField (
 export type AuthEmailPhoneTextFieldProps = {
   activeTextType: EmailPhoneTextType
   onActiveTextTypeToggled: () => void
-} & Omit<
-  AuthShadedTextFieldProps,
-  "rightAddon" | "keyboardType" | "iconName" | "placeholder"
->
+} & Omit<AuthShadedTextFieldProps, "rightAddon" | "keyboardType" | "iconName">
 
 /**
  * An auth text field that accepts both email addresses and phone numbers as input.
@@ -103,7 +100,6 @@ export const AuthShadedEmailPhoneTextFieldView = forwardRef(function TextField (
     <AuthShadedTextField
       {...props}
       ref={ref}
-      placeholder="Enter Phone # / Email"
       iconName={activeTextType === "email" ? "mail" : "call"}
       keyboardType={activeTextType === "phone" ? "number-pad" : "email-address"}
       rightAddon={

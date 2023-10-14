@@ -11,20 +11,24 @@ import { TouchableOpacity } from "react-native-gesture-handler"
 
 export type AuthResendVerificationCodeStatus = "success" | "error"
 
-export type UseAuthVerificationCodeFormEnvironment = {
+export type AuthVerifyCodeResult<Data> =
+  | { isCorrect: false }
+  | { isCorrect: true; data: Data }
+
+export type UseAuthVerificationCodeFormEnvironment<Data> = {
   resendCode: () => Promise<void>
-  submitCode: (code: string) => Promise<boolean>
-  onSuccess: () => void
+  submitCode: (code: string) => Promise<AuthVerifyCodeResult<Data>>
+  onSuccess: (data: Data) => void
 }
 
 /**
  * A hook to manage the form state for a verification code form.
  */
-export const useAuthVerificationCodeForm = ({
+export const useAuthVerificationCodeForm = <Data, >({
   resendCode,
   submitCode,
   onSuccess
-}: UseAuthVerificationCodeFormEnvironment) => {
+}: UseAuthVerificationCodeFormEnvironment<Data>) => {
   const [code, setCode] = useState("")
   const attemptedCodesRef = useRef<string[]>([])
   const resendCodeMutation = useMutation(resendCode)
@@ -55,9 +59,9 @@ export const useAuthVerificationCodeForm = ({
         }
       },
       {
-        onSuccess: (isValidCode: boolean, code: string) => {
-          if (isValidCode) {
-            onSuccess()
+        onSuccess: (result, code) => {
+          if (result.isCorrect) {
+            onSuccess(result.data)
           } else {
             Alert.alert(
               "Invalid Code",

@@ -32,8 +32,8 @@ describe("ResetPassword tests", () => {
     const renderResetPassword = () => {
       return renderHook(
         () =>
-          useResetPasswordForm({
-            initiateResetPassword,
+          useResetPasswordForm(undefined, {
+            submitResettedPassword: initiateResetPassword,
             onSuccess
           }),
         {

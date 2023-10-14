@@ -79,6 +79,7 @@ const TestScreen = ({ navigation }: StackScreenProps<ParamsList, "test">) => {
       <AuthShadedEmailPhoneTextFieldView
         iconBackgroundColor={AppStyles.darkColor}
         value={text}
+        placeholder="Phone number or Email"
         activeTextType={activeTextType}
         onChangeText={onTextChanged}
         onActiveTextTypeToggled={onActiveTextTypeToggled}

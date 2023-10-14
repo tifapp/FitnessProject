@@ -1,70 +1,53 @@
 import { StackNavigatorType } from "@components/Navigation"
 import {} from "@lib/users"
 import { StackScreenProps } from "@react-navigation/stack"
-import { useRef } from "react"
 import { Alert } from "react-native"
+import { EmailAddress, Password, USPhoneNumber } from ".."
 import {
   AuthVerificationCodeFormView,
-  EmailAddress,
-  Password,
-  USPhoneNumber,
   useAuthVerificationCodeForm
-} from ".."
+} from "../VerifyCode"
+import { ForgotPasswordEnvironment } from "./Environment"
 import {
   ForgotPasswordFormView,
   useForgotPasswordForm
 } from "./ForgotPasswordForm"
 import {
   ResetPasswordFormView,
-  ResetPasswordResult,
   useResetPasswordForm
 } from "./ResetPasswordForm"
 
-export type ForgotPasswordEnvironment = {
-  initiateForgotPassword: (
-    emailOrPhoneNumber: EmailAddress | USPhoneNumber
-  ) => Promise<void>
-  initiateResetPassword: (newPass: Password) => Promise<ResetPasswordResult>
-  finishVerifyingAccount: (
-    emailOrPhoneNumber: EmailAddress | USPhoneNumber,
-    verificationCode: string
-  ) => Promise<"invalid-verification-code" | string>
-}
-
 export type ForgotPasswordParamsList = {
-  forgotPassword: { emailOrPhoneNumber: EmailAddress | USPhoneNumber }
+  forgotPassword: undefined
   verifyCode: {
     emailOrPhoneNumber: EmailAddress | USPhoneNumber
     code?: string
+    newPass?: Password
   }
-  resetPassword: { code: string }
+  resetPassword: {
+    initialPassword?: Password
+    emailOrPhoneNumber: EmailAddress | USPhoneNumber
+    code: string
+  }
 }
 
 type ForgotPasswordScreenProps = StackScreenProps<
   ForgotPasswordParamsList,
   "forgotPassword"
-> & {
-  initiateForgotPassword: (
-    emailOrPhoneNumber: EmailAddress | USPhoneNumber
-  ) => Promise<void>
-}
+> &
+  Pick<ForgotPasswordEnvironment, "initiateForgotPassword">
 
 type VerifyCodeScreenProps = StackScreenProps<
   ForgotPasswordParamsList,
   "verifyCode"
-> & {
-  finishVerifyingAccount: (
-    emailOrPhoneNumber: EmailAddress | USPhoneNumber,
-    verificationCode: string
-  ) => Promise<"invalid-verification-code" | string>
-}
+> &
+  Pick<ForgotPasswordEnvironment, "initiateForgotPassword">
 
 type ResetPasswordScreenProps = StackScreenProps<
   ForgotPasswordParamsList,
   "resetPassword"
-> & {
-  initiateResetPassword: (newPass: Password) => Promise<ResetPasswordResult>
-}
+> &
+  Pick<ForgotPasswordEnvironment, "submitResettedPassword">
 
 export const createForgotPasswordScreens = <T extends ForgotPasswordParamsList>(
   stack: StackNavigatorType<T>,
@@ -82,19 +65,14 @@ export const createForgotPasswordScreens = <T extends ForgotPasswordParamsList>(
       </stack.Screen>
 
       <stack.Screen name="verifyCode">
-        {(props: any) => (
-          <VerifyCodeScreen
-            {...props}
-            finishVerifyingAccount={env.finishVerifyingAccount}
-          />
-        )}
+        {(props: any) => <VerifyCodeScreen {...props} />}
       </stack.Screen>
 
       <stack.Screen name="resetPassword">
         {(props: any) => (
           <ResetPasswordScreen
             {...props}
-            initiateResetPassword={env.initiateResetPassword}
+            submitResettedPassword={env.submitResettedPassword}
           />
         )}
       </stack.Screen>
@@ -117,31 +95,18 @@ const ForgotPasswordScreen = ({
   return <ForgotPasswordFormView {...forgotPassword} />
 }
 
-const VerifyCodeScreen = ({
-  navigation,
-  route,
-  finishVerifyingAccount
-}: VerifyCodeScreenProps) => {
-  const generatedRef = useRef<string | undefined>()
+const VerifyCodeScreen = ({ navigation, route }: VerifyCodeScreenProps) => {
   const form = useAuthVerificationCodeForm({
     resendCode: async () => {},
-    submitCode: async (code: string) => {
-      const result = await finishVerifyingAccount(
-        route.params.emailOrPhoneNumber,
-        code
-      )
-      if (result === "invalid-verification-code") {
-        return false
-      }
-      generatedRef.current = result
-      return true
+    submitCode: async (code) => {
+      return { isCorrect: true, data: code }
     },
-    onSuccess: () => {
-      if (generatedRef.current) {
-        navigation.navigate("resetPassword", {
-          code: generatedRef.current
-        })
-      }
+    onSuccess: (code) => {
+      navigation.navigate("resetPassword", {
+        initialPassword: route.params.newPass,
+        code,
+        emailOrPhoneNumber: route.params.emailOrPhoneNumber
+      })
     }
   })
   return (
@@ -156,19 +121,30 @@ const VerifyCodeScreen = ({
 const ResetPasswordScreen = ({
   route,
   navigation,
-  initiateResetPassword
+  submitResettedPassword
 }: ResetPasswordScreenProps) => {
-  const resetPassword = useResetPasswordForm({
-    initiateResetPassword,
-    onSuccess: () => navigation.goBack(),
-    onError: () => {
-      Alert.alert(
-        "Whoops",
-        "Sorry, something went wrong when trying to reset your password. Please try again.",
-        [{ text: "Ok" }]
+  const resetPassword = useResetPasswordForm(route.params.initialPassword, {
+    submitResettedPassword: (newPass) =>
+      submitResettedPassword(
+        route.params.emailOrPhoneNumber,
+        route.params.code,
+        newPass
       ),
-      navigation.goBack()
+    onSuccess: (result, newPass) => {
+      if (result === "valid") navigation.pop(2)
+      else {
+        Alert.alert(
+          "Invalid Verification Code",
+          "The verification code that you have entered is invalid.",
+          [{ text: "Ok" }]
+        )
+        navigation.replace("verifyCode", {
+          emailOrPhoneNumber: route.params.emailOrPhoneNumber,
+          code: route.params.code,
+          newPass
+        })
+      }
     }
   })
-  return <ResetPasswordFormView {...resetPassword} code={route.params.code} />
+  return <ResetPasswordFormView {...resetPassword} />
 }

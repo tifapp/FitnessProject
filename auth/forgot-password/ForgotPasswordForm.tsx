@@ -118,6 +118,7 @@ export const ForgotPasswordFormView = ({
         activeTextType={forgotPasswordText.activeTextType}
         onChangeText={forgotPasswordText.onTextChanged}
         blurOnSubmit={false}
+        placeholder="Enter Phone # / Email"
         onActiveTextTypeToggled={forgotPasswordText.onActiveTextTypeToggled}
         style={styles.emailPhoneTextField}
         ref={emailPhoneRef}

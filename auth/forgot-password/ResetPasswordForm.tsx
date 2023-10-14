@@ -3,35 +3,32 @@ import { AuthShadedPasswordTextField } from "@auth/AuthTextFields"
 import { useFormSubmission } from "@hooks/FormHooks"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useState } from "react"
-import { StyleProp, StyleSheet, ViewStyle } from "react-native"
-import Animated, { Layout } from "react-native-reanimated"
+import { Alert, StyleProp, StyleSheet, ViewStyle } from "react-native"
 import { Password } from ".."
+import { ResetPasswordResult } from "./Environment"
 
 /**
  * A type to help show what props need to be given in order to utilize {@link useForgotPasswordForm}.
  */
 export type UseResetPasswordFormEnvironment = {
-  initiateResetPassword: (newPass: Password) => Promise<ResetPasswordResult>
-  onSuccess: () => void
-  onError: () => void
-  code?: string
+  submitResettedPassword: (newPass: Password) => Promise<ResetPasswordResult>
+  onSuccess: (result: ResetPasswordResult, newPass: Password) => void
 }
 
-export type ResetPasswordResult = "valid" | "invalid-password"
-
-export const useResetPasswordForm = ({
-  initiateResetPassword,
-  onSuccess,
-  onError
-}: UseResetPasswordFormEnvironment) => {
-  const [newPasswordField, setNewPasswordField] = useState("")
+export const useResetPasswordForm = (
+  initialPassword: Password | undefined,
+  { submitResettedPassword, onSuccess }: UseResetPasswordFormEnvironment
+) => {
+  const [newPasswordField, setNewPasswordField] = useState(
+    initialPassword?.toString() ?? ""
+  )
   const validatedNewPassword = Password.validate(newPasswordField)
 
   return {
     newPasswordField,
     submission: useFormSubmission(
       async (args) => {
-        return await initiateResetPassword(args.newPass)
+        return await submitResettedPassword(args.newPass)
       },
       () => {
         const newPasswordError = checkForNewPasswordError(
@@ -50,8 +47,13 @@ export const useResetPasswordForm = ({
         return { status: "invalid", newPasswordError }
       },
       {
-        onSuccess,
-        onError
+        onSuccess: (data, args) => onSuccess(data, args.newPass),
+        onError: () =>
+          Alert.alert(
+            "Whoops",
+            "Sorry, something went wrong when trying to reset your password. Please try again.",
+            [{ text: "Ok" }]
+          )
       }
     ),
     onTextChanged: (text: string) => setNewPasswordField(text)
@@ -80,14 +82,12 @@ const newPasswordErrorMessage = (error?: "weak-new-password" | "empty") => {
 }
 
 export type ResetPasswordFormProps = {
-  code: string
   style?: StyleProp<ViewStyle>
 } & ReturnType<typeof useResetPasswordForm>
 
 export const ResetPasswordFormView = ({
   style,
   submission,
-  code,
   newPasswordField,
   onTextChanged
 }: ResetPasswordFormProps) => {
@@ -101,21 +101,19 @@ export const ResetPasswordFormView = ({
       submission={submission}
       style={style}
     >
-      <Animated.View layout={Layout.springify()}>
-        <AuthShadedPasswordTextField
-          iconName="lock-closed"
-          iconBackgroundColor="#FB3640"
-          style={styles.textField}
-          value={newPasswordField}
-          placeholder="New Password"
-          error={
-            submission.status === "invalid"
-              ? newPasswordErrorMessage(submission.newPasswordError)
-              : undefined
-          }
-          onChangeText={(text) => onTextChanged(text)}
-        />
-      </Animated.View>
+      <AuthShadedPasswordTextField
+        iconName="lock-closed"
+        iconBackgroundColor="#FB3640"
+        style={styles.textField}
+        value={newPasswordField}
+        placeholder="New Password"
+        error={
+          submission.status === "invalid"
+            ? newPasswordErrorMessage(submission.newPasswordError)
+            : undefined
+        }
+        onChangeText={(text) => onTextChanged(text)}
+      />
     </AuthFormView>
   )
 }

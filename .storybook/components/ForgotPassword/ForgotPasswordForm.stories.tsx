@@ -1,4 +1,3 @@
-import { Password } from "@auth/Password"
 import {
   ForgotPasswordParamsList,
   createForgotPasswordScreens
@@ -26,11 +25,8 @@ const Stack = createStackNavigator<ForgotPasswordParamsList>()
 const signUpScreens = createForgotPasswordScreens(Stack, {
   initiateForgotPassword: async () =>
     await delayData<void>(console.log("Test Forgot Password Screen"), 500),
-  initiateResetPassword: async () =>
-    await delayData<ResetPasswordResult>("valid", 500),
-  finishVerifyingAccount: async () => {
-    return "elon@Smusk"
-  }
+  submitResettedPassword: async () =>
+    await delayData<ResetPasswordResult>("invalid-verification-code", 500)
 })
 
 export const Basic: ForgotPasswordStory = () => (
@@ -47,23 +43,3 @@ export const Basic: ForgotPasswordStory = () => (
     </SafeAreaProvider>
   </TiFQueryClientProvider>
 )
-
-// const TestScreen = () => {
-//   const navigation: NavigationProp<ParamListBase> = useNavigation()
-//   return (
-//     <View>
-//       <Button
-//         title="Email Entry"
-//         onPress={() => navigation.navigate("ForgotPasswordScreen")}
-//       />
-//       <Button
-//         title="Verify Code Form"
-//         onPress={() => navigation.navigate("VerifyCodeScreen")}
-//       />
-//       <Button
-//         title="Reset Password"
-//         onPress={() => navigation.navigate("ResetPasswordScreen")}
-//       />
-//     </View>
-//   )
-// }
