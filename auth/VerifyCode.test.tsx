@@ -1,9 +1,9 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
-import { useAuthVerificationCodeForm } from "./VerifyCode"
 import { act } from "react-test-renderer"
-import { TestQueryClientProvider } from "../tests/helpers/ReactQuery"
-import { neverPromise } from "../tests/helpers/Promise"
 import { captureAlerts } from "../tests/helpers/Alerts"
+import { neverPromise } from "../tests/helpers/Promise"
+import { TestQueryClientProvider } from "../tests/helpers/ReactQuery"
+import { useAuthVerificationCodeForm } from "./VerifyCode"
 
 describe("VerifyCode tests", () => {
   beforeEach(() => jest.resetAllMocks())
@@ -67,7 +67,9 @@ describe("VerifyCode tests", () => {
     })
 
     test("submit invalid code, then resubmit valid code", async () => {
-      submitCode.mockResolvedValueOnce(false).mockResolvedValueOnce(true)
+      submitCode
+        .mockResolvedValueOnce({ isCorrect: false })
+        .mockResolvedValueOnce({ isCorrect: true, data: "cool" })
 
       const { result } = renderUseAuthVerificationCodeForm()
 
@@ -85,7 +87,7 @@ describe("VerifyCode tests", () => {
       act(() => result.current.onCodeChanged("123457"))
       act(() => (result.current.submission as any).submit())
 
-      await waitFor(() => expect(onSuccess).toHaveBeenCalled())
+      await waitFor(() => expect(onSuccess).toHaveBeenCalledWith("cool"))
     })
 
     test("submit invalid code, change code while submitting, retype invalid code after submission, stays invalid for retyped code", async () => {
@@ -118,7 +120,7 @@ describe("VerifyCode tests", () => {
     })
 
     test("previous invalid codes are always invalid", async () => {
-      submitCode.mockResolvedValue(false)
+      submitCode.mockResolvedValue({ isCorrect: false })
       const invalidCode = "123456"
       const invalidCode2 = "789012"
 

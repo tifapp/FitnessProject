@@ -1,30 +1,34 @@
 import { AuthFormView } from "@auth/AuthSection"
 import { AuthShadedTextField } from "@auth/AuthTextFields"
 import { BodyText } from "@components/Text"
+import { TextToastView } from "@components/common/Toasts"
+import { useFormSubmission } from "@hooks/FormHooks"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useMutation } from "@tanstack/react-query"
 import React, { useRef, useState } from "react"
-import { StyleProp, ViewStyle, StyleSheet, Alert, View } from "react-native"
+import { Alert, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
-import { TextToastView } from "@components/common/Toasts"
-import { useFormSubmission } from "@hooks/FormHooks"
 
 export type AuthResendVerificationCodeStatus = "success" | "error"
 
-export type UseAuthVerificationCodeFormEnvironment = {
+export type AuthVerifyCodeResult<Data> =
+  | { isCorrect: false }
+  | { isCorrect: true; data: Data }
+
+export type UseAuthVerificationCodeFormEnvironment<Data> = {
   resendCode: () => Promise<void>
-  submitCode: (code: string) => Promise<boolean>
-  onSuccess: () => void
+  submitCode: (code: string) => Promise<AuthVerifyCodeResult<Data>>
+  onSuccess: (data: Data) => void
 }
 
 /**
  * A hook to manage the form state for a verification code form.
  */
-export const useAuthVerificationCodeForm = ({
+export const useAuthVerificationCodeForm = <Data, >({
   resendCode,
   submitCode,
   onSuccess
-}: UseAuthVerificationCodeFormEnvironment) => {
+}: UseAuthVerificationCodeFormEnvironment<Data>) => {
   const [code, setCode] = useState("")
   const attemptedCodesRef = useRef<string[]>([])
   const resendCodeMutation = useMutation(resendCode)
@@ -55,9 +59,9 @@ export const useAuthVerificationCodeForm = ({
         }
       },
       {
-        onSuccess: (isValidCode: boolean, code: string) => {
-          if (isValidCode) {
-            onSuccess()
+        onSuccess: (result, code) => {
+          if (result.isCorrect) {
+            onSuccess(result.data)
           } else {
             Alert.alert(
               "Invalid Code",

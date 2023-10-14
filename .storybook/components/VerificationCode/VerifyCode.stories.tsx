@@ -1,23 +1,28 @@
 import {
-  BASE_HEADER_SCREEN_OPTIONS,
-  ChevronBackButton
-} from "@components/Navigation"
-import { NavigationContainer, useNavigation } from "@react-navigation/native"
-import { createStackNavigator } from "@react-navigation/stack"
-import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
-import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import {
   AuthVerificationCodeFormView,
   EmailAddress,
   USPhoneNumber,
   useAuthVerificationCodeForm
 } from "@auth/index"
+import {
+  BASE_HEADER_SCREEN_OPTIONS,
+  ChevronBackButton
+} from "@components/Navigation"
+import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
+import { delayData } from "@lib/DelayData"
+import {
+  NavigationContainer,
+  NavigationProp,
+  ParamListBase,
+  useNavigation
+} from "@react-navigation/native"
+import { createStackNavigator } from "@react-navigation/stack"
+import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
+import { ComponentMeta, ComponentStory } from "@storybook/react-native"
+import React from "react"
+import { Button, View } from "react-native"
 import { RootSiblingParent } from "react-native-root-siblings"
 import { SafeAreaProvider } from "react-native-safe-area-context"
-import { Button, View } from "react-native"
-import React, { useState } from "react"
-import { delayData } from "@lib/DelayData"
-import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 
 const VerifyCodeMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Verifcation Code"
@@ -87,7 +92,7 @@ const PhoneNumberScreen = () => {
 }
 
 const TestScreen = () => {
-  const navigation = useNavigation()
+  const navigation: NavigationProp<ParamListBase> = useNavigation()
   return (
     <View>
       <Button

@@ -29,15 +29,16 @@ import RequireNewPassword from "@components/loginComponents/RequireNewPassword"
 import SignIn from "@components/loginComponents/SignIn"
 import SignUp from "@components/loginComponents/SignUp"
 import VerifyContact from "@components/loginComponents/VerifyContact"
+import { AnalyticsProvider, MixpanelAnalytics } from "@lib/Analytics"
 import {
   addLogHandler,
   createLogFunction,
   sentryBreadcrumbLogHandler,
   sentryErrorCapturingLogHandler
 } from "@lib/Logging"
-import "expo-dev-client"
-import { AnalyticsProvider, MixpanelAnalytics } from "@lib/Analytics"
 import { enableSentry } from "@lib/Sentry"
+import { Auth } from "aws-amplify"
+import "expo-dev-client"
 import { Native as SentryNative } from "sentry-expo"
 import awsconfig from "./src/aws-exports"
 import { setupCognito } from "./auth"

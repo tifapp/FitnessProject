@@ -1,24 +1,24 @@
+import { TiFAPI } from "@api-client/TiFAPI"
+import { createAWSTiFAPIFetch } from "@api-client/aws"
+import { AuthShadedEmailPhoneTextFieldView } from "@auth/AuthTextFields"
+import { useEmailPhoneTextState } from "@auth/UseEmailPhoneText"
+import {
+  SignUpParamsList,
+  cognitoConfirmSignUpWithAutoSignIn,
+  createSignUpEnvironment,
+  createSignUpScreens
+} from "@auth/sign-up"
+import { Auth } from "@aws-amplify/auth"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
+import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
+import { AppStyles } from "@lib/AppColorStyle"
 import { NavigationContainer } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import {
-  createSignUpEnvironment,
-  createSignUpScreens,
-  SignUpParamsList,
-  cognitoConfirmSignUpWithAutoSignIn
-} from "@auth/sign-up"
-import { useEmailPhoneTextState } from "@auth/UseEmailPhoneText"
-import { AuthShadedEmailPhoneTextFieldView } from "@auth/AuthTextFields"
-import { SafeAreaProvider } from "react-native-safe-area-context"
 import { Button } from "react-native"
-import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { ScrollView } from "react-native-gesture-handler"
-import { AppStyles } from "@lib/AppColorStyle"
-import { TiFAPI } from "@api-client/TiFAPI"
-import { createAWSTiFAPIFetch } from "@api-client/aws"
-import { Auth } from "@aws-amplify/auth"
+import { SafeAreaProvider } from "react-native-safe-area-context"
 
 const SignUpMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Sign Up"
@@ -79,6 +79,7 @@ const TestScreen = ({ navigation }: StackScreenProps<ParamsList, "test">) => {
       <AuthShadedEmailPhoneTextFieldView
         iconBackgroundColor={AppStyles.darkColor}
         value={text}
+        placeholder="Phone number or Email"
         activeTextType={activeTextType}
         onChangeText={onTextChanged}
         onActiveTextTypeToggled={onActiveTextTypeToggled}

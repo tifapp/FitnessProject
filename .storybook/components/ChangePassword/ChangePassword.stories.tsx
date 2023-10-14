@@ -1,18 +1,23 @@
+import { ChangePasswordFormView, useChangePasswordForm } from "@auth/index"
 import {
   BASE_HEADER_SCREEN_OPTIONS,
   ChevronBackButton
 } from "@components/Navigation"
-import { NavigationContainer, useNavigation } from "@react-navigation/native"
+import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
+import { delayData } from "@lib/DelayData"
+import {
+  NavigationContainer,
+  NavigationProp,
+  ParamListBase,
+  useNavigation
+} from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import { ChangePasswordFormView, useChangePasswordForm } from "@auth/index"
+import React from "react"
+import { Button, View } from "react-native"
 import { RootSiblingParent } from "react-native-root-siblings"
 import { SafeAreaProvider } from "react-native-safe-area-context"
-import { Button, View } from "react-native"
-import React from "react"
-import { delayData } from "@lib/DelayData"
-import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 
 const ChangePasswordMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Change Password"
@@ -57,7 +62,7 @@ const ChangePasswordScreen = () => {
 }
 
 const TestScreen = () => {
-  const navigation = useNavigation()
+  const navigation: NavigationProp<ParamListBase> = useNavigation()
   return (
     <View>
       <Button

@@ -10,6 +10,10 @@ export class Password {
     this.rawValue = rawValue
   }
 
+  toString () {
+    return this.rawValue
+  }
+
   /**
    * Attempts to validate a raw string as a valid {@link Password}, or returns `undefined` if invalid.
    *
