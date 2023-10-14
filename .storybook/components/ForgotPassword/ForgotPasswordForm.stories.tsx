@@ -1,11 +1,11 @@
+import { createForgotPasswordEnvironment } from "@auth/forgot-password/Environment"
 import {
   ForgotPasswordParamsList,
   createForgotPasswordScreens
 } from "@auth/forgot-password/ForgotPasswordNavigation"
-import { ResetPasswordResult } from "@auth/forgot-password/ResetPasswordForm"
+import { Auth } from "@aws-amplify/auth"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
-import { delayData } from "@lib/DelayData"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
@@ -22,12 +22,18 @@ type ForgotPasswordStory = ComponentStory<typeof SettingsScreen>
 
 const Stack = createStackNavigator<ForgotPasswordParamsList>()
 
-const signUpScreens = createForgotPasswordScreens(Stack, {
-  initiateForgotPassword: async () =>
-    await delayData<void>(console.log("Test Forgot Password Screen"), 500),
-  submitResettedPassword: async () =>
-    await delayData<ResetPasswordResult>("invalid-verification-code", 500)
-})
+const signUpScreens = createForgotPasswordScreens(
+  Stack,
+  createForgotPasswordEnvironment({
+    forgotPassword: async (username: string) =>
+      await Auth.forgotPassword(username),
+    forgotPasswordSubmit: async (
+      username: string,
+      code: string,
+      password: string
+    ) => await Auth.forgotPasswordSubmit(username, code, password)
+  })
+)
 
 export const Basic: ForgotPasswordStory = () => (
   <TiFQueryClientProvider>

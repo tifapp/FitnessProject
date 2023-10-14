@@ -5,6 +5,7 @@ import {
 import { Auth } from "@aws-amplify/auth"
 import { EmailAddress, Password, USPhoneNumber } from ".."
 
+export type ForgotPasswordResult = "success" | "invalid-email"
 export type ResetPasswordResult = "valid" | "invalid-verification-code"
 
 /**
@@ -20,13 +21,15 @@ export const createForgotPasswordEnvironment = (
    */
   initiateForgotPassword: async (
     emailOrPhoneNumber: EmailAddress | USPhoneNumber
-  ): Promise<void> => {
+  ): Promise<ForgotPasswordResult> => {
     try {
       await cognito.forgotPassword(
         cognitoFormatEmailOrPhoneNumber(emailOrPhoneNumber)
       )
+      return "success"
     } catch (err) {
-      if (!isCognitoErrorWithCode(err, "InvalidParameterException")) throw err
+      if (!isCognitoErrorWithCode(err, "UserNotFoundException")) throw err
+      return "invalid-email"
     }
   },
   /**

@@ -22,6 +22,7 @@ export type CognitoErrorCode =
   | "CodeMismatchException"
   | "UsernameExistsException"
   | "InvalidParameterException"
+  | "UserNotFoundException"
 
 /**
  * An {@link Error} subclass that mimicks a Cognito error for testing purposes.
