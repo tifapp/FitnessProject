@@ -15,6 +15,8 @@ export class USPhoneNumber {
   private static E164_REGEX = /^(\+1)?\d{10}$/
   private static PRETTY_FORMAT_REGEX = /^\(\d{3}\) \d{3}-\d{4}$/
 
+  static mock = USPhoneNumber.parse("(123) 456-7890")!
+
   /**
    * Pretty formats this phone number with only the last 4 digits shown.
    *

@@ -5,6 +5,8 @@ import { act } from "react-test-renderer"
 import { captureAlerts } from "../../tests/helpers/Alerts"
 
 describe("SignInForm tests", () => {
+  beforeEach(() => jest.resetAllMocks())
+
   describe("UseSignInForm tests", () => {
     test("invalid form states", () => {
       const { result } = renderUseSignInForm()

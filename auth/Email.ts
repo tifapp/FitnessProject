@@ -6,6 +6,8 @@ const RawStringEmailAddressSchema = z.string().email()
  * A data type representing a valid email address.
  */
 export class EmailAddress {
+  static peacock69 = EmailAddress.parse("peacock69@gmail.com")!
+
   private readonly rawValue: string
 
   private constructor (rawValue: string) {

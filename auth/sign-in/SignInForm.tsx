@@ -23,11 +23,7 @@ import {
 import { useFormSubmission } from "@hooks/FormHooks"
 import { USPhoneNumber } from "../PhoneNumber"
 import { EmailAddress } from "../Email"
-
-export type SignInResult =
-  | "success"
-  | "incorrect-credentials"
-  | "verification-required"
+import { SignInResult } from "./Authenticator"
 
 export type UseSignInFormEnvironment = {
   signIn: (
