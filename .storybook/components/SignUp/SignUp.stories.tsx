@@ -1,4 +1,7 @@
+import { TiFAPI } from "@api-client/TiFAPI"
+import { Auth } from "@aws-amplify/auth"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
+import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { NavigationContainer } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
@@ -11,11 +14,8 @@ import {
 } from "@auth/sign-up"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { Button } from "react-native"
-import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { ScrollView } from "react-native-gesture-handler"
-import { TiFAPI } from "@api-client/TiFAPI"
 import { createAWSTiFAPIFetch } from "@api-client/aws"
-import { Auth } from "@aws-amplify/auth"
 
 const SignUpMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Sign Up"
@@ -66,9 +66,7 @@ const TestScreen = ({ navigation }: StackScreenProps<ParamsList, "test">) => (
   <ScrollView>
     <Button
       title="Do sign up flow"
-      onPress={() => {
-        navigation.navigate("signUp", { screen: "signUpCredentialsForm" })
-      }}
+      onPress={() => navigation.navigate("signUpCredentialsForm")}
     />
   </ScrollView>
 )

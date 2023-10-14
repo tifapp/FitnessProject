@@ -9,13 +9,15 @@ import {
   useAuthVerificationCodeForm
 } from "@auth/VerifyCode"
 import { SignUpParamsList } from "@auth/sign-up"
+import { ForgotPasswordParamsList } from "@auth/forgot-password"
 
 export type SignInParamsList = {
   signInForm: undefined
   signInVerifyCode: {
     emailOrPhoneNumber: EmailAddress | USPhoneNumber
   }
-} & SignUpParamsList
+} & SignUpParamsList &
+  ForgotPasswordParamsList
 
 export const createSignInScreens = <Params extends SignInParamsList>(
   stack: StackNavigatorType<Params>,
@@ -44,43 +46,6 @@ export const createSignInScreens = <Params extends SignInParamsList>(
     </>
   )
 
-// const SignInModalStack = createStackNavigator<SignInModalParamsList>()
-
-// type SignInModalScreenProps = StackScreenProps<SignInParamsList, "signIn"> & {
-//   authenticator: SignInAuthenticator
-// }
-
-// const SignInModalScreen = memo(function Screen ({
-//   authenticator
-// }: SignInModalScreenProps) {
-//   return (
-//     <SignInModalStack.Navigator
-//       screenOptions={BASE_HEADER_SCREEN_OPTIONS}
-//       initialRouteName="signInForm"
-//     >
-//       <SignInModalStack.Screen
-//         name="signInForm"
-//         options={{ headerLeft: XMarkBackButton, title: "" }}
-//       >
-//         {(props) => (
-//           <SignInFormScreen {...props} authenticator={authenticator} />
-//         )}
-//       </SignInModalStack.Screen>
-//       <SignInModalStack.Screen
-//         name="signInVerifyCode"
-//         options={{ headerLeft: XMarkBackButton, title: "" }}
-//       >
-//         {(props) => (
-//           <SignInVerificationCodeScreen
-//             {...props}
-//             authenticator={authenticator}
-//           />
-//         )}
-//       </SignInModalStack.Screen>
-//     </SignInModalStack.Navigator>
-//   )
-// })
-
 type SignInFormScreenProps = StackScreenProps<
   SignInParamsList,
   "signInForm"
@@ -106,7 +71,12 @@ const SignInFormScreen = memo(function Screen ({
       }
     }
   })
-  return <SignInFormView {...form} onForgotPasswordTapped={() => {}} />
+  return (
+    <SignInFormView
+      {...form}
+      onForgotPasswordTapped={() => navigation.replace("forgotPassword")}
+    />
+  )
 })
 
 type SignInVerificationCodeScreenProps = StackScreenProps<
@@ -125,7 +95,7 @@ const SignInVerificationCodeScreen = memo(function Screen ({
     resendCode: async () => await authenticator.resendSignInVerificationCode(),
     submitCode: async (code) => {
       const result = await authenticator.verifySignIn(code)
-      return result === "success"
+      return { isCorrect: result === "success", data: undefined }
     },
     onSuccess: () => navigation.getParent()?.goBack()
   })

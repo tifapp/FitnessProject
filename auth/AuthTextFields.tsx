@@ -1,17 +1,21 @@
-import React, { forwardRef } from "react"
 import {
+  PasswordTextFieldProps,
   ShadedPasswordTextField,
   ShadedTextField,
-  PasswordTextFieldProps,
   TextFieldProps,
   TextFieldRef
 } from "@components/TextFields"
 import { CircularIonicon, Ionicon, IoniconName } from "@components/common/Icons"
-import { StyleProp, ViewStyle, StyleSheet } from "react-native"
 import { useFontScale } from "@hooks/Fonts"
 import { AppStyles } from "@lib/AppColorStyle"
 import { EmailPhoneTextErrorReason, EmailPhoneTextType } from "./EmailPhoneText"
-import { TouchableOpacity } from "react-native-gesture-handler"
+import {
+  StyleProp,
+  ViewStyle,
+  StyleSheet,
+  TouchableOpacity
+} from "react-native"
+import React, { forwardRef } from "react"
 
 export type AuthShadedTextFieldProps = {
   iconName: IoniconName

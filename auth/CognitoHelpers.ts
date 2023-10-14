@@ -1,9 +1,9 @@
 import { Auth } from "@aws-amplify/auth"
+import * as ExpoSecureStore from "expo-secure-store"
 import awsExports from "../src/aws-exports"
 import { CognitoSecureStorage } from "./CognitoSecureStorage"
 import { EmailAddress } from "./Email"
 import { USPhoneNumber } from "./PhoneNumber"
-import * as ExpoSecureStore from "expo-secure-store"
 
 /**
  * Sets up cognito with a secure store.
@@ -24,6 +24,7 @@ export type CognitoErrorCode =
   | "NotAuthorizedException"
   | "UserNotFoundException"
   | "UserNotConfirmedException"
+  | "InvalidParameterException"
 
 /**
  * An {@link Error} subclass that mimicks a Cognito error for testing purposes.

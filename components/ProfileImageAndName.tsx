@@ -6,31 +6,35 @@ import { useNavigation } from "@react-navigation/native"
 import React, { useEffect, useState } from "react"
 import {
   ActivityIndicator,
-  Image, ImageStyle, StyleProp,
-  Text, TextStyle, TouchableOpacity,
+  Image,
+  ImageStyle,
+  StyleProp,
+  Text,
+  TextStyle,
+  TouchableOpacity,
   View,
   ViewStyle
 } from "react-native"
 
 globalThis.savedUsers = {}
 interface Props {
-  userId?: string;
-  isFullSize?: boolean;
-  hideAll?: boolean;
-  hideName?: boolean;
-  vertical?: boolean;
-  spaceAfterName?: boolean;
-  nameComponent?: React.ReactNode;
-  subtitleComponent?: React.ReactNode;
-  imageOverlay?: React.ReactNode;
-  onPress?: (imageURL?: string | null) => void;
-  imageSize?: number;
-  imageStyle?: StyleProp<ImageStyle>;
-  navigationObject?: any;
-  margin?: number;
-  style?: StyleProp<ViewStyle>;
-  textLayoutStyle?: StyleProp<ViewStyle>;
-  textStyle?: StyleProp<TextStyle>;
+  userId?: string
+  isFullSize?: boolean
+  hideAll?: boolean
+  hideName?: boolean
+  vertical?: boolean
+  spaceAfterName?: boolean
+  nameComponent?: React.ReactNode
+  subtitleComponent?: React.ReactNode
+  imageOverlay?: React.ReactNode
+  onPress?: (imageURL?: string | null) => void
+  imageSize?: number
+  imageStyle?: StyleProp<ImageStyle>
+  navigationObject?: any
+  margin?: number
+  style?: StyleProp<ViewStyle>
+  textLayoutStyle?: StyleProp<ViewStyle>
+  textStyle?: StyleProp<TextStyle>
 }
 
 const component = ({
@@ -52,7 +56,10 @@ const component = ({
   style,
   spaceAfterName
 }: Props) => {
-  const [userInfo, setUserInfo] = useState<typeof globalThis.savedUsers[keyof typeof globalThis.savedUsers]>()
+  const [userInfo, setUserInfo] =
+    useState<
+      (typeof globalThis.savedUsers)[keyof typeof globalThis.savedUsers]
+    >()
   const [nameArray, setNameArray] = useState<string[]>([])
 
   useEffect(() => {
@@ -60,11 +67,9 @@ const component = ({
       !globalThis.savedUsers?.[userId] ||
       (!!isFullSize && !globalThis.savedUsers?.[userId]?.isFullSize)
     ) {
-      (async () => {
+      ;(async () => {
         try {
-          const { name, identityId } = await fetchUserAsync(
-            userId
-          )
+          const { name, identityId } = await fetchUserAsync(userId)
           const profileimageurl = await fetchProfileImageAsync(
             identityId,
             isFullSize
@@ -138,8 +143,8 @@ const component = ({
         onPress={
           onPress
             ? () => {
-                onPress(userInfo?.imageURL)
-              }
+              onPress(userInfo?.imageURL)
+            }
             : goToProfile
         }
       >
@@ -165,20 +170,20 @@ const component = ({
         {imageOverlay}
         {userInfo == null
           ? (
-          <View
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              width: "100%",
-              height: "100%"
-            }}
-          >
-            <ActivityIndicator color="#26c6a2" />
-          </View>
-            )
+            <View
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                width: "100%",
+                height: "100%"
+              }}
+            >
+              <ActivityIndicator color="#26c6a2" />
+            </View>
+          )
           : null}
         {hideName ? null : (
           <View
@@ -196,30 +201,33 @@ const component = ({
               onPress={
                 onPress
                   ? () => {
-                      onPress(userInfo?.imageURL)
-                    }
+                    onPress(userInfo?.imageURL)
+                  }
                   : goToProfile
               }
               style={[textStyle, { flexWrap: "wrap", fontSize: 15 }]}
-
             >
               {!isFullSize && userInfo && userInfo.status
                 ? (
-                <MaterialIcons
-                  name={userInfo.isVerified ? "check-circle" : "circle"}
-                  size={10}
-                  color={
-                    userInfo.isVerified
-                      ? "black"
-                      : StatusColors[userInfo.status as keyof typeof StatusColors]
-                  }
-                />
-                  )
+                  <MaterialIcons
+                    name={userInfo.isVerified ? "check-circle" : "circle"}
+                    size={10}
+                    color={
+                      userInfo.isVerified
+                        ? "black"
+                        : StatusColors[
+                          userInfo.status as keyof typeof StatusColors
+                        ]
+                    }
+                  />
+                )
                 : null}
               {!isFullSize && userInfo && userInfo.status ? " " : null}
               {userInfo != null && userInfo.name
                 ? nameArray[0] +
-                  (nameArray[1] != null ? " " + nameArray[1][0].toUpperCase() + "." : "")
+                  (nameArray[1] != null
+                    ? " " + nameArray[1][0].toUpperCase() + "."
+                    : "")
                 : "Loading..."}
 
               {nameComponent}

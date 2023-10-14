@@ -1,8 +1,12 @@
-import React from "react"
-import { useNavigation } from "@react-navigation/native"
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation
+} from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
-import { TouchableIonicon } from "./common/Icons"
+import React from "react"
 import { StyleProp, StyleSheet, ViewStyle } from "react-native"
+import { TouchableIonicon } from "./common/Icons"
 
 /**
  * A helper type that's useful for making reusable navigation flows.
@@ -38,7 +42,7 @@ export type BackButtonProps = {
 export const ChevronBackButton = ({
   style = styles.backButtonPadding
 }: BackButtonProps) => {
-  const navigation = useNavigation()
+  const navigation: NavigationProp<ParamListBase> = useNavigation()
   return (
     <TouchableIonicon
       icon={{ name: "chevron-back" }}
@@ -52,7 +56,7 @@ export const ChevronBackButton = ({
 export const XMarkBackButton = ({
   style = styles.backButtonPadding
 }: BackButtonProps) => {
-  const navigation = useNavigation()
+  const navigation: NavigationProp<ParamListBase> = useNavigation()
   return (
     <TouchableIonicon
       icon={{ name: "close" }}

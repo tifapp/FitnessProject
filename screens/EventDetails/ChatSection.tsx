@@ -2,7 +2,11 @@ import { Caption, Headline } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { EventUserAttendeeStatus, isAttendingEvent } from "@lib/events"
-import { useNavigation } from "@react-navigation/native"
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation
+} from "@react-navigation/native"
 import React from "react"
 import { StyleSheet, TouchableOpacity, View } from "react-native"
 
@@ -12,7 +16,7 @@ interface ChatSectionProps {
 }
 
 const ChatSection = ({ color, userAttendeeStatus }: ChatSectionProps) => {
-  const navigation = useNavigation()
+  const navigation: NavigationProp<ParamListBase> = useNavigation()
   return (
     <TouchableOpacity
       style={[styles.flexRow, styles.paddingIconSection]}

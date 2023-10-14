@@ -1,29 +1,29 @@
-import React, { memo, useRef } from "react"
+import {
+  AuthVerificationCodeFormView,
+  useAuthVerificationCodeForm
+} from "@auth/VerifyCode"
 import {
   ChevronBackButton,
   StackNavigatorType,
   XMarkBackButton
 } from "@components/Navigation"
-import { EmailAddress, USPhoneNumber } from ".."
+import { TouchableIonicon } from "@components/common/Icons"
 import { UserHandle } from "@lib/users"
+import { useNavigation } from "@react-navigation/native"
 import { StackScreenProps } from "@react-navigation/stack"
-import {
-  SignUpCredentialsFormView,
-  useSignUpCredentialsForm
-} from "./CredentialsForm"
+import React, { memo } from "react"
+import { Alert, StyleSheet } from "react-native"
+import { EmailAddress, USPhoneNumber } from ".."
 import {
   SignUpChangeUserHandleFormView,
   useSignUpChangeUserHandleForm
 } from "./ChangeUserHandle"
-import { SignUpEndingView } from "./Ending"
-import { useNavigation } from "@react-navigation/native"
 import {
-  useAuthVerificationCodeForm,
-  AuthVerificationCodeFormView
-} from "@auth/VerifyCode"
+  SignUpCredentialsFormView,
+  useSignUpCredentialsForm
+} from "./CredentialsForm"
+import { SignUpEndingView } from "./Ending"
 import { SignUpEnvironment } from "./Environment"
-import { TouchableIonicon } from "@components/common/Icons"
-import { Alert, StyleSheet } from "react-native"
 
 export type SignUpParamsList = {
   signUpCredentialsForm: undefined
@@ -134,7 +134,6 @@ const VerifyCodeFormScreen = memo(function Screen ({
   finishRegisteringAccount,
   resendVerificationCode
 }: VerifyCodeFormScreenProps) {
-  const generatedUserHandleRef = useRef<UserHandle | undefined>()
   const form = useAuthVerificationCodeForm({
     resendCode: async () =>
       await resendVerificationCode(route.params.emailOrPhoneNumber),
@@ -144,15 +143,15 @@ const VerifyCodeFormScreen = memo(function Screen ({
         code
       )
       if (result === "invalid-verification-code") {
-        return false
+        return { isCorrect: false }
+      } else {
+        return { isCorrect: true, data: result }
       }
-      generatedUserHandleRef.current = result
-      return true
     },
-    onSuccess: () => {
-      if (generatedUserHandleRef.current) {
+    onSuccess: (data) => {
+      if (data) {
         navigation.replace("signUpChangeUserHandleForm", {
-          initialHandle: generatedUserHandleRef.current
+          initialHandle: data
         })
       }
     }

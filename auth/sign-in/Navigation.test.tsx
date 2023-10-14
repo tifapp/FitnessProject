@@ -84,6 +84,23 @@ describe("SignInNavigation tests", () => {
     })
   })
 
+  it("should switch over to the forgot password flow when forgot password tapped", async () => {
+    renderSignInScreens()
+    beginSignInTest()
+    tapForgotPassword()
+    expect(forgotPaswordFlow()).toBeDisplayed()
+  })
+
+  const tapForgotPassword = () => {
+    fireEvent.press(screen.getByText("Forgot your password?"))
+  }
+
+  const FORGOT_PASSWORD_TEST_ID = "forgot-password-test"
+
+  const forgotPaswordFlow = () => {
+    return screen.queryByTestId(FORGOT_PASSWORD_TEST_ID)
+  }
+
   const enterPhoneNumberText = (text: string) => {
     fireEvent.changeText(
       screen.getByPlaceholderText("Phone number or Email"),
@@ -136,6 +153,9 @@ describe("SignInNavigation tests", () => {
                         testID={`sign-up-verify-${props.route.params.emailOrPhoneNumber}`}
                       />
                     )}
+                  </ModalStack.Screen>
+                  <ModalStack.Screen name="forgotPassword">
+                    {() => <View testID={FORGOT_PASSWORD_TEST_ID} />}
                   </ModalStack.Screen>
                 </ModalStack.Navigator>
               )}
