@@ -75,7 +75,7 @@ const checkForNewPasswordError = (
 
 const newPasswordErrorMessage = (error?: "weak-new-password" | "empty") => {
   if (error === "weak-new-password") {
-    return "Your password should be at least 8 characters, and contain at least 1 capital letter, number, and special character."
+    return "Your password should be at least 8 characters."
   } else {
     return undefined
   }

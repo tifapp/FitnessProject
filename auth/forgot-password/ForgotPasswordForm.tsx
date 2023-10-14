@@ -62,7 +62,7 @@ export const useForgotPasswordForm = ({
         onError: () => {
           Alert.alert(
             "Whoops",
-            "Sorry, something went wrong when trying to change your password. Please try again.",
+            "Sorry, something went wrong. Please try again.",
             [{ text: "Ok" }]
           )
         }

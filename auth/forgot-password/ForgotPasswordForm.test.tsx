@@ -1,20 +1,9 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { captureAlerts } from "../../tests/helpers/Alerts"
-import {
-  TestQueryClientProvider,
-  createTestQueryClient
-} from "../../tests/helpers/ReactQuery"
+import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
 import { useForgotPasswordForm } from "./ForgotPasswordForm"
 describe("Forgot Password Form tests", () => {
   describe("Verify Email logic tests", () => {
-    const queryClient = createTestQueryClient()
-    beforeEach(() => queryClient.clear())
-
-    afterAll(() => {
-      queryClient.resetQueries()
-      queryClient.clear()
-    })
-
     const emailOrPhone = jest.fn()
     const onSuccess = jest.fn()
 
@@ -27,9 +16,7 @@ describe("Forgot Password Form tests", () => {
           }),
         {
           wrapper: ({ children }) => (
-            <TestQueryClientProvider client={queryClient}>
-              {children}
-            </TestQueryClientProvider>
+            <TestQueryClientProvider>{children}</TestQueryClientProvider>
           )
         }
       )

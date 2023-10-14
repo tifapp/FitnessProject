@@ -1,4 +1,8 @@
-import { StackNavigatorType } from "@components/Navigation"
+import {
+  ChevronBackButton,
+  StackNavigatorType,
+  XMarkBackButton
+} from "@components/Navigation"
 import {} from "@lib/users"
 import { StackScreenProps } from "@react-navigation/stack"
 import { Alert } from "react-native"
@@ -55,7 +59,13 @@ export const createForgotPasswordScreens = <T extends ForgotPasswordParamsList>(
 ) => {
   return (
     <>
-      <stack.Screen name="forgotPassword">
+      <stack.Screen
+        name="forgotPassword"
+        options={() => ({
+          headerLeft: XMarkBackButton,
+          title: ""
+        })}
+      >
         {(props: any) => (
           <ForgotPasswordScreen
             {...props}
@@ -64,11 +74,23 @@ export const createForgotPasswordScreens = <T extends ForgotPasswordParamsList>(
         )}
       </stack.Screen>
 
-      <stack.Screen name="verifyCode">
+      <stack.Screen
+        name="verifyCode"
+        options={() => ({
+          headerLeft: XMarkBackButton,
+          title: ""
+        })}
+      >
         {(props: any) => <VerifyCodeScreen {...props} />}
       </stack.Screen>
 
-      <stack.Screen name="resetPassword">
+      <stack.Screen
+        name="resetPassword"
+        options={() => ({
+          headerLeft: ChevronBackButton,
+          title: ""
+        })}
+      >
         {(props: any) => (
           <ResetPasswordScreen
             {...props}
