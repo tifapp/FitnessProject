@@ -73,7 +73,7 @@ const SignInFormScreen = memo(function Screen ({
       } else if (result === "sign-up-verification-required") {
         navigation.replace("signUpVerifyCodeForm", { emailOrPhoneNumber })
       } else {
-        navigation.navigate("signInVerifyCode", { emailOrPhoneNumber })
+        navigation.replace("signInVerifyCode", { emailOrPhoneNumber })
       }
     }
   })
@@ -108,7 +108,7 @@ const SignInVerificationCodeScreen = memo(function Screen ({
   return (
     <AuthVerificationCodeFormView
       {...form}
-      codeReceiverName={route.params.emailOrPhoneNumber.formattedForPrivacy}
+      codeReceiverName={route.params.emailOrPhoneNumber}
     />
   )
 })

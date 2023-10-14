@@ -140,7 +140,7 @@ const VerifyCodeScreen = ({ navigation, route }: VerifyCodeScreenProps) => {
   return (
     <AuthVerificationCodeFormView
       {...form}
-      codeReceiverName={route.params.emailOrPhoneNumber.formattedForPrivacy}
+      codeReceiverName={route.params.emailOrPhoneNumber}
     />
   )
 }

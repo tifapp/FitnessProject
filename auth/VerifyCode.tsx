@@ -8,6 +8,7 @@ import { useMutation } from "@tanstack/react-query"
 import React, { useRef, useState } from "react"
 import { Alert, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
+import { PrivacyFormattable } from "./Models"
 
 export type AuthResendVerificationCodeStatus = "success" | "error"
 
@@ -83,7 +84,7 @@ export const useAuthVerificationCodeForm = <Data, >({
 
 export type AuthVerificationCodeProps = {
   code: string
-  codeReceiverName: string
+  codeReceiverName: PrivacyFormattable
   style?: StyleProp<ViewStyle>
 } & ReturnType<typeof useAuthVerificationCodeForm>
 
@@ -103,7 +104,7 @@ export const AuthVerificationCodeFormView = ({
   <>
     <AuthFormView
       title="Verify your Account"
-      description={`We have sent a 6-digit verification code to ${codeReceiverName}. Please enter it in the field below.`}
+      description={`We have sent a 6-digit verification code to ${codeReceiverName.formattedForPrivacy}. Please enter it in the field below.`}
       footer={
         <View style={styles.resendContainer}>
           <BodyText style={styles.resendText}>
@@ -136,11 +137,11 @@ export const AuthVerificationCodeFormView = ({
     </AuthFormView>
     <TextToastView
       isVisible={resendCodeStatus === "success"}
-      text={`We have resent the code to ${codeReceiverName}.`}
+      text={`We have resent the code to ${codeReceiverName.formattedForPrivacy}.`}
     />
     <TextToastView
       isVisible={resendCodeStatus === "error"}
-      text={`We were unable to resend the code to ${codeReceiverName}, please try again.`}
+      text={`We were unable to resend the code to ${codeReceiverName.formattedForPrivacy}, please try again.`}
     />
   </>
 )

@@ -1,12 +1,19 @@
 import { z } from "zod"
 import { StringUtils } from "@lib/String"
 
+/**
+ * An interface for describing how something can be formatted with respect to privacy.
+ */
+export interface PrivacyFormattable {
+  get formattedForPrivacy(): string
+}
+
 const RawStringEmailAddressSchema = z.string().email()
 
 /**
  * A data type representing a valid email address.
  */
-export class EmailAddress {
+export class EmailAddress implements PrivacyFormattable {
   static peacock69 = EmailAddress.parse("peacock69@gmail.com")!
 
   private readonly rawValue: string
@@ -72,7 +79,7 @@ export class Password {
  *
  * In this case, the phone number is a precise 10 digit string.
  */
-export class USPhoneNumber {
+export class USPhoneNumber implements PrivacyFormattable {
   private readonly rawValue: string
 
   private constructor (rawValue: string) {
