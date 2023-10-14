@@ -1,33 +1,18 @@
-import { Password } from "@auth/Password"
+import { Password } from ".."
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { captureAlerts } from "../../tests/helpers/Alerts"
 import { neverPromise } from "../../tests/helpers/Promise"
-import {
-  TestQueryClientProvider,
-  createTestQueryClient
-} from "../../tests/helpers/ReactQuery"
+import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
 import { useResetPasswordForm } from "./ResetPasswordForm"
 
 describe("ResetPassword tests", () => {
   beforeEach(() => jest.resetAllMocks())
 
   describe("UseResetPassword tests", () => {
-    const queryClient = createTestQueryClient()
-    beforeEach(() => queryClient.clear())
-
-    afterAll(() => {
-      queryClient.resetQueries()
-      queryClient.clear()
-    })
-
     const initiateResetPassword = jest.fn()
     const onSuccess = jest.fn()
 
-    const { tapAlertButton, alertPresentationSpy } = captureAlerts()
-
-    const retry = async () => {
-      await tapAlertButton("Ok")
-    }
+    const { alertPresentationSpy } = captureAlerts()
 
     const renderResetPassword = () => {
       return renderHook(
@@ -38,9 +23,7 @@ describe("ResetPassword tests", () => {
           }),
         {
           wrapper: ({ children }) => (
-            <TestQueryClientProvider client={queryClient}>
-              {children}
-            </TestQueryClientProvider>
+            <TestQueryClientProvider>{children}</TestQueryClientProvider>
           )
         }
       )

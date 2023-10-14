@@ -1,4 +1,4 @@
-import { Password } from "@auth/Password"
+import { Password, USPhoneNumber } from ".."
 import { NavigationContainer, useFocusEffect } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import {
@@ -11,7 +11,6 @@ import {
 import { useCallback, useState } from "react"
 import { View } from "react-native"
 import { Button } from "react-native-elements"
-import { USPhoneNumber } from ".."
 import "../../tests/helpers/Matchers"
 import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
 import { fakeTimers } from "../../tests/helpers/Timers"
@@ -32,7 +31,7 @@ describe("Forgot Password Navigation tests", () => {
   test("valid navigation flow", async () => {
     // Test screen to get into actual flow
     const testPhoneNumber = "8882332121"
-    initiateForgotPassword.mockReturnValueOnce(Promise.resolve())
+    initiateForgotPassword.mockResolvedValueOnce("success")
 
     submitResettedPassword.mockResolvedValueOnce("valid")
 
@@ -65,7 +64,7 @@ describe("Forgot Password Navigation tests", () => {
   it("has a full navigation flow: forgot -> verify -> reset -> verify", async () => {
     // Test screen to get into actual flow
     const testPhoneNumber = "8882332121"
-    initiateForgotPassword.mockReturnValueOnce(Promise.resolve())
+    initiateForgotPassword.mockResolvedValueOnce("success")
 
     submitResettedPassword
       .mockResolvedValueOnce("invalid-verification-code")

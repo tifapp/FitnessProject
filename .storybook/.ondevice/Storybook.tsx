@@ -44,8 +44,9 @@ import VerifcationCodeMeta, {
 import TextFieldMeta, {
   Basic as TextFieldBasic
 } from "../components/TextField/TextField.stories"
+import { InMemorySecureStore } from "@auth/CognitoSecureStorage"
 
-setupCognito()
+setupCognito(new InMemorySecureStore())
 
 // Create an array of stories
 const stories = [

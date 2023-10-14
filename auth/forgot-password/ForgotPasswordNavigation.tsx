@@ -53,6 +53,12 @@ type ResetPasswordScreenProps = StackScreenProps<
 > &
   Pick<ForgotPasswordEnvironment, "submitResettedPassword">
 
+/**
+ * Creates screens required for Forgot password on a stack navigator.
+ *
+ * @param stack a stack navigator.
+ * @param env see {@link ForgotPasswordEnvironment}
+ */
 export const createForgotPasswordScreens = <T extends ForgotPasswordParamsList>(
   stack: StackNavigatorType<T>,
   env: ForgotPasswordEnvironment
@@ -159,7 +165,7 @@ const ResetPasswordScreen = ({
           "The verification code that you have entered is invalid.",
           [{ text: "Ok" }]
         )
-        navigation.replace("verifyCode", {
+        navigation.navigate("verifyCode", {
           emailOrPhoneNumber: route.params.emailOrPhoneNumber,
           code: route.params.code,
           newPass

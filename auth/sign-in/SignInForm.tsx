@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Alert
 } from "react-native"
-import { AuthFormView } from "../AuthSection"
+import { AuthFormView } from "../AuthLayout"
 import {
   AuthShadedEmailPhoneTextFieldView,
   AuthShadedPasswordTextField
@@ -21,8 +21,7 @@ import {
   useEmailPhoneTextState
 } from "../EmailPhoneText"
 import { useFormSubmission } from "@hooks/FormHooks"
-import { USPhoneNumber } from "../PhoneNumber"
-import { EmailAddress } from "../Email"
+import { USPhoneNumber, EmailAddress } from ".."
 import { SignInResult } from "./Authenticator"
 
 export type UseSignInFormEnvironment = {

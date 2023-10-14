@@ -1,9 +1,5 @@
 import React, { useState } from "react"
-import {
-  USPhoneNumber,
-  prettyFormatIncrementalE164PhoneNumber
-} from "./PhoneNumber"
-import { EmailAddress } from "./Email"
+import { USPhoneNumber, EmailAddress } from "./Models"
 import { StringUtils } from "@lib/String"
 import {
   StyleProp,
@@ -63,6 +59,30 @@ export const useEmailPhoneTextState = (initialTextType: EmailPhoneTextType) => {
         ? "invalid-email"
         : "invalid-phone-number"
     }
+  }
+}
+
+/**
+ * Formates an incremental E164 phone number string as a pretty formatted phone number.
+ *
+ * Ex.
+ *
+ * `"1234" -> "(123) 4"`
+ *
+ * `"1234567" -> "(123) 456-7"`
+ */
+export const prettyFormatIncrementalE164PhoneNumber = (
+  digitString: `${number}` | ""
+) => {
+  if (digitString.length < 4) {
+    return digitString
+  } else if (digitString.length < 7) {
+    return `(${digitString.substring(0, 3)}) ${digitString.slice(3)}`
+  } else {
+    return `(${digitString.substring(0, 3)}) ${digitString.substring(
+      3,
+      6
+    )}-${digitString.slice(6)}`
   }
 }
 

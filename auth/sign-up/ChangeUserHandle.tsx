@@ -1,4 +1,4 @@
-import { AuthFormView } from "@auth/AuthSection"
+import { AuthFormView } from "@auth/AuthLayout"
 import { AuthShadedTextField } from "@auth/AuthTextFields"
 import { Ionicon } from "@components/common/Icons"
 import { useFormSubmission } from "@hooks/FormHooks"

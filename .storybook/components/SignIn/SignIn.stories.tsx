@@ -10,9 +10,19 @@ import {
 import { createStackNavigator } from "@react-navigation/stack"
 import { NavigationContainer } from "@react-navigation/native"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
-import { SignUpEnvironment, createSignUpScreens } from "@auth/sign-up"
-import { ForgotPasswordEnvironment } from "@auth/forgot-password/Environment"
+import {
+  SignUpEnvironment,
+  cognitoConfirmSignUpWithAutoSignIn,
+  createSignUpEnvironment,
+  createSignUpScreens
+} from "@auth/sign-up"
+import {
+  ForgotPasswordEnvironment,
+  createForgotPasswordEnvironment
+} from "@auth/forgot-password/Environment"
 import { createForgotPasswordScreens } from "@auth/forgot-password"
+import { Auth } from "@aws-amplify/auth"
+import { TiFAPI, createAWSTiFAPIFetch } from "@api-client"
 
 const SignInMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Sign In"
@@ -24,12 +34,30 @@ type SignInStory = ComponentStory<typeof SettingsScreen>
 
 const Stack = createStackNavigator<SignInParamsList>()
 
+const tiFAPI = new TiFAPI(
+  createAWSTiFAPIFetch(
+    new URL("https://623qsegfb9.execute-api.us-west-2.amazonaws.com/prod/")
+  )
+)
+
 const authenticator = new CognitoSignInAuthenticator()
 const signInScreens = createSignInScreens(Stack, authenticator)
-const signUpScreens = createSignUpScreens(Stack, {} as any as SignUpEnvironment)
+const signUpScreens = createSignUpScreens(
+  Stack,
+  createSignUpEnvironment(
+    {
+      signUp: async (request) => await Auth.signUp(request),
+      resendSignUp: async (username: string) => {
+        await Auth.resendSignUp(username)
+      },
+      confirmSignUpWithAutoSignIn: cognitoConfirmSignUpWithAutoSignIn
+    },
+    tiFAPI
+  )
+)
 const forgotPasswordScreens = createForgotPasswordScreens(
   Stack,
-  {} as any as ForgotPasswordEnvironment
+  createForgotPasswordEnvironment(Auth)
 )
 
 export const Basic: SignInStory = () => (

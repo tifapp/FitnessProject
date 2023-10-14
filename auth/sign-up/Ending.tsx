@@ -1,4 +1,4 @@
-import { AuthLayoutView } from "@auth/AuthSection"
+import { AuthLayoutView } from "@auth/AuthLayout"
 import { BodyText, Subtitle } from "@components/Text"
 import { CircularIonicon, IoniconName } from "@components/common/Icons"
 import React from "react"

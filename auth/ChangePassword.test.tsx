@@ -1,4 +1,4 @@
-import { Password } from "@auth/Password"
+import { Password } from "./Models"
 import { useChangePasswordForm } from "@auth/ChangePassword"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { captureAlerts } from "../tests/helpers/Alerts"

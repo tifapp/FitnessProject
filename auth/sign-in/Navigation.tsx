@@ -19,6 +19,12 @@ export type SignInParamsList = {
 } & SignUpParamsList &
   ForgotPasswordParamsList
 
+/**
+ * Creates the screens required for sign in on a given stack navigator.
+ *
+ * @param stack a stack navigator.
+ * @param authenticator see {@link SignInAuthenticator}.
+ */
 export const createSignInScreens = <Params extends SignInParamsList>(
   stack: StackNavigatorType<Params>,
   authenticator: SignInAuthenticator

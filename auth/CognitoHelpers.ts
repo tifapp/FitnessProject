@@ -1,17 +1,16 @@
 import { Auth } from "@aws-amplify/auth"
 import * as ExpoSecureStore from "expo-secure-store"
 import awsExports from "../src/aws-exports"
-import { CognitoSecureStorage } from "./CognitoSecureStorage"
-import { EmailAddress } from "./Email"
-import { USPhoneNumber } from "./PhoneNumber"
+import { CognitoSecureStorage, SecureStore } from "./CognitoSecureStorage"
+import { EmailAddress, USPhoneNumber } from "./Models"
 
 /**
  * Sets up cognito with a secure store.
  */
-export const setupCognito = () => {
+export const setupCognito = (secureStore: SecureStore = ExpoSecureStore) => {
   Auth.configure({
     ...awsExports,
-    storage: new CognitoSecureStorage(ExpoSecureStore)
+    storage: new CognitoSecureStorage(secureStore)
   })
 }
 

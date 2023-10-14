@@ -12,7 +12,7 @@ export type ForgotPasswordResult =
 export type ResetPasswordResult = "valid" | "invalid-verification-code"
 
 /**
- * Creates the functions needed for the sign-up flow.
+ * Creates the functions needed for the forgot password flow.
  */
 export const createForgotPasswordEnvironment = (
   cognito: Pick<typeof Auth, "forgotPassword" | "forgotPasswordSubmit">
@@ -32,24 +32,28 @@ export const createForgotPasswordEnvironment = (
       return "success"
     } catch (err) {
       if (!isCognitoErrorWithCode(err, "UserNotFoundException")) throw err
-      return "invalid-email"
+      return emailOrPhoneNumber instanceof EmailAddress
+        ? "invalid-email"
+        : "invalid-phone-number"
     }
   },
   /**
-   * Starts the process of sending you a code for the password you forgot.
+   * Resets the user's password.
    *
    * @param emailOrPhoneNumber an email or phone number that the user provides.
+   * @param verificationCode the verification code from a cognito forgot password flow.
+   * @param password the new password to reset to.
    */
   submitResettedPassword: async (
     emailOrPhoneNumber: EmailAddress | USPhoneNumber,
-    code: string,
-    newPass: Password
+    verificationCode: string,
+    password: Password
   ): Promise<ResetPasswordResult> => {
     try {
       await cognito.forgotPasswordSubmit(
         cognitoFormatEmailOrPhoneNumber(emailOrPhoneNumber),
-        code,
-        newPass.toString()
+        verificationCode,
+        password.toString()
       )
       return "valid"
     } catch (err) {
