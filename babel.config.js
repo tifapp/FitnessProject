@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 // @ts-nocheck
 /* eslint-disable comma-dangle */
 /* eslint-disable semi */
@@ -26,6 +27,7 @@ module.exports = function (api) {
             "@graphql": path.join(rootPath, "src/graphql"),
             "@lib": path.join(rootPath, "lib"),
             "@auth": path.join(rootPath, "auth"),
+            "@event-details": path.join(rootPath, "event-details"),
             "@modules": path.join(rootPath, "modules")
           },
           extensions: [".js", ".jsx", ".ts", ".tsx"]

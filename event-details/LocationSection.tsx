@@ -7,7 +7,10 @@ import {
   Placemark,
   placemarkToFormattedAddress
 } from "@lib/location"
-import { OpenInMapsRequest, openInMapWithDirections } from "@lib/OpenInMaps"
+import {
+  OpenInMapsRequest,
+  openInMapWithDirections
+} from "@event-details/OpenInMaps"
 import { Ionicon } from "@components/common/Icons"
 import { showToast } from "@components/common/Toasts"
 import { Divider } from "react-native-elements"

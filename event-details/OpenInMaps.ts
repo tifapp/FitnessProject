@@ -3,7 +3,7 @@ import {
   LocationCoordinate2D,
   Placemark,
   placemarkToFormattedAddress
-} from "./location"
+} from "../lib/location"
 
 /**
  * A request type that allows for opening certain locations in the user's preferred maps app.

@@ -1,7 +1,7 @@
 import React, { SetStateAction } from "react"
 import { Title } from "@components/Text"
 import { TouchableIonicon } from "@components/common/Icons"
-import { EventCard } from "@components/eventCard/EventCard"
+import { EventCard } from "@event-details/EventCard"
 import { AppStyles } from "@lib/AppColorStyle"
 import { CurrentUserEvent } from "@lib/events"
 import { FlatList, ListRenderItemInfo, Modal, StyleSheet } from "react-native"

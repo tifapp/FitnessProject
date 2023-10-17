@@ -4,8 +4,8 @@ import { EventMocks } from "@lib/events"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
-import { EventDetailsProps } from "@screens/EventDetails/EventDetails"
-import { createEventDetailsStackScreens } from "@screens/EventDetails/EventScreensNavigation"
+import { EventDetailsProps } from "@event-details/EventDetails"
+import { createEventDetailsStackScreens } from "@event-details/EventScreensNavigation"
 import { EventFormScreenNavWrapper } from "@screens/EventFormScreenNavWrapper"
 import {
   ExploreEventsScreensParamsList,

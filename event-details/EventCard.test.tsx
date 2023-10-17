@@ -1,8 +1,8 @@
 import { render } from "@testing-library/react-native"
-import { EventCard } from "@components/eventCard/EventCard"
+import { EventCard } from "@event-details/EventCard"
 import React from "react"
 import { EventMocks, CurrentUserEvent } from "@lib/events"
-import "../../helpers/Matchers"
+import "../tests/helpers/Matchers"
 
 describe("EventCard tests", () => {
   beforeEach(() => {
