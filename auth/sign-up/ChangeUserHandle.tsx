@@ -1,4 +1,4 @@
-import { AuthFormView } from "@auth/AuthSection"
+import { AuthFormView } from "@auth/AuthLayout"
 import { AuthShadedTextField } from "@auth/AuthTextFields"
 import { Ionicon } from "@components/common/Icons"
 import { useFormSubmission } from "@hooks/FormHooks"
@@ -127,7 +127,6 @@ export const SignUpChangeUserHandleFormView = ({
     title="Choose your Username"
     description="We have created a username for you, but you can customize it if you don't like it. It's also possible to change it later if you want to."
     submissionTitle="I like this name!"
-    iOSInModal
     submission={submission}
     style={style}
   >

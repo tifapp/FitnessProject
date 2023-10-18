@@ -3,7 +3,6 @@ import {
   StackNavigatorType,
   XMarkBackButton
 } from "@components/Navigation"
-import {} from "@lib/users"
 import { StackScreenProps } from "@react-navigation/stack"
 import { Alert } from "react-native"
 import { EmailAddress, Password, USPhoneNumber } from ".."
@@ -20,6 +19,7 @@ import {
   ResetPasswordFormView,
   useResetPasswordForm
 } from "./ResetPasswordForm"
+import React from "react"
 
 export type ForgotPasswordParamsList = {
   forgotPassword: undefined
@@ -53,6 +53,12 @@ type ResetPasswordScreenProps = StackScreenProps<
 > &
   Pick<ForgotPasswordEnvironment, "submitResettedPassword">
 
+/**
+ * Creates screens required for Forgot password on a stack navigator.
+ *
+ * @param stack a stack navigator.
+ * @param env see {@link ForgotPasswordEnvironment}
+ */
 export const createForgotPasswordScreens = <T extends ForgotPasswordParamsList>(
   stack: StackNavigatorType<T>,
   env: ForgotPasswordEnvironment
@@ -134,8 +140,7 @@ const VerifyCodeScreen = ({ navigation, route }: VerifyCodeScreenProps) => {
   return (
     <AuthVerificationCodeFormView
       {...form}
-      iOSInModal
-      codeReceiverName={route.params.emailOrPhoneNumber.formattedForPrivacy}
+      codeReceiverName={route.params.emailOrPhoneNumber}
     />
   )
 }
@@ -160,7 +165,7 @@ const ResetPasswordScreen = ({
           "The verification code that you have entered is invalid.",
           [{ text: "Ok" }]
         )
-        navigation.replace("verifyCode", {
+        navigation.navigate("verifyCode", {
           emailOrPhoneNumber: route.params.emailOrPhoneNumber,
           code: route.params.code,
           newPass

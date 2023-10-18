@@ -1,29 +1,15 @@
-import { CognitoSecureStorage, SecureStore } from "@auth/CognitoSecureStorage"
+import {
+  CognitoSecureStorage,
+  InMemorySecureStore
+} from "@auth/CognitoSecureStorage"
 
 const TEST_STORAGE_KEY = "TestStorageKey"
-
-class TestSecureStore implements SecureStore {
-  private readonly map = new Map<string, string>()
-
-  async setItemAsync (key: string, value: string) {
-    this.map.set(key, value)
-  }
-
-  async getItemAsync (key: string) {
-    return this.map.get(key) ?? null
-  }
-
-  async deleteItemAsync (key: string) {
-    this.map.delete(key)
-  }
-}
-
 /**
  * Have to mock this instead of attempting to utilise the functionality directly
  */
 describe("CognitoSecureStorage tests", () => {
   test("if the secure storage can sync data between another instance, after a get, set, and remove", async () => {
-    const sharedStorage = new TestSecureStore()
+    const sharedStorage = new InMemorySecureStore()
     const TestStorage1 = new CognitoSecureStorage(sharedStorage)
     const TestStorage2 = new CognitoSecureStorage(sharedStorage)
 
@@ -44,7 +30,7 @@ describe("CognitoSecureStorage tests", () => {
   })
 
   test("if the secure storage can clear all data, and when trying to access it, no data can be found", async () => {
-    const sharedStorage = new TestSecureStore()
+    const sharedStorage = new InMemorySecureStore()
     const TestStorage1 = new CognitoSecureStorage(sharedStorage)
 
     TestStorage1.setItem(TEST_STORAGE_KEY + "1", "Test Value")
@@ -59,7 +45,7 @@ describe("CognitoSecureStorage tests", () => {
   })
 
   it("should break down large data strings into 2048 byte chunks in the underlying store", async () => {
-    const testStore = new TestSecureStore()
+    const testStore = new InMemorySecureStore()
     const storage = new CognitoSecureStorage(testStore)
 
     const data = "a".repeat(6000)
@@ -77,7 +63,7 @@ describe("CognitoSecureStorage tests", () => {
   })
 
   it("should be able to sync large data chunks between stores", async () => {
-    const testStore = new TestSecureStore()
+    const testStore = new InMemorySecureStore()
     const storage1 = new CognitoSecureStorage(testStore)
     const storage2 = new CognitoSecureStorage(testStore)
 

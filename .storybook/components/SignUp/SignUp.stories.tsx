@@ -1,24 +1,21 @@
 import { TiFAPI } from "@api-client/TiFAPI"
-import { createAWSTiFAPIFetch } from "@api-client/aws"
-import { AuthShadedEmailPhoneTextFieldView } from "@auth/AuthTextFields"
-import { useEmailPhoneTextState } from "@auth/UseEmailPhoneText"
-import {
-  SignUpParamsList,
-  cognitoConfirmSignUpWithAutoSignIn,
-  createSignUpEnvironment,
-  createSignUpScreens
-} from "@auth/sign-up"
 import { Auth } from "@aws-amplify/auth"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
-import { AppStyles } from "@lib/AppColorStyle"
 import { NavigationContainer } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
+import {
+  createSignUpEnvironment,
+  createSignUpScreens,
+  SignUpParamsList,
+  cognitoConfirmSignUpWithAutoSignIn
+} from "@auth/sign-up"
+import { SafeAreaProvider } from "react-native-safe-area-context"
 import { Button } from "react-native"
 import { ScrollView } from "react-native-gesture-handler"
-import { SafeAreaProvider } from "react-native-safe-area-context"
+import { createAWSTiFAPIFetch } from "@api-client/aws"
 
 const SignUpMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Sign Up"
@@ -65,26 +62,11 @@ export const Basic: SignUpStory = () => (
   </TiFQueryClientProvider>
 )
 
-const TestScreen = ({ navigation }: StackScreenProps<ParamsList, "test">) => {
-  const { text, activeTextType, onTextChanged, onActiveTextTypeToggled } =
-    useEmailPhoneTextState("phone")
-  return (
-    <ScrollView>
-      <Button
-        title="Do sign up flow"
-        onPress={() => {
-          navigation.navigate("signUp", { screen: "signUpCredentialsForm" })
-        }}
-      />
-      <AuthShadedEmailPhoneTextFieldView
-        iconBackgroundColor={AppStyles.darkColor}
-        value={text}
-        placeholder="Phone number or Email"
-        activeTextType={activeTextType}
-        onChangeText={onTextChanged}
-        onActiveTextTypeToggled={onActiveTextTypeToggled}
-        style={{ marginTop: 48, paddingHorizontal: 16 }}
-      />
-    </ScrollView>
-  )
-}
+const TestScreen = ({ navigation }: StackScreenProps<ParamsList, "test">) => (
+  <ScrollView>
+    <Button
+      title="Do sign up flow"
+      onPress={() => navigation.navigate("signUpCredentialsForm")}
+    />
+  </ScrollView>
+)

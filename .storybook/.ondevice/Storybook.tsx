@@ -35,14 +35,18 @@ import SettingsMeta, {
 import SignUpMeta, {
   Basic as SignUpBasic
 } from "../components/SignUp/SignUp.stories"
-import TextFieldMeta, {
-  Basic as TextFieldBasic
-} from "../components/TextField/TextField.stories"
+import SignInMeta, {
+  Basic as SignInBasic
+} from "../components/SignIn/SignIn.stories"
 import VerifcationCodeMeta, {
   Basic as VerifcationCodeBasic
 } from "../components/VerificationCode/VerifyCode.stories"
+import TextFieldMeta, {
+  Basic as TextFieldBasic
+} from "../components/TextField/TextField.stories"
+import { InMemorySecureStore } from "@auth/CognitoSecureStorage"
 
-setupCognito()
+setupCognito(new InMemorySecureStore())
 
 // Create an array of stories
 const stories = [
@@ -95,6 +99,11 @@ const stories = [
     name: SignUpMeta.title,
     component: SignUpBasic,
     args: SignUpMeta.args
+  },
+  {
+    name: SignInMeta.title,
+    component: SignInBasic,
+    args: SignInMeta.args
   },
   {
     name: VerifcationCodeMeta.title,
