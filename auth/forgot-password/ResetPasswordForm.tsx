@@ -1,9 +1,8 @@
-import { AuthFormView } from "@auth/AuthSection"
+import { AuthFormView } from "@auth/AuthLayout"
 import { AuthShadedPasswordTextField } from "@auth/AuthTextFields"
 import { useFormSubmission } from "@hooks/FormHooks"
-import { AppStyles } from "@lib/AppColorStyle"
-import { useState } from "react"
-import { Alert, StyleProp, StyleSheet, ViewStyle } from "react-native"
+import React, { useState } from "react"
+import { Alert, StyleProp, ViewStyle } from "react-native"
 import { Password } from ".."
 import { ResetPasswordResult } from "./Environment"
 
@@ -94,9 +93,7 @@ export const ResetPasswordFormView = ({
   return (
     <AuthFormView
       title={"Reset Password"}
-      description={
-        "Your new password must at least be 8 characters and contain at least 1 letter, 1 number, and 1 special character."
-      }
+      description={"Your new password must at least be 8 characters."}
       submissionTitle={"Change Password"}
       submission={submission}
       style={style}
@@ -104,7 +101,6 @@ export const ResetPasswordFormView = ({
       <AuthShadedPasswordTextField
         iconName="lock-closed"
         iconBackgroundColor="#FB3640"
-        style={styles.textField}
         value={newPasswordField}
         placeholder="New Password"
         error={
@@ -117,35 +113,3 @@ export const ResetPasswordFormView = ({
     </AuthFormView>
   )
 }
-
-const styles = StyleSheet.create({
-  flexColumn: {
-    flex: 1
-  },
-  container: {
-    backgroundColor: "white",
-    flex: 1
-  },
-  buttonContainer: {
-    flex: 1,
-    flexDirection: "row",
-    marginTop: "90%"
-  },
-  activeButton: {
-    flex: 1,
-    backgroundColor: AppStyles.darkColor
-  },
-  inactiveButton: {
-    flex: 1,
-    opacity: 0.5,
-    backgroundColor: AppStyles.colorOpacity35
-  },
-  bodyText: {
-    color: AppStyles.colorOpacity35,
-    paddingBottom: 16
-  },
-  textField: {
-    flex: 1,
-    marginTop: 16
-  }
-})

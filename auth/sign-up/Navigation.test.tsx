@@ -1,8 +1,4 @@
-import { TiFAPI } from "@api-client/TiFAPI"
-import { createTiFAPIFetch } from "@api-client/client"
-import { UserHandle } from "@lib/users"
 import { uuid } from "@lib/uuid"
-import { NavigationContainer, useFocusEffect } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import {
   act,
@@ -11,20 +7,29 @@ import {
   screen,
   waitFor
 } from "@testing-library/react-native"
-import { rest } from "msw"
+import {
+  NavigationContainer,
+  NavigatorScreenParams,
+  useFocusEffect
+} from "@react-navigation/native"
+import { UserHandle } from "@lib/users"
+import { fakeTimers } from "../../tests/helpers/Timers"
+import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
 import { useCallback, useState } from "react"
+import { TiFAPI } from "@api-client/TiFAPI"
+import { createTiFAPIFetch } from "@api-client/client"
+import { createSignUpEnvironment } from "./Environment"
+import { rest } from "msw"
 import { Button, View } from "react-native"
 import { captureAlerts } from "../../tests/helpers/Alerts"
 import "../../tests/helpers/Matchers"
-import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
-import { fakeTimers } from "../../tests/helpers/Timers"
 import { mswServer } from "../../tests/helpers/msw"
-import { createSignUpEnvironment } from "./Environment"
 import { SignUpParamsList, createSignUpScreens } from "./Navigation"
 
 type TestSignUpParamsList = {
   test: undefined
-} & SignUpParamsList
+  signUp: NavigatorScreenParams<SignUpParamsList>
+}
 
 const TEST_GENERATED_USER_HANDLE = UserHandle.parse("bitchelldic12").handle!
 
@@ -155,13 +160,20 @@ describe("SignUpNavigation tests", () => {
 
   const renderSignUpFlow = () => {
     const Stack = createStackNavigator<TestSignUpParamsList>()
-    const signUpScreens = createSignUpScreens(Stack, env)
+    const ModalStack = createStackNavigator<SignUpParamsList>()
+    const signUpScreens = createSignUpScreens(ModalStack, env)
     return render(
       <TestQueryClientProvider>
         <NavigationContainer>
           <Stack.Navigator initialRouteName="test">
-            {signUpScreens}
             <Stack.Screen name="test" component={TestScreen} />
+            <Stack.Screen name="signUp">
+              {() => (
+                <ModalStack.Navigator initialRouteName="signUpCredentialsForm">
+                  {signUpScreens}
+                </ModalStack.Navigator>
+              )}
+            </Stack.Screen>
           </Stack.Navigator>
         </NavigationContainer>
       </TestQueryClientProvider>

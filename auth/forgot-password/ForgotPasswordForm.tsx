@@ -1,22 +1,16 @@
-import { AuthFormView } from "@auth/AuthSection"
+import { AuthFormView } from "@auth/AuthLayout"
 import { AuthShadedEmailPhoneTextFieldView } from "@auth/AuthTextFields"
-import { EmailAddress } from "@auth/Email"
-import { useEmailPhoneTextState } from "@auth/UseEmailPhoneText"
-import { BodyText } from "@components/Text"
+import { EmailAddress, USPhoneNumber } from ".."
 import { TextFieldRefValue } from "@components/TextFields"
 import { useFormSubmission } from "@hooks/FormHooks"
 import { AppStyles } from "@lib/AppColorStyle"
-import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
-import { useRef, useState } from "react"
+import React, { useRef, useState } from "react"
+import { Alert, StyleProp, StyleSheet, ViewStyle } from "react-native"
 import {
-  Alert,
-  StyleProp,
-  StyleSheet,
-  TouchableOpacity,
-  ViewStyle
-} from "react-native"
-import Animated, { SlideInLeft, SlideOutLeft } from "react-native-reanimated"
-import { USPhoneNumber } from ".."
+  EmailPhoneTextToggleFooterView,
+  useEmailPhoneTextState
+} from "@auth/EmailPhoneText"
+import { ForgotPasswordResult } from "./Environment"
 
 /**
  * A type to help show what props need to be given in order to utilize {@link useForgotPasswordForm}.
@@ -24,7 +18,7 @@ import { USPhoneNumber } from ".."
 export type UseForgotPasswordFormEnvironment = {
   initiateForgotPassword: (
     emailOrPhoneNumber: EmailAddress | USPhoneNumber
-  ) => Promise<void>
+  ) => Promise<ForgotPasswordResult>
   onSuccess: (emailOrPhoneNumber: EmailAddress | USPhoneNumber) => void
 }
 
@@ -36,9 +30,7 @@ export const useForgotPasswordForm = ({
   return {
     forgotPasswordText,
     submission: useFormSubmission(
-      async (args) => {
-        await initiateForgotPassword(args.emailOrPhoneNumber)
-      },
+      async (args) => await initiateForgotPassword(args.emailOrPhoneNumber),
       () => {
         if (forgotPasswordText.parsedValue) {
           return {
@@ -50,15 +42,25 @@ export const useForgotPasswordForm = ({
         } else {
           return {
             status: "invalid",
-            error:
-              forgotPasswordText.activeTextType === "email"
-                ? "invalid-email"
-                : "invalid-phone-number"
+            error: forgotPasswordText.errorReason
           } as const
         }
       },
       {
-        onSuccess: (_, args) => onSuccess(args.emailOrPhoneNumber),
+        onSuccess: (result, args) => {
+          if (result === "success") {
+            onSuccess(args.emailOrPhoneNumber)
+          } else {
+            Alert.alert(
+              result === "invalid-email"
+                ? "Invalid Email"
+                : "Invalid Phone Number",
+              result === "invalid-email"
+                ? "No account exists with the email that you entered."
+                : "No account exists with the phone number that you entered."
+            )
+          }
+        },
         onError: () => {
           Alert.alert(
             "Whoops",
@@ -86,42 +88,30 @@ export const ForgotPasswordFormView = ({
     <AuthFormView
       title={"Forgot Your Password?"}
       description={
-        "Please enter in your valid email or phone number. A verification code will be sent to your account's email, that will be used to reset your password."
+        "A verification code will be sent to your account's email or phone number, that will be used to reset your password."
       }
       submissionTitle={"Reset Password"}
       submission={submission}
       style={style}
       footer={
-        <Animated.View layout={TiFDefaultLayoutTransition}>
-          {isFocusingEmailPhone && (
-            <Animated.View
-              entering={SlideInLeft.duration(300)}
-              exiting={SlideOutLeft.duration(300)}
-            >
-              <TouchableOpacity
-                onPress={forgotPasswordText.onActiveTextTypeToggled}
-              >
-                <BodyText style={styles.emailPhoneToggle}>
-                  {forgotPasswordText.activeTextType === "email"
-                    ? "Use phone number instead."
-                    : "Use email instead."}
-                </BodyText>
-              </TouchableOpacity>
-            </Animated.View>
-          )}
-        </Animated.View>
+        <EmailPhoneTextToggleFooterView
+          isVisible={isFocusingEmailPhone}
+          textType={forgotPasswordText.activeTextType}
+          onTextTypeToggled={forgotPasswordText.onActiveTextTypeToggled}
+        />
       }
     >
       <AuthShadedEmailPhoneTextFieldView
-        iconBackgroundColor={AppStyles.darkColor}
         value={forgotPasswordText.text}
         activeTextType={forgotPasswordText.activeTextType}
         onChangeText={forgotPasswordText.onTextChanged}
         blurOnSubmit={false}
-        placeholder="Enter Phone # / Email"
         onActiveTextTypeToggled={forgotPasswordText.onActiveTextTypeToggled}
         style={styles.emailPhoneTextField}
         ref={emailPhoneRef}
+        errorReason={
+          submission.status === "invalid" ? submission.error : undefined
+        }
         onFocus={() => setIsFocusingEmailPhone(true)}
         onBlur={() => setIsFocusingEmailPhone(false)}
       />

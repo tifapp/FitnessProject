@@ -1,22 +1,21 @@
-import { AuthFormView } from "@auth/AuthSection"
+import { AuthFormView } from "@auth/AuthLayout"
 import {
   AuthShadedEmailPhoneTextFieldView,
   AuthShadedPasswordTextField,
   AuthShadedTextField
 } from "@auth/AuthTextFields"
 import {
-  EmailPhoneTextType,
+  EmailPhoneTextToggleFooterView,
   useEmailPhoneTextState
-} from "@auth/UseEmailPhoneText"
-import { BodyText, Caption } from "@components/Text"
+} from "@auth/EmailPhoneText"
+import { Caption } from "@components/Text"
 import { TextFieldRefValue } from "@components/TextFields"
 import { useFormSubmission } from "@hooks/FormHooks"
 import { AppStyles } from "@lib/AppColorStyle"
 import React, { useRef, useState } from "react"
 import { StyleProp, ViewStyle, StyleSheet, Alert } from "react-native"
 import { EmailAddress, Password, USPhoneNumber } from ".."
-import { TouchableOpacity } from "react-native-gesture-handler"
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
+import Animated from "react-native-reanimated"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { CreateAccountResult } from "./Environment"
 
@@ -77,11 +76,7 @@ export const useSignUpCredentialsForm = ({
       },
       () => {
         const nameReason = checkForNameError(baseFields.name)
-        const emailPhoneReason = checkForEmailPhoneError(
-          emailPhoneText.text,
-          emailPhoneText.activeTextType,
-          emailPhoneText.parsedValue
-        )
+        const emailPhoneReason = emailPhoneText.errorReason
         const passwordReason = checkForPasswordError(
           baseFields.passwordText,
           validatedPassword
@@ -98,7 +93,6 @@ export const useSignUpCredentialsForm = ({
             }
           }
         }
-
         return {
           status: "invalid",
           nameReason,
@@ -136,20 +130,6 @@ const checkForNameError = (name: string) => {
   return name.length === 0 ? ("empty" as const) : undefined
 }
 
-const checkForEmailPhoneError = (
-  text: string,
-  activeTextType: EmailPhoneTextType,
-  emailOrPhoneNumber: EmailAddress | USPhoneNumber | undefined
-) => {
-  if (text.length === 0) return "empty" as const
-  if (!emailOrPhoneNumber) {
-    return activeTextType === "email"
-      ? ("invalid-email" as const)
-      : ("invalid-phone-number" as const)
-  }
-  return undefined
-}
-
 const checkForPasswordError = (
   passwordText: string,
   validatedPassword: Password | undefined
@@ -185,25 +165,13 @@ export const SignUpCredentialsFormView = ({
       title="Create your Account"
       description="Welcome to tiF! Begin your fitness journey by creating an account."
       submissionTitle="I'm ready!"
-      iOSInModal
       submission={submission}
       footer={
-        <Animated.View layout={TiFDefaultLayoutTransition}>
-          {isFocusingEmailPhone && (
-            <Animated.View
-              entering={FadeIn.duration(300)}
-              exiting={FadeOut.duration(300)}
-            >
-              <TouchableOpacity onPress={onEmailPhoneTextTypeToggled}>
-                <BodyText style={styles.emailPhoneToggle}>
-                  {emailPhoneTextType === "email"
-                    ? "Use phone number instead."
-                    : "Use email instead."}
-                </BodyText>
-              </TouchableOpacity>
-            </Animated.View>
-          )}
-        </Animated.View>
+        <EmailPhoneTextToggleFooterView
+          isVisible={isFocusingEmailPhone}
+          textType={emailPhoneTextType}
+          onTextTypeToggled={onEmailPhoneTextTypeToggled}
+        />
       }
       style={style}
     >
@@ -221,14 +189,12 @@ export const SignUpCredentialsFormView = ({
       <AuthShadedEmailPhoneTextFieldView
         activeTextType={emailPhoneTextType}
         onActiveTextTypeToggled={onEmailPhoneTextTypeToggled}
-        iconBackgroundColor="#14B329"
-        placeholder="Phone number or Email"
         blurOnSubmit={false}
         value={fields.emailPhoneText}
         onChangeText={(text) => onFieldUpdated("emailPhoneNumberText", text)}
-        error={
+        errorReason={
           submission.status === "invalid"
-            ? emailPhoneErrorText(submission.emailPhoneReason)
+            ? submission.emailPhoneReason
             : undefined
         }
         returnKeyType="next"
@@ -278,18 +244,6 @@ export const SignUpCredentialsFormView = ({
   )
 }
 
-const emailPhoneErrorText = (
-  error: "invalid-email" | "invalid-phone-number" | "empty" | undefined
-) => {
-  if (error === "invalid-email") {
-    return "Please enter a valid email."
-  } else if (error === "invalid-phone-number") {
-    return "Please enter a valid phone number."
-  } else {
-    return undefined
-  }
-}
-
 const styles = StyleSheet.create({
   textField: {
     marginTop: 16
@@ -305,9 +259,5 @@ const styles = StyleSheet.create({
   legalLinkText: {
     color: AppStyles.linkColor,
     opacity: 1
-  },
-  emailPhoneToggle: {
-    color: AppStyles.linkColor,
-    paddingBottom: 8
   }
 })
