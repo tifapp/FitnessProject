@@ -1,6 +1,6 @@
 import { useNavigation, useRoute } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import EventDetails from "@screens/EventDetails/EventDetails"
+import EventDetails from "@event-details/EventDetails"
 import { EventDetailsScreenRouteProps } from "@stacks/ActivitiesStack"
 
 export const EventDetailsScreenNavWrapper = () => {

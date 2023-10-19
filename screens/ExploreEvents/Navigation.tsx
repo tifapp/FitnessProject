@@ -11,7 +11,7 @@ import { ExploreEventsView } from "./ExploreView"
 import { StackScreenProps } from "@react-navigation/stack"
 import { createInitialCenter } from "./models"
 import { StyleSheet } from "react-native"
-import { EventScreensParamsList } from "@screens/EventDetails/EventScreensNavigation"
+import { EventScreensParamsList } from "@event-details/EventScreensNavigation"
 import { useExploreEvents } from "./useExploreEvents"
 
 export type ExploreEventsScreensParamsList = {

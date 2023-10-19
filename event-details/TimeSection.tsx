@@ -3,7 +3,11 @@ import { StyleSheet, TouchableOpacity, View } from "react-native"
 import * as Calendar from "expo-calendar"
 import { Headline, Caption, CaptionTitle } from "@components/Text"
 import { dayjs, now } from "@lib/date"
-import { CalendarEvent, addToCalendar, getCalendar } from "@lib/Calendar"
+import {
+  CalendarEvent,
+  addToCalendar,
+  getCalendar
+} from "@event-details/Calendar"
 import { Ionicon } from "@components/common/Icons"
 import { Divider } from "react-native-elements"
 import { showToast } from "@components/common/Toasts"
