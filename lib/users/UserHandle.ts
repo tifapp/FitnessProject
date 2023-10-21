@@ -1,4 +1,6 @@
+import { StringUtils } from "@lib/String"
 import { ZodUtils } from "@lib/Zod"
+import { LinkifyIt } from "linkify-it"
 
 /**
  * An reason that a user handle's raw text was unable to be parsed.
@@ -16,26 +18,27 @@ export type UserHandleParsingResult =
  */
 export type UserHandleError = "already-taken" | UserHandleParsingError
 
-const USER_HANDLE_REGEX = /^@[A-Za-z0-9_]{1,15}$/
-const UNPREFIXED_USER_HANDLE_REGEX = /^[A-Za-z0-9_]{1,15}$/
-
 /**
- * Returns true if the given string is a valid user handle.
+ * Adds user handle validation to a linkify instance.
  *
- * A valid user handle is similar to a twitter handle.
- * It must be prefixed with an "@" and can only contain alphanumeric characters
- * and underscores. It also must be less than 15 characters.
- *
- * ```ts
- * isValidUserHandle("@") // 🔴 false, has no characters after @
- * isValidUserHandle("dkjbd") // 🔴 false, doesn't start with @
- * isValidUserHandle("@+++test+++") // 🔴 false, not alpha numeric
- * isValidUserHandle("@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") // 🔴 false, too long
- * isValidUserHandle("@why_people") // ✅ true
- * ```
+ * @param linkify see {@link LinkifyIt}
  */
-export const isValidUserHandle = (handle: string) => {
-  return USER_HANDLE_REGEX.test(handle)
+export const linkifyAddUserHandleValidation = (linkify: LinkifyIt) => {
+  linkify.add("@", {
+    validate: (text: string, pos: number) => {
+      const slice = text.slice(pos)
+      const handle = slice.split(/\s/)[0] ?? slice
+
+      if (!UserHandle.parse(handle).handle) return false
+      if (pos >= 2 && !StringUtils.isWhitespaceCharacter(text, pos - 2)) {
+        return false
+      }
+      return handle.length
+    },
+    normalize: (match) => {
+      match.url = "tifapp://user/" + match.url.replace(/^@/, "")
+    }
+  })
 }
 
 /**
@@ -66,9 +69,11 @@ export class UserHandle {
   /**
    * A zod schema that converts a string to an {@link UserHandle}.
    */
-  static schema = ZodUtils.createOptionalParseableSchema({
+  static zodSchema = ZodUtils.createOptionalParseableSchema({
     parse: (rawValue: string) => UserHandle.parse(rawValue).handle
   })
+
+  private static REGEX = /^[A-Za-z0-9_]{1,15}$/
 
   /**
    * Validates a raw user handle string and returns an instance of this
@@ -87,7 +92,7 @@ export class UserHandle {
       return { handle: undefined, error: "empty" }
     } else if (rawValue.length > 15) {
       return { handle: undefined, error: "too-long" }
-    } else if (!UNPREFIXED_USER_HANDLE_REGEX.test(rawValue)) {
+    } else if (!UserHandle.REGEX.test(rawValue)) {
       return { handle: undefined, error: "bad-format" }
     } else {
       return { handle: new UserHandle(rawValue), error: undefined }

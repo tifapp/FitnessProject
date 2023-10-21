@@ -33,7 +33,7 @@ export class TiFAPI {
       {
         status201: z.object({
           id: z.string().uuid(),
-          handle: UserHandle.schema
+          handle: UserHandle.zodSchema
         })
       }
     )
@@ -76,7 +76,7 @@ export class TiFAPI {
             z.object({
               id: z.string().uuid(),
               name: z.string(),
-              handle: UserHandle.schema
+              handle: UserHandle.zodSchema
             })
           )
         })

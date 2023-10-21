@@ -1,4 +1,6 @@
+import { StringUtils } from "@lib/String"
 import { ZodUtils } from "@lib/Zod"
+import { LinkifyIt } from "linkify-it"
 
 /**
  * A handle that users can reference other events with.
@@ -42,4 +44,27 @@ export class EventHandle {
       ? new EventHandle(rawValue)
       : undefined
   }
+}
+
+/**
+ * Adds event handle validation to a linkify config.
+ *
+ * @param linkify see {@link LinkifyIt}
+ */
+export const linkifyAddEventHandleValidation = (linkify: LinkifyIt) => {
+  linkify.add("!", {
+    validate: (text: string, pos: number) => {
+      const slice = text.slice(pos)
+      const handle = slice.split(/\s/)[0] ?? slice
+
+      if (!EventHandle.parse(handle)) return false
+      if (pos >= 2 && !StringUtils.isWhitespaceCharacter(text, pos - 2)) {
+        return false
+      }
+      return handle.length
+    },
+    normalize: (match) => {
+      match.url = "tifapp://event/" + match.url.replace(/^!/, "")
+    }
+  })
 }

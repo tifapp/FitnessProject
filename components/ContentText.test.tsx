@@ -1,4 +1,6 @@
 import { ContentText } from "@components/ContentText"
+import { EventHandle } from "@event-details/EventHandle"
+import { UserHandle } from "@lib/users"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 
 describe("ContentText tests", () => {
@@ -30,7 +32,9 @@ describe("ContentText tests", () => {
       `This is a handle\n${handle}\nthat brings you to a profile.`
     )
     tapText(handle)
-    expect(handleTappedAction).toHaveBeenCalledWith(handle)
+    expect(userHandleTappedAction).toHaveBeenCalledWith(
+      UserHandle.parse("why_people").handle
+    )
   })
 
   it("does not detect @@handles as a handle", () => {
@@ -51,7 +55,37 @@ describe("ContentText tests", () => {
     expectRegularText(text)
   })
 
-  const handleTappedAction = jest.fn()
+  it("allows for opening an event based on its handle", () => {
+    const handle = "!why_people"
+    renderLinkedText(
+      `This is a handle\n${handle}\nthat brings you to an event.`
+    )
+    tapText(handle)
+    expect(eventHandleTappedAction).toHaveBeenCalledWith(
+      EventHandle.parse("why_people")
+    )
+  })
+
+  it("does not detect !!handles as an event handle", () => {
+    const invalidHandle = "!!why_people"
+    renderLinkedText(invalidHandle)
+    expectRegularText(invalidHandle)
+  })
+
+  it("does not detect invalid event handles", () => {
+    const invalidHandle = "!++++test++++"
+    renderLinkedText(invalidHandle)
+    expectRegularText(invalidHandle)
+  })
+
+  test("the character before an event handle must be whitespace for it to be valid", () => {
+    const text = "...!why_people"
+    renderLinkedText(text)
+    expectRegularText(text)
+  })
+
+  const userHandleTappedAction = jest.fn()
+  const eventHandleTappedAction = jest.fn()
   const urlTappedAction = jest.fn()
 
   const tapText = (text: string) => {
@@ -66,7 +100,8 @@ describe("ContentText tests", () => {
     return render(
       <ContentText
         text={url}
-        onUserHandleTapped={handleTappedAction}
+        onUserHandleTapped={userHandleTappedAction}
+        onEventHandleTapped={eventHandleTappedAction}
         onURLTapped={urlTappedAction}
       />
     )
