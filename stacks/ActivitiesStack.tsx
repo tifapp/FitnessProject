@@ -1,4 +1,6 @@
+import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { BottomNavTabBar } from "@components/bottomTabComponents/BottomNavTabBar"
+import { EventMocks } from "@lib/events"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
@@ -6,9 +8,9 @@ import { EventDetailsProps } from "@screens/EventDetails/EventDetails"
 import { createEventDetailsStackScreens } from "@screens/EventDetails/EventScreensNavigation"
 import { EventFormScreenNavWrapper } from "@screens/EventFormScreenNavWrapper"
 import {
-  LocationSearchPicker,
-  LocationSearchPickerProps
-} from "@screens/LocationSearch"
+  ExploreEventsScreensParamsList,
+  createExploreEventsScreens
+} from "@screens/ExploreEvents"
 import {
   ProfileScreenProps,
   ProfileScreensParamsList,
@@ -22,13 +24,11 @@ import {
 import { TestChatRoomScreen } from "@screens/testScreens/TestChatRoomScreen"
 import { TestEventFormScreen } from "@screens/testScreens/TestEventFormScreen"
 import { TestNotifScreen } from "@screens/testScreens/TestNotifScreen"
-import React from "react"
-import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import {
-  ExploreEventsScreensParamsList,
-  createExploreEventsScreens
-} from "@screens/ExploreEvents"
-import { EventMocks } from "@lib/events"
+  LocationSearchPicker,
+  LocationSearchPickerProps
+} from "location-search"
+import React from "react"
 
 export enum ActivitiesScreenNames {
   EVENT_FORM = "Event Form",

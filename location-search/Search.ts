@@ -1,5 +1,9 @@
 import { randomBool } from "@lib/Random"
-import { TiFLocation, LocationCoordinate2D, mockTiFLocation } from "./Location"
+import {
+  LocationCoordinate2D,
+  TiFLocation,
+  mockTiFLocation
+} from "../lib/location/Location"
 import { RecentLocationAnnotation } from "./RecentsStorage"
 
 /**

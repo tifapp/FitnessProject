@@ -3,20 +3,20 @@ import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
 import { ArrayUtils } from "@lib/Array"
 import { delayData } from "@lib/DelayData"
-import { LocationSearchResult, mockLocationSearchResult } from "@lib/location"
+import { mockLocationSearchResult } from "@lib/location"
 import { NavigationContainer, useNavigation } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
-import {
-  LocationSearchBar,
-  LocationSearchPicker,
-  useLocationSearchPicker
-} from "@screens/LocationSearch"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import {
   getCurrentPositionAsync,
   requestForegroundPermissionsAsync
 } from "expo-location"
+import {
+  LocationSearchBar,
+  LocationSearchPicker,
+  useLocationSearchPicker
+} from "location-search/LocationSearch"
 import { Button } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
