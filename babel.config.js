@@ -28,6 +28,7 @@ module.exports = function (api) {
             "@lib": path.join(rootPath, "lib"),
             "@auth": path.join(rootPath, "auth"),
             "@event-details": path.join(rootPath, "event-details"),
+            "@location-search": path.join(rootPath, "location-search"),
             "@modules": path.join(rootPath, "modules")
           },
           extensions: [".js", ".jsx", ".ts", ".tsx"]

@@ -150,21 +150,21 @@ export function TabNavigation () {
   return (
     <Tab.Navigator
       tabBar={(props) => <BottomNavTabBar {...props} />}
-      children={
-        <>
-          <Tab.Screen name="Map" component={ActivitiesStack} />
-          <Tab.Screen name="Chat Room" component={TestChatRoomScreen} />
-          <Tab.Screen name="Event Form" component={TestEventFormScreen} />
-          <Tab.Screen name="Notifications" component={TestNotifScreen} />
-          <Tab.Screen
-            name="Profile"
-            component={ProfileStack}
-            options={({ route }) => ({
-              tabBarVisible: getTabBarVisibility(route)
-            })}
-          />
-        </>
-      }
-    ></Tab.Navigator>
+      screenOptions={{ headerShown: false }}
+    >
+      <Tab.Screen name="Map" component={ActivitiesStack} />
+      <Tab.Screen name="Chat Room" component={TestChatRoomScreen} />
+      <Tab.Screen name="Event Form" component={TestEventFormScreen} />
+      <Tab.Screen name="Notifications" component={TestNotifScreen} />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileStack}
+        options={({ route }) => ({
+          tabBarStyle: getTabBarVisibility(route)
+            ? { display: "none" }
+            : undefined
+        })}
+      />
+    </Tab.Navigator>
   )
 }

@@ -1,5 +1,3 @@
-export * from "../../location-search/RecentsStorage"
-export * from "../../location-search/Search"
 export * from "./ExpoHelpers"
 export * from "./Location"
 export * from "./Placemark"

@@ -1,11 +1,5 @@
 import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
-import {
-  LocationSearchResult,
-  LocationsSearchQuery,
-  TiFLocation,
-  mockExpoLocationObject,
-  mockLocationSearchResult
-} from "@lib/location"
+import { TiFLocation, mockExpoLocationObject } from "@lib/location"
 import {
   act,
   fireEvent,
@@ -22,11 +16,16 @@ import {
   LocationSearchResultProps,
   LocationSearchResultView,
   useLocationSearchPicker
-} from "../../location-search"
-import "../helpers/Matchers"
-import { neverPromise } from "../helpers/Promise"
-import { TestQueryClientProvider } from "../helpers/ReactQuery"
-import { fakeTimers } from "../helpers/Timers"
+} from "."
+import "../tests/helpers/Matchers"
+import { neverPromise } from "../tests/helpers/Promise"
+import { TestQueryClientProvider } from "../tests/helpers/ReactQuery"
+import { fakeTimers } from "../tests/helpers/Timers"
+import {
+  LocationSearchResult,
+  LocationsSearchQuery,
+  mockLocationSearchResult
+} from "./models"
 
 describe("LocationSearch tests", () => {
   beforeEach(() => jest.resetAllMocks())
