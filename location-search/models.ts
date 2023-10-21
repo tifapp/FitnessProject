@@ -1,5 +1,9 @@
 import { randomBool } from "@lib/Random"
-import { TiFLocation, LocationCoordinate2D, mockTiFLocation } from "./Location"
+import {
+  LocationCoordinate2D,
+  TiFLocation,
+  mockTiFLocation
+} from "../lib/location/Location"
 import { RecentLocationAnnotation } from "./RecentsStorage"
 
 /**
@@ -30,6 +34,18 @@ export type LocationSearchResult = {
    */
   isRecentLocation: boolean
 }
+
+/**
+ * Result data for the location search picker.
+ */
+export type LocationSearchResultsData =
+  | {
+      status: "loading"
+      data: undefined
+    }
+  | { status: "no-results"; data: [] }
+  | { status: "error"; data: undefined }
+  | { status: "success"; data: LocationSearchResult[] }
 
 /**
  * Mocks a {@link LocationSearchResult}.

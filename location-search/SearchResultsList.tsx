@@ -1,22 +1,24 @@
-import React, { ReactElement } from "react"
 import { Caption, CaptionTitle } from "@components/Text"
+import { SkeletonView } from "@components/common/Skeleton"
+import { useFontScale } from "@hooks/Fonts"
 import {
   LocationCoordinate2D,
-  LocationSearchResult,
-  LocationsSearchQuery,
   hashLocationCoordinate,
   milesBetweenLocations
 } from "@lib/location"
+import React, { ReactElement } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view"
-import { SkeletonView } from "@components/common/Skeleton"
 import { Divider } from "react-native-elements"
-import { useFontScale } from "@hooks/Fonts"
+import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view"
 import {
   LocationSearchResultProps,
   LocationSearchResultView
 } from "./SearchResultView"
-import { LocationSearchResultsData } from "./models"
+import {
+  LocationSearchResult,
+  LocationSearchResultsData,
+  LocationsSearchQuery
+} from "./models"
 
 export type LocationSearchResultsListProps = {
   query: LocationsSearchQuery
