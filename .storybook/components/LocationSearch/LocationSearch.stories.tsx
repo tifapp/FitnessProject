@@ -3,7 +3,12 @@ import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
 import { ArrayUtils } from "@lib/Array"
 import { delayData } from "@lib/DelayData"
-import { mockLocationSearchResult } from "@lib/location"
+import {
+  useLocationSearchPicker,
+  LocationSearchPicker
+} from "@location-search/Picker"
+import { LocationSearchBar } from "@location-search/SearchBar"
+import { mockLocationSearchResult } from "@location-search/models"
 import {
   NavigationContainer,
   NavigationProp,
@@ -11,11 +16,6 @@ import {
   useNavigation
 } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
-import {
-  LocationSearchBar,
-  LocationSearchPicker,
-  useLocationSearchPicker
-} from "@screens/LocationSearch"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import {

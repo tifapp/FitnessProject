@@ -1,23 +1,24 @@
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor
-} from "@testing-library/react-native"
-import { CognitoSignInAuthenticator } from "./Authenticator"
-import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
+import { TestCognitoError } from "@auth/CognitoHelpers"
 import {
   NavigationContainer,
   NavigatorScreenParams,
   useFocusEffect
 } from "@react-navigation/native"
-import { SignInParamsList, createSignInScreens } from "./Navigation"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
-import { useState, useCallback } from "react"
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor
+} from "@testing-library/react-native"
+import { useCallback, useState } from "react"
 import { Button, View } from "react-native"
 import { USPhoneNumber } from ".."
 import "../../tests/helpers/Matchers"
-import { TestCognitoError } from "@auth/CognitoHelpers"
+import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
+import { CognitoSignInAuthenticator } from "./Authenticator"
+import { SignInParamsList, createSignInScreens } from "./Navigation"
 
 type TestParamsList = {
   test: undefined
@@ -34,6 +35,7 @@ describe("SignInNavigation tests", () => {
   const authenticator = new CognitoSignInAuthenticator(cognito)
 
   beforeEach(() => jest.useFakeTimers())
+  afterEach(() => act(jest.runAllTimers))
 
   test("sign in with correct credentials", async () => {
     renderSignInScreens()

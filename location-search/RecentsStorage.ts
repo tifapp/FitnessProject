@@ -1,13 +1,13 @@
-import { z } from "zod"
-import {
-  TiFLocation,
-  LocationCoordinate2D,
-  TiFLocationSchema,
-  hashLocationCoordinate
-} from "./Location"
-import AsyncStorage from "@react-native-async-storage/async-storage"
 import { ArrayUtils } from "@lib/Array"
 import { AsyncStorageUtils } from "@lib/AsyncStorage"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import { z } from "zod"
+import {
+  LocationCoordinate2D,
+  TiFLocation,
+  TiFLocationSchema,
+  hashLocationCoordinate
+} from "../lib/location/Location"
 
 /**
  * A zod schema for {@link RecentLocationAnnotationSchema}.
