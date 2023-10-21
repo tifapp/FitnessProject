@@ -15,6 +15,14 @@ jest.mock("react-native-reanimated", () => {
     damping: () => Reanimated.Layout
   }
 
+  Reanimated.FadeIn = {
+    duration: jest.fn()
+  }
+
+  Reanimated.FadeOut = {
+    duration: jest.fn()
+  }
+
   return Reanimated
 })
 

@@ -6,9 +6,9 @@ import {
   Dimensions,
   View
 } from "react-native"
-import Carousel from "react-native-reanimated-carousel";
+import Carousel from "react-native-reanimated-carousel"
 import { CurrentUserEvent } from "@lib/events"
-import { EventCard } from "@components/eventCard/EventCard"
+import { EventCard } from "@event-details/EventCard"
 
 interface EventPagerProps {
   events: CurrentUserEvent[]
@@ -16,16 +16,16 @@ interface EventPagerProps {
 
 const EventCarousel = ({ events }: EventPagerProps) => {
   const height = 280 // Need to set a fixed height
-  const width = Dimensions.get('window').width;
+  const width = Dimensions.get("window").width
 
   return (
     <View style={styles.container}>
       <Carousel
         loop={false}
         data={events}
-        renderItem={({ item }) =>
-          <EventCard event={item} style={{height: "100%"}}/>
-        }
+        renderItem={({ item }) => (
+          <EventCard event={item} style={{ height: "100%" }} />
+        )}
         width={width}
         height={height}
         mode="parallax"
@@ -35,7 +35,7 @@ const EventCarousel = ({ events }: EventPagerProps) => {
           parallaxAdjacentItemScale: 0.7
         }}
         panGestureHandlerProps={{
-          activeOffsetX: [-10, 10],
+          activeOffsetX: [-10, 10]
         }}
       />
     </View>

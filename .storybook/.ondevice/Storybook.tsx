@@ -2,45 +2,51 @@ import React, { useState } from "react"
 import { Text, TouchableOpacity, View } from "react-native"
 
 // Import your stories
+import { setupCognito } from "@auth/CognitoHelpers"
 import { FlatList } from "react-native-gesture-handler"
 import { useAppFonts } from "../../hooks/Fonts"
 import AttendeesListMeta, {
   Basic as AttendeesListScreenBasic
 } from "../components/AttendeesList/AttendeesList.stories"
+import ChangePasswordMeta, {
+  Basic as ChangePasswordBasic
+} from "../components/ChangePassword/ChangePassword.stories"
 import ContentReportingMeta, {
   Default as DefaultReportingFlow
 } from "../components/ContentReporting/ContentReporting.stories"
 import ContentTextMeta, {
   Basic as ContentTextBasic
 } from "../components/ContentText/ContextText.stories"
-import SettingsMeta, {
-  Basic as SettingsScreenBasic
-} from "../components/SettingsScreen/SettingsScreen.stories"
 import ExploreEventsMeta, {
   Basic as ExploreEventsBasic
 } from "../components/Explore/Explore.stories"
-import TextFieldMeta, {
-  Basic as TextFieldBasic
-} from "../components/TextField/TextField.stories"
-import SearchBarMeta, {
-  Default as SearchBarBasic
-} from "../components/SearchBar/SearchBar.stories"
+import ForgotPasswordMeta, {
+  Basic as ForgotPasswordBasic
+} from "../components/ForgotPassword/ForgotPasswordForm.stories"
 import LocationSearchMeta, {
   Basic as LocationSearchBasic
 } from "../components/LocationSearch/LocationSearch.stories"
+import SearchBarMeta, {
+  Default as SearchBarBasic
+} from "../components/SearchBar/SearchBar.stories"
+import SettingsMeta, {
+  Basic as SettingsScreenBasic
+} from "../components/SettingsScreen/SettingsScreen.stories"
 import SignUpMeta, {
   Basic as SignUpBasic
 } from "../components/SignUp/SignUp.stories"
+import SignInMeta, {
+  Basic as SignInBasic
+} from "../components/SignIn/SignIn.stories"
 import VerifcationCodeMeta, {
   Basic as VerifcationCodeBasic
 } from "../components/VerificationCode/VerifyCode.stories"
-import ChangePasswordMeta, {
-  Basic as ChangePasswordBasic
-} from "../components/ChangePassword/ChangePassword.stories"
-import { setupCognito } from "@auth/CognitoHelpers"
-import * as ExpoSecureStore from "expo-secure-store"
+import TextFieldMeta, {
+  Basic as TextFieldBasic
+} from "../components/TextField/TextField.stories"
+import { InMemorySecureStore } from "@auth/CognitoSecureStorage"
 
-setupCognito(ExpoSecureStore)
+setupCognito(new InMemorySecureStore())
 
 // Create an array of stories
 const stories = [
@@ -85,9 +91,19 @@ const stories = [
     args: LocationSearchMeta.args
   },
   {
+    name: ForgotPasswordMeta.title,
+    component: ForgotPasswordBasic,
+    args: ForgotPasswordMeta.args
+  },
+  {
     name: SignUpMeta.title,
     component: SignUpBasic,
     args: SignUpMeta.args
+  },
+  {
+    name: SignInMeta.title,
+    component: SignInBasic,
+    args: SignInMeta.args
   },
   {
     name: VerifcationCodeMeta.title,

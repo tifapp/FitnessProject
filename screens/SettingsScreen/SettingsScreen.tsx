@@ -1,7 +1,11 @@
 import { Caption, Headline } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
-import { useNavigation } from "@react-navigation/native"
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation
+} from "@react-navigation/native"
 import { useAtom } from "jotai"
 import { atomWithStorage } from "jotai/utils"
 import React from "react"
@@ -58,7 +62,7 @@ const EmailSection = () => {
 }
 
 const ChangePasswdSection = () => {
-  const navigation = useNavigation()
+  const navigation: NavigationProp<ParamListBase> = useNavigation()
   return (
     <TouchableOpacity
       onPress={() => {

@@ -3,8 +3,18 @@ import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
 import { ArrayUtils } from "@lib/Array"
 import { delayData } from "@lib/DelayData"
-import { mockLocationSearchResult } from "@lib/location"
-import { NavigationContainer, useNavigation } from "@react-navigation/native"
+import {
+  useLocationSearchPicker,
+  LocationSearchPicker
+} from "@location-search/Picker"
+import { LocationSearchBar } from "@location-search/SearchBar"
+import { mockLocationSearchResult } from "@location-search/models"
+import {
+  NavigationContainer,
+  NavigationProp,
+  ParamListBase,
+  useNavigation
+} from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
@@ -12,11 +22,7 @@ import {
   getCurrentPositionAsync,
   requestForegroundPermissionsAsync
 } from "expo-location"
-import {
-  LocationSearchBar,
-  LocationSearchPicker,
-  useLocationSearchPicker
-} from "location-search/LocationSearch"
+import React from "react"
 import { Button } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
@@ -57,7 +63,7 @@ export const Basic: LocationSearchStory = () => (
 
 const LocationSearchHeader = () => {
   const insets = useSafeAreaInsets()
-  const navigation = useNavigation()
+  const navigation: NavigationProp<ParamListBase> = useNavigation()
   return (
     <LocationSearchBar
       placeholder="Search for locations..."
@@ -88,7 +94,7 @@ const LocationSearchScreen = () => {
 }
 
 const TestScreen = () => {
-  const navigation = useNavigation()
+  const navigation: NavigationProp<ParamListBase> = useNavigation()
   return (
     <Button
       title="Go to Location Search"

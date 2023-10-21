@@ -1,30 +1,35 @@
-import { AuthFormView } from "@auth/AuthSection"
+import { AuthFormView } from "@auth/AuthLayout"
 import { AuthShadedTextField } from "@auth/AuthTextFields"
 import { BodyText } from "@components/Text"
+import { TextToastView } from "@components/common/Toasts"
+import { useFormSubmission } from "@hooks/FormHooks"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useMutation } from "@tanstack/react-query"
 import React, { useRef, useState } from "react"
-import { StyleProp, ViewStyle, StyleSheet, Alert, View } from "react-native"
+import { Alert, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
-import { TextToastView } from "@components/common/Toasts"
-import { useFormSubmission } from "@hooks/FormHooks"
+import { PrivacyFormattable } from "./Models"
 
 export type AuthResendVerificationCodeStatus = "success" | "error"
 
-export type UseAuthVerificationCodeFormEnvironment = {
+export type AuthVerifyCodeResult<Data> =
+  | { isCorrect: false }
+  | { isCorrect: true; data: Data }
+
+export type UseAuthVerificationCodeFormEnvironment<Data> = {
   resendCode: () => Promise<void>
-  submitCode: (code: string) => Promise<boolean>
-  onSuccess: () => void
+  submitCode: (code: string) => Promise<AuthVerifyCodeResult<Data>>
+  onSuccess: (data: Data) => void
 }
 
 /**
  * A hook to manage the form state for a verification code form.
  */
-export const useAuthVerificationCodeForm = ({
+export const useAuthVerificationCodeForm = <Data, >({
   resendCode,
   submitCode,
   onSuccess
-}: UseAuthVerificationCodeFormEnvironment) => {
+}: UseAuthVerificationCodeFormEnvironment<Data>) => {
   const [code, setCode] = useState("")
   const attemptedCodesRef = useRef<string[]>([])
   const resendCodeMutation = useMutation(resendCode)
@@ -55,9 +60,9 @@ export const useAuthVerificationCodeForm = ({
         }
       },
       {
-        onSuccess: (isValidCode: boolean, code: string) => {
-          if (isValidCode) {
-            onSuccess()
+        onSuccess: (result, code) => {
+          if (result.isCorrect) {
+            onSuccess(result.data)
           } else {
             Alert.alert(
               "Invalid Code",
@@ -79,9 +84,8 @@ export const useAuthVerificationCodeForm = ({
 
 export type AuthVerificationCodeProps = {
   code: string
-  codeReceiverName: string
+  codeReceiverName: PrivacyFormattable
   style?: StyleProp<ViewStyle>
-  iOSInModal?: boolean
 } & ReturnType<typeof useAuthVerificationCodeForm>
 
 /**
@@ -95,13 +99,12 @@ export const AuthVerificationCodeFormView = ({
   resendCodeStatus,
   onCodeResent,
   codeReceiverName,
-  iOSInModal,
   style
 }: AuthVerificationCodeProps) => (
   <>
     <AuthFormView
       title="Verify your Account"
-      description={`We have sent a 6-digit verification code to ${codeReceiverName}. Please enter it in the field below.`}
+      description={`We have sent a 6-digit verification code to ${codeReceiverName.formattedForPrivacy}. Please enter it in the field below.`}
       footer={
         <View style={styles.resendContainer}>
           <BodyText style={styles.resendText}>
@@ -112,7 +115,6 @@ export const AuthVerificationCodeFormView = ({
           </TouchableOpacity>
         </View>
       }
-      iOSInModal={iOSInModal}
       submissionTitle="Verify me!"
       submission={submission}
       style={style}
@@ -135,11 +137,11 @@ export const AuthVerificationCodeFormView = ({
     </AuthFormView>
     <TextToastView
       isVisible={resendCodeStatus === "success"}
-      text={`We have resent the code to ${codeReceiverName}.`}
+      text={`We have resent the code to ${codeReceiverName.formattedForPrivacy}.`}
     />
     <TextToastView
       isVisible={resendCodeStatus === "error"}
-      text={`We were unable to resend the code to ${codeReceiverName}, please try again.`}
+      text={`We were unable to resend the code to ${codeReceiverName.formattedForPrivacy}, please try again.`}
     />
   </>
 )

@@ -1,32 +1,31 @@
-import React, { memo, useRef } from "react"
 import {
-  BASE_HEADER_SCREEN_OPTIONS,
+  AuthVerificationCodeFormView,
+  useAuthVerificationCodeForm
+} from "@auth/VerifyCode"
+import {
   ChevronBackButton,
   StackNavigatorType,
   XMarkBackButton
 } from "@components/Navigation"
-import { EmailAddress, USPhoneNumber } from ".."
+import { TouchableIonicon } from "@components/common/Icons"
 import { UserHandle } from "@lib/users"
-import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
-import {
-  SignUpCredentialsFormView,
-  useSignUpCredentialsForm
-} from "./CredentialsForm"
+import { useNavigation } from "@react-navigation/native"
+import { StackScreenProps } from "@react-navigation/stack"
+import React, { memo } from "react"
+import { Alert, StyleSheet } from "react-native"
+import { EmailAddress, USPhoneNumber } from ".."
 import {
   SignUpChangeUserHandleFormView,
   useSignUpChangeUserHandleForm
 } from "./ChangeUserHandle"
-import { SignUpEndingView } from "./Ending"
-import { NavigatorScreenParams, useNavigation } from "@react-navigation/native"
 import {
-  useAuthVerificationCodeForm,
-  AuthVerificationCodeFormView
-} from "@auth/VerifyCode"
+  SignUpCredentialsFormView,
+  useSignUpCredentialsForm
+} from "./CredentialsForm"
+import { SignUpEndingView } from "./Ending"
 import { SignUpEnvironment } from "./Environment"
-import { TouchableIonicon } from "@components/common/Icons"
-import { Alert, StyleSheet } from "react-native"
 
-export type SignUpModalParamsList = {
+export type SignUpParamsList = {
   signUpCredentialsForm: undefined
   signUpVerifyCodeForm: {
     emailOrPhoneNumber: EmailAddress | USPhoneNumber
@@ -36,96 +35,70 @@ export type SignUpModalParamsList = {
   }
   signUpEnding: undefined
 }
-
-export type SignUpParamsList = {
-  signUp: NavigatorScreenParams<SignUpModalParamsList>
-}
-
-const SignUpModalStack = createStackNavigator<SignUpModalParamsList>()
-
 /**
  * Creates the sign up screens on a Stack Navigator.
  */
 export const createSignUpScreens = <Params extends SignUpParamsList>(
   stack: StackNavigatorType<Params>,
-  env: SignUpEnvironment
+  {
+    createAccount,
+    finishRegisteringAccount,
+    resendVerificationCode,
+    changeUserHandle,
+    checkIfUserHandleTaken
+  }: SignUpEnvironment
 ) => {
   return (
-    <stack.Screen
-      name="signUp"
-      options={() => ({ headerShown: false, presentation: "modal" })}
-    >
-      {(props: StackScreenProps<SignUpParamsList, "signUp">) => (
-        <SignUpModalScreen {...props} {...env} />
-      )}
-    </stack.Screen>
-  )
-}
-
-type SignUpModalScreenProps = StackScreenProps<SignUpParamsList, "signUp"> &
-  SignUpEnvironment
-
-const SignUpModalScreen = memo(function Screen ({
-  createAccount,
-  finishRegisteringAccount,
-  resendVerificationCode,
-  changeUserHandle,
-  checkIfUserHandleTaken
-}: SignUpModalScreenProps) {
-  return (
-    <SignUpModalStack.Navigator
-      screenOptions={BASE_HEADER_SCREEN_OPTIONS}
-      initialRouteName="signUpCredentialsForm"
-    >
-      <SignUpModalStack.Screen
+    <>
+      <stack.Screen
         name="signUpCredentialsForm"
         options={() => ({
           headerLeft: SignUpExitButton,
           title: ""
         })}
       >
-        {(props) => (
+        {(props: any) => (
           <CredentialsFormScreen {...props} createAccount={createAccount} />
         )}
-      </SignUpModalStack.Screen>
-      <SignUpModalStack.Screen
+      </stack.Screen>
+      <stack.Screen
         name="signUpVerifyCodeForm"
         options={() => ({
           headerLeft: XMarkBackButton,
           title: ""
         })}
       >
-        {(props) => (
+        {(props: any) => (
           <VerifyCodeFormScreen
             {...props}
             resendVerificationCode={resendVerificationCode}
             finishRegisteringAccount={finishRegisteringAccount}
           />
         )}
-      </SignUpModalStack.Screen>
-      <SignUpModalStack.Screen
+      </stack.Screen>
+      <stack.Screen
         name="signUpChangeUserHandleForm"
         options={() => ({ headerLeft: XMarkBackButton, title: "" })}
       >
-        {(props) => (
+        {(props: any) => (
           <ChangeUserHandleFormScreen
             {...props}
             changeUserHandle={changeUserHandle}
             checkIfUserHandleTaken={checkIfUserHandleTaken}
           />
         )}
-      </SignUpModalStack.Screen>
-      <SignUpModalStack.Screen
+      </stack.Screen>
+      <stack.Screen
         name="signUpEnding"
         options={() => ({ headerLeft: ChevronBackButton, title: "" })}
         component={EndingScreen}
       />
-    </SignUpModalStack.Navigator>
+    </>
   )
-})
+}
 
 type CredentialsScreenProps = StackScreenProps<
-  SignUpModalParamsList,
+  SignUpParamsList,
   "signUpCredentialsForm"
 > &
   Pick<SignUpEnvironment, "createAccount">
@@ -150,7 +123,7 @@ const CredentialsFormScreen = memo(function Screen ({
 })
 
 type VerifyCodeFormScreenProps = StackScreenProps<
-  SignUpModalParamsList,
+  SignUpParamsList,
   "signUpVerifyCodeForm"
 > &
   Pick<SignUpEnvironment, "finishRegisteringAccount" | "resendVerificationCode">
@@ -161,7 +134,6 @@ const VerifyCodeFormScreen = memo(function Screen ({
   finishRegisteringAccount,
   resendVerificationCode
 }: VerifyCodeFormScreenProps) {
-  const generatedUserHandleRef = useRef<UserHandle | undefined>()
   const form = useAuthVerificationCodeForm({
     resendCode: async () =>
       await resendVerificationCode(route.params.emailOrPhoneNumber),
@@ -171,15 +143,15 @@ const VerifyCodeFormScreen = memo(function Screen ({
         code
       )
       if (result === "invalid-verification-code") {
-        return false
+        return { isCorrect: false }
+      } else {
+        return { isCorrect: true, data: result }
       }
-      generatedUserHandleRef.current = result
-      return true
     },
-    onSuccess: () => {
-      if (generatedUserHandleRef.current) {
+    onSuccess: (data) => {
+      if (data) {
         navigation.replace("signUpChangeUserHandleForm", {
-          initialHandle: generatedUserHandleRef.current
+          initialHandle: data
         })
       }
     }
@@ -187,14 +159,13 @@ const VerifyCodeFormScreen = memo(function Screen ({
   return (
     <AuthVerificationCodeFormView
       {...form}
-      iOSInModal
-      codeReceiverName={route.params.emailOrPhoneNumber.formattedForPrivacy}
+      codeReceiverName={route.params.emailOrPhoneNumber}
     />
   )
 })
 
 type ChangeUserHandleFormScreenProps = StackScreenProps<
-  SignUpModalParamsList,
+  SignUpParamsList,
   "signUpChangeUserHandleForm"
 > &
   Pick<SignUpEnvironment, "checkIfUserHandleTaken" | "changeUserHandle">
@@ -215,7 +186,7 @@ const ChangeUserHandleFormScreen = memo(function Screen ({
 
 const EndingScreen = ({
   navigation
-}: StackScreenProps<SignUpModalParamsList, "signUpEnding">) => (
+}: StackScreenProps<SignUpParamsList, "signUpEnding">) => (
   <SignUpEndingView
     onCallToActionTapped={() => navigation.getParent()?.goBack()}
   />

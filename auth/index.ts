@@ -1,5 +1,3 @@
 export * from "./ChangePassword"
-export * from "./Password"
-export * from "./Email"
-export * from "./PhoneNumber"
+export * from "./Models"
 export { setupCognito } from "./CognitoHelpers"
