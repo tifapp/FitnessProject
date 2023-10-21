@@ -23,10 +23,15 @@ export class TestFilesystem implements Filesystem {
   async appendString (filepath: string, data: string) {
     const testFilepath = TEST_DIRECTORY + filepath
     const dirname = path.dirname(testFilepath)
+    console.log(dirname, testFilepath)
     if (!fs.existsSync(dirname)) {
       fs.mkdirSync(dirname, { recursive: true })
     }
+    if (!fs.existsSync(testFilepath)) {
+      fs.openSync(testFilepath, "w")
+    }
     fs.appendFileSync(testFilepath, data)
+    fs.chmodSync(testFilepath, "777")
   }
 
   /**
@@ -50,6 +55,7 @@ export class TestFilesystem implements Filesystem {
 
   private setup () {
     fs.mkdirSync(TEST_DIRECTORY)
+    fs.chmodSync(TEST_DIRECTORY, "777")
   }
 
   private cleanup () {
