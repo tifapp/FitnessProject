@@ -24,6 +24,7 @@ import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
 import { mswServer } from "../../tests/helpers/msw"
 import { createSignUpEnvironment } from "./Environment"
 import { SignUpParamsList, createSignUpScreens } from "./Navigation"
+import { fakeTimers } from "../../tests/helpers/Timers"
 
 type TestSignUpParamsList = {
   test: undefined
@@ -47,6 +48,9 @@ describe("SignUpNavigation tests", () => {
       )
     )
   )
+
+  afterEach(() => act(jest.runAllTimers))
+  fakeTimers()
 
   beforeEach(() => {
     jest.resetAllMocks()
