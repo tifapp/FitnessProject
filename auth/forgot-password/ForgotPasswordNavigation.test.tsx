@@ -125,7 +125,8 @@ const renderForgotPasswordNavigation = () => {
   const Stack = createStackNavigator<TestForgotPasswordParamsList>()
   const signUpScreens = createForgotPasswordScreens(Stack, {
     initiateForgotPassword,
-    submitResettedPassword
+    submitResettedPassword,
+    resendForgotPasswordCode: jest.fn()
   })
   return render(
     <TestQueryClientProvider>

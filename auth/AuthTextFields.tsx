@@ -118,6 +118,7 @@ export const AuthShadedEmailPhoneTextFieldView = forwardRef(function TextField (
       iconBackgroundColor="#14B329"
       keyboardType={activeTextType === "phone" ? "number-pad" : "email-address"}
       placeholder="Phone number or Email"
+      autoCapitalize="none"
       error={errorReason && emailPhoneTextStateErrorMessage(errorReason)}
       rightAddon={
         <TouchableOpacity

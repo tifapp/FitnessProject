@@ -1,7 +1,4 @@
-import {
-  cognitoFormatEmailOrPhoneNumber,
-  isCognitoErrorWithCode
-} from "@auth/CognitoHelpers"
+import { isCognitoErrorWithCode } from "@auth/CognitoHelpers"
 import { Auth } from "@aws-amplify/auth"
 import { EmailAddress, Password, USPhoneNumber } from ".."
 
@@ -26,9 +23,7 @@ export const createForgotPasswordEnvironment = (
     emailOrPhoneNumber: EmailAddress | USPhoneNumber
   ): Promise<ForgotPasswordResult> => {
     try {
-      await cognito.forgotPassword(
-        cognitoFormatEmailOrPhoneNumber(emailOrPhoneNumber)
-      )
+      await cognito.forgotPassword(emailOrPhoneNumber.toString())
       return "success"
     } catch (err) {
       if (!isCognitoErrorWithCode(err, "UserNotFoundException")) throw err
@@ -36,6 +31,16 @@ export const createForgotPasswordEnvironment = (
         ? "invalid-email"
         : "invalid-phone-number"
     }
+  },
+  /**
+   * Attemps to resend a forgot password code.
+   *
+   * @param emailOrPhoneNumber the email or phone number of the account to resend the code to.
+   */
+  resendForgotPasswordCode: async (
+    emailOrPhoneNumber: EmailAddress | USPhoneNumber
+  ) => {
+    await cognito.forgotPassword(emailOrPhoneNumber.toString())
   },
   /**
    * Resets the user's password.
@@ -51,7 +56,7 @@ export const createForgotPasswordEnvironment = (
   ): Promise<ResetPasswordResult> => {
     try {
       await cognito.forgotPasswordSubmit(
-        cognitoFormatEmailOrPhoneNumber(emailOrPhoneNumber),
+        emailOrPhoneNumber.toString(),
         verificationCode,
         password.toString()
       )

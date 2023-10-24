@@ -100,12 +100,14 @@ export class USPhoneNumber implements PrivacyFormattable {
     return `(***) ***-${this.rawValue.substring(6)}`
   }
 
-  get e164Formatted () {
-    return `+1${this.rawValue}`
-  }
-
+  /**
+   * Formats this phone number as an e.164 formatted string.
+   *
+   * Ex.
+   * `(123) 456-7890` -> `+11234567890`
+   */
   toString () {
-    return this.rawValue
+    return `+1${this.rawValue}`
   }
 
   /**
