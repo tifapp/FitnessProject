@@ -29,6 +29,7 @@
       "@modules/*": ["./modules/*"],
       "@event-details/*": ["./event-details/*"],
       "@event-details": ["./event-details"],
+      "@location-search/*": ["./location-search/*"],
       "env": ["./.env"]
     }
   },

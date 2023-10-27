@@ -1,20 +1,20 @@
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { BottomNavTabBar } from "@components/bottomTabComponents/BottomNavTabBar"
+import { EventDetailsProps } from "@event-details/EventDetails"
+import { createEventDetailsStackScreens } from "@event-details/EventScreensNavigation"
 import { EventMocks } from "@lib/events"
+import {
+  LocationSearchPicker,
+  LocationSearchPickerProps
+} from "@location-search/Picker"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
-import { EventDetailsProps } from "@event-details/EventDetails"
-import { createEventDetailsStackScreens } from "@event-details/EventScreensNavigation"
 import { EventFormScreenNavWrapper } from "@screens/EventFormScreenNavWrapper"
 import {
   ExploreEventsScreensParamsList,
   createExploreEventsScreens
 } from "@screens/ExploreEvents"
-import {
-  LocationSearchPicker,
-  LocationSearchPickerProps
-} from "@screens/LocationSearch"
 import {
   ProfileScreenProps,
   ProfileScreensParamsList,
@@ -150,21 +150,21 @@ export function TabNavigation () {
   return (
     <Tab.Navigator
       tabBar={(props) => <BottomNavTabBar {...props} />}
-      children={
-        <>
-          <Tab.Screen name="Map" component={ActivitiesStack} />
-          <Tab.Screen name="Chat Room" component={TestChatRoomScreen} />
-          <Tab.Screen name="Event Form" component={TestEventFormScreen} />
-          <Tab.Screen name="Notifications" component={TestNotifScreen} />
-          <Tab.Screen
-            name="Profile"
-            component={ProfileStack}
-            options={({ route }) => ({
-              tabBarVisible: getTabBarVisibility(route)
-            })}
-          />
-        </>
-      }
-    ></Tab.Navigator>
+      screenOptions={{ headerShown: false }}
+    >
+      <Tab.Screen name="Map" component={ActivitiesStack} />
+      <Tab.Screen name="Chat Room" component={TestChatRoomScreen} />
+      <Tab.Screen name="Event Form" component={TestEventFormScreen} />
+      <Tab.Screen name="Notifications" component={TestNotifScreen} />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileStack}
+        options={({ route }) => ({
+          tabBarStyle: getTabBarVisibility(route)
+            ? { display: "none" }
+            : undefined
+        })}
+      />
+    </Tab.Navigator>
   )
 }
