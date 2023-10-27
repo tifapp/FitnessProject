@@ -2,7 +2,6 @@ import { Headline, Title } from "@components/Text"
 import AttendanceButton from "@components/bottomTabComponents/AttendanceButton"
 import ExpandableText from "@components/common/ExpandableText"
 import ProfileImageAndNameWithFriend from "@components/profileImageComponents/ProfileImageAndNameWithFriend"
-import { CalendarEvent } from "@event-details/Calendar"
 import { OpenInMapsRequest, openInMaps } from "@event-details/OpenInMaps"
 import { CurrentUserEvent } from "@lib/events"
 import React from "react"
@@ -29,13 +28,6 @@ const BOTTOM_TAB_HEIGHT = 80
 const MARGIN_SPACING = 16
 
 const EventDetails = ({ event }: EventDetailsProps) => {
-  const calenderEvent: CalendarEvent = {
-    duration: event.dateRange,
-    id: event.id,
-    description: event.description!,
-    coordinates: event.location.coordinate,
-    title: event.title
-  }
   const mapDetails: OpenInMapsRequest = {
     coordinates: event.location.coordinate,
     placemark: event.location.placemark
@@ -63,7 +55,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
           userFriendStatus="not-friends"
         />
         <View style={styles.iconSection}>
-          <TimeSection color={event.color} event={calenderEvent} />
+          <TimeSection color={event.color} event={event} />
           <LocationSection
             color={event.color}
             coordinates={event.location.coordinate}
