@@ -1,2 +1,2 @@
 export * from "./EventScreensNavigation"
-export * from "./EventHandle"
+export * from "./Event"

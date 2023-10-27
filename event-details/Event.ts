@@ -4,9 +4,79 @@ import {
   Placemark,
   placemarkToFormattedAddress
 } from "@lib/location"
-import { UserToProfileRelationStatus } from "@lib/users"
+import { UserHandle, UserToProfileRelationStatus } from "@lib/users"
 import { uuid } from "@lib/uuid"
 import * as Clipboard from "expo-clipboard"
+import { StringUtils } from "@lib/String"
+import { ZodUtils } from "@lib/Zod"
+import { LinkifyIt } from "linkify-it"
+
+/**
+ * A handle that users can reference other events with.
+ *
+ * Each event has a handle that is generated from its name similar to user handles.
+ * Since {@link UserHandle}s are already referenced through the `@` sign, event handles
+ * are referenced via `!`.
+ *
+ * A valid event handle consists of only letters, numbers, and underscores, but
+ * must start with a letter and be at least 1 character long.
+ */
+export class EventHandle {
+  static zodSchema = ZodUtils.createOptionalParseableSchema(EventHandle)
+
+  readonly rawValue: string
+
+  private constructor (rawValue: string) {
+    this.rawValue = rawValue
+  }
+
+  /**
+   * Formats this handle by prefixing it with an "!".
+   */
+  toString () {
+    return `!${this.rawValue}`
+  }
+
+  private static REGEX = /^[a-zA-Z]{1}[a-zA-Z0-9_]*$/
+
+  /**
+   * Attempts to parse an {@link EventHandle} from a raw string.
+   *
+   * A valid event handle consists of only letters, numbers, and underscores, but
+   * must start with a letter and be at least 1 character long.
+   *
+   * @param rawValue the raw string to attempt to parse.
+   * @returns an {@link EventHandle} instance if valid.
+   */
+  static parse (rawValue: string) {
+    return EventHandle.REGEX.test(rawValue)
+      ? new EventHandle(rawValue)
+      : undefined
+  }
+}
+
+/**
+ * Adds event handle validation to a linkify config.
+ *
+ * @param linkify see {@link LinkifyIt}
+ */
+export const linkifyAddEventHandleValidation = (linkify: LinkifyIt) => {
+  linkify.add("!", {
+    validate: (text: string, pos: number) => {
+      const slice = text.slice(pos)
+      const handle = slice.split(/\s/)[0] ?? slice
+
+      if (!EventHandle.parse(handle)) return false
+      if (pos >= 2 && !StringUtils.isWhitespaceCharacter(text, pos - 2)) {
+        return false
+      }
+      return handle.length
+    },
+    normalize: (match) => {
+      match.url = "tifapp://event/" + match.url.replace(/^!/, "")
+    }
+  })
+}
 
 /**
  * A type for the color value for an event.
@@ -27,7 +97,7 @@ export enum EventColors {
 export type EventAttendee = {
   id: string
   username: string
-  handle: string
+  handle: UserHandle
   profileImageURL?: string
   relationStatus: UserToProfileRelationStatus
 }
@@ -39,7 +109,7 @@ export namespace EventAttendeeMocks {
   export const Alivs = {
     id: uuid(),
     username: "Alvis",
-    handle: "alvis",
+    handle: UserHandle.optionalParse("alvis")!,
     profileImageURL:
       "https://www.escapistmagazine.com/wp-content/uploads/2023/05/xc3-future-redeemed-alvis.jpg?resize=1200%2C673"
   } as EventAttendee
@@ -47,13 +117,13 @@ export namespace EventAttendeeMocks {
   export const BlobJr = {
     id: uuid(),
     username: "Blob Jr.",
-    handle: "SmallBlob"
+    handle: UserHandle.optionalParse("SmallBlob")!
   } as EventAttendee
 
   export const BlobSr = {
     id: uuid(),
     username: "Blob Sr.",
-    handle: "TheOriginalBlob"
+    handle: UserHandle.optionalParse("OriginalBlob")!
   } as EventAttendee
 
   // NB: Unfortunately, we can't reuse Harrison's legendary
@@ -69,54 +139,6 @@ export namespace EventAttendeeMocks {
     id: uuid(),
     username: "Haley Host"
   } as EventAttendee
-}
-
-/**
- * A type representing events that are attended and hosted by users.
- */
-export type Event = {
-  host: EventAttendee
-  id: string
-  title: string
-  description: string
-  dateRange: FixedDateRange
-  color: EventColors
-  coordinates: LocationCoordinate2D
-  placemark?: Placemark
-  shouldHideAfterStartDate: boolean
-  attendeeCount: number
-}
-
-/**
- * A type for determining whether or not a user is a host,
- * attendee, or a non-participant of an event.
- */
-export type EventUserAttendeeStatus =
-  | "hosting"
-  | "attending"
-  | "not-participating"
-
-/**
- * Returns true if the status indicates that the user is hosting the event.
- */
-export const isHostingEvent = (attendeeStatus: EventUserAttendeeStatus) => {
-  return attendeeStatus === "hosting"
-}
-
-/**
- * Returns true if the status indicates that the user is either hosting or
- * attending the event.
- */
-export const isAttendingEvent = (attendeeStatus: EventUserAttendeeStatus) => {
-  return attendeeStatus !== "not-participating"
-}
-
-/**
- * An event type that adds additional data on a specific user's
- * perspective of the event.
- */
-export type CurrentUserEvent = Event & {
-  userAttendeeStatus: EventUserAttendeeStatus
 }
 
 /**
@@ -154,12 +176,61 @@ const formatEventLocation = (location: EventLocation) => {
 }
 
 /**
+ * A type representing events that are attended and hosted by users.
+ */
+export type Event = {
+  host: EventAttendee
+  id: string
+  handle: EventHandle
+  title: string
+  description: string
+  dateRange: FixedDateRange
+  color: EventColors
+  location: EventLocation
+  shouldHideAfterStartDate: boolean
+  attendeeCount: number
+}
+
+/**
+ * A type for determining whether or not a user is a host,
+ * attendee, or a non-participant of an event.
+ */
+export type EventUserAttendeeStatus =
+  | "hosting"
+  | "attending"
+  | "not-participating"
+
+/**
+ * Returns true if the status indicates that the user is hosting the event.
+ */
+export const isHostingEvent = (attendeeStatus: EventUserAttendeeStatus) => {
+  return attendeeStatus === "hosting"
+}
+
+/**
+ * Returns true if the status indicates that the user is either hosting or
+ * attending the event.
+ */
+export const isAttendingEvent = (attendeeStatus: EventUserAttendeeStatus) => {
+  return attendeeStatus !== "not-participating"
+}
+
+/**
+ * An event type that adds additional data on a specific user's
+ * perspective of the event.
+ */
+export type CurrentUserEvent = Event & {
+  userAttendeeStatus: EventUserAttendeeStatus
+}
+
+/**
  * Some mock {@link CurrentUserEvent} objects.
  */
 export namespace EventMocks {
   export const PickupBasketball = {
     host: EventAttendeeMocks.Alivs,
     id: uuid(),
+    handle: EventHandle.parse("pickup_basketball1234")!,
     title: "Pickup Basketball",
     description: "I'm better than Lebron James.",
     dateRange: dateRange(
@@ -167,15 +238,17 @@ export namespace EventMocks {
       new Date("2023-03-18T13:00:00")
     ),
     color: EventColors.Orange,
-    coordinates: {
-      latitude: 36.994621,
-      longitude: -122.064537
-    },
-    placemark: {
-      name: "Basketball Court",
-      city: "Santa Cruz",
-      region: "CA",
-      postalCode: "95064"
+    location: {
+      coordinate: {
+        latitude: 36.994621,
+        longitude: -122.064537
+      },
+      placemark: {
+        name: "Basketball Court",
+        city: "Santa Cruz",
+        region: "CA",
+        postalCode: "95064"
+      }
     },
     shouldHideAfterStartDate: false,
     attendeeCount: 10,
@@ -186,6 +259,7 @@ export namespace EventMocks {
   export const Multiday = {
     host: EventAttendeeMocks.Alivs,
     id: uuid(),
+    handle: EventHandle.parse("multiday_marathon6666")!,
     title: "Multiday Event",
     description: "This event runs for more than one day.",
     dateRange: dateRange(
@@ -193,15 +267,17 @@ export namespace EventMocks {
       new Date("2023-03-21T12:00:00")
     ),
     color: EventColors.Purple,
-    coordinates: {
-      latitude: 55.862634,
-      longitude: -4.280214
-    },
-    placemark: {
-      name: "McDonalds",
-      city: "Glasgow",
-      region: "Scotland",
-      postalCode: "G3 8JU"
+    location: {
+      coordinate: {
+        latitude: 55.862634,
+        longitude: -4.280214
+      },
+      placemark: {
+        name: "McDonalds",
+        city: "Glasgow",
+        region: "Scotland",
+        postalCode: "G3 8JU"
+      }
     },
     shouldHideAfterStartDate: false,
     attendeeCount: 3,
@@ -212,6 +288,7 @@ export namespace EventMocks {
   export const NoPlacemarkInfo = {
     host: EventAttendeeMocks.Alivs,
     id: uuid(),
+    handle: EventHandle.parse("lol")!,
     title: "No Placemark Info",
     attendeeCount: 5,
     description:
@@ -222,9 +299,11 @@ export namespace EventMocks {
       new Date("2023-03-18T15:00:00")
     ),
     color: EventColors.Green,
-    coordinates: {
-      latitude: 40.777874,
-      longitude: -73.969717
+    location: {
+      coordinate: {
+        latitude: 40.777874,
+        longitude: -73.969717
+      }
     },
     shouldHideAfterStartDate: false,
     userAttendeeStatus: "attending",

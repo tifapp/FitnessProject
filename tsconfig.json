@@ -28,6 +28,7 @@
       "@auth/*": ["./auth/*"],
       "@modules/*": ["./modules/*"],
       "@event-details/*": ["./event-details/*"],
+      "@event-details": ["./event-details"],
       "env": ["./.env"]
     }
   },

@@ -1,6 +1,6 @@
 import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { CurrentUserEvent, EventColors } from "@lib/events/Event"
+import { CurrentUserEvent, EventColors } from "./Event"
 import { placemarkToAbbreviatedAddress } from "@lib/location"
 import { dayjs, now } from "@lib/date"
 import { Ionicon, IoniconName } from "@components/common/Icons"
@@ -24,7 +24,7 @@ export const EventCard = ({ event, style }: EventCardProps) => {
       <View style={[styles.topRow, styles.flexRow]}>
         <ProfileImageAndName
           username={event.host.username}
-          userHandle={event.host.handle}
+          userHandle={event.host.handle.toString()}
           imageURL={event.host.profileImageURL}
         />
         <ConfirmationDialogue style={styles.moreButtonStyle} />
@@ -45,8 +45,8 @@ export const EventCard = ({ event, style }: EventCardProps) => {
         <IconRowView
           icon="location"
           text={
-            event.placemark
-              ? placemarkToAbbreviatedAddress(event.placemark)
+            event.location.placemark
+              ? placemarkToAbbreviatedAddress(event.location.placemark)
               : "Unknown Address"
           }
           color={event.color}
