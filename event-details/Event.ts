@@ -1,7 +1,12 @@
 import { dateRange, FixedDateRange } from "@lib/date"
-import { LocationCoordinate2D, Placemark } from "@lib/location"
+import {
+  LocationCoordinate2D,
+  Placemark,
+  placemarkToFormattedAddress
+} from "@lib/location"
 import { UserToProfileRelationStatus } from "@lib/users"
 import { uuid } from "@lib/uuid"
+import * as Clipboard from "expo-clipboard"
 
 /**
  * A type for the color value for an event.
@@ -112,6 +117,40 @@ export const isAttendingEvent = (attendeeStatus: EventUserAttendeeStatus) => {
  */
 export type CurrentUserEvent = Event & {
   userAttendeeStatus: EventUserAttendeeStatus
+}
+
+/**
+ * The location of an event.
+ *
+ * Event locations may not have a placemark, this could either be because
+ * the event is in the middle of nowhere, or its placemark hasn't been fully
+ * decoded for some reason.
+ */
+export type EventLocation = {
+  coordinate: LocationCoordinate2D
+  placemark?: Placemark
+}
+
+/**
+ * Copies an event location to the clipboard.
+ *
+ * If the event has no formattable placemark, the coordinates are formatted
+ * and copied to the clipboard instead of the formatted address of the placemark.
+ */
+export const copyEventLocationToClipboard = (
+  location: EventLocation,
+  setClipboardText: (text: string) => Promise<void> = expoCopyTextToClipboard
+) => setClipboardText(formatEventLocation(location))
+
+const expoCopyTextToClipboard = async (text: string) => {
+  await Clipboard.setStringAsync(text)
+}
+
+const formatEventLocation = (location: EventLocation) => {
+  const formattedLocationCoordinate = `${location.coordinate.latitude}, ${location.coordinate.longitude}`
+  if (!location.placemark) return formattedLocationCoordinate
+  const formattedPlacemark = placemarkToFormattedAddress(location.placemark)
+  return formattedPlacemark ?? formattedLocationCoordinate
 }
 
 /**
