@@ -24,15 +24,7 @@ const Stack = createStackNavigator<ForgotPasswordParamsList>()
 
 const signUpScreens = createForgotPasswordScreens(
   Stack,
-  createForgotPasswordEnvironment({
-    forgotPassword: async (username: string) =>
-      await Auth.forgotPassword(username),
-    forgotPasswordSubmit: async (
-      username: string,
-      code: string,
-      password: string
-    ) => await Auth.forgotPasswordSubmit(username, code, password)
-  })
+  createForgotPasswordEnvironment(Auth)
 )
 
 export const Basic: ForgotPasswordStory = () => (

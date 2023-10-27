@@ -2,10 +2,7 @@ import { Auth } from "@aws-amplify/auth"
 import { EmailAddress, Password, USPhoneNumber } from ".."
 import { TiFAPI } from "@api-client/TiFAPI"
 import { UserHandle } from "@lib/users"
-import {
-  cognitoFormatEmailOrPhoneNumber,
-  isCognitoErrorWithCode
-} from "@auth/CognitoHelpers"
+import { isCognitoErrorWithCode } from "@auth/CognitoHelpers"
 
 export type CreateAccountResult =
   | "success"
@@ -37,20 +34,15 @@ export const createSignUpEnvironment = (
     password: Password
   ): Promise<CreateAccountResult> => {
     try {
+      const attributes = { name } as Record<string, string>
+      // NB: If we have a phone number, then cognito throws an error if we have the email key and vice versa.
+      const verificationAttributeKey =
+        emailOrPhoneNumber instanceof USPhoneNumber ? "phoneNumber" : "email"
+      attributes[verificationAttributeKey] = emailOrPhoneNumber.toString()
       await cognito.signUp({
-        username: cognitoFormatEmailOrPhoneNumber(emailOrPhoneNumber),
+        username: emailOrPhoneNumber.toString(),
         password: password.rawValue,
-        attributes:
-          // NB: If we have a phone number, then cognito throws an error if we have the email key and vice versa.
-          emailOrPhoneNumber instanceof USPhoneNumber
-            ? {
-              name,
-              phoneNumber: cognitoFormatEmailOrPhoneNumber(emailOrPhoneNumber)
-            }
-            : {
-              name,
-              email: cognitoFormatEmailOrPhoneNumber(emailOrPhoneNumber)
-            },
+        attributes,
         autoSignIn: {
           enabled: true
         }
@@ -71,9 +63,7 @@ export const createSignUpEnvironment = (
   resendVerificationCode: async (
     emailOrPhoneNumber: EmailAddress | USPhoneNumber
   ) => {
-    await cognito.resendSignUp(
-      cognitoFormatEmailOrPhoneNumber(emailOrPhoneNumber)
-    )
+    await cognito.resendSignUp(emailOrPhoneNumber.toString())
   },
   /**
    * Returns true if another user is using the given user handle.
@@ -110,7 +100,7 @@ export const createSignUpEnvironment = (
   ) => {
     try {
       await cognito.confirmSignUpWithAutoSignIn(
-        cognitoFormatEmailOrPhoneNumber(emailOrPhoneNumber),
+        emailOrPhoneNumber.toString(),
         verificationCode
       )
       return await tifAPI
