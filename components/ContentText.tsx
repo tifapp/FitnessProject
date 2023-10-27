@@ -5,7 +5,7 @@ import { BodyText, Headline } from "./Text"
 import { linkify } from "@lib/Linkify"
 import { Match } from "linkify-it"
 import { UserHandle } from "@lib/users"
-import { EventHandle } from "@event-details/EventHandle"
+import { EventHandle } from "@event-details"
 
 export type ContentTextCallbacks = {
   onUserHandleTapped: (handle: UserHandle) => void

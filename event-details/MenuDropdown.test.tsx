@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react-native"
 import React from "react"
 import { captureAlerts } from "../tests/helpers/Alerts"
 import { MenuProvider } from "react-native-popup-menu"
-import MenuDropdown from "@event-details/MenuDropdown"
+import MenuDropdown from "./MenuDropdown"
 
 jest.mock("react-native-popup-menu", () => ({
   Menu: "Menu",

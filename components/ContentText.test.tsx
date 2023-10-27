@@ -1,5 +1,5 @@
 import { ContentText } from "@components/ContentText"
-import { EventHandle } from "@event-details/EventHandle"
+import { EventHandle } from "@event-details"
 import { UserHandle } from "@lib/users"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 

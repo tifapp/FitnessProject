@@ -33,12 +33,12 @@ const EventDetails = ({ event }: EventDetailsProps) => {
     duration: event.dateRange,
     id: event.id,
     description: event.description!,
-    coordinates: event.coordinates,
+    coordinates: event.location.coordinate,
     title: event.title
   }
   const mapDetails: OpenInMapsRequest = {
-    coordinates: event.coordinates,
-    placemark: event.placemark
+    coordinates: event.location.coordinate,
+    placemark: event.location.placemark
   }
 
   const openMapWithoutDirections = () => {
@@ -56,7 +56,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
         <ProfileImageAndNameWithFriend
           imageURL={event.host.profileImageURL}
           username={event.host.username}
-          userHandle={event.host.handle}
+          userHandle={event.host.handle.toString()}
           eventColor={event.color}
           style={[styles.flexRow, { marginVertical: 24 }]}
           imageStyle={styles.profileImage}
@@ -66,8 +66,8 @@ const EventDetails = ({ event }: EventDetailsProps) => {
           <TimeSection color={event.color} event={calenderEvent} />
           <LocationSection
             color={event.color}
-            coordinates={event.coordinates}
-            placemark={event.placemark}
+            coordinates={event.location.coordinate}
+            placemark={event.location.placemark}
           />
           <AttendeeSection
             color={event.color}
@@ -103,8 +103,8 @@ const EventDetails = ({ event }: EventDetailsProps) => {
               style={{ width: "100%", height: 160 }}
               minZoomLevel={12}
               initialRegion={{
-                latitude: event.coordinates.latitude,
-                longitude: event.coordinates.longitude,
+                latitude: event.location.coordinate.latitude,
+                longitude: event.location.coordinate.longitude,
                 latitudeDelta: 0.1,
                 longitudeDelta: 0.1
               }}
@@ -120,7 +120,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
                   }}
                 />
               )}
-              marker={{ key: event.id, location: event.coordinates }}
+              marker={{ key: event.id, location: event.location.coordinate }}
             />
           </TouchableOpacity>
         </View>

@@ -70,7 +70,7 @@ export class UserHandle {
    * A zod schema that converts a string to an {@link UserHandle}.
    */
   static zodSchema = ZodUtils.createOptionalParseableSchema({
-    parse: (rawValue: string) => UserHandle.parse(rawValue).handle
+    parse: (rawValue: string) => UserHandle.optionalParse(rawValue)
   })
 
   private static REGEX = /^[A-Za-z0-9_]{1,15}$/
@@ -97,5 +97,12 @@ export class UserHandle {
     } else {
       return { handle: new UserHandle(rawValue), error: undefined }
     }
+  }
+
+  /**
+   * Attempts to parse this handle and returns `undefined` if the handle can't be parsed.
+   */
+  static optionalParse (rawValue: string) {
+    return UserHandle.parse(rawValue).handle
   }
 }

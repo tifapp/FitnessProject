@@ -1,6 +1,6 @@
 import linkifyIt from "linkify-it"
 import { linkifyAddUserHandleValidation } from "./users"
-import { linkifyAddEventHandleValidation } from "@event-details/EventHandle"
+import { linkifyAddEventHandleValidation } from "@event-details"
 
 /**
  * The app-wide `linkifyIt` config.
