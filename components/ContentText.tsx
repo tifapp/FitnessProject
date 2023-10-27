@@ -4,19 +4,27 @@ import { openURL } from "expo-linking"
 import { BodyText, Headline } from "./Text"
 import { linkify } from "@lib/Linkify"
 import { Match } from "linkify-it"
+import { UserHandle } from "@lib/users"
+import { EventHandle } from "@event-details/EventHandle"
+
+export type ContentTextCallbacks = {
+  onUserHandleTapped: (handle: UserHandle) => void
+  onEventHandleTapped: (handle: EventHandle) => void
+  onURLTapped: (url: string) => void
+}
 
 /**
  * Props for {@link ContextText}.
  */
 export type ContentTextProps = {
   text: string
-  onUserHandleTapped: (handle: string) => void
 
   /**
    * Defaults to expo's `openURL` function.
    */
   onURLTapped?: (url: string) => void
-} & Omit<TextProps, "children">
+} & Omit<TextProps, "children"> &
+  Omit<ContentTextCallbacks, "onURLTapped">
 
 /**
  * A text component which allows user handles and links to be interacted with.
@@ -26,54 +34,67 @@ export type ContentTextProps = {
  */
 export const ContentText = ({
   text,
-  onUserHandleTapped: onHandleTapped,
+  onUserHandleTapped,
+  onEventHandleTapped,
   onURLTapped = openURL,
   ...props
 }: ContentTextProps) => (
   <BodyText {...props} testID="regular-text">
-    {useTextBlocks(text, onURLTapped, onHandleTapped)}
+    {useTextBlocks(
+      text,
+      useMemo(
+        () => ({ onURLTapped, onEventHandleTapped, onUserHandleTapped }),
+        [onUserHandleTapped, onEventHandleTapped, onURLTapped]
+      )
+    )}
   </BodyText>
 )
 
-const useTextBlocks = (
-  text: string,
-  onURLTapped: (url: string) => void,
-  onHandleTapped: (handle: string) => void
-) => {
-  return useMemo(
-    () => renderLinkTextBlocks(text, onURLTapped, onHandleTapped),
-    [text, onURLTapped, onHandleTapped]
-  )
+const useTextBlocks = (text: string, callbacks: ContentTextCallbacks) => {
+  return useMemo(() => renderLinkTextBlocks(text, callbacks), [text, callbacks])
 }
 
 const renderLinkTextBlocks = (
   text: string,
-  onURLTapped: (url: string) => void,
-  onHandleTapped: (handle: string) => void
+  callbacks: ContentTextCallbacks
 ) => {
   const matches = linkify.match(text)
   if (!matches) return [text]
-  return renderLinkifyMatches(text, matches, onURLTapped, onHandleTapped)
+  return renderLinkifyMatches(text, matches, callbacks)
 }
 
 const renderLinkifyMatches = (
   text: string,
   matches: Match[],
-  onURLTapped: (url: string) => void,
-  onHandleTapped: (handle: string) => void
+  { onURLTapped, onEventHandleTapped, onUserHandleTapped }: ContentTextCallbacks
 ) => {
   const blocks = []
   let anchorIndex = 0
   for (const match of matches) {
-    const isHandleMatch = match.schema === "@"
     blocks.push(text.substring(anchorIndex, match.index))
 
-    if (isHandleMatch) {
+    if (match.schema === "@") {
       blocks.push(
         <Headline
-          key={`handle-${match.index}`}
+          key={`user-handle-${match.index}`}
           style={styles.handle}
-          onPress={() => onHandleTapped(match.text)}
+          onPress={() => {
+            const handle = UserHandle.parse(match.text.slice(1)).handle
+            if (handle) onUserHandleTapped(handle)
+          }}
+        >
+          {match.text}
+        </Headline>
+      )
+    } else if (match.schema === "!") {
+      blocks.push(
+        <Headline
+          key={`event-handle-${match.index}`}
+          style={styles.handle}
+          onPress={() => {
+            const handle = EventHandle.parse(match.text.slice(1))
+            if (handle) onEventHandleTapped(handle)
+          }}
         >
           {match.text}
         </Headline>
