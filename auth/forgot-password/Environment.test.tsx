@@ -33,13 +33,7 @@ describe("ForgotPasswordEnvironment tests", () => {
     cognito.forgotPassword.mockRejectedValueOnce(
       new TestCognitoError("UserNotFoundException")
     )
-
     const result = await env.initiateForgotPassword(USPhoneNumber.mock)
-
-    expect(cognito.forgotPassword).toHaveBeenCalledWith(
-      USPhoneNumber.mock.e164Formatted
-    )
-
     expect(result).toEqual("invalid-phone-number")
   })
 

@@ -45,7 +45,7 @@ type VerifyCodeScreenProps = StackScreenProps<
   ForgotPasswordParamsList,
   "verifyCode"
 > &
-  Pick<ForgotPasswordEnvironment, "initiateForgotPassword">
+  Pick<ForgotPasswordEnvironment, "resendForgotPasswordCode">
 
 type ResetPasswordScreenProps = StackScreenProps<
   ForgotPasswordParamsList,
@@ -87,7 +87,12 @@ export const createForgotPasswordScreens = <T extends ForgotPasswordParamsList>(
           title: ""
         })}
       >
-        {(props: any) => <VerifyCodeScreen {...props} />}
+        {(props: any) => (
+          <VerifyCodeScreen
+            {...props}
+            resendForgotPasswordCode={env.resendForgotPasswordCode}
+          />
+        )}
       </stack.Screen>
 
       <stack.Screen
@@ -123,9 +128,15 @@ const ForgotPasswordScreen = ({
   return <ForgotPasswordFormView {...forgotPassword} />
 }
 
-const VerifyCodeScreen = ({ navigation, route }: VerifyCodeScreenProps) => {
+const VerifyCodeScreen = ({
+  navigation,
+  route,
+  resendForgotPasswordCode
+}: VerifyCodeScreenProps) => {
   const form = useAuthVerificationCodeForm({
-    resendCode: async () => {},
+    resendCode: async () => {
+      await resendForgotPasswordCode(route.params.emailOrPhoneNumber)
+    },
     submitCode: async (code) => {
       return { isCorrect: true, data: code }
     },

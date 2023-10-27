@@ -1,7 +1,4 @@
-import {
-  cognitoFormatEmailOrPhoneNumber,
-  isCognitoErrorWithCode
-} from "@auth/CognitoHelpers"
+import { isCognitoErrorWithCode } from "@auth/CognitoHelpers"
 import { Auth } from "@aws-amplify/auth"
 import { EmailAddress, USPhoneNumber } from ".."
 import { CognitoUser } from "amazon-cognito-identity-js"
@@ -55,7 +52,7 @@ export class CognitoSignInAuthenticator implements SignInAuthenticator {
 
   private signedInCognitoUser?: CognitoUser
   private previousSignInCredentials?: {
-    emailOrPhoneNumber: EmailAddress | USPhoneNumber
+    emailOrPhoneNumber: string
     uncheckedPassword: string
   }
 
@@ -69,11 +66,11 @@ export class CognitoSignInAuthenticator implements SignInAuthenticator {
   ) {
     try {
       this.previousSignInCredentials = {
-        emailOrPhoneNumber,
+        emailOrPhoneNumber: emailOrPhoneNumber.toString(),
         uncheckedPassword
       }
       this.signedInCognitoUser = await this.cognito.signIn(
-        cognitoFormatEmailOrPhoneNumber(emailOrPhoneNumber),
+        emailOrPhoneNumber.toString(),
         uncheckedPassword
       )
       return this.signedInCognitoUser?.challengeName === "SMS_MFA"
@@ -86,9 +83,7 @@ export class CognitoSignInAuthenticator implements SignInAuthenticator {
       ) {
         return "incorrect-credentials"
       } else if (isCognitoErrorWithCode(err, "UserNotConfirmedException")) {
-        await this.cognito.resendSignUp(
-          cognitoFormatEmailOrPhoneNumber(emailOrPhoneNumber)
-        )
+        await this.cognito.resendSignUp(emailOrPhoneNumber.toString())
         return "sign-up-verification-required"
       } else {
         throw err
@@ -99,9 +94,7 @@ export class CognitoSignInAuthenticator implements SignInAuthenticator {
   async resendSignInVerificationCode () {
     if (!this.previousSignInCredentials) return
     this.signedInCognitoUser = await this.cognito.signIn(
-      cognitoFormatEmailOrPhoneNumber(
-        this.previousSignInCredentials.emailOrPhoneNumber
-      ),
+      this.previousSignInCredentials.emailOrPhoneNumber,
       this.previousSignInCredentials.uncheckedPassword
     )
   }
