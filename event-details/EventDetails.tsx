@@ -2,8 +2,7 @@ import { Headline, Title } from "@components/Text"
 import AttendanceButton from "@components/bottomTabComponents/AttendanceButton"
 import ExpandableText from "@components/common/ExpandableText"
 import ProfileImageAndNameWithFriend from "@components/profileImageComponents/ProfileImageAndNameWithFriend"
-import { OpenInMapsRequest, openInMaps } from "@event-details/OpenInMaps"
-import { CurrentUserEvent } from "@lib/events"
+import { CurrentUserEvent, openEventLocationInMaps } from "@lib/events"
 import React from "react"
 import {
   Image,
@@ -27,103 +26,88 @@ const PROFILE_IMAGE_SIZE = 40
 const BOTTOM_TAB_HEIGHT = 80
 const MARGIN_SPACING = 16
 
-const EventDetails = ({ event }: EventDetailsProps) => {
-  const mapDetails: OpenInMapsRequest = {
-    coordinates: event.location.coordinate,
-    placemark: event.location.placemark
-  }
-
-  const openMapWithoutDirections = () => {
-    openInMaps(mapDetails)
-  }
-
-  return (
-    <View style={styles.container}>
-      <ScrollView
-        style={[styles.contentContainer, styles.spacing]}
-        contentContainerStyle={{ flexGrow: 1 }}
-        nestedScrollEnabled={true}
-      >
-        <Title>{event.title}</Title>
-        <ProfileImageAndNameWithFriend
-          imageURL={event.host.profileImageURL}
-          username={event.host.username}
-          userHandle={event.host.handle.toString()}
-          eventColor={event.color}
-          style={[styles.flexRow, { marginVertical: 24 }]}
-          imageStyle={styles.profileImage}
-          userFriendStatus="not-friends"
-        />
-        <View style={styles.iconSection}>
-          <TimeSection color={event.color} event={event} />
-          <LocationSection
-            color={event.color}
-            coordinates={event.location.coordinate}
-            placemark={event.location.placemark}
-          />
-          <AttendeeSection
-            color={event.color}
-            attendeeCount={event.attendeeCount}
-          />
-          <ChatSection
-            color={event.color}
-            userAttendeeStatus={event.userAttendeeStatus}
-          />
-        </View>
-
-        {event.description && (
-          <View style={{ marginTop: 16 }}>
-            <Headline style={{ marginBottom: 4 }}>About</Headline>
-            <ExpandableText
-              style={{ color: event.color, marginTop: 5 }}
-              text={event.description}
-              linesToDisplay={3}
-            />
-          </View>
-        )}
-
-        <View style={{ marginTop: 16, marginBottom: BOTTOM_TAB_HEIGHT + 24 }}>
-          <Headline style={{ marginBottom: 8 }}>Location</Headline>
-          <TouchableOpacity
-            style={{
-              borderRadius: 12,
-              overflow: "hidden"
-            }}
-            onPress={openMapWithoutDirections}
-          >
-            <EventMapSnippet
-              style={{ width: "100%", height: 160 }}
-              minZoomLevel={12}
-              initialRegion={{
-                latitude: event.location.coordinate.latitude,
-                longitude: event.location.coordinate.longitude,
-                latitudeDelta: 0.1,
-                longitudeDelta: 0.1
-              }}
-              renderMarker={() => (
-                <Image
-                  source={require("@assets/icon.png")}
-                  style={{
-                    width: MARKER_SIZE,
-                    height: MARKER_SIZE,
-                    borderWidth: 1,
-                    borderColor: "white",
-                    borderRadius: 20
-                  }}
-                />
-              )}
-              marker={{ key: event.id, location: event.location.coordinate }}
-            />
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-      <AttendanceButton
-        attendeeStatus={event.userAttendeeStatus}
-        style={styles.bottomTabButton}
+const EventDetails = ({ event }: EventDetailsProps) => (
+  <View style={styles.container}>
+    <ScrollView
+      style={[styles.contentContainer, styles.spacing]}
+      contentContainerStyle={{ flexGrow: 1 }}
+      nestedScrollEnabled={true}
+    >
+      <Title>{event.title}</Title>
+      <ProfileImageAndNameWithFriend
+        imageURL={event.host.profileImageURL}
+        username={event.host.username}
+        userHandle={event.host.handle.toString()}
+        eventColor={event.color}
+        style={[styles.flexRow, { marginVertical: 24 }]}
+        imageStyle={styles.profileImage}
+        userFriendStatus="not-friends"
       />
-    </View>
-  )
-}
+      <View style={styles.iconSection}>
+        <TimeSection color={event.color} event={event} />
+        <LocationSection color={event.color} location={event.location} />
+        <AttendeeSection
+          color={event.color}
+          attendeeCount={event.attendeeCount}
+        />
+        <ChatSection
+          color={event.color}
+          userAttendeeStatus={event.userAttendeeStatus}
+        />
+      </View>
+
+      {event.description && (
+        <View style={{ marginTop: 16 }}>
+          <Headline style={{ marginBottom: 4 }}>About</Headline>
+          <ExpandableText
+            style={{ color: event.color, marginTop: 5 }}
+            text={event.description}
+            linesToDisplay={3}
+          />
+        </View>
+      )}
+
+      <View style={{ marginTop: 16, marginBottom: BOTTOM_TAB_HEIGHT + 24 }}>
+        <Headline style={{ marginBottom: 8 }}>Location</Headline>
+        <TouchableOpacity
+          style={{
+            borderRadius: 12,
+            overflow: "hidden"
+          }}
+          onPress={() => openEventLocationInMaps(event.location)}
+        >
+          <EventMapSnippet
+            style={{ width: "100%", height: 160 }}
+            minZoomLevel={12}
+            initialRegion={{
+              latitude: event.location.coordinate.latitude,
+              longitude: event.location.coordinate.longitude,
+              latitudeDelta: 0.1,
+              longitudeDelta: 0.1
+            }}
+            renderMarker={() => (
+              <Image
+                source={require("@assets/icon.png")}
+                style={{
+                  width: MARKER_SIZE,
+                  height: MARKER_SIZE,
+                  borderWidth: 1,
+                  borderColor: "white",
+                  borderRadius: 20
+                }}
+              />
+            )}
+            marker={{ key: event.id, location: event.location.coordinate }}
+          />
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+    <AttendanceButton
+      attendeeStatus={event.userAttendeeStatus}
+      style={styles.bottomTabButton}
+    />
+  </View>
+)
 
 export default EventDetails
 
