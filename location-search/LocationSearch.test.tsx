@@ -21,11 +21,8 @@ import "../tests/helpers/Matchers"
 import { neverPromise } from "../tests/helpers/Promise"
 import { TestQueryClientProvider } from "../tests/helpers/ReactQuery"
 import { fakeTimers } from "../tests/helpers/Timers"
-import {
-  LocationSearchResult,
-  LocationsSearchQuery,
-  mockLocationSearchResult
-} from "./models"
+import { LocationSearchResult, LocationsSearchQuery } from "./models"
+import { mockLocationSearchResult } from "./mocks"
 
 describe("LocationSearch tests", () => {
   beforeEach(() => jest.resetAllMocks())

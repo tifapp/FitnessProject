@@ -4,11 +4,11 @@ import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
 import { ArrayUtils } from "@lib/Array"
 import { delayData } from "@lib/DelayData"
 import {
-  useLocationSearchPicker,
-  LocationSearchPicker
+  LocationSearchPicker,
+  useLocationSearchPicker
 } from "@location-search/Picker"
 import { LocationSearchBar } from "@location-search/SearchBar"
-import { mockLocationSearchResult } from "@location-search/models"
+import { mockLocationSearchResult } from "@location-search/mocks"
 import {
   NavigationContainer,
   NavigationProp,
