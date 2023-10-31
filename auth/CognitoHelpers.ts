@@ -2,7 +2,6 @@ import { Auth } from "@aws-amplify/auth"
 import * as ExpoSecureStore from "expo-secure-store"
 import awsExports from "../src/aws-exports"
 import { CognitoSecureStorage, SecureStore } from "./CognitoSecureStorage"
-import { EmailAddress, USPhoneNumber } from "./Models"
 
 /**
  * Sets up cognito with a secure store.
@@ -52,19 +51,4 @@ export const isCognitoErrorWithCode = (
     return error.code === code
   }
   return false
-}
-
-/**
- * Formats an email or phone number in the way cognito expects it.
- *
- * Phone Number -> `emailOrPhoneNumber.e164Formatted`
- *
- * Email -> `emailOrPhoneNumber.toString()`
- */
-export const cognitoFormatEmailOrPhoneNumber = (
-  emailOrPhoneNumber: EmailAddress | USPhoneNumber
-) => {
-  return emailOrPhoneNumber instanceof USPhoneNumber
-    ? emailOrPhoneNumber.e164Formatted
-    : emailOrPhoneNumber.toString()
 }

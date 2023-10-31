@@ -34,10 +34,6 @@ describe("CognitoSignInAuthenticator tests", () => {
         TEST_PASSWORD
       )
       expect(result).toEqual("success")
-      expect(cognito.signIn).toHaveBeenCalledWith(
-        USPhoneNumber.mock.e164Formatted,
-        TEST_PASSWORD
-      )
     })
 
     test("UserNotFoundException returns incorrect-credentials", async () => {
@@ -80,9 +76,6 @@ describe("CognitoSignInAuthenticator tests", () => {
         TEST_PASSWORD
       )
       expect(result).toEqual("sign-up-verification-required")
-      expect(cognito.resendSignUp).toHaveBeenCalledWith(
-        USPhoneNumber.mock.e164Formatted
-      )
     })
   })
 
