@@ -1,37 +1,23 @@
 import React, { useState } from "react"
 import { StyleSheet, TouchableOpacity, View } from "react-native"
-import * as Clipboard from "expo-clipboard"
 import { Headline, Caption, CaptionTitle } from "@components/Text"
-import {
-  LocationCoordinate2D,
-  Placemark,
-  placemarkToFormattedAddress
-} from "@lib/location"
-import {
-  OpenInMapsRequest,
-  openInMapWithDirections
-} from "@event-details/OpenInMaps"
 import { Ionicon } from "@components/common/Icons"
 import { showToast } from "@components/common/Toasts"
 import { Divider } from "react-native-elements"
+import {
+  EventLocation,
+  copyEventLocationToClipboard,
+  openEventLocationInMaps
+} from "./Event"
 
 interface LocationSectionProps {
   color: string
-  placemark?: Placemark
-  coordinates: LocationCoordinate2D
+  location: EventLocation
 }
 
-const LocationSection = ({
-  color,
-  placemark,
-  coordinates
-}: LocationSectionProps) => {
+const LocationSection = ({ color, location }: LocationSectionProps) => {
+  const { coordinate, placemark } = location
   const [dividerWidth, setDividerWidth] = useState(0)
-
-  const mapDetails: OpenInMapsRequest = {
-    coordinates,
-    placemark
-  }
 
   const hitSlopInset = {
     top: 10,
@@ -40,18 +26,8 @@ const LocationSection = ({
     left: 10
   }
 
-  const openMapWithDirections = () => {
-    openInMapWithDirections(mapDetails)
-  }
-
   const copyToClipboard = async () => {
-    if (placemark) {
-      await Clipboard.setStringAsync(placemarkToFormattedAddress(placemark)!)
-    } else {
-      await Clipboard.setStringAsync(
-        `${coordinates.latitude}, ${coordinates.longitude}`
-      )
-    }
+    await copyEventLocationToClipboard(location)
     showToast("Copied to Clipboard")
   }
 
@@ -93,7 +69,7 @@ const LocationSection = ({
                   </CaptionTitle>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={openMapWithDirections}
+                  onPress={() => openEventLocationInMaps(location, "car")}
                   hitSlop={hitSlopInset}
                 >
                   <CaptionTitle style={[{ color }, styles.captionLinks]}>
@@ -106,7 +82,7 @@ const LocationSection = ({
           : (
             <View style={styles.spacing} onLayout={onLayout}>
               <View style={{ marginBottom: 4 }}>
-                <Headline>{`${coordinates.latitude}, ${coordinates.longitude}`}</Headline>
+                <Headline>{`${coordinate.latitude}, ${coordinate.longitude}`}</Headline>
                 <View style={styles.flexRow}>
                   <Caption>Unknown Address</Caption>
                 </View>
@@ -123,7 +99,7 @@ const LocationSection = ({
                   </CaptionTitle>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={openMapWithDirections}
+                  onPress={() => openEventLocationInMaps(location)}
                   hitSlop={hitSlopInset}
                 >
                   <CaptionTitle style={[{ color }, styles.captionLinks]}>
