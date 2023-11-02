@@ -1,17 +1,28 @@
-import { PrimaryButton } from "@components/common/Buttons"
+import { PrimaryButton } from "@components/Buttons"
 import { AppStyles } from "@lib/AppColorStyle"
-import { ButtonProps, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import {
+  ButtonProps,
+  StyleProp,
+  StyleSheet,
+  View,
+  ViewStyle
+} from "react-native"
 
 const BOTTOM_TAB_HEIGHT = 80
 
 type ButtonTabProps = {
   title: string
   onPress: () => void
-  disabled? : boolean
+  disabled?: boolean
   style?: StyleProp<ViewStyle>
 } & ButtonProps
 
-const BottomTabButton = ({title, onPress, disabled, style }: ButtonTabProps) => {
+const BottomTabButton = ({
+  title,
+  onPress,
+  disabled,
+  style
+}: ButtonTabProps) => {
   return (
     <View style={[style, styles.bottomTab]}>
       <PrimaryButton
@@ -41,7 +52,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: AppStyles.colorOpacity50,
     borderWidth: 0
-  },
+  }
 })
 
 export default BottomTabButton
