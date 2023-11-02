@@ -11,8 +11,6 @@ import {
 import { mockLocationSearchFunction } from "./mocks"
 import { LocationsSearchQuery } from "./models"
 
-Geo.configure(awsconfig)
-
 describe("Search client tests", () => {
   beforeEach(async () => await AsyncStorage.clear())
   describe("awsPlaceToTiFLocation tests", () => {
@@ -93,7 +91,7 @@ describe("Search client tests", () => {
         }
       ])
     })
-    it("gives an empty array when called with faulty or nonexistent information", async () => {
+    it("returns an empty array when called with faulty or nonexistent information", async () => {
       const results = await searchRecentLocations()
       expect(results).toEqual([])
     })
@@ -141,17 +139,4 @@ describe("Search client tests", () => {
       ])
     })
   })
-  // describe("awsGeoSearchLocations tests", () => {
-  //   it("returns an array of valid TiFLocations when given a valid query", async () => {
-  //     const mockLocation1 = mockLocationCoordinate2D()
-  //     await asyncStorageSaveRecentLocation(
-  //       { coordinates: mockLocation1, placemark: { name: "New York" } },
-  //       "attended-event"
-  //     )
-
-  //     const testQuery = new LocationsSearchQuery("New York")
-  //     const results = await awsGeoSearchLocations(testQuery)
-  //     expect(results).toBeDefined()
-  //   })
-  // })
 })

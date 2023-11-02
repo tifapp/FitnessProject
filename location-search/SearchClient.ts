@@ -8,7 +8,40 @@ import {
   asyncStorageLoadRecentLocations,
   asyncStorageLoadSpecificRecentLocations
 } from "./RecentsStorage"
+import { mockLocationSearchFunction } from "./mocks"
 
+/**
+ * A top-level function that allows a location search, and gives location   data regarding the query and the designated
+ * center.
+ *
+ * Uses either {@link searchRecentLocations}, if querying for the user's current recent locations OR
+ * uses {@link searchWithRecentAnnotations}, along with the given query and center, if querying for
+ * locations in a different location.
+ *
+ * @param query A {@link LocationsSearchQuery} given for the search function to use.
+ * @param center An optional {@link LocationCoordinate2D} that designates where the location search is occurring from.
+ * @returns A Promise of an array of {@link LocationSearchResult}s, or usable data given from the search client.
+ */
+export const useLocationSearch = async (
+  query: LocationsSearchQuery,
+  center?: LocationCoordinate2D
+): Promise<LocationSearchResult[]> => {
+  if (query.sourceType === "user-recents") return await searchRecentLocations()
+  else {
+    return await searchWithRecentAnnotations(
+      query,
+      mockLocationSearchFunction,
+      center
+    )
+  }
+}
+
+/**
+ *  A function that converts a {@link Place} into a {@link TiFLocation}.
+ *
+ * @param place A given {@link Place} from Geo.searchByText.
+ * @returns The parameter converted into a {@link TiFLocation}.
+ */
 export const awsPlaceToTifLocation = (place: Place) => {
   if (!place.geometry) return undefined
   return {
@@ -29,31 +62,70 @@ export const awsPlaceToTifLocation = (place: Place) => {
   }
 }
 
-export const awsGeoSearchLocations = async (query: LocationsSearchQuery) => {
-  const geoSearchResults = await Geo.searchByText(query.toString())
+/**
+ * A function that takes in a query, and uses a search function to obtain results, then converts the data
+ * into a usable set of {@link TiFLocation}s.
+ *
+ * @param query A {@link LocationsSearchQuery} given for the search function to use.
+ * @param center An optional {@link LocationCoordinate2D} given for the search to center in where it should be searching.
+ * @returns A Promise of an array of {@link TiFLocation}s.
+ */
+export const awsGeoSearchLocations = async (
+  query: LocationsSearchQuery,
+  center?: LocationCoordinate2D
+) => {
+  const options = {
+    maxResults: 10,
+    biasPosition: center ? [center?.longitude, center?.latitude] : undefined
+  }
+  const geoSearchResults = await Geo.searchByText(query.toString(), options)
   return ArrayUtils.compactMap(geoSearchResults, awsPlaceToTifLocation)
 }
 
+/**
+ * A function that pulls the 10 most recent locations stored in AsyncStorage, and maps out their data
+ * into a set of {@link LocationSearchResult}s.
+ * @returns A Promise of an array of {@link LocationSearchResult}s.
+ */
 export const searchRecentLocations = (): Promise<LocationSearchResult[]> => {
   return asyncStorageLoadRecentLocations(10).then((results) =>
     results.map((area) => ({ ...area, isRecentLocation: true }))
   )
 }
 
+/**
+ * A function that uses a provided query, with both its provided searchFunction to obtain {@link TiFLocation}s,
+ * and {@link asyncStorageLoadSpecificRecentLocations} on their coordinates to obtain async storage's information
+ * on whether those locations are recent.
+ * This involves combining the data from both processes.
+ *
+ * @param query A {@link LocationsSearchQuery} given for the search function to use.
+ * @param searchFunction A function that takes in a query + an optional center, then converts the data into a usable set of {@link TiFLocation}s.
+ * @param center An optional {@link LocationCoordinate2D} given for the search to center in where it should be searching.
+ * @returns A Promise of an array of {@link LocationSearchResult}s.
+ */
+
 export const searchWithRecentAnnotations = async (
   query: LocationsSearchQuery,
-  searchFunction: (query: LocationsSearchQuery) => Promise<TiFLocation[]>
+  searchFunction: (
+    query: LocationsSearchQuery,
+    center?: LocationCoordinate2D
+  ) => Promise<TiFLocation[]>,
+  center?: LocationCoordinate2D
 ): Promise<LocationSearchResult[]> => {
-  const results = await searchFunction(query)
-  const coordinates = results.map(
+  const searchResults = await searchFunction(query, center)
+  const convertedSearchResults = searchResults.map((point) => ({
+    location: point
+  }))
+  const searchCoordinates = searchResults.map(
     (point) => point.coordinates
   ) as LocationCoordinate2D[]
-  const finishedResults = await asyncStorageLoadSpecificRecentLocations(
-    coordinates
-  )
-  return finishedResults.map((point) => ({
-    location: point.location,
-    annotation: point.annotation,
-    isRecentLocation: true
+  const asyncRecentSearchResults =
+    await asyncStorageLoadSpecificRecentLocations(searchCoordinates)
+  const mergedResults = asyncRecentSearchResults.concat(convertedSearchResults)
+  return mergedResults.map((result) => ({
+    location: result.location,
+    annotation: result.annotation,
+    isRecentLocation: !!result.annotation
   }))
 }
