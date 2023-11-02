@@ -10,6 +10,7 @@ import * as Clipboard from "expo-clipboard"
 import { StringUtils } from "@lib/String"
 import { ZodUtils } from "@lib/Zod"
 import { LinkifyIt } from "linkify-it"
+import { showLocation } from "react-native-map-link"
 
 /**
  * A handle that users can reference other events with.
@@ -173,6 +174,25 @@ const formatEventLocation = (location: EventLocation) => {
   if (!location.placemark) return formattedLocationCoordinate
   const formattedPlacemark = placemarkToFormattedAddress(location.placemark)
   return formattedPlacemark ?? formattedLocationCoordinate
+}
+
+/**
+ * Opens the event location in the user's preffered maps app.
+ *
+ * @param location the location to open in maps.
+ * @param directionsMode the mehtod of how to link specific directions to the location.
+ */
+export const openEventLocationInMaps = (
+  location: EventLocation,
+  directionsMode?: "car" | "walk" | "bike" | "public-transport"
+) => {
+  showLocation({
+    ...location.coordinate,
+    title: location.placemark
+      ? placemarkToFormattedAddress(location.placemark)
+      : undefined,
+    directionsMode
+  })
 }
 
 /**

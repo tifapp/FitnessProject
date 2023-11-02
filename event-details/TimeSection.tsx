@@ -1,62 +1,28 @@
 import React, { useState } from "react"
-import { StyleSheet, TouchableOpacity, View } from "react-native"
-import * as Calendar from "expo-calendar"
-import { Headline, Caption, CaptionTitle } from "@components/Text"
+import { StyleSheet, View } from "react-native"
+import { Headline, Caption } from "@components/Text"
 import { dayjs, now } from "@lib/date"
-import {
-  CalendarEvent,
-  addToCalendar,
-  getCalendar
-} from "@event-details/Calendar"
 import { Ionicon } from "@components/common/Icons"
 import { Divider } from "react-native-elements"
-import { showToast } from "@components/common/Toasts"
+import { CurrentUserEvent } from "./Event"
 
 interface TimeSectionProps {
   color: string
-  event: CalendarEvent
+  event: CurrentUserEvent
 }
 
 const TimeSection = ({ color, event }: TimeSectionProps) => {
-  const [status, requestPermission] = Calendar.useCalendarPermissions()
-  const [addedEvent, setAddedEvent] = useState(false)
   const [dividerWidth, setDividerWidth] = useState(0)
-  const startDateFormat = event.duration.formattedDate(
+  const startDateFormat = event.dateRange.formattedDate(
     now(),
-    dayjs(event.duration.startDate)
+    dayjs(event.dateRange.startDate)
   )
-  const endDateFormat = event.duration.formattedDate(
+  const endDateFormat = event.dateRange.formattedDate(
     now(),
-    dayjs(event.duration.endDate)
+    dayjs(event.dateRange.endDate)
   )
-  const startTimeFormat = dayjs(event.duration.startDate).format("h A")
-  const endTimeFormat = dayjs(event.duration.endDate).format("h A")
-  const hitSlopInset = {
-    top: 10,
-    bottom: 10,
-    right: 10,
-    left: 10
-  }
-
-  const addEventToCalendar = async () => {
-    let calendar: Calendar.Calendar
-
-    if (status?.granted) {
-      calendar = await getCalendar()
-      await addToCalendar(calendar.id, event, setAddedEvent)
-    } else {
-      await requestPermission()
-        .then(async (status) => {
-          if (status?.granted) {
-            calendar = await getCalendar()
-            await addToCalendar(calendar.id, event, setAddedEvent)
-          }
-        })
-        .catch(() => {
-          showToast("Unable to add Event without Permissions")
-        })
-    }
-  }
+  const startTimeFormat = dayjs(event.dateRange.startDate).format("h A")
+  const endTimeFormat = dayjs(event.dateRange.endDate).format("h A")
 
   const onLayout = (e: { nativeEvent: { layout: { width: any } } }) => {
     setDividerWidth(e.nativeEvent.layout.width)
@@ -69,7 +35,7 @@ const TimeSection = ({ color, event }: TimeSectionProps) => {
           <Ionicon name="calendar" color={"white"} />
         </View>
         <View style={styles.spacing} onLayout={onLayout}>
-          {event.duration.endSameDay()
+          {event.dateRange.endSameDay()
             ? (
               <View style={{ marginBottom: 4 }}>
                 <Headline>{`${startDateFormat}`}</Headline>
@@ -82,16 +48,6 @@ const TimeSection = ({ color, event }: TimeSectionProps) => {
                 <Caption>{`to ${endDateFormat}, ${endTimeFormat}`}</Caption>
               </View>
             )}
-          {!addedEvent && (
-            <TouchableOpacity
-              onPress={addEventToCalendar}
-              hitSlop={hitSlopInset}
-            >
-              <CaptionTitle style={[{ color }, styles.captionLinks]}>
-                Add to Calendar
-              </CaptionTitle>
-            </TouchableOpacity>
-          )}
         </View>
       </View>
       <Divider style={[styles.divider, { width: dividerWidth + 16 }]} />
