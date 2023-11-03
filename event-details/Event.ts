@@ -88,7 +88,6 @@ export const linkifyAddEventHandleValidation = (linkify: LinkifyIt) => {
   linkify.add("!", {
     validate: (text: string, pos: number) => {
       parsedHandle = EventHandle.parse(text, pos)
-      console.log(parsedHandle, text, pos)
       if (!parsedHandle) return false
       if (pos >= 2 && !StringUtils.isWhitespaceCharacter(text, pos - 2)) {
         return false
