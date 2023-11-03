@@ -4,8 +4,8 @@ import { openURL } from "expo-linking"
 import { BodyText, Headline } from "./Text"
 import { linkify } from "@lib/Linkify"
 import { Match } from "linkify-it"
-import { UserHandle } from "@lib/users"
-import { EventHandle } from "@event-details"
+import { UserHandle, UserHandleLinkifyMatch } from "@lib/users"
+import { EventHandle, EventHandleLinkifyMatch } from "@event-details"
 
 export type ContentTextCallbacks = {
   onUserHandleTapped: (handle: UserHandle) => void
@@ -74,29 +74,25 @@ const renderLinkifyMatches = (
     blocks.push(text.substring(anchorIndex, match.index))
 
     if (match.schema === "@") {
+      const userHandleMatch = match as UserHandleLinkifyMatch
       blocks.push(
         <Headline
           key={`user-handle-${match.index}`}
           style={styles.handle}
-          onPress={() => {
-            const handle = UserHandle.parse(match.text.slice(1)).handle
-            if (handle) onUserHandleTapped(handle)
-          }}
+          onPress={() => onUserHandleTapped(userHandleMatch.userHandle)}
         >
-          {match.text}
+          {userHandleMatch.text}
         </Headline>
       )
     } else if (match.schema === "!") {
+      const eventHandleMatch = match as EventHandleLinkifyMatch
       blocks.push(
         <Headline
           key={`event-handle-${match.index}`}
           style={styles.handle}
-          onPress={() => {
-            const handle = EventHandle.parse(match.text.slice(1))
-            if (handle) onEventHandleTapped(handle)
-          }}
+          onPress={() => onEventHandleTapped(eventHandleMatch.eventHandle)}
         >
-          {match.text}
+          {eventHandleMatch.eventHandle.eventName}
         </Headline>
       )
     } else {

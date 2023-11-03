@@ -1,6 +1,6 @@
 import { StringUtils } from "@lib/String"
 import { ZodUtils } from "@lib/Zod"
-import { LinkifyIt } from "linkify-it"
+import { LinkifyIt, Match } from "linkify-it"
 
 /**
  * An reason that a user handle's raw text was unable to be parsed.
@@ -17,29 +17,6 @@ export type UserHandleParsingResult =
  * namely if it's already taken or is in an improper format.
  */
 export type UserHandleError = "already-taken" | UserHandleParsingError
-
-/**
- * Adds user handle validation to a linkify instance.
- *
- * @param linkify see {@link LinkifyIt}
- */
-export const linkifyAddUserHandleValidation = (linkify: LinkifyIt) => {
-  linkify.add("@", {
-    validate: (text: string, pos: number) => {
-      const slice = text.slice(pos)
-      const handle = slice.split(/\s/)[0] ?? slice
-
-      if (!UserHandle.parse(handle).handle) return false
-      if (pos >= 2 && !StringUtils.isWhitespaceCharacter(text, pos - 2)) {
-        return false
-      }
-      return handle.length
-    },
-    normalize: (match) => {
-      match.url = "tifapp://user/" + match.url.replace(/^@/, "")
-    }
-  })
-}
 
 /**
  * A class representing a valid user handle string.
@@ -105,4 +82,29 @@ export class UserHandle {
   static optionalParse (rawValue: string) {
     return UserHandle.parse(rawValue).handle
   }
+}
+
+export type UserHandleLinkifyMatch = Match & { userHandle: UserHandle }
+
+/**
+ * Adds user handle validation to a linkify instance.
+ *
+ * @param linkify see {@link LinkifyIt}
+ */
+export const linkifyAddUserHandleValidation = (linkify: LinkifyIt) => {
+  let parsedHandle: UserHandle | undefined
+  linkify.add("@", {
+    validate: (text: string, pos: number) => {
+      const slice = text.slice(pos)
+      parsedHandle = UserHandle.optionalParse(slice.split(/\s/, 1)[0] ?? slice)
+      if (!parsedHandle) return false
+      if (pos >= 2 && !StringUtils.isWhitespaceCharacter(text, pos - 2)) {
+        return false
+      }
+      return parsedHandle.toString().length
+    },
+    normalize: (match: UserHandleLinkifyMatch) => {
+      if (parsedHandle) match.userHandle = parsedHandle
+    }
+  })
 }
