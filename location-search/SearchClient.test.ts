@@ -1,7 +1,6 @@
-import { Coordinates, Geo } from "@aws-amplify/geo"
+import { Coordinates } from "@aws-amplify/geo"
 import { mockLocationCoordinate2D, mockTiFLocation } from "@lib/location"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import awsconfig from "../src/aws-exports"
 import { asyncStorageSaveRecentLocation } from "./RecentsStorage"
 import {
   awsPlaceToTifLocation,

@@ -113,16 +113,33 @@ export const searchWithRecentAnnotations = async (
   ) => Promise<TiFLocation[]>,
   center?: LocationCoordinate2D
 ): Promise<LocationSearchResult[]> => {
-  const searchResults = await searchFunction(query, center)
-  const convertedSearchResults = searchResults.map((point) => ({
+  const remoteSearchResults = await searchFunction(query, center)
+  const convertedRemoteSearchResults = remoteSearchResults.map((point) => ({
     location: point
   }))
-  const searchCoordinates = searchResults.map(
+  console.log(
+    "Converted Remote Search: " + JSON.stringify(convertedRemoteSearchResults)
+  )
+  const searchCoordinates = remoteSearchResults.map(
     (point) => point.coordinates
   ) as LocationCoordinate2D[]
   const asyncRecentSearchResults =
     await asyncStorageLoadSpecificRecentLocations(searchCoordinates)
-  const mergedResults = asyncRecentSearchResults.concat(convertedSearchResults)
+  const filteredResults = ArrayUtils.compactMap(
+    convertedRemoteSearchResults,
+    (remoteSearchPoint) => {
+      if (
+        !asyncRecentSearchResults.find(
+          (asyncPoint) =>
+            JSON.stringify(asyncPoint.location) ===
+            JSON.stringify(remoteSearchPoint.location)
+        )
+      ) {
+        return remoteSearchPoint
+      }
+    }
+  )
+  const mergedResults = asyncRecentSearchResults.concat(filteredResults)
   return mergedResults.map((result) => ({
     location: result.location,
     annotation: result.annotation,
