@@ -15,6 +15,15 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  pull-requests: write
+  
+env:
+  EXPO_PROJECT_ID: ${{ secrets.EXPO_PROJECT_ID }}
+  EXPO_PROJECT_OWNER: ${{ secrets.EXPO_PROJECT_OWNER }}
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   setup_and_lint:
     runs-on: ubuntu-latest
@@ -82,3 +91,22 @@ jobs:
 
       - name: Bundle project
         run: npx expo export
+
+      - name: Setup Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_ACCESS_TOKEN }}
+
+      - name: Append Check Run ID to .env
+        run: |
+          echo "EXPO_PROJECT_ID=${{ secrets.EXPO_PROJECT_ID }}" >> .env
+          echo "EXPO_PROJECT_OWNER=${{ secrets.EXPO_PROJECT_OWNER }}" >> .env
+          echo "CHECK_RUN_ID=${{ github.run_id }}" >> .env
+          echo "GITHUB_SHA=${{ github.event.pull_request.head.sha }}" >> .env
+          echo "GH_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env
+          echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .env
+          cat .env
+
+      - name: Trigger Build on EAS
+        run: eas build --platform android --non-interactive --no-wait

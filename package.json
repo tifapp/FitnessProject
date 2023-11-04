@@ -11,7 +11,11 @@
     "test:ci": "jest --ci --detectOpenHandles",
     "prepare": "husky install",
     "staged-lint": "lint-staged",
-    "dev": "expo start --dev-client"
+    "dev": "expo start --dev-client",
+    "eas-build-post-install": "node easbuildsuccess.mjs",
+    "eas-build-on-success": "node easbuildsuccess.mjs",
+    "eas-build-on-error": "node easbuildsuccess.mjs",
+    "eas-build-on-cancel": "node easbuildsuccess.mjs"
   },
   "engines": {
     "npm": ">=8.3.0"
@@ -65,7 +69,6 @@
     "expo-linking": "~4.0.1",
     "expo-location": "~15.1.1",
     "expo-media-library": "~15.2.3",
-    "expo-modules-core": "~1.2.7",
     "expo-notifications": "~0.18.1",
     "expo-secure-store": "~12.1.1",
     "expo-splash-screen": "~0.18.2",
@@ -87,7 +90,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.43.4",
-    "react-native": "0.71.8",
+    "react-native": "0.71.14",
     "react-native-config": "^1.5.0",
     "react-native-crypto": "^2.2.0",
     "react-native-dotenv": "^3.4.8",
