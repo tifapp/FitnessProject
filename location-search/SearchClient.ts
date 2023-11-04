@@ -6,7 +6,7 @@ import { Geo, Place } from "@aws-amplify/geo"
 import {
   LocationCoordinate2D,
   TiFLocation,
-  coordinateMatch
+  checkIfCoordsAreEqual
 } from "@lib/location"
 import {
   asyncStorageLoadRecentLocations,
@@ -33,8 +33,8 @@ export const locationSearch = async (
   else {
     return await searchWithRecentAnnotations(
       query,
-      awsGeoSearchLocations,
-      center
+      center,
+      awsGeoSearchLocations
     )
   }
 }
@@ -110,11 +110,11 @@ export const searchRecentLocations = (): Promise<LocationSearchResult[]> => {
 
 export const searchWithRecentAnnotations = async (
   query: LocationsSearchQuery,
+  center: LocationCoordinate2D | undefined,
   searchFunction: (
     query: LocationsSearchQuery,
     center?: LocationCoordinate2D
-  ) => Promise<TiFLocation[]>,
-  center?: LocationCoordinate2D
+  ) => Promise<TiFLocation[]>
 ): Promise<LocationSearchResult[]> => {
   const remoteSearchResults = await searchFunction(query, center)
   const searchCoordinates = remoteSearchResults.map(
@@ -123,12 +123,11 @@ export const searchWithRecentAnnotations = async (
   const asyncRecentSearchResults =
     await asyncStorageLoadSpecificRecentLocations(searchCoordinates)
   const mergedResults = remoteSearchResults.map((remoteSearchPoint) => {
-    const checkRecentsForMatch = asyncRecentSearchResults.find(
-      (asyncPoint) =>
-        coordinateMatch(
-          asyncPoint.location.coordinates,
-          remoteSearchPoint.coordinates
-        ) === true
+    const checkRecentsForMatch = asyncRecentSearchResults.find((asyncPoint) =>
+      checkIfCoordsAreEqual(
+        asyncPoint.location.coordinates,
+        remoteSearchPoint.coordinates
+      )
     )
     return {
       location: remoteSearchPoint,

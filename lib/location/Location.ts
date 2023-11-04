@@ -27,7 +27,7 @@ export type LocationCoordinate2D = Readonly<
 /**
  * Checks for equality on two sets of coordinates.
  */
-export const coordinateMatch = (
+export const checkIfCoordsAreEqual = (
   coordsA: LocationCoordinate2D,
   coordsB: LocationCoordinate2D
 ) => {

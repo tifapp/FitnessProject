@@ -101,6 +101,7 @@ describe("Search client tests", () => {
       const mockLocation1 = mockLocationCoordinate2D()
       const mockLocation2 = mockLocationCoordinate2D()
       const mockLocation3 = mockLocationCoordinate2D()
+      const mockLocation4 = mockLocationCoordinate2D()
       const mockTiFLocation1 = {
         coordinates: mockLocation1,
         placemark: { name: "New York" }
@@ -113,18 +114,29 @@ describe("Search client tests", () => {
         coordinates: mockLocation3,
         placemark: { name: "New York" }
       }
+      const mockTiFLocation4 = {
+        coordinates: mockLocation4,
+        placemark: { name: "New York" }
+      }
 
       const testQuery = new LocationsSearchQuery("New York")
 
       await asyncStorageSaveRecentLocation(mockTiFLocation1, "attended-event")
       await asyncStorageSaveRecentLocation(mockTiFLocation2, "hosted-event")
       await asyncStorageSaveRecentLocation(mockTiFLocation3, "hosted-event")
+      await asyncStorageSaveRecentLocation(mockTiFLocation4, undefined)
 
       const testResults = await searchWithRecentAnnotations(
         testQuery,
+        undefined,
         mockLocationSearchFunction
       )
       expect(testResults).toEqual([
+        {
+          location: mockTiFLocation4,
+          annotation: undefined,
+          isRecentLocation: false
+        },
         {
           location: mockTiFLocation3,
           annotation: "hosted-event",
