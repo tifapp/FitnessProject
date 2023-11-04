@@ -3,7 +3,11 @@ import { ArrayUtils } from "@lib/Array"
 import { LocationSearchResult, LocationsSearchQuery } from "./models"
 
 import { Geo, Place } from "@aws-amplify/geo"
-import { LocationCoordinate2D, TiFLocation } from "@lib/location"
+import {
+  LocationCoordinate2D,
+  TiFLocation,
+  coordinateMatch
+} from "@lib/location"
 import {
   asyncStorageLoadRecentLocations,
   asyncStorageLoadSpecificRecentLocations
@@ -119,11 +123,12 @@ export const searchWithRecentAnnotations = async (
   const asyncRecentSearchResults =
     await asyncStorageLoadSpecificRecentLocations(searchCoordinates)
   const mergedResults = remoteSearchResults.map((remoteSearchPoint) => {
-    const checkRecentsForMatch = asyncRecentSearchResults.find((asyncPoint) =>
-      coordinateMatch(
-        asyncPoint.location.coordinates,
-        remoteSearchPoint.coordinates
-      )
+    const checkRecentsForMatch = asyncRecentSearchResults.find(
+      (asyncPoint) =>
+        coordinateMatch(
+          asyncPoint.location.coordinates,
+          remoteSearchPoint.coordinates
+        ) === true
     )
     return {
       location: remoteSearchPoint,
@@ -133,14 +138,4 @@ export const searchWithRecentAnnotations = async (
   })
 
   return mergedResults
-}
-
-export const coordinateMatch = (
-  coordsA: LocationCoordinate2D,
-  coordsB: LocationCoordinate2D
-) => {
-  return (
-    coordsA.longitude === coordsB.longitude &&
-    coordsA.latitude === coordsB.latitude
-  )
 }
