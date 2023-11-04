@@ -8,7 +8,6 @@ import {
   asyncStorageLoadRecentLocations,
   asyncStorageLoadSpecificRecentLocations
 } from "./RecentsStorage"
-import { mockLocationSearchFunction } from "./mocks"
 
 /**
  * A top-level function that allows a location search, and gives location   data regarding the query and the designated
@@ -22,7 +21,7 @@ import { mockLocationSearchFunction } from "./mocks"
  * @param center An optional {@link LocationCoordinate2D} that designates where the location search is occurring from.
  * @returns A Promise of an array of {@link LocationSearchResult}s, or usable data given from the search client.
  */
-export const useLocationSearch = async (
+export const locationSearch = async (
   query: LocationsSearchQuery,
   center?: LocationCoordinate2D
 ): Promise<LocationSearchResult[]> => {
@@ -30,7 +29,7 @@ export const useLocationSearch = async (
   else {
     return await searchWithRecentAnnotations(
       query,
-      mockLocationSearchFunction,
+      awsGeoSearchLocations,
       center
     )
   }
@@ -76,7 +75,7 @@ export const awsGeoSearchLocations = async (
 ) => {
   const options = {
     maxResults: 10,
-    biasPosition: center ? [center?.longitude, center?.latitude] : undefined
+    biasPosition: center
   }
   const geoSearchResults = await Geo.searchByText(query.toString(), options)
   return ArrayUtils.compactMap(geoSearchResults, awsPlaceToTifLocation)
@@ -114,35 +113,34 @@ export const searchWithRecentAnnotations = async (
   center?: LocationCoordinate2D
 ): Promise<LocationSearchResult[]> => {
   const remoteSearchResults = await searchFunction(query, center)
-  const convertedRemoteSearchResults = remoteSearchResults.map((point) => ({
-    location: point
-  }))
-  console.log(
-    "Converted Remote Search: " + JSON.stringify(convertedRemoteSearchResults)
-  )
   const searchCoordinates = remoteSearchResults.map(
     (point) => point.coordinates
   ) as LocationCoordinate2D[]
   const asyncRecentSearchResults =
     await asyncStorageLoadSpecificRecentLocations(searchCoordinates)
-  const filteredResults = ArrayUtils.compactMap(
-    convertedRemoteSearchResults,
-    (remoteSearchPoint) => {
-      if (
-        !asyncRecentSearchResults.find(
-          (asyncPoint) =>
-            JSON.stringify(asyncPoint.location) ===
-            JSON.stringify(remoteSearchPoint.location)
-        )
-      ) {
-        return remoteSearchPoint
-      }
+  const mergedResults = remoteSearchResults.map((remoteSearchPoint) => {
+    const checkRecentsForMatch = asyncRecentSearchResults.find((asyncPoint) =>
+      coordinateMatch(
+        asyncPoint.location.coordinates,
+        remoteSearchPoint.coordinates
+      )
+    )
+    return {
+      location: remoteSearchPoint,
+      annotation: checkRecentsForMatch?.annotation,
+      isRecentLocation: !!checkRecentsForMatch?.annotation
     }
+  })
+
+  return mergedResults
+}
+
+export const coordinateMatch = (
+  coordsA: LocationCoordinate2D,
+  coordsB: LocationCoordinate2D
+) => {
+  return (
+    coordsA.longitude === coordsB.longitude &&
+    coordsA.latitude === coordsB.latitude
   )
-  const mergedResults = asyncRecentSearchResults.concat(filteredResults)
-  return mergedResults.map((result) => ({
-    location: result.location,
-    annotation: result.annotation,
-    isRecentLocation: !!result.annotation
-  }))
 }
