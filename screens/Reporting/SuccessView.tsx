@@ -1,5 +1,5 @@
 import { BodyText, Headline } from "@components/Text"
-import { PrimaryButton } from "@components/common/Buttons"
+import { PrimaryButton } from "@components/Buttons"
 import { Ionicon } from "@components/common/Icons"
 import React from "react"
 import {

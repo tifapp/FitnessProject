@@ -1,10 +1,6 @@
 import React, { useState } from "react"
 import { Caption, Headline, Title } from "@components/Text"
-import {
-  DisabledButton,
-  OutlinedButton,
-  PrimaryButton
-} from "@components/common/Buttons"
+import { SecondaryOutlinedButton, PrimaryButton } from "@components/Buttons"
 import ExpandableText from "@components/common/ExpandableText"
 import { TextToastView } from "@components/common/Toasts"
 import ProfileImage from "@components/profileImageComponents/ProfileImage"
@@ -62,11 +58,16 @@ const ProfileView = ({ user, events }: ProfileScreenViewProps) => {
               />
             )}
             {userStatus === "friend-request-pending" && (
-              <DisabledButton title="Request Pending" />
+              <PrimaryButton title="Request Pending" disabled />
             )}
-            {userStatus === "friends" && <DisabledButton title="Friends" />}
+            {userStatus === "friends" && (
+              <PrimaryButton title="Friends" disabled />
+            )}
             {userStatus !== "blocked" && (
-              <OutlinedButton style={styles.messageButton} title="Message" />
+              <SecondaryOutlinedButton
+                style={styles.messageButton}
+                title="Message"
+              />
             )}
             <TextToastView
               requestSent={requestSent}

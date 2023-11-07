@@ -44,6 +44,9 @@ import VerifcationCodeMeta, {
 import TextFieldMeta, {
   Basic as TextFieldBasic
 } from "../components/TextField/TextField.stories"
+import ButtonsMeta, {
+  Basic as ButtonsBasic
+} from "../components/Buttons/Buttons.stories"
 import { InMemorySecureStore } from "@auth/CognitoSecureStorage"
 
 setupCognito(new InMemorySecureStore())
@@ -114,6 +117,11 @@ const stories = [
     name: ChangePasswordMeta.title,
     component: ChangePasswordBasic,
     args: ChangePasswordMeta.args
+  },
+  {
+    name: ButtonsMeta.title,
+    component: ButtonsBasic,
+    args: ButtonsMeta.args
   }
   // Add more stories here...
 ]

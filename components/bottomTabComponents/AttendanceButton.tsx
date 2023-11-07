@@ -1,4 +1,4 @@
-import { OutlinedButton, PrimaryButton } from "@components/common/Buttons"
+import { SecondaryOutlinedButton, PrimaryButton } from "@components/Buttons"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { EventUserAttendeeStatus, isAttendingEvent } from "@lib/events"
 
@@ -14,7 +14,7 @@ const AttendanceButton = ({ attendeeStatus, style }: LeaveJoinButtonProps) => {
     <View style={[style, styles.bottomTab]}>
       {isAttendingEvent(attendeeStatus)
         ? (
-          <OutlinedButton
+          <SecondaryOutlinedButton
             title={attendeeStatus === "hosting" ? "Delete Event" : "Leave Event"}
             style={styles.buttonStyle}
           />

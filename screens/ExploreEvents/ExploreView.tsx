@@ -10,7 +10,7 @@ import { ExploreEventsBottomSheet } from "./BottomSheet"
 import { BodyText, Title } from "@components/Text"
 import { SkeletonEventCard } from "@screens/ExploreEvents/SkeletonEventCard"
 import { Ionicon } from "@components/common/Icons"
-import { PrimaryButton } from "@components/common/Buttons"
+import { PrimaryButton } from "@components/Buttons"
 import { ExploreEventsSearchBar } from "./SearchBar"
 
 export type ExploreEventsProps = {
