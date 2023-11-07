@@ -1,18 +1,5 @@
-import { randomBool } from "@lib/Random"
-import {
-  LocationCoordinate2D,
-  TiFLocation,
-  mockTiFLocation
-} from "../lib/location/Location"
+import { TiFLocation } from "../lib/location/Location"
 import { RecentLocationAnnotation } from "./RecentsStorage"
-
-/**
- * Creates a random {@link LocationSearchResultAnnotation}.
- */
-export const mockLocationSearchAnnotation = () => {
-  const annotation = randomBool() ? "attended-recently" : "hosted-recently"
-  return annotation as RecentLocationAnnotation
-}
 
 /**
  * An result that is displayed by the location search.
@@ -46,20 +33,6 @@ export type LocationSearchResultsData =
   | { status: "no-results"; data: [] }
   | { status: "error"; data: undefined }
   | { status: "success"; data: LocationSearchResult[] }
-
-/**
- * Mocks a {@link LocationSearchResult}.
- */
-export const mockLocationSearchResult = (
-  coordinates?: LocationCoordinate2D
-) => {
-  const isRecent = randomBool(0.8)
-  return {
-    location: mockTiFLocation(coordinates),
-    annotation: isRecent ? mockLocationSearchAnnotation() : undefined,
-    isRecentLocation: isRecent
-  } as LocationSearchResult
-}
 
 /**
  * A type that denotes whether searching for locations should utilize the user's
