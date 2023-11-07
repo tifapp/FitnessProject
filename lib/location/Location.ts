@@ -1,13 +1,13 @@
+import { faker } from "@faker-js/faker"
+import geohash from "ngeohash"
+import { z } from "zod"
 import {
   degreesToRadians,
   EARTH_RADIUS_METERS,
   metersToMiles,
   sin2
 } from "../Math"
-import { z } from "zod"
 import { mockPlacemark, PlacemarkSchema } from "./Placemark"
-import { faker } from "@faker-js/faker"
-import geohash from "ngeohash"
 
 /**
  * A zod schema for {@link LocationCoordinate2D}.
@@ -23,6 +23,19 @@ export const LocationCoordinates2DSchema = z.object({
 export type LocationCoordinate2D = Readonly<
   z.infer<typeof LocationCoordinates2DSchema>
 >
+
+/**
+ * Checks for equality on two sets of coordinates.
+ */
+export const checkIfCoordsAreEqual = (
+  coordsA: LocationCoordinate2D,
+  coordsB: LocationCoordinate2D
+) => {
+  return (
+    coordsA.longitude === coordsB.longitude &&
+    coordsA.latitude === coordsB.latitude
+  )
+}
 
 /**
  * Generates a mock coordinate for testing and UI purposes.

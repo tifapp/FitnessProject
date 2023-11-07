@@ -1,12 +1,11 @@
-import React from "react"
-import {
-  LocationCoordinate2D,
-  LocationSearchResult,
-  LocationsSearchQuery,
-  TiFLocation
-} from "@lib/location"
+import { Headline } from "@components/Text"
+import { CircularIonicon } from "@components/common/Icons"
 import { useUserCoordinatesQuery } from "@hooks/UserLocation"
-import { LocationSearchResultsListView } from "./SearchResultsList"
+import { AppStyles } from "@lib/AppColorStyle"
+import { LocationCoordinate2D, TiFLocation } from "@lib/location"
+import { UseQueryResult, useQuery } from "@tanstack/react-query"
+import { LocationAccuracy, LocationObject } from "expo-location"
+import React from "react"
 import {
   StyleProp,
   StyleSheet,
@@ -14,17 +13,14 @@ import {
   ViewStyle
 } from "react-native"
 import Animated, { FadeIn } from "react-native-reanimated"
-import { Headline } from "@components/Text"
+import { LocationSearchResult, LocationsSearchQuery } from "."
 import {
   LocationSearchResultProps,
   LocationSearchResultView
 } from "./SearchResultView"
-import { LocationAccuracy, LocationObject } from "expo-location"
-import { useLocationsSearchQueryObject } from "./state"
-import { UseQueryResult, useQuery } from "@tanstack/react-query"
+import { LocationSearchResultsListView } from "./SearchResultsList"
 import { LocationSearchResultsData } from "./models"
-import { AppStyles } from "@lib/AppColorStyle"
-import { CircularIonicon } from "@components/common/Icons"
+import { useLocationsSearchQueryObject } from "./state"
 
 export type UseLocationSearchPickerEnvironment = {
   loadSearchResults: (
