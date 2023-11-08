@@ -56,18 +56,18 @@ describe("ContentText tests", () => {
   })
 
   it("allows for opening an event based on its handle", () => {
-    const handle = "!why_people"
+    const handle = "!17|123/Pickup Basketball"
     renderLinkedText(
       `This is a handle\n${handle}\nthat brings you to an event.`
     )
-    tapText(handle)
+    tapText("Pickup Basketball")
     expect(eventHandleTappedAction).toHaveBeenCalledWith(
-      EventHandle.parse("why_people")
+      new EventHandle(123, "Pickup Basketball")
     )
   })
 
   it("does not detect !!handles as an event handle", () => {
-    const invalidHandle = "!!why_people"
+    const invalidHandle = "!!17|123/Pickup Basketball"
     renderLinkedText(invalidHandle)
     expectRegularText(invalidHandle)
   })
@@ -79,7 +79,7 @@ describe("ContentText tests", () => {
   })
 
   test("the character before an event handle must be whitespace for it to be valid", () => {
-    const text = "...!why_people"
+    const text = "...!17|123/Pickup Basketball"
     renderLinkedText(text)
     expectRegularText(text)
   })
