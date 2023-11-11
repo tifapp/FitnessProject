@@ -86,11 +86,7 @@ export const ExpandableContentText = ({
   const [expansionStatus, setExpansionStatus] = useState<
     "expandable" | "unexpandable" | undefined
   >()
-  const textSplitsRef = useRef({
-    collapsedText: "",
-    expandedText: "",
-    originalText: ""
-  })
+  const textSplitsRef = useRef({ collapsedText: "", expandedText: "" })
   const numberOfLines = expansionStatus
     ? collapsedLineLimit
     : collapsedLineLimit + 1
@@ -106,7 +102,6 @@ export const ExpandableContentText = ({
             return
           }
           const textBlocks = e.nativeEvent.lines.map((line) => line.text)
-          textSplitsRef.current.originalText = initialText
           const visibleText = textBlocks
             .slice(0, textBlocks.length - 1)
             .join("")
