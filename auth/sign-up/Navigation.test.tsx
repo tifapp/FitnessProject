@@ -1,6 +1,5 @@
 import { TiFAPI } from "@api-client/TiFAPI"
 import { createTiFAPIFetch } from "@api-client/client"
-import { UserHandle } from "@lib/users"
 import { uuid } from "@lib/uuid"
 import {
   NavigationContainer,
@@ -25,6 +24,7 @@ import { mswServer } from "../../tests/helpers/msw"
 import { createSignUpEnvironment } from "./Environment"
 import { SignUpParamsList, createSignUpScreens } from "./Navigation"
 import { fakeTimers } from "../../tests/helpers/Timers"
+import { UserHandle } from "@content-formatting"
 
 type TestSignUpParamsList = {
   test: undefined

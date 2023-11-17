@@ -10,7 +10,7 @@ import { useAtom } from "jotai"
 import { hasEditedProfileAtom } from "../state"
 import React, { useState } from "react"
 import CustomizableTextInput from "@components/common/CustomizableTextInput.tsx"
-import { ContentText } from "@components/ContentText"
+import { ContentText } from "@content-formatting"
 
 type InputTypes = "display" | "bio" | "handle"
 
@@ -122,6 +122,7 @@ const EditProfileView = ({ user }: EditProfileViewProps) => {
               <ContentText
                 text={bio}
                 onUserHandleTapped={() => console.log(handle)}
+                onEventHandleTapped={() => console.log(handle)}
               />
             </CustomizableTextInput>
           </View>

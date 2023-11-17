@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { TiFAPIFetch } from "./client"
-import { UserHandle } from "@lib/users"
+import { UserHandle } from "@content-formatting"
 
 export type UpdateCurrentUserProfileRequest = Partial<{
   name: string

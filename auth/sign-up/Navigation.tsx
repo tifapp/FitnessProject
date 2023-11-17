@@ -8,7 +8,6 @@ import {
   XMarkBackButton
 } from "@components/Navigation"
 import { TouchableIonicon } from "@components/common/Icons"
-import { UserHandle } from "@lib/users"
 import { useNavigation } from "@react-navigation/native"
 import { StackScreenProps } from "@react-navigation/stack"
 import React, { memo } from "react"
@@ -24,6 +23,7 @@ import {
 } from "./CredentialsForm"
 import { SignUpEndingView } from "./Ending"
 import { SignUpEnvironment } from "./Environment"
+import { UserHandle } from "@content-formatting"
 
 export type SignUpParamsList = {
   signUpCredentialsForm: undefined

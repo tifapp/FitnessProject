@@ -30,6 +30,7 @@
       "@event-details/*": ["./event-details/*"],
       "@event-details": ["./event-details"],
       "@location-search/*": ["./location-search/*"],
+      "@content-formatting": ["./content-formatting"],
       "env": ["./.env"]
     }
   },
