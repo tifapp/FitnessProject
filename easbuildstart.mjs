@@ -15,20 +15,19 @@ const jwtToken = jwt.sign(
 
 const octokit = new Octokit({ auth: jwtToken })
 
-const updateCheckRun = async () => {
+const createCheckRun = async () => {
   try {
-    const apiUrl = `/repos/${process.env.GITHUB_REPOSITORY}/check-runs/${process.env.CHECK_RUN_ID}`
-    const response = await octokit.request(`PATCH ${apiUrl}`, {
+    const apiUrl = `/repos/${process.env.GITHUB_REPOSITORY}/check-runs`
+    const response = await octokit.request(`POST ${apiUrl}`, {
       owner: "tifapp",
       repo: "FitnessProject",
-      check_run_id: process.env.CHECK_RUN_ID,
       name: "EAS Build",
-      status: "completed",
-      conclusion: "success",
-      completed_at: new Date().toISOString(),
+      status: "in_progress",
+      started_at: new Date().toISOString(),
+      head_sha: process.env.GITHUB_SHA,
       output: {
-        title: "Build Result",
-        summary: "Build completed successfully.",
+        title: "Build Started",
+        summary: "Build started successfully.",
         text: "Detailed build information here."
       },
       headers: {
@@ -40,4 +39,4 @@ const updateCheckRun = async () => {
   }
 }
 
-updateCheckRun()
+createCheckRun()
