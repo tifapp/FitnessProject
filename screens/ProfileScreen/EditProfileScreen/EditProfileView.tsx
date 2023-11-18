@@ -10,7 +10,7 @@ import { useAtom } from "jotai"
 import { hasEditedProfileAtom } from "../state"
 import React, { useState } from "react"
 import CustomizableTextInput from "@components/common/CustomizableTextInput.tsx"
-import { ContentText } from "@content-formatting"
+import { ContentText } from "@content-parsing"
 
 type InputTypes = "display" | "bio" | "handle"
 

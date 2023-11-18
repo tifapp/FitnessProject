@@ -30,7 +30,7 @@ module.exports = function (api) {
             "@event-details": path.join(rootPath, "event-details"),
             "@location-search": path.join(rootPath, "location-search"),
             "@modules": path.join(rootPath, "modules"),
-            "@content-formatting": path.join(rootPath, "content-formatting")
+            "@content-parsing": path.join(rootPath, "content-parsing")
           },
           extensions: [".js", ".jsx", ".ts", ".tsx"]
         }

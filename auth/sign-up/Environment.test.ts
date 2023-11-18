@@ -6,7 +6,7 @@ import { rest } from "msw"
 import { uuid } from "@lib/uuid"
 import { TestCognitoError } from "@auth/CognitoHelpers"
 import { mswServer } from "../../tests/helpers/msw"
-import { UserHandle } from "@content-formatting"
+import { UserHandle } from "@content-parsing"
 
 describe("SignUpEnvironment tests", () => {
   const cognito = {

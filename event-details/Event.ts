@@ -1,4 +1,4 @@
-import { UserHandle } from "@content-formatting"
+import { UserHandle } from "@content-parsing"
 import { dateRange, FixedDateRange } from "@lib/date"
 import {
   LocationCoordinate2D,

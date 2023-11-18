@@ -23,7 +23,7 @@ import {
 } from "./CredentialsForm"
 import { SignUpEndingView } from "./Ending"
 import { SignUpEnvironment } from "./Environment"
-import { UserHandle } from "@content-formatting"
+import { UserHandle } from "@content-parsing"
 
 export type SignUpParamsList = {
   signUpCredentialsForm: undefined

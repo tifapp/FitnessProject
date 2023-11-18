@@ -1,7 +1,7 @@
 import { AuthFormView } from "@auth/AuthLayout"
 import { AuthShadedTextField } from "@auth/AuthTextFields"
 import { Ionicon } from "@components/common/Icons"
-import { UserHandle, UserHandleError } from "@content-formatting"
+import { UserHandle, UserHandleError } from "@content-parsing"
 import { useFormSubmission } from "@hooks/FormHooks"
 import { sleep } from "@lib/DelayData"
 import { QueryHookOptions } from "@lib/ReactQuery"

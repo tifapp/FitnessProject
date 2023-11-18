@@ -24,7 +24,7 @@ import { mswServer } from "../../tests/helpers/msw"
 import { createSignUpEnvironment } from "./Environment"
 import { SignUpParamsList, createSignUpScreens } from "./Navigation"
 import { fakeTimers } from "../../tests/helpers/Timers"
-import { UserHandle } from "@content-formatting"
+import { UserHandle } from "@content-parsing"
 
 type TestSignUpParamsList = {
   test: undefined

@@ -5,7 +5,7 @@ import { fakeTimers } from "../../tests/helpers/Timers"
 import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
 import { neverPromise } from "../../tests/helpers/Promise"
 import { captureAlerts } from "../../tests/helpers/Alerts"
-import { UserHandle } from "@content-formatting"
+import { UserHandle } from "@content-parsing"
 
 describe("SignUpChangeUserHandle tests", () => {
   beforeEach(() => jest.resetAllMocks())

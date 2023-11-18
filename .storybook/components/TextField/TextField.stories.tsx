@@ -6,7 +6,7 @@ import {
 } from "@components/TextFields"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { Button, KeyboardAvoidingView, View } from "react-native"
-import { ContentText } from "@content-formatting"
+import { ContentText } from "@content-parsing"
 import { Ionicon } from "@components/common/Icons"
 
 const TextFieldMeta: ComponentMeta<typeof TextField> = {
