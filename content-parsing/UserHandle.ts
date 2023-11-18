@@ -1,6 +1,4 @@
-import { StringUtils } from "@lib/String"
 import { ZodUtils } from "@lib/Zod"
-import { LinkifyIt, Match } from "linkify-it"
 
 /**
  * An reason that a user handle's raw text was unable to be parsed.
@@ -82,29 +80,4 @@ export class UserHandle {
   static optionalParse (rawValue: string) {
     return UserHandle.parse(rawValue).handle
   }
-}
-
-export type UserHandleLinkifyMatch = Match & { userHandle: UserHandle }
-
-/**
- * Adds user handle validation to a linkify instance.
- *
- * @param linkify see {@link LinkifyIt}
- */
-export const linkifyAddUserHandleValidation = (linkify: LinkifyIt) => {
-  let parsedHandle: UserHandle | undefined
-  linkify.add("@", {
-    validate: (text: string, pos: number) => {
-      const slice = text.slice(pos)
-      parsedHandle = UserHandle.optionalParse(slice.split(/\s/, 1)[0] ?? slice)
-      if (!parsedHandle) return false
-      if (pos >= 2 && !StringUtils.isWhitespaceCharacter(text, pos - 2)) {
-        return false
-      }
-      return parsedHandle.toString().length
-    },
-    normalize: (match: UserHandleLinkifyMatch) => {
-      if (parsedHandle) match.userHandle = parsedHandle
-    }
-  })
 }

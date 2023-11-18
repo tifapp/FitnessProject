@@ -9,9 +9,6 @@ import { useAppFonts } from "../../hooks/Fonts"
 import AttendeesListMeta, {
   Basic as AttendeesListScreenBasic
 } from "../components/AttendeesList/AttendeesList.stories"
-import AuthBannerMeta, {
-  Basic as AuthBannerBasic
-} from "../components/AuthBanner/AuthBanner.stories"
 import ButtonsMeta, {
   Basic as ButtonsBasic
 } from "../components/Buttons/Buttons.stories"
@@ -125,11 +122,6 @@ const stories = [
     name: ButtonsMeta.title,
     component: ButtonsBasic,
     args: ButtonsMeta.args
-  },
-  {
-    name: AuthBannerMeta.title,
-    component: AuthBannerBasic,
-    args: AuthBannerMeta.args
   }
   // Add more stories here...
 ]
