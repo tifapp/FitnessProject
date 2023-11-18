@@ -3,11 +3,18 @@ import { Text, TouchableOpacity, View } from "react-native"
 
 // Import your stories
 import { setupCognito } from "@auth/CognitoHelpers"
+import { InMemorySecureStore } from "@auth/CognitoSecureStorage"
 import { FlatList } from "react-native-gesture-handler"
 import { useAppFonts } from "../../hooks/Fonts"
 import AttendeesListMeta, {
   Basic as AttendeesListScreenBasic
 } from "../components/AttendeesList/AttendeesList.stories"
+import AuthBannerMeta, {
+  Basic as AuthBannerBasic
+} from "../components/AuthBanner/AuthBanner.stories"
+import ButtonsMeta, {
+  Basic as ButtonsBasic
+} from "../components/Buttons/Buttons.stories"
 import ChangePasswordMeta, {
   Basic as ChangePasswordBasic
 } from "../components/ChangePassword/ChangePassword.stories"
@@ -32,22 +39,18 @@ import SearchBarMeta, {
 import SettingsMeta, {
   Basic as SettingsScreenBasic
 } from "../components/SettingsScreen/SettingsScreen.stories"
-import SignUpMeta, {
-  Basic as SignUpBasic
-} from "../components/SignUp/SignUp.stories"
 import SignInMeta, {
   Basic as SignInBasic
 } from "../components/SignIn/SignIn.stories"
-import VerifcationCodeMeta, {
-  Basic as VerifcationCodeBasic
-} from "../components/VerificationCode/VerifyCode.stories"
+import SignUpMeta, {
+  Basic as SignUpBasic
+} from "../components/SignUp/SignUp.stories"
 import TextFieldMeta, {
   Basic as TextFieldBasic
 } from "../components/TextField/TextField.stories"
-import ButtonsMeta, {
-  Basic as ButtonsBasic
-} from "../components/Buttons/Buttons.stories"
-import { InMemorySecureStore } from "@auth/CognitoSecureStorage"
+import VerifcationCodeMeta, {
+  Basic as VerifcationCodeBasic
+} from "../components/VerificationCode/VerifyCode.stories"
 
 setupCognito(new InMemorySecureStore())
 
@@ -122,6 +125,11 @@ const stories = [
     name: ButtonsMeta.title,
     component: ButtonsBasic,
     args: ButtonsMeta.args
+  },
+  {
+    name: AuthBannerMeta.title,
+    component: AuthBannerBasic,
+    args: AuthBannerMeta.args
   }
   // Add more stories here...
 ]

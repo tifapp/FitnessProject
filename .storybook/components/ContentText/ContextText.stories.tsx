@@ -1,30 +1,45 @@
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import React, { useState } from "react"
-import IconButton from "../../../components/common/IconButton"
-import { View } from "react-native"
-import { ContentText } from "@components/ContentText"
-import { TextInput } from "react-native-gesture-handler"
+import { ContentText, ExpandableContentText } from "@components/ContentText"
+import { ScrollView, TextInput } from "react-native-gesture-handler"
+import { Headline } from "@components/Text"
 
 const StoryText = () => {
-  const [text, setText] = useState("")
+  const [text, setText] = useState(
+    "Hello world, this is an @event of some kind. Please join it if you like to do nothing. \n\nNow I write this endless storybook story in the void, where \nI can test things like @hello to make sure that links are highlighting and I am not going absolutely crazy."
+  )
   return (
-    <View
-      style={{ height: "100%", justifyContent: "center", alignItems: "center" }}
-    >
-      <ContentText
-        style={{ width: "100%" }}
+    <ScrollView style={{ marginTop: 64 }}>
+      <Headline>Expandable Text</Headline>
+      <ExpandableContentText
+        initialText={text}
+        collapsedLineLimit={2}
         onUserHandleTapped={console.log}
-        text={text}
+        onEventHandleTapped={console.log}
+        expandButtonTextStyle={{ color: "red" }}
+        style={{ marginBottom: 24, marginTop: 8 }}
       />
+      <Headline>No Long Enought Text</Headline>
+      <ExpandableContentText
+        initialText="Hello world, this is longer than one line possibly. Now it is..."
+        collapsedLineLimit={5}
+        onUserHandleTapped={console.log}
+        onEventHandleTapped={console.log}
+      />
+      <Headline style={{ marginTop: 24 }}>Text Input</Headline>
       <TextInput multiline style={{ width: "100%" }} onChangeText={setText}>
-        <ContentText onUserHandleTapped={console.log} text={text} />
+        <ContentText
+          onUserHandleTapped={console.log}
+          onEventHandleTapped={console.log}
+          text={text}
+        />
       </TextInput>
-    </View>
+    </ScrollView>
   )
 }
 
 const ContentTextMeta: ComponentMeta<typeof StoryText> = {
-  title: "LinkedText",
+  title: "Content Text",
   component: StoryText
 }
 

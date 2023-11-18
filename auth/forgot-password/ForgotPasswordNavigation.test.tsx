@@ -1,4 +1,3 @@
-import { Password, USPhoneNumber } from ".."
 import { NavigationContainer, useFocusEffect } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import {
@@ -11,6 +10,7 @@ import {
 import { useCallback, useState } from "react"
 import { View } from "react-native"
 import { Button } from "react-native-elements"
+import { Password, USPhoneNumber } from ".."
 import "../../tests/helpers/Matchers"
 import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
 import { fakeTimers } from "../../tests/helpers/Timers"

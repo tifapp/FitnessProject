@@ -9,52 +9,74 @@ import { uuid } from "@lib/uuid"
 import * as Clipboard from "expo-clipboard"
 import { StringUtils } from "@lib/String"
 import { ZodUtils } from "@lib/Zod"
-import { LinkifyIt } from "linkify-it"
+import { LinkifyIt, Match } from "linkify-it"
 import { showLocation } from "react-native-map-link"
 
 /**
  * A handle that users can reference other events with.
  *
- * Each event has a handle that is generated from its name similar to user handles.
- * Since {@link UserHandle}s are already referenced through the `@` sign, event handles
- * are referenced via `!`.
+ * Event handles are not visible to users, rather they are an internal detail
+ * that allow users to reference events easily. A raw form of the handle is
+ * embedded in text like bios, chat messages, etc. that takes the form:
  *
- * A valid event handle consists of only letters, numbers, and underscores, but
- * must start with a letter and be at least 1 character long.
+ * `"!<event-name-length>|<event-id>/<event-name>"`
+ *
+ * This form is not visible to the user, but rather just the event name is shown in
+ * the resulting text to the user.
  */
 export class EventHandle {
   static zodSchema = ZodUtils.createOptionalParseableSchema(EventHandle)
 
-  readonly rawValue: string
+  readonly eventId: number
+  readonly eventName: string
 
-  private constructor (rawValue: string) {
-    this.rawValue = rawValue
+  constructor (eventId: number, eventName: string) {
+    this.eventId = eventId
+    this.eventName = eventName
   }
 
   /**
-   * Formats this handle by prefixing it with an "!".
+   * Formats this event handle back to its raw form.
    */
   toString () {
-    return `!${this.rawValue}`
+    return `!${this.eventName.length}|${this.eventId}/${this.eventName}`
   }
-
-  private static REGEX = /^[a-zA-Z]{1}[a-zA-Z0-9_]*$/
 
   /**
    * Attempts to parse an {@link EventHandle} from a raw string.
    *
-   * A valid event handle consists of only letters, numbers, and underscores, but
-   * must start with a letter and be at least 1 character long.
+   * A valid event handle takes the form `"<event-name-length>|<event-id>/<event-name>""`
+   * (note the omitted `"!"` at the start).
    *
    * @param rawValue the raw string to attempt to parse.
+   * @param startPosition the position of the string to begin parsing at (defaults to 0).
    * @returns an {@link EventHandle} instance if valid.
    */
-  static parse (rawValue: string) {
-    return EventHandle.REGEX.test(rawValue)
-      ? new EventHandle(rawValue)
-      : undefined
+  static parse (rawValue: string, startPosition: number = 0) {
+    const lengthSeparatorIndex = rawValue.indexOf("|", startPosition)
+    if (lengthSeparatorIndex === -1) return undefined
+
+    const slashIndex = rawValue.indexOf("/", lengthSeparatorIndex)
+    if (slashIndex === -1) return undefined
+
+    const eventId = parseInt(
+      rawValue.substring(lengthSeparatorIndex + 1, slashIndex)
+    )
+    if (Number.isNaN(eventId)) return undefined
+
+    const nameLength = parseInt(
+      rawValue.substring(startPosition, lengthSeparatorIndex)
+    )
+    if (Number.isNaN(nameLength)) return undefined
+
+    return new EventHandle(
+      eventId,
+      rawValue.substring(slashIndex + 1, slashIndex + 1 + nameLength)
+    )
   }
 }
+
+export type EventHandleLinkifyMatch = Match & { eventHandle: EventHandle }
 
 /**
  * Adds event handle validation to a linkify config.
@@ -62,19 +84,18 @@ export class EventHandle {
  * @param linkify see {@link LinkifyIt}
  */
 export const linkifyAddEventHandleValidation = (linkify: LinkifyIt) => {
+  let parsedHandle: EventHandle | undefined
   linkify.add("!", {
     validate: (text: string, pos: number) => {
-      const slice = text.slice(pos)
-      const handle = slice.split(/\s/)[0] ?? slice
-
-      if (!EventHandle.parse(handle)) return false
+      parsedHandle = EventHandle.parse(text, pos)
+      if (!parsedHandle) return false
       if (pos >= 2 && !StringUtils.isWhitespaceCharacter(text, pos - 2)) {
         return false
       }
-      return handle.length
+      return parsedHandle.toString().length
     },
-    normalize: (match) => {
-      match.url = "tifapp://event/" + match.url.replace(/^!/, "")
+    normalize: (match: EventHandleLinkifyMatch) => {
+      if (parsedHandle) match.eventHandle = parsedHandle
     }
   })
 }
@@ -201,7 +222,6 @@ export const openEventLocationInMaps = (
 export type Event = {
   host: EventAttendee
   id: string
-  handle: EventHandle
   title: string
   description: string
   dateRange: FixedDateRange
@@ -250,7 +270,6 @@ export namespace EventMocks {
   export const PickupBasketball = {
     host: EventAttendeeMocks.Alivs,
     id: uuid(),
-    handle: EventHandle.parse("pickup_basketball1234")!,
     title: "Pickup Basketball",
     description: "I'm better than Lebron James.",
     dateRange: dateRange(
@@ -279,7 +298,6 @@ export namespace EventMocks {
   export const Multiday = {
     host: EventAttendeeMocks.Alivs,
     id: uuid(),
-    handle: EventHandle.parse("multiday_marathon6666")!,
     title: "Multiday Event",
     description: "This event runs for more than one day.",
     dateRange: dateRange(
@@ -308,7 +326,6 @@ export namespace EventMocks {
   export const NoPlacemarkInfo = {
     host: EventAttendeeMocks.Alivs,
     id: uuid(),
-    handle: EventHandle.parse("lol")!,
     title: "No Placemark Info",
     attendeeCount: 5,
     description:
