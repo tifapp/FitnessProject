@@ -3,10 +3,10 @@ import { createSignUpEnvironment } from "./Environment"
 import { TiFAPI } from "@api-client/TiFAPI"
 import { createTiFAPIFetch } from "@api-client/client"
 import { rest } from "msw"
-import { UserHandle } from "@lib/users"
 import { uuid } from "@lib/uuid"
 import { TestCognitoError } from "@auth/CognitoHelpers"
 import { mswServer } from "../../tests/helpers/msw"
+import { UserHandle } from "@content-parsing"
 
 describe("SignUpEnvironment tests", () => {
   const cognito = {

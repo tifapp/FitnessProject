@@ -1,7 +1,7 @@
-import { ContentText } from "@components/ContentText"
-import { EventHandle } from "@event-details"
-import { UserHandle } from "@lib/users"
+import { ContentText } from "./ContentText"
+import { EventHandle } from "./EventHandle"
 import { fireEvent, render, screen } from "@testing-library/react-native"
+import { UserHandle } from "./UserHandle"
 
 describe("ContentText tests", () => {
   beforeEach(() => jest.resetAllMocks())

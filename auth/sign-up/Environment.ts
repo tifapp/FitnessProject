@@ -1,8 +1,8 @@
 import { Auth } from "@aws-amplify/auth"
 import { EmailAddress, Password, USPhoneNumber } from ".."
 import { TiFAPI } from "@api-client/TiFAPI"
-import { UserHandle } from "@lib/users"
 import { isCognitoErrorWithCode } from "@auth/CognitoHelpers"
+import { UserHandle } from "@content-parsing"
 
 export type CreateAccountResult =
   | "success"
