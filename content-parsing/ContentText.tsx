@@ -93,7 +93,7 @@ const renderLinkifyMatches = (
       blocks.push(
         <Headline
           key={`event-handle-${match.index}`}
-          style={styles.handle}
+          style={{ color: eventHandleMatch.eventHandle.color.toString() }}
           onPress={() => onEventHandleTapped(eventHandleMatch.eventHandle)}
         >
           {eventHandleMatch.eventHandle.eventName}
