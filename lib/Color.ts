@@ -40,7 +40,7 @@ export class ColorString {
     return this.rgbHexString + opacityHexString
   }
 
-  private static RGB_LENGTH = 7
+  private static RGB_HEX_STRING_LENGTH = 7
   private static REGEX = /^#([a-f0-9]{2}){3,4}$/i
 
   /**
@@ -58,19 +58,16 @@ export class ColorString {
    */
   static parse (hexString: string) {
     if (!ColorString.REGEX.test(hexString)) return undefined
+    const opacityHex = hexString.slice(ColorString.RGB_HEX_STRING_LENGTH)
     return new ColorString(
-      hexString.substring(0, ColorString.RGB_LENGTH),
-      hexString.length === ColorString.RGB_LENGTH
+      hexString.substring(0, ColorString.RGB_HEX_STRING_LENGTH),
+      hexString.length === ColorString.RGB_HEX_STRING_LENGTH
         ? 1
-        : normalizeFrom0To1(hexString.substring(ColorString.RGB_LENGTH))
+        : parseInt(opacityHex, 16) / 255
     )
   }
 
   static primaryDarkColor = ColorString.parse("#26282A")!
 
   static zodSchema = ZodUtils.createOptionalParseableSchema(ColorString)
-}
-
-const normalizeFrom0To1 = (hexString: string) => {
-  return (parseInt(hexString, 16) & 0xff) / 255
 }
