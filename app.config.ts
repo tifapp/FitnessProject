@@ -31,9 +31,9 @@ const config = {
     bundleIdentifier: "com.tifapp.FitnessApp",
     infoPlist: {
       NSLocationAlwaysAndWhenInUseUsageDescription:
-        "To be able to let others know when you've arrived at an event, tap \"Change to Always Allow\".",
+        "To inform others of your arrival, tap \"Change to Always Allow.\"",
       NSLocationWhenInUseUsageDescription:
-        "To find fitness events in your current area, and to get travel estimates to upcoming events, tap \"Allow Once\" or \"Allow While Using App\".",
+        "Discover events and receive travel estimates for events by tapping \"Allow Once\" or \"Allow While Using App.\"",
       UIBackgroundModes: ["location", "fetch"],
       LSApplicationQueriesSchemes: [
         "comgooglemaps",
