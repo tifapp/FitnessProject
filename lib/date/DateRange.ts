@@ -1,6 +1,7 @@
 import { Dayjs } from "dayjs"
 import { addSecondsToDate, diffDates } from "./Date"
 import { dayjs, now } from "./dayjs"
+import { z } from "zod"
 
 /**
  * A data type to deal with a date range that has a known start and end date.
@@ -134,6 +135,20 @@ const formatFromBasis = (basis: Dayjs, date: Dayjs) => {
 const formatTime = (date: Dayjs) => {
   return date.format(date.minute() !== 0 ? "h:mma" : "ha")
 }
+
+/**
+ * A zod schema to parse an {@link FixedDateRange} where the start and end dates
+ * are represented as raw date strings.
+ */
+export const StringDateRangeSchema = z
+  .object({
+    startDate: z.string().datetime(),
+    endDate: z.string().datetime()
+  })
+  .transform(({ startDate, endDate }) => {
+    return dateRange(new Date(startDate), new Date(endDate))
+  })
+
 /**
  * Creates a date range object where the start date is always before
  * the end date.

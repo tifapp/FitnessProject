@@ -1,4 +1,5 @@
 import { faker } from "@faker-js/faker"
+import { StringDateRangeSchema, dateRange } from "@lib/date"
 import {
   LocationCoordinates2DSchema,
   mockLocationCoordinate2D
@@ -11,7 +12,8 @@ import { z } from "zod"
 export const EventArrivalNotificationSchema = z.object({
   eventId: z.number(),
   eventName: z.string().nonempty(),
-  coordinate: LocationCoordinates2DSchema
+  coordinate: LocationCoordinates2DSchema,
+  dateRange: StringDateRangeSchema
 })
 
 /**
@@ -36,5 +38,6 @@ export type EventArrivalNotification = z.infer<
 export const mockEventArrivalNotification = (): EventArrivalNotification => ({
   eventId: parseInt(faker.random.numeric(3)),
   eventName: faker.word.noun(),
-  coordinate: mockLocationCoordinate2D()
+  coordinate: mockLocationCoordinate2D(),
+  dateRange: dateRange(faker.date.past(), faker.date.future())
 })
