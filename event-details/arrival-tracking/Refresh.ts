@@ -39,7 +39,7 @@ export class EventArrivalsRefresher {
     const refreshTimeDiff = await this.lastRefreshTime.diffFromLastRefresh()
     if (
       !refreshTimeDiff ||
-      refreshTimeDiff.minutes >= this.minutesBetweenNeededRefreshes
+      Math.abs(refreshTimeDiff.minutes) >= this.minutesBetweenNeededRefreshes
     ) {
       await this.forceRefresh()
     }

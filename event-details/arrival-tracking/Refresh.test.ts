@@ -25,6 +25,16 @@ describe("EventArrivalsRefresher tests", () => {
     expect(performRefresh).not.toHaveBeenCalled()
   })
 
+  test("refresh if needed, refreshes when last refresh is at least <time-threshold> minutes ago", async () => {
+    const refresher = new EventArrivalsRefresher(performRefresh, 1)
+    jest.setSystemTime(new Date("2023-11-24T00:00:00"))
+    await refresher.refreshIfNeeded()
+    performRefresh.mockReset()
+    jest.setSystemTime(new Date("2023-11-24T00:01:00"))
+    await refresher.refreshIfNeeded()
+    expect(performRefresh).toHaveBeenCalledTimes(1)
+  })
+
   test("force refresh, ignores previous refresh time", async () => {
     const refresher = new EventArrivalsRefresher(performRefresh, 1)
     jest.setSystemTime(new Date("2023-11-24T00:00:00"))
