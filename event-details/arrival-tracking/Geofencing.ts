@@ -36,18 +36,18 @@ const taskCallbacks = {
  * ie. about 1-2 american football fields.
  */
 export class EventArrivalsGeofencer {
-  private readonly taskName: keyof typeof taskCallbacks
+  private readonly key: keyof typeof taskCallbacks
 
-  private constructor (taskName: keyof typeof taskCallbacks) {
-    this.taskName = taskName
+  private constructor (key: keyof typeof taskCallbacks) {
+    this.key = key
   }
 
   async replaceGeofencedCoordinates (coordinates: LocationCoordinate2D[]) {
     if (coordinates.length === 0) {
-      await stopGeofencingAsync(this.taskName)
+      await this.stopGeofencing()
     } else {
       await startGeofencingAsync(
-        this.taskName,
+        taskName(this.key),
         coordinates.map((coordinate) => ({
           ...coordinate,
           radius: yardsToMeters(125)
@@ -57,7 +57,7 @@ export class EventArrivalsGeofencer {
   }
 
   async stopGeofencing () {
-    await stopGeofencingAsync(this.taskName)
+    await stopGeofencingAsync(taskName(this.key))
   }
 
   /**
@@ -65,7 +65,7 @@ export class EventArrivalsGeofencer {
    * calling it twice will unregister the first consumer.
    */
   onUpdate (handleUpdate: GeofencingCallback) {
-    taskCallbacks[this.taskName] = handleUpdate
+    taskCallbacks[this.key] = handleUpdate
   }
 
   /**
@@ -88,12 +88,14 @@ const TaskEventSchema = z.object({
   })
 })
 
-const defineEventArrivalsGeofencingTask = (
-  taskName: keyof typeof taskCallbacks
-) => {
-  defineTask(taskName, async (arg) => {
+const taskName = (key: keyof typeof taskCallbacks) => {
+  return `event-arrivals-geofencing-${key}`
+}
+
+const defineEventArrivalsGeofencingTask = (key: keyof typeof taskCallbacks) => {
+  defineTask(taskName(key), async (arg) => {
     const { data } = await TaskEventSchema.parseAsync(arg)
-    taskCallbacks[taskName]?.(
+    taskCallbacks[key]?.(
       data.region,
       LocationGeofencingEventType.Enter ? "entered" : "exited"
     )
