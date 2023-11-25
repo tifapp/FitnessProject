@@ -145,7 +145,9 @@ const manageCheckRun = async (action = "create") => {
 
   const postData = JSON.stringify(checkRunData)
 
+  console.log("jwt is ", jwtToken)
   const installationId = await fetchInstallationId()
+  console.log("installation id is ", installationId)
   const accessToken = await fetchInstallationAccessToken(installationId)
 
   console.log("access token is ", accessToken)
