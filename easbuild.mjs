@@ -148,6 +148,8 @@ const manageCheckRun = async (action = "create") => {
   const installationId = await fetchInstallationId()
   const accessToken = await fetchInstallationAccessToken(installationId)
 
+  console.log("access token is ", accessToken)
+
   const method = action === "create" ? "POST" : "PATCH"
   const checkRunIdPath =
     action !== "create" ? `/${process.env.CHECK_RUN_ID}` : ""
