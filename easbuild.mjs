@@ -7,7 +7,7 @@ dotenv.config()
 const jwtToken = jwt.sign(
   {
     iat: Math.floor(Date.now() / 1000),
-    exp: Math.floor(Date.now() / 1000) + 100 * 600,
+    exp: Math.floor(Date.now() / 1000) + 10 * 60,
     iss: process.env.GITHUB_APP_ID
   },
   process.env.GITHUB_APP_PRIVATE_KEY ?? "",
