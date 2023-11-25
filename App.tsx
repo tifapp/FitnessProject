@@ -7,9 +7,6 @@ import {
   IS_HAPTICS_SUPPORTED_ON_DEVICE,
   TiFHaptics
 } from "@lib/Haptics"
-import { NavigationContainer } from "@react-navigation/native"
-import { createStackNavigator } from "@react-navigation/stack"
-import { TabNavigation } from "@stacks/ActivitiesStack"
 import {
   getCurrentPositionAsync,
   requestForegroundPermissionsAsync
@@ -27,10 +24,11 @@ import {
   sentryErrorCapturingLogHandler
 } from "@lib/Logging"
 import { enableSentry } from "@lib/Sentry"
+import { AppView } from "root-feature/AppView"
 import "expo-dev-client"
 import { Native as SentryNative } from "sentry-expo"
-import awsconfig from "./src/aws-exports"
 import { setupCognito } from "./auth"
+import awsconfig from "./src/aws-exports"
 
 Geo.configure(awsconfig)
 setupCognito()
@@ -41,29 +39,6 @@ addLogHandler(sentryBreadcrumbLogHandler())
 addLogHandler(sentryErrorCapturingLogHandler())
 
 log("info", "App launched", { date: new Date() })
-
-const Stack = createStackNavigator()
-
-export type AppProps = {
-  isFontsLoaded: boolean
-}
-
-const AppView = ({ isFontsLoaded }: AppProps) => {
-  if (!isFontsLoaded) return null // TODO: - Splash Screen?
-  return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Activities Screen"
-          component={TabNavigation}
-          options={{
-            headerShown: false
-          }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
-  )
-}
 
 const App = () => {
   const [isFontsLoaded] = useAppFonts()

@@ -1,5 +1,5 @@
 import { Headline } from "@components/Text"
-import React, { Button, View } from "react-native"
+import React, { View } from "react-native"
 
 export const TestNotifScreen = () => {
   return (
