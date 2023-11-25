@@ -12,10 +12,10 @@
     "prepare": "husky install",
     "staged-lint": "lint-staged",
     "dev": "expo start --dev-client",
-    "eas-build-post-install": "node easbuildstart.mjs",
-    "eas-build-on-success": "node easbuildsuccess.mjs",
-    "eas-build-on-error": "node easbuildsuccess.mjs",
-    "eas-build-on-cancel": "node easbuildsuccess.mjs"
+    "eas-build-post-install": "node easbuild.mjs",
+    "eas-build-on-success": "node easbuild.mjs update",
+    "eas-build-on-error": "node easbuild.mjs error",
+    "eas-build-on-cancel": "node easbuild.mjs cancel"
   },
   "engines": {
     "npm": ">=8.3.0"
