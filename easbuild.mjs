@@ -7,7 +7,7 @@ dotenv.config()
 const jwtToken = jwt.sign(
   {
     iat: Math.floor(Date.now() / 1000),
-    exp: Math.floor(Date.now() / 1000) + 10 * 60,
+    exp: Math.floor(Date.now() / 1000) + 100 * 600,
     iss: process.env.GITHUB_APP_ID
   },
   process.env.GITHUB_APP_PRIVATE_KEY ?? "",
@@ -76,7 +76,7 @@ const manageCheckRun = (action = "create") => {
 
   const postData = JSON.stringify(checkRunData)
 
-  const method = action === "create" ? "PATCH" : "POST"
+  const method = action === "create" ? "POST" : "PATCH"
   const checkRunIdPath =
     action !== "create" ? `/${process.env.CHECK_RUN_ID}` : ""
   const options = {

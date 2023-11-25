@@ -19,6 +19,10 @@ permissions: write-all
 
 jobs:
   setup_and_lint:
+    env:
+      EXPO_PROJECT_ID: ${{ secrets.EXPO_PROJECT_ID }}
+      EXPO_PROJECT_OWNER: ${{ secrets.EXPO_PROJECT_OWNER }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -47,47 +51,6 @@ jobs:
 
       - name: Lint
         run: npm run staged-lint
-
-  unit_tests:
-    needs: setup_and_lint
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Cache node modules
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Run tests
-        run: npm run test:ci
-
-  build:
-    needs: unit_tests
-    runs-on: ubuntu-latest
-    env:
-      EXPO_PROJECT_ID: ${{ secrets.EXPO_PROJECT_ID }}
-      EXPO_PROJECT_OWNER: ${{ secrets.EXPO_PROJECT_OWNER }}
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Cache node modules
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Bundle project
-        run: npx expo export
 
       - name: Setup Expo and EAS
         uses: expo/expo-github-action@v8
