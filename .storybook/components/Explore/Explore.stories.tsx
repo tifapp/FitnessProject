@@ -15,6 +15,7 @@ import { NavigationContainer } from "@react-navigation/native"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import {
   getCurrentPositionAsync,
+  requestBackgroundPermissionsAsync,
   requestForegroundPermissionsAsync
 } from "expo-location"
 
@@ -43,6 +44,7 @@ export const Basic: ExploreEventsStory = () => (
       <UserLocationFunctionsProvider
         getCurrentLocation={getCurrentPositionAsync}
         requestForegroundPermissions={requestForegroundPermissionsAsync}
+        requestBackgroundPermissions={requestBackgroundPermissionsAsync}
       >
         <SafeAreaProvider>
           <NavigationContainer onStateChange={console.log}>
