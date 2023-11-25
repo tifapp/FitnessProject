@@ -14,7 +14,76 @@ const jwtToken = jwt.sign(
   { algorithm: "RS256" }
 )
 
-const manageCheckRun = (action = "create") => {
+const fetchInstallationId = async () => {
+  const options = {
+    hostname: "api.github.com",
+    path: "/app/installations",
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${jwtToken}`,
+      Accept: "application/vnd.github.v3+json",
+      "User-Agent": "NodeJS-Http-Request"
+    }
+  }
+
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, (res) => {
+      let data = ""
+      res.on("data", (chunk) => {
+        data += chunk
+      })
+      res.on("end", () => {
+        const installations = JSON.parse(data)
+        // Assuming the first installation is the one you want
+        const installationId = installations[0]?.id
+        resolve(installationId)
+      })
+    })
+
+    req.on("error", (error) => {
+      console.error("Error fetching installations:", error)
+      reject(error)
+    })
+
+    req.end()
+  })
+}
+
+const fetchInstallationAccessToken = async (installationId) => {
+  const options = {
+    hostname: "api.github.com",
+    path: `/app/installations/${installationId}/access_tokens`,
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${jwtToken}`,
+      Accept: "application/vnd.github.v3+json",
+      "User-Agent": "NodeJS-Http-Request"
+    }
+  }
+
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, (res) => {
+      let data = ""
+      res.on("data", (chunk) => {
+        data += chunk
+      })
+      res.on("end", () => {
+        const response = JSON.parse(data)
+        const accessToken = response.token
+        resolve(accessToken)
+      })
+    })
+
+    req.on("error", (error) => {
+      console.error("Error fetching installation access token:", error)
+      reject(error)
+    })
+
+    req.end()
+  })
+}
+
+const manageCheckRun = async (action = "create") => {
   let checkRunData
 
   switch (action) {
@@ -76,6 +145,9 @@ const manageCheckRun = (action = "create") => {
 
   const postData = JSON.stringify(checkRunData)
 
+  const installationId = await fetchInstallationId()
+  const accessToken = await fetchInstallationAccessToken(installationId)
+
   const method = action === "create" ? "POST" : "PATCH"
   const checkRunIdPath =
     action !== "create" ? `/${process.env.CHECK_RUN_ID}` : ""
@@ -84,7 +156,7 @@ const manageCheckRun = (action = "create") => {
     path: `/repos/${process.env.GITHUB_REPOSITORY}/check-runs${checkRunIdPath}`,
     method,
     headers: {
-      Authorization: `Bearer ${jwtToken}`,
+      Authorization: `token ${accessToken}`,
       Accept: "application/vnd.github.v3+json",
       "User-Agent": "NodeJS-Http-Request",
       "Content-Type": "application/json",
