@@ -99,5 +99,5 @@ export const setupArrivalsRefreshPolicy = (
       refresher.refreshIfNeeded()
     }
   })
-  setInterval(refresher.forceRefresh, THIRTY_MINUTES_IN_MILLIS)
+  setInterval(() => refresher.forceRefresh(), THIRTY_MINUTES_IN_MILLIS)
 }
