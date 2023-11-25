@@ -1,13 +1,26 @@
 import dotenv from "dotenv"
+import fs from "fs"
 import https from "https"
 import jwt from "jsonwebtoken"
+
+const getPredictedBuildTime = () => {
+  const now = new Date()
+
+  now.setMinutes(now.getMinutes() + 15)
+
+  return now.toLocaleString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true
+  })
+}
 
 dotenv.config()
 
 const jwtToken = jwt.sign(
   {
     iat: Math.floor(Date.now() / 1000),
-    exp: Math.floor(Date.now() / 1000) + 10 * 60,
+    exp: Math.floor(Date.now() / 1000) + 5 * 60,
     iss: process.env.GITHUB_APP_ID
   },
   process.env.GITHUB_APP_PRIVATE_KEY ?? "",
@@ -34,7 +47,6 @@ const fetchInstallationId = async () => {
       })
       res.on("end", () => {
         const installations = JSON.parse(data)
-        // Assuming the first installation is the one you want
         const installationId = installations[0]?.id
         resolve(installationId)
       })
@@ -49,7 +61,9 @@ const fetchInstallationId = async () => {
   })
 }
 
-const fetchInstallationAccessToken = async (installationId) => {
+const fetchInstallationAccessToken = async (
+  /** @type {string} */ installationId
+) => {
   const options = {
     hostname: "api.github.com",
     path: `/app/installations/${installationId}/access_tokens`,
@@ -84,48 +98,49 @@ const fetchInstallationAccessToken = async (installationId) => {
 }
 
 const manageCheckRun = async (action = "create") => {
+  console.log(JSON.stringify(process.env, null, 4))
+  let checkRunParams = {}
+  let checkRunId = ""
+  if (action !== "create") {
+    checkRunId = fs.readFileSync("checkRunId.txt", "utf8")
+    checkRunParams = {
+      checkRunId,
+      name: "EAS Build",
+      status: "completed",
+      completed_at: new Date().toISOString(),
+      conclusion: action
+    }
+  }
+  const checkRunIdPath = action !== "create" ? `/${checkRunId}` : ""
   let checkRunData
 
   switch (action) {
-  case "update":
+  case "success":
     checkRunData = {
-      check_run_id: process.env.CHECK_RUN_ID,
-      name: "EAS Build",
-      status: "completed",
-      conclusion: "success",
-      completed_at: new Date().toISOString(),
+      ...checkRunParams,
       output: {
         title: "Build Completed",
         summary: "Build completed successfully.",
-        text: "Detailed build information here."
+        text: "https://api.eas.build/artifacts/"
       }
     }
     break
-  case "error":
+  case "failure":
     checkRunData = {
-      check_run_id: process.env.CHECK_RUN_ID,
-      name: "EAS Build",
-      status: "completed",
-      conclusion: "failure",
-      completed_at: new Date().toISOString(),
+      ...checkRunParams,
       output: {
         title: "Build Failed",
         summary: "Build failed with an error.",
-        text: "Error details here."
+        text: `https://expo.dev/accounts/tifapp/projects/FitnessApp/builds/${process.env.EAS_BUILD_ID}`
       }
     }
     break
-  case "cancel":
+  case "cancelled":
     checkRunData = {
-      check_run_id: process.env.CHECK_RUN_ID,
-      name: "EAS Build",
-      status: "completed",
-      conclusion: "cancelled",
-      completed_at: new Date().toISOString(),
+      ...checkRunParams,
       output: {
         title: "Build Cancelled",
-        summary: "Build was cancelled.",
-        text: "Cancellation details here."
+        summary: "Build was cancelled."
       }
     }
     break
@@ -138,23 +153,16 @@ const manageCheckRun = async (action = "create") => {
       output: {
         title: "Build Started",
         summary: "Build started successfully.",
-        text: "Detailed build information here."
+        text: `Build will be finished at approximately ${getPredictedBuildTime()}`
       }
     }
   }
 
   const postData = JSON.stringify(checkRunData)
-
-  console.log("jwt is ", jwtToken)
   const installationId = await fetchInstallationId()
-  console.log("installation id is ", installationId)
   const accessToken = await fetchInstallationAccessToken(installationId)
 
-  console.log("access token is ", accessToken)
-
   const method = action === "create" ? "POST" : "PATCH"
-  const checkRunIdPath =
-    action !== "create" ? `/${process.env.CHECK_RUN_ID}` : ""
   const options = {
     hostname: "api.github.com",
     path: `/repos/${process.env.GITHUB_REPOSITORY}/check-runs${checkRunIdPath}`,
@@ -174,7 +182,16 @@ const manageCheckRun = async (action = "create") => {
       data += chunk
     })
     res.on("end", () => {
-      console.log(data)
+      try {
+        console.log(data)
+        const responseObj = JSON.parse(data)
+        const checkRunId = responseObj.id
+        console.log("Check Run ID:", checkRunId)
+
+        fs.writeFileSync("checkRunId.txt", checkRunId.toString())
+      } catch (error) {
+        console.error("Error parsing response data:", error)
+      }
     })
   })
 

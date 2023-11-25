@@ -13,9 +13,10 @@
     "staged-lint": "lint-staged",
     "dev": "expo start --dev-client",
     "eas-build-post-install": "node easbuild.mjs",
-    "eas-build-on-success": "node easbuild.mjs update",
-    "eas-build-on-error": "node easbuild.mjs error",
-    "eas-build-on-cancel": "node easbuild.mjs cancel"
+    "eas-build-on-success": "node easbuild.mjs success",
+    "eas-build-on-error": "node easbuild.mjs failure",
+    "eas-build-on-cancel": "node easbuild.mjs cancelled",
+    "eas-build-local": "eas build --profile development --platform android"
   },
   "engines": {
     "npm": ">=8.3.0"
@@ -51,6 +52,7 @@
     "babel-jest": "^29.5.0",
     "dayjs": "^1.11.7",
     "dotenv": "^16.0.3",
+    "eas-cli": "^5.9.1",
     "expo": "^48.0.0",
     "expo-application": "~5.1.1",
     "expo-asset": "~8.9.1",
@@ -126,6 +128,7 @@
     "@faker-js/faker": "^7.6.0",
     "@testing-library/react-native": "12.2",
     "@types/jest": "^29.5.4",
+    "@types/jsonwebtoken": "^9.0.5",
     "@types/linkify-it": "^3.0.2",
     "@types/ngeohash": "^0.6.4",
     "@types/react": "~18.0.27",
