@@ -54,4 +54,29 @@ describe("EventArrivalsRefresher tests", () => {
     await refresher.refreshIfNeeded()
     expect(performRefresh).not.toHaveBeenCalled()
   })
+
+  test("time until next available refresh, basic", async () => {
+    const refresher = new EventArrivalsRefresher(performRefresh, 20)
+    jest.setSystemTime(new Date("2023-11-24T00:00:00"))
+    await refresher.refreshIfNeeded()
+    jest.setSystemTime(new Date("2023-11-24T00:08:42"))
+    const time = await refresher.timeUntilNextRefreshAvailable()
+    expect(time).toEqual(678000)
+  })
+
+  test("time until next available refresh, zero when no prior refreshes", async () => {
+    const refresher = new EventArrivalsRefresher(performRefresh, 20)
+    jest.setSystemTime(new Date("2023-11-24T00:08:42"))
+    const time = await refresher.timeUntilNextRefreshAvailable()
+    expect(time).toEqual(0)
+  })
+
+  test("time until next available refresh, zero when past minute threshold", async () => {
+    const refresher = new EventArrivalsRefresher(performRefresh, 20)
+    jest.setSystemTime(new Date("2023-11-24T00:00:00"))
+    await refresher.refreshIfNeeded()
+    jest.setSystemTime(new Date("2023-11-24T00:32:16"))
+    const time = await refresher.timeUntilNextRefreshAvailable()
+    expect(time).toEqual(0)
+  })
 })

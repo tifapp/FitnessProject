@@ -1,5 +1,5 @@
 import { AsyncStorageUtils } from "@lib/AsyncStorage"
-import { StringDateSchema, diffDates } from "@lib/date"
+import { StringDateSchema, addSecondsToDate, diffDates, now } from "@lib/date"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { AppState } from "react-native"
 import { EventArrivalNotification } from "./models"
@@ -9,9 +9,13 @@ import { EventArrivalsTracker } from "./Tracker"
  * A class that manages refreshing of upcoming event arrivals.
  */
 export class EventArrivalsRefresher {
-  private readonly lastRefreshTime = new LastRefreshTime()
+  private readonly lastRefreshDate = new LastRefreshDate()
   private readonly performRefresh: () => Promise<void>
   private readonly minutesBetweenNeededRefreshes: number
+
+  private get secondsNeededBetweenRefreshes () {
+    return this.minutesBetweenNeededRefreshes * 60
+  }
 
   constructor (
     performRefresh: () => Promise<void>,
@@ -23,81 +27,99 @@ export class EventArrivalsRefresher {
 
   static usingTracker (
     tracker: EventArrivalsTracker,
-    fetchUpcomingNotifications: () => Promise<EventArrivalNotification[]>
+    fetchUpcomingNotifications: () => Promise<EventArrivalNotification[]>,
+    minutesBetweenNeededRefreshes: number
   ) {
     return new EventArrivalsRefresher(async () => {
       await tracker.refreshUpcomingArrivalNotifications(
         fetchUpcomingNotifications
       )
-    }, 30)
+    }, minutesBetweenNeededRefreshes)
   }
 
   /**
    * Refreshes if the time from the last refresh is greater than the specified duration of minutes.
    */
   async refreshIfNeeded () {
-    const refreshTimeDiff = await this.lastRefreshTime.diffFromLastRefresh()
-    if (
-      !refreshTimeDiff ||
-      Math.abs(refreshTimeDiff.minutes) >= this.minutesBetweenNeededRefreshes
-    ) {
+    if (now().isSameOrAfter(await this.nextAvailableRefreshDate())) {
       await this.forceRefresh()
     }
+  }
+
+  /**
+   * Returns the number of milliseconds to wait until another refresh should be performed.
+   */
+  async timeUntilNextRefreshAvailable () {
+    const { milliseconds } = diffDates(
+      await this.nextAvailableRefreshDate(),
+      new Date()
+    )
+    return Math.max(0, milliseconds)
   }
 
   /**
    * Forces a refresh and updates the last referesh time.
    */
   async forceRefresh () {
-    await Promise.all([
+    await Promise.allSettled([
       this.performRefresh(),
-      this.lastRefreshTime.markNewRefreshTime()
+      this.lastRefreshDate.markNewRefreshDate()
     ])
+  }
+
+  private async nextAvailableRefreshDate () {
+    const lastDate = await this.lastRefreshDate.date()
+    if (!lastDate) return new Date()
+    return addSecondsToDate(lastDate, this.secondsNeededBetweenRefreshes)
   }
 }
 
-class LastRefreshTime {
+class LastRefreshDate {
   private static LAST_REFRESH_KEY = "@event-arrivals-last-refresh"
   private cachedRefreshTime?: Date
 
-  async diffFromLastRefresh () {
-    const lastRefreshDate = await this.current()
-    if (!lastRefreshDate) return undefined
-    return diffDates(lastRefreshDate, new Date())
-  }
-
-  private async current () {
+  async date () {
     if (this.cachedRefreshTime) return this.cachedRefreshTime
     const lastTime = await AsyncStorageUtils.parseJSONItem(
       StringDateSchema,
-      LastRefreshTime.LAST_REFRESH_KEY
+      LastRefreshDate.LAST_REFRESH_KEY
     )
     this.cachedRefreshTime = lastTime
     return lastTime
   }
 
-  async markNewRefreshTime () {
+  async markNewRefreshDate () {
     const lastTime = new Date()
     this.cachedRefreshTime = lastTime
     await AsyncStorage.setItem(
-      LastRefreshTime.LAST_REFRESH_KEY,
+      LastRefreshDate.LAST_REFRESH_KEY,
       JSON.stringify(lastTime)
     )
   }
 }
 
-const THIRTY_MINUTES_IN_MILLIS = 1.8e6
-
 /**
- * Sets up force refreshing every 30 minutes and needs based refreshing everytime the app foregrounds.
+ * Sets up forced interval refreshing and needed refreshes whenever the app foregrounds.
  */
 export const setupArrivalsRefreshPolicy = (
   refresher: EventArrivalsRefresher
 ) => {
-  AppState.addEventListener("change", (state) => {
+  AppState.addEventListener("change", async (state) => {
     if (state === "active") {
-      refresher.refreshIfNeeded()
+      await refresher.refreshIfNeeded()
     }
   })
-  setInterval(() => refresher.forceRefresh(), THIRTY_MINUTES_IN_MILLIS)
+  setupIntervalRefreshes(refresher)
+}
+
+const setupIntervalRefreshes = async (refresher: EventArrivalsRefresher) => {
+  setTimeout(async () => {
+    // NB: We force refresh because setTimeout delays are imprecise and thus can possibly
+    // cause missed refreshes. However, this is fine since we sleep for "about the right"
+    // amount of time needed to make the refreshes available.
+    await refresher.forceRefresh()
+
+    // NB: See https://developer.mozilla.org/en-US/docs/Web/API/setInterval#ensure_that_execution_duration_is_shorter_than_interval_frequency
+    await setupIntervalRefreshes(refresher)
+  }, await refresher.timeUntilNextRefreshAvailable())
 }
