@@ -11,16 +11,22 @@ import {
 import { defineTask } from "expo-task-manager"
 import { z } from "zod"
 
-export type GeofencedCoordinateStatus = "entered" | "exited"
+export type EventArrivalGeofencedCoordinateStatus = "entered" | "exited"
 
-export type GeofencingCallback = (
+export type EventArrivalGeofencingCallback = (
   coordinate: LocationCoordinate2D,
-  status: GeofencedCoordinateStatus
+  status: EventArrivalGeofencedCoordinateStatus
 ) => void
 
 const taskCallbacks = {
-  foreground: undefined as GeofencingCallback | undefined,
-  background: undefined as GeofencingCallback | undefined
+  foreground: undefined as EventArrivalGeofencingCallback | undefined,
+  background: undefined as EventArrivalGeofencingCallback | undefined
+}
+
+type TaskCallbackKey = keyof typeof taskCallbacks
+
+const taskName = (key: TaskCallbackKey) => {
+  return `event-arrivals-geofencing-${key}`
 }
 
 /**
@@ -36,9 +42,9 @@ const taskCallbacks = {
  * ie. about 1-2 american football fields.
  */
 export class EventArrivalsGeofencer {
-  private readonly key: keyof typeof taskCallbacks
+  private readonly key: TaskCallbackKey
 
-  private constructor (key: keyof typeof taskCallbacks) {
+  private constructor (key: TaskCallbackKey) {
     this.key = key
   }
 
@@ -64,7 +70,7 @@ export class EventArrivalsGeofencer {
    * Handle geofencing updates. This method only supports 1 consumer at a time, and
    * calling it twice will unregister the first consumer.
    */
-  onUpdate (handleUpdate: GeofencingCallback) {
+  onUpdate (handleUpdate: EventArrivalGeofencingCallback) {
     taskCallbacks[this.key] = handleUpdate
   }
 
@@ -81,6 +87,16 @@ export class EventArrivalsGeofencer {
   static background = new EventArrivalsGeofencer("background")
 }
 
+/**
+ * Starts tasks for observing geofencing updates in the background.
+ *
+ * **This *must* be called in the global scope.**
+ */
+export const defineEventArrivalsGeofencingTasks = () => {
+  defineEventArrivalsGeofencingTask("background")
+  defineEventArrivalsGeofencingTask("foreground")
+}
+
 const TaskEventSchema = z.object({
   data: z.object({
     eventType: z.nativeEnum(LocationGeofencingEventType),
@@ -88,11 +104,7 @@ const TaskEventSchema = z.object({
   })
 })
 
-const taskName = (key: keyof typeof taskCallbacks) => {
-  return `event-arrivals-geofencing-${key}`
-}
-
-const defineEventArrivalsGeofencingTask = (key: keyof typeof taskCallbacks) => {
+const defineEventArrivalsGeofencingTask = (key: TaskCallbackKey) => {
   defineTask(taskName(key), async (arg) => {
     const { data } = await TaskEventSchema.parseAsync(arg)
     taskCallbacks[key]?.(
@@ -101,7 +113,3 @@ const defineEventArrivalsGeofencingTask = (key: keyof typeof taskCallbacks) => {
     )
   })
 }
-
-// NB: According to expo, we must make these calls in global scope.
-defineEventArrivalsGeofencingTask("background")
-defineEventArrivalsGeofencingTask("foreground")
