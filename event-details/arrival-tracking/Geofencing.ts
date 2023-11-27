@@ -1,4 +1,5 @@
 import { yardsToMeters } from "@lib/Math"
+import { StringUtils } from "@lib/String"
 import {
   LocationCoordinate2D,
   LocationCoordinates2DSchema
@@ -13,20 +14,24 @@ import { z } from "zod"
 
 export type EventArrivalGeofencedCoordinateStatus = "entered" | "exited"
 
-export type EventArrivalGeofencingCallback = (
-  coordinate: LocationCoordinate2D,
+export type EventArrivalGeofencingUpdate = {
+  coordinate: LocationCoordinate2D
   status: EventArrivalGeofencedCoordinateStatus
+}
+
+export type EventArrivalGeofencingCallback = (
+  update: EventArrivalGeofencingUpdate
 ) => void
 
 const taskCallbacks = {
-  foreground: undefined as EventArrivalGeofencingCallback | undefined,
-  background: undefined as EventArrivalGeofencingCallback | undefined
+  nonUpcoming: undefined as EventArrivalGeofencingCallback | undefined,
+  upcoming: undefined as EventArrivalGeofencingCallback | undefined
 }
 
 type TaskCallbackKey = keyof typeof taskCallbacks
 
 const taskName = (key: TaskCallbackKey) => {
-  return `event-arrivals-geofencing-${key}`
+  return `eventArrivalsGeofencing${StringUtils.capitalizeFirstLetter(key)}`
 }
 
 /**
@@ -34,14 +39,14 @@ const taskName = (key: TaskCallbackKey) => {
  *
  * There are only 2 instances of this class, `foreground` and `background`.
  *
- * `background` is used for tracking event arrivals added through {@link EventArrivalsTracker}.
+ * `upcomingArrivalsInstance` is used for tracking event arrivals added through {@link EventArrivalsTracker}.
  *
- * `foreground` is used for tracking event arrivals for non-upcoming events, and thus only runs in the foreground.
+ * `nonUpcomingArrivalsInstance` is used for tracking event arrivals for non-upcoming events.
  *
  * This distance being geofenced is based on a "walking to the event from the parking lot basis",
  * ie. about 1-2 american football fields.
  */
-export class EventArrivalsGeofencer {
+export class ExpoEventArrivalsGeofencer {
   private readonly key: TaskCallbackKey
 
   private constructor (key: TaskCallbackKey) {
@@ -69,22 +74,29 @@ export class EventArrivalsGeofencer {
   /**
    * Handle geofencing updates. This method only supports 1 consumer at a time, and
    * calling it twice will unregister the first consumer.
+   *
+   * @returns a function to unsubscribe from updates.
    */
   onUpdate (handleUpdate: EventArrivalGeofencingCallback) {
     taskCallbacks[this.key] = handleUpdate
+    return () => {
+      taskCallbacks[this.key] = undefined
+    }
   }
 
   /**
-   * The {@link EventArrivalsGeofencer} instance to use when the user wants to check
-   * their "arrival" at events they are not apart of.
+   * The {@link ExpoEventArrivalsGeofencer} instance to use when the user wants to check
+   * their "arrival" at events they are not apart of or are in the distant future.
    */
-  static foreground = new EventArrivalsGeofencer("foreground")
+  static nonUpcomingArrivalsInstance = new ExpoEventArrivalsGeofencer(
+    "nonUpcoming"
+  )
 
   /**
-   * The {@link EventArrivalsGeofencer} instance to use for handling arrival notifications
-   * for events that the user has joined in the background.
+   * The {@link ExpoEventArrivalsGeofencer} instance to use for events that start within
+   * 24 hours that the user is a part of.
    */
-  static background = new EventArrivalsGeofencer("background")
+  static upcomingArrivalsInstance = new ExpoEventArrivalsGeofencer("upcoming")
 }
 
 /**
@@ -93,8 +105,8 @@ export class EventArrivalsGeofencer {
  * **This *must* be called in the global scope.**
  */
 export const defineEventArrivalsGeofencingTasks = () => {
-  defineEventArrivalsGeofencingTask("background")
-  defineEventArrivalsGeofencingTask("foreground")
+  defineEventArrivalsGeofencingTask("upcoming")
+  defineEventArrivalsGeofencingTask("nonUpcoming")
 }
 
 const TaskEventSchema = z.object({
@@ -107,9 +119,9 @@ const TaskEventSchema = z.object({
 const defineEventArrivalsGeofencingTask = (key: TaskCallbackKey) => {
   defineTask(taskName(key), async (arg) => {
     const { data } = await TaskEventSchema.parseAsync(arg)
-    taskCallbacks[key]?.(
-      data.region,
-      LocationGeofencingEventType.Enter ? "entered" : "exited"
-    )
+    taskCallbacks[key]?.({
+      coordinate: data.region,
+      status: LocationGeofencingEventType.Enter ? "entered" : "exited"
+    })
   })
 }
