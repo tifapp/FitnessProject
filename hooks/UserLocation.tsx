@@ -42,9 +42,26 @@ export const useRequestForegroundLocationPermissions = (
   )
 }
 
+/**
+ * A query hook to request permission for background location permissions.
+ *
+ * Background location permissions first require that foreground location permissions are accepted.
+ */
+export const useRequestBackgroundLocationsPermissions = (
+  options?: QueryHookOptions<PermissionResponse>
+) => {
+  const { requestBackgroundPermissions } = useUserLocationFunctions()
+  return useQuery(
+    ["request-location-foreground-permissions"],
+    async () => await requestBackgroundPermissions(),
+    options
+  )
+}
+
 export type UserLocationFunctions = {
   getCurrentLocation: (options: LocationOptions) => Promise<LocationObject>
   requestForegroundPermissions: () => Promise<PermissionResponse>
+  requestBackgroundPermissions: () => Promise<PermissionResponse>
 }
 
 const UserLocationFunctionsContext = createContext<
