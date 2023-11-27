@@ -18,10 +18,7 @@ import {
 import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import {
-  getCurrentPositionAsync,
-  requestForegroundPermissionsAsync
-} from "expo-location"
+import { PermissionStatus, getCurrentPositionAsync } from "expo-location"
 import React from "react"
 import { Button } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -40,18 +37,27 @@ export const Basic: LocationSearchStory = () => (
   <TiFQueryClientProvider>
     <UserLocationFunctionsProvider
       getCurrentLocation={getCurrentPositionAsync}
-      requestForegroundPermissions={requestForegroundPermissionsAsync}
+      requestForegroundPermissions={async () => ({
+        expires: Infinity,
+        canAskAgain: true,
+        granted: true,
+        status: PermissionStatus.GRANTED
+      })}
+      requestBackgroundPermissions={async () => ({
+        expires: Infinity,
+        canAskAgain: true,
+        granted: true,
+        status: PermissionStatus.GRANTED
+      })}
     >
       <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
-          headerMode="screen"
-        >
+        <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
           <Stack.Screen name="settings" component={TestScreen} />
           <Stack.Screen
             name="search"
             options={{
-              header: () => <LocationSearchHeader />
+              header: () => <LocationSearchHeader />,
+              headerMode: "screen"
             }}
             component={LocationSearchScreen}
           />

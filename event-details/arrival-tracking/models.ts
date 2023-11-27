@@ -1,5 +1,4 @@
 import { faker } from "@faker-js/faker"
-import { StringDateRangeSchema, dateRange } from "@lib/date"
 import {
   LocationCoordinates2DSchema,
   mockLocationCoordinate2D
@@ -7,37 +6,27 @@ import {
 import { z } from "zod"
 
 /**
- * A zod schema for {@link EventArrivalNotification}.
+ * A zod schema for {@link EventArrival}.
  */
-export const EventArrivalNotificationSchema = z.object({
+export const EventArrivalSchema = z.object({
   eventId: z.number(),
-  eventName: z.string().nonempty(),
-  coordinate: LocationCoordinates2DSchema,
-  dateRange: StringDateRangeSchema
+  coordinate: LocationCoordinates2DSchema
 })
 
 /**
- * A zod schema for an array of {@link EventArrivalNotification}.
+ * A zod schema for an array of {@link EventArrival}.
  */
-export const EventArrivalNotificationsSchema = z.array(
-  EventArrivalNotificationSchema
-)
+export const EventArrivalsSchema = z.array(EventArrivalSchema)
 
 /**
- * Event arrival notifications are sent when the user enters the area of an event,
+ * Event arrivala are sent as notifications when the user enters the area of an event,
  * so that other participants are aware of their arrival.
  *
- * This type is used to store the information neccessary for sending a local notification
- * to the user that they have arrived at the event, and that we have let everyone else know
- * that they are there.
+ * The scheduling/sending of the push notifications is handled server-side.
  */
-export type EventArrivalNotification = z.infer<
-  typeof EventArrivalNotificationSchema
->
+export type EventArrival = z.infer<typeof EventArrivalSchema>
 
-export const mockEventArrivalNotification = (): EventArrivalNotification => ({
+export const mockEventArrival = (): EventArrival => ({
   eventId: parseInt(faker.random.numeric(3)),
-  eventName: faker.word.noun(),
-  coordinate: mockLocationCoordinate2D(),
-  dateRange: dateRange(faker.date.past(), faker.date.future())
+  coordinate: mockLocationCoordinate2D()
 })

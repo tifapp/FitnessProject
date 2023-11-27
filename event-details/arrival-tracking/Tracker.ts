@@ -1,73 +1,68 @@
 import { LocationCoordinate2D } from "@lib/location"
-import { PendingEventArrivalNotifications } from "./PendingNotifications"
-import { EventArrivalNotification } from "./models"
+import { UpcomingEventArrivals } from "./UpcomingArrivals"
+import { EventArrival } from "./models"
 
 /**
  * A class for tracking upcoming event arrivals.
  *
- * This class acts as a proxy that ensures that all pending arrival notifications
+ * This class acts as a proxy that ensures that all pending arrivals
  * also have their coordinates being geofenced simulataneously, and keeps those
  * sources in sync on a consistent basis.
  */
 export class EventArrivalsTracker {
-  private readonly pendingArrivalNotifications: PendingEventArrivalNotifications
+  private readonly upcomingArrivals: UpcomingEventArrivals
   private readonly replaceGeofencedCoordinates: (
     events: LocationCoordinate2D[]
   ) => void
 
   constructor (
-    pendingArrivalNotifications: PendingEventArrivalNotifications,
+    upcomingArrivals: UpcomingEventArrivals,
     replaceGeofencedCoordinates: (coordinates: LocationCoordinate2D[]) => void
   ) {
-    this.pendingArrivalNotifications = pendingArrivalNotifications
+    this.upcomingArrivals = upcomingArrivals
     this.replaceGeofencedCoordinates = replaceGeofencedCoordinates
   }
 
   /**
-   * Refreshes the upcoming arrival notifications.
+   * Refreshes the upcoming arrivals.
    *
-   * @param fetchUpcomingNotifications a function to fetch the upcoming {@link EventArrivalNotification}s.
+   * @param fetchUpcomingArrivals a function to fetch the upcoming {@link EventArrival}s.
    */
-  async refreshUpcomingArrivalNotifications (
-    fetchUpcomingNotifications: () => Promise<EventArrivalNotification[]>
-  ) {
-    await this.syncArrivalNotifications(await fetchUpcomingNotifications())
+  async refreshArrivals (fetchUpcomingArrivals: () => Promise<EventArrival[]>) {
+    await this.syncArrivals(await fetchUpcomingArrivals())
   }
 
   /**
-   * Adds an {@link EventArrivalNotification} to tracking.
+   * Adds an {@link EventArrival} to tracking.
    *
-   * If a notification exists with the same event id, then that notification
-   * is updated without a new one being added.
+   * If an arrival exists with the same event id, then that arrival is updated instead of added.
    */
-  async addUpcomingArrivalNotification (notification: EventArrivalNotification) {
-    const currentNotifications = await this.pendingArrivalNotifications.all()
-    const eventIdIndex = currentNotifications.findIndex(
-      (innerNotification) => innerNotification.eventId === notification.eventId
+  async trackArrival (newArrival: EventArrival) {
+    const trackedArrivals = await this.upcomingArrivals.all()
+    const eventIdIndex = trackedArrivals.findIndex(
+      (trackedArrival) => trackedArrival.eventId === newArrival.eventId
     )
     if (eventIdIndex >= 0) {
-      currentNotifications[eventIdIndex] = notification
+      trackedArrivals[eventIdIndex] = newArrival
     } else {
-      currentNotifications.push(notification)
+      trackedArrivals.push(newArrival)
     }
-    await this.syncArrivalNotifications(currentNotifications)
+    await this.syncArrivals(trackedArrivals)
   }
 
-  async removeUpcomingArrivalNotificationByEventId (eventId: number) {
-    const currentNotifications = await this.pendingArrivalNotifications.all()
-    const filteredNotifications = currentNotifications.filter(
-      (notification) => notification.eventId !== eventId
+  async removeArrivalByEventId (eventId: number) {
+    const trackedArrivals = await this.upcomingArrivals.all()
+    const filteredArrivals = trackedArrivals.filter(
+      (arrival) => arrival.eventId !== eventId
     )
-    if (currentNotifications.length === filteredNotifications.length) return
-    await this.syncArrivalNotifications(filteredNotifications)
+    if (trackedArrivals.length === filteredArrivals.length) return
+    await this.syncArrivals(filteredArrivals)
   }
 
-  private async syncArrivalNotifications (
-    notifications: EventArrivalNotification[]
-  ) {
+  private async syncArrivals (arrivals: EventArrival[]) {
     this.replaceGeofencedCoordinates(
-      notifications.map((notification) => notification.coordinate)
+      arrivals.map((arrival) => arrival.coordinate)
     )
-    await this.pendingArrivalNotifications.replaceAll(notifications)
+    await this.upcomingArrivals.replaceAll(arrivals)
   }
 }

@@ -12,6 +12,7 @@ import { createStackNavigator } from "@react-navigation/stack"
 import { TabNavigation } from "@stacks/ActivitiesStack"
 import {
   getCurrentPositionAsync,
+  requestBackgroundPermissionsAsync,
   requestForegroundPermissionsAsync
 } from "expo-location"
 import React from "react"
@@ -75,6 +76,7 @@ const App = () => {
       <UserLocationFunctionsProvider
         getCurrentLocation={getCurrentPositionAsync}
         requestForegroundPermissions={requestForegroundPermissionsAsync}
+        requestBackgroundPermissions={requestBackgroundPermissionsAsync}
       >
         <HapticsProvider
           isSupportedOnDevice={IS_HAPTICS_SUPPORTED_ON_DEVICE}

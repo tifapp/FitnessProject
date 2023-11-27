@@ -2,7 +2,7 @@ import { AsyncStorageUtils } from "@lib/AsyncStorage"
 import { StringDateSchema, addSecondsToDate, diffDates, now } from "@lib/date"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { AppState } from "react-native"
-import { EventArrivalNotification } from "./models"
+import { EventArrival } from "./models"
 import { EventArrivalsTracker } from "./Tracker"
 
 /**
@@ -27,13 +27,11 @@ export class EventArrivalsRefresher {
 
   static usingTracker (
     tracker: EventArrivalsTracker,
-    fetchUpcomingNotifications: () => Promise<EventArrivalNotification[]>,
+    fetchUpcomingArrivals: () => Promise<EventArrival[]>,
     minutesBetweenNeededRefreshes: number
   ) {
     return new EventArrivalsRefresher(async () => {
-      await tracker.refreshUpcomingArrivalNotifications(
-        fetchUpcomingNotifications
-      )
+      await tracker.refreshArrivals(fetchUpcomingArrivals)
     }, minutesBetweenNeededRefreshes)
   }
 

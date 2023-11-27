@@ -1,114 +1,103 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { AsyncStoragePendingEventArrivalNotifications } from "./PendingNotifications"
+import { AsyncStorageUpcomingEventArrivals } from "./UpcomingArrivals"
 import { EventArrivalsTracker } from "./Tracker"
-import {
-  EventArrivalNotification,
-  mockEventArrivalNotification
-} from "./models"
+import { EventArrival, mockEventArrival } from "./models"
 import { ArrayUtils } from "@lib/Array"
 
 describe("EventArrivalsTracker tests", () => {
-  const pendingNotifications =
-    new AsyncStoragePendingEventArrivalNotifications()
+  const upcomingArrivals = new AsyncStorageUpcomingEventArrivals()
   beforeEach(async () => await AsyncStorage.clear())
 
   const replaceGeofencedCoordinates = jest.fn()
   afterEach(() => replaceGeofencedCoordinates.mockReset())
 
   const tracker = new EventArrivalsTracker(
-    pendingNotifications,
+    upcomingArrivals,
     replaceGeofencedCoordinates
   )
 
-  test("refresh upcoming arrivals", async () => {
-    const upcomingArrivals = ArrayUtils.repeatElements(2, () => {
-      return mockEventArrivalNotification()
+  test("refresh arrivals", async () => {
+    const arrivals = ArrayUtils.repeatElements(2, () => {
+      return mockEventArrival()
     })
-    await tracker.refreshUpcomingArrivalNotifications(
-      jest.fn().mockResolvedValueOnce(upcomingArrivals)
-    )
+    await tracker.refreshArrivals(jest.fn().mockResolvedValueOnce(arrivals))
     expect(replaceGeofencedCoordinates).toHaveBeenCalledWith([
-      upcomingArrivals[0].coordinate,
-      upcomingArrivals[1].coordinate
+      arrivals[0].coordinate,
+      arrivals[1].coordinate
     ])
-    await expectPendingNotifications(upcomingArrivals)
+    await expectUpcomingArrivals(arrivals)
   })
 
-  test("add upcoming arrival, basic", async () => {
-    const arrivalNotification = mockEventArrivalNotification()
-    await tracker.addUpcomingArrivalNotification(arrivalNotification)
+  test("track arrival, basic", async () => {
+    const arrival = mockEventArrival()
+    await tracker.trackArrival(arrival)
     expect(replaceGeofencedCoordinates).toHaveBeenCalledWith([
-      arrivalNotification.coordinate
+      arrival.coordinate
     ])
-    await expectPendingNotifications([arrivalNotification])
+    await expectUpcomingArrivals([arrival])
   })
 
-  test("add upcoming arrival, merges with tracked arrivals", async () => {
-    const notifications = ArrayUtils.repeatElements(2, () => {
-      return mockEventArrivalNotification()
+  test("track arrival, merges with tracked arrivals", async () => {
+    const arrivals = ArrayUtils.repeatElements(2, () => {
+      return mockEventArrival()
     })
-    await tracker.addUpcomingArrivalNotification(notifications[0])
+    await tracker.trackArrival(arrivals[0])
     replaceGeofencedCoordinates.mockReset()
-    await tracker.addUpcomingArrivalNotification(notifications[1])
+    await tracker.trackArrival(arrivals[1])
     expect(replaceGeofencedCoordinates).toHaveBeenCalledWith([
-      notifications[0].coordinate,
-      notifications[1].coordinate
+      arrivals[0].coordinate,
+      arrivals[1].coordinate
     ])
-    await expectPendingNotifications(notifications)
+    await expectUpcomingArrivals(arrivals)
   })
 
-  test("add upcoming arrival, updates existing arrival with matching event id", async () => {
-    const arrivalNotification = mockEventArrivalNotification()
-    await tracker.addUpcomingArrivalNotification(arrivalNotification)
+  test("track arrival, updates existing arrival with matching event id", async () => {
+    const arrival = mockEventArrival()
+    await tracker.trackArrival(arrival)
     replaceGeofencedCoordinates.mockReset()
     const nextArrival = {
-      ...mockEventArrivalNotification(),
-      eventId: arrivalNotification.eventId
+      ...mockEventArrival(),
+      eventId: arrival.eventId
     }
-    await tracker.addUpcomingArrivalNotification(nextArrival)
+    await tracker.trackArrival(nextArrival)
     expect(replaceGeofencedCoordinates).toHaveBeenCalledWith([
       nextArrival.coordinate
     ])
-    await expectPendingNotifications([nextArrival])
+    await expectUpcomingArrivals([nextArrival])
   })
 
-  test("remove upcoming arrival, basic", async () => {
+  test("remove arrival, basic", async () => {
     const arrivals = ArrayUtils.repeatElements(3, () => {
-      return mockEventArrivalNotification()
+      return mockEventArrival()
     })
     for (const arrival of arrivals) {
-      await tracker.addUpcomingArrivalNotification(arrival)
+      await tracker.trackArrival(arrival)
     }
     replaceGeofencedCoordinates.mockReset()
-    await tracker.removeUpcomingArrivalNotificationByEventId(
-      arrivals[1].eventId
-    )
+    await tracker.removeArrivalByEventId(arrivals[1].eventId)
     expect(replaceGeofencedCoordinates).toHaveBeenCalledWith([
       arrivals[0].coordinate,
       arrivals[2].coordinate
     ])
-    await expectPendingNotifications([arrivals[0], arrivals[2]])
+    await expectUpcomingArrivals([arrivals[0], arrivals[2]])
   })
 
-  test("remove upcoming arrival, does nothing when no tracked arrivals", async () => {
-    await tracker.removeUpcomingArrivalNotificationByEventId(1)
+  test("remove arrival, does nothing when no tracked arrivals", async () => {
+    await tracker.removeArrivalByEventId(1)
     expect(replaceGeofencedCoordinates).not.toHaveBeenCalled()
-    await expectPendingNotifications([])
+    await expectUpcomingArrivals([])
   })
 
-  test("remove upcoming arrival, does nothing when given arrival not tracked", async () => {
-    const trackedArrival = { ...mockEventArrivalNotification(), eventId: 2 }
-    await tracker.addUpcomingArrivalNotification(trackedArrival)
+  test("remove arrival, does nothing when given arrival not tracked", async () => {
+    const trackedArrival = { ...mockEventArrival(), eventId: 2 }
+    await tracker.trackArrival(trackedArrival)
     replaceGeofencedCoordinates.mockReset()
-    await tracker.removeUpcomingArrivalNotificationByEventId(1)
+    await tracker.removeArrivalByEventId(1)
     expect(replaceGeofencedCoordinates).not.toHaveBeenCalled()
-    await expectPendingNotifications([trackedArrival])
+    await expectUpcomingArrivals([trackedArrival])
   })
 
-  const expectPendingNotifications = async (
-    expected: EventArrivalNotification[]
-  ) => {
-    const allPending = await pendingNotifications.all()
-    expect(allPending).toEqual(expected)
+  const expectUpcomingArrivals = async (expected: EventArrival[]) => {
+    expect(await upcomingArrivals.all()).toEqual(expected)
   }
 })
