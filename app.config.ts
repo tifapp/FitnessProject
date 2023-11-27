@@ -30,7 +30,10 @@ const config = {
   ios: {
     bundleIdentifier: "com.tifapp.FitnessApp",
     infoPlist: {
-      NSLocationAlwaysAndWhenInUseUsageDescription: "REASON_FOR_REQUEST",
+      NSLocationAlwaysAndWhenInUseUsageDescription:
+        "To inform others of your arrival, tap \"Change to Always Allow.\"",
+      NSLocationWhenInUseUsageDescription:
+        "Discover events and receive travel estimates for events by tapping \"Allow Once\" or \"Allow While Using App.\"",
       UIBackgroundModes: ["location", "fetch"],
       LSApplicationQueriesSchemes: [
         "comgooglemaps",
