@@ -24,7 +24,7 @@ import {
   sentryErrorCapturingLogHandler
 } from "@lib/Logging"
 import { enableSentry } from "@lib/Sentry"
-import { AppView } from "root-feature/AppView"
+import { AppView } from "@root-feature/AppView"
 import "expo-dev-client"
 import { Native as SentryNative } from "sentry-expo"
 import { setupCognito } from "./auth"

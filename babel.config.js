@@ -29,6 +29,7 @@ module.exports = function (api) {
             "@auth": path.join(rootPath, "auth"),
             "@event-details": path.join(rootPath, "event-details"),
             "@location-search": path.join(rootPath, "location-search"),
+            "@root-feature": path.join(rootPath, "root-feature"),
             "@modules": path.join(rootPath, "modules"),
             "@content-parsing": path.join(rootPath, "content-parsing")
           },

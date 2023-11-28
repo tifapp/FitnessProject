@@ -30,6 +30,7 @@
       "@event-details/*": ["./event-details/*"],
       "@event-details": ["./event-details"],
       "@location-search/*": ["./location-search/*"],
+      "@root-feature/*": ["./root-feature/*"],
       "@content-parsing": ["./content-parsing"],
       "env": ["./.env"]
     }
