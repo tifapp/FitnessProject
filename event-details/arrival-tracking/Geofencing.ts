@@ -23,6 +23,27 @@ export type EventArrivalGeofencingCallback = (
   update: EventArrivalGeofencingUpdate
 ) => void
 
+export type EventArrivalGeofencingUnsubscribe = () => void
+
+/**
+ * A geofencer interface explicitly tuned for event arrivals.
+ */
+export interface EventArrivalsGeofencer {
+  /**
+   * Replaces all coordinates currently being geofenced.
+   */
+  replaceGeofencedCoordinates: (
+    coordinates: LocationCoordinate2D[]
+  ) => Promise<void>
+
+  /**
+   * Registers a callback that listens for geofencing updates.
+   */
+  onUpdate: (
+    handleUpdate: EventArrivalGeofencingCallback
+  ) => EventArrivalGeofencingUnsubscribe
+}
+
 const taskCallbacks = {
   nonUpcoming: undefined as EventArrivalGeofencingCallback | undefined,
   upcoming: undefined as EventArrivalGeofencingCallback | undefined
@@ -46,7 +67,7 @@ const taskName = (key: TaskCallbackKey) => {
  * This distance being geofenced is based on a "walking to the event from the parking lot basis",
  * ie. about 1-2 american football fields.
  */
-export class ExpoEventArrivalsGeofencer {
+export class ExpoEventArrivalsGeofencer implements EventArrivalsGeofencer {
   private readonly key: TaskCallbackKey
 
   private constructor (key: TaskCallbackKey) {
