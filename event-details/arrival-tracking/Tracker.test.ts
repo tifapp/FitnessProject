@@ -58,7 +58,7 @@ describe("EventArrivalsTracker tests", () => {
     performArrivalOperation.mockReset()
   })
 
-  const tracker = EventArrivalsTracker.trackingUpcomingArrivals(
+  const tracker = new EventArrivalsTracker(
     upcomingArrivals,
     testGeofencer,
     performArrivalOperation
@@ -127,19 +127,21 @@ describe("EventArrivalsTracker tests", () => {
   })
 
   test("does not subscribe to geofencing updates when no tracked arrivals", async () => {
-    await waitFor(() => expect(testGeofencer.hasSubscriber).toEqual(false))
+    await tracker.startTracking()
+    expect(testGeofencer.hasSubscriber).toEqual(false)
   })
 
   test("subscribes to geofencing updates when previously tracked arrivals", async () => {
     await tracker.trackArrival(mockEventArrival())
     tracker.stopTracking()
     expect(testGeofencer.hasSubscriber).toEqual(false)
-    EventArrivalsTracker.trackingUpcomingArrivals(
+    const tracker2 = new EventArrivalsTracker(
       upcomingArrivals,
       testGeofencer,
       jest.fn()
     )
-    await waitFor(() => expect(testGeofencer.hasSubscriber).toEqual(true))
+    await tracker2.startTracking()
+    expect(testGeofencer.hasSubscriber).toEqual(true)
   })
 
   test("unsubscribes from tracker when removing all tracked arrivals", async () => {

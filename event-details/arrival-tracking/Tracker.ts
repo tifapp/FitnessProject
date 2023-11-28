@@ -31,7 +31,7 @@ export class EventArrivalsTracker {
 
   private unsubscribeFromGeofencing?: EventArrivalGeofencingUnsubscribe
 
-  private constructor (
+  constructor (
     upcomingArrivals: UpcomingEventArrivals,
     geofencer: EventArrivalsGeofencer,
     performArrivalsOperation: PerformArrivalsOperation
@@ -39,29 +39,6 @@ export class EventArrivalsTracker {
     this.upcomingArrivals = upcomingArrivals
     this.geofencer = geofencer
     this.performArrivalsOperation = performArrivalsOperation
-  }
-
-  /**
-   * Constructs an {@link EventArrivalsTracker} instance and immediately begins tracking
-   * arrival updates for all upcoming event arrivals.
-   */
-  static trackingUpcomingArrivals (
-    upcomingArrivals: UpcomingEventArrivals,
-    geofencer: EventArrivalsGeofencer,
-    performArrivalsOperation: PerformArrivalsOperation
-  ) {
-    const tracker = new EventArrivalsTracker(
-      upcomingArrivals,
-      geofencer,
-      performArrivalsOperation
-    )
-    tracker.tryStartTracking()
-    return tracker
-  }
-
-  private async tryStartTracking () {
-    const arrivals = await this.upcomingArrivals.all()
-    this.updateGeofencingSubscription(arrivals)
   }
 
   /**
@@ -108,6 +85,14 @@ export class EventArrivalsTracker {
     })
     if (trackedArrivals.length === filteredArrivals.length) return
     await this.syncArrivals(filteredArrivals)
+  }
+
+  /**
+   * Starts tracking if there is at least 1 upcoming event arrival.
+   */
+  async startTracking () {
+    const arrivals = await this.upcomingArrivals.all()
+    this.updateGeofencingSubscription(arrivals)
   }
 
   /**
