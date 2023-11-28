@@ -60,18 +60,19 @@ export class EventArrivalsTracker {
   }
 
   async trackArrivals (newArrivals: EventArrival[]) {
-    const trackedArrivals = await this.upcomingArrivals.all()
-    for (const newArrival of newArrivals) {
-      const eventIdIndex = trackedArrivals.findIndex(
-        (trackedArrival) => trackedArrival.eventId === newArrival.eventId
-      )
-      if (eventIdIndex >= 0) {
-        trackedArrivals[eventIdIndex] = newArrival
-      } else {
-        trackedArrivals.push(newArrival)
+    await this.editAllUpcomingArrivals((arrivals) => {
+      for (const newArrival of newArrivals) {
+        const eventIdIndex = arrivals.findIndex(
+          (arrival) => arrival.eventId === newArrival.eventId
+        )
+        if (eventIdIndex >= 0) {
+          arrivals[eventIdIndex] = newArrival
+        } else {
+          arrivals.push(newArrival)
+        }
       }
-    }
-    await this.syncArrivals(trackedArrivals)
+      return arrivals
+    })
   }
 
   async removeArrivalByEventId (eventId: number) {
@@ -79,12 +80,9 @@ export class EventArrivalsTracker {
   }
 
   async removeArrivalsByEventIds (eventIds: Set<number>) {
-    const trackedArrivals = await this.upcomingArrivals.all()
-    const filteredArrivals = trackedArrivals.filter((arrival) => {
-      return !eventIds.has(arrival.eventId)
+    await this.editAllUpcomingArrivals((arrivals) => {
+      return arrivals.filter((arrival) => !eventIds.has(arrival.eventId))
     })
-    if (trackedArrivals.length === filteredArrivals.length) return
-    await this.syncArrivals(filteredArrivals)
   }
 
   /**
@@ -105,37 +103,36 @@ export class EventArrivalsTracker {
   }
 
   private async handleGeofencingUpdate (update: EventArrivalGeofencingUpdate) {
-    const allArrivals = await this.upcomingArrivals.all()
-    const arrivalsAtCoordinate = allArrivals.filter((arrival) => {
-      return checkIfCoordsAreEqual(arrival.coordinate, update.coordinate)
-    })
-    if (arrivalsAtCoordinate.length === 0) return
+    await this.editAllUpcomingArrivals(async (arrivals) => {
+      const arrivalsAtCoordinate = arrivals.filter((arrival) => {
+        return checkIfCoordsAreEqual(arrival.coordinate, update.coordinate)
+      })
+      if (arrivalsAtCoordinate.length === 0) return arrivals
 
-    const results = await this.performArrivalsOperation(
-      arrivalsAtCoordinate,
-      update.status === "entered" ? "arrived" : "departed"
-    )
-    const nonUpcomingEventIds = new Set(
-      ArrayUtils.compactMap(results, (result) => {
+      const results = await this.performArrivalsOperation(
+        arrivalsAtCoordinate,
+        update.status === "entered" ? "arrived" : "departed"
+      )
+      const nonUpcomingEventIds = ArrayUtils.compactMap(results, (result) => {
         return result.status === "non-upcoming" ? result.eventId : undefined
       })
-    )
-    const filteredArrivals = ArrayUtils.compactMap(allArrivals, (arrival) => {
-      if (nonUpcomingEventIds.has(arrival.eventId)) {
-        return undefined
-      }
-      const result = results.find(
-        (result) => result.eventId === arrival.eventId
-      )
-      if (result?.status === "outdated-coordinate") {
-        return {
-          eventId: arrival.eventId,
-          coordinate: result.updatedCoordinate
+      return ArrayUtils.compactMap(arrivals, (arrival) => {
+        if (nonUpcomingEventIds.includes(arrival.eventId)) return undefined
+        const result = results.find(
+          (result) => result.eventId === arrival.eventId
+        )
+        if (result?.status === "outdated-coordinate") {
+          return { ...arrival, coordinate: result.updatedCoordinate }
         }
-      }
-      return arrival
+        return arrival
+      })
     })
-    await this.syncArrivals(filteredArrivals)
+  }
+
+  private async editAllUpcomingArrivals (
+    work: (arrivals: EventArrival[]) => Promise<EventArrival[]> | EventArrival[]
+  ) {
+    await this.syncArrivals(await work(await this.upcomingArrivals.all()))
   }
 
   private async syncArrivals (arrivals: EventArrival[]) {
@@ -149,9 +146,8 @@ export class EventArrivalsTracker {
   }
 
   private updateGeofencingSubscription (arrivals: EventArrival[]) {
-    if (arrivals.length === 0) {
-      this.stopTracking()
-    } else {
+    this.stopTracking()
+    if (arrivals.length > 0) {
       this.unsubscribeFromGeofencing = this.geofencer.onUpdate((update) => {
         this.handleGeofencingUpdate(update)
       })
