@@ -101,6 +101,7 @@ export class EventArrivalsTracker {
    */
   stopTracking () {
     this.unsubscribeFromGeofencing?.()
+    this.unsubscribeFromGeofencing = undefined
   }
 
   private async handleGeofencingUpdate (update: EventArrivalGeofencingUpdate) {
