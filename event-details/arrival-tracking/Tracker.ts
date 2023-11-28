@@ -1,6 +1,21 @@
-import { LocationCoordinate2D } from "@lib/location"
 import { UpcomingEventArrivals } from "./UpcomingArrivals"
-import { EventArrival } from "./models"
+import {
+  EventArrival,
+  EventArrivalOperationKind,
+  EventArrivalOperationResult
+} from "./models"
+import {
+  EventArrivalGeofencingUpdate,
+  EventArrivalGeofencingUnsubscribe,
+  EventArrivalsGeofencer
+} from "./Geofencing"
+import { ArrayUtils } from "@lib/Array"
+import { checkIfCoordsAreEqual } from "@lib/location"
+
+export type PerformArrivalsOperation = (
+  arrivals: EventArrival[],
+  operation: EventArrivalOperationKind
+) => Promise<EventArrivalOperationResult[]>
 
 /**
  * A class for tracking upcoming event arrivals.
@@ -11,16 +26,19 @@ import { EventArrival } from "./models"
  */
 export class EventArrivalsTracker {
   private readonly upcomingArrivals: UpcomingEventArrivals
-  private readonly replaceGeofencedCoordinates: (
-    events: LocationCoordinate2D[]
-  ) => void
+  private readonly geofencer: EventArrivalsGeofencer
+  private readonly performArrivalsOperation: PerformArrivalsOperation
+
+  private unsubscribeFromGeofencing?: EventArrivalGeofencingUnsubscribe
 
   constructor (
     upcomingArrivals: UpcomingEventArrivals,
-    replaceGeofencedCoordinates: (coordinates: LocationCoordinate2D[]) => void
+    geofencer: EventArrivalsGeofencer,
+    performArrivalsOperation: PerformArrivalsOperation
   ) {
     this.upcomingArrivals = upcomingArrivals
-    this.replaceGeofencedCoordinates = replaceGeofencedCoordinates
+    this.geofencer = geofencer
+    this.performArrivalsOperation = performArrivalsOperation
   }
 
   /**
@@ -38,31 +56,104 @@ export class EventArrivalsTracker {
    * If an arrival exists with the same event id, then that arrival is updated instead of added.
    */
   async trackArrival (newArrival: EventArrival) {
+    await this.trackArrivals([newArrival])
+  }
+
+  async trackArrivals (newArrivals: EventArrival[]) {
     const trackedArrivals = await this.upcomingArrivals.all()
-    const eventIdIndex = trackedArrivals.findIndex(
-      (trackedArrival) => trackedArrival.eventId === newArrival.eventId
-    )
-    if (eventIdIndex >= 0) {
-      trackedArrivals[eventIdIndex] = newArrival
-    } else {
-      trackedArrivals.push(newArrival)
+    for (const newArrival of newArrivals) {
+      const eventIdIndex = trackedArrivals.findIndex(
+        (trackedArrival) => trackedArrival.eventId === newArrival.eventId
+      )
+      if (eventIdIndex >= 0) {
+        trackedArrivals[eventIdIndex] = newArrival
+      } else {
+        trackedArrivals.push(newArrival)
+      }
     }
     await this.syncArrivals(trackedArrivals)
   }
 
   async removeArrivalByEventId (eventId: number) {
+    await this.removeArrivalsByEventIds(new Set([eventId]))
+  }
+
+  async removeArrivalsByEventIds (eventIds: Set<number>) {
     const trackedArrivals = await this.upcomingArrivals.all()
-    const filteredArrivals = trackedArrivals.filter(
-      (arrival) => arrival.eventId !== eventId
-    )
+    const filteredArrivals = trackedArrivals.filter((arrival) => {
+      return !eventIds.has(arrival.eventId)
+    })
     if (trackedArrivals.length === filteredArrivals.length) return
     await this.syncArrivals(filteredArrivals)
   }
 
-  private async syncArrivals (arrivals: EventArrival[]) {
-    this.replaceGeofencedCoordinates(
-      arrivals.map((arrival) => arrival.coordinate)
+  /**
+   * Starts tracking if there is at least 1 upcoming event arrival.
+   */
+  async startTracking () {
+    const arrivals = await this.upcomingArrivals.all()
+    this.updateGeofencingSubscription(arrivals)
+  }
+
+  /**
+   * Stops tracking all event arrivals in real-time. This will keep upcoming arrivals
+   * persisted, but it will not perform any arrival operations on them.
+   */
+  stopTracking () {
+    this.unsubscribeFromGeofencing?.()
+  }
+
+  private async handleGeofencingUpdate (update: EventArrivalGeofencingUpdate) {
+    const allArrivals = await this.upcomingArrivals.all()
+    const arrivalsAtCoordinate = allArrivals.filter((arrival) => {
+      return checkIfCoordsAreEqual(arrival.coordinate, update.coordinate)
+    })
+    if (arrivalsAtCoordinate.length === 0) return
+
+    const results = await this.performArrivalsOperation(
+      arrivalsAtCoordinate,
+      update.status === "entered" ? "arrived" : "departed"
     )
-    await this.upcomingArrivals.replaceAll(arrivals)
+    const nonUpcomingEventIds = new Set(
+      ArrayUtils.compactMap(results, (result) => {
+        return result.status === "non-upcoming" ? result.eventId : undefined
+      })
+    )
+    const filteredArrivals = ArrayUtils.compactMap(allArrivals, (arrival) => {
+      if (nonUpcomingEventIds.has(arrival.eventId)) {
+        return undefined
+      }
+      const result = results.find(
+        (result) => result.eventId === arrival.eventId
+      )
+      if (result?.status === "outdated-coordinate") {
+        return {
+          eventId: arrival.eventId,
+          coordinate: result.updatedCoordinate
+        }
+      }
+      return arrival
+    })
+    await this.syncArrivals(filteredArrivals)
+  }
+
+  private async syncArrivals (arrivals: EventArrival[]) {
+    await Promise.all([
+      this.geofencer.replaceGeofencedCoordinates(
+        arrivals.map((arrival) => arrival.coordinate)
+      ),
+      this.upcomingArrivals.replaceAll(arrivals)
+    ])
+    this.updateGeofencingSubscription(arrivals)
+  }
+
+  private updateGeofencingSubscription (arrivals: EventArrival[]) {
+    if (arrivals.length === 0) {
+      this.stopTracking()
+    } else {
+      this.unsubscribeFromGeofencing = this.geofencer.onUpdate((update) => {
+        this.handleGeofencingUpdate(update)
+      })
+    }
   }
 }
