@@ -4,7 +4,9 @@ import isToday from "dayjs/plugin/isToday"
 import isTomorrow from "dayjs/plugin/isTomorrow"
 import isYesterday from "dayjs/plugin/isYesterday"
 import isBetween from "dayjs/plugin/isBetween"
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter"
 
+dayjs.extend(isSameOrAfter)
 dayjs.extend(duration)
 dayjs.extend(isToday)
 dayjs.extend(isTomorrow)

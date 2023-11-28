@@ -1,5 +1,5 @@
 import { Dayjs } from "dayjs"
-import { addSecondsToDate, diffDates } from "./Date"
+import { StringDateSchema, addSecondsToDate, diffDates } from "./Date"
 import { dayjs, now } from "./dayjs"
 import { z } from "zod"
 
@@ -142,11 +142,11 @@ const formatTime = (date: Dayjs) => {
  */
 export const StringDateRangeSchema = z
   .object({
-    startDate: z.string().datetime(),
-    endDate: z.string().datetime()
+    startDate: StringDateSchema,
+    endDate: StringDateSchema
   })
   .transform(({ startDate, endDate }) => {
-    return dateRange(new Date(startDate), new Date(endDate))
+    return dateRange(startDate, endDate)
   })
 
 /**
