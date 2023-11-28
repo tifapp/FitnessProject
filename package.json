@@ -113,7 +113,8 @@
     "tlds": "^1.221.1",
     "type-detect": "4.0.8",
     "uuid": "^9.0.0",
-    "zod": "^3.20.6"
+    "zod": "^3.20.6",
+    "expo-task-manager": "~11.1.1"
   },
   "devDependencies": {
     "@aws-amplify/cli": "^10.8.1",

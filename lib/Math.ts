@@ -20,6 +20,9 @@ export const milesToMeters = (miles: number) => miles * METERS_PER_MILE
  */
 export const metersToMiles = (meters: number) => meters / METERS_PER_MILE
 
+export const yardsToMeters = (yards: number) => yards * YARDS_PER_METER
+
+export const YARDS_PER_METER = 0.91444
 export const EARTH_RADIUS_METERS = 6371e3
 export const METERS_PER_MILE = 1609.344
 export const FEET_PER_MILE = 5280
