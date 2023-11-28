@@ -3,6 +3,36 @@ import fs from "fs"
 import https from "https"
 import jwt from "jsonwebtoken"
 
+const sendSlackMessage = (webhookUrl, message) => {
+  const data = JSON.stringify(message)
+
+  const url = new URL(webhookUrl)
+  const options = {
+    hostname: url.hostname,
+    path: url.pathname,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Length": data.length
+    }
+  }
+
+  const req = https.request(options, (res) => {
+    console.log(`statusCode: ${res.statusCode}`)
+
+    res.on("data", (d) => {
+      process.stdout.write(d)
+    })
+  })
+
+  req.on("error", (error) => {
+    console.error(error)
+  })
+
+  req.write(data)
+  req.end()
+}
+
 const getPredictedBuildTime = () => {
   const now = new Date()
 
@@ -120,8 +150,7 @@ const manageCheckRun = async (action = "create") => {
       ...checkRunParams,
       output: {
         title: "Build Completed",
-        summary: "Build completed successfully.",
-        text: "https://api.eas.build/artifacts/"
+        summary: `https://expo.dev/accounts/tifapp/projects/FitnessApp/builds/${process.env.EAS_BUILD_ID}`
       }
     }
     break
@@ -152,8 +181,7 @@ const manageCheckRun = async (action = "create") => {
       head_sha: process.env.GITHUB_SHA,
       output: {
         title: "Build Started",
-        summary: "Build started successfully.",
-        text: `Build will be finished at approximately ${getPredictedBuildTime()}`
+        summary: `Build will be finished at approximately ${getPredictedBuildTime()}`
       }
     }
   }
@@ -205,3 +233,7 @@ const manageCheckRun = async (action = "create") => {
 
 const action = process.argv[2] || "create"
 manageCheckRun(action)
+
+sendSlackMessage("YOUR_SLACK_WEBHOOK_URL", {
+  text: "Hello, this is a test message from Node.js!"
+})
