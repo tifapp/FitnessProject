@@ -32,6 +32,7 @@ import "expo-dev-client"
 import { Native as SentryNative } from "sentry-expo"
 import awsconfig from "./src/aws-exports"
 import { setupCognito } from "./auth"
+import { defineEventArrivalsGeofencingTasks } from "@event-details/arrival-tracking"
 
 Geo.configure(awsconfig)
 setupCognito()
@@ -42,6 +43,8 @@ addLogHandler(sentryBreadcrumbLogHandler())
 addLogHandler(sentryErrorCapturingLogHandler())
 
 log("info", "App launched", { date: new Date() })
+
+defineEventArrivalsGeofencingTasks()
 
 const Stack = createStackNavigator()
 

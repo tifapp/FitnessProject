@@ -1,3 +1,4 @@
+import { z } from "zod"
 import { dayjs } from "./dayjs"
 
 /**
@@ -24,3 +25,11 @@ export const diffDates = (date1: Date, date2: Date) => {
 export const addSecondsToDate = (date: Date, seconds: number) => {
   return dayjs(date).add(seconds, "seconds").toDate()
 }
+
+/**
+ * A zod schema that parses from a string to a date.
+ */
+export const StringDateSchema = z
+  .string()
+  .datetime()
+  .transform((date) => new Date(date))

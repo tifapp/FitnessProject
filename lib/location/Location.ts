@@ -24,17 +24,18 @@ export type LocationCoordinate2D = Readonly<
   z.infer<typeof LocationCoordinates2DSchema>
 >
 
+const COORDINATE_EPSILON = 0.0000000000001
+
 /**
- * Checks for equality on two sets of coordinates.
+ * Checks for equality on two sets of coordinates based on an epsilon = 0.0000000000001.
  */
 export const checkIfCoordsAreEqual = (
-  coordsA: LocationCoordinate2D,
-  coordsB: LocationCoordinate2D
+  a: LocationCoordinate2D,
+  b: LocationCoordinate2D
 ) => {
-  return (
-    coordsA.longitude === coordsB.longitude &&
-    coordsA.latitude === coordsB.latitude
-  )
+  const isLatEqual = Math.abs(a.latitude - b.latitude) <= COORDINATE_EPSILON
+  const isLngEqual = Math.abs(a.longitude - b.longitude) <= COORDINATE_EPSILON
+  return isLatEqual && isLngEqual
 }
 
 /**
