@@ -22,7 +22,7 @@ const sendMessageToSlack = (
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Content-Length": Buffer.byteLength(postData),
+      "Content-Length": Buffer.byteLength(data) + imageBuffer.length,
       Authorization: `Bearer ${process.env.SLACK_APP_ID}`
     }
   }
@@ -45,28 +45,28 @@ const sendImageToSlack = async (
   /** @type {string} */ message,
   channelId = outputChannel
 ) => {
+  const imageBuffer = Buffer.from(imageData.split(",")[1], "base64")
   const boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW"
-  let data = "--" + boundary + "\r\n"
-  data +=
-    "Content-Disposition: form-data; name=\"token\"\r\n\r\n" +
-    process.env.SLACK_APP_ID +
-    "\r\n"
-  data += "--" + boundary + "\r\n"
-  data +=
-    "Content-Disposition: form-data; name=\"channels\"\r\n\r\n" +
-    channelId +
-    "\r\n"
-  data += "--" + boundary + "\r\n"
-  data +=
-    "Content-Disposition: form-data; name=\"initial_comment\"\r\n\r\n" +
-    message +
-    "\r\n"
-  data += "--" + boundary + "\r\n"
-  data +=
-    "Content-Disposition: form-data; name=\"file\"; filename=\"qrcode.png\"\r\n"
-  data += "Content-Type: image/png\r\n\r\n"
-  data += imageData.split(",")[1] // Remove the base64 prefix
-  data += "\r\n--" + boundary + "--"
+  const data = [
+    "--" + boundary,
+    "Content-Disposition: form-data; name=\"token\"",
+    "",
+    process.env.SLACK_APP_ID,
+    "--" + boundary,
+    "Content-Disposition: form-data; name=\"channels\"",
+    "",
+    channelId,
+    "--" + boundary,
+    "Content-Disposition: form-data; name=\"initial_comment\"",
+    "",
+    message,
+    "--" + boundary,
+    "Content-Disposition: form-data; name=\"file\"; filename=\"qrcode.png\"",
+    "Content-Type: image/png",
+    "",
+    imageBuffer,
+    "--" + boundary + "--"
+  ]
 
   const options = {
     hostname: "slack.com",
@@ -74,8 +74,7 @@ const sendImageToSlack = async (
     path: "/api/files.upload",
     method: "POST",
     headers: {
-      "Content-Type": "multipart/form-data; boundary=" + boundary,
-      "Content-Length": Buffer.byteLength(data)
+      "Content-Type": "multipart/form-data; boundary=" + boundary
     }
   }
 
@@ -87,7 +86,16 @@ const sendImageToSlack = async (
     })
 
     req.on("error", (e) => reject(e))
-    req.write(data)
+    // Write each part of the data array to the request
+    for (const part of data) {
+      if (typeof part === "string") {
+        req.write(part + "\r\n")
+      } else {
+        // part is a Buffer
+        req.write(part)
+        req.write("\r\n")
+      }
+    }
     req.end()
   })
 }
@@ -293,14 +301,14 @@ const manageCheckRun = async (action = "create") => {
 
   if (action === "success") {
     const buildqr = await qrcode.toDataURL(buildLink)
-    sendImageToSlack(buildqr, `Build is ready: ${buildLink}`)
+    sendImageToSlack(buildqr, `Build is ready:\n${buildLink}`)
   }
   if (action === "failure") {
-    sendMessageToSlack(`Build failed. See details at ${buildLink}`)
+    sendMessageToSlack(`Build failed. See details at\n${buildLink}`)
   }
   if (action === "create") {
     sendMessageToSlack(
-      `A new build has started. It should be ready in ~15 minutes. See details at ${buildLink}`
+      `A new build has started. Build will be finished at approximately *${getPredictedBuildTime()}*. See details at\n${buildLink}`
     )
   }
 }
