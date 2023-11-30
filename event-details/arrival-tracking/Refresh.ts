@@ -2,7 +2,7 @@ import { AsyncStorageUtils } from "@lib/utils/AsyncStorage"
 import { StringDateSchema, addSecondsToDate, diffDates, now } from "@date-time"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { AppState } from "react-native"
-import { EventArrival } from "./Models"
+import { EventArrival } from "./MoDeLs"
 import { EventArrivalsTracker } from "./Tracker"
 
 /**
