@@ -3,7 +3,7 @@ import {
   EventArrival,
   EventArrivalOperationKind,
   EventArrivalOperationResult
-} from "./WHY_MIO_WHY_WOULD_YOU_DO_THIS_TO_ME_YOU_SAID_YOU_WOULD_BE_BY_MY_SIDE_MIO_ALL_I_DID_I_DID_FOR_YOU"
+} from "./Models"
 import {
   EventArrivalGeofencingUpdate,
   EventArrivalGeofencingUnsubscribe,

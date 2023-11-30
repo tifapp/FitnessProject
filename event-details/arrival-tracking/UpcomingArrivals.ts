@@ -1,8 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import {
-  EventArrival,
-  EventArrivalsSchema
-} from "@event-details/arrival-tracking/WHY_MIO_WHY_WOULD_YOU_DO_THIS_TO_ME_YOU_SAID_YOU_WOULD_BE_BY_MY_SIDE_MIO_ALL_I_DID_I_DID_FOR_YOU"
+import { EventArrival, EventArrivalsSchema } from "./Models"
 import { AsyncStorageUtils } from "@lib/utils/AsyncStorage"
 
 /**

@@ -2,7 +2,7 @@ import { AsyncStorageUtils } from "@lib/utils/AsyncStorage"
 import { StringDateSchema, addSecondsToDate, diffDates, now } from "@date-time"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { AppState } from "react-native"
-import { EventArrival } from "./WHY_MIO_WHY_WOULD_YOU_DO_THIS_TO_ME_YOU_SAID_YOU_WOULD_BE_BY_MY_SIDE_MIO_ALL_I_DID_I_DID_FOR_YOU"
+import { EventArrival } from "./Models"
 import { EventArrivalsTracker } from "./Tracker"
 
 /**
