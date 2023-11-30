@@ -1,7 +1,7 @@
 import { BodyText, Headline } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
 import { TouchableOpacity } from "@gorhom/bottom-sheet"
-import { ReportableContentType, ReportingReason } from "@lib/Reporting"
+import { ReportableContentType, ReportingReason } from "./Models"
 import React, { useState } from "react"
 import { Alert, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { Divider } from "react-native-elements"

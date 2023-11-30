@@ -8,7 +8,7 @@ import { Button } from "react-native"
 import {
   ReportingScreensParamsList,
   createContentReportingStackScreens
-} from "../../../screens/Reporting"
+} from "@content-reporting"
 
 type ParamsList = { test: undefined } & ReportingScreensParamsList
 

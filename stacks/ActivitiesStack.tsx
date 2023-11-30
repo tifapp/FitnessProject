@@ -25,7 +25,7 @@ import { SignInScreensParamsList } from "@screens/ProfileScreen/Navigation/SignI
 import {
   ReportingScreensParamsList,
   createContentReportingStackScreens
-} from "@screens/Reporting"
+} from "@content-reporting"
 import { TestChatRoomScreen } from "@screens/testScreens/TestChatRoomScreen"
 import { TestEventFormScreen } from "@screens/testScreens/TestEventFormScreen"
 import { TestNotifScreen } from "@screens/testScreens/TestNotifScreen"

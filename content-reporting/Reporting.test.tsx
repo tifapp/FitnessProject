@@ -1,4 +1,4 @@
-import { ReportFormView } from "@screens/Reporting"
+import { ReportFormView } from "@content-reporting"
 import {
   act,
   fireEvent,
@@ -9,7 +9,7 @@ import {
 import React from "react"
 import { captureAlerts } from "@test-helpers/Alerts"
 import { neverPromise } from "@test-helpers/Promise"
-import { REPORTING_REASONS } from "@lib/Reporting"
+import { REPORTING_REASONS } from "./Models"
 import "@test-helpers/Matchers"
 
 describe("Reporting tests", () => {

@@ -1,10 +1,10 @@
 import React from "react"
 import { ChevronBackButton, StackNavigatorType } from "@components/Navigation"
-import { ReportingReason, ReportableContentType } from "@lib/Reporting"
-import { ReportSuccessView } from "./SuccessView"
+import { ReportingReason, ReportableContentType } from "./Models"
+import { ReportSuccessView } from "./Success"
 import { StackScreenProps } from "@react-navigation/stack"
 import { StringUtils } from "@lib/String"
-import { ReportFormView } from "./FormView"
+import { ReportFormView } from "./Form"
 
 export type ReportingScreensParamsList = {
   reportSuccess: { contentType: ReportableContentType }

@@ -32,6 +32,7 @@
       "@location/*": ["./location/*"],
       "@location": ["./location"],
       "@content-parsing": ["./content-parsing"],
+      "@content-reporting": ["./content-reporting"],
       "@date-time": ["./date-time"],
       "@test-helpers/*": ["./test-helpers/*"],
       "env": ["./.env"]
