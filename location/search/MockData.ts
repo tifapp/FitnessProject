@@ -1,15 +1,12 @@
 import { ArrayUtils } from "@lib/Array"
 import { randomBool } from "@lib/Random"
-import {
-  LocationCoordinate2D,
-  TiFLocation,
-  mockTiFLocation
-} from "@lib/location"
+import { LocationCoordinate2D, TiFLocation } from "@location"
 import {
   RecentLocationAnnotation,
   asyncStorageLoadRecentLocations
 } from "./RecentsStorage"
-import { LocationSearchResult, LocationsSearchQuery } from "./models"
+import { LocationSearchResult, LocationsSearchQuery } from "./Models"
+import { mockTiFLocation } from "@location/MockData"
 
 /**
  * Creates a random {@link LocationSearchResultAnnotation}.

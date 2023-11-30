@@ -1,5 +1,5 @@
 import { EventFormValues } from "@components/eventForm"
-import { GeocodingFunctionsProvider } from "@hooks/Geocoding"
+import { GeocodingFunctionsProvider } from "@location/Geocoding"
 import { HapticsProvider } from "@lib/Haptics"
 import { dateRange } from "@date-time"
 import { EventColors } from "@lib/events"

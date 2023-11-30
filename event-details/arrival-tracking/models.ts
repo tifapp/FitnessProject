@@ -1,9 +1,4 @@
-import { faker } from "@faker-js/faker"
-import {
-  LocationCoordinate2D,
-  LocationCoordinates2DSchema,
-  mockLocationCoordinate2D
-} from "@lib/location"
+import { LocationCoordinate2D, LocationCoordinates2DSchema } from "@location"
 import { z } from "zod"
 
 /**
@@ -26,11 +21,6 @@ export const EventArrivalsSchema = z.array(EventArrivalSchema)
  * The scheduling/sending of the push notifications is handled server-side.
  */
 export type EventArrival = z.infer<typeof EventArrivalSchema>
-
-export const mockEventArrival = (): EventArrival => ({
-  eventId: parseInt(faker.random.numeric(3)),
-  coordinate: mockLocationCoordinate2D()
-})
 
 export type EventArrivalOperationKind = "arrived" | "departed"
 

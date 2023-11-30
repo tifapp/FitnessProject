@@ -3,7 +3,7 @@ import { Platform, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import RNDateTimePicker, {
   DateTimePickerAndroid as RNDateTimePickerAndroid
 } from "@react-native-community/datetimepicker"
-import { dayjs } from "."
+import { dayjs } from "./Dayjs"
 import { MaterialIcons } from "@expo/vector-icons"
 import IconButton from "../components/common/IconButton"
 

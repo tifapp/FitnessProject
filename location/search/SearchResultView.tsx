@@ -3,10 +3,10 @@ import { CircularIonicon, Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { compactFormatFeet, compactFormatMiles } from "@lib/DistanceFormatting"
 import { FEET_PER_MILE } from "@lib/Math"
-import { placemarkToFormattedAddress } from "@lib/location"
+import { placemarkToFormattedAddress } from "@location"
 import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { LocationSearchResult } from "./models"
+import { LocationSearchResult } from "./Models"
 
 export type LocationSearchResultProps = {
   result: LocationSearchResult

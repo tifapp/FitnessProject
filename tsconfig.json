@@ -29,7 +29,8 @@
       "@modules/*": ["./modules/*"],
       "@event-details/*": ["./event-details/*"],
       "@event-details": ["./event-details"],
-      "@location-search/*": ["./location-search/*"],
+      "@location/*": ["./location/*"],
+      "@location": ["./location"],
       "@content-parsing": ["./content-parsing"],
       "@date-time": ["./date-time"],
       "env": ["./.env"]

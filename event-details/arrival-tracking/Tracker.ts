@@ -3,14 +3,14 @@ import {
   EventArrival,
   EventArrivalOperationKind,
   EventArrivalOperationResult
-} from "./models"
+} from "./Models"
 import {
   EventArrivalGeofencingUpdate,
   EventArrivalGeofencingUnsubscribe,
   EventArrivalsGeofencer
 } from "./Geofencing"
 import { ArrayUtils } from "@lib/Array"
-import { checkIfCoordsAreEqual } from "@lib/location"
+import { checkIfCoordsAreEqual } from "@location/index"
 
 export type PerformArrivalsOperation = (
   arrivals: EventArrival[],

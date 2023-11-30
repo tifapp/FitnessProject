@@ -1,7 +1,7 @@
 import React from "react"
 import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { LocationCoordinate2D, Region } from "@lib/location"
+import { LocationCoordinate2D, Region } from "@location/index"
 import { CurrentUserEvent } from "@lib/events"
 import { ExploreEventsData } from "./models"
 import { ExploreEventsMap } from "./Map"

@@ -1,6 +1,6 @@
 import { debounceAtomGroup } from "@lib/Jotai"
 import { useAtomValue } from "jotai"
-import { LocationsSearchQuery } from "./models"
+import { LocationsSearchQuery } from "./Models"
 
 export const searchTextAtoms = debounceAtomGroup("", 200)
 

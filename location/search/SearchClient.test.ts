@@ -1,5 +1,4 @@
 import { Coordinates } from "@aws-amplify/geo"
-import { mockLocationCoordinate2D, mockTiFLocation } from "@lib/location"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { asyncStorageSaveRecentLocation } from "./RecentsStorage"
 import {
@@ -7,8 +6,9 @@ import {
   searchRecentLocations,
   searchWithRecentAnnotations
 } from "./SearchClient"
-import { mockLocationSearchFunction } from "./mocks"
-import { LocationsSearchQuery } from "./models"
+import { mockLocationSearchFunction } from "./MockData"
+import { LocationsSearchQuery } from "./Models"
+import { mockTiFLocation, mockLocationCoordinate2D } from "@location/MockData"
 
 describe("Search client tests", () => {
   beforeEach(async () => await AsyncStorage.clear())

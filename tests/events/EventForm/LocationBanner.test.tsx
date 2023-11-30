@@ -6,9 +6,9 @@ import {
 import { render, screen, waitFor } from "@testing-library/react-native"
 import "../../helpers/Matchers"
 import { TestQueryClientProvider } from "../../helpers/ReactQuery"
-import { baseTestPlacemark } from "../../location/helpers"
+import { baseTestPlacemark } from "@location/MockData"
 import { baseTestEventFormValues } from "./helpers"
-import { GeocodingFunctionsProvider } from "@hooks/Geocoding"
+import { GeocodingFunctionsProvider } from "@location/Geocoding"
 
 const testLocation = baseTestEventFormValues.locationInfo.coordinates
 const testLocationName = baseTestPlacemark.name

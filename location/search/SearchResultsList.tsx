@@ -5,7 +5,7 @@ import {
   LocationCoordinate2D,
   hashLocationCoordinate,
   milesBetweenLocations
-} from "@lib/location"
+} from "@location"
 import React, { ReactElement } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { Divider } from "react-native-elements"
@@ -18,7 +18,7 @@ import {
   LocationSearchResult,
   LocationSearchResultsData,
   LocationsSearchQuery
-} from "./models"
+} from "./Models"
 
 export type LocationSearchResultsListProps = {
   query: LocationsSearchQuery

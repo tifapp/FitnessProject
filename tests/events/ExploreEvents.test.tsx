@@ -2,7 +2,7 @@ import {
   mockExpoLocationObject,
   mockLocationCoordinate2D,
   mockRegion
-} from "@lib/location"
+} from "@location/MockData"
 import {
   ExploreEventsInitialCenter,
   useExploreEvents,
@@ -15,7 +15,7 @@ import {
   TestQueryClientProvider,
   createTestQueryClient
 } from "../helpers/ReactQuery"
-import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
+import { UserLocationFunctionsProvider } from "@location/UserLocation"
 import { nonCancellable, endlessCancellable } from "../helpers/Cancellable"
 import { EventMocks } from "@lib/events"
 import { fakeTimers } from "../helpers/Timers"
@@ -274,6 +274,7 @@ describe("ExploreEvents tests", () => {
               <UserLocationFunctionsProvider
                 getCurrentLocation={queryUserCoordinates}
                 requestForegroundPermissions={requestForegroundPermissions}
+                requestBackgroundPermissions={jest.fn()}
               >
                 {children}
               </UserLocationFunctionsProvider>

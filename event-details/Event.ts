@@ -4,7 +4,7 @@ import {
   LocationCoordinate2D,
   Placemark,
   placemarkToFormattedAddress
-} from "@lib/location"
+} from "@location"
 import { UserToProfileRelationStatus } from "@lib/users"
 import { uuid } from "@lib/uuid"
 import * as Clipboard from "expo-clipboard"

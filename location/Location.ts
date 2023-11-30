@@ -1,4 +1,3 @@
-import { faker } from "@faker-js/faker"
 import geohash from "ngeohash"
 import { z } from "zod"
 import {
@@ -6,8 +5,8 @@ import {
   EARTH_RADIUS_METERS,
   metersToMiles,
   sin2
-} from "../Math"
-import { mockPlacemark, PlacemarkSchema } from "./Placemark"
+} from "../lib/Math"
+import { PlacemarkSchema } from "./Placemark"
 
 /**
  * A zod schema for {@link LocationCoordinate2D}.
@@ -39,44 +38,6 @@ export const checkIfCoordsAreEqual = (
 }
 
 /**
- * Generates a mock coordinate for testing and UI purposes.
- */
-export const mockLocationCoordinate2D = (): LocationCoordinate2D => ({
-  latitude: parseFloat(faker.address.latitude()),
-  longitude: parseFloat(faker.address.longitude())
-})
-
-/**
- * Some mock Location coordinates suitable for testing.
- */
-export namespace LocationCoordinatesMocks {
-  export const SantaCruz = {
-    latitude: 36.9741,
-    longitude: -122.0308
-  } as const
-
-  export const NYC = {
-    latitude: 40.7128,
-    longitude: -74.006
-  } as const
-
-  export const SanFrancisco = {
-    latitude: 37.7749,
-    longitude: -122.4194
-  } as const
-
-  export const London = {
-    latitude: 51.5072,
-    longitude: 0.1276
-  } as const
-
-  export const Paris = {
-    latitude: 48.8566,
-    longitude: 2.3522
-  } as const
-}
-
-/**
  * A zod schema for {@link TiFLocation}.
  */
 export const TiFLocationSchema = z.object({
@@ -88,16 +49,6 @@ export const TiFLocationSchema = z.object({
  * A type that maps a lat-lng coordinate to its respective placemark.
  */
 export type TiFLocation = Readonly<z.infer<typeof TiFLocationSchema>>
-
-/**
- * Creates a mock location for testing and UI purposes.
- */
-export const mockTiFLocation = (
-  coordinates?: LocationCoordinate2D
-): TiFLocation => ({
-  coordinates: coordinates ?? mockLocationCoordinate2D(),
-  placemark: mockPlacemark()
-})
 
 /**
  * Computes the number of meters between 2 locations using the haversine formula.

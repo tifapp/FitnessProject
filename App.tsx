@@ -1,7 +1,7 @@
 import { TiFMenuProvider } from "@components/TiFMenuProvider"
 import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { useAppFonts } from "@hooks/Fonts"
-import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
+import { UserLocationFunctionsProvider } from "@location/UserLocation"
 import {
   HapticsProvider,
   IS_HAPTICS_SUPPORTED_ON_DEVICE,

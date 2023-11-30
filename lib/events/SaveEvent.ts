@@ -1,5 +1,5 @@
 import { FixedDateRange } from "@date-time"
-import { LocationCoordinate2D } from "@lib/location"
+import { LocationCoordinate2D } from "@location"
 import { EventColors } from "../../event-details/Event"
 
 /**

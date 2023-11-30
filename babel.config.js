@@ -31,7 +31,7 @@ module.exports = function (api) {
             "@lib": modulePath("lib"),
             "@auth": modulePath("auth"),
             "@event-details": modulePath("event-details"),
-            "@location-search": modulePath("location-search"),
+            "@location": modulePath("location"),
             "@modules": modulePath("modules"),
             "@content-parsing": modulePath("content-parsing"),
             "@date-time": modulePath("date-time")

@@ -1,5 +1,4 @@
-import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
-import { TiFLocation, mockExpoLocationObject } from "@lib/location"
+import { TiFLocation, UserLocationFunctionsProvider } from "@location"
 import {
   act,
   fireEvent,
@@ -17,12 +16,13 @@ import {
   LocationSearchResultView,
   useLocationSearchPicker
 } from "."
-import "../tests/helpers/Matchers"
-import { neverPromise } from "../tests/helpers/Promise"
-import { TestQueryClientProvider } from "../tests/helpers/ReactQuery"
-import { fakeTimers } from "../tests/helpers/Timers"
-import { LocationSearchResult, LocationsSearchQuery } from "./models"
-import { mockLocationSearchResult } from "./mocks"
+import "../../tests/helpers/Matchers"
+import { neverPromise } from "../../tests/helpers/Promise"
+import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
+import { fakeTimers } from "../../tests/helpers/Timers"
+import { LocationSearchResult, LocationsSearchQuery } from "./Models"
+import { mockLocationSearchResult } from "./MockData"
+import { mockExpoLocationObject } from "@location/MockData"
 
 describe("LocationSearch tests", () => {
   beforeEach(() => jest.resetAllMocks())
@@ -345,6 +345,7 @@ describe("LocationSearch tests", () => {
             <UserLocationFunctionsProvider
               getCurrentLocation={queryUserCoordinates}
               requestForegroundPermissions={jest.fn()}
+              requestBackgroundPermissions={jest.fn()}
             >
               <LocationSearchBar
                 onBackTapped={jest.fn()}

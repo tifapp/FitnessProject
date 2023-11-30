@@ -1,5 +1,5 @@
 import React, { ReactNode, createContext, useContext } from "react"
-import { LocationCoordinate2D, TiFLocation } from "../lib/location"
+import { LocationCoordinate2D, TiFLocation } from "."
 import { useQuery } from "@tanstack/react-query"
 import { QueryHookOptions } from "@lib/ReactQuery"
 

@@ -7,7 +7,7 @@ import {
   TiFLocation,
   TiFLocationSchema,
   hashLocationCoordinate
-} from "../lib/location/Location"
+} from "../Location"
 
 /**
  * A zod schema for {@link RecentLocationAnnotationSchema}.

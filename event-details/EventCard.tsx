@@ -1,7 +1,7 @@
 import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { CurrentUserEvent, EventColors } from "./Event"
-import { placemarkToAbbreviatedAddress } from "@lib/location"
+import { placemarkToAbbreviatedAddress } from "@location"
 import { dayjs, now } from "@date-time"
 import { Ionicon, IoniconName } from "@components/common/Icons"
 import { BodyText, Caption, Headline } from "@components/Text"

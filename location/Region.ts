@@ -1,10 +1,5 @@
 import { milesToMeters } from "@lib/Math"
-import {
-  LocationCoordinate2D,
-  metersBetweenLocations,
-  mockLocationCoordinate2D
-} from "./Location"
-import { randomFloatInRange } from "@lib/Random"
+import { LocationCoordinate2D, metersBetweenLocations } from "./Location"
 
 /**
  * A type representing the area around a given lat-lng coordinate.
@@ -13,15 +8,6 @@ export type Region = LocationCoordinate2D & {
   latitudeDelta: number
   longitudeDelta: number
 }
-
-/**
- * Creates a mock {@link Region} suitable for testing purposes.
- */
-export const mockRegion = () => ({
-  ...mockLocationCoordinate2D(),
-  latitudeDelta: randomFloatInRange(0.1, 2.3),
-  longitudeDelta: randomFloatInRange(0.1, 2.3)
-})
 
 /**
  * Returns true if 2 regions are either not contained within each other,

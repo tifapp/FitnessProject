@@ -1,5 +1,5 @@
-import { placemarkToFormattedAddress } from "@lib/location"
-import { baseTestPlacemark, unknownLocationPlacemark } from "./helpers"
+import { placemarkToFormattedAddress } from "@location/index"
+import { baseTestPlacemark, unknownLocationPlacemark } from "./MockData"
 
 describe("Placemark Formatting tests", () => {
   it("formats in US style", () => {

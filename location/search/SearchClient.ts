@@ -1,13 +1,13 @@
 import { ArrayUtils } from "@lib/Array"
 
-import { LocationSearchResult, LocationsSearchQuery } from "./models"
+import { LocationSearchResult, LocationsSearchQuery } from "./Models"
 
 import { Geo, Place } from "@aws-amplify/geo"
 import {
   LocationCoordinate2D,
   TiFLocation,
   checkIfCoordsAreEqual
-} from "@lib/location"
+} from "@location/index"
 import {
   asyncStorageLoadRecentLocations,
   asyncStorageLoadSpecificRecentLocations

@@ -1,4 +1,4 @@
-import { milesBetweenLocations, LocationCoordinate2D } from "@lib/location"
+import { milesBetweenLocations, LocationCoordinate2D } from "@location/index"
 
 describe("LocationCoordinate2D tests", () => {
   describe("milesBetweenLocations tests", () => {

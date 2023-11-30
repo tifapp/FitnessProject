@@ -7,7 +7,7 @@ import {
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import React from "react"
-import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
+import { UserLocationFunctionsProvider } from "@location"
 import { MenuProvider } from "react-native-popup-menu"
 import { createStackNavigator } from "@react-navigation/stack"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"

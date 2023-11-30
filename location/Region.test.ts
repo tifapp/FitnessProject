@@ -4,7 +4,7 @@ import {
   isSignificantlyDifferentRegions,
   minRegionMeterRadius,
   regionRect
-} from "@lib/location"
+} from "@location/index"
 
 describe("Region tests", () => {
   describe("minRegionMeterRadius tests", () => {

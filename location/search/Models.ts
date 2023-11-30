@@ -1,4 +1,4 @@
-import { TiFLocation } from "../lib/location/Location"
+import { TiFLocation } from "../Location"
 import { RecentLocationAnnotation } from "./RecentsStorage"
 
 /**

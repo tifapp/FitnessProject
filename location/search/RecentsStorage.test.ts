@@ -1,9 +1,9 @@
-import { mockTiFLocation } from "@lib/location"
+import { mockTiFLocation } from "@location/MockData"
 import {
   asyncStorageLoadRecentLocations,
   asyncStorageLoadSpecificRecentLocations,
   asyncStorageSaveRecentLocation
-} from "@location-search/RecentsStorage"
+} from "./RecentsStorage"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 const TEST_COORDINATES = { latitude: 41.1234, longitude: -121.1234 }
