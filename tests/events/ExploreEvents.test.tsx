@@ -17,7 +17,7 @@ import {
 } from "@test-helpers/ReactQuery"
 import { UserLocationFunctionsProvider } from "@location/UserLocation"
 import { nonCancellable, endlessCancellable } from "@test-helpers/Cancellable"
-import { EventMocks } from "@lib/events"
+import { EventMocks } from "@event-details/MockData"
 import { fakeTimers } from "@test-helpers/Timers"
 
 const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]

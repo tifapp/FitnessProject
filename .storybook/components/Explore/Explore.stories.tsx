@@ -1,9 +1,9 @@
-import { EventMocks } from "@lib/events"
 import {
   ExploreEventsScreensParamsList,
   ExploreEventsView,
   createExploreEventsScreens
 } from "@screens/ExploreEvents"
+import { EventMocks } from "@event-details/MockData"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import React from "react"
