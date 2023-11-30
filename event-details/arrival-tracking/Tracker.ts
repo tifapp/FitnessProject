@@ -10,7 +10,7 @@ import {
   EventArrivalsGeofencer
 } from "./Geofencing"
 import { ArrayUtils } from "@lib/utils/Array"
-import { checkIfCoordsAreEqual } from "@location/index"
+import { checkIfCoordsAreEqual } from "@location"
 
 export type PerformArrivalsOperation = (
   arrivals: EventArrival[],

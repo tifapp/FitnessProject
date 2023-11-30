@@ -1,5 +1,5 @@
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
-import { uuidString } from "@lib/UUID"
+import { uuidString } from "@lib/utils/UUID"
 import { NavigationContainer } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
