@@ -6,7 +6,7 @@ import {
   placemarkToFormattedAddress
 } from "@location"
 import { UserToProfileRelationStatus } from "@lib/users"
-import { uuid } from "@lib/UUID"
+import { uuidString } from "@lib/UUID"
 import * as Clipboard from "expo-clipboard"
 import { showLocation } from "react-native-map-link"
 
@@ -39,7 +39,7 @@ export type EventAttendee = {
  */
 export namespace EventAttendeeMocks {
   export const Alivs = {
-    id: uuid(),
+    id: uuidString(),
     username: "Alvis",
     handle: UserHandle.optionalParse("alvis")!,
     profileImageURL:
@@ -47,13 +47,13 @@ export namespace EventAttendeeMocks {
   } as EventAttendee
 
   export const BlobJr = {
-    id: uuid(),
+    id: uuidString(),
     username: "Blob Jr.",
     handle: UserHandle.optionalParse("SmallBlob")!
   } as EventAttendee
 
   export const BlobSr = {
-    id: uuid(),
+    id: uuidString(),
     username: "Blob Sr.",
     handle: UserHandle.optionalParse("OriginalBlob")!
   } as EventAttendee
@@ -63,12 +63,12 @@ export namespace EventAttendeeMocks {
   // (Also Molly died and was replaced with Haley Host...)
 
   export const AnnaAttendee = {
-    id: uuid(),
+    id: uuidString(),
     username: "Anna Attendee"
   } as EventAttendee
 
   export const HaleyHost = {
-    id: uuid(),
+    id: uuidString(),
     username: "Haley Host"
   } as EventAttendee
 }
@@ -179,7 +179,7 @@ export type CurrentUserEvent = Event & {
 export namespace EventMocks {
   export const PickupBasketball = {
     host: EventAttendeeMocks.Alivs,
-    id: uuid(),
+    id: uuidString(),
     title: "Pickup Basketball",
     description: "I'm better than Lebron James.",
     dateRange: dateRange(
@@ -207,7 +207,7 @@ export namespace EventMocks {
 
   export const Multiday = {
     host: EventAttendeeMocks.Alivs,
-    id: uuid(),
+    id: uuidString(),
     title: "Multiday Event",
     description: "This event runs for more than one day.",
     dateRange: dateRange(
@@ -235,7 +235,7 @@ export namespace EventMocks {
 
   export const NoPlacemarkInfo = {
     host: EventAttendeeMocks.Alivs,
-    id: uuid(),
+    id: uuidString(),
     title: "No Placemark Info",
     attendeeCount: 5,
     description:

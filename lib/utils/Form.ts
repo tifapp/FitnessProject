@@ -18,7 +18,7 @@ export const useReactHookFormContext = <T extends FieldValues>() => {
   return formContext
 }
 
-export type FormVaidationResult<
+export type FormValidationResult<
   Result extends { status: "invalid" },
   SubmissionArgs
 > = Result | { status: "submittable"; submissionValues: SubmissionArgs }
@@ -48,7 +48,7 @@ export const useFormSubmission = <
     submit: (args: SubmissionArgs) => Promise<SubmissionResult>,
     validate: (
     submissionMutation: FormSubmissionMutation<SubmissionResult, SubmissionArgs>
-  ) => FormVaidationResult<InvalidValidationResult, SubmissionArgs>,
+  ) => FormValidationResult<InvalidValidationResult, SubmissionArgs>,
     options?: MutationHookOptions<SubmissionResult, SubmissionArgs>
   ) => {
   const submissionMutation = useMutation(submit, options)

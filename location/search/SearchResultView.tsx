@@ -5,11 +5,11 @@ import {
   compactFormatFeet,
   compactFormatMiles
 } from "@lib/utils/DistanceFormatting"
-import { FEET_PER_MILE } from "@lib/Math"
 import { placemarkToFormattedAddress } from "@location"
 import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { LocationSearchResult } from "./Models"
+import { milesToFeet } from "@lib/utils/MetricConversions"
 
 export type LocationSearchResultProps = {
   result: LocationSearchResult
@@ -70,7 +70,7 @@ export const LocationSearchResultView = ({
 }
 
 const compactFormatSearchResultDistance = (miles: number) => {
-  if (miles < 0.1) return compactFormatFeet(miles * FEET_PER_MILE)
+  if (miles < 0.1) return compactFormatFeet(milesToFeet(miles))
   return compactFormatMiles(miles)
 }
 

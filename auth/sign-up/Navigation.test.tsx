@@ -1,5 +1,5 @@
 import { TiFAPI, createTiFAPIFetch } from "@api-client"
-import { uuid } from "@lib/UUID"
+import { uuidString } from "@lib/UUID"
 import {
   NavigationContainer,
   NavigatorScreenParams,
@@ -57,7 +57,10 @@ describe("SignUpNavigation tests", () => {
       rest.post("https://localhost:8080/user", async (_, res, ctx) => {
         return res(
           ctx.status(201),
-          ctx.json({ id: uuid(), handle: TEST_GENERATED_USER_HANDLE.rawValue })
+          ctx.json({
+            id: uuidString(),
+            handle: TEST_GENERATED_USER_HANDLE.rawValue
+          })
         )
       }),
       rest.get(

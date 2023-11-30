@@ -1,4 +1,4 @@
-import { uuid } from "../UUID"
+import { uuidString } from "../UUID"
 
 /**
  * A type representing the relationship status between 2 users.
@@ -29,7 +29,7 @@ export type User = {
  */
 export namespace UserMocks {
   export const Mia = {
-    id: uuid(),
+    id: uuidString(),
     name: "Mia Anderson",
     handle: "@MysticalMia",
     bio: "When I'm not on the field or court, you can find me cheering for my favorite teams and athletes from the sidelines.",

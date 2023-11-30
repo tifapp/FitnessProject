@@ -1,12 +1,8 @@
 import geohash from "ngeohash"
 import { z } from "zod"
-import {
-  degreesToRadians,
-  EARTH_RADIUS_METERS,
-  metersToMiles,
-  sin2
-} from "../lib/Math"
+import { MathUtils } from "@lib/utils/Math"
 import { PlacemarkSchema } from "./Placemark"
+import { metersToMiles } from "@lib/utils/MetricConversions"
 
 /**
  * A zod schema for {@link LocationCoordinate2D}.
@@ -23,18 +19,14 @@ export type LocationCoordinate2D = Readonly<
   z.infer<typeof LocationCoordinates2DSchema>
 >
 
-const COORDINATE_EPSILON = 0.0000000000001
-
 /**
- * Checks for equality on two sets of coordinates based on an epsilon = 0.0000000000001.
+ * Returns true if 2 {@link LocationCoordinate2D}s are equal.
  */
 export const checkIfCoordsAreEqual = (
   a: LocationCoordinate2D,
   b: LocationCoordinate2D
 ) => {
-  const isLatEqual = Math.abs(a.latitude - b.latitude) <= COORDINATE_EPSILON
-  const isLngEqual = Math.abs(a.longitude - b.longitude) <= COORDINATE_EPSILON
-  return isLatEqual && isLngEqual
+  return a.latitude === b.latitude && a.longitude === b.longitude
 }
 
 /**
@@ -50,6 +42,8 @@ export const TiFLocationSchema = z.object({
  */
 export type TiFLocation = Readonly<z.infer<typeof TiFLocationSchema>>
 
+const EARTH_RADIUS_METERS = 6371e3
+
 /**
  * Computes the number of meters between 2 locations using the haversine formula.
  *
@@ -59,19 +53,19 @@ export const metersBetweenLocations = (
   location1: LocationCoordinate2D,
   location2: LocationCoordinate2D
 ) => {
-  const lat1Radians = degreesToRadians(location1.latitude)
-  const lat2Radians = degreesToRadians(location2.latitude)
+  const lat1Radians = MathUtils.degreesToRadians(location1.latitude)
+  const lat2Radians = MathUtils.degreesToRadians(location2.latitude)
 
-  const latDeltaRadians = degreesToRadians(
+  const latDeltaRadians = MathUtils.degreesToRadians(
     location2.latitude - location1.latitude
   )
-  const lngDeltaRadians = degreesToRadians(
+  const lngDeltaRadians = MathUtils.degreesToRadians(
     location2.longitude - location1.longitude
   )
 
-  const latDelta = sin2(latDeltaRadians / 2)
+  const latDelta = MathUtils.sin2(latDeltaRadians / 2)
   const latCos = Math.cos(lat1Radians) * Math.cos(lat2Radians)
-  const lngDelta = sin2(lngDeltaRadians / 2)
+  const lngDelta = MathUtils.sin2(lngDeltaRadians / 2)
 
   return (
     2 * EARTH_RADIUS_METERS * Math.asin(Math.sqrt(latDelta + latCos * lngDelta))

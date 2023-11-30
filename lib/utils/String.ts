@@ -27,10 +27,3 @@ export namespace StringUtils {
     return str.replace(NON_DIGIT_REGEX, "") as `${number}` | ""
   }
 }
-
-/**
- * An interface reprsenting types that have a callable `toString` method.
- */
-export interface ToStringable {
-  toString(): string
-}

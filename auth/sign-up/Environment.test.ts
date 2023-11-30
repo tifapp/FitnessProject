@@ -2,7 +2,7 @@ import { EmailAddress, Password, USPhoneNumber } from ".."
 import { createSignUpEnvironment } from "./Environment"
 import { TiFAPI, createTiFAPIFetch } from "@api-client"
 import { rest } from "msw"
-import { uuid } from "@lib/UUID"
+import { uuidString } from "@lib/UUID"
 import { TestCognitoError } from "@auth/CognitoHelpers"
 import { mswServer } from "@test-helpers/msw"
 import { UserHandle } from "@content-parsing"
@@ -108,7 +108,7 @@ describe("SignUpEnvironment tests", () => {
               ctx.json({
                 users: [
                   {
-                    id: uuid(),
+                    id: uuidString(),
                     handle: handle.rawValue,
                     name: "Bitchell Dickle"
                   }
@@ -155,7 +155,7 @@ describe("SignUpEnvironment tests", () => {
             ctx.json({
               users: [
                 {
-                  id: uuid(),
+                  id: uuidString(),
                   handle: "thing",
                   name: "Bitchell Dickle"
                 }
@@ -212,7 +212,7 @@ describe("SignUpEnvironment tests", () => {
         rest.post("https://localhost:8080/user", async (_, res, ctx) => {
           return res(
             ctx.status(201),
-            ctx.json({ id: uuid(), handle: handle.rawValue })
+            ctx.json({ id: uuidString(), handle: handle.rawValue })
           )
         })
       )

@@ -1,5 +1,5 @@
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
-import { uuid } from "@lib/UUID"
+import { uuidString } from "@lib/UUID"
 import { NavigationContainer } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
@@ -27,7 +27,7 @@ const Screen = ({ navigation }: StackScreenProps<ParamsList, "test">) => (
     onPress={() =>
       navigation.navigate("reportContent", {
         contentType: "event",
-        contentId: uuid()
+        contentId: uuidString()
       })
     }
   />

@@ -1,4 +1,4 @@
-import { yardsToMeters } from "@lib/Math"
+import { yardsToMeters } from "@lib/utils/MetricConversions"
 import { StringUtils } from "@lib/utils/String"
 import { LocationCoordinate2D, LocationCoordinates2DSchema } from "@location"
 import {

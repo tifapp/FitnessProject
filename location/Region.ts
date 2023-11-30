@@ -1,4 +1,4 @@
-import { milesToMeters } from "@lib/Math"
+import { milesToMeters } from "@lib/utils/MetricConversions"
 import { LocationCoordinate2D, metersBetweenLocations } from "./Location"
 
 /**
