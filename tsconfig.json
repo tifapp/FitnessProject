@@ -33,6 +33,7 @@
       "@location": ["./location"],
       "@content-parsing": ["./content-parsing"],
       "@date-time": ["./date-time"],
+      "@test-helpers/*": ["./test-helpers/*"],
       "env": ["./.env"]
     }
   },

@@ -1,10 +1,10 @@
 import { DateTimePicker } from "./DateTimePicker"
-import { setPlatform } from "../tests/helpers/Platform"
-import "../tests/helpers/Matchers"
+import { setPlatform } from "@test-helpers/Platform"
+import "@test-helpers/Matchers"
 import { render, screen } from "@testing-library/react-native"
 import { useState } from "react"
 import { View } from "react-native"
-import { setDateTimePickerDate } from "../tests/helpers/DateTimePicker"
+import { setDateTimePickerDate } from "../test-helpers/DateTimePicker"
 
 describe("DateTimePicker tests", () => {
   test("android default date formatter formats date properly", () => {

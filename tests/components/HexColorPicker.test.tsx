@@ -6,8 +6,8 @@ import { HapticsProvider } from "@lib/Haptics"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import { useState } from "react"
 import { View } from "react-native"
-import { TestHaptics } from "../helpers/Haptics"
-import "../helpers/Matchers"
+import { TestHaptics } from "@test-helpers/Haptics"
+import "@test-helpers/Matchers"
 
 const testOptions = [
   { color: "#123456", accessibilityLabel: "#123456" },

@@ -14,11 +14,11 @@ import { act, renderHook, waitFor } from "@testing-library/react-native"
 import {
   TestQueryClientProvider,
   createTestQueryClient
-} from "../helpers/ReactQuery"
+} from "@test-helpers/ReactQuery"
 import { UserLocationFunctionsProvider } from "@location/UserLocation"
-import { nonCancellable, endlessCancellable } from "../helpers/Cancellable"
+import { nonCancellable, endlessCancellable } from "@test-helpers/Cancellable"
 import { EventMocks } from "@lib/events"
-import { fakeTimers } from "../helpers/Timers"
+import { fakeTimers } from "@test-helpers/Timers"
 
 const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
 

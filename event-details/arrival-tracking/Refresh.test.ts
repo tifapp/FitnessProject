@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { EventArrivalsRefresher } from "./Refresh"
-import { fakeTimers } from "../../tests/helpers/Timers"
+import { fakeTimers } from "@test-helpers/Timers"
 
 describe("EventArrivalsRefresher tests", () => {
   fakeTimers()

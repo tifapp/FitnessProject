@@ -1,9 +1,9 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
 import { useSignUpCredentialsForm } from "./CredentialsForm"
 import { act } from "react-test-renderer"
-import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
-import { captureAlerts } from "../../tests/helpers/Alerts"
-import { fakeTimers } from "../../tests/helpers/Timers"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import { captureAlerts } from "@test-helpers/Alerts"
+import { fakeTimers } from "@test-helpers/Timers"
 
 describe("SignUpCredentialsForm tests", () => {
   describe("useSignUpCredentialsForm tests", () => {

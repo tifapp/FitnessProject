@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react-native"
 import React, { useState } from "react"
 import { View } from "react-native"
 import { SearchBar } from "@components/SearchBar"
-import "../helpers/Matchers"
+import "@test-helpers/Matchers"
 
 describe("SearchBar tests", () => {
   beforeEach(() => jest.resetAllMocks())

@@ -34,7 +34,8 @@ module.exports = function (api) {
             "@location": modulePath("location"),
             "@modules": modulePath("modules"),
             "@content-parsing": modulePath("content-parsing"),
-            "@date-time": modulePath("date-time")
+            "@date-time": modulePath("date-time"),
+            "@test-helpers": modulePath("test-helpers")
           },
           extensions: [".js", ".jsx", ".ts", ".tsx"]
         }

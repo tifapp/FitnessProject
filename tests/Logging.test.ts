@@ -8,8 +8,8 @@ import {
   sentryBreadcrumbLogHandler,
   sentryErrorCapturingLogHandler
 } from "@lib/Logging"
-import { TestFilesystem } from "./helpers/Filesystem"
-import { fakeTimers } from "./helpers/Timers"
+import { TestFilesystem } from "@test-helpers/Filesystem"
+import { fakeTimers } from "@test-helpers/Timers"
 
 describe("Logging tests", () => {
   fakeTimers()

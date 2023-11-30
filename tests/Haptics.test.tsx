@@ -5,7 +5,7 @@ import {
   useHaptics
 } from "@lib/Haptics"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { TestHaptics } from "./helpers/Haptics"
+import { TestHaptics } from "../test-helpers/Haptics"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { Provider } from "jotai"
 

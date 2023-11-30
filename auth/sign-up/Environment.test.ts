@@ -5,7 +5,7 @@ import { createTiFAPIFetch } from "@api-client/client"
 import { rest } from "msw"
 import { uuid } from "@lib/uuid"
 import { TestCognitoError } from "@auth/CognitoHelpers"
-import { mswServer } from "../../tests/helpers/msw"
+import { mswServer } from "@test-helpers/msw"
 import { UserHandle } from "@content-parsing"
 
 describe("SignUpEnvironment tests", () => {

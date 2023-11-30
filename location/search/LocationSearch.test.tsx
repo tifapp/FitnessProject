@@ -16,10 +16,10 @@ import {
   LocationSearchResultView,
   useLocationSearchPicker
 } from "."
-import "../../tests/helpers/Matchers"
-import { neverPromise } from "../../tests/helpers/Promise"
-import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
-import { fakeTimers } from "../../tests/helpers/Timers"
+import "@test-helpers/Matchers"
+import { neverPromise } from "@test-helpers/Promise"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import { fakeTimers } from "@test-helpers/Timers"
 import { LocationSearchResult, LocationsSearchQuery } from "./Models"
 import { mockLocationSearchResult } from "./MockData"
 import { mockExpoLocationObject } from "@location/MockData"

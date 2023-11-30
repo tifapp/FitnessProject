@@ -4,8 +4,8 @@ import {
   EventFormLocationInfo
 } from "@components/eventForm"
 import { render, screen, waitFor } from "@testing-library/react-native"
-import "../../helpers/Matchers"
-import { TestQueryClientProvider } from "../../helpers/ReactQuery"
+import "@test-helpers/Matchers"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { baseTestPlacemark } from "@location/MockData"
 import { baseTestEventFormValues } from "./helpers"
 import { GeocodingFunctionsProvider } from "@location/Geocoding"

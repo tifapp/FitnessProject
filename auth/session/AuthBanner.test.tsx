@@ -1,12 +1,10 @@
 import { render, screen, waitFor } from "@testing-library/react-native"
 import React from "react"
 import { View } from "react-native"
-import "../../tests/helpers/Matchers"
-import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
+import "@test-helpers/Matchers"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { IfAuthenticated } from "./AuthBanner"
 import { UserSessionContextProvider } from "./UserSessionContext"
-
-const IS_AT_END_TEST_ID = "test-flow-end"
 
 describe("AuthBanner tests", () => {
   beforeEach(() => jest.resetAllMocks())

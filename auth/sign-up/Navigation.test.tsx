@@ -17,13 +17,13 @@ import {
 import { rest } from "msw"
 import { useCallback, useState } from "react"
 import { Button, View } from "react-native"
-import { captureAlerts } from "../../tests/helpers/Alerts"
-import "../../tests/helpers/Matchers"
-import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
-import { mswServer } from "../../tests/helpers/msw"
+import { captureAlerts } from "@test-helpers/Alerts"
+import "@test-helpers/Matchers"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import { mswServer } from "@test-helpers/msw"
 import { createSignUpEnvironment } from "./Environment"
 import { SignUpParamsList, createSignUpScreens } from "./Navigation"
-import { fakeTimers } from "../../tests/helpers/Timers"
+import { fakeTimers } from "@test-helpers/Timers"
 import { UserHandle } from "@content-parsing"
 
 type TestSignUpParamsList = {

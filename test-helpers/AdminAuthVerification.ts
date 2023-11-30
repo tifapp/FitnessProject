@@ -1,4 +1,4 @@
-import { EmailAddress, USPhoneNumber } from "../../auth/Models"
+import { EmailAddress, USPhoneNumber } from "../auth/Models"
 import {
   AWS_REGION,
   AWS_ACCESS_KEY_ID,

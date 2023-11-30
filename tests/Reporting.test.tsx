@@ -7,10 +7,10 @@ import {
   waitFor
 } from "@testing-library/react-native"
 import React from "react"
-import { captureAlerts } from "./helpers/Alerts"
-import { neverPromise } from "./helpers/Promise"
+import { captureAlerts } from "@test-helpers/Alerts"
+import { neverPromise } from "@test-helpers/Promise"
 import { REPORTING_REASONS } from "@lib/Reporting"
-import "./helpers/Matchers"
+import "@test-helpers/Matchers"
 
 describe("Reporting tests", () => {
   beforeEach(() => jest.resetAllMocks())
