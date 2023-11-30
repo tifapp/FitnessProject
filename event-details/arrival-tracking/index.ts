@@ -1,5 +1,5 @@
 export * from "./Tracker"
-export * from "./MoDeLs"
+export * from "@event-details/arrival-tracking/Models"
 export * from "./Geofencing"
 export * from "./UpcomingArrivals"
 export * from "./Refresh"

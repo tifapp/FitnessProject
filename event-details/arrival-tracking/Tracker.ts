@@ -3,7 +3,7 @@ import {
   EventArrival,
   EventArrivalOperationKind,
   EventArrivalOperationResult
-} from "./MoDeLs"
+} from "@event-details/arrival-tracking/Models"
 import {
   EventArrivalGeofencingUpdate,
   EventArrivalGeofencingUnsubscribe,

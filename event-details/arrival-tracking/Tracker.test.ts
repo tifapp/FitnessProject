@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { AsyncStorageUpcomingEventArrivals } from "./UpcomingArrivals"
 import { EventArrivalsTracker } from "./Tracker"
-import { EventArrival, EventArrivalOperationResult } from "./MoDeLs"
+import { EventArrival, EventArrivalOperationResult } from "./Models"
 import { ArrayUtils } from "@lib/utils/Array"
 import { LocationCoordinate2D } from "@location"
 import {
