@@ -1,5 +1,5 @@
 import { EventAttendee } from "@lib/events"
-import { uuidString } from "@lib/UUID"
+import { uuidString } from "@lib/utils/UUID"
 
 const namesAndHandles = [
   { name: "Sophia Wilson", handle: "sophisophia" },

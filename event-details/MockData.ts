@@ -1,5 +1,5 @@
 import { UserHandle } from "@content-parsing"
-import { uuidString } from "@lib/UUID"
+import { uuidString } from "@lib/utils/UUID"
 import { CurrentUserEvent, EventAttendee, EventColors } from "./Event"
 import { dateRange } from "@date-time"
 
