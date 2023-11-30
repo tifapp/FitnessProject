@@ -37,11 +37,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          if [ -d node_modules ]; then
-            echo "Dependencies are cached - skipping installation"
-          else
-            npm ci
-          fi
+          npm ci
 
       - name: Lint
         run: npm run staged-lint
@@ -91,11 +87,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          if [ -d node_modules ]; then
-            echo "Dependencies are cached - skipping installation"
-          else
-            npm ci
-          fi
+          npm ci
 
       - name: Bundle project
         run: npx expo export
