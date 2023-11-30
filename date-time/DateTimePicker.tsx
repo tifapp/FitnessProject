@@ -3,9 +3,9 @@ import { Platform, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import RNDateTimePicker, {
   DateTimePickerAndroid as RNDateTimePickerAndroid
 } from "@react-native-community/datetimepicker"
-import { dayjs } from "../../lib/date"
+import { dayjs } from "."
 import { MaterialIcons } from "@expo/vector-icons"
-import IconButton from "../common/IconButton"
+import IconButton from "../components/common/IconButton"
 
 /**
  * Default date formatter for `DateTimePicker`.
@@ -71,7 +71,7 @@ export type DateTimePickerProps = {
  * that display a modal are used. The modal then uses Android's native
  * date and time pickers respectively.
  */
-const DateTimePicker = (props: DateTimePickerProps) =>
+export const DateTimePicker = (props: DateTimePickerProps) =>
   Platform.OS === "android"
     ? (
       <DatePickerAndroid {...props} />
@@ -182,5 +182,3 @@ const styles = StyleSheet.create({
     marginRight: 8
   }
 })
-
-export default DateTimePicker

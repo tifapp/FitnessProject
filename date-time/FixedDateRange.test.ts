@@ -1,4 +1,4 @@
-import { dateRange } from "@lib/date"
+import { dateRange } from "@date-time"
 
 describe("FixedDateRange tests", () => {
   test("moveStartDate basic", () => {

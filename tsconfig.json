@@ -31,6 +31,7 @@
       "@event-details": ["./event-details"],
       "@location-search/*": ["./location-search/*"],
       "@content-parsing": ["./content-parsing"],
+      "@date-time": ["./date-time"],
       "env": ["./.env"]
     }
   },

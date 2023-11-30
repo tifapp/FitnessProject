@@ -1,6 +1,6 @@
 import { Dayjs } from "dayjs"
 import { StringDateSchema, addSecondsToDate, diffDates } from "./Date"
-import { dayjs, now } from "./dayjs"
+import { dayjs, now } from "./Dayjs"
 import { z } from "zod"
 
 /**

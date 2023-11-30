@@ -1,4 +1,4 @@
-import { FixedDateRange } from "@lib/date"
+import { FixedDateRange } from "@date-time"
 import { EventColors, SaveEventRequest } from "@lib/events"
 import { LocationCoordinate2D } from "@lib/location"
 

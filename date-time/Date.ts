@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { dayjs } from "./dayjs"
+import { dayjs } from "./Dayjs"
 
 /**
  * Computes the difference between 2 dates in a variety of units.

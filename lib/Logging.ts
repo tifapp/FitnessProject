@@ -1,6 +1,6 @@
 import { ArrayUtils } from "./Array"
 import { Filesystem } from "./Filesystem"
-import { diffDates } from "./date"
+import { diffDates } from "@date-time"
 import { Native as SentryNative } from "sentry-expo"
 
 /**
