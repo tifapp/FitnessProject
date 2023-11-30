@@ -1,5 +1,5 @@
-import { makeLinkingConfig } from "@lib/linkingConfig"
 import { UserNotifications } from "@lib/UserNotifications"
+import { makeLinkingConfig } from "@root-feature/linkingConfig"
 import { NotificationContent } from "expo-notifications"
 import { unimplementedUserNotifications } from "./helpers/UserNotifications"
 

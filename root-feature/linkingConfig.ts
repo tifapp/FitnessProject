@@ -1,6 +1,6 @@
 import { LinkingOptions } from "@react-navigation/native"
 import { Linking } from "react-native"
-import { UserNotifications } from "./UserNotifications"
+import { UserNotifications } from "../lib/UserNotifications"
 
 /**
  * Creates the app's deep linking configuration.
@@ -13,8 +13,8 @@ export const makeLinkingConfig = ({
   getAppLaunchURL = Linking.getInitialURL,
   userNotifications
 }: {
-  getAppLaunchURL?: () => Promise<string | null>;
-  userNotifications: UserNotifications;
+  getAppLaunchURL?: () => Promise<string | null>
+  userNotifications: UserNotifications
 }): LinkingOptions => {
   return {
     prefixes: ["tifapp://"],
