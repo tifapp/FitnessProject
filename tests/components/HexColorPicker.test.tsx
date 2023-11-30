@@ -1,7 +1,7 @@
 import HexColorPicker, {
   HexColorPickerOption
 } from "@components/formComponents/HexColorPicker"
-import { HexColor } from "@lib/Color"
+import { HexColor } from "@lib/utils/Color"
 import { HapticsProvider } from "@lib/Haptics"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import { useState } from "react"

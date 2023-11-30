@@ -9,7 +9,7 @@ import {
   EventArrivalGeofencingUnsubscribe,
   EventArrivalsGeofencer
 } from "./Geofencing"
-import { ArrayUtils } from "@lib/Array"
+import { ArrayUtils } from "@lib/utils/Array"
 import { checkIfCoordsAreEqual } from "@location/index"
 
 export type PerformArrivalsOperation = (

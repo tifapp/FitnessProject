@@ -1,5 +1,5 @@
-import { ArrayUtils } from "@lib/Array"
-import { randomBool } from "@lib/Random"
+import { ArrayUtils } from "@lib/utils/Array"
+import { randomBool } from "@lib/utils/Random"
 import { LocationCoordinate2D, TiFLocation } from "@location"
 import {
   RecentLocationAnnotation,

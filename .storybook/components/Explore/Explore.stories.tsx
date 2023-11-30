@@ -5,7 +5,7 @@ import {
   createExploreEventsScreens
 } from "@screens/ExploreEvents"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
+import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import React from "react"
 import { UserLocationFunctionsProvider } from "@location"
 import { MenuProvider } from "react-native-popup-menu"

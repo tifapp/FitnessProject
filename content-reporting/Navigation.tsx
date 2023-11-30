@@ -3,7 +3,7 @@ import { ChevronBackButton, StackNavigatorType } from "@components/Navigation"
 import { ReportingReason, ReportableContentType } from "./Models"
 import { ReportSuccessView } from "./Success"
 import { StackScreenProps } from "@react-navigation/stack"
-import { StringUtils } from "@lib/String"
+import { StringUtils } from "@lib/utils/String"
 import { ReportFormView } from "./Form"
 
 export type ReportingScreensParamsList = {

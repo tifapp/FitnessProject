@@ -1,4 +1,4 @@
-import { uuid } from "../uuid"
+import { uuid } from "../UUID"
 
 /**
  * A type representing the relationship status between 2 users.

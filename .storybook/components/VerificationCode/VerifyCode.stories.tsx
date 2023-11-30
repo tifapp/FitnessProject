@@ -1,15 +1,14 @@
+import { EmailAddress, USPhoneNumber } from "@auth"
 import {
-  AuthVerificationCodeFormView,
-  EmailAddress,
-  USPhoneNumber,
-  useAuthVerificationCodeForm
-} from "@auth/index"
+  useAuthVerificationCodeForm,
+  AuthVerificationCodeFormView
+} from "@auth/VerifyCode"
 import {
   BASE_HEADER_SCREEN_OPTIONS,
   ChevronBackButton
 } from "@components/Navigation"
-import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
-import { delayData } from "@lib/DelayData"
+import { TiFQueryClientProvider } from "@lib/ReactQuery"
+import { delayData } from "@lib/utils/DelayData"
 import {
   NavigationContainer,
   NavigationProp,
@@ -61,33 +60,26 @@ export const Basic: VerifyCodeStory = () => (
 const EmailScreen = () => {
   const email = EmailAddress.parse("peacock69@gmail.com")!
   const form = useAuthVerificationCodeForm({
-    submitCode: async () => await delayData(false, 7000),
+    submitCode: async () => await delayData({ isCorrect: false }, 7000),
     resendCode: async () => await delayData(undefined, 1000),
     onSuccess: () => console.log("success")
   })
   console.log("Code resend status", form.resendCodeStatus)
-  return (
-    <AuthVerificationCodeFormView
-      {...form}
-      codeReceiverName={email.formattedForPrivacy}
-    />
-  )
+  return <AuthVerificationCodeFormView {...form} codeReceiverName={email} />
 }
 
 const PhoneNumberScreen = () => {
   const phoneNumber = USPhoneNumber.parse("1234567890")!
   const form = useAuthVerificationCodeForm({
-    submitCode: async () => await delayData(false, 1500),
+    submitCode: async () =>
+      await delayData({ isCorrect: true, data: undefined }, 1500),
     resendCode: async () => {
       throw new Error("Lol")
     },
     onSuccess: () => console.log("success")
   })
   return (
-    <AuthVerificationCodeFormView
-      {...form}
-      codeReceiverName={phoneNumber.formattedForPrivacy}
-    />
+    <AuthVerificationCodeFormView {...form} codeReceiverName={phoneNumber} />
   )
 }
 

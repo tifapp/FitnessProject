@@ -1,6 +1,5 @@
-import { TiFAPI } from "@api-client/TiFAPI"
-import { createTiFAPIFetch } from "@api-client/client"
-import { uuid } from "@lib/uuid"
+import { TiFAPI, createTiFAPIFetch } from "@api-client"
+import { uuid } from "@lib/UUID"
 import {
   NavigationContainer,
   NavigatorScreenParams,

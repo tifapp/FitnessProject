@@ -1,8 +1,8 @@
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
-import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
+import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { UserLocationFunctionsProvider } from "@location"
-import { ArrayUtils } from "@lib/Array"
-import { delayData } from "@lib/DelayData"
+import { ArrayUtils } from "@lib/utils/Array"
+import { delayData } from "@lib/utils/DelayData"
 import {
   LocationSearchPicker,
   useLocationSearchPicker,

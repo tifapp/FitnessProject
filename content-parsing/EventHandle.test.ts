@@ -1,4 +1,4 @@
-import { ColorString } from "@lib/Color"
+import { ColorString } from "@lib/utils/Color"
 import { EventHandle } from "./EventHandle"
 
 describe("EventHandle tests", () => {

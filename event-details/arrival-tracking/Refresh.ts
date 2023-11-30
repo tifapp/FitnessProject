@@ -1,4 +1,4 @@
-import { AsyncStorageUtils } from "@lib/AsyncStorage"
+import { AsyncStorageUtils } from "@lib/utils/AsyncStorage"
 import { StringDateSchema, addSecondsToDate, diffDates, now } from "@date-time"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { AppState } from "react-native"

@@ -1,6 +1,5 @@
 import { TiFMenuProvider } from "@components/TiFMenuProvider"
-import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
-import { useAppFonts } from "@hooks/Fonts"
+import { useAppFonts } from "@lib/Fonts"
 import { UserLocationFunctionsProvider } from "@location/UserLocation"
 import {
   HapticsProvider,
@@ -33,6 +32,7 @@ import { Native as SentryNative } from "sentry-expo"
 import awsconfig from "./src/aws-exports"
 import { setupCognito } from "./auth"
 import { defineEventArrivalsGeofencingTasks } from "@event-details/arrival-tracking"
+import { TiFQueryClientProvider } from "@lib/ReactQuery"
 
 Geo.configure(awsconfig)
 setupCognito()

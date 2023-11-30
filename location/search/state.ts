@@ -1,8 +1,8 @@
-import { debounceAtomGroup } from "@lib/Jotai"
+import { JotaiUtils } from "@lib/utils/Jotai"
 import { useAtomValue } from "jotai"
 import { LocationsSearchQuery } from "./Models"
 
-export const searchTextAtoms = debounceAtomGroup("", 200)
+export const searchTextAtoms = JotaiUtils.debounceAtomGroup("", 200)
 
 export const useLocationsSearchQueryObject = () => {
   const debouncedSearchText = useAtomValue(searchTextAtoms.debouncedValueAtom)

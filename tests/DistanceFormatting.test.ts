@@ -1,4 +1,7 @@
-import { compactFormatFeet, compactFormatMiles } from "@lib/DistanceFormatting"
+import {
+  compactFormatFeet,
+  compactFormatMiles
+} from "@lib/utils/DistanceFormatting"
 
 describe("DistanceFormatting tests", () => {
   describe("compactFormatMiles tests", () => {

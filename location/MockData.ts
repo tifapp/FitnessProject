@@ -1,6 +1,6 @@
 import { LocationObject, LocationObjectCoords } from "expo-location"
 import { LocationCoordinate2D, TiFLocation } from "./Location"
-import { randomFloatInRange, randomlyNull } from "@lib/Random"
+import { randomFloatInRange, randomlyNull } from "@lib/utils/Random"
 import { faker } from "@faker-js/faker"
 
 /**

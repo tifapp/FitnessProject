@@ -1,6 +1,6 @@
 import { Caption, CaptionTitle } from "@components/Text"
 import { SkeletonView } from "@components/common/Skeleton"
-import { useFontScale } from "@hooks/Fonts"
+import { useFontScale } from "@lib/Fonts"
 import {
   LocationCoordinate2D,
   hashLocationCoordinate,

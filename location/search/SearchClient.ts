@@ -1,4 +1,4 @@
-import { ArrayUtils } from "@lib/Array"
+import { ArrayUtils } from "@lib/utils/Array"
 
 import { LocationSearchResult, LocationsSearchQuery } from "./Models"
 

@@ -6,7 +6,7 @@ import {
   placemarkToFormattedAddress
 } from "@location"
 import { UserToProfileRelationStatus } from "@lib/users"
-import { uuid } from "@lib/uuid"
+import { uuid } from "@lib/UUID"
 import * as Clipboard from "expo-clipboard"
 import { showLocation } from "react-native-map-link"
 

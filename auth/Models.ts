@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { StringUtils } from "@lib/String"
+import { StringUtils } from "@lib/utils/String"
 
 /**
  * An interface for describing how something can be formatted with respect to privacy.

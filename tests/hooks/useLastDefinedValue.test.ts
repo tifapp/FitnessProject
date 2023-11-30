@@ -1,4 +1,4 @@
-import { useLastDefinedValue } from "@hooks/useLastDefinedValue"
+import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
 import { renderHook } from "@testing-library/react-native"
 
 describe("useLastDefinedValue tests", () => {

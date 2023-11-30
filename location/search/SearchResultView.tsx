@@ -1,7 +1,10 @@
 import { Caption, Headline } from "@components/Text"
 import { CircularIonicon, Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
-import { compactFormatFeet, compactFormatMiles } from "@lib/DistanceFormatting"
+import {
+  compactFormatFeet,
+  compactFormatMiles
+} from "@lib/utils/DistanceFormatting"
 import { FEET_PER_MILE } from "@lib/Math"
 import { placemarkToFormattedAddress } from "@location"
 import React from "react"

@@ -1,4 +1,4 @@
-import { AsyncStorageUtils } from "@lib/AsyncStorage"
+import { AsyncStorageUtils } from "@lib/utils/AsyncStorage"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { z } from "zod"
 
