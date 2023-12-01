@@ -93,12 +93,14 @@ const sendImageToSlack = async (
   })
 }
 
-const getPredictedBuildTime = () => {
+const getPredictedBuildTime = (timeZone = "America/Los_Angeles") => {
   const now = new Date()
 
   now.setMinutes(now.getMinutes() + 15)
 
   return now.toLocaleString("en-US", {
+    timeZone,
+    timeZoneName: "short",
     hour: "2-digit",
     minute: "2-digit",
     hour12: true
