@@ -22,7 +22,7 @@ const sendMessageToSlack = (
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Content-Length": Buffer.byteLength(data) + imageBuffer.length,
+      "Content-Length": Buffer.byteLength(postData),
       Authorization: `Bearer ${process.env.SLACK_APP_ID}`
     }
   }
@@ -48,24 +48,20 @@ const sendImageToSlack = async (
   const imageBuffer = Buffer.from(imageData.split(",")[1], "base64")
   const boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW"
   const data = [
-    "--" + boundary,
-    "Content-Disposition: form-data; name=\"token\"",
-    "",
-    process.env.SLACK_APP_ID,
-    "--" + boundary,
-    "Content-Disposition: form-data; name=\"channels\"",
-    "",
-    channelId,
-    "--" + boundary,
-    "Content-Disposition: form-data; name=\"initial_comment\"",
-    "",
-    message,
-    "--" + boundary,
-    "Content-Disposition: form-data; name=\"file\"; filename=\"qrcode.png\"",
-    "Content-Type: image/png",
-    "",
+    "--" + boundary + "\r\n",
+    "Content-Disposition: form-data; name=\"token\"\r\n\r\n",
+    process.env.SLACK_BOT_TOKEN + "\r\n",
+    "--" + boundary + "\r\n",
+    "Content-Disposition: form-data; name=\"channels\"\r\n\r\n",
+    channelId + "\r\n",
+    "--" + boundary + "\r\n",
+    "Content-Disposition: form-data; name=\"initial_comment\"\r\n\r\n",
+    message + "\r\n",
+    "--" + boundary + "\r\n",
+    "Content-Disposition: form-data; name=\"file\"; filename=\"qrcode.png\"\r\n",
+    "Content-Type: image/png\r\n\r\n",
     imageBuffer,
-    "--" + boundary + "--"
+    "\r\n--" + boundary + "--\r\n"
   ]
 
   const options = {
@@ -86,14 +82,11 @@ const sendImageToSlack = async (
     })
 
     req.on("error", (e) => reject(e))
-    // Write each part of the data array to the request
     for (const part of data) {
-      if (typeof part === "string") {
-        req.write(part + "\r\n")
-      } else {
-        // part is a Buffer
+      if (Buffer.isBuffer(part)) {
         req.write(part)
-        req.write("\r\n")
+      } else {
+        req.write(part)
       }
     }
     req.end()
