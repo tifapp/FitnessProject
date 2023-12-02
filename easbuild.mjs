@@ -53,7 +53,7 @@ const sendImageToSlack = async (
   const data = [
     "--" + boundary + "\r\n",
     "Content-Disposition: form-data; name=\"token\"\r\n\r\n",
-    process.env.SLACK_BOT_TOKEN + "\r\n",
+    process.env.SLACK_APP_ID + "\r\n",
     "--" + boundary + "\r\n",
     "Content-Disposition: form-data; name=\"channels\"\r\n\r\n",
     channelId + "\r\n",
