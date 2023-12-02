@@ -1,5 +1,5 @@
 import { EventAttendee } from "@lib/events"
-import { uuid } from "@lib/uuid"
+import { uuidString } from "@lib/utils/UUID"
 
 const namesAndHandles = [
   { name: "Sophia Wilson", handle: "sophisophia" },
@@ -27,7 +27,7 @@ const namesAndHandles = [
 export namespace AttendeeListMocks {
   export const List1: EventAttendee[] = namesAndHandles.map(
     ({ name, handle }) => ({
-      id: uuid(),
+      id: uuidString(),
       username: name,
       handle: "@" + handle
     })

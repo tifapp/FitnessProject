@@ -9,23 +9,17 @@ import { UserNotifications } from "./UserNotifications"
  * @param userNotifications a `UserNotifications` instance to handle urls from push notifications
  * @returns
  */
-export const makeLinkingConfig = ({
+export const makeLinkingConfig = <ParamsList extends {}>({
   getAppLaunchURL = Linking.getInitialURL,
   userNotifications
 }: {
-  getAppLaunchURL?: () => Promise<string | null>;
-  userNotifications: UserNotifications;
-}): LinkingOptions => {
+  getAppLaunchURL?: () => Promise<string | null>
+  userNotifications: UserNotifications
+}): LinkingOptions<ParamsList> => {
   return {
     prefixes: ["tifapp://"],
     config: {
-      screens: {
-        Feed: {
-          screens: {
-            Home: "home"
-          }
-        }
-      }
+      screens: {}
     },
     getInitialURL: async () => {
       const notificationURL = await userNotifications

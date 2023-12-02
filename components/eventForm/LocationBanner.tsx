@@ -1,10 +1,10 @@
-import { useReverseGeocodeQuery } from "../../hooks/Geocoding"
-import { placemarkToFormattedAddress } from "../../lib/location"
+import { useReverseGeocodeQuery } from "../../location/Geocoding"
+import { placemarkToFormattedAddress } from "../../location"
 import React from "react"
 import { StyleSheet, View } from "react-native"
 import { useEventFormContext } from "./EventForm"
 import { FormLabel, SkeletonFormLabel } from "../formComponents/FormLabels"
-import { FontScaleFactors } from "../../hooks/Fonts"
+import { FontScaleFactors } from "../../lib/Fonts"
 import {
   EventFormLocationInfo,
   EventFormPlacemarkInfo

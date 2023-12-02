@@ -1,5 +1,5 @@
-import { ColorString } from "@lib/Color"
-import { ZodUtils } from "@lib/Zod"
+import { ColorString } from "@lib/utils/Color"
+import { ZodUtils } from "@lib/utils/Zod"
 
 /**
  * A handle that users can reference other events with.

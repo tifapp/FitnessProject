@@ -18,7 +18,7 @@ import {
   useResetPasswordForm
 } from "@auth/forgot-password/ResetPasswordForm"
 import { StackNavigatorType } from "@components/Navigation"
-import { delayData } from "@lib/DelayData"
+import { delayData } from "@lib/utils/DelayData"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { ActivitiesStackParamList } from "@stacks/ActivitiesStack"
 import React from "react"

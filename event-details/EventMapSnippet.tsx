@@ -1,4 +1,4 @@
-import { LocationCoordinate2D } from "lib/location/Location"
+import { LocationCoordinate2D } from "@location"
 import React from "react"
 import { StyleProp, ViewStyle } from "react-native"
 import MapView, { Marker } from "react-native-maps"
