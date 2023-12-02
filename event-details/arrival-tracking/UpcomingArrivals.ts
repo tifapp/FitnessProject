@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { EventArrival, EventArrivalsSchema } from "./models"
-import { AsyncStorageUtils } from "@lib/AsyncStorage"
+import { EventArrival, EventArrivalsSchema } from "./Models"
+import { AsyncStorageUtils } from "@lib/utils/AsyncStorage"
 
 /**
  * An interface for storing client-side details on upcoming event arrivals.

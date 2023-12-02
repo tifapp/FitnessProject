@@ -1,7 +1,7 @@
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { SafeAreaProvider } from "react-native-safe-area-context"
-import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
+import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import {
   CognitoSignInAuthenticator,
   SignInParamsList,
@@ -16,10 +16,7 @@ import {
   createSignUpEnvironment,
   createSignUpScreens
 } from "@auth/sign-up"
-import {
-  ForgotPasswordEnvironment,
-  createForgotPasswordEnvironment
-} from "@auth/forgot-password/Environment"
+import { createForgotPasswordEnvironment } from "@auth/forgot-password/Environment"
 import { createForgotPasswordScreens } from "@auth/forgot-password"
 import { Auth } from "@aws-amplify/auth"
 import { TiFAPI, createAWSTiFAPIFetch } from "@api-client"
@@ -36,7 +33,7 @@ const Stack = createStackNavigator<SignInParamsList>()
 
 const tiFAPI = new TiFAPI(
   createAWSTiFAPIFetch(
-    new URL("https://623qsegfb9.execute-api.us-west-2.amazonaws.com/prod/")
+    new URL("https://623qsegfb9.execute-api.us-west-2.amazonaws.com/staging/")
   )
 )
 

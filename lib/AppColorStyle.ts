@@ -1,4 +1,4 @@
-import { ColorString } from "./Color"
+import { ColorString } from "./utils/Color"
 
 export namespace AppStyles {
   export const darkColor = ColorString.primaryDarkColor.toString()

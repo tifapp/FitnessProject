@@ -1,7 +1,7 @@
 import { EventFormValues } from "@components/eventForm"
-import { GeocodingFunctionsProvider } from "@hooks/Geocoding"
+import { GeocodingFunctionsProvider } from "@location/Geocoding"
 import { HapticsProvider } from "@lib/Haptics"
-import { dateRange } from "@lib/date"
+import { dateRange } from "@date-time"
 import { EventColors } from "@lib/events"
 import EventFormScreen from "@screens/EventFormScreen"
 import {
@@ -11,13 +11,13 @@ import {
   waitFor
 } from "@testing-library/react-native"
 import { QueryClient } from "@tanstack/react-query"
-import { captureAlerts } from "../../helpers/Alerts"
-import { TestHaptics } from "../../helpers/Haptics"
-import { neverPromise } from "../../helpers/Promise"
+import { captureAlerts } from "@test-helpers/Alerts"
+import { TestHaptics } from "@test-helpers/Haptics"
+import { neverPromise } from "@test-helpers/Promise"
 import {
   TestQueryClientProvider,
   createTestQueryClient
-} from "../../helpers/ReactQuery"
+} from "@test-helpers/ReactQuery"
 import {
   attemptDismiss,
   baseTestEventFormValues,

@@ -1,9 +1,6 @@
-import { yardsToMeters } from "@lib/Math"
-import { StringUtils } from "@lib/String"
-import {
-  LocationCoordinate2D,
-  LocationCoordinates2DSchema
-} from "@lib/location"
+import { yardsToMeters } from "@lib/utils/MetricConversions"
+import { StringUtils } from "@lib/utils/String"
+import { LocationCoordinate2D, LocationCoordinates2DSchema } from "@location"
 import {
   LocationGeofencingEventType,
   startGeofencingAsync,

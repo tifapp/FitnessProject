@@ -1,7 +1,7 @@
-import { TiFAPI } from "@api-client/TiFAPI"
+import { TiFAPI, createAWSTiFAPIFetch } from "@api-client"
 import { Auth } from "@aws-amplify/auth"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
-import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
+import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { NavigationContainer } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
@@ -15,7 +15,6 @@ import {
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { Button } from "react-native"
 import { ScrollView } from "react-native-gesture-handler"
-import { createAWSTiFAPIFetch } from "@api-client/aws"
 
 const SignUpMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Sign Up"
