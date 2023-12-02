@@ -34,7 +34,10 @@ const sendMessageToSlack = (
       res.on("end", () => resolve(JSON.parse(body)))
     })
 
-    req.on("error", (e) => reject(e))
+    req.on("error", (e) => {
+      console.error(e)
+      reject(e)
+    })
     req.write(postData)
     req.end()
   })
@@ -61,7 +64,7 @@ const sendImageToSlack = async (
     "Content-Disposition: form-data; name=\"file\"; filename=\"qrcode.png\"\r\n",
     "Content-Type: image/png\r\n\r\n",
     imageBuffer,
-    "\r\n--" + boundary + "--\r\n"
+    "\r\n--" + boundary + "--"
   ]
 
   const options = {
@@ -81,7 +84,10 @@ const sendImageToSlack = async (
       res.on("end", () => resolve(JSON.parse(body)))
     })
 
-    req.on("error", (e) => reject(e))
+    req.on("error", (e) => {
+      console.error(e)
+      reject(e)
+    })
     for (const part of data) {
       if (Buffer.isBuffer(part)) {
         req.write(part)
@@ -190,7 +196,6 @@ const fetchInstallationAccessToken = async (
 }
 
 const manageCheckRun = async (action = "create") => {
-  console.log(JSON.stringify(process.env, null, 4))
   let checkRunParams = {}
   let checkRunId = ""
   if (action !== "create") {
@@ -275,10 +280,8 @@ const manageCheckRun = async (action = "create") => {
     })
     res.on("end", () => {
       try {
-        console.log(data)
         const responseObj = JSON.parse(data)
         const checkRunId = responseObj.id
-        console.log("Check Run ID:", checkRunId)
 
         fs.writeFileSync("checkRunId.txt", checkRunId.toString())
       } catch (error) {
@@ -296,13 +299,13 @@ const manageCheckRun = async (action = "create") => {
 
   if (action === "success") {
     const buildqr = await qrcode.toDataURL(buildLink)
-    sendImageToSlack(buildqr, `Build is ready:\n${buildLink}`)
+    await sendImageToSlack(buildqr, `Build is ready:\n${buildLink}`)
   }
   if (action === "failure") {
-    sendMessageToSlack(`Build failed. See details at\n${buildLink}`)
+    await sendMessageToSlack(`Build failed. See details at\n${buildLink}`)
   }
   if (action === "create") {
-    sendMessageToSlack(
+    await sendMessageToSlack(
       `A new build has started. Build will be finished at approximately *${getPredictedBuildTime()}*. See details at\n${buildLink}`
     )
   }
