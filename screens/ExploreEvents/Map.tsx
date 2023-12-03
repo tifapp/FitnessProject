@@ -1,6 +1,6 @@
 import { ExploreEventsMarkerView } from "@screens/ExploreEvents/MapMarker"
 import { CurrentUserEvent } from "@lib/events"
-import { LocationCoordinate2D, Region } from "@lib/location"
+import { LocationCoordinate2D, Region } from "@location/index"
 import React from "react"
 import { StyleProp, ViewStyle } from "react-native"
 import MapView, { Marker } from "react-native-maps"

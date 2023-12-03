@@ -11,9 +11,9 @@ import { useCallback, useState } from "react"
 import { View } from "react-native"
 import { Button } from "react-native-elements"
 import { Password, USPhoneNumber } from ".."
-import "../../tests/helpers/Matchers"
-import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
-import { fakeTimers } from "../../tests/helpers/Timers"
+import "@test-helpers/Matchers"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import { fakeTimers } from "@test-helpers/Timers"
 import {
   ForgotPasswordParamsList,
   createForgotPasswordScreens

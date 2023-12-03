@@ -1,8 +1,8 @@
 import { z } from "zod"
 import { createTiFAPIFetch } from "./client"
 import { rest } from "msw"
-import { neverPromise } from "../tests/helpers/Promise"
-import { mswServer } from "../tests/helpers/msw"
+import { neverPromise } from "../test-helpers/Promise"
+import { mswServer } from "../test-helpers/msw"
 
 const TEST_BASE_URL = new URL("http://localhost:8080")
 

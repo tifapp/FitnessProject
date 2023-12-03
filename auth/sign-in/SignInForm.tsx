@@ -20,7 +20,7 @@ import {
   EmailPhoneTextToggleFooterView,
   useEmailPhoneTextState
 } from "../EmailPhoneText"
-import { useFormSubmission } from "@hooks/FormHooks"
+import { useFormSubmission } from "@lib/utils/Form"
 import { USPhoneNumber, EmailAddress } from ".."
 import { SignInResult } from "./Authenticator"
 

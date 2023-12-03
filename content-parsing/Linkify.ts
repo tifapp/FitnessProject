@@ -1,5 +1,5 @@
 import linkifyIt, { LinkifyIt, Match } from "linkify-it"
-import { StringUtils, ToStringable } from "@lib/String"
+import { StringUtils, ToStringable } from "@lib/utils/String"
 import { UserHandle } from "./UserHandle"
 import { EventHandle } from "./EventHandle"
 
