@@ -1,12 +1,11 @@
 import { UserHandle } from "@content-parsing"
-import { dateRange, FixedDateRange } from "@lib/date"
+import { FixedDateRange } from "@date-time"
 import {
   LocationCoordinate2D,
   Placemark,
   placemarkToFormattedAddress
-} from "@lib/location"
+} from "@location"
 import { UserToProfileRelationStatus } from "@lib/users"
-import { uuid } from "@lib/uuid"
 import * as Clipboard from "expo-clipboard"
 import { showLocation } from "react-native-map-link"
 
@@ -32,45 +31,6 @@ export type EventAttendee = {
   handle: UserHandle
   profileImageURL?: string
   relationStatus: UserToProfileRelationStatus
-}
-
-/**
- * Some mock {@link EventAttendee} objects.
- */
-export namespace EventAttendeeMocks {
-  export const Alivs = {
-    id: uuid(),
-    username: "Alvis",
-    handle: UserHandle.optionalParse("alvis")!,
-    profileImageURL:
-      "https://www.escapistmagazine.com/wp-content/uploads/2023/05/xc3-future-redeemed-alvis.jpg?resize=1200%2C673"
-  } as EventAttendee
-
-  export const BlobJr = {
-    id: uuid(),
-    username: "Blob Jr.",
-    handle: UserHandle.optionalParse("SmallBlob")!
-  } as EventAttendee
-
-  export const BlobSr = {
-    id: uuid(),
-    username: "Blob Sr.",
-    handle: UserHandle.optionalParse("OriginalBlob")!
-  } as EventAttendee
-
-  // NB: Unfortunately, we can't reuse Harrison's legendary
-  // Anna Admin and Molly Member personas, bc this isn't a book club...
-  // (Also Molly died and was replaced with Haley Host...)
-
-  export const AnnaAttendee = {
-    id: uuid(),
-    username: "Anna Attendee"
-  } as EventAttendee
-
-  export const HaleyHost = {
-    id: uuid(),
-    username: "Haley Host"
-  } as EventAttendee
 }
 
 /**
@@ -171,89 +131,4 @@ export const isAttendingEvent = (attendeeStatus: EventUserAttendeeStatus) => {
  */
 export type CurrentUserEvent = Event & {
   userAttendeeStatus: EventUserAttendeeStatus
-}
-
-/**
- * Some mock {@link CurrentUserEvent} objects.
- */
-export namespace EventMocks {
-  export const PickupBasketball = {
-    host: EventAttendeeMocks.Alivs,
-    id: uuid(),
-    title: "Pickup Basketball",
-    description: "I'm better than Lebron James.",
-    dateRange: dateRange(
-      new Date("2023-03-18T12:00:00"),
-      new Date("2023-03-18T13:00:00")
-    ),
-    color: EventColors.Orange,
-    location: {
-      coordinate: {
-        latitude: 36.994621,
-        longitude: -122.064537
-      },
-      placemark: {
-        name: "Basketball Court",
-        city: "Santa Cruz",
-        region: "CA",
-        postalCode: "95064"
-      }
-    },
-    shouldHideAfterStartDate: false,
-    attendeeCount: 10,
-    userAttendeeStatus: "attending",
-    userMilesFromEvent: 12.7892
-  } as CurrentUserEvent
-
-  export const Multiday = {
-    host: EventAttendeeMocks.Alivs,
-    id: uuid(),
-    title: "Multiday Event",
-    description: "This event runs for more than one day.",
-    dateRange: dateRange(
-      new Date("2023-03-18T12:00:00"),
-      new Date("2023-03-21T12:00:00")
-    ),
-    color: EventColors.Purple,
-    location: {
-      coordinate: {
-        latitude: 55.862634,
-        longitude: -4.280214
-      },
-      placemark: {
-        name: "McDonalds",
-        city: "Glasgow",
-        region: "Scotland",
-        postalCode: "G3 8JU"
-      }
-    },
-    shouldHideAfterStartDate: false,
-    attendeeCount: 3,
-    userAttendeeStatus: "attending",
-    userMilesFromEvent: 12.7892
-  } as CurrentUserEvent
-
-  export const NoPlacemarkInfo = {
-    host: EventAttendeeMocks.Alivs,
-    id: uuid(),
-    title: "No Placemark Info",
-    attendeeCount: 5,
-    description:
-      "The placemark info should then be geocoded from the coordinates if it is not available." +
-      "(ie. Our AWS backend still needs to geocode it) The result in this case should be somewhere in New York.",
-    dateRange: dateRange(
-      new Date("2023-03-18T12:00:00"),
-      new Date("2023-03-18T15:00:00")
-    ),
-    color: EventColors.Green,
-    location: {
-      coordinate: {
-        latitude: 40.777874,
-        longitude: -73.969717
-      }
-    },
-    shouldHideAfterStartDate: false,
-    userAttendeeStatus: "attending",
-    userMilesFromEvent: 12.7892
-  } as CurrentUserEvent
 }

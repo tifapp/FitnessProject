@@ -1,6 +1,6 @@
 import { SkeletonView } from "@components/common/Skeleton"
 import ConfirmationDialogue from "@components/common/ConfirmationDialogue"
-import { delayData } from "@lib/DelayData"
+import { delayData } from "@lib/utils/DelayData"
 import { AttendeeEntry } from "@screens/EventAttendeesList/attendeeEntry"
 import React from "react"
 import { FlatList, StyleProp, StyleSheet, View, ViewStyle } from "react-native"

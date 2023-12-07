@@ -1,5 +1,5 @@
-import { ArrayUtils } from "@lib/Array"
-import "@lib/Promise"
+import { ArrayUtils } from "@lib/utils/Array"
+import "@lib/utils/Promise"
 import * as ExpoSecureStore from "expo-secure-store"
 
 /**

@@ -12,8 +12,8 @@ import {
 import {
   useRequestForegroundLocationPermissions,
   useUserCoordinatesQuery
-} from "@hooks/UserLocation"
-import { Region } from "@lib/location"
+} from "@location/UserLocation"
+import { Region } from "@location/index"
 import { QueryHookOptions } from "@lib/ReactQuery"
 import { LocationAccuracy, PermissionResponse } from "expo-location"
 
