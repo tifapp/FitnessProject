@@ -2,11 +2,11 @@ import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { BottomNavTabBar } from "@components/bottomTabComponents/BottomNavTabBar"
 import { EventDetailsProps } from "@event-details/EventDetails"
 import { createEventDetailsStackScreens } from "@event-details/EventScreensNavigation"
-import { EventMocks } from "@lib/events"
+import { EventMocks } from "@event-details/MockData"
 import {
   LocationSearchPicker,
   LocationSearchPickerProps
-} from "@location-search/Picker"
+} from "@location/search"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
@@ -25,7 +25,7 @@ import { SignInScreensParamsList } from "@screens/ProfileScreen/Navigation/SignI
 import {
   ReportingScreensParamsList,
   createContentReportingStackScreens
-} from "@screens/Reporting"
+} from "@content-reporting"
 import { TestChatRoomScreen } from "@screens/testScreens/TestChatRoomScreen"
 import { TestEventFormScreen } from "@screens/testScreens/TestEventFormScreen"
 import { TestNotifScreen } from "@screens/testScreens/TestNotifScreen"

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import React from "react"
-import { captureAlerts } from "../tests/helpers/Alerts"
+import { captureAlerts } from "@test-helpers/Alerts"
 import { MenuProvider } from "react-native-popup-menu"
 import MenuDropdown from "./MenuDropdown"
 

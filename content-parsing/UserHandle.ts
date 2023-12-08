@@ -1,4 +1,4 @@
-import { ZodUtils } from "@lib/Zod"
+import { ZodUtils } from "@lib/utils/Zod"
 
 /**
  * An reason that a user handle's raw text was unable to be parsed.

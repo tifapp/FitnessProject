@@ -1,10 +1,10 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
 import { useSignUpChangeUserHandleForm } from "./ChangeUserHandle"
 import { act } from "react-test-renderer"
-import { fakeTimers } from "../../tests/helpers/Timers"
-import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
-import { neverPromise } from "../../tests/helpers/Promise"
-import { captureAlerts } from "../../tests/helpers/Alerts"
+import { fakeTimers } from "@test-helpers/Timers"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import { neverPromise } from "@test-helpers/Promise"
+import { captureAlerts } from "@test-helpers/Alerts"
 import { UserHandle } from "@content-parsing"
 
 describe("SignUpChangeUserHandle tests", () => {

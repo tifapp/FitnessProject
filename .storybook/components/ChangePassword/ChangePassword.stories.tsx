@@ -3,8 +3,8 @@ import {
   BASE_HEADER_SCREEN_OPTIONS,
   ChevronBackButton
 } from "@components/Navigation"
-import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
-import { delayData } from "@lib/DelayData"
+import { TiFQueryClientProvider } from "@lib/ReactQuery"
+import { delayData } from "@lib/utils/DelayData"
 import {
   NavigationContainer,
   NavigationProp,

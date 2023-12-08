@@ -3,7 +3,7 @@ import {
   MaterialCommunityIcons,
   MaterialIcons
 } from "@expo/vector-icons"
-import { useFontScale } from "@hooks/Fonts"
+import { useFontScale } from "@lib/Fonts"
 import React, { ComponentProps } from "react"
 import {
   StyleProp,

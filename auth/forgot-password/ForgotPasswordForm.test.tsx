@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native"
-import { captureAlerts } from "../../tests/helpers/Alerts"
-import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
+import { captureAlerts } from "@test-helpers/Alerts"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { useForgotPasswordForm } from "./ForgotPasswordForm"
 import { USPhoneNumber } from ".."
 describe("Forgot Password Form tests", () => {
