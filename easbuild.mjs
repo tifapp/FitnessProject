@@ -49,54 +49,27 @@ const sendImageToSlack = async (
   channelId = outputChannel
 ) => {
   const imageBuffer = Buffer.from(imageData.split(",")[1], "base64")
-  const boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW"
-  const data = [
-    "--" + boundary + "\r\n",
-    "Content-Disposition: form-data; name=\"token\"\r\n\r\n",
-    process.env.SLACK_APP_ID + "\r\n",
-    "--" + boundary + "\r\n",
-    "Content-Disposition: form-data; name=\"channels\"\r\n\r\n",
-    channelId + "\r\n",
-    "--" + boundary + "\r\n",
-    "Content-Disposition: form-data; name=\"initial_comment\"\r\n\r\n",
-    message + "\r\n",
-    "--" + boundary + "\r\n",
-    "Content-Disposition: form-data; name=\"file\"; filename=\"qrcode.png\"\r\n",
-    "Content-Type: image/png\r\n\r\n",
-    imageBuffer,
-    "\r\n--" + boundary + "--"
-  ]
 
-  const options = {
-    hostname: "slack.com",
-    port: 443,
-    path: "/api/files.upload",
-    method: "POST",
-    headers: {
-      "Content-Type": "multipart/form-data; boundary=" + boundary
-    }
+  const formData = new FormData()
+  formData.append("token", process.env.SLACK_APP_ID ?? "")
+  formData.append("channels", channelId)
+  formData.append("initial_comment", message)
+
+  const blob = new Blob([imageBuffer], { type: "image/png" })
+  formData.append("file", blob, "qrcode.png")
+
+  try {
+    const response = await fetch("https://slack.com/api/files.upload", {
+      method: "POST",
+      body: formData
+    })
+
+    const responseBody = await response.json()
+    return responseBody
+  } catch (error) {
+    console.error(error)
+    throw error
   }
-
-  return new Promise((resolve, reject) => {
-    const req = https.request(options, (res) => {
-      let body = ""
-      res.on("data", (chunk) => (body += chunk))
-      res.on("end", () => resolve(JSON.parse(body)))
-    })
-
-    req.on("error", (e) => {
-      console.error(e)
-      reject(e)
-    })
-    for (const part of data) {
-      if (Buffer.isBuffer(part)) {
-        req.write(part)
-      } else {
-        req.write(part)
-      }
-    }
-    req.end()
-  })
 }
 
 const getPredictedBuildTime = (timeZone = "America/Los_Angeles") => {
