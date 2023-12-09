@@ -66,7 +66,7 @@ jobs:
           echo "EXPO_PROJECT_ID=${{ secrets.EXPO_PROJECT_ID }}" >> .env.infra
           echo "EXPO_PROJECT_OWNER=${{ secrets.EXPO_PROJECT_OWNER }}" >> .env.infra
           echo "CHECK_RUN_ID=${{ github.run_id }}" >> .env.infra
-          echo "GITHUB_SHA=${{ github.event.pull_request.head.sha }}" >> .env.infra
+          echo "GITHUB_SHA=${{ github.sha }}" >> .env.infra
           echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .env.infra
           cat .env.infra
 
