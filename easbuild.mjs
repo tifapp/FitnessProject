@@ -195,6 +195,8 @@ const checkGithubActionRuns = async (
       console.error("Error managing check run:", err)
     })
 
+  console.log(resp)
+
   // @ts-ignore
   fs.writeFileSync("checkRunId.txt", resp.id.toString())
 }
