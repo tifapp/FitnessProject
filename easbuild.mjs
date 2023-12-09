@@ -196,6 +196,10 @@ const checkGithubActionRuns = async (
     })
 
   console.log(resp)
+  console.log(
+    `Git SHA: ${process.env.GITHUB_SHA}`,
+    `Length: ${(process.env.GITHUB_SHA ?? "").length}`
+  )
 
   // @ts-ignore
   fs.writeFileSync("checkRunId.txt", resp.id.toString())
