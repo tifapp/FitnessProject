@@ -7,6 +7,7 @@ import qrcode from "qrcode"
 import fetch from "node-fetch"
 
 dotenv.config({ path: ".env.infra" })
+console.log(process.env)
 
 const outputChannel = "C01B7FFKDCP"
 
