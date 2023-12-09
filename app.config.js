@@ -1,6 +1,6 @@
 const dotenv = require("dotenv")
 
-dotenv.config()
+dotenv.config({ path: ".env.infra" })
 
 const { MAPS_API, EXPO_PROJECT_ID, EXPO_PROJECT_OWNER } = process.env
 
