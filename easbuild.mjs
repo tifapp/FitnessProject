@@ -11,6 +11,8 @@ console.log(process.env)
 
 const outputChannel = "C01B7FFKDCP"
 
+const action = process.argv[2] ?? "create"
+
 const sendMessageToSlack = (
   /** @type {string} */ message,
   channelId = outputChannel
@@ -181,7 +183,7 @@ const checkGithubActionRuns = async (
   const resp = await fetch(
     `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/check-runs${idPath}`,
     {
-      method: "POST",
+      method: action === "create" ? "POST" : "PATCH",
       headers: {
         Authorization: `token ${accessToken}`,
         Accept: "application/vnd.github.v3+json",
@@ -282,5 +284,4 @@ const manageCheckRun = async (/** @type {string} */ action) => {
   }
 }
 
-const action = process.argv[2] || "create"
 manageCheckRun(action)
