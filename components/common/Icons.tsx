@@ -73,6 +73,8 @@ export const MaterialCommunityIcon = ({
   />
 )
 
+export const DEFAULT_ICON_SIZE = 24
+
 export type IoniconName = ComponentProps<typeof Ionicons>["name"]
 
 /**
@@ -80,7 +82,7 @@ export type IoniconName = ComponentProps<typeof Ionicons>["name"]
  */
 export const Ionicon = ({
   name,
-  size = 24,
+  size = DEFAULT_ICON_SIZE,
   style,
   color,
   maximumFontScaleFactor,
@@ -90,7 +92,13 @@ export const Ionicon = ({
     name={name}
     size={size * useFontScale({ maximumScaleFactor: maximumFontScaleFactor })}
     color={color}
-    style={style}
+    style={[
+      style,
+      {
+        height:
+          size * useFontScale({ maximumScaleFactor: maximumFontScaleFactor })
+      }
+    ]}
     {...props}
   />
 )
@@ -102,10 +110,22 @@ export type IoniconButtonProps = {
 /**
  * An ionicon with no background that behaves like {@link TouchableOpacity}.
  */
-export const TouchableIonicon = ({ icon, ...props }: IoniconButtonProps) => (
+export const TouchableIonicon = ({
+  icon,
+  style,
+  ...props
+}: IoniconButtonProps) => (
   <TouchableOpacity
     {...props}
     hitSlop={{ left: 16, right: 16, top: 16, bottom: 16 }}
+    style={[
+      style,
+      {
+        height:
+          (icon.size ?? DEFAULT_ICON_SIZE) *
+          useFontScale({ maximumScaleFactor: icon.maximumFontScaleFactor })
+      }
+    ]}
   >
     <Ionicon {...icon} />
   </TouchableOpacity>
