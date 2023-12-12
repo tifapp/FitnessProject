@@ -6,12 +6,10 @@ on:
       - development
 
 jobs:
-  main:
-    name: Create PR Release to Main
+  create-release-pr:
+    name: Create Release PR to Main
     runs-on: ubuntu-latest
     env:
-      EXPO_PROJECT_ID: ${{ secrets.EXPO_PROJECT_ID }}
-      EXPO_PROJECT_OWNER: ${{ secrets.EXPO_PROJECT_OWNER }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout code
@@ -27,6 +25,18 @@ jobs:
           destination_branch: ${{ github.event.repository.default_branch }}
           pr_title: "[Automated] Merge ${{ github.ref_name }} into ${{ github.event.repository.default_branch }}"
           pr_body: "See commit history for details"
+
+  eas-build:
+    name: Perform EAS Build
+    runs-on: ubuntu-latest
+    env:
+      EXPO_PROJECT_ID: ${{ secrets.EXPO_PROJECT_ID }}
+      EXPO_PROJECT_OWNER: ${{ secrets.EXPO_PROJECT_OWNER }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cache node modules
         uses: actions/cache@v2
@@ -53,12 +63,12 @@ jobs:
 
       - name: Append Check Run ID to .env
         run: |
-          echo "EXPO_PROJECT_ID=${{ secrets.EXPO_PROJECT_ID }}" >> .env
-          echo "EXPO_PROJECT_OWNER=${{ secrets.EXPO_PROJECT_OWNER }}" >> .env
-          echo "CHECK_RUN_ID=${{ github.run_id }}" >> .env
-          echo "GITHUB_SHA=${{ github.event.pull_request.head.sha }}" >> .env
-          echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .env
-          cat .env
+          echo "EXPO_PROJECT_ID=${{ secrets.EXPO_PROJECT_ID }}" >> .env.infra
+          echo "EXPO_PROJECT_OWNER=${{ secrets.EXPO_PROJECT_OWNER }}" >> .env.infra
+          echo "CHECK_RUN_ID=${{ github.run_id }}" >> .env.infra
+          echo "GITHUB_SHA=${{ github.sha }}" >> .env.infra
+          echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .env.infra
+          cat .env.infra
 
       - name: Trigger Build on EAS
         run: eas build --profile preview --platform android --non-interactive --no-wait

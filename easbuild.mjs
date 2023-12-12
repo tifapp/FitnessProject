@@ -1,10 +1,17 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import dotenv from "dotenv"
 import fs from "fs"
 import https from "https"
 import jwt from "jsonwebtoken"
 import qrcode from "qrcode"
+import fetch from "node-fetch"
+
+dotenv.config({ path: ".env.infra" })
+console.log(process.env)
 
 const outputChannel = "C01B7FFKDCP"
+
+const action = process.argv[2] ?? "create"
 
 const sendMessageToSlack = (
   /** @type {string} */ message,
@@ -86,8 +93,6 @@ const getPredictedBuildTime = (timeZone = "America/Los_Angeles") => {
   })
 }
 
-dotenv.config()
-
 const jwtToken = jwt.sign(
   {
     iat: Math.floor(Date.now() / 1000),
@@ -168,7 +173,42 @@ const fetchInstallationAccessToken = async (
   })
 }
 
-const manageCheckRun = async (action = "create") => {
+const checkGithubActionRuns = async (
+  /** @type {{ output: { title: string; summary: string; text?: undefined; }; name?: undefined; status?: undefined; started_at?: undefined; head_sha?: undefined; } | { output: { title: string; summary: string; text: string; }; name?: undefined; status?: undefined; started_at?: undefined; head_sha?: undefined; } | { name: string; status: string; started_at: string; head_sha: string | undefined; output: { title: string; summary: string; text?: undefined; }; }} */ checkRunData,
+  /** @type {string} */ idPath
+) => {
+  const installationId = await fetchInstallationId()
+  const accessToken = await fetchInstallationAccessToken(installationId)
+
+  const resp = await fetch(
+    `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/check-runs${idPath}`,
+    {
+      method: action === "create" ? "POST" : "PATCH",
+      headers: {
+        Authorization: `token ${accessToken}`,
+        Accept: "application/vnd.github.v3+json",
+        "User-Agent": "NodeJS-Http-Request",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(checkRunData)
+    }
+  )
+    .then((resp) => resp.json())
+    .catch((err) => {
+      console.error("Error managing check run:", err)
+    })
+
+  console.log(resp)
+  console.log(
+    `Git SHA: ${process.env.GITHUB_SHA}`,
+    `Length: ${(process.env.GITHUB_SHA ?? "").length}`
+  )
+
+  // @ts-ignore
+  fs.writeFileSync("checkRunId.txt", resp.id.toString())
+}
+
+const manageCheckRun = async (/** @type {string} */ action) => {
   let checkRunParams = {}
   let checkRunId = ""
   if (action !== "create") {
@@ -228,47 +268,7 @@ const manageCheckRun = async (action = "create") => {
     }
   }
 
-  const postData = JSON.stringify(checkRunData)
-  const installationId = await fetchInstallationId()
-  const accessToken = await fetchInstallationAccessToken(installationId)
-
-  const method = action === "create" ? "POST" : "PATCH"
-  const options = {
-    hostname: "api.github.com",
-    path: `/repos/${process.env.GITHUB_REPOSITORY}/check-runs${checkRunIdPath}`,
-    method,
-    headers: {
-      Authorization: `token ${accessToken}`,
-      Accept: "application/vnd.github.v3+json",
-      "User-Agent": "NodeJS-Http-Request",
-      "Content-Type": "application/json",
-      "Content-Length": postData.length
-    }
-  }
-
-  const req = https.request(options, (res) => {
-    let data = ""
-    res.on("data", (chunk) => {
-      data += chunk
-    })
-    res.on("end", () => {
-      try {
-        const responseObj = JSON.parse(data)
-        const checkRunId = responseObj.id
-
-        fs.writeFileSync("checkRunId.txt", checkRunId.toString())
-      } catch (error) {
-        console.error("Error parsing response data:", error)
-      }
-    })
-  })
-
-  req.on("error", (error) => {
-    console.error("Error managing check run:", error)
-  })
-
-  req.write(postData)
-  req.end()
+  await checkGithubActionRuns(checkRunData, checkRunIdPath)
 
   if (action === "success") {
     const buildqr = await qrcode.toDataURL(buildLink)
@@ -284,5 +284,4 @@ const manageCheckRun = async (action = "create") => {
   }
 }
 
-const action = process.argv[2] || "create"
 manageCheckRun(action)
