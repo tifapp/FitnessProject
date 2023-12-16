@@ -1,6 +1,12 @@
 import { QueryHookOptions } from "@lib/ReactQuery"
 import { LocationCoordinate2D } from "@location/Location"
-import { QueryClient, UseQueryResult, useQuery } from "@tanstack/react-query"
+import {
+  QueryClient,
+  UseQueryResult,
+  useQuery,
+  useQueryClient
+} from "@tanstack/react-query"
+import { LocationObject } from "expo-location"
 
 type RouteKind = "automobile" | "walking" | "public-transport" | "bike"
 
@@ -13,7 +19,7 @@ type CamelCaseRouteKeyName<Kind extends RouteKind> =
   Kind extends "public-transport" ? "publicTransport" : Kind
 
 export type TravelEstimates = {
-  sourceLocation: LocationCoordinate2D
+  userLocation: LocationObject
 } & { [Key in CamelCaseRouteKeyName<RouteKind>]?: ETAInformation }
 
 export type DistanceETAData =
@@ -25,14 +31,14 @@ export type DistanceETAData =
  * A wrapper function that calls on React Query to calculate the ETA.
  */
 export const useCalculateETA = (
-  queryClient: QueryClient,
   eventLocation: LocationCoordinate2D,
   loadETAFromLocations: (
     eventLocation: LocationCoordinate2D
   ) => Promise<TravelEstimates>,
   options?: QueryHookOptions<TravelEstimates>
 ): DistanceETAData => {
-  const queryKey = ["testing-ETA", eventLocation]
+  const queryClient = useQueryClient()
+  const queryKey = ["travel-ETAs", eventLocation]
   const etaResults = useQuery(
     queryKey,
     async () => {
@@ -61,5 +67,8 @@ const cacheETAQueryData = (
   etaInfo: TravelEstimates,
   queryClient: QueryClient
 ) => {
-  queryClient.setQueryData(["etaUserLocation", etaInfo.sourceLocation], etaInfo)
+  queryClient.setQueryData(
+    ["user-coordinates", etaInfo.userLocation.coords],
+    etaInfo
+  )
 }

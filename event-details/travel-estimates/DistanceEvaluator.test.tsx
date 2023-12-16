@@ -21,10 +21,12 @@ describe("DistanceEvaluator tests", () => {
 
   const renderUseCalculateETA = (eventLocation: LocationCoordinate2D) => {
     return renderHook(
-      () => useCalculateETA(queryClient, eventLocation, loadETAFromLocations),
+      () => useCalculateETA(eventLocation, loadETAFromLocations),
       {
         wrapper: ({ children }) => (
-          <TestQueryClientProvider>{children}</TestQueryClientProvider>
+          <TestQueryClientProvider client={queryClient}>
+            {children}
+          </TestQueryClientProvider>
         )
       }
     )
@@ -34,9 +36,17 @@ describe("DistanceEvaluator tests", () => {
     rootLocation: LocationCoordinate2D
   ): Promise<TravelEstimates> => {
     return {
-      sourceLocation: {
-        latitude: rootLocation.latitude,
-        longitude: rootLocation.longitude
+      userLocation: {
+        coords: {
+          latitude: rootLocation.latitude,
+          longitude: rootLocation.longitude,
+          altitude: null,
+          accuracy: null,
+          altitudeAccuracy: null,
+          heading: null,
+          speed: null
+        },
+        timestamp: 0
       },
       walking: {
         localizedWarnings: ["Godzilla is approaching the generator"],
@@ -57,9 +67,17 @@ describe("DistanceEvaluator tests", () => {
       )
       const { result } = renderUseCalculateETA(testLocation)
       const mockResult = {
-        sourceLocation: {
-          latitude: testLocation.latitude,
-          longitude: testLocation.longitude
+        userLocation: {
+          coords: {
+            latitude: testLocation.latitude,
+            longitude: testLocation.longitude,
+            altitude: null,
+            accuracy: null,
+            altitudeAccuracy: null,
+            heading: null,
+            speed: null
+          },
+          timestamp: 0
         },
         walking: {
           localizedWarnings: ["Godzilla is approaching the generator"],
@@ -75,6 +93,43 @@ describe("DistanceEvaluator tests", () => {
           status: "success",
           data: mockResult
         })
+      })
+    })
+    test("should fetch data from query cache correctly", async () => {
+      const testLocation = mockLocationCoordinate2D()
+      loadETAFromLocations.mockResolvedValueOnce(
+        exampleEstimateResponse(testLocation)
+      )
+      renderUseCalculateETA(testLocation)
+      const mockResult = {
+        userLocation: {
+          coords: {
+            latitude: testLocation.latitude,
+            longitude: testLocation.longitude,
+            altitude: null,
+            accuracy: null,
+            altitudeAccuracy: null,
+            heading: null,
+            speed: null
+          },
+          timestamp: 0
+        },
+        walking: {
+          localizedWarnings: ["Godzilla is approaching the generator"],
+          totalSecondsFromSource: 69
+        },
+        publicTransport: {
+          localizedWarnings: [],
+          totalSecondsFromSource: 420
+        }
+      }
+      await waitFor(() => {
+        expect(
+          queryClient.getQueryData([
+            "user-coordinates",
+            mockResult.userLocation.coords
+          ])
+        ).toMatchObject(mockResult)
       })
     })
   })
