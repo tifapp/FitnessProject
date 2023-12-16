@@ -1,0 +1,74 @@
+name: Merge Development Into Main
+
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  create-release-pr:
+    name: Create Release PR to Main
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create PR
+        id: open-pr
+        uses: repo-sync/pull-request@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          destination_branch: ${{ github.event.repository.default_branch }}
+          pr_title: "[Automated] Merge ${{ github.ref_name }} into ${{ github.event.repository.default_branch }}"
+          pr_body: "See commit history for details"
+
+  eas-build:
+    name: Perform EAS Build
+    runs-on: ubuntu-latest
+    env:
+      EXPO_PROJECT_ID: ${{ secrets.EXPO_PROJECT_ID }}
+      EXPO_PROJECT_OWNER: ${{ secrets.EXPO_PROJECT_OWNER }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.16.0"
+
+      - name: Install Dependencies
+        run: |
+          npm ci
+
+      - name: Setup Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_ACCESS_TOKEN }}
+
+      - name: Append Check Run ID to .env
+        run: |
+          echo "EXPO_PROJECT_ID=${{ secrets.EXPO_PROJECT_ID }}" >> .env.infra
+          echo "EXPO_PROJECT_OWNER=${{ secrets.EXPO_PROJECT_OWNER }}" >> .env.infra
+          echo "CHECK_RUN_ID=${{ github.run_id }}" >> .env.infra
+          echo "GITHUB_SHA=${{ github.sha }}" >> .env.infra
+          echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .env.infra
+          cat .env.infra
+
+      - name: Trigger Build on EAS
+        run: eas build --profile preview --platform android --non-interactive --no-wait

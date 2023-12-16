@@ -2,11 +2,11 @@ import React, { ReactNode, createContext, useContext, useEffect } from "react"
 import { TiFNativeHaptics, TiFNativeHapticEvent } from "@modules/tif-haptics"
 import { createLogFunction } from "./Logging"
 import { useAtom } from "jotai"
-import { atomWithAsyncStorage } from "./Jotai"
+import { JotaiUtils } from "./utils/Jotai"
 
 export const IS_HAPTICS_MUTED_KEY = "@haptics_is_muted"
 
-export const isHapticsMutedAtom = atomWithAsyncStorage(
+const isHapticsMutedAtom = JotaiUtils.atomWithAsyncStorage(
   IS_HAPTICS_MUTED_KEY,
   false
 )

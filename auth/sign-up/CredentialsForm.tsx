@@ -10,7 +10,7 @@ import {
 } from "@auth/EmailPhoneText"
 import { Caption } from "@components/Text"
 import { TextFieldRefValue } from "@components/TextFields"
-import { useFormSubmission } from "@hooks/FormHooks"
+import { useFormSubmission } from "@lib/utils/Form"
 import { AppStyles } from "@lib/AppColorStyle"
 import React, { useRef, useState } from "react"
 import { StyleProp, ViewStyle, StyleSheet, Alert } from "react-native"

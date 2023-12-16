@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { USPhoneNumber, EmailAddress } from "./Models"
-import { StringUtils } from "@lib/String"
+import { StringUtils } from "@lib/utils/String"
 import {
   StyleProp,
   StyleSheet,

@@ -8,7 +8,7 @@ import { AuthFormView } from "./AuthLayout"
 import { AuthShadedPasswordTextField } from "./AuthTextFields"
 import { TextFieldRefValue } from "@components/TextFields"
 import Animated from "react-native-reanimated"
-import { useFormSubmission } from "@hooks/FormHooks"
+import { useFormSubmission } from "@lib/utils/Form"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 
 export type ChangePasswordResult = "valid" | "incorrect-password"

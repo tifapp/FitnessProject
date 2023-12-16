@@ -1,7 +1,6 @@
 import { TiFMenuProvider } from "@components/TiFMenuProvider"
-import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
-import { useAppFonts } from "@hooks/Fonts"
-import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
+import { useAppFonts } from "@lib/Fonts"
+import { UserLocationFunctionsProvider } from "@location/UserLocation"
 import {
   HapticsProvider,
   IS_HAPTICS_SUPPORTED_ON_DEVICE,
@@ -9,6 +8,7 @@ import {
 } from "@lib/Haptics"
 import {
   getCurrentPositionAsync,
+  requestBackgroundPermissionsAsync,
   requestForegroundPermissionsAsync
 } from "expo-location"
 import React from "react"
@@ -27,8 +27,13 @@ import { enableSentry } from "@lib/Sentry"
 import { AppView } from "@root-feature/AppView"
 import "expo-dev-client"
 import { Native as SentryNative } from "sentry-expo"
-import { setupCognito } from "./auth"
 import awsconfig from "./src/aws-exports"
+import { setupCognito } from "./auth"
+import {
+  defineEventArrivalsGeofencingTasks,
+  defineEventArrivalsGeofencingTasks
+} from "@event-details/arrival-tracking"
+import { TiFQueryClientProvider } from "@lib/ReactQuery"
 
 Geo.configure(awsconfig)
 setupCognito()
@@ -40,6 +45,31 @@ addLogHandler(sentryErrorCapturingLogHandler())
 
 log("info", "App launched", { date: new Date() })
 
+defineEventArrivalsGeofencingTasks()
+
+const Stack = createStackNavigator()
+
+export type AppProps = {
+  isFontsLoaded: boolean
+}
+
+const AppView = ({ isFontsLoaded }: AppProps) => {
+  if (!isFontsLoaded) return null // TODO: - Splash Screen?
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Activities Screen"
+          component={TabNavigation}
+          options={{
+            headerShown: false
+          }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  )
+}
+
 const App = () => {
   const [isFontsLoaded] = useAppFonts()
   return (
@@ -47,6 +77,7 @@ const App = () => {
       <UserLocationFunctionsProvider
         getCurrentLocation={getCurrentPositionAsync}
         requestForegroundPermissions={requestForegroundPermissionsAsync}
+        requestBackgroundPermissions={requestBackgroundPermissionsAsync}
       >
         <HapticsProvider
           isSupportedOnDevice={IS_HAPTICS_SUPPORTED_ON_DEVICE}

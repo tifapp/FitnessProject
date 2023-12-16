@@ -1,4 +1,4 @@
-import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
+import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { AttendeesListScreen } from "@screens/EventAttendeesList/AttendeesListScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 

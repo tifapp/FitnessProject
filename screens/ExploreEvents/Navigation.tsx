@@ -6,7 +6,7 @@ import {
   LocationCoordinate2D,
   Region,
   isSignificantlyDifferentRegions
-} from "@lib/location"
+} from "@location/index"
 import { ExploreEventsView } from "./ExploreView"
 import { StackScreenProps } from "@react-navigation/stack"
 import { createInitialCenter } from "./models"

@@ -1,9 +1,9 @@
 import { Password } from "./Models"
 import { useChangePasswordForm } from "@auth/ChangePassword"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
-import { captureAlerts } from "../tests/helpers/Alerts"
-import { TestQueryClientProvider } from "../tests/helpers/ReactQuery"
-import { neverPromise } from "../tests/helpers/Promise"
+import { captureAlerts } from "@test-helpers/Alerts"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import { neverPromise } from "@test-helpers/Promise"
 
 describe("ChangePassword tests", () => {
   beforeEach(() => jest.resetAllMocks())

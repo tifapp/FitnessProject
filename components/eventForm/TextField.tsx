@@ -1,7 +1,7 @@
 import CustomizableTextInput from "@components/common/CustomizableTextInput.tsx"
 import React from "react"
 import { StyleProp, TextStyle } from "react-native"
-import { FontScaleFactors } from "../../hooks/Fonts"
+import { FontScaleFactors } from "../../lib/Fonts"
 import { useEventFormContext, useEventFormField } from "./EventForm"
 import { EventFormValues } from "./EventFormValues"
 

@@ -5,7 +5,7 @@ import {
 } from "@auth/forgot-password/ForgotPasswordNavigation"
 import { Auth } from "@aws-amplify/auth"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
-import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
+import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"

@@ -1,8 +1,8 @@
 import { Password } from ".."
 import { act, renderHook, waitFor } from "@testing-library/react-native"
-import { captureAlerts } from "../../tests/helpers/Alerts"
-import { neverPromise } from "../../tests/helpers/Promise"
-import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
+import { captureAlerts } from "@test-helpers/Alerts"
+import { neverPromise } from "@test-helpers/Promise"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { useResetPasswordForm } from "./ResetPasswordForm"
 
 describe("ResetPassword tests", () => {

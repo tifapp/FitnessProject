@@ -1,13 +1,13 @@
-import { EventMocks } from "@lib/events"
 import {
   ExploreEventsScreensParamsList,
   ExploreEventsView,
   createExploreEventsScreens
 } from "@screens/ExploreEvents"
+import { EventMocks } from "@event-details/MockData"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
+import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import React from "react"
-import { UserLocationFunctionsProvider } from "@hooks/UserLocation"
+import { UserLocationFunctionsProvider } from "@location"
 import { MenuProvider } from "react-native-popup-menu"
 import { createStackNavigator } from "@react-navigation/stack"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
@@ -15,6 +15,7 @@ import { NavigationContainer } from "@react-navigation/native"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import {
   getCurrentPositionAsync,
+  requestBackgroundPermissionsAsync,
   requestForegroundPermissionsAsync
 } from "expo-location"
 
@@ -43,6 +44,7 @@ export const Basic: ExploreEventsStory = () => (
       <UserLocationFunctionsProvider
         getCurrentLocation={getCurrentPositionAsync}
         requestForegroundPermissions={requestForegroundPermissionsAsync}
+        requestBackgroundPermissions={requestBackgroundPermissionsAsync}
       >
         <SafeAreaProvider>
           <NavigationContainer onStateChange={console.log}>
