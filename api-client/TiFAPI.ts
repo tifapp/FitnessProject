@@ -1,5 +1,5 @@
 import { UserHandle } from "@content-parsing"
-import { API_URL } from "env"
+import { API_URL } from "@env"
 import { z } from "zod"
 import { createAWSTiFAPIFetch } from "./aws"
 import { TiFAPIFetch } from "./client"
