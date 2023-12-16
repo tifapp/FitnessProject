@@ -1,6 +1,6 @@
+import { UserHandle } from "@content-parsing"
 import { z } from "zod"
 import { TiFAPIFetch } from "./client"
-import { UserHandle } from "@content-parsing"
 
 export type UpdateCurrentUserProfileRequest = Partial<{
   name: string
@@ -16,6 +16,10 @@ export type UpdateCurrentUserProfileRequest = Partial<{
  * and handles authorization headers as well as response parsing.
  */
 export class TiFAPI {
+  static readonly productionURL = new URL(
+    "https://623qsegfb9.execute-api.us-west-2.amazonaws.com/prod/"
+  )
+
   private readonly apiFetch: TiFAPIFetch
 
   constructor (apiFetch: TiFAPIFetch) {

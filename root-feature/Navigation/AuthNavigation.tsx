@@ -27,11 +27,7 @@ export type AuthNavigationStackParamList = SignInParamsList &
 
 const Stack = createStackNavigator<AuthNavigationStackParamList>()
 
-const tiFAPI = new TiFAPI(
-  createAWSTiFAPIFetch(
-    new URL("https://623qsegfb9.execute-api.us-west-2.amazonaws.com/prod/")
-  )
-)
+const tiFAPI = new TiFAPI(createAWSTiFAPIFetch(TiFAPI.productionURL))
 
 const signInScreens = createSignInScreens<AuthNavigationStackParamList>(
   Stack,

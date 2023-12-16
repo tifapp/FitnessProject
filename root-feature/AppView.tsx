@@ -10,12 +10,12 @@ export type AppProps = {
 }
 
 export const AppView = ({ isFontsLoaded }: AppProps) => {
-  if (!isFontsLoaded) return null // TODO: - Splash Screen?
+  if (!isFontsLoaded) return null
   return (
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
-          name="Activities Screen"
+          name="tabs"
           component={TabNavigation}
           options={{
             headerShown: false
