@@ -1,16 +1,10 @@
 import { EmailAddress, USPhoneNumber } from "../auth/Models"
-import {
-  AWS_REGION,
-  AWS_ACCESS_KEY_ID,
-  AWS_SECRET_ACCESS_KEY,
-  COGNITO_USER_POOL_ID
-} from "env"
 import AWS from "aws-sdk"
 
 AWS.config.update({
-  region: AWS_REGION,
-  accessKeyId: AWS_ACCESS_KEY_ID,
-  secretAccessKey: AWS_SECRET_ACCESS_KEY
+  region: process.env.AWS_REGION,
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
 })
 
 const cognito = new AWS.CognitoIdentityServiceProvider()
@@ -23,7 +17,7 @@ export const adminVerifySignUpForTesting = async (
 ) => {
   await cognito
     .adminConfirmSignUp({
-      UserPoolId: COGNITO_USER_POOL_ID,
+      UserPoolId: process.env.COGNITO_USER_POOL_ID!,
       Username: emailOrPhoneNumber.toString()
     })
     .promise()

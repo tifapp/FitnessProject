@@ -1,22 +1,26 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { EventArrivalsRefresher } from "./Refresh"
+import { EventArrivalsLastRefreshDate, EventArrivalsRefresher } from "./Refresh"
 import { fakeTimers } from "@test-helpers/Timers"
 
 describe("EventArrivalsRefresher tests", () => {
+  let lastRefreshDate = new EventArrivalsLastRefreshDate()
   fakeTimers()
-  beforeEach(async () => await AsyncStorage.clear())
+  beforeEach(async () => {
+    lastRefreshDate = new EventArrivalsLastRefreshDate()
+    await AsyncStorage.clear()
+  })
 
   const performRefresh = jest.fn()
   beforeEach(() => performRefresh.mockReset())
 
   test("refresh if needed, performs refresh if no prior refereshes", async () => {
-    const refresher = new EventArrivalsRefresher(performRefresh, 30)
+    const refresher = createRefresher(30)
     await refresher.refreshIfNeeded()
     expect(performRefresh).toHaveBeenCalledTimes(1)
   })
 
   test("refresh if needed, does not perform refresh if last refresh was not <time-threshold> minutes ago", async () => {
-    const refresher = new EventArrivalsRefresher(performRefresh, 1)
+    const refresher = createRefresher(1)
     jest.setSystemTime(new Date("2023-11-24T00:00:00"))
     await refresher.refreshIfNeeded()
     performRefresh.mockReset()
@@ -26,7 +30,7 @@ describe("EventArrivalsRefresher tests", () => {
   })
 
   test("refresh if needed, refreshes when last refresh is at least <time-threshold> minutes ago", async () => {
-    const refresher = new EventArrivalsRefresher(performRefresh, 1)
+    const refresher = createRefresher(1)
     jest.setSystemTime(new Date("2023-11-24T00:00:00"))
     await refresher.refreshIfNeeded()
     performRefresh.mockReset()
@@ -36,7 +40,7 @@ describe("EventArrivalsRefresher tests", () => {
   })
 
   test("force refresh, ignores previous refresh time", async () => {
-    const refresher = new EventArrivalsRefresher(performRefresh, 1)
+    const refresher = createRefresher(1)
     jest.setSystemTime(new Date("2023-11-24T00:00:00"))
     await refresher.refreshIfNeeded()
     performRefresh.mockReset()
@@ -46,7 +50,7 @@ describe("EventArrivalsRefresher tests", () => {
   })
 
   test("force refresh, marks new refresh time for needed refresh", async () => {
-    const refresher = new EventArrivalsRefresher(performRefresh, 1)
+    const refresher = createRefresher(1)
     jest.setSystemTime(new Date("2023-11-24T00:00:00"))
     await refresher.forceRefresh()
     performRefresh.mockReset()
@@ -56,7 +60,7 @@ describe("EventArrivalsRefresher tests", () => {
   })
 
   test("time until next available refresh, basic", async () => {
-    const refresher = new EventArrivalsRefresher(performRefresh, 20)
+    const refresher = createRefresher(20)
     jest.setSystemTime(new Date("2023-11-24T00:00:00"))
     await refresher.refreshIfNeeded()
     jest.setSystemTime(new Date("2023-11-24T00:08:42"))
@@ -65,18 +69,26 @@ describe("EventArrivalsRefresher tests", () => {
   })
 
   test("time until next available refresh, zero when no prior refreshes", async () => {
-    const refresher = new EventArrivalsRefresher(performRefresh, 20)
+    const refresher = createRefresher(20)
     jest.setSystemTime(new Date("2023-11-24T00:08:42"))
     const time = await refresher.timeUntilNextRefreshAvailable()
     expect(time).toEqual(0)
   })
 
   test("time until next available refresh, zero when past minute threshold", async () => {
-    const refresher = new EventArrivalsRefresher(performRefresh, 20)
+    const refresher = createRefresher(20)
     jest.setSystemTime(new Date("2023-11-24T00:00:00"))
     await refresher.refreshIfNeeded()
     jest.setSystemTime(new Date("2023-11-24T00:32:16"))
     const time = await refresher.timeUntilNextRefreshAvailable()
     expect(time).toEqual(0)
   })
+
+  const createRefresher = (minutesBetweenNeededRefreshes: number) => {
+    return new EventArrivalsRefresher(
+      performRefresh,
+      lastRefreshDate,
+      minutesBetweenNeededRefreshes
+    )
+  }
 })

@@ -1,10 +1,17 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import dotenv from "dotenv"
 import fs from "fs"
 import https from "https"
 import jwt from "jsonwebtoken"
 import qrcode from "qrcode"
+import fetch from "node-fetch"
+
+dotenv.config({ path: ".env.infra" })
+console.log(process.env)
 
 const outputChannel = "C01B7FFKDCP"
+
+const action = process.argv[2] ?? "create"
 
 const sendMessageToSlack = (
   /** @type {string} */ message,
@@ -49,54 +56,27 @@ const sendImageToSlack = async (
   channelId = outputChannel
 ) => {
   const imageBuffer = Buffer.from(imageData.split(",")[1], "base64")
-  const boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW"
-  const data = [
-    "--" + boundary + "\r\n",
-    "Content-Disposition: form-data; name=\"token\"\r\n\r\n",
-    process.env.SLACK_APP_ID + "\r\n",
-    "--" + boundary + "\r\n",
-    "Content-Disposition: form-data; name=\"channels\"\r\n\r\n",
-    channelId + "\r\n",
-    "--" + boundary + "\r\n",
-    "Content-Disposition: form-data; name=\"initial_comment\"\r\n\r\n",
-    message + "\r\n",
-    "--" + boundary + "\r\n",
-    "Content-Disposition: form-data; name=\"file\"; filename=\"qrcode.png\"\r\n",
-    "Content-Type: image/png\r\n\r\n",
-    imageBuffer,
-    "\r\n--" + boundary + "--"
-  ]
 
-  const options = {
-    hostname: "slack.com",
-    port: 443,
-    path: "/api/files.upload",
-    method: "POST",
-    headers: {
-      "Content-Type": "multipart/form-data; boundary=" + boundary
-    }
+  const formData = new FormData()
+  formData.append("token", process.env.SLACK_APP_ID ?? "")
+  formData.append("channels", channelId)
+  formData.append("initial_comment", message)
+
+  const blob = new Blob([imageBuffer], { type: "image/png" })
+  formData.append("file", blob, "qrcode.png")
+
+  try {
+    const response = await fetch("https://slack.com/api/files.upload", {
+      method: "POST",
+      body: formData
+    })
+
+    const responseBody = await response.json()
+    return responseBody
+  } catch (error) {
+    console.error(error)
+    throw error
   }
-
-  return new Promise((resolve, reject) => {
-    const req = https.request(options, (res) => {
-      let body = ""
-      res.on("data", (chunk) => (body += chunk))
-      res.on("end", () => resolve(JSON.parse(body)))
-    })
-
-    req.on("error", (e) => {
-      console.error(e)
-      reject(e)
-    })
-    for (const part of data) {
-      if (Buffer.isBuffer(part)) {
-        req.write(part)
-      } else {
-        req.write(part)
-      }
-    }
-    req.end()
-  })
 }
 
 const getPredictedBuildTime = (timeZone = "America/Los_Angeles") => {
@@ -112,8 +92,6 @@ const getPredictedBuildTime = (timeZone = "America/Los_Angeles") => {
     hour12: true
   })
 }
-
-dotenv.config()
 
 const jwtToken = jwt.sign(
   {
@@ -195,7 +173,42 @@ const fetchInstallationAccessToken = async (
   })
 }
 
-const manageCheckRun = async (action = "create") => {
+const checkGithubActionRuns = async (
+  /** @type {{ output: { title: string; summary: string; text?: undefined; }; name?: undefined; status?: undefined; started_at?: undefined; head_sha?: undefined; } | { output: { title: string; summary: string; text: string; }; name?: undefined; status?: undefined; started_at?: undefined; head_sha?: undefined; } | { name: string; status: string; started_at: string; head_sha: string | undefined; output: { title: string; summary: string; text?: undefined; }; }} */ checkRunData,
+  /** @type {string} */ idPath
+) => {
+  const installationId = await fetchInstallationId()
+  const accessToken = await fetchInstallationAccessToken(installationId)
+
+  const resp = await fetch(
+    `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/check-runs${idPath}`,
+    {
+      method: action === "create" ? "POST" : "PATCH",
+      headers: {
+        Authorization: `token ${accessToken}`,
+        Accept: "application/vnd.github.v3+json",
+        "User-Agent": "NodeJS-Http-Request",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(checkRunData)
+    }
+  )
+    .then((resp) => resp.json())
+    .catch((err) => {
+      console.error("Error managing check run:", err)
+    })
+
+  console.log(resp)
+  console.log(
+    `Git SHA: ${process.env.GITHUB_SHA}`,
+    `Length: ${(process.env.GITHUB_SHA ?? "").length}`
+  )
+
+  // @ts-ignore
+  fs.writeFileSync("checkRunId.txt", resp.id.toString())
+}
+
+const manageCheckRun = async (/** @type {string} */ action) => {
   let checkRunParams = {}
   let checkRunId = ""
   if (action !== "create") {
@@ -255,47 +268,7 @@ const manageCheckRun = async (action = "create") => {
     }
   }
 
-  const postData = JSON.stringify(checkRunData)
-  const installationId = await fetchInstallationId()
-  const accessToken = await fetchInstallationAccessToken(installationId)
-
-  const method = action === "create" ? "POST" : "PATCH"
-  const options = {
-    hostname: "api.github.com",
-    path: `/repos/${process.env.GITHUB_REPOSITORY}/check-runs${checkRunIdPath}`,
-    method,
-    headers: {
-      Authorization: `token ${accessToken}`,
-      Accept: "application/vnd.github.v3+json",
-      "User-Agent": "NodeJS-Http-Request",
-      "Content-Type": "application/json",
-      "Content-Length": postData.length
-    }
-  }
-
-  const req = https.request(options, (res) => {
-    let data = ""
-    res.on("data", (chunk) => {
-      data += chunk
-    })
-    res.on("end", () => {
-      try {
-        const responseObj = JSON.parse(data)
-        const checkRunId = responseObj.id
-
-        fs.writeFileSync("checkRunId.txt", checkRunId.toString())
-      } catch (error) {
-        console.error("Error parsing response data:", error)
-      }
-    })
-  })
-
-  req.on("error", (error) => {
-    console.error("Error managing check run:", error)
-  })
-
-  req.write(postData)
-  req.end()
+  await checkGithubActionRuns(checkRunData, checkRunIdPath)
 
   if (action === "success") {
     const buildqr = await qrcode.toDataURL(buildLink)
@@ -311,5 +284,4 @@ const manageCheckRun = async (action = "create") => {
   }
 }
 
-const action = process.argv[2] || "create"
 manageCheckRun(action)

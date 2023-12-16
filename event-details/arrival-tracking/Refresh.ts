@@ -6,11 +6,44 @@ import { EventArrival } from "./Models"
 import { EventArrivalsTracker } from "./Tracker"
 
 /**
+ * A class that manages the storage of the last event arrivals refresh date.
+ */
+export class EventArrivalsLastRefreshDate {
+  private static LAST_REFRESH_KEY = "@event-arrivals-last-refresh"
+  private cachedRefreshDate?: Date
+
+  /**
+   * Returns the current last refresh date.
+   */
+  async date () {
+    if (this.cachedRefreshDate) return this.cachedRefreshDate
+    const lastDate = await AsyncStorageUtils.parseJSONItem(
+      StringDateSchema,
+      EventArrivalsLastRefreshDate.LAST_REFRESH_KEY
+    )
+    this.cachedRefreshDate = lastDate
+    return lastDate
+  }
+
+  /**
+   * Marks the new last refresh date as the current date.
+   */
+  async markNewRefreshDate () {
+    const lastDate = new Date()
+    this.cachedRefreshDate = lastDate
+    await AsyncStorage.setItem(
+      EventArrivalsLastRefreshDate.LAST_REFRESH_KEY,
+      JSON.stringify(lastDate)
+    )
+  }
+}
+
+/**
  * A class that manages refreshing of upcoming event arrivals.
  */
 export class EventArrivalsRefresher {
-  private readonly lastRefreshDate = new LastRefreshDate()
   private readonly performRefresh: () => Promise<void>
+  private readonly lastRefreshDate: EventArrivalsLastRefreshDate
   private readonly minutesBetweenNeededRefreshes: number
 
   private get secondsNeededBetweenRefreshes () {
@@ -19,20 +52,27 @@ export class EventArrivalsRefresher {
 
   constructor (
     performRefresh: () => Promise<void>,
+    lastRefreshDate: EventArrivalsLastRefreshDate,
     minutesBetweenNeededRefreshes: number
   ) {
     this.performRefresh = performRefresh
+    this.lastRefreshDate = lastRefreshDate
     this.minutesBetweenNeededRefreshes = minutesBetweenNeededRefreshes
   }
 
   static usingTracker (
     tracker: EventArrivalsTracker,
     fetchUpcomingArrivals: () => Promise<EventArrival[]>,
+    lastRefreshDate: EventArrivalsLastRefreshDate,
     minutesBetweenNeededRefreshes: number
   ) {
-    return new EventArrivalsRefresher(async () => {
-      await tracker.refreshArrivals(fetchUpcomingArrivals)
-    }, minutesBetweenNeededRefreshes)
+    return new EventArrivalsRefresher(
+      async () => {
+        await tracker.refreshArrivals(fetchUpcomingArrivals)
+      },
+      lastRefreshDate,
+      minutesBetweenNeededRefreshes
+    )
   }
 
   /**
@@ -69,30 +109,6 @@ export class EventArrivalsRefresher {
     const lastDate = await this.lastRefreshDate.date()
     if (!lastDate) return new Date()
     return addSecondsToDate(lastDate, this.secondsNeededBetweenRefreshes)
-  }
-}
-
-class LastRefreshDate {
-  private static LAST_REFRESH_KEY = "@event-arrivals-last-refresh"
-  private cachedRefreshTime?: Date
-
-  async date () {
-    if (this.cachedRefreshTime) return this.cachedRefreshTime
-    const lastTime = await AsyncStorageUtils.parseJSONItem(
-      StringDateSchema,
-      LastRefreshDate.LAST_REFRESH_KEY
-    )
-    this.cachedRefreshTime = lastTime
-    return lastTime
-  }
-
-  async markNewRefreshDate () {
-    const lastTime = new Date()
-    this.cachedRefreshTime = lastTime
-    await AsyncStorage.setItem(
-      LastRefreshDate.LAST_REFRESH_KEY,
-      JSON.stringify(lastTime)
-    )
   }
 }
 
