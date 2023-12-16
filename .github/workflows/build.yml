@@ -3,7 +3,6 @@ run-name: Setup Project
 
 env:
   TEST_RUNNER_CI: 1
-  API_URL: https://623qsegfb9.execute-api.us-west-2.amazonaws.com/prod/
 
 on:
   pull_request:
@@ -58,6 +57,9 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
+
+      - name: Add Env
+        run: echo "API_URL= https://623qsegfb9.execute-api.us-west-2.amazonaws.com/prod/" >> .env
 
       - name: Run tests
         run: npm run test:ci
