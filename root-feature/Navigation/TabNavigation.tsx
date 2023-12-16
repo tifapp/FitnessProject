@@ -2,9 +2,6 @@ import BottomNavTabBar from "@components/bottomTabComponents/BottomNavTabBar"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native"
 import { ProfileStack } from "@screens/ProfileScreen/Navigation/ProfileScreensNavigation"
-import { TestChatRoomScreen } from "@screens/TestScreens/TestChatRoomScreen"
-import { TestEventFormScreen } from "@screens/TestScreens/TestEventFormScreen"
-import { TestNotifScreen } from "@screens/TestScreens/TestNotifScreen"
 import React from "react"
 
 const Tab = createBottomTabNavigator()
@@ -28,9 +25,6 @@ export function TabNavigation () {
       tabBar={(props) => <BottomNavTabBar {...props} />}
       screenOptions={{ headerShown: false }}
     >
-      <Tab.Screen name="Chat Room" component={TestChatRoomScreen} />
-      <Tab.Screen name="Event Form" component={TestEventFormScreen} />
-      <Tab.Screen name="Notifications" component={TestNotifScreen} />
       <Tab.Screen
         name="Profile"
         component={ProfileStack}
