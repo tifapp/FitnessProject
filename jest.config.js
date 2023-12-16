@@ -7,7 +7,8 @@ module.exports = {
     "<rootDir>/jest/setupMapMock.jsx",
     "<rootDir>/jest/setupKeyboardAwareMock.jsx",
     "<rootDir>/jest/setupAssetMocks.js",
-    "<rootDir>/jest/setupFetch.js"
+    "<rootDir>/jest/setupFetch.js",
+    "<rootDir>/jest/setupInfraEnv.js"
   ],
   transformIgnorePatterns: [
     "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|@alessiocancian/react-native-actionsheet|@sentry/.*|sentry-expo|node-fetch|data-uri-to-buffer|fetch-blob|formdata-polyfill)"
