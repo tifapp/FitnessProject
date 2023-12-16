@@ -30,6 +30,8 @@
       "@modules/*": ["./modules/*"],
       "@event-details/*": ["./event-details/*"],
       "@event-details": ["./event-details"],
+      "@root-feature/*": ["./root-feature/*"],
+      "@root-feature": ["./root-feature"],
       "@location/*": ["./location/*"],
       "@location": ["./location"],
       "@content-parsing": ["./content-parsing"],
