@@ -18,6 +18,7 @@
     "plugins": [],
     "paths": {
       "@screens/*": ["./screens/*"],
+      "@screens": ["./screens"],
       "@components/*": ["./components/*"],
       "@api-client": ["./api-client"],
       "@stacks/*": ["./stacks/*"],

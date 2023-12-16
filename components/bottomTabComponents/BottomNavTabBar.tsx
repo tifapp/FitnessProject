@@ -5,7 +5,7 @@ import {
   BottomTabBarProps
 } from "@react-navigation/bottom-tabs"
 import React from "react"
-import { Platform, SafeAreaView, StyleSheet, View } from "react-native"
+import { Platform, StyleSheet, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 function getIconName (routeName: string) {
