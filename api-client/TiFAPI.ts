@@ -1,5 +1,7 @@
 import { UserHandle } from "@content-parsing"
+import { API_URL } from "env"
 import { z } from "zod"
+import { createAWSTiFAPIFetch } from "./aws"
 import { TiFAPIFetch } from "./client"
 
 export type UpdateCurrentUserProfileRequest = Partial<{
@@ -16,8 +18,8 @@ export type UpdateCurrentUserProfileRequest = Partial<{
  * and handles authorization headers as well as response parsing.
  */
 export class TiFAPI {
-  static readonly productionURL = new URL(
-    "https://623qsegfb9.execute-api.us-west-2.amazonaws.com/prod/"
+  static readonly productionInstance = new TiFAPI(
+    createAWSTiFAPIFetch(new URL(API_URL))
   )
 
   private readonly apiFetch: TiFAPIFetch

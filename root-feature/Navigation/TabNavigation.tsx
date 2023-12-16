@@ -19,25 +19,11 @@ function getIconName (routeName: string) {
   else return "person"
 }
 
-export const BottomNavTabBar = ({
-  state,
-  descriptors,
-  navigation
-}: BottomTabBarProps<BottomTabBarOptions>) => {
-  const focusedOptions = descriptors[state.routes[state.index].key].options
-  const isVisible = !!(
-    focusedOptions?.tabBarVisible === true ||
-    focusedOptions?.tabBarVisible === undefined
-  )
+export const BottomNavTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const insets = useSafeAreaInsets()
 
   return (
-    <View
-      style={[
-        styles.container,
-        { display: isVisible ? "flex" : "none", paddingBottom: insets.bottom }
-      ]}
-    >
+    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
       {state.routes.map((route, index) => {
         const isFocused = state.index === index
 

@@ -1,5 +1,4 @@
 import { TiFAPI } from "@api-client/TiFAPI"
-import { createAWSTiFAPIFetch } from "@api-client/aws"
 import {
   ForgotPasswordParamsList,
   createForgotPasswordScreens
@@ -27,7 +26,7 @@ export type AuthNavigationStackParamList = SignInParamsList &
 
 const Stack = createStackNavigator<AuthNavigationStackParamList>()
 
-const tiFAPI = new TiFAPI(createAWSTiFAPIFetch(TiFAPI.productionURL))
+const tiFAPI = TiFAPI.productionInstance
 
 const signInScreens = createSignInScreens<AuthNavigationStackParamList>(
   Stack,
