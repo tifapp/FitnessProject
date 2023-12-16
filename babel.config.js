@@ -15,7 +15,7 @@ module.exports = function (api) {
     plugins: [
       [
         "module:react-native-dotenv",
-        { moduleName: "env", path: ".env", safe: true }
+        { moduleName: "@env", path: ".env", safe: true }
       ],
       ["@babel/plugin-transform-flow-strip-types"],
       ["@babel/plugin-proposal-decorators", { legacy: true }],
