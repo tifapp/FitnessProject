@@ -18,7 +18,9 @@
     "plugins": [],
     "paths": {
       "@screens/*": ["./screens/*"],
+      "@screens": ["./screens"],
       "@components/*": ["./components/*"],
+      "@api-client/*": ["./api-client/*"],
       "@api-client": ["./api-client"],
       "@stacks/*": ["./stacks/*"],
       "@hooks/*": ["./hooks/*"],
@@ -30,6 +32,8 @@
       "@modules/*": ["./modules/*"],
       "@event-details/*": ["./event-details/*"],
       "@event-details": ["./event-details"],
+      "@root-feature/*": ["./root-feature/*"],
+      "@root-feature": ["./root-feature"],
       "@location/*": ["./location/*"],
       "@location": ["./location"],
       "@content-parsing": ["./content-parsing"],
