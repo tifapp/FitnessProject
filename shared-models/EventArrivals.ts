@@ -23,6 +23,11 @@ export const EventArrivalsSchema = z.array(EventArrivalSchema)
  */
 export type EventArrival = z.infer<typeof EventArrivalSchema>
 
+export type EventArrivalsOperationLocation = {
+  coordinate: LocationCoordinate2D
+  eventIds: number[]
+}
+
 /**
  * The result of trying to post an arrival or departure from an event.
  */

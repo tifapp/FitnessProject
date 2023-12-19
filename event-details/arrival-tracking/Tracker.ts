@@ -1,5 +1,8 @@
 import { UpcomingEventArrivals } from "./UpcomingArrivals"
-import { EventArrival } from "@shared-models/EventArrivals"
+import {
+  EventArrival,
+  EventArrivalOperationResult
+} from "@shared-models/EventArrivals"
 import {
   EventArrivalGeofencingUpdate,
   EventArrivalGeofencingUnsubscribe,
@@ -52,7 +55,7 @@ export class EventArrivalsTracker {
   }
 
   async trackArrivals (newArrivals: EventArrival[]) {
-    await this.editAllUpcomingArrivals((arrivals) => {
+    await this.transformAllUpcomingArrivals((arrivals) => {
       for (const newArrival of newArrivals) {
         const eventIdIndex = arrivals.findIndex(
           (arrival) => arrival.eventId === newArrival.eventId
@@ -72,7 +75,7 @@ export class EventArrivalsTracker {
   }
 
   async removeArrivalsByEventIds (eventIds: Set<number>) {
-    await this.editAllUpcomingArrivals((arrivals) => {
+    await this.transformAllUpcomingArrivals((arrivals) => {
       return arrivals.filter((arrival) => !eventIds.has(arrival.eventId))
     })
   }
@@ -94,36 +97,7 @@ export class EventArrivalsTracker {
     this.unsubscribeFromGeofencing = undefined
   }
 
-  private async handleGeofencingUpdate (update: EventArrivalGeofencingUpdate) {
-    await this.editAllUpcomingArrivals(async (arrivals) => {
-      const arrivalsAtCoordinate = arrivals.filter((arrival) => {
-        return checkIfCoordsAreEqual(arrival.coordinate, update.coordinate)
-      })
-      if (arrivalsAtCoordinate.length === 0) return arrivals
-
-      const results = await this.performArrivalsOperation(
-        arrivalsAtCoordinate,
-        update.status === "entered" ? "arrived" : "departed"
-      )
-      const nonUpcomingEventIds = ArrayUtils.compactMap(results, (result) => {
-        return result.status === "remove-from-tracking"
-          ? result.eventId
-          : undefined
-      })
-      return ArrayUtils.compactMap(arrivals, (arrival) => {
-        if (nonUpcomingEventIds.includes(arrival.eventId)) return undefined
-        const result = results.find(
-          (result) => result.eventId === arrival.eventId
-        )
-        if (result?.status === "outdated-coordinate") {
-          arrival.coordinate = result.updatedCoordinate
-        }
-        return arrival
-      })
-    })
-  }
-
-  private async editAllUpcomingArrivals (
+  private async transformAllUpcomingArrivals (
     work: (arrivals: EventArrival[]) => Promise<EventArrival[]> | EventArrival[]
   ) {
     await this.syncArrivals(await work(await this.upcomingArrivals.all()))
@@ -144,5 +118,56 @@ export class EventArrivalsTracker {
         this.handleGeofencingUpdate(update)
       })
     }
+  }
+
+  private async handleGeofencingUpdate (update: EventArrivalGeofencingUpdate) {
+    await this.transformAllUpcomingArrivals(async (arrivals) => {
+      const results = await this.performArrivalsOperationIfNeeded(
+        arrivals,
+        update
+      )
+      return !results
+        ? arrivals
+        : this.transformArrivalsFromOperationResults(results, arrivals)
+    })
+  }
+
+  private async performArrivalsOperationIfNeeded (
+    arrivals: EventArrival[],
+    update: EventArrivalGeofencingUpdate
+  ) {
+    const arrivalsAtCoordinate = arrivals.filter((arrival) => {
+      return checkIfCoordsAreEqual(arrival.coordinate, update.coordinate)
+    })
+    if (arrivalsAtCoordinate.length === 0) return undefined
+
+    return await this.performArrivalsOperation(
+      {
+        coordinate: update.coordinate,
+        eventIds: arrivalsAtCoordinate.map((arrival) => arrival.eventId)
+      },
+      update.status === "entered" ? "arrived" : "departed"
+    )
+  }
+
+  private transformArrivalsFromOperationResults (
+    results: EventArrivalOperationResult[],
+    arrivals: EventArrival[]
+  ) {
+    const removeableEventIds = ArrayUtils.compactMap(results, (result) => {
+      return result.status === "remove-from-tracking"
+        ? result.eventId
+        : undefined
+    })
+    return ArrayUtils.compactMap(arrivals, (arrival) => {
+      if (removeableEventIds.includes(arrival.eventId)) return undefined
+      const result = results.find(
+        (result) => result.eventId === arrival.eventId
+      )
+      if (result?.status === "outdated-coordinate") {
+        arrival.coordinate = result.updatedCoordinate
+      }
+      return arrival
+    })
   }
 }

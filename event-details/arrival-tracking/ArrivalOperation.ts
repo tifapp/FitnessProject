@@ -1,11 +1,9 @@
 import {
-  EventArrival,
-  EventArrivalOperationResult
+  EventArrivalOperationResult,
+  EventArrivalsOperationLocation
 } from "@shared-models/EventArrivals"
 
-export type EventArrivalOperationKind = "arrived" | "departed"
-
 export type PerformArrivalsOperation = (
-  arrivals: EventArrival[],
-  operation: EventArrivalOperationKind
+  location: EventArrivalsOperationLocation,
+  operation: "arrived" | "departed"
 ) => Promise<EventArrivalOperationResult[]>

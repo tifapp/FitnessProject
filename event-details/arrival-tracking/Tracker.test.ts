@@ -165,7 +165,17 @@ describe("EventArrivalsTracker tests", () => {
     await tracker.trackArrivals(arrivals)
     testGeofencer.sendUpdate({ coordinate, status: "entered" })
     await waitFor(() => {
-      expect(performArrivalOperation).toHaveBeenCalledWith(arrivals, "arrived")
+      expect(performArrivalOperation).toHaveBeenCalledWith(
+        {
+          coordinate,
+          eventIds: [
+            arrivals[0].eventId,
+            arrivals[1].eventId,
+            arrivals[2].eventId
+          ]
+        },
+        "arrived"
+      )
     })
   })
 
@@ -180,7 +190,17 @@ describe("EventArrivalsTracker tests", () => {
     await tracker.trackArrivals(arrivals)
     testGeofencer.sendUpdate({ coordinate, status: "exited" })
     await waitFor(() => {
-      expect(performArrivalOperation).toHaveBeenCalledWith(arrivals, "departed")
+      expect(performArrivalOperation).toHaveBeenCalledWith(
+        {
+          coordinate,
+          eventIds: [
+            arrivals[0].eventId,
+            arrivals[1].eventId,
+            arrivals[2].eventId
+          ]
+        },
+        "departed"
+      )
     })
   })
 
