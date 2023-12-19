@@ -114,7 +114,9 @@ export class EventArrivalsTracker {
         update.status === "entered" ? "arrived" : "departed"
       )
       const nonUpcomingEventIds = ArrayUtils.compactMap(results, (result) => {
-        return result.status === "non-upcoming" ? result.eventId : undefined
+        return result.status === "remove-from-tracking"
+          ? result.eventId
+          : undefined
       })
       return ArrayUtils.compactMap(arrivals, (arrival) => {
         if (nonUpcomingEventIds.includes(arrival.eventId)) return undefined
@@ -122,7 +124,7 @@ export class EventArrivalsTracker {
           (result) => result.eventId === arrival.eventId
         )
         if (result?.status === "outdated-coordinate") {
-          return { ...arrival, coordinate: result.updatedCoordinate }
+          arrival.coordinate = result.updatedCoordinate
         }
         return arrival
       })

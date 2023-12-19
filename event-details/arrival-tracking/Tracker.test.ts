@@ -181,7 +181,7 @@ describe("EventArrivalsTracker tests", () => {
     })
   })
 
-  test("handle geofencing update, removes arrivals with a \"non-upcoming\" operation result status", async () => {
+  test("handle geofencing update, removes arrivals with a \"remove-from-tracking\" operation result status", async () => {
     const coordinate = mockLocationCoordinate2D()
     const arrivals = ArrayUtils.repeatElements(3, () => {
       return { ...mockEventArrival(), coordinate }
@@ -189,7 +189,7 @@ describe("EventArrivalsTracker tests", () => {
     const operationResults = arrivals.map(successResultForArrival)
     operationResults[1] = {
       eventId: operationResults[1].eventId,
-      status: "non-upcoming"
+      status: "remove-from-tracking"
     }
     performArrivalOperation.mockResolvedValueOnce(operationResults)
     await tracker.trackArrivals(arrivals)

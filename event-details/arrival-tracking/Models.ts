@@ -31,7 +31,6 @@ export type EventArrivalOperationKind = "arrived" | "departed"
 export type EventArrivalOperationResult = {
   eventId: number
 } & (
-  | { status: "success" }
+  | { status: "success" | "remove-from-tracking" }
   | { status: "outdated-coordinate"; updatedCoordinate: LocationCoordinate2D }
-  | { status: "non-upcoming" }
 )
