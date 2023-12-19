@@ -10,12 +10,14 @@ on:
     branches:
       - master
       - development
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build:
+  storybook_build:
     runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -36,5 +38,7 @@ jobs:
         run: cd .storybook | npm ci
       - name: Lint
         run: cd .storybook | npm run staged-lint
+      - name: Add Env
+        run: echo "API_URL= https://623qsegfb9.execute-api.us-west-2.amazonaws.com/prod/" >> .env
       - name: Bundle project
         run: cd .storybook | npx expo export

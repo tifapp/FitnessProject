@@ -1,7 +1,7 @@
-import { FixedDateRange } from "@lib/date"
+import { FixedDateRange } from "@date-time"
 import { EventColors } from "@lib/events"
 import { fireEvent, screen } from "@testing-library/react-native"
-import { setDateTimePickerDate } from "../../helpers/DateTimePicker"
+import { setDateTimePickerDate } from "@test-helpers/DateTimePicker"
 
 export const baseTestEventFormValues = {
   title: "Test Event",

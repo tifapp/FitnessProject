@@ -6,7 +6,7 @@ import {
   TextFieldRef
 } from "@components/TextFields"
 import { CircularIonicon, Ionicon, IoniconName } from "@components/common/Icons"
-import { useFontScale } from "@hooks/Fonts"
+import { useFontScale } from "@lib/Fonts"
 import { AppStyles } from "@lib/AppColorStyle"
 import { EmailPhoneTextErrorReason, EmailPhoneTextType } from "./EmailPhoneText"
 import {

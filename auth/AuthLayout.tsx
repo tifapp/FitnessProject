@@ -1,6 +1,6 @@
 import { BodyText, Title } from "@components/Text"
 import { PrimaryButton } from "@components/Buttons"
-import { useKeyboardState } from "@hooks/Keyboard"
+import { useKeyboardState } from "@lib/Keyboard"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import React, { ReactNode, useState } from "react"
 import {

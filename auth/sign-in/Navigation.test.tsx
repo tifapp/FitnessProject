@@ -15,8 +15,8 @@ import {
 import { useCallback, useState } from "react"
 import { Button, View } from "react-native"
 import { USPhoneNumber } from ".."
-import "../../tests/helpers/Matchers"
-import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
+import "@test-helpers/Matchers"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { CognitoSignInAuthenticator } from "./Authenticator"
 import { SignInParamsList, createSignInScreens } from "./Navigation"
 

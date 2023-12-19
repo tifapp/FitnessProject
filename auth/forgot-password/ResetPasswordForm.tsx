@@ -1,6 +1,6 @@
 import { AuthFormView } from "@auth/AuthLayout"
 import { AuthShadedPasswordTextField } from "@auth/AuthTextFields"
-import { useFormSubmission } from "@hooks/FormHooks"
+import { useFormSubmission } from "@lib/utils/Form"
 import React, { useState } from "react"
 import { Alert, StyleProp, ViewStyle } from "react-native"
 import { Password } from ".."

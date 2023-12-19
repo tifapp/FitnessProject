@@ -1,8 +1,16 @@
+import { ColorString } from "./utils/Color"
+
 export namespace AppStyles {
-  export const darkColor = "#26282A"
-  export const colorOpacity15 = "#26282A26" // 15% Opacity
-  export const colorOpacity50 = "#26282A80" // 50% Opacity
-  export const colorOpacity35 = "#26282A59" // 35% Opacity
+  export const darkColor = ColorString.primaryDarkColor.toString()
+  export const colorOpacity15 = ColorString.primaryDarkColor
+    .withOpacity(0.15)
+    .toString()
+  export const colorOpacity50 = ColorString.primaryDarkColor
+    .withOpacity(0.5)
+    .toString()
+  export const colorOpacity35 = ColorString.primaryDarkColor
+    .withOpacity(0.35)
+    .toString()
   export const errorColor = "#EA4335"
   export const highlightedText = "#4285F4"
   export const eventCardColor = "#F4F4F6"

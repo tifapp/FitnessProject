@@ -1,5 +1,5 @@
 import { CurrentUserEvent } from "@lib/events"
-import { LocationCoordinate2D } from "@lib/location"
+import { LocationCoordinate2D } from "@location/index"
 
 /**
  * Creates an {@link Region} from a coordinate suitable for the explore map.

@@ -1,7 +1,7 @@
 import { isCognitoErrorWithCode } from "@auth/CognitoHelpers"
 import { Auth } from "@aws-amplify/auth"
-import { EmailAddress, USPhoneNumber } from ".."
 import { CognitoUser } from "amazon-cognito-identity-js"
+import { EmailAddress, USPhoneNumber } from ".."
 
 export type SignInResult =
   | "success"
