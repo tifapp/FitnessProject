@@ -7,7 +7,6 @@ import qrcode from "qrcode"
 import fetch from "node-fetch"
 
 dotenv.config({ path: ".env.infra" })
-console.log(process.env)
 
 const outputChannel = "C01B7FFKDCP"
 
@@ -93,17 +92,7 @@ const getPredictedBuildTime = (timeZone = "America/Los_Angeles") => {
   })
 }
 
-const jwtToken = jwt.sign(
-  {
-    iat: Math.floor(Date.now() / 1000),
-    exp: Math.floor(Date.now() / 1000) + 5 * 60,
-    iss: process.env.GITHUB_APP_ID
-  },
-  process.env.GITHUB_APP_PRIVATE_KEY ?? "",
-  { algorithm: "RS256" }
-)
-
-const fetchInstallationId = async () => {
+const fetchInstallationId = async (/** @type {string} */ jwtToken) => {
   const options = {
     hostname: "api.github.com",
     path: "/app/installations",
@@ -138,7 +127,8 @@ const fetchInstallationId = async () => {
 }
 
 const fetchInstallationAccessToken = async (
-  /** @type {string} */ installationId
+  /** @type {string} */ installationId,
+  /** @type {string} */ jwtToken
 ) => {
   const options = {
     hostname: "api.github.com",
@@ -173,12 +163,28 @@ const fetchInstallationAccessToken = async (
   })
 }
 
+const githubJWT = () => {
+  return jwt.sign(
+    {
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + 5 * 60,
+      iss: process.env.GITHUB_APP_ID
+    },
+    process.env.GITHUB_APP_PRIVATE_KEY ?? "",
+    { algorithm: "RS256" }
+  )
+}
+
 const checkGithubActionRuns = async (
   /** @type {{ output: { title: string; summary: string; text?: undefined; }; name?: undefined; status?: undefined; started_at?: undefined; head_sha?: undefined; } | { output: { title: string; summary: string; text: string; }; name?: undefined; status?: undefined; started_at?: undefined; head_sha?: undefined; } | { name: string; status: string; started_at: string; head_sha: string | undefined; output: { title: string; summary: string; text?: undefined; }; }} */ checkRunData,
   /** @type {string} */ idPath
 ) => {
-  const installationId = await fetchInstallationId()
-  const accessToken = await fetchInstallationAccessToken(installationId)
+  const jwtToken = githubJWT()
+  const installationId = await fetchInstallationId(jwtToken)
+  const accessToken = await fetchInstallationAccessToken(
+    installationId,
+    jwtToken
+  )
 
   const resp = await fetch(
     `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/check-runs${idPath}`,
@@ -284,4 +290,6 @@ const manageCheckRun = async (/** @type {string} */ action) => {
   }
 }
 
-manageCheckRun(action)
+if (process.env.RUN_EAS_BUILD_HOOKS === "1") {
+  manageCheckRun(action)
+}
