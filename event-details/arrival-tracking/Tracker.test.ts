@@ -1,10 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { AsyncStorageUpcomingEventArrivals } from "./UpcomingArrivals"
 import { EventArrivalsTracker } from "./Tracker"
-import {
-  EventArrival,
-  EventArrivalOperationResult
-} from "@shared-models/EventArrivals"
+import { EventArrivalOperationResult } from "@shared-models/EventArrivals"
 import { ArrayUtils } from "@lib/utils/Array"
 import {
   EventArrivalGeofencingCallback,
@@ -14,6 +11,7 @@ import {
 import { waitFor } from "@testing-library/react-native"
 import { mockLocationCoordinate2D } from "@location/MockData"
 import { mockEventArrival } from "./MockData"
+import { EventArrival } from "./Models"
 
 class TestGeofencer implements EventArrivalsGeofencer {
   private updateCallback?: EventArrivalGeofencingCallback

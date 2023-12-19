@@ -2,8 +2,8 @@ import { AsyncStorageUtils } from "@lib/utils/AsyncStorage"
 import { StringDateSchema, addSecondsToDate, diffDates, now } from "@date-time"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { AppState } from "react-native"
-import { EventArrival } from "@shared-models/EventArrivals"
 import { EventArrivalsTracker } from "./Tracker"
+import { EventArrival } from "./Models"
 
 /**
  * A class that manages the storage of the last event arrivals refresh date.

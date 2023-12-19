@@ -2,7 +2,9 @@ import { UserHandle } from "@content-parsing"
 import { API_URL } from "@env"
 import { z } from "zod"
 import { createAWSTiFAPIFetch } from "./aws"
-import { TiFAPIFetch } from "./client"
+import { TiFAPIFetch, createTiFAPIFetch } from "./client"
+import { EventArrivalsOperationResultSchema } from "@shared-models/EventArrivals"
+import { LocationCoordinate2D } from "@shared-models/Location"
 
 export type UpdateCurrentUserProfileRequest = Partial<{
   name: string
@@ -18,8 +20,18 @@ export type UpdateCurrentUserProfileRequest = Partial<{
  * and handles authorization headers as well as response parsing.
  */
 export class TiFAPI {
+  static readonly TEST_URL = new URL("https://localhost:8080")
+
+  static testPath (path: `/${string}`) {
+    return `${TiFAPI.TEST_URL}${path.slice(1)}`
+  }
+
   static readonly productionInstance = new TiFAPI(
     createAWSTiFAPIFetch(new URL(API_URL))
+  )
+
+  static readonly testAuthenticatedInstance = new TiFAPI(
+    createTiFAPIFetch(TiFAPI.TEST_URL, async () => "test jwt")
   )
 
   private readonly apiFetch: TiFAPIFetch
@@ -88,6 +100,52 @@ export class TiFAPI {
         })
       },
       signal
+    )
+  }
+
+  /**
+   * Indicates that the user has arrived at the given upcoming (less than 24 hours from start time)
+   * events at the given coordinate.
+   *
+   * @param coordinate the coordinate shared by all the events.
+   * @param eventIds a list of event ids to mark as arrived.
+   * @returns an object containing an array of {@link EventArrivalsOperationResult}s
+   */
+  async arriveAtEvents (eventIds: number[], coordinate: LocationCoordinate2D) {
+    return await this.apiFetch(
+      {
+        method: "POST",
+        endpoint: "/events/arrived",
+        body: { location: coordinate, events: eventIds }
+      },
+      {
+        status200: z.object({
+          arrivalStatuses: z.array(EventArrivalsOperationResultSchema)
+        })
+      }
+    )
+  }
+
+  /**
+   * Indicates that the user has departer from the given upcoming (less than 24 hours from start time)
+   * events at the given coordinate.
+   *
+   * @param coordinate the coordinate shared by all the events.
+   * @param eventIds a list of event ids to mark as departed.
+   * @returns an object containing an array of {@link EventArrivalsOperationResult}s
+   */
+  async departFromEvents (eventIds: number[], coordinate: LocationCoordinate2D) {
+    return await this.apiFetch(
+      {
+        method: "POST",
+        endpoint: "/events/departed",
+        body: { location: coordinate, events: eventIds }
+      },
+      {
+        status200: z.object({
+          arrivalStatuses: z.array(EventArrivalsOperationResultSchema)
+        })
+      }
     )
   }
 }

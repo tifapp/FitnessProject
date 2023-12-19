@@ -7,7 +7,7 @@ import {
 } from "expo-location"
 import { defineTask } from "expo-task-manager"
 import { z } from "zod"
-import { EventArrival } from "@shared-models/EventArrivals"
+import { EventArrival } from "./Models"
 
 export type EventArrivalGeofencedCoordinateStatus = "entered" | "exited"
 
@@ -27,9 +27,9 @@ export type EventArrivalGeofencingUnsubscribe = () => void
  */
 export interface EventArrivalsGeofencer {
   /**
-   * Replaces all coordinates currently being geofenced.
+   * Replaces all arrivals currently being geofenced.
    */
-  replaceGeofencedArrivals: (coordinates: EventArrival[]) => Promise<void>
+  replaceGeofencedArrivals: (arrivals: EventArrival[]) => Promise<void>
 
   /**
    * Registers a callback that listens for geofencing updates.
