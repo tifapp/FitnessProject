@@ -2,7 +2,6 @@ import { ChevronBackButton, StackNavigatorType } from "@components/Navigation"
 import { Headline } from "@components/Text"
 import { TouchableIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
-import { EventMocks } from "@event-details/MockData"
 import { UserMocks } from "@lib/users/User"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
@@ -114,13 +113,8 @@ const ProfileScreen = ({ route }: ProfileScreenProps) => {
   const user = UserMocks.Mia
   // user.relationStatus = "current-user"
   // get user's events
-  const events = [
-    EventMocks.Multiday,
-    EventMocks.NoPlacemarkInfo,
-    EventMocks.PickupBasketball
-  ]
 
-  return <ProfileScreenView user={user} events={events} />
+  return <ProfileScreenView user={user} events={[]} />
 }
 
 const CurrentUserProfileScreen = () => {
@@ -129,15 +123,10 @@ const CurrentUserProfileScreen = () => {
   user.relationStatus = "current-user"
 
   // get user's events
-  const events = [
-    EventMocks.Multiday,
-    EventMocks.NoPlacemarkInfo,
-    EventMocks.PickupBasketball
-  ]
   // update Atom
   useHydrateAtoms([[userAtom, user]])
 
-  return <ProfileScreenView user={user} events={events} />
+  return <ProfileScreenView user={user} events={[]} />
 }
 
 const EditProfileScreen = () => {
