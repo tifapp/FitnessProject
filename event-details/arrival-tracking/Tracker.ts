@@ -1,9 +1,5 @@
 import { UpcomingEventArrivals } from "./UpcomingArrivals"
-import {
-  EventArrival,
-  EventArrivalOperationKind,
-  EventArrivalOperationResult
-} from "./Models"
+import { EventArrival } from "@shared-models/EventArrivals"
 import {
   EventArrivalGeofencingUpdate,
   EventArrivalGeofencingUnsubscribe,
@@ -11,11 +7,7 @@ import {
 } from "./Geofencing"
 import { ArrayUtils } from "@lib/utils/Array"
 import { checkIfCoordsAreEqual } from "@location"
-
-export type PerformArrivalsOperation = (
-  arrivals: EventArrival[],
-  operation: EventArrivalOperationKind
-) => Promise<EventArrivalOperationResult[]>
+import { PerformArrivalsOperation } from "./ArrivalOperation"
 
 /**
  * A class for tracking upcoming event arrivals.

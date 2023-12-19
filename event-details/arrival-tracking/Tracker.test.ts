@@ -1,7 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { AsyncStorageUpcomingEventArrivals } from "./UpcomingArrivals"
 import { EventArrivalsTracker } from "./Tracker"
-import { EventArrival, EventArrivalOperationResult } from "./Models"
+import {
+  EventArrival,
+  EventArrivalOperationResult
+} from "@shared-models/EventArrivals"
 import { ArrayUtils } from "@lib/utils/Array"
 import {
   EventArrivalGeofencingCallback,

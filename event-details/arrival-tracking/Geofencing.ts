@@ -7,7 +7,7 @@ import {
 } from "expo-location"
 import { defineTask } from "expo-task-manager"
 import { z } from "zod"
-import { EventArrival } from "./Models"
+import { EventArrival } from "@shared-models/EventArrivals"
 
 export type EventArrivalGeofencedCoordinateStatus = "entered" | "exited"
 

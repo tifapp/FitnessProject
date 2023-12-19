@@ -1,5 +1,5 @@
 export * from "./Tracker"
-export * from "./Models"
 export * from "./Geofencing"
 export * from "./UpcomingArrivals"
 export * from "./Refresh"
+export * from "./ArrivalOperation"

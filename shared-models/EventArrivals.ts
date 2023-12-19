@@ -1,4 +1,4 @@
-import { LocationCoordinate2D, LocationCoordinates2DSchema } from "@location"
+import { LocationCoordinate2D, LocationCoordinates2DSchema } from "./Location"
 import { z } from "zod"
 
 /**
@@ -22,8 +22,6 @@ export const EventArrivalsSchema = z.array(EventArrivalSchema)
  * The scheduling/sending of the push notifications is handled server-side.
  */
 export type EventArrival = z.infer<typeof EventArrivalSchema>
-
-export type EventArrivalOperationKind = "arrived" | "departed"
 
 /**
  * The result of trying to post an arrival or departure from an event.

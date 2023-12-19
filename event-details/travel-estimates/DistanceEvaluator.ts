@@ -1,5 +1,5 @@
 import { QueryHookOptions } from "@lib/ReactQuery"
-import { LocationCoordinate2D } from "@location/Location"
+import { LocationCoordinate2D } from "@shared-models/Location"
 import {
   QueryClient,
   UseQueryResult,
