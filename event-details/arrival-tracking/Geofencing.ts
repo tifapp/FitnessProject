@@ -1,4 +1,3 @@
-import { yardsToMeters } from "@lib/utils/MetricConversions"
 import { StringUtils } from "@lib/utils/String"
 import { LocationCoordinate2D, LocationCoordinates2DSchema } from "@location"
 import {
@@ -8,6 +7,7 @@ import {
 } from "expo-location"
 import { defineTask } from "expo-task-manager"
 import { z } from "zod"
+import { EventArrival } from "./Models"
 
 export type EventArrivalGeofencedCoordinateStatus = "entered" | "exited"
 
@@ -29,9 +29,7 @@ export interface EventArrivalsGeofencer {
   /**
    * Replaces all coordinates currently being geofenced.
    */
-  replaceGeofencedCoordinates: (
-    coordinates: LocationCoordinate2D[]
-  ) => Promise<void>
+  replaceGeofencedArrivals: (coordinates: EventArrival[]) => Promise<void>
 
   /**
    * Registers a callback that listens for geofencing updates.
@@ -71,15 +69,15 @@ export class ExpoEventArrivalsGeofencer implements EventArrivalsGeofencer {
     this.key = key
   }
 
-  async replaceGeofencedCoordinates (coordinates: LocationCoordinate2D[]) {
-    if (coordinates.length === 0) {
+  async replaceGeofencedArrivals (arrivals: EventArrival[]) {
+    if (arrivals.length === 0) {
       await this.stopGeofencing()
     } else {
       await startGeofencingAsync(
         taskName(this.key),
-        coordinates.map((coordinate) => ({
-          ...coordinate,
-          radius: yardsToMeters(125)
+        arrivals.map((arrival) => ({
+          ...arrival.coordinate,
+          radius: arrival.arrivalRadiusMeters
         }))
       )
     }

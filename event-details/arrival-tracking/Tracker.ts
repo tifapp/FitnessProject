@@ -137,9 +137,7 @@ export class EventArrivalsTracker {
 
   private async syncArrivals (arrivals: EventArrival[]) {
     await Promise.all([
-      this.geofencer.replaceGeofencedCoordinates(
-        arrivals.map((arrival) => arrival.coordinate)
-      ),
+      this.geofencer.replaceGeofencedArrivals(arrivals),
       this.upcomingArrivals.replaceAll(arrivals)
     ])
     this.updateGeofencingSubscription(arrivals)

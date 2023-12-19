@@ -6,7 +6,8 @@ import { z } from "zod"
  */
 export const EventArrivalSchema = z.object({
   eventId: z.number(),
-  coordinate: LocationCoordinates2DSchema
+  coordinate: LocationCoordinates2DSchema,
+  arrivalRadiusMeters: z.number()
 })
 
 /**
