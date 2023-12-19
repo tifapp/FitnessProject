@@ -1,5 +1,8 @@
 name: Merge Development Into Main
 
+env:
+  RUN_EAS_BUILD_HOOKS: 1
+
 on:
   push:
     branches:

@@ -13,7 +13,10 @@ module.exports = function (api) {
   return {
     presets: ["babel-preset-expo"],
     plugins: [
-      ["module:react-native-dotenv", { moduleName: "env", path: ".env" }],
+      [
+        "module:react-native-dotenv",
+        { moduleName: "@env", path: ".env", safe: true }
+      ],
       ["@babel/plugin-transform-flow-strip-types"],
       ["@babel/plugin-proposal-decorators", { legacy: true }],
       ["@babel/plugin-proposal-class-properties", { loose: true }],
@@ -31,6 +34,7 @@ module.exports = function (api) {
             "@lib": modulePath("lib"),
             "@auth": modulePath("auth"),
             "@event-details": modulePath("event-details"),
+            "@root-feature": modulePath("root-feature"),
             "@location": modulePath("location"),
             "@modules": modulePath("modules"),
             "@content-parsing": modulePath("content-parsing"),

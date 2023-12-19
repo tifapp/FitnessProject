@@ -1,14 +1,11 @@
 import { TiFMenuProvider } from "@components/TiFMenuProvider"
 import { useAppFonts } from "@lib/Fonts"
-import { UserLocationFunctionsProvider } from "@location/UserLocation"
 import {
   HapticsProvider,
   IS_HAPTICS_SUPPORTED_ON_DEVICE,
   TiFHaptics
 } from "@lib/Haptics"
-import { NavigationContainer } from "@react-navigation/native"
-import { createStackNavigator } from "@react-navigation/stack"
-import { TabNavigation } from "@stacks/ActivitiesStack"
+import { UserLocationFunctionsProvider } from "@location/UserLocation"
 import {
   getCurrentPositionAsync,
   requestBackgroundPermissionsAsync,
@@ -19,6 +16,7 @@ import { RootSiblingParent } from "react-native-root-siblings"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 
 import { Geo } from "@aws-amplify/geo"
+import { defineEventArrivalsGeofencingTasks } from "@event-details/arrival-tracking"
 import { AnalyticsProvider, MixpanelAnalytics } from "@lib/Analytics"
 import {
   addLogHandler,
@@ -26,13 +24,13 @@ import {
   sentryBreadcrumbLogHandler,
   sentryErrorCapturingLogHandler
 } from "@lib/Logging"
+import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { enableSentry } from "@lib/Sentry"
+import { AppView } from "@root-feature/AppView"
 import "expo-dev-client"
 import { Native as SentryNative } from "sentry-expo"
-import awsconfig from "./src/aws-exports"
 import { setupCognito } from "./auth"
-import { defineEventArrivalsGeofencingTasks } from "@event-details/arrival-tracking"
-import { TiFQueryClientProvider } from "@lib/ReactQuery"
+import awsconfig from "./src/aws-exports"
 
 Geo.configure(awsconfig)
 setupCognito()
@@ -46,27 +44,8 @@ log("info", "App launched", { date: new Date() })
 
 defineEventArrivalsGeofencingTasks()
 
-const Stack = createStackNavigator()
-
 export type AppProps = {
   isFontsLoaded: boolean
-}
-
-const AppView = ({ isFontsLoaded }: AppProps) => {
-  if (!isFontsLoaded) return null // TODO: - Splash Screen?
-  return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Activities Screen"
-          component={TabNavigation}
-          options={{
-            headerShown: false
-          }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
-  )
 }
 
 const App = () => {

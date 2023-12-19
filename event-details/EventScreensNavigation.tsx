@@ -1,4 +1,3 @@
-import React from "react"
 import { ChevronBackButton, StackNavigatorType } from "@components/Navigation"
 import { EventMocks } from "@lib/events"
 import { StackScreenProps } from "@react-navigation/stack"
@@ -8,7 +7,8 @@ import {
   ProfileScreenProps,
   ProfileStack
 } from "@screens/ProfileScreen/Navigation/ProfileScreensNavigation"
-import { TestChatRoomScreen } from "@screens/testScreens/TestChatRoomScreen"
+import { TestChatRoomScreen } from "@screens/TestScreens/TestChatRoomScreen"
+import React from "react"
 import { EventDetailsProps } from "./EventDetails"
 
 export type EventScreensParamsList = {

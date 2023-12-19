@@ -1,12 +1,15 @@
 import { TouchableIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import {
-  BottomTabBarOptions,
-  BottomTabBarProps
+  BottomTabBarProps,
+  createBottomTabNavigator
 } from "@react-navigation/bottom-tabs"
+import { ProfileStack } from "@screens/ProfileScreen/Navigation/ProfileScreensNavigation"
 import React from "react"
-import { Platform, SafeAreaView, StyleSheet, View } from "react-native"
+import { Platform, StyleSheet, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
+
+const Tab = createBottomTabNavigator()
 
 function getIconName (routeName: string) {
   if (routeName === "Map") return "map"
@@ -16,25 +19,11 @@ function getIconName (routeName: string) {
   else return "person"
 }
 
-export const BottomNavTabBar = ({
-  state,
-  descriptors,
-  navigation
-}: BottomTabBarProps<BottomTabBarOptions>) => {
-  const focusedOptions = descriptors[state.routes[state.index].key].options
-  const isVisible = !!(
-    focusedOptions?.tabBarVisible === true ||
-    focusedOptions?.tabBarVisible === undefined
-  )
+export const BottomNavTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const insets = useSafeAreaInsets()
 
   return (
-    <View
-      style={[
-        styles.container,
-        { display: isVisible ? "flex" : "none", paddingBottom: insets.bottom }
-      ]}
-    >
+    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
       {state.routes.map((route, index) => {
         const isFocused = state.index === index
 
@@ -79,6 +68,21 @@ export const BottomNavTabBar = ({
   )
 }
 
+export function TabNavigation () {
+  return (
+    <Tab.Navigator
+      tabBar={(props) => <BottomNavTabBar {...props} />}
+      screenOptions={{ headerShown: false }}
+    >
+      <Tab.Screen
+        name="Profile"
+        component={ProfileStack}
+        options={({ route }) => ({})}
+      />
+    </Tab.Navigator>
+  )
+}
+
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
@@ -101,5 +105,3 @@ const styles = StyleSheet.create({
     backgroundColor: AppStyles.darkColor
   }
 })
-
-export default BottomNavTabBar
