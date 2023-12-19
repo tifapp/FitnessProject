@@ -2,11 +2,10 @@ import { ChevronBackButton, StackNavigatorType } from "@components/Navigation"
 import { Headline } from "@components/Text"
 import { TouchableIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
-import { EventMocks } from "@lib/events"
+import { EventMocks } from "@event-details/MockData"
 import { UserMocks } from "@lib/users/User"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
-import { ActivitiesStackParamList } from "@stacks/ActivitiesStack"
 import { useAtomValue } from "jotai"
 import { useHydrateAtoms } from "jotai/utils"
 import React from "react"
@@ -151,9 +150,8 @@ const EditProfileScreen = () => {
  * Navigation Stack for Profile Screens for use in the Tab Navigator (so headers render)
  */
 export const ProfileStack = () => {
-  const ProfileStack = createStackNavigator<ActivitiesStackParamList>()
-  const profileScreens =
-    createProfileStackScreens<ActivitiesStackParamList>(ProfileStack)
+  const ProfileStack = createStackNavigator<ProfileScreensParamsList>()
+  const profileScreens = createProfileStackScreens(ProfileStack)
 
   return (
     <ProfileStack.Navigator initialRouteName={"CurrentUserProfileScreen"}>
