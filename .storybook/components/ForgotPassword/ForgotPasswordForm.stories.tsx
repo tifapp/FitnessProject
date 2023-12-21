@@ -1,9 +1,12 @@
-import { createForgotPasswordEnvironment } from "@auth/forgot-password/Environment"
+import {
+  CognitoResetPassword,
+  createForgotPasswordEnvironment
+} from "@auth/forgot-password/Environment"
 import {
   ForgotPasswordParamsList,
   createForgotPasswordScreens
 } from "@auth/forgot-password/ForgotPasswordNavigation"
-import { Auth } from "@aws-amplify/auth"
+import { confirmResetPassword, resetPassword } from "@aws-amplify/auth"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { TiFQueryClientProvider } from "@components/TiFQueryClientProvider"
 import { NavigationContainer } from "@react-navigation/native"
@@ -18,13 +21,18 @@ const ForgotPasswordMeta: ComponentMeta<typeof SettingsScreen> = {
 
 export default ForgotPasswordMeta
 
+const resetPasswordAuth: CognitoResetPassword = {
+  resetPassword,
+  confirmResetPassword
+}
+
 type ForgotPasswordStory = ComponentStory<typeof SettingsScreen>
 
 const Stack = createStackNavigator<ForgotPasswordParamsList>()
 
 const signUpScreens = createForgotPasswordScreens(
   Stack,
-  createForgotPasswordEnvironment(Auth)
+  createForgotPasswordEnvironment(resetPasswordAuth)
 )
 
 export const Basic: ForgotPasswordStory = () => (

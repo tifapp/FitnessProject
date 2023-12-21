@@ -1,6 +1,11 @@
 import { isCognitoErrorWithCode } from "@auth/CognitoHelpers"
-import { Auth } from "@aws-amplify/auth"
+import { confirmResetPassword, resetPassword } from "@aws-amplify/auth"
 import { EmailAddress, Password, USPhoneNumber } from ".."
+
+export type CognitoResetPassword = {
+  resetPassword: typeof resetPassword
+  confirmResetPassword: typeof confirmResetPassword
+}
 
 export type ForgotPasswordResult =
   | "success"
@@ -12,7 +17,7 @@ export type ResetPasswordResult = "valid" | "invalid-verification-code"
  * Creates the functions needed for the forgot password flow.
  */
 export const createForgotPasswordEnvironment = (
-  cognito: Pick<typeof Auth, "forgotPassword" | "forgotPasswordSubmit">
+  cognito: CognitoResetPassword
 ) => ({
   /**
    * Starts the process of sending you a code for the password you forgot.
@@ -23,7 +28,7 @@ export const createForgotPasswordEnvironment = (
     emailOrPhoneNumber: EmailAddress | USPhoneNumber
   ): Promise<ForgotPasswordResult> => {
     try {
-      await cognito.forgotPassword(emailOrPhoneNumber.toString())
+      await cognito.resetPassword({ username: emailOrPhoneNumber.toString() })
       return "success"
     } catch (err) {
       if (!isCognitoErrorWithCode(err, "UserNotFoundException")) throw err
@@ -40,7 +45,7 @@ export const createForgotPasswordEnvironment = (
   resendForgotPasswordCode: async (
     emailOrPhoneNumber: EmailAddress | USPhoneNumber
   ) => {
-    await cognito.forgotPassword(emailOrPhoneNumber.toString())
+    await cognito.resetPassword({ username: emailOrPhoneNumber.toString() })
   },
   /**
    * Resets the user's password.
@@ -55,11 +60,11 @@ export const createForgotPasswordEnvironment = (
     password: Password
   ): Promise<ResetPasswordResult> => {
     try {
-      await cognito.forgotPasswordSubmit(
-        emailOrPhoneNumber.toString(),
-        verificationCode,
-        password.toString()
-      )
+      await cognito.confirmResetPassword({
+        username: emailOrPhoneNumber.toString(),
+        confirmationCode: verificationCode,
+        newPassword: password.toString()
+      })
       return "valid"
     } catch (err) {
       if (!isCognitoErrorWithCode(err, "CodeMismatchException")) throw err

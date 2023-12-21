@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { Text, TouchableOpacity, View } from "react-native"
 
 // Import your stories
-import { setupCognito } from "@auth/CognitoHelpers"
+
 import { InMemorySecureStore } from "@auth/CognitoSecureStorage"
 import { FlatList } from "react-native-gesture-handler"
 import { useAppFonts } from "../../hooks/Fonts"
@@ -49,7 +49,6 @@ import VerifcationCodeMeta, {
   Basic as VerifcationCodeBasic
 } from "../components/VerificationCode/VerifyCode.stories"
 
-setupCognito(new InMemorySecureStore())
 
 // Create an array of stories
 const stories = [
