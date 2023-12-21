@@ -5,7 +5,7 @@ import { Text, TouchableOpacity, View } from "react-native"
 
 import { InMemorySecureStore } from "@auth/CognitoSecureStorage"
 import { FlatList } from "react-native-gesture-handler"
-import { useAppFonts } from "../../hooks/Fonts"
+import { useAppFonts } from "../../lib/Fonts"
 import AttendeesListMeta, {
   Basic as AttendeesListScreenBasic
 } from "../components/AttendeesList/AttendeesList.stories"

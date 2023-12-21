@@ -1,5 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons"
-import { HexColor } from "@lib/Color"
+import { HexColor } from "@lib/utils/Color"
 import React from "react"
 import {
   StyleProp,

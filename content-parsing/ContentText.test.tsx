@@ -2,6 +2,7 @@ import { ContentText } from "./ContentText"
 import { EventHandle } from "./EventHandle"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import { UserHandle } from "./UserHandle"
+import { ColorString } from "@lib/utils/Color"
 
 describe("ContentText tests", () => {
   beforeEach(() => jest.resetAllMocks())
@@ -56,13 +57,13 @@ describe("ContentText tests", () => {
   })
 
   it("allows for opening an event based on its handle", () => {
-    const handle = "!17|123/Pickup Basketball"
+    const handle = "!17|123/#123456/Pickup Basketball"
     renderLinkedText(
       `This is a handle\n${handle}\nthat brings you to an event.`
     )
     tapText("Pickup Basketball")
     expect(eventHandleTappedAction).toHaveBeenCalledWith(
-      new EventHandle(123, "Pickup Basketball")
+      new EventHandle(123, "Pickup Basketball", ColorString.parse("#123456")!)
     )
   })
 

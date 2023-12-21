@@ -1,8 +1,8 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
-import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { useSignInForm } from "./SignInForm"
 import { act } from "react-test-renderer"
-import { captureAlerts } from "../../tests/helpers/Alerts"
+import { captureAlerts } from "@test-helpers/Alerts"
 import { USPhoneNumber } from ".."
 
 describe("SignInForm tests", () => {

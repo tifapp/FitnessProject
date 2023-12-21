@@ -21,7 +21,7 @@ const StoryText = () => {
       />
       <Headline>No Long Enought Text</Headline>
       <ExpandableContentText
-        initialText="Hello world, this is longer than one line possibly. Now it is..."
+        initialText="Now, for the new event! !17|123/#2BC016/Pickup Basketball"
         collapsedLineLimit={5}
         onUserHandleTapped={console.log}
         onEventHandleTapped={console.log}

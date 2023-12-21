@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { StyleSheet, View } from "react-native"
 import { Headline, Caption } from "@components/Text"
-import { dayjs, now } from "@lib/date"
+import { dayjs, now } from "@date-time"
 import { Ionicon } from "@components/common/Icons"
 import { Divider } from "react-native-elements"
 import { CurrentUserEvent } from "./Event"

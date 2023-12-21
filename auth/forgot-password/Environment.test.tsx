@@ -1,7 +1,7 @@
 import { TestCognitoError } from "@auth/CognitoHelpers"
 import { act } from "react-test-renderer"
 import { EmailAddress, Password, USPhoneNumber } from ".."
-import { fakeTimers } from "../../tests/helpers/Timers"
+import { fakeTimers } from "@test-helpers/Timers"
 import { createForgotPasswordEnvironment } from "./Environment"
 
 describe("ForgotPasswordEnvironment tests", () => {

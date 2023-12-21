@@ -3,8 +3,8 @@ import {
   BottomSheetModal,
   BottomSheetModalProvider
 } from "@gorhom/bottom-sheet"
-import { useLastDefinedValue } from "../../hooks/useLastDefinedValue"
-import { FontScaleFactors, useFontScale } from "../../hooks/Fonts"
+import { useLastDefinedValue } from "../../lib/utils/UseLastDefinedValue"
+import { FontScaleFactors, useFontScale } from "../../lib/Fonts"
 import React, { useEffect, useMemo, useRef } from "react"
 import { StyleSheet } from "react-native"
 import { EventFormAdvancedSettings } from "./AdvancedSettings"

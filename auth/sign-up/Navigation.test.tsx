@@ -1,6 +1,5 @@
-import { TiFAPI } from "@api-client/TiFAPI"
-import { createTiFAPIFetch } from "@api-client/client"
-import { uuid } from "@lib/uuid"
+import { TiFAPI, createTiFAPIFetch } from "@api-client"
+import { uuidString } from "@lib/utils/UUID"
 import {
   NavigationContainer,
   NavigatorScreenParams,
@@ -17,13 +16,13 @@ import {
 import { rest } from "msw"
 import { useCallback, useState } from "react"
 import { Button, View } from "react-native"
-import { captureAlerts } from "../../tests/helpers/Alerts"
-import "../../tests/helpers/Matchers"
-import { TestQueryClientProvider } from "../../tests/helpers/ReactQuery"
-import { mswServer } from "../../tests/helpers/msw"
+import { captureAlerts } from "@test-helpers/Alerts"
+import "@test-helpers/Matchers"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import { mswServer } from "@test-helpers/msw"
 import { createSignUpEnvironment } from "./Environment"
 import { SignUpParamsList, createSignUpScreens } from "./Navigation"
-import { fakeTimers } from "../../tests/helpers/Timers"
+import { fakeTimers } from "@test-helpers/Timers"
 import { UserHandle } from "@content-parsing"
 
 type TestSignUpParamsList = {
@@ -58,7 +57,10 @@ describe("SignUpNavigation tests", () => {
       rest.post("https://localhost:8080/user", async (_, res, ctx) => {
         return res(
           ctx.status(201),
-          ctx.json({ id: uuid(), handle: TEST_GENERATED_USER_HANDLE.rawValue })
+          ctx.json({
+            id: uuidString(),
+            handle: TEST_GENERATED_USER_HANDLE.rawValue
+          })
         )
       }),
       rest.get(
