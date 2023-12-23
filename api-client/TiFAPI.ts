@@ -142,4 +142,22 @@ export class TiFAPI {
       }
     )
   }
+
+  /**
+   * Fetches all upcoming event arrival regions.
+   *
+   * The regions include ids of events that are either ongoing, or
+   * start within the next 24 hours.
+   *
+   * @returns a list of regions of the user's upcoming events.
+   */
+  async upcomingEventArrivalRegions () {
+    return await this.apiFetch(
+      {
+        method: "GET",
+        endpoint: "/events/upcoming"
+      },
+      { status200: UpcomingEventArrivalsRegionsSchema }
+    )
+  }
 }
