@@ -1,11 +1,11 @@
+import { TiFAPI, createTiFAPIFetch } from "@api-client"
+import { AuthError } from "@aws-amplify/auth"
+import { UserHandle } from "@content-parsing"
+import { uuidString } from "@lib/utils/UUID"
+import { mswServer } from "@test-helpers/msw"
+import { rest } from "msw"
 import { EmailAddress, Password, USPhoneNumber } from ".."
 import { createSignUpEnvironment } from "./Environment"
-import { TiFAPI, createTiFAPIFetch } from "@api-client"
-import { rest } from "msw"
-import { uuidString } from "@lib/utils/UUID"
-import { TestCognitoError } from "@auth/CognitoHelpers"
-import { mswServer } from "@test-helpers/msw"
-import { UserHandle } from "@content-parsing"
 
 describe("SignUpEnvironment tests", () => {
   const cognito = {
@@ -67,7 +67,7 @@ describe("SignUpEnvironment tests", () => {
 
     test("create account with already existing email", async () => {
       cognito.signUp.mockRejectedValueOnce(
-        new TestCognitoError("UsernameExistsException")
+        simpleAuthError("UsernameExistsException")
       )
       const result = await env.createAccount(
         "Bitchell Dickle",
@@ -79,7 +79,7 @@ describe("SignUpEnvironment tests", () => {
 
     test("create account with already existing phone number", async () => {
       cognito.signUp.mockRejectedValueOnce(
-        new TestCognitoError("UsernameExistsException")
+        simpleAuthError("UsernameExistsException")
       )
       const result = await env.createAccount(
         "Bitchell Dickle",
@@ -187,7 +187,7 @@ describe("SignUpEnvironment tests", () => {
   describe("FinishRegisteringAccount tests", () => {
     it("should return \"invalid-verification-code\" when cognito throws CodeMismatchException", async () => {
       cognito.confirmSignUpWithAutoSignIn.mockRejectedValueOnce(
-        new TestCognitoError("CodeMismatchException")
+        simpleAuthError("CodeMismatchException")
       )
       const result = await env.finishRegisteringAccount(
         USPhoneNumber.parse("1234567890")!,

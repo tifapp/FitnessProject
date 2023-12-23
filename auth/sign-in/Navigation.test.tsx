@@ -1,10 +1,11 @@
-import { TestCognitoError } from "@auth/CognitoHelpers"
 import {
   NavigationContainer,
   NavigatorScreenParams,
   useFocusEffect
 } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
+import "@test-helpers/Matchers"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import {
   act,
   fireEvent,
@@ -15,10 +16,9 @@ import {
 import { useCallback, useState } from "react"
 import { Button, View } from "react-native"
 import { USPhoneNumber } from ".."
-import "@test-helpers/Matchers"
-import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { CognitoSignInAuthenticator } from "./Authenticator"
 import { SignInParamsList, createSignInScreens } from "./Navigation"
+import { simpleAuthError } from "@auth/CognitoHelpers"
 
 type TestParamsList = {
   test: undefined
@@ -77,7 +77,7 @@ describe("SignInNavigation tests", () => {
     enterPasswordText(TEST_PASSWORD)
 
     cognito.signIn.mockRejectedValueOnce(
-      new TestCognitoError("UserNotConfirmedException")
+      simpleAuthError("UserNotConfirmedException")
     )
     submitSignInCredentials()
 

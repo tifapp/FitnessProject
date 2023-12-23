@@ -1,4 +1,4 @@
-import { AuthError } from "@aws-amplify/auth"
+import { simpleAuthError } from "@auth/CognitoHelpers"
 import { fakeTimers } from "@test-helpers/Timers"
 import { act } from "react-test-renderer"
 import { EmailAddress, Password, USPhoneNumber } from ".."
@@ -16,7 +16,7 @@ describe("ForgotPasswordEnvironment tests", () => {
   test("initiateForgotPassword returns invalid-email when email entered with UserNotFoundException", async () => {
     // Test screen to get into actual flow
     cognito.resetPassword.mockRejectedValueOnce(
-      new AuthError({ message: "", name: "UserNotFoundException" })
+      simpleAuthError("UserNotFoundException")
     )
     const testEmail = "ilikepie1464@gmail.co"
 
@@ -33,7 +33,7 @@ describe("ForgotPasswordEnvironment tests", () => {
 
   test("initiateForgotPassword returns invalid-phone-number when phone number entered with UserNotFoundException", async () => {
     cognito.resetPassword.mockRejectedValueOnce(
-      new AuthError({ message: "", name: "UserNotFoundException" })
+      simpleAuthError("UserNotFoundException")
     )
     const result = await env.initiateForgotPassword(USPhoneNumber.mock)
     expect(result).toEqual("invalid-phone-number")
@@ -51,7 +51,7 @@ describe("ForgotPasswordEnvironment tests", () => {
 
   test("Forgot Password Submit correctly handles an error", async () => {
     cognito.confirmResetPassword.mockRejectedValueOnce(
-      new AuthError({ message: "", name: "CodeMismatchException" })
+      simpleAuthError("CodeMismatchException")
     )
     const testCode = "123134"
     const testPassword = "fafasfass#$#fafas"
