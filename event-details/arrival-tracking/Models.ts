@@ -1,13 +1,14 @@
-import { LocationCoordinates2DSchema } from "@shared-models/Location"
+import { EventArrivalRegionSchema } from "@shared-models/EventArrivals"
 import { z } from "zod"
 
 /**
  * A zod schema for {@link EventArrival}.
  */
-export const EventArrivalSchema = z.object({
-  eventId: z.number(),
-  coordinate: LocationCoordinates2DSchema,
-  arrivalRadiusMeters: z.number()
+export const EventArrivalSchema = EventArrivalRegionSchema.omit({
+  eventIds: true,
+  isArrived: true
+}).extend({
+  eventId: z.number()
 })
 
 /**

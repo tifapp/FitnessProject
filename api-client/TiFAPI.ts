@@ -3,14 +3,18 @@ import { API_URL } from "@env"
 import { z } from "zod"
 import { createAWSTiFAPIFetch } from "./aws"
 import { TiFAPIFetch, createTiFAPIFetch } from "./client"
-import { EventArrivalsOperationResultSchema } from "@shared-models/EventArrivals"
-import { LocationCoordinate2D } from "@shared-models/Location"
+import { EventArrivalRegionsSchema } from "@shared-models/EventArrivals"
+import { EventRegion } from "@shared-models/Event"
 
 export type UpdateCurrentUserProfileRequest = Partial<{
   name: string
   bio: string
   handle: UserHandle
 }>
+
+const UpcomingEventArrivalsRegionsSchema = z.object({
+  upcomingRegions: EventArrivalRegionsSchema
+})
 
 /**
  * A high-level client for the TiF API.
@@ -104,47 +108,37 @@ export class TiFAPI {
   }
 
   /**
-   * Indicates that the user has arrived at the given upcoming (less than 24 hours from start time)
-   * events at the given coordinate.
+   * Indicates that the user has arrived at the given region.
    *
-   * @param coordinate the coordinate shared by all the events.
-   * @param eventIds a list of event ids to mark as arrived.
-   * @returns an object containing an array of {@link EventArrivalsOperationResult}s
+   * @returns a list of regions of the user's upcoming events.
    */
-  async arriveAtEvents (eventIds: number[], coordinate: LocationCoordinate2D) {
+  async arriveAtRegion (region: EventRegion) {
     return await this.apiFetch(
       {
         method: "POST",
         endpoint: "/events/arrived",
-        body: { location: coordinate, events: eventIds }
+        body: region
       },
       {
-        status200: z.object({
-          arrivalStatuses: z.array(EventArrivalsOperationResultSchema)
-        })
+        status200: UpcomingEventArrivalsRegionsSchema
       }
     )
   }
 
   /**
-   * Indicates that the user has departer from the given upcoming (less than 24 hours from start time)
-   * events at the given coordinate.
+   * Indicates that the user has departed from the given region.
    *
-   * @param coordinate the coordinate shared by all the events.
-   * @param eventIds a list of event ids to mark as departed.
-   * @returns an object containing an array of {@link EventArrivalsOperationResult}s
+   * @returns a list of regions of the user's upcoming events.
    */
-  async departFromEvents (eventIds: number[], coordinate: LocationCoordinate2D) {
+  async departFromRegion (region: EventRegion) {
     return await this.apiFetch(
       {
         method: "POST",
         endpoint: "/events/departed",
-        body: { location: coordinate, events: eventIds }
+        body: region
       },
       {
-        status200: z.object({
-          arrivalStatuses: z.array(EventArrivalsOperationResultSchema)
-        })
+        status200: UpcomingEventArrivalsRegionsSchema
       }
     )
   }

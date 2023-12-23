@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import { AppState } from "react-native"
 import { EventArrivalsTracker } from "./Tracker"
 import { EventArrival } from "./Models"
+import { EventArrivalRegion } from "@shared-models/EventArrivals"
 
 /**
  * A class that manages the storage of the last event arrivals refresh date.
@@ -62,7 +63,7 @@ export class EventArrivalsRefresher {
 
   static usingTracker (
     tracker: EventArrivalsTracker,
-    fetchUpcomingArrivals: () => Promise<EventArrival[]>,
+    fetchUpcomingArrivals: () => Promise<EventArrivalRegion[]>,
     lastRefreshDate: EventArrivalsLastRefreshDate,
     minutesBetweenNeededRefreshes: number
   ) {

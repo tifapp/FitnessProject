@@ -1,29 +1,24 @@
 import { TiFAPI } from "@api-client/TiFAPI"
-import { EventArrivalOperationResult } from "@shared-models/EventArrivals"
-import { LocationCoordinate2D } from "@shared-models/Location"
+import { EventRegion } from "@shared-models/Event"
+import { EventArrivalRegion } from "@shared-models/EventArrivals"
 
 export type EventArrivalsOperationKind = "arrived" | "departed"
 
-export type EventArrivalsOperationLocation = {
-  coordinate: LocationCoordinate2D
-  eventIds: number[]
-}
-
 export type PerformArrivalsOperation = (
-  location: EventArrivalsOperationLocation,
+  region: EventRegion,
   kind: EventArrivalsOperationKind
-) => Promise<EventArrivalOperationResult[]>
+) => Promise<EventArrivalRegion[]>
 
 /**
- * Marks the events at the given location as either "arrived" or "departed".
+ * Marks the events at the given region as either "arrived" or "departed".
  */
 export const performEventArrivalsOperation = async (
-  location: EventArrivalsOperationLocation,
+  region: EventRegion,
   kind: EventArrivalsOperationKind,
   tifAPI: TiFAPI
 ) => {
-  const methodKey = kind === "arrived" ? "arriveAtEvents" : "departFromEvents"
-  return await tifAPI[methodKey](location.eventIds, location.coordinate).then(
-    (result) => result.data.arrivalStatuses
+  const methodKey = kind === "arrived" ? "arriveAtRegion" : "departFromRegion"
+  return await tifAPI[methodKey](region).then(
+    (result) => result.data.upcomingRegions
   )
 }

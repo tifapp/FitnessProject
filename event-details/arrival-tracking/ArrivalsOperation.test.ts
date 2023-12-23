@@ -10,38 +10,31 @@ import {
   rest
 } from "msw"
 import { performEventArrivalsOperation } from "./ArrivalsOperation"
+import { randomFloatInRange } from "@lib/utils/Random"
+import { ArrayUtils } from "@lib/utils/Array"
+import { mockEventArrivalRegion } from "./MockData"
 
 describe("ArrivalsOperation tests", () => {
   describe("PerformEventArrivalsOperation tests", () => {
-    const TEST_ARRIVALS_LOCATION = {
+    const TEST_REGION = {
       coordinate: mockLocationCoordinate2D(),
-      eventIds: [1, 2, 3, 4]
+      arrivalRadiusMeters: randomFloatInRange(50, 150)
     }
 
-    const EXPECTED_ARRIVALS_RESULTS = [
-      { eventId: 1, status: "success" },
-      { eventId: 2, status: "success" },
-      { eventId: 3, status: "remove-from-tracking" },
-      {
-        eventId: 4,
-        status: "outdated-coordinate",
-        updatedCoordinate: mockLocationCoordinate2D()
-      }
-    ]
+    const EXPECTED_ARRIVALS_RESULTS = ArrayUtils.repeatElements(4, () => {
+      return mockEventArrivalRegion()
+    })
 
     const testBodyHandler = async (
       req: RestRequest<DefaultBodyType, PathParams<string>>,
       res: ResponseComposition<DefaultBodyType>,
       ctx: RestContext
     ) => {
-      expect(await req.json()).toEqual({
-        location: TEST_ARRIVALS_LOCATION.coordinate,
-        events: TEST_ARRIVALS_LOCATION.eventIds
-      })
+      expect(await req.json()).toEqual(TEST_REGION)
       return res(
         ctx.status(200),
         ctx.json({
-          arrivalStatuses: EXPECTED_ARRIVALS_RESULTS
+          upcomingRegions: EXPECTED_ARRIVALS_RESULTS
         })
       )
     }
@@ -51,7 +44,7 @@ describe("ArrivalsOperation tests", () => {
         rest.post(TiFAPI.testPath("/events/arrived"), testBodyHandler)
       )
       const results = await performEventArrivalsOperation(
-        TEST_ARRIVALS_LOCATION,
+        TEST_REGION,
         "arrived",
         TiFAPI.testAuthenticatedInstance
       )
@@ -63,7 +56,7 @@ describe("ArrivalsOperation tests", () => {
         rest.post(TiFAPI.testPath("/events/departed"), testBodyHandler)
       )
       const results = await performEventArrivalsOperation(
-        TEST_ARRIVALS_LOCATION,
+        TEST_REGION,
         "departed",
         TiFAPI.testAuthenticatedInstance
       )

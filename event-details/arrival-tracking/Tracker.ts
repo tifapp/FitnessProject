@@ -1,14 +1,14 @@
 import { UpcomingEventArrivals } from "./UpcomingArrivals"
-import { EventArrivalOperationResult } from "@shared-models/EventArrivals"
+import { EventArrivalRegion } from "@shared-models/EventArrivals"
 import {
-  EventArrivalGeofencingUpdate,
+  EventArrivalGeofencedRegion,
   EventArrivalGeofencingUnsubscribe,
   EventArrivalsGeofencer
 } from "./Geofencing"
 import { ArrayUtils } from "@lib/utils/Array"
-import { checkIfCoordsAreEqual } from "@location"
 import { PerformArrivalsOperation } from "./ArrivalsOperation"
 import { EventArrival } from "./Models"
+import { areEventRegionsEqual } from "@shared-models/Event"
 
 /**
  * A class for tracking upcoming event arrivals.
@@ -39,8 +39,10 @@ export class EventArrivalsTracker {
    *
    * @param fetchUpcomingArrivals a function to fetch the upcoming {@link EventArrival}s.
    */
-  async refreshArrivals (fetchUpcomingArrivals: () => Promise<EventArrival[]>) {
-    await this.syncArrivals(await fetchUpcomingArrivals())
+  async refreshArrivals (
+    fetchUpcomingArrivals: () => Promise<EventArrivalRegion[]>
+  ) {
+    await this.syncRegions(await fetchUpcomingArrivals())
   }
 
   /**
@@ -53,18 +55,25 @@ export class EventArrivalsTracker {
   }
 
   async trackArrivals (newArrivals: EventArrival[]) {
-    await this.transformAllUpcomingArrivals((arrivals) => {
-      for (const newArrival of newArrivals) {
-        const eventIdIndex = arrivals.findIndex(
-          (arrival) => arrival.eventId === newArrival.eventId
-        )
-        if (eventIdIndex >= 0) {
-          arrivals[eventIdIndex] = newArrival
+    await this.transformAllUpcomingArrivals((regions) => {
+      const eventIds = new Set(newArrivals.map((arrival) => arrival.eventId))
+      const newRegions = this.removeByEventIdsTransform(eventIds, regions)
+      for (const arrival of newArrivals) {
+        const regionIndex = newRegions.findIndex((region) => {
+          return areEventRegionsEqual(region, arrival)
+        })
+        if (regionIndex === -1) {
+          newRegions.push({
+            eventIds: [arrival.eventId],
+            coordinate: arrival.coordinate,
+            arrivalRadiusMeters: arrival.arrivalRadiusMeters,
+            isArrived: false
+          })
         } else {
-          arrivals.push(newArrival)
+          newRegions[regionIndex].eventIds.push(arrival.eventId)
         }
       }
-      return arrivals
+      return newRegions
     })
   }
 
@@ -73,8 +82,20 @@ export class EventArrivalsTracker {
   }
 
   async removeArrivalsByEventIds (eventIds: Set<number>) {
-    await this.transformAllUpcomingArrivals((arrivals) => {
-      return arrivals.filter((arrival) => !eventIds.has(arrival.eventId))
+    await this.transformAllUpcomingArrivals((regions) => {
+      return this.removeByEventIdsTransform(eventIds, regions)
+    })
+  }
+
+  private removeByEventIdsTransform (
+    eventIds: Set<number>,
+    regions: EventArrivalRegion[]
+  ) {
+    return ArrayUtils.compactMap(regions, (region) => {
+      const newEventIds = region.eventIds.filter((id) => !eventIds.has(id))
+      if (newEventIds.length === 0) return undefined
+      region.eventIds = newEventIds
+      return region
     })
   }
 
@@ -96,20 +117,22 @@ export class EventArrivalsTracker {
   }
 
   private async transformAllUpcomingArrivals (
-    work: (arrivals: EventArrival[]) => Promise<EventArrival[]> | EventArrival[]
+    work: (
+      regions: EventArrivalRegion[]
+    ) => Promise<EventArrivalRegion[]> | EventArrivalRegion[]
   ) {
-    await this.syncArrivals(await work(await this.upcomingArrivals.all()))
+    await this.syncRegions(await work(await this.upcomingArrivals.all()))
   }
 
-  private async syncArrivals (arrivals: EventArrival[]) {
+  private async syncRegions (regions: EventArrivalRegion[]) {
     await Promise.all([
-      this.geofencer.replaceGeofencedArrivals(arrivals),
-      this.upcomingArrivals.replaceAll(arrivals)
+      this.geofencer.replaceGeofencedRegions(regions),
+      this.upcomingArrivals.replaceAll(regions)
     ])
-    this.updateGeofencingSubscription(arrivals)
+    this.updateGeofencingSubscription(regions)
   }
 
-  private updateGeofencingSubscription (arrivals: EventArrival[]) {
+  private updateGeofencingSubscription (arrivals: EventArrivalRegion[]) {
     this.stopTracking()
     if (arrivals.length > 0) {
       this.unsubscribeFromGeofencing = this.geofencer.onUpdate((update) => {
@@ -118,54 +141,11 @@ export class EventArrivalsTracker {
     }
   }
 
-  private async handleGeofencingUpdate (update: EventArrivalGeofencingUpdate) {
-    await this.transformAllUpcomingArrivals(async (arrivals) => {
-      const results = await this.performArrivalsOperationIfNeeded(
-        arrivals,
-        update
-      )
-      return !results
-        ? arrivals
-        : this.transformArrivalsFromOperationResults(results, arrivals)
-    })
-  }
-
-  private async performArrivalsOperationIfNeeded (
-    arrivals: EventArrival[],
-    update: EventArrivalGeofencingUpdate
-  ) {
-    const arrivalsAtCoordinate = arrivals.filter((arrival) => {
-      return checkIfCoordsAreEqual(arrival.coordinate, update.coordinate)
-    })
-    if (arrivalsAtCoordinate.length === 0) return undefined
-
-    return await this.performArrivalsOperation(
-      {
-        coordinate: update.coordinate,
-        eventIds: arrivalsAtCoordinate.map((arrival) => arrival.eventId)
-      },
-      update.status === "entered" ? "arrived" : "departed"
+  private async handleGeofencingUpdate (update: EventArrivalGeofencedRegion) {
+    const upcomingArrivals = await this.performArrivalsOperation(
+      update,
+      update.isArrived ? "arrived" : "departed"
     )
-  }
-
-  private transformArrivalsFromOperationResults (
-    results: EventArrivalOperationResult[],
-    arrivals: EventArrival[]
-  ) {
-    const removeableEventIds = ArrayUtils.compactMap(results, (result) => {
-      return result.status === "remove-from-tracking"
-        ? result.eventId
-        : undefined
-    })
-    return ArrayUtils.compactMap(arrivals, (arrival) => {
-      if (removeableEventIds.includes(arrival.eventId)) return undefined
-      const result = results.find(
-        (result) => result.eventId === arrival.eventId
-      )
-      if (result?.status === "outdated-coordinate") {
-        arrival.coordinate = result.updatedCoordinate
-      }
-      return arrival
-    })
+    await this.syncRegions(upcomingArrivals)
   }
 }
