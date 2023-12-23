@@ -1,4 +1,4 @@
-import { TestCognitoError } from "@auth/CognitoHelpers"
+import { AuthError } from "@aws-amplify/auth"
 import { EmailAddress, USPhoneNumber } from ".."
 import { CognitoSignInAuthenticator } from "./Authenticator"
 
@@ -38,7 +38,7 @@ describe("CognitoSignInAuthenticator tests", () => {
 
     test("UserNotFoundException returns incorrect-credentials", async () => {
       cognito.signIn.mockRejectedValueOnce(
-        new TestCognitoError("UserNotFoundException")
+        simpleAuthError("UserNotFoundException")
       )
       const result = await authenticator.signIn(
         USPhoneNumber.mock,
@@ -49,7 +49,7 @@ describe("CognitoSignInAuthenticator tests", () => {
 
     test("NotAuthorizedException returns incorrect-credentials", async () => {
       cognito.signIn.mockRejectedValueOnce(
-        new TestCognitoError("NotAuthorizedException")
+        simpleAuthError("NotAuthorizedException")
       )
       const result = await authenticator.signIn(
         USPhoneNumber.mock,
@@ -69,7 +69,7 @@ describe("CognitoSignInAuthenticator tests", () => {
 
     test("UserNotConfirmedException returns sign-up-verification-required and resends the sign-up verification code", async () => {
       cognito.signIn.mockRejectedValueOnce(
-        new TestCognitoError("UserNotConfirmedException")
+        simpleAuthError("UserNotConfirmedException")
       )
       const result = await authenticator.signIn(
         USPhoneNumber.mock,
@@ -115,7 +115,7 @@ describe("CognitoSignInAuthenticator tests", () => {
       await authenticator.signIn(EmailAddress.peacock69, TEST_PASSWORD)
 
       cognito.confirmSignIn.mockRejectedValueOnce(
-        new TestCognitoError("CodeMismatchException")
+        simpleAuthError("CodeMismatchException")
       )
       const result = await authenticator.verifySignIn("123456")
       expect(result).toEqual("invalid-verification-code")
