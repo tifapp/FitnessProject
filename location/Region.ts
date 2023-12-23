@@ -1,5 +1,8 @@
 import { milesToMeters } from "@lib/utils/MetricConversions"
-import { LocationCoordinate2D, metersBetweenLocations } from "./Location"
+import {
+  LocationCoordinate2D,
+  metersBetweenLocations
+} from "../shared-models/Location"
 
 /**
  * A type representing the area around a given lat-lng coordinate.

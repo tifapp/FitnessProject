@@ -1,6 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { EventArrival, EventArrivalsSchema } from "./Models"
 import { AsyncStorageUtils } from "@lib/utils/AsyncStorage"
+import {
+  EventArrivalRegion,
+  EventArrivalRegionsSchema
+} from "@shared-models/EventArrivals"
 
 /**
  * An interface for storing client-side details on upcoming event arrivals.
@@ -9,14 +12,13 @@ export interface UpcomingEventArrivals {
   /**
    * Loads all upcoming event arrivals.
    */
-  all: () => Promise<EventArrival[]>
+  all: () => Promise<EventArrivalRegion[]>
 
   /**
    * Replaces all upcoming arrivals with the new list of arrivals.
    */
-  replaceAll: (arrivals: EventArrival[]) => Promise<void>
+  replaceAll: (regions: EventArrivalRegion[]) => Promise<void>
 }
-
 /**
  * {@link UpcomingEventArrivals} implemented with {@link AsyncStorage}.
  */
@@ -26,15 +28,15 @@ implements UpcomingEventArrivals {
 
   async all () {
     return await AsyncStorageUtils.parseJSONItem(
-      EventArrivalsSchema,
+      EventArrivalRegionsSchema,
       AsyncStorageUpcomingEventArrivals.KEY
     ).then((arrivals) => arrivals ?? [])
   }
 
-  async replaceAll (arrivals: EventArrival[]) {
+  async replaceAll (regions: EventArrivalRegion[]) {
     await AsyncStorage.setItem(
       AsyncStorageUpcomingEventArrivals.KEY,
-      JSON.stringify(arrivals)
+      JSON.stringify(regions)
     )
   }
 }

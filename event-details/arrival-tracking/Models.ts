@@ -1,13 +1,14 @@
-import { LocationCoordinate2D, LocationCoordinates2DSchema } from "@location"
+import { EventArrivalRegionSchema } from "@shared-models/EventArrivals"
 import { z } from "zod"
 
 /**
  * A zod schema for {@link EventArrival}.
  */
-export const EventArrivalSchema = z.object({
-  eventId: z.number(),
-  coordinate: LocationCoordinates2DSchema,
-  arrivalRadiusMeters: z.number()
+export const EventArrivalSchema = EventArrivalRegionSchema.omit({
+  eventIds: true,
+  isArrived: true
+}).extend({
+  eventId: z.number()
 })
 
 /**
@@ -22,16 +23,3 @@ export const EventArrivalsSchema = z.array(EventArrivalSchema)
  * The scheduling/sending of the push notifications is handled server-side.
  */
 export type EventArrival = z.infer<typeof EventArrivalSchema>
-
-export type EventArrivalOperationKind = "arrived" | "departed"
-
-/**
- * The result of trying to post an arrival or departure from an event.
- */
-export type EventArrivalOperationResult = {
-  eventId: number
-} & (
-  | { status: "success" }
-  | { status: "outdated-coordinate"; updatedCoordinate: LocationCoordinate2D }
-  | { status: "non-upcoming" }
-)
