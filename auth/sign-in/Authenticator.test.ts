@@ -1,4 +1,4 @@
-import { AuthError } from "@aws-amplify/auth"
+import { simpleAuthError } from "@auth/CognitoHelpers"
 import { EmailAddress, USPhoneNumber } from ".."
 import { CognitoSignInAuthenticator } from "./Authenticator"
 

@@ -1,5 +1,5 @@
 import { TiFAPI, createTiFAPIFetch } from "@api-client"
-import { AuthError } from "@aws-amplify/auth"
+import { simpleAuthError } from "@auth/CognitoHelpers"
 import { UserHandle } from "@content-parsing"
 import { uuidString } from "@lib/utils/UUID"
 import { mswServer } from "@test-helpers/msw"
