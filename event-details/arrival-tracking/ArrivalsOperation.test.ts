@@ -41,7 +41,7 @@ describe("ArrivalsOperation tests", () => {
 
     test("arrived", async () => {
       mswServer.use(
-        rest.post(TiFAPI.testPath("/events/arrived"), testBodyHandler)
+        rest.post(TiFAPI.testPath("/event/arrived"), testBodyHandler)
       )
       const results = await performEventArrivalsOperation(
         TEST_REGION,

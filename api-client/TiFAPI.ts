@@ -116,7 +116,7 @@ export class TiFAPI {
     return await this.apiFetch(
       {
         method: "POST",
-        endpoint: "/events/arrived",
+        endpoint: "/event/arrived",
         body: region
       },
       {
@@ -134,7 +134,7 @@ export class TiFAPI {
     return await this.apiFetch(
       {
         method: "POST",
-        endpoint: "/events/departed",
+        endpoint: "/event/departed",
         body: region
       },
       {
@@ -155,7 +155,7 @@ export class TiFAPI {
     return await this.apiFetch(
       {
         method: "GET",
-        endpoint: "/events/upcoming"
+        endpoint: "/event/upcoming"
       },
       { status200: UpcomingEventArrivalsRegionsSchema }
     )
