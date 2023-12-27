@@ -74,7 +74,7 @@ jobs:
           echo "RUN_EAS_BUILD_HOOKS=1" >> .env.infra
           echo "SENTRY_DSN=${{ secrets.SENTRY_DSN }}" >> .env
           echo "MIXPANEL_TOKEN=${{ secrets.MIXPANEL_TOKEN }}" >> .env
-          echo "API_ENDPOINT=${{ secrets.API_ENDPOINT }}" >> .env
+          echo "API_URL=${{ secrets.API_ENDPOINT }}" >> .env
 
       - name: Trigger Build on EAS
         run: eas build --profile preview --platform android --non-interactive --no-wait
