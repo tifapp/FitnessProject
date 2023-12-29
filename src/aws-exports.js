@@ -3,14 +3,26 @@
 
 const awsmobile = {
     "aws_project_region": "us-west-2",
-    "aws_cognito_identity_pool_id": "us-west-2:a3a3d523-73de-4352-8055-1e3ecf98fad0",
+    "aws_cognito_identity_pool_id": "us-west-2:3d146bea-6a09-400c-85e7-2a8c13ebd764",
     "aws_cognito_region": "us-west-2",
-    "aws_user_pools_id": "us-west-2_kfUHcSZXb",
-    "aws_user_pools_web_client_id": "23vh20mvu0939bl2rrkftnivud",
-    "oauth": {},
+    "aws_user_pools_id": "us-west-2_VXUS2q1PM",
+    "aws_user_pools_web_client_id": "3lfnaahkhjaotal2m13huv05ji",
+    "oauth": {
+        "domain": "tifappe713c872-e713c872-dev.auth.us-west-2.amazoncognito.com",
+        "scope": [
+            "phone",
+            "email",
+            "openid",
+            "profile",
+            "aws.cognito.signin.user.admin"
+        ],
+        "redirectSignIn": "exp://192.168.42.5:19000/,tifapp://",
+        "redirectSignOut": "tifapp://,exp://192.168.42.5:19000/",
+        "responseType": "code"
+    },
+    "federationTarget": "COGNITO_USER_POOLS",
     "aws_cognito_username_attributes": [
-        "EMAIL",
-        "PHONE_NUMBER"
+        "EMAIL"
     ],
     "aws_cognito_social_providers": [],
     "aws_cognito_signup_attributes": [
@@ -27,11 +39,17 @@ const awsmobile = {
     "aws_cognito_verification_mechanisms": [
         "EMAIL"
     ],
-    "aws_appsync_graphqlEndpoint": "https://dngqwkczhjdexneem43my5unje.appsync-api.us-west-2.amazonaws.com/graphql",
-    "aws_appsync_region": "us-west-2",
-    "aws_appsync_authenticationType": "AMAZON_COGNITO_USER_POOLS",
-    "aws_user_files_s3_bucket": "fitnessproject990b7c5f3b1e4687a61074386ec11c28231929-dev",
-    "aws_user_files_s3_bucket_region": "us-west-2"
+    "geo": {
+        "amazon_location_service": {
+            "region": "us-west-2",
+            "search_indices": {
+                "items": [
+                    "placeIndex7c0b71bf-dev"
+                ],
+                "default": "placeIndex7c0b71bf-dev"
+            }
+        }
+    }
 };
 
 

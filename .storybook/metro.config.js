@@ -1,5 +1,12 @@
 const path = require("path");
 const { getDefaultConfig } = require("expo/metro-config");
+const blacklist = require("metro-config/src/defaults/exclusionList");
+module.exports = {
+  resolver: {
+    blacklistRE: blacklist([/#current-cloud-backend\/.*/]),
+  },
+};
+
 const defaultConfig = getDefaultConfig(__dirname);
 const workspaceRoot = path.resolve(__dirname, "..");
 defaultConfig.transformer.getTransformOptions = async () => ({
@@ -8,12 +15,15 @@ defaultConfig.transformer.getTransformOptions = async () => ({
     inlineRequires: false,
   },
 });
-defaultConfig.resolver.resolverMainFields = [
-  "sbmodern",
-  "react-native",
-  "browser",
-  "main",
-];
+(defaultConfig.resolver.blacklistRE = blacklist([
+  /#current-cloud-backend\/.*/,
+])),
+  (defaultConfig.resolver.resolverMainFields = [
+    "sbmodern",
+    "react-native",
+    "browser",
+    "main",
+  ]);
 defaultConfig.resolver.nodeModulesPaths = [
   path.resolve(__dirname, "node_modules"),
   path.resolve(workspaceRoot, "node_modules"),

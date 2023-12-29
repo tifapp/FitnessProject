@@ -13,7 +13,13 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["react", "react-native", "@typescript-eslint", "jest"],
+  "plugins": [
+    "react",
+    "react-hooks",
+    "react-native",
+    "@typescript-eslint",
+    "jest"
+  ],
   "settings": {
     "react": {
       "version": "detect"
@@ -24,7 +30,37 @@
     "no-unused-vars": "warn",
     "eqeqeq": "warn",
     "react/jsx-key": "warn",
-    "spaced-comment": "warn"
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "spaced-comment": "warn",
+    "space-in-parens": "error",
+    "computed-property-spacing": "error",
+    "array-bracket-spacing": "error",
+    "object-curly-spacing": "error",
+    "comma-spacing": "error",
+    "indent": ["error", 2],
+    "@typescript-eslint/naming-convention": [
+      "warn",
+      {
+        "selector": [
+          "function",
+          "objectLiteralProperty",
+          "objectLiteralMethod"
+        ],
+        "format": ["PascalCase", "camelCase"]
+      },
+      { "selector": "typeLike", "format": ["PascalCase"] },
+      { "selector": "typeParameter", "format": ["PascalCase"] },
+
+      { "selector": "interface", "format": ["PascalCase"] }
+    ]
+  },
+  "globals": {
+    "RequestInfo": "readonly",
+    "RequestInit": "readonly",
+    "JSX": "readonly",
+    "NodeJS": "readonly",
+    "__DEV__": "readonly"
   },
   "overrides": [
     {

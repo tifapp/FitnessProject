@@ -49,8 +49,20 @@ try {
 
 const getStories = () => {
   return {
-    "./componentsButtonButton.stories.tsx": require("../components/Button/Button.stories.tsx"),
-    "./componentsIconButtonIconButton.stories.tsx": require("../components/IconButton/IconButton.stories.tsx"),
+    "./componentsAttendeesListAttendeesList.stories.tsx": require("../components/AttendeesList/AttendeesList.stories.tsx"),
+    "./componentsButtonsButtons.stories.tsx": require("../components/Buttons/Buttons.stories.tsx"),
+    "./componentsChangePasswordChangePassword.stories.tsx": require("../components/ChangePassword/ChangePassword.stories.tsx"),
+    "./componentsContentReportingContentReporting.stories.tsx": require("../components/ContentReporting/ContentReporting.stories.tsx"),
+    "./componentsContentTextContextText.stories.tsx": require("../components/ContentText/ContextText.stories.tsx"),
+    "./componentsExploreExplore.stories.tsx": require("../components/Explore/Explore.stories.tsx"),
+    "./componentsForgotPasswordForgotPasswordForm.stories.tsx": require("../components/ForgotPassword/ForgotPasswordForm.stories.tsx"),
+    "./componentsLocationSearchLocationSearch.stories.tsx": require("../components/LocationSearch/LocationSearch.stories.tsx"),
+    "./componentsSearchBarSearchBar.stories.tsx": require("../components/SearchBar/SearchBar.stories.tsx"),
+    "./componentsSettingsScreenSettingsScreen.stories.tsx": require("../components/SettingsScreen/SettingsScreen.stories.tsx"),
+    "./componentsSignInSignIn.stories.tsx": require("../components/SignIn/SignIn.stories.tsx"),
+    "./componentsSignUpSignUp.stories.tsx": require("../components/SignUp/SignUp.stories.tsx"),
+    "./componentsTextFieldTextField.stories.tsx": require("../components/TextField/TextField.stories.tsx"),
+    "./componentsVerificationCodeVerifyCode.stories.tsx": require("../components/VerificationCode/VerifyCode.stories.tsx"),
   };
 };
 

@@ -1,121 +1,70 @@
 # FitnessProject
 
-Installing and testing the app ->
+## tiF Mobile App: Health and Fitness
 
-1. Create an email account and a GitHub account to access the repo
+- Our new mobile app is an application designed to make socializing be much more accessible for individuals just getting into fitness, or to give a simplistic, but reliable way to schedule events for themselves and groups. We plan on having the app be available as a tool used to build communities and strengthen bonds with others in the pursuit of getting healthier, in order to take advantage of the rising digital age, instead of ignoring it.
 
-   1. <https://github.com/signup>
+- We hope to expand into further prospects as we develop our application, and begin turning fitness around!
+
+## Installation
+
+In order to install the project, you must first:
+
+1. Create an email account and a [GitHub](https://github.com/signup) account to access the repo:
 
 2. Clone the remote repository to your local machine using a git client or through the command line.
 
-   1. We recommend using a git client like Sourcetree for convenience ([Install Sourcetree](https://confluence.atlassian.com/get-started-with-sourcetree/install-sourcetree-847359094.html)).
+   #### Git Client
 
-      1. After installing, click the “clone from URL” button and add the repo’s git<https://github.com/tifapp/FitnessProject.git>
+   After installing, click the “clone from URL” button and add the repo’s git: <https://github.com/tifapp/FitnessProject.git>
 
-   2. If you are instead using the command line, install git and then run this command:
+   #### Command Line
 
-      1. git clone<https://github.com/tifapp/FitnessProject.git>
+   If you are instead using the command line, install git and then run this command:
 
-3. Install Node.js version 16.13.1
+   `git clone https://github.com/tifapp/FitnessProject.git`
 
+3. Install [Node.js](https://nodejs.org/download/release/v16.13.1/) version 16.13.1:
 
-1. <https://nodejs.org/download/release/v16.13.1/>
+   #### Windows
 
-   1. For Windows, download node-v16.13.1-win…
-   2. For Mac, download node-v16.13.1-pkg
+   Look for the package labeled "node-v16.13.1-win…", and download.
 
+   #### Mac
 
-4. Install the Expo CLI in the command line
+   Look for the package labeled "node-v16.13.1-pkg", and download.
 
+4. Install the Expo CLI in the command line, using this command: `npm install expo-cli --global`
 
-1. npm install expo-cli --global
+5. Go to the FitnessProject folder (`cd FitnessProject`), then install all dependencies through the command line (`npm install`).
 
+## Usage
 
-5. Go to the project folder, then install all dependencies through the command line
+Using the app is fairly simple:
 
-   1. cd FitnessProject
-   2. npm install
+### Running the Server
 
-6. Run the metro server on your machine through the command line
+To use the app, you must first run the metro server on your machine through the command line:
 
-   1. expo start
+#### Local Process
 
-      1. \*Must be on the same wifi network
+1.  `expo start`
 
-   2. expo start –tunnel
+    - Note: You must be on the same wifi network, in order to make proper usage of the server.
 
-      1. Opens a tunnel link that’s accessible to anyone from the internet
+#### Publicly Accessible Proces
 
-7. Download the Expo Go App on your device to test the application locally
+2. `expo start –tunnel`
 
-   1. Scan the given QR code or link from the terminal  
+   - Note: This opens a tunnel link that is accessible to anyone from the internet.
 
+Second, download the Expo Go App on the Play Store/App Store, to test the application locally.
 
-Development process ->
+1.  To use the app, you must scan the given QR code or link from the terminal using the Expo Go app.
 
-8. [Code Editor (IDE) - Visual Studio](https://visualstudio.microsoft.com/downloads/)
+## Manually Testing the App
 
-   1. Settings
-   {
-   "diffEditor.renderSideBySide":false,
-   "\[javascript]": {
-   "editor.defaultFormatter":"esbenp.prettier-vscode",
-   "editor.formatOnSave":true,
-   "editor.formatOnPaste":true,
-   "editor.autoIndent":"full",
-   },
-   "editor.codeActionsOnSave": {"source.fixAll":true,"source.fixAll.eslint":true,"source.organizeImports":true,"source.addMissingImports":true,},
-   "javascript.updateImportsOnFileMove.enabled":"always",
-   "\[json]": {
-   "editor.defaultFormatter":"esbenp.prettier-vscode"
-   }
-   }
-
-  
-
-
-9. Create an AWS account and follow the instructions in the link<https://docs.amplify.aws/>
-
-10. In the project folder use the command "amplify configure" and select the region "us-west-2" for AWS setup.
-
-    1. See Sean for login details
-
-Trello:[Fitness Project (fitnessproject19) | Trello](https://trello.com/w/fitnessproject19)
-
-Login instructions:  
-  
-<https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_sign-in.html>
-
-<https://docs.aws.amazon.com/IAM/latest/UserGuide/console.html#user-sign-in-page>
-
-  
-
-
-Tif Mobile App ->
-
-Convention ->
-
-Branch Management ->
-
-- Branch off the development branch for each user story.
-
-- When you are ready to merge your feature branch to the sprint branch, create a pull request and have it reviewed by two other team members and one code owner (Sean or Surya).
-
-  - Recommended to checkout the branch and test the changes locally before approval
-
-- Before the pull request, do a git rebase squash.
-
-- Once merged, delete the branch afterward.
-
-Debugging ->
-
-- Reproduce the error
-- Isolate the error
-- Feel free to reach out to team members through Slack for any issues.
-
-Testing ->
-
-- Use “expo start”/“expo start --tunnel”
+- Use “`expo start`”/“`expo start --tunnel`”
 
 - Scan the QR code on your testing device or open the tunnel URL by clicking on the link
 
@@ -124,13 +73,48 @@ Testing ->
   - [cse115bdevelopers@gmail.com](mailto:cse115bdevelopers@gmail.com)
   - cse115bdeveloper
 
-Pull Requests ->
+## Running Automated Testing
 
-- When you have a feature ready to be merged into the sprint branch, issue a pull request
-- Two other members on the team and one code owner must approve the changes before the merge
-- When a pull request gets made, jenkins will test it for any compile time errors
+We utilize automated testing in a good portion of our work. In order to run tests that have been created, you must:
 
-Extensions (Visual Studio Code) ->
+## Convention
+
+The standards that we have for our code are located on our [style guide](STYLEGUIDE.md).
+
+## Development process
+
+To develop for the app, you must utilize a code editor of your own choosing. Recommendations are given below, for the usage of [Visual Studio Code](https://visualstudio.microsoft.com/downloads/).
+
+### Recommended Settings for VSCode
+
+Settings here are to be added onto your workspace's settings.json.
+
+      {
+      	"diffEditor.renderSideBySide":false,
+      	"\[javascript]":
+      	{
+      		"editor.defaultFormatter":"esbenp.prettier-vscode",
+      		"editor.formatOnSave":true,
+      		"editor.formatOnPaste":true,
+      		"editor.autoIndent":"full",
+      	},
+      	"editor.codeActionsOnSave":
+      	{
+      		"source.fixAll":true,
+      		"source.fixAll.eslint":true,
+      		"source.organizeImports":true,
+      		"source.addMissingImports":true,
+      	},
+      	"javascript.updateImportsOnFileMove.enabled":"always",
+      	"\[json]":
+      	{
+      		"editor.defaultFormatter":"esbenp.prettier-vscode"
+      	}
+      }
+
+If you are a developer for the app, please keep track of tasks on our Trello: [Fitness Project (fitnessproject19) | Trello](https://trello.com/w/fitnessproject19)
+
+### Recommended Extensions for VSCode
 
 - Prettier ESLint
 - Code spell checker
@@ -138,19 +122,25 @@ Extensions (Visual Studio Code) ->
 - GraphQL: Language Feature Support
 - GraphQL: Syntax Highlighting
 
-Sourcetree ->
+## Branch Management / Pull Request Policy
 
-- Download using the following link<https://www.sourcetreeapp.com/>
-- Tutorial<https://confluence.atlassian.com/get-started-with-sourcetree>
+- Branch off the development branch for each task you are performing.
 
-React Native ->
+- When you are ready to merge your feature branch to the sprint branch, create a pull request and have it reviewed by one other team member.
 
-- Documentation:<https://reactnative.dev/>
+  - Recommended to checkout the branch and test the changes locally before approval
 
+- Before the pull request, do a git rebase squash.
 
-- Tutorial:<https://reactnative.dev/docs/getting-started>
+- Once merged, delete the branch afterward.
 
-Appendix ->
+### React Native
+
+- Documentation: <https://reactnative.dev/>
+
+- Tutorial: <https://reactnative.dev/docs/getting-started>
+
+### Appendix
 
 <https://www.linode.com/docs/guides/install-and-use-npm-on-linux/>
 
@@ -160,21 +150,14 @@ Appendix ->
 
 <https://reactnative.dev/docs/getting-started>
 
-To do:
-
-- Include AWS setup
-- Include details on setting up and using Sourcetree
-- Include visual studio settings and extensions, and tips/helpful shortcuts
-- Include react native documentation links
-
 ### Storybook
 
-1. cd .storybook
+1. `cd .storybook`
 
-2. npm install
+2. `npm install`
 
-3. expo start
+3. `expo start`
 
-4. When adding new stories, run "npm run update-stories" so they appear in the app
+4. When adding new stories, run "`npm run update-stories`" so they appear in the app
 
 See examples in .storybook/components
