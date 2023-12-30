@@ -1,23 +1,19 @@
-import { yardsToMeters } from "@lib/utils/MetricConversions"
 import { StringUtils } from "@lib/utils/String"
-import { LocationCoordinate2D, LocationCoordinates2DSchema } from "@location"
+import { LocationCoordinates2DSchema } from "@location"
 import {
+  LocationGeofencingRegionState,
   LocationGeofencingEventType,
   startGeofencingAsync,
   stopGeofencingAsync
 } from "expo-location"
 import { defineTask } from "expo-task-manager"
 import { z } from "zod"
+import { EventArrivalRegion } from "@shared-models/EventArrivals"
 
-export type EventArrivalGeofencedCoordinateStatus = "entered" | "exited"
-
-export type EventArrivalGeofencingUpdate = {
-  coordinate: LocationCoordinate2D
-  status: EventArrivalGeofencedCoordinateStatus
-}
+export type EventArrivalGeofencedRegion = Omit<EventArrivalRegion, "eventIds">
 
 export type EventArrivalGeofencingCallback = (
-  update: EventArrivalGeofencingUpdate
+  update: EventArrivalGeofencedRegion
 ) => void
 
 export type EventArrivalGeofencingUnsubscribe = () => void
@@ -27,10 +23,10 @@ export type EventArrivalGeofencingUnsubscribe = () => void
  */
 export interface EventArrivalsGeofencer {
   /**
-   * Replaces all coordinates currently being geofenced.
+   * Replaces all arrivals currently being geofenced.
    */
-  replaceGeofencedCoordinates: (
-    coordinates: LocationCoordinate2D[]
+  replaceGeofencedRegions: (
+    regions: EventArrivalGeofencedRegion[]
   ) => Promise<void>
 
   /**
@@ -71,15 +67,18 @@ export class ExpoEventArrivalsGeofencer implements EventArrivalsGeofencer {
     this.key = key
   }
 
-  async replaceGeofencedCoordinates (coordinates: LocationCoordinate2D[]) {
-    if (coordinates.length === 0) {
+  async replaceGeofencedRegions (regions: EventArrivalGeofencedRegion[]) {
+    if (regions.length === 0) {
       await this.stopGeofencing()
     } else {
       await startGeofencingAsync(
         taskName(this.key),
-        coordinates.map((coordinate) => ({
-          ...coordinate,
-          radius: yardsToMeters(125)
+        regions.map((region) => ({
+          ...region.coordinate,
+          radius: region.arrivalRadiusMeters,
+          state: region.isArrived
+            ? LocationGeofencingRegionState.Inside
+            : LocationGeofencingRegionState.Outside
         }))
       )
     }
@@ -130,7 +129,9 @@ export const defineEventArrivalsGeofencingTasks = () => {
 const TaskEventSchema = z.object({
   data: z.object({
     eventType: z.nativeEnum(LocationGeofencingEventType),
-    region: LocationCoordinates2DSchema.passthrough()
+    region: LocationCoordinates2DSchema.extend({
+      radius: z.number()
+    }).passthrough()
   })
 })
 
@@ -138,8 +139,12 @@ const defineEventArrivalsGeofencingTask = (key: TaskCallbackKey) => {
   defineTask(taskName(key), async (arg) => {
     const { data } = await TaskEventSchema.parseAsync(arg)
     taskCallbacks[key]?.({
-      coordinate: data.region,
-      status: LocationGeofencingEventType.Enter ? "entered" : "exited"
+      coordinate: {
+        latitude: data.region.latitude,
+        longitude: data.region.longitude
+      },
+      arrivalRadiusMeters: data.region.radius,
+      isArrived: data.eventType === LocationGeofencingEventType.Enter
     })
   })
 }

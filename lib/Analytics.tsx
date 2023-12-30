@@ -1,4 +1,4 @@
-import { MIXPANEL_TOKEN } from "env"
+import { MIXPANEL_TOKEN } from "@env"
 import { Mixpanel } from "mixpanel-react-native"
 import React, { ReactNode, createContext, useContext } from "react"
 import { JSONSerializableValue } from "./JSONSerializable"

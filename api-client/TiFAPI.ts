@@ -1,12 +1,20 @@
-import { z } from "zod"
-import { TiFAPIFetch } from "./client"
 import { UserHandle } from "@content-parsing"
+import { API_URL } from "@env"
+import { z } from "zod"
+import { createAWSTiFAPIFetch } from "./aws"
+import { TiFAPIFetch, createTiFAPIFetch } from "./client"
+import { EventArrivalRegionsSchema } from "@shared-models/EventArrivals"
+import { EventRegion } from "@shared-models/Event"
 
 export type UpdateCurrentUserProfileRequest = Partial<{
   name: string
   bio: string
   handle: UserHandle
 }>
+
+const UpcomingEventArrivalsRegionsSchema = z.object({
+  upcomingRegions: EventArrivalRegionsSchema
+})
 
 /**
  * A high-level client for the TiF API.
@@ -16,6 +24,20 @@ export type UpdateCurrentUserProfileRequest = Partial<{
  * and handles authorization headers as well as response parsing.
  */
 export class TiFAPI {
+  static readonly TEST_URL = new URL("https://localhost:8080")
+
+  static testPath (path: `/${string}`) {
+    return `${TiFAPI.TEST_URL}${path.slice(1)}`
+  }
+
+  static readonly productionInstance = new TiFAPI(
+    createAWSTiFAPIFetch(new URL(API_URL))
+  )
+
+  static readonly testAuthenticatedInstance = new TiFAPI(
+    createTiFAPIFetch(TiFAPI.TEST_URL, async () => "test jwt")
+  )
+
   private readonly apiFetch: TiFAPIFetch
 
   constructor (apiFetch: TiFAPIFetch) {
@@ -82,6 +104,60 @@ export class TiFAPI {
         })
       },
       signal
+    )
+  }
+
+  /**
+   * Indicates that the user has arrived at the given region.
+   *
+   * @returns a list of regions of the user's upcoming events.
+   */
+  async arriveAtRegion (region: EventRegion) {
+    return await this.apiFetch(
+      {
+        method: "POST",
+        endpoint: "/event/arrived",
+        body: region
+      },
+      {
+        status200: UpcomingEventArrivalsRegionsSchema
+      }
+    )
+  }
+
+  /**
+   * Indicates that the user has departed from the given region.
+   *
+   * @returns a list of regions of the user's upcoming events.
+   */
+  async departFromRegion (region: EventRegion) {
+    return await this.apiFetch(
+      {
+        method: "POST",
+        endpoint: "/event/departed",
+        body: region
+      },
+      {
+        status200: UpcomingEventArrivalsRegionsSchema
+      }
+    )
+  }
+
+  /**
+   * Fetches all upcoming event arrival regions.
+   *
+   * The regions include ids of events that are either ongoing, or
+   * start within the next 24 hours.
+   *
+   * @returns a list of regions of the user's upcoming events.
+   */
+  async upcomingEventArrivalRegions () {
+    return await this.apiFetch(
+      {
+        method: "GET",
+        endpoint: "/event/upcoming"
+      },
+      { status200: UpcomingEventArrivalsRegionsSchema }
     )
   }
 }
