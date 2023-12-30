@@ -1,7 +1,7 @@
-import { SecondaryOutlinedButton } from "@components/Buttons"
 import { BodyText, Subtitle } from "@components/Text"
 import { TouchableIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
+import { FontScaleFactors } from "@lib/Fonts"
 import React from "react"
 import { View, ViewStyle, StyleSheet } from "react-native"
 import Animated, {
@@ -21,35 +21,63 @@ export const EventArrivalBannerView = ({
 }: EventArrivalBannerProps) => (
   <Animated.View entering={FadeIn} exiting={FadeOut} style={style}>
     <View style={styles.container}>
-      <View style={styles.illustrationRow}>
-        <View style={styles.illustrationPlaceholder} />
+      <View style={styles.outerRow}>
+        <View style={styles.innerRow}>
+          <View style={styles.alternativeIllustrationPlaceholder} />
+          <View style={styles.textContainer}>
+            <Subtitle
+              style={styles.titleText}
+              maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
+            >
+              You&apos;ve Arrived!
+            </Subtitle>
+            <BodyText
+              style={styles.bodyText}
+              maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
+            >
+              We&apos;ve let everyone else know that you&apos;re here. Have fun
+              and make new friends!
+            </BodyText>
+          </View>
+        </View>
         <TouchableIonicon
-          icon={{ name: "close" }}
+          icon={{
+            name: "close",
+            maximumFontScaleFactor: FontScaleFactors.xxxLarge
+          }}
           onPress={onClose}
           style={styles.closeIcon}
         />
       </View>
-      <Subtitle style={styles.titleText}>You&apos;ve Arrived!</Subtitle>
-      <BodyText style={styles.bodyText}>
-        We&apos;ve let everyone else know that you&apos;re here. Have fun and
-        make new friends!
-      </BodyText>
-      <SecondaryOutlinedButton onPress={onClose} style={styles.gotItButton}>
-        Got it!
-      </SecondaryOutlinedButton>
     </View>
   </Animated.View>
 )
 
 const styles = StyleSheet.create({
-  illustrationRow: {
+  outerRow: {
     display: "flex",
     flexDirection: "row"
   },
-  illustrationPlaceholder: {
-    backgroundColor: "red",
-    height: 100,
+  innerRow: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
     flex: 1
+  },
+  alternativeIllustrationPlaceholder: {
+    backgroundColor: "red",
+    height: 64,
+    width: 64,
+    marginRight: 8
+  },
+  textContainer: {
+    flex: 1
+  },
+  titleText: {
+    marginBottom: 8
+  },
+  bodyText: {
+    opacity: 0.5
   },
   closeIcon: {
     opacity: 0.35,
@@ -60,17 +88,5 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     width: "100%"
-  },
-  titleText: {
-    textAlign: "center",
-    marginVertical: 8
-  },
-  bodyText: {
-    opacity: 0.5,
-    textAlign: "center"
-  },
-  gotItButton: {
-    width: "100%",
-    marginTop: 16
   }
 })

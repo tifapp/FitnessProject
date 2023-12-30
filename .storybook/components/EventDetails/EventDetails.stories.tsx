@@ -5,7 +5,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context"
 import { EventArrivalBannerView } from "@event-details/arrival-tracking"
 import { Button, View } from "react-native"
 import Animated, { Layout } from "react-native-reanimated"
-import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
+import { ScrollView } from "react-native-gesture-handler"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
