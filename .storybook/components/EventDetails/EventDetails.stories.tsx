@@ -29,6 +29,11 @@ export const Basic: EventDetailsStory = () => {
       >
         {!isClosed && (
           <EventArrivalBannerView
+            messageTheme={{
+              kind: "joinedEventArrivedOnTime",
+              isUsingAlternativeDescription: false
+            }}
+            isUsingAlternativeDescription={false}
             onClose={() => setIsClosed(true)}
             style={{ padding: 16, width: "100%" }}
           />
