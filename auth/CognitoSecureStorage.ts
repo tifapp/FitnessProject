@@ -1,3 +1,4 @@
+import { KeyValueStorageInterface } from "@aws-amplify/core"
 import { ArrayUtils } from "@lib/utils/Array"
 import "@lib/utils/Promise"
 import * as ExpoSecureStore from "expo-secure-store"
@@ -36,109 +37,121 @@ const STORE_CHUNK_SIZE = 2048
 /**
  * Encrypted secure storage for AWS Cognito Auth.
  */
-export class CognitoSecureStorage {
-  private syncPromise?: Promise<void>
+export class CognitoSecureStorage implements KeyValueStorageInterface {
   private store: SecureStore
   private keyChunkMappings = new Map<string, number>()
-  private cache = new Map<string, string>()
+  private keyChunkMappingsPromise?: Promise<Map<string, number>>
 
   constructor (store: SecureStore) {
     this.store = store
+    this.keyChunkMappingsPromise = undefined
   }
 
-  setItem (key: string, value: string) {
-    const chunks = stringToChunks(value)
-    this.keyChunkMappings.set(key, chunks.length)
-    this.saveKeyChunkMappings()
-    this.cache.set(key, value)
-    for (let i = 0; i < chunks.length; i++) {
-      this.store.setItemAsync(secureStoreKey(key, i), chunks[i])
+  async removeItem (key: string) {
+    const keyChunkMappings = await this.loadKeyChunkMappings()
+    if (keyChunkMappings) {
+      const amountOfChunks = keyChunkMappings.get(key) ?? 0
+      await Promise.allSettled(
+        ArrayUtils.repeatElements(amountOfChunks, async (chunkIndex) => {
+          await this.store.deleteItemAsync(this.secureStoreKey(key, chunkIndex))
+        })
+      )
+      keyChunkMappings.delete(key)
+    }
+    this.keyChunkMappings = keyChunkMappings
+    await this.saveKeyChunkMappings()
+  }
+
+  async setItem (key: string, value: string) {
+    const keyChunkMappings = await this.loadKeyChunkMappings()
+    if (keyChunkMappings) {
+      const chunks = this.stringToChunks(value)
+      for (let i = 0; i < chunks.length; i++) {
+        const chunkKey = this.secureStoreKey(key, i)
+        await this.store.setItemAsync(chunkKey, chunks[i])
+      }
+      keyChunkMappings.set(key, chunks.length)
+      this.keyChunkMappings = keyChunkMappings
+      await this.saveKeyChunkMappings()
     }
   }
 
-  getItem (key: string) {
-    return this.cache.get(key)
-  }
-
-  removeItem (key: string) {
-    this.cache.delete(key)
-
-    const amountOfChunks = this.keyChunkMappings.get(key) ?? 0
-    for (let i = 0; i < amountOfChunks; i++) {
-      this.store.deleteItemAsync(secureStoreKey(key, i))
+  async getItem (key: string) {
+    const keyChunkMappings = await this.loadKeyChunkMappings()
+    if (keyChunkMappings.size > 0) {
+      const amountOfChunks = keyChunkMappings.get(key) ?? 0
+      const chunks = [] as string[]
+      for (let i = 0; i < amountOfChunks; i++) {
+        const chunk = await this.store.getItemAsync(this.secureStoreKey(key, i))
+        if (chunk) {
+          chunks.push(chunk)
+        }
+      }
+      if (chunks.length === 0) {
+        return null
+      }
+      return chunks.join("")
+    } else {
+      return null
     }
-
-    this.keyChunkMappings.delete(key)
-    this.saveKeyChunkMappings()
   }
 
   async clear () {
+    const keyChunkMappings = await this.loadKeyChunkMappings()
     await Promise.allSettled(
-      Array.from(this.keyChunkMappings).map(async ([key, amountOfChunks]) => {
+      Array.from(keyChunkMappings).map(async ([key, amountOfChunks]) => {
         await Promise.allSettled(
           ArrayUtils.repeatElements(amountOfChunks, async (chunkIndex) => {
-            await this.store.deleteItemAsync(secureStoreKey(key, chunkIndex))
+            await this.store.deleteItemAsync(
+              this.secureStoreKey(key, chunkIndex)
+            )
           })
         )
       })
     )
-    this.keyChunkMappings = new Map()
+    this.keyChunkMappings.clear()
     await this.saveKeyChunkMappings()
-    this.cache = new Map()
-  }
-
-  async sync () {
-    if (this.syncPromise) {
-      return await this.syncPromise
-    }
-    this.syncPromise = this.syncKnownKeys()
-    return await this.syncPromise
-  }
-
-  private async syncKnownKeys () {
-    await this.loadKeyChunkMappings()
-    await Promise.allSettled(
-      Array.from(this.keyChunkMappings).map(async ([key, amountOfChunks]) => {
-        const loadPromises = [] as Promise<string | null>[]
-        for (let i = 0; i < amountOfChunks; i++) {
-          loadPromises.push(this.store.getItemAsync(secureStoreKey(key, i)))
-        }
-        const value = ArrayUtils.compactMap(
-          await Promise.allSettled(loadPromises),
-          (result) => {
-            if (result.status === "rejected") return undefined
-            return result.value
-          }
-        ).join("")
-        this.cache.set(key, value)
-      })
-    )
   }
 
   private async loadKeyChunkMappings () {
-    const result = await this.store.getItemAsync(KEY_CHUNK_MAPPINGS_KEY)
-    if (result) {
-      this.keyChunkMappings = new Map(JSON.parse(result))
+    if (this.keyChunkMappingsPromise) {
+      return await this.keyChunkMappingsPromise
     }
+    const loadPromise = this.store
+      .getItemAsync(KEY_CHUNK_MAPPINGS_KEY)
+      .then((jsonMap) => {
+        if (!jsonMap) {
+          this.keyChunkMappings = new Map<string, number>()
+          return this.keyChunkMappings
+        }
+        this.keyChunkMappings = new Map<string, number>(JSON.parse(jsonMap))
+        return this.keyChunkMappings
+      })
+    this.keyChunkMappingsPromise = loadPromise
+    return await loadPromise
   }
 
   private async saveKeyChunkMappings () {
-    await this.store.setItemAsync(
-      KEY_CHUNK_MAPPINGS_KEY,
-      JSON.stringify(Array.from(this.keyChunkMappings))
-    )
+    if (this.keyChunkMappings) {
+      await this.store.setItemAsync(
+        KEY_CHUNK_MAPPINGS_KEY,
+        JSON.stringify(Array.from(this.keyChunkMappings))
+      )
+    }
+    this.keyChunkMappingsPromise = undefined
   }
-}
 
-const stringToChunks = (data: string) => {
-  const numChunks = Math.ceil(data.length / STORE_CHUNK_SIZE)
-  const chunks = [] as string[]
-  for (let i = 0; i < numChunks; i++) {
-    chunks.push(data.slice(i * STORE_CHUNK_SIZE, (i + 1) * STORE_CHUNK_SIZE))
+  stringToChunks = (data: string) => {
+    const numChunks = Math.ceil(data.length / STORE_CHUNK_SIZE)
+    const chunks = [] as string[]
+    for (let i = 0; i < numChunks; i++) {
+      chunks.push(data.slice(i * STORE_CHUNK_SIZE, (i + 1) * STORE_CHUNK_SIZE))
+    }
+    return chunks
   }
-  return chunks
-}
 
-const secureStoreKey = (name: string, chunkIndex: number) => {
-  return SECURE_STORAGE_KEY_PREFIX + name + `___chunk${chunkIndex}`
+  secureStoreKey = (name: string, chunkIndex: number) => {
+    const key = SECURE_STORAGE_KEY_PREFIX + name + `___chunk${chunkIndex}`
+    return key
+  }
 }
