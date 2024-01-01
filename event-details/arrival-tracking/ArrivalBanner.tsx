@@ -34,7 +34,6 @@ export type EventArrivalBannerMessageTheme = {
 
 export type EventArrivalBannerProps = {
   messageTheme: EventArrivalBannerMessageTheme
-  isUsingAlternativeDescription: boolean
   onClose: () => void
   style?: AnimatedStyleProp<ViewStyle>
 }
