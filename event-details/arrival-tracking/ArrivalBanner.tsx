@@ -2,13 +2,61 @@ import { BodyText, Subtitle } from "@components/Text"
 import { TouchableIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors } from "@lib/Fonts"
-import React from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { View, ViewStyle, StyleSheet } from "react-native"
 import Animated, {
   AnimatedStyleProp,
   FadeIn,
   FadeOut
 } from "react-native-reanimated"
+import {
+  EventArrivalsOperationKind,
+  EventArrivalsOperationUnsubscribe
+} from "./ArrivalsOperation"
+import { EventArrivalGeofencedRegion } from "./Geofencing"
+import { EventRegion } from "@shared-models/Event"
+
+/**
+ * Handles state related to whether or not to show the event arrival banner for
+ * a particular {@link EventArrivalGeofencedRegion}.
+ *
+ * If `close` is called, `isShowing` will always return false from there on out as
+ * the banner is simply meant to be non-instrusive after it has been dismissed.
+ *
+ * @param region the region to show the arrival banner for.
+ * @param subscribe subscribes to updates for entering and leaving the region.
+ */
+export const useIsShowingEventArrivalBanner = (
+  region: EventArrivalGeofencedRegion,
+  subscribe: (
+    region: EventRegion,
+    handleUpdate: (operationKind: EventArrivalsOperationKind) => void
+  ) => EventArrivalsOperationUnsubscribe
+) => {
+  const subscriptionRef = useRef<
+    EventArrivalsOperationUnsubscribe | undefined
+  >()
+  const [isClosed, setIsClosed] = useState(false)
+  const [isArrived, setIsArrived] = useState(region.isArrived)
+  useEffect(() => {
+    subscriptionRef.current = subscribe(
+      {
+        coordinate: region.coordinate,
+        arrivalRadiusMeters: region.arrivalRadiusMeters
+      },
+      (operationKind) => setIsArrived(operationKind === "arrived")
+    )
+    return () => subscriptionRef.current?.()
+  }, [region, subscribe])
+  return {
+    isShowing: isArrived && !isClosed,
+    close: () => {
+      setIsClosed(true)
+      subscriptionRef.current?.()
+      subscriptionRef.current = undefined
+    }
+  }
+}
 
 /**
  * The arrival banner message theme consists of a simple title and description
