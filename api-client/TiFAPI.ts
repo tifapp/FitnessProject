@@ -24,7 +24,7 @@ const UpcomingEventArrivalsRegionsSchema = z.object({
  * and handles authorization headers as well as response parsing.
  */
 export class TiFAPI {
-  static readonly TEST_URL = new URL("https://localhost:8080")
+  static readonly TEST_URL = new URL("http://localhost:8080")
 
   static testPath (path: `/${string}`) {
     return `${TiFAPI.TEST_URL}${path.slice(1)}`

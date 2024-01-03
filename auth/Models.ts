@@ -60,6 +60,8 @@ export class Password {
     this.rawValue = rawValue
   }
 
+  static readonly mock = Password.validate("12345678")!
+
   toString () {
     return this.rawValue
   }
