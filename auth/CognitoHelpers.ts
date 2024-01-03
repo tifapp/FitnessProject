@@ -10,7 +10,3 @@ export const isCognitoErrorWithCode = (error: unknown, code: string) => {
   }
   return false
 }
-
-export const simpleAuthError = (error: string) => {
-  return new AuthError({ message: "", name: error })
-}

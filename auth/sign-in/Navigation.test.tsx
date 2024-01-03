@@ -18,7 +18,7 @@ import { Button, View } from "react-native"
 import { USPhoneNumber } from ".."
 import { CognitoSignInAuthenticator } from "./Authenticator"
 import { SignInParamsList, createSignInScreens } from "./Navigation"
-import { simpleAuthError } from "@auth/CognitoHelpers"
+import { testAuthErrorWithCode } from "@test-helpers/Cognito"
 
 type TestParamsList = {
   test: undefined
@@ -77,7 +77,7 @@ describe("SignInNavigation tests", () => {
     enterPasswordText(TEST_PASSWORD)
 
     cognito.signIn.mockRejectedValueOnce(
-      simpleAuthError("UserNotConfirmedException")
+      testAuthErrorWithCode("UserNotConfirmedException")
     )
     submitSignInCredentials()
 
