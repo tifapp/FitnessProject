@@ -1,6 +1,5 @@
 import { isCognitoErrorWithCode } from "@auth/CognitoHelpers"
 import { signIn, confirmSignIn, resendSignUpCode } from "@aws-amplify/auth"
-import { CognitoUser } from "amazon-cognito-identity-js"
 import { EmailAddress, USPhoneNumber } from ".."
 
 export type SignInResult =
@@ -51,13 +50,18 @@ export type CognitoSignInFunctions = {
 export class CognitoSignInAuthenticator implements SignInAuthenticator {
   private readonly cognito: CognitoSignInFunctions
 
-  private signedInCognitoUser?: CognitoUser
   private previousSignInCredentials?: {
-    emailOrPhoneNumber: string
-    uncheckedPassword: string
+    username: string
+    password: string
   }
 
-  constructor (cognito: CognitoSignInFunctions) {
+  constructor (
+    cognito: CognitoSignInFunctions = {
+      signIn,
+      confirmSignIn,
+      resendSignUpCode
+    }
+  ) {
     this.cognito = cognito
   }
 
@@ -66,17 +70,13 @@ export class CognitoSignInAuthenticator implements SignInAuthenticator {
     uncheckedPassword: string
   ) {
     try {
-      this.previousSignInCredentials = {
-        emailOrPhoneNumber: emailOrPhoneNumber.toString(),
-        uncheckedPassword
+      const credentials = {
+        username: emailOrPhoneNumber.toString(),
+        password: uncheckedPassword
       }
-      this.signedInCognitoUser = await this.cognito.signIn(
-        emailOrPhoneNumber.toString(),
-        uncheckedPassword
-      )
-      return this.signedInCognitoUser?.challengeName === "SMS_MFA"
-        ? "sign-in-verification-required"
-        : "success"
+      this.previousSignInCredentials = credentials
+      const { isSignedIn } = await this.cognito.signIn(credentials)
+      return !isSignedIn ? "sign-in-verification-required" : "success"
     } catch (err) {
       if (
         isCognitoErrorWithCode(err, "NotAuthorizedException") ||
@@ -84,7 +84,9 @@ export class CognitoSignInAuthenticator implements SignInAuthenticator {
       ) {
         return "incorrect-credentials"
       } else if (isCognitoErrorWithCode(err, "UserNotConfirmedException")) {
-        await this.cognito.resendSignUp(emailOrPhoneNumber.toString())
+        await this.cognito.resendSignUpCode({
+          username: emailOrPhoneNumber.toString()
+        })
         return "sign-up-verification-required"
       } else {
         throw err
@@ -94,19 +96,12 @@ export class CognitoSignInAuthenticator implements SignInAuthenticator {
 
   async resendSignInVerificationCode () {
     if (!this.previousSignInCredentials) return
-    this.signedInCognitoUser = await this.cognito.signIn(
-      this.previousSignInCredentials.emailOrPhoneNumber,
-      this.previousSignInCredentials.uncheckedPassword
-    )
+    await this.cognito.signIn(this.previousSignInCredentials)
   }
 
   async verifySignIn (verificationCode: string) {
     try {
-      await this.cognito.confirmSignIn(
-        this.signedInCognitoUser,
-        verificationCode,
-        "SMS_MFA"
-      )
+      await this.cognito.confirmSignIn({ challengeResponse: verificationCode })
       return "success"
     } catch (err) {
       if (isCognitoErrorWithCode(err, "CodeMismatchException")) {

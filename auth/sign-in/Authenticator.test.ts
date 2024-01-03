@@ -1,7 +1,11 @@
-import { AuthError } from "@aws-amplify/auth"
 import { EmailAddress, USPhoneNumber } from ".."
 import { CognitoSignInAuthenticator } from "./Authenticator"
 import { testAuthErrorWithCode } from "@test-helpers/Cognito"
+
+const CONFIRM_SMS_SIGN_IN_RESULT = {
+  isSignedIn: false,
+  nextStep: { signInStep: "CONFIRM_SIGN_IN_WITH_SMS_CODE" }
+}
 
 describe("CognitoSignInAuthenticator tests", () => {
   beforeEach(() => jest.resetAllMocks())
@@ -9,32 +13,36 @@ describe("CognitoSignInAuthenticator tests", () => {
   const TEST_PASSWORD = "12345678"
   const cognito = {
     signIn: jest.fn(),
-    resendSignUp: jest.fn(),
+    resendSignUpCode: jest.fn(),
     confirmSignIn: jest.fn()
   }
   const authenticator = new CognitoSignInAuthenticator(cognito)
 
   describe("SignIn tests", () => {
     test("successful sign in with email returns success", async () => {
-      cognito.signIn.mockReturnValueOnce(Promise.resolve())
+      cognito.signIn.mockResolvedValueOnce({ isSignedIn: true })
       const result = await authenticator.signIn(
         EmailAddress.peacock69,
         TEST_PASSWORD
       )
       expect(result).toEqual("success")
-      expect(cognito.signIn).toHaveBeenCalledWith(
-        EmailAddress.peacock69.toString(),
-        TEST_PASSWORD
-      )
+      expect(cognito.signIn).toHaveBeenCalledWith({
+        username: EmailAddress.peacock69.toString(),
+        password: TEST_PASSWORD
+      })
     })
 
     test("successful sign in with phone number returns success", async () => {
-      cognito.signIn.mockReturnValueOnce(Promise.resolve({}))
+      cognito.signIn.mockResolvedValueOnce({ isSignedIn: true })
       const result = await authenticator.signIn(
         USPhoneNumber.mock,
         TEST_PASSWORD
       )
       expect(result).toEqual("success")
+      expect(cognito.signIn).toHaveBeenCalledWith({
+        username: USPhoneNumber.mock.toString(),
+        password: TEST_PASSWORD
+      })
     })
 
     test("UserNotFoundException returns incorrect-credentials", async () => {
@@ -60,7 +68,7 @@ describe("CognitoSignInAuthenticator tests", () => {
     })
 
     test("SMS_MFA challenge on Phone auth returns sign-in-verification-required", async () => {
-      cognito.signIn.mockResolvedValueOnce({ challengeName: "SMS_MFA" })
+      cognito.signIn.mockResolvedValueOnce(CONFIRM_SMS_SIGN_IN_RESULT)
       const result = await authenticator.signIn(
         USPhoneNumber.mock,
         TEST_PASSWORD
@@ -82,37 +90,32 @@ describe("CognitoSignInAuthenticator tests", () => {
 
   describe("ResendSignInVerificationCode tests", () => {
     test("resent verification code after sign in verifcation required", async () => {
-      cognito.signIn.mockResolvedValue({ challengeName: "SMS_MFA" })
+      cognito.signIn.mockResolvedValue(CONFIRM_SMS_SIGN_IN_RESULT)
       await authenticator.signIn(EmailAddress.peacock69, TEST_PASSWORD)
 
       await authenticator.resendSignInVerificationCode()
-      expect(cognito.signIn).toHaveBeenNthCalledWith(
-        2,
-        EmailAddress.peacock69.toString(),
-        TEST_PASSWORD
-      )
+      expect(cognito.signIn).toHaveBeenNthCalledWith(2, {
+        username: EmailAddress.peacock69.toString(),
+        password: TEST_PASSWORD
+      })
     })
   })
 
   describe("VerifySignIn tests", () => {
     test("success when entered credentials are correct", async () => {
-      const signedInUser = { challengeName: "SMS_MFA" }
-      cognito.signIn.mockResolvedValueOnce(signedInUser)
+      cognito.signIn.mockResolvedValueOnce(CONFIRM_SMS_SIGN_IN_RESULT)
       await authenticator.signIn(EmailAddress.peacock69, TEST_PASSWORD)
 
-      cognito.confirmSignIn.mockResolvedValueOnce({})
+      cognito.confirmSignIn.mockResolvedValueOnce({ isSignedIn: true })
       const result = await authenticator.verifySignIn("123456")
       expect(result).toEqual("success")
-      expect(cognito.confirmSignIn).toHaveBeenCalledWith(
-        signedInUser,
-        "123456",
-        "SMS_MFA"
-      )
+      expect(cognito.confirmSignIn).toHaveBeenCalledWith({
+        challengeResponse: "123456"
+      })
     })
 
     test("invalid-verification-code when CodeMismatchException throws", async () => {
-      const signedInUser = { challengeName: "SMS_MFA" }
-      cognito.signIn.mockResolvedValueOnce(signedInUser)
+      cognito.signIn.mockResolvedValueOnce(CONFIRM_SMS_SIGN_IN_RESULT)
       await authenticator.signIn(EmailAddress.peacock69, TEST_PASSWORD)
 
       cognito.confirmSignIn.mockRejectedValueOnce(
@@ -120,32 +123,24 @@ describe("CognitoSignInAuthenticator tests", () => {
       )
       const result = await authenticator.verifySignIn("123456")
       expect(result).toEqual("invalid-verification-code")
-      expect(cognito.confirmSignIn).toHaveBeenCalledWith(
-        signedInUser,
-        "123456",
-        "SMS_MFA"
-      )
+      expect(cognito.confirmSignIn).toHaveBeenCalledWith({
+        challengeResponse: "123456"
+      })
     })
 
     test("sign in, resend sign in verification code, verify sign in, uses up-to-date cognito user", async () => {
-      const upToDateCognitoUser = {
-        challengeName: "SMS_MFA",
-        attribute: "thing"
-      }
       cognito.signIn
-        .mockResolvedValueOnce({ challengeName: "SMS_MFA" })
-        .mockResolvedValueOnce(upToDateCognitoUser)
+        .mockResolvedValueOnce(CONFIRM_SMS_SIGN_IN_RESULT)
+        .mockResolvedValueOnce({ isSignedIn: true })
       await authenticator.signIn(EmailAddress.peacock69, TEST_PASSWORD)
 
       await authenticator.resendSignInVerificationCode()
 
-      cognito.confirmSignIn.mockReturnValueOnce(Promise.resolve({}))
+      cognito.confirmSignIn.mockResolvedValueOnce({ isSignedIn: true })
       await authenticator.verifySignIn("123456")
-      expect(cognito.confirmSignIn).toHaveBeenCalledWith(
-        upToDateCognitoUser,
-        "123456",
-        "SMS_MFA"
-      )
+      expect(cognito.confirmSignIn).toHaveBeenCalledWith({
+        challengeResponse: "123456"
+      })
     })
   })
 })
