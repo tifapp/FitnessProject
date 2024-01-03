@@ -39,54 +39,61 @@ const STORE_CHUNK_SIZE = 2048
  */
 export class CognitoSecureStorage implements KeyValueStorageInterface {
   private store: SecureStore
-  private keyChunkMappings = new Map<string, number>()
+  private keyChunkMappings?: Map<string, number>
   private keyChunkMappingsPromise?: Promise<Map<string, number>>
 
   constructor (store: SecureStore) {
     this.store = store
     this.keyChunkMappingsPromise = undefined
+    this.keyChunkMappings = undefined
   }
 
   async removeItem (key: string) {
     const keyChunkMappings = await this.loadKeyChunkMappings()
-    if (keyChunkMappings) {
-      const amountOfChunks = keyChunkMappings.get(key) ?? 0
-      await Promise.allSettled(
-        ArrayUtils.repeatElements(amountOfChunks, async (chunkIndex) => {
-          await this.store.deleteItemAsync(this.secureStoreKey(key, chunkIndex))
-        })
-      )
-      keyChunkMappings.delete(key)
-    }
+    const amountOfChunks = keyChunkMappings.get(key) ?? 0
+    await Promise.allSettled(
+      ArrayUtils.repeatElements(amountOfChunks, async (chunkIndex) => {
+        await this.store.deleteItemAsync(this.secureStoreKey(key, chunkIndex))
+      })
+    )
+    keyChunkMappings.delete(key)
     this.keyChunkMappings = keyChunkMappings
     await this.saveKeyChunkMappings()
   }
 
   async setItem (key: string, value: string) {
     const keyChunkMappings = await this.loadKeyChunkMappings()
-    if (keyChunkMappings) {
-      const chunks = this.stringToChunks(value)
-      for (let i = 0; i < chunks.length; i++) {
-        const chunkKey = this.secureStoreKey(key, i)
-        await this.store.setItemAsync(chunkKey, chunks[i])
-      }
-      keyChunkMappings.set(key, chunks.length)
-      this.keyChunkMappings = keyChunkMappings
-      await this.saveKeyChunkMappings()
-    }
+    const chunks = this.stringToChunks(value)
+    await Promise.allSettled(
+      ArrayUtils.repeatElements(chunks.length, async (chunkIndex) => {
+        return await this.store.setItemAsync(
+          this.secureStoreKey(key, chunkIndex),
+          chunks[chunkIndex]
+        )
+      })
+    )
+    keyChunkMappings.set(key, chunks.length)
+    this.keyChunkMappings = keyChunkMappings
+    await this.saveKeyChunkMappings()
   }
 
   async getItem (key: string) {
     const keyChunkMappings = await this.loadKeyChunkMappings()
     if (keyChunkMappings.size > 0) {
       const amountOfChunks = keyChunkMappings.get(key) ?? 0
-      const chunks = [] as string[]
-      for (let i = 0; i < amountOfChunks; i++) {
-        const chunk = await this.store.getItemAsync(this.secureStoreKey(key, i))
-        if (chunk) {
-          chunks.push(chunk)
-        }
-      }
+      const results = await Promise.allSettled(
+        ArrayUtils.repeatElements(amountOfChunks, async (chunkIndex) => {
+          return await this.store.getItemAsync(
+            this.secureStoreKey(key, chunkIndex)
+          )
+        })
+      )
+      const chunks = results
+        .filter(
+          (result) =>
+            result.status === "fulfilled" && result.value !== undefined
+        )
+        .map((result) => (result as { value?: string }).value)
       if (chunks.length === 0) {
         return null
       }
@@ -109,11 +116,14 @@ export class CognitoSecureStorage implements KeyValueStorageInterface {
         )
       })
     )
-    this.keyChunkMappings.clear()
+    this.keyChunkMappings = undefined
     await this.saveKeyChunkMappings()
   }
 
   private async loadKeyChunkMappings () {
+    if (this.keyChunkMappings) {
+      return this.keyChunkMappings
+    }
     if (this.keyChunkMappingsPromise) {
       return await this.keyChunkMappingsPromise
     }
@@ -137,11 +147,16 @@ export class CognitoSecureStorage implements KeyValueStorageInterface {
         KEY_CHUNK_MAPPINGS_KEY,
         JSON.stringify(Array.from(this.keyChunkMappings))
       )
+    } else {
+      await this.store.setItemAsync(
+        KEY_CHUNK_MAPPINGS_KEY,
+        JSON.stringify(Array.from(new Map<string, number>()))
+      )
+      this.keyChunkMappingsPromise = undefined
     }
-    this.keyChunkMappingsPromise = undefined
   }
 
-  stringToChunks = (data: string) => {
+  private stringToChunks = (data: string) => {
     const numChunks = Math.ceil(data.length / STORE_CHUNK_SIZE)
     const chunks = [] as string[]
     for (let i = 0; i < numChunks; i++) {
@@ -150,7 +165,7 @@ export class CognitoSecureStorage implements KeyValueStorageInterface {
     return chunks
   }
 
-  secureStoreKey = (name: string, chunkIndex: number) => {
+  private secureStoreKey = (name: string, chunkIndex: number) => {
     const key = SECURE_STORAGE_KEY_PREFIX + name + `___chunk${chunkIndex}`
     return key
   }

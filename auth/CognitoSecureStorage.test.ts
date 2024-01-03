@@ -65,7 +65,7 @@ describe("CognitoSecureStorage tests", () => {
 
   it("should only read CognitoSecureStorage values", async () => {
     await sharedStorage.setItemAsync(
-      "secureStorageTestStorageKey2___chunk0",
+      "secureStorageTestStorage___chunk0",
       "Cool"
     )
 
@@ -74,5 +74,23 @@ describe("CognitoSecureStorage tests", () => {
       "Test Value"
     )
     expect(await testStorage1.getItem(TEST_STORAGE_KEY + "2")).toBeNull()
+  })
+
+  it("should load in items in both storages after a sets from testStorage1 and testStorage2, and a remove from testStorage2", async () => {
+    const data = "a".repeat(6000)
+    await testStorage1.setItem(TEST_STORAGE_KEY, data)
+
+    expect(await testStorage1.getItem(TEST_STORAGE_KEY)).toEqual(data)
+    expect(await testStorage2.getItem(TEST_STORAGE_KEY)).toEqual(data)
+
+    await testStorage2.setItem(TEST_STORAGE_KEY + "1", data)
+
+    expect(await testStorage2.getItem(TEST_STORAGE_KEY + "1")).toEqual(data)
+    expect(await testStorage1.getItem(TEST_STORAGE_KEY + "1")).toEqual(data)
+
+    await testStorage2.removeItem(TEST_STORAGE_KEY)
+
+    expect(await testStorage2.getItem(TEST_STORAGE_KEY + "1")).toBeNull()
+    expect(await testStorage1.getItem(TEST_STORAGE_KEY + "1")).toBeNull()
   })
 })
