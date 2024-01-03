@@ -1,4 +1,4 @@
-import { LocationCoordinate2D } from "@location/Location"
+import { LocationCoordinate2D } from "@shared-models/Location"
 import { mockLocationCoordinate2D } from "@location/MockData"
 import {
   TestQueryClientProvider,

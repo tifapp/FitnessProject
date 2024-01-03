@@ -1,4 +1,4 @@
-import { TiFLocation } from "../Location"
+import { TiFLocation } from "@shared-models/Location"
 import { RecentLocationAnnotation } from "./RecentsStorage"
 
 /**

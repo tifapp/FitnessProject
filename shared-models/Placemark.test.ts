@@ -1,5 +1,8 @@
 import { placemarkToFormattedAddress } from "@location/index"
-import { baseTestPlacemark, unknownLocationPlacemark } from "./MockData"
+import {
+  baseTestPlacemark,
+  unknownLocationPlacemark
+} from "../location/MockData"
 
 describe("Placemark tests", () => {
   describe("PlacemarkFormatting tests", () => {
