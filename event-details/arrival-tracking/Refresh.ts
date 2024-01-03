@@ -2,8 +2,8 @@ import { AsyncStorageUtils } from "@lib/utils/AsyncStorage"
 import { StringDateSchema, addSecondsToDate, diffDates, now } from "@date-time"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { AppState } from "react-native"
-import { EventArrival } from "./Models"
 import { EventArrivalsTracker } from "./Tracker"
+import { TiFAPI } from "@api-client/TiFAPI"
 
 /**
  * A class that manages the storage of the last event arrivals refresh date.
@@ -62,13 +62,16 @@ export class EventArrivalsRefresher {
 
   static usingTracker (
     tracker: EventArrivalsTracker,
-    fetchUpcomingArrivals: () => Promise<EventArrival[]>,
+    tifAPI: TiFAPI,
     lastRefreshDate: EventArrivalsLastRefreshDate,
     minutesBetweenNeededRefreshes: number
   ) {
     return new EventArrivalsRefresher(
       async () => {
-        await tracker.refreshArrivals(fetchUpcomingArrivals)
+        await tracker.refreshArrivals(async () => {
+          const resp = await tifAPI.upcomingEventArrivalRegions()
+          return resp.data.upcomingRegions
+        })
       },
       lastRefreshDate,
       minutesBetweenNeededRefreshes
