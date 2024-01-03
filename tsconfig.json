@@ -40,6 +40,7 @@
       "@content-reporting": ["./content-reporting"],
       "@date-time": ["./date-time"],
       "@test-helpers/*": ["./test-helpers/*"],
+      "@shared-models/*": ["./shared-models/*"],
       "env": ["./.env"]
     }
   },
