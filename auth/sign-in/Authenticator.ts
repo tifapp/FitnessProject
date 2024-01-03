@@ -1,5 +1,5 @@
 import { isCognitoErrorWithCode } from "@auth/CognitoHelpers"
-import { Auth } from "@aws-amplify/auth"
+import { signIn, confirmSignIn, resendSignUpCode } from "@aws-amplify/auth"
 import { CognitoUser } from "amazon-cognito-identity-js"
 import { EmailAddress, USPhoneNumber } from ".."
 
@@ -39,10 +39,11 @@ export interface SignInAuthenticator {
   verifySignIn(verificationCode: string): Promise<VerifySignInResult>
 }
 
-export type CognitoSignInFunctions = Pick<
-  typeof Auth,
-  "confirmSignIn" | "signIn" | "resendSignUp"
->
+export type CognitoSignInFunctions = {
+  signIn: typeof signIn
+  confirmSignIn: typeof confirmSignIn
+  resendSignUpCode: typeof resendSignUpCode
+}
 
 /**
  * An {@link SignInAuthenticator} implemented with Cognito.
@@ -56,7 +57,7 @@ export class CognitoSignInAuthenticator implements SignInAuthenticator {
     uncheckedPassword: string
   }
 
-  constructor (cognito: CognitoSignInFunctions = Auth) {
+  constructor (cognito: CognitoSignInFunctions) {
     this.cognito = cognito
   }
 
