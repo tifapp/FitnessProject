@@ -1,5 +1,4 @@
-import { Auth } from "@aws-amplify/auth"
-import { Hub } from "@aws-amplify/core"
+import { confirmSignUp, autoSignIn } from "@aws-amplify/auth"
 
 /**
  * Confirms a sign-up and waits for auto-sign-in.
@@ -9,16 +8,8 @@ import { Hub } from "@aws-amplify/core"
  */
 export const cognitoConfirmSignUpWithAutoSignIn = async (
   username: string,
-  code: string
+  confirmationCode: string
 ) => {
-  const result = await Auth.confirmSignUp(username, code)
-  return await new Promise<typeof result>((resolve, reject) => {
-    Hub.listen("auth", ({ payload }) => {
-      if (payload.event === "autoSignIn") {
-        resolve(result)
-      } else if (payload.event === "autoSignIn_failure") {
-        reject(new Error("Auto Sign in Failed"))
-      }
-    })
-  })
+  await confirmSignUp({ username, confirmationCode })
+  await autoSignIn()
 }

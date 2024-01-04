@@ -1,24 +1,26 @@
-import { Auth } from "@aws-amplify/auth"
+import { signUp, resendSignUpCode } from "@aws-amplify/auth"
 import { EmailAddress, Password, USPhoneNumber } from ".."
 import { TiFAPI } from "@api-client/TiFAPI"
 import { isCognitoErrorWithCode } from "@auth/CognitoHelpers"
 import { UserHandle } from "@content-parsing"
+import { cognitoConfirmSignUpWithAutoSignIn } from "./CognitoHelpers"
 
 export type CreateAccountResult =
   | "success"
   | "phone-number-already-exists"
   | "email-already-exists"
 
+export type CognitoSignUpFunctions = {
+  signUp: typeof signUp
+  resendSignUpCode: typeof resendSignUpCode
+  confirmSignUpWithAutoSignIn: typeof cognitoConfirmSignUpWithAutoSignIn
+}
+
 /**
  * Creates the functions needed for the sign-up flow.
  */
 export const createSignUpEnvironment = (
-  cognito: Pick<typeof Auth, "signUp" | "resendSignUp"> & {
-    confirmSignUpWithAutoSignIn: (
-      username: string,
-      code: string
-    ) => Promise<any>
-  },
+  cognito: CognitoSignUpFunctions,
   tifAPI: TiFAPI
 ) => ({
   /**
@@ -37,14 +39,14 @@ export const createSignUpEnvironment = (
       const attributes = { name } as Record<string, string>
       // NB: If we have a phone number, then cognito throws an error if we have the email key and vice versa.
       const verificationAttributeKey =
-        emailOrPhoneNumber instanceof USPhoneNumber ? "phoneNumber" : "email"
+        emailOrPhoneNumber instanceof USPhoneNumber ? "phone_number" : "email"
       attributes[verificationAttributeKey] = emailOrPhoneNumber.toString()
       await cognito.signUp({
         username: emailOrPhoneNumber.toString(),
         password: password.rawValue,
-        attributes,
-        autoSignIn: {
-          enabled: true
+        options: {
+          userAttributes: attributes,
+          autoSignIn: true
         }
       })
       return "success"
@@ -63,7 +65,7 @@ export const createSignUpEnvironment = (
   resendVerificationCode: async (
     emailOrPhoneNumber: EmailAddress | USPhoneNumber
   ) => {
-    await cognito.resendSignUp(emailOrPhoneNumber.toString())
+    await cognito.resendSignUpCode({ username: emailOrPhoneNumber.toString() })
   },
   /**
    * Returns true if another user is using the given user handle.

@@ -1,5 +1,3 @@
-import { TiFAPI, createTiFAPIFetch } from "@api-client"
-import { uuidString } from "@lib/utils/UUID"
 import {
   NavigationContainer,
   NavigatorScreenParams,
@@ -13,63 +11,38 @@ import {
   screen,
   waitFor
 } from "@testing-library/react-native"
-import { rest } from "msw"
 import { useCallback, useState } from "react"
 import { Button, View } from "react-native"
 import { captureAlerts } from "@test-helpers/Alerts"
 import "@test-helpers/Matchers"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { mswServer } from "@test-helpers/msw"
-import { createSignUpEnvironment } from "./Environment"
 import { SignUpParamsList, createSignUpScreens } from "./Navigation"
 import { fakeTimers } from "@test-helpers/Timers"
 import { UserHandle } from "@content-parsing"
+import { USPhoneNumber } from ".."
 
 type TestSignUpParamsList = {
   test: undefined
   signUp: NavigatorScreenParams<SignUpParamsList>
 }
 
-const TEST_GENERATED_USER_HANDLE = UserHandle.parse("bitchelldic12").handle!
+const TEST_GENERATED_USER_HANDLE = UserHandle.optionalParse("bitchelldic12")!
 
 describe("SignUpNavigation tests", () => {
-  const cognito = {
-    signUp: jest.fn(),
-    resendSignUp: jest.fn(),
-    confirmSignUpWithAutoSignIn: jest.fn()
+  const env = {
+    createAccount: jest.fn(),
+    resendVerificationCode: jest.fn(),
+    checkIfUserHandleTaken: jest.fn(),
+    changeUserHandle: jest.fn(),
+    finishRegisteringAccount: jest.fn()
   }
-  const env = createSignUpEnvironment(
-    cognito,
-    new TiFAPI(
-      createTiFAPIFetch(
-        new URL("https://localhost:8080"),
-        async () => "I am a jwt"
-      )
-    )
-  )
 
   afterEach(() => act(jest.runAllTimers))
   fakeTimers()
 
   beforeEach(() => {
     jest.resetAllMocks()
-    mswServer.use(
-      rest.post("https://localhost:8080/user", async (_, res, ctx) => {
-        return res(
-          ctx.status(201),
-          ctx.json({
-            id: uuidString(),
-            handle: TEST_GENERATED_USER_HANDLE.rawValue
-          })
-        )
-      }),
-      rest.get(
-        "https://localhost:8080/user/autocomplete",
-        async (_, res, ctx) => {
-          return res(ctx.status(200), ctx.json({ users: [] }))
-        }
-      )
-    )
+    env.checkIfUserHandleTaken.mockResolvedValue(false)
   })
 
   test("a full valid sign-up flow", async () => {
@@ -81,67 +54,63 @@ describe("SignUpNavigation tests", () => {
     enterPhoneNumberText("1234567890")
     enterPassword("Abc123{}op")
 
-    cognito.signUp.mockReturnValue(Promise.resolve({}))
+    env.createAccount.mockResolvedValueOnce("success")
     submitCredentials()
 
     await waitFor(() => expect(verifyCodeForm()).toBeDisplayed())
     expect(credentialsForm()).not.toBeDisplayed()
 
-    enterVerificationCode("123456")
-    cognito.confirmSignUpWithAutoSignIn.mockReturnValue(
-      Promise.resolve("SUCCESS")
+    const verificationCode = "123456"
+    enterVerificationCode(verificationCode)
+    env.finishRegisteringAccount.mockResolvedValueOnce(
+      TEST_GENERATED_USER_HANDLE
     )
     submitVerificationCode()
 
     await waitFor(() => expect(changeUserHandleForm()).toBeDisplayed())
-    expect(cognito.confirmSignUpWithAutoSignIn).toHaveBeenCalledWith(
-      "+11234567890",
-      "123456"
+    expect(env.finishRegisteringAccount).toHaveBeenCalledWith(
+      USPhoneNumber.mock,
+      verificationCode
     )
     expect(verifyCodeForm()).not.toBeDisplayed()
 
-    const newHandleText = "bitchelldickle"
-
+    const newHandleText = UserHandle.bitchellDickle.rawValue
     replaceUserHandleText(TEST_GENERATED_USER_HANDLE.rawValue, newHandleText)
-    mswServer.use(
-      rest.patch("https://localhost:8080/user/self", async (req, res, ctx) => {
-        const body = await req.json()
-        if (body.handle !== newHandleText) {
-          return res(ctx.status(500))
-        }
-        return res(ctx.status(204))
-      })
-    )
     submitNewUserHandle()
 
     await waitFor(() => expect(endingView()).toBeDisplayed())
+    expect(env.changeUserHandle).toHaveBeenCalledWith(UserHandle.bitchellDickle)
     endSignUpTest()
 
     expect(isAtEnd()).toEqual(true)
   })
 
   test("get to end of sign-up flow, go back to change username again, finish sign-up flow", async () => {
-    mswServer.use(
-      rest.patch("https://localhost:8080/user/self", async (_, res, ctx) => {
-        return res(ctx.status(204))
-      })
-    )
-
     renderSignUpFlow()
 
     startSignUpTestAtUserHandleStage(TEST_GENERATED_USER_HANDLE)
 
-    replaceUserHandleText(TEST_GENERATED_USER_HANDLE.rawValue, "bitchelldickle")
+    replaceUserHandleText(
+      TEST_GENERATED_USER_HANDLE.rawValue,
+      UserHandle.bitchellDickle.rawValue
+    )
     submitNewUserHandle()
 
     await waitFor(() => expect(endingView()).toBeDisplayed())
+    expect(env.changeUserHandle).toHaveBeenCalledWith(UserHandle.bitchellDickle)
     goBack()
     expect(endingView()).not.toBeDisplayed()
 
-    replaceUserHandleText("bitchelldickle", "bic")
+    replaceUserHandleText(
+      UserHandle.bitchellDickle.rawValue,
+      TEST_GENERATED_USER_HANDLE.rawValue
+    )
     submitNewUserHandle()
 
     await waitFor(() => expect(endingView()).toBeDisplayed())
+    expect(env.changeUserHandle).toHaveBeenCalledWith(
+      TEST_GENERATED_USER_HANDLE
+    )
 
     endSignUpTest()
 
