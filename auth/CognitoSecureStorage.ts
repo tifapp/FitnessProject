@@ -1,34 +1,7 @@
 import { KeyValueStorageInterface } from "@aws-amplify/core"
+import { SecureStore } from "@lib/SecureStore"
 import { ArrayUtils } from "@lib/utils/Array"
 import "@lib/utils/Promise"
-import * as ExpoSecureStore from "expo-secure-store"
-
-/**
- * An interface for expo secure storage functions.
- */
-export type SecureStore = Pick<
-  typeof ExpoSecureStore,
-  "getItemAsync" | "setItemAsync" | "deleteItemAsync"
->
-
-/**
- * An in memory secure storage useful for testing and storybook.
- */
-export class InMemorySecureStore implements SecureStore {
-  private readonly map = new Map<string, string>()
-
-  async setItemAsync (key: string, value: string) {
-    this.map.set(key, value)
-  }
-
-  async getItemAsync (key: string) {
-    return this.map.get(key) ?? null
-  }
-
-  async deleteItemAsync (key: string) {
-    this.map.delete(key)
-  }
-}
 
 const SECURE_STORAGE_KEY_PREFIX = "secureStorage"
 const KEY_CHUNK_MAPPINGS_KEY = SECURE_STORAGE_KEY_PREFIX + "KeyList"
@@ -58,7 +31,7 @@ export class CognitoSecureStorage implements KeyValueStorageInterface {
     )
     keyChunkMappings.delete(key)
     this.keyChunkMappings = keyChunkMappings
-    await this.saveKeyChunkMappings()
+    await this.saveKeyChunkMappings(keyChunkMappings)
   }
 
   async setItem (key: string, value: string) {
@@ -73,34 +46,25 @@ export class CognitoSecureStorage implements KeyValueStorageInterface {
       })
     )
     keyChunkMappings.set(key, chunks.length)
-    this.keyChunkMappings = keyChunkMappings
-    await this.saveKeyChunkMappings()
+    await this.saveKeyChunkMappings(keyChunkMappings)
   }
 
   async getItem (key: string) {
     const keyChunkMappings = await this.loadKeyChunkMappings()
-    if (keyChunkMappings.size > 0) {
-      const amountOfChunks = keyChunkMappings.get(key) ?? 0
-      const results = await Promise.allSettled(
-        ArrayUtils.repeatElements(amountOfChunks, async (chunkIndex) => {
-          return await this.store.getItemAsync(
-            this.secureStoreKey(key, chunkIndex)
-          )
-        })
-      )
-      const chunks = results
-        .filter(
-          (result) =>
-            result.status === "fulfilled" && result.value !== undefined
+    if (keyChunkMappings.size === 0) return null
+    const amountOfChunks = keyChunkMappings.get(key) ?? 0
+    const results = await Promise.allSettled(
+      ArrayUtils.repeatElements(amountOfChunks, async (chunkIndex) => {
+        return await this.store.getItemAsync(
+          this.secureStoreKey(key, chunkIndex)
         )
-        .map((result) => (result as { value?: string }).value)
-      if (chunks.length === 0) {
-        return null
-      }
-      return chunks.join("")
-    } else {
-      return null
-    }
+      })
+    )
+
+    const chunks = ArrayUtils.compactMap(results, (result) => {
+      return result.status !== "fulfilled" ? null : result.value
+    })
+    return chunks.length === 0 ? null : chunks.join("")
   }
 
   async clear () {
@@ -116,8 +80,8 @@ export class CognitoSecureStorage implements KeyValueStorageInterface {
         )
       })
     )
-    this.keyChunkMappings = undefined
-    await this.saveKeyChunkMappings()
+
+    await this.saveKeyChunkMappings(new Map())
   }
 
   private async loadKeyChunkMappings () {
@@ -130,6 +94,8 @@ export class CognitoSecureStorage implements KeyValueStorageInterface {
     const loadPromise = this.store
       .getItemAsync(KEY_CHUNK_MAPPINGS_KEY)
       .then((jsonMap) => {
+        this.keyChunkMappingsPromise = undefined
+
         if (!jsonMap) {
           this.keyChunkMappings = new Map<string, number>()
           return this.keyChunkMappings
@@ -141,19 +107,12 @@ export class CognitoSecureStorage implements KeyValueStorageInterface {
     return await loadPromise
   }
 
-  private async saveKeyChunkMappings () {
-    if (this.keyChunkMappings) {
-      await this.store.setItemAsync(
-        KEY_CHUNK_MAPPINGS_KEY,
-        JSON.stringify(Array.from(this.keyChunkMappings))
-      )
-    } else {
-      await this.store.setItemAsync(
-        KEY_CHUNK_MAPPINGS_KEY,
-        JSON.stringify(Array.from(new Map<string, number>()))
-      )
-      this.keyChunkMappingsPromise = undefined
-    }
+  private async saveKeyChunkMappings (mappings: Map<string, number>) {
+    this.keyChunkMappings = mappings
+    await this.store.setItemAsync(
+      KEY_CHUNK_MAPPINGS_KEY,
+      JSON.stringify(Array.from(this.keyChunkMappings))
+    )
   }
 
   private stringToChunks = (data: string) => {
