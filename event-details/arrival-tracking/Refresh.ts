@@ -6,39 +6,6 @@ import { EventArrivalsTracker } from "./Tracker"
 import { TiFAPI } from "@api-client/TiFAPI"
 
 /**
- * A class that manages the storage of the last event arrivals refresh date.
- */
-export class EventArrivalsLastRefreshDate {
-  private static LAST_REFRESH_KEY = "@event-arrivals-last-refresh"
-  private cachedRefreshDate?: Date
-
-  /**
-   * Returns the current last refresh date.
-   */
-  async date () {
-    if (this.cachedRefreshDate) return this.cachedRefreshDate
-    const lastDate = await AsyncStorageUtils.parseJSONItem(
-      StringDateSchema,
-      EventArrivalsLastRefreshDate.LAST_REFRESH_KEY
-    )
-    this.cachedRefreshDate = lastDate
-    return lastDate
-  }
-
-  /**
-   * Marks the new last refresh date as the current date.
-   */
-  async markNewRefreshDate () {
-    const lastDate = new Date()
-    this.cachedRefreshDate = lastDate
-    await AsyncStorage.setItem(
-      EventArrivalsLastRefreshDate.LAST_REFRESH_KEY,
-      JSON.stringify(lastDate)
-    )
-  }
-}
-
-/**
  * A class that manages refreshing of upcoming event arrivals.
  */
 export class EventArrivalsRefresher {
@@ -112,6 +79,39 @@ export class EventArrivalsRefresher {
     const lastDate = await this.lastRefreshDate.date()
     if (!lastDate) return new Date()
     return addSecondsToDate(lastDate, this.secondsNeededBetweenRefreshes)
+  }
+}
+
+/**
+ * A class that manages the storage of the last event arrivals refresh date.
+ */
+export class EventArrivalsLastRefreshDate {
+  private static LAST_REFRESH_KEY = "@event-arrivals-last-refresh"
+  private cachedRefreshDate?: Date
+
+  /**
+   * Returns the current last refresh date.
+   */
+  async date () {
+    if (this.cachedRefreshDate) return this.cachedRefreshDate
+    const lastDate = await AsyncStorageUtils.parseJSONItem(
+      StringDateSchema,
+      EventArrivalsLastRefreshDate.LAST_REFRESH_KEY
+    )
+    this.cachedRefreshDate = lastDate
+    return lastDate
+  }
+
+  /**
+   * Marks the new last refresh date as the current date.
+   */
+  async markNewRefreshDate () {
+    const lastDate = new Date()
+    this.cachedRefreshDate = lastDate
+    await AsyncStorage.setItem(
+      EventArrivalsLastRefreshDate.LAST_REFRESH_KEY,
+      JSON.stringify(lastDate)
+    )
   }
 }
 
