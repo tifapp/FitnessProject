@@ -1,7 +1,7 @@
-import { TestCognitoError } from "@auth/CognitoHelpers"
+import { testAuthErrorWithCode } from "@test-helpers/Cognito"
+import { fakeTimers } from "@test-helpers/Timers"
 import { act } from "react-test-renderer"
 import { EmailAddress, Password, USPhoneNumber } from ".."
-import { fakeTimers } from "@test-helpers/Timers"
 import { createForgotPasswordEnvironment } from "./Environment"
 
 describe("ForgotPasswordEnvironment tests", () => {
@@ -9,14 +9,14 @@ describe("ForgotPasswordEnvironment tests", () => {
   fakeTimers()
   beforeEach(() => jest.resetAllMocks())
   const cognito = {
-    forgotPassword: jest.fn(),
-    forgotPasswordSubmit: jest.fn()
+    resetPassword: jest.fn(),
+    confirmResetPassword: jest.fn()
   }
   const env = createForgotPasswordEnvironment(cognito)
   test("initiateForgotPassword returns invalid-email when email entered with UserNotFoundException", async () => {
     // Test screen to get into actual flow
-    cognito.forgotPassword.mockRejectedValueOnce(
-      new TestCognitoError("UserNotFoundException")
+    cognito.resetPassword.mockRejectedValueOnce(
+      testAuthErrorWithCode("UserNotFoundException")
     )
     const testEmail = "ilikepie1464@gmail.co"
 
@@ -24,14 +24,16 @@ describe("ForgotPasswordEnvironment tests", () => {
       EmailAddress.parse(testEmail)!
     )
 
-    expect(cognito.forgotPassword).toHaveBeenCalledWith("ilikepie1464@gmail.co")
+    expect(cognito.resetPassword).toHaveBeenCalledWith({
+      username: "ilikepie1464@gmail.co"
+    })
 
     expect(result).toEqual("invalid-email")
   })
 
   test("initiateForgotPassword returns invalid-phone-number when phone number entered with UserNotFoundException", async () => {
-    cognito.forgotPassword.mockRejectedValueOnce(
-      new TestCognitoError("UserNotFoundException")
+    cognito.resetPassword.mockRejectedValueOnce(
+      testAuthErrorWithCode("UserNotFoundException")
     )
     const result = await env.initiateForgotPassword(USPhoneNumber.mock)
     expect(result).toEqual("invalid-phone-number")
@@ -40,16 +42,16 @@ describe("ForgotPasswordEnvironment tests", () => {
   test("Forgot Password correctly handles an successful flow", async () => {
     const result = await env.initiateForgotPassword(EmailAddress.peacock69)
 
-    expect(cognito.forgotPassword).toHaveBeenCalledWith(
-      EmailAddress.peacock69.toString()
-    )
+    expect(cognito.resetPassword).toHaveBeenCalledWith({
+      username: EmailAddress.peacock69.toString()
+    })
 
     expect(result).toEqual("success")
   })
 
   test("Forgot Password Submit correctly handles an error", async () => {
-    cognito.forgotPasswordSubmit.mockRejectedValueOnce(
-      new TestCognitoError("CodeMismatchException")
+    cognito.confirmResetPassword.mockRejectedValueOnce(
+      testAuthErrorWithCode("CodeMismatchException")
     )
     const testCode = "123134"
     const testPassword = "fafasfass#$#fafas"
@@ -60,11 +62,11 @@ describe("ForgotPasswordEnvironment tests", () => {
       Password.validate(testPassword)!
     )
 
-    expect(cognito.forgotPasswordSubmit).toHaveBeenCalledWith(
-      EmailAddress.peacock69.toString(),
-      testCode,
-      testPassword
-    )
+    expect(cognito.confirmResetPassword).toHaveBeenCalledWith({
+      username: EmailAddress.peacock69.toString(),
+      confirmationCode: testCode,
+      newPassword: testPassword
+    })
 
     expect(result).toEqual("invalid-verification-code")
   })
@@ -79,11 +81,11 @@ describe("ForgotPasswordEnvironment tests", () => {
       Password.validate(testPassword)!
     )
 
-    expect(cognito.forgotPasswordSubmit).toHaveBeenCalledWith(
-      EmailAddress.peacock69.toString(),
-      testCode,
-      testPassword
-    )
+    expect(cognito.confirmResetPassword).toHaveBeenCalledWith({
+      username: EmailAddress.peacock69.toString(),
+      confirmationCode: testCode,
+      newPassword: testPassword
+    })
 
     expect(result).toEqual("valid")
   })

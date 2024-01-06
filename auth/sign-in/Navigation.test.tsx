@@ -1,10 +1,11 @@
-import { TestCognitoError } from "@auth/CognitoHelpers"
 import {
   NavigationContainer,
   NavigatorScreenParams,
   useFocusEffect
 } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
+import "@test-helpers/Matchers"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import {
   act,
   fireEvent,
@@ -15,9 +16,6 @@ import {
 import { useCallback, useState } from "react"
 import { Button, View } from "react-native"
 import { USPhoneNumber } from ".."
-import "@test-helpers/Matchers"
-import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { CognitoSignInAuthenticator } from "./Authenticator"
 import { SignInParamsList, createSignInScreens } from "./Navigation"
 
 type TestParamsList = {
@@ -27,12 +25,11 @@ type TestParamsList = {
 
 describe("SignInNavigation tests", () => {
   const TEST_PASSWORD = "12345678"
-  const cognito = {
+  const authenticator = {
     signIn: jest.fn(),
-    resendSignUp: jest.fn(),
-    confirmSignIn: jest.fn()
+    resendSignInVerificationCode: jest.fn(),
+    verifySignIn: jest.fn()
   }
-  const authenticator = new CognitoSignInAuthenticator(cognito)
 
   beforeEach(() => jest.useFakeTimers())
   afterEach(() => act(jest.runAllTimers))
@@ -44,7 +41,7 @@ describe("SignInNavigation tests", () => {
     enterPhoneNumberText(USPhoneNumber.mock.toString())
     enterPasswordText(TEST_PASSWORD)
 
-    cognito.signIn.mockResolvedValueOnce({})
+    authenticator.signIn.mockResolvedValueOnce("success")
     submitSignInCredentials()
 
     await waitFor(() => expect(isAtEnd()).toEqual(true))
@@ -57,13 +54,13 @@ describe("SignInNavigation tests", () => {
     enterPhoneNumberText(USPhoneNumber.mock.toString())
     enterPasswordText(TEST_PASSWORD)
 
-    cognito.signIn.mockResolvedValueOnce({ challengeName: "SMS_MFA" })
+    authenticator.signIn.mockResolvedValueOnce("sign-in-verification-required")
     submitSignInCredentials()
 
     await waitFor(() => expect(signInVerificationCodeForm()).toBeDisplayed())
     enterVerificationCode("123456")
 
-    cognito.confirmSignIn.mockResolvedValue({})
+    authenticator.verifySignIn.mockResolvedValueOnce("success")
 
     submitVerificationCode()
     await waitFor(() => expect(isAtEnd()).toEqual(true))
@@ -76,9 +73,7 @@ describe("SignInNavigation tests", () => {
     enterPhoneNumberText(USPhoneNumber.mock.toString())
     enterPasswordText(TEST_PASSWORD)
 
-    cognito.signIn.mockRejectedValueOnce(
-      new TestCognitoError("UserNotConfirmedException")
-    )
+    authenticator.signIn.mockResolvedValueOnce("sign-up-verification-required")
     submitSignInCredentials()
 
     await waitFor(() => {

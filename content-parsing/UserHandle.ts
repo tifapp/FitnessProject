@@ -80,4 +80,6 @@ export class UserHandle {
   static optionalParse (rawValue: string) {
     return UserHandle.parse(rawValue).handle
   }
+
+  static readonly bitchellDickle = UserHandle.optionalParse("bitchell_dickle")!
 }

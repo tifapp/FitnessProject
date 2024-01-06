@@ -33,7 +33,6 @@ import { setupCognito } from "./auth"
 import awsconfig from "./src/aws-exports"
 
 Geo.configure(awsconfig)
-setupCognito()
 enableSentry()
 
 const log = createLogFunction("app.root")
