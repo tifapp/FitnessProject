@@ -16,7 +16,8 @@
     "eas-build-on-success": "node easbuild.mjs success",
     "eas-build-on-error": "node easbuild.mjs failure",
     "eas-build-on-cancel": "node easbuild.mjs cancelled",
-    "eas-build-local": "eas build --profile development --platform android"
+    "eas-build-local": "eas build --profile development --platform android",
+    "eas-build-storybook-local": "cd .storybook && eas build --profile development --platform android"
   },
   "engines": {
     "npm": ">=8.3.0"
