@@ -3,7 +3,7 @@ const dotenv = require("dotenv")
 
 dotenv.config({ path: ".env.infra" })
 
-const { MAPS_API, EXPO_PROJECT_ID, EXPO_PROJECT_OWNER } = process.env
+const { MAPS_API_KEY, EXPO_PROJECT_ID, EXPO_PROJECT_OWNER } = process.env
 
 const config = {
   name: "FitnessApp",

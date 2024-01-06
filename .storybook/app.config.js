@@ -3,11 +3,12 @@ const dotenv = require("dotenv")
 
 dotenv.config({ path: "../.env.infra" })
 
-const { EXPO_PROJECT_STORYBOOK_ID, EXPO_PROJECT_OWNER } = process.env
+const { MAPS_API_KEY, EXPO_PROJECT_STORYBOOK_ID, EXPO_PROJECT_OWNER } =
+  process.env
 
 const config = {
   name: "FitnessAppStorybook",
-  slug: "FitnessAppStorybook",
+  slug: "fitnessappstorybook",
   scheme: "tifappstorybook",
   version: "1.0.0",
   orientation: "portrait",
@@ -37,6 +38,11 @@ const config = {
   },
   android: {
     package: "com.tifapp.FitnessAppStorybook",
+    config: {
+      googleMaps: {
+        apiKey: MAPS_API_KEY
+      }
+    },
     ...androidConfig
   }
 }
