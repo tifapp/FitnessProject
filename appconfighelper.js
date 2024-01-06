@@ -1,10 +1,5 @@
-const dotenv = require("dotenv")
-
-dotenv.config({ path: ".env.infra" })
-
-const { MAPS_API } = process.env
-
 // can't export these from app.config.js
+
 module.exports = {
   iosConfig: {
     infoPlist: {
@@ -37,11 +32,6 @@ module.exports = {
     }
   },
   androidConfig: {
-    config: {
-      googleMaps: {
-        apiKey: MAPS_API
-      }
-    },
     permissions: [
       "ACCESS_BACKGROUND_LOCATION",
       "READ_CALENDAR",
