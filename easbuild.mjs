@@ -3,14 +3,15 @@ import dotenv from "dotenv"
 import fs from "fs"
 import https from "https"
 import jwt from "jsonwebtoken"
-import qrcode from "qrcode"
 import fetch from "node-fetch"
+import qrcode from "qrcode"
 
 dotenv.config({ path: ".env.infra" })
 
 const outputChannel = "C01B7FFKDCP"
 
-const action = process.argv[2] ?? "create"
+const action = process.argv[2]
+const checkRunName = process.argv[3]
 
 const sendMessageToSlack = (
   /** @type {string} */ message,
@@ -221,7 +222,7 @@ const manageCheckRun = async (/** @type {string} */ action) => {
     checkRunId = fs.readFileSync("checkRunId.txt", "utf8")
     checkRunParams = {
       checkRunId,
-      name: "EAS Build",
+      name: checkRunName,
       status: "completed",
       completed_at: new Date().toISOString(),
       conclusion: action
@@ -263,7 +264,7 @@ const manageCheckRun = async (/** @type {string} */ action) => {
     break
   default:
     checkRunData = {
-      name: "EAS Build",
+      name: checkRunName,
       status: "in_progress",
       started_at: new Date().toISOString(),
       head_sha: process.env.GITHUB_SHA,
