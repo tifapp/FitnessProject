@@ -16,10 +16,10 @@
     "prestart": "yarn update-stories",
     "storybook-watcher": "sb-rn-watcher --config-path .ondevice",
     "storybook": "start-storybook -p 6006",
-    "eas-build-post-install": "node easbuild.mjs",
-    "eas-build-on-success": "node easbuild.mjs success",
-    "eas-build-on-error": "node easbuild.mjs failure",
-    "eas-build-on-cancel": "node easbuild.mjs cancelled"
+    "eas-build-post-install": "node easbuild.mjs create \"EAS Storybook Build\"",
+    "eas-build-on-success": "node easbuild.mjs success \"EAS Storybook Build\"",
+    "eas-build-on-error": "node easbuild.mjs failure \"EAS Storybook Build\"",
+    "eas-build-on-cancel": "node easbuild.mjs cancelled \"EAS Storybook Build\""
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "~1.17.3",
