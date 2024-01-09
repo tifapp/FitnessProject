@@ -5,7 +5,6 @@ import { SafeAreaProvider } from "react-native-safe-area-context"
 import { EventArrivalBannerView } from "@event-details/arrival-tracking"
 import { Button, View } from "react-native"
 import Animated, { Layout } from "react-native-reanimated"
-import { ScrollView } from "react-native-gesture-handler"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -29,10 +28,9 @@ export const Basic: EventDetailsStory = () => {
       >
         {!isClosed && (
           <EventArrivalBannerView
-            messageTheme={{
-              kind: "joinedEventArrivedOnTime",
-              isUsingAlternativeDescription: false
-            }}
+            hasJoinedEvent
+            countdown={{ secondsToStart: 0 }}
+            canShareArrivalStatus={false}
             onClose={() => setIsClosed(true)}
             style={{ padding: 16, width: "100%" }}
           />

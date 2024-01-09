@@ -2,6 +2,7 @@ import { BodyText, Subtitle } from "@components/Text"
 import { TouchableIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors } from "@lib/Fonts"
+import { ceilDurationToUnit, dayjs } from "@date-time"
 import React from "react"
 import { View, ViewStyle, StyleSheet } from "react-native"
 import Animated, {
@@ -11,29 +12,23 @@ import Animated, {
 } from "react-native-reanimated"
 
 /**
- * The arrival banner message theme consists of a simple title and description
- * that let the user know that they've arrived at an event in a given context.
+ * Data needed to display the countdown on the {@link EventArrivalBannerView}.
  *
- * This "context" is determined by 3 factors:
- * - Has the user joined the event?
- * - When did the user arrive relative to the event start time?
- * - Does the user share their arrival status with others?
- *
- * The first 2 points determine the `kind` field, which is a simple string that
- * keys into an object of the actual messages to display.
- *
- * The last one determines whether or not to display an alternate description if
- * the user has decided to disable sharing their arrival status with others for
- * privacy reasons.
+ * The value of this type differs on 3 primary cases:
+ * 1. If the event starts within an hour `secondsToStart` is used.
+ * 2. If the event is over an hour away starting, but starts either today or tomorrow then `day` is used.
+ * 3. If the event start time if more than 2 days away `secondsToStart` is used.
  */
-export type EventArrivalBannerMessageTheme = {
-  // eslint-disable-next-line no-use-before-define
-  kind: keyof typeof ARRIVAL_BANNER_MESSAGES
-  isUsingAlternativeDescription: boolean
-}
+export type EventArrivalBannerCountdown =
+  | {
+      day: "today" | "tomorrow"
+    }
+  | { secondsToStart: number }
 
 export type EventArrivalBannerProps = {
-  messageTheme: EventArrivalBannerMessageTheme
+  hasJoinedEvent: boolean
+  canShareArrivalStatus: boolean
+  countdown: EventArrivalBannerCountdown
   onClose: () => void
   style?: AnimatedStyleProp<ViewStyle>
 }
@@ -41,102 +36,135 @@ export type EventArrivalBannerProps = {
 /**
  * A banner to display when the user has arrived at an event.
  *
- * The contents of the arrival banner fade in and out automatically, so this shouldn't
- * need to be wrapped inside an `Animated.View`.
+ * The banner fades in and out automatically.
  */
 export const EventArrivalBannerView = ({
-  messageTheme: { kind, isUsingAlternativeDescription },
+  hasJoinedEvent,
+  countdown,
+  canShareArrivalStatus,
   style,
   onClose
-}: EventArrivalBannerProps) => (
-  <Animated.View entering={FadeIn} exiting={FadeOut} style={style}>
-    <View style={styles.container}>
-      <View style={styles.outerRow}>
-        <View style={styles.innerRow}>
-          <View style={styles.alternativeIllustrationPlaceholder} />
-          <View style={styles.textContainer}>
-            <Subtitle
-              style={styles.titleText}
-              maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
-            >
-              {ARRIVAL_BANNER_MESSAGES[kind].title}
-            </Subtitle>
-            <BodyText
-              style={styles.bodyText}
-              maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
-            >
-              {isUsingAlternativeDescription
-                ? ARRIVAL_BANNER_MESSAGES[kind].altDescription
-                : ARRIVAL_BANNER_MESSAGES[kind].description}
-            </BodyText>
+}: EventArrivalBannerProps) => {
+  const othersKey = othersStatementKey(
+    countdown,
+    hasJoinedEvent,
+    canShareArrivalStatus
+  )
+  const fomoKey = fomoStatementKey(countdown, hasJoinedEvent)
+  const countdownText = countdownMessage(countdown)
+  return (
+    <Animated.View entering={FadeIn} exiting={FadeOut} style={style}>
+      <View style={styles.container}>
+        <View style={styles.outerRow}>
+          <View style={styles.innerRow}>
+            <View style={styles.alternativeIllustrationPlaceholder} />
+            <View style={styles.textContainer}>
+              <Subtitle
+                style={styles.titleText}
+                maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
+              >
+                {hasJoinedEvent ? "Welcome!" : "Join Now!"}
+              </Subtitle>
+              <BodyText
+                style={styles.bodyText}
+                maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
+              >
+                {`${countdownText}${OTHERS_STATEMENTS[othersKey]} ${FOMO_STATEMENTS[fomoKey]}`}
+              </BodyText>
+            </View>
           </View>
+          <TouchableIonicon
+            icon={{
+              name: "close",
+              maximumFontScaleFactor: FontScaleFactors.xxxLarge
+            }}
+            onPress={onClose}
+            style={styles.closeIcon}
+          />
         </View>
-        <TouchableIonicon
-          icon={{
-            name: "close",
-            maximumFontScaleFactor: FontScaleFactors.xxxLarge
-          }}
-          onPress={onClose}
-          style={styles.closeIcon}
-        />
       </View>
-    </View>
-  </Animated.View>
-)
+    </Animated.View>
+  )
+}
 
-const ARRIVAL_BANNER_MESSAGES = {
-  joinedEventArrivedOnTime: {
-    title: "You've Arrived!",
-    description:
-      "We've let everyone else know that you're here. Have fun and make new friends!",
-    altDescription: "TBD"
-  },
-  joinedEventArrivedWhenOngoing: {
-    title: "You've Died!",
-    description: "This message is still being decided!",
-    altDescription: "TBD"
-  },
-  joinedEventArrivedEarly: {
-    title: "You're Early!",
-    description: "This message is still being decided!",
-    altDescription: "TBD"
-  },
-  joinedEventArrivedInSameDayAsEventStart: {
-    title: "TBD",
-    description: "TBD",
-    altDescription: "TBD"
-  },
-  joinedEventArrivedMoreThanADayBeforeEventStart: {
-    title: "TBD",
-    description: "TBD",
-    altDescription: "TBD"
-  },
-  notJoinedEventArrivedOnTime: {
-    title: "TBD",
-    description: "TBD",
-    altDescription: "TBD"
-  },
-  notJoinedEventArrivedWhenOngoing: {
-    title: "TBD",
-    description: "TBD",
-    altDescription: "TBD"
-  },
-  notJoinedEventArrivedEarly: {
-    title: "TBD",
-    description: "TBD",
-    altDescription: "TBD"
-  },
-  notJoinedEventArrivedInSameDayAsEventStart: {
-    title: "TBD",
-    description: "TBD",
-    altDescription: "TBD"
-  },
-  notJoinedEventArrivedMoreThanADayBeforeEventStart: {
-    title: "TBD",
-    description: "TBD",
-    altDescription: "TBD"
+const TEN_MINUTES_IN_SECONDS = dayjs.duration(10, "minutes").asSeconds()
+const ONE_DAY_IN_SECONDS = dayjs.duration(1, "day").asSeconds()
+const ONE_HOUR_IN_SECONDS = dayjs.duration(1, "hour").asSeconds()
+
+const FOMO_STATEMENTS = {
+  joinNow: "Join now or miss out on the epic fun!",
+  laceUp: "Lace up for some epic fun!",
+  gearUp: "Gear up for some epic fun!",
+  spintOver: "Sprint over to the meeting point!"
+}
+
+export const fomoStatementKey = (
+  countdown: EventArrivalBannerCountdown,
+  hasJoinedEvent: boolean
+): keyof typeof FOMO_STATEMENTS => {
+  if (!hasJoinedEvent) {
+    return "joinNow"
+  } else if (
+    "day" in countdown ||
+    countdown.secondsToStart > ONE_DAY_IN_SECONDS
+  ) {
+    return "gearUp"
+  } else if (countdown.secondsToStart < TEN_MINUTES_IN_SECONDS) {
+    return "spintOver"
+  } else {
+    return "laceUp"
   }
-} as const
+}
+
+const OTHERS_STATEMENTS = {
+  othersNotified: " Others have been notified of your arrival.",
+  othersEager: " Others are eager to meet you.",
+  empty: ""
+}
+
+export const othersStatementKey = (
+  countdown: EventArrivalBannerCountdown,
+  hasJoinedEvent: boolean,
+  canShareArrivalStatus: boolean
+): keyof typeof OTHERS_STATEMENTS => {
+  if (
+    !hasJoinedEvent ||
+    "day" in countdown ||
+    countdown.secondsToStart > ONE_HOUR_IN_SECONDS
+  ) {
+    return "empty"
+  }
+  return canShareArrivalStatus ? "othersNotified" : "othersEager"
+}
+
+export const countdownMessage = (countdown: EventArrivalBannerCountdown) => {
+  if ("day" in countdown) {
+    return `This event kicks off ${countdown.day}.`
+  } else if (countdown.secondsToStart <= 0) {
+    return "This event is underway."
+  } else if (countdown.secondsToStart < TEN_MINUTES_IN_SECONDS) {
+    return "This event kicks off in under 10 minutes."
+  } else if (countdown.secondsToStart < ONE_HOUR_IN_SECONDS) {
+    return "This event kicks off in under an hour."
+  } else {
+    const countdownText = humanizeCountdownSeconds(countdown.secondsToStart)
+    return `This event kicks off in ${countdownText}.`
+  }
+}
+
+const humanizeCountdownSeconds = (countdownSeconds: number) => {
+  const duration = dayjs.duration(countdownSeconds, "seconds")
+  // NB: Dayjs formats weeks as days (eg. 1 week -> 7-13 days), so this conversion must be done manually.
+  if (duration.asWeeks() === 1) {
+    return "a week"
+  } else if (duration.asWeeks() > 1 && duration.asWeeks() < 4) {
+    return `${Math.ceil(duration.asWeeks())} weeks`
+  } else if (duration.asWeeks() < 1) {
+    return ceilDurationToUnit(duration, "days").humanize()
+  } else {
+    return ceilDurationToUnit(duration, "months").humanize()
+  }
+}
 
 const styles = StyleSheet.create({
   outerRow: {
