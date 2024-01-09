@@ -6,7 +6,6 @@ import { ZodUtils } from "@lib/utils/Zod"
 export type UserHandleParsingError = "bad-format" | "empty" | "too-long"
 
 export type UserHandleParsingResult =
-  // eslint-disable-next-line no-use-before-define
   | { handle: UserHandle; error: undefined }
   | { handle: undefined; error: UserHandleParsingError }
 
