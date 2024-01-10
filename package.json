@@ -12,12 +12,16 @@
     "prepare": "husky install",
     "staged-lint": "lint-staged",
     "dev": "expo start --dev-client",
-    "eas-build-post-install": "node easbuild.mjs create \"EAS Build\"",
-    "eas-build-on-success": "node easbuild.mjs success \"EAS Build\"",
-    "eas-build-on-error": "node easbuild.mjs failure \"EAS Build\"",
-    "eas-build-on-cancel": "node easbuild.mjs cancelled \"EAS Build\"",
+    "eas-build-post-install": "node easbuild.mjs",
+    "eas-build-on-success": "node easbuild.mjs success",
+    "eas-build-on-error": "node easbuild.mjs failure",
+    "eas-build-on-cancel": "node easbuild.mjs cancelled",
     "eas-build-local": "eas build --profile development --platform android",
-    "eas-build-storybook-local": "cd .storybook && eas build --profile development --platform android"
+    "eas-build-storybook-local": "eas build --profile storybook --platform android",
+    "storybook-update-stories": "sb-rn-get-stories --config-path .ondevice",
+    "storybook-prestart": "yarn update-stories",
+    "storybook-watcher": "sb-rn-watcher --config-path .ondevice",
+    "storybook": "start-storybook -p 6006"
   },
   "engines": {
     "npm": ">=8.3.0"
@@ -129,6 +133,9 @@
   },
   "devDependencies": {
     "@aws-amplify/cli": "^10.8.1",
+    "@react-native-community/slider": "^4.4.2",
+    "fs": "^0.0.1-security",
+    "react-native-web": "^0.18.10",
     "@babel/core": "^7.20.0",
     "@faker-js/faker": "^7.6.0",
     "@testing-library/react-native": "12.2",
@@ -164,7 +171,23 @@
     "node-fetch": "^3.3.2",
     "prettier": "^2.8.8",
     "react-test-renderer": "18.2",
-    "typescript": "^4.9.5"
+    "typescript": "^4.9.5",
+    "@storybook/addon-actions": "^6.5.14",
+    "@storybook/addon-controls": "^6.5.14",
+    "@storybook/addon-essentials": "^6.5.14",
+    "@storybook/addon-links": "^6.5.14",
+    "@storybook/addon-ondevice-actions": "next",
+    "@storybook/addon-ondevice-backgrounds": "next",
+    "@storybook/addon-ondevice-controls": "next",
+    "@storybook/addon-ondevice-notes": "next",
+    "@storybook/addon-react-native-web": "^0.0.19",
+    "@storybook/react": "^6.5.14",
+    "@storybook/react-native": "next",
+    "babel-loader": "^8.2.3",
+    "babel-plugin-react-docgen-typescript": "^1.5.1",
+    "babel-plugin-react-native-web": "^0.18.10",
+    "jsonwebtoken": "^9.0.2",
+    "qrcode": "^1.5.3"
   },
   "private": true
 }

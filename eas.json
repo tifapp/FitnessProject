@@ -3,6 +3,16 @@
     "version": ">=5.6.0"
   },
   "build": {
+    "storybook": {
+      "env": {
+        "BUILD_TYPE": "storybook"
+      },
+      "developmentClient": true,
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
+    },
     "development": {
       "developmentClient": true,
       "distribution": "internal",

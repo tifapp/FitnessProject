@@ -11,7 +11,8 @@ dotenv.config({ path: ".env.infra" })
 const outputChannel = "C01B7FFKDCP"
 
 const action = process.argv[2]
-const checkRunName = process.argv[3]
+const checkRunName =
+  process.env.BUILD_TYPE === "storybook" ? "EAS Storybook Build" : "EAS Build"
 
 const sendMessageToSlack = (
   /** @type {string} */ message,
