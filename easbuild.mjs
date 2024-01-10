@@ -238,7 +238,7 @@ const manageCheckRun = async (/** @type {string} */ action) => {
     checkRunData = {
       ...checkRunParams,
       output: {
-        title: "Build Completed",
+        title: `${checkRunName} Completed`,
         summary: buildLink
       }
     }
@@ -247,7 +247,7 @@ const manageCheckRun = async (/** @type {string} */ action) => {
     checkRunData = {
       ...checkRunParams,
       output: {
-        title: "Build Failed",
+        title: `${checkRunName} Failed`,
         summary: "Build failed with an error.",
         text: buildLink
       }
@@ -257,7 +257,7 @@ const manageCheckRun = async (/** @type {string} */ action) => {
     checkRunData = {
       ...checkRunParams,
       output: {
-        title: "Build Cancelled",
+        title: `${checkRunName} Cancelled`,
         summary: "Build was cancelled."
       }
     }
@@ -269,7 +269,7 @@ const manageCheckRun = async (/** @type {string} */ action) => {
       started_at: new Date().toISOString(),
       head_sha: process.env.GITHUB_SHA,
       output: {
-        title: "Build Started",
+        title: `${checkRunName} Started`,
         summary: `Build will be finished at approximately ${getPredictedBuildTime()}`
       }
     }
@@ -279,14 +279,16 @@ const manageCheckRun = async (/** @type {string} */ action) => {
 
   if (action === "success") {
     const buildqr = await qrcode.toDataURL(buildLink)
-    await sendImageToSlack(buildqr, `Build is ready:\n${buildLink}`)
+    await sendImageToSlack(buildqr, `${checkRunName} is ready:\n${buildLink}`)
   }
   if (action === "failure") {
-    await sendMessageToSlack(`Build failed. See details at\n${buildLink}`)
+    await sendMessageToSlack(
+      `${checkRunName} failed. See details at\n${buildLink}`
+    )
   }
   if (action === "create") {
     await sendMessageToSlack(
-      `A new build has started. Build will be finished at approximately *${getPredictedBuildTime()}*. See details at\n${buildLink}`
+      `A new build has started. ${checkRunName} will be finished at approximately *${getPredictedBuildTime()}*. See details at\n${buildLink}`
     )
   }
 }
