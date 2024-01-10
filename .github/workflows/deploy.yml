@@ -107,7 +107,8 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          cd .storybook && npm ci
+          cd .storybook
+          npm ci
 
       - name: Setup Expo and EAS
         uses: expo/expo-github-action@v8
@@ -117,17 +118,16 @@ jobs:
 
       - name: Construct .env
         run: |
-          cd .storybook
-          echo "MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}" >> .env.infra
-          echo "EXPO_PROJECT_STORYBOOK_ID=${{ secrets.EXPO_PROJECT_STORYBOOK_ID }}" >> .env.infra
-          echo "EXPO_PROJECT_OWNER=${{ secrets.EXPO_PROJECT_OWNER }}" >> .env.infra
-          echo "CHECK_RUN_ID=${{ github.run_id }}" >> .env.infra
-          echo "GITHUB_SHA=${{ github.sha }}" >> .env.infra
-          echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .env.infra
-          echo "RUN_EAS_BUILD_HOOKS=1" >> .env.infra
-          echo "SENTRY_DSN=${{ secrets.SENTRY_DSN }}" >> .env
-          echo "MIXPANEL_TOKEN=${{ secrets.MIXPANEL_TOKEN }}" >> .env
-          echo "API_URL=${{ secrets.API_ENDPOINT }}" >> .env
+          echo "MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}" >> .storybook/.env.infra
+          echo "EXPO_PROJECT_STORYBOOK_ID=${{ secrets.EXPO_PROJECT_STORYBOOK_ID }}" >> .storybook/.env.infra
+          echo "EXPO_PROJECT_OWNER=${{ secrets.EXPO_PROJECT_OWNER }}" >> .storybook/.env.infra
+          echo "CHECK_RUN_ID=${{ github.run_id }}" >> .storybook/.env.infra
+          echo "GITHUB_SHA=${{ github.sha }}" >> .storybook/.env.infra
+          echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .storybook/.env.infra
+          echo "RUN_EAS_BUILD_HOOKS=1" >> .storybook/.env.infra
+          echo "SENTRY_DSN=${{ secrets.SENTRY_DSN }}" >> .storybook/.env
+          echo "MIXPANEL_TOKEN=${{ secrets.MIXPANEL_TOKEN }}" >> .storybook/.env
+          echo "API_URL=${{ secrets.API_ENDPOINT }}" >> .storybook/.env
 
       - name: Trigger Build on EAS
         run: |
