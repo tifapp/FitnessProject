@@ -4,7 +4,7 @@ import {
   EventArrivalGeofencedRegion,
   EventArrivalGeofencingUnsubscribe,
   EventArrivalsGeofencer
-} from "./Geofencing"
+} from "./geofencing"
 import { ArrayUtils } from "@lib/utils/Array"
 import { PerformArrivalsOperation } from "./ArrivalsOperation"
 import { EventArrival, removeDuplicateArrivals } from "./Models"

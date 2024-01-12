@@ -1,41 +1,18 @@
 import { StringUtils } from "@lib/utils/String"
-import { LocationCoordinates2DSchema } from "@location"
+import { LocationCoordinates2DSchema } from "@shared-models/Location"
 import {
-  LocationGeofencingRegionState,
-  LocationGeofencingEventType,
   startGeofencingAsync,
-  stopGeofencingAsync
+  LocationGeofencingRegionState,
+  stopGeofencingAsync,
+  LocationGeofencingEventType
 } from "expo-location"
 import { defineTask } from "expo-task-manager"
 import { z } from "zod"
-import { EventArrivalRegion } from "@shared-models/EventArrivals"
-
-export type EventArrivalGeofencedRegion = Omit<EventArrivalRegion, "eventIds">
-
-export type EventArrivalGeofencingCallback = (
-  update: EventArrivalGeofencedRegion
-) => void
-
-export type EventArrivalGeofencingUnsubscribe = () => void
-
-/**
- * A geofencer interface explicitly tuned for event arrivals.
- */
-export interface EventArrivalsGeofencer {
-  /**
-   * Replaces all arrivals currently being geofenced.
-   */
-  replaceGeofencedRegions: (
-    regions: EventArrivalGeofencedRegion[]
-  ) => Promise<void>
-
-  /**
-   * Registers a callback that listens for geofencing updates.
-   */
-  onUpdate: (
-    handleUpdate: EventArrivalGeofencingCallback
-  ) => EventArrivalGeofencingUnsubscribe
-}
+import {
+  EventArrivalGeofencingCallback,
+  EventArrivalsGeofencer,
+  EventArrivalGeofencedRegion
+} from "./Geofencer"
 
 const taskCallbacks = {
   nonUpcoming: undefined as EventArrivalGeofencingCallback | undefined,

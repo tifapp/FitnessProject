@@ -3,11 +3,6 @@ import { AsyncStorageUpcomingEventArrivals } from "./UpcomingArrivals"
 import { EventArrivalsTracker } from "./Tracker"
 import { EventArrivalRegion } from "@shared-models/EventArrivals"
 import { ArrayUtils } from "@lib/utils/Array"
-import {
-  EventArrivalGeofencedRegion,
-  EventArrivalGeofencingCallback,
-  EventArrivalsGeofencer
-} from "./Geofencing"
 import { waitFor } from "@testing-library/react-native"
 import { mockLocationCoordinate2D } from "@location/MockData"
 import {
@@ -16,41 +11,13 @@ import {
   mockEventArrivalRegion
 } from "./MockData"
 import { neverPromise } from "@test-helpers/Promise"
-
-class TestGeofencer implements EventArrivalsGeofencer {
-  private updateCallback?: EventArrivalGeofencingCallback
-  geofencedRegions = [] as EventArrivalGeofencedRegion[]
-
-  get hasSubscriber () {
-    return !!this.updateCallback
-  }
-
-  async replaceGeofencedRegions (regions: EventArrivalGeofencedRegion[]) {
-    this.geofencedRegions = regions
-  }
-
-  sendUpdate (update: EventArrivalGeofencedRegion) {
-    this.updateCallback?.(update)
-  }
-
-  reset () {
-    this.updateCallback = undefined
-    this.geofencedRegions = []
-  }
-
-  onUpdate (handleUpdate: EventArrivalGeofencingCallback) {
-    this.updateCallback = handleUpdate
-    return () => {
-      this.updateCallback = undefined
-    }
-  }
-}
+import { TestEventArrivalsGeofencer } from "./geofencing/TestGeofencer"
 
 describe("EventArrivalsTracker tests", () => {
   const upcomingArrivals = new AsyncStorageUpcomingEventArrivals()
   beforeEach(async () => await AsyncStorage.clear())
 
-  const testGeofencer = new TestGeofencer()
+  const testGeofencer = new TestEventArrivalsGeofencer()
 
   const performArrivalOperation = jest.fn()
   beforeEach(() => testGeofencer.reset())

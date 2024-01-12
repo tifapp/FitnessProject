@@ -4,7 +4,7 @@ import { EventArrival } from "./Models"
 import { randomBool, randomFloatInRange } from "@lib/utils/Random"
 import { ArrayUtils } from "@lib/utils/Array"
 import { EventArrivalRegion } from "@shared-models/EventArrivals"
-import { EventArrivalGeofencedRegion } from "./Geofencing"
+import { EventArrivalGeofencedRegion } from "./geofencing"
 
 export const mockEventArrivalGeofencedRegion =
   (): EventArrivalGeofencedRegion => ({
