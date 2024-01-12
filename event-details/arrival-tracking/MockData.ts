@@ -14,13 +14,13 @@ export const mockEventArrivalGeofencedRegion =
   })
 
 export const mockEventArrival = (): EventArrival => ({
-  eventId: parseInt(faker.random.numeric(3)),
+  eventId: parseInt(faker.random.numeric(5)),
   ...mockEventArrivalGeofencedRegion()
 })
 
 export const mockEventArrivalRegion = (): EventArrivalRegion => ({
   eventIds: ArrayUtils.repeatElements(Math.ceil(randomFloatInRange(1, 5)), () =>
-    parseInt(faker.random.numeric(3))
+    parseInt(faker.random.numeric(5))
   ),
   ...mockEventArrivalGeofencedRegion()
 })

@@ -85,6 +85,55 @@ describe("EventArrivalsTracker tests", () => {
     ])
   })
 
+  test("track arrival, does not add duplicates", async () => {
+    const arrival = mockEventArrival()
+    await tracker.trackArrival(arrival)
+    await tracker.trackArrival(arrival)
+    await expectTrackedRegions([
+      {
+        eventIds: [arrival.eventId],
+        coordinate: arrival.coordinate,
+        arrivalRadiusMeters: arrival.arrivalRadiusMeters,
+        isArrived: false
+      }
+    ])
+  })
+
+  test("track arrivals, does not add duplicates", async () => {
+    const arrival = mockEventArrival()
+    await tracker.trackArrivals([arrival, arrival])
+    await expectTrackedRegions([
+      {
+        eventIds: [arrival.eventId],
+        coordinate: arrival.coordinate,
+        arrivalRadiusMeters: arrival.arrivalRadiusMeters,
+        isArrived: false
+      }
+    ])
+  })
+
+  test("track arrivals, updates already existing arrival from earlier in the array", async () => {
+    const arrival = mockEventArrival()
+    const arrival2 = { ...arrival, coordinate: mockLocationCoordinate2D() }
+    const arrival3 = mockEventArrival()
+    const arrival4 = { ...arrival, coordinate: mockLocationCoordinate2D() }
+    await tracker.trackArrivals([arrival, arrival2, arrival3, arrival4])
+    await expectTrackedRegions([
+      {
+        eventIds: [arrival3.eventId],
+        coordinate: arrival3.coordinate,
+        arrivalRadiusMeters: arrival3.arrivalRadiusMeters,
+        isArrived: false
+      },
+      {
+        eventIds: [arrival4.eventId],
+        coordinate: arrival4.coordinate,
+        arrivalRadiusMeters: arrival4.arrivalRadiusMeters,
+        isArrived: false
+      }
+    ])
+  })
+
   test("track arrival, adds event id to already existing region", async () => {
     const region = {
       ...mockEventArrivalRegion(),
