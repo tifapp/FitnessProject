@@ -48,6 +48,9 @@ import TextFieldMeta, {
 import VerifcationCodeMeta, {
   Basic as VerifcationCodeBasic
 } from "../components/VerificationCode/VerifyCode.stories"
+import EventDetailsMeta, {
+  Basic as EventDetailsBasic
+} from "../components/EventDetails/EventDetails.stories"
 
 setupCognito(new InMemorySecureStore())
 
@@ -122,6 +125,11 @@ const stories = [
     name: ButtonsMeta.title,
     component: ButtonsBasic,
     args: ButtonsMeta.args
+  },
+  {
+    name: EventDetailsMeta.title,
+    component: EventDetailsBasic,
+    args: EventDetailsMeta.args
   }
   // Add more stories here...
 ]
