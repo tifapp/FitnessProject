@@ -145,7 +145,7 @@ export type CurrentUserEvent = Event & {
  * Adds or removes events in the given arrival tracker depending on whether or not the user
  * is attending the event, and if the event is allowed to be tracked (ie. it starts soon).
  */
-export const updateEventsInTracker = async (
+export const updateEventsInArrivalsTracker = async (
   events: Pick<CurrentUserEvent, "id" | "location" | "userAttendeeStatus">[],
   tracker: EventArrivalsTracker
 ) => {

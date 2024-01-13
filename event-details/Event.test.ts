@@ -5,7 +5,7 @@ import {
   copyEventLocationToClipboard,
   isAttendingEvent,
   isHostingEvent,
-  updateEventsInTracker
+  updateEventsInArrivalsTracker
 } from "./Event"
 import {
   AsyncStorageUpcomingEventArrivals,
@@ -106,14 +106,14 @@ describe("Event tests", () => {
     )
 
     it("should not update the tracker when no events given", async () => {
-      await updateEventsInTracker([], tracker)
+      await updateEventsInArrivalsTracker([], tracker)
       await expectTrackedRegions([])
     })
 
     it("should add events to the tracker which the user has joined and when the tracking period has begun", async () => {
       const event1 = testEvent(1, true, "hosting")
       const event2 = testEvent(2, true, "attending")
-      await updateEventsInTracker([event1, event2], tracker)
+      await updateEventsInArrivalsTracker([event1, event2], tracker)
       expectTrackedRegions([
         {
           eventIds: [1],
@@ -134,7 +134,7 @@ describe("Event tests", () => {
       const arrival = { ...mockEventArrival(), eventId: 1 }
       await tracker.trackArrival(arrival)
       const event = testEvent(arrival.eventId, true, "not-participating")
-      await updateEventsInTracker([event], tracker)
+      await updateEventsInArrivalsTracker([event], tracker)
       expectTrackedRegions([])
     })
 
@@ -146,7 +146,7 @@ describe("Event tests", () => {
       await tracker.trackArrivals(arrivals)
       const event = testEvent(arrivals[0].eventId, false, "hosting")
       const event2 = testEvent(arrivals[0].eventId, false, "not-participating")
-      await updateEventsInTracker([event, event2], tracker)
+      await updateEventsInArrivalsTracker([event, event2], tracker)
       expectTrackedRegions([])
     })
 
@@ -155,7 +155,7 @@ describe("Event tests", () => {
       await tracker.trackArrival(initialArrival)
       const event = testEvent(initialArrival.eventId, false, "attending")
       const event2 = testEvent(2, true, "hosting")
-      await updateEventsInTracker([event, event2], tracker)
+      await updateEventsInArrivalsTracker([event, event2], tracker)
       expectTrackedRegions([
         {
           eventIds: [2],
