@@ -170,3 +170,8 @@ export const updateEventsInArrivalsTracker = async (
     tracker.trackArrivals(arrivalsToTrack)
   ])
 }
+
+/**
+ * Contents of an event when the user is blocked by or is blocking the host.
+ */
+export type BlockedEvent = Pick<Event, "id" | "host" | "title">
