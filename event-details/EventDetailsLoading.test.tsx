@@ -113,6 +113,24 @@ describe("EventDetailsLoading tests", () => {
       expect(loadEvent).toHaveBeenCalledTimes(2)
     })
 
+    test("load successfully, refresh returns \"not-found\" flow", async () => {
+      loadEvent
+        .mockResolvedValueOnce({
+          status: "success",
+          event: EventMocks.Multiday
+        })
+        .mockResolvedValueOnce({ status: "not-found" })
+      const { result } = renderUseLoadEvent(1)
+      expect(result.current).toEqual({ status: "loading" })
+      await waitFor(() => expect(result.current.status).toEqual("success"))
+      act(() => (result.current as any).refresh())
+      await waitFor(() => {
+        expect(result.current.status).toEqual("not-found")
+      })
+      expect(loadEvent).toHaveBeenNthCalledWith(2, 1)
+      expect(loadEvent).toHaveBeenCalledTimes(2)
+    })
+
     test("load failure, then retry successfully", async () => {
       let resolveRetry: (() => void) | undefined
       const retryPromise = new Promise<void>(
