@@ -165,8 +165,7 @@ export const updateEventsInArrivalsTracker = async (
       idsToRemove.add(event.id)
     }
   }
-  await Promise.all([
-    tracker.removeArrivalsByEventIds(idsToRemove),
-    tracker.trackArrivals(arrivalsToTrack)
-  ])
+  // TODO: Why doesn't Promise.all work here?
+  await tracker.removeArrivalsByEventIds(idsToRemove)
+  await tracker.trackArrivals(arrivalsToTrack)
 }
