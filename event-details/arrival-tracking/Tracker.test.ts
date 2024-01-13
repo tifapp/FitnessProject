@@ -12,10 +12,11 @@ import {
 } from "./MockData"
 import { neverPromise } from "@test-helpers/Promise"
 import { TestEventArrivalsGeofencer } from "./geofencing/TestGeofencer"
+import { clearAsyncStorageBeforeEach } from "@test-helpers/AsyncStorage"
 
 describe("EventArrivalsTracker tests", () => {
   const upcomingArrivals = new AsyncStorageUpcomingEventArrivals()
-  beforeEach(async () => await AsyncStorage.clear())
+  clearAsyncStorageBeforeEach()
 
   const testGeofencer = new TestEventArrivalsGeofencer()
 

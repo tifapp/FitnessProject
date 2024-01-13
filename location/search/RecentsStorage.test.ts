@@ -5,12 +5,13 @@ import {
   asyncStorageSaveRecentLocation
 } from "./RecentsStorage"
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import { clearAsyncStorageBeforeEach } from "@test-helpers/AsyncStorage"
 
 const TEST_COORDINATES = { latitude: 41.1234, longitude: -121.1234 }
 const TEST_COORDINATES_STORAGE_KEY = "@location_9r3cgy29h"
 
 describe("RecentLocationStorage tests", () => {
-  beforeEach(async () => await AsyncStorage.clear())
+  clearAsyncStorageBeforeEach()
 
   describe("AsyncStorageSaveRecentLocation tests", () => {
     it("should save the location in async storage", async () => {

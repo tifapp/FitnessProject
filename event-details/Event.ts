@@ -8,6 +8,7 @@ import {
 import { UserToProfileRelationStatus } from "@lib/users"
 import * as Clipboard from "expo-clipboard"
 import { showLocation } from "react-native-map-link"
+import { EventArrival, EventArrivalsTracker } from "./arrival-tracking"
 
 /**
  * A type for the color value for an event.
@@ -43,7 +44,14 @@ export type EventAttendee = {
 export type EventLocation = {
   coordinate: LocationCoordinate2D
   placemark?: Placemark
+  arrivalRadiusMeters: number
+  isInArrivalTrackingPeriod: boolean
 }
+
+export type EventLocationCoordinatePlacemark = Pick<
+  EventLocation,
+  "coordinate" | "placemark"
+>
 
 /**
  * Copies an event location to the clipboard.
@@ -52,7 +60,7 @@ export type EventLocation = {
  * and copied to the clipboard instead of the formatted address of the placemark.
  */
 export const copyEventLocationToClipboard = (
-  location: EventLocation,
+  location: EventLocationCoordinatePlacemark,
   setClipboardText: (text: string) => Promise<void> = expoCopyTextToClipboard
 ) => setClipboardText(formatEventLocation(location))
 
@@ -60,7 +68,7 @@ const expoCopyTextToClipboard = async (text: string) => {
   await Clipboard.setStringAsync(text)
 }
 
-const formatEventLocation = (location: EventLocation) => {
+const formatEventLocation = (location: EventLocationCoordinatePlacemark) => {
   const formattedLocationCoordinate = `${location.coordinate.latitude}, ${location.coordinate.longitude}`
   if (!location.placemark) return formattedLocationCoordinate
   const formattedPlacemark = placemarkToFormattedAddress(location.placemark)
@@ -74,7 +82,7 @@ const formatEventLocation = (location: EventLocation) => {
  * @param directionsMode the mehtod of how to link specific directions to the location.
  */
 export const openEventLocationInMaps = (
-  location: EventLocation,
+  location: EventLocationCoordinatePlacemark,
   directionsMode?: "car" | "walk" | "bike" | "public-transport"
 ) => {
   showLocation({
@@ -91,7 +99,7 @@ export const openEventLocationInMaps = (
  */
 export type Event = {
   host: EventAttendee
-  id: string
+  id: number
   title: string
   description: string
   dateRange: FixedDateRange
@@ -131,4 +139,34 @@ export const isAttendingEvent = (attendeeStatus: EventUserAttendeeStatus) => {
  */
 export type CurrentUserEvent = Event & {
   userAttendeeStatus: EventUserAttendeeStatus
+}
+
+/**
+ * Adds or removes events in the given arrival tracker depending on whether or not the user
+ * is attending the event, and if the event is allowed to be tracked (ie. it starts soon).
+ */
+export const updateEventsInTracker = async (
+  events: Pick<CurrentUserEvent, "id" | "location" | "userAttendeeStatus">[],
+  tracker: EventArrivalsTracker
+) => {
+  const [idsToRemove, arrivalsToTrack] = [
+    new Set<number>(),
+    [] as EventArrival[]
+  ]
+  for (const event of events) {
+    const isAttending = isAttendingEvent(event.userAttendeeStatus)
+    if (isAttending && event.location.isInArrivalTrackingPeriod) {
+      arrivalsToTrack.push({
+        eventId: event.id,
+        coordinate: event.location.coordinate,
+        arrivalRadiusMeters: event.location.arrivalRadiusMeters
+      })
+    } else {
+      idsToRemove.add(event.id)
+    }
+  }
+  await Promise.all([
+    tracker.removeArrivalsByEventIds(idsToRemove),
+    tracker.trackArrivals(arrivalsToTrack)
+  ])
 }
