@@ -1,15 +1,14 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native"
-import { useLoadEvent } from "./EventLoading"
+import { useLoadEventDetails } from "./EventDetailsLoading"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { EventMocks } from "./MockData"
-import { sleep } from "@lib/utils/DelayData"
 
-describe("EventLoading tests", () => {
+describe("EventDetailsLoading tests", () => {
   const loadEvent = jest.fn()
 
   beforeEach(() => jest.resetAllMocks())
 
-  describe("UseLoadEvent tests", () => {
+  describe("UseLoadEventDetails tests", () => {
     test("basic loading flow", async () => {
       loadEvent.mockResolvedValueOnce({
         status: "success",
@@ -144,12 +143,15 @@ describe("EventLoading tests", () => {
     })
 
     const renderUseLoadEvent = (eventId: number) => {
-      return renderHook((eventId: number) => useLoadEvent(eventId, loadEvent), {
-        initialProps: eventId,
-        wrapper: ({ children }: any) => (
-          <TestQueryClientProvider>{children}</TestQueryClientProvider>
-        )
-      })
+      return renderHook(
+        (eventId: number) => useLoadEventDetails(eventId, loadEvent),
+        {
+          initialProps: eventId,
+          wrapper: ({ children }: any) => (
+            <TestQueryClientProvider>{children}</TestQueryClientProvider>
+          )
+        }
+      )
     }
   })
 })

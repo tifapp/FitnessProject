@@ -1,32 +1,41 @@
-import { DefinedQueryObserverResult, useQuery } from "@tanstack/react-query"
+import {
+  DefinedQueryObserverResult,
+  UseQueryResult,
+  useQuery
+} from "@tanstack/react-query"
 import { BlockedEvent, CurrentUserEvent } from "./Event"
 
-export type EventLoadingResult =
+/**
+ * A result from loading a single event for the details screen.
+ */
+export type EventDetailsLoadingResult =
   | { status: "not-found" | "deleted" }
   | { status: "blocked"; event: BlockedEvent }
   | { status: "success"; event: CurrentUserEvent }
 
-export type UseLoadEventResult =
+export type UseLoadEventDetailsResult =
   | { status: "loading" | "not-found" | "deleted" }
   | { status: "error"; retry: () => void }
   | {
       status: "success"
-      // eslint-disable-next-line no-use-before-define
-      refreshStatus: ReturnType<typeof refreshStatus>
+      refreshStatus: "loading" | "error" | "idle"
       event: CurrentUserEvent
       refresh: () => void
     }
   | { status: "blocked"; event: BlockedEvent }
 
-export const useLoadEvent = (
+/**
+ * A hook to load an event in the context of the details screen.
+ */
+export const useLoadEventDetails = (
   eventId: number,
-  loadEvent: (id: number) => Promise<EventLoadingResult>
-): UseLoadEventResult => {
+  loadEvent: (id: number) => Promise<EventDetailsLoadingResult>
+): UseLoadEventDetailsResult => {
   const query = useQuery(
     ["event", eventId],
     async () => await loadEvent(eventId)
   )
-  if (query.status === "error") {
+  if (query.status === "error" && !query.isRefetchError) {
     return {
       status: "error",
       retry: () => {
@@ -49,7 +58,7 @@ export const useLoadEvent = (
 }
 
 const refreshStatus = (
-  query: DefinedQueryObserverResult<EventLoadingResult, unknown>
+  query: UseQueryResult<EventDetailsLoadingResult, unknown>
 ) => {
   if (query.isRefetching) {
     return "loading" as const
