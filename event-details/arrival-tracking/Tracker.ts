@@ -72,9 +72,7 @@ export class EventArrivalsTracker {
             arrivalRadiusMeters: arrival.arrivalRadiusMeters,
             isArrived: false
           })
-        } else if (
-          !newRegions[regionIndex].eventIds.includes(arrival.eventId)
-        ) {
+        } else {
           newRegions[regionIndex].eventIds.push(arrival.eventId)
         }
       }

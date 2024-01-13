@@ -2,12 +2,13 @@ const dotenv = require("dotenv")
 
 dotenv.config({ path: ".env.infra" })
 
-const { MAPS_API_KEY, EXPO_PROJECT_ID, EXPO_PROJECT_OWNER } = process.env
+const { MAPS_API_KEY, EXPO_PROJECT_STORYBOOK_ID, EXPO_PROJECT_OWNER } =
+  process.env
 
 const config = {
-  name: "FitnessApp",
-  slug: "FitnessApp",
-  scheme: "tifapp",
+  name: "FitnessAppStorybook",
+  slug: "fitnessappstorybook",
+  scheme: "tifappstorybook",
   version: "1.0.0",
   orientation: "portrait",
   icon: "./assets/icon.png",
@@ -22,13 +23,13 @@ const config = {
   owner: EXPO_PROJECT_OWNER,
   extra: {
     eas: {
-      projectId: EXPO_PROJECT_ID
+      projectId: EXPO_PROJECT_STORYBOOK_ID
     }
   },
-  plugins: ["sentry-expo"],
+  plugins: [],
   assetBundlePatterns: ["**/*"],
   ios: {
-    bundleIdentifier: "com.tifapp.FitnessApp",
+    bundleIdentifier: "com.tifapp.FitnessAppStorybook",
     infoPlist: {
       NSLocationAlwaysAndWhenInUseUsageDescription:
         "To inform others of your arrival, tap \"Change to Always Allow.\"",
@@ -62,8 +63,7 @@ const config = {
     favicon: "./assets/favicon.png"
   },
   android: {
-    package: "com.tifapp.FitnessApp",
-    googleServicesFile: "./google-services.json",
+    package: "com.tifapp.FitnessAppStorybook",
     config: {
       googleMaps: {
         apiKey: MAPS_API_KEY

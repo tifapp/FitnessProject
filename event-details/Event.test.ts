@@ -114,7 +114,7 @@ describe("Event tests", () => {
       const event1 = testEvent(1, true, "hosting")
       const event2 = testEvent(2, true, "attending")
       await updateEventsInArrivalsTracker([event1, event2], tracker)
-      expectTrackedRegions([
+      await expectTrackedRegions([
         {
           eventIds: [1],
           arrivalRadiusMeters: event1.location.arrivalRadiusMeters,
@@ -135,7 +135,7 @@ describe("Event tests", () => {
       await tracker.trackArrival(arrival)
       const event = testEvent(arrival.eventId, true, "not-participating")
       await updateEventsInArrivalsTracker([event], tracker)
-      expectTrackedRegions([])
+      await expectTrackedRegions([])
     })
 
     it("should remove events from the tracker when the arrival period has not begun", async () => {
@@ -145,9 +145,9 @@ describe("Event tests", () => {
       }))
       await tracker.trackArrivals(arrivals)
       const event = testEvent(arrivals[0].eventId, false, "hosting")
-      const event2 = testEvent(arrivals[0].eventId, false, "not-participating")
+      const event2 = testEvent(arrivals[1].eventId, false, "not-participating")
       await updateEventsInArrivalsTracker([event, event2], tracker)
-      expectTrackedRegions([])
+      await expectTrackedRegions([])
     })
 
     test("adds and removes events from tracker based on join date and arrival status", async () => {
@@ -156,7 +156,7 @@ describe("Event tests", () => {
       const event = testEvent(initialArrival.eventId, false, "attending")
       const event2 = testEvent(2, true, "hosting")
       await updateEventsInArrivalsTracker([event, event2], tracker)
-      expectTrackedRegions([
+      await expectTrackedRegions([
         {
           eventIds: [2],
           arrivalRadiusMeters: event2.location.arrivalRadiusMeters,
