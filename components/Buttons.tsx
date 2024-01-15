@@ -122,7 +122,6 @@ const styles = StyleSheet.create({
     backgroundColor: AppStyles.darkColor
   },
   outlinedButton: {
-    backgroundColor: "white",
     borderWidth: 1,
     borderColor: AppStyles.colorOpacity15
   }
