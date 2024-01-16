@@ -4,6 +4,7 @@ import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { EventMocks } from "./MockData"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 import { InternetConnectionStatusProvider } from "@lib/InternetConnection"
+import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 
 describe("EventDetailsLoading tests", () => {
   const loadEvent = jest.fn()
@@ -184,6 +185,24 @@ describe("EventDetailsLoading tests", () => {
       })
       expect(loadEvent).toHaveBeenNthCalledWith(2, 1)
       expect(loadEvent).toHaveBeenCalledTimes(2)
+    })
+
+    it("should only retry on internet coming back up only when in an error state", async () => {
+      loadEvent
+        .mockResolvedValueOnce({
+          status: "success",
+          event: EventMocks.Multiday
+        })
+        .mockRejectedValueOnce(new Error())
+      const { result } = renderUseLoadEvent(1)
+      await waitFor(() => expect(result.current.status).toEqual("success"))
+      act(() => testConnectionStatus.publishIsConnected(false))
+      act(() => testConnectionStatus.publishIsConnected(true))
+      await verifyNeverOccurs(() => {
+        expect((result.current as any).refreshStatus).toEqual("error")
+      })
+      console.log(result.current)
+      expect(loadEvent).toHaveBeenCalledTimes(1)
     })
 
     const renderUseLoadEvent = (eventId: number) => {
