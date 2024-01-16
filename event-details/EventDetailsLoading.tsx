@@ -1,5 +1,5 @@
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
-import { BlockedEvent, CurrentUserEvent } from "./Event"
+import { BlockedEvent, CurrentUserEvent } from "@shared-models/Event"
 import { useIsConnectedToInternet } from "@lib/InternetConnection"
 import { useEffect } from "react"
 import { useEffectEvent } from "@lib/utils/UseEffectEvent"
@@ -59,7 +59,7 @@ const loadEventDetailsResult = (
       retry: () => {
         query.refetch()
       }
-    } as const
+    }
   } else if (query.status === "loading") {
     return { status: query.status }
   } else if (query.data.status !== "success") {
@@ -71,7 +71,7 @@ const loadEventDetailsResult = (
         query.refetch()
       },
       refreshStatus: refreshStatus(query)
-    } as const
+    }
   }
 }
 

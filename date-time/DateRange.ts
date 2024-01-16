@@ -142,11 +142,11 @@ const formatTime = (date: Dayjs) => {
  */
 export const StringDateRangeSchema = z
   .object({
-    startDate: StringDateSchema,
-    endDate: StringDateSchema
+    startDateTime: StringDateSchema,
+    endDateTime: StringDateSchema
   })
-  .transform(({ startDate, endDate }) => {
-    return dateRange(startDate, endDate)
+  .transform(({ startDateTime, endDateTime }) => {
+    return dateRange(startDateTime, endDateTime)
   })
 
 /**

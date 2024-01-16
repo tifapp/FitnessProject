@@ -4,7 +4,7 @@ import {
   BottomSheetFlatList,
   BottomSheetModalProvider
 } from "@gorhom/bottom-sheet"
-import { CurrentUserEvent } from "@lib/events"
+import { CurrentUserEvent } from "@shared-models/Event"
 import React, { ReactElement, useEffect, useRef } from "react"
 import {
   ListRenderItemInfo,
@@ -53,7 +53,7 @@ export const ExploreEventsBottomSheet = ({
         >
           <BottomSheetFlatList
             data={events}
-            keyExtractor={(event) => event.id}
+            keyExtractor={(event) => event.id.toString()}
             renderItem={({ item }: ListRenderItemInfo<CurrentUserEvent>) => (
               <Pressable
                 onPress={() => onEventSelected(item)}

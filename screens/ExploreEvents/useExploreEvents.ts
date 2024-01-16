@@ -1,5 +1,5 @@
 import { Cancellable, cancelOnAborted } from "@lib/Cancellable"
-import { CurrentUserEvent } from "@lib/events"
+import { CurrentUserEvent } from "@shared-models/Event"
 import { useState } from "react"
 import { UseQueryResult, useQuery, useQueryClient } from "@tanstack/react-query"
 import {

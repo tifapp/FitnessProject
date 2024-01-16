@@ -1,7 +1,7 @@
 import React from "react"
 import { StackNavigatorType } from "@components/Navigation"
 import { Cancellable } from "@lib/Cancellable"
-import { CurrentUserEvent } from "@lib/events"
+import { CurrentUserEvent } from "@shared-models/Event"
 import {
   LocationCoordinate2D,
   Region,
@@ -11,8 +11,9 @@ import { ExploreEventsView } from "./ExploreView"
 import { StackScreenProps } from "@react-navigation/stack"
 import { createInitialCenter } from "./models"
 import { StyleSheet } from "react-native"
-import { EventScreensParamsList } from "@event-details/EventScreensNavigation"
 import { useExploreEvents } from "./useExploreEvents"
+
+type EventScreensParamsList = {} // TODO: - Fill this out
 
 export type ExploreEventsScreensParamsList = {
   exploreEvents: { searchText: string; center?: LocationCoordinate2D }
@@ -70,7 +71,7 @@ const ExploreEventsScreen = ({
       data={data}
       onRegionUpdated={updateRegion}
       searchText={route.params.searchText}
-      onEventTapped={(event) => navigation.navigate("Event Details", { event })}
+      onEventTapped={() => {}}
       onMapLongPress={console.log}
       onSearchTapped={() => console.log("Search")}
       style={styles.exploreEvents}

@@ -1,7 +1,6 @@
 import { EventArrivalRegion } from "@shared-models/EventArrivals"
 import { waitFor } from "@testing-library/react-native"
 import {
-  EventUserAttendeeStatus,
   copyEventLocationToClipboard,
   isAttendingEvent,
   isHostingEvent,
@@ -16,6 +15,7 @@ import { clearAsyncStorageBeforeEach } from "@test-helpers/AsyncStorage"
 import { mockEventLocation } from "./MockData"
 import { mockEventArrival } from "./arrival-tracking/MockData"
 import { ArrayUtils } from "@lib/utils/Array"
+import { EventUserAttendeeStatus } from "@shared-models/Event"
 
 describe("Event tests", () => {
   describe("EventCurrentUserAttendeeStatus tests", () => {
