@@ -1,9 +1,7 @@
-import {
-  DefinedQueryObserverResult,
-  UseQueryResult,
-  useQuery
-} from "@tanstack/react-query"
+import { UseQueryResult, useQuery } from "@tanstack/react-query"
 import { BlockedEvent, CurrentUserEvent } from "./Event"
+import { useIsConnectedToInternet } from "@lib/InternetConnection"
+import { useEffect } from "react"
 
 /**
  * A result from loading a single event for the details screen.
@@ -15,7 +13,7 @@ export type EventDetailsLoadingResult =
 
 export type UseLoadEventDetailsResult =
   | { status: "loading" | "not-found" | "deleted" }
-  | { status: "error"; retry: () => void }
+  | { status: "error"; retry: () => void; isConnectedToInternet: boolean }
   | {
       status: "success"
       refreshStatus: "loading" | "error" | "idle"
@@ -35,11 +33,19 @@ export const useLoadEventDetails = (
     ["event", eventId],
     async () => await loadEvent(eventId)
   )
+  const refetch = query.refetch
+  const isConnectedToInternet = useIsConnectedToInternet()
+  useEffect(() => {
+    if (isConnectedToInternet) {
+      refetch()
+    }
+  }, [refetch, isConnectedToInternet])
   if (query.status === "error" && !query.isRefetchError) {
     return {
       status: "error",
+      isConnectedToInternet,
       retry: () => {
-        query.refetch()
+        refetch()
       }
     } as const
   } else if (query.status === "loading") {
@@ -50,7 +56,7 @@ export const useLoadEventDetails = (
     return {
       ...query.data,
       refresh: () => {
-        query.refetch()
+        refetch()
       },
       refreshStatus: refreshStatus(query)
     } as const
