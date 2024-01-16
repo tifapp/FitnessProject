@@ -201,7 +201,6 @@ describe("EventDetailsLoading tests", () => {
       await verifyNeverOccurs(() => {
         expect((result.current as any).refreshStatus).toEqual("error")
       })
-      console.log(result.current)
       expect(loadEvent).toHaveBeenCalledTimes(1)
     })
 
