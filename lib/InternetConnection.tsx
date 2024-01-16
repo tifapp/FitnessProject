@@ -30,7 +30,7 @@ implements InternetConnectionStatus {
     callback: (isConnected: boolean) => void
   ): InternetConnectionStatusUnsubscribe {
     return addEventListener((state) => {
-      this._isConnected = state.isConnected ?? false
+      this._isConnected = state.isInternetReachable ?? false
       callback(this._isConnected)
     })
   }
