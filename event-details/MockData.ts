@@ -3,9 +3,8 @@ import { uuidString } from "@lib/utils/UUID"
 import {
   CurrentUserEvent,
   EventAttendee,
-  EventColors,
   EventLocation
-} from "./Event"
+} from "@shared-models/Event"
 import { dateRange } from "@date-time"
 import { mockLocationCoordinate2D, mockPlacemark } from "@location/MockData"
 import { faker } from "@faker-js/faker"
@@ -14,6 +13,7 @@ import {
   randomIntegerInRange,
   randomlyUndefined
 } from "@lib/utils/Random"
+import { EventColors } from "./Event"
 
 export const mockEventLocation = (): EventLocation => ({
   coordinate: mockLocationCoordinate2D(),

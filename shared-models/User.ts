@@ -28,23 +28,7 @@ export type UserToProfileRelationStatus = z.infer<
   typeof UserToProfileRelationStatusSchema
 >
 
-export const BidirectionalUserRelationsSchema = z.union([
-  z.object({
-    themToYou: NotFriendsStatusSchema,
-    youToThem: NotFriendsStatusSchema
-  }),
-  z.object({
-    themToYou: FriendRequestPendingStatusSchema,
-    youToThem: NotFriendsStatusSchema
-  }),
-  z.object({
-    themToYou: NotFriendsStatusSchema,
-    youToThem: FriendRequestPendingStatusSchema
-  }),
-  z.object({
-    themToYou: FriendsStatusSchema,
-    youToThem: FriendsStatusSchema
-  }),
+export const BlockedBidirectionalUserRelationsSchema = z.union([
   z.object({
     themToYou: BlockedStatusSchema,
     youToThem: BlockedStatusSchema
@@ -60,12 +44,35 @@ export const BidirectionalUserRelationsSchema = z.union([
 ])
 
 /**
- * The relation status from the user to a given profile, and the status from that profile to
- * the current user.
- *
- * All possible valid relationships are represented by this union type, but perhaps the most
- * notable one to be aware about is that user's can mutually block each other.
+ * A 2-way relationship from a user to another profile where at least one party
+ * involved is blocking the other.
  */
-export type BidirectionalUserRelations = z.infer<
-  typeof BidirectionalUserRelationsSchema
+export type BlockedBidirectionalUserRelations = z.infer<
+  typeof BlockedBidirectionalUserRelationsSchema
+>
+
+export const UnblockedBidirectionalUserRelationsSchema = z.union([
+  z.object({
+    themToYou: NotFriendsStatusSchema,
+    youToThem: NotFriendsStatusSchema
+  }),
+  z.object({
+    themToYou: FriendRequestPendingStatusSchema,
+    youToThem: NotFriendsStatusSchema
+  }),
+  z.object({
+    themToYou: NotFriendsStatusSchema,
+    youToThem: FriendRequestPendingStatusSchema
+  }),
+  z.object({
+    themToYou: FriendsStatusSchema,
+    youToThem: FriendsStatusSchema
+  })
+])
+
+/**
+ * A 2-way relationship from a user to another profile where no party is blocking the other.
+ */
+export type UnblockedBidirectionalUserRelations = z.infer<
+  typeof UnblockedBidirectionalUserRelationsSchema
 >

@@ -1,10 +1,13 @@
 import { z } from "zod"
 import { LocationCoordinates2DSchema, checkIfCoordsAreEqual } from "./Location"
 import { UserHandle } from "@content-parsing"
-import { BidirectionalUserRelationsSchema } from "./User"
+import {
+  BlockedBidirectionalUserRelationsSchema,
+  UnblockedBidirectionalUserRelationsSchema
+} from "./User"
 import { PlacemarkSchema } from "./Placemark"
 import { TodayOrTomorrowSchema } from "./TodayOrTomorrow"
-import { StringDateRangeSchema } from "@date-time"
+import { StringDateRangeSchema, StringDateSchema } from "@date-time"
 import { ColorString } from "@lib/utils/Color"
 
 /**
@@ -30,18 +33,25 @@ export const areEventRegionsEqual = (r1: EventRegion, r2: EventRegion) => {
   )
 }
 
-export const EventAttendeeSchema = z.object({
+export const UnblockedEventAttendeeSchema = z.object({
   id: z.string().uuid(),
   username: z.string(),
   handle: UserHandle.zodSchema,
   profileImageURL: z.string().url().optional(),
-  relations: BidirectionalUserRelationsSchema
+  relations: UnblockedBidirectionalUserRelationsSchema
 })
+
+/**
+ * A zod schema for an event attendee where either the user or host are blocking one another.
+ */
+export const BlockedEventAttendeeSchema = UnblockedEventAttendeeSchema.omit({
+  relations: true
+}).extend({ relations: BlockedBidirectionalUserRelationsSchema })
 
 /**
  * User information given for an attendee of an event.
  */
-export type EventAttendee = z.infer<typeof EventAttendeeSchema>
+export type EventAttendee = z.infer<typeof UnblockedEventAttendeeSchema>
 
 export const EventSettingsSchema = z.object({
   shouldHideAfterStartDate: z.boolean(),
@@ -66,7 +76,7 @@ export type EventUserAttendeeStatus = z.infer<
   typeof EventUserAttendeeStatusSchema
 >
 
-export const EventPreviewAttendeeSchema = EventAttendeeSchema.pick({
+export const EventPreviewAttendeeSchema = UnblockedEventAttendeeSchema.pick({
   id: true,
   profileImageURL: true
 })
@@ -92,7 +102,7 @@ export const EventLocationSchema = EventRegionSchema.extend({
  */
 export type EventLocation = z.infer<typeof EventLocationSchema>
 
-export const EventTimeSchema = z.object({
+export const EventTimeResponseSchema = z.object({
   secondsToStart: z.number(),
   todayOrTomorrow: TodayOrTomorrowSchema.optional(),
   timezoneIdentifier: z.string(),
@@ -107,26 +117,34 @@ export const EventTimeSchema = z.object({
  *
  * If `secondsToStart` is negative, then the event is officially underway.
  */
-export type EventTime = z.infer<typeof EventTimeSchema>
+export type EventTimeResponse = z.infer<typeof EventTimeResponseSchema>
 
-export const CurrentUserEventSchema = z.object({
+export const CurrentUserEventResponseSchema = z.object({
   id: z.number(),
   title: z.string(), // TODO: - Decide max length.
   description: z.string(),
   color: ColorString.zodSchema,
   attendeeCount: z.number().nonnegative(),
-  joinDate: z.date().optional(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  joinDate: StringDateSchema.optional(),
+  createdAt: StringDateSchema,
+  updatedAt: StringDateSchema,
   hasArrived: z.boolean(),
   isChatExpired: z.boolean(),
   userAttendeeStatus: EventUserAttendeeStatusSchema,
   settings: EventSettingsSchema,
-  time: EventTimeSchema,
+  time: EventTimeResponseSchema,
   location: EventLocationSchema,
   previewAttendees: z.array(EventPreviewAttendeeSchema),
-  host: EventAttendeeSchema
+  host: UnblockedEventAttendeeSchema
 })
+
+/**
+ * The response type for an event. See {@link CurrentUserEvent} for more properties that
+ * don't come directly from the response.
+ */
+export type CurrentUserEventResponse = z.infer<
+  typeof CurrentUserEventResponseSchema
+>
 
 /**
  * The main type for representing an event throughout the app.
@@ -151,7 +169,9 @@ export const CurrentUserEventSchema = z.object({
  *
  * Information denoting the time that the event takes place can be found in the `time` field. The overall
  * philosophy is to have the server respond with the relative time to when the event starts, as the user's
- * device time is flakey and sometimes blatantly wrong. See {@link EventTime} for more information.
+ * device time is flakey and sometimes blatantly wrong. When we receive an event from the server, a timestamp
+ * is added to the event that indicates when we received it. This ensures the countdown in the UI is accurate
+ * when the user navigates to the details page. See {@link EventTimeResponse} for more information.
  *
  * Hosts are allowed to customize specific properties about the event, such as disabling the group chat.
  * However, one of the main properties that they can choose is `shouldHideEventAfterStartDate` which indicates
@@ -165,17 +185,22 @@ export const CurrentUserEventSchema = z.object({
  * `isInArrivalTrackingPeriod` is a simple boolean for describing whether or not we can add the event region to the
  * {@link EventArrivalsTracker} once the user has joined the event. See {@link EventLocation} for more information.
  */
-export type CurrentUserEvent = z.infer<typeof CurrentUserEventSchema>
+export type CurrentUserEvent = Omit<CurrentUserEventResponse, "time"> & {
+  time: CurrentUserEventResponse["time"] & { clientReceivedTime: Date }
+}
 
-export const BlockedEventSchema = CurrentUserEventSchema.pick({
-  id: true,
-  title: true,
-  host: true,
-  createdAt: true,
-  updatedAt: true
+export const BlockedEventResponseSchema = CurrentUserEventResponseSchema.omit({
+  host: true
 })
+  .pick({
+    id: true,
+    title: true,
+    createdAt: true,
+    updatedAt: true
+  })
+  .extend({ host: BlockedEventAttendeeSchema })
 
 /**
  * The content of an event that the user sees when they are blocked by the host.
  */
-export type BlockedEvent = z.infer<typeof BlockedEventSchema>
+export type BlockedEvent = z.infer<typeof BlockedEventResponseSchema>
