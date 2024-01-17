@@ -7,7 +7,7 @@ import {
   View
 } from "react-native"
 import Carousel from "react-native-reanimated-carousel"
-import { CurrentUserEvent } from "@lib/events"
+import { CurrentUserEvent } from "@shared-models/Event"
 import { EventCard } from "@event-details/EventCard"
 
 interface EventPagerProps {

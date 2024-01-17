@@ -4,7 +4,11 @@ import { z } from "zod"
 import { createAWSTiFAPIFetch } from "./aws"
 import { TiFAPIFetch, createTiFAPIFetch } from "./client"
 import { EventArrivalRegionsSchema } from "@shared-models/EventArrivals"
-import { EventRegion } from "@shared-models/Event"
+import {
+  BlockedEventResponseSchema,
+  CurrentUserEventResponseSchema,
+  EventRegion
+} from "@shared-models/Event"
 
 export type UpdateCurrentUserProfileRequest = Partial<{
   name: string
@@ -158,6 +162,25 @@ export class TiFAPI {
         endpoint: "/event/upcoming"
       },
       { status200: UpcomingEventArrivalsRegionsSchema }
+    )
+  }
+
+  async eventDetails (eventId: number) {
+    return await this.apiFetch(
+      {
+        method: "GET",
+        endpoint: `/event/details/${eventId}`
+      },
+      {
+        status200: CurrentUserEventResponseSchema.refine(
+          (resp) => resp.id === eventId
+        ),
+        status204: "no-content",
+        status404: z.object({ error: z.literal("event-not-found") }),
+        status403: BlockedEventResponseSchema.refine(
+          (resp) => resp.id === eventId
+        )
+      }
     )
   }
 }

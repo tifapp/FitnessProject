@@ -4,7 +4,7 @@ import { EventArrival } from "./Models"
 import { randomBool, randomFloatInRange } from "@lib/utils/Random"
 import { ArrayUtils } from "@lib/utils/Array"
 import { EventArrivalRegion } from "@shared-models/EventArrivals"
-import { EventArrivalGeofencedRegion } from "./Geofencing"
+import { EventArrivalGeofencedRegion } from "./geofencing"
 
 export const mockEventArrivalGeofencedRegion =
   (): EventArrivalGeofencedRegion => ({
@@ -14,13 +14,13 @@ export const mockEventArrivalGeofencedRegion =
   })
 
 export const mockEventArrival = (): EventArrival => ({
-  eventId: parseInt(faker.random.numeric(3)),
+  eventId: parseInt(faker.random.numeric(5)),
   ...mockEventArrivalGeofencedRegion()
 })
 
 export const mockEventArrivalRegion = (): EventArrivalRegion => ({
   eventIds: ArrayUtils.repeatElements(Math.ceil(randomFloatInRange(1, 5)), () =>
-    parseInt(faker.random.numeric(3))
+    parseInt(faker.random.numeric(5))
   ),
   ...mockEventArrivalGeofencedRegion()
 })

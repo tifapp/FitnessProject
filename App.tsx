@@ -16,7 +16,7 @@ import { RootSiblingParent } from "react-native-root-siblings"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 
 import { Geo } from "@aws-amplify/geo"
-import { defineEventArrivalsGeofencingTasks } from "@event-details/arrival-tracking"
+import { defineEventArrivalsGeofencingTasks } from "@event-details/arrival-tracking/geofencing"
 import { AnalyticsProvider, MixpanelAnalytics } from "@lib/Analytics"
 import {
   addLogHandler,
