@@ -1,10 +1,20 @@
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import React, { useState } from "react"
+import React from "react"
 import { SafeAreaProvider } from "react-native-safe-area-context"
-import { EventArrivalBannerView } from "@event-details/arrival-tracking"
-import { Button, View } from "react-native"
-import Animated, { Layout } from "react-native-reanimated"
+import { View } from "react-native"
+import {
+  EventDetailErrorView,
+  EventDetailsLoadingView,
+  useLoadEventDetails
+} from "@event-details"
+import { sleep } from "@lib/utils/DelayData"
+import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
+import { InternetConnectionStatusProvider } from "@lib/InternetConnection"
+import { TiFQueryClientProvider } from "@lib/ReactQuery"
+import { createTestQueryClient } from "@test-helpers/ReactQuery"
+import { QueryClientProvider } from "@tanstack/react-query"
+import { BodyText } from "@components/Text"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -14,8 +24,28 @@ export default EventDetailsMeta
 
 type EventDetailsStory = ComponentStory<typeof SettingsScreen>
 
-export const Basic: EventDetailsStory = () => {
-  const [isClosed, setIsClosed] = useState(false)
+const connectionStatus = new TestInternetConnectionStatus(false)
+
+setInterval(
+  () => connectionStatus.publishIsConnected(!connectionStatus.isConnected),
+  5000
+)
+
+const queryClient = createTestQueryClient()
+
+export const Basic: EventDetailsStory = () => (
+  <QueryClientProvider client={queryClient}>
+    <InternetConnectionStatusProvider status={connectionStatus}>
+      <Screen />
+    </InternetConnectionStatusProvider>
+  </QueryClientProvider>
+)
+
+const Screen = () => {
+  const result = useLoadEventDetails(1, async () => {
+    await sleep(3000)
+    throw new Error("Internet died")
+  })
   return (
     <SafeAreaProvider>
       <View
@@ -26,18 +56,15 @@ export const Basic: EventDetailsStory = () => {
           alignItems: "center"
         }}
       >
-        {!isClosed && (
-          <EventArrivalBannerView
-            hasJoinedEvent
-            countdown={{ secondsToStart: 0 }}
-            canShareArrivalStatus={false}
-            onClose={() => setIsClosed(true)}
-            style={{ padding: 16, width: "100%" }}
-          />
+        {result.status === "loading" && <EventDetailsLoadingView />}
+        {result.status === "error" && (
+          <View>
+            <EventDetailErrorView {...result} />
+            <BodyText style={{ marginTop: 64 }}>
+              Is Connected to Internet: {`${result.isConnectedToInternet}`}
+            </BodyText>
+          </View>
         )}
-        <Animated.View layout={Layout}>
-          <Button onPress={() => setIsClosed(false)} title="Show" />
-        </Animated.View>
       </View>
     </SafeAreaProvider>
   )

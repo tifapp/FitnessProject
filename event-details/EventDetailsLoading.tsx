@@ -1,9 +1,13 @@
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
 import { BlockedEvent, CurrentUserEvent } from "@shared-models/Event"
 import { useIsConnectedToInternet } from "@lib/InternetConnection"
-import { useEffect } from "react"
+import React, { useEffect, useMemo } from "react"
 import { useEffectEvent } from "@lib/utils/UseEffectEvent"
 import { TiFAPI } from "@api-client/TiFAPI"
+import { StyleProp, View, ViewStyle, StyleSheet } from "react-native"
+import { BodyText, Subtitle } from "@components/Text"
+import { ArrayUtils } from "@lib/utils/Array"
+import { PrimaryButton } from "@components/Buttons"
 
 /**
  * A result from loading a single event for the details screen.
@@ -115,3 +119,132 @@ const refreshStatus = (
     return "idle" as const
   }
 }
+
+export type EventDetailsLoadingProps = {
+  style?: StyleProp<ViewStyle>
+}
+
+export const EventDetailsLoadingView = ({
+  style
+}: EventDetailsLoadingProps) => (
+  <BaseEventDetailsLoadingView
+    title="Loading..."
+    possibleMessages={LOADING_MESSAGES}
+    style={style}
+  />
+)
+
+const LOADING_MESSAGES = ["Hang tight.", "Stay put.", "Hold on a sec."]
+
+export type EventDetailsCanceledProps = {
+  style?: StyleProp<ViewStyle>
+  onExploreOtherEventsTapped: () => void
+}
+
+export const EventDetailCanceledView = ({
+  onExploreOtherEventsTapped,
+  style
+}: EventDetailsCanceledProps) => (
+  <BaseEventDetailsLoadingView
+    onActionButtonTapped={onExploreOtherEventsTapped}
+    title="Bummer!"
+    actionButtonTitle="Explore Other Events"
+    possibleMessages={CANCELED_MESSAGES}
+    style={style}
+  />
+)
+
+const CANCELED_MESSAGES = [
+  "This event was canceled. Click here to explore other events in the area.",
+  "This event is no longer taking place. Click here to explore other events in the area.",
+  "This event has been revoked. Click here to explore other events in the area."
+]
+
+export type EventDetailsErrorProps = {
+  style?: StyleProp<ViewStyle>
+  retry: () => void
+  isConnectedToInternet: boolean
+}
+
+export const EventDetailErrorView = ({
+  retry,
+  isConnectedToInternet,
+  style
+}: EventDetailsErrorProps) => (
+  <BaseEventDetailsLoadingView
+    onActionButtonTapped={retry}
+    title="Uh Oh!"
+    actionButtonTitle="Try Again"
+    possibleMessages={
+      isConnectedToInternet ? GENERIC_ERROR_MESSAGES : INTERNET_ERROR_MESSAGES
+    }
+    style={style}
+  />
+)
+
+const GENERIC_ERROR_MESSAGES = ["Something went wrong. Please try again."]
+
+const INTERNET_ERROR_MESSAGES = [
+  "Poor network connection. Check your network settings and try again.",
+  "Unstable network detected. Check your network settings and try again.",
+  "Network issues detected. Check your network settings and try again."
+]
+
+type BaseEventDetailsLoadingProps = {
+  style?: StyleProp<ViewStyle>
+  title: string
+  possibleMessages: string[]
+  actionButtonTitle?: string
+  onActionButtonTapped?: () => void
+}
+
+const BaseEventDetailsLoadingView = ({
+  style,
+  title,
+  possibleMessages,
+  actionButtonTitle,
+  onActionButtonTapped
+}: BaseEventDetailsLoadingProps) => (
+  <View style={[style, styles.container]}>
+    <View style={styles.placeholderIllustration} />
+    <Subtitle style={styles.titleText}>{title}</Subtitle>
+    <BodyText style={styles.bodyText}>
+      {useMemo(
+        () => ArrayUtils.randomElement(possibleMessages),
+        [possibleMessages]
+      )}
+    </BodyText>
+    {onActionButtonTapped && actionButtonTitle && (
+      <PrimaryButton
+        style={styles.errorActionButton}
+        onPress={onActionButtonTapped}
+      >
+        {actionButtonTitle}
+      </PrimaryButton>
+    )}
+  </View>
+)
+
+const styles = StyleSheet.create({
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center"
+  },
+  placeholderIllustration: {
+    backgroundColor: "red",
+    width: 200,
+    height: 200
+  },
+  titleText: {
+    marginVertical: 8,
+    textAlign: "center"
+  },
+  bodyText: {
+    opacity: 0.5,
+    textAlign: "center"
+  },
+  errorActionButton: {
+    marginTop: 16
+  }
+})
