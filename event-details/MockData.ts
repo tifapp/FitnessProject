@@ -5,7 +5,7 @@ import {
   EventAttendee,
   EventLocation
 } from "@shared-models/Event"
-import { dateRange } from "@date-time"
+import { dateRange, dayjs } from "@date-time"
 import { mockLocationCoordinate2D, mockPlacemark } from "@location/MockData"
 import { faker } from "@faker-js/faker"
 import {
@@ -13,7 +13,7 @@ import {
   randomIntegerInRange,
   randomlyUndefined
 } from "@lib/utils/Random"
-import { EventColors } from "./Event"
+import { ColorString } from "@lib/utils/Color"
 
 export const mockEventLocation = (): EventLocation => ({
   coordinate: mockLocationCoordinate2D(),
@@ -31,19 +31,31 @@ export namespace EventAttendeeMocks {
     username: "Alvis",
     handle: UserHandle.optionalParse("alvis")!,
     profileImageURL:
-      "https://www.escapistmagazine.com/wp-content/uploads/2023/05/xc3-future-redeemed-alvis.jpg?resize=1200%2C673"
+      "https://www.escapistmagazine.com/wp-content/uploads/2023/05/xc3-future-redeemed-alvis.jpg?resize=1200%2C673",
+    relations: {
+      themToYou: "not-friends",
+      youToThem: "not-friends"
+    }
   } as EventAttendee
 
   export const BlobJr = {
     id: uuidString(),
     username: "Blob Jr.",
-    handle: UserHandle.optionalParse("SmallBlob")!
+    handle: UserHandle.optionalParse("SmallBlob")!,
+    relations: {
+      themToYou: "not-friends",
+      youToThem: "not-friends"
+    }
   } as EventAttendee
 
   export const BlobSr = {
     id: uuidString(),
     username: "Blob Sr.",
-    handle: UserHandle.optionalParse("OriginalBlob")!
+    handle: UserHandle.optionalParse("OriginalBlob")!,
+    relations: {
+      themToYou: "not-friends",
+      youToThem: "not-friends"
+    }
   } as EventAttendee
 
   // NB: Unfortunately, we can't reuse Harrison's legendary
@@ -52,12 +64,22 @@ export namespace EventAttendeeMocks {
 
   export const AnnaAttendee = {
     id: uuidString(),
-    username: "Anna Attendee"
+    username: "Anna Attendee",
+    handle: UserHandle.optionalParse("AnnaAttendee")!,
+    relations: {
+      themToYou: "not-friends",
+      youToThem: "not-friends"
+    }
   } as EventAttendee
 
   export const HaleyHost = {
     id: uuidString(),
-    username: "Haley Host"
+    username: "Haley Host",
+    handle: UserHandle.optionalParse("HaleyHost")!,
+    relations: {
+      themToYou: "not-friends",
+      youToThem: "not-friends"
+    }
   } as EventAttendee
 }
 
@@ -70,16 +92,27 @@ export namespace EventMocks {
     id: randomIntegerInRange(0, 10000),
     title: "Pickup Basketball",
     description: "I'm better than Lebron James.",
-    dateRange: dateRange(
-      new Date("2023-03-18T12:00:00"),
-      new Date("2023-03-18T13:00:00")
-    ),
-    color: EventColors.Orange,
+    color: ColorString.parse("#ABCDEF"),
+    time: {
+      dateRange: dateRange(
+        new Date("2023-03-18T12:00:00"),
+        new Date("2023-03-18T13:00:00")
+      ),
+      secondsToStart: dayjs.duration(3, "hours").asSeconds(),
+      todayOrTomorrow: "today",
+      timezoneIdentifier: "UTC",
+      clientReceivedTime: new Date()
+    },
+    settings: {
+      shouldHideAfterStartDate: true,
+      isChatEnabled: true
+    },
     location: mockEventLocation(),
-    shouldHideAfterStartDate: false,
     attendeeCount: 10,
     userAttendeeStatus: "attending",
-    userMilesFromEvent: 12.7892
+    hasArrived: false,
+    joinDate: new Date(),
+    isChatExpired: false
   } as CurrentUserEvent
 
   export const Multiday = {
@@ -87,16 +120,26 @@ export namespace EventMocks {
     id: randomIntegerInRange(0, 10000),
     title: "Multiday Event",
     description: "This event runs for more than one day.",
-    dateRange: dateRange(
-      new Date("2023-03-18T12:00:00"),
-      new Date("2023-03-21T12:00:00")
-    ),
-    color: EventColors.Purple,
+    color: ColorString.parse("#ABCDEF"),
+    time: {
+      dateRange: dateRange(
+        new Date("2023-03-18T12:00:00"),
+        new Date("2023-03-21T12:00:00")
+      ),
+      secondsToStart: dayjs.duration(2, "days").asSeconds(),
+      timezoneIdentifier: "UTC",
+      clientReceivedTime: new Date()
+    },
     location: mockEventLocation(),
-    shouldHideAfterStartDate: false,
+    settings: {
+      shouldHideAfterStartDate: false,
+      isChatEnabled: true
+    },
     attendeeCount: 3,
     userAttendeeStatus: "attending",
-    userMilesFromEvent: 12.7892
+    hasArrived: false,
+    joinDate: new Date(),
+    isChatExpired: false
   } as CurrentUserEvent
 
   export const NoPlacemarkInfo = {
@@ -105,16 +148,25 @@ export namespace EventMocks {
     title: "No Placemark Info",
     attendeeCount: 5,
     description:
-      "The placemark info should then be geocoded from the coordinates if it is not available." +
-      "(ie. Our AWS backend still needs to geocode it) The result in this case should be somewhere in New York.",
-    dateRange: dateRange(
-      new Date("2023-03-18T12:00:00"),
-      new Date("2023-03-18T15:00:00")
-    ),
-    color: EventColors.Green,
+      "The placemark info should then be geocoded from the coordinates if it is not available.",
+    time: {
+      dateRange: dateRange(
+        new Date("2023-03-18T12:00:00"),
+        new Date("2023-03-18T15:00:00")
+      ),
+      secondsToStart: dayjs.duration(2, "days").asSeconds(),
+      timezoneIdentifier: "UTC",
+      clientReceivedTime: new Date()
+    },
+    color: ColorString.parse("#ABCDEF")!,
     location: { ...mockEventLocation(), placemark: undefined },
-    shouldHideAfterStartDate: false,
+    settings: {
+      shouldHideAfterStartDate: false,
+      isChatEnabled: true
+    },
     userAttendeeStatus: "attending",
-    userMilesFromEvent: 12.7892
+    hasArrived: false,
+    joinDate: new Date(),
+    isChatExpired: false
   } as CurrentUserEvent
 }
