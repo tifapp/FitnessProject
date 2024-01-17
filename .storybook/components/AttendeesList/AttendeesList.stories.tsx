@@ -1,17 +1,18 @@
+import { Headline } from "@components/Text"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
-import { AttendeesListScreen } from "@screens/EventAttendeesList/AttendeesListScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 
-const AttendeesListMeta: ComponentMeta<typeof AttendeesListScreen> = {
-  title: "Attendees List",
-  component: AttendeesListScreen
+const SomeComponent = (props: any) => <></>
+
+const AttendeesListMeta: ComponentMeta<typeof SomeComponent> = {
+  title: "Attendees List"
 }
 export default AttendeesListMeta
 
-type AttendeesListStory = ComponentStory<typeof AttendeesListScreen>
+type AttendeesListStory = ComponentStory<typeof SomeComponent>
 
 export const Basic: AttendeesListStory = () => (
   <TiFQueryClientProvider>
-    <AttendeesListScreen />
+    <Headline>Hello world</Headline>
   </TiFQueryClientProvider>
 )
