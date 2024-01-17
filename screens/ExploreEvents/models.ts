@@ -1,4 +1,4 @@
-import { CurrentUserEvent } from "@lib/events"
+import { CurrentUserEvent } from "@shared-models/Event"
 import { LocationCoordinate2D } from "@location/index"
 
 /**

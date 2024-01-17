@@ -1,21 +1,33 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native"
-import { useLoadEventDetails } from "./EventDetailsLoading"
+import { loadEventDetails, useLoadEventDetails } from "./EventDetailsLoading"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { EventMocks } from "./MockData"
+import { EventMocks, mockEventLocation } from "./MockData"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 import { InternetConnectionStatusProvider } from "@lib/InternetConnection"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
+import { TiFAPI } from "@api-client/TiFAPI"
+import { mswServer } from "@test-helpers/msw"
+import { rest } from "msw"
+import { uuidString } from "@lib/utils/UUID"
+import { UserHandle } from "@content-parsing"
+import dayjs from "dayjs"
+import { ColorString } from "@lib/utils/Color"
+import { dateRange } from "@date-time"
+import { fakeTimers } from "@test-helpers/Timers"
 
 describe("EventDetailsLoading tests", () => {
-  const loadEvent = jest.fn()
-  let testConnectionStatus = new TestInternetConnectionStatus(true)
-
   beforeEach(() => {
     jest.resetAllMocks()
-    testConnectionStatus = new TestInternetConnectionStatus(true)
   })
 
   describe("UseLoadEventDetails tests", () => {
+    const loadEvent = jest.fn()
+    let testConnectionStatus = new TestInternetConnectionStatus(true)
+
+    beforeEach(() => {
+      testConnectionStatus = new TestInternetConnectionStatus(true)
+    })
+
     test("basic loading flow", async () => {
       loadEvent.mockResolvedValueOnce({
         status: "success",
@@ -74,11 +86,13 @@ describe("EventDetailsLoading tests", () => {
       expect(loadEvent).toHaveBeenCalledTimes(1)
     })
 
-    test("test deleted flow", async () => {
-      loadEvent.mockResolvedValueOnce({ status: "deleted" })
+    test("test cancelled flow", async () => {
+      loadEvent.mockResolvedValueOnce({ status: "cancelled" })
       const { result } = renderUseLoadEvent(1)
       expect(result.current).toEqual({ status: "loading" })
-      await waitFor(() => expect(result.current).toEqual({ status: "deleted" }))
+      await waitFor(() =>
+        expect(result.current).toEqual({ status: "cancelled" })
+      )
       expect(loadEvent).toHaveBeenCalledWith(1)
       expect(loadEvent).toHaveBeenCalledTimes(1)
     })
@@ -215,6 +229,125 @@ describe("EventDetailsLoading tests", () => {
             </InternetConnectionStatusProvider>
           )
         }
+      )
+    }
+  })
+
+  describe("LoadEventDetails tests", () => {
+    fakeTimers()
+
+    it("should return \"canceled\" when a 204 occurs", async () => {
+      setEventResponse(204)
+      const result = await loadEventDetails(1, TiFAPI.testAuthenticatedInstance)
+      expect(result).toEqual({ status: "cancelled" })
+    })
+
+    it("should return \"not-found\" when a 404 occurs", async () => {
+      setEventResponse(404, { error: "event-not-found" })
+      const result = await loadEventDetails(1, TiFAPI.testAuthenticatedInstance)
+      expect(result).toEqual({ status: "not-found" })
+    })
+
+    it("should return \"blocked\" when a 403 occurs", async () => {
+      const blockedEventResponse = {
+        id: 1,
+        title: "Some Event",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        host: {
+          id: uuidString(),
+          username: "Blob",
+          handle: "blob",
+          relations: {
+            themToYou: "blocked",
+            youToThem: "blocked"
+          }
+        }
+      }
+      setEventResponse(403, blockedEventResponse)
+      const result = await loadEventDetails(1, TiFAPI.testAuthenticatedInstance)
+      expect(result).toEqual({
+        status: "blocked",
+        event: {
+          ...blockedEventResponse,
+          host: {
+            ...blockedEventResponse.host,
+            handle: UserHandle.optionalParse("blob")!
+          }
+        }
+      })
+    })
+
+    it("should indicate the time of response on the event time when a 200 occurs", async () => {
+      const clientReceivedTime = new Date(4500)
+      jest.setSystemTime(clientReceivedTime)
+      const eventResponse = {
+        id: 1,
+        title: "Some Event",
+        color: "#FFFFFF",
+        description: "This is an event.",
+        hasArrived: false,
+        createdAt: new Date(2000),
+        updatedAt: new Date(3000),
+        attendeeCount: 10,
+        userAttendeeStatus: "attending",
+        isChatExpired: false,
+        host: {
+          id: uuidString(),
+          username: "Blob",
+          handle: "blob",
+          relations: {
+            themToYou: "not-friends",
+            youToThem: "not-friends"
+          }
+        },
+        settings: {
+          shouldHideAfterStartDate: false,
+          isChatEnabled: true
+        },
+        time: {
+          secondsToStart: dayjs.duration(3, "hours").asSeconds(),
+          todayOrTomorrow: "today",
+          timezoneIdentifier: "UTC",
+          dateRange: {
+            startDateTime: new Date(4000),
+            endDateTime: new Date(5000)
+          }
+        },
+        location: mockEventLocation(),
+        previewAttendees: [{ id: uuidString() }]
+      }
+      setEventResponse(200, eventResponse)
+      const resp = await loadEventDetails(1, TiFAPI.testAuthenticatedInstance)
+      expect(resp).toEqual({
+        status: "success",
+        event: {
+          ...eventResponse,
+          color: ColorString.parse("#FFFFFF")!,
+          host: {
+            ...eventResponse.host,
+            handle: UserHandle.optionalParse("blob")!
+          },
+          time: {
+            ...eventResponse.time,
+            dateRange: dateRange(new Date(4000), new Date(5000)),
+            clientReceivedTime
+          }
+        }
+      })
+    })
+
+    const setEventResponse = (
+      statusCode: 200 | 204 | 404 | 403,
+      body?: object
+    ) => {
+      mswServer.use(
+        rest.get(TiFAPI.testPath("/event/details/:id"), async (_, res, ctx) => {
+          if (statusCode === 204) {
+            return res(ctx.status(204))
+          }
+          return res(ctx.status(statusCode), ctx.json(body))
+        })
       )
     }
   })

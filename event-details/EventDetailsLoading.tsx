@@ -1,19 +1,48 @@
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
-import { BlockedEvent, CurrentUserEvent } from "./Event"
+import { BlockedEvent, CurrentUserEvent } from "@shared-models/Event"
 import { useIsConnectedToInternet } from "@lib/InternetConnection"
 import { useEffect } from "react"
 import { useEffectEvent } from "@lib/utils/UseEffectEvent"
+import { TiFAPI } from "@api-client/TiFAPI"
 
 /**
  * A result from loading a single event for the details screen.
  */
 export type EventDetailsLoadingResult =
-  | { status: "not-found" | "deleted" }
+  | { status: "not-found" | "cancelled" }
   | { status: "blocked"; event: BlockedEvent }
   | { status: "success"; event: CurrentUserEvent }
 
+/**
+ * Loads the event details from the server.
+ *
+ * A `clientReceivedTime` property is added on a successful response which is used for
+ * calculating accurate countdown times.
+ */
+export const loadEventDetails = async (
+  eventId: number,
+  tifAPI: TiFAPI
+): Promise<EventDetailsLoadingResult> => {
+  const resp = await tifAPI.eventDetails(eventId)
+  if (resp.status === 404) {
+    return { status: "not-found" }
+  } else if (resp.status === 403) {
+    return { status: "blocked", event: resp.data }
+  } else if (resp.status === 204) {
+    return { status: "cancelled" }
+  } else {
+    return {
+      status: "success",
+      event: {
+        ...resp.data,
+        time: { ...resp.data.time, clientReceivedTime: new Date() }
+      }
+    }
+  }
+}
+
 export type UseLoadEventDetailsResult =
-  | { status: "loading" | "not-found" | "deleted" }
+  | { status: "loading" | "not-found" | "cancelled" }
   | { status: "error"; retry: () => void; isConnectedToInternet: boolean }
   | {
       status: "success"
@@ -59,7 +88,7 @@ const loadEventDetailsResult = (
       retry: () => {
         query.refetch()
       }
-    } as const
+    }
   } else if (query.status === "loading") {
     return { status: query.status }
   } else if (query.data.status !== "success") {
@@ -71,7 +100,7 @@ const loadEventDetailsResult = (
         query.refetch()
       },
       refreshStatus: refreshStatus(query)
-    } as const
+    }
   }
 }
 

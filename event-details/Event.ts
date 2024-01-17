@@ -1,14 +1,12 @@
-import { UserHandle } from "@content-parsing"
-import { FixedDateRange } from "@date-time"
-import {
-  LocationCoordinate2D,
-  Placemark,
-  placemarkToFormattedAddress
-} from "@location"
-import { UserToProfileRelationStatus } from "@lib/users"
+import { placemarkToFormattedAddress } from "@location"
 import * as Clipboard from "expo-clipboard"
 import { showLocation } from "react-native-map-link"
 import { EventArrival, EventArrivalsTracker } from "./arrival-tracking"
+import {
+  EventLocation,
+  EventUserAttendeeStatus,
+  CurrentUserEvent
+} from "@shared-models/Event"
 
 /**
  * A type for the color value for an event.
@@ -21,31 +19,6 @@ export enum EventColors {
   Pink = "#F7B2BD",
   Orange = "#F4845F",
   Yellow = "#F6BD60"
-}
-
-/**
- * A user who is attending an event.
- */
-export type EventAttendee = {
-  id: string
-  username: string
-  handle: UserHandle
-  profileImageURL?: string
-  relationStatus: UserToProfileRelationStatus
-}
-
-/**
- * The location of an event.
- *
- * Event locations may not have a placemark, this could either be because
- * the event is in the middle of nowhere, or its placemark hasn't been fully
- * decoded for some reason.
- */
-export type EventLocation = {
-  coordinate: LocationCoordinate2D
-  placemark?: Placemark
-  arrivalRadiusMeters: number
-  isInArrivalTrackingPeriod: boolean
 }
 
 export type EventLocationCoordinatePlacemark = Pick<
@@ -95,30 +68,6 @@ export const openEventLocationInMaps = (
 }
 
 /**
- * A type representing events that are attended and hosted by users.
- */
-export type Event = {
-  host: EventAttendee
-  id: number
-  title: string
-  description: string
-  dateRange: FixedDateRange
-  color: EventColors
-  location: EventLocation
-  shouldHideAfterStartDate: boolean
-  attendeeCount: number
-}
-
-/**
- * A type for determining whether or not a user is a host,
- * attendee, or a non-participant of an event.
- */
-export type EventUserAttendeeStatus =
-  | "hosting"
-  | "attending"
-  | "not-participating"
-
-/**
  * Returns true if the status indicates that the user is hosting the event.
  */
 export const isHostingEvent = (attendeeStatus: EventUserAttendeeStatus) => {
@@ -131,14 +80,6 @@ export const isHostingEvent = (attendeeStatus: EventUserAttendeeStatus) => {
  */
 export const isAttendingEvent = (attendeeStatus: EventUserAttendeeStatus) => {
   return attendeeStatus !== "not-participating"
-}
-
-/**
- * An event type that adds additional data on a specific user's
- * perspective of the event.
- */
-export type CurrentUserEvent = Event & {
-  userAttendeeStatus: EventUserAttendeeStatus
 }
 
 /**
@@ -169,8 +110,3 @@ export const updateEventsInArrivalsTracker = async (
   await tracker.removeArrivalsByEventIds(idsToRemove)
   await tracker.trackArrivals(arrivalsToTrack)
 }
-
-/**
- * Contents of an event when the user is blocked by or is blocking the host.
- */
-export type BlockedEvent = Pick<Event, "id" | "host" | "title">

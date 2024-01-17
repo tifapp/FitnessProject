@@ -1,5 +1,5 @@
 import { ExploreEventsMarkerView } from "@screens/ExploreEvents/MapMarker"
-import { CurrentUserEvent } from "@lib/events"
+import { CurrentUserEvent } from "@shared-models/Event"
 import { LocationCoordinate2D, Region } from "@location/index"
 import React from "react"
 import { StyleProp, ViewStyle } from "react-native"
@@ -47,11 +47,11 @@ export const ExploreEventsMap = ({
     {events.map((event) => (
       <Marker
         key={event.id}
-        coordinate={event.coordinates}
+        coordinate={event.location.coordinate}
         onPress={() => onEventSelected(event)}
       >
         <ExploreEventsMarkerView
-          color={event.color}
+          color={event.color.toString()}
           imageURL={event.host.profileImageURL}
           attendeeCount={event.attendeeCount}
         />
