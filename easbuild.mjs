@@ -294,6 +294,7 @@ const manageCheckRun = async (/** @type {string} */ action) => {
   }
 }
 
+console.log(process.env)
 if (process.env.RUN_EAS_BUILD_HOOKS === "1") {
   manageCheckRun(action)
 }

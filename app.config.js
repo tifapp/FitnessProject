@@ -2,7 +2,8 @@ const dotenv = require("dotenv")
 
 dotenv.config({ path: ".env.infra" })
 
-const { MAPS_API_KEY, EXPO_PROJECT_ID, EXPO_PROJECT_OWNER } = process.env
+const { MAPS_API_KEY, EXPO_PROJECT_ID, EXPO_PROJECT_OWNER, BUILD_TYPE } =
+  process.env
 
 const config = {
   name: "FitnessApp",
@@ -62,7 +63,10 @@ const config = {
     favicon: "./assets/favicon.png"
   },
   android: {
-    package: "com.tifapp.FitnessApp",
+    package:
+      BUILD_TYPE === "storybook"
+        ? "com.tifapp.FitnessAppStorybook"
+        : "com.tifapp.FitnessApp",
     googleServicesFile: "./google-services.json",
     config: {
       googleMaps: {

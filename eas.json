@@ -3,21 +3,19 @@
     "version": ">=5.6.0"
   },
   "build": {
-    "storybook": {
+    "development": {
       "env": {
         "BUILD_TYPE": "storybook"
       },
       "developmentClient": true,
       "distribution": "internal",
       "android": {
-        "buildType": "apk"
-      }
-    },
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal",
-      "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleDevelopmentDebug"
+      },
+      "ios": {
+        "buildConfiguration": "Debug",
+        "scheme": "tifapp-storybook"
       }
     },
     "preview": {
