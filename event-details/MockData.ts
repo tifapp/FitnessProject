@@ -11,7 +11,7 @@ import { faker } from "@faker-js/faker"
 import {
   randomBool,
   randomIntegerInRange,
-  randomlyUndefined
+  randomlyNull
 } from "@lib/utils/Random"
 import { ColorString } from "@lib/utils/Color"
 
@@ -19,7 +19,8 @@ export const mockEventLocation = (): EventLocation => ({
   coordinate: mockLocationCoordinate2D(),
   arrivalRadiusMeters: parseInt(faker.random.numeric(3)),
   isInArrivalTrackingPeriod: randomBool(),
-  placemark: randomlyUndefined(mockPlacemark())
+  timezoneIdentifier: faker.address.timeZone(),
+  placemark: randomlyNull(mockPlacemark())
 })
 
 /**
@@ -42,6 +43,7 @@ export namespace EventAttendeeMocks {
     id: uuidString(),
     username: "Blob Jr.",
     handle: UserHandle.optionalParse("SmallBlob")!,
+    profileImageURL: null,
     relations: {
       themToYou: "not-friends",
       youToThem: "not-friends"
@@ -52,6 +54,7 @@ export namespace EventAttendeeMocks {
     id: uuidString(),
     username: "Blob Sr.",
     handle: UserHandle.optionalParse("OriginalBlob")!,
+    profileImageURL: null,
     relations: {
       themToYou: "not-friends",
       youToThem: "not-friends"
@@ -66,6 +69,7 @@ export namespace EventAttendeeMocks {
     id: uuidString(),
     username: "Anna Attendee",
     handle: UserHandle.optionalParse("AnnaAttendee")!,
+    profileImageURL: null,
     relations: {
       themToYou: "not-friends",
       youToThem: "not-friends"
@@ -76,6 +80,7 @@ export namespace EventAttendeeMocks {
     id: uuidString(),
     username: "Haley Host",
     handle: UserHandle.optionalParse("HaleyHost")!,
+    profileImageURL: null,
     relations: {
       themToYou: "not-friends",
       youToThem: "not-friends"
@@ -100,7 +105,6 @@ export namespace EventMocks {
       ),
       secondsToStart: dayjs.duration(3, "hours").asSeconds(),
       todayOrTomorrow: "today",
-      timezoneIdentifier: "UTC",
       clientReceivedTime: new Date()
     },
     settings: {
@@ -112,7 +116,8 @@ export namespace EventMocks {
     userAttendeeStatus: "attending",
     hasArrived: false,
     joinDate: new Date(),
-    isChatExpired: false
+    isChatExpired: false,
+    hasEndedEarly: false
   } as CurrentUserEvent
 
   export const Multiday = {
@@ -127,7 +132,6 @@ export namespace EventMocks {
         new Date("2023-03-21T12:00:00")
       ),
       secondsToStart: dayjs.duration(2, "days").asSeconds(),
-      timezoneIdentifier: "UTC",
       clientReceivedTime: new Date()
     },
     location: mockEventLocation(),
@@ -139,7 +143,8 @@ export namespace EventMocks {
     userAttendeeStatus: "attending",
     hasArrived: false,
     joinDate: new Date(),
-    isChatExpired: false
+    isChatExpired: false,
+    hasEndedEarly: false
   } as CurrentUserEvent
 
   export const NoPlacemarkInfo = {
@@ -155,11 +160,10 @@ export namespace EventMocks {
         new Date("2023-03-18T15:00:00")
       ),
       secondsToStart: dayjs.duration(2, "days").asSeconds(),
-      timezoneIdentifier: "UTC",
       clientReceivedTime: new Date()
     },
     color: ColorString.parse("#ABCDEF")!,
-    location: { ...mockEventLocation(), placemark: undefined },
+    location: { ...mockEventLocation(), placemark: null },
     settings: {
       shouldHideAfterStartDate: false,
       isChatEnabled: true
@@ -167,6 +171,7 @@ export namespace EventMocks {
     userAttendeeStatus: "attending",
     hasArrived: false,
     joinDate: new Date(),
-    isChatExpired: false
+    isChatExpired: false,
+    hasEndedEarly: false
   } as CurrentUserEvent
 }

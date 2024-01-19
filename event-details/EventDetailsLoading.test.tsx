@@ -258,6 +258,7 @@ describe("EventDetailsLoading tests", () => {
           id: uuidString(),
           username: "Blob",
           handle: "blob",
+          profileImageURL: null,
           relations: {
             themToYou: "blocked",
             youToThem: "blocked"
@@ -296,6 +297,7 @@ describe("EventDetailsLoading tests", () => {
           id: uuidString(),
           username: "Blob",
           handle: "blob",
+          profileImageURL: null,
           relations: {
             themToYou: "not-friends",
             youToThem: "not-friends"
@@ -308,14 +310,15 @@ describe("EventDetailsLoading tests", () => {
         time: {
           secondsToStart: dayjs.duration(3, "hours").asSeconds(),
           todayOrTomorrow: "today",
-          timezoneIdentifier: "UTC",
           dateRange: {
             startDateTime: new Date(4000),
             endDateTime: new Date(5000)
           }
         },
+        joinDate: null,
         location: mockEventLocation(),
-        previewAttendees: [{ id: uuidString() }]
+        previewAttendees: [{ id: uuidString(), profileImageURL: null }],
+        hasEndedEarly: false
       }
       setEventResponse(200, eventResponse)
       const resp = await loadEventDetails(1, TiFAPI.testAuthenticatedInstance)
