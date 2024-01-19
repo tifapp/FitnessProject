@@ -4,10 +4,10 @@ import {
   EventArrivalGeofencedRegion,
   EventArrivalGeofencingUnsubscribe,
   EventArrivalsGeofencer
-} from "./Geofencing"
+} from "./geofencing"
 import { ArrayUtils } from "@lib/utils/Array"
 import { PerformArrivalsOperation } from "./ArrivalsOperation"
-import { EventArrival } from "./Models"
+import { EventArrival, removeDuplicateArrivals } from "./Models"
 import { areEventRegionsEqual } from "@shared-models/Event"
 
 /**
@@ -56,9 +56,12 @@ export class EventArrivalsTracker {
 
   async trackArrivals (newArrivals: EventArrival[]) {
     await this.transformAllUpcomingArrivals((regions) => {
-      const eventIds = new Set(newArrivals.map((arrival) => arrival.eventId))
-      const newRegions = this.removeByEventIdsTransform(eventIds, regions)
-      for (const arrival of newArrivals) {
+      const deduplicatedArrivals = removeDuplicateArrivals(newArrivals)
+      const newRegions = this.removeByEventIdsTransform(
+        new Set(deduplicatedArrivals.map((arrival) => arrival.eventId)),
+        regions
+      )
+      for (const arrival of deduplicatedArrivals) {
         const regionIndex = newRegions.findIndex((region) => {
           return areEventRegionsEqual(region, arrival)
         })

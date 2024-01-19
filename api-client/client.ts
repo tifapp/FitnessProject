@@ -1,7 +1,7 @@
 import { JSONSerializableValue } from "@lib/JSONSerializable"
 import { createLogFunction } from "@lib/Logging"
 import { ToStringable } from "@lib/ToStringable"
-import { AnyZodObject, z } from "zod"
+import { AnyZodObject, ZodType, z } from "zod"
 
 export type TiFHTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE"
 
@@ -37,9 +37,7 @@ type StatusCodeMap = {
  * must be in the form `statusXXX`.
  */
 export type TiFAPIResponseSchemas = Partial<{
-  [key in keyof StatusCodeMap]: key extends "status204"
-    ? "no-content"
-    : AnyZodObject
+  [key in keyof StatusCodeMap]: key extends "status204" ? "no-content" : ZodType
 }>
 
 const EmptyObjectSchema = z.object({})
@@ -57,7 +55,7 @@ type SchemaFor<
  * A union type mapping a status code to the infered type of a ZodSchema.
  */
 export type TiFAPIResponse<Schemas extends TiFAPIResponseSchemas> = {
-  [key in keyof StatusCodeMap]: SchemaFor<key, Schemas> extends AnyZodObject
+  [key in keyof StatusCodeMap]: SchemaFor<key, Schemas> extends ZodType
     ? {
         status: StatusCodeMap[key]
         data: z.infer<SchemaFor<key, Schemas>>

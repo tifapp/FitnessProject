@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react-native"
 import { EventCard } from "./EventCard"
 import React from "react"
-import { CurrentUserEvent } from "./Event"
+import { CurrentUserEvent } from "@shared-models/Event"
 import "@test-helpers/Matchers"
 import { EventMocks } from "./MockData"
 

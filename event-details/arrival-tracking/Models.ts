@@ -23,3 +23,18 @@ export const EventArrivalsSchema = z.array(EventArrivalSchema)
  * The scheduling/sending of the push notifications is handled server-side.
  */
 export type EventArrival = z.infer<typeof EventArrivalSchema>
+
+/**
+ * Removes arrivals in the given array by whether or not they have the same event id.
+ *
+ * The latest occurrence of the last arrival is the one that remains.
+ */
+export const removeDuplicateArrivals = (arrivals: EventArrival[]) => {
+  const idToIndexMap = new Map<number, number>()
+  arrivals.forEach((arrival, index) => {
+    idToIndexMap.set(arrival.eventId, index)
+  })
+  return arrivals.filter(
+    (arrival, index) => idToIndexMap.get(arrival.eventId) === index
+  )
+}

@@ -9,9 +9,10 @@ import {
 import { mockLocationSearchFunction } from "./MockData"
 import { LocationsSearchQuery } from "./Models"
 import { mockTiFLocation, mockLocationCoordinate2D } from "@location/MockData"
+import { clearAsyncStorageBeforeEach } from "@test-helpers/AsyncStorage"
 
 describe("Search client tests", () => {
-  beforeEach(async () => await AsyncStorage.clear())
+  clearAsyncStorageBeforeEach()
   describe("awsPlaceToTiFLocation tests", () => {
     it("returns undefined if there is no geometry", () => {
       const testPlace = {
