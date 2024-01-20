@@ -3,8 +3,8 @@
   "main": "AppEntry.js",
   "scripts": {
     "start": "node enableStorybook.js false && node checkEnv.js && npx expo start --dev-client --clear",
-    "sb_start": "node enableStorybook.js true && sb-rn-get-stories --config-path .ondevice && npx expo start --dev-client --clear",
-    "sb_watcher": "sb-rn-watcher --config-path .ondevice",
+    "sb_start": "node enableStorybook.js true && sb-rn-get-stories --config-path .storybook/.ondevice && npx expo start --dev-client --clear",
+    "sb_watcher": "sb-rn-watcher --config-path .storybook/.ondevice",
     "test": "jest",
     "test:ci": "jest --ci --detectOpenHandles",
     "staged-lint": "lint-staged",

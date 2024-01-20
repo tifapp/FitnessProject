@@ -5,16 +5,15 @@ import {
   addDecorator,
   addParameters,
   addArgsEnhancer,
-  clearDecorators,
 } from "@storybook/react-native";
 
 global.STORIES = [
   {
     titlePrefix: "",
-    directory: "./components",
+    directory: "./.storybook/components",
     files: "**/*.stories.?(ts|tsx|js|jsx)",
     importPathMatcher:
-      "^\\.[\\\\/](?:components(?:\\/(?!\\.)(?:(?:(?!(?:^|\\/)\\.).)*?)\\/|\\/|$)(?!\\.)(?=.)[^/]*?\\.stories\\.(?:ts|tsx|js|jsx)?)$",
+      "^\\.[\\\\/](?:\\.storybook[\\\\/]components(?:[\\\\/](?!\\.)(?:(?:(?!(?:^|[\\\\/])\\.).)*?)[\\\\/]|[\\\\/]|$)(?!\\.)(?=.)[^\\\\/]*?\\.stories\\.(?:ts|tsx|js|jsx)?)$",
   },
 ];
 
@@ -23,19 +22,11 @@ import "@storybook/addon-ondevice-controls/register";
 import "@storybook/addon-ondevice-backgrounds/register";
 import "@storybook/addon-ondevice-actions/register";
 
-import { argsEnhancers } from "@storybook/addon-actions/dist/modern/preset/addArgs";
+import { argsEnhancers } from "@storybook/addon-actions/dist/preview";
 
 import { decorators, parameters } from "./preview";
 
 if (decorators) {
-  if (__DEV__) {
-    // stops the warning from showing on every HMR
-    require("react-native").LogBox.ignoreLogs([
-      "`clearDecorators` is deprecated and will be removed in Storybook 7.0",
-    ]);
-  }
-  // workaround for global decorators getting infinitely applied on HMR, see https://github.com/storybookjs/react-native/issues/185
-  clearDecorators();
   decorators.forEach((decorator) => addDecorator(decorator));
 }
 
@@ -49,21 +40,21 @@ try {
 
 const getStories = () => {
   return {
-    "./components/AttendeesList/AttendeesList.stories.tsx": require("../components/AttendeesList/AttendeesList.stories.tsx"),
-    "./components/Buttons/Buttons.stories.tsx": require("../components/Buttons/Buttons.stories.tsx"),
-    "./components/ChangePassword/ChangePassword.stories.tsx": require("../components/ChangePassword/ChangePassword.stories.tsx"),
-    "./components/ContentReporting/ContentReporting.stories.tsx": require("../components/ContentReporting/ContentReporting.stories.tsx"),
-    "./components/ContentText/ContextText.stories.tsx": require("../components/ContentText/ContextText.stories.tsx"),
-    "./components/EventDetails/EventDetails.stories.tsx": require("../components/EventDetails/EventDetails.stories.tsx"),
-    "./components/Explore/Explore.stories.tsx": require("../components/Explore/Explore.stories.tsx"),
-    "./components/ForgotPassword/ForgotPasswordForm.stories.tsx": require("../components/ForgotPassword/ForgotPasswordForm.stories.tsx"),
-    "./components/LocationSearch/LocationSearch.stories.tsx": require("../components/LocationSearch/LocationSearch.stories.tsx"),
-    "./components/SearchBar/SearchBar.stories.tsx": require("../components/SearchBar/SearchBar.stories.tsx"),
-    "./components/SettingsScreen/SettingsScreen.stories.tsx": require("../components/SettingsScreen/SettingsScreen.stories.tsx"),
-    "./components/SignIn/SignIn.stories.tsx": require("../components/SignIn/SignIn.stories.tsx"),
-    "./components/SignUp/SignUp.stories.tsx": require("../components/SignUp/SignUp.stories.tsx"),
-    "./components/TextField/TextField.stories.tsx": require("../components/TextField/TextField.stories.tsx"),
-    "./components/VerificationCode/VerifyCode.stories.tsx": require("../components/VerificationCode/VerifyCode.stories.tsx"),
+    "./.storybook/components/AttendeesList/AttendeesList.stories.tsx": require("../components/AttendeesList/AttendeesList.stories.tsx"),
+    "./.storybook/components/Buttons/Buttons.stories.tsx": require("../components/Buttons/Buttons.stories.tsx"),
+    "./.storybook/components/ChangePassword/ChangePassword.stories.tsx": require("../components/ChangePassword/ChangePassword.stories.tsx"),
+    "./.storybook/components/ContentReporting/ContentReporting.stories.tsx": require("../components/ContentReporting/ContentReporting.stories.tsx"),
+    "./.storybook/components/ContentText/ContextText.stories.tsx": require("../components/ContentText/ContextText.stories.tsx"),
+    "./.storybook/components/EventDetails/EventDetails.stories.tsx": require("../components/EventDetails/EventDetails.stories.tsx"),
+    "./.storybook/components/Explore/Explore.stories.tsx": require("../components/Explore/Explore.stories.tsx"),
+    "./.storybook/components/ForgotPassword/ForgotPasswordForm.stories.tsx": require("../components/ForgotPassword/ForgotPasswordForm.stories.tsx"),
+    "./.storybook/components/LocationSearch/LocationSearch.stories.tsx": require("../components/LocationSearch/LocationSearch.stories.tsx"),
+    "./.storybook/components/SearchBar/SearchBar.stories.tsx": require("../components/SearchBar/SearchBar.stories.tsx"),
+    "./.storybook/components/SettingsScreen/SettingsScreen.stories.tsx": require("../components/SettingsScreen/SettingsScreen.stories.tsx"),
+    "./.storybook/components/SignIn/SignIn.stories.tsx": require("../components/SignIn/SignIn.stories.tsx"),
+    "./.storybook/components/SignUp/SignUp.stories.tsx": require("../components/SignUp/SignUp.stories.tsx"),
+    "./.storybook/components/TextField/TextField.stories.tsx": require("../components/TextField/TextField.stories.tsx"),
+    "./.storybook/components/VerificationCode/VerifyCode.stories.tsx": require("../components/VerificationCode/VerifyCode.stories.tsx"),
   };
 };
 
