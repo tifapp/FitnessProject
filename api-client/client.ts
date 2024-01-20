@@ -5,10 +5,14 @@ import { AnyZodObject, ZodType, z } from "zod"
 
 export type TiFHTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE"
 
-type BaseTiFAPIRequest<Method extends TiFHTTPMethod> = {
+export type TiFAPIRequestQueryParameters = {
+  [key: string]: ToStringable | undefined
+}
+
+export type BaseTiFAPIRequest<Method extends TiFHTTPMethod> = {
   method: Method
   endpoint: `/${string}`
-  query?: { [key: string]: ToStringable }
+  query?: TiFAPIRequestQueryParameters
 }
 
 /**
@@ -199,9 +203,10 @@ const loadResponseBody = async (resp: Response) => {
   }
 }
 
-const queryToSearchParams = (query: { [key: string]: ToStringable }) => {
+const queryToSearchParams = (query: TiFAPIRequestQueryParameters) => {
   const params = new URLSearchParams()
   for (const [key, value] of Object.entries(query)) {
+    if (!value) continue
     params.set(key, value.toString())
   }
   return params
