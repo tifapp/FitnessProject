@@ -165,6 +165,9 @@ export class TiFAPI {
     )
   }
 
+  /**
+   * Loads an individual event by its id.
+   */
   async eventDetails (eventId: number) {
     return await this.apiFetch(
       {
