@@ -8,6 +8,13 @@ const bundleIdentifier =
       ? "com.tifapp.FitnessAppPreview"
       : "com.tifapp.FitnessApp"
 
+const googleServicesFile =
+  EAS_BUILD_TYPE === "development"
+    ? "./development-google-services.json"
+    : EAS_BUILD_TYPE === "preview"
+      ? "./preview-google-services.json"
+      : "./google-services.json"
+
 const config = {
   name: "FitnessApp",
   slug: "FitnessApp",
@@ -67,7 +74,7 @@ const config = {
   },
   android: {
     package: bundleIdentifier,
-    googleServicesFile: "./google-services.json",
+    googleServicesFile,
     config: {
       googleMaps: {
         apiKey: MAPS_API_KEY
