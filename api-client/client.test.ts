@@ -64,6 +64,12 @@ describe("CreateAPIFetch tests", () => {
       rest.get("http://localhost:8080/test7", async (_, res, ctx) => {
         await neverPromise()
         return res(ctx.status(500))
+      }),
+      rest.get("http://localhost:8080/test8", async (req, res, ctx) => {
+        if (req.url.searchParams.has("hello")) {
+          return res(ctx.status(500))
+        }
+        return res(ctx.status(200), ctx.json({ a: 1 }))
       })
     )
   })
@@ -75,6 +81,22 @@ describe("CreateAPIFetch tests", () => {
         endpoint: "/test",
         query: { hello: "world", a: 1 },
         body: { a: 1, b: "hello" }
+      },
+      TestResponseSchema
+    )
+
+    expect(resp).toMatchObject({
+      status: 200,
+      data: { a: 1 }
+    })
+  })
+
+  test("api client fetch, undefined query", async () => {
+    const resp = await apiFetch(
+      {
+        method: "GET",
+        endpoint: "/test8",
+        query: { hello: undefined }
       },
       TestResponseSchema
     )
