@@ -37,7 +37,7 @@ export const UnblockedEventAttendeeSchema = z.object({
   id: z.string().uuid(),
   username: z.string(),
   handle: UserHandle.zodSchema,
-  profileImageURL: z.string().url().optional(),
+  profileImageURL: z.string().url().nullable(),
   relations: UnblockedBidirectionalUserRelationsSchema
 })
 
@@ -88,7 +88,8 @@ export type EventPreviewAttendee = Pick<EventAttendee, "id" | "profileImageURL">
 
 export const EventLocationSchema = EventRegionSchema.extend({
   isInArrivalTrackingPeriod: z.boolean(),
-  placemark: PlacemarkSchema.optional()
+  timezoneIdentifier: z.string(),
+  placemark: PlacemarkSchema.nullable()
 })
 
 /**
@@ -104,8 +105,7 @@ export type EventLocation = z.infer<typeof EventLocationSchema>
 
 export const EventTimeResponseSchema = z.object({
   secondsToStart: z.number(),
-  todayOrTomorrow: TodayOrTomorrowSchema.optional(),
-  timezoneIdentifier: z.string(),
+  todayOrTomorrow: TodayOrTomorrowSchema.nullable(),
   dateRange: StringDateRangeSchema
 })
 
@@ -125,7 +125,7 @@ export const CurrentUserEventResponseSchema = z.object({
   description: z.string(),
   color: ColorString.zodSchema,
   attendeeCount: z.number().nonnegative(),
-  joinDate: StringDateSchema.optional(),
+  joinDate: StringDateSchema.nullable(),
   createdAt: StringDateSchema,
   updatedAt: StringDateSchema,
   hasArrived: z.boolean(),
@@ -135,7 +135,8 @@ export const CurrentUserEventResponseSchema = z.object({
   time: EventTimeResponseSchema,
   location: EventLocationSchema,
   previewAttendees: z.array(EventPreviewAttendeeSchema),
-  host: UnblockedEventAttendeeSchema
+  host: UnblockedEventAttendeeSchema,
+  hasEndedEarly: z.boolean()
 })
 
 /**
@@ -188,6 +189,13 @@ export type CurrentUserEventResponse = z.infer<
 export type CurrentUserEvent = Omit<CurrentUserEventResponse, "time"> & {
   time: CurrentUserEventResponse["time"] & { clientReceivedTime: Date }
 }
+
+export const currentUserEventFromResponse = (
+  response: CurrentUserEventResponse
+) => ({
+  ...response,
+  time: { ...response.time, clientReceivedTime: new Date() }
+})
 
 export const BlockedEventResponseSchema = CurrentUserEventResponseSchema.omit({
   host: true
