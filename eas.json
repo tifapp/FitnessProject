@@ -5,7 +5,7 @@
   "build": {
     "development": {
       "env": {
-        "BUILD_TYPE": "storybook"
+        "EAS_BUILD_TYPE": "development"
       },
       "developmentClient": true,
       "distribution": "internal",
@@ -14,8 +14,7 @@
         "gradleCommand": ":app:assembleDevelopmentDebug"
       },
       "ios": {
-        "buildConfiguration": "Debug",
-        "scheme": "tifapp-storybook"
+        "buildConfiguration": "Debug"
       }
     },
     "preview": {

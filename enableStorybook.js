@@ -20,4 +20,4 @@ function modifyEnv (addBuildType) {
   fs.writeFileSync(envPath, envContent)
 }
 
-modifyEnv(!!process.argv[2])
+modifyEnv(process.argv[2] === "true")

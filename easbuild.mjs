@@ -11,8 +11,7 @@ dotenv.config({ path: ".env.infra" })
 const outputChannel = "C01B7FFKDCP"
 
 const action = process.argv[2]
-const checkRunName =
-  process.env.BUILD_TYPE === "storybook" ? "EAS Storybook Build" : "EAS Build"
+const checkRunName = "EAS Build"
 
 const sendMessageToSlack = (
   /** @type {string} */ message,
@@ -206,11 +205,7 @@ const checkGithubActionRuns = async (
       console.error("Error managing check run:", err)
     })
 
-  console.log(resp)
-  console.log(
-    `Git SHA: ${process.env.GITHUB_SHA}`,
-    `Length: ${(process.env.GITHUB_SHA ?? "").length}`
-  )
+  console.log("Updated github check run")
 
   // @ts-ignore
   fs.writeFileSync("checkRunId.txt", resp.id.toString())
@@ -292,9 +287,10 @@ const manageCheckRun = async (/** @type {string} */ action) => {
       `A new build has started. ${checkRunName} will be finished at approximately *${getPredictedBuildTime()}*. See details at\n${buildLink}`
     )
   }
+
+  console.log("Sent build status to slack")
 }
 
-console.log(process.env)
 if (process.env.RUN_EAS_BUILD_HOOKS === "1") {
   manageCheckRun(action)
 }
