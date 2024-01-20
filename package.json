@@ -12,7 +12,7 @@
     "prepare": "husky install",
     "staged-lint": "lint-staged",
     "dev": "expo start --dev-client",
-    "eas-build-local": "eas build --profile development --platform android",
+    "eas_build_local": "eas build --profile development --platform android",
     "storybook-update-stories": "sb-rn-get-stories --config-path .ondevice",
     "storybook-watcher": "sb-rn-watcher --config-path .ondevice",
     "set_api_prod": "node setEnv.js",
