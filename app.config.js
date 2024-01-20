@@ -1,3 +1,7 @@
+import dotenv from "dotenv"
+
+dotenv.config({ path: ".env.infra" })
+
 const { MAPS_API_KEY, EXPO_PROJECT_ID, EXPO_PROJECT_OWNER, EAS_BUILD_TYPE } =
   process.env
 
