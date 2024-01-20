@@ -10,8 +10,7 @@
       "developmentClient": true,
       "distribution": "internal",
       "android": {
-        "buildType": "apk",
-        "gradleCommand": ":app:assembleDevelopmentDebug"
+        "buildType": "apk"
       },
       "ios": {
         "buildConfiguration": "Debug"

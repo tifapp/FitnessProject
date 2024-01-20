@@ -66,13 +66,11 @@ jobs:
 
       - name: Construct .env
         run: |
-          echo "MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}" >> .env.infra
-          echo "EXPO_PROJECT_ID=${{ secrets.EXPO_PROJECT_ID }}" >> .env.infra
-          echo "EXPO_PROJECT_OWNER=${{ secrets.EXPO_PROJECT_OWNER }}" >> .env.infra
           echo "CHECK_RUN_ID=${{ github.run_id }}" >> .env.infra
           echo "GITHUB_SHA=${{ github.sha }}" >> .env.infra
           echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .env.infra
           echo "RUN_EAS_BUILD_HOOKS=1" >> .env.infra
+          echo "MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}" >> .env
           echo "SENTRY_DSN=${{ secrets.SENTRY_DSN }}" >> .env
           echo "MIXPANEL_TOKEN=${{ secrets.MIXPANEL_TOKEN }}" >> .env
           echo "API_URL=${{ secrets.API_ENDPOINT }}" >> .env

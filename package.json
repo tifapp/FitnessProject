@@ -12,17 +12,17 @@
     "prepare": "husky install",
     "staged-lint": "lint-staged",
     "dev": "expo start --dev-client",
-    "eas-build-pre-install": "node easprebuild.mjs",
-    "eas-build-post-install": "node easbuild.mjs",
-    "eas-build-on-success": "node easbuild.mjs success",
-    "eas-build-on-error": "node easbuild.mjs failure",
-    "eas-build-on-cancel": "node easbuild.mjs cancelled",
     "eas-build-local": "eas build --profile development --platform android",
     "storybook-update-stories": "sb-rn-get-stories --config-path .ondevice",
     "storybook-watcher": "sb-rn-watcher --config-path .ondevice",
     "set_api_prod": "node setEnv.js",
     "set_api_staging": "node setEnv.js STAGING_API_URL",
-    "set_api_local": "node setEnv.js LOCAL_API_URL"
+    "set_api_local": "node setEnv.js LOCAL_API_URL",
+    "eas-build-pre-install": "node easprebuild.mjs",
+    "eas-build-post-install": "node easbuild.mjs",
+    "eas-build-on-success": "node easbuild.mjs success",
+    "eas-build-on-error": "node easbuild.mjs failure",
+    "eas-build-on-cancel": "node easbuild.mjs cancelled"
   },
   "engines": {
     "npm": ">=8.3.0"

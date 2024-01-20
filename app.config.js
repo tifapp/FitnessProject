@@ -1,7 +1,3 @@
-const dotenv = require("dotenv")
-
-dotenv.config({ path: ".env.infra" })
-
 const { MAPS_API_KEY, EXPO_PROJECT_ID, EXPO_PROJECT_OWNER, EAS_BUILD_TYPE } =
   process.env
 
@@ -11,8 +7,6 @@ const bundleIdentifier =
     : EAS_BUILD_TYPE === "preview"
       ? "com.tifapp.FitnessAppPreview"
       : "com.tifapp.FitnessApp"
-
-console.log("env is ", process.env)
 
 const config = {
   name: "FitnessApp",
