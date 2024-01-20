@@ -17,12 +17,19 @@
       }
     },
     "preview": {
+      "env": {
+        "EAS_BUILD_TYPE": "preview"
+      },
       "distribution": "internal",
       "android": {
         "buildType": "apk"
       }
     },
-    "production": {},
+    "production": {
+      "env": {
+        "EAS_BUILD_TYPE": "production"
+      }
+    },
     "development-simulator": {
       "developmentClient": true,
       "distribution": "internal",
