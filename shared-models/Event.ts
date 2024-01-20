@@ -190,6 +190,13 @@ export type CurrentUserEvent = Omit<CurrentUserEventResponse, "time"> & {
   time: CurrentUserEventResponse["time"] & { clientReceivedTime: Date }
 }
 
+export const currentUserEventFromResponse = (
+  response: CurrentUserEventResponse
+) => ({
+  ...response,
+  time: { ...response.time, clientReceivedTime: new Date() }
+})
+
 export const BlockedEventResponseSchema = CurrentUserEventResponseSchema.omit({
   host: true
 })

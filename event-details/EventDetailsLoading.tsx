@@ -1,5 +1,9 @@
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
-import { BlockedEvent, CurrentUserEvent } from "@shared-models/Event"
+import {
+  BlockedEvent,
+  CurrentUserEvent,
+  currentUserEventFromResponse
+} from "@shared-models/Event"
 import { useIsConnectedToInternet } from "@lib/InternetConnection"
 import { useEffect } from "react"
 import { useEffectEvent } from "@lib/utils/UseEffectEvent"
@@ -33,10 +37,7 @@ export const loadEventDetails = async (
   } else {
     return {
       status: "success",
-      event: {
-        ...resp.data,
-        time: { ...resp.data.time, clientReceivedTime: new Date() }
-      }
+      event: currentUserEventFromResponse(resp.data)
     }
   }
 }
