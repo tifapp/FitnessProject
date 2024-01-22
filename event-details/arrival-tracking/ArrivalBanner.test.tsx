@@ -1,14 +1,22 @@
+import { EventRegion } from "@shared-models/Event"
 import {
   EventArrivalBannerCountdown,
   fomoStatementKey,
   othersStatementKey,
   countdownMessage,
   EventArrivalBannerProps,
-  EventArrivalBannerView
+  EventArrivalBannerView,
+  useIsShowingEventArrivalBanner
 } from "./ArrivalBanner"
 import "@test-helpers/Matchers"
-import { render } from "@testing-library/react-native"
+import { act, render, renderHook, waitFor } from "@testing-library/react-native"
 import dayjs from "dayjs"
+import {
+  EventArrivalsOperationKind,
+  EventArrivalsOperationUnsubscribe
+} from "./ArrivalsOperation"
+import { mockEventArrivalGeofencedRegion, mockEventRegion } from "./MockData"
+import { EventArrivalGeofencedRegion } from "./geofencing"
 
 const TWO_AND_A_HALF_DAYS_IN_SECONDS = dayjs.duration(2.5, "days").asSeconds()
 const THIRTY_MINUTES_IN_SECONDS = dayjs.duration(30, "minutes").asSeconds()
@@ -226,6 +234,63 @@ describe("ArrivalBanner tests", () => {
         <EventArrivalBannerView {...props} onClose={jest.fn()} />
       )
       expect(queryByText(text)).toBeDisplayed()
+    }
+  })
+
+  describe("useIsShowingEventArrivalBanner tests", () => {
+    it("should use the isArrived property for the initial isShowing value", () => {
+      const { result } = renderUseIsShowingEventArrivalBanner(
+        { ...mockEventRegion(), isArrived: true },
+        jest.fn()
+      )
+      expect(result.current.isShowing).toEqual(true)
+    })
+
+    it("should update the result when subscription updated", async () => {
+      let sendUpdate:
+        | ((operationKind: EventArrivalsOperationKind) => void)
+        | undefined
+      const { result } = renderUseIsShowingEventArrivalBanner(
+        mockEventArrivalGeofencedRegion(),
+        (_, callback) => {
+          sendUpdate = callback
+          return jest.fn()
+        }
+      )
+      act(() => sendUpdate?.("arrived"))
+      await waitFor(() => expect(result.current.isShowing).toEqual(true))
+
+      act(() => sendUpdate?.("departed"))
+      await waitFor(() => expect(result.current.isShowing).toEqual(false))
+    })
+
+    it("should always be false when closed", async () => {
+      let sendUpdate:
+        | ((operationKind: EventArrivalsOperationKind) => void)
+        | undefined
+      const { result } = renderUseIsShowingEventArrivalBanner(
+        { ...mockEventRegion(), isArrived: true },
+        (_, callback) => {
+          sendUpdate = callback
+          return jest.fn()
+        }
+      )
+      act(() => result.current.close())
+      expect(result.current.isShowing).toEqual(false)
+      act(() => sendUpdate?.("arrived"))
+      await waitFor(() => expect(result.current.isShowing).toEqual(false))
+    })
+
+    const renderUseIsShowingEventArrivalBanner = (
+      region: EventArrivalGeofencedRegion,
+      subscribe: (
+        region: EventRegion,
+        fn: (operationKind: EventArrivalsOperationKind) => void
+      ) => EventArrivalsOperationUnsubscribe
+    ) => {
+      return renderHook(() => {
+        return useIsShowingEventArrivalBanner(region, subscribe)
+      })
     }
   })
 })

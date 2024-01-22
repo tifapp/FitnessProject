@@ -3,13 +3,49 @@ import { TouchableIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors } from "@lib/Fonts"
 import { ceilDurationToUnit, dayjs } from "@date-time"
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { View, ViewStyle, StyleSheet } from "react-native"
 import Animated, {
   AnimatedStyleProp,
   FadeIn,
   FadeOut
 } from "react-native-reanimated"
+import { EventRegion } from "@shared-models/Event"
+import {
+  EventArrivalsOperationKind,
+  EventArrivalsOperationUnsubscribe
+} from "./ArrivalsOperation"
+import { EventArrivalGeofencedRegion } from "./geofencing"
+
+/**
+ * Handles state related to whether or not to show the event arrival banner for
+ * a particular {@link EventArrivalGeofencedRegion}.
+ *
+ * If `close` is called, `isShowing` will always return false from there on out as
+ * the banner is simply meant to be non-instrusive after it has been dismissed.
+ *
+ * @param region the region to show the arrival banner for.
+ * @param subscribe subscribes to updates for entering and leaving the region.
+ */
+export const useIsShowingEventArrivalBanner = (
+  region: EventArrivalGeofencedRegion,
+  subscribe: (
+    region: EventRegion,
+    handleUpdate: (operationKind: EventArrivalsOperationKind) => void
+  ) => EventArrivalsOperationUnsubscribe
+) => {
+  const [isClosed, setIsClosed] = useState(false)
+  const [hasArrived, setHasArrived] = useState(region.isArrived)
+  useEffect(() => {
+    return subscribe(region, (operationKind) => {
+      setHasArrived(operationKind === "arrived")
+    })
+  }, [region, subscribe, setHasArrived])
+  return {
+    isShowing: hasArrived && !isClosed,
+    close: () => setIsClosed(true)
+  }
+}
 
 /**
  * Data needed to display the countdown on the {@link EventArrivalBannerView}.
