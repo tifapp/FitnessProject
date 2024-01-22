@@ -1,14 +1,15 @@
 import { UserHandle } from "@content-parsing"
 import { API_URL } from "@env"
-import { z } from "zod"
-import { createAWSTiFAPIFetch } from "./aws"
-import { TiFAPIFetch, createTiFAPIFetch } from "./client"
-import { EventArrivalRegionsSchema } from "@shared-models/EventArrivals"
 import {
   BlockedEventResponseSchema,
   CurrentUserEventResponseSchema,
+  EventAttendeesPageSchema,
   EventRegion
 } from "@shared-models/Event"
+import { EventArrivalRegionsSchema } from "@shared-models/EventArrivals"
+import { z } from "zod"
+import { createAWSTiFAPIFetch } from "./aws"
+import { TiFAPIFetch, createTiFAPIFetch } from "./client"
 
 export type UpdateCurrentUserProfileRequest = Partial<{
   name: string
@@ -19,6 +20,10 @@ export type UpdateCurrentUserProfileRequest = Partial<{
 const UpcomingEventArrivalsRegionsSchema = z.object({
   upcomingRegions: EventArrivalRegionsSchema
 })
+
+const errorSchema = <T extends z.Primitive>(literal: T) => {
+  return z.object({ error: z.literal(literal) })
+}
 
 /**
  * A high-level client for the TiF API.
@@ -179,10 +184,26 @@ export class TiFAPI {
           (resp) => resp.id === eventId
         ),
         status204: "no-content",
-        status404: z.object({ error: z.literal("event-not-found") }),
+        status404: errorSchema("event-not-found"),
         status403: BlockedEventResponseSchema.refine(
           (resp) => resp.id === eventId
         )
+      }
+    )
+  }
+
+  async attendeesList (eventId: number, limit: number, nextPage?: string) {
+    return await this.apiFetch(
+      {
+        method: "GET",
+        endpoint: `/event/attendees/${eventId}`,
+        query: { limit, nextPage }
+      },
+      {
+        status200: EventAttendeesPageSchema,
+        status204: "no-content",
+        status404: errorSchema("event-not-found"),
+        status403: errorSchema("blocked-by-host")
       }
     )
   }
