@@ -5,11 +5,10 @@ dotenv.config({ path: ".env.infra" })
 const { MAPS_API_KEY, EXPO_PROJECT_ID, EXPO_PROJECT_OWNER, EAS_BUILD_TYPE } =
   process.env
 
-const { bundleIdentifier, googleServicesFile, icon, splash, name } =
+const { bundleIdentifier, icon, splash, name } =
   EAS_BUILD_TYPE === "development"
     ? {
       bundleIdentifier: "com.tifapp.FitnessAppDevelopment",
-      googleServicesFile: "./development-google-services.json",
       icon: ".storybook/assets/icon.png",
       splash: ".storybook/assets/splash.png",
       name: "FitnessAppDevelopment"
@@ -17,14 +16,12 @@ const { bundleIdentifier, googleServicesFile, icon, splash, name } =
     : EAS_BUILD_TYPE === "preview"
       ? {
         bundleIdentifier: "com.tifapp.FitnessAppPreview",
-        googleServicesFile: "./preview-google-services.json",
         icon: "./assets/icon.png",
         splash: "./assets/splash.png",
         name: "FitnessAppPreview"
       }
       : {
         bundleIdentifier: "com.tifapp.FitnessApp",
-        googleServicesFile: "./google-services.json",
         icon: "./assets/icon.png",
         splash: "./assets/splash.png",
         name: "FitnessApp"
@@ -86,7 +83,6 @@ const config = {
   },
   android: {
     package: bundleIdentifier,
-    googleServicesFile,
     config: {
       googleMaps: {
         apiKey: MAPS_API_KEY
