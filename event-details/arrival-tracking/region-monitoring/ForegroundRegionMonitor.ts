@@ -6,29 +6,37 @@ import {
   metersBetweenLocations
 } from "@shared-models/Location"
 import { LocationSubscription } from "expo-location"
-import { useSyncExternalStore } from "react"
+import { EventRegionMonitor } from "./RegionMonitoring"
 
-export type EventRegionMonitorUnsubscribe = () => void
-
-export interface EventRegionMonitor {
-  monitorRegion(
-    region: EventRegion,
-    callback: (hasArrived: boolean) => void
-  ): EventRegionMonitorUnsubscribe
-
-  hasArrivedAtRegion(region: EventRegion): boolean
-}
-
-export const useHasArrivedAtRegion = (
-  region: EventRegion,
-  monitor: EventRegionMonitor
-) => {
-  return useSyncExternalStore(
-    (callback) => monitor.monitorRegion(region, callback),
-    () => monitor.hasArrivedAtRegion(region)
-  )
-}
-
+/**
+ * A way to monitor the user's proximity to {@link EventRegion}s entirely in
+ * the foreground.
+ *
+ * We can only monitor event regions in the background given 2 conditions:
+ * 1. The user has given us access to background location permissions.
+ * 2. The user is attending an event in the region of interest within the next
+ *    24 hours
+ *
+ * The second condition is due to OS constraints only allowing up to 20
+ * locations on iOS to be monitored, and 100 on android in the background.
+ *
+ * To get around those conditions, this special {@link EventRegionMonitor}
+ * conformance attempts to mimick the background geofencing capabilities, but
+ * completely in the foreground. This still allows users to see arrival
+ * information on the details screen even if the 2 conditions don't apply.
+ *
+ * When a user enters or exits a region, the update isn't published
+ * immediately. There's a 20 seond buffer between the user crossing a region
+ * boundary, and when an update is published. This ensures that the UI isn't
+ * spammed with extraneous updates, and it evokes similar behavior as the
+ * OS geofencing capabilities.
+ *
+ * Only 1 subscription is made to watch the current user's location, and it
+ * can be controlled via the `startWatchingIfNeeded` and
+ * `stopWatchingIfNeeded`. Adding a region to be monitored also starts up the
+ * subscription. This laziness ensures that if location permissions change
+ * while the app is open, then this class will behave accordingly.
+ */
 export class ForegroundEventRegionMonitor implements EventRegionMonitor {
   static BUFFER_TIME = 20_000
 
@@ -70,7 +78,7 @@ export class ForegroundEventRegionMonitor implements EventRegionMonitor {
   hasArrivedAtRegion (region: EventRegion) {
     const state = this.stateForRegion(region)
     if (state) return state.hasArrived
-    return isRegionWithinCoordinate(region, this.userCoordinate)
+    return isCoordinateWithinRegion(region, this.userCoordinate)
   }
 
   private handleUserCoordinateUpdate (newCoordinate: LocationCoordinate2D) {
@@ -95,6 +103,7 @@ export class ForegroundEventRegionMonitor implements EventRegionMonitor {
 
   stopWatchingIfNeeded () {
     this.watchPromise?.then((subscription) => subscription.remove())
+    this.watchPromise = undefined
   }
 }
 
@@ -124,20 +133,17 @@ class RegionState {
   }
 
   processUpdate (newCoordinate: LocationCoordinate2D) {
-    const hasArrivedAtNewCoordinate = isRegionWithinCoordinate(
+    const hasArrivedAtNewCoordinate = isCoordinateWithinRegion(
       this.region,
       newCoordinate
     )
-    if (
-      this.bufferedUpdate &&
-      this.bufferedUpdate.hasArrived !== hasArrivedAtNewCoordinate
-    ) {
+    const isBufferedUpdateInvalid =
+      this.bufferedUpdate?.hasArrived !== hasArrivedAtNewCoordinate
+    const didCrossRegionBoundary = this.hasArrived !== hasArrivedAtNewCoordinate
+    if (this.bufferedUpdate && isBufferedUpdateInvalid) {
       clearTimeout(this.bufferedUpdate.timeout)
       this.bufferedUpdate = undefined
-    } else if (
-      !this.bufferedUpdate &&
-      this.hasArrived !== hasArrivedAtNewCoordinate
-    ) {
+    } else if (!this.bufferedUpdate && didCrossRegionBoundary) {
       this.bufferedUpdate = {
         timeout: setTimeout(() => {
           this.callbacks.forEach((callback) => {
@@ -152,7 +158,7 @@ class RegionState {
   }
 }
 
-const isRegionWithinCoordinate = (
+const isCoordinateWithinRegion = (
   region: EventRegion,
   coordinate?: LocationCoordinate2D
 ) => {

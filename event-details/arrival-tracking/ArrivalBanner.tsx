@@ -11,7 +11,7 @@ import Animated, {
   FadeOut
 } from "react-native-reanimated"
 import { EventRegion } from "@shared-models/Event"
-import { EventRegionMonitor, useHasArrivedAtRegion } from "./RegionMonitoring"
+import { EventRegionMonitor, useHasArrivedAtRegion } from "./region-monitoring"
 
 /**
  * Handles state related to whether or not to show the event arrival banner for

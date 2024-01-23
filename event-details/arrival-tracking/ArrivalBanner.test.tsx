@@ -13,7 +13,7 @@ import { act, render, renderHook, waitFor } from "@testing-library/react-native"
 import dayjs from "dayjs"
 import { mockEventArrivalGeofencedRegion, mockEventRegion } from "./MockData"
 import { EventArrivalGeofencedRegion } from "./geofencing"
-import { EventRegionMonitorUnsubscribe } from "./RegionMonitoring"
+import { EventRegionMonitorUnsubscribe } from "./region-monitoring"
 
 const TWO_AND_A_HALF_DAYS_IN_SECONDS = dayjs.duration(2.5, "days").asSeconds()
 const THIRTY_MINUTES_IN_SECONDS = dayjs.duration(30, "minutes").asSeconds()
