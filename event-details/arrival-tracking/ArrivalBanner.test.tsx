@@ -11,12 +11,12 @@ import {
 import "@test-helpers/Matchers"
 import { act, render, renderHook, waitFor } from "@testing-library/react-native"
 import dayjs from "dayjs"
-import {
-  EventArrivalsOperationKind,
-  EventArrivalsOperationUnsubscribe
-} from "./ArrivalsOperation"
 import { mockEventArrivalGeofencedRegion, mockEventRegion } from "./MockData"
 import { EventArrivalGeofencedRegion } from "./geofencing"
+import {
+  EventRegionMonitor,
+  EventRegionMonitorUnsubscribe
+} from "./RegionMonitoring"
 
 const TWO_AND_A_HALF_DAYS_IN_SECONDS = dayjs.duration(2.5, "days").asSeconds()
 const THIRTY_MINUTES_IN_SECONDS = dayjs.duration(30, "minutes").asSeconds()
@@ -238,18 +238,8 @@ describe("ArrivalBanner tests", () => {
   })
 
   describe("useIsShowingEventArrivalBanner tests", () => {
-    it("should use the isArrived property for the initial isShowing value", () => {
-      const { result } = renderUseIsShowingEventArrivalBanner(
-        { ...mockEventRegion(), isArrived: true },
-        jest.fn()
-      )
-      expect(result.current.isShowing).toEqual(true)
-    })
-
     it("should update the result when subscription updated", async () => {
-      let sendUpdate:
-        | ((operationKind: EventArrivalsOperationKind) => void)
-        | undefined
+      let sendUpdate: ((hasArrived: boolean) => void) | undefined
       const { result } = renderUseIsShowingEventArrivalBanner(
         mockEventArrivalGeofencedRegion(),
         (_, callback) => {
@@ -257,17 +247,15 @@ describe("ArrivalBanner tests", () => {
           return jest.fn()
         }
       )
-      act(() => sendUpdate?.("arrived"))
+      act(() => sendUpdate?.(true))
       await waitFor(() => expect(result.current.isShowing).toEqual(true))
 
-      act(() => sendUpdate?.("departed"))
+      act(() => sendUpdate?.(false))
       await waitFor(() => expect(result.current.isShowing).toEqual(false))
     })
 
     it("should always be false when closed", async () => {
-      let sendUpdate:
-        | ((operationKind: EventArrivalsOperationKind) => void)
-        | undefined
+      let sendUpdate: ((hasArrived: boolean) => void) | undefined
       const { result } = renderUseIsShowingEventArrivalBanner(
         { ...mockEventRegion(), isArrived: true },
         (_, callback) => {
@@ -277,7 +265,7 @@ describe("ArrivalBanner tests", () => {
       )
       act(() => result.current.close())
       expect(result.current.isShowing).toEqual(false)
-      act(() => sendUpdate?.("arrived"))
+      act(() => sendUpdate?.(true))
       await waitFor(() => expect(result.current.isShowing).toEqual(false))
     })
 
@@ -285,11 +273,20 @@ describe("ArrivalBanner tests", () => {
       region: EventArrivalGeofencedRegion,
       subscribe: (
         region: EventRegion,
-        fn: (operationKind: EventArrivalsOperationKind) => void
-      ) => EventArrivalsOperationUnsubscribe
+        fn: (hasArrived: boolean) => void
+      ) => EventRegionMonitorUnsubscribe
     ) => {
+      let hasArrived = false
       return renderHook(() => {
-        return useIsShowingEventArrivalBanner(region, subscribe)
+        return useIsShowingEventArrivalBanner(region, {
+          hasArrivedAtRegion: () => hasArrived,
+          monitorRegion: (region, callback) => {
+            return subscribe(region, (isArrived) => {
+              hasArrived = isArrived
+              callback(isArrived)
+            })
+          }
+        })
       })
     }
   })

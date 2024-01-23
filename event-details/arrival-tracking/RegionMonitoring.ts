@@ -6,6 +6,7 @@ import {
   metersBetweenLocations
 } from "@shared-models/Location"
 import { LocationSubscription } from "expo-location"
+import { useSyncExternalStore } from "react"
 
 export type EventRegionMonitorUnsubscribe = () => void
 
@@ -16,6 +17,16 @@ export interface EventRegionMonitor {
   ): EventRegionMonitorUnsubscribe
 
   hasArrivedAtRegion(region: EventRegion): boolean
+}
+
+export const useHasArrivedAtRegion = (
+  region: EventRegion,
+  monitor: EventRegionMonitor
+) => {
+  return useSyncExternalStore(
+    (callback) => monitor.monitorRegion(region, callback),
+    () => monitor.hasArrivedAtRegion(region)
+  )
 }
 
 export class ForegroundEventRegionMonitor implements EventRegionMonitor {

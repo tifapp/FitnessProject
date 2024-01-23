@@ -3,7 +3,7 @@ import { TouchableIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors } from "@lib/Fonts"
 import { ceilDurationToUnit, dayjs } from "@date-time"
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { View, ViewStyle, StyleSheet } from "react-native"
 import Animated, {
   AnimatedStyleProp,
@@ -11,15 +11,11 @@ import Animated, {
   FadeOut
 } from "react-native-reanimated"
 import { EventRegion } from "@shared-models/Event"
-import {
-  EventArrivalsOperationKind,
-  EventArrivalsOperationUnsubscribe
-} from "./ArrivalsOperation"
-import { EventArrivalGeofencedRegion } from "./geofencing"
+import { EventRegionMonitor, useHasArrivedAtRegion } from "./RegionMonitoring"
 
 /**
  * Handles state related to whether or not to show the event arrival banner for
- * a particular {@link EventArrivalGeofencedRegion}.
+ * a particular {@link EventRegion}.
  *
  * If `close` is called, `isShowing` will always return false from there on out as
  * the banner is simply meant to be non-instrusive after it has been dismissed.
@@ -28,19 +24,11 @@ import { EventArrivalGeofencedRegion } from "./geofencing"
  * @param subscribe subscribes to updates for entering and leaving the region.
  */
 export const useIsShowingEventArrivalBanner = (
-  region: EventArrivalGeofencedRegion,
-  subscribe: (
-    region: EventRegion,
-    handleUpdate: (operationKind: EventArrivalsOperationKind) => void
-  ) => EventArrivalsOperationUnsubscribe
+  region: EventRegion,
+  monitor: EventRegionMonitor
 ) => {
   const [isClosed, setIsClosed] = useState(false)
-  const [hasArrived, setHasArrived] = useState(region.isArrived)
-  useEffect(() => {
-    return subscribe(region, (operationKind) => {
-      setHasArrived(operationKind === "arrived")
-    })
-  }, [region, subscribe, setHasArrived])
+  const hasArrived = useHasArrivedAtRegion(region, monitor)
   return {
     isShowing: hasArrived && !isClosed,
     close: () => setIsClosed(true)
