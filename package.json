@@ -8,7 +8,7 @@
     "test": "jest",
     "test:ci": "jest --ci --detectOpenHandles",
     "staged-lint": "lint-staged",
-    "eas_build_local": "eas build --profile development --platform android",
+    "eas_build_local": "eas build --profile development",
     "set_api_prod": "node setEnv.js",
     "set_api_staging": "node setEnv.js STAGING_API_URL",
     "set_api_local": "node setEnv.js LOCAL_API_URL",
