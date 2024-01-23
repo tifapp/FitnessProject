@@ -38,7 +38,7 @@ import { EventRegionMonitor } from "./RegionMonitoring"
  * while the app is open, then this class will behave accordingly.
  */
 export class ForegroundEventRegionMonitor implements EventRegionMonitor {
-  static BUFFER_TIME = 20_000
+  static readonly BUFFER_TIME = 20_000
 
   private regionStates = [] as RegionState[]
 
@@ -65,7 +65,7 @@ export class ForegroundEventRegionMonitor implements EventRegionMonitor {
     if (!state) {
       this.regionStates.push(newState)
     }
-    const unsub = newState.addCallback(callback)
+    const unsub = newState.subscribe(callback)
     return () => {
       unsub()
       if (newState.hasSubscribers) return
@@ -83,9 +83,7 @@ export class ForegroundEventRegionMonitor implements EventRegionMonitor {
 
   private handleUserCoordinateUpdate (newCoordinate: LocationCoordinate2D) {
     this.userCoordinate = newCoordinate
-    for (const state of this.regionStates) {
-      state.processUpdate(newCoordinate)
-    }
+    this.regionStates.forEach((state) => state.processUpdate(newCoordinate))
   }
 
   private stateForRegion (region: EventRegion) {
@@ -108,14 +106,18 @@ export class ForegroundEventRegionMonitor implements EventRegionMonitor {
 }
 
 class RegionState {
-  region: EventRegion
-  hasArrived: boolean
-  private bufferedUpdate?: {
+  readonly region: EventRegion
+  private _hasArrived: boolean
+  private scheduledUpdate?: {
     timeout: NodeJS.Timeout
     hasArrived: boolean
   }
 
   private callbacks = new Map<string, (hasArrived: boolean) => void>()
+
+  get hasArrived () {
+    return this._hasArrived
+  }
 
   get hasSubscribers () {
     return this.callbacks.size > 0
@@ -123,13 +125,18 @@ class RegionState {
 
   constructor (region: EventRegion, hasArrived: boolean) {
     this.region = region
-    this.hasArrived = hasArrived
+    this._hasArrived = hasArrived
   }
 
-  addCallback (callback: (hasArrived: boolean) => void) {
+  subscribe (callback: (hasArrived: boolean) => void) {
     const id = uuidString()
     this.callbacks.set(id, callback)
-    return () => this.callbacks.delete(id)
+    return () => {
+      this.callbacks.delete(id)
+      if (!this.hasSubscribers) {
+        this.cancelScheduledlUpdate()
+      }
+    }
   }
 
   processUpdate (newCoordinate: LocationCoordinate2D) {
@@ -137,23 +144,34 @@ class RegionState {
       this.region,
       newCoordinate
     )
-    const isBufferedUpdateInvalid =
-      this.bufferedUpdate?.hasArrived !== hasArrivedAtNewCoordinate
+    const isScheduledUpdateInvalid =
+      this.scheduledUpdate?.hasArrived !== hasArrivedAtNewCoordinate
+    if (isScheduledUpdateInvalid) {
+      this.cancelScheduledlUpdate()
+    }
+
     const didCrossRegionBoundary = this.hasArrived !== hasArrivedAtNewCoordinate
-    if (this.bufferedUpdate && isBufferedUpdateInvalid) {
-      clearTimeout(this.bufferedUpdate.timeout)
-      this.bufferedUpdate = undefined
-    } else if (!this.bufferedUpdate && didCrossRegionBoundary) {
-      this.bufferedUpdate = {
-        timeout: setTimeout(() => {
-          this.callbacks.forEach((callback) => {
-            callback(hasArrivedAtNewCoordinate)
-          })
-          this.bufferedUpdate = undefined
-          this.hasArrived = hasArrivedAtNewCoordinate
-        }, ForegroundEventRegionMonitor.BUFFER_TIME),
-        hasArrived: hasArrivedAtNewCoordinate
-      }
+    if (!this.scheduledUpdate && didCrossRegionBoundary) {
+      this.scheduleUpdate(hasArrivedAtNewCoordinate)
+    }
+  }
+
+  private cancelScheduledlUpdate () {
+    if (!this.scheduledUpdate) return
+    clearTimeout(this.scheduledUpdate.timeout)
+    this.scheduledUpdate = undefined
+  }
+
+  private scheduleUpdate (hasArrived: boolean) {
+    this.scheduledUpdate = {
+      timeout: setTimeout(() => {
+        this.callbacks.forEach((callback) => {
+          callback(hasArrived)
+        })
+        this.scheduledUpdate = undefined
+        this._hasArrived = hasArrived
+      }, ForegroundEventRegionMonitor.BUFFER_TIME),
+      hasArrived
     }
   }
 }
