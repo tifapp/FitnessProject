@@ -32,7 +32,7 @@ const { bundleIdentifier, googleServicesFile, icon, splash, name } =
 
 const config = {
   name,
-  slug: name,
+  slug: "FitnessApp",
   scheme: "tifapp",
   version: "1.0.0",
   orientation: "portrait",
