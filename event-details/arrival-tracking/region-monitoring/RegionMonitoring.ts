@@ -1,6 +1,6 @@
 /* eslint-disable func-call-spacing */
 import { EventRegion } from "@shared-models/Event"
-import { useSyncExternalStore } from "react"
+import { useCallback, useSyncExternalStore } from "react"
 
 export type EventRegionMonitorUnsubscribe = () => void
 
@@ -11,7 +11,9 @@ export type EventRegionMonitorUnsubscribe = () => void
 export interface EventRegionMonitor {
   /**
    * Begins monitoring the given region. The callback should be invoked
-   * immediately with the inital arrival status.
+   * initially with the current arrival status, and then should invoke the
+   * callback whenever a further update is received. Duplicate statuses should
+   * not be published.
    */
   monitorRegion(
     region: EventRegion,
@@ -26,7 +28,10 @@ export const useHasArrivedAtRegion = (
   monitor: EventRegionMonitor
 ) => {
   return useSyncExternalStore(
-    (callback) => monitor.monitorRegion(region, callback),
+    useCallback(
+      (callback) => monitor.monitorRegion(region, callback),
+      [monitor, region]
+    ),
     () => monitor.hasArrivedAtRegion(region)
   )
 }
