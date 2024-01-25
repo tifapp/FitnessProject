@@ -335,9 +335,9 @@ describe("EventArrivalsTracker tests", () => {
     performArrivalOperation.mockResolvedValueOnce([mockEventArrivalRegion()])
     await tracker.trackArrival(mockEventArrival())
     const callback = jest.fn()
-    const unsub = tracker.subscribe(callback)
+    const subscription = tracker.subscribe(callback)
     await waitFor(() => expect(callback).toHaveBeenCalled())
-    unsub()
+    subscription.unsubscribe()
     testGeofencer.sendUpdate(mockEventArrivalGeofencedRegion())
     await verifyNeverOccurs(() => expect(callback).toHaveBeenCalledTimes(2))
   })
@@ -349,8 +349,9 @@ describe("EventArrivalsTracker tests", () => {
     expect(regions).toMatchObject(testGeofencer.geofencedRegions)
 
     const callback = jest.fn()
-    tracker.subscribe(callback)
-    await waitFor(() => expect(callback).toHaveBeenCalledWith(regions))
+    const subscription = tracker.subscribe(callback)
+    await subscription.waitForInitialRegionsToLoad()
+    expect(callback).toHaveBeenCalledWith(regions)
     expect(callback).toHaveBeenCalledTimes(1)
   }
 })

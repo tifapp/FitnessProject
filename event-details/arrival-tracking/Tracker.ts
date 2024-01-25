@@ -12,7 +12,10 @@ import { EventArrival, arrivalRegion, removeDuplicateArrivals } from "./Models"
 import { areEventRegionsEqual } from "@shared-models/Event"
 import { uuidString } from "@lib/utils/UUID"
 
-export type EventArrivalsTrackerUnsubscribe = () => void
+export interface EventArrivalsTrackerSubscription {
+  waitForInitialRegionsToLoad(): Promise<void>
+  unsubscribe(): void
+}
 
 /**
  * A class for tracking upcoming event arrivals.
@@ -127,11 +130,14 @@ export class EventArrivalsTracker {
    */
   subscribe (
     callback: (regions: EventArrivalRegion[]) => void
-  ): EventArrivalsTrackerUnsubscribe {
+  ): EventArrivalsTrackerSubscription {
     const id = uuidString()
     this.subscriptions.set(id, callback)
-    this.upcomingArrivals.all().then(callback)
-    return () => this.subscriptions.delete(id)
+    const initial = this.upcomingArrivals.all().then(callback)
+    return {
+      waitForInitialRegionsToLoad: () => initial,
+      unsubscribe: () => this.subscriptions.delete(id)
+    }
   }
 
   private async transformAllUpcomingArrivals (

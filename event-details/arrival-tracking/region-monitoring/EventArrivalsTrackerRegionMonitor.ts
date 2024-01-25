@@ -6,9 +6,13 @@ import {
 } from "./RegionMonitoring"
 import {
   EventArrivalsTracker,
-  EventArrivalsTrackerUnsubscribe
+  EventArrivalsTrackerSubscription
 } from "../Tracker"
-import { BaseRegionState, stateForRegion } from "./RegionState"
+import {
+  RegionState,
+  filterStateIfInactive,
+  stateForRegion
+} from "./RegionState"
 import { EventArrivalRegion } from "@shared-models/EventArrivals"
 
 /**
@@ -38,94 +42,71 @@ import { EventArrivalRegion } from "@shared-models/EventArrivals"
  */
 export class EventArrivalsTrackerRegionMonitor implements EventRegionMonitor {
   private readonly tracker: EventArrivalsTracker
-  private readonly foregroundMonitor: EventRegionMonitor
+  private readonly fallbackMonitor: EventRegionMonitor
   private regionStates = [] as EventArrivalsTrackerMonitorRegionState[]
-  private didReceiveInitialRegionsPromise?: Promise<void>
-  private trackerUnsubscribe?: EventArrivalsTrackerUnsubscribe
+  private trackerSubscription?: EventArrivalsTrackerSubscription
 
   constructor (
     tracker: EventArrivalsTracker,
-    foregroundMonitor: EventRegionMonitor
+    fallbackMonitor: EventRegionMonitor
   ) {
     this.tracker = tracker
-    this.foregroundMonitor = foregroundMonitor
+    this.fallbackMonitor = fallbackMonitor
   }
 
   monitorRegion (region: EventRegion, callback: (hasArrived: boolean) => void) {
-    const currentState = stateForRegion(region, this.regionStates)
-    const state =
-      currentState ?? new EventArrivalsTrackerMonitorRegionState(region, false)
-    if (!currentState) {
-      this.regionStates.push(state)
-    }
-    const didLoadInitialRegionsFromTracker = this.subscribeToTrackerIfNeeded()
-    didLoadInitialRegionsFromTracker.then(() => {
-      if (state.isBeingTrackedByArrivalsTracker) {
-        callback(state.hasArrived)
-      } else {
-        callback(this.foregroundMonitor.hasArrivedAtRegion(region))
-      }
-    })
-    const unsub = state.subscribeWithForegroundMonitoring(
+    const state = this.findOrPushStateForRegion(region)
+    const unsub = state.subscribeWithFallbackMonitoring(
       callback,
-      (region, callback) => {
-        return this.foregroundMonitor.monitorRegion(
-          region,
-          async (hasArrived) => {
-            await didLoadInitialRegionsFromTracker
-            callback(hasArrived)
-          }
-        )
-      }
+      this.fallbackMonitor,
+      this.subscribeToTrackerIfNeeded()
     )
-    return () => {
-      unsub()
-      if (!state.hasSubscribers && !state.isBeingTrackedByArrivalsTracker) {
-        this.regionStates.filter((regionState) => {
-          return !areEventRegionsEqual(regionState.region, state.region)
-        })
-      }
-      if (this.regionStates.length === 0) {
-        this.unsubscribeFromTracker()
-      }
+    return async () => {
+      await unsub()
+      this.regionStates = filterStateIfInactive(state, this.regionStates)
+      this.unsubscribeFromTrackerIfNeeded()
     }
   }
 
   hasArrivedAtRegion (region: EventRegion) {
     const state = stateForRegion(region, this.regionStates)
     if (state) return state.hasArrived
-    return this.foregroundMonitor.hasArrivedAtRegion(region)
+    return this.fallbackMonitor.hasArrivedAtRegion(region)
   }
 
-  private unsubscribeFromTracker () {
-    this.trackerUnsubscribe?.()
-    this.didReceiveInitialRegionsPromise = undefined
-    this.trackerUnsubscribe = undefined
+  private findOrPushStateForRegion (region: EventRegion) {
+    const currentState = stateForRegion(region, this.regionStates)
+    const state =
+      currentState ?? new EventArrivalsTrackerMonitorRegionState(region, false)
+    if (!currentState) {
+      this.regionStates.push(state)
+    }
+    return state
+  }
+
+  private unsubscribeFromTrackerIfNeeded () {
+    if (this.regionStates.length === 0) return
+    this.trackerSubscription?.unsubscribe()
+    this.trackerSubscription = undefined
   }
 
   private subscribeToTrackerIfNeeded () {
-    if (this.didReceiveInitialRegionsPromise) {
-      return this.didReceiveInitialRegionsPromise
+    if (this.trackerSubscription) {
+      return this.trackerSubscription
     }
-    const promise = new Promise<void>((resolve) => {
-      this.trackerUnsubscribe = this.tracker.subscribe((regions) => {
-        this.updateWithArrivalRegions(regions)
-        // NB: When a promise is resolved multiple times, only the first
-        // resolve is returned when awaited. Therefore, it's fine to resolve
-        // on every subscription.
-        resolve()
-      })
+    const trackerSubscription = this.tracker.subscribe((regions) => {
+      this.publishPossibleRegionUpdates(regions)
     })
-    this.didReceiveInitialRegionsPromise = promise
-    return promise
+    this.trackerSubscription = trackerSubscription
+    return trackerSubscription
   }
 
-  private updateWithArrivalRegions (regions: EventArrivalRegion[]) {
+  private publishPossibleRegionUpdates (regions: EventArrivalRegion[]) {
     for (const state of this.regionStates) {
       const region = regions.find((region) => {
         return areEventRegionsEqual(state.region, region)
       })
-      state.updateWithRegion(region)
+      state.publishRegionChangeIfNeeded(region)
     }
     for (const region of regions) {
       const hasState = !!stateForRegion(region, this.regionStates)
@@ -141,13 +122,13 @@ export class EventArrivalsTrackerRegionMonitor implements EventRegionMonitor {
   }
 }
 
-class EventArrivalsTrackerMonitorRegionState extends BaseRegionState {
-  private _isBeingTrackedByArrivalsTracker: boolean
-  private sinceLastTrackerUpdateHasArrived?: boolean
+class EventArrivalsTrackerMonitorRegionState extends RegionState {
+  private isBeingTrackedByArrivalsTracker: boolean
+  private bufferedFallbackHasArrived?: boolean
   private foregroundMonitorUnsubscribe?: EventRegionMonitorUnsubscribe
 
-  get isBeingTrackedByArrivalsTracker () {
-    return this._isBeingTrackedByArrivalsTracker
+  override get isActive () {
+    return this.isBeingTrackedByArrivalsTracker || this.hasSubscribers
   }
 
   constructor (
@@ -156,64 +137,67 @@ class EventArrivalsTrackerMonitorRegionState extends BaseRegionState {
     isBeingTrackedByArrivalsTracker: boolean = false
   ) {
     super(region, hasArrived)
-    this._isBeingTrackedByArrivalsTracker = isBeingTrackedByArrivalsTracker
+    this.isBeingTrackedByArrivalsTracker = isBeingTrackedByArrivalsTracker
   }
 
-  subscribeWithForegroundMonitoring (
+  subscribeWithFallbackMonitoring (
     callback: (hasArrived: boolean) => void,
-    subscribeToForegroundMonitor: (
-      region: EventRegion,
-      callback: (hasArrived: boolean) => void
-    ) => EventRegionMonitorUnsubscribe
+    fallbackMonitor: EventRegionMonitor,
+    trackerSubscription: EventArrivalsTrackerSubscription
   ) {
-    const baseUnsub = super.subscribe(callback)
-    this.subscribeToForegroundMonitorIfNeeded(subscribeToForegroundMonitor)
-    return () => {
-      baseUnsub()
+    const promise = trackerSubscription
+      .waitForInitialRegionsToLoad()
+      .then(() => {
+        if (this.isBeingTrackedByArrivalsTracker) {
+          callback(this.hasArrived)
+        } else {
+          callback(fallbackMonitor.hasArrivedAtRegion(this.region))
+        }
+        const baseUnsub = super.subscribe(callback)
+        this.subscribeToFallbackMonitorIfNeeded(fallbackMonitor)
+        return baseUnsub
+      })
+    return async () => {
+      const unsub = await promise
+      unsub()
       if (!this.hasSubscribers) {
-        this.unsubscribeFromForegroundMonitor()
+        this.unsubscribeFromForegroundMonitorIfNeeded()
       }
     }
   }
 
-  private subscribeToForegroundMonitorIfNeeded (
-    subscribeToForegroundMonitor: (
-      region: EventRegion,
-      callback: (hasArrived: boolean) => void
-    ) => EventRegionMonitorUnsubscribe
-  ) {
-    if (!this.foregroundMonitorUnsubscribe) {
-      this.foregroundMonitorUnsubscribe = subscribeToForegroundMonitor(
-        this.region,
-        (hasArrived) => {
-          if (!this.isBeingTrackedByArrivalsTracker) {
-            this.publishUpdate(hasArrived)
-          } else {
-            this.sinceLastTrackerUpdateHasArrived = hasArrived
-          }
+  private subscribeToFallbackMonitorIfNeeded (monitor: EventRegionMonitor) {
+    if (this.foregroundMonitorUnsubscribe) return
+    this.foregroundMonitorUnsubscribe = monitor.monitorRegion(
+      this.region,
+      (hasArrived) => {
+        if (!this.isBeingTrackedByArrivalsTracker) {
+          this.publishUpdate(hasArrived)
+        } else {
+          this.bufferedFallbackHasArrived = hasArrived
         }
-      )
-    }
+      }
+    )
   }
 
-  private unsubscribeFromForegroundMonitor () {
+  private unsubscribeFromForegroundMonitorIfNeeded () {
     this.foregroundMonitorUnsubscribe?.()
     this.foregroundMonitorUnsubscribe = undefined
   }
 
-  updateWithRegion (region: EventArrivalRegion | undefined) {
-    this._isBeingTrackedByArrivalsTracker = !!region
+  publishRegionChangeIfNeeded (region: EventArrivalRegion | undefined) {
+    this.isBeingTrackedByArrivalsTracker = !!region
     if (region) {
       this.publishUpdateIfNotDuplicate(region.isArrived)
-    } else if (!region && this.sinceLastTrackerUpdateHasArrived) {
-      this.publishUpdateIfNotDuplicate(this.sinceLastTrackerUpdateHasArrived)
-      this.sinceLastTrackerUpdateHasArrived = undefined
+    } else if (!region && this.bufferedFallbackHasArrived) {
+      this.publishUpdateIfNotDuplicate(this.bufferedFallbackHasArrived)
+      this.bufferedFallbackHasArrived = undefined
     }
   }
 
   private publishUpdateIfNotDuplicate (hasArrived: boolean) {
     if (this.hasArrived === hasArrived) return
     this.publishUpdate(hasArrived)
-    this.sinceLastTrackerUpdateHasArrived = undefined
+    this.bufferedFallbackHasArrived = undefined
   }
 }

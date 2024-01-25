@@ -52,11 +52,11 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     const region = mockEventRegion()
     const callback = jest.fn()
     monitor.monitorRegion(region, callback)
+    await waitFor(() => expect(callback).toHaveBeenNthCalledWith(1, false))
+
     sendForegroundLocationUpdate(region.coordinate)
     advanceByForegroundMonitorBufferTime()
-    await waitFor(() => {
-      expect(callback).toHaveBeenCalledWith(true)
-    })
+    await waitFor(() => expect(callback).toHaveBeenCalledWith(true))
     expect(monitor.hasArrivedAtRegion(region)).toEqual(true)
   })
 
@@ -64,6 +64,8 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     const region = mockEventRegion()
     const callback = jest.fn()
     monitor.monitorRegion(region, callback)
+    await waitFor(() => expect(callback).toHaveBeenNthCalledWith(1, false))
+
     sendForegroundLocationUpdate(region.coordinate)
     advanceByForegroundMonitorBufferTime()
     await waitFor(() => expect(callback).toHaveBeenCalledWith(true))
@@ -80,6 +82,8 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     await tracker.trackArrival(arrival)
     const callback = jest.fn()
     monitor.monitorRegion(arrival, callback)
+    await waitFor(() => expect(callback).toHaveBeenNthCalledWith(1, false))
+
     sendForegroundLocationUpdate(arrival.coordinate)
     advanceByForegroundMonitorBufferTime()
     await verifyNeverOccurs(() => {
@@ -93,10 +97,9 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     await tracker.trackArrival(arrival)
     const callback = jest.fn()
     monitor.monitorRegion(arrival, callback)
-    await waitFor(() => {
-      expect(callback).toHaveBeenCalledWith(false)
-    })
+    await waitFor(() => expect(callback).toHaveBeenCalledWith(false))
     expect(callback).toHaveBeenCalledTimes(1)
+
     performArrivalsOperation.mockResolvedValueOnce([
       arrivalRegion(arrival, true)
     ])
@@ -113,15 +116,13 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     await tracker.trackArrival(arrival)
     const callback = jest.fn()
     monitor.monitorRegion(arrival, callback)
-    await waitFor(() => {
-      expect(callback).toHaveBeenCalledWith(false)
-    })
+    await waitFor(() => expect(callback).toHaveBeenCalledWith(false))
+
     await tracker.removeArrivalByEventId(arrival.eventId)
+
     sendForegroundLocationUpdate(arrival.coordinate)
     advanceByForegroundMonitorBufferTime()
-    await waitFor(() => {
-      expect(callback).toHaveBeenCalledWith(true)
-    })
+    await waitFor(() => expect(callback).toHaveBeenCalledWith(true))
     expect(callback).toHaveBeenCalledTimes(2)
     expect(monitor.hasArrivedAtRegion(arrival)).toEqual(true)
   })
@@ -132,6 +133,7 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     const callback = jest.fn()
     monitor.monitorRegion(arrival, callback)
     await waitFor(() => expect(callback).toHaveBeenCalledWith(false))
+
     performArrivalsOperation.mockResolvedValue([arrivalRegion(arrival)])
     geofencer.sendUpdate({ ...arrival, isArrived: false })
     await verifyNeverOccurs(() => {
@@ -201,8 +203,10 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     const callback = jest.fn()
     monitor.monitorRegion(arrival, callback)
     await waitFor(() => expect(callback).toHaveBeenCalledWith(false))
+
     sendForegroundLocationUpdate(arrival.coordinate)
     advanceByForegroundMonitorBufferTime()
+
     await tracker.removeArrivalByEventId(arrival.eventId)
     await waitFor(() => expect(callback).toHaveBeenNthCalledWith(2, true))
     expect(callback).toHaveBeenCalledTimes(2)
@@ -215,16 +219,19 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     const callback = jest.fn()
     monitor.monitorRegion(arrival, callback)
     await waitFor(() => expect(callback).toHaveBeenCalledWith(false))
+
     sendForegroundLocationUpdate({
       latitude: arrival.coordinate.latitude + 5,
       longitude: arrival.coordinate.longitude - 5
     })
     advanceByForegroundMonitorBufferTime()
+
     performArrivalsOperation.mockResolvedValueOnce([
       arrivalRegion(arrival, true)
     ])
     geofencer.sendUpdate({ ...arrival, isArrived: true })
     await waitFor(() => expect(callback).toHaveBeenNthCalledWith(2, true))
+
     await tracker.removeArrivalByEventId(arrival.eventId)
     await verifyNeverOccurs(() => {
       expect(callback).toHaveBeenNthCalledWith(3, false)
@@ -239,21 +246,22 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     const callbacks = [jest.fn(), jest.fn()]
     monitor.monitorRegion(arrivals[0], callbacks[0])
     monitor.monitorRegion(arrivals[1], callbacks[1])
+    await waitFor(() => expect(callbacks[0]).toHaveBeenNthCalledWith(1, false))
+    await waitFor(() => expect(callbacks[1]).toHaveBeenNthCalledWith(1, false))
+
     sendForegroundLocationUpdate(arrivals[0].coordinate)
     advanceByForegroundMonitorBufferTime()
+
     performArrivalsOperation.mockResolvedValueOnce([
       arrivalRegion(arrivals[0], false),
       arrivalRegion(arrivals[1], true)
     ])
     geofencer.sendUpdate({ ...arrivals[1], isArrived: true })
-    await waitFor(() => {
-      expect(callbacks[1]).toHaveBeenNthCalledWith(2, true)
-    })
+    await waitFor(() => expect(callbacks[1]).toHaveBeenNthCalledWith(2, true))
     expect(monitor.hasArrivedAtRegion(arrivals[0])).toEqual(false)
+
     await tracker.removeArrivalByEventId(arrivals[0].eventId)
-    await waitFor(() => {
-      expect(callbacks[0]).toHaveBeenNthCalledWith(2, true)
-    })
+    await waitFor(() => expect(callbacks[0]).toHaveBeenNthCalledWith(2, true))
     expect(callbacks[0]).toHaveBeenCalledTimes(2)
     expect(monitor.hasArrivedAtRegion(arrivals[0])).toEqual(true)
   })
@@ -264,6 +272,9 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     const callbacks = [jest.fn(), jest.fn()]
     monitor.monitorRegion(arrivals[0], callbacks[0])
     monitor.monitorRegion(arrivals[1], callbacks[1])
+    await waitFor(() => expect(callbacks[0]).toHaveBeenNthCalledWith(1, false))
+    await waitFor(() => expect(callbacks[1]).toHaveBeenNthCalledWith(1, false))
+
     performArrivalsOperation.mockResolvedValueOnce([
       arrivalRegion(arrivals[0], false),
       arrivalRegion(arrivals[1], true)
@@ -279,9 +290,7 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
       arrivalRegion(arrivals[1], false)
     ])
     geofencer.sendUpdate({ ...arrivals[0], isArrived: true })
-    await waitFor(() => {
-      expect(callbacks[0]).toHaveBeenNthCalledWith(2, true)
-    })
+    await waitFor(() => expect(callbacks[0]).toHaveBeenNthCalledWith(2, true))
     expect(callbacks[1]).toHaveBeenNthCalledWith(3, false)
     expect(monitor.hasArrivedAtRegion(arrivals[0])).toEqual(true)
     expect(monitor.hasArrivedAtRegion(arrivals[1])).toEqual(false)
@@ -294,6 +303,7 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     const unsub = monitor.monitorRegion(arrival, callback)
     await waitFor(() => expect(callback).toHaveBeenCalledWith(false))
     unsub()
+
     performArrivalsOperation.mockResolvedValueOnce([
       arrivalRegion(arrival, true)
     ])
@@ -301,6 +311,7 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     await verifyNeverOccurs(() => {
       expect(callback).toHaveBeenNthCalledWith(2, true)
     })
+
     sendForegroundLocationUpdate(arrival.coordinate)
     advanceByForegroundMonitorBufferTime()
     await tracker.removeArrivalByEventId(arrival.eventId)

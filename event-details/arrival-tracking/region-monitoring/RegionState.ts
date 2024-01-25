@@ -2,7 +2,11 @@
 import { uuidString } from "@lib/utils/UUID"
 import { EventRegion, areEventRegionsEqual } from "@shared-models/Event"
 
-export class BaseRegionState {
+/**
+ * A shared base helper class for handling a list of subscriptions to the
+ * arrival state of a region.
+ */
+export class RegionState {
   readonly region: EventRegion
   private _hasArrived: boolean
 
@@ -10,6 +14,10 @@ export class BaseRegionState {
 
   get hasArrived () {
     return this._hasArrived
+  }
+
+  get isActive () {
+    return this.hasSubscribers
   }
 
   get hasSubscribers () {
@@ -21,7 +29,7 @@ export class BaseRegionState {
     this._hasArrived = hasArrived
   }
 
-  publishUpdate (hasArrived: boolean) {
+  protected publishUpdate (hasArrived: boolean) {
     this._hasArrived = hasArrived
     this.callbacks.forEach((callback) => callback(hasArrived))
   }
@@ -35,9 +43,19 @@ export class BaseRegionState {
   }
 }
 
-export const stateForRegion = <RegionState extends BaseRegionState>(
+export const stateForRegion = <State extends RegionState>(
   region: EventRegion,
-  states: RegionState[]
+  states: State[]
 ) => {
   return states.find((state) => areEventRegionsEqual(region, state.region))
+}
+
+export const filterStateIfInactive = <State extends RegionState>(
+  state: State,
+  states: State[]
+) => {
+  if (state.isActive) return states
+  return states.filter((innerState) => {
+    return !areEventRegionsEqual(innerState.region, state.region)
+  })
 }

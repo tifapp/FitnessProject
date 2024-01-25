@@ -1,12 +1,16 @@
 /* eslint-disable func-call-spacing */
-import { EventRegion, areEventRegionsEqual } from "@shared-models/Event"
+import { EventRegion } from "@shared-models/Event"
 import {
   LocationCoordinate2D,
   metersBetweenLocations
 } from "@shared-models/Location"
 import { LocationSubscription } from "expo-location"
 import { EventRegionMonitor } from "./RegionMonitoring"
-import { BaseRegionState, stateForRegion } from "./RegionState"
+import {
+  RegionState,
+  filterStateIfInactive,
+  stateForRegion
+} from "./RegionState"
 
 /**
  * A way to monitor the user's proximity to {@link EventRegion}s entirely in
@@ -58,23 +62,13 @@ export class ForegroundEventRegionMonitor implements EventRegionMonitor {
 
   monitorRegion (region: EventRegion, callback: (hasArrived: boolean) => void) {
     const hasArrived = this.hasArrivedAtRegion(region)
-    callback(hasArrived)
+    const state = this.findOrPushStateForRegion(region, hasArrived)
+    const unsub = state.subscribeEmittingInitialStatus(callback)
     this.startWatchingIfNeeded()
-    const state = stateForRegion(region, this.regionStates)
-    const newState = state ?? new ForegroundRegionState(region, hasArrived)
-    if (!state) {
-      this.regionStates.push(newState)
-    }
-    const unsub = newState.subscribe(callback)
-    return () => {
+    return async () => {
       unsub()
-      if (newState.hasSubscribers) return
-      this.regionStates = this.regionStates.filter((state) => {
-        return !areEventRegionsEqual(state.region, newState.region)
-      })
-      if (this.regionStates.length === 0) {
-        this.stopWatchingIfNeeded()
-      }
+      this.regionStates = filterStateIfInactive(state, this.regionStates)
+      await this.stopWatchingIfNeeded()
     }
   }
 
@@ -82,6 +76,15 @@ export class ForegroundEventRegionMonitor implements EventRegionMonitor {
     const state = stateForRegion(region, this.regionStates)
     if (state) return state.hasArrived
     return isCoordinateWithinRegion(region, this.userCoordinate)
+  }
+
+  private findOrPushStateForRegion (region: EventRegion, hasArrived: boolean) {
+    const state = stateForRegion(region, this.regionStates)
+    const newState = state ?? new ForegroundRegionState(region, hasArrived)
+    if (!state) {
+      this.regionStates.push(newState)
+    }
+    return newState
   }
 
   private handleUserCoordinateUpdate (newCoordinate: LocationCoordinate2D) {
@@ -105,19 +108,22 @@ export class ForegroundEventRegionMonitor implements EventRegionMonitor {
     })
   }
 
-  private stopWatchingIfNeeded () {
-    this.watchPromise?.then((subscription) => subscription.remove())
+  private async stopWatchingIfNeeded () {
+    if (this.regionStates.length > 0) return
+    const subscription = await this.watchPromise
+    subscription?.remove()
     this.watchPromise = undefined
   }
 }
 
-class ForegroundRegionState extends BaseRegionState {
+class ForegroundRegionState extends RegionState {
   private scheduledUpdate?: {
     timeout: NodeJS.Timeout
     hasArrived: boolean
   }
 
-  override subscribe (callback: (hasArrived: boolean) => void) {
+  subscribeEmittingInitialStatus (callback: (hasArrived: boolean) => void) {
+    callback(this.hasArrived)
     const baseUnsub = super.subscribe(callback)
     return () => {
       baseUnsub()
