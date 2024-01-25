@@ -6,9 +6,6 @@ import { setupCognito } from "@auth/CognitoHelpers"
 import { InMemorySecureStore } from "@auth/CognitoSecureStorage"
 import { FlatList } from "react-native-gesture-handler"
 import { useAppFonts } from "../../lib/Fonts"
-import AttendeesListMeta, {
-  Basic as AttendeesListScreenBasic
-} from "../components/AttendeesList/AttendeesList.stories"
 import ButtonsMeta, {
   Basic as ButtonsBasic
 } from "../components/Buttons/Buttons.stories"
@@ -70,11 +67,6 @@ const stories = [
     name: SettingsMeta.title,
     component: SettingsScreenBasic,
     args: ContentTextMeta.args
-  },
-  {
-    name: AttendeesListMeta.title,
-    component: AttendeesListScreenBasic,
-    args: AttendeesListMeta.args
   },
   {
     name: ExploreEventsMeta.title,

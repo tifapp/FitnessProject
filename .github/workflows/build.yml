@@ -59,7 +59,7 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Add Env
-        run: echo "API_URL= https://623qsegfb9.execute-api.us-west-2.amazonaws.com/prod/" >> .env
+        run: echo "API_URL=${{ secrets.API_ENDPOINT }}" >> .env
 
       - name: Run tests
         run: npm run test:ci
