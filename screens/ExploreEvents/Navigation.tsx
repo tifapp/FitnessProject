@@ -1,17 +1,17 @@
-import React from "react"
 import { StackNavigatorType } from "@components/Navigation"
 import { Cancellable } from "@lib/Cancellable"
-import { CurrentUserEvent } from "@shared-models/Event"
 import {
   LocationCoordinate2D,
   Region,
   isSignificantlyDifferentRegions
 } from "@location/index"
-import { ExploreEventsView } from "./ExploreView"
 import { StackScreenProps } from "@react-navigation/stack"
-import { createInitialCenter } from "./models"
+import { CurrentUserEvent } from "@shared-models/Event"
+import React from "react"
 import { StyleSheet } from "react-native"
 import { useExploreEvents } from "./useExploreEvents"
+import { ExploreEventsView } from "./ExploreView"
+import { createInitialCenter } from "./models"
 
 type EventScreensParamsList = {} // TODO: - Fill this out
 
@@ -19,7 +19,7 @@ export type ExploreEventsScreensParamsList = {
   exploreEvents: { searchText: string; center?: LocationCoordinate2D }
   exploreEventsLocationSearch: undefined
   exploreEventsForm: { coordinates: LocationCoordinate2D }
-} & EventScreensParamsList
+}
 
 type ExploreEventsProps = StackScreenProps<
   ExploreEventsScreensParamsList,
