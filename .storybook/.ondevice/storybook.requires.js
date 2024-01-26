@@ -58,6 +58,7 @@ const getStories = () => {
     "./components/Explore/Explore.stories.tsx": require("../components/Explore/Explore.stories.tsx"),
     "./components/ForgotPassword/ForgotPasswordForm.stories.tsx": require("../components/ForgotPassword/ForgotPasswordForm.stories.tsx"),
     "./components/LocationSearch/LocationSearch.stories.tsx": require("../components/LocationSearch/LocationSearch.stories.tsx"),
+    "./components/RegionMonitoring/RegionMonitoring.stories.tsx": require("../components/RegionMonitoring/RegionMonitoring.stories.tsx"),
     "./components/SearchBar/SearchBar.stories.tsx": require("../components/SearchBar/SearchBar.stories.tsx"),
     "./components/SettingsScreen/SettingsScreen.stories.tsx": require("../components/SettingsScreen/SettingsScreen.stories.tsx"),
     "./components/SignIn/SignIn.stories.tsx": require("../components/SignIn/SignIn.stories.tsx"),
