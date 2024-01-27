@@ -6,24 +6,19 @@ import {
   EventAttendeesPageSchema,
   EventRegion
 } from "@shared-models/Event"
+
 import { EventArrivalRegionsSchema } from "@shared-models/EventArrivals"
 import { z } from "zod"
 import { createAWSTiFAPIFetch } from "./aws"
 import { TiFAPIFetch, createTiFAPIFetch } from "./client"
+import { EventChatTokenRequestSchema } from "@shared-models/ChatToken"
+
 
 export type UpdateCurrentUserProfileRequest = Partial<{
   name: string
   bio: string
   handle: UserHandle
 }>
-
-const UpcomingEventArrivalsRegionsSchema = z.object({
-  upcomingRegions: EventArrivalRegionsSchema
-})
-
-const errorSchema = <T extends z.Primitive>(literal: T) => {
-  return z.object({ error: z.literal(literal) })
-}
 
 /**
  * A high-level client for the TiF API.
@@ -184,13 +179,14 @@ export class TiFAPI {
           (resp) => resp.id === eventId
         ),
         status204: "no-content",
-        status404: errorSchema("event-not-found"),
+        status404: EventNotFoundErrorSchema,
         status403: BlockedEventResponseSchema.refine(
           (resp) => resp.id === eventId
         )
       }
     )
   }
+
 
   async attendeesList (eventId: number, limit: number, nextPage?: string) {
     return await this.apiFetch(
@@ -207,4 +203,48 @@ export class TiFAPI {
       }
     )
   }
+
+  /**
+   * Joins the event with the given id.
+   *
+   * @param eventId The id of the event to join.
+   * @param arrivalRegion A region to pass for marking an initial arrival if the user has arrived in the area of the event.
+   * @returns The upcoming event arrivals based on the user joining this event, and a token request for the event group chat.
+   */
+  async joinEvent (eventId: number, arrivalRegion: EventRegion | null) {
+    return await this.apiFetch(
+      {
+        method: "POST",
+        endpoint: `/event/join/${eventId}`,
+        body: { region: arrivalRegion }
+      },
+      {
+        status404: EventNotFoundErrorSchema,
+        status403: literalErrorSchema("user-is-blocked", "event-has-ended"),
+        status201: JoinResponseSchema,
+        status200: JoinResponseSchema
+      }
+    )
+  }
 }
+
+const UpcomingEventArrivalsRegionsSchema = z.object({
+  upcomingRegions: EventArrivalRegionsSchema
+})
+
+const JoinResponseSchema = UpcomingEventArrivalsRegionsSchema.extend({
+  id: z.number(),
+  token: EventChatTokenRequestSchema
+})
+
+const literalErrorSchema = <T extends z.Primitive, V extends z.Primitive[]>(
+  literal: T,
+  ...literals: [...V]
+) => {
+  if (literals.length === 0) return z.object({ error: z.literal(literal) })
+  const [literal2, ...rest] = literals.map((l) => z.literal(l))
+  return z.object({ error: z.union([z.literal(literal), literal2, ...rest]) })
+
+}
+
+const EventNotFoundErrorSchema = literalErrorSchema("event-not-found")
