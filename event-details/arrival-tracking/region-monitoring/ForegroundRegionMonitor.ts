@@ -1,12 +1,16 @@
 /* eslint-disable func-call-spacing */
-import { uuidString } from "@lib/utils/UUID"
-import { EventRegion, areEventRegionsEqual } from "@shared-models/Event"
+import { EventRegion } from "@shared-models/Event"
 import {
   LocationCoordinate2D,
   metersBetweenLocations
 } from "@shared-models/Location"
 import { LocationSubscription } from "expo-location"
 import { EventRegionMonitor } from "./RegionMonitoring"
+import {
+  RegionState,
+  filterStateIfInactive,
+  stateForRegion
+} from "./RegionState"
 
 /**
  * A way to monitor the user's proximity to {@link EventRegion}s entirely in
@@ -40,7 +44,7 @@ import { EventRegionMonitor } from "./RegionMonitoring"
 export class ForegroundEventRegionMonitor implements EventRegionMonitor {
   static readonly BUFFER_TIME = 20_000
 
-  private regionStates = [] as RegionState[]
+  private regionStates = [] as ForegroundRegionState[]
 
   private userCoordinate?: LocationCoordinate2D
   private watchPromise?: Promise<LocationSubscription>
@@ -58,119 +62,102 @@ export class ForegroundEventRegionMonitor implements EventRegionMonitor {
 
   monitorRegion (region: EventRegion, callback: (hasArrived: boolean) => void) {
     const hasArrived = this.hasArrivedAtRegion(region)
-    callback(hasArrived)
+    const state = this.findOrPushStateForRegion(region, hasArrived)
+    const unsub = state.subscribeEmittingInitialStatus(callback)
     this.startWatchingIfNeeded()
-    const state = this.stateForRegion(region)
-    const newState = state ?? new RegionState(region, hasArrived)
-    if (!state) {
-      this.regionStates.push(newState)
-    }
-    const unsub = newState.subscribe(callback)
-    return () => {
+    return async () => {
       unsub()
-      if (newState.hasSubscribers) return
-      this.regionStates = this.regionStates.filter((state) => {
-        return !areEventRegionsEqual(state.region, newState.region)
-      })
+      this.regionStates = filterStateIfInactive(state, this.regionStates)
+      await this.stopWatchingIfNeeded()
     }
   }
 
   hasArrivedAtRegion (region: EventRegion) {
-    const state = this.stateForRegion(region)
+    const state = stateForRegion(region, this.regionStates)
     if (state) return state.hasArrived
     return isCoordinateWithinRegion(region, this.userCoordinate)
   }
 
-  private handleUserCoordinateUpdate (newCoordinate: LocationCoordinate2D) {
-    this.userCoordinate = newCoordinate
-    this.regionStates.forEach((state) => state.processUpdate(newCoordinate))
+  private findOrPushStateForRegion (region: EventRegion, hasArrived: boolean) {
+    const state = stateForRegion(region, this.regionStates)
+    const newState = state ?? new ForegroundRegionState(region, hasArrived)
+    if (!state) {
+      this.regionStates.push(newState)
+    }
+    return newState
   }
 
-  private stateForRegion (region: EventRegion) {
-    return this.regionStates.find((state) => {
-      return areEventRegionsEqual(region, state.region)
+  private handleUserCoordinateUpdate (newCoordinate: LocationCoordinate2D) {
+    this.userCoordinate = newCoordinate
+    this.regionStates.forEach((state) => {
+      const hasArrivedAtNewCoordinate = isCoordinateWithinRegion(
+        state.region,
+        newCoordinate
+      )
+      state.scheduleUpdateIfNeeded(
+        hasArrivedAtNewCoordinate,
+        ForegroundEventRegionMonitor.BUFFER_TIME
+      )
     })
   }
 
-  startWatchingIfNeeded () {
+  private startWatchingIfNeeded () {
     if (this.watchPromise) return
     this.watchPromise = this.watch((coordinate) => {
       this.handleUserCoordinateUpdate(coordinate)
     })
   }
 
-  stopWatchingIfNeeded () {
-    this.watchPromise?.then((subscription) => subscription.remove())
+  private async stopWatchingIfNeeded () {
+    if (this.regionStates.length > 0) return
+    const subscription = await this.watchPromise
+    subscription?.remove()
     this.watchPromise = undefined
   }
 }
 
-class RegionState {
-  readonly region: EventRegion
-  private _hasArrived: boolean
+class ForegroundRegionState extends RegionState {
   private scheduledUpdate?: {
     timeout: NodeJS.Timeout
     hasArrived: boolean
   }
 
-  private callbacks = new Map<string, (hasArrived: boolean) => void>()
-
-  get hasArrived () {
-    return this._hasArrived
-  }
-
-  get hasSubscribers () {
-    return this.callbacks.size > 0
-  }
-
-  constructor (region: EventRegion, hasArrived: boolean) {
-    this.region = region
-    this._hasArrived = hasArrived
-  }
-
-  subscribe (callback: (hasArrived: boolean) => void) {
-    const id = uuidString()
-    this.callbacks.set(id, callback)
+  subscribeEmittingInitialStatus (callback: (hasArrived: boolean) => void) {
+    callback(super.hasArrived)
+    const baseUnsub = super.subscribe(callback)
     return () => {
-      this.callbacks.delete(id)
-      if (!this.hasSubscribers) {
-        this.cancelScheduledlUpdate()
+      baseUnsub()
+      if (!super.hasSubscribers) {
+        this.cancelScheduledUpdate()
       }
     }
   }
 
-  processUpdate (newCoordinate: LocationCoordinate2D) {
-    const hasArrivedAtNewCoordinate = isCoordinateWithinRegion(
-      this.region,
-      newCoordinate
-    )
+  scheduleUpdateIfNeeded (hasArrived: boolean, timeout: number) {
     const isScheduledUpdateInvalid =
-      this.scheduledUpdate?.hasArrived !== hasArrivedAtNewCoordinate
+      this.scheduledUpdate?.hasArrived !== hasArrived
     if (isScheduledUpdateInvalid) {
-      this.cancelScheduledlUpdate()
+      this.cancelScheduledUpdate()
     }
 
-    const didCrossRegionBoundary = this.hasArrived !== hasArrivedAtNewCoordinate
+    const didCrossRegionBoundary = this.hasArrived !== hasArrived
     if (!this.scheduledUpdate && didCrossRegionBoundary) {
-      this.scheduleUpdate(hasArrivedAtNewCoordinate)
+      this.scheduleUpdate(hasArrived, timeout)
     }
   }
 
-  private cancelScheduledlUpdate () {
+  private cancelScheduledUpdate () {
     if (!this.scheduledUpdate) return
     clearTimeout(this.scheduledUpdate.timeout)
     this.scheduledUpdate = undefined
   }
 
-  private scheduleUpdate (hasArrived: boolean) {
+  private scheduleUpdate (hasArrived: boolean, timeout: number) {
     this.scheduledUpdate = {
       timeout: setTimeout(() => {
-        this.callbacks.forEach((callback) => {
-          callback(hasArrived)
-        })
+        super.publishUpdate(hasArrived)
         this.scheduledUpdate = undefined
-        this._hasArrived = hasArrived
-      }, ForegroundEventRegionMonitor.BUFFER_TIME),
+      }, timeout),
       hasArrived
     }
   }
