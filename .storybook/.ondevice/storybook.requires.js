@@ -4,8 +4,17 @@ import {
   configure,
   addDecorator,
   addParameters,
-  addArgsEnhancer,
-} from "@storybook/react-native";
+  addArgsEnhancer
+} from "@storybook/react-native"
+
+import "@storybook/addon-ondevice-notes/register"
+import "@storybook/addon-ondevice-controls/register"
+import "@storybook/addon-ondevice-backgrounds/register"
+import "@storybook/addon-ondevice-actions/register"
+
+import { argsEnhancers } from "@storybook/addon-actions/dist/preview"
+
+import { decorators, parameters } from "./preview"
 
 global.STORIES = [
   {
@@ -13,49 +22,41 @@ global.STORIES = [
     directory: "./.storybook/components",
     files: "**/*.stories.?(ts|tsx|js|jsx)",
     importPathMatcher:
-      "^\\.[\\\\/](?:\\.storybook[\\\\/]components(?:[\\\\/](?!\\.)(?:(?:(?!(?:^|[\\\\/])\\.).)*?)[\\\\/]|[\\\\/]|$)(?!\\.)(?=.)[^\\\\/]*?\\.stories\\.(?:ts|tsx|js|jsx)?)$",
-  },
-];
-
-import "@storybook/addon-ondevice-notes/register";
-import "@storybook/addon-ondevice-controls/register";
-import "@storybook/addon-ondevice-backgrounds/register";
-import "@storybook/addon-ondevice-actions/register";
-
-import { argsEnhancers } from "@storybook/addon-actions/dist/preview";
-
-import { decorators, parameters } from "./preview";
+      "^\\.[\\\\/](?:\\.storybook[\\\\/]components(?:[\\\\/](?!\\.)(?:(?:(?!(?:^|[\\\\/])\\.).)*?)[\\\\/]|[\\\\/]|$)(?!\\.)(?=.)[^\\\\/]*?\\.stories\\.(?:ts|tsx|js|jsx)?)$"
+  }
+]
 
 if (decorators) {
-  decorators.forEach((decorator) => addDecorator(decorator));
+  decorators.forEach((decorator) => addDecorator(decorator))
 }
 
 if (parameters) {
-  addParameters(parameters);
+  addParameters(parameters)
 }
 
 try {
-  argsEnhancers.forEach((enhancer) => addArgsEnhancer(enhancer));
+  argsEnhancers.forEach((enhancer) => addArgsEnhancer(enhancer))
 } catch {}
 
 const getStories = () => {
   return {
-    "./.storybook/components/AttendeesList/AttendeesList.stories.tsx": require("../components/AttendeesList/AttendeesList.stories.tsx"),
-    "./.storybook/components/Buttons/Buttons.stories.tsx": require("../components/Buttons/Buttons.stories.tsx"),
-    "./.storybook/components/ChangePassword/ChangePassword.stories.tsx": require("../components/ChangePassword/ChangePassword.stories.tsx"),
-    "./.storybook/components/ContentReporting/ContentReporting.stories.tsx": require("../components/ContentReporting/ContentReporting.stories.tsx"),
-    "./.storybook/components/ContentText/ContextText.stories.tsx": require("../components/ContentText/ContextText.stories.tsx"),
-    "./.storybook/components/EventDetails/EventDetails.stories.tsx": require("../components/EventDetails/EventDetails.stories.tsx"),
-    "./.storybook/components/Explore/Explore.stories.tsx": require("../components/Explore/Explore.stories.tsx"),
-    "./.storybook/components/ForgotPassword/ForgotPasswordForm.stories.tsx": require("../components/ForgotPassword/ForgotPasswordForm.stories.tsx"),
-    "./.storybook/components/LocationSearch/LocationSearch.stories.tsx": require("../components/LocationSearch/LocationSearch.stories.tsx"),
-    "./.storybook/components/SearchBar/SearchBar.stories.tsx": require("../components/SearchBar/SearchBar.stories.tsx"),
-    "./.storybook/components/SettingsScreen/SettingsScreen.stories.tsx": require("../components/SettingsScreen/SettingsScreen.stories.tsx"),
-    "./.storybook/components/SignIn/SignIn.stories.tsx": require("../components/SignIn/SignIn.stories.tsx"),
-    "./.storybook/components/SignUp/SignUp.stories.tsx": require("../components/SignUp/SignUp.stories.tsx"),
-    "./.storybook/components/TextField/TextField.stories.tsx": require("../components/TextField/TextField.stories.tsx"),
-    "./.storybook/components/VerificationCode/VerifyCode.stories.tsx": require("../components/VerificationCode/VerifyCode.stories.tsx"),
-  };
-};
+    "./components/AttendeesList/AttendeesList.stories.tsx": require("../components/AttendeesList/AttendeesList.stories.tsx"),
+    "./components/Buttons/Buttons.stories.tsx": require("../components/Buttons/Buttons.stories.tsx"),
+    "./components/ChangePassword/ChangePassword.stories.tsx": require("../components/ChangePassword/ChangePassword.stories.tsx"),
+    "./components/ContentReporting/ContentReporting.stories.tsx": require("../components/ContentReporting/ContentReporting.stories.tsx"),
+    "./components/ContentText/ContextText.stories.tsx": require("../components/ContentText/ContextText.stories.tsx"),
+    "./components/EventDetails/EventDetails.stories.tsx": require("../components/EventDetails/EventDetails.stories.tsx"),
+    "./components/Explore/Explore.stories.tsx": require("../components/Explore/Explore.stories.tsx"),
+    "./components/ForgotPassword/ForgotPasswordForm.stories.tsx": require("../components/ForgotPassword/ForgotPasswordForm.stories.tsx"),
+    "./components/LocationSearch/LocationSearch.stories.tsx": require("../components/LocationSearch/LocationSearch.stories.tsx"),
+    "./components/RegionMonitoring/RegionMonitoring.stories.tsx": require("../components/RegionMonitoring/RegionMonitoring.stories.tsx"),
+    "./components/SearchBar/SearchBar.stories.tsx": require("../components/SearchBar/SearchBar.stories.tsx"),
+    "./components/SettingsScreen/SettingsScreen.stories.tsx": require("../components/SettingsScreen/SettingsScreen.stories.tsx"),
+    "./components/SignIn/SignIn.stories.tsx": require("../components/SignIn/SignIn.stories.tsx"),
+    "./components/SignUp/SignUp.stories.tsx": require("../components/SignUp/SignUp.stories.tsx"),
+    "./components/TextField/TextField.stories.tsx": require("../components/TextField/TextField.stories.tsx"),
+    "./components/VerificationCode/VerifyCode.stories.tsx": require("../components/VerificationCode/VerifyCode.stories.tsx")
+  }
+}
 
-configure(getStories, module, false);
+configure(getStories, module, false)

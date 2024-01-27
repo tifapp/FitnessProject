@@ -48,6 +48,9 @@ import VerifcationCodeMeta, {
 import EventDetailsMeta, {
   Basic as EventDetailsBasic
 } from "../components/EventDetails/EventDetails.stories"
+import RegionMonitoringMeta, {
+  Basic as RegionMonitoringBasic
+} from "../components/RegionMonitoring/RegionMonitoring.stories"
 
 setupCognito(new InMemorySecureStore())
 
@@ -122,6 +125,11 @@ const stories = [
     name: EventDetailsMeta.title,
     component: EventDetailsBasic,
     args: EventDetailsMeta.args
+  },
+  {
+    name: RegionMonitoringMeta.title,
+    component: RegionMonitoringBasic,
+    args: RegionMonitoringMeta.args
   }
   // Add more stories here...
 ]
