@@ -1,14 +1,14 @@
+import { UserHandle } from "@content-parsing"
+import { StringDateRangeSchema, StringDateSchema } from "@date-time"
+import { ColorString } from "@lib/utils/Color"
 import { z } from "zod"
 import { LocationCoordinates2DSchema, checkIfCoordsAreEqual } from "./Location"
-import { UserHandle } from "@content-parsing"
+import { PlacemarkSchema } from "./Placemark"
+import { TodayOrTomorrowSchema } from "./TodayOrTomorrow"
 import {
   BlockedBidirectionalUserRelationsSchema,
   UnblockedBidirectionalUserRelationsSchema
 } from "./User"
-import { PlacemarkSchema } from "./Placemark"
-import { TodayOrTomorrowSchema } from "./TodayOrTomorrow"
-import { StringDateRangeSchema, StringDateSchema } from "@date-time"
-import { ColorString } from "@lib/utils/Color"
 
 /**
  * A zod schema for {@link EventRegion}.
@@ -52,6 +52,15 @@ export const BlockedEventAttendeeSchema = UnblockedEventAttendeeSchema.omit({
  * User information given for an attendee of an event.
  */
 export type EventAttendee = z.infer<typeof UnblockedEventAttendeeSchema>
+
+/**
+ * A zod schema for an event attendees list page fetched from the server.
+ */
+export const EventAttendeesPageSchema = z.object({
+  attendees: z.array(UnblockedEventAttendeeSchema),
+  attendeeCount: z.number(),
+  nextPageKey: z.string().nullable()
+})
 
 export const EventSettingsSchema = z.object({
   shouldHideAfterStartDate: z.boolean(),

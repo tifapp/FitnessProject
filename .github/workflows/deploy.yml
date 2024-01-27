@@ -67,8 +67,6 @@ jobs:
       - name: Construct .env
         run: |
           echo "MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}" >> .env.infra
-          echo "EXPO_PROJECT_ID=${{ secrets.EXPO_PROJECT_ID }}" >> .env.infra
-          echo "EXPO_PROJECT_OWNER=${{ secrets.EXPO_PROJECT_OWNER }}" >> .env.infra
           echo "CHECK_RUN_ID=${{ github.run_id }}" >> .env.infra
           echo "GITHUB_SHA=${{ github.sha }}" >> .env.infra
           echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .env.infra
@@ -79,58 +77,3 @@ jobs:
 
       - name: Trigger Build on EAS
         run: eas build --profile preview --platform android --non-interactive --no-wait
-
-  storybook-eas-build:
-    name: Perform Storybook EAS Build
-    runs-on: ubuntu-latest
-    env:
-      EXPO_PROJECT_STORYBOOK_ID: ${{ secrets.EXPO_PROJECT_STORYBOOK_ID }}
-      EXPO_PROJECT_OWNER: ${{ secrets.EXPO_PROJECT_OWNER }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Cache node modules
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18.16.0"
-
-      - name: Install Dependencies
-        run: |
-          cd .storybook
-          npm ci
-
-      - name: Setup Expo and EAS
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_ACCESS_TOKEN }}
-
-      - name: Construct .env
-        run: |
-          echo "MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}" >> .storybook/.env.infra
-          echo "EXPO_PROJECT_STORYBOOK_ID=${{ secrets.EXPO_PROJECT_STORYBOOK_ID }}" >> .storybook/.env.infra
-          echo "EXPO_PROJECT_OWNER=${{ secrets.EXPO_PROJECT_OWNER }}" >> .storybook/.env.infra
-          echo "CHECK_RUN_ID=${{ github.run_id }}" >> .storybook/.env.infra
-          echo "GITHUB_SHA=${{ github.sha }}" >> .storybook/.env.infra
-          echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .storybook/.env.infra
-          echo "RUN_EAS_BUILD_HOOKS=1" >> .storybook/.env.infra
-          echo "SENTRY_DSN=${{ secrets.SENTRY_DSN }}" >> .storybook/.env
-          echo "MIXPANEL_TOKEN=${{ secrets.MIXPANEL_TOKEN }}" >> .storybook/.env
-          echo "API_URL=${{ secrets.API_ENDPOINT }}" >> .storybook/.env
-
-      - name: Trigger Build on EAS
-        run: |
-          cp easbuild.mjs .storybook/easbuild.mjs
-          cd .storybook
-          eas build --profile preview --platform android --non-interactive --no-wait
