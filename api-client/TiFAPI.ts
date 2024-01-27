@@ -1,15 +1,18 @@
 import { UserHandle } from "@content-parsing"
 import { API_URL } from "@env"
-import { z } from "zod"
-import { createAWSTiFAPIFetch } from "./aws"
-import { TiFAPIFetch, createTiFAPIFetch } from "./client"
-import { EventArrivalRegionsSchema } from "@shared-models/EventArrivals"
 import {
   BlockedEventResponseSchema,
   CurrentUserEventResponseSchema,
+  EventAttendeesPageSchema,
   EventRegion
 } from "@shared-models/Event"
+
+import { EventArrivalRegionsSchema } from "@shared-models/EventArrivals"
+import { z } from "zod"
+import { createAWSTiFAPIFetch } from "./aws"
+import { TiFAPIFetch, createTiFAPIFetch } from "./client"
 import { EventChatTokenRequestSchema } from "@shared-models/ChatToken"
+
 
 export type UpdateCurrentUserProfileRequest = Partial<{
   name: string
@@ -184,6 +187,23 @@ export class TiFAPI {
     )
   }
 
+
+  async attendeesList (eventId: number, limit: number, nextPage?: string) {
+    return await this.apiFetch(
+      {
+        method: "GET",
+        endpoint: `/event/attendees/${eventId}`,
+        query: { limit, nextPage }
+      },
+      {
+        status200: EventAttendeesPageSchema,
+        status204: "no-content",
+        status404: errorSchema("event-not-found"),
+        status403: errorSchema("blocked-by-host")
+      }
+    )
+  }
+
   /**
    * Joins the event with the given id.
    *
@@ -224,6 +244,7 @@ const literalErrorSchema = <T extends z.Primitive, V extends z.Primitive[]>(
   if (literals.length === 0) return z.object({ error: z.literal(literal) })
   const [literal2, ...rest] = literals.map((l) => z.literal(l))
   return z.object({ error: z.union([z.literal(literal), literal2, ...rest]) })
+
 }
 
 const EventNotFoundErrorSchema = literalErrorSchema("event-not-found")

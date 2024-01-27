@@ -7,6 +7,12 @@ export namespace ArrayUtils {
   }
 
   /**
+   * Returns a random element from an array which has at least one element.
+   */
+  export const randomElement = <T>(arr: T[]) => {
+    return arr[Math.floor(Math.random() * arr.length)]
+  }
+  /**
    * Maps an array using a transform function, but removes any `null` or
    * `undefined` values from the array.
    */
