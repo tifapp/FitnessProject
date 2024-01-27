@@ -26,7 +26,10 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
   let sendForegroundLocationUpdate: (coordinate: LocationCoordinate2D) => void
   const createForegroundMonitor = () => {
     return new ForegroundEventRegionMonitor(async (callback) => {
-      sendForegroundLocationUpdate = callback
+      sendForegroundLocationUpdate = (coordinate) => {
+        callback(coordinate)
+        advanceByForegroundMonitorBufferTime()
+      }
       return { remove: jest.fn() }
     })
   }
@@ -55,7 +58,6 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     await waitFor(() => expect(callback).toHaveBeenNthCalledWith(1, false))
 
     sendForegroundLocationUpdate(region.coordinate)
-    advanceByForegroundMonitorBufferTime()
     await waitFor(() => expect(callback).toHaveBeenCalledWith(true))
     expect(monitor.hasArrivedAtRegion(region)).toEqual(true)
   })
@@ -67,7 +69,6 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     await waitFor(() => expect(callback).toHaveBeenNthCalledWith(1, false))
 
     sendForegroundLocationUpdate(region.coordinate)
-    advanceByForegroundMonitorBufferTime()
     await waitFor(() => expect(callback).toHaveBeenCalledWith(true))
 
     const callback2 = jest.fn()
@@ -85,7 +86,6 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     await waitFor(() => expect(callback).toHaveBeenNthCalledWith(1, false))
 
     sendForegroundLocationUpdate(arrival.coordinate)
-    advanceByForegroundMonitorBufferTime()
     await verifyNeverOccurs(() => {
       expect(callback).toHaveBeenCalledWith(true)
     })
@@ -121,7 +121,6 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     await tracker.removeArrivalByEventId(arrival.eventId)
 
     sendForegroundLocationUpdate(arrival.coordinate)
-    advanceByForegroundMonitorBufferTime()
     await waitFor(() => expect(callback).toHaveBeenCalledWith(true))
     expect(callback).toHaveBeenCalledTimes(2)
     expect(monitor.hasArrivedAtRegion(arrival)).toEqual(true)
@@ -183,7 +182,6 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     await tracker.removeArrivalByEventId(arrivals[0].eventId)
 
     sendForegroundLocationUpdate(arrivals[0].coordinate)
-    advanceByForegroundMonitorBufferTime()
     await waitFor(() => expect(callback).toHaveBeenCalledWith(true))
 
     performArrivalsOperation.mockResolvedValueOnce([
@@ -205,7 +203,6 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     await waitFor(() => expect(callback).toHaveBeenCalledWith(false))
 
     sendForegroundLocationUpdate(arrival.coordinate)
-    advanceByForegroundMonitorBufferTime()
 
     await tracker.removeArrivalByEventId(arrival.eventId)
     await waitFor(() => expect(callback).toHaveBeenNthCalledWith(2, true))
@@ -224,7 +221,6 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
       latitude: arrival.coordinate.latitude + 5,
       longitude: arrival.coordinate.longitude - 5
     })
-    advanceByForegroundMonitorBufferTime()
 
     performArrivalsOperation.mockResolvedValueOnce([
       arrivalRegion(arrival, true)
@@ -250,7 +246,6 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     await waitFor(() => expect(callbacks[1]).toHaveBeenNthCalledWith(1, false))
 
     sendForegroundLocationUpdate(arrivals[0].coordinate)
-    advanceByForegroundMonitorBufferTime()
 
     performArrivalsOperation.mockResolvedValueOnce([
       arrivalRegion(arrivals[0], false),
@@ -313,7 +308,6 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     })
 
     sendForegroundLocationUpdate(arrival.coordinate)
-    advanceByForegroundMonitorBufferTime()
     await tracker.removeArrivalByEventId(arrival.eventId)
     await verifyNeverOccurs(() => {
       expect(callback).toHaveBeenNthCalledWith(2, true)

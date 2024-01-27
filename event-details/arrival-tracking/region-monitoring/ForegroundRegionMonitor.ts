@@ -123,11 +123,11 @@ class ForegroundRegionState extends RegionState {
   }
 
   subscribeEmittingInitialStatus (callback: (hasArrived: boolean) => void) {
-    callback(this.hasArrived)
+    callback(super.hasArrived)
     const baseUnsub = super.subscribe(callback)
     return () => {
       baseUnsub()
-      if (!this.hasSubscribers) {
+      if (!super.hasSubscribers) {
         this.cancelScheduledUpdate()
       }
     }
@@ -155,7 +155,7 @@ class ForegroundRegionState extends RegionState {
   private scheduleUpdate (hasArrived: boolean, timeout: number) {
     this.scheduledUpdate = {
       timeout: setTimeout(() => {
-        this.publishUpdate(hasArrived)
+        super.publishUpdate(hasArrived)
         this.scheduledUpdate = undefined
       }, timeout),
       hasArrived

@@ -128,7 +128,7 @@ class EventArrivalsTrackerMonitorRegionState extends RegionState {
   private foregroundMonitorUnsubscribe?: EventRegionMonitorUnsubscribe
 
   override get isActive () {
-    return this.isBeingTrackedByArrivalsTracker || this.hasSubscribers
+    return this.isBeingTrackedByArrivalsTracker || super.hasSubscribers
   }
 
   constructor (
@@ -149,7 +149,7 @@ class EventArrivalsTrackerMonitorRegionState extends RegionState {
       .waitForInitialRegionsToLoad()
       .then(() => {
         if (this.isBeingTrackedByArrivalsTracker) {
-          callback(this.hasArrived)
+          callback(super.hasArrived)
         } else {
           callback(fallbackMonitor.hasArrivedAtRegion(this.region))
         }
@@ -160,9 +160,7 @@ class EventArrivalsTrackerMonitorRegionState extends RegionState {
     return async () => {
       const unsub = await promise
       unsub()
-      if (!this.hasSubscribers) {
-        this.unsubscribeFromForegroundMonitorIfNeeded()
-      }
+      this.unsubscribeFromForegroundMonitorIfNeeded()
     }
   }
 
@@ -172,7 +170,7 @@ class EventArrivalsTrackerMonitorRegionState extends RegionState {
       this.region,
       (hasArrived) => {
         if (!this.isBeingTrackedByArrivalsTracker) {
-          this.publishUpdate(hasArrived)
+          super.publishUpdate(hasArrived)
         } else {
           this.bufferedFallbackHasArrived = hasArrived
         }
@@ -181,6 +179,7 @@ class EventArrivalsTrackerMonitorRegionState extends RegionState {
   }
 
   private unsubscribeFromForegroundMonitorIfNeeded () {
+    if (super.hasSubscribers) return
     this.foregroundMonitorUnsubscribe?.()
     this.foregroundMonitorUnsubscribe = undefined
   }
@@ -196,8 +195,8 @@ class EventArrivalsTrackerMonitorRegionState extends RegionState {
   }
 
   private publishUpdateIfNotDuplicate (hasArrived: boolean) {
-    if (this.hasArrived === hasArrived) return
-    this.publishUpdate(hasArrived)
+    if (super.hasArrived === hasArrived) return
+    super.publishUpdate(hasArrived)
     this.bufferedFallbackHasArrived = undefined
   }
 }
