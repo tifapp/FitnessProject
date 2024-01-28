@@ -2,46 +2,46 @@ import { captureAlerts } from "@test-helpers/Alerts"
 import {
   JOIN_EVENT_ERROR_ALERTS,
   JoinEventResult,
-  useJoinEvent
+  useJoinEventStages
 } from "./JoinEvent"
 import { renderHook, waitFor } from "@testing-library/react-native"
 import { act } from "react-test-renderer"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { mockLocationCoordinate2D } from "@location/MockData"
+import "@test-helpers/Matchers"
+import { TrueRegionMonitor } from "./arrival-tracking/region-monitoring/MockRegionMonitors"
 
 describe("JoinEvent tests", () => {
+  const env = {
+    joinEvent: jest.fn(),
+    monitor: TrueRegionMonitor,
+    onSuccess: jest.fn(),
+    loadPermissions: jest.fn()
+  }
+
+  const TEST_EVENT = {
+    id: 1,
+    location: {
+      coordinate: mockLocationCoordinate2D(),
+      arrivalRadiusMeters: 50,
+      isInArrivalTrackingPeriod: true
+    }
+  }
+
+  beforeEach(() => jest.resetAllMocks())
+
   describe("useJoinEvent tests", () => {
     const { alertPresentationSpy } = captureAlerts()
-    const env = {
-      joinEvent: jest.fn(),
-      monitor: {
-        monitorRegion: () => jest.fn(),
-        hasArrivedAtRegion: () => true
-      },
-      onSuccess: jest.fn(),
-      loadPermissions: jest.fn()
-    }
-
-    const TEST_EVENT = {
-      id: 1,
-      location: {
-        coordinate: mockLocationCoordinate2D(),
-        arrivalRadiusMeters: 50,
-        isInArrivalTrackingPeriod: true
-      }
-    }
-
-    beforeEach(() => jest.resetAllMocks())
 
     test("join event flow, all permissions requested", async () => {
       env.loadPermissions.mockResolvedValueOnce([
         {
-          id: "1",
+          id: "notifications",
           canRequestPermission: true,
           requestPermission: jest.fn().mockResolvedValueOnce(true)
         },
         {
-          id: "2",
+          id: "backgroundLocation",
           canRequestPermission: true,
           requestPermission: jest.fn().mockResolvedValueOnce(true)
         }
@@ -53,17 +53,17 @@ describe("JoinEvent tests", () => {
       env.joinEvent.mockReturnValueOnce(joinPromise)
       const { result } = renderUseJoinEvent()
       expect(result.current).toEqual({
-        status: "idle",
+        id: "idle",
         joinButtonTapped: expect.any(Function)
       })
 
       act(() => (result.current as any).joinButtonTapped())
-      await waitFor(() => expect(result.current.status).toEqual("loading"))
+      await waitFor(() => expect(result.current.id).toEqual("loading"))
       act(() => resolveJoin?.("success"))
       await waitFor(() => {
         expect(result.current).toMatchObject({
-          status: "permission",
-          permissionId: "1"
+          id: "permission",
+          permissionId: "notifications"
         })
       })
       expect(env.joinEvent).toHaveBeenCalledWith({
@@ -74,26 +74,26 @@ describe("JoinEvent tests", () => {
       act(() => (result.current as any).requestButtonTapped())
       await waitFor(() => {
         expect(result.current).toMatchObject({
-          status: "permission",
-          permissionId: "2"
+          id: "permission",
+          permissionId: "backgroundLocation"
         })
       })
 
       expect(env.onSuccess).not.toHaveBeenCalled()
       act(() => (result.current as any).requestButtonTapped())
-      await waitFor(() => expect(result.current).toEqual({ status: "success" }))
+      await waitFor(() => expect(result.current).toEqual({ id: "success" }))
       expect(env.onSuccess).toHaveBeenCalledTimes(1)
     })
 
     test("join event flow, skips false permissions", async () => {
       env.loadPermissions.mockResolvedValueOnce([
         {
-          id: "1",
+          id: "notifications",
           canRequestPermission: false,
           requestPermission: jest.fn().mockResolvedValueOnce(true)
         },
         {
-          id: "2",
+          id: "backgroundLocation",
           canRequestPermission: true,
           requestPermission: jest.fn().mockResolvedValueOnce(true)
         }
@@ -104,8 +104,8 @@ describe("JoinEvent tests", () => {
       act(() => (result.current as any).joinButtonTapped())
       await waitFor(() => {
         expect(result.current).toMatchObject({
-          status: "permission",
-          permissionId: "2"
+          id: "permission",
+          permissionId: "backgroundLocation"
         })
       })
     })
@@ -113,12 +113,12 @@ describe("JoinEvent tests", () => {
     test("join event flow, no permissions requested", async () => {
       env.loadPermissions.mockResolvedValueOnce([
         {
-          id: "1",
+          id: "notifications",
           canRequestPermission: false,
           requestPermission: jest.fn().mockResolvedValueOnce(true)
         },
         {
-          id: "2",
+          id: "backgroundLocation",
           canRequestPermission: false,
           requestPermission: jest.fn().mockResolvedValueOnce(true)
         }
@@ -128,7 +128,7 @@ describe("JoinEvent tests", () => {
 
       act(() => (result.current as any).joinButtonTapped())
       await waitFor(() => {
-        expect(result.current).toEqual({ status: "success" })
+        expect(result.current).toEqual({ id: "success" })
       })
       expect(env.onSuccess).toHaveBeenCalledTimes(1)
     })
@@ -136,12 +136,12 @@ describe("JoinEvent tests", () => {
     test("join event flow, dismiss permissions", async () => {
       env.loadPermissions.mockResolvedValueOnce([
         {
-          id: "1",
+          id: "notifications",
           canRequestPermission: true,
           requestPermission: jest.fn().mockResolvedValueOnce(true)
         },
         {
-          id: "2",
+          id: "backgroundLocation",
           canRequestPermission: true,
           requestPermission: jest.fn().mockResolvedValueOnce(true)
         }
@@ -152,20 +152,20 @@ describe("JoinEvent tests", () => {
       act(() => (result.current as any).joinButtonTapped())
       await waitFor(() => {
         expect(result.current).toMatchObject({
-          status: "permission",
-          permissionId: "1"
+          id: "permission",
+          permissionId: "notifications"
         })
       })
 
       act(() => (result.current as any).dismissButtonTapped())
       expect(result.current).toMatchObject({
-        status: "permission",
-        permissionId: "2"
+        id: "permission",
+        permissionId: "backgroundLocation"
       })
 
       expect(env.onSuccess).not.toHaveBeenCalled()
       act(() => (result.current as any).dismissButtonTapped())
-      expect(result.current).toEqual({ status: "success" })
+      expect(result.current).toEqual({ id: "success" })
       expect(env.onSuccess).toHaveBeenCalledTimes(1)
     })
 
@@ -184,7 +184,7 @@ describe("JoinEvent tests", () => {
     })
 
     const expectErrorAlertState = async (
-      result: { current: ReturnType<typeof useJoinEvent> },
+      result: { current: ReturnType<typeof useJoinEventStages> },
       callIndex: number,
       key: keyof typeof JOIN_EVENT_ERROR_ALERTS
     ) => {
@@ -197,13 +197,13 @@ describe("JoinEvent tests", () => {
         )
       })
       expect(result.current).toEqual({
-        status: "idle",
+        id: "idle",
         joinButtonTapped: expect.any(Function)
       })
     }
 
     const renderUseJoinEvent = () => {
-      return renderHook(() => useJoinEvent(TEST_EVENT, env), {
+      return renderHook(() => useJoinEventStages(TEST_EVENT, env), {
         wrapper: ({ children }: any) => (
           <TestQueryClientProvider>{children}</TestQueryClientProvider>
         )
