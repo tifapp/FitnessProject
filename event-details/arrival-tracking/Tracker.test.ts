@@ -342,6 +342,28 @@ describe("EventArrivalsTracker tests", () => {
     await verifyNeverOccurs(() => expect(callback).toHaveBeenCalledTimes(2))
   })
 
+  it("should not publish an update when failing to replace arrivals on geofencer", async () => {
+    const arrival = mockEventArrival()
+    const tracker = new EventArrivalsTracker(
+      upcomingArrivals,
+      {
+        replaceGeofencedRegions: jest
+          .fn()
+          .mockRejectedValueOnce(
+            new Error("No Background location permissions enabled")
+          ),
+        onUpdate: jest.fn()
+      },
+      performArrivalOperation
+    )
+    const callback = jest.fn()
+    const subscription = tracker.subscribe(callback)
+    await subscription.waitForInitialRegionsToLoad()
+    callback.mockReset()
+    await tracker.trackArrival(arrival)
+    await verifyNeverOccurs(() => expect(callback).toHaveBeenCalled())
+  })
+
   const expectTrackedRegions = async (regions: EventArrivalRegion[]) => {
     await waitFor(async () => {
       expect(await upcomingArrivals.all()).toEqual(regions)
