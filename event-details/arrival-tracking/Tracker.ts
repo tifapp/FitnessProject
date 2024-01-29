@@ -10,7 +10,7 @@ import { ArrayUtils } from "@lib/utils/Array"
 import { PerformArrivalsOperation } from "./ArrivalsOperation"
 import { EventArrival, arrivalRegion, removeDuplicateArrivals } from "./Models"
 import { areEventRegionsEqual } from "@shared-models/Event"
-import { uuidString } from "@lib/utils/UUID"
+import { CallbackCollection } from "@lib/CallbackCollection"
 
 export interface EventArrivalsTrackerSubscription {
   waitForInitialRegionsToLoad(): Promise<void>
@@ -30,10 +30,7 @@ export class EventArrivalsTracker {
   private readonly performArrivalsOperation: PerformArrivalsOperation
 
   private unsubscribeFromGeofencing?: EventArrivalGeofencingUnsubscribe
-  private subscriptions = new Map<
-    string,
-    (regions: EventArrivalRegion[]) => void
-  >()
+  private callbacks = new CallbackCollection<EventArrivalRegion[]>()
 
   constructor (
     upcomingArrivals: UpcomingEventArrivals,
@@ -131,12 +128,11 @@ export class EventArrivalsTracker {
   subscribe (
     callback: (regions: EventArrivalRegion[]) => void
   ): EventArrivalsTrackerSubscription {
-    const id = uuidString()
-    this.subscriptions.set(id, callback)
+    const unsubscribe = this.callbacks.add(callback)
     const initial = this.upcomingArrivals.all().then(callback)
     return {
       waitForInitialRegionsToLoad: () => initial,
-      unsubscribe: () => this.subscriptions.delete(id)
+      unsubscribe
     }
   }
 
@@ -154,7 +150,7 @@ export class EventArrivalsTracker {
       this.upcomingArrivals.replaceAll(regions)
     ])
     this.updateGeofencingSubscription(regions)
-    this.subscriptions.forEach((callback) => callback(regions))
+    this.callbacks.send(regions)
   }
 
   private updateGeofencingSubscription (arrivals: EventArrivalRegion[]) {
