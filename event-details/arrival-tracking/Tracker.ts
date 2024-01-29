@@ -161,6 +161,8 @@ export class EventArrivalsTracker {
       this.subscriptions.forEach((callback) => callback(regions))
     } catch (e) {
       log("error", "Failed to sync regions", { message: e.message })
+      // eslint-disable-next-line n/no-callback-literal
+      this.subscriptions.forEach((callback) => callback([]))
     }
   }
 

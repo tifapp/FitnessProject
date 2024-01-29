@@ -342,7 +342,7 @@ describe("EventArrivalsTracker tests", () => {
     await verifyNeverOccurs(() => expect(callback).toHaveBeenCalledTimes(2))
   })
 
-  it("should not publish an update when failing to replace arrivals on geofencer", async () => {
+  it("should publish an empty update when failing to replace arrivals on geofencer", async () => {
     const arrival = mockEventArrival()
     const tracker = new EventArrivalsTracker(
       upcomingArrivals,
@@ -361,7 +361,8 @@ describe("EventArrivalsTracker tests", () => {
     await subscription.waitForInitialRegionsToLoad()
     callback.mockReset()
     await tracker.trackArrival(arrival)
-    await verifyNeverOccurs(() => expect(callback).toHaveBeenCalled())
+    await waitFor(() => expect(callback).toHaveBeenCalledWith([]))
+    expect(callback).toHaveBeenCalledTimes(1)
   })
 
   const expectTrackedRegions = async (regions: EventArrivalRegion[]) => {
