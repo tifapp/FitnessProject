@@ -16,15 +16,6 @@ import { CallbackCollection } from "@lib/CallbackCollection"
 
 /**
  * An expo geofencing wrapper tuned for event arrivals.
- *
- * There are only 2 instances of this class, `foreground` and `background`.
- *
- * `upcomingArrivalsInstance` is used for tracking event arrivals added through {@link EventArrivalsTracker}.
- *
- * `nonUpcomingArrivalsInstance` is used for tracking event arrivals for non-upcoming events.
- *
- * This distance being geofenced is based on a "walking to the event from the parking lot basis",
- * ie. about 1-2 american football fields.
  */
 export class ExpoEventArrivalsGeofencer implements EventArrivalsGeofencer {
   private static readonly taskName = "eventArrivalsTrackingGeofencing"
@@ -59,12 +50,6 @@ export class ExpoEventArrivalsGeofencer implements EventArrivalsGeofencer {
     }
   }
 
-  /**
-   * Handle geofencing updates. This method only supports 1 consumer at a time, and
-   * calling it twice will unregister the first consumer.
-   *
-   * @returns a function to unsubscribe from updates.
-   */
   onUpdate (handleUpdate: EventArrivalGeofencingCallback) {
     return this.callbacks.add(handleUpdate)
   }
@@ -89,9 +74,5 @@ export class ExpoEventArrivalsGeofencer implements EventArrivalsGeofencer {
     })
   }
 
-  /**
-   * The {@link ExpoEventArrivalsGeofencer} instance to use for events that start within
-   * 24 hours that the user is a part of.
-   */
   static readonly shared = new ExpoEventArrivalsGeofencer()
 }
