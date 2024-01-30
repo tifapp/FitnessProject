@@ -3,7 +3,7 @@ import { TouchableIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors } from "@lib/Fonts"
 import { ceilDurationToUnit, dayjs } from "@date-time"
-import React, { useState } from "react"
+import { useState } from "react"
 import { View, ViewStyle, StyleSheet } from "react-native"
 import Animated, {
   AnimatedStyleProp,

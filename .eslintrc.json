@@ -33,6 +33,7 @@
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
     "no-use-before-define": "off",
+    "react/react-in-jsx-scope": "off",
     "spaced-comment": "warn",
     "space-in-parens": "error",
     "computed-property-spacing": "error",
