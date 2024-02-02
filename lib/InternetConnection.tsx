@@ -1,6 +1,7 @@
 import React, {
   ReactNode,
   createContext,
+  useCallback,
   useContext,
   useSyncExternalStore
 } from "react"
@@ -59,12 +60,13 @@ export const InternetConnectionStatusProvider = ({
 )
 
 /**
- * Subscribes to the current {@link InternetConnectionStatus} provided by {@link InternetConnectionStatusProvider}.
+ * Subscribes to the current {@link InternetConnectionStatus} provided by
+ * {@link InternetConnectionStatusProvider}.
  */
 export const useIsConnectedToInternet = () => {
   const status = useContext(InternetConnectionContext)
   return useSyncExternalStore(
-    (callback) => status.subscribe(callback),
+    useCallback((callback) => status.subscribe(callback), [status]),
     () => status.isConnected
   )
 }

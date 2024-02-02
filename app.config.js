@@ -1,18 +1,41 @@
-const dotenv = require("dotenv")
+import dotenv from "dotenv"
 
 dotenv.config({ path: ".env.infra" })
 
-const { MAPS_API_KEY, EXPO_PROJECT_ID, EXPO_PROJECT_OWNER } = process.env
+const { MAPS_API_KEY, EXPO_PROJECT_ID, EXPO_PROJECT_OWNER, EAS_BUILD_TYPE } =
+  process.env
+
+const { bundleIdentifier, icon, splash, name } =
+  EAS_BUILD_TYPE === "development"
+    ? {
+      bundleIdentifier: "com.tifapp.FitnessAppDevelopment",
+      icon: ".storybook/assets/icon.png",
+      splash: ".storybook/assets/splash.png",
+      name: "FitnessAppDevelopment"
+    }
+    : EAS_BUILD_TYPE === "preview"
+      ? {
+        bundleIdentifier: "com.tifapp.FitnessAppPreview",
+        icon: "./assets/icon.png",
+        splash: "./assets/splash.png",
+        name: "FitnessAppPreview"
+      }
+      : {
+        bundleIdentifier: "com.tifapp.FitnessApp",
+        icon: "./assets/icon.png",
+        splash: "./assets/splash.png",
+        name: "FitnessApp"
+      }
 
 const config = {
-  name: "FitnessApp",
+  name,
   slug: "FitnessApp",
   scheme: "tifapp",
   version: "1.0.0",
   orientation: "portrait",
-  icon: "./assets/icon.png",
+  icon,
   splash: {
-    image: "./assets/splash.png",
+    image: splash,
     resizeMode: "contain",
     backgroundColor: "#ffffff"
   },
@@ -28,7 +51,7 @@ const config = {
   plugins: ["sentry-expo"],
   assetBundlePatterns: ["**/*"],
   ios: {
-    bundleIdentifier: "com.tifapp.FitnessApp",
+    bundleIdentifier,
     infoPlist: {
       NSLocationAlwaysAndWhenInUseUsageDescription:
         "To inform others of your arrival, tap \"Change to Always Allow.\"",
@@ -58,12 +81,8 @@ const config = {
       ]
     }
   },
-  web: {
-    favicon: "./assets/favicon.png"
-  },
   android: {
-    package: "com.tifapp.FitnessApp",
-    googleServicesFile: "./google-services.json",
+    package: bundleIdentifier,
     config: {
       googleMaps: {
         apiKey: MAPS_API_KEY

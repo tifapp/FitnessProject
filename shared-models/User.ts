@@ -33,10 +33,7 @@ export const BlockedBidirectionalUserRelationsSchema = z.union([
     themToYou: BlockedStatusSchema,
     youToThem: BlockedStatusSchema
   }),
-  z.object({
-    themToYou: NotFriendsStatusSchema,
-    youToThem: BlockedStatusSchema
-  }),
+
   z.object({
     themToYou: BlockedStatusSchema,
     youToThem: NotFriendsStatusSchema
@@ -59,6 +56,10 @@ export const UnblockedBidirectionalUserRelationsSchema = z.union([
   z.object({
     themToYou: FriendRequestPendingStatusSchema,
     youToThem: NotFriendsStatusSchema
+  }),
+  z.object({
+    themToYou: NotFriendsStatusSchema,
+    youToThem: BlockedStatusSchema
   }),
   z.object({
     themToYou: NotFriendsStatusSchema,

@@ -6,9 +6,6 @@ import { setupCognito } from "@auth/CognitoHelpers"
 import { InMemorySecureStore } from "@auth/CognitoSecureStorage"
 import { FlatList } from "react-native-gesture-handler"
 import { useAppFonts } from "../../lib/Fonts"
-import AttendeesListMeta, {
-  Basic as AttendeesListScreenBasic
-} from "../components/AttendeesList/AttendeesList.stories"
 import ButtonsMeta, {
   Basic as ButtonsBasic
 } from "../components/Buttons/Buttons.stories"
@@ -51,6 +48,9 @@ import VerifcationCodeMeta, {
 import EventDetailsMeta, {
   Basic as EventDetailsBasic
 } from "../components/EventDetails/EventDetails.stories"
+import RegionMonitoringMeta, {
+  Basic as RegionMonitoringBasic
+} from "../components/RegionMonitoring/RegionMonitoring.stories"
 
 setupCognito(new InMemorySecureStore())
 
@@ -70,11 +70,6 @@ const stories = [
     name: SettingsMeta.title,
     component: SettingsScreenBasic,
     args: ContentTextMeta.args
-  },
-  {
-    name: AttendeesListMeta.title,
-    component: AttendeesListScreenBasic,
-    args: AttendeesListMeta.args
   },
   {
     name: ExploreEventsMeta.title,
@@ -130,6 +125,11 @@ const stories = [
     name: EventDetailsMeta.title,
     component: EventDetailsBasic,
     args: EventDetailsMeta.args
+  },
+  {
+    name: RegionMonitoringMeta.title,
+    component: RegionMonitoringBasic,
+    args: RegionMonitoringMeta.args
   }
   // Add more stories here...
 ]
