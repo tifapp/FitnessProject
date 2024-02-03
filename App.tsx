@@ -31,6 +31,8 @@ import { Native as SentryNative } from "sentry-expo"
 import { setupCognito } from "./auth"
 import awsconfig from "./src/aws-exports"
 import { ExpoEventArrivalsGeofencer } from "@event-details/arrival-tracking"
+import { addPushTokenListener } from "expo-notifications"
+import { registerForPushNotifications } from "./notifications"
 
 Geo.configure(awsconfig)
 setupCognito()
@@ -43,6 +45,7 @@ addLogHandler(sentryErrorCapturingLogHandler())
 log("info", "App launched", { date: new Date() })
 
 ExpoEventArrivalsGeofencer.shared.defineTask()
+addPushTokenListener(registerForPushNotifications)
 
 export type AppProps = {
   isFontsLoaded: boolean
