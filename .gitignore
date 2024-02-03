@@ -37,4 +37,7 @@ amplifytools.xcconfig
 **.sample
 #amplify-do-not-edit-end
 
+*.ipa
+*.apk
+
 test-fs
