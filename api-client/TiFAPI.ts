@@ -13,7 +13,6 @@ import { createAWSTiFAPIFetch } from "./aws"
 import { TiFAPIFetch, createTiFAPIFetch } from "./client"
 import { EventChatTokenRequestSchema } from "@shared-models/ChatToken"
 
-
 export type UpdateCurrentUserProfileRequest = Partial<{
   name: string
   bio: string
@@ -187,7 +186,6 @@ export class TiFAPI {
     )
   }
 
-
   async attendeesList (eventId: number, limit: number, nextPage?: string) {
     return await this.apiFetch(
       {
@@ -198,8 +196,8 @@ export class TiFAPI {
       {
         status200: EventAttendeesPageSchema,
         status204: "no-content",
-        status404: errorSchema("event-not-found"),
-        status403: errorSchema("blocked-by-host")
+        status404: EventNotFoundErrorSchema,
+        status403: literalErrorSchema("blocked-by-host")
       }
     )
   }
@@ -226,6 +224,27 @@ export class TiFAPI {
       }
     )
   }
+
+  /**
+   * Registers for the user for push notifications given a push token and a
+   * platform name.
+   */
+  async registerForPushNotifications (
+    pushToken: string,
+    platformName: "apple" | "android"
+  ) {
+    return await this.apiFetch(
+      {
+        method: "POST",
+        endpoint: "/user/notifications/push/register",
+        body: { pushToken, platformName }
+      },
+      {
+        status201: z.object({ status: z.literal("inserted") }),
+        status400: literalErrorSchema("token-already-registered")
+      }
+    )
+  }
 }
 
 const UpcomingEventArrivalsRegionsSchema = z.object({
@@ -244,7 +263,6 @@ const literalErrorSchema = <T extends z.Primitive, V extends z.Primitive[]>(
   if (literals.length === 0) return z.object({ error: z.literal(literal) })
   const [literal2, ...rest] = literals.map((l) => z.literal(l))
   return z.object({ error: z.union([z.literal(literal), literal2, ...rest]) })
-
 }
 
 const EventNotFoundErrorSchema = literalErrorSchema("event-not-found")

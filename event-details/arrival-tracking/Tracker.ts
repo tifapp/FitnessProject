@@ -11,6 +11,9 @@ import { PerformArrivalsOperation } from "./ArrivalsOperation"
 import { EventArrival, arrivalRegion, removeDuplicateArrivals } from "./Models"
 import { areEventRegionsEqual } from "@shared-models/Event"
 import { uuidString } from "@lib/utils/UUID"
+import { createLogFunction } from "@lib/Logging"
+
+const log = createLogFunction("event.arrivals.tracker")
 
 export interface EventArrivalsTrackerSubscription {
   waitForInitialRegionsToLoad(): Promise<void>
@@ -149,12 +152,18 @@ export class EventArrivalsTracker {
   }
 
   private async syncRegions (regions: EventArrivalRegion[]) {
-    await Promise.all([
-      this.geofencer.replaceGeofencedRegions(regions),
-      this.upcomingArrivals.replaceAll(regions)
-    ])
-    this.updateGeofencingSubscription(regions)
-    this.subscriptions.forEach((callback) => callback(regions))
+    try {
+      await Promise.all([
+        this.geofencer.replaceGeofencedRegions(regions),
+        this.upcomingArrivals.replaceAll(regions)
+      ])
+      this.updateGeofencingSubscription(regions)
+      this.subscriptions.forEach((callback) => callback(regions))
+    } catch (e) {
+      log("error", "Failed to sync regions", { message: e.message })
+      // eslint-disable-next-line n/no-callback-literal
+      this.subscriptions.forEach((callback) => callback([]))
+    }
   }
 
   private updateGeofencingSubscription (arrivals: EventArrivalRegion[]) {

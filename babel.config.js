@@ -41,7 +41,8 @@ module.exports = function (api) {
             "@date-time": modulePath("date-time"),
             "@test-helpers": modulePath("test-helpers"),
             "@content-reporting": modulePath("content-reporting"),
-            "@shared-models": modulePath("shared-models")
+            "@shared-models": modulePath("shared-models"),
+            "@notifications": modulePath("notifications")
           },
           extensions: [".js", ".jsx", ".ts", ".tsx"]
         }
