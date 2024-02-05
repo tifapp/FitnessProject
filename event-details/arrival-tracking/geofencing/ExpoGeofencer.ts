@@ -1,4 +1,3 @@
-import { StringUtils } from "@lib/utils/String"
 import { LocationCoordinates2DSchema } from "@shared-models/Location"
 import {
   startGeofencingAsync,
@@ -13,43 +12,33 @@ import {
   EventArrivalsGeofencer,
   EventArrivalGeofencedRegion
 } from "./Geofencer"
-
-const taskCallbacks = {
-  nonUpcoming: undefined as EventArrivalGeofencingCallback | undefined,
-  upcoming: undefined as EventArrivalGeofencingCallback | undefined
-}
-
-type TaskCallbackKey = keyof typeof taskCallbacks
-
-const taskName = (key: TaskCallbackKey) => {
-  return `eventArrivalsGeofencing${StringUtils.capitalizeFirstLetter(key)}`
-}
+import { CallbackCollection } from "@lib/CallbackCollection"
 
 /**
  * An expo geofencing wrapper tuned for event arrivals.
- *
- * There are only 2 instances of this class, `foreground` and `background`.
- *
- * `upcomingArrivalsInstance` is used for tracking event arrivals added through {@link EventArrivalsTracker}.
- *
- * `nonUpcomingArrivalsInstance` is used for tracking event arrivals for non-upcoming events.
- *
- * This distance being geofenced is based on a "walking to the event from the parking lot basis",
- * ie. about 1-2 american football fields.
  */
 export class ExpoEventArrivalsGeofencer implements EventArrivalsGeofencer {
-  private readonly key: TaskCallbackKey
+  private static readonly taskName = "eventArrivalsTrackingGeofencing"
+  private static readonly TaskEventSchema = z.object({
+    data: z.object({
+      eventType: z.nativeEnum(LocationGeofencingEventType),
+      region: LocationCoordinates2DSchema.extend({
+        radius: z.number()
+      }).passthrough()
+    })
+  })
 
-  private constructor (key: TaskCallbackKey) {
-    this.key = key
-  }
+  private callbacks = new CallbackCollection<EventArrivalGeofencedRegion>()
+
+  // eslint-disable-next-line no-useless-constructor
+  private constructor () {}
 
   async replaceGeofencedRegions (regions: EventArrivalGeofencedRegion[]) {
     if (regions.length === 0) {
-      await this.stopGeofencing()
+      await stopGeofencingAsync(ExpoEventArrivalsGeofencer.taskName)
     } else {
       await startGeofencingAsync(
-        taskName(this.key),
+        ExpoEventArrivalsGeofencer.taskName,
         regions.map((region) => ({
           ...region.coordinate,
           radius: region.arrivalRadiusMeters,
@@ -61,67 +50,29 @@ export class ExpoEventArrivalsGeofencer implements EventArrivalsGeofencer {
     }
   }
 
-  async stopGeofencing () {
-    await stopGeofencingAsync(taskName(this.key))
-  }
-
-  /**
-   * Handle geofencing updates. This method only supports 1 consumer at a time, and
-   * calling it twice will unregister the first consumer.
-   *
-   * @returns a function to unsubscribe from updates.
-   */
   onUpdate (handleUpdate: EventArrivalGeofencingCallback) {
-    taskCallbacks[this.key] = handleUpdate
-    return () => {
-      taskCallbacks[this.key] = undefined
-    }
+    return this.callbacks.add(handleUpdate)
   }
 
   /**
-   * The {@link ExpoEventArrivalsGeofencer} instance to use when the user wants to check
-   * their "arrival" at events they are not apart of or are in the distant future.
+   * Defines the background geofencing task needed for event arivals. This
+   * should only be called in the global scope at the root of the app since
+   * expo doesn't render any UI when launching the app in the background.
    */
-  static nonUpcomingArrivalsInstance = new ExpoEventArrivalsGeofencer(
-    "nonUpcoming"
-  )
-
-  /**
-   * The {@link ExpoEventArrivalsGeofencer} instance to use for events that start within
-   * 24 hours that the user is a part of.
-   */
-  static upcomingArrivalsInstance = new ExpoEventArrivalsGeofencer("upcoming")
-}
-
-/**
- * Starts tasks for observing geofencing updates in the background.
- *
- * **This *must* be called in the global scope.**
- */
-export const defineEventArrivalsGeofencingTasks = () => {
-  defineEventArrivalsGeofencingTask("upcoming")
-  defineEventArrivalsGeofencingTask("nonUpcoming")
-}
-
-const TaskEventSchema = z.object({
-  data: z.object({
-    eventType: z.nativeEnum(LocationGeofencingEventType),
-    region: LocationCoordinates2DSchema.extend({
-      radius: z.number()
-    }).passthrough()
-  })
-})
-
-const defineEventArrivalsGeofencingTask = (key: TaskCallbackKey) => {
-  defineTask(taskName(key), async (arg) => {
-    const { data } = await TaskEventSchema.parseAsync(arg)
-    taskCallbacks[key]?.({
-      coordinate: {
-        latitude: data.region.latitude,
-        longitude: data.region.longitude
-      },
-      arrivalRadiusMeters: data.region.radius,
-      isArrived: data.eventType === LocationGeofencingEventType.Enter
+  defineTask () {
+    defineTask(ExpoEventArrivalsGeofencer.taskName, async (arg) => {
+      const { data } =
+        await ExpoEventArrivalsGeofencer.TaskEventSchema.parseAsync(arg)
+      this.callbacks.send({
+        coordinate: {
+          latitude: data.region.latitude,
+          longitude: data.region.longitude
+        },
+        arrivalRadiusMeters: data.region.radius,
+        isArrived: data.eventType === LocationGeofencingEventType.Enter
+      })
     })
-  })
+  }
+
+  static readonly shared = new ExpoEventArrivalsGeofencer()
 }

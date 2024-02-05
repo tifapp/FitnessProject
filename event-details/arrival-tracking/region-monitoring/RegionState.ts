@@ -1,5 +1,4 @@
-/* eslint-disable func-call-spacing */
-import { uuidString } from "@lib/utils/UUID"
+import { CallbackCollection } from "@lib/CallbackCollection"
 import { EventRegion, areEventRegionsEqual } from "@shared-models/Event"
 
 /**
@@ -10,7 +9,7 @@ export class RegionState {
   readonly region: EventRegion
   private _hasArrived: boolean
 
-  private callbacks = new Map<string, (hasArrived: boolean) => void>()
+  private callbacks = new CallbackCollection<boolean>()
 
   get hasArrived () {
     return this._hasArrived
@@ -21,7 +20,7 @@ export class RegionState {
   }
 
   get hasSubscribers () {
-    return this.callbacks.size > 0
+    return this.callbacks.count > 0
   }
 
   constructor (region: EventRegion, hasArrived: boolean) {
@@ -31,15 +30,11 @@ export class RegionState {
 
   protected publishUpdate (hasArrived: boolean) {
     this._hasArrived = hasArrived
-    this.callbacks.forEach((callback) => callback(hasArrived))
+    this.callbacks.send(hasArrived)
   }
 
   protected subscribe (callback: (hasArrived: boolean) => void) {
-    const id = uuidString()
-    this.callbacks.set(id, callback)
-    return () => {
-      this.callbacks.delete(id)
-    }
+    return this.callbacks.add(callback)
   }
 }
 

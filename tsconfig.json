@@ -41,6 +41,7 @@
       "@date-time": ["./date-time"],
       "@test-helpers/*": ["./test-helpers/*"],
       "@shared-models/*": ["./shared-models/*"],
+      "@notifications": ["./notifications"],
       "env": ["./.env"]
     }
   },
