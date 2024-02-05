@@ -128,6 +128,9 @@ PODS:
     - React-Core
     - React-RCTAppDelegate
     - ReactCommon/turbomodule/core
+  - ExpoTiFTravelEstimates (1.0.0):
+    - ExpoModulesCore
+    - TiFTravelEstimates (~> 1.0.0)
   - EXSecureStore (12.1.1):
     - ExpoModulesCore
   - EXSplashScreen (0.18.2):
@@ -595,6 +598,7 @@ PODS:
   - Sentry/HybridSDK (7.31.5)
   - TifHaptics (1.0.0):
     - ExpoModulesCore
+  - TiFTravelEstimates (1.0.0)
   - UMAppLoader (4.1.2)
   - Yoga (1.14.0)
 
@@ -629,6 +633,7 @@ DEPENDENCIES:
   - ExpoImagePicker (from `../node_modules/expo-image-picker/ios`)
   - ExpoKeepAwake (from `../node_modules/expo-keep-awake/ios`)
   - ExpoModulesCore (from `../node_modules/expo-modules-core`)
+  - ExpoTiFTravelEstimates (from `../modules/tif-travel-estimates/ios`)
   - EXSecureStore (from `../node_modules/expo-secure-store/ios`)
   - EXSplashScreen (from `../node_modules/expo-splash-screen/ios`)
   - EXStructuredHeaders (from `../node_modules/expo-structured-headers/ios`)
@@ -688,6 +693,7 @@ DEPENDENCIES:
   - "RNSentry (from `../node_modules/@sentry/react-native`)"
   - RNSVG (from `../node_modules/react-native-svg`)
   - TifHaptics (from `../modules/tif-haptics/ios`)
+  - TiFTravelEstimates (from `../native-code/iOS/TiFTravelEstimates`)
   - UMAppLoader (from `../node_modules/unimodules-app-loader/ios`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -764,6 +770,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-keep-awake/ios"
   ExpoModulesCore:
     :path: "../node_modules/expo-modules-core"
+  ExpoTiFTravelEstimates:
+    :path: "../modules/tif-travel-estimates/ios"
   EXSecureStore:
     :path: "../node_modules/expo-secure-store/ios"
   EXSplashScreen:
@@ -878,6 +886,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-svg"
   TifHaptics:
     :path: "../modules/tif-haptics/ios"
+  TiFTravelEstimates:
+    :path: "../native-code/iOS/TiFTravelEstimates"
   UMAppLoader:
     :path: "../node_modules/unimodules-app-loader/ios"
   Yoga:
@@ -916,6 +926,7 @@ SPEC CHECKSUMS:
   ExpoImagePicker: 270dea232b3a072d981dd564e2cafc63a864edb1
   ExpoKeepAwake: 69f5f627670d62318410392d03e0b5db0f85759a
   ExpoModulesCore: 653958063a301098b541ae4dfed1ac0b98db607b
+  ExpoTiFTravelEstimates: d8a20ea6b4a75bf5b7159e19346f17125bcdd3c4
   EXSecureStore: e8923258361cc406d0401af380f12bd05b2b720f
   EXSplashScreen: 0e0a9ba0cf7553094e93213099bd7b42e6e237e9
   EXStructuredHeaders: f3a6d417d5d12ef369fd1a31320d1c188a1b0f4b
@@ -980,9 +991,10 @@ SPEC CHECKSUMS:
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   Sentry: 4c9babff9034785067c896fd580b1f7de44da020
   TifHaptics: fa348c2a95a4dea18737c1b932aaec8d410559f4
+  TiFTravelEstimates: 53eb513fe2415a54ac41cdf665e8a06f7392236f
   UMAppLoader: d1cd37524ea948f9e695722994496784a6d6213c
   Yoga: e71803b4c1fff832ccf9b92541e00f9b873119b9
 
-PODFILE CHECKSUM: 33b5e6a9a27c7c894f0229b859ceff63c65ea58f
+PODFILE CHECKSUM: a62d43e104550de5bac77da8a86bed4de28b7cda
 
 COCOAPODS: 1.12.1

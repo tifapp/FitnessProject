@@ -1,6 +1,6 @@
 {
-  "platforms": ["ios", "android", "web"],
+  "platforms": ["ios", "web"],
   "ios": {
-    "modules": ["TiFTravelEstimatesModule"]
+    "modules": ["ExpoTiFTravelEstimatesModule"]
   }
 }

@@ -1,1 +1,1 @@
-export * from "./src/TiFTravelEstimatesModule"
+export * from "./src/ExpoTiFTravelEstimatesModule"
