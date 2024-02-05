@@ -79,17 +79,33 @@ describe("Attendees List tests", () => {
       expect(result.current.fetchNextGroup).toBeUndefined()
       expect(result.current.attendeeCount).toEqual(10)
     })
-    test("the hook returns an error if fetchPage function fails to give results", async () => {
+    test("the hook returns an error and allows refetching, if initial fetchPage function fails to give results", async () => {
+      const mockData = {
+        attendees: [EventAttendeeMocks.Alivs, EventAttendeeMocks.AnnaAttendee],
+        attendeeCount: 2,
+        nextPageKey: "2"
+      }
       fetchNextAttendeesPage.mockRejectedValueOnce(
         new Error("failed to receive data")
       )
+      fetchNextAttendeesPage.mockResolvedValueOnce(mockData)
+
       const { result } = renderUseAttendeesList(11, 15)
       expect(result.current.status).toEqual("loading")
 
       await waitFor(() => expect(result.current.status).toEqual("error"))
-      expect(result.current.error?.message).toEqual("failed to receive data")
       expect(fetchNextAttendeesPage).toHaveBeenCalledWith(11, 15, undefined)
-      expect(fetchNextAttendeesPage).toHaveBeenCalledTimes(1)
+      await waitFor(() => expect(result.current.refresh).toBeDefined())
+      await waitFor(() => result.current.refresh?.())
+
+      expect(fetchNextAttendeesPage).toHaveBeenCalledWith(11, 15, undefined)
+      expect(fetchNextAttendeesPage).toHaveBeenCalledTimes(2)
+      await waitFor(() => expect(result.current.status).toEqual("success"))
+
+      expect(result.current.host).toEqual(EventAttendeeMocks.Alivs)
+      expect(result.current.attendeePages).toEqual([
+        [EventAttendeeMocks.AnnaAttendee]
+      ])
     })
   })
 })

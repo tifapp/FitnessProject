@@ -1,11 +1,14 @@
-import React, { useState } from "react"
-import { Text, TouchableOpacity, View } from "react-native"
-
-// Import your stories
 import { setupCognito } from "@auth/CognitoHelpers"
 import { InMemorySecureStore } from "@auth/CognitoSecureStorage"
+import React, { useState } from "react"
+import { Text, TouchableOpacity, View } from "react-native"
 import { FlatList } from "react-native-gesture-handler"
 import { useAppFonts } from "../../lib/Fonts"
+
+// Import your stories
+import AttendeesListMeta, {
+  Basic as AttendeesListBasic
+} from "../components/AttendeesList/AttendeesList.stories"
 import ButtonsMeta, {
   Basic as ButtonsBasic
 } from "../components/Buttons/Buttons.stories"
@@ -18,6 +21,9 @@ import ContentReportingMeta, {
 import ContentTextMeta, {
   Basic as ContentTextBasic
 } from "../components/ContentText/ContextText.stories"
+import EventDetailsMeta, {
+  Basic as EventDetailsBasic
+} from "../components/EventDetails/EventDetails.stories"
 import ExploreEventsMeta, {
   Basic as ExploreEventsBasic
 } from "../components/Explore/Explore.stories"
@@ -27,6 +33,9 @@ import ForgotPasswordMeta, {
 import LocationSearchMeta, {
   Basic as LocationSearchBasic
 } from "../components/LocationSearch/LocationSearch.stories"
+import RegionMonitoringMeta, {
+  Basic as RegionMonitoringBasic
+} from "../components/RegionMonitoring/RegionMonitoring.stories"
 import SearchBarMeta, {
   Default as SearchBarBasic
 } from "../components/SearchBar/SearchBar.stories"
@@ -45,12 +54,6 @@ import TextFieldMeta, {
 import VerifcationCodeMeta, {
   Basic as VerifcationCodeBasic
 } from "../components/VerificationCode/VerifyCode.stories"
-import EventDetailsMeta, {
-  Basic as EventDetailsBasic
-} from "../components/EventDetails/EventDetails.stories"
-import RegionMonitoringMeta, {
-  Basic as RegionMonitoringBasic
-} from "../components/RegionMonitoring/RegionMonitoring.stories"
 
 setupCognito(new InMemorySecureStore())
 
@@ -130,6 +133,11 @@ const stories = [
     name: RegionMonitoringMeta.title,
     component: RegionMonitoringBasic,
     args: RegionMonitoringMeta.args
+  },
+  {
+    name: AttendeesListMeta.title,
+    component: AttendeesListBasic,
+    args: AttendeesListMeta.args
   }
   // Add more stories here...
 ]

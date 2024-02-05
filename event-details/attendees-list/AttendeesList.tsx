@@ -1,10 +1,6 @@
 import { TiFAPI } from "@api-client/TiFAPI"
-import { BodyText, Subtitle } from "@components/Text"
-import { ArrayUtils } from "@lib/utils/Array"
 import { EventAttendee } from "@shared-models/Event"
 import { useInfiniteQuery } from "@tanstack/react-query"
-import React, { useMemo } from "react"
-import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 
 export type EventAttendeesPage = {
   attendees: EventAttendee[]
@@ -45,6 +41,32 @@ export const loadEventAttendeesPage = async (
   }
 }
 
+export type UseAttendeesListLoadingResult = {
+  status: "loading"
+  host?: EventAttendee
+  attendeePages: EventAttendee[][]
+}
+
+export type UseAttendeesListErrorResult = {
+  status: "error"
+  refresh: () => void
+}
+
+export type UseAttendeesListSuccessResult = {
+  status: "success"
+  host?: EventAttendee
+  attendeePages: EventAttendee[][]
+  fetchNextGroup?: () => void
+  attendeeCount: number
+  refresh: () => void
+  isRefetchingGroups: boolean
+}
+
+export type UseAttendeesListResult =
+  | UseAttendeesListErrorResult
+  | UseAttendeesListLoadingResult
+  | UseAttendeesListSuccessResult
+
 export const useAttendeesList = (
   fetchNextAttendeesPage: (
     eventId: number,
@@ -53,7 +75,7 @@ export const useAttendeesList = (
   ) => Promise<EventAttendeesPage>,
   eventId: number,
   pageSize: number
-) => {
+): UseAttendeesListResult => {
   const infiniteAttendeesQuery = useInfiniteQuery<EventAttendeesPage, Error>({
     queryKey: ["eventAttendees", eventId],
     queryFn: async ({ pageParam }) => {
@@ -62,7 +84,22 @@ export const useAttendeesList = (
     getNextPageParam: (lastPage) => lastPage.nextPageKey
   })
 
+  if (infiniteAttendeesQuery.status === "loading") {
+    return {
+      ...infiniteAttendeesQuery,
+      host: infiniteAttendeesQuery.data,
+      attendeePages: []
+    }
+  }
+  if (infiniteAttendeesQuery.status === "error") {
+    return {
+      ...infiniteAttendeesQuery,
+      refresh: () => infiniteAttendeesQuery.refetch()
+    }
+  }
+
   return {
+    status: infiniteAttendeesQuery.status,
     host:
       infiniteAttendeesQuery.data &&
       infiniteAttendeesQuery.data.pages[0].attendees.length > 0
@@ -73,8 +110,6 @@ export const useAttendeesList = (
         if (index === 0) return page.attendees.slice(1)
         return page.attendees
       }) ?? [],
-    status: infiniteAttendeesQuery.status,
-    error: infiniteAttendeesQuery.error,
     fetchNextGroup: infiniteAttendeesQuery.hasNextPage
       ? () => {
         infiniteAttendeesQuery.fetchNextPage()
@@ -83,74 +118,10 @@ export const useAttendeesList = (
     attendeeCount:
       infiniteAttendeesQuery.data?.pages[
         infiniteAttendeesQuery.data.pages.length - 1
-      ].attendeeCount
+      ].attendeeCount,
+    refresh: () => {
+      infiniteAttendeesQuery.refetch()
+    },
+    isRefetchingGroups: infiniteAttendeesQuery.isRefetching
   }
 }
-
-export type AttendeesListLoadingProps = {
-  style?: StyleProp<ViewStyle>
-}
-
-export const AttendeesListLoadingView = ({
-  style
-}: AttendeesListLoadingProps) => (
-  <BaseAttendeesListLoadingView
-    title="Loading..."
-    possibleMessages={LOADING_MESSAGES}
-    style={style}
-  />
-)
-
-const LOADING_MESSAGES = ["Hang tight.", "Stay put.", "Hold on a sec."]
-
-export type AttendeesListErrorProps = {
-  style?: StyleProp<ViewStyle>
-}
-
-export const AttendeesListErrorView = ({ style }: AttendeesListErrorProps) => (
-  <BaseAttendeesListLoadingView
-    title="Uh Oh!"
-    possibleMessages={GENERIC_ERROR_MESSAGES}
-    style={style}
-  />
-)
-
-const GENERIC_ERROR_MESSAGES = ["Something went wrong. Please try again."]
-
-type BaseAttendeesListLoadingProps = {
-  style?: StyleProp<ViewStyle>
-  title: string
-  possibleMessages: string[]
-}
-
-const BaseAttendeesListLoadingView = ({
-  style,
-  title,
-  possibleMessages
-}: BaseAttendeesListLoadingProps) => (
-  <View style={[style, styles.container]}>
-    <Subtitle style={styles.titleText}>{title}</Subtitle>
-    <BodyText style={styles.bodyText}>
-      {useMemo(
-        () => ArrayUtils.randomElement(possibleMessages),
-        [possibleMessages]
-      )}
-    </BodyText>
-  </View>
-)
-
-const styles = StyleSheet.create({
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center"
-  },
-  titleText: {
-    marginVertical: 8,
-    textAlign: "center"
-  },
-  bodyText: {
-    opacity: 0.5,
-    textAlign: "center"
-  }
-})
