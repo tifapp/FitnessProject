@@ -4,7 +4,6 @@ import { LocationCoordinate2D } from "@shared-models/Location"
 import { useQuery } from "@tanstack/react-query"
 import { LocationAccuracy } from "expo-location"
 import { Platform } from "react-native"
-import { EventLocationCoordinatePlacemark } from "./Event"
 
 /**
  * The supported methods of travel for event travel estimates.
@@ -18,7 +17,6 @@ export type EventTravelEstimateRouteKind =
   | "automobile"
   | "walking"
   | "public-transport"
-  | "any"
 
 type ObjectRouteKeyName<Kind extends EventTravelEstimateRouteKind> =
   Kind extends "public-transport" ? "publicTransport" : Kind
@@ -33,8 +31,6 @@ type ObjectRouteKeyName<Kind extends EventTravelEstimateRouteKind> =
  * both the distance and estimated travel time relative to `sourceCoordinate`.
  */
 export type EventTravelEstimates = {
-  sourceCoordinate: LocationCoordinate2D
-} & {
   [Key in ObjectRouteKeyName<EventTravelEstimateRouteKind>]: {
     travelDistanceMeters: number
     estimatedTravelSeconds: number
@@ -46,8 +42,8 @@ export type UseEventTravelEstimatesResult =
   | { status: "success"; data: EventTravelEstimates }
 
 export type LoadEventTravelEstimates = (
-  location: EventLocationCoordinatePlacemark,
   userCoordinate: LocationCoordinate2D,
+  eventCoordinate: LocationCoordinate2D,
   abortSignal?: AbortSignal
 ) => Promise<EventTravelEstimates>
 
@@ -60,7 +56,7 @@ export type LoadEventTravelEstimates = (
  * `{ status: "unsupported" }`
  */
 export const useEventTravelEstimates = (
-  location: EventLocationCoordinatePlacemark,
+  coordinate: LocationCoordinate2D,
   loadTravelEstimates: LoadEventTravelEstimates
 ): UseEventTravelEstimatesResult => {
   const isSupported = Platform.OS !== "android"
@@ -70,7 +66,7 @@ export const useEventTravelEstimates = (
   )
   const etaResults = useEventTravelEstimatesQuery(
     userLocationQuery.data?.coords!,
-    location,
+    coordinate,
     loadTravelEstimates,
     { enabled: !!userLocationQuery.data && isSupported }
   )
@@ -85,14 +81,14 @@ export const useEventTravelEstimates = (
 
 const useEventTravelEstimatesQuery = (
   userCoordinate: LocationCoordinate2D,
-  eventLocation: EventLocationCoordinatePlacemark,
+  eventCoordinate: LocationCoordinate2D,
   loadTravelEstimates: LoadEventTravelEstimates,
   options?: QueryHookOptions<EventTravelEstimates>
 ) => {
   return useQuery(
-    ["event-travel-estimates", eventLocation, userCoordinate],
+    ["event-travel-estimates", eventCoordinate, userCoordinate],
     async ({ signal }) => {
-      return await loadTravelEstimates(eventLocation, userCoordinate, signal)
+      return await loadTravelEstimates(userCoordinate, eventCoordinate, signal)
     },
     options
   )

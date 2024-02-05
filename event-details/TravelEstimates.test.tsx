@@ -5,14 +5,13 @@ import {
 import { fakeTimers } from "@test-helpers/Timers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { useEventTravelEstimates } from "./TravelEstimates"
-import { mockEventLocation } from "@event-details/MockData"
-import { EventLocation } from "@shared-models/Event"
 import {
   mockExpoLocationObject,
   mockLocationCoordinate2D
 } from "@location/MockData"
 import { UserLocationFunctionsProvider } from "@location/UserLocation"
 import { setPlatform } from "@test-helpers/Platform"
+import { LocationCoordinate2D } from "@shared-models/Location"
 
 describe("EventTravelEstimates tests", () => {
   describe("UseEventTravelEstimates tests", () => {
@@ -27,10 +26,8 @@ describe("EventTravelEstimates tests", () => {
     const loadTravelEstimates = jest.fn()
     const loadUserLocation = jest.fn()
 
-    const TEST_LOCATION = mockEventLocation()
+    const TEST_COORDINATE = mockLocationCoordinate2D()
     const TEST_TRAVEL_ESTIMATES = {
-      sourceCoordinate: mockLocationCoordinate2D(),
-      any: null,
       automobile: null,
       walking: {
         travelDistanceMeters: 142,
@@ -42,9 +39,11 @@ describe("EventTravelEstimates tests", () => {
       }
     }
 
-    const renderUseEventTravelEstimates = (location: EventLocation) => {
+    const renderUseEventTravelEstimates = (
+      coordinate: LocationCoordinate2D
+    ) => {
       return renderHook(
-        () => useEventTravelEstimates(location, loadTravelEstimates),
+        () => useEventTravelEstimates(coordinate, loadTravelEstimates),
         {
           wrapper: ({ children }) => (
             <UserLocationFunctionsProvider
@@ -66,7 +65,7 @@ describe("EventTravelEstimates tests", () => {
         const userLocation = mockExpoLocationObject()
         loadUserLocation.mockResolvedValueOnce(userLocation)
         loadTravelEstimates.mockResolvedValueOnce(TEST_TRAVEL_ESTIMATES)
-        const { result } = renderUseEventTravelEstimates(TEST_LOCATION)
+        const { result } = renderUseEventTravelEstimates(TEST_COORDINATE)
         expect(result.current.status).toEqual("loading")
         await waitFor(() => {
           expect(result.current).toMatchObject({
@@ -75,8 +74,8 @@ describe("EventTravelEstimates tests", () => {
           })
         })
         expect(loadTravelEstimates).toHaveBeenCalledWith(
-          TEST_LOCATION,
           userLocation.coords,
+          TEST_COORDINATE,
           expect.any(AbortSignal)
         )
         expect(loadTravelEstimates).toHaveBeenCalledTimes(1)
@@ -84,7 +83,7 @@ describe("EventTravelEstimates tests", () => {
 
       it("should be in an error state when loading the user location fails", async () => {
         loadUserLocation.mockRejectedValueOnce(new Error())
-        const { result } = renderUseEventTravelEstimates(TEST_LOCATION)
+        const { result } = renderUseEventTravelEstimates(TEST_COORDINATE)
         expect(result.current.status).toEqual("loading")
         await waitFor(() => expect(result.current.status).toEqual("error"))
         expect(loadTravelEstimates).not.toHaveBeenCalled()
@@ -92,7 +91,7 @@ describe("EventTravelEstimates tests", () => {
 
       it("should return an unsupported status when the platform is android", async () => {
         setPlatform("android")
-        const { result } = renderUseEventTravelEstimates(TEST_LOCATION)
+        const { result } = renderUseEventTravelEstimates(TEST_COORDINATE)
         expect(result.current.status).toEqual("unsupported")
         expect(loadTravelEstimates).not.toHaveBeenCalled()
         expect(loadUserLocation).not.toHaveBeenCalled()
