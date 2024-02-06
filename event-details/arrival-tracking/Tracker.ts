@@ -10,7 +10,7 @@ import { ArrayUtils } from "@lib/utils/Array"
 import { PerformArrivalsOperation } from "./ArrivalsOperation"
 import { EventArrival, arrivalRegion, removeDuplicateArrivals } from "./Models"
 import { areEventRegionsEqual } from "@shared-models/Event"
-import { uuidString } from "@lib/utils/UUID"
+import { CallbackCollection } from "@lib/CallbackCollection"
 import { createLogFunction } from "@lib/Logging"
 
 const log = createLogFunction("event.arrivals.tracker")
@@ -33,10 +33,7 @@ export class EventArrivalsTracker {
   private readonly performArrivalsOperation: PerformArrivalsOperation
 
   private unsubscribeFromGeofencing?: EventArrivalGeofencingUnsubscribe
-  private subscriptions = new Map<
-    string,
-    (regions: EventArrivalRegion[]) => void
-  >()
+  private callbacks = new CallbackCollection<EventArrivalRegion[]>()
 
   constructor (
     upcomingArrivals: UpcomingEventArrivals,
@@ -134,12 +131,11 @@ export class EventArrivalsTracker {
   subscribe (
     callback: (regions: EventArrivalRegion[]) => void
   ): EventArrivalsTrackerSubscription {
-    const id = uuidString()
-    this.subscriptions.set(id, callback)
+    const unsubscribe = this.callbacks.add(callback)
     const initial = this.upcomingArrivals.all().then(callback)
     return {
       waitForInitialRegionsToLoad: () => initial,
-      unsubscribe: () => this.subscriptions.delete(id)
+      unsubscribe
     }
   }
 
@@ -158,11 +154,10 @@ export class EventArrivalsTracker {
         this.upcomingArrivals.replaceAll(regions)
       ])
       this.updateGeofencingSubscription(regions)
-      this.subscriptions.forEach((callback) => callback(regions))
+      this.callbacks.send(regions)
     } catch (e) {
       log("error", "Failed to sync regions", { message: e.message })
-      // eslint-disable-next-line n/no-callback-literal
-      this.subscriptions.forEach((callback) => callback([]))
+      this.callbacks.send([])
     }
   }
 
