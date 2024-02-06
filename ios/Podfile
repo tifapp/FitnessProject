@@ -45,8 +45,6 @@ target 'FitnessApp' do
   use_frameworks! :linkage => podfile_properties['ios.useFrameworks'].to_sym if podfile_properties['ios.useFrameworks']
   use_frameworks! :linkage => ENV['USE_FRAMEWORKS'].to_sym if ENV['USE_FRAMEWORKS']
   
-  print ENV['USE_FRAMEWORKS']
-  
   pod 'TiFTravelEstimates', :path => '../native-code/iOS/TiFTravelEstimates'
 
   # Flags change depending on the env values.

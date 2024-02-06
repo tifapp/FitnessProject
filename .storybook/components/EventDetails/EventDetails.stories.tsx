@@ -1,6 +1,6 @@
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import React from "react"
+import React, { useEffect } from "react"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { View } from "react-native"
 import { EventMocks } from "@event-details/MockData"
@@ -9,6 +9,17 @@ import { delayData } from "@lib/utils/DelayData"
 import { TrueRegionMonitor } from "@event-details/arrival-tracking/region-monitoring/MockRegionMonitors"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
+import {
+  loadEventTravelEstimates,
+  useEventTravelEstimates
+} from "@event-details/TravelEstimates"
+import { ExpoTiFTravelEstimates } from "@modules/tif-travel-estimates"
+import { UserLocationFunctionsProvider } from "@location/UserLocation"
+import {
+  getCurrentPositionAsync,
+  requestBackgroundPermissionsAsync,
+  requestForegroundPermissionsAsync
+} from "expo-location"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -31,11 +42,17 @@ export const Basic: EventDetailsStory = () => {
           alignItems: "center"
         }}
       >
-        <TiFQueryClientProvider>
-          <BottomSheetModalProvider>
-            <Test />
-          </BottomSheetModalProvider>
-        </TiFQueryClientProvider>
+        <UserLocationFunctionsProvider
+          getCurrentLocation={getCurrentPositionAsync}
+          requestBackgroundPermissions={requestBackgroundPermissionsAsync}
+          requestForegroundPermissions={requestForegroundPermissionsAsync}
+        >
+          <TiFQueryClientProvider>
+            <BottomSheetModalProvider>
+              <Test />
+            </BottomSheetModalProvider>
+          </TiFQueryClientProvider>
+        </UserLocationFunctionsProvider>
       </View>
     </SafeAreaProvider>
   )
@@ -65,5 +82,17 @@ const Test = () => {
     monitor: TrueRegionMonitor,
     onSuccess: () => console.log("success")
   })
+  const result = useEventTravelEstimates(
+    { latitude: 36.96493, longitude: -122.01693 },
+    async (eventCoordinate, userCoordinate, signal) => {
+      return await loadEventTravelEstimates(
+        eventCoordinate,
+        userCoordinate,
+        ExpoTiFTravelEstimates!,
+        signal
+      )
+    }
+  )
+  console.log(result)
   return <JoinEventStagesView stage={stage} />
 }
