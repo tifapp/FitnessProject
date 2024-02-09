@@ -133,7 +133,7 @@ export const CurrentUserEventResponseSchema = z.object({
   title: z.string(), // TODO: - Decide max length.
   description: z.string(),
   color: ColorString.zodSchema,
-  totalAttendeeCount: z.number().nonnegative(),
+  attendeeCount: z.number().nonnegative(),
   joinDate: StringDateSchema.nullable(),
   createdAt: StringDateSchema,
   updatedAt: StringDateSchema,
