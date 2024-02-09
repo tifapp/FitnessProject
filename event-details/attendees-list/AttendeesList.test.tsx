@@ -3,7 +3,7 @@ import { act, renderHook, waitFor } from "@testing-library/react-native"
 
 import { EventAttendeeMocks } from "@event-details/MockData"
 import { fakeTimers } from "@test-helpers/Timers"
-import { useAttendeesList } from "./AttendeesList"
+import { EventAttendeesPage, useAttendeesList } from "./AttendeesList"
 
 describe("Attendees List tests", () => {
   afterEach(() => act(() => jest.runAllTimers()))
@@ -26,63 +26,73 @@ describe("Attendees List tests", () => {
     it("loads first page correctly", async () => {
       const mockData = {
         attendees: [EventAttendeeMocks.Alivs, EventAttendeeMocks.AnnaAttendee],
-        attendeeCount: 2
+        totalAttendeeCount: 2
       }
       fetchNextAttendeesPage.mockResolvedValueOnce(mockData)
       const { result } = renderUseAttendeesList(11, 15)
 
       expect(result.current.status).toEqual("loading")
-      expect(result.current.host).toBeUndefined()
-      expect(result.current.attendeePages).toEqual([])
 
       await waitFor(() => expect(result.current.status).toEqual("success"))
 
       expect(fetchNextAttendeesPage).toHaveBeenCalledWith(11, 15, undefined)
       expect(fetchNextAttendeesPage).toHaveBeenCalledTimes(1)
-      expect(result.current.host).toEqual(EventAttendeeMocks.Alivs)
-      expect(result.current.attendeePages).toEqual([
-        [EventAttendeeMocks.AnnaAttendee]
-      ])
-      expect(result.current.attendeeCount).toEqual(2)
+      expect(result.current).toMatchObject({
+        host: EventAttendeeMocks.Alivs,
+        attendees: [EventAttendeeMocks.AnnaAttendee],
+        totalAttendeeCount: 2
+      })
     })
     it("loads multiple pages correctly", async () => {
       const mockData = {
         attendees: [EventAttendeeMocks.Alivs, EventAttendeeMocks.AnnaAttendee],
-        attendeeCount: 2,
+        totalAttendeeCount: 2,
         nextPageKey: "2"
       }
       const mockData2 = {
         attendees: [EventAttendeeMocks.BlobJr, EventAttendeeMocks.BlobSr],
-        attendeeCount: 10,
-        nextPageKey: undefined
+        totalAttendeeCount: 10,
+        nextPageKey: null
       }
+
       fetchNextAttendeesPage.mockResolvedValueOnce(mockData)
       const { result } = renderUseAttendeesList(11, 15)
 
       expect(result.current.status).toEqual("loading")
       await waitFor(() => expect(result.current.status).toEqual("success"))
 
-      fetchNextAttendeesPage.mockResolvedValueOnce(mockData2)
-      act(() => result.current.fetchNextGroup?.())
-      await waitFor(() => expect(result.current.status).toEqual("success"))
+      let resolveFetch: ((page: EventAttendeesPage) => void) | undefined
+      const fetchPromise = new Promise<EventAttendeesPage>(
+        (resolve) => (resolveFetch = resolve)
+      )
+      fetchNextAttendeesPage.mockReturnValueOnce(fetchPromise)
+      act(() => (result.current as any).fetchNextGroup())
+
+      await waitFor(() =>
+        expect(result.current).toMatchObject({ isFetchingNextPage: true })
+      )
+      act(() => resolveFetch?.(mockData2))
+      await waitFor(() =>
+        expect(result.current).toMatchObject({ isFetchingNextPage: false })
+      )
 
       expect(fetchNextAttendeesPage).toHaveBeenNthCalledWith(2, 11, 15, "2")
       expect(fetchNextAttendeesPage).toHaveBeenCalledTimes(2)
-
-      await waitFor(() =>
-        expect(result.current.attendeePages).toEqual([
-          [EventAttendeeMocks.AnnaAttendee],
-          [EventAttendeeMocks.BlobJr, EventAttendeeMocks.BlobSr]
-        ])
-      )
-      expect(result.current.host).toEqual(EventAttendeeMocks.Alivs)
-      expect(result.current.fetchNextGroup).toBeUndefined()
-      expect(result.current.attendeeCount).toEqual(10)
+      expect(result.current).toMatchObject({
+        host: EventAttendeeMocks.Alivs,
+        attendees: [
+          EventAttendeeMocks.AnnaAttendee,
+          EventAttendeeMocks.BlobJr,
+          EventAttendeeMocks.BlobSr
+        ],
+        fetchNextGroup: undefined,
+        totalAttendeeCount: 10
+      })
     })
     test("the hook returns an error and allows refetching, if initial fetchPage function fails to give results", async () => {
       const mockData = {
         attendees: [EventAttendeeMocks.Alivs, EventAttendeeMocks.AnnaAttendee],
-        attendeeCount: 2,
+        totalAttendeeCount: 2,
         nextPageKey: "2"
       }
       fetchNextAttendeesPage.mockRejectedValueOnce(
@@ -95,17 +105,61 @@ describe("Attendees List tests", () => {
 
       await waitFor(() => expect(result.current.status).toEqual("error"))
       expect(fetchNextAttendeesPage).toHaveBeenCalledWith(11, 15, undefined)
-      await waitFor(() => expect(result.current.refresh).toBeDefined())
-      await waitFor(() => result.current.refresh?.())
+      act(() => (result.current as any).refresh())
 
       expect(fetchNextAttendeesPage).toHaveBeenCalledWith(11, 15, undefined)
       expect(fetchNextAttendeesPage).toHaveBeenCalledTimes(2)
       await waitFor(() => expect(result.current.status).toEqual("success"))
 
-      expect(result.current.host).toEqual(EventAttendeeMocks.Alivs)
-      expect(result.current.attendeePages).toEqual([
-        [EventAttendeeMocks.AnnaAttendee]
-      ])
+      expect(result.current).toMatchObject({
+        host: EventAttendeeMocks.Alivs,
+        attendees: [EventAttendeeMocks.AnnaAttendee]
+      })
+    })
+    test("pull to refresh flow", async () => {
+      const mockData = {
+        attendees: [EventAttendeeMocks.Alivs, EventAttendeeMocks.AnnaAttendee],
+        totalAttendeeCount: 2,
+        nextPageKey: "2"
+      }
+      const mockData2 = {
+        attendees: [EventAttendeeMocks.BlobJr, EventAttendeeMocks.BlobSr],
+        totalAttendeeCount: 10,
+        nextPageKey: null
+      }
+      fetchNextAttendeesPage.mockResolvedValueOnce(mockData)
+      const { result } = renderUseAttendeesList(11, 15)
+      await waitFor(() => expect(result.current.status).toEqual("success"))
+
+      expect(result.current).toMatchObject({
+        host: EventAttendeeMocks.Alivs,
+        attendees: [EventAttendeeMocks.AnnaAttendee]
+      })
+
+      let resolveFetch: ((page: EventAttendeesPage) => void) | undefined
+      const fetchPromise = new Promise<EventAttendeesPage>(
+        (resolve) => (resolveFetch = resolve)
+      )
+      fetchNextAttendeesPage.mockReturnValueOnce(fetchPromise)
+
+      act(() => (result.current as any).refresh())
+
+      await waitFor(() =>
+        expect(result.current).toMatchObject({ isRefetching: true })
+      )
+      act(() => resolveFetch?.(mockData2))
+      await waitFor(() =>
+        expect(result.current).toMatchObject({ isRefetching: false })
+      )
+      expect(fetchNextAttendeesPage).toHaveBeenCalledWith(11, 15, undefined)
+      expect(fetchNextAttendeesPage).toHaveBeenCalledTimes(2)
+
+      expect(result.current).toMatchObject({
+        host: EventAttendeeMocks.BlobJr,
+        attendees: [EventAttendeeMocks.BlobSr],
+        fetchNextGroup: undefined,
+        totalAttendeeCount: 10
+      })
     })
   })
 })

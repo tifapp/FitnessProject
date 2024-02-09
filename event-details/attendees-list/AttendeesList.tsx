@@ -1,10 +1,13 @@
 import { TiFAPI } from "@api-client/TiFAPI"
+import { Headline } from "@components/Text"
 import { EventAttendee } from "@shared-models/Event"
 import { useInfiniteQuery } from "@tanstack/react-query"
+import React from "react"
+import { FlatList, StyleProp, View, ViewStyle } from "react-native"
 
 export type EventAttendeesPage = {
   attendees: EventAttendee[]
-  attendeeCount: number
+  totalAttendeeCount: number
   nextPageKey: string | null
 }
 
@@ -41,31 +44,19 @@ export const loadEventAttendeesPage = async (
   }
 }
 
-export type UseAttendeesListLoadingResult = {
-  status: "loading"
-  host?: EventAttendee
-  attendeePages: EventAttendee[][]
-}
-
-export type UseAttendeesListErrorResult = {
-  status: "error"
-  refresh: () => void
-}
-
-export type UseAttendeesListSuccessResult = {
-  status: "success"
-  host?: EventAttendee
-  attendeePages: EventAttendee[][]
-  fetchNextGroup?: () => void
-  attendeeCount: number
-  refresh: () => void
-  isRefetchingGroups: boolean
-}
-
 export type UseAttendeesListResult =
-  | UseAttendeesListErrorResult
-  | UseAttendeesListLoadingResult
-  | UseAttendeesListSuccessResult
+  | { status: "error"; refresh: () => void }
+  | { status: "loading" }
+  | {
+      status: "success"
+      host: EventAttendee
+      attendees: EventAttendee[]
+      fetchNextGroup?: () => void
+      totalAttendeeCount: number
+      refresh: () => void
+      isRefetching: boolean
+      isFetchingNextPage: boolean
+    }
 
 export const useAttendeesList = (
   fetchNextAttendeesPage: (
@@ -83,45 +74,79 @@ export const useAttendeesList = (
     },
     getNextPageParam: (lastPage) => lastPage.nextPageKey
   })
-
   if (infiniteAttendeesQuery.status === "loading") {
     return {
-      ...infiniteAttendeesQuery,
-      host: infiniteAttendeesQuery.data,
-      attendeePages: []
+      status: "loading"
     }
   }
   if (infiniteAttendeesQuery.status === "error") {
     return {
-      ...infiniteAttendeesQuery,
-      refresh: () => infiniteAttendeesQuery.refetch()
+      status: "error",
+      refresh: () => {
+        infiniteAttendeesQuery.refetch()
+      }
     }
   }
 
   return {
-    status: infiniteAttendeesQuery.status,
-    host:
-      infiniteAttendeesQuery.data &&
-      infiniteAttendeesQuery.data.pages[0].attendees.length > 0
-        ? infiniteAttendeesQuery.data.pages[0].attendees[0]
-        : undefined,
-    attendeePages:
-      infiniteAttendeesQuery.data?.pages.map((page, index) => {
-        if (index === 0) return page.attendees.slice(1)
-        return page.attendees
-      }) ?? [],
+    ...infiniteAttendeesQuery,
+    host: infiniteAttendeesQuery.data.pages[0].attendees[0],
+    attendees:
+      infiniteAttendeesQuery.data?.pages
+        .map((page, index) => {
+          if (index === 0) return page.attendees.slice(1)
+          return page.attendees
+        })
+        .flat() ?? [],
     fetchNextGroup: infiniteAttendeesQuery.hasNextPage
       ? () => {
         infiniteAttendeesQuery.fetchNextPage()
       }
       : undefined,
-    attendeeCount:
+    totalAttendeeCount:
       infiniteAttendeesQuery.data?.pages[
         infiniteAttendeesQuery.data.pages.length - 1
-      ].attendeeCount,
+      ].totalAttendeeCount,
     refresh: () => {
       infiniteAttendeesQuery.refetch()
-    },
-    isRefetchingGroups: infiniteAttendeesQuery.isRefetching
+    }
   }
+}
+
+export type AttendeesListViewProps = {
+  renderAttendee: (eventAttendee: EventAttendee) => JSX.Element
+  ListHeaderComponent?: JSX.Element
+  style?: StyleProp<ViewStyle>
+} & Extract<ReturnType<typeof useAttendeesList>, { status: "success" }>
+
+export const AttendeesListView = ({
+  attendees,
+  totalAttendeeCount,
+  isRefetching,
+  renderAttendee,
+  refresh,
+  fetchNextGroup,
+  ListHeaderComponent,
+  style
+}: AttendeesListViewProps) => {
+  return (
+    <FlatList
+      style={style}
+      refreshing={isRefetching}
+      ListHeaderComponent={
+        <View>
+          {ListHeaderComponent}
+          <View>
+            <Headline> Attendees </Headline>
+            <Headline> ({totalAttendeeCount})</Headline>
+          </View>
+        </View>
+      }
+      data={attendees}
+      onRefresh={refresh}
+      keyExtractor={(item) => `attendee-${item.id}`}
+      renderItem={({ item }) => renderAttendee(item)}
+      onEndReached={fetchNextGroup}
+    />
+  )
 }
