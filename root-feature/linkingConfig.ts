@@ -1,6 +1,6 @@
 import { LinkingOptions } from "@react-navigation/native"
 import { Linking } from "react-native"
-import { UserNotifications } from "../lib/UserNotifications"
+import { UserNotifications } from "@notifications"
 
 /**
  * Creates the app's deep linking configuration.
