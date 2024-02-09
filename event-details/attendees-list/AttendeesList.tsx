@@ -38,7 +38,8 @@ export const loadEventAttendeesPage = async (
     return {
       status: "success",
       eventAttendeesPage: {
-        ...resp.data
+        ...resp.data,
+        totalAttendeeCount: 0
       }
     }
   }

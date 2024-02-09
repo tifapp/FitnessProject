@@ -58,7 +58,7 @@ export type EventAttendee = z.infer<typeof UnblockedEventAttendeeSchema>
  */
 export const EventAttendeesPageSchema = z.object({
   attendees: z.array(UnblockedEventAttendeeSchema),
-  attendeeCount: z.number(),
+  totalAttendeeCount: z.number(),
   nextPageKey: z.string().nullable()
 })
 
@@ -133,7 +133,7 @@ export const CurrentUserEventResponseSchema = z.object({
   title: z.string(), // TODO: - Decide max length.
   description: z.string(),
   color: ColorString.zodSchema,
-  attendeeCount: z.number().nonnegative(),
+  totalAttendeeCount: z.number().nonnegative(),
   joinDate: StringDateSchema.nullable(),
   createdAt: StringDateSchema,
   updatedAt: StringDateSchema,
