@@ -66,6 +66,7 @@
     "expo-av": "~13.2.1",
     "expo-blur": "~12.2.2",
     "expo-calendar": "~11.1.1",
+    "expo-cli": "^6.3.10",
     "expo-clipboard": "~4.1.2",
     "expo-dev-client": "~2.2.1",
     "expo-device": "~5.2.1",

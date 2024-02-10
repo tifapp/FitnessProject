@@ -58,8 +58,8 @@ export type EventAttendee = z.infer<typeof UnblockedEventAttendeeSchema>
  */
 export const EventAttendeesPageSchema = z.object({
   attendees: z.array(UnblockedEventAttendeeSchema),
-  attendeeCount: z.number(),
-  nextPageKey: z.string().nullable()
+  totalAttendeeCount: z.number(),
+  nextPageCursor: z.string().nullable()
 })
 
 export const EventSettingsSchema = z.object({

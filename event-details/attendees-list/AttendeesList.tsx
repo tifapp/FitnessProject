@@ -1,15 +1,14 @@
 import { TiFAPI } from "@api-client/TiFAPI"
-import { BodyText, Subtitle } from "@components/Text"
-import { ArrayUtils } from "@lib/utils/Array"
+import { Headline } from "@components/Text"
 import { EventAttendee } from "@shared-models/Event"
 import { useInfiniteQuery } from "@tanstack/react-query"
-import React, { useMemo } from "react"
-import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import React from "react"
+import { FlatList, StyleProp, View, ViewStyle } from "react-native"
 
 export type EventAttendeesPage = {
   attendees: EventAttendee[]
-  attendeeCount: number
-  nextPageKey: string | null
+  totalAttendeeCount: number
+  nextPageCursor: string | null
 }
 
 /**
@@ -26,9 +25,9 @@ export const loadEventAttendeesPage = async (
   eventId: number,
   pageSize: number,
   tifAPI: TiFAPI,
-  nextPageKey?: string
+  nextPageCursor?: string
 ): Promise<EventAttendeesLoadingResult> => {
-  const resp = await tifAPI.attendeesList(eventId, pageSize, nextPageKey)
+  const resp = await tifAPI.attendeesList(eventId, pageSize, nextPageCursor)
   if (resp.status === 404) {
     return { status: "not-found" }
   } else if (resp.status === 403) {
@@ -39,118 +38,116 @@ export const loadEventAttendeesPage = async (
     return {
       status: "success",
       eventAttendeesPage: {
-        ...resp.data
+        ...resp.data,
+        totalAttendeeCount: 0
       }
     }
   }
 }
 
+export type UseAttendeesListResult =
+  | { status: "error"; refresh: () => void }
+  | { status: "loading" }
+  | {
+      status: "success"
+      host: EventAttendee
+      attendees: EventAttendee[]
+      fetchNextGroup?: () => void
+      totalAttendeeCount: number
+      refresh: () => void
+      isRefetching: boolean
+      isFetchingNextPage: boolean
+    }
+
 export const useAttendeesList = (
   fetchNextAttendeesPage: (
     eventId: number,
     pageSize: number,
-    nextPageKey?: string
+    nextPageCursor?: string
   ) => Promise<EventAttendeesPage>,
   eventId: number,
   pageSize: number
-) => {
+): UseAttendeesListResult => {
   const infiniteAttendeesQuery = useInfiniteQuery<EventAttendeesPage, Error>({
     queryKey: ["eventAttendees", eventId],
     queryFn: async ({ pageParam }) => {
       return await fetchNextAttendeesPage(eventId, pageSize, pageParam)
     },
-    getNextPageParam: (lastPage) => lastPage.nextPageKey
+    getNextPageParam: (lastPage) => lastPage.nextPageCursor
   })
+  if (infiniteAttendeesQuery.status === "loading") {
+    return {
+      status: "loading"
+    }
+  }
+  if (infiniteAttendeesQuery.status === "error") {
+    return {
+      status: "error",
+      refresh: () => {
+        infiniteAttendeesQuery.refetch()
+      }
+    }
+  }
 
   return {
-    host:
-      infiniteAttendeesQuery.data &&
-      infiniteAttendeesQuery.data.pages[0].attendees.length > 0
-        ? infiniteAttendeesQuery.data.pages[0].attendees[0]
-        : undefined,
-    attendeePages:
-      infiniteAttendeesQuery.data?.pages.map((page, index) => {
-        if (index === 0) return page.attendees.slice(1)
-        return page.attendees
-      }) ?? [],
-    status: infiniteAttendeesQuery.status,
-    error: infiniteAttendeesQuery.error,
+    ...infiniteAttendeesQuery,
+    host: infiniteAttendeesQuery.data.pages[0].attendees[0],
+    attendees:
+      infiniteAttendeesQuery.data?.pages
+        .map((page, index) => {
+          if (index === 0) return page.attendees.slice(1)
+          return page.attendees
+        })
+        .flat() ?? [],
     fetchNextGroup: infiniteAttendeesQuery.hasNextPage
       ? () => {
         infiniteAttendeesQuery.fetchNextPage()
       }
       : undefined,
-    attendeeCount:
+    totalAttendeeCount:
       infiniteAttendeesQuery.data?.pages[
         infiniteAttendeesQuery.data.pages.length - 1
-      ].attendeeCount
+      ].totalAttendeeCount,
+    refresh: () => {
+      infiniteAttendeesQuery.refetch()
+    }
   }
 }
 
-export type AttendeesListLoadingProps = {
+export type AttendeesListViewProps = {
+  renderAttendee: (eventAttendee: EventAttendee) => JSX.Element
+  ListHeaderComponent?: JSX.Element
   style?: StyleProp<ViewStyle>
-}
+} & Extract<ReturnType<typeof useAttendeesList>, { status: "success" }>
 
-export const AttendeesListLoadingView = ({
+export const AttendeesListView = ({
+  attendees,
+  totalAttendeeCount,
+  isRefetching,
+  renderAttendee,
+  refresh,
+  fetchNextGroup,
+  ListHeaderComponent,
   style
-}: AttendeesListLoadingProps) => (
-  <BaseAttendeesListLoadingView
-    title="Loading..."
-    possibleMessages={LOADING_MESSAGES}
-    style={style}
-  />
-)
-
-const LOADING_MESSAGES = ["Hang tight.", "Stay put.", "Hold on a sec."]
-
-export type AttendeesListErrorProps = {
-  style?: StyleProp<ViewStyle>
+}: AttendeesListViewProps) => {
+  return (
+    <FlatList
+      style={style}
+      refreshing={isRefetching}
+      ListHeaderComponent={
+        <View>
+          {ListHeaderComponent}
+          <View>
+            <Headline> Attendees </Headline>
+            <Headline> ({totalAttendeeCount})</Headline>
+          </View>
+        </View>
+      }
+      data={attendees}
+      onRefresh={refresh}
+      keyExtractor={(item) => `attendee-${item.id}`}
+      renderItem={({ item }) => renderAttendee(item)}
+      onEndReached={fetchNextGroup}
+    />
+  )
 }
-
-export const AttendeesListErrorView = ({ style }: AttendeesListErrorProps) => (
-  <BaseAttendeesListLoadingView
-    title="Uh Oh!"
-    possibleMessages={GENERIC_ERROR_MESSAGES}
-    style={style}
-  />
-)
-
-const GENERIC_ERROR_MESSAGES = ["Something went wrong. Please try again."]
-
-type BaseAttendeesListLoadingProps = {
-  style?: StyleProp<ViewStyle>
-  title: string
-  possibleMessages: string[]
-}
-
-const BaseAttendeesListLoadingView = ({
-  style,
-  title,
-  possibleMessages
-}: BaseAttendeesListLoadingProps) => (
-  <View style={[style, styles.container]}>
-    <Subtitle style={styles.titleText}>{title}</Subtitle>
-    <BodyText style={styles.bodyText}>
-      {useMemo(
-        () => ArrayUtils.randomElement(possibleMessages),
-        [possibleMessages]
-      )}
-    </BodyText>
-  </View>
-)
-
-const styles = StyleSheet.create({
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center"
-  },
-  titleText: {
-    marginVertical: 8,
-    textAlign: "center"
-  },
-  bodyText: {
-    opacity: 0.5,
-    textAlign: "center"
-  }
-})
