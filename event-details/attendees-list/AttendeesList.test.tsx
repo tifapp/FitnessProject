@@ -47,12 +47,12 @@ describe("Attendees List tests", () => {
       const mockData = {
         attendees: [EventAttendeeMocks.Alivs, EventAttendeeMocks.AnnaAttendee],
         totalAttendeeCount: 2,
-        nextPageKey: "2"
+        nextPageCursor: "2"
       }
       const mockData2 = {
         attendees: [EventAttendeeMocks.BlobJr, EventAttendeeMocks.BlobSr],
         totalAttendeeCount: 10,
-        nextPageKey: null
+        nextPageCursor: null
       }
 
       fetchNextAttendeesPage.mockResolvedValueOnce(mockData)
@@ -93,7 +93,7 @@ describe("Attendees List tests", () => {
       const mockData = {
         attendees: [EventAttendeeMocks.Alivs, EventAttendeeMocks.AnnaAttendee],
         totalAttendeeCount: 2,
-        nextPageKey: "2"
+        nextPageCursor: "2"
       }
       fetchNextAttendeesPage.mockRejectedValueOnce(
         new Error("failed to receive data")
@@ -120,12 +120,12 @@ describe("Attendees List tests", () => {
       const mockData = {
         attendees: [EventAttendeeMocks.Alivs, EventAttendeeMocks.AnnaAttendee],
         totalAttendeeCount: 2,
-        nextPageKey: "2"
+        nextPageCursor: "2"
       }
       const mockData2 = {
         attendees: [EventAttendeeMocks.BlobJr, EventAttendeeMocks.BlobSr],
         totalAttendeeCount: 10,
-        nextPageKey: null
+        nextPageCursor: null
       }
       fetchNextAttendeesPage.mockResolvedValueOnce(mockData)
       const { result } = renderUseAttendeesList(11, 15)
