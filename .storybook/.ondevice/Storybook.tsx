@@ -1,8 +1,7 @@
 import { setupCognito } from "@auth/CognitoHelpers"
 import { InMemorySecureStore } from "@auth/CognitoSecureStorage"
 import React, { useState } from "react"
-import { Text, TouchableOpacity, View } from "react-native"
-import { FlatList } from "react-native-gesture-handler"
+import { FlatList, Text, TouchableOpacity, View } from "react-native"
 import { useAppFonts } from "../../lib/Fonts"
 
 // Import your stories

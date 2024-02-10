@@ -12,7 +12,7 @@ const ProfileImage = ({ imageURL, style }: ProfileImageProps) => {
   return (
     <Image
       defaultSource={fallbackImage}
-      source={{ uri: imageURL }}
+      source={imageURL ? { uri: imageURL } : fallbackImage}
       style={[style, styles.image]}
     />
   )

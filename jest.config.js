@@ -11,13 +11,13 @@ module.exports = {
     "<rootDir>/jest/setupInfraEnv.js"
   ],
   transformIgnorePatterns: [
-    "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|@alessiocancian/react-native-actionsheet|@sentry/.*|sentry-expo|node-fetch|data-uri-to-buffer|fetch-blob|formdata-polyfill)"
+    "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|native-base|react-native-svg|@alessiocancian/react-native-actionsheet|@sentry/.*|node-fetch|data-uri-to-buffer|fetch-blob|formdata-polyfill)"
   ],
   transform: {
     "^.+\\.jsx$": "babel-jest"
   },
   moduleNameMapper: {
     "^uuid$": require.resolve("uuid"),
-    "^sentry-expo$": require.resolve("sentry-expo")
+    "^@sentry/react-native$": require.resolve("@sentry/react-native")
   }
 }

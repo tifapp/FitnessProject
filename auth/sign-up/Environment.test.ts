@@ -1,11 +1,11 @@
+import { TiFAPI, createTiFAPIFetch } from "@api-client"
+import { TestCognitoError } from "@auth/CognitoHelpers"
+import { UserHandle } from "@content-parsing"
+import { uuidString } from "@lib/utils/UUID"
+import { mswServer } from "@test-helpers/msw"
+import { HttpResponse, http } from "msw"
 import { EmailAddress, Password, USPhoneNumber } from ".."
 import { createSignUpEnvironment } from "./Environment"
-import { TiFAPI, createTiFAPIFetch } from "@api-client"
-import { rest } from "msw"
-import { uuidString } from "@lib/utils/UUID"
-import { TestCognitoError } from "@auth/CognitoHelpers"
-import { mswServer } from "@test-helpers/msw"
-import { UserHandle } from "@content-parsing"
 
 describe("SignUpEnvironment tests", () => {
   const cognito = {
@@ -94,27 +94,33 @@ describe("SignUpEnvironment tests", () => {
     test("autocomplete returns user with matching handle, returns true", async () => {
       const handle = UserHandle.parse("abc").handle!
       mswServer.use(
-        rest.get(
+        http.get(
           "https://localhost:8080/user/autocomplete",
-          async (req, res, ctx) => {
-            if (req.url.searchParams.get("limit") !== "1") {
-              return res(ctx.status(500))
-            }
-            if (req.url.searchParams.get("handle") !== handle.rawValue) {
-              return res(ctx.status(500))
-            }
-            return res(
-              ctx.status(200),
-              ctx.json({
-                users: [
-                  {
-                    id: uuidString(),
-                    handle: handle.rawValue,
-                    name: "Bitchell Dickle"
-                  }
-                ]
+          async ({ request }) => {
+            if (new URLSearchParams(request.url).get("limit") !== "1") {
+              return new HttpResponse(null, {
+                status: 500
               })
-            )
+            }
+            if (new URLSearchParams(request.url).get("handle") !== handle.rawValue) {
+              return new HttpResponse(null, {
+                status: 500
+              })
+            }
+            return new HttpResponse(JSON.stringify({
+              users: [
+                {
+                  id: uuidString(),
+                  handle: handle.rawValue,
+                  name: "Bitchell Dickle"
+                }
+              ]
+            }), {
+              status: 200,
+              headers: {
+                "Content-Type": "application/json"
+              }
+            })
           }
         )
       )
@@ -127,15 +133,17 @@ describe("SignUpEnvironment tests", () => {
   test("autocomplete returns no users, returns false", async () => {
     const handle = UserHandle.parse("abc").handle!
     mswServer.use(
-      rest.get(
+      http.get(
         "https://localhost:8080/user/autocomplete",
-        async (_, res, ctx) => {
-          return res(
-            ctx.status(200),
-            ctx.json({
-              users: []
-            })
-          )
+        async () => {
+          return new HttpResponse(JSON.stringify({
+            users: []
+          }), {
+            status: 200,
+            headers: {
+              "Content-Type": "application/json"
+            }
+          })
         }
       )
     )
@@ -147,21 +155,23 @@ describe("SignUpEnvironment tests", () => {
   test("autocomplete returns no user with non-matching handle, returns false", async () => {
     const handle = UserHandle.parse("abc").handle!
     mswServer.use(
-      rest.get(
+      http.get(
         "https://localhost:8080/user/autocomplete",
-        async (_, res, ctx) => {
-          return res(
-            ctx.status(200),
-            ctx.json({
-              users: [
-                {
-                  id: uuidString(),
-                  handle: "thing",
-                  name: "Bitchell Dickle"
-                }
-              ]
-            })
-          )
+        async () => {
+          return new HttpResponse(JSON.stringify({
+            users: [
+              {
+                id: uuidString(),
+                handle: "thing",
+                name: "Bitchell Dickle"
+              }
+            ]
+          }), {
+            status: 200,
+            headers: {
+              "Content-Type": "application/json"
+            }
+          })
         }
       )
     )
@@ -209,11 +219,13 @@ describe("SignUpEnvironment tests", () => {
       const handle = UserHandle.parse("test").handle!
       cognito.confirmSignUpWithAutoSignIn.mockResolvedValueOnce("SUCCESS")
       mswServer.use(
-        rest.post("https://localhost:8080/user", async (_, res, ctx) => {
-          return res(
-            ctx.status(201),
-            ctx.json({ id: uuidString(), handle: handle.rawValue })
-          )
+        http.post("https://localhost:8080/user", async () => {
+          return new HttpResponse(JSON.stringify({ id: uuidString(), handle: handle.rawValue }), {
+            status: 201,
+            headers: {
+              "Content-Type": "application/json"
+            }
+          })
         })
       )
       const result = await env.finishRegisteringAccount(
