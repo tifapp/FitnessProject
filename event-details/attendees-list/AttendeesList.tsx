@@ -8,7 +8,7 @@ import { FlatList, StyleProp, View, ViewStyle } from "react-native"
 export type EventAttendeesPage = {
   attendees: EventAttendee[]
   totalAttendeeCount: number
-  nextPageKey: string | null
+  nextPageCursor: string | null
 }
 
 /**
@@ -25,9 +25,9 @@ export const loadEventAttendeesPage = async (
   eventId: number,
   pageSize: number,
   tifAPI: TiFAPI,
-  nextPageKey?: string
+  nextPageCursor?: string
 ): Promise<EventAttendeesLoadingResult> => {
-  const resp = await tifAPI.attendeesList(eventId, pageSize, nextPageKey)
+  const resp = await tifAPI.attendeesList(eventId, pageSize, nextPageCursor)
   if (resp.status === 404) {
     return { status: "not-found" }
   } else if (resp.status === 403) {
@@ -63,7 +63,7 @@ export const useAttendeesList = (
   fetchNextAttendeesPage: (
     eventId: number,
     pageSize: number,
-    nextPageKey?: string
+    nextPageCursor?: string
   ) => Promise<EventAttendeesPage>,
   eventId: number,
   pageSize: number
@@ -73,7 +73,7 @@ export const useAttendeesList = (
     queryFn: async ({ pageParam }) => {
       return await fetchNextAttendeesPage(eventId, pageSize, pageParam)
     },
-    getNextPageParam: (lastPage) => lastPage.nextPageKey
+    getNextPageParam: (lastPage) => lastPage.nextPageCursor
   })
   if (infiniteAttendeesQuery.status === "loading") {
     return {
