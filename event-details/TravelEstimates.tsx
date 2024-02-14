@@ -361,6 +361,7 @@ const TravelTypeButton = ({ travelKey, location, result, style }: TravelTypeButt
           maximumFontScaleFactor={FontScaleFactors.xxxLarge}
           borderRadius={12}
           backgroundColor={AppStyles.eventCardColor}
+          accessibilityLabel={TRAVEL_KEYS_INFO[travelKey].accessibilityLabel}
         />
         {result.status !== "loading"
           ? (
@@ -406,15 +407,18 @@ const TravelTypeButton = ({ travelKey, location, result, style }: TravelTypeButt
 const TRAVEL_KEYS_INFO = {
   automobile: {
     directionsMode: "car",
-    iconName: "car"
+    iconName: "car",
+    accessibilityLabel: "Driving Directions"
   },
   publicTransportation: {
     directionsMode: "public-transport",
-    iconName: "bus"
+    iconName: "bus",
+    accessibilityLabel: "Public Transportation Directions"
   },
   walking: {
     directionsMode: "walk",
-    iconName: "walk"
+    iconName: "walk",
+    accessibilityLabel: "Walking Directions"
   }
 } as const
 
