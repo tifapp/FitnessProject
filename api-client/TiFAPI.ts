@@ -7,11 +7,11 @@ import {
   EventRegion
 } from "@shared-models/Event"
 
+import { EventChatTokenRequestSchema } from "@shared-models/ChatToken"
 import { EventArrivalRegionsSchema } from "@shared-models/EventArrivals"
 import { z } from "zod"
 import { createAWSTiFAPIFetch } from "./aws"
 import { TiFAPIFetch, createTiFAPIFetch } from "./client"
-import { EventChatTokenRequestSchema } from "@shared-models/ChatToken"
 
 export type UpdateCurrentUserProfileRequest = Partial<{
   name: string
@@ -221,6 +221,25 @@ export class TiFAPI {
         status403: literalErrorSchema("user-is-blocked", "event-has-ended"),
         status201: JoinResponseSchema,
         status200: JoinResponseSchema
+      }
+    )
+  }
+
+  /**
+   * Leaves the event with the given id.
+   *
+   * @param eventId The id of the event to leave.
+   */
+  async leaveEvent (eventId: number) {
+    return await this.apiFetch(
+      {
+        method: "POST",
+        endpoint: `/event/leave/${eventId}`
+      },
+      {
+        status403: literalErrorSchema("event-has-been-cancelled", "event-has-ended"),
+        status400: literalErrorSchema("co-host-not-found", "already-left-event"),
+        status204: "no-content"
       }
     )
   }
