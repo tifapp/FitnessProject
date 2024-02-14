@@ -21,7 +21,7 @@ const StoryText = () => {
         onUserHandleTapped={console.log}
         onEventHandleTapped={console.log}
         expandButtonTextStyle={{ color: "red" }}
-        style={{ marginBottom: 24, marginTop: 8 }}
+        style={{ marginBottom: 24, marginTop: 8, marginHorizontal: 16 }}
       />
       <Button
         title="Toggle text"

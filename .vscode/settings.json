@@ -14,5 +14,12 @@
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "file",
   "files.autoSave": "onFocusChange",
-  "cSpell.words": ["Haptics", "Ionicons", "Placemark", "tinycolor", "UCSC"]
+  "cSpell.words": [
+    "Haptics",
+    "Ionicons",
+    "Placemark",
+    "tinycolor",
+    "UCSC"
+  ],
+  "java.compile.nullAnalysis.mode": "automatic"
 }

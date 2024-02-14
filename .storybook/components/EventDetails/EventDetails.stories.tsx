@@ -1,15 +1,17 @@
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import React, { useEffect } from "react"
+import React from "react"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { View } from "react-native"
-import { EventMocks } from "@event-details/MockData"
-import { JoinEventStagesView, useJoinEventStages } from "@event-details"
-import { delayData } from "@lib/utils/DelayData"
-import { TrueRegionMonitor } from "@event-details/arrival-tracking/region-monitoring/MockRegionMonitors"
+import {
+  EventAttendeeMocks,
+  EventMocks,
+  mockEventLocation
+} from "@event-details/MockData"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 import {
+  EventTravelEstimatesView,
   loadEventTravelEstimates,
   useEventTravelEstimates
 } from "@event-details/TravelEstimates"
@@ -20,6 +22,8 @@ import {
   requestBackgroundPermissionsAsync,
   requestForegroundPermissionsAsync
 } from "expo-location"
+import { mockPlacemark } from "@location/MockData"
+import { sleep } from "@lib/utils/DelayData"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -31,17 +35,16 @@ type EventDetailsStory = ComponentStory<typeof SettingsScreen>
 
 const event = EventMocks.PickupBasketball
 
+const location = {
+  ...mockEventLocation(),
+  coordinate: { latitude: 36.96493, longitude: -122.01693 },
+  placemark: mockPlacemark()
+}
+
 export const Basic: EventDetailsStory = () => {
   return (
     <SafeAreaProvider>
-      <View
-        style={{
-          display: "flex",
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center"
-        }}
-      >
+      <View style={{ width: "100%", marginTop: 256 }}>
         <UserLocationFunctionsProvider
           getCurrentLocation={getCurrentPositionAsync}
           requestBackgroundPermissions={requestBackgroundPermissionsAsync}
@@ -58,41 +61,21 @@ export const Basic: EventDetailsStory = () => {
   )
 }
 
+const host = EventAttendeeMocks.Alivs
+
 const Test = () => {
-  const stage = useJoinEventStages(event, {
-    joinEvent: async () => {
-      return await delayData("success", 2000)
-    },
-    loadPermissions: async () => [
-      {
-        id: "notifications",
-        canRequestPermission: true,
-        requestPermission: async () => {
-          // await sleep(3000)
-        }
-      },
-      {
-        id: "backgroundLocation",
-        canRequestPermission: true,
-        requestPermission: async () => {
-          // await sleep(3000)
-        }
-      }
-    ],
-    monitor: TrueRegionMonitor,
-    onSuccess: () => console.log("success")
-  })
   const result = useEventTravelEstimates(
-    { latitude: 36.96493, longitude: -122.01693 },
+    location.coordinate,
     async (eventCoordinate, userCoordinate, signal) => {
-      return await loadEventTravelEstimates(
-        eventCoordinate,
-        userCoordinate,
-        ExpoTiFTravelEstimates!,
-        signal
-      )
+      throw new Error("Died")
     }
   )
   console.log(result)
-  return <JoinEventStagesView stage={stage} />
+  return (
+    <EventTravelEstimatesView 
+      host={host} 
+      location={location} 
+      result={result} 
+    />
+  )
 }
