@@ -13,7 +13,6 @@ import { Button } from "react-native-elements"
 import { Password, USPhoneNumber } from ".."
 import "@test-helpers/Matchers"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { fakeTimers } from "@test-helpers/Timers"
 import {
   ForgotPasswordParamsList,
   createForgotPasswordScreens
@@ -24,8 +23,6 @@ type TestForgotPasswordParamsList = {
 } & ForgotPasswordParamsList
 
 describe("Forgot Password Navigation tests", () => {
-  afterEach(() => act(() => jest.runAllTimers()))
-  fakeTimers()
   beforeEach(() => jest.resetAllMocks())
 
   test("valid navigation flow", async () => {

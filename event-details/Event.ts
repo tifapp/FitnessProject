@@ -1,5 +1,5 @@
 import { placemarkToFormattedAddress } from "@location"
-import * as Clipboard from "expo-clipboard"
+import { setStringAsync as expoSetClipboardStringAsync } from "expo-clipboard"
 import { showLocation } from "react-native-map-link"
 import { EventArrival, EventArrivalsTracker } from "./arrival-tracking"
 import {
@@ -38,7 +38,7 @@ export const copyEventLocationToClipboard = (
 ) => setClipboardText(formatEventLocation(location))
 
 const expoCopyTextToClipboard = async (text: string) => {
-  await Clipboard.setStringAsync(text)
+  await expoSetClipboardStringAsync(text)
 }
 
 const formatEventLocation = (location: EventLocationCoordinatePlacemark) => {

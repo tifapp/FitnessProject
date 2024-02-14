@@ -48,7 +48,6 @@ describe("SignUpNavigation tests", () => {
     )
   )
 
-  afterEach(() => act(jest.runAllTimers))
   fakeTimers()
 
   beforeEach(() => {

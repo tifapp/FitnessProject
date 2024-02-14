@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { TiFAPI, createTiFAPIFetch } from "@api-client"
 import { TestCognitoError } from "@auth/CognitoHelpers"
 import { UserHandle } from "@content-parsing"
@@ -97,12 +98,13 @@ describe("SignUpEnvironment tests", () => {
         http.get(
           "https://localhost:8080/user/autocomplete",
           async ({ request }) => {
-            if (new URLSearchParams(request.url).get("limit") !== "1") {
+            const searchParams = new URL(request.url).searchParams
+            if (searchParams.get("limit") !== "1") {
               return new HttpResponse(null, {
                 status: 500
               })
             }
-            if (new URLSearchParams(request.url).get("handle") !== handle.rawValue) {
+            if (searchParams.get("handle") !== handle.rawValue) {
               return new HttpResponse(null, {
                 status: 500
               })

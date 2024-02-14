@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { HttpResponse, http } from "msw"
 import { z } from "zod"
 import { neverPromise } from "../test-helpers/Promise"
@@ -29,14 +30,14 @@ describe("CreateAPIFetch tests", () => {
           }
         })
         const body: any = await request.json()
+        const searchParams = new URL(request.url).searchParams
 
         if (request.headers.get("Authorization") !== `Bearer ${TEST_JWT}`) {
-          console.log("invalid token")
           return errorResp
         }
         if (
-          new URLSearchParams(request.url).get("hello") !== "world" ||
-          new URLSearchParams(request.url).get("a") !== "1"
+          searchParams.get("hello") !== "world" ||
+          searchParams.get("a") !== "1"
         ) {
           return errorResp
         }

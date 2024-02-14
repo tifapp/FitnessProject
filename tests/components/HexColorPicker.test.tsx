@@ -42,9 +42,8 @@ describe("HexColorPicker tests", () => {
 
     return (
       <HapticsProvider isSupportedOnDevice={true} haptics={haptics}>
-        <View testID={displayedColorId(color)}>
-          <HexColorPicker color={color} onChange={setColor} options={options} />
-        </View>
+        <View testID={displayedColorId(color)} />
+        <HexColorPicker color={color} onChange={setColor} options={options} />
       </HapticsProvider>
     )
   }
