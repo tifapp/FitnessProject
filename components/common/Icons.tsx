@@ -180,3 +180,38 @@ const circularStyles = StyleSheet.create({
     borderRadius: 32
   }
 })
+
+export type RoundedIoniconProps = CircularIoniconProps & {
+  borderRadius: number,
+  size?: number
+}
+
+/**
+ * An ionicon wrapped in a rounded square with a border radius.
+ */
+export const RoundedIonicon = ({
+  backgroundColor,
+  borderRadius,
+  name,
+  size = DEFAULT_ICON_SIZE,
+  maximumFontScaleFactor,
+  style,
+  ...props
+}: RoundedIoniconProps) => {
+  const fontScale = useFontScale({
+    maximumScaleFactor: maximumFontScaleFactor
+  })
+  return (
+    <View style={{ borderRadius, backgroundColor }}>
+      <View style={{ padding: size * fontScale * (1 / 3) }}>
+        <Ionicon
+          {...props}
+          name={name}
+          size={size * fontScale}
+          maximumFontScaleFactor={maximumFontScaleFactor}
+          color={props.color}
+        />
+      </View>
+    </View>
+  )
+}

@@ -12,7 +12,7 @@ export type EventTravelEstimateRouteKind =
   | "public-transport"
 
 type ObjectRouteKeyName<Kind extends EventTravelEstimateRouteKind> =
-  Kind extends "public-transport" ? "publicTransport" : Kind
+  Kind extends "public-transport" ? "publicTransportation" : Kind
 
 /**
  * Result of a travel estimates calculation for an event.
@@ -26,6 +26,6 @@ type ObjectRouteKeyName<Kind extends EventTravelEstimateRouteKind> =
 export type EventTravelEstimates = {
   [Key in ObjectRouteKeyName<EventTravelEstimateRouteKind>]: {
     travelDistanceMeters: number
-    estimatedTravelSeconds: number
+    expectedTravelSeconds: number
   } | null
 }

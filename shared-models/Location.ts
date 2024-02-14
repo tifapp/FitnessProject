@@ -19,6 +19,11 @@ export type LocationCoordinate2D = Readonly<
   z.infer<typeof LocationCoordinates2DSchema>
 >
 
+export const EXPO_LOCATION_ERRORS = {
+  noPermissions: "E_NO_PERMISSIONS",
+  servicesDisabled: "E_LOCATION_SERVICES_DISABLED"
+}
+
 /**
  * Returns true if 2 {@link LocationCoordinate2D}s are equal.
  */

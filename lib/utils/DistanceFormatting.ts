@@ -1,3 +1,5 @@
+import { milesToFeet } from "./MetricConversions"
+
 /**
  * Formats miles into a compact format suitable for displaying in small UI spaces.
  *
@@ -16,4 +18,14 @@ export const compactFormatMiles = (miles: number) => {
 export const compactFormatFeet = (feet: number) => {
   /// TODO: - Intl Format + Locale Param
   return `${Math.max(Math.round(feet), 1)} ft`
+}
+
+/**
+ * Formats a distance in miles.
+ *
+ * If `miles` is less than 0.1, then it formats in feet.
+ */
+export const compactFormatDistance = (miles: number) => {
+  if (miles < 0.1) return compactFormatFeet(milesToFeet(miles))
+  return compactFormatMiles(miles)
 }
