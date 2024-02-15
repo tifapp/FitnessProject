@@ -1,6 +1,6 @@
 import {
-  RotatingFileLogsConfig,
   RotatingFileLogs,
+  RotatingFileLogsConfig,
   addLogHandler,
   createLogFunction,
   formatLogMessage,
@@ -9,10 +9,10 @@ import {
   sentryErrorCapturingLogHandler
 } from "@lib/Logging"
 import { TestFilesystem } from "@test-helpers/Filesystem"
-import { fakeTimers } from "@test-helpers/Timers"
+import { withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
 
 describe("Logging tests", () => {
-  fakeTimers()
+  withAnimatedTimeTravelEnabled()
   afterEach(() => resetLogHandlers())
 
   describe("RotatingFilesystemLogs tests", () => {

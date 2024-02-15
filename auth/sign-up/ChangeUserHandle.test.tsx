@@ -1,17 +1,17 @@
-import { renderHook, waitFor } from "@testing-library/react-native"
-import { useSignUpChangeUserHandleForm } from "./ChangeUserHandle"
-import { act } from "react-test-renderer"
-import { fakeTimers } from "@test-helpers/Timers"
-import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { neverPromise } from "@test-helpers/Promise"
-import { captureAlerts } from "@test-helpers/Alerts"
 import { UserHandle } from "@content-parsing"
+import { captureAlerts } from "@test-helpers/Alerts"
+import { neverPromise } from "@test-helpers/Promise"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import { timeTravel, withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
+import { renderHook, waitFor } from "@testing-library/react-native"
+import { act } from "react-test-renderer"
+import { useSignUpChangeUserHandleForm } from "./ChangeUserHandle"
 
 describe("SignUpChangeUserHandle tests", () => {
   beforeEach(() => jest.resetAllMocks())
 
   describe("useSignUpChangeUserHandle tests", () => {
-    fakeTimers()
+    withAnimatedTimeTravelEnabled()
 
     it("should debounce when looking up a new user handle", async () => {
       checkIfUserHandleTaken.mockResolvedValueOnce(true)
@@ -22,16 +22,16 @@ describe("SignUpChangeUserHandle tests", () => {
       expect(result.current.handleText).toEqual("musk_elon")
       expect(result.current.isPerformingUserHandleTakenCheck).toEqual(true)
 
-      act(() => jest.advanceTimersByTime(150))
+      act(timeTravel)
       expect(result.current.submission.status).toEqual("submittable")
 
       act(() => result.current.onHandleTextChanged("melon_husk"))
       expect(result.current.handleText).toEqual("melon_husk")
 
-      act(() => jest.advanceTimersByTime(150))
+      act(timeTravel)
       expect(result.current.submission.status).toEqual("submittable")
 
-      act(() => jest.advanceTimersByTime(150))
+      act(timeTravel)
       await waitFor(() => {
         expect(result.current.submission).toMatchObject({
           status: "invalid",

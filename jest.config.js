@@ -1,7 +1,9 @@
 module.exports = {
   verbose: true,
   preset: "jest-expo",
+  setupFiles: ["<rootDir>/jest/setup.js"],
   setupFilesAfterEnv: [
+    "<rootDir>/jest/setupAnimations.js",
     "<rootDir>/jest/setupNav.js",
     "<rootDir>/jest/setupBottomSheetMock.jsx",
     "<rootDir>/jest/setupMapMock.jsx",

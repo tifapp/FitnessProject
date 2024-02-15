@@ -1,4 +1,9 @@
 import { TiFLocation, UserLocationFunctionsProvider } from "@location"
+import { mockExpoLocationObject } from "@location/MockData"
+import "@test-helpers/Matchers"
+import { neverPromise } from "@test-helpers/Promise"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import { timeTravel, withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
 import {
   act,
   fireEvent,
@@ -16,13 +21,8 @@ import {
   LocationSearchResultView,
   useLocationSearchPicker
 } from "."
-import "@test-helpers/Matchers"
-import { neverPromise } from "@test-helpers/Promise"
-import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { fakeTimers } from "@test-helpers/Timers"
-import { LocationSearchResult, LocationsSearchQuery } from "./Models"
 import { mockLocationSearchResult } from "./MockData"
-import { mockExpoLocationObject } from "@location/MockData"
+import { LocationSearchResult, LocationsSearchQuery } from "./Models"
 
 describe("LocationSearch tests", () => {
   beforeEach(() => jest.resetAllMocks())
@@ -93,7 +93,7 @@ describe("LocationSearch tests", () => {
     })
 
     describe("Picker tests", () => {
-      fakeTimers()
+      withAnimatedTimeTravelEnabled()
 
       test("loading results at the user's location", async () => {
         const userLocation = mockExpoLocationObject()
@@ -165,7 +165,7 @@ describe("LocationSearch tests", () => {
         let searchText = "Hello World!"
         enterSearchText(searchText)
 
-        jest.advanceTimersByTime(100)
+        act(() => timeTravel(100))
         await waitFor(() => {
           expect(searchForLocations).not.toHaveBeenCalledWith(
             new LocationsSearchQuery(searchText),
@@ -176,13 +176,13 @@ describe("LocationSearch tests", () => {
         searchText = "The user changed the text while typing or something..."
         enterSearchText(searchText)
 
-        act(() => jest.advanceTimersByTime(100))
+        act(() => timeTravel(100))
         expect(searchForLocations).not.toHaveBeenCalledWith(
           new LocationsSearchQuery(searchText),
           undefined
         )
 
-        act(() => jest.advanceTimersByTime(100))
+        act(() => timeTravel(100))
         expect(searchForLocations).toHaveBeenCalledWith(
           new LocationsSearchQuery(searchText),
           undefined

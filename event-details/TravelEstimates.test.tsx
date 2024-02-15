@@ -1,28 +1,33 @@
-import {
-  TestQueryClientProvider,
-  createTestQueryClient
-} from "@test-helpers/ReactQuery"
-import { fakeTimers } from "@test-helpers/Timers"
-import { act, renderHook, waitFor } from "@testing-library/react-native"
-import { formattedTravelEstimateResult, useEventTravelEstimates } from "./TravelEstimates"
+import { dayjs } from "@date-time"
 import {
   mockExpoLocationObject,
   mockLocationCoordinate2D
 } from "@location/MockData"
 import { UserLocationFunctionsProvider } from "@location/UserLocation"
-import { setPlatform } from "@test-helpers/Platform"
 import { EXPO_LOCATION_ERRORS, LocationCoordinate2D } from "@shared-models/Location"
+import { setPlatform } from "@test-helpers/Platform"
+import {
+  TestQueryClientProvider,
+  createTestQueryClient
+} from "@test-helpers/ReactQuery"
+import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { CodedError } from "expo-modules-core"
-import { dayjs } from "@date-time"
+import { formattedTravelEstimateResult, useEventTravelEstimates } from "./TravelEstimates"
 
 describe("EventTravelEstimates tests", () => {
   describe("UseEventTravelEstimates tests", () => {
     const queryClient = createTestQueryClient()
-    afterEach(() => act(() => jest.runAllTimers()))
-    fakeTimers()
+
     beforeEach(() => {
       jest.resetAllMocks()
       queryClient.clear()
+    })
+
+    afterEach(async () => {
+      // resolve "Jest did not exit one second after the test run has completed." warning
+      await act(async () => {
+        await Promise.resolve()
+      })
     })
 
     const loadTravelEstimates = jest.fn()

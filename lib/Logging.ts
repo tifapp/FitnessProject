@@ -1,4 +1,4 @@
-import { diffDates } from "@date-time/Date" // NB: Why does adding "Date" this fix a test???
+import { diffDates } from "@date-time"
 import * as Sentry from "@sentry/react-native"
 import { Filesystem } from "./Filesystem"
 import { ArrayUtils } from "./utils/Array"

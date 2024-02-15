@@ -10,7 +10,7 @@ import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { captureAlerts } from "@test-helpers/Alerts"
 import "@test-helpers/Matchers"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { fakeTimers } from "@test-helpers/Timers"
+import { withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
 import { mswServer } from "@test-helpers/msw"
 import {
   act,
@@ -48,7 +48,7 @@ describe("SignUpNavigation tests", () => {
     )
   )
 
-  fakeTimers()
+  withAnimatedTimeTravelEnabled()
 
   beforeEach(() => {
     jest.resetAllMocks()
@@ -127,7 +127,7 @@ describe("SignUpNavigation tests", () => {
     await waitFor(() => expect(endingView()).toBeDisplayed())
     endSignUpTest()
 
-    expect(isAtEnd()).toEqual(true)
+    await waitFor(() => expect(isAtEnd()).toEqual(true))
   })
 
   test("get to end of sign-up flow, go back to change username again, finish sign-up flow", async () => {

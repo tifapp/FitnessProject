@@ -1,15 +1,9 @@
 import { EventFormValues } from "@components/eventForm"
-import { GeocodingFunctionsProvider } from "@location/Geocoding"
-import { HapticsProvider } from "@lib/Haptics"
 import { dateRange } from "@date-time"
-import { EventColors } from "@lib/events"
+import { EventColors } from "@event-details/Event"
+import { HapticsProvider } from "@lib/Haptics"
+import { GeocodingFunctionsProvider } from "@location/Geocoding"
 import EventFormScreen from "@screens/EventFormScreen"
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor
-} from "@testing-library/react-native"
 import { QueryClient } from "@tanstack/react-query"
 import { captureAlerts } from "@test-helpers/Alerts"
 import { TestHaptics } from "@test-helpers/Haptics"
@@ -18,6 +12,13 @@ import {
   TestQueryClientProvider,
   createTestQueryClient
 } from "@test-helpers/ReactQuery"
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor
+} from "@testing-library/react-native"
 import {
   attemptDismiss,
   baseTestEventFormValues,
@@ -37,6 +38,13 @@ describe("EventFormScreen tests", () => {
   beforeEach(() => {
     jest.resetAllMocks()
     queryClient.clear()
+  })
+
+  afterEach(async () => {
+    // resolve "Warning: An update to ForwardRef inside a test was not wrapped in act(...)."
+    await act(async () => {
+      await Promise.resolve()
+    })
   })
 
   it("should be able to edit and submit a form with a preselected location", async () => {
@@ -105,29 +113,30 @@ describe("EventFormScreen tests", () => {
     editEventTitle(editedTitle)
     attemptDismiss()
     await dismissFormFromConfirmationAlert()
-
-    expect(dismissAction).toHaveBeenCalled()
+    await waitFor(() => {
+      expect(dismissAction).toHaveBeenCalled()
+    })
   })
 
-  it("should not be able to submit initial form content", () => {
+  it("should not be able to submit initial form content", async () => {
     renderEventFormScreen(queryClient, baseTestEventFormValues)
-    expect(canSubmit()).toEqual(false)
+    await waitFor(() => expect(canSubmit()).toEqual(false))
   })
 
-  it("cannot submit form with an empty title", () => {
+  it("cannot submit form with an empty title", async () => {
     renderEventFormScreen(queryClient, {
       ...baseTestEventFormValues,
       title: ""
     })
-    expect(canSubmit()).toEqual(false)
+    await waitFor(() => expect(canSubmit()).toEqual(false))
   })
 
-  it("cannot submit form with no location", () => {
+  it("cannot submit form with no location", async () => {
     renderEventFormScreen(queryClient, {
       ...baseTestEventFormValues,
       locationInfo: undefined
     })
-    expect(canSubmit()).toEqual(false)
+    await waitFor(() => expect(canSubmit()).toEqual(false))
   })
 
   it("should not allow submissions when in process of submitting current form", async () => {

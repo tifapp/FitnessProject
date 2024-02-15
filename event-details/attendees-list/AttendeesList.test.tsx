@@ -1,14 +1,17 @@
+import { EventAttendeeMocks } from "@event-details/MockData"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
-
-import { EventAttendeeMocks } from "@event-details/MockData"
-import { fakeTimers } from "@test-helpers/Timers"
 import { EventAttendeesPage, useAttendeesList } from "./AttendeesList"
 
 describe("Attendees List tests", () => {
-  afterEach(() => act(() => jest.runAllTimers()))
-  fakeTimers()
   beforeEach(() => jest.resetAllMocks())
+  afterEach(async () => {
+    // resolve "Jest did not exit one second after the test run has completed." warning
+    await act(async () => {
+      await Promise.resolve()
+    })
+  })
+
   const fetchNextAttendeesPage = jest.fn()
 
   const renderUseAttendeesList = (eventId: number, pageSize: number) => {

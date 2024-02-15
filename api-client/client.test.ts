@@ -23,8 +23,10 @@ describe("CreateAPIFetch tests", () => {
   beforeEach(() => {
     mswServer.use(
       http.post("http://localhost:8080/test", async ({ request }) => {
-        const errorResp = new HttpResponse(JSON.stringify({ a: 1 }), {
-          status: 200,
+        // TODO: Use helper method for creating httpresponses
+        // https://mswjs.io/docs/migrations/1.x-to-2.x#response-declaration
+        const errorResp = new HttpResponse(JSON.stringify({ b: "bad request" }), {
+          status: 400,
           headers: {
             "Content-Type": "application/json"
           }
