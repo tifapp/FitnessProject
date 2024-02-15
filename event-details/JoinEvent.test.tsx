@@ -1,14 +1,15 @@
+import { mockLocationCoordinate2D } from "@location/MockData"
 import { captureAlerts } from "@test-helpers/Alerts"
+import "@test-helpers/Matchers"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import { withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
+import { renderHook, waitFor } from "@testing-library/react-native"
+import { act } from "react-test-renderer"
 import {
   JOIN_EVENT_ERROR_ALERTS,
   JoinEventResult,
   useJoinEventStages
 } from "./JoinEvent"
-import { renderHook, waitFor } from "@testing-library/react-native"
-import { act } from "react-test-renderer"
-import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { mockLocationCoordinate2D } from "@location/MockData"
-import "@test-helpers/Matchers"
 import { TrueRegionMonitor } from "./arrival-tracking/region-monitoring/MockRegionMonitors"
 
 describe("JoinEvent tests", () => {
@@ -27,10 +28,26 @@ describe("JoinEvent tests", () => {
       isInArrivalTrackingPeriod: true
     }
   }
-
   beforeEach(() => jest.resetAllMocks())
 
+  afterEach(async () => {
+    // resolve "Warning: An update to ForwardRef inside a test was not wrapped in act(...)."
+    await act(async () => {
+      await Promise.resolve()
+    })
+  })
+  withAnimatedTimeTravelEnabled()
+
   describe("useJoinEvent tests", () => {
+    beforeEach(() => jest.resetAllMocks())
+
+    afterEach(async () => {
+      // resolve "Warning: An update to ForwardRef inside a test was not wrapped in act(...)."
+      await act(async () => {
+        await Promise.resolve()
+      })
+    })
+    withAnimatedTimeTravelEnabled()
     const { alertPresentationSpy } = captureAlerts()
 
     test("join event flow, all permissions requested", async () => {
@@ -52,10 +69,10 @@ describe("JoinEvent tests", () => {
       )
       env.joinEvent.mockReturnValueOnce(joinPromise)
       const { result } = renderUseJoinEvent()
-      expect(result.current).toEqual({
+      await waitFor(() => expect(result.current).toEqual({
         id: "idle",
         joinButtonTapped: expect.any(Function)
-      })
+      }))
 
       act(() => (result.current as any).joinButtonTapped())
       await waitFor(() => expect(result.current.id).toEqual("loading"))
@@ -66,10 +83,10 @@ describe("JoinEvent tests", () => {
           permissionId: "notifications"
         })
       })
-      expect(env.joinEvent).toHaveBeenCalledWith({
+      await waitFor(() => expect(env.joinEvent).toHaveBeenCalledWith({
         ...TEST_EVENT,
         hasArrived: true
-      })
+      }))
 
       act(() => (result.current as any).requestButtonTapped())
       await waitFor(() => {
@@ -79,10 +96,10 @@ describe("JoinEvent tests", () => {
         })
       })
 
-      expect(env.onSuccess).not.toHaveBeenCalled()
+      await waitFor(() => expect(env.onSuccess).not.toHaveBeenCalled())
       act(() => (result.current as any).requestButtonTapped())
       await waitFor(() => expect(result.current).toEqual({ id: "success" }))
-      expect(env.onSuccess).toHaveBeenCalledTimes(1)
+      await waitFor(() => expect(env.onSuccess).toHaveBeenCalledTimes(1))
     })
 
     test("join event flow, skips false permissions", async () => {
@@ -130,7 +147,7 @@ describe("JoinEvent tests", () => {
       await waitFor(() => {
         expect(result.current).toEqual({ id: "success" })
       })
-      expect(env.onSuccess).toHaveBeenCalledTimes(1)
+      await waitFor(() => expect(env.onSuccess).toHaveBeenCalledTimes(1))
     })
 
     test("join event flow, dismiss permissions", async () => {
@@ -158,15 +175,15 @@ describe("JoinEvent tests", () => {
       })
 
       act(() => (result.current as any).dismissButtonTapped())
-      expect(result.current).toMatchObject({
+      await waitFor(() => expect(result.current).toMatchObject({
         id: "permission",
         permissionId: "backgroundLocation"
-      })
+      }))
 
-      expect(env.onSuccess).not.toHaveBeenCalled()
+      await waitFor(() => expect(env.onSuccess).not.toHaveBeenCalled())
       act(() => (result.current as any).dismissButtonTapped())
-      expect(result.current).toEqual({ id: "success" })
-      expect(env.onSuccess).toHaveBeenCalledTimes(1)
+      await waitFor(() => { expect(result.current).toEqual({ id: "success" }) })
+      await waitFor(() => expect(env.onSuccess).toHaveBeenCalledTimes(1))
     })
 
     test("join event flow, error alerts", async () => {
@@ -196,9 +213,11 @@ describe("JoinEvent tests", () => {
           JOIN_EVENT_ERROR_ALERTS[key].description
         )
       })
-      expect(result.current).toEqual({
-        id: "idle",
-        joinButtonTapped: expect.any(Function)
+      await waitFor(() => {
+        expect(result.current).toEqual({
+          id: "idle",
+          joinButtonTapped: expect.any(Function)
+        })
       })
     }
 

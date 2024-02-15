@@ -1,11 +1,18 @@
+import { ColorString } from "@lib/utils/Color"
+import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import { ContentText } from "./ContentText"
 import { EventHandle } from "./EventHandle"
-import { fireEvent, render, screen } from "@testing-library/react-native"
 import { UserHandle } from "./UserHandle"
-import { ColorString } from "@lib/utils/Color"
 
 describe("ContentText tests", () => {
   beforeEach(() => jest.resetAllMocks())
+
+  afterEach(async () => {
+    // resolve "Warning: An update to ForwardRef inside a test was not wrapped in act(...)."
+    await act(async () => {
+      await Promise.resolve()
+    })
+  })
 
   it("renders text without urls or profile handles normally", () => {
     const text = "Hello world this is a test"

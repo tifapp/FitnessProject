@@ -1,5 +1,7 @@
 import { NavigationContainer, useFocusEffect } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
+import "@test-helpers/Matchers"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import {
   act,
   fireEvent,
@@ -11,8 +13,6 @@ import { useCallback, useState } from "react"
 import { View } from "react-native"
 import { Button } from "react-native-elements"
 import { Password, USPhoneNumber } from ".."
-import "@test-helpers/Matchers"
-import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import {
   ForgotPasswordParamsList,
   createForgotPasswordScreens
@@ -24,6 +24,13 @@ type TestForgotPasswordParamsList = {
 
 describe("Forgot Password Navigation tests", () => {
   beforeEach(() => jest.resetAllMocks())
+
+  afterEach(async () => {
+    // resolve "Warning: An update to ForwardRef inside a test was not wrapped in act(...)."
+    await act(async () => {
+      await Promise.resolve()
+    })
+  })
 
   test("valid navigation flow", async () => {
     // Test screen to get into actual flow
@@ -37,20 +44,20 @@ describe("Forgot Password Navigation tests", () => {
     beginForgotPasswordTest()
 
     enterPhoneNumberText(testPhoneNumber)
-    expect(checkText(testPhoneNumber)).not.toBeNull()
+    await waitFor(() => expect(checkText(testPhoneNumber)).not.toBeNull())
 
     submitCredentials()
 
     await waitFor(() => expect(verifyCodeForm()).toBeDisplayed())
-    expect(credentialsForm()).not.toBeDisplayed()
+    await waitFor(() => expect(credentialsForm()).not.toBeDisplayed())
 
     enterVerificationCode("123456")
-    expect(checkText("123456")).not.toBeNull()
+    await waitFor(() => expect(checkText("123456")).not.toBeNull())
 
     submitVerificationCode()
 
     await waitFor(() => expect(resetPasswordForm()).toBeDisplayed())
-    expect(verifyCodeForm()).not.toBeDisplayed()
+    await waitFor(() => expect(verifyCodeForm()).not.toBeDisplayed())
 
     enterNewPassword("elon@musK3")
     submitNewPassword()
@@ -73,35 +80,35 @@ describe("Forgot Password Navigation tests", () => {
 
     enterPhoneNumberText(testPhoneNumber)
 
-    expect(checkText(testPhoneNumber)).not.toBeNull()
+    await waitFor(() => expect(checkText(testPhoneNumber)).not.toBeNull())
 
     submitCredentials()
 
     await waitFor(() => expect(verifyCodeForm()).toBeDisplayed())
-    expect(credentialsForm()).not.toBeDisplayed()
+    await waitFor(() => expect(credentialsForm()).not.toBeDisplayed())
 
     enterVerificationCode("123456")
-    expect(checkText("123456")).not.toBeNull()
+    await waitFor(() => expect(checkText("123456")).not.toBeNull())
 
     submitVerificationCode()
 
     await waitFor(() => expect(resetPasswordForm()).toBeDisplayed())
-    expect(verifyCodeForm()).not.toBeDisplayed()
+    await waitFor(() => expect(verifyCodeForm()).not.toBeDisplayed())
 
     enterNewPassword("elon@musK3")
 
     submitNewPassword()
 
     await waitFor(() => expect(verifyCodeForm()).toBeDisplayed())
-    expect(resetPasswordForm()).not.toBeDisplayed()
+    await waitFor(() => expect(resetPasswordForm()).not.toBeDisplayed())
 
     enterVerificationCode("543423")
-    expect(checkText("543423")).not.toBeNull()
+    await waitFor(() => expect(checkText("543423")).not.toBeNull())
 
     submitVerificationCode()
 
     await waitFor(() => expect(resetPasswordForm()).toBeDisplayed())
-    expect(verifyCodeForm()).not.toBeDisplayed()
+    await waitFor(() => expect(verifyCodeForm()).not.toBeDisplayed())
 
     submitNewPassword()
 

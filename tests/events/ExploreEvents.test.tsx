@@ -25,6 +25,13 @@ const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
 describe("ExploreEvents tests", () => {
   beforeEach(() => jest.resetAllMocks())
 
+  afterEach(async () => {
+    // resolve "Warning: An update to ForwardRef inside a test was not wrapped in act(...)."
+    await act(async () => {
+      await Promise.resolve()
+    })
+  })
+
   describe("ExploreEventsInitialCenter tests", () => {
     describe("CoordinateToInitialCenter tests", () => {
       it("should be user-location when undefined", () => {

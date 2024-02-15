@@ -1,10 +1,21 @@
-import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { captureAlerts } from "@test-helpers/Alerts"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { useForgotPasswordForm } from "./ForgotPasswordForm"
+import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { USPhoneNumber } from ".."
+import { useForgotPasswordForm } from "./ForgotPasswordForm"
+import { withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
+
 describe("Forgot Password Form tests", () => {
   beforeEach(() => jest.resetAllMocks())
+
+  afterEach(async () => {
+    // resolve "Warning: An update to ForwardRef inside a test was not wrapped in act(...)."
+    await act(async () => {
+      await Promise.resolve()
+    })
+  })
+
+  withAnimatedTimeTravelEnabled()
 
   describe("Verify Email logic tests", () => {
     const initiateForgotPassword = jest.fn()
@@ -42,7 +53,7 @@ describe("Forgot Password Form tests", () => {
       })
     })
 
-    it("can verify a phone number and send back an error for invalid phone numbers", () => {
+    it("can verify a phone number and send back an error for invalid phone numbers", async () => {
       const phoneNumber = "833412412"
       const { result } = renderForgotPassword()
 
@@ -51,10 +62,10 @@ describe("Forgot Password Form tests", () => {
       )
       act(() => result.current.forgotPasswordText.onTextChanged(phoneNumber))
 
-      expect(result.current.submission).toMatchObject({
+      await waitFor(() => expect(result.current.submission).toMatchObject({
         status: "invalid",
         error: "invalid-phone-number"
-      })
+      }))
     })
 
     it("can correctly use its logic to proceed onto the next screen after a successful verification", async () => {

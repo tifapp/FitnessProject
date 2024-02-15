@@ -1,4 +1,8 @@
 import { ReportFormView } from "@content-reporting"
+import { captureAlerts } from "@test-helpers/Alerts"
+import "@test-helpers/Matchers"
+import { neverPromise } from "@test-helpers/Promise"
+import { withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
 import {
   act,
   fireEvent,
@@ -7,13 +11,19 @@ import {
   waitFor
 } from "@testing-library/react-native"
 import React from "react"
-import { captureAlerts } from "@test-helpers/Alerts"
-import { neverPromise } from "@test-helpers/Promise"
 import { REPORTING_REASONS } from "./Models"
-import "@test-helpers/Matchers"
 
 describe("Reporting tests", () => {
   beforeEach(() => jest.resetAllMocks())
+
+  afterEach(async () => {
+    // resolve "Warning: An update to ForwardRef inside a test was not wrapped in act(...)."
+    await act(async () => {
+      await Promise.resolve()
+    })
+  })
+
+  withAnimatedTimeTravelEnabled()
 
   describe("ReportingUI tests", () => {
     describe("ReportFormView tests", () => {

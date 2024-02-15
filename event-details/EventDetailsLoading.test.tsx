@@ -20,6 +20,13 @@ describe("EventDetailsLoading tests", () => {
     jest.resetAllMocks()
   })
 
+  afterEach(async () => {
+    // resolve "Warning: An update to ForwardRef inside a test was not wrapped in act(...)."
+    await act(async () => {
+      await Promise.resolve()
+    })
+  })
+
   describe("UseLoadEventDetails tests", () => {
     const loadEvent = jest.fn()
     let testConnectionStatus = new TestInternetConnectionStatus(true)

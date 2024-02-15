@@ -1,4 +1,8 @@
+import { ArrayUtils } from "@lib/utils/Array"
+import { EventUserAttendeeStatus } from "@shared-models/Event"
 import { EventArrivalRegion } from "@shared-models/EventArrivals"
+import { clearAsyncStorageBeforeEach } from "@test-helpers/AsyncStorage"
+import { withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
 import { waitFor } from "@testing-library/react-native"
 import {
   copyEventLocationToClipboard,
@@ -6,18 +10,17 @@ import {
   isHostingEvent,
   updateEventsInArrivalsTracker
 } from "./Event"
+import { mockEventLocation } from "./MockData"
 import {
   AsyncStorageUpcomingEventArrivals,
   EventArrivalsTracker
 } from "./arrival-tracking"
-import { TestEventArrivalsGeofencer } from "./arrival-tracking/geofencing/TestGeofencer"
-import { clearAsyncStorageBeforeEach } from "@test-helpers/AsyncStorage"
-import { mockEventLocation } from "./MockData"
 import { mockEventArrival } from "./arrival-tracking/MockData"
-import { ArrayUtils } from "@lib/utils/Array"
-import { EventUserAttendeeStatus } from "@shared-models/Event"
+import { TestEventArrivalsGeofencer } from "./arrival-tracking/geofencing/TestGeofencer"
 
 describe("Event tests", () => {
+  withAnimatedTimeTravelEnabled()
+
   describe("EventCurrentUserAttendeeStatus tests", () => {
     describe("isHostingEvent tests", () => {
       it("returns true for hosting", () => {

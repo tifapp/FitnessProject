@@ -1,12 +1,22 @@
-import { Password } from "./Models"
 import { useChangePasswordForm } from "@auth/ChangePassword"
-import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { captureAlerts } from "@test-helpers/Alerts"
-import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { neverPromise } from "@test-helpers/Promise"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import { act, renderHook, waitFor } from "@testing-library/react-native"
+import { Password } from "./Models"
+import { withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
 
 describe("ChangePassword tests", () => {
   beforeEach(() => jest.resetAllMocks())
+
+  afterEach(async () => {
+    // resolve "Warning: An update to ForwardRef inside a test was not wrapped in act(...)."
+    await act(async () => {
+      await Promise.resolve()
+    })
+  })
+
+  withAnimatedTimeTravelEnabled()
 
   describe("UseChangePassword tests", () => {
     const changePassword = jest.fn()

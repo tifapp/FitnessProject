@@ -3,12 +3,12 @@ import {
   EventFormLocationBanner,
   EventFormLocationInfo
 } from "@components/eventForm"
-import { render, screen, waitFor } from "@testing-library/react-native"
+import { GeocodingFunctionsProvider } from "@location/Geocoding"
+import { baseTestPlacemark } from "@location/MockData"
 import "@test-helpers/Matchers"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { baseTestPlacemark } from "@location/MockData"
+import { act, render, screen, waitFor } from "@testing-library/react-native"
 import { baseTestEventFormValues } from "./helpers"
-import { GeocodingFunctionsProvider } from "@location/Geocoding"
 
 const testLocation = baseTestEventFormValues.locationInfo.coordinates
 const testLocationName = baseTestPlacemark.name
@@ -16,6 +16,13 @@ const testLocationAddress = "1234 Cupertino Rd, Cupertino, CA 95104"
 
 describe("EventFormLocationBanner tests", () => {
   beforeEach(() => jest.resetAllMocks())
+
+  afterEach(async () => {
+    // resolve "Warning: An update to ForwardRef inside a test was not wrapped in act(...)."
+    await act(async () => {
+      await Promise.resolve()
+    })
+  })
 
   it("should not attempt to geocode when no location is given", () => {
     renderLocationField()
