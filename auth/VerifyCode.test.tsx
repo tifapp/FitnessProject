@@ -1,53 +1,33 @@
+import { renderHook, waitFor } from "@testing-library/react-native"
+import { act } from "react-test-renderer"
 import { captureAlerts } from "@test-helpers/Alerts"
 import { neverPromise } from "@test-helpers/Promise"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
-import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { useAuthVerificationCodeForm } from "./VerifyCode"
 
 describe("VerifyCode tests", () => {
   beforeEach(() => jest.resetAllMocks())
 
-  afterEach(async () => {
-    // resolve "Warning: An update to ForwardRef inside a test was not wrapped in act(...)."
-    await act(async () => {
-      await Promise.resolve()
-    })
-  })
-  withAnimatedTimeTravelEnabled()
   describe("useAuthVerificationCodeForm tests", () => {
-    beforeEach(() => jest.resetAllMocks())
-
-    afterEach(async () => {
-      // resolve "Warning: An update to ForwardRef inside a test was not wrapped in act(...)."
-      await act(async () => {
-        await Promise.resolve()
-      })
-    })
-    withAnimatedTimeTravelEnabled()
-    it("should be in an invalid state when code is less than 6 digits", async () => {
+    it("should be in an invalid state when code is less than 6 digits", () => {
       const { result } = renderUseAuthVerificationCodeForm()
 
       act(() => result.current.onCodeChanged(""))
 
-      await waitFor(() => {
-        expect(result.current.submission).toMatchObject({
-          status: "invalid",
-          reason: "code-too-short"
-        })
+      expect(result.current.submission).toMatchObject({
+        status: "invalid",
+        reason: "code-too-short"
       })
     })
 
-    it("should be in an invalid state when code is longer than 6 digits", async () => {
+    it("should be in an invalid state when code is longer than 6 digits", () => {
       const { result } = renderUseAuthVerificationCodeForm()
 
       act(() => result.current.onCodeChanged("1234567"))
 
-      await waitFor(() => {
-        expect(result.current.submission).toMatchObject({
-          status: "invalid",
-          reason: "code-too-long"
-        })
+      expect(result.current.submission).toMatchObject({
+        status: "invalid",
+        reason: "code-too-long"
       })
     })
 
@@ -57,7 +37,6 @@ describe("VerifyCode tests", () => {
       const { result } = renderUseAuthVerificationCodeForm()
 
       act(() => result.current.onCodeResent())
-
       await waitFor(() => {
         expect(result.current.resendCodeStatus).toEqual("success")
       })
@@ -134,11 +113,9 @@ describe("VerifyCode tests", () => {
       })
 
       act(() => result.current.onCodeChanged(invalidCode))
-      await waitFor(() => {
-        expect(result.current.submission).toMatchObject({
-          status: "invalid",
-          reason: "invalid-code"
-        })
+      expect(result.current.submission).toMatchObject({
+        status: "invalid",
+        reason: "invalid-code"
       })
     })
 
@@ -162,19 +139,15 @@ describe("VerifyCode tests", () => {
       })
 
       act(() => result.current.onCodeChanged(invalidCode))
-      await waitFor(() => {
-        expect(result.current.submission).toMatchObject({
-          status: "invalid",
-          reason: "invalid-code"
-        })
+      expect(result.current.submission).toMatchObject({
+        status: "invalid",
+        reason: "invalid-code"
       })
 
       act(() => result.current.onCodeChanged(invalidCode2))
-      await waitFor(() => {
-        expect(result.current.submission).toMatchObject({
-          status: "invalid",
-          reason: "invalid-code"
-        })
+      expect(result.current.submission).toMatchObject({
+        status: "invalid",
+        reason: "invalid-code"
       })
     })
 

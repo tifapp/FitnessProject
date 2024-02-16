@@ -17,13 +17,6 @@ const testLocationAddress = "1234 Cupertino Rd, Cupertino, CA 95104"
 describe("EventFormLocationBanner tests", () => {
   beforeEach(() => jest.resetAllMocks())
 
-  afterEach(async () => {
-    // resolve "Warning: An update to ForwardRef inside a test was not wrapped in act(...)."
-    await act(async () => {
-      await Promise.resolve()
-    })
-  })
-
   it("should not attempt to geocode when no location is given", () => {
     renderLocationField()
     expect(reverseGeocode).not.toHaveBeenCalled()

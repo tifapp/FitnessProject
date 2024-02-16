@@ -1,18 +1,11 @@
-import { SearchBar } from "@components/SearchBar"
-import "@test-helpers/Matchers"
-import { act, fireEvent, render, screen } from "@testing-library/react-native"
+import { fireEvent, render, screen } from "@testing-library/react-native"
 import React, { useState } from "react"
 import { View } from "react-native"
+import { SearchBar } from "@components/SearchBar"
+import "@test-helpers/Matchers"
 
 describe("SearchBar tests", () => {
   beforeEach(() => jest.resetAllMocks())
-
-  afterEach(async () => {
-    // resolve "Warning: An update to ForwardRef inside a test was not wrapped in act(...)."
-    await act(async () => {
-      await Promise.resolve()
-    })
-  })
 
   test("basic searching", () => {
     renderSearchBar()

@@ -27,13 +27,6 @@ import { LocationSearchResult, LocationsSearchQuery } from "./Models"
 describe("LocationSearch tests", () => {
   beforeEach(() => jest.resetAllMocks())
 
-  afterEach(async () => {
-    // resolve "Warning: An update to ForwardRef inside a test was not wrapped in act(...)."
-    await act(async () => {
-      await Promise.resolve()
-    })
-  })
-
   describe("LocationsSearchQuery tests", () => {
     test("sourceType", () => {
       expect(LocationsSearchQuery.empty.sourceType).toEqual("user-recents")
@@ -45,13 +38,6 @@ describe("LocationSearch tests", () => {
 
   describe("LocationSearchUI tests", () => {
     beforeEach(() => jest.resetAllMocks())
-
-    afterEach(async () => {
-    // resolve "Warning: An update to ForwardRef inside a test was not wrapped in act(...)."
-      await act(async () => {
-        await Promise.resolve()
-      })
-    })
 
     describe("SearchBar tests", () => {
       it("allows for backwards navigation", () => {
