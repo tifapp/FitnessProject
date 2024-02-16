@@ -2,7 +2,7 @@
 import { HttpResponse, http } from "msw"
 import { z } from "zod"
 import { neverPromise } from "../test-helpers/Promise"
-import { mswServer } from "../test-helpers/msw"
+import { noContentResponse, mswServer } from "../test-helpers/msw"
 import { createTiFAPIFetch } from "./client"
 
 const TEST_BASE_URL = new URL("http://localhost:8080")
@@ -13,6 +13,12 @@ const apiFetch = createTiFAPIFetch(
   TEST_BASE_URL,
   jest.fn().mockResolvedValue(TEST_JWT)
 )
+
+const successResponse = () => HttpResponse.json({ a: 1 })
+
+const badResponse = (status: number) => {
+  return HttpResponse.json({ b: "bad" }, { status })
+}
 
 const TestResponseSchema = {
   status400: z.object({ b: z.string() }),
@@ -25,12 +31,7 @@ describe("CreateAPIFetch tests", () => {
       http.post("http://localhost:8080/test", async ({ request }) => {
         // TODO: Use helper method for creating httpresponses
         // https://mswjs.io/docs/migrations/1.x-to-2.x#response-declaration
-        const errorResp = new HttpResponse(JSON.stringify({ b: "bad request" }), {
-          status: 400,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
+        const errorResp = badResponse(400) as any
         const body: any = await request.json()
         const searchParams = new URL(request.url).searchParams
 
@@ -47,75 +48,37 @@ describe("CreateAPIFetch tests", () => {
         if (body?.a !== 1 || body?.b !== "hello") {
           return errorResp
         }
-        return new HttpResponse(JSON.stringify({ a: 1 }), {
-          status: 200,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
+        return successResponse()
       }),
       http.get("http://localhost:8080/test2", async ({ request }) => {
         try {
           await request.json()
-          return new HttpResponse(JSON.stringify({ b: "bad" }), {
-            status: 500,
-            headers: {
-              "Content-Type": "application/json"
-            }
-          })
+          return badResponse(400) as any
         } catch {
-          return new HttpResponse(JSON.stringify({ a: 1 }), {
-            status: 200,
-            headers: {
-              "Content-Type": "application/json"
-            }
-          })
+          return successResponse()
         }
       }),
       http.get("http://localhost:8080/test3", async () => {
-        return new HttpResponse(JSON.stringify({ b: "bad" }), {
-          status: 500,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
+        return badResponse(500)
       }),
       http.get("http://localhost:8080/test4", async () => {
-        return new HttpResponse("LMAO", {
-          status: 200
-        })
+        return new HttpResponse("LMAO", { status: 200 })
       }),
       http.get("http://localhost:8080/test5", async () => {
-        return new HttpResponse(JSON.stringify({ b: "bad" }), {
-          status: 200,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
+        return badResponse(200)
       }),
       http.get("http://localhost:8080/test6", async () => {
-        return new HttpResponse(null, {
-          status: 204
-        })
+        return noContentResponse()
       }),
       http.get("http://localhost:8080/test7", async () => {
         await neverPromise()
-        return new HttpResponse(null, {
-          status: 500
-        })
+        return new HttpResponse(null, { status: 500 })
       }),
       http.get("http://localhost:8080/test8", async ({ request }) => {
         if (new URLSearchParams(request.url).has("hello")) {
-          return new HttpResponse(null, {
-            status: 500
-          })
+          return new HttpResponse(null, { status: 500 })
         }
-        return new HttpResponse(JSON.stringify({ a: 1 }), {
-          status: 200,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
+        return successResponse()
       })
     )
   })

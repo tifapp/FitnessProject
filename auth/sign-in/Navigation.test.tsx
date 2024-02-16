@@ -8,7 +8,6 @@ import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import "@test-helpers/Matchers"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import {
-  act,
   fireEvent,
   render,
   screen,

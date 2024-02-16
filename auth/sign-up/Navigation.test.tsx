@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { TiFAPI, createTiFAPIFetch } from "@api-client"
+import { TiFAPI } from "@api-client"
 import { UserHandle } from "@content-parsing"
 import { uuidString } from "@lib/utils/UUID"
 import {
@@ -40,38 +40,21 @@ describe("SignUpNavigation tests", () => {
   }
   const env = createSignUpEnvironment(
     cognito,
-    new TiFAPI(
-      createTiFAPIFetch(
-        new URL("https://localhost:8080"),
-        async () => "I am a jwt"
-      )
-    )
+    TiFAPI.testAuthenticatedInstance
   )
 
   beforeEach(() => {
     jest.resetAllMocks()
     mswServer.use(
       http.post("https://localhost:8080/user", async () => {
-        return new HttpResponse(JSON.stringify({
+        return HttpResponse.json({
           id: uuidString(),
           handle: TEST_GENERATED_USER_HANDLE.rawValue
-        }), {
-          status: 201,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
+        }, { status: 201 })
       }),
       http.get(
         "https://localhost:8080/user/autocomplete",
-        async () => {
-          return new HttpResponse(JSON.stringify({ users: [] }), {
-            status: 200,
-            headers: {
-              "Content-Type": "application/json"
-            }
-          })
-        }
+        async () => HttpResponse.json({ users: [] })
       )
     )
   })

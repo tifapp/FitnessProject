@@ -13,7 +13,6 @@ import {
   createTestQueryClient
 } from "@test-helpers/ReactQuery"
 import {
-  act,
   fireEvent,
   render,
   screen,
