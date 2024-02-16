@@ -34,17 +34,21 @@ import { setupCognito } from "./auth"
 import { registerForPushNotifications } from "./notifications"
 import awsconfig from "./src/aws-exports"
 
-enableSentry()
-setupCognito()
-Geo.configure(awsconfig)
-const log = createLogFunction("app.root")
-addLogHandler(sentryBreadcrumbLogHandler())
-addLogHandler(sentryErrorCapturingLogHandler())
-
-log("info", "App launched", { date: new Date() })
-
-ExpoEventArrivalsGeofencer.shared.defineTask()
-addPushTokenListener(registerForPushNotifications)
+/**
+ * Performs all the necessary setup (starting background tasks, configuration,
+ * etc.) for the app that does not have to do directly with the UI.
+ */
+export const setupApp = () => {
+  const log = createLogFunction("app.root")
+  enableSentry()
+  addLogHandler(sentryBreadcrumbLogHandler())
+  addLogHandler(sentryErrorCapturingLogHandler())
+  log("info", "App launched", { date: new Date() })
+  setupCognito()
+  Geo.configure(awsconfig)
+  ExpoEventArrivalsGeofencer.shared.defineTask()
+  addPushTokenListener(registerForPushNotifications)
+}
 
 export type AppProps = {
   isFontsLoaded: boolean
