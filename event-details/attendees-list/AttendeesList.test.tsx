@@ -3,14 +3,8 @@ import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { EventAttendeesPage, useAttendeesList } from "./AttendeesList"
 
-describe("Attendees List tests", () => {
+describe("AttendeesList tests", () => {
   beforeEach(() => jest.resetAllMocks())
-  afterEach(async () => {
-    // resolve "Jest did not exit one second after the test run has completed." warning
-    await act(async () => {
-      await Promise.resolve()
-    })
-  })
 
   const fetchNextAttendeesPage = jest.fn()
 

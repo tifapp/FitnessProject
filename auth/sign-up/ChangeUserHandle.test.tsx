@@ -2,7 +2,7 @@ import { UserHandle } from "@content-parsing"
 import { captureAlerts } from "@test-helpers/Alerts"
 import { neverPromise } from "@test-helpers/Promise"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { timeTravel, withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
+import { timeTravel, fakeTimers } from "@test-helpers/Timers"
 import { renderHook, waitFor } from "@testing-library/react-native"
 import { act } from "react-test-renderer"
 import { useSignUpChangeUserHandleForm } from "./ChangeUserHandle"
@@ -11,7 +11,7 @@ describe("SignUpChangeUserHandle tests", () => {
   beforeEach(() => jest.resetAllMocks())
 
   describe("useSignUpChangeUserHandle tests", () => {
-    withAnimatedTimeTravelEnabled()
+    fakeTimers()
 
     it("should debounce when looking up a new user handle", async () => {
       checkIfUserHandleTaken.mockResolvedValueOnce(true)

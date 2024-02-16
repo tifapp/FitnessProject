@@ -7,7 +7,7 @@ import { uuidString } from "@lib/utils/UUID"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
+import { fakeTimers } from "@test-helpers/Timers"
 import { mswServer } from "@test-helpers/msw"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import dayjs from "dayjs"
@@ -234,7 +234,7 @@ describe("EventDetailsLoading tests", () => {
   })
 
   describe("LoadEventDetails tests", () => {
-    withAnimatedTimeTravelEnabled()
+    fakeTimers()
 
     it("should return \"canceled\" when a 204 occurs", async () => {
       setEventResponse(204)

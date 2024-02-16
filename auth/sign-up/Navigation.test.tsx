@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { TiFAPI, createTiFAPIFetch } from "@api-client"
 import { UserHandle } from "@content-parsing"
 import { uuidString } from "@lib/utils/UUID"
@@ -10,7 +11,6 @@ import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { captureAlerts } from "@test-helpers/Alerts"
 import "@test-helpers/Matchers"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
 import { mswServer } from "@test-helpers/msw"
 import {
   act,
@@ -47,8 +47,6 @@ describe("SignUpNavigation tests", () => {
       )
     )
   )
-
-  withAnimatedTimeTravelEnabled()
 
   beforeEach(() => {
     jest.resetAllMocks()
@@ -180,11 +178,17 @@ describe("SignUpNavigation tests", () => {
     return render(
       <TestQueryClientProvider>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="test">
+          <Stack.Navigator
+            initialRouteName="test"
+            screenOptions={{ animationEnabled: false }}
+          >
             <Stack.Screen name="test" component={TestScreen} />
             <Stack.Screen name="signUp">
               {() => (
-                <ModalStack.Navigator initialRouteName="signUpCredentialsForm">
+                <ModalStack.Navigator
+                  initialRouteName="signUpCredentialsForm"
+                  screenOptions={{ animationEnabled: false }}
+                >
                   {signUpScreens}
                 </ModalStack.Navigator>
               )}

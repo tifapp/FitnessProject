@@ -1,5 +1,5 @@
 // https://docs.swmansion.com/react-native-reanimated/docs/guides/testing/
-import { frameTime } from "@test-helpers/FakeTimeInterval"
+import { TEST_FRAME_TIME } from "@test-helpers/FakeTimeInterval"
 import { setUpTests } from "react-native-reanimated"
 
 setUpTests()
@@ -15,5 +15,5 @@ global.requestAnimationFrame = (cb) => {
   // if the number gets too large.
   //
   // Setting the timeout simulates a frame every 1/100th of a second
-  setTimeout(cb, frameTime)
+  setTimeout(cb, TEST_FRAME_TIME)
 }

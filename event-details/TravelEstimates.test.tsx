@@ -4,31 +4,22 @@ import {
   mockLocationCoordinate2D
 } from "@location/MockData"
 import { UserLocationFunctionsProvider } from "@location/UserLocation"
-import { EXPO_LOCATION_ERRORS, LocationCoordinate2D } from "@shared-models/Location"
-import { setPlatform } from "@test-helpers/Platform"
 import {
-  TestQueryClientProvider,
-  createTestQueryClient
-} from "@test-helpers/ReactQuery"
-import { act, renderHook, waitFor } from "@testing-library/react-native"
+  EXPO_LOCATION_ERRORS,
+  LocationCoordinate2D
+} from "@shared-models/Location"
+import { setPlatform } from "@test-helpers/Platform"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import { renderHook, waitFor } from "@testing-library/react-native"
 import { CodedError } from "expo-modules-core"
-import { formattedTravelEstimateResult, useEventTravelEstimates } from "./TravelEstimates"
+import {
+  formattedTravelEstimateResult,
+  useEventTravelEstimates
+} from "./TravelEstimates"
 
 describe("EventTravelEstimates tests", () => {
   describe("UseEventTravelEstimates tests", () => {
-    const queryClient = createTestQueryClient()
-
-    beforeEach(() => {
-      jest.resetAllMocks()
-      queryClient.clear()
-    })
-
-    afterEach(async () => {
-      // resolve "Jest did not exit one second after the test run has completed." warning
-      await act(async () => {
-        await Promise.resolve()
-      })
-    })
+    beforeEach(() => jest.resetAllMocks())
 
     const loadTravelEstimates = jest.fn()
     const loadUserLocation = jest.fn()
@@ -58,7 +49,7 @@ describe("EventTravelEstimates tests", () => {
               requestBackgroundPermissions={jest.fn()}
               requestForegroundPermissions={jest.fn()}
             >
-              <TestQueryClientProvider client={queryClient}>
+              <TestQueryClientProvider>
                 {children}
               </TestQueryClientProvider>
             </UserLocationFunctionsProvider>

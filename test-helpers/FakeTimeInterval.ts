@@ -4,4 +4,4 @@
 // if the number gets too large.
 // https://stackoverflow.com/questions/42268673/jest-test-animated-view-for-react-native-app/51067606#51067606
 
-export const frameTime = 30
+export const TEST_FRAME_TIME = 30

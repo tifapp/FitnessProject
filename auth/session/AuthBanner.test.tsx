@@ -5,9 +5,12 @@ import "@test-helpers/Matchers"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { IfAuthenticated } from "./AuthBanner"
 import { UserSessionContextProvider } from "./UserSessionContext"
+import { fakeTimers } from "@test-helpers/Timers"
 
 describe("AuthBanner tests", () => {
   beforeEach(() => jest.resetAllMocks())
+  fakeTimers()
+
   test("AuthBanner replaces screen, if the user is not authenticated", async () => {
     renderTestScreen(jest.fn().mockResolvedValueOnce(false))
     await waitFor(() => expect(elseComponent()).toBeDisplayed())

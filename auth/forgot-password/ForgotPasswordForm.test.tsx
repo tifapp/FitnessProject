@@ -1,20 +1,14 @@
 import { captureAlerts } from "@test-helpers/Alerts"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
+import { fakeTimers } from "@test-helpers/Timers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { USPhoneNumber } from ".."
 import { useForgotPasswordForm } from "./ForgotPasswordForm"
-describe("Forgot Password Form tests", () => {
+
+describe("ForgotPasswordForm tests", () => {
   beforeEach(() => jest.resetAllMocks())
 
-  afterEach(async () => {
-    // resolve "Warning: An update to ForwardRef inside a test was not wrapped in act(...)."
-    await act(async () => {
-      await Promise.resolve()
-    })
-  })
-
-  withAnimatedTimeTravelEnabled()
+  fakeTimers()
 
   describe("Verify Email logic tests", () => {
     const initiateForgotPassword = jest.fn()

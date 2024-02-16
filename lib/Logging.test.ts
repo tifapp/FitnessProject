@@ -9,10 +9,10 @@ import {
   sentryErrorCapturingLogHandler
 } from "@lib/Logging"
 import { TestFilesystem } from "@test-helpers/Filesystem"
-import { withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
+import { fakeTimers } from "@test-helpers/Timers"
 
 describe("Logging tests", () => {
-  withAnimatedTimeTravelEnabled()
+  fakeTimers()
   afterEach(() => resetLogHandlers())
 
   describe("RotatingFilesystemLogs tests", () => {

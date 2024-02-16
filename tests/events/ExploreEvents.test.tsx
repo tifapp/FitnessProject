@@ -17,7 +17,7 @@ import {
   TestQueryClientProvider,
   createTestQueryClient
 } from "@test-helpers/ReactQuery"
-import { timeTravel, withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
+import { timeTravel, fakeTimers } from "@test-helpers/Timers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 
 const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
@@ -46,7 +46,7 @@ describe("ExploreEvents tests", () => {
   describe("useExploreEvents tests", () => {
     const queryClient = createTestQueryClient()
     beforeEach(() => queryClient.clear())
-    withAnimatedTimeTravelEnabled()
+    fakeTimers()
 
     test("exploring events successfully at user location", async () => {
       const userLocation = mockExpoLocationObject()
