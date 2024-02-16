@@ -129,7 +129,6 @@
   "devDependencies": {
     "@aws-amplify/cli": "^10.8.1",
     "@babel/core": "^7.20.0",
-    "@esbuild/darwin-arm64": "^0.20.0",
     "@faker-js/faker": "^7.6.0",
     "@react-native-community/slider": "4.4.2",
     "@storybook/addon-actions": "^6.5.14",
