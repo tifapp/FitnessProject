@@ -176,6 +176,3 @@ export namespace EventMocks {
   } as CurrentUserEvent
 }
 
-const func = () => {
-  const helloWorldThisIsAReallyLongName = { hello: "This is a really long object name", num: 420_000 } 
-}
