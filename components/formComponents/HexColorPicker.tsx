@@ -9,7 +9,6 @@ import {
   View,
   ViewStyle
 } from "react-native"
-// import { useHaptics } from "@lib/Haptics"
 
 export type HexColorPickerOption<T extends HexColor = HexColor> = {
   color: T
