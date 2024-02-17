@@ -182,7 +182,7 @@ const circularStyles = StyleSheet.create({
 })
 
 export type RoundedIoniconProps = CircularIoniconProps & {
-  borderRadius: number,
+  borderRadius: number
   size?: number
 }
 

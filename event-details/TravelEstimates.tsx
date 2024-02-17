@@ -1,6 +1,9 @@
 import { QueryHookOptions } from "@lib/ReactQuery"
 import { useUserCoordinatesQuery } from "@location/UserLocation"
-import { EXPO_LOCATION_ERRORS, LocationCoordinate2D } from "@shared-models/Location"
+import {
+  EXPO_LOCATION_ERRORS,
+  LocationCoordinate2D
+} from "@shared-models/Location"
 import { useQuery } from "@tanstack/react-query"
 import { LocationAccuracy } from "expo-location"
 import {
@@ -94,9 +97,7 @@ export const formattedTravelEstimateResult = (
   }
 }
 
-const compactFormatTravelEstimateDuration = (
-  duration: duration.Duration
-) => {
+const compactFormatTravelEstimateDuration = (duration: duration.Duration) => {
   if (duration.asMinutes() < 1) {
     return undefined
   } else if (duration.asMinutes() >= 1 && duration.asHours() < 1) {
@@ -199,8 +200,9 @@ export const EventTravelEstimatesView = ({
   result,
   style
 }: EventTravelEstimatesProps) => {
-  const [overlayLayout, setOverlayLayout] =
-    useState<LayoutRectangle | undefined>(undefined)
+  const [overlayLayout, setOverlayLayout] = useState<
+    LayoutRectangle | undefined
+  >(undefined)
   return (
     <View style={[style]}>
       {result.status === "disabled" && (
@@ -219,7 +221,8 @@ export const EventTravelEstimatesView = ({
       )}
       {result.status === "error" && (
         <NoticeLabel style={styles.noticeLabel}>
-          An unexpected error has occurred. Please check back later to get a precise ETA.
+          An unexpected error has occurred. Please check back later to get a
+          precise ETA.
         </NoticeLabel>
       )}
       <Animated.View
@@ -259,7 +262,9 @@ export const EventTravelEstimatesView = ({
               ]}
             >
               <Marker coordinate={location.coordinate}>
-                <AvatarMapMarkerView imageURL={host.profileImageURL ?? undefined} />
+                <AvatarMapMarkerView
+                  imageURL={host.profileImageURL ?? undefined}
+                />
               </Marker>
             </MapView>
           </Animated.View>
@@ -311,10 +316,7 @@ const NoticeLabel = ({ children, style }: NoticeLabelProps) => (
   <Animated.View entering={FadeIn.duration(300)}>
     <View style={style}>
       <View style={styles.noticeLabelContainer}>
-        <Ionicon
-          name="alert-circle"
-          accessibilityLabel="Notice"
-        />
+        <Ionicon name="alert-circle" accessibilityLabel="Notice" />
         <BodyText style={styles.noticeLabelText}>{children}</BodyText>
       </View>
     </View>
@@ -327,7 +329,8 @@ const SettingsText = () => (
     suppressHighlighting
     style={styles.settingsButton}
   >
-    {" "}Settings{" "}
+    {" "}
+    Settings{" "}
   </BodyText>
 )
 
@@ -338,7 +341,12 @@ type TravelTypeButtonProps = {
   style?: StyleProp<ViewStyle>
 }
 
-const TravelTypeButton = ({ travelKey, location, result, style }: TravelTypeButtonProps) => {
+const TravelTypeButton = ({
+  travelKey,
+  location,
+  result,
+  style
+}: TravelTypeButtonProps) => {
   const formattedEstimate = formattedTravelEstimateResult(result, travelKey)
   const fontscale = useFontScale({
     maximumScaleFactor: FontScaleFactors.xxxLarge
@@ -363,42 +371,37 @@ const TravelTypeButton = ({ travelKey, location, result, style }: TravelTypeButt
           backgroundColor={AppStyles.eventCardColor}
           accessibilityLabel={TRAVEL_KEYS_INFO[travelKey].accessibilityLabel}
         />
-        {result.status !== "loading"
-          ? (
-            result.status !== "unsupported" && (
-              <Animated.View
-                style={{ height: 40 * fontscale }}
-                entering={FadeIn.duration(300)}
-              >
-                {formattedEstimate
-                  ? (
-                    <View style={styles.travelTypeButtonText}>
-                      <CaptionTitle
-                        maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
-                        style={styles.travelEstimateText}
-                      >
-                        {formattedEstimate.travelTime}
-                      </CaptionTitle>
-                      <Caption
-                        maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
-                        style={styles.travelEstimateText}
-                      >
-                        {formattedEstimate.travelDistance}
-                      </Caption>
-                    </View>
-                  )
-                  : (
-                    <Headline maxFontSizeMultiplier={FontScaleFactors.xxxLarge}>
-                      -
-                    </Headline>
-                  )
-                }
-              </Animated.View>
-            )
+        {result.status !== "loading" ? (
+          result.status !== "unsupported" && (
+            <Animated.View
+              style={{ height: 40 * fontscale }}
+              entering={FadeIn.duration(300)}
+            >
+              {formattedEstimate ? (
+                <View style={styles.travelTypeButtonText}>
+                  <CaptionTitle
+                    maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
+                    style={styles.travelEstimateText}
+                  >
+                    {formattedEstimate.travelTime}
+                  </CaptionTitle>
+                  <Caption
+                    maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
+                    style={styles.travelEstimateText}
+                  >
+                    {formattedEstimate.travelDistance}
+                  </Caption>
+                </View>
+              ) : (
+                <Headline maxFontSizeMultiplier={FontScaleFactors.xxxLarge}>
+                  -
+                </Headline>
+              )}
+            </Animated.View>
           )
-          : (
-            <View style={{ height: 40 * fontscale }} />
-          )}
+        ) : (
+          <View style={{ height: 40 * fontscale }} />
+        )}
       </View>
     </TouchableOpacity>
   )

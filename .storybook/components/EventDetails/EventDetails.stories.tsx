@@ -72,10 +72,6 @@ const Test = () => {
   )
   console.log(result)
   return (
-    <EventTravelEstimatesView 
-      host={host} 
-      location={location} 
-      result={result} 
-    />
+    <EventTravelEstimatesView host={host} location={location} result={result} />
   )
 }
