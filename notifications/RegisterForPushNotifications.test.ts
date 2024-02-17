@@ -18,12 +18,7 @@ describe("RegisterForPushNotifications tests", () => {
       { request }: {request: StrictRequest<DefaultBodyType>}
     ) => {
       expect(await request.json()).toEqual(expectedRequest)
-      return new HttpResponse(JSON.stringify({ status: "inserted" }), {
-        status: 201,
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
+      return HttpResponse.json({ status: "inserted" }, { status: 201 })
     }
   }
 

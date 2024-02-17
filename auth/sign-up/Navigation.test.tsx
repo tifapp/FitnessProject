@@ -1,4 +1,5 @@
-import { TiFAPI, createTiFAPIFetch } from "@api-client"
+/* eslint-disable @typescript-eslint/naming-convention */
+import { TiFAPI } from "@api-client"
 import { UserHandle } from "@content-parsing"
 import { uuidString } from "@lib/utils/UUID"
 import {
@@ -10,7 +11,6 @@ import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { captureAlerts } from "@test-helpers/Alerts"
 import "@test-helpers/Matchers"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
 import { mswServer } from "@test-helpers/msw"
 import {
   act,
@@ -40,40 +40,21 @@ describe("SignUpNavigation tests", () => {
   }
   const env = createSignUpEnvironment(
     cognito,
-    new TiFAPI(
-      createTiFAPIFetch(
-        new URL("https://localhost:8080"),
-        async () => "I am a jwt"
-      )
-    )
+    TiFAPI.testAuthenticatedInstance
   )
-
-  withAnimatedTimeTravelEnabled()
 
   beforeEach(() => {
     jest.resetAllMocks()
     mswServer.use(
       http.post("https://localhost:8080/user", async () => {
-        return new HttpResponse(JSON.stringify({
+        return HttpResponse.json({
           id: uuidString(),
           handle: TEST_GENERATED_USER_HANDLE.rawValue
-        }), {
-          status: 201,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
+        }, { status: 201 })
       }),
       http.get(
         "https://localhost:8080/user/autocomplete",
-        async () => {
-          return new HttpResponse(JSON.stringify({ users: [] }), {
-            status: 200,
-            headers: {
-              "Content-Type": "application/json"
-            }
-          })
-        }
+        async () => HttpResponse.json({ users: [] })
       )
     )
   })
@@ -180,11 +161,17 @@ describe("SignUpNavigation tests", () => {
     return render(
       <TestQueryClientProvider>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="test">
+          <Stack.Navigator
+            initialRouteName="test"
+            screenOptions={{ animationEnabled: false }}
+          >
             <Stack.Screen name="test" component={TestScreen} />
             <Stack.Screen name="signUp">
               {() => (
-                <ModalStack.Navigator initialRouteName="signUpCredentialsForm">
+                <ModalStack.Navigator
+                  initialRouteName="signUpCredentialsForm"
+                  screenOptions={{ animationEnabled: false }}
+                >
                   {signUpScreens}
                 </ModalStack.Navigator>
               )}

@@ -130,7 +130,7 @@ const renderForgotPasswordNavigation = () => {
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName="test"
-          screenOptions={{ headerShown: false }}
+          screenOptions={{ animationEnabled: false }}
         >
           <Stack.Screen name="test" component={TestScreen} />
           {signUpScreens}

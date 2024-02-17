@@ -2,7 +2,7 @@ import { mockLocationCoordinate2D } from "@location/MockData"
 import { LocationCoordinate2D } from "@shared-models/Location"
 import { clearAsyncStorageBeforeEach } from "@test-helpers/AsyncStorage"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
-import { withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
+import { fakeTimers } from "@test-helpers/Timers"
 import { waitFor } from "@testing-library/react-native"
 import { mockEventArrival, mockEventRegion } from "../MockData"
 import { arrivalRegion } from "../Models"
@@ -45,7 +45,7 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
       createForegroundMonitor()
     )
   })
-  withAnimatedTimeTravelEnabled()
+  fakeTimers()
 
   it("should indicate not arrived when no regions monitored", () => {
     expect(monitor.hasArrivedAtRegion(mockEventRegion())).toEqual(false)

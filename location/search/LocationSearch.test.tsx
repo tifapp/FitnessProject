@@ -3,7 +3,7 @@ import { mockExpoLocationObject } from "@location/MockData"
 import "@test-helpers/Matchers"
 import { neverPromise } from "@test-helpers/Promise"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { timeTravel, withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
+import { timeTravel, fakeTimers } from "@test-helpers/Timers"
 import {
   act,
   fireEvent,
@@ -93,7 +93,7 @@ describe("LocationSearch tests", () => {
     })
 
     describe("Picker tests", () => {
-      withAnimatedTimeTravelEnabled()
+      fakeTimers()
 
       test("loading results at the user's location", async () => {
         const userLocation = mockExpoLocationObject()

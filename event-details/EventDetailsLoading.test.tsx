@@ -7,8 +7,8 @@ import { uuidString } from "@lib/utils/UUID"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
-import { mswServer } from "@test-helpers/msw"
+import { fakeTimers } from "@test-helpers/Timers"
+import { noContentResponse, mswServer } from "@test-helpers/msw"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import dayjs from "dayjs"
 import { HttpResponse, http } from "msw"
@@ -234,7 +234,7 @@ describe("EventDetailsLoading tests", () => {
   })
 
   describe("LoadEventDetails tests", () => {
-    withAnimatedTimeTravelEnabled()
+    fakeTimers()
 
     it("should return \"canceled\" when a 204 occurs", async () => {
       setEventResponse(204)
@@ -341,22 +341,15 @@ describe("EventDetailsLoading tests", () => {
     })
 
     const setEventResponse = (
-      statusCode: 200 | 204 | 404 | 403,
+      status: 200 | 204 | 404 | 403,
       body?: object
     ) => {
       mswServer.use(
-        http.get(TiFAPI.testPath("/event/details/:id"), async ({ request }) => {
-          if (statusCode === 204) {
-            return new HttpResponse(null, {
-              status: 204
-            })
+        http.get(TiFAPI.testPath("/event/details/:id"), async () => {
+          if (status === 204) {
+            return noContentResponse()
           }
-          return new HttpResponse(JSON.stringify(body), {
-            status: statusCode,
-            headers: {
-              "Content-Type": "application/json"
-            }
-          })
+          return HttpResponse.json(body, { status })
         })
       )
     }

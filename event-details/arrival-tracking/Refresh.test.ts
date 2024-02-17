@@ -1,10 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
+import { fakeTimers } from "@test-helpers/Timers"
 import { EventArrivalsLastRefreshDate, EventArrivalsRefresher } from "./Refresh"
 
 describe("EventArrivalsRefresher tests", () => {
   let lastRefreshDate = new EventArrivalsLastRefreshDate()
-  withAnimatedTimeTravelEnabled()
+  fakeTimers()
   beforeEach(async () => {
     lastRefreshDate = new EventArrivalsLastRefreshDate()
     await AsyncStorage.clear()

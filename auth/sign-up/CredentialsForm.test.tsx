@@ -1,13 +1,13 @@
 import { captureAlerts } from "@test-helpers/Alerts"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
+import { fakeTimers } from "@test-helpers/Timers"
 import { renderHook, waitFor } from "@testing-library/react-native"
 import { act } from "react-test-renderer"
 import { useSignUpCredentialsForm } from "./CredentialsForm"
 
 describe("SignUpCredentialsForm tests", () => {
   describe("useSignUpCredentialsForm tests", () => {
-    withAnimatedTimeTravelEnabled()
+    fakeTimers()
 
     it("should not be sumbittable when any field is empty", () => {
       const { result } = renderUseSignUpCredentialsForm()

@@ -3,14 +3,8 @@ import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { EventAttendeesPage, useAttendeesList } from "./AttendeesList"
 
-describe("Attendees List tests", () => {
+describe("AttendeesList tests", () => {
   beforeEach(() => jest.resetAllMocks())
-  afterEach(async () => {
-    // resolve "Jest did not exit one second after the test run has completed." warning
-    await act(async () => {
-      await Promise.resolve()
-    })
-  })
 
   const fetchNextAttendeesPage = jest.fn()
 
@@ -81,7 +75,7 @@ describe("Attendees List tests", () => {
 
       expect(fetchNextAttendeesPage).toHaveBeenNthCalledWith(2, 11, 15, "2")
       expect(fetchNextAttendeesPage).toHaveBeenCalledTimes(2)
-      expect(result.current).toMatchObject({
+      await waitFor(() => expect(result.current).toMatchObject({
         host: EventAttendeeMocks.Alivs,
         attendees: [
           EventAttendeeMocks.AnnaAttendee,
@@ -90,7 +84,7 @@ describe("Attendees List tests", () => {
         ],
         fetchNextGroup: undefined,
         totalAttendeeCount: 10
-      })
+      }))
     })
     test("the hook returns an error and allows refetching, if initial fetchPage function fails to give results", async () => {
       const mockData = {
@@ -114,10 +108,10 @@ describe("Attendees List tests", () => {
       expect(fetchNextAttendeesPage).toHaveBeenCalledTimes(2)
       await waitFor(() => expect(result.current.status).toEqual("success"))
 
-      expect(result.current).toMatchObject({
+      await waitFor(() => expect(result.current).toMatchObject({
         host: EventAttendeeMocks.Alivs,
         attendees: [EventAttendeeMocks.AnnaAttendee]
-      })
+      }))
     })
     test("pull to refresh flow", async () => {
       const mockData = {

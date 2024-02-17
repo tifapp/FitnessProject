@@ -1,16 +1,9 @@
 import { TestCognitoError } from "@auth/CognitoHelpers"
-import { act } from "react-test-renderer"
 import { EmailAddress, Password, USPhoneNumber } from ".."
 import { createForgotPasswordEnvironment } from "./Environment"
 
 describe("ForgotPasswordEnvironment tests", () => {
   beforeEach(() => jest.resetAllMocks())
-  afterEach(async () => {
-    // resolve "Jest did not exit one second after the test run has completed." warning
-    await act(async () => {
-      await Promise.resolve()
-    })
-  })
 
   const cognito = {
     forgotPassword: jest.fn(),

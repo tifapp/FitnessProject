@@ -6,7 +6,8 @@ export type IfAuthenticatedProps = {
 }
 
 /**
- * A component that renders {@link thenRender} if the user is signed in, and {@link elseRender} if they aren't.
+ * A component that renders {@link thenRender} if the user is signed in, and
+ * {@link elseRender} if they aren't.
  */
 export const IfAuthenticated = ({
   thenRender,

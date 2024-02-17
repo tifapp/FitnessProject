@@ -13,7 +13,6 @@ import {
   createTestQueryClient
 } from "@test-helpers/ReactQuery"
 import {
-  act,
   fireEvent,
   render,
   screen,
@@ -29,6 +28,7 @@ import {
   pickEventColor,
   toggleShouldHideAfterStartDate
 } from "./helpers"
+import { fakeTimers } from "@test-helpers/Timers"
 
 const testLocation = { latitude: 45.0, longitude: -121.0 }
 
@@ -40,12 +40,7 @@ describe("EventFormScreen tests", () => {
     queryClient.clear()
   })
 
-  afterEach(async () => {
-    // resolve "Warning: An update to ForwardRef inside a test was not wrapped in act(...)."
-    await act(async () => {
-      await Promise.resolve()
-    })
-  })
+  fakeTimers()
 
   it("should be able to edit and submit a form with a preselected location", async () => {
     renderEventFormScreen(queryClient, {

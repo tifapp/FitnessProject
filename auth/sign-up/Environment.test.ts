@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { TiFAPI, createTiFAPIFetch } from "@api-client"
+import { TiFAPI } from "@api-client"
 import { TestCognitoError } from "@auth/CognitoHelpers"
 import { UserHandle } from "@content-parsing"
 import { uuidString } from "@lib/utils/UUID"
@@ -16,12 +16,7 @@ describe("SignUpEnvironment tests", () => {
   }
   const env = createSignUpEnvironment(
     cognito,
-    new TiFAPI(
-      createTiFAPIFetch(
-        new URL("https://localhost:8080"),
-        async () => "I am a jwt"
-      )
-    )
+    TiFAPI.testAuthenticatedInstance
   )
   beforeEach(() => jest.resetAllMocks())
 
@@ -109,7 +104,7 @@ describe("SignUpEnvironment tests", () => {
                 status: 500
               })
             }
-            return new HttpResponse(JSON.stringify({
+            return HttpResponse.json({
               users: [
                 {
                   id: uuidString(),
@@ -117,11 +112,6 @@ describe("SignUpEnvironment tests", () => {
                   name: "Bitchell Dickle"
                 }
               ]
-            }), {
-              status: 200,
-              headers: {
-                "Content-Type": "application/json"
-              }
             })
           }
         )
@@ -138,14 +128,7 @@ describe("SignUpEnvironment tests", () => {
       http.get(
         "https://localhost:8080/user/autocomplete",
         async () => {
-          return new HttpResponse(JSON.stringify({
-            users: []
-          }), {
-            status: 200,
-            headers: {
-              "Content-Type": "application/json"
-            }
-          })
+          return HttpResponse.json({ users: [] })
         }
       )
     )
@@ -160,7 +143,7 @@ describe("SignUpEnvironment tests", () => {
       http.get(
         "https://localhost:8080/user/autocomplete",
         async () => {
-          return new HttpResponse(JSON.stringify({
+          return HttpResponse.json({
             users: [
               {
                 id: uuidString(),
@@ -168,11 +151,6 @@ describe("SignUpEnvironment tests", () => {
                 name: "Bitchell Dickle"
               }
             ]
-          }), {
-            status: 200,
-            headers: {
-              "Content-Type": "application/json"
-            }
           })
         }
       )
@@ -222,12 +200,10 @@ describe("SignUpEnvironment tests", () => {
       cognito.confirmSignUpWithAutoSignIn.mockResolvedValueOnce("SUCCESS")
       mswServer.use(
         http.post("https://localhost:8080/user", async () => {
-          return new HttpResponse(JSON.stringify({ id: uuidString(), handle: handle.rawValue }), {
-            status: 201,
-            headers: {
-              "Content-Type": "application/json"
-            }
-          })
+          return HttpResponse.json({
+            id: uuidString(),
+            handle: handle.rawValue
+          }, { status: 201 })
         })
       )
       const result = await env.finishRegisteringAccount(

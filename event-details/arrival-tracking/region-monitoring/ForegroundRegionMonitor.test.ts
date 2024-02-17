@@ -1,7 +1,7 @@
 import { ArrayUtils } from "@lib/utils/Array"
 import { LocationCoordinate2D } from "@shared-models/Location"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
-import { withAnimatedTimeTravelEnabled } from "@test-helpers/Timers"
+import { fakeTimers } from "@test-helpers/Timers"
 import { waitFor } from "@testing-library/react-native"
 import { mockEventRegion } from "../MockData"
 import { ForegroundEventRegionMonitor } from "./ForegroundRegionMonitor"
@@ -30,7 +30,7 @@ describe("ForegroundEventRegionMonitor tests", () => {
     monitor = createMonitor()
     jest.resetAllMocks()
   })
-  withAnimatedTimeTravelEnabled()
+  fakeTimers()
 
   it("should return false for arriving in an unmonitored region", () => {
     expect(monitor.hasArrivedAtRegion(mockEventRegion())).toEqual(false)
