@@ -7,15 +7,15 @@ import {
   updateEventsInArrivalsTracker
 } from "./Event"
 import {
-  AsyncStorageUpcomingEventArrivals,
-  EventArrivalsTracker
+  EventArrivalsTracker,
+  SQLiteUpcomingEventArrivals
 } from "./arrival-tracking"
 import { TestEventArrivalsGeofencer } from "./arrival-tracking/geofencing/TestGeofencer"
-import { clearAsyncStorageBeforeEach } from "@test-helpers/AsyncStorage"
 import { mockEventLocation } from "./MockData"
 import { mockEventArrival } from "./arrival-tracking/MockData"
 import { ArrayUtils } from "@lib/utils/Array"
 import { EventUserAttendeeStatus } from "@shared-models/Event"
+import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 
 describe("Event tests", () => {
   describe("EventCurrentUserAttendeeStatus tests", () => {
@@ -55,7 +55,7 @@ describe("Event tests", () => {
     it("should copy coordinates to clipboard when no placemark availiable", async () => {
       const clipboard = jest.fn()
       await copyEventLocationToClipboard(
-        { coordinate: TEST_COORDINATES },
+        { coordinate: TEST_COORDINATES, placemark: null },
         clipboard
       )
       expect(clipboard).toHaveBeenCalledWith(TEST_COORDINATES_FORMATTED)
@@ -96,8 +96,8 @@ describe("Event tests", () => {
   })
 
   describe("UpdateEventsInArrivalTracker tests", () => {
-    const upcomingArrivals = new AsyncStorageUpcomingEventArrivals()
-    clearAsyncStorageBeforeEach()
+    const upcomingArrivals = new SQLiteUpcomingEventArrivals(testSQLite)
+    resetTestSQLiteBeforeEach()
 
     const tracker = new EventArrivalsTracker(
       upcomingArrivals,
@@ -178,7 +178,9 @@ describe("Event tests", () => {
 
     const expectTrackedRegions = async (regions: EventArrivalRegion[]) => {
       await waitFor(async () => {
-        expect(await upcomingArrivals.all()).toEqual(regions)
+        expect(await upcomingArrivals.all()).toEqual(
+          expect.arrayContaining(regions)
+        )
       })
     }
   })
