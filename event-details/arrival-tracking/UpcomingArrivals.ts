@@ -27,14 +27,14 @@ export class AsyncStorageUpcomingEventArrivals
 implements UpcomingEventArrivals {
   private static KEY = "@upcoming-event-arrivals"
 
-  async all () {
+  async all() {
     return await AsyncStorageUtils.parseJSONItem(
       EventArrivalRegionsSchema,
       AsyncStorageUpcomingEventArrivals.KEY
     ).then((arrivals) => arrivals ?? [])
   }
 
-  async replaceAll (regions: EventArrivalRegion[]) {
+  async replaceAll(regions: EventArrivalRegion[]) {
     await AsyncStorage.setItem(
       AsyncStorageUpcomingEventArrivals.KEY,
       JSON.stringify(regions)

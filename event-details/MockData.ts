@@ -175,4 +175,3 @@ export namespace EventMocks {
     hasEndedEarly: false
   } as CurrentUserEvent
 }
-
