@@ -130,13 +130,16 @@ export const setupArrivalsRefreshPolicy = (
 }
 
 const setupIntervalRefreshes = async (refresher: EventArrivalsRefresher) => {
-  setTimeout(async () => {
-    // NB: We force refresh because setTimeout delays are imprecise and thus can possibly
-    // cause missed refreshes. However, this is fine since we sleep for "about the right"
-    // amount of time needed to make the refreshes available.
-    await refresher.forceRefresh()
+  setTimeout(
+    async () => {
+      // NB: We force refresh because setTimeout delays are imprecise and thus can possibly
+      // cause missed refreshes. However, this is fine since we sleep for "about the right"
+      // amount of time needed to make the refreshes available.
+      await refresher.forceRefresh()
 
-    // NB: See https://developer.mozilla.org/en-US/docs/Web/API/setInterval#ensure_that_execution_duration_is_shorter_than_interval_frequency
-    await setupIntervalRefreshes(refresher)
-  }, await refresher.timeUntilNextRefreshAvailable())
+      // NB: See https://developer.mozilla.org/en-US/docs/Web/API/setInterval#ensure_that_execution_duration_is_shorter_than_interval_frequency
+      await setupIntervalRefreshes(refresher)
+    },
+    await refresher.timeUntilNextRefreshAvailable()
+  )
 }

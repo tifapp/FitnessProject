@@ -1,3 +1,4 @@
+/* eslint-disable func-call-spacing */
 import { UpcomingEventArrivals } from "./UpcomingArrivals"
 import { EventArrivalRegion } from "@shared-models/EventArrivals"
 import {
@@ -7,8 +8,17 @@ import {
 } from "./geofencing"
 import { ArrayUtils } from "@lib/utils/Array"
 import { PerformArrivalsOperation } from "./ArrivalsOperation"
-import { EventArrival, removeDuplicateArrivals } from "./Models"
+import { EventArrival, arrivalRegion, removeDuplicateArrivals } from "./Models"
 import { areEventRegionsEqual } from "@shared-models/Event"
+import { CallbackCollection } from "@lib/CallbackCollection"
+import { createLogFunction } from "@lib/Logging"
+
+const log = createLogFunction("event.arrivals.tracker")
+
+export interface EventArrivalsTrackerSubscription {
+  waitForInitialRegionsToLoad(): Promise<void>
+  unsubscribe(): void
+}
 
 /**
  * A class for tracking upcoming event arrivals.
@@ -23,6 +33,7 @@ export class EventArrivalsTracker {
   private readonly performArrivalsOperation: PerformArrivalsOperation
 
   private unsubscribeFromGeofencing?: EventArrivalGeofencingUnsubscribe
+  private callbacks = new CallbackCollection<EventArrivalRegion[]>()
 
   constructor (
     upcomingArrivals: UpcomingEventArrivals,
@@ -66,12 +77,7 @@ export class EventArrivalsTracker {
           return areEventRegionsEqual(region, arrival)
         })
         if (regionIndex === -1) {
-          newRegions.push({
-            eventIds: [arrival.eventId],
-            coordinate: arrival.coordinate,
-            arrivalRadiusMeters: arrival.arrivalRadiusMeters,
-            isArrived: false
-          })
+          newRegions.push(arrivalRegion(arrival))
         } else {
           newRegions[regionIndex].eventIds.push(arrival.eventId)
         }
@@ -119,6 +125,20 @@ export class EventArrivalsTracker {
     this.unsubscribeFromGeofencing = undefined
   }
 
+  /**
+   * Subscribes to changes in the tracked regions.
+   */
+  subscribe (
+    callback: (regions: EventArrivalRegion[]) => void
+  ): EventArrivalsTrackerSubscription {
+    const unsubscribe = this.callbacks.add(callback)
+    const initial = this.upcomingArrivals.all().then(callback)
+    return {
+      waitForInitialRegionsToLoad: () => initial,
+      unsubscribe
+    }
+  }
+
   private async transformAllUpcomingArrivals (
     work: (
       regions: EventArrivalRegion[]
@@ -128,11 +148,17 @@ export class EventArrivalsTracker {
   }
 
   private async syncRegions (regions: EventArrivalRegion[]) {
-    await Promise.all([
-      this.geofencer.replaceGeofencedRegions(regions),
-      this.upcomingArrivals.replaceAll(regions)
-    ])
-    this.updateGeofencingSubscription(regions)
+    try {
+      await Promise.all([
+        this.geofencer.replaceGeofencedRegions(regions),
+        this.upcomingArrivals.replaceAll(regions)
+      ])
+      this.updateGeofencingSubscription(regions)
+      this.callbacks.send(regions)
+    } catch (e) {
+      log("error", "Failed to sync regions", { message: e.message })
+      this.callbacks.send([])
+    }
   }
 
   private updateGeofencingSubscription (arrivals: EventArrivalRegion[]) {

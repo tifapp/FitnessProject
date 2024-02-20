@@ -1,4 +1,4 @@
-import { UserNotifications } from "@lib/UserNotifications"
+import { UserNotifications } from "notifications/UserNotifications"
 import { NotificationContent } from "expo-notifications"
 import { unimplementedUserNotifications } from "../test-helpers/UserNotifications"
 import { makeLinkingConfig } from "./linkingConfig"

@@ -3,12 +3,12 @@ import { Alert, Dimensions, Image, TouchableOpacity } from "react-native"
 import usePhotos from "../hooks/usePhotos"
 
 interface Props {
-  imageURL: string,
-  setImageURL: React.Dispatch<React.SetStateAction<string>>,
+  imageURL: string
+  setImageURL: React.Dispatch<React.SetStateAction<string>>
   setImageChanged: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const ProfilePic = ({ imageURL, setImageURL, setImageChanged } : Props) => {
+const ProfilePic = ({ imageURL, setImageURL, setImageChanged }: Props) => {
   const [pickFromGallery, pickFromCamera] = usePhotos()
 
   const promptUser = () => {

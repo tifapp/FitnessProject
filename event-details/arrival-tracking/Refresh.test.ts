@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { EventArrivalsLastRefreshDate, EventArrivalsRefresher } from "./Refresh"
 import { fakeTimers } from "@test-helpers/Timers"
+import { EventArrivalsLastRefreshDate, EventArrivalsRefresher } from "./Refresh"
 
 describe("EventArrivalsRefresher tests", () => {
   let lastRefreshDate = new EventArrivalsLastRefreshDate()

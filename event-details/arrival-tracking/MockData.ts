@@ -5,11 +5,11 @@ import { randomBool, randomFloatInRange } from "@lib/utils/Random"
 import { ArrayUtils } from "@lib/utils/Array"
 import { EventArrivalRegion } from "@shared-models/EventArrivals"
 import { EventArrivalGeofencedRegion } from "./geofencing"
+import { EventRegion } from "@shared-models/Event"
 
 export const mockEventArrivalGeofencedRegion =
   (): EventArrivalGeofencedRegion => ({
-    coordinate: mockLocationCoordinate2D(),
-    arrivalRadiusMeters: randomFloatInRange(50, 200),
+    ...mockEventRegion(),
     isArrived: randomBool()
   })
 
@@ -23,4 +23,9 @@ export const mockEventArrivalRegion = (): EventArrivalRegion => ({
     parseInt(faker.random.numeric(5))
   ),
   ...mockEventArrivalGeofencedRegion()
+})
+
+export const mockEventRegion = (): EventRegion => ({
+  coordinate: mockLocationCoordinate2D(),
+  arrivalRadiusMeters: randomFloatInRange(50, 200)
 })

@@ -1,4 +1,7 @@
-import { EventArrivalRegionSchema } from "@shared-models/EventArrivals"
+import {
+  EventArrivalRegion,
+  EventArrivalRegionSchema
+} from "@shared-models/EventArrivals"
 import { z } from "zod"
 
 /**
@@ -38,3 +41,20 @@ export const removeDuplicateArrivals = (arrivals: EventArrival[]) => {
     (arrival, index) => idToIndexMap.get(arrival.eventId) === index
   )
 }
+
+/**
+ * Creates an {@link EventArrivalRegion} using the `eventId` from a given
+ * {@link EventArrival} as a single element in the initial array of `eventIds`.
+ *
+ * @param arrival See {@link EventArrival}
+ * @param hasArrived Whether or not to mark the initial state as arrived.
+ */
+export const arrivalRegion = (
+  arrival: EventArrival,
+  hasArrived: boolean = false
+): EventArrivalRegion => ({
+  eventIds: [arrival.eventId],
+  coordinate: arrival.coordinate,
+  arrivalRadiusMeters: arrival.arrivalRadiusMeters,
+  isArrived: hasArrived
+})

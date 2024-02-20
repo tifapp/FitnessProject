@@ -1,4 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons"
+import { useHaptics } from "@lib/Haptics"
 import { HexColor } from "@lib/utils/Color"
 import React from "react"
 import {
@@ -8,7 +9,6 @@ import {
   View,
   ViewStyle
 } from "react-native"
-import { useHaptics } from "../../lib/Haptics"
 
 export type HexColorPickerOption<T extends HexColor = HexColor> = {
   color: T

@@ -4,17 +4,26 @@ import React from "react"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { View } from "react-native"
 import {
-  EventDetailErrorView,
-  EventDetailsLoadingView,
-  useLoadEventDetails
-} from "@event-details"
-import { sleep } from "@lib/utils/DelayData"
-import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
-import { InternetConnectionStatusProvider } from "@lib/InternetConnection"
+  EventAttendeeMocks,
+  EventMocks,
+  mockEventLocation
+} from "@event-details/MockData"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
-import { createTestQueryClient } from "@test-helpers/ReactQuery"
-import { QueryClientProvider } from "@tanstack/react-query"
-import { BodyText } from "@components/Text"
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
+import {
+  EventTravelEstimatesView,
+  loadEventTravelEstimates,
+  useEventTravelEstimates
+} from "@event-details/TravelEstimates"
+import { ExpoTiFTravelEstimates } from "@modules/tif-travel-estimates"
+import { UserLocationFunctionsProvider } from "@location/UserLocation"
+import {
+  getCurrentPositionAsync,
+  requestBackgroundPermissionsAsync,
+  requestForegroundPermissionsAsync
+} from "expo-location"
+import { mockPlacemark } from "@location/MockData"
+import { sleep } from "@lib/utils/DelayData"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -24,48 +33,45 @@ export default EventDetailsMeta
 
 type EventDetailsStory = ComponentStory<typeof SettingsScreen>
 
-const connectionStatus = new TestInternetConnectionStatus(false)
+const event = EventMocks.PickupBasketball
 
-setInterval(
-  () => connectionStatus.publishIsConnected(!connectionStatus.isConnected),
-  5000
-)
+const location = {
+  ...mockEventLocation(),
+  coordinate: { latitude: 36.96493, longitude: -122.01693 },
+  placemark: mockPlacemark()
+}
 
-const queryClient = createTestQueryClient()
-
-export const Basic: EventDetailsStory = () => (
-  <QueryClientProvider client={queryClient}>
-    <InternetConnectionStatusProvider status={connectionStatus}>
-      <Screen />
-    </InternetConnectionStatusProvider>
-  </QueryClientProvider>
-)
-
-const Screen = () => {
-  const result = useLoadEventDetails(1, async () => {
-    await sleep(3000)
-    throw new Error("Internet died")
-  })
+export const Basic: EventDetailsStory = () => {
   return (
     <SafeAreaProvider>
-      <View
-        style={{
-          display: "flex",
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center"
-        }}
-      >
-        {result.status === "loading" && <EventDetailsLoadingView />}
-        {result.status === "error" && (
-          <View>
-            <EventDetailErrorView {...result} />
-            <BodyText style={{ marginTop: 64 }}>
-              Is Connected to Internet: {`${result.isConnectedToInternet}`}
-            </BodyText>
-          </View>
-        )}
+      <View style={{ width: "100%", marginTop: 256 }}>
+        <UserLocationFunctionsProvider
+          getCurrentLocation={getCurrentPositionAsync}
+          requestBackgroundPermissions={requestBackgroundPermissionsAsync}
+          requestForegroundPermissions={requestForegroundPermissionsAsync}
+        >
+          <TiFQueryClientProvider>
+            <BottomSheetModalProvider>
+              <Test />
+            </BottomSheetModalProvider>
+          </TiFQueryClientProvider>
+        </UserLocationFunctionsProvider>
       </View>
     </SafeAreaProvider>
+  )
+}
+
+const host = EventAttendeeMocks.Alivs
+
+const Test = () => {
+  const result = useEventTravelEstimates(
+    location.coordinate,
+    async (eventCoordinate, userCoordinate, signal) => {
+      throw new Error("Died")
+    }
+  )
+  console.log(result)
+  return (
+    <EventTravelEstimatesView host={host} location={location} result={result} />
   )
 }

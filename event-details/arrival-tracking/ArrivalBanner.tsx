@@ -3,13 +3,37 @@ import { TouchableIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors } from "@lib/Fonts"
 import { ceilDurationToUnit, dayjs } from "@date-time"
-import React from "react"
+import { useState } from "react"
 import { View, ViewStyle, StyleSheet } from "react-native"
 import Animated, {
   AnimatedStyleProp,
   FadeIn,
   FadeOut
 } from "react-native-reanimated"
+import { EventRegion } from "@shared-models/Event"
+import { EventRegionMonitor, useHasArrivedAtRegion } from "./region-monitoring"
+
+/**
+ * Handles state related to whether or not to show the event arrival banner for
+ * a particular {@link EventRegion}.
+ *
+ * If `close` is called, `isShowing` will always return false from there on out as
+ * the banner is simply meant to be non-instrusive after it has been dismissed.
+ *
+ * @param region the region to show the arrival banner for.
+ * @param subscribe subscribes to updates for entering and leaving the region.
+ */
+export const useIsShowingEventArrivalBanner = (
+  region: EventRegion,
+  monitor: EventRegionMonitor
+) => {
+  const [isClosed, setIsClosed] = useState(false)
+  const hasArrived = useHasArrivedAtRegion(region, monitor)
+  return {
+    isShowing: hasArrived && !isClosed,
+    close: () => setIsClosed(true)
+  }
+}
 
 /**
  * Data needed to display the countdown on the {@link EventArrivalBannerView}.

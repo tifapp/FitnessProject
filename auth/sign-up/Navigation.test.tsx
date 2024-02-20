@@ -1,4 +1,6 @@
-import { TiFAPI, createTiFAPIFetch } from "@api-client"
+/* eslint-disable @typescript-eslint/naming-convention */
+import { TiFAPI } from "@api-client"
+import { UserHandle } from "@content-parsing"
 import { uuidString } from "@lib/utils/UUID"
 import {
   NavigationContainer,
@@ -6,6 +8,10 @@ import {
   useFocusEffect
 } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
+import { captureAlerts } from "@test-helpers/Alerts"
+import "@test-helpers/Matchers"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import { mswServer } from "@test-helpers/msw"
 import {
   act,
   fireEvent,
@@ -13,17 +19,11 @@ import {
   screen,
   waitFor
 } from "@testing-library/react-native"
-import { rest } from "msw"
+import { HttpResponse, http } from "msw"
 import { useCallback, useState } from "react"
 import { Button, View } from "react-native"
-import { captureAlerts } from "@test-helpers/Alerts"
-import "@test-helpers/Matchers"
-import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { mswServer } from "@test-helpers/msw"
 import { createSignUpEnvironment } from "./Environment"
 import { SignUpParamsList, createSignUpScreens } from "./Navigation"
-import { fakeTimers } from "@test-helpers/Timers"
-import { UserHandle } from "@content-parsing"
 
 type TestSignUpParamsList = {
   test: undefined
@@ -40,34 +40,21 @@ describe("SignUpNavigation tests", () => {
   }
   const env = createSignUpEnvironment(
     cognito,
-    new TiFAPI(
-      createTiFAPIFetch(
-        new URL("https://localhost:8080"),
-        async () => "I am a jwt"
-      )
-    )
+    TiFAPI.testAuthenticatedInstance
   )
-
-  afterEach(() => act(jest.runAllTimers))
-  fakeTimers()
 
   beforeEach(() => {
     jest.resetAllMocks()
     mswServer.use(
-      rest.post("https://localhost:8080/user", async (_, res, ctx) => {
-        return res(
-          ctx.status(201),
-          ctx.json({
-            id: uuidString(),
-            handle: TEST_GENERATED_USER_HANDLE.rawValue
-          })
-        )
+      http.post("https://localhost:8080/user", async () => {
+        return HttpResponse.json({
+          id: uuidString(),
+          handle: TEST_GENERATED_USER_HANDLE.rawValue
+        }, { status: 201 })
       }),
-      rest.get(
+      http.get(
         "https://localhost:8080/user/autocomplete",
-        async (_, res, ctx) => {
-          return res(ctx.status(200), ctx.json({ users: [] }))
-        }
+        async () => HttpResponse.json({ users: [] })
       )
     )
   })
@@ -104,12 +91,16 @@ describe("SignUpNavigation tests", () => {
 
     replaceUserHandleText(TEST_GENERATED_USER_HANDLE.rawValue, newHandleText)
     mswServer.use(
-      rest.patch("https://localhost:8080/user/self", async (req, res, ctx) => {
-        const body = await req.json()
-        if (body.handle !== newHandleText) {
-          return res(ctx.status(500))
+      http.patch("https://localhost:8080/user/self", async ({ request }) => {
+        const body: any = await request.json()
+        if (body?.handle !== newHandleText) {
+          return new HttpResponse(null, {
+            status: 500
+          })
         }
-        return res(ctx.status(204))
+        return new HttpResponse(null, {
+          status: 204
+        })
       })
     )
     submitNewUserHandle()
@@ -117,13 +108,15 @@ describe("SignUpNavigation tests", () => {
     await waitFor(() => expect(endingView()).toBeDisplayed())
     endSignUpTest()
 
-    expect(isAtEnd()).toEqual(true)
+    await waitFor(() => expect(isAtEnd()).toEqual(true))
   })
 
   test("get to end of sign-up flow, go back to change username again, finish sign-up flow", async () => {
     mswServer.use(
-      rest.patch("https://localhost:8080/user/self", async (_, res, ctx) => {
-        return res(ctx.status(204))
+      http.patch("https://localhost:8080/user/self", async () => {
+        return new HttpResponse(null, {
+          status: 204
+        })
       })
     )
 
@@ -168,11 +161,17 @@ describe("SignUpNavigation tests", () => {
     return render(
       <TestQueryClientProvider>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="test">
+          <Stack.Navigator
+            initialRouteName="test"
+            screenOptions={{ animationEnabled: false }}
+          >
             <Stack.Screen name="test" component={TestScreen} />
             <Stack.Screen name="signUp">
               {() => (
-                <ModalStack.Navigator initialRouteName="signUpCredentialsForm">
+                <ModalStack.Navigator
+                  initialRouteName="signUpCredentialsForm"
+                  screenOptions={{ animationEnabled: false }}
+                >
                   {signUpScreens}
                 </ModalStack.Navigator>
               )}

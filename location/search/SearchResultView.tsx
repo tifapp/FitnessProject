@@ -1,15 +1,11 @@
 import { Caption, Headline } from "@components/Text"
 import { CircularIonicon, Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
-import {
-  compactFormatFeet,
-  compactFormatMiles
-} from "@lib/utils/DistanceFormatting"
+import { compactFormatDistance } from "@lib/utils/DistanceFormatting"
 import { placemarkToFormattedAddress } from "@location"
 import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { LocationSearchResult } from "./Models"
-import { milesToFeet } from "@lib/utils/MetricConversions"
 
 export type LocationSearchResultProps = {
   result: LocationSearchResult
@@ -61,17 +57,12 @@ export const LocationSearchResultView = ({
         </View>
         {distanceMiles && (
           <Headline style={styles.distanceText}>
-            {compactFormatSearchResultDistance(distanceMiles)}
+            {compactFormatDistance(distanceMiles)}
           </Headline>
         )}
       </View>
     </View>
   )
-}
-
-const compactFormatSearchResultDistance = (miles: number) => {
-  if (miles < 0.1) return compactFormatFeet(milesToFeet(miles))
-  return compactFormatMiles(miles)
 }
 
 const styles = StyleSheet.create({

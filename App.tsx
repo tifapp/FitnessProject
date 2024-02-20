@@ -16,7 +16,7 @@ import { RootSiblingParent } from "react-native-root-siblings"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 
 import { Geo } from "@aws-amplify/geo"
-import { defineEventArrivalsGeofencingTasks } from "@event-details/arrival-tracking/geofencing"
+import { ExpoEventArrivalsGeofencer } from "@event-details/arrival-tracking"
 import { AnalyticsProvider, MixpanelAnalytics } from "@lib/Analytics"
 import {
   addLogHandler,
@@ -27,22 +27,28 @@ import {
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { enableSentry } from "@lib/Sentry"
 import { AppView } from "@root-feature/AppView"
+import * as Sentry from "@sentry/react-native"
 import "expo-dev-client"
-import { Native as SentryNative } from "sentry-expo"
+import { addPushTokenListener } from "expo-notifications"
 import { setupCognito } from "./auth"
+import { registerForPushNotifications } from "./notifications"
 import awsconfig from "./src/aws-exports"
 
-Geo.configure(awsconfig)
-setupCognito()
-enableSentry()
-
-const log = createLogFunction("app.root")
-addLogHandler(sentryBreadcrumbLogHandler())
-addLogHandler(sentryErrorCapturingLogHandler())
-
-log("info", "App launched", { date: new Date() })
-
-defineEventArrivalsGeofencingTasks()
+/**
+ * Performs all the necessary setup (starting background tasks, configuration,
+ * etc.) for the app that does not have to do directly with the UI.
+ */
+export const setupApp = () => {
+  const log = createLogFunction("app.root")
+  enableSentry()
+  addLogHandler(sentryBreadcrumbLogHandler())
+  addLogHandler(sentryErrorCapturingLogHandler())
+  log("info", "App launched", { date: new Date() })
+  setupCognito()
+  Geo.configure(awsconfig)
+  ExpoEventArrivalsGeofencer.shared.defineTask()
+  addPushTokenListener(registerForPushNotifications)
+}
 
 export type AppProps = {
   isFontsLoaded: boolean
@@ -76,4 +82,4 @@ const App = () => {
   )
 }
 
-export default SentryNative.wrap(App)
+export default Sentry.wrap(App)

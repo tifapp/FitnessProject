@@ -1,4 +1,4 @@
-import { UserNotifications } from "@lib/UserNotifications"
+import { UserNotifications } from "@notifications"
 
 /**
  * A `UserNotifications` instance that causes a test failure when its methods are invoked.

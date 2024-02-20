@@ -1,6 +1,6 @@
 import {
-  RotatingFileLogsConfig,
   RotatingFileLogs,
+  RotatingFileLogsConfig,
   addLogHandler,
   createLogFunction,
   formatLogMessage,

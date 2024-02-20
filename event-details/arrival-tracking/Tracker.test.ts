@@ -12,6 +12,7 @@ import {
 import { neverPromise } from "@test-helpers/Promise"
 import { TestEventArrivalsGeofencer } from "./geofencing/TestGeofencer"
 import { clearAsyncStorageBeforeEach } from "@test-helpers/AsyncStorage"
+import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 
 describe("EventArrivalsTracker tests", () => {
   const upcomingArrivals = new AsyncStorageUpcomingEventArrivals()
@@ -309,10 +310,71 @@ describe("EventArrivalsTracker tests", () => {
     await expectTrackedRegions(newRegions)
   })
 
+  test("publishes update after performing an arrivals operation", async () => {
+    const newRegions = ArrayUtils.repeatElements(3, () => {
+      return mockEventArrivalRegion()
+    })
+    performArrivalOperation.mockResolvedValueOnce(newRegions)
+    await tracker.trackArrival(mockEventArrival())
+    const callback = jest.fn()
+    tracker.subscribe(callback)
+    await waitFor(() => expect(callback).toHaveBeenCalled())
+
+    const geofencedRegion = {
+      ...mockEventArrivalGeofencedRegion(),
+      isArrived: true
+    }
+    testGeofencer.sendUpdate(geofencedRegion)
+    await waitFor(() => {
+      expect(callback).toHaveBeenNthCalledWith(2, newRegions)
+    })
+    expect(callback).toHaveBeenCalledTimes(2)
+  })
+
+  test("does not publish update after unsubscribing from arrivals operation updates", async () => {
+    performArrivalOperation.mockResolvedValueOnce([mockEventArrivalRegion()])
+    await tracker.trackArrival(mockEventArrival())
+    const callback = jest.fn()
+    const subscription = tracker.subscribe(callback)
+    await waitFor(() => expect(callback).toHaveBeenCalled())
+    subscription.unsubscribe()
+    testGeofencer.sendUpdate(mockEventArrivalGeofencedRegion())
+    await verifyNeverOccurs(() => expect(callback).toHaveBeenCalledTimes(2))
+  })
+
+  it("should publish an empty update when failing to replace arrivals on geofencer", async () => {
+    const arrival = mockEventArrival()
+    const tracker = new EventArrivalsTracker(
+      upcomingArrivals,
+      {
+        replaceGeofencedRegions: jest
+          .fn()
+          .mockRejectedValueOnce(
+            new Error("No Background location permissions enabled")
+          ),
+        onUpdate: jest.fn()
+      },
+      performArrivalOperation
+    )
+    const callback = jest.fn()
+    const subscription = tracker.subscribe(callback)
+    await subscription.waitForInitialRegionsToLoad()
+    callback.mockReset()
+    await tracker.trackArrival(arrival)
+    await waitFor(() => expect(callback).toHaveBeenCalledWith([]))
+    expect(callback).toHaveBeenCalledTimes(1)
+  })
+
   const expectTrackedRegions = async (regions: EventArrivalRegion[]) => {
     await waitFor(async () => {
       expect(await upcomingArrivals.all()).toEqual(regions)
     })
     expect(regions).toMatchObject(testGeofencer.geofencedRegions)
+
+    const callback = jest.fn()
+    const subscription = tracker.subscribe(callback)
+    await subscription.waitForInitialRegionsToLoad()
+    expect(callback).toHaveBeenCalledWith(regions)
+    expect(callback).toHaveBeenCalledTimes(1)
   }
 })
