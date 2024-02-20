@@ -113,7 +113,7 @@ export class SQLiteRecentLocationsStorage implements RecentLocationsStorage {
 }
 
 type SQLiteLocationPlacemark = LocationCoordinate2D &
-  DeepNullable<Placemark> & {
+  DeepNullable<Required<Placemark>> & {
     recentAnnotation: RecentLocationAnnotation | null
   }
 
