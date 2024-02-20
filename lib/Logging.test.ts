@@ -96,9 +96,10 @@ describe("Logging tests", () => {
       })
       log("info", "Test")
       await waitFor(async () => {
-        const logs = (await allLogs())[0]
-        expect(logs.level).toEqual("info")
-        expect(logs.timestamp).toBeGreaterThan(0)
+        const logs = await allLogs()
+        expect(logs).toHaveLength(1)
+        expect(logs[0].level).toEqual("info")
+        expect(logs[0].timestamp).toBeGreaterThan(0)
       })
     })
 
