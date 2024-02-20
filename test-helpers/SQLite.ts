@@ -13,6 +13,7 @@ export const resetTestSQLiteBeforeEach = () => {
     await testSQLite.withTransaction(async (db) => {
       await db.run`DELETE FROM LocationArrivals`
       await db.run`DELETE FROM LocationPlacemarks`
+      await db.run`DELETE FROM Logs`
     })
   })
 }
