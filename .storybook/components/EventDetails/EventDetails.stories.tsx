@@ -1,21 +1,13 @@
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import React from "react"
-import { SafeAreaProvider } from "react-native-safe-area-context"
-import { View } from "react-native"
+import React, { useEffect } from "react"
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 import {
   EventAttendeeMocks,
   EventMocks,
   mockEventLocation
 } from "@event-details/MockData"
-import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
-import {
-  EventTravelEstimatesView,
-  loadEventTravelEstimates,
-  useEventTravelEstimates
-} from "@event-details/TravelEstimates"
-import { ExpoTiFTravelEstimates } from "@modules/tif-travel-estimates"
 import { UserLocationFunctionsProvider } from "@location/UserLocation"
 import {
   getCurrentPositionAsync,
@@ -24,6 +16,9 @@ import {
 } from "expo-location"
 import { mockPlacemark } from "@location/MockData"
 import { sleep } from "@lib/utils/DelayData"
+import { EventDetailsView, useLoadEventDetails } from "@event-details/Details"
+import { createTestQueryClient } from "@test-helpers/ReactQuery"
+import { QueryClientProvider } from "@tanstack/react-query"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -41,22 +36,28 @@ const location = {
   placemark: mockPlacemark()
 }
 
+const queryClient = createTestQueryClient()
+
 export const Basic: EventDetailsStory = () => {
+  useEffect(() => {
+    queryClient.resetQueries()
+  }, [])
+
   return (
     <SafeAreaProvider>
-      <View style={{ width: "100%", marginTop: 256 }}>
+      <SafeAreaView>
         <UserLocationFunctionsProvider
           getCurrentLocation={getCurrentPositionAsync}
           requestBackgroundPermissions={requestBackgroundPermissionsAsync}
           requestForegroundPermissions={requestForegroundPermissionsAsync}
         >
-          <TiFQueryClientProvider>
+          <QueryClientProvider client={queryClient}>
             <BottomSheetModalProvider>
               <Test />
             </BottomSheetModalProvider>
-          </TiFQueryClientProvider>
+          </QueryClientProvider>
         </UserLocationFunctionsProvider>
-      </View>
+      </SafeAreaView>
     </SafeAreaProvider>
   )
 }
@@ -64,14 +65,11 @@ export const Basic: EventDetailsStory = () => {
 const host = EventAttendeeMocks.Alivs
 
 const Test = () => {
-  const result = useEventTravelEstimates(
-    location.coordinate,
-    async (eventCoordinate, userCoordinate, signal) => {
-      throw new Error("Died")
-    }
-  )
-  console.log(result)
+  const result = useLoadEventDetails(1, async () => {
+    await sleep(5000)
+    return { status: "blocked", event: EventMocks.Multiday }
+  })
   return (
-    <EventTravelEstimatesView host={host} location={location} result={result} />
+    <EventDetailsView result={result} onExploreOtherEventsTapped={() => {}} />
   )
 }
