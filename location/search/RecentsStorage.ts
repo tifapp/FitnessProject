@@ -61,7 +61,7 @@ export class SQLiteRecentLocationsStorage implements RecentLocationsStorage {
       const results = await db.queryAll<SQLiteLocationPlacemark>`
       SELECT * FROM LocationPlacemarks
       WHERE ${stringifiedCoordinates} 
-        LIKE '%' || cast(latitude AS TEXT) || ',' || cast(longitude as TEXT) || '%'
+        LIKE '%' || latitude || ',' || longitude || '%'
       ORDER BY recentUpdatedAt DESC
       `
       return results.map(recentLocationFromSQLite)
