@@ -1,5 +1,6 @@
 import {
   SQLiteDatabase as ExpoSQLiteDatabase,
+  SQLiteBindValue,
   openDatabaseAsync
 } from "expo-sqlite/next"
 
@@ -13,7 +14,7 @@ import {
  * to perform a transaction.
  */
 export class TiFSQLite {
-  private sqlExecutablePromise: Promise<SQLExecutable>
+  private sqlExecutablePromise: Promise<ExpoSQLExecutable>
   private queuedTransactions = [] as (() => Promise<void>)[]
 
   /**
@@ -38,7 +39,7 @@ export class TiFSQLite {
       this.queuedTransactions.push(async () => {
         try {
           const db = await this.sqlExecutablePromise
-          await db._expoDb.withTransactionAsync(async () => {
+          await db.expoDb.withTransactionAsync(async () => {
             resolve(await fn(db))
           })
         } catch (e) {
@@ -61,7 +62,7 @@ export class TiFSQLite {
   }
 
   private static async open(path: string) {
-    const db = new SQLExecutable(await openDatabaseAsync(path))
+    const db = new ExpoSQLExecutable(await openDatabaseAsync(path))
     await Promise.all([
       db.run`
       CREATE TABLE IF NOT EXISTS LocationArrivals (
@@ -90,36 +91,62 @@ export class TiFSQLite {
 }
 
 /**
- * A class to query the database.
+ * A type exposing methods to query the database.
  *
  * This class' methods use [tagged template literal](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals)
  * calling conventions which allow for queries to be string interpolated
  * whilst avoiding SQL injection.
  */
-export class SQLExecutable {
-  readonly _expoDb: ExpoSQLiteDatabase
+export type SQLExecutable = Omit<ExpoSQLExecutable, "expoDb">
+
+/**
+ * A value that can be placed in the template string in {@link SQLExecutable}.
+ */
+export type SQLiteInterpolatableValue = SQLiteBindValue | undefined
+
+class ExpoSQLExecutable {
+  readonly expoDb: ExpoSQLiteDatabase
 
   constructor(db: ExpoSQLiteDatabase) {
-    this._expoDb = db
+    this.expoDb = db
   }
 
-  async run(statements: TemplateStringsArray, ...args: any[]) {
-    const query = statements.join("?")
-    const result = await this._expoDb.runAsync(query, args)
+  async run(
+    statements: TemplateStringsArray,
+    ...args: SQLiteInterpolatableValue[]
+  ) {
+    const { query, values } = this.queryParameters(statements, args)
+    const result = await this.expoDb.runAsync(query, values)
     return {
       rowsAffected: result.changes,
       lastInsertId: result.lastInsertRowId
     }
   }
 
-  async queryFirst<T>(statements: TemplateStringsArray, ...args: any[]) {
-    const query = statements.join("?")
-    const result = await this._expoDb.getFirstAsync<T>(query, args)
+  async queryFirst<T>(
+    statements: TemplateStringsArray,
+    ...args: SQLiteInterpolatableValue[]
+  ) {
+    const { query, values } = this.queryParameters(statements, args)
+    const result = await this.expoDb.getFirstAsync<T>(query, values)
     return result ?? undefined
   }
 
-  async queryAll<T>(statements: TemplateStringsArray, ...args: any[]) {
-    const query = statements.join("?")
-    return await this._expoDb.getAllAsync<T>(query, args)
+  async queryAll<T>(
+    statements: TemplateStringsArray,
+    ...args: SQLiteInterpolatableValue[]
+  ) {
+    const { query, values } = this.queryParameters(statements, args)
+    return await this.expoDb.getAllAsync<T>(query, values)
+  }
+
+  private queryParameters(
+    statements: TemplateStringsArray,
+    args: SQLiteInterpolatableValue[]
+  ) {
+    return {
+      query: statements.join("?"),
+      values: args.map((arg) => (arg === undefined ? null : arg))
+    }
   }
 }
