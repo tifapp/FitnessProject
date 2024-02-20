@@ -1,18 +1,20 @@
 import { Coordinates } from "@aws-amplify/geo"
-import AsyncStorage from "@react-native-async-storage/async-storage"
-import { asyncStorageSaveRecentLocation } from "./RecentsStorage"
+import { SQLiteRecentLocationsStorage } from "./RecentsStorage"
 import {
   awsPlaceToTifLocation,
   searchRecentLocations,
   searchWithRecentAnnotations
 } from "./SearchClient"
-import { mockLocationSearchFunction } from "./MockData"
 import { LocationsSearchQuery } from "./Models"
-import { mockTiFLocation, mockLocationCoordinate2D } from "@location/MockData"
-import { clearAsyncStorageBeforeEach } from "@test-helpers/AsyncStorage"
+import { mockTiFLocation } from "@location/MockData"
+import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
+import { ArrayUtils } from "@lib/utils/Array"
+import { sleep } from "@lib/utils/DelayData"
 
 describe("Search client tests", () => {
-  clearAsyncStorageBeforeEach()
+  resetTestSQLiteBeforeEach()
+  const storage = new SQLiteRecentLocationsStorage(testSQLite)
+
   describe("awsPlaceToTiFLocation tests", () => {
     it("returns undefined if there is no geometry", () => {
       const testPlace = {
@@ -45,7 +47,7 @@ describe("Search client tests", () => {
         subRegion: "King County"
       }
       expect(awsPlaceToTifLocation(testPlace)).toMatchObject({
-        coordinates: {
+        coordinate: {
           latitude: 47.61609000000004,
           longitude: -122.34014899999994
         },
@@ -63,20 +65,22 @@ describe("Search client tests", () => {
     })
   })
   describe("searchRecentLocations tests", () => {
-    it("gives a LocationSearchResult array when called with information in async storage", async () => {
+    it("gives a LocationSearchResult array when called with information in sqlite", async () => {
       const location1 = mockTiFLocation()
       const location2 = mockTiFLocation()
       const location3 = mockTiFLocation()
-      await asyncStorageSaveRecentLocation(location1, "attended-event")
-      await asyncStorageSaveRecentLocation(location2, "hosted-event")
-      await asyncStorageSaveRecentLocation(location3, "hosted-event")
+      await storage.save(location1, "attended-event")
+      await sleep(10)
+      await storage.save(location2, "hosted-event")
+      await sleep(10)
+      await storage.save(location3)
 
-      const results = await searchRecentLocations()
+      const results = await searchRecentLocations(storage)
 
       expect(results).toEqual([
         {
           location: location3,
-          annotation: "hosted-event",
+          annotation: undefined,
           isRecentLocation: true
         },
         {
@@ -92,61 +96,44 @@ describe("Search client tests", () => {
       ])
     })
     it("returns an empty array when called with faulty or nonexistent information", async () => {
-      const results = await searchRecentLocations()
+      const results = await searchRecentLocations(storage)
       expect(results).toEqual([])
     })
   })
 
   describe("searchWithRecentAnnotations tests", () => {
     it("returns an array of valid LocationSearchResults when given a proper callback", async () => {
-      const mockLocation1 = mockLocationCoordinate2D()
-      const mockLocation2 = mockLocationCoordinate2D()
-      const mockLocation3 = mockLocationCoordinate2D()
-      const mockLocation4 = mockLocationCoordinate2D()
-      const mockTiFLocation1 = {
-        coordinates: mockLocation1,
-        placemark: { name: "New York" }
-      }
-      const mockTiFLocation2 = {
-        coordinates: mockLocation2,
-        placemark: { name: "Joe" }
-      }
-      const mockTiFLocation3 = {
-        coordinates: mockLocation3,
-        placemark: { name: "New York" }
-      }
-      const mockTiFLocation4 = {
-        coordinates: mockLocation4,
-        placemark: { name: "New York" }
-      }
+      const locations = ArrayUtils.repeatElements(4, () => mockTiFLocation())
 
-      const testQuery = new LocationsSearchQuery("New York")
-
-      await asyncStorageSaveRecentLocation(mockTiFLocation1, "attended-event")
-      await asyncStorageSaveRecentLocation(mockTiFLocation2, "hosted-event")
-      await asyncStorageSaveRecentLocation(mockTiFLocation3, "hosted-event")
-      await asyncStorageSaveRecentLocation(mockTiFLocation4, undefined)
+      await storage.save(locations[0], "attended-event")
+      await storage.save(locations[2])
 
       const testResults = await searchWithRecentAnnotations(
-        testQuery,
+        new LocationsSearchQuery("New York"),
         undefined,
-        mockLocationSearchFunction
+        storage,
+        jest.fn().mockResolvedValueOnce(locations)
       )
       expect(testResults).toEqual([
         {
-          location: mockTiFLocation4,
+          location: locations[0],
+          annotation: "attended-event",
+          isRecentLocation: true
+        },
+        {
+          location: locations[1],
           annotation: undefined,
           isRecentLocation: false
         },
         {
-          location: mockTiFLocation3,
-          annotation: "hosted-event",
+          location: locations[2],
+          annotation: undefined,
           isRecentLocation: true
         },
         {
-          location: mockTiFLocation1,
-          annotation: "attended-event",
-          isRecentLocation: true
+          location: locations[3],
+          annotation: undefined,
+          isRecentLocation: false
         }
       ])
     })
