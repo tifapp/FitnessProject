@@ -1,10 +1,10 @@
 import { ArrayUtils } from "@lib/utils/Array"
+import { LocationCoordinate2D } from "@shared-models/Location"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { fakeTimers } from "@test-helpers/Timers"
 import { waitFor } from "@testing-library/react-native"
 import { mockEventRegion } from "../MockData"
 import { ForegroundEventRegionMonitor } from "./ForegroundRegionMonitor"
-import { LocationCoordinate2D } from "@shared-models/Location"
 import { advanceByForegroundMonitorBufferTime } from "./TestHelpers"
 
 describe("ForegroundEventRegionMonitor tests", () => {

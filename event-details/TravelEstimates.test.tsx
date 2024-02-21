@@ -1,29 +1,25 @@
-import {
-  TestQueryClientProvider,
-  createTestQueryClient
-} from "@test-helpers/ReactQuery"
-import { fakeTimers } from "@test-helpers/Timers"
-import { act, renderHook, waitFor } from "@testing-library/react-native"
-import { formattedTravelEstimateResult, useEventTravelEstimates } from "./TravelEstimates"
+import { dayjs } from "@date-time"
 import {
   mockExpoLocationObject,
   mockLocationCoordinate2D
 } from "@location/MockData"
 import { UserLocationFunctionsProvider } from "@location/UserLocation"
+import {
+  EXPO_LOCATION_ERRORS,
+  LocationCoordinate2D
+} from "@shared-models/Location"
 import { setPlatform } from "@test-helpers/Platform"
-import { EXPO_LOCATION_ERRORS, LocationCoordinate2D } from "@shared-models/Location"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import { renderHook, waitFor } from "@testing-library/react-native"
 import { CodedError } from "expo-modules-core"
-import { dayjs } from "@date-time"
+import {
+  formattedTravelEstimateResult,
+  useEventTravelEstimates
+} from "./TravelEstimates"
 
 describe("EventTravelEstimates tests", () => {
   describe("UseEventTravelEstimates tests", () => {
-    const queryClient = createTestQueryClient()
-    afterEach(() => act(() => jest.runAllTimers()))
-    fakeTimers()
-    beforeEach(() => {
-      jest.resetAllMocks()
-      queryClient.clear()
-    })
+    beforeEach(() => jest.resetAllMocks())
 
     const loadTravelEstimates = jest.fn()
     const loadUserLocation = jest.fn()
@@ -53,7 +49,7 @@ describe("EventTravelEstimates tests", () => {
               requestBackgroundPermissions={jest.fn()}
               requestForegroundPermissions={jest.fn()}
             >
-              <TestQueryClientProvider client={queryClient}>
+              <TestQueryClientProvider>
                 {children}
               </TestQueryClientProvider>
             </UserLocationFunctionsProvider>

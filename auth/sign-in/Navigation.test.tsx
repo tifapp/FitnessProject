@@ -5,8 +5,9 @@ import {
   useFocusEffect
 } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
+import "@test-helpers/Matchers"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import {
-  act,
   fireEvent,
   render,
   screen,
@@ -15,8 +16,6 @@ import {
 import { useCallback, useState } from "react"
 import { Button, View } from "react-native"
 import { USPhoneNumber } from ".."
-import "@test-helpers/Matchers"
-import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { CognitoSignInAuthenticator } from "./Authenticator"
 import { SignInParamsList, createSignInScreens } from "./Navigation"
 
@@ -33,9 +32,6 @@ describe("SignInNavigation tests", () => {
     confirmSignIn: jest.fn()
   }
   const authenticator = new CognitoSignInAuthenticator(cognito)
-
-  beforeEach(() => jest.useFakeTimers())
-  afterEach(() => act(jest.runAllTimers))
 
   test("sign in with correct credentials", async () => {
     renderSignInScreens()
@@ -143,11 +139,17 @@ describe("SignInNavigation tests", () => {
     return render(
       <TestQueryClientProvider>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="test">
+          <Stack.Navigator
+            initialRouteName="test"
+            screenOptions={{ animationEnabled: false }}
+          >
             <Stack.Screen name="test" component={TestScreen} />
             <Stack.Screen name="signIn">
               {() => (
-                <ModalStack.Navigator initialRouteName="signInForm">
+                <ModalStack.Navigator
+                  initialRouteName="signInForm"
+                  screenOptions={{ animationEnabled: false }}
+                >
                   {signInScreens}
                   <ModalStack.Screen name="signUpVerifyCodeForm">
                     {(props) => (

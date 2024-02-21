@@ -1,7 +1,7 @@
-import { ArrayUtils } from "./utils/Array"
-import { Filesystem } from "./Filesystem"
 import { diffDates } from "@date-time"
-import { Native as SentryNative } from "sentry-expo"
+import * as Sentry from "@sentry/react-native"
+import { Filesystem } from "./Filesystem"
+import { ArrayUtils } from "./utils/Array"
 
 /**
  * A level to be used when logging.
@@ -241,8 +241,8 @@ export class RotatingFileLogs {
  */
 export const sentryBreadcrumbLogHandler = (
   handleBreadcrumb: (
-    breadcrumb: SentryNative.Breadcrumb
-  ) => void = SentryNative.addBreadcrumb
+    breadcrumb: Sentry.Breadcrumb
+  ) => void = Sentry.addBreadcrumb
 ): LogHandler => {
   return (label, level, message, metadata) => {
     if (level === "debug") return
@@ -274,7 +274,7 @@ const getSentryBreadcrumbMetadata = (label: string, metadata?: object) => {
  * The error must be assigned to the `error` field and must be an instance of subclass of {@link Error}.
  */
 export const sentryErrorCapturingLogHandler = (
-  captureError: (error: Error) => void = SentryNative.captureException
+  captureError: (error: Error) => void = Sentry.captureException
 ): LogHandler => {
   // NB: We don't need to care about the label of message since those are handled by the breadcrumb handler
   return (_, level, __, metadata) => {

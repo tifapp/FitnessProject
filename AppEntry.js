@@ -1,12 +1,13 @@
-// @ts-ignore
+// @ts-nocheck
+// @ts-ignore Entry point
 import { BUILD_TYPE } from "@env"
-import { AppRegistry } from "react-native"
-import App from "./App"
+import { registerRootComponent } from "expo"
 
-if (BUILD_TYPE === "storybook") {
-  import("./.storybook/App").then((StorybookAppModule) => {
-    AppRegistry.registerComponent("main", () => StorybookAppModule.default)
-  })
+if (BUILD_TYPE !== "storybook") {
+  const Module = require("./App")
+  Module.setupApp()
+  registerRootComponent(Module.default)
 } else {
-  AppRegistry.registerComponent("main", () => App)
+  const Module = require("./.storybook/App")
+  registerRootComponent(Module.default)
 }

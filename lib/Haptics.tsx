@@ -4,6 +4,8 @@ import { createLogFunction } from "./Logging"
 import { useAtom } from "jotai"
 import { JotaiUtils } from "./utils/Jotai"
 
+const log = createLogFunction("tif.haptics")
+
 export const IS_HAPTICS_MUTED_KEY = "@haptics_is_muted"
 
 const isHapticsMutedAtom = JotaiUtils.atomWithAsyncStorage(
@@ -43,8 +45,6 @@ export interface Haptics {
    */
   unmute(): void
 }
-
-const log = createLogFunction("tif.haptics")
 
 /**
  * The default {@link Haptics} implementation which persists the mute state in async storage,

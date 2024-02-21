@@ -1,14 +1,12 @@
+import { uuidString } from "@lib/utils/UUID"
+import { mswServer } from "@test-helpers/msw"
 import {
-  RestRequest,
   DefaultBodyType,
-  PathParams,
-  ResponseComposition,
-  RestContext,
-  rest
+  HttpResponse,
+  StrictRequest,
+  http
 } from "msw"
 import { TiFAPI } from "../api-client/TiFAPI"
-import { mswServer } from "@test-helpers/msw"
-import { uuidString } from "@lib/utils/UUID"
 import { registerForPushNotifications } from "./RegisterForPushNotifications"
 
 describe("RegisterForPushNotifications tests", () => {
@@ -17,19 +15,17 @@ describe("RegisterForPushNotifications tests", () => {
     platformName: "apple" | "android"
   }) => {
     return async (
-      req: RestRequest<DefaultBodyType, PathParams<string>>,
-      res: ResponseComposition<DefaultBodyType>,
-      ctx: RestContext
+      { request }: {request: StrictRequest<DefaultBodyType>}
     ) => {
-      expect(await req.json()).toEqual(expectedRequest)
-      return res(ctx.status(201), ctx.json({ status: "inserted" }))
+      expect(await request.json()).toEqual(expectedRequest)
+      return HttpResponse.json({ status: "inserted" }, { status: 201 })
     }
   }
 
   test("register with iOS token", async () => {
     const pushToken = uuidString()
     mswServer.use(
-      rest.post(
+      http.post(
         TiFAPI.testPath("/user/notifications/push/register"),
         createTestBodyHandler({ pushToken, platformName: "apple" })
       )
@@ -43,7 +39,7 @@ describe("RegisterForPushNotifications tests", () => {
   test("register with android token", async () => {
     const pushToken = uuidString()
     mswServer.use(
-      rest.post(
+      http.post(
         TiFAPI.testPath("/user/notifications/push/register"),
         createTestBodyHandler({ pushToken, platformName: "android" })
       )

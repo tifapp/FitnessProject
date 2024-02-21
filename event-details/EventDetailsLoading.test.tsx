@@ -1,19 +1,19 @@
-import { act, renderHook, waitFor } from "@testing-library/react-native"
-import { loadEventDetails, useLoadEventDetails } from "./EventDetailsLoading"
-import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { EventMocks, mockEventLocation } from "./MockData"
-import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
-import { InternetConnectionStatusProvider } from "@lib/InternetConnection"
-import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { TiFAPI } from "@api-client/TiFAPI"
-import { mswServer } from "@test-helpers/msw"
-import { rest } from "msw"
-import { uuidString } from "@lib/utils/UUID"
 import { UserHandle } from "@content-parsing"
-import dayjs from "dayjs"
-import { ColorString } from "@lib/utils/Color"
 import { dateRange } from "@date-time"
+import { InternetConnectionStatusProvider } from "@lib/InternetConnection"
+import { ColorString } from "@lib/utils/Color"
+import { uuidString } from "@lib/utils/UUID"
+import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
+import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { fakeTimers } from "@test-helpers/Timers"
+import { noContentResponse, mswServer } from "@test-helpers/msw"
+import { act, renderHook, waitFor } from "@testing-library/react-native"
+import dayjs from "dayjs"
+import { HttpResponse, http } from "msw"
+import { loadEventDetails, useLoadEventDetails } from "./EventDetailsLoading"
+import { EventMocks, mockEventLocation } from "./MockData"
 
 describe("EventDetailsLoading tests", () => {
   beforeEach(() => {
@@ -341,15 +341,15 @@ describe("EventDetailsLoading tests", () => {
     })
 
     const setEventResponse = (
-      statusCode: 200 | 204 | 404 | 403,
+      status: 200 | 204 | 404 | 403,
       body?: object
     ) => {
       mswServer.use(
-        rest.get(TiFAPI.testPath("/event/details/:id"), async (_, res, ctx) => {
-          if (statusCode === 204) {
-            return res(ctx.status(204))
+        http.get(TiFAPI.testPath("/event/details/:id"), async () => {
+          if (status === 204) {
+            return noContentResponse()
           }
-          return res(ctx.status(statusCode), ctx.json(body))
+          return HttpResponse.json(body, { status })
         })
       )
     }
