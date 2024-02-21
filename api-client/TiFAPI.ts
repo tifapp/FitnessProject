@@ -237,7 +237,7 @@ export class TiFAPI {
         endpoint: `/event/leave/${eventId}`
       },
       {
-        status403: literalErrorSchema("event-has-been-cancelled", "event-has-ended"),
+        status403: literalErrorSchema("event-has-been-cancelled", "event-has-ended", "user-is-blocked"),
         status400: literalErrorSchema("co-host-not-found", "already-left-event"),
         status204: "no-content"
       }
