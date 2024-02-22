@@ -5,11 +5,18 @@ import {
   currentUserEventFromResponse
 } from "@shared-models/Event"
 import { useIsConnectedToInternet } from "@lib/InternetConnection"
-import React, { useEffect, useRef, useState } from "react"
+import React, { ReactNode, useEffect, useRef, useState } from "react"
 import { useEffectEvent } from "@lib/utils/UseEffectEvent"
 import { TiFAPI } from "@api-client/TiFAPI"
-import { StyleProp, View, ViewStyle, StyleSheet } from "react-native"
-import { BodyText, Subtitle, Title } from "@components/Text"
+import {
+  StyleProp,
+  View,
+  ViewStyle,
+  StyleSheet,
+  ScrollView,
+  RefreshControl
+} from "react-native"
+import { BodyText, Headline, Subtitle, Title } from "@components/Text"
 import { ArrayUtils } from "@lib/utils/Array"
 import { PrimaryButton } from "@components/Buttons"
 import { useConst } from "@lib/utils/UseConst"
@@ -17,6 +24,15 @@ import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useAutocorrectingInterval } from "@lib/utils/UseInterval"
+import { ExpandableContentText } from "@content-parsing"
+import { RoundedIonicon } from "@components/common/Icons"
+import { placemarkToFormattedAddress } from "@shared-models/Placemark"
+import {
+  EventTravelEstimatesView,
+  useEventTravelEstimates
+} from "./TravelEstimates"
+import { useEventDetails } from "./Context"
+import { EventDetailsHostView } from "./Host"
 
 /**
  * A result from loading a single event for the details screen.
@@ -157,7 +173,14 @@ export const EventDetailsView = ({
         style={styles.noContent}
       />
     )}
-    {result.status === "success" && <Title>TODO</Title>}
+    {result.status === "success" && (
+      <SuccessView
+        event={result.event}
+        refreshStatus={result.refreshStatus}
+        onPullToRefresh={result.refresh}
+        style={styles.success}
+      />
+    )}
   </View>
 )
 
@@ -166,6 +189,108 @@ const isExploratoryFailure = (
 ): status is "not-found" | "cancelled" | "blocked" => {
   return status !== "success" && status !== "error" && status !== "loading"
 }
+
+type SuccessProps = {
+  onPullToRefresh: () => void
+  style?: StyleProp<ViewStyle>
+} & Omit<
+  Extract<UseLoadEventDetailsResult, { status: "success" }>,
+  "status" | "refresh"
+>
+
+const SuccessView = ({
+  event,
+  refreshStatus,
+  onPullToRefresh,
+  style
+}: SuccessProps) => (
+  <ScrollView
+    style={style}
+    refreshControl={
+      <RefreshControl
+        onRefresh={onPullToRefresh}
+        refreshing={refreshStatus === "loading"}
+      />
+    }
+    contentContainerStyle={styles.detailContent}
+  >
+    <Title>{event.title}</Title>
+    <DetailSectionView>
+      <EventDetailsHostView
+        host={event.host}
+        color={event.color}
+        onFriendButtonTapped={() => console.log("TODO: Friend Logic")}
+      />
+    </DetailSectionView>
+    <DetailSectionView title="Details">
+      {/* TODO: - Widgets */}
+      <View style={styles.detailWidgetsPlaceholder} />
+    </DetailSectionView>
+    <DetailSectionView title="Description">
+      <ExpandableContentText
+        text={event.description}
+        collapsedLineLimit={3}
+        onUserHandleTapped={() => console.log("TODO: User Handle Navigation")}
+        onEventHandleTapped={() => console.log("TODO: Event Handle Navigation")}
+        expandButtonTextStyle={{ color: event.color.toString() }}
+      />
+    </DetailSectionView>
+    <DetailSectionView title="Location">
+      <LocationSectionView event={event} />
+    </DetailSectionView>
+    <View style={{ marginBottom: 48 }} />
+  </ScrollView>
+)
+
+const LocationSectionView = ({
+  event
+}: {
+  event: Pick<CurrentUserEvent, "location" | "host" | "color">
+}) => (
+  <>
+    <View style={styles.locationDetailsContainer}>
+      <RoundedIonicon
+        borderRadius={12}
+        color="white"
+        backgroundColor={event.color.toString()}
+        name="location"
+      />
+      <View style={styles.locationDetailsText}>
+        <Headline>
+          {event.location.placemark?.name ?? "Unknown Location"}
+        </Headline>
+        <BodyText>
+          {event.location.placemark
+            ? placemarkToFormattedAddress(event.location.placemark)
+            : "Unknown Address"}
+        </BodyText>
+      </View>
+    </View>
+    <EventTravelEstimatesView
+      host={event.host}
+      location={event.location}
+      result={useEventTravelEstimates(
+        event.location.coordinate,
+        useEventDetails().travelEstimates
+      )}
+    />
+  </>
+)
+
+type DetailSectionProps = {
+  title?: string
+  children: ReactNode
+}
+
+const DetailSectionView = ({ title, children }: DetailSectionProps) => (
+  <Animated.View
+    layout={TiFDefaultLayoutTransition}
+    style={styles.detailSection}
+  >
+    {title && <Subtitle>{title}</Subtitle>}
+    {children}
+  </Animated.View>
+)
 
 const LoadingTitleView = ({ title }: { title: string }) => {
   const balls = useDisplayedEventDetailsLoadingBalls(700)
@@ -482,5 +607,31 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
     marginBottom: 2,
     backgroundColor: AppStyles.darkColor
+  },
+  success: {
+    width: "100%",
+    height: "100%"
+  },
+  detailContent: {
+    paddingHorizontal: 24,
+    rowGap: 32
+  },
+  detailSection: {
+    rowGap: 16
+  },
+  detailWidgetsPlaceholder: {
+    borderRadius: 12,
+    width: "100%",
+    height: 450,
+    backgroundColor: AppStyles.eventCardColor
+  },
+  locationDetailsContainer: {
+    display: "flex",
+    flexDirection: "row",
+    columnGap: 16
+  },
+  locationDetailsText: {
+    paddingRight: 24,
+    rowGap: 4
   }
 })

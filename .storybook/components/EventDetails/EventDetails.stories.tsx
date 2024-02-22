@@ -1,6 +1,6 @@
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import React, { useCallback, useEffect } from "react"
+import React, { useEffect } from "react"
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 import {
   EventAttendeeMocks,
@@ -15,21 +15,12 @@ import {
   requestForegroundPermissionsAsync
 } from "expo-location"
 import { mockPlacemark } from "@location/MockData"
+import { EventDetailsView, useLoadEventDetails } from "@event-details/Details"
 import { createTestQueryClient } from "@test-helpers/ReactQuery"
 import { QueryClientProvider } from "@tanstack/react-query"
-import { EventCountdownView, useEventCountdown } from "@event-details/Countdown"
-import { dateRange, dayjs, now } from "@date-time"
-import { View } from "react-native"
-import { JoinEventStagesView } from "@event-details/JoinEvent"
-import { NavigationContainer, useFocusEffect } from "@react-navigation/native"
-import { createStackNavigator } from "@react-navigation/stack"
-import { AppState } from "@aws-amplify/core"
-import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
+import { ColorString } from "@lib/utils/Color"
 import { sleep } from "@lib/utils/DelayData"
-import { TrueRegionMonitor } from "@event-details/arrival-tracking/region-monitoring/MockRegionMonitors"
-import { GestureHandlerRootView } from "react-native-gesture-handler"
-import { createTestQueryClient } from "@test-helpers/ReactQuery"
-import { QueryClientProvider } from "@tanstack/react-query"
+import { EventDetailsProvider } from "@event-details/Context"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -40,8 +31,6 @@ export default EventDetailsMeta
 type EventDetailsStory = ComponentStory<typeof SettingsScreen>
 
 const event = EventMocks.PickupBasketball
-
-const Stack = createStackNavigator()
 
 const location = {
   ...mockEventLocation(),
@@ -55,61 +44,49 @@ export const Basic: EventDetailsStory = () => {
   useEffect(() => {
     queryClient.resetQueries()
   }, [])
-
   return (
     <SafeAreaProvider>
-      {/* <SafeAreaView edges={["bottom"]}> */}
-      <UserLocationFunctionsProvider
-        getCurrentLocation={getCurrentPositionAsync}
-        requestBackgroundPermissions={requestBackgroundPermissionsAsync}
-        requestForegroundPermissions={requestForegroundPermissionsAsync}
-      >
-        <QueryClientProvider client={queryClient}>
-          <BottomSheetModalProvider>
-            <NavigationContainer>
-              <Stack.Navigator
-                screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
-              >
-                <Stack.Screen name="test" component={Test} />
-              </Stack.Navigator>
-            </NavigationContainer>
-          </BottomSheetModalProvider>
-        </QueryClientProvider>
-      </UserLocationFunctionsProvider>
-      {/* </SafeAreaView> */}
+      <SafeAreaView edges={["top"]}>
+        <UserLocationFunctionsProvider
+          getCurrentLocation={getCurrentPositionAsync}
+          requestBackgroundPermissions={requestBackgroundPermissionsAsync}
+          requestForegroundPermissions={requestForegroundPermissionsAsync}
+        >
+          <QueryClientProvider client={queryClient}>
+            <BottomSheetModalProvider>
+              <Test />
+            </BottomSheetModalProvider>
+          </QueryClientProvider>
+        </UserLocationFunctionsProvider>
+      </SafeAreaView>
     </SafeAreaProvider>
   )
 }
 
 const host = EventAttendeeMocks.Alivs
 
-const time = {
-  secondsToStart: dayjs.duration(15, "minute").asSeconds(),
-  todayOrTomorrow: "tomorrow",
-  clientReceivedTime: new Date(),
-  dateRange: dateRange(new Date(), now().add(1, "hour").toDate())
-} as const
-
 const Test = () => {
-  const result = useEventCountdown(time)
+  const result = useLoadEventDetails(1, async () => {
+    // await sleep(30000)
+    return {
+      status: "success",
+      event: {
+        ...EventMocks.PickupBasketball,
+        location,
+        color: ColorString.parse("#345995")!,
+        description:
+          "Hello world, this is an @event of some kind. Please join it if you like to do !17|123/#2BC016/Pickup Basketball. \n\nNow I write this endless storybook story in the void, where \nI can test things like @hello to make sure that links are highlighting and I am not going absolutely crazy."
+      }
+    }
+  })
   return (
-    <View style={{ height: "100%" }}>
-      <View
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "flex-end",
-          justifyContent: "space-between",
-          paddingHorizontal: 24,
-          paddingBottom: 48,
-          flex: 1
-        }}
-      >
-        <EventCountdownView result={result} />
-        <JoinEventStagesView
-          stage={{ stage: "idle", joinButtonTapped: () => {} }}
-        />
-      </View>
-    </View>
+    <EventDetailsProvider
+      travelEstimates={async () => {
+        await sleep(10_000)
+        throw new Error("lol")
+      }}
+    >
+      <EventDetailsView result={result} onExploreOtherEventsTapped={() => {}} />
+    </EventDetailsProvider>
   )
 }

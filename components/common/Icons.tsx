@@ -202,7 +202,13 @@ export const RoundedIonicon = ({
     maximumScaleFactor: maximumFontScaleFactor
   })
   return (
-    <View style={{ borderRadius, backgroundColor }}>
+    <View
+      style={{
+        borderRadius,
+        backgroundColor,
+        maxHeight: size * 1.7 * fontScale
+      }}
+    >
       <View style={{ padding: size * fontScale * (1 / 3) }}>
         <Ionicon
           {...props}
