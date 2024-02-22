@@ -115,7 +115,7 @@ export class TiFSQLite {
       `,
       db.run`
       CREATE TABLE IF NOT EXISTS InternalMetrics (
-        id INTEGER NOT NULL PRIMARY KEY DEFAULT 1,
+        id INTEGER NOT NULL PRIMARY KEY DEFAULT 1 CHECK (id = 1),
         hasCompletedOnboarding INT2 NOT NULL,
         lastEventArrivalsRefreshTime DOUBLE
       )

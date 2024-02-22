@@ -77,7 +77,7 @@ export class SQLiteInternalMetrics implements InternalMetricsStorage {
       )
       ON CONFLICT(id)
       DO UPDATE SET
-      hasCompletedOnboarding = ${valuesToSave.hasCompletedOnboarding},
+        hasCompletedOnboarding = ${valuesToSave.hasCompletedOnboarding},
         lastEventArrivalsRefreshTime = ${valuesToSave.lastEventArrivalsRefreshDate?.getTime()}
       `
     })
