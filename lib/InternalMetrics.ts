@@ -40,7 +40,7 @@ export interface InternalMetricsStorage {
   update(values: Partial<InternalMetrics>): Promise<void>
 }
 
-type SQLiteInternalMetricsValues = {
+type SQLiteInternalMetrics = {
   hasCompletedOnboarding: number
   lastEventArrivalsRefreshTime: number | null
 }
@@ -48,7 +48,7 @@ type SQLiteInternalMetricsValues = {
 /**
  * {@link InternalMetricsStorage} implementation using SQLite.
  */
-export class SQLiteInternalMetrics implements InternalMetricsStorage {
+export class SQLiteInternalMetricsStorage implements InternalMetricsStorage {
   private readonly sqlite: TiFSQLite
 
   constructor(sqlite: TiFSQLite) {
@@ -84,7 +84,7 @@ export class SQLiteInternalMetrics implements InternalMetricsStorage {
   }
 
   private async currentValues(db: SQLExecutable) {
-    const dbValues = await db.queryFirst<SQLiteInternalMetricsValues>`
+    const dbValues = await db.queryFirst<SQLiteInternalMetrics>`
       SELECT * FROM InternalMetrics LIMIT 1
       `
     if (!dbValues) return { ...DEFAULT_INTERNAL_METRICS_VALUES }

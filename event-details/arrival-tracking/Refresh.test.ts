@@ -1,7 +1,7 @@
 import { fakeTimers } from "@test-helpers/Timers"
 import { EventArrivalsRefresher } from "./Refresh"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
-import { SQLiteInternalMetrics } from "@lib/InternalMetrics"
+import { SQLiteInternalMetricsStorage } from "@lib/InternalMetrics"
 
 describe("EventArrivalsRefresher tests", () => {
   resetTestSQLiteBeforeEach()
@@ -84,7 +84,7 @@ describe("EventArrivalsRefresher tests", () => {
   const createRefresher = (minutesBetweenNeededRefreshes: number) => {
     return new EventArrivalsRefresher(
       performRefresh,
-      new SQLiteInternalMetrics(testSQLite),
+      new SQLiteInternalMetricsStorage(testSQLite),
       minutesBetweenNeededRefreshes
     )
   }

@@ -1,13 +1,13 @@
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 import {
   DEFAULT_INTERNAL_METRICS_VALUES,
-  SQLiteInternalMetrics
+  SQLiteInternalMetricsStorage
 } from "./InternalMetrics"
 
 describe("InternalMetrics tests", () => {
   describe("SQLiteInternalMetrics tests", () => {
     resetTestSQLiteBeforeEach()
-    const internalMetrics = new SQLiteInternalMetrics(testSQLite)
+    const internalMetrics = new SQLiteInternalMetricsStorage(testSQLite)
 
     it("should return the default values when no values are saved", async () => {
       const values = await internalMetrics.current()
