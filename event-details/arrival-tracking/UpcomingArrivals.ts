@@ -88,7 +88,7 @@ export class SQLiteUpcomingEventArrivals implements UpcomingEventArrivals {
             ${region.coordinate.latitude},
             ${region.coordinate.longitude},
             ${region.arrivalRadiusMeters},
-            ${region.isArrived ? 1 : 0}
+            ${region.isArrived}
           )
           `
           await Promise.all(
