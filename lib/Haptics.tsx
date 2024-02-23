@@ -1,25 +1,22 @@
-import React, { ReactNode, createContext, useContext, useEffect } from "react"
+import React, { ReactNode, createContext, useContext } from "react"
 import { TiFNativeHaptics, TiFNativeHapticEvent } from "@modules/tif-haptics"
 import { createLogFunction } from "./Logging"
-import { useAtom } from "jotai"
-import { JotaiUtils } from "./utils/Jotai"
+import { DeviceSettings, DeviceSettingsStore } from "./DeviceSettings"
 
 const log = createLogFunction("tif.haptics")
-
-export const IS_HAPTICS_MUTED_KEY = "@haptics_is_muted"
-
-const isHapticsMutedAtom = JotaiUtils.atomWithAsyncStorage(
-  IS_HAPTICS_MUTED_KEY,
-  false
-)
-
-export const IS_HAPTICS_SUPPORTED_ON_DEVICE =
-  !!TiFNativeHaptics.IS_HAPTICS_SUPPORTED
 
 /**
  * A function type to indicate haptic feedback being played to the user.
  */
 export type HapticEvent = { name: "selection" }
+
+/**
+ * Configuration settings for the underlying haptics engine.
+ */
+export type HapticsSettings = Pick<
+  DeviceSettings,
+  "isHapticFeedbackEnabled" | "isHapticAudioEnabled"
+>
 
 const toNativeHapticEvent = (_: HapticEvent) => {
   // TODO: - Add more events
@@ -36,14 +33,20 @@ export interface Haptics {
   play(event: HapticEvent): Promise<void>
 
   /**
-   * Mutes haptics if unmuted.
+   * Applies the settings to this underlying haptics engine.
    */
-  mute(): void
+  apply(settings: HapticsSettings): Promise<void>
+}
 
-  /**
-   * Unmutes haptics if muted.
-   */
-  unmute(): void
+/**
+ * Subscribes to the given {@link DeviceSettingsStore} and applies haptic
+ * related settings changes to the given {@link Haptics} instance.
+ */
+export const applyHapticDeviceSettingsChanges = (
+  haptics: Haptics,
+  deviceSettingsStore: DeviceSettingsStore
+) => {
+  deviceSettingsStore.subscribe((settings) => haptics.apply(settings))
 }
 
 /**
@@ -51,7 +54,6 @@ export interface Haptics {
  * and uses CoreHaptics on iOS and Vibrator on Android.
  */
 export const TiFHaptics = {
-  ...TiFNativeHaptics,
   play: async (event: HapticEvent) => {
     try {
       await TiFNativeHaptics.play(toNativeHapticEvent(event))
@@ -60,37 +62,26 @@ export const TiFHaptics = {
         error: error.message
       })
     }
+  },
+  apply: async () => {
+    throw new Error("TODO: - Implement this natively")
   }
 } as Haptics
 
-export type HapticsContextValues = Haptics & { isSupportedOnDevice: boolean }
+export type HapticsContextValues = {
+  haptics: Haptics
+  isSupportedOnDevice: boolean
+}
 
-const HapticsContext = createContext<HapticsContextValues | undefined>(
-  undefined
-)
+const HapticsContext = createContext<HapticsContextValues>({
+  haptics: TiFHaptics,
+  isSupportedOnDevice: !!TiFNativeHaptics.IS_HAPTICS_SUPPORTED
+})
 
 /**
  * The current {@link Haptics} implementation provided by {@link HapticsProvider}.
  */
-export const useHaptics = () => {
-  const [isMuted, setIsMuted] = useAtom(isHapticsMutedAtom)
-  const hapticsContext = useContext(HapticsContext)!
-
-  useEffect(() => {
-    if (isMuted) {
-      hapticsContext.mute()
-    } else {
-      hapticsContext.unmute()
-    }
-  }, [isMuted, hapticsContext])
-
-  return {
-    ...hapticsContext,
-    isMuted,
-    mute: () => setIsMuted(true),
-    unmute: () => setIsMuted(false)
-  }
-}
+export const useHaptics = () => useContext(HapticsContext)
 
 export type HapticsProviderProps = {
   haptics: Haptics
@@ -103,17 +94,7 @@ export type HapticsProviderProps = {
  */
 export const HapticsProvider = ({
   children,
-  haptics,
-  isSupportedOnDevice
+  ...props
 }: HapticsProviderProps) => (
-  <HapticsContext.Provider
-    value={{
-      play: async (event) => await haptics.play(event),
-      mute: () => haptics.mute(),
-      unmute: () => haptics.unmute(),
-      isSupportedOnDevice
-    }}
-  >
-    {children}
-  </HapticsContext.Provider>
+  <HapticsContext.Provider value={props}>{children}</HapticsContext.Provider>
 )
