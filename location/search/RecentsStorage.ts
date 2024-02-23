@@ -56,12 +56,12 @@ export class SQLiteRecentLocationsStorage implements RecentLocationsStorage {
   async locationsForCoordinates(coordinates: LocationCoordinate2D[]) {
     const stringifiedCoordinates = coordinates
       .map((coordinate) => `${coordinate.latitude},${coordinate.longitude}`)
-      .join(",")
+      .join("|")
     return await this.sqlite.withTransaction(async (db) => {
       const results = await db.queryAll<SQLiteLocationPlacemark>`
       SELECT * FROM LocationPlacemarks
-      WHERE ${stringifiedCoordinates} 
-        LIKE '%' || latitude || ',' || longitude || '%'
+      WHERE '|' || ${stringifiedCoordinates} || '|'
+        LIKE '%|' || latitude || ',' || longitude || '|%'
       ORDER BY recentUpdatedAt DESC
       `
       return results.map(recentLocationFromSQLite)
@@ -95,7 +95,7 @@ export class SQLiteRecentLocationsStorage implements RecentLocationsStorage {
         ${location.placemark.isoCountryCode},
         ${location.placemark.city},
         ${annotation}
-      ) 
+      )
       ON CONFLICT(latitude, longitude)
       DO UPDATE SET
         name = ${location.placemark.name},

@@ -88,5 +88,30 @@ describe("RecentLocationStorage tests", () => {
         })
       ])
     })
+
+    test("load locations by coordinates with first longitude value equal to second latitude value", async () => {
+      await storage.save(
+        mockTiFLocation({ latitude: -50.123, longitude: -50.123 })
+      )
+      const results = await storage.locationsForCoordinates([
+        { latitude: 45.123, longitude: -50.123 },
+        { latitude: -50.123, longitude: 45.123 }
+      ])
+      expect(results).toEqual([])
+    })
+
+    test("load locations by coordinates using duplicate coordinates", async () => {
+      const locations = ArrayUtils.repeatElements(2, () => mockTiFLocation())
+      await storage.save(locations[0], "attended-event")
+      await storage.save(locations[1])
+      const results = await storage.locationsForCoordinates([
+        locations[0].coordinate,
+        locations[0].coordinate
+      ])
+      expect(results).toEqual([{
+        location: locations[0],
+        annotation: "attended-event"
+      }])
+    })
   })
 })
