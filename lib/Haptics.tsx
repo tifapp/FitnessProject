@@ -68,13 +68,12 @@ export const TiFHaptics = {
   }
 } as Haptics
 
-export type HapticsContextValues = {
-  haptics: Haptics
+export type HapticsContextValues = Haptics & {
   isSupportedOnDevice: boolean
 }
 
 const HapticsContext = createContext<HapticsContextValues>({
-  haptics: TiFHaptics,
+  ...TiFHaptics,
   isSupportedOnDevice: !!TiFNativeHaptics.IS_HAPTICS_SUPPORTED
 })
 
@@ -94,7 +93,16 @@ export type HapticsProviderProps = {
  */
 export const HapticsProvider = ({
   children,
-  ...props
+  haptics,
+  isSupportedOnDevice
 }: HapticsProviderProps) => (
-  <HapticsContext.Provider value={props}>{children}</HapticsContext.Provider>
+  <HapticsContext.Provider
+    value={{
+      play: (event) => haptics.play(event),
+      apply: (settings) => haptics.apply(settings),
+      isSupportedOnDevice
+    }}
+  >
+    {children}
+  </HapticsContext.Provider>
 )
