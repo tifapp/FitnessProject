@@ -102,6 +102,16 @@ export class TiFSQLite {
         CHECK(recentAnnotation IN ('attended-event', 'hosted-event')),
         PRIMARY KEY(latitude, longitude)
       )
+      `,
+      db.run`
+      CREATE TABLE IF NOT EXISTS Logs (
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        label TEXT NOT NULL,
+        message TEXT NOT NULL,
+        level TEXT NOT NULL CHECK(level IN ('debug', 'info', 'warn', 'error')),
+        stringifiedMetadata TEXT,
+        timestamp DOUBLE NOT NULL DEFAULT (unixepoch('now', 'subsec'))
+      )
       `
     ])
     return db
