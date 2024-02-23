@@ -14,6 +14,7 @@ export const resetTestSQLiteBeforeEach = () => {
       await db.run`DELETE FROM LocationArrivals`
       await db.run`DELETE FROM LocationPlacemarks`
       await db.run`DELETE FROM Logs`
+      await db.run`DELETE FROM InternalMetrics`
     })
   })
 }

@@ -112,6 +112,13 @@ export class TiFSQLite {
         stringifiedMetadata TEXT,
         timestamp DOUBLE NOT NULL DEFAULT (unixepoch('now', 'subsec'))
       )
+      `,
+      db.run`
+      CREATE TABLE IF NOT EXISTS InternalMetrics (
+        id TEXT NOT NULL PRIMARY KEY DEFAULT 'A' CHECK (id = 'A'),
+        hasCompletedOnboarding INT2 NOT NULL,
+        lastEventArrivalsRefreshTime DOUBLE
+      )
       `
     ])
     return db
@@ -174,7 +181,12 @@ class ExpoSQLExecutable {
   ) {
     return {
       query: statements.join("?"),
-      values: args.map((arg) => (arg === undefined ? null : arg))
+      values: args.map((arg) => {
+        if (typeof arg === "boolean") {
+          return arg ? 1 : 0
+        }
+        return arg === undefined ? null : arg
+      })
     }
   }
 }
