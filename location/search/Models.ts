@@ -51,7 +51,7 @@ export class LocationsSearchQuery {
 
   private readonly rawValue: string
 
-  constructor (rawValue: string) {
+  constructor(rawValue: string) {
     this.rawValue = rawValue
   }
 
@@ -59,11 +59,11 @@ export class LocationsSearchQuery {
    * The data source type of this query. An empty string means loading from
    * the user's recent locations.
    */
-  get sourceType (): LocationsSearchSourceType {
+  get sourceType(): LocationsSearchSourceType {
     return this.rawValue.length === 0 ? "user-recents" : "remote-search"
   }
 
-  toString () {
+  toString() {
     return this.rawValue
   }
 }

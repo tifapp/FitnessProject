@@ -38,7 +38,7 @@ export const checkIfCoordsAreEqual = (
  * A zod schema for {@link TiFLocation}.
  */
 export const TiFLocationSchema = z.object({
-  coordinates: LocationCoordinates2DSchema,
+  coordinate: LocationCoordinates2DSchema,
   placemark: PlacemarkSchema
 })
 

@@ -84,6 +84,24 @@ export class TiFSQLite {
           REFERENCES LocationArrivals(latitude, longitude, arrivalRadiusMeters)
           ON DELETE CASCADE
       )
+      `,
+      db.run`
+      CREATE TABLE IF NOT EXISTS LocationPlacemarks (
+        latitude DOUBLE NOT NULL,
+        longitude DOUBLE NOT NULL,
+        name TEXT,
+        country TEXT,
+        postalCode TEXT,
+        street TEXT,
+        streetNumber TEXT,
+        region TEXT,
+        isoCountryCode TEXT,
+        city TEXT,
+        recentAnnotation TEXT,
+        recentUpdatedAt DOUBLE NOT NULL DEFAULT (unixepoch('now', 'subsec')),
+        CHECK(recentAnnotation IN ('attended-event', 'hosted-event')),
+        PRIMARY KEY(latitude, longitude)
+      )
       `
     ])
     return db
