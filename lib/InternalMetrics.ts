@@ -67,11 +67,9 @@ export class SQLiteInternalMetricsStorage implements InternalMetricsStorage {
       }
       await db.run`
       INSERT INTO InternalMetrics (
-        id,
         hasCompletedOnboarding,
         lastEventArrivalsRefreshTime
       ) VALUES (
-        1,
         ${valuesToSave.hasCompletedOnboarding},
         ${valuesToSave.lastEventArrivalsRefreshDate?.getTime()}
       )
