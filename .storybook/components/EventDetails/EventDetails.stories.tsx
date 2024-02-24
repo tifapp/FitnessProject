@@ -24,6 +24,13 @@ import {
 } from "expo-location"
 import { mockPlacemark } from "@location/MockData"
 import { sleep } from "@lib/utils/DelayData"
+import {
+  JoinEventStagesView,
+  loadJoinEventPermissions,
+  useJoinEventStages
+} from "@event-details/JoinEvent"
+import { TrueRegionMonitor } from "@event-details/arrival-tracking/region-monitoring/MockRegionMonitors"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -44,19 +51,28 @@ const location = {
 export const Basic: EventDetailsStory = () => {
   return (
     <SafeAreaProvider>
-      <View style={{ width: "100%", marginTop: 256 }}>
-        <UserLocationFunctionsProvider
-          getCurrentLocation={getCurrentPositionAsync}
-          requestBackgroundPermissions={requestBackgroundPermissionsAsync}
-          requestForegroundPermissions={requestForegroundPermissionsAsync}
-        >
-          <TiFQueryClientProvider>
-            <BottomSheetModalProvider>
-              <Test />
-            </BottomSheetModalProvider>
-          </TiFQueryClientProvider>
-        </UserLocationFunctionsProvider>
-      </View>
+      <GestureHandlerRootView>
+        <BottomSheetModalProvider>
+          <View
+            style={{
+              width: "100%",
+              height: "100%",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            <UserLocationFunctionsProvider
+              getCurrentLocation={getCurrentPositionAsync}
+              requestBackgroundPermissions={requestBackgroundPermissionsAsync}
+              requestForegroundPermissions={requestForegroundPermissionsAsync}
+            >
+              <TiFQueryClientProvider>
+                <Test />
+              </TiFQueryClientProvider>
+            </UserLocationFunctionsProvider>
+          </View>
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
     </SafeAreaProvider>
   )
 }
@@ -64,14 +80,11 @@ export const Basic: EventDetailsStory = () => {
 const host = EventAttendeeMocks.Alivs
 
 const Test = () => {
-  const result = useEventTravelEstimates(
-    location.coordinate,
-    async (eventCoordinate, userCoordinate, signal) => {
-      throw new Error("Died")
-    }
-  )
-  console.log(result)
-  return (
-    <EventTravelEstimatesView host={host} location={location} result={result} />
-  )
+  const currentStage = useJoinEventStages(EventMocks.Multiday, {
+    monitor: TrueRegionMonitor,
+    joinEvent: async () => "success",
+    loadPermissions: loadJoinEventPermissions,
+    onSuccess: () => {}
+  })
+  return <JoinEventStagesView stage={currentStage} />
 }

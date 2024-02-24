@@ -60,7 +60,7 @@ export class SQLiteRecentLocationsStorage implements RecentLocationsStorage {
     return await this.sqlite.withTransaction(async (db) => {
       const results = await db.queryAll<SQLiteLocationPlacemark>`
       SELECT * FROM LocationPlacemarks
-      WHERE ${stringifiedCoordinates} 
+      WHERE ${stringifiedCoordinates}
         LIKE '%' || latitude || ',' || longitude || '%'
       ORDER BY recentUpdatedAt DESC
       `
@@ -95,7 +95,7 @@ export class SQLiteRecentLocationsStorage implements RecentLocationsStorage {
         ${location.placemark.isoCountryCode},
         ${location.placemark.city},
         ${annotation}
-      ) 
+      )
       ON CONFLICT(latitude, longitude)
       DO UPDATE SET
         name = ${location.placemark.name},
@@ -138,14 +138,6 @@ const recentLocationFromSQLite = (location: SQLiteLocationPlacemark) => ({
 })
 
 /**
- * A zod schema for {@link RecentLocationAnnotationSchema}.
- */
-export const RecentLocationAnnotationSchema = z.enum([
-  "attended-event",
-  "hosted-event"
-])
-
-/**
  * Reason for saving a location in the location storage.
  *
  * This is mainly meant for use cases in which some status indicator can
@@ -154,11 +146,16 @@ export const RecentLocationAnnotationSchema = z.enum([
  *
  * ### Available Options
  * - `"attended-event"`
- *    - Use this when the user joins an event
+ *    - Use this when the user has evidence of attending an event.
  * - `"hosted-event"`
- *    - Use this when the user creates an event
+ *    - Use this when the user creates an event.
+ * - `"joined-event"`
+ *    - Use this when the user has joined an event.
  */
-export type RecentLocationAnnotation = "attended-event" | "hosted-event"
+export type RecentLocationAnnotation =
+  | "attended-event"
+  | "hosted-event"
+  | "joined-event"
 
 /**
  * A type that contains recency data around a particular location.
