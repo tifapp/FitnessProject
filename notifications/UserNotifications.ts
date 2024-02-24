@@ -8,9 +8,7 @@ export interface UserNotifications {
    * Returns the content from the last notification the user tapped on
    * from outside the app.
    */
-  lastNotificationContent: () => Promise<
-    NotificationContent | null | undefined
-  >;
+  lastNotificationContent: () => Promise<NotificationContent | null | undefined>
 }
 
 /**

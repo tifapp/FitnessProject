@@ -1,6 +1,6 @@
-import { withBackgrounds } from "@storybook/addon-ondevice-backgrounds";
+import { withBackgrounds } from "@storybook/addon-ondevice-backgrounds"
 
-export const decorators = [withBackgrounds];
+export const decorators = [withBackgrounds]
 
 export const parameters = {
   backgrounds: {
@@ -8,13 +8,13 @@ export const parameters = {
     values: [
       { name: "plain", value: "white" },
       { name: "warm", value: "hotpink" },
-      { name: "cool", value: "deepskyblue" },
-    ],
+      { name: "cool", value: "deepskyblue" }
+    ]
   },
   controls: {
     matchers: {
       color: /(background|color)$/i,
-      date: /Date$/,
-    },
-  },
-};
+      date: /Date$/
+    }
+  }
+}

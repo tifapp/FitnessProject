@@ -75,8 +75,9 @@ const StoryView = () => {
 
 const MainView = () => {
   const [arrivalRadiusMeters, setArrivalRadiusMeters] = useState(100)
-  const [coordinate, setCoordinate] =
-    useState<LocationCoordinate2D | undefined>()
+  const [coordinate, setCoordinate] = useState<
+    LocationCoordinate2D | undefined
+  >()
   const region = useMemo(() => {
     if (!coordinate) return undefined
     return { arrivalRadiusMeters, coordinate }
@@ -164,8 +165,9 @@ type RegionMonitoringProps = {
 }
 
 const RegionMonitoringView = ({ region }: RegionMonitoringProps) => {
-  const [lastKnownCoordinate, setLastKnownCoordinate] =
-    useState<LocationCoordinate2D | undefined>()
+  const [lastKnownCoordinate, setLastKnownCoordinate] = useState<
+    LocationCoordinate2D | undefined
+  >()
   const monitor = useMemo(() => {
     return new ForegroundEventRegionMonitor(async (callback) => {
       return await watchPositionAsync(
@@ -188,22 +190,20 @@ const RegionMonitoringView = ({ region }: RegionMonitoringProps) => {
         <CoordinateLabel coordinate={lastKnownCoordinate} />
       )}
       <Spacer />
-      {hasArrived
-        ? (
-          <EventArrivalBannerView
-            hasJoinedEvent
-            countdown={{ secondsToStart: 200 }}
-            canShareArrivalStatus={true}
-            onClose={() => console.log("I will remain open forever!")}
-            style={{ width: "100%" }}
-          />
-        )
-        : (
-          <BodyText>
+      {hasArrived ? (
+        <EventArrivalBannerView
+          hasJoinedEvent
+          countdown={{ secondsToStart: 200 }}
+          canShareArrivalStatus={true}
+          onClose={() => console.log("I will remain open forever!")}
+          style={{ width: "100%" }}
+        />
+      ) : (
+        <BodyText>
           The arrival Banner will appear here when the foreground monitor
           detects that you've arrived at the region.
-          </BodyText>
-        )}
+        </BodyText>
+      )}
     </View>
   )
 }

@@ -86,7 +86,7 @@ type NotShittyUserResponse = {
 const fetchFromThirdPartyBad = async () => {
   const data = await shittyClient
     .get<ShittyUser>()
-    .then((res) => ({ userId: res.user_id } as NotShittyUserResponse))
+    .then((res) => ({ userId: res.user_id }) as NotShittyUserResponse)
   // Do stuff with the data in camelCase
   return data
 }

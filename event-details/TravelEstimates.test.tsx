@@ -1,4 +1,10 @@
 import { dayjs } from "@date-time"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import { renderHook, waitFor } from "@testing-library/react-native"
+import {
+  formattedTravelEstimateResult,
+  useEventTravelEstimates
+} from "./TravelEstimates"
 import {
   mockExpoLocationObject,
   mockLocationCoordinate2D
@@ -9,13 +15,7 @@ import {
   LocationCoordinate2D
 } from "@shared-models/Location"
 import { setPlatform } from "@test-helpers/Platform"
-import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { renderHook, waitFor } from "@testing-library/react-native"
 import { CodedError } from "expo-modules-core"
-import {
-  formattedTravelEstimateResult,
-  useEventTravelEstimates
-} from "./TravelEstimates"
 
 describe("EventTravelEstimates tests", () => {
   describe("UseEventTravelEstimates tests", () => {
@@ -49,9 +49,7 @@ describe("EventTravelEstimates tests", () => {
               requestBackgroundPermissions={jest.fn()}
               requestForegroundPermissions={jest.fn()}
             >
-              <TestQueryClientProvider>
-                {children}
-              </TestQueryClientProvider>
+              <TestQueryClientProvider>{children}</TestQueryClientProvider>
             </UserLocationFunctionsProvider>
           )
         }
@@ -187,7 +185,10 @@ describe("EventTravelEstimates tests", () => {
         formattedTravelEstimateResult({ status: "disabled" }, "automobile")
       ).toBeUndefined()
       expect(
-        formattedTravelEstimateResult({ status: "not-permissible" }, "automobile")
+        formattedTravelEstimateResult(
+          { status: "not-permissible" },
+          "automobile"
+        )
       ).toBeUndefined()
     })
 
@@ -217,7 +218,8 @@ describe("EventTravelEstimates tests", () => {
 
     test("decimal mile distance", () => {
       expect(
-        formattedTravelEstimateResult(testSuccess3, "automobile")?.travelDistance
+        formattedTravelEstimateResult(testSuccess3, "automobile")
+          ?.travelDistance
       ).toEqual("1.1 mi")
     })
 
@@ -238,19 +240,15 @@ describe("EventTravelEstimates tests", () => {
         formattedTravelEstimateResult(testSuccess, "walking")?.travelTime
       ).toEqual("1h 10m")
       expect(
-        formattedTravelEstimateResult(
-          testSuccess2,
-          "publicTransportation"
-        )?.travelTime
+        formattedTravelEstimateResult(testSuccess2, "publicTransportation")
+          ?.travelTime
       ).toEqual("1d 2h")
       expect(
         formattedTravelEstimateResult(testSuccess3, "walking")?.travelTime
       ).toEqual("1d 14h")
       expect(
-        formattedTravelEstimateResult(
-          testSuccess3,
-          "publicTransportation"
-        )?.travelTime
+        formattedTravelEstimateResult(testSuccess3, "publicTransportation")
+          ?.travelTime
       ).toEqual("1h 36m")
     })
   })

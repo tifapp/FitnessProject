@@ -12,7 +12,11 @@ import { noContentResponse, mswServer } from "@test-helpers/msw"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import dayjs from "dayjs"
 import { HttpResponse, http } from "msw"
-import { loadEventDetails, useLoadEventDetails } from "./EventDetailsLoading"
+import {
+  loadEventDetails,
+  useDisplayedEventDetailsLoadingBalls,
+  useLoadEventDetails
+} from "./Details"
 import { EventMocks, mockEventLocation } from "./MockData"
 
 describe("EventDetailsLoading tests", () => {
@@ -134,7 +138,7 @@ describe("EventDetailsLoading tests", () => {
       expect(loadEvent).toHaveBeenCalledTimes(2)
     })
 
-    test("load successfully, refresh returns \"not-found\" flow", async () => {
+    test("load successfully, refresh returns not-found flow", async () => {
       loadEvent
         .mockResolvedValueOnce({
           status: "success",
@@ -236,19 +240,19 @@ describe("EventDetailsLoading tests", () => {
   describe("LoadEventDetails tests", () => {
     fakeTimers()
 
-    it("should return \"canceled\" when a 204 occurs", async () => {
+    it("should return canceled when a 204 occurs", async () => {
       setEventResponse(204)
       const result = await loadEventDetails(1, TiFAPI.testAuthenticatedInstance)
       expect(result).toEqual({ status: "cancelled" })
     })
 
-    it("should return \"not-found\" when a 404 occurs", async () => {
+    it("should return not-found when a 404 occurs", async () => {
       setEventResponse(404, { error: "event-not-found" })
       const result = await loadEventDetails(1, TiFAPI.testAuthenticatedInstance)
       expect(result).toEqual({ status: "not-found" })
     })
 
-    it("should return \"blocked\" when a 403 occurs", async () => {
+    it("should return blocked when a 403 occurs", async () => {
       const blockedEventResponse = {
         id: 1,
         title: "Some Event",
@@ -340,10 +344,7 @@ describe("EventDetailsLoading tests", () => {
       })
     })
 
-    const setEventResponse = (
-      status: 200 | 204 | 404 | 403,
-      body?: object
-    ) => {
+    const setEventResponse = (status: 200 | 204 | 404 | 403, body?: object) => {
       mswServer.use(
         http.get(TiFAPI.testPath("/event/details/:id"), async () => {
           if (status === 204) {
@@ -352,6 +353,37 @@ describe("EventDetailsLoading tests", () => {
           return HttpResponse.json(body, { status })
         })
       )
+    }
+  })
+
+  describe("UseDisplayedEventDetailsLoadingBalls tests", () => {
+    fakeTimers()
+
+    test("appearance cycle", async () => {
+      const { result } = renderUseDisplayedEventDetailsLoadingBalls()
+      const assert = async (one: boolean, two: boolean, three: boolean) => {
+        await waitFor(() => expect(result.current).toEqual([one, two, three]))
+      }
+
+      await assert(false, false, false)
+      act(() => jest.advanceTimersByTime(100))
+      await assert(false, false, false)
+      act(() => jest.advanceTimersByTime(400))
+      await assert(true, false, false)
+      act(() => jest.advanceTimersByTime(500))
+      await assert(true, true, false)
+      act(() => jest.advanceTimersByTime(500))
+      await assert(true, true, true)
+      act(() => jest.advanceTimersByTime(500))
+      await assert(false, false, false)
+      act(() => jest.advanceTimersByTime(500))
+      await assert(true, false, false)
+    })
+
+    const renderUseDisplayedEventDetailsLoadingBalls = () => {
+      return renderHook(useDisplayedEventDetailsLoadingBalls, {
+        initialProps: 500
+      })
     }
   })
 })
