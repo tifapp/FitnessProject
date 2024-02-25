@@ -42,7 +42,6 @@
     "@fragaria/address-formatter": "^5.0.1",
     "@gorhom/bottom-sheet": "^4.4.5",
     "@jest/reporters": "29.4.1",
-    "@react-native-async-storage/async-storage": "1.21.0",
     "@react-native-community/checkbox": "^0.5.5",
     "@react-native-community/datetimepicker": "7.6.1",
     "@react-native-community/netinfo": "11.1.0",
