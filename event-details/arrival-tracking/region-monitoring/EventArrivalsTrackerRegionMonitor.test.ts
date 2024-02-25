@@ -1,24 +1,24 @@
 import { mockLocationCoordinate2D } from "@location/MockData"
 import { LocationCoordinate2D } from "@shared-models/Location"
-import { clearAsyncStorageBeforeEach } from "@test-helpers/AsyncStorage"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { fakeTimers } from "@test-helpers/Timers"
 import { waitFor } from "@testing-library/react-native"
 import { mockEventArrival, mockEventRegion } from "../MockData"
 import { arrivalRegion } from "../Models"
 import { EventArrivalsTracker } from "../Tracker"
-import { AsyncStorageUpcomingEventArrivals } from "../UpcomingArrivals"
+import { SQLiteUpcomingEventArrivals } from "../UpcomingArrivals"
 import { TestEventArrivalsGeofencer } from "../geofencing/TestGeofencer"
 import { EventArrivalsTrackerRegionMonitor } from "./EventArrivalsTrackerRegionMonitor"
 import { ForegroundEventRegionMonitor } from "./ForegroundRegionMonitor"
 import { advanceByForegroundMonitorBufferTime } from "./TestHelpers"
+import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 
 describe("EventArrivalsTrackerRegionMonitor tests", () => {
-  clearAsyncStorageBeforeEach()
+  resetTestSQLiteBeforeEach()
   const performArrivalsOperation = jest.fn()
   const geofencer = new TestEventArrivalsGeofencer()
   const tracker = new EventArrivalsTracker(
-    new AsyncStorageUpcomingEventArrivals(),
+    new SQLiteUpcomingEventArrivals(testSQLite),
     geofencer,
     performArrivalsOperation
   )

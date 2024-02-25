@@ -1,14 +1,11 @@
-import AsyncStorage from "@react-native-async-storage/async-storage"
 import { fakeTimers } from "@test-helpers/Timers"
-import { EventArrivalsLastRefreshDate, EventArrivalsRefresher } from "./Refresh"
+import { EventArrivalsRefresher } from "./Refresh"
+import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
+import { SQLiteInternalMetricsStorage } from "@lib/InternalMetrics"
 
 describe("EventArrivalsRefresher tests", () => {
-  let lastRefreshDate = new EventArrivalsLastRefreshDate()
+  resetTestSQLiteBeforeEach()
   fakeTimers()
-  beforeEach(async () => {
-    lastRefreshDate = new EventArrivalsLastRefreshDate()
-    await AsyncStorage.clear()
-  })
 
   const performRefresh = jest.fn()
   beforeEach(() => performRefresh.mockReset())
@@ -87,7 +84,7 @@ describe("EventArrivalsRefresher tests", () => {
   const createRefresher = (minutesBetweenNeededRefreshes: number) => {
     return new EventArrivalsRefresher(
       performRefresh,
-      lastRefreshDate,
+      new SQLiteInternalMetricsStorage(testSQLite),
       minutesBetweenNeededRefreshes
     )
   }

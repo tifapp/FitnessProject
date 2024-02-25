@@ -1,36 +1,35 @@
-import { AsyncStorageUtils } from "@lib/utils/AsyncStorage"
-import { StringDateSchema, addSecondsToDate, diffDates, now } from "@date-time"
-import AsyncStorage from "@react-native-async-storage/async-storage"
+import { addSecondsToDate, diffDates, now } from "@date-time"
 import { AppState } from "react-native"
 import { EventArrivalsTracker } from "./Tracker"
 import { TiFAPI } from "@api-client/TiFAPI"
+import { InternalMetricsStorage } from "@lib/InternalMetrics"
 
 /**
  * A class that manages refreshing of upcoming event arrivals.
  */
 export class EventArrivalsRefresher {
   private readonly performRefresh: () => Promise<void>
-  private readonly lastRefreshDate: EventArrivalsLastRefreshDate
+  private readonly internalMetrics: InternalMetricsStorage
   private readonly minutesBetweenNeededRefreshes: number
 
-  private get secondsNeededBetweenRefreshes () {
+  private get secondsNeededBetweenRefreshes() {
     return this.minutesBetweenNeededRefreshes * 60
   }
 
-  constructor (
+  constructor(
     performRefresh: () => Promise<void>,
-    lastRefreshDate: EventArrivalsLastRefreshDate,
+    internalMetrics: InternalMetricsStorage,
     minutesBetweenNeededRefreshes: number
   ) {
     this.performRefresh = performRefresh
-    this.lastRefreshDate = lastRefreshDate
+    this.internalMetrics = internalMetrics
     this.minutesBetweenNeededRefreshes = minutesBetweenNeededRefreshes
   }
 
-  static usingTracker (
+  static usingTracker(
     tracker: EventArrivalsTracker,
     tifAPI: TiFAPI,
-    lastRefreshDate: EventArrivalsLastRefreshDate,
+    internalMetrics: InternalMetricsStorage,
     minutesBetweenNeededRefreshes: number
   ) {
     return new EventArrivalsRefresher(
@@ -40,7 +39,7 @@ export class EventArrivalsRefresher {
           return resp.data.upcomingRegions
         })
       },
-      lastRefreshDate,
+      internalMetrics,
       minutesBetweenNeededRefreshes
     )
   }
@@ -48,7 +47,7 @@ export class EventArrivalsRefresher {
   /**
    * Refreshes if the time from the last refresh is greater than the specified duration of minutes.
    */
-  async refreshIfNeeded () {
+  async refreshIfNeeded() {
     if (now().isSameOrAfter(await this.nextAvailableRefreshDate())) {
       await this.forceRefresh()
     }
@@ -57,7 +56,7 @@ export class EventArrivalsRefresher {
   /**
    * Returns the number of milliseconds to wait until another refresh should be performed.
    */
-  async timeUntilNextRefreshAvailable () {
+  async timeUntilNextRefreshAvailable() {
     const { milliseconds } = diffDates(
       await this.nextAvailableRefreshDate(),
       new Date()
@@ -68,50 +67,18 @@ export class EventArrivalsRefresher {
   /**
    * Forces a refresh and updates the last referesh time.
    */
-  async forceRefresh () {
+  async forceRefresh() {
     await Promise.allSettled([
       this.performRefresh(),
-      this.lastRefreshDate.markNewRefreshDate()
+      this.internalMetrics.update({ lastEventArrivalsRefreshDate: new Date() })
     ])
   }
 
-  private async nextAvailableRefreshDate () {
-    const lastDate = await this.lastRefreshDate.date()
+  private async nextAvailableRefreshDate() {
+    const lastDate = (await this.internalMetrics.current())
+      .lastEventArrivalsRefreshDate
     if (!lastDate) return new Date()
     return addSecondsToDate(lastDate, this.secondsNeededBetweenRefreshes)
-  }
-}
-
-/**
- * A class that manages the storage of the last event arrivals refresh date.
- */
-export class EventArrivalsLastRefreshDate {
-  private static LAST_REFRESH_KEY = "@event-arrivals-last-refresh"
-  private cachedRefreshDate?: Date
-
-  /**
-   * Returns the current last refresh date.
-   */
-  async date () {
-    if (this.cachedRefreshDate) return this.cachedRefreshDate
-    const lastDate = await AsyncStorageUtils.parseJSONItem(
-      StringDateSchema,
-      EventArrivalsLastRefreshDate.LAST_REFRESH_KEY
-    )
-    this.cachedRefreshDate = lastDate
-    return lastDate
-  }
-
-  /**
-   * Marks the new last refresh date as the current date.
-   */
-  async markNewRefreshDate () {
-    const lastDate = new Date()
-    this.cachedRefreshDate = lastDate
-    await AsyncStorage.setItem(
-      EventArrivalsLastRefreshDate.LAST_REFRESH_KEY,
-      JSON.stringify(lastDate)
-    )
   }
 }
 

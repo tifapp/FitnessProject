@@ -1,14 +1,14 @@
-import { clearAsyncStorageBeforeEach } from "@test-helpers/AsyncStorage"
 import {
-  AsyncStorageUpcomingEventArrivals,
+  SQLiteUpcomingEventArrivals,
   requireBackgroundLocationPermissions
 } from "./UpcomingArrivals"
 import { mockEventArrivalRegion } from "./MockData"
+import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 
 describe("UpcomingArrivals tests", () => {
   describe("RequireBackgroundLocationPermissions tests", () => {
-    clearAsyncStorageBeforeEach()
-    const baseUpcomingArrivals = new AsyncStorageUpcomingEventArrivals()
+    resetTestSQLiteBeforeEach()
+    const baseUpcomingArrivals = new SQLiteUpcomingEventArrivals(testSQLite)
 
     it("should not be able to query all arrivals when background location permissions are disabled", async () => {
       baseUpcomingArrivals.replaceAll([mockEventArrivalRegion()])

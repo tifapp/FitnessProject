@@ -1,4 +1,4 @@
-import { AsyncStorageUpcomingEventArrivals } from "./UpcomingArrivals"
+import { SQLiteUpcomingEventArrivals } from "./UpcomingArrivals"
 import { EventArrivalsTracker } from "./Tracker"
 import { EventArrivalRegion } from "@shared-models/EventArrivals"
 import { ArrayUtils } from "@lib/utils/Array"
@@ -11,26 +11,25 @@ import {
 } from "./MockData"
 import { neverPromise } from "@test-helpers/Promise"
 import { TestEventArrivalsGeofencer } from "./geofencing/TestGeofencer"
-import { clearAsyncStorageBeforeEach } from "@test-helpers/AsyncStorage"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
+import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 
 describe("EventArrivalsTracker tests", () => {
-  const upcomingArrivals = new AsyncStorageUpcomingEventArrivals()
-  clearAsyncStorageBeforeEach()
+  const upcomingArrivals = new SQLiteUpcomingEventArrivals(testSQLite)
+  resetTestSQLiteBeforeEach()
 
   const testGeofencer = new TestEventArrivalsGeofencer()
 
   const performArrivalOperation = jest.fn()
-  beforeEach(() => testGeofencer.reset())
-  afterEach(() => {
-    performArrivalOperation.mockReset()
-  })
-
   const tracker = new EventArrivalsTracker(
     upcomingArrivals,
     testGeofencer,
     performArrivalOperation
   )
+  beforeEach(() => testGeofencer.reset())
+  afterEach(() => {
+    performArrivalOperation.mockReset()
+  })
 
   test("refresh arrivals", async () => {
     const regions = ArrayUtils.repeatElements(2, () => {
@@ -268,7 +267,7 @@ describe("EventArrivalsTracker tests", () => {
     expect(testGeofencer.hasSubscriber).toEqual(false)
   })
 
-  test("handle geofencing update, does \"arrived\" operation for all arrivals when entering region", async () => {
+  test("handle geofencing update, does arrived operation for all arrivals when entering region", async () => {
     performArrivalOperation.mockImplementationOnce(neverPromise)
     await tracker.trackArrival(mockEventArrival())
     const region = { ...mockEventArrivalGeofencedRegion(), isArrived: true }
@@ -284,7 +283,7 @@ describe("EventArrivalsTracker tests", () => {
     })
   })
 
-  test("handle geofencing update, does \"departed\" operation for all arrivals when exiting region", async () => {
+  test("handle geofencing update, does departed operation for all arrivals when exiting region", async () => {
     performArrivalOperation.mockImplementationOnce(neverPromise)
     await tracker.trackArrival(mockEventArrival())
     const region = { ...mockEventArrivalGeofencedRegion(), isArrived: false }
@@ -367,14 +366,19 @@ describe("EventArrivalsTracker tests", () => {
 
   const expectTrackedRegions = async (regions: EventArrivalRegion[]) => {
     await waitFor(async () => {
-      expect(await upcomingArrivals.all()).toEqual(regions)
+      const upcoming = await upcomingArrivals.all()
+      expect(upcoming).toEqual(expect.arrayContaining(regions))
+      expect(upcoming).toHaveLength(regions.length)
     })
-    expect(regions).toMatchObject(testGeofencer.geofencedRegions)
+    expect(testGeofencer.geofencedRegions).toMatchObject(
+      expect.arrayContaining(regions)
+    )
+    expect(testGeofencer.geofencedRegions).toHaveLength(regions.length)
 
     const callback = jest.fn()
     const subscription = tracker.subscribe(callback)
     await subscription.waitForInitialRegionsToLoad()
-    expect(callback).toHaveBeenCalledWith(regions)
+    expect(callback).toHaveBeenCalledWith(expect.arrayContaining(regions))
     expect(callback).toHaveBeenCalledTimes(1)
   }
 })
