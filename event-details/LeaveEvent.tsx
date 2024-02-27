@@ -1,4 +1,4 @@
-import { CurrentUserEvent, EventAttendee } from "@shared-models/Event"
+import { CurrentUserEvent } from "@shared-models/Event"
 import { useMutation } from "@tanstack/react-query"
 import { useState } from "react"
 import { Alert } from "react-native"
@@ -69,6 +69,10 @@ export const useLeaveEvent = (event: Pick<CurrentUserEvent, "id" | "userAttendee
     setIsModalOpen(true)
   }
 
+  const endSelectionFlow = () => {
+    setIsModalOpen(false)
+  }
+
   const isSuccess =
     leaveEventMutation.isSuccess && leaveEventMutation.data === "success"
 
@@ -83,31 +87,28 @@ export const useLeaveEvent = (event: Pick<CurrentUserEvent, "id" | "userAttendee
       status: "select",
       attendeeStatus: event.userAttendeeStatus,
       confirmButtonTapped: leaveEventMutation.mutate,
-      dismissButtonTapped: () => setIsModalOpen(false)
+      dismissButtonTapped: () => endSelectionFlow()
     }
   } else if (isModalOpen && event.userAttendeeStatus === "hosting") {
     return {
       status: "select",
       attendeeStatus: event.userAttendeeStatus,
       deleteButtonTapped: () => {
-        setIsModalOpen(false); Alert.alert("Delete Event", "Are you sure you want to delete this event?", [
+        endSelectionFlow(); Alert.alert("Delete Event", "Are you sure you want to delete this event?", [
           {
             text: "Delete",
-            onPress: () => leaveEventMutation.mutate
+            style: "destructive",
+            onPress: () => leaveEventMutation.mutate()
           },
           {
             text: "Cancel",
-            onPress: () => console.log("Close")
+            style: "cancel"
           }])
       },
       reselectButtonTapped: () => console.log("Reselect"),
-      dismissButtonTapped: () => setIsModalOpen(false)
+      dismissButtonTapped: () => endSelectionFlow()
     }
   } else {
     return { status: "idle", leaveButtonTapped: () => startSelectionFlow() }
   }
-}
-
-export const hostPicker = (host: EventAttendee) => {
-
 }

@@ -12,7 +12,11 @@ describe("LeaveEvent tests", () => {
     onSuccess: jest.fn()
   }
   const TEST_EVENT = EventMocks.PickupBasketball
-  const { alertPresentationSpy } = captureAlerts()
+  const { tapAlertButton, alertPresentationSpy } = captureAlerts()
+
+  const alertDeleteButtonTapped = async () => {
+    await tapAlertButton("Delete")
+  }
 
   const renderUseLeaveEvent = (testUserStatus: Pick<CurrentUserEvent, "userAttendeeStatus">) => {
     return renderHook(() => useLeaveEvent({ id: TEST_EVENT.id, userAttendeeStatus: testUserStatus.userAttendeeStatus }, testEnv), {
@@ -74,7 +78,12 @@ describe("LeaveEvent tests", () => {
       leaveButtonTapped: expect.any(Function)
     })
   })
-  test("Host leave event flow, cancel selected", async () => {
+  test("Host leave event flow, delete selected", async () => {
+    let resolveLeave: ((result: LeaveEventResult) => void) | undefined
+    const leavePromise = new Promise<LeaveEventResult>(
+      (resolve) => (resolveLeave = resolve)
+    )
+    testEnv.leaveEvent.mockReturnValueOnce(leavePromise)
     const { result } = renderUseLeaveEvent({ userAttendeeStatus: "hosting" })
 
     expect(result.current).toEqual({
@@ -96,9 +105,17 @@ describe("LeaveEvent tests", () => {
         "Are you sure you want to delete this event?", expect.any(Array)
       )
     })
-    expect(result.current).toEqual({
-      status: "idle",
-      leaveButtonTapped: expect.any(Function)
+    await alertDeleteButtonTapped()
+    await waitFor(() => {
+      expect(result.current).toEqual({
+        status: "loading"
+      })
+    })
+    act(() => resolveLeave?.("success"))
+    await waitFor(() => {
+      expect(result.current).toEqual({
+        status: "success"
+      })
     })
   })
   test("Host leave event flow, dismiss selected", async () => {
