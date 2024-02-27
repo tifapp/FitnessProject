@@ -7,6 +7,7 @@ import {
   EventUserAttendeeStatus,
   CurrentUserEvent
 } from "@shared-models/Event"
+import { ceilDurationToUnit, dayjs } from "@date-time"
 
 /**
  * A type for the color value for an event.
@@ -109,4 +110,18 @@ export const updateEventsInArrivalsTracker = async (
   // TODO: Why doesn't Promise.all work here?
   await tracker.removeArrivalsByEventIds(idsToRemove)
   await tracker.trackArrivals(arrivalsToTrack)
+}
+
+export const humanizeEventCountdownSeconds = (countdownSeconds: number) => {
+  const duration = dayjs.duration(countdownSeconds, "seconds")
+  // NB: Dayjs formats weeks as days (eg. 1 week -> 7-13 days), so this conversion must be done manually.
+  if (duration.asWeeks() === 1) {
+    return "a week"
+  } else if (duration.asWeeks() > 1 && duration.asWeeks() < 4) {
+    return `${Math.ceil(duration.asWeeks())} weeks`
+  } else if (duration.asWeeks() < 1) {
+    return ceilDurationToUnit(duration, "days").humanize()
+  } else {
+    return ceilDurationToUnit(duration, "months").humanize()
+  }
 }

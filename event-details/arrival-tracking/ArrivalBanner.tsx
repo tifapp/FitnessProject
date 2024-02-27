@@ -2,9 +2,9 @@ import { BodyText, Subtitle } from "@components/Text"
 import { TouchableIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors } from "@lib/Fonts"
-import { ceilDurationToUnit, dayjs } from "@date-time"
+import { dayjs } from "@date-time"
 import { useState } from "react"
-import { View, ViewStyle, StyleSheet } from "react-native"
+import { View, ViewStyle, StyleSheet, StyleProp } from "react-native"
 import Animated, {
   AnimatedStyleProp,
   FadeIn,
@@ -12,6 +12,7 @@ import Animated, {
 } from "react-native-reanimated"
 import { EventRegion } from "@shared-models/Event"
 import { EventRegionMonitor, useHasArrivedAtRegion } from "./region-monitoring"
+import { humanizeEventCountdownSeconds } from "../Event"
 
 /**
  * Handles state related to whether or not to show the event arrival banner for
@@ -54,7 +55,7 @@ export type EventArrivalBannerProps = {
   canShareArrivalStatus: boolean
   countdown: EventArrivalBannerCountdown
   onClose: () => void
-  style?: AnimatedStyleProp<ViewStyle>
+  style?: StyleProp<ViewStyle>
 }
 
 /**
@@ -171,22 +172,10 @@ export const countdownMessage = (countdown: EventArrivalBannerCountdown) => {
   } else if (countdown.secondsToStart < ONE_HOUR_IN_SECONDS) {
     return "This event kicks off in under an hour."
   } else {
-    const countdownText = humanizeCountdownSeconds(countdown.secondsToStart)
+    const countdownText = humanizeEventCountdownSeconds(
+      countdown.secondsToStart
+    )
     return `This event kicks off in ${countdownText}.`
-  }
-}
-
-const humanizeCountdownSeconds = (countdownSeconds: number) => {
-  const duration = dayjs.duration(countdownSeconds, "seconds")
-  // NB: Dayjs formats weeks as days (eg. 1 week -> 7-13 days), so this conversion must be done manually.
-  if (duration.asWeeks() === 1) {
-    return "a week"
-  } else if (duration.asWeeks() > 1 && duration.asWeeks() < 4) {
-    return `${Math.ceil(duration.asWeeks())} weeks`
-  } else if (duration.asWeeks() < 1) {
-    return ceilDurationToUnit(duration, "days").humanize()
-  } else {
-    return ceilDurationToUnit(duration, "months").humanize()
   }
 }
 
