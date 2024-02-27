@@ -8,6 +8,7 @@ import {
   CurrentUserEvent
 } from "@shared-models/Event"
 import { ceilDurationToUnit, dayjs } from "@date-time"
+import { MathUtils } from "@lib/utils/Math"
 
 /**
  * A type for the color value for an event.
@@ -114,14 +115,20 @@ export const updateEventsInArrivalsTracker = async (
 
 export const humanizeEventCountdownSeconds = (countdownSeconds: number) => {
   const duration = dayjs.duration(countdownSeconds, "seconds")
+  const roundedHours = MathUtils.roundToHalf(duration.asHours())
   // NB: Dayjs formats weeks as days (eg. 1 week -> 7-13 days), so this conversion must be done manually.
   if (duration.asWeeks() === 1) {
     return "a week"
-  } else if (duration.asWeeks() > 1 && duration.asWeeks() < 4) {
+  } else if (duration.asWeeks() >= 1 && duration.asMonths() < 1) {
     return `${Math.ceil(duration.asWeeks())} weeks`
-  } else if (duration.asWeeks() < 1) {
+  } else if (duration.asDays() >= 1 && duration.asWeeks() < 1) {
     return ceilDurationToUnit(duration, "days").humanize()
-  } else {
+  } else if (duration.asMonths() >= 1) {
     return ceilDurationToUnit(duration, "months").humanize()
+  } else if (roundedHours === 1) {
+    return "an hour"
+  } else {
+    // NB: Dayjs Humanization will cut the decimal, so we need to interpolate manually.
+    return `${roundedHours} hours`
   }
 }

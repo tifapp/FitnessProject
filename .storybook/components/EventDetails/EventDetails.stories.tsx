@@ -1,6 +1,6 @@
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import React, { useEffect } from "react"
+import React, { useCallback, useEffect } from "react"
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 import {
   EventAttendeeMocks,
@@ -15,10 +15,15 @@ import {
   requestForegroundPermissionsAsync
 } from "expo-location"
 import { mockPlacemark } from "@location/MockData"
-import { sleep } from "@lib/utils/DelayData"
-import { EventDetailsView, useLoadEventDetails } from "@event-details/Details"
 import { createTestQueryClient } from "@test-helpers/ReactQuery"
 import { QueryClientProvider } from "@tanstack/react-query"
+import { EventCountdownView, useEventCountdown } from "@event-details/Countdown"
+import { dateRange, dayjs, now } from "@date-time"
+import { View } from "react-native"
+import { JoinEventStagesView } from "@event-details/JoinEvent"
+import { NavigationContainer, useFocusEffect } from "@react-navigation/native"
+import { createStackNavigator } from "@react-navigation/stack"
+import { AppState } from "@aws-amplify/core"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -29,6 +34,8 @@ export default EventDetailsMeta
 type EventDetailsStory = ComponentStory<typeof SettingsScreen>
 
 const event = EventMocks.PickupBasketball
+
+const Stack = createStackNavigator()
 
 const location = {
   ...mockEventLocation(),
@@ -45,19 +52,23 @@ export const Basic: EventDetailsStory = () => {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView>
-        <UserLocationFunctionsProvider
-          getCurrentLocation={getCurrentPositionAsync}
-          requestBackgroundPermissions={requestBackgroundPermissionsAsync}
-          requestForegroundPermissions={requestForegroundPermissionsAsync}
-        >
-          <QueryClientProvider client={queryClient}>
-            <BottomSheetModalProvider>
-              <Test />
-            </BottomSheetModalProvider>
-          </QueryClientProvider>
-        </UserLocationFunctionsProvider>
-      </SafeAreaView>
+      {/* <SafeAreaView> */}
+      <UserLocationFunctionsProvider
+        getCurrentLocation={getCurrentPositionAsync}
+        requestBackgroundPermissions={requestBackgroundPermissionsAsync}
+        requestForegroundPermissions={requestForegroundPermissionsAsync}
+      >
+        <QueryClientProvider client={queryClient}>
+          <BottomSheetModalProvider>
+            <NavigationContainer>
+              <Stack.Navigator>
+                <Stack.Screen name="test" component={Test} />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </BottomSheetModalProvider>
+        </QueryClientProvider>
+      </UserLocationFunctionsProvider>
+      {/* </SafeAreaView> */}
     </SafeAreaProvider>
   )
 }
@@ -65,11 +76,30 @@ export const Basic: EventDetailsStory = () => {
 const host = EventAttendeeMocks.Alivs
 
 const Test = () => {
-  const result = useLoadEventDetails(1, async () => {
-    await sleep(5000)
-    return { status: "blocked", event: EventMocks.Multiday }
+  const result = useEventCountdown({
+    secondsToStart: -dayjs.duration(14, "minute").asSeconds(),
+    todayOrTomorrow: "today",
+    clientReceivedTime: new Date(),
+    dateRange: dateRange(new Date(), now().add(1, "hour").toDate())
   })
   return (
-    <EventDetailsView result={result} onExploreOtherEventsTapped={() => {}} />
+    <View style={{ height: "100%" }}>
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "flex-end",
+          justifyContent: "space-between",
+          paddingHorizontal: 24,
+          paddingVertical: 64,
+          flex: 1
+        }}
+      >
+        <EventCountdownView result={result} />
+        <JoinEventStagesView
+          stage={{ id: "idle", joinButtonTapped: () => {} }}
+        />
+      </View>
+    </View>
   )
 }

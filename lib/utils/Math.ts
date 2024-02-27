@@ -10,4 +10,16 @@ export namespace MathUtils {
    * @param x radians
    */
   export const sin2 = (radians: number) => (1 - Math.cos(2 * radians)) / 2
+
+  export const roundToHalf = (num: number) => {
+    const flooredNum = Math.floor(num)
+    const decimal = num - flooredNum
+    if (decimal < 0.25) {
+      return flooredNum
+    } else if (decimal < 0.75) {
+      return flooredNum + 0.5
+    } else {
+      return flooredNum + 1
+    }
+  }
 }
