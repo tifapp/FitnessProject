@@ -274,7 +274,6 @@ describe("ExploreEvents tests", () => {
               <UserLocationFunctionsProvider
                 getCurrentLocation={queryUserCoordinates}
                 requestForegroundPermissions={requestForegroundPermissions}
-                requestBackgroundPermissions={jest.fn()}
               >
                 {children}
               </UserLocationFunctionsProvider>

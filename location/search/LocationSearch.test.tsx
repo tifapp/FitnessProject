@@ -344,8 +344,6 @@ describe("LocationSearch tests", () => {
           <TestQueryClientProvider>
             <UserLocationFunctionsProvider
               getCurrentLocation={queryUserCoordinates}
-              requestForegroundPermissions={jest.fn()}
-              requestBackgroundPermissions={jest.fn()}
             >
               <LocationSearchBar
                 onBackTapped={jest.fn()}

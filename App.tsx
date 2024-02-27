@@ -17,7 +17,6 @@ import { SafeAreaProvider } from "react-native-safe-area-context"
 
 import { Geo } from "@aws-amplify/geo"
 import { ExpoEventArrivalsGeofencer } from "@event-details/arrival-tracking"
-import { AnalyticsProvider, MixpanelAnalytics } from "@lib/Analytics"
 import {
   addLogHandler,
   createLogFunction,
@@ -67,15 +66,13 @@ const App = () => {
           isSupportedOnDevice={IS_HAPTICS_SUPPORTED_ON_DEVICE}
           haptics={TiFHaptics}
         >
-          <AnalyticsProvider analytics={MixpanelAnalytics.shared}>
-            <SafeAreaProvider>
-              <TiFMenuProvider>
-                <RootSiblingParent>
-                  <AppView isFontsLoaded={isFontsLoaded} />
-                </RootSiblingParent>
-              </TiFMenuProvider>
-            </SafeAreaProvider>
-          </AnalyticsProvider>
+          <SafeAreaProvider>
+            <TiFMenuProvider>
+              <RootSiblingParent>
+                <AppView isFontsLoaded={isFontsLoaded} />
+              </RootSiblingParent>
+            </TiFMenuProvider>
+          </SafeAreaProvider>
         </HapticsProvider>
       </UserLocationFunctionsProvider>
     </TiFQueryClientProvider>
