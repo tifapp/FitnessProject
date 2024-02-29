@@ -16,7 +16,7 @@ import { useConst } from "@lib/utils/UseConst"
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { AppStyles } from "@lib/AppColorStyle"
-import { useInterval } from "@lib/utils/UseInterval"
+import { useAutocorrectingInterval } from "@lib/utils/UseInterval"
 
 /**
  * A result from loading a single event for the details screen.
@@ -220,7 +220,7 @@ export const useDisplayedEventDetailsLoadingBalls = (
 ) => {
   const [balls, setBalls] = useState([false, false, false])
   const indexRef = useRef(0)
-  useInterval(() => {
+  useAutocorrectingInterval(() => {
     setBalls((balls) => {
       if (indexRef.current === balls.length) {
         indexRef.current = 0

@@ -24,6 +24,7 @@ import { JoinEventStagesView } from "@event-details/JoinEvent"
 import { NavigationContainer, useFocusEffect } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { AppState } from "@aws-amplify/core"
+import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -61,7 +62,9 @@ export const Basic: EventDetailsStory = () => {
         <QueryClientProvider client={queryClient}>
           <BottomSheetModalProvider>
             <NavigationContainer>
-              <Stack.Navigator>
+              <Stack.Navigator
+                screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
+              >
                 <Stack.Screen name="test" component={Test} />
               </Stack.Navigator>
             </NavigationContainer>
@@ -75,13 +78,15 @@ export const Basic: EventDetailsStory = () => {
 
 const host = EventAttendeeMocks.Alivs
 
+const time = {
+  secondsToStart: -dayjs.duration(14, "minute").asSeconds(),
+  todayOrTomorrow: "today",
+  clientReceivedTime: new Date(),
+  dateRange: dateRange(new Date(), now().add(1, "hour").toDate())
+} as const
+
 const Test = () => {
-  const result = useEventCountdown({
-    secondsToStart: -dayjs.duration(14, "minute").asSeconds(),
-    todayOrTomorrow: "today",
-    clientReceivedTime: new Date(),
-    dateRange: dateRange(new Date(), now().add(1, "hour").toDate())
-  })
+  const result = useEventCountdown(time)
   return (
     <View style={{ height: "100%" }}>
       <View

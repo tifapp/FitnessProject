@@ -115,7 +115,7 @@ export const updateEventsInArrivalsTracker = async (
 
 export const humanizeEventCountdownSeconds = (countdownSeconds: number) => {
   const duration = dayjs.duration(countdownSeconds, "seconds")
-  const roundedHours = MathUtils.roundToHalf(duration.asHours())
+  const roundedHours = MathUtils.roundToDenominator(duration.asHours(), 2)
   // NB: Dayjs formats weeks as days (eg. 1 week -> 7-13 days), so this conversion must be done manually.
   if (duration.asWeeks() === 1) {
     return "a week"

@@ -5,21 +5,19 @@ import {
   UseEventCountdownResult,
   useEventCountdown
 } from "./Countdown"
-import { fakeTimers } from "@test-helpers/Timers"
+import { fakeTimers, timeTravel } from "@test-helpers/Timers"
 import { dateRange, dayjs } from "@date-time"
 import { act } from "react-test-renderer"
 
 describe("EventDetailsCountdown tests", () => {
   describe("UseEventCountdown tests", () => {
-    const renderUseEventCountdown = (time: CurrentUserEvent["time"]) => {
-      return renderHook(() => {
-        return useEventCountdown(time)
-      })
-    }
-
+    const TEST_CLIENT_RECEIVED_TIME = new Date()
     const BASE_TEST_EVENT_TIME = {
-      clientReceivedTime: new Date(),
-      dateRange: dateRange(new Date(), new Date())
+      clientReceivedTime: TEST_CLIENT_RECEIVED_TIME,
+      dateRange: dateRange(
+        TEST_CLIENT_RECEIVED_TIME,
+        dayjs(TEST_CLIENT_RECEIVED_TIME).add(15, "minutes").toDate()
+      )
     }
 
     fakeTimers()
@@ -178,10 +176,10 @@ describe("EventDetailsCountdown tests", () => {
       })
       expectCountdown(result.current, { formatted: "10:00" })
 
-      act(() => jest.advanceTimersByTime(1000))
+      act(() => timeTravel(1000))
       expectCountdown(result.current, { formatted: "9:59" })
 
-      act(() => jest.advanceTimersByTime(20_000))
+      act(() => timeTravel(20_000))
       expectCountdown(result.current, { formatted: "9:39" })
     })
 
@@ -202,17 +200,17 @@ describe("EventDetailsCountdown tests", () => {
     test("counting down, ends-in", () => {
       const baseDate = new Date()
       const { result } = renderUseEventCountdown({
-        ...BASE_TEST_EVENT_TIME,
+        clientReceivedTime: baseDate,
         secondsToStart: -dayjs.duration(10, "minutes").asSeconds(),
         dateRange: dateRange(baseDate, dayjs(baseDate).add(1, "hour").toDate()),
         todayOrTomorrow: "today"
       })
       expectCountdown(result.current, { formatted: "50:00" })
 
-      act(() => jest.advanceTimersByTime(1000))
+      act(() => timeTravel(1000))
       expectCountdown(result.current, { formatted: "49:59" })
 
-      act(() => jest.advanceTimersByTime(20_000))
+      act(() => timeTravel(20_000))
       expectCountdown(result.current, { formatted: "49:39" })
     })
 
@@ -232,6 +230,10 @@ describe("EventDetailsCountdown tests", () => {
       countdown: EventFormattedCountdown
     ) => {
       expect((result as any).countdown).toEqual(countdown)
+    }
+
+    const renderUseEventCountdown = (time: CurrentUserEvent["time"]) => {
+      return renderHook(() => useEventCountdown(time))
     }
   })
 })

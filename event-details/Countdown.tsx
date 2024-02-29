@@ -1,10 +1,9 @@
-import { dayjs, diffDates } from "@date-time"
-import { useInterval } from "@lib/utils/UseInterval"
+import { dayjs, now } from "@date-time"
+import { useAutocorrectingInterval } from "@lib/utils/UseInterval"
 import { CurrentUserEvent } from "@shared-models/Event"
 import { TodayOrTomorrow } from "@shared-models/TodayOrTomorrow"
 import { useState } from "react"
 import { humanizeEventCountdownSeconds } from "./Event"
-import { StringUtils } from "@lib/utils/String"
 import {
   StyleProp,
   ViewStyle,
@@ -14,13 +13,12 @@ import {
 } from "react-native"
 import { Caption, Headline } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
-import { duration } from "dayjs"
 
 export type EventCountdownTime = CurrentUserEvent["time"]
 
-const initialSecondsToStart = (time: EventCountdownTime) => {
-  const { seconds } = diffDates(new Date(), time.clientReceivedTime)
-  return time.secondsToStart - seconds
+const eventSecondsToStart = (time: EventCountdownTime) => {
+  const offset = now().diff(dayjs(time.clientReceivedTime))
+  return time.secondsToStart - Math.round(offset / 1000)
 }
 
 export type UseEventCountdownResult =
@@ -34,9 +32,12 @@ export const useEventCountdown = (
   time: EventCountdownTime
 ): UseEventCountdownResult => {
   const [secondsToStart, setSecondsToStart] = useState(
-    initialSecondsToStart(time)
+    eventSecondsToStart(time)
   )
-  useInterval(() => setSecondsToStart((s) => s - 1), 1000)
+  useAutocorrectingInterval(
+    () => setSecondsToStart(eventSecondsToStart(time)),
+    1000
+  )
   if (secondsToStart > 0) {
     return {
       status: "starts-in",

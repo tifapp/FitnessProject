@@ -11,15 +11,10 @@ export namespace MathUtils {
    */
   export const sin2 = (radians: number) => (1 - Math.cos(2 * radians)) / 2
 
-  export const roundToHalf = (num: number) => {
-    const flooredNum = Math.floor(num)
-    const decimal = num - flooredNum
-    if (decimal < 0.25) {
-      return flooredNum
-    } else if (decimal < 0.75) {
-      return flooredNum + 0.5
-    } else {
-      return flooredNum + 1
-    }
+  /**
+   * Rounds to the nearest fractional denominator. (eg. 2 -> 0.5, 3 -> 0.334)
+   */
+  export const roundToDenominator = (num: number, denominator: number) => {
+    return Math.round(num * denominator) / denominator
   }
 }
