@@ -5,7 +5,7 @@ import {
   UseEventCountdownResult,
   useEventCountdown
 } from "./Countdown"
-import { fakeTimers, timeTravel } from "@test-helpers/Timers"
+import { fakeTimers } from "@test-helpers/Timers"
 import { dateRange, dayjs } from "@date-time"
 import { act } from "react-test-renderer"
 
@@ -176,10 +176,10 @@ describe("EventDetailsCountdown tests", () => {
       })
       expectCountdown(result.current, { formatted: "10:00" })
 
-      act(() => timeTravel(1000))
+      act(() => jest.advanceTimersByTime(1000))
       expectCountdown(result.current, { formatted: "9:59" })
 
-      act(() => timeTravel(20_000))
+      act(() => jest.advanceTimersByTime(20_000))
       expectCountdown(result.current, { formatted: "9:39" })
     })
 
@@ -207,10 +207,10 @@ describe("EventDetailsCountdown tests", () => {
       })
       expectCountdown(result.current, { formatted: "50:00" })
 
-      act(() => timeTravel(1000))
+      act(() => jest.advanceTimersByTime(1000))
       expectCountdown(result.current, { formatted: "49:59" })
 
-      act(() => timeTravel(20_000))
+      act(() => jest.advanceTimersByTime(20_000))
       expectCountdown(result.current, { formatted: "49:39" })
     })
 

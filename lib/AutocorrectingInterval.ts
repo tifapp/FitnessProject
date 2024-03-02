@@ -9,9 +9,10 @@ const intervals = new Map<number, NodeJS.Timeout>()
 
 /**
  * Sets an interval that automatically adjusts the delay between each
- * interval tick by the amount of the previous tick's innaccuracies.
+ * interval tick by the average of all sleep inaccuracies.
  * (eg. If one interval tick sleeps for 50ms more than the given `millis`,
- * then the next duration tick will be adjusted to `millis - 50`.)
+ * then the next duration tick will be adjusted to
+ * `millis - (previousAverageOffset + 50) / 2`.)
  *
  * @returns An identifier that should be passed to
  * {@link clearAutocorrectingInterval} that cancels the interval.
@@ -21,14 +22,13 @@ export const setAutocorrectingInterval = (
   millis: number,
   timeoutFn: TimeoutFunction = setTimeout
 ): AutocorrectingInterval => {
-  const id = currentId
-  currentId++
-  let nowTime = new Date().getTime()
+  const id = currentId++
+  let nowTime = Date.now()
   let currentIntervalMillis = millis
   let averageSleepOffset: number | undefined
   const run = () => {
     callback()
-    const endTime = new Date().getTime()
+    const endTime = Date.now()
     const currentSleepOffset = endTime - nowTime - currentIntervalMillis
     averageSleepOffset = averageSleepOffset
       ? (averageSleepOffset + currentSleepOffset) / 2

@@ -13,6 +13,7 @@ import {
 } from "react-native"
 import { Caption, Headline } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
+import { useFontScale } from "@lib/Fonts"
 
 export type EventCountdownTime = CurrentUserEvent["time"]
 
@@ -122,30 +123,24 @@ const CountdownLabel = ({
   title,
   todayOrTomorrowTitle,
   countdown
-}: CountdownLabelProps) => {
-  const [captionRect, setCaptionRect] = useState<LayoutRectangle | undefined>()
-  return (
-    <View style={styles.container}>
-      <Caption onLayout={(e) => setCaptionRect(e.nativeEvent.layout)}>
-        {"todayOrTomorrow" in countdown ? todayOrTomorrowTitle : title}
-      </Caption>
-      <View style={styles.countdownTextContainerContainer}>
-        <View style={styles.countdownTextContainer}>
-          <Headline
-            style={[
-              styles.countdownText,
-              { minWidth: captionRect?.width ?? 0 }
-            ]}
-          >
-            {"formatted" in countdown
-              ? countdown.formatted
-              : countdown.todayOrTomorrow}
-          </Headline>
-        </View>
+}: CountdownLabelProps) => (
+  <View style={styles.container}>
+    <Caption>
+      {"todayOrTomorrow" in countdown ? todayOrTomorrowTitle : title}
+    </Caption>
+    <View style={styles.countdownTextContainerContainer}>
+      <View style={styles.countdownTextContainer}>
+        <Headline
+          style={[styles.countdownText, { minWidth: 100 * useFontScale() }]}
+        >
+          {"formatted" in countdown
+            ? countdown.formatted
+            : countdown.todayOrTomorrow}
+        </Headline>
       </View>
     </View>
-  )
-}
+  </View>
+)
 
 const styles = StyleSheet.create({
   container: {
