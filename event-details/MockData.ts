@@ -14,6 +14,7 @@ import {
   randomlyNull
 } from "@lib/utils/Random"
 import { ColorString } from "@lib/utils/Color"
+import { EventChatTokenRequest } from "@shared-models/ChatToken"
 
 export const mockEventLocation = (): EventLocation => ({
   coordinate: mockLocationCoordinate2D(),
@@ -21,6 +22,20 @@ export const mockEventLocation = (): EventLocation => ({
   isInArrivalTrackingPeriod: randomBool(),
   timezoneIdentifier: faker.address.timeZone(),
   placemark: randomlyNull(mockPlacemark())
+})
+
+export const mockEventChatTokenRequest = (): EventChatTokenRequest => ({
+  capability: JSON.stringify({
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    "5678-event": ["history", "publish", "subscribe"],
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    "5878-event-pinned": ["history", "subscribe"]
+  }),
+  clientId: uuidString(),
+  keyName: "abcdefghijklmnopqrstuvwxyz123456",
+  mac: "abcdefghijklmnopqrstuvwxyz123456",
+  timestamp: new Date().getTime(),
+  nonce: "1234567890123456"
 })
 
 /**

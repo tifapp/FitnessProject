@@ -104,11 +104,17 @@ export const EventLocationSchema = EventRegionSchema.extend({
 /**
  * Information for the location of an event.
  *
- * This type includes the properties of an {@link EventRegion}, and additionally adds
- * an optional placemark property which can be undefined if the `coordinate` has not
- * yet been geocoded on the backend. Additionally, since arrival tracking is tied to
- * regions rather than events there's a property on whether or not the event can safely
- * be added to the {@link EventArrivalsTracker} once the user joins.
+ * This type includes the properties of an {@link EventRegion}, and
+ * additionally adds an optional placemark property which can be undefined if
+ * the `coordinate` has not yet been geocoded on the backend.
+ *
+ * Additionally, since arrival tracking is tied to regions rather than events,
+ * `isInArrivalTrackingPeriod` is contained on this type rather than
+ * {@link CurrentUserEvent}. Whilst arrival statuses are only displayed within
+ * 1 hour of the event starting, `isInArrivalTrackingPeriod` determines whether
+ * or not the event is in the 24 hour period where we can add it to
+ * {@link EventArrivalsTracker}. The 24 hour period covers the 24 hours prior
+ * to the event starting.
  */
 export type EventLocation = z.infer<typeof EventLocationSchema>
 

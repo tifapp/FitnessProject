@@ -31,6 +31,9 @@ export class TiFSQLite {
    * All executions of transactions are serialized, so no 2 functions
    * passed to this method will interleave with each other.
    *
+   * Escaping the given {@link SQLExecutable} from the transaction results
+   * in undefined behavior.
+   *
    * @param fn A function to run with exclusive database access.
    */
   withTransaction<T>(fn: (db: SQLExecutable) => Promise<T>) {
@@ -99,7 +102,13 @@ export class TiFSQLite {
         city TEXT,
         recentAnnotation TEXT,
         recentUpdatedAt DOUBLE NOT NULL DEFAULT (unixepoch('now', 'subsec')),
-        CHECK(recentAnnotation IN ('attended-event', 'hosted-event')),
+        CHECK(
+          recentAnnotation IN (
+            'attended-event',
+            'hosted-event',
+            'joined-event'
+          )
+        ),
         PRIMARY KEY(latitude, longitude)
       )
       `,
@@ -118,6 +127,13 @@ export class TiFSQLite {
         id TEXT NOT NULL PRIMARY KEY DEFAULT 'A' CHECK (id = 'A'),
         hasCompletedOnboarding INT2 NOT NULL,
         lastEventArrivalsRefreshTime DOUBLE
+      )
+      `,
+      db.run`
+      CREATE TABLE IF NOT EXISTS DeviceSettings (
+        id TEXT NOT NULL PRIMARY KEY DEFAULT 'A' CHECK (id = 'A'),
+        isHapticFeedbackEnabled INT2 NOT NULL,
+        isHapticAudioEnabled INT2 NOT NULL
       )
       `
     ])
@@ -146,6 +162,14 @@ class ExpoSQLExecutable {
     this.expoDb = db
   }
 
+  /**
+   * Runs the given sql query using template syntax, and returns the last
+   * insertion id and the number of rows that the query update, inserted
+   * or removed.
+   *
+   * This method should be used for "UPDATE", "DELETE", and "INSERT"
+   * statements.
+   */
   async run(
     statements: TemplateStringsArray,
     ...args: SQLiteInterpolatableValue[]
@@ -158,6 +182,12 @@ class ExpoSQLExecutable {
     }
   }
 
+  /**
+   * Returns the first result from the given query using template syntax.
+   *
+   * This method should be used for "SELECT" queries where only 1 result is
+   * needed.
+   */
   async queryFirst<T>(
     statements: TemplateStringsArray,
     ...args: SQLiteInterpolatableValue[]
@@ -167,6 +197,12 @@ class ExpoSQLExecutable {
     return result ?? undefined
   }
 
+  /**
+   * Returns all the results from the given query using template syntax.
+   *
+   * This method should be used for "SELECT" queries which return a list of
+   * results.
+   */
   async queryAll<T>(
     statements: TemplateStringsArray,
     ...args: SQLiteInterpolatableValue[]

@@ -25,6 +25,9 @@ import { NavigationContainer, useFocusEffect } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { AppState } from "@aws-amplify/core"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
+import { sleep } from "@lib/utils/DelayData"
+import { TrueRegionMonitor } from "@event-details/arrival-tracking/region-monitoring/MockRegionMonitors"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"

@@ -6,12 +6,11 @@ import {
   EventAttendeesPageSchema,
   EventRegion
 } from "@shared-models/Event"
-
-import { EventChatTokenRequestSchema } from "@shared-models/ChatToken"
-import { EventArrivalRegionsSchema } from "@shared-models/EventArrivals"
+import { UpcomingEventArrivalsRegionsSchema } from "@shared-models/EventArrivals"
 import { z } from "zod"
 import { createAWSTiFAPIFetch } from "./aws"
 import { TiFAPIFetch, createTiFAPIFetch } from "./client"
+import { JoinEventResponseSchema } from "@shared-models/JoinEvent"
 
 export type UpdateCurrentUserProfileRequest = Partial<{
   name: string
@@ -29,7 +28,7 @@ export type UpdateCurrentUserProfileRequest = Partial<{
 export class TiFAPI {
   static readonly TEST_URL = new URL("https://localhost:8080")
 
-  static testPath (path: `/${string}`) {
+  static testPath(path: `/${string}`) {
     return `${TiFAPI.TEST_URL}${path.slice(1)}`
   }
 
@@ -43,7 +42,7 @@ export class TiFAPI {
 
   private readonly apiFetch: TiFAPIFetch
 
-  constructor (apiFetch: TiFAPIFetch) {
+  constructor(apiFetch: TiFAPIFetch) {
     this.apiFetch = apiFetch
   }
 
@@ -52,7 +51,7 @@ export class TiFAPI {
    *
    * @returns an object containing the user's id and generated user handle.
    */
-  async createCurrentUserProfile () {
+  async createCurrentUserProfile() {
     return await this.apiFetch(
       { method: "POST", endpoint: "/user" },
       {
@@ -67,7 +66,7 @@ export class TiFAPI {
   /**
    * Updates the current user's profile attributes.
    */
-  async updateCurrentUserProfile (request: UpdateCurrentUserProfileRequest) {
+  async updateCurrentUserProfile(request: UpdateCurrentUserProfileRequest) {
     return await this.apiFetch(
       {
         method: "PATCH",
@@ -88,7 +87,7 @@ export class TiFAPI {
    * @param signal an {@link AbortSignal} to cancel the query.
    * @returns an object with a list of users containing their name, handle, and id.
    */
-  async autocompleteUsers (handle: string, limit: number, signal?: AbortSignal) {
+  async autocompleteUsers(handle: string, limit: number, signal?: AbortSignal) {
     return await this.apiFetch(
       {
         method: "GET",
@@ -115,7 +114,7 @@ export class TiFAPI {
    *
    * @returns a list of regions of the user's upcoming events.
    */
-  async arriveAtRegion (region: EventRegion) {
+  async arriveAtRegion(region: EventRegion) {
     return await this.apiFetch(
       {
         method: "POST",
@@ -133,7 +132,7 @@ export class TiFAPI {
    *
    * @returns a list of regions of the user's upcoming events.
    */
-  async departFromRegion (region: EventRegion) {
+  async departFromRegion(region: EventRegion) {
     return await this.apiFetch(
       {
         method: "POST",
@@ -154,7 +153,7 @@ export class TiFAPI {
    *
    * @returns a list of regions of the user's upcoming events.
    */
-  async upcomingEventArrivalRegions () {
+  async upcomingEventArrivalRegions() {
     return await this.apiFetch(
       {
         method: "GET",
@@ -167,7 +166,7 @@ export class TiFAPI {
   /**
    * Loads an individual event by its id.
    */
-  async eventDetails (eventId: number) {
+  async eventDetails(eventId: number) {
     return await this.apiFetch(
       {
         method: "GET",
@@ -186,7 +185,7 @@ export class TiFAPI {
     )
   }
 
-  async attendeesList (eventId: number, limit: number, nextPage?: string) {
+  async attendeesList(eventId: number, limit: number, nextPage?: string) {
     return await this.apiFetch(
       {
         method: "GET",
@@ -209,18 +208,24 @@ export class TiFAPI {
    * @param arrivalRegion A region to pass for marking an initial arrival if the user has arrived in the area of the event.
    * @returns The upcoming event arrivals based on the user joining this event, and a token request for the event group chat.
    */
-  async joinEvent (eventId: number, arrivalRegion: EventRegion | null) {
+  async joinEvent(eventId: number, arrivalRegion: EventRegion | null) {
+    const body = arrivalRegion ? { region: arrivalRegion } : undefined
     return await this.apiFetch(
       {
         method: "POST",
         endpoint: `/event/join/${eventId}`,
-        body: { region: arrivalRegion }
+        body
       },
       {
-        status404: EventNotFoundErrorSchema,
-        status403: literalErrorSchema("user-is-blocked", "event-has-ended"),
-        status201: JoinResponseSchema,
-        status200: JoinResponseSchema
+        status403: literalErrorSchema(
+          "event-has-ended",
+          "event-was-cancelled",
+          "user-is-blocked"
+        ),
+        status201: JoinEventResponseSchema.refine(
+          (resp) => resp.id === eventId
+        ),
+        status200: JoinEventResponseSchema.refine((resp) => resp.id === eventId)
       }
     )
   }
@@ -230,7 +235,7 @@ export class TiFAPI {
    *
    * @param eventId The id of the event to leave.
    */
-  async leaveEvent (eventId: number) {
+  async leaveEvent(eventId: number) {
     return await this.apiFetch(
       {
         method: "POST",
@@ -254,7 +259,7 @@ export class TiFAPI {
    * Registers for the user for push notifications given a push token and a
    * platform name.
    */
-  async registerForPushNotifications (
+  async registerForPushNotifications(
     pushToken: string,
     platformName: "apple" | "android"
   ) {
@@ -271,15 +276,6 @@ export class TiFAPI {
     )
   }
 }
-
-const UpcomingEventArrivalsRegionsSchema = z.object({
-  upcomingRegions: EventArrivalRegionsSchema
-})
-
-const JoinResponseSchema = UpcomingEventArrivalsRegionsSchema.extend({
-  id: z.number(),
-  token: EventChatTokenRequestSchema
-})
 
 const literalErrorSchema = <T extends z.Primitive, V extends z.Primitive[]>(
   literal: T,
