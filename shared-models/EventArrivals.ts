@@ -16,3 +16,11 @@ export const EventArrivalRegionsSchema = z.array(EventArrivalRegionSchema)
  * all the ids of the events which share this region.
  */
 export type EventArrivalRegion = z.infer<typeof EventArrivalRegionSchema>
+
+export const UpcomingEventArrivalsRegionsSchema = z.object({
+  upcomingRegions: EventArrivalRegionsSchema
+})
+
+export type UpcomingEventArrivalRegions = z.infer<
+  typeof UpcomingEventArrivalsRegionsSchema
+>

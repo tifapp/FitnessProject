@@ -102,7 +102,13 @@ export class TiFSQLite {
         city TEXT,
         recentAnnotation TEXT,
         recentUpdatedAt DOUBLE NOT NULL DEFAULT (unixepoch('now', 'subsec')),
-        CHECK(recentAnnotation IN ('attended-event', 'hosted-event')),
+        CHECK(
+          recentAnnotation IN (
+            'attended-event',
+            'hosted-event',
+            'joined-event'
+          )
+        ),
         PRIMARY KEY(latitude, longitude)
       )
       `,

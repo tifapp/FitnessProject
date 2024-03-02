@@ -16,9 +16,13 @@ import {
 } from "expo-location"
 import { mockPlacemark } from "@location/MockData"
 import { sleep } from "@lib/utils/DelayData"
-import { EventDetailsView, useLoadEventDetails } from "@event-details/Details"
-import { createTestQueryClient } from "@test-helpers/ReactQuery"
-import { QueryClientProvider } from "@tanstack/react-query"
+import {
+  JoinEventStagesView,
+  loadJoinEventPermissions,
+  useJoinEventStages
+} from "@event-details/JoinEvent"
+import { TrueRegionMonitor } from "@event-details/arrival-tracking/region-monitoring/MockRegionMonitors"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -65,11 +69,11 @@ export const Basic: EventDetailsStory = () => {
 const host = EventAttendeeMocks.Alivs
 
 const Test = () => {
-  const result = useLoadEventDetails(1, async () => {
-    await sleep(5000)
-    return { status: "blocked", event: EventMocks.Multiday }
+  const currentStage = useJoinEventStages(EventMocks.Multiday, {
+    monitor: TrueRegionMonitor,
+    joinEvent: async () => "success",
+    loadPermissions: loadJoinEventPermissions,
+    onSuccess: () => {}
   })
-  return (
-    <EventDetailsView result={result} onExploreOtherEventsTapped={() => {}} />
-  )
+  return <JoinEventStagesView stage={currentStage} />t
 }
