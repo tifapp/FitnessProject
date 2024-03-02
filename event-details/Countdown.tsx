@@ -24,6 +24,9 @@ export type UseEventCountdownResult =
     }
   | { status: "done" }
 
+/**
+ * A hook that computes the formatted countdown timer for the event.
+ */
 export const useEventCountdown = (
   time: EventCountdownTime
 ): UseEventCountdownResult => {
@@ -97,6 +100,9 @@ export type EventCountdownProps = {
   style?: StyleProp<ViewStyle>
 }
 
+/**
+ * Displays the countdown for an event.
+ */
 export const EventCountdownView = ({ result, style }: EventCountdownProps) => (
   <View style={style}>
     {result.status === "starts-in" && (
