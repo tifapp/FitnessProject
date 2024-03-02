@@ -5,9 +5,9 @@ import { TodayOrTomorrow } from "@shared-models/TodayOrTomorrow"
 import { useState } from "react"
 import { humanizeEventCountdownSeconds } from "./Event"
 import { StyleProp, ViewStyle, View, StyleSheet } from "react-native"
-import { Caption, Headline } from "@components/Text"
+import { BodyText, Headline } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
-import { useFontScale } from "@lib/Fonts"
+import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import { StringUtils } from "@lib/utils/String"
 
 export type EventCountdownTime = CurrentUserEvent["time"]
@@ -107,16 +107,16 @@ export const EventCountdownView = ({ result, style }: EventCountdownProps) => (
   <View style={style}>
     {result.status === "starts-in" && (
       <CountdownLabel
-        title="Event starts in"
-        todayOrTomorrowTitle="Event starts"
+        title="Starts in"
+        todayOrTomorrowTitle="Starts"
         countdown={result.countdown}
         shouldDisplayFomoEffect={result.countdown.shouldDisplayFomoEffect}
       />
     )}
     {result.status === "ends-in" && (
       <CountdownLabel
-        title="Event ends in"
-        todayOrTomorrowTitle="Event ends"
+        title="Ends in"
+        todayOrTomorrowTitle="Ends"
         countdown={result.countdown}
         shouldDisplayFomoEffect={result.countdown.shouldDisplayFomoEffect}
       />
@@ -138,16 +138,27 @@ const CountdownLabel = ({
   shouldDisplayFomoEffect
 }: CountdownLabelProps) => (
   <View style={styles.container}>
-    <Caption>
+    <BodyText
+      maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
+      style={styles.titleText}
+    >
       {"todayOrTomorrow" in countdown ? todayOrTomorrowTitle : title}
-    </Caption>
-    <View style={styles.countdownTextContainerContainer}>
+    </BodyText>
+    <View
+      style={[
+        styles.countdownTextContainerContainer,
+        {
+          height:
+            48 * useFontScale({ maximumScaleFactor: FontScaleFactors.xxxLarge })
+        }
+      ]}
+    >
       <View style={styles.countdownTextContainer}>
         <Headline
+          maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
           style={[
             styles.countdownText,
             {
-              minWidth: 100 * useFontScale(),
               color: shouldDisplayFomoEffect ? AppStyles.errorColor : "black"
             }
           ]}
@@ -168,12 +179,16 @@ const styles = StyleSheet.create({
   countdownTextContainer: {
     display: "flex",
     flexDirection: "row",
+    alignItems: "center",
     borderRadius: 12,
     backgroundColor: AppStyles.eventCardColor
   },
   countdownText: {
-    padding: 8,
+    paddingHorizontal: 16,
     textAlign: "center"
+  },
+  titleText: {
+    paddingLeft: 8
   },
   countdownTextContainerContainer: {
     display: "flex",

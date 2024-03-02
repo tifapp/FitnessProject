@@ -1,5 +1,6 @@
 import { Headline } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
+import { useFontScale } from "@lib/Fonts"
 import React, { ReactNode } from "react"
 import {
   StyleProp,
@@ -28,6 +29,7 @@ export type ButtonProps<Children extends ReactNode> =
        */
       title: string
       contentStyle?: StyleProp<TextStyle>
+      maximumFontSizeMultiplier: number
     } & Omit<TouchableOpacityProps, "children">)
   | (TouchableOpacityProps & ContentStyle<Children>)
 
@@ -46,19 +48,19 @@ export const PrimaryButton = <Children extends ReactNode>({
   disabled,
   ...props
 }: ButtonProps<Children>) => (
-    <BaseButton
-      style={[
-        styles.defaultPrimaryBackground,
-        styles.container,
-        style,
-        { opacity: disabled ? 0.5 : 1 }
-      ]}
-      disabled={disabled}
-      activeOpacity={0.8}
-      contentStyle={[styles.primaryContent, contentStyle]}
-      {...props}
-    />
-  )
+  <BaseButton
+    style={[
+      styles.defaultPrimaryBackground,
+      styles.container,
+      style,
+      { opacity: disabled ? 0.5 : 1 }
+    ]}
+    disabled={disabled}
+    activeOpacity={0.8}
+    contentStyle={[styles.primaryContent, contentStyle]}
+    {...props}
+  />
+)
 
 /**
  * An outlined button which should be used as a secondary element to other visual elements in the hierarchy.
@@ -74,41 +76,57 @@ export const SecondaryOutlinedButton = <Children extends ReactNode>({
   disabled,
   ...props
 }: ButtonProps<Children>) => (
-    <BaseButton
-      style={[
-        styles.container,
-        styles.outlinedButton,
-        style,
-        { opacity: disabled ? 0.4 : 1 }
-      ]}
-      disabled={disabled}
-      activeOpacity={0.65}
-      {...props}
-    />
-  )
+  <BaseButton
+    style={[
+      styles.container,
+      styles.outlinedButton,
+      style,
+      { opacity: disabled ? 0.4 : 1 }
+    ]}
+    disabled={disabled}
+    activeOpacity={0.65}
+    {...props}
+  />
+)
 
-const BaseButton = <Children extends ReactNode>(
-  props: ButtonProps<Children>
-) => (
-    <TouchableOpacity {...props}>
-      {"title" in props
-        ? (
-          <Headline style={props.contentStyle}>{props.title}</Headline>
-        )
-        : typeof props.children === "string" ||
-      typeof props.children === "number"
-          ? (
-            <Headline style={props.contentStyle}>{props.children}</Headline>
-          )
-          : (
-            <View style={props.contentStyle}>{props.children}</View>
-          )}
-    </TouchableOpacity>
-  )
+const BaseButton = <Children extends ReactNode>({
+  style,
+  maximumFontSizeMultiplier,
+  ...props
+}: ButtonProps<Children>) => (
+  <TouchableOpacity
+    {...props}
+    style={[
+      style,
+      {
+        height:
+          48 * useFontScale({ maximumScaleFactor: maximumFontSizeMultiplier })
+      }
+    ]}
+  >
+    {"title" in props ? (
+      <Headline
+        maxFontSizeMultiplier={maximumFontSizeMultiplier}
+        style={props.contentStyle}
+      >
+        {props.title}
+      </Headline>
+    ) : typeof props.children === "string" ||
+      typeof props.children === "number" ? (
+      <Headline
+        maxFontSizeMultiplier={maximumFontSizeMultiplier}
+        style={props.contentStyle}
+      >
+        {props.children}
+      </Headline>
+    ) : (
+      <View style={props.contentStyle}>{props.children}</View>
+    )}
+  </TouchableOpacity>
+)
 
 const styles = StyleSheet.create({
   container: {
-    height: 48,
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",

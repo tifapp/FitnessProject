@@ -53,7 +53,7 @@ export const Basic: EventDetailsStory = () => {
 
   return (
     <SafeAreaProvider>
-      {/* <SafeAreaView> */}
+      {/* <SafeAreaView edges={["bottom"]}> */}
       <UserLocationFunctionsProvider
         getCurrentLocation={getCurrentPositionAsync}
         requestBackgroundPermissions={requestBackgroundPermissionsAsync}
@@ -79,8 +79,8 @@ export const Basic: EventDetailsStory = () => {
 const host = EventAttendeeMocks.Alivs
 
 const time = {
-  secondsToStart: dayjs.duration(15.1, "minutes").asSeconds(),
-  todayOrTomorrow: "today",
+  secondsToStart: dayjs.duration(6.389787389686, "hour").asSeconds(),
+  todayOrTomorrow: "tomorrow",
   clientReceivedTime: new Date(),
   dateRange: dateRange(new Date(), now().add(1, "hour").toDate())
 } as const
@@ -96,7 +96,7 @@ const Test = () => {
           alignItems: "flex-end",
           justifyContent: "space-between",
           paddingHorizontal: 24,
-          paddingVertical: 64,
+          paddingBottom: 48,
           flex: 1
         }}
       >

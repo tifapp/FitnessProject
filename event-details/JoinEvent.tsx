@@ -13,10 +13,11 @@ import {
 import React, { useEffect, useRef, useState } from "react"
 import { Alert, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { TouchableIonicon } from "@components/common/Icons"
-import { BodyText, Title } from "@components/Text"
+import { BodyText, Headline, Title } from "@components/Text"
 import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useSharedValue } from "react-native-reanimated"
+import { FontScaleFactors } from "@lib/Fonts"
 
 export const JOIN_EVENT_ERROR_ALERTS = {
   eventHasEnded: {
@@ -191,6 +192,7 @@ export const JoinEventStagesView = ({ stage, style }: JoinEventStagesProps) => (
         if (stage.id !== "idle") return
         stage.joinButtonTapped()
       }}
+      maximumFontSizeMultiplier={FontScaleFactors.xxxLarge}
     >
       Join Now!
     </PrimaryButton>
