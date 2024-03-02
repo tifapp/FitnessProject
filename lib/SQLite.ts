@@ -122,6 +122,13 @@ export class TiFSQLite {
         hasCompletedOnboarding INT2 NOT NULL,
         lastEventArrivalsRefreshTime DOUBLE
       )
+      `,
+      db.run`
+      CREATE TABLE IF NOT EXISTS DeviceSettings (
+        id TEXT NOT NULL PRIMARY KEY DEFAULT 'A' CHECK (id = 'A'),
+        isHapticFeedbackEnabled INT2 NOT NULL,
+        isHapticAudioEnabled INT2 NOT NULL
+      )
       `
     ])
     return db
