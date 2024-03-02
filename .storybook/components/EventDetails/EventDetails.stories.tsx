@@ -79,8 +79,8 @@ export const Basic: EventDetailsStory = () => {
 const host = EventAttendeeMocks.Alivs
 
 const time = {
-  secondsToStart: -dayjs.duration(14, "minute").asSeconds(),
-  todayOrTomorrow: "today",
+  secondsToStart: dayjs.duration(2.1, "weeks").asSeconds(),
+  todayOrTomorrow: null,
   clientReceivedTime: new Date(),
   dateRange: dateRange(new Date(), now().add(1, "hour").toDate())
 } as const

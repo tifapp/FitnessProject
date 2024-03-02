@@ -4,16 +4,11 @@ import { CurrentUserEvent } from "@shared-models/Event"
 import { TodayOrTomorrow } from "@shared-models/TodayOrTomorrow"
 import { useState } from "react"
 import { humanizeEventCountdownSeconds } from "./Event"
-import {
-  StyleProp,
-  ViewStyle,
-  View,
-  StyleSheet,
-  LayoutRectangle
-} from "react-native"
+import { StyleProp, ViewStyle, View, StyleSheet } from "react-native"
 import { Caption, Headline } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useFontScale } from "@lib/Fonts"
+import { StringUtils } from "@lib/utils/String"
 
 export type EventCountdownTime = CurrentUserEvent["time"]
 
@@ -72,16 +67,19 @@ const formatEventCountdownSeconds = (
     /(a|an) /,
     "1 "
   )
-  if (todayOrTomorrow === "today" && duration.asHours() > 6) {
-    return { todayOrTomorrow: "Today" }
-  } else if (todayOrTomorrow === "tomorrow") {
-    return { todayOrTomorrow: "Tomorrow" }
+  if (
+    (duration.asHours() >= 1 && duration.asHours() <= 6) ||
+    !todayOrTomorrow
+  ) {
+    return { formatted }
   } else if (duration.asHours() < 1) {
     const seconds = Math.floor(duration.asSeconds() % 60)
     const minutes = Math.floor(duration.asMinutes())
     return formatMinuteAndSecond(minutes, seconds)
   } else {
-    return { formatted }
+    return {
+      todayOrTomorrow: StringUtils.capitalizeFirstLetter(todayOrTomorrow)
+    }
   }
 }
 

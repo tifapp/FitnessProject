@@ -154,6 +154,15 @@ describe("EventDetailsCountdown tests", () => {
       expectCountdown(result.current, { formatted: "1 year" })
     })
 
+    test("initial countdown, starts tomorrow in less than 6 hours, returns a numeric countdown and not tomorrow", () => {
+      const { result } = renderUseEventCountdown({
+        ...BASE_TEST_EVENT_TIME,
+        secondsToStart: dayjs.duration(5, "hour").asSeconds(),
+        todayOrTomorrow: "tomorrow"
+      })
+      expectCountdown(result.current, { formatted: "5 hours" })
+    })
+
     test("initial countdown, offsets by client received time for initial countdown", () => {
       jest.setSystemTime(new Date(20_000))
       const { result } = renderUseEventCountdown({
