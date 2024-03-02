@@ -171,7 +171,7 @@ describe("EventDetailsCountdown tests", () => {
         clientReceivedTime: new Date(10_000),
         todayOrTomorrow: "today"
       })
-      expect(result.current).toEqual({
+      expect(result.current).toMatchObject({
         status: "starts-in",
         countdown: { formatted: "9:50" }
       })
@@ -200,7 +200,7 @@ describe("EventDetailsCountdown tests", () => {
         clientReceivedTime: dayjs(baseDate).subtract(1, "minute").toDate(),
         todayOrTomorrow: "today"
       })
-      expect(result.current).toEqual({
+      expect(result.current).toMatchObject({
         status: "ends-in",
         countdown: { formatted: "49:00" }
       })
@@ -234,11 +234,59 @@ describe("EventDetailsCountdown tests", () => {
       expect(result.current).toEqual({ status: "done" })
     })
 
+    test("initial negative countdown, should display fomo effect when less than 15 minutes until event ending", () => {
+      const baseDate = new Date()
+      const { result } = renderUseEventCountdown({
+        ...BASE_TEST_EVENT_TIME,
+        secondsToStart: -dayjs.duration(50, "minutes").asSeconds(),
+        dateRange: dateRange(baseDate, dayjs(baseDate).add(1, "hour").toDate()),
+        todayOrTomorrow: "today"
+      })
+      expect((result.current as any).countdown.shouldDisplayFomoEffect).toEqual(
+        true
+      )
+    })
+
+    test("initial negative countdown, should not display fomo effect when more than 15 minutes until event ending", () => {
+      const baseDate = new Date()
+      const { result } = renderUseEventCountdown({
+        ...BASE_TEST_EVENT_TIME,
+        secondsToStart: -dayjs.duration(40, "minutes").asSeconds(),
+        dateRange: dateRange(baseDate, dayjs(baseDate).add(1, "hour").toDate()),
+        todayOrTomorrow: "today"
+      })
+      expect((result.current as any).countdown.shouldDisplayFomoEffect).toEqual(
+        false
+      )
+    })
+
+    test("initial countdown, should display fomo effect when less than 15 minutes until event starting", () => {
+      const { result } = renderUseEventCountdown({
+        ...BASE_TEST_EVENT_TIME,
+        secondsToStart: dayjs.duration(10, "minutes").asSeconds(),
+        todayOrTomorrow: "today"
+      })
+      expect((result.current as any).countdown.shouldDisplayFomoEffect).toEqual(
+        true
+      )
+    })
+
+    test("initial countdown, should not display fomo effect when less than 15 minutes until event starting", () => {
+      const { result } = renderUseEventCountdown({
+        ...BASE_TEST_EVENT_TIME,
+        secondsToStart: dayjs.duration(20, "minutes").asSeconds(),
+        todayOrTomorrow: "today"
+      })
+      expect((result.current as any).countdown.shouldDisplayFomoEffect).toEqual(
+        false
+      )
+    })
+
     const expectCountdown = (
       result: UseEventCountdownResult,
-      countdown: EventFormattedCountdown
+      countdown: Omit<EventFormattedCountdown, "shouldDisplayFomoEffect">
     ) => {
-      expect((result as any).countdown).toEqual(countdown)
+      expect((result as any).countdown).toMatchObject(countdown)
     }
 
     const renderUseEventCountdown = (time: CurrentUserEvent["time"]) => {
