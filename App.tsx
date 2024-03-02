@@ -12,7 +12,6 @@ import { SafeAreaProvider } from "react-native-safe-area-context"
 
 import { Geo } from "@aws-amplify/geo"
 import { ExpoEventArrivalsGeofencer } from "@event-details/arrival-tracking"
-import { AnalyticsProvider, MixpanelAnalytics } from "@lib/Analytics"
 import {
   addLogHandler,
   createLogFunction,
@@ -54,21 +53,13 @@ const App = () => {
   const [isFontsLoaded] = useAppFonts()
   return (
     <TiFQueryClientProvider>
-      <UserLocationFunctionsProvider
-        getCurrentLocation={getCurrentPositionAsync}
-        requestForegroundPermissions={requestForegroundPermissionsAsync}
-        requestBackgroundPermissions={requestBackgroundPermissionsAsync}
-      >
-        <AnalyticsProvider analytics={MixpanelAnalytics.shared}>
-          <SafeAreaProvider>
-            <TiFMenuProvider>
-              <RootSiblingParent>
-                <AppView isFontsLoaded={isFontsLoaded} />
-              </RootSiblingParent>
-            </TiFMenuProvider>
-          </SafeAreaProvider>
-        </AnalyticsProvider>
-      </UserLocationFunctionsProvider>
+      <SafeAreaProvider>
+        <TiFMenuProvider>
+          <RootSiblingParent>
+            <AppView isFontsLoaded={isFontsLoaded} />
+          </RootSiblingParent>
+        </TiFMenuProvider>
+      </SafeAreaProvider>
     </TiFQueryClientProvider>
   )
 }

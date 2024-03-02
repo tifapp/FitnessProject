@@ -46,8 +46,6 @@ describe("EventTravelEstimates tests", () => {
           wrapper: ({ children }) => (
             <UserLocationFunctionsProvider
               getCurrentLocation={loadUserLocation}
-              requestBackgroundPermissions={jest.fn()}
-              requestForegroundPermissions={jest.fn()}
             >
               <TestQueryClientProvider>{children}</TestQueryClientProvider>
             </UserLocationFunctionsProvider>

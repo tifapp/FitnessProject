@@ -3,9 +3,13 @@ import { QueryHookOptions } from "@lib/ReactQuery"
 import {
   LocationObject,
   LocationOptions,
-  PermissionResponse
+  PermissionResponse,
+  getCurrentPositionAsync,
+  requestBackgroundPermissionsAsync,
+  requestForegroundPermissionsAsync
 } from "expo-location"
 import { useQuery } from "@tanstack/react-query"
+import { ObjectUtils } from "@lib/utils/Object"
 
 /**
  * A query hook to load the user's current location from expo.
@@ -64,9 +68,11 @@ export type UserLocationFunctions = {
   requestBackgroundPermissions: () => Promise<PermissionResponse>
 }
 
-const UserLocationFunctionsContext = createContext<
-  UserLocationFunctions | undefined
->(undefined)
+const UserLocationFunctionsContext = createContext<UserLocationFunctions>({
+  getCurrentLocation: getCurrentPositionAsync,
+  requestBackgroundPermissions: requestBackgroundPermissionsAsync,
+  requestForegroundPermissions: requestForegroundPermissionsAsync
+})
 
 /**
  * The current functions that handle user location based operations.
@@ -74,9 +80,10 @@ const UserLocationFunctionsContext = createContext<
 export const useUserLocationFunctions = () =>
   useContext(UserLocationFunctionsContext)!
 
-export type UserLocationFunctionsProviderProps = UserLocationFunctions & {
-  children: ReactNode
-}
+export type UserLocationFunctionsProviderProps =
+  Partial<UserLocationFunctions> & {
+    children: ReactNode
+  }
 
 /**
  * Provides a context of functions that operate on the user's current location.
@@ -85,7 +92,12 @@ export const UserLocationFunctionsProvider = ({
   children,
   ...props
 }: UserLocationFunctionsProviderProps) => (
-  <UserLocationFunctionsContext.Provider value={props}>
+  <UserLocationFunctionsContext.Provider
+    value={{
+      ...useContext(UserLocationFunctionsContext),
+      ...ObjectUtils.removeUndefined(props)
+    }}
+  >
     {children}
   </UserLocationFunctionsContext.Provider>
 )

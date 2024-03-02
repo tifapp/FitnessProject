@@ -15,10 +15,7 @@ import {
   requestForegroundPermissionsAsync,
   watchPositionAsync
 } from "expo-location"
-import {
-  UserLocationFunctionsProvider,
-  useRequestForegroundLocationPermissions
-} from "@location/UserLocation"
+import { useRequestForegroundLocationPermissions } from "@location/UserLocation"
 import { BodyText, Headline, Title } from "@components/Text"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { LocationCoordinate2D } from "@shared-models/Location"
@@ -45,13 +42,7 @@ export const Basic: RegionMonitoringStory = () => (
       }}
     >
       <TiFQueryClientProvider>
-        <UserLocationFunctionsProvider
-          getCurrentLocation={getCurrentPositionAsync}
-          requestForegroundPermissions={requestForegroundPermissionsAsync}
-          requestBackgroundPermissions={requestBackgroundPermissionsAsync}
-        >
-          <StoryView />
-        </UserLocationFunctionsProvider>
+        <StoryView />
       </TiFQueryClientProvider>
     </View>
   </SafeAreaProvider>
