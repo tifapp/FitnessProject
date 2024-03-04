@@ -1,5 +1,3 @@
-import { setupCognito } from "@auth/CognitoHelpers"
-import { InMemorySecureStore } from "@auth/CognitoSecureStorage"
 import React, { useState } from "react"
 import { FlatList, Text, TouchableOpacity, View } from "react-native"
 import { useAppFonts } from "../../lib/Fonts"
@@ -53,8 +51,6 @@ import TextFieldMeta, {
 import VerifcationCodeMeta, {
   Basic as VerifcationCodeBasic
 } from "../components/VerificationCode/VerifyCode.stories"
-
-setupCognito(new InMemorySecureStore())
 
 // Create an array of stories
 const stories = [
