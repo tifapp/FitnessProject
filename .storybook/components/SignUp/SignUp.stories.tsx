@@ -1,9 +1,7 @@
 import { TiFAPI, createAWSTiFAPIFetch } from "@api-client"
 import {
-  SignUpParamsList,
   cognitoConfirmSignUpWithAutoSignIn,
-  createSignUpEnvironment,
-  createSignUpScreens
+  createSignUpEnvironment
 } from "@auth/sign-up"
 import { Auth } from "@aws-amplify/auth"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
@@ -11,6 +9,10 @@ import { API_URL } from "@env"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { NavigationContainer } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
+import {
+  SignUpParamsList,
+  createSignUpScreens
+} from "@root-feature/navigation/auth/SignUp"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { Button } from "react-native"

@@ -23,6 +23,8 @@ import {
 } from "@event-details/JoinEvent"
 import { TrueRegionMonitor } from "@event-details/arrival-tracking/region-monitoring/MockRegionMonitors"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { createTestQueryClient } from "@test-helpers/ReactQuery"
+import { QueryClientProvider } from "@tanstack/react-query"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -75,5 +77,5 @@ const Test = () => {
     loadPermissions: loadJoinEventPermissions,
     onSuccess: () => {}
   })
-  return <JoinEventStagesView stage={currentStage} />t
+  return <JoinEventStagesView stage={currentStage} />
 }

@@ -1,2 +1,2 @@
 export * from "./TabBar"
-export * from "./linkingConfig"
+export * from "./LinkingConfig"
