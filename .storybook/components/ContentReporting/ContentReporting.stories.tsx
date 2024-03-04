@@ -2,19 +2,18 @@ import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { uuidString } from "@lib/utils/UUID"
 import { NavigationContainer } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
+import {
+  ReportingScreensParamsList,
+  createContentReportingScreens
+} from "@root-feature/navigation/ContentReporting"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import React from "react"
 import { Button } from "react-native"
-import {
-  ReportingScreensParamsList,
-  createContentReportingStackScreens
-} from "@content-reporting"
-
 type ParamsList = { test: undefined } & ReportingScreensParamsList
 
 const Stack = createStackNavigator<ParamsList>()
 
-const reportingScreens = createContentReportingStackScreens<ParamsList>(
+const reportingScreens = createContentReportingScreens<ParamsList>(
   Stack,
   () => {
     throw new Error()
