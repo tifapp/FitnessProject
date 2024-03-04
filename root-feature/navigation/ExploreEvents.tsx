@@ -9,11 +9,11 @@ import { StackScreenProps } from "@react-navigation/stack"
 import { CurrentUserEvent } from "@shared-models/Event"
 import React from "react"
 import { StyleSheet } from "react-native"
-import { useExploreEvents } from "./useExploreEvents"
-import { ExploreEventsView } from "./ExploreView"
-import { createInitialCenter } from "./models"
-
-type EventScreensParamsList = {} // TODO: - Fill this out
+import {
+  useExploreEvents,
+  ExploreEventsView,
+  createInitialCenter
+} from "@screens/ExploreEvents"
 
 export type ExploreEventsScreensParamsList = {
   exploreEvents: { searchText: string; center?: LocationCoordinate2D }
@@ -32,22 +32,22 @@ type ExploreEventsProps = StackScreenProps<
 export const createExploreEventsScreens = <
   ParamsList extends ExploreEventsScreensParamsList
 >(
-    stack: StackNavigatorType<ParamsList>,
-    fetchEvents: (region: Region) => Cancellable<CurrentUserEvent[]>
-  ) => (
-    <>
-      <stack.Screen
-        name="exploreEvents"
-        options={{ headerShown: false }}
-        initialParams={{}}
-      >
-        {(props: ExploreEventsProps) => (
-          <ExploreEventsScreen {...props} fetchEvents={fetchEvents} />
-        )}
-      </stack.Screen>
-      {/* TODO: - Add Location Search Route */}
-    </>
-  )
+  stack: StackNavigatorType<ParamsList>,
+  fetchEvents: (region: Region) => Cancellable<CurrentUserEvent[]>
+) => (
+  <>
+    <stack.Screen
+      name="exploreEvents"
+      options={{ headerShown: false }}
+      initialParams={{}}
+    >
+      {(props: ExploreEventsProps) => (
+        <ExploreEventsScreen {...props} fetchEvents={fetchEvents} />
+      )}
+    </stack.Screen>
+    {/* TODO: - Add Location Search Route */}
+  </>
+)
 
 type ExploreEventsScreenProps = {
   fetchEvents: (region: Region) => Cancellable<CurrentUserEvent[]>
