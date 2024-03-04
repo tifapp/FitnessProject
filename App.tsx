@@ -1,10 +1,5 @@
 import { TiFMenuProvider } from "@components/TiFMenuProvider"
 import { useAppFonts } from "@lib/Fonts"
-import {
-  HapticsProvider,
-  IS_HAPTICS_SUPPORTED_ON_DEVICE,
-  TiFHaptics
-} from "@lib/Haptics"
 import { UserLocationFunctionsProvider } from "@location/UserLocation"
 import {
   getCurrentPositionAsync,
@@ -17,7 +12,6 @@ import { SafeAreaProvider } from "react-native-safe-area-context"
 
 import { Geo } from "@aws-amplify/geo"
 import { ExpoEventArrivalsGeofencer } from "@event-details/arrival-tracking"
-import { AnalyticsProvider, MixpanelAnalytics } from "@lib/Analytics"
 import {
   addLogHandler,
   createLogFunction,
@@ -39,12 +33,13 @@ import { registerForPushNotifications } from "./notifications"
 import awsconfig from "./src/aws-exports"
 import { NetInfoInternetConnectionStatus } from "@lib/InternetConnection"
 
+const log = createLogFunction("app.root")
+
 /**
  * Performs all the necessary setup (starting background tasks, configuration,
  * etc.) for the app that does not have to do directly with the UI.
  */
 export const setupApp = () => {
-  const log = createLogFunction("app.root")
   enableSentry()
   addLogHandler(sentryBreadcrumbLogHandler())
   addLogHandler(sentryErrorCapturingLogHandler())
@@ -65,26 +60,13 @@ const App = () => {
   const [isFontsLoaded] = useAppFonts()
   return (
     <TiFQueryClientProvider>
-      <UserLocationFunctionsProvider
-        getCurrentLocation={getCurrentPositionAsync}
-        requestForegroundPermissions={requestForegroundPermissionsAsync}
-        requestBackgroundPermissions={requestBackgroundPermissionsAsync}
-      >
-        <HapticsProvider
-          isSupportedOnDevice={IS_HAPTICS_SUPPORTED_ON_DEVICE}
-          haptics={TiFHaptics}
-        >
-          <AnalyticsProvider analytics={MixpanelAnalytics.shared}>
-            <SafeAreaProvider>
-              <TiFMenuProvider>
-                <RootSiblingParent>
-                  <AppView isFontsLoaded={isFontsLoaded} />
-                </RootSiblingParent>
-              </TiFMenuProvider>
-            </SafeAreaProvider>
-          </AnalyticsProvider>
-        </HapticsProvider>
-      </UserLocationFunctionsProvider>
+      <SafeAreaProvider>
+        <TiFMenuProvider>
+          <RootSiblingParent>
+            <AppView isFontsLoaded={isFontsLoaded} />
+          </RootSiblingParent>
+        </TiFMenuProvider>
+      </SafeAreaProvider>
     </TiFQueryClientProvider>
   )
 }

@@ -113,6 +113,26 @@ export const updateEventsInArrivalsTracker = async (
   await tracker.trackArrivals(arrivalsToTrack)
 }
 
+/**
+ * Returns a formatted string for detailing the number of seconds before an
+ * event.
+ *
+ * Examples:
+ *
+ * Exactly 1 week, 1 hour, 1 month, etc. -> A week/month/hour/etc
+ *
+ * 2 hours, 24 minutes -> 2.5 hours
+ *
+ * 2 hours, 13 minutes -> 2 hours
+ *
+ * 2 hours, 44 minutes -> 2.5 hours
+ *
+ * 2 hours, 45 minutes -> 3 hours
+ *
+ * 2 weeks, 1 day -> 3 weeks
+ *
+ * 2 days, 1 hour -> 3 days
+ */
 export const humanizeEventCountdownSeconds = (countdownSeconds: number) => {
   const duration = dayjs.duration(countdownSeconds, "seconds")
   const roundedHours = MathUtils.roundToDenominator(duration.asHours(), 2)

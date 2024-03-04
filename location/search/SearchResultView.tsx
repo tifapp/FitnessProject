@@ -44,9 +44,7 @@ export const LocationSearchResultView = ({
             <View style={styles.annotation}>
               <Ionicon name="people" size={12} style={styles.annotationIcon} />
               <Caption style={styles.annotationText}>
-                {result.annotation === "attended-event"
-                  ? "You attended an event here recently."
-                  : "You hosted an event here recently."}
+                {ANNOTATION_MESSAGES[result.annotation]}
               </Caption>
             </View>
           )}
@@ -63,6 +61,15 @@ export const LocationSearchResultView = ({
       </View>
     </View>
   )
+}
+
+const ANNOTATION_MESSAGES = {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  "attended-event": "You attended an event here recently.",
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  "hosted-event": "You hosted an event here recently.",
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  "joined-event": "You joined an event here recently."
 }
 
 const styles = StyleSheet.create({

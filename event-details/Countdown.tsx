@@ -4,15 +4,11 @@ import { CurrentUserEvent } from "@shared-models/Event"
 import { TodayOrTomorrow } from "@shared-models/TodayOrTomorrow"
 import { useState } from "react"
 import { humanizeEventCountdownSeconds } from "./Event"
-import {
-  StyleProp,
-  ViewStyle,
-  View,
-  StyleSheet,
-  LayoutRectangle
-} from "react-native"
-import { Caption, Headline } from "@components/Text"
+import { StyleProp, ViewStyle, View, StyleSheet } from "react-native"
+import { BodyText, Footnote, Headline } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
+import { FontScaleFactors, useFontScale } from "@lib/Fonts"
+import { StringUtils } from "@lib/utils/String"
 
 export type EventCountdownTime = CurrentUserEvent["time"]
 
@@ -28,6 +24,9 @@ export type UseEventCountdownResult =
     }
   | { status: "done" }
 
+/**
+ * A hook that computes the formatted countdown timer for the event.
+ */
 export const useEventCountdown = (
   time: EventCountdownTime
 ): UseEventCountdownResult => {
@@ -59,8 +58,8 @@ export const useEventCountdown = (
 }
 
 export type EventFormattedCountdown =
-  | { todayOrTomorrow: "Today" | "Tomorrow" }
-  | { formatted: string }
+  | { todayOrTomorrow: "Today" | "Tomorrow"; shouldDisplayFomoEffect: false }
+  | { formatted: string; shouldDisplayFomoEffect: boolean }
 
 const formatEventCountdownSeconds = (
   seconds: number,
@@ -71,21 +70,29 @@ const formatEventCountdownSeconds = (
     /(a|an) /,
     "1 "
   )
-  if (todayOrTomorrow === "today" && duration.asHours() > 6) {
-    return { todayOrTomorrow: "Today" }
-  } else if (todayOrTomorrow === "tomorrow") {
-    return { todayOrTomorrow: "Tomorrow" }
+  const shouldDisplayFomoEffect = duration.asMinutes() <= 15
+  if (
+    (duration.asHours() >= 1 && duration.asHours() <= 6) ||
+    !todayOrTomorrow
+  ) {
+    return { formatted, shouldDisplayFomoEffect }
   } else if (duration.asHours() < 1) {
     const seconds = Math.floor(duration.asSeconds() % 60)
     const minutes = Math.floor(duration.asMinutes())
-    return formatMinuteAndSecond(minutes, seconds)
+    return {
+      formatted: formatMinuteAndSecond(minutes, seconds),
+      shouldDisplayFomoEffect
+    }
   } else {
-    return { formatted }
+    return {
+      todayOrTomorrow: StringUtils.capitalizeFirstLetter(todayOrTomorrow),
+      shouldDisplayFomoEffect: false
+    }
   }
 }
 
 const formatMinuteAndSecond = (left: number, right: number) => {
-  return { formatted: `${left}:${right < 10 ? `0${right}` : right}` }
+  return `${left}:${right < 10 ? `0${right}` : right}`
 }
 
 export type EventCountdownProps = {
@@ -93,20 +100,25 @@ export type EventCountdownProps = {
   style?: StyleProp<ViewStyle>
 }
 
+/**
+ * Displays the countdown for an event.
+ */
 export const EventCountdownView = ({ result, style }: EventCountdownProps) => (
   <View style={style}>
     {result.status === "starts-in" && (
       <CountdownLabel
-        title="Event starts in"
-        todayOrTomorrowTitle="Event starts"
+        title="Starts in"
+        todayOrTomorrowTitle="Starts"
         countdown={result.countdown}
+        shouldDisplayFomoEffect={result.countdown.shouldDisplayFomoEffect}
       />
     )}
     {result.status === "ends-in" && (
       <CountdownLabel
-        title="Event ends in"
-        todayOrTomorrowTitle="Event ends"
+        title="Ends in"
+        todayOrTomorrowTitle="Ends"
         countdown={result.countdown}
+        shouldDisplayFomoEffect={result.countdown.shouldDisplayFomoEffect}
       />
     )}
   </View>
@@ -116,36 +128,49 @@ type CountdownLabelProps = {
   title: string
   todayOrTomorrowTitle: string
   countdown: EventFormattedCountdown
+  shouldDisplayFomoEffect: boolean
 }
 
 const CountdownLabel = ({
   title,
   todayOrTomorrowTitle,
-  countdown
-}: CountdownLabelProps) => {
-  const [captionRect, setCaptionRect] = useState<LayoutRectangle | undefined>()
-  return (
-    <View style={styles.container}>
-      <Caption onLayout={(e) => setCaptionRect(e.nativeEvent.layout)}>
-        {"todayOrTomorrow" in countdown ? todayOrTomorrowTitle : title}
-      </Caption>
-      <View style={styles.countdownTextContainerContainer}>
-        <View style={styles.countdownTextContainer}>
-          <Headline
-            style={[
-              styles.countdownText,
-              { minWidth: captionRect?.width ?? 0 }
-            ]}
-          >
-            {"formatted" in countdown
-              ? countdown.formatted
-              : countdown.todayOrTomorrow}
-          </Headline>
-        </View>
+  countdown,
+  shouldDisplayFomoEffect
+}: CountdownLabelProps) => (
+  <View style={styles.container}>
+    <Footnote
+      maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
+      style={styles.titleText}
+    >
+      {"todayOrTomorrow" in countdown ? todayOrTomorrowTitle : title}
+    </Footnote>
+    <View
+      style={[
+        styles.countdownTextContainerContainer,
+        {
+          height:
+            48 * useFontScale({ maximumScaleFactor: FontScaleFactors.xxxLarge })
+        }
+      ]}
+    >
+      <View style={styles.countdownTextContainer}>
+        <Headline
+          maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
+          style={[
+            styles.countdownText,
+            {
+              color: shouldDisplayFomoEffect ? AppStyles.errorColor : "black"
+            }
+          ]}
+        >
+          {"formatted" in countdown
+            ? countdown.formatted
+            : countdown.todayOrTomorrow}
+        </Headline>
       </View>
     </View>
-  )
-}
+  </View>
+)
 
 const styles = StyleSheet.create({
   container: {
@@ -154,12 +179,16 @@ const styles = StyleSheet.create({
   countdownTextContainer: {
     display: "flex",
     flexDirection: "row",
+    alignItems: "center",
     borderRadius: 12,
     backgroundColor: AppStyles.eventCardColor
   },
   countdownText: {
-    padding: 8,
+    paddingHorizontal: 16,
     textAlign: "center"
+  },
+  titleText: {
+    paddingLeft: 8
   },
   countdownTextContainerContainer: {
     display: "flex",

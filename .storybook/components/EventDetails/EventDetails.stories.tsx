@@ -25,6 +25,9 @@ import { NavigationContainer, useFocusEffect } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { AppState } from "@aws-amplify/core"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
+import { sleep } from "@lib/utils/DelayData"
+import { TrueRegionMonitor } from "@event-details/arrival-tracking/region-monitoring/MockRegionMonitors"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -53,7 +56,7 @@ export const Basic: EventDetailsStory = () => {
 
   return (
     <SafeAreaProvider>
-      {/* <SafeAreaView> */}
+      {/* <SafeAreaView edges={["bottom"]}> */}
       <UserLocationFunctionsProvider
         getCurrentLocation={getCurrentPositionAsync}
         requestBackgroundPermissions={requestBackgroundPermissionsAsync}
@@ -79,8 +82,8 @@ export const Basic: EventDetailsStory = () => {
 const host = EventAttendeeMocks.Alivs
 
 const time = {
-  secondsToStart: -dayjs.duration(14, "minute").asSeconds(),
-  todayOrTomorrow: "today",
+  secondsToStart: dayjs.duration(15, "minute").asSeconds(),
+  todayOrTomorrow: "tomorrow",
   clientReceivedTime: new Date(),
   dateRange: dateRange(new Date(), now().add(1, "hour").toDate())
 } as const
@@ -96,13 +99,13 @@ const Test = () => {
           alignItems: "flex-end",
           justifyContent: "space-between",
           paddingHorizontal: 24,
-          paddingVertical: 64,
+          paddingBottom: 48,
           flex: 1
         }}
       >
         <EventCountdownView result={result} />
         <JoinEventStagesView
-          stage={{ id: "idle", joinButtonTapped: () => {} }}
+          stage={{ stage: "idle", joinButtonTapped: () => {} }}
         />
       </View>
     </View>

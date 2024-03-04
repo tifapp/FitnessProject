@@ -2,7 +2,8 @@ import {
   clearAutocorrectingInterval,
   setAutocorrectingInterval
 } from "@lib/AutocorrectingInterval"
-import { useRef, useEffect, useInsertionEffect } from "react"
+import { useEffect } from "react"
+import { useEffectEvent } from "./UseEffectEvent"
 
 /**
  * A hook that runs the callback on an interval of length `intervalMillis`.
@@ -11,16 +12,11 @@ export const useAutocorrectingInterval = (
   callback: () => void,
   intervalMillis: number
 ) => {
-  const savedCallback = useRef(callback)
-
-  useInsertionEffect(() => {
-    savedCallback.current = callback
-  }, [callback])
-
+  const callbackEvent = useEffectEvent(callback)
   useEffect(() => {
     const interval = setAutocorrectingInterval(() => {
-      savedCallback.current()
+      callbackEvent()
     }, intervalMillis)
     return () => clearAutocorrectingInterval(interval)
-  }, [intervalMillis])
+  }, [intervalMillis, callbackEvent])
 }
