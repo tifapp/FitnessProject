@@ -25,6 +25,9 @@ import { TrueRegionMonitor } from "@event-details/arrival-tracking/region-monito
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { createTestQueryClient } from "@test-helpers/ReactQuery"
 import { QueryClientProvider } from "@tanstack/react-query"
+import { EventDetailsMenuView } from "@event-details/Menu"
+import { View } from "react-native"
+import { CognitoSecureStorage } from "@auth/CognitoSecureStorage"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -71,11 +74,25 @@ export const Basic: EventDetailsStory = () => {
 const host = EventAttendeeMocks.Alivs
 
 const Test = () => {
-  const currentStage = useJoinEventStages(EventMocks.Multiday, {
-    monitor: TrueRegionMonitor,
-    joinEvent: async () => "success",
-    loadPermissions: loadJoinEventPermissions,
-    onSuccess: () => {}
-  })
-  return <JoinEventStagesView stage={currentStage} />
+  return (
+    <View
+      style={{
+        height: "100%",
+        justifyContent: "center"
+      }}
+    >
+      <EventDetailsMenuView
+        event={{ title: "Test Event", userAttendeeStatus: "hosting", host }}
+        eventShareContent={async () => ({
+          title: "Test",
+          url: "https://www.google.com"
+        })}
+        onCopyEventTapped={() => console.log("Copy")}
+        onInviteFriendsTapped={() => console.log("Invite")}
+        onContactHostTapped={() => console.log("Contact Host")}
+        onEditEventTapped={() => console.log("Edit")}
+        onReportEventTapped={() => console.log("Report")}
+      />
+    </View>
+  )
 }
