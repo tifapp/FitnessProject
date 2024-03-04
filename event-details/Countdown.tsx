@@ -5,7 +5,7 @@ import { TodayOrTomorrow } from "@shared-models/TodayOrTomorrow"
 import { useState } from "react"
 import { humanizeEventCountdownSeconds } from "./Event"
 import { StyleProp, ViewStyle, View, StyleSheet } from "react-native"
-import { BodyText, Headline } from "@components/Text"
+import { BodyText, Footnote, Headline } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import { StringUtils } from "@lib/utils/String"
@@ -138,12 +138,12 @@ const CountdownLabel = ({
   shouldDisplayFomoEffect
 }: CountdownLabelProps) => (
   <View style={styles.container}>
-    <BodyText
+    <Footnote
       maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
       style={styles.titleText}
     >
       {"todayOrTomorrow" in countdown ? todayOrTomorrowTitle : title}
-    </BodyText>
+    </Footnote>
     <View
       style={[
         styles.countdownTextContainerContainer,

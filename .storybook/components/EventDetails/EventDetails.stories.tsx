@@ -82,7 +82,7 @@ export const Basic: EventDetailsStory = () => {
 const host = EventAttendeeMocks.Alivs
 
 const time = {
-  secondsToStart: dayjs.duration(6.389787389686, "hour").asSeconds(),
+  secondsToStart: dayjs.duration(15, "minute").asSeconds(),
   todayOrTomorrow: "tomorrow",
   clientReceivedTime: new Date(),
   dateRange: dateRange(new Date(), now().add(1, "hour").toDate())
@@ -105,7 +105,7 @@ const Test = () => {
       >
         <EventCountdownView result={result} />
         <JoinEventStagesView
-          stage={{ id: "idle", joinButtonTapped: () => {} }}
+          stage={{ stage: "idle", joinButtonTapped: () => {} }}
         />
       </View>
     </View>
