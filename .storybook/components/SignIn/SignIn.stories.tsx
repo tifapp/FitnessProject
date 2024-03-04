@@ -1,5 +1,5 @@
 import { TiFAPI, createAWSTiFAPIFetch } from "@api-client"
-import { createForgotPasswordScreens } from "@auth/forgot-password"
+import { createForgotPasswordScreens } from "@root-feature/navigation/auth/ForgotPassword"
 import { createForgotPasswordEnvironment } from "@auth/forgot-password/Environment"
 import { CognitoSignInAuthenticator } from "@auth/sign-in"
 import {
