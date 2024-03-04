@@ -16,22 +16,26 @@ type ContentStyle<Children extends ReactNode> = Children extends string | number
   ? { contentStyle?: StyleProp<TextStyle> }
   : { contentStyle?: StyleProp<ViewStyle> }
 
+export type LegacyButtonProps = {
+  /**
+   * @deprecated Use `children` to render just text instead.
+   */
+  title: string
+  contentStyle?: StyleProp<TextStyle>
+} & Omit<TouchableOpacityProps, "children">
+
 /**
  * Props for a button.
  *
  * If you just want a text button, you can either pass in a `title` prop or use `children`.
  * In this case, always use the `children` prop as `title` is only kept around for legacy reasons.
  */
-export type ButtonProps<Children extends ReactNode> =
-  | ({
-      /**
-       * @deprecated Use `children` to render just text instead.
-       */
-      title: string
-      contentStyle?: StyleProp<TextStyle>
-      maximumFontSizeMultiplier: number
-    } & Omit<TouchableOpacityProps, "children">)
+export type ButtonProps<Children extends ReactNode> = (
+  | LegacyButtonProps
   | (TouchableOpacityProps & ContentStyle<Children>)
+) & {
+  maximumFontSizeMultiplier?: number
+}
 
 /**
  * The button that should be used for main CTAs and should have visual hierarchy
