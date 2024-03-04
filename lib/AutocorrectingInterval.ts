@@ -23,18 +23,18 @@ export const setAutocorrectingInterval = (
   timeoutFn: TimeoutFunction = setTimeout
 ): AutocorrectingInterval => {
   const id = currentId++
-  let nowTime = Date.now()
+  let nowTime = new Date().getTime()
   let currentIntervalMillis = millis
-  let averageSleepOffset: number | undefined
+  let intervalCount = 0
+  let offsetTotal = 0
   const run = () => {
     callback()
-    const endTime = Date.now()
+    const endTime = new Date().getTime()
     const currentSleepOffset = endTime - nowTime - currentIntervalMillis
-    averageSleepOffset = averageSleepOffset
-      ? (averageSleepOffset + currentSleepOffset) / 2
-      : currentSleepOffset
+    offsetTotal += currentSleepOffset
+    const averageOffset = offsetTotal / ++intervalCount
     nowTime = endTime
-    currentIntervalMillis = millis - averageSleepOffset
+    currentIntervalMillis = millis - averageOffset
     intervals.set(id, timeoutFn(run, currentIntervalMillis))
   }
   intervals.set(id, timeoutFn(run, millis))
