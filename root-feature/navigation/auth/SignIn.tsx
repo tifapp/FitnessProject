@@ -12,7 +12,7 @@ import {
   useAuthVerificationCodeForm
 } from "@auth/VerifyCode"
 import { SignUpParamsList } from "./SignUp"
-import { ForgotPasswordParamsList } from "@auth/forgot-password"
+import { ForgotPasswordParamsList } from "./ForgotPassword"
 
 export type SignInParamsList = {
   signInForm: undefined
