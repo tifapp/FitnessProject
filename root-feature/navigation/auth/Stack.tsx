@@ -1,24 +1,20 @@
 import { TiFAPI } from "@api-client/TiFAPI"
+import { createForgotPasswordEnvironment } from "@auth/forgot-password"
+import { CognitoSignInAuthenticator } from "@auth/sign-in"
 import {
-  ForgotPasswordParamsList,
-  createForgotPasswordScreens
-} from "@auth/forgot-password"
-import { createForgotPasswordEnvironment } from "@auth/forgot-password/Environment"
-import {
-  CognitoSignInAuthenticator,
-  SignInParamsList,
-  createSignInScreens
-} from "@auth/sign-in"
-import {
-  SignUpParamsList,
   cognitoConfirmSignUpWithAutoSignIn,
-  createSignUpEnvironment,
-  createSignUpScreens
+  createSignUpEnvironment
 } from "@auth/sign-up"
 import { Auth } from "@aws-amplify/auth"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
+import { SignUpParamsList, createSignUpScreens } from "./SignUp"
+import {
+  ForgotPasswordParamsList,
+  createForgotPasswordScreens
+} from "./ForgotPassword"
+import { SignInParamsList, createSignInScreens } from "./SignIn"
 
 export type AuthNavigationStackParamList = SignInParamsList &
   SignUpParamsList &
