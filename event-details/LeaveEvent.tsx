@@ -1,6 +1,5 @@
 import { CurrentUserEvent } from "@shared-models/Event"
 import { useMutation } from "@tanstack/react-query"
-import { useState } from "react"
 import { Alert } from "react-native"
 
 export const LEAVE_EVENT_ERROR_ALERTS = {
@@ -32,30 +31,29 @@ const presentErrorAlert = (key: keyof typeof LEAVE_EVENT_ERROR_ALERTS) => {
 export type LeaveEventResult = "success" | "eventHasEnded" | "eventWasCancelled" | "coHostNotFound"
 
 export type UseLeaveEventEnvironment = {
-  leaveEvent: (event: Pick<CurrentUserEvent, "id" | "userAttendeeStatus">) => Promise<LeaveEventResult>
+  leaveEvent: (eventId: number) => Promise<LeaveEventResult>
   onSuccess: () => void
 }
 
-export type UseLeaveEventStage = {
-  attendeeStatus: "hosting"
+export type UseLeaveEventMenu = {
+  attendeeStatus: "hosting",
+  isLoading: boolean,
   deleteButtonTapped: () => void,
   reselectButtonTapped: () => void,
-  dismissButtonTapped: () => void
-} | { attendeeStatus: "attending"
+} | { attendeeStatus: "attending",
+  isLoading: boolean
   confirmButtonTapped: () => void
-  dismissButtonTapped: () => void
-} | { attendeeStatus: "not-participating"}
+}
 
 export type UseLeaveEventStatus =
-  | { status: "idle"; leaveButtonTapped: () => void }
-  | { status: "loading" | "success" }
-  | ({ status: "select" } & UseLeaveEventStage)
+  | { status: "success" }
+  | ({ status: "select" } & UseLeaveEventMenu)
+  | { status: "idle" }
 
 export const useLeaveEvent = (event: Pick<CurrentUserEvent, "id" | "userAttendeeStatus">, env: UseLeaveEventEnvironment): UseLeaveEventStatus => {
   const { onSuccess, leaveEvent } = env
-  const [isModalOpen, setIsModalOpen] = useState(false)
   const leaveEventMutation = useMutation(
-    async () => await leaveEvent(event),
+    async () => await leaveEvent(event.id),
     {
       onSuccess: (status) => {
         if (status !== "success") presentErrorAlert(status)
@@ -65,36 +63,27 @@ export const useLeaveEvent = (event: Pick<CurrentUserEvent, "id" | "userAttendee
     }
   )
 
-  const startSelectionFlow = () => {
-    setIsModalOpen(true)
-  }
-
-  const endSelectionFlow = () => {
-    setIsModalOpen(false)
-  }
-
   const isSuccess =
     leaveEventMutation.isSuccess && leaveEventMutation.data === "success"
 
   if (isSuccess) {
     return { status: "success" }
-  } else if (
-    leaveEventMutation.isLoading
-  ) {
-    return { status: "loading" }
-  } else if (isModalOpen && event.userAttendeeStatus === "attending") {
+  } else if (event.userAttendeeStatus === "attending") {
     return {
       status: "select",
+      isLoading: leaveEventMutation.isLoading,
       attendeeStatus: event.userAttendeeStatus,
-      confirmButtonTapped: leaveEventMutation.mutate,
-      dismissButtonTapped: () => endSelectionFlow()
+      confirmButtonTapped: () => {
+        leaveEventMutation.mutate()
+      }
     }
-  } else if (isModalOpen && event.userAttendeeStatus === "hosting") {
+  } else if (event.userAttendeeStatus === "hosting") {
     return {
       status: "select",
+      isLoading: leaveEventMutation.isLoading,
       attendeeStatus: event.userAttendeeStatus,
       deleteButtonTapped: () => {
-        endSelectionFlow(); Alert.alert("Delete Event", "Are you sure you want to delete this event?", [
+        Alert.alert("Delete Event", "Are you sure you want to delete this event?", [
           {
             text: "Delete",
             style: "destructive",
@@ -105,10 +94,19 @@ export const useLeaveEvent = (event: Pick<CurrentUserEvent, "id" | "userAttendee
             style: "cancel"
           }])
       },
-      reselectButtonTapped: () => console.log("Reselect"),
-      dismissButtonTapped: () => endSelectionFlow()
+      reselectButtonTapped: () => console.log("Reselect")
     }
-  } else {
-    return { status: "idle", leaveButtonTapped: () => startSelectionFlow() }
-  }
+  } else { return { status: "idle" } }
 }
+
+// export const AttendeesListPicker = () => {
+//   const result = useLeaveEventHostPicker()
+// }
+
+// export const useLeaveEventHostPicker = (
+//   onAttendeeSelected: (eventAttendee: Pick<EventAttendee, "id">) => Promise<EventAttendee>,
+//   attendeesListProps: UseAttendeesListProps
+// ) => {
+//   const result = useAttendeesList(attendeesListProps)
+//   const [currentAttendeeId, setCurrentAttendeeId] = useState<number>()
+// }

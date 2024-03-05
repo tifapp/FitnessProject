@@ -13,7 +13,7 @@ describe("Attendees List tests", () => {
 
   const renderUseAttendeesList = (eventId: number, pageSize: number) => {
     return renderHook(
-      () => useAttendeesList(fetchNextAttendeesPage, eventId, pageSize),
+      () => useAttendeesList({ fetchNextAttendeesPage, eventId, pageSize }),
       {
         wrapper: ({ children }) => (
           <TestQueryClientProvider>{children}</TestQueryClientProvider>

@@ -59,15 +59,21 @@ export type UseAttendeesListResult =
       isFetchingNextPage: boolean
     }
 
-export const useAttendeesList = (
-  fetchNextAttendeesPage: (
+export type UseAttendeesListProps =
+{
+  fetchNextAttendeesPage:
+  (
     eventId: number,
     pageSize: number,
     nextPageCursor?: string
   ) => Promise<EventAttendeesPage>,
   eventId: number,
   pageSize: number
-): UseAttendeesListResult => {
+}
+
+export const useAttendeesList = ({
+  fetchNextAttendeesPage, eventId, pageSize
+}: UseAttendeesListProps): UseAttendeesListResult => {
   const infiniteAttendeesQuery = useInfiniteQuery<EventAttendeesPage, Error>({
     queryKey: ["eventAttendees", eventId],
     queryFn: async ({ pageParam }) => {
@@ -118,7 +124,7 @@ export type AttendeesListViewProps = {
   renderAttendee: (eventAttendee: EventAttendee) => JSX.Element
   ListHeaderComponent?: JSX.Element
   style?: StyleProp<ViewStyle>
-} & Extract<ReturnType<typeof useAttendeesList>, { status: "success" }>
+} & Omit<Extract<ReturnType<typeof useAttendeesList>, { status: "success" }>, "status" | "host" | "isFetchingNextPage">
 
 export const AttendeesListView = ({
   attendees,
