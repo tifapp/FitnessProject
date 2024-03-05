@@ -18,6 +18,7 @@ export type EventDetailsMenuProps = {
   onEditEventTapped: () => void
   onContactHostTapped: () => void
   onInviteFriendsTapped: () => void
+  onAssignNewHostTapped: () => void
   style?: StyleProp<ViewStyle>
 }
 
@@ -32,6 +33,7 @@ export type EventDetailsMenuProps = {
  * - Editing the event (Host).
  * - Sharing the event (All roles).
  * - Inviting friends (Host, Attendee).
+ * - Assiging a new host (Host).
  */
 export const EventDetailsMenuView = ({
   event,
@@ -41,6 +43,7 @@ export const EventDetailsMenuView = ({
   onEditEventTapped,
   onContactHostTapped,
   onInviteFriendsTapped,
+  onAssignNewHostTapped,
   style
 }: EventDetailsMenuProps) => {
   const callbacks = {
@@ -49,6 +52,7 @@ export const EventDetailsMenuView = ({
     "edit-event": onEditEventTapped,
     "contact-host": onContactHostTapped,
     "invite-friends": onInviteFriendsTapped,
+    "assign-host": onAssignNewHostTapped,
     "share-event": async () => {
       Share.share(await eventShareContent())
     }
@@ -145,11 +149,20 @@ export const EVENT_MENU_ACTION = {
       ios: "person.fill",
       android: "ic_menu_call"
     })
+  },
+  assignHost: {
+    id: "assign-host",
+    title: "Assign New Host",
+    image: Platform.select({
+      ios: "person.fill.badge.plus",
+      android: "ic_menu_rotate"
+    })
   }
 } as const satisfies Record<string, MenuAction>
 
 const ATTENDEE_STATUS_ACTIONS = {
   hosting: [
+    EVENT_MENU_ACTION.assignHost,
     EVENT_MENU_ACTION.copyEvent,
     EVENT_MENU_ACTION.editEvent,
     EVENT_MENU_ACTION.inviteFriends,

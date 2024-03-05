@@ -84,7 +84,7 @@ const Test = () => {
       <EventDetailsMenuView
         event={{
           title: "Test Event",
-          userAttendeeStatus: "attending",
+          userAttendeeStatus: "hosting",
           host
         }}
         eventShareContent={async () => ({
@@ -97,6 +97,7 @@ const Test = () => {
         onContactHostTapped={() => console.log("Contact Host")}
         onEditEventTapped={() => console.log("Edit")}
         onReportEventTapped={() => console.log("Report")}
+        onAssignNewHostTapped={() => console.log("Assign Host")}
       />
     </View>
   )
