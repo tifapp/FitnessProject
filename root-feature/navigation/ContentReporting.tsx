@@ -1,10 +1,13 @@
 import React from "react"
 import { ChevronBackButton, StackNavigatorType } from "@components/Navigation"
-import { ReportingReason, ReportableContentType } from "./Models"
-import { ReportSuccessView } from "./Success"
 import { StackScreenProps } from "@react-navigation/stack"
 import { StringUtils } from "@lib/utils/String"
-import { ReportFormView } from "./Form"
+import {
+  ReportFormView,
+  ReportSuccessView,
+  ReportingReason,
+  ReportableContentType
+} from "@content-reporting"
 
 export type ReportingScreensParamsList = {
   reportSuccess: { contentType: ReportableContentType }
@@ -44,16 +47,16 @@ type ReportingScreenStackProps = StackScreenProps<
  * @param stack the stack navigator to add the reporting screens to.
  * @param onReported a function that runs when a piece of content is reported.
  */
-export const createContentReportingStackScreens = <
+export const createContentReportingScreens = <
   T extends ReportingScreensParamsList
 >(
-    stack: StackNavigatorType<T>,
-    onReported: (
+  stack: StackNavigatorType<T>,
+  onReported: (
     contentId: string,
     contentType: ReportableContentType,
     reason: ReportingReason
   ) => Promise<void>
-  ) => {
+) => {
   return (
     <>
       <stack.Screen

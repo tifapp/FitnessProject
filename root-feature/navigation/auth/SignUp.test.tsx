@@ -22,8 +22,8 @@ import {
 import { HttpResponse, http } from "msw"
 import { useCallback, useState } from "react"
 import { Button, View } from "react-native"
-import { createSignUpEnvironment } from "./Environment"
-import { SignUpParamsList, createSignUpScreens } from "./Navigation"
+import { createSignUpEnvironment } from "@auth/sign-up"
+import { SignUpParamsList, createSignUpScreens } from "./SignUp"
 
 type TestSignUpParamsList = {
   test: undefined
@@ -38,23 +38,22 @@ describe("SignUpNavigation tests", () => {
     resendSignUp: jest.fn(),
     confirmSignUpWithAutoSignIn: jest.fn()
   }
-  const env = createSignUpEnvironment(
-    cognito,
-    TiFAPI.testAuthenticatedInstance
-  )
+  const env = createSignUpEnvironment(cognito, TiFAPI.testAuthenticatedInstance)
 
   beforeEach(() => {
     jest.resetAllMocks()
     mswServer.use(
       http.post("https://localhost:8080/user", async () => {
-        return HttpResponse.json({
-          id: uuidString(),
-          handle: TEST_GENERATED_USER_HANDLE.rawValue
-        }, { status: 201 })
+        return HttpResponse.json(
+          {
+            id: uuidString(),
+            handle: TEST_GENERATED_USER_HANDLE.rawValue
+          },
+          { status: 201 }
+        )
       }),
-      http.get(
-        "https://localhost:8080/user/autocomplete",
-        async () => HttpResponse.json({ users: [] })
+      http.get("https://localhost:8080/user/autocomplete", async () =>
+        HttpResponse.json({ users: [] })
       )
     )
   })

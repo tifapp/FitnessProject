@@ -10,13 +10,13 @@ import {
 import { useCallback, useState } from "react"
 import { View } from "react-native"
 import { Button } from "react-native-elements"
-import { Password, USPhoneNumber } from ".."
+import { Password, USPhoneNumber } from "@auth"
 import "@test-helpers/Matchers"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import {
   ForgotPasswordParamsList,
   createForgotPasswordScreens
-} from "./ForgotPasswordNavigation"
+} from "./ForgotPassword"
 
 type TestForgotPasswordParamsList = {
   test: undefined
