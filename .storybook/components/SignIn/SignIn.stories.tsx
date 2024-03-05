@@ -1,15 +1,10 @@
 import { TiFAPI, createAWSTiFAPIFetch } from "@api-client"
-import { createForgotPasswordScreens } from "@auth/forgot-password"
+import { createForgotPasswordScreens } from "@root-feature/navigation/auth/ForgotPassword"
 import { createForgotPasswordEnvironment } from "@auth/forgot-password/Environment"
-import {
-  CognitoSignInAuthenticator,
-  SignInParamsList,
-  createSignInScreens
-} from "@auth/sign-in"
+import { CognitoSignInAuthenticator } from "@auth/sign-in"
 import {
   cognitoConfirmSignUpWithAutoSignIn,
-  createSignUpEnvironment,
-  createSignUpScreens
+  createSignUpEnvironment
 } from "@auth/sign-up"
 import { Auth } from "@aws-amplify/auth"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
@@ -17,6 +12,11 @@ import { API_URL } from "@env"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
+import {
+  SignInParamsList,
+  createSignInScreens
+} from "@root-feature/navigation/auth/SignIn"
+import { createSignUpScreens } from "@root-feature/navigation/auth/SignUp"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { SafeAreaProvider } from "react-native-safe-area-context"

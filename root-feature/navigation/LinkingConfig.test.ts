@@ -1,7 +1,7 @@
 import { UserNotifications } from "notifications/UserNotifications"
 import { NotificationContent } from "expo-notifications"
-import { unimplementedUserNotifications } from "../test-helpers/UserNotifications"
-import { makeLinkingConfig } from "./linkingConfig"
+import { unimplementedUserNotifications } from "@test-helpers/UserNotifications"
+import { makeLinkingConfig } from "./LinkingConfig"
 
 let userNotifications: UserNotifications
 let getAppLaunchURL: () => Promise<string | null> = async () => null

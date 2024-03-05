@@ -5,20 +5,18 @@ import {
 } from "@components/Navigation"
 import { StackScreenProps } from "@react-navigation/stack"
 import { Alert } from "react-native"
-import { EmailAddress, Password, USPhoneNumber } from ".."
+import { EmailAddress, Password, USPhoneNumber } from "@auth"
 import {
   AuthVerificationCodeFormView,
   useAuthVerificationCodeForm
-} from "../VerifyCode"
-import { ForgotPasswordEnvironment } from "./Environment"
+} from "@auth/VerifyCode"
 import {
+  ForgotPasswordEnvironment,
   ForgotPasswordFormView,
-  useForgotPasswordForm
-} from "./ForgotPasswordForm"
-import {
+  useForgotPasswordForm,
   ResetPasswordFormView,
   useResetPasswordForm
-} from "./ResetPasswordForm"
+} from "@auth/forgot-password"
 import React from "react"
 
 export type ForgotPasswordParamsList = {
