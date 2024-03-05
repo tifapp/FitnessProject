@@ -24,6 +24,14 @@ export type EventDetailsMenuProps = {
 /**
  * A drop-down menu view that allows the user to perform various miscellaneous
  * actions with respect to the event.
+ *
+ * ## Actions Availability
+ * - Reporting the event (Attendee, Non-Participant).
+ * - Copying the event (All roles).
+ * - Contacting host (Attendee, Non-Participant).
+ * - Editing the event (Host).
+ * - Sharing the event (All roles).
+ * - Inviting friends (Host, Attendee).
  */
 export const EventDetailsMenuView = ({
   event,
@@ -78,11 +86,12 @@ export const formatEventMenuActions = (
   event: Pick<CurrentUserEvent, "host">,
   actions: EventMenuAction[]
 ): MenuAction[] => {
-  return actions.map((action) => {
+  const formattedActions = actions.map((action) => {
     if (action.id !== "contact-host") return action
     const title = action.title.replace("%@", event.host.username)
     return { ...action, title }
   })
+  return Platform.OS === "ios" ? formattedActions : formattedActions.reverse()
 }
 
 export const EVENT_MENU_ACTION = {
@@ -91,14 +100,15 @@ export const EVENT_MENU_ACTION = {
     title: "Copy Event",
     image: Platform.select({
       ios: "doc.on.doc.fill",
-      android: "ic_menu_add"
+      android: "ic_menu_crop"
     })
   },
   reportEvent: {
     id: "report-event",
     title: "Report Event",
     image: Platform.select({
-      ios: "exclamationmark.bubble.fill"
+      ios: "exclamationmark.bubble.fill",
+      android: "ic_menu_report_image"
     }),
     attributes: {
       destructive: true
@@ -106,33 +116,37 @@ export const EVENT_MENU_ACTION = {
   },
   editEvent: {
     id: "edit-event",
-    title: "Edit",
+    title: "Edit Event",
     image: Platform.select({
-      ios: "square.dashed.inset.filled"
+      ios: "square.dashed.inset.filled",
+      android: "ic_menu_edit"
     })
   },
   inviteFriends: {
     id: "invite-friends",
     title: "Invite Friends",
     image: Platform.select({
-      ios: "person.3.fill"
+      ios: "person.3.fill",
+      android: "ic_menu_send"
     })
   },
   shareEvent: {
     id: "share-event",
-    title: "Share",
+    title: "Share Event",
     image: Platform.select({
-      ios: "square.and.arrow.up.fill"
+      ios: "square.and.arrow.up.fill",
+      android: "ic_menu_share"
     })
   },
   contactHost: {
     id: "contact-host",
     title: "Contact %@",
     image: Platform.select({
-      ios: "person.fill"
+      ios: "person.fill",
+      android: "ic_menu_call"
     })
   }
-} as const
+} as const satisfies Record<string, MenuAction>
 
 const ATTENDEE_STATUS_ACTIONS = {
   hosting: [

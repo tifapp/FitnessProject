@@ -82,10 +82,15 @@ const Test = () => {
       }}
     >
       <EventDetailsMenuView
-        event={{ title: "Test Event", userAttendeeStatus: "hosting", host }}
+        event={{
+          title: "Test Event",
+          userAttendeeStatus: "attending",
+          host
+        }}
         eventShareContent={async () => ({
           title: "Test",
-          url: "https://www.google.com"
+          url: "https://www.google.com",
+          message: "Hello There"
         })}
         onCopyEventTapped={() => console.log("Copy")}
         onInviteFriendsTapped={() => console.log("Invite")}
