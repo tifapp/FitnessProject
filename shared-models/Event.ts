@@ -151,7 +151,7 @@ export const CurrentUserEventResponseSchema = z.object({
   location: EventLocationSchema,
   previewAttendees: z.array(EventPreviewAttendeeSchema),
   host: UnblockedEventAttendeeSchema,
-  hasEndedEarly: z.boolean()
+  endedAt: StringDateRangeSchema.nullable()
 })
 
 /**

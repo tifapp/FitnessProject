@@ -132,7 +132,7 @@ export namespace EventMocks {
     hasArrived: false,
     joinDate: new Date(),
     isChatExpired: false,
-    hasEndedEarly: false
+    endedAt: null
   } as CurrentUserEvent
 
   export const Multiday = {
@@ -159,7 +159,7 @@ export namespace EventMocks {
     hasArrived: false,
     joinDate: new Date(),
     isChatExpired: false,
-    hasEndedEarly: false
+    endedAt: null
   } as CurrentUserEvent
 
   export const NoPlacemarkInfo = {
@@ -187,6 +187,6 @@ export namespace EventMocks {
     hasArrived: false,
     joinDate: new Date(),
     isChatExpired: false,
-    hasEndedEarly: false
+    endedAt: null
   } as CurrentUserEvent
 }
