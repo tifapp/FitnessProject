@@ -73,18 +73,7 @@ export const useLoadEventDetails = (
     ["event", eventId],
     async () => await loadEvent(eventId)
   )
-  const isConnectedToInternet = useIsConnectedToInternet()
-  const refetchIfInErrorState = useEffectEvent(() => {
-    if (query.status === "error") {
-      query.refetch()
-    }
-  })
-  useEffect(() => {
-    if (isConnectedToInternet) {
-      refetchIfInErrorState()
-    }
-  }, [refetchIfInErrorState, isConnectedToInternet])
-  return loadEventDetailsResult(query, isConnectedToInternet)
+  return loadEventDetailsResult(query, useIsConnectedToInternet())
 }
 
 const loadEventDetailsResult = (

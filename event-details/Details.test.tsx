@@ -186,42 +186,6 @@ describe("EventDetailsLoading tests", () => {
       expect(loadEvent).toHaveBeenCalledTimes(2)
     })
 
-    test("load failure with bad internet, retries successfully when internet comes back online", async () => {
-      testConnectionStatus.publishIsConnected(false)
-      loadEvent.mockRejectedValueOnce(new Error()).mockResolvedValueOnce({
-        status: "success",
-        event: EventMocks.Multiday
-      })
-      const { result } = renderUseLoadEvent(1)
-      await waitFor(() => expect(result.current.status).toEqual("error"))
-      expect((result.current as any).isConnectedToInternet).toEqual(false)
-      act(() => testConnectionStatus.publishIsConnected(true))
-      await waitFor(() => expect(result.current.status).toEqual("success"))
-      expect(result.current).toMatchObject({
-        event: EventMocks.Multiday,
-        refreshStatus: "idle"
-      })
-      expect(loadEvent).toHaveBeenNthCalledWith(2, 1)
-      expect(loadEvent).toHaveBeenCalledTimes(2)
-    })
-
-    it("should only retry on internet coming back up only when in an error state", async () => {
-      loadEvent
-        .mockResolvedValueOnce({
-          status: "success",
-          event: EventMocks.Multiday
-        })
-        .mockRejectedValueOnce(new Error())
-      const { result } = renderUseLoadEvent(1)
-      await waitFor(() => expect(result.current.status).toEqual("success"))
-      act(() => testConnectionStatus.publishIsConnected(false))
-      act(() => testConnectionStatus.publishIsConnected(true))
-      await verifyNeverOccurs(() => {
-        expect((result.current as any).refreshStatus).toEqual("error")
-      })
-      expect(loadEvent).toHaveBeenCalledTimes(1)
-    })
-
     const renderUseLoadEvent = (eventId: number) => {
       return renderHook(
         (eventId: number) => useLoadEventDetails(eventId, loadEvent),

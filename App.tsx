@@ -18,7 +18,11 @@ import {
   sentryBreadcrumbLogHandler,
   sentryErrorCapturingLogHandler
 } from "@lib/Logging"
-import { TiFQueryClientProvider } from "@lib/ReactQuery"
+import {
+  TiFQueryClientProvider,
+  setupFocusRefreshes,
+  setupInternetReconnectionRefreshes
+} from "@lib/ReactQuery"
 import { enableSentry } from "@lib/Sentry"
 import { AppView } from "@root-feature/AppView"
 import * as Sentry from "@sentry/react-native"
@@ -27,6 +31,7 @@ import { addPushTokenListener } from "expo-notifications"
 import { setupCognito } from "./auth"
 import { registerForPushNotifications } from "./notifications"
 import awsconfig from "./src/aws-exports"
+import { NetInfoInternetConnectionStatus } from "@lib/InternetConnection"
 
 const log = createLogFunction("app.root")
 
@@ -43,6 +48,8 @@ export const setupApp = () => {
   Geo.configure(awsconfig)
   ExpoEventArrivalsGeofencer.shared.defineTask()
   addPushTokenListener(registerForPushNotifications)
+  setupInternetReconnectionRefreshes(NetInfoInternetConnectionStatus.shared)
+  setupFocusRefreshes()
 }
 
 export type AppProps = {
