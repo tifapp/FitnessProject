@@ -1,15 +1,18 @@
 import { StackNavigatorType, XMarkBackButton } from "@components/Navigation"
-import { SignInAuthenticator } from "./Authenticator"
 import { StackScreenProps } from "@react-navigation/stack"
 import React, { memo } from "react"
-import { SignInFormView, useSignInForm } from "./SignInForm"
-import { EmailAddress, USPhoneNumber } from ".."
+import {
+  SignInFormView,
+  useSignInForm,
+  SignInAuthenticator
+} from "@auth/sign-in"
+import { EmailAddress, USPhoneNumber } from "@auth"
 import {
   AuthVerificationCodeFormView,
   useAuthVerificationCodeForm
 } from "@auth/VerifyCode"
-import { SignUpParamsList } from "@auth/sign-up"
-import { ForgotPasswordParamsList } from "@auth/forgot-password"
+import { SignUpParamsList } from "./SignUp"
+import { ForgotPasswordParamsList } from "./ForgotPassword"
 
 export type SignInParamsList = {
   signInForm: undefined
@@ -29,28 +32,28 @@ export const createSignInScreens = <Params extends SignInParamsList>(
   stack: StackNavigatorType<Params>,
   authenticator: SignInAuthenticator
 ) => (
-    <>
-      <stack.Screen
-        name="signInForm"
-        options={{ headerLeft: XMarkBackButton, title: "" }}
-      >
-        {(props: any) => (
-          <SignInFormScreen {...props} authenticator={authenticator} />
-        )}
-      </stack.Screen>
-      <stack.Screen
-        name="signInVerifyCode"
-        options={{ headerLeft: XMarkBackButton, title: "" }}
-      >
-        {(props: any) => (
-          <SignInVerificationCodeScreen
-            {...props}
-            authenticator={authenticator}
-          />
-        )}
-      </stack.Screen>
-    </>
-  )
+  <>
+    <stack.Screen
+      name="signInForm"
+      options={{ headerLeft: XMarkBackButton, title: "" }}
+    >
+      {(props: any) => (
+        <SignInFormScreen {...props} authenticator={authenticator} />
+      )}
+    </stack.Screen>
+    <stack.Screen
+      name="signInVerifyCode"
+      options={{ headerLeft: XMarkBackButton, title: "" }}
+    >
+      {(props: any) => (
+        <SignInVerificationCodeScreen
+          {...props}
+          authenticator={authenticator}
+        />
+      )}
+    </stack.Screen>
+  </>
+)
 
 type SignInFormScreenProps = StackScreenProps<
   SignInParamsList,
@@ -59,7 +62,7 @@ type SignInFormScreenProps = StackScreenProps<
   authenticator: SignInAuthenticator
 }
 
-const SignInFormScreen = memo(function Screen ({
+const SignInFormScreen = memo(function Screen({
   navigation,
   authenticator
 }: SignInFormScreenProps) {
@@ -92,7 +95,7 @@ type SignInVerificationCodeScreenProps = StackScreenProps<
   authenticator: SignInAuthenticator
 }
 
-const SignInVerificationCodeScreen = memo(function Screen ({
+const SignInVerificationCodeScreen = memo(function Screen({
   navigation,
   route,
   authenticator

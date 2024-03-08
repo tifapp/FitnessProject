@@ -12,17 +12,15 @@ import { useNavigation } from "@react-navigation/native"
 import { StackScreenProps } from "@react-navigation/stack"
 import React, { memo } from "react"
 import { Alert, StyleSheet } from "react-native"
-import { EmailAddress, USPhoneNumber } from ".."
+import { EmailAddress, USPhoneNumber } from "auth"
 import {
   SignUpChangeUserHandleFormView,
-  useSignUpChangeUserHandleForm
-} from "./ChangeUserHandle"
-import {
+  useSignUpChangeUserHandleForm,
   SignUpCredentialsFormView,
-  useSignUpCredentialsForm
-} from "./CredentialsForm"
-import { SignUpEndingView } from "./Ending"
-import { SignUpEnvironment } from "./Environment"
+  useSignUpCredentialsForm,
+  SignUpEndingView,
+  SignUpEnvironment
+} from "@auth/sign-up"
 import { UserHandle } from "@content-parsing"
 
 export type SignUpParamsList = {
@@ -103,7 +101,7 @@ type CredentialsScreenProps = StackScreenProps<
 > &
   Pick<SignUpEnvironment, "createAccount">
 
-const CredentialsFormScreen = memo(function Screen ({
+const CredentialsFormScreen = memo(function Screen({
   navigation,
   createAccount
 }: CredentialsScreenProps) {
@@ -128,7 +126,7 @@ type VerifyCodeFormScreenProps = StackScreenProps<
 > &
   Pick<SignUpEnvironment, "finishRegisteringAccount" | "resendVerificationCode">
 
-const VerifyCodeFormScreen = memo(function Screen ({
+const VerifyCodeFormScreen = memo(function Screen({
   navigation,
   route,
   finishRegisteringAccount,
@@ -170,7 +168,7 @@ type ChangeUserHandleFormScreenProps = StackScreenProps<
 > &
   Pick<SignUpEnvironment, "checkIfUserHandleTaken" | "changeUserHandle">
 
-const ChangeUserHandleFormScreen = memo(function Screen ({
+const ChangeUserHandleFormScreen = memo(function Screen({
   navigation,
   route,
   checkIfUserHandleTaken,

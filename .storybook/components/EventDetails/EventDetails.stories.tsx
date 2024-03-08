@@ -28,6 +28,8 @@ import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { sleep } from "@lib/utils/DelayData"
 import { TrueRegionMonitor } from "@event-details/arrival-tracking/region-monitoring/MockRegionMonitors"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { createTestQueryClient } from "@test-helpers/ReactQuery"
+import { QueryClientProvider } from "@tanstack/react-query"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
