@@ -5,8 +5,7 @@ import {
   currentUserEventFromResponse
 } from "@shared-models/Event"
 import { useIsConnectedToInternet } from "@lib/InternetConnection"
-import React, { ReactNode, useEffect, useRef, useState } from "react"
-import { useEffectEvent } from "@lib/utils/UseEffectEvent"
+import React, { ReactNode, useRef, useState } from "react"
 import { TiFAPI } from "@api-client/TiFAPI"
 import {
   StyleProp,
@@ -31,7 +30,7 @@ import {
   EventTravelEstimatesView,
   useEventTravelEstimates
 } from "./TravelEstimates"
-import { useEventDetails } from "./Context"
+import { useEventDetailsEnvironment } from "./Environment"
 import { EventDetailsHostView } from "./Host"
 
 /**
@@ -271,7 +270,7 @@ const LocationSectionView = ({
       location={event.location}
       result={useEventTravelEstimates(
         event.location.coordinate,
-        useEventDetails().travelEstimates
+        useEventDetailsEnvironment().travelEstimates
       )}
     />
   </>
