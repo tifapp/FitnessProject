@@ -34,6 +34,7 @@ import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import Animated, { FadeIn } from "react-native-reanimated"
 import { openSettings } from "expo-linking"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
+import { Pressable } from "react-native"
 
 export type LoadEventTravelEstimates = (
   userCoordinate: LocationCoordinate2D,
@@ -232,42 +233,45 @@ export const EventTravelEstimatesView = ({
       >
         {overlayLayout && (
           <Animated.View entering={FadeIn.duration(300)}>
-            <MapView
-              style={[
-                styles.mapDimensions,
-                { height: Math.max(300, 200 + overlayLayout.height) }
-              ]}
-              loadingEnabled
-              zoomEnabled={false}
-              scrollEnabled={false}
-              initialRegion={{
-                ...location.coordinate,
-                latitudeDelta: 0.007,
-                longitudeDelta: 0.007
-              }}
-              mapPadding={{
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: overlayLayout.height + 16
-              }}
-              customMapStyle={[
-                {
-                  featureType: "poi",
-                  stylers: [{ visibility: "off" }]
-                },
-                {
-                  featureType: "transit",
-                  stylers: [{ visibility: "off" }]
-                }
-              ]}
-            >
-              <Marker coordinate={location.coordinate}>
-                <AvatarMapMarkerView
-                  imageURL={host.profileImageURL ?? undefined}
-                />
-              </Marker>
-            </MapView>
+            <Pressable onPress={() => openEventLocationInMaps(location)}>
+              <MapView
+                style={[
+                  styles.mapDimensions,
+                  { height: Math.max(300, 200 + overlayLayout.height) }
+                ]}
+                loadingEnabled
+                zoomEnabled={false}
+                scrollEnabled={false}
+                initialRegion={{
+                  ...location.coordinate,
+                  latitudeDelta: 0.011,
+                  longitudeDelta: 0.011
+                }}
+                mapPadding={{
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: overlayLayout.height + 16
+                }}
+                customMapStyle={[
+                  {
+                    featureType: "poi",
+                    stylers: [{ visibility: "off" }]
+                  },
+                  {
+                    featureType: "transit",
+                    stylers: [{ visibility: "off" }]
+                  }
+                ]}
+              >
+                <Marker coordinate={location.coordinate}>
+                  <AvatarMapMarkerView
+                    imageURL={host.profileImageURL ?? undefined}
+                    maximumFontScaleFactor={FontScaleFactors.xxxLarge}
+                  />
+                </Marker>
+              </MapView>
+            </Pressable>
           </Animated.View>
         )}
         <View style={styles.overlayContainer}>

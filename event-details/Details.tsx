@@ -19,11 +19,21 @@ import { BodyText, Headline, Subtitle, Title } from "@components/Text"
 import { ArrayUtils } from "@lib/utils/Array"
 import { PrimaryButton } from "@components/Buttons"
 import { useConst } from "@lib/utils/UseConst"
-import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated"
+import Animated, {
+  FadeIn,
+  ReduceMotion,
+  SlideInDown,
+  ZoomIn,
+  ZoomOut
+} from "react-native-reanimated"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useAutocorrectingInterval } from "@lib/utils/UseInterval"
-import { ExpandableContentText } from "@content-parsing"
+import {
+  EventHandle,
+  ExpandableContentText,
+  UserHandle
+} from "@content-parsing"
 import { RoundedIonicon } from "@components/common/Icons"
 import { placemarkToFormattedAddress } from "@shared-models/Placemark"
 import {
@@ -133,6 +143,8 @@ const refreshStatus = (
 export type EventDetailsProps = {
   result: UseLoadEventDetailsResult
   onExploreOtherEventsTapped: () => void
+  onUserHandleTapped: (handle: UserHandle) => void
+  onEventHandleTapped: (handle: EventHandle) => void
   style?: StyleProp<ViewStyle>
 }
 
@@ -141,16 +153,20 @@ export type EventDetailsProps = {
  */
 export const EventDetailsView = ({
   result,
+  onUserHandleTapped,
+  onEventHandleTapped,
   onExploreOtherEventsTapped,
   style
 }: EventDetailsProps) => (
   <View style={style}>
     {result.status === "loading" && (
-      <NoContentView
-        renderTitle={(title) => <LoadingTitleView title={title} />}
-        possibleMessages={LOADING_MESSAGES}
-        style={styles.noContent}
-      />
+      <Animated.View entering={FadeIn}>
+        <NoContentView
+          renderTitle={(title) => <LoadingTitleView title={title} />}
+          possibleMessages={LOADING_MESSAGES}
+          style={styles.noContent}
+        />
+      </Animated.View>
     )}
     {result.status === "error" && (
       <NoContentView
@@ -173,12 +189,20 @@ export const EventDetailsView = ({
       />
     )}
     {result.status === "success" && (
-      <SuccessView
-        event={result.event}
-        refreshStatus={result.refreshStatus}
-        onPullToRefresh={result.refresh}
-        style={styles.success}
-      />
+      <Animated.View
+        entering={SlideInDown.springify(1250)
+          .dampingRatio(0.8)
+          .reduceMotion(ReduceMotion.System)}
+      >
+        <SuccessView
+          event={result.event}
+          refreshStatus={result.refreshStatus}
+          onPullToRefresh={result.refresh}
+          onUserHandleTapped={onUserHandleTapped}
+          onEventHandleTapped={onEventHandleTapped}
+          style={styles.success}
+        />
+      </Animated.View>
     )}
   </View>
 )
@@ -191,6 +215,8 @@ const isExploratoryFailure = (
 
 type SuccessProps = {
   onPullToRefresh: () => void
+  onUserHandleTapped: (handle: UserHandle) => void
+  onEventHandleTapped: (handle: EventHandle) => void
   style?: StyleProp<ViewStyle>
 } & Omit<
   Extract<UseLoadEventDetailsResult, { status: "success" }>,
@@ -199,6 +225,8 @@ type SuccessProps = {
 
 const SuccessView = ({
   event,
+  onUserHandleTapped,
+  onEventHandleTapped,
   refreshStatus,
   onPullToRefresh,
   style
@@ -217,7 +245,7 @@ const SuccessView = ({
     <DetailSectionView>
       <EventDetailsHostView
         host={event.host}
-        color={event.color}
+        onHostTapped={onUserHandleTapped}
         onFriendButtonTapped={() => console.log("TODO: Friend Logic")}
       />
     </DetailSectionView>
@@ -229,14 +257,11 @@ const SuccessView = ({
       <ExpandableContentText
         text={event.description}
         collapsedLineLimit={3}
-        onUserHandleTapped={() => console.log("TODO: User Handle Navigation")}
-        onEventHandleTapped={() => console.log("TODO: Event Handle Navigation")}
-        expandButtonTextStyle={{ color: event.color.toString() }}
+        onUserHandleTapped={onUserHandleTapped}
+        onEventHandleTapped={onEventHandleTapped}
       />
     </DetailSectionView>
-    <DetailSectionView title="Location">
-      <LocationSectionView event={event} />
-    </DetailSectionView>
+    <LocationSectionView event={event} />
     <View style={{ marginBottom: 48 }} />
   </ScrollView>
 )
@@ -244,14 +269,14 @@ const SuccessView = ({
 const LocationSectionView = ({
   event
 }: {
-  event: Pick<CurrentUserEvent, "location" | "host" | "color">
+  event: Pick<CurrentUserEvent, "location" | "host">
 }) => (
-  <>
+  <DetailSectionView title="Location">
     <View style={styles.locationDetailsContainer}>
       <RoundedIonicon
         borderRadius={12}
         color="white"
-        backgroundColor={event.color.toString()}
+        backgroundColor={AppStyles.darkColor}
         name="location"
       />
       <View style={styles.locationDetailsText}>
@@ -273,7 +298,7 @@ const LocationSectionView = ({
         useEventDetailsEnvironment().travelEstimates
       )}
     />
-  </>
+  </DetailSectionView>
 )
 
 type DetailSectionProps = {
@@ -360,7 +385,6 @@ const LOADING_MESSAGES = [
 ]
 
 const UNSUCCESSFUL_MESSAGE_SET = {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   "not-found": [
     {
       title: "Yikes!",
@@ -630,7 +654,8 @@ const styles = StyleSheet.create({
     columnGap: 16
   },
   locationDetailsText: {
-    paddingRight: 24,
+    marginRight: 24,
+    flex: 1,
     rowGap: 4
   }
 })

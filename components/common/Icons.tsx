@@ -4,7 +4,7 @@ import {
   MaterialIcons
 } from "@expo/vector-icons"
 import { useFontScale } from "@lib/Fonts"
-import React, { ComponentProps } from "react"
+import React, { ComponentProps, useState } from "react"
 import {
   StyleProp,
   StyleSheet,
@@ -12,7 +12,8 @@ import {
   TouchableOpacity,
   ViewProps,
   ViewStyle,
-  View
+  View,
+  LayoutRectangle
 } from "react-native"
 
 /**
@@ -201,15 +202,19 @@ export const RoundedIonicon = ({
   const fontScale = useFontScale({
     maximumScaleFactor: maximumFontScaleFactor
   })
+  const [iconLayout, setIconLayout] = useState<LayoutRectangle>()
   return (
     <View
       style={{
         borderRadius,
         backgroundColor,
-        maxHeight: size * 1.7 * fontScale
+        maxHeight: iconLayout?.height
       }}
     >
-      <View style={{ padding: size * fontScale * (1 / 3) }}>
+      <View
+        onLayout={(e) => setIconLayout(e.nativeEvent.layout)}
+        style={{ padding: size * fontScale * (1 / 3) }}
+      >
         <Ionicon
           {...props}
           name={name}

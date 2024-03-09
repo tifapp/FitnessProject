@@ -1,9 +1,11 @@
 import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
 import ProfileImage from "./profileImageComponents/ProfileImage"
+import { useFontScale } from "@lib/Fonts"
 
 export type AvatarMapMarkerProps = {
   imageURL?: string
   children?: JSX.Element
+  maximumFontScaleFactor?: number
   style?: StyleProp<ViewStyle>
 }
 
@@ -15,25 +17,42 @@ export const AVATAR_MARKER_SIZE = 44
 export const AvatarMapMarkerView = ({
   imageURL,
   children,
+  maximumFontScaleFactor,
   style
-}: AvatarMapMarkerProps) => (
-  <View style={[style, styles.frame]}>
-    <View style={styles.container}>
-      <View style={styles.markerContainer}>
-        {children}
-        <View style={styles.whiteBackground}>
-          <ProfileImage imageURL={imageURL} style={styles.imageBackground} />
+}: AvatarMapMarkerProps) => {
+  const fontScale = useFontScale({ maximumScaleFactor: maximumFontScaleFactor })
+  return (
+    <View style={[style, { width: 96 * fontScale, height: 64 * fontScale }]}>
+      <View style={styles.container}>
+        <View style={styles.markerContainer}>
+          {children}
+          <View
+            style={[
+              styles.whiteBackground,
+              {
+                width: AVATAR_MARKER_SIZE * fontScale,
+                height: AVATAR_MARKER_SIZE * fontScale
+              }
+            ]}
+          >
+            <ProfileImage
+              imageURL={imageURL}
+              style={[
+                styles.imageBackground,
+                {
+                  width: (AVATAR_MARKER_SIZE - 2) * fontScale,
+                  height: (AVATAR_MARKER_SIZE - 2) * fontScale
+                }
+              ]}
+            />
+          </View>
         </View>
       </View>
     </View>
-  </View>
-)
+  )
+}
 
 const styles = StyleSheet.create({
-  frame: {
-    width: 96,
-    height: 64
-  },
   container: {
     flex: 1,
     justifyContent: "center",

@@ -20,7 +20,9 @@ import { createTestQueryClient } from "@test-helpers/ReactQuery"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { ColorString } from "@lib/utils/Color"
 import { sleep } from "@lib/utils/DelayData"
-import { EventDetailsProvider } from "@event-details/Context"
+import { EventDetailsEnvironmentProvider } from "@event-details/Environment"
+import { faker } from "@faker-js/faker"
+import { setupFocusRefreshes } from "@lib/ReactQuery"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -37,6 +39,8 @@ const location = {
   coordinate: { latitude: 36.96493, longitude: -122.01693 },
   placemark: mockPlacemark()
 }
+
+setupFocusRefreshes()
 
 const queryClient = createTestQueryClient()
 
@@ -67,12 +71,15 @@ const host = EventAttendeeMocks.Alivs
 
 const Test = () => {
   const result = useLoadEventDetails(1, async () => {
-    // await sleep(30000)
+    // await sleep(3000)
+    // throw new Error()
+    await sleep(3000)
     return {
       status: "success",
       event: {
         ...EventMocks.PickupBasketball,
-        location,
+        location: { ...location, placemark: mockPlacemark() },
+        title: faker.name.jobArea(),
         color: ColorString.parse("#345995")!,
         description:
           "Hello world, this is an @event of some kind. Please join it if you like to do !17|123/#2BC016/Pickup Basketball. \n\nNow I write this endless storybook story in the void, where \nI can test things like @hello to make sure that links are highlighting and I am not going absolutely crazy."
@@ -80,13 +87,13 @@ const Test = () => {
     }
   })
   return (
-    <EventDetailsProvider
-      travelEstimates={async () => {
-        await sleep(10_000)
-        throw new Error("lol")
-      }}
-    >
-      <EventDetailsView result={result} onExploreOtherEventsTapped={() => {}} />
-    </EventDetailsProvider>
+    <EventDetailsEnvironmentProvider>
+      <EventDetailsView
+        result={result}
+        onUserHandleTapped={console.log}
+        onEventHandleTapped={console.log}
+        onExploreOtherEventsTapped={() => {}}
+      />
+    </EventDetailsEnvironmentProvider>
   )
 }

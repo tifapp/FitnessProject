@@ -83,6 +83,7 @@ const renderLinkifyMatches = (
         <Headline
           key={`user-handle-${match.index}`}
           style={styles.handle}
+          suppressHighlighting
           onPress={() => onUserHandleTapped(userHandleMatch.userHandle)}
         >
           {userHandleMatch.text}
@@ -93,6 +94,7 @@ const renderLinkifyMatches = (
       blocks.push(
         <Headline
           key={`event-handle-${match.index}`}
+          suppressHighlighting
           style={{ color: eventHandleMatch.eventHandle.color.toString() }}
           onPress={() => onEventHandleTapped(eventHandleMatch.eventHandle)}
         >
@@ -103,6 +105,7 @@ const renderLinkifyMatches = (
       blocks.push(
         <BodyText
           onPress={() => onURLTapped(match.url)}
+          suppressHighlighting
           key={`url-${match.index}`}
           style={styles.link}
         >
