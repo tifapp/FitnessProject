@@ -1,5 +1,6 @@
 import { act } from "@testing-library/react-native"
 import { TEST_FRAME_TIME } from "./FakeTimeInterval"
+import { now } from "@date-time"
 
 /**
  * Fakes jest timers for the duration of each test with the ability to step
@@ -16,16 +17,9 @@ export const fakeTimers = () => {
 }
 
 /**
- * Incrementally advances all timers by the given time.
- *
- * The timers are advanced by increments of:
- * `time / TEST_FRAME_TIME`.
+ * Advances all timers by the given time and current date simultaneously.
  */
 export const timeTravel = (timeMillis = TEST_FRAME_TIME) => {
-  const frames = timeMillis / TEST_FRAME_TIME
-  for (let i = 0; i < frames; i++) {
-    const now = Date.now()
-    jest.setSystemTime(new Date(now + TEST_FRAME_TIME))
-    jest.advanceTimersByTime(TEST_FRAME_TIME)
-  }
+  // jest.setSystemTime(now().add(timeMillis, "milliseconds").toDate())
+  jest.advanceTimersByTime(timeMillis)
 }

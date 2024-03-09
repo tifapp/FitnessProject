@@ -1,6 +1,6 @@
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import React, { useEffect } from "react"
+import React, { useCallback, useEffect } from "react"
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 import {
   EventAttendeeMocks,
@@ -15,12 +15,17 @@ import {
   requestForegroundPermissionsAsync
 } from "expo-location"
 import { mockPlacemark } from "@location/MockData"
+import { createTestQueryClient } from "@test-helpers/ReactQuery"
+import { QueryClientProvider } from "@tanstack/react-query"
+import { EventCountdownView, useEventCountdown } from "@event-details/Countdown"
+import { dateRange, dayjs, now } from "@date-time"
+import { View } from "react-native"
+import { JoinEventStagesView } from "@event-details/JoinEvent"
+import { NavigationContainer, useFocusEffect } from "@react-navigation/native"
+import { createStackNavigator } from "@react-navigation/stack"
+import { AppState } from "@aws-amplify/core"
+import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { sleep } from "@lib/utils/DelayData"
-import {
-  JoinEventStagesView,
-  loadJoinEventPermissions,
-  useJoinEventStages
-} from "@event-details/JoinEvent"
 import { TrueRegionMonitor } from "@event-details/arrival-tracking/region-monitoring/MockRegionMonitors"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { createTestQueryClient } from "@test-helpers/ReactQuery"
@@ -35,6 +40,8 @@ export default EventDetailsMeta
 type EventDetailsStory = ComponentStory<typeof SettingsScreen>
 
 const event = EventMocks.PickupBasketball
+
+const Stack = createStackNavigator()
 
 const location = {
   ...mockEventLocation(),
@@ -51,31 +58,58 @@ export const Basic: EventDetailsStory = () => {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView>
-        <UserLocationFunctionsProvider
-          getCurrentLocation={getCurrentPositionAsync}
-          requestBackgroundPermissions={requestBackgroundPermissionsAsync}
-          requestForegroundPermissions={requestForegroundPermissionsAsync}
-        >
-          <QueryClientProvider client={queryClient}>
-            <BottomSheetModalProvider>
-              <Test />
-            </BottomSheetModalProvider>
-          </QueryClientProvider>
-        </UserLocationFunctionsProvider>
-      </SafeAreaView>
+      {/* <SafeAreaView edges={["bottom"]}> */}
+      <UserLocationFunctionsProvider
+        getCurrentLocation={getCurrentPositionAsync}
+        requestBackgroundPermissions={requestBackgroundPermissionsAsync}
+        requestForegroundPermissions={requestForegroundPermissionsAsync}
+      >
+        <QueryClientProvider client={queryClient}>
+          <BottomSheetModalProvider>
+            <NavigationContainer>
+              <Stack.Navigator
+                screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
+              >
+                <Stack.Screen name="test" component={Test} />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </BottomSheetModalProvider>
+        </QueryClientProvider>
+      </UserLocationFunctionsProvider>
+      {/* </SafeAreaView> */}
     </SafeAreaProvider>
   )
 }
 
 const host = EventAttendeeMocks.Alivs
 
+const time = {
+  secondsToStart: dayjs.duration(15, "minute").asSeconds(),
+  todayOrTomorrow: "tomorrow",
+  clientReceivedTime: new Date(),
+  dateRange: dateRange(new Date(), now().add(1, "hour").toDate())
+} as const
+
 const Test = () => {
-  const currentStage = useJoinEventStages(EventMocks.Multiday, {
-    monitor: TrueRegionMonitor,
-    joinEvent: async () => "success",
-    loadPermissions: loadJoinEventPermissions,
-    onSuccess: () => {}
-  })
-  return <JoinEventStagesView stage={currentStage} />
+  const result = useEventCountdown(time)
+  return (
+    <View style={{ height: "100%" }}>
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "flex-end",
+          justifyContent: "space-between",
+          paddingHorizontal: 24,
+          paddingBottom: 48,
+          flex: 1
+        }}
+      >
+        <EventCountdownView result={result} />
+        <JoinEventStagesView
+          stage={{ stage: "idle", joinButtonTapped: () => {} }}
+        />
+      </View>
+    </View>
+  )
 }

@@ -14,14 +14,15 @@ import React, { useEffect, useRef, useState } from "react"
 import { Alert, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { TouchableIonicon } from "@components/common/Icons"
 import { BodyText, Headline, Title } from "@components/Text"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { useSharedValue } from "react-native-reanimated"
+import { FontScaleFactors } from "@lib/Fonts"
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetModalProvider,
   BottomSheetView
 } from "@gorhom/bottom-sheet"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { useSharedValue } from "react-native-reanimated"
 import { TiFAPI } from "@api-client/TiFAPI"
 import { RecentLocationsStorage } from "@location/search"
 import { JoinEventResponse } from "@shared-models/JoinEvent"
@@ -276,6 +277,7 @@ export const JoinEventStagesView = ({ stage, style }: JoinEventStagesProps) => (
         if (stage.stage !== "idle") return
         stage.joinButtonTapped()
       }}
+      maximumFontSizeMultiplier={FontScaleFactors.xxxLarge}
     >
       Join Now!
     </PrimaryButton>
