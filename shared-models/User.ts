@@ -6,12 +6,14 @@ export const FriendRequestPendingStatusSchema = z.literal(
 )
 export const FriendsStatusSchema = z.literal("friends")
 export const BlockedStatusSchema = z.literal("blocked")
+export const CurrentUserStatusSchema = z.literal("current-user")
 
 export const UserToProfileRelationStatusSchema = z.union([
   NotFriendsStatusSchema,
   FriendRequestPendingStatusSchema,
   FriendsStatusSchema,
-  BlockedStatusSchema
+  BlockedStatusSchema,
+  CurrentUserStatusSchema
 ])
 
 /**
@@ -68,6 +70,10 @@ export const UnblockedBidirectionalUserRelationsSchema = z.union([
   z.object({
     themToYou: FriendsStatusSchema,
     youToThem: FriendsStatusSchema
+  }),
+  z.object({
+    themToYou: CurrentUserStatusSchema,
+    youToThem: CurrentUserStatusSchema
   })
 ])
 
@@ -77,3 +83,13 @@ export const UnblockedBidirectionalUserRelationsSchema = z.union([
 export type UnblockedBidirectionalUserRelations = z.infer<
   typeof UnblockedBidirectionalUserRelationsSchema
 >
+
+/**
+ * Whether or not the given {@link UnblockedBidirectionalUserRelations}
+ * represents the current user.
+ */
+export const isCurrentUserRelations = (
+  relations: UnblockedBidirectionalUserRelations
+): relations is { themToYou: "current-user"; youToThem: "current-user" } => {
+  return relations.themToYou === "current-user"
+}

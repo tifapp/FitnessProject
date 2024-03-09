@@ -66,6 +66,10 @@ const Test = () => {
       status: "success",
       event: {
         ...EventMocks.PickupBasketball,
+        host: {
+          ...host,
+          relations: { themToYou: "current-user", youToThem: "current-user" }
+        },
         location: { ...location, placemark: mockPlacemark() },
         title: faker.name.jobArea(),
         color: ColorString.parse("#345995")!,
@@ -80,6 +84,7 @@ const Test = () => {
         result={result}
         onUserHandleTapped={console.log}
         onEventHandleTapped={console.log}
+        onEditEventTapped={() => console.log("Edit Event")}
         onExploreOtherEventsTapped={() => {}}
       />
     </EventDetailsEnvironmentProvider>

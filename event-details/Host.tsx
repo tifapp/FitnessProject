@@ -1,9 +1,11 @@
-import { Headline, Caption, BodyText } from "@components/Text"
+import { Headline, Caption } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
 import ProfileImage from "@components/profileImageComponents/ProfileImage"
 import { UserHandle } from "@content-parsing"
 import { AppStyles } from "@lib/AppColorStyle"
+import { FontScaleFactors } from "@lib/Fonts"
 import { CurrentUserEvent } from "@shared-models/Event"
+import { isCurrentUserRelations } from "@shared-models/User"
 import { Pressable } from "react-native"
 import {
   StyleProp,
@@ -16,6 +18,7 @@ import {
 export type EventDetailsHostProps = Pick<CurrentUserEvent, "host"> & {
   onFriendButtonTapped: () => void
   onHostTapped: (handle: UserHandle) => void
+  onEditEventTapped: () => void
   style?: StyleProp<ViewStyle>
 }
 
@@ -23,6 +26,7 @@ export const EventDetailsHostView = ({
   host,
   onHostTapped,
   onFriendButtonTapped,
+  onEditEventTapped,
   style
 }: EventDetailsHostProps) => (
   <View style={[style, styles.container]}>
@@ -35,19 +39,48 @@ export const EventDetailsHostView = ({
         style={styles.image}
       />
       <View style={styles.text}>
-        <Headline>{host.username}</Headline>
-        <Caption>{host.handle.toString()}</Caption>
+        <Headline maxFontSizeMultiplier={FontScaleFactors.xxxLarge}>
+          {host.username}
+        </Headline>
+        <Caption maxFontSizeMultiplier={FontScaleFactors.xxxLarge}>
+          {host.handle.toString()}
+        </Caption>
       </View>
     </Pressable>
     <View style={styles.spacer} />
-    <TouchableOpacity activeOpacity={0.8} onPress={onFriendButtonTapped}>
-      <View style={styles.button}>
-        <View style={styles.buttonContent}>
-          <Ionicon name="person-add" size={16} color="white" />
-          <Headline style={{ opacity: 1, color: "white" }}>Friend</Headline>
+    {/* TODO: - Show other friend button statuses. */}
+    {!isCurrentUserRelations(host.relations) ? (
+      <TouchableOpacity activeOpacity={0.8} onPress={onFriendButtonTapped}>
+        <View style={styles.button}>
+          <View style={styles.buttonContent}>
+            <Ionicon
+              name="person-add"
+              size={16}
+              color="white"
+              maximumFontScaleFactor={FontScaleFactors.xxxLarge}
+            />
+            <Headline
+              maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
+              style={styles.friendButtonText}
+            >
+              Friend
+            </Headline>
+          </View>
         </View>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    ) : (
+      <TouchableOpacity onPress={onEditEventTapped}>
+        <View style={styles.editEventButton}>
+          <Ionicon
+            name="pencil"
+            maximumFontScaleFactor={FontScaleFactors.xxxLarge}
+          />
+          <Headline maxFontSizeMultiplier={FontScaleFactors.xxxLarge}>
+            Edit Event
+          </Headline>
+        </View>
+      </TouchableOpacity>
+    )}
   </View>
 )
 
@@ -84,5 +117,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     columnGap: 8,
     padding: 8
+  },
+  editEventButton: {
+    display: "flex",
+    flexDirection: "row",
+    columnGap: 8
+  },
+  friendButtonText: {
+    opacity: 1,
+    color: "white"
   }
 })

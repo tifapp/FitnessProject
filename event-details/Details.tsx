@@ -49,6 +49,7 @@ import {
 } from "./arrival-tracking"
 import { useEventSecondsToStart } from "./SecondsToStart"
 import { isAttendingEvent } from "./Event"
+import { FontScaleFactors } from "@lib/Fonts"
 
 /**
  * A result from loading a single event for the details screen.
@@ -152,6 +153,7 @@ export type EventDetailsProps = {
   onExploreOtherEventsTapped: () => void
   onUserHandleTapped: (handle: UserHandle) => void
   onEventHandleTapped: (handle: EventHandle) => void
+  onEditEventTapped: () => void
   style?: StyleProp<ViewStyle>
 }
 
@@ -162,6 +164,7 @@ export const EventDetailsView = ({
   result,
   onUserHandleTapped,
   onEventHandleTapped,
+  onEditEventTapped,
   onExploreOtherEventsTapped,
   style
 }: EventDetailsProps) => (
@@ -207,6 +210,7 @@ export const EventDetailsView = ({
           onPullToRefresh={result.refresh}
           onUserHandleTapped={onUserHandleTapped}
           onEventHandleTapped={onEventHandleTapped}
+          onEditEventTapped={onEditEventTapped}
           style={styles.success}
         />
       </Animated.View>
@@ -224,6 +228,7 @@ type SuccessProps = {
   onPullToRefresh: () => void
   onUserHandleTapped: (handle: UserHandle) => void
   onEventHandleTapped: (handle: EventHandle) => void
+  onEditEventTapped: () => void
   style?: StyleProp<ViewStyle>
 } & Omit<
   Extract<UseLoadEventDetailsResult, { status: "success" }>,
@@ -234,6 +239,7 @@ const SuccessView = ({
   event,
   onUserHandleTapped,
   onEventHandleTapped,
+  onEditEventTapped,
   refreshStatus,
   onPullToRefresh,
   style
@@ -253,6 +259,7 @@ const SuccessView = ({
       <EventDetailsHostView
         host={event.host}
         onHostTapped={onUserHandleTapped}
+        onEditEventTapped={onEditEventTapped}
         onFriendButtonTapped={() => console.log("TODO: Friend Logic")}
       />
     </DetailSectionView>
@@ -308,6 +315,7 @@ const LocationSectionView = ({
         color="white"
         backgroundColor={AppStyles.darkColor}
         name="location"
+        maximumFontScaleFactor={FontScaleFactors.xxxLarge}
       />
       <View style={styles.locationDetailsText}>
         <Headline>
