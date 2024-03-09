@@ -9,7 +9,7 @@ import {
 } from "@gorhom/bottom-sheet"
 import { useSharedValue } from "react-native-reanimated"
 import { View } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { useFontScale } from "@lib/Fonts"
 import { AppStyles } from "@lib/AppColorStyle"
 import { IoniconCloseButton } from "./common/Icons"
@@ -67,7 +67,10 @@ export const AuthBannerButton = <Children extends ReactNode>({
 }: AuthBannerButtonProps<Children>) => {
   const sheetRef = useRef<BottomSheetModal>(null)
   const [bannerLayout, setBannerLayout] = useState<LayoutRectangle>()
-  const sheetHeight = bannerLayout?.height && bannerLayout.height + 24
+  const { bottom } = useSafeAreaInsets()
+  const paddingForNonSafeAreaScreens = bottom === 0 ? 24 : 0
+  const sheetHeight =
+    bannerLayout?.height && bannerLayout.height + paddingForNonSafeAreaScreens
   const animatedIndex = useSharedValue(1)
   const closeButtonHitSlop = 24 * useFontScale()
   return (
