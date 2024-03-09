@@ -26,7 +26,11 @@ export class FixedDateRange {
   readonly startDate: Date
   readonly endDate: Date
 
-  constructor (startDate: Date, endDate: Date) {
+  get diff() {
+    return diffDates(this.endDate, this.startDate)
+  }
+
+  constructor(startDate: Date, endDate: Date) {
     this.startDate = startDate
     this.endDate = endDate
 
@@ -38,7 +42,7 @@ export class FixedDateRange {
   /**
    * Sets the start date of this range adjusting the end date accordingly.
    */
-  moveStartDate (date: Date) {
+  moveStartDate(date: Date) {
     const { seconds } = diffDates(date, this.endDate)
     if (date > this.endDate) {
       return new FixedDateRange(date, addSecondsToDate(date, seconds))
@@ -49,7 +53,7 @@ export class FixedDateRange {
   /**
    * Sets the start date of this range adjusting the start date accordingly.
    */
-  moveEndDate (date: Date) {
+  moveEndDate(date: Date) {
     const { seconds } = diffDates(date, this.startDate)
     if (date < this.startDate) {
       return new FixedDateRange(addSecondsToDate(date, seconds), date)
@@ -60,7 +64,7 @@ export class FixedDateRange {
   /**
    * Formats this date range in a UI friendly way.
    */
-  formatted () {
+  formatted() {
     // TODO: - Should this support multiple locales?
     const start = dayjs(this.startDate)
     const end = dayjs(this.endDate)
@@ -74,7 +78,7 @@ export class FixedDateRange {
     return `${startDateFormat} - ${endDateFormat}`
   }
 
-  formattedDateRange () {
+  formattedDateRange() {
     const start = dayjs(this.startDate)
     const end = dayjs(this.endDate)
     const startDateFormat = formatDate(now(), start)
@@ -83,11 +87,11 @@ export class FixedDateRange {
     return `${startDateFormat} - ${endDateFormat}`
   }
 
-  formattedDate (basis: Dayjs, date: Dayjs) {
+  formattedDate(basis: Dayjs, date: Dayjs) {
     return formatDate(basis, date)
   }
 
-  formattedTime () {
+  formattedTime() {
     const end = dayjs(this.endDate)
     const startDateFormat = this.formattedDate(now(), dayjs(this.startDate))
     const endDateFormat = formatTime(end)
@@ -95,12 +99,12 @@ export class FixedDateRange {
     return `${startDateFormat} - ${endDateFormat}`
   }
 
-  formattedStartTime () {
+  formattedStartTime() {
     const start = dayjs(this.startDate)
     return start.format("h:mm A")
   }
 
-  endSameDay () {
+  endSameDay() {
     const start = dayjs(this.startDate)
     const end = dayjs(this.endDate)
     return start.isSame(end, "day")

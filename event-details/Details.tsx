@@ -16,7 +16,7 @@ import { useConst } from "@lib/utils/UseConst"
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { AppStyles } from "@lib/AppColorStyle"
-import { useInterval } from "@lib/utils/UseInterval"
+import { useAutocorrectingInterval } from "@lib/utils/UseInterval"
 
 /**
  * A result from loading a single event for the details screen.
@@ -73,18 +73,7 @@ export const useLoadEventDetails = (
     ["event", eventId],
     async () => await loadEvent(eventId)
   )
-  const isConnectedToInternet = useIsConnectedToInternet()
-  const refetchIfInErrorState = useEffectEvent(() => {
-    if (query.status === "error") {
-      query.refetch()
-    }
-  })
-  useEffect(() => {
-    if (isConnectedToInternet) {
-      refetchIfInErrorState()
-    }
-  }, [refetchIfInErrorState, isConnectedToInternet])
-  return loadEventDetailsResult(query, isConnectedToInternet)
+  return loadEventDetailsResult(query, useIsConnectedToInternet())
 }
 
 const loadEventDetailsResult = (
@@ -220,7 +209,7 @@ export const useDisplayedEventDetailsLoadingBalls = (
 ) => {
   const [balls, setBalls] = useState([false, false, false])
   const indexRef = useRef(0)
-  useInterval(() => {
+  useAutocorrectingInterval(() => {
     setBalls((balls) => {
       if (indexRef.current === balls.length) {
         indexRef.current = 0
