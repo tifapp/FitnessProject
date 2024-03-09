@@ -17,6 +17,7 @@ import com.facebook.react.flipper.ReactNativeFlipper
 import com.facebook.soloader.SoLoader
 
 import expo.modules.ApplicationLifecycleDispatcher
+import expo.modules.BuildConfig
 import expo.modules.ReactNativeHostWrapper
 
 class MainApplication : Application(), ReactApplication {
@@ -35,7 +36,7 @@ class MainApplication : Application(), ReactApplication {
           override fun getUseDeveloperSupport(): Boolean = BuildConfig.DEBUG
 
           override val isNewArchEnabled: Boolean = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED
-          override val isHermesEnabled: Boolean = BuildConfig.IS_HERMES_ENABLED
+          override val isHermesEnabled: Boolean = true
       }
   )
 
@@ -45,9 +46,9 @@ class MainApplication : Application(), ReactApplication {
   override fun onCreate() {
     super.onCreate()
     SoLoader.init(this, false)
-    if (!BuildConfig.REACT_NATIVE_UNSTABLE_USE_RUNTIME_SCHEDULER_ALWAYS) {
+//    if (!BuildConfig.REACT_NATIVE_UNSTABLE_USE_RUNTIME_SCHEDULER_ALWAYS) {
       ReactFeatureFlags.unstable_useRuntimeSchedulerAlways = false
-    }
+//    }
     if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
       // If you opted-in for the New Architecture, we load the native entry point for this app.
       load()

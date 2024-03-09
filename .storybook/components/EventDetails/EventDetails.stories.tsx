@@ -28,7 +28,8 @@ import { TrueRegionMonitor } from "@event-details/arrival-tracking/region-monito
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { createTestQueryClient } from "@test-helpers/ReactQuery"
 import { QueryClientProvider } from "@tanstack/react-query"
-import { useEventSecondsToStart } from "@event-details/SecondsToStart"
+import { EventDetailsMenuView } from "@event-details/Menu"
+import { View } from "react-native"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -90,31 +91,31 @@ const time = {
 } as const
 
 const Test = () => {
-  const secondsToStart = useEventSecondsToStart(time)
   return (
-    <View style={{ height: "100%" }}>
-      <View
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "flex-end",
-          justifyContent: "space-between",
-          paddingHorizontal: 24,
-          paddingBottom: 48,
-          flex: 1
+    <View
+      style={{
+        height: "100%",
+        justifyContent: "center"
+      }}
+    >
+      <EventDetailsMenuView
+        event={{
+          title: "Test Event",
+          userAttendeeStatus: "hosting",
+          host
         }}
-      >
-        <EventCountdownView
-          countdown={eventCountdown(
-            secondsToStart,
-            time.dateRange,
-            time.todayOrTomorrow
-          )}
-        />
-        <JoinEventStagesView
-          stage={{ stage: "idle", joinButtonTapped: () => {} }}
-        />
-      </View>
+        eventShareContent={async () => ({
+          title: "Test",
+          url: "https://www.google.com",
+          message: "Hello There"
+        })}
+        onCopyEventTapped={() => console.log("Copy")}
+        onInviteFriendsTapped={() => console.log("Invite")}
+        onContactHostTapped={() => console.log("Contact Host")}
+        onEditEventTapped={() => console.log("Edit")}
+        onReportEventTapped={() => console.log("Report")}
+        onAssignNewHostTapped={() => console.log("Assign Host")}
+      />
     </View>
   )
 }
