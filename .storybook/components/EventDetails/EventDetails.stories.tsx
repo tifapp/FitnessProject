@@ -15,9 +15,7 @@ import {
   requestForegroundPermissionsAsync
 } from "expo-location"
 import { mockPlacemark } from "@location/MockData"
-import { createTestQueryClient } from "@test-helpers/ReactQuery"
-import { QueryClientProvider } from "@tanstack/react-query"
-import { EventCountdownView, useEventCountdown } from "@event-details/Countdown"
+import { EventCountdownView, eventCountdown } from "@event-details/Countdown"
 import { dateRange, dayjs, now } from "@date-time"
 import { View } from "react-native"
 import { JoinEventStagesView } from "@event-details/JoinEvent"
@@ -30,6 +28,7 @@ import { TrueRegionMonitor } from "@event-details/arrival-tracking/region-monito
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { createTestQueryClient } from "@test-helpers/ReactQuery"
 import { QueryClientProvider } from "@tanstack/react-query"
+import { useEventSecondsToStart } from "@event-details/SecondsToStart"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -84,14 +83,14 @@ export const Basic: EventDetailsStory = () => {
 const host = EventAttendeeMocks.Alivs
 
 const time = {
-  secondsToStart: dayjs.duration(15, "minute").asSeconds(),
+  secondsToStart: dayjs.duration(15.1, "minute").asSeconds(),
   todayOrTomorrow: "tomorrow",
   clientReceivedTime: new Date(),
   dateRange: dateRange(new Date(), now().add(1, "hour").toDate())
 } as const
 
 const Test = () => {
-  const result = useEventCountdown(time)
+  const secondsToStart = useEventSecondsToStart(time)
   return (
     <View style={{ height: "100%" }}>
       <View
@@ -105,7 +104,13 @@ const Test = () => {
           flex: 1
         }}
       >
-        <EventCountdownView result={result} />
+        <EventCountdownView
+          countdown={eventCountdown(
+            secondsToStart,
+            time.dateRange,
+            time.todayOrTomorrow
+          )}
+        />
         <JoinEventStagesView
           stage={{ stage: "idle", joinButtonTapped: () => {} }}
         />
