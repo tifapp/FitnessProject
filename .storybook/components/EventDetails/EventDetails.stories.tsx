@@ -8,21 +8,15 @@ import {
   mockEventLocation
 } from "@event-details/MockData"
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
-import { UserLocationFunctionsProvider } from "@location/UserLocation"
-import {
-  getCurrentPositionAsync,
-  requestBackgroundPermissionsAsync,
-  requestForegroundPermissionsAsync
-} from "expo-location"
 import { mockPlacemark } from "@location/MockData"
-import { EventDetailsView, useLoadEventDetails } from "@event-details/Details"
+import { sleep } from "@lib/utils/DelayData"
 import { createTestQueryClient } from "@test-helpers/ReactQuery"
 import { QueryClientProvider } from "@tanstack/react-query"
-import { ColorString } from "@lib/utils/Color"
-import { sleep } from "@lib/utils/DelayData"
+import { setupFocusRefreshes } from "@lib/ReactQuery"
+import { EventDetailsView, useLoadEventDetails } from "@event-details/Details"
 import { EventDetailsEnvironmentProvider } from "@event-details/Environment"
 import { faker } from "@faker-js/faker"
-import { setupFocusRefreshes } from "@lib/ReactQuery"
+import { ColorString } from "@lib/utils/Color"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -51,17 +45,11 @@ export const Basic: EventDetailsStory = () => {
   return (
     <SafeAreaProvider>
       <SafeAreaView edges={["top"]}>
-        <UserLocationFunctionsProvider
-          getCurrentLocation={getCurrentPositionAsync}
-          requestBackgroundPermissions={requestBackgroundPermissionsAsync}
-          requestForegroundPermissions={requestForegroundPermissionsAsync}
-        >
-          <QueryClientProvider client={queryClient}>
-            <BottomSheetModalProvider>
-              <Test />
-            </BottomSheetModalProvider>
-          </QueryClientProvider>
-        </UserLocationFunctionsProvider>
+        <QueryClientProvider client={queryClient}>
+          <BottomSheetModalProvider>
+            <Test />
+          </BottomSheetModalProvider>
+        </QueryClientProvider>
       </SafeAreaView>
     </SafeAreaProvider>
   )

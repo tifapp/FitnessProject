@@ -5,14 +5,11 @@ import { FontScaleFactors } from "@lib/Fonts"
 import { dayjs } from "@date-time"
 import { useState } from "react"
 import { View, ViewStyle, StyleSheet, StyleProp } from "react-native"
-import Animated, {
-  AnimatedStyleProp,
-  FadeIn,
-  FadeOut
-} from "react-native-reanimated"
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 import { EventRegion } from "@shared-models/Event"
 import { EventRegionMonitor, useHasArrivedAtRegion } from "./region-monitoring"
 import { humanizeEventCountdownSeconds } from "../Event"
+import { TodayOrTomorrow } from "@shared-models/TodayOrTomorrow"
 
 /**
  * Handles state related to whether or not to show the event arrival banner for
@@ -49,6 +46,18 @@ export type EventArrivalBannerCountdown =
       day: "today" | "tomorrow"
     }
   | { secondsToStart: number }
+
+const ONE_HOUR_IN_SECONDS = dayjs.duration(1, "hour").asSeconds()
+
+export const eventArrivalBannerCountdown = (
+  secondsToStart: number,
+  todayOrTomorrow: TodayOrTomorrow | null
+): EventArrivalBannerCountdown => {
+  if (todayOrTomorrow && secondsToStart > ONE_HOUR_IN_SECONDS) {
+    return { day: todayOrTomorrow }
+  }
+  return { secondsToStart }
+}
 
 export type EventArrivalBannerProps = {
   hasJoinedEvent: boolean
@@ -114,7 +123,6 @@ export const EventArrivalBannerView = ({
 
 const TEN_MINUTES_IN_SECONDS = dayjs.duration(10, "minutes").asSeconds()
 const ONE_DAY_IN_SECONDS = dayjs.duration(1, "day").asSeconds()
-const ONE_HOUR_IN_SECONDS = dayjs.duration(1, "hour").asSeconds()
 
 const FOMO_STATEMENTS = {
   joinNow: "Join now or miss out on the epic fun!",

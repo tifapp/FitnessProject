@@ -1,67 +1,44 @@
-import { dayjs, now } from "@date-time"
-import { useAutocorrectingInterval } from "@lib/utils/UseInterval"
+import { FixedDateRange, dayjs } from "@date-time"
 import { CurrentUserEvent } from "@shared-models/Event"
 import { TodayOrTomorrow } from "@shared-models/TodayOrTomorrow"
-import { useState } from "react"
 import { humanizeEventCountdownSeconds } from "./Event"
 import { StyleProp, ViewStyle, View, StyleSheet } from "react-native"
-import { BodyText, Footnote, Headline } from "@components/Text"
+import { Footnote, Headline } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import { StringUtils } from "@lib/utils/String"
 
 export type EventCountdownTime = CurrentUserEvent["time"]
 
-const eventSecondsToStart = (time: EventCountdownTime) => {
-  const offset = now().diff(dayjs(time.clientReceivedTime))
-  return time.secondsToStart - Math.round(offset / 1000)
-}
-
-export type UseEventCountdownResult =
+export type EventCountdown =
   | {
-      status: "starts-in" | "ends-in"
-      countdown: EventFormattedCountdown
+      kind: "starts-in" | "ends-in"
+      formatted: EventFormattedCountdown
     }
-  | { status: "done" }
-
-/**
- * A hook that computes the formatted countdown timer for the event.
- */
-export const useEventCountdown = (
-  time: EventCountdownTime
-): UseEventCountdownResult => {
-  const [secondsToStart, setSecondsToStart] = useState(
-    eventSecondsToStart(time)
-  )
-  useAutocorrectingInterval(
-    () => setSecondsToStart(eventSecondsToStart(time)),
-    1000
-  )
-  if (secondsToStart > 0) {
-    return {
-      status: "starts-in",
-      countdown: formatEventCountdownSeconds(
-        secondsToStart,
-        time.todayOrTomorrow
-      )
-    }
-  }
-  const { seconds } = time.dateRange.diff
-  const secondsToEnd = seconds - Math.abs(secondsToStart)
-  const countdown = formatEventCountdownSeconds(
-    secondsToEnd,
-    time.todayOrTomorrow
-  )
-  return secondsToEnd <= 0
-    ? { status: "done" }
-    : { status: "ends-in", countdown }
-}
+  | { kind: "done" }
 
 export type EventFormattedCountdown =
   | { todayOrTomorrow: "Today" | "Tomorrow"; shouldDisplayFomoEffect: false }
   | { formatted: string; shouldDisplayFomoEffect: boolean }
 
-const formatEventCountdownSeconds = (
+export const eventCountdown = (
+  secondsToStart: number,
+  dateRange: FixedDateRange,
+  todayOrTomorrow: TodayOrTomorrow | null
+): EventCountdown => {
+  if (secondsToStart > 0) {
+    return {
+      kind: "starts-in",
+      formatted: eventFormattedCountdown(secondsToStart, todayOrTomorrow)
+    }
+  }
+  const { seconds } = dateRange.diff
+  const secondsToEnd = seconds - Math.abs(secondsToStart)
+  const formatted = eventFormattedCountdown(secondsToEnd, todayOrTomorrow)
+  return secondsToEnd <= 0 ? { kind: "done" } : { kind: "ends-in", formatted }
+}
+
+const eventFormattedCountdown = (
   seconds: number,
   todayOrTomorrow: TodayOrTomorrow | null
 ): EventFormattedCountdown => {
@@ -96,29 +73,27 @@ const formatMinuteAndSecond = (left: number, right: number) => {
 }
 
 export type EventCountdownProps = {
-  result: UseEventCountdownResult
+  countdown: EventCountdown
   style?: StyleProp<ViewStyle>
 }
 
-/**
- * Displays the countdown for an event.
- */
-export const EventCountdownView = ({ result, style }: EventCountdownProps) => (
+export const EventCountdownView = ({
+  countdown,
+  style
+}: EventCountdownProps) => (
   <View style={style}>
-    {result.status === "starts-in" && (
+    {countdown.kind === "starts-in" && (
       <CountdownLabel
         title="Starts in"
         todayOrTomorrowTitle="Starts"
-        countdown={result.countdown}
-        shouldDisplayFomoEffect={result.countdown.shouldDisplayFomoEffect}
+        formattedCountdown={countdown.formatted}
       />
     )}
-    {result.status === "ends-in" && (
+    {countdown.kind === "ends-in" && (
       <CountdownLabel
         title="Ends in"
         todayOrTomorrowTitle="Ends"
-        countdown={result.countdown}
-        shouldDisplayFomoEffect={result.countdown.shouldDisplayFomoEffect}
+        formattedCountdown={countdown.formatted}
       />
     )}
   </View>
@@ -127,22 +102,20 @@ export const EventCountdownView = ({ result, style }: EventCountdownProps) => (
 type CountdownLabelProps = {
   title: string
   todayOrTomorrowTitle: string
-  countdown: EventFormattedCountdown
-  shouldDisplayFomoEffect: boolean
+  formattedCountdown: EventFormattedCountdown
 }
 
 const CountdownLabel = ({
   title,
   todayOrTomorrowTitle,
-  countdown,
-  shouldDisplayFomoEffect
+  formattedCountdown
 }: CountdownLabelProps) => (
   <View style={styles.container}>
     <Footnote
       maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
       style={styles.titleText}
     >
-      {"todayOrTomorrow" in countdown ? todayOrTomorrowTitle : title}
+      {"todayOrTomorrow" in formattedCountdown ? todayOrTomorrowTitle : title}
     </Footnote>
     <View
       style={[
@@ -159,13 +132,15 @@ const CountdownLabel = ({
           style={[
             styles.countdownText,
             {
-              color: shouldDisplayFomoEffect ? AppStyles.errorColor : "black"
+              color: formattedCountdown.shouldDisplayFomoEffect
+                ? AppStyles.errorColor
+                : "black"
             }
           ]}
         >
-          {"formatted" in countdown
-            ? countdown.formatted
-            : countdown.todayOrTomorrow}
+          {"formatted" in formattedCountdown
+            ? formattedCountdown.formatted
+            : formattedCountdown.todayOrTomorrow}
         </Headline>
       </View>
     </View>

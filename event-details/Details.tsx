@@ -42,6 +42,13 @@ import {
 } from "./TravelEstimates"
 import { useEventDetailsEnvironment } from "./Environment"
 import { EventDetailsHostView } from "./Host"
+import {
+  EventArrivalBannerView,
+  eventArrivalBannerCountdown,
+  useIsShowingEventArrivalBanner
+} from "./arrival-tracking"
+import { useEventSecondsToStart } from "./SecondsToStart"
+import { isAttendingEvent } from "./Event"
 
 /**
  * A result from loading a single event for the details screen.
@@ -249,6 +256,7 @@ const SuccessView = ({
         onFriendButtonTapped={() => console.log("TODO: Friend Logic")}
       />
     </DetailSectionView>
+    <ArrivalBannerSectionView event={event} />
     <DetailSectionView title="Details">
       {/* TODO: - Widgets */}
       <View style={styles.detailWidgetsPlaceholder} />
@@ -265,6 +273,28 @@ const SuccessView = ({
     <View style={{ marginBottom: 48 }} />
   </ScrollView>
 )
+
+const ArrivalBannerSectionView = ({ event }: { event: CurrentUserEvent }) => {
+  const { isShowing, close } = useIsShowingEventArrivalBanner(
+    event.location,
+    useEventDetailsEnvironment().regionMonitor
+  )
+  const secondsToStart = useEventSecondsToStart(event.time)
+  if (!isShowing) return undefined
+  return (
+    <DetailSectionView>
+      <EventArrivalBannerView
+        hasJoinedEvent={isAttendingEvent(event.userAttendeeStatus)}
+        canShareArrivalStatus // TODO: - Implement This
+        countdown={eventArrivalBannerCountdown(
+          secondsToStart,
+          event.time.todayOrTomorrow
+        )}
+        onClose={close}
+      />
+    </DetailSectionView>
+  )
+}
 
 const LocationSectionView = ({
   event

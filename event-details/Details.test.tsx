@@ -286,7 +286,7 @@ describe("EventDetailsLoading tests", () => {
         joinDate: null,
         location: mockEventLocation(),
         previewAttendees: [{ id: uuidString(), profileImageURL: null }],
-        hasEndedEarly: false
+        endedAt: null
       }
       setEventResponse(200, eventResponse)
       const resp = await loadEventDetails(1, TiFAPI.testAuthenticatedInstance)
