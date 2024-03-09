@@ -6,7 +6,8 @@ import {
   countdownMessage,
   EventArrivalBannerProps,
   EventArrivalBannerView,
-  useIsShowingEventArrivalBanner
+  useIsShowingEventArrivalBanner,
+  eventArrivalBannerCountdown
 } from "./ArrivalBanner"
 import "@test-helpers/Matchers"
 import { act, render, renderHook, waitFor } from "@testing-library/react-native"
@@ -14,11 +15,50 @@ import dayjs from "dayjs"
 import { mockEventArrivalGeofencedRegion, mockEventRegion } from "./MockData"
 import { EventArrivalGeofencedRegion } from "./geofencing"
 import { EventRegionMonitorUnsubscribe } from "./region-monitoring"
+import { fakeTimers } from "@test-helpers/Timers"
 
 const TWO_AND_A_HALF_DAYS_IN_SECONDS = dayjs.duration(2.5, "days").asSeconds()
 const THIRTY_MINUTES_IN_SECONDS = dayjs.duration(30, "minutes").asSeconds()
 
 describe("ArrivalBanner tests", () => {
+  describe("ArrivalBannerCountdown tests", () => {
+    it("should use seconds to start when start time is under 1 hour", () => {
+      const countdown = eventArrivalBannerCountdown(
+        dayjs.duration(59, "minutes").asSeconds(),
+        "today"
+      )
+      expect(countdown).toEqual({
+        secondsToStart: dayjs.duration(59, "minutes").asSeconds()
+      })
+    })
+
+    it("should use day when start time is over 1 hour away", () => {
+      const countdown = eventArrivalBannerCountdown(
+        dayjs.duration(61, "minutes").asSeconds(),
+        "today"
+      )
+      expect(countdown).toEqual({ day: "today" })
+    })
+
+    it("should use day when start time indicates tomorrow", () => {
+      const countdown = eventArrivalBannerCountdown(
+        dayjs.duration(25, "hour").asSeconds(),
+        "tomorrow"
+      )
+      expect(countdown).toEqual({ day: "tomorrow" })
+    })
+
+    it("should use seconds to start when no today or tomorrow", () => {
+      const countdown = eventArrivalBannerCountdown(
+        dayjs.duration(2, "days").asSeconds(),
+        null
+      )
+      expect(countdown).toEqual({
+        secondsToStart: dayjs.duration(2, "days").asSeconds()
+      })
+    })
+  })
+
   describe("ArriavlBannerMessages tests", () => {
     test("fomoStatementKey", () => {
       expectFomoStatementKey({ day: "today" }, "gearUp")
