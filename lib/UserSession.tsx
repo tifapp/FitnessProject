@@ -11,21 +11,21 @@ const UserSessionContext = createContext<UserSessionFunctions | undefined>(
 )
 
 export const useIsSignedInQuery = (options?: QueryHookOptions<boolean>) => {
-  const { isSignedIn } = useUserSessionContext()
+  const { isSignedIn } = useUserSession()
   return useQuery(["isSignedIn"], isSignedIn, options)
 }
 
-type UserSessionContextProviderProps = {
+type UserSessionProviderProps = {
   children: JSX.Element
 } & UserSessionFunctions
 
 /**
  * Provides functions to check the user's current session.
  */
-export const UserSessionContextProvider = ({
+export const UserSessionProvider = ({
   children,
   ...rest
-}: UserSessionContextProviderProps) => {
+}: UserSessionProviderProps) => {
   return (
     <UserSessionContext.Provider value={rest}>
       {children}
@@ -33,4 +33,25 @@ export const UserSessionContextProvider = ({
   )
 }
 
-export const useUserSessionContext = () => useContext(UserSessionContext)!
+export const useUserSession = () => useContext(UserSessionContext)!
+
+export type IfAuthenticatedProps = {
+  thenRender: JSX.Element
+  elseRender: JSX.Element
+}
+
+/**
+ * A component that renders {@link thenRender} if the user is signed in, and
+ * {@link elseRender} if they aren't.
+ */
+export const IfAuthenticated = ({
+  thenRender,
+  elseRender
+}: IfAuthenticatedProps) => {
+  const query = useIsSignedInQuery({ initialData: true })
+  if (query.data === true) {
+    return thenRender
+  } else {
+    return elseRender
+  }
+}
