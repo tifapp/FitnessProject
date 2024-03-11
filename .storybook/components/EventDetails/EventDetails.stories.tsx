@@ -17,7 +17,6 @@ import {
 import { mockPlacemark } from "@location/MockData"
 import { EventCountdownView, eventCountdown } from "@event-details/Countdown"
 import { dateRange, dayjs, now } from "@date-time"
-import { View } from "react-native"
 import { JoinEventStagesView } from "@event-details/JoinEvent"
 import { NavigationContainer, useFocusEffect } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
@@ -30,6 +29,7 @@ import { createTestQueryClient } from "@test-helpers/ReactQuery"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { EventDetailsMenuView } from "@event-details/Menu"
 import { View } from "react-native"
+import { CurrentUserEvent } from "@shared-models/Event"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -99,20 +99,25 @@ const Test = () => {
       }}
     >
       <EventDetailsMenuView
-        event={{
-          title: "Test Event",
-          userAttendeeStatus: "hosting",
-          host
-        }}
+        event={
+          {
+            title: "Test Event",
+            userAttendeeStatus: "attending",
+            host: {
+              ...host,
+              relations: { youToThem: "not-friends", themToYou: "not-friends" }
+            }
+          } as CurrentUserEvent
+        }
         eventShareContent={async () => ({
           title: "Test",
           url: "https://www.google.com",
           message: "Hello There"
         })}
+        onBlockHostToggled={() => console.log("Block Toggled")}
         onCopyEventTapped={() => console.log("Copy")}
         onInviteFriendsTapped={() => console.log("Invite")}
         onContactHostTapped={() => console.log("Contact Host")}
-        onEditEventTapped={() => console.log("Edit")}
         onReportEventTapped={() => console.log("Report")}
         onAssignNewHostTapped={() => console.log("Assign Host")}
       />
