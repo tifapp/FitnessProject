@@ -9,6 +9,60 @@ import { MenuView, MenuAction } from "@react-native-menu/menu"
 import { Ionicon } from "@components/common/Icons"
 import { CurrentUserEvent } from "@shared-models/Event"
 import { useFontScale } from "@lib/Fonts"
+import { useIsSignedIn } from "@lib/UserSession"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { setEventDetailsQueryData } from "./Query"
+import {
+  UnblockedBidirectionalUserRelations,
+  toggleBlockUserRelations
+} from "@shared-models/User"
+
+export type EventMenuActionsListKey = keyof typeof EVENT_MENU_ACTIONS_LISTS
+
+type ToggleBlockMutationArgs = {
+  isBlocking: boolean
+  originalRelations: UnblockedBidirectionalUserRelations
+}
+
+/**
+ * A hook that controls the state of the menu actions.
+ */
+export const useEventDetailsMenuActions = (
+  event: Pick<CurrentUserEvent, "id" | "userAttendeeStatus" | "host">,
+  toggleBlockHost: (isBlocked: boolean) => Promise<void>
+) => {
+  const queryClient = useQueryClient()
+  const toggleBlockMutation = useMutation(
+    async ({ isBlocking }: ToggleBlockMutationArgs) => {
+      await toggleBlockHost(isBlocking)
+    },
+    {
+      onError: (_, { originalRelations }) => {
+        setEventDetailsQueryData(queryClient, event.id, (e) => ({
+          ...e,
+          host: { ...e.host, relations: originalRelations }
+        }))
+      }
+    }
+  )
+  return {
+    actionsListKey: useIsSignedIn()
+      ? (event.userAttendeeStatus as EventMenuActionsListKey)
+      : ("not-signed-in" as EventMenuActionsListKey),
+    isToggleBlockHostError: toggleBlockMutation.isError,
+    blockHostToggled: () => {
+      const isBlocking = event.host.relations.youToThem !== "blocked"
+      setEventDetailsQueryData(queryClient, event.id, (e) => ({
+        ...e,
+        host: { ...e.host, relations: toggleBlockUserRelations(isBlocking) }
+      }))
+      toggleBlockMutation.mutate({
+        isBlocking,
+        originalRelations: event.host.relations
+      })
+    }
+  }
+}
 
 export type EventDetailsMenuProps = {
   event: CurrentUserEvent
@@ -63,7 +117,7 @@ export const EventDetailsMenuView = ({
     }}
     actions={formatEventMenuActions(
       event,
-      ATTENDEE_STATUS_ACTIONS[event.userAttendeeStatus]
+      EVENT_MENU_ACTIONS_LISTS[event.userAttendeeStatus]
     )}
     shouldOpenOnLongPress={false}
     style={[style, { width: 44 * useFontScale(), height: 44 * useFontScale() }]}
@@ -179,7 +233,7 @@ export const EVENT_MENU_ACTION = {
   }
 } as const satisfies Record<string, BaseEventMenuAction>
 
-const ATTENDEE_STATUS_ACTIONS = {
+const EVENT_MENU_ACTIONS_LISTS = {
   hosting: [
     EVENT_MENU_ACTION.assignHost,
     EVENT_MENU_ACTION.copyEvent,
@@ -200,5 +254,6 @@ const ATTENDEE_STATUS_ACTIONS = {
     EVENT_MENU_ACTION.copyEvent,
     EVENT_MENU_ACTION.contactHost,
     EVENT_MENU_ACTION.shareEvent
-  ]
-} as Readonly<Record<string, EventMenuAction[]>>
+  ],
+  "not-signed-in": [EVENT_MENU_ACTION.reportEvent, EVENT_MENU_ACTION.shareEvent]
+} as const satisfies Readonly<Record<string, EventMenuAction[]>>
