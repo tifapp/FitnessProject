@@ -11,15 +11,22 @@ import { CurrentUserEvent } from "@shared-models/Event"
 import { useFontScale } from "@lib/Fonts"
 import { useIsSignedIn } from "@lib/UserSession"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { setEventDetailsQueryData } from "./Query"
+import { updateEventDetailsQueryEvent } from "./Query"
 import {
   UnblockedBidirectionalUserRelations,
+  UserID,
   toggleBlockUserRelations
 } from "@shared-models/User"
 
 export type EventMenuActionsListKey = keyof typeof EVENT_MENU_ACTIONS_LISTS
 
+export type UseEventDetailsMenuActionsEnvironment = {
+  blockHost: (id: UserID) => Promise<void>
+  unblockHost: (id: UserID) => Promise<void>
+}
+
 type ToggleBlockMutationArgs = {
+  hostId: UserID
   isBlocking: boolean
   originalRelations: UnblockedBidirectionalUserRelations
 }
@@ -29,16 +36,20 @@ type ToggleBlockMutationArgs = {
  */
 export const useEventDetailsMenuActions = (
   event: Pick<CurrentUserEvent, "id" | "userAttendeeStatus" | "host">,
-  toggleBlockHost: (isBlocked: boolean) => Promise<void>
+  env: UseEventDetailsMenuActionsEnvironment
 ) => {
   const queryClient = useQueryClient()
   const toggleBlockMutation = useMutation(
-    async ({ isBlocking }: ToggleBlockMutationArgs) => {
-      await toggleBlockHost(isBlocking)
+    async ({ isBlocking, hostId }: ToggleBlockMutationArgs) => {
+      if (isBlocking) {
+        await env.blockHost(hostId)
+      } else {
+        await env.unblockHost(hostId)
+      }
     },
     {
       onError: (_, { originalRelations }) => {
-        setEventDetailsQueryData(queryClient, event.id, (e) => ({
+        updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({
           ...e,
           host: { ...e.host, relations: originalRelations }
         }))
@@ -52,12 +63,13 @@ export const useEventDetailsMenuActions = (
     isToggleBlockHostError: toggleBlockMutation.isError,
     blockHostToggled: () => {
       const isBlocking = event.host.relations.youToThem !== "blocked"
-      setEventDetailsQueryData(queryClient, event.id, (e) => ({
+      updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({
         ...e,
         host: { ...e.host, relations: toggleBlockUserRelations(isBlocking) }
       }))
       toggleBlockMutation.mutate({
         isBlocking,
+        hostId: event.host.id,
         originalRelations: event.host.relations
       })
     }

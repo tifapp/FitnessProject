@@ -86,6 +86,7 @@ describe("EventDetailsMenu tests", () => {
     const queryClient = createTestQueryClient()
     const isSignedIn = jest.fn()
     const blockHost = jest.fn()
+    const unblockHost = jest.fn()
 
     fakeTimers()
     beforeEach(() => {
@@ -130,7 +131,7 @@ describe("EventDetailsMenu tests", () => {
         youToThem: "blocked",
         themToYou: "not-friends"
       })
-      await waitFor(() => expect(blockHost).toHaveBeenCalledWith(true))
+      await waitFor(() => expect(blockHost).toHaveBeenCalledWith(event.host.id))
     })
 
     test("successful unblock host flow, updates event details hook", async () => {
@@ -151,7 +152,9 @@ describe("EventDetailsMenu tests", () => {
         youToThem: "not-friends",
         themToYou: "not-friends"
       })
-      await waitFor(() => expect(blockHost).toHaveBeenCalledWith(false))
+      await waitFor(() => {
+        expect(unblockHost).toHaveBeenCalledWith(event.host.id)
+      })
     })
 
     test("unsuccessful block flow, reverts details hook result", async () => {
@@ -224,15 +227,18 @@ describe("EventDetailsMenu tests", () => {
     }
 
     const renderUseEventDetailsMenuActions = (event: CurrentUserEvent) => {
-      return renderHook(() => useEventDetailsMenuActions(event, blockHost), {
-        wrapper: ({ children }: any) => (
-          <TestQueryClientProvider client={queryClient}>
-            <UserSessionProvider isSignedIn={isSignedIn}>
-              {children}
-            </UserSessionProvider>
-          </TestQueryClientProvider>
-        )
-      })
+      return renderHook(
+        () => useEventDetailsMenuActions(event, { blockHost, unblockHost }),
+        {
+          wrapper: ({ children }: any) => (
+            <TestQueryClientProvider client={queryClient}>
+              <UserSessionProvider isSignedIn={isSignedIn}>
+                {children}
+              </UserSessionProvider>
+            </TestQueryClientProvider>
+          )
+        }
+      )
     }
   })
 })

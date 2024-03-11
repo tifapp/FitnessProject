@@ -17,7 +17,13 @@ export const useEventDetailsQuery = (
   return useQuery(eventDetailsQueryKey(id), async () => await loadEvent(id))
 }
 
-export const setEventDetailsQueryData = (
+/**
+ * Updates the currently cached {@link CurrentUserEvent} for the given event id
+ * on the details screen. If no event is cached for the given id, or if the
+ * underlying {@link EventDetailsLoadingResult} status is not `"success"`, then
+ * the update function is not ran.
+ */
+export const updateEventDetailsQueryEvent = (
   queryClient: QueryClient,
   id: EventID,
   updateFn: (event: CurrentUserEvent) => CurrentUserEvent

@@ -108,10 +108,15 @@ const Test = () => {
 }
 
 const Menu = ({ event }: { event: CurrentUserEvent }) => {
-  const state = useEventDetailsMenuActions(event, async () => {
-    await sleep(3000)
-    throw new Error()
+  const state = useEventDetailsMenuActions(event, {
+    blockHost: async () => {
+      console.log("Blocked")
+    },
+    unblockHost: async () => {
+      console.log("Unblocked")
+    }
   })
+  console.error("isToggleBlockError", state.isToggleBlockHostError)
   return (
     <View
       style={{
