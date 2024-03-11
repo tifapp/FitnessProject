@@ -320,14 +320,6 @@ export class TiFAPI {
   }
 }
 
-const userErrorSchema = <T extends z.Primitive>(literal: T) => {
-  return literalErrorSchema(literal).extend({
-    userId: z.string().uuid()
-  })
-}
-
-const UserNotFoundResponseSchema = userErrorSchema("user-not-found")
-
 const literalErrorSchema = <T extends z.Primitive, V extends z.Primitive[]>(
   literal: T,
   ...literals: [...V]
@@ -338,3 +330,11 @@ const literalErrorSchema = <T extends z.Primitive, V extends z.Primitive[]>(
 }
 
 const EventNotFoundErrorSchema = literalErrorSchema("event-not-found")
+
+const userErrorSchema = <T extends z.Primitive>(literal: T) => {
+  return literalErrorSchema(literal).extend({
+    userId: z.string().uuid()
+  })
+}
+
+const UserNotFoundResponseSchema = userErrorSchema("user-not-found")
