@@ -11,6 +11,7 @@ import { z } from "zod"
 import { createAWSTiFAPIFetch } from "./aws"
 import { TiFAPIFetch, createTiFAPIFetch } from "./client"
 import { JoinEventResponseSchema } from "@shared-models/JoinEvent"
+import { UserID } from "@shared-models/User"
 
 export type UpdateCurrentUserProfileRequest = Partial<{
   name: string
@@ -275,7 +276,57 @@ export class TiFAPI {
       }
     )
   }
+
+  /**
+   * Blocks a user.
+   *
+   * Blocks can be mutual (ie. 2 users can block each other regardless of if
+   * they have been blocked by the user they are trying to block), so this
+   * endpoint only fails if the given user id does not exist.
+   */
+  async blockUser(id: UserID) {
+    return await this.apiFetch(
+      {
+        method: "POST",
+        endpoint: `/user/block/${id}`
+      },
+      {
+        status204: "no-content",
+        status404: UserNotFoundResponseSchema
+      }
+    )
+  }
+
+  /**
+   * Unblocks a user.
+   *
+   * Blocks can be mutual (ie. 2 users can block each other regardless of if
+   * they have been blocked by the user they are trying to block), so this
+   * endpoint only fails if the given user id does not exist or if the user
+   * is not blocked in the first place.
+   */
+  async unblockUser(id: UserID) {
+    return await this.apiFetch(
+      {
+        method: "DELETE",
+        endpoint: `/user/block/${id}`
+      },
+      {
+        status204: "no-content",
+        status404: UserNotFoundResponseSchema,
+        status403: userErrorSchema("user-not-blocked")
+      }
+    )
+  }
 }
+
+const userErrorSchema = <T extends z.Primitive>(literal: T) => {
+  return literalErrorSchema(literal).extend({
+    userId: z.string().uuid()
+  })
+}
+
+const UserNotFoundResponseSchema = userErrorSchema("user-not-found")
 
 const literalErrorSchema = <T extends z.Primitive, V extends z.Primitive[]>(
   literal: T,
