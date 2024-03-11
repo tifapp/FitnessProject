@@ -2,6 +2,7 @@ import { UseQueryResult, useQuery } from "@tanstack/react-query"
 import {
   BlockedEvent,
   CurrentUserEvent,
+  EventID,
   currentUserEventFromResponse
 } from "@shared-models/Event"
 import { useIsConnectedToInternet } from "@lib/InternetConnection"
@@ -17,14 +18,7 @@ import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useAutocorrectingInterval } from "@lib/utils/UseInterval"
-
-/**
- * A result from loading a single event for the details screen.
- */
-export type EventDetailsLoadingResult =
-  | { status: "not-found" | "cancelled" }
-  | { status: "blocked"; event: BlockedEvent }
-  | { status: "success"; event: CurrentUserEvent }
+import { EventDetailsLoadingResult, useEventDetailsQuery } from "./Query"
 
 /**
  * Loads the event details from the server.
@@ -66,13 +60,10 @@ export type UseLoadEventDetailsResult =
  * A hook to load an event in the context of the details screen.
  */
 export const useLoadEventDetails = (
-  eventId: number,
-  loadEvent: (id: number) => Promise<EventDetailsLoadingResult>
+  eventId: EventID,
+  loadEvent: (id: EventID) => Promise<EventDetailsLoadingResult>
 ): UseLoadEventDetailsResult => {
-  const query = useQuery(
-    ["event", eventId],
-    async () => await loadEvent(eventId)
-  )
+  const query = useEventDetailsQuery(eventId, loadEvent)
   return loadEventDetailsResult(query, useIsConnectedToInternet())
 }
 
