@@ -20,13 +20,13 @@ export const useEventDetailsQuery = (
 export const setEventDetailsQueryData = (
   queryClient: QueryClient,
   id: EventID,
-  setFn: (event: CurrentUserEvent) => CurrentUserEvent
+  updateFn: (event: CurrentUserEvent) => CurrentUserEvent
 ) => {
   queryClient.setQueryData(
     eventDetailsQueryKey(id),
-    (result: EventDetailsLoadingResult) => {
-      if (result.status !== "success") return result
-      return { ...result, event: setFn(result.event) }
+    (result: EventDetailsLoadingResult | undefined) => {
+      if (!result || result.status !== "success") return result
+      return { ...result, event: updateFn(result.event) }
     }
   )
 }

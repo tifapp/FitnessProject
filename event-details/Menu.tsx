@@ -66,10 +66,10 @@ export const useEventDetailsMenuActions = (
 
 export type EventDetailsMenuProps = {
   event: CurrentUserEvent
+  state: ReturnType<typeof useEventDetailsMenuActions>
   eventShareContent: () => Promise<ShareContent>
   onCopyEventTapped: () => void
   onReportEventTapped: () => void
-  onBlockHostToggled: () => void
   onContactHostTapped: () => void
   onInviteFriendsTapped: () => void
   onAssignNewHostTapped: () => void
@@ -91,22 +91,23 @@ export type EventDetailsMenuProps = {
  */
 export const EventDetailsMenuView = ({
   event,
+  state,
   eventShareContent,
   onCopyEventTapped,
   onReportEventTapped,
-  onBlockHostToggled,
   onContactHostTapped,
   onInviteFriendsTapped,
   onAssignNewHostTapped,
   style
 }: EventDetailsMenuProps) => (
   <MenuView
+    // TODO: - Error UI
     onPressAction={({ nativeEvent }) => {
       const callbacks = {
         "copy-event": onCopyEventTapped,
         "report-event": onReportEventTapped,
         "contact-host": onContactHostTapped,
-        "toggle-block-host": onBlockHostToggled,
+        "toggle-block-host": state.blockHostToggled,
         "invite-friends": onInviteFriendsTapped,
         "assign-host": onAssignNewHostTapped,
         "share-event": async () => {
@@ -117,7 +118,7 @@ export const EventDetailsMenuView = ({
     }}
     actions={formatEventMenuActions(
       event,
-      EVENT_MENU_ACTIONS_LISTS[event.userAttendeeStatus]
+      EVENT_MENU_ACTIONS_LISTS[state.actionsListKey]
     )}
     shouldOpenOnLongPress={false}
     style={[style, { width: 44 * useFontScale(), height: 44 * useFontScale() }]}
