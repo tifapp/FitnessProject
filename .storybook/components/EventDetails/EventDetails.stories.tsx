@@ -29,7 +29,6 @@ import { createTestQueryClient } from "@test-helpers/ReactQuery"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { EventDetailsMenuView } from "@event-details/Menu"
 import { View } from "react-native"
-import { NonCompliantChecksCount } from "aws-sdk/clients/iot"
 import { CurrentUserEvent } from "@shared-models/Event"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
