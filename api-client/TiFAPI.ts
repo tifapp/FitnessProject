@@ -287,7 +287,7 @@ export class TiFAPI {
   async blockUser(id: UserID) {
     return await this.apiFetch(
       {
-        method: "POST",
+        method: "PATCH",
         endpoint: `/user/block/${id}`
       },
       {
