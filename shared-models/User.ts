@@ -1,5 +1,7 @@
 import { z } from "zod"
 
+export type UserID = string
+
 export const NotFriendsStatusSchema = z.literal("not-friends")
 export const FriendRequestPendingStatusSchema = z.literal(
   "friend-request-pending"
