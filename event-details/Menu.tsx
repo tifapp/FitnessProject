@@ -9,13 +9,79 @@ import { MenuView, MenuAction } from "@react-native-menu/menu"
 import { Ionicon } from "@components/common/Icons"
 import { CurrentUserEvent } from "@shared-models/Event"
 import { useFontScale } from "@lib/Fonts"
+import { useIsSignedIn } from "@lib/UserSession"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { updateEventDetailsQueryEvent } from "./Query"
+import {
+  UnblockedBidirectionalUserRelations,
+  UserID,
+  toggleBlockUserRelations
+} from "@shared-models/User"
+
+export type EventMenuActionsListKey = keyof typeof EVENT_MENU_ACTIONS_LISTS
+
+export type UseEventDetailsMenuActionsEnvironment = {
+  blockHost: (id: UserID) => Promise<void>
+  unblockHost: (id: UserID) => Promise<void>
+}
+
+type ToggleBlockMutationArgs = {
+  hostId: UserID
+  isBlocking: boolean
+  originalRelations: UnblockedBidirectionalUserRelations
+}
+
+/**
+ * A hook that controls the state of the menu actions.
+ */
+export const useEventDetailsMenuActions = (
+  event: Pick<CurrentUserEvent, "id" | "userAttendeeStatus" | "host">,
+  env: UseEventDetailsMenuActionsEnvironment
+) => {
+  const queryClient = useQueryClient()
+  const toggleBlockMutation = useMutation(
+    async ({ isBlocking, hostId }: ToggleBlockMutationArgs) => {
+      if (isBlocking) {
+        await env.blockHost(hostId)
+      } else {
+        await env.unblockHost(hostId)
+      }
+    },
+    {
+      onError: (_, { originalRelations }) => {
+        updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({
+          ...e,
+          host: { ...e.host, relations: originalRelations }
+        }))
+      }
+    }
+  )
+  return {
+    actionsListKey: useIsSignedIn()
+      ? (event.userAttendeeStatus as EventMenuActionsListKey)
+      : ("not-signed-in" as EventMenuActionsListKey),
+    isToggleBlockHostError: toggleBlockMutation.isError,
+    blockHostToggled: () => {
+      const isBlocking = event.host.relations.youToThem !== "blocked"
+      updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({
+        ...e,
+        host: { ...e.host, relations: toggleBlockUserRelations(isBlocking) }
+      }))
+      toggleBlockMutation.mutate({
+        isBlocking,
+        hostId: event.host.id,
+        originalRelations: event.host.relations
+      })
+    }
+  }
+}
 
 export type EventDetailsMenuProps = {
   event: CurrentUserEvent
+  state: ReturnType<typeof useEventDetailsMenuActions>
   eventShareContent: () => Promise<ShareContent>
   onCopyEventTapped: () => void
   onReportEventTapped: () => void
-  onBlockHostToggled: () => void
   onContactHostTapped: () => void
   onInviteFriendsTapped: () => void
   onAssignNewHostTapped: () => void
@@ -37,22 +103,23 @@ export type EventDetailsMenuProps = {
  */
 export const EventDetailsMenuView = ({
   event,
+  state,
   eventShareContent,
   onCopyEventTapped,
   onReportEventTapped,
-  onBlockHostToggled,
   onContactHostTapped,
   onInviteFriendsTapped,
   onAssignNewHostTapped,
   style
 }: EventDetailsMenuProps) => (
   <MenuView
+    // TODO: - Error UI
     onPressAction={({ nativeEvent }) => {
       const callbacks = {
         "copy-event": onCopyEventTapped,
         "report-event": onReportEventTapped,
         "contact-host": onContactHostTapped,
-        "toggle-block-host": onBlockHostToggled,
+        "toggle-block-host": state.blockHostToggled,
         "invite-friends": onInviteFriendsTapped,
         "assign-host": onAssignNewHostTapped,
         "share-event": async () => {
@@ -63,7 +130,7 @@ export const EventDetailsMenuView = ({
     }}
     actions={formatEventMenuActions(
       event,
-      ATTENDEE_STATUS_ACTIONS[event.userAttendeeStatus]
+      EVENT_MENU_ACTIONS_LISTS[state.actionsListKey]
     )}
     shouldOpenOnLongPress={false}
     style={[style, { width: 44 * useFontScale(), height: 44 * useFontScale() }]}
@@ -179,7 +246,7 @@ export const EVENT_MENU_ACTION = {
   }
 } as const satisfies Record<string, BaseEventMenuAction>
 
-const ATTENDEE_STATUS_ACTIONS = {
+const EVENT_MENU_ACTIONS_LISTS = {
   hosting: [
     EVENT_MENU_ACTION.assignHost,
     EVENT_MENU_ACTION.copyEvent,
@@ -200,5 +267,6 @@ const ATTENDEE_STATUS_ACTIONS = {
     EVENT_MENU_ACTION.copyEvent,
     EVENT_MENU_ACTION.contactHost,
     EVENT_MENU_ACTION.shareEvent
-  ]
-} as Readonly<Record<string, EventMenuAction[]>>
+  ],
+  "not-signed-in": [EVENT_MENU_ACTION.reportEvent, EVENT_MENU_ACTION.shareEvent]
+} as const satisfies Readonly<Record<string, EventMenuAction[]>>

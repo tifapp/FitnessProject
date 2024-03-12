@@ -12,7 +12,11 @@ const UserSessionContext = createContext<UserSessionFunctions | undefined>(
 
 export const useIsSignedInQuery = (options?: QueryHookOptions<boolean>) => {
   const { isSignedIn } = useUserSession()
-  return useQuery(["isSignedIn"], isSignedIn, options)
+  return useQuery(["isSignedIn"], isSignedIn, { initialData: true, ...options })
+}
+
+export const useIsSignedIn = () => {
+  return useIsSignedInQuery().data
 }
 
 type UserSessionProviderProps = {
@@ -48,7 +52,7 @@ export const IfAuthenticated = ({
   thenRender,
   elseRender
 }: IfAuthenticatedProps) => {
-  const query = useIsSignedInQuery({ initialData: true })
+  const query = useIsSignedInQuery()
   if (query.data === true) {
     return thenRender
   } else {

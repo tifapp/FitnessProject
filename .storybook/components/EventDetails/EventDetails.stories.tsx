@@ -27,9 +27,15 @@ import { TrueRegionMonitor } from "@event-details/arrival-tracking/region-monito
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { createTestQueryClient } from "@test-helpers/ReactQuery"
 import { QueryClientProvider } from "@tanstack/react-query"
-import { EventDetailsMenuView } from "@event-details/Menu"
+import {
+  EventDetailsMenuView,
+  useEventDetailsMenuActions
+} from "@event-details/Menu"
 import { View } from "react-native"
 import { CurrentUserEvent } from "@shared-models/Event"
+import { useLoadEventDetails } from "@event-details/Details"
+import { UserSessionProvider } from "@lib/UserSession"
+import { TiFQueryClientProvider } from "@lib/ReactQuery"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -64,17 +70,19 @@ export const Basic: EventDetailsStory = () => {
         requestBackgroundPermissions={requestBackgroundPermissionsAsync}
         requestForegroundPermissions={requestForegroundPermissionsAsync}
       >
-        <QueryClientProvider client={queryClient}>
-          <BottomSheetModalProvider>
-            <NavigationContainer>
-              <Stack.Navigator
-                screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
-              >
-                <Stack.Screen name="test" component={Test} />
-              </Stack.Navigator>
-            </NavigationContainer>
-          </BottomSheetModalProvider>
-        </QueryClientProvider>
+        <UserSessionProvider isSignedIn={async () => true}>
+          <TiFQueryClientProvider>
+            <BottomSheetModalProvider>
+              <NavigationContainer>
+                <Stack.Navigator
+                  screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
+                >
+                  <Stack.Screen name="test" component={Test} />
+                </Stack.Navigator>
+              </NavigationContainer>
+            </BottomSheetModalProvider>
+          </TiFQueryClientProvider>
+        </UserSessionProvider>
       </UserLocationFunctionsProvider>
       {/* </SafeAreaView> */}
     </SafeAreaProvider>
@@ -91,6 +99,24 @@ const time = {
 } as const
 
 const Test = () => {
+  const result = useLoadEventDetails(event.id, async () => ({
+    status: "success",
+    event
+  }))
+  if (result.status !== "success") return undefined
+  return <Menu event={result.event} />
+}
+
+const Menu = ({ event }: { event: CurrentUserEvent }) => {
+  const state = useEventDetailsMenuActions(event, {
+    blockHost: async () => {
+      console.log("Blocked")
+    },
+    unblockHost: async () => {
+      console.log("Unblocked")
+    }
+  })
+  console.error("isToggleBlockError", state.isToggleBlockHostError)
   return (
     <View
       style={{
@@ -99,22 +125,13 @@ const Test = () => {
       }}
     >
       <EventDetailsMenuView
-        event={
-          {
-            title: "Test Event",
-            userAttendeeStatus: "attending",
-            host: {
-              ...host,
-              relations: { youToThem: "not-friends", themToYou: "not-friends" }
-            }
-          } as CurrentUserEvent
-        }
+        event={event}
+        state={state}
         eventShareContent={async () => ({
           title: "Test",
           url: "https://www.google.com",
           message: "Hello There"
         })}
-        onBlockHostToggled={() => console.log("Block Toggled")}
         onCopyEventTapped={() => console.log("Copy")}
         onInviteFriendsTapped={() => console.log("Invite")}
         onContactHostTapped={() => console.log("Contact Host")}
