@@ -1,5 +1,5 @@
 import { CurrentUserEvent } from "@shared-models/Event"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Alert } from "react-native"
 
 export const LEAVE_EVENT_ERROR_ALERTS = {
@@ -48,9 +48,10 @@ export type UseLeaveEventMenu = {
 export type UseLeaveEventStatus =
   | { status: "success" }
   | ({ status: "select" } & UseLeaveEventMenu)
-  | { status: "idle" }
+  | undefined
 
 export const useLeaveEvent = (event: Pick<CurrentUserEvent, "id" | "userAttendeeStatus">, env: UseLeaveEventEnvironment): UseLeaveEventStatus => {
+  const queryClient = useQueryClient()
   const { onSuccess, leaveEvent } = env
   const leaveEventMutation = useMutation(
     async () => await leaveEvent(event.id),
@@ -58,6 +59,7 @@ export const useLeaveEvent = (event: Pick<CurrentUserEvent, "id" | "userAttendee
       onSuccess: (status) => {
         if (status !== "success") presentErrorAlert(status)
         onSuccess()
+        queryClient.setQueryData(["event", event.id], event)
       },
       onError: () => presentErrorAlert("generic")
     }
@@ -96,17 +98,5 @@ export const useLeaveEvent = (event: Pick<CurrentUserEvent, "id" | "userAttendee
       },
       reselectButtonTapped: () => console.log("Reselect")
     }
-  } else { return { status: "idle" } }
+  }
 }
-
-// export const AttendeesListPicker = () => {
-//   const result = useLeaveEventHostPicker()
-// }
-
-// export const useLeaveEventHostPicker = (
-//   onAttendeeSelected: (eventAttendee: Pick<EventAttendee, "id">) => Promise<EventAttendee>,
-//   attendeesListProps: UseAttendeesListProps
-// ) => {
-//   const result = useAttendeesList(attendeesListProps)
-//   const [currentAttendeeId, setCurrentAttendeeId] = useState<number>()
-// }
