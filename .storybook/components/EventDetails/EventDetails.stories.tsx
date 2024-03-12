@@ -9,14 +9,14 @@ import {
 } from "@event-details/MockData"
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 import { mockPlacemark } from "@location/MockData"
-import { sleep } from "@lib/utils/DelayData"
-import { createTestQueryClient } from "@test-helpers/ReactQuery"
-import { QueryClientProvider } from "@tanstack/react-query"
 import { setupFocusRefreshes } from "@lib/ReactQuery"
 import { EventDetailsView, useLoadEventDetails } from "@event-details/Details"
 import { EventDetailsEnvironmentProvider } from "@event-details/Environment"
 import { faker } from "@faker-js/faker"
 import { ColorString } from "@lib/utils/Color"
+import { sleep } from "@lib/utils/DelayData"
+import { createTestQueryClient } from "@test-helpers/ReactQuery"
+import { QueryClientProvider } from "@tanstack/react-query"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -73,8 +73,7 @@ const Test = () => {
         location: { ...location, placemark: mockPlacemark() },
         title: faker.name.jobArea(),
         color: ColorString.parse("#345995")!,
-        description:
-          "Hello world, this is an @event of some kind. Please join it if you like to do !17|123/#2BC016/Pickup Basketball. \n\nNow I write this endless storybook story in the void, where \nI can test things like @hello to make sure that links are highlighting and I am not going absolutely crazy."
+        description: "Hello world"
       }
     }
   })

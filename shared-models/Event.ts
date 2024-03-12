@@ -10,6 +10,8 @@ import {
   UnblockedBidirectionalUserRelationsSchema
 } from "./User"
 
+export type EventID = number
+
 /**
  * A zod schema for {@link EventRegion}.
  */

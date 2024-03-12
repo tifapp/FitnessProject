@@ -12,6 +12,7 @@ import {
   createInitialCenter,
   useExploreEvents
 } from "@screens/ExploreEvents"
+import { eventDetailsQueryKey } from "@shared-models/query-keys/Event"
 import { endlessCancellable, nonCancellable } from "@test-helpers/Cancellable"
 import {
   TestQueryClientProvider,
@@ -243,13 +244,13 @@ describe("ExploreEvents tests", () => {
       })
 
       await waitFor(() => {
-        expect(queryClient.getQueryData(["event", events[0].id])).toMatchObject(
-          events[0]
-        )
+        expect(
+          queryClient.getQueryData(eventDetailsQueryKey(events[0].id))
+        ).toMatchObject(events[0])
       })
-      expect(queryClient.getQueryData(["event", events[1].id])).toMatchObject(
-        events[1]
-      )
+      expect(
+        queryClient.getQueryData(eventDetailsQueryKey(events[1].id))
+      ).toMatchObject(events[1])
     })
 
     const advanceThroughRegionUpdateDebounce = () => {

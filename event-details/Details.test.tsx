@@ -1,12 +1,9 @@
 import { TiFAPI } from "@api-client/TiFAPI"
 import { UserHandle } from "@content-parsing"
 import { dateRange } from "@date-time"
-import { InternetConnectionStatusProvider } from "@lib/InternetConnection"
 import { ColorString } from "@lib/utils/Color"
 import { uuidString } from "@lib/utils/UUID"
-import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
-import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { fakeTimers } from "@test-helpers/Timers"
 import { noContentResponse, mswServer } from "@test-helpers/msw"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
@@ -14,10 +11,11 @@ import dayjs from "dayjs"
 import { HttpResponse, http } from "msw"
 import {
   loadEventDetails,
-  useDisplayedEventDetailsLoadingBalls,
-  useLoadEventDetails
+  useDisplayedEventDetailsLoadingBalls
 } from "./Details"
 import { EventMocks, mockEventLocation } from "./MockData"
+import { renderUseLoadEventDetails } from "./TestHelpers"
+import { EventID } from "@shared-models/Event"
 
 describe("EventDetailsLoading tests", () => {
   beforeEach(() => {
@@ -186,18 +184,8 @@ describe("EventDetailsLoading tests", () => {
       expect(loadEvent).toHaveBeenCalledTimes(2)
     })
 
-    const renderUseLoadEvent = (eventId: number) => {
-      return renderHook(
-        (eventId: number) => useLoadEventDetails(eventId, loadEvent),
-        {
-          initialProps: eventId,
-          wrapper: ({ children }: any) => (
-            <InternetConnectionStatusProvider status={testConnectionStatus}>
-              <TestQueryClientProvider>{children}</TestQueryClientProvider>
-            </InternetConnectionStatusProvider>
-          )
-        }
-      )
+    const renderUseLoadEvent = (eventId: EventID) => {
+      return renderUseLoadEventDetails(eventId, testConnectionStatus, loadEvent)
     }
   })
 
