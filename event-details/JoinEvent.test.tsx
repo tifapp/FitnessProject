@@ -22,8 +22,11 @@ import { mswServer } from "@test-helpers/msw"
 import { http, HttpResponse } from "msw"
 import { TiFAPI } from "@api-client/TiFAPI"
 import { mockEventRegion } from "./arrival-tracking/MockData"
-import { EventMocks, mockEventChatTokenRequest } from "./MockData"
-import { CurrentUserEvent } from "@shared-models/Event"
+import {
+  EventMocks,
+  mockEventChatTokenRequest,
+  mockEventLocation
+} from "./MockData"
 import { renderSuccessfulUseLoadEventDetails } from "./TestHelpers"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 
@@ -35,19 +38,13 @@ describe("JoinEvent tests", () => {
     const env = {
       joinEvent: jest.fn(),
       monitor: TrueRegionMonitor,
-      onSuccess: jest.fn(),
       loadPermissions: jest.fn()
     }
 
     const TEST_EVENT = {
       ...EventMocks.PickupBasketball,
       id: 1,
-      location: {
-        coordinate: mockLocationCoordinate2D(),
-        arrivalRadiusMeters: 50,
-        isInArrivalTrackingPeriod: true,
-        placemark: null
-      },
+      location: mockEventLocation(),
       userAttendeeStatus: "not-participating"
     } as const
 
@@ -109,10 +106,8 @@ describe("JoinEvent tests", () => {
         })
       })
 
-      expect(env.onSuccess).not.toHaveBeenCalled()
       act(() => (result.current as any).requestButtonTapped())
       await waitFor(() => expect(result.current).toEqual({ stage: "success" }))
-      expect(env.onSuccess).toHaveBeenCalledTimes(1)
     })
 
     test("join event flow, skips false permissions", async () => {
@@ -141,7 +136,6 @@ describe("JoinEvent tests", () => {
       await waitFor(() => {
         expect(result.current).toEqual({ stage: "success" })
       })
-      expect(env.onSuccess).toHaveBeenCalledTimes(1)
     })
 
     test("join event flow, dismiss permissions", async () => {
@@ -163,10 +157,8 @@ describe("JoinEvent tests", () => {
         permissionKind: "backgroundLocation"
       })
 
-      expect(env.onSuccess).not.toHaveBeenCalled()
       act(() => (result.current as any).dismissButtonTapped())
       expect(result.current).toEqual({ stage: "success" })
-      expect(env.onSuccess).toHaveBeenCalledTimes(1)
     })
 
     test("join event flow, error alerts", async () => {

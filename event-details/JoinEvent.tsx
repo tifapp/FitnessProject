@@ -167,7 +167,6 @@ export type UseJoinEventEnvironment = {
   monitor: EventRegionMonitor
   joinEvent: (request: JoinEventRequest) => Promise<JoinEventResult>
   loadPermissions: () => Promise<JoinEventPermission[]>
-  onSuccess: () => void
 }
 
 export type UseJoinEventPermissionStage = {
@@ -225,10 +224,6 @@ export const useJoinEventStages = (
   const hasJoined =
     joinEventMutation.isSuccess && joinEventMutation.data === "success"
   const isSuccess = hasJoined && currentPermission === "done"
-
-  useEffect(() => {
-    if (isSuccess) onSuccess()
-  }, [isSuccess, onSuccess])
 
   if (hasJoined && typeof currentPermission === "object") {
     return { stage: "permission", ...currentPermission }
