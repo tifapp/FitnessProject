@@ -15,7 +15,7 @@
     "set_api_local": "node setEnv.js LOCAL_API_URL",
     "prepare": "husky install",
     "eas-build-pre-install": "node easprebuild.mjs",
-    "eas-build-post-install": "node easbuild.mjs",
+    "eas-build-post-install": "node easbuild.mjs create",
     "eas-build-on-success": "node easbuild.mjs success",
     "eas-build-on-error": "node easbuild.mjs failure",
     "eas-build-on-cancel": "node easbuild.mjs cancelled",
