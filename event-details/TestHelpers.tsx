@@ -5,9 +5,10 @@ import {
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { renderHook } from "@testing-library/react-native"
 import { useLoadEventDetails } from "./Details"
-import { EventID } from "@shared-models/Event"
+import { CurrentUserEvent, EventID } from "@shared-models/Event"
 import { EventDetailsLoadingResult } from "./Query"
 import { QueryClient } from "@tanstack/react-query"
+import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 
 export const renderUseLoadEventDetails = (
   eventId: EventID,
@@ -27,5 +28,17 @@ export const renderUseLoadEventDetails = (
         </InternetConnectionStatusProvider>
       )
     }
+  )
+}
+
+export const renderSuccessfulUseLoadEventDetails = (
+  event: CurrentUserEvent,
+  queryClient: QueryClient
+) => {
+  return renderUseLoadEventDetails(
+    event.id,
+    new TestInternetConnectionStatus(true),
+    async () => ({ status: "success", event }),
+    queryClient
   )
 }
