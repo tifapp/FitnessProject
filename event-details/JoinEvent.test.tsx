@@ -9,7 +9,10 @@ import {
 } from "./JoinEvent"
 import { renderHook, waitFor } from "@testing-library/react-native"
 import { act } from "react-test-renderer"
-import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import {
+  TestQueryClientProvider,
+  createTestQueryClient
+} from "@test-helpers/ReactQuery"
 import { mockLocationCoordinate2D, mockTiFLocation } from "@location/MockData"
 import "@test-helpers/Matchers"
 import { TrueRegionMonitor } from "./arrival-tracking/region-monitoring/MockRegionMonitors"
@@ -19,11 +22,15 @@ import { mswServer } from "@test-helpers/msw"
 import { http, HttpResponse } from "msw"
 import { TiFAPI } from "@api-client/TiFAPI"
 import { mockEventRegion } from "./arrival-tracking/MockData"
-import { mockEventChatTokenRequest } from "./MockData"
+import { EventMocks, mockEventChatTokenRequest } from "./MockData"
+import { CurrentUserEvent } from "@shared-models/Event"
+import { renderSuccessfulUseLoadEventDetails } from "./TestHelpers"
+import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 
 describe("JoinEvent tests", () => {
   describe("UseJoinEvent tests", () => {
     const { alertPresentationSpy } = captureAlerts()
+    const queryClient = createTestQueryClient()
 
     const env = {
       joinEvent: jest.fn(),
@@ -33,32 +40,42 @@ describe("JoinEvent tests", () => {
     }
 
     const TEST_EVENT = {
+      ...EventMocks.PickupBasketball,
       id: 1,
       location: {
         coordinate: mockLocationCoordinate2D(),
         arrivalRadiusMeters: 50,
         isInArrivalTrackingPeriod: true,
         placemark: null
+      },
+      userAttendeeStatus: "not-participating"
+    } as const
+
+    const NON_REQUESTABLE_PERMISSIONS = [
+      {
+        kind: "notifications",
+        canRequestPermission: false,
+        requestPermission: jest.fn().mockResolvedValueOnce(true)
+      },
+      {
+        kind: "backgroundLocation",
+        canRequestPermission: false,
+        requestPermission: jest.fn().mockResolvedValueOnce(true)
       }
-    }
+    ] as const
+
+    const REQUESTABLE_PERMISSIONS = NON_REQUESTABLE_PERMISSIONS.map((p) => ({
+      ...p,
+      canRequestPermission: true
+    }))
 
     beforeEach(() => {
       Object.values(env).forEach((m) => "mockReset" in m && m.mockReset())
+      queryClient.clear()
     })
 
     test("join event flow, all permissions requested", async () => {
-      env.loadPermissions.mockResolvedValueOnce([
-        {
-          kind: "notifications",
-          canRequestPermission: true,
-          requestPermission: jest.fn().mockResolvedValueOnce(true)
-        },
-        {
-          kind: "backgroundLocation",
-          canRequestPermission: true,
-          requestPermission: jest.fn().mockResolvedValueOnce(true)
-        }
-      ])
+      env.loadPermissions.mockResolvedValueOnce(REQUESTABLE_PERMISSIONS)
       let resolveJoin: ((result: JoinEventResult) => void) | undefined
       const joinPromise = new Promise<JoinEventResult>(
         (resolve) => (resolveJoin = resolve)
@@ -100,16 +117,8 @@ describe("JoinEvent tests", () => {
 
     test("join event flow, skips false permissions", async () => {
       env.loadPermissions.mockResolvedValueOnce([
-        {
-          kind: "notifications",
-          canRequestPermission: false,
-          requestPermission: jest.fn().mockResolvedValueOnce(true)
-        },
-        {
-          kind: "backgroundLocation",
-          canRequestPermission: true,
-          requestPermission: jest.fn().mockResolvedValueOnce(true)
-        }
+        NON_REQUESTABLE_PERMISSIONS[0],
+        { ...NON_REQUESTABLE_PERMISSIONS[1], canRequestPermission: true }
       ])
       env.joinEvent.mockResolvedValueOnce("success")
       const { result } = renderUseJoinEvent()
@@ -124,18 +133,7 @@ describe("JoinEvent tests", () => {
     })
 
     test("join event flow, no permissions requested", async () => {
-      env.loadPermissions.mockResolvedValueOnce([
-        {
-          kind: "notifications",
-          canRequestPermission: false,
-          requestPermission: jest.fn().mockResolvedValueOnce(true)
-        },
-        {
-          kind: "backgroundLocation",
-          canRequestPermission: false,
-          requestPermission: jest.fn().mockResolvedValueOnce(true)
-        }
-      ])
+      env.loadPermissions.mockResolvedValueOnce(NON_REQUESTABLE_PERMISSIONS)
       env.joinEvent.mockResolvedValueOnce("success")
       const { result } = renderUseJoinEvent()
 
@@ -147,18 +145,7 @@ describe("JoinEvent tests", () => {
     })
 
     test("join event flow, dismiss permissions", async () => {
-      env.loadPermissions.mockResolvedValueOnce([
-        {
-          kind: "notifications",
-          canRequestPermission: true,
-          requestPermission: jest.fn().mockResolvedValueOnce(true)
-        },
-        {
-          kind: "backgroundLocation",
-          canRequestPermission: true,
-          requestPermission: jest.fn().mockResolvedValueOnce(true)
-        }
-      ])
+      env.loadPermissions.mockResolvedValueOnce(REQUESTABLE_PERMISSIONS)
       env.joinEvent.mockResolvedValueOnce("success")
       const { result } = renderUseJoinEvent()
 
@@ -199,6 +186,42 @@ describe("JoinEvent tests", () => {
       await expectErrorAlertState(result, 4, "generic")
     })
 
+    it("should update the details hook when joining an event successfully", async () => {
+      env.loadPermissions.mockResolvedValueOnce(NON_REQUESTABLE_PERMISSIONS)
+      env.joinEvent.mockResolvedValueOnce("success")
+      const { result: eventDetailsResult } = renderUseEventDetails()
+      const { result: joinEventResult } = renderUseJoinEvent()
+      await waitFor(() => {
+        expect(eventDetailsResult.current).toMatchObject({
+          event: { userAttendeeStatus: "not-participating" }
+        })
+      })
+      act(() => (joinEventResult.current as any).joinButtonTapped())
+      await waitFor(() => {
+        expect(eventDetailsResult.current).toMatchObject({
+          event: { userAttendeeStatus: "attending" }
+        })
+      })
+    })
+
+    it("should not update the details hook when joining an event unsuccessfully", async () => {
+      env.loadPermissions.mockResolvedValueOnce(NON_REQUESTABLE_PERMISSIONS)
+      env.joinEvent.mockResolvedValueOnce("event-has-ended")
+      const { result: eventDetailsResult } = renderUseEventDetails()
+      const { result: joinEventResult } = renderUseJoinEvent()
+      await waitFor(() => {
+        expect(eventDetailsResult.current).toMatchObject({
+          event: { userAttendeeStatus: "not-participating" }
+        })
+      })
+      act(() => (joinEventResult.current as any).joinButtonTapped())
+      await verifyNeverOccurs(() => {
+        expect(eventDetailsResult.current).toMatchObject({
+          event: { userAttendeeStatus: "attending" }
+        })
+      })
+    })
+
     const expectErrorAlertState = async (
       result: { current: ReturnType<typeof useJoinEventStages> },
       callIndex: number,
@@ -218,10 +241,16 @@ describe("JoinEvent tests", () => {
       })
     }
 
+    const renderUseEventDetails = () => {
+      return renderSuccessfulUseLoadEventDetails(TEST_EVENT, queryClient)
+    }
+
     const renderUseJoinEvent = () => {
       return renderHook(() => useJoinEventStages(TEST_EVENT, env), {
         wrapper: ({ children }: any) => (
-          <TestQueryClientProvider>{children}</TestQueryClientProvider>
+          <TestQueryClientProvider client={queryClient}>
+            {children}
+          </TestQueryClientProvider>
         )
       })
     }

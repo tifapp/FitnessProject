@@ -12,7 +12,10 @@ import {
   TestQueryClientProvider,
   createTestQueryClient
 } from "@test-helpers/ReactQuery"
-import { renderUseLoadEventDetails } from "./TestHelpers"
+import {
+  renderUseLoadEventDetails,
+  renderSuccessfulUseLoadEventDetails
+} from "./TestHelpers"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 import { CloudDirectory } from "aws-sdk"
 import { Faker } from "@faker-js/faker"
@@ -218,12 +221,7 @@ describe("EventDetailsMenu tests", () => {
     }
 
     const renderUseEventDetails = (event: CurrentUserEvent) => {
-      return renderUseLoadEventDetails(
-        event.id,
-        new TestInternetConnectionStatus(true),
-        async () => ({ status: "success", event }),
-        queryClient
-      )
+      return renderSuccessfulUseLoadEventDetails(event, queryClient)
     }
 
     const renderUseEventDetailsMenuActions = (event: CurrentUserEvent) => {

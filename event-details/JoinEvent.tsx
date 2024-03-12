@@ -1,7 +1,7 @@
 import { PrimaryButton } from "@components/Buttons"
 import { EventRegionMonitor, useHasArrivedAtRegion } from "./arrival-tracking"
 import { CurrentUserEvent, EventLocation } from "@shared-models/Event"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   getBackgroundPermissionsAsync as getBackgroundLocationPermissions,
   requestBackgroundPermissionsAsync as requestBackgroundLocationPermissions
@@ -26,6 +26,7 @@ import {
 import { TiFAPI } from "@api-client/TiFAPI"
 import { RecentLocationsStorage } from "@location/search"
 import { JoinEventResponse } from "@shared-models/JoinEvent"
+import { updateEventDetailsQueryEvent } from "./Query"
 
 export const JOIN_EVENT_ERROR_ALERTS = {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -204,11 +205,19 @@ export const useJoinEventStages = (
   const { onSuccess, loadPermissions, joinEvent, monitor } = env
   const hasArrived = useHasArrivedAtRegion(event.location, monitor)
   const currentPermission = useCurrentJoinEventPermission(loadPermissions)
+  const queryClient = useQueryClient()
   const joinEventMutation = useMutation(
     async () => await joinEvent({ ...event, hasArrived }),
     {
       onSuccess: (status) => {
-        if (status !== "success") presentErrorAlert(status)
+        if (status !== "success") {
+          presentErrorAlert(status)
+        } else {
+          updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({
+            ...e,
+            userAttendeeStatus: "attending"
+          }))
+        }
       },
       onError: () => presentErrorAlert("generic")
     }
