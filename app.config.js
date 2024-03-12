@@ -52,7 +52,7 @@ const config = {
     [
       "@sentry/react-native/expo",
       {
-        url: "https://tif-a7.sentry.io//",
+        url: "https://sentry.io",
         organization: "tif-a7",
         project: "react-native"
       }
