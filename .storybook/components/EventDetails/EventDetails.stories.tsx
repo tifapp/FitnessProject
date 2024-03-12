@@ -9,7 +9,7 @@ import {
 } from "@event-details/MockData"
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 import { mockPlacemark } from "@location/MockData"
-import { setupFocusRefreshes } from "@lib/ReactQuery"
+import { TiFQueryClientProvider, setupFocusRefreshes } from "@lib/ReactQuery"
 import { EventDetailsView, useLoadEventDetails } from "@event-details/Details"
 import { EventDetailsEnvironmentProvider } from "@event-details/Environment"
 import { faker } from "@faker-js/faker"
@@ -17,6 +17,8 @@ import { ColorString } from "@lib/utils/Color"
 import { sleep } from "@lib/utils/DelayData"
 import { createTestQueryClient } from "@test-helpers/ReactQuery"
 import { QueryClientProvider } from "@tanstack/react-query"
+import { UserSessionProvider } from "@lib/UserSession"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -36,20 +38,19 @@ const location = {
 
 setupFocusRefreshes()
 
-const queryClient = createTestQueryClient()
-
 export const Basic: EventDetailsStory = () => {
-  useEffect(() => {
-    queryClient.resetQueries()
-  }, [])
   return (
     <SafeAreaProvider>
       <SafeAreaView edges={["top"]}>
-        <QueryClientProvider client={queryClient}>
-          <BottomSheetModalProvider>
-            <Test />
-          </BottomSheetModalProvider>
-        </QueryClientProvider>
+        <TiFQueryClientProvider>
+          <UserSessionProvider isSignedIn={async () => true}>
+            <GestureHandlerRootView>
+              <BottomSheetModalProvider>
+                <Test />
+              </BottomSheetModalProvider>
+            </GestureHandlerRootView>
+          </UserSessionProvider>
+        </TiFQueryClientProvider>
       </SafeAreaView>
     </SafeAreaProvider>
   )
@@ -66,6 +67,7 @@ const Test = () => {
       status: "success",
       event: {
         ...EventMocks.PickupBasketball,
+        id: 1,
         host: {
           ...host,
           relations: { themToYou: "current-user", youToThem: "current-user" }
@@ -73,12 +75,18 @@ const Test = () => {
         location: { ...location, placemark: mockPlacemark() },
         title: faker.name.jobArea(),
         color: ColorString.parse("#345995")!,
-        description: "Hello world"
+        description: "Hello world",
+        userAttendeeStatus: "not-participating"
       }
     }
   })
   return (
-    <EventDetailsEnvironmentProvider>
+    <EventDetailsEnvironmentProvider
+      joinEvent={async () => {
+        await sleep(3000)
+        return "success"
+      }}
+    >
       <EventDetailsView
         result={result}
         onUserHandleTapped={console.log}

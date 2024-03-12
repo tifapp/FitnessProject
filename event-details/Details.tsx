@@ -14,7 +14,8 @@ import {
   ViewStyle,
   StyleSheet,
   ScrollView,
-  RefreshControl
+  RefreshControl,
+  LayoutRectangle
 } from "react-native"
 import { BodyText, Headline, Subtitle, Title } from "@components/Text"
 import { ArrayUtils } from "@lib/utils/Array"
@@ -52,6 +53,12 @@ import { useEventSecondsToStart } from "./SecondsToStart"
 import { isAttendingEvent } from "./Event"
 import { FontScaleFactors } from "@lib/Fonts"
 import { EventDetailsLoadingResult, useEventDetailsQuery } from "./Query"
+import { EventCountdownView, eventCountdown } from "./Countdown"
+import { useIsSignedIn } from "@lib/UserSession"
+import { AuthBannerButton } from "@components/AuthBanner"
+import { JoinEventStagesView, useJoinEventStages } from "./JoinEvent"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { useScreenBottomPadding } from "@components/Padding"
 
 /**
  * Loads the event details from the server.
@@ -234,43 +241,55 @@ const SuccessView = ({
   refreshStatus,
   onPullToRefresh,
   style
-}: SuccessProps) => (
-  <ScrollView
-    style={style}
-    refreshControl={
-      <RefreshControl
-        onRefresh={onPullToRefresh}
-        refreshing={refreshStatus === "loading"}
-      />
-    }
-    contentContainerStyle={styles.detailContent}
-  >
-    <Title>{event.title}</Title>
-    <DetailSectionView>
-      <EventDetailsHostView
-        host={event.host}
-        onHostTapped={onUserHandleTapped}
-        onEditEventTapped={onEditEventTapped}
-        onFriendButtonTapped={() => console.log("TODO: Friend Logic")}
-      />
-    </DetailSectionView>
-    <ArrivalBannerSectionView event={event} />
-    <DetailSectionView title="Details">
-      {/* TODO: - Widgets */}
-      <View style={styles.detailWidgetsPlaceholder} />
-    </DetailSectionView>
-    <DetailSectionView title="Description">
-      <ExpandableContentText
-        text={event.description}
-        collapsedLineLimit={3}
-        onUserHandleTapped={onUserHandleTapped}
-        onEventHandleTapped={onEventHandleTapped}
-      />
-    </DetailSectionView>
-    <LocationSectionView event={event} />
-    <View style={{ marginBottom: 48 }} />
-  </ScrollView>
-)
+}: SuccessProps) => {
+  const [footerLayout, setFooterLayout] = useState<LayoutRectangle>()
+  return (
+    <View style={[style, styles.detailsContainer]}>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            onRefresh={onPullToRefresh}
+            refreshing={refreshStatus === "loading"}
+          />
+        }
+        contentContainerStyle={styles.detailContent}
+      >
+        <Title>{event.title}</Title>
+        <DetailSectionView>
+          <EventDetailsHostView
+            host={event.host}
+            onHostTapped={onUserHandleTapped}
+            onEditEventTapped={onEditEventTapped}
+            onFriendButtonTapped={() => console.log("TODO: Friend Logic")}
+          />
+        </DetailSectionView>
+        <ArrivalBannerSectionView event={event} />
+        <DetailSectionView title="Details">
+          {/* TODO: - Widgets */}
+          <View style={styles.detailWidgetsPlaceholder} />
+        </DetailSectionView>
+        <DetailSectionView title="Description">
+          <ExpandableContentText
+            text={event.description}
+            collapsedLineLimit={3}
+            onUserHandleTapped={onUserHandleTapped}
+            onEventHandleTapped={onEventHandleTapped}
+          />
+        </DetailSectionView>
+        <LocationSectionView event={event} />
+        {/* NB: This empty view adds bottom padding due to the rowGap style. */}
+        <View />
+      </ScrollView>
+      <View style={{ marginBottom: footerLayout?.height ?? 0 }} />
+      <View
+        onLayout={(e) => setFooterLayout(e.nativeEvent.layout)}
+        style={styles.footer}
+      >
+        <DetailsFooterView event={event} />
+      </View>
+    </View>
+  )
+}
 
 const ArrivalBannerSectionView = ({ event }: { event: CurrentUserEvent }) => {
   const { isShowing, close } = useIsShowingEventArrivalBanner(
@@ -343,6 +362,71 @@ const DetailSectionView = ({ title, children }: DetailSectionProps) => (
     {title && <Subtitle>{title}</Subtitle>}
     {children}
   </Animated.View>
+)
+
+type DetailsFooterProps = {
+  event: CurrentUserEvent
+  style?: StyleProp<ViewStyle>
+}
+
+const DetailsFooterView = ({ event, style }: DetailsFooterProps) => {
+  const bottomPadding = useScreenBottomPadding({
+    safeAreaScreens: 8,
+    nonSafeAreaScreens: 24
+  })
+  const marginBottom = useSafeAreaInsets().bottom + bottomPadding
+  return (
+    <View style={style}>
+      <View
+        style={[
+          styles.footerRow,
+          {
+            marginBottom,
+            alignItems: !isAttendingEvent(event.userAttendeeStatus)
+              ? "flex-end"
+              : "center"
+          }
+        ]}
+      >
+        <CountdownView event={event} />
+        {useIsSignedIn() ? (
+          !isAttendingEvent(event.userAttendeeStatus) ? (
+            <JoinButtonView event={event} />
+          ) : (
+            <Headline>Leave Event</Headline>
+          )
+        ) : (
+          <AuthBannerButton
+            onSignInTapped={() => console.log("TODO")}
+            onSignUpTapped={() => console.log("TODO")}
+          >
+            Join Now
+          </AuthBannerButton>
+        )}
+      </View>
+    </View>
+  )
+}
+
+const JoinButtonView = ({ event }: { event: CurrentUserEvent }) => {
+  const { regionMonitor, joinEvent, joinEventPermissions } =
+    useEventDetailsEnvironment()
+  const stage = useJoinEventStages(event, {
+    monitor: regionMonitor,
+    joinEvent,
+    loadPermissions: joinEventPermissions
+  })
+  return <JoinEventStagesView stage={stage} />
+}
+
+const CountdownView = ({ event }: { event: CurrentUserEvent }) => (
+  <EventCountdownView
+    countdown={eventCountdown(
+      useEventSecondsToStart(event.time),
+      event.time.dateRange,
+      event.time.todayOrTomorrow
+    )}
+  />
 )
 
 const LoadingTitleView = ({ title }: { title: string }) => {
@@ -664,6 +748,9 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%"
   },
+  detailsContainer: {
+    position: "relative"
+  },
   detailContent: {
     paddingHorizontal: 24,
     rowGap: 32
@@ -686,5 +773,20 @@ const styles = StyleSheet.create({
     marginRight: 24,
     flex: 1,
     rowGap: 4
+  },
+  footer: {
+    position: "absolute",
+    width: "100%",
+    flex: 1,
+    backgroundColor: "white",
+    bottom: 0
+  },
+  footerRow: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    paddingHorizontal: 24,
+    paddingTop: 8
   }
 })
