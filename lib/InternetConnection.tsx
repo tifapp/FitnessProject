@@ -24,10 +24,13 @@ export interface InternetConnectionStatus {
  * An {@link InternetConnectionStatus} using netinfo.
  */
 export class NetInfoInternetConnectionStatus
-implements InternetConnectionStatus {
+  implements InternetConnectionStatus
+{
+  static readonly shared = new NetInfoInternetConnectionStatus()
+
   private _isConnected = true
 
-  subscribe (
+  subscribe(
     callback: (isConnected: boolean) => void
   ): InternetConnectionStatusUnsubscribe {
     return addEventListener((state) => {
@@ -36,13 +39,13 @@ implements InternetConnectionStatus {
     })
   }
 
-  get isConnected () {
+  get isConnected() {
     return this._isConnected
   }
 }
 
 const InternetConnectionContext = createContext<InternetConnectionStatus>(
-  new NetInfoInternetConnectionStatus()
+  NetInfoInternetConnectionStatus.shared
 )
 
 export type InternetConnectionStatusProviderProps = {

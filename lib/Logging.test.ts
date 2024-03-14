@@ -1,248 +1,113 @@
 import {
-  RotatingFileLogsConfig,
-  RotatingFileLogs,
+  SQLiteLogMessage,
   addLogHandler,
   createLogFunction,
-  formatLogMessage,
   resetLogHandlers,
   sentryBreadcrumbLogHandler,
-  sentryErrorCapturingLogHandler
+  sentryErrorCapturingLogHandler,
+  sqliteLogHandler
 } from "@lib/Logging"
-import { TestFilesystem } from "@test-helpers/Filesystem"
+import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 import { fakeTimers } from "@test-helpers/Timers"
+import { waitFor } from "@testing-library/react-native"
+import { dayjs } from "@date-time"
 
 describe("Logging tests", () => {
   fakeTimers()
   afterEach(() => resetLogHandlers())
 
-  describe("RotatingFilesystemLogs tests", () => {
-    const TEST_DIRECTORY = "test"
-    const testLogFileName = (name: string) => {
-      return `${TEST_DIRECTORY}/${name}.log`
+  describe("SQLiteLogHandler tests", () => {
+    resetTestSQLiteBeforeEach()
+    const label = "sqlite.log.handler.test"
+    const log = createLogFunction(label)
+
+    beforeEach(() => {
+      addLogHandler(
+        sqliteLogHandler(testSQLite, dayjs.duration(2, "w").asSeconds())
+      )
+    })
+
+    it("should store log messages in sqlite", async () => {
+      const metadata = { hello: "world", num: 1 }
+      log("debug", "Debug message")
+      log("info", "Info message")
+      log("warn", "Warning message")
+      log("error", "Error message")
+      log("info", "With metadata", metadata)
+
+      await waitFor(async () => {
+        expect(await allLogs()).toEqual([
+          expect.objectContaining({
+            id: 1,
+            label,
+            level: "debug",
+            message: "Debug message",
+            stringifiedMetadata: null
+          }),
+          expect.objectContaining({
+            id: 2,
+            label,
+            level: "info",
+            message: "Info message",
+            stringifiedMetadata: null
+          }),
+          expect.objectContaining({
+            id: 3,
+            label,
+            level: "warn",
+            message: "Warning message",
+            stringifiedMetadata: null
+          }),
+          expect.objectContaining({
+            id: 4,
+            label,
+            level: "error",
+            message: "Error message",
+            stringifiedMetadata: null
+          }),
+          expect.objectContaining({
+            id: 5,
+            label,
+            level: "info",
+            message: "With metadata",
+            stringifiedMetadata: JSON.stringify(metadata)
+          })
+        ])
+      })
+    })
+
+    it("should purge any logs that are older than the test time threshold", async () => {
+      await testSQLite.withTransaction(async (db) => {
+        await db.run`
+        INSERT INTO Logs (
+          label,
+          level,
+          message,
+          stringifiedMetadata,
+          timestamp
+        ) VALUES (
+          'test.old.message', 
+          'debug',
+          'A test really old log message',
+          NULL,
+          0
+        )
+        `
+      })
+      log("info", "Test")
+      await waitFor(async () => {
+        const logs = await allLogs()
+        expect(logs).toHaveLength(1)
+        expect(logs[0].level).toEqual("info")
+        expect(logs[0].timestamp).toBeGreaterThan(0)
+      })
+    })
+
+    const allLogs = async () => {
+      return await testSQLite.withTransaction(async (db) => {
+        return await db.queryAll<SQLiteLogMessage>`SELECT * FROM Logs`
+      })
     }
-
-    const fs = TestFilesystem.create()
-    const log = createLogFunction("rotating.filesystem.test")
-
-    const TWO_WEEKS_MILLIS = 1000 * 60 * 60 * 24 * 14
-
-    const TEST_LOG_FILES_CONFIG = {
-      directoryPath: TEST_DIRECTORY,
-      maxFiles: 5,
-      rotatingIntervalMillis: TWO_WEEKS_MILLIS,
-      format: formatLogMessage
-    }
-
-    const setupRotatingFileLogsWithDate = (
-      date: Date,
-      config: RotatingFileLogsConfig = TEST_LOG_FILES_CONFIG
-    ) => {
-      jest.setSystemTime(date)
-      const fsLogs = new RotatingFileLogs(config, fs)
-      addLogHandler(fsLogs.logHandler)
-      return fsLogs
-    }
-
-    const resetToNewRotatingFileLogsWithDate = async (
-      fsLogs: RotatingFileLogs,
-      date: Date,
-      config: RotatingFileLogsConfig = TEST_LOG_FILES_CONFIG
-    ) => {
-      await fsLogs.flush()
-      resetLogHandlers()
-      return setupRotatingFileLogsWithDate(date, config)
-    }
-
-    it("should batch write logs when flushing", async () => {
-      const fsLogs = setupRotatingFileLogsWithDate(
-        new Date("2022-11-24T00:00:03.000Z")
-      )
-      log("info", "Test message", { a: 1, b: "hello" })
-
-      jest.setSystemTime(new Date("2022-11-24T00:00:05.000Z"))
-      log("error", "Test message", { a: 2, b: "world", c: { d: true } })
-
-      let logData = fs.readString(testLogFileName("2022-11-24T00:00:03.000Z"))
-      expect(logData).toBeUndefined()
-
-      await fsLogs.flush()
-
-      logData = fs.readString(testLogFileName("2022-11-24T00:00:03.000Z"))
-      expect(logData).toEqual(
-        `2022-11-24T00:00:03.000Z [rotating.filesystem.test] (INFO 🔵) Test message {"a":1,"b":"hello"}
-2022-11-24T00:00:05.000Z [rotating.filesystem.test] (ERROR 🔴) Test message {"a":2,"b":"world","c":{"d":true}}
-`
-      )
-
-      jest.setSystemTime(new Date("2022-11-24T00:01:12.000Z"))
-      log("error", "Test message 2")
-
-      await fsLogs.flush()
-
-      logData = fs.readString(testLogFileName("2022-11-24T00:00:03.000Z"))
-      expect(logData).toEqual(
-        `2022-11-24T00:00:03.000Z [rotating.filesystem.test] (INFO 🔵) Test message {"a":1,"b":"hello"}
-2022-11-24T00:00:05.000Z [rotating.filesystem.test] (ERROR 🔴) Test message {"a":2,"b":"world","c":{"d":true}}
-2022-11-24T00:01:12.000Z [rotating.filesystem.test] (ERROR 🔴) Test message 2
-`
-      )
-    })
-
-    it("should write to the same logfile if the difference between the last log < 2 weeks", async () => {
-      let fsLogs = setupRotatingFileLogsWithDate(
-        new Date("2022-11-24T00:00:03.000Z")
-      )
-      log("info", "Test message", { a: 1, b: "hello" })
-
-      fsLogs = await resetToNewRotatingFileLogsWithDate(
-        fsLogs,
-        new Date("2022-11-26T00:00:05.000Z")
-      )
-      log("error", "Test message", { a: 2, b: "world", c: { d: true } })
-
-      await fsLogs.flush()
-
-      const logData = fs.readString(testLogFileName("2022-11-24T00:00:03.000Z"))
-      expect(logData).toEqual(
-        `2022-11-24T00:00:03.000Z [rotating.filesystem.test] (INFO 🔵) Test message {"a":1,"b":"hello"}
-2022-11-26T00:00:05.000Z [rotating.filesystem.test] (ERROR 🔴) Test message {"a":2,"b":"world","c":{"d":true}}
-`
-      )
-    })
-
-    it("should not write DEBUG level logs to log file", async () => {
-      const fsLogs = setupRotatingFileLogsWithDate(
-        new Date("2022-11-24T00:00:03.000Z")
-      )
-
-      log("debug", "Test message")
-
-      await fsLogs.flush()
-
-      expect(
-        fs.readString(testLogFileName("2022-11-24T00:00:03.000Z"))
-      ).toBeUndefined()
-    })
-
-    it("should ignore random filenames when logging to new file", async () => {
-      await fs.appendString(`${TEST_DIRECTORY}/hello.txt`, "Hello")
-      let fsLogs = setupRotatingFileLogsWithDate(
-        new Date("2022-11-24T00:00:03.000Z")
-      )
-
-      log("info", "test")
-
-      fsLogs = await resetToNewRotatingFileLogsWithDate(
-        fsLogs,
-        new Date("2022-11-24T00:12:52.000Z")
-      )
-      log("info", "test 2")
-
-      await fsLogs.flush()
-
-      const logData = fs.readString(testLogFileName("2022-11-24T00:00:03.000Z"))
-      expect(logData).toEqual(
-        `2022-11-24T00:00:03.000Z [rotating.filesystem.test] (INFO 🔵) test
-2022-11-24T00:12:52.000Z [rotating.filesystem.test] (INFO 🔵) test 2
-`
-      )
-    })
-
-    it("should create another log file when writing to a log 2 weeks later", async () => {
-      let fsLogs = setupRotatingFileLogsWithDate(
-        new Date("2022-11-24T00:00:03.000Z")
-      )
-      log("info", "Test message 1")
-
-      fsLogs = await resetToNewRotatingFileLogsWithDate(
-        fsLogs,
-        new Date("2022-12-09T00:00:03.000Z")
-      )
-      log("info", "Test message 2")
-
-      await fsLogs.flush()
-
-      const directoryContents = await fs.listDirectoryContents(TEST_DIRECTORY)
-      expect(directoryContents).toEqual([
-        "2022-11-24T00:00:03.000Z.log",
-        "2022-12-09T00:00:03.000Z.log"
-      ])
-
-      const file1Logs = fs.readString(
-        testLogFileName("2022-11-24T00:00:03.000Z")
-      )
-      const file2Logs = fs.readString(
-        testLogFileName("2022-12-09T00:00:03.000Z")
-      )
-      expect(file1Logs).toEqual(
-        "2022-11-24T00:00:03.000Z [rotating.filesystem.test] (INFO 🔵) Test message 1\n"
-      )
-      expect(file2Logs).toEqual(
-        "2022-12-09T00:00:03.000Z [rotating.filesystem.test] (INFO 🔵) Test message 2\n"
-      )
-    })
-
-    it("should purge the oldest log file when more than 2 log files", async () => {
-      const config = { ...TEST_LOG_FILES_CONFIG, maxFiles: 2 }
-      let fsLogs = setupRotatingFileLogsWithDate(
-        new Date("2023-01-01T00:00:00.000Z"),
-        config
-      )
-      log("info", "Test message 1")
-
-      fsLogs = await resetToNewRotatingFileLogsWithDate(
-        fsLogs,
-        new Date("2023-01-15T00:00:00.000Z"),
-        config
-      )
-      log("info", "Test message 2")
-
-      fsLogs = await resetToNewRotatingFileLogsWithDate(
-        fsLogs,
-        new Date("2023-01-29T00:00:00.000Z"),
-        config
-      )
-      log("info", "Test message 3")
-
-      await fsLogs.flush()
-
-      const directoryContents = await fs.listDirectoryContents(TEST_DIRECTORY)
-      expect(directoryContents).toEqual([
-        "2023-01-15T00:00:00.000Z.log",
-        "2023-01-29T00:00:00.000Z.log"
-      ])
-
-      const file1Logs = fs.readString(
-        testLogFileName("2023-01-15T00:00:00.000Z")
-      )
-      const file2Logs = fs.readString(
-        testLogFileName("2023-01-29T00:00:00.000Z")
-      )
-      expect(file1Logs).toEqual(
-        "2023-01-15T00:00:00.000Z [rotating.filesystem.test] (INFO 🔵) Test message 2\n"
-      )
-      expect(file2Logs).toEqual(
-        "2023-01-29T00:00:00.000Z [rotating.filesystem.test] (INFO 🔵) Test message 3\n"
-      )
-    })
-
-    it("should trim the number of log files to the maximum when logging to a the current file", async () => {
-      const config = { ...TEST_LOG_FILES_CONFIG, maxFiles: 1 }
-      const fsLogs = setupRotatingFileLogsWithDate(
-        new Date("2023-01-29T00:04:23.000Z"),
-        config
-      )
-      await fs.appendString(testLogFileName("2023-01-01T00:00:00.000Z"), "logs")
-      await fs.appendString(testLogFileName("2023-01-15T00:00:00.000Z"), "logs")
-      await fs.appendString(testLogFileName("2023-01-29T00:00:00.000Z"), "logs")
-
-      log("info", "wsjkadhbibhas")
-
-      await fsLogs.flush()
-
-      const directoryContents = await fs.listDirectoryContents(TEST_DIRECTORY)
-      expect(directoryContents).toEqual(["2023-01-29T00:00:00.000Z.log"])
-    })
   })
 
   describe("SentryBreadcrumbsLogHandler tests", () => {

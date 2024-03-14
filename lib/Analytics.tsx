@@ -42,25 +42,25 @@ export class MixpanelAnalytics implements Analytics {
 
   private readonly mixpanel: Mixpanel
 
-  private constructor () {
+  private constructor() {
     this.mixpanel = new Mixpanel(MIXPANEL_TOKEN, true)
     this.mixpanel.init()
   }
 
-  track (name: string, metadata?: AnalyticsMetadata) {
+  track(name: string, metadata?: AnalyticsMetadata) {
     this.mixpanel.track(name, metadata)
   }
 
-  optOut () {
+  optOut() {
     this.mixpanel.optOutTracking()
   }
 
-  optIn () {
+  optIn() {
     this.mixpanel.optInTracking()
   }
 }
 
-const AnalyticsContext = createContext<Analytics | undefined>(undefined)
+const AnalyticsContext = createContext<Analytics>(MixpanelAnalytics.shared)
 
 /**
  * Uses the current {@link Analytics} implementation provided by {@link AnalyticsProvider}.

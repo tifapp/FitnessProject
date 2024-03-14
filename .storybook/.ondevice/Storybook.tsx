@@ -1,8 +1,5 @@
-import { setupCognito } from "@auth/CognitoHelpers"
-import { InMemorySecureStore } from "@auth/CognitoSecureStorage"
 import React, { useState } from "react"
-import { Text, TouchableOpacity, View } from "react-native"
-import { FlatList } from "react-native-gesture-handler"
+import { FlatList, Text, TouchableOpacity, View } from "react-native"
 import { useAppFonts } from "../../lib/Fonts"
 
 // Import your stories
@@ -54,6 +51,8 @@ import TextFieldMeta, {
 import VerifcationCodeMeta, {
   Basic as VerifcationCodeBasic
 } from "../components/VerificationCode/VerifyCode.stories"
+import { setupCognito } from "@auth/CognitoHelpers"
+import { InMemorySecureStore } from "@auth/CognitoSecureStorage"
 
 setupCognito(new InMemorySecureStore())
 
@@ -156,7 +155,7 @@ const CustomStorybookUI = () => {
         <StoryComponent {...args} />
         <Text
           onPress={() => setSelectedStory(-1)}
-          style={{ position: "absolute", bottom: 10, left: 10 }}
+          style={{ position: "absolute", bottom: 30, left: 10 }}
         >
           Close
         </Text>

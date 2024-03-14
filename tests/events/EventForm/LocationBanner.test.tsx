@@ -3,12 +3,12 @@ import {
   EventFormLocationBanner,
   EventFormLocationInfo
 } from "@components/eventForm"
-import { render, screen, waitFor } from "@testing-library/react-native"
+import { GeocodingFunctionsProvider } from "@location/Geocoding"
+import { baseTestPlacemark } from "@location/MockData"
 import "@test-helpers/Matchers"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { baseTestPlacemark } from "@location/MockData"
+import { act, render, screen, waitFor } from "@testing-library/react-native"
 import { baseTestEventFormValues } from "./helpers"
-import { GeocodingFunctionsProvider } from "@location/Geocoding"
 
 const testLocation = baseTestEventFormValues.locationInfo.coordinates
 const testLocationName = baseTestPlacemark.name

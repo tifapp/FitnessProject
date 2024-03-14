@@ -1,18 +1,5 @@
 export namespace ArrayUtils {
   /**
-   * A typesafe way for removing all null/undefined values from an array.
-   */
-  export const removeOptionals = <T>(arr: (T | null | undefined)[]) => {
-    return arr.reduce((acc, curr) => (curr ? [...acc, curr] : acc), [])
-  }
-
-  /**
-   * Returns a random element from an array which has at least one element.
-   */
-  export const randomElement = <T>(arr: T[]) => {
-    return arr[Math.floor(Math.random() * arr.length)]
-  }
-  /**
    * Maps an array using a transform function, but removes any `null` or
    * `undefined` values from the array.
    */
@@ -45,4 +32,21 @@ export namespace ArrayUtils {
       return element
     })
   }
+
+  /**
+   * Returns a random element from an array which has at least one element.
+   */
+  export const randomElement = <T>(arr: T[]) => {
+    return arr[Math.floor(Math.random() * arr.length)]
+  }
 }
+
+// eslint-disable-next-line no-extend-native
+Array.prototype.with =
+  Array.prototype.with ||
+  function (index: number, element: any) {
+    return this.map((value: any, i: number) => {
+      if (index === i) return element
+      return value
+    })
+  }

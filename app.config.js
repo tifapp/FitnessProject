@@ -48,7 +48,18 @@ const config = {
       projectId: EXPO_PROJECT_ID
     }
   },
-  plugins: ["sentry-expo"],
+  plugins: [
+    [
+      "@sentry/react-native/expo",
+      {
+        url: "https://sentry.io",
+        organization: "tif-a7",
+        project: "react-native"
+      }
+    ],
+    "expo-font",
+    "expo-secure-store"
+  ],
   assetBundlePatterns: ["**/*"],
   ios: {
     bundleIdentifier,

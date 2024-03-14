@@ -3,6 +3,7 @@ import {
   MaterialCommunityIcons,
   MaterialIcons
 } from "@expo/vector-icons"
+import { AppStyles } from "@lib/AppColorStyle"
 import { useFontScale } from "@lib/Fonts"
 import React, { ComponentProps } from "react"
 import {
@@ -180,3 +181,58 @@ const circularStyles = StyleSheet.create({
     borderRadius: 32
   }
 })
+
+export type RoundedIoniconProps = CircularIoniconProps & {
+  borderRadius: number
+  size?: number
+}
+
+/**
+ * An ionicon wrapped in a rounded square with a border radius.
+ */
+export const RoundedIonicon = ({
+  backgroundColor,
+  borderRadius,
+  name,
+  size = DEFAULT_ICON_SIZE,
+  maximumFontScaleFactor,
+  style,
+  ...props
+}: RoundedIoniconProps) => {
+  const fontScale = useFontScale({
+    maximumScaleFactor: maximumFontScaleFactor
+  })
+  return (
+    <View style={{ borderRadius, backgroundColor }}>
+      <View style={{ padding: size * fontScale * (1 / 3) }}>
+        <Ionicon
+          {...props}
+          name={name}
+          size={size * fontScale}
+          maximumFontScaleFactor={maximumFontScaleFactor}
+          color={props.color}
+        />
+      </View>
+    </View>
+  )
+}
+
+export type IoniconCloseButtonProps = Omit<IconProps<"close">, "name"> &
+  TouchableOpacityProps
+
+/**
+ * A close button that uses the "close" Ionicon.
+ */
+export const IoniconCloseButton = ({
+  onPress,
+  ...props
+}: IoniconCloseButtonProps) => (
+  <TouchableOpacity {...props} onPress={onPress}>
+    <RoundedIonicon
+      {...props}
+      name="close"
+      borderRadius={32}
+      backgroundColor={AppStyles.eventCardColor}
+    />
+  </TouchableOpacity>
+)

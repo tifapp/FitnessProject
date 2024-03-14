@@ -1,24 +1,25 @@
+import { EventMocks } from "@event-details/MockData"
 import {
   mockExpoLocationObject,
   mockLocationCoordinate2D,
   mockRegion
 } from "@location/MockData"
+import { UserLocationFunctionsProvider } from "@location/UserLocation"
 import {
   ExploreEventsInitialCenter,
-  useExploreEvents,
   SAN_FRANCISCO_DEFAULT_REGION,
+  createDefaultMapRegion,
   createInitialCenter,
-  createDefaultMapRegion
+  useExploreEvents
 } from "@screens/ExploreEvents"
-import { act, renderHook, waitFor } from "@testing-library/react-native"
+import { eventDetailsQueryKey } from "@shared-models/query-keys/Event"
+import { endlessCancellable, nonCancellable } from "@test-helpers/Cancellable"
 import {
   TestQueryClientProvider,
   createTestQueryClient
 } from "@test-helpers/ReactQuery"
-import { UserLocationFunctionsProvider } from "@location/UserLocation"
-import { nonCancellable, endlessCancellable } from "@test-helpers/Cancellable"
-import { EventMocks } from "@event-details/MockData"
-import { fakeTimers } from "@test-helpers/Timers"
+import { timeTravel, fakeTimers } from "@test-helpers/Timers"
+import { act, renderHook, waitFor } from "@testing-library/react-native"
 
 const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
 
@@ -243,17 +244,17 @@ describe("ExploreEvents tests", () => {
       })
 
       await waitFor(() => {
-        expect(queryClient.getQueryData(["event", events[0].id])).toMatchObject(
-          events[0]
-        )
+        expect(
+          queryClient.getQueryData(eventDetailsQueryKey(events[0].id))
+        ).toMatchObject(events[0])
       })
-      expect(queryClient.getQueryData(["event", events[1].id])).toMatchObject(
-        events[1]
-      )
+      expect(
+        queryClient.getQueryData(eventDetailsQueryKey(events[1].id))
+      ).toMatchObject(events[1])
     })
 
     const advanceThroughRegionUpdateDebounce = () => {
-      act(() => jest.advanceTimersByTime(300))
+      act(() => timeTravel(300))
     }
 
     const requestForegroundPermissions = jest.fn()
@@ -274,7 +275,6 @@ describe("ExploreEvents tests", () => {
               <UserLocationFunctionsProvider
                 getCurrentLocation={queryUserCoordinates}
                 requestForegroundPermissions={requestForegroundPermissions}
-                requestBackgroundPermissions={jest.fn()}
               >
                 {children}
               </UserLocationFunctionsProvider>

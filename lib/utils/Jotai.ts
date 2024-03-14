@@ -1,42 +1,12 @@
 import { SetStateAction, atom } from "jotai"
-import AsyncStorage from "@react-native-async-storage/async-storage"
 
 export namespace JotaiUtils {
-  /**
-   * {@link atomWithStorage} but uses a default of {@link AsyncStorage}.
-   *
-   * Copied from: {@link https://jotai.org/docs/guides/persistence}
-   */
-  export const atomWithAsyncStorage = <Value>(
-    key: string,
-    initialValue: Value
-  ) => {
-    const baseAtom = atom<Value>(initialValue)
-    baseAtom.onMount = (setValue) => {
-      const loadInitial = async () => {
-        const item = await AsyncStorage.getItem(key)
-        if (item) setValue(JSON.parse(item))
-      }
-      loadInitial()
-    }
-    const derivedAtom = atom(
-      (get) => get(baseAtom),
-      (get, set, update) => {
-        const nextValue =
-          typeof update === "function" ? update(get(baseAtom)) : update
-        set(baseAtom, nextValue)
-        AsyncStorage.setItem(key, JSON.stringify(nextValue))
-      }
-    )
-    return derivedAtom
-  }
-
   /**
    * Creates a group of atoms that allow for debouncing operations.
    *
    * Copied from: {@link https://jotai.org/docs/recipes/atom-creators}
    */
-  export const debounceAtomGroup = <T>(
+  export const debounceAtomGroup = <T,>(
     initialValue: T,
     delayMilliseconds = 500,
     shouldDebounceOnReset = false

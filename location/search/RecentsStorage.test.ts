@@ -1,78 +1,57 @@
-import { mockTiFLocation } from "@location/MockData"
-import {
-  asyncStorageLoadRecentLocations,
-  asyncStorageLoadSpecificRecentLocations,
-  asyncStorageSaveRecentLocation
-} from "./RecentsStorage"
-import AsyncStorage from "@react-native-async-storage/async-storage"
-import { clearAsyncStorageBeforeEach } from "@test-helpers/AsyncStorage"
-
-const TEST_COORDINATES = { latitude: 41.1234, longitude: -121.1234 }
-const TEST_COORDINATES_STORAGE_KEY = "@location_9r3cgy29h"
+import { mockLocationCoordinate2D, mockTiFLocation } from "@location/MockData"
+import { SQLiteRecentLocationsStorage } from "./RecentsStorage"
+import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
+import { ArrayUtils } from "@lib/utils/Array"
+import { sleep } from "@lib/utils/DelayData"
 
 describe("RecentLocationStorage tests", () => {
-  clearAsyncStorageBeforeEach()
+  describe("SQLiteRecentLocations tests", () => {
+    resetTestSQLiteBeforeEach()
+    const storage = new SQLiteRecentLocationsStorage(testSQLite)
 
-  describe("AsyncStorageSaveRecentLocation tests", () => {
-    it("should save the location in async storage", async () => {
-      const location = mockTiFLocation(TEST_COORDINATES)
+    it("should return no recent locations when no locations are saved", async () => {
+      const recents = await storage.recent(10)
+      expect(recents).toEqual([])
+    })
 
-      await asyncStorageSaveRecentLocation(location, "attended-event")
-      const savedLocation = JSON.parse(
-        (await AsyncStorage.getItem(TEST_COORDINATES_STORAGE_KEY))!
-      )
-      expect(savedLocation).toMatchObject({
-        location,
-        annotation: "attended-event"
+    it("should return no locations for coordinates when no locations are saved", async () => {
+      const coordinates = ArrayUtils.repeatElements(3, () => {
+        return mockLocationCoordinate2D()
       })
+      const locations = await storage.locationsForCoordinates(coordinates)
+      expect(locations).toEqual([])
     })
-  })
 
-  describe("AsyncStorageLoadSpecificRecentLocations tests", () => {
-    it("should be able to retrieve multiple saved locations", async () => {
-      const location1 = mockTiFLocation()
-      const location2 = mockTiFLocation()
-      const location3 = mockTiFLocation()
-      await asyncStorageSaveRecentLocation(location1, "attended-event")
-      await asyncStorageSaveRecentLocation(location2, "hosted-event")
+    test("save then load single location from recents", async () => {
+      const location = mockTiFLocation()
+      await storage.save(location, "attended-event")
+      const recents = await storage.recent(10)
+      expect(recents).toEqual([{ location, annotation: "attended-event" }])
+    })
 
-      const results = await asyncStorageLoadSpecificRecentLocations([
-        location1.coordinates,
-        location2.coordinates,
-        location3.coordinates
+    test("save then load single location by its coordinates", async () => {
+      const location = mockTiFLocation()
+      await storage.save(location, "attended-event")
+      const recents = await storage.locationsForCoordinates([
+        location.coordinate
       ])
-      expect(results).toEqual([
-        expect.objectContaining({
-          location: location1,
-          annotation: "attended-event"
-        }),
-        expect.objectContaining({
-          location: location2,
-          annotation: "hosted-event"
-        })
-      ])
+      expect(recents).toEqual([{ location, annotation: "attended-event" }])
     })
 
-    it("filters invalidly persisted locations", async () => {
-      await AsyncStorage.setItem(TEST_COORDINATES_STORAGE_KEY, "sdkjcudsb")
-      expect(
-        await asyncStorageLoadSpecificRecentLocations([TEST_COORDINATES])
-      ).toHaveLength(0)
-    })
-  })
-
-  describe("AsyncStorageLoadRecentLocations tests", () => {
-    it("should load recent locations ordered by most recently saved", async () => {
-      const location1 = mockTiFLocation()
+    test("loads multiple recent locations ordered by most recently saved", async () => {
+      const location1 = { ...mockTiFLocation(), placemark: { name: "hello" } }
       const location2 = mockTiFLocation()
       const location3 = mockTiFLocation()
 
-      await asyncStorageSaveRecentLocation(location1)
-      await asyncStorageSaveRecentLocation(location2, "hosted-event")
-      await asyncStorageSaveRecentLocation(location3, "attended-event")
-      await asyncStorageSaveRecentLocation(location1)
+      await storage.save(location1)
+      await sleep(10)
+      await storage.save(location2, "hosted-event")
+      await sleep(10)
+      await storage.save(location3, "attended-event")
+      await sleep(10)
+      await storage.save(location1)
 
-      const results = await asyncStorageLoadRecentLocations(2)
+      const results = await storage.recent(2)
       expect(results).toEqual([
         {
           location: location1,
@@ -85,15 +64,54 @@ describe("RecentLocationStorage tests", () => {
       ])
     })
 
-    it("is empty when no recent locations", async () => {
-      expect(await asyncStorageLoadRecentLocations(100)).toHaveLength(0)
+    test("loading multiple recent locations by their coordinates", async () => {
+      const location1 = mockTiFLocation()
+      const location2 = mockTiFLocation()
+      const location3 = mockTiFLocation()
+      await storage.save(location1, "attended-event")
+      await sleep(10)
+      await storage.save(location2, "hosted-event")
+
+      const results = await storage.locationsForCoordinates([
+        location1.coordinate,
+        location2.coordinate,
+        location3.coordinate
+      ])
+      expect(results).toEqual([
+        expect.objectContaining({
+          location: location2,
+          annotation: "hosted-event"
+        }),
+        expect.objectContaining({
+          location: location1,
+          annotation: "attended-event"
+        })
+      ])
     })
 
-    it("filters invalidly persisted locations", async () => {
-      // NB: Ensure this location appears in the keylist.
-      await asyncStorageSaveRecentLocation(mockTiFLocation(TEST_COORDINATES))
-      await AsyncStorage.setItem(TEST_COORDINATES_STORAGE_KEY, "sdkjcudsb")
-      expect(await asyncStorageLoadRecentLocations(10)).toHaveLength(0)
+    test("load locations by coordinates with first longitude value equal to second latitude value", async () => {
+      await storage.save(
+        mockTiFLocation({ latitude: -50.123, longitude: -50.123 })
+      )
+      const results = await storage.locationsForCoordinates([
+        { latitude: 45.123, longitude: -50.123 },
+        { latitude: -50.123, longitude: 45.123 }
+      ])
+      expect(results).toEqual([])
+    })
+
+    test("load locations by coordinates using duplicate coordinates", async () => {
+      const locations = ArrayUtils.repeatElements(2, () => mockTiFLocation())
+      await storage.save(locations[0], "attended-event")
+      await storage.save(locations[1])
+      const results = await storage.locationsForCoordinates([
+        locations[0].coordinate,
+        locations[0].coordinate
+      ])
+      expect(results).toEqual([{
+        location: locations[0],
+        annotation: "attended-event"
+      }])
     })
   })
 })

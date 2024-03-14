@@ -16,6 +16,7 @@ import {
 import { Region } from "@location/index"
 import { QueryHookOptions } from "@lib/ReactQuery"
 import { LocationAccuracy, PermissionResponse } from "expo-location"
+import { eventDetailsQueryKey } from "@shared-models/query-keys/Event"
 
 export type UseExploreEventsEnvironment = {
   fetchEvents: (region: Region) => Cancellable<CurrentUserEvent[]>
@@ -91,9 +92,9 @@ const useUserRegion = (
   return !coords
     ? undefined
     : createDefaultMapRegion({
-      latitude: coords.latitude,
-      longitude: coords.longitude
-    })
+        latitude: coords.latitude,
+        longitude: coords.longitude
+      })
 }
 
 const useExploreEventsQuery = (
@@ -110,7 +111,7 @@ const useExploreEventsQuery = (
         const events = await cancelOnAborted(fetchEvents(region), signal).value
 
         events.forEach((event) => {
-          queryClient.setQueryData(["event", event.id], event)
+          queryClient.setQueryData(eventDetailsQueryKey(event.id), event)
         })
 
         return events
