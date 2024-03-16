@@ -1,13 +1,18 @@
 import { CurrentUserEvent } from "@shared-models/Event"
 import { captureAlerts } from "@test-helpers/Alerts"
+import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { TestQueryClientProvider, createTestQueryClient } from "@test-helpers/ReactQuery"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { LeaveEventResult, useLeaveEvent } from "./LeaveEvent"
 import { EventMocks } from "./MockData"
+import { renderSuccessfulUseLoadEventDetails } from "./TestHelpers"
 
 describe("LeaveEvent tests", () => {
   const queryClient = createTestQueryClient()
-  beforeEach(() => { jest.resetAllMocks(); queryClient.clear() })
+  beforeEach(() => {
+    jest.resetAllMocks()
+    queryClient.clear()
+  })
   describe("useLeaveEvent tests", () => {
     const testEnv = {
       leaveEvent: jest.fn(),
@@ -18,6 +23,14 @@ describe("LeaveEvent tests", () => {
 
     const alertDeleteButtonTapped = async () => {
       await tapAlertButton("Delete")
+    }
+
+    const dismissAlert = async () => {
+      await tapAlertButton("OK")
+    }
+
+    const renderUseEventDetails = (event: CurrentUserEvent) => {
+      return renderSuccessfulUseLoadEventDetails(event, queryClient)
     }
 
     const renderUseLeaveEvent = (testUserStatus: Pick<CurrentUserEvent, "userAttendeeStatus">) => {
@@ -95,6 +108,79 @@ describe("LeaveEvent tests", () => {
         status: "select",
         attendeeStatus: "hosting"
       })
+    })
+    it("should change attendee status to host when Leave Event returns co-host-not-found", async () => {
+      const { result: leaveEventResult } = renderUseLeaveEvent({ userAttendeeStatus: "attending" })
+      const { result: eventDetailsResult } = renderUseEventDetails({ ...TEST_EVENT, userAttendeeStatus: "attending" })
+      await waitFor(() => {
+        expect(eventDetailsResult.current).toMatchObject({
+          event: { userAttendeeStatus: "attending" }
+        })
+      })
+      testEnv.leaveEvent.mockResolvedValueOnce("co-host-not-found")
+      act(() => (leaveEventResult.current as any).confirmButtonTapped())
+      await waitFor(() => {
+        expect(eventDetailsResult.current).toMatchObject({
+          event: { userAttendeeStatus: "hosting" }
+        })
+      })
+    })
+    it("should not call onSuccess on non-successful Leave Event result", async () => {
+      const { result: leaveEventResult } = renderUseLeaveEvent({ userAttendeeStatus: "attending" })
+      testEnv.leaveEvent.mockResolvedValueOnce("co-host-not-found")
+      act(() => (leaveEventResult.current as any).confirmButtonTapped())
+      await verifyNeverOccurs(() => expect(testEnv.onSuccess).toHaveBeenCalled())
+    })
+    it("should change attendee status to not-participating when Leave Event returns success", async () => {
+      const { result: leaveEventResult } = renderUseLeaveEvent({ userAttendeeStatus: "attending" })
+      const { result: eventDetailsResult } = renderUseEventDetails({ ...TEST_EVENT, userAttendeeStatus: "attending" })
+      await waitFor(() => {
+        expect(eventDetailsResult.current).toMatchObject({
+          event: { userAttendeeStatus: "attending" }
+        })
+      })
+      testEnv.leaveEvent.mockResolvedValueOnce("success")
+      act(() => (leaveEventResult.current as any).confirmButtonTapped())
+      await waitFor(() => {
+        expect(eventDetailsResult.current).toMatchObject({
+          event: { userAttendeeStatus: "not-participating" }
+        })
+      })
+    })
+    test("Error alerts appear correctly for error cases", async () => {
+      const { result: leaveEventResult } = renderUseLeaveEvent({ userAttendeeStatus: "attending" })
+      testEnv.leaveEvent.mockResolvedValueOnce("event-has-ended")
+      act(() => (leaveEventResult.current as any).confirmButtonTapped())
+      await waitFor(() => {
+        expect(alertPresentationSpy).toHaveBeenCalledWith(
+          "Event has ended",
+          "This event has ended. You will be moved to the previous screen.", expect.any(Array)
+        )
+      })
+      await waitFor(() => dismissAlert())
+      testEnv.leaveEvent.mockResolvedValueOnce("event-was-cancelled")
+      act(() => (leaveEventResult.current as any).confirmButtonTapped())
+      await waitFor(() => {
+        expect(alertPresentationSpy).toHaveBeenCalledWith(
+          "Event was cancelled",
+          "This event was cancelled. You will be moved to the previous screen.", expect.any(Array)
+        )
+      })
+      await waitFor(() => dismissAlert())
+      testEnv.leaveEvent.mockResolvedValueOnce("co-host-not-found")
+      act(() => (leaveEventResult.current as any).confirmButtonTapped())
+      await waitFor(() => {
+        expect(alertPresentationSpy).toHaveBeenCalledWith(
+          "Event has no co-host",
+          "This event has no co-host. To leave, you will need to select a new host.", expect.any(Array)
+        )
+      })
+    })
+    test("onSuccess should be called correctly if given a success status", async () => {
+      const { result: leaveEventResult } = renderUseLeaveEvent({ userAttendeeStatus: "attending" })
+      testEnv.leaveEvent.mockResolvedValueOnce("success")
+      act(() => (leaveEventResult.current as any).confirmButtonTapped())
+      await waitFor(() => expect(testEnv.onSuccess).toHaveBeenCalled())
     })
   })
 })

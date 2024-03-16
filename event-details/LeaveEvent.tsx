@@ -1,17 +1,18 @@
 import { CurrentUserEvent } from "@shared-models/Event"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Alert } from "react-native"
+import { updateEventDetailsQueryEvent } from "./Query"
 
 export const LEAVE_EVENT_ERROR_ALERTS = {
-  eventHasEnded: {
+  "event-has-ended": {
     title: "Event has ended",
     description: "This event has ended. You will be moved to the previous screen."
   },
-  eventWasCancelled: {
+  "event-was-cancelled": {
     title: "Event was cancelled",
     description: "This event was cancelled. You will be moved to the previous screen."
   },
-  coHostNotFound: {
+  "co-host-not-found": {
     title: "Event has no co-host",
     description: "This event has no co-host. To leave, you will need to select a new host."
   },
@@ -24,11 +25,13 @@ export const LEAVE_EVENT_ERROR_ALERTS = {
 const presentErrorAlert = (key: keyof typeof LEAVE_EVENT_ERROR_ALERTS) => {
   Alert.alert(
     LEAVE_EVENT_ERROR_ALERTS[key].title,
-    LEAVE_EVENT_ERROR_ALERTS[key].description
+    LEAVE_EVENT_ERROR_ALERTS[key].description, [
+      { text: "OK", style: "destructive" }
+    ]
   )
 }
 
-export type LeaveEventResult = "success" | "eventHasEnded" | "eventWasCancelled" | "coHostNotFound"
+export type LeaveEventResult = "success" | "event-has-ended" | "event-was-cancelled" | "co-host-not-found"
 
 export type UseLeaveEventEnvironment = {
   leaveEvent: (eventId: number) => Promise<LeaveEventResult>
@@ -57,9 +60,15 @@ export const useLeaveEvent = (event: Pick<CurrentUserEvent, "id" | "userAttendee
     async () => await leaveEvent(event.id),
     {
       onSuccess: (status) => {
-        if (status !== "success") presentErrorAlert(status)
-        onSuccess()
-        queryClient.setQueryData(["event", event.id], event)
+        if (status === "co-host-not-found") {
+          presentErrorAlert(status)
+          updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({ ...e, userAttendeeStatus: "hosting" }))
+        } else if (status === "success") {
+          onSuccess()
+          updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({ ...e, userAttendeeStatus: "not-participating" }))
+        } else {
+          presentErrorAlert(status)
+        }
       },
       onError: () => presentErrorAlert("generic")
     }

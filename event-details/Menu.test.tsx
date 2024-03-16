@@ -1,28 +1,23 @@
+import { UserSessionProvider } from "@lib/UserSession"
+import { CurrentUserEvent } from "@shared-models/Event"
+import { UnblockedBidirectionalUserRelations } from "@shared-models/User"
 import { setPlatform } from "@test-helpers/Platform"
+import {
+  TestQueryClientProvider,
+  createTestQueryClient
+} from "@test-helpers/ReactQuery"
+import { fakeTimers } from "@test-helpers/Timers"
+import { act, renderHook, waitFor } from "@testing-library/react-native"
+import { UseLoadEventDetailsResult } from "./Details"
 import {
   EVENT_MENU_ACTION,
   formatEventMenuActions,
   useEventDetailsMenuActions
 } from "./Menu"
 import { EventAttendeeMocks, EventMocks } from "./MockData"
-import { CurrentUserEvent } from "@shared-models/Event"
-import { act, renderHook, waitFor } from "@testing-library/react-native"
-import { UserSessionProvider } from "@lib/UserSession"
 import {
-  TestQueryClientProvider,
-  createTestQueryClient
-} from "@test-helpers/ReactQuery"
-import {
-  renderUseLoadEventDetails,
   renderSuccessfulUseLoadEventDetails
 } from "./TestHelpers"
-import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
-import { CloudDirectory } from "aws-sdk"
-import { Faker } from "@faker-js/faker"
-import { fakeTimers } from "@test-helpers/Timers"
-import { UseLoadEventDetailsResult } from "./Details"
-import { UnblockedBidirectionalUserRelations } from "@shared-models/User"
-import { sleep } from "@lib/utils/DelayData"
 
 describe("EventDetailsMenu tests", () => {
   describe("FormatEventMenuActions tests", () => {
