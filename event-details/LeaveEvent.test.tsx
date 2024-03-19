@@ -25,10 +25,6 @@ describe("LeaveEvent tests", () => {
       await tapAlertButton("Delete")
     }
 
-    const dismissAlert = async () => {
-      await tapAlertButton("OK")
-    }
-
     const renderUseEventDetails = (event: CurrentUserEvent) => {
       return renderSuccessfulUseLoadEventDetails(event, queryClient)
     }
@@ -52,8 +48,7 @@ describe("LeaveEvent tests", () => {
       expect(result.current).toMatchObject({
         status: "select",
         isLoading: false,
-        attendeeStatus: "attending",
-        confirmButtonTapped: expect.any(Function)
+        attendeeStatus: "attending"
       })
       act(() => (result.current as any).confirmButtonTapped())
       act(() => resolveLeave?.("success"))
@@ -74,9 +69,7 @@ describe("LeaveEvent tests", () => {
       expect(result.current).toMatchObject({
         status: "select",
         isLoading: false,
-        attendeeStatus: "hosting",
-        deleteButtonTapped: expect.any(Function),
-        reselectButtonTapped: expect.any(Function)
+        attendeeStatus: "hosting"
       })
       act(() => (result.current as any).deleteButtonTapped())
       await waitFor(() => {
@@ -91,22 +84,6 @@ describe("LeaveEvent tests", () => {
         expect(result.current).toMatchObject({
           status: "success"
         })
-      })
-    })
-    test("Host leave event flow, reselect option selected", async () => {
-      const { result } = renderUseLeaveEvent({ userAttendeeStatus: "hosting" })
-
-      expect(result.current).toMatchObject({
-        status: "select",
-        isLoading: false,
-        attendeeStatus: "hosting",
-        deleteButtonTapped: expect.any(Function),
-        reselectButtonTapped: expect.any(Function)
-      })
-      act(() => (result.current as any).reselectButtonTapped())
-      expect(result.current).toMatchObject({
-        status: "select",
-        attendeeStatus: "hosting"
       })
     })
     it("should change attendee status to host when Leave Event returns co-host-not-found", async () => {
@@ -154,25 +131,25 @@ describe("LeaveEvent tests", () => {
       await waitFor(() => {
         expect(alertPresentationSpy).toHaveBeenCalledWith(
           "Event has ended",
-          "This event has ended. You will be moved to the previous screen.", expect.any(Array)
+          "This event has ended. You will be moved to the previous screen."
         )
       })
-      await waitFor(() => dismissAlert())
+
       testEnv.leaveEvent.mockResolvedValueOnce("event-was-cancelled")
       act(() => (leaveEventResult.current as any).confirmButtonTapped())
       await waitFor(() => {
         expect(alertPresentationSpy).toHaveBeenCalledWith(
           "Event was cancelled",
-          "This event was cancelled. You will be moved to the previous screen.", expect.any(Array)
+          "This event was cancelled. You will be moved to the previous screen."
         )
       })
-      await waitFor(() => dismissAlert())
+
       testEnv.leaveEvent.mockResolvedValueOnce("co-host-not-found")
       act(() => (leaveEventResult.current as any).confirmButtonTapped())
       await waitFor(() => {
         expect(alertPresentationSpy).toHaveBeenCalledWith(
           "Event has no co-host",
-          "This event has no co-host. To leave, you will need to select a new host.", expect.any(Array)
+          "This event has no co-host. To leave, you will need to select a new host."
         )
       })
     })

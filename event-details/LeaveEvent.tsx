@@ -25,9 +25,7 @@ export const LEAVE_EVENT_ERROR_ALERTS = {
 const presentErrorAlert = (key: keyof typeof LEAVE_EVENT_ERROR_ALERTS) => {
   Alert.alert(
     LEAVE_EVENT_ERROR_ALERTS[key].title,
-    LEAVE_EVENT_ERROR_ALERTS[key].description, [
-      { text: "OK", style: "destructive" }
-    ]
+    LEAVE_EVENT_ERROR_ALERTS[key].description
   )
 }
 
@@ -42,7 +40,7 @@ export type UseLeaveEventMenu = {
   attendeeStatus: "hosting",
   isLoading: boolean,
   deleteButtonTapped: () => void,
-  reselectButtonTapped: () => void,
+
 } | { attendeeStatus: "attending",
   isLoading: boolean
   confirmButtonTapped: () => void
@@ -104,8 +102,7 @@ export const useLeaveEvent = (event: Pick<CurrentUserEvent, "id" | "userAttendee
             text: "Cancel",
             style: "cancel"
           }])
-      },
-      reselectButtonTapped: () => console.log("Reselect")
+      }
     }
   }
 }
