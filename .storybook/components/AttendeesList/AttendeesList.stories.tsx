@@ -47,14 +47,11 @@ const AttendeesListTestScreen = () => {
   return (
     <View>
       <AttendeesListView
-        status={"success"}
         attendees={testValue.attendees}
         renderAttendee={renderAttendee}
         totalAttendeeCount={testValue.attendeeCount}
         refresh={() => console.log("Refresh")}
         isRefetching={false}
-        host={testValue.host}
-        isFetchingNextPage={false}
       />
     </View>
   )
