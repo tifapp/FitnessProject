@@ -4,6 +4,7 @@ import {
 } from "@components/AvatarMapMarker"
 import { CaptionTitle } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
+import { useFontScale } from "@lib/Fonts"
 import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 
@@ -22,7 +23,13 @@ export const ExploreEventsMarkerView = ({
 }: ExploreEventsMarkerProps) => {
   return (
     <AvatarMapMarkerView imageURL={imageURL} style={style}>
-      <View style={[{ backgroundColor: color }, styles.badgeContainer]}>
+      <View
+        style={[
+          { backgroundColor: color },
+          styles.badgeContainer,
+          { right: (-AVATAR_MARKER_SIZE / 2) * useFontScale() }
+        ]}
+      >
         <Ionicon
           style={styles.badgeIcon}
           name="people"

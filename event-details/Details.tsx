@@ -1,4 +1,4 @@
-import { UseQueryResult, useQuery } from "@tanstack/react-query"
+import { UseQueryResult } from "@tanstack/react-query"
 import {
   BlockedEvent,
   CurrentUserEvent,
@@ -6,19 +6,59 @@ import {
   currentUserEventFromResponse
 } from "@shared-models/Event"
 import { useIsConnectedToInternet } from "@lib/InternetConnection"
-import React, { useEffect, useRef, useState } from "react"
-import { useEffectEvent } from "@lib/utils/UseEffectEvent"
+import React, { ReactNode, useRef, useState } from "react"
 import { TiFAPI } from "@api-client/TiFAPI"
-import { StyleProp, View, ViewStyle, StyleSheet } from "react-native"
-import { BodyText, Subtitle, Title } from "@components/Text"
+import {
+  StyleProp,
+  View,
+  ViewStyle,
+  StyleSheet,
+  ScrollView,
+  RefreshControl,
+  LayoutRectangle
+} from "react-native"
+import { BodyText, Headline, Subtitle, Title } from "@components/Text"
 import { ArrayUtils } from "@lib/utils/Array"
 import { PrimaryButton } from "@components/Buttons"
 import { useConst } from "@lib/utils/UseConst"
-import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated"
+import Animated, {
+  FadeIn,
+  ReduceMotion,
+  SlideInDown,
+  ZoomIn,
+  ZoomOut
+} from "react-native-reanimated"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useAutocorrectingInterval } from "@lib/utils/UseInterval"
+import {
+  EventHandle,
+  ExpandableContentText,
+  UserHandle
+} from "@content-parsing"
+import { RoundedIonicon } from "@components/common/Icons"
+import { placemarkToFormattedAddress } from "@shared-models/Placemark"
+import {
+  EventTravelEstimatesView,
+  useEventTravelEstimates
+} from "./TravelEstimates"
+import { useEventDetailsEnvironment } from "./Environment"
+import { EventDetailsHostView } from "./Host"
+import {
+  EventArrivalBannerView,
+  eventArrivalBannerCountdown,
+  useIsShowingEventArrivalBanner
+} from "./arrival-tracking"
+import { useEventSecondsToStart } from "./SecondsToStart"
+import { isAttendingEvent } from "./Event"
+import { FontScaleFactors } from "@lib/Fonts"
 import { EventDetailsLoadingResult, useEventDetailsQuery } from "./Query"
+import { EventCountdownView, eventCountdown } from "./Countdown"
+import { useIsSignedIn } from "@lib/UserSession"
+import { AuthBannerButton } from "@components/AuthBanner"
+import { JoinEventStagesView, useJoinEventStages } from "./JoinEvent"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { useScreenBottomPadding } from "@components/Padding"
 
 /**
  * Loads the event details from the server.
@@ -109,6 +149,9 @@ const refreshStatus = (
 export type EventDetailsProps = {
   result: UseLoadEventDetailsResult
   onExploreOtherEventsTapped: () => void
+  onUserHandleTapped: (handle: UserHandle) => void
+  onEventHandleTapped: (handle: EventHandle) => void
+  onEditEventTapped: () => void
   style?: StyleProp<ViewStyle>
 }
 
@@ -117,16 +160,21 @@ export type EventDetailsProps = {
  */
 export const EventDetailsView = ({
   result,
+  onUserHandleTapped,
+  onEventHandleTapped,
+  onEditEventTapped,
   onExploreOtherEventsTapped,
   style
 }: EventDetailsProps) => (
   <View style={style}>
     {result.status === "loading" && (
-      <NoContentView
-        renderTitle={(title) => <LoadingTitleView title={title} />}
-        possibleMessages={LOADING_MESSAGES}
-        style={styles.noContent}
-      />
+      <Animated.View entering={FadeIn}>
+        <NoContentView
+          renderTitle={(title) => <LoadingTitleView title={title} />}
+          possibleMessages={LOADING_MESSAGES}
+          style={styles.noContent}
+        />
+      </Animated.View>
     )}
     {result.status === "error" && (
       <NoContentView
@@ -148,7 +196,23 @@ export const EventDetailsView = ({
         style={styles.noContent}
       />
     )}
-    {result.status === "success" && <Title>TODO</Title>}
+    {result.status === "success" && (
+      <Animated.View
+        entering={SlideInDown.springify(1250)
+          .dampingRatio(0.8)
+          .reduceMotion(ReduceMotion.System)}
+      >
+        <SuccessView
+          event={result.event}
+          refreshStatus={result.refreshStatus}
+          onPullToRefresh={result.refresh}
+          onUserHandleTapped={onUserHandleTapped}
+          onEventHandleTapped={onEventHandleTapped}
+          onEditEventTapped={onEditEventTapped}
+          style={styles.success}
+        />
+      </Animated.View>
+    )}
   </View>
 )
 
@@ -157,6 +221,213 @@ const isExploratoryFailure = (
 ): status is "not-found" | "cancelled" | "blocked" => {
   return status !== "success" && status !== "error" && status !== "loading"
 }
+
+type SuccessProps = {
+  onPullToRefresh: () => void
+  onUserHandleTapped: (handle: UserHandle) => void
+  onEventHandleTapped: (handle: EventHandle) => void
+  onEditEventTapped: () => void
+  style?: StyleProp<ViewStyle>
+} & Omit<
+  Extract<UseLoadEventDetailsResult, { status: "success" }>,
+  "status" | "refresh"
+>
+
+const SuccessView = ({
+  event,
+  onUserHandleTapped,
+  onEventHandleTapped,
+  onEditEventTapped,
+  refreshStatus,
+  onPullToRefresh,
+  style
+}: SuccessProps) => {
+  const [footerLayout, setFooterLayout] = useState<LayoutRectangle>()
+  return (
+    <View style={[style, styles.detailsContainer]}>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            onRefresh={onPullToRefresh}
+            refreshing={refreshStatus === "loading"}
+          />
+        }
+        contentContainerStyle={styles.detailContent}
+      >
+        <Title>{event.title}</Title>
+        <DetailSectionView>
+          <EventDetailsHostView
+            host={event.host}
+            onHostTapped={onUserHandleTapped}
+            onEditEventTapped={onEditEventTapped}
+            onFriendButtonTapped={() => console.log("TODO: Friend Logic")}
+          />
+        </DetailSectionView>
+        <ArrivalBannerSectionView event={event} />
+        <DetailSectionView title="Details">
+          {/* TODO: - Widgets */}
+          <View style={styles.detailWidgetsPlaceholder} />
+        </DetailSectionView>
+        <DetailSectionView title="Description">
+          <ExpandableContentText
+            text={event.description}
+            collapsedLineLimit={3}
+            onUserHandleTapped={onUserHandleTapped}
+            onEventHandleTapped={onEventHandleTapped}
+          />
+        </DetailSectionView>
+        <LocationSectionView event={event} />
+        {/* NB: This empty view adds bottom padding due to the rowGap style. */}
+        <View />
+      </ScrollView>
+      <View style={{ marginBottom: footerLayout?.height ?? 0 }} />
+      <View
+        onLayout={(e) => setFooterLayout(e.nativeEvent.layout)}
+        style={styles.footer}
+      >
+        <DetailsFooterView event={event} />
+      </View>
+    </View>
+  )
+}
+
+const ArrivalBannerSectionView = ({ event }: { event: CurrentUserEvent }) => {
+  const { isShowing, close } = useIsShowingEventArrivalBanner(
+    event.location,
+    useEventDetailsEnvironment().regionMonitor
+  )
+  const secondsToStart = useEventSecondsToStart(event.time)
+  if (!isShowing) return undefined
+  return (
+    <DetailSectionView>
+      <EventArrivalBannerView
+        hasJoinedEvent={isAttendingEvent(event.userAttendeeStatus)}
+        canShareArrivalStatus // TODO: - Implement This
+        countdown={eventArrivalBannerCountdown(
+          secondsToStart,
+          event.time.todayOrTomorrow
+        )}
+        onClose={close}
+      />
+    </DetailSectionView>
+  )
+}
+
+const LocationSectionView = ({
+  event
+}: {
+  event: Pick<CurrentUserEvent, "location" | "host">
+}) => (
+  <DetailSectionView title="Location">
+    <View style={styles.locationDetailsContainer}>
+      <RoundedIonicon
+        borderRadius={12}
+        color="white"
+        backgroundColor={AppStyles.darkColor}
+        name="location"
+        maximumFontScaleFactor={FontScaleFactors.xxxLarge}
+      />
+      <View style={styles.locationDetailsText}>
+        <Headline>
+          {event.location.placemark?.name ?? "Unknown Location"}
+        </Headline>
+        <BodyText>
+          {event.location.placemark
+            ? placemarkToFormattedAddress(event.location.placemark)
+            : "Unknown Address"}
+        </BodyText>
+      </View>
+    </View>
+    <EventTravelEstimatesView
+      host={event.host}
+      location={event.location}
+      result={useEventTravelEstimates(
+        event.location.coordinate,
+        useEventDetailsEnvironment().travelEstimates
+      )}
+    />
+  </DetailSectionView>
+)
+
+type DetailSectionProps = {
+  title?: string
+  children: ReactNode
+}
+
+const DetailSectionView = ({ title, children }: DetailSectionProps) => (
+  <Animated.View
+    layout={TiFDefaultLayoutTransition}
+    style={styles.detailSection}
+  >
+    {title && <Subtitle>{title}</Subtitle>}
+    {children}
+  </Animated.View>
+)
+
+type DetailsFooterProps = {
+  event: CurrentUserEvent
+  style?: StyleProp<ViewStyle>
+}
+
+const DetailsFooterView = ({ event, style }: DetailsFooterProps) => {
+  const bottomPadding = useScreenBottomPadding({
+    safeAreaScreens: 8,
+    nonSafeAreaScreens: 24
+  })
+  const marginBottom = useSafeAreaInsets().bottom + bottomPadding
+  return (
+    <View style={style}>
+      <View
+        style={[
+          styles.footerRow,
+          {
+            marginBottom,
+            alignItems: !isAttendingEvent(event.userAttendeeStatus)
+              ? "flex-end"
+              : "center"
+          }
+        ]}
+      >
+        <CountdownView event={event} />
+        {useIsSignedIn() ? (
+          !isAttendingEvent(event.userAttendeeStatus) ? (
+            <JoinButtonView event={event} />
+          ) : (
+            <Headline>Leave Event</Headline>
+          )
+        ) : (
+          <AuthBannerButton
+            onSignInTapped={() => console.log("TODO")}
+            onSignUpTapped={() => console.log("TODO")}
+          >
+            Join Now
+          </AuthBannerButton>
+        )}
+      </View>
+    </View>
+  )
+}
+
+const JoinButtonView = ({ event }: { event: CurrentUserEvent }) => {
+  const { regionMonitor, joinEvent, joinEventPermissions } =
+    useEventDetailsEnvironment()
+  const stage = useJoinEventStages(event, {
+    monitor: regionMonitor,
+    joinEvent,
+    loadPermissions: joinEventPermissions
+  })
+  return <JoinEventStagesView stage={stage} />
+}
+
+const CountdownView = ({ event }: { event: CurrentUserEvent }) => (
+  <EventCountdownView
+    countdown={eventCountdown(
+      useEventSecondsToStart(event.time),
+      event.time.dateRange,
+      event.time.todayOrTomorrow
+    )}
+  />
+)
 
 const LoadingTitleView = ({ title }: { title: string }) => {
   const balls = useDisplayedEventDetailsLoadingBalls(700)
@@ -227,7 +498,6 @@ const LOADING_MESSAGES = [
 ]
 
 const UNSUCCESSFUL_MESSAGE_SET = {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   "not-found": [
     {
       title: "Yikes!",
@@ -473,5 +743,50 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
     marginBottom: 2,
     backgroundColor: AppStyles.darkColor
+  },
+  success: {
+    width: "100%",
+    height: "100%"
+  },
+  detailsContainer: {
+    position: "relative"
+  },
+  detailContent: {
+    paddingHorizontal: 24,
+    rowGap: 32
+  },
+  detailSection: {
+    rowGap: 16
+  },
+  detailWidgetsPlaceholder: {
+    borderRadius: 12,
+    width: "100%",
+    height: 450,
+    backgroundColor: AppStyles.eventCardColor
+  },
+  locationDetailsContainer: {
+    display: "flex",
+    flexDirection: "row",
+    columnGap: 16
+  },
+  locationDetailsText: {
+    marginRight: 24,
+    flex: 1,
+    rowGap: 4
+  },
+  footer: {
+    position: "absolute",
+    width: "100%",
+    flex: 1,
+    backgroundColor: "white",
+    bottom: 0
+  },
+  footerRow: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    paddingHorizontal: 24,
+    paddingTop: 8
   }
 })

@@ -108,6 +108,10 @@ export type JoinEventHandlerSuccessInput = Pick<
   location: Pick<EventLocation, "coordinate" | "placemark">
 }
 
+export type JoinEventSuccessHandler = (
+  resp: JoinEventHandlerSuccessInput
+) => void
+
 /**
  * Joins an event using the TiF API, and if successful, runs the array of
  * success handlers.
@@ -121,7 +125,7 @@ export type JoinEventHandlerSuccessInput = Pick<
 export const joinEvent = async (
   request: JoinEventRequest,
   tifAPI: TiFAPI,
-  onSuccessHandlers: [(resp: JoinEventHandlerSuccessInput) => void]
+  onSuccessHandlers: JoinEventSuccessHandler[]
 ): Promise<JoinEventResult> => {
   const shouldIncludeArrivalRegion =
     request.hasArrived && request.location.isInArrivalTrackingPeriod
@@ -201,7 +205,7 @@ export const useJoinEventStages = (
   event: Omit<JoinEventRequest, "hasArrived">,
   env: UseJoinEventEnvironment
 ): UseJoinEventStage => {
-  const { onSuccess, loadPermissions, joinEvent, monitor } = env
+  const { loadPermissions, joinEvent, monitor } = env
   const hasArrived = useHasArrivedAtRegion(event.location, monitor)
   const currentPermission = useCurrentJoinEventPermission(loadPermissions)
   const queryClient = useQueryClient()

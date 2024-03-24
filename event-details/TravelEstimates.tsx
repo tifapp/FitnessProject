@@ -16,7 +16,7 @@ import {
   LayoutRectangle
 } from "react-native"
 import { EventTravelEstimates } from "@shared-models/TravelEstimates"
-import { ExpoTiFTravelEstimatesModule } from "@modules/tif-travel-estimates"
+import { ExpoTiFTravelEstimates } from "@modules/tif-travel-estimates"
 import { EventAttendee, EventLocation } from "@shared-models/Event"
 import { CodedError } from "expo-modules-core"
 import { ReactNode, useState } from "react"
@@ -34,6 +34,7 @@ import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import Animated, { FadeIn } from "react-native-reanimated"
 import { openSettings } from "expo-linking"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
+import { Pressable } from "react-native"
 
 export type LoadEventTravelEstimates = (
   userCoordinate: LocationCoordinate2D,
@@ -52,16 +53,17 @@ export type LoadEventTravelEstimates = (
 export const loadEventTravelEstimates = async (
   eventCoordinate: LocationCoordinate2D,
   userCoordinate: LocationCoordinate2D,
-  nativeTravelEstimates: ExpoTiFTravelEstimatesModule,
   signal?: AbortSignal
 ) => {
+  // NB: We only expect this to be called from platforms that support travel
+  // estimates, making this force unwrap fine.
   signal?.addEventListener("abort", () => {
-    nativeTravelEstimates.cancelTravelEstimatesAsync(
+    ExpoTiFTravelEstimates!.cancelTravelEstimatesAsync(
       userCoordinate,
       eventCoordinate
     )
   })
-  return await nativeTravelEstimates.travelEstimatesAsync(
+  return await ExpoTiFTravelEstimates!.travelEstimatesAsync(
     userCoordinate,
     eventCoordinate
   )
@@ -231,42 +233,45 @@ export const EventTravelEstimatesView = ({
       >
         {overlayLayout && (
           <Animated.View entering={FadeIn.duration(300)}>
-            <MapView
-              style={[
-                styles.mapDimensions,
-                { height: Math.max(300, 200 + overlayLayout.height) }
-              ]}
-              loadingEnabled
-              zoomEnabled={false}
-              scrollEnabled={false}
-              initialRegion={{
-                ...location.coordinate,
-                latitudeDelta: 0.007,
-                longitudeDelta: 0.007
-              }}
-              mapPadding={{
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: overlayLayout.height + 16
-              }}
-              customMapStyle={[
-                {
-                  featureType: "poi",
-                  stylers: [{ visibility: "off" }]
-                },
-                {
-                  featureType: "transit",
-                  stylers: [{ visibility: "off" }]
-                }
-              ]}
-            >
-              <Marker coordinate={location.coordinate}>
-                <AvatarMapMarkerView
-                  imageURL={host.profileImageURL ?? undefined}
-                />
-              </Marker>
-            </MapView>
+            <Pressable onPress={() => openEventLocationInMaps(location)}>
+              <MapView
+                style={[
+                  styles.mapDimensions,
+                  { height: Math.max(300, 200 + overlayLayout.height) }
+                ]}
+                loadingEnabled
+                zoomEnabled={false}
+                scrollEnabled={false}
+                initialRegion={{
+                  ...location.coordinate,
+                  latitudeDelta: 0.011,
+                  longitudeDelta: 0.011
+                }}
+                mapPadding={{
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: overlayLayout.height + 16
+                }}
+                customMapStyle={[
+                  {
+                    featureType: "poi",
+                    stylers: [{ visibility: "off" }]
+                  },
+                  {
+                    featureType: "transit",
+                    stylers: [{ visibility: "off" }]
+                  }
+                ]}
+              >
+                <Marker coordinate={location.coordinate}>
+                  <AvatarMapMarkerView
+                    imageURL={host.profileImageURL ?? undefined}
+                    maximumFontScaleFactor={FontScaleFactors.xxxLarge}
+                  />
+                </Marker>
+              </MapView>
+            </Pressable>
           </Animated.View>
         )}
         <View style={styles.overlayContainer}>
@@ -427,8 +432,7 @@ const TRAVEL_KEYS_INFO = {
 
 const styles = StyleSheet.create({
   mapContainer: {
-    position: "relative",
-    marginHorizontal: 24
+    position: "relative"
   },
   mapDimensions: {
     width: "100%",
@@ -479,8 +483,7 @@ const styles = StyleSheet.create({
     textAlign: "center"
   },
   noticeLabel: {
-    paddingHorizontal: 24,
-    paddingVertical: 16
+    paddingBottom: 16
   },
   noticeLabelContainer: {
     display: "flex",
