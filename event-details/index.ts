@@ -1,2 +1,2 @@
-export * from "./EventScreensNavigation"
 export * from "./Event"
+export * from "./JoinEvent"

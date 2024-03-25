@@ -1,7 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
-import { TabNavigation } from "./Navigation/TabNavigation"
+import { TabNavigation } from "./navigation"
 
 const Stack = createStackNavigator()
 

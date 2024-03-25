@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+import { HttpResponse, http } from "msw"
 import { z } from "zod"
-import { createTiFAPIFetch } from "./client"
-import { rest } from "msw"
 import { neverPromise } from "../test-helpers/Promise"
-import { mswServer } from "../test-helpers/msw"
+import { noContentResponse, mswServer } from "../test-helpers/msw"
+import { createTiFAPIFetch } from "./client"
 
 const TEST_BASE_URL = new URL("http://localhost:8080")
 
@@ -13,6 +14,12 @@ const apiFetch = createTiFAPIFetch(
   jest.fn().mockResolvedValue(TEST_JWT)
 )
 
+const successResponse = () => HttpResponse.json({ a: 1 })
+
+const badResponse = (status: number) => {
+  return HttpResponse.json({ b: "bad" }, { status })
+}
+
 const TestResponseSchema = {
   status400: z.object({ b: z.string() }),
   status200: z.object({ a: z.number() })
@@ -21,49 +28,57 @@ const TestResponseSchema = {
 describe("CreateAPIFetch tests", () => {
   beforeEach(() => {
     mswServer.use(
-      rest.post("http://localhost:8080/test", async (req, res, ctx) => {
-        const errorResp = res(ctx.status(400), ctx.json({ b: "bad request" }))
-        const body = await req.json()
+      http.post("http://localhost:8080/test", async ({ request }) => {
+        // TODO: Use helper method for creating httpresponses
+        // https://mswjs.io/docs/migrations/1.x-to-2.x#response-declaration
+        const errorResp = badResponse(400) as any
+        const body: any = await request.json()
+        const searchParams = new URL(request.url).searchParams
 
-        if (req.headers.get("Authorization") !== `Bearer ${TEST_JWT}`) {
-          console.log("invalid token")
+        if (request.headers.get("Authorization") !== `Bearer ${TEST_JWT}`) {
           return errorResp
         }
         if (
-          req.url.searchParams.get("hello") !== "world" ||
-          req.url.searchParams.get("a") !== "1"
+          searchParams.get("hello") !== "world" ||
+          searchParams.get("a") !== "1"
         ) {
           return errorResp
         }
 
-        if (body.a !== 1 || body.b !== "hello") {
+        if (body?.a !== 1 || body?.b !== "hello") {
           return errorResp
         }
-        return res(ctx.status(200), ctx.json({ a: 1 }))
+        return successResponse()
       }),
-      rest.get("http://localhost:8080/test2", async (req, res, ctx) => {
+      http.get("http://localhost:8080/test2", async ({ request }) => {
         try {
-          await req.json()
-          return res(ctx.status(500), ctx.json({ b: "bad" }))
+          await request.json()
+          return badResponse(400) as any
         } catch {
-          return res(ctx.status(200), ctx.json({ a: 1 }))
+          return successResponse()
         }
       }),
-      rest.get("http://localhost:8080/test3", async (_, res, ctx) => {
-        return res(ctx.status(500), ctx.json({ b: "bad" }))
+      http.get("http://localhost:8080/test3", async () => {
+        return badResponse(500)
       }),
-      rest.get("http://localhost:8080/test4", async (_, res, ctx) => {
-        return res(ctx.status(200), ctx.text("LMAO"))
+      http.get("http://localhost:8080/test4", async () => {
+        return new HttpResponse("LMAO", { status: 200 })
       }),
-      rest.get("http://localhost:8080/test5", async (_, res, ctx) => {
-        return res(ctx.status(200), ctx.json({ b: "bad" }))
+      http.get("http://localhost:8080/test5", async () => {
+        return badResponse(200)
       }),
-      rest.get("http://localhost:8080/test6", async (_, res, ctx) => {
-        return res(ctx.status(204))
+      http.get("http://localhost:8080/test6", async () => {
+        return noContentResponse()
       }),
-      rest.get("http://localhost:8080/test7", async (_, res, ctx) => {
+      http.get("http://localhost:8080/test7", async () => {
         await neverPromise()
-        return res(ctx.status(500))
+        return new HttpResponse(null, { status: 500 })
+      }),
+      http.get("http://localhost:8080/test8", async ({ request }) => {
+        if (new URLSearchParams(request.url).has("hello")) {
+          return new HttpResponse(null, { status: 500 })
+        }
+        return successResponse()
       })
     )
   })
@@ -75,6 +90,22 @@ describe("CreateAPIFetch tests", () => {
         endpoint: "/test",
         query: { hello: "world", a: 1 },
         body: { a: 1, b: "hello" }
+      },
+      TestResponseSchema
+    )
+
+    expect(resp).toMatchObject({
+      status: 200,
+      data: { a: 1 }
+    })
+  })
+
+  test("api client fetch, undefined query", async () => {
+    const resp = await apiFetch(
+      {
+        method: "GET",
+        endpoint: "/test8",
+        query: { hello: undefined }
       },
       TestResponseSchema
     )

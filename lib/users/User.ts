@@ -1,27 +1,12 @@
 import { uuidString } from "../utils/UUID"
 
-/**
- * A type representing the relationship status between 2 users.
- */
-export type UserToProfileRelationStatus =
-  | "not-friends"
-  | "friend-request-pending"
-  | "friends"
-  | "blocked"
-
-export type UserFriendStatus =
-  | "not-friends"
-  | "friend-request-pending"
-  | "friends"
-  | "blocked"
-
 export type User = {
   id: string
   name: string
   handle: string
   bio: string
   profileImageURL: string
-  relationStatus: UserFriendStatus | "current-user"
+  relationStatus: string
 }
 
 /**

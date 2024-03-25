@@ -8,18 +8,16 @@ import {
   TiFLocation,
   checkIfCoordsAreEqual
 } from "@location/index"
-import {
-  asyncStorageLoadRecentLocations,
-  asyncStorageLoadSpecificRecentLocations
-} from "./RecentsStorage"
+import { RecentLocationsStorage } from "./RecentsStorage"
 
 /**
- * A top-level function that allows a location search, and gives location   data regarding the query and the designated
- * center.
+ * A top-level function that allows a location search, and gives location data
+ * regarding the query and the designated center.
  *
- * Uses either {@link searchRecentLocations}, if querying for the user's current recent locations OR
- * uses {@link searchWithRecentAnnotations}, along with the given query and center, if querying for
- * locations in a different location.
+ * Uses either {@link searchRecentLocations}, if querying for the user's
+ * current recent locations OR uses {@link searchWithRecentAnnotations}, along
+ * with the given query and center, if querying for locations in a different
+ * location.
  *
  * @param query A {@link LocationsSearchQuery} given for the search function to use.
  * @param center An optional {@link LocationCoordinate2D} that designates where the location search is occurring from.
@@ -27,13 +25,16 @@ import {
  */
 export const locationSearch = async (
   query: LocationsSearchQuery,
-  center?: LocationCoordinate2D
+  center: LocationCoordinate2D | undefined,
+  storage: Pick<RecentLocationsStorage, "locationsForCoordinates" | "recent">
 ): Promise<LocationSearchResult[]> => {
-  if (query.sourceType === "user-recents") return await searchRecentLocations()
-  else {
+  if (query.sourceType === "user-recents") {
+    return await searchRecentLocations(storage)
+  } else {
     return await searchWithRecentAnnotations(
       query,
       center,
+      storage,
       awsGeoSearchLocations
     )
   }
@@ -48,7 +49,7 @@ export const locationSearch = async (
 export const awsPlaceToTifLocation = (place: Place) => {
   if (!place.geometry) return undefined
   return {
-    coordinates: {
+    coordinate: {
       latitude: place.geometry.point[1],
       longitude: place.geometry.point[0]
     },
@@ -66,8 +67,8 @@ export const awsPlaceToTifLocation = (place: Place) => {
 }
 
 /**
- * A function that takes in a query, and uses a search function to obtain results, then converts the data
- * into a usable set of {@link TiFLocation}s.
+ * A function that takes in a query, and uses a search function to obtain
+ * results, then converts the data into a usable set of {@link TiFLocation}s.
  *
  * @param query A {@link LocationsSearchQuery} given for the search function to use.
  * @param center An optional {@link LocationCoordinate2D} given for the search to center in where it should be searching.
@@ -86,20 +87,25 @@ export const awsGeoSearchLocations = async (
 }
 
 /**
- * A function that pulls the 10 most recent locations stored in AsyncStorage, and maps out their data
+ * A function that pulls the 10 most recent locations stored in a given
+ * instance of {@link RecentLocationsStorage}, and maps out their data
  * into a set of {@link LocationSearchResult}s.
+ *
  * @returns A Promise of an array of {@link LocationSearchResult}s.
  */
-export const searchRecentLocations = (): Promise<LocationSearchResult[]> => {
-  return asyncStorageLoadRecentLocations(10).then((results) =>
-    results.map((area) => ({ ...area, isRecentLocation: true }))
-  )
+export const searchRecentLocations = async (
+  storage: Pick<RecentLocationsStorage, "recent">
+): Promise<LocationSearchResult[]> => {
+  return await storage.recent(10).then((results) => {
+    return results.map((area) => ({ ...area, isRecentLocation: true }))
+  })
 }
 
 /**
- * A function that uses a provided query, with both its provided searchFunction to obtain {@link TiFLocation}s,
- * and {@link asyncStorageLoadSpecificRecentLocations} on their coordinates to obtain async storage's information
- * on whether those locations are recent.
+ * A function that uses a provided query, with both its provided
+ * `searchFunction` to obtain {@link TiFLocation}s, and
+ * {@link RecentLocationsStorage} on their coordinates to obtain async
+ * storage's information on whether those locations are recent.
  * This involves combining the data from both processes.
  *
  * @param query A {@link LocationsSearchQuery} given for the search function to use.
@@ -111,30 +117,28 @@ export const searchRecentLocations = (): Promise<LocationSearchResult[]> => {
 export const searchWithRecentAnnotations = async (
   query: LocationsSearchQuery,
   center: LocationCoordinate2D | undefined,
+  recents: Pick<RecentLocationsStorage, "locationsForCoordinates">,
   searchFunction: (
     query: LocationsSearchQuery,
     center?: LocationCoordinate2D
   ) => Promise<TiFLocation[]>
 ): Promise<LocationSearchResult[]> => {
   const remoteSearchResults = await searchFunction(query, center)
-  const searchCoordinates = remoteSearchResults.map(
-    (point) => point.coordinates
-  ) as LocationCoordinate2D[]
-  const asyncRecentSearchResults =
-    await asyncStorageLoadSpecificRecentLocations(searchCoordinates)
+  const searchCoordinates = remoteSearchResults.map((point) => point.coordinate)
+  const recentLocations =
+    await recents.locationsForCoordinates(searchCoordinates)
   const mergedResults = remoteSearchResults.map((remoteSearchPoint) => {
-    const checkRecentsForMatch = asyncRecentSearchResults.find((asyncPoint) =>
-      checkIfCoordsAreEqual(
-        asyncPoint.location.coordinates,
-        remoteSearchPoint.coordinates
+    const recentLocation = recentLocations.find((asyncPoint) => {
+      return checkIfCoordsAreEqual(
+        asyncPoint.location.coordinate,
+        remoteSearchPoint.coordinate
       )
-    )
+    })
     return {
       location: remoteSearchPoint,
-      annotation: checkRecentsForMatch?.annotation,
-      isRecentLocation: !!checkRecentsForMatch?.annotation
+      annotation: recentLocation?.annotation,
+      isRecentLocation: !!recentLocation
     }
   })
-
   return mergedResults
 }

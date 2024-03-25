@@ -1,14 +1,24 @@
+/* eslint-disable func-call-spacing */
 import { UpcomingEventArrivals } from "./UpcomingArrivals"
 import { EventArrivalRegion } from "@shared-models/EventArrivals"
 import {
   EventArrivalGeofencedRegion,
   EventArrivalGeofencingUnsubscribe,
   EventArrivalsGeofencer
-} from "./Geofencing"
+} from "./geofencing"
 import { ArrayUtils } from "@lib/utils/Array"
 import { PerformArrivalsOperation } from "./ArrivalsOperation"
-import { EventArrival } from "./Models"
+import { EventArrival, arrivalRegion, removeDuplicateArrivals } from "./Models"
 import { areEventRegionsEqual } from "@shared-models/Event"
+import { CallbackCollection } from "@lib/CallbackCollection"
+import { createLogFunction } from "@lib/Logging"
+
+const log = createLogFunction("event.arrivals.tracker")
+
+export interface EventArrivalsTrackerSubscription {
+  waitForInitialRegionsToLoad(): Promise<void>
+  unsubscribe(): void
+}
 
 /**
  * A class for tracking upcoming event arrivals.
@@ -23,8 +33,9 @@ export class EventArrivalsTracker {
   private readonly performArrivalsOperation: PerformArrivalsOperation
 
   private unsubscribeFromGeofencing?: EventArrivalGeofencingUnsubscribe
+  private callbacks = new CallbackCollection<EventArrivalRegion[]>()
 
-  constructor (
+  constructor(
     upcomingArrivals: UpcomingEventArrivals,
     geofencer: EventArrivalsGeofencer,
     performArrivalsOperation: PerformArrivalsOperation
@@ -35,14 +46,37 @@ export class EventArrivalsTracker {
   }
 
   /**
+   * Replaces all existing {@link EventArrivalRegion}s held by this tracker.
+   *
+   * If this method throws, then all events are removed from the tracker, and
+   * an empty array of {@link EventArrivalRegion}s is published to all
+   * subscribers. We remove all regions because the act of throwing means that
+   * no region is being geofenced properly, likely due to background location
+   * permissions being disabled.
+   */
+  async replaceRegions(regions: EventArrivalRegion[]) {
+    try {
+      await Promise.all([
+        this.geofencer.replaceGeofencedRegions(regions),
+        this.upcomingArrivals.replaceAll(regions)
+      ])
+      this.updateGeofencingSubscription(regions)
+      this.callbacks.send(regions)
+    } catch (e) {
+      log("error", "Failed to replace regions", { message: e.message })
+      this.callbacks.send([])
+    }
+  }
+
+  /**
    * Refreshes the upcoming arrivals.
    *
    * @param fetchUpcomingArrivals a function to fetch the upcoming {@link EventArrival}s.
    */
-  async refreshArrivals (
+  async refreshArrivals(
     fetchUpcomingArrivals: () => Promise<EventArrivalRegion[]>
   ) {
-    await this.syncRegions(await fetchUpcomingArrivals())
+    await this.replaceRegions(await fetchUpcomingArrivals())
   }
 
   /**
@@ -50,25 +84,23 @@ export class EventArrivalsTracker {
    *
    * If an arrival exists with the same event id, then that arrival is updated instead of added.
    */
-  async trackArrival (newArrival: EventArrival) {
+  async trackArrival(newArrival: EventArrival) {
     await this.trackArrivals([newArrival])
   }
 
-  async trackArrivals (newArrivals: EventArrival[]) {
+  async trackArrivals(newArrivals: EventArrival[]) {
     await this.transformAllUpcomingArrivals((regions) => {
-      const eventIds = new Set(newArrivals.map((arrival) => arrival.eventId))
-      const newRegions = this.removeByEventIdsTransform(eventIds, regions)
-      for (const arrival of newArrivals) {
+      const deduplicatedArrivals = removeDuplicateArrivals(newArrivals)
+      const newRegions = this.removeByEventIdsTransform(
+        new Set(deduplicatedArrivals.map((arrival) => arrival.eventId)),
+        regions
+      )
+      for (const arrival of deduplicatedArrivals) {
         const regionIndex = newRegions.findIndex((region) => {
           return areEventRegionsEqual(region, arrival)
         })
         if (regionIndex === -1) {
-          newRegions.push({
-            eventIds: [arrival.eventId],
-            coordinate: arrival.coordinate,
-            arrivalRadiusMeters: arrival.arrivalRadiusMeters,
-            isArrived: false
-          })
+          newRegions.push(arrivalRegion(arrival))
         } else {
           newRegions[regionIndex].eventIds.push(arrival.eventId)
         }
@@ -77,17 +109,17 @@ export class EventArrivalsTracker {
     })
   }
 
-  async removeArrivalByEventId (eventId: number) {
+  async removeArrivalByEventId(eventId: number) {
     await this.removeArrivalsByEventIds(new Set([eventId]))
   }
 
-  async removeArrivalsByEventIds (eventIds: Set<number>) {
+  async removeArrivalsByEventIds(eventIds: Set<number>) {
     await this.transformAllUpcomingArrivals((regions) => {
       return this.removeByEventIdsTransform(eventIds, regions)
     })
   }
 
-  private removeByEventIdsTransform (
+  private removeByEventIdsTransform(
     eventIds: Set<number>,
     regions: EventArrivalRegion[]
   ) {
@@ -102,7 +134,7 @@ export class EventArrivalsTracker {
   /**
    * Starts tracking if there is at least 1 upcoming event arrival.
    */
-  async startTracking () {
+  async startTracking() {
     const arrivals = await this.upcomingArrivals.all()
     this.updateGeofencingSubscription(arrivals)
   }
@@ -111,28 +143,34 @@ export class EventArrivalsTracker {
    * Stops tracking all event arrivals in real-time. This will keep upcoming arrivals
    * persisted, but it will not perform any arrival operations on them.
    */
-  stopTracking () {
+  stopTracking() {
     this.unsubscribeFromGeofencing?.()
     this.unsubscribeFromGeofencing = undefined
   }
 
-  private async transformAllUpcomingArrivals (
+  /**
+   * Subscribes to changes in the tracked regions.
+   */
+  subscribe(
+    callback: (regions: EventArrivalRegion[]) => void
+  ): EventArrivalsTrackerSubscription {
+    const unsubscribe = this.callbacks.add(callback)
+    const initial = this.upcomingArrivals.all().then(callback)
+    return {
+      waitForInitialRegionsToLoad: () => initial,
+      unsubscribe
+    }
+  }
+
+  private async transformAllUpcomingArrivals(
     work: (
       regions: EventArrivalRegion[]
     ) => Promise<EventArrivalRegion[]> | EventArrivalRegion[]
   ) {
-    await this.syncRegions(await work(await this.upcomingArrivals.all()))
+    await this.replaceRegions(await work(await this.upcomingArrivals.all()))
   }
 
-  private async syncRegions (regions: EventArrivalRegion[]) {
-    await Promise.all([
-      this.geofencer.replaceGeofencedRegions(regions),
-      this.upcomingArrivals.replaceAll(regions)
-    ])
-    this.updateGeofencingSubscription(regions)
-  }
-
-  private updateGeofencingSubscription (arrivals: EventArrivalRegion[]) {
+  private updateGeofencingSubscription(arrivals: EventArrivalRegion[]) {
     this.stopTracking()
     if (arrivals.length > 0) {
       this.unsubscribeFromGeofencing = this.geofencer.onUpdate((update) => {
@@ -141,11 +179,11 @@ export class EventArrivalsTracker {
     }
   }
 
-  private async handleGeofencingUpdate (update: EventArrivalGeofencedRegion) {
+  private async handleGeofencingUpdate(update: EventArrivalGeofencedRegion) {
     const upcomingArrivals = await this.performArrivalsOperation(
       update,
       update.isArrived ? "arrived" : "departed"
     )
-    await this.syncRegions(upcomingArrivals)
+    await this.replaceRegions(upcomingArrivals)
   }
 }

@@ -71,7 +71,7 @@ export const mockLocationCoordinate2D = (): LocationCoordinate2D => ({
 export const mockTiFLocation = (
   coordinates?: LocationCoordinate2D
 ): TiFLocation => ({
-  coordinates: coordinates ?? mockLocationCoordinate2D(),
+  coordinate: coordinates ?? mockLocationCoordinate2D(),
   placemark: mockPlacemark()
 })
 

@@ -4,19 +4,32 @@
   },
   "build": {
     "development": {
+      "env": {
+        "EAS_BUILD_TYPE": "development"
+      },
       "developmentClient": true,
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "ios": {
+        "buildConfiguration": "Debug"
       }
     },
     "preview": {
+      "env": {
+        "EAS_BUILD_TYPE": "preview"
+      },
       "distribution": "internal",
       "android": {
         "buildType": "apk"
       }
     },
-    "production": {},
+    "production": {
+      "env": {
+        "EAS_BUILD_TYPE": "production"
+      }
+    },
     "development-simulator": {
       "developmentClient": true,
       "distribution": "internal",

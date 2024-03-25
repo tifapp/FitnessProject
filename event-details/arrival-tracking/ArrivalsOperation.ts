@@ -4,6 +4,8 @@ import { EventArrivalRegion } from "@shared-models/EventArrivals"
 
 export type EventArrivalsOperationKind = "arrived" | "departed"
 
+export type EventArrivalsOperationUnsubscribe = () => void
+
 export type PerformArrivalsOperation = (
   region: EventRegion,
   kind: EventArrivalsOperationKind

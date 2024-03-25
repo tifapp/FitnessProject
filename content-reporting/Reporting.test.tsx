@@ -11,12 +11,15 @@ import { captureAlerts } from "@test-helpers/Alerts"
 import { neverPromise } from "@test-helpers/Promise"
 import { REPORTING_REASONS } from "./Models"
 import "@test-helpers/Matchers"
+import { fakeTimers } from "@test-helpers/Timers"
 
 describe("Reporting tests", () => {
   beforeEach(() => jest.resetAllMocks())
 
   describe("ReportingUI tests", () => {
     describe("ReportFormView tests", () => {
+      fakeTimers()
+
       it("submits a report with the correct reason when selected", async () => {
         renderForm()
         submitReportReason("Harassment")

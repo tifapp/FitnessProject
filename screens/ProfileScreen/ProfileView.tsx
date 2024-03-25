@@ -9,7 +9,7 @@ import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
 import EventPager from "./EventCarousel"
 import { AppStyles } from "@lib/AppColorStyle"
 import EventHistoryModal from "./EventHistoryModal"
-import { CurrentUserEvent } from "@lib/events"
+import { CurrentUserEvent } from "@shared-models/Event"
 
 export type ProfileScreenViewProps = {
   user: User

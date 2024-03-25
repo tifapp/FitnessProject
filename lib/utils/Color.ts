@@ -17,7 +17,7 @@ export class ColorString {
   private readonly rgbHexString: string
   readonly opacity: number
 
-  private constructor (rgbaHexString: string, opacity: number) {
+  private constructor(rgbaHexString: string, opacity: number) {
     this.rgbHexString = rgbaHexString
     this.opacity = opacity
   }
@@ -27,14 +27,14 @@ export class ColorString {
    *
    * @param value a number in the range from 0 to 1
    */
-  withOpacity (value: number) {
+  withOpacity(value: number) {
     return new ColorString(this.rgbHexString, value)
   }
 
   /**
    * Outputs this string in hex omitting the alpha if `opacity` is 1.
    */
-  toString () {
+  toString() {
     const opacityHexString =
       this.opacity === 1 ? "" : Math.ceil(255 * this.opacity).toString(16)
     return this.rgbHexString + opacityHexString
@@ -56,7 +56,7 @@ export class ColorString {
    *
    * `123456AA -> 🔴` (Needs #)
    */
-  static parse (hexString: string) {
+  static parse(hexString: string) {
     if (!ColorString.REGEX.test(hexString)) return undefined
     const opacityHex = hexString.slice(ColorString.RGB_HEX_STRING_LENGTH)
     return new ColorString(
@@ -68,6 +68,7 @@ export class ColorString {
   }
 
   static primaryDarkColor = ColorString.parse("#26282A")!
+  static errorColor = ColorString.parse("#EA4335")!
 
   static zodSchema = ZodUtils.createOptionalParseableSchema(ColorString)
 }

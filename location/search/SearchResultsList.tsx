@@ -69,7 +69,7 @@ export const LocationSearchResultsListView = ({
           result={item}
           distanceMiles={
             center
-              ? milesBetweenLocations(center, item.location.coordinates)
+              ? milesBetweenLocations(center, item.location.coordinate)
               : undefined
           }
           style={styles.horizontalPadding}
@@ -88,7 +88,7 @@ export const LocationSearchResultsListView = ({
 }
 
 const keyExtractor = (result: LocationSearchResult) => {
-  return hashLocationCoordinate(result.location.coordinates)
+  return hashLocationCoordinate(result.location.coordinate)
 }
 
 type EmptyResultsProps = {

@@ -2,8 +2,9 @@ export namespace StringUtils {
   /**
    * Captitalizes the first letter in a given string.
    */
-  export const capitalizeFirstLetter = (str: string) => {
-    return str[0].toUpperCase() + str.slice(1)
+  export const capitalizeFirstLetter = <S extends string>(str: S) => {
+    if (str.length === 0) return str as Capitalize<S>
+    return (str[0].toUpperCase() + str.slice(1)) as Capitalize<S>
   }
 
   const WHITESPACE_REGEX = /\s/

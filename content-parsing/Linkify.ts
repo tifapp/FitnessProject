@@ -1,7 +1,8 @@
 import linkifyIt, { LinkifyIt, Match } from "linkify-it"
-import { StringUtils, ToStringable } from "@lib/utils/String"
+import { StringUtils } from "@lib/utils/String"
 import { UserHandle } from "./UserHandle"
 import { EventHandle } from "./EventHandle"
+import { ToStringable } from "@lib/ToStringable"
 
 export type UserHandleLinkifyMatch = Match & { userHandle: UserHandle }
 

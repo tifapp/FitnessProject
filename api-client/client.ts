@@ -1,14 +1,18 @@
 import { JSONSerializableValue } from "@lib/JSONSerializable"
 import { createLogFunction } from "@lib/Logging"
 import { ToStringable } from "@lib/ToStringable"
-import { AnyZodObject, z } from "zod"
+import { AnyZodObject, ZodType, z } from "zod"
 
 export type TiFHTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE"
 
-type BaseTiFAPIRequest<Method extends TiFHTTPMethod> = {
+export type TiFAPIRequestQueryParameters = {
+  [key: string]: ToStringable | undefined
+}
+
+export type BaseTiFAPIRequest<Method extends TiFHTTPMethod> = {
   method: Method
   endpoint: `/${string}`
-  query?: { [key: string]: ToStringable }
+  query?: TiFAPIRequestQueryParameters
 }
 
 /**
@@ -37,9 +41,7 @@ type StatusCodeMap = {
  * must be in the form `statusXXX`.
  */
 export type TiFAPIResponseSchemas = Partial<{
-  [key in keyof StatusCodeMap]: key extends "status204"
-    ? "no-content"
-    : AnyZodObject
+  [key in keyof StatusCodeMap]: key extends "status204" ? "no-content" : ZodType
 }>
 
 const EmptyObjectSchema = z.object({})
@@ -57,7 +59,7 @@ type SchemaFor<
  * A union type mapping a status code to the infered type of a ZodSchema.
  */
 export type TiFAPIResponse<Schemas extends TiFAPIResponseSchemas> = {
-  [key in keyof StatusCodeMap]: SchemaFor<key, Schemas> extends AnyZodObject
+  [key in keyof StatusCodeMap]: SchemaFor<key, Schemas> extends ZodType
     ? {
         status: StatusCodeMap[key]
         data: z.infer<SchemaFor<key, Schemas>>
@@ -201,9 +203,10 @@ const loadResponseBody = async (resp: Response) => {
   }
 }
 
-const queryToSearchParams = (query: { [key: string]: ToStringable }) => {
+const queryToSearchParams = (query: TiFAPIRequestQueryParameters) => {
   const params = new URLSearchParams()
   for (const [key, value] of Object.entries(query)) {
+    if (!value) continue
     params.set(key, value.toString())
   }
   return params

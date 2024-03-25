@@ -2,7 +2,7 @@ import { createForgotPasswordEnvironment } from "@auth/forgot-password/Environme
 import {
   ForgotPasswordParamsList,
   createForgotPasswordScreens
-} from "@auth/forgot-password/ForgotPasswordNavigation"
+} from "@root-feature/navigation/auth/ForgotPassword"
 import { Auth } from "@aws-amplify/auth"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"

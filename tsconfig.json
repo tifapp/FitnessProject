@@ -39,8 +39,11 @@
       "@content-parsing": ["./content-parsing"],
       "@content-reporting": ["./content-reporting"],
       "@date-time": ["./date-time"],
+      "@date-time/*": ["./date-time/*"],
       "@test-helpers/*": ["./test-helpers/*"],
       "@shared-models/*": ["./shared-models/*"],
+      "@notifications": ["./notifications"],
+      "@explore-events": ["./explore-events"],
       "env": ["./.env"]
     }
   },

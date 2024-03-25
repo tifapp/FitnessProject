@@ -40,7 +40,8 @@ export const createTestQueryClient = () => {
       },
       mutations: {
         cacheTime: Infinity,
-        retry: false
+        retry: false,
+        retryDelay: 0
       }
     },
     logger: {

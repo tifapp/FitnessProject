@@ -1,12 +1,13 @@
 import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { CurrentUserEvent, EventColors } from "./Event"
+import { CurrentUserEvent } from "@shared-models/Event"
 import { placemarkToAbbreviatedAddress } from "@location"
 import { dayjs, now } from "@date-time"
 import { Ionicon, IoniconName } from "@components/common/Icons"
 import { BodyText, Caption, Headline } from "@components/Text"
 import ConfirmationDialogue from "@components/common/ConfirmationDialogue"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
+import { ColorString } from "@lib/utils/Color"
 
 export type EventCardProps = {
   event: CurrentUserEvent
@@ -14,9 +15,9 @@ export type EventCardProps = {
 }
 
 export const EventCard = ({ event, style }: EventCardProps) => {
-  const formattedStartDate = event.dateRange.formattedDate(
+  const formattedStartDate = event.time.dateRange.formattedDate(
     now(),
-    dayjs(event.dateRange.startDate)
+    dayjs(event.time.dateRange.startDate)
   )
 
   return (
@@ -38,7 +39,7 @@ export const EventCard = ({ event, style }: EventCardProps) => {
         </BodyText>
         <IconRowView
           icon="calendar"
-          text={`${formattedStartDate} • ${event.dateRange.formattedStartTime()}`}
+          text={`${formattedStartDate} • ${event.time.dateRange.formattedStartTime()}`}
           color={event.color}
           style={styles.bottomSpacing}
         />
@@ -58,14 +59,14 @@ export const EventCard = ({ event, style }: EventCardProps) => {
 
 type IconRowProps = {
   icon: IoniconName
-  color: EventColors
+  color: ColorString
   text: string
   style?: StyleProp<ViewStyle>
 }
 
 const IconRowView = ({ icon, color, text, style }: IconRowProps) => (
   <View style={[style, styles.flexRow]}>
-    <View style={[styles.iconContainer, { backgroundColor: color }]}>
+    <View style={[styles.iconContainer, { backgroundColor: color.toString() }]}>
       <Ionicon name={icon} color="white" style={styles.icon} />
     </View>
     <Caption style={styles.infoText}>{text}</Caption>

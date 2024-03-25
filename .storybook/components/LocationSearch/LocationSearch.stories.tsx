@@ -1,6 +1,5 @@
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
-import { UserLocationFunctionsProvider } from "@location"
 import { ArrayUtils } from "@lib/utils/Array"
 import { delayData } from "@lib/utils/DelayData"
 import {
@@ -35,35 +34,19 @@ const Stack = createStackNavigator()
 
 export const Basic: LocationSearchStory = () => (
   <TiFQueryClientProvider>
-    <UserLocationFunctionsProvider
-      getCurrentLocation={getCurrentPositionAsync}
-      requestForegroundPermissions={async () => ({
-        expires: Infinity,
-        canAskAgain: true,
-        granted: true,
-        status: PermissionStatus.GRANTED
-      })}
-      requestBackgroundPermissions={async () => ({
-        expires: Infinity,
-        canAskAgain: true,
-        granted: true,
-        status: PermissionStatus.GRANTED
-      })}
-    >
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
-          <Stack.Screen name="settings" component={TestScreen} />
-          <Stack.Screen
-            name="search"
-            options={{
-              header: () => <LocationSearchHeader />,
-              headerMode: "screen"
-            }}
-            component={LocationSearchScreen}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </UserLocationFunctionsProvider>
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
+        <Stack.Screen name="settings" component={TestScreen} />
+        <Stack.Screen
+          name="search"
+          options={{
+            header: () => <LocationSearchHeader />,
+            headerMode: "screen"
+          }}
+          component={LocationSearchScreen}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   </TiFQueryClientProvider>
 )
 

@@ -1,13 +1,13 @@
 import HexColorPicker, {
   HexColorPickerOption
 } from "@components/formComponents/HexColorPicker"
-import { HexColor } from "@lib/utils/Color"
 import { HapticsProvider } from "@lib/Haptics"
+import { HexColor } from "@lib/utils/Color"
+import { TestHaptics } from "@test-helpers/Haptics"
+import "@test-helpers/Matchers"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import { useState } from "react"
 import { View } from "react-native"
-import { TestHaptics } from "@test-helpers/Haptics"
-import "@test-helpers/Matchers"
 
 const testOptions = [
   { color: "#123456", accessibilityLabel: "#123456" },

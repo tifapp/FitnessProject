@@ -41,12 +41,14 @@ module.exports = function (api) {
             "@date-time": modulePath("date-time"),
             "@test-helpers": modulePath("test-helpers"),
             "@content-reporting": modulePath("content-reporting"),
-            "@shared-models": modulePath("shared-models")
+            "@shared-models": modulePath("shared-models"),
+            "@notifications": modulePath("notifications"),
+            "@explore-events": modulePath("explore-events")
           },
           extensions: [".js", ".jsx", ".ts", ".tsx"]
         }
       ],
-      "react-native-reanimated/plugin"
+      ["react-native-reanimated/plugin"]
     ]
   }
 }

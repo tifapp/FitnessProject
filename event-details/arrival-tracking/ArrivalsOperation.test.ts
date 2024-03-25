@@ -1,17 +1,15 @@
 import { TiFAPI } from "@api-client/TiFAPI"
+import { ArrayUtils } from "@lib/utils/Array"
+import { randomFloatInRange } from "@lib/utils/Random"
 import { mockLocationCoordinate2D } from "@location/MockData"
 import { mswServer } from "@test-helpers/msw"
 import {
   DefaultBodyType,
-  PathParams,
-  ResponseComposition,
-  RestContext,
-  RestRequest,
-  rest
+  HttpResponse,
+  StrictRequest,
+  http
 } from "msw"
 import { performEventArrivalsOperation } from "./ArrivalsOperation"
-import { randomFloatInRange } from "@lib/utils/Random"
-import { ArrayUtils } from "@lib/utils/Array"
 import { mockEventArrivalRegion } from "./MockData"
 
 describe("ArrivalsOperation tests", () => {
@@ -26,22 +24,21 @@ describe("ArrivalsOperation tests", () => {
     })
 
     const testBodyHandler = async (
-      req: RestRequest<DefaultBodyType, PathParams<string>>,
-      res: ResponseComposition<DefaultBodyType>,
-      ctx: RestContext
+      { request }: {request: StrictRequest<DefaultBodyType>}
     ) => {
-      expect(await req.json()).toEqual(TEST_REGION)
-      return res(
-        ctx.status(200),
-        ctx.json({
-          upcomingRegions: EXPECTED_ARRIVALS_RESULTS
-        })
-      )
+      expect(await request.json()).toEqual(TEST_REGION)
+
+      return new HttpResponse(JSON.stringify({ upcomingRegions: EXPECTED_ARRIVALS_RESULTS }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
     }
 
     test("arrived", async () => {
       mswServer.use(
-        rest.post(TiFAPI.testPath("/event/arrived"), testBodyHandler)
+        http.post(TiFAPI.testPath("/event/arrived"), testBodyHandler)
       )
       const results = await performEventArrivalsOperation(
         TEST_REGION,
@@ -53,7 +50,7 @@ describe("ArrivalsOperation tests", () => {
 
     test("departed", async () => {
       mswServer.use(
-        rest.post(TiFAPI.testPath("/event/departed"), testBodyHandler)
+        http.post(TiFAPI.testPath("/event/departed"), testBodyHandler)
       )
       const results = await performEventArrivalsOperation(
         TEST_REGION,
