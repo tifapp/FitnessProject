@@ -43,6 +43,7 @@
       "@test-helpers/*": ["./test-helpers/*"],
       "@shared-models/*": ["./shared-models/*"],
       "@notifications": ["./notifications"],
+      "@explore-events": ["./explore-events"],
       "env": ["./.env"]
     }
   },

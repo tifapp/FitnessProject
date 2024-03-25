@@ -1,5 +1,4 @@
 import { StackNavigatorType } from "@components/Navigation"
-import { Cancellable } from "@lib/Cancellable"
 import {
   LocationCoordinate2D,
   Region,
@@ -13,7 +12,7 @@ import {
   useExploreEvents,
   ExploreEventsView,
   createInitialCenter
-} from "@screens/ExploreEvents"
+} from "@explore-events"
 
 export type ExploreEventsScreensParamsList = {
   exploreEvents: { searchText: string; center?: LocationCoordinate2D }
@@ -33,7 +32,10 @@ export const createExploreEventsScreens = <
   ParamsList extends ExploreEventsScreensParamsList
 >(
   stack: StackNavigatorType<ParamsList>,
-  fetchEvents: (region: Region) => Cancellable<CurrentUserEvent[]>
+  fetchEvents: (
+    region: Region,
+    signal?: AbortSignal
+  ) => Promise<CurrentUserEvent[]>
 ) => (
   <>
     <stack.Screen
@@ -50,12 +52,14 @@ export const createExploreEventsScreens = <
 )
 
 type ExploreEventsScreenProps = {
-  fetchEvents: (region: Region) => Cancellable<CurrentUserEvent[]>
+  fetchEvents: (
+    region: Region,
+    signal?: AbortSignal
+  ) => Promise<CurrentUserEvent[]>
 } & ExploreEventsProps
 
 const ExploreEventsScreen = ({
   route,
-  navigation,
   fetchEvents
 }: ExploreEventsScreenProps) => {
   const { region, data, updateRegion } = useExploreEvents(
