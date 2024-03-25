@@ -12,6 +12,7 @@ import { createAWSTiFAPIFetch } from "./aws"
 import { TiFAPIFetch, createTiFAPIFetch } from "./client"
 import { JoinEventResponseSchema } from "@shared-models/JoinEvent"
 import { UserID } from "@shared-models/User"
+import { LocationCoordinate2D } from "@shared-models/Location"
 
 export type UpdateCurrentUserProfileRequest = Partial<{
   name: string
@@ -315,6 +316,27 @@ export class TiFAPI {
         status204: "no-content",
         status404: UserNotFoundResponseSchema,
         status403: userErrorSchema("user-not-blocked")
+      }
+    )
+  }
+
+  /**
+   * Returns the events in the area of the center with the given radius in
+   * meters.
+   */
+  async eventsInArea(center: LocationCoordinate2D, radiusMeters: number) {
+    return await this.apiFetch(
+      {
+        method: "POST",
+        endpoint: "/event/region",
+        body: {
+          userLatitude: center.latitude,
+          userLongitude: center.longitude,
+          radius: radiusMeters
+        }
+      },
+      {
+        status200: z.object({ events: z.array(CurrentUserEventResponseSchema) })
       }
     )
   }
