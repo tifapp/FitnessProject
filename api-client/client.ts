@@ -181,7 +181,7 @@ const parseResponseBody = async (
 ) => {
   try {
     return await responseSchema.parseAsync(json)
-  } catch {
+  } catch (e) {
     throw new Error(
       `TiF API responded with an invalid JSON body ${JSON.stringify(
         json
