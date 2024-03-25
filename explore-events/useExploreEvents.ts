@@ -1,4 +1,3 @@
-import { Cancellable, cancelOnAborted } from "@lib/Cancellable"
 import { CurrentUserEvent } from "@shared-models/Event"
 import { useState } from "react"
 import { UseQueryResult, useQuery, useQueryClient } from "@tanstack/react-query"
@@ -19,7 +18,10 @@ import { LocationAccuracy, PermissionResponse } from "expo-location"
 import { eventDetailsQueryKey } from "@shared-models/query-keys/Event"
 
 export type UseExploreEventsEnvironment = {
-  fetchEvents: (region: Region) => Cancellable<CurrentUserEvent[]>
+  fetchEvents: (
+    region: Region,
+    signal?: AbortSignal
+  ) => Promise<CurrentUserEvent[]>
   isSignificantlyDifferentRegions: (r1: Region, r2: Region) => boolean
 }
 
@@ -99,7 +101,10 @@ const useUserRegion = (
 
 const useExploreEventsQuery = (
   region: Region,
-  fetchEvents: (region: Region) => Cancellable<CurrentUserEvent[]>,
+  fetchEvents: (
+    region: Region,
+    signal?: AbortSignal
+  ) => Promise<CurrentUserEvent[]>,
   options: QueryHookOptions<CurrentUserEvent[]>
 ) => {
   const queryClient = useQueryClient()
@@ -108,7 +113,7 @@ const useExploreEventsQuery = (
     events: useQuery(
       queryKey,
       async ({ signal }) => {
-        const events = await cancelOnAborted(fetchEvents(region), signal).value
+        const events = await fetchEvents(region, signal)
 
         events.forEach((event) => {
           queryClient.setQueryData(eventDetailsQueryKey(event.id), {

@@ -24,6 +24,9 @@ import { renderUseLoadEventDetails } from "@event-details/TestHelpers"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 import { neverPromise } from "@test-helpers/Promise"
 import { EventID } from "@shared-models/Event"
+import { Region } from "@location/Region"
+import { FadeInUp } from "react-native-reanimated"
+import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 
 const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
 
@@ -62,9 +65,7 @@ describe("ExploreEvents tests", () => {
 
       requestForegroundPermissions.mockResolvedValueOnce({ granted: true })
       queryUserCoordinates.mockReturnValueOnce(userLocation)
-      fetchEvents.mockReturnValueOnce(
-        nonCancellable(Promise.resolve(TEST_EVENTS))
-      )
+      fetchEvents.mockResolvedValueOnce(TEST_EVENTS)
 
       const { result } = renderUseExploreEvents({ center: "user-location" })
 
@@ -74,15 +75,13 @@ describe("ExploreEvents tests", () => {
 
       await waitFor(() => expect(result.current.data.status).toEqual("success"))
       expect(result.current.data.events).toEqual(TEST_EVENTS)
-      expect(fetchEvents).toHaveBeenCalledWith(expectedRegion)
+      expectFetchedExploreRegion(expectedRegion)
     })
 
     test("retrying after unsuccessfully exploring events", async () => {
       fetchEvents
-        .mockReturnValueOnce(nonCancellable(Promise.reject(new Error())))
-        .mockReturnValueOnce(
-          nonCancellable(Promise.resolve([EventMocks.Multiday]))
-        )
+        .mockRejectedValueOnce(new Error())
+        .mockResolvedValueOnce([EventMocks.Multiday])
 
       const coordinate = mockLocationCoordinate2D()
       const { result } = renderUseExploreEvents({
@@ -102,7 +101,7 @@ describe("ExploreEvents tests", () => {
     })
 
     it("should be in a no-results state when no events for region", async () => {
-      fetchEvents.mockReturnValueOnce(nonCancellable(Promise.resolve([])))
+      fetchEvents.mockResolvedValueOnce([])
       const coordinate = mockLocationCoordinate2D()
       const { result } = renderUseExploreEvents({
         center: "preset",
@@ -115,7 +114,7 @@ describe("ExploreEvents tests", () => {
     })
 
     it("should use the initial provided region when fetching for first time", async () => {
-      fetchEvents.mockReturnValueOnce(endlessCancellable())
+      mockEndlessFetchEvents()
       const coordinates = mockLocationCoordinate2D()
       const expectedRegion = createDefaultMapRegion(coordinates)
       const { result } = renderUseExploreEvents({
@@ -127,12 +126,12 @@ describe("ExploreEvents tests", () => {
         expect(result.current.region).toMatchObject(expectedRegion)
       })
       await waitFor(() => {
-        expect(fetchEvents).toHaveBeenCalledWith(expectedRegion)
+        expectFetchedExploreRegion(expectedRegion)
       })
     })
 
     it("should not request location permissions if initial coordinates provided", async () => {
-      fetchEvents.mockReturnValueOnce(endlessCancellable())
+      mockEndlessFetchEvents()
 
       renderUseExploreEvents({
         center: "preset",
@@ -145,32 +144,32 @@ describe("ExploreEvents tests", () => {
     })
 
     it("should use sanfrancisco as the default region when user denies foreground location permissions", async () => {
-      fetchEvents.mockReturnValueOnce(endlessCancellable())
+      mockEndlessFetchEvents()
       requestForegroundPermissions.mockResolvedValueOnce({ granted: false })
 
       const { result } = renderUseExploreEvents({ center: "user-location" })
 
       await waitFor(() => {
-        expect(fetchEvents).toHaveBeenCalledWith(SAN_FRANCISCO_DEFAULT_REGION)
+        expectFetchedExploreRegion(SAN_FRANCISCO_DEFAULT_REGION)
       })
       expect(result.current.region).toEqual(SAN_FRANCISCO_DEFAULT_REGION)
     })
 
     it("should use sanfrancisco as the default region when user location fetch errors", async () => {
-      fetchEvents.mockReturnValueOnce(endlessCancellable())
+      mockEndlessFetchEvents()
       requestForegroundPermissions.mockResolvedValueOnce({ granted: true })
       queryUserCoordinates.mockRejectedValueOnce(new Error())
 
       const { result } = renderUseExploreEvents({ center: "user-location" })
 
       await waitFor(() => {
-        expect(fetchEvents).toHaveBeenCalledWith(SAN_FRANCISCO_DEFAULT_REGION)
+        expectFetchedExploreRegion(SAN_FRANCISCO_DEFAULT_REGION)
       })
       expect(result.current.region).toEqual(SAN_FRANCISCO_DEFAULT_REGION)
     })
 
     it("should maintain current region when new region is not significantly different", async () => {
-      fetchEvents.mockReturnValueOnce(endlessCancellable())
+      mockEndlessFetchEvents()
       isSignificantlyDifferentRegions.mockReturnValueOnce(false)
       const coordinate = mockLocationCoordinate2D()
       const initialRegion = createDefaultMapRegion(coordinate)
@@ -184,13 +183,13 @@ describe("ExploreEvents tests", () => {
 
       advanceThroughRegionUpdateDebounce()
       expect(result.current.region).toMatchObject(initialRegion)
-      await waitFor(() => {
-        expect(fetchEvents).not.toHaveBeenCalledWith(updatedRegion)
+      await verifyNeverOccurs(() => {
+        expectFetchedExploreRegion(updatedRegion)
       })
     })
 
     it("should update to new region after debounce period if new region is significantly different", async () => {
-      fetchEvents.mockReturnValueOnce(endlessCancellable())
+      mockEndlessFetchEvents()
       isSignificantlyDifferentRegions.mockReturnValueOnce(true)
       const { result } = renderUseExploreEvents({
         center: "preset",
@@ -203,12 +202,12 @@ describe("ExploreEvents tests", () => {
       advanceThroughRegionUpdateDebounce()
       expect(result.current.region).toMatchObject(updatedRegion)
       await waitFor(() => {
-        expect(fetchEvents).toHaveBeenCalledWith(updatedRegion)
+        expectFetchedExploreRegion(updatedRegion)
       })
     })
 
     it("should region update region immediately when current region is non-existent", async () => {
-      fetchEvents.mockReturnValueOnce(endlessCancellable())
+      mockEndlessFetchEvents()
       const { result } = renderUseExploreEvents({ center: "user-location" })
 
       const region = mockRegion()
@@ -216,13 +215,16 @@ describe("ExploreEvents tests", () => {
 
       expect(result.current.region).toMatchObject(region)
       await waitFor(() => {
-        expect(fetchEvents).toHaveBeenCalledWith(region)
+        expectFetchedExploreRegion(region)
       })
     })
 
     it("should cancel the existing fetch immediatedly when significant region change", async () => {
-      const cancellable = endlessCancellable()
-      fetchEvents.mockReturnValueOnce(cancellable)
+      let testSignal: AbortSignal | undefined
+      fetchEvents.mockImplementation(async (_, signal) => {
+        testSignal = signal
+        return await neverPromise()
+      })
       isSignificantlyDifferentRegions.mockReturnValueOnce(true)
 
       const { result } = renderUseExploreEvents({
@@ -235,12 +237,12 @@ describe("ExploreEvents tests", () => {
       const region = mockRegion()
       act(() => result.current.updateRegion(region))
 
-      await waitFor(() => expect(cancellable.cancel).toHaveBeenCalled())
+      await waitFor(() => expect(testSignal?.aborted).toEqual(true))
     })
 
     it("should seed the query cache with an entry for each individual loaded event", async () => {
       const events = [EventMocks.Multiday, EventMocks.PickupBasketball]
-      fetchEvents.mockReturnValueOnce(nonCancellable(Promise.resolve(events)))
+      fetchEvents.mockResolvedValueOnce(events)
 
       const { result: event1Result } = renderEventDetails(events[0].id)
       const { result: event2Result } = renderEventDetails(events[1].id)
@@ -264,6 +266,10 @@ describe("ExploreEvents tests", () => {
       })
     })
 
+    const expectFetchedExploreRegion = (region: Region) => {
+      expect(fetchEvents).toHaveBeenCalledWith(region, expect.any(AbortSignal))
+    }
+
     const renderEventDetails = (id: EventID) => {
       return renderUseLoadEventDetails(
         id,
@@ -271,6 +277,10 @@ describe("ExploreEvents tests", () => {
         neverPromise,
         queryClient
       )
+    }
+
+    const mockEndlessFetchEvents = () => {
+      fetchEvents.mockImplementationOnce(neverPromise)
     }
 
     const advanceThroughRegionUpdateDebounce = () => {
