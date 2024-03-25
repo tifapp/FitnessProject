@@ -111,7 +111,10 @@ const useExploreEventsQuery = (
         const events = await cancelOnAborted(fetchEvents(region), signal).value
 
         events.forEach((event) => {
-          queryClient.setQueryData(eventDetailsQueryKey(event.id), event)
+          queryClient.setQueryData(eventDetailsQueryKey(event.id), {
+            status: "success",
+            event
+          })
         })
 
         return events

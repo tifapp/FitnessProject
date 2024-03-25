@@ -20,6 +20,10 @@ import {
   ExploreEventsInitialCenter
 } from "./models"
 import { useExploreEvents } from "./useExploreEvents"
+import { renderUseLoadEventDetails } from "@event-details/TestHelpers"
+import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
+import { neverPromise } from "@test-helpers/Promise"
+import { EventID } from "@shared-models/Event"
 
 const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
 
@@ -238,20 +242,36 @@ describe("ExploreEvents tests", () => {
       const events = [EventMocks.Multiday, EventMocks.PickupBasketball]
       fetchEvents.mockReturnValueOnce(nonCancellable(Promise.resolve(events)))
 
+      const { result: event1Result } = renderEventDetails(events[0].id)
+      const { result: event2Result } = renderEventDetails(events[1].id)
+
       renderUseExploreEvents({
         center: "preset",
         coordinate: mockLocationCoordinate2D()
       })
 
       await waitFor(() => {
-        expect(
-          queryClient.getQueryData(eventDetailsQueryKey(events[0].id))
-        ).toMatchObject(events[0])
+        expect(event1Result.current).toMatchObject({
+          status: "success",
+          event: events[0]
+        })
       })
-      expect(
-        queryClient.getQueryData(eventDetailsQueryKey(events[1].id))
-      ).toMatchObject(events[1])
+      await waitFor(() => {
+        expect(event2Result.current).toMatchObject({
+          status: "success",
+          event: events[1]
+        })
+      })
     })
+
+    const renderEventDetails = (id: EventID) => {
+      return renderUseLoadEventDetails(
+        id,
+        new TestInternetConnectionStatus(true),
+        neverPromise,
+        queryClient
+      )
+    }
 
     const advanceThroughRegionUpdateDebounce = () => {
       act(() => timeTravel(300))
