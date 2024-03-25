@@ -8,7 +8,7 @@ import { ExploreEventsMap } from "./Map"
 import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
 import { ExploreEventsBottomSheet } from "./BottomSheet"
 import { BodyText, Title } from "@components/Text"
-import { SkeletonEventCard } from "@screens/ExploreEvents/SkeletonEventCard"
+import { SkeletonEventCard } from "./SkeletonEventCard"
 import { Ionicon } from "@components/common/Icons"
 import { PrimaryButton } from "@components/Buttons"
 import { ExploreEventsSearchBar } from "./SearchBar"
@@ -45,20 +45,18 @@ export const ExploreEventsView = ({
 
   return (
     <View style={[style, styles.container]}>
-      {region
-        ? (
-          <ExploreEventsMap
-            initialRegion={region}
-            onLongPress={onMapLongPress}
-            onRegionChanged={onRegionUpdated}
-            onEventSelected={onEventTapped}
-            events={mapEventsData ?? []}
-            style={styles.map}
-          />
-        )
-        : (
-          <Water />
-        )}
+      {region ? (
+        <ExploreEventsMap
+          initialRegion={region}
+          onLongPress={onMapLongPress}
+          onRegionChanged={onRegionUpdated}
+          onEventSelected={onEventTapped}
+          events={mapEventsData ?? []}
+          style={styles.map}
+        />
+      ) : (
+        <Water />
+      )}
       <View style={[{ paddingTop: insets.top + 4 }, styles.searchBarContainer]}>
         <Pressable onPress={onSearchTapped} style={styles.searchBar}>
           <ExploreEventsSearchBar text={searchText} />

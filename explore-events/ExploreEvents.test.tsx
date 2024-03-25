@@ -5,13 +5,6 @@ import {
   mockRegion
 } from "@location/MockData"
 import { UserLocationFunctionsProvider } from "@location/UserLocation"
-import {
-  ExploreEventsInitialCenter,
-  SAN_FRANCISCO_DEFAULT_REGION,
-  createDefaultMapRegion,
-  createInitialCenter,
-  useExploreEvents
-} from "@screens/ExploreEvents"
 import { eventDetailsQueryKey } from "@shared-models/query-keys/Event"
 import { endlessCancellable, nonCancellable } from "@test-helpers/Cancellable"
 import {
@@ -20,6 +13,13 @@ import {
 } from "@test-helpers/ReactQuery"
 import { timeTravel, fakeTimers } from "@test-helpers/Timers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
+import {
+  createInitialCenter,
+  createDefaultMapRegion,
+  SAN_FRANCISCO_DEFAULT_REGION,
+  ExploreEventsInitialCenter
+} from "./models"
+import { useExploreEvents } from "./useExploreEvents"
 
 const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
 

@@ -42,7 +42,8 @@ module.exports = function (api) {
             "@test-helpers": modulePath("test-helpers"),
             "@content-reporting": modulePath("content-reporting"),
             "@shared-models": modulePath("shared-models"),
-            "@notifications": modulePath("notifications")
+            "@notifications": modulePath("notifications"),
+            "@explore-events": modulePath("explore-events")
           },
           extensions: [".js", ".jsx", ".ts", ".tsx"]
         }

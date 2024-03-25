@@ -1,4 +1,4 @@
-import { ExploreEventsMarkerView } from "@screens/ExploreEvents/MapMarker"
+import { ExploreEventsMarkerView } from "./MapMarker"
 import { CurrentUserEvent } from "@shared-models/Event"
 import { LocationCoordinate2D, Region } from "@location/index"
 import React from "react"
