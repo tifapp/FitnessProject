@@ -12,23 +12,197 @@ import {
 import { timeTravel, fakeTimers } from "@test-helpers/Timers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import {
-  createInitialCenter,
   createDefaultMapRegion,
   SAN_FRANCISCO_DEFAULT_REGION,
   ExploreEventsInitialCenter
-} from "./models"
-import { useExploreEvents } from "./ExploreEvents"
+} from "./Models"
+import { eventsByRegion, useExploreEvents } from "./ExploreEvents"
 import { renderUseLoadEventDetails } from "@event-details/TestHelpers"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 import { neverPromise } from "@test-helpers/Promise"
 import { EventID } from "@shared-models/Event"
-import { Region } from "@location/Region"
+import { Region, minRegionMeterRadius } from "@location/Region"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
+import { mswServer } from "@test-helpers/msw"
+import { HttpResponse, http } from "msw"
+import { TiFAPI } from "@api-client/TiFAPI"
 
 const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
 
 describe("ExploreEvents tests", () => {
   beforeEach(() => jest.resetAllMocks())
+
+  describe("EventsByRegion tests", () => {
+    fakeTimers()
+
+    const TEST_EXPLORE_RESPONSE = {
+      events: [
+        {
+          attendeeCount: 2,
+          isChatExpired: false,
+          createdAt: "2024-03-25T03:31:24.000Z",
+          description: "Dactylomys boliviensis",
+          color: "#FFFFFF",
+          endedAt: null,
+          hasArrived: false,
+          host: {
+            handle: "marygoodwin3187",
+            id: "269851f0-64ae-4fc6-a2e3-e1b957cc7769",
+            profileImageURL: null,
+            relations: {
+              themToYou: "not-friends",
+              youToThem: "not-friends"
+            },
+            username: "Mary Goodwin"
+          },
+          id: 19160,
+          joinDate: "2024-03-25T03:31:26.000Z",
+          location: {
+            arrivalRadiusMeters: 120,
+            coordinate: {
+              latitude: 34.9187,
+              longitude: -94.8593
+            },
+            isInArrivalTrackingPeriod: true,
+            placemark: {
+              city: "Sample Neighborhood",
+              country: "Sample Country",
+              name: "Sample Location",
+              street: "Sample Street",
+              streetNumber: "1234"
+            },
+            timezoneIdentifier: "Sample/Timezone"
+          },
+          previewAttendees: [
+            {
+              id: "269851f0-64ae-4fc6-a2e3-e1b957cc7769",
+              profileImageURL: null
+            },
+            {
+              id: "b144faae-8519-40ab-9af4-99a27bf7bccd",
+              profileImageURL: null
+            }
+          ],
+          settings: {
+            isChatEnabled: true,
+            shouldHideAfterStartDate: true
+          },
+          time: {
+            dateRange: {
+              endDateTime: "2025-03-25T03:31:22.000Z",
+              startDateTime: "2024-03-25T15:31:22.000Z"
+            },
+            secondsToStart: 43195.08,
+            todayOrTomorrow: "today"
+          },
+          title: "quince",
+          updatedAt: "2024-03-25T03:31:24.000Z",
+          userAttendeeStatus: "attending"
+        },
+        {
+          attendeeCount: 2,
+          isChatExpired: false,
+          createdAt: "2024-03-25T03:31:24.000Z",
+          description: "Dactylomys boliviensis",
+          color: "#FFFFFF",
+          endedAt: null,
+          hasArrived: false,
+          host: {
+            handle: "marygoodwin3187",
+            id: "269851f0-64ae-4fc6-a2e3-e1b957cc7769",
+            profileImageURL: null,
+            relations: {
+              themToYou: "not-friends",
+              youToThem: "not-friends"
+            },
+            username: "Mary Goodwin"
+          },
+          id: 19161,
+          joinDate: "2024-03-25T03:31:26.000Z",
+          location: {
+            arrivalRadiusMeters: 120,
+            coordinate: {
+              latitude: 34.9187,
+              longitude: -94.8593
+            },
+            isInArrivalTrackingPeriod: true,
+            placemark: {
+              city: "Sample Neighborhood",
+              country: "Sample Country",
+              name: "Sample Location",
+              street: "Sample Street",
+              streetNumber: "1234"
+            },
+            timezoneIdentifier: "Sample/Timezone"
+          },
+          previewAttendees: [
+            {
+              id: "269851f0-64ae-4fc6-a2e3-e1b957cc7769",
+              profileImageURL: null
+            },
+            {
+              id: "b144faae-8519-40ab-9af4-99a27bf7bccd",
+              profileImageURL: null
+            }
+          ],
+          settings: {
+            isChatEnabled: true,
+            shouldHideAfterStartDate: true
+          },
+          time: {
+            dateRange: {
+              endDateTime: "2025-03-25T03:31:22.000Z",
+              startDateTime: "2024-03-24T15:31:22.000Z"
+            },
+            secondsToStart: -43204.922,
+            todayOrTomorrow: null
+          },
+          title: "quince",
+          updatedAt: "2024-03-25T03:31:24.000Z",
+          userAttendeeStatus: "attending"
+        }
+      ]
+    }
+
+    test("basics", async () => {
+      const now = new Date()
+      jest.setSystemTime(now)
+      const region = mockRegion()
+      setupExploreEndpointHandlerExpectingRegion(
+        region.latitude,
+        region.longitude,
+        minRegionMeterRadius(region)
+      )
+      const events = await eventsByRegion(
+        TiFAPI.testAuthenticatedInstance,
+        region
+      )
+      expect(events).toMatchObject([
+        {
+          id: TEST_EXPLORE_RESPONSE.events[0].id,
+          time: { clientReceivedTime: now }
+        },
+        {
+          id: TEST_EXPLORE_RESPONSE.events[1].id,
+          time: { clientReceivedTime: now }
+        }
+      ])
+    })
+
+    const setupExploreEndpointHandlerExpectingRegion = (
+      userLatitude: number,
+      userLongitude: number,
+      radius: number
+    ) => {
+      mswServer.use(
+        http.post(TiFAPI.testPath("/event/region"), async ({ request }) => {
+          const body = await request.json()
+          expect(body).toEqual({ userLatitude, userLongitude, radius })
+          return HttpResponse.json(TEST_EXPLORE_RESPONSE)
+        })
+      )
+    }
+  })
 
   describe("UseExploreEvents tests", () => {
     const queryClient = createTestQueryClient()
