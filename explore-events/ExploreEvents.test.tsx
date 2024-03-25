@@ -12,11 +12,10 @@ import {
 import { timeTravel, fakeTimers } from "@test-helpers/Timers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import {
-  createInitialCenter,
   createDefaultMapRegion,
   SAN_FRANCISCO_DEFAULT_REGION,
   ExploreEventsInitialCenter
-} from "./models"
+} from "./Models"
 import { useExploreEvents } from "./ExploreEvents"
 import { renderUseLoadEventDetails } from "@event-details/TestHelpers"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
