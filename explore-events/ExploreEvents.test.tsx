@@ -5,8 +5,6 @@ import {
   mockRegion
 } from "@location/MockData"
 import { UserLocationFunctionsProvider } from "@location/UserLocation"
-import { eventDetailsQueryKey } from "@shared-models/query-keys/Event"
-import { endlessCancellable, nonCancellable } from "@test-helpers/Cancellable"
 import {
   TestQueryClientProvider,
   createTestQueryClient
@@ -19,13 +17,12 @@ import {
   SAN_FRANCISCO_DEFAULT_REGION,
   ExploreEventsInitialCenter
 } from "./models"
-import { useExploreEvents } from "./useExploreEvents"
+import { useExploreEvents } from "./ExploreEvents"
 import { renderUseLoadEventDetails } from "@event-details/TestHelpers"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 import { neverPromise } from "@test-helpers/Promise"
 import { EventID } from "@shared-models/Event"
 import { Region } from "@location/Region"
-import { FadeInUp } from "react-native-reanimated"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 
 const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
@@ -33,25 +30,7 @@ const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
 describe("ExploreEvents tests", () => {
   beforeEach(() => jest.resetAllMocks())
 
-  describe("ExploreEventsInitialCenter tests", () => {
-    describe("CoordinateToInitialCenter tests", () => {
-      it("should be user-location when undefined", () => {
-        expect(createInitialCenter(undefined)).toMatchObject({
-          center: "user-location"
-        })
-      })
-
-      it("should be preset when coordinates passed", () => {
-        const coordinate = mockLocationCoordinate2D()
-        expect(createInitialCenter(coordinate)).toMatchObject({
-          center: "preset",
-          coordinate
-        })
-      })
-    })
-  })
-
-  describe("useExploreEvents tests", () => {
+  describe("UseExploreEvents tests", () => {
     const queryClient = createTestQueryClient()
     beforeEach(() => queryClient.clear())
     fakeTimers()

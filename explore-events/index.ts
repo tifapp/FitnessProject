@@ -1,5 +1,4 @@
-export * from "./ExploreView"
-export * from "./useExploreEvents"
-export * from "./models"
+export * from "./ExploreEvents"
+export * from "./Models"
 export * from "./Map"
 export * from "./MapMarker"
