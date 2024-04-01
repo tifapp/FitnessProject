@@ -4,10 +4,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import {
   LocationCoordinate2D,
   Region,
+  minRegionMeterRadius,
   useRequestForegroundLocationPermissions,
   useUserCoordinatesQuery
 } from "@location/index"
-import { CurrentUserEvent } from "@shared-models/Event"
+import {
+  CurrentUserEvent,
+  currentUserEventFromResponse
+} from "@shared-models/Event"
 import {
   ExploreEventsData,
   ExploreEventsInitialCenter,
@@ -27,6 +31,21 @@ import { QueryHookOptions } from "@lib/ReactQuery"
 import { eventDetailsQueryKey } from "@shared-models/query-keys/Event"
 import { UseQueryResult, useQueryClient, useQuery } from "@tanstack/react-query"
 import { PermissionResponse, LocationAccuracy } from "expo-location"
+import { TiFAPI } from "@api-client/TiFAPI"
+
+export const eventsByRegion = async (
+  api: TiFAPI,
+  region: Region,
+  signal?: AbortSignal
+) => {
+  return (
+    await api.exploreEvents(
+      { latitude: region.latitude, longitude: region.longitude },
+      minRegionMeterRadius(region),
+      signal
+    )
+  ).data.events.map(currentUserEventFromResponse)
+}
 
 export type UseExploreEventsEnvironment = {
   fetchEvents: (
