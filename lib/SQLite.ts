@@ -4,6 +4,8 @@ import {
   openDatabaseAsync
 } from "expo-sqlite/next"
 
+export const SQLITE_IN_MEMORY_PATH = ":memory:"
+
 /**
  * A class that manages the SQLite database for the app.
  *
@@ -17,12 +19,21 @@ export class TiFSQLite {
   private sqlExecutablePromise: Promise<ExpoSQLExecutable>
   private queuedTransactions = [] as (() => Promise<void>)[]
 
+  private get isQueueEmpty() {
+    return this.queuedTransactions.length === 0
+  }
+
   /**
    * Opens a sqlite database at the given path with all application
    * tables and migrations applied/created.
    */
-  constructor(path: string) {
-    this.sqlExecutablePromise = TiFSQLite.open(path)
+  constructor(
+    path: string,
+    openSQLExecuatble: (
+      path: string
+    ) => Promise<ExpoSQLExecutable> = openExpoSQLExecutable
+  ) {
+    this.sqlExecutablePromise = TiFSQLite.setup(path, openSQLExecuatble)
   }
 
   /**
@@ -37,8 +48,16 @@ export class TiFSQLite {
    * @param fn A function to run with exclusive database access.
    */
   withTransaction<T>(fn: (db: SQLExecutable) => Promise<T>) {
-    const shouldRunTransactions = this.queuedTransactions.length === 0
-    const promise = new Promise<T>((resolve, reject) => {
+    const shouldRunTransactions = this.isQueueEmpty
+    const promise = this.enqueueTransaction(fn)
+    if (shouldRunTransactions) {
+      this.runQueueUntilEmpty()
+    }
+    return promise
+  }
+
+  private enqueueTransaction<T>(fn: (db: SQLExecutable) => Promise<T>) {
+    return new Promise<T>((resolve, reject) => {
       this.queuedTransactions.push(async () => {
         try {
           const db = await this.sqlExecutablePromise
@@ -50,22 +69,37 @@ export class TiFSQLite {
         }
       })
     })
-    if (shouldRunTransactions) {
-      this.runQueuedTransactions()
-    }
-    return promise
   }
 
-  private async runQueuedTransactions() {
-    while (this.queuedTransactions.length > 0) {
+  private async runQueueUntilEmpty() {
+    while (!this.isQueueEmpty) {
       const transaction = this.queuedTransactions[0]
       await transaction()
       this.queuedTransactions.shift()
     }
   }
 
-  private static async open(path: string) {
-    const db = new ExpoSQLExecutable(await openDatabaseAsync(path))
+  private static async setup(
+    path: string,
+    openSQLExecuatble: (path: string) => Promise<ExpoSQLExecutable>
+  ) {
+    const db = await TiFSQLite.openWithInMemoryFallback(path, openSQLExecuatble)
+    await TiFSQLite.migrateV1(db)
+    return db
+  }
+
+  private static async openWithInMemoryFallback(
+    path: string,
+    openSQLExecuatble: (path: string) => Promise<ExpoSQLExecutable>
+  ) {
+    try {
+      return await openSQLExecuatble(path)
+    } catch {
+      return await openSQLExecuatble(SQLITE_IN_MEMORY_PATH)
+    }
+  }
+
+  private static async migrateV1(db: SQLExecutable) {
     await Promise.all([
       db.run`
       CREATE TABLE IF NOT EXISTS LocationArrivals (
@@ -137,7 +171,6 @@ export class TiFSQLite {
       )
       `
     ])
-    return db
   }
 }
 
@@ -150,12 +183,19 @@ export class TiFSQLite {
  */
 export type SQLExecutable = Omit<ExpoSQLExecutable, "expoDb">
 
+export const openExpoSQLExecutable = async (path: string) => {
+  return new ExpoSQLExecutable(await openDatabaseAsync(path))
+}
+
 /**
  * A value that can be placed in the template string in {@link SQLExecutable}.
  */
 export type SQLiteInterpolatableValue = SQLiteBindValue | undefined
 
-class ExpoSQLExecutable {
+/**
+ * An expo backed {@link SQLExecutable}.
+ */
+export class ExpoSQLExecutable implements SQLExecutable {
   readonly expoDb: ExpoSQLiteDatabase
 
   constructor(db: ExpoSQLiteDatabase) {
