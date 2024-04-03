@@ -1,6 +1,7 @@
 import { TiFAPI } from "@api-client/TiFAPI"
 import { Headline } from "@components/Text"
 import { EventAttendee } from "@shared-models/Event"
+import { eventAttendeesListQueryKey } from "@shared-models/query-keys/Event"
 import { useInfiniteQuery } from "@tanstack/react-query"
 import React from "react"
 import { FlatList, StyleProp, View, ViewStyle } from "react-native"
@@ -59,23 +60,23 @@ export type UseAttendeesListResult =
       isFetchingNextPage: boolean
     }
 
-export type UseAttendeesListProps =
-{
-  fetchNextAttendeesPage:
-  (
+export type UseAttendeesListProps = {
+  fetchNextAttendeesPage: (
     eventId: number,
     pageSize: number,
     nextPageCursor?: string
-  ) => Promise<EventAttendeesPage>,
-  eventId: number,
+  ) => Promise<EventAttendeesPage>
+  eventId: number
   pageSize: number
 }
 
 export const useAttendeesList = ({
-  fetchNextAttendeesPage, eventId, pageSize
+  fetchNextAttendeesPage,
+  eventId,
+  pageSize
 }: UseAttendeesListProps): UseAttendeesListResult => {
   const infiniteAttendeesQuery = useInfiniteQuery<EventAttendeesPage, Error>({
-    queryKey: ["eventAttendees", eventId],
+    queryKey: eventAttendeesListQueryKey(eventId),
     queryFn: async ({ pageParam }) => {
       return await fetchNextAttendeesPage(eventId, pageSize, pageParam)
     },
@@ -107,8 +108,8 @@ export const useAttendeesList = ({
         .flat() ?? [],
     fetchNextGroup: infiniteAttendeesQuery.hasNextPage
       ? () => {
-        infiniteAttendeesQuery.fetchNextPage()
-      }
+          infiniteAttendeesQuery.fetchNextPage()
+        }
       : undefined,
     totalAttendeeCount:
       infiniteAttendeesQuery.data?.pages[
@@ -124,7 +125,10 @@ export type AttendeesListViewProps = {
   renderAttendee: (eventAttendee: EventAttendee) => JSX.Element
   ListHeaderComponent?: JSX.Element
   style?: StyleProp<ViewStyle>
-} & Omit<Extract<ReturnType<typeof useAttendeesList>, { status: "success" }>, "status" | "host" | "isFetchingNextPage">
+} & Omit<
+  Extract<ReturnType<typeof useAttendeesList>, { status: "success" }>,
+  "status" | "host" | "isFetchingNextPage"
+>
 
 export const AttendeesListView = ({
   attendees,

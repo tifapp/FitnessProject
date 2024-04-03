@@ -6,15 +6,18 @@ import { updateEventDetailsQueryEvent } from "./Query"
 export const LEAVE_EVENT_ERROR_ALERTS = {
   "event-has-ended": {
     title: "Event has ended",
-    description: "This event has ended. You will be moved to the previous screen."
+    description:
+      "This event has ended. You will be moved to the previous screen."
   },
   "event-was-cancelled": {
     title: "Event was cancelled",
-    description: "This event was cancelled. You will be moved to the previous screen."
+    description:
+      "This event was cancelled. You will be moved to the previous screen."
   },
   "co-host-not-found": {
     title: "Event has no co-host",
-    description: "This event has no co-host. To leave, you will need to select a new host."
+    description:
+      "This event has no co-host. To leave, you will need to select a new host."
   },
   generic: {
     title: "Uh-oh!",
@@ -25,35 +28,44 @@ export const LEAVE_EVENT_ERROR_ALERTS = {
 const presentErrorAlert = (key: keyof typeof LEAVE_EVENT_ERROR_ALERTS) => {
   Alert.alert(
     LEAVE_EVENT_ERROR_ALERTS[key].title,
-    LEAVE_EVENT_ERROR_ALERTS[key].description, [
-      { text: "OK", style: "destructive" }
-    ]
+    LEAVE_EVENT_ERROR_ALERTS[key].description,
+    [{ text: "OK", style: "destructive" }]
   )
 }
 
-export type LeaveEventResult = "success" | "event-has-ended" | "event-was-cancelled" | "co-host-not-found"
+export type LeaveEventResult =
+  | "success"
+  | "event-has-ended"
+  | "event-was-cancelled"
+  | "co-host-not-found"
 
 export type UseLeaveEventEnvironment = {
   leaveEvent: (eventId: number) => Promise<LeaveEventResult>
   onSuccess: () => void
 }
 
-export type UseLeaveEventMenu = {
-  attendeeStatus: "hosting",
-  isLoading: boolean,
-  deleteButtonTapped: () => void,
-  reselectButtonTapped: () => void,
-} | { attendeeStatus: "attending",
-  isLoading: boolean
-  confirmButtonTapped: () => void
-}
+export type UseLeaveEventMenu =
+  | {
+      attendeeStatus: "hosting"
+      isLoading: boolean
+      deleteButtonTapped: () => void
+      reselectButtonTapped: () => void
+    }
+  | {
+      attendeeStatus: "attending"
+      isLoading: boolean
+      confirmButtonTapped: () => void
+    }
 
 export type UseLeaveEventStatus =
   | { status: "success" }
   | ({ status: "select" } & UseLeaveEventMenu)
   | undefined
 
-export const useLeaveEvent = (event: Pick<CurrentUserEvent, "id" | "userAttendeeStatus">, env: UseLeaveEventEnvironment): UseLeaveEventStatus => {
+export const useLeaveEvent = (
+  event: Pick<CurrentUserEvent, "id" | "userAttendeeStatus">,
+  env: UseLeaveEventEnvironment
+): UseLeaveEventStatus => {
   const queryClient = useQueryClient()
   const { onSuccess, leaveEvent } = env
   const leaveEventMutation = useMutation(
@@ -62,10 +74,16 @@ export const useLeaveEvent = (event: Pick<CurrentUserEvent, "id" | "userAttendee
       onSuccess: (status) => {
         if (status === "co-host-not-found") {
           presentErrorAlert(status)
-          updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({ ...e, userAttendeeStatus: "hosting" }))
+          updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({
+            ...e,
+            userAttendeeStatus: "hosting"
+          }))
         } else if (status === "success") {
           onSuccess()
-          updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({ ...e, userAttendeeStatus: "not-participating" }))
+          updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({
+            ...e,
+            userAttendeeStatus: "not-participating"
+          }))
         } else {
           presentErrorAlert(status)
         }
@@ -94,18 +112,44 @@ export const useLeaveEvent = (event: Pick<CurrentUserEvent, "id" | "userAttendee
       isLoading: leaveEventMutation.isLoading,
       attendeeStatus: event.userAttendeeStatus,
       deleteButtonTapped: () => {
-        Alert.alert("Delete Event", "Are you sure you want to delete this event?", [
-          {
-            text: "Delete",
-            style: "destructive",
-            onPress: () => leaveEventMutation.mutate()
-          },
-          {
-            text: "Cancel",
-            style: "cancel"
-          }])
+        Alert.alert(
+          "Delete Event",
+          "Are you sure you want to delete this event?",
+          [
+            {
+              text: "Delete",
+              style: "destructive",
+              onPress: () => leaveEventMutation.mutate()
+            },
+            {
+              text: "Cancel",
+              style: "cancel"
+            }
+          ]
+        )
       },
       reselectButtonTapped: () => console.log("Reselect")
     }
   }
 }
+
+// const renderAttendee = (
+//   onAttendeeSelected: (attendee: EventAttendee) => void,
+//   attendee: EventAttendee,
+//   selectedAttendeeId: string
+// ) => {
+//   return (
+//     <View>
+//       <TouchableOpacity
+//         onPress={() => onAttendeeSelected(attendee)}
+//         style={{
+//           backgroundColor:
+//             selectedAttendeeId === attendee.id ? "yellow" : "white"
+//         }}
+//       >
+//         <Subtitle> {attendee.username} </Subtitle>
+//         <BodyText> {attendee.handle.toString()} </BodyText>
+//       </TouchableOpacity>
+//     </View>
+//   )
+// }

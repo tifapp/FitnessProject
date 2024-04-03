@@ -1,7 +1,15 @@
 import { Cancellable, cancelOnAborted } from "@lib/Cancellable"
+import { QueryHookOptions } from "@lib/ReactQuery"
+import {
+  useRequestForegroundLocationPermissions,
+  useUserCoordinatesQuery
+} from "@location/UserLocation"
+import { Region } from "@location/index"
 import { CurrentUserEvent } from "@shared-models/Event"
-import { useState } from "react"
+import { eventDetailsQueryKey } from "@shared-models/query-keys/Event"
 import { UseQueryResult, useQuery, useQueryClient } from "@tanstack/react-query"
+import { LocationAccuracy, PermissionResponse } from "expo-location"
+import { useState } from "react"
 import {
   ExploreEventsData,
   ExploreEventsInitialCenter,
@@ -9,14 +17,6 @@ import {
   createDefaultMapRegion,
   initialCenterToRegion
 } from "./models"
-import {
-  useRequestForegroundLocationPermissions,
-  useUserCoordinatesQuery
-} from "@location/UserLocation"
-import { Region } from "@location/index"
-import { QueryHookOptions } from "@lib/ReactQuery"
-import { LocationAccuracy, PermissionResponse } from "expo-location"
-import { eventDetailsQueryKey } from "@shared-models/query-keys/Event"
 
 export type UseExploreEventsEnvironment = {
   fetchEvents: (region: Region) => Cancellable<CurrentUserEvent[]>
