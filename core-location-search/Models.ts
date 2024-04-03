@@ -1,5 +1,5 @@
 import { TiFLocation } from "@shared-models/Location"
-import { RecentLocationAnnotation } from "./RecentsStorage"
+import { RecentLocationAnnotation } from "@lib/RecentsLocations"
 
 /**
  * An result that is displayed by the location search.
