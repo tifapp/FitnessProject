@@ -1,8 +1,9 @@
-import { EmailAddress, USPhoneNumber } from "@auth"
 import {
+  EmailAddress,
+  USPhoneNumber,
   useAuthVerificationCodeForm,
   AuthVerificationCodeFormView
-} from "@auth/VerifyCode"
+} from "@core-auth"
 import {
   BASE_HEADER_SCREEN_OPTIONS,
   ChevronBackButton

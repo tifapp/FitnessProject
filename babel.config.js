@@ -17,18 +17,18 @@ const MODULES = [
   "assets",
   "graphql",
   "lib",
-  "auth",
-  "event-details",
-  "root-feature",
+  "core-auth",
+  "core-event-details",
+  "core-root",
   "location",
   "modules",
   "content-parsing",
   "date-time",
   "test-helpers",
-  "content-reporting",
+  "core-content-reporting",
   "shared-models",
   "notifications",
-  "explore-events",
+  "core-explore-events",
   "arrival-tracking"
 ]
 

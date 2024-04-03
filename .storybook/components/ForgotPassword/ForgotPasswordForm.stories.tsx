@@ -1,8 +1,8 @@
-import { createForgotPasswordEnvironment } from "@auth/forgot-password/Environment"
+import { createForgotPasswordEnvironment } from "@core-auth/forgot-password"
 import {
   ForgotPasswordParamsList,
   createForgotPasswordScreens
-} from "@root-feature/navigation/auth/ForgotPassword"
+} from "@core-root/navigation/auth/ForgotPassword"
 import { Auth } from "@aws-amplify/auth"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"

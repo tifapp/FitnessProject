@@ -2,21 +2,21 @@ import {
   ChangePasswordFormView,
   ChangePasswordResult,
   useChangePasswordForm
-} from "@auth/ChangePassword"
-import { EmailAddress } from "@auth/Email"
+} from "@core-event-details/ChangePassword"
+import { EmailAddress } from "@core-event-details/Email"
 import {
   AuthVerificationCodeFormView,
   useAuthVerificationCodeForm
-} from "@auth/VerifyCode"
+} from "@core-event-details/VerifyCode"
 import {
   ForgotPasswordFormView,
   useForgotPasswordForm
-} from "@auth/forgot-password/ForgotPasswordForm"
+} from "@core-event-details/forgot-password/ForgotPasswordForm"
 import {
   ResetPasswordFormView,
   ResetPasswordResult,
   useResetPasswordForm
-} from "@auth/forgot-password/ResetPasswordForm"
+} from "@core-event-details/forgot-password/ResetPasswordForm"
 import { StackNavigatorType } from "@components/Navigation"
 import { delayData } from "@lib/utils/DelayData"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"

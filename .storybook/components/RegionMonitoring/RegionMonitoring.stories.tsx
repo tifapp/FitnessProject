@@ -3,10 +3,9 @@ import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import React, { useMemo, useState } from "react"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import {
-  EventArrivalBannerView,
   ForegroundEventRegionMonitor,
   useHasArrivedAtRegion
-} from "@event-details/arrival-tracking"
+} from "@arrival-tracking"
 import { Button, Modal, View } from "react-native"
 import {
   LocationAccuracy,
@@ -22,6 +21,7 @@ import { LocationCoordinate2D } from "@shared-models/Location"
 import Slider from "@react-native-community/slider"
 import MapView from "react-native-maps"
 import { EventRegion } from "@shared-models/Event"
+import { EventArrivalBannerView } from "@core-event-details/ArrivalBanner"
 
 const RegionMonitoringMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Region Monitoring"

@@ -18,11 +18,11 @@ import {
   setupInternetReconnectionRefreshes
 } from "@lib/ReactQuery"
 import { enableSentry } from "@lib/Sentry"
-import { AppView } from "@root-feature/AppView"
+import { AppView } from "@core-root/AppView"
 import * as Sentry from "@sentry/react-native"
 import "expo-dev-client"
 import { addPushTokenListener } from "expo-notifications"
-import { setupCognito } from "./auth"
+import { setupCognito } from "@core-auth"
 import { registerForPushNotifications } from "./notifications"
 import awsconfig from "./src/aws-exports"
 import { NetInfoInternetConnectionStatus } from "@lib/InternetConnection"

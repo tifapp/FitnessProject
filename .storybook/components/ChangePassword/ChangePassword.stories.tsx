@@ -1,4 +1,4 @@
-import { ChangePasswordFormView, useChangePasswordForm } from "@auth/index"
+import { ChangePasswordFormView, useChangePasswordForm } from "@core-auth"
 import {
   BASE_HEADER_SCREEN_OPTIONS,
   ChevronBackButton
