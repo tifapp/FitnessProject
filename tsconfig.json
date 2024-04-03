@@ -46,6 +46,7 @@
       "@core-explore-events": ["./core-explore-events"],
       "@arrival-tracking": ["./arrival-tracking"],
       "@arrival-tracking/*": ["./arrival-tracking/*"],
+      "@core-location-search": ["./core-location-search"],
       "env": ["./.env"]
     }
   },

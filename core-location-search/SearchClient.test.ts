@@ -1,5 +1,5 @@
 import { Coordinates } from "@aws-amplify/geo"
-import { SQLiteRecentLocationsStorage } from "./RecentsStorage"
+import { SQLiteRecentLocationsStorage } from "@lib/RecentsLocations"
 import {
   awsPlaceToTifLocation,
   searchRecentLocations,

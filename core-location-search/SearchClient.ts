@@ -8,7 +8,7 @@ import {
   TiFLocation,
   checkIfCoordsAreEqual
 } from "@location/index"
-import { RecentLocationsStorage } from "./RecentsStorage"
+import { RecentLocationsStorage } from "@lib/RecentsLocations"
 
 /**
  * A top-level function that allows a location search, and gives location data

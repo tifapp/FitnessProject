@@ -29,7 +29,8 @@ const MODULES = [
   "shared-models",
   "notifications",
   "core-explore-events",
-  "arrival-tracking"
+  "arrival-tracking",
+  "core-location-search"
 ]
 
 module.exports = function (api) {

@@ -1,5 +1,5 @@
 import { mockLocationCoordinate2D, mockTiFLocation } from "@location/MockData"
-import { SQLiteRecentLocationsStorage } from "./RecentsStorage"
+import { SQLiteRecentLocationsStorage } from "./RecentsLocations"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 import { ArrayUtils } from "@lib/utils/Array"
 import { sleep } from "@lib/utils/DelayData"
@@ -108,10 +108,12 @@ describe("RecentLocationStorage tests", () => {
         locations[0].coordinate,
         locations[0].coordinate
       ])
-      expect(results).toEqual([{
-        location: locations[0],
-        annotation: "attended-event"
-      }])
+      expect(results).toEqual([
+        {
+          location: locations[0],
+          annotation: "attended-event"
+        }
+      ])
     })
   })
 })

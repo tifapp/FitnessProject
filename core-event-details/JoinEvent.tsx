@@ -22,7 +22,7 @@ import { useSharedValue } from "react-native-reanimated"
 import { FontScaleFactors } from "@lib/Fonts"
 import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet"
 import { TiFAPI } from "@api-client/TiFAPI"
-import { RecentLocationsStorage } from "@location/search"
+import { RecentLocationsStorage } from "@lib/RecentsLocations"
 import { JoinEventResponse } from "@shared-models/JoinEvent"
 import { updateEventDetailsQueryEvent } from "./Query"
 

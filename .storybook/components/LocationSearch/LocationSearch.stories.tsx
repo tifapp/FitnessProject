@@ -6,8 +6,8 @@ import {
   LocationSearchPicker,
   useLocationSearchPicker,
   LocationSearchBar
-} from "@location/search"
-import { mockLocationSearchResult } from "@location/search/MockData"
+} from "@core-location-search"
+import { mockLocationSearchResult } from "@core-location-search/MockData"
 import {
   NavigationContainer,
   NavigationProp,
@@ -17,7 +17,6 @@ import {
 import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import { PermissionStatus, getCurrentPositionAsync } from "expo-location"
 import React from "react"
 import { Button } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
