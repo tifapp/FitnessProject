@@ -15,13 +15,13 @@ import {
 } from "@test-helpers/ReactQuery"
 import { mockLocationCoordinate2D, mockTiFLocation } from "@location/MockData"
 import "@test-helpers/Matchers"
-import { TrueRegionMonitor } from "./arrival-tracking/region-monitoring/MockRegionMonitors"
+import { TrueRegionMonitor } from "@arrival-tracking/region-monitoring/MockRegionMonitors"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 import { SQLiteRecentLocationsStorage } from "@location/search"
 import { mswServer } from "@test-helpers/msw"
 import { http, HttpResponse } from "msw"
 import { TiFAPI } from "@api-client/TiFAPI"
-import { mockEventRegion } from "./arrival-tracking/MockData"
+import { mockEventRegion } from "@arrival-tracking/MockData"
 import {
   EventMocks,
   mockEventChatTokenRequest,

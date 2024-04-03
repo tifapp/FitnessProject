@@ -8,6 +8,30 @@ const modulePath = (dir) => {
   return path.join(__dirname, dir)
 }
 
+const MODULES = [
+  "screens",
+  "api-client",
+  "components",
+  "stacks",
+  "hooks",
+  "assets",
+  "graphql",
+  "lib",
+  "auth",
+  "event-details",
+  "root-feature",
+  "location",
+  "modules",
+  "content-parsing",
+  "date-time",
+  "test-helpers",
+  "content-reporting",
+  "shared-models",
+  "notifications",
+  "explore-events",
+  "arrival-tracking"
+]
+
 module.exports = function (api) {
   api.cache(true)
   return {
@@ -23,28 +47,9 @@ module.exports = function (api) {
       [
         "module-resolver",
         {
-          alias: {
-            "@screens": modulePath("screens"),
-            "@api-client": modulePath("api-client"),
-            "@components": modulePath("components"),
-            "@stacks": modulePath("stacks"),
-            "@hooks": modulePath("hooks"),
-            "@assets": modulePath("assets"),
-            "@graphql": modulePath("src/graphql"),
-            "@lib": modulePath("lib"),
-            "@auth": modulePath("auth"),
-            "@event-details": modulePath("event-details"),
-            "@root-feature": modulePath("root-feature"),
-            "@location": modulePath("location"),
-            "@modules": modulePath("modules"),
-            "@content-parsing": modulePath("content-parsing"),
-            "@date-time": modulePath("date-time"),
-            "@test-helpers": modulePath("test-helpers"),
-            "@content-reporting": modulePath("content-reporting"),
-            "@shared-models": modulePath("shared-models"),
-            "@notifications": modulePath("notifications"),
-            "@explore-events": modulePath("explore-events")
-          },
+          alias: Object.fromEntries(
+            MODULES.map((module) => [`@${module}`, modulePath(module)])
+          ),
           extensions: [".js", ".jsx", ".ts", ".tsx"]
         }
       ],

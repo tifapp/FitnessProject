@@ -12,10 +12,12 @@ import {
 import "@test-helpers/Matchers"
 import { act, render, renderHook, waitFor } from "@testing-library/react-native"
 import dayjs from "dayjs"
-import { mockEventArrivalGeofencedRegion, mockEventRegion } from "./MockData"
-import { EventArrivalGeofencedRegion } from "./geofencing"
-import { EventRegionMonitorUnsubscribe } from "./region-monitoring"
-import { fakeTimers } from "@test-helpers/Timers"
+import {
+  mockEventArrivalGeofencedRegion,
+  mockEventRegion
+} from "@arrival-tracking/MockData"
+import { EventArrivalGeofencedRegion } from "@arrival-tracking/geofencing"
+import { EventRegionMonitorUnsubscribe } from "@arrival-tracking/region-monitoring"
 
 const TWO_AND_A_HALF_DAYS_IN_SECONDS = dayjs.duration(2.5, "days").asSeconds()
 const THIRTY_MINUTES_IN_SECONDS = dayjs.duration(30, "minutes").asSeconds()

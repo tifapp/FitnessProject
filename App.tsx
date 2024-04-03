@@ -1,17 +1,11 @@
 import { TiFMenuProvider } from "@components/TiFMenuProvider"
 import { useAppFonts } from "@lib/Fonts"
-import { UserLocationFunctionsProvider } from "@location/UserLocation"
-import {
-  getCurrentPositionAsync,
-  requestBackgroundPermissionsAsync,
-  requestForegroundPermissionsAsync
-} from "expo-location"
 import React from "react"
 import { RootSiblingParent } from "react-native-root-siblings"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 
 import { Geo } from "@aws-amplify/geo"
-import { ExpoEventArrivalsGeofencer } from "@event-details/arrival-tracking"
+import { ExpoEventArrivalsGeofencer } from "@arrival-tracking/geofencing"
 import {
   addLogHandler,
   createLogFunction,

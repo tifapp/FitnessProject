@@ -1,7 +1,6 @@
 export * from "./Tracker"
 export * from "./UpcomingArrivals"
 export * from "./Refresh"
-export * from "./ArrivalBanner"
 export * from "./ArrivalsOperation"
 export * from "./Models"
 export * from "./region-monitoring"

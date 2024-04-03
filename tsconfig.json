@@ -44,6 +44,8 @@
       "@shared-models/*": ["./shared-models/*"],
       "@notifications": ["./notifications"],
       "@explore-events": ["./explore-events"],
+      "@arrival-tracking": ["./arrival-tracking"],
+      "@arrival-tracking/*": ["./arrival-tracking/*"],
       "env": ["./.env"]
     }
   },

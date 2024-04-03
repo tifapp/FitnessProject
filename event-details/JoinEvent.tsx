@@ -1,5 +1,8 @@
 import { PrimaryButton } from "@components/Buttons"
-import { EventRegionMonitor, useHasArrivedAtRegion } from "./arrival-tracking"
+import {
+  EventRegionMonitor,
+  useHasArrivedAtRegion
+} from "@arrival-tracking/region-monitoring"
 import { CurrentUserEvent, EventLocation } from "@shared-models/Event"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
@@ -13,33 +16,25 @@ import {
 import React, { useEffect, useRef, useState } from "react"
 import { Alert, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { TouchableIonicon } from "@components/common/Icons"
-import { BodyText, Headline, Title } from "@components/Text"
+import { BodyText, Title } from "@components/Text"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useSharedValue } from "react-native-reanimated"
 import { FontScaleFactors } from "@lib/Fonts"
-import {
-  BottomSheetBackdrop,
-  BottomSheetModal,
-  BottomSheetModalProvider,
-  BottomSheetView
-} from "@gorhom/bottom-sheet"
+import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet"
 import { TiFAPI } from "@api-client/TiFAPI"
 import { RecentLocationsStorage } from "@location/search"
 import { JoinEventResponse } from "@shared-models/JoinEvent"
 import { updateEventDetailsQueryEvent } from "./Query"
 
 export const JOIN_EVENT_ERROR_ALERTS = {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   "event-has-ended": {
     title: "Event has ended",
     description: "This event has ended, tbd tbd tbd"
   },
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   "event-was-cancelled": {
     title: "Event was canceled",
     description: "This event was canceled, tbd tbd tbd"
   },
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   "user-is-blocked": {
     title: "Event Access Restricted",
     description: "The host has restricted you from joining this event."
@@ -201,7 +196,7 @@ export const useJoinEventStages = (
   event: Omit<JoinEventRequest, "hasArrived">,
   env: UseJoinEventEnvironment
 ): UseJoinEventStage => {
-  const { onSuccess, loadPermissions, joinEvent, monitor } = env
+  const { loadPermissions, joinEvent, monitor } = env
   const hasArrived = useHasArrivedAtRegion(event.location, monitor)
   const currentPermission = useCurrentJoinEventPermission(loadPermissions)
   const queryClient = useQueryClient()

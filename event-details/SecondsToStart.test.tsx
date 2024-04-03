@@ -1,5 +1,4 @@
 import { dayjs } from "@date-time"
-import { CurrentUserEvent } from "@shared-models/Event"
 import { act, renderHook } from "@testing-library/react-native"
 import {
   useEventSecondsToStart,

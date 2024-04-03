@@ -9,10 +9,10 @@ import {
 import {
   EventArrivalsTracker,
   SQLiteUpcomingEventArrivals
-} from "./arrival-tracking"
-import { TestEventArrivalsGeofencer } from "./arrival-tracking/geofencing/TestGeofencer"
+} from "@arrival-tracking"
+import { TestEventArrivalsGeofencer } from "@arrival-tracking/geofencing/TestGeofencer"
 import { mockEventLocation } from "./MockData"
-import { mockEventArrival } from "./arrival-tracking/MockData"
+import { mockEventArrival } from "@arrival-tracking/MockData"
 import { ArrayUtils } from "@lib/utils/Array"
 import { EventUserAttendeeStatus } from "@shared-models/Event"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
