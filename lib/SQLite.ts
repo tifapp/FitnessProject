@@ -73,8 +73,7 @@ export class TiFSQLite {
 
   private async runQueueUntilEmpty() {
     while (!this.isQueueEmpty) {
-      const transaction = this.queuedTransactions[0]
-      await transaction()
+      await this.queuedTransactions[0]()
       this.queuedTransactions.shift()
     }
   }
