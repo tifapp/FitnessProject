@@ -2,7 +2,7 @@ import { ContentText } from "./ContentText"
 import { EventHandle } from "./EventHandle"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import { UserHandle } from "./UserHandle"
-import { ColorString } from "@lib/utils/Color"
+import { ColorString } from "TiFShared/domain-models/ColorString"
 
 describe("ContentText tests", () => {
   beforeEach(() => jest.resetAllMocks())

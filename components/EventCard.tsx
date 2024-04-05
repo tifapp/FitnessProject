@@ -7,7 +7,7 @@ import { Ionicon, IoniconName } from "@components/common/Icons"
 import { BodyText, Caption, Headline } from "@components/Text"
 import ConfirmationDialogue from "@components/common/ConfirmationDialogue"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
-import { ColorString } from "@lib/utils/Color"
+import { ColorString } from "TiFShared/domain-models/ColorString"
 
 export type EventCardProps = {
   event: CurrentUserEvent

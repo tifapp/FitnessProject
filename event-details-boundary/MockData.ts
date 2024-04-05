@@ -13,7 +13,7 @@ import {
   randomIntegerInRange,
   randomlyNull
 } from "@lib/utils/Random"
-import { ColorString } from "@lib/utils/Color"
+import { ColorString } from "TiFShared/domain-models/ColorString"
 import { EventChatTokenRequest } from "@shared-models/ChatToken"
 
 export const mockEventLocation = (): EventLocation => ({

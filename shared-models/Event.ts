@@ -1,8 +1,8 @@
 import { UserHandle } from "@content-parsing"
 import { StringDateRangeSchema, StringDateSchema } from "@date-time"
-import { ColorString } from "@lib/utils/Color"
+import { ColorStringSchema } from "TiFShared/domain-models/ColorString"
 import { z } from "zod"
-import { LocationCoordinates2DSchema, checkIfCoordsAreEqual } from "./Location"
+import { LocationCoordinates2DSchema } from "./Location"
 import { PlacemarkSchema } from "./Placemark"
 import { TodayOrTomorrowSchema } from "./TodayOrTomorrow"
 import {
@@ -130,7 +130,7 @@ export const CurrentUserEventResponseSchema = z.object({
   id: z.number(),
   title: z.string(), // TODO: - Decide max length.
   description: z.string(),
-  color: ColorString.zodSchema,
+  color: ColorStringSchema,
   attendeeCount: z.number().nonnegative(),
   joinDate: StringDateSchema.nullable(),
   createdAt: StringDateSchema,

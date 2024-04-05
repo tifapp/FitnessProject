@@ -1,4 +1,4 @@
-import { ColorString } from "@lib/utils/Color"
+import { ColorString } from "TiFShared/domain-models/ColorString"
 import { ZodUtils } from "@lib/utils/Zod"
 
 /**
@@ -20,7 +20,7 @@ export class EventHandle {
   readonly eventName: string
   readonly color: ColorString
 
-  constructor (eventId: number, eventName: string, color: ColorString) {
+  constructor(eventId: number, eventName: string, color: ColorString) {
     this.eventId = eventId
     this.eventName = eventName
     this.color = color
@@ -29,7 +29,7 @@ export class EventHandle {
   /**
    * Formats this event handle back to its raw form.
    */
-  toString () {
+  toString() {
     return `!${this.eventName.length}|${this.eventId}/${this.color}/${this.eventName}`
   }
 
@@ -43,7 +43,7 @@ export class EventHandle {
    * @param startPosition the position of the string to begin parsing at (defaults to 0).
    * @returns an {@link EventHandle} instance if valid.
    */
-  static parse (rawValue: string, startPosition: number = 0) {
+  static parse(rawValue: string, startPosition: number = 0) {
     const lengthSeparatorIndex = rawValue.indexOf("|", startPosition)
     if (lengthSeparatorIndex === -1) return undefined
 

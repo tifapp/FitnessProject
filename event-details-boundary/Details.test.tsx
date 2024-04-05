@@ -1,7 +1,7 @@
 import { TiFAPI } from "@api-client/TiFAPI"
 import { UserHandle } from "@content-parsing"
 import { dateRange } from "@date-time"
-import { ColorString } from "@lib/utils/Color"
+import { ColorString } from "TiFShared/domain-models/ColorString"
 import { uuidString } from "@lib/utils/UUID"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 import { fakeTimers } from "@test-helpers/Timers"

@@ -1,4 +1,4 @@
-import { ColorString } from "@lib/utils/Color"
+import { ColorString } from "TiFShared/domain-models/ColorString"
 import { EventHandle } from "./EventHandle"
 
 describe("EventHandle tests", () => {
