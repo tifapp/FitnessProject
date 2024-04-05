@@ -1,5 +1,5 @@
 import { SQLExecutable, TiFSQLite } from "./SQLite"
-import { ObjectUtils } from "./utils/Object"
+import { mergeWithPartial } from "TiFShared/lib/Object"
 
 /**
  * A type for modeling simple configuration values that the app needs to keep
@@ -61,10 +61,10 @@ export class SQLiteInternalMetricsStorage implements InternalMetricsStorage {
 
   async update(values: Partial<InternalMetrics>) {
     await this.sqlite.withTransaction(async (db) => {
-      const valuesToSave = {
-        ...(await this.currentValues(db)),
-        ...ObjectUtils.removeUndefined(values)
-      }
+      const valuesToSave = mergeWithPartial(
+        await this.currentValues(db),
+        values
+      )
       await db.run`
       INSERT INTO InternalMetrics (
         hasCompletedOnboarding,

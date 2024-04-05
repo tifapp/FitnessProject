@@ -6,7 +6,7 @@ import {
 } from "react"
 import { CallbackCollection } from "./CallbackCollection"
 import { SQLExecutable, TiFSQLite } from "./SQLite"
-import { ObjectUtils } from "./utils/Object"
+import { mergeWithPartial } from "TiFShared/lib/Object"
 
 /**
  * A type for user settings that are local to the device.
@@ -92,10 +92,7 @@ export class SQLiteDeviceSettingsStore implements DeviceSettingsStore {
   }
 
   async save(settings: Partial<DeviceSettings>) {
-    const newSettings = {
-      ...this.current,
-      ...ObjectUtils.removeUndefined(settings)
-    }
+    const newSettings = mergeWithPartial(this.current, settings)
     if (areDeviceSettingsEqual(this.current, newSettings)) return
     this.callbackCollection.send(newSettings)
     this._settings = newSettings
