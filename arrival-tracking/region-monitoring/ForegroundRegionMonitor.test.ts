@@ -1,4 +1,3 @@
-import { ArrayUtils } from "@lib/utils/Array"
 import { LocationCoordinate2D } from "@shared-models/Location"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { fakeTimers } from "@test-helpers/Timers"

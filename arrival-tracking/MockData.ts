@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker"
 import { mockLocationCoordinate2D } from "@location/MockData"
 import { EventArrival } from "./Models"
 import { randomBool, randomFloatInRange } from "@lib/utils/Random"
-import { ArrayUtils } from "@lib/utils/Array"
+
 import { EventArrivalRegion } from "@shared-models/EventArrivals"
 import { EventArrivalGeofencedRegion } from "./geofencing"
 import { EventRegion } from "@shared-models/Event"

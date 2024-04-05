@@ -1,7 +1,7 @@
 import { mockLocationCoordinate2D, mockTiFLocation } from "@location/MockData"
 import { SQLiteRecentLocationsStorage } from "./RecentsLocations"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
-import { ArrayUtils } from "@lib/utils/Array"
+
 import { sleep } from "@lib/utils/DelayData"
 import { repeatElements } from "TiFShared/lib/Array"
 

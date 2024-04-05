@@ -11,7 +11,7 @@ import { useEffectEvent } from "@lib/utils/UseEffectEvent"
 import { TiFAPI } from "@api-client/TiFAPI"
 import { StyleProp, View, ViewStyle, StyleSheet } from "react-native"
 import { BodyText, Subtitle, Title } from "@components/Text"
-import { ArrayUtils } from "@lib/utils/Array"
+
 import { PrimaryButton } from "@components/Buttons"
 import { useConst } from "@lib/utils/UseConst"
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated"

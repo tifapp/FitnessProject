@@ -1,7 +1,7 @@
 import { SQLiteUpcomingEventArrivals } from "./UpcomingArrivals"
 import { EventArrivalsTracker } from "./Tracker"
 import { EventArrivalRegion } from "@shared-models/EventArrivals"
-import { ArrayUtils } from "@lib/utils/Array"
+
 import { waitFor } from "@testing-library/react-native"
 import { mockLocationCoordinate2D } from "@location/MockData"
 import {
