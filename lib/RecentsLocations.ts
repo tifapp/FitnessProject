@@ -1,7 +1,7 @@
 import { LocationCoordinate2D, TiFLocation } from "@shared-models/Location"
 import { TiFSQLite } from "@lib/SQLite"
 import { Placemark } from "@shared-models/Placemark"
-import { DeepNullable } from "@lib/utils/DeepNullable"
+import { DeepNullable } from "TiFShared/lib/HelperTypes"
 
 /**
  * An interface for storing locations that the user has interacted with

@@ -25,16 +25,6 @@ export const EXPO_LOCATION_ERRORS = {
 }
 
 /**
- * Returns true if 2 {@link LocationCoordinate2D}s are equal.
- */
-export const checkIfCoordsAreEqual = (
-  a: LocationCoordinate2D,
-  b: LocationCoordinate2D
-) => {
-  return a.latitude === b.latitude && a.longitude === b.longitude
-}
-
-/**
  * A zod schema for {@link TiFLocation}.
  */
 export const TiFLocationSchema = z.object({
