@@ -16,6 +16,7 @@ import { mockEventArrival } from "@arrival-tracking/MockData"
 import { ArrayUtils } from "@lib/utils/Array"
 import { EventUserAttendeeStatus } from "@shared-models/Event"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
+import { repeatElements } from "TiFShared/lib/Array"
 
 describe("Event tests", () => {
   describe("EventCurrentUserAttendeeStatus tests", () => {
@@ -139,7 +140,7 @@ describe("Event tests", () => {
     })
 
     it("should remove events from the tracker when the arrival period has not begun", async () => {
-      const arrivals = ArrayUtils.repeatElements(2, (eventId) => ({
+      const arrivals = repeatElements(2, (eventId) => ({
         ...mockEventArrival(),
         eventId
       }))

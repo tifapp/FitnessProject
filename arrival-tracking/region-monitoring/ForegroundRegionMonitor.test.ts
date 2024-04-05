@@ -6,6 +6,7 @@ import { waitFor } from "@testing-library/react-native"
 import { mockEventRegion } from "../MockData"
 import { ForegroundEventRegionMonitor } from "./ForegroundRegionMonitor"
 import { advanceByForegroundMonitorBufferTime } from "./TestHelpers"
+import { repeatElements } from "TiFShared/lib/Array"
 
 describe("ForegroundEventRegionMonitor tests", () => {
   const TEST_REGION = {
@@ -146,7 +147,7 @@ describe("ForegroundEventRegionMonitor tests", () => {
   })
 
   it("should update multiple subscribers for the same region", async () => {
-    const callbacks = ArrayUtils.repeatElements(10, () => jest.fn())
+    const callbacks = repeatElements(10, () => jest.fn())
     callbacks.forEach((callback) => {
       monitor.monitorRegion(TEST_REGION, callback)
       callback.mockReset()

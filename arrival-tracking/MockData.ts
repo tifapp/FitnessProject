@@ -6,6 +6,7 @@ import { ArrayUtils } from "@lib/utils/Array"
 import { EventArrivalRegion } from "@shared-models/EventArrivals"
 import { EventArrivalGeofencedRegion } from "./geofencing"
 import { EventRegion } from "@shared-models/Event"
+import { repeatElements } from "TiFShared/lib/Array"
 
 export const mockEventArrivalGeofencedRegion =
   (): EventArrivalGeofencedRegion => ({
@@ -19,7 +20,7 @@ export const mockEventArrival = (): EventArrival => ({
 })
 
 export const mockEventArrivalRegion = (): EventArrivalRegion => ({
-  eventIds: ArrayUtils.repeatElements(Math.ceil(randomFloatInRange(1, 5)), () =>
+  eventIds: repeatElements(Math.ceil(randomFloatInRange(1, 5)), () =>
     parseInt(faker.random.numeric(5))
   ),
   ...mockEventArrivalGeofencedRegion()

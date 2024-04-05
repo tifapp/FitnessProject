@@ -3,6 +3,7 @@ import { SQLiteRecentLocationsStorage } from "./RecentsLocations"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 import { ArrayUtils } from "@lib/utils/Array"
 import { sleep } from "@lib/utils/DelayData"
+import { repeatElements } from "TiFShared/lib/Array"
 
 describe("RecentLocationStorage tests", () => {
   describe("SQLiteRecentLocations tests", () => {
@@ -15,7 +16,7 @@ describe("RecentLocationStorage tests", () => {
     })
 
     it("should return no locations for coordinates when no locations are saved", async () => {
-      const coordinates = ArrayUtils.repeatElements(3, () => {
+      const coordinates = repeatElements(3, () => {
         return mockLocationCoordinate2D()
       })
       const locations = await storage.locationsForCoordinates(coordinates)
@@ -101,7 +102,7 @@ describe("RecentLocationStorage tests", () => {
     })
 
     test("load locations by coordinates using duplicate coordinates", async () => {
-      const locations = ArrayUtils.repeatElements(2, () => mockTiFLocation())
+      const locations = repeatElements(2, () => mockTiFLocation())
       await storage.save(locations[0], "attended-event")
       await storage.save(locations[1])
       const results = await storage.locationsForCoordinates([

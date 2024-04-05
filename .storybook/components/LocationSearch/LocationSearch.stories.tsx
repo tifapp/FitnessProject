@@ -17,6 +17,7 @@ import {
 import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
+import { repeatElements } from "TiFShared/lib/Array"
 import React from "react"
 import { Button } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -65,7 +66,7 @@ const LocationSearchScreen = () => {
   const picker = useLocationSearchPicker({
     loadSearchResults: async () => {
       return await delayData(
-        ArrayUtils.repeatElements(15, () => mockLocationSearchResult()),
+        repeatElements(15, () => mockLocationSearchResult()),
         3000
       )
     }

@@ -1,24 +1,5 @@
 export namespace ArrayUtils {
   /**
-   * Creates an array that repeats the element given to it a certain number of times (the right way...).
-   *
-   * @param times the number of times to repeat the given element.
-   * @param element a value or function to create the repeated element.
-   * @returns an array with repeated elements.
-   */
-  export const repeatElements = <T>(
-    times: number,
-    element: ((time: number) => T) | T
-  ) => {
-    return (Array.apply(null, Array(times)) as null[]).map((_, index) => {
-      if (element instanceof Function) {
-        return element(index)
-      }
-      return element
-    })
-  }
-
-  /**
    * Returns a random element from an array which has at least one element.
    */
   export const randomElement = <T>(arr: T[]) => {

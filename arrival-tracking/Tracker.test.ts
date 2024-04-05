@@ -13,6 +13,7 @@ import { neverPromise } from "@test-helpers/Promise"
 import { TestEventArrivalsGeofencer } from "./geofencing/TestGeofencer"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
+import { repeatElements } from "TiFShared/lib/Array"
 
 describe("EventArrivalsTracker tests", () => {
   const upcomingArrivals = new SQLiteUpcomingEventArrivals(testSQLite)
@@ -32,7 +33,7 @@ describe("EventArrivalsTracker tests", () => {
   })
 
   test("refresh arrivals", async () => {
-    const regions = ArrayUtils.repeatElements(2, () => {
+    const regions = repeatElements(2, () => {
       return mockEventArrivalRegion()
     })
     await tracker.refreshArrivals(jest.fn().mockResolvedValueOnce(regions))
@@ -139,7 +140,7 @@ describe("EventArrivalsTracker tests", () => {
 
   test("track arrival, updates the region of an existing event id, adds a new region if no other events in said region", async () => {
     const region = mockEventArrivalRegion()
-    const arrivals = ArrayUtils.repeatElements(2, () => {
+    const arrivals = repeatElements(2, () => {
       return {
         ...mockEventArrival(),
         coordinate: region.coordinate,
@@ -169,7 +170,7 @@ describe("EventArrivalsTracker tests", () => {
   })
 
   test("track arrival, updates the region of an existing event id, moves event to existing region if new region is tracked", async () => {
-    const arrivals = ArrayUtils.repeatElements(3, () => {
+    const arrivals = repeatElements(3, () => {
       return mockEventArrival()
     })
     await tracker.trackArrivals(arrivals)
@@ -203,7 +204,7 @@ describe("EventArrivalsTracker tests", () => {
 
   test("remove arrival, keeps region when there are still arrivals left at the same region", async () => {
     const region = mockEventArrivalRegion()
-    const arrivals = ArrayUtils.repeatElements(2, () => {
+    const arrivals = repeatElements(2, () => {
       return {
         ...mockEventArrival(),
         coordinate: region.coordinate,
@@ -300,7 +301,7 @@ describe("EventArrivalsTracker tests", () => {
   })
 
   test("replaces all tracked regions when performing an arrivals operation", async () => {
-    const newRegions = ArrayUtils.repeatElements(3, () => {
+    const newRegions = repeatElements(3, () => {
       return mockEventArrivalRegion()
     })
     performArrivalOperation.mockResolvedValueOnce(newRegions)
@@ -310,7 +311,7 @@ describe("EventArrivalsTracker tests", () => {
   })
 
   test("publishes update after performing an arrivals operation", async () => {
-    const newRegions = ArrayUtils.repeatElements(3, () => {
+    const newRegions = repeatElements(3, () => {
       return mockEventArrivalRegion()
     })
     performArrivalOperation.mockResolvedValueOnce(newRegions)
