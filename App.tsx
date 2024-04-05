@@ -26,6 +26,7 @@ import { setupCognito } from "@auth-boundary"
 import { registerForPushNotifications } from "./notifications"
 import awsconfig from "./src/aws-exports"
 import { NetInfoInternetConnectionStatus } from "@lib/InternetConnection"
+import "TiFShared"
 
 const log = createLogFunction("app.root")
 
