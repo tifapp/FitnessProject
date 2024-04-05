@@ -2,7 +2,7 @@ import { EventArrivalRegion } from "@shared-models/EventArrivals"
 import { getBackgroundPermissionsAsync } from "expo-location"
 import { TiFSQLite } from "@lib/SQLite"
 import { LocationCoordinate2D } from "@shared-models/Location"
-import { areEventRegionsEqual } from "@shared-models/Event"
+import { areEventRegionsEqual } from "TiFShared/domain-models/Event"
 
 /**
  * An interface for storing client-side details on upcoming event arrivals.
@@ -38,17 +38,17 @@ export class SQLiteUpcomingEventArrivals implements UpcomingEventArrivals {
           hasArrived: number
         }
       >`
-      SELECT 
-        l.*, 
-        u.eventId AS eventId 
+      SELECT
+        l.*,
+        u.eventId AS eventId
       FROM UpcomingEventArrivals u
       LEFT JOIN LocationArrivals l ON
         u.latitude = l.latitude AND
         u.longitude = l.longitude AND
         u.arrivalRadiusMeters = l.arrivalRadiusMeters
-      ORDER BY 
-        u.latitude DESC, 
-        u.longitude DESC, 
+      ORDER BY
+        u.latitude DESC,
+        u.longitude DESC,
         u.arrivalRadiusMeters DESC
       `
       return results.reduce((acc, curr) => {
@@ -80,9 +80,9 @@ export class SQLiteUpcomingEventArrivals implements UpcomingEventArrivals {
         regions.map(async (region) => {
           await db.run`
           INSERT INTO LocationArrivals (
-            latitude, 
-            longitude, 
-            arrivalRadiusMeters, 
+            latitude,
+            longitude,
+            arrivalRadiusMeters,
             hasArrived
           ) VALUES (
             ${region.coordinate.latitude},

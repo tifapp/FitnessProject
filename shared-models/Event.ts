@@ -25,16 +25,6 @@ export const EventRegionSchema = z.object({
  */
 export type EventRegion = z.infer<typeof EventRegionSchema>
 
-/**
- * Returns true if 2 {@link EventRegion}s are equal.
- */
-export const areEventRegionsEqual = (r1: EventRegion, r2: EventRegion) => {
-  return (
-    checkIfCoordsAreEqual(r1.coordinate, r2.coordinate) &&
-    r1.arrivalRadiusMeters === r2.arrivalRadiusMeters
-  )
-}
-
 export const UnblockedEventAttendeeSchema = z.object({
   id: z.string().uuid(),
   username: z.string(),

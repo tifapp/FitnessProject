@@ -9,9 +9,9 @@ import {
 import { ArrayUtils } from "@lib/utils/Array"
 import { PerformArrivalsOperation } from "./ArrivalsOperation"
 import { EventArrival, arrivalRegion, removeDuplicateArrivals } from "./Models"
-import { areEventRegionsEqual } from "@shared-models/Event"
 import { CallbackCollection } from "@lib/CallbackCollection"
 import { createLogFunction } from "@lib/Logging"
+import { areEventRegionsEqual } from "TiFShared/domain-models/Event"
 
 const log = createLogFunction("event.arrivals.tracker")
 

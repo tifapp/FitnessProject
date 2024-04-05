@@ -1,11 +1,8 @@
 import { LocationSearchResult, LocationsSearchQuery } from "./Models"
 import { Geo, Place } from "@aws-amplify/geo"
-import {
-  LocationCoordinate2D,
-  TiFLocation,
-  checkIfCoordsAreEqual
-} from "@location/index"
+import { LocationCoordinate2D, TiFLocation } from "@location/index"
 import { RecentLocationsStorage } from "@lib/RecentsLocations"
+import { areCoordinatesEqual } from "TiFShared/domain-models/LocationCoordinate2D"
 
 /**
  * A top-level function that allows a location search, and gives location data
@@ -114,7 +111,7 @@ export const searchWithRecentAnnotations = async (
     await recents.locationsForCoordinates(searchCoordinates)
   const mergedResults = remoteSearchResults.map((remoteSearchPoint) => {
     const recentLocation = recentLocations.find((asyncPoint) => {
-      return checkIfCoordsAreEqual(
+      return areCoordinatesEqual(
         asyncPoint.location.coordinate,
         remoteSearchPoint.coordinate
       )
