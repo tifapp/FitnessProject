@@ -23,10 +23,10 @@ import { createTestQueryClient } from "@test-helpers/ReactQuery"
 import {
   EventDetailsMenuView,
   useEventDetailsMenuActions
-} from "@core-event-details/Menu"
+} from "@event-details-boundary/Menu"
 import { View } from "react-native"
 import { CurrentUserEvent } from "@shared-models/Event"
-import { useLoadEventDetails } from "@core-event-details/Details"
+import { useLoadEventDetails } from "@event-details-boundary/Details"
 import { UserSessionProvider } from "@lib/UserSession"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 

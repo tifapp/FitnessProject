@@ -21,7 +21,7 @@ import { LocationCoordinate2D } from "@shared-models/Location"
 import Slider from "@react-native-community/slider"
 import MapView from "react-native-maps"
 import { EventRegion } from "@shared-models/Event"
-import { EventArrivalBannerView } from "@core-event-details/ArrivalBanner"
+import { EventArrivalBannerView } from "@event-details-boundary/ArrivalBanner"
 
 const RegionMonitoringMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Region Monitoring"

@@ -1,4 +1,4 @@
-import { TestCognitoError } from "@core-auth/CognitoHelpers"
+import { TestCognitoError } from "@auth-boundary/CognitoHelpers"
 import { EmailAddress, USPhoneNumber } from ".."
 import { CognitoSignInAuthenticator } from "./Authenticator"
 

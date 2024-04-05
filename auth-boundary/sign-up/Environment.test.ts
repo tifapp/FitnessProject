@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { TiFAPI } from "@api-client"
-import { TestCognitoError } from "@core-auth/CognitoHelpers"
+import { TestCognitoError } from "@auth-boundary/CognitoHelpers"
 import { UserHandle } from "@content-parsing"
 import { uuidString } from "@lib/utils/UUID"
 import { mswServer } from "@test-helpers/msw"

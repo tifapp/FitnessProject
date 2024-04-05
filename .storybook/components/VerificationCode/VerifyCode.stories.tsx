@@ -3,7 +3,7 @@ import {
   USPhoneNumber,
   useAuthVerificationCodeForm,
   AuthVerificationCodeFormView
-} from "@core-auth"
+} from "@auth-boundary"
 import {
   BASE_HEADER_SCREEN_OPTIONS,
   ChevronBackButton

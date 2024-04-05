@@ -1,4 +1,4 @@
-import { TestCognitoError } from "@core-auth/CognitoHelpers"
+import { TestCognitoError } from "@auth-boundary/CognitoHelpers"
 import {
   NavigationContainer,
   NavigatorScreenParams,
@@ -15,8 +15,8 @@ import {
 } from "@testing-library/react-native"
 import { useCallback, useState } from "react"
 import { Button, View } from "react-native"
-import { USPhoneNumber } from "@core-auth"
-import { CognitoSignInAuthenticator } from "@core-auth/sign-in"
+import { USPhoneNumber } from "@auth-boundary"
+import { CognitoSignInAuthenticator } from "@auth-boundary/sign-in"
 import { SignInParamsList, createSignInScreens } from "./SignIn"
 
 type TestParamsList = {

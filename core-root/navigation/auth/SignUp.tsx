@@ -13,7 +13,7 @@ import {
   USPhoneNumber,
   AuthVerificationCodeFormView,
   useAuthVerificationCodeForm
-} from "@core-auth"
+} from "@auth-boundary"
 import {
   SignUpChangeUserHandleFormView,
   useSignUpChangeUserHandleForm,
@@ -21,7 +21,7 @@ import {
   useSignUpCredentialsForm,
   SignUpEndingView,
   SignUpEnvironment
-} from "@core-auth/sign-up"
+} from "@auth-boundary/sign-up"
 import { UserHandle } from "@content-parsing"
 
 export type SignUpParamsList = {

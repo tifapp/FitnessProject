@@ -12,7 +12,7 @@ import {
   useExploreEvents,
   ExploreEventsView,
   createInitialCenter
-} from "@core-explore-events"
+} from "@explore-events-boundary"
 
 export type ExploreEventsScreensParamsList = {
   exploreEvents: { searchText: string; center?: LocationCoordinate2D }

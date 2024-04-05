@@ -17,20 +17,20 @@ const MODULES = [
   "assets",
   "graphql",
   "lib",
-  "core-auth",
-  "core-event-details",
+  "boundary-auth",
+  "boundary-event-details",
   "core-root",
   "location",
   "modules",
   "content-parsing",
   "date-time",
   "test-helpers",
-  "core-content-reporting",
+  "boundary-content-reporting",
   "shared-models",
   "notifications",
-  "core-explore-events",
+  "boundary-explore-events",
   "arrival-tracking",
-  "core-location-search"
+  "boundary-location-search"
 ]
 
 module.exports = function (api) {

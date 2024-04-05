@@ -6,8 +6,8 @@ import {
   LocationSearchPicker,
   useLocationSearchPicker,
   LocationSearchBar
-} from "@core-location-search"
-import { mockLocationSearchResult } from "@core-location-search/MockData"
+} from "@location-search-boundary"
+import { mockLocationSearchResult } from "@location-search-boundary/MockData"
 import {
   NavigationContainer,
   NavigationProp,

@@ -1,4 +1,4 @@
-import { EventMocks } from "@core-event-details/MockData"
+import { EventMocks } from "@event-details-boundary/MockData"
 import {
   mockExpoLocationObject,
   mockLocationCoordinate2D,
@@ -17,7 +17,7 @@ import {
   ExploreEventsInitialCenter
 } from "./Models"
 import { eventsByRegion, useExploreEvents } from "./ExploreEvents"
-import { renderUseLoadEventDetails } from "@core-event-details/TestHelpers"
+import { renderUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 import { neverPromise } from "@test-helpers/Promise"
 import { EventID } from "@shared-models/Event"

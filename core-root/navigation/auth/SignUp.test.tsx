@@ -22,7 +22,7 @@ import {
 import { HttpResponse, http } from "msw"
 import { useCallback, useState } from "react"
 import { Button, View } from "react-native"
-import { createSignUpEnvironment } from "@core-auth/sign-up"
+import { createSignUpEnvironment } from "@auth-boundary/sign-up"
 import { SignUpParamsList, createSignUpScreens } from "./SignUp"
 
 type TestSignUpParamsList = {

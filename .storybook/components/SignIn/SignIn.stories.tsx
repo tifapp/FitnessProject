@@ -1,11 +1,11 @@
 import { TiFAPI, createAWSTiFAPIFetch } from "@api-client"
 import { createForgotPasswordScreens } from "@core-root/navigation/auth/ForgotPassword"
-import { createForgotPasswordEnvironment } from "@core-auth/forgot-password"
-import { CognitoSignInAuthenticator } from "@core-auth/sign-in"
+import { createForgotPasswordEnvironment } from "@auth-boundary/forgot-password"
+import { CognitoSignInAuthenticator } from "@auth-boundary/sign-in"
 import {
   cognitoConfirmSignUpWithAutoSignIn,
   createSignUpEnvironment
-} from "@core-auth/sign-up"
+} from "@auth-boundary/sign-up"
 import { Auth } from "@aws-amplify/auth"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { API_URL } from "@env"

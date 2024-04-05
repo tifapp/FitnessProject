@@ -1,6 +1,6 @@
 import { FixedDateRange } from "@date-time"
 import { LocationCoordinate2D } from "@location"
-import { EventColors } from "../../core-event-details/Event"
+import { EventColors } from "../../event-details-boundary/Event"
 
 /**
  * A data type which is used to update and create an event.

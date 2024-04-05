@@ -1,4 +1,4 @@
-import { createForgotPasswordEnvironment } from "@core-auth/forgot-password"
+import { createForgotPasswordEnvironment } from "@auth-boundary/forgot-password"
 import {
   ForgotPasswordParamsList,
   createForgotPasswordScreens

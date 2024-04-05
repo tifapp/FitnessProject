@@ -11,14 +11,14 @@ import {
   Password,
   USPhoneNumber,
   useAuthVerificationCodeForm
-} from "@core-auth"
+} from "@auth-boundary"
 import {
   ForgotPasswordEnvironment,
   ForgotPasswordFormView,
   useForgotPasswordForm,
   ResetPasswordFormView,
   useResetPasswordForm
-} from "@core-auth/forgot-password"
+} from "@auth-boundary/forgot-password"
 import React from "react"
 
 export type ForgotPasswordParamsList = {

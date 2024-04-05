@@ -5,13 +5,13 @@ import {
   SignInFormView,
   useSignInForm,
   SignInAuthenticator
-} from "@core-auth/sign-in"
+} from "@auth-boundary/sign-in"
 import {
   EmailAddress,
   USPhoneNumber,
   AuthVerificationCodeFormView,
   useAuthVerificationCodeForm
-} from "@core-auth"
+} from "@auth-boundary"
 import { SignUpParamsList } from "./SignUp"
 import { ForgotPasswordParamsList } from "./ForgotPassword"
 

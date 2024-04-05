@@ -7,7 +7,7 @@ import {
   ReportSuccessView,
   ReportingReason,
   ReportableContentType
-} from "@core-content-reporting"
+} from "@content-reporting-boundary"
 
 export type ReportingScreensParamsList = {
   reportSuccess: { contentType: ReportableContentType }

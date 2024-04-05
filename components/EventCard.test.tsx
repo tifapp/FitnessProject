@@ -3,7 +3,7 @@ import { EventCard } from "./EventCard"
 import React from "react"
 import { CurrentUserEvent } from "@shared-models/Event"
 import "@test-helpers/Matchers"
-import { EventMocks } from "@core-event-details/MockData"
+import { EventMocks } from "@event-details-boundary/MockData"
 
 describe("EventCard tests", () => {
   beforeEach(() => {

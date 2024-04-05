@@ -1,5 +1,5 @@
-import { ExploreEventsView } from "@core-explore-events"
-import { EventMocks } from "@core-event-details/MockData"
+import { ExploreEventsView } from "@explore-events-boundary"
+import { EventMocks } from "@event-details-boundary/MockData"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import {

@@ -1,2 +1,2 @@
-export * from "../../core-event-details/Event"
+export * from "../../event-details-boundary/Event"
 export * from "./SaveEvent"

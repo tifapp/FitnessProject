@@ -1,6 +1,6 @@
 import { EventFormValues } from "@components/eventForm"
 import { dateRange } from "@date-time"
-import { EventColors } from "@core-event-details/Event"
+import { EventColors } from "@event-details-boundary/Event"
 import { HapticsProvider } from "@lib/Haptics"
 import { GeocodingFunctionsProvider } from "@location/Geocoding"
 import EventFormScreen from "@screens/EventFormScreen"
