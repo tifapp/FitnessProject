@@ -397,9 +397,7 @@ const NoContentView = ({
   actionButtonTitle,
   onActionButtonTapped
 }: NoContentProps) => {
-  const { title, message } = useConst(
-    ArrayUtils.randomElement(possibleMessages)
-  )
+  const { title, message } = useConst(possibleMessages.ext.randomElement())
   return (
     <View style={style}>
       <View style={styles.noContentContainer}>
