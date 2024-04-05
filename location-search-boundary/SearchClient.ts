@@ -1,7 +1,4 @@
-import { ArrayUtils } from "@lib/utils/Array"
-
 import { LocationSearchResult, LocationsSearchQuery } from "./Models"
-
 import { Geo, Place } from "@aws-amplify/geo"
 import {
   LocationCoordinate2D,
@@ -35,55 +32,43 @@ export const locationSearch = async (
       query,
       center,
       storage,
-      awsGeoSearchLocations
+      awsLocationSearch
     )
   }
 }
 
 /**
- *  A function that converts a {@link Place} into a {@link TiFLocation}.
- *
- * @param place A given {@link Place} from Geo.searchByText.
- * @returns The parameter converted into a {@link TiFLocation}.
+ * Returns a list of {@link TiFLocation}s from AWS Geo using the specified
+ * query and center coordinate.
  */
-export const awsPlaceToTifLocation = (place: Place) => {
-  if (!place.geometry) return undefined
-  return {
-    coordinate: {
-      latitude: place.geometry.point[1],
-      longitude: place.geometry.point[0]
-    },
-    placemark: {
-      name: place.label?.split(", ", 1)[0],
-      country: place.country,
-      postalCode: place.postalCode,
-      street: place.street,
-      streetNumber: place.addressNumber,
-      region: place.region,
-      isoCountryCode: "US",
-      city: place.municipality
-    }
-  }
-}
-
-/**
- * A function that takes in a query, and uses a search function to obtain
- * results, then converts the data into a usable set of {@link TiFLocation}s.
- *
- * @param query A {@link LocationsSearchQuery} given for the search function to use.
- * @param center An optional {@link LocationCoordinate2D} given for the search to center in where it should be searching.
- * @returns A Promise of an array of {@link TiFLocation}s.
- */
-export const awsGeoSearchLocations = async (
+export const awsLocationSearch = async (
   query: LocationsSearchQuery,
-  center?: LocationCoordinate2D
-) => {
-  const options = {
+  center: LocationCoordinate2D | undefined,
+  awsSearch: typeof Geo.searchByText = Geo.searchByText
+): Promise<TiFLocation[]> => {
+  const results = await awsSearch(query.toString(), {
     maxResults: 10,
-    biasPosition: center
-  }
-  const geoSearchResults = await Geo.searchByText(query.toString(), options)
-  return ArrayUtils.compactMap(geoSearchResults, awsPlaceToTifLocation)
+    biasPosition: center ? [center.longitude, center.latitude] : undefined
+  })
+  return results.ext.compactMap((place: Place) => {
+    if (!place.geometry) return undefined
+    return {
+      coordinate: {
+        latitude: place.geometry.point[1],
+        longitude: place.geometry.point[0]
+      },
+      placemark: {
+        name: place.label?.split(", ", 1)[0],
+        country: place.country,
+        postalCode: place.postalCode,
+        street: place.street,
+        streetNumber: place.addressNumber,
+        region: place.region,
+        isoCountryCode: "US",
+        city: place.municipality
+      }
+    }
+  })
 }
 
 /**

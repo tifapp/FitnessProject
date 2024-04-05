@@ -1,5 +1,6 @@
 import { ArrayUtils } from "@lib/utils/Array"
 import "@lib/utils/Promise"
+import { repeatElements } from "TiFShared/lib/Array"
 import * as ExpoSecureStore from "expo-secure-store"
 
 /**
@@ -16,15 +17,15 @@ export type SecureStore = Pick<
 export class InMemorySecureStore implements SecureStore {
   private readonly map = new Map<string, string>()
 
-  async setItemAsync (key: string, value: string) {
+  async setItemAsync(key: string, value: string) {
     this.map.set(key, value)
   }
 
-  async getItemAsync (key: string) {
+  async getItemAsync(key: string) {
     return this.map.get(key) ?? null
   }
 
-  async deleteItemAsync (key: string) {
+  async deleteItemAsync(key: string) {
     this.map.delete(key)
   }
 }
@@ -42,11 +43,11 @@ export class CognitoSecureStorage {
   private keyChunkMappings = new Map<string, number>()
   private cache = new Map<string, string>()
 
-  constructor (store: SecureStore) {
+  constructor(store: SecureStore) {
     this.store = store
   }
 
-  setItem (key: string, value: string) {
+  setItem(key: string, value: string) {
     const chunks = stringToChunks(value)
     this.keyChunkMappings.set(key, chunks.length)
     this.saveKeyChunkMappings()
@@ -56,11 +57,11 @@ export class CognitoSecureStorage {
     }
   }
 
-  getItem (key: string) {
+  getItem(key: string) {
     return this.cache.get(key)
   }
 
-  removeItem (key: string) {
+  removeItem(key: string) {
     this.cache.delete(key)
 
     const amountOfChunks = this.keyChunkMappings.get(key) ?? 0
@@ -72,14 +73,13 @@ export class CognitoSecureStorage {
     this.saveKeyChunkMappings()
   }
 
-  async clear () {
+  async clear() {
     await Promise.allSettled(
       Array.from(this.keyChunkMappings).map(async ([key, amountOfChunks]) => {
-        await Promise.allSettled(
-          ArrayUtils.repeatElements(amountOfChunks, async (chunkIndex) => {
-            await this.store.deleteItemAsync(secureStoreKey(key, chunkIndex))
-          })
-        )
+        const promises = repeatElements(amountOfChunks, (chunkIndex) => {
+          return this.store.deleteItemAsync(secureStoreKey(key, chunkIndex))
+        })
+        await Promise.allSettled(promises)
       })
     )
     this.keyChunkMappings = new Map()
@@ -87,7 +87,7 @@ export class CognitoSecureStorage {
     this.cache = new Map()
   }
 
-  async sync () {
+  async sync() {
     if (this.syncPromise) {
       return await this.syncPromise
     }
@@ -95,34 +95,32 @@ export class CognitoSecureStorage {
     return await this.syncPromise
   }
 
-  private async syncKnownKeys () {
+  private async syncKnownKeys() {
     await this.loadKeyChunkMappings()
     await Promise.allSettled(
       Array.from(this.keyChunkMappings).map(async ([key, amountOfChunks]) => {
-        const loadPromises = [] as Promise<string | null>[]
-        for (let i = 0; i < amountOfChunks; i++) {
-          loadPromises.push(this.store.getItemAsync(secureStoreKey(key, i)))
-        }
-        const value = ArrayUtils.compactMap(
-          await Promise.allSettled(loadPromises),
-          (result) => {
+        const loadPromises = repeatElements(amountOfChunks, (i) => {
+          return this.store.getItemAsync(secureStoreKey(key, i))
+        })
+        const value = (await Promise.allSettled(loadPromises)).ext
+          .compactMap((result) => {
             if (result.status === "rejected") return undefined
             return result.value
-          }
-        ).join("")
+          })
+          .join("")
         this.cache.set(key, value)
       })
     )
   }
 
-  private async loadKeyChunkMappings () {
+  private async loadKeyChunkMappings() {
     const result = await this.store.getItemAsync(KEY_CHUNK_MAPPINGS_KEY)
     if (result) {
       this.keyChunkMappings = new Map(JSON.parse(result))
     }
   }
 
-  private async saveKeyChunkMappings () {
+  private async saveKeyChunkMappings() {
     await this.store.setItemAsync(
       KEY_CHUNK_MAPPINGS_KEY,
       JSON.stringify(Array.from(this.keyChunkMappings))
@@ -132,11 +130,9 @@ export class CognitoSecureStorage {
 
 const stringToChunks = (data: string) => {
   const numChunks = Math.ceil(data.length / STORE_CHUNK_SIZE)
-  const chunks = [] as string[]
-  for (let i = 0; i < numChunks; i++) {
-    chunks.push(data.slice(i * STORE_CHUNK_SIZE, (i + 1) * STORE_CHUNK_SIZE))
-  }
-  return chunks
+  return repeatElements(numChunks, (i) => {
+    return data.slice(i * STORE_CHUNK_SIZE, (i + 1) * STORE_CHUNK_SIZE)
+  })
 }
 
 const secureStoreKey = (name: string, chunkIndex: number) => {

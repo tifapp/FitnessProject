@@ -1,20 +1,5 @@
 export namespace ArrayUtils {
   /**
-   * Maps an array using a transform function, but removes any `null` or
-   * `undefined` values from the array.
-   */
-  export const compactMap = <A, B>(
-    arr: A[],
-    mapper: (a: A, index: number) => B | undefined | null
-  ) => {
-    return arr.reduce((acc, curr, index) => {
-      const mapped = mapper(curr, index)
-      if (mapped) acc.push(mapped)
-      return acc
-    }, [] as NonNullable<B>[])
-  }
-
-  /**
    * Creates an array that repeats the element given to it a certain number of times (the right way...).
    *
    * @param times the number of times to repeat the given element.

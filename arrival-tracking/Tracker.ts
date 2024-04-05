@@ -123,7 +123,7 @@ export class EventArrivalsTracker {
     eventIds: Set<number>,
     regions: EventArrivalRegion[]
   ) {
-    return ArrayUtils.compactMap(regions, (region) => {
+    return regions.ext.compactMap((region) => {
       const newEventIds = region.eventIds.filter((id) => !eventIds.has(id))
       if (newEventIds.length === 0) return undefined
       region.eventIds = newEventIds
