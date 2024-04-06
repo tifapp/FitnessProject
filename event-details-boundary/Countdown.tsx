@@ -1,4 +1,3 @@
-import { FixedDateRange, dayjs } from "@date-time"
 import { CurrentUserEvent } from "@shared-models/Event"
 import { TodayOrTomorrow } from "@shared-models/TodayOrTomorrow"
 import { humanizeEventCountdownSeconds } from "./Event"
@@ -7,6 +6,7 @@ import { Footnote, Headline } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import { StringUtils } from "@lib/utils/String"
+import { dayjs } from "TiFShared/lib/Dayjs"
 
 export type EventCountdownTime = CurrentUserEvent["time"]
 

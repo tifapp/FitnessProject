@@ -1,5 +1,5 @@
 import { UserHandle } from "@content-parsing"
-import { StringDateRangeSchema, StringDateSchema } from "@date-time"
+import { FixedDateRangeSchema } from "TiFShared/api/models/FixedDateRange"
 import { ColorStringSchema } from "TiFShared/domain-models/ColorString"
 import { z } from "zod"
 import { LocationCoordinates2DSchema } from "./Location"
@@ -9,6 +9,7 @@ import {
   BlockedBidirectionalUserRelationsSchema,
   UnblockedBidirectionalUserRelationsSchema
 } from "./User"
+import { StringDateSchema } from "TiFShared/lib/Date"
 
 export type EventID = number
 
@@ -113,7 +114,7 @@ export type EventLocation = z.infer<typeof EventLocationSchema>
 export const EventTimeResponseSchema = z.object({
   secondsToStart: z.number(),
   todayOrTomorrow: TodayOrTomorrowSchema.nullable(),
-  dateRange: StringDateRangeSchema
+  dateRange: FixedDateRangeSchema
 })
 
 /**

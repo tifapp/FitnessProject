@@ -1,4 +1,4 @@
-import { dayjs } from "@date-time"
+import { dayjs } from "TiFShared/lib/Dayjs"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { renderHook, waitFor } from "@testing-library/react-native"
 import {

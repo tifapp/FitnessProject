@@ -1,13 +1,11 @@
-import { CurrentUserEvent } from "@shared-models/Event"
-import { renderHook } from "@testing-library/react-native"
+import { dayjs } from "TiFShared/lib/Dayjs"
 import {
   EventFormattedCountdown,
   EventCountdown,
-  useEventCountdown,
   eventCountdown
 } from "./Countdown"
 import { fakeTimers } from "@test-helpers/Timers"
-import { dateRange, dayjs } from "@date-time"
+import { dateRange } from "TiFShared/domain-models/FixedDateRange"
 
 describe("EventDetailsCountdown tests", () => {
   describe("EventCountdown tests", () => {

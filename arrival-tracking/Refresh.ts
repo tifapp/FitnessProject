@@ -1,8 +1,8 @@
-import { addSecondsToDate, diffDates, now } from "@date-time"
 import { AppState } from "react-native"
 import { EventArrivalsTracker } from "./Tracker"
 import { TiFAPI } from "@api-client/TiFAPI"
 import { InternalMetricsStorage } from "@lib/InternalMetrics"
+import { now } from "TiFShared/lib/Dayjs"
 
 /**
  * A class that manages refreshing of upcoming event arrivals.
@@ -57,8 +57,7 @@ export class EventArrivalsRefresher {
    * Returns the number of milliseconds to wait until another refresh should be performed.
    */
   async timeUntilNextRefreshAvailable() {
-    const { milliseconds } = diffDates(
-      await this.nextAvailableRefreshDate(),
+    const { milliseconds } = (await this.nextAvailableRefreshDate()).ext.diff(
       new Date()
     )
     return Math.max(0, milliseconds)
@@ -78,7 +77,7 @@ export class EventArrivalsRefresher {
     const lastDate = (await this.internalMetrics.current())
       .lastEventArrivalsRefreshDate
     if (!lastDate) return new Date()
-    return addSecondsToDate(lastDate, this.secondsNeededBetweenRefreshes)
+    return lastDate.ext.addSeconds(this.secondsNeededBetweenRefreshes)
   }
 }
 

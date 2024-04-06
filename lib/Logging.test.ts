@@ -10,7 +10,7 @@ import {
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 import { fakeTimers } from "@test-helpers/Timers"
 import { waitFor } from "@testing-library/react-native"
-import { dayjs } from "@date-time"
+import { dayjs } from "TiFShared/lib/Dayjs"
 
 describe("Logging tests", () => {
   fakeTimers()
@@ -86,7 +86,7 @@ describe("Logging tests", () => {
           stringifiedMetadata,
           timestamp
         ) VALUES (
-          'test.old.message', 
+          'test.old.message',
           'debug',
           'A test really old log message',
           NULL,

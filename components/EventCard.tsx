@@ -2,12 +2,13 @@ import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { CurrentUserEvent } from "@shared-models/Event"
 import { placemarkToAbbreviatedAddress } from "@location"
-import { dayjs, now } from "@date-time"
 import { Ionicon, IoniconName } from "@components/common/Icons"
 import { BodyText, Caption, Headline } from "@components/Text"
 import ConfirmationDialogue from "@components/common/ConfirmationDialogue"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
 import { ColorString } from "TiFShared/domain-models/ColorString"
+import { now } from "TiFShared/lib/Dayjs"
+import dayjs from "dayjs"
 
 export type EventCardProps = {
   event: CurrentUserEvent
@@ -15,7 +16,7 @@ export type EventCardProps = {
 }
 
 export const EventCard = ({ event, style }: EventCardProps) => {
-  const formattedStartDate = event.time.dateRange.formattedDate(
+  const formattedStartDate = event.time.dateRange.ext.formattedDate(
     now(),
     dayjs(event.time.dateRange.startDate)
   )
@@ -39,7 +40,7 @@ export const EventCard = ({ event, style }: EventCardProps) => {
         </BodyText>
         <IconRowView
           icon="calendar"
-          text={`${formattedStartDate} • ${event.time.dateRange.formattedStartTime()}`}
+          text={`${formattedStartDate} • ${event.time.dateRange.ext.formattedStartTime()}`}
           color={event.color}
           style={styles.bottomSpacing}
         />

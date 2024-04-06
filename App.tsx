@@ -27,6 +27,7 @@ import { registerForPushNotifications } from "./notifications"
 import awsconfig from "./src/aws-exports"
 import { NetInfoInternetConnectionStatus } from "@lib/InternetConnection"
 import "TiFShared"
+import "date-time/DateRange"
 
 const log = createLogFunction("app.root")
 

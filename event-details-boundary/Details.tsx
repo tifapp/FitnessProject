@@ -1,4 +1,4 @@
-import { UseQueryResult, useQuery } from "@tanstack/react-query"
+import { UseQueryResult } from "@tanstack/react-query"
 import {
   BlockedEvent,
   CurrentUserEvent,
@@ -6,8 +6,7 @@ import {
   currentUserEventFromResponse
 } from "@shared-models/Event"
 import { useIsConnectedToInternet } from "@lib/InternetConnection"
-import React, { useEffect, useRef, useState } from "react"
-import { useEffectEvent } from "@lib/utils/UseEffectEvent"
+import React, { useRef, useState } from "react"
 import { TiFAPI } from "@api-client/TiFAPI"
 import { StyleProp, View, ViewStyle, StyleSheet } from "react-native"
 import { BodyText, Subtitle, Title } from "@components/Text"

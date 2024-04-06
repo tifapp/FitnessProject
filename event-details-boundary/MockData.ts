@@ -5,7 +5,6 @@ import {
   EventAttendee,
   EventLocation
 } from "@shared-models/Event"
-import { dateRange, dayjs } from "@date-time"
 import { mockLocationCoordinate2D, mockPlacemark } from "@location/MockData"
 import { faker } from "@faker-js/faker"
 import {
@@ -15,6 +14,8 @@ import {
 } from "@lib/utils/Random"
 import { ColorString } from "TiFShared/domain-models/ColorString"
 import { EventChatTokenRequest } from "@shared-models/ChatToken"
+import { dateRange } from "TiFShared/domain-models/FixedDateRange"
+import { dayjs } from "TiFShared/lib/Dayjs"
 
 export const mockEventLocation = (): EventLocation => ({
   coordinate: mockLocationCoordinate2D(),
