@@ -1,4 +1,3 @@
-import { UserHandle } from "@content-parsing"
 import { captureAlerts } from "@test-helpers/Alerts"
 import { neverPromise } from "@test-helpers/Promise"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
@@ -6,6 +5,7 @@ import { timeTravel, fakeTimers } from "@test-helpers/Timers"
 import { renderHook, waitFor } from "@testing-library/react-native"
 import { act } from "react-test-renderer"
 import { useSignUpChangeUserHandleForm } from "./ChangeUserHandle"
+import { UserHandle } from "TiFShared/domain-models/User"
 
 describe("SignUpChangeUserHandle tests", () => {
   beforeEach(() => jest.resetAllMocks())

@@ -13,6 +13,7 @@ import { TiFAPIFetch, createTiFAPIFetch } from "./client"
 import { JoinEventResponseSchema } from "@shared-models/JoinEvent"
 import { UserID } from "@shared-models/User"
 import { LocationCoordinate2D } from "@shared-models/Location"
+import { UserHandleSchema } from "TiFShared/domain-models/User"
 
 export type UpdateCurrentUserProfileRequest = Partial<{
   name: string
@@ -59,7 +60,7 @@ export class TiFAPI {
       {
         status201: z.object({
           id: z.string().uuid(),
-          handle: UserHandle.zodSchema
+          handle: UserHandleSchema
         })
       }
     )
@@ -102,7 +103,7 @@ export class TiFAPI {
             z.object({
               id: z.string().uuid(),
               name: z.string(),
-              handle: UserHandle.zodSchema
+              handle: UserHandleSchema
             })
           )
         })

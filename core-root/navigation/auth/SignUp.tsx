@@ -22,7 +22,7 @@ import {
   SignUpEndingView,
   SignUpEnvironment
 } from "@auth-boundary/sign-up"
-import { UserHandle } from "@content-parsing"
+import { UserHandle } from "TiFShared/domain-models/User"
 
 export type SignUpParamsList = {
   signUpCredentialsForm: undefined

@@ -1,5 +1,4 @@
 import { TiFAPI } from "@api-client/TiFAPI"
-import { UserHandle } from "@content-parsing"
 import { ColorString } from "TiFShared/domain-models/ColorString"
 import { uuidString } from "@lib/utils/UUID"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
@@ -16,6 +15,7 @@ import { EventMocks, mockEventLocation } from "./MockData"
 import { renderUseLoadEventDetails } from "./TestHelpers"
 import { EventID } from "@shared-models/Event"
 import { dateRange } from "TiFShared/domain-models/FixedDateRange"
+import { UserHandle } from "TiFShared/domain-models/User"
 
 describe("EventDetailsLoading tests", () => {
   beforeEach(() => {

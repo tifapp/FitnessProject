@@ -1,4 +1,3 @@
-import { UserHandle } from "@content-parsing"
 import { FixedDateRangeSchema } from "TiFShared/api/models/FixedDateRange"
 import { ColorStringSchema } from "TiFShared/domain-models/ColorString"
 import { z } from "zod"
@@ -10,6 +9,7 @@ import {
   UnblockedBidirectionalUserRelationsSchema
 } from "./User"
 import { StringDateSchema } from "TiFShared/lib/Date"
+import { UserHandleSchema } from "TiFShared/domain-models/User"
 
 export type EventID = number
 
@@ -29,7 +29,7 @@ export type EventRegion = z.infer<typeof EventRegionSchema>
 export const UnblockedEventAttendeeSchema = z.object({
   id: z.string().uuid(),
   username: z.string(),
-  handle: UserHandle.zodSchema,
+  handle: UserHandleSchema,
   profileImageURL: z.string().url().nullable(),
   relations: UnblockedBidirectionalUserRelationsSchema
 })

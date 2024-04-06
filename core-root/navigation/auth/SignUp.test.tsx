@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { TiFAPI } from "@api-client"
-import { UserHandle } from "@content-parsing"
 import { uuidString } from "@lib/utils/UUID"
 import {
   NavigationContainer,
@@ -24,6 +23,7 @@ import { useCallback, useState } from "react"
 import { Button, View } from "react-native"
 import { createSignUpEnvironment } from "@auth-boundary/sign-up"
 import { SignUpParamsList, createSignUpScreens } from "./SignUp"
+import { UserHandle } from "TiFShared/domain-models/User"
 
 type TestSignUpParamsList = {
   test: undefined

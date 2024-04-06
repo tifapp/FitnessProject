@@ -1,7 +1,7 @@
+import { UserHandle } from "TiFShared/domain-models/User"
 import { ContentText } from "./ContentText"
-import { EventHandle } from "./EventHandle"
+import { EventHandle } from "TiFShared/domain-models/Event"
 import { fireEvent, render, screen } from "@testing-library/react-native"
-import { UserHandle } from "./UserHandle"
 import { ColorString } from "TiFShared/domain-models/ColorString"
 
 describe("ContentText tests", () => {

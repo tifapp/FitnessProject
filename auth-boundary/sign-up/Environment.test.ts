@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { TiFAPI } from "@api-client"
 import { TestCognitoError } from "@auth-boundary/CognitoHelpers"
-import { UserHandle } from "@content-parsing"
 import { uuidString } from "@lib/utils/UUID"
 import { mswServer } from "@test-helpers/msw"
 import { HttpResponse, http } from "msw"
 import { EmailAddress, Password, USPhoneNumber } from ".."
 import { createSignUpEnvironment } from "./Environment"
+import { UserHandle } from "TiFShared/domain-models/User"
 
 describe("SignUpEnvironment tests", () => {
   const cognito = {

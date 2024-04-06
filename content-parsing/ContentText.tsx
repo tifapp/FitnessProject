@@ -2,14 +2,16 @@ import React, { useMemo } from "react"
 import { StyleSheet, TextProps } from "react-native"
 import { openURL } from "expo-linking"
 import { BodyText, Headline } from "../components/Text"
-import {
-  linkify,
-  UserHandleLinkifyMatch,
-  EventHandleLinkifyMatch
-} from "./Linkify"
 import { Match } from "linkify-it"
-import { EventHandle } from "./EventHandle"
-import { UserHandle } from "./UserHandle"
+import {
+  UserHandle,
+  UserHandleLinkifyMatch
+} from "TiFShared/domain-models/User"
+import {
+  EventHandle,
+  EventHandleLinkifyMatch
+} from "TiFShared/domain-models/Event"
+import { linkify } from "TiFShared/lib/LinkifyIt"
 
 export type ContentTextCallbacks = {
   onUserHandleTapped: (handle: UserHandle) => void

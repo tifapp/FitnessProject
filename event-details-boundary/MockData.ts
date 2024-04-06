@@ -1,4 +1,3 @@
-import { UserHandle } from "@content-parsing"
 import { uuidString } from "@lib/utils/UUID"
 import {
   CurrentUserEvent,
@@ -16,6 +15,7 @@ import { ColorString } from "TiFShared/domain-models/ColorString"
 import { EventChatTokenRequest } from "@shared-models/ChatToken"
 import { dateRange } from "TiFShared/domain-models/FixedDateRange"
 import { dayjs } from "TiFShared/lib/Dayjs"
+import { UserHandle } from "TiFShared/domain-models/User"
 
 export const mockEventLocation = (): EventLocation => ({
   coordinate: mockLocationCoordinate2D(),
