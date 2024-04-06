@@ -5,7 +5,6 @@ import { StyleProp, ViewStyle, View, StyleSheet } from "react-native"
 import { Footnote, Headline } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors, useFontScale } from "@lib/Fonts"
-import { StringUtils } from "@lib/utils/String"
 import { dayjs } from "TiFShared/lib/Dayjs"
 import { capitalizeFirstLetter } from "TiFShared/lib/String"
 
