@@ -1,11 +1,7 @@
 import { Caption, CaptionTitle } from "@components/Text"
 import { SkeletonView } from "@components/common/Skeleton"
 import { useFontScale } from "@lib/Fonts"
-import {
-  LocationCoordinate2D,
-  hashLocationCoordinate,
-  milesBetweenLocations
-} from "@location"
+import { LocationCoordinate2D, hashLocationCoordinate } from "@location"
 import React, { ReactElement } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { Divider } from "react-native-elements"
@@ -19,6 +15,7 @@ import {
   LocationSearchResultsData,
   LocationsSearchQuery
 } from "./Models"
+import { coordinateDistance } from "TiFShared/domain-models/LocationCoordinate2D"
 
 export type LocationSearchResultsListProps = {
   query: LocationsSearchQuery
@@ -69,7 +66,7 @@ export const LocationSearchResultsListView = ({
           result={item}
           distanceMiles={
             center
-              ? milesBetweenLocations(center, item.location.coordinate)
+              ? coordinateDistance(center, item.location.coordinate, "miles")
               : undefined
           }
           style={styles.horizontalPadding}

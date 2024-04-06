@@ -1,7 +1,6 @@
 import geohash from "ngeohash"
 import { z } from "zod"
 import { PlacemarkSchema } from "./Placemark"
-import { metersToMiles } from "TiFShared/lib/MetricConversions"
 
 /**
  * A zod schema for {@link LocationCoordinate2D}.
@@ -35,48 +34,6 @@ export const TiFLocationSchema = z.object({
  * A type that maps a lat-lng coordinate to its respective placemark.
  */
 export type TiFLocation = Readonly<z.infer<typeof TiFLocationSchema>>
-
-const EARTH_RADIUS_METERS = 6371e3
-
-/**
- * Computes the number of meters between 2 locations using the haversine formula.
- *
- * For more info on the math: https://en.wikipedia.org/wiki/Haversine_formula
- */
-export const metersBetweenLocations = (
-  location1: LocationCoordinate2D,
-  location2: LocationCoordinate2D
-) => {
-  const lat1Radians = Math.degreesToRadians(location1.latitude)
-  const lat2Radians = Math.degreesToRadians(location2.latitude)
-
-  const latDeltaRadians = Math.degreesToRadians(
-    location2.latitude - location1.latitude
-  )
-  const lngDeltaRadians = Math.degreesToRadians(
-    location2.longitude - location1.longitude
-  )
-
-  const latDelta = Math.sin2(latDeltaRadians / 2)
-  const latCos = Math.cos(lat1Radians) * Math.cos(lat2Radians)
-  const lngDelta = Math.sin2(lngDeltaRadians / 2)
-
-  return (
-    2 * EARTH_RADIUS_METERS * Math.asin(Math.sqrt(latDelta + latCos * lngDelta))
-  )
-}
-
-/**
- * Computes the number of miles between 2 locations using the haversine formula.
- *
- * For more info on the math: https://en.wikipedia.org/wiki/Haversine_formula
- */
-export const milesBetweenLocations = (
-  location1: LocationCoordinate2D,
-  location2: LocationCoordinate2D
-) => {
-  return metersToMiles(metersBetweenLocations(location1, location2))
-}
 
 /**
  * Produces a geohash of a location coordinate.

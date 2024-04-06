@@ -1,8 +1,6 @@
 import { milesToMeters } from "TiFShared/lib/MetricConversions"
-import {
-  LocationCoordinate2D,
-  metersBetweenLocations
-} from "../shared-models/Location"
+import { LocationCoordinate2D } from "../shared-models/Location"
+import { coordinateDistance } from "TiFShared/domain-models/LocationCoordinate2D"
 
 /**
  * A type representing the area around a given lat-lng coordinate.
@@ -52,11 +50,16 @@ const isMinRadiusDifferenceAboveThreshold = (
  */
 export const minRegionMeterRadius = (region: Region) => {
   const isMinLatitude = region.latitudeDelta < region.longitudeDelta
-  return metersBetweenLocations(region, {
-    latitude: region.latitude + (isMinLatitude ? region.latitudeDelta / 2 : 0),
-    longitude:
-      region.longitude + (!isMinLatitude ? region.longitudeDelta / 2 : 0)
-  })
+  return coordinateDistance(
+    region,
+    {
+      latitude:
+        region.latitude + (isMinLatitude ? region.latitudeDelta / 2 : 0),
+      longitude:
+        region.longitude + (!isMinLatitude ? region.longitudeDelta / 2 : 0)
+    },
+    "meters"
+  )
 }
 
 /**
