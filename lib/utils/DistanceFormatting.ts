@@ -1,4 +1,4 @@
-import { milesToFeet } from "./MetricConversions"
+import { milesToFeet } from "TiFShared/lib/MetricConversions"
 
 /**
  * Formats miles into a compact format suitable for displaying in small UI spaces.

@@ -25,7 +25,6 @@ import { openEventLocationInMaps } from "./Event"
 import { Ionicon, RoundedIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { compactFormatDistance } from "@lib/utils/DistanceFormatting"
-import { metersToMiles } from "@lib/utils/MetricConversions"
 import { dayjs } from "TiFShared/lib/Dayjs"
 import duration from "dayjs/plugin/duration"
 import { AvatarMapMarkerView } from "@components/AvatarMapMarker"
@@ -34,6 +33,7 @@ import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import Animated, { FadeIn } from "react-native-reanimated"
 import { openSettings } from "expo-linking"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
+import { metersToMiles } from "TiFShared/lib/MetricConversions"
 
 export type LoadEventTravelEstimates = (
   userCoordinate: LocationCoordinate2D,

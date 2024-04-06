@@ -1,4 +1,4 @@
-import { milesToMeters } from "@lib/utils/MetricConversions"
+import { milesToMeters } from "TiFShared/lib/MetricConversions"
 import {
   LocationCoordinate2D,
   metersBetweenLocations

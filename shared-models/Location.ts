@@ -1,7 +1,7 @@
 import geohash from "ngeohash"
 import { z } from "zod"
 import { PlacemarkSchema } from "./Placemark"
-import { metersToMiles } from "@lib/utils/MetricConversions"
+import { metersToMiles } from "TiFShared/lib/MetricConversions"
 
 /**
  * A zod schema for {@link LocationCoordinate2D}.
