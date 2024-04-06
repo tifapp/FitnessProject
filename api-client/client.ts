@@ -1,6 +1,6 @@
 import { JSONSerializableValue } from "@lib/JSONSerializable"
 import { createLogFunction } from "@lib/Logging"
-import { ToStringable } from "@lib/ToStringable"
+import { ToStringable } from "TiFShared/lib/String"
 import { AnyZodObject, ZodType, z } from "zod"
 
 export type TiFHTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE"
