@@ -7,6 +7,7 @@ import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import { StringUtils } from "@lib/utils/String"
 import { dayjs } from "TiFShared/lib/Dayjs"
+import { capitalizeFirstLetter } from "TiFShared/lib/String"
 
 export type EventCountdownTime = CurrentUserEvent["time"]
 
@@ -62,7 +63,7 @@ const eventFormattedCountdown = (
     }
   } else {
     return {
-      todayOrTomorrow: StringUtils.capitalizeFirstLetter(todayOrTomorrow),
+      todayOrTomorrow: capitalizeFirstLetter(todayOrTomorrow),
       shouldDisplayFomoEffect: false
     }
   }
