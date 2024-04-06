@@ -1,7 +1,7 @@
 import { Caption, CaptionTitle } from "@components/Text"
 import { SkeletonView } from "@components/common/Skeleton"
 import { useFontScale } from "@lib/Fonts"
-import { LocationCoordinate2D, hashLocationCoordinate } from "@location"
+import { hashLocationCoordinate } from "@location"
 import React, { ReactElement } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { Divider } from "react-native-elements"
@@ -15,7 +15,10 @@ import {
   LocationSearchResultsData,
   LocationsSearchQuery
 } from "./Models"
-import { coordinateDistance } from "TiFShared/domain-models/LocationCoordinate2D"
+import {
+  LocationCoordinate2D,
+  coordinateDistance
+} from "TiFShared/domain-models/LocationCoordinate2D"
 
 export type LocationSearchResultsListProps = {
   query: LocationsSearchQuery

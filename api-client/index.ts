@@ -1,3 +1,2 @@
-export * from "./aws"
-export * from "./client"
+export * from "./AWS"
 export * from "./TiFAPI"

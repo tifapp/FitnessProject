@@ -1,5 +1,5 @@
 /* eslint-disable func-call-spacing */
-import { EventRegion } from "@shared-models/Event"
+import { EventRegion } from "TiFShared/domain-models/Event"
 import { useCallback, useSyncExternalStore } from "react"
 
 export type EventRegionMonitorUnsubscribe = () => void

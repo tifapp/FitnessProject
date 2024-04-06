@@ -1,8 +1,10 @@
-import { EventArrivalRegion } from "@shared-models/EventArrivals"
 import { getBackgroundPermissionsAsync } from "expo-location"
 import { TiFSQLite } from "@lib/SQLite"
-import { LocationCoordinate2D } from "@shared-models/Location"
-import { areEventRegionsEqual } from "TiFShared/domain-models/Event"
+import {
+  EventArrivalRegion,
+  areEventRegionsEqual
+} from "TiFShared/domain-models/Event"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 
 /**
  * An interface for storing client-side details on upcoming event arrivals.
@@ -58,7 +60,7 @@ export class SQLiteUpcomingEventArrivals implements UpcomingEventArrivals {
             longitude: curr.longitude
           },
           arrivalRadiusMeters: curr.arrivalRadiusMeters,
-          isArrived: curr.hasArrived === 1
+          hasArrived: curr.hasArrived === 1
         }
         if (
           acc.length > 0 &&
@@ -88,7 +90,7 @@ export class SQLiteUpcomingEventArrivals implements UpcomingEventArrivals {
             ${region.coordinate.latitude},
             ${region.coordinate.longitude},
             ${region.arrivalRadiusMeters},
-            ${region.isArrived}
+            ${region.hasArrived}
           )
           `
           await Promise.all(

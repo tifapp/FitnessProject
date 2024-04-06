@@ -1,6 +1,6 @@
 import { DevicePushToken } from "expo-notifications"
-import { TiFAPI } from "../api-client/TiFAPI"
 import { createLogFunction } from "@lib/Logging"
+import { TiFAPI } from "TiFShared/api"
 
 const log = createLogFunction("push.notifications.registration")
 

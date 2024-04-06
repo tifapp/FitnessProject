@@ -12,11 +12,11 @@ import { useFontScale } from "@lib/Fonts"
 import { useIsSignedIn } from "@lib/UserSession"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { updateEventDetailsQueryEvent } from "./Query"
+import { toggleBlockUserRelations } from "@shared-models/User"
 import {
-  UnblockedBidirectionalUserRelations,
   UserID,
-  toggleBlockUserRelations
-} from "@shared-models/User"
+  UnblockedBidirectionalUserRelations
+} from "TiFShared/domain-models/User"
 
 export type EventMenuActionsListKey = keyof typeof EVENT_MENU_ACTIONS_LISTS
 

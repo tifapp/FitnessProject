@@ -1,4 +1,4 @@
-import { TiFAPI } from "@api-client/TiFAPI"
+import { TiFAPI } from "TiFShared/api"
 import { createForgotPasswordEnvironment } from "@auth-boundary/forgot-password"
 import { CognitoSignInAuthenticator } from "@auth-boundary/sign-in"
 import {

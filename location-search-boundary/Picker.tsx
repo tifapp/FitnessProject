@@ -2,7 +2,7 @@ import { Headline } from "@components/Text"
 import { CircularIonicon } from "@components/common/Icons"
 import { useUserCoordinatesQuery } from "@location/UserLocation"
 import { AppStyles } from "@lib/AppColorStyle"
-import { LocationCoordinate2D, TiFLocation } from "@location"
+import { TiFLocation } from "@location"
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
 import { LocationAccuracy, LocationObject } from "expo-location"
 import React from "react"
@@ -21,6 +21,7 @@ import {
 import { LocationSearchResultsListView } from "./SearchResultsList"
 import { LocationSearchResultsData } from "./Models"
 import { useLocationsSearchQueryObject } from "./state"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 
 export type UseLocationSearchPickerEnvironment = {
   loadSearchResults: (

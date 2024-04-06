@@ -20,7 +20,7 @@ import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 import { SQLiteRecentLocationsStorage } from "@lib/RecentsLocations"
 import { mswServer } from "@test-helpers/msw"
 import { http, HttpResponse } from "msw"
-import { TiFAPI } from "@api-client/TiFAPI"
+import { TiFAPI } from "TiFShared/api"
 import { mockEventRegion } from "@arrival-tracking/MockData"
 import {
   EventMocks,
@@ -385,8 +385,8 @@ describe("JoinEvent tests", () => {
 
   const mockSuccessResponse = () => ({
     id: 1,
-    upcomingRegions: [],
-    isArrived: false,
-    token: mockEventChatTokenRequest()
+    trackableRegions: [],
+    hasArrived: false,
+    chatToken: mockEventChatTokenRequest()
   })
 })

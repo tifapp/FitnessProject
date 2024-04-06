@@ -1,7 +1,7 @@
 import {
   EventArrivalRegion,
   EventArrivalRegionSchema
-} from "@shared-models/EventArrivals"
+} from "TiFShared/domain-models/Event"
 import { z } from "zod"
 
 /**
@@ -56,5 +56,5 @@ export const arrivalRegion = (
   eventIds: [arrival.eventId],
   coordinate: arrival.coordinate,
   arrivalRadiusMeters: arrival.arrivalRadiusMeters,
-  isArrived: hasArrived
+  hasArrived
 })

@@ -1,6 +1,6 @@
 import { AppState } from "react-native"
 import { EventArrivalsTracker } from "./Tracker"
-import { TiFAPI } from "@api-client/TiFAPI"
+import { TiFAPI } from "TiFShared/api"
 import { InternalMetricsStorage } from "@lib/InternalMetrics"
 import { now } from "TiFShared/lib/Dayjs"
 
@@ -36,7 +36,7 @@ export class EventArrivalsRefresher {
       async () => {
         await tracker.refreshArrivals(async () => {
           const resp = await tifAPI.upcomingEventArrivalRegions()
-          return resp.data.upcomingRegions
+          return resp.data.trackableRegions
         })
       },
       internalMetrics,

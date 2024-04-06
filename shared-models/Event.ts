@@ -1,159 +1,9 @@
-import { FixedDateRangeSchema } from "TiFShared/api/models/FixedDateRange"
-import { ColorStringSchema } from "TiFShared/domain-models/ColorString"
-import { z } from "zod"
-import { LocationCoordinates2DSchema } from "./Location"
-import { PlacemarkSchema } from "./Placemark"
-import { TodayOrTomorrowSchema } from "./TodayOrTomorrow"
 import {
-  BlockedBidirectionalUserRelationsSchema,
-  UnblockedBidirectionalUserRelationsSchema
-} from "./User"
-import { StringDateSchema } from "TiFShared/lib/Date"
-import { UserHandleSchema } from "TiFShared/domain-models/User"
+  EventResponse,
+  EventWhenBlockedByHostResponse
+} from "TiFShared/api/models/Event"
 
-export type EventID = number
-
-/**
- * A zod schema for {@link EventRegion}.
- */
-export const EventRegionSchema = z.object({
-  coordinate: LocationCoordinates2DSchema,
-  arrivalRadiusMeters: z.number()
-})
-
-/**
- * An event region is defined by the precise location coordinate of an event, and its arrival radius.
- */
-export type EventRegion = z.infer<typeof EventRegionSchema>
-
-export const UnblockedEventAttendeeSchema = z.object({
-  id: z.string().uuid(),
-  username: z.string(),
-  handle: UserHandleSchema,
-  profileImageURL: z.string().url().nullable(),
-  relations: UnblockedBidirectionalUserRelationsSchema
-})
-
-/**
- * A zod schema for an event attendee where either the user or host are blocking one another.
- */
-export const BlockedEventAttendeeSchema = UnblockedEventAttendeeSchema.omit({
-  relations: true
-}).extend({ relations: BlockedBidirectionalUserRelationsSchema })
-
-/**
- * User information given for an attendee of an event.
- */
-export type EventAttendee = z.infer<typeof UnblockedEventAttendeeSchema>
-
-/**
- * A zod schema for an event attendees list page fetched from the server.
- */
-export const EventAttendeesPageSchema = z.object({
-  attendees: z.array(UnblockedEventAttendeeSchema),
-  totalAttendeeCount: z.number(),
-  nextPageCursor: z.string().nullable()
-})
-
-export const EventSettingsSchema = z.object({
-  shouldHideAfterStartDate: z.boolean(),
-  isChatEnabled: z.boolean()
-})
-
-/**
- * Specific tunable values that a host can impose on an event.
- */
-export type EventSettings = z.infer<typeof EventSettingsSchema>
-
-export const EventUserAttendeeStatusSchema = z.union([
-  z.literal("not-participating"),
-  z.literal("hosting"),
-  z.literal("attending")
-])
-
-/**
- * A status for telling whether or not the user is attending, hosting, or not participating in an event.
- */
-export type EventUserAttendeeStatus = z.infer<
-  typeof EventUserAttendeeStatusSchema
->
-
-export const EventPreviewAttendeeSchema = UnblockedEventAttendeeSchema.pick({
-  id: true,
-  profileImageURL: true
-})
-
-/**
- * Quick and simple information needed to show profile images of an event attendee.
- */
-export type EventPreviewAttendee = Pick<EventAttendee, "id" | "profileImageURL">
-
-export const EventLocationSchema = EventRegionSchema.extend({
-  isInArrivalTrackingPeriod: z.boolean(),
-  timezoneIdentifier: z.string(),
-  placemark: PlacemarkSchema.nullable()
-})
-
-/**
- * Information for the location of an event.
- *
- * This type includes the properties of an {@link EventRegion}, and
- * additionally adds an optional placemark property which can be undefined if
- * the `coordinate` has not yet been geocoded on the backend.
- *
- * Additionally, since arrival tracking is tied to regions rather than events,
- * `isInArrivalTrackingPeriod` is contained on this type rather than
- * {@link CurrentUserEvent}. Whilst arrival statuses are only displayed within
- * 1 hour of the event starting, `isInArrivalTrackingPeriod` determines whether
- * or not the event is in the 24 hour period where we can add it to
- * {@link EventArrivalsTracker}. The 24 hour period covers the 24 hours prior
- * to the event starting.
- */
-export type EventLocation = z.infer<typeof EventLocationSchema>
-
-export const EventTimeResponseSchema = z.object({
-  secondsToStart: z.number(),
-  todayOrTomorrow: TodayOrTomorrowSchema.nullable(),
-  dateRange: FixedDateRangeSchema
-})
-
-/**
- * Information on the time that an event starts.
- *
- * The goal of this type is to have the server provide as much information about the time upfront
- * since the user's device time can be flakey, or event blatantly incorrect.
- *
- * If `secondsToStart` is negative, then the event is officially underway.
- */
-export type EventTimeResponse = z.infer<typeof EventTimeResponseSchema>
-
-export const CurrentUserEventResponseSchema = z.object({
-  id: z.number(),
-  title: z.string(), // TODO: - Decide max length.
-  description: z.string(),
-  color: ColorStringSchema,
-  attendeeCount: z.number().nonnegative(),
-  joinDate: StringDateSchema.nullable(),
-  createdAt: StringDateSchema,
-  updatedAt: StringDateSchema,
-  hasArrived: z.boolean(),
-  isChatExpired: z.boolean(),
-  userAttendeeStatus: EventUserAttendeeStatusSchema,
-  settings: EventSettingsSchema,
-  time: EventTimeResponseSchema,
-  location: EventLocationSchema,
-  previewAttendees: z.array(EventPreviewAttendeeSchema),
-  host: UnblockedEventAttendeeSchema,
-  endedAt: StringDateSchema.nullable()
-})
-
-/**
- * The response type for an event. See {@link CurrentUserEvent} for more properties that
- * don't come directly from the response.
- */
-export type CurrentUserEventResponse = z.infer<
-  typeof CurrentUserEventResponseSchema
->
+export type EventWhenBlockedByHost = EventWhenBlockedByHostResponse
 
 /**
  * The main type for representing an event throughout the app.
@@ -194,29 +44,11 @@ export type CurrentUserEventResponse = z.infer<
  * `isInArrivalTrackingPeriod` is a simple boolean for describing whether or not we can add the event region to the
  * {@link EventArrivalsTracker} once the user has joined the event. See {@link EventLocation} for more information.
  */
-export type CurrentUserEvent = Omit<CurrentUserEventResponse, "time"> & {
-  time: CurrentUserEventResponse["time"] & { clientReceivedTime: Date }
+export type CurrentUserEvent = Omit<EventResponse, "time"> & {
+  time: EventResponse["time"] & { clientReceivedTime: Date }
 }
 
-export const currentUserEventFromResponse = (
-  response: CurrentUserEventResponse
-) => ({
+export const currentUserEventFromResponse = (response: EventResponse) => ({
   ...response,
   time: { ...response.time, clientReceivedTime: new Date() }
 })
-
-export const BlockedEventResponseSchema = CurrentUserEventResponseSchema.omit({
-  host: true
-})
-  .pick({
-    id: true,
-    title: true,
-    createdAt: true,
-    updatedAt: true
-  })
-  .extend({ host: BlockedEventAttendeeSchema })
-
-/**
- * The content of an event that the user sees when they are blocked by the host.
- */
-export type BlockedEvent = z.infer<typeof BlockedEventResponseSchema>

@@ -1,7 +1,8 @@
 import { LocationObject, LocationObjectCoords } from "expo-location"
-import { LocationCoordinate2D, TiFLocation } from "@shared-models/Location"
+import { TiFLocation } from "@shared-models/Location"
 import { randomFloatInRange, randomlyNull } from "@lib/utils/Random"
 import { faker } from "@faker-js/faker"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 
 /**
  * Creates a fake {@link LocationObject}.

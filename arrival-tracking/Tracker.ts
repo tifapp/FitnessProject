@@ -1,6 +1,5 @@
 /* eslint-disable func-call-spacing */
 import { UpcomingEventArrivals } from "./UpcomingArrivals"
-import { EventArrivalRegion } from "@shared-models/EventArrivals"
 import {
   EventArrivalGeofencedRegion,
   EventArrivalGeofencingUnsubscribe,
@@ -11,7 +10,10 @@ import { PerformArrivalsOperation } from "./ArrivalsOperation"
 import { EventArrival, arrivalRegion, removeDuplicateArrivals } from "./Models"
 import { CallbackCollection } from "@lib/CallbackCollection"
 import { createLogFunction } from "@lib/Logging"
-import { areEventRegionsEqual } from "TiFShared/domain-models/Event"
+import {
+  EventArrivalRegion,
+  areEventRegionsEqual
+} from "TiFShared/domain-models/Event"
 
 const log = createLogFunction("event.arrivals.tracker")
 
@@ -126,8 +128,7 @@ export class EventArrivalsTracker {
     return regions.ext.compactMap((region) => {
       const newEventIds = region.eventIds.filter((id) => !eventIds.has(id))
       if (newEventIds.length === 0) return undefined
-      region.eventIds = newEventIds
-      return region
+      return { ...region, eventIds: newEventIds }
     })
   }
 
@@ -182,7 +183,7 @@ export class EventArrivalsTracker {
   private async handleGeofencingUpdate(update: EventArrivalGeofencedRegion) {
     const upcomingArrivals = await this.performArrivalsOperation(
       update,
-      update.isArrived ? "arrived" : "departed"
+      update.hasArrived ? "arrived" : "departed"
     )
     await this.replaceRegions(upcomingArrivals)
   }

@@ -1,4 +1,4 @@
-import { TiFAPI } from "@api-client/TiFAPI"
+import { TiFAPI } from "TiFShared/api"
 import { randomFloatInRange } from "@lib/utils/Random"
 import { mockLocationCoordinate2D } from "@location/MockData"
 import { mswServer } from "@test-helpers/msw"
@@ -24,16 +24,7 @@ describe("ArrivalsOperation tests", () => {
       request: StrictRequest<DefaultBodyType>
     }) => {
       expect(await request.json()).toEqual(TEST_REGION)
-
-      return new HttpResponse(
-        JSON.stringify({ upcomingRegions: EXPECTED_ARRIVALS_RESULTS }),
-        {
-          status: 200,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
-      )
+      return HttpResponse.json({ trackableRegions: EXPECTED_ARRIVALS_RESULTS })
     }
 
     test("arrived", async () => {

@@ -10,12 +10,10 @@ import {
   mockLocationCoordinate2D
 } from "@location/MockData"
 import { UserLocationFunctionsProvider } from "@location/UserLocation"
-import {
-  EXPO_LOCATION_ERRORS,
-  LocationCoordinate2D
-} from "@shared-models/Location"
+import { EXPO_LOCATION_ERRORS } from "@shared-models/Location"
 import { setPlatform } from "@test-helpers/Platform"
 import { CodedError } from "expo-modules-core"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 
 describe("EventTravelEstimates tests", () => {
   describe("UseEventTravelEstimates tests", () => {

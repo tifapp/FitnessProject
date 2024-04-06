@@ -1,6 +1,5 @@
 import { UserSessionProvider } from "@lib/UserSession"
 import { CurrentUserEvent } from "@shared-models/Event"
-import { UnblockedBidirectionalUserRelations } from "@shared-models/User"
 import { setPlatform } from "@test-helpers/Platform"
 import {
   TestQueryClientProvider,
@@ -15,9 +14,8 @@ import {
   useEventDetailsMenuActions
 } from "./Menu"
 import { EventAttendeeMocks, EventMocks } from "./MockData"
-import {
-  renderSuccessfulUseLoadEventDetails
-} from "./TestHelpers"
+import { renderSuccessfulUseLoadEventDetails } from "./TestHelpers"
+import { UnblockedBidirectionalUserRelations } from "TiFShared/domain-models/User"
 
 describe("EventDetailsMenu tests", () => {
   describe("FormatEventMenuActions tests", () => {

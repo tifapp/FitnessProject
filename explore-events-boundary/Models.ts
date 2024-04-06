@@ -1,5 +1,5 @@
 import { CurrentUserEvent } from "@shared-models/Event"
-import { LocationCoordinate2D } from "@location/index"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 
 /**
  * Creates an {@link Region} from a coordinate suitable for the explore map.

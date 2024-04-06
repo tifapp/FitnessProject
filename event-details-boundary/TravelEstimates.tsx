@@ -1,9 +1,6 @@
 import { QueryHookOptions } from "@lib/ReactQuery"
 import { useUserCoordinatesQuery } from "@location/UserLocation"
-import {
-  EXPO_LOCATION_ERRORS,
-  LocationCoordinate2D
-} from "@shared-models/Location"
+import { EXPO_LOCATION_ERRORS } from "@shared-models/Location"
 import { useQuery } from "@tanstack/react-query"
 import { LocationAccuracy } from "expo-location"
 import {
@@ -17,7 +14,6 @@ import {
 } from "react-native"
 import { EventTravelEstimates } from "@shared-models/TravelEstimates"
 import { ExpoTiFTravelEstimatesModule } from "@modules/tif-travel-estimates"
-import { EventAttendee, EventLocation } from "@shared-models/Event"
 import { CodedError } from "expo-modules-core"
 import { ReactNode, useState } from "react"
 import { BodyText, Caption, CaptionTitle, Headline } from "@components/Text"
@@ -34,6 +30,8 @@ import Animated, { FadeIn } from "react-native-reanimated"
 import { openSettings } from "expo-linking"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { metersToMiles } from "TiFShared/lib/MetricConversions"
+import { EventAttendee, EventLocation } from "TiFShared/domain-models/Event"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 
 export type LoadEventTravelEstimates = (
   userCoordinate: LocationCoordinate2D,

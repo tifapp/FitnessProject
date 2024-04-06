@@ -1,8 +1,11 @@
 import { LocationSearchResult, LocationsSearchQuery } from "./Models"
 import { Geo, Place } from "@aws-amplify/geo"
-import { LocationCoordinate2D, TiFLocation } from "@location/index"
+import { TiFLocation } from "@location/index"
 import { RecentLocationsStorage } from "@lib/RecentsLocations"
-import { areCoordinatesEqual } from "TiFShared/domain-models/LocationCoordinate2D"
+import {
+  LocationCoordinate2D,
+  areCoordinatesEqual
+} from "TiFShared/domain-models/LocationCoordinate2D"
 
 /**
  * A top-level function that allows a location search, and gives location data

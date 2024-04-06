@@ -25,7 +25,7 @@ import { Region, minRegionMeterRadius } from "@location/Region"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { mswServer } from "@test-helpers/msw"
 import { HttpResponse, http } from "msw"
-import { TiFAPI } from "@api-client/TiFAPI"
+import { TiFAPI } from "TiFShared/api"
 
 const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
 

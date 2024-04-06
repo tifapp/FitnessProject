@@ -1,7 +1,5 @@
 import { SQLiteUpcomingEventArrivals } from "./UpcomingArrivals"
 import { EventArrivalsTracker } from "./Tracker"
-import { EventArrivalRegion } from "@shared-models/EventArrivals"
-
 import { waitFor } from "@testing-library/react-native"
 import { mockLocationCoordinate2D } from "@location/MockData"
 import {
@@ -14,6 +12,7 @@ import { TestEventArrivalsGeofencer } from "./geofencing/TestGeofencer"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 import { repeatElements } from "TiFShared/lib/Array"
+import { EventArrivalRegion } from "TiFShared/domain-models/Event"
 
 describe("EventArrivalsTracker tests", () => {
   const upcomingArrivals = new SQLiteUpcomingEventArrivals(testSQLite)
@@ -48,7 +47,7 @@ describe("EventArrivalsTracker tests", () => {
         eventIds: [arrival.eventId],
         coordinate: arrival.coordinate,
         arrivalRadiusMeters: arrival.arrivalRadiusMeters,
-        isArrived: false
+        hasArrived: false
       }
     ])
   })
@@ -62,7 +61,7 @@ describe("EventArrivalsTracker tests", () => {
         eventIds: [arrival.eventId],
         coordinate: arrival.coordinate,
         arrivalRadiusMeters: arrival.arrivalRadiusMeters,
-        isArrived: false
+        hasArrived: false
       }
     ])
   })
@@ -75,7 +74,7 @@ describe("EventArrivalsTracker tests", () => {
         eventIds: [arrival.eventId],
         coordinate: arrival.coordinate,
         arrivalRadiusMeters: arrival.arrivalRadiusMeters,
-        isArrived: false
+        hasArrived: false
       }
     ])
   })
@@ -91,13 +90,13 @@ describe("EventArrivalsTracker tests", () => {
         eventIds: [arrival3.eventId],
         coordinate: arrival3.coordinate,
         arrivalRadiusMeters: arrival3.arrivalRadiusMeters,
-        isArrived: false
+        hasArrived: false
       },
       {
         eventIds: [arrival4.eventId],
         coordinate: arrival4.coordinate,
         arrivalRadiusMeters: arrival4.arrivalRadiusMeters,
-        isArrived: false
+        hasArrived: false
       }
     ])
   })
@@ -106,7 +105,7 @@ describe("EventArrivalsTracker tests", () => {
     const region = {
       ...mockEventArrivalRegion(),
       eventIds: [1],
-      isArrived: true
+      hasArrived: true
     }
     const arrival = {
       ...mockEventArrival(),
@@ -133,7 +132,7 @@ describe("EventArrivalsTracker tests", () => {
         eventIds: [newArrival.eventId],
         coordinate: newArrival.coordinate,
         arrivalRadiusMeters: newArrival.arrivalRadiusMeters,
-        isArrived: false
+        hasArrived: false
       }
     ])
   })
@@ -158,13 +157,13 @@ describe("EventArrivalsTracker tests", () => {
         eventIds: [arrivals[0].eventId],
         coordinate: arrivals[0].coordinate,
         arrivalRadiusMeters: arrivals[0].arrivalRadiusMeters,
-        isArrived: false
+        hasArrived: false
       },
       {
         eventIds: [newArrival.eventId],
         coordinate: newArrival.coordinate,
         arrivalRadiusMeters: newArrival.arrivalRadiusMeters,
-        isArrived: false
+        hasArrived: false
       }
     ])
   })
@@ -185,13 +184,13 @@ describe("EventArrivalsTracker tests", () => {
         eventIds: [arrivals[0].eventId, newArrival.eventId],
         coordinate: arrivals[0].coordinate,
         arrivalRadiusMeters: arrivals[0].arrivalRadiusMeters,
-        isArrived: false
+        hasArrived: false
       },
       {
         eventIds: [arrivals[1].eventId],
         coordinate: arrivals[1].coordinate,
         arrivalRadiusMeters: arrivals[1].arrivalRadiusMeters,
-        isArrived: false
+        hasArrived: false
       }
     ])
   })
@@ -218,7 +217,7 @@ describe("EventArrivalsTracker tests", () => {
         eventIds: [arrivals[1].eventId],
         coordinate: region.coordinate,
         arrivalRadiusMeters: region.arrivalRadiusMeters,
-        isArrived: false
+        hasArrived: false
       }
     ])
   })
@@ -237,7 +236,7 @@ describe("EventArrivalsTracker tests", () => {
         eventIds: [2],
         coordinate: trackedArrival.coordinate,
         arrivalRadiusMeters: trackedArrival.arrivalRadiusMeters,
-        isArrived: false
+        hasArrived: false
       }
     ])
   })
@@ -271,7 +270,7 @@ describe("EventArrivalsTracker tests", () => {
   test("handle geofencing update, does arrived operation for all arrivals when entering region", async () => {
     performArrivalOperation.mockImplementationOnce(neverPromise)
     await tracker.trackArrival(mockEventArrival())
-    const region = { ...mockEventArrivalGeofencedRegion(), isArrived: true }
+    const region = { ...mockEventArrivalGeofencedRegion(), hasArrived: true }
     testGeofencer.sendUpdate(region)
     await waitFor(() => {
       expect(performArrivalOperation).toHaveBeenCalledWith(
@@ -287,7 +286,7 @@ describe("EventArrivalsTracker tests", () => {
   test("handle geofencing update, does departed operation for all arrivals when exiting region", async () => {
     performArrivalOperation.mockImplementationOnce(neverPromise)
     await tracker.trackArrival(mockEventArrival())
-    const region = { ...mockEventArrivalGeofencedRegion(), isArrived: false }
+    const region = { ...mockEventArrivalGeofencedRegion(), hasArrived: false }
     testGeofencer.sendUpdate(region)
     await waitFor(() => {
       expect(performArrivalOperation).toHaveBeenCalledWith(
@@ -322,7 +321,7 @@ describe("EventArrivalsTracker tests", () => {
 
     const geofencedRegion = {
       ...mockEventArrivalGeofencedRegion(),
-      isArrived: true
+      hasArrived: true
     }
     testGeofencer.sendUpdate(geofencedRegion)
     await waitFor(() => {

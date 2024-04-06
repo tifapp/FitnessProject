@@ -1,5 +1,4 @@
 /* eslint-disable comma-spacing */
-import { EventRegion } from "@shared-models/Event"
 import {
   EventRegionMonitor,
   EventRegionMonitorUnsubscribe
@@ -13,8 +12,11 @@ import {
   filterStateIfInactive,
   stateForRegion
 } from "./RegionState"
-import { EventArrivalRegion } from "@shared-models/EventArrivals"
-import { areEventRegionsEqual } from "TiFShared/domain-models/Event"
+import {
+  EventArrivalRegion,
+  EventRegion,
+  areEventRegionsEqual
+} from "TiFShared/domain-models/Event"
 
 /**
  * An {@link EventRegionMonitor} that subscribes to updates for regions in the
@@ -114,7 +116,7 @@ export class EventArrivalsTrackerRegionMonitor implements EventRegionMonitor {
       if (!hasState) {
         const state = new EventArrivalsTrackerMonitorRegionState(
           region,
-          region.isArrived,
+          region.hasArrived,
           true
         )
         this.regionStates.push(state)
@@ -188,7 +190,7 @@ class EventArrivalsTrackerMonitorRegionState extends RegionState {
   publishRegionChangeIfNeeded(region: EventArrivalRegion | undefined) {
     this.isBeingTrackedByArrivalsTracker = !!region
     if (region) {
-      this.publishUpdateIfNotDuplicate(region.isArrived)
+      this.publishUpdateIfNotDuplicate(region.hasArrived)
     } else if (!region && this.bufferedFallbackHasArrived) {
       this.publishUpdateIfNotDuplicate(this.bufferedFallbackHasArrived)
       this.bufferedFallbackHasArrived = undefined

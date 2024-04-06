@@ -6,13 +6,13 @@ import { dayjs } from "TiFShared/lib/Dayjs"
 import { useState } from "react"
 import { View, ViewStyle, StyleSheet, StyleProp } from "react-native"
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
-import { EventRegion } from "@shared-models/Event"
 import {
   EventRegionMonitor,
   useHasArrivedAtRegion
 } from "@arrival-tracking/region-monitoring"
 import { humanizeEventCountdownSeconds } from "./Event"
-import { TodayOrTomorrow } from "@shared-models/TodayOrTomorrow"
+import { EventRegion } from "TiFShared/domain-models/Event"
+import { TodayOrTomorrow } from "TiFShared/domain-models/TodayOrTomorrow"
 
 /**
  * Handles state related to whether or not to show the event arrival banner for

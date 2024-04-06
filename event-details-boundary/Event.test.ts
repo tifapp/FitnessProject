@@ -1,4 +1,3 @@
-import { EventArrivalRegion } from "@shared-models/EventArrivals"
 import { waitFor } from "@testing-library/react-native"
 import {
   copyEventLocationToClipboard,
@@ -13,10 +12,12 @@ import {
 import { TestEventArrivalsGeofencer } from "@arrival-tracking/geofencing/TestGeofencer"
 import { mockEventLocation } from "./MockData"
 import { mockEventArrival } from "@arrival-tracking/MockData"
-
-import { EventUserAttendeeStatus } from "@shared-models/Event"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 import { repeatElements } from "TiFShared/lib/Array"
+import {
+  EventUserAttendeeStatus,
+  EventArrivalRegion
+} from "TiFShared/domain-models/Event"
 
 describe("Event tests", () => {
   describe("EventCurrentUserAttendeeStatus tests", () => {
@@ -119,13 +120,13 @@ describe("Event tests", () => {
         {
           eventIds: [1],
           arrivalRadiusMeters: event1.location.arrivalRadiusMeters,
-          isArrived: false,
+          hasArrived: false,
           coordinate: event1.location.coordinate
         },
         {
           eventIds: [2],
           arrivalRadiusMeters: event2.location.arrivalRadiusMeters,
-          isArrived: false,
+          hasArrived: false,
           coordinate: event2.location.coordinate
         }
       ])
@@ -161,7 +162,7 @@ describe("Event tests", () => {
         {
           eventIds: [2],
           arrivalRadiusMeters: event2.location.arrivalRadiusMeters,
-          isArrived: false,
+          hasArrived: false,
           coordinate: event2.location.coordinate
         }
       ])

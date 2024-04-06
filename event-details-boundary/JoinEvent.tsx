@@ -3,7 +3,7 @@ import {
   EventRegionMonitor,
   useHasArrivedAtRegion
 } from "@arrival-tracking/region-monitoring"
-import { CurrentUserEvent, EventLocation } from "@shared-models/Event"
+import { CurrentUserEvent } from "@shared-models/Event"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   getBackgroundPermissionsAsync as getBackgroundLocationPermissions,
@@ -21,10 +21,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useSharedValue } from "react-native-reanimated"
 import { FontScaleFactors } from "@lib/Fonts"
 import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet"
-import { TiFAPI } from "@api-client/TiFAPI"
+import { TiFAPI } from "TiFShared/api"
 import { RecentLocationsStorage } from "@lib/RecentsLocations"
-import { JoinEventResponse } from "@shared-models/JoinEvent"
 import { updateEventDetailsQueryEvent } from "./Query"
+import { JoinEventResponse } from "TiFShared/api/models/Event"
+import { EventLocation } from "TiFShared/domain-models/Event"
 
 export const JOIN_EVENT_ERROR_ALERTS = {
   "event-has-ended": {
@@ -98,7 +99,7 @@ export type JoinEventRequest = Pick<CurrentUserEvent, "id"> & {
  */
 export type JoinEventHandlerSuccessInput = Pick<
   JoinEventResponse,
-  "token" | "upcomingRegions"
+  "chatToken" | "trackableRegions"
 > & {
   location: Pick<EventLocation, "coordinate" | "placemark">
 }

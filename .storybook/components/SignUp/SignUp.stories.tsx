@@ -1,4 +1,4 @@
-import { TiFAPI, createAWSTiFAPIFetch } from "@api-client"
+import { awsTiFAPITransport } from "@api-client"
 import {
   cognitoConfirmSignUpWithAutoSignIn,
   createSignUpEnvironment
@@ -12,12 +12,13 @@ import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import {
   SignUpParamsList,
   createSignUpScreens
-} from "@core-root-feature/navigation/auth/SignUp"
+} from "@core-root/navigation/auth/SignUp"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { Button } from "react-native"
 import { ScrollView } from "react-native-gesture-handler"
 import { SafeAreaProvider } from "react-native-safe-area-context"
+import { TiFAPI } from "TiFShared/api"
 
 const SignUpMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Sign Up"
@@ -31,7 +32,7 @@ type ParamsList = SignUpParamsList & { test: {} }
 
 const Stack = createStackNavigator<ParamsList>()
 
-const tiFAPI = new TiFAPI(createAWSTiFAPIFetch(new URL(API_URL)))
+const tiFAPI = new TiFAPI(awsTiFAPITransport(new URL(API_URL)))
 
 const screens = createSignUpScreens(
   Stack,

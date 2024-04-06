@@ -7,7 +7,7 @@ import {
 } from "@shared-models/Event"
 import { useIsConnectedToInternet } from "@lib/InternetConnection"
 import React, { useRef, useState } from "react"
-import { TiFAPI } from "@api-client/TiFAPI"
+import { TiFAPI } from "TiFShared/api"
 import { StyleProp, View, ViewStyle, StyleSheet } from "react-native"
 import { BodyText, Subtitle, Title } from "@components/Text"
 

@@ -1,8 +1,8 @@
 import { randomBool } from "@lib/utils/Random"
-import { LocationCoordinate2D } from "@location"
-import { RecentLocationAnnotation } from "./RecentsStorage"
+import { RecentLocationAnnotation } from "@lib/RecentsLocations"
 import { LocationSearchResult } from "./Models"
 import { mockTiFLocation } from "@location/MockData"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 
 /**
  * Creates a random {@link LocationSearchResultAnnotation}.

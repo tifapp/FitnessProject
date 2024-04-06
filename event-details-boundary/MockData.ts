@@ -1,9 +1,5 @@
 import { uuidString } from "@lib/utils/UUID"
-import {
-  CurrentUserEvent,
-  EventAttendee,
-  EventLocation
-} from "@shared-models/Event"
+import { CurrentUserEvent } from "@shared-models/Event"
 import { mockLocationCoordinate2D, mockPlacemark } from "@location/MockData"
 import { faker } from "@faker-js/faker"
 import {
@@ -12,10 +8,11 @@ import {
   randomlyNull
 } from "@lib/utils/Random"
 import { ColorString } from "TiFShared/domain-models/ColorString"
-import { EventChatTokenRequest } from "@shared-models/ChatToken"
 import { dateRange } from "TiFShared/domain-models/FixedDateRange"
 import { dayjs } from "TiFShared/lib/Dayjs"
 import { UserHandle } from "TiFShared/domain-models/User"
+import { EventLocation, EventAttendee } from "TiFShared/domain-models/Event"
+import { ChatTokenRequest } from "TiFShared/api/models/Chat"
 
 export const mockEventLocation = (): EventLocation => ({
   coordinate: mockLocationCoordinate2D(),
@@ -25,7 +22,7 @@ export const mockEventLocation = (): EventLocation => ({
   placemark: randomlyNull(mockPlacemark())
 })
 
-export const mockEventChatTokenRequest = (): EventChatTokenRequest => ({
+export const mockEventChatTokenRequest = (): ChatTokenRequest => ({
   capability: JSON.stringify({
     // eslint-disable-next-line @typescript-eslint/naming-convention
     "5678-event": ["history", "publish", "subscribe"],

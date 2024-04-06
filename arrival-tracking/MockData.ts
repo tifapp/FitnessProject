@@ -3,15 +3,14 @@ import { mockLocationCoordinate2D } from "@location/MockData"
 import { EventArrival } from "./Models"
 import { randomBool, randomFloatInRange } from "@lib/utils/Random"
 
-import { EventArrivalRegion } from "@shared-models/EventArrivals"
 import { EventArrivalGeofencedRegion } from "./geofencing"
-import { EventRegion } from "@shared-models/Event"
 import { repeatElements } from "TiFShared/lib/Array"
+import { EventArrivalRegion, EventRegion } from "TiFShared/domain-models/Event"
 
 export const mockEventArrivalGeofencedRegion =
   (): EventArrivalGeofencedRegion => ({
     ...mockEventRegion(),
-    isArrived: randomBool()
+    hasArrived: randomBool()
   })
 
 export const mockEventArrival = (): EventArrival => ({

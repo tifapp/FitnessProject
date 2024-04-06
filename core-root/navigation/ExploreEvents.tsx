@@ -1,9 +1,5 @@
 import { StackNavigatorType } from "@components/Navigation"
-import {
-  LocationCoordinate2D,
-  Region,
-  isSignificantlyDifferentRegions
-} from "@location/index"
+import { Region, isSignificantlyDifferentRegions } from "@location/index"
 import { StackScreenProps } from "@react-navigation/stack"
 import { CurrentUserEvent } from "@shared-models/Event"
 import React from "react"
@@ -13,6 +9,7 @@ import {
   ExploreEventsView,
   createInitialCenter
 } from "@explore-events-boundary"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 
 export type ExploreEventsScreensParamsList = {
   exploreEvents: { searchText: string; center?: LocationCoordinate2D }

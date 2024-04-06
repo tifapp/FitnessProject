@@ -1,4 +1,4 @@
-import { TiFAPI } from "@api-client/TiFAPI"
+import { TiFAPI } from "TiFShared/api"
 import { EventRegion } from "@shared-models/Event"
 import { EventArrivalRegion } from "@shared-models/EventArrivals"
 
@@ -21,6 +21,6 @@ export const performEventArrivalsOperation = async (
 ) => {
   const methodKey = kind === "arrived" ? "arriveAtRegion" : "departFromRegion"
   return await tifAPI[methodKey](region).then(
-    (result) => result.data.upcomingRegions
+    (result) => result.data.trackableRegions
   )
 }

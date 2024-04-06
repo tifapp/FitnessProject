@@ -1,6 +1,4 @@
 /* eslint-disable func-call-spacing */
-import { EventRegion } from "@shared-models/Event"
-import { LocationCoordinate2D } from "@shared-models/Location"
 import { LocationSubscription } from "expo-location"
 import { EventRegionMonitor } from "./RegionMonitoring"
 import {
@@ -8,7 +6,11 @@ import {
   filterStateIfInactive,
   stateForRegion
 } from "./RegionState"
-import { coordinateDistance } from "TiFShared/domain-models/LocationCoordinate2D"
+import {
+  LocationCoordinate2D,
+  coordinateDistance
+} from "TiFShared/domain-models/LocationCoordinate2D"
+import { EventRegion } from "TiFShared/domain-models/Event"
 
 /**
  * A way to monitor the user's proximity to {@link EventRegion}s entirely in

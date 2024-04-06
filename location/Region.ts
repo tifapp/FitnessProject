@@ -1,6 +1,8 @@
 import { milesToMeters } from "TiFShared/lib/MetricConversions"
-import { LocationCoordinate2D } from "../shared-models/Location"
-import { coordinateDistance } from "TiFShared/domain-models/LocationCoordinate2D"
+import {
+  LocationCoordinate2D,
+  coordinateDistance
+} from "TiFShared/domain-models/LocationCoordinate2D"
 
 /**
  * A type representing the area around a given lat-lng coordinate.

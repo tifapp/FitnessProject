@@ -1,13 +1,14 @@
-import { BlockedEvent, CurrentUserEvent, EventID } from "@shared-models/Event"
+import { CurrentUserEvent, EventWhenBlockedByHost } from "@shared-models/Event"
 import { eventDetailsQueryKey } from "@shared-models/query-keys/Event"
 import { QueryClient, useQuery } from "@tanstack/react-query"
+import { EventID } from "TiFShared/domain-models/Event"
 
 /**
  * A result from loading a single event for the details screen.
  */
 export type EventDetailsLoadingResult =
   | { status: "not-found" | "cancelled" }
-  | { status: "blocked"; event: BlockedEvent }
+  | { status: "blocked"; event: EventWhenBlockedByHost }
   | { status: "success"; event: CurrentUserEvent }
 
 export const useEventDetailsQuery = (

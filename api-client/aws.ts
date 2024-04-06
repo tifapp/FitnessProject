@@ -1,5 +1,5 @@
 import { Auth } from "@aws-amplify/auth"
-import { TiFAPIFetch, createTiFAPIFetch } from "./client"
+import { TiFAPITransport, jwtMiddleware, tifAPITransport } from "TiFShared/api"
 
 const awsAmplifyLoadBearerToken = async () => {
   try {
@@ -10,10 +10,11 @@ const awsAmplifyLoadBearerToken = async () => {
 }
 
 /**
- * Creates a {@link TiFAPIFetch} that uses AWS Cognito as the backing token storage.
+ * Creates a {@link TiFAPITransport} that uses AWS Cognito as the backing
+ * token storage.
  *
  * @param url the base url of the API.
  */
-export const createAWSTiFAPIFetch = (url: URL): TiFAPIFetch => {
-  return createTiFAPIFetch(new URL(url), awsAmplifyLoadBearerToken)
+export const awsTiFAPITransport = (url: URL): TiFAPITransport => {
+  return tifAPITransport(url, jwtMiddleware(awsAmplifyLoadBearerToken))
 }

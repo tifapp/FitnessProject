@@ -6,7 +6,7 @@ import {
   EventAttendeeMocks,
   EventMocks,
   mockEventLocation
-} from "@event-details/MockData"
+} from "@event-details-boundary/MockData"
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 import { UserLocationFunctionsProvider } from "@location/UserLocation"
 import {
@@ -15,7 +15,6 @@ import {
   requestForegroundPermissionsAsync
 } from "expo-location"
 import { mockPlacemark } from "@location/MockData"
-import { dateRange, dayjs, now } from "@date-time"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
@@ -29,6 +28,8 @@ import { CurrentUserEvent } from "@shared-models/Event"
 import { useLoadEventDetails } from "@event-details-boundary/Details"
 import { UserSessionProvider } from "@lib/UserSession"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
+import { dateRange } from "TiFShared/domain-models/FixedDateRange"
+import { dayjs, now } from "TiFShared/lib/Dayjs"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"

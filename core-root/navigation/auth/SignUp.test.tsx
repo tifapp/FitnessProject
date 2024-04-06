@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { TiFAPI } from "@api-client"
 import { uuidString } from "@lib/utils/UUID"
 import {
   NavigationContainer,
@@ -24,6 +23,7 @@ import { Button, View } from "react-native"
 import { createSignUpEnvironment } from "@auth-boundary/sign-up"
 import { SignUpParamsList, createSignUpScreens } from "./SignUp"
 import { UserHandle } from "TiFShared/domain-models/User"
+import { TiFAPI } from "TiFShared/api"
 
 type TestSignUpParamsList = {
   test: undefined
@@ -43,7 +43,7 @@ describe("SignUpNavigation tests", () => {
   beforeEach(() => {
     jest.resetAllMocks()
     mswServer.use(
-      http.post("https://localhost:8080/user", async () => {
+      http.post(TiFAPI.testPath("/user"), async () => {
         return HttpResponse.json(
           {
             id: uuidString(),
@@ -52,7 +52,7 @@ describe("SignUpNavigation tests", () => {
           { status: 201 }
         )
       }),
-      http.get("https://localhost:8080/user/autocomplete", async () =>
+      http.get(TiFAPI.testPath("/user/autocomplete"), async () =>
         HttpResponse.json({ users: [] })
       )
     )
@@ -90,7 +90,7 @@ describe("SignUpNavigation tests", () => {
 
     replaceUserHandleText(TEST_GENERATED_USER_HANDLE.rawValue, newHandleText)
     mswServer.use(
-      http.patch("https://localhost:8080/user/self", async ({ request }) => {
+      http.patch(TiFAPI.testPath("/user/self"), async ({ request }) => {
         const body: any = await request.json()
         if (body?.handle !== newHandleText) {
           return new HttpResponse(null, {
@@ -112,7 +112,7 @@ describe("SignUpNavigation tests", () => {
 
   test("get to end of sign-up flow, go back to change username again, finish sign-up flow", async () => {
     mswServer.use(
-      http.patch("https://localhost:8080/user/self", async () => {
+      http.patch(TiFAPI.testPath("/user/self"), async () => {
         return new HttpResponse(null, {
           status: 204
         })

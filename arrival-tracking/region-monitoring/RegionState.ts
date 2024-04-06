@@ -1,6 +1,8 @@
 import { CallbackCollection } from "@lib/CallbackCollection"
-import { EventRegion } from "@shared-models/Event"
-import { areEventRegionsEqual } from "TiFShared/domain-models/Event"
+import {
+  EventRegion,
+  areEventRegionsEqual
+} from "TiFShared/domain-models/Event"
 
 /**
  * A shared base helper class for handling a list of subscriptions to the

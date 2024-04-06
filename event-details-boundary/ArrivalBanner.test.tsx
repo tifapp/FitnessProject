@@ -1,4 +1,3 @@
-import { EventRegion } from "@shared-models/Event"
 import {
   EventArrivalBannerCountdown,
   fomoStatementKey,
@@ -18,6 +17,7 @@ import {
 } from "@arrival-tracking/MockData"
 import { EventArrivalGeofencedRegion } from "@arrival-tracking/geofencing"
 import { EventRegionMonitorUnsubscribe } from "@arrival-tracking/region-monitoring"
+import { EventRegion } from "TiFShared/domain-models/Event"
 
 const TWO_AND_A_HALF_DAYS_IN_SECONDS = dayjs.duration(2.5, "days").asSeconds()
 const THIRTY_MINUTES_IN_SECONDS = dayjs.duration(30, "minutes").asSeconds()

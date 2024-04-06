@@ -1,21 +1,10 @@
 import geohash from "ngeohash"
 import { z } from "zod"
-import { PlacemarkSchema } from "./Placemark"
-
-/**
- * A zod schema for {@link LocationCoordinate2D}.
- */
-export const LocationCoordinates2DSchema = z.object({
-  latitude: z.number().min(-90).max(90),
-  longitude: z.number().min(-180).max(180)
-})
-
-/**
- * A simple latitude and longitude based coordinate.
- */
-export type LocationCoordinate2D = Readonly<
-  z.infer<typeof LocationCoordinates2DSchema>
->
+import {
+  LocationCoordinate2D,
+  LocationCoordinate2DSchema
+} from "TiFShared/domain-models/LocationCoordinate2D"
+import { PlacemarkSchema } from "TiFShared/domain-models/Placemark"
 
 export const EXPO_LOCATION_ERRORS = {
   noPermissions: "E_NO_PERMISSIONS",
@@ -26,7 +15,7 @@ export const EXPO_LOCATION_ERRORS = {
  * A zod schema for {@link TiFLocation}.
  */
 export const TiFLocationSchema = z.object({
-  coordinate: LocationCoordinates2DSchema,
+  coordinate: LocationCoordinate2DSchema,
   placemark: PlacemarkSchema
 })
 

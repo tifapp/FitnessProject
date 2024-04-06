@@ -2,12 +2,9 @@ import { placemarkToFormattedAddress } from "@location"
 import { setStringAsync as expoSetClipboardStringAsync } from "expo-clipboard"
 import { showLocation } from "react-native-map-link"
 import { EventArrival, EventArrivalsTracker } from "@arrival-tracking"
-import {
-  EventLocation,
-  EventUserAttendeeStatus,
-  CurrentUserEvent
-} from "@shared-models/Event"
+import { CurrentUserEvent } from "@shared-models/Event"
 import { dayjs } from "TiFShared/lib/Dayjs"
+import { EventLocation } from "TiFShared/domain-models/Event"
 
 /**
  * A type for the color value for an event.

@@ -2,7 +2,6 @@ import React, { useState } from "react"
 import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import {
-  LocationCoordinate2D,
   Region,
   minRegionMeterRadius,
   useRequestForegroundLocationPermissions,
@@ -31,7 +30,8 @@ import { QueryHookOptions } from "@lib/ReactQuery"
 import { eventDetailsQueryKey } from "@shared-models/query-keys/Event"
 import { UseQueryResult, useQueryClient, useQuery } from "@tanstack/react-query"
 import { PermissionResponse, LocationAccuracy } from "expo-location"
-import { TiFAPI } from "@api-client/TiFAPI"
+import { TiFAPI } from "TiFShared/api"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 
 export const eventsByRegion = async (
   api: TiFAPI,

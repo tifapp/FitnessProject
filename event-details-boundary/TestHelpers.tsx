@@ -5,10 +5,11 @@ import {
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { renderHook } from "@testing-library/react-native"
 import { useLoadEventDetails } from "./Details"
-import { CurrentUserEvent, EventID } from "@shared-models/Event"
+import { CurrentUserEvent } from "@shared-models/Event"
 import { EventDetailsLoadingResult } from "./Query"
 import { QueryClient } from "@tanstack/react-query"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
+import { EventID } from "TiFShared/domain-models/Event"
 
 export const renderUseLoadEventDetails = (
   eventId: EventID,

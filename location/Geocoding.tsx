@@ -1,7 +1,8 @@
 import React, { ReactNode, createContext, useContext } from "react"
-import { LocationCoordinate2D, TiFLocation } from "."
+import { TiFLocation } from "."
 import { useQuery } from "@tanstack/react-query"
 import { QueryHookOptions } from "@lib/ReactQuery"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 
 /**
  * Reverse geocodes the most accurrate location for the given coordinates.
