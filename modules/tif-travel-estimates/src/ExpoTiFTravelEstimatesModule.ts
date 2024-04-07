@@ -1,6 +1,6 @@
 import { requireOptionalNativeModule } from "@lib/utils/RequireOptionalNativeModule"
-import { LocationCoordinate2D } from "@shared-models/Location"
 import { EventTravelEstimates } from "@shared-models/TravelEstimates"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 
 /**
  * Native code methods for travel estimates.

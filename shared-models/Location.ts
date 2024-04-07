@@ -1,9 +1,5 @@
-import geohash from "ngeohash"
 import { z } from "zod"
-import {
-  LocationCoordinate2D,
-  LocationCoordinate2DSchema
-} from "TiFShared/domain-models/LocationCoordinate2D"
+import { LocationCoordinate2DSchema } from "TiFShared/domain-models/LocationCoordinate2D"
 import { PlacemarkSchema } from "TiFShared/domain-models/Placemark"
 
 export const EXPO_LOCATION_ERRORS = {
@@ -22,11 +18,4 @@ export const TiFLocationSchema = z.object({
 /**
  * A type that maps a lat-lng coordinate to its respective placemark.
  */
-export type TiFLocation = Readonly<z.infer<typeof TiFLocationSchema>>
-
-/**
- * Produces a geohash of a location coordinate.
- */
-export const hashLocationCoordinate = (coordinate: LocationCoordinate2D) => {
-  return geohash.encode(coordinate.latitude, coordinate.longitude)
-}
+export type TiFLocation = z.rInfer<typeof TiFLocationSchema>
