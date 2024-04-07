@@ -1,74 +1,6 @@
 import * as Sentry from "@sentry/react-native"
 import { TiFSQLite } from "./SQLite"
-
-/**
- * A level to be used when logging.
- *
- * `debug` = important stuff that doesn't matter in prod
- *
- * `info` = general log message
- *
- * `warn` = a forewarning that a giant alien spider will trample this lostbe- I mean world
- *
- * `error` = for when an error occurs
- */
-export type LogLevel = "debug" | "info" | "warn" | "error"
-
-/**
- * A type that handles log messages and sends them somewhere.
- */
-export type LogHandler = (
-  label: string,
-  level: LogLevel,
-  message: string,
-  metadata?: object
-) => void
-
-const consoleLogHandler: LogHandler = (label, level, message, metadata) => {
-  console[level](formatLogMessage(label, level, message, metadata))
-}
-
-let logHandlers = [consoleLogHandler]
-
-/**
- * Creates a function to log with a given label.
- *
- * Use this instead of `console.log` to log to many different sources at once.
- *
- * ```ts
- * const log = createLogFunction("example")
- * addLogHandler(rotatingLogFileHandler(...))
- *
- * // Logs to both the console and filesystem.
- * log("info", "Message", { key: "value" })
- * ```
- *
- * By default, calling `log` will output formatted logs to the console, use `addLogHandler` to log to more sources.
- *
- * @param label the label which identifies this logger, use this in different modules of the app to identify specific components.
- * @returns a function which handles logging.
- */
-export const createLogFunction = (label: string) => {
-  return (level: LogLevel, message: string, metadata?: object) => {
-    for (const handler of logHandlers) {
-      handler(label, level, message, metadata)
-    }
-  }
-}
-
-/**
- * Adds a log handler that can handle and receive log messages via calls from the function created by `createLogFunction`.
- */
-export const addLogHandler = (handler: LogHandler) => {
-  logHandlers.push(handler)
-}
-
-/**
- * Removes all active log handlers, preserving only the console logger.
- */
-export const resetLogHandlers = () => {
-  logHandlers = [consoleLogHandler]
-}
+import { LogHandler, LogLevel } from "TiFShared/logging"
 
 /**
  * A log handler which tracks info logs as sentry breadcrumbs.
@@ -84,11 +16,21 @@ export const sentryBreadcrumbLogHandler = (
     if (level === "debug") return
     handleBreadcrumb({
       message,
-      level: level === "warn" ? "warning" : level,
+      level: LOG_LEVEL_TO_SENTRY_LEVEL[level],
       ...getSentryBreadcrumbMetadata(label, metadata)
     })
   }
 }
+
+type SentryLevel = NonNullable<Sentry.Breadcrumb["level"]>
+
+const LOG_LEVEL_TO_SENTRY_LEVEL = {
+  warn: "warning",
+  trace: "log",
+  info: "info",
+  error: "error",
+  debug: "debug"
+} as Record<LogLevel, SentryLevel>
 
 const getSentryBreadcrumbMetadata = (label: string, metadata?: object) => {
   if (!metadata) return { category: undefined, data: { label } }
@@ -139,9 +81,9 @@ export const sqliteLogHandler = (
       `
       await db.run`
       INSERT INTO Logs (
-        label, 
-        level, 
-        message, 
+        label,
+        level,
+        message,
         stringifiedMetadata
       ) VALUES (
         ${label},
@@ -166,27 +108,4 @@ export type SQLiteLogMessage = {
   message: string
   stringifedMetadata: string
   timestamp: number
-}
-
-/**
- * The default formatter for a log message.
- */
-export const formatLogMessage = (
-  label: string,
-  level: LogLevel,
-  message: string,
-  metadata?: object
-) => {
-  const currentDate = new Date()
-  const levelEmoji = emojiForLogLevel(level)
-  const stringifiedMetadata = JSON.stringify(metadata)
-  const metadataStr = stringifiedMetadata ? ` ${stringifiedMetadata}` : ""
-  return `${currentDate.toISOString()} [${label}] (${level.toUpperCase()} ${levelEmoji}) ${message}${metadataStr}\n`
-}
-
-const emojiForLogLevel = (level: LogLevel) => {
-  if (level === "debug") return "🟢"
-  if (level === "info") return "🔵"
-  if (level === "warn") return "🟡"
-  return "🔴"
 }

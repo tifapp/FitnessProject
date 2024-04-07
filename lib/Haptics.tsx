@@ -1,9 +1,9 @@
 import React, { ReactNode, createContext, useContext } from "react"
 import { TiFNativeHaptics, TiFNativeHapticEvent } from "@modules/tif-haptics"
-import { createLogFunction } from "./Logging"
 import { DeviceSettings, DeviceSettingsStore } from "./DeviceSettings"
+import { logger } from "TiFShared/logging"
 
-const log = createLogFunction("tif.haptics")
+const log = logger("tif.haptics")
 
 /**
  * A function type to indicate haptic feedback being played to the user.
@@ -58,7 +58,7 @@ export const TiFHaptics = {
     try {
       await TiFNativeHaptics.play(toNativeHapticEvent(event))
     } catch (error) {
-      log("warn", "An error occurred when playing haptics", {
+      log.warn("An error occurred when playing haptics", {
         error: error.message
       })
     }

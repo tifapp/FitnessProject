@@ -7,8 +7,6 @@ import { SafeAreaProvider } from "react-native-safe-area-context"
 import { Geo } from "@aws-amplify/geo"
 import { ExpoEventArrivalsGeofencer } from "@arrival-tracking/geofencing"
 import {
-  addLogHandler,
-  createLogFunction,
   sentryBreadcrumbLogHandler,
   sentryErrorCapturingLogHandler
 } from "@lib/Logging"
@@ -28,8 +26,9 @@ import awsconfig from "./src/aws-exports"
 import { NetInfoInternetConnectionStatus } from "@lib/InternetConnection"
 import "TiFShared"
 import "date-time/DateRange"
+import { consoleLogHandler, logger, addLogHandler } from "TiFShared/logging"
 
-const log = createLogFunction("app.root")
+const log = logger("app.root")
 
 /**
  * Performs all the necessary setup (starting background tasks, configuration,
@@ -37,9 +36,10 @@ const log = createLogFunction("app.root")
  */
 export const setupApp = () => {
   enableSentry()
+  addLogHandler(consoleLogHandler())
   addLogHandler(sentryBreadcrumbLogHandler())
   addLogHandler(sentryErrorCapturingLogHandler())
-  log("info", "App launched", { date: new Date() })
+  log.info("App launched", { date: new Date() })
   setupCognito()
   Geo.configure(awsconfig)
   ExpoEventArrivalsGeofencer.shared.defineTask()

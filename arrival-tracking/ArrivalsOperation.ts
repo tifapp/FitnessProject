@@ -1,6 +1,5 @@
 import { TiFAPI } from "TiFShared/api"
-import { EventRegion } from "@shared-models/Event"
-import { EventArrivalRegion } from "@shared-models/EventArrivals"
+import { EventRegion, EventArrivalRegion } from "TiFShared/domain-models/Event"
 
 export type EventArrivalsOperationKind = "arrived" | "departed"
 

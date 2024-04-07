@@ -9,13 +9,13 @@ import {
 import { PerformArrivalsOperation } from "./ArrivalsOperation"
 import { EventArrival, arrivalRegion, removeDuplicateArrivals } from "./Models"
 import { CallbackCollection } from "@lib/CallbackCollection"
-import { createLogFunction } from "@lib/Logging"
 import {
   EventArrivalRegion,
   areEventRegionsEqual
 } from "TiFShared/domain-models/Event"
+import { logger } from "TiFShared/logging"
 
-const log = createLogFunction("event.arrivals.tracker")
+const log = logger("event.arrivals.tracker")
 
 export interface EventArrivalsTrackerSubscription {
   waitForInitialRegionsToLoad(): Promise<void>
@@ -65,7 +65,7 @@ export class EventArrivalsTracker {
       this.updateGeofencingSubscription(regions)
       this.callbacks.send(regions)
     } catch (e) {
-      log("error", "Failed to replace regions", { message: e.message })
+      log.error("Failed to replace regions", { message: e.message })
       this.callbacks.send([])
     }
   }

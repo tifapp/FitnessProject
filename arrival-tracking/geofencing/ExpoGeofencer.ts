@@ -42,7 +42,7 @@ export class ExpoEventArrivalsGeofencer implements EventArrivalsGeofencer {
         regions.map((region) => ({
           ...region.coordinate,
           radius: region.arrivalRadiusMeters,
-          state: region.isArrived
+          state: region.hasArrived
             ? LocationGeofencingRegionState.Inside
             : LocationGeofencingRegionState.Outside
         }))
@@ -69,7 +69,7 @@ export class ExpoEventArrivalsGeofencer implements EventArrivalsGeofencer {
           longitude: data.region.longitude
         },
         arrivalRadiusMeters: data.region.radius,
-        isArrived: data.eventType === LocationGeofencingEventType.Enter
+        hasArrived: data.eventType === LocationGeofencingEventType.Enter
       })
     })
   }
