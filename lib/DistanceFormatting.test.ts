@@ -1,7 +1,8 @@
 import {
+  compactFormatDistance,
   compactFormatFeet,
   compactFormatMiles
-} from "@lib/utils/DistanceFormatting"
+} from "./DistanceFormatting"
 
 describe("DistanceFormatting tests", () => {
   describe("compactFormatMiles tests", () => {
@@ -45,6 +46,16 @@ describe("DistanceFormatting tests", () => {
 
     it("never goes below 1 ft", () => {
       expect(compactFormatFeet(0.00001)).toEqual("1 ft")
+    })
+  })
+
+  describe("CompactFormatDistance tests", () => {
+    it("should display in miles", () => {
+      expect(compactFormatDistance(12.3)).toEqual("12.3 mi")
+    })
+
+    it("should display in feet when the distance is small", () => {
+      expect(compactFormatDistance(0.03)).toEqual("158 ft")
     })
   })
 })

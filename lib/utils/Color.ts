@@ -1,5 +1,3 @@
-import { ZodUtils } from "./Zod"
-
 /**
  * A simple type to ensure that a hex color string takes somewhat the shape
  * of a hex string.

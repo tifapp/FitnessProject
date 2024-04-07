@@ -1,7 +1,7 @@
 import { Caption, Headline } from "@components/Text"
 import { CircularIonicon, Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
-import { compactFormatDistance } from "@lib/utils/DistanceFormatting"
+import { compactFormatDistance } from "@lib/DistanceFormatting"
 import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
 import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
