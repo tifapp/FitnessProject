@@ -22,7 +22,6 @@ const MODULES = [
   "core-root",
   "location",
   "modules",
-  "content-parsing",
   "date-time",
   "test-helpers",
   "boundary-content-reporting",

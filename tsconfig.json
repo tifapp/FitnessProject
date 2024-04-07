@@ -36,7 +36,6 @@
       "@core-root": ["./core-root"],
       "@location/*": ["./location/*"],
       "@location": ["./location"],
-      "@content-parsing": ["./content-parsing"],
       "@content-reporting-boundary": ["./content-reporting-boundary"],
       "@date-time": ["./date-time"],
       "@date-time/*": ["./date-time/*"],
