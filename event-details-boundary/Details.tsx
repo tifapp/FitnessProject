@@ -16,7 +16,7 @@ import { useConst } from "@lib/utils/UseConst"
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { AppStyles } from "@lib/AppColorStyle"
-import { useAutocorrectingInterval } from "@lib/utils/UseInterval"
+import { useAutocorrectingInterval } from "@lib/AutocorrectingInterval"
 import { EventDetailsLoadingResult, useEventDetailsQuery } from "./Query"
 
 /**

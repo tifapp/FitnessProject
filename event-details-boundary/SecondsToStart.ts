@@ -1,4 +1,4 @@
-import { useAutocorrectingInterval } from "@lib/utils/UseInterval"
+import { useAutocorrectingInterval } from "@lib/AutocorrectingInterval"
 import { CurrentUserEvent } from "@shared-models/Event"
 import { dayjs, now } from "TiFShared/lib/Dayjs"
 import { useState } from "react"
