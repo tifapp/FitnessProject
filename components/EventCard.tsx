@@ -1,7 +1,7 @@
 import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { CurrentUserEvent } from "@shared-models/Event"
-import { placemarkToAbbreviatedAddress } from "@location"
+import { placemarkToAbbreviatedAddress } from "@lib/AddressFormatting"
 import { Ionicon, IoniconName } from "@components/common/Icons"
 import { BodyText, Caption, Headline } from "@components/Text"
 import ConfirmationDialogue from "@components/common/ConfirmationDialogue"

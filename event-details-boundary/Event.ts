@@ -1,4 +1,4 @@
-import { placemarkToFormattedAddress } from "@location"
+import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
 import { setStringAsync as expoSetClipboardStringAsync } from "expo-clipboard"
 import { showLocation } from "react-native-map-link"
 import { EventArrival, EventArrivalsTracker } from "@arrival-tracking"

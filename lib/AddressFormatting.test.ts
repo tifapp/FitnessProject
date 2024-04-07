@@ -1,10 +1,10 @@
-import { placemarkToFormattedAddress } from "@location/index"
+import { placemarkToFormattedAddress } from "./AddressFormatting"
 import {
   baseTestPlacemark,
   unknownLocationPlacemark
 } from "../location/MockData"
 
-describe("Placemark tests", () => {
+describe("AddressFormatting tests", () => {
   describe("PlacemarkFormatting tests", () => {
     it("formats in US style", () => {
       expect(placemarkToFormattedAddress(baseTestPlacemark)).toEqual(

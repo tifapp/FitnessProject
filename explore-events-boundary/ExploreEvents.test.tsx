@@ -20,12 +20,12 @@ import { eventsByRegion, useExploreEvents } from "./ExploreEvents"
 import { renderUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 import { neverPromise } from "@test-helpers/Promise"
-import { EventID } from "@shared-models/Event"
 import { Region, minRegionMeterRadius } from "@location/Region"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { mswServer } from "@test-helpers/msw"
 import { HttpResponse, http } from "msw"
 import { TiFAPI } from "TiFShared/api"
+import { EventID } from "TiFShared/domain-models/Event"
 
 const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
 
