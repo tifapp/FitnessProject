@@ -1,4 +1,4 @@
-import { awsTiFAPITransport } from "@api-client"
+import { awsTiFAPITransport } from "@lib/TiFAPI"
 import {
   cognitoConfirmSignUpWithAutoSignIn,
   createSignUpEnvironment

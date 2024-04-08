@@ -1,5 +1,11 @@
 import { Auth } from "@aws-amplify/auth"
-import { TiFAPITransport, jwtMiddleware, tifAPITransport } from "TiFShared/api"
+import { API_URL } from "@env"
+import {
+  TiFAPI,
+  TiFAPITransport,
+  jwtMiddleware,
+  tifAPITransport
+} from "TiFShared/api"
 
 const awsAmplifyLoadBearerToken = async () => {
   try {
@@ -18,3 +24,14 @@ const awsAmplifyLoadBearerToken = async () => {
 export const awsTiFAPITransport = (url: URL): TiFAPITransport => {
   return tifAPITransport(url, jwtMiddleware(awsAmplifyLoadBearerToken))
 }
+
+declare module "TiFShared/api" {
+  export interface TiFAPIConstructor {
+    /**
+     * An instance of {@link TiFAPI} that is pointed at the production backend.
+     */
+    productionInstance: TiFAPI
+  }
+}
+
+TiFAPI.productionInstance = new TiFAPI(awsTiFAPITransport(new URL(API_URL)))

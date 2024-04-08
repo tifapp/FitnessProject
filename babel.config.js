@@ -10,7 +10,6 @@ const modulePath = (dir) => {
 
 const MODULES = [
   "screens",
-  "api-client",
   "components",
   "stacks",
   "hooks",

@@ -1,4 +1,4 @@
-import { awsTiFAPITransport } from "@api-client"
+import { awsTiFAPITransport } from "@lib/TiFAPI"
 import { createForgotPasswordScreens } from "@core-root/navigation/auth/ForgotPassword"
 import { createForgotPasswordEnvironment } from "@auth-boundary/forgot-password"
 import { CognitoSignInAuthenticator } from "@auth-boundary/sign-in"
