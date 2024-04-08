@@ -1,8 +1,5 @@
 import { waitFor } from "@testing-library/react-native"
-import {
-  copyEventLocationToClipboard,
-  updateEventsInArrivalsTracker
-} from "./Event"
+import { updateEventsInArrivalsTracker } from "./Event"
 import {
   EventArrivalsTracker,
   SQLiteUpcomingEventArrivals

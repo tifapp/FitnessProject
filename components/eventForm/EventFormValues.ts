@@ -1,6 +1,6 @@
 import { EventColors, SaveEventRequest } from "@lib/events"
-import { LocationCoordinate2D } from "@location/index"
 import { FixedDateRange } from "TiFShared/domain-models/FixedDateRange"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 
 export type EventFormPlacemarkInfo = {
   readonly name?: string

@@ -4,19 +4,6 @@ import { dayjs } from "TiFShared/lib/Dayjs"
 import { isAttendingEvent } from "TiFShared/domain-models/Event"
 
 /**
- * A type for the color value for an event.
- */
-export enum EventColors {
-  Red = "#EF6351",
-  Purple = "#CB9CF2",
-  Blue = "#88BDEA",
-  Green = "#72B01D",
-  Pink = "#F7B2BD",
-  Orange = "#F4845F",
-  Yellow = "#F6BD60"
-}
-
-/**
  * Adds or removes events in the given arrival tracker depending on whether or not the user
  * is attending the event, and if the event is allowed to be tracked (ie. it starts soon).
  */
