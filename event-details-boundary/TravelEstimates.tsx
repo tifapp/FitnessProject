@@ -17,7 +17,6 @@ import { ExpoTiFTravelEstimatesModule } from "@modules/tif-travel-estimates"
 import { CodedError } from "expo-modules-core"
 import { ReactNode, useState } from "react"
 import { BodyText, Caption, CaptionTitle, Headline } from "@components/Text"
-import { openEventLocationInMaps } from "./Event"
 import { Ionicon, RoundedIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { compactFormatDistance } from "@lib/DistanceFormatting"
@@ -32,6 +31,7 @@ import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { metersToMiles } from "TiFShared/lib/MetricConversions"
 import { EventAttendee, EventLocation } from "TiFShared/domain-models/Event"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
+import { openEventLocationInMaps } from "./LocationIdentifier"
 
 export type LoadEventTravelEstimates = (
   userCoordinate: LocationCoordinate2D,

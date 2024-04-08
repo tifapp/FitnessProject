@@ -14,7 +14,7 @@ describe("EventDetailsCountdown tests", () => {
     const BASE_TEST_DATE_RANGE = dateRange(
       new Date(),
       dayjs().add(15, "minutes").toDate()
-    )
+    )!
 
     test("within 1 hour, returns 1 hour", () => {
       const countdown = eventCountdown(
@@ -146,7 +146,7 @@ describe("EventDetailsCountdown tests", () => {
       const baseDate = new Date()
       const countdown = eventCountdown(
         -dayjs.duration(2, "hours").asSeconds(),
-        dateRange(baseDate, dayjs(baseDate).add(1, "hour").toDate()),
+        dateRange(baseDate, dayjs(baseDate).add(1, "hour").toDate())!,
         "today"
       )
       expect(countdown.kind).toEqual("done")
@@ -156,7 +156,7 @@ describe("EventDetailsCountdown tests", () => {
       const baseDate = new Date()
       const countdown = eventCountdown(
         -dayjs.duration(10, "minutes").asSeconds(),
-        dateRange(baseDate, dayjs(baseDate).add(1, "hour").toDate()),
+        dateRange(baseDate, dayjs(baseDate).add(1, "hour").toDate())!,
         "today"
       )
       expect(countdown.kind).toEqual("ends-in")
@@ -166,7 +166,7 @@ describe("EventDetailsCountdown tests", () => {
       const baseDate = new Date()
       const countdown = eventCountdown(
         dayjs.duration(10, "minutes").asSeconds(),
-        dateRange(baseDate, dayjs(baseDate).add(1, "hour").toDate()),
+        dateRange(baseDate, dayjs(baseDate).add(1, "hour").toDate())!,
         "today"
       )
       expect(countdown.kind).toEqual("starts-in")
@@ -176,7 +176,7 @@ describe("EventDetailsCountdown tests", () => {
       const baseDate = new Date()
       const countdown = eventCountdown(
         -dayjs.duration(50, "minutes").asSeconds(),
-        dateRange(baseDate, dayjs(baseDate).add(1, "hour").toDate()),
+        dateRange(baseDate, dayjs(baseDate).add(1, "hour").toDate())!,
         "today"
       )
       expect((countdown as any).formatted.shouldDisplayFomoEffect).toEqual(true)
@@ -186,7 +186,7 @@ describe("EventDetailsCountdown tests", () => {
       const baseDate = new Date()
       const countdown = eventCountdown(
         -dayjs.duration(40, "minutes").asSeconds(),
-        dateRange(baseDate, dayjs(baseDate).add(1, "hour").toDate()),
+        dateRange(baseDate, dayjs(baseDate).add(1, "hour").toDate())!,
         "today"
       )
       expect((countdown as any).formatted.shouldDisplayFomoEffect).toEqual(
