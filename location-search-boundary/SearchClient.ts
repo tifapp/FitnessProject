@@ -1,7 +1,7 @@
 import { LocationSearchResult, LocationsSearchQuery } from "./Models"
 import { Geo, Place } from "@aws-amplify/geo"
-import { TiFLocation } from "@location/index"
-import { RecentLocationsStorage } from "@lib/RecentsLocations"
+import { NamedLocation } from "@location/NamedLocation"
+import { RecentLocationsStorage } from "@location/Recents"
 import {
   LocationCoordinate2D,
   areCoordinatesEqual
@@ -38,14 +38,14 @@ export const locationSearch = async (
 }
 
 /**
- * Returns a list of {@link TiFLocation}s from AWS Geo using the specified
+ * Returns a list of {@link NamedLocation}s from AWS Geo using the specified
  * query and center coordinate.
  */
 export const awsLocationSearch = async (
   query: LocationsSearchQuery,
   center: LocationCoordinate2D | undefined,
   awsSearch: typeof Geo.searchByText = Geo.searchByText
-): Promise<TiFLocation[]> => {
+): Promise<NamedLocation[]> => {
   const results = await awsSearch(query.toString(), {
     maxResults: 10,
     biasPosition: center ? [center.longitude, center.latitude] : undefined
@@ -88,13 +88,13 @@ export const searchRecentLocations = async (
 
 /**
  * A function that uses a provided query, with both its provided
- * `searchFunction` to obtain {@link TiFLocation}s, and
+ * `searchFunction` to obtain {@link NamedLocation}s, and
  * {@link RecentLocationsStorage} on their coordinates to obtain async
  * storage's information on whether those locations are recent.
  * This involves combining the data from both processes.
  *
  * @param query A {@link LocationsSearchQuery} given for the search function to use.
- * @param searchFunction A function that takes in a query + an optional center, then converts the data into a usable set of {@link TiFLocation}s.
+ * @param searchFunction A function that takes in a query + an optional center, then converts the data into a usable set of {@link NamedLocation}s.
  * @param center An optional {@link LocationCoordinate2D} given for the search to center in where it should be searching.
  * @returns A Promise of an array of {@link LocationSearchResult}s.
  */
@@ -106,7 +106,7 @@ export const searchWithRecentAnnotations = async (
   searchFunction: (
     query: LocationsSearchQuery,
     center?: LocationCoordinate2D
-  ) => Promise<TiFLocation[]>
+  ) => Promise<NamedLocation[]>
 ): Promise<LocationSearchResult[]> => {
   const remoteSearchResults = await searchFunction(query, center)
   const searchCoordinates = remoteSearchResults.map((point) => point.coordinate)

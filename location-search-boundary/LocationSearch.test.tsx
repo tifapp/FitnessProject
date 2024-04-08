@@ -1,4 +1,4 @@
-import { TiFLocation, UserLocationFunctionsProvider } from "@location"
+import { UserLocationFunctionsProvider } from "@location"
 import { mockExpoLocationObject } from "@location/MockData"
 import "@test-helpers/Matchers"
 import { neverPromise } from "@test-helpers/Promise"
@@ -23,6 +23,7 @@ import {
 } from "."
 import { mockLocationSearchResult } from "./MockData"
 import { LocationSearchResult, LocationsSearchQuery } from "./Models"
+import { NamedLocation } from "@location/NamedLocation"
 
 describe("LocationSearch tests", () => {
   beforeEach(() => jest.resetAllMocks())
@@ -250,8 +251,8 @@ describe("LocationSearch tests", () => {
       const queryUserCoordinates = jest.fn()
 
       let selectedUserLocationObject: LocationObject
-      let selectedLocation: TiFLocation
-      let savedLocation: TiFLocation
+      let selectedLocation: NamedLocation
+      let savedLocation: NamedLocation
 
       const waitForCurrentLocationOptionToLoad = async () => {
         expect(await userLocationOptionLabel()).toBeDisplayed()

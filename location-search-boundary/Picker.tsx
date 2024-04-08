@@ -2,7 +2,7 @@ import { Headline } from "@components/Text"
 import { CircularIonicon } from "@components/common/Icons"
 import { useUserCoordinatesQuery } from "@location/UserLocation"
 import { AppStyles } from "@lib/AppColorStyle"
-import { TiFLocation } from "@location"
+import { NamedLocation } from "@location/NamedLocation"
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
 import { LocationAccuracy, LocationObject } from "expo-location"
 import React from "react"
@@ -89,9 +89,9 @@ export type LocationSearchPickerProps = {
   query: LocationsSearchQuery
   userLocation?: LocationObject
   searchResults: LocationSearchResultsData
-  savePickedLocation: (result: TiFLocation) => void
+  savePickedLocation: (result: NamedLocation) => void
   onUserLocationSelected: (location: LocationObject) => void
-  onLocationSelected: (selection: TiFLocation) => void
+  onLocationSelected: (selection: NamedLocation) => void
   SearchResultView?: (props: LocationSearchResultProps) => JSX.Element
   style?: StyleProp<ViewStyle>
   contentContainerStyle?: StyleProp<ViewStyle>

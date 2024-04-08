@@ -1,4 +1,4 @@
-import { SQLiteRecentLocationsStorage } from "@lib/RecentsLocations"
+import { SQLiteRecentLocationsStorage } from "@location/Recents"
 import {
   awsLocationSearch,
   searchRecentLocations,

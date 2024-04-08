@@ -1,4 +1,4 @@
-import { TiFLocation } from "@shared-models/Location"
+import { NamedLocation } from "@location/NamedLocation"
 import { TiFSQLite } from "@lib/SQLite"
 import { DeepNullable } from "TiFShared/lib/HelperTypes"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
@@ -27,7 +27,7 @@ export interface RecentLocationsStorage {
    * Saves a location to the recents storage with the given annotation.
    */
   save(
-    location: TiFLocation,
+    location: NamedLocation,
     annotation?: RecentLocationAnnotation
   ): Promise<void>
 }
@@ -68,7 +68,7 @@ export class SQLiteRecentLocationsStorage implements RecentLocationsStorage {
     })
   }
 
-  async save(location: TiFLocation, annotation?: RecentLocationAnnotation) {
+  async save(location: NamedLocation, annotation?: RecentLocationAnnotation) {
     await this.sqlite.withTransaction(async (db) => {
       await db.run`
       INSERT INTO LocationPlacemarks (
@@ -161,6 +161,6 @@ export type RecentLocationAnnotation =
  * A type that contains recency data around a particular location.
  */
 export type RecentLocation = {
-  location: TiFLocation
+  location: NamedLocation
   annotation?: RecentLocationAnnotation
 }

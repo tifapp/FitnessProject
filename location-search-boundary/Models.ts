@@ -1,5 +1,5 @@
-import { TiFLocation } from "@shared-models/Location"
-import { RecentLocationAnnotation } from "@lib/RecentsLocations"
+import { NamedLocation } from "@location/NamedLocation"
+import { RecentLocationAnnotation } from "@location/Recents"
 
 /**
  * An result that is displayed by the location search.
@@ -8,7 +8,7 @@ export type LocationSearchResult = {
   /**
    * The actual location presented by this option.
    */
-  location: TiFLocation
+  location: NamedLocation
 
   /**
    * An annotation that appears above this option.

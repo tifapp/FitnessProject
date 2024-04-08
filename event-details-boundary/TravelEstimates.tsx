@@ -1,6 +1,6 @@
 import { QueryHookOptions } from "@lib/ReactQuery"
 import { useUserCoordinatesQuery } from "@location/UserLocation"
-import { EXPO_LOCATION_ERRORS } from "@shared-models/Location"
+import { EXPO_LOCATION_ERRORS } from "@location/Expo"
 import { useQuery } from "@tanstack/react-query"
 import { LocationAccuracy } from "expo-location"
 import {

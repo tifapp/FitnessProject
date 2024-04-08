@@ -1,5 +1,5 @@
 import { LocationObject, LocationObjectCoords } from "expo-location"
-import { TiFLocation } from "@shared-models/Location"
+import { NamedLocation } from "./NamedLocation"
 import { randomFloatInRange, randomlyNull } from "@lib/utils/Random"
 import { faker } from "@faker-js/faker"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
@@ -71,7 +71,7 @@ export const mockLocationCoordinate2D = (): LocationCoordinate2D => ({
  */
 export const mockTiFLocation = (
   coordinates?: LocationCoordinate2D
-): TiFLocation => ({
+): NamedLocation => ({
   coordinate: coordinates ?? mockLocationCoordinate2D(),
   placemark: mockPlacemark()
 })

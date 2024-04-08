@@ -1,5 +1,5 @@
 import { mockLocationCoordinate2D, mockTiFLocation } from "@location/MockData"
-import { SQLiteRecentLocationsStorage } from "./RecentsLocations"
+import { SQLiteRecentLocationsStorage } from "./Recents"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 
 import { sleep } from "@lib/utils/DelayData"
