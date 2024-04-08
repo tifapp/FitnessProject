@@ -1,22 +1,5 @@
-import { CurrentUserEvent } from "@shared-models/Event"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
-
-/**
- * Creates an {@link Region} from a coordinate suitable for the explore map.
- */
-export const createDefaultMapRegion = (coordinates: LocationCoordinate2D) => ({
-  ...coordinates,
-  latitudeDelta: 0.1,
-  longitudeDelta: 0.1
-})
-
-/**
- * The default region if none can be retreived from location search or the user's location.
- */
-export const SAN_FRANCISCO_DEFAULT_REGION = createDefaultMapRegion({
-  latitude: 37.773972,
-  longitude: -122.431297
-})
+import { createDefaultMapRegion } from "./Region"
 
 /**
  * A type to describe the initial center of the explore events map.
@@ -47,12 +30,3 @@ export const initialCenterToRegion = (center: ExploreEventsInitialCenter) => {
     ? createDefaultMapRegion(center.coordinate)
     : undefined
 }
-
-/**
- * Data representation of events explored in a given area.
- */
-export type ExploreEventsData =
-  | { status: "loading"; events?: CurrentUserEvent[] }
-  | { status: "error"; events?: CurrentUserEvent[]; retry: () => void }
-  | { status: "no-results"; events: [] }
-  | { status: "success"; events: CurrentUserEvent[] }

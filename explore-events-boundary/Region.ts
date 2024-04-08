@@ -7,7 +7,7 @@ import {
 /**
  * A type representing the area around a given lat-lng coordinate.
  */
-export type Region = LocationCoordinate2D & {
+export type ExploreEventsRegion = LocationCoordinate2D & {
   latitudeDelta: number
   longitudeDelta: number
 }
@@ -19,13 +19,13 @@ export type Region = LocationCoordinate2D & {
  * The minimum radius of a region is computed based on the minimum of
  * its latitude and longitude delta.
  *
- * @param r1 see {@link Region}
- * @param r2 see {@link Region}
+ * @param r1 see {@link ExploreEventsRegion}
+ * @param r2 see {@link ExploreEventsRegion}
  * @param radiusMetersDifferenceThreshold the minimum radius difference threshold if the regions are contained within each other
  */
 export const isSignificantlyDifferentRegions = (
-  r1: Region,
-  r2: Region,
+  r1: ExploreEventsRegion,
+  r2: ExploreEventsRegion,
   radiusMetersDifferenceThreshold: number = milesToMeters(5)
 ) => {
   const isAboveRadiusDiffThreshold = isMinRadiusDifferenceAboveThreshold(
@@ -37,8 +37,8 @@ export const isSignificantlyDifferentRegions = (
 }
 
 const isMinRadiusDifferenceAboveThreshold = (
-  r1: Region,
-  r2: Region,
+  r1: ExploreEventsRegion,
+  r2: ExploreEventsRegion,
   thresholdMeters: number
 ) => {
   const radiusDiff = minRegionMeterRadius(r1) - minRegionMeterRadius(r2)
@@ -50,7 +50,7 @@ const isMinRadiusDifferenceAboveThreshold = (
  *
  * The minimum radius is computed based on the minimum of the latitude and longitude delta.
  */
-export const minRegionMeterRadius = (region: Region) => {
+export const minRegionMeterRadius = (region: ExploreEventsRegion) => {
   const isMinLatitude = region.latitudeDelta < region.longitudeDelta
   return coordinateDistance(
     region,
@@ -67,14 +67,17 @@ export const minRegionMeterRadius = (region: Region) => {
 /**
  * Returns true if any points in a region are contained within another region.
  */
-export const containsRegion = (region: Region, other: Region) => {
+export const containsRegion = (
+  region: ExploreEventsRegion,
+  other: ExploreEventsRegion
+) => {
   return containsRegionRect(regionRect(region), regionRect(other))
 }
 
 /**
  * The area of a region of latlng coordinates enclosed in a rectangle.
  */
-export type RegionRect = {
+export type ExploreEventsRegionRect = {
   northLatitude: number
   southLatitude: number
   westLongitude: number
@@ -84,9 +87,11 @@ export type RegionRect = {
 /**
  * Creates a lat-lng rectangle from a region.
  *
- * @returns see {@link RegionRect}
+ * @returns see {@link ExploreEventsRegionRect}
  */
-export const regionRect = (region: Region): RegionRect => ({
+export const regionRect = (
+  region: ExploreEventsRegion
+): ExploreEventsRegionRect => ({
   northLatitude: region.latitude + region.latitudeDelta / 2,
   southLatitude: region.latitude - region.latitudeDelta / 2,
   eastLongitude: region.longitude + region.longitudeDelta / 2,
@@ -96,7 +101,10 @@ export const regionRect = (region: Region): RegionRect => ({
 /**
  * Returns true if any of the points in `rect1` are contained in `rect2`.
  */
-export const containsRegionRect = (rect1: RegionRect, rect2: RegionRect) => {
+export const containsRegionRect = (
+  rect1: ExploreEventsRegionRect,
+  rect2: ExploreEventsRegionRect
+) => {
   const isTopLeftIntersection =
     isTopIntersection(rect1, rect2) && isLeftIntersection(rect1, rect2)
 
@@ -116,30 +124,61 @@ export const containsRegionRect = (rect1: RegionRect, rect2: RegionRect) => {
   )
 }
 
-const isTopIntersection = (rect1: RegionRect, rect2: RegionRect) => {
+const isTopIntersection = (
+  rect1: ExploreEventsRegionRect,
+  rect2: ExploreEventsRegionRect
+) => {
   return (
     rect1.southLatitude >= rect2.southLatitude &&
     rect1.southLatitude <= rect2.northLatitude
   )
 }
 
-const isBottomIntersection = (rect1: RegionRect, rect2: RegionRect) => {
+const isBottomIntersection = (
+  rect1: ExploreEventsRegionRect,
+  rect2: ExploreEventsRegionRect
+) => {
   return (
     rect1.northLatitude >= rect2.southLatitude &&
     rect1.northLatitude <= rect2.northLatitude
   )
 }
 
-const isLeftIntersection = (rect1: RegionRect, rect2: RegionRect) => {
+const isLeftIntersection = (
+  rect1: ExploreEventsRegionRect,
+  rect2: ExploreEventsRegionRect
+) => {
   return (
     rect1.eastLongitude >= rect2.westLongitude &&
     rect1.eastLongitude <= rect2.eastLongitude
   )
 }
 
-const isRightIntersection = (rect1: RegionRect, rect2: RegionRect) => {
+const isRightIntersection = (
+  rect1: ExploreEventsRegionRect,
+  rect2: ExploreEventsRegionRect
+) => {
   return (
     rect1.westLongitude >= rect2.westLongitude &&
     rect1.westLongitude <= rect2.eastLongitude
   )
 }
+
+/**
+ * Creates an {@link Region} from a coordinate suitable for the explore map.
+ */
+export const createDefaultMapRegion = (
+  coordinates: LocationCoordinate2D
+): ExploreEventsRegion => ({
+  ...coordinates,
+  latitudeDelta: 0.1,
+  longitudeDelta: 0.1
+})
+
+/**
+ * The default region if none can be retreived from location search or the user's location.
+ */
+export const SAN_FRANCISCO_DEFAULT_REGION = createDefaultMapRegion({
+  latitude: 37.773972,
+  longitude: -122.431297
+})

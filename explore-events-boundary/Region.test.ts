@@ -1,10 +1,10 @@
 import {
-  containsRegion,
-  containsRegionRect,
-  isSignificantlyDifferentRegions,
   minRegionMeterRadius,
-  regionRect
-} from "@location/index"
+  regionRect,
+  containsRegionRect,
+  containsRegion,
+  isSignificantlyDifferentRegions
+} from "./Region"
 
 describe("Region tests", () => {
   describe("minRegionMeterRadius tests", () => {

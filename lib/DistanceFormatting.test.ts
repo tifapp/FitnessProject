@@ -5,7 +5,7 @@ import {
 } from "./DistanceFormatting"
 
 describe("DistanceFormatting tests", () => {
-  describe("compactFormatMiles tests", () => {
+  describe("CompactFormatMiles tests", () => {
     it("only uses 1 decimal place", () => {
       expect(compactFormatMiles(1.1234)).toEqual("1.1 mi")
     })
@@ -35,7 +35,7 @@ describe("DistanceFormatting tests", () => {
     })
   })
 
-  describe("compactFormatFeet tests", () => {
+  describe("CompactFormatFeet tests", () => {
     it("rounds to the nearest whole number", () => {
       expect(compactFormatFeet(52.8)).toEqual("53 ft")
     })

@@ -1,5 +1,5 @@
 import { mockLocationCoordinate2D } from "@location/MockData"
-import { createInitialCenter } from "./Models"
+import { createInitialCenter } from "./InitialCenter"
 
 describe("ExploreEventsModels tests", () => {
   describe("CreateInitialCenter tests", () => {
