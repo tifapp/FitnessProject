@@ -1,8 +1,7 @@
 import { UseQueryResult } from "@tanstack/react-query"
 import {
-  BlockedEvent,
   CurrentUserEvent,
-  EventID,
+  EventWhenBlockedByHost,
   currentUserEventFromResponse
 } from "@shared-models/Event"
 import { useIsConnectedToInternet } from "@lib/InternetConnection"
@@ -18,6 +17,7 @@ import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useAutocorrectingInterval } from "@lib/AutocorrectingInterval"
 import { EventDetailsLoadingResult, useEventDetailsQuery } from "./Query"
+import { EventID } from "TiFShared/domain-models/Event"
 
 /**
  * Loads the event details from the server.
@@ -53,7 +53,7 @@ export type UseLoadEventDetailsResult =
       event: CurrentUserEvent
       refresh: () => void
     }
-  | { status: "blocked"; event: BlockedEvent }
+  | { status: "blocked"; event: EventWhenBlockedByHost }
 
 /**
  * A hook to load an event in the context of the details screen.
