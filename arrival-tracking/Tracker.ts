@@ -8,7 +8,7 @@ import {
 
 import { PerformArrivalsOperation } from "./ArrivalsOperation"
 import { EventArrival, arrivalRegion, removeDuplicateArrivals } from "./Models"
-import { CallbackCollection } from "@lib/CallbackCollection"
+import { CallbackCollection } from "@lib/utils/CallbackCollection"
 import {
   EventArrivalRegion,
   areEventRegionsEqual

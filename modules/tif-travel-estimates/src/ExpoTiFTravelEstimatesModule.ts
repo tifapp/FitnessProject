@@ -1,5 +1,5 @@
+import { requireOptionalNativeModule } from "expo"
 import { Platform } from "react-native"
-import { requireOptionalNativeModule } from "@lib/utils/RequireOptionalNativeModule"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 
 /**

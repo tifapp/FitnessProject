@@ -11,7 +11,7 @@ import {
   EventArrivalsGeofencer,
   EventArrivalGeofencedRegion
 } from "./Geofencer"
-import { CallbackCollection } from "@lib/CallbackCollection"
+import { CallbackCollection } from "@lib/utils/CallbackCollection"
 import { LocationCoordinate2DSchema } from "TiFShared/domain-models/LocationCoordinate2D"
 
 /**

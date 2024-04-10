@@ -1,4 +1,4 @@
-import { CallbackCollection } from "@lib/CallbackCollection"
+import { CallbackCollection } from "@lib/utils/CallbackCollection"
 import {
   EventRegion,
   areEventRegionsEqual
