@@ -1,20 +1,20 @@
 import { UserHandle } from "@content-parsing"
-import { uuidString } from "@lib/utils/UUID"
-import {
-  CurrentUserEvent,
-  EventAttendee,
-  EventLocation
-} from "@shared-models/Event"
 import { dateRange, dayjs } from "@date-time"
-import { mockLocationCoordinate2D, mockPlacemark } from "@location/MockData"
 import { faker } from "@faker-js/faker"
+import { ColorString } from "@lib/utils/Color"
 import {
   randomBool,
   randomIntegerInRange,
   randomlyNull
 } from "@lib/utils/Random"
-import { ColorString } from "@lib/utils/Color"
+import { uuidString } from "@lib/utils/UUID"
+import { mockLocationCoordinate2D, mockPlacemark } from "@location/MockData"
 import { EventChatTokenRequest } from "@shared-models/ChatToken"
+import {
+  CurrentUserEvent,
+  EventAttendee,
+  EventLocation
+} from "@shared-models/Event"
 
 export const mockEventLocation = (): EventLocation => ({
   coordinate: mockLocationCoordinate2D(),
