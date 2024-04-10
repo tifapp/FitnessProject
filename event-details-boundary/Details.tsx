@@ -1,9 +1,8 @@
 import { UseQueryResult } from "@tanstack/react-query"
 import {
-  CurrentUserEvent,
-  EventWhenBlockedByHost,
-  currentUserEventFromResponse
-} from "@shared-models/Event"
+  ClientSideEvent,
+  clientSideEventFromResponse
+} from "@event/ClientSideEvent"
 import { useIsConnectedToInternet } from "@lib/InternetConnection"
 import React, { useRef, useState } from "react"
 import { TiFAPI } from "TiFShared/api"
@@ -16,8 +15,11 @@ import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useAutocorrectingInterval } from "@lib/AutocorrectingInterval"
-import { EventDetailsLoadingResult, useEventDetailsQuery } from "./Query"
-import { EventID } from "TiFShared/domain-models/Event"
+import {
+  EventDetailsLoadingResult,
+  useEventDetailsQuery
+} from "@event/DetailsQuery"
+import { EventWhenBlockedByHost, EventID } from "TiFShared/domain-models/Event"
 
 /**
  * Loads the event details from the server.
@@ -39,7 +41,7 @@ export const loadEventDetails = async (
   } else {
     return {
       status: "success",
-      event: currentUserEventFromResponse(resp.data)
+      event: clientSideEventFromResponse(resp.data)
     }
   }
 }
@@ -50,7 +52,7 @@ export type UseLoadEventDetailsResult =
   | {
       status: "success"
       refreshStatus: "loading" | "error" | "idle"
-      event: CurrentUserEvent
+      event: ClientSideEvent
       refresh: () => void
     }
   | { status: "blocked"; event: EventWhenBlockedByHost }

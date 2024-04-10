@@ -1,9 +1,16 @@
-import {
-  EventResponse,
-  EventWhenBlockedByHostResponse
-} from "TiFShared/api/models/Event"
+import { EventResponse } from "TiFShared/api/models/Event"
+import { Reassign } from "TiFShared/lib/HelperTypes"
 
-export type EventWhenBlockedByHost = EventWhenBlockedByHostResponse
+/**
+ * Adds a `clientReceivedTime` field to the time object in an event response.
+ *
+ * This field is used to calculate the time until the event starts in the
+ * countdown UI, as the event may be received on the client many minutes
+ * before the user actually views the event in any capacity.
+ */
+export type ClientSideEventTime = EventResponse["time"] & {
+  clientReceivedTime: Date
+}
 
 /**
  * The main type for representing an event throughout the app.
@@ -44,11 +51,13 @@ export type EventWhenBlockedByHost = EventWhenBlockedByHostResponse
  * `isInArrivalTrackingPeriod` is a simple boolean for describing whether or not we can add the event region to the
  * {@link EventArrivalsTracker} once the user has joined the event. See {@link EventLocation} for more information.
  */
-export type CurrentUserEvent = Omit<EventResponse, "time"> & {
-  time: EventResponse["time"] & { clientReceivedTime: Date }
-}
+export type ClientSideEvent = Reassign<
+  EventResponse,
+  "time",
+  ClientSideEventTime
+>
 
-export const currentUserEventFromResponse = (response: EventResponse) => ({
+export const clientSideEventFromResponse = (response: EventResponse) => ({
   ...response,
   time: { ...response.time, clientReceivedTime: new Date() }
 })

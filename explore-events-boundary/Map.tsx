@@ -1,5 +1,5 @@
 import { ExploreEventsMarkerView } from "./MapMarker"
-import { CurrentUserEvent } from "@shared-models/Event"
+import { ClientSideEvent } from "@event/ClientSideEvent"
 import { Region } from "@location/index"
 import React from "react"
 import { StyleProp, ViewStyle } from "react-native"
@@ -8,8 +8,8 @@ import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate
 
 export type ExploreEventsMapProps = {
   initialRegion: Region
-  events: CurrentUserEvent[]
-  onEventSelected: (event: CurrentUserEvent) => void
+  events: ClientSideEvent[]
+  onEventSelected: (event: ClientSideEvent) => void
   onRegionChanged: (region: Region) => void
   onLongPress: (coordinate: LocationCoordinate2D) => void
   style?: StyleProp<ViewStyle>

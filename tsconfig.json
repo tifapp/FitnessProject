@@ -44,6 +44,8 @@
       "@arrival-tracking": ["./arrival-tracking"],
       "@arrival-tracking/*": ["./arrival-tracking/*"],
       "@location-search-boundary": ["./location-search-boundary"],
+      "@event": ["./event"],
+      "@event/*": ["./event/*"],
       "env": ["./.env"]
     }
   },

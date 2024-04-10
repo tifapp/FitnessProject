@@ -1,24 +1,16 @@
-import { CurrentUserEvent } from "@shared-models/Event"
+import { ClientSideEvent } from "@event/ClientSideEvent"
 import React from "react"
-import {
-  Dimensions,
-  StyleSheet,
-  View
-} from "react-native"
+import { Dimensions, StyleSheet, View } from "react-native"
 
 interface EventPagerProps {
-  events: CurrentUserEvent[]
+  events: ClientSideEvent[]
 }
 
 const EventCarousel = ({ events }: EventPagerProps) => {
   const height = 280 // Need to set a fixed height
   const width = Dimensions.get("window").width
 
-  return (
-    <View style={styles.container}>
-
-    </View>
-  )
+  return <View style={styles.container}></View>
 }
 
 const styles = StyleSheet.create({

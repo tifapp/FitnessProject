@@ -13,9 +13,10 @@ import {
 } from "./Details"
 import { EventMocks, mockEventLocation } from "./MockData"
 import { renderUseLoadEventDetails } from "./TestHelpers"
-import { EventID } from "@shared-models/Event"
 import { dateRange } from "TiFShared/domain-models/FixedDateRange"
 import { UserHandle } from "TiFShared/domain-models/User"
+import { EventID } from "TiFShared/domain-models/Event"
+import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
 
 describe("EventDetailsLoading tests", () => {
   beforeEach(() => {

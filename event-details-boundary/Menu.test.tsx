@@ -1,5 +1,5 @@
 import { UserSessionProvider } from "@lib/UserSession"
-import { CurrentUserEvent } from "@shared-models/Event"
+import { ClientSideEvent } from "@event/ClientSideEvent"
 import { setPlatform } from "@test-helpers/Platform"
 import {
   TestQueryClientProvider,
@@ -23,7 +23,7 @@ describe("EventDetailsMenu tests", () => {
 
     it("should format the contact-host action with the host's name", () => {
       const actions = formatEventMenuActions(
-        { host: EventAttendeeMocks.Alivs } as CurrentUserEvent,
+        { host: EventAttendeeMocks.Alivs } as ClientSideEvent,
         [EVENT_MENU_ACTION.copyEvent, EVENT_MENU_ACTION.contactHost]
       )
       expect(actions).toEqual([
@@ -34,7 +34,7 @@ describe("EventDetailsMenu tests", () => {
 
     it("should format the toggle-block-host with 'Block Hostname' when user is not blocking host", () => {
       const actions = formatEventMenuActions(
-        { host: EventAttendeeMocks.Alivs } as CurrentUserEvent,
+        { host: EventAttendeeMocks.Alivs } as ClientSideEvent,
         [EVENT_MENU_ACTION.toggleBlockHost]
       )
       expect(actions).toEqual([
@@ -53,7 +53,7 @@ describe("EventDetailsMenu tests", () => {
             ...EventAttendeeMocks.Alivs,
             relations: { themToYou: "not-friends", youToThem: "blocked" }
           }
-        } as CurrentUserEvent,
+        } as ClientSideEvent,
         [EVENT_MENU_ACTION.toggleBlockHost]
       )
       expect(actions).toEqual([
@@ -67,7 +67,7 @@ describe("EventDetailsMenu tests", () => {
 
     it("should reverse the actions if the platform is android", () => {
       setPlatform("android")
-      const actions = formatEventMenuActions({} as CurrentUserEvent, [
+      const actions = formatEventMenuActions({} as ClientSideEvent, [
         EVENT_MENU_ACTION.copyEvent,
         EVENT_MENU_ACTION.shareEvent
       ])
@@ -213,11 +213,11 @@ describe("EventDetailsMenu tests", () => {
       })
     }
 
-    const renderUseEventDetails = (event: CurrentUserEvent) => {
+    const renderUseEventDetails = (event: ClientSideEvent) => {
       return renderSuccessfulUseLoadEventDetails(event, queryClient)
     }
 
-    const renderUseEventDetailsMenuActions = (event: CurrentUserEvent) => {
+    const renderUseEventDetailsMenuActions = (event: ClientSideEvent) => {
       return renderHook(
         () => useEventDetailsMenuActions(event, { blockHost, unblockHost }),
         {

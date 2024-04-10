@@ -6,9 +6,9 @@ import {
   useUserCoordinatesQuery
 } from "@location/index"
 import {
-  CurrentUserEvent,
-  currentUserEventFromResponse
-} from "@shared-models/Event"
+  ClientSideEvent,
+  clientSideEventFromResponse
+} from "@event/ClientSideEvent"
 import {
   ExploreEventsInitialCenter,
   initialCenterToRegion
@@ -22,7 +22,6 @@ import { Ionicon } from "@components/common/Icons"
 import { PrimaryButton } from "@components/Buttons"
 import { ExploreEventsSearchBar } from "./SearchBar"
 import { QueryHookOptions } from "@lib/ReactQuery"
-import { eventDetailsQueryKey } from "@shared-models/query-keys/Event"
 import { UseQueryResult, useQueryClient, useQuery } from "@tanstack/react-query"
 import { PermissionResponse, LocationAccuracy } from "expo-location"
 import { TiFAPI } from "TiFShared/api"
@@ -33,6 +32,7 @@ import {
   createDefaultMapRegion,
   minRegionMeterRadius
 } from "./Region"
+import { eventDetailsQueryKey } from "@event/DetailsQuery"
 
 export const eventsByRegion = async (
   api: TiFAPI,
@@ -45,23 +45,23 @@ export const eventsByRegion = async (
       minRegionMeterRadius(region),
       signal
     )
-  ).data.events.map(currentUserEventFromResponse)
+  ).data.events.map(clientSideEventFromResponse)
 }
 
 /**
  * Data representation of events explored in a given area.
  */
 export type ExploreEventsData =
-  | { status: "loading"; events?: CurrentUserEvent[] }
-  | { status: "error"; events?: CurrentUserEvent[]; retry: () => void }
+  | { status: "loading"; events?: ClientSideEvent[] }
+  | { status: "error"; events?: ClientSideEvent[]; retry: () => void }
   | { status: "no-results"; events: [] }
-  | { status: "success"; events: CurrentUserEvent[] }
+  | { status: "success"; events: ClientSideEvent[] }
 
 export type UseExploreEventsEnvironment = {
   fetchEvents: (
     region: ExploreEventsRegion,
     signal?: AbortSignal
-  ) => Promise<CurrentUserEvent[]>
+  ) => Promise<ClientSideEvent[]>
   isSignificantlyDifferentRegions: (
     r1: ExploreEventsRegion,
     r2: ExploreEventsRegion
@@ -94,7 +94,7 @@ export const useExploreEvents = (
 }
 
 const eventsQueryToExploreEventsData = (
-  query: UseQueryResult<CurrentUserEvent[], unknown>
+  query: UseQueryResult<ClientSideEvent[], unknown>
 ): ExploreEventsData => {
   if (query.isLoading) {
     return { status: "loading" }
@@ -147,8 +147,8 @@ const useExploreEventsQuery = (
   fetchEvents: (
     region: ExploreEventsRegion,
     signal?: AbortSignal
-  ) => Promise<CurrentUserEvent[]>,
-  options: QueryHookOptions<CurrentUserEvent[]>
+  ) => Promise<ClientSideEvent[]>,
+  options: QueryHookOptions<ClientSideEvent[]>
 ) => {
   const queryClient = useQueryClient()
   const queryKey = ["explore-events", region]
@@ -181,7 +181,7 @@ export type ExploreEventsProps = {
   data: ExploreEventsData
   onRegionUpdated: (region: ExploreEventsRegion) => void
   onMapLongPress: (coordinate: LocationCoordinate2D) => void
-  onEventTapped: (event: CurrentUserEvent) => void
+  onEventTapped: (event: ClientSideEvent) => void
   onSearchTapped: () => void
   style?: StyleProp<ViewStyle>
 }

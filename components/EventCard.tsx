@@ -1,6 +1,6 @@
 import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { CurrentUserEvent } from "@shared-models/Event"
+import { ClientSideEvent } from "@event/ClientSideEvent"
 import { placemarkToAbbreviatedAddress } from "@lib/AddressFormatting"
 import { Ionicon, IoniconName } from "@components/common/Icons"
 import { BodyText, Caption, Headline } from "@components/Text"
@@ -11,7 +11,7 @@ import { now } from "TiFShared/lib/Dayjs"
 import dayjs from "dayjs"
 
 export type EventCardProps = {
-  event: CurrentUserEvent
+  event: ClientSideEvent
   style?: StyleProp<ViewStyle>
 }
 

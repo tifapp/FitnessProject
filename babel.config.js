@@ -28,7 +28,8 @@ const MODULES = [
   "notifications",
   "boundary-explore-events",
   "arrival-tracking",
-  "boundary-location-search"
+  "boundary-location-search",
+  "event"
 ]
 
 module.exports = function (api) {

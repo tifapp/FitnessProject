@@ -1,5 +1,5 @@
 import { uuidString } from "@lib/utils/UUID"
-import { CurrentUserEvent } from "@shared-models/Event"
+import { ClientSideEvent } from "@event/ClientSideEvent"
 import { mockLocationCoordinate2D, mockPlacemark } from "@location/MockData"
 import { faker } from "@faker-js/faker"
 import {
@@ -102,7 +102,7 @@ export namespace EventAttendeeMocks {
 }
 
 /**
- * Some mock {@link CurrentUserEvent} objects.
+ * Some mock {@link ClientSideEvent} objects.
  */
 export namespace EventMocks {
   export const PickupBasketball = {
@@ -131,7 +131,7 @@ export namespace EventMocks {
     joinDate: new Date(),
     isChatExpired: false,
     endedAt: null
-  } as CurrentUserEvent
+  } as ClientSideEvent
 
   export const Multiday = {
     host: EventAttendeeMocks.Alivs,
@@ -158,7 +158,7 @@ export namespace EventMocks {
     joinDate: new Date(),
     isChatExpired: false,
     endedAt: null
-  } as CurrentUserEvent
+  } as ClientSideEvent
 
   export const NoPlacemarkInfo = {
     host: EventAttendeeMocks.Alivs,
@@ -186,5 +186,5 @@ export namespace EventMocks {
     joinDate: new Date(),
     isChatExpired: false,
     endedAt: null
-  } as CurrentUserEvent
+  } as ClientSideEvent
 }

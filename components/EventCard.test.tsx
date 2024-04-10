@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react-native"
 import { EventCard } from "./EventCard"
 import React from "react"
-import { CurrentUserEvent } from "@shared-models/Event"
+import { ClientSideEvent } from "@event/ClientSideEvent"
 import "@test-helpers/Matchers"
 import { EventMocks } from "@event-details-boundary/MockData"
 
@@ -17,6 +17,6 @@ describe("EventCard tests", () => {
   })
 })
 
-const renderEventCard = (event: CurrentUserEvent) => {
+const renderEventCard = (event: ClientSideEvent) => {
   return render(<EventCard event={event} />)
 }

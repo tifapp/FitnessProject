@@ -1,5 +1,5 @@
 import { EventArrival, EventArrivalsTracker } from "@arrival-tracking"
-import { CurrentUserEvent } from "@shared-models/Event"
+import { ClientSideEvent } from "@event/ClientSideEvent"
 import { dayjs } from "TiFShared/lib/Dayjs"
 import { isAttendingEvent } from "TiFShared/domain-models/Event"
 
@@ -8,7 +8,7 @@ import { isAttendingEvent } from "TiFShared/domain-models/Event"
  * is attending the event, and if the event is allowed to be tracked (ie. it starts soon).
  */
 export const updateEventsInArrivalsTracker = async (
-  events: Pick<CurrentUserEvent, "id" | "location" | "userAttendeeStatus">[],
+  events: Pick<ClientSideEvent, "id" | "location" | "userAttendeeStatus">[],
   tracker: EventArrivalsTracker
 ) => {
   const [idsToRemove, arrivalsToTrack] = [

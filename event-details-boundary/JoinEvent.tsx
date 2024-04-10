@@ -3,7 +3,7 @@ import {
   EventRegionMonitor,
   useHasArrivedAtRegion
 } from "@arrival-tracking/region-monitoring"
-import { CurrentUserEvent } from "@shared-models/Event"
+import { ClientSideEvent } from "@event/ClientSideEvent"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   getBackgroundPermissionsAsync as getBackgroundLocationPermissions,
@@ -23,9 +23,9 @@ import { FontScaleFactors } from "@lib/Fonts"
 import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet"
 import { TiFAPI } from "TiFShared/api"
 import { RecentLocationsStorage } from "@location/Recents"
-import { updateEventDetailsQueryEvent } from "./Query"
 import { JoinEventResponse } from "TiFShared/api/models/Event"
 import { EventLocation } from "TiFShared/domain-models/Event"
+import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
 
 export const JOIN_EVENT_ERROR_ALERTS = {
   "event-has-ended": {
@@ -88,7 +88,7 @@ export type JoinEventResult =
   | "event-was-cancelled"
   | "user-is-blocked"
 
-export type JoinEventRequest = Pick<CurrentUserEvent, "id"> & {
+export type JoinEventRequest = Pick<ClientSideEvent, "id"> & {
   location: Omit<EventLocation, "timezoneIdentifier">
   hasArrived: boolean
 }

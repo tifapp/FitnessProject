@@ -24,7 +24,7 @@ import {
   useEventDetailsMenuActions
 } from "@event-details-boundary/Menu"
 import { View } from "react-native"
-import { CurrentUserEvent } from "@shared-models/Event"
+import { ClientSideEvent } from "@event/ClientSideEvent"
 import { useLoadEventDetails } from "@event-details-boundary/Details"
 import { UserSessionProvider } from "@lib/UserSession"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
@@ -101,7 +101,7 @@ const Test = () => {
   return <Menu event={result.event} />
 }
 
-const Menu = ({ event }: { event: CurrentUserEvent }) => {
+const Menu = ({ event }: { event: ClientSideEvent }) => {
   const state = useEventDetailsMenuActions(event, {
     blockHost: async () => {
       console.log("Blocked")

@@ -1,7 +1,7 @@
 import { StackNavigatorType } from "@components/Navigation"
 import { Region, isSignificantlyDifferentRegions } from "@location/index"
 import { StackScreenProps } from "@react-navigation/stack"
-import { CurrentUserEvent } from "@shared-models/Event"
+import { ClientSideEvent } from "@event/ClientSideEvent"
 import React from "react"
 import { StyleSheet } from "react-native"
 import {
@@ -32,7 +32,7 @@ export const createExploreEventsScreens = <
   fetchEvents: (
     region: Region,
     signal?: AbortSignal
-  ) => Promise<CurrentUserEvent[]>
+  ) => Promise<ClientSideEvent[]>
 ) => (
   <>
     <stack.Screen
@@ -52,7 +52,7 @@ type ExploreEventsScreenProps = {
   fetchEvents: (
     region: Region,
     signal?: AbortSignal
-  ) => Promise<CurrentUserEvent[]>
+  ) => Promise<ClientSideEvent[]>
 } & ExploreEventsProps
 
 const ExploreEventsScreen = ({

@@ -1,4 +1,4 @@
-import { CurrentUserEvent } from "@shared-models/Event"
+import { ClientSideEvent } from "@event/ClientSideEvent"
 import { humanizeEventCountdownSeconds } from "./Event"
 import { StyleProp, ViewStyle, View, StyleSheet } from "react-native"
 import { Footnote, Headline } from "@components/Text"
@@ -9,7 +9,7 @@ import { capitalizeFirstLetter } from "TiFShared/lib/String"
 import { FixedDateRange } from "TiFShared/domain-models/FixedDateRange"
 import { TodayOrTomorrow } from "TiFShared/domain-models/TodayOrTomorrow"
 
-export type EventCountdownTime = CurrentUserEvent["time"]
+export type EventCountdownTime = ClientSideEvent["time"]
 
 export type EventCountdown =
   | {
