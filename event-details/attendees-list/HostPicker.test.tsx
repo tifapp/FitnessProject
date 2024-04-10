@@ -73,6 +73,48 @@ describe("EventHostPicker tests", () => {
         EventAttendeeMocks.AnnaAttendee
       ])
     })
+    test("edge case: select attendee that becomes not-participating right before promotion", async () => {
+      const mockData = {
+        attendees: [
+          EventAttendeeMocks.Alivs,
+          EventAttendeeMocks.AnnaAttendee,
+          EventAttendeeMocks.BlobJr
+        ],
+        totalAttendeeCount: 3
+      }
+      fetchNextAttendeesPage.mockResolvedValueOnce(mockData)
+      const { result } = renderUseEventHostPicker(11, 15)
+
+      await waitFor(() =>
+        expect(result.current.attendeesList.status).toEqual("success")
+      )
+      act(() =>
+        result.current.onAttendeeSelected(
+          (result.current.attendeesList as any).attendees[0].id
+        )
+      )
+      expect(result.current.selectedAttendeeId).toEqual(
+        EventAttendeeMocks.AnnaAttendee.id
+      )
+      act(() =>
+        result.current.onAttendeeSelected(
+          (result.current.attendeesList as any).attendees[1].id
+        )
+      )
+      expect(result.current.selectedAttendeeId).toEqual(
+        EventAttendeeMocks.BlobJr.id
+      )
+      testEnv.promoteToHost.mockRejectedValueOnce("error")
+      act(() => (result.current as any).submitted())
+      await waitFor(() => expect(testEnv.onSuccess).toHaveBeenCalled())
+      expect(testEnv.promoteToHost).toHaveBeenCalledWith(
+        EventAttendeeMocks.BlobJr.id
+      )
+      expect((result.current.attendeesList as any).host).toEqual(
+        EventAttendeeMocks.Alivs
+      )
+      expect(result.current.selectedAttendeeId).toBeUndefined()
+    })
     test("presents generic error alert when failure", async () => {
       const mockData = {
         attendees: [

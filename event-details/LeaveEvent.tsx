@@ -132,24 +132,3 @@ export const useLeaveEvent = (
     }
   }
 }
-
-// const renderAttendee = (
-//   onAttendeeSelected: (attendee: EventAttendee) => void,
-//   attendee: EventAttendee,
-//   selectedAttendeeId: string
-// ) => {
-//   return (
-//     <View>
-//       <TouchableOpacity
-//         onPress={() => onAttendeeSelected(attendee)}
-//         style={{
-//           backgroundColor:
-//             selectedAttendeeId === attendee.id ? "yellow" : "white"
-//         }}
-//       >
-//         <Subtitle> {attendee.username} </Subtitle>
-//         <BodyText> {attendee.handle.toString()} </BodyText>
-//       </TouchableOpacity>
-//     </View>
-//   )
-// }

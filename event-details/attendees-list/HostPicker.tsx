@@ -102,10 +102,8 @@ export const useEventHostPicker = (
         newAttendeesData.pages[0].attendees[newHostIndex]
       )
       newAttendeesData.pages[0].attendees.splice(newHostIndex + 1, 1)
-      return newAttendeesData
-    } else {
-      return attendeesData
     }
+    return newAttendeesData
   }
   const hostPickerMutation = useMutation(env.promoteToHost, {
     onSuccess: (_, attendeeID) => {
