@@ -47,6 +47,8 @@
       "@event/*": ["./event/*"],
       "@user": ["./user"],
       "@user/*": ["./user/*"],
+      "@settings-storage": ["./settings-storage"],
+      "@settings-storage/*": ["./settings-storage/*"],
       "env": ["./.env"]
     }
   },

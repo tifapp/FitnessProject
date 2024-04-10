@@ -1,6 +1,9 @@
 import { requireOptionalNativeModule } from "expo"
 import { ReactNode, createContext, useContext } from "react"
-import { DeviceSettings, DeviceSettingsStore } from "@lib/DeviceSettings"
+import {
+  DeviceSettings,
+  DeviceSettingsStore
+} from "@settings-storage/DeviceSettings"
 import { logger } from "TiFShared/logging"
 
 enum TiFNativeHapticEvent {

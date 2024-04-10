@@ -1,7 +1,7 @@
 import { AppState } from "react-native"
 import { EventArrivalsTracker } from "./Tracker"
 import { TiFAPI } from "TiFShared/api"
-import { InternalMetricsStorage } from "@lib/InternalMetrics"
+import { InternalMetricsStorage } from "@settings-storage/InternalMetrics"
 import { now } from "TiFShared/lib/Dayjs"
 
 /**

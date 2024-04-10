@@ -4,8 +4,8 @@ import {
   useContext,
   useSyncExternalStore
 } from "react"
-import { CallbackCollection } from "./utils/CallbackCollection"
-import { SQLExecutable, TiFSQLite } from "./SQLite"
+import { CallbackCollection } from "@lib/utils/CallbackCollection"
+import { SQLExecutable, TiFSQLite } from "@lib/SQLite"
 import { mergeWithPartial } from "TiFShared/lib/Object"
 
 /**

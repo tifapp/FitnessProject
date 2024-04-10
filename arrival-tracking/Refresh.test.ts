@@ -1,7 +1,7 @@
 import { fakeTimers } from "@test-helpers/Timers"
 import { EventArrivalsRefresher } from "./Refresh"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
-import { SQLiteInternalMetricsStorage } from "@lib/InternalMetrics"
+import { SQLiteInternalMetricsStorage } from "@settings-storage/InternalMetrics"
 
 describe("EventArrivalsRefresher tests", () => {
   resetTestSQLiteBeforeEach()
