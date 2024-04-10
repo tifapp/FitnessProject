@@ -1,18 +1,18 @@
 import { uuidString } from "@lib/utils/UUID"
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import { mockLocationCoordinate2D, mockPlacemark } from "@location/MockData"
-import { faker } from "@faker-js/faker"
-import {
-  randomBool,
-  randomIntegerInRange,
-  randomlyNull
-} from "@lib/utils/Random"
 import { ColorString } from "TiFShared/domain-models/ColorString"
 import { dateRange } from "TiFShared/domain-models/FixedDateRange"
 import { dayjs } from "TiFShared/lib/Dayjs"
 import { UserHandle } from "TiFShared/domain-models/User"
 import { EventLocation, EventAttendee } from "TiFShared/domain-models/Event"
 import { ChatTokenRequest } from "TiFShared/api/models/Chat"
+import { faker } from "@faker-js/faker"
+import {
+  randomBool,
+  randomIntegerInRange,
+  randomlyNull
+} from "@lib/utils/Random"
 
 export const mockEventLocation = (): EventLocation => ({
   coordinate: mockLocationCoordinate2D(),

@@ -1,9 +1,3 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useSyncExternalStore
-} from "react"
 import { CallbackCollection } from "@lib/utils/CallbackCollection"
 import { SQLExecutable, TiFSQLite } from "@lib/SQLite"
 import { mergeWithPartial } from "TiFShared/lib/Object"
@@ -27,7 +21,7 @@ export const areLocalSettingsEqual = (s1: LocalSettings, s2: LocalSettings) => {
     s1.isHapticAudioEnabled === s2.isHapticAudioEnabled &&
     s1.hasCompletedOnboarding === s2.hasCompletedOnboarding &&
     s1.lastEventArrivalsRefreshDate?.getTime() ===
-      s2.lastEventArrivalsRefreshDate?.getTime()
+    s2.lastEventArrivalsRefreshDate?.getTime()
   )
 }
 
@@ -174,39 +168,5 @@ export class SQLiteLocalSettingsStore implements LocalSettingsStore {
         ? new Date(sqliteSettings.lastEventArrivalsRefreshTime)
         : null
     }
-  }
-}
-
-const LocalSettingsContext = createContext<LocalSettingsStore | undefined>(
-  undefined // TODO: - Default Value
-)
-
-export type LocalSettingsProviderProps = {
-  store: LocalSettingsStore
-  children: JSX.Element
-}
-
-export const LocalSettingsProvider = ({
-  store,
-  children
-}: LocalSettingsProviderProps) => (
-  <LocalSettingsContext.Provider value={store}>
-    {children}
-  </LocalSettingsContext.Provider>
-)
-
-/**
- * Returns the current device settings, along with the store that stores the
- * settings.
- */
-export const useLocalSettings = () => {
-  const store = useContext(LocalSettingsContext)
-  if (!store) throw new Error("No DeviceSettingsStore provided.")
-  return {
-    settings: useSyncExternalStore(
-      useCallback((callback) => store.subscribe(callback), [store]),
-      () => store.current
-    ),
-    store
   }
 }
