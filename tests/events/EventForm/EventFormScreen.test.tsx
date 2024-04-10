@@ -1,6 +1,6 @@
 import { EventFormValues } from "@components/eventForm"
 import { EventColors } from "@lib/events"
-import { HapticsProvider } from "@lib/Haptics"
+import { HapticsProvider } from "@modules/tif-haptics"
 import { GeocodingFunctionsProvider } from "@location/Geocoding"
 import EventFormScreen from "@screens/EventFormScreen"
 import { QueryClient } from "@tanstack/react-query"

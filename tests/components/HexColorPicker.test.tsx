@@ -1,7 +1,7 @@
 import HexColorPicker, {
   HexColorPickerOption
 } from "@components/formComponents/HexColorPicker"
-import { HapticsProvider } from "@lib/Haptics"
+import { HapticsProvider } from "@modules/tif-haptics"
 import { HexColor } from "@lib/utils/Color"
 import { TestHaptics } from "@test-helpers/Haptics"
 import "@test-helpers/Matchers"

@@ -1,7 +1,16 @@
-import React, { ReactNode, createContext, useContext } from "react"
-import { TiFNativeHaptics, TiFNativeHapticEvent } from "@modules/tif-haptics"
-import { DeviceSettings, DeviceSettingsStore } from "./DeviceSettings"
+import { requireOptionalNativeModule } from "expo"
+import { ReactNode, createContext, useContext } from "react"
+import { DeviceSettings, DeviceSettingsStore } from "@lib/DeviceSettings"
 import { logger } from "TiFShared/logging"
+
+enum TiFNativeHapticEvent {
+  Selection = "selection"
+}
+
+const TiFNativeHaptics = requireOptionalNativeModule("TifHaptics") ?? {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  IS_HAPTICS_SUPPORTED: false
+}
 
 const log = logger("tif.haptics")
 

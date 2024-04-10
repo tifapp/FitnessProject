@@ -1,2 +1,2 @@
-export * from "./DateRange"
+export * from "./DateRangeFormatting"
 export * from "./DateTimePicker"
