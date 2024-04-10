@@ -1,4 +1,4 @@
-import { EventCard } from "@components/EventCard"
+import { EventCard } from "@event/EventCard"
 import {
   BottomSheetModal,
   BottomSheetFlatList,
