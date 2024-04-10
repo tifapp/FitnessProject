@@ -1,4 +1,4 @@
-import { UserSessionProvider } from "@lib/UserSession"
+import { UserSessionProvider } from "@user/Session"
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import { setPlatform } from "@test-helpers/Platform"
 import {

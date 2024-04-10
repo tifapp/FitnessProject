@@ -9,9 +9,8 @@ import { MenuView, MenuAction } from "@react-native-menu/menu"
 import { Ionicon } from "@components/common/Icons"
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import { useFontScale } from "@lib/Fonts"
-import { useIsSignedIn } from "@lib/UserSession"
+import { useIsSignedIn } from "@user/Session"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { toggleBlockUserRelations } from "@shared-models/User"
 import {
   UserID,
   UnblockedBidirectionalUserRelations
@@ -65,7 +64,15 @@ export const useEventDetailsMenuActions = (
       const isBlocking = event.host.relations.youToThem !== "blocked"
       updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({
         ...e,
-        host: { ...e.host, relations: toggleBlockUserRelations(isBlocking) }
+        host: {
+          ...e.host,
+          relations: {
+            youToThem: isBlocking ? "blocked" : "not-friends",
+            // NB: Either the block removes the friendship status, or if they
+            // are unblocking then the only possible value is not friends.
+            themToYou: "not-friends"
+          } as const
+        }
       }))
       toggleBlockMutation.mutate({
         isBlocking,

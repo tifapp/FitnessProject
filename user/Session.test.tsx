@@ -3,7 +3,7 @@ import React from "react"
 import { View } from "react-native"
 import "@test-helpers/Matchers"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { IfAuthenticated, UserSessionProvider } from "./UserSession"
+import { IfAuthenticated, UserSessionProvider } from "./Session"
 import { fakeTimers } from "@test-helpers/Timers"
 
 describe("UserSession tests", () => {

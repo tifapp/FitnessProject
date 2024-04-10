@@ -24,12 +24,12 @@ const MODULES = [
   "date-time",
   "test-helpers",
   "boundary-content-reporting",
-  "shared-models",
   "notifications",
   "boundary-explore-events",
   "arrival-tracking",
   "boundary-location-search",
-  "event"
+  "event",
+  "user"
 ]
 
 module.exports = function (api) {

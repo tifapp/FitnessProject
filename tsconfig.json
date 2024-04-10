@@ -38,7 +38,6 @@
       "@date-time": ["./date-time"],
       "@date-time/*": ["./date-time/*"],
       "@test-helpers/*": ["./test-helpers/*"],
-      "@shared-models/*": ["./shared-models/*"],
       "@notifications": ["./notifications"],
       "@explore-events-boundary": ["./explore-events-boundary"],
       "@arrival-tracking": ["./arrival-tracking"],
@@ -46,6 +45,8 @@
       "@location-search-boundary": ["./location-search-boundary"],
       "@event": ["./event"],
       "@event/*": ["./event/*"],
+      "@user": ["./user"],
+      "@user/*": ["./user/*"],
       "env": ["./.env"]
     }
   },
