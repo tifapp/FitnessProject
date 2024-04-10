@@ -26,7 +26,7 @@ import {
 import { View } from "react-native"
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import { useLoadEventDetails } from "@event-details-boundary/Details"
-import { UserSessionProvider } from "@lib/UserSession"
+import { UserSessionProvider } from "@user/Session"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { dateRange } from "TiFShared/domain-models/FixedDateRange"
 import { dayjs, now } from "TiFShared/lib/Dayjs"

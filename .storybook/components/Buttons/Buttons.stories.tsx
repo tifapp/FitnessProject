@@ -1,6 +1,6 @@
 import { SecondaryOutlinedButton, PrimaryButton } from "@components/Buttons"
 import { CircularIonicon } from "@components/common/Icons"
-import { EventColors } from "@event-details/Event"
+import { EventColors } from "@lib/events"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { ScrollView, View } from "react-native"
 import { AuthBannerButton } from "@components/AuthBanner"

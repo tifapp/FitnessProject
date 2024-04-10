@@ -51,8 +51,8 @@ import TextFieldMeta, {
 import VerifcationCodeMeta, {
   Basic as VerifcationCodeBasic
 } from "../components/VerificationCode/VerifyCode.stories"
-import { setupCognito } from "@event-details-boundary/CognitoHelpers"
-import { InMemorySecureStore } from "@event-details-boundary/CognitoSecureStorage"
+import { setupCognito } from "@auth-boundary/CognitoHelpers"
+import { InMemorySecureStore } from "@auth-boundary/CognitoSecureStorage"
 
 setupCognito(new InMemorySecureStore())
 

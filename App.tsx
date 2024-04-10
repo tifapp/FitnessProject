@@ -25,7 +25,8 @@ import { registerForPushNotifications } from "./notifications"
 import awsconfig from "./src/aws-exports"
 import { NetInfoInternetConnectionStatus } from "@lib/InternetConnection"
 import "TiFShared"
-import "date-time/DateRange"
+import "@lib/TiFAPI"
+import "date-time/DateRangeFormatting"
 import { consoleLogHandler, logger, addLogHandler } from "TiFShared/logging"
 
 const log = logger("app.root")
