@@ -1,5 +1,5 @@
 import { ClientSideEvent } from "@event/ClientSideEvent"
-import { humanizeEventCountdownSeconds } from "./Event"
+import { formattedEventCountdownSeconds } from "./SharedCountdownFormatting"
 import { StyleProp, ViewStyle, View, StyleSheet } from "react-native"
 import { Footnote, Headline } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
@@ -44,7 +44,7 @@ const eventFormattedCountdown = (
   todayOrTomorrow: TodayOrTomorrow | null
 ): EventFormattedCountdown => {
   const duration = dayjs.duration(seconds, "second")
-  const formatted = humanizeEventCountdownSeconds(seconds).replace(
+  const formatted = formattedEventCountdownSeconds(seconds).replace(
     /(a|an) /,
     "1 "
   )

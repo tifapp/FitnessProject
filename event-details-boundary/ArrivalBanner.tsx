@@ -10,7 +10,7 @@ import {
   EventRegionMonitor,
   useHasArrivedAtRegion
 } from "@arrival-tracking/region-monitoring"
-import { humanizeEventCountdownSeconds } from "./Event"
+import { formattedEventCountdownSeconds } from "./SharedCountdownFormatting"
 import { EventRegion } from "TiFShared/domain-models/Event"
 import { TodayOrTomorrow } from "TiFShared/domain-models/TodayOrTomorrow"
 
@@ -183,7 +183,7 @@ export const countdownMessage = (countdown: EventArrivalBannerCountdown) => {
   } else if (countdown.secondsToStart < ONE_HOUR_IN_SECONDS) {
     return "This event kicks off in under an hour."
   } else {
-    const countdownText = humanizeEventCountdownSeconds(
+    const countdownText = formattedEventCountdownSeconds(
       countdown.secondsToStart
     )
     return `This event kicks off in ${countdownText}.`
