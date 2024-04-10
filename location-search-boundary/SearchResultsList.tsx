@@ -10,20 +10,18 @@ import {
   LocationSearchResultView
 } from "./SearchResultView"
 import {
-  LocationSearchResult,
-  LocationSearchResultsData,
-  LocationsSearchQuery
-} from "./Models"
-import {
   LocationCoordinate2D,
   coordinateDistance
 } from "TiFShared/domain-models/LocationCoordinate2D"
 import { hashCoordinate } from "@lib/CoordinateHashing"
+import { LocationsSearchQueryText } from "./QueryText"
+import { LocationSearchResult } from "./SearchClient"
+import { LocationSearchLoadingResult } from "./LoadingResult"
 
 export type LocationSearchResultsListProps = {
-  query: LocationsSearchQuery
+  query: LocationsSearchQueryText
   center?: LocationCoordinate2D
-  searchResults: LocationSearchResultsData
+  searchResults: LocationSearchLoadingResult
   Header: JSX.Element
   SearchResultView?: (props: LocationSearchResultProps) => ReactElement
   style?: StyleProp<ViewStyle>
@@ -92,7 +90,7 @@ const keyExtractor = (result: LocationSearchResult) => {
 }
 
 type EmptyResultsProps = {
-  query: LocationsSearchQuery
+  query: LocationsSearchQueryText
   reason: LocationSearchResultsData["status"]
   style?: StyleProp<ViewStyle>
 }

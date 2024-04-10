@@ -1,10 +1,10 @@
 import { useAtomValue } from "jotai"
-import { LocationsSearchQuery } from "./Models"
 import { debounceAtomGroup } from "@lib/Jotai"
+import { LocationsSearchQueryText } from "./SearchClient"
 
 export const searchTextAtoms = debounceAtomGroup("", 200)
 
-export const useLocationsSearchQueryObject = () => {
+export const useLocationsSearchQueryTextObject = () => {
   const debouncedSearchText = useAtomValue(searchTextAtoms.debouncedValueAtom)
-  return new LocationsSearchQuery(debouncedSearchText)
+  return new LocationsSearchQueryText(debouncedSearchText)
 }

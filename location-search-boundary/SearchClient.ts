@@ -1,11 +1,68 @@
-import { LocationSearchResult, LocationsSearchQuery } from "./Models"
 import { Geo, Place } from "@aws-amplify/geo"
 import { NamedLocation } from "@location/NamedLocation"
-import { RecentLocationsStorage } from "@location/Recents"
+import {
+  RecentLocationAnnotation,
+  RecentLocationsStorage
+} from "@location/Recents"
 import {
   LocationCoordinate2D,
   areCoordinatesEqual
 } from "TiFShared/domain-models/LocationCoordinate2D"
+
+/**
+ * An result that is displayed by the location search.
+ */
+export type LocationSearchResult = {
+  /**
+   * The actual location presented by this option.
+   */
+  location: NamedLocation
+
+  /**
+   * An annotation that appears above this option.
+   */
+  annotation?: RecentLocationAnnotation
+
+  /**
+   * True if the option is a saved location in the user's
+   * recent locations.
+   */
+  isRecentLocation: boolean
+}
+
+/**
+ * A type that denotes whether searching for locations should utilize the user's
+ * recent locations, or a remote service.
+ */
+export type LocationsSearchSourceType = "user-recents" | "remote-search"
+
+/**
+ * A rich query type that carries user-entered text for searching locations.
+ */
+export class LocationsSearchQueryText {
+  /**
+   * A {@link LocationsSearchQueryText} that is initialized with an empty string.
+   */
+  static empty = new LocationsSearchQueryText("")
+
+  private readonly rawValue: string
+
+  constructor(rawValue: string) {
+    this.rawValue = rawValue
+  }
+
+  /**
+   * The data source type of this query. An empty string means loading from
+   * the user's recent locations.
+   */
+  get sourceType(): LocationsSearchSourceType {
+    return this.rawValue.length === 0 ? "user-recents" : "remote-search"
+  }
+
+  toString() {
+    return this.rawValue
+  }
+}
 
 /**
  * A top-level function that allows a location search, and gives location data
@@ -16,12 +73,12 @@ import {
  * with the given query and center, if querying for locations in a different
  * location.
  *
- * @param query A {@link LocationsSearchQuery} given for the search function to use.
+ * @param query A {@link LocationsSearchQueryText} given for the search function to use.
  * @param center An optional {@link LocationCoordinate2D} that designates where the location search is occurring from.
  * @returns A Promise of an array of {@link LocationSearchResult}s, or usable data given from the search client.
  */
 export const locationSearch = async (
-  query: LocationsSearchQuery,
+  query: LocationsSearchQueryText,
   center: LocationCoordinate2D | undefined,
   storage: Pick<RecentLocationsStorage, "locationsForCoordinates" | "recent">
 ): Promise<LocationSearchResult[]> => {
@@ -42,7 +99,7 @@ export const locationSearch = async (
  * query and center coordinate.
  */
 export const awsLocationSearch = async (
-  query: LocationsSearchQuery,
+  query: LocationsSearchQueryText,
   center: LocationCoordinate2D | undefined,
   awsSearch: typeof Geo.searchByText = Geo.searchByText
 ): Promise<NamedLocation[]> => {
@@ -93,18 +150,18 @@ export const searchRecentLocations = async (
  * storage's information on whether those locations are recent.
  * This involves combining the data from both processes.
  *
- * @param query A {@link LocationsSearchQuery} given for the search function to use.
+ * @param query A {@link LocationsSearchQueryText} given for the search function to use.
  * @param searchFunction A function that takes in a query + an optional center, then converts the data into a usable set of {@link NamedLocation}s.
  * @param center An optional {@link LocationCoordinate2D} given for the search to center in where it should be searching.
  * @returns A Promise of an array of {@link LocationSearchResult}s.
  */
 
 export const searchWithRecentAnnotations = async (
-  query: LocationsSearchQuery,
+  query: LocationsSearchQueryText,
   center: LocationCoordinate2D | undefined,
   recents: Pick<RecentLocationsStorage, "locationsForCoordinates">,
   searchFunction: (
-    query: LocationsSearchQuery,
+    query: LocationsSearchQueryText,
     center?: LocationCoordinate2D
   ) => Promise<NamedLocation[]>
 ): Promise<LocationSearchResult[]> => {

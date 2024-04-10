@@ -22,20 +22,11 @@ import {
   useLocationSearchPicker
 } from "."
 import { mockLocationSearchResult } from "./MockData"
-import { LocationSearchResult, LocationsSearchQuery } from "./Models"
 import { NamedLocation } from "@location/NamedLocation"
+import { LocationSearchResult, LocationsSearchQueryText } from "./SearchClient"
 
 describe("LocationSearch tests", () => {
   beforeEach(() => jest.resetAllMocks())
-
-  describe("LocationsSearchQuery tests", () => {
-    test("sourceType", () => {
-      expect(LocationsSearchQuery.empty.sourceType).toEqual("user-recents")
-      expect(new LocationsSearchQuery("New York").sourceType).toEqual(
-        "remote-search"
-      )
-    })
-  })
 
   describe("LocationSearchUI tests", () => {
     beforeEach(() => jest.resetAllMocks())
@@ -113,7 +104,7 @@ describe("LocationSearch tests", () => {
           await waitForLocationWithName(searchResult.location.placemark.name!)
         ).toBeDisplayed()
         expect(searchForLocations).toHaveBeenCalledWith(
-          LocationsSearchQuery.empty,
+          LocationsSearchQueryText.empty,
           userLocation.coords
         )
       })
@@ -169,7 +160,7 @@ describe("LocationSearch tests", () => {
         act(() => timeTravel(100))
         await waitFor(() => {
           expect(searchForLocations).not.toHaveBeenCalledWith(
-            new LocationsSearchQuery(searchText),
+            new LocationsSearchQueryText(searchText),
             undefined
           )
         })
@@ -179,13 +170,13 @@ describe("LocationSearch tests", () => {
 
         act(() => timeTravel(100))
         expect(searchForLocations).not.toHaveBeenCalledWith(
-          new LocationsSearchQuery(searchText),
+          new LocationsSearchQueryText(searchText),
           undefined
         )
 
         act(() => timeTravel(100))
         expect(searchForLocations).toHaveBeenCalledWith(
-          new LocationsSearchQuery(searchText),
+          new LocationsSearchQueryText(searchText),
           undefined
         )
         expect(

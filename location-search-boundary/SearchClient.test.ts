@@ -1,10 +1,10 @@
 import { SQLiteRecentLocationsStorage } from "@location/Recents"
 import {
+  LocationsSearchQueryText,
   awsLocationSearch,
   searchRecentLocations,
   searchWithRecentAnnotations
 } from "./SearchClient"
-import { LocationsSearchQuery } from "./Models"
 import { mockTiFLocation } from "@location/MockData"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 import { sleep } from "@lib/utils/DelayData"
@@ -14,6 +14,15 @@ describe("Search client tests", () => {
   resetTestSQLiteBeforeEach()
   const storage = new SQLiteRecentLocationsStorage(testSQLite)
 
+  describe("LocationsSearchQueryText tests", () => {
+    test("sourceType", () => {
+      expect(LocationsSearchQueryText.empty.sourceType).toEqual("user-recents")
+      expect(new LocationsSearchQueryText("New York").sourceType).toEqual(
+        "remote-search"
+      )
+    })
+  })
+
   describe("AWSLocationSearch tests", () => {
     const awsSearch = jest.fn()
     beforeEach(() => awsSearch.mockReset())
@@ -22,7 +31,7 @@ describe("Search client tests", () => {
       awsSearch.mockResolvedValueOnce([])
       const coordinate = { latitude: -121.287929, longitude: 40.20982 }
       await awsLocationSearch(
-        new LocationsSearchQuery("hello"),
+        new LocationsSearchQueryText("hello"),
         coordinate,
         awsSearch
       )
@@ -37,7 +46,7 @@ describe("Search client tests", () => {
     it("should convert request to a proper AWS request with no center coordinate", async () => {
       awsSearch.mockResolvedValueOnce([])
       await awsLocationSearch(
-        new LocationsSearchQuery("hello"),
+        new LocationsSearchQueryText("hello"),
         undefined,
         awsSearch
       )
@@ -63,7 +72,7 @@ describe("Search client tests", () => {
         }
       ])
       const results = await awsLocationSearch(
-        new LocationsSearchQuery("Amazon go stores in Seattle"),
+        new LocationsSearchQueryText("Amazon go stores in Seattle"),
         undefined,
         awsSearch
       )
@@ -102,7 +111,7 @@ describe("Search client tests", () => {
         }
       ])
       const results = await awsLocationSearch(
-        new LocationsSearchQuery("Amazon go stores in Seattle"),
+        new LocationsSearchQueryText("Amazon go stores in Seattle"),
         undefined,
         awsSearch
       )
@@ -187,7 +196,7 @@ describe("Search client tests", () => {
       await storage.save(locations[2])
 
       const testResults = await searchWithRecentAnnotations(
-        new LocationsSearchQuery("New York"),
+        new LocationsSearchQueryText("New York"),
         undefined,
         storage,
         jest.fn().mockResolvedValueOnce(locations)
