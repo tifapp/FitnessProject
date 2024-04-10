@@ -12,8 +12,10 @@ import {
   TouchableOpacity,
   LayoutRectangle
 } from "react-native"
-import { EventTravelEstimates } from "@shared-models/TravelEstimates"
-import { ExpoTiFTravelEstimatesModule } from "@modules/tif-travel-estimates"
+import {
+  EventTravelEstimates,
+  eventTravelEstimates
+} from "@modules/tif-travel-estimates"
 import { CodedError } from "expo-modules-core"
 import { ReactNode, useState } from "react"
 import { BodyText, Caption, CaptionTitle, Headline } from "@components/Text"
@@ -32,38 +34,6 @@ import { metersToMiles } from "TiFShared/lib/MetricConversions"
 import { EventAttendee, EventLocation } from "TiFShared/domain-models/Event"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 import { openEventLocationInMaps } from "./LocationIdentifier"
-
-export type LoadEventTravelEstimates = (
-  userCoordinate: LocationCoordinate2D,
-  eventCoordinate: LocationCoordinate2D,
-  abortSignal?: AbortSignal
-) => Promise<EventTravelEstimates>
-
-/**
- * Loads travel estimates for an event.
- *
- * @param eventCoordinate The coordinate of the event.
- * @param userCoordinate The user's location current coordinate.
- * @param nativeTravelEstimates The native module for loading travel estimates.
- * @param signal An {@link AbortSignal} to cancel the request.
- */
-export const loadEventTravelEstimates = async (
-  eventCoordinate: LocationCoordinate2D,
-  userCoordinate: LocationCoordinate2D,
-  nativeTravelEstimates: ExpoTiFTravelEstimatesModule,
-  signal?: AbortSignal
-) => {
-  signal?.addEventListener("abort", () => {
-    nativeTravelEstimates.cancelTravelEstimatesAsync(
-      userCoordinate,
-      eventCoordinate
-    )
-  })
-  return await nativeTravelEstimates.travelEstimatesAsync(
-    userCoordinate,
-    eventCoordinate
-  )
-}
 
 export type UseEventTravelEstimatesResult =
   | {
@@ -127,7 +97,7 @@ const compactFormatTravelEstimateDuration = (duration: duration.Duration) => {
  */
 export const useEventTravelEstimates = (
   coordinate: LocationCoordinate2D,
-  loadTravelEstimates: LoadEventTravelEstimates
+  loadTravelEstimates: typeof eventTravelEstimates
 ): UseEventTravelEstimatesResult => {
   const isSupported = Platform.OS !== "android"
   const userLocationQuery = useUserCoordinatesQuery(
@@ -166,7 +136,7 @@ const resultForCodedError = (
 const useEventTravelEstimatesQuery = (
   userCoordinate: LocationCoordinate2D,
   eventCoordinate: LocationCoordinate2D,
-  loadTravelEstimates: LoadEventTravelEstimates,
+  loadTravelEstimates: typeof eventTravelEstimates,
   options?: QueryHookOptions<EventTravelEstimates>
 ) => {
   return useQuery(
