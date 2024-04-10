@@ -11,10 +11,7 @@ const modulePath = (dir) => {
 const MODULES = [
   "screens",
   "components",
-  "stacks",
-  "hooks",
   "assets",
-  "graphql",
   "lib",
   "boundary-auth",
   "boundary-event-details",
@@ -29,7 +26,8 @@ const MODULES = [
   "arrival-tracking",
   "boundary-location-search",
   "event",
-  "user"
+  "user",
+  "settings-storage"
 ]
 
 module.exports = function (api) {
