@@ -8,7 +8,7 @@ import { LocationSearchResult } from "./SearchClient"
  * Creates a random {@link LocationSearchResultAnnotation}.
  */
 export const mockLocationSearchAnnotation = () => {
-  const annotation = randomBool() ? "attended-recently" : "hosted-recently"
+  const annotation = randomBool() ? "attended-event" : "hosted-event"
   return annotation as RecentLocationAnnotation
 }
 

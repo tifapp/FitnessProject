@@ -1,9 +1,7 @@
 import { Caption, CaptionTitle } from "@components/Text"
 import { SkeletonView } from "@components/common/Skeleton"
-import { useFontScale } from "@lib/Fonts"
 import React, { ReactElement } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { Divider } from "react-native-elements"
 import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view"
 import {
   LocationSearchResultProps,
@@ -14,8 +12,7 @@ import {
   coordinateDistance
 } from "TiFShared/domain-models/LocationCoordinate2D"
 import { hashCoordinate } from "@lib/CoordinateHashing"
-import { LocationsSearchQueryText } from "./QueryText"
-import { LocationSearchResult } from "./SearchClient"
+import { LocationSearchResult, LocationsSearchQueryText } from "./SearchClient"
 import { LocationSearchLoadingResult } from "./LoadingResult"
 
 export type LocationSearchResultsListProps = {
@@ -42,48 +39,43 @@ export const LocationSearchResultsListView = ({
   contentContainerStyle,
   Header,
   SearchResultView = LocationSearchResultView
-}: LocationSearchResultsListProps) => {
-  const fontScale = useFontScale()
-  return (
-    <KeyboardAwareFlatList
-      style={style}
-      contentContainerStyle={contentContainerStyle}
-      keyExtractor={keyExtractor}
-      ItemSeparatorComponent={() => (
-        <View style={styles.separator}>
-          <Divider style={{ ...styles.divider, marginLeft: 48 * fontScale }} />
-        </View>
-      )}
-      ListHeaderComponent={
-        <View style={styles.horizontalPadding}>
-          {Header}
-          <CaptionTitle style={styles.searchResultsTitle}>
-            {query.sourceType === "user-recents" ? "Recents" : "Results"}
-          </CaptionTitle>
-        </View>
-      }
-      renderItem={({ item }) => (
-        <SearchResultView
-          result={item}
-          distanceMiles={
-            center
-              ? coordinateDistance(center, item.location.coordinate, "miles")
-              : undefined
-          }
-          style={styles.horizontalPadding}
-        />
-      )}
-      data={searchResults.data ?? []}
-      ListEmptyComponent={
-        <EmptyResultsView
-          query={query}
-          reason={searchResults.status}
-          style={styles.horizontalPadding}
-        />
-      }
-    />
-  )
-}
+}: LocationSearchResultsListProps) => (
+  <KeyboardAwareFlatList
+    style={style}
+    contentContainerStyle={contentContainerStyle}
+    keyExtractor={keyExtractor}
+    ItemSeparatorComponent={ListItemSpacer}
+    ListHeaderComponent={
+      <View style={styles.horizontalPadding}>
+        {Header}
+        <CaptionTitle style={styles.searchResultsTitle}>
+          {query.sourceType === "user-recents" ? "Recents" : "Results"}
+        </CaptionTitle>
+      </View>
+    }
+    renderItem={({ item }) => (
+      <SearchResultView
+        result={item}
+        distanceMiles={
+          center
+            ? coordinateDistance(center, item.location.coordinate, "miles")
+            : undefined
+        }
+        style={styles.horizontalPadding}
+      />
+    )}
+    data={searchResults.data ?? []}
+    ListEmptyComponent={
+      <EmptyResultsView
+        query={query}
+        reason={searchResults.status}
+        style={styles.horizontalPadding}
+      />
+    }
+  />
+)
+
+const ListItemSpacer = () => <View style={styles.separator} />
 
 const keyExtractor = (result: LocationSearchResult) => {
   return hashCoordinate(result.location.coordinate)
@@ -91,7 +83,7 @@ const keyExtractor = (result: LocationSearchResult) => {
 
 type EmptyResultsProps = {
   query: LocationsSearchQueryText
-  reason: LocationSearchResultsData["status"]
+  reason: LocationSearchLoadingResult["status"]
   style?: StyleProp<ViewStyle>
 }
 

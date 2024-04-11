@@ -6,6 +6,7 @@ import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
 import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { LocationSearchResult } from "./SearchClient"
+import { RecentLocationAnnotation } from "@location/Recents"
 
 export type LocationSearchResultProps = {
   result: LocationSearchResult
@@ -64,13 +65,10 @@ export const LocationSearchResultView = ({
 }
 
 const ANNOTATION_MESSAGES = {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   "attended-event": "You attended an event here recently.",
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   "hosted-event": "You hosted an event here recently.",
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   "joined-event": "You joined an event here recently."
-}
+} satisfies Record<RecentLocationAnnotation, string>
 
 const styles = StyleSheet.create({
   container: {
