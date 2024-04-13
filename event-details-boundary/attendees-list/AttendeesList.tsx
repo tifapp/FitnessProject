@@ -1,9 +1,10 @@
 import { TiFAPI } from "TiFShared/api"
 import { Headline } from "@components/Text"
 import { useInfiniteQuery } from "@tanstack/react-query"
-import React from "react"
+import React, { useMemo } from "react"
 import { FlatList, StyleProp, View, ViewStyle } from "react-native"
 import { EventAttendee } from "TiFShared/domain-models/Event"
+import { EventAttendeesList } from "./EventAttendeesList"
 
 export type EventAttendeesPage = {
   attendees: EventAttendee[]
@@ -50,10 +51,8 @@ export type UseAttendeesListResult =
   | { status: "loading" }
   | {
       status: "success"
-      host: EventAttendee
-      attendees: EventAttendee[]
       fetchNextGroup?: () => void
-      totalAttendeeCount: number
+      attendeesList: EventAttendeesList
       refresh: () => void
       isRefetching: boolean
       isFetchingNextPage: boolean
@@ -74,13 +73,17 @@ export const useAttendeesList = ({
   eventId,
   pageSize
 }: UseAttendeesListProps): UseAttendeesListResult => {
-  const infiniteAttendeesQuery = useInfiniteQuery<EventAttendeesPage, Error>({
+  const infiniteAttendeesQuery = useInfiniteQuery({
     queryKey: ["eventAttendees", eventId],
     queryFn: async ({ pageParam }) => {
       return await fetchNextAttendeesPage(eventId, pageSize, pageParam)
     },
     getNextPageParam: (lastPage) => lastPage.nextPageCursor
   })
+  const attendeesList = useMemo(
+    () => new EventAttendeesList(infiniteAttendeesQuery.data?.pages ?? []),
+    [infiniteAttendeesQuery.data?.pages]
+  )
   if (infiniteAttendeesQuery.status === "loading") {
     return {
       status: "loading"
@@ -95,25 +98,16 @@ export const useAttendeesList = ({
     }
   }
 
+  const fetchNextGroup = () => {
+    infiniteAttendeesQuery.fetchNextPage()
+  }
+
   return {
     ...infiniteAttendeesQuery,
-    host: infiniteAttendeesQuery.data.pages[0].attendees[0],
-    attendees:
-      infiniteAttendeesQuery.data?.pages
-        .map((page, index) => {
-          if (index === 0) return page.attendees.slice(1)
-          return page.attendees
-        })
-        .flat() ?? [],
+    attendeesList,
     fetchNextGroup: infiniteAttendeesQuery.hasNextPage
-      ? () => {
-          infiniteAttendeesQuery.fetchNextPage()
-        }
+      ? fetchNextGroup
       : undefined,
-    totalAttendeeCount:
-      infiniteAttendeesQuery.data?.pages[
-        infiniteAttendeesQuery.data.pages.length - 1
-      ].totalAttendeeCount,
     refresh: () => {
       infiniteAttendeesQuery.refetch()
     }
