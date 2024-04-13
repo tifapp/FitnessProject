@@ -1,7 +1,8 @@
-import { EventAttendeeMocks } from "../MockData"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
+import { EventAttendeeMocks } from "../MockData"
 import { EventAttendeesPage, useAttendeesList } from "./AttendeesList"
+import { EventAttendeesList } from "./EventAttendeesList"
 
 describe("AttendeesList tests", () => {
   beforeEach(() => jest.resetAllMocks())
@@ -23,7 +24,8 @@ describe("AttendeesList tests", () => {
     it("loads first page correctly", async () => {
       const mockData = {
         attendees: [EventAttendeeMocks.Alivs, EventAttendeeMocks.AnnaAttendee],
-        totalAttendeeCount: 2
+        totalAttendeeCount: 2,
+        nextPageCursor: null
       }
       fetchNextAttendeesPage.mockResolvedValueOnce(mockData)
       const { result } = renderUseAttendeesList(11, 15)
@@ -35,9 +37,7 @@ describe("AttendeesList tests", () => {
       expect(fetchNextAttendeesPage).toHaveBeenCalledWith(11, 15, undefined)
       expect(fetchNextAttendeesPage).toHaveBeenCalledTimes(1)
       expect(result.current).toMatchObject({
-        host: EventAttendeeMocks.Alivs,
-        attendees: [EventAttendeeMocks.AnnaAttendee],
-        totalAttendeeCount: 2
+        attendeesList: new EventAttendeesList([mockData])
       })
     })
     it("loads multiple pages correctly", async () => {
@@ -77,14 +77,8 @@ describe("AttendeesList tests", () => {
       expect(fetchNextAttendeesPage).toHaveBeenCalledTimes(2)
       await waitFor(() =>
         expect(result.current).toMatchObject({
-          host: EventAttendeeMocks.Alivs,
-          attendees: [
-            EventAttendeeMocks.AnnaAttendee,
-            EventAttendeeMocks.BlobJr,
-            EventAttendeeMocks.BlobSr
-          ],
-          fetchNextGroup: undefined,
-          totalAttendeeCount: 10
+          attendeesList: new EventAttendeesList([mockData, mockData2]),
+          fetchNextGroup: undefined
         })
       )
     })
@@ -112,8 +106,7 @@ describe("AttendeesList tests", () => {
 
       await waitFor(() =>
         expect(result.current).toMatchObject({
-          host: EventAttendeeMocks.Alivs,
-          attendees: [EventAttendeeMocks.AnnaAttendee]
+          attendeesList: new EventAttendeesList([mockData])
         })
       )
     })
@@ -133,10 +126,8 @@ describe("AttendeesList tests", () => {
       await waitFor(() => expect(result.current.status).toEqual("success"))
 
       expect(result.current).toMatchObject({
-        host: EventAttendeeMocks.Alivs,
-        attendees: [EventAttendeeMocks.AnnaAttendee]
+        attendeesList: new EventAttendeesList([mockData])
       })
-
       let resolveFetch: ((page: EventAttendeesPage) => void) | undefined
       const fetchPromise = new Promise<EventAttendeesPage>(
         (resolve) => (resolveFetch = resolve)
@@ -156,10 +147,8 @@ describe("AttendeesList tests", () => {
       expect(fetchNextAttendeesPage).toHaveBeenCalledTimes(2)
 
       expect(result.current).toMatchObject({
-        host: EventAttendeeMocks.BlobJr,
-        attendees: [EventAttendeeMocks.BlobSr],
-        fetchNextGroup: undefined,
-        totalAttendeeCount: 10
+        attendeesList: new EventAttendeesList([mockData2]),
+        fetchNextGroup: undefined
       })
     })
   })

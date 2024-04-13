@@ -1,9 +1,9 @@
 import { TiFAPI } from "@api-client/TiFAPI"
-import { Headline } from "@components/Text"
 import { EventAttendee } from "@shared-models/Event"
 import { useInfiniteQuery } from "@tanstack/react-query"
-import React from "react"
-import { FlatList, StyleProp, View, ViewStyle } from "react-native"
+import { useMemo } from "react"
+import { StyleProp, ViewStyle } from "react-native"
+import { EventAttendeesList } from "./EventAttendeesList"
 
 export type EventAttendeesPage = {
   attendees: EventAttendee[]
@@ -50,37 +50,39 @@ export type UseAttendeesListResult =
   | { status: "loading" }
   | {
       status: "success"
-      host: EventAttendee
-      attendees: EventAttendee[]
       fetchNextGroup?: () => void
-      totalAttendeeCount: number
+      attendeesList: EventAttendeesList
       refresh: () => void
       isRefetching: boolean
       isFetchingNextPage: boolean
     }
 
-export type UseAttendeesListProps =
-{
-  fetchNextAttendeesPage:
-  (
+export type UseAttendeesListProps = {
+  fetchNextAttendeesPage: (
     eventId: number,
     pageSize: number,
     nextPageCursor?: string
-  ) => Promise<EventAttendeesPage>,
-  eventId: number,
+  ) => Promise<EventAttendeesPage>
+  eventId: number
   pageSize: number
 }
 
 export const useAttendeesList = ({
-  fetchNextAttendeesPage, eventId, pageSize
+  fetchNextAttendeesPage,
+  eventId,
+  pageSize
 }: UseAttendeesListProps): UseAttendeesListResult => {
-  const infiniteAttendeesQuery = useInfiniteQuery<EventAttendeesPage, Error>({
+  const infiniteAttendeesQuery = useInfiniteQuery({
     queryKey: ["eventAttendees", eventId],
     queryFn: async ({ pageParam }) => {
       return await fetchNextAttendeesPage(eventId, pageSize, pageParam)
     },
     getNextPageParam: (lastPage) => lastPage.nextPageCursor
   })
+  const attendeesList = useMemo(
+    () => new EventAttendeesList(infiniteAttendeesQuery.data?.pages ?? []),
+    [infiniteAttendeesQuery.data?.pages]
+  )
   if (infiniteAttendeesQuery.status === "loading") {
     return {
       status: "loading"
@@ -95,25 +97,16 @@ export const useAttendeesList = ({
     }
   }
 
+  const fetchNextGroup = () => {
+    infiniteAttendeesQuery.fetchNextPage()
+  }
+
   return {
     ...infiniteAttendeesQuery,
-    host: infiniteAttendeesQuery.data.pages[0].attendees[0],
-    attendees:
-      infiniteAttendeesQuery.data?.pages
-        .map((page, index) => {
-          if (index === 0) return page.attendees.slice(1)
-          return page.attendees
-        })
-        .flat() ?? [],
+    attendeesList,
     fetchNextGroup: infiniteAttendeesQuery.hasNextPage
-      ? () => {
-        infiniteAttendeesQuery.fetchNextPage()
-      }
+      ? fetchNextGroup
       : undefined,
-    totalAttendeeCount:
-      infiniteAttendeesQuery.data?.pages[
-        infiniteAttendeesQuery.data.pages.length - 1
-      ].totalAttendeeCount,
     refresh: () => {
       infiniteAttendeesQuery.refetch()
     }
@@ -124,36 +117,7 @@ export type AttendeesListViewProps = {
   renderAttendee: (eventAttendee: EventAttendee) => JSX.Element
   ListHeaderComponent?: JSX.Element
   style?: StyleProp<ViewStyle>
-} & Omit<Extract<ReturnType<typeof useAttendeesList>, { status: "success" }>, "status" | "host" | "isFetchingNextPage">
-
-export const AttendeesListView = ({
-  attendees,
-  totalAttendeeCount,
-  isRefetching,
-  renderAttendee,
-  refresh,
-  fetchNextGroup,
-  ListHeaderComponent,
-  style
-}: AttendeesListViewProps) => {
-  return (
-    <FlatList
-      style={style}
-      refreshing={isRefetching}
-      ListHeaderComponent={
-        <View>
-          {ListHeaderComponent}
-          <View>
-            <Headline> Attendees </Headline>
-            <Headline> ({totalAttendeeCount})</Headline>
-          </View>
-        </View>
-      }
-      data={attendees}
-      onRefresh={refresh}
-      keyExtractor={(item) => `attendee-${item.id}`}
-      renderItem={({ item }) => renderAttendee(item)}
-      onEndReached={fetchNextGroup}
-    />
-  )
-}
+} & Omit<
+  Extract<ReturnType<typeof useAttendeesList>, { status: "success" }>,
+  "status" | "host" | "isFetchingNextPage"
+>
