@@ -102,7 +102,9 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     expect(callback).toHaveBeenCalledTimes(1)
 
     performArrivalsOperation.mockResolvedValueOnce(
-      EventArrivals.fromRegions([arrivalRegion(arrival, true)])
+      EventArrivals.fromRegions([
+        arrivalRegion({ ...arrival, hasArrived: true })
+      ])
     )
     geofencer.sendUpdate({ ...arrival, hasArrived: true })
     await waitFor(() => {
@@ -161,8 +163,8 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
 
     performArrivalsOperation.mockResolvedValueOnce(
       EventArrivals.fromRegions([
-        arrivalRegion(arrivals[0], true),
-        arrivalRegion(arrivals[1], true)
+        arrivalRegion({ ...arrivals[0], hasArrived: true }),
+        arrivalRegion({ ...arrivals[1], hasArrived: true })
       ])
     )
     geofencer.sendUpdate({ ...arrivals[0], hasArrived: true })
@@ -190,7 +192,9 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     await waitFor(() => expect(callback).toHaveBeenCalledWith(true))
 
     performArrivalsOperation.mockResolvedValueOnce(
-      EventArrivals.fromRegions([arrivalRegion(arrivals[0], false)])
+      EventArrivals.fromRegions([
+        arrivalRegion({ ...arrivals[0], hasArrived: false })
+      ])
     )
     geofencer.sendUpdate({ ...arrivals[1], hasArrived: true })
     await waitFor(() => {
@@ -228,7 +232,9 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     })
 
     performArrivalsOperation.mockResolvedValueOnce(
-      EventArrivals.fromRegions([arrivalRegion(arrival, true)])
+      EventArrivals.fromRegions([
+        arrivalRegion({ ...arrival, hasArrived: true })
+      ])
     )
     geofencer.sendUpdate({ ...arrival, hasArrived: true })
     await waitFor(() => expect(callback).toHaveBeenNthCalledWith(2, true))
@@ -254,8 +260,8 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
 
     performArrivalsOperation.mockResolvedValueOnce(
       EventArrivals.fromRegions([
-        arrivalRegion(arrivals[0], false),
-        arrivalRegion(arrivals[1], true)
+        arrivalRegion({ ...arrivals[0], hasArrived: false }),
+        arrivalRegion({ ...arrivals[1], hasArrived: true })
       ])
     )
     geofencer.sendUpdate({ ...arrivals[1], hasArrived: true })
@@ -279,8 +285,8 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
 
     performArrivalsOperation.mockResolvedValueOnce(
       EventArrivals.fromRegions([
-        arrivalRegion(arrivals[0], false),
-        arrivalRegion(arrivals[1], true)
+        arrivalRegion({ ...arrivals[0], hasArrived: false }),
+        arrivalRegion({ ...arrivals[1], hasArrived: true })
       ])
     )
     geofencer.sendUpdate({ ...arrivals[1], hasArrived: true })
@@ -291,8 +297,8 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
 
     performArrivalsOperation.mockResolvedValueOnce(
       EventArrivals.fromRegions([
-        arrivalRegion(arrivals[0], true),
-        arrivalRegion(arrivals[1], false)
+        arrivalRegion({ ...arrivals[0], hasArrived: true }),
+        arrivalRegion({ ...arrivals[1], hasArrived: false })
       ])
     )
     geofencer.sendUpdate({ ...arrivals[0], hasArrived: true })
@@ -311,7 +317,9 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     unsub()
 
     performArrivalsOperation.mockResolvedValueOnce(
-      EventArrivals.fromRegions([arrivalRegion(arrival, true)])
+      EventArrivals.fromRegions([
+        arrivalRegion({ ...arrival, hasArrived: true })
+      ])
     )
     geofencer.sendUpdate({ ...arrival, hasArrived: true })
     await verifyNeverOccurs(() => {

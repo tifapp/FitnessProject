@@ -22,16 +22,12 @@ export type EventArrival = Omit<EventArrivalRegion, "eventIds"> & {
  * {@link EventArrival} as a single element in the initial array of `eventIds`.
  *
  * @param arrival See {@link EventArrival}
- * @param hasArrived Whether or not to mark the initial state as arrived.
  */
-export const arrivalRegion = (
-  arrival: EventArrival,
-  hasArrived?: boolean
-): EventArrivalRegion => ({
+export const arrivalRegion = (arrival: EventArrival): EventArrivalRegion => ({
   eventIds: [arrival.eventId],
   coordinate: arrival.coordinate,
   arrivalRadiusMeters: arrival.arrivalRadiusMeters,
-  hasArrived: hasArrived ?? arrival.hasArrived
+  hasArrived: arrival.hasArrived
 })
 
 const removeDuplicateArrivals = (arrivals: EventArrival[]) => {
