@@ -1,5 +1,6 @@
 export * from "./Tracker"
-export * from "./UpcomingArrivals"
+export * from "./Storage"
+export * from "./Arrivals"
 export * from "./Refresh"
 export * from "./ArrivalsOperation"
 export * from "./region-monitoring"
