@@ -16,7 +16,8 @@ import { logger } from "TiFShared/logging"
 import {
   EventArrival,
   removeDuplicateArrivals,
-  arrivalRegion
+  arrivalRegion,
+  EventArrivals
 } from "./Arrivals"
 
 const log = logger("event.arrivals.tracker")
@@ -173,6 +174,14 @@ export class EventArrivalsTracker {
     ) => Promise<EventArrivalRegion[]> | EventArrivalRegion[]
   ) {
     await this.replaceRegions(await work(await this.upcomingArrivals.all()))
+  }
+
+  async transformArrivals(
+    work: (arrivals: EventArrivals) => Promise<EventArrivals> | EventArrivals
+  ) {
+    const regions = await this.upcomingArrivals.all()
+    const arrivals = await work(EventArrivals.fromRegions(regions))
+    await this.replaceRegions(arrivals.regions)
   }
 
   private updateGeofencingSubscription(arrivals: EventArrivalRegion[]) {
