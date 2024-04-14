@@ -11,12 +11,13 @@ import { TestEventArrivalsGeofencer } from "./geofencing/TestGeofencer"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 import { repeatElements } from "TiFShared/lib/Array"
-import { EventArrivalRegion } from "TiFShared/domain-models/Event"
 import {
   addTestArrivals,
+  expectOrderInsensitiveEventArrivals,
   regionWithArrivalData,
   removeTestArrivals
 } from "./TestHelpers"
+import { EventArrivals } from "./Arrivals"
 
 describe("EventArrivalsTracker tests", () => {
   const upcomingArrivals = new SQLiteUpcomingEventArrivals(testSQLite)
@@ -36,21 +37,23 @@ describe("EventArrivalsTracker tests", () => {
   })
 
   test("refresh arrivals", async () => {
-    const regions = repeatElements(2, () => {
-      return mockEventArrivalRegion()
-    })
-    await tracker.refreshArrivals(jest.fn().mockResolvedValueOnce(regions))
-    await expectTrackedRegions(regions)
+    const arrivals = EventArrivals.fromRegions(
+      repeatElements(2, () => mockEventArrivalRegion())
+    )
+    await tracker.refreshArrivals(jest.fn().mockResolvedValueOnce(arrivals))
+    await expectTrackedArrivals(arrivals)
   })
 
   test("transform arrivals", async () => {
     const arrival = mockEventArrival()
-    await tracker.transformArrivals((arrivals) =>
+    await tracker.transformTrackedArrivals((arrivals) =>
       arrivals.addArrivals([arrival])
     )
-    await expectTrackedRegions([
-      regionWithArrivalData([arrival.eventId], arrival)
-    ])
+    await expectTrackedArrivals(
+      EventArrivals.fromRegions([
+        regionWithArrivalData([arrival.eventId], arrival)
+      ])
+    )
   })
 
   test("does not subscribe to geofencing updates when no tracked arrivals", async () => {
@@ -118,7 +121,7 @@ describe("EventArrivalsTracker tests", () => {
     performArrivalOperation.mockResolvedValueOnce(newRegions)
     await addTestArrivals(tracker, mockEventArrival())
     testGeofencer.sendUpdate(mockEventArrivalGeofencedRegion())
-    await expectTrackedRegions(newRegions)
+    await expectTrackedArrivals(EventArrivals.fromRegions(newRegions))
   })
 
   test("publishes update after performing an arrivals operation", async () => {
@@ -137,7 +140,10 @@ describe("EventArrivalsTracker tests", () => {
     }
     testGeofencer.sendUpdate(geofencedRegion)
     await waitFor(() => {
-      expect(callback).toHaveBeenNthCalledWith(2, newRegions)
+      expectOrderInsensitiveEventArrivals(
+        callback.mock.lastCall[0],
+        EventArrivals.fromRegions(newRegions)
+      )
     })
     expect(callback).toHaveBeenCalledTimes(2)
   })
@@ -172,25 +178,26 @@ describe("EventArrivalsTracker tests", () => {
     await subscription.waitForInitialRegionsToLoad()
     callback.mockReset()
     await addTestArrivals(tracker, arrival)
-    await waitFor(() => expect(callback).toHaveBeenCalledWith([]))
+    await waitFor(() =>
+      expect(callback).toHaveBeenCalledWith(new EventArrivals())
+    )
     expect(callback).toHaveBeenCalledTimes(1)
   })
 
-  const expectTrackedRegions = async (regions: EventArrivalRegion[]) => {
+  const expectTrackedArrivals = async (arrivals: EventArrivals) => {
     await waitFor(async () => {
-      const upcoming = await upcomingArrivals.all()
-      expect(upcoming).toEqual(expect.arrayContaining(regions))
-      expect(upcoming).toHaveLength(regions.length)
+      const trackedArrivals = await tracker.trackedArrivals()
+      expectOrderInsensitiveEventArrivals(trackedArrivals, arrivals)
     })
     expect(testGeofencer.geofencedRegions).toMatchObject(
-      expect.arrayContaining(regions)
+      expect.arrayContaining(arrivals.regions)
     )
-    expect(testGeofencer.geofencedRegions).toHaveLength(regions.length)
+    expect(testGeofencer.geofencedRegions).toHaveLength(arrivals.regions.length)
 
     const callback = jest.fn()
     const subscription = tracker.subscribe(callback)
     await subscription.waitForInitialRegionsToLoad()
-    expect(callback).toHaveBeenCalledWith(expect.arrayContaining(regions))
+    expectOrderInsensitiveEventArrivals(callback.mock.lastCall[0], arrivals)
     expect(callback).toHaveBeenCalledTimes(1)
   }
 })

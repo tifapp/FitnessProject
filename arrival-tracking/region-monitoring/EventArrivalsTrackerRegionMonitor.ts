@@ -97,8 +97,8 @@ export class EventArrivalsTrackerRegionMonitor implements EventRegionMonitor {
     if (this.trackerSubscription) {
       return this.trackerSubscription
     }
-    const trackerSubscription = this.tracker.subscribe((regions) => {
-      this.publishPossibleRegionUpdates(regions)
+    const trackerSubscription = this.tracker.subscribe((arrivals) => {
+      this.publishPossibleRegionUpdates(arrivals.regions)
     })
     this.trackerSubscription = trackerSubscription
     return trackerSubscription

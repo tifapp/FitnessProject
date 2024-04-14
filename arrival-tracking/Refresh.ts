@@ -3,6 +3,7 @@ import { EventArrivalsTracker } from "./Tracker"
 import { TiFAPI } from "TiFShared/api"
 import { InternalMetricsStorage } from "@settings-storage/InternalMetrics"
 import { now } from "TiFShared/lib/Dayjs"
+import { EventArrivals } from "./Arrivals"
 
 /**
  * A class that manages refreshing of upcoming event arrivals.
@@ -36,7 +37,7 @@ export class EventArrivalsRefresher {
       async () => {
         await tracker.refreshArrivals(async () => {
           const resp = await tifAPI.upcomingEventArrivalRegions()
-          return resp.data.trackableRegions
+          return EventArrivals.fromRegions(resp.data.trackableRegions)
         })
       },
       internalMetrics,

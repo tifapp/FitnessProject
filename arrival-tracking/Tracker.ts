@@ -32,7 +32,7 @@ export class EventArrivalsTracker {
   private readonly performArrivalsOperation: PerformArrivalsOperation
 
   private unsubscribeFromGeofencing?: EventArrivalGeofencingUnsubscribe
-  private callbacks = new CallbackCollection<EventArrivalRegion[]>()
+  private callbacks = new CallbackCollection<EventArrivals>()
 
   constructor(
     upcomingArrivals: UpcomingEventArrivals,
@@ -45,6 +45,14 @@ export class EventArrivalsTracker {
   }
 
   /**
+   * Returns an instance of {@link EventArrivals} based on the current arrivals
+   * stored in this tracker.
+   */
+  async trackedArrivals() {
+    return EventArrivals.fromRegions(await this.upcomingArrivals.all())
+  }
+
+  /**
    * Replaces all existing {@link EventArrivalRegion}s held by this tracker.
    *
    * If this method throws, then all events are removed from the tracker, and
@@ -53,17 +61,17 @@ export class EventArrivalsTracker {
    * no region is being geofenced properly, likely due to background location
    * permissions being disabled.
    */
-  async replaceRegions(regions: EventArrivalRegion[]) {
+  async replaceArrivals(arrivals: EventArrivals) {
     try {
       await Promise.all([
-        this.geofencer.replaceGeofencedRegions(regions),
-        this.upcomingArrivals.replaceAll(regions)
+        this.geofencer.replaceGeofencedRegions(arrivals.regions),
+        this.upcomingArrivals.replaceAll(arrivals.regions)
       ])
-      this.updateGeofencingSubscription(regions)
-      this.callbacks.send(regions)
+      this.updateGeofencingSubscription(arrivals.regions)
+      this.callbacks.send(arrivals)
     } catch (e) {
       log.error("Failed to replace regions", { message: e.message })
-      this.callbacks.send([])
+      this.callbacks.send(new EventArrivals())
     }
   }
 
@@ -72,10 +80,8 @@ export class EventArrivalsTracker {
    *
    * @param fetchUpcomingArrivals a function to fetch the upcoming {@link EventArrival}s.
    */
-  async refreshArrivals(
-    fetchUpcomingArrivals: () => Promise<EventArrivalRegion[]>
-  ) {
-    await this.replaceRegions(await fetchUpcomingArrivals())
+  async refreshArrivals(fetchUpcomingArrivals: () => Promise<EventArrivals>) {
+    await this.replaceArrivals(await fetchUpcomingArrivals())
   }
 
   /**
@@ -99,22 +105,25 @@ export class EventArrivalsTracker {
    * Subscribes to changes in the tracked regions.
    */
   subscribe(
-    callback: (regions: EventArrivalRegion[]) => void
+    callback: (regions: EventArrivals) => void
   ): EventArrivalsTrackerSubscription {
     const unsubscribe = this.callbacks.add(callback)
-    const initial = this.upcomingArrivals.all().then(callback)
+    const initial = this.trackedArrivals().then(callback)
     return {
       waitForInitialRegionsToLoad: () => initial,
       unsubscribe
     }
   }
 
-  async transformArrivals(
+  /**
+   * Updates the arrivals in this tracker based on a transformation function
+   * on the current {@link EventArrivals} stored in this tracker.
+   */
+  async transformTrackedArrivals(
     work: (arrivals: EventArrivals) => Promise<EventArrivals> | EventArrivals
   ) {
     const regions = await this.upcomingArrivals.all()
-    const arrivals = await work(EventArrivals.fromRegions(regions))
-    await this.replaceRegions(arrivals.regions)
+    await this.replaceArrivals(await work(EventArrivals.fromRegions(regions)))
   }
 
   private updateGeofencingSubscription(arrivals: EventArrivalRegion[]) {
@@ -131,6 +140,6 @@ export class EventArrivalsTracker {
       update,
       update.hasArrived ? "arrived" : "departed"
     )
-    await this.replaceRegions(upcomingArrivals)
+    await this.replaceArrivals(EventArrivals.fromRegions(upcomingArrivals))
   }
 }
