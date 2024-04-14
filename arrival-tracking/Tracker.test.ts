@@ -115,20 +115,20 @@ describe("EventArrivalsTracker tests", () => {
   })
 
   test("replaces all tracked regions when performing an arrivals operation", async () => {
-    const newRegions = repeatElements(3, () => {
-      return mockEventArrivalRegion()
-    })
-    performArrivalOperation.mockResolvedValueOnce(newRegions)
+    const newArrivals = EventArrivals.fromRegions(
+      repeatElements(3, () => mockEventArrivalRegion())
+    )
+    performArrivalOperation.mockResolvedValueOnce(newArrivals)
     await addTestArrivals(tracker, mockEventArrival())
     testGeofencer.sendUpdate(mockEventArrivalGeofencedRegion())
-    await expectTrackedArrivals(EventArrivals.fromRegions(newRegions))
+    await expectTrackedArrivals(newArrivals)
   })
 
   test("publishes update after performing an arrivals operation", async () => {
-    const newRegions = repeatElements(3, () => {
-      return mockEventArrivalRegion()
-    })
-    performArrivalOperation.mockResolvedValueOnce(newRegions)
+    const newArrivals = EventArrivals.fromRegions(
+      repeatElements(3, () => mockEventArrivalRegion())
+    )
+    performArrivalOperation.mockResolvedValueOnce(newArrivals)
     await addTestArrivals(tracker, mockEventArrival())
     const callback = jest.fn()
     tracker.subscribe(callback)
@@ -142,14 +142,16 @@ describe("EventArrivalsTracker tests", () => {
     await waitFor(() => {
       expectOrderInsensitiveEventArrivals(
         callback.mock.lastCall[0],
-        EventArrivals.fromRegions(newRegions)
+        newArrivals
       )
     })
     expect(callback).toHaveBeenCalledTimes(2)
   })
 
   test("does not publish update after unsubscribing from arrivals operation updates", async () => {
-    performArrivalOperation.mockResolvedValueOnce([mockEventArrivalRegion()])
+    performArrivalOperation.mockResolvedValueOnce(
+      EventArrivals.fromRegions([mockEventArrivalRegion()])
+    )
     await addTestArrivals(tracker, mockEventArrival())
     const callback = jest.fn()
     const subscription = tracker.subscribe(callback)

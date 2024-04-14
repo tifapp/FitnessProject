@@ -137,6 +137,6 @@ export class EventArrivalsTracker {
       update,
       update.hasArrived ? "arrived" : "departed"
     )
-    await this.replaceArrivals(EventArrivals.fromRegions(upcomingArrivals))
+    await this.replaceArrivals(upcomingArrivals)
   }
 }
