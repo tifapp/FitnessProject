@@ -8,17 +8,9 @@ import {
 
 import { PerformArrivalsOperation } from "./ArrivalsOperation"
 import { CallbackCollection } from "@lib/utils/CallbackCollection"
-import {
-  EventArrivalRegion,
-  areEventRegionsEqual
-} from "TiFShared/domain-models/Event"
+import { EventArrivalRegion } from "TiFShared/domain-models/Event"
 import { logger } from "TiFShared/logging"
-import {
-  EventArrival,
-  removeDuplicateArrivals,
-  arrivalRegion,
-  EventArrivals
-} from "./Arrivals"
+import { EventArrivals } from "./Arrivals"
 
 const log = logger("event.arrivals.tracker")
 
@@ -87,57 +79,6 @@ export class EventArrivalsTracker {
   }
 
   /**
-   * Adds an {@link EventArrival} to tracking.
-   *
-   * If an arrival exists with the same event id, then that arrival is updated instead of added.
-   */
-  async trackArrival(newArrival: EventArrival) {
-    await this.trackArrivals([newArrival])
-  }
-
-  async trackArrivals(newArrivals: EventArrival[]) {
-    await this.transformAllUpcomingArrivals((regions) => {
-      const deduplicatedArrivals = removeDuplicateArrivals(newArrivals)
-      const newRegions = this.removeByEventIdsTransform(
-        new Set(deduplicatedArrivals.map((arrival) => arrival.eventId)),
-        regions
-      )
-      for (const arrival of deduplicatedArrivals) {
-        const regionIndex = newRegions.findIndex((region) => {
-          return areEventRegionsEqual(region, arrival)
-        })
-        if (regionIndex === -1) {
-          newRegions.push(arrivalRegion(arrival, false))
-        } else {
-          newRegions[regionIndex].eventIds.push(arrival.eventId)
-        }
-      }
-      return newRegions
-    })
-  }
-
-  async removeArrivalByEventId(eventId: number) {
-    await this.removeArrivalsByEventIds(new Set([eventId]))
-  }
-
-  async removeArrivalsByEventIds(eventIds: Set<number>) {
-    await this.transformAllUpcomingArrivals((regions) => {
-      return this.removeByEventIdsTransform(eventIds, regions)
-    })
-  }
-
-  private removeByEventIdsTransform(
-    eventIds: Set<number>,
-    regions: EventArrivalRegion[]
-  ) {
-    return regions.ext.compactMap((region) => {
-      const newEventIds = region.eventIds.filter((id) => !eventIds.has(id))
-      if (newEventIds.length === 0) return undefined
-      return { ...region, eventIds: newEventIds }
-    })
-  }
-
-  /**
    * Starts tracking if there is at least 1 upcoming event arrival.
    */
   async startTracking() {
@@ -166,14 +107,6 @@ export class EventArrivalsTracker {
       waitForInitialRegionsToLoad: () => initial,
       unsubscribe
     }
-  }
-
-  private async transformAllUpcomingArrivals(
-    work: (
-      regions: EventArrivalRegion[]
-    ) => Promise<EventArrivalRegion[]> | EventArrivalRegion[]
-  ) {
-    await this.replaceRegions(await work(await this.upcomingArrivals.all()))
   }
 
   async transformArrivals(

@@ -12,6 +12,11 @@ import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 import { repeatElements } from "TiFShared/lib/Array"
 import { EventArrivalRegion } from "TiFShared/domain-models/Event"
+import {
+  addTestArrivals,
+  regionWithArrivalData,
+  removeTestArrivals
+} from "./TestHelpers"
 
 describe("EventArrivalsTracker tests", () => {
   const upcomingArrivals = new SQLiteUpcomingEventArrivals(testSQLite)
@@ -44,12 +49,7 @@ describe("EventArrivalsTracker tests", () => {
       arrivals.addArrivals([arrival])
     )
     await expectTrackedRegions([
-      {
-        eventIds: [arrival.eventId],
-        coordinate: arrival.coordinate,
-        arrivalRadiusMeters: arrival.arrivalRadiusMeters,
-        hasArrived: arrival.hasArrived
-      }
+      regionWithArrivalData([arrival.eventId], arrival)
     ])
   })
 
@@ -59,7 +59,7 @@ describe("EventArrivalsTracker tests", () => {
   })
 
   test("subscribes to geofencing updates when new instance detects previously tracked arrivals", async () => {
-    await tracker.trackArrival(mockEventArrival())
+    await addTestArrivals(tracker, mockEventArrival())
     tracker.stopTracking()
     expect(testGeofencer.hasSubscriber).toEqual(false)
     const tracker2 = new EventArrivalsTracker(
@@ -73,15 +73,15 @@ describe("EventArrivalsTracker tests", () => {
 
   test("unsubscribes from tracker when removing all tracked arrivals", async () => {
     const arrival = mockEventArrival()
-    await tracker.trackArrival(arrival)
+    await addTestArrivals(tracker, arrival)
     expect(testGeofencer.hasSubscriber).toEqual(true)
-    await tracker.removeArrivalByEventId(arrival.eventId)
+    await removeTestArrivals(tracker, arrival.eventId)
     expect(testGeofencer.hasSubscriber).toEqual(false)
   })
 
   test("handle geofencing update, does arrived operation for all arrivals when entering region", async () => {
     performArrivalOperation.mockImplementationOnce(neverPromise)
-    await tracker.trackArrival(mockEventArrival())
+    await addTestArrivals(tracker, mockEventArrival())
     const region = { ...mockEventArrivalGeofencedRegion(), hasArrived: true }
     testGeofencer.sendUpdate(region)
     await waitFor(() => {
@@ -97,7 +97,7 @@ describe("EventArrivalsTracker tests", () => {
 
   test("handle geofencing update, does departed operation for all arrivals when exiting region", async () => {
     performArrivalOperation.mockImplementationOnce(neverPromise)
-    await tracker.trackArrival(mockEventArrival())
+    await addTestArrivals(tracker, mockEventArrival())
     const region = { ...mockEventArrivalGeofencedRegion(), hasArrived: false }
     testGeofencer.sendUpdate(region)
     await waitFor(() => {
@@ -116,7 +116,7 @@ describe("EventArrivalsTracker tests", () => {
       return mockEventArrivalRegion()
     })
     performArrivalOperation.mockResolvedValueOnce(newRegions)
-    await tracker.trackArrival(mockEventArrival())
+    await addTestArrivals(tracker, mockEventArrival())
     testGeofencer.sendUpdate(mockEventArrivalGeofencedRegion())
     await expectTrackedRegions(newRegions)
   })
@@ -126,7 +126,7 @@ describe("EventArrivalsTracker tests", () => {
       return mockEventArrivalRegion()
     })
     performArrivalOperation.mockResolvedValueOnce(newRegions)
-    await tracker.trackArrival(mockEventArrival())
+    await addTestArrivals(tracker, mockEventArrival())
     const callback = jest.fn()
     tracker.subscribe(callback)
     await waitFor(() => expect(callback).toHaveBeenCalled())
@@ -144,7 +144,7 @@ describe("EventArrivalsTracker tests", () => {
 
   test("does not publish update after unsubscribing from arrivals operation updates", async () => {
     performArrivalOperation.mockResolvedValueOnce([mockEventArrivalRegion()])
-    await tracker.trackArrival(mockEventArrival())
+    await addTestArrivals(tracker, mockEventArrival())
     const callback = jest.fn()
     const subscription = tracker.subscribe(callback)
     await waitFor(() => expect(callback).toHaveBeenCalled())
@@ -171,7 +171,7 @@ describe("EventArrivalsTracker tests", () => {
     const subscription = tracker.subscribe(callback)
     await subscription.waitForInitialRegionsToLoad()
     callback.mockReset()
-    await tracker.trackArrival(arrival)
+    await addTestArrivals(tracker, arrival)
     await waitFor(() => expect(callback).toHaveBeenCalledWith([]))
     expect(callback).toHaveBeenCalledTimes(1)
   })

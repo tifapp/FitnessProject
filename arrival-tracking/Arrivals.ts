@@ -18,20 +18,6 @@ export type EventArrival = Omit<EventArrivalRegion, "eventIds"> & {
 }
 
 /**
- * Removes arrivals in the given array by whether or not they have the same event id.
- *
- * The latest occurrence of the last arrival is the one that remains.
- */
-export const removeDuplicateArrivals = (arrivals: EventArrival[]) => {
-  const idIndexMap = arrivals.reduce((acc, arrival, index) => {
-    return acc.set(arrival.eventId, index)
-  }, new Map<EventID, number>())
-  return arrivals.filter(
-    (arrival, index) => idIndexMap.get(arrival.eventId) === index
-  )
-}
-
-/**
  * Creates an {@link EventArrivalRegion} using the `eventId` from a given
  * {@link EventArrival} as a single element in the initial array of `eventIds`.
  *
@@ -47,6 +33,15 @@ export const arrivalRegion = (
   arrivalRadiusMeters: arrival.arrivalRadiusMeters,
   hasArrived: hasArrived ?? arrival.hasArrived
 })
+
+const removeDuplicateArrivals = (arrivals: EventArrival[]) => {
+  const idIndexMap = arrivals.reduce((acc, arrival, index) => {
+    return acc.set(arrival.eventId, index)
+  }, new Map<EventID, number>())
+  return arrivals.filter(
+    (arrival, index) => idIndexMap.get(arrival.eventId) === index
+  )
+}
 
 /**
  * An immutable collection that manages {@link EventArrival}s and their

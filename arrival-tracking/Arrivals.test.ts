@@ -4,6 +4,7 @@ import { repeatElements } from "TiFShared/lib/Array"
 import { EventArrival, EventArrivals, SyncableTrackableEvent } from "./Arrivals"
 import { EventID, EventUserAttendeeStatus } from "TiFShared/domain-models/Event"
 import { mockEventLocation } from "@event-details-boundary/MockData"
+import { regionWithArrivalData } from "./TestHelpers"
 
 describe("EventArrivals tests", () => {
   test("add arrival, basic", async () => {
@@ -238,16 +239,6 @@ describe("EventArrivals tests", () => {
       .addArrivals([initialArrival])
       .syncTrackableAttendingEvents([event, event2])
     expect(arrivals.regions).toEqual([regionWithEventData([2], event2)])
-  })
-
-  const regionWithArrivalData = (
-    eventIds: EventID[],
-    arrival: EventArrival
-  ) => ({
-    coordinate: arrival.coordinate,
-    hasArrived: arrival.hasArrived,
-    arrivalRadiusMeters: arrival.arrivalRadiusMeters,
-    eventIds
   })
 
   const regionWithEventData = (
