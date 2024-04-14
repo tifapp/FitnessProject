@@ -7,13 +7,17 @@ import {
 } from "./geofencing"
 
 import { PerformArrivalsOperation } from "./ArrivalsOperation"
-import { EventArrival, arrivalRegion, removeDuplicateArrivals } from "./Models"
 import { CallbackCollection } from "@lib/utils/CallbackCollection"
 import {
   EventArrivalRegion,
   areEventRegionsEqual
 } from "TiFShared/domain-models/Event"
 import { logger } from "TiFShared/logging"
+import {
+  EventArrival,
+  removeDuplicateArrivals,
+  arrivalRegion
+} from "./Arrivals"
 
 const log = logger("event.arrivals.tracker")
 
@@ -102,7 +106,7 @@ export class EventArrivalsTracker {
           return areEventRegionsEqual(region, arrival)
         })
         if (regionIndex === -1) {
-          newRegions.push(arrivalRegion(arrival))
+          newRegions.push(arrivalRegion(arrival, false))
         } else {
           newRegions[regionIndex].eventIds.push(arrival.eventId)
         }

@@ -1,11 +1,11 @@
 import { faker } from "@faker-js/faker"
 import { mockLocationCoordinate2D } from "@location/MockData"
-import { EventArrival } from "./Models"
 import { randomBool, randomFloatInRange } from "@lib/utils/Random"
 
 import { EventArrivalGeofencedRegion } from "./geofencing"
 import { repeatElements } from "TiFShared/lib/Array"
 import { EventArrivalRegion, EventRegion } from "TiFShared/domain-models/Event"
+import { EventArrival } from "./Arrivals"
 
 export const mockEventArrivalGeofencedRegion =
   (): EventArrivalGeofencedRegion => ({
