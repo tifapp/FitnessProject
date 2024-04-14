@@ -1,5 +1,5 @@
 /* eslint-disable func-call-spacing */
-import { UpcomingEventArrivals } from "./UpcomingArrivals"
+import { EventArrivalsStorage } from "./Storage"
 import {
   EventArrivalGeofencedRegion,
   EventArrivalGeofencingUnsubscribe,
@@ -8,7 +8,6 @@ import {
 
 import { PerformArrivalsOperation } from "./ArrivalsOperation"
 import { CallbackCollection } from "@lib/utils/CallbackCollection"
-import { EventArrivalRegion } from "TiFShared/domain-models/Event"
 import { logger } from "TiFShared/logging"
 import { EventArrivals } from "./Arrivals"
 
@@ -27,7 +26,7 @@ export interface EventArrivalsTrackerSubscription {
  * sources in sync on a consistent basis.
  */
 export class EventArrivalsTracker {
-  private readonly upcomingArrivals: UpcomingEventArrivals
+  private readonly storage: EventArrivalsStorage
   private readonly geofencer: EventArrivalsGeofencer
   private readonly performArrivalsOperation: PerformArrivalsOperation
 
@@ -35,11 +34,11 @@ export class EventArrivalsTracker {
   private callbacks = new CallbackCollection<EventArrivals>()
 
   constructor(
-    upcomingArrivals: UpcomingEventArrivals,
+    storage: EventArrivalsStorage,
     geofencer: EventArrivalsGeofencer,
     performArrivalsOperation: PerformArrivalsOperation
   ) {
-    this.upcomingArrivals = upcomingArrivals
+    this.storage = storage
     this.geofencer = geofencer
     this.performArrivalsOperation = performArrivalsOperation
   }
@@ -49,7 +48,7 @@ export class EventArrivalsTracker {
    * stored in this tracker.
    */
   async trackedArrivals() {
-    return EventArrivals.fromRegions(await this.upcomingArrivals.all())
+    return await this.storage.current()
   }
 
   /**
@@ -65,9 +64,9 @@ export class EventArrivalsTracker {
     try {
       await Promise.all([
         this.geofencer.replaceGeofencedRegions(arrivals.regions),
-        this.upcomingArrivals.replaceAll(arrivals.regions)
+        this.storage.replace(arrivals)
       ])
-      this.updateGeofencingSubscription(arrivals.regions)
+      this.updateGeofencingSubscription(arrivals)
       this.callbacks.send(arrivals)
     } catch (e) {
       log.error("Failed to replace regions", { message: e.message })
@@ -88,8 +87,7 @@ export class EventArrivalsTracker {
    * Starts tracking if there is at least 1 upcoming event arrival.
    */
   async startTracking() {
-    const arrivals = await this.upcomingArrivals.all()
-    this.updateGeofencingSubscription(arrivals)
+    this.updateGeofencingSubscription(await this.storage.current())
   }
 
   /**
@@ -122,13 +120,12 @@ export class EventArrivalsTracker {
   async transformTrackedArrivals(
     work: (arrivals: EventArrivals) => Promise<EventArrivals> | EventArrivals
   ) {
-    const regions = await this.upcomingArrivals.all()
-    await this.replaceArrivals(await work(EventArrivals.fromRegions(regions)))
+    await this.replaceArrivals(await work(await this.storage.current()))
   }
 
-  private updateGeofencingSubscription(arrivals: EventArrivalRegion[]) {
+  private updateGeofencingSubscription(arrivals: EventArrivals) {
     this.stopTracking()
-    if (arrivals.length > 0) {
+    if (arrivals.regions.length > 0) {
       this.unsubscribeFromGeofencing = this.geofencer.onUpdate((update) => {
         this.handleGeofencingUpdate(update)
       })

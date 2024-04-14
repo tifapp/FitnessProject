@@ -57,6 +57,13 @@ export class EventArrivals {
     return this._regions
   }
 
+  constructor(arrivals: EventArrival[] = []) {
+    // NB: Prevent stack overflow since fromRegions calls this
+    // with an empty array
+    if (arrivals.length === 0) return
+    this._regions = this.addArrivals(arrivals).regions
+  }
+
   static fromRegions(regions: EventArrivalRegion[]) {
     const arrivals = new EventArrivals()
     arrivals._regions = regions

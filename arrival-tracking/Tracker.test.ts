@@ -1,4 +1,4 @@
-import { SQLiteUpcomingEventArrivals } from "./UpcomingArrivals"
+import { SQLiteEventArrivalsStorage } from "./Storage"
 import { EventArrivalsTracker } from "./Tracker"
 import { waitFor } from "@testing-library/react-native"
 import {
@@ -20,7 +20,7 @@ import {
 import { EventArrivals } from "./Arrivals"
 
 describe("EventArrivalsTracker tests", () => {
-  const upcomingArrivals = new SQLiteUpcomingEventArrivals(testSQLite)
+  const upcomingArrivals = new SQLiteEventArrivalsStorage(testSQLite)
   resetTestSQLiteBeforeEach()
 
   const testGeofencer = new TestEventArrivalsGeofencer()

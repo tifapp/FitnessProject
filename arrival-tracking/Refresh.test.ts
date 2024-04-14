@@ -3,7 +3,7 @@ import { EventArrivalsRefresher } from "./Refresh"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 import { SQLiteInternalMetricsStorage } from "@settings-storage/InternalMetrics"
 import { EventArrivalsTracker } from "./Tracker"
-import { SQLiteUpcomingEventArrivals } from "./UpcomingArrivals"
+import { SQLiteEventArrivalsStorage } from "./Storage"
 import { TestEventArrivalsGeofencer } from "./geofencing/TestGeofencer"
 import { TiFAPI } from "TiFShared/api"
 import { mswServer } from "@test-helpers/msw"
@@ -94,7 +94,7 @@ describe("EventArrivalsRefresher tests", () => {
 
   test("refresh using tracker", async () => {
     const tracker = new EventArrivalsTracker(
-      new SQLiteUpcomingEventArrivals(testSQLite),
+      new SQLiteEventArrivalsStorage(testSQLite),
       new TestEventArrivalsGeofencer(),
       jest.fn()
     )

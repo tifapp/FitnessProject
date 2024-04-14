@@ -5,7 +5,7 @@ import { waitFor } from "@testing-library/react-native"
 import { mockEventArrival, mockEventRegion } from "../MockData"
 import { arrivalRegion } from "../Arrivals"
 import { EventArrivalsTracker } from "../Tracker"
-import { SQLiteUpcomingEventArrivals } from "../UpcomingArrivals"
+import { SQLiteEventArrivalsStorage } from "../Storage"
 import { TestEventArrivalsGeofencer } from "../geofencing/TestGeofencer"
 import { EventArrivalsTrackerRegionMonitor } from "./EventArrivalsTrackerRegionMonitor"
 import { ForegroundEventRegionMonitor } from "./ForegroundRegionMonitor"
@@ -19,7 +19,7 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
   const performArrivalsOperation = jest.fn()
   const geofencer = new TestEventArrivalsGeofencer()
   const tracker = new EventArrivalsTracker(
-    new SQLiteUpcomingEventArrivals(testSQLite),
+    new SQLiteEventArrivalsStorage(testSQLite),
     geofencer,
     performArrivalsOperation
   )

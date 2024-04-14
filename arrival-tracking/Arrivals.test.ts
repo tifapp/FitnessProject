@@ -1,7 +1,7 @@
 import { mockLocationCoordinate2D } from "@location/MockData"
 import { mockEventArrival, mockEventArrivalRegion } from "./MockData"
 import { repeatElements } from "TiFShared/lib/Array"
-import { EventArrival, EventArrivals, SyncableTrackableEvent } from "./Arrivals"
+import { EventArrivals, SyncableTrackableEvent } from "./Arrivals"
 import { EventID, EventUserAttendeeStatus } from "TiFShared/domain-models/Event"
 import { mockEventLocation } from "@event-details-boundary/MockData"
 import { regionWithArrivalData } from "./TestHelpers"
@@ -17,9 +17,7 @@ describe("EventArrivals tests", () => {
 
   test("add arrival, does not add duplicates", async () => {
     const arrival = mockEventArrival()
-    const arrivals = new EventArrivals()
-      .addArrivals([arrival])
-      .addArrivals([arrival])
+    const arrivals = new EventArrivals([arrival]).addArrivals([arrival])
     expect(arrivals.regions).toEqual([
       regionWithArrivalData([arrival.eventId], arrival)
     ])
@@ -70,9 +68,7 @@ describe("EventArrivals tests", () => {
   test("add arrival, updates the region of an existing event id, removes the original region if no other events in said region", async () => {
     const arrival = mockEventArrival()
     const newArrival = { ...arrival, coordinate: mockLocationCoordinate2D() }
-    const arrivals = new EventArrivals()
-      .addArrivals([arrival])
-      .addArrivals([newArrival])
+    const arrivals = new EventArrivals([arrival]).addArrivals([newArrival])
     expect(arrivals.regions).toEqual([
       regionWithArrivalData([newArrival.eventId], newArrival)
     ])
@@ -91,9 +87,7 @@ describe("EventArrivals tests", () => {
       ...baseArrivals[0],
       coordinate: mockLocationCoordinate2D()
     }
-    const arrivals = new EventArrivals()
-      .addArrivals(baseArrivals)
-      .addArrivals([newArrival])
+    const arrivals = new EventArrivals(baseArrivals).addArrivals([newArrival])
     expect(arrivals.regions).toEqual([
       regionWithArrivalData([baseArrivals[1].eventId], baseArrivals[1]),
       regionWithArrivalData([newArrival.eventId], newArrival)
@@ -109,9 +103,7 @@ describe("EventArrivals tests", () => {
       coordinate: baseArrivals[0].coordinate,
       arrivalRadiusMeters: baseArrivals[0].arrivalRadiusMeters
     }
-    const arrivals = new EventArrivals()
-      .addArrivals(baseArrivals)
-      .addArrivals([newArrival])
+    const arrivals = new EventArrivals(baseArrivals).addArrivals([newArrival])
     expect(arrivals.regions).toEqual([
       regionWithArrivalData(
         [baseArrivals[0].eventId, newArrival.eventId],
@@ -142,9 +134,9 @@ describe("EventArrivals tests", () => {
         arrivalRadiusMeters: region.arrivalRadiusMeters
       }
     })
-    const arrivals = new EventArrivals()
-      .addArrivals(baseArrivals)
-      .removeArrivalsByEventIds([baseArrivals[0].eventId])
+    const arrivals = new EventArrivals(baseArrivals).removeArrivalsByEventIds([
+      baseArrivals[0].eventId
+    ])
     expect(arrivals.regions).toEqual([
       regionWithArrivalData([baseArrivals[1].eventId], baseArrivals[1])
     ])
@@ -157,9 +149,9 @@ describe("EventArrivals tests", () => {
 
   test("remove arrival, does nothing when given arrival not tracked", async () => {
     const trackedArrival = { ...mockEventArrival(), eventId: 2 }
-    const arrivals = new EventArrivals()
-      .addArrivals([trackedArrival])
-      .removeArrivalsByEventIds([1])
+    const arrivals = new EventArrivals([
+      trackedArrival
+    ]).removeArrivalsByEventIds([1])
     expect(arrivals.regions).toEqual([
       regionWithArrivalData([2], trackedArrival)
     ])
@@ -167,20 +159,18 @@ describe("EventArrivals tests", () => {
 
   test("remove arrivals, basic", async () => {
     const baseArrivals = repeatElements(2, () => mockEventArrival())
-    const arrivals = new EventArrivals()
-      .addArrivals(baseArrivals)
-      .removeArrivalsByEventIds([
-        baseArrivals[0].eventId,
-        baseArrivals[1].eventId
-      ])
+    const arrivals = new EventArrivals(baseArrivals).removeArrivalsByEventIds([
+      baseArrivals[0].eventId,
+      baseArrivals[1].eventId
+    ])
     expect(arrivals.regions).toEqual([])
   })
 
   test("remove arrivals, only removes arrivals with event ids", async () => {
     const baseArrivals = repeatElements(2, () => mockEventArrival())
-    const arrivals = new EventArrivals()
-      .addArrivals(baseArrivals)
-      .removeArrivalsByEventIds([baseArrivals[0].eventId])
+    const arrivals = new EventArrivals(baseArrivals).removeArrivalsByEventIds([
+      baseArrivals[0].eventId
+    ])
     expect(arrivals.regions).toMatchObject([
       regionWithArrivalData([baseArrivals[1].eventId], baseArrivals[1])
     ])
@@ -207,9 +197,9 @@ describe("EventArrivals tests", () => {
   it("sync trackable attending events, removes events which the user has not joined and in arrival period", async () => {
     const arrival = { ...mockEventArrival(), eventId: 1 }
     const event = testEvent(arrival.eventId, true, "not-participating")
-    const arrivals = new EventArrivals()
-      .addArrivals([arrival])
-      .syncTrackableAttendingEvents([event])
+    const arrivals = new EventArrivals([arrival]).syncTrackableAttendingEvents([
+      event
+    ])
     expect(arrivals.regions).toEqual([])
   })
 
@@ -225,9 +215,9 @@ describe("EventArrivals tests", () => {
       false,
       "not-participating"
     )
-    const arrivals = new EventArrivals()
-      .addArrivals(baseArrivals)
-      .syncTrackableAttendingEvents([event, event2])
+    const arrivals = new EventArrivals(
+      baseArrivals
+    ).syncTrackableAttendingEvents([event, event2])
     expect(arrivals.regions).toEqual([])
   })
 
@@ -235,9 +225,9 @@ describe("EventArrivals tests", () => {
     const initialArrival = { ...mockEventArrival(), eventId: 1 }
     const event = testEvent(initialArrival.eventId, false, "attending")
     const event2 = testEvent(2, true, "hosting")
-    const arrivals = new EventArrivals()
-      .addArrivals([initialArrival])
-      .syncTrackableAttendingEvents([event, event2])
+    const arrivals = new EventArrivals([
+      initialArrival
+    ]).syncTrackableAttendingEvents([event, event2])
     expect(arrivals.regions).toEqual([regionWithEventData([2], event2)])
   })
 
