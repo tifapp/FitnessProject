@@ -1,4 +1,4 @@
-import { SQLExecutable, TiFSQLite } from "./SQLite"
+import { SQLExecutable, TiFSQLite } from "@lib/SQLite"
 import { mergeWithPartial } from "TiFShared/lib/Object"
 
 /**
