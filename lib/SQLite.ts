@@ -101,6 +101,7 @@ export class TiFSQLite {
         "Failed to open SQLite at the specified path, falling back to an in memory instance.",
         {
           message: e.message,
+          code: e.code,
           path
         }
       )
