@@ -1,24 +1,25 @@
-import { UseQueryResult, useQuery } from "@tanstack/react-query"
+import { UseQueryResult } from "@tanstack/react-query"
 import {
-  BlockedEvent,
-  CurrentUserEvent,
-  EventID,
-  currentUserEventFromResponse
-} from "@shared-models/Event"
+  ClientSideEvent,
+  clientSideEventFromResponse
+} from "@event/ClientSideEvent"
 import { useIsConnectedToInternet } from "@lib/InternetConnection"
-import React, { useEffect, useRef, useState } from "react"
-import { useEffectEvent } from "@lib/utils/UseEffectEvent"
-import { TiFAPI } from "@api-client/TiFAPI"
+import React, { useRef, useState } from "react"
+import { TiFAPI } from "TiFShared/api"
 import { StyleProp, View, ViewStyle, StyleSheet } from "react-native"
 import { BodyText, Subtitle, Title } from "@components/Text"
-import { ArrayUtils } from "@lib/utils/Array"
+
 import { PrimaryButton } from "@components/Buttons"
 import { useConst } from "@lib/utils/UseConst"
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { AppStyles } from "@lib/AppColorStyle"
-import { useAutocorrectingInterval } from "@lib/utils/UseInterval"
-import { EventDetailsLoadingResult, useEventDetailsQuery } from "./Query"
+import { useAutocorrectingInterval } from "@lib/AutocorrectingInterval"
+import {
+  EventDetailsLoadingResult,
+  useEventDetailsQuery
+} from "@event/DetailsQuery"
+import { EventWhenBlockedByHost, EventID } from "TiFShared/domain-models/Event"
 
 /**
  * Loads the event details from the server.
@@ -40,7 +41,7 @@ export const loadEventDetails = async (
   } else {
     return {
       status: "success",
-      event: currentUserEventFromResponse(resp.data)
+      event: clientSideEventFromResponse(resp.data)
     }
   }
 }
@@ -51,10 +52,10 @@ export type UseLoadEventDetailsResult =
   | {
       status: "success"
       refreshStatus: "loading" | "error" | "idle"
-      event: CurrentUserEvent
+      event: ClientSideEvent
       refresh: () => void
     }
-  | { status: "blocked"; event: BlockedEvent }
+  | { status: "blocked"; event: EventWhenBlockedByHost }
 
 /**
  * A hook to load an event in the context of the details screen.
@@ -397,9 +398,7 @@ const NoContentView = ({
   actionButtonTitle,
   onActionButtonTapped
 }: NoContentProps) => {
-  const { title, message } = useConst(
-    ArrayUtils.randomElement(possibleMessages)
-  )
+  const { title, message } = useConst(possibleMessages.ext.randomElement())
   return (
     <View style={style}>
       <View style={styles.noContentContainer}>

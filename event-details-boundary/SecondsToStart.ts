@@ -1,10 +1,10 @@
-import { dayjs, now } from "@date-time"
-import { useAutocorrectingInterval } from "@lib/utils/UseInterval"
-import { CurrentUserEvent } from "@shared-models/Event"
+import { useAutocorrectingInterval } from "@lib/AutocorrectingInterval"
+import { ClientSideEvent } from "@event/ClientSideEvent"
+import { dayjs, now } from "TiFShared/lib/Dayjs"
 import { useState } from "react"
 
 export type UseEventSecondsToStartProps = Pick<
-  CurrentUserEvent["time"],
+  ClientSideEvent["time"],
   "secondsToStart" | "clientReceivedTime"
 >
 

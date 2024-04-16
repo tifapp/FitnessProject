@@ -1,13 +1,13 @@
 import React from "react"
 import { ChevronBackButton, StackNavigatorType } from "@components/Navigation"
 import { StackScreenProps } from "@react-navigation/stack"
-import { StringUtils } from "@lib/utils/String"
 import {
   ReportFormView,
   ReportSuccessView,
   ReportingReason,
   ReportableContentType
 } from "@content-reporting-boundary"
+import { capitalizeFirstLetter } from "TiFShared/lib/String"
 
 export type ReportingScreensParamsList = {
   reportSuccess: { contentType: ReportableContentType }
@@ -83,7 +83,7 @@ export const createContentReportingScreens = <
 }
 
 const titleFromContentType = (contentType: ReportableContentType) => {
-  return StringUtils.capitalizeFirstLetter(contentType)
+  return capitalizeFirstLetter(contentType)
 }
 
 type ReportContentScreenProps = {

@@ -1,4 +1,4 @@
-import { dayjs } from "@date-time"
+import { dayjs } from "TiFShared/lib/Dayjs"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { renderHook, waitFor } from "@testing-library/react-native"
 import {
@@ -10,12 +10,10 @@ import {
   mockLocationCoordinate2D
 } from "@location/MockData"
 import { UserLocationFunctionsProvider } from "@location/UserLocation"
-import {
-  EXPO_LOCATION_ERRORS,
-  LocationCoordinate2D
-} from "@shared-models/Location"
+import { EXPO_LOCATION_ERRORS } from "@location/Expo"
 import { setPlatform } from "@test-helpers/Platform"
 import { CodedError } from "expo-modules-core"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 
 describe("EventTravelEstimates tests", () => {
   describe("UseEventTravelEstimates tests", () => {

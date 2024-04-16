@@ -1,22 +1,15 @@
 import { uuidString } from "@lib/utils/UUID"
 import { mswServer } from "@test-helpers/msw"
-import {
-  DefaultBodyType,
-  HttpResponse,
-  StrictRequest,
-  http
-} from "msw"
-import { TiFAPI } from "../api-client/TiFAPI"
+import { DefaultBodyType, HttpResponse, StrictRequest, http } from "msw"
 import { registerForPushNotifications } from "./RegisterForPushNotifications"
+import { TiFAPI } from "TiFShared/api"
 
 describe("RegisterForPushNotifications tests", () => {
   const createTestBodyHandler = (expectedRequest: {
     pushToken: string
     platformName: "apple" | "android"
   }) => {
-    return async (
-      { request }: {request: StrictRequest<DefaultBodyType>}
-    ) => {
+    return async ({ request }: { request: StrictRequest<DefaultBodyType> }) => {
       expect(await request.json()).toEqual(expectedRequest)
       return HttpResponse.json({ status: "inserted" }, { status: 201 })
     }

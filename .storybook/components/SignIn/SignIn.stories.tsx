@@ -1,4 +1,4 @@
-import { TiFAPI, createAWSTiFAPIFetch } from "@api-client"
+import { awsTiFAPITransport } from "@lib/TiFAPI"
 import { createForgotPasswordScreens } from "@core-root/navigation/auth/ForgotPassword"
 import { createForgotPasswordEnvironment } from "@auth-boundary/forgot-password"
 import { CognitoSignInAuthenticator } from "@auth-boundary/sign-in"
@@ -20,6 +20,7 @@ import { createSignUpScreens } from "@core-root/navigation/auth/SignUp"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { SafeAreaProvider } from "react-native-safe-area-context"
+import { TiFAPI } from "TiFShared/api"
 
 const SignInMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Sign In"
@@ -31,7 +32,7 @@ type SignInStory = ComponentStory<typeof SettingsScreen>
 
 const Stack = createStackNavigator<SignInParamsList>()
 
-const tiFAPI = new TiFAPI(createAWSTiFAPIFetch(new URL(API_URL)))
+const tiFAPI = new TiFAPI(awsTiFAPITransport(new URL(API_URL)))
 
 const authenticator = new CognitoSignInAuthenticator()
 const signInScreens = createSignInScreens(Stack, authenticator)

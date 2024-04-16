@@ -1,16 +1,12 @@
-import { TiFAPI } from "@api-client/TiFAPI"
-import { ArrayUtils } from "@lib/utils/Array"
+import { TiFAPI } from "TiFShared/api"
 import { randomFloatInRange } from "@lib/utils/Random"
 import { mockLocationCoordinate2D } from "@location/MockData"
 import { mswServer } from "@test-helpers/msw"
-import {
-  DefaultBodyType,
-  HttpResponse,
-  StrictRequest,
-  http
-} from "msw"
+import { DefaultBodyType, HttpResponse, StrictRequest, http } from "msw"
 import { performEventArrivalsOperation } from "./ArrivalsOperation"
 import { mockEventArrivalRegion } from "./MockData"
+import { repeatElements } from "TiFShared/lib/Array"
+import { EventArrivals } from "./Arrivals"
 
 describe("ArrivalsOperation tests", () => {
   describe("PerformEventArrivalsOperation tests", () => {
@@ -19,21 +15,21 @@ describe("ArrivalsOperation tests", () => {
       arrivalRadiusMeters: randomFloatInRange(50, 150)
     }
 
-    const EXPECTED_ARRIVALS_RESULTS = ArrayUtils.repeatElements(4, () => {
+    const EXPECTED_ARRIVAL_REGIONS = repeatElements(4, () => {
       return mockEventArrivalRegion()
     })
 
-    const testBodyHandler = async (
-      { request }: {request: StrictRequest<DefaultBodyType>}
-    ) => {
-      expect(await request.json()).toEqual(TEST_REGION)
+    const EXPECTED_ARRIVALS = EventArrivals.fromRegions(
+      EXPECTED_ARRIVAL_REGIONS
+    )
 
-      return new HttpResponse(JSON.stringify({ upcomingRegions: EXPECTED_ARRIVALS_RESULTS }), {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
+    const testBodyHandler = async ({
+      request
+    }: {
+      request: StrictRequest<DefaultBodyType>
+    }) => {
+      expect(await request.json()).toEqual(TEST_REGION)
+      return HttpResponse.json({ trackableRegions: EXPECTED_ARRIVAL_REGIONS })
     }
 
     test("arrived", async () => {
@@ -45,7 +41,7 @@ describe("ArrivalsOperation tests", () => {
         "arrived",
         TiFAPI.testAuthenticatedInstance
       )
-      expect(results).toMatchObject(EXPECTED_ARRIVALS_RESULTS)
+      expect(results).toEqual(EXPECTED_ARRIVALS)
     })
 
     test("departed", async () => {
@@ -57,7 +53,7 @@ describe("ArrivalsOperation tests", () => {
         "departed",
         TiFAPI.testAuthenticatedInstance
       )
-      expect(results).toMatchObject(EXPECTED_ARRIVALS_RESULTS)
+      expect(results).toEqual(EXPECTED_ARRIVALS)
     })
   })
 })

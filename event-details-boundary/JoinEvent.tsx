@@ -3,7 +3,7 @@ import {
   EventRegionMonitor,
   useHasArrivedAtRegion
 } from "@arrival-tracking/region-monitoring"
-import { CurrentUserEvent, EventLocation } from "@shared-models/Event"
+import { ClientSideEvent } from "@event/ClientSideEvent"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   getBackgroundPermissionsAsync as getBackgroundLocationPermissions,
@@ -21,10 +21,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useSharedValue } from "react-native-reanimated"
 import { FontScaleFactors } from "@lib/Fonts"
 import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet"
-import { TiFAPI } from "@api-client/TiFAPI"
-import { RecentLocationsStorage } from "@lib/RecentsLocations"
-import { JoinEventResponse } from "@shared-models/JoinEvent"
-import { updateEventDetailsQueryEvent } from "./Query"
+import { TiFAPI } from "TiFShared/api"
+import { RecentLocationsStorage } from "@location/Recents"
+import { EventLocation } from "TiFShared/domain-models/Event"
+import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
+import { EventArrivals } from "@arrival-tracking"
+import { EventLocationIdentifier } from "./LocationIdentifier"
+import { ChatTokenRequest } from "TiFShared/api/models/Chat"
 
 export const JOIN_EVENT_ERROR_ALERTS = {
   "event-has-ended": {
@@ -87,7 +90,7 @@ export type JoinEventResult =
   | "event-was-cancelled"
   | "user-is-blocked"
 
-export type JoinEventRequest = Pick<CurrentUserEvent, "id"> & {
+export type JoinEventRequest = Pick<ClientSideEvent, "id"> & {
   location: Omit<EventLocation, "timezoneIdentifier">
   hasArrived: boolean
 }
@@ -96,11 +99,10 @@ export type JoinEventRequest = Pick<CurrentUserEvent, "id"> & {
  * A payload given to a success handler that runs when the user joins an event
  * successfully.
  */
-export type JoinEventHandlerSuccessInput = Pick<
-  JoinEventResponse,
-  "token" | "upcomingRegions"
-> & {
-  location: Pick<EventLocation, "coordinate" | "placemark">
+export type JoinEventSuccess = {
+  chatToken: ChatTokenRequest
+  locationIdentifier: EventLocationIdentifier
+  arrivals: EventArrivals
 }
 
 /**
@@ -116,7 +118,7 @@ export type JoinEventHandlerSuccessInput = Pick<
 export const joinEvent = async (
   request: JoinEventRequest,
   tifAPI: TiFAPI,
-  onSuccessHandlers: [(resp: JoinEventHandlerSuccessInput) => void]
+  onSuccessHandlers: [(resp: JoinEventSuccess) => void]
 ): Promise<JoinEventResult> => {
   const shouldIncludeArrivalRegion =
     request.hasArrived && request.location.isInArrivalTrackingPeriod
@@ -133,8 +135,9 @@ export const joinEvent = async (
   }
   onSuccessHandlers.forEach((handler) => {
     handler({
-      ...resp.data,
-      location: request.location
+      chatToken: resp.data.chatToken,
+      arrivals: EventArrivals.fromRegions(resp.data.trackableRegions),
+      locationIdentifier: request.location
     })
   })
   return "success"
@@ -145,14 +148,14 @@ export const joinEvent = async (
  * {@link RecentLocationsStorage} with a `"joined-event"` annotation.
  */
 export const saveRecentLocationJoinEventHandler = async (
-  input: Pick<JoinEventHandlerSuccessInput, "location">,
+  success: Pick<JoinEventSuccess, "locationIdentifier">,
   recentLocationsStorage: RecentLocationsStorage
 ) => {
-  if (!input.location.placemark) return
+  if (!success.locationIdentifier.placemark) return
   await recentLocationsStorage.save(
     {
-      coordinate: input.location.coordinate,
-      placemark: input.location.placemark
+      coordinate: success.locationIdentifier.coordinate,
+      placemark: success.locationIdentifier.placemark
     },
     "joined-event"
   )

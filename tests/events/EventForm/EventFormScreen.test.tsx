@@ -1,7 +1,6 @@
 import { EventFormValues } from "@components/eventForm"
-import { dateRange } from "@date-time"
-import { EventColors } from "@event-details-boundary/Event"
-import { HapticsProvider } from "@lib/Haptics"
+import { EventColors } from "@lib/events"
+import { HapticsProvider } from "@modules/tif-haptics"
 import { GeocodingFunctionsProvider } from "@location/Geocoding"
 import EventFormScreen from "@screens/EventFormScreen"
 import { QueryClient } from "@tanstack/react-query"
@@ -29,6 +28,7 @@ import {
   toggleShouldHideAfterStartDate
 } from "./helpers"
 import { fakeTimers } from "@test-helpers/Timers"
+import { dateRange } from "TiFShared/domain-models/FixedDateRange"
 
 const testLocation = { latitude: 45.0, longitude: -121.0 }
 

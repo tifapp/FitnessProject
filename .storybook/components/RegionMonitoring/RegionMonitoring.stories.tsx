@@ -20,7 +20,7 @@ import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { LocationCoordinate2D } from "@shared-models/Location"
 import Slider from "@react-native-community/slider"
 import MapView from "react-native-maps"
-import { EventRegion } from "@shared-models/Event"
+import { EventRegion } from "@event/ClientSideEvent"
 import { EventArrivalBannerView } from "@event-details-boundary/ArrivalBanner"
 
 const RegionMonitoringMeta: ComponentMeta<typeof SettingsScreen> = {

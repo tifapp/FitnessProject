@@ -1,10 +1,10 @@
-import { EventCard } from "@components/EventCard"
+import { EventCard } from "@event/EventCard"
 import {
   BottomSheetModal,
   BottomSheetFlatList,
   BottomSheetModalProvider
 } from "@gorhom/bottom-sheet"
-import { CurrentUserEvent } from "@shared-models/Event"
+import { ClientSideEvent } from "@event/ClientSideEvent"
 import React, { ReactElement, useEffect, useRef } from "react"
 import {
   ListRenderItemInfo,
@@ -16,8 +16,8 @@ import {
 } from "react-native"
 
 export type ExploreEventsBottomSheetProps = {
-  events: CurrentUserEvent[]
-  onEventSelected: (event: CurrentUserEvent) => void
+  events: ClientSideEvent[]
+  onEventSelected: (event: ClientSideEvent) => void
   HeaderComponent: ReactElement
   EmptyEventsComponent: ReactElement
   style?: StyleProp<ViewStyle>
@@ -54,7 +54,7 @@ export const ExploreEventsBottomSheet = ({
           <BottomSheetFlatList
             data={events}
             keyExtractor={(event) => event.id.toString()}
-            renderItem={({ item }: ListRenderItemInfo<CurrentUserEvent>) => (
+            renderItem={({ item }: ListRenderItemInfo<ClientSideEvent>) => (
               <Pressable
                 onPress={() => onEventSelected(item)}
                 style={styles.eventContainer}

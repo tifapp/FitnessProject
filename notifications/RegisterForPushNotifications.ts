@@ -1,8 +1,8 @@
 import { DevicePushToken } from "expo-notifications"
-import { TiFAPI } from "../api-client/TiFAPI"
-import { createLogFunction } from "@lib/Logging"
+import { TiFAPI } from "TiFShared/api"
+import { logger } from "TiFShared/logging"
 
-const log = createLogFunction("push.notifications.registration")
+const log = logger("push.notifications.registration")
 
 export const registerForPushNotifications = async (
   token: DevicePushToken,
@@ -13,6 +13,6 @@ export const registerForPushNotifications = async (
     token.type === "ios" ? "apple" : "android"
   )
   if (resp.status === 400) {
-    log("error", "Attempted to register a duplicate push token.")
+    log.error("Attempted to register a duplicate push token.")
   }
 }

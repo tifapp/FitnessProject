@@ -9,11 +9,11 @@ import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
 import EventPager from "./EventCarousel"
 import { AppStyles } from "@lib/AppColorStyle"
 import EventHistoryModal from "./EventHistoryModal"
-import { CurrentUserEvent } from "@shared-models/Event"
+import { ClientSideEvent } from "@event/ClientSideEvent"
 
 export type ProfileScreenViewProps = {
   user: User
-  events: CurrentUserEvent[]
+  events: ClientSideEvent[]
 }
 
 const NUM_EVENTS_SHOWN = 20
@@ -105,24 +105,22 @@ const ProfileView = ({ user, events }: ProfileScreenViewProps) => {
             </View>
           )}
         </View>
-        {events.length !== 0
-          ? (
-            <EventPager events={recentEvents} />
-          )
-          : (
-            <View
-              style={[
-                styles.spacing,
-                {
-                  flex: 1,
-                  alignItems: "center",
-                  justifyContent: "center"
-                }
-              ]}
-            >
-              <Caption>{"Sorry, this user hasn't attended any events"}</Caption>
-            </View>
-          )}
+        {events.length !== 0 ? (
+          <EventPager events={recentEvents} />
+        ) : (
+          <View
+            style={[
+              styles.spacing,
+              {
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center"
+              }
+            ]}
+          >
+            <Caption>{"Sorry, this user hasn't attended any events"}</Caption>
+          </View>
+        )}
       </ScrollView>
     </View>
   )

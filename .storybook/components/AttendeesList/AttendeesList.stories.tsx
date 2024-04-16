@@ -5,7 +5,7 @@ import { AttendeesListView } from "@event-details-boundary/attendees-list/Attend
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
-import { EventAttendee } from "@shared-models/Event"
+import { EventAttendee } from "@event/ClientSideEvent"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import React from "react"
 import { View } from "react-native"

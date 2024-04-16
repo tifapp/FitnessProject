@@ -1,14 +1,15 @@
-import { FixedDateRange, dayjs } from "@date-time"
-import { CurrentUserEvent } from "@shared-models/Event"
-import { TodayOrTomorrow } from "@shared-models/TodayOrTomorrow"
-import { humanizeEventCountdownSeconds } from "./Event"
+import { ClientSideEvent } from "@event/ClientSideEvent"
+import { formattedEventCountdownSeconds } from "./SharedCountdownFormatting"
 import { StyleProp, ViewStyle, View, StyleSheet } from "react-native"
 import { Footnote, Headline } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors, useFontScale } from "@lib/Fonts"
-import { StringUtils } from "@lib/utils/String"
+import { dayjs } from "TiFShared/lib/Dayjs"
+import { capitalizeFirstLetter } from "TiFShared/lib/String"
+import { FixedDateRange } from "TiFShared/domain-models/FixedDateRange"
+import { TodayOrTomorrow } from "TiFShared/domain-models/TodayOrTomorrow"
 
-export type EventCountdownTime = CurrentUserEvent["time"]
+export type EventCountdownTime = ClientSideEvent["time"]
 
 export type EventCountdown =
   | {
@@ -43,7 +44,7 @@ const eventFormattedCountdown = (
   todayOrTomorrow: TodayOrTomorrow | null
 ): EventFormattedCountdown => {
   const duration = dayjs.duration(seconds, "second")
-  const formatted = humanizeEventCountdownSeconds(seconds).replace(
+  const formatted = formattedEventCountdownSeconds(seconds).replace(
     /(a|an) /,
     "1 "
   )
@@ -62,7 +63,7 @@ const eventFormattedCountdown = (
     }
   } else {
     return {
-      todayOrTomorrow: StringUtils.capitalizeFirstLetter(todayOrTomorrow),
+      todayOrTomorrow: capitalizeFirstLetter(todayOrTomorrow),
       shouldDisplayFomoEffect: false
     }
   }

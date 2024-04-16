@@ -1,4 +1,4 @@
-import { dayjs } from "@date-time"
+import { dayjs } from "TiFShared/lib/Dayjs"
 import { act, renderHook } from "@testing-library/react-native"
 import {
   useEventSecondsToStart,

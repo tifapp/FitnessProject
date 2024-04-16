@@ -2,7 +2,7 @@ import { Headline } from "@components/Text"
 import { CircularIonicon } from "@components/common/Icons"
 import { useUserCoordinatesQuery } from "@location/UserLocation"
 import { AppStyles } from "@lib/AppColorStyle"
-import { LocationCoordinate2D, TiFLocation } from "@location"
+import { NamedLocation } from "@location/NamedLocation"
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
 import { LocationAccuracy, LocationObject } from "expo-location"
 import React from "react"
@@ -13,18 +13,19 @@ import {
   ViewStyle
 } from "react-native"
 import Animated, { FadeIn } from "react-native-reanimated"
-import { LocationSearchResult, LocationsSearchQuery } from "."
 import {
   LocationSearchResultProps,
   LocationSearchResultView
 } from "./SearchResultView"
 import { LocationSearchResultsListView } from "./SearchResultsList"
-import { LocationSearchResultsData } from "./Models"
-import { useLocationsSearchQueryObject } from "./state"
+import { useLocationsSearchQueryTextObject } from "./state"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
+import { LocationSearchLoadingResult } from "./LoadingResult"
+import { LocationSearchResult, LocationsSearchQueryText } from "./SearchClient"
 
 export type UseLocationSearchPickerEnvironment = {
   loadSearchResults: (
-    query: LocationsSearchQuery,
+    query: LocationsSearchQueryText,
     center?: LocationCoordinate2D
   ) => Promise<LocationSearchResult[]>
 }
@@ -35,7 +36,7 @@ export type UseLocationSearchPickerEnvironment = {
 export const useLocationSearchPicker = ({
   loadSearchResults
 }: UseLocationSearchPickerEnvironment) => {
-  const query = useLocationsSearchQueryObject()
+  const query = useLocationsSearchQueryTextObject()
   const userLocation = useLocationSearchCenter()
   const queryResult = useLocationSearchResultsQuery(
     query,
@@ -55,7 +56,7 @@ const queryResultToDataResult = ({
 }: UseQueryResult<
   LocationSearchResult[],
   unknown
->): LocationSearchResultsData => {
+>): LocationSearchLoadingResult => {
   if (status === "success" && data.length === 0) {
     return { status: "no-results", data: [] }
   } else if (status === "success") {
@@ -67,10 +68,10 @@ const queryResultToDataResult = ({
 }
 
 const useLocationSearchResultsQuery = (
-  query: LocationsSearchQuery,
+  query: LocationsSearchQueryText,
   center: LocationCoordinate2D | undefined,
   loadSearchResults: (
-    query: LocationsSearchQuery,
+    query: LocationsSearchQueryText,
     center?: LocationCoordinate2D
   ) => Promise<LocationSearchResult[]>
 ) => {
@@ -85,12 +86,12 @@ const useLocationSearchCenter = () => {
 }
 
 export type LocationSearchPickerProps = {
-  query: LocationsSearchQuery
+  query: LocationsSearchQueryText
   userLocation?: LocationObject
-  searchResults: LocationSearchResultsData
-  savePickedLocation: (result: TiFLocation) => void
+  searchResults: LocationSearchLoadingResult
+  savePickedLocation: (result: NamedLocation) => void
   onUserLocationSelected: (location: LocationObject) => void
-  onLocationSelected: (selection: TiFLocation) => void
+  onLocationSelected: (selection: NamedLocation) => void
   SearchResultView?: (props: LocationSearchResultProps) => JSX.Element
   style?: StyleProp<ViewStyle>
   contentContainerStyle?: StyleProp<ViewStyle>

@@ -1,9 +1,6 @@
 import { QueryHookOptions } from "@lib/ReactQuery"
 import { useUserCoordinatesQuery } from "@location/UserLocation"
-import {
-  EXPO_LOCATION_ERRORS,
-  LocationCoordinate2D
-} from "@shared-models/Location"
+import { EXPO_LOCATION_ERRORS } from "@location/Expo"
 import { useQuery } from "@tanstack/react-query"
 import { LocationAccuracy } from "expo-location"
 import {
@@ -15,18 +12,17 @@ import {
   TouchableOpacity,
   LayoutRectangle
 } from "react-native"
-import { EventTravelEstimates } from "@shared-models/TravelEstimates"
-import { ExpoTiFTravelEstimatesModule } from "@modules/tif-travel-estimates"
-import { EventAttendee, EventLocation } from "@shared-models/Event"
+import {
+  EventTravelEstimates,
+  eventTravelEstimates
+} from "@modules/tif-travel-estimates"
 import { CodedError } from "expo-modules-core"
 import { ReactNode, useState } from "react"
 import { BodyText, Caption, CaptionTitle, Headline } from "@components/Text"
-import { openEventLocationInMaps } from "./Event"
 import { Ionicon, RoundedIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
-import { compactFormatDistance } from "@lib/utils/DistanceFormatting"
-import { metersToMiles } from "@lib/utils/MetricConversions"
-import { dayjs } from "@date-time"
+import { compactFormatDistance } from "@lib/DistanceFormatting"
+import { dayjs } from "TiFShared/lib/Dayjs"
 import duration from "dayjs/plugin/duration"
 import { AvatarMapMarkerView } from "@components/AvatarMapMarker"
 import MapView, { Marker } from "react-native-maps"
@@ -34,38 +30,10 @@ import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import Animated, { FadeIn } from "react-native-reanimated"
 import { openSettings } from "expo-linking"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
-
-export type LoadEventTravelEstimates = (
-  userCoordinate: LocationCoordinate2D,
-  eventCoordinate: LocationCoordinate2D,
-  abortSignal?: AbortSignal
-) => Promise<EventTravelEstimates>
-
-/**
- * Loads travel estimates for an event.
- *
- * @param eventCoordinate The coordinate of the event.
- * @param userCoordinate The user's location current coordinate.
- * @param nativeTravelEstimates The native module for loading travel estimates.
- * @param signal An {@link AbortSignal} to cancel the request.
- */
-export const loadEventTravelEstimates = async (
-  eventCoordinate: LocationCoordinate2D,
-  userCoordinate: LocationCoordinate2D,
-  nativeTravelEstimates: ExpoTiFTravelEstimatesModule,
-  signal?: AbortSignal
-) => {
-  signal?.addEventListener("abort", () => {
-    nativeTravelEstimates.cancelTravelEstimatesAsync(
-      userCoordinate,
-      eventCoordinate
-    )
-  })
-  return await nativeTravelEstimates.travelEstimatesAsync(
-    userCoordinate,
-    eventCoordinate
-  )
-}
+import { metersToMiles } from "TiFShared/lib/MetricConversions"
+import { EventAttendee, EventLocation } from "TiFShared/domain-models/Event"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
+import { openEventLocationInMaps } from "./LocationIdentifier"
 
 export type UseEventTravelEstimatesResult =
   | {
@@ -129,7 +97,7 @@ const compactFormatTravelEstimateDuration = (duration: duration.Duration) => {
  */
 export const useEventTravelEstimates = (
   coordinate: LocationCoordinate2D,
-  loadTravelEstimates: LoadEventTravelEstimates
+  loadTravelEstimates: typeof eventTravelEstimates
 ): UseEventTravelEstimatesResult => {
   const isSupported = Platform.OS !== "android"
   const userLocationQuery = useUserCoordinatesQuery(
@@ -168,7 +136,7 @@ const resultForCodedError = (
 const useEventTravelEstimatesQuery = (
   userCoordinate: LocationCoordinate2D,
   eventCoordinate: LocationCoordinate2D,
-  loadTravelEstimates: LoadEventTravelEstimates,
+  loadTravelEstimates: typeof eventTravelEstimates,
   options?: QueryHookOptions<EventTravelEstimates>
 ) => {
   return useQuery(

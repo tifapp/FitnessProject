@@ -7,16 +7,15 @@ import {
 } from "react-native"
 import { MenuView, MenuAction } from "@react-native-menu/menu"
 import { Ionicon } from "@components/common/Icons"
-import { CurrentUserEvent } from "@shared-models/Event"
+import { ClientSideEvent } from "@event/ClientSideEvent"
 import { useFontScale } from "@lib/Fonts"
-import { useIsSignedIn } from "@lib/UserSession"
+import { useIsSignedIn } from "@user/Session"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { updateEventDetailsQueryEvent } from "./Query"
 import {
-  UnblockedBidirectionalUserRelations,
   UserID,
-  toggleBlockUserRelations
-} from "@shared-models/User"
+  UnblockedBidirectionalUserRelations
+} from "TiFShared/domain-models/User"
+import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
 
 export type EventMenuActionsListKey = keyof typeof EVENT_MENU_ACTIONS_LISTS
 
@@ -35,7 +34,7 @@ type ToggleBlockMutationArgs = {
  * A hook that controls the state of the menu actions.
  */
 export const useEventDetailsMenuActions = (
-  event: Pick<CurrentUserEvent, "id" | "userAttendeeStatus" | "host">,
+  event: Pick<ClientSideEvent, "id" | "userAttendeeStatus" | "host">,
   env: UseEventDetailsMenuActionsEnvironment
 ) => {
   const queryClient = useQueryClient()
@@ -65,7 +64,15 @@ export const useEventDetailsMenuActions = (
       const isBlocking = event.host.relations.youToThem !== "blocked"
       updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({
         ...e,
-        host: { ...e.host, relations: toggleBlockUserRelations(isBlocking) }
+        host: {
+          ...e.host,
+          relations: {
+            youToThem: isBlocking ? "blocked" : "not-friends",
+            // NB: Either the block removes the friendship status, or if they
+            // are unblocking then the only possible value is not friends.
+            themToYou: "not-friends"
+          } as const
+        }
       }))
       toggleBlockMutation.mutate({
         isBlocking,
@@ -77,7 +84,7 @@ export const useEventDetailsMenuActions = (
 }
 
 export type EventDetailsMenuProps = {
-  event: CurrentUserEvent
+  event: ClientSideEvent
   state: ReturnType<typeof useEventDetailsMenuActions>
   eventShareContent: () => Promise<ShareContent>
   onCopyEventTapped: () => void
@@ -149,7 +156,7 @@ export type EventMenuActionID = EventMenuAction["id"]
  * `event` in place of `"%@"` for any of the given menu actions.
  */
 export const formatEventMenuActions = (
-  event: CurrentUserEvent,
+  event: ClientSideEvent,
   actions: EventMenuAction[]
 ): MenuAction[] => {
   const formattedActions = actions.map((action) => {
@@ -165,8 +172,8 @@ export const formatEventMenuActions = (
 }
 
 type BaseEventMenuAction = Omit<MenuAction, "title" | "image"> & {
-  title: string | ((event: CurrentUserEvent) => string)
-  image: string | undefined | ((event: CurrentUserEvent) => string | undefined)
+  title: string | ((event: ClientSideEvent) => string)
+  image: string | undefined | ((event: ClientSideEvent) => string | undefined)
 }
 
 export const EVENT_MENU_ACTION = {

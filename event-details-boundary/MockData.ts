@@ -1,11 +1,5 @@
-import { UserHandle } from "@content-parsing"
 import { uuidString } from "@lib/utils/UUID"
-import {
-  CurrentUserEvent,
-  EventAttendee,
-  EventLocation
-} from "@shared-models/Event"
-import { dateRange, dayjs } from "@date-time"
+import { ClientSideEvent } from "@event/ClientSideEvent"
 import { mockLocationCoordinate2D, mockPlacemark } from "@location/MockData"
 import { faker } from "@faker-js/faker"
 import {
@@ -13,8 +7,12 @@ import {
   randomIntegerInRange,
   randomlyNull
 } from "@lib/utils/Random"
-import { ColorString } from "@lib/utils/Color"
-import { EventChatTokenRequest } from "@shared-models/ChatToken"
+import { ColorString } from "TiFShared/domain-models/ColorString"
+import { dateRange } from "TiFShared/domain-models/FixedDateRange"
+import { dayjs } from "TiFShared/lib/Dayjs"
+import { UserHandle } from "TiFShared/domain-models/User"
+import { EventLocation, EventAttendee } from "TiFShared/domain-models/Event"
+import { ChatTokenRequest } from "TiFShared/api/models/Chat"
 
 export const mockEventLocation = (): EventLocation => ({
   coordinate: mockLocationCoordinate2D(),
@@ -24,7 +22,7 @@ export const mockEventLocation = (): EventLocation => ({
   placemark: randomlyNull(mockPlacemark())
 })
 
-export const mockEventChatTokenRequest = (): EventChatTokenRequest => ({
+export const mockEventChatTokenRequest = (): ChatTokenRequest => ({
   capability: JSON.stringify({
     // eslint-disable-next-line @typescript-eslint/naming-convention
     "5678-event": ["history", "publish", "subscribe"],
@@ -104,7 +102,7 @@ export namespace EventAttendeeMocks {
 }
 
 /**
- * Some mock {@link CurrentUserEvent} objects.
+ * Some mock {@link ClientSideEvent} objects.
  */
 export namespace EventMocks {
   export const PickupBasketball = {
@@ -133,7 +131,7 @@ export namespace EventMocks {
     joinDate: new Date(),
     isChatExpired: false,
     endedAt: null
-  } as CurrentUserEvent
+  } as ClientSideEvent
 
   export const Multiday = {
     host: EventAttendeeMocks.Alivs,
@@ -160,7 +158,7 @@ export namespace EventMocks {
     joinDate: new Date(),
     isChatExpired: false,
     endedAt: null
-  } as CurrentUserEvent
+  } as ClientSideEvent
 
   export const NoPlacemarkInfo = {
     host: EventAttendeeMocks.Alivs,
@@ -188,5 +186,5 @@ export namespace EventMocks {
     joinDate: new Date(),
     isChatExpired: false,
     endedAt: null
-  } as CurrentUserEvent
+  } as ClientSideEvent
 }
