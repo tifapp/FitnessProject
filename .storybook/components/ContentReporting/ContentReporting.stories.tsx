@@ -5,7 +5,7 @@ import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import {
   ReportingScreensParamsList,
   createContentReportingScreens
-} from "@root-feature/navigation/ContentReporting"
+} from "@core-root/navigation/ContentReporting"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import React from "react"
 import { Button } from "react-native"

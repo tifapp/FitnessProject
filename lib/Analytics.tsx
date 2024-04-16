@@ -1,7 +1,7 @@
 import { MIXPANEL_TOKEN } from "@env"
 import { Mixpanel } from "mixpanel-react-native"
 import React, { ReactNode, createContext, useContext } from "react"
-import { JSONSerializableValue } from "./JSONSerializable"
+import { JSONSerializableValue } from "TiFShared/lib/HelperTypes"
 
 /**
  * A type for representing metadata sent with analytic events. Metadata must contain

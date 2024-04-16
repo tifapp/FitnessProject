@@ -1,20 +1,12 @@
 import { TiFMenuProvider } from "@components/TiFMenuProvider"
 import { useAppFonts } from "@lib/Fonts"
-import { UserLocationFunctionsProvider } from "@location/UserLocation"
-import {
-  getCurrentPositionAsync,
-  requestBackgroundPermissionsAsync,
-  requestForegroundPermissionsAsync
-} from "expo-location"
 import React from "react"
 import { RootSiblingParent } from "react-native-root-siblings"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 
 import { Geo } from "@aws-amplify/geo"
-import { ExpoEventArrivalsGeofencer } from "@event-details/arrival-tracking"
+import { ExpoEventArrivalsGeofencer } from "@arrival-tracking/geofencing"
 import {
-  addLogHandler,
-  createLogFunction,
   sentryBreadcrumbLogHandler,
   sentryErrorCapturingLogHandler
 } from "@lib/Logging"
@@ -24,16 +16,20 @@ import {
   setupInternetReconnectionRefreshes
 } from "@lib/ReactQuery"
 import { enableSentry } from "@lib/Sentry"
-import { AppView } from "@root-feature/AppView"
+import { AppView } from "@core-root/AppView"
 import * as Sentry from "@sentry/react-native"
 import "expo-dev-client"
 import { addPushTokenListener } from "expo-notifications"
-import { setupCognito } from "./auth"
+import { setupCognito } from "@auth-boundary"
 import { registerForPushNotifications } from "./notifications"
 import awsconfig from "./src/aws-exports"
 import { NetInfoInternetConnectionStatus } from "@lib/InternetConnection"
+import "TiFShared"
+import "@lib/TiFAPI"
+import "date-time/DateRangeFormatting"
+import { consoleLogHandler, logger, addLogHandler } from "TiFShared/logging"
 
-const log = createLogFunction("app.root")
+const log = logger("app.root")
 
 /**
  * Performs all the necessary setup (starting background tasks, configuration,
@@ -41,9 +37,10 @@ const log = createLogFunction("app.root")
  */
 export const setupApp = () => {
   enableSentry()
+  addLogHandler(consoleLogHandler())
   addLogHandler(sentryBreadcrumbLogHandler())
   addLogHandler(sentryErrorCapturingLogHandler())
-  log("info", "App launched", { date: new Date() })
+  log.info("App launched", { date: new Date() })
   setupCognito()
   Geo.configure(awsconfig)
   ExpoEventArrivalsGeofencer.shared.defineTask()
