@@ -1,4 +1,10 @@
-import { StyleProp, ViewStyle, StyleSheet, LayoutRectangle } from "react-native"
+import {
+  StyleProp,
+  ViewStyle,
+  StyleSheet,
+  LayoutRectangle,
+  View
+} from "react-native"
 import { ButtonProps, PrimaryButton } from "./Buttons"
 import { ReactNode, useMemo, useRef, useState } from "react"
 import { BodyText, Headline, Title } from "./Text"
@@ -8,7 +14,6 @@ import {
   TouchableHighlight
 } from "@gorhom/bottom-sheet"
 import { useSharedValue } from "react-native-reanimated"
-import { View } from "react-native"
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { useFontScale } from "@lib/Fonts"
 import { AppStyles } from "@lib/AppColorStyle"

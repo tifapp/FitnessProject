@@ -43,7 +43,7 @@ const DateTab = () => (
       maxFontSizeMultiplier={FontScaleFactors.accessibility2}
       style={styles.tabText}
     >
-      {useEventFormContext().watch("dateRange").formatted()}
+      {useEventFormContext().watch("dateRange").ext.formatted()}
     </Text>
   </SectionTab>
 )

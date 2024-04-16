@@ -1,6 +1,5 @@
 import { act } from "@testing-library/react-native"
 import { TEST_FRAME_TIME } from "./FakeTimeInterval"
-import { now } from "@date-time"
 
 /**
  * Fakes jest timers for the duration of each test with the ability to step

@@ -8,6 +8,28 @@ const modulePath = (dir) => {
   return path.join(__dirname, dir)
 }
 
+const MODULES = [
+  "screens",
+  "components",
+  "assets",
+  "lib",
+  "auth-boundary",
+  "event-details-boundary",
+  "core-root",
+  "location",
+  "modules",
+  "date-time",
+  "test-helpers",
+  "content-reporting-boundary",
+  "notifications",
+  "explore-events-boundary",
+  "arrival-tracking",
+  "location-search-boundary",
+  "event",
+  "user",
+  "settings-storage"
+]
+
 module.exports = function (api) {
   api.cache(true)
   return {
@@ -23,28 +45,9 @@ module.exports = function (api) {
       [
         "module-resolver",
         {
-          alias: {
-            "@screens": modulePath("screens"),
-            "@api-client": modulePath("api-client"),
-            "@components": modulePath("components"),
-            "@stacks": modulePath("stacks"),
-            "@hooks": modulePath("hooks"),
-            "@assets": modulePath("assets"),
-            "@graphql": modulePath("src/graphql"),
-            "@lib": modulePath("lib"),
-            "@auth": modulePath("auth"),
-            "@event-details": modulePath("event-details"),
-            "@root-feature": modulePath("root-feature"),
-            "@location": modulePath("location"),
-            "@modules": modulePath("modules"),
-            "@content-parsing": modulePath("content-parsing"),
-            "@date-time": modulePath("date-time"),
-            "@test-helpers": modulePath("test-helpers"),
-            "@content-reporting": modulePath("content-reporting"),
-            "@shared-models": modulePath("shared-models"),
-            "@notifications": modulePath("notifications"),
-            "@explore-events": modulePath("explore-events")
-          },
+          alias: Object.fromEntries(
+            MODULES.map((module) => [`@${module}`, modulePath(module)])
+          ),
           extensions: [".js", ".jsx", ".ts", ".tsx"]
         }
       ],

@@ -1,4 +1,4 @@
-import { HapticEvent, Haptics, HapticsSettings } from "@lib/Haptics"
+import { HapticEvent, Haptics, HapticsSettings } from "@modules/tif-haptics"
 
 export class TestHaptics implements Haptics {
   private _playedEvents = [] as HapticEvent[]

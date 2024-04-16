@@ -1,11 +1,11 @@
-import { ExploreEventsView } from "explore-events"
-import { EventMocks } from "@event-details/MockData"
+import { ExploreEventsView } from "@explore-events-boundary"
+import { EventMocks } from "@event-details-boundary/MockData"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import {
   ExploreEventsScreensParamsList,
   createExploreEventsScreens
-} from "@root-feature/navigation/ExploreEvents"
+} from "@core-root/navigation/ExploreEvents"
 import React from "react"
 import { MenuProvider } from "react-native-popup-menu"
 import { createStackNavigator } from "@react-navigation/stack"

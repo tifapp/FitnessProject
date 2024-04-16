@@ -16,7 +16,7 @@ export const EventFormDatePicker = () => {
         label="Start Date"
         date={dateRange.startDate}
         onDateChanged={(date) => {
-          setDateRange((range) => range.moveStartDate(date))
+          setDateRange((range) => range.moveStartDateWithAutocorrection(date))
         }}
       />
       <View style={styles.spacer} />
@@ -25,7 +25,7 @@ export const EventFormDatePicker = () => {
         label="End Date"
         date={dateRange.endDate}
         onDateChanged={(date) => {
-          setDateRange((range) => range.moveEndDate(date))
+          setDateRange((range) => range.moveEndDateWithAutocorrection(date))
         }}
       />
     </View>
