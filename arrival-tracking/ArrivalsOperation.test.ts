@@ -6,6 +6,7 @@ import { DefaultBodyType, HttpResponse, StrictRequest, http } from "msw"
 import { performEventArrivalsOperation } from "./ArrivalsOperation"
 import { mockEventArrivalRegion } from "./MockData"
 import { repeatElements } from "TiFShared/lib/Array"
+import { EventArrivals } from "./Arrivals"
 
 describe("ArrivalsOperation tests", () => {
   describe("PerformEventArrivalsOperation tests", () => {
@@ -14,9 +15,13 @@ describe("ArrivalsOperation tests", () => {
       arrivalRadiusMeters: randomFloatInRange(50, 150)
     }
 
-    const EXPECTED_ARRIVALS_RESULTS = repeatElements(4, () => {
+    const EXPECTED_ARRIVAL_REGIONS = repeatElements(4, () => {
       return mockEventArrivalRegion()
     })
+
+    const EXPECTED_ARRIVALS = EventArrivals.fromRegions(
+      EXPECTED_ARRIVAL_REGIONS
+    )
 
     const testBodyHandler = async ({
       request
@@ -24,7 +29,7 @@ describe("ArrivalsOperation tests", () => {
       request: StrictRequest<DefaultBodyType>
     }) => {
       expect(await request.json()).toEqual(TEST_REGION)
-      return HttpResponse.json({ trackableRegions: EXPECTED_ARRIVALS_RESULTS })
+      return HttpResponse.json({ trackableRegions: EXPECTED_ARRIVAL_REGIONS })
     }
 
     test("arrived", async () => {
@@ -36,7 +41,7 @@ describe("ArrivalsOperation tests", () => {
         "arrived",
         TiFAPI.testAuthenticatedInstance
       )
-      expect(results).toMatchObject(EXPECTED_ARRIVALS_RESULTS)
+      expect(results).toEqual(EXPECTED_ARRIVALS)
     })
 
     test("departed", async () => {
@@ -48,7 +53,7 @@ describe("ArrivalsOperation tests", () => {
         "departed",
         TiFAPI.testAuthenticatedInstance
       )
-      expect(results).toMatchObject(EXPECTED_ARRIVALS_RESULTS)
+      expect(results).toEqual(EXPECTED_ARRIVALS)
     })
   })
 })

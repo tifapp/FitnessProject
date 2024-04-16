@@ -2,9 +2,20 @@ import { fakeTimers } from "@test-helpers/Timers"
 import { EventArrivalsRefresher } from "./Refresh"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 import { SQLiteInternalMetricsStorage } from "@settings-storage/InternalMetrics"
+import { EventArrivalsTracker } from "./Tracker"
+import { SQLiteEventArrivalsStorage } from "./Storage"
+import { TestEventArrivalsGeofencer } from "./geofencing/TestGeofencer"
+import { TiFAPI } from "TiFShared/api"
+import { mswServer } from "@test-helpers/msw"
+import { HttpResponse, http } from "msw"
+import { repeatElements } from "TiFShared/lib/Array"
+import { mockEventArrivalRegion } from "./MockData"
+import { expectOrderInsensitiveEventArrivals } from "./TestHelpers"
+import { EventArrivals } from "./Arrivals"
 
 describe("EventArrivalsRefresher tests", () => {
   resetTestSQLiteBeforeEach()
+  const internalMetrics = new SQLiteInternalMetricsStorage(testSQLite)
   fakeTimers()
 
   const performRefresh = jest.fn()
@@ -81,10 +92,36 @@ describe("EventArrivalsRefresher tests", () => {
     expect(time).toEqual(0)
   })
 
+  test("refresh using tracker", async () => {
+    const tracker = new EventArrivalsTracker(
+      new SQLiteEventArrivalsStorage(testSQLite),
+      new TestEventArrivalsGeofencer(),
+      jest.fn()
+    )
+    const refresher = EventArrivalsRefresher.usingTracker(
+      tracker,
+      TiFAPI.testAuthenticatedInstance,
+      internalMetrics,
+      20
+    )
+    const regions = repeatElements(3, () => mockEventArrivalRegion())
+    mswServer.use(
+      http.get(TiFAPI.testPath("/event/upcoming"), async () => {
+        return HttpResponse.json({ trackableRegions: regions })
+      })
+    )
+
+    await refresher.forceRefresh()
+    expectOrderInsensitiveEventArrivals(
+      await tracker.trackedArrivals(),
+      EventArrivals.fromRegions(regions)
+    )
+  })
+
   const createRefresher = (minutesBetweenNeededRefreshes: number) => {
     return new EventArrivalsRefresher(
       performRefresh,
-      new SQLiteInternalMetricsStorage(testSQLite),
+      internalMetrics,
       minutesBetweenNeededRefreshes
     )
   }

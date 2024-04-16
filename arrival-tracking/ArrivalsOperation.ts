@@ -1,5 +1,6 @@
 import { TiFAPI } from "TiFShared/api"
-import { EventRegion, EventArrivalRegion } from "TiFShared/domain-models/Event"
+import { EventRegion } from "TiFShared/domain-models/Event"
+import { EventArrivals } from "./Arrivals"
 
 export type EventArrivalsOperationKind = "arrived" | "departed"
 
@@ -8,7 +9,7 @@ export type EventArrivalsOperationUnsubscribe = () => void
 export type PerformArrivalsOperation = (
   region: EventRegion,
   kind: EventArrivalsOperationKind
-) => Promise<EventArrivalRegion[]>
+) => Promise<EventArrivals>
 
 /**
  * Marks the events at the given region as either "arrived" or "departed".
@@ -19,7 +20,7 @@ export const performEventArrivalsOperation = async (
   tifAPI: TiFAPI
 ) => {
   const methodKey = kind === "arrived" ? "arriveAtRegion" : "departFromRegion"
-  return await tifAPI[methodKey](region).then(
-    (result) => result.data.trackableRegions
+  return await tifAPI[methodKey](region).then((result) =>
+    EventArrivals.fromRegions(result.data.trackableRegions)
   )
 }

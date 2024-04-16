@@ -1,45 +1,38 @@
 import { getBackgroundPermissionsAsync } from "expo-location"
 import { TiFSQLite } from "@lib/SQLite"
-import {
-  EventArrivalRegion,
-  areEventRegionsEqual
-} from "TiFShared/domain-models/Event"
+import { EventID } from "TiFShared/domain-models/Event"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
+import { EventArrivals } from "./Arrivals"
 
 /**
  * An interface for storing client-side details on upcoming event arrivals.
  */
-export interface UpcomingEventArrivals {
+export interface EventArrivalsStorage {
   /**
-   * Loads all upcoming event arrivals.
+   * Loads all stored event arrivals.
    */
-  all: () => Promise<EventArrivalRegion[]>
+  current: () => Promise<EventArrivals>
 
   /**
-   * Replaces all upcoming arrivals with the new list of arrivals.
+   * Replaces all stored arrivals with a new instance of {@link EventArrivals}.
    */
-  replaceAll: (regions: EventArrivalRegion[]) => Promise<void>
+  replace: (regions: EventArrivals) => Promise<void>
 }
 
 /**
- * {@link UpcomingEventArrivals} implemented with SQLite.
+ * {@link EventArrivalsStorage} implemented with SQLite.
  */
-export class SQLiteUpcomingEventArrivals implements UpcomingEventArrivals {
+export class SQLiteEventArrivalsStorage implements EventArrivalsStorage {
   private readonly sqlite: TiFSQLite
 
   constructor(sqlite: TiFSQLite) {
     this.sqlite = sqlite
   }
 
-  async all() {
+  async current() {
     return await this.sqlite.withTransaction(async (db) => {
-      const results = await db.queryAll<
-        LocationCoordinate2D & {
-          arrivalRadiusMeters: number
-          eventId: number
-          hasArrived: number
-        }
-      >`
+      const arrivals = (
+        await db.queryAll<SQLiteEventArrival>`
       SELECT
         l.*,
         u.eventId AS eventId
@@ -53,33 +46,24 @@ export class SQLiteUpcomingEventArrivals implements UpcomingEventArrivals {
         u.longitude DESC,
         u.arrivalRadiusMeters DESC
       `
-      return results.reduce((acc, curr) => {
-        const region = {
-          coordinate: {
-            latitude: curr.latitude,
-            longitude: curr.longitude
-          },
-          arrivalRadiusMeters: curr.arrivalRadiusMeters,
-          hasArrived: curr.hasArrived === 1
-        }
-        if (
-          acc.length > 0 &&
-          areEventRegionsEqual(acc[acc.length - 1], region)
-        ) {
-          acc[acc.length - 1].eventIds.push(curr.eventId)
-        } else {
-          acc.push({ eventIds: [curr.eventId], ...region })
-        }
-        return acc
-      }, [] as EventArrivalRegion[])
+      ).map((arrival) => ({
+        eventId: arrival.eventId,
+        coordinate: {
+          latitude: arrival.latitude,
+          longitude: arrival.longitude
+        },
+        arrivalRadiusMeters: arrival.arrivalRadiusMeters,
+        hasArrived: arrival.hasArrived === 1
+      }))
+      return new EventArrivals(arrivals)
     })
   }
 
-  async replaceAll(regions: EventArrivalRegion[]) {
+  async replace(arrivals: EventArrivals) {
     await this.sqlite.withTransaction(async (db) => {
       await db.run`DELETE FROM LocationArrivals`
       await Promise.all(
-        regions.map(async (region) => {
+        arrivals.regions.map(async (region) => {
           await db.run`
           INSERT INTO LocationArrivals (
             latitude,
@@ -115,23 +99,31 @@ export class SQLiteUpcomingEventArrivals implements UpcomingEventArrivals {
   }
 }
 
+type SQLiteEventArrival = LocationCoordinate2D & {
+  arrivalRadiusMeters: number
+  eventId: EventID
+  hasArrived: number
+}
+
 /**
- * Given a base {@link UpcomingEventArrivals} instance, it prevents arrivals
+ * Given a base {@link EventArrivalsStorage} instance, it prevents arrivals
  * from being read and written if the user has background location permissions
  * disabled.
  */
 export const requireBackgroundLocationPermissions = (
-  base: UpcomingEventArrivals,
+  base: EventArrivalsStorage,
   loadPermissions: () => Promise<boolean> = async () => {
     return (await getBackgroundPermissionsAsync()).granted
   }
-): UpcomingEventArrivals => ({
-  all: async () => {
-    return (await loadPermissions()) ? await base.all() : []
+): EventArrivalsStorage => ({
+  current: async () => {
+    return (await loadPermissions())
+      ? await base.current()
+      : new EventArrivals()
   },
-  replaceAll: async (arrivalRegions) => {
+  replace: async (arrivalRegions) => {
     if (await loadPermissions()) {
-      await base.replaceAll(arrivalRegions)
+      await base.replace(arrivalRegions)
     }
   }
 })
