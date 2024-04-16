@@ -156,17 +156,12 @@ export class TiFSQLite {
       )
       `,
       db.run`
-      CREATE TABLE IF NOT EXISTS InternalMetrics (
-        id TEXT NOT NULL PRIMARY KEY DEFAULT 'A' CHECK (id = 'A'),
-        hasCompletedOnboarding INT2 NOT NULL,
-        lastEventArrivalsRefreshTime DOUBLE
-      )
-      `,
-      db.run`
-      CREATE TABLE IF NOT EXISTS DeviceSettings (
+      CREATE TABLE IF NOT EXISTS LocalSettings (
         id TEXT NOT NULL PRIMARY KEY DEFAULT 'A' CHECK (id = 'A'),
         isHapticFeedbackEnabled INT2 NOT NULL,
-        isHapticAudioEnabled INT2 NOT NULL
+        isHapticAudioEnabled INT2 NOT NULL,
+        hasCompletedOnboarding INT2 NOT NULL,
+        lastEventArrivalsRefreshTime DOUBLE
       )
       `
     ])
