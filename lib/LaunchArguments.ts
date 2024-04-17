@@ -2,6 +2,26 @@ import { CognitoAccessToken } from "amazon-cognito-identity-js"
 import { LaunchArguments as RNLaunchArguements } from "react-native-launch-arguments"
 import { z } from "zod"
 
+export const RawLaunchArgumentsSchema = z
+  .object({
+    apiURL: z.string().url(),
+    testCognitoUserToken: z.string()
+  })
+  .partial()
+
+/**
+ * A primitive form of {@link LaunchArguments}.
+ */
+export type RawLaunchArguments = z.rInfer<typeof RawLaunchArgumentsSchema>
+
+/**
+ * Launch arguments that can be configured for acceptance testing.
+ */
+export type ConfigurableTestRawLaunchArguments = Omit<
+  RawLaunchArguments,
+  "apiURL"
+>
+
 export const LaunchArgumentsSchema = z
   .object({
     apiURL: z
@@ -15,11 +35,6 @@ export const LaunchArgumentsSchema = z
   .partial()
 
 export type LaunchArguments = z.rInfer<typeof LaunchArgumentsSchema>
-
-/**
- * Launch arguments that can be configured for acceptance testing.
- */
-export type ConfigurableTestLaunchArguments = Omit<LaunchArguments, "apiURL">
 
 /**
  * The current run's launch arguments.
