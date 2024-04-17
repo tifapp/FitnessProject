@@ -1,4 +1,5 @@
 // "Generated" by Roswaal, do not touch.
+import { launchApp } from "../Launch"
 import {
   beforeLaunch,
   attemptToMakeJohnnyJoinTheEvent,
@@ -10,8 +11,7 @@ import {
 } from "./TestActions"
 
 test("BasicJoinEventThroughExploration", async () => {
-  await beforeLaunch()
-  await device.launchApp()
+  await launchApp(await beforeLaunch())
   // Johnny is signed in
   await ensureJohnnyHasSignedIntoHisAccount()
   // Johnny lives in the Bay Area
