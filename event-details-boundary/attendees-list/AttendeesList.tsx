@@ -1,8 +1,9 @@
 import { TiFAPI } from "@api-client/TiFAPI"
+import { Headline } from "@components/Text"
 import { EventAttendee } from "@shared-models/Event"
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { useMemo } from "react"
-import { StyleProp, ViewStyle } from "react-native"
+import { FlatList, StyleProp, View, ViewStyle } from "react-native"
 import { EventAttendeesList } from "./EventAttendeesList"
 
 export type EventAttendeesPage = {
@@ -121,3 +122,34 @@ export type AttendeesListViewProps = {
   Extract<ReturnType<typeof useAttendeesList>, { status: "success" }>,
   "status" | "host" | "isFetchingNextPage"
 >
+
+export const AttendeesListView = ({
+  attendeesList,
+  isRefetching,
+  renderAttendee,
+  refresh,
+  fetchNextGroup,
+  ListHeaderComponent,
+  style
+}: AttendeesListViewProps) => {
+  return (
+    <FlatList
+      style={style}
+      refreshing={isRefetching}
+      ListHeaderComponent={
+        <View>
+          {ListHeaderComponent}
+          <View>
+            <Headline> Attendees </Headline>
+            <Headline> ({attendeesList.totalAttendeeCount})</Headline>
+          </View>
+        </View>
+      }
+      data={attendeesList.attendees()}
+      onRefresh={refresh}
+      keyExtractor={(item) => `attendee-${item.id}`}
+      renderItem={({ item }) => renderAttendee(item)}
+      onEndReached={fetchNextGroup}
+    />
+  )
+}

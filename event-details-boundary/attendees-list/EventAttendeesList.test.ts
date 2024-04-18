@@ -31,18 +31,8 @@ describe("EventAttendeesList tests", () => {
         EventAttendeeMocks.BlobSr
       ])
     })
-    it("switches host with other attendee in list", () => {
-      const attendeesList = testAttendeesList.swapHost(
-        EventAttendeeMocks.BlobJr.id
-      )
-      expect(attendeesList.host).toEqual(EventAttendeeMocks.BlobJr)
-      expect(attendeesList.attendees()).toEqual([
-        EventAttendeeMocks.AnnaAttendee,
-        EventAttendeeMocks.Alivs,
-        EventAttendeeMocks.BlobSr
-      ])
-    })
-    it("switches host with attendee right after original host in list", () => {
+
+    it("switches host with attendee received on the first page of data", () => {
       const attendeesList = testAttendeesList.swapHost(
         EventAttendeeMocks.AnnaAttendee.id
       )
@@ -50,6 +40,17 @@ describe("EventAttendeesList tests", () => {
       expect(attendeesList.attendees()).toEqual([
         EventAttendeeMocks.Alivs,
         EventAttendeeMocks.BlobJr,
+        EventAttendeeMocks.BlobSr
+      ])
+    })
+    it("switches host with attendee received on the second page of data", () => {
+      const attendeesList = testAttendeesList.swapHost(
+        EventAttendeeMocks.BlobJr.id
+      )
+      expect(attendeesList.host).toEqual(EventAttendeeMocks.BlobJr)
+      expect(attendeesList.attendees()).toEqual([
+        EventAttendeeMocks.AnnaAttendee,
+        EventAttendeeMocks.Alivs,
         EventAttendeeMocks.BlobSr
       ])
     })
