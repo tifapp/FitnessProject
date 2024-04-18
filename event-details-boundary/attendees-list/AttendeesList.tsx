@@ -145,7 +145,7 @@ export const AttendeesListView = ({
           </View>
         </View>
       }
-      data={attendeesList.attendees()}
+      data={useMemo(() => attendeesList.attendees(), [attendeesList])}
       onRefresh={refresh}
       keyExtractor={(item) => `attendee-${item.id}`}
       renderItem={({ item }) => renderAttendee(item)}
