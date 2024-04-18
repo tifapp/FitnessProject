@@ -124,8 +124,7 @@ export type AttendeesListViewProps = {
 >
 
 export const AttendeesListView = ({
-  attendees,
-  totalAttendeeCount,
+  attendeesList,
   isRefetching,
   renderAttendee,
   refresh,
@@ -142,11 +141,11 @@ export const AttendeesListView = ({
           {ListHeaderComponent}
           <View>
             <Headline> Attendees </Headline>
-            <Headline> ({totalAttendeeCount})</Headline>
+            <Headline> ({attendeesList.totalAttendeeCount})</Headline>
           </View>
         </View>
       }
-      data={attendees}
+      data={attendeesList.attendees()}
       onRefresh={refresh}
       keyExtractor={(item) => `attendee-${item.id}`}
       renderItem={({ item }) => renderAttendee(item)}
