@@ -1,4 +1,4 @@
-import { CurrentUserEvent } from "@shared-models/Event"
+import { ClientSideEvent } from "@event/ClientSideEvent"
 import { captureAlerts } from "@test-helpers/Alerts"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import {
@@ -28,12 +28,12 @@ describe("LeaveEvent tests", () => {
       await tapAlertButton("Delete")
     }
 
-    const renderUseEventDetails = (event: CurrentUserEvent) => {
+    const renderUseEventDetails = (event: ClientSideEvent) => {
       return renderSuccessfulUseLoadEventDetails(event, queryClient)
     }
 
     const renderUseLeaveEvent = (
-      testUserStatus: Pick<CurrentUserEvent, "userAttendeeStatus">
+      testUserStatus: Pick<ClientSideEvent, "userAttendeeStatus">
     ) => {
       return renderHook(
         () =>

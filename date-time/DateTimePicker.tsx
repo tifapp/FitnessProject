@@ -3,7 +3,7 @@ import { Platform, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import RNDateTimePicker, {
   DateTimePickerAndroid as RNDateTimePickerAndroid
 } from "@react-native-community/datetimepicker"
-import { dayjs } from "./Dayjs"
+import { dayjs } from "TiFShared/lib/Dayjs"
 import { MaterialIcons } from "@expo/vector-icons"
 import IconButton from "../components/common/IconButton"
 
@@ -72,13 +72,11 @@ export type DateTimePickerProps = {
  * date and time pickers respectively.
  */
 export const DateTimePicker = (props: DateTimePickerProps) =>
-  Platform.OS === "android"
-    ? (
-      <DatePickerAndroid {...props} />
-    )
-    : (
-      <DateTimePickerIOS {...props} />
-    )
+  Platform.OS === "android" ? (
+    <DatePickerAndroid {...props} />
+  ) : (
+    <DateTimePickerIOS {...props} />
+  )
 
 const DateTimePickerIOS = ({
   testID,

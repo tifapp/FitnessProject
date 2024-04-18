@@ -1,13 +1,13 @@
 import { AuthFormView } from "../AuthLayout"
 import { AuthShadedTextField } from "../AuthTextFields"
 import { Ionicon } from "@components/common/Icons"
-import { UserHandle, UserHandleError } from "@content-parsing"
 import { useFormSubmission } from "@lib/utils/Form"
 import { sleep } from "@lib/utils/DelayData"
 import { QueryHookOptions } from "@lib/ReactQuery"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import React, { useRef, useState } from "react"
 import { ActivityIndicator, Alert, StyleProp, ViewStyle } from "react-native"
+import { UserHandle, UserHandleError } from "TiFShared/domain-models/User"
 
 export type UseSignUpChangeUserHandleFormEnvironment = {
   checkIfUserHandleTaken: (

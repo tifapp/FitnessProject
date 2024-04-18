@@ -2,17 +2,17 @@ import { BodyText, Subtitle } from "@components/Text"
 import { TouchableIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors } from "@lib/Fonts"
-import { dayjs } from "@date-time"
+import { dayjs } from "TiFShared/lib/Dayjs"
 import { useState } from "react"
 import { View, ViewStyle, StyleSheet, StyleProp } from "react-native"
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
-import { EventRegion } from "@shared-models/Event"
 import {
   EventRegionMonitor,
   useHasArrivedAtRegion
 } from "@arrival-tracking/region-monitoring"
-import { humanizeEventCountdownSeconds } from "./Event"
-import { TodayOrTomorrow } from "@shared-models/TodayOrTomorrow"
+import { formattedEventCountdownSeconds } from "./SharedCountdownFormatting"
+import { EventRegion } from "TiFShared/domain-models/Event"
+import { TodayOrTomorrow } from "TiFShared/domain-models/TodayOrTomorrow"
 
 /**
  * Handles state related to whether or not to show the event arrival banner for
@@ -183,7 +183,7 @@ export const countdownMessage = (countdown: EventArrivalBannerCountdown) => {
   } else if (countdown.secondsToStart < ONE_HOUR_IN_SECONDS) {
     return "This event kicks off in under an hour."
   } else {
-    const countdownText = humanizeEventCountdownSeconds(
+    const countdownText = formattedEventCountdownSeconds(
       countdown.secondsToStart
     )
     return `This event kicks off in ${countdownText}.`

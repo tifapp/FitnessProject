@@ -12,20 +12,21 @@ import {
 import { timeTravel, fakeTimers } from "@test-helpers/Timers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import {
+  ExploreEventsRegion,
+  minRegionMeterRadius,
   createDefaultMapRegion,
-  SAN_FRANCISCO_DEFAULT_REGION,
-  ExploreEventsInitialCenter
-} from "./Models"
+  SAN_FRANCISCO_DEFAULT_REGION
+} from "./Region"
 import { eventsByRegion, useExploreEvents } from "./ExploreEvents"
 import { renderUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 import { neverPromise } from "@test-helpers/Promise"
-import { EventID } from "@shared-models/Event"
-import { Region, minRegionMeterRadius } from "@location/Region"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { mswServer } from "@test-helpers/msw"
 import { HttpResponse, http } from "msw"
-import { TiFAPI } from "@api-client/TiFAPI"
+import { TiFAPI } from "TiFShared/api"
+import { EventID } from "TiFShared/domain-models/Event"
+import { ExploreEventsInitialCenter } from "./InitialCenter"
 
 const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
 
@@ -419,7 +420,7 @@ describe("ExploreEvents tests", () => {
       })
     })
 
-    const expectFetchedExploreRegion = (region: Region) => {
+    const expectFetchedExploreRegion = (region: ExploreEventsRegion) => {
       expect(fetchEvents).toHaveBeenCalledWith(region, expect.any(AbortSignal))
     }
 

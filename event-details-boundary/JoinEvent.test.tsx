@@ -17,10 +17,10 @@ import { mockLocationCoordinate2D, mockTiFLocation } from "@location/MockData"
 import "@test-helpers/Matchers"
 import { TrueRegionMonitor } from "@arrival-tracking/region-monitoring/MockRegionMonitors"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
-import { SQLiteRecentLocationsStorage } from "@lib/RecentsLocations"
+import { SQLiteRecentLocationsStorage } from "@location/Recents"
 import { mswServer } from "@test-helpers/msw"
 import { http, HttpResponse } from "msw"
-import { TiFAPI } from "@api-client/TiFAPI"
+import { TiFAPI } from "TiFShared/api"
 import { mockEventRegion } from "@arrival-tracking/MockData"
 import {
   EventMocks,
@@ -29,6 +29,7 @@ import {
 } from "./MockData"
 import { renderSuccessfulUseLoadEventDetails } from "./TestHelpers"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
+import { EventArrivals } from "@arrival-tracking"
 
 describe("JoinEvent tests", () => {
   describe("UseJoinEvent tests", () => {
@@ -306,8 +307,9 @@ describe("JoinEvent tests", () => {
       setTestRequestHandler(response, 201)
       await performTestJoinEvent(TEST_REQUEST)
       expect(onJoinSuccessHandler).toHaveBeenCalledWith({
-        ...response,
-        location: TEST_REQUEST.location
+        chatToken: response.chatToken,
+        arrivals: EventArrivals.fromRegions(response.trackableRegions),
+        locationIdentifier: TEST_REQUEST.location
       })
       expect(onJoinSuccessHandler).toHaveBeenCalledTimes(1)
     })
@@ -366,7 +368,7 @@ describe("JoinEvent tests", () => {
     it("should not save anything when the location has no placemark", async () => {
       const coordinate = mockLocationCoordinate2D()
       await saveRecentLocationJoinEventHandler(
-        { location: { coordinate, placemark: null } },
+        { locationIdentifier: { coordinate, placemark: null } },
         recentsStorage
       )
       const recents = await recentsStorage.locationsForCoordinates([coordinate])
@@ -375,7 +377,10 @@ describe("JoinEvent tests", () => {
 
     it("should save the location when the location has a placemark with an joined-event annotation", async () => {
       const location = mockTiFLocation()
-      await saveRecentLocationJoinEventHandler({ location }, recentsStorage)
+      await saveRecentLocationJoinEventHandler(
+        { locationIdentifier: location },
+        recentsStorage
+      )
       const recents = await recentsStorage.locationsForCoordinates([
         location.coordinate
       ])
@@ -385,8 +390,8 @@ describe("JoinEvent tests", () => {
 
   const mockSuccessResponse = () => ({
     id: 1,
-    upcomingRegions: [],
-    isArrived: false,
-    token: mockEventChatTokenRequest()
+    trackableRegions: [],
+    hasArrived: false,
+    chatToken: mockEventChatTokenRequest()
   })
 })

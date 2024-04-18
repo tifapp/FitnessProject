@@ -1,9 +1,6 @@
-import { SQLiteUpcomingEventArrivals } from "./UpcomingArrivals"
+import { SQLiteEventArrivalsStorage } from "./Storage"
 import { EventArrivalsTracker } from "./Tracker"
-import { EventArrivalRegion } from "@shared-models/EventArrivals"
-import { ArrayUtils } from "@lib/utils/Array"
 import { waitFor } from "@testing-library/react-native"
-import { mockLocationCoordinate2D } from "@location/MockData"
 import {
   mockEventArrival,
   mockEventArrivalGeofencedRegion,
@@ -13,9 +10,17 @@ import { neverPromise } from "@test-helpers/Promise"
 import { TestEventArrivalsGeofencer } from "./geofencing/TestGeofencer"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
+import { repeatElements } from "TiFShared/lib/Array"
+import {
+  addTestArrivals,
+  expectOrderInsensitiveEventArrivals,
+  regionWithArrivalData,
+  removeTestArrivals
+} from "./TestHelpers"
+import { EventArrivals } from "./Arrivals"
 
 describe("EventArrivalsTracker tests", () => {
-  const upcomingArrivals = new SQLiteUpcomingEventArrivals(testSQLite)
+  const upcomingArrivals = new SQLiteEventArrivalsStorage(testSQLite)
   resetTestSQLiteBeforeEach()
 
   const testGeofencer = new TestEventArrivalsGeofencer()
@@ -32,213 +37,23 @@ describe("EventArrivalsTracker tests", () => {
   })
 
   test("refresh arrivals", async () => {
-    const regions = ArrayUtils.repeatElements(2, () => {
-      return mockEventArrivalRegion()
-    })
-    await tracker.refreshArrivals(jest.fn().mockResolvedValueOnce(regions))
-    await expectTrackedRegions(regions)
+    const arrivals = EventArrivals.fromRegions(
+      repeatElements(2, () => mockEventArrivalRegion())
+    )
+    await tracker.refreshArrivals(jest.fn().mockResolvedValueOnce(arrivals))
+    await expectTrackedArrivals(arrivals)
   })
 
-  test("track arrival, basic", async () => {
+  test("transform arrivals", async () => {
     const arrival = mockEventArrival()
-    await tracker.trackArrival(arrival)
-    await expectTrackedRegions([
-      {
-        eventIds: [arrival.eventId],
-        coordinate: arrival.coordinate,
-        arrivalRadiusMeters: arrival.arrivalRadiusMeters,
-        isArrived: false
-      }
-    ])
-  })
-
-  test("track arrival, does not add duplicates", async () => {
-    const arrival = mockEventArrival()
-    await tracker.trackArrival(arrival)
-    await tracker.trackArrival(arrival)
-    await expectTrackedRegions([
-      {
-        eventIds: [arrival.eventId],
-        coordinate: arrival.coordinate,
-        arrivalRadiusMeters: arrival.arrivalRadiusMeters,
-        isArrived: false
-      }
-    ])
-  })
-
-  test("track arrivals, does not add duplicates", async () => {
-    const arrival = mockEventArrival()
-    await tracker.trackArrivals([arrival, arrival])
-    await expectTrackedRegions([
-      {
-        eventIds: [arrival.eventId],
-        coordinate: arrival.coordinate,
-        arrivalRadiusMeters: arrival.arrivalRadiusMeters,
-        isArrived: false
-      }
-    ])
-  })
-
-  test("track arrivals, updates already existing arrival from earlier in the array", async () => {
-    const arrival = mockEventArrival()
-    const arrival2 = { ...arrival, coordinate: mockLocationCoordinate2D() }
-    const arrival3 = mockEventArrival()
-    const arrival4 = { ...arrival, coordinate: mockLocationCoordinate2D() }
-    await tracker.trackArrivals([arrival, arrival2, arrival3, arrival4])
-    await expectTrackedRegions([
-      {
-        eventIds: [arrival3.eventId],
-        coordinate: arrival3.coordinate,
-        arrivalRadiusMeters: arrival3.arrivalRadiusMeters,
-        isArrived: false
-      },
-      {
-        eventIds: [arrival4.eventId],
-        coordinate: arrival4.coordinate,
-        arrivalRadiusMeters: arrival4.arrivalRadiusMeters,
-        isArrived: false
-      }
-    ])
-  })
-
-  test("track arrival, adds event id to already existing region", async () => {
-    const region = {
-      ...mockEventArrivalRegion(),
-      eventIds: [1],
-      isArrived: true
-    }
-    const arrival = {
-      ...mockEventArrival(),
-      coordinate: region.coordinate,
-      arrivalRadiusMeters: region.arrivalRadiusMeters
-    }
-    await tracker.refreshArrivals(jest.fn().mockResolvedValueOnce([region]))
-    await tracker.trackArrival(arrival)
-    await expectTrackedRegions([
-      {
-        ...region,
-        eventIds: [1, arrival.eventId]
-      }
-    ])
-  })
-
-  test("track arrival, updates the region of an existing event id, removes the original region if no other events in said region", async () => {
-    const arrival = mockEventArrival()
-    await tracker.trackArrival(arrival)
-    const newArrival = { ...arrival, coordinate: mockLocationCoordinate2D() }
-    await tracker.trackArrival(newArrival)
-    await expectTrackedRegions([
-      {
-        eventIds: [newArrival.eventId],
-        coordinate: newArrival.coordinate,
-        arrivalRadiusMeters: newArrival.arrivalRadiusMeters,
-        isArrived: false
-      }
-    ])
-  })
-
-  test("track arrival, updates the region of an existing event id, adds a new region if no other events in said region", async () => {
-    const region = mockEventArrivalRegion()
-    const arrivals = ArrayUtils.repeatElements(2, () => {
-      return {
-        ...mockEventArrival(),
-        coordinate: region.coordinate,
-        arrivalRadiusMeters: region.arrivalRadiusMeters
-      }
-    })
-    await tracker.trackArrivals(arrivals)
-    const newArrival = {
-      ...arrivals[1],
-      coordinate: mockLocationCoordinate2D()
-    }
-    await tracker.trackArrival(newArrival)
-    await expectTrackedRegions([
-      {
-        eventIds: [arrivals[0].eventId],
-        coordinate: arrivals[0].coordinate,
-        arrivalRadiusMeters: arrivals[0].arrivalRadiusMeters,
-        isArrived: false
-      },
-      {
-        eventIds: [newArrival.eventId],
-        coordinate: newArrival.coordinate,
-        arrivalRadiusMeters: newArrival.arrivalRadiusMeters,
-        isArrived: false
-      }
-    ])
-  })
-
-  test("track arrival, updates the region of an existing event id, moves event to existing region if new region is tracked", async () => {
-    const arrivals = ArrayUtils.repeatElements(3, () => {
-      return mockEventArrival()
-    })
-    await tracker.trackArrivals(arrivals)
-    const newArrival = {
-      ...arrivals[2],
-      coordinate: arrivals[0].coordinate,
-      arrivalRadiusMeters: arrivals[0].arrivalRadiusMeters
-    }
-    await tracker.trackArrival(newArrival)
-    await expectTrackedRegions([
-      {
-        eventIds: [arrivals[0].eventId, newArrival.eventId],
-        coordinate: arrivals[0].coordinate,
-        arrivalRadiusMeters: arrivals[0].arrivalRadiusMeters,
-        isArrived: false
-      },
-      {
-        eventIds: [arrivals[1].eventId],
-        coordinate: arrivals[1].coordinate,
-        arrivalRadiusMeters: arrivals[1].arrivalRadiusMeters,
-        isArrived: false
-      }
-    ])
-  })
-
-  test("remove arrival, basic", async () => {
-    await tracker.trackArrival({ ...mockEventArrival(), eventId: 1 })
-    await tracker.removeArrivalByEventId(1)
-    await expectTrackedRegions([])
-  })
-
-  test("remove arrival, keeps region when there are still arrivals left at the same region", async () => {
-    const region = mockEventArrivalRegion()
-    const arrivals = ArrayUtils.repeatElements(2, () => {
-      return {
-        ...mockEventArrival(),
-        coordinate: region.coordinate,
-        arrivalRadiusMeters: region.arrivalRadiusMeters
-      }
-    })
-    await tracker.trackArrivals(arrivals)
-    await tracker.removeArrivalByEventId(arrivals[0].eventId)
-    await expectTrackedRegions([
-      {
-        eventIds: [arrivals[1].eventId],
-        coordinate: region.coordinate,
-        arrivalRadiusMeters: region.arrivalRadiusMeters,
-        isArrived: false
-      }
-    ])
-  })
-
-  test("remove arrival, does nothing when no tracked arrivals", async () => {
-    await tracker.removeArrivalByEventId(1)
-    await expectTrackedRegions([])
-  })
-
-  test("remove arrival, does nothing when given arrival not tracked", async () => {
-    const trackedArrival = { ...mockEventArrival(), eventId: 2 }
-    await tracker.trackArrival(trackedArrival)
-    await tracker.removeArrivalByEventId(1)
-    await expectTrackedRegions([
-      {
-        eventIds: [2],
-        coordinate: trackedArrival.coordinate,
-        arrivalRadiusMeters: trackedArrival.arrivalRadiusMeters,
-        isArrived: false
-      }
-    ])
+    await tracker.transformTrackedArrivals((arrivals) =>
+      arrivals.addArrivals([arrival])
+    )
+    await expectTrackedArrivals(
+      EventArrivals.fromRegions([
+        regionWithArrivalData([arrival.eventId], arrival)
+      ])
+    )
   })
 
   test("does not subscribe to geofencing updates when no tracked arrivals", async () => {
@@ -247,7 +62,7 @@ describe("EventArrivalsTracker tests", () => {
   })
 
   test("subscribes to geofencing updates when new instance detects previously tracked arrivals", async () => {
-    await tracker.trackArrival(mockEventArrival())
+    await addTestArrivals(tracker, mockEventArrival())
     tracker.stopTracking()
     expect(testGeofencer.hasSubscriber).toEqual(false)
     const tracker2 = new EventArrivalsTracker(
@@ -261,16 +76,16 @@ describe("EventArrivalsTracker tests", () => {
 
   test("unsubscribes from tracker when removing all tracked arrivals", async () => {
     const arrival = mockEventArrival()
-    await tracker.trackArrival(arrival)
+    await addTestArrivals(tracker, arrival)
     expect(testGeofencer.hasSubscriber).toEqual(true)
-    await tracker.removeArrivalByEventId(arrival.eventId)
+    await removeTestArrivals(tracker, arrival.eventId)
     expect(testGeofencer.hasSubscriber).toEqual(false)
   })
 
   test("handle geofencing update, does arrived operation for all arrivals when entering region", async () => {
     performArrivalOperation.mockImplementationOnce(neverPromise)
-    await tracker.trackArrival(mockEventArrival())
-    const region = { ...mockEventArrivalGeofencedRegion(), isArrived: true }
+    await addTestArrivals(tracker, mockEventArrival())
+    const region = { ...mockEventArrivalGeofencedRegion(), hasArrived: true }
     testGeofencer.sendUpdate(region)
     await waitFor(() => {
       expect(performArrivalOperation).toHaveBeenCalledWith(
@@ -285,8 +100,8 @@ describe("EventArrivalsTracker tests", () => {
 
   test("handle geofencing update, does departed operation for all arrivals when exiting region", async () => {
     performArrivalOperation.mockImplementationOnce(neverPromise)
-    await tracker.trackArrival(mockEventArrival())
-    const region = { ...mockEventArrivalGeofencedRegion(), isArrived: false }
+    await addTestArrivals(tracker, mockEventArrival())
+    const region = { ...mockEventArrivalGeofencedRegion(), hasArrived: false }
     testGeofencer.sendUpdate(region)
     await waitFor(() => {
       expect(performArrivalOperation).toHaveBeenCalledWith(
@@ -300,39 +115,44 @@ describe("EventArrivalsTracker tests", () => {
   })
 
   test("replaces all tracked regions when performing an arrivals operation", async () => {
-    const newRegions = ArrayUtils.repeatElements(3, () => {
-      return mockEventArrivalRegion()
-    })
-    performArrivalOperation.mockResolvedValueOnce(newRegions)
-    await tracker.trackArrival(mockEventArrival())
+    const newArrivals = EventArrivals.fromRegions(
+      repeatElements(3, () => mockEventArrivalRegion())
+    )
+    performArrivalOperation.mockResolvedValueOnce(newArrivals)
+    await addTestArrivals(tracker, mockEventArrival())
     testGeofencer.sendUpdate(mockEventArrivalGeofencedRegion())
-    await expectTrackedRegions(newRegions)
+    await expectTrackedArrivals(newArrivals)
   })
 
   test("publishes update after performing an arrivals operation", async () => {
-    const newRegions = ArrayUtils.repeatElements(3, () => {
-      return mockEventArrivalRegion()
-    })
-    performArrivalOperation.mockResolvedValueOnce(newRegions)
-    await tracker.trackArrival(mockEventArrival())
+    const newArrivals = EventArrivals.fromRegions(
+      repeatElements(3, () => mockEventArrivalRegion())
+    )
+    performArrivalOperation.mockResolvedValueOnce(newArrivals)
+    await addTestArrivals(tracker, mockEventArrival())
     const callback = jest.fn()
     tracker.subscribe(callback)
     await waitFor(() => expect(callback).toHaveBeenCalled())
 
     const geofencedRegion = {
       ...mockEventArrivalGeofencedRegion(),
-      isArrived: true
+      hasArrived: true
     }
     testGeofencer.sendUpdate(geofencedRegion)
     await waitFor(() => {
-      expect(callback).toHaveBeenNthCalledWith(2, newRegions)
+      expectOrderInsensitiveEventArrivals(
+        callback.mock.lastCall[0],
+        newArrivals
+      )
     })
     expect(callback).toHaveBeenCalledTimes(2)
   })
 
   test("does not publish update after unsubscribing from arrivals operation updates", async () => {
-    performArrivalOperation.mockResolvedValueOnce([mockEventArrivalRegion()])
-    await tracker.trackArrival(mockEventArrival())
+    performArrivalOperation.mockResolvedValueOnce(
+      EventArrivals.fromRegions([mockEventArrivalRegion()])
+    )
+    await addTestArrivals(tracker, mockEventArrival())
     const callback = jest.fn()
     const subscription = tracker.subscribe(callback)
     await waitFor(() => expect(callback).toHaveBeenCalled())
@@ -359,26 +179,27 @@ describe("EventArrivalsTracker tests", () => {
     const subscription = tracker.subscribe(callback)
     await subscription.waitForInitialRegionsToLoad()
     callback.mockReset()
-    await tracker.trackArrival(arrival)
-    await waitFor(() => expect(callback).toHaveBeenCalledWith([]))
+    await addTestArrivals(tracker, arrival)
+    await waitFor(() =>
+      expect(callback).toHaveBeenCalledWith(new EventArrivals())
+    )
     expect(callback).toHaveBeenCalledTimes(1)
   })
 
-  const expectTrackedRegions = async (regions: EventArrivalRegion[]) => {
+  const expectTrackedArrivals = async (arrivals: EventArrivals) => {
     await waitFor(async () => {
-      const upcoming = await upcomingArrivals.all()
-      expect(upcoming).toEqual(expect.arrayContaining(regions))
-      expect(upcoming).toHaveLength(regions.length)
+      const trackedArrivals = await tracker.trackedArrivals()
+      expectOrderInsensitiveEventArrivals(trackedArrivals, arrivals)
     })
     expect(testGeofencer.geofencedRegions).toMatchObject(
-      expect.arrayContaining(regions)
+      expect.arrayContaining(arrivals.regions)
     )
-    expect(testGeofencer.geofencedRegions).toHaveLength(regions.length)
+    expect(testGeofencer.geofencedRegions).toHaveLength(arrivals.regions.length)
 
     const callback = jest.fn()
     const subscription = tracker.subscribe(callback)
     await subscription.waitForInitialRegionsToLoad()
-    expect(callback).toHaveBeenCalledWith(expect.arrayContaining(regions))
+    expectOrderInsensitiveEventArrivals(callback.mock.lastCall[0], arrivals)
     expect(callback).toHaveBeenCalledTimes(1)
   }
 })

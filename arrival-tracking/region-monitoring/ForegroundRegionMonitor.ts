@@ -1,9 +1,4 @@
 /* eslint-disable func-call-spacing */
-import { EventRegion } from "@shared-models/Event"
-import {
-  LocationCoordinate2D,
-  metersBetweenLocations
-} from "@shared-models/Location"
 import { LocationSubscription } from "expo-location"
 import { EventRegionMonitor } from "./RegionMonitoring"
 import {
@@ -11,6 +6,11 @@ import {
   filterStateIfInactive,
   stateForRegion
 } from "./RegionState"
+import {
+  LocationCoordinate2D,
+  coordinateDistance
+} from "TiFShared/domain-models/LocationCoordinate2D"
+import { EventRegion } from "TiFShared/domain-models/Event"
 
 /**
  * A way to monitor the user's proximity to {@link EventRegion}s entirely in
@@ -52,7 +52,7 @@ export class ForegroundEventRegionMonitor implements EventRegionMonitor {
     callback: (coordinate: LocationCoordinate2D) => void
   ) => Promise<LocationSubscription>
 
-  constructor (
+  constructor(
     watch: (
       callback: (coordinate: LocationCoordinate2D) => void
     ) => Promise<LocationSubscription>
@@ -60,7 +60,7 @@ export class ForegroundEventRegionMonitor implements EventRegionMonitor {
     this.watch = watch
   }
 
-  monitorRegion (region: EventRegion, callback: (hasArrived: boolean) => void) {
+  monitorRegion(region: EventRegion, callback: (hasArrived: boolean) => void) {
     const hasArrived = this.hasArrivedAtRegion(region)
     const state = this.findOrPushStateForRegion(region, hasArrived)
     const unsub = state.subscribeEmittingInitialStatus(callback)
@@ -72,13 +72,13 @@ export class ForegroundEventRegionMonitor implements EventRegionMonitor {
     }
   }
 
-  hasArrivedAtRegion (region: EventRegion) {
+  hasArrivedAtRegion(region: EventRegion) {
     const state = stateForRegion(region, this.regionStates)
     if (state) return state.hasArrived
     return isCoordinateWithinRegion(region, this.userCoordinate)
   }
 
-  private findOrPushStateForRegion (region: EventRegion, hasArrived: boolean) {
+  private findOrPushStateForRegion(region: EventRegion, hasArrived: boolean) {
     const state = stateForRegion(region, this.regionStates)
     const newState = state ?? new ForegroundRegionState(region, hasArrived)
     if (!state) {
@@ -87,7 +87,7 @@ export class ForegroundEventRegionMonitor implements EventRegionMonitor {
     return newState
   }
 
-  private handleUserCoordinateUpdate (newCoordinate: LocationCoordinate2D) {
+  private handleUserCoordinateUpdate(newCoordinate: LocationCoordinate2D) {
     this.userCoordinate = newCoordinate
     this.regionStates.forEach((state) => {
       const hasArrivedAtNewCoordinate = isCoordinateWithinRegion(
@@ -101,14 +101,14 @@ export class ForegroundEventRegionMonitor implements EventRegionMonitor {
     })
   }
 
-  private startWatchingIfNeeded () {
+  private startWatchingIfNeeded() {
     if (this.watchPromise) return
     this.watchPromise = this.watch((coordinate) => {
       this.handleUserCoordinateUpdate(coordinate)
     })
   }
 
-  private async stopWatchingIfNeeded () {
+  private async stopWatchingIfNeeded() {
     if (this.regionStates.length > 0) return
     const subscription = await this.watchPromise
     subscription?.remove()
@@ -122,7 +122,7 @@ class ForegroundRegionState extends RegionState {
     hasArrived: boolean
   }
 
-  subscribeEmittingInitialStatus (callback: (hasArrived: boolean) => void) {
+  subscribeEmittingInitialStatus(callback: (hasArrived: boolean) => void) {
     callback(super.hasArrived)
     const baseUnsub = super.subscribe(callback)
     return () => {
@@ -133,7 +133,7 @@ class ForegroundRegionState extends RegionState {
     }
   }
 
-  scheduleUpdateIfNeeded (hasArrived: boolean, timeout: number) {
+  scheduleUpdateIfNeeded(hasArrived: boolean, timeout: number) {
     const isScheduledUpdateInvalid =
       this.scheduledUpdate?.hasArrived !== hasArrived
     if (isScheduledUpdateInvalid) {
@@ -146,13 +146,13 @@ class ForegroundRegionState extends RegionState {
     }
   }
 
-  private cancelScheduledUpdate () {
+  private cancelScheduledUpdate() {
     if (!this.scheduledUpdate) return
     clearTimeout(this.scheduledUpdate.timeout)
     this.scheduledUpdate = undefined
   }
 
-  private scheduleUpdate (hasArrived: boolean, timeout: number) {
+  private scheduleUpdate(hasArrived: boolean, timeout: number) {
     this.scheduledUpdate = {
       timeout: setTimeout(() => {
         super.publishUpdate(hasArrived)
@@ -168,6 +168,6 @@ const isCoordinateWithinRegion = (
   coordinate?: LocationCoordinate2D
 ) => {
   if (!coordinate) return false
-  const metersDiff = metersBetweenLocations(region.coordinate, coordinate)
+  const metersDiff = coordinateDistance(region.coordinate, coordinate, "meters")
   return metersDiff <= region.arrivalRadiusMeters
 }

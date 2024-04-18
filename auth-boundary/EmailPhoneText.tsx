@@ -1,6 +1,5 @@
 import React, { useState } from "react"
 import { USPhoneNumber, EmailAddress } from "./Models"
-import { StringUtils } from "@lib/utils/String"
 import {
   StyleProp,
   StyleSheet,
@@ -11,6 +10,7 @@ import { BodyText } from "@components/Text"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 import { AppStyles } from "@lib/AppColorStyle"
+import { extractNumbers } from "TiFShared/lib/String"
 
 export type EmailPhoneTextType = "email" | "phone"
 
@@ -42,9 +42,7 @@ export const useEmailPhoneTextState = (initialTextType: EmailPhoneTextType) => {
     text:
       activeTextType === "email"
         ? activeText
-        : prettyFormatIncrementalE164PhoneNumber(
-          StringUtils.extractNumbers(activeText)
-        ),
+        : prettyFormatIncrementalE164PhoneNumber(extractNumbers(activeText)),
     onTextChanged: (text: string) => {
       setText((t) => ({ ...t, [activeTextType]: text }))
     },
@@ -52,7 +50,7 @@ export const useEmailPhoneTextState = (initialTextType: EmailPhoneTextType) => {
     onActiveTextTypeChanged: setTextType,
     onActiveTextTypeToggled: () => setTextType(toggleTextType),
     parsedValue,
-    get errorReason (): EmailPhoneTextErrorReason | undefined {
+    get errorReason(): EmailPhoneTextErrorReason | undefined {
       if (activeText.length === 0) return "empty"
       if (parsedValue) return undefined
       return activeTextType === "email"

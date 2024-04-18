@@ -1,5 +1,8 @@
-import { CallbackCollection } from "@lib/CallbackCollection"
-import { EventRegion, areEventRegionsEqual } from "@shared-models/Event"
+import { CallbackCollection } from "@lib/utils/CallbackCollection"
+import {
+  EventRegion,
+  areEventRegionsEqual
+} from "TiFShared/domain-models/Event"
 
 /**
  * A shared base helper class for handling a list of subscriptions to the
@@ -11,29 +14,29 @@ export class RegionState {
 
   private callbacks = new CallbackCollection<boolean>()
 
-  get hasArrived () {
+  get hasArrived() {
     return this._hasArrived
   }
 
-  get isActive () {
+  get isActive() {
     return this.hasSubscribers
   }
 
-  get hasSubscribers () {
+  get hasSubscribers() {
     return this.callbacks.count > 0
   }
 
-  constructor (region: EventRegion, hasArrived: boolean) {
+  constructor(region: EventRegion, hasArrived: boolean) {
     this.region = region
     this._hasArrived = hasArrived
   }
 
-  protected publishUpdate (hasArrived: boolean) {
+  protected publishUpdate(hasArrived: boolean) {
     this._hasArrived = hasArrived
     this.callbacks.send(hasArrived)
   }
 
-  protected subscribe (callback: (hasArrived: boolean) => void) {
+  protected subscribe(callback: (hasArrived: boolean) => void) {
     return this.callbacks.add(callback)
   }
 }

@@ -1,4 +1,4 @@
-import { EventArrivalRegion } from "@shared-models/EventArrivals"
+import { EventArrivalRegion } from "TiFShared/domain-models/Event"
 
 export type EventArrivalGeofencedRegion = Omit<EventArrivalRegion, "eventIds">
 

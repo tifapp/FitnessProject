@@ -2,23 +2,17 @@ import React, { useState } from "react"
 import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import {
-  LocationCoordinate2D,
-  Region,
-  minRegionMeterRadius,
   useRequestForegroundLocationPermissions,
   useUserCoordinatesQuery
 } from "@location/index"
 import {
-  CurrentUserEvent,
-  currentUserEventFromResponse
-} from "@shared-models/Event"
+  ClientSideEvent,
+  clientSideEventFromResponse
+} from "@event/ClientSideEvent"
 import {
-  ExploreEventsData,
   ExploreEventsInitialCenter,
-  SAN_FRANCISCO_DEFAULT_REGION,
-  createDefaultMapRegion,
   initialCenterToRegion
-} from "./Models"
+} from "./InitialCenter"
 import { ExploreEventsMap } from "./Map"
 import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
 import { ExploreEventsBottomSheet } from "./BottomSheet"
@@ -28,14 +22,21 @@ import { Ionicon } from "@components/common/Icons"
 import { PrimaryButton } from "@components/Buttons"
 import { ExploreEventsSearchBar } from "./SearchBar"
 import { QueryHookOptions } from "@lib/ReactQuery"
-import { eventDetailsQueryKey } from "@shared-models/query-keys/Event"
 import { UseQueryResult, useQueryClient, useQuery } from "@tanstack/react-query"
 import { PermissionResponse, LocationAccuracy } from "expo-location"
-import { TiFAPI } from "@api-client/TiFAPI"
+import { TiFAPI } from "TiFShared/api"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
+import {
+  ExploreEventsRegion,
+  SAN_FRANCISCO_DEFAULT_REGION,
+  createDefaultMapRegion,
+  minRegionMeterRadius
+} from "./Region"
+import { eventDetailsQueryKey } from "@event/DetailsQuery"
 
 export const eventsByRegion = async (
   api: TiFAPI,
-  region: Region,
+  region: ExploreEventsRegion,
   signal?: AbortSignal
 ) => {
   return (
@@ -44,15 +45,27 @@ export const eventsByRegion = async (
       minRegionMeterRadius(region),
       signal
     )
-  ).data.events.map(currentUserEventFromResponse)
+  ).data.events.map(clientSideEventFromResponse)
 }
+
+/**
+ * Data representation of events explored in a given area.
+ */
+export type ExploreEventsData =
+  | { status: "loading"; events?: ClientSideEvent[] }
+  | { status: "error"; events?: ClientSideEvent[]; retry: () => void }
+  | { status: "no-results"; events: [] }
+  | { status: "success"; events: ClientSideEvent[] }
 
 export type UseExploreEventsEnvironment = {
   fetchEvents: (
-    region: Region,
+    region: ExploreEventsRegion,
     signal?: AbortSignal
-  ) => Promise<CurrentUserEvent[]>
-  isSignificantlyDifferentRegions: (r1: Region, r2: Region) => boolean
+  ) => Promise<ClientSideEvent[]>
+  isSignificantlyDifferentRegions: (
+    r1: ExploreEventsRegion,
+    r2: ExploreEventsRegion
+  ) => boolean
 }
 
 /**
@@ -69,7 +82,7 @@ export const useExploreEvents = (
   return {
     region,
     data: eventsQueryToExploreEventsData(events),
-    updateRegion: (newRegion: Region) => {
+    updateRegion: (newRegion: ExploreEventsRegion) => {
       if (!region) {
         panToRegion(newRegion)
       } else if (isSignificantlyDifferentRegions(region, newRegion)) {
@@ -81,7 +94,7 @@ export const useExploreEvents = (
 }
 
 const eventsQueryToExploreEventsData = (
-  query: UseQueryResult<CurrentUserEvent[], unknown>
+  query: UseQueryResult<ClientSideEvent[], unknown>
 ): ExploreEventsData => {
   if (query.isLoading) {
     return { status: "loading" }
@@ -105,7 +118,7 @@ const useExploreEventsRegion = (initialCenter: ExploreEventsInitialCenter) => {
   return { region: exploreRegion, panToRegion: setPannedRegion }
 }
 
-type UserRegionResult = "loading" | (Region | undefined)
+type UserRegionResult = "loading" | (ExploreEventsRegion | undefined)
 
 const useUserRegion = (
   options: QueryHookOptions<PermissionResponse>
@@ -130,12 +143,12 @@ const useUserRegion = (
 }
 
 const useExploreEventsQuery = (
-  region: Region,
+  region: ExploreEventsRegion,
   fetchEvents: (
-    region: Region,
+    region: ExploreEventsRegion,
     signal?: AbortSignal
-  ) => Promise<CurrentUserEvent[]>,
-  options: QueryHookOptions<CurrentUserEvent[]>
+  ) => Promise<ClientSideEvent[]>,
+  options: QueryHookOptions<ClientSideEvent[]>
 ) => {
   const queryClient = useQueryClient()
   const queryKey = ["explore-events", region]
@@ -164,11 +177,11 @@ const useExploreEventsQuery = (
 
 export type ExploreEventsProps = {
   searchText?: string
-  region?: Region
+  region?: ExploreEventsRegion
   data: ExploreEventsData
-  onRegionUpdated: (region: Region) => void
+  onRegionUpdated: (region: ExploreEventsRegion) => void
   onMapLongPress: (coordinate: LocationCoordinate2D) => void
-  onEventTapped: (event: CurrentUserEvent) => void
+  onEventTapped: (event: ClientSideEvent) => void
   onSearchTapped: () => void
   style?: StyleProp<ViewStyle>
 }

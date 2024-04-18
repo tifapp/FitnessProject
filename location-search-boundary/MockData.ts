@@ -1,14 +1,14 @@
 import { randomBool } from "@lib/utils/Random"
-import { LocationCoordinate2D } from "@location"
-import { RecentLocationAnnotation } from "./RecentsStorage"
-import { LocationSearchResult } from "./Models"
+import { RecentLocationAnnotation } from "@location/Recents"
 import { mockTiFLocation } from "@location/MockData"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
+import { LocationSearchResult } from "./SearchClient"
 
 /**
  * Creates a random {@link LocationSearchResultAnnotation}.
  */
 export const mockLocationSearchAnnotation = () => {
-  const annotation = randomBool() ? "attended-recently" : "hosted-recently"
+  const annotation = randomBool() ? "attended-event" : "hosted-event"
   return annotation as RecentLocationAnnotation
 }
 

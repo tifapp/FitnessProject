@@ -9,7 +9,7 @@ import {
   requestForegroundPermissionsAsync
 } from "expo-location"
 import { useQuery } from "@tanstack/react-query"
-import { ObjectUtils } from "@lib/utils/Object"
+import { mergeWithPartial } from "TiFShared/lib/Object"
 
 /**
  * A query hook to load the user's current location from expo.
@@ -93,10 +93,7 @@ export const UserLocationFunctionsProvider = ({
   ...props
 }: UserLocationFunctionsProviderProps) => (
   <UserLocationFunctionsContext.Provider
-    value={{
-      ...useContext(UserLocationFunctionsContext),
-      ...ObjectUtils.removeUndefined(props)
-    }}
+    value={mergeWithPartial(useContext(UserLocationFunctionsContext), props)}
   >
     {children}
   </UserLocationFunctionsContext.Provider>

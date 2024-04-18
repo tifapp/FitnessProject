@@ -1,6 +1,6 @@
 import { SENTRY_DSN } from "@env"
+import { pollyfillPromise } from "TiFShared/lib/Promise"
 import * as Sentry from "@sentry/react-native"
-import { allSettledShim } from "./utils/Promise"
 
 /**
  * Sets up sentry with the default app config.
@@ -15,7 +15,7 @@ export const enableSentry = () => {
 
     // sentry overrides the global promise polyfill, must apply afterwards
     // https://docs.sentry.io/platforms/react-native/troubleshooting/#using-with-other-polyfills
-    allSettledShim()
+    pollyfillPromise()
   }
 }
 

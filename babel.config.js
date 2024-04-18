@@ -10,27 +10,24 @@ const modulePath = (dir) => {
 
 const MODULES = [
   "screens",
-  "api-client",
   "components",
-  "stacks",
-  "hooks",
   "assets",
-  "graphql",
   "lib",
-  "boundary-auth",
-  "boundary-event-details",
+  "auth-boundary",
+  "event-details-boundary",
   "core-root",
   "location",
   "modules",
-  "content-parsing",
   "date-time",
   "test-helpers",
-  "boundary-content-reporting",
-  "shared-models",
+  "content-reporting-boundary",
   "notifications",
-  "boundary-explore-events",
+  "explore-events-boundary",
   "arrival-tracking",
-  "boundary-location-search"
+  "location-search-boundary",
+  "event",
+  "user",
+  "settings-storage"
 ]
 
 module.exports = function (api) {

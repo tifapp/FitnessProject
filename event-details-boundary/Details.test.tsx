@@ -1,7 +1,5 @@
-import { TiFAPI } from "@api-client/TiFAPI"
-import { UserHandle } from "@content-parsing"
-import { dateRange } from "@date-time"
-import { ColorString } from "@lib/utils/Color"
+import { TiFAPI } from "TiFShared/api"
+import { ColorString } from "TiFShared/domain-models/ColorString"
 import { uuidString } from "@lib/utils/UUID"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 import { fakeTimers } from "@test-helpers/Timers"
@@ -15,7 +13,10 @@ import {
 } from "./Details"
 import { EventMocks, mockEventLocation } from "./MockData"
 import { renderUseLoadEventDetails } from "./TestHelpers"
-import { EventID } from "@shared-models/Event"
+import { dateRange } from "TiFShared/domain-models/FixedDateRange"
+import { UserHandle } from "TiFShared/domain-models/User"
+import { EventID } from "TiFShared/domain-models/Event"
+import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
 
 describe("EventDetailsLoading tests", () => {
   beforeEach(() => {
@@ -289,7 +290,7 @@ describe("EventDetailsLoading tests", () => {
           },
           time: {
             ...eventResponse.time,
-            dateRange: dateRange(new Date(4000), new Date(5000)),
+            dateRange: dateRange(new Date(4000), new Date(5000))!,
             clientReceivedTime
           }
         }

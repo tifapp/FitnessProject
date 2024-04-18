@@ -1,5 +1,5 @@
 import { useReverseGeocodeQuery } from "../../location/Geocoding"
-import { placemarkToFormattedAddress } from "../../location"
+import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
 import React from "react"
 import { StyleSheet, View } from "react-native"
 import { useEventFormContext } from "./EventForm"
@@ -18,18 +18,16 @@ export const EventFormLocationBanner = () => {
   const locationInfo = useEventFormContext().watch("locationInfo")
   return (
     <View style={styles.bannerContainer}>
-      {!locationInfo
-        ? (
-          <FormLabel
-            style={styles.label}
-            icon="location-pin"
-            headerText="No Location Selected"
-            captionText="You must select a location to save this event."
-          />
-        )
-        : (
-          <LocationInfoBanner {...locationInfo} />
-        )}
+      {!locationInfo ? (
+        <FormLabel
+          style={styles.label}
+          icon="location-pin"
+          headerText="No Location Selected"
+          captionText="You must select a location to save this event."
+        />
+      ) : (
+        <LocationInfoBanner {...locationInfo} />
+      )}
       <MaterialIcon
         name="chevron-right"
         maximumFontScaleFactor={FontScaleFactors.xxxLarge}
@@ -41,13 +39,11 @@ export const EventFormLocationBanner = () => {
 }
 
 const LocationInfoBanner = (locationInfo: EventFormLocationInfo) => {
-  return locationInfo.placemarkInfo
-    ? (
-      <PlacemarkInfoBanner {...locationInfo.placemarkInfo} />
-    )
-    : (
-      <GeocodedLocationInfoBanner {...locationInfo} />
-    )
+  return locationInfo.placemarkInfo ? (
+    <PlacemarkInfoBanner {...locationInfo.placemarkInfo} />
+  ) : (
+    <GeocodedLocationInfoBanner {...locationInfo} />
+  )
 }
 
 const GeocodedLocationInfoBanner = (locationInfo: EventFormLocationInfo) => {

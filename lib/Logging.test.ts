@@ -1,8 +1,5 @@
 import {
   SQLiteLogMessage,
-  addLogHandler,
-  createLogFunction,
-  resetLogHandlers,
   sentryBreadcrumbLogHandler,
   sentryErrorCapturingLogHandler,
   sqliteLogHandler
@@ -10,7 +7,8 @@ import {
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 import { fakeTimers } from "@test-helpers/Timers"
 import { waitFor } from "@testing-library/react-native"
-import { dayjs } from "@date-time"
+import { dayjs } from "TiFShared/lib/Dayjs"
+import { addLogHandler, logger, resetLogHandlers } from "TiFShared/logging"
 
 describe("Logging tests", () => {
   fakeTimers()
@@ -19,7 +17,7 @@ describe("Logging tests", () => {
   describe("SQLiteLogHandler tests", () => {
     resetTestSQLiteBeforeEach()
     const label = "sqlite.log.handler.test"
-    const log = createLogFunction(label)
+    const log = logger(label)
 
     beforeEach(() => {
       addLogHandler(
@@ -29,11 +27,11 @@ describe("Logging tests", () => {
 
     it("should store log messages in sqlite", async () => {
       const metadata = { hello: "world", num: 1 }
-      log("debug", "Debug message")
-      log("info", "Info message")
-      log("warn", "Warning message")
-      log("error", "Error message")
-      log("info", "With metadata", metadata)
+      log.debug("Debug message")
+      log.info("Info message")
+      log.warn("Warning message")
+      log.error("Error message")
+      log.info("With metadata", metadata)
 
       await waitFor(async () => {
         expect(await allLogs()).toEqual([
@@ -86,7 +84,7 @@ describe("Logging tests", () => {
           stringifiedMetadata,
           timestamp
         ) VALUES (
-          'test.old.message', 
+          'test.old.message',
           'debug',
           'A test really old log message',
           NULL,
@@ -94,7 +92,7 @@ describe("Logging tests", () => {
         )
         `
       })
-      log("info", "Test")
+      log.info("Test")
       await waitFor(async () => {
         const logs = await allLogs()
         expect(logs).toHaveLength(1)
@@ -112,22 +110,35 @@ describe("Logging tests", () => {
 
   describe("SentryBreadcrumbsLogHandler tests", () => {
     const label = "sentry.breadcrumbs.test"
-    const log = createLogFunction(label)
+    const log = logger(label)
 
     it("should ignore DEBUG logs", () => {
       const handleBreadcrumb = jest.fn()
       addLogHandler(sentryBreadcrumbLogHandler(handleBreadcrumb))
 
-      log("debug", "iodjkhfcids")
+      log.debug("iodjkhfcids")
 
       expect(handleBreadcrumb).not.toHaveBeenCalled()
+    })
+
+    it("should use the log serverity level when level is trace", () => {
+      const handleBreadcrumb = jest.fn()
+      addLogHandler(sentryBreadcrumbLogHandler(handleBreadcrumb))
+
+      log.trace("Trace")
+
+      expect(handleBreadcrumb).toHaveBeenCalledWith(
+        expect.objectContaining({
+          level: "log"
+        })
+      )
     })
 
     test("logging with no metadata", () => {
       const handleBreadcrumb = jest.fn()
       addLogHandler(sentryBreadcrumbLogHandler(handleBreadcrumb))
 
-      log("warn", "Test message")
+      log.warn("Test message")
 
       expect(handleBreadcrumb).toHaveBeenCalledWith({
         level: "warning",
@@ -140,7 +151,7 @@ describe("Logging tests", () => {
       const handleBreadcrumb = jest.fn()
       addLogHandler(sentryBreadcrumbLogHandler(handleBreadcrumb))
 
-      log("info", "Test message", { key: "value" })
+      log.info("Test message", { key: "value" })
 
       expect(handleBreadcrumb).toHaveBeenCalledWith({
         level: "info",
@@ -153,7 +164,7 @@ describe("Logging tests", () => {
       const handleBreadcrumb = jest.fn()
       addLogHandler(sentryBreadcrumbLogHandler(handleBreadcrumb))
 
-      log("error", "Test message", {
+      log.error("Test message", {
         key: "value",
         category: "Test Category"
       })
@@ -168,14 +179,14 @@ describe("Logging tests", () => {
   })
 
   describe("SentryErrorLogHandler tests", () => {
-    const log = createLogFunction("sentry.error.test")
+    const log = logger("sentry.error.test")
 
     it("should ignore INFO and DEBUG logs", () => {
       const captureError = jest.fn()
       addLogHandler(sentryErrorCapturingLogHandler(captureError))
 
-      log("debug", "hello", { error: new Error() })
-      log("info", "hello", { error: new Error() })
+      log.debug("hello", { error: new Error() })
+      log.info("hello", { error: new Error() })
 
       expect(captureError).not.toHaveBeenCalled()
     })
@@ -184,7 +195,7 @@ describe("Logging tests", () => {
       const captureError = jest.fn()
       addLogHandler(sentryErrorCapturingLogHandler(captureError))
 
-      log("error", "hello", { key: "value" })
+      log.error("hello", { key: "value" })
 
       expect(captureError).not.toHaveBeenCalled()
     })
@@ -193,7 +204,7 @@ describe("Logging tests", () => {
       const captureError = jest.fn()
       addLogHandler(sentryErrorCapturingLogHandler(captureError))
 
-      log("error", "hello", { error: "value" })
+      log.error("hello", { error: "value" })
 
       expect(captureError).not.toHaveBeenCalled()
     })
@@ -203,7 +214,7 @@ describe("Logging tests", () => {
       addLogHandler(sentryErrorCapturingLogHandler(captureError))
 
       const error = new Error("Some error")
-      log("error", "hello", { error })
+      log.error("hello", { error })
 
       expect(captureError).toHaveBeenCalledWith(error)
     })
@@ -214,7 +225,7 @@ describe("Logging tests", () => {
       addLogHandler(sentryErrorCapturingLogHandler(captureError))
 
       const error = new TestError("Some error")
-      log("error", "hello", { error })
+      log.error("hello", { error })
 
       expect(captureError).toHaveBeenCalledWith(error)
     })

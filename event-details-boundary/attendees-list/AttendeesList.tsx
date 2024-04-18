@@ -1,10 +1,11 @@
-import { TiFAPI } from "@api-client/TiFAPI"
+import { TiFAPI } from "TiFShared/api"
 import { Headline } from "@components/Text"
-import { EventAttendee } from "@shared-models/Event"
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { useMemo } from "react"
 import { FlatList, StyleProp, View, ViewStyle } from "react-native"
 import { EventAttendeesList } from "./EventAttendeesList"
+import { EventAttendee } from "TiFShared/domain-models/Event"
+
 
 export type EventAttendeesPage = {
   attendees: EventAttendee[]
