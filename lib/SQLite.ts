@@ -1,3 +1,4 @@
+import { logger } from "TiFShared/logging"
 import {
   SQLiteDatabase as ExpoSQLiteDatabase,
   SQLiteBindValue,
@@ -5,6 +6,8 @@ import {
 } from "expo-sqlite/next"
 
 export const SQLITE_IN_MEMORY_PATH = ":memory:"
+
+const log = logger("tif.sqlite")
 
 /**
  * A class that manages the SQLite database for the app.
@@ -93,7 +96,15 @@ export class TiFSQLite {
   ) {
     try {
       return await openSQLExecuatble(path)
-    } catch {
+    } catch (e) {
+      log.warn(
+        "Failed to open SQLite at the specified path, falling back to an in memory instance.",
+        {
+          message: e.message,
+          code: e.code,
+          path
+        }
+      )
       return await openSQLExecuatble(SQLITE_IN_MEMORY_PATH)
     }
   }
