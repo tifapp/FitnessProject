@@ -1,5 +1,5 @@
 import { EventAttendeesPage } from "@event-details-boundary/attendees-list"
-import { UserID } from "../../shared-models/User"
+import { UserID } from "TiFShared/domain-models/User"
 
 /**
  * An immutable data structure that represents an event's attendees list.

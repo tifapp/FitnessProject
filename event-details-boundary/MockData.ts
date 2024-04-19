@@ -1,11 +1,6 @@
-
-import { UserHandle } from "@content-parsing"
-import { dateRange, dayjs } from "@date-time"
-import { uuidString } from "@lib/utils/UUID"
 import { ClientSideEvent } from "@event/ClientSideEvent"
-import { mockLocationCoordinate2D, mockPlacemark } from "@location/MockData"
 import { faker } from "@faker-js/faker"
-import { ColorString } from "@lib/utils/Color"
+
 import {
   randomBool,
   randomIntegerInRange,
@@ -13,18 +8,13 @@ import {
 } from "@lib/utils/Random"
 import { uuidString } from "@lib/utils/UUID"
 import { mockLocationCoordinate2D, mockPlacemark } from "@location/MockData"
-import { EventChatTokenRequest } from "@shared-models/ChatToken"
-import {
-  CurrentUserEvent,
-  EventAttendee,
-  EventLocation
-} from "@shared-models/Event"
-import { ColorString } from "TiFShared/domain-models/ColorString"
-import { dateRange } from "TiFShared/domain-models/FixedDateRange"
-import { dayjs } from "TiFShared/lib/Dayjs"
-import { UserHandle } from "TiFShared/domain-models/User"
-import { EventLocation, EventAttendee } from "TiFShared/domain-models/Event"
+
 import { ChatTokenRequest } from "TiFShared/api/models/Chat"
+import { ColorString } from "TiFShared/domain-models/ColorString"
+import { EventAttendee, EventLocation } from "TiFShared/domain-models/Event"
+import { dateRange } from "TiFShared/domain-models/FixedDateRange"
+import { UserHandle } from "TiFShared/domain-models/User"
+import dayjs from "dayjs"
 
 export const mockEventLocation = (): EventLocation => ({
   coordinate: mockLocationCoordinate2D(),
