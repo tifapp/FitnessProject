@@ -6,10 +6,25 @@ import {
   jwtMiddleware,
   tifAPITransport
 } from "TiFShared/api"
+import { LaunchArguments, launchArguments } from "./LaunchArguments"
+import { CognitoUserSession } from "amazon-cognito-identity-js"
 
-const awsAmplifyLoadBearerToken = async () => {
+const userSession = () => Auth.currentSession()
+
+/**
+ * Loads a cognito formatted bearer token using either the specified
+ * {@link LaunchArguments} or from the current user session if no launch
+ * argument token is provided.
+ */
+export const cognitoBearerToken = async (
+  launchArgs: LaunchArguments = launchArguments,
+  currentSession: () => Promise<CognitoUserSession> = userSession
+) => {
   try {
-    return (await Auth.currentSession()).getIdToken().getJwtToken()
+    if (launchArgs.testCognitoUserToken) {
+      return launchArgs.testCognitoUserToken.getJwtToken()
+    }
+    return (await currentSession()).getAccessToken().getJwtToken()
   } catch {
     return undefined
   }
@@ -22,7 +37,7 @@ const awsAmplifyLoadBearerToken = async () => {
  * @param url the base url of the API.
  */
 export const awsTiFAPITransport = (url: URL): TiFAPITransport => {
-  return tifAPITransport(url, jwtMiddleware(awsAmplifyLoadBearerToken))
+  return tifAPITransport(url, jwtMiddleware(cognitoBearerToken))
 }
 
 declare module "TiFShared/api" {
@@ -34,4 +49,6 @@ declare module "TiFShared/api" {
   }
 }
 
-TiFAPI.productionInstance = new TiFAPI(awsTiFAPITransport(new URL(API_URL)))
+TiFAPI.productionInstance = new TiFAPI(
+  awsTiFAPITransport(launchArguments.apiURL ?? new URL(API_URL))
+)

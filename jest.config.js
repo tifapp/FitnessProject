@@ -14,8 +14,10 @@ module.exports = {
     "<rootDir>/jest/setupInfraEnv.js",
     "<rootDir>/jest/setupSQLite.js",
     "<rootDir>/jest/setupTiFShared.js",
-    "<rootDir>/jest/setupExtensions.js"
+    "<rootDir>/jest/setupExtensions.js",
+    "<rootDir>/jest/setupLaunchArguments.js"
   ],
+  testPathIgnorePatterns: ["/node_modules/", "<rootDir>/roswaal/"],
   transformIgnorePatterns: [
     "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|native-base|react-native-svg|@alessiocancian/react-native-actionsheet|@sentry/.*|node-fetch|data-uri-to-buffer|fetch-blob|formdata-polyfill|TiFShared)"
   ],
