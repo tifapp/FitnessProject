@@ -146,27 +146,32 @@ export const CircularIonicon = ({
   style,
   ...props
 }: CircularIoniconProps) => (
-  <View style={circularStyles.iconContainer}>
-    <View
-      style={[
-        circularStyles.iconBackground,
-        {
-          backgroundColor,
-          width: DEFAULT_ICON_SIZE * 1.5,
-          height: DEFAULT_ICON_SIZE * 1.5
-        }
-      ]}
-    />
-    <Ionicon
-      {...props}
-      name={name}
-      size={DEFAULT_ICON_SIZE * (2 / 3)}
-      color="white"
-      style={[
-        circularStyles.icon,
-        { bottom: DEFAULT_ICON_SIZE / 2 - 1, right: DEFAULT_ICON_SIZE / 2 - 2 }
-      ]}
-    />
+  <View style={style}>
+    <View style={circularStyles.iconContainer}>
+      <View
+        style={[
+          circularStyles.iconBackground,
+          {
+            backgroundColor,
+            width: DEFAULT_ICON_SIZE * 1.5,
+            height: DEFAULT_ICON_SIZE * 1.5
+          }
+        ]}
+      />
+      <Ionicon
+        {...props}
+        name={name}
+        size={DEFAULT_ICON_SIZE * (2 / 3)}
+        color="white"
+        style={[
+          circularStyles.icon,
+          {
+            bottom: DEFAULT_ICON_SIZE / 2 - 1,
+            right: DEFAULT_ICON_SIZE / 2 - 2
+          }
+        ]}
+      />
+    </View>
   </View>
 )
 

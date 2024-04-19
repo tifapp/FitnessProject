@@ -10,7 +10,7 @@ import { useAtom } from "jotai"
 import { hasEditedProfileAtom } from "../state"
 import React, { useState } from "react"
 import CustomizableTextInput from "@components/common/CustomizableTextInput.tsx"
-import { ContentText } from "@content-parsing"
+import { ContentText } from "@components/ContentText"
 
 type InputTypes = "display" | "bio" | "handle"
 
@@ -29,43 +29,43 @@ const EditProfileView = ({ user }: EditProfileViewProps) => {
 
   const onChangeText = (text: string, input: InputTypes) => {
     switch (input) {
-    case "display":
-      setDisplayName(text)
-      if (text === user.name && bio === user.bio && handle === user.handle) {
-        setHasEdited(false)
-      } else {
-        setHasEdited(true)
-      }
-      break
+      case "display":
+        setDisplayName(text)
+        if (text === user.name && bio === user.bio && handle === user.handle) {
+          setHasEdited(false)
+        } else {
+          setHasEdited(true)
+        }
+        break
 
-    case "bio":
-      setBio(text)
-      if (
-        displayName === user.name &&
+      case "bio":
+        setBio(text)
+        if (
+          displayName === user.name &&
           text === user.bio &&
           handle === user.handle
-      ) {
-        setHasEdited(false)
-      } else {
-        setHasEdited(true)
-      }
-      break
+        ) {
+          setHasEdited(false)
+        } else {
+          setHasEdited(true)
+        }
+        break
 
-    case "handle":
-      setHandle(text)
-      if (handleErrorMessage) {
-        setHandleErrorMessage(undefined)
-      }
-      if (
-        displayName === user.name &&
+      case "handle":
+        setHandle(text)
+        if (handleErrorMessage) {
+          setHandleErrorMessage(undefined)
+        }
+        if (
+          displayName === user.name &&
           bio === user.bio &&
           text === user.handle
-      ) {
-        setHasEdited(false)
-      } else {
-        setHasEdited(true)
-      }
-      break
+        ) {
+          setHasEdited(false)
+        } else {
+          setHasEdited(true)
+        }
+        break
     }
   }
 

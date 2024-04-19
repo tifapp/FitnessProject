@@ -1,6 +1,9 @@
 import { SecondaryOutlinedButton, PrimaryButton } from "@components/Buttons"
+import {
+  EventUserAttendeeStatus,
+  isAttendingEvent
+} from "TiFShared/domain-models/Event"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { EventUserAttendeeStatus, isAttendingEvent } from "@lib/events"
 
 const BOTTOM_TAB_HEIGHT = 80
 
@@ -12,16 +15,14 @@ interface LeaveJoinButtonProps {
 const AttendanceButton = ({ attendeeStatus, style }: LeaveJoinButtonProps) => {
   return (
     <View style={[style, styles.bottomTab]}>
-      {isAttendingEvent(attendeeStatus)
-        ? (
-          <SecondaryOutlinedButton
-            title={attendeeStatus === "hosting" ? "Delete Event" : "Leave Event"}
-            style={styles.buttonStyle}
-          />
-        )
-        : (
-          <PrimaryButton title={"Join Now"} style={styles.buttonStyle} />
-        )}
+      {isAttendingEvent(attendeeStatus) ? (
+        <SecondaryOutlinedButton
+          title={attendeeStatus === "hosting" ? "Delete Event" : "Leave Event"}
+          style={styles.buttonStyle}
+        />
+      ) : (
+        <PrimaryButton title={"Join Now"} style={styles.buttonStyle} />
+      )}
     </View>
   )
 }

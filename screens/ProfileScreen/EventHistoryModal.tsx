@@ -1,16 +1,16 @@
 import React, { SetStateAction } from "react"
 import { Title } from "@components/Text"
 import { TouchableIonicon } from "@components/common/Icons"
-import { EventCard } from "@event-details/EventCard"
+import { EventCard } from "@event/EventCard"
 import { AppStyles } from "@lib/AppColorStyle"
-import { CurrentUserEvent } from "@shared-models/Event"
+import { ClientSideEvent } from "@event/ClientSideEvent"
 import { FlatList, ListRenderItemInfo, Modal, StyleSheet } from "react-native"
 
 interface Props {
   username: string
   visible: boolean
   setVisible: React.Dispatch<SetStateAction<boolean>>
-  events: CurrentUserEvent[]
+  events: ClientSideEvent[]
 }
 
 const MARGIN_HORIZONTAL = 16
@@ -34,7 +34,7 @@ const EventHistoryModal = ({
       <Title style={styles.eventSpacing}>{`${username}'s\nEvents`}</Title>
       <FlatList
         data={events}
-        renderItem={({ item }: ListRenderItemInfo<CurrentUserEvent>) => (
+        renderItem={({ item }: ListRenderItemInfo<ClientSideEvent>) => (
           <EventCard event={item} style={styles.eventSpacing} />
         )}
       />

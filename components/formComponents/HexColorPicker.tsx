@@ -1,5 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons"
-import { useHaptics } from "@lib/Haptics"
+import { useHaptics } from "@modules/tif-haptics"
 import { HexColor } from "@lib/utils/Color"
 import React from "react"
 import {
