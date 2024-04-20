@@ -1,7 +1,7 @@
-import { FixedDateRange } from "@date-time"
 import { EventColors } from "@lib/events"
 import { fireEvent, screen } from "@testing-library/react-native"
 import { setDateTimePickerDate } from "@test-helpers/DateTimePicker"
+import { dateRange } from "TiFShared/domain-models/FixedDateRange"
 
 export const baseTestEventFormValues = {
   title: "Test Event",
@@ -13,10 +13,10 @@ export const baseTestEventFormValues = {
       address: "1234 Test Dr, TestCity, TestState 12345"
     }
   },
-  dateRange: new FixedDateRange(
+  dateRange: dateRange(
     new Date("2023-02-23T00:17:00"),
     new Date("2023-02-23T00:19:00")
-  ),
+  )!,
   color: EventColors.Red,
   shouldHideAfterStartDate: false,
   radiusMeters: 0

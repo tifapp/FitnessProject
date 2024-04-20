@@ -1,4 +1,9 @@
 import { testSQLite } from "@test-helpers/SQLite"
+import {
+  SQLITE_IN_MEMORY_PATH,
+  TiFSQLite,
+  openExpoSQLExecutable
+} from "./SQLite"
 
 describe("SQLite tests", () => {
   beforeEach(async () => {
@@ -64,5 +69,19 @@ describe("SQLite tests", () => {
       return await db.queryFirst`SELECT * FROM test`
     })
     expect(id).toBeUndefined()
+  })
+
+  it("should fallback to an in memory database if opening at the path fails", async () => {
+    const open = jest.fn().mockImplementation(async (path: string) => {
+      if (path === SQLITE_IN_MEMORY_PATH) {
+        return await openExpoSQLExecutable(path)
+      }
+      throw new Error()
+    })
+    const sqlite = new TiFSQLite("hello/world", open)
+    const result = await sqlite.withTransaction(async (db) => {
+      return await db.queryFirst<{ value: number }>`SELECT TRUE AS value`
+    })
+    expect(result).toEqual({ value: 1 })
   })
 })

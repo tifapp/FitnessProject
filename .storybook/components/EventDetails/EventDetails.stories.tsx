@@ -1,12 +1,12 @@
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import React, { useCallback, useEffect } from "react"
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
+import React, { useEffect } from "react"
+import { SafeAreaProvider } from "react-native-safe-area-context"
 import {
   EventAttendeeMocks,
   EventMocks,
   mockEventLocation
-} from "@event-details/MockData"
+} from "@event-details-boundary/MockData"
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 import { UserLocationFunctionsProvider } from "@location/UserLocation"
 import {
@@ -15,27 +15,21 @@ import {
   requestForegroundPermissionsAsync
 } from "expo-location"
 import { mockPlacemark } from "@location/MockData"
-import { EventCountdownView, eventCountdown } from "@event-details/Countdown"
-import { dateRange, dayjs, now } from "@date-time"
-import { JoinEventStagesView } from "@event-details/JoinEvent"
-import { NavigationContainer, useFocusEffect } from "@react-navigation/native"
+import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
-import { AppState } from "@aws-amplify/core"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
-import { sleep } from "@lib/utils/DelayData"
-import { TrueRegionMonitor } from "@event-details/arrival-tracking/region-monitoring/MockRegionMonitors"
-import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { createTestQueryClient } from "@test-helpers/ReactQuery"
-import { QueryClientProvider } from "@tanstack/react-query"
 import {
   EventDetailsMenuView,
   useEventDetailsMenuActions
-} from "@event-details/Menu"
+} from "@event-details-boundary/Menu"
 import { View } from "react-native"
-import { CurrentUserEvent } from "@shared-models/Event"
-import { useLoadEventDetails } from "@event-details/Details"
-import { UserSessionProvider } from "@lib/UserSession"
+import { ClientSideEvent } from "@event/ClientSideEvent"
+import { useLoadEventDetails } from "@event-details-boundary/Details"
+import { UserSessionProvider } from "@user/Session"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
+import { dateRange } from "TiFShared/domain-models/FixedDateRange"
+import { dayjs, now } from "TiFShared/lib/Dayjs"
 
 const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Details"
@@ -107,7 +101,7 @@ const Test = () => {
   return <Menu event={result.event} />
 }
 
-const Menu = ({ event }: { event: CurrentUserEvent }) => {
+const Menu = ({ event }: { event: ClientSideEvent }) => {
   const state = useEventDetailsMenuActions(event, {
     blockHost: async () => {
       console.log("Blocked")

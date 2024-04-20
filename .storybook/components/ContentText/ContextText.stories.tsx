@@ -1,6 +1,6 @@
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import React, { useState } from "react"
-import { ContentText, ExpandableContentText } from "@content-parsing"
+import { ContentText, ExpandableContentText } from "@components/ContentText"
 import { ScrollView, TextInput } from "react-native-gesture-handler"
 import { Headline } from "@components/Text"
 import { Button } from "react-native"
