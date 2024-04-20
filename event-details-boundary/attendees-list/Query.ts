@@ -1,6 +1,5 @@
-import { EventID } from "@shared-models/Event"
-import { eventAttendeesListQueryKey } from "@shared-models/query-keys/Event"
 import { InfiniteData, QueryClient } from "@tanstack/react-query"
+import { EventID } from "TiFShared/domain-models/Event"
 import { EventAttendeesPage } from "./AttendeesList"
 
 /**
@@ -14,7 +13,7 @@ export const updateAttendeesListQueryEvent = (
   ) => InfiniteData<EventAttendeesPage>
 ) => {
   queryClient.setQueryData(
-    eventAttendeesListQueryKey(id),
+    ["eventAttendees", id],
     (result: InfiniteData<EventAttendeesPage> | undefined) => {
       if (!result) return result
       return updateFn(result)

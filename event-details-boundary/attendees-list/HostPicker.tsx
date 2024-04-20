@@ -65,8 +65,7 @@ export const AttendeesListPicker = (
               </TouchableOpacity>
             </View>
           )}
-          attendees={attendeesList.attendees}
-          totalAttendeeCount={attendeesList.totalAttendeeCount}
+          attendeesList={attendeesList.attendeesList}
           refresh={attendeesList.refresh}
           isRefetching={attendeesList.isRefetching}
         ></AttendeesListView>

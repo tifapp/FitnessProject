@@ -1,8 +1,8 @@
-import { EventAttendeeMocks } from "@event-details/MockData"
-import { EventID } from "@shared-models/Event"
+import { EventAttendeeMocks } from "@event-details-boundary/MockData"
 import { captureAlerts } from "@test-helpers/Alerts"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { renderHook, waitFor } from "@testing-library/react-native"
+import { EventID } from "TiFShared/domain-models/Event"
 import { act } from "react-test-renderer"
 import { useEventHostPicker } from "./HostPicker"
 
