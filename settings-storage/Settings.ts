@@ -11,6 +11,7 @@ export interface SettingsStore<Settings extends AnySettings> {
 }
 
 export interface SettingsStorage<Settings extends AnySettings> {
+  get tag(): string
   load(): Promise<Settings>
   save(settings: Partial<Settings>): Promise<void>
 }

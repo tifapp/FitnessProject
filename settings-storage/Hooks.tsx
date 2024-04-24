@@ -4,14 +4,15 @@ import {
   useContext,
   useSyncExternalStore
 } from "react"
-import { LocalSettingsStore } from "./LocalSettings"
+import { LocalSettings } from "./LocalSettings"
+import { SettingsStore } from "./Settings"
 
 const SettingsContext = createContext<
-  { localStore: LocalSettingsStore } | undefined
+  { localStore: SettingsStore<LocalSettings> } | undefined
 >(undefined)
 
 export type SettingsProviderProps = {
-  localStore: LocalSettingsStore
+  localStore: SettingsStore<LocalSettings>
   children: JSX.Element
 }
 

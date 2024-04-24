@@ -1,10 +1,8 @@
 import { requireOptionalNativeModule } from "expo"
 import { ReactNode, createContext, useContext } from "react"
-import {
-  LocalSettings,
-  LocalSettingsStore
-} from "@settings-storage/LocalSettings"
+import { LocalSettings } from "@settings-storage/LocalSettings"
 import { logger } from "TiFShared/logging"
+import { SettingsStore } from "@settings-storage/Settings"
 
 enum TiFNativeHapticEvent {
   Selection = "selection"
@@ -56,9 +54,9 @@ export interface Haptics {
  */
 export const applyHapticDeviceSettingsChanges = (
   haptics: Haptics,
-  deviceSettingsStore: LocalSettingsStore
+  localSettingsStore: SettingsStore<LocalSettings>
 ) => {
-  deviceSettingsStore.subscribe((settings) => haptics.apply(settings))
+  localSettingsStore.subscribe((settings) => haptics.apply(settings))
 }
 
 /**
