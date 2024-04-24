@@ -1,9 +1,9 @@
 import { requireOptionalNativeModule } from "expo"
 import { ReactNode, createContext, useContext } from "react"
 import {
-  DeviceSettings,
-  DeviceSettingsStore
-} from "@settings-storage/DeviceSettings"
+  LocalSettings,
+  LocalSettingsStore
+} from "@settings-storage/LocalSettings"
 import { logger } from "TiFShared/logging"
 
 enum TiFNativeHapticEvent {
@@ -26,7 +26,7 @@ export type HapticEvent = { name: "selection" }
  * Configuration settings for the underlying haptics engine.
  */
 export type HapticsSettings = Pick<
-  DeviceSettings,
+  LocalSettings,
   "isHapticFeedbackEnabled" | "isHapticAudioEnabled"
 >
 
@@ -51,12 +51,12 @@ export interface Haptics {
 }
 
 /**
- * Subscribes to the given {@link DeviceSettingsStore} and applies haptic
+ * Subscribes to the given {@link LocalSettingsStore} and applies haptic
  * related settings changes to the given {@link Haptics} instance.
  */
 export const applyHapticDeviceSettingsChanges = (
   haptics: Haptics,
-  deviceSettingsStore: DeviceSettingsStore
+  deviceSettingsStore: LocalSettingsStore
 ) => {
   deviceSettingsStore.subscribe((settings) => haptics.apply(settings))
 }
