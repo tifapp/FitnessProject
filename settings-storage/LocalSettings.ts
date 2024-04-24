@@ -1,7 +1,7 @@
 import { CallbackCollection } from "@lib/utils/CallbackCollection"
 import { SQLExecutable, TiFSQLite } from "@lib/SQLite"
 import { mergeWithPartial } from "TiFShared/lib/Object"
-import { SettingsStorage } from "./Settings"
+import { SettingsStorage, areSettingsEqual } from "./Settings"
 
 /**
  * A type for user settings that are local to the device.
@@ -62,16 +62,6 @@ export class SQLiteLocalSettingsStorage
         : null
     }
   }
-}
-
-export const areLocalSettingsEqual = (s1: LocalSettings, s2: LocalSettings) => {
-  return (
-    s1.isHapticFeedbackEnabled === s2.isHapticFeedbackEnabled &&
-    s1.isHapticAudioEnabled === s2.isHapticAudioEnabled &&
-    s1.hasCompletedOnboarding === s2.hasCompletedOnboarding &&
-    s1.lastEventArrivalsRefreshDate?.getTime() ===
-      s2.lastEventArrivalsRefreshDate?.getTime()
-  )
 }
 
 export const DEFAULT_LOCAL_SETTINGS = {
@@ -189,7 +179,7 @@ export class SQLiteLocalSettingsStore implements LocalSettingsStore {
   }
 
   private publishNewSettingsIfDifferent(newSettings: LocalSettings) {
-    if (!areLocalSettingsEqual(this.current, newSettings)) {
+    if (!areSettingsEqual(this.current, newSettings)) {
       this.callbackCollection.send(newSettings)
       this._current = newSettings
     }
