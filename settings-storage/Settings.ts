@@ -26,26 +26,6 @@ export interface SettingsStore<Settings extends AnySettings> {
 }
 
 /**
- * An interface for storing settings.
- */
-export interface SettingsStorage<Settings extends AnySettings> {
-  /**
-   * A unique identifier of this storage instance used for logging.
-   */
-  get tag(): string
-
-  /**
-   * Loads the current settings from the storage.
-   */
-  load(): Promise<Settings>
-
-  /**
-   * Saves the new values of the settings in `partialSettings`.
-   */
-  save(partialSettings: Partial<Settings>): Promise<void>
-}
-
-/**
  * Returns true if 2 settings objects are equal.
  */
 export const areSettingsEqual = <Settings extends AnySettings>(
