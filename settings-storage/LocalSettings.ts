@@ -1,6 +1,7 @@
 import { CallbackCollection } from "@lib/utils/CallbackCollection"
 import { SQLExecutable, TiFSQLite } from "@lib/SQLite"
 import { mergeWithPartial } from "TiFShared/lib/Object"
+import { SettingsStorage } from "./Settings"
 
 /**
  * A type for user settings that are local to the device.
@@ -15,13 +16,61 @@ export type LocalSettings = {
   lastEventArrivalsRefreshDate: Date | null
 }
 
+export class SQLiteLocalSettingsStorage
+  implements SettingsStorage<LocalSettings>
+{
+  private readonly sqlite: TiFSQLite
+
+  constructor(sqlite: TiFSQLite) {
+    this.sqlite = sqlite
+  }
+
+  async load() {
+    return await this.sqlite.withTransaction((db) => this._load(db))
+  }
+
+  async save(settings: Partial<LocalSettings>) {
+    return await this.sqlite.withTransaction(async (db) => {
+      const newSettings = mergeWithPartial(await this._load(db), settings)
+      await db.run`
+      INSERT OR REPLACE INTO LocalSettings (
+        isHapticFeedbackEnabled,
+        isHapticAudioEnabled,
+        hasCompletedOnboarding,
+        lastEventArrivalsRefreshTime
+      ) VALUES (
+        ${newSettings.isHapticFeedbackEnabled},
+        ${newSettings.isHapticAudioEnabled},
+        ${newSettings.hasCompletedOnboarding},
+        ${newSettings.lastEventArrivalsRefreshDate?.getTime()}
+      )
+      `
+    })
+  }
+
+  private async _load(db: SQLExecutable): Promise<LocalSettings> {
+    const sqliteSettings = await db.queryFirst<SQLiteLocalSettings>`
+      SELECT * FROM LocalSettings LIMIT 1
+      `
+    if (!sqliteSettings) return { ...DEFAULT_LOCAL_SETTINGS }
+    return {
+      isHapticAudioEnabled: sqliteSettings.isHapticAudioEnabled === 1,
+      isHapticFeedbackEnabled: sqliteSettings.isHapticFeedbackEnabled === 1,
+      hasCompletedOnboarding: sqliteSettings.hasCompletedOnboarding === 1,
+      lastEventArrivalsRefreshDate: sqliteSettings.lastEventArrivalsRefreshTime
+        ? new Date(sqliteSettings.lastEventArrivalsRefreshTime)
+        : null
+    }
+  }
+}
+
 export const areLocalSettingsEqual = (s1: LocalSettings, s2: LocalSettings) => {
   return (
     s1.isHapticFeedbackEnabled === s2.isHapticFeedbackEnabled &&
     s1.isHapticAudioEnabled === s2.isHapticAudioEnabled &&
     s1.hasCompletedOnboarding === s2.hasCompletedOnboarding &&
     s1.lastEventArrivalsRefreshDate?.getTime() ===
-    s2.lastEventArrivalsRefreshDate?.getTime()
+      s2.lastEventArrivalsRefreshDate?.getTime()
   )
 }
 
