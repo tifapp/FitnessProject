@@ -38,7 +38,7 @@ export const useLocalSettings = () => {
         (callback) => context.localStore.subscribe(callback),
         [context.localStore]
       ),
-      () => context.localStore.current
+      () => context.localStore.mostRecentlyPublished
     ),
     store: context.localStore
   }

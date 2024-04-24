@@ -1,15 +1,34 @@
 import { mergeWithPartial } from "TiFShared/lib/Object"
-import {
-  AnySettings,
-  SettingsStorage,
-  SettingsStore,
-  areSettingsEqual
-} from "./Settings"
+import { AnySettings, SettingsStore, areSettingsEqual } from "./Settings"
 import { CallbackCollection } from "@lib/utils/CallbackCollection"
 import { logger } from "TiFShared/logging"
 
+/**
+ * An interface for storing settings.
+ */
+export interface SettingsStorage<Settings extends AnySettings> {
+  /**
+   * A unique identifier of this storage instance used for logging.
+   */
+  get tag(): string
+
+  /**
+   * Loads the current settings from the storage.
+   */
+  load(): Promise<Settings>
+
+  /**
+   * Saves the new values of the settings in `partialSettings`.
+   */
+  save(partialSettings: Partial<Settings>): Promise<void>
+}
+
 const log = logger("persistent.settings.store")
 
+/**
+ * An {@link SettingsStore} implementation which loads and saves settings to
+ * a persistent backing store that implements {@link SettingsStorage}.
+ */
 export class PersistentSettingsStore<Settings extends AnySettings>
   implements SettingsStore<Settings>
 {
@@ -25,7 +44,7 @@ export class PersistentSettingsStore<Settings extends AnySettings>
     this.storage = storage
   }
 
-  get current() {
+  get mostRecentlyPublished() {
     return this.currentSettings ?? this.defaultSettings
   }
 
@@ -39,15 +58,15 @@ export class PersistentSettingsStore<Settings extends AnySettings>
     return unsub
   }
 
-  save(settings: Partial<Settings>): void {
+  update(settings: Partial<Settings>): void {
     this.storage.save(settings).catch((err) => {
       log.warn(
         "Failed to save settings to the underlying storage",
         this.errorLogMetadata(err)
       )
     })
-    const newSettings = mergeWithPartial(this.current, settings)
-    if (!areSettingsEqual(this.current, newSettings)) {
+    const newSettings = mergeWithPartial(this.mostRecentlyPublished, settings)
+    if (!areSettingsEqual(this.mostRecentlyPublished, newSettings)) {
       this.currentSettings = newSettings
       this.subscribers.send(newSettings)
     }

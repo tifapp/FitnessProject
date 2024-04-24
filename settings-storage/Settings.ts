@@ -4,16 +4,45 @@ export type SettingValue = string | boolean | number | Date | null
 
 export type AnySettings = Record<string, SettingValue>
 
+/**
+ * An interface for observing settings.
+ */
 export interface SettingsStore<Settings extends AnySettings> {
-  get current(): Settings
+  /**
+   * Returns the most recently published settings from a subscriber.
+   */
+  get mostRecentlyPublished(): Settings
+
+  /**
+   * Subscribes to the store. This method should publish to new subscribers
+   * immediately, and load the initial settings for the first subscriber.
+   */
   subscribe(callback: (settings: Settings) => void): SettingsStoreUnsubscribe
-  save(settings: Partial<Settings>): void
+
+  /**
+   * Updates and publishes the new values of the settings in `partialSettings`.
+   */
+  update(partialSettings: Partial<Settings>): void
 }
 
+/**
+ * An interface for storing settings.
+ */
 export interface SettingsStorage<Settings extends AnySettings> {
+  /**
+   * A unique identifier of this storage instance used for logging.
+   */
   get tag(): string
+
+  /**
+   * Loads the current settings from the storage.
+   */
   load(): Promise<Settings>
-  save(settings: Partial<Settings>): Promise<void>
+
+  /**
+   * Saves the new values of the settings in `partialSettings`.
+   */
+  save(partialSettings: Partial<Settings>): Promise<void>
 }
 
 /**

@@ -1,7 +1,6 @@
 import { SQLExecutable, TiFSQLite } from "@lib/SQLite"
 import { mergeWithPartial } from "TiFShared/lib/Object"
-import { SettingsStorage } from "./Settings"
-import { PersistentSettingsStore } from "./PersistentStore"
+import { PersistentSettingsStore, SettingsStorage } from "./PersistentStore"
 
 /**
  * A type for user settings that are local to the device.
@@ -15,6 +14,13 @@ export type LocalSettings = {
   hasCompletedOnboarding: boolean
   lastEventArrivalsRefreshDate: Date | null
 }
+
+export const DEFAULT_LOCAL_SETTINGS = {
+  isHapticFeedbackEnabled: true,
+  isHapticAudioEnabled: true,
+  hasCompletedOnboarding: false,
+  lastEventArrivalsRefreshDate: null
+} as Readonly<LocalSettings>
 
 const STORAGE_TAG = "sqlite.local.settings"
 
@@ -73,13 +79,6 @@ export class SQLiteLocalSettingsStorage
     }
   }
 }
-
-export const DEFAULT_LOCAL_SETTINGS = {
-  isHapticFeedbackEnabled: true,
-  isHapticAudioEnabled: true,
-  hasCompletedOnboarding: false,
-  lastEventArrivalsRefreshDate: null
-} as Readonly<LocalSettings>
 
 export const localSettingsStore = (storage: SettingsStorage<LocalSettings>) => {
   return new PersistentSettingsStore(DEFAULT_LOCAL_SETTINGS, storage)

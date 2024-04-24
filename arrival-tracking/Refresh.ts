@@ -1,13 +1,10 @@
 import { AppState } from "react-native"
 import { EventArrivalsTracker } from "./Tracker"
 import { TiFAPI } from "TiFShared/api"
-import {
-  LocalSettings,
-  LocalSettingsStore
-} from "@settings-storage/LocalSettings"
+import { LocalSettings } from "@settings-storage/LocalSettings"
 import { now } from "TiFShared/lib/Dayjs"
 import { EventArrivals } from "./Arrivals"
-import { SettingsStorage } from "@settings-storage/Settings"
+import { SettingsStorage } from "@settings-storage/PersistentStore"
 
 /**
  * A class that manages refreshing of upcoming event arrivals.
