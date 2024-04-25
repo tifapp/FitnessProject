@@ -1,9 +1,5 @@
 import { BodyText, Subtitle } from "@components/Text"
-import {
-  InfiniteData,
-  useMutation,
-  useQueryClient
-} from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { UserID } from "aws-sdk/clients/personalizeruntime"
 import { useState } from "react"
 import {
@@ -15,7 +11,6 @@ import {
 } from "react-native"
 import {
   AttendeesListView,
-  EventAttendeesPage,
   UseAttendeesListProps,
   useAttendeesList
 } from "./AttendeesList"
@@ -88,35 +83,21 @@ export const useEventHostPicker = (
   const [selectedAttendeeId, setSelectedAttendeeId] = useState<
     UserID | undefined
   >()
-  const updateClientSideAttendeesList = (
-    attendeesData: InfiniteData<EventAttendeesPage>,
-    attendeeID: UserID
-  ) => {
-    const newHostIndex = attendeesData.pages[0].attendees.findIndex(
-      (attendee) => attendee.id === attendeeID
-    )
-    const newAttendeesData = attendeesData
-    if (newHostIndex !== -1) {
-      newAttendeesData.pages[0].attendees.unshift(
-        newAttendeesData.pages[0].attendees[newHostIndex]
-      )
-      newAttendeesData.pages[0].attendees.splice(newHostIndex + 1, 1)
-    }
-    return newAttendeesData
-  }
   const hostPickerMutation = useMutation(env.promoteToHost, {
     onSuccess: (_, attendeeID) => {
       if (attendeesList.status === "success") {
         updateAttendeesListQueryEvent(
           queryClient,
           attendeesListProps.eventId,
-          (attendeeList) =>
-            updateClientSideAttendeesList(attendeeList, attendeeID)
+          (attendeeList) => attendeeList.swapHost(attendeeID)
         )
       }
       env.onSuccess()
     },
-    onError: () => presentErrorAlert("generic")
+    onError: () => {
+      setSelectedAttendeeId(undefined)
+      presentErrorAlert("generic")
+    }
   })
 
   return {

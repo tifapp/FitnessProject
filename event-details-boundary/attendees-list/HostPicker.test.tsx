@@ -1,6 +1,7 @@
 import { EventAttendeeMocks } from "@event-details-boundary/MockData"
 import { captureAlerts } from "@test-helpers/Alerts"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import { fakeTimers } from "@test-helpers/Timers"
 import { renderHook, waitFor } from "@testing-library/react-native"
 import { EventID } from "TiFShared/domain-models/Event"
 import { act } from "react-test-renderer"
@@ -8,6 +9,8 @@ import { useEventHostPicker } from "./HostPicker"
 
 describe("EventHostPicker tests", () => {
   describe("UseLeaveEventHostPicker tests", () => {
+    fakeTimers()
+    beforeEach(() => jest.resetAllMocks())
     const testEnv = {
       promoteToHost: jest.fn(),
       onSuccess: jest.fn()
@@ -45,7 +48,7 @@ describe("EventHostPicker tests", () => {
       )
       act(() =>
         result.current.onAttendeeSelected(
-          (result.current.attendeesList as any).attendees[0].id
+          (result.current.attendeesList as any).attendeesList.attendees()[0].id
         )
       )
       expect(result.current.selectedAttendeeId).toEqual(
@@ -53,7 +56,7 @@ describe("EventHostPicker tests", () => {
       )
       act(() =>
         result.current.onAttendeeSelected(
-          (result.current.attendeesList as any).attendees[1].id
+          (result.current.attendeesList as any).attendeesList.attendees()[1].id
         )
       )
       expect(result.current.selectedAttendeeId).toEqual(
@@ -65,13 +68,12 @@ describe("EventHostPicker tests", () => {
       expect(testEnv.promoteToHost).toHaveBeenCalledWith(
         EventAttendeeMocks.BlobJr.id
       )
-      expect((result.current.attendeesList as any).host).toEqual(
+      expect((result.current.attendeesList as any).attendeesList.host).toEqual(
         EventAttendeeMocks.BlobJr
       )
-      expect((result.current.attendeesList as any).attendees).toEqual([
-        EventAttendeeMocks.Alivs,
-        EventAttendeeMocks.AnnaAttendee
-      ])
+      expect(
+        (result.current.attendeesList as any).attendeesList.attendees()
+      ).toEqual([EventAttendeeMocks.AnnaAttendee, EventAttendeeMocks.Alivs])
     })
     test("edge case: select attendee that becomes not-participating right before promotion", async () => {
       const mockData = {
@@ -90,7 +92,7 @@ describe("EventHostPicker tests", () => {
       )
       act(() =>
         result.current.onAttendeeSelected(
-          (result.current.attendeesList as any).attendees[0].id
+          (result.current.attendeesList as any).attendeesList.attendees()[0].id
         )
       )
       expect(result.current.selectedAttendeeId).toEqual(
@@ -98,7 +100,7 @@ describe("EventHostPicker tests", () => {
       )
       act(() =>
         result.current.onAttendeeSelected(
-          (result.current.attendeesList as any).attendees[1].id
+          (result.current.attendeesList as any).attendeesList.attendees()[1].id
         )
       )
       expect(result.current.selectedAttendeeId).toEqual(
@@ -106,14 +108,16 @@ describe("EventHostPicker tests", () => {
       )
       testEnv.promoteToHost.mockRejectedValueOnce("error")
       act(() => (result.current as any).submitted())
-      await waitFor(() => expect(testEnv.onSuccess).toHaveBeenCalled())
+      await waitFor(() => expect(testEnv.onSuccess).not.toHaveBeenCalled())
       expect(testEnv.promoteToHost).toHaveBeenCalledWith(
         EventAttendeeMocks.BlobJr.id
       )
-      expect((result.current.attendeesList as any).host).toEqual(
+      expect((result.current.attendeesList as any).attendeesList.host).toEqual(
         EventAttendeeMocks.Alivs
       )
-      expect(result.current.selectedAttendeeId).toBeUndefined()
+      await waitFor(() =>
+        expect(result.current.selectedAttendeeId).toBeUndefined()
+      )
     })
     test("presents generic error alert when failure", async () => {
       const mockData = {
@@ -132,7 +136,7 @@ describe("EventHostPicker tests", () => {
       )
       act(() =>
         result.current.onAttendeeSelected(
-          (result.current.attendeesList as any).attendees[0].id
+          (result.current.attendeesList as any).attendeesList.attendees()[0].id
         )
       )
       testEnv.promoteToHost.mockRejectedValueOnce(new Error())
