@@ -20,6 +20,10 @@ export const HOST_PICKER_ERROR_ALERTS = {
   generic: {
     title: "Uh-oh!",
     description: "Something went wrong. Please try again"
+  },
+  "user-not-attending": {
+    title: "User",
+    description: "Uh-oh, they're not here anymore"
   }
 } as const
 
@@ -30,8 +34,10 @@ const presentErrorAlert = (key: keyof typeof HOST_PICKER_ERROR_ALERTS) => {
   )
 }
 
+export type PromoteToHostResult = "success" | "user-not-attending"
+
 export type UseEventHostPickerEnvironment = {
-  promoteToHost: (attendeeID: UserID) => Promise<void>
+  promoteToHost: (attendeeID: UserID) => Promise<PromoteToHostResult>
   onSuccess: () => void
 }
 
@@ -84,15 +90,18 @@ export const useEventHostPicker = (
     UserID | undefined
   >()
   const hostPickerMutation = useMutation(env.promoteToHost, {
-    onSuccess: (_, attendeeID) => {
-      if (attendeesList.status === "success") {
+    onSuccess: (result, attendeeID) => {
+      if (result === "user-not-attending") {
+        setSelectedAttendeeId(undefined)
+        presentErrorAlert("user-not-attending")
+      } else {
         updateAttendeesListQueryEvent(
           queryClient,
           attendeesListProps.eventId,
           (attendeeList) => attendeeList.swapHost(attendeeID)
         )
+        env.onSuccess()
       }
-      env.onSuccess()
     },
     onError: () => {
       setSelectedAttendeeId(undefined)
