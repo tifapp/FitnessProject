@@ -1,10 +1,10 @@
 import { EventAttendeeMocks } from "@event-details-boundary/MockData"
 import { captureAlerts } from "@test-helpers/Alerts"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
+import { neverPromise } from "@test-helpers/Promise"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { fakeTimers } from "@test-helpers/Timers"
 import { renderHook, waitFor } from "@testing-library/react-native"
-import { EventID } from "TiFShared/domain-models/Event"
 import { act } from "react-test-renderer"
 import { HOST_PICKER_ERROR_ALERTS, useEventHostPicker } from "./HostPicker"
 
@@ -18,21 +18,7 @@ describe("EventHostPicker tests", () => {
     }
     const { alertPresentationSpy } = captureAlerts()
     const fetchNextAttendeesPage = jest.fn()
-    const renderUseEventHostPicker = (eventId: EventID, pageSize: number) => {
-      return renderHook(
-        () =>
-          useEventHostPicker(
-            { fetchNextAttendeesPage, eventId, pageSize },
-            testEnv
-          ),
-        {
-          wrapper: ({ children }: any) => (
-            <TestQueryClientProvider>{children}</TestQueryClientProvider>
-          )
-        }
-      )
-    }
-    test("selecting a new host successfully", async () => {
+    const renderUseEventHostPicker = async () => {
       const mockData = {
         attendees: [
           EventAttendeeMocks.Alivs,
@@ -42,24 +28,33 @@ describe("EventHostPicker tests", () => {
         totalAttendeeCount: 3
       }
       fetchNextAttendeesPage.mockResolvedValueOnce(mockData)
-      const { result } = renderUseEventHostPicker(11, 15)
+      const { result } = renderHook(
+        () =>
+          useEventHostPicker(
+            { fetchNextAttendeesPage, eventId: 11, pageSize: 15 },
+            testEnv
+          ),
+        {
+          wrapper: ({ children }: any) => (
+            <TestQueryClientProvider>{children}</TestQueryClientProvider>
+          )
+        }
+      )
 
       await waitFor(() =>
         expect(result.current.attendeesList.status).toEqual("success")
       )
-      act(() =>
-        result.current.onAttendeeSelected(
-          (result.current.attendeesList as any).attendeesList.attendees()[0].id
-        )
-      )
+
+      return result
+    }
+
+    test("selecting a new host successfully", async () => {
+      const result = await renderUseEventHostPicker()
+      selectAttendeeWithIndex(result.current, 0)
       expect(result.current.selectedAttendeeId).toEqual(
         EventAttendeeMocks.AnnaAttendee.id
       )
-      act(() =>
-        result.current.onAttendeeSelected(
-          (result.current.attendeesList as any).attendeesList.attendees()[1].id
-        )
-      )
+      selectAttendeeWithIndex(result.current, 1)
       expect(result.current.selectedAttendeeId).toEqual(
         EventAttendeeMocks.BlobJr.id
       )
@@ -76,37 +71,10 @@ describe("EventHostPicker tests", () => {
         (result.current.attendeesList as any).attendeesList.attendees()
       ).toEqual([EventAttendeeMocks.AnnaAttendee, EventAttendeeMocks.Alivs])
     })
-    test("select attendee that becomes not-participating right before promotion", async () => {
-      const mockData = {
-        attendees: [
-          EventAttendeeMocks.Alivs,
-          EventAttendeeMocks.AnnaAttendee,
-          EventAttendeeMocks.BlobJr
-        ],
-        totalAttendeeCount: 3
-      }
-      fetchNextAttendeesPage.mockResolvedValueOnce(mockData)
-      const { result } = renderUseEventHostPicker(11, 15)
 
-      await waitFor(() =>
-        expect(result.current.attendeesList.status).toEqual("success")
-      )
-      act(() =>
-        result.current.onAttendeeSelected(
-          (result.current.attendeesList as any).attendeesList.attendees()[0].id
-        )
-      )
-      expect(result.current.selectedAttendeeId).toEqual(
-        EventAttendeeMocks.AnnaAttendee.id
-      )
-      act(() =>
-        result.current.onAttendeeSelected(
-          (result.current.attendeesList as any).attendeesList.attendees()[1].id
-        )
-      )
-      expect(result.current.selectedAttendeeId).toEqual(
-        EventAttendeeMocks.BlobJr.id
-      )
+    test("select attendee that becomes not-participating right before promotion", async () => {
+      const result = await renderUseEventHostPicker()
+      selectAttendeeWithIndex(result.current, 1)
       testEnv.promoteToHost.mockResolvedValueOnce("user-not-attending")
       act(() => (result.current as any).submitted())
       await verifyNeverOccurs(() =>
@@ -122,26 +90,10 @@ describe("EventHostPicker tests", () => {
         expect(result.current.selectedAttendeeId).toBeUndefined()
       )
     })
-    test("select attendee that becomes not-participating right before promotion, presents error alert", async () => {
-      const mockData = {
-        attendees: [
-          EventAttendeeMocks.Alivs,
-          EventAttendeeMocks.AnnaAttendee,
-          EventAttendeeMocks.BlobJr
-        ],
-        totalAttendeeCount: 3
-      }
-      fetchNextAttendeesPage.mockResolvedValueOnce(mockData)
-      const { result } = renderUseEventHostPicker(11, 15)
 
-      await waitFor(() =>
-        expect(result.current.attendeesList.status).toEqual("success")
-      )
-      act(() =>
-        result.current.onAttendeeSelected(
-          (result.current.attendeesList as any).attendeesList.attendees()[0].id
-        )
-      )
+    test("select attendee that becomes not-participating right before promotion, presents error alert", async () => {
+      const result = await renderUseEventHostPicker()
+      selectAttendeeWithIndex(result.current, 0)
       testEnv.promoteToHost.mockResolvedValueOnce("user-not-attending")
       act(() => (result.current as any).submitted())
       await waitFor(() =>
@@ -151,29 +103,33 @@ describe("EventHostPicker tests", () => {
         )
       )
     })
-    test("presents generic error alert when failure", async () => {
-      const mockData = {
-        attendees: [
-          EventAttendeeMocks.Alivs,
-          EventAttendeeMocks.AnnaAttendee,
-          EventAttendeeMocks.BlobJr
-        ],
-        totalAttendeeCount: 3
-      }
-      fetchNextAttendeesPage.mockResolvedValueOnce(mockData)
-      const { result } = renderUseEventHostPicker(11, 15)
 
-      await waitFor(() =>
-        expect(result.current.attendeesList.status).toEqual("success")
-      )
-      act(() =>
-        result.current.onAttendeeSelected(
-          (result.current.attendeesList as any).attendeesList.attendees()[0].id
-        )
-      )
+    test("cannot submit while loading", async () => {
+      testEnv.promoteToHost.mockImplementation(neverPromise)
+      const result = await renderUseEventHostPicker()
+      selectAttendeeWithIndex(result.current, 0)
+      act(() => (result.current as any).submitted())
+      await waitFor(() => expect(result.current.submitted).toEqual(false))
+    })
+
+    test("presents generic error alert when failure", async () => {
+      const result = await renderUseEventHostPicker()
+      selectAttendeeWithIndex(result.current, 0)
       testEnv.promoteToHost.mockRejectedValueOnce(new Error())
       act(() => (result.current as any).submitted())
       await waitFor(() => expect(alertPresentationSpy).toHaveBeenCalled())
     })
+
+    const selectAttendeeWithIndex = (
+      result: ReturnType<typeof useEventHostPicker>,
+      attendeeIndex: number
+    ) => {
+      act(() =>
+        result.onAttendeeSelected(
+          (result.attendeesList as any).attendeesList.attendees()[attendeeIndex]
+            .id
+        )
+      )
+    }
   })
 })

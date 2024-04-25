@@ -104,7 +104,6 @@ export const useEventHostPicker = (
       }
     },
     onError: () => {
-      setSelectedAttendeeId(undefined)
       presentErrorAlert("generic")
     }
   })
@@ -115,6 +114,7 @@ export const useEventHostPicker = (
     onAttendeeSelected: (id: UserID) => setSelectedAttendeeId(id),
     submitted:
       selectedAttendeeId &&
+      !hostPickerMutation.isLoading &&
       (() => hostPickerMutation.mutate(selectedAttendeeId))
   }
 }
