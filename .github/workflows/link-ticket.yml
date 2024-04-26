@@ -1,0 +1,62 @@
+name: Attach PR to Trello Ticket
+
+on:
+  pull_request:
+    types: [opened]
+    branches:
+      - development
+
+jobs:
+  link-ticket:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Link PR and Trello Ticket
+      env:
+        TRELLO_API_KEY: ${{ secrets.TRELLO_API_KEY }}
+        TRELLO_API_TOKEN: ${{ secrets.TRELLO_API_TOKEN }}
+        USER_GITHUB_TOKEN: ${{ secrets.USER_GITHUB_TOKEN }}
+      run: |
+        PR_TITLE="${{ github.event.pull_request.title }}"
+        TRELLO_CARD_ID=$(echo $PR_TITLE | grep -oEi 'task_[0-9a-zA-Z]+' | cut -d'_' -f2)
+
+        echo "Found Card ID: $TRELLO_CARD_ID"
+
+        if [[ -z "$TRELLO_CARD_ID" ]]; then
+          echo "No card ID found in PR title."
+          exit 0
+        fi
+
+        # Define Card URL
+        TRELLO_CARD_URL="https://trello.com/c/$TRELLO_CARD_ID"
+
+        # URL of the Pull Request
+        PR_URL="${{ github.event.pull_request.html_url }}"
+        PR_NAME="Pull Request #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}"
+
+        # Attach PR to Trello Card
+        TRELLO_RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST "https://api.trello.com/1/cards/$TRELLO_CARD_ID/attachments" \
+        -d "key=${TRELLO_API_KEY}" \
+        -d "token=${TRELLO_API_TOKEN}" \
+        -d "url=${PR_URL}" \
+        -d "name=${PR_NAME}")
+        echo "Trello API Response Code: $TRELLO_RESPONSE"
+        echo "Trello API Response Body:"
+        cat response.json
+
+        if [[ "$TRELLO_RESPONSE" -ne 200 ]]; then
+          echo "Failed to attach PR to card. Response code: $TRELLO_RESPONSE"
+          cat response.json
+          exit 1
+        else
+          echo "PR successfully attached to Trello card."
+        fi
+
+        # Comment on the GitHub PR with the card link
+        COMMENT_BODY="Linked Ticket: $TRELLO_CARD_URL"
+        curl -s -H "Authorization: token $USER_GITHUB_TOKEN" \
+        -H "Accept: application/vnd.github.v3+json" \
+        -d "{\"body\": \"$COMMENT_BODY\"}" \
+        "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
