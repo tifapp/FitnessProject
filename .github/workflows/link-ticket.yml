@@ -13,19 +13,39 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Extract Trello Card ID from Branch Name or PR Body
+      id: card_id
+      run: |
+        BRANCH_NAME="${{ github.head_ref }}"
+        PR_BODY="${{ github.event.pull_request.body }}"
+        # Extract ID from branch name, assuming format includes 'task_XXXX'
+        TRELLO_CARD_ID=$(echo "$BRANCH_NAME" | grep -oP 'task_\K[A-Za-z0-9]+' || echo "")
+        
+        # If not found in branch name, try PR body
+        if [[ -z "$TRELLO_CARD_ID" ]]; then
+          TRELLO_CARD_ID=$(echo "$PR_BODY" | grep -oP 'task_\K[A-Za-z0-9]+' || echo "")
+          if [[ -z "$TRELLO_CARD_ID" ]]; then
+            echo "No card ID found in branch name or PR body."
+            exit 0
+          else
+            echo "Found Card ID: $TRELLO_CARD_ID in PR Body"
+            echo "::set-output name=card_id::$TRELLO_CARD_ID"
+          fi
+        else
+          echo "Found Card ID: $TRELLO_CARD_ID in Branch Name"
+          echo "::set-output name=card_id::$TRELLO_CARD_ID"
+        fi
+
     - name: Link PR and Trello Ticket
       env:
         TRELLO_API_KEY: ${{ secrets.TRELLO_API_KEY }}
         TRELLO_API_TOKEN: ${{ secrets.TRELLO_API_TOKEN }}
         USER_GITHUB_TOKEN: ${{ secrets.USER_GITHUB_TOKEN }}
       run: |
-        PR_TITLE="${{ github.event.pull_request.title }}"
-        TRELLO_CARD_ID=$(echo $PR_TITLE | grep -oEi 'task_[0-9a-zA-Z]+' | cut -d'_' -f2)
-
-        echo "Found Card ID: $TRELLO_CARD_ID"
+        TRELLO_CARD_ID="${{ steps.card_id.outputs.card_id }}"
 
         if [[ -z "$TRELLO_CARD_ID" ]]; then
-          echo "No card ID found in PR title."
+          echo "No card ID found from previous step."
           exit 0
         fi
 
@@ -53,7 +73,7 @@ jobs:
         else
           echo "PR successfully attached to Trello card."
         fi
-
+        
         # Comment on the GitHub PR with the card link
         COMMENT_BODY="Linked Ticket: $TRELLO_CARD_URL"
         curl -s -H "Authorization: token $USER_GITHUB_TOKEN" \
