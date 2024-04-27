@@ -1,5 +1,5 @@
-import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
 import { ClientSideEvent } from "@event/ClientSideEvent"
+import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Alert } from "react-native"
 
