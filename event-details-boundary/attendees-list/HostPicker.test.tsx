@@ -67,6 +67,14 @@ describe("EventHostPicker tests", () => {
       expect((result.current.attendeesList as any).attendeesList.host).toEqual(
         EventAttendeeMocks.BlobJr
       )
+    })
+
+    test("swaps attendee in list with current host if selected attendee is currently in event", async () => {
+      const result = await renderUseEventHostPicker()
+      selectAttendeeWithIndex(result.current, 1)
+      testEnv.promoteToHost.mockResolvedValueOnce("success")
+      act(() => (result.current as any).submitted())
+      await waitFor(() => expect(testEnv.onSuccess).toHaveBeenCalled())
       expect(
         (result.current.attendeesList as any).attendeesList.attendees()
       ).toEqual([EventAttendeeMocks.AnnaAttendee, EventAttendeeMocks.Alivs])
@@ -86,12 +94,22 @@ describe("EventHostPicker tests", () => {
       expect((result.current.attendeesList as any).attendeesList.host).toEqual(
         EventAttendeeMocks.Alivs
       )
-      expect(
-        (result.current.attendeesList as any).attendeesList.attendees()
-      ).toEqual([EventAttendeeMocks.AnnaAttendee])
       await waitFor(() =>
         expect(result.current.selectedAttendeeId).toBeUndefined()
       )
+    })
+
+    test("removes attendee from list if selected attendee has left event already", async () => {
+      const result = await renderUseEventHostPicker()
+      selectAttendeeWithIndex(result.current, 1)
+      testEnv.promoteToHost.mockResolvedValueOnce("user-not-attending")
+      act(() => (result.current as any).submitted())
+      await verifyNeverOccurs(() =>
+        expect(testEnv.onSuccess).toHaveBeenCalled()
+      )
+      expect(
+        (result.current.attendeesList as any).attendeesList.attendees()
+      ).toEqual([EventAttendeeMocks.AnnaAttendee])
     })
 
     test("select attendee that becomes not-participating right before promotion, presents error alert", async () => {
