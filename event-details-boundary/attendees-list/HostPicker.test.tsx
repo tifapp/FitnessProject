@@ -86,6 +86,9 @@ describe("EventHostPicker tests", () => {
       expect((result.current.attendeesList as any).attendeesList.host).toEqual(
         EventAttendeeMocks.Alivs
       )
+      expect(
+        (result.current.attendeesList as any).attendeesList.attendees()
+      ).toEqual([EventAttendeeMocks.AnnaAttendee])
       await waitFor(() =>
         expect(result.current.selectedAttendeeId).toBeUndefined()
       )

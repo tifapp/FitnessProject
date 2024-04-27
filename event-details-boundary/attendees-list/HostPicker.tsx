@@ -41,12 +41,12 @@ export type UseEventHostPickerEnvironment = {
   onSuccess: () => void
 }
 
-export const AttendeesListPicker = (
+export const EventHostPickerView = (
   attendeesListProps: UseAttendeesListProps,
   env: UseEventHostPickerEnvironment,
   style: StyleProp<ViewStyle>
 ) => {
-  const { attendeesList, selectedAttendeeId, onAttendeeSelected } =
+  const { attendeesList, selectedAttendeeId, onAttendeeSelected, submitted } =
     useEventHostPicker(attendeesListProps, env)
   if (attendeesList.status === "success") {
     return (
@@ -69,11 +69,11 @@ export const AttendeesListPicker = (
           attendeesList={attendeesList.attendeesList}
           refresh={attendeesList.refresh}
           isRefetching={attendeesList.isRefetching}
-        ></AttendeesListView>
+        />
         <TouchableOpacity
           style={style}
           disabled={!selectedAttendeeId}
-          onPress={() => console.log("Continue")}
+          onPress={() => submitted}
         />
       </View>
     )
@@ -93,6 +93,11 @@ export const useEventHostPicker = (
     onSuccess: (result, attendeeID) => {
       if (result === "user-not-attending") {
         setSelectedAttendeeId(undefined)
+        updateAttendeesListQueryEvent(
+          queryClient,
+          attendeesListProps.eventId,
+          (attendeeList) => attendeeList.removeAttendee(attendeeID)
+        )
         presentErrorAlert("user-not-attending")
       } else {
         updateAttendeesListQueryEvent(
