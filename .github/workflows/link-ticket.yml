@@ -9,30 +9,27 @@ on:
 jobs:
   link-ticket:
     runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Extract Trello Card ID from Branch Name or PR Body
-      id: card_id
+    steps:    
+    - name: Safe Handling of PR Body
       run: |
+        ENCODED_BODY=$(echo "${{ github.event.pull_request.body }}" | base64 -w 0)
+        echo "ENCODED_BODY=$ENCODED_BODY" >> $GITHUB_ENV
+
+    - name: Extract Trello Card ID from Encoded Branch Name or PR Body
+      run: |
+        PR_BODY=$(echo "$ENCODED_BODY" | base64 --decode)
         BRANCH_NAME="${{ github.head_ref }}"
-        PR_BODY="${{ github.event.pull_request.body }}"
-        # Extract ID from branch name, assuming format includes 'task_XXXX'
-        TRELLO_CARD_ID=$(echo "$BRANCH_NAME" | grep -oP 'task_\K[A-Za-z0-9]+' || echo "")
-        
-        # If not found in branch name, try PR body
+        TRELLO_CARD_ID=$(echo "$BRANCH_NAME" | grep -oP '(?i:task)_\K[A-Za-z0-9]+' || echo "")
+
         if [[ -z "$TRELLO_CARD_ID" ]]; then
-          TRELLO_CARD_ID=$(echo "$PR_BODY" | grep -oP 'task_\K[A-Za-z0-9]+' || echo "")
-          if [[ -z "$TRELLO_CARD_ID" ]]; then
-            echo "No card ID found in branch name or PR body."
-            exit 0
-          else
-            echo "Found Card ID: $TRELLO_CARD_ID in PR Body"
-            echo "::set-output name=card_id::$TRELLO_CARD_ID"
-          fi
+          TRELLO_CARD_ID=$(echo "$PR_BODY" | grep -oP '(?i:task)_\K[A-Za-z0-9]+' || echo "")
+        fi
+
+        if [[ -z "$TRELLO_CARD_ID" ]]; then
+          echo "No card ID found in branch name or PR body."
+          exit 1
         else
-          echo "Found Card ID: $TRELLO_CARD_ID in Branch Name"
+          echo "Found Card ID: $TRELLO_CARD_ID"
           echo "::set-output name=card_id::$TRELLO_CARD_ID"
         fi
 
@@ -43,11 +40,6 @@ jobs:
         USER_GITHUB_TOKEN: ${{ secrets.USER_GITHUB_TOKEN }}
       run: |
         TRELLO_CARD_ID="${{ steps.card_id.outputs.card_id }}"
-
-        if [[ -z "$TRELLO_CARD_ID" ]]; then
-          echo "No card ID found from previous step."
-          exit 0
-        fi
 
         # Define Card URL
         TRELLO_CARD_URL="https://trello.com/c/$TRELLO_CARD_ID"
