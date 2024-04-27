@@ -41,24 +41,28 @@ export type UseEventHostPickerEnvironment = {
   onSuccess: () => void
 }
 
-export const EventHostPickerView = (
-  attendeesListProps: UseAttendeesListProps,
-  env: UseEventHostPickerEnvironment,
-  style: StyleProp<ViewStyle>
-) => {
-  const { attendeesList, selectedAttendeeId, onAttendeeSelected, submitted } =
-    useEventHostPicker(attendeesListProps, env)
-  if (attendeesList.status === "success") {
+export type EventHostPickerProps = {
+  picker: ReturnType<typeof useEventHostPicker>
+  style?: StyleProp<ViewStyle>
+}
+
+export const EventHostPickerView = ({
+  picker,
+  style
+}: EventHostPickerProps) => {
+  if (picker.attendeesList.status === "success") {
     return (
       <View>
         <AttendeesListView
           renderAttendee={(attendee) => (
             <View>
               <TouchableOpacity
-                onPress={() => onAttendeeSelected(attendee.id)}
+                onPress={() => picker.onAttendeeSelected(attendee.id)}
                 style={{
                   backgroundColor:
-                    selectedAttendeeId === attendee.id ? "yellow" : "white"
+                    picker.selectedAttendeeId === attendee.id
+                      ? "yellow"
+                      : "white"
                 }}
               >
                 <Subtitle> {attendee.username} </Subtitle>
@@ -66,14 +70,18 @@ export const EventHostPickerView = (
               </TouchableOpacity>
             </View>
           )}
-          attendeesList={attendeesList.attendeesList}
-          refresh={attendeesList.refresh}
-          isRefetching={attendeesList.isRefetching}
+          attendeesList={picker.attendeesList.attendeesList}
+          refresh={picker.attendeesList.refresh}
+          isRefetching={picker.attendeesList.isRefetching}
         />
         <TouchableOpacity
           style={style}
-          disabled={!selectedAttendeeId}
-          onPress={() => submitted}
+          disabled={!picker.selectedAttendeeId}
+          onPress={() => {
+            if (picker.submitted) {
+              picker.submitted()
+            }
+          }}
         />
       </View>
     )
