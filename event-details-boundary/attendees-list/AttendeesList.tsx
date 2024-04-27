@@ -1,10 +1,10 @@
 import { Headline } from "@components/Text"
 import { useInfiniteQuery } from "@tanstack/react-query"
+import { EventAttendeesList } from "./EventAttendeesList"
 import { TiFAPI } from "TiFShared/api"
 import { EventAttendee } from "TiFShared/domain-models/Event"
 import { useMemo } from "react"
-import { FlatList, StyleProp, View, ViewStyle } from "react-native"
-import { EventAttendeesList } from "./EventAttendeesList"
+import { StyleProp, ViewStyle, FlatList, View } from "react-native"
 
 export type EventAttendeesPage = {
   attendees: EventAttendee[]

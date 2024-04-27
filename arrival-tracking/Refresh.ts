@@ -1,7 +1,7 @@
 import { AppState } from "react-native"
 import { EventArrivalsTracker } from "./Tracker"
 import { TiFAPI } from "TiFShared/api"
-import { InternalMetricsStorage } from "@settings-storage/InternalMetrics"
+import { LocalSettingsStore } from "@settings-storage/LocalSettings"
 import { now } from "TiFShared/lib/Dayjs"
 import { EventArrivals } from "./Arrivals"
 
@@ -10,7 +10,7 @@ import { EventArrivals } from "./Arrivals"
  */
 export class EventArrivalsRefresher {
   private readonly performRefresh: () => Promise<void>
-  private readonly internalMetrics: InternalMetricsStorage
+  private readonly localSettings: LocalSettingsStore
   private readonly minutesBetweenNeededRefreshes: number
 
   private get secondsNeededBetweenRefreshes() {
@@ -19,18 +19,18 @@ export class EventArrivalsRefresher {
 
   constructor(
     performRefresh: () => Promise<void>,
-    internalMetrics: InternalMetricsStorage,
+    localSettings: LocalSettingsStore,
     minutesBetweenNeededRefreshes: number
   ) {
     this.performRefresh = performRefresh
-    this.internalMetrics = internalMetrics
+    this.localSettings = localSettings
     this.minutesBetweenNeededRefreshes = minutesBetweenNeededRefreshes
   }
 
   static usingTracker(
     tracker: EventArrivalsTracker,
     tifAPI: TiFAPI,
-    internalMetrics: InternalMetricsStorage,
+    localSettings: LocalSettingsStore,
     minutesBetweenNeededRefreshes: number
   ) {
     return new EventArrivalsRefresher(
@@ -40,7 +40,7 @@ export class EventArrivalsRefresher {
           return EventArrivals.fromRegions(resp.data.trackableRegions)
         })
       },
-      internalMetrics,
+      localSettings,
       minutesBetweenNeededRefreshes
     )
   }
@@ -70,12 +70,12 @@ export class EventArrivalsRefresher {
   async forceRefresh() {
     await Promise.allSettled([
       this.performRefresh(),
-      this.internalMetrics.update({ lastEventArrivalsRefreshDate: new Date() })
+      this.localSettings.save({ lastEventArrivalsRefreshDate: new Date() })
     ])
   }
 
   private async nextAvailableRefreshDate() {
-    const lastDate = (await this.internalMetrics.current())
+    const lastDate = (await this.localSettings.load())
       .lastEventArrivalsRefreshDate
     if (!lastDate) return new Date()
     return lastDate.ext.addSeconds(this.secondsNeededBetweenRefreshes)
