@@ -21,7 +21,14 @@ const envVars = z
 const execAsync = promisify(exec)
 
 const args = process.argv.slice(2)
-const taskCardId = args[0]
+const arg = args[0]
+
+if (arg && !/^TASK_\w+$/i.test(arg)) {
+  console.error("Invalid arg format. Expected format is 'TASK_xxx'.")
+  process.exit(1)
+}
+
+const realCardId = arg ? arg.replace(/^TASK_/i, "") : null
 
 const getGitRemoteUrl = async () => {
   try {
@@ -38,6 +45,7 @@ const getCardDetails = async (cardId) => {
 
   try {
     const response = await fetch(url)
+    console.log(response)
     const data = await response.json()
     if (!response.ok) {
       throw new Error(data.message || "Failed to fetch task details.")
@@ -72,9 +80,9 @@ const openPR = async () => {
   let prTitle = currentBranch
   let prBody = ""
 
-  if (taskCardId) {
-    const details = await getCardDetails(taskCardId)
-    prTitle = encodeURIComponent(`${taskCardId} ${details.title}`)
+  if (realCardId) {
+    const details = await getCardDetails(realCardId)
+    prTitle = encodeURIComponent(`${realCardId} ${details.title}`)
     prBody = encodeURIComponent(details.description)
   } else {
     console.log("Could not find task name.")

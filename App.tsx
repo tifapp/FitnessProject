@@ -1,11 +1,16 @@
+// added crypto
+
 import { TiFMenuProvider } from "@components/TiFMenuProvider"
 import { useAppFonts } from "@lib/Fonts"
 import React from "react"
 import { RootSiblingParent } from "react-native-root-siblings"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 
-import { Geo } from "@aws-amplify/geo"
 import { ExpoEventArrivalsGeofencer } from "@arrival-tracking/geofencing"
+import { setupCognito } from "@auth-boundary"
+import { Geo } from "@aws-amplify/geo"
+import { AppView } from "@core-root/AppView"
+import { NetInfoInternetConnectionStatus } from "@lib/InternetConnection"
 import {
   sentryBreadcrumbLogHandler,
   sentryErrorCapturingLogHandler
