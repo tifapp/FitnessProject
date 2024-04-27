@@ -7,7 +7,29 @@ on:
       - development
 
 jobs:
+  check-existing-comment:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.check-comment.outputs.skip }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Check for existing Trello link comment
+        id: check-comment
+        run: |
+          COMMENTS_URL=${{ github.event.pull_request.comments_url }}
+          COMMENT_FOUND=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" $COMMENTS_URL | jq -r '.[] | select(.body | test("^Linked Ticket: https://trello.com/c/"))')
+          if [[ -n "$COMMENT_FOUND" ]]; then
+            echo "::set-output name=skip::true"
+            echo "Existing Trello link found, skipping..."
+          else
+            echo "::set-output name=skip::false"
+          fi
+
   link-ticket:
+    needs: check-existing-comment
+    if: needs.check-existing-comment.outputs.skip == 'false'
     runs-on: ubuntu-latest
     steps:    
     - name: Safe Handling of PR Body
