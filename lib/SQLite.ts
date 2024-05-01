@@ -174,6 +174,19 @@ export class TiFSQLite {
         hasCompletedOnboarding INT2 NOT NULL,
         lastEventArrivalsRefreshTime DOUBLE
       )
+      `,
+      db.run`
+      CREATE TABLE IF NOT EXISTS UserSettings (
+        id TEXT NOT NULL PRIMARY KEY DEFAULT 'A' CHECK (id = 'A'),
+        isAnalyticsEnabled INT2 NOT NULL,
+        isCrashReportingEnabled INT2 NOT NULL,
+        isEventNotificationsEnabled INT2 NOT NULL,
+        isMentionsNotificationsEnabled INT2 NOT NULL,
+        isChatNotificationsEnabled INT2 NOT NULL,
+        isFriendRequestNotificationsEnabled INT2 NOT NULL,
+        canShareArrivalStatus INT2 NOT NULL,
+        version INTEGER NOT NULL DEFAULT 0
+      )
       `
     ])
   }

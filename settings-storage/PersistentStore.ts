@@ -72,10 +72,13 @@ export class PersistentSettingsStore<Settings extends AnySettings>
     }
   }
 
+  async persistedSettings() {
+    return await this.storage.load()
+  }
+
   private performInitialLoadIfNeeded() {
     if (this.initialLoadPromise) return
-    this.initialLoadPromise = this.storage
-      .load()
+    this.initialLoadPromise = this.persistedSettings()
       .then((settings) => {
         this.currentSettings = settings
         this.subscribers.send(settings)

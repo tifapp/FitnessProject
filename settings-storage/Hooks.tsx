@@ -5,22 +5,29 @@ import {
   useSyncExternalStore
 } from "react"
 import { LocalSettings } from "./LocalSettings"
-import { SettingsStore } from "./Settings"
+import { AnySettings, SettingsStore } from "./Settings"
+import { UserSettings } from "TiFShared/domain-models/User"
 
 const SettingsContext = createContext<
-  { localStore: SettingsStore<LocalSettings> } | undefined
+  | {
+      localSettingsStore: SettingsStore<LocalSettings>
+      userSettingsStore: SettingsStore<UserSettings>
+    }
+  | undefined
 >(undefined)
 
 export type SettingsProviderProps = {
-  localStore: SettingsStore<LocalSettings>
+  localSettingsStore: SettingsStore<LocalSettings>
+  userSettingsStore: SettingsStore<UserSettings>
   children: JSX.Element
 }
 
 export const SettingsProvider = ({
-  localStore,
+  localSettingsStore,
+  userSettingsStore,
   children
 }: SettingsProviderProps) => (
-  <SettingsContext.Provider value={{ localStore }}>
+  <SettingsContext.Provider value={{ localSettingsStore, userSettingsStore }}>
     {children}
   </SettingsContext.Provider>
 )
@@ -30,16 +37,36 @@ export const SettingsProvider = ({
  * settings.
  */
 export const useLocalSettings = () => {
-  const context = useContext(SettingsContext)
-  if (!context) throw new Error("No LocalSettingsStore provided.")
+  const { localSettingsStore } = useSettings()
   return {
-    settings: useSyncExternalStore(
-      useCallback(
-        (callback) => context.localStore.subscribe(callback),
-        [context.localStore]
-      ),
-      () => context.localStore.mostRecentlyPublished
-    ),
-    store: context.localStore
+    settings: useSettingsStoreState(localSettingsStore),
+    store: localSettingsStore
   }
+}
+
+/**
+ * Returns the current user settings, along with the store that stores the
+ * settings.
+ */
+export const useUserSettings = () => {
+  const { userSettingsStore } = useSettings()
+  return {
+    settings: useSettingsStoreState(userSettingsStore),
+    store: userSettingsStore
+  }
+}
+
+const useSettings = () => {
+  const context = useContext(SettingsContext)
+  if (!context) throw new Error("No SettingsProvider provided.")
+  return context
+}
+
+const useSettingsStoreState = <Settings extends AnySettings>(
+  store: SettingsStore<Settings>
+) => {
+  return useSyncExternalStore(
+    useCallback((callback) => store.subscribe(callback), [store]),
+    () => store.mostRecentlyPublished
+  )
 }
