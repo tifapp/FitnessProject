@@ -4,14 +4,15 @@ import {
   useContext,
   useSyncExternalStore
 } from "react"
-import { LocalSettingsStore } from "./LocalSettings"
+import { LocalSettings } from "./LocalSettings"
+import { SettingsStore } from "./Settings"
 
 const SettingsContext = createContext<
-  { localStore: LocalSettingsStore } | undefined
+  { localStore: SettingsStore<LocalSettings> } | undefined
 >(undefined)
 
 export type SettingsProviderProps = {
-  localStore: LocalSettingsStore
+  localStore: SettingsStore<LocalSettings>
   children: JSX.Element
 }
 
@@ -37,7 +38,7 @@ export const useLocalSettings = () => {
         (callback) => context.localStore.subscribe(callback),
         [context.localStore]
       ),
-      () => context.localStore.current
+      () => context.localStore.mostRecentlyPublished
     ),
     store: context.localStore
   }

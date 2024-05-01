@@ -11,18 +11,15 @@ import { repeatElements } from "TiFShared/lib/Array"
 import { mockEventArrivalRegion } from "./MockData"
 import { expectOrderInsensitiveEventArrivals } from "./TestHelpers"
 import { EventArrivals } from "./Arrivals"
-import { SQLiteLocalSettingsStore } from "@settings-storage/LocalSettings"
+import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
 
 describe("EventArrivalsRefresher tests", () => {
   resetTestSQLiteBeforeEach()
-  let localSettings = new SQLiteLocalSettingsStore(testSQLite)
+  const storage = new SQLiteLocalSettingsStorage(testSQLite)
   fakeTimers()
 
   const performRefresh = jest.fn()
-  beforeEach(() => {
-    performRefresh.mockReset()
-    // localSettings = new SQLiteLocalSettingsStore(testSQLite)
-  })
+  beforeEach(() => performRefresh.mockReset())
 
   test("refresh if needed, performs refresh if no prior refereshes", async () => {
     const refresher = createRefresher(30)
@@ -104,7 +101,7 @@ describe("EventArrivalsRefresher tests", () => {
     const refresher = EventArrivalsRefresher.usingTracker(
       tracker,
       TiFAPI.testAuthenticatedInstance,
-      localSettings,
+      storage,
       20
     )
     const regions = repeatElements(3, () => mockEventArrivalRegion())
@@ -124,7 +121,7 @@ describe("EventArrivalsRefresher tests", () => {
   const createRefresher = (minutesBetweenNeededRefreshes: number) => {
     return new EventArrivalsRefresher(
       performRefresh,
-      localSettings,
+      storage,
       minutesBetweenNeededRefreshes
     )
   }
