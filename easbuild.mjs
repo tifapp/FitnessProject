@@ -57,22 +57,52 @@ const sendImageToSlack = async (
 ) => {
   const imageBuffer = Buffer.from(imageData.split(",")[1], "base64")
 
-  const formData = new FormData()
-  formData.append("token", process.env.SLACK_APP_ID ?? "")
-  formData.append("channels", channelId)
-  formData.append("initial_comment", message)
-
-  const blob = new Blob([imageBuffer], { type: "image/png" })
-  formData.append("file", blob, "qrcode.png")
-
   try {
-    const response = await fetch("https://slack.com/api/files.upload", {
-      method: "POST",
-      body: formData
+    const uploadUrlResponse = await fetch(
+      "https://slack.com/api/files.getUploadURLExternal",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.SLACK_APP_ID}`
+        },
+        body: JSON.stringify({
+          channels: channelId
+        })
+      }
+    )
+
+    // @ts-ignore
+    const { url } = await uploadUrlResponse.json()
+
+    const uploadResponse = await fetch(url, {
+      method: "PUT",
+      body: imageBuffer
     })
 
-    const responseBody = await response.json()
-    return responseBody
+    if (!uploadResponse.ok) {
+      throw new Error("Failed to upload file to pre-signed URL")
+    }
+
+    const completeUploadResponse = await fetch(
+      "https://slack.com/api/files.completeUploadExternal",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.SLACK_APP_ID}`
+        },
+        body: JSON.stringify({
+          file: url,
+          initial_comment: message,
+          channels: channelId
+        })
+      }
+    )
+
+    const completeUploadData = await completeUploadResponse.json()
+
+    return completeUploadData
   } catch (error) {
     console.error(error)
     throw error
