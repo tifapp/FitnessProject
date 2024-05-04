@@ -2,7 +2,7 @@
   "name": "root",
   "main": "AppEntry.js",
   "scripts": {
-    "pr": "node autopr.mjs",
+    "pr": "node --loader ts-node/esm ./node_modules/TiFShared/npm-scripts/auto-pr.ts --env .env.infra",
     "start": "node enableStorybook.js false && node checkEnv.js && npx expo start --dev-client --clear",
     "sb_start": "node enableStorybook.js true && sb-rn-get-stories --config-path .storybook/.ondevice && npx expo start --dev-client --clear",
     "sb_watcher": "sb-rn-watcher --config-path .storybook/.ondevice",
