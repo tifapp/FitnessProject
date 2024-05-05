@@ -1,12 +1,8 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useSyncExternalStore
-} from "react"
+import { createContext, useCallback, useContext } from "react"
 import { LocalSettings } from "./LocalSettings"
-import { AnySettings, SettingsStore } from "./Settings"
+import { AnySettings, SettingsStore, areSettingsEqual } from "./Settings"
 import { UserSettings } from "TiFShared/domain-models/User"
+import { useSyncExternalStoreWithSelector } from "use-sync-external-store/with-selector"
 
 const SettingsContext = createContext<
   | {
@@ -36,25 +32,17 @@ export const SettingsProvider = ({
  * Returns the current device settings, along with the store that stores the
  * settings.
  */
-export const useLocalSettings = () => {
-  const { localSettingsStore } = useSettings()
-  return {
-    settings: useSettingsStoreState(localSettingsStore),
-    store: localSettingsStore
-  }
-}
+export const useLocalSettings = <ScopedSettings extends AnySettings>(
+  selector: (userSettings: LocalSettings) => ScopedSettings
+) => useSettingsStore(useSettings().localSettingsStore, selector)
 
 /**
  * Returns the current user settings, along with the store that stores the
  * settings.
  */
-export const useUserSettings = () => {
-  const { userSettingsStore } = useSettings()
-  return {
-    settings: useSettingsStoreState(userSettingsStore),
-    store: userSettingsStore
-  }
-}
+export const useUserSettings = <ScopedSettings extends AnySettings>(
+  selector: (userSettings: UserSettings) => ScopedSettings
+) => useSettingsStore(useSettings().userSettingsStore, selector)
 
 const useSettings = () => {
   const context = useContext(SettingsContext)
@@ -62,11 +50,19 @@ const useSettings = () => {
   return context
 }
 
-const useSettingsStoreState = <Settings extends AnySettings>(
-  store: SettingsStore<Settings>
-) => {
-  return useSyncExternalStore(
+const useSettingsStore = <
+  Settings extends AnySettings,
+  ScopedSettings extends AnySettings
+>(
+  store: SettingsStore<Settings>,
+  selector: (userSettings: Settings) => ScopedSettings
+) => ({
+  settings: useSyncExternalStoreWithSelector(
     useCallback((callback) => store.subscribe(callback), [store]),
-    () => store.mostRecentlyPublished
-  )
-}
+    () => store.mostRecentlyPublished,
+    undefined,
+    selector,
+    areSettingsEqual
+  ),
+  update: (settings: Settings) => store.update(settings)
+})
