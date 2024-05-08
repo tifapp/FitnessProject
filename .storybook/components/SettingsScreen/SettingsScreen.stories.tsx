@@ -43,7 +43,10 @@ const store = userSettingsPersistentStore(
 const Test = () => (
   <SafeAreaView edges={["bottom"]}>
     <SettingsProvider localSettingsStore={{} as any} userSettingsStore={store}>
-      <PrivacySettingsView permissions={usePrivacySettingsPermissions()} />
+      <PrivacySettingsView
+        permissions={usePrivacySettingsPermissions()}
+        onPrivacyPolicyTapped={() => console.log("Privacy Policy")}
+      />
     </SettingsProvider>
   </SafeAreaView>
 )

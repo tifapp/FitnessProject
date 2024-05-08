@@ -7,7 +7,7 @@ import {
   StyleSheet,
   View
 } from "react-native"
-import { SettingsSectionView } from "./components/SettingsSectionView"
+import { SettingsSectionView } from "./components/Section"
 import { BodyText } from "@components/Text"
 import {
   useBackgroundPermissions as useBackgroundLocationPermissions,
@@ -16,8 +16,10 @@ import {
 } from "expo-location"
 import { usePermissions as useNotificationPermissions } from "expo-notifications"
 import { openSettings as expoOpenSettings } from "expo-linking"
-import { SettingsToggleView } from "./components/SettingsToggle"
+import { SettingsToggleCardView } from "./components/ToggleCard"
 import { AppStyles } from "@lib/AppColorStyle"
+import { SettingsNavigationLinkView } from "./components/NavigationLink"
+import { SettingsCardView } from "./components/Card"
 
 export const privacySettingsPermissionsStatus = <
   Permission extends PermissionResponse
@@ -30,7 +32,7 @@ export const privacySettingsPermissionsStatus = <
     permissions && (permissions.granted || !permissions.canAskAgain)
   return {
     isGranted: permissions?.granted ?? false,
-    action: shouldOpenSettings ? openSettings : request
+    onToggled: shouldOpenSettings ? openSettings : request
   }
 }
 
@@ -59,17 +61,13 @@ export const usePrivacySettingsPermissions = () => {
 
 export type PrivacySettingsProps = {
   permissions: ReturnType<typeof usePrivacySettingsPermissions>
+  onPrivacyPolicyTapped: () => void
   style?: StyleProp<ViewStyle>
 }
 
-const privacySettingsSelector = (settings: UserSettings) => ({
-  isAnalyticsEnabled: settings.isAnalyticsEnabled,
-  isCrashReportingEnabled: settings.isCrashReportingEnabled,
-  canShareArrivalStatus: settings.canShareArrivalStatus
-})
-
 export const PrivacySettingsView = ({
   permissions,
+  onPrivacyPolicyTapped,
   style
 }: PrivacySettingsProps) => {
   const { settings, update } = useUserSettings(privacySettingsSelector)
@@ -83,65 +81,85 @@ export const PrivacySettingsView = ({
           you wish to share it with.
         </BodyText>
       </SettingsSectionView>
+      <SettingsSectionView title="Learn More">
+        <SettingsCardView>
+          <SettingsNavigationLinkView
+            title="Privacy Policy"
+            onTapped={onPrivacyPolicyTapped}
+            iconName="lock-closed"
+            iconBackgroundColor={AppStyles.black}
+          />
+        </SettingsCardView>
+      </SettingsSectionView>
       <SettingsSectionView title="Control What You Share">
-        <SettingsToggleView
+        <SettingsToggleCardView
           title="Anonymous Analytics"
           description="We improve the app by having a better understanding of how you and others use the app. To do this we collect anonymous usage data that's not linked to you in any way."
           iconName="bar-chart"
           iconBackgroundColor={AppStyles.red}
           isOn={settings.isAnalyticsEnabled}
-          onChange={(isAnalyticsEnabled) => update({ isAnalyticsEnabled })}
+          onIsOnChange={(isAnalyticsEnabled) => update({ isAnalyticsEnabled })}
         />
-        <SettingsToggleView
+        <SettingsToggleCardView
           title="Crash Reports"
           description="We reduce bugs and crashes by collecting anonymous usage data around app issues. This data is not linked to you in any way."
           iconName="warning"
           iconBackgroundColor={AppStyles.yellow}
           isOn={settings.isCrashReportingEnabled}
-          onChange={(isCrashReportingEnabled) => {
+          onIsOnChange={(isCrashReportingEnabled) => {
             update({ isCrashReportingEnabled })
           }}
         />
-        <SettingsToggleView
+        <SettingsToggleCardView
           title="Event Arrivals"
           description="We detect when you arrive at events so that we can let other participants know that you've arrived. You can choose to disable sharing this to others."
           iconName="footsteps"
           iconBackgroundColor={AppStyles.green}
           isOn={settings.canShareArrivalStatus}
-          onChange={(canShareArrivalStatus) => {
+          onIsOnChange={(canShareArrivalStatus) => {
             update({ canShareArrivalStatus })
           }}
         />
       </SettingsSectionView>
       <SettingsSectionView title="Device Permissions">
-        <SettingsToggleView
+        <SettingsToggleCardView
           title="Location While Using the App"
           description="Your location is used to search for local events in your area, and to detect whether or not you arrive at an event when the app is open."
           iconName="location"
           iconBackgroundColor={AppStyles.blue}
           isOn={permissions.foregroundLocation.isGranted}
-          onTogglePress={permissions.foregroundLocation.action}
+          onToggleTappedWithoutIsOnChange={
+            permissions.foregroundLocation.onToggled
+          }
         />
-        <SettingsToggleView
+        <SettingsToggleCardView
           title="Location While Not Using the App"
           description="Your location is used to detect when you arrive at events when the app is not open."
           iconName="golf"
           iconBackgroundColor={AppStyles.purple}
           isOn={permissions.backgroundLocation.isGranted}
-          onTogglePress={permissions.backgroundLocation.action}
+          onToggleTappedWithoutIsOnChange={
+            permissions.backgroundLocation.onToggled
+          }
         />
-        <SettingsToggleView
+        <SettingsToggleCardView
           title="Notifications"
           description="Your location is used to detect when you arrive at events when the app is not open."
           iconName="notifications"
           iconBackgroundColor={AppStyles.orange}
           isOn={permissions.notifications.isGranted}
-          onTogglePress={permissions.notifications.action}
+          onToggleTappedWithoutIsOnChange={permissions.notifications.onToggled}
         />
       </SettingsSectionView>
     </ScrollView>
   )
 }
+
+const privacySettingsSelector = (settings: UserSettings) => ({
+  isAnalyticsEnabled: settings.isAnalyticsEnabled,
+  isCrashReportingEnabled: settings.isCrashReportingEnabled,
+  canShareArrivalStatus: settings.canShareArrivalStatus
+})
 
 const styles = StyleSheet.create({
   privacyIllustration: {
