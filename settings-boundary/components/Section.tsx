@@ -1,4 +1,4 @@
-import { Headline } from "@components/Text"
+import { Subtitle } from "@components/Text"
 import { ViewStyle, View, StyleProp, StyleSheet } from "react-native"
 
 export type SettingsSectionProps = {
@@ -14,7 +14,7 @@ export const SettingsSectionView = ({
 }: SettingsSectionProps) => (
   <View style={style}>
     <View style={styles.container}>
-      {title && <Headline>{title}</Headline>}
+      {title && <Subtitle>{title}</Subtitle>}
       {children}
     </View>
   </View>

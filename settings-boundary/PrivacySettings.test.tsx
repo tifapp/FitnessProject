@@ -8,15 +8,24 @@ describe("PrivacySettings tests", () => {
       canAskAgain: false
     } as PermissionResponse
 
+    it("should return true for isGranted when permission has been granted", () => {
+      const { isGranted } = privacySettingsPermissionsStatus(
+        { ...TEST_PERMISSIONS_RESPONSE, granted: true },
+        jest.fn(),
+        jest.fn()
+      )
+      expect(isGranted).toEqual(true)
+    })
+
     test("permissions response is null, treats status as permissions is denied with request access", () => {
       const openSettings = jest.fn()
       const requestPermission = jest.fn()
-      const { isGranted, action } = privacySettingsPermissionsStatus(
+      const { isGranted, onToggled } = privacySettingsPermissionsStatus(
         null,
         requestPermission,
         openSettings
       )
-      action()
+      onToggled()
       expect(isGranted).toEqual(false)
       expect(openSettings).not.toHaveBeenCalled()
       expect(requestPermission).toHaveBeenCalled()
@@ -25,7 +34,7 @@ describe("PrivacySettings tests", () => {
     it("should return the open settings function as the action if the permission is granted", () => {
       const openSettings = jest.fn()
       const requestPermission = jest.fn()
-      const { action } = privacySettingsPermissionsStatus(
+      const { onToggled } = privacySettingsPermissionsStatus(
         {
           ...TEST_PERMISSIONS_RESPONSE,
           granted: true
@@ -33,7 +42,7 @@ describe("PrivacySettings tests", () => {
         requestPermission,
         openSettings
       )
-      action()
+      onToggled()
       expect(openSettings).toHaveBeenCalled()
       expect(requestPermission).not.toHaveBeenCalled()
     })
@@ -41,7 +50,7 @@ describe("PrivacySettings tests", () => {
     it("should return the request function as the action if the permission is not granted", () => {
       const openSettings = jest.fn()
       const requestPermission = jest.fn()
-      const { action } = privacySettingsPermissionsStatus(
+      const { onToggled } = privacySettingsPermissionsStatus(
         {
           ...TEST_PERMISSIONS_RESPONSE,
           granted: false,
@@ -50,7 +59,7 @@ describe("PrivacySettings tests", () => {
         requestPermission,
         openSettings
       )
-      action()
+      onToggled()
       expect(openSettings).not.toHaveBeenCalled()
       expect(requestPermission).toHaveBeenCalled()
     })
@@ -58,7 +67,7 @@ describe("PrivacySettings tests", () => {
     it("should return the open settings function as the action if permission is denied and cannot ask again", () => {
       const openSettings = jest.fn()
       const requestPermission = jest.fn()
-      const { action } = privacySettingsPermissionsStatus(
+      const { onToggled } = privacySettingsPermissionsStatus(
         {
           ...TEST_PERMISSIONS_RESPONSE,
           granted: false,
@@ -67,7 +76,7 @@ describe("PrivacySettings tests", () => {
         requestPermission,
         openSettings
       )
-      action()
+      onToggled()
       expect(openSettings).toHaveBeenCalled()
       expect(requestPermission).not.toHaveBeenCalled()
     })
