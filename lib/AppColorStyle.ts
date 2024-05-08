@@ -12,4 +12,10 @@ export namespace AppStyles {
   export const eventCardColor = "#F4F4F6"
   export const eventCardBorder = "rgba(145, 145, 145, 0.2)"
   export const linkColor = "#4287f5"
+  export const blue = ColorString.parse(linkColor)!
+  export const red = ColorString.parse("#FB3640")!
+  export const yellow = ColorString.parse("#F7CD24")!
+  export const green = ColorString.parse("#14B329")!
+  export const purple = ColorString.parse("#A882DD")!
+  export const orange = ColorString.parse("#FB5607")!
 }

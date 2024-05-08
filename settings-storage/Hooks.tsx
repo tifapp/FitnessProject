@@ -64,5 +64,5 @@ const useSettingsStore = <
     selector,
     areSettingsEqual
   ),
-  update: (settings: Settings) => store.update(settings)
+  update: (settings: Partial<Settings>) => store.update(settings)
 })

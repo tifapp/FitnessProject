@@ -36,17 +36,17 @@ const ProfileImageAndNameWithFriend = ({
     status: UserToProfileRelationStatus | undefined
   ) => {
     switch (status) {
-    case "not-friends":
-      return "Add Friend"
+      case "not-friends":
+        return "Add Friend"
 
-    case "friends":
-      return "Friends"
+      case "friends":
+        return "Friends"
 
-    case "friend-request-pending":
-      return "Request Sent"
+      case "friend-request-pending":
+        return "Request Sent"
 
-    default:
-      return null
+      default:
+        return null
     }
   }
 

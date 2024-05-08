@@ -246,8 +246,14 @@ export const userSettingsStore = (
   apiSaveRetryCount = 3
 ) => {
   return new UserSettingsSynchronizingStore(
-    new PersistentSettingsStore(DEFAULT_USER_SETTINGS, storage),
+    userSettingsPersistentStore(storage),
     addAPIUserSettingsExponentialBackoff(api, queryClient, apiSaveRetryCount),
     debounceMillis
   )
+}
+
+export const userSettingsPersistentStore = (
+  storage: SettingsStorage<UserSettings>
+) => {
+  return new PersistentSettingsStore(DEFAULT_USER_SETTINGS, storage)
 }
