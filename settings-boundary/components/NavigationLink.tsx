@@ -1,14 +1,13 @@
-import { Headline } from "@components/Text"
-import { CircularIonicon, Ionicon, IoniconName } from "@components/common/Icons"
+import { Ionicon, IoniconName } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { ColorString } from "TiFShared/domain-models/ColorString"
 import {
   StyleProp,
   ViewStyle,
   StyleSheet,
-  View,
   TouchableHighlight
 } from "react-native"
+import { SettingsNamedIconRowView } from "./NamedIconRow"
 
 export type SettingsNavigationLinkProps = {
   title: string
@@ -30,23 +29,19 @@ export const SettingsNavigationLinkView = ({
     onPress={onTapped}
     style={style}
   >
-    <View style={styles.container}>
-      <CircularIonicon
-        name={iconName}
-        backgroundColor={iconBackgroundColor.toString()}
-      />
-      <Headline style={styles.titleText}>{title}</Headline>
+    <SettingsNamedIconRowView
+      iconName={iconName}
+      iconBackgroundColor={iconBackgroundColor}
+      name={title}
+      style={styles.container}
+    >
       <Ionicon name="chevron-forward" style={styles.chevron} />
-    </View>
+    </SettingsNamedIconRowView>
   </TouchableHighlight>
 )
 
 const styles = StyleSheet.create({
   container: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    columnGap: 8,
     padding: 16
   },
   titleText: {
