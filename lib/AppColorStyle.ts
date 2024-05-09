@@ -5,6 +5,7 @@ const primaryDarkColor = ColorString.parse("#26282A")!
 export namespace AppStyles {
   export const darkColor = primaryDarkColor.toString()
   export const colorOpacity15 = primaryDarkColor.withOpacity(0.15).toString()
+  export const veryLightGrey = primaryDarkColor.withOpacity(0.1)
   export const colorOpacity50 = primaryDarkColor.withOpacity(0.5).toString()
   export const colorOpacity35 = primaryDarkColor.withOpacity(0.35).toString()
   export const errorColor = "#EA4335"

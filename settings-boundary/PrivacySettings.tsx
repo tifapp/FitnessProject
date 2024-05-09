@@ -144,7 +144,7 @@ export const PrivacySettingsView = ({
         />
         <SettingsToggleCardView
           title="Notifications"
-          description="Your location is used to detect when you arrive at events when the app is not open."
+          description="Receive notifications about the events you attend and much more!"
           iconName="notifications"
           iconBackgroundColor={AppStyles.orange}
           isOn={permissions.notifications.isGranted}

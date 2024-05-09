@@ -53,6 +53,6 @@ const styles = StyleSheet.create({
     flex: 1
   },
   chevron: {
-    opacity: 0.5
+    opacity: 0.15
   }
 })
