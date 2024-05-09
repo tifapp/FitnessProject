@@ -43,7 +43,7 @@
     "array-bracket-spacing": "error",
     "object-curly-spacing": "error",
     "comma-spacing": "error",
-    "indent": ["error", 2],
+    "indent": "off",
     "@typescript-eslint/naming-convention": [
       "warn",
       {
