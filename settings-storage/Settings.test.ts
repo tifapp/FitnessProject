@@ -3,13 +3,20 @@ import { areSettingsEqual } from "./Settings"
 describe("Settings tests", () => {
   describe("AreSettingsEqual tests", () => {
     it("should be equal when the keys and values are the same", () => {
+      const now = new Date()
       const settings1 = {
         hello: "world",
         isOn: true,
         count: 3,
-        currentDate: new Date()
+        currentDate: now,
+        someSet: [1, 2, now]
       }
-      expect(areSettingsEqual(settings1, { ...settings1 })).toEqual(true)
+      expect(
+        areSettingsEqual(settings1, {
+          ...settings1,
+          someSet: [1, 2, now]
+        })
+      ).toEqual(true)
     })
 
     it("should not be equal when values are not the same", () => {
@@ -17,7 +24,8 @@ describe("Settings tests", () => {
         hello: "hello",
         isOn: false,
         count: 2,
-        currentDate: new Date()
+        currentDate: new Date(),
+        someSet: [1, 2, new Date()]
       }
       expect(
         areSettingsEqual(settings, { ...settings, hello: "world" })
@@ -30,6 +38,15 @@ describe("Settings tests", () => {
       )
       expect(
         areSettingsEqual(settings, { ...settings, currentDate: new Date(0) })
+      ).toEqual(false)
+      expect(areSettingsEqual(settings, { ...settings, someSet: [1] })).toEqual(
+        false
+      )
+      expect(
+        areSettingsEqual(settings, {
+          ...settings,
+          someSet: [1, new Date(1000), 3]
+        })
       ).toEqual(false)
     })
   })

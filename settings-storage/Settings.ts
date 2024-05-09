@@ -1,6 +1,12 @@
 export type SettingsStoreUnsubscribe = () => void
 
-export type SettingValue = string | boolean | number | Date | null
+export type SettingValue =
+  | string
+  | boolean
+  | number
+  | SettingValue[]
+  | Date
+  | null
 
 export type AnySettings = Record<string, SettingValue>
 
@@ -32,11 +38,17 @@ export const areSettingsEqual = <Settings extends AnySettings>(
   s1: Settings,
   s2: Settings
 ) => {
-  return Object.keys(s1).every((key) => {
-    const [v1, v2] = [s1[key], s2[key]]
-    if (v1 instanceof Date && v2 instanceof Date) {
-      return v1.getTime() === v2.getTime()
-    }
-    return v1 === v2
-  })
+  return Object.keys(s1).every((key) => isEqualSettingValue(s1[key], s2[key]))
+}
+
+const isEqualSettingValue = (v1: SettingValue, v2: SettingValue): boolean => {
+  if (v1 instanceof Date && v2 instanceof Date) {
+    return v1.getTime() === v2.getTime()
+  }
+  if (Array.isArray(v1) && Array.isArray(v2)) {
+    return v1.every((setting, index) => {
+      return index <= v2.length - 1 && isEqualSettingValue(setting, v2[index])
+    })
+  }
+  return v1 === v2
 }
