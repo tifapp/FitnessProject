@@ -1,10 +1,11 @@
-import { Footnote, Headline } from "@components/Text"
-import { CircularIonicon, IoniconName } from "@components/common/Icons"
+import { Footnote } from "@components/Text"
+import { IoniconName } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { ColorString } from "TiFShared/domain-models/ColorString"
 import { StyleProp, ViewStyle, View, StyleSheet, Pressable } from "react-native"
 import { SettingsSwitchView } from "./Switch"
 import { SettingsCardView } from "./Card"
+import { SettingsNamedIconRowView } from "./NamedIconRow"
 
 export type SettingsToggleCardProps = {
   isOn: boolean
@@ -12,7 +13,7 @@ export type SettingsToggleCardProps = {
   onToggleTappedWithoutIsOnChange?: () => void
   isDisabled?: boolean
   iconName: IoniconName
-  iconBackgroundColor: string | ColorString
+  iconBackgroundColor: ColorString
   title: string
   description: string
   style?: StyleProp<ViewStyle>
@@ -32,12 +33,11 @@ export const SettingsToggleCardView = ({
   <View style={style}>
     <SettingsCardView>
       <View style={styles.innerContainer}>
-        <View style={styles.switchRow}>
-          <CircularIonicon
-            name={iconName}
-            backgroundColor={iconBackgroundColor.toString()}
-          />
-          <Headline style={styles.switchTitle}>{title}</Headline>
+        <SettingsNamedIconRowView
+          iconName={iconName}
+          iconBackgroundColor={iconBackgroundColor}
+          name={title}
+        >
           <Pressable onPress={onToggleTappedWithoutIsOnChange}>
             <View
               pointerEvents={onToggleTappedWithoutIsOnChange ? "none" : "auto"}
@@ -49,7 +49,7 @@ export const SettingsToggleCardView = ({
               />
             </View>
           </Pressable>
-        </View>
+        </SettingsNamedIconRowView>
         <Footnote style={styles.descriptionText}>{description}</Footnote>
       </View>
     </SettingsCardView>
@@ -69,14 +69,5 @@ const styles = StyleSheet.create({
   },
   descriptionText: {
     opacity: 0.5
-  },
-  switchTitle: {
-    flex: 1
-  },
-  switchRow: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    columnGap: 8
   }
 })
