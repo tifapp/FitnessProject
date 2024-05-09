@@ -44,6 +44,7 @@
     "object-curly-spacing": "error",
     "comma-spacing": "error",
     "indent": "off",
+    "brace-style": "off",
     "@typescript-eslint/naming-convention": [
       "warn",
       {
