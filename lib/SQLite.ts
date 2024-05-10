@@ -180,11 +180,13 @@ export class TiFSQLite {
         id TEXT NOT NULL PRIMARY KEY DEFAULT 'A' CHECK (id = 'A'),
         isAnalyticsEnabled INT2 NOT NULL,
         isCrashReportingEnabled INT2 NOT NULL,
-        isEventNotificationsEnabled INT2 NOT NULL,
-        isMentionsNotificationsEnabled INT2 NOT NULL,
-        isChatNotificationsEnabled INT2 NOT NULL,
-        isFriendRequestNotificationsEnabled INT2 NOT NULL,
         canShareArrivalStatus INT2 NOT NULL,
+        eventArrivalNotificationTriggerIds TEXT NOT NULL,
+        eventChangeNotificationTriggerIds TEXT NOT NULL,
+        eventTimeNotificationTriggerIds TEXT NOT NULL,
+        friendNotificationTriggerIds TEXT NOT NULL,
+        eventCalendarStartOfWeekDay TEXT NOT NULL,
+        eventCalendarDefaultLayout TEXT NOT NULL,
         version INTEGER NOT NULL DEFAULT 0
       )
       `

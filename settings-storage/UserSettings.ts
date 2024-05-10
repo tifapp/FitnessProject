@@ -1,7 +1,11 @@
 import {
   DEFAULT_USER_SETTINGS,
+  EventArrivalNotificationTriggerIDSchema,
+  EventChangeNotificationTriggerIDSchema,
+  EventTimeNotificationTriggerIDSchema,
+  FriendNotificationTriggerIDSchema,
   UserSettings
-} from "TiFShared/domain-models/User"
+} from "TiFShared/domain-models/Settings"
 import { PersistentSettingsStore, SettingsStorage } from "./PersistentStore"
 import { SQLExecutable, TiFSQLite } from "@lib/SQLite"
 import { mergeWithPartial } from "TiFShared/lib/Object"
@@ -10,17 +14,21 @@ import { TiFAPI } from "TiFShared/api"
 import { UpdateUserSettingsRequest } from "TiFShared/api/models/User"
 import { logger } from "TiFShared/logging"
 import { QueryClient, MutationObserver } from "@tanstack/react-query"
+import { ZodType, ZodTypeDef, z } from "zod"
 
 const STORAGE_TAG = "sqlite.user.settings"
 
 type SQLiteUserSettings = {
+  id: string
   isAnalyticsEnabled: number
   isCrashReportingEnabled: number
-  isEventNotificationsEnabled: number
-  isMentionsNotificationsEnabled: number
-  isChatNotificationsEnabled: number
-  isFriendRequestNotificationsEnabled: number
   canShareArrivalStatus: number
+  eventArrivalNotificationTriggerIds: string
+  eventChangeNotificationTriggerIds: string
+  eventTimeNotificationTriggerIds: string
+  friendNotificationTriggerIds: string
+  eventCalendarStartOfWeekDay: string
+  eventCalendarDefaultLayout: string
   version: number
 }
 
@@ -48,20 +56,24 @@ export class SQLiteUserSettingsStorage
       INSERT OR REPLACE INTO UserSettings (
         isAnalyticsEnabled,
         isCrashReportingEnabled,
-        isEventNotificationsEnabled,
-        isMentionsNotificationsEnabled,
-        isChatNotificationsEnabled,
-        isFriendRequestNotificationsEnabled,
         canShareArrivalStatus,
+        eventArrivalNotificationTriggerIds,
+        eventChangeNotificationTriggerIds,
+        eventTimeNotificationTriggerIds,
+        friendNotificationTriggerIds,
+        eventCalendarStartOfWeekDay,
+        eventCalendarDefaultLayout,
         version
       ) VALUES (
         ${newSettings.isAnalyticsEnabled},
         ${newSettings.isCrashReportingEnabled},
-        ${newSettings.isEventNotificationsEnabled},
-        ${newSettings.isMentionsNotificationsEnabled},
-        ${newSettings.isChatNotificationsEnabled},
-        ${newSettings.isFriendRequestNotificationsEnabled},
         ${newSettings.canShareArrivalStatus},
+        ${serializeTriggerIds(newSettings.eventArrivalNotificationTriggerIds)},
+        ${serializeTriggerIds(newSettings.eventChangeNotificationTriggerIds)},
+        ${serializeTriggerIds(newSettings.eventTimeNotificationTriggerIds)},
+        ${serializeTriggerIds(newSettings.friendNotificationTriggerIds)},
+        ${newSettings.eventCalendarStartOfWeekDay},
+        ${newSettings.eventCalendarDefaultLayout},
         ${newSettings.version}
       )
       `
@@ -69,25 +81,47 @@ export class SQLiteUserSettingsStorage
   }
 
   private async _load(db: SQLExecutable): Promise<UserSettings> {
-    const sqliteSettings = await db.queryFirst<SQLiteUserSettings>`
+    const dbSettings = await db.queryFirst<SQLiteUserSettings>`
       SELECT * FROM UserSettings LIMIT 1
       `
-    if (!sqliteSettings) return { ...DEFAULT_USER_SETTINGS }
+    if (!dbSettings) return { ...DEFAULT_USER_SETTINGS }
+    const { id: _, ...sqliteSettings } = dbSettings
     return {
+      ...(sqliteSettings as unknown as UserSettings),
       isAnalyticsEnabled: sqliteSettings.isAnalyticsEnabled === 1,
       isCrashReportingEnabled: sqliteSettings.isCrashReportingEnabled === 1,
-      isEventNotificationsEnabled:
-        sqliteSettings.isEventNotificationsEnabled === 1,
-      isMentionsNotificationsEnabled:
-        sqliteSettings.isMentionsNotificationsEnabled === 1,
-      isChatNotificationsEnabled:
-        sqliteSettings.isChatNotificationsEnabled === 1,
-      isFriendRequestNotificationsEnabled:
-        sqliteSettings.isFriendRequestNotificationsEnabled === 1,
       canShareArrivalStatus: sqliteSettings.canShareArrivalStatus === 1,
-      version: sqliteSettings.version
+      eventTimeNotificationTriggerIds: deserializeTriggerIds(
+        sqliteSettings.eventTimeNotificationTriggerIds,
+        z.array(EventTimeNotificationTriggerIDSchema)
+      ),
+      eventChangeNotificationTriggerIds: deserializeTriggerIds(
+        sqliteSettings.eventChangeNotificationTriggerIds,
+        z.array(EventChangeNotificationTriggerIDSchema)
+      ),
+      eventArrivalNotificationTriggerIds: deserializeTriggerIds(
+        sqliteSettings.eventArrivalNotificationTriggerIds,
+        z.array(EventArrivalNotificationTriggerIDSchema)
+      ),
+      friendNotificationTriggerIds: deserializeTriggerIds(
+        sqliteSettings.friendNotificationTriggerIds,
+        z.array(FriendNotificationTriggerIDSchema)
+      )
     }
   }
+}
+
+const serializeTriggerIds = <TriggerID extends string>(
+  triggers: TriggerID[]
+) => {
+  return triggers.join(",")
+}
+
+const deserializeTriggerIds = <TriggerID extends string>(
+  serializedIds: string,
+  schema: ZodType<TriggerID[], ZodTypeDef, string[]>
+) => {
+  return schema.parse(serializedIds.split(","))
 }
 
 const log = logger("user.settings.synchronizing.store")

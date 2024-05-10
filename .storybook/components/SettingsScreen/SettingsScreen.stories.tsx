@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import {
   PrivacySettingsView,
+  NotificationSettingsView,
   usePrivacySettingsPermissions
 } from "@settings-boundary"
 import { SettingsProvider } from "@settings-storage/Hooks"
@@ -43,9 +44,13 @@ const store = userSettingsPersistentStore(
 const Test = () => (
   <SafeAreaView edges={["bottom"]}>
     <SettingsProvider localSettingsStore={{} as any} userSettingsStore={store}>
-      <PrivacySettingsView
+      {/* <PrivacySettingsView
         permissions={usePrivacySettingsPermissions()}
         onPrivacyPolicyTapped={() => console.log("Privacy Policy")}
+      /> */}
+      <NotificationSettingsView
+        isGrantedNotificationPermissions={false}
+        onNotificationPermissionsRequested={() => console.log("Requested")}
       />
     </SettingsProvider>
   </SafeAreaView>

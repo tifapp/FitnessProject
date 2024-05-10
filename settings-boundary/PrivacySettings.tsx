@@ -1,12 +1,6 @@
 import { useUserSettings } from "@settings-storage/Hooks"
 import { UserSettings } from "TiFShared/domain-models/User"
-import {
-  ScrollView,
-  StyleProp,
-  ViewStyle,
-  StyleSheet,
-  View
-} from "react-native"
+import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
 import { SettingsSectionView } from "./components/Section"
 import { BodyText } from "@components/Text"
 import {
@@ -20,6 +14,7 @@ import { SettingsToggleCardView } from "./components/ToggleCard"
 import { AppStyles } from "@lib/AppColorStyle"
 import { SettingsNavigationLinkView } from "./components/NavigationLink"
 import { SettingsCardView } from "./components/Card"
+import { SettingsScrollView } from "./components/ScrollView"
 
 export const privacySettingsPermissionsStatus = <
   Permission extends PermissionResponse
@@ -71,12 +66,12 @@ export const PrivacySettingsView = ({
   style
 }: PrivacySettingsProps) => {
   return (
-    <ScrollView style={style} contentContainerStyle={styles.contentContainer}>
+    <SettingsScrollView style={style}>
       <PreabmleSectionView />
       <LearnMoreSectionView onPrivacyPolicyTapped={onPrivacyPolicyTapped} />
       <ShareSectionView />
       <PermissionsSectionView permissions={permissions} />
-    </ScrollView>
+    </SettingsScrollView>
   )
 }
 
@@ -190,9 +185,5 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 250,
     backgroundColor: "red"
-  },
-  contentContainer: {
-    paddingHorizontal: 24,
-    rowGap: 32
   }
 })
