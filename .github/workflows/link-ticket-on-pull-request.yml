@@ -2,7 +2,7 @@ name: Attach PR to Trello Ticket
 
 on:
   pull_request:
-    types: [opened]
+    types: [opened, edited]
     branches:
       - development
 
