@@ -181,10 +181,7 @@ export class TiFSQLite {
         isAnalyticsEnabled INT2 NOT NULL,
         isCrashReportingEnabled INT2 NOT NULL,
         canShareArrivalStatus INT2 NOT NULL,
-        eventArrivalNotificationTriggerIds TEXT NOT NULL,
-        eventChangeNotificationTriggerIds TEXT NOT NULL,
-        eventTimeNotificationTriggerIds TEXT NOT NULL,
-        friendNotificationTriggerIds TEXT NOT NULL,
+        pushNotificationTriggerIds TEXT NOT NULL,
         eventCalendarStartOfWeekDay TEXT NOT NULL,
         eventCalendarDefaultLayout TEXT NOT NULL,
         version INTEGER NOT NULL DEFAULT 0

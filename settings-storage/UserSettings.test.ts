@@ -54,12 +54,12 @@ describe("UserSettings tests", () => {
 
     it("should be able to save and load triggers", async () => {
       await storage.save({
-        eventChangeNotificationTriggerIds: ["event-cancelled", "name-changed"]
+        pushNotificationTriggerIds: ["event-cancelled", "event-name-changed"]
       })
       const settings = await storage.load()
       expect(settings).toEqual({
         ...DEFAULT_USER_SETTINGS,
-        eventChangeNotificationTriggerIds: ["event-cancelled", "name-changed"]
+        pushNotificationTriggerIds: ["event-cancelled", "event-name-changed"]
       })
     })
   })

@@ -1,9 +1,7 @@
 import {
   DEFAULT_USER_SETTINGS,
-  EventArrivalNotificationTriggerIDSchema,
-  EventChangeNotificationTriggerIDSchema,
-  EventTimeNotificationTriggerIDSchema,
-  FriendNotificationTriggerIDSchema,
+  PushNotificationTriggerID,
+  PushNotificationTriggerIDSchema,
   UserSettings
 } from "TiFShared/domain-models/Settings"
 import { PersistentSettingsStore, SettingsStorage } from "./PersistentStore"
@@ -14,7 +12,7 @@ import { TiFAPI } from "TiFShared/api"
 import { UpdateUserSettingsRequest } from "TiFShared/api/models/User"
 import { logger } from "TiFShared/logging"
 import { QueryClient, MutationObserver } from "@tanstack/react-query"
-import { ZodType, ZodTypeDef, z } from "zod"
+import { z } from "zod"
 
 const STORAGE_TAG = "sqlite.user.settings"
 
@@ -23,10 +21,7 @@ type SQLiteUserSettings = {
   isAnalyticsEnabled: number
   isCrashReportingEnabled: number
   canShareArrivalStatus: number
-  eventArrivalNotificationTriggerIds: string
-  eventChangeNotificationTriggerIds: string
-  eventTimeNotificationTriggerIds: string
-  friendNotificationTriggerIds: string
+  pushNotificationTriggerIds: string
   eventCalendarStartOfWeekDay: string
   eventCalendarDefaultLayout: string
   version: number
@@ -57,10 +52,7 @@ export class SQLiteUserSettingsStorage
         isAnalyticsEnabled,
         isCrashReportingEnabled,
         canShareArrivalStatus,
-        eventArrivalNotificationTriggerIds,
-        eventChangeNotificationTriggerIds,
-        eventTimeNotificationTriggerIds,
-        friendNotificationTriggerIds,
+        pushNotificationTriggerIds,
         eventCalendarStartOfWeekDay,
         eventCalendarDefaultLayout,
         version
@@ -68,10 +60,7 @@ export class SQLiteUserSettingsStorage
         ${newSettings.isAnalyticsEnabled},
         ${newSettings.isCrashReportingEnabled},
         ${newSettings.canShareArrivalStatus},
-        ${serializeTriggerIds(newSettings.eventArrivalNotificationTriggerIds)},
-        ${serializeTriggerIds(newSettings.eventChangeNotificationTriggerIds)},
-        ${serializeTriggerIds(newSettings.eventTimeNotificationTriggerIds)},
-        ${serializeTriggerIds(newSettings.friendNotificationTriggerIds)},
+        ${serializeTriggerIds(newSettings.pushNotificationTriggerIds)},
         ${newSettings.eventCalendarStartOfWeekDay},
         ${newSettings.eventCalendarDefaultLayout},
         ${newSettings.version}
@@ -91,37 +80,21 @@ export class SQLiteUserSettingsStorage
       isAnalyticsEnabled: sqliteSettings.isAnalyticsEnabled === 1,
       isCrashReportingEnabled: sqliteSettings.isCrashReportingEnabled === 1,
       canShareArrivalStatus: sqliteSettings.canShareArrivalStatus === 1,
-      eventTimeNotificationTriggerIds: deserializeTriggerIds(
-        sqliteSettings.eventTimeNotificationTriggerIds,
-        z.array(EventTimeNotificationTriggerIDSchema)
-      ),
-      eventChangeNotificationTriggerIds: deserializeTriggerIds(
-        sqliteSettings.eventChangeNotificationTriggerIds,
-        z.array(EventChangeNotificationTriggerIDSchema)
-      ),
-      eventArrivalNotificationTriggerIds: deserializeTriggerIds(
-        sqliteSettings.eventArrivalNotificationTriggerIds,
-        z.array(EventArrivalNotificationTriggerIDSchema)
-      ),
-      friendNotificationTriggerIds: deserializeTriggerIds(
-        sqliteSettings.friendNotificationTriggerIds,
-        z.array(FriendNotificationTriggerIDSchema)
+      pushNotificationTriggerIds: deserializeTriggerIds(
+        sqliteSettings.pushNotificationTriggerIds
       )
     }
   }
 }
 
-const serializeTriggerIds = <TriggerID extends string>(
-  triggers: TriggerID[]
-) => {
+const serializeTriggerIds = (triggers: PushNotificationTriggerID[]) => {
   return triggers.join(",")
 }
 
-const deserializeTriggerIds = <TriggerID extends string>(
-  serializedIds: string,
-  schema: ZodType<TriggerID[], ZodTypeDef, string[]>
-) => {
-  return schema.parse(serializedIds.split(","))
+const deserializeTriggerIds = (serializedIds: string) => {
+  return z
+    .array(PushNotificationTriggerIDSchema)
+    .parse(serializedIds.split(","))
 }
 
 const log = logger("user.settings.synchronizing.store")
