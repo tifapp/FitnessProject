@@ -1,35 +1,19 @@
 import { useUserSettings } from "@settings-storage/Hooks"
-import { UserSettings } from "TiFShared/domain-models/User"
+import { UserSettings } from "TiFShared/domain-models/Settings"
 import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
 import { SettingsSectionView } from "./components/Section"
 import { BodyText } from "@components/Text"
 import {
   useBackgroundPermissions as useBackgroundLocationPermissions,
-  useForegroundPermissions as useForegroundLocationPermissions,
-  PermissionResponse
+  useForegroundPermissions as useForegroundLocationPermissions
 } from "expo-location"
 import { usePermissions as useNotificationPermissions } from "expo-notifications"
-import { openSettings as expoOpenSettings } from "expo-linking"
 import { SettingsToggleCardView } from "./components/ToggleCard"
 import { AppStyles } from "@lib/AppColorStyle"
 import { SettingsNavigationLinkView } from "./components/NavigationLink"
 import { SettingsCardView } from "./components/Card"
 import { SettingsScrollView } from "./components/ScrollView"
-
-export const privacySettingsPermissionsStatus = <
-  Permission extends PermissionResponse
->(
-  permissions: Permission | null,
-  request: () => Promise<Permission>,
-  openSettings: () => Promise<void> = expoOpenSettings
-) => {
-  const shouldOpenSettings =
-    permissions && (permissions.granted || !permissions.canAskAgain)
-  return {
-    isGranted: permissions?.granted ?? false,
-    onToggled: shouldOpenSettings ? openSettings : request
-  }
-}
+import { settingsPermission } from "./Permissions"
 
 export const usePrivacySettingsPermissions = () => {
   const [foregroundStatus, requestForeground] =
@@ -39,18 +23,9 @@ export const usePrivacySettingsPermissions = () => {
   const [notificationsStatus, requestNotifications] =
     useNotificationPermissions()
   return {
-    foregroundLocation: privacySettingsPermissionsStatus(
-      foregroundStatus,
-      requestForeground
-    ),
-    backgroundLocation: privacySettingsPermissionsStatus(
-      backgroundStatus,
-      requestBackground
-    ),
-    notifications: privacySettingsPermissionsStatus(
-      notificationsStatus,
-      requestNotifications
-    )
+    foregroundLocation: settingsPermission(foregroundStatus, requestForeground),
+    backgroundLocation: settingsPermission(backgroundStatus, requestBackground),
+    notifications: settingsPermission(notificationsStatus, requestNotifications)
   }
 }
 

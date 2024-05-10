@@ -4,22 +4,22 @@ import { SettingsSectionView } from "./components/Section"
 import { SettingsCardView } from "./components/Card"
 import { BodyText, Headline } from "@components/Text"
 import { PrimaryButton } from "@components/Buttons"
+import { SettingsPermission } from "./Permissions"
 
 export type NotificationSettingsProps = {
-  isGrantedNotificationPermissions: boolean
+  notificationPermission: SettingsPermission
   onNotificationPermissionsRequested: () => void
   style?: StyleProp<ViewStyle>
 }
 
 export const NotificationSettingsView = ({
-  isGrantedNotificationPermissions,
-  onNotificationPermissionsRequested,
+  notificationPermission,
   style
 }: NotificationSettingsProps) => (
   <SettingsScrollView style={style}>
-    {!isGrantedNotificationPermissions && (
+    {!notificationPermission.isGranted && (
       <PermissionsDisabledSectionView
-        onPermissionsRequested={onNotificationPermissionsRequested}
+        onPermissionsRequested={notificationPermission.onToggled}
       />
     )}
   </SettingsScrollView>

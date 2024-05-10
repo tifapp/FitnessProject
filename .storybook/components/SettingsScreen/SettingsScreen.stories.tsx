@@ -49,8 +49,10 @@ const Test = () => (
         onPrivacyPolicyTapped={() => console.log("Privacy Policy")}
       /> */}
       <NotificationSettingsView
-        isGrantedNotificationPermissions={false}
-        onNotificationPermissionsRequested={() => console.log("Requested")}
+        notificationPermission={{
+          isGranted: false,
+          onToggled: () => console.log("Requested")
+        }}
       />
     </SettingsProvider>
   </SafeAreaView>

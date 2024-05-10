@@ -10,7 +10,10 @@ export const SettingsScrollView = ({
   children,
   style
 }: SettingsScrollViewProps) => (
-  <ScrollView style={style} contentContainerStyle={styles.contentContainer}>
+  <ScrollView
+    style={[style, styles.scroll]}
+    contentContainerStyle={styles.contentContainer}
+  >
     {children}
   </ScrollView>
 )
@@ -19,5 +22,8 @@ const styles = StyleSheet.create({
   contentContainer: {
     paddingHorizontal: 24,
     rowGap: 32
+  },
+  scroll: {
+    height: "100%"
   }
 })
