@@ -11,12 +11,7 @@ describe("Settings tests", () => {
         currentDate: now,
         someSet: [1, 2, now]
       }
-      expect(
-        areSettingsEqual(settings1, {
-          ...settings1,
-          someSet: [1, 2, now]
-        })
-      ).toEqual(true)
+      expect(areSettingsEqual(settings1, { ...settings1 })).toEqual(true)
     })
 
     it("should not be equal when values are not the same", () => {

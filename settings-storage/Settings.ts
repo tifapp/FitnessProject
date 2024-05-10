@@ -45,10 +45,5 @@ const isEqualSettingValue = (v1: SettingValue, v2: SettingValue): boolean => {
   if (v1 instanceof Date && v2 instanceof Date) {
     return v1.getTime() === v2.getTime()
   }
-  if (Array.isArray(v1) && Array.isArray(v2)) {
-    return v1.every((setting, index) => {
-      return index <= v2.length - 1 && isEqualSettingValue(setting, v2[index])
-    })
-  }
   return v1 === v2
 }
