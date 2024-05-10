@@ -2,11 +2,7 @@ import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
-import {
-  PrivacySettingsView,
-  NotificationSettingsView,
-  usePrivacySettingsPermissions
-} from "@settings-boundary"
+import { NotificationSettingsView } from "@settings-boundary"
 import { SettingsProvider } from "@settings-storage/Hooks"
 import {
   SQLiteUserSettingsStorage,
@@ -14,6 +10,7 @@ import {
 } from "@settings-storage/UserSettings"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { testSQLite } from "@test-helpers/SQLite"
+import { useState } from "react"
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 
 const SettingsMeta: ComponentMeta<typeof SettingsScreen> = {
@@ -31,7 +28,7 @@ export const Basic: SettingsStory = () => (
   <SafeAreaProvider>
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
-        <Stack.Screen name="Privacy Settings" component={Test} />
+        <Stack.Screen name="Notifications" component={Test} />
       </Stack.Navigator>
     </NavigationContainer>
   </SafeAreaProvider>
@@ -41,19 +38,21 @@ const store = userSettingsPersistentStore(
   new SQLiteUserSettingsStorage(testSQLite)
 )
 
-const Test = () => (
-  <SafeAreaView edges={["bottom"]}>
-    <SettingsProvider localSettingsStore={{} as any} userSettingsStore={store}>
-      {/* <PrivacySettingsView
-        permissions={usePrivacySettingsPermissions()}
-        onPrivacyPolicyTapped={() => console.log("Privacy Policy")}
-      /> */}
-      <NotificationSettingsView
-        notificationPermission={{
-          isGranted: false,
-          onToggled: () => console.log("Requested")
-        }}
-      />
-    </SettingsProvider>
-  </SafeAreaView>
-)
+const Test = () => {
+  const [isGranted, setIsGranted] = useState(false)
+  return (
+    <SafeAreaView edges={["bottom"]}>
+      <SettingsProvider
+        localSettingsStore={{} as any}
+        userSettingsStore={store}
+      >
+        <NotificationSettingsView
+          notificationPermission={{
+            isGranted,
+            onToggled: async () => setIsGranted(!isGranted)
+          }}
+        />
+      </SettingsProvider>
+    </SafeAreaView>
+  )
+}

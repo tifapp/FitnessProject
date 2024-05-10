@@ -1,4 +1,5 @@
-import { areSettingsEqual } from "./Settings"
+import { DEFAULT_USER_SETTINGS } from "TiFShared/domain-models/Settings"
+import { areSettingsEqual, settingsSelector } from "./Settings"
 
 describe("Settings tests", () => {
   describe("AreSettingsEqual tests", () => {
@@ -43,6 +44,19 @@ describe("Settings tests", () => {
           someSet: [1, new Date(1000), 3]
         })
       ).toEqual(false)
+    })
+  })
+
+  describe("SettingsSelector tests", () => {
+    it("should return an object consisting of only the selected settings keys", () => {
+      const selector = settingsSelector(
+        "isAnalyticsEnabled",
+        "canShareArrivalStatus"
+      )
+      expect(selector(DEFAULT_USER_SETTINGS)).toEqual({
+        isAnalyticsEnabled: DEFAULT_USER_SETTINGS.isAnalyticsEnabled,
+        canShareArrivalStatus: DEFAULT_USER_SETTINGS.canShareArrivalStatus
+      })
     })
   })
 })

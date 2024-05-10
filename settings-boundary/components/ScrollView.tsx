@@ -1,5 +1,7 @@
+import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { ReactNode } from "react"
-import { StyleProp, ViewStyle, ScrollView, StyleSheet } from "react-native"
+import { StyleProp, ViewStyle, StyleSheet } from "react-native"
+import Animated from "react-native-reanimated"
 
 export type SettingsScrollViewProps = {
   children: ReactNode
@@ -10,12 +12,12 @@ export const SettingsScrollView = ({
   children,
   style
 }: SettingsScrollViewProps) => (
-  <ScrollView
+  <Animated.ScrollView
     style={[style, styles.scroll]}
     contentContainerStyle={styles.contentContainer}
   >
     {children}
-  </ScrollView>
+  </Animated.ScrollView>
 )
 
 const styles = StyleSheet.create({

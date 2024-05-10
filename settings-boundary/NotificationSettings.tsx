@@ -5,10 +5,16 @@ import { SettingsCardView } from "./components/Card"
 import { BodyText, Headline } from "@components/Text"
 import { PrimaryButton } from "@components/Buttons"
 import { SettingsPermission } from "./Permissions"
+import { SettingsNamedToggleView } from "./components/NamedToggle"
+import {
+  PushNotificationTriggerID,
+  toggleSettingsTriggerId
+} from "TiFShared/domain-models/Settings"
+import { useUserSettings } from "@settings-storage/Hooks"
+import { settingsSelector } from "@settings-storage/Settings"
 
 export type NotificationSettingsProps = {
   notificationPermission: SettingsPermission
-  onNotificationPermissionsRequested: () => void
   style?: StyleProp<ViewStyle>
 }
 
@@ -22,6 +28,12 @@ export const NotificationSettingsView = ({
         onPermissionsRequested={notificationPermission.onToggled}
       />
     )}
+    <EventNotificationsSectionView
+      isEnabled={notificationPermission.isGranted}
+    />
+    <ProfileNotificationsSectionView
+      isEnabled={notificationPermission.isGranted}
+    />
   </SettingsScrollView>
 )
 
@@ -38,10 +50,10 @@ const PermissionsDisabledSectionView = ({
         <View style={styles.permissionsDisabledSectionRow}>
           <View style={styles.permissionsDisabledIllustration} />
           <View style={styles.permissionsDisabledTextColumn}>
-            <Headline>Notifications are disabled!</Headline>
+            <Headline>Notifications are off!</Headline>
             <BodyText>
-              You must turn on notification permissions to receive
-              notifications.
+              Turn on notifications to stay up to date on the latest and
+              greatest developments in your fitness journey!
             </BodyText>
           </View>
         </View>
@@ -60,6 +72,111 @@ const PermissionsDisabledSectionView = ({
 
 type EditableSectionBaseProps = {
   isEnabled: boolean
+}
+
+type EventNotificationsSectionProps = EditableSectionBaseProps
+
+const EventNotificationsSectionView = ({
+  isEnabled
+}: EventNotificationsSectionProps) => (
+  <SettingsSectionView isDisabled={!isEnabled} title="Event Notifications">
+    <SettingsCardView>
+      <NamedTriggerIdToggleView
+        name="When the Start Time or Duration Changes"
+        id="event-time-changed"
+      />
+      <NamedTriggerIdToggleView
+        name="When the Location Changes"
+        id="event-location-changed"
+      />
+      <NamedTriggerIdToggleView
+        name="When the Name Changes"
+        id="event-name-changed"
+      />
+      <NamedTriggerIdToggleView
+        name="When the Description Changes"
+        id="event-description-changed"
+      />
+      <NamedTriggerIdToggleView
+        name="When the Event is Cancelled"
+        id="event-cancelled"
+      />
+      <NamedTriggerIdToggleView
+        name="Prior to the Event Starting"
+        id="event-starting-soon"
+      />
+      <NamedTriggerIdToggleView
+        name="When the Event Starts"
+        id="event-started"
+      />
+      <NamedTriggerIdToggleView name="When the Event Ends" id="event-ended" />
+      <NamedTriggerIdToggleView
+        name="When I Arrive at the Event"
+        id="user-entered-region"
+      />
+      <NamedTriggerIdToggleView
+        name="When Others Arrive at the Event"
+        description="This notification is sent periodically throughout the duration of the event, not on every arrival."
+        id="event-periodic-arrivals"
+      />
+      <NamedTriggerIdToggleView
+        name="Attendance Headcount"
+        description="This notification is sent at the start of the event."
+        id="event-attendance-headcount"
+      />
+    </SettingsCardView>
+  </SettingsSectionView>
+)
+
+type ProfileNotificationsSectionProps = EditableSectionBaseProps
+
+const ProfileNotificationsSectionView = ({
+  isEnabled
+}: ProfileNotificationsSectionProps) => (
+  <SettingsSectionView isDisabled={!isEnabled} title="Profile Notifications">
+    <SettingsCardView>
+      <NamedTriggerIdToggleView
+        name="When I Receive a Friend Request"
+        id="friend-request-received"
+      />
+      <NamedTriggerIdToggleView
+        name="When Someone Accepts my Friend Request"
+        id="friend-request-accepted"
+      />
+    </SettingsCardView>
+  </SettingsSectionView>
+)
+
+type NamedTriggerIdToggleProps = {
+  name: string
+  description?: string
+  id: PushNotificationTriggerID
+}
+
+const NamedTriggerIdToggleView = ({
+  name,
+  description,
+  id
+}: NamedTriggerIdToggleProps) => {
+  const { settings, update } = useUserSettings(
+    settingsSelector("pushNotificationTriggerIds")
+  )
+  return (
+    <SettingsNamedToggleView
+      name={name}
+      description={description}
+      isOn={settings.pushNotificationTriggerIds.includes(id)}
+      onIsOnChange={(isOn) => {
+        update({
+          pushNotificationTriggerIds: toggleSettingsTriggerId(
+            settings.pushNotificationTriggerIds,
+            id,
+            isOn
+          )
+        })
+      }}
+    />
+  )
 }
 
 const styles = StyleSheet.create({

@@ -6,6 +6,7 @@ import { StyleProp, ViewStyle, View, StyleSheet, Pressable } from "react-native"
 import { SettingsSwitchView } from "./Switch"
 import { SettingsCardView } from "./Card"
 import { SettingsNamedIconRowView } from "./NamedIconRow"
+import { useCurrentSettingsSection } from "./Section"
 
 export type SettingsToggleCardProps = {
   isOn: boolean
@@ -38,7 +39,13 @@ export const SettingsToggleCardView = ({
           iconBackgroundColor={iconBackgroundColor}
           name={title}
         >
-          <Pressable onPress={onToggleTappedWithoutIsOnChange}>
+          <Pressable
+            onPress={
+              !useCurrentSettingsSection().isDisabled
+                ? onToggleTappedWithoutIsOnChange
+                : undefined
+            }
+          >
             <View
               pointerEvents={onToggleTappedWithoutIsOnChange ? "none" : "auto"}
             >

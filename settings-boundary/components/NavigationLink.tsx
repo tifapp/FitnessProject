@@ -8,6 +8,7 @@ import {
   TouchableHighlight
 } from "react-native"
 import { SettingsNamedIconRowView } from "./NamedIconRow"
+import { useCurrentSettingsSection } from "./Section"
 
 export type SettingsNavigationLinkProps = {
   title: string
@@ -26,7 +27,7 @@ export const SettingsNavigationLinkView = ({
 }: SettingsNavigationLinkProps) => (
   <TouchableHighlight
     underlayColor={AppStyles.colorOpacity15}
-    onPress={onTapped}
+    onPress={!useCurrentSettingsSection().isDisabled ? onTapped : undefined}
     style={style}
   >
     <SettingsNamedIconRowView
