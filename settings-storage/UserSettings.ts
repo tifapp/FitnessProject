@@ -13,6 +13,7 @@ import { UpdateUserSettingsRequest } from "TiFShared/api/models/User"
 import { logger } from "TiFShared/logging"
 import { QueryClient, MutationObserver } from "@tanstack/react-query"
 import { z } from "zod"
+import { PersistentSettingsStores } from "./PersistentStores"
 
 const STORAGE_TAG = "sqlite.user.settings"
 
@@ -253,14 +254,8 @@ export const userSettingsStore = (
   apiSaveRetryCount = 3
 ) => {
   return new UserSettingsSynchronizingStore(
-    userSettingsPersistentStore(storage),
+    PersistentSettingsStores.user(storage),
     addAPIUserSettingsExponentialBackoff(api, queryClient, apiSaveRetryCount),
     debounceMillis
   )
-}
-
-export const userSettingsPersistentStore = (
-  storage: SettingsStorage<UserSettings>
-) => {
-  return new PersistentSettingsStore(DEFAULT_USER_SETTINGS, storage)
 }

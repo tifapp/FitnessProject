@@ -6,12 +6,13 @@ import {
   localSettingsStore
 } from "./LocalSettings"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
+import { PersistentSettingsStores } from "./PersistentStores"
 
 describe("PersistentSettingsStore tests", () => {
   const storage = new SQLiteLocalSettingsStorage(testSQLite)
-  let store = localSettingsStore(storage)
+  let store = PersistentSettingsStores.local(storage)
   resetTestSQLiteBeforeEach()
-  beforeEach(() => (store = localSettingsStore(storage)))
+  beforeEach(() => (store = PersistentSettingsStores.local(storage)))
 
   it("should emit the default settings when no previously saved settings", async () => {
     const callback = await expectInitialSubscriptionEmitsDefaultSettings()
