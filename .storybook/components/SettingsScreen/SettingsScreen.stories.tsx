@@ -4,10 +4,9 @@ import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { NotificationSettingsView } from "@settings-boundary"
 import { SettingsProvider } from "@settings-storage/Hooks"
-import {
-  SQLiteUserSettingsStorage,
-  userSettingsPersistentStore
-} from "@settings-storage/UserSettings"
+import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
+import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
+import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { testSQLite } from "@test-helpers/SQLite"
 import { useState } from "react"
@@ -34,7 +33,11 @@ export const Basic: SettingsStory = () => (
   </SafeAreaProvider>
 )
 
-const store = userSettingsPersistentStore(
+const localStore = PersistentSettingsStores.local(
+  new SQLiteLocalSettingsStorage(testSQLite)
+)
+
+const userStore = PersistentSettingsStores.user(
   new SQLiteUserSettingsStorage(testSQLite)
 )
 
@@ -43,8 +46,8 @@ const Test = () => {
   return (
     <SafeAreaView edges={["bottom"]}>
       <SettingsProvider
-        localSettingsStore={{} as any}
-        userSettingsStore={store}
+        localSettingsStore={localStore}
+        userSettingsStore={userStore}
       >
         <NotificationSettingsView
           notificationPermission={{

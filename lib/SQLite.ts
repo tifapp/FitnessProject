@@ -172,7 +172,9 @@ export class TiFSQLite {
         isHapticFeedbackEnabled INT2 NOT NULL,
         isHapticAudioEnabled INT2 NOT NULL,
         hasCompletedOnboarding INT2 NOT NULL,
-        lastEventArrivalsRefreshTime DOUBLE
+        lastEventArrivalsRefreshDate DOUBLE,
+        userInterfaceStyle TEXT NOT NULL,
+        preferredFontFamily TEXT NOT NULL
       )
       `,
       db.run`
