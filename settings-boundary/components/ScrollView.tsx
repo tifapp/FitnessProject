@@ -1,4 +1,3 @@
-import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { ReactNode } from "react"
 import { StyleProp, ViewStyle, StyleSheet } from "react-native"
 import Animated from "react-native-reanimated"
