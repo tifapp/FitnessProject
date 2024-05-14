@@ -1,11 +1,13 @@
+import { EmailAddress, USPhoneNumber } from "@user/privacy"
+import { Password } from ".."
 import { isCognitoErrorWithCode } from "../CognitoHelpers"
 import { Auth } from "@aws-amplify/auth"
-import { EmailAddress, Password, USPhoneNumber } from ".."
 
 export type ForgotPasswordResult =
   | "success"
   | "invalid-email"
   | "invalid-phone-number"
+
 export type ResetPasswordResult = "valid" | "invalid-verification-code"
 
 /**

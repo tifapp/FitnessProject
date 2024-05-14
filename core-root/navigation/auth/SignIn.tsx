@@ -7,13 +7,12 @@ import {
   SignInAuthenticator
 } from "@auth-boundary/sign-in"
 import {
-  EmailAddress,
-  USPhoneNumber,
   AuthVerificationCodeFormView,
   useAuthVerificationCodeForm
 } from "@auth-boundary"
 import { SignUpParamsList } from "./SignUp"
 import { ForgotPasswordParamsList } from "./ForgotPassword"
+import { EmailAddress, USPhoneNumber } from "@user/privacy"
 
 export type SignInParamsList = {
   signInForm: undefined
