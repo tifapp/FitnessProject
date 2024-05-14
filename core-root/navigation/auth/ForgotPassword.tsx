@@ -7,9 +7,7 @@ import { StackScreenProps } from "@react-navigation/stack"
 import { Alert } from "react-native"
 import {
   AuthVerificationCodeFormView,
-  EmailAddress,
   Password,
-  USPhoneNumber,
   useAuthVerificationCodeForm
 } from "@auth-boundary"
 import {
@@ -20,6 +18,7 @@ import {
   useResetPasswordForm
 } from "@auth-boundary/forgot-password"
 import React from "react"
+import { EmailAddress, USPhoneNumber } from "@user/privacy"
 
 export type ForgotPasswordParamsList = {
   forgotPassword: undefined

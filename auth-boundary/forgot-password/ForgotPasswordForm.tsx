@@ -1,6 +1,5 @@
 import { AuthFormView } from "../AuthLayout"
 import { AuthShadedEmailPhoneTextFieldView } from "../AuthTextFields"
-import { EmailAddress, USPhoneNumber } from ".."
 import { TextFieldRefValue } from "@components/TextFields"
 import { useFormSubmission } from "@lib/utils/Form"
 import { AppStyles } from "@lib/AppColorStyle"
@@ -11,6 +10,7 @@ import {
   useEmailPhoneTextState
 } from "../EmailPhoneText"
 import { ForgotPasswordResult } from "./Environment"
+import { EmailAddress, USPhoneNumber } from "@user/privacy"
 
 /**
  * A type to help show what props need to be given in order to utilize {@link useForgotPasswordForm}.
