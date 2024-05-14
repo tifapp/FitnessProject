@@ -3,6 +3,7 @@ import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { ReactNode, createContext, useContext } from "react"
 import { ViewStyle, View, StyleProp, StyleSheet } from "react-native"
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
+import { SettingsCardView } from "./Card"
 
 export type SettingsSectionContextValues = {
   isDisabled: boolean
@@ -51,6 +52,15 @@ export const SettingsSectionView = ({
       </View>
     </SettingsSectionContext.Provider>
   </Animated.View>
+)
+
+export const SettingsCardSectionView = ({
+  children,
+  ...props
+}: SettingsSectionProps) => (
+  <SettingsSectionView {...props}>
+    <SettingsCardView>{children}</SettingsCardView>
+  </SettingsSectionView>
 )
 
 const styles = StyleSheet.create({

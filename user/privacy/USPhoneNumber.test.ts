@@ -35,4 +35,9 @@ describe("USPhoneNumber tests", () => {
     const phoneNumber = USPhoneNumber.parse("9258881234")!
     expect(phoneNumber.formattedForPrivacy).toEqual("(***) ***-1234")
   })
+
+  test("pretty formatted", () => {
+    const phoneNumber = USPhoneNumber.parse("9258881234")!
+    expect(phoneNumber.prettyFormatted).toEqual("+1 (925) 888-1234")
+  })
 })
