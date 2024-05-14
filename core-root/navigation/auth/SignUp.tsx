@@ -9,8 +9,6 @@ import { StackScreenProps } from "@react-navigation/stack"
 import React, { memo } from "react"
 import { Alert, StyleSheet } from "react-native"
 import {
-  EmailAddress,
-  USPhoneNumber,
   AuthVerificationCodeFormView,
   useAuthVerificationCodeForm
 } from "@auth-boundary"
@@ -23,6 +21,7 @@ import {
   SignUpEnvironment
 } from "@auth-boundary/sign-up"
 import { UserHandle } from "TiFShared/domain-models/User"
+import { EmailAddress, USPhoneNumber } from "@user/privacy"
 
 export type SignUpParamsList = {
   signUpCredentialsForm: undefined

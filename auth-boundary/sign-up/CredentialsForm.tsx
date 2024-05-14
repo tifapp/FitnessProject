@@ -14,10 +14,11 @@ import { useFormSubmission } from "@lib/utils/Form"
 import { AppStyles } from "@lib/AppColorStyle"
 import React, { useRef, useState } from "react"
 import { StyleProp, ViewStyle, StyleSheet, Alert } from "react-native"
-import { EmailAddress, Password, USPhoneNumber } from ".."
 import Animated from "react-native-reanimated"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { CreateAccountResult } from "./Environment"
+import { EmailAddress, USPhoneNumber } from "@user/privacy"
+import { Password } from ".."
 
 export type SignUpCredentialsFormFields = {
   name: string

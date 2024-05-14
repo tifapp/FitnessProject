@@ -1,6 +1,5 @@
 import { Headline } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
-import { Password } from "./Models"
 import React, { useRef, useState } from "react"
 import { Alert, Platform, StyleProp, StyleSheet, ViewStyle } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
@@ -10,6 +9,7 @@ import { TextFieldRefValue } from "@components/TextFields"
 import Animated from "react-native-reanimated"
 import { useFormSubmission } from "@lib/utils/Form"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
+import { Password } from "./Password"
 
 export type ChangePasswordResult = "valid" | "incorrect-password"
 
