@@ -4,6 +4,7 @@ import {
   StyleSheet,
   View,
   Text,
+  TextProps,
   TextStyle,
   Pressable,
   Platform
@@ -13,7 +14,7 @@ import { SettingsSectionView } from "./components/Section"
 import { SettingsCardView } from "./components/Card"
 import { useLocalSettings } from "@settings-storage/Hooks"
 import { settingsSelector } from "@settings-storage/Settings"
-import { BodyText } from "@components/Text"
+import { BodyText, CaptionTitle } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 
@@ -99,6 +100,12 @@ const FontFamilySectionView = () => {
         <View style={styles.previewOptionRow}>
           <PreviewableOptionView
             name="Open Sans"
+            NameComponent={(props: TextProps) => (
+              <Text
+                {...props}
+                style={[props.style, styles.openSansOptionLabel]}
+              />
+            )}
             isSelected={settings.preferredFontFamily === "OpenSans"}
             onSelected={() => update({ preferredFontFamily: "OpenSans" })}
             previewStyle={styles.fontOptionPreviewContainer}
@@ -107,10 +114,16 @@ const FontFamilySectionView = () => {
           </PreviewableOptionView>
           <PreviewableOptionView
             name="Open Dyslexic"
-            nameTextStyle={[
-              styles.openDyslexicOptionLabel,
-              { marginTop: Platform.OS === "ios" ? -4 * fontScale : 0 }
-            ]}
+            NameComponent={(props: TextProps) => (
+              <Text
+                {...props}
+                style={[
+                  props.style,
+                  styles.openDyslexicOptionLabel,
+                  { marginTop: Platform.OS === "ios" ? -4 * fontScale : 0 }
+                ]}
+              />
+            )}
             isSelected={settings.preferredFontFamily === "OpenDyslexic3"}
             onSelected={() => update({ preferredFontFamily: "OpenDyslexic3" })}
             previewStyle={styles.fontOptionPreviewContainer}
@@ -139,16 +152,20 @@ const FontOptionPreviewView = ({ textStyle }: FontOptionPreviewProps) => (
 
 type PreviewableOptionProps = {
   name: string
-  nameTextStyle?: StyleProp<TextStyle>
+  NameComponent?: (props: TextProps) => JSX.Element
   previewStyle?: StyleProp<ViewStyle>
   isSelected: boolean
   onSelected: () => void
   children?: JSX.Element | JSX.Element[]
 }
 
+const DefaultPreviewOptionName = (props: TextProps) => (
+  <CaptionTitle {...props} />
+)
+
 const PreviewableOptionView = ({
   name,
-  nameTextStyle = styles.openSansOptionLabel,
+  NameComponent = DefaultPreviewOptionName,
   previewStyle,
   isSelected,
   onSelected,
@@ -180,10 +197,9 @@ const PreviewableOptionView = ({
           backgroundColor: isSelected ? AppStyles.darkColor : undefined
         }}
       >
-        <Text
+        <NameComponent
           maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
           style={[
-            nameTextStyle,
             {
               padding: 8,
               color: isSelected ? "white" : AppStyles.darkColor
@@ -191,7 +207,7 @@ const PreviewableOptionView = ({
           ]}
         >
           {name}
-        </Text>
+        </NameComponent>
       </View>
     </View>
   </Pressable>
@@ -272,13 +288,11 @@ const styles = StyleSheet.create({
     padding: 8
   },
   openDyslexicOptionLabel: {
-    fontFamily: "OpenDyslexic3",
-    fontSize: 10,
-    marginTop: Platform.OS === "ios" ? -4 : 0
+    fontFamily: "OpenDyslexic3Bold",
+    fontSize: 10
   },
   openDyslexicOptionPreview: {
-    fontFamily: "OpenDyslexic3",
-    fontSize: 18,
-    marginTop: Platform.OS === "ios" ? -4 : 0
+    fontFamily: "OpenDyslexic3Bold",
+    fontSize: 18
   }
 })

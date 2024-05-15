@@ -11,7 +11,6 @@ export class EmailAddress implements ContactInfoFormattable {
 
   readonly formattedContactInfoType = "Email"
   readonly contactInfoTypeIconName = "mail"
-
   private readonly rawValue: string
 
   private constructor(rawValue: string) {
