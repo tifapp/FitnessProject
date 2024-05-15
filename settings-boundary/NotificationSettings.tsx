@@ -117,10 +117,6 @@ const EventTimingSectionView = ({ isEnabled }: EditableSectionBaseProps) => (
         id="event-started"
       />
       <NamedTriggerIdToggleView name="When the Event Ends" id="event-ended" />
-      <NamedTriggerIdToggleView
-        name="When I Arrive at the Event"
-        id="user-entered-region"
-      />
     </SettingsCardView>
   </SettingsSectionView>
 )
