@@ -1,17 +1,17 @@
-import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
-import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
-import { EventSettingsView } from "@settings-boundary"
-import { SettingsProvider } from "@settings-storage/Hooks"
+import { ComponentMeta, ComponentStory } from "@storybook/react-native"
+import React from "react"
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
+import { BASE_HEADER_SCREEN_OPTIONS } from "../../../components/Navigation"
+import { SettingsScreen } from "../../../screens/SettingsScreen/SettingsScreen"
+import { EventSettingsView } from "../../../settings-boundary/EventSettings"
+import { SettingsProvider } from "../../../settings-storage/Hooks"
 import {
   SQLiteUserSettingsStorage,
   userSettingsPersistentStore
-} from "@settings-storage/UserSettings"
-import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import { testSQLite } from "@test-helpers/SQLite"
-import React from "react"
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
+} from "../../../settings-storage/UserSettings"
+import { testSQLite } from "../../../test-helpers/SQLite"
 
 const SettingsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Event Settings Screen",
