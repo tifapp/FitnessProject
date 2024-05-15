@@ -2,7 +2,7 @@ import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
 import { SettingsScrollView } from "./components/ScrollView"
 import { SettingsSectionView } from "./components/Section"
 import { SettingsCardView } from "./components/Card"
-import { BodyText, Headline } from "@components/Text"
+import { BodyText, Headline, Subtitle } from "@components/Text"
 import { PrimaryButton } from "@components/Buttons"
 import { SettingsPermission } from "./Permissions"
 import { SettingsNamedToggleView } from "./components/NamedToggle"
@@ -28,12 +28,10 @@ export const NotificationSettingsView = ({
         onPermissionsRequested={notificationPermission.onToggled}
       />
     )}
-    <EventNotificationsSectionView
-      isEnabled={notificationPermission.isGranted}
-    />
-    <ProfileNotificationsSectionView
-      isEnabled={notificationPermission.isGranted}
-    />
+    <EventChangesSectionView isEnabled={notificationPermission.isGranted} />
+    <EventTimingSectionView isEnabled={notificationPermission.isGranted} />
+    <EventArrivalsSectionView isEnabled={notificationPermission.isGranted} />
+    <ProfileSectionView isEnabled={notificationPermission.isGranted} />
   </SettingsScrollView>
 )
 
@@ -74,12 +72,11 @@ type EditableSectionBaseProps = {
   isEnabled: boolean
 }
 
-type EventNotificationsSectionProps = EditableSectionBaseProps
-
-const EventNotificationsSectionView = ({
-  isEnabled
-}: EventNotificationsSectionProps) => (
-  <SettingsSectionView isDisabled={!isEnabled} title="Event Notifications">
+const EventChangesSectionView = ({ isEnabled }: EditableSectionBaseProps) => (
+  <SettingsSectionView
+    isDisabled={!isEnabled}
+    title="Event Changes Notifications"
+  >
     <SettingsCardView>
       <NamedTriggerIdToggleView
         name="When the Start Time or Duration Changes"
@@ -101,6 +98,16 @@ const EventNotificationsSectionView = ({
         name="When the Event is Cancelled"
         id="event-cancelled"
       />
+    </SettingsCardView>
+  </SettingsSectionView>
+)
+
+const EventTimingSectionView = ({ isEnabled }: EditableSectionBaseProps) => (
+  <SettingsSectionView
+    title="Event Timing Notifications"
+    isDisabled={!isEnabled}
+  >
+    <SettingsCardView>
       <NamedTriggerIdToggleView
         name="Prior to the Event Starting"
         id="event-starting-soon"
@@ -110,6 +117,20 @@ const EventNotificationsSectionView = ({
         id="event-started"
       />
       <NamedTriggerIdToggleView name="When the Event Ends" id="event-ended" />
+      <NamedTriggerIdToggleView
+        name="When I Arrive at the Event"
+        id="user-entered-region"
+      />
+    </SettingsCardView>
+  </SettingsSectionView>
+)
+
+const EventArrivalsSectionView = ({ isEnabled }: EditableSectionBaseProps) => (
+  <SettingsSectionView
+    title="Event Arrivals Notifications"
+    isDisabled={!isEnabled}
+  >
+    <SettingsCardView>
       <NamedTriggerIdToggleView
         name="When I Arrive at the Event"
         id="user-entered-region"
@@ -128,11 +149,7 @@ const EventNotificationsSectionView = ({
   </SettingsSectionView>
 )
 
-type ProfileNotificationsSectionProps = EditableSectionBaseProps
-
-const ProfileNotificationsSectionView = ({
-  isEnabled
-}: ProfileNotificationsSectionProps) => (
+const ProfileSectionView = ({ isEnabled }: EditableSectionBaseProps) => (
   <SettingsSectionView isDisabled={!isEnabled} title="Profile Notifications">
     <SettingsCardView>
       <NamedTriggerIdToggleView
@@ -202,6 +219,6 @@ const styles = StyleSheet.create({
   permissionsDisabledButton: {
     width: "100%",
     flex: 1,
-    marginLeft: 72
+    marginTop: 8
   }
 })
