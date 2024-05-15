@@ -1,9 +1,12 @@
+import { Placemark } from "TiFShared/domain-models/Placemark"
+
 export type SettingsStoreUnsubscribe = () => void
 
 export type SettingValue =
   | string
   | boolean
   | number
+  | Placemark
   | SettingValue[]
   | Date
   | null
