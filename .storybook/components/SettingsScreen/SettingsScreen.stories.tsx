@@ -3,16 +3,20 @@ import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import {
-  PrivacySettingsView,
-  usePrivacySettingsPermissions
+  AccountInfoSettingsView,
+  AppearanceSettingsView,
+  NotificationSettingsView,
+  useAccountInfoSettings
 } from "@settings-boundary"
 import { SettingsProvider } from "@settings-storage/Hooks"
-import {
-  SQLiteUserSettingsStorage,
-  userSettingsPersistentStore
-} from "@settings-storage/UserSettings"
+import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
+import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
+import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
+import { neverPromise } from "@test-helpers/Promise"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { testSQLite } from "@test-helpers/SQLite"
+import { EmailAddress, USPhoneNumber } from "@user/privacy"
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 
 const SettingsMeta: ComponentMeta<typeof SettingsScreen> = {
@@ -28,25 +32,44 @@ const Stack = createStackNavigator()
 
 export const Basic: SettingsStory = () => (
   <SafeAreaProvider>
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
-        <Stack.Screen name="Privacy Settings" component={Test} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <TestQueryClientProvider>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
+          <Stack.Screen name="Account Info" component={Test} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </TestQueryClientProvider>
   </SafeAreaProvider>
 )
 
-const store = userSettingsPersistentStore(
+const localStore = PersistentSettingsStores.local(
+  new SQLiteLocalSettingsStorage(testSQLite)
+)
+
+const userStore = PersistentSettingsStores.user(
   new SQLiteUserSettingsStorage(testSQLite)
 )
 
-const Test = () => (
-  <SafeAreaView edges={["bottom"]}>
-    <SettingsProvider localSettingsStore={{} as any} userSettingsStore={store}>
-      <PrivacySettingsView
-        permissions={usePrivacySettingsPermissions()}
-        onPrivacyPolicyTapped={() => console.log("Privacy Policy")}
-      />
-    </SettingsProvider>
-  </SafeAreaView>
-)
+const Test = () => {
+  return (
+    <SafeAreaView edges={["bottom"]}>
+      <SettingsProvider
+        localSettingsStore={localStore}
+        userSettingsStore={userStore}
+      >
+        <AccountInfoSettingsView
+          state={useAccountInfoSettings({
+            signOut: async () => {
+              await neverPromise()
+            },
+            onSignOutSuccess: () => console.log("Signed Out")
+          })}
+          userContactInfo={EmailAddress.peacock69}
+          onChangePasswordTapped={() => console.log("Change Password")}
+          onForgotPasswordTapped={() => console.log("Forgot Password")}
+          onChangeContactInfoTapped={() => console.log("Contact Info Changed")}
+        />
+      </SettingsProvider>
+    </SafeAreaView>
+  )
+}

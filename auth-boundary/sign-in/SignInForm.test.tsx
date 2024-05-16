@@ -3,7 +3,7 @@ import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { useSignInForm } from "./SignInForm"
 import { act } from "react-test-renderer"
 import { captureAlerts } from "@test-helpers/Alerts"
-import { USPhoneNumber } from ".."
+import { USPhoneNumber } from "@user/privacy"
 
 describe("SignInForm tests", () => {
   beforeEach(() => jest.resetAllMocks())

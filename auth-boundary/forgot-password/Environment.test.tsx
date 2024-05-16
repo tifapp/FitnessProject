@@ -1,5 +1,6 @@
+import { EmailAddress, USPhoneNumber } from "@user/privacy"
+import { Password } from ".."
 import { TestCognitoError } from "../CognitoHelpers"
-import { EmailAddress, Password, USPhoneNumber } from ".."
 import { createForgotPasswordEnvironment } from "./Environment"
 
 describe("ForgotPasswordEnvironment tests", () => {

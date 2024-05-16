@@ -1,4 +1,4 @@
 export * from "./ChangePassword"
-export * from "./Models"
+export * from "./Password"
 export * from "./VerifyCode"
 export { setupCognito } from "./CognitoHelpers"

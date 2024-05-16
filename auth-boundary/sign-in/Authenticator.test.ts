@@ -1,6 +1,6 @@
 import { TestCognitoError } from "@auth-boundary/CognitoHelpers"
-import { EmailAddress, USPhoneNumber } from ".."
 import { CognitoSignInAuthenticator } from "./Authenticator"
+import { EmailAddress, USPhoneNumber } from "@user/privacy"
 
 describe("CognitoSignInAuthenticator tests", () => {
   beforeEach(() => jest.resetAllMocks())

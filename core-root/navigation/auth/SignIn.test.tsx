@@ -15,9 +15,9 @@ import {
 } from "@testing-library/react-native"
 import { useCallback, useState } from "react"
 import { Button, View } from "react-native"
-import { USPhoneNumber } from "@auth-boundary"
 import { CognitoSignInAuthenticator } from "@auth-boundary/sign-in"
 import { SignInParamsList, createSignInScreens } from "./SignIn"
+import { USPhoneNumber } from "@user/privacy"
 
 type TestParamsList = {
   test: undefined
