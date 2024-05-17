@@ -174,7 +174,9 @@ export class TiFSQLite {
         hasCompletedOnboarding INT2 NOT NULL,
         lastEventArrivalsRefreshDate DOUBLE,
         userInterfaceStyle TEXT NOT NULL,
-        preferredFontFamily TEXT NOT NULL
+        preferredFontFamily TEXT NOT NULL,
+        preferredBrowserName TEXT NOT NULL,
+        isUsingSafariReaderMode INT2 NOT NULL
       )
       `,
       db.run`

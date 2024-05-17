@@ -1,10 +1,12 @@
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
+import { HapticsProvider } from "@modules/tif-haptics"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import {
   AccountInfoSettingsView,
   AppearanceSettingsView,
+  GeneralSettingsView,
   NotificationSettingsView,
   useAccountInfoSettings
 } from "@settings-boundary"
@@ -13,6 +15,7 @@ import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
+import { TestHaptics } from "@test-helpers/Haptics"
 import { neverPromise } from "@test-helpers/Promise"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { testSQLite } from "@test-helpers/SQLite"
@@ -32,13 +35,19 @@ const Stack = createStackNavigator()
 
 export const Basic: SettingsStory = () => (
   <SafeAreaProvider>
-    <TestQueryClientProvider>
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
-          <Stack.Screen name="Account Info" component={Test} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </TestQueryClientProvider>
+    <HapticsProvider
+      haptics={new TestHaptics()}
+      isAudioSupportedOnDevice
+      isFeedbackSupportedOnDevice
+    >
+      <TestQueryClientProvider>
+        <NavigationContainer>
+          <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
+            <Stack.Screen name="General" component={Test} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </TestQueryClientProvider>
+    </HapticsProvider>
   </SafeAreaProvider>
 )
 
@@ -57,17 +66,8 @@ const Test = () => {
         localSettingsStore={localStore}
         userSettingsStore={userStore}
       >
-        <AccountInfoSettingsView
-          state={useAccountInfoSettings({
-            signOut: async () => {
-              await neverPromise()
-            },
-            onSignOutSuccess: () => console.log("Signed Out")
-          })}
-          userContactInfo={EmailAddress.peacock69}
-          onChangePasswordTapped={() => console.log("Change Password")}
-          onForgotPasswordTapped={() => console.log("Forgot Password")}
-          onChangeContactInfoTapped={() => console.log("Contact Info Changed")}
+        <GeneralSettingsView
+          onClearCacheTapped={() => console.log("Clear Cache")}
         />
       </SettingsProvider>
     </SafeAreaView>
