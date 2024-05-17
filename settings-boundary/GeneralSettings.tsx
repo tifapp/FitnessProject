@@ -105,7 +105,7 @@ const WebBrowserSectionView = () => {
   )
   return (
     <>
-      <SettingsCardSectionView title="Open Web Links In">
+      <SettingsCardSectionView title="Open Websites In">
         <SettingsChecklistPickerView<PreferredBrowserName>
           options={WEB_BROWSER_CHECKLIST_OPTIONS}
           onOptionSelected={(preferredBrowserName) => {
