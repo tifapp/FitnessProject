@@ -1,18 +1,16 @@
 import { BodyText } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useUserSettings } from "@settings-storage/Hooks"
-import { UserSettings } from "TiFShared/domain-models/User"
+import { settingsSelector } from "@settings-storage/Settings"
 import React from "react"
-import {
-  ScrollView,
-  StyleProp,
-  StyleSheet,
-  View,
-  ViewStyle
-} from "react-native"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { SettingsNamedToggleView } from "./components/NamedToggle"
 import { SettingsNavigationLinkView } from "./components/NavigationLink"
-import { SettingsSectionView } from "./components/Section"
-import { SettingsToggleCardView } from "./components/ToggleCard"
+import { SettingsScrollView } from "./components/ScrollView"
+import {
+  SettingsCardSectionView,
+  SettingsSectionView
+} from "./components/Section"
 
 export type SettingDurationCardProps = {
   style?: StyleProp<ViewStyle>
@@ -31,15 +29,15 @@ export const SettingsDurationCard = ({
   )
 }
 
-export type SettingsDurationCardViewProps = {
+export type DurationSectionViewProps = {
   title: string
   currentPresets: number[]
 }
 
-export const SettingsDurationCardView = ({
+export const DurationSectionView = ({
   title,
   currentPresets
-}: SettingsDurationCardViewProps) => {
+}: DurationSectionViewProps) => {
   return (
     <SettingsSectionView style={styles.settingsSection} title={title}>
       {currentPresets.map((index) => {
@@ -54,48 +52,59 @@ export const SettingsDurationCardView = ({
   )
 }
 
-export type EventSettingsViewProps = {
+export type EventSettingsProps = {
   style?: StyleProp<ViewStyle>
+  onLocationPresetTapped: () => void
 }
 
-export const EventSettingsView = ({ style }: EventSettingsViewProps) => {
-  const { settings, update } = useUserSettings(eventSettingsSelector)
+export const EventSettingsView = ({
+  style,
+  onLocationPresetTapped
+}: EventSettingsProps) => (
+  <SettingsScrollView style={style}>
+    <PresetSectionView onLocationPresetTapped={onLocationPresetTapped} />
+  </SettingsScrollView>
+)
+
+type PresetSectionProps = {
+  onLocationPresetTapped: () => void
+}
+
+const PresetSectionView = ({ onLocationPresetTapped }: PresetSectionProps) => {
+  const { settings, update } = useUserSettings(
+    settingsSelector(
+      "eventPresetDurations",
+      "eventPresetPlacemark",
+      "eventPresetShouldHideAfterStartDate"
+    )
+  )
   return (
-    <ScrollView style={style}>
-      <SettingsSectionView title="Event Settings">
-        <SettingsToggleCardView
-          iconName={"push"}
-          iconBackgroundColor={AppStyles.green}
-          title={"Hide Event After Start Date"}
-          description={""}
-          isOn={settings.eventPresetShouldHideAfterStartDate}
-          onIsOnChange={(eventPresetShouldHideAfterStartDate) =>
-            update({ eventPresetShouldHideAfterStartDate })
-          }
-          style={style}
-        ></SettingsToggleCardView>
-        <SettingsNavigationLinkView
-          title={"Location"}
-          iconName={"push"}
-          iconBackgroundColor={AppStyles.blue}
-          onTapped={() => console.log("goToLocationSearch")}
-          style={style}
-        ></SettingsNavigationLinkView>
-        <SettingsDurationCardView
-          title={"Duration Presets"}
-          currentPresets={[15, 30, 60, 120]}
-        ></SettingsDurationCardView>
-      </SettingsSectionView>
-    </ScrollView>
+    <SettingsCardSectionView
+      title="Presets"
+      subtitle="These presets will be filled in when you create a new event."
+    >
+      <SettingsNamedToggleView
+        name={"Hide After Start Date"}
+        description={
+          "The event will not be shown publicly to other users after it starts."
+        }
+        isOn={settings.eventPresetShouldHideAfterStartDate}
+        onIsOnChange={(eventPresetShouldHideAfterStartDate) =>
+          update({ eventPresetShouldHideAfterStartDate })
+        }
+      />
+      <SettingsNavigationLinkView
+        title={"Location"}
+        description={settings.eventPresetPlacemark?.name ?? "No Location"}
+        onTapped={onLocationPresetTapped}
+      />
+      <DurationSectionView
+        title={"Duration Presets"}
+        currentPresets={[15, 30, 60, 120]}
+      />
+    </SettingsCardSectionView>
   )
 }
-
-const eventSettingsSelector = (settings: UserSettings) => ({
-  eventPresetDurations: settings.eventPresetDurations,
-  eventPresetPlacemark: settings.eventPresetPlacemark,
-  eventPresetShouldHideAfterStartDate:
-    settings.eventPresetShouldHideAfterStartDate
-})
 
 const styles = StyleSheet.create({
   container: {
