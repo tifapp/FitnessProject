@@ -5,21 +5,13 @@ import {
   useMutation,
   useQueryClient
 } from "@tanstack/react-query"
-import { UserHandle, UserID } from "TiFShared/domain-models/User"
+import { UserID } from "TiFShared/domain-models/User"
+import {
+  BlockListPage,
+  removeUsersFromBlockListPages
+} from "TiFShared/domain-models/BlockList"
 import { useMemo, useRef, useState } from "react"
 import { StyleProp, View, ViewStyle, Alert } from "react-native"
-
-export type BlockListUser = {
-  id: UserID
-  username: string
-  handle: UserHandle
-  profileImageURL: string | null
-}
-
-export type BlockListPage = {
-  users: BlockListUser[]
-  nextPageToken: string | null
-}
 
 export type BlockListUnblockSuccessBannerID = "single-user" | "multiple-users"
 
@@ -96,10 +88,7 @@ const useBlocklistSettingsUnblocking = ({
   const unblockMutation = useMutation(unblockUsers, {
     onSuccess: (_, userIds) => {
       updateBlockListQueryUserPages(queryClient, (pages) => {
-        return pages.map((p) => ({
-          ...p,
-          users: p.users.filter((u) => !userIds.includes(u.id))
-        }))
+        return removeUsersFromBlockListPages(pages, userIds)
       })
     },
     onError: (_, userIds) => {

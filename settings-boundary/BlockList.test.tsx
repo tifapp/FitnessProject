@@ -1,16 +1,13 @@
 import { repeatElements } from "TiFShared/lib/Array"
 import { mockBlockListPage } from "./MockData"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
-import {
-  BLOCK_LIST_SETTINGS_ALERTS,
-  BlockListPage,
-  useBlockListSettings
-} from "./BlockList"
+import { BLOCK_LIST_SETTINGS_ALERTS, useBlockListSettings } from "./BlockList"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { fakeTimers } from "@test-helpers/Timers"
 import { neverPromise } from "@test-helpers/Promise"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { captureAlerts } from "@test-helpers/Alerts"
+import { BlockListPage } from "TiFShared/domain-models/BlockList"
 
 describe("BlockListSettings tests", () => {
   describe("UseBlockListSettings tests", () => {
