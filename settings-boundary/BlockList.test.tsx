@@ -183,14 +183,26 @@ describe("BlockListSettings tests", () => {
       })
     })
 
-    it("should show unblock success banner after successful unblock", async () => {
+    it("should show unblock single user success banner after successful unblock", async () => {
       const page = mockBlockListPage(3)
       const { result } = await renderUseBlockListSettingsWithInitialPage(page)
       act(() => result.current.userUnblocked(page.users[0].id))
-      expect(result.current.isShowingUnblockSuccess).toEqual(false)
+      expect(result.current.unblockSuccessBannerId).toBeUndefined()
       act(() => jest.advanceTimersByTime(TEST_UNBLOCK_DEBOUNCE_TIME))
       await waitFor(() => {
-        expect(result.current.isShowingUnblockSuccess).toEqual(true)
+        expect(result.current.unblockSuccessBannerId).toEqual("single-user")
+      })
+    })
+
+    it("should show unblock multiple users success banner after successful unblock", async () => {
+      const page = mockBlockListPage(3)
+      const { result } = await renderUseBlockListSettingsWithInitialPage(page)
+      act(() => result.current.userUnblocked(page.users[0].id))
+      act(() => result.current.userUnblocked(page.users[1].id))
+      expect(result.current.unblockSuccessBannerId).toBeUndefined()
+      act(() => jest.advanceTimersByTime(TEST_UNBLOCK_DEBOUNCE_TIME))
+      await waitFor(() => {
+        expect(result.current.unblockSuccessBannerId).toEqual("multiple-users")
       })
     })
 

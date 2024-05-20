@@ -1,5 +1,6 @@
 import {
   InfiniteData,
+  QueryClient,
   useInfiniteQuery,
   useMutation,
   useQueryClient
@@ -19,6 +20,8 @@ export type BlockListPage = {
   users: BlockListUser[]
   nextPageToken: string | null
 }
+
+export type BlockListUnblockSuccessBannerID = "single-user" | "multiple-users"
 
 export type UseBlockListSettingsEnvironment = {
   nextPage: (token: string | null) => Promise<BlockListPage>
@@ -67,6 +70,19 @@ const useBlockListSettingsUsers = ({
   }
 }
 
+const updateBlockListQueryUserPages = (
+  queryClient: QueryClient,
+  update: (pages: BlockListPage[]) => BlockListPage[]
+) => {
+  queryClient.setQueryData(
+    BLOCK_LIST_QUERY_KEY,
+    (data: InfiniteData<BlockListPage> | undefined) => {
+      if (!data) return undefined
+      return { ...data, pages: update(data.pages) }
+    }
+  )
+}
+
 const useBlocklistSettingsUnblocking = ({
   unblockUsers,
   unblockDebounceMillis
@@ -79,19 +95,12 @@ const useBlocklistSettingsUnblocking = ({
   const unblockTimeoutRef = useRef<NodeJS.Timeout>()
   const unblockMutation = useMutation(unblockUsers, {
     onSuccess: (_, userIds) => {
-      queryClient.setQueryData(
-        BLOCK_LIST_QUERY_KEY,
-        (data: InfiniteData<BlockListPage> | undefined) => {
-          if (!data) return undefined
-          return {
-            ...data,
-            pages: data.pages.map((p) => ({
-              ...p,
-              users: p.users.filter((u) => !userIds.includes(u.id))
-            }))
-          }
-        }
-      )
+      updateBlockListQueryUserPages(queryClient, (pages) => {
+        return pages.map((p) => ({
+          ...p,
+          users: p.users.filter((u) => !userIds.includes(u.id))
+        }))
+      })
     },
     onError: (_, userIds) => {
       Alert.alert(
@@ -103,7 +112,12 @@ const useBlocklistSettingsUnblocking = ({
   })
   return {
     activeUnblockingIds,
-    isShowingUnblockSuccess: unblockMutation.isSuccess,
+    get unblockSuccessBannerId(): BlockListUnblockSuccessBannerID | undefined {
+      if (!unblockMutation.isSuccess) return undefined
+      return (unblockMutation.variables?.length ?? 0) > 1
+        ? "multiple-users"
+        : "single-user"
+    },
     userUnblocked: (id: UserID) => {
       clearTimeout(unblockTimeoutRef.current)
       const newIds = [...activeUnblockingIds, id]
