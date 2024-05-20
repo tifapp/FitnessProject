@@ -107,6 +107,11 @@ const useBlocklistSettingsUnblocking = ({
         ? "multiple-users"
         : "single-user"
     },
+    disappeared: () => {
+      if (activeUnblockingIds.length <= 0) return
+      clearTimeout(unblockTimeoutRef.current)
+      unblockMutation.mutate(activeUnblockingIds)
+    },
     userUnblocked: (id: UserID) => {
       clearTimeout(unblockTimeoutRef.current)
       const newIds = [...activeUnblockingIds, id]

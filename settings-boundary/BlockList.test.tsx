@@ -203,6 +203,36 @@ describe("BlockListSettings tests", () => {
       })
     })
 
+    it("should unblock user without waiting when disappearing", async () => {
+      const page = mockBlockListPage(3)
+      const { result } = await renderUseBlockListSettingsWithInitialPage(page)
+      act(() => result.current.userUnblocked(page.users[0].id))
+      act(() => result.current.disappeared())
+      await waitFor(() => {
+        expect(unblockUsers).toHaveBeenCalledWith([page.users[0].id])
+      })
+    })
+
+    it("should not invoke unblocking when disappearing if no users are to be unblocked", async () => {
+      const { result } =
+        await renderUseBlockListSettingsWithInitialPage(mockBlockListPage())
+      act(() => result.current.disappeared())
+      await verifyNeverOccurs(() => {
+        expect(unblockUsers).toHaveBeenCalled()
+      })
+    })
+
+    it("should cancel debounced updates after disappearing", async () => {
+      const page = mockBlockListPage(3)
+      const { result } = await renderUseBlockListSettingsWithInitialPage(page)
+      act(() => result.current.userUnblocked(page.users[0].id))
+      act(() => result.current.disappeared())
+      act(() => jest.advanceTimersByTime(TEST_UNBLOCK_DEBOUNCE_TIME))
+      await verifyNeverOccurs(() => {
+        expect(unblockUsers).toHaveBeenNthCalledWith(2, [page.users[0].id])
+      })
+    })
+
     const { alertPresentationSpy } = captureAlerts()
 
     const renderUseBlockListSettingsWithInitialPage = async (
