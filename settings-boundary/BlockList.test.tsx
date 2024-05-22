@@ -8,6 +8,7 @@ import { neverPromise } from "@test-helpers/Promise"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { captureAlerts } from "@test-helpers/Alerts"
 import { BlockListPage } from "TiFShared/domain-models/BlockList"
+import { NavigationContainer } from "@react-navigation/native"
 
 describe("BlockListSettings tests", () => {
   describe("UseBlockListSettings tests", () => {
@@ -221,18 +222,19 @@ describe("BlockListSettings tests", () => {
 
     it("should unblock user without waiting when disappearing", async () => {
       const page = mockBlockListPage(3)
-      const { result } = await renderUseBlockListSettingsWithInitialPage(page)
+      const { result, unmount } =
+        await renderUseBlockListSettingsWithInitialPage(page)
       act(() => result.current.userUnblocked(page.users[0].id))
-      act(() => result.current.disappeared())
+      act(() => unmount())
       await waitFor(() => {
         expect(unblockUsers).toHaveBeenCalledWith([page.users[0].id])
       })
     })
 
     it("should not invoke unblocking when disappearing if no users are to be unblocked", async () => {
-      const { result } =
+      const { unmount } =
         await renderUseBlockListSettingsWithInitialPage(mockBlockListPage())
-      act(() => result.current.disappeared())
+      act(() => unmount())
       await verifyNeverOccurs(() => {
         expect(unblockUsers).toHaveBeenCalled()
       })
@@ -240,9 +242,10 @@ describe("BlockListSettings tests", () => {
 
     it("should cancel debounced updates after disappearing", async () => {
       const page = mockBlockListPage(3)
-      const { result } = await renderUseBlockListSettingsWithInitialPage(page)
+      const { result, unmount } =
+        await renderUseBlockListSettingsWithInitialPage(page)
       act(() => result.current.userUnblocked(page.users[0].id))
-      act(() => result.current.disappeared())
+      act(() => unmount())
       act(() => jest.advanceTimersByTime(TEST_UNBLOCK_DEBOUNCE_TIME))
       await verifyNeverOccurs(() => {
         expect(unblockUsers).toHaveBeenNthCalledWith(2, [page.users[0].id])
@@ -272,7 +275,9 @@ describe("BlockListSettings tests", () => {
           }),
         {
           wrapper: ({ children }: any) => (
-            <TestQueryClientProvider>{children}</TestQueryClientProvider>
+            <NavigationContainer>
+              <TestQueryClientProvider>{children}</TestQueryClientProvider>
+            </NavigationContainer>
           )
         }
       )

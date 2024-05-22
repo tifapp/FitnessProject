@@ -11,7 +11,7 @@ import {
   BlockListUser,
   removeUsersFromBlockListPages
 } from "TiFShared/domain-models/BlockList"
-import { useMemo, useRef, useState } from "react"
+import { useCallback, useMemo, useRef, useState } from "react"
 import {
   StyleProp,
   Pressable,
@@ -35,6 +35,8 @@ import { TextToastView } from "@components/common/Toasts"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
 import { Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
+import { useFocusEffect } from "@react-navigation/native"
+import { useEffectEvent } from "@lib/utils/UseEffectEvent"
 
 export type BlockListUnblockSuccessBannerID = "single-user" | "multiple-users"
 
@@ -130,6 +132,12 @@ const useBlocklistSettingsUnblocking = ({
       })
     }
   })
+  const flush = useEffectEvent(() => {
+    if (activeUnblockingIds.length <= 0) return
+    clearTimeout(unblockTimeoutRef.current)
+    unblockMutation.mutate(activeUnblockingIds)
+  })
+  useFocusEffect(useCallback(() => flush, [flush]))
   return {
     activeUnblockingIds,
     get unblockSuccessBannerId(): BlockListUnblockSuccessBannerID | undefined {
@@ -137,11 +145,6 @@ const useBlocklistSettingsUnblocking = ({
       return (unblockMutation.variables?.length ?? 0) > 1
         ? "multiple-users"
         : "single-user"
-    },
-    disappeared: () => {
-      if (activeUnblockingIds.length <= 0) return
-      clearTimeout(unblockTimeoutRef.current)
-      unblockMutation.mutate(activeUnblockingIds)
     },
     userUnblocked: (id: UserID) => {
       clearTimeout(unblockTimeoutRef.current)

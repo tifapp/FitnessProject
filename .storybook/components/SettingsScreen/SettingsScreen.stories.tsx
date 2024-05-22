@@ -66,9 +66,10 @@ const Test = () => {
       return await delayData(mockBlockListPage(100, uuidString()), 3000)
     },
     unblockUsers: async (ids) => {
+      console.log("Unblocking", ids)
       await sleep(1000)
     },
-    unblockDebounceMillis: 500
+    unblockDebounceMillis: 10_0000000000
   })
   console.log(state.users)
   return (
