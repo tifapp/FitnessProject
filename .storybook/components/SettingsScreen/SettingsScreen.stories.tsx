@@ -1,5 +1,5 @@
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
-import { delayData } from "@lib/utils/DelayData"
+import { delayData, sleep } from "@lib/utils/DelayData"
 import { HapticsProvider } from "@modules/tif-haptics"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
@@ -16,6 +16,7 @@ import { testSQLite } from "@test-helpers/SQLite"
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 import { mockBlockListPage } from "settings-boundary/MockData"
 import { RootSiblingParent } from "react-native-root-siblings"
+import { uuidString } from "@lib/utils/UUID"
 
 const SettingsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Settings Screen",
@@ -59,7 +60,9 @@ const userStore = PersistentSettingsStores.user(
 const Test = () => {
   const state = useBlockListSettings({
     nextPage: async () => {
-      return await delayData(mockBlockListPage(10, null), 3000)
+      // await sleep(2000)
+      // throw new Error()
+      return await delayData(mockBlockListPage(50, uuidString()), 3000)
     },
     unblockUsers: async (ids) => console.log("Unblocking", ids),
     unblockDebounceMillis: 2000

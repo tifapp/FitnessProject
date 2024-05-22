@@ -22,15 +22,19 @@ import {
   Alert,
   View,
   FlatList,
-  Platform
+  Platform,
+  TouchableOpacity
 } from "react-native"
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
-import { Caption, Headline } from "@components/Text"
+import { Headline } from "@components/Text"
 import { SettingsSectionView } from "./components/Section"
 import { PrimaryButton } from "@components/Buttons"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { SettingsCardView } from "./components/Card"
 import { TextToastView } from "@components/common/Toasts"
+import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
+import { Ionicon } from "@components/common/Icons"
+import { AppStyles } from "@lib/AppColorStyle"
 
 export type BlockListUnblockSuccessBannerID = "single-user" | "multiple-users"
 
@@ -187,14 +191,25 @@ export const BlockListSettingsView = ({
       }
       ListHeaderComponentStyle={styles.container}
       ListEmptyComponent={
-        <>
+        <View style={styles.noItems}>
           {state.status === "success" ||
             (state.status === "refreshing" && (
               <Headline>No users have been blocked.</Headline>
             ))}
-          {state.status === "loading" && <ActivityIndicator />}
+          {state.status === "loading" && (
+            <ActivityIndicator style={styles.loadingIndicator} />
+          )}
           {state.status === "error" && (
             <PrimaryButton onPress={state.refreshed}>Retry</PrimaryButton>
+          )}
+        </View>
+      }
+      ListFooterComponent={
+        <>
+          {state.status === "loading" && state.users.length > 0 && (
+            <Animated.View entering={FadeIn} exiting={FadeOut}>
+              <ActivityIndicator style={styles.loadingIndicator} />
+            </Animated.View>
           )}
         </>
       }
@@ -207,6 +222,8 @@ export const BlockListSettingsView = ({
         />
       }
       onEndReached={state.nextPageRequested}
+      onEndReachedThreshold={0.8}
+      contentContainerStyle={styles.listContent}
       style={[style, styles.list]}
     />
     <TextToastView
@@ -240,18 +257,27 @@ const BlockListUserView = ({
   >
     <SettingsCardView>
       <View style={styles.userContainer}>
-        <Pressable onPress={() => onProfileTapped(user.id)}>
-          <View>
-            <Headline>{user.username}</Headline>
-            <Caption>{user.handle.toString()}</Caption>
-          </View>
-        </Pressable>
-        <PrimaryButton
-          disabled={isActivelyBeingBlocked}
+        <View style={styles.profileAndName}>
+          <Pressable onPress={() => onProfileTapped(user.id)}>
+            <ProfileImageAndName
+              username={user.username}
+              handle={user.handle}
+              imageURL={user.profileImageURL}
+            />
+          </Pressable>
+        </View>
+        <TouchableOpacity
+          activeOpacity={0.5}
           onPress={() => onUnblockTapped(user.id)}
+          disabled={isActivelyBeingBlocked}
+          hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
+          style={{ opacity: isActivelyBeingBlocked ? 0.5 : 1 }}
         >
-          Unblock
-        </PrimaryButton>
+          <View style={styles.unblockButton}>
+            <Ionicon name="trash" color={AppStyles.red.toString()} />
+            <Headline style={styles.unblockText}>Unblock</Headline>
+          </View>
+        </TouchableOpacity>
       </View>
     </SettingsCardView>
   </Animated.View>
@@ -267,14 +293,41 @@ const styles = StyleSheet.create({
   list: {
     height: "100%"
   },
+  listContent: {
+    flexGrow: 1
+  },
   userContainer: {
     padding: 16,
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
+    columnGap: 8
+  },
+  profileAndName: {
+    flex: 1
+  },
+  unblockButton: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    columnGap: 4
+  },
+  unblockText: {
+    color: AppStyles.red.toString()
   },
   itemSeparator: {
     padding: 8
+  },
+  loadingIndicator: {
+    padding: 16
+  },
+  noItems: {
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    flex: 1,
+    paddingHorizontal: 24
   }
 })
