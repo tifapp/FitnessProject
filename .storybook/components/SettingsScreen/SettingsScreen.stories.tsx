@@ -62,7 +62,7 @@ const Test = () => {
     nextPage: async () => {
       // await sleep(2000)
       // throw new Error()
-      return await delayData(mockBlockListPage(0, null), 3000)
+      return await delayData(mockBlockListPage(50, uuidString()), 3000)
     },
     unblockUsers: async (ids) => console.log("Unblocking", ids),
     unblockDebounceMillis: 2000

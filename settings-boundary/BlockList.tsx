@@ -55,28 +55,18 @@ export const BLOCK_LIST_SETTINGS_ALERTS = {
 
 const BLOCK_LIST_QUERY_KEY = ["block-list"]
 
-export const useBlockListSettings = (env: UseBlockListSettingsEnvironment) => {
-  const unblocking = useBlocklistSettingsUnblocking(env)
-  return {
-    ...useBlockListSettingsUsers(unblocking.activeUnblockingIds, env),
-    ...unblocking
-  }
-}
+export const useBlockListSettings = (env: UseBlockListSettingsEnvironment) => ({
+  ...useBlockListSettingsUsers(env),
+  ...useBlocklistSettingsUnblocking(env)
+})
 
-const useBlockListSettingsUsers = (
-  activeUnblockingIds: UserID[],
-  { nextPage }: Pick<UseBlockListSettingsEnvironment, "nextPage">
-) => {
+const useBlockListSettingsUsers = ({
+  nextPage
+}: Pick<UseBlockListSettingsEnvironment, "nextPage">) => {
   const query = useInfiniteQuery(
     BLOCK_LIST_QUERY_KEY,
     async ({ pageParam }) => await nextPage(pageParam),
-    {
-      getNextPageParam: (page) => page.nextPageToken,
-      select: (data) => ({
-        ...data,
-        pages: removeUsersFromBlockListPages(data.pages, activeUnblockingIds)
-      })
-    }
+    { getNextPageParam: (page) => page.nextPageToken }
   )
   return {
     get status() {
@@ -202,9 +192,10 @@ export const BlockListSettingsView = ({
       ListHeaderComponentStyle={styles.container}
       ListEmptyComponent={
         <View style={styles.noItems}>
-          {(state.status === "success" || state.status === "refreshing") && (
-            <Headline>No users have been blocked.</Headline>
-          )}
+          {state.status === "success" ||
+            (state.status === "refreshing" && (
+              <Headline>No users have been blocked.</Headline>
+            ))}
           {state.status === "loading" && (
             <ActivityIndicator style={styles.loadingIndicator} />
           )}
