@@ -14,7 +14,7 @@ describe("UseDismissal tests", () => {
     expect(callback).toHaveBeenCalledTimes(1)
   })
 
-  it("should run the dismissal function only when the app is not active", () => {
+  it("should run the dismissal function only when the app is in the background", () => {
     let send: ((status: AppStateStatus) => void) | undefined
     appStateSubscribe.mockImplementationOnce((_, cb) => {
       send = cb
@@ -26,8 +26,6 @@ describe("UseDismissal tests", () => {
     expect(callback).not.toHaveBeenCalled()
     act(() => send?.("background"))
     expect(callback).toHaveBeenCalledTimes(1)
-    act(() => send?.("inactive"))
-    expect(callback).toHaveBeenCalledTimes(2)
   })
 
   const renderUseDismissal = (onDismiss: () => void) => {

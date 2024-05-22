@@ -12,7 +12,7 @@ export const useDismissal = (onDismiss: () => void) => {
   useEffect(() => fn, [fn])
   useEffect(() => {
     const subscription = appState.addEventListener("change", (status) => {
-      if (status !== "active") fn()
+      if (status === "background") fn()
     })
     return () => subscription.remove()
   }, [fn, appState])
