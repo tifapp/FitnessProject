@@ -11,7 +11,7 @@ import {
   BlockListUser,
   removeUsersFromBlockListPages
 } from "TiFShared/domain-models/BlockList"
-import { useCallback, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
   StyleProp,
   Pressable,
@@ -37,6 +37,7 @@ import { Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useFocusEffect } from "@react-navigation/native"
 import { useEffectEvent } from "@lib/utils/UseEffectEvent"
+import { useDismissal } from "@lib/utils/UseDismissal"
 
 export type BlockListUnblockSuccessBannerID = "single-user" | "multiple-users"
 
@@ -132,12 +133,11 @@ const useBlocklistSettingsUnblocking = ({
       })
     }
   })
-  const flush = useEffectEvent(() => {
+  useDismissal(() => {
     if (activeUnblockingIds.length <= 0) return
     clearTimeout(unblockTimeoutRef.current)
     unblockMutation.mutate(activeUnblockingIds)
   })
-  useFocusEffect(useCallback(() => flush, [flush]))
   return {
     activeUnblockingIds,
     get unblockSuccessBannerId(): BlockListUnblockSuccessBannerID | undefined {

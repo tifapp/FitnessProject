@@ -275,9 +275,7 @@ describe("BlockListSettings tests", () => {
           }),
         {
           wrapper: ({ children }: any) => (
-            <NavigationContainer>
-              <TestQueryClientProvider>{children}</TestQueryClientProvider>
-            </NavigationContainer>
+            <TestQueryClientProvider>{children}</TestQueryClientProvider>
           )
         }
       )

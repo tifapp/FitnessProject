@@ -69,9 +69,8 @@ const Test = () => {
       console.log("Unblocking", ids)
       await sleep(1000)
     },
-    unblockDebounceMillis: 10_0000000000
+    unblockDebounceMillis: 100_000_000_000
   })
-  console.log(state.users)
   return (
     <SafeAreaView edges={["bottom"]}>
       <SettingsProvider
