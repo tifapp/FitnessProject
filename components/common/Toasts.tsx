@@ -1,11 +1,11 @@
 import React from "react"
 import Toast, { ToastContainer } from "react-native-root-toast"
 import { AppStyles } from "../../lib/AppColorStyle"
-import { StyleSheet, View, useWindowDimensions } from "react-native"
+import { StyleSheet, View, Platform, useWindowDimensions } from "react-native"
 import { Ionicon } from "./Icons"
 import { BodyText } from "@components/Text"
 
-const TOAST_OFFSET = 100
+const TOAST_OFFSET = 80
 
 export const showToast = (message: string) => {
   Toast.show(message, {
@@ -26,6 +26,7 @@ export const showToast = (message: string) => {
 export type TextToastProps = {
   isVisible: boolean
   text: string
+  offset?: number
   duration?: number
 }
 
@@ -35,12 +36,13 @@ export type TextToastProps = {
 export const TextToastView = ({
   isVisible,
   text,
+  offset = 0,
   duration = 3000
 }: TextToastProps) => (
   <ToastContainer
     visible={isVisible}
     opacity={1}
-    position={Toast.positions.BOTTOM - TOAST_OFFSET}
+    position={Toast.positions.BOTTOM + offset}
     shadow={false}
     animation={true}
     hideOnPress={true}
@@ -63,11 +65,15 @@ const styles = StyleSheet.create({
     backgroundColor: AppStyles.darkColor
   },
   text: {
-    color: "white",
-    marginHorizontal: 8
+    color: "white"
   },
   containerStyle: {
+    display: "flex",
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
+    width: "100%",
+    padding: 8,
+    columnGap: 8,
+    marginTop: Platform.OS === "ios" ? -4 : 0
   }
 })

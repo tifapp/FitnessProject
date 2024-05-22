@@ -8,10 +8,29 @@ import {
 import { UserID } from "TiFShared/domain-models/User"
 import {
   BlockListPage,
+  BlockListUser,
   removeUsersFromBlockListPages
 } from "TiFShared/domain-models/BlockList"
 import { useMemo, useRef, useState } from "react"
-import { StyleProp, View, ViewStyle, Alert } from "react-native"
+import {
+  StyleProp,
+  Pressable,
+  ActivityIndicator,
+  RefreshControl,
+  ViewStyle,
+  StyleSheet,
+  Alert,
+  View,
+  FlatList,
+  Platform
+} from "react-native"
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
+import { Caption, Headline } from "@components/Text"
+import { SettingsSectionView } from "./components/Section"
+import { PrimaryButton } from "@components/Buttons"
+import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
+import { SettingsCardView } from "./components/Card"
+import { TextToastView } from "@components/common/Toasts"
 
 export type BlockListUnblockSuccessBannerID = "single-user" | "multiple-users"
 
@@ -46,7 +65,11 @@ const useBlockListSettingsUsers = ({
     { getNextPageParam: (page) => page.nextPageToken }
   )
   return {
-    status: query.isFetching ? "loading" : query.status,
+    get status() {
+      if (query.isRefetching) return "refreshing"
+      return query.isFetching ? "loading" : query.status
+    },
+    isRefreshing: query.isRefetching,
     users: useMemo(
       () => query.data?.pages.flatMap((p) => p.users) ?? [],
       [query.data]
@@ -125,9 +148,133 @@ const useBlocklistSettingsUnblocking = ({
 }
 
 export type BlockListSettingsProps = {
+  state: ReturnType<typeof useBlockListSettings>
+  onUserProfileTapped: (id: UserID) => void
   style?: StyleProp<ViewStyle>
 }
 
-export const BlockListSettingsView = ({ style }: BlockListSettingsProps) => (
-  <View />
+const blockListUserKeyExtractor = (user: BlockListUser) => user.id
+
+// NB: Animated.FlatList has a bug on android in where item removal animations
+// cause glitches and inivisible elements in the list. For now, we'll disable
+// animations on Android. More info:
+// https://github.com/software-mansion/react-native-reanimated/issues/5728
+const FlatListView = Platform.OS === "ios" ? Animated.FlatList : FlatList
+
+export const BlockListSettingsView = ({
+  state,
+  onUserProfileTapped,
+  style
+}: BlockListSettingsProps) => (
+  <>
+    <FlatListView
+      data={state.users}
+      keyExtractor={blockListUserKeyExtractor}
+      renderItem={({ item: user }: { item: BlockListUser }) => (
+        <BlockListUserView
+          user={user}
+          isActivelyBeingBlocked={state.activeUnblockingIds.includes(user.id)}
+          onProfileTapped={onUserProfileTapped}
+          onUnblockTapped={state.userUnblocked}
+        />
+      )}
+      ListHeaderComponent={
+        <SettingsSectionView
+          title="Blocked Users"
+          subtitle="Listed below are the users that you have blocked. You can choose to unblock them or view their profile."
+          style={styles.section}
+        />
+      }
+      ListHeaderComponentStyle={styles.container}
+      ListEmptyComponent={
+        <>
+          {state.status === "success" ||
+            (state.status === "refreshing" && (
+              <Headline>No users have been blocked.</Headline>
+            ))}
+          {state.status === "loading" && <ActivityIndicator />}
+          {state.status === "error" && (
+            <PrimaryButton onPress={state.refreshed}>Retry</PrimaryButton>
+          )}
+        </>
+      }
+      ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
+      itemLayoutAnimation={TiFDefaultLayoutTransition}
+      refreshControl={
+        <RefreshControl
+          refreshing={state.isRefreshing}
+          onRefresh={state.refreshed}
+        />
+      }
+      onEndReached={state.nextPageRequested}
+      style={[style, styles.list]}
+    />
+    <TextToastView
+      isVisible={state.unblockSuccessBannerId === "single-user"}
+      text="Successfully Unblocked User!"
+    />
+    <TextToastView
+      isVisible={state.unblockSuccessBannerId === "multiple-users"}
+      text="Successfully Unblocked Users!"
+    />
+  </>
 )
+
+type BlockListUserProps = {
+  user: BlockListUser
+  isActivelyBeingBlocked: boolean
+  onProfileTapped: (id: UserID) => void
+  onUnblockTapped: (id: UserID) => void
+}
+
+const BlockListUserView = ({
+  user,
+  isActivelyBeingBlocked,
+  onUnblockTapped,
+  onProfileTapped
+}: BlockListUserProps) => (
+  <Animated.View
+    entering={Platform.OS === "ios" ? FadeIn : undefined}
+    exiting={Platform.OS === "ios" ? FadeOut : undefined}
+    style={styles.container}
+  >
+    <SettingsCardView>
+      <View style={styles.userContainer}>
+        <Pressable onPress={() => onProfileTapped(user.id)}>
+          <View>
+            <Headline>{user.username}</Headline>
+            <Caption>{user.handle.toString()}</Caption>
+          </View>
+        </Pressable>
+        <PrimaryButton
+          disabled={isActivelyBeingBlocked}
+          onPress={() => onUnblockTapped(user.id)}
+        >
+          Unblock
+        </PrimaryButton>
+      </View>
+    </SettingsCardView>
+  </Animated.View>
+)
+
+const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: 24
+  },
+  section: {
+    paddingBottom: 32
+  },
+  list: {
+    height: "100%"
+  },
+  userContainer: {
+    padding: 16,
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between"
+  },
+  itemSeparator: {
+    padding: 8
+  }
+})

@@ -66,14 +66,15 @@ describe("BlockListSettings tests", () => {
       expect(nextPage).toHaveBeenNthCalledWith(2, pages[0].nextPageToken)
     })
 
-    it("should have a loading status when refreshing", async () => {
+    it("should indicate refreshing when refreshed with active page", async () => {
       nextPage
         .mockResolvedValueOnce(mockBlockListPage())
         .mockImplementationOnce(neverPromise)
       const { result } = renderUseBlockListSettings()
       await waitFor(() => expect(result.current.status).toEqual("success"))
+      expect(result.current.isRefreshing).toEqual(false)
       act(() => result.current.refreshed())
-      await waitFor(() => expect(result.current.status).toEqual("loading"))
+      await waitFor(() => expect(result.current.status).toEqual("refreshing"))
     })
 
     it("should not be able to request the next page when no next page token is available", async () => {
