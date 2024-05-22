@@ -17,6 +17,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 import { mockBlockListPage } from "settings-boundary/MockData"
 import { RootSiblingParent } from "react-native-root-siblings"
 import { uuidString } from "@lib/utils/UUID"
+import { neverPromise } from "@test-helpers/Promise"
 
 const SettingsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Settings Screen",
@@ -57,15 +58,17 @@ const userStore = PersistentSettingsStores.user(
   new SQLiteUserSettingsStorage(testSQLite)
 )
 
+const page = mockBlockListPage(50, null)
+
 const Test = () => {
   const state = useBlockListSettings({
     nextPage: async () => {
-      // await sleep(2000)
-      // throw new Error()
-      return await delayData(mockBlockListPage(50, uuidString()), 3000)
+      return await delayData(mockBlockListPage(100, uuidString()), 3000)
     },
-    unblockUsers: async (ids) => console.log("Unblocking", ids),
-    unblockDebounceMillis: 2000
+    unblockUsers: async (ids) => {
+      await sleep(1000)
+    },
+    unblockDebounceMillis: 500
   })
   console.log(state.users)
   return (

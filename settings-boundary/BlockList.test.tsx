@@ -141,6 +141,21 @@ describe("BlockListSettings tests", () => {
       })
     })
 
+    it("should only reset the active unblocking ids in a particular unblock when the unblock finishes", async () => {
+      const page = mockBlockListPage(3)
+      unblockUsers
+        .mockReturnValueOnce(Promise.resolve())
+        .mockImplementationOnce(neverPromise)
+      const { result } = await renderUseBlockListSettingsWithInitialPage(page)
+      act(() => result.current.userUnblocked(page.users[0].id))
+      act(() => jest.advanceTimersByTime(TEST_UNBLOCK_DEBOUNCE_TIME))
+      act(() => result.current.userUnblocked(page.users[1].id))
+      act(() => jest.advanceTimersByTime(TEST_UNBLOCK_DEBOUNCE_TIME))
+      await waitFor(() => {
+        expect(result.current.activeUnblockingIds).toEqual([page.users[1].id])
+      })
+    })
+
     it("should remove users from the block list after they have been unblocked successfully", async () => {
       const page = mockBlockListPage(3)
       const { result } = await renderUseBlockListSettingsWithInitialPage(page)

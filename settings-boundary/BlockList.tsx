@@ -26,7 +26,7 @@ import {
   TouchableOpacity
 } from "react-native"
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
-import { Headline } from "@components/Text"
+import { BoldFootnote, Headline } from "@components/Text"
 import { SettingsSectionView } from "./components/Section"
 import { PrimaryButton } from "@components/Buttons"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
@@ -124,7 +124,11 @@ const useBlocklistSettingsUnblocking = ({
         BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.description(userIds.length)
       )
     },
-    onSettled: () => setActiveUnblockingIds([])
+    onSettled: (_, __, ids) => {
+      setActiveUnblockingIds((activeIds) => {
+        return activeIds.filter((id) => !ids.includes(id))
+      })
+    }
   })
   return {
     activeUnblockingIds,
@@ -274,8 +278,8 @@ const BlockListUserView = ({
           style={{ opacity: isActivelyBeingBlocked ? 0.5 : 1 }}
         >
           <View style={styles.unblockButton}>
-            <Ionicon name="trash" color={AppStyles.red.toString()} />
-            <Headline style={styles.unblockText}>Unblock</Headline>
+            <Ionicon name="trash" size={16} color={AppStyles.red.toString()} />
+            <BoldFootnote style={styles.unblockText}>Unblock</BoldFootnote>
           </View>
         </TouchableOpacity>
       </View>
