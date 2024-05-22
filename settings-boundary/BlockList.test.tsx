@@ -66,6 +66,20 @@ describe("BlockListSettings tests", () => {
       expect(nextPage).toHaveBeenNthCalledWith(2, pages[0].nextPageToken)
     })
 
+    it("should filter out actively unblocked users when refreshing", async () => {
+      const page = mockBlockListPage(3)
+      nextPage.mockResolvedValueOnce(page).mockResolvedValueOnce(page)
+      unblockUsers.mockImplementationOnce(neverPromise)
+      const { result } = renderUseBlockListSettings()
+      await waitFor(() => expect(result.current.status).toEqual("success"))
+      act(() => result.current.userUnblocked(page.users[0].id))
+      act(() => result.current.userUnblocked(page.users[1].id))
+      act(() => result.current.refreshed())
+      await waitFor(() => {
+        expect(result.current.users).toEqual([page.users[2]])
+      })
+    })
+
     it("should indicate refreshing when refreshed with active page", async () => {
       nextPage
         .mockResolvedValueOnce(mockBlockListPage())
