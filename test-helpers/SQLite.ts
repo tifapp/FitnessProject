@@ -1,9 +1,12 @@
-import { SQLITE_IN_MEMORY_PATH, TiFSQLite } from "@lib/SQLite"
+import { Migrations, SQLITE_IN_MEMORY_PATH, TiFSQLite } from "@lib/SQLite"
 
 /**
  * An in memory {@link TiFSQLite} instance for testing.
  */
-export const testSQLite = new TiFSQLite(SQLITE_IN_MEMORY_PATH)
+export const testSQLite = new TiFSQLite(SQLITE_IN_MEMORY_PATH, async (db) => {
+  await Migrations.main(db)
+  await Migrations.logs(db)
+})
 
 /**
  * Resets the data inside {@link testSQLite}.
