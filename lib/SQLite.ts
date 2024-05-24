@@ -290,7 +290,7 @@ export namespace Migrations {
       id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
       label TEXT NOT NULL,
       message TEXT NOT NULL,
-      level TEXT NOT NULL CHECK(level IN ('debug', 'info', 'warn', 'error')),
+      level TEXT NOT NULL CHECK(level IN ('debug', 'info', 'warn', 'error', 'trace')),
       stringifiedMetadata TEXT,
       timestamp DOUBLE NOT NULL DEFAULT (unixepoch('now', 'subsec'))
     )
