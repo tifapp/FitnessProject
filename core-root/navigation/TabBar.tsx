@@ -11,7 +11,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 const Tab = createBottomTabNavigator()
 
-function getIconName (routeName: string) {
+function getIconName(routeName: string) {
   if (routeName === "Map") return "map"
   else if (routeName === "Chat Room") return "chatbox"
   else if (routeName === "Event Form") return "add-outline"
@@ -68,7 +68,7 @@ export const BottomNavTabBar = ({ state, navigation }: BottomTabBarProps) => {
   )
 }
 
-export function TabNavigation () {
+export function TabNavigation() {
   return (
     <Tab.Navigator
       tabBar={(props) => <BottomNavTabBar {...props} />}

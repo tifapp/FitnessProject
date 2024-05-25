@@ -26,7 +26,7 @@ export type AuthShadedTextFieldProps = {
 /**
  * A filled text field matching the style of the auth screens.
  */
-export const AuthShadedTextField = forwardRef(function TextField (
+export const AuthShadedTextField = forwardRef(function TextField(
   { iconName, iconBackgroundColor, style, ...props }: AuthShadedTextFieldProps,
   ref: TextFieldRef
 ) {
@@ -57,7 +57,7 @@ export type AuthShadedPasswordTextFieldProps = {
 /**
  * A filled password text field matching the style of the auth screens.
  */
-export const AuthShadedPasswordTextField = forwardRef(function TextField (
+export const AuthShadedPasswordTextField = forwardRef(function TextField(
   {
     iconName,
     iconBackgroundColor,
@@ -101,7 +101,7 @@ export type AuthEmailPhoneTextFieldProps = {
 /**
  * An auth text field that accepts both email addresses and phone numbers as input.
  */
-export const AuthShadedEmailPhoneTextFieldView = forwardRef(function TextField (
+export const AuthShadedEmailPhoneTextFieldView = forwardRef(function TextField(
   {
     activeTextType,
     onActiveTextTypeToggled,

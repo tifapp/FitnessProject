@@ -50,6 +50,7 @@
       "@user/*": ["./user/*"],
       "@settings-storage": ["./settings-storage"],
       "@settings-storage/*": ["./settings-storage/*"],
+      "@settings-boundary": ["./settings-boundary"],
       "env": ["./.env"]
     }
   },

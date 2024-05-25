@@ -27,7 +27,8 @@ const MODULES = [
   "location-search-boundary",
   "event",
   "user",
-  "settings-storage"
+  "settings-storage",
+  "settings-boundary"
 ]
 
 module.exports = function (api) {
