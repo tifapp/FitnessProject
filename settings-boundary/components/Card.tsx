@@ -1,4 +1,3 @@
-import { DividerView } from "@components/Divider"
 import { AppStyles } from "@lib/AppColorStyle"
 import { StyleProp, ViewStyle, View, StyleSheet } from "react-native"
 
@@ -9,16 +8,7 @@ export type SettingsCardProps = {
 
 export const SettingsCardView = ({ children, style }: SettingsCardProps) => (
   <View style={style}>
-    <View style={styles.container}>
-      {Array.isArray(children)
-        ? children.map((child, i) => (
-            <View key={`settings-card-item-${i}`}>
-              {i !== 0 && <DividerView style={styles.divider} />}
-              {child}
-            </View>
-          ))
-        : children}
-    </View>
+    <View style={styles.container}>{children}</View>
   </View>
 )
 
@@ -27,8 +17,5 @@ const styles = StyleSheet.create({
     backgroundColor: AppStyles.eventCardColor,
     overflow: "hidden",
     borderRadius: 12
-  },
-  divider: {
-    marginLeft: 60
   }
 })

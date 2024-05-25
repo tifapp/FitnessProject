@@ -21,8 +21,8 @@ import {
   useEmailPhoneTextState
 } from "../EmailPhoneText"
 import { useFormSubmission } from "@lib/utils/Form"
-import { USPhoneNumber, EmailAddress } from ".."
 import { SignInResult } from "./Authenticator"
+import { EmailAddress, USPhoneNumber } from "@user/privacy"
 
 export type UseSignInFormEnvironment = {
   signIn: (

@@ -5,7 +5,10 @@ import {
   userSettingsRefreshAction,
   userSettingsStore
 } from "./UserSettings"
-import { DEFAULT_USER_SETTINGS } from "TiFShared/domain-models/User"
+import {
+  DEFAULT_USER_SETTINGS,
+  UserSettings
+} from "TiFShared/domain-models/Settings"
 import { fakeTimers } from "@test-helpers/Timers"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { mswServer } from "@test-helpers/msw"
@@ -46,6 +49,17 @@ describe("UserSettings tests", () => {
         ...DEFAULT_USER_SETTINGS,
         canShareArrivalStatus: false,
         isCrashReportingEnabled: false
+      })
+    })
+
+    it("should be able to save and load triggers", async () => {
+      await storage.save({
+        pushNotificationTriggerIds: ["event-cancelled", "event-name-changed"]
+      })
+      const settings = await storage.load()
+      expect(settings).toEqual({
+        ...DEFAULT_USER_SETTINGS,
+        pushNotificationTriggerIds: ["event-cancelled", "event-name-changed"]
       })
     })
   })
@@ -205,7 +219,7 @@ describe("UserSettings tests", () => {
     it("should be able to flush any debounced updates in order to save the changes immediately", async () => {
       const saveRequest = {
         isAnalyticsEnabled: false,
-        isMentionsNotificationsEnabled: false
+        canShareArrivalStatus: false
       }
 
       store.update(saveRequest)
@@ -274,7 +288,7 @@ describe("UserSettings tests", () => {
       const expectedSettings = {
         ...DEFAULT_USER_SETTINGS,
         isAnalyticsEnabled: false,
-        isMentionsNotificationsEnabled: false,
+        canShareArrivalStatus: false,
         version: DEFAULT_USER_SETTINGS.version + 1
       }
       setGetSettingsResponse(expectedSettings)
@@ -288,7 +302,7 @@ describe("UserSettings tests", () => {
       const expectedSettings = {
         ...DEFAULT_USER_SETTINGS,
         isAnalyticsEnabled: false,
-        isMentionsNotificationsEnabled: false,
+        canShareArrivalStatus: false,
         version: DEFAULT_USER_SETTINGS.version + 1
       }
       setGetSettingsResponse(expectedSettings)
@@ -355,7 +369,7 @@ describe("UserSettings tests", () => {
       })
     })
 
-    let savedAPISettings = DEFAULT_USER_SETTINGS
+    let savedAPISettings = DEFAULT_USER_SETTINGS as UserSettings
 
     const USER_SETTINGS_ENDPOINT_PATH = TiFAPI.testPath("/user/self/settings")
 

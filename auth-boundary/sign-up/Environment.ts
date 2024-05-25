@@ -1,8 +1,9 @@
 import { Auth } from "@aws-amplify/auth"
-import { EmailAddress, Password, USPhoneNumber } from ".."
+import { Password } from ".."
 import { TiFAPI } from "TiFShared/api"
 import { isCognitoErrorWithCode } from "@auth-boundary/CognitoHelpers"
 import { UserHandle } from "TiFShared/domain-models/User"
+import { EmailAddress, USPhoneNumber } from "@user/privacy"
 
 export type CreateAccountResult =
   | "success"

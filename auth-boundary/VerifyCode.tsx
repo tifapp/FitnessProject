@@ -8,7 +8,7 @@ import { useMutation } from "@tanstack/react-query"
 import React, { useRef, useState } from "react"
 import { Alert, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
-import { PrivacyFormattable } from "./Models"
+import { PrivacyFormattable } from "@user/privacy"
 
 export type AuthResendVerificationCodeStatus = "success" | "error"
 

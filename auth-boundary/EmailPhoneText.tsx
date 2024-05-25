@@ -1,5 +1,4 @@
 import React, { useState } from "react"
-import { USPhoneNumber, EmailAddress } from "./Models"
 import {
   StyleProp,
   StyleSheet,
@@ -11,6 +10,7 @@ import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 import { AppStyles } from "@lib/AppColorStyle"
 import { extractNumbers } from "TiFShared/lib/String"
+import { EmailAddress, USPhoneNumber } from "@user/privacy"
 
 export type EmailPhoneTextType = "email" | "phone"
 

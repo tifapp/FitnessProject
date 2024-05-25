@@ -47,3 +47,21 @@ const isEqualSettingValue = (v1: SettingValue, v2: SettingValue): boolean => {
   }
   return v1 === v2
 }
+
+/**
+ * Returns a selector function that grabs the settings values for the
+ * specified keys.
+ */
+export const settingsSelector = <
+  Settings extends AnySettings,
+  Keys extends (keyof Settings)[]
+>(
+  ...keys: Keys
+) => {
+  return (settings: Settings): Pick<Settings, Keys[number]> => {
+    return keys.reduce((acc, key) => {
+      acc[key] = settings[key]
+      return acc
+    }, {} as Settings) as unknown as Pick<Settings, Keys[number]>
+  }
+}

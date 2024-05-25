@@ -32,11 +32,16 @@ export class TiFSQLite {
    */
   constructor(
     path: string,
+    migrate: (db: SQLExecutable) => Promise<void>,
     openSQLExecuatble: (
       path: string
     ) => Promise<ExpoSQLExecutable> = openExpoSQLExecutable
   ) {
-    this.sqlExecutablePromise = TiFSQLite.setup(path, openSQLExecuatble)
+    this.sqlExecutablePromise = TiFSQLite.setup(
+      path,
+      migrate,
+      openSQLExecuatble
+    )
   }
 
   /**
@@ -83,10 +88,11 @@ export class TiFSQLite {
 
   private static async setup(
     path: string,
+    migrate: (db: SQLExecutable) => Promise<void>,
     openSQLExecuatble: (path: string) => Promise<ExpoSQLExecutable>
   ) {
     const db = await TiFSQLite.openWithInMemoryFallback(path, openSQLExecuatble)
-    await TiFSQLite.migrateV1(db)
+    await migrate(db)
     return db
   }
 
@@ -107,88 +113,6 @@ export class TiFSQLite {
       )
       return await openSQLExecuatble(SQLITE_IN_MEMORY_PATH)
     }
-  }
-
-  private static async migrateV1(db: SQLExecutable) {
-    await Promise.all([
-      db.run`
-      CREATE TABLE IF NOT EXISTS LocationArrivals (
-        latitude DOUBLE,
-        longitude DOUBLE,
-        arrivalRadiusMeters DOUBLE,
-        hasArrived INT2 DEFAULT 0,
-        PRIMARY KEY(latitude, longitude, arrivalRadiusMeters)
-      )
-      `,
-      db.run`
-      CREATE TABLE IF NOT EXISTS UpcomingEventArrivals (
-        eventId BIGINT,
-        latitude DOUBLE,
-        longitude DOUBLE,
-        arrivalRadiusMeters DOUBLE,
-        PRIMARY KEY(eventId, latitude, longitude, arrivalRadiusMeters),
-        FOREIGN KEY(latitude, longitude, arrivalRadiusMeters)
-          REFERENCES LocationArrivals(latitude, longitude, arrivalRadiusMeters)
-          ON DELETE CASCADE
-      )
-      `,
-      db.run`
-      CREATE TABLE IF NOT EXISTS LocationPlacemarks (
-        latitude DOUBLE NOT NULL,
-        longitude DOUBLE NOT NULL,
-        name TEXT,
-        country TEXT,
-        postalCode TEXT,
-        street TEXT,
-        streetNumber TEXT,
-        region TEXT,
-        isoCountryCode TEXT,
-        city TEXT,
-        recentAnnotation TEXT,
-        recentUpdatedAt DOUBLE NOT NULL DEFAULT (unixepoch('now', 'subsec')),
-        CHECK(
-          recentAnnotation IN (
-            'attended-event',
-            'hosted-event',
-            'joined-event'
-          )
-        ),
-        PRIMARY KEY(latitude, longitude)
-      )
-      `,
-      db.run`
-      CREATE TABLE IF NOT EXISTS Logs (
-        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-        label TEXT NOT NULL,
-        message TEXT NOT NULL,
-        level TEXT NOT NULL CHECK(level IN ('debug', 'info', 'warn', 'error')),
-        stringifiedMetadata TEXT,
-        timestamp DOUBLE NOT NULL DEFAULT (unixepoch('now', 'subsec'))
-      )
-      `,
-      db.run`
-      CREATE TABLE IF NOT EXISTS LocalSettings (
-        id TEXT NOT NULL PRIMARY KEY DEFAULT 'A' CHECK (id = 'A'),
-        isHapticFeedbackEnabled INT2 NOT NULL,
-        isHapticAudioEnabled INT2 NOT NULL,
-        hasCompletedOnboarding INT2 NOT NULL,
-        lastEventArrivalsRefreshTime DOUBLE
-      )
-      `,
-      db.run`
-      CREATE TABLE IF NOT EXISTS UserSettings (
-        id TEXT NOT NULL PRIMARY KEY DEFAULT 'A' CHECK (id = 'A'),
-        isAnalyticsEnabled INT2 NOT NULL,
-        isCrashReportingEnabled INT2 NOT NULL,
-        isEventNotificationsEnabled INT2 NOT NULL,
-        isMentionsNotificationsEnabled INT2 NOT NULL,
-        isChatNotificationsEnabled INT2 NOT NULL,
-        isFriendRequestNotificationsEnabled INT2 NOT NULL,
-        canShareArrivalStatus INT2 NOT NULL,
-        version INTEGER NOT NULL DEFAULT 0
-      )
-      `
-    ])
   }
 }
 
@@ -282,5 +206,94 @@ export class ExpoSQLExecutable implements SQLExecutable {
         return arg === undefined ? null : arg
       })
     }
+  }
+}
+
+export namespace Migrations {
+  export const main = async (db: SQLExecutable) => {
+    await Promise.all([
+      db.run`
+      CREATE TABLE IF NOT EXISTS LocationArrivals (
+        latitude DOUBLE,
+        longitude DOUBLE,
+        arrivalRadiusMeters DOUBLE,
+        hasArrived INT2 DEFAULT 0,
+        PRIMARY KEY(latitude, longitude, arrivalRadiusMeters)
+      )
+      `,
+      db.run`
+      CREATE TABLE IF NOT EXISTS UpcomingEventArrivals (
+        eventId BIGINT,
+        latitude DOUBLE,
+        longitude DOUBLE,
+        arrivalRadiusMeters DOUBLE,
+        PRIMARY KEY(eventId, latitude, longitude, arrivalRadiusMeters),
+        FOREIGN KEY(latitude, longitude, arrivalRadiusMeters)
+          REFERENCES LocationArrivals(latitude, longitude, arrivalRadiusMeters)
+          ON DELETE CASCADE
+      )
+      `,
+      db.run`
+      CREATE TABLE IF NOT EXISTS LocationPlacemarks (
+        latitude DOUBLE NOT NULL,
+        longitude DOUBLE NOT NULL,
+        name TEXT,
+        country TEXT,
+        postalCode TEXT,
+        street TEXT,
+        streetNumber TEXT,
+        region TEXT,
+        isoCountryCode TEXT,
+        city TEXT,
+        recentAnnotation TEXT,
+        recentUpdatedAt DOUBLE NOT NULL DEFAULT (unixepoch('now', 'subsec')),
+        CHECK(
+          recentAnnotation IN (
+            'attended-event',
+            'hosted-event',
+            'joined-event'
+          )
+        ),
+        PRIMARY KEY(latitude, longitude)
+      )
+      `,
+      db.run`
+      CREATE TABLE IF NOT EXISTS LocalSettings (
+        id TEXT NOT NULL PRIMARY KEY DEFAULT 'A' CHECK (id = 'A'),
+        isHapticFeedbackEnabled INT2 NOT NULL,
+        isHapticAudioEnabled INT2 NOT NULL,
+        hasCompletedOnboarding INT2 NOT NULL,
+        lastEventArrivalsRefreshDate DOUBLE,
+        userInterfaceStyle TEXT NOT NULL,
+        preferredFontFamily TEXT NOT NULL,
+        preferredBrowserName TEXT NOT NULL,
+        isUsingSafariReaderMode INT2 NOT NULL
+      )
+      `,
+      db.run`
+      CREATE TABLE IF NOT EXISTS UserSettings (
+        id TEXT NOT NULL PRIMARY KEY DEFAULT 'A' CHECK (id = 'A'),
+        isAnalyticsEnabled INT2 NOT NULL,
+        isCrashReportingEnabled INT2 NOT NULL,
+        canShareArrivalStatus INT2 NOT NULL,
+        pushNotificationTriggerIds TEXT NOT NULL,
+        eventCalendarStartOfWeekDay TEXT NOT NULL,
+        eventCalendarDefaultLayout TEXT NOT NULL,
+        version INTEGER NOT NULL DEFAULT 0
+      )
+      `
+    ])
+  }
+  export const logs = async (db: SQLExecutable) => {
+    await db.run`
+    CREATE TABLE IF NOT EXISTS Logs (
+      id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+      label TEXT NOT NULL,
+      message TEXT NOT NULL,
+      level TEXT NOT NULL CHECK(level IN ('debug', 'info', 'warn', 'error', 'trace')),
+      stringifiedMetadata TEXT,
+      timestamp DOUBLE NOT NULL DEFAULT (unixepoch('now', 'subsec'))
+    )
+    `
   }
 }

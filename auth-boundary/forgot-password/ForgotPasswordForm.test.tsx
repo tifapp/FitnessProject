@@ -2,8 +2,8 @@ import { captureAlerts } from "@test-helpers/Alerts"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { fakeTimers } from "@test-helpers/Timers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
-import { USPhoneNumber } from ".."
 import { useForgotPasswordForm } from "./ForgotPasswordForm"
+import { USPhoneNumber } from "@user/privacy"
 
 describe("ForgotPasswordForm tests", () => {
   beforeEach(() => jest.resetAllMocks())

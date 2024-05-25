@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext } from "react"
 import { LocalSettings } from "./LocalSettings"
 import { AnySettings, SettingsStore, areSettingsEqual } from "./Settings"
-import { UserSettings } from "TiFShared/domain-models/User"
+import { UserSettings } from "TiFShared/domain-models/Settings"
 import { useSyncExternalStoreWithSelector } from "use-sync-external-store/with-selector"
 
 const SettingsContext = createContext<

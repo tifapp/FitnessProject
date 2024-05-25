@@ -3,10 +3,11 @@ import { TestCognitoError } from "@auth-boundary/CognitoHelpers"
 import { uuidString } from "@lib/utils/UUID"
 import { mswServer } from "@test-helpers/msw"
 import { HttpResponse, http } from "msw"
-import { EmailAddress, Password, USPhoneNumber } from ".."
+import { Password } from ".."
 import { createSignUpEnvironment } from "./Environment"
 import { UserHandle } from "TiFShared/domain-models/User"
 import { TiFAPI } from "TiFShared/api"
+import { EmailAddress, USPhoneNumber } from "@user/privacy"
 
 const AUTOCOMPLETE_USERS_PATH = TiFAPI.testPath("/user/autocomplete")
 

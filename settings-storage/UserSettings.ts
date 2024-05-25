@@ -1,7 +1,9 @@
 import {
   DEFAULT_USER_SETTINGS,
+  PushNotificationTriggerID,
+  PushNotificationTriggerIDSchema,
   UserSettings
-} from "TiFShared/domain-models/User"
+} from "TiFShared/domain-models/Settings"
 import { PersistentSettingsStore, SettingsStorage } from "./PersistentStore"
 import { SQLExecutable, TiFSQLite } from "@lib/SQLite"
 import { mergeWithPartial } from "TiFShared/lib/Object"
@@ -10,17 +12,19 @@ import { TiFAPI } from "TiFShared/api"
 import { UpdateUserSettingsRequest } from "TiFShared/api/models/User"
 import { logger } from "TiFShared/logging"
 import { QueryClient, MutationObserver } from "@tanstack/react-query"
+import { z } from "zod"
+import { PersistentSettingsStores } from "./PersistentStores"
 
 const STORAGE_TAG = "sqlite.user.settings"
 
 type SQLiteUserSettings = {
+  id: string
   isAnalyticsEnabled: number
   isCrashReportingEnabled: number
-  isEventNotificationsEnabled: number
-  isMentionsNotificationsEnabled: number
-  isChatNotificationsEnabled: number
-  isFriendRequestNotificationsEnabled: number
   canShareArrivalStatus: number
+  pushNotificationTriggerIds: string
+  eventCalendarStartOfWeekDay: string
+  eventCalendarDefaultLayout: string
   version: number
 }
 
@@ -48,20 +52,18 @@ export class SQLiteUserSettingsStorage
       INSERT OR REPLACE INTO UserSettings (
         isAnalyticsEnabled,
         isCrashReportingEnabled,
-        isEventNotificationsEnabled,
-        isMentionsNotificationsEnabled,
-        isChatNotificationsEnabled,
-        isFriendRequestNotificationsEnabled,
         canShareArrivalStatus,
+        pushNotificationTriggerIds,
+        eventCalendarStartOfWeekDay,
+        eventCalendarDefaultLayout,
         version
       ) VALUES (
         ${newSettings.isAnalyticsEnabled},
         ${newSettings.isCrashReportingEnabled},
-        ${newSettings.isEventNotificationsEnabled},
-        ${newSettings.isMentionsNotificationsEnabled},
-        ${newSettings.isChatNotificationsEnabled},
-        ${newSettings.isFriendRequestNotificationsEnabled},
         ${newSettings.canShareArrivalStatus},
+        ${serializeTriggerIds(newSettings.pushNotificationTriggerIds)},
+        ${newSettings.eventCalendarStartOfWeekDay},
+        ${newSettings.eventCalendarDefaultLayout},
         ${newSettings.version}
       )
       `
@@ -69,25 +71,31 @@ export class SQLiteUserSettingsStorage
   }
 
   private async _load(db: SQLExecutable): Promise<UserSettings> {
-    const sqliteSettings = await db.queryFirst<SQLiteUserSettings>`
+    const dbSettings = await db.queryFirst<SQLiteUserSettings>`
       SELECT * FROM UserSettings LIMIT 1
       `
-    if (!sqliteSettings) return { ...DEFAULT_USER_SETTINGS }
+    if (!dbSettings) return { ...DEFAULT_USER_SETTINGS }
+    const { id: _, ...sqliteSettings } = dbSettings
     return {
+      ...(sqliteSettings as unknown as UserSettings),
       isAnalyticsEnabled: sqliteSettings.isAnalyticsEnabled === 1,
       isCrashReportingEnabled: sqliteSettings.isCrashReportingEnabled === 1,
-      isEventNotificationsEnabled:
-        sqliteSettings.isEventNotificationsEnabled === 1,
-      isMentionsNotificationsEnabled:
-        sqliteSettings.isMentionsNotificationsEnabled === 1,
-      isChatNotificationsEnabled:
-        sqliteSettings.isChatNotificationsEnabled === 1,
-      isFriendRequestNotificationsEnabled:
-        sqliteSettings.isFriendRequestNotificationsEnabled === 1,
       canShareArrivalStatus: sqliteSettings.canShareArrivalStatus === 1,
-      version: sqliteSettings.version
+      pushNotificationTriggerIds: deserializeTriggerIds(
+        sqliteSettings.pushNotificationTriggerIds
+      )
     }
   }
+}
+
+const serializeTriggerIds = (triggers: PushNotificationTriggerID[]) => {
+  return triggers.join(",")
+}
+
+const deserializeTriggerIds = (serializedIds: string) => {
+  return z
+    .array(PushNotificationTriggerIDSchema)
+    .parse(serializedIds.split(","))
 }
 
 const log = logger("user.settings.synchronizing.store")
@@ -246,14 +254,8 @@ export const userSettingsStore = (
   apiSaveRetryCount = 3
 ) => {
   return new UserSettingsSynchronizingStore(
-    userSettingsPersistentStore(storage),
+    PersistentSettingsStores.user(storage),
     addAPIUserSettingsExponentialBackoff(api, queryClient, apiSaveRetryCount),
     debounceMillis
   )
-}
-
-export const userSettingsPersistentStore = (
-  storage: SettingsStorage<UserSettings>
-) => {
-  return new PersistentSettingsStore(DEFAULT_USER_SETTINGS, storage)
 }
