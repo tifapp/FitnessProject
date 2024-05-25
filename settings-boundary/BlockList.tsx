@@ -11,7 +11,7 @@ import {
   BlockListUser,
   removeUsersFromBlockListPages
 } from "TiFShared/domain-models/BlockList"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useMemo, useState } from "react"
 import {
   StyleProp,
   Pressable,
@@ -35,24 +35,22 @@ import { TextToastView } from "@components/common/Toasts"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
 import { Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
-import { useFocusEffect } from "@react-navigation/native"
-import { useEffectEvent } from "@lib/utils/UseEffectEvent"
-import { useDismissal } from "@lib/utils/UseDismissal"
-
-export type BlockListUnblockSuccessBannerID = "single-user" | "multiple-users"
 
 export type UseBlockListSettingsEnvironment = {
   nextPage: (token: string | null) => Promise<BlockListPage>
-  unblockUsers: (ids: UserID[]) => Promise<void>
-  unblockDebounceMillis: number
+  unblockUser: (id: UserID) => Promise<void>
 }
 
 export const BLOCK_LIST_SETTINGS_ALERTS = {
+  unblockUserConfirmation: {
+    title: (username: string) => `Unblock ${username}?`,
+    description: (user: Pick<BlockListUser, "username" | "handle">) => {
+      return `Do you really want to unblock ${user.username} (${user.handle}). You won't be able to block them for another 48 hours.`
+    }
+  },
   unblockUserFailed: {
     title: "Uh Oh!",
-    description: (userCount: number) => {
-      return `Unable to unblock ${userCount > 1 ? "users" : "user"}. Please try again later.`
-    }
+    description: "Unable to unblock user. Please try again later."
   }
 }
 
@@ -106,53 +104,65 @@ const updateBlockListQueryUserPages = (
 }
 
 const useBlocklistSettingsUnblocking = ({
-  unblockUsers,
-  unblockDebounceMillis
-}: Pick<
-  UseBlockListSettingsEnvironment,
-  "unblockUsers" | "unblockDebounceMillis"
->) => {
+  unblockUser
+}: Pick<UseBlockListSettingsEnvironment, "unblockUser">) => {
   const [activeUnblockingIds, setActiveUnblockingIds] = useState<UserID[]>([])
+  const [mostRecentUnblockedUser, setMostRecentUnblockedUser] = useState<
+    BlockListUser | undefined
+  >()
+  const [isShowingErrorAlert, setIsShowingErrorAlert] = useState(false)
   const queryClient = useQueryClient()
-  const unblockTimeoutRef = useRef<NodeJS.Timeout>()
-  const unblockMutation = useMutation(unblockUsers, {
-    onSuccess: (_, userIds) => {
-      updateBlockListQueryUserPages(queryClient, (pages) => {
-        return removeUsersFromBlockListPages(pages, userIds)
-      })
-    },
-    onError: (_, userIds) => {
-      Alert.alert(
-        BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.title,
-        BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.description(userIds.length)
-      )
-    },
-    onSettled: (_, __, ids) => {
-      setActiveUnblockingIds((activeIds) => {
-        return activeIds.filter((id) => !ids.includes(id))
-      })
+  const unblockMutation = useMutation(
+    async (user: BlockListUser) => await unblockUser(user.id),
+    {
+      onSuccess: (_, user) => {
+        setMostRecentUnblockedUser(user)
+        updateBlockListQueryUserPages(queryClient, (pages) => {
+          return removeUsersFromBlockListPages(pages, [user.id])
+        })
+      },
+      onError: () => {
+        if (isShowingErrorAlert) return
+        setIsShowingErrorAlert(true)
+        Alert.alert(
+          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.title,
+          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.description,
+          [{ text: "Ok", onPress: () => setIsShowingErrorAlert(false) }]
+        )
+      },
+      onSettled: (_, __, user) => {
+        setActiveUnblockingIds((activeIds) => {
+          return activeIds.filter((id) => id !== user.id)
+        })
+      }
     }
-  })
-  useDismissal(() => {
-    if (activeUnblockingIds.length <= 0) return
-    clearTimeout(unblockTimeoutRef.current)
-    unblockMutation.mutate(activeUnblockingIds)
-  })
+  )
   return {
     activeUnblockingIds,
-    get unblockSuccessBannerId(): BlockListUnblockSuccessBannerID | undefined {
-      if (!unblockMutation.isSuccess) return undefined
-      return (unblockMutation.variables?.length ?? 0) > 1
-        ? "multiple-users"
-        : "single-user"
-    },
-    userUnblocked: (id: UserID) => {
-      clearTimeout(unblockTimeoutRef.current)
-      const newIds = [...activeUnblockingIds, id]
-      setActiveUnblockingIds(newIds)
-      unblockTimeoutRef.current = setTimeout(
-        () => unblockMutation.mutate(newIds),
-        unblockDebounceMillis
+    mostRecentUnblockedUser,
+    userUnblocked: (user: BlockListUser) => {
+      setMostRecentUnblockedUser(undefined)
+      setActiveUnblockingIds((ids) => [...ids, user.id])
+      Alert.alert(
+        BLOCK_LIST_SETTINGS_ALERTS.unblockUserConfirmation.title(user.username),
+        BLOCK_LIST_SETTINGS_ALERTS.unblockUserConfirmation.description(user),
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+            onPress: () => {
+              setActiveUnblockingIds((ids) => {
+                return ids.filter((id) => id !== user.id)
+              })
+            }
+          },
+          {
+            text: "Confirm",
+            onPress: () => {
+              unblockMutation.mutate(user)
+            }
+          }
+        ]
       )
     }
   }
@@ -234,12 +244,8 @@ export const BlockListSettingsView = ({
       style={[style, styles.list]}
     />
     <TextToastView
-      isVisible={state.unblockSuccessBannerId === "single-user"}
-      text="Successfully Unblocked User!"
-    />
-    <TextToastView
-      isVisible={state.unblockSuccessBannerId === "multiple-users"}
-      text="Successfully Unblocked Users!"
+      isVisible={!!state.mostRecentUnblockedUser}
+      text={`Unblocked ${state.mostRecentUnblockedUser?.username}!`}
     />
   </>
 )
@@ -248,7 +254,7 @@ type BlockListUserProps = {
   user: BlockListUser
   isActivelyBeingBlocked: boolean
   onProfileTapped: (id: UserID) => void
-  onUnblockTapped: (id: UserID) => void
+  onUnblockTapped: (user: BlockListUser) => void
 }
 
 const BlockListUserView = ({
@@ -275,7 +281,7 @@ const BlockListUserView = ({
         </View>
         <TouchableOpacity
           activeOpacity={0.5}
-          onPress={() => onUnblockTapped(user.id)}
+          onPress={() => onUnblockTapped(user)}
           disabled={isActivelyBeingBlocked}
           hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
           style={{ opacity: isActivelyBeingBlocked ? 0.5 : 1 }}

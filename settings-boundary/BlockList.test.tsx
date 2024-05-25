@@ -2,21 +2,26 @@ import { repeatElements } from "TiFShared/lib/Array"
 import { mockBlockListPage } from "./MockData"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { BLOCK_LIST_SETTINGS_ALERTS, useBlockListSettings } from "./BlockList"
-import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import {
+  TestQueryClientProvider,
+  createTestQueryClient
+} from "@test-helpers/ReactQuery"
 import { fakeTimers } from "@test-helpers/Timers"
 import { neverPromise } from "@test-helpers/Promise"
-import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { captureAlerts } from "@test-helpers/Alerts"
 import { BlockListPage } from "TiFShared/domain-models/BlockList"
-import { NavigationContainer } from "@react-navigation/native"
+import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 
 describe("BlockListSettings tests", () => {
   describe("UseBlockListSettings tests", () => {
     const nextPage = jest.fn()
-    const unblockUsers = jest.fn()
-    const TEST_UNBLOCK_DEBOUNCE_TIME = 1000
+    const unblockUser = jest.fn()
+    const queryClient = createTestQueryClient()
     fakeTimers()
-    beforeEach(() => jest.resetAllMocks())
+    beforeEach(() => {
+      jest.resetAllMocks()
+      queryClient.resetQueries()
+    })
 
     it("should have an empty array when loading the first page of users", async () => {
       const { result } = renderUseBlockListSettings()
@@ -89,54 +94,56 @@ describe("BlockListSettings tests", () => {
       const page = mockBlockListPage(1)
       const { result } = await renderUseBlockListSettingsWithInitialPage(page)
       expect(result.current.activeUnblockingIds).toEqual([])
-      act(() => result.current.userUnblocked(page.users[0].id))
+      act(() => result.current.userUnblocked(page.users[0]))
       expect(result.current.activeUnblockingIds).toEqual([page.users[0].id])
     })
 
     it("should add multiple user ids to the active unblocking ids when unblocking mutliple users", async () => {
       const page = mockBlockListPage(2)
       const { result } = await renderUseBlockListSettingsWithInitialPage(page)
-      act(() => result.current.userUnblocked(page.users[0].id))
-      act(() => result.current.userUnblocked(page.users[1].id))
+      act(() => result.current.userUnblocked(page.users[0]))
+      act(() => result.current.userUnblocked(page.users[1]))
       expect(result.current.activeUnblockingIds).toEqual([
         page.users[0].id,
         page.users[1].id
       ])
     })
 
-    it("should attempt to unblock a user after a small debounce time", async () => {
+    it("should remove the user id from the active unblocked ids when canceling the block confirmation alert", async () => {
+      unblockUser.mockImplementation(neverPromise)
       const page = mockBlockListPage(2)
       const { result } = await renderUseBlockListSettingsWithInitialPage(page)
-      act(() => result.current.userUnblocked(page.users[0].id))
-      act(() => jest.advanceTimersByTime(TEST_UNBLOCK_DEBOUNCE_TIME / 2))
-      await verifyNeverOccurs(() => expect(unblockUsers).toHaveBeenCalled())
-      act(() => jest.advanceTimersByTime(TEST_UNBLOCK_DEBOUNCE_TIME / 2))
-      await waitFor(() => {
-        expect(unblockUsers).toHaveBeenCalledWith([page.users[0].id])
-      })
+      act(() => result.current.userUnblocked(page.users[0]))
+      await confirmUnblockUser()
+      act(() => result.current.userUnblocked(page.users[1]))
+      await cancelBlockConfirmation()
+      expect(result.current.activeUnblockingIds).toEqual([page.users[0].id])
     })
 
-    it("should reset debounce time when trying to block multiple users at once", async () => {
+    it("should attempt to unblock a user after a confirmation alert", async () => {
       const page = mockBlockListPage(2)
       const { result } = await renderUseBlockListSettingsWithInitialPage(page)
-      act(() => result.current.userUnblocked(page.users[0].id))
-      act(() => jest.advanceTimersByTime(TEST_UNBLOCK_DEBOUNCE_TIME / 2))
-      act(() => result.current.userUnblocked(page.users[1].id))
-      await verifyNeverOccurs(() => expect(unblockUsers).toHaveBeenCalled())
-      act(() => jest.advanceTimersByTime(TEST_UNBLOCK_DEBOUNCE_TIME / 2))
+      act(() => result.current.userUnblocked(page.users[0]))
+      expect(alertPresentationSpy).toHaveBeenCalledWith(
+        BLOCK_LIST_SETTINGS_ALERTS.unblockUserConfirmation.title(
+          page.users[0].username
+        ),
+        BLOCK_LIST_SETTINGS_ALERTS.unblockUserConfirmation.description(
+          page.users[0]
+        ),
+        expect.any(Array)
+      )
+      await confirmUnblockUser()
       await waitFor(() => {
-        expect(unblockUsers).toHaveBeenCalledWith([
-          page.users[0].id,
-          page.users[1].id
-        ])
+        expect(unblockUser).toHaveBeenCalledWith(page.users[0].id)
       })
     })
 
     it("should reset the active unblocking ids when unblock finishes", async () => {
       const page = mockBlockListPage(2)
       const { result } = await renderUseBlockListSettingsWithInitialPage(page)
-      act(() => result.current.userUnblocked(page.users[0].id))
-      act(() => jest.advanceTimersByTime(TEST_UNBLOCK_DEBOUNCE_TIME))
+      act(() => result.current.userUnblocked(page.users[0]))
+      await confirmUnblockUser()
       await waitFor(() => {
         expect(result.current.activeUnblockingIds).toEqual([])
       })
@@ -144,55 +151,83 @@ describe("BlockListSettings tests", () => {
 
     it("should only reset the active unblocking ids in a particular unblock when the unblock finishes", async () => {
       const page = mockBlockListPage(3)
-      unblockUsers
+      unblockUser
         .mockReturnValueOnce(Promise.resolve())
         .mockImplementationOnce(neverPromise)
       const { result } = await renderUseBlockListSettingsWithInitialPage(page)
-      act(() => result.current.userUnblocked(page.users[0].id))
-      act(() => jest.advanceTimersByTime(TEST_UNBLOCK_DEBOUNCE_TIME))
-      act(() => result.current.userUnblocked(page.users[1].id))
-      act(() => jest.advanceTimersByTime(TEST_UNBLOCK_DEBOUNCE_TIME))
+      act(() => result.current.userUnblocked(page.users[0]))
+      await confirmUnblockUser()
+      act(() => result.current.userUnblocked(page.users[1]))
+      await confirmUnblockUser()
       await waitFor(() => {
         expect(result.current.activeUnblockingIds).toEqual([page.users[1].id])
       })
     })
 
     it("should remove users from the block list after they have been unblocked successfully", async () => {
-      const page = mockBlockListPage(3)
+      const page = mockBlockListPage(2)
       const { result } = await renderUseBlockListSettingsWithInitialPage(page)
-      act(() => result.current.userUnblocked(page.users[1].id))
-      act(() => result.current.userUnblocked(page.users[2].id))
-      act(() => jest.advanceTimersByTime(TEST_UNBLOCK_DEBOUNCE_TIME))
+      act(() => result.current.userUnblocked(page.users[1]))
+      await confirmUnblockUser()
       await waitFor(() => {
         expect(result.current.users).toEqual([page.users[0]])
       })
     })
 
-    it("should display the singular unblock failure error alert when unblocking 1 user fails", async () => {
-      unblockUsers.mockRejectedValueOnce(new Error())
+    it("should display the unblock failure error alert when unblocking user fails", async () => {
+      unblockUser.mockRejectedValueOnce(new Error())
       const page = mockBlockListPage(3)
       const { result } = await renderUseBlockListSettingsWithInitialPage(page)
-      act(() => result.current.userUnblocked(page.users[1].id))
-      act(() => jest.advanceTimersByTime(TEST_UNBLOCK_DEBOUNCE_TIME))
+      act(() => result.current.userUnblocked(page.users[1]))
+      await confirmUnblockUser()
       await waitFor(() => {
         expect(alertPresentationSpy).toHaveBeenCalledWith(
           BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.title,
-          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.description(1)
+          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.description,
+          expect.any(Array)
         )
       })
     })
 
-    it("should display the plural unblock failure error alert when unblocking multiple users fails", async () => {
-      unblockUsers.mockRejectedValueOnce(new Error())
+    it("should not spam the user with unblock failed alerts when multiple users fail to be unblocked", async () => {
+      unblockUser
+        .mockRejectedValueOnce(new Error())
+        .mockRejectedValueOnce(new Error())
       const page = mockBlockListPage(3)
       const { result } = await renderUseBlockListSettingsWithInitialPage(page)
-      act(() => result.current.userUnblocked(page.users[0].id))
-      act(() => result.current.userUnblocked(page.users[1].id))
-      act(() => jest.advanceTimersByTime(TEST_UNBLOCK_DEBOUNCE_TIME))
-      await waitFor(() => {
-        expect(alertPresentationSpy).toHaveBeenCalledWith(
+      act(() => result.current.userUnblocked(page.users[1]))
+      await confirmUnblockUser()
+      act(() => result.current.userUnblocked(page.users[2]))
+      await confirmUnblockUser()
+      await verifyNeverOccurs(() => {
+        expect(alertPresentationSpy).toHaveBeenNthCalledWith(
+          4,
           BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.title,
-          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.description(2)
+          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.description,
+          expect.any(Array)
+        )
+      })
+      expect(alertPresentationSpy).toHaveBeenCalledTimes(3)
+    })
+
+    it("should reallow unblock error alerts to be presented when the user dismisses the prior error alert", async () => {
+      unblockUser
+        .mockRejectedValueOnce(new Error())
+        .mockRejectedValueOnce(new Error())
+      const page = mockBlockListPage(3)
+      const { result } = await renderUseBlockListSettingsWithInitialPage(page)
+      act(() => result.current.userUnblocked(page.users[1]))
+      await confirmUnblockUser()
+      await waitFor(() => expect(alertPresentationSpy).toHaveBeenCalledTimes(2))
+      await dismissUnblockErrorAlert()
+      act(() => result.current.userUnblocked(page.users[2]))
+      await confirmUnblockUser()
+      await waitFor(() => {
+        expect(alertPresentationSpy).toHaveBeenNthCalledWith(
+          4,
+          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.title,
+          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.description,
+          expect.any(Array)
         )
       })
     })
@@ -200,59 +235,27 @@ describe("BlockListSettings tests", () => {
     it("should show unblock single user success banner after successful unblock", async () => {
       const page = mockBlockListPage(3)
       const { result } = await renderUseBlockListSettingsWithInitialPage(page)
-      act(() => result.current.userUnblocked(page.users[0].id))
-      expect(result.current.unblockSuccessBannerId).toBeUndefined()
-      act(() => jest.advanceTimersByTime(TEST_UNBLOCK_DEBOUNCE_TIME))
+      act(() => result.current.userUnblocked(page.users[0]))
+      expect(result.current.mostRecentUnblockedUser).toBeUndefined()
+      await confirmUnblockUser()
       await waitFor(() => {
-        expect(result.current.unblockSuccessBannerId).toEqual("single-user")
+        expect(result.current.mostRecentUnblockedUser).toEqual(page.users[0])
       })
     })
 
-    it("should show unblock multiple users success banner after successful unblock", async () => {
-      const page = mockBlockListPage(3)
-      const { result } = await renderUseBlockListSettingsWithInitialPage(page)
-      act(() => result.current.userUnblocked(page.users[0].id))
-      act(() => result.current.userUnblocked(page.users[1].id))
-      expect(result.current.unblockSuccessBannerId).toBeUndefined()
-      act(() => jest.advanceTimersByTime(TEST_UNBLOCK_DEBOUNCE_TIME))
-      await waitFor(() => {
-        expect(result.current.unblockSuccessBannerId).toEqual("multiple-users")
-      })
-    })
+    const { alertPresentationSpy, tapAlertButton } = captureAlerts()
 
-    it("should unblock user without waiting when disappearing", async () => {
-      const page = mockBlockListPage(3)
-      const { result, unmount } =
-        await renderUseBlockListSettingsWithInitialPage(page)
-      act(() => result.current.userUnblocked(page.users[0].id))
-      act(() => unmount())
-      await waitFor(() => {
-        expect(unblockUsers).toHaveBeenCalledWith([page.users[0].id])
-      })
-    })
+    const confirmUnblockUser = async () => {
+      await tapAlertButton("Confirm")
+    }
 
-    it("should not invoke unblocking when disappearing if no users are to be unblocked", async () => {
-      const { unmount } =
-        await renderUseBlockListSettingsWithInitialPage(mockBlockListPage())
-      act(() => unmount())
-      await verifyNeverOccurs(() => {
-        expect(unblockUsers).toHaveBeenCalled()
-      })
-    })
+    const cancelBlockConfirmation = async () => {
+      await tapAlertButton("Cancel")
+    }
 
-    it("should cancel debounced updates after disappearing", async () => {
-      const page = mockBlockListPage(3)
-      const { result, unmount } =
-        await renderUseBlockListSettingsWithInitialPage(page)
-      act(() => result.current.userUnblocked(page.users[0].id))
-      act(() => unmount())
-      act(() => jest.advanceTimersByTime(TEST_UNBLOCK_DEBOUNCE_TIME))
-      await verifyNeverOccurs(() => {
-        expect(unblockUsers).toHaveBeenNthCalledWith(2, [page.users[0].id])
-      })
-    })
-
-    const { alertPresentationSpy } = captureAlerts()
+    const dismissUnblockErrorAlert = async () => {
+      await tapAlertButton("Ok")
+    }
 
     const renderUseBlockListSettingsWithInitialPage = async (
       page: BlockListPage
@@ -266,19 +269,13 @@ describe("BlockListSettings tests", () => {
     }
 
     const renderUseBlockListSettings = () => {
-      return renderHook(
-        () =>
-          useBlockListSettings({
-            nextPage,
-            unblockUsers,
-            unblockDebounceMillis: TEST_UNBLOCK_DEBOUNCE_TIME
-          }),
-        {
-          wrapper: ({ children }: any) => (
-            <TestQueryClientProvider>{children}</TestQueryClientProvider>
-          )
-        }
-      )
+      return renderHook(() => useBlockListSettings({ nextPage, unblockUser }), {
+        wrapper: ({ children }: any) => (
+          <TestQueryClientProvider client={queryClient}>
+            {children}
+          </TestQueryClientProvider>
+        )
+      })
     }
   })
 })

@@ -65,7 +65,8 @@ const styles = StyleSheet.create({
     backgroundColor: AppStyles.darkColor
   },
   text: {
-    color: "white"
+    color: "white",
+    flex: 1
   },
   containerStyle: {
     display: "flex",
