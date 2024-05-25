@@ -1,14 +1,16 @@
 import { z } from "zod"
-import { PrivacyFormattable } from "./PrivacyFormattable"
+import { ContactInfoFormattable } from "./Formattable"
 
 const RawStringEmailAddressSchema = z.string().email()
 
 /**
  * A data type representing a valid email address.
  */
-export class EmailAddress implements PrivacyFormattable {
+export class EmailAddress implements ContactInfoFormattable {
   static peacock69 = EmailAddress.parse("peacock69@gmail.com")!
 
+  readonly formattedContactInfoType = "Email"
+  readonly contactInfoTypeIconName = "mail"
   private readonly rawValue: string
 
   private constructor(rawValue: string) {
@@ -25,6 +27,10 @@ export class EmailAddress implements PrivacyFormattable {
       this.rawValue.indexOf("@") - 1
     )
     return `${this.rawValue[0]}***${privacySuffix}`
+  }
+
+  get prettyFormatted() {
+    return this.rawValue
   }
 
   toString() {

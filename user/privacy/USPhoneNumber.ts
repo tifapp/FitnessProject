@@ -1,4 +1,4 @@
-import { PrivacyFormattable } from "./PrivacyFormattable"
+import { ContactInfoFormattable } from "./Formattable"
 import { extractNumbers } from "TiFShared/lib/String"
 
 /**
@@ -6,7 +6,9 @@ import { extractNumbers } from "TiFShared/lib/String"
  *
  * In this case, the phone number is a precise 10 digit string.
  */
-export class USPhoneNumber implements PrivacyFormattable {
+export class USPhoneNumber implements ContactInfoFormattable {
+  readonly formattedContactInfoType = "Phone Number"
+  readonly contactInfoTypeIconName = "call"
   private readonly rawValue: string
 
   private constructor(rawValue: string) {
@@ -25,6 +27,18 @@ export class USPhoneNumber implements PrivacyFormattable {
    */
   get formattedForPrivacy() {
     return `(***) ***-${this.rawValue.substring(6)}`
+  }
+
+  /**
+   * Pretty formats this phone number.
+   *
+   * `1234567890 -> +1 (123) 456-7890`
+   */
+  get prettyFormatted() {
+    const areaCode = this.rawValue.substring(0, 3)
+    const prefix = this.rawValue.substring(3, 6)
+    const lineNumber = this.rawValue.substring(6)
+    return `+1 (${areaCode}) ${prefix}-${lineNumber}`
   }
 
   /**

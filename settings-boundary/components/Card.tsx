@@ -1,4 +1,3 @@
-import { DividerView } from "@components/Divider"
 import { AppStyles } from "@lib/AppColorStyle"
 import { StyleProp, ViewStyle, View, StyleSheet } from "react-native"
 

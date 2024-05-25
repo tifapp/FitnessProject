@@ -1,3 +1,3 @@
-export * from "./PrivacyFormattable"
+export * from "./Formattable"
 export * from "./EmailAddress"
 export * from "./USPhoneNumber"

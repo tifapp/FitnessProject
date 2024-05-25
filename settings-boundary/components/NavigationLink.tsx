@@ -1,20 +1,15 @@
 import { Ionicon, IoniconName } from "@components/common/Icons"
-import { AppStyles } from "@lib/AppColorStyle"
 import { ColorString } from "TiFShared/domain-models/ColorString"
-import {
-  StyleProp,
-  ViewStyle,
-  StyleSheet,
-  TouchableHighlight
-} from "react-native"
+import { StyleProp, ViewStyle, StyleSheet } from "react-native"
 import { SettingsNamedIconRowView } from "./NamedIconRow"
-import { useCurrentSettingsSection } from "./Section"
+import { SettingsButton } from "./Button"
 
 export type SettingsNavigationLinkProps = {
   title: string
   iconName: IoniconName
   iconBackgroundColor: ColorString
   onTapped: () => void
+  isDisabled?: boolean
   style?: StyleProp<ViewStyle>
 }
 
@@ -23,22 +18,18 @@ export const SettingsNavigationLinkView = ({
   iconName,
   iconBackgroundColor,
   onTapped,
+  isDisabled,
   style
 }: SettingsNavigationLinkProps) => (
-  <TouchableHighlight
-    underlayColor={AppStyles.colorOpacity15}
-    onPress={!useCurrentSettingsSection().isDisabled ? onTapped : undefined}
-    style={style}
-  >
+  <SettingsButton onTapped={onTapped} isDisabled={isDisabled} style={style}>
     <SettingsNamedIconRowView
       iconName={iconName}
       iconBackgroundColor={iconBackgroundColor}
       name={title}
-      style={styles.container}
     >
       <Ionicon name="chevron-forward" style={styles.chevron} />
     </SettingsNamedIconRowView>
-  </TouchableHighlight>
+  </SettingsButton>
 )
 
 const styles = StyleSheet.create({
