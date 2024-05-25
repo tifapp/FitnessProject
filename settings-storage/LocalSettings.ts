@@ -4,6 +4,7 @@ import { PersistentSettingsStore, SettingsStorage } from "./PersistentStore"
 
 export type UserInterfaceStyle = "light" | "dark" | "system"
 export type PreferredFontFamily = "OpenSans" | "OpenDyslexic3"
+export type PreferredBrowserName = "in-app" | "system-default"
 
 /**
  * A type for user settings that are local to the device.
@@ -17,6 +18,8 @@ export type LocalSettings = {
   hasCompletedOnboarding: boolean
   userInterfaceStyle: UserInterfaceStyle
   preferredFontFamily: PreferredFontFamily
+  preferredBrowserName: PreferredBrowserName
+  isUsingSafariReaderMode: boolean
   lastEventArrivalsRefreshDate: Date | null
 }
 
@@ -26,6 +29,8 @@ export const DEFAULT_LOCAL_SETTINGS = {
   hasCompletedOnboarding: false,
   userInterfaceStyle: "system",
   preferredFontFamily: "OpenSans",
+  preferredBrowserName: "in-app",
+  isUsingSafariReaderMode: false,
   lastEventArrivalsRefreshDate: null
 } satisfies Readonly<LocalSettings> as Readonly<LocalSettings>
 
@@ -36,8 +41,10 @@ type SQLiteLocalSettings = {
   isHapticFeedbackEnabled: number
   isHapticAudioEnabled: number
   hasCompletedOnboarding: number
+  isUsingSafariReaderMode: number
   userInterfaceStyle: UserInterfaceStyle
   preferredFontFamily: PreferredFontFamily
+  preferredBrowserName: PreferredBrowserName
   lastEventArrivalsRefreshDate: number | null
 }
 
@@ -65,14 +72,18 @@ export class SQLiteLocalSettingsStorage
         hasCompletedOnboarding,
         lastEventArrivalsRefreshDate,
         userInterfaceStyle,
-        preferredFontFamily
+        preferredFontFamily,
+        preferredBrowserName,
+        isUsingSafariReaderMode
       ) VALUES (
         ${newSettings.isHapticFeedbackEnabled},
         ${newSettings.isHapticAudioEnabled},
         ${newSettings.hasCompletedOnboarding},
         ${newSettings.lastEventArrivalsRefreshDate?.getTime()},
         ${newSettings.userInterfaceStyle},
-        ${newSettings.preferredFontFamily}
+        ${newSettings.preferredFontFamily},
+        ${newSettings.preferredBrowserName},
+        ${newSettings.isUsingSafariReaderMode}
       )
       `
     })
@@ -89,6 +100,7 @@ export class SQLiteLocalSettingsStorage
       isHapticAudioEnabled: sqliteSettings.isHapticAudioEnabled === 1,
       isHapticFeedbackEnabled: sqliteSettings.isHapticFeedbackEnabled === 1,
       hasCompletedOnboarding: sqliteSettings.hasCompletedOnboarding === 1,
+      isUsingSafariReaderMode: sqliteSettings.isUsingSafariReaderMode === 1,
       lastEventArrivalsRefreshDate: sqliteSettings.lastEventArrivalsRefreshDate
         ? new Date(sqliteSettings.lastEventArrivalsRefreshDate)
         : null
