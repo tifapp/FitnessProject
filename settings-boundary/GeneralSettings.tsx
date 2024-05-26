@@ -118,7 +118,7 @@ const WebBrowserSectionView = () => {
         <SettingsCardSectionView>
           <SettingsNamedToggleView
             name="Safari Reader Mode"
-            description="Makes websites easier to read by stripping visual styling."
+            description="Makes websites easier to read by removing visual styling. This may not be supported on some websites."
             isOn={settings.isUsingSafariReaderMode}
             onIsOnChange={(isUsingSafariReaderMode) => {
               update({ isUsingSafariReaderMode })

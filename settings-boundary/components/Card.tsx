@@ -1,8 +1,9 @@
 import { AppStyles } from "@lib/AppColorStyle"
+import { ReactNode } from "react"
 import { StyleProp, ViewStyle, View, StyleSheet } from "react-native"
 
 export type SettingsCardProps = {
-  children: JSX.Element | JSX.Element[]
+  children?: ReactNode
   style?: StyleProp<ViewStyle>
 }
 
