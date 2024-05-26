@@ -8,7 +8,6 @@ import { SettingsCardView } from "./Card"
 import { SettingsNamedIconRowView } from "./NamedIconRow"
 import { useCurrentSettingsSection } from "./Section"
 
-
 export type SettingsToggleCardProps = {
   isOn: boolean
   onIsOnChange?: (isOn: boolean) => void

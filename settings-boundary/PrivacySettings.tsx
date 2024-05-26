@@ -1,7 +1,6 @@
 import { useUserSettings } from "@settings-storage/Hooks"
 import { UserSettings } from "TiFShared/domain-models/Settings"
 import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
-
 import { SettingsSectionView } from "./components/Section"
 import { BodyText } from "@components/Text"
 import {
