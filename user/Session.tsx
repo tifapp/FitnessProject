@@ -50,7 +50,7 @@ export const useUserSession = () => useContext(UserSessionContext)!
 
 export type IfAuthenticatedProps = {
   thenRender: ReactNode | ((session: UserSession) => ReactNode)
-  elseRender: ReactNode
+  elseRender?: ReactNode
 }
 
 /**
