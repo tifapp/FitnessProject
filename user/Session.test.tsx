@@ -3,8 +3,9 @@ import React from "react"
 import { View } from "react-native"
 import "@test-helpers/Matchers"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { IfAuthenticated, UserSessionProvider } from "./Session"
+import { IfAuthenticated, UserSession, UserSessionProvider } from "./Session"
 import { fakeTimers } from "@test-helpers/Timers"
+import { EmailAddress } from "./privacy"
 
 describe("UserSession tests", () => {
   describe("IfAuthenticated tests", () => {
@@ -12,13 +13,18 @@ describe("UserSession tests", () => {
     fakeTimers()
 
     it("should render else if the user is not authenticated", async () => {
-      renderTestScreen(jest.fn().mockResolvedValueOnce(false))
+      renderTestScreen(jest.fn().mockRejectedValueOnce(new Error()))
       await waitFor(() => expect(elseComponent()).toBeDisplayed())
       await waitFor(() => expect(thenComponent()).not.toBeDisplayed())
     })
 
     it("should render then if user is authenticated", async () => {
-      renderTestScreen(jest.fn().mockResolvedValueOnce(true))
+      renderTestScreen(
+        jest.fn().mockResolvedValueOnce({
+          id: 1,
+          primaryContactInfo: EmailAddress.peacock69
+        })
+      )
       await waitFor(() => expect(thenComponent()).toBeDisplayed())
       expect(elseComponent()).not.toBeDisplayed()
     })
@@ -31,10 +37,10 @@ describe("UserSession tests", () => {
       return screen.queryByTestId("else")
     }
 
-    const renderTestScreen = (isSignedIn: () => Promise<boolean>) => {
+    const renderTestScreen = (userSession: () => Promise<UserSession>) => {
       return render(
         <TestQueryClientProvider>
-          <UserSessionProvider isSignedIn={isSignedIn}>
+          <UserSessionProvider userSession={userSession}>
             <IfAuthenticated
               thenRender={<View testID="then" />}
               elseRender={<View testID="else" />}
