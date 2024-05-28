@@ -3,6 +3,9 @@ import { SettingsScrollView } from "./components/ScrollView"
 import { SettingsCardSectionView } from "./components/Section"
 import { settingsSelector } from "@settings-storage/Settings"
 import { useUserSettings } from "@settings-storage/Hooks"
+import { SettingsMenuPickerView } from "./components/MenuPicker"
+import { EventCalendarWeekdayID } from "TiFShared/domain-models/Settings"
+import { SettingsRowItemView } from "./components/RowItem"
 
 export type CalendarSettingsProps = {
   style?: StyleProp<ViewStyle>
@@ -10,31 +13,38 @@ export type CalendarSettingsProps = {
 
 export const CalendarSettingsView = ({ style }: CalendarSettingsProps) => (
   <SettingsScrollView style={style}>
-    <LayoutPickerSection />
     <WeekdayPickerSection />
   </SettingsScrollView>
 )
-
-const LayoutPickerSection = () => {
-  const { settings, update } = useUserSettings(
-    settingsSelector("eventCalendarDefaultLayout")
-  )
-  return (
-    <SettingsCardSectionView
-      title="Default Layout"
-      subtitle="You can choose the starting layout of the calendar when you open the app."
-    ></SettingsCardSectionView>
-  )
-}
 
 const WeekdayPickerSection = () => {
   const { settings, update } = useUserSettings(
     settingsSelector("eventCalendarStartOfWeekDay")
   )
   return (
-    <SettingsCardSectionView
-      title="Default Layout"
-      subtitle="You can choose the starting layout of the calendar when you open the app."
-    ></SettingsCardSectionView>
+    <SettingsCardSectionView>
+      <SettingsRowItemView title="Start Week On">
+        <SettingsMenuPickerView
+          options={WEEKDAY_PICKER_OPTIONS}
+          selectedOption={settings.eventCalendarStartOfWeekDay}
+          onOptionSelected={(eventCalendarStartOfWeekDay) => {
+            update({ eventCalendarStartOfWeekDay })
+          }}
+        />
+      </SettingsRowItemView>
+    </SettingsCardSectionView>
   )
 }
+
+const WEEKDAY_PICKER_OPTIONS = new Map<
+  EventCalendarWeekdayID,
+  { title: string }
+>([
+  ["sunday", { title: "Sunday" }],
+  ["monday", { title: "Monday" }],
+  ["tuesday", { title: "Tuesday" }],
+  ["wednesday", { title: "Wednesday" }],
+  ["thursday", { title: "Thursday" }],
+  ["friday", { title: "Friday" }],
+  ["saturday", { title: "Saturday" }]
+])

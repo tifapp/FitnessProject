@@ -17,6 +17,7 @@ export type SettingsPreviewableOptionProps = {
   isSelected: boolean
   onSelected: () => void
   children?: JSX.Element | JSX.Element[]
+  style?: StyleProp<ViewStyle>
 }
 
 const DefaultPreviewOptionName = (props: TextProps) => (
@@ -29,48 +30,51 @@ export const SettingsPreviewableOptionView = ({
   previewStyle,
   isSelected,
   onSelected,
-  children
+  children,
+  style
 }: SettingsPreviewableOptionProps) => (
-  <Pressable onPress={onSelected} style={styles.previewOptionContainer}>
-    <View
-      style={[
-        previewStyle,
-        {
-          borderRadius: 12,
-          overflow: "hidden",
-          borderWidth: isSelected ? 2 : 0
-        }
-      ]}
-    >
-      {children}
-    </View>
-    <View
-      style={{
-        height:
-          32 * useFontScale({ maximumScaleFactor: FontScaleFactors.xxxLarge })
-      }}
-    >
+  <View style={style}>
+    <Pressable onPress={onSelected} style={styles.previewOptionContainer}>
+      <View
+        style={[
+          previewStyle,
+          {
+            borderRadius: 12,
+            overflow: "hidden",
+            borderWidth: isSelected ? 2 : 0
+          }
+        ]}
+      >
+        {children}
+      </View>
       <View
         style={{
-          borderRadius: 12,
-          overflow: "hidden",
-          backgroundColor: isSelected ? AppStyles.darkColor : undefined
+          height:
+            32 * useFontScale({ maximumScaleFactor: FontScaleFactors.xxxLarge })
         }}
       >
-        <NameComponent
-          maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
-          style={[
-            {
-              padding: 8,
-              color: isSelected ? "white" : AppStyles.darkColor
-            }
-          ]}
+        <View
+          style={{
+            borderRadius: 12,
+            overflow: "hidden",
+            backgroundColor: isSelected ? AppStyles.darkColor : undefined
+          }}
         >
-          {name}
-        </NameComponent>
+          <NameComponent
+            maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
+            style={[
+              {
+                padding: 8,
+                color: isSelected ? "white" : AppStyles.darkColor
+              }
+            ]}
+          >
+            {name}
+          </NameComponent>
+        </View>
       </View>
-    </View>
-  </Pressable>
+    </Pressable>
+  </View>
 )
 
 const styles = StyleSheet.create({

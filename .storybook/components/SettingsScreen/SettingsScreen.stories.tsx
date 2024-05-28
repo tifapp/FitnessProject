@@ -7,6 +7,7 @@ import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import {
   AppearanceSettingsView,
   BlockListSettingsView,
+  CalendarSettingsView,
   useBlockListSettings
 } from "@settings-boundary"
 import { SettingsProvider } from "@settings-storage/Hooks"
@@ -45,7 +46,7 @@ export const Basic: SettingsStory = () => (
         <TestQueryClientProvider>
           <NavigationContainer>
             <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
-              <Stack.Screen name="General" component={Test} />
+              <Stack.Screen name="Calendar" component={Test} />
             </Stack.Navigator>
           </NavigationContainer>
         </TestQueryClientProvider>
@@ -94,7 +95,7 @@ const Test = () => {
         localSettingsStore={localStore}
         userSettingsStore={userStore}
       >
-        <AppearanceSettingsView />
+        <CalendarSettingsView />
       </SettingsProvider>
     </SafeAreaView>
   )
