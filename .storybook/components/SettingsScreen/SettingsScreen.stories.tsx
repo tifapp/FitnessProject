@@ -4,7 +4,11 @@ import { HapticsProvider } from "@modules/tif-haptics"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
-import { BlockListSettingsView, useBlockListSettings } from "@settings-boundary"
+import {
+  AppearanceSettingsView,
+  BlockListSettingsView,
+  useBlockListSettings
+} from "@settings-boundary"
 import { SettingsProvider } from "@settings-storage/Hooks"
 import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
@@ -90,10 +94,7 @@ const Test = () => {
         localSettingsStore={localStore}
         userSettingsStore={userStore}
       >
-        <BlockListSettingsView
-          state={state}
-          onUserProfileTapped={(id) => console.log("User tapped", id)}
-        />
+        <AppearanceSettingsView />
       </SettingsProvider>
     </SafeAreaView>
   )
