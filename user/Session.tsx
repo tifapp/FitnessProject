@@ -1,22 +1,31 @@
 import { QueryHookOptions } from "@lib/ReactQuery"
 import { useQuery } from "@tanstack/react-query"
-import { createContext, useContext } from "react"
+import { UserID } from "TiFShared/domain-models/User"
+import { ReactNode, createContext, useContext } from "react"
+import { ContactInfoFormattable } from "./privacy"
+
+export type UserSession = {
+  id: UserID
+  primaryContactInfo: ContactInfoFormattable
+}
 
 export type UserSessionFunctions = {
-  isSignedIn: () => Promise<boolean>
+  userSession: () => Promise<UserSession>
 }
 
 const UserSessionContext = createContext<UserSessionFunctions | undefined>(
   undefined
 )
 
-export const useIsSignedInQuery = (options?: QueryHookOptions<boolean>) => {
-  const { isSignedIn } = useUserSession()
-  return useQuery(["isSignedIn"], isSignedIn, { initialData: true, ...options })
+export const useUserSessionQuery = (
+  options?: QueryHookOptions<UserSession>
+) => {
+  const { userSession } = useUserSession()
+  return useQuery(["userSession"], async () => await userSession(), options)
 }
 
 export const useIsSignedIn = () => {
-  return useIsSignedInQuery().data
+  return useUserSessionQuery().isSuccess
 }
 
 type UserSessionProviderProps = {
@@ -40,8 +49,8 @@ export const UserSessionProvider = ({
 export const useUserSession = () => useContext(UserSessionContext)!
 
 export type IfAuthenticatedProps = {
-  thenRender: JSX.Element
-  elseRender: JSX.Element
+  thenRender: ReactNode | ((session: UserSession) => ReactNode)
+  elseRender?: ReactNode
 }
 
 /**
@@ -52,9 +61,9 @@ export const IfAuthenticated = ({
   thenRender,
   elseRender
 }: IfAuthenticatedProps) => {
-  const query = useIsSignedInQuery()
-  if (query.data === true) {
-    return thenRender
+  const query = useUserSessionQuery()
+  if (query.data) {
+    return thenRender instanceof Function ? thenRender(query.data) : thenRender
   } else {
     return elseRender
   }

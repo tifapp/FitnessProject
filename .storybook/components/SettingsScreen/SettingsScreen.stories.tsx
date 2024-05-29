@@ -23,6 +23,7 @@ import { mockBlockListPage } from "settings-boundary/MockData"
 import { RootSiblingParent } from "react-native-root-siblings"
 import { uuidString } from "@lib/utils/UUID"
 import { UserHandle } from "TiFShared/domain-models/User"
+import { UserSessionProvider } from "@user/Session"
 
 const SettingsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Settings Screen",
