@@ -4,7 +4,7 @@ import { HapticsProvider } from "@modules/tif-haptics"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
-import { BlockListSettingsView, useBlockListSettings } from "@settings-boundary"
+import { RootSettingsView, useBlockListSettings } from "@settings-boundary"
 import { SettingsProvider } from "@settings-storage/Hooks"
 import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
@@ -18,6 +18,7 @@ import { mockBlockListPage } from "settings-boundary/MockData"
 import { RootSiblingParent } from "react-native-root-siblings"
 import { uuidString } from "@lib/utils/UUID"
 import { UserHandle } from "TiFShared/domain-models/User"
+import { UserSessionProvider } from "@user/Session"
 
 const SettingsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Settings Screen",
@@ -39,11 +40,19 @@ export const Basic: SettingsStory = () => (
         isFeedbackSupportedOnDevice
       >
         <TestQueryClientProvider>
-          <NavigationContainer>
-            <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
-              <Stack.Screen name="General" component={Test} />
-            </Stack.Navigator>
-          </NavigationContainer>
+          <UserSessionProvider
+            userSession={async () => {
+              throw new Error()
+            }}
+          >
+            <NavigationContainer>
+              <Stack.Navigator
+                screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
+              >
+                <Stack.Screen name="Settings" component={Test} />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </UserSessionProvider>
         </TestQueryClientProvider>
       </HapticsProvider>
     </SafeAreaProvider>

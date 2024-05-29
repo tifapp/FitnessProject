@@ -35,6 +35,7 @@ import { TextToastView } from "@components/common/Toasts"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
 import { Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
+import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
 
 export type UseBlockListSettingsEnvironment = {
   nextPage: (token: string | null) => Promise<BlockListPage>
@@ -253,7 +254,7 @@ export const BlockListSettingsView = ({
     />
     <TextToastView
       isVisible={!!state.mostRecentUnblockedUser}
-      text={`Unblocked ${state.mostRecentUnblockedUser?.username}!`}
+      text={`Unblocked ${useLastDefinedValue(state.mostRecentUnblockedUser?.username)}!`}
     />
   </>
 )
