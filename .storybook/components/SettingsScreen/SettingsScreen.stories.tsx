@@ -92,7 +92,7 @@ const Test = () => {
       >
         <BlockListSettingsView
           state={state}
-          onUserProfileTapped={(id) => console.log("User tapped", id)}
+          onUserProfileTapped={console.log}
         />
       </SettingsProvider>
     </SafeAreaView>

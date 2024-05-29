@@ -76,6 +76,7 @@
     "expo-document-picker": "~11.10.1",
     "expo-font": "~11.10.2",
     "expo-haptics": "~12.8.1",
+    "expo-image": "~1.10.6",
     "expo-image-manipulator": "~11.8.0",
     "expo-image-picker": "~14.7.1",
     "expo-linking": "~6.2.2",
@@ -110,7 +111,6 @@
     "react-native-crypto": "^2.2.0",
     "react-native-dotenv": "^3.4.10",
     "react-native-elements": "^2.3.2",
-    "react-native-fast-image": "^8.6.3",
     "react-native-gesture-handler": "~2.14.0",
     "react-native-get-random-values": "~1.8.0",
     "react-native-hyperlink": "^0.0.21",
@@ -126,12 +126,12 @@
     "react-native-select-dropdown": "^3.2.1",
     "react-native-svg": "14.1.0",
     "regenerator-runtime": "^0.13.11",
+    "TiFShared": "git+https://github.com/tifapp/TiFShared#type-updates",
     "tlds": "^1.221.1",
     "type-detect": "4.0.8",
     "use-sync-external-store": "^1.2.2",
     "uuid": "^9.0.0",
-    "zod": "^3.20.6",
-    "TiFShared": "git+https://github.com/tifapp/TiFShared#type-updates"
+    "zod": "^3.20.6"
   },
   "devDependencies": {
     "@aws-amplify/cli": "^10.8.1",
