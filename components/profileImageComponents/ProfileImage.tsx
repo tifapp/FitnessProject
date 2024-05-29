@@ -10,7 +10,11 @@ interface ProfileImageProps {
 // TODO: - Placeholder
 
 const ProfileImage = ({ imageURL, style }: ProfileImageProps) => (
-  <Image source={imageURL} style={[style, styles.image]} />
+  <Image
+    source={imageURL}
+    cachePolicy="memory-disk"
+    style={[style, styles.image]}
+  />
 )
 
 const styles = StyleSheet.create({
