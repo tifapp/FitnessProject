@@ -1,5 +1,5 @@
 import XCTest
-import TiFTravelEstimates
+import TiFNative
 
 final class TravelEstimatesTests: XCTestCase {
   func testExpoObject() throws {

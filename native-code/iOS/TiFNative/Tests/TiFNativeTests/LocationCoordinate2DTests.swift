@@ -1,5 +1,5 @@
 import XCTest
-import TiFTravelEstimates
+import TiFNative
 
 final class LocationCoordinate2DTests: XCTestCase {
   func testFromExpoObjectBasic() throws {
