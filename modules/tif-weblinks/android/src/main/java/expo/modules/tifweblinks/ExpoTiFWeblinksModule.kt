@@ -1,47 +1,113 @@
 package expo.modules.tifweblinks
 
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
+import android.content.pm.ResolveInfo
+import android.net.Uri
+import android.os.Build
+import androidx.browser.customtabs.CustomTabsIntent
+import expo.modules.kotlin.exception.Exceptions
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
+import kotlin.collections.List
 
 class ExpoTiFWeblinksModule : Module() {
-  // Each module class must implement the definition function. The definition consists of components
-  // that describes the module's functionality and behavior.
-  // See https://docs.expo.dev/modules/module-api for more details about available components.
-  override fun definition() = ModuleDefinition {
-    // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
-    // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
-    // The module will be accessible from `requireNativeModule('ExpoTiFWeblinks')` in JavaScript.
-    Name("ExpoTiFWeblinks")
+    private val context: Context
+        get() = appContext.reactContext ?: throw Exceptions.ReactContextLost()
 
-    // Sets constant properties on the module. Can take a dictionary or a closure that returns a dictionary.
-    Constants(
-      "PI" to Math.PI
-    )
+    override fun definition() = ModuleDefinition {
+        Name("ExpoTiFWeblinks")
 
-    // Defines event names that the module can send to JavaScript.
-    Events("onChange")
-
-    // Defines a JavaScript synchronous function that runs the native code on the JavaScript thread.
-    Function("hello") {
-      "Hello world! 👋"
+        // NB: The 3rd parameter is only used on iOS, but it needs to be specified here. Otherwise,
+        // an exception is thrown.
+        AsyncFunction("openWeblink") { uri: Uri, shouldUseInAppBrowser: Boolean, _: Boolean ->
+            if (!shouldUseInAppBrowser) {
+                return@AsyncFunction openURL(context, uri)
+            }
+            val didDeeplink = openWithUniversalDeeplinking(context, uri)
+            if (didDeeplink) return@AsyncFunction true
+            openInCustomTab(context, uri)
+            true
+        }
     }
 
-    // Defines a JavaScript function that always returns a Promise and whose native code
-    // is by default dispatched on the different thread than the JavaScript runtime runs on.
-    AsyncFunction("setValueAsync") { value: String ->
-      // Send an event to JavaScript.
-      sendEvent("onChange", mapOf(
-        "value" to value
-      ))
+    private fun openURL(context: Context, uri: Uri): Boolean {
+        val intent =
+                Intent(Intent.ACTION_VIEW, uri).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
+        return try {
+            context.startActivity(intent)
+            true
+        } catch (e: ActivityNotFoundException) {
+            false
+        }
     }
 
-    // Enables the module to be used as a native view. Definition components that are accepted as part of
-    // the view definition: Prop, Events.
-    View(ExpoTiFWeblinksView::class) {
-      // Defines a setter for the `name` prop.
-      Prop("name") { view: ExpoTiFWeblinksView, prop: String ->
-        println(prop)
-      }
+    private fun openInCustomTab(context: Context, uri: Uri) {
+        val intent =
+                CustomTabsIntent.Builder().build().intent.apply {
+                    data = uri
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+        context.startActivity(intent)
     }
-  }
+
+    // Ported From:
+    // https://github.com/aeharding/capacitor-launch-native/blob/main/android/src/main/java/dev/harding/plugins/launchnative/LaunchNative.java
+
+    private fun openWithUniversalDeeplinking(context: Context, uri: Uri): Boolean {
+        return if (Build.VERSION.SDK_INT >= 30) {
+            launchNativeApi30(context, uri)
+        } else {
+            launchNativeBeforeApi30(context, uri)
+        }
+    }
+
+    private fun launchNativeApi30(context: Context, uri: Uri): Boolean {
+        val nativeAppIntent =
+                Intent(Intent.ACTION_VIEW, uri).apply {
+                    addCategory(Intent.CATEGORY_BROWSABLE)
+                    addFlags(
+                            Intent.FLAG_ACTIVITY_NEW_TASK or
+                                    Intent.FLAG_ACTIVITY_REQUIRE_NON_BROWSER
+                    )
+                }
+        return try {
+            context.startActivity(nativeAppIntent)
+            true
+        } catch (ex: ActivityNotFoundException) {
+            false
+        }
+    }
+
+    private fun launchNativeBeforeApi30(context: Context, uri: Uri): Boolean {
+        val pm = context.packageManager
+        val browserActivityIntent =
+                Intent().apply {
+                    action = Intent.ACTION_VIEW
+                    addCategory(Intent.CATEGORY_BROWSABLE)
+                    data = Uri.fromParts("http", "", null)
+                }
+        val genericResolvedList =
+                extractPackageNames(pm.queryIntentActivities(browserActivityIntent, 0))
+        val specializedActivityIntent =
+                Intent(Intent.ACTION_VIEW, uri).apply { addCategory(Intent.CATEGORY_BROWSABLE) }
+        val resolvedSpecializedList =
+                extractPackageNames(pm.queryIntentActivities(specializedActivityIntent, 0))
+        resolvedSpecializedList.removeAll(genericResolvedList)
+        if (resolvedSpecializedList.isEmpty()) {
+            return false
+        }
+        specializedActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(specializedActivityIntent)
+        return true
+    }
+
+    private fun extractPackageNames(resolveInfoList: List<ResolveInfo>?): MutableSet<String> {
+        val packageNames = mutableSetOf<String>()
+        resolveInfoList?.forEach { resolveInfo ->
+            resolveInfo.activityInfo?.packageName?.let { packageNames.add(it) }
+        }
+        return packageNames
+    }
 }
