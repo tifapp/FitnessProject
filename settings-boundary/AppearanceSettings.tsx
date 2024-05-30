@@ -17,6 +17,7 @@ import { settingsSelector } from "@settings-storage/Settings"
 import { BodyText, CaptionTitle } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors, useFontScale } from "@lib/Fonts"
+import { useOpenWeblink } from "@modules/tif-weblinks"
 
 export type AppearanceSettingsProps = {
   style?: StyleProp<ViewStyle>
@@ -77,6 +78,7 @@ const FontFamilySectionView = () => {
   const fontScale = useFontScale({
     maximumScaleFactor: FontScaleFactors.xxxLarge
   })
+  const openWeblink = useOpenWeblink()
   return (
     <SettingsSectionView
       title="Font"
@@ -89,6 +91,7 @@ const FontFamilySectionView = () => {
           <BodyText
             style={styles.learnMore}
             suppressHighlighting
+            onPress={() => openWeblink("https://opendyslexic.org/about")}
             // TODO: - Open web page.
           >
             Learn More...
