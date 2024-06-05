@@ -21,7 +21,7 @@ export type SettingsSectionProps = {
   title?: string
   subtitle?: ReactNode
   isDisabled?: boolean
-  children: JSX.Element | JSX.Element[]
+  children?: ReactNode
   style?: StyleProp<ViewStyle>
 }
 

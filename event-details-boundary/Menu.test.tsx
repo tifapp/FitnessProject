@@ -16,6 +16,8 @@ import {
 import { EventAttendeeMocks, EventMocks } from "./MockData"
 import { renderSuccessfulUseLoadEventDetails } from "./TestHelpers"
 import { UnblockedBidirectionalUserRelations } from "TiFShared/domain-models/User"
+import { uuidString } from "@lib/utils/UUID"
+import { EmailAddress } from "@user/privacy"
 
 describe("EventDetailsMenu tests", () => {
   describe("FormatEventMenuActions tests", () => {
@@ -80,7 +82,7 @@ describe("EventDetailsMenu tests", () => {
 
   describe("UseEventMenuActions tests", () => {
     const queryClient = createTestQueryClient()
-    const isSignedIn = jest.fn()
+    const userSession = jest.fn()
     const blockHost = jest.fn()
     const unblockHost = jest.fn()
 
@@ -92,25 +94,32 @@ describe("EventDetailsMenu tests", () => {
 
     const TEST_EVENT = EventMocks.PickupBasketball
 
+    const TEST_USER_SESSION = {
+      id: uuidString(),
+      primaryContactInfo: EmailAddress.peacock69
+    }
+
     it("should use the non-signed in actions when the user isn't signed in", async () => {
-      isSignedIn.mockResolvedValueOnce(false)
+      userSession.mockRejectedValueOnce(new Error())
       const { result } = renderUseEventDetailsMenuActions(TEST_EVENT)
       await waitFor(() => {
         expect(result.current.actionsListKey).toEqual("not-signed-in")
       })
     })
 
-    it("should use the user attendee status for the actions key when the user is signed in", () => {
-      isSignedIn.mockResolvedValueOnce(true)
+    it("should use the user attendee status for the actions key when the user is signed in", async () => {
+      ensureUserIsSignedIn()
       const { result } = renderUseEventDetailsMenuActions({
         ...TEST_EVENT,
         userAttendeeStatus: "attending"
       })
-      expect(result.current.actionsListKey).toEqual("attending")
+      await waitFor(() => {
+        expect(result.current.actionsListKey).toEqual("attending")
+      })
     })
 
     test("successful block host flow, updates event details hook", async () => {
-      isSignedIn.mockResolvedValueOnce(true)
+      ensureUserIsSignedIn()
       const event = testEventWithRelations({
         youToThem: "friends",
         themToYou: "friends"
@@ -131,7 +140,7 @@ describe("EventDetailsMenu tests", () => {
     })
 
     test("successful unblock host flow, updates event details hook", async () => {
-      isSignedIn.mockResolvedValueOnce(true)
+      ensureUserIsSignedIn()
       const event = testEventWithRelations({
         youToThem: "blocked",
         themToYou: "not-friends"
@@ -157,7 +166,7 @@ describe("EventDetailsMenu tests", () => {
       blockHost.mockImplementationOnce(async () => {
         await Promise.reject(new Error())
       })
-      isSignedIn.mockResolvedValueOnce(true)
+      ensureUserIsSignedIn()
       const event = testEventWithRelations({
         youToThem: "friends",
         themToYou: "friends"
@@ -187,6 +196,10 @@ describe("EventDetailsMenu tests", () => {
         themToYou: "friends"
       })
     })
+
+    const ensureUserIsSignedIn = () => {
+      userSession.mockResolvedValueOnce(TEST_USER_SESSION)
+    }
 
     const testEventWithRelations = (
       relations: UnblockedBidirectionalUserRelations
@@ -223,7 +236,7 @@ describe("EventDetailsMenu tests", () => {
         {
           wrapper: ({ children }: any) => (
             <TestQueryClientProvider client={queryClient}>
-              <UserSessionProvider isSignedIn={isSignedIn}>
+              <UserSessionProvider userSession={userSession}>
                 {children}
               </UserSessionProvider>
             </TestQueryClientProvider>

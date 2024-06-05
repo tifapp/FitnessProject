@@ -1,5 +1,4 @@
 import { useUserSettings } from "@settings-storage/Hooks"
-import { UserSettings } from "TiFShared/domain-models/Settings"
 import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
 import { SettingsSectionView } from "./components/Section"
 import { BodyText } from "@components/Text"
@@ -14,6 +13,7 @@ import { SettingsNavigationLinkView } from "./components/NavigationLink"
 import { SettingsCardView } from "./components/Card"
 import { SettingsScrollView } from "./components/ScrollView"
 import { settingsPermission } from "./Permissions"
+import { settingsSelector } from "@settings-storage/Settings"
 
 export const usePrivacySettingsPermissions = () => {
   const [foregroundStatus, requestForeground] =
@@ -54,9 +54,9 @@ const PreabmleSectionView = () => (
   <SettingsSectionView>
     <View style={styles.privacyIllustration} />
     <BodyText>
-      We are commited to your privacy and will protect your data at all times.
-      Your data belongs to you, and is only shared with those whom you wish to
-      share it with.
+      We are committed to protecting your data and prioritize your privacy at
+      all times. Your data is only used to enhance the app with you remaining in
+      control of it.
     </BodyText>
   </SettingsSectionView>
 )
@@ -81,12 +81,18 @@ const LearnMoreSectionView = ({
 )
 
 const ShareSectionView = () => {
-  const { settings, update } = useUserSettings(shareSectionSelector)
+  const { settings, update } = useUserSettings(
+    settingsSelector(
+      "isAnalyticsEnabled",
+      "isCrashReportingEnabled",
+      "canShareArrivalStatus"
+    )
+  )
   return (
     <SettingsSectionView title="Control What You Share">
       <SettingsToggleCardView
         title="Anonymous Analytics"
-        description="We improve the app by having a better understanding of how you and others use the app. To do this we collect anonymous usage data that's not linked to you in any way."
+        description="To improve your app experience, we collect anonymous usage data to enhance the quality of the app. This data is not linked to you."
         iconName="bar-chart"
         iconBackgroundColor={AppStyles.red}
         isOn={settings.isAnalyticsEnabled}
@@ -94,7 +100,7 @@ const ShareSectionView = () => {
       />
       <SettingsToggleCardView
         title="Crash Reports"
-        description="We reduce bugs and crashes by collecting anonymous usage data around app issues. This data is not linked to you in any way."
+        description="To reduce bugs, crashes, and errors, we collect anonymous usage data regarding app issues. This data is not linked to you."
         iconName="warning"
         iconBackgroundColor={AppStyles.yellow}
         isOn={settings.isCrashReportingEnabled}
@@ -104,7 +110,7 @@ const ShareSectionView = () => {
       />
       <SettingsToggleCardView
         title="Event Arrivals"
-        description="We detect when you arrive at events so that we can let other participants know that you've arrived. You can choose to disable sharing this to others."
+        description="You can stay connected with participants by notifying them of your arrival at an event’s designated location."
         iconName="footsteps"
         iconBackgroundColor={AppStyles.green}
         isOn={settings.canShareArrivalStatus}
@@ -124,7 +130,7 @@ const PermissionsSectionView = ({ permissions }: PermissionsSectionProps) => (
   <SettingsSectionView title="Device Permissions">
     <SettingsToggleCardView
       title="Location While Using the App"
-      description="Your location is used to search for local events in your area, and to detect whether or not you arrive at an event when the app is open."
+      description="Your location is used to discover events, select current location, and precisely detect your arrival at an event’s designated location."
       iconName="location"
       iconBackgroundColor={AppStyles.blue}
       isOn={permissions.foregroundLocation.isGranted}
@@ -132,7 +138,7 @@ const PermissionsSectionView = ({ permissions }: PermissionsSectionProps) => (
     />
     <SettingsToggleCardView
       title="Location While Not Using the App"
-      description="Your location is used to detect when you arrive at events when the app is not open."
+      description="Your location is used to precisely detect your arrival at an event’s designated location. You can share your arrival status without having the app open."
       iconName="golf"
       iconBackgroundColor={AppStyles.purple}
       isOn={permissions.backgroundLocation.isGranted}
@@ -140,7 +146,7 @@ const PermissionsSectionView = ({ permissions }: PermissionsSectionProps) => (
     />
     <SettingsToggleCardView
       title="Notifications"
-      description="Receive notifications about the events you attend and much more!"
+      description="Enable app notifications to receive important event updates, arrivals notifications, and profile notifications."
       iconName="notifications"
       iconBackgroundColor={AppStyles.orange}
       isOn={permissions.notifications.isGranted}
@@ -148,12 +154,6 @@ const PermissionsSectionView = ({ permissions }: PermissionsSectionProps) => (
     />
   </SettingsSectionView>
 )
-
-const shareSectionSelector = (settings: UserSettings) => ({
-  isAnalyticsEnabled: settings.isAnalyticsEnabled,
-  isCrashReportingEnabled: settings.isCrashReportingEnabled,
-  canShareArrivalStatus: settings.canShareArrivalStatus
-})
 
 const styles = StyleSheet.create({
   privacyIllustration: {

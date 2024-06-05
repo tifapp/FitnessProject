@@ -1,51 +1,39 @@
 import { Ionicon, IoniconName } from "@components/common/Icons"
 import { ColorString } from "TiFShared/domain-models/ColorString"
-import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { SettingsButton } from "./Button"
-import { SettingsLabelView } from "./Label"
+import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
 import { SettingsNamedIconRowView } from "./NamedIconRow"
+import { SettingsButton } from "./Button"
 
-type BaseSettingsNavigationLinkProps = {
+export type SettingsNavigationLinkProps = {
   title: string
-  description?: string
+  iconName: IoniconName
+  iconBackgroundColor: ColorString
   onTapped: () => void
   isDisabled?: boolean
+  rightAccessory?: ReactNode
   style?: StyleProp<ViewStyle>
 }
 
-export type SettingsNavigationLinkProps = BaseSettingsNavigationLinkProps &
-  (
-    | {
-        iconName: IoniconName
-        iconBackgroundColor: ColorString
-      }
-    | { iconName?: undefined; iconBackgroundColor?: undefined }
-  )
-
 export const SettingsNavigationLinkView = ({
   title,
-  description,
   iconName,
   iconBackgroundColor,
   onTapped,
   isDisabled,
+  rightAccessory,
   style
 }: SettingsNavigationLinkProps) => (
   <SettingsButton onTapped={onTapped} isDisabled={isDisabled} style={style}>
-    {iconName ? (
-      <SettingsNamedIconRowView
-        iconName={iconName}
-        iconBackgroundColor={iconBackgroundColor}
-        name={title}
-      >
-        <Ionicon name="chevron-forward" style={styles.chevron} />
-      </SettingsNamedIconRowView>
-    ) : (
-      <View style={styles.row}>
-        <SettingsLabelView title={title} description={description} />
+    <SettingsNamedIconRowView
+      iconName={iconName}
+      iconBackgroundColor={iconBackgroundColor}
+      name={title}
+    >
+      <View style={styles.accessoryRow}>
+        {rightAccessory}
         <Ionicon name="chevron-forward" style={styles.chevron} />
       </View>
-    )}
+    </SettingsNamedIconRowView>
   </SettingsButton>
 )
 
@@ -59,10 +47,9 @@ const styles = StyleSheet.create({
   chevron: {
     opacity: 0.15
   },
-  row: {
+  accessoryRow: {
     display: "flex",
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between"
+    alignItems: "center"
   }
 })
