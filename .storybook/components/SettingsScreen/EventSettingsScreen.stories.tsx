@@ -47,7 +47,9 @@ const Test = () => (
       localSettingsStore={{} as any}
       userSettingsStore={userStore}
     >
-      <EventSettingsView />
+      <EventSettingsView
+        onLocationPresetTapped={() => console.log("Location")}
+      />
     </SettingsProvider>
   </SafeAreaView>
 )

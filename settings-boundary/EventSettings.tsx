@@ -2,6 +2,7 @@ import { BodyText } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useUserSettings } from "@settings-storage/Hooks"
 import { settingsSelector } from "@settings-storage/Settings"
+import { Placemark } from "TiFShared/domain-models/Placemark"
 import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { SettingsNamedToggleView } from "./components/NamedToggle"
@@ -54,20 +55,22 @@ export const DurationSectionView = ({
 
 export type EventSettingsProps = {
   style?: StyleProp<ViewStyle>
-  onLocationPresetTapped: () => void
+  onLocationPresetTapped: (locationPreset: Placemark) => void
 }
 
 export const EventSettingsView = ({
   style,
   onLocationPresetTapped
-}: EventSettingsProps) => (
-  <SettingsScrollView style={style}>
-    <PresetSectionView onLocationPresetTapped={onLocationPresetTapped} />
-  </SettingsScrollView>
-)
+}: EventSettingsProps) => {
+  return (
+    <SettingsScrollView style={style}>
+      <PresetSectionView onLocationPresetTapped={onLocationPresetTapped} />
+    </SettingsScrollView>
+  )
+}
 
 type PresetSectionProps = {
-  onLocationPresetTapped: () => void
+  onLocationPresetTapped: (locationPreset: Placemark) => void
 }
 
 const PresetSectionView = ({ onLocationPresetTapped }: PresetSectionProps) => {
@@ -96,7 +99,7 @@ const PresetSectionView = ({ onLocationPresetTapped }: PresetSectionProps) => {
       <SettingsNavigationLinkView
         title={"Location"}
         description={settings.eventPresetPlacemark?.name ?? "No Location"}
-        onTapped={onLocationPresetTapped}
+        onTapped={() => onLocationPresetTapped(settings.eventPresetPlacemark)}
       />
       <DurationSectionView
         title={"Duration Presets"}
