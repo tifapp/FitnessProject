@@ -4,7 +4,12 @@ import { HapticsProvider } from "@modules/tif-haptics"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
-import { RootSettingsView, useBlockListSettings } from "@settings-boundary"
+import {
+  AppearanceSettingsView,
+  BlockListSettingsView,
+  CalendarSettingsView,
+  useBlockListSettings
+} from "@settings-boundary"
 import { SettingsProvider } from "@settings-storage/Hooks"
 import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
@@ -40,19 +45,11 @@ export const Basic: SettingsStory = () => (
         isFeedbackSupportedOnDevice
       >
         <TestQueryClientProvider>
-          <UserSessionProvider
-            userSession={async () => {
-              throw new Error()
-            }}
-          >
-            <NavigationContainer>
-              <Stack.Navigator
-                screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
-              >
-                <Stack.Screen name="Settings" component={Test} />
-              </Stack.Navigator>
-            </NavigationContainer>
-          </UserSessionProvider>
+          <NavigationContainer>
+            <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
+              <Stack.Screen name="Calendar" component={Test} />
+            </Stack.Navigator>
+          </NavigationContainer>
         </TestQueryClientProvider>
       </HapticsProvider>
     </SafeAreaProvider>
@@ -99,11 +96,7 @@ const Test = () => {
         localSettingsStore={localStore}
         userSettingsStore={userStore}
       >
-        <RootSettingsView
-          areNotificationsEnabled={false}
-          onSettingsScreenLinkTapped={console.log}
-          onAccountInfoLinkTapped={console.log}
-        />
+        <CalendarSettingsView />
       </SettingsProvider>
     </SafeAreaView>
   )
