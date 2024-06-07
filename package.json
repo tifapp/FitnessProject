@@ -9,6 +9,7 @@
     "test": "jest --testPathIgnorePatterns \"<rootDir>/roswaal/\"",
     "test:ci": "jest --testPathIgnorePatterns \"<rootDir>/roswaal/\" --ci --detectOpenHandles",
     "test-roswaal": "jest --config=\"./roswaal/jest.infra.config.js\"",
+    "test-acceptance": "detox test",
     "staged-lint": "lint-staged",
     "eas_dev_build": "eas build --profile development",
     "eas_dev_build_local": "eas build --profile development --local",
