@@ -99,10 +99,9 @@ const Test = () => {
         localSettingsStore={localStore}
         userSettingsStore={userStore}
       >
-        <RootSettingsView
-          areNotificationsEnabled={false}
-          onSettingsScreenLinkTapped={console.log}
-          onAccountInfoLinkTapped={console.log}
+        <BlockListSettingsView
+          state={state}
+          onUserProfileTapped={console.log}
         />
       </SettingsProvider>
     </SafeAreaView>
