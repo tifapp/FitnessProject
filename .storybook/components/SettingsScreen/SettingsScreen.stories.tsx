@@ -3,9 +3,11 @@ import { delayData, sleep } from "@lib/utils/DelayData"
 import { HapticsProvider } from "@modules/tif-haptics"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
+import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import {
+  AppearanceSettingsView,
   BlockListSettingsView,
-  RootSettingsView,
+  CalendarSettingsView,
   useBlockListSettings
 } from "@settings-boundary"
 import { SettingsProvider } from "@settings-storage/Hooks"
@@ -40,19 +42,11 @@ export const Basic = () => (
         isFeedbackSupportedOnDevice
       >
         <TestQueryClientProvider>
-          <UserSessionProvider
-            userSession={async () => {
-              throw new Error()
-            }}
-          >
-            <NavigationContainer>
-              <Stack.Navigator
-                screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
-              >
-                <Stack.Screen name="Settings" component={Test} />
-              </Stack.Navigator>
-            </NavigationContainer>
-          </UserSessionProvider>
+          <NavigationContainer>
+            <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
+              <Stack.Screen name="Calendar" component={Test} />
+            </Stack.Navigator>
+          </NavigationContainer>
         </TestQueryClientProvider>
       </HapticsProvider>
     </SafeAreaProvider>
@@ -99,10 +93,7 @@ const Test = () => {
         localSettingsStore={localStore}
         userSettingsStore={userStore}
       >
-        <BlockListSettingsView
-          state={state}
-          onUserProfileTapped={console.log}
-        />
+        <CalendarSettingsView />
       </SettingsProvider>
     </SafeAreaView>
   )
