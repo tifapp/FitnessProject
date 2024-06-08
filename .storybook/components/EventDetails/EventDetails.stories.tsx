@@ -1,4 +1,3 @@
-import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import React, { useEffect } from "react"
 import { SafeAreaProvider } from "react-native-safe-area-context"
@@ -30,8 +29,9 @@ import { UserSessionProvider } from "@user/Session"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { dateRange } from "TiFShared/domain-models/FixedDateRange"
 import { dayjs, now } from "TiFShared/lib/Dayjs"
+import { StoryMeta } from ".storybook/HelperTypes"
 
-const EventDetailsMeta: ComponentMeta<typeof SettingsScreen> = {
+const EventDetailsMeta: StoryMeta = {
   title: "Event Details"
 }
 

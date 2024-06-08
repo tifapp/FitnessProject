@@ -14,7 +14,6 @@ import { SettingsProvider } from "@settings-storage/Hooks"
 import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
-import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { TestHaptics } from "@test-helpers/Haptics"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { testSQLite } from "@test-helpers/SQLite"
@@ -24,19 +23,17 @@ import { RootSiblingParent } from "react-native-root-siblings"
 import { uuidString } from "@lib/utils/UUID"
 import { UserHandle } from "TiFShared/domain-models/User"
 import { UserSessionProvider } from "@user/Session"
+import { StoryMeta } from "../../HelperTypes"
 
-const SettingsMeta: ComponentMeta<typeof SettingsScreen> = {
-  title: "Settings Screen",
-  component: SettingsScreen
+const SettingsMeta: StoryMeta = {
+  title: "Settings Screen"
 }
 
 export default SettingsMeta
 
-type SettingsStory = ComponentStory<typeof SettingsScreen>
-
 const Stack = createStackNavigator()
 
-export const Basic: SettingsStory = () => (
+export const Basic = () => (
   <RootSiblingParent>
     <SafeAreaProvider>
       <HapticsProvider

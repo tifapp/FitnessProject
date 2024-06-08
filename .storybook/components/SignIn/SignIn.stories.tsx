@@ -17,12 +17,12 @@ import {
   createSignInScreens
 } from "@core-root/navigation/auth/SignIn"
 import { createSignUpScreens } from "@core-root/navigation/auth/SignUp"
-import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { TiFAPI } from "TiFShared/api"
+import { StoryMeta } from ".storybook/HelperTypes"
 
-const SignInMeta: ComponentMeta<typeof SettingsScreen> = {
+const SignInMeta: StoryMeta = {
   title: "Sign In"
 }
 

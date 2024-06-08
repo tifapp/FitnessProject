@@ -1,10 +1,10 @@
+import { Headline } from "@components/Text"
 import { TouchableIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import {
   BottomTabBarProps,
   createBottomTabNavigator
 } from "@react-navigation/bottom-tabs"
-import { ProfileStack } from "@screens/ProfileScreen/Navigation/ProfileScreensNavigation"
 import React from "react"
 import { Platform, StyleSheet, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -74,16 +74,24 @@ export function TabNavigation() {
       tabBar={(props) => <BottomNavTabBar {...props} />}
       screenOptions={{ headerShown: false }}
     >
-      <Tab.Screen
-        name="Profile"
-        component={ProfileStack}
-        options={({ route }) => ({})}
-      />
+      <Tab.Screen name="Profile" component={TODO} />
     </Tab.Navigator>
   )
 }
 
+const TODO = () => (
+  <View style={styles.todo}>
+    <Headline>TODO: - Root</Headline>
+  </View>
+)
+
 const styles = StyleSheet.create({
+  todo: {
+    flex: 1,
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center"
+  },
   container: {
     flexDirection: "row",
     position: "absolute",

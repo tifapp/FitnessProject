@@ -17,7 +17,7 @@ module.exports = {
     "<rootDir>/jest/setupExtensions.js",
     "<rootDir>/jest/setupLaunchArguments.js"
   ],
-  testPathIgnorePatterns: ["/node_modules/", "<rootDir>/roswaal/"],
+  testPathIgnorePatterns: ["/node_modules/"],
   transformIgnorePatterns: [
     "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|native-base|react-native-svg|@alessiocancian/react-native-actionsheet|@sentry/.*|node-fetch|data-uri-to-buffer|fetch-blob|formdata-polyfill|TiFShared)"
   ],
