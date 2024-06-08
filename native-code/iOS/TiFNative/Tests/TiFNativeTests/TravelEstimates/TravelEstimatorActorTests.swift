@@ -1,6 +1,6 @@
 import XCTest
 import MapKit
-import TiFTravelEstimates
+import TiFNative
 
 final class TravelEstimatorActorTests: XCTestCase {
   func testBasics() async throws {
