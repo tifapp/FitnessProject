@@ -26,6 +26,7 @@ import Animated, {
   FadeIn,
   LinearTransition
 } from "react-native-reanimated"
+import { useOpenWeblink } from "@modules/tif-weblinks"
 
 export type ContentTextCallbacks = {
   onUserHandleTapped: (handle: UserHandle) => void
@@ -38,11 +39,6 @@ export type ContentTextCallbacks = {
  */
 export type ContentTextProps = {
   text: string
-
-  /**
-   * Defaults to expo's `openURL` function.
-   */
-  onURLTapped?: (url: string) => void
 } & Omit<TextProps, "children"> &
   Omit<ContentTextCallbacks, "onURLTapped">
 
@@ -56,19 +52,21 @@ export const ContentText = ({
   text,
   onUserHandleTapped,
   onEventHandleTapped,
-  onURLTapped = openURL,
   ...props
-}: ContentTextProps) => (
-  <BodyText {...props} testID="regular-text">
-    {useTextBlocks(
-      text,
-      useMemo(
-        () => ({ onURLTapped, onEventHandleTapped, onUserHandleTapped }),
-        [onUserHandleTapped, onEventHandleTapped, onURLTapped]
-      )
-    )}
-  </BodyText>
-)
+}: ContentTextProps) => {
+  const onURLTapped = useOpenWeblink()
+  return (
+    <BodyText {...props} testID="regular-text">
+      {useTextBlocks(
+        text,
+        useMemo(
+          () => ({ onURLTapped, onEventHandleTapped, onUserHandleTapped }),
+          [onUserHandleTapped, onEventHandleTapped, onURLTapped]
+        )
+      )}
+    </BodyText>
+  )
+}
 
 const useTextBlocks = (text: string, callbacks: ContentTextCallbacks) => {
   return useMemo(() => renderLinkTextBlocks(text, callbacks), [text, callbacks])

@@ -6,12 +6,14 @@ import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import {
   AppearanceSettingsView,
-  BlockListSettingsView,
-  CalendarSettingsView,
+  RootSettingsView,
   useBlockListSettings
 } from "@settings-boundary"
 import { SettingsProvider } from "@settings-storage/Hooks"
-import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
+import {
+  LocalSettings,
+  SQLiteLocalSettingsStorage
+} from "@settings-storage/LocalSettings"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { TestHaptics } from "@test-helpers/Haptics"
@@ -23,6 +25,7 @@ import { RootSiblingParent } from "react-native-root-siblings"
 import { uuidString } from "@lib/utils/UUID"
 import { UserHandle } from "TiFShared/domain-models/User"
 import { UserSessionProvider } from "@user/Session"
+import { OpenWeblinkProvider, openWeblink } from "@modules/tif-weblinks"
 import { StoryMeta } from "../../HelperTypes"
 
 const SettingsMeta: StoryMeta = {
@@ -42,11 +45,32 @@ export const Basic = () => (
         isFeedbackSupportedOnDevice
       >
         <TestQueryClientProvider>
-          <NavigationContainer>
-            <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
-              <Stack.Screen name="Calendar" component={Test} />
-            </Stack.Navigator>
-          </NavigationContainer>
+          <OpenWeblinkProvider
+            open={async (url) =>
+              openWeblink(url, {
+                load: async () => {
+                  return {
+                    isUsingSafariReaderMode: true,
+                    preferredBrowserName: "in-app"
+                  } as LocalSettings
+                }
+              })
+            }
+          >
+            <UserSessionProvider
+              userSession={async () => {
+                throw new Error()
+              }}
+            >
+              <NavigationContainer>
+                <Stack.Navigator
+                  screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
+                >
+                  <Stack.Screen name="Settings" component={Test} />
+                </Stack.Navigator>
+              </NavigationContainer>
+            </UserSessionProvider>
+          </OpenWeblinkProvider>
         </TestQueryClientProvider>
       </HapticsProvider>
     </SafeAreaProvider>
@@ -93,7 +117,7 @@ const Test = () => {
         localSettingsStore={localStore}
         userSettingsStore={userStore}
       >
-        <CalendarSettingsView />
+        <AppearanceSettingsView />
       </SettingsProvider>
     </SafeAreaView>
   )
