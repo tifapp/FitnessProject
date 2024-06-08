@@ -8,7 +8,7 @@ import { baseTestPlacemark } from "@location/MockData"
 import "@test-helpers/Matchers"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { act, render, screen, waitFor } from "@testing-library/react-native"
-import { baseTestEventFormValues } from "./helpers"
+import { baseTestEventFormValues } from "./TestHelpers"
 
 const testLocation = baseTestEventFormValues.locationInfo.coordinates
 const testLocationName = baseTestPlacemark.name
