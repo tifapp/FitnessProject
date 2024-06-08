@@ -1,7 +1,7 @@
-import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { SearchBar } from "@components/SearchBar"
 import { useState } from "react"
 import { MaterialIcon } from "@components/common/Icons"
+import { StoryMeta } from ".storybook/HelperTypes"
 
 const PreviewSearchBar = () => {
   const [text, setText] = useState("")
@@ -16,13 +16,10 @@ const PreviewSearchBar = () => {
   )
 }
 
-const SearchBarMeta: ComponentMeta<typeof PreviewSearchBar> = {
-  title: "SearchBar",
-  component: PreviewSearchBar
+const SearchBarMeta: StoryMeta = {
+  title: "SearchBar"
 }
 
 export default SearchBarMeta
 
-type SearchBarStory = ComponentStory<typeof PreviewSearchBar>
-
-export const Default: SearchBarStory = () => <PreviewSearchBar />
+export const Default = () => <PreviewSearchBar />

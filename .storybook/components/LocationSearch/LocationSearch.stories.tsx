@@ -1,3 +1,4 @@
+import { StoryMeta } from ".storybook/HelperTypes"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 
@@ -15,14 +16,13 @@ import {
   useNavigation
 } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
-import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { repeatElements } from "TiFShared/lib/Array"
 import React from "react"
 import { Button } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
-const LocationSearchMeta: ComponentMeta<typeof SettingsScreen> = {
+const LocationSearchMeta: StoryMeta = {
   title: "Location Search Screen"
 }
 

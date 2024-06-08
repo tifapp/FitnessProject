@@ -12,7 +12,7 @@ import {
   EventFormTextField,
   EventFormToolbar,
   EventFormValues
-} from "../components/eventForm"
+} from "."
 
 export type EventFormScreenProps = {
   initialValues: EventFormValues

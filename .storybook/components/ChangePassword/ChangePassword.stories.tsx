@@ -1,3 +1,4 @@
+import { StoryMeta } from ".storybook/HelperTypes"
 import { ChangePasswordFormView, useChangePasswordForm } from "@auth-boundary"
 import {
   BASE_HEADER_SCREEN_OPTIONS,
@@ -12,14 +13,13 @@ import {
   useNavigation
 } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
-import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import React from "react"
 import { Button, View } from "react-native"
 import { RootSiblingParent } from "react-native-root-siblings"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 
-const ChangePasswordMeta: ComponentMeta<typeof SettingsScreen> = {
+const ChangePasswordMeta: StoryMeta = {
   title: "Change Password"
 }
 

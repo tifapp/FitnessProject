@@ -18,13 +18,8 @@
     "strictNullChecks": true,
     "plugins": [],
     "paths": {
-      "@screens/*": ["./screens/*"],
-      "@screens": ["./screens"],
       "@components/*": ["./components/*"],
-      "@stacks/*": ["./stacks/*"],
-      "@hooks/*": ["./hooks/*"],
       "@assets/*": ["./assets/*"],
-      "@graphql/*": ["./src/graphql/*"],
       "@lib/*": ["./lib/*"],
       "@auth-boundary/*": ["./auth-boundary/*"],
       "@auth-boundary": ["./auth-boundary"],
