@@ -2,7 +2,7 @@ import { EventFormValues } from "@components/eventForm"
 import { EventColors } from "@lib/events"
 import { HapticsProvider } from "@modules/tif-haptics"
 import { GeocodingFunctionsProvider } from "@location/Geocoding"
-import EventFormScreen from "@screens/EventFormScreen"
+import EventFormScreen from "@components/eventForm/EventFormScreen"
 import { QueryClient } from "@tanstack/react-query"
 import { captureAlerts } from "@test-helpers/Alerts"
 import { TestHaptics } from "@test-helpers/Haptics"
@@ -26,7 +26,7 @@ import {
   moveEventStartDate,
   pickEventColor,
   toggleShouldHideAfterStartDate
-} from "./helpers"
+} from "./TestHelpers"
 import { fakeTimers } from "@test-helpers/Timers"
 import { dateRange } from "TiFShared/domain-models/FixedDateRange"
 
@@ -180,7 +180,11 @@ const renderEventFormScreen = (
 ) => {
   render(
     <TestQueryClientProvider client={queryClient}>
-      <HapticsProvider isSupportedOnDevice={false} haptics={new TestHaptics()}>
+      <HapticsProvider
+        isFeedbackSupportedOnDevice={false}
+        isAudioSupportedOnDevice={false}
+        haptics={new TestHaptics()}
+      >
         <GeocodingFunctionsProvider reverseGeocode={neverPromise}>
           <EventFormScreen
             submissionLabel={testSubmissionLabel}

@@ -13,14 +13,14 @@ import {
   SignUpParamsList,
   createSignUpScreens
 } from "@core-root/navigation/auth/SignUp"
-import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { Button } from "react-native"
 import { ScrollView } from "react-native-gesture-handler"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { TiFAPI } from "TiFShared/api"
+import { StoryMeta } from ".storybook/HelperTypes"
 
-const SignUpMeta: ComponentMeta<typeof SettingsScreen> = {
+const SignUpMeta: StoryMeta = {
   title: "Sign Up"
 }
 
