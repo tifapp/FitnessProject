@@ -1,5 +1,5 @@
 import XCTest
-import TiFTravelEstimates
+import TiFNative
 import MapKit
 
 final class MapKitTravelEstimatesTests: XCTestCase {

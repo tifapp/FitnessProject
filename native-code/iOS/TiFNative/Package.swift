@@ -4,16 +4,16 @@
 import PackageDescription
 
 let package = Package(
-  name: "TiFTravelEstimates",
+  name: "TiFNative",
   platforms: [.iOS(.v13)],
   products: [
-    .library(name: "TiFTravelEstimates", targets: ["TiFTravelEstimates"])
+    .library(name: "TiFNative", targets: ["TiFNative"])
   ],
   targets: [
-    .target(name: "TiFTravelEstimates"),
+    .target(name: "TiFNative"),
     .testTarget(
-      name: "TiFTravelEstimatesTests",
-      dependencies: ["TiFTravelEstimates"]
+      name: "TiFNativeTests",
+      dependencies: ["TiFNative"]
     )
   ]
 )

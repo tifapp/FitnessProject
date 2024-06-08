@@ -1,21 +1,25 @@
 import React from "react"
-import { View, ImageStyle, StyleProp, StyleSheet } from "react-native"
+import { ImageStyle, StyleProp, StyleSheet } from "react-native"
+import { Image } from "expo-image"
 
 interface ProfileImageProps {
-  imageURL?: string
+  imageURL?: string | null
   style?: StyleProp<ImageStyle>
 }
 
-// TODO: - Async Image Library
+// TODO: - Placeholder
 
-const ProfileImage = ({ style }: ProfileImageProps) => (
-  <View style={[style, styles.image]} />
+const ProfileImage = ({ imageURL, style }: ProfileImageProps) => (
+  <Image
+    source={imageURL}
+    cachePolicy="memory-disk"
+    style={[style, styles.image]}
+  />
 )
 
 const styles = StyleSheet.create({
   image: {
-    borderRadius: 128,
-    backgroundColor: "grey"
+    borderRadius: 128
   }
 })
 
