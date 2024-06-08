@@ -34,7 +34,7 @@ describe("RoswaalClient tests", () => {
     )
     testCase2.appendAction(jest.fn())
     await client.run(testCase2, jest.fn())
-    await client.upload()
+    await client.uploadTestResultsIfAble()
     expect(uploadedResults).toEqual([
       {
         name: "Hello",
@@ -59,7 +59,7 @@ describe("RoswaalClient tests", () => {
     await expect(client.run(testCase, jest.fn())).rejects.toThrow(
       new Error("I died")
     )
-    await client.upload()
+    await client.uploadTestResultsIfAble()
     expect(uploadedResults).toEqual(
       expect.arrayContaining([
         {
@@ -82,7 +82,7 @@ describe("RoswaalClient tests", () => {
     )
     testCase.appendAction(jest.fn())
     client.run(testCase, jest.fn())
-    await client.upload()
+    await client.uploadTestResultsIfAble()
     expect(uploadedResults).toEqual([])
   })
 })

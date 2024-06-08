@@ -52,10 +52,10 @@ export class RoswaalClient {
    *
    * This should only need to be called in the global teardown.
    */
-  async upload() {
+  async uploadTestResultsIfAble() {
     if (!this.uploadURL) {
       console.warn(
-        "No roswaal upload URL specified, test results will not be uploaded. To specify an upload URL, set the ROSWAAL_UPLOAD_RESULTS_URL accordingly."
+        "🟡 No roswaal upload URL specified, test results will not be uploaded. To specify an upload URL, set the ROSWAAL_UPLOAD_RESULTS_URL accordingly."
       )
       return
     }
@@ -72,6 +72,7 @@ export class RoswaalClient {
       },
       body: JSON.stringify({ results: uploadableResults })
     })
+    console.log("✅ Uploaded test results to roswaal!")
   }
 }
 

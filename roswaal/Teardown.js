@@ -3,5 +3,5 @@ import detoxTeardown from "detox/runners/jest/globalTeardown"
 
 module.exports = async () => {
   await detoxTeardown()
-  await roswaalClient.upload()
+  await roswaalClient.uploadTestResultsIfAble()
 }
