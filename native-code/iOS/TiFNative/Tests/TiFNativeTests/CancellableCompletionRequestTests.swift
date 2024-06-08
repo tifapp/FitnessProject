@@ -1,6 +1,6 @@
 import XCTest
 import MapKit
-import TiFTravelEstimates
+import TiFNative
 
 final class CancellableCompletionRequestTests: XCTestCase {
   private final class TestRequest: CancellableCompletionRequest, Sendable {
