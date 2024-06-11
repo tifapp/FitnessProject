@@ -8,7 +8,7 @@ import qrcode from "qrcode"
 
 dotenv.config({ path: ".env.infra" })
 
-const outputChannel = "C01B7FFKDCP"
+const outputChannel = "C01BRGR9SHM"
 
 const action = process.argv[2]
 const checkRunName = "EAS Build"
@@ -284,7 +284,7 @@ const manageCheckRun = async (/** @type {string} */ action) => {
   }
   if (action === "create") {
     await sendMessageToSlack(
-      `A new build has started. ${checkRunName} will be finished at approximately *${getPredictedBuildTime()}*. See details at\n${buildLink}`
+      `A new development build has started. ${checkRunName} will be finished at approximately *${getPredictedBuildTime()}*. See details at\n${buildLink}\nCommit: ${process.env.GITHUB_SHA}`
     )
   }
 
