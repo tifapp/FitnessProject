@@ -1,4 +1,3 @@
-import "TiFShared"
 import "@lib/TiFAPI"
 import "date-time/DateRangeFormatting"
 import { TiFMenuProvider } from "@components/TiFMenuProvider"

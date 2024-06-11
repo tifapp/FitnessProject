@@ -1,4 +1,3 @@
-import "TiFShared"
 import "@lib/TiFAPI"
 import CustomStorybookUI from "./.ondevice/Storybook"
 
