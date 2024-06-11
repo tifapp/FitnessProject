@@ -4,12 +4,18 @@ import { HapticsProvider } from "@modules/tif-haptics"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
-import { RootSettingsView, useBlockListSettings } from "@settings-boundary"
+import {
+  AppearanceSettingsView,
+  RootSettingsView,
+  useBlockListSettings
+} from "@settings-boundary"
 import { SettingsProvider } from "@settings-storage/Hooks"
-import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
+import {
+  LocalSettings,
+  SQLiteLocalSettingsStorage
+} from "@settings-storage/LocalSettings"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
-import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { TestHaptics } from "@test-helpers/Haptics"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { testSQLite } from "@test-helpers/SQLite"
@@ -19,19 +25,18 @@ import { RootSiblingParent } from "react-native-root-siblings"
 import { uuidString } from "@lib/utils/UUID"
 import { UserHandle } from "TiFShared/domain-models/User"
 import { UserSessionProvider } from "@user/Session"
+import { OpenWeblinkProvider, openWeblink } from "@modules/tif-weblinks"
+import { StoryMeta } from "../../HelperTypes"
 
-const SettingsMeta: ComponentMeta<typeof SettingsScreen> = {
-  title: "Settings Screen",
-  component: SettingsScreen
+const SettingsMeta: StoryMeta = {
+  title: "Settings Screen"
 }
 
 export default SettingsMeta
 
-type SettingsStory = ComponentStory<typeof SettingsScreen>
-
 const Stack = createStackNavigator()
 
-export const Basic: SettingsStory = () => (
+export const Basic = () => (
   <RootSiblingParent>
     <SafeAreaProvider>
       <HapticsProvider
@@ -40,19 +45,32 @@ export const Basic: SettingsStory = () => (
         isFeedbackSupportedOnDevice
       >
         <TestQueryClientProvider>
-          <UserSessionProvider
-            userSession={async () => {
-              throw new Error()
-            }}
+          <OpenWeblinkProvider
+            open={async (url) =>
+              openWeblink(url, {
+                load: async () => {
+                  return {
+                    isUsingSafariReaderMode: true,
+                    preferredBrowserName: "in-app"
+                  } as LocalSettings
+                }
+              })
+            }
           >
-            <NavigationContainer>
-              <Stack.Navigator
-                screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
-              >
-                <Stack.Screen name="Settings" component={Test} />
-              </Stack.Navigator>
-            </NavigationContainer>
-          </UserSessionProvider>
+            <UserSessionProvider
+              userSession={async () => {
+                throw new Error()
+              }}
+            >
+              <NavigationContainer>
+                <Stack.Navigator
+                  screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
+                >
+                  <Stack.Screen name="Settings" component={Test} />
+                </Stack.Navigator>
+              </NavigationContainer>
+            </UserSessionProvider>
+          </OpenWeblinkProvider>
         </TestQueryClientProvider>
       </HapticsProvider>
     </SafeAreaProvider>
@@ -99,10 +117,7 @@ const Test = () => {
         localSettingsStore={localStore}
         userSettingsStore={userStore}
       >
-        <BlockListSettingsView
-          state={state}
-          onUserProfileTapped={console.log}
-        />
+        <AppearanceSettingsView />
       </SettingsProvider>
     </SafeAreaView>
   )

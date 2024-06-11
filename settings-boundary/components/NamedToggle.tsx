@@ -1,6 +1,6 @@
-import { Footnote, Headline } from "@components/Text"
 import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
 import { SettingsSwitchView } from "./Switch"
+import { SettingsLabelView } from "./Label"
 
 export type SettingsNamedToggleProps = {
   name: string
@@ -19,12 +19,11 @@ export const SettingsNamedToggleView = ({
 }: SettingsNamedToggleProps) => (
   <View style={style}>
     <View style={styles.container}>
-      <View style={styles.label}>
-        <Headline>{name}</Headline>
-        {description && (
-          <Footnote style={styles.description}>{description}</Footnote>
-        )}
-      </View>
+      <SettingsLabelView
+        title={name}
+        description={description}
+        style={styles.label}
+      />
       <SettingsSwitchView isOn={isOn} onIsOnChange={onIsOnChange} />
     </View>
   </View>
@@ -39,10 +38,6 @@ const styles = StyleSheet.create({
     padding: 16
   },
   label: {
-    flex: 1,
     rowGap: 4
-  },
-  description: {
-    opacity: 0.5
   }
 })

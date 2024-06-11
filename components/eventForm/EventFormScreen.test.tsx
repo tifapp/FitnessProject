@@ -1,0 +1,215 @@
+import { EventFormValues } from "@components/eventForm"
+import { EventColors } from "@lib/events"
+import { HapticsProvider } from "@modules/tif-haptics"
+import { GeocodingFunctionsProvider } from "@location/Geocoding"
+import EventFormScreen from "@components/eventForm/EventFormScreen"
+import { QueryClient } from "@tanstack/react-query"
+import { captureAlerts } from "@test-helpers/Alerts"
+import { TestHaptics } from "@test-helpers/Haptics"
+import { neverPromise } from "@test-helpers/Promise"
+import {
+  TestQueryClientProvider,
+  createTestQueryClient
+} from "@test-helpers/ReactQuery"
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor
+} from "@testing-library/react-native"
+import {
+  attemptDismiss,
+  baseTestEventFormValues,
+  editEventDescription,
+  editEventTitle,
+  moveEventEndDate,
+  moveEventStartDate,
+  pickEventColor,
+  toggleShouldHideAfterStartDate
+} from "./TestHelpers"
+import { fakeTimers } from "@test-helpers/Timers"
+import { dateRange } from "TiFShared/domain-models/FixedDateRange"
+
+const testLocation = { latitude: 45.0, longitude: -121.0 }
+
+const queryClient = createTestQueryClient()
+
+describe("EventFormScreen tests", () => {
+  beforeEach(() => {
+    jest.resetAllMocks()
+    queryClient.clear()
+  })
+
+  fakeTimers()
+
+  it("should be able to edit and submit a form with a preselected location", async () => {
+    renderEventFormScreen(queryClient, {
+      ...baseTestEventFormValues,
+      locationInfo: { coordinates: testLocation }
+    })
+    moveEventStartDate(new Date(0))
+    moveEventEndDate(new Date(1))
+    toggleShouldHideAfterStartDate(false)
+    editEventTitle(editedTitle)
+    editEventDescription("Hello world this is a test!")
+    pickEventColor("Blue")
+    submit()
+
+    await waitFor(() => {
+      expect(submitAction).toHaveBeenCalledWith({
+        title: editedTitle,
+        description: "Hello world this is a test!",
+        dateRange: dateRange(new Date(0), new Date(1)),
+        color: EventColors.Blue,
+        coordinates: testLocation,
+        radiusMeters: 0,
+        shouldHideAfterStartDate: false
+      })
+    })
+  })
+
+  it("should present an error alert when a submission error occurs", async () => {
+    submitAction.mockRejectedValue(new Error())
+    renderEventFormScreen(queryClient, baseTestEventFormValues)
+    editEventDescription("Nice")
+    submit()
+
+    await waitFor(() => expect(alertPresentationSpy).toHaveBeenCalled())
+  })
+
+  it("should be able to be dismissed", () => {
+    renderEventFormScreen(queryClient, baseTestEventFormValues)
+    attemptDismiss()
+    expect(dismissAction).toHaveBeenCalled()
+  })
+
+  it("gives a confirmation alert when attempting to dismiss after making edits to the form", () => {
+    renderEventFormScreen(queryClient, baseTestEventFormValues)
+    toggleShouldHideAfterStartDate(true)
+    editEventDescription("Hello world this is a test!")
+    pickEventColor("Green")
+    attemptDismiss()
+
+    expect(dismissAction).not.toHaveBeenCalled()
+    expect(alertPresentationSpy).toHaveBeenCalled()
+  })
+
+  it("should allow dismissing the confirmation alert without dismissing the form", async () => {
+    renderEventFormScreen(queryClient, baseTestEventFormValues)
+    editEventTitle(editedTitle)
+    attemptDismiss()
+    await dismissConfirmationAlert()
+
+    expect(dismissAction).not.toHaveBeenCalled()
+  })
+
+  it("should be able to dismiss the form from the confirmation alert", async () => {
+    renderEventFormScreen(queryClient, baseTestEventFormValues)
+    editEventTitle(editedTitle)
+    attemptDismiss()
+    await dismissFormFromConfirmationAlert()
+    await waitFor(() => {
+      expect(dismissAction).toHaveBeenCalled()
+    })
+  })
+
+  it("should not be able to submit initial form content", async () => {
+    renderEventFormScreen(queryClient, baseTestEventFormValues)
+    await waitFor(() => expect(canSubmit()).toEqual(false))
+  })
+
+  it("cannot submit form with an empty title", async () => {
+    renderEventFormScreen(queryClient, {
+      ...baseTestEventFormValues,
+      title: ""
+    })
+    await waitFor(() => expect(canSubmit()).toEqual(false))
+  })
+
+  it("cannot submit form with no location", async () => {
+    renderEventFormScreen(queryClient, {
+      ...baseTestEventFormValues,
+      locationInfo: undefined
+    })
+    await waitFor(() => expect(canSubmit()).toEqual(false))
+  })
+
+  it("should not allow submissions when in process of submitting current form", async () => {
+    submitAction.mockImplementation(neverPromise)
+    renderEventFormScreen(queryClient, baseTestEventFormValues)
+    editEventTitle(editedTitle)
+    submit()
+    await waitFor(() => expect(canSubmit()).toEqual(false))
+  })
+
+  it("should make the description undefined when empty in submisssion", async () => {
+    renderEventFormScreen(queryClient, {
+      ...baseTestEventFormValues,
+      description: ""
+    })
+    editEventTitle(editedTitle)
+    submit()
+    await waitFor(() => {
+      expect(submitAction).toHaveBeenCalledWith(
+        expect.objectContaining({ description: undefined })
+      )
+    })
+  })
+
+  /* it("should re-enable submissions after current submission finishes", async () => {
+    submitAction.mockImplementation(Promise.resolve)
+    renderEventFormScreen(queryClient, baseTestEventFormValues)
+    editEventTitle(editedTitle)
+    submit()
+    await waitFor(() => expect(canSubmit()).toEqual(true))
+  }) */
+})
+
+const editedTitle = "Test title"
+
+const { alertPresentationSpy, tapAlertButton } = captureAlerts()
+
+const testSubmissionLabel = "Test Submit"
+
+const submitAction = jest.fn()
+const dismissAction = jest.fn()
+
+const renderEventFormScreen = (
+  queryClient: QueryClient,
+  values: EventFormValues
+) => {
+  render(
+    <TestQueryClientProvider client={queryClient}>
+      <HapticsProvider
+        isFeedbackSupportedOnDevice={false}
+        isAudioSupportedOnDevice={false}
+        haptics={new TestHaptics()}
+      >
+        <GeocodingFunctionsProvider reverseGeocode={neverPromise}>
+          <EventFormScreen
+            submissionLabel={testSubmissionLabel}
+            initialValues={values}
+            onSubmit={submitAction}
+            onDismiss={dismissAction}
+          />
+        </GeocodingFunctionsProvider>
+      </HapticsProvider>
+    </TestQueryClientProvider>
+  )
+}
+
+const submit = () => {
+  fireEvent.press(screen.getByText(testSubmissionLabel))
+}
+
+const canSubmit = () => {
+  return !screen.getByText(testSubmissionLabel).props.disabled
+}
+
+const dismissConfirmationAlert = async () => {
+  await tapAlertButton("Keep Editing")
+}
+
+const dismissFormFromConfirmationAlert = async () => {
+  await tapAlertButton("Discard")
+}

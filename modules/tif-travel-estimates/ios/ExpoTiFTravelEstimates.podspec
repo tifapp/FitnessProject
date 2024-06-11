@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.static_framework = true
 
   s.dependency 'ExpoModulesCore'
-  s.dependency 'TiFTravelEstimates', '~> 1.0.0'
+  s.dependency 'TiFNative', '~> 1.0.0'
 
   # Swift/Objective-C compatibility
   s.pod_target_xcconfig = {
