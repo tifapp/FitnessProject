@@ -116,7 +116,7 @@ const ContactInfoSectionView = ({
   <>
     <SettingsCardSectionView
       title="Contact Info"
-      subtitle="Your contact info is not shared with anyone unless you explicity share it with others."
+      subtitle="Your contact information is only shared with people you explicitly select."
     >
       <View style={styles.contactInfoContainer}>
         <Headline>{userContactInfo.formattedContactInfoType}</Headline>
