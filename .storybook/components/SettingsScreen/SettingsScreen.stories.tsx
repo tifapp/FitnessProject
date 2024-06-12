@@ -6,6 +6,7 @@ import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import {
   AppearanceSettingsView,
+  BlockListSettingsView,
   RootSettingsView,
   useBlockListSettings
 } from "@settings-boundary"

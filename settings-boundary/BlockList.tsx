@@ -45,9 +45,13 @@ export type UseBlockListSettingsEnvironment = {
 export const BLOCK_LIST_SETTINGS_ALERTS = {
   unblockUserConfirmation: {
     title: (username: string) => `Unblock ${username}?`,
-    description: (user: Pick<BlockListUser, "username" | "handle">) => {
-      return `Do you really want to unblock ${user.username} (${user.handle}). You won't be able to block them for another 48 hours.`
-    },
+    description: (
+      user: Pick<BlockListUser, "username" | "handle">
+    ) => `Are you sure you want to unblock ${user.username} (${user.handle})? You will need to wait 48 hours to block them again.
+
+    They will be able to view your profile and see your activity, including the events you attend.
+
+    You can continue to report them for any inappropriate behavior.`,
     buttons: (cancel: () => void, unblock: () => void) => [
       {
         text: "Cancel",
