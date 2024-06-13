@@ -1,9 +1,8 @@
 import { AppStyles } from "@lib/AppColorStyle"
-import { StyleProp, StyleSheet, ViewStyle } from "react-native"
-import { SettingsButton } from "./components/Button"
+import { StyleProp, ViewStyle } from "react-native"
+import { SettingsNavigationLinkView } from "./components/NavigationLink"
 import { SettingsScrollView } from "./components/ScrollView"
 import { SettingsSectionView } from "./components/Section"
-import { SettingsToggleCardView } from "./components/ToggleCard"
 
 export type EventSettingsProps = {
   style?: StyleProp<ViewStyle>
@@ -33,7 +32,7 @@ type PresetSectionProps = {
   onRequestFeatureTapped: () => void
 }
 
-const HelpSectionView = ({
+export const HelpSectionView = ({
   onViewHelpTapped,
   onReportBugTapped,
   onRequestFeatureTapped
@@ -44,39 +43,30 @@ const HelpSectionView = ({
         title="Help Center"
         subtitle="This is the hub for any help you may want, or reports or feedback you might have about the app."
       >
-        <SettingsButton>{"View Help Center"}</SettingsButton>
+        <SettingsNavigationLinkView
+          title={"View Help Center"}
+          onTapped={onViewHelpTapped}
+          iconName={"link"}
+          iconBackgroundColor={AppStyles.yellow}
+        />
       </SettingsSectionView>
-      <SettingsToggleCardView
-        title="Location While Not Using the App"
-        description="Your location is used to detect when you arrive at events when the app is not open."
-        iconName="golf"
-        iconBackgroundColor={AppStyles.purple}
-        isOn={permissions.backgroundLocation.isGranted}
-        onToggleTappedWithoutIsOnChange={
-          permissions.backgroundLocation.onToggled
-        }
-      />
-      <SettingsToggleCardView
-        title="Notifications"
-        description="Receive notifications about the events you attend and much more!"
-        iconName="notifications"
-        iconBackgroundColor={AppStyles.orange}
-        isOn={permissions.notifications.isGranted}
-        onToggleTappedWithoutIsOnChange={permissions.notifications.onToggled}
-      />
+      <SettingsSectionView
+        title="Contact Us"
+        subtitle="Feel free to talk to us about anything you might be feeling about the app!"
+      >
+        <SettingsNavigationLinkView
+          title={"Report a Bug"}
+          onTapped={onReportBugTapped}
+          iconName={"link"}
+          iconBackgroundColor={AppStyles.yellow}
+        />
+        <SettingsNavigationLinkView
+          title={"Request a Feature"}
+          onTapped={onRequestFeatureTapped}
+          iconName={"link"}
+          iconBackgroundColor={AppStyles.yellow}
+        />
+      </SettingsSectionView>
     </SettingsSectionView>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "white",
-    borderColor: "black"
-  },
-  cardDuration: {
-    color: AppStyles.darkColor
-  },
-  settingsSection: {
-    flexWrap: "wrap"
-  }
-})
